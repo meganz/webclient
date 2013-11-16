@@ -1,4 +1,4 @@
-newfm
+MEGA Web client
 =====
 
-Private development of the new MEGA File Manager.
+

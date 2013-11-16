@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.9.2.custom.min.js"></script>
+<script type="text/javascript" src="js/checkboxes.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+   $(document).ready(function() {
+	  // Demo of checkbox
+	  $('.reg-checkbox :checkbox').iphoneStyle({ resizeContainer: false, resizeHandle: false, onChange: 
+	     function(elem, data) 
+		 {
+		    if(data)
+			{
+				$('#month').addClass('red');
+		        $('#year').removeClass('red');
+				$('.reg-st3-save-icon').addClass('hidden');
+				$('.pro-new-year').addClass('hidden');
+				$('.pro-new-month').removeClass('hidden');
+		    } 
+			else 
+			{
+				$('#month').removeClass('red');
+		        $('#year').addClass('red');
+				$('.reg-st3-save-icon').removeClass('hidden');
+				$('.pro-new-year').removeClass('hidden');
+				$('.pro-new-month').addClass('hidden');
+			}
+		 } 
+	   });
+	   //Demo of scrolling
+	   function initMainScroll() 
+       {
+	      $('.main-scroll-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});	
+       }
+	   initMainScroll();
+	   $(window).bind('resize.icon', function () 
+	   {
+		initMainScroll();
+       });
+	   
+	   	
+   });
+</script>
+
+
+
+</head>
+
+<body class="new-startpage">
+<div id="pageholder" style="display:none;"></div>
+
+<div id="nstartholder" class="fmholder">
+
+  <!-- Add scrolling to this block please !-->
+  <div class="main-scroll-block">
+   <div class="main-pad-block">
+      <div class="top-head"> 
+        <a class="logo"></a> 
+        <a class="top-menu-icon"></a> 
+        <a class="create-account-button"> Create Account </a> 
+        <a class="top-login-button"> Login </a> 
+      </div> 
+      
+    
+      <div class="main-mid-pad">
+         
+            <div class="reg-st3-top-txt-block">
+               <h3 class="main-italic-header">Take full advantage of MEGA with <span class="red">Pro Accounts</span></h3>
+               <div class="reg-st3-txt"><span class="red">Get 2 months free</span> if you choose an annual subscription on a PRO account</div>
+            </div>
+            <div class="reg-st3-right-checkbox-block">
+              <div class="reg-st3-checkbox-label" id="month">
+                Monthly
+              </div>
+              <div class="on_off reg-checkbox">
+                <input type="checkbox" id="reg-checkbox" checked="checked" />
+              </div>
+              <div class="reg-st3-checkbox-label red" id="year">
+                 Annually
+              </div>
+              <div class="clear"></div>
+            </div>
+            <div class="clear"></div>  
+      </div>
+      
+      <div class="pro-gray-block">
+          <div class="main-mid-pad">
+             <div class="pro-mid-header">Choose your Pro package</div>
+             <div class="register-st3-main-bl">
+               <div class="reg-st3-membership-bl pro1 selected">
+                    <div class="reg-st3-membership-icon"></div>
+                    <div class="reg-st3-storage">
+                        <div class="reg-st3-big-txt">500 <span>GB</span></div>
+                        <div class="reg-st3-mid-txt">Storage</div>
+                    </div>
+                    <div class="reg-st3-bandwidth">
+                        <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                        <div class="reg-st3-mid-txt">Bandwidth</div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="reg-st3-button">
+                        <div class="reg-st3-bott-title left">PRO I</div>
+                        <div class="reg-st3-bott-title right">99<span>.99 €</span></div>
+                        <div class="clear"></div>
+                    </div>
+               </div>
+               <div class="reg-st3-membership-bl pro2">
+                    <div class="pro-recommended"></div>
+                    <div class="reg-st3-membership-icon"></div>
+                    <div class="reg-st3-storage">
+                        <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                        <div class="reg-st3-mid-txt">Storage</div>
+                    </div>
+                    <div class="reg-st3-bandwidth">
+                        <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                        <div class="reg-st3-mid-txt">Bandwidth</div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="reg-st3-button">
+                        <div class="reg-st3-bott-title left">PRO II</div>
+                        <div class="reg-st3-bott-title right">199<span>.99 €</span></div>
+                        <div class="clear"></div>
+                    </div>
+               </div>
+               <div class="reg-st3-membership-bl pro3">
+                    <div class="reg-st3-membership-icon"></div>
+                    <div class="reg-st3-storage">
+                        <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                        <div class="reg-st3-mid-txt">Storage</div>
+                    </div>
+                    <div class="reg-st3-bandwidth">
+                        <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                        <div class="reg-st3-mid-txt">Bandwidth</div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="reg-st3-button">
+                        <div class="reg-st3-bott-title left">PRO III</div>
+                        <div class="reg-st3-bott-title right">299<span>.99 €</span></div>
+                        <div class="clear"></div>
+                    </div>
+               </div>
+               <div class="clear"></div>
+               <div class="reg-st3-save-icon hidden">
+                   <div class="reg-st3-save-txt">save</div>
+                   <div class="reg-st3-percents">17 %</div>
+               </div>
+               <div class="register-st2-button active">
+                 <div class="register-st2-button-arrow">
+                    Buy Now
+                 </div>
+               </div>
+               <div class="clear"></div>
+            </div>
+          </div>
+      </div>
+      
+      <div class="main-mid-pad pro-icons-pad">
+        <div class="pro-icons-block storage">
+           Massive storage space
+        </div>
+        <div class="pro-icons-block star">
+           <div class="pro-star-button">
+             from
+           </div>
+           <div class="pro-price-txt">
+              8<span class="mid-txt">.33 €</span> <span class="small-txt">/month</span>
+           </div>
+           <div class="pro-star-txt">
+             (yearly subscription)
+           </div>
+        </div>
+        <div class="pro-icons-block bandwidth">
+          Generous bandwidth quota
+        </div>
+        <div class="clear"></div>
+      </div>
+      
+      <div class="pro-bottom-block">
+          <div class="main-mid-pad">
+             <div class="pro-bottom-button">
+                  Contact us
+             </div>
+             <div class="pro-bottom-icon-block">
+                <div class="pro-bottom-header">Do you have any question about <span class="red">Pro accounts</span>?</div>
+                <div class="pro-bottom-txt">Our support team will be glad to provide you with any answer you may have</div>
+             </div>
+          </div>
+      </div>
+    
+      <div class="nw-bottom-block">
+        <div class="nw-bottom-pad">
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">MEGA</div>
+            <div class="nw-bottom-link">About Us</div>
+            <div class="nw-bottom-link">The Privacy Company</div>
+            <div class="nw-bottom-link">Blog</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">APPS</div>
+            <div class="nw-bottom-link">Android App</div>
+            <div class="nw-bottom-link">Chrome App</div>
+            <div class="nw-bottom-link">iOS App</div>
+            <div class="nw-bottom-link">Windows Sync Client</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">SUPPORT</div>
+            <div class="nw-bottom-link">Help</div>
+            <div class="nw-bottom-link">Contact Us</div>
+            <div class="nw-bottom-link">Site Map</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">DEVELOPERS</div>
+            <div class="nw-bottom-link">SDK</div>
+            <div class="nw-bottom-link">Documentation</div>
+            <div class="nw-bottom-link">Affiliate Program</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">LEGAL &amp; POLICIES</div>
+            <div class="nw-bottom-link">Terms of Service</div>
+            <div class="nw-bottom-link">Privacy Policy</div>
+            <div class="nw-bottom-link">Copyright</div>
+            <div class="nw-bottom-link">Takedown Guidance</div>
+          </div>
+          <div class="nw-start-nz"></div>
+          <div class="clear"></div>
+        </div>
+        <div class="nw-bottom-pad-with-border">
+          <div class="nw-bottom-copyrigths"> Mega Limited 2013 <span>All rights reserved</span> </div>
+          <div class="nw-bottom-social facebook"></div>
+          <div class="nw-bottom-social twitter"></div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    
+  </div>
+</div>
+
+</body>
+</html>

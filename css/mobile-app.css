@@ -1,0 +1,1446 @@
+@charset "UTF-8";
+html {
+	height: 100%;
+	font-size: 75%;
+	color: #000;
+	width: 100%;
+	overflow: hidden;
+}
+@font-face {
+	font-family: 'Open Sans';
+	src: url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.eot');
+	src: url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.woff') format('woff'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.ttf') format('truetype'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.svg#open_sansregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Open Sans Semibold';
+	src: url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.eot');
+	src: url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.woff') format('woff'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.ttf') format('truetype'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.svg#open_sanssemibold') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Open Sans Semibold Italic";
+	src: url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.eot?") format("eot"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.woff") format("woff"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.ttf") format("truetype"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic.svg#OpenSans-SemiboldItalic") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+body {
+	margin: 0;
+	-webkit-text-size-adjust: 100%;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	background-position: left top;
+	background-repeat: repeat;
+	overflow: hidden;
+}
+a, a:link, a:visited, a:hover, a:active {
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	outline: none;
+	text-decoration: none;
+}
+a, a:focus img, a:focus img {
+	outline: none;
+}
+.red {
+	color: #D8280B;
+}
+.bold {
+	font-weight: bold;
+}
+.clear {
+	clear: both;
+	margin: 0;
+	padding: 0;
+	display: block;
+}
+img {
+	border: 0;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.hidden {
+	display: none;
+}
+.new-folder-popup {
+	position: absolute;
+	width: 90%;
+	left: 50%;
+	top: 50%;
+	margin: -155px 0 0 -45%;
+	border-radius: 14px;
+	-moz-border-radius: 14px;
+	-webkit-border-radius: 14px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	background-color: #d8d8d8;
+	z-index: 201;
+	-moz-box-shadow: 0 1px 5px -2px #000;
+	-webkit-box-shadow: 0 1px 4px -2px #000;
+	box-shadow: 0 1px 5px -2px #000;
+	padding: 5px;
+}
+.new-folder-popup-bg {
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	background-color: #d8d8d8;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/menu-bg2.jpg);
+}
+.new-folder-header {
+	font-size: 2.4em;
+	color: white;
+	text-align: center;
+	line-height: 60px;
+	padding-top: 2px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.new-folder-main-bg {
+	border-top: 1px solid #525252;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	background: #494949;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzQ5NDk0OSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyZjJmMmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #494949 0%, #2f2f2f 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #494949), color-stop(100%, #2f2f2f));
+	background: -webkit-linear-gradient(top, #494949 0%, #2f2f2f 100%);
+	background: -o-linear-gradient(top, #494949 0%, #2f2f2f 100%);
+	background: -ms-linear-gradient(top, #494949 0%, #2f2f2f 100%);
+	background: linear-gradient(to bottom, #494949 0%, #2f2f2f 100%);
+	-webkit-border-bottom-left-radius: 10px;
+	-moz-border-radius-bottomleft: 10px;
+	border-bottom-left-radius: 10px;
+	-webkit-border-bottom-right-radius: 10px;
+	-moz-border-radius-bottomright: 10px;
+	border-bottom-right-radius: 10px;
+	padding-bottom: 18px;
+}
+.new-folder-descr {
+	font-size: 1.7em;
+	color: white;
+	text-align: center;
+	line-height: 1.9em;
+	padding: 16px 16px 5px 16px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.new-folder-input.left-button {
+	margin: 18px 0 0 15px;
+	float: left;
+	width: 46%;
+}
+.new-folder-input.right-button {
+	margin: 18px 15px 0 0;
+	float: right;
+	width: 46%;
+}
+.add-popup-but-bg1, .new-folder-bg1 {
+	display: block;
+	background: #0f0f0f;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzBmMGYwZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyMDIwMjAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #0f0f0f 0%, #202020 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #0f0f0f), color-stop(100%, #202020));
+	background: -webkit-linear-gradient(top, #0f0f0f 0%, #202020 100%);
+	background: -o-linear-gradient(top, #0f0f0f 0%, #202020 100%);
+	background: -ms-linear-gradient(top, #0f0f0f 0%, #202020 100%);
+	background: linear-gradient(to bottom, #0f0f0f 0%, #202020 100%);
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	padding: 5px;
+}
+.add-popup-but-bg2, .new-folder-bg2 {
+	display: block;
+	background: #babab9;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2JhYmFiOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM0YjRiNGIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #babab9 0%, #4b4b4b 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #babab9), color-stop(100%, #4b4b4b));
+	background: -webkit-linear-gradient(top, #babab9 0%, #4b4b4b 100%);
+	background: -o-linear-gradient(top, #babab9 0%, #4b4b4b 100%);
+	background: -ms-linear-gradient(top, #babab9 0%, #4b4b4b 100%);
+	background: linear-gradient(to bottom, #babab9 0%, #4b4b4b 100%);
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	text-align: center;
+	color: white;
+	font-size: 2.4em;
+	line-height: 60px;
+}
+.overlay {
+	background: black;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNzUlIj4KICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM3YzdjN2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9IjEiLz4KICA8L3JhZGlhbEdyYWRpZW50PgogIDxyZWN0IHg9Ii01MCIgeT0iLTUwIiB3aWR0aD0iMTAxIiBoZWlnaHQ9IjEwMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-radial-gradient(center, ellipse cover, #7c7c7c 0%, #000000 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #7c7c7c), color-stop(100%, #000000));
+	background: -webkit-radial-gradient(center, ellipse cover, #7c7c7c 0%, #000000 100%);
+	background: -o-radial-gradient(center, ellipse cover, #7c7c7c 0%, #000000 100%);
+	background: -ms-radial-gradient(center, ellipse cover, #7c7c7c 0%, #000000 100%);
+	background: radial-gradient(ellipse at center, #7c7c7c 0%, #000000 100%);
+	position: absolute;
+	z-index: 200;
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+	width: 100%;
+	height: inherit;
+}
+.bottom-menu {
+	height: 80px;
+	background-color: #EEEEEE;
+	background-repeat: repeat-x;
+	background-size: 1px 81px;
+	display: block;
+	position: static;
+	bottom: 0;
+	width: 100%;
+	display: block;
+	margin: 60px 0 0 0;
+}
+.bottom-left-link {
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size: 1.5em;
+	line-height: 30px;
+	color: #585858;
+	text-align: center;
+	float: left;
+	margin: 24px 0 0 18px;
+	display: block;
+}
+.empty {
+	min-height: 320px;
+}
+.language-block {
+	float: right;
+	margin: 24px 20px 0 0;
+	display: block;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/bottom_nw_sprite@2x.png);
+	background-position: right -313px;
+	background-repeat: no-repeat;
+	background-size: 44px 443px;
+}
+.select-box {
+	display: block;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/bottom_nw_sprite@2x.png);
+	background-position: left -254px;
+	background-repeat: no-repeat;
+	background-size: 44px 443px;
+	position: relative;
+	height: 30px;
+}
+span.select-txt {
+	padding: 0 26px 0 26px;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size: 1.5em;
+	line-height: 30px;
+	color: #585858;
+	display: block;
+	z-index: 87;
+}
+.android-not-chrome .bottom-left-link, .android-not-chrome span.select-txt {
+	padding-top: 2px;
+}
+.select-box select {
+	border: 0;
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size: 1.1em;
+	line-height: 1.9em;
+	color: #585858;
+	padding: 0;
+	position: absolute;
+	width: 100%;
+	z-index: 88;
+	left: 0;
+	top: 0;
+	padding-left: 15px;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	height: 34px;
+	left: 0;
+	top: 0;
+}
+.main-scroll-block {
+	height: 100%;
+	overflow-y: scroll;
+	-webkit-overflow-scrolling: touch;
+	width: 100%;
+	position: absolute;
+	z-index: 10;
+}
+.top-gradient {
+	height: 50px;
+	width: 100%;
+	background: #d0d0d0;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QwZDBkMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #d0d0d0 0%, #ffffff 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d0d0d0), color-stop(100%, #ffffff));
+	background: -webkit-linear-gradient(top, #d0d0d0 0%, #ffffff 100%);
+	background: -o-linear-gradient(top, #d0d0d0 0%, #ffffff 100%);
+	background: -ms-linear-gradient(top, #d0d0d0 0%, #ffffff 100%);
+	background: linear-gradient(to bottom, #d0d0d0 0%, #ffffff 100%);
+	position: absolute;
+}
+.free-green-tip {
+	height: 136px;
+	width: 136px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/en/free.png);
+	background-position: left top;
+	background-repeat: no-repeat;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 10;
+}
+.main-centered-bl {
+	width: 100%;
+	padding: 70px 0 30px 0;
+	position: relative;
+}
+.main-logo {
+	width: 150px;
+	height: 150px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-android.png);
+	background-position: left top;
+	background-repeat: no-repeat;
+	margin: 0 auto 0 auto;
+}
+.ios .main-logo, .another-os .main-logo {
+	width: 116px;
+	height: 116px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-ios.png);
+}
+.main-head-txt {
+	padding: 55px 20px 0 20px;
+	text-align: center;
+	font-size: 1.5em;
+	line-height: 1.5em;
+	color: #333333;
+}
+.ios .main-head-txt, .another-os .main-head-txt {
+	padding: 65px 20px 0 20px;
+	font-size: 1.6em;
+}
+.main-txt {
+	font-size: 1.3em;
+	color: #666666;
+	line-height: 1.5em;
+	text-align: center;
+	padding: 25px 20px 50px 20px;
+}
+.ios .main-txt, .another-os .main-txt {
+	line-height: 1.6em;
+}
+.main-button {
+	display: block;
+	width: 205px;
+	height: 60px;
+	margin: 0 auto;
+	border: 3px solid #b2b2b2;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-android.png);
+	background-position: 13px -271px;
+	background-repeat: no-repeat;
+	box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.ios .main-button, .another-os .main-button {
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-ios.png);
+	background-position: 33px -203px;
+}
+.unsupported .main-button {
+	display: none;
+}
+.main-content-block {
+	min-height: 100%;
+	position: relative;
+}
+.main-social {
+	width: 104px;
+	height: 32px;
+	margin: 0 auto;
+	display: none;
+}
+.unsupported .main-social {
+	display: block;
+}
+.main-social-icon {
+	width: 32px;
+	height: 32px;
+	display: block;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-social.png);
+	background-position: left top;
+	background-repeat: no-repeat;
+}
+.main-social-icon.facebook {
+	background-position: left top;
+	float: left;
+}
+.main-social-icon.twitter {
+	background-position: right top;
+	float: right;
+}
+.full-mode .main-content-block {
+	min-height: 20px;
+}
+.scrolling-panel {
+	position: absolute;
+	display: block;
+	width: 100%;
+	bottom: 0;
+	height: 60px;
+	background-color: #2c2b2a;
+	text-align: center;
+	z-index: 20;
+}
+.full-mode .scrolling-panel {
+	position: fixed;
+	top: 0;
+	bottom: auto;
+}
+.scrolling-link {
+	display: inline-block;
+	line-height: 58px;
+	padding: 0 20px;
+	height: 60px;
+	font-size: 1.3em;
+	color: white;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-full.png);
+	background-position: center -30px;
+	background-repeat: no-repeat;
+}
+.scroll-to-top {
+	display: none;
+	background-position: center 10px;
+}
+.full-mode .scroll-to-top {
+	display: inline-block;
+}
+.full-mode .scroll-to-bottom {
+	display: none;
+}
+.scrolling-content {
+	display: none;
+}
+.full-mode .scrolling-content {
+	display: block;
+}
+.mid-logo {
+	max-width: 290px;
+	height: 97px;
+	margin: 35px auto 33px auto;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-full.png);
+	background-position: center -196px;
+	background-repeat: no-repeat;
+	background-size: 100% auto;
+}
+.mid-gray-block {
+	background-color: #eeeeee;
+	padding: 25px;
+	font-size: 1.3em;
+	text-align: center;
+	color: #333333;
+	line-height: 1.6em;
+}
+.scrolling-block-icon {
+	height: 78px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-full.png);
+	background-position: center -489px;
+	background-repeat: no-repeat;
+	margin-top: 60px;
+}
+.scrolling-block-header {
+	font-size: 1.6em;
+	text-align: center;
+	line-height: 1.5em;
+	color: #333333;
+	padding: 0 25px;
+}
+.scrolling-block-txt {
+	font-size: 1.3em;
+	color: #666666;
+	line-height: 1.6em;
+	text-align: center;
+	padding: 10px 25px 0 25px;
+}
+.scrolling-block-icon.access {
+	background-position: center -728px;
+	height: 80px;
+}
+.scrolling-block-icon.colaboration {
+	background-position: center -979px;
+	height: 65px;
+}
+.copyright-txt {
+	font-size: 1.5em;
+	line-height: 30px;
+	color: #333333;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/bottom-sprite.png);
+	background-repeat: no-repeat;
+	background-position: left -212px;
+	float: left;
+	margin: 24px 0 0 20px;
+	padding-left: 22px;
+}
+.top-menu {
+	height: 60px;
+	background-color: #2c2b2a;
+}
+.blog-button, .back-button {
+	height: 32px;
+	line-height: 30px;
+	color: white;
+	display: block;
+	background-color: #6c6b6a;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 17px 0 34px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-page-sprite.png);
+	background-position: 10px 3px;
+	background-repeat: no-repeat;
+	margin: 14px 0 0 20px;
+	float: left;
+	font-size: 1.3em;
+}
+.back-button {
+	background-position: -328px 9px;
+}
+.blog .blog-button {
+	display: none;
+}
+.top-logo {
+	width: 130px;
+	height: 25px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-page-sprite.png);
+	background-position: -145px top;
+	background-repeat: no-repeat;
+	margin: 18px 0 0 -65px;
+	position: absolute;
+	left: 50%;
+}
+.blog .top-logo {
+	width: 172px;
+	height: 30px;
+}
+.blog-new-item {
+	padding: 5px 20px 40px 20px;
+}
+.blog-new h2, .blog-new .blog-h2 {
+	margin: 0;
+	font-size: 1.5em;
+	line-height: 1.5em;
+	color: #333333;
+	display: block;
+	font-weight: normal;
+	padding: 22px 0 2px 0;
+	font-family: 'Open Sans', Arial;
+}
+.blog-new-small {
+	color: #999a9c;
+	float: left;
+	font-size: 1.3em;
+	line-height: 30px;
+	font-family: 'Open Sans Semibold', Arial, Helvetica;
+	margin: 0 0 0 0;
+}
+.blog-new-date-div {
+	width: 2px;
+	height: 20px;
+	float: left;
+	background-color: #e3e3e3;
+	margin: 4px 10px 0px 10px;
+}
+.blog-new-small span {
+	color: #727376;
+}
+.blog-new-item .img-link {
+	width: 250px;
+	float: left;
+	display: block;
+	margin-top: 16px;
+	line-height: 0;
+}
+.blog-new-item .img-link img {
+	width: 100%;
+}
+.blog-new-item p, .blog-new-full p {
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 16px 0 0 281px;
+	font-size: 1.3em;
+	line-height: 2em;
+	color: #333333;
+}
+.blog-new-item p a, .blog-new-full p a {
+	color: #D22400;
+}
+.blog-new-item p span.blog-new-description {
+	display: block;
+	min-height: 110px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-bottom: 12px;
+}
+.blog-new-item p span.quote {
+	display: inline;
+	font-style: italic;
+}
+p .blog-new-read-more, p a.blog-new-read-more {
+	display: block;
+	height: 30px;
+	background-color: #cccccc;
+	cursor: pointer;
+	float: left;
+	-moz-border-radius: 5px;
+	font-size: 0.9em;
+	line-height: 28px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	padding: 0 15px 0 15px;
+	color: white !important;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	font-family: 'Open Sans', Arial;
+}
+p a.blog-new-read-more:active {
+	color: white !important;
+	background-color: #7f7f7f;
+}
+.blog-new-div {
+	height: 2px;
+	position: relative;
+	background-color: #eeeeee;
+}
+.ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li {
+	font-size: 1.2em;
+}
+.blog div.bottom-menu {
+	margin-top: 0;
+}
+.blog-new-full {
+	padding: 5px 20px 30px 20px;
+}
+.blog-new-full.empty-bottom {
+	padding: 5px 20px 7px 20px;
+}
+.blog-new-forward, .blog-new-back {
+	display: none;
+}
+.blog-new-full-img {
+	max-width: 100%;
+	margin: 20px auto 15px auto;
+	display:block;
+}
+.blog-new-full-img.large {
+	width: 100%;
+	margin: 20px auto 15px auto;
+}
+.blog-new-full p {
+	color: #3F4646;
+	padding: 10px 0 15px 0
+}
+.blog-browser-logo {
+	float: left;
+	width: 63px;
+	padding-bottom:8px;
+}
+.blog-apps-icon {
+	float: left;
+	width: 60px;
+}
+.blog-browser-title, .blog-dev-titles {
+	margin-left: 83px;
+	font-size: 1.3em;
+	line-height: 2em;
+	padding-top: 18px;
+	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+	color: #737376;
+}
+.blog-dev-titles {
+	padding-top: 16px;
+}
+.blog-new-full-div {
+	background-color: #ededed;
+	height: 2px;
+	margin: 15px -20px 30px -20px;
+}
+.blog-new-full-div2 {
+	background-color: #ededed;
+	height: 2px;
+	margin: 5px -20px 35px -20px;
+}
+.blog-new-full p.conclusion {
+	margin: 0;
+	padding: 7px 0 33px 0;
+}
+.blog-new-full ul {
+	margin: 0;
+	padding: 20px 0 15px 0;
+}
+.sync ul {
+	margin: 0;
+	padding: 43px 0 25px 0;
+	width: 430px;
+}
+.blog-new-full ul li, .sync li, .affiliate li, .pro li {
+	margin: 0;
+	padding: 0 0 18px 20px;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-size: 1.3em;
+	line-height: 28px;
+	color: #3F4646;
+	text-align: left;
+	font-weight: normal;
+	list-style-type: none;
+	background-position: -15px -3px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/dev-point.png);
+	background-repeat: no-repeat;
+}
+.pro li {
+	padding: 0 0 12px 20px;
+}
+.blog-new-full p.strong-paragraph {
+	font-weight: normal;
+	font-family: 'Open Sans Semibold', Arial;
+	color: #3F4646;
+	padding-top: 0;
+	padding-bottom: 20px;
+	padding-top:6px;
+}
+.blog-new-full p strong {
+	font-weight: normal;
+	font-family: 'Open Sans Semibold', Arial;
+	color: #3F4646;
+}
+.blog-new-full p .italic-quote {
+	color: #919091;
+	font-style: italic;
+}
+.blog-new-full p.small-pad-paragraph {
+	padding-top: 0;
+	padding-bottom: 15px;
+}
+.blog-new-full ul.ul-small-pad {
+	padding-top: 0;
+}
+.blog-new-full .blog-dark {
+	color: #131313;
+	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+}
+.blog-new-number {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 2px solid #888787;
+	padding: 10px;
+	float: left;
+	display: block;
+	line-height: 20px;
+	color: #404646;
+	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	color: #3F4646;
+	font-weight: bold;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	margin: 0;
+	padding: 0 0 0 0;
+	text-align: center;
+}
+.blog-plus-sign {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: 5px -248px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-minus-sign {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -41px -248px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-arrow {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -84px -248px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-positive {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -116px -248px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-negative {
+	width: 24px;
+	height: 24px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -151px -248px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-strong-recomend {
+	width: 26px;
+	height: 26px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -190px -246px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-recomend {
+	width: 26px;
+	height: 26px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -150px -206px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-not-recomend {
+	width: 26px;
+	height: 26px;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	float: left;
+	display: block;
+	background-position: -190px -206px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite.png);
+	background-repeat: no-repeat;
+}
+.blog-new-num-txt, .blog-new-num-txtpositive-negative-txt {
+	margin-left: 33px;
+	display: block;
+	line-height:25px;
+}
+.blog-new-full ul li a {
+	color: #d9290b;
+}
+.blog-new-full ul ul {
+	margin: 0 0 0 30px;
+	padding: 0;
+}
+.blog-new-full ul ul li {
+	background-image: url(https://eu.static.mega.co.nz/images/mega/dev-point-gray.png);
+}
+.blog-new-num-txt.strong-header {
+	padding: 0 0 20px 0;
+	color: #3F4646;
+	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+}
+.blog-new-num-txt .dev-new-input-block {
+	margin: 10px 0 -15px 0;
+}
+.blog-new-num-txt .dev-new-input-block input {
+	color: #99999E;
+}
+.blog-left-image {
+	width: 220px;
+	float: left;
+	padding-bottom: 33px;
+	padding-top:10px;
+}
+p.blog-p-left-pad {
+	margin-left: 261px;
+	padding-top: 5px;
+}
+img.blog-new-logos {
+	width: 160px;
+	float: left;
+}
+.blog-browser-title.large {
+	margin-left: 191px;
+}
+.blog-new-num-txt.positive-negative-txt, .blog-new-num-txtpositive-negative-txt {
+	padding-bottom: 12px;
+}
+.blog-status {
+	display: block;
+	padding-top: 15px;
+}
+.blog-status .blog-new-num-txt.positive-negative-txt {
+	padding-top: 1px;
+}
+.blog-left-image.clouds {
+	width: 115px;
+}
+.blog-p-left-pad.clouds {
+	padding-top: 0;
+}
+.blog-apps-icon.news {
+	width: 68px;
+	padding-bottom: 30px;
+}
+.blog-browser-title.news {
+	padding-top: 4px;
+	margin-left: 98px;
+	padding-bottom: 30px;
+	padding-top: 3px;
+}
+.blog-paragraph-big-lines {
+	line-height: 32px;
+}
+.blog-jobs-icon {
+	padding: 7px 0 10px 40px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blogs/jobs-sprite.png);
+	background-repeat: no-repeat;
+	background-size: 31px 438px;
+	font-weight: bold;
+	color: #727376;
+	margin-bottom: 15px;
+}
+.blog-jobs-icon.you {
+	background-position: left 1px;
+}
+.blog-jobs-icon.salary {
+	background-position: left -99px;
+}
+.blog-jobs-icon.location {
+	background-position: left -199px;
+}
+.blog-jobs-icon.server-side {
+	background-position: left -294px;
+}
+.blog-jobs-icon.client-side {
+	background-position: left -389px;
+}
+.blog-jobs-mega {
+	display: block;
+	width: 140px;
+	margin-bottom: 33px
+}
+.blog-article-divider {
+	height: 2px;
+}
+.blog-new-full h2.not-float {
+	float: none;
+	background-image: none;
+	padding: 42px 0 2px 0;
+}
+.blog-new-full p.strong-paragraph.new-blog-icon {
+	padding: 15px 0 15px 45px;
+	background-image: url(https://eu.static.mega.co.nz/images/mega/blogs/blog-post-sprite1.png);
+	background-repeat: no-repeat;
+	line-height: 26px;
+}
+.new-blog-icon.faster-loading-icon {
+	background-position: -2px 13px;
+}
+.new-blog-icon.new-user-interface {
+	background-position: 1px -120px;
+}
+.new-blog-icon.local-caching-icon {
+	background-position: -1px -279px;
+}
+.new-blog-icon.user-avatars-icon {
+	background-position: -1px -444px;
+}
+.new-blog-icon.contact-management-icon {
+	background-position: -1px -620px;
+}
+.new-blog-icon.new-tree-panel-icon {
+	background-position: -1px -785px;
+}
+.new-blog-icon.improved-transfers-icon {
+	background-position: -1px -961px;
+}
+.new-blog-icon.firefox-extension-icon {
+	background-position: -1px -1126px;
+}
+.new-blog-icon.new-ios-icon {
+	background-position: -1px -1344px;
+}
+.blog-new-full p.strong-paragraph.new-blog-icon.new-sync-icon {
+	background-position: 0 -1530px;
+	padding-top: 20px;
+}
+.blog-new-full-img.middle-blog-img {
+	margin: 12px 0 38px 0;
+	max-width: 100%;
+	display: block;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 1px solid #e5e5e5;
+}
+.blog-new-full-img.list-blog-img {
+	margin: 15px 0 20px 0;
+	max-width: 100%;
+	display: block;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 1px solid #e5e5e5;
+}
+.middle-blog-img img, .list-blog-img img {
+	max-width: 100%;
+	border: 0;
+	display: block;
+}
+.blog-new-full ul.small-pad li {
+	padding-bottom: 0;
+	padding-left: 0;
+	background-image: none;
+}
+#blogarticle_post {
+	padding-top: 15px;
+}
+
+ @media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
+	 .blog-new-full-div {
+	margin: 0 -20px 30px -20px;
+}
+.blog-left-image {
+	float:none;
+	width:auto;
+	max-width:100%;
+	padding-bottom: 23px;
+	margin-left:auto;
+	margin-right:auto;
+	display:block;
+}
+p.blog-p-left-pad {
+	margin-left:0;
+}
+.ios #blogarticle_post, .another-os #blogarticle_post {
+	padding-top: 10px;
+}
+.ios .blog-new-full-img.middle-blog-img, .another-os .blog-new-full-img.middle-blog-img {
+	margin: 8px 0 30px 0;
+}
+.ios .blog-new-full-img.list-blog-img, .another-os .blog-new-full-img.list-blog-img {
+	margin: 10px 0 12px 0;
+}
+.blog-new-full {
+	padding: 5px 20px 30px 20px;
+}
+.ios .blog-new-full, .another-os .blog-new-full {
+	padding: 0 20px 30px 20px;
+}
+.blog-new-full.empty-bottom {
+	padding: 5px 20px 7px 20px;
+}
+.ios .blog-new-full, .another-os .blog-new-full {
+	padding: 0 20px 7px 20px;
+}
+.ios .blog-new h2, .ios .blog-new .blog-h2, .another-os .blog-new h2, .another-os .blog-new .blog-h2 {
+	font-size: 1.3em;
+}
+.ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li {
+	font-size: 1.1em;
+}
+.ios .blog-new-item, .another-os .blog-new-item {
+	padding: 0 20px 25px 20px;
+}
+.ios .blog-new-item p, .android .blog-new-item p {
+	padding: 20px 0 0 0;
+}
+.blog-new-item .img-link {
+	width: 100%;
+	float: none;
+}
+.blog-new-item {
+	padding: 5px 20px 30px 20px;
+}
+.blog-new-item p {
+	padding: 25px 0 0 0;
+	font-size: 1.3em;
+	line-height: 2em;
+}
+.blog-new-item p span.blog-new-description {
+	min-height: 10px;
+	padding-bottom: 0;
+}
+p .blog-new-read-more, p a.blog-new-read-more {
+	display: none;
+}
+.ios .top-menu, .another-os .top-menu {
+	height: 50px;
+}
+.ios .blog-button, .another-os .blog-button, .ios .back-button, .another-os .back-button {
+	height: 27px;
+	line-height: 25px;
+	padding: 0 11px 0 32px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/ios-mobile-page-sprite.png);
+	background-position: 10px 3px;
+	background-repeat: no-repeat;
+	background-size: auto;
+	margin: 11px 0 0 11px;
+	float: left;
+	font-size: 1.1em;
+}
+.ios .back-button, .another-os .back-button {
+	background-position: -280px 7px;
+	padding-left: 29px;
+}
+.ios .top-logo, .another-os .top-logo {
+	width: 109px;
+	height: 21px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/ios-mobile-page-sprite.png);
+	background-position: -125px top;
+	background-size: auto;
+	margin: 15px 0 0 -54px;
+}
+.ios.blog .top-logo, .another-os.blog .top-logo {
+	width: 142px;
+	height: 26px;
+}
+.ios .scrolling-block-icon, .unsupported.ios .bottom-menu.full-version, .another-os .scrolling-block-icon, .unsupported.another-os .bottom-menu.full-version {
+	margin-top: 40px;
+}
+.main-centered-bl {
+	width: 100%;
+	padding: 70px 0 20px 0;
+}
+.new-folder-popup {
+	margin: -87px 0 0 -45%;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	padding: 3px;
+}
+.new-folder-popup-bg {
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+}
+.new-folder-header {
+	font-size: 1.3em;
+	line-height: 33px;
+	padding-top: 2px;
+}
+.new-folder-main-bg {
+	-webkit-border-bottom-left-radius: 10px;
+	-moz-border-radius-bottomleft: 10px;
+	border-bottom-left-radius: 10px;
+	-webkit-border-bottom-right-radius: 10px;
+	-moz-border-radius-bottomright: 10px;
+	border-bottom-right-radius: 10px;
+	padding-bottom: 10px;
+}
+.new-folder-descr {
+	font-size: 1.1em;
+	padding: 8px 8px 2px 8px;
+}
+.new-folder-bg1 input {
+	font-size: 1.2em;
+	line-height: 32px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.new-folder-input.left-button {
+	margin: 8px 0 0 7px;
+}
+.new-folder-input.right-button {
+	margin: 9px 7px 0 0;
+}
+.add-popup-but-bg1, .new-folder-bg1 {
+	padding: 3px;
+}
+.add-popup-but-bg2, .new-folder-bg2 {
+	font-size: 1.3em;
+	line-height: 30px;
+}
+.bottom-menu {
+	height: 60px;
+	background-size: 1px 51px;
+}
+.ios .bottom-menu, .another-os .bottom-menu {
+	height: 50px;
+}
+.bottom-left-link {
+	font-size: 1.2em;
+	line-height: 25px;
+	margin: 18px 0 0 10px;
+}
+.ios .bottom-left-link, .another-os .bottom-left-link {
+	margin: 13px 0 0 10px;
+}
+span.select-txt {
+	padding: 0 20px 0 21px;
+	font-size: 1.2em;
+	line-height: 25px;
+}
+.language-block {
+	margin: 18px 10px 0 0;
+	background-position: right -240px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/bottom_nw_sprite.png);
+	background-size: 34px 342px;
+}
+.ios .language-block, .another-os .language-block {
+	margin: 13px 10px 0 0;
+}
+.select-box {
+	background-position: left -195px;
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/bottom_nw_sprite.png);
+	background-size: 34px 342px;
+	height: 25px;
+}
+.select-box select {
+	border: 0;
+	height: 25px;
+}
+.ios .main-centered-bl, .another-os .main-centered-bl {
+	padding: 50px 0 10px 0;
+}
+.ios .main-head-txt, .another-os .main-head-txt {
+	padding: 35px 20px 0 20px;
+	text-align: center;
+	font-size: 1.3em;
+	line-height: 1.5em;
+}
+.ios .main-txt, .another-os .main-txt {
+	font-size: 1.1em;
+	line-height: 1.5em;
+	padding: 20px 20px 30px 20px;
+}
+.ios .main-button, .another-os .main-button {
+	width: 159px;
+	height: 50px;
+	background-position: 10px -208px;
+}
+.ios .scrolling-panel, .another-os .scrolling-panel {
+	height: 50px;
+}
+.ios .scrolling-link, .another-os .scrolling-link {
+	line-height: 48px;
+	height: 50px;
+	font-size: 1.2em;
+	background-position: center -39px;
+}
+.ios .scroll-to-to, .another-os .scroll-to-to {
+	background-position: center 8px;
+}
+.ios .mid-gray-block, .another-os .mid-gray-block {
+	font-size: 1.1em;
+	line-height: 1.5em;
+}
+.ios .scrolling-block-icon, .another-os .scrolling-block-icon {
+	height: 78px;
+	background-position: center -489px;
+}
+.ios .scrolling-block-header, .another-os .scrolling-block-header {
+	font-size: 1.3em;
+	line-height: 1.5em;
+}
+.ios .scrolling-block-txt, .another-os .scrolling-block-txt {
+	font-size: 1.1em;
+	line-height: 1.5em;
+}
+.ios .scrolling-block-icon.access, .another-os .scrolling-block-icon.access {
+	background-position: center -728px;
+	height: 80px;
+}
+.ios .scrolling-block-icon.colaboration, .another-os .scrolling-block-icon.colaboration {
+	background-position: center -979px;
+	height: 65px;
+}
+.copyright-txt {
+	font-size: 1.2em;
+	line-height: 25px;
+	margin: 18px 0 0 10px;
+	background-position: left -215px;
+}
+.ios .copyright-txt, .another-os .copyright-txt {
+	background-image: url(https://eu.static.mega.co.nz/images/mega/bottom-sprite.png);
+	background-repeat: no-repeat;
+	background-position: left -215px;
+	margin: 13px 0 0 20px;
+	padding-left: 22px;
+	font-size: 1.2em;
+	line-height: 25px;
+}
+.ios .mid-logo, .another-os .mid-logo {
+	max-width: 200px;
+	height: 65px;
+	background-position: center -136px;
+	background-repeat: no-repeat;
+	background-size: 100% auto;
+	margin-bottom: 32px;
+}
+}
+@media only screen and (max-height: 650px) {
+.main-head-txt {
+	padding-top: 35px;
+}
+.main-centered-bl {
+	padding-top: 40px;
+	padding-bottom: 0;
+}
+.main-txt {
+	padding-bottom: 25px;
+}
+.ios .main-txt, .another-os .main-txt {
+	padding-bottom: 45px;
+}
+}
+@media only screen and (max-height: 485px) {
+.ios .main-txt, .another-os .main-txt {
+	font-size: 1.1em;
+	line-height: 1.5em;
+	padding: 15px 20px 25px 20px;
+}
+.ios .main-centered-bl, .another-os .main-centered-bl {
+	padding: 40px 0 0 0;
+}
+.ios .main-head-txt, .another-os .main-head-txt {
+	padding: 25px 20px 0 20px;
+}
+}
+@media only screen and (max-height: 437px) {
+.ios .main-txt, .another-os .main-txt {
+	padding: 10px 20px 15px 20px;
+}
+.ios .main-head-txt, .another-os .main-head-txt {
+	padding: 15px 20px 0 20px;
+}
+.ios .main-centered-bl, .another-os .main-centered-bl {
+	padding: 25px 0 0 0;
+}
+}
+@media only screen and (max-width: 360px) {
+.android .top-logo {
+	margin: 18px 0 0 25px;
+	position: static;
+	left: auto;
+	float: left;
+}
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.ios .language-block, .ios .select-box {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/bottom_nw_sprite@2x.png);
+}
+.ios .free-green-tip {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/en/free@2x.png);
+ background-size:136px;
+}
+.ios .main-logo, .ios .main-button {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-ios@2x.png);
+ background-size:236px auto;
+}
+.ios .main-social-icon {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-social@2x.png);
+ background-size:104px auto;
+}
+.ios .copyright-txt {
+background-image: url(https://eu.static.mega.co.nz/images/mega/bottom-sprite@2x.png);
+background-size: 170px auto;
+}
+.scrolling-block-icon, .mid-logo, .scrolling-link {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-full@2x.png);
+ background-size:290px auto;
+}
+.ios .blog-button, .another-os .blog-button, .ios .top-logo, .another-os .top-logo, .ios .back-button, .another-os .back-button {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/mobile-page-sprite@2x.png);
+ background-size:350px auto;
+}
+.blog-new-full p.strong-paragraph.new-blog-icon {
+background-image: url(https://eu.static.mega.co.nz/images/mega/blogs/blog-post-sprite1@2x.png);
+background-size: 36px auto;
+}
+.blog-article li, .blog-new-full ul li, .sync li, .affiliate li, .pro li {
+ background-image: url(https://eu.static.mega.co.nz/images/mega/dev-point-new.png);
+ background-size: 39px auto;
+}
+.blog-new-search, .social-icon, .social-arrow, .rss-view-all, .blog-new-forward, .blog-new-back, .blog-plus-sign, .blog-minus-sign, .blog-new-arrow, .blog-new-positive, .blog-new-negative, .blog-new-strong-recomend, .blog-new-recomend, .blog-new-not-recomend {
+background-image: url(https://eu.static.mega.co.nz/images/mega/blog-new-sprite@2x.png);
+background-size: 217px auto;
+}
+}
+@media only screen and (max-width: 568px) and (-webkit-min-device-pixel-ratio: 1.5), only screen and (max-width: 568px) and (-o-min-device-pixel-ratio: 3/2), only screen and (max-width: 568px) and (min--moz-device-pixel-ratio: 1.5), only screen and (max-width: 568px) and (min-device-pixel-ratio: 1.5), (max-width: 800px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 1.5), only screen and (max-width: 800px) and (orientation: landscape) and (-o-min-device-pixel-ratio: 3/2), only screen and (max-width: 800px) and (orientation: landscape) and (min--moz-device-pixel-ratio: 1.5), only screen and (max-width: 800px) and (orientation: landscape) and (min-device-pixel-ratio: 1.5) {
+.ios .blog-button, .another-os .blog-button, .ios .top-logo, .another-os .top-logo, .ios .back-button, .another-os .back-button {
+ background-image: url(https://eu.static.mega.co.nz/images/mobile/ios-mobile-page-sprite@2x.png);
+ background-size:350px auto;
+}
+}

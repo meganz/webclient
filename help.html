@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/fm.js"></script>
+<script type="text/javascript">
+   $(document).ready(function() {
+	   
+	   function initMainScroll() 
+       {
+	      $('.main-scroll-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});	
+       }
+	   initMainScroll();
+	   $(window).bind('resize.icon', function () 
+	   {
+		initMainScroll();
+       });
+ 	   
+   //Demo of Dev menu
+	   $('.new-left-menu-link').bind('click', function() {
+	    if ($(this).attr('class').indexOf('active') == -1) {
+				if($(this).parent().attr('class').indexOf('new-left-submenu-item') > -1) {
+   			       $(this).parent().parent().find('.new-left-menu-link').removeClass('active');
+				} else {
+					$(this).parent().children('.new-left-menu-link').removeClass('active');
+				}
+				$(this).parent().children('.new-left-submenu').addClass('hidden');
+				$(this).addClass('active');
+				if ($(this).attr('class').indexOf('contains-submenu') > -1) {
+					$(this).next('.new-left-submenu').removeClass('hidden');
+				}
+				initMainScroll();
+			}
+	   });
+	   
+        
+   });
+</script>
+
+
+
+</head>
+
+<body>
+<div id="pageholder" style="display:none;"></div>
+
+<div id="nstartholder" class="fmholder">
+  <!-- Add scrolling to this block please !-->
+  <div class="main-scroll-block">
+   <div class="main-pad-block">
+      <div class="top-head"> 
+        <a class="logo"></a> 
+        <a class="top-menu-icon"></a> 
+        <a class="create-account-button"> Create Account </a> 
+        <a class="top-login-button"> Login </a> 
+      </div> 
+
+      <div class="dev-nw-gray-bg">
+        <div class="dev-nw-gray"></div>
+      </div>
+      
+      <div class="main-mid-pad new-bottom-pages help-nw">
+         <div class="new-left-menu-block">
+            <div class="new-left-menu-link active">
+              <div class="new-left-menu-icon help-icon help-home">Home</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-basics">Basics</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-sharing">Sharing</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-security">Security & Privacy</div>
+            </div>
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-account">Account</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-sync">Sync Client</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-ios">iOS App</div>
+            </div> 
+            <div class="new-left-menu-link">
+              <div class="new-left-menu-icon help-icon help-android">Android App</div>
+            </div> 
+         </div>
+         
+         
+         <div class="new-right-content-block">
+           <h1 class="help-home-header">Welcome to the help centre</h1>
+           <div class="blog-new-search">
+                 <input value="Search" id="blog_searchinput"  />
+           </div>
+           <div class="blog-new-div">
+              <div></div>
+           </div>
+           <div class="help-short-block">
+            <div class="dev-short-block left"> 
+             <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+               <span class="red">Get Support</span> 
+             </div> 
+             <div class="help-text-block"> 
+               If your question isn’t answered here, do not hesitate to contact us. 
+             </div> 
+             <div class="dev-new-button"> Contact Support </div> 
+             <div class="clear"></div> 
+            </div>
+            <div class="dev-short-block right"> 
+             <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+               <span class="red">Popular Topics:</span> 
+             </div>  
+             <div class="help-listing"> 
+               What is MEGA all about?
+             </div>
+             <div class="help-listing"> 
+               What is MEGA all about?
+             </div>
+            </div>
+            <div class="clear"></div>
+           </div>
+           <div class="blog-new-div">
+              <div></div>
+           </div>
+           <div class="new-affiliate-mid-header new-affiliate-bot-pad"> 
+               <span class="red">Get Support</span> 
+           </div> 
+           <div class="dev-short-block left help-nw-short-blocks"> 
+               <div class="help-block">
+                   <div class="help-short-icon basics">
+                     Basics
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+               <div class="help-block">
+                   <div class="help-short-icon security">
+                     Security & Privacy
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+               <div class="help-block">
+                   <div class="help-short-icon sync">
+                     Sync Client
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+               <div class="help-block">
+                   <div class="help-short-icon android">
+                     Android App
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+            </div>
+           <div class="dev-short-block right help-nw-short-blocks"> 
+               <div class="help-block">
+                   <div class="help-short-icon sharing">
+                     Sharing
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+               <div class="help-block">
+                   <div class="help-short-icon account">
+                     Account
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+               <div class="help-block">
+                   <div class="help-short-icon ios">
+                     iOS App
+                   </div>
+                   <div class="help-short-txt">
+                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+                   </div>
+               </div>
+            </div>
+           <div class="clear"></div>
+         </div>
+         
+
+         <div class="new-right-content-block help-info-pages hidden">
+           <h1 class="help-home-header">Help Centre - <span class="red">Basics</span></h1>
+           <h2>
+             What is the MEGA SDK good for?
+           </h2>
+           <p>
+              MEGA is a recursive acronym and stands for “MEGA Encrypted Global Access”.
+           </p>
+           <h2>
+             What is MEGA all about?
+           </h2>
+           <p>
+             MEGA is a secure cloud storage and electronic collaboration/communication service. It offers free and paid Internet-accessible storage space and bandwidth. It allows you to store and access your files from within your web browser or through dedicated client applications.
+           </p>
+           <h2>
+             Is MEGA legal?
+           </h2>
+           <p>
+             To the best of our knowledge, cloud storage and encryption are legal. Please comply with applicable laws and regulations on how you use cloud storage and encryption as well as our <a href="">terms of use</a>.
+           </p>
+           <h2>
+             Why base a cloud storage company in New Zealand, of all places?
+           </h2>
+           <p>
+             Among other important reasons, New Zealand’s native Māori name is “Aotearoa”, which means <i>“Land of the long white cloud”</i>.
+           </p>
+           <h2>
+             Can I access MEGA on my mobile device?
+           </h2>
+           <p>
+             You can access MEGA through your mobile browser, but this severely limits performance and functionality. We recommend using our dedicated <a href="">mobile app</a> for your device instead.
+           </p>
+           <h2>
+             Can I resume interrupted up- or downloads?
+           </h2>
+           <p>
+             Yes, as long as you do not close the browser tab, up- and downloads will resume automatically after e.g. a network interruption or your device having entered standby/sleep mode. Please note that our servers automatically discard incomplete uploads after 48 hours of inactivity.
+           </p>
+           <h2>
+             Can I upload the same file multiple times?
+           </h2>
+           <p>
+             Because the server can’t see filenames, filename collisions have to be dealt with on the client side. With standard settings, if you upload a file that you already seem to have in your account (same target path/filename, same size, same last modification time), it is skipped, but nothing prevents you from keeping multiple files or folders with the same name in the same folder.
+           </p>
+           <h2>
+             How do you regulate bandwidth utilization?
+           </h2>
+           <p>
+             Our policy is not to impose any artificial restrictions on our users unless necessitated by infrastructure bottlenecks. We therefore reserve the right to cap user bandwidth utilization for operational reasons at any time on a per-IP basis. Your transfer queue will resume automatically once the congestion eases. No manual intervention is required.
+           </p>
+           <h2>
+             Are there any file size limits on MEGA?
+           </h2>
+           <p>
+            We do not impose artificial file size limits other than your available cloud drive space. While all current browsers are capable of uploading large files, downloading is size-constrained with Internet Explorer and Safari due to their incomplete HTML5 support.
+           </p>
+           <h2>
+             Can I upload and download at the same time?
+           </h2>
+           <p>
+            Yes. One upload and one download per browser tab can run in parallel.
+           </p>
+           <h1>
+             Account
+           </h1>
+         </div>
+         
+         <div class="clear"></div>
+      </div>
+      
+    
+      <div class="nw-bottom-block">
+        <div class="nw-bottom-pad">
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">MEGA</div>
+            <div class="nw-bottom-link">About Us</div>
+            <div class="nw-bottom-link">The Privacy Company</div>
+            <div class="nw-bottom-link">Blog</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">APPS</div>
+            <div class="nw-bottom-link">Android App</div>
+            <div class="nw-bottom-link">Chrome App</div>
+            <div class="nw-bottom-link">iOS App</div>
+            <div class="nw-bottom-link">Windows Sync Client</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">SUPPORT</div>
+            <div class="nw-bottom-link">Help</div>
+            <div class="nw-bottom-link">Contact Us</div>
+            <div class="nw-bottom-link">Site Map</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">DEVELOPERS</div>
+            <div class="nw-bottom-link">SDK</div>
+            <div class="nw-bottom-link">Documentation</div>
+            <div class="nw-bottom-link">Affiliate Program</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">LEGAL &amp; POLICIES</div>
+            <div class="nw-bottom-link">Terms of Service</div>
+            <div class="nw-bottom-link">Privacy Policy</div>
+            <div class="nw-bottom-link">Copyright</div>
+            <div class="nw-bottom-link">Takedown Guidance</div>
+          </div>
+          <div class="nw-start-nz"></div>
+          <div class="clear"></div>
+        </div>
+        <div class="nw-bottom-pad-with-border">
+          <div class="nw-bottom-copyrigths"> Mega Limited 2013 <span>All rights reserved</span> </div>
+          <div class="nw-bottom-social facebook"></div>
+          <div class="nw-bottom-social twitter"></div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

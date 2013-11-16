@@ -1,0 +1,592 @@
+<div class="dark-overlay" style="display:none;"></div>  
+<div class="loading-spinner" style="display:none;">
+  <div class="main-loader">
+    <div class="wBall" id="wBall_1">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_2">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_3">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_4">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_5">
+      <div class="wInnerBall"> </div>
+    </div>
+  </div>
+</div>
+
+<div class="fm-dialog-overlay hidden"></div>
+
+
+
+
+
+
+<div class="fm-dialog create-folder-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$68]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="[$157]" /></div>
+        </div>
+        <div class="fm-dialog-new-folder-button">[$158]</div>
+    </div>
+    <div class="create-folder-dialog-loader hidden">
+         <div class="cr-fountaing">
+              <div class="fountaing-circle cr-fountaing_1"></div>
+              <div class="fountaing-circle cr-fountaing_2"></div>
+              <div class="fountaing-circle cr-fountaing_3"></div>
+              <div class="fountaing-circle cr-fountaing_4"></div>
+              <div class="fountaing-circle cr-fountaing_5"></div>
+              <div class="fountaing-circle cr-fountaing_6"></div>
+              <div class="fountaing-circle cr-fountaing_7"></div>
+              <div class="fountaing-circle cr-fountaing_8"></div>
+          </div>
+    </div>
+</div>
+
+
+<div class="fm-dialog dlkey-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$1026]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="[$1028]" /></div>
+        </div>
+        <div class="fm-dialog-new-folder-button">[$1027]</div>
+    </div>
+</div>
+
+
+
+<div class="fm-dialog registration-success hidden">
+     <div class="reg-success-icon"></div>
+     <div class="reg-success-header">[$216]!</div>
+     <div class="reg-success-txt"> [$217]</div>
+  </div>
+
+<div class="fm-dialog rename-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$425]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-rename" type="text" value="[$157]" /></div>
+        </div>
+        <div class="fm-dialog-rename-button">[$61]</div>
+    </div>
+</div>
+
+<div class="fm-dialog move-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$62]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-move-dialog-body">
+      <div class="fm-move-dialog-pad">
+        <span class="fm-connector-first"></span>
+         <a class="fm-tree-header cloud-drive-item active opened expanded" id="topheader">
+             <span>
+                [$164]
+             </span> 
+         </a>          
+         <ul class="fm-subfolders opened" id="mainsub">   
+         </ul>
+       </div>
+     </div>
+     <div class="fm-move-trashbin">
+        <span class="fm-connector-first"></span>
+        <a class="fm-tree-header recycle-item" id="bottomheader">
+           <span>
+             [$168]
+           </span>    
+        </a>
+     </div>
+     <div class="fm-move-bottom-block">
+        <div class="fm-dialog-button move-button">[$62]</div>
+        <div class="fm-dialog-button cancel-button active">[$82]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog share-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$149]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="share-folder-block hidden">
+       <div class="share-folder-icon">
+          <img alt="" src=""/>
+       </div>
+       <div class="share-folder-info">
+          <div class="properties-small-gray">[$86]:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+       </div>
+       <div class="clear"></div> 
+       <div class="share-folder-link-bl">
+         <div class="properties-file-txt">[$1029]</div>
+		 <div id="share_on_off">
+         <div class="on_off public-checkbox">
+               <input type="checkbox" id="public-checkbox" />
+         </div>
+		 </div>
+         <div class="clear"></div> 
+         <div class="properties-file-link">
+		
+         </div>
+       </div>
+     </div> 
+     <div class="fm-share-body">
+        <div class="fm-share-empty">
+           <div>[$1030]</div>
+           <div class="fm-share-pointer"></div>
+        </div>
+        <div class="fm-shared-to">           
+        </div>     
+     </div>     
+     <div class="fm-share-bottom-block">
+        <div class="fm-share-add-contacts"><div class="fm-share-contacts-arrow"></div></div>
+
+        <div class="fm-share-contacts-popup hidden">
+           <div class="fm-share-contacts-head">
+              <input name="email-search" type="text" value="[$1019]" />
+              <div class="fm-share-contacts-search"></div>
+           </div>
+           <div class="fm-share-contacts-body">
+           </div>
+           <div class="fm-share-contacts-bottom">
+              <div class="fm-dialog-button add-contact-button">[$155]</div>
+              <div class="fm-dialog-button cancel-contact-button active">[$156]</div>
+              <div class="clear"></div>
+           </div>
+        </div>
+        <div class="fm-dialog-button cancel-button active">[$726]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog hidden" id="msgDialog">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$14]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-notification-body">
+        <div class="fm-notification-icon"></div>
+        <div class="fm-notification-info">
+          <p>[$15]</p>
+          <div class="fm-notification-warning">[$1007]</div>
+        </div>
+        <div class="clear"></div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button notification-button active">[$1018]</div>
+        <div class="fm-dialog-button notification-button active">[$82]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog export-links-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$1031]</div>
+	   <div class="fm-dialog-chrome-clipboard hidden"><textarea id="chromeclipboard" style="width:10px; height:20px;"></textarea></div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>   
+     <div class="export-link-body">      
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="export-checkbox" id="export-checkbox" class="checkboxOff"> </div>
+        <label for="export-checkbox" class="radio-txt">[$1032]</label> 
+		<div class="fm-dialog-button links-button active" id="clipboardbtn1">
+          [$370]
+          <object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>
+        </div>
+		
+		<div class="fm-dialog-button links-button active copy-keys-button" id="clipboardbtn2">
+          [$1033]
+          <object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>
+        </div>
+        <div class="clear"></div>
+		
+     </div>
+</div>
+
+
+<div class="export-links-warning hidden">
+   <div class="export-links-warning-close"></div>
+   <p>
+     <span class="orange">[$368]</span> [$369]
+   </p>
+   <p>
+     <span class="red">[$366]</span> [$367]
+   </p>
+</div>
+
+
+<div class="fm-dialog browsers-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$891]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div>
+      <div class="browsers-top-icon safari"></div>
+      <div class="browsers-info-block">
+         <div class="browsers-info-header">           
+         </div>
+         <p>           
+         </p>
+      </div>
+      <div class="clear"></div>
+      <div class="browsers-gray-notification">
+        [$890]
+      </div>
+      <div class="browsers-logos-block">
+        <div class="browsers-logo opera-next hidden">
+          <a href="http://www.opera.com" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info"></span></span>
+             </span>
+             <span class="browsers-title">
+               Opera
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo firefox">
+          <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$888]</span></span>
+             </span>
+             <span class="browsers-title">
+               Firefox
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo chrome">
+          <a href="http://www.google.com/chrome" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$888]</span></span>
+             </span>
+             <span class="browsers-title">
+               Chrome
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo opera">
+          <a href="http://www.opera.com/" target="_blank" class="browsers-logo-lnk">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">[$889]</span></span>
+             </span>
+             <span class="browsers-title">
+               Opera
+             </span>
+          </a>
+        </div>
+        <div class="clear"></div>
+      </div> 
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="browsers-checkbox" id="browsers-checkbox" class="checkboxOff"> </div>
+        <label for="browsers-checkbox" class="radio-txt">[$229]</label>    
+        <div class="fm-dialog-button browsers-button active">[$148]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog chrome-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$1034]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="chrome-dialog-body">
+         <div class="chrome-dialog-logo"></div>
+         <div class="chrome-dialog-notification">
+            <div class="chrome-dialog-arrow"></div> 
+            [$1035]
+         </div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="chrome-checkbox" id="chrome-checkbox" class="checkboxOff"> </div>
+        <label for="chrome-checkbox" class="radio-txt">[$229]</label>    
+        <div class="fm-dialog-button browsers-button active">[$148]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog bandwidth-quota hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Complementary bandwidth quota exceeded</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-bandwidth-body">
+        <div class="fm-bandwidth-icon"></div>
+        <div class="fm-bandwidth-icon-text">
+            Your download cannot proceed, because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.
+        </div>
+        <div class="clear"></div>
+        <div class="fm-bandwidth-dashed">
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                    <div class="fm-bandwidth-number-txt">532 <span class="small">MB</span></div>
+                    <div class="fm-bandwidth-small-txt">download usage <span class="red">*</span></div>
+              </div>
+           </div>
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                    <div class="fm-bandwidth-number-txt green">532 <span class="small">MB</span></div>
+                    <div class="fm-bandwidth-small-txt">will become available in <br /><span class="green">34 minutes *</span></div>
+              </div>
+           </div>
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                   <div class="fm-bandwidth-number-txt">22 <span class="small">GB</span></div>
+                   <div class="fm-bandwidth-small-txt">storage usage </div>
+              </div>
+           </div>
+           <div class="clear"></div>
+           <p>
+              <span class="red">*</span> Only transfers made during the last <span class="red">five or six hours</span> count.
+           </p>
+           <p>
+              * For your convenience, your queued downloads will be put on hold until you have enough quota available, and then resume automatically.
+           </p>
+        </div>
+        <div class="fm-bandwidth-dashed quota-bottom-block">
+             <div class="fm-bandwidth-icon pro-icon"></div>
+        
+             <div class="fm-bandwidth-icon-text">
+                If you do not wish to wait, you may consider signing up for a bandwidth package that also gives you ample extra storage.
+             </div>
+             <div class="clear"></div>
+        </div> 
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button quota-upgrade-button active">Upgrade to Pro</div>
+        <div class="fm-dialog-button quota-later-button active">I'll wait</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog avatar-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$993]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="avatar-body">	 
+	 </div>
+</div>
+
+
+<div class="fm-dialog properties-dialog multiple shared hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$892]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="properties-body">
+       <div class="properties-file-icon">
+       </div>
+       <div class="properties-txt-pad">
+          <div class="properties-small-gray">Name:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+          <div class="properties-float-bl">
+            <span class="properties-small-gray">Size:</span>
+            <span class="propreties-dark-txt">100kb</span>
+          </div>
+          <div class="properties-float-bl second">
+            <span class="properties-small-gray">Size:</span>
+            <span class="propreties-dark-txt">100kb</span>
+          </div>
+          <div class="properties-small-gray">Name:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+       </div>
+       <div class="clear"></div>
+       <div class="properties-shared-block">
+          <div class="properties-file-txt">[$1036]</div>
+          <div class="clear"></div>
+          <div class="properties-contacts-block">
+              <div class="properties-contact">
+                  <span class="avatar"><span><img src="" alt=""></span></span>
+                  <div class="properties-contact-close"></div>
+                  <span class="add-contact-username"></span>
+              </div>
+          </div>
+          <div class="properties-contacts-block">          
+              <div class="fm-share-contacts-popup properties-contacts-popup ">                  
+                  <div class="fm-share-contacts-body">
+                       <a class="add-contact-item properties-shared-to">
+                          <span class="add-contact-pad">
+                            <span class="avatar">
+                              <span>
+                              <img src="" alt="">
+                              </span>
+                            </span>
+                            <span class="properties-contact-delete"></span>
+                            <span class="add-contact-username"></span>
+                          </span>
+                      </a>
+                  </div> 
+                  <div class="properties-arrow"></div>
+                </div>          
+              <div class="properties-more-contacts"> and <span class="red">10 more contacts</span>
+              </div>
+          </div>
+       </div>
+       <div class="properties-link-block">
+           <div class="properties-file-lnk-pad">
+              <div class="properties-file-txt">[$808]</div>
+              <div class="on_off">
+               <input type="checkbox" id="on_off" />
+              </div>
+              <div class="clear"></div>
+              <div class="properties-file-link">
+                <div class="left">https://mega.co.nz/#!qhozTJLa<span class="properties-file-key">!AuOcZqqJoTPFCEpD2iodtBh9FpeR3FnjYLpDznLyWdk</span></div>
+                <div class="properties-caution-icon">
+                    <div class="properties-caution">
+                       <div class="properties-caution-bg">
+                            <span class="red">[$368]</span>  [$369]
+                       </div>
+                       <div class="properties-caution-arrow"></div>
+                    </div>
+               </div>
+              </div>
+           </div>
+           <div class="clear"></div>
+       </div>
+     </div>
+     <div class="fm-notifications-bottom">
+		<div id="keyoption">
+        <div class="checkboxOff"> <input type="checkbox" name="properties-checkbox" id="propertiescheckbox" class="checkboxOff"> </div>
+        <label for="propertiescheckbox" class="radio-txt">[$1032]</label> 
+		</div>
+        <div class="fm-dialog-button close-button active">[$148]</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+
+<div class="fm-dialog terms-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$385]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="terms-body">
+        <div class="terms-main">
+        </div>
+	 </div>
+     <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button fm-terms-agree active">[$1037]</div>
+          <div class="fm-dialog-button fm-terms-cancel active">[$82]</div>
+          <div class="clear"></div>
+     </div> 
+</div>
+
+
+<div class="fm-dialog slingshot-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Welcome, Slingshot Customer!</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="slingshot-body">
+        <div class="slingshot-main">
+		Thank you for activating your complimentary MEGA Pro account! Upon completion, you will receive 500 GB of secure encrypted high-performance online storage space for one year. All transfers from and to MEGA are unmetered and therefore uncapped from all Slingshot broadband connections.
+		
+		<br><br>
+
+		Questions or comments? Please contact our <a href="mailto:support@mega.co.nz" class="red">customer support department</a> for assistance. </br>		
+		<div style="width:100%; text-align:center; margin-top:15px;">
+		<img src="{staticpath}images/mega/slingshot.png"> <img src="{staticpath}images/mega/m-logo.png"> 
+		</div>		
+        </div>
+	 </div>
+     <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button fm-terms-agree active">Continue</div>
+          <div class="clear"></div>
+     </div> 
+</div>
+
+
+
+<div class="fm-dialog languages-dialog hidden">
+  <div class="fm-dialog-header">
+    <div class="fm-dialog-title">[$1038]</div>
+    <div class="fm-dialog-close"></div>
+    <div class="clear"></div>
+  </div>
+  <div id="language_menu_options" class="languages-dialog-body">       
+  </div>
+  <div class="fm-notifications-bottom">
+    <div class="fm-dialog-button fm-languages-save active">[$776]</div>
+    <div class="nlanguage-bottom"> [$671] <a href="mailto:translate@mega.co.nz">[$672]</a> </div>
+    <div class="clear"></div>
+  </div>
+</div>
+
+
+<div class="fm-dialog paypal-dialog hidden">
+  <div class="fm-dialog-header">
+    <div class="fm-dialog-title">[$1039]</div>
+    <div class="fm-dialog-close"></div>
+    <div class="clear"></div>
+  </div>
+  <div class="paypal-body">
+  <a href="" target="_blank"><img src="{staticpath}images/mega/paypal-checkout.png"></a><br>
+  <a href="" target="_blank"><img src="{staticpath}images/mega/paypal-cards.png"></a>
+  </div>
+</div>
+
+
+<div class="fm-dialog download-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">[$239]</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+          <div class="download-dialog-icon">
+             [$240]
+             <a href="https://www.google.com/chrome" class="download-chrome-lnk" target="_blank">
+                [$242]
+             </a>
+          </div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button notification-button active">
+          <div class="download-save-your-file">
+            
+          </div>
+          [$241]
+        </div>
+        <div class="clear"></div>
+     </div>
+</div>

@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/fm.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() { 
+    //Andrei's last commit: Startpage main button
+	$('.st-main-button-icon').bind('mouseover',function(event) 
+	{
+		    $('.st-main-button-icon').fadeOut( 100, function() {
+              $('.st-main-button-icon-hovered').fadeIn();
+            });
+			
+			$('.st-main-info').addClass('active');
+			$('.st-main-cursor').addClass('active');
+			$('.st-main-button').addClass('active');	
+	});
+	$('.st-main-button-icon-hovered').bind('mouseout',function(event) 
+	{
+		    $('.st-main-button-icon-hovered').fadeOut( 100, function() {
+              $('.st-main-button-icon').fadeIn();
+            });
+			$('.st-main-info').removeClass('active');
+			$('.st-main-cursor').removeClass('active');
+			$('.st-main-button').removeClass('active');
+	});
+	
+	function startpageScroll(scrollingVal) 
+    {
+      var element = $('.st-main-block').jScrollPane({showArrows:false, arrowSize:0,animateScroll: true});
+	  if(scrollingVal) {
+		  var api = element.data('jsp');
+		  api.scrollToElement($('.st-scroll-to'), true, true);
+	  }
+    }
+	startpageScroll();
+	$(window).bind('resize', function (e) 
+	{	
+         startpageScroll();
+    });
+	
+	// Demo of scrolling
+	$(".st-bottom-scroll-button").bind('click',function(event) 
+    {
+		  $('.st-mid-white-block').addClass('active');
+		  $('.st-mid-white-block').height($('.st-main-block').outerHeight()-50);
+		  $('.st-full-block').removeClass('hidden');
+		  $('.st-main-bottom').addClass('scroll');
+		  $('.st-main-bottom').addClass('floating');
+		  startpageScroll('true');
+    });
+	
+	$('.how-it-works-button').bind('click',function(event) 
+    {
+		$(this).parent().addClass('active');
+		$('.how-it-works-more').addClass('active');
+		startpageScroll();
+	});
+
+});
+
+</script>
+
+</head>
+
+<body class="new-startpage">
+
+<div id="pageholder" style="display:none;"></div>
+<div id="nstartholder" class="fmholder">
+  
+  <div class="st-main-block">
+  
+    <div class="top-head">
+     <a class="logo"></a>
+     <a class="top-menu-icon">Menu</a>
+     <a class="create-account-button"> Create Account </a>
+     <a class="top-login-button"> Login </a>
+    </div>
+
+         <!-- Set curren height in js if scrolling. If we Getting back to the top - Please set height:100% again !-->
+         <div class="st-mid-white-block">
+             <div class="st-mid-centered-block" >
+                <label for="start-upload" class="st-main-button-bl">
+                   <input type="file" id="start-upload" name="start-upload" class="hidden">
+                   <div class="st-main-button"></div>
+                   <div class="st-main-button-icon" id="st-main-button-icon"></div>
+                   <div class="st-main-button-icon-hovered" style="display:none;" id="st-main-button-icon-hovered"></div>
+                   <div class="st-main-cursor"></div>  
+                </label>
+             </div>
+             <div class="st-main-info" >
+                 Select filecs to upload or drag & drop anywhere on this page
+             </div>
+             
+             
+             <div class="st-social-block">
+                 <div class="st-bottom-button st-facebook-button"></div>
+                 <div class="st-bottom-button st-twitter-button"></div>
+                 <a href="http://www.instra.com" target="_blank" class="st-bottom-button st-thunder-button">
+                   <span class="powered-popup">
+                         <span class="powered-txt">
+                            powered by:
+                         </span>
+                         <span class="powered-logo"></span>
+                   </span>
+                   <span class="powered-arrow"></span>
+                 </a>
+             </div>
+             
+             <div class="st-scroll-to"></div>
+             
+             <!-- Set "scroll" to change arrow icon anf "floating" class to make it alwat on top of browser !-->
+             <div class="st-main-bottom">
+                 <!-- Add class active !--> 
+                 <div class="st-bottom-scroll-button">
+                    Click or Scroll
+                 </div>
+                 <div class="clear"></div>
+             </div>
+         </div>
+         
+         
+
+  </div>
+</div>
+</body>
+</html>

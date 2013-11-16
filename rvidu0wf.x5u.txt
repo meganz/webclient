@@ -1,0 +1,31 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   html/fm.html
+#	modified:   index.js
+#	modified:   js/fm.js
+#	modified:   js/mega.js
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	5fij1qwo.4yc.txt
+#	beta.html
+#	chrome.xml
+#	html/about_mobile.html
+#	html/chrome_old.html
+#	html/copyrightnotice_old.html
+#	html/mobile_old.html
+#	html/privacy_old.html
+#	html/resellers_old.html
+#	html/takedown_old.html
+#	html/terms_old.html
+#	mega.crx
+#	mega.xpi
+#	update.rdf
+#	update.rdf.dev
+

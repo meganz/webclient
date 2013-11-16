@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/fm.js"></script>
+<script type="text/javascript">
+   $(document).ready(function() {
+	   function initMainScroll() 
+       {
+	      $('.main-scroll-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});	
+       }
+	   initMainScroll();
+	   $(window).bind('resize.icon', function () 
+	   {
+		initMainScroll();
+       });
+        
+   });
+</script>
+
+
+
+</head>
+
+<body class="new-startpage">
+<div id="pageholder" style="display:none;"></div>
+
+<div id="nstartholder" class="fmholder">
+
+  <!-- Add scrolling to this block please !-->
+  <div class="main-scroll-block">
+   <div class="main-pad-block">
+      <div class="top-head"> 
+        <a class="logo"></a> 
+        <a class="top-menu-icon"></a> 
+        <a class="create-account-button"> Create Account </a> 
+        <a class="top-login-button"> Login </a> 
+      </div> 
+     
+      <div class="main-mid-pad new-bottom-pages copyrights-page">
+           <h1>Copyright Notice</h1>
+           <p>
+             <span class="red">This notification is a serious legal document - please be careful to be accurate in your copyright infringement claims. You may wish to first consult with an attorney to determine whether the content you are reporting is in fact infringing and not protected by fair use, license, or other legal basis.</span>
+           </p>
+           <h2 class="copyrights-h2-pad"><span>Step 2:</span> Copyright owner details</h2>
+           
+           <div class="new-affiliate-small-bl left">
+              <div class="new-affiliate-label">
+                 <div class="new-affiliate-star"></div>
+                 Name of copyright owner:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="owner-name" id="owner-name" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 <div class="new-affiliate-star"></div>
+                 Job title / position (if applicable):
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="job-title" id="job-title" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 <div class="new-affiliate-star"></div>
+                 E-mail address:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="owner-email" id="owner-email" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Fax:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="owner-fax" id="owner-fax" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 City:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="owner-city" id="owner-city" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Zip / Postal code:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="zip-postal" id="zip-postal" value=""> 
+              </div>
+           </div>
+           
+           <div class="new-affiliate-small-bl right">
+              <div class="new-affiliate-label">
+                 <div class="new-affiliate-star"></div>
+                 Name of copyright owner’s authorised agent submitting notice:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="agent-name" id="agent-name" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Company / Organization:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="organization" id="organization" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Phone:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="phone" id="phone" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Adress:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="address" id="address" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 State / Province:
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block"> 
+                <input type="text" name="state" id="state" value=""> 
+              </div>
+              <div class="new-affiliate-label">
+                 Country
+              </div>
+              <div class="clear"></div>
+              <div class="affiliate-input-block select"> 
+                <div class="affiliate-select-txt"></div>
+                <select>
+                  <option>1212</option>
+                  <option>1312</option>
+                  <option>1412</option>
+                </select>
+              </div>
+           </div>
+           <div class="clear"></div>
+           
+           <div class="register-st2-button active copyrights-form"> 
+                <div class="register-st2-button-arrow"> Sign and submit notice </div> 
+           </div>
+           <div class="register-st2-button active back copyrights-form"> 
+             <div class="register-st2-button-arrow"> Back </div> 
+           </div>
+           <div class="clear"></div>     
+      </div> 
+      
+      <div class="copyrights-gray">
+         <div class="main-mid-pad new-bottom-pages copyrights-bottom">
+           <div class="new-affiliate-small-bl left">
+            <div class="new-registration-checkbox"> 
+              <div class="checkboxOn"> 
+                <input type="checkbox" name="agree1-checkbox" id="agree1-checkbox" class="checkboxOn"> 
+              </div> 
+              <label for="agree1-checkbox" class="radio-txt">I understand I may be liable for damages, including costs and attorneys’ fees, if I knowingly and materially misrepresent that the reported content, URL(s), or files are infringing.</label> 
+              <div class="clear"></div> 
+            </div>
+           </div>
+           <div class="new-affiliate-small-bl right">
+            <div class="new-registration-checkbox"> 
+              <div class="checkboxOn"> 
+                <input type="checkbox" name="agree2-checkbox" id="agree2-checkbox" class="checkboxOn"> 
+              </div> 
+              <label for="agree2-checkbox" class="radio-txt">The information in this notification is accurate, and I am entitled to submit this under New Zealand law, or I state under penalty of perjury that I am authorized to act on behalf of the copyright owner.</label> 
+              <div class="clear"></div> 
+            </div>
+           </div>
+           <div class="clear"></div>
+         </div>
+      </div>
+    
+      
+    
+      <div class="nw-bottom-block">
+        <div class="nw-bottom-pad">
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">MEGA</div>
+            <div class="nw-bottom-link">About Us</div>
+            <div class="nw-bottom-link">The Privacy Company</div>
+            <div class="nw-bottom-link">Blog</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">APPS</div>
+            <div class="nw-bottom-link">Android App</div>
+            <div class="nw-bottom-link">Chrome App</div>
+            <div class="nw-bottom-link">iOS App</div>
+            <div class="nw-bottom-link">Windows Sync Client</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">SUPPORT</div>
+            <div class="nw-bottom-link">Help</div>
+            <div class="nw-bottom-link">Contact Us</div>
+            <div class="nw-bottom-link">Site Map</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">DEVELOPERS</div>
+            <div class="nw-bottom-link">SDK</div>
+            <div class="nw-bottom-link">Documentation</div>
+            <div class="nw-bottom-link">Affiliate Program</div>
+          </div>
+          <div class="nw-bottom-column">
+            <div class="nw-bottom-header">LEGAL &amp; POLICIES</div>
+            <div class="nw-bottom-link">Terms of Service</div>
+            <div class="nw-bottom-link">Privacy Policy</div>
+            <div class="nw-bottom-link">Copyright</div>
+            <div class="nw-bottom-link">Takedown Guidance</div>
+          </div>
+          <div class="nw-start-nz"></div>
+          <div class="clear"></div>
+        </div>
+        <div class="nw-bottom-pad-with-border">
+          <div class="nw-bottom-copyrigths"> Mega Limited 2013 <span>All rights reserved</span> </div>
+          <div class="nw-bottom-social facebook"></div>
+          <div class="nw-bottom-social twitter"></div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    
+  </div>
+</div>
+</div>
+
+</body>
+</html>

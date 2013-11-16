@@ -1,0 +1,75 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modified:   html/js/key.js
+#	modified:   html/js/start.js
+#	modified:   html/key.html
+#	modified:   html/megainfo.html
+#	modified:   js/arkanoid.js
+#	modified:   lang/af.json
+#	modified:   lang/ar.json
+#	modified:   lang/bg.json
+#	modified:   lang/br.json
+#	modified:   lang/bs.json
+#	modified:   lang/ca.json
+#	modified:   lang/cn.json
+#	modified:   lang/ct.json
+#	modified:   lang/cz.json
+#	modified:   lang/de.json
+#	modified:   lang/dk.json
+#	modified:   lang/el.json
+#	modified:   lang/en.json
+#	modified:   lang/es.json
+#	modified:   lang/et.json
+#	modified:   lang/eu.json
+#	modified:   lang/fi.json
+#	modified:   lang/fr.json
+#	modified:   lang/gl.json
+#	modified:   lang/he.json
+#	modified:   lang/hr.json
+#	modified:   lang/hu.json
+#	modified:   lang/id.json
+#	modified:   lang/it.json
+#	modified:   lang/jp.json
+#	modified:   lang/kr.json
+#	modified:   lang/lt.json
+#	modified:   lang/lv.json
+#	modified:   lang/mi.json
+#	modified:   lang/nl.json
+#	modified:   lang/no.json
+#	modified:   lang/pl.json
+#	modified:   lang/pt.json
+#	modified:   lang/ro.json
+#	modified:   lang/ru.json
+#	modified:   lang/se.json
+#	modified:   lang/sk.json
+#	modified:   lang/sl.json
+#	modified:   lang/sq.json
+#	modified:   lang/sr.json
+#	modified:   lang/th.json
+#	modified:   lang/tr.json
+#	modified:   lang/uk.json
+#	modified:   lang/vn.json
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	beta.html
+#	chrome.xml
+#	html/about_mobile.html
+#	html/chrome_old.html
+#	html/copyrightnotice_old.html
+#	html/mobile_old.html
+#	html/privacy_old.html
+#	html/resellers_old.html
+#	html/takedown_old.html
+#	html/terms_old.html
+#	mega.crx
+#	mega.xpi
+#	update.rdf
+#	update.rdf.dev
+

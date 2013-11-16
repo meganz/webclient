@@ -1,0 +1,1504 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="resources/css/style.css" />
+
+<script type="text/javascript">
+var mobileversion=false;
+var lightweight=false;
+var l = {};
+</script>
+<script type="text/javascript" src="js/crypto.js"></script>
+<script type="text/javascript" src="js/functions.js"></script>
+<script type="text/javascript" src="sjcl.js"></script>
+<script type="text/javascript" src="js/rsa.js"></script>
+<script type="text/javascript" src="js/keygen.js"></script>
+<script type="text/javascript" src="js/mouse.js"></script>
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui.js"></script>
+<script type="text/javascript" src="js/jquery.color.min.js"></script>
+<script type="text/javascript" src="js/base64.js"></script>
+<script type="text/javascript" src="filedrag.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="newfm.js"></script>
+<script type="text/javascript" src="js/mDB.js"></script>
+<script type="text/javascript" src="js/cleartemp.js"></script>
+<script type="text/javascript" src="js/download.js"></script>
+<script type="text/javascript" src="js/upload.js"></script>
+
+<script type="text/javascript" src="thumbnail.js"></script>
+<script type="text/javascript" src="exif.js"></script>
+<script type="text/javascript" src="megapix.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() 
+{  	
+	if (!window.indexedDB) loadfm();	
+	//Andrei's last commit
+    chatUI();
+});
+
+
+function initGridScrolling() 
+{
+	$('.grid-scrolling-table').jScrollPane({showArrows:true, arrowSize:5});
+}
+function initFileblocksScrolling() 
+{
+	$('.file-block-scrolling').jScrollPane({showArrows:true, arrowSize:5});		
+	$('.file-block-scrolling.jspPane').height('');
+}
+function initTranferScroll() 
+{
+	$('.transfer-scrolling-table').jScrollPane({showArrows:true, arrowSize:5});
+}
+function initTreeScroll() 
+{
+	$('.fm-tree-panel').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});	
+}
+
+//Andrei's last commit: init scrolling for Attach files block
+function initAttachFilesScroll() 
+{
+	$('.fm-chat-attach-scrolling').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});	
+}
+//Andrei's last commit: init chat block scrolling
+function initChatScroll() 
+{
+	$('.fm-chat-message-scroll').jScrollPane({showArrows:true, arrowSize:5});	
+}
+
+//Andrei's last commit
+function chatUI() {
+	
+	 //TODO: put init chat scrolling in correct position.
+     initChatScroll;
+     $(window).bind("resize.fm-chat-message-scroll", initChatScroll);
+	
+	 //Andrei's last commit: Chat page. Show/Hide attach files popup
+	 $('.fm-chat-attach-file').bind('click',function() 
+	 {
+		if ($(this).attr('class').indexOf('active') == -1) {
+		    $(this).addClass('active');
+			$('.fm-chat-attach-popup').removeClass('hidden');
+			initAttachFilesScroll;
+		} 
+		else {
+			$(this).removeClass('active');
+			$('.fm-chat-attach-popup').addClass('hidden');
+		}
+	 });
+	 
+	 $('.attach-cancel').bind('click',function() 
+	 {
+		$('.fm-chat-attach-file').removeClass('active');
+		$('.fm-chat-attach-popup').addClass('hidden');	 
+	 });
+	 
+	 $('.fm-chat-emotions-icon').bind('click',function() 
+	 {
+		if ($(this).attr('class').indexOf('active') == -1) {
+		    $(this).addClass('active');
+			$('.fm-chat-emotion-popup').removeClass('hidden');
+		} 
+		else {
+			$(this).removeClass('active');
+			$('.fm-chat-emotion-popup').addClass('hidden');
+		}
+	 });
+	 
+	 $('.fm-chat-smile').bind('click',function() 
+	 {
+		$('.fm-chat-emotions-icon').removeClass('active');
+		$('.fm-chat-emotion-popup').addClass('hidden');	 
+	 });
+}
+
+
+function initUI()
+{
+	console.log('initUI');
+	InitFileDrag();	 // initialize input file
+	createfolderUI();
+	cSortMenuUI();
+	initContextUI();	
+	transferPanelUI();	
+	
+	// change grid view mode
+	$('.fm-files-view-icon').unbind('click');
+	$('.fm-files-view-icon').bind('click',function(event) 
+	{
+		console.log('clickit');
+		if($(this).attr('class').indexOf('listing-view') > -1) 
+		{
+		  M.viewmode=0;
+		  M.renderMain();		 
+		}
+		else
+		{
+		  M.viewmode=1;
+		  M.renderMain();	     
+		}
+		return false;
+	});	
+	$.hideContextMenu = function(e)
+	{
+		$('.fm-tree-header').removeClass('dragover');
+		$('.fm-tree-folder').removeClass('dragover');
+		if ($('.contacts-arrows').attr('class').indexOf('active') > -1)	
+		{	
+			if(e && $(e.target).closest('.contacts-arrows').length == 0 ) 
+			{
+				$('.sorting-menu').addClass('hidden');
+				$('.contacts-arrows').removeClass('active');
+			}
+		}
+		else $('.context-menu').addClass('hidden');
+	};
+	$('.fmholder').unbind('click.contextmenu');
+	$('.fmholder').bind('click.contextmenu', function(e) 
+	{
+		$.hideContextMenu(e);
+		if ($(e.target).attr('type') !== 'file') return false;
+    });
+}
+
+function initContextUI()
+{
+	var c = '.context-menu-item';
+	$(c+'.download-item').unbind('click');
+	$(c+'.download-item').bind('click',function(event) 
+	{
+		M.addDownload($.selected);
+	});
+	
+	$(c+'.zipdownload-item').unbind('click');
+	$(c+'.zipdownload-item').bind('click',function(event) 
+	{
+		M.addDownload($.selected,true);
+	});
+	
+	$(c+'.getlink-item').unbind('click');
+	$(c+'.getlink-item').bind('click',function(event) 
+	{
+		console.log('get link');		
+	});
+	
+	$(c+'.sharing-item').unbind('click');
+	$(c+'.sharing-item').bind('click',function(event) 
+	{
+		console.log('sharing');		
+	});
+	
+	$(c+'.rename-item').unbind('click');
+	$(c+'.rename-item').bind('click',function(event) 
+	{
+		console.log('rename');		
+	});
+	
+	$(c+'.move-item').unbind('click');
+	$(c+'.move-item').bind('click',function(event) 
+	{
+		console.log('move');		
+	});
+	
+	$(c+'.copy-item').unbind('click');
+	$(c+'.copy-item').bind('click',function(event) 
+	{
+		console.log('copy');		
+	});
+	
+	$(c+'.newfolder-item').unbind('click');
+	$(c+'.newfolder-item').bind('click',function(event) 
+	{
+		console.log('new folder');		
+	});
+	
+	$(c+'.remove-item').unbind('click');
+	$(c+'.remove-item').bind('click',function(event) 
+	{
+		console.log('remove');		
+	});
+	
+	$(c+'.properties-item').unbind('click');
+	$(c+'.properties-item').bind('click',function(event) 
+	{
+		console.log('remove');		
+	});
+	
+	$(c+'.permissions-item').unbind('click');
+	$(c+'.permissions-item').bind('click',function(event) 
+	{
+		console.log('permissions');		
+	});
+	
+	$(c+'.open-item').unbind('click');
+	$(c+'.open-item').bind('click',function(event) 
+	{
+		console.log('open');		
+	});
+	
+	$(c+'.clearbin-item').unbind('click');
+	$(c+'.clearbin-item').bind('click',function(event) 
+	{
+		console.log('clear rubbish bin');		
+	});
+	
+	$(c+'.addcontact-item').unbind('click');
+	$(c+'.addcontact-item').bind('click',function(event) 
+	{
+		console.log('addcontact');		
+	});
+	
+	$(c+'.refresh-item').unbind('click');
+	$(c+'.refresh-item').bind('click',function(event) 
+	{
+		console.log('refresh');		
+	});
+}
+
+
+function cSortMenuUI()
+{	
+	$('.contacts-arrows').unbind('click');
+	$('.contacts-arrows').bind('click', function(e) 
+	{
+		var menuBlock = $('.sorting-menu');
+		var bottomPosition = $('body').outerHeight()-$(menuBlock).outerHeight();
+		if($(this).attr('class').indexOf('active') == -1) 
+		{
+			menuBlock.removeClass('hidden');
+			$(this).addClass('active');
+			menuBlock.css('top', $(this).position().top - 10);
+			menuBlock.css('left', $(this).position().left + 30);
+			if(bottomPosition- $(menuBlock).position().top < 50) menuBlock.css('top', bottomPosition-50);				
+		} 
+		else 
+		{
+			$('.fm-main').bind('click');
+			menuBlock.addClass('hidden');
+			$(this).removeClass('active');
+		}
+		return false;
+	});
+
+	$('.contacts-sorting-by').unbind('click');
+	$('.contacts-sorting-by').bind('click', function(e) 
+	{
+		if($(this).attr('class').indexOf('active') == -1) 
+		{
+			$('.contacts-sorting-by').removeClass('active');
+			$(this).addClass('active');
+		} 
+		return false;
+	});
+
+	$('.contacts-sorting-type').unbind('click');
+	$('.contacts-sorting-type').bind('click', function(e) 
+	{
+		if($(this).attr('class').indexOf('active') == -1) 
+		{
+			$('.contacts-sorting-type').removeClass('active');
+			$(this).addClass('active');
+		} 
+		return false;
+	});
+}
+
+function createfolderUI()
+{
+	$('.fm-new-folder').unbind('mouseover');
+	$('.fm-new-folder').bind('mouseover',function(e) 
+	{		
+		$(this).addClass('active');
+		$(this).removeClass('gray');
+			
+	});
+	
+	$('.fm-new-folder').unbind('mouseout');
+	$('.fm-new-folder').bind('mouseout',function(e) 
+	{
+		$(this).removeClass('active');
+		$(this).addClass('gray');
+	});
+	
+	$('.create-folder-button').unbind('click');
+	$('.create-folder-button').bind('click',function(e) 
+	{
+		docreatefolderUI(e);
+		return false;
+	});
+	
+	$('.create-folder-input-bl input').unbind('keypress');
+	$('.create-folder-input-bl input').bind('keypress',function(e) 
+	{
+		if (e.which == 13) docreatefolderUI(e);		
+	});
+}
+
+function docreatefolderUI(e)
+{
+	if ($('.create-folder-input-bl input').val() == '') $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() { $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function(){$('.create-folder-input-bl input').focus();});});	
+	else createfolder(M.currentdirid,$('.create-folder-input-bl input').val());	
+}
+
+
+function gridUI()
+{   
+	$.gridDragging=false;
+	$.gridLastSelected=false;
+	$('.fm-files-view-icon.listing-view').addClass('active');
+	$('.fm-files-view-icon.block-view').removeClass('active');	
+	
+
+	$.gridHeader = function()  
+	{	
+		var el = $('.grid-table-header th');		
+		var i=0;
+		var w=0;		
+		while (i < el.length)
+		{
+			if (i !== 1) w+=$(el[i]).width();
+			i++;
+		}
+		$('.grid-table-header th:eq(1)').width($('.files-grid-view').width()-w-48);
+		initTranferScroll();
+	}
+	$.selectddUIgrid = '.grid-scrolling-table';
+	$.selectddUIitem = 'tr';
+	selectddUI();
+	
+	$(window).unbind('resize.grid');
+	$(window).bind('resize.grid', function () 
+	{
+		if (M.viewmode == 0)
+		{
+			initGridScrolling();
+			$.gridHeader();
+		}
+    });
+	$('.fm-blocks-view').addClass('hidden');
+	$('.files-grid-view').removeClass('hidden');	
+	
+	initGridScrolling();
+	$.gridHeader();
+}
+
+function selectddUI()
+{
+	$($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable( 
+	{
+		tolerance: 'pointer',
+		drop: function( e, ui)
+		{
+			$.doDD(e,ui,'drop',0);
+		},
+		over: function (e, ui)
+		{
+			$.doDD(e,ui,'over',0);
+		},
+		out: function (e, ui)
+		{
+			$.doDD(e,ui,'out',0);
+		}
+	});
+
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
+	{
+		start: function(e,u) 
+		{	
+			$.hideContextMenu(e);
+			$.gridDragging=true;
+			if ($(this).attr('class').indexOf('ui-selected') == -1)
+			{
+				$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+				$(this).addClass('ui-selected');				
+			}
+			
+			
+			var s = $($.selectddUIgrid + ' .ui-selected');		
+			if (s.length > 1)
+			{
+				$('.dragger-block').addClass('multiple');
+				$('.dragger-files-number').text(s.length);
+				$('.dragger-files-number').show();	
+			}
+			$.selected=[];
+			s.each(function(i,e)
+			{
+				$.selected.push($(e).attr('id'));
+			});
+		},
+		drag: function(e,u) 
+		{
+			console.log($.gridDragging,$($.selectddUIgrid + ' .ui-selected').length);		
+		},
+		containment: 'document',
+		distance:10,
+		revertDuration:200,
+		revert: function (el,el2)
+		{
+			return true;
+		},	
+		cursorAt:{right:100,bottom:70},
+		helper: function(e,ui)
+		{
+			return getDDhelper();
+		},
+		stop: function(event)
+		{
+			$.gridDragging=false;
+		}
+	});
+	
+	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); }});
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function (e) 
+	{	
+		if ($(this).attr('class').indexOf('ui-selected') == -1)
+		{
+			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+			$(this).addClass('ui-selected');
+		}
+		$.selected=[];		
+		$($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i,o)
+		{
+			if ($(o).attr('class').indexOf('ui-selected') > -1) $.selected.push($(o).attr('id'));			
+		});
+		contextmenuUI(e);
+	});
+	
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
+	{
+		if ($.gridDragging) return false;
+		if (e.shiftKey && s.length > 0)
+		{				
+			var start = s[0];
+			var end = this;
+			if ($.gridLastSelected && $($.gridLastSelected).attr('class').indexOf('ui-selected') > -1) start = $.gridLastSelected;
+			if ($(start).index() > $(end).index())
+			{
+				end = start;
+				start = this;
+			}
+			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+			$([start,end]).addClass('ui-selected');
+			$(start).nextUntil($(end)).each(function(i,e)
+			{
+				$(e).addClass('ui-selected');		
+			});
+		}
+		else if (e.metaKey == false) 
+		{
+			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+			$(this).addClass('ui-selected');
+			$.gridLastSelected = this;
+		}
+		else 
+		{
+			if ($(this).hasClass("ui-selected"))  $(this).removeClass("ui-selected");			
+			else 
+			{
+				$(this).addClass("ui-selected");
+				$.gridLastSelected = this;
+			}
+		}
+		$.hideContextMenu(e);
+		return false;
+	});
+		
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('dblclick');
+	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e) 
+	{
+		var h = $(e.currentTarget).attr('id');
+		if (M.d[h] && M.d[h].t) M.openFolder(h);
+		else M.addDownload([h]);
+	});
+}
+
+
+
+
+
+function iconUI()
+{
+	$('.fm-files-view-icon.block-view').addClass('active');
+	$('.fm-files-view-icon.listing-view').removeClass('active');
+	
+	$.selectddUIgrid = '.file-block-scrolling';
+	$.selectddUIitem = 'a';
+	selectddUI();
+	
+	$('.fm-blocks-view').removeClass('hidden');
+	$('.files-grid-view').addClass('hidden');
+	
+	$(window).unbind('resize.icon');
+	$(window).bind('resize.icon', function () 
+	{
+         if (M.viewmode == 1) initFileblocksScrolling();
+    });	
+	initFileblocksScrolling();
+}
+
+function transferPanelUI()
+{
+    $.transferHeader = function()
+	{	
+		var el = $('.transfer-table-header th');		
+		var i=1;
+		var w=0;		
+		while (i < el.length)
+		{
+			w+=$(el[i]).width();
+			i++;
+		}
+		$('.transfer-table-header th:eq(0)').width($('.transfer-scrolling-table').width()-w-72);
+		initTranferScroll();
+	}	
+	$(window).unbind('resize.transferpanel');
+	$(window).bind('resize.transferpanel', function (e) 
+	{	
+         $.transferHeader();
+    });
+	$('.tranfer-view-icon').unbind('click');
+	$('.tranfer-view-icon').bind('click', function (e) 
+	{
+        if($(this).attr('class').indexOf('active') == -1) 
+		{
+			$(this).addClass('active');
+			$('.fmholder').addClass('transfer-panel-opened');
+			$.transferHeader();
+		}
+		else 
+		{
+			$(this).removeClass('active');
+			$('.fmholder').removeClass('transfer-panel-opened');
+		}
+		initTreeScroll();
+		initGridScrolling();
+		initFileblocksScrolling();
+    });		
+}
+
+function getDDhelper()
+{	
+	var el = $('.dragger-block');
+	if (el.length == 0) $('.fmholder').append("<div class=\"dragger-block drag\" id=\"draghelper\"><div class=\"dragger-icon first\" style=\"background-image:url(images/mega/new-filetypes/large-icons/word.png);\"></div><div class=\"dragger-icon second\" style=\"background-image:url(images/mega/new-filetypes/large-icons/word.png);\"></div><div class=\"dragger-icon third\" style=\"background-image:url(images/mega/new-filetypes/large-icons/folder.png);\"></div><div class=\"dragger-status\"></div><div class=\"dragger-files-number\">1</div></div>");
+	
+	<!-- Addition classes: drag/copy/move/warning, multiple. -->
+	
+	$('.dragger-block').removeClass('multiple');
+	$('.dragger-files-number').hide();
+	
+	
+	return $('.dragger-block')[0];
+}
+
+
+function contextmenuUI(e)
+{		
+	var m = $('.files-menu');
+	m.removeClass('hidden');
+	var r = $('body').outerWidth()-$(m).outerWidth();
+	var b = $('body').outerHeight()-$(m).outerHeight();
+	var mX = e.pageX;
+	var mY = e.pageY;
+	m.css({'top':mY,'left':mX})
+	if (b - $(m).position().top < 50) m.css('top', b-50);		
+	if (r - $(m).position().left < 1) m.css('left', mX - 10 - $(m).outerWidth());	
+	e.preventDefault();
+}
+
+
+function treeUI()
+{	
+	$.selectingHeader = function(currentHeader) 
+	{   
+		console.log('selectingHeader');
+	
+		
+		var c = currentHeader.attr('class');
+		
+		initTreeScroll();
+		
+		
+		if(c && c.indexOf('active') == -1) 
+		{
+		   $('.fm-menu-item').removeClass('active');
+		   if (currentHeader.attr('class').indexOf('cloud') > -1)
+		   {
+			 $('.fm-menu-item.cloud').addClass('active');			   
+		   }
+		   else if (currentHeader.attr('class').indexOf('recycle') > -1)
+		   {
+			 $('.fm-menu-item.recycle').addClass('active');
+		   }
+		   else if (currentHeader.attr('class').indexOf('contacts') > -1)
+		   {
+			 $('.fm-menu-item.contacts').addClass('active');
+		   }
+		   else if (currentHeader.attr('class').indexOf('messages') > -1)
+		   {
+			 $('.fm-menu-item.messages').addClass('active');
+		   }
+		   currentHeader.addClass('active');
+		}	  
+	   $('.fm-tree-header').each(function()
+	   {
+			
+			var subFoldersBlock = $(this).next();
+			if ($(this).attr('class') !== currentHeader.attr('class')) 
+			{
+				$(this).removeClass('active');
+				subFoldersBlock.find('li').removeClass('selected');
+				subFoldersBlock.find('.fm-tree-folder').removeClass('active');
+				subFoldersBlock.find('.fm-connector').removeClass('mid last vertical-line');
+				subFoldersBlock.find('.fm-horizontal-connector').removeClass('active');
+				$(this).prev().removeClass('active');
+			}
+	   });
+    };
+		
+	$('.fm-menu-item').unbind('click');
+	$('.fm-menu-item').bind('click',function(event) 
+	{
+		if ($(this).attr('class').indexOf('cloud') > -1)
+		{	
+			$('.fm-tree-header.cloud-drive-item').click();
+			var jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) jsp.scrollTo(0,0);
+		}		
+		else if ($(this).attr('class').indexOf('recycle') > -1)
+		{	
+			$('.fm-tree-header.recycle-item').click();
+			var pos = $('.fm-tree-header.recycle-item').position();			
+			var jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) jsp.scrollTo(0,pos.top);
+		}		
+		else if ($(this).attr('class').indexOf('contacts') > -1)
+		{	
+			$('.fm-tree-header.contacts-item').click();
+			var pos = $('.fm-tree-header.contacts-item').position();			
+			var jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) jsp.scrollTo(0,pos.top);		
+		}		
+		else if ($(this).attr('class').indexOf('messages') > -1)
+		{	
+			$('.fm-tree-header.messages-item').click();
+			var pos = $('.fm-tree-header.messages-item').position();
+			var jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) jsp.scrollTo(0,pos.top);
+		}
+		return false;		
+	});
+	   
+	$('.fm-tree-header').unbind('click contextmenu');
+	$('.fm-tree-header').bind('click contextmenu',function(e) 
+	{
+		$.hideContextMenu(e);		
+		if (e.type == 'contextmenu')
+		{
+			$('.fm-tree-header').removeClass('dragover');
+			$('.fm-tree-folder').removeClass('dragover');
+			$(this).addClass('dragover');
+			contextmenuUI(e);
+			return false;			
+		}
+
+		
+		$('.fm-connector').removeClass('last vertical-line mid');
+		$('.fm-horizontal-connector').removeClass('active');
+		$('.fm-tree-folder').removeClass('active');
+		$('.fm-connector-first').removeClass('active');
+	
+		var id;
+		if ($(this).attr('class').indexOf('cloud-drive-item') > -1)
+		{	
+			console.log('Cloud drive click');
+			id = M.RootID;			
+		}		
+		else if ($(this).attr('class').indexOf('recycle-item') > -1)
+		{	
+			console.log('Rubbish bin click');
+			id = M.RubbishID;			
+		}		
+		else if ($(this).attr('class').indexOf('contacts-item') > -1)
+		{	
+			console.log('Contacts click');
+			var c = $(e.target).attr('class');	
+			if (c && c.indexOf('contacts-arrows') > -1) return false;			
+			id = 'contacts';			
+		}		
+		else if ($(this).attr('class').indexOf('messages-item') > -1)
+		{	
+			console.log('Messages click');
+			id = 'messages';			
+		}
+		var isSubfolders = $(this).attr('class').indexOf('contains-subfolders');
+		
+		
+		if(isSubfolders > -1 && $(this).attr('class').indexOf('opened') == -1) 
+		{
+			var mainConnector = $(this).prev();
+			$(this).next().addClass('opened');
+			$(this).addClass('opened expanded');
+			$(this).next().find('li').each(function()
+			{
+				if($(this).attr('class') && $(this).attr('class').indexOf('selected') > -1) 
+				{
+					mainConnector.addClass('active');
+					return false;
+				}
+			});
+		} 
+		else if ((id == M.currentdirid) || (e.offsetX < 25))
+		{			
+			$(this).next().removeClass('opened');
+			$(this).removeClass('opened expanded');
+			$(this).prev().removeClass('active');
+		}		
+		$.selectingHeader($(this)); 		   
+		if (id) M.openFolder(id);		
+		return false;
+	});
+	
+	$('.fm-tree-panel .fm-tree-folder').not('.contact').draggable( 
+	{
+		revert: function (el,el2)
+		{
+			return true;
+		},
+		containment: 'document',
+		revertDuration:200,
+		distance: 10,
+		cursorAt:{right:100,bottom:70},
+		helper: function(e,ui)
+		{			
+			return getDDhelper();
+		},
+		start: function (e, ui) 
+		{
+			$.hideContextMenu(e);
+			//console.log('start tree dragging');
+		},
+		drag: function(e,u) 
+		{
+			//console.log('tree dragging',e);
+		}
+	});
+	
+	$.doDD = function(e,ui,a,type)
+	{
+		var c = $(e.target).attr('class');
+		var toid, fromid, dd;
+		if (type == 1)
+		{
+			if (c && c.indexOf('recycle-item') > -1) toid = M.RubbishID;
+			else if (c && c.indexOf('cloud-drive-item') > -1) toid = M.RootID;
+			else
+			{
+				var toid = $(e.target).attr('id');			
+				if (toid) toid = toid.replace('treea_','');
+			}
+			var c = $(ui.draggable).attr('id');			
+			if (c) fromid = c.replace('treea_','');
+		}
+		else
+		{
+			if ($.selected && $.selected.length > 0) fromid = $.selected[0];
+			toid = $(e.target).attr('id');
+		}
+		if (fromid && toid) dd = ddtype(fromid,toid);		
+		$('.dragger-block').removeClass('move copy warning drag');		
+		if (a == 'drop' || a == 'out')
+		{			
+			$(e.target).removeClass('dragover');
+			$('.dragger-block').addClass('drag');
+		}
+		else if (a == 'over')
+		{
+			if (toid == M.RubbishID) $('.dragger-block').addClass('warning');
+			else if (dd == 'move') $('.dragger-block').addClass('move');
+			else if (dd == 'copy') $('.dragger-block').addClass('copy');
+			else $('.dragger-block').addClass('drag');			
+			$(e.target).addClass('dragover');
+		}
+	};
+	
+	$('.fm-tree-panel a.fm-tree-folder,.fm-tree-header.cloud-drive-item,.fm-tree-header.recycle-item').droppable( 
+	{
+		tolerance: 'pointer',
+		drop: function(e, ui)
+		{
+			$.doDD(e,ui,'drop',1);
+		},
+		over: function (e, ui)
+		{	
+			$.doDD(e,ui,'over',1);
+		},
+		out: function (e, ui)
+		{
+			$.doDD(e,ui,'out',1);
+		}			
+	});	
+		
+	$('.fm-tree-folder').unbind('click contextmenu');
+	$('.fm-tree-folder').bind('click contextmenu',function(e) 
+	{
+		if (e.type == 'contextmenu')
+		{
+			$('.fm-tree-header').removeClass('dragover');
+			$('.fm-tree-folder').removeClass('dragover');
+			$(this).addClass('dragover');
+			$.selected=[id];
+			contextmenuUI(e);
+			return false;			
+		}		
+		var id = $(this).attr('id').replace('treea_','');		
+		console.log(id);
+		M.openFolder(id);
+		treeUIopen(id,e);
+		return false;		
+	});
+	
+	$(window).unbind('resize.tree');
+	$(window).bind('resize.tree', function () 
+	{		
+		initTreeScroll();	
+	});
+	console.log('inittrescroll');
+	console.log($('.fm-tree-panel').height());
+	setTimeout(initTreeScroll,10);
+}
+
+
+function treeUIopen(id,event)
+{
+	if (id == 'messages') return false;
+	$.hideContextMenu(event);
+	$('.fm-connector').removeClass('last vertical-line mid');
+	$('.fm-horizontal-connector').removeClass('active');
+	$('.fm-tree-folder').removeClass('opened');	
+	var b = $('#treea_' + id);	
+	var d = b.attr('class');	
+	if ((event && d && d.indexOf('expanded') > -1 && d.indexOf('active') > -1) || (event && event.offsetX < 22 && d && d.indexOf('expanded') > -1))
+	{
+		$('#treesub_' + id).removeClass('opened');
+		b.removeClass('opened');
+		b.removeClass('expanded');
+	}
+	else if (((event && d.indexOf('active') > -1) || (event && event.offsetX < 22 && d && d.indexOf('expanded') == -1)) && d && d.indexOf('contains-folders') > -1)
+	{
+		$('#treesub_' + id).addClass('opened');
+		b.addClass('opened')
+		b.addClass('expanded');
+	}
+	$('.fm-tree-folder').removeClass('active');	
+	var a = M.getPath(id);	
+	$('.fm-connector').each(function(i,e)
+	{		
+		if (i == 0) $(e).prev().prev().prev().closest('.fm-connector-first').addClass('active');
+		$(e).addClass('vertical-line');
+		if ($(e).next().next().closest('.fm-tree-folder').attr('id').replace('treea_','') == id) return false;
+	});	
+	$(a).each(function(i,e)
+	{		
+		var f = $('#treea_' + e).prev().prev().closest('.fm-connector');
+		if (i > 0)
+		{
+			$('#treesub_' + e).addClass('opened');	
+			$('#treea_' + e).addClass('opened');
+			f.removeClass('vertical-line');
+			f.addClass('mid');			
+		}		
+		else f.addClass('last');
+		$('#treea_' + e).addClass('active');		
+		$('#treea_' + e).prev().closest('.fm-horizontal-connector').addClass('active');
+	});
+	var currentHeader = b.closest('.fm-subfolders').prev();	
+	$('.fm-connector-first').addClass('active');	
+	$.selectingHeader(currentHeader);
+}
+
+
+</script>
+
+</head>
+
+<body>
+
+<div class="dark-overlay" style="display:none;"></div>  
+<div class="loading-spinner" style="display:none;"></div>
+
+
+<div class="dark-overlay hidden"></div>  
+<div class="loading-spinner hidden"></div>
+
+<!-- add "transfer-panel-opened" to next block to show treepanel. "active" class shoud be added to "tranfer-view-icon" block !-->
+<div class="fmholder" id="fmholder">
+
+  <div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="orange-dropdown">Menu</a> 
+    <a class="fm-avatar"><img alt="" src="images/mega/temp/photo3.png"/></a>
+    <div class="activity-status online"></div>
+    <div class="membership-status">Pro</div>
+    <a class="user-name">Eduardo</a>
+    <div class="language-popup-icon"></div> 
+    <div class="notification-popup-icon"></div>
+    <div class="cloud-popup-icon"></div>
+    
+    <div class="top-search-bl">
+       <div class="top-search-clear">
+           <input type="text" value="Search for files and messages" class="top-search-input"/>
+       </div>
+    </div>
+  </div>
+  
+  <div class="context-menu sorting-menu hidden" >
+    <a class="contacts-sorting-by">Name</a>
+    <a class="contacts-sorting-by active">Status</a>
+    <a class="contacts-sorting-by">Starred</a>
+    <div class="context-menu-divider"></div>
+    <a class="contacts-sorting-type active">Ascending</a>
+    <a class="contacts-sorting-type">Descending</a>
+  </div>
+  
+  <div class="context-menu files-menu hidden">
+	<a class="context-menu-item open-item">Open</a>
+	<a class="context-menu-item download-item">Download</a>
+	<a class="context-menu-item zipdownload-item">Download as ZIP</a>
+	<a class="context-menu-item zipdownload-item">Send to contact</a>
+    <a class="context-menu-item getlink-item">Get Link</a>
+	<a class="context-menu-item sharing-item">Sharing</a>
+	<a class="context-menu-item rename-item">Rename</a>
+	<a class="context-menu-item move-item">Move</a>
+	<a class="context-menu-item copy-item">Copy</a>
+	<a class="context-menu-item newfolder-item">New Folder</a>
+	<a class="context-menu-item remove-item">Remove</a>
+	<a class="context-menu-item properties-item">Properties</a>
+	<a class="context-menu-item permissions-item">Permissions</a>	
+	<a class="context-menu-item clearbin-item">Clear Rubbish bin</a>
+	<a class="context-menu-item addcontact-item">Add Contact</a>      
+      <div class="context-menu-divider"></div>
+      <a class="context-menu-item refresh-item">Reload</a>
+  </div>
+  
+  
+ 
+  
+  <div class="fm-main">
+    
+    <div class="fm-left-panel" >
+     
+      <div class="fm-left-menu">
+         <a class="fm-menu-item cloud active"></a> 
+         <a class="fm-menu-item recycle"></a>
+         <a class="fm-menu-item contacts"></a>
+         <a class="fm-menu-item messages"></a>
+      </div>       
+       
+      <div class="fm-tree-panel">
+        <div class="fm-tree-pad">
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header cloud-drive-item active">
+             <span>
+                Cloud drive
+             </span>    
+          </a>          
+          <ul class="fm-subfolders" id="cloudsub"></ul>
+		  
+		            
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header recycle-item">
+             <span>
+                Rubbish-bin
+             </span>    
+          </a>
+          <ul class="fm-subfolders" id="rubbishsub"></ul>
+          
+          
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header contacts-item">
+             <span class="contacts-arrows"></span> 
+             <span>
+                Contacts
+             </span>  
+          </a>          
+          <ul class="fm-subfolders treesub_contacts" id="treesub_contacts"> 
+           <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact online-status contains-folders">
+                 <span>
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="messages-icon active"><span class="active">2</span></span>
+                   <span class="contact-name">Andrei.d</span>
+                 </span>    
+              </a>
+              
+              <ul>
+                <li>
+                  <span class="fm-connector"></span>
+                  <span class="fm-horizontal-connector"></span>
+                  <a class="fm-tree-folder">
+                    <span>
+                      Cloud drive
+                    </span>    
+                  </a>
+                </li>
+                <li>
+                  <span class="fm-connector"></span>
+                  <span class="fm-horizontal-connector"></span>
+                  <a class="fm-tree-folder">
+                    <span>
+                      Cloud drive
+                    </span>    
+                  </a>
+                </li>
+              </ul>              
+            </li>
+           <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact online-status contains-folders">
+                 <span>
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="messages-icon active"><span>2</span></span>
+                   <span class="contact-name">Bramos</span>
+                 </span>    
+              </a>
+              
+              <ul>
+                <li>
+                  <span class="fm-connector"></span>
+                  <span class="fm-horizontal-connector"></span>
+                  <a class="fm-tree-folder">
+                    <span>
+                      Cloud drive
+                    </span>    
+                  </a>
+                </li>
+                <li>
+                  <span class="fm-connector"></span>
+                  <span class="fm-horizontal-connector"></span>
+                  <a class="fm-tree-folder">
+                    <span>
+                      Cloud drive
+                    </span>    
+                  </a>
+                </li>
+              </ul>
+              
+            </li>
+            <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact away-status">
+                 <span>
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="messages-icon"><span>2</span></span>
+                   <span class="contact-name">Andrei.d</span>
+                 </span>    
+              </a> 
+            </li>
+            <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact offline-status">
+                 <span>
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="messages-icon"><span>2</span></span>
+                   <span class="contact-name">Andrei.d</span>
+                 </span>    
+              </a> 
+            </li>
+          </ul>
+         
+		 
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header messages-item">
+             <span>
+                Messaging
+             </span>    
+          </a>
+		  <ul class="fm-subfolders" id="treesub_messaging"></ul>
+        </div>
+      </div>
+  
+  </div>
+  <div class="fm-right-files-block">
+       <div class="fm-right-header">
+         <a class="fm-back-button"></a>
+         <div class="fm-breadcrumbs-block">
+           <a class="fm-breadcrumbs cloud-drive contains-directories has-next-button">
+              <span class="right-arrow-bg">
+                <span class="dropdown-arrow">Cloud Drive</span>
+              </span>
+           </a>
+           <a class="fm-breadcrumbs folder contains-directories has-next-button">
+              <span class="right-arrow-bg">
+                <span class="dropdown-arrow">Some folder</span>
+              </span>
+           </a>
+           <a class="fm-breadcrumbs opened-folder">
+              <span class="right-arrow-bg">
+                <span class="dropdown-arrow">Some folder</span>
+              </span>
+           </a>
+           <div class="clear"></div>
+         </div>
+         
+         <!-- Add user button !-->
+         <div class="fm-add-user">
+           <span>Add to conversation</span>
+         </div>
+         
+         <div class="fm-add-contact-popup hidden">
+            <div class="fm-add-contact-arrow"></div>
+            <div class="fm-add-contact-scrolling">
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/temp/photo3.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+            </div>
+            <div class="fm-add-contact-bottom">
+               <div class="fm-chat-contact-button">
+                   Add
+               </div>
+               <div class="fm-chat-contact-button active">
+                   Cancel
+               </div>
+               <div class="clear"></div>
+            </div>
+         </div>
+         
+         <div class="clear"></div>
+       </div>
+       
+       <!--Chat block !-->
+       
+       <div class="fm-chat-block">
+
+           <div class="fm-chat-header">
+               <div class="fm-chat-avatar-block"> 
+                    <div class="fm-chat-avatar">
+                         <img alt="" src="images/mega/temp/photo3.png" />
+                    </div>
+               </div>
+               <div class="fm-chat-user-info star">
+                  <div class="fm-chat-user">Bram Van Der Kolk</div>
+                  <div class="fm-chat-user-status online">
+                    Online
+                  </div>
+               </div>
+               <div class="clear"></div>
+           </div>
+           
+           <div class="fm-chat-message-scroll">
+             <!-- block with messages from one user !-->
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <!-- messages from one user !-->
+              <div class="fm-chat-messages-pad">
+                 
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+                 
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+
+              </div>
+              <div class="clear"></div>
+              <!-- end of messages from one user !-->
+              
+             </div>
+             <!-- end of block with messages from one user !-->
+             
+             <div class="fm-chat-messages-block">
+             
+              <div class="fm-chat-username current-name">
+                 Andre.d
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                 </div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+              
+              
+             </div>
+             
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+
+                 <img alt="" src="images/mega/new-filetypes/large-icons/word.png" />
+                 <div class="fm-chat-filename">
+                     FileName.doc
+                 </div>
+                 <div class="fm-chat-filesize">
+                     750 kb
+                 </div>
+                  
+                 <div class="fm-chat-file-button save-button hidden">Add to your Cloud Drive</div> 
+                 <div class="fm-chat-file-button cancel-button hidden">Cancel</div> 
+                 
+                 <!-- unhide this icon if file is saved !-->                    
+                 <div class="fm-chat-view-icon"></div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+
+             </div>
+             
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+
+                 <img alt="" src="images/mega/new-filetypes/large-icons/word.png" />
+                 <div class="fm-chat-filename">
+                     FileName.doc
+                 </div>
+                 <div class="fm-chat-filesize">
+                     750 kb
+                 </div>
+                  
+                 <div class="fm-chat-file-button save-button">Add to your Cloud Drive</div> 
+                 <div class="fm-chat-file-button cancel-button">Cancel</div> 
+                 
+                 <!-- unhide this icon if file is saved !-->                    
+                 <div class="fm-chat-view-icon hidden"></div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+
+             </div>
+             
+           </div>
+           
+           <div class="fm-chat-line-block">
+             
+             <div class="fm-chat-attach-file">
+                <div class="fm-chat-attach-arrow"></div>
+             </div>
+             <div class="fm-chat-attach-popup hidden">
+                  <div class="fm-chat-attach-top">
+                    <a class="fm-back-button"></a>
+                    <div class="fm-share-breadcrumbs-block">
+                      <a class="fm-share-breadcrumbs cloud-drive contains-directories">
+                        <span class="right-arrow-bg">
+                          <span>Cloud Drive</span>
+                        </span>
+                      </a>
+                    </div>             
+                  </div>
+                  <div class="fm-chat-attach-scrolling">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-share-table">
+                       <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/messages-folder.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/messages-folder.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/messages-folder.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/img.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/img.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon"><img alt="" src="images/mega/new-filetypes/img.png" /></span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="fm-chat-attach-bottom">
+                    <div class="fm-chat-attach-button attach-send">
+                       Send
+                    </div>
+                    <div class="fm-chat-attach-button attach-cancel active">
+                       Cancel
+                    </div>
+                    <div class="clear"></div>
+                  </div>
+             </div>
+             
+             <div class="fm-chat-emotions-icon">
+               <div class="fm-chat-emotion-arrow"></div>
+             </div>
+             <div class="fm-chat-emotion-popup hidden">
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="clear"></div>
+             </div>
+             
+             <div class="fm-chat-input-block">
+               <input type="text" />
+             </div>
+             <div class="clear"></div>
+           </div>
+           
+       </div>
+       
+       <!--end !-->
+       
+  </div>
+  
+</div>
+
+<div class="transfer-panel">
+      <div class="transfer-panel-title">
+         File Transfers
+      </div>
+      <a class="tranfer-view-icon"></a>
+      <a class="transfer-settings-icon"></a>
+      <div class="transfer-points"></div>
+      <div class="clear"></div>
+      <div class="tranfer-table">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
+            <tr>
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+              <th width="110">Remaining Time</th>
+            </tr>
+        </table>
+        <div class="transfer-scrolling-table">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
+            <tr class="clone-of-header">
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+			  <th width="110">Remaining Time</th>
+            </tr>                       
+        </table>
+       </div>
+      </div> 
+</div>
+  
+</div>
+<a href="" download="filename" id="dllink" style="display:none;"></a>
+</body>
+</html>

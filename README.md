@@ -51,6 +51,12 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/exif.js** library that we use to read the EXIF flags from images prior to client side thumbnail creation
 
-**js/filedrag.js** event handlers for the upload buttons, and file&folder-drag&drop event handling for upload initialization
+**js/filedrag.js** event handlers for the upload buttons, file&folder-drag&drop event handling for upload init.
 
-**js/filetypes.js** 
+**js/filetypes.js** contains all the supported file types based on the file extension to match icons
+
+**js/fm.js** core file: contains mainly file manager UI & dialog UI logic
+
+**js/functions.js** contains some generic functions that are used throughout the site
+
+**js.hex.js** HEX conversion functions

@@ -1859,9 +1859,26 @@ $.elementInArray = function(el, arr) {
         }
     );
     return found.length > 0 ? found[0] : -1;
-}
+};
 
 /**
+ * Case insensitive :contains.
+ *
+ * @param a
+ * @param i
+ * @param m
+ * @returns {boolean}
+ */
+jQuery.expr[':'].icontains = function(a, i, m) {
+    return jQuery(a).text().toUpperCase()
+        .indexOf(m[3].toUpperCase()) >= 0;
+};
+
+/**
+ * Simple 'Find in text of the page'-like functionality that will search and highlight (select) the matched files in the
+ * current view.
+ *
+ * PS: This is meant to be somehow reusable.
  *
  * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
  * specified text
@@ -1872,6 +1889,9 @@ $.elementInArray = function(el, arr) {
  * @constructor
  */
 var QuickFinder = function(searchable_elements, containers) {
+    var self = this;
+
+    // create the input field that will contain the user's search text and hide it.
     var $find_input = $('<input class="quick-finder" />');
     $find_input.hide();
     $find_input.css({
@@ -1882,21 +1902,47 @@ var QuickFinder = function(searchable_elements, containers) {
     $(document.body).append($find_input);
 
 
-    $(window).unbind('keypress.quickFinder');
-    $(window).bind('keypress', function(e) {
-        e = e || window.event;
+    // hide on page change
+    $(window).bind('hashchange', function() {
+        if($find_input.is(":visible")) {
+            $(self).trigger('hide');
+        }
+    });
 
-        if(e.keyCode >= 48 && e.keyCode <= 122) {
+
+    // unbind if already bound.
+    $(window).unbind('keypress.quickFinder');
+
+    // bind
+    $(window).bind('keypress.quickFinder', function(e) {
+        e = e || window.event;
+        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
+        // contact field)
+        if($(e.target).is("input, textarea, select")) {
+            return;
+        }
+        console.log(e.keyCode);
+
+        if((e.keyCode >= 48 && e.keyCode <= 122) || e.keyCode > 255) {
             var charCode = e.which || e.keyCode;
             var charTyped = String.fromCharCode(charCode);
             if(!$find_input.is(":visible")) {
-                var $container = $(containers);
+                // get the currently visible container
+                var $container = $(containers).filter(":visible");
+                if($container.size() == 0) {
+                    // no active container, this means that we are receiving events for a page, for which we should not
+                    // do anything....
+                    return;
+                }
+
                 $find_input
-                    .show()
+                    .slideDown(250)
+                    // position to the currently visible container.
                     .css({
-                        'top': $container.position().top,
-                        'left': $container.position().left + $container.outerWidth() - $find_input.outerWidth()
+                        'top': $container.offset().top,
+                        'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
                     })
+                    // initialize with the same char that the user had typed before focusing the field
                     .val(
                         charTyped
                     )
@@ -1908,35 +1954,50 @@ var QuickFinder = function(searchable_elements, containers) {
         }
     });
 
+    // Hide on keyup OR enter.
     $find_input.bind('keyup', function(e) {
         if(e.keyCode == 27 || e.keyCode == 13) {
-            $find_input
-                .val('')
-                .blur()
-                .hide();
+            $(self).trigger('hide');
+            return e.keyCode == 72 ? false : undefined; // stop propagation only on ESC.
+        }
+    });
+
+    // hide the search field when the user had clicked somewhere in the document
+    $(document.body).delegate('> *', 'mousedown', function(e) {
+        console.log("hm:",e.target);
+        if(!$(e.target).is($find_input)) {
+            $(self).trigger('hide');
             return false;
         }
     });
 
-
+    // search thru `searchable_elements`
     $find_input.bind('keyup', function(e) {
         var val = $(this).val();
 
         if($(this).is(":visible")) { // only if find is active, if not, the user had pressed esc/enter to cancel the
                                      // find proc.
 
-            var $found = $(searchable_elements).filter(":visible:contains('" + val + "')");
+            var $found = $(searchable_elements).filter(":visible:icontains('" + val + "')");
 
-            $(searchable_elements).parents(".ui-selectee").removeClass('ui-selected');
-            $found.parents(".ui-selectee").addClass("ui-selected");
+            $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
+            $found.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
         }
+    });
+
+    // use events as a way to communicate with this from the outside world.
+    $(self).on('hide', function() {
+        $find_input
+            .val('')
+            .blur()
+            .slideUp(250);
     });
     return this;
 };
 
 var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title',
-    '.files-grid-view:visible, .fm-blocks-view:visible'
+    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
+    '.files-grid-view, .fm-blocks-view, .contacts-grid-table'
 );
 
 /**

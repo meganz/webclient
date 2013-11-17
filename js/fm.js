@@ -1842,9 +1842,156 @@ function gridUI()
 }
 
 
+/**
+ * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
+ * Pretty similar to the $.inArray, but will match the object IDs.
+ *
+ *
+ * @param el
+ * @param arr
+ * @returns int -1 or key index
+ */
+$.elementInArray = function(el, arr) {
+    var found = $.map(
+        arr,
+        function(n, i) {
+            return el.is(n) ? i : undefined;
+        }
+    );
+    return found.length > 0 ? found[0] : -1;
+}
 
 
 
+
+/**
+ * This should take care of flagging the LAST selected item in those cases:
+ *
+ *  - jQ UI $.selectable's multi selection using drag area (integrated using jQ UI $.selectable's Events)
+ *
+ *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this case
+ *  when there is only one .ui-selected...this is how no other code had to be changed :))
+ *
+ *  - Left/right/up/down keys (integrated by using the .set_currently_selected and .get_currently_selected public
+ *  methods)
+ *
+ * @param $selectable
+ * @returns {*}
+ * @constructor
+ */
+var CurrentlySelectedManager = function($selectable) {
+    var self = this;
+
+    $selectable.unbind('selectableselecting');
+    $selectable.unbind('selectableselected');
+    $selectable.unbind('selectableunselecting');
+    $selectable.unbind('selectableunselected');
+
+    /**
+     * Store all selected items in an _ordered_ array.
+     *
+     * @type {Array}
+     */
+    var selected_list = [];
+
+
+    /**
+     * Helper func to clear old reset state from other icons.
+     */
+    this.clear = function() {
+        $('.currently-selected', $selectable).removeClass('currently-selected');
+    };
+
+
+    this.clear(); // remove ANY old .currently-selected values.
+
+
+    /**
+     * The idea of this method is to _validate_ and return the .currently-selected element.
+     *
+     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
+     * not .currently-selected
+     *
+     * @returns {*|jQuery|HTMLElement}
+     */
+    this.get_currently_selected = function(first_or_last) {
+        if(!first_or_last) {
+            first_or_last = "first";
+        }
+
+        var $currently_selected = $('.currently-selected', $selectable);
+
+        if($currently_selected.size() == 0) { // NO .currently-selected
+            return $('.ui-selected:' + first_or_last, $selectable);
+        } else if(!$currently_selected.is(".ui-selected")) { // validate that the currently selected is actually selected.
+            // if not, try to get the first_or_last .ui-selected item
+            var selected_elms = $('.ui-selected:' + first_or_last, $selectable);
+            return selected_elms;
+        } else { // everything is ok, we should return the .currently-selected
+            return $currently_selected;
+        }
+    };
+
+
+    /**
+     * Used from the shortcut keys code.
+     *
+     * @param element
+     */
+    this.set_currently_selected = function($element) {
+        self.clear();
+        $element.addClass("currently-selected");
+    };
+
+
+    /**
+     * Push the last selected item to the end of the selected_list array.
+     */
+    $selectable.bind('selectableselecting', function(e, data) {
+        var $selected = $(data.selecting);
+        selected_list.push(
+            $selected
+        );
+    });
+
+
+    /**
+     * Remove any unselected element from the selected_list array.
+     */
+    $selectable.bind('selectableunselecting', function(e, data) {
+        var $unselected = $(data.unselecting);
+        var idx = $.elementInArray($unselected, selected_list);
+
+        if(idx > -1) {
+            delete selected_list[idx];
+        }
+    });
+
+    /**
+     * After the user finished selecting the icons, flag the last selected one as .currently-selecting
+     */
+    $selectable.bind('selectablestop', function(e, data) {
+        self.clear();
+
+        // remove `undefined` from the list
+        selected_list = $.map(selected_list, function(n, i) {
+            if(n != undefined) {
+                return n;
+            }
+        });
+
+        // add the .currently-selected
+        if(selected_list.length > 0) {
+            $(selected_list[selected_list.length - 1]).addClass('currently-selected');
+        }
+
+        selected_list = []; // reset the state of the last selected items for the next selectablestart
+    });
+
+    return this;
+};
+
+var currentlySelectedManager;
 
 function UIkeyevents()
 {
@@ -1854,7 +2001,89 @@ function UIkeyevents()
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
-		if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
+
+        /**
+         * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
+         * other day :)
+         */
+        if(!$.dialog && M.viewmode == 1) {
+
+            var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
+            var total_rows = Math.ceil($('.file-block').size() / items_per_row);
+
+            if(e.keyCode == 37) { // left
+                var current = currentlySelectedManager.get_currently_selected("first");
+                if(!e.shiftKey) { // clear old selection if no shiftKey
+                    s.removeClass("ui-selected");
+                }
+                var $target_element = null;
+
+                if(current.length > 0 && current.prev(".file-block").length > 0) {
+                    $target_element = current.prev(".file-block");
+                } else {
+                    $target_element = $('.file-block:last');
+                }
+
+                if($target_element) {
+                    $target_element.addClass('ui-selected');
+                    currentlySelectedManager.set_currently_selected($target_element);
+                }
+
+            } else if(e.keyCode == 39) { // right
+                var current = currentlySelectedManager.get_currently_selected("last");
+                if(!e.shiftKey) {
+                    s.removeClass("ui-selected");
+                }
+
+                var $target_element = null;
+
+                var next = current.next(".file-block");
+                if(next.length > 0) { // clear old selection if no shiftKey
+                    $target_element = next;
+                } else {
+                    $target_element = $('.file-block:first');
+                }
+
+                if($target_element) {
+                    $target_element.addClass('ui-selected');
+                    currentlySelectedManager.set_currently_selected($target_element);
+                }
+
+            } else if(e.keyCode == 38 || e.keyCode == 40) { // up & down
+                var current = currentlySelectedManager.get_currently_selected("first");
+                var current_idx = $.elementInArray(
+                    current,
+                    $('.file-block')
+                ) + 1;
+
+                if(!e.shiftKey) {
+                    s.removeClass("ui-selected");
+                }
+
+                var current_row = Math.ceil(current_idx/items_per_row);
+                var current_col = current_idx % items_per_row;
+                var target_row;
+                if(e.keyCode == 38) { // up
+                    // handle the case when the users presses ^ and the current row is the first row
+                    target_row = current_row == 1 ? total_rows : current_row - 1;
+                } else if(e.keyCode == 40) { // down
+                    // handle the case when the users presses DOWN and the current row is the last row
+                    target_row = current_row == total_rows ? 1 : current_row + 1;
+                }
+
+                // calc the index of the target element
+                var target_element_num = ((target_row-1) * items_per_row) + (current_col - 1);
+
+                var $target = $('.file-block:eq(' + target_element_num + ')');
+
+                $target.addClass("ui-selected");
+                currentlySelectedManager.set_currently_selected(
+                    $target
+                );
+
+            }
+        }
+        if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
 		{
 			// up in grid
 			if (e.shiftKey) $(e).addClass('ui-selected');
@@ -2016,6 +2245,17 @@ function selectddUI()
 	});
 	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }});
+
+    /**
+     * (Re)Init the currentlySelectedManager, because the .selectable() is reinitialized and we need to reattach to its
+     * events.
+     *
+     * @type {CurrentlySelectedManager}
+     */
+    currentlySelectedManager = new CurrentlySelectedManager(
+        $('.file-block-scrolling')
+    );
+
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function (e) 
 	{	
@@ -2051,12 +2291,15 @@ function selectddUI()
 			{
 				$(e).addClass('ui-selected');		
 			});
+
+            currentlySelectedManager.set_currently_selected($(this));
 		}
 		else if (e.ctrlKey == false && e.metaKey == false)
 		{
 			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
 			$(this).addClass('ui-selected');
 			$.gridLastSelected = this;
+            currentlySelectedManager.set_currently_selected($(this));
 		}
 		else 
 		{
@@ -2065,6 +2308,7 @@ function selectddUI()
 			{
 				$(this).addClass("ui-selected");
 				$.gridLastSelected = this;
+                currentlySelectedManager.set_currently_selected($(this));
 			}
 		}
 		$.hideContextMenu(e);
@@ -2122,6 +2366,7 @@ function iconUI()
 	$('.fm-blocks-view').bind('contextmenu',function(e)
 	{		
 		$('.file-block').removeClass('ui-selected');
+		currentlySelectedManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
 		$.selected=[];
 		if (contextmenuUI(e,2)) return true;
 		else return false;	

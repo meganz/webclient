@@ -1632,18 +1632,7 @@ function accountUI()
 	{
 		if ($(this).val() == $('#account-new-password').val()) $('.fm-account-save-block').removeClass('hidden');
 	});
-	
-	
-	
-	
-	
-	
-	
 }
-
-
-
-
 
 function acc_checkpassword(pass)
 {
@@ -1675,9 +1664,6 @@ function acc_checkpassword(pass)
 		document.getElementById('acc_pwstatus').className = 'register-pass-status-block account good1 good4';	
 	}
 }
-
-
-
 
 var imageCrop;
 
@@ -1730,10 +1716,6 @@ function avatarDialog(close)
 		avatarDialog(1);
 	});
 }
-
-
-
-
 
 function gridUI()
 {   
@@ -1840,11 +1822,6 @@ function gridUI()
 		if (c) M.renderMain();
 	});
 }
-
-
-
-
-
 
 function UIkeyevents()
 {

@@ -303,8 +303,7 @@ function blog_archive()
 		var mm = blog_month(blogposts[i].t);
 		if (blogmonths[mm]) blogmonths[mm]++;
 		else blogmonths[mm]=1;	
-	}
-	
+	}	
 	var blogarchive='';	
 	for (var mm in blogmonths)
 	{

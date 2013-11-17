@@ -59,5 +59,43 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/functions.js** contains some generic functions that are used throughout the site
 
-**js.hex.js** HEX conversion functions
+**js/hex.js** HEX conversion functions
+
+**js/jquery.jscrollpane.min.js** jScrollpane jQuery plugin for custom scrollbars
+
+**js/jquery.mousewheel.js** jQuery mousewheel plugin for cross browser mousewheel event handling
+
+**js/jquery-min-1.8.1.js** jQuery library
+
+**js/jquery-ui.js** jQuery User Interface for various UI functionallity, such as: rubberband selection, drag&drop
+
+**js/json.js** provides JSON.parse & JSON.stringify to older browsers
+
+**js/keygen.js** for cryptographic public/private key pair creation
+
+**js/mDB.js** providers the local database abstraction layer for caching of metadata in IndexedDB
+
+**js/mega.js** providers the MegaData class which does most of the datahandling (but also some filemanager UI interaction)
+
+**js/megapix.js** client side canvas based thumbnail creation (because thumbnails are encrypted, too)
+
+**js/mouse.js** captures mouse events for entropy collection
+
+**js/notifications.js** contains the notification logic
+
+**js/rsa.js** cryto library for RSA
+
+**js/thumbnail.js** client side canvas based thumbnail creation (because thumbnails are encrypted, too)
+
+**js/upload.js** contains all the upload logic
+
+**js/user.js** contains the user creation & login logic
+
+**js/zip.js** JavaScript implementation to create ZIP archives of multiple files on the client side
+
+**js/zxcvbn.js** password strength verification library (including dictionary table)
+
+
+
+
 

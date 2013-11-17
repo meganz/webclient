@@ -21,3 +21,15 @@ localStorage.d = 1;		// enables logging
 localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM for element inspection
 ```
 
+**js/** contains all generic JavaScript files
+**html/** contains all generic HTML files
+**js/html/** contains all JavaScript files that belong to the specific HTML file of the parent folder
+
+
+**js/arkanoid.js** has the arkanoid game which is used to collect entropy for public/private key creation
+**js/avatar.js** is used for avatar selection, cropping & scaling (all on the client side in the canvas)
+**js/base64.js** base64 library
+**js/checkboxes.js** jQuery iOS style checkboexes
+**js/cleartemp.js** contains the function clearIt() which is used to purge temporary data from the FileSystem API (Chrome only)
+**js/countries.js** contains all the country names (we should translate these at some point)
+

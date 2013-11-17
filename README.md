@@ -37,6 +37,20 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/checkboxes.js** jQuery iOS style checkboexes
 
-**js/cleartemp.js** contains the function clearIt() which is used to purge temporary data from the FileSystem API (Chrome only)
+**js/cleartemp.js** contains clearIt() which is used to purge temp data from the FileSystem API (Chrome only)
 
 **js/countries.js** contains all the country names (we should translate these at some point)
+
+**js/crypto.js** contains all the cryptographic functions & API handlers
+
+**js/descrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
+
+**js/download.js** contains all the download logic
+
+**js/encrypter.js** the encrypter which is used as a web worker to encrypt data while uploading
+
+**js/exif.js** library that we use to read the EXIF flags from images prior to client side thumbnail creation
+
+**js/filedrag.js** event handlers for the upload buttons, and file&folder-drag&drop event handling for upload initialization
+
+**js/filetypes.js** 

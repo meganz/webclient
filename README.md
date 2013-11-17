@@ -101,10 +101,4 @@ JavaScript files
 **js/zxcvbn.js** password strength verification library (including dictionary table)
 
 
-HTML Files
------
-
-
-
-
 

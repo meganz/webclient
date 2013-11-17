@@ -1861,8 +1861,83 @@ $.elementInArray = function(el, arr) {
     return found.length > 0 ? found[0] : -1;
 }
 
+/**
+ *
+ * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
+ * specified text
+ * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
+ * will dynamically detect and pick the :visible container)
+ *
+ * @returns {*}
+ * @constructor
+ */
+var QuickFinder = function(searchable_elements, containers) {
+    var $find_input = $('<input class="quick-finder" />');
+    $find_input.hide();
+    $find_input.css({
+        'position': 'absolute',
+        'top': 0,
+        'left': 0
+    });
+    $(document.body).append($find_input);
 
 
+    $(window).unbind('keypress.quickFinder');
+    $(window).bind('keypress', function(e) {
+        e = e || window.event;
+
+        if(e.keyCode >= 48 && e.keyCode <= 122) {
+            var charCode = e.which || e.keyCode;
+            var charTyped = String.fromCharCode(charCode);
+            if(!$find_input.is(":visible")) {
+                var $container = $(containers);
+                $find_input
+                    .show()
+                    .css({
+                        'top': $container.position().top,
+                        'left': $container.position().left + $container.outerWidth() - $find_input.outerWidth()
+                    })
+                    .val(
+                        charTyped
+                    )
+                    .focus()
+                    .triggerHandler('keyup');
+
+                return false;
+            }
+        }
+    });
+
+    $find_input.bind('keyup', function(e) {
+        if(e.keyCode == 27 || e.keyCode == 13) {
+            $find_input
+                .val('')
+                .blur()
+                .hide();
+            return false;
+        }
+    });
+
+
+    $find_input.bind('keyup', function(e) {
+        var val = $(this).val();
+
+        if($(this).is(":visible")) { // only if find is active, if not, the user had pressed esc/enter to cancel the
+                                     // find proc.
+
+            var $found = $(searchable_elements).filter(":visible:contains('" + val + "')");
+
+            $(searchable_elements).parents(".ui-selectee").removeClass('ui-selected');
+            $found.parents(".ui-selectee").addClass("ui-selected");
+        }
+    });
+    return this;
+};
+
+var quickFinder = new QuickFinder(
+    '.tranfer-filetype-txt, .file-block-title',
+    '.files-grid-view:visible, .fm-blocks-view:visible'
+);
 
 /**
  * This should take care of flagging the LAST selected item in those cases:

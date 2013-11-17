@@ -1921,7 +1921,6 @@ var QuickFinder = function(searchable_elements, containers) {
         if($(e.target).is("input, textarea, select")) {
             return;
         }
-        console.log(e.keyCode);
 
         if((e.keyCode >= 48 && e.keyCode <= 122) || e.keyCode > 255) {
             var charCode = e.which || e.keyCode;
@@ -1964,7 +1963,6 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
-        console.log("hm:",e.target);
         if(!$(e.target).is($find_input)) {
             $(self).trigger('hide');
             return false;

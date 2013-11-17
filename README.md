@@ -3,10 +3,10 @@
 
 MEGA provides robust cloud storage with convenient and powerful always-on privacy. MEGA believes in your right to privacy and provides you with the technology tools to protect it. We call it User Controlled Encryption, or UCE, and it happens automatically.
 
-Directory & file structure
-=====
+Secure Boot
+-----
 
-**secureboot.js** loads all the resources from static content servers and verifies its authenticity by checking the cryptographic hash.
+secureboot.js loads all the resources from static content servers and verifies its authenticity by checking the cryptographic hash.
 
 *Please note that this is not the exact same secureboot.js as we have online at https://mega.co.nz/secureboot.js. We have an automatic process that generates secureboot.js with its cryptographic hashes and all the versioned resource files (file_X.js / file_X.html) as needed based on this respository before prior to updating the live site.*
 
@@ -21,6 +21,9 @@ localStorage.d = 1;		// enables logging
 localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM for element inspection
 ```
 
+Directories
+-----
+
 **js/** contains all generic JavaScript files
 
 **html/** contains all generic HTML files
@@ -28,6 +31,8 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 **js/html/** contains all JavaScript files that belong to the specific HTML file of the parent folder
 
 
+JavaScript files
+-----
 
 **js/arkanoid.js** has the arkanoid game which is used to collect entropy for public/private key creation
 
@@ -75,7 +80,7 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/mDB.js** providers the local database abstraction layer for caching of metadata in IndexedDB
 
-**js/mega.js** providers the MegaData class which does most of the datahandling (but also some filemanager UI interaction)
+**js/mega.js** MegaData class which does most of the datahandling (but also some FM UI interaction)
 
 **js/megapix.js** client side canvas based thumbnail creation (because thumbnails are encrypted, too)
 
@@ -94,6 +99,10 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 **js/zip.js** JavaScript implementation to create ZIP archives of multiple files on the client side
 
 **js/zxcvbn.js** password strength verification library (including dictionary table)
+
+
+HTML Files
+-----
 
 
 

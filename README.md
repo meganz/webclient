@@ -35,7 +35,7 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/base64.js** base64 library
 
-**js/checkboxes.js** jQuery iOS style checkboexes
+**js/checkboxes.js** jQuery iOS styled checkboxes
 
 **js/cleartemp.js** contains clearIt() which is used to purge temp data from the FileSystem API (Chrome only)
 
@@ -55,7 +55,7 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/filetypes.js** contains all the supported file types based on the file extension to match icons
 
-**js/fm.js** core file: contains mainly file manager UI & dialog UI logic
+**js/fm.js** file manager core file, contains mainly file manager UI & dialog UI logic
 
 **js/functions.js** contains some generic functions that are used throughout the site
 

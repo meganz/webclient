@@ -1922,7 +1922,7 @@ var QuickFinder = function(searchable_elements, containers) {
             return;
         }
 
-        if((e.keyCode >= 48 && e.keyCode <= 122) || e.keyCode > 255) {
+        if((e.keyCode >= 46 && e.keyCode <= 122) || e.keyCode > 255) {
             var charCode = e.which || e.keyCode;
             var charTyped = String.fromCharCode(charCode);
             if(!$find_input.is(":visible")) {

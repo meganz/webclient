@@ -43,7 +43,7 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 
 **js/crypto.js** contains all the cryptographic functions & API handlers
 
-**js/descrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
+**js/decrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
 
 **js/download.js** contains all the download logic
 
@@ -60,3 +60,4 @@ localStorage.contextmenu = 1;	// allows you to disable the contextmenu in the FM
 **js/functions.js** contains some generic functions that are used throughout the site
 
 **js.hex.js** HEX conversion functions
+

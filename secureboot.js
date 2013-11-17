@@ -307,6 +307,10 @@ if (m)
 		script.src = 'https://mega.co.nz/blog.js';
 	}
 }
+else if (document.location.hash == '#android')
+{
+	document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
+}
 else 
 {
 	if (!b_u)
@@ -419,9 +423,6 @@ else
 			'affiliatemember_js': {f:'html/js/affiliatemember.js', n: 'affiliatemember_js', j:1},
 			'contact': {f:'html/contact.html', n: 'contact', j:0},
 			'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
-			'resellerapp': {f:'html/resellerapp.html', n: 'resellerapp', j:0},
-			'resellerapp_js': {f:'html/js/resellerapp.js', n: 'resellerapp_js', j:1},		
-			'resellerintro': {f:'html/resellerintro.html', n: 'resellerintro', j:0},
 			'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
 			'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
 		};	
@@ -433,7 +434,6 @@ else
 			'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
 			'register': ['register','register_js'],
 			'android': ['android'],
-			'resetpassword': ['forgotpassword','forgotpassword_js'],
 			'resellers': ['resellers'],
 			'!': ['download','download_js'],
 			'copyright': ['copyright'],
@@ -449,8 +449,6 @@ else
 			'sdk': ['dev','dev_js','sdkterms'],
 			'doc': ['dev','dev_js','sdkterms'],
 			'help': ['help','help_js'],
-			'resellerapp': ['resellerapp','resellerapp_js'],
-			'resellerintro': ['resellerintro'],
 			'chrome': ['chrome'],
 			'plugin': ['chrome','firefox'],
 			'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js']

@@ -99,7 +99,6 @@ function init_page()
 		return false;
 	}
 
-
 	$('.top-head').remove();
 	$('#loading').hide();
 	if (loadingDialog) loadingDialog.hide();	
@@ -477,24 +476,11 @@ function init_page()
 			mainScroll();
 		}
 	}
-	else if ((page == 'resellers')  && (!m))
-	{
-		parsepage(pages['resellers']);
-	}
-	else if ((page == 'android')  && (!m))
-	{
-		parsepage(pages['mobile']);
-	}
 	else if (page.substr(0,3) == 'pro')
 	{
 		parsepage(pages['pro']);		
 		init_pro();
 	}
-	else if ((page == 'hosting')  && (!m))
-	{
-		parsepage(pages['hosting']);
-		init_hosting();
-	}	
 	else if ((page == 'credits')  && (!m))
 	{
 		parsepage(pages['credits']);
@@ -1157,7 +1143,6 @@ function topmenuUI()
 		else if (c.indexOf('aboutus') > -1) document.location.hash = 'about';
 		else if (c.indexOf('megablog') > -1) document.location.hash = 'blog';
 		else if (c.indexOf('credits') > -1) document.location.hash = 'credits';
-		else if (c.indexOf('android') > -1) document.location.hash = 'android';
 		else if (c.indexOf('chrome') > -1) document.location.hash = 'chrome';
 		else if (c.indexOf('resellers') > -1) document.location.hash = 'resellers';
 		else if (c.indexOf('firefox') > -1) document.location.hash = 'firefox';

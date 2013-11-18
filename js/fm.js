@@ -1856,6 +1856,27 @@ jQuery.expr[':'].icontains = function(a, i, m) {
         .indexOf(m[3].toUpperCase()) >= 0;
 };
 
+
+/**
+ * Required to move the cursor at the end of the QuickFinder input field.
+ *
+ *
+ * PS: Move this somewhere else?
+ *
+ * @param pos
+ */
+$.fn.setCursorPosition = function(pos) {
+    if ($(this).get(0).setSelectionRange) {
+        $(this).get(0).setSelectionRange(pos, pos);
+    } else if ($(this).get(0).createTextRange) {
+        var range = $(this).get(0).createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pos);
+        range.moveStart('character', pos);
+        range.select();
+    }
+};
+
 /**
  * Simple 'Find in text of the page'-like functionality that will search and highlight (select) the matched files in the
  * current view.
@@ -1897,15 +1918,16 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // bind
     $(window).bind('keypress.quickFinder', function(e) {
+        console.log(e);
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
         if($(e.target).is("input, textarea, select")) {
             return;
         }
+        var charCode = e.which || e.keyCode; // ff
 
-        if((e.keyCode >= 46 && e.keyCode <= 122) || e.keyCode > 255) {
-            var charCode = e.which || e.keyCode;
+        if((charCode >= 46 && charCode <= 122) || charCode > 255) {
             var charTyped = String.fromCharCode(charCode);
             if(!$find_input.is(":visible")) {
                 // get the currently visible container
@@ -1924,11 +1946,15 @@ var QuickFinder = function(searchable_elements, containers) {
                         'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
                     })
                     // initialize with the same char that the user had typed before focusing the field
+                    .focus()
+                    .select()
+                    .trigger('keyup', e)
                     .val(
                         charTyped
-                    )
-                    .focus()
-                    .triggerHandler('keyup');
+                    );
+
+                // IE fix.
+                $find_input.setCursorPosition(1);
 
                 return false;
             }
@@ -1945,7 +1971,7 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
-        if(!$(e.target).is($find_input)) {
+        if($find_input.is(":visible") && !$(e.target).is($find_input)) {
             $(self).trigger('hide');
             return false;
         }

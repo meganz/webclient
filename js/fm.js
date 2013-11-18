@@ -1475,10 +1475,6 @@ function accountUI()
 			$('.fm-account-save-block').removeClass('hidden');
 		});
 		
-		
-		
-		
-		
 		$('.redeem-voucher').unbind('click');
 		$('.redeem-voucher').bind('click',function(event) 
 		{
@@ -3412,8 +3408,13 @@ function mcDialog(close)
 		$('.move-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.move-dialog #mainsub').html('');
-		return true;
+		return true;	
 	}
+	
+	
+	var jsp = $('.fm-move-dialog-body').data('jsp');
+	if (jsp) jsp.scrollTo(0,0,false);
+	
 	if ($.selected.length > 0)
 	{
 		$.dialog = 'mc';		
@@ -3834,6 +3835,45 @@ function chromeDialog(close)
 		else
 		{
 			delete localStorage.chromeDialog;
+			$(this).attr('class', 'checkboxOff');
+			$(this).parent().attr('class', 'checkboxOff');
+			$(this).attr('checked', false);
+		}
+	});
+}
+
+
+function firefoxDialog(close)
+{
+	if (close)
+	{
+		$.dialog = false;
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.fm-dialog.firefox-dialog').addClass('hidden');
+		return true;
+	}	
+	if (lang !== 'en') $('.ff-extension-txt').text(l[1174]);
+	$('.fm-dialog-overlay').removeClass('hidden');
+	$('.fm-dialog.firefox-dialog').removeClass('hidden');	
+	$.dialog = 'firefox';	
+	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
+	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click',function()
+	{
+		firefoxDialog(1);
+	});	
+	$('#firefox-checkbox').unbind('click');
+    $('#firefox-checkbox').bind('click',function()  
+	{
+		if ($(this).attr('class').indexOf('checkboxOn') == -1)
+		{
+			localStorage.firefoxDialog=1;
+			$(this).attr('class', 'checkboxOn');
+			$(this).parent().attr('class', 'checkboxOn');
+			$(this).attr('checked', true);
+		}
+		else
+		{
+			delete localStorage.firefoxDialog;
 			$(this).attr('class', 'checkboxOff');
 			$(this).parent().attr('class', 'checkboxOff');
 			$(this).attr('checked', false);

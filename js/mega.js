@@ -811,6 +811,8 @@ function MegaData ()
 	
 	this.copyNodes = function(cn,t)
 	{
+		console.log('copyNodes',cn,t);
+	
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
 		{		
@@ -830,6 +832,8 @@ function MegaData ()
 			},[t]);
 			return false;
 		}
+		
+		
 		var a=[];		
 		var r=[];
 		for (var i in cn)
@@ -841,6 +845,9 @@ function MegaData ()
 		for(var i in r)
 		{
 			var n = M.d[r[i]];			
+			
+			console.log(n);
+			
 			if (n)
 			{
 				var ar = clone(n.ar);
@@ -864,9 +871,13 @@ function MegaData ()
 		if (s.length > 0)
 		{
 			var mn = [];
-			for (i in a) mn.push(mn[i]);
+			for (i in a) mn.push(a[i].h);
 			ops[0].cr =  crypto_makecr(mn,s,true);
-		}		
+		}
+		
+		
+	
+		
 		api_req(ops,
 		{ 
 			t:t,
@@ -1197,11 +1208,11 @@ function MegaData ()
 	}
 
 	this.addDownload = function(n,z)
-	{
+	{				
 		delete $.dlhash;
-		var zipname,path;	
+		var zipname,path;		
 		var nodes = [];
-		var paths={};	
+		var paths={};
 		for (var i in n)
 		{
 			if (M.d[n[i]])
@@ -1230,7 +1241,8 @@ function MegaData ()
 					nodes.push(n[i]);
 				}
 			}
-		}		
+		}
+		
 		if (z)
 		{
 			zipid++;
@@ -1240,15 +1252,14 @@ function MegaData ()
 			var zipsize = 0;
 		}
 		else z = false;		
+		if (!$.totalDL) $.totalDL=0;
 		for (var i in nodes)
 		{		
 			n = M.d[nodes[i]];
-			
 			if (paths[nodes[i]]) path = paths[nodes[i]];
 			else path ='';
-			
-			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-			
+			$.totalDL+=n.s;
+			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));			
 			if (li.length == 0)
 			{			
 				dl_queue.push(
@@ -1279,6 +1290,9 @@ function MegaData ()
 				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon(n,'s') +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 			}
 		}
+		
+		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);
+		
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon({name:'archive.zip'},'s') + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		$('.tranfer-view-icon').addClass('active');
 		$('.fmholder').addClass('transfer-panel-opened');

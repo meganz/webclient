@@ -454,7 +454,17 @@ else
 			'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js']
 		};		
 		var page = document.location.hash;	
-		if (page) page = page.replace('#','');	
+		if (page)
+		{
+			page = page.replace('#','');			
+			if (page.indexOf('%21') > -1)
+			{
+				page = page.replace('%21','!').replace('%21','!');
+				document.location.hash = '#' + page;			
+			}
+		}
+		
+		
 		for (var p in subpages)
 		{
 			if (page && page.substr(0,p.length) == p)	

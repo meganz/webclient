@@ -39,7 +39,7 @@ function startMega()
 		silent_loading=false;
 		return false;
 	}
-	if (pages['dialogs'] && !m)
+	if (pages['dialogs'])
 	{	
 		$('body').append(translate(pages['dialogs'].replace(/{staticpath}/g,staticpath)));
 		delete pages['dialogs'];
@@ -103,7 +103,7 @@ function init_page()
 	$('#loading').hide();
 	if (loadingDialog) loadingDialog.hide();	
 	page = page.replace('%21','!');		
-	if ((page.substr(0,1) == '!') && (page.length > 1))
+	if (page.substr(0,1) == '!' && page.length > 1)
 	{							
 		dlkey=false;
 		var ar = page.substr(1,page.length-1).split('!');
@@ -111,7 +111,7 @@ function init_page()
 		if (ar[1]) dlkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 	}
 	
-	if ((page.substr(0,2) == 'F!') && (page.length > 2))
+	if (page.substr(0,2) == 'F!' && page.length > 2)
 	{							
 		var ar = page.substr(2,page.length-1).split('!');		
 		if (ar[0]) pfid  = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
@@ -201,18 +201,18 @@ function init_page()
 		delete localStorage.voucher;
 	}
 	
-	if ((page.substr(0,10) == 'blogsearch'))
+	if (page.substr(0,10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));	
 		if (!blogsearch) document.location.hash = '#blog';
 		page = 'blog';
 	}
-	else if ((page.substr(0,4) == 'blog') && (page.length > 4) && (page.length < 10))
+	else if (page.substr(0,4) == 'blog' && page.length > 4 && page.length < 10)
 	{
 		blogid = page.substr(5,page.length-2);		
 		page = 'blogarticle';			
 	}
-	else if ((page.substr(0,4) == 'blog') && (page.length > 4))
+	else if (page.substr(0,4) == 'blog' && page.length > 4)
 	{
 		blogmonth = page.substr(5,page.length-2);	
 		page = 'blog';			
@@ -255,7 +255,7 @@ function init_page()
 		setpwset(pwchangecode,{callback: function(res) 
 		{
 			loadingDialog.hide();
-			if ((res[0] == EACCESS) || (res[0] == 0)) alert(l[727]);
+			if (res[0] == EACCESS || res[0] == 0) alert(l[727]);
 			else if(res[0] == EEXPIRED) alert(l[728]);
 			else if(res[0] == ENOENT) alert(l[729]);
 			else alert(l[200]);				
@@ -314,54 +314,17 @@ function init_page()
 		parsepage(pages['login']);
 		init_login();
 	}
-	else if (page == 'resetpassword')
-	{
-		api_req([{a: 'upkc', uk: resetpwcode}],
-		{ 
-			callback : function (json,params) 
-			{
-				if (typeof json[0] == 'string')
-				{	
-					
-					resetpwemail = json[0];
-					parsepage(pages['forgotpassword']);
-					fp_init(true);					
-				}
-				else
-				{
-					if (json[0] == EEXPIRED) alert(l[743]);
-					else alert(l[744]);
-					parsepage(pages['forgotpassword']);
-					fp_init(false);							
-				}		
-			}
-		});
-	}
-	else if ((page == 'forgotpassword') && (!m))
-	{
-		parsepage(pages['forgotpassword']);
-		fp_init(false);
-	}
 	else if (page == 'account')
 	{
 		document.location.hash = 'fm/account';
 		return false;
-	}
-	else if ((page == 'investors')  && (!m))
-	{
-		parsepage(pages['investors']);
 	}
 	else if (page == 'register')
 	{
 		parsepage(pages['register']);
 		init_register();
 	}
-	else if ((page == 'chromemsg') && (!m))
-	{
-		parsepage(pages['chromemsg']);
-		init_chrome();
-	}
-	else if (page == 'chrome' && !m)
+	else if (page == 'chrome')
 	{
 		parsepage(pages['chrome']);	
 		var h=0;
@@ -377,7 +340,7 @@ function init_page()
 		parsepage(pages['key']);
 		init_key();
 	}
-	else if ((page == 'contact')  && (!m))
+	else if (page == 'contact')
 	{
 		parsepage(pages['contact']);
 		if (lang == 'ru') $('.account-mid-block').addClass('high');
@@ -391,26 +354,25 @@ function init_page()
 	{
 		parsepage(pages['privacy']);
 	}
-	else if (page == 'privacycompany' && !m)
+	else if (page == 'privacycompany')
 	{
 		parsepage(pages['privacycompany']);
 	}
-	else if ((page == 'dev' || page == 'developers') && !m)
+	else if (page == 'dev' || page == 'developers')
 	{
 		parsepage(pages['dev']);
 		dev_init('dev');
 	}
-	else if (page == 'doc' && !m)
+	else if (page == 'doc')
 	{
 		parsepage(pages['dev']);
 		dev_init('doc');
 	}
-	else if (page == 'sdkterms' && !m)
+	else if (page == 'sdkterms')
 	{
-		parsepage(pages['sdkterms']);
-		
+		parsepage(pages['sdkterms']);		
 	}
-	else if (page.substr(0,3) == 'sdk' && !m)
+	else if (page.substr(0,3) == 'sdk')
 	{
 		parsepage(pages['dev']);
 		if (page.length > 3) dev_init('sdk',page.replace('sdk_',''));
@@ -439,18 +401,14 @@ function init_page()
 	{
 		parsepage(pages['terms']);
 	}
-	else if (page == 'takedown' && !m)
+	else if (page == 'takedown')
 	{
 		parsepage(pages['takedown']);
 	}
-	else if ((page == 'affiliateterms') && (!m))
+	else if (page == 'affiliateterms')
 	{
 		parsepage(pages['affiliateterms']);		
 	}
-	else if ((page == 'resellerintro')  && (!m))
-	{
-		parsepage(pages['resellerintro']);
-	}	
 	else if (page == 'blog')
 	{		
 		parsepage(pages['blog']);
@@ -461,7 +419,7 @@ function init_page()
 		parsepage(pages['blogarticle']);
 		init_blogarticle();
 	}
-	else if ((page == 'copyright')  && (!m))
+	else if (page == 'copyright')
 	{
 		parsepage(pages['copyright']);
 		$('.reg-st5-complete-button').unbind('click');
@@ -481,7 +439,7 @@ function init_page()
 		parsepage(pages['pro']);		
 		init_pro();
 	}
-	else if ((page == 'credits')  && (!m))
+	else if (page == 'credits')
 	{
 		parsepage(pages['credits']);
 		var html ='';
@@ -491,7 +449,7 @@ function init_page()
 		});
 		$('.credits-main-pad').html(html + '<div class="clear"></div>');
 	}
-	else if ((page == 'firefox')  && (!m))
+	else if (page == 'firefox')
 	{
 		parsepage(pages['firefox']);
 		$('.ff-bott-button').unbind('mouseover');
@@ -505,24 +463,24 @@ function init_page()
 			$('.ff-icon').removeClass('hovered');
 		});
 	}
-	else if ((page == 'mobile')  && (!m))
-	{
-		parsepage(pages['mobile']);		
-	}
-	else if ((page == 'sync')  && (!m))
+	else if (page == 'sync')
 	{
 		parsepage(pages['sync'],'sync');		
 	}
-	else if ((page == 'affiliates')  && (!m) && (u_attr) && (u_attr.aff))
+	else if (page == 'affiliates'  && u_attr && u_attr.aff)
 	{
 		parsepage(pages['affiliatemember']);
 		init_affiliatemember();
 	}
-	else if ((page == 'affiliates')  && (!m))
+	else if (page == 'affiliates')
 	{
 		parsepage(pages['affiliates']);
 	}
-	else if ((page == 'affiliatesignup')  && (!m) && (u_type < 3))
+	else if (page == 'resellers')
+	{
+		parsepage(pages['resellers']);
+	}
+	else if (page == 'affiliatesignup' && u_type < 3)
 	{
 		if (loggedout)
 		{
@@ -533,19 +491,10 @@ function init_page()
 		parsepage(pages['login']);
 		init_login();
 	}
-	else if ((page == 'affiliatesignup')  && (!m))
+	else if (page == 'affiliatesignup')
 	{
 		parsepage(pages['affiliatesignup']);
 		init_affiliatesignup();
-	}	
-	else if ((page == 'resellerapp')  && (!m))
-	{
-		parsepage(pages['resellerapp']);
-		init_resellerapp();
-	}
-	else if ((page == 'flash')  && (!m))
-	{
-		parsepage(pages['flash']);
 	}
 	else if (page == 'done')
 	{
@@ -557,24 +506,7 @@ function init_page()
 		parsepage(pages['done']);
 		init_done();
 	}
-	else if (page.substr(0,7) == 'account' && u_type === false && m)
-	{
-		if (loggedout)
-		{
-			document.location.hash = '#start';
-			return false;
-		}
-		page = 'login';
-		parsepage(pages['mobileui']);
-		mobileui();	
-	}
-	else if (page.substr(0,7) == 'account' && m)
-	{
-		parsepage(pages['mobileui']);
-		mobileui();
-		mload_acc();
-	}
-	else if ((page == 'copyrightnotice')  && (!m))
+	else if (page == 'copyrightnotice')
 	{
 		parsepage(pages['copyrightnotice']);
 		init_cn();
@@ -1312,7 +1244,7 @@ window.onhashchange = function()
 		return false;
 	}
 	
-	if ((tpage == '#' || (tpage == '') || (tpage == 'start')) && page == 'start')
+	if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start')
 	{
 		if ($.infoscroll) startpageMain();
 		return false;
@@ -1417,12 +1349,10 @@ function languageDialog(close)
 	});
 }
 
-
-
-
-
-
 window.onbeforeunload = function ()
 {
-	if ((downloading) || (ul_uploading)) return l[377];
+	if (downloading || ul_uploading) return l[377];
 }
+
+
+

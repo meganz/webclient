@@ -55,6 +55,8 @@ function dlinfo(ph,key,next)
 				$('.new-download-red-button').unbind('click');
 				$('.new-download-red-button').bind('click',function(e)
 				{
+					if (dl_method == 4 && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
+					
 					dl_queue.push(fdl_queue_var);					
 					$('.download-mid-centered-block').addClass('downloading');
 					$.dlhash = window.location.hash;

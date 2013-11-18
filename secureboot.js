@@ -39,26 +39,33 @@ try
 {
 	if (is_chrome_firefox)
 	{
-		eval("const Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;");
+		var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 		
-		var dsm, tmp;
-		var uri = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService).newURI("https://mega.co.nz/", "", null);
-		var principal = Cc["@mozilla.org/scriptsecuritymanager;1"].getService(Ci.nsIScriptSecurityManager).getCodebasePrincipal(uri);
-		try 
-		{
-			dsm = Cc["@mozilla.org/dom/localStorage-manager;1"].getService(Ci.nsIDOMStorageManager);
-			tmp = dsm.createStorage(principal, "");
-		} 
-		catch(e) 
-		{
-			dsm = Cc["@mozilla.org/dom/storagemanager;1"].getService(Ci.nsIDOMStorageManager);
-			tmp = dsm.getLocalStorageForPrincipal(principal, "");
-		}
-		eval("const localStorage = tmp, sessionStorage = tmp;");
-		principal = dsm = tmp = undefined;		
-		if(!(localStorage instanceof Ci.nsIDOMStorage)) 
-		{		
-			throw new Error('Invalid DOMStorage');
+		Cu['import']("resource://gre/modules/Services.jsm");
+		
+		(function(global) {
+			global.loadSubScript = function(file,scope) {
+				Services.scriptloader.loadSubScript(file,scope||global);
+			};
+		})(this);
+		
+		try {
+			loadSubScript('chrome://mega/content/strg.js');
+			
+			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+				throw new Error('Initialization failed.');
+			}
+		} catch(e) {
+			alert('Error setting up DOM Storage instance:\n\n'
+				+ e + '\n\n'
+				+ [Services.appinfo.vendor,
+					Services.appinfo.name,
+					Services.appinfo.platformVersion,
+					Services.appinfo.platformBuildID,
+					Services.appinfo.OS,
+					Services.appinfo.XPCOMABI].join(" "));
+			
+			throw new Error("FxEx");
 		}
 	}
 	if (typeof localStorage == 'undefined')
@@ -77,7 +84,9 @@ try
 }
 catch(e)
 {
-	alert('Your browser does not allow data to be written. Please make sure you use default browser settings.');
+	if(e.message != 'FxEx') {
+		alert('Your browser does not allow data to be written. Please make sure you use default browser settings.');
+	}
 	b_u = 1;
 	var staticpath = 'https://eu.static.mega.co.nz/';
 }
@@ -99,14 +108,6 @@ if (is_chrome_firefox)
 	staticpath = 'https://eu.static.mega.co.nz/';
 	
 	if(!b_u) try {
-	// fx_indexeddb_test();
-	
-		eval('Cu.import("resource://gre/modules/Services.jsm");');
-		
-		eval("(function(global) global.loadSubScript = function(file,scope) Services.scriptloader.loadSubScript(file,scope||global))(this);");
-		
-		
-		
 		var mozPrefs = Services.prefs.getBranch('extensions.mega.');
 		
 		if(!mozPrefs.getPrefType('dir')) {
@@ -118,21 +119,6 @@ if (is_chrome_firefox)
 		}
 		
 		loadSubScript(bootstaticpath + 'fileapi.js');
-		
-	/* 	var tmp1, tmp2, tabs = document.getElementById('tabbrowser-tabs');
-		for(var t in tabs.tabbrowser.tabs) {
-			t = tabs.tabbrowser.tabs[t];
-			if(t.nodeName === 'tab') {
-				if(t.linkedBrowser._contentWindow == content) {
-					tmp1 = t;
-					tmp2 = t.linkedBrowser;
-					break;
-				}
-			}
-		}
-		const tabbrowser = tmp1, linkedBrowser = tmp2;
-		tmp1 = tmp2 = undefined;
-		 */
 	} catch(e) {		
 		Cu.reportError(e);
 		alert('Startup error: ' + e);

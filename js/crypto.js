@@ -912,7 +912,7 @@ function api_proc()
 	if (d) console.log("Making API request: " + apiq[0][0]);
 	
 	var n_h_api = false;	
-	if ((apiq[0][0].indexOf('"a":"f"') > -1 || apiq[0][0].indexOf('"a":"ufa"') > -1 || apiq[0][0].indexOf('sc?sn') > -1) && n_h) n_h_api = n_h;
+	if ((apiq[0][0].indexOf('"a":"f"') > -1 || apiq[0][0].indexOf('"a":"ufa"') > -1 || apiq[0][0].indexOf('"a":"g"') > -1 || apiq[0][0].indexOf('sc?sn') > -1) && n_h) n_h_api = n_h;
 
 	var url = (apiq[0][0].substr(0,4) == 'https') ? apiq[0][0] : (apipath + (apiq[0][0].substr(0,1) == '[' ? ('cs?id=' + apiq[0][2]) : apiq[0][0]) + (n_h_api ? '&n=' + n_h_api : (u_sid ? ('&sid=' + u_sid) : '')));
 

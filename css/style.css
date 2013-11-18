@@ -283,7 +283,7 @@ input[type="checkbox"] {
 	webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -300,7 +300,7 @@ input[type="checkbox"] {
 	webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -318,7 +318,7 @@ input[type="checkbox"] {
 	webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -4754,7 +4754,7 @@ th.grid-first-th {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -6228,7 +6228,7 @@ div .fm-tree-folder.dragover {
 	box-sizing: border-box;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 }
 .export-link-item img {
@@ -6664,7 +6664,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 	float: left;
@@ -6767,7 +6767,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }

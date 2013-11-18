@@ -6,8 +6,19 @@ var dl_queue = [];
 var dl_queue_num = 0;
 var dl_retryinterval = 1000;
 
-// 0 - FileSystem (Chrome), 1 - Flash, 2 - Blob (IE10), 3 - Extension (Firefox), 4 - Blob (for mobile), 5 - Streaming video
+
 var dl_method;
+// 0: Filesystem API (Chrome / Firefox Extension polyfill
+// 1: Adobe Flash SWF Filewriter (fallback for old browsers)
+// 2: BlobBuilder (IE10/IE11)
+// 3: Deprecated MEGA Firefox Extension
+// 4: Arraybuffer/Blob Memory Based
+// 5: MediaSource (experimental streaming solution)
+// 6: IndexedDB blob based (Firefox 20+)
+
+
+var blob_urls = [];
+
 
 var dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined');
 var dl_flash_connections = 0;
@@ -17,7 +28,7 @@ var dl_instance = 0;
 
 var dl_blob;
 
-var dl_data;
+var dl_blob_array = [];
 
 var dl_key;
 var dl_keyNonce;
@@ -67,12 +78,13 @@ var dl_id;
 
 var dl_chunklen;
 
-
-
 var skipcheck = 0;
 
 
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.OIndexedDB || window.msIndexedDB;
+
+
+var use_idb = false;
 
 
 
@@ -262,10 +274,7 @@ function dl_dispatch_write()
 
 function dl_write_block()
 {
-	
-
 	if (d) console.log("Writing " + dl_plainq[dl_write_position].length + " bytes of file data at dl_pos " + dl_write_position);
-
 	if (dl_zip)
 	{
 		if (dl_zip.crc32pos != dl_write_position)
@@ -277,14 +286,14 @@ function dl_write_block()
 
 	switch (dl_method)
 	{
-		case 0:		// Chrome (async)
+		case 0:		// Filesystem API (Chrome / Firefox Extension polyfill
 			dl_writing = true;
 			dl_fw.instance = dl_instance;			
 			dl_fw.targetpos = dl_fw.position+dl_plainq[dl_write_position].length;
 			dl_fw.write(new Blob([dl_plainq[dl_write_position]]));
 			break;
 			
-		case 1:		// Flash
+		case 1:		// Adobe Flash SWF Filewriter (fallback for old browsers)
 			var j, k;
 			var len;
 			
@@ -298,25 +307,24 @@ function dl_write_block()
 			dl_ack_write();
 			break;
 			
-		case 2:		// BlobBuilder (IE10)
+		case 2:		// BlobBuilder IE10
 			if (have_ab) dl_blob.append(dl_plainq[dl_write_position]);
 			else dl_blob.append(dl_plainq[dl_write_position].buffer);
 			dl_ack_write();
 			break;
 			
-		case 3:		// Firefox extension
+		case 3:		// Deprecated Firefox Extension
 			console.log(dl_write_position);
 		
 			ffe_writechunk(ab_to_str(dl_plainq[dl_write_position]),dl_write_position);
 			dl_ack_write();
 			break;
 	
-		case 4:		// Blob (for local viewing on mobile devices)
-			dl_data = appendBuffer(dl_data,dl_plainq[dl_write_position]);
+		case 4:		// Blob Memory Based Downloading
+			dl_blob_array.push(new Blob([dl_plainq[dl_write_position]]));
 			dl_ack_write();
-			break;
-			
-		case 5:		// MediaSource
+			break;			
+		case 5:		// MediaSource (experimental)
 			try
 			{	
 				sourceBuffer.append(dl_plainq[dl_write_position]);
@@ -324,11 +332,11 @@ function dl_write_block()
 			catch(e)
 			{
 				console.log(e);		
-			}	
+			}
 			dl_ack_write();
 			break;
 
-		case 6:		// Firefox 20+ (async)
+		case 6:		// IndexedDB blob based (Firefox 20+)
 			dl_writing = true;
 			DBWriter.write(dl_write_position);
 	}
@@ -516,7 +524,6 @@ function startdownload()
 		dl_flash_connections = 0;
 		dl_flash_progress = {};
 	}
-
 	if (use_workers)
 	{
 		dl_workers = new Array(dl_maxWorkers);
@@ -524,10 +531,8 @@ function startdownload()
 
 		for (var id = dl_maxWorkers; id--; ) dl_workerbusy[id] = 0;
 	}
-	else dl_aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-	
+	else dl_aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 	dl_write_position = 0;
-
 	dl_getsourceurl(startdownload2);
 }
 
@@ -680,9 +685,8 @@ function dl_setcredentials(g,s,n)
 				break;
 			
 			case 4:
-				dl_data = new ArrayBuffer();
-				break;
-				
+				dl_blob_array = [];
+				break;				
 			case 6:
 				DBWriter.init();
 		}
@@ -773,14 +777,13 @@ function dl_complete()
 		name = dl_queue[dl_queue_num].n;
 		path = dl_queue[dl_queue_num].p;
 	}
-
 	switch (dl_method)
 	{
 		case 0:
 			if (dl_queue_num >= 0) dl_queue[dl_queue_num].onBeforeDownloadComplete();
 			document.getElementById('dllink').download = name;
 			document.getElementById('dllink').href = document.fileEntry.toURL();
-			if (!is_chrome_firefox && document.getElementById('dllink').click) document.getElementById('dllink').click();				
+			if (!is_chrome_firefox) document.getElementById('dllink').click();
 			break;
 
 		case 1:
@@ -794,7 +797,16 @@ function dl_complete()
 		case 3:
 			ffe_complete(name,path);
 			break;
-
+		case 4:
+			document.getElementById('dllink').download = name;
+			blob_urls.push(myURL.createObjectURL(new Blob(dl_blob_array)));
+			document.getElementById('dllink').href = blob_urls[blob_urls.length-1];
+			document.getElementById('dllink').click();
+			setTimeout(function()
+			{
+				myURL.revokeObjectURL(document.getElementById('dllink').href);
+			},100);
+			break;
 		case 6:
 			DBWriter.servedl(name);
 	}
@@ -1209,7 +1221,7 @@ else if (navigator.msSaveOrOpenBlob)
 {
 	dl_method = 2;
 }
-else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a"))
+else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a") && use_idb)
 {
 	function pingDBname()
 	{
@@ -1377,8 +1389,7 @@ else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", 
 			DBWriter.names[DBWriter.iddb_name] = 1;
 			pingDBname()
 		}
-	};
-	
+	};	
 	$(window).unload(function()
 	{
 		var dbnames = localStorage.dbnames;		
@@ -1394,6 +1405,10 @@ else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", 
 		}
 		localStorage.dbnames = JSON.stringify(dbnames);
 	});
+}
+else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a"))
+{
+	dl_method = 4;
 }
 else
 {

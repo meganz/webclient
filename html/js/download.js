@@ -168,9 +168,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps)
 {
 	$('.downloading-txt.temporary-error').addClass('hidden');
 	$('.downloadings-icons').removeClass('hidden');
-
 	if (uldl_hold) return false;
-
 	if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
 	if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;	
 	var perc = Math.round(bytesloaded/bytestotal*100);	
@@ -190,9 +188,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps)
 		var retime = (bytestotal-bytesloaded)/bps;
 		$('.downloading-txt.speed').text(bytesToSize(bps,1) +'/s');
 		$('.downloading-txt.time').text(secondsToTime(retime));		
-	}
-	
-	
+	}	
 	if (page !== 'download' || $.infoscroll)
 	{
 		$('.widget-block').removeClass('hidden');

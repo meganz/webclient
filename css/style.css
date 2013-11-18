@@ -270,7 +270,7 @@ input[type="checkbox"] {
 	-ms-user-select: text !important;
 	user-select: text !important;
 }
-.download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff {
+.download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .firefox-dialog .checkboxOff {
 	width: 21px;
 	height: 21px;
 	background-position: left -8514px;
@@ -287,7 +287,7 @@ input[type="checkbox"] {
 	-ms-user-select: none;
 	user-select: none;
 }
-.download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn {
+.download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .firefox-dialog .checkboxOn {
 	width: 21px;
 	height: 21px;
 	background-position: left -8554px;
@@ -5369,6 +5369,11 @@ div .fm-tree-folder.dragover {
 	width: 504px;
 	min-height: 100px;
 	margin: -107px 0 0 -252px;
+}
+.fm-dialog.firefox-dialog {
+	width: 620px;
+	min-height: 100px;
+	margin: -176px 0 0 -310px;
 }
 .fm-dialog.registration-success {
 	width: 364px;
@@ -12753,6 +12758,48 @@ h1.help-home-header {
 	background-image: url(../images/mega/main-sprite.png?v=2);
 	background-position: right -11122px;
 }
+.ff-extension-icon {
+	float:left; width:140px; background-image:url(../images/mega/firefox-sprite.png); background-position: 39px 37px; background-repeat:no-repeat; height:138px;
+}
+.ff-extension-content {
+	margin-left:169px;
+        padding:37px 0 40px 0
+}
+.ff-extension-head {
+	font-size:16px; line-height:24px; color:#333333;
+}
+.ff-extension-txt {
+	font-size:13px; line-height:24px; color:#666666; padding:8px 0 38px 0;
+}
+.ff-extension-button {
+	display: block;
+height: 64px;
+min-width: 284px;
+border: 2px solid #d9d9d9;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+-ms-box-sizing: border-box;
+box-sizing: border-box;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+font-size: 13px;
+line-height: 58px;
+color: #666666;
+white-space: nowrap;
+padding: 0 20px 0 82px;
+float: left;
+font-family: 'Open Sans Semibold', Arail;
+background-image: url(../images/mega/firefox-sprite.png);
+background-position: 10px -130px;
+background-repeat: no-repeat;
+}
+.ff-extension-button:hover {
+	background-color: #b2b2b2;
+	border: 2px solid #b2b2b2;
+	background-position: 10px -230px;
+	color:white;
+}
 @media only screen and (max-width: 1143px) {
 .powered-popup {
 	margin-left: -30px;
@@ -12763,7 +12810,10 @@ h1.help-home-header {
 	font-size:16px !important;
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-	
+.ff-extension-icon, .ff-extension-button {
+	background-image: url(../images/mega/firefox-sprite@2x.png);
+background-size: 90px auto;
+}
 .st-green-note {
  background-image: url(../images/mega/en/start-green-note@2x.png);
  background-size:180px auto;

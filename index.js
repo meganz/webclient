@@ -465,7 +465,11 @@ function init_page()
 	}
 	else if (page == 'sync')
 	{
-		parsepage(pages['sync'],'sync');		
+		parsepage(pages['sync']);		
+	}
+	else if (page == 'mobile')
+	{
+		parsepage(pages['mobile']);		
 	}
 	else if (page == 'affiliates'  && u_attr && u_attr.aff)
 	{

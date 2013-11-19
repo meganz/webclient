@@ -497,26 +497,27 @@ function openTransferpanel()
 }
 
 
-function doAddContact(e)
-{
-	if (checkMail($('.add-user-popup input').val())) 
+function doAddContact(e,dialog)
+{	
+	var c = '.add-user-popup input';
+	if (dialog) c = '.add-contact-dialog input';
+	if (checkMail($(c).val())) 
 	{
-		$.doAddContactVal = $('.add-user-popup input').val();
-		$('.add-user-popup input').val('email@domain.com');
-		$('.add-user-popup input').css('font-weight','bold');
-		$('.add-user-popup input').css('color','#D22000');
-		setTimeout(function()
+		$.doAddContactVal = $(c).val();
+		$(c).val('email@domain.com');
+		$(c).css('color','#D22000');
+		setTimeout(function(c)
 		{
-			$('.add-user-popup input').val($.doAddContactVal);
-			$('.add-user-popup input').css('font-weight','normal');
-			$('.add-user-popup input').css('color','#000000');
-			$('.add-user-popup input').select();	
-		},850);
+			$(c).val($.doAddContactVal);
+			$(c).css('color','#000000');
+			$(c).select();	
+		},850,c);
 	}
 	else 
 	{
 		loadingDialog.show();
-		M.addContact($('.add-user-popup input').val());
+		M.addContact($(c).val());
+		if (dialog) addContactDialog(1);
 	}
 }
 
@@ -755,6 +756,7 @@ function initContextUI()
 	$(c+'.addcontact-item').unbind('click');
 	$(c+'.addcontact-item').bind('click',function(event) 
 	{
+		addContactDialog();
 		if (d) console.log('addcontact');	
 	});
 	
@@ -3748,18 +3750,7 @@ function createfolderDialog(close)
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.fm-dialog.create-folder-dialog').addClass('hidden');
 		return true;	
-	}
-	$('.create-folder-dialog input').val(l[157]);
-	$('.create-folder-dialog input').unbind('focus');
-	$('.create-folder-dialog input').bind('focus',function() 
-	{
-		if ($(this).val() == l[157]) $(this).val('');	
-	});	
-	$('.create-folder-dialog input').unbind('blur');
-	$('.create-folder-dialog input').bind('blur',function() 
-	{
-		if ($(this).val() == '') $(this).val(l[157]);	
-	});	
+	}	
 	$('.create-folder-dialog input').unbind('keyup');
 	$('.create-folder-dialog input').bind('keyup',function() 
 	{
@@ -3802,6 +3793,68 @@ function createfolderDialog(close)
 	});
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.create-folder-dialog').removeClass('hidden');
+	$('.create-folder-dialog').removeClass('active');
+	$('.create-folder-dialog input').val('');
+	$('.create-folder-dialog input').focus();
+}
+
+
+
+function addContactDialog(close)
+{
+	$.dialog = 'addcontact';	
+	if (close)
+	{
+		$.dialog = false;
+		if ($.cftarget) delete $.cftarget;
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.fm-dialog.add-contact-dialog').addClass('hidden');
+		return true;	
+	}
+	$('.add-contact-dialog input').unbind('keyup');
+	$('.add-contact-dialog input').bind('keyup',function() 
+	{
+		if ($('.add-contact-dialog input').val() == '' || $('.add-contact-dialog input').val() == l[157]) $('.add-contact-dialog').removeClass('active');
+		else $('.add-contact-dialog').addClass('active');
+	});	
+	$('.add-contact-dialog input').unbind('keypress');
+	$('.add-contact-dialog input').bind('keypress',function(e) 
+	{
+		if (e.which == 13 && $(this).val() !== '') 
+		{
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e,1);
+		}
+	});
+	$('.add-contact-dialog .fm-dialog-close').unbind('click');
+	$('.add-contact-dialog .fm-dialog-close').bind('click',function()  
+	{
+		addContactDialog(1);
+	});	
+	$('.fm-dialog-input-clear').unbind('click');
+	$('.fm-dialog-input-clear').bind('click',function()  
+	{
+		$('.add-contact-dialog input').val('');
+		$('.add-contact-dialog').removeClass('active');
+		$('.add-contact-dialog input').focus();
+	});
+	
+	$('.fm-dialog-add-folder-button').unbind('click');
+	$('.fm-dialog-add-folder-button').bind('click',function(e)
+	{
+		var v = $('.add-contact-dialog input').val();
+		if (v == '' || v == l[157]) alert(l[1024]);
+		else
+		{			
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e,1);
+		}
+	});
+	$('.fm-dialog-overlay').removeClass('hidden');
+	$('.fm-dialog.add-contact-dialog').removeClass('hidden');
+	$('.add-contact-dialog').removeClass('active');
+	$('.add-contact-dialog input').val('');
+	$('.add-contact-dialog input').focus();
 }
 
 

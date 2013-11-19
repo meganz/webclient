@@ -4679,14 +4679,7 @@ th.grid-first-th {
 .create-folder-pad, .add-user-popup-pad {
 	margin: 20px 18px 0 18px
 }
-.create-folder-loader {
-	height: 70px;
-	position: relative;
-}
-.create-folder-dialog-loader {
-	height: 90px;
-	position: relative;
-}
+
 .create-folder-input-bl, .add-user-popup-input-bl {
 	float: left;
 	width: 70%;
@@ -5359,7 +5352,7 @@ div .fm-tree-folder.dragover {
 	-ms-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.fm-dialog.create-folder-dialog, .fm-dialog.rename-dialog, .fm-dialog.dlkey-dialog {
+.fm-dialog.create-folder-dialog, .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
 	min-width: 500px;
 	height: 126px;
 	margin: -63px 0 0 -250px;
@@ -5547,7 +5540,7 @@ div .fm-tree-folder.dragover {
 	width: 100% !important;
 	cursor: pointer;
 }
-.fm-dialog-new-folder-input {
+.fm-dialog-new-folder-input , .fm-dialog-add-contact-input{
 	height: 30px;
 	border: 2px solid #dcdcdc;
 	float: left;
@@ -5574,10 +5567,10 @@ div .fm-tree-folder.dragover {
 	background-image: url(../images/mega/main-sprite.png?v=3);
 	cursor: pointer;
 }
-.fm-dialog-new-folder-pad {
+.fm-dialog-new-folder-pad,.fm-dialog-add-contact-pad {
 	margin: 0 30px 0 0;
 }
-.fm-dialog-new-folder-input input {
+.fm-dialog-new-folder-input input ,.fm-dialog-add-contact-input input {
 	line-height: 24px;
 	padding: 0 0 0 10px;
 	color: #c3c3c3;
@@ -5593,7 +5586,12 @@ div .fm-tree-folder.dragover {
 .active .fm-dialog-new-folder-input input {
 	color: #9a9a9a;
 }
-.fm-dialog-new-folder-button, .fm-dialog-rename-button, .fm-voucher-button, .new-start-arrow-button {
+
+.active .fm-dialog-add-contact-input input {
+	color: #9a9a9a;
+}
+
+.fm-dialog-new-folder-button, .fm-dialog-add-contact-button, .fm-dialog-rename-button, .fm-voucher-button, .new-start-arrow-button {
 	height: 30px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5612,7 +5610,7 @@ div .fm-tree-folder.dragover {
 	color: #b8baba;
 	cursor: default;
 }
-.active.fm-dialog-new-folder-button, .active.fm-dialog-rename-button, .active .fm-dialog-new-folder-button, .active .fm-dialog-rename-button, .active .fm-voucher-button {
+.active.fm-dialog-new-folder-button, .active .fm-dialog-add-contact-button, .active.fm-dialog-rename-button, .active .fm-dialog-new-folder-button, .active .fm-dialog-rename-button, .active .fm-voucher-button {
 	background-color: white;
 	border: 2px solid #6bb219;
 	color: #6bb219;
@@ -5648,7 +5646,7 @@ div .fm-tree-folder.dragover {
 .active.new-start-arrow-button.download-now:hover {
 	background-position: -2px -1409px;
 }
-.active.fm-dialog-new-folder-button:hover, .active.fm-dialog-rename-button:hover, .active .fm-dialog-new-folder-button:hover, .active.fm-dialog-rename-button:hover {
+.active.fm-dialog-new-folder-button:hover, .active .fm-dialog-add-contact-button:hover, .active.fm-dialog-rename-button:hover, .active .fm-dialog-new-folder-button:hover, .active.fm-dialog-rename-button:hover {
 	background-color: #6bb219;
 	border: 2px solid #6bb219;
 	color: white;

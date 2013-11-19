@@ -130,7 +130,7 @@ function dl_dispatch_decryption()
 				dl_workers[id].instance = dl_instance;
 
 				dl_workers[id].onmessage = function(e)
-				{
+				{				
 					if (this.instance == dl_instance)
 					{
 						if (typeof(e.data) == "string")
@@ -884,7 +884,7 @@ function dl_flashdldata(p,data,httpcode)
 
 function dl_dispatch_read()
 {
-	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+8) return;
+	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+40) return;
 
 	if (!dl_chunks.length) return;
 

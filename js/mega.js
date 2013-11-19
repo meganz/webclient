@@ -678,7 +678,31 @@ function MegaData ()
 		{			
 			if (n.sk) n.p = n.u;
 			else if (n.su) n.p = n.su;
+		}		
+		
+		if (n.p.length == 11 && !M.d[n.p])
+		{
+			var u = this.u[n.p];
+			if (u)
+			{
+				u.name = u.m;
+				u.h = u.u;
+				u.t=1;
+				u.p = 'contacts';
+				M.addNode(u);
+			}
+			else console.log('CHECK THIS MISSING CONTACT!!');
+			
+			/*
+			u[i].name = u[i].m;
+			u[i].h = u[i].u;
+			u[i].t=1;
+			u[i].p = 'contacts';
+			M.addNode(u[i]);
+			*/		
 		}
+	
+		//wN-NqeMUkGs
 		
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));		
 		if (n.p)
@@ -719,7 +743,7 @@ function MegaData ()
 		var a =0;
 		function ds(h)
 		{
-			if (M.c[h]) 
+			if (M.c[h] && h.length < 11)
 			{
 				for(var h2 in M.c[h]) ds(h2);
 				delete M.c[h];
@@ -810,9 +834,7 @@ function MegaData ()
 	};
 	
 	this.copyNodes = function(cn,t)
-	{
-		console.log('copyNodes',cn,t);
-	
+	{	
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
 		{		
@@ -832,8 +854,6 @@ function MegaData ()
 			},[t]);
 			return false;
 		}
-		
-		
 		var a=[];		
 		var r=[];
 		for (var i in cn)
@@ -874,10 +894,6 @@ function MegaData ()
 			for (i in a) mn.push(a[i].h);
 			ops[0].cr =  crypto_makecr(mn,s,true);
 		}
-		
-		
-	
-		
 		api_req(ops,
 		{ 
 			t:t,
@@ -932,14 +948,12 @@ function MegaData ()
 				cb: cb,
 				callback: function(json,ctx)
 				{
-					loadingDialog.hide();
-					
+					loadingDialog.hide();					
 					if (json[5] && json[5].p)
 					{
 						u_attr.p = json[5].p;						
 						if (u_attr.p) topmenuUI();
-					}
-					
+					}					
 					if (json)
 					{
 						M.account = 
@@ -978,14 +992,11 @@ function MegaData ()
 								M.account.downbw_used = t;
 								M.account.bw = json[0].tal;
 							}
-						}
-						
+						}						
 						if (!M.account.bw) M.account.bw=1024*1024*1024*10;
 						if (!M.account.servbw_used) M.account.servbw_used=0;
-						if (!M.account.downbw_used) M.account.downbw_used=0;
-							
-						if (json[0].balance.length == 0) M.account.balance = [['0.00','EUR']];
-						
+						if (!M.account.downbw_used) M.account.downbw_used=0;							
+						if (json[0].balance.length == 0) M.account.balance = [['0.00','EUR']];						
 						if (ctx.cb) ctx.cb(M.account);					
 					}				
 				}
@@ -1005,8 +1016,7 @@ function MegaData ()
 			$('#treea'+p).removeClass('contains-folders');
 		}
 	}
-	
-	
+		
 	this.rubbishIco = function()
 	{
 		var i=0;
@@ -2161,14 +2171,14 @@ function process_u(u)
 	for (var i in u)
 	{
 		if (u[i].c == 1)
-		{		
+		{
 			u[i].name = u[i].m;
 			u[i].h = u[i].u;
 			u[i].t=1;
 			u[i].p = 'contacts';
 			M.addNode(u[i]);
 		}
-		else if (M.d[u[i].u]) M.delNode(u[i].u);		
+		else if (M.d[u[i].u]) M.delNode(u[i].u);
 		M.addUser(u[i]);
 	}
 }

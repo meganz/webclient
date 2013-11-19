@@ -1,14 +1,18 @@
 
-var mozOnSavingDownload = function(file,callback) {
+var mozOnSavingDownload = function(file,callback,ask) {
 
 	var options = {
 		folder: mozPrefs.getCharPref('dir'),
-		saveFolder: !1
+		saveFolder: 2 == ask
 	}, f;
 
-	if((mozOnSavingDownload.last_path && file.folder) || (~file.filename.indexOf('.') && options.folder)) {
+	if(!ask && ((mozOnSavingDownload.last_path && file.folder)
+		|| (~file.filename.indexOf('.') && options.folder)))
+	{
 		f = mozFile(file.folder && mozOnSavingDownload.last_path || options.folder,file.filename,file.folder);
-	} else {
+	}
+	else
+	{
 		f = mozFilePicker(file.filename);
 
 		if( f && file.folder ) {
@@ -18,6 +22,7 @@ var mozOnSavingDownload = function(file,callback) {
 	}
 
 	options.saveto = f;
+	options.folder = f && f.parent && f.parent.path;
 	mozOnSavingDownload.last_path = file.folder && f && mozGetPath(f.path,file.folder).path;
 	if(d) console.log('Saving To: ' + (f && f.path) + ' -- Next path: ' + mozOnSavingDownload.last_path);
 
@@ -393,13 +398,9 @@ function mozPlaySound(n) {
 					File.filetime = scope.dl_queue[scope.dl_queue_num].t;
 				} catch(e) {}
 
-				mozOnSavingDownload(File,function(options) {
+				function osd_cb(options) {
 
 					File.options = options;
-					if(options.saveFolder) {
-
-						mozPrefs.setCharPref('dir', options.folder);
-					}
 
 					var fs, f = options.saveto;
 
@@ -412,11 +413,32 @@ function mozPlaySound(n) {
 						fs.QueryInterface(Ci.nsISeekableStream);
 						fs.init(f, 0x02 | 0x08 | 0x20, parseInt("0755",8), 0);
 					} catch(ex) {
-						alert(ex.message);
+						Cu.reportError(ex);
+						var ps = Services.prompt,
+							btn = ['Yes','Yes, saving as default'],
+							flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_IS_STRING +
+								ps.BUTTON_POS_1 * ps.BUTTON_TITLE_CANCEL  +
+								ps.BUTTON_POS_2 * ps.BUTTON_TITLE_IS_STRING,
+							msg = 'Unexpected Download Error:\n'
+								+ '\nFile: ' + f.path
+								+ '\nError: ' + ex.message
+								+ '\n\nWould you like to choose a different folder?',
+							r = ps.confirmEx(null,'MEGA',msg,flags,
+									btn[0],"",btn[1],null,{value:!1});
+
+						switch( r ) {
+							case 0: ++r;
+							case 2:
+								return mozOnSavingDownload(File,osd_cb,r);
+						}
 						fs = null;
 					}
 
 					if((File.fs = fs)) {
+						if(options.saveFolder && options.folder) {
+							if(d) console.log('Using new downloads folder: ' + options.folder);
+							mozPrefs.setCharPref('dir', options.folder);
+						}
 
 						File.sBufSize = Math.min(4*1024*1024,File.filesize * 1.3 / 100);
 						File.startTime = Date.now();
@@ -492,7 +514,9 @@ function mozPlaySound(n) {
 							Cu.reportError(e);
 						}
 					}
-				});
+				}
+				
+				mozOnSavingDownload(File,osd_cb);
 			}
 		}
 	};

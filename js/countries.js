@@ -241,7 +241,7 @@ var isocountries =
 	'WS':'Samoa',
 	'IQ':'Iraq',
 	'CD':'Congo',
-	'RS':'Republic of Serbia',
+	'RS':'Serbia',
 	'AX':'Aaland Islands',
 	'ME':'Montenegro',
 	'GG':'Guernsey',

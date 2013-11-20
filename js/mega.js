@@ -691,18 +691,7 @@ function MegaData ()
 				u.p = 'contacts';
 				M.addNode(u);
 			}
-			else console.log('CHECK THIS MISSING CONTACT!!');
-			
-			/*
-			u[i].name = u[i].m;
-			u[i].h = u[i].u;
-			u[i].t=1;
-			u[i].p = 'contacts';
-			M.addNode(u[i]);
-			*/		
 		}
-	
-		//wN-NqeMUkGs
 		
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));		
 		if (n.p)
@@ -1376,7 +1365,7 @@ function MegaData ()
 					$('.widget-block').addClass('active');
 				}
 			}
-		}	
+		}		
 	}
 	
 	this.dlcomplete = function (id,z)

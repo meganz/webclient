@@ -39,31 +39,41 @@ if (indexedDB)
 			}
 			else mDBreload();
 		});		
-	}	
+	}
 	
 	function mDBstart()
 	{
+		loadingDialog.show();
+		
+		if (d) console.log('mDBstart()');
 		request = indexedDB.open("MEGA_" + u_handle,2);
 		request.onerror = function(event) 
 		{			
 			if (d) console.log('mDB error',event);
-			mDB=undefined;
-			loadfm();
+			if (mDB)
+			{
+				mDB=undefined;
+				loadfm();
+			}
 		};
 		request.onblocked = function(event)
 		{
 			if (d) console.log('mDB blocked',event);
-			mDB=undefined;
-			loadfm();			
+			if (mDB)
+			{
+				mDB=undefined;
+				loadfm();
+			}
 		}
 		request.onsuccess = function(event) 
 		{
+			if (!mDB) return false;
 			if (d) console.log('mDB success');
-			mDB=request.result;			
+			mDB=request.result;
 			if (localStorage[u_handle + '_mDBcount'] && localStorage[u_handle + '_mDBcount'] == 0 && localStorage[u_handle + '_maxaction'])
 			{
 				mDBcount('f',function(c)
-				{					
+				{
 					if (c == 0) mDBfetch();	
 					else
 					{
@@ -86,7 +96,17 @@ if (indexedDB)
 			db.createObjectStore("ok", { keyPath:  "h"});
 			db.createObjectStore("s",  { keyPath:  "h_u"});
 			db.createObjectStore("u",  { keyPath:  "u"});		
-		};	
+		};
+		
+		setTimeout(function()
+		{	
+			if (mDB === 1)
+			{
+				if (d) console.log('mDBstart timeout (2000ms), fetching live data');
+				mDB=undefined;
+				loadfm();
+			}
+		},2000);
 	}
 	
 	var mDBqueue = {};	
@@ -221,6 +241,7 @@ if (indexedDB)
 	function mDBreload()
 	{
 		mDB.close();
+		mDB=2;
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.onsuccess = function(event) 
 		{
@@ -230,19 +251,31 @@ if (indexedDB)
 		dbreq.onerror = function(event) 
 		{
 			mDBrestart();
-		};
+		};		
+		setTimeout(function()
+		{
+			if (mDB === 2)
+			{
+				if (d) console.log('mDBreload timeout (2000ms), fetching live data');
+				mDB=undefined;
+				loadfm();
+			}
+		},2000);		
 	}
 	
 	
 	function mDBrestart()
-	{
-		delete localStorage[u_handle + '_mDBcount'];
-		delete localStorage[u_handle + '_maxaction'];			
-		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
-		Qt=undefined;
-		request=undefined;
-		mDB=1;
-		mDBstart();
+	{	
+		if (mDB)
+		{
+			delete localStorage[u_handle + '_mDBcount'];
+			delete localStorage[u_handle + '_maxaction'];			
+			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+			Qt=undefined;
+			request=undefined;
+			mDB=1;
+			mDBstart();
+		}
 	}
 	
 	var mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};

@@ -473,6 +473,8 @@ function ul_failed(next)
 	ul_settimeout(1000+(next ? 0 : 1000*ul_queue[ul_queue_num].retries),startupload);
 }
 
+var ul_lastprogress=0;
+
 function ul_updateprogress()
 {
 	if (ul_queue[ul_queue_num].size)
@@ -482,6 +484,10 @@ function ul_updateprogress()
 		for (var slot = ul_maxSlots; slot--; ) tp += ul_progress[slot];
 
 		if (tp > ul_queue[ul_queue_num].size) tp = ul_queue[ul_queue_num].size;
+		
+		
+		if (ul_lastprogress+250 > new Date().getTime()) return false;
+		else ul_lastprogress=new Date().getTime();
 		
 		onUploadProgress(ul_queue_num, tp, ul_queue[ul_queue_num].size);
 	}

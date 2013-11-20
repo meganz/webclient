@@ -24,9 +24,9 @@ function ssl_needed()
 
 var use_ssl = ssl_needed();
 if (!use_ssl && localStorage.use_ssl) use_ssl = 1;
-//else if ((navigator.userAgent.indexOf('Chrome/') >= 0) && (document.location.hash.indexOf('#!') >= 0)) use_ssl = 0;
 else use_ssl++;
 
+if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) use_ssl=0;
 
 var chromehack = navigator.appVersion.indexOf('Chrome/');
 chromehack = chromehack >= 0 && parseInt(navigator.appVersion.substr(chromehack+7)) > 21;

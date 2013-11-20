@@ -884,6 +884,8 @@ function dl_flashdldata(p,data,httpcode)
 
 function dl_dispatch_read()
 {
+	console.log('CHECK THIS',dl_cipherqlen+dl_plainqlen);
+
 	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+40) return;
 
 	if (!dl_chunks.length) return;
@@ -997,14 +999,23 @@ function dl_dispatch_read()
 
 var dl_prevprogress = 0;
 
+var dl_lastprogress = 0;
+
 function dl_updateprogress()
 {
+
+	
+	
 	var p = dl_bytesreceived;
 
 	if (dl_queue[dl_queue_num])
 	{
 		if (dl_legacy_ie) for (var pp in dl_flash_progress) p += dl_flash_progress[pp];
 		else for (var slot = dl_maxSlots; slot--; ) p += dl_progress[slot];
+		
+		
+		if (dl_lastprogress+250 > new Date().getTime()) return false;
+		else dl_lastprogress=new Date().getTime();
 
 		dl_queue[dl_queue_num].onDownloadProgress(dl_id, p, dl_filesize, dl_xr.update(p-dl_prevprogress));
 

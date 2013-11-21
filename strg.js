@@ -1,3 +1,6 @@
+
+var mIDBPlaceHolder = false;
+
 (function(scope) {
 	var nsIDOMStorage,
 		uri = Cc["@mozilla.org/network/io-service;1"]
@@ -29,5 +32,20 @@
 	
 	Object.defineProperty(scope, "localStorage", nsIDOMStorageProperty);
 	Object.defineProperty(scope, "sessionStorage", nsIDOMStorageProperty);
-	principal = uri = undefined;
+	
+	try {
+		var nsIIDBManager = Cc["@mozilla.org/dom/indexeddb/manager;1"]
+			.getService(Ci.nsIIndexedDatabaseManager);
+		
+		mIDBPlaceHolder = {};
+		nsIIDBManager.initWindowless(mIDBPlaceHolder);
+		
+		Object.defineProperty(scope, "indexedDB", Object.freeze({ value : mIDBPlaceHolder.indexedDB }));
+		Object.defineProperty(scope, "IDBKeyRange", Object.freeze({ value : mIDBPlaceHolder.IDBKeyRange }));
+		
+	} catch(e) {
+		// Bug 921478 - 28.0a1 20131120062258
+		
+		Cu.importGlobalProperties(['indexedDB']);
+	}
 })(self);

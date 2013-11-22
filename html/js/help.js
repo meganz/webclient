@@ -307,7 +307,7 @@ var helpdata =
 {
 	// q: 'What do I get with my free account?',
 	q: l[348],
-	a: '<p>' + l[349].replace('[X]','50 GB').replace('[A1]','<a href="/#pro">').replace('[/A1]','</a>').replace('[A2]','<a href="/#account">').replace('[/A2]','</a>') + '</p>',
+	a: '<p>' + l[349].replace('[X]','50 GB').replace('[A1]','<a href="/#pro">').replace('[/A1]','</a>').replace('[A2]','<a href="/#fm/account">').replace('[/A2]','</a>') + '</p>',
 	c: [3],
 	i: 1,
 },

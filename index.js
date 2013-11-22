@@ -484,6 +484,10 @@ function init_page()
 	{
 		parsepage(pages['resellers']);
 	}
+	else if (page == 'takedown')
+	{
+		parsepage(pages['takedown']);
+	}
 	else if (page == 'affiliatesignup' && u_type < 3)
 	{
 		if (loggedout)

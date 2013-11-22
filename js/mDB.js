@@ -50,6 +50,11 @@ if (indexedDB)
 		}
 		request.onsuccess = function(event)
 		{
+			if (localStorage[u_handle + '_mDBcount'] && (!localStorage.mDBv || parseInt(localStorage.mDBv) < 1))
+			{
+				localStorage.mDBv=1;
+				delete localStorage[u_handle + '_mDBcount'];			
+			}
 			if (!mDB) return false;
 			if (d) console.log('mDB success');
 			mDB=request.result;
@@ -78,7 +83,7 @@ if (indexedDB)
 			db.createObjectStore("f",  { keyPath:  "h"});
 			db.createObjectStore("ok", { keyPath:  "h"});
 			db.createObjectStore("s",  { keyPath:  "h_u"});
-			db.createObjectStore("u",  { keyPath:  "u"});
+			db.createObjectStore("u",  { keyPath:  "u"});		
 		};
 
 		setTimeout(function()

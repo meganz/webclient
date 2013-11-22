@@ -50,6 +50,14 @@ try
 		})(this);
 		
 		try {
+			var mozBrowserID =
+			[	Services.appinfo.vendor,
+				Services.appinfo.name,
+				Services.appinfo.platformVersion,
+				Services.appinfo.platformBuildID,
+				Services.appinfo.OS,
+				Services.appinfo.XPCOMABI].join(" ");
+			
 			loadSubScript('chrome://mega/content/strg.js');
 			
 			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
@@ -57,13 +65,7 @@ try
 			}
 		} catch(e) {
 			alert('Error setting up DOM Storage instance:\n\n'
-				+ e + '\n\n'
-				+ [Services.appinfo.vendor,
-					Services.appinfo.name,
-					Services.appinfo.platformVersion,
-					Services.appinfo.platformBuildID,
-					Services.appinfo.OS,
-					Services.appinfo.XPCOMABI].join(" "));
+				+ e + '\n\n' + mozBrowserID);
 			
 			throw new Error("FxEx");
 		}
@@ -121,7 +123,8 @@ if (is_chrome_firefox)
 		loadSubScript(bootstaticpath + 'fileapi.js');
 	} catch(e) {		
 		Cu.reportError(e);
-		alert('Startup error: ' + e);
+		alert('Unable to initialize core functionality:\n\n'
+			+ e + '\n\n' + mozBrowserID);
 	}
 }
 
@@ -601,7 +604,7 @@ else
 				  xhr_stack[xhri].jsi = jsi;
 				  xhr_stack[xhri].xhri = xhri;
 				  xhr_stack[xhri].open("GET", url, true);
-				  if (document.location.href.substr(0,13) == 'chrome://mega') xhr_stack[xhri].overrideMimeType('text/plain');
+				  if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
 				  xhr_stack[xhri].send(null);
 			  }
 		}		

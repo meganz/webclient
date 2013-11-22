@@ -1,54 +1,37 @@
 
-if (typeof is_chrome_firefox == 'undefined') var is_chrome_firefox =false;
-
-
-if (is_chrome_firefox)
-{
-	var idbm = Cc["@mozilla.org/dom/indexeddb/manager;1"].getService(Ci.nsIIndexedDatabaseManager);
-	var placeholder = {};
-	idbm.initWindowless(placeholder);
-	var indexedDB = placeholder.indexedDB;
-	var IDBKeyRange = placeholder.IDBKeyRange;
-}
-else
-{
-	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-}
-
+var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-
-
-if (indexedDB) 
-{    	
+if (indexedDB)
+{
 	var mDB=1;
 	var request;
-		
+
 	function mDBfetch()
-	{	
+	{
 		if (d) console.log('mDBfetch()');
 		mDBcount('f',function(c)
-		{					
+		{
 			if (c == 0)
 			{
 				delete localStorage[u_handle + '_mDBcount'];
 				mDBt = {};
 				mDBqueue={};
-				loadfm();			
+				loadfm();
 			}
 			else mDBreload();
-		});		
+		});
 	}
-	
+
 	function mDBstart()
 	{
 		loadingDialog.show();
-		
+
 		if (d) console.log('mDBstart()');
 		request = indexedDB.open("MEGA_" + u_handle,2);
-		request.onerror = function(event) 
-		{			
+		request.onerror = function(event)
+		{
 			if (d) console.log('mDB error',event);
 			if (mDB)
 			{
@@ -65,7 +48,7 @@ if (indexedDB)
 				loadfm();
 			}
 		}
-		request.onsuccess = function(event) 
+		request.onsuccess = function(event)
 		{
 			if (!mDB) return false;
 			if (d) console.log('mDB success');
@@ -74,13 +57,13 @@ if (indexedDB)
 			{
 				mDBcount('f',function(c)
 				{
-					if (c == 0) mDBfetch();	
+					if (c == 0) mDBfetch();
 					else
 					{
 						loadingDialog.show();
 						mDBquery('ok');
 					}
-				});		
+				});
 			}
 			else
 			{
@@ -95,11 +78,11 @@ if (indexedDB)
 			db.createObjectStore("f",  { keyPath:  "h"});
 			db.createObjectStore("ok", { keyPath:  "h"});
 			db.createObjectStore("s",  { keyPath:  "h_u"});
-			db.createObjectStore("u",  { keyPath:  "u"});		
+			db.createObjectStore("u",  { keyPath:  "u"});
 		};
-		
+
 		setTimeout(function()
-		{	
+		{
 			if (mDB === 1)
 			{
 				if (d) console.log('mDBstart timeout (2000ms), fetching live data');
@@ -108,9 +91,9 @@ if (indexedDB)
 			}
 		},2000);
 	}
-	
-	var mDBqueue = {};	
-	
+
+	var mDBqueue = {};
+
 	function mDBadd(t,n)
 	{
 		var a = n;
@@ -118,11 +101,11 @@ if (indexedDB)
 		if (a.ar && a.p !== 'contacts') delete a.ar;
 		if (a.key) delete a.key;
 		mDBaddQueue(t,{a:a});
-	}	
-	
-	var Qt;		
+	}
+
+	var Qt;
 	var mDBt = {};
-	
+
 	function mDBprocess()
 	{
 		if (!Qt) Qt = new Date().getTime();
@@ -139,13 +122,13 @@ if (indexedDB)
 					}
 					var objectStore = mDBt.transation.objectStore(t);
 					if (mDBqueue[t][i].a) var request=objectStore.put(mDBqueue[t][i].a);
-					else if (mDBqueue[t][i].d) var request=objectStore.delete(mDBqueue[t][i].d);					
-					request.onsuccess = function(event) 
+					else if (mDBqueue[t][i].d) var request=objectStore.delete(mDBqueue[t][i].d);
+					request.onsuccess = function(event)
 					{
 						localStorage[u_handle + '_mDBcount']--;
 						mDBprocess();
 					};
-					request.onerror = function(event) 
+					request.onerror = function(event)
 					{
 						if (d) console.log('error',event);
 						mDBprocess();
@@ -154,12 +137,12 @@ if (indexedDB)
 					return;
 				}
 			}
-		}		
+		}
 		if (d) console.log('Qt',Qt-new Date().getTime());
 		mDBt = {};
 		mDBqueue={};
 	}
-	
+
 	function mDBaddQueue(t,obj)
 	{
 		if (!localStorage[u_handle + '_mDBcount']) localStorage[u_handle + '_mDBcount']=0;
@@ -173,11 +156,11 @@ if (indexedDB)
 	{
 		mDBaddQueue(t,{d:id});
 	}
-	
-	function mDBcount(t,callback) 
+
+	function mDBcount(t,callback)
 	{
 		var request = mDB.transaction([t], "readwrite") .objectStore(t).count();
-		request.onsuccess = function(event) 
+		request.onsuccess = function(event)
 		{
 			if (d) console.log('mDBcount',event.target.result);
 			if (callback) callback(event.target.result);
@@ -189,22 +172,22 @@ if (indexedDB)
 	}
 
 	function mDBquery(t)
-	{	
+	{
 		if (d) console.log('mDBquery()');
 		var dt = t;
 		if (t == 'f_sk') dt='f';
 		var objectStore = mDB.transaction(dt,'readonly').objectStore(dt);
-		objectStore.openCursor().onsuccess = function(event) 
+		objectStore.openCursor().onsuccess = function(event)
 		{
 			var rec = event.target.result;
-			if (rec) 
-			{				
+			if (rec)
+			{
 				if (t == 'ok') process_ok([rec.value]);
 				else if (t == 'f') M.addNode(rec.value,1);
 				else if (t == 'f_sk')
 				{
 					var n = rec.value;
-					if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);				
+					if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
 				}
 				else if (t == 'u') M.addUser(rec.value,1);
 				else if (t == 's') M.nodeShare(rec.value.h,rec.value,1);
@@ -216,42 +199,42 @@ if (indexedDB)
 				mDBloaded[t]=1;
 				for (var dbt in mDBloaded)
 				{
-					if (mDBloaded[dbt] == 0) 
+					if (mDBloaded[dbt] == 0)
 					{
 						mDBquery(dbt);
 						return false;
 					}
-				}				
+				}
 				maxaction = localStorage[u_handle + '_maxaction'];
 				getsc(1);
 			}
 		};
 	}
-	
+
 	function mDBclear(callback)
-	{		
+	{
 		mDB.close();
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
-		dbreq.onsuccess = function(event) 
+		dbreq.onsuccess = function(event)
 		{
 			if (d) console.log('db deleted');
-		};		
+		};
 	}
-	
+
 	function mDBreload()
 	{
 		mDB.close();
 		mDB=2;
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
-		dbreq.onsuccess = function(event) 
+		dbreq.onsuccess = function(event)
 		{
 			if (d) console.log('db deleted');
 			mDBrestart();
 		};
-		dbreq.onerror = function(event) 
+		dbreq.onerror = function(event)
 		{
 			mDBrestart();
-		};		
+		};
 		setTimeout(function()
 		{
 			if (mDB === 2)
@@ -260,16 +243,15 @@ if (indexedDB)
 				mDB=undefined;
 				loadfm();
 			}
-		},2000);		
+		},2000);
 	}
-	
-	
+
 	function mDBrestart()
-	{	
+	{
 		if (mDB)
 		{
 			delete localStorage[u_handle + '_mDBcount'];
-			delete localStorage[u_handle + '_maxaction'];			
+			delete localStorage[u_handle + '_maxaction'];
 			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 			Qt=undefined;
 			request=undefined;
@@ -277,8 +259,6 @@ if (indexedDB)
 			mDBstart();
 		}
 	}
-	
-	var mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 
-	
+	var mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 }

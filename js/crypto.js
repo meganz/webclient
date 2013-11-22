@@ -1,7 +1,3 @@
-
-
-
-
 window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
@@ -30,8 +26,6 @@ if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_
 
 var chromehack = navigator.appVersion.indexOf('Chrome/');
 chromehack = chromehack >= 0 && parseInt(navigator.appVersion.substr(chromehack+7)) > 21;
-
-
 
 var EINTERNAL = -1;
 var EARGS = -2;
@@ -983,20 +977,24 @@ function getsc(fm)
 }
 
 var waiturl;
-var waitxhr;
+var waitxhr = false;
 var waitbackoff = 125;
 var waitbegin;
+var waitid = 0;
 
 function waitsc()
 {
-	if (waitxhr && waitxhr.readyState != apixhr.DONE) waitxhr = undefined;
+	var newid = ++waitid;
+
+	if (waitxhr && waitxhr.readyState != apixhr.DONE) waitxhr.abort();
 
 	waitxhr = getxhr();
+	waitxhr.waitid = newid;
 
 	waitxhr.onerror = function()
 	{
 		if (d) console.log("Error while waiting - retrying, backoff: " + waitbackoff);
-		getsc();
+		if (this.waitid == waitid) getsc();
 	}
 
 	waitxhr.onload = function()
@@ -1004,7 +1002,7 @@ function waitsc()
 		var t = new Date().getTime()-waitbegin;
 		if (t < 1000) waitbackoff += waitbackoff;
 		else waitbackoff = 125;
-		getsc();
+		if (this.waitid == waitid) getsc();
 	}
 
 	waitbegin = new Date().getTime();
@@ -1956,8 +1954,6 @@ function crypto_processkey(me,master_aes,file)
 	// do I own the file? (user key is guaranteed to be first in .k)
 	var p = file.k.indexOf(id + ':');
 	
-	
-	
 	if (p)
 	{
 		// I don't - do I have a suitable sharekey?
@@ -1970,8 +1966,6 @@ function crypto_processkey(me,master_aes,file)
 			p = -1;
 		}
 	}
-	
-	
 
 	if (p >= 0)
 	{

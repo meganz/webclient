@@ -1916,7 +1916,6 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // bind
     $(window).bind('keypress.quickFinder', function(e) {
-        console.log(e);
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)

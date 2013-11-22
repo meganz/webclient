@@ -1099,6 +1099,8 @@ function MegaData ()
 			}			
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
+			
+			if (mDB && !pfkey) mDBadd('ok',{h:h,k:a32_to_base64(encrypt_key(u_k_aes,u_sharekeys[h])),ha:crypto_handleauth(h)});
 		}
 	}
 		

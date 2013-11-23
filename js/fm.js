@@ -1854,6 +1854,19 @@ jQuery.expr[':'].icontains = function(a, i, m) {
         .indexOf(m[3].toUpperCase()) >= 0;
 };
 
+/**
+ * Case insensitive :istartswith.
+ *
+ * @param a
+ * @param i
+ * @param m
+ * @returns {boolean}
+ */
+jQuery.expr[':'].istartswith = function(a, i, m) {
+    return jQuery(a).text().toUpperCase()
+        .indexOf(m[3].toUpperCase()) == 0;
+};
+
 
 /**
  * Required to move the cursor at the end of the QuickFinder input field.
@@ -1892,13 +1905,21 @@ $.fn.setCursorPosition = function(pos) {
 var QuickFinder = function(searchable_elements, containers) {
     var self = this;
 
+
+    var opts = {
+        'hideFunction': 'hide',
+        'showFunction': 'show',
+        'autoHideTimeout': 2000
+    };
+
     // create the input field that will contain the user's search text and hide it.
-    var $find_input = $('<input class="quick-finder" />');
+    var $find_input = $('<input class="quick-finder" autocomplete="false" autofocus="false" spellcheck="false" autocorrect="off" autocapitalize="off"/>');
     $find_input.hide();
     $find_input.css({
         'position': 'absolute',
-        'top': 0,
-        'left': 0
+        'top': -400,
+        'left': -400,
+        'opacity': 0 /* hide the input, but preserve accessability */
     });
     $(document.body).append($find_input);
 
@@ -1906,7 +1927,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide on page change
     $(window).bind('hashchange', function() {
         if($find_input.is(":visible")) {
-            $(self).trigger('hide');
+            self.hide();
         }
     });
 
@@ -1936,12 +1957,12 @@ var QuickFinder = function(searchable_elements, containers) {
                 }
 
                 $find_input
-                    .slideDown(250)
+                    [opts['showFunction']](250)
                     // position to the currently visible container.
-                    .css({
-                        'top': $container.offset().top,
-                        'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
-                    })
+//                    .css({
+//                        'top': $container.offset().top,
+//                        'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
+//                    })
                     // initialize with the same char that the user had typed before focusing the field
                     .focus()
                     .select()
@@ -1953,6 +1974,8 @@ var QuickFinder = function(searchable_elements, containers) {
                 // IE fix.
                 $find_input.setCursorPosition(1);
 
+                $(self).trigger("shown");
+
                 return false;
             }
         }
@@ -1961,7 +1984,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // Hide on keyup OR enter.
     $find_input.bind('keyup', function(e) {
         if(e.keyCode == 27 || e.keyCode == 13) {
-            $(self).trigger('hide');
+            self.hide();
             return e.keyCode == 72 ? false : undefined; // stop propagation only on ESC.
         }
     });
@@ -1969,7 +1992,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if($find_input.is(":visible") && !$(e.target).is($find_input)) {
-            $(self).trigger('hide');
+            self.hide();
             return false;
         }
     });
@@ -1981,7 +2004,7 @@ var QuickFinder = function(searchable_elements, containers) {
         if($(this).is(":visible")) { // only if find is active, if not, the user had pressed esc/enter to cancel the
                                      // find proc.
 
-            var $found = $(searchable_elements).filter(":visible:icontains('" + val + "')");
+            var $found = $(searchable_elements).filter(":visible:istartswith('" + val + "'):first");
 
             $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
             $found.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
@@ -1989,12 +2012,46 @@ var QuickFinder = function(searchable_elements, containers) {
     });
 
     // use events as a way to communicate with this from the outside world.
-    $(self).on('hide', function() {
+    self.hide = function() {
         $find_input
             .val('')
             .blur()
-            .slideUp(250);
+            [opts['hideFunction']](250);
+
+
+        $(self).trigger("hidden");
+    };
+
+    self.is_active = function() {
+        return $find_input.is(":visible");
+    };
+
+    self.hide_if_active = function() {
+        if($find_input.is(":visible")) {
+            self.hide();
+        }
+    };
+
+    /**
+     * Reset search string after timeout of Xmsec (see opts['autoHideTimeout']).
+     */
+    var auto_hide_timeout = null;
+    $(self).on('shown', function() {
+        if(auto_hide_timeout) {
+            clearTimeout(auto_hide_timeout);
+        }
+
+        auto_hide_timeout = setTimeout(function() {
+            self.hide_if_active();
+        }, opts['autoHideTimeout']);
     });
+
+    $(self).on('hidden', function() {
+        if(auto_hide_timeout) {
+            clearTimeout(auto_hide_timeout);
+        }
+    });
+
     return this;
 };
 
@@ -2080,6 +2137,7 @@ var CurrentlySelectedManager = function($selectable) {
     this.set_currently_selected = function($element) {
         self.clear();
         $element.addClass("currently-selected");
+        quickFinder.hide_if_active();
     };
 
 
@@ -2231,6 +2289,8 @@ function UIkeyevents()
 				if (!e.shiftKey) $('.grid-table.fm tr').removeClass('ui-selected');
 				$(s[0]).prev().addClass('ui-selected');
 				sl = $(s[0]).prev();
+
+                quickFinder.hide_if_active();
 			}
 		}
 		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
@@ -2242,6 +2302,8 @@ function UIkeyevents()
 				if (!e.shiftKey) $('.grid-table.fm tr').removeClass('ui-selected');
 				$(s[s.length-1]).next().addClass('ui-selected');
 				sl = $(s[0]).next();
+
+                quickFinder.hide_if_active();
 			}
 		}
 		else if (e.keyCode == 46 && s.length > 0 && !$.dialog)

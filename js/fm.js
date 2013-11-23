@@ -1903,7 +1903,11 @@ var QuickFinder = function(searchable_elements, containers) {
         }
         var charCode = e.which || e.keyCode; // ff
 
-        if((charCode >= 65 && charCode <= 123) || charCode > 255) {
+        if(
+            (charCode >= 48 && charCode <= 57) ||
+            (charCode >= 65 && charCode <= 123) ||
+            charCode > 255
+        ) {
             var charTyped = String.fromCharCode(charCode);
 
 

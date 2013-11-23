@@ -1205,15 +1205,18 @@ function MegaData ()
 	this.makeDir = function(n)
 	{
 		var dirs = [];
-		function getfolders(d,o) {
+		function getfolders(d,o) 
+		{
 			var c = 0;
-			for (var e in M.d) {
-				if(M.d[e].t == 1 && M.d[e].p == d) {
+			for (var e in M.d) 
+			{
+				if(M.d[e].t == 1 && M.d[e].p == d) 
+				{
 					var p = o || [];
-					if(!o)
-						p.push(fm_safename(M.d[d].name));
+					if(!o) p.push(fm_safename(M.d[d].name));
 					p.push(fm_safename(M.d[e].name));
-					if(!getfolders(M.d[e].h,p)) {
+					if(!getfolders(M.d[e].h,p)) 
+					{
 						dirs.push(p);
 					}
 					++c;
@@ -1223,25 +1226,30 @@ function MegaData ()
 		}
 		getfolders(n);
 
-		if(d) console.log('makedir',dirs);
+		if (d) console.log('makedir',dirs);
 
-		if(is_chrome_firefox) {
+		if(is_chrome_firefox) 
+		{
 			var root = mozPrefs.getCharPref('dir');
-
-			dirs.forEach(function(p) {
-				try {
+			dirs.forEach(function(p) 
+			{
+				try 
+				{
 					p = mozFile(root,0,p);
-					if(!p.exists())
-						p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
-				} catch(e) {
+					if(!p.exists()) p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
+				} 
+				catch(e) 
+				{
 					Cu.reportError(e);
 					console.log('makedir', e.message);
 				}
 			});
-		} else {
-			console.log('MAKEDIR: TODO');
+		} 
+		else 
+		{
+			if (d) console.log('MAKEDIR: TODO');
 		}
-	},
+	}
 
 	this.addDownload = function(n,z)
 	{
@@ -1257,20 +1265,26 @@ function MegaData ()
 				{
 					this.makeDir(n[i]);
 					var subids = fm_getnodes(n[i]);
+					
 					for(var j in subids)
 					{
 						var p = this.getPath(subids[j]);
 						var path = '';
+						
 						for(var k in p)
 						{
 							if (p[k],M.d[p[k]].t) path = fm_safename(M.d[p[k]].name) + '/' + path;
-							if (p[k] == M.d[subids[j]].p) break;
+							if (p[k] == n[i]) break;
 						}
+						
 						if (!M.d[subids[j]].t)
 						{
 							nodes.push(subids[j]);
 							paths[subids[j]]=path;
+							
+							console.log('1 path',path, subids[j]);
 						}
+						else console.log('0 path',path);
 					}
 				}
 				else
@@ -1292,6 +1306,8 @@ function MegaData ()
 		if (!$.totalDL) $.totalDL=0;
 		for (var i in nodes)
 		{
+			console.log('paths',paths);
+			
 			n = M.d[nodes[i]];
 			if (paths[nodes[i]]) path = paths[nodes[i]];
 			else path ='';

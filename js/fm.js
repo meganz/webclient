@@ -1842,19 +1842,6 @@ $.elementInArray = function(el, arr) {
 };
 
 /**
- * Case insensitive :contains.
- *
- * @param a
- * @param i
- * @param m
- * @returns {boolean}
- */
-jQuery.expr[':'].icontains = function(a, i, m) {
-    return jQuery(a).text().toUpperCase()
-        .indexOf(m[3].toUpperCase()) >= 0;
-};
-
-/**
  * Case insensitive :istartswith.
  *
  * @param a
@@ -1869,33 +1856,12 @@ jQuery.expr[':'].istartswith = function(a, i, m) {
 
 
 /**
- * Required to move the cursor at the end of the QuickFinder input field.
- *
- *
- * PS: Move this somewhere else?
- *
- * @param pos
- */
-$.fn.setCursorPosition = function(pos) {
-    if ($(this).get(0).setSelectionRange) {
-        $(this).get(0).setSelectionRange(pos, pos);
-    } else if ($(this).get(0).createTextRange) {
-        var range = $(this).get(0).createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', pos);
-        range.moveStart('character', pos);
-        range.select();
-    }
-};
-
-/**
- * Simple 'Find in text of the page'-like functionality that will search and highlight (select) the matched files in the
- * current view.
+ * Simple way for searching for nodes by their first letter.
  *
  * PS: This is meant to be somehow reusable.
  *
  * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
- * specified text
+ * specified key press character
  * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
  * will dynamically detect and pick the :visible container)
  *
@@ -1908,28 +1874,18 @@ var QuickFinder = function(searchable_elements, containers) {
 
     var DEBUG = false;
 
-    var opts = {
-        'hideFunction': !DEBUG ? 'hide' : 'slideUp',
-        'showFunction': !DEBUG ? 'show' : 'slideDown',
-        'autoHideTimeout': !DEBUG ? 1000 : 5000
-    };
 
-    // create the input field that will contain the user's search text and hide it.
-    var $find_input = $('<input class="quick-finder" autocomplete="false" autofocus="false" spellcheck="false" autocorrect="off" autocapitalize="off"/>');
-    $find_input.hide();
-    $find_input.css({
-        'position': 'absolute',
-        'top': !DEBUG ? -400 : 0,
-        'left':  !DEBUG ? -400 : 0,
-        'opacity': !DEBUG ? 0 : 1 /* hide the input, but preserve accessability */
-    });
-    $(document.body).append($find_input);
 
+    self._is_active = false; // defined as a prop of this. so that when in debug mode it can be easily accessed from
+                             // out of this scope
+
+    var last_key = null;
+    var next_idx = 0;
 
     // hide on page change
     $(window).bind('hashchange', function() {
-        if($find_input.is(":visible")) {
-            self.hide();
+        if(self.is_active()) {
+            self.deactivate();
         }
     });
 
@@ -1942,165 +1898,82 @@ var QuickFinder = function(searchable_elements, containers) {
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if($(e.target).is("input, textarea, select")) {
+        if($(e.target).is("input, textarea, select") || $.dialog) {
             return;
         }
         var charCode = e.which || e.keyCode; // ff
 
-        if((charCode >= 46 && charCode <= 122) || charCode > 255) {
+        if((charCode >= 65 && charCode <= 123) || charCode > 255) {
             var charTyped = String.fromCharCode(charCode);
-            if(!$find_input.is(":visible")) {
-                // get the currently visible container
-                var $container = $(containers).filter(":visible");
-                if($container.size() == 0) {
-                    // no active container, this means that we are receiving events for a page, for which we should not
-                    // do anything....
-                    return;
-                }
 
-                $find_input
-                    [opts['showFunction']](250)
-                    // position to the currently visible container.
-                    .css(
-                        !DEBUG ?
-                            {} :
-                            {
-                                'top': $container.offset().top,
-                                'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
-                            }
-                    )
-                    // initialize with the same char that the user had typed before focusing the field
-                    .focus()
-                    .select()
-                    .trigger('keyup', e)
-                    .val(
-                        charTyped
-                    );
 
-                // IE fix.
-                $find_input.setCursorPosition(1);
-
-                $(self).trigger("shown");
-
-                return false;
+            // get the currently visible container
+            var $container = $(containers).filter(":visible");
+            if($container.size() == 0) {
+                // no active container, this means that we are receiving events for a page, for which we should not
+                // do anything....
+                return;
             }
-        }
-    });
 
-    // Hide on keyup OR enter.
-    $find_input.bind('keyup', function(e) {
-        if(e.keyCode == 27 || e.keyCode == 13) {
-            self.hide();
-            return e.keyCode == 72 ? false : undefined; // stop propagation only on ESC.
-        }
-    });
 
-    // hide the search field when the user had clicked somewhere in the document
-    $(document.body).delegate('> *', 'mousedown', function(e) {
-        if($find_input.is(":visible") && !$(e.target).is($find_input)) {
-            self.hide();
+
+            self._is_active = true;
+
+            $(self).trigger("activated");
+
+            var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
+
+            if(
+            /* repeat key press, but show start from the first element */
+                (last_key != null && ($found.size() - 1) <= next_idx)
+                    ||
+                    /* repeat key press is not active, should reset the target idx to always select the first element */
+                    (last_key == null)
+                ) {
+                next_idx = 0;
+                last_key = null;
+            } else if(last_key == charTyped) {
+                next_idx++;
+            }
+            last_key = charTyped;
+
+            $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
+
+            $($found[next_idx]).parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+
+            $(self).trigger('search');
+
+
             return false;
         }
     });
 
-    var target_idx = 0;
-    var last_idx_char = null;
-
-    // search thru `searchable_elements`
-    $find_input.bind('keyup', function(e) {
-        var val = $(this).val();
-
-        if(val.length == 0) {
-            return;
-        }
-
-        if($(this).is(":visible")) { // only if find is active, if not, the user had pressed esc/enter to cancel the
-                                     // find proc.
 
 
-            // handle repeatable key press navigation
-            if(val.length == 2) {
-                if(val[0] == val[1]) {
-                    // change the value to "c" instead of "cc", this is how the user will be able to continue typing if
-                    // he decided to type the full name of the searched node
-                    $(this).val(
-                        val[0]
-                    );
-                    val = $(this).val();
-
-                    if(last_idx_char == val[0]) {
-                        target_idx++;
-                    } else {
-                        last_idx_char = val[0];
-                        target_idx = 1; // the first node is always selected first, so proceed to the second.
-                    }
-                } else {
-                    last_idx_char = null;
-                }
-            } else {
-                last_idx_char = null;
-            }
-
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + val + "')");
-
-            if(
-                /* repeat key press, but show start from the first element */
-                (last_idx_char != null && $found.size() <= target_idx)
-                    ||
-                /* repeat key press is not active, should reset the target idx to always select the first element */
-                (last_idx_char == null)
-            ) {
-                target_idx = 0;
-            }
-
-            $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
-
-            $($found[target_idx]).parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
-
-            $(self).trigger('search');
+    // hide the search field when the user had clicked somewhere in the document
+    $(document.body).delegate('> *', 'mousedown', function(e) {
+        if(self.is_active()) {
+            self.deactivate();
+            return false;
         }
     });
 
     // use events as a way to communicate with this from the outside world.
-    self.hide = function() {
-        $find_input
-            .val('')
-            .blur()
-            [opts['hideFunction']](250);
-
-
-        $(self).trigger("hidden");
+    self.deactivate = function() {
+        self._is_active = false;
+        $(self).trigger("deactivated");
     };
 
     self.is_active = function() {
-        return $find_input.is(":visible");
+        return self._is_active;
     };
 
-    self.hide_if_active = function() {
-        if($find_input.is(":visible")) {
-            self.hide();
+    self.disable_if_active = function() {
+        if(self.is_active()) {
+            self.deactivate();
         }
     };
 
-    /**
-     * Reset search string after timeout of Xmsec (see opts['autoHideTimeout']).
-     */
-    var auto_hide_timeout = null;
-    $(self).on('shown search', function() {
-        if(auto_hide_timeout) {
-            clearTimeout(auto_hide_timeout);
-        }
-
-        auto_hide_timeout = setTimeout(function() {
-            self.hide_if_active();
-        }, opts['autoHideTimeout']);
-    });
-
-    $(self).on('hidden', function() {
-        if(auto_hide_timeout) {
-            clearTimeout(auto_hide_timeout);
-        }
-    });
 
     return this;
 };
@@ -2187,7 +2060,7 @@ var CurrentlySelectedManager = function($selectable) {
     this.set_currently_selected = function($element) {
         self.clear();
         $element.addClass("currently-selected");
-        quickFinder.hide_if_active();
+        quickFinder.disable_if_active();
     };
 
 
@@ -2340,7 +2213,7 @@ function UIkeyevents()
 				$(s[0]).prev().addClass('ui-selected');
 				sl = $(s[0]).prev();
 
-                quickFinder.hide_if_active();
+                quickFinder.disable_if_active();
 			}
 		}
 		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
@@ -2353,7 +2226,7 @@ function UIkeyevents()
 				$(s[s.length-1]).next().addClass('ui-selected');
 				sl = $(s[0]).next();
 
-                quickFinder.hide_if_active();
+                quickFinder.disable_if_active();
 			}
 		}
 		else if (e.keyCode == 46 && s.length > 0 && !$.dialog)
@@ -2523,7 +2396,7 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
 	{
-		if (d) console.log(e);		
+		if (d) console.log(e);
 		if ($.gridDragging) return false;
 		if (e.shiftKey && s.length > 0)
 		{

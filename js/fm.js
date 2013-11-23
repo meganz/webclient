@@ -1909,7 +1909,7 @@ var QuickFinder = function(searchable_elements, containers) {
     var opts = {
         'hideFunction': 'hide',
         'showFunction': 'show',
-        'autoHideTimeout': 2000
+        'autoHideTimeout': 1000
     };
 
     // create the input field that will contain the user's search text and hide it.
@@ -2008,6 +2008,8 @@ var QuickFinder = function(searchable_elements, containers) {
 
             $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
             $found.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+
+            $(self).trigger('search');
         }
     });
 
@@ -2036,7 +2038,7 @@ var QuickFinder = function(searchable_elements, containers) {
      * Reset search string after timeout of Xmsec (see opts['autoHideTimeout']).
      */
     var auto_hide_timeout = null;
-    $(self).on('shown', function() {
+    $(self).on('shown search', function() {
         if(auto_hide_timeout) {
             clearTimeout(auto_hide_timeout);
         }

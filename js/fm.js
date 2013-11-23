@@ -1906,10 +1906,12 @@ var QuickFinder = function(searchable_elements, containers) {
     var self = this;
 
 
+    var DEBUG = false;
+
     var opts = {
-        'hideFunction': 'hide',
-        'showFunction': 'show',
-        'autoHideTimeout': 1000
+        'hideFunction': !DEBUG ? 'hide' : 'slideUp',
+        'showFunction': !DEBUG ? 'show' : 'slideDown',
+        'autoHideTimeout': !DEBUG ? 1000 : 5000
     };
 
     // create the input field that will contain the user's search text and hide it.
@@ -1917,9 +1919,9 @@ var QuickFinder = function(searchable_elements, containers) {
     $find_input.hide();
     $find_input.css({
         'position': 'absolute',
-        'top': -400,
-        'left': -400,
-        'opacity': 0 /* hide the input, but preserve accessability */
+        'top': !DEBUG ? -400 : 0,
+        'left':  !DEBUG ? -400 : 0,
+        'opacity': !DEBUG ? 0 : 1 /* hide the input, but preserve accessability */
     });
     $(document.body).append($find_input);
 
@@ -1959,10 +1961,14 @@ var QuickFinder = function(searchable_elements, containers) {
                 $find_input
                     [opts['showFunction']](250)
                     // position to the currently visible container.
-//                    .css({
-//                        'top': $container.offset().top,
-//                        'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
-//                    })
+                    .css(
+                        !DEBUG ?
+                            {} :
+                            {
+                                'top': $container.offset().top,
+                                'left': $container.offset().left + $container.outerWidth() - $find_input.outerWidth()
+                            }
+                    )
                     // initialize with the same char that the user had typed before focusing the field
                     .focus()
                     .select()
@@ -1997,17 +2003,59 @@ var QuickFinder = function(searchable_elements, containers) {
         }
     });
 
+    var target_idx = 0;
+    var last_idx_char = null;
+
     // search thru `searchable_elements`
     $find_input.bind('keyup', function(e) {
         var val = $(this).val();
 
+        if(val.length == 0) {
+            return;
+        }
+
         if($(this).is(":visible")) { // only if find is active, if not, the user had pressed esc/enter to cancel the
                                      // find proc.
 
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + val + "'):first");
+
+            // handle repeatable key press navigation
+            if(val.length == 2) {
+                if(val[0] == val[1]) {
+                    // change the value to "c" instead of "cc", this is how the user will be able to continue typing if
+                    // he decided to type the full name of the searched node
+                    $(this).val(
+                        val[0]
+                    );
+                    val = $(this).val();
+
+                    if(last_idx_char == val[0]) {
+                        target_idx++;
+                    } else {
+                        last_idx_char = val[0];
+                        target_idx = 1; // the first node is always selected first, so proceed to the second.
+                    }
+                } else {
+                    last_idx_char = null;
+                }
+            } else {
+                last_idx_char = null;
+            }
+
+            var $found = $(searchable_elements).filter(":visible:istartswith('" + val + "')");
+
+            if(
+                /* repeat key press, but show start from the first element */
+                (last_idx_char != null && $found.size() <= target_idx)
+                    ||
+                /* repeat key press is not active, should reset the target idx to always select the first element */
+                (last_idx_char == null)
+            ) {
+                target_idx = 0;
+            }
 
             $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
-            $found.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+
+            $($found[target_idx]).parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
 
             $(self).trigger('search');
         }

@@ -58,13 +58,20 @@ function initContactsBlocksScrolling()
 	jScrollFade('.contacts-blocks-scrolling');
 }
 
-function initTranferScroll() 
+function initTransferScroll()
 {
 	$('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, verticalDragMinHeight: 20});	
 	jScrollFade('.transfer-scrolling-table');
 }
 function initTreeScroll() 
 {
+
+    if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth) {
+        $('.fm-left-panel').css({
+            'width': localStorage.leftPaneWidth + "px"
+        });
+    }
+
 	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
 	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
 	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
@@ -77,6 +84,8 @@ function initTreeScroll()
 		},100);
 	});
 	jScrollFade('.fm-tree-panel');
+
+
 }
 
 
@@ -480,6 +489,47 @@ function initUI()
 			browserDialog();		
 		},2000);
 	}
+
+    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
+        'direction': 'n',
+        'minHeight': 25,
+        'maxHeight': (
+            $(document.body).outerHeight() * 0.45 /* 45%? */
+        ),
+        'persistanceKey': 'transferPaneHeight',
+        'handle': '.transfer-drag-handle'
+    });
+    $($.transferPaneResizable).on('resize', function(e, resize_event, ui) {
+        if($('#fmholder.transfer-panel-opened').size() == 0) {
+            $('.tranfer-view-icon').trigger('click');
+            $.transferHeader();
+        }
+    });
+
+    $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
+        if($.transferPaneResizable.options.minHeight >= ui.size.height) {
+            $('.tranfer-view-icon').trigger('click');
+            $.transferHeader();
+        };
+    });
+
+    $.leftPaneResizable = new FMResizablePane($('.fm-left-panel'), {
+        'direction': 'e',
+        'minWidth': 200,
+        'maxWidth': (
+            $(document.body).outerWidth() * 0.30 /* 30%? */
+        ),
+        'persistanceKey': 'leftPaneWidth',
+        'handle': '.left-pane-drag-handle'
+    });
+
+
+
+    // because setTimeout was used in treeUI, we should trigger a `resize` evt
+    // we need to use setTimeout again :/
+    setTimeout(function() {
+        $(window).trigger('resize');
+    },50);
 }
 
 
@@ -1733,7 +1783,7 @@ function gridUI()
 			i++;
 		}
 		$('.grid-table-header th:eq(1)').width($('.files-grid-view').width()-w-60);
-		initTranferScroll();
+		initTransferScroll();
 	}	
 	$.contactgridHeader = function()
 	{
@@ -1746,7 +1796,7 @@ function gridUI()
 			i++;
 		}
 		$('.contacts-grid-header th:eq(0)').width($('.contacts-grid-view').width()-w-34);
-		initTranferScroll();	
+		initTransferScroll();
 	}	
 	if (M.currentdirid == 'contacts') $.selectddUIgrid = '.contacts-grid-table';
 	else $.selectddUIgrid = '.grid-scrolling-table';	
@@ -1957,6 +2007,7 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if(self.is_active()) {
+            console.log("Deactivating quick finder.");
             self.deactivate();
             return false;
         }
@@ -2065,6 +2116,9 @@ var CurrentlySelectedManager = function($selectable) {
         self.clear();
         $element.addClass("currently-selected");
         quickFinder.disable_if_active();
+
+
+        //TODO: Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
     };
 
 
@@ -2573,7 +2627,7 @@ function transferPanelUI()
 				}
 			}			
 		});		
-		initTranferScroll();
+		initTransferScroll();
 	}	
 	$(window).unbind('resize.transferpanel');
 	$(window).bind('resize.transferpanel', function (e) 
@@ -2587,19 +2641,35 @@ function transferPanelUI()
 		{
 			$(this).addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
+
+            if(localStorage.transferPaneHeight) {
+                $('.transfer-panel').css({
+                    'height': localStorage.transferPaneHeight + "px"
+                });
+            } else {
+                $('.transfer-panel').css({
+                    'height': '193px'
+                });
+            }
 			$.transferHeader();
 		}
 		else 
 		{
 			$(this).removeClass('active');
 			$('#fmholder').removeClass('transfer-panel-opened');
+            $('.transfer-panel').css({
+                'height': ''
+            });
 		}
+
 		initTreeScroll();
 		
 		if (M.currentdirid == 'notifications') notificationsScroll();
 		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
 		else initGridScrolling();
+
+        $(window).trigger('resize');
     });
 	$('.transfer-settings-icon').unbind('click');
 	$('.transfer-settings-icon').bind('click',function()
@@ -4307,4 +4377,181 @@ function savecomplete(id)
 	if (!$.dialog) 
 	$('#dlswf_'+id).remove();
 	M.dlcomplete(id);
+}
+
+/**
+ * Because of the left and transfer panes resizing options, we are now implementing the UI layout logic here, instead of
+ * the original code from the styles.css.
+ * The main reason is that, the CSS is not able to correctly calculate values based on other element's properties (e.g.
+ * width, height, position, etc).
+ * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
+ */
+function fm_resize_handler() {
+    // transfer panel resize logic
+    var right_pane_height = (
+        $('#fmholder').outerHeight() - (
+            $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
+        )
+    );
+
+    $('.fm-main.default').css({
+       'height': right_pane_height  + "px"
+    });
+
+
+    $('.transfer-scrolling-table').css({
+        'height': (
+            $('.transfer-panel').outerHeight() - (
+                    $('.transfer-panel-title').outerHeight() + $('.transfer-table-header').outerHeight()
+                )
+            ) + "px"
+    });
+
+    // left panel resize logic
+    var right_panel_margin = $('.fm-left-panel').outerWidth();
+    var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
+    $('.fm-main > div:not(.fm-left-panel)').each(function() {
+        $(this).css({
+            'margin-left':  right_panel_margin + (
+                    /* add padding, except for the my-account tab */
+                    !$(this).is(".fm-right-account-block") ? 10 : resize_handle_width
+                )
+        });
+    });
+
+    $([
+        '.files-grid-view .grid-scrolling-table',
+        '.file-block-scrolling',
+        '.contacts-grid-view .contacts-grid-scrolling-table'
+    ].join(", ")).css({
+            'width': (
+                $(document.body).outerWidth() - (
+                    $('.fm-left-panel').outerWidth()
+                )
+            )
+        });
+
+    var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
+    $('.fm-right-files-block > *:not(.fm-right-header)').css({
+        'height': right_blocks_height + "px",
+        'min-height': right_blocks_height + "px"
+    });
+
+
+    // account page tweak, required since the transfer panel resize logic was introduced
+    var $account_save_block = $('.fm-account-save-block');
+    if($('.transfer-panel').size() > 0) {
+        $account_save_block.css({
+            'top': $('.transfer-panel').position().top - $account_save_block.outerHeight(),
+            'bottom': ''
+        });
+    }
+}
+$(window).on('resize.fm hashchange.fm', fm_resize_handler);
+
+/**
+ * Implements the behavior of "File Manager - Resizable Panes":
+ * - Initializes a jQuery UI .resizable
+ * - Sets w/h/direction
+ * - Persistance (only saving is implemented here, you should implement by yourself an initial set of the w/h from the
+ *  localStorage
+ * - Proxies the jQ UI's resizable events - `resize` and `resizestop`
+ * - Can be initialized only once per element (instance is stored in $element.data('fmresizable'))
+ *
+ * @param element
+ * @param opts
+ * @returns {*}
+ * @constructor
+ */
+function FMResizablePane(element, opts) {
+    var $element = $(element);
+    var self = this;
+    var $self = $(this);
+
+
+    self.element = element;
+
+    /**
+     * Default options
+     *
+     * @type {{direction: string, persistanceKey: string, minHeight: undefined, minWidth: undefined, handle: string}}
+     */
+    var defaults = {
+        'direction': 'n',
+        'persistanceKey': 'transferPanelHeight',
+        'minHeight': undefined,
+        'minWidth': undefined,
+        'handle': '.transfer-drag-handle'
+    };
+
+
+    var size_attr = 'height';
+
+    opts = $.extend(true, {}, defaults, opts);
+
+    self.options = opts; //expose as public
+
+
+    /**
+     * Depending on the selected direction, pick which css attr should we be changing - width OR height
+     */
+    if(opts.direction == 'n' || opts.direction == 's') {
+        size_attr = 'height';
+    } else if(opts.direction == 'e' || opts.direction == 'w') {
+        size_attr = 'width';
+    }
+
+    /**
+     * Destroy if already initialized.
+     */
+    if($element.data('fmresizable')) {
+        $element.data('fmresizable').destroy();
+    }
+
+    self.destroy = function() {
+        // some optimizations can be done here in the future.
+    };
+
+
+    /**
+     * Basic init/constructor code
+     */
+    {
+        var $handle = $(opts.handle, $element);
+
+        $handle.addClass('ui-resizable-handle ui-resizable-' + opts.direction);
+
+        var resizable_opts = {
+            'handles': {
+
+            },
+            minHeight: opts.minHeight,
+            minWidth: opts.minWidth,
+            maxHeight: opts.maxHeight,
+            maxWidth: opts.maxWidth,
+            resize: function(e, ui) {
+                $self.trigger('resize', [e, ui]);
+
+                var css_attrs = {
+                    'top': 0
+                };
+
+                css_attrs[size_attr] = ui.size[size_attr];
+                $element.css(css_attrs);
+                localStorage[opts.persistanceKey] = ui.size[size_attr];
+
+                $(window).trigger('resize');
+            },
+            'stop': function(e, ui) {
+                $self.trigger('resizestop', [e, ui]);
+            }
+        };
+
+        resizable_opts['handles'][opts.direction] = $handle;
+
+        $element.resizable(resizable_opts);
+
+        $element.data('fmresizable', this)
+    }
+    return this;
 }

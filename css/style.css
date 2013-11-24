@@ -3737,7 +3737,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 }
 .transfer-panel {
 	height: 27px;
-	border-top: 2px solid #B8BCBF;
+	/*border-top: 2px solid #B8BCBF;*/
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
@@ -7699,6 +7699,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .fm-purchase-voucher:hover {
 	background-color: black;
 	border-color: black;
+}
+.fm-account-profile {
+  padding-bottom: 30px;
 }
 .fm-account-profile .fm-account-avatar {
 	width: 100px;
@@ -13672,4 +13675,102 @@ transform:rotate(900deg);
 opacity: 0;
 transform: rotate(900deg);
 }
+}
+
+/**
+ * jQuery UI - Resizable - required classes.
+ */
+.ui-resizable {
+    position: relative;
+}
+.ui-resizable-handle {
+    position: absolute;
+    font-size: 0.1px;
+    display: block;
+}
+.ui-resizable-disabled .ui-resizable-handle,
+.ui-resizable-autohide .ui-resizable-handle {
+    display: none;
+}
+.ui-resizable-n {
+    cursor: n-resize;
+    height: 7px;
+    width: 100%;
+    top: -5px;
+    left: 0;
+}
+.ui-resizable-s {
+    cursor: s-resize;
+    height: 7px;
+    width: 100%;
+    bottom: -5px;
+    left: 0;
+}
+.ui-resizable-e {
+    cursor: e-resize;
+    width: 7px;
+    right: -5px;
+    top: 0;
+    height: 100%;
+}
+.ui-resizable-w {
+    cursor: w-resize;
+    width: 7px;
+    left: -5px;
+    top: 0;
+    height: 100%;
+}
+.ui-resizable-se {
+    cursor: se-resize;
+    width: 12px;
+    height: 12px;
+    right: 1px;
+    bottom: 1px;
+}
+.ui-resizable-sw {
+    cursor: sw-resize;
+    width: 9px;
+    height: 9px;
+    left: -5px;
+    bottom: -5px;
+}
+.ui-resizable-nw {
+    cursor: nw-resize;
+    width: 9px;
+    height: 9px;
+    left: -5px;
+    top: -5px;
+}
+.ui-resizable-ne {
+    cursor: ne-resize;
+    width: 9px;
+    height: 9px;
+    right: -5px;
+    top: -5px;
+}
+.ui-selectable-helper {
+    position: absolute;
+    z-index: 100;
+    border: 1px dotted black;
+}
+
+/**
+ * Transfer Panel - Resize Handle styling
+ */
+.transfer-drag-handle {
+    background-color: #B8BCBF;
+    width: 100%;
+    cursor: ns-resize;
+    z-index: 10;
+}
+
+/**
+ * Left Pane - Resize Handle styling
+ */
+.left-pane-drag-handle {
+    cursor: ew-resize;
+    background-color: #B8BCBF;
+    width: 1px;
+    padding-left: 2px;
+    margin-right: 2px;
 }

@@ -13763,6 +13763,10 @@ transform: rotate(900deg);
     width: 100%;
     cursor: ns-resize;
     z-index: 10;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 /**
@@ -13771,7 +13775,11 @@ transform: rotate(900deg);
 .left-pane-drag-handle {
     cursor: ew-resize;
     background-color: rgba(255, 255, 255, 0);
-    width: 1px;
-    padding-left: 2px;
-    margin-right: 2px;
+    width: 5px;
+	z-index: 10;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	right:0;
 }

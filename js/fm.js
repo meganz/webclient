@@ -4411,11 +4411,9 @@ function fm_resize_handler() {
     var right_panel_margin = $('.fm-left-panel').outerWidth();
     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
     $('.fm-main > div:not(.fm-left-panel)').each(function() {
+		
         $(this).css({
-            'margin-left':  right_panel_margin + (
-                    /* add padding, except for the my-account tab */
-                    !$(this).is(".fm-right-account-block") ? 10 : resize_handle_width
-                )
+            'margin-left':  right_panel_margin
         });
     });
 

@@ -523,6 +523,10 @@ function initUI()
         'handle': '.left-pane-drag-handle'
     });
 
+    $($.leftPaneResizable).on('resize', function() {
+        $(window).trigger('resize');
+    });
+
 
 
     // because setTimeout was used in treeUI, we should trigger a `resize` evt
@@ -536,9 +540,8 @@ function initUI()
 
 function openTransferpanel()
 {
-	$('.tranfer-view-icon').addClass('active');
-	$('#fmholder').addClass('transfer-panel-opened');
-	$.transferHeader();
+	$('.tranfer-view-icon:not(.active)').trigger('click');
+
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
@@ -1871,6 +1874,23 @@ function gridUI()
 	});
 }
 
+/**
+ * Helper function to get the jScrollPane container of this element
+ *
+ * @returns {*}
+ */
+$.fn.getParentJScrollPane = function() {
+    var $scrollable_parent = $(this).parents('.jspScrollable:first');
+    if($scrollable_parent.size() > 0) {
+        var $jsp = $scrollable_parent.data('jsp');
+        if($jsp) {
+            return $jsp;
+        } else {
+            return false;
+        }
+    }
+}
+
 
 /**
  * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
@@ -1988,12 +2008,26 @@ var QuickFinder = function(searchable_elements, containers) {
                 last_key = null;
             } else if(last_key == charTyped) {
                 next_idx++;
+            } else if(last_key != charTyped) {
+                next_idx = 0;
             }
             last_key = charTyped;
 
             $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
 
-            $($found[next_idx]).parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+            var $target_elm = $($found[next_idx]);
+
+            $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+
+            var $jsp = $target_elm.getParentJScrollPane();
+            if($jsp) {
+                var $scrolled_elm = $target_elm.parent("a");
+
+                if($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
+                    $scrolled_elm = $target_elm.parents('tr:first');
+                }
+                $jsp.scrollToElement($scrolled_elm);
+            }
 
             $(self).trigger('search');
 
@@ -2117,8 +2151,14 @@ var CurrentlySelectedManager = function($selectable) {
         $element.addClass("currently-selected");
         quickFinder.disable_if_active();
 
+        // Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
+        {
+            var $jsp = $element.getParentJScrollPane();
+            if($jsp) {
+                $jsp.scrollToElement($element);
+            }
+        }
 
-        //TODO: Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
     };
 
 
@@ -4410,7 +4450,7 @@ function fm_resize_handler() {
     // left panel resize logic
     var right_panel_margin = $('.fm-left-panel').outerWidth();
     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
-    $('.fm-main > div:not(.fm-left-panel)').each(function() {
+    $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
 		
         $(this).css({
             'margin-left':  right_panel_margin
@@ -4527,9 +4567,10 @@ function FMResizablePane(element, opts) {
             minWidth: opts.minWidth,
             maxHeight: opts.maxHeight,
             maxWidth: opts.maxWidth,
-            resize: function(e, ui) {
-                $self.trigger('resize', [e, ui]);
+            start: function(e, ui) {
 
+            },
+            resize: function(e, ui) {
                 var css_attrs = {
                     'top': 0
                 };
@@ -4538,10 +4579,11 @@ function FMResizablePane(element, opts) {
                 $element.css(css_attrs);
                 localStorage[opts.persistanceKey] = ui.size[size_attr];
 
-                $(window).trigger('resize');
+                $self.trigger('resize', [e, ui]);
             },
             'stop': function(e, ui) {
                 $self.trigger('resizestop', [e, ui]);
+                $(window).trigger('resize');
             }
         };
 

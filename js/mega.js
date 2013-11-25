@@ -1346,9 +1346,12 @@ function MegaData ()
 		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);
 
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon({name:'archive.zip'},'s') + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
-		$('.tranfer-view-icon').addClass('active');
-		$('.fmholder').addClass('transfer-panel-opened');
-		$.transferHeader();
+//		$('.tranfer-view-icon').addClass('active');
+//		$('.fmholder').addClass('transfer-panel-opened');
+//		$.transferHeader();
+
+        $('.tranfer-view-icon').trigger('click');
+
 		initGridScrolling();
 		initFileblocksScrolling();
 		initTreeScroll();

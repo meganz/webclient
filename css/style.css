@@ -13781,5 +13781,5 @@ transform: rotate(900deg);
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-	right:0;
+	right:-2px;
 }

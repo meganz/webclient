@@ -3737,8 +3737,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: 100%;
 }
 .transfer-panel {
-	height: 27px;
-	/*border-top: 2px solid #B8BCBF;*/
+	height: 29px;
+	padding-top: 2px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;

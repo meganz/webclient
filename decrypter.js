@@ -46,7 +46,8 @@ self.onmessage = function(e)
 
 			mac = aes.encrypt(mac);
 			
-			if (!(++ctr[3])) ctr[2]++;
+			ctr[3]++;
+			if (!ctr[3]) ctr[2]++;
 		}
 
 		if (i < dv.buffer.byteLength)

@@ -44,8 +44,9 @@ self.onmessage = function(e)
 			dv.setUint32(i+4,data1 ^ enc[1],false);
 			dv.setUint32(i+8,data2 ^ enc[2],false);
 			dv.setUint32(i+12,data3 ^ enc[3],false);
-			
-			if (!(++ctr[3])) ctr[2]++;
+		
+			ctr[3]++;
+			if (!ctr[3]) ctr[2]++;
 		}
 
 		if (i < dv.buffer.byteLength)

@@ -538,12 +538,15 @@ function openTransferpanel()
 {
 	$('.tranfer-view-icon').addClass('active');
 	$('#fmholder').addClass('transfer-panel-opened');
+	if(localStorage.transferPaneHeight) $('.transfer-panel').css({'height': localStorage.transferPaneHeight + "px"});
+    else $('.transfer-panel').css({'height': '193px'});            
 	$.transferHeader();
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
 	initTreeScroll();
 	if (!ul_uploading) startupload();
+	$(window).trigger('resize');
 }
 
 

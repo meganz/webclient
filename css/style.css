@@ -2207,6 +2207,7 @@ a.blog-new-archive-lnk {
 .new-bottom-pages .blog-new-full h2 {
 	float: left;
 	width: 550px;
+	padding-bottom:0;
 }
 .blog-new-forward {
 	float: right;
@@ -2216,7 +2217,7 @@ a.blog-new-archive-lnk {
 	background-image: url(../images/mega/blog-new-sprite.png);
 	background-position: -30px 8px;
 	background-repeat: no-repeat;
-	margin: 26px -6px 0 10px;
+	margin: 26px -6px -6px 10px;
 	background-color: #cccccc;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
@@ -2230,7 +2231,7 @@ a.blog-new-archive-lnk {
 	background-image: url(../images/mega/blog-new-sprite.png);
 	background-position: 10px 8px;
 	background-repeat: no-repeat;
-	margin: 26px 0 0 10px;
+	margin: 26px 0 -6px 10px;
 	background-color: #cccccc;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;

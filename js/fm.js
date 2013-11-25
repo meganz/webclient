@@ -492,7 +492,7 @@ function initUI()
 
     $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
         'direction': 'n',
-        'minHeight': 25,
+        'minHeight': 135,
         'maxHeight': (
             $(document.body).outerHeight() * 0.45 /* 45%? */
         ),

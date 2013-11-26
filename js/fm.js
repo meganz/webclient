@@ -1017,12 +1017,12 @@ function notificationsUI(close)
 		if (M.viewmode) iconUI();
 		else gridUI();
 		return false;
-	}	
+	}
 	notifymarkcount(true);
-	donotify();
-	
+	donotify();	
 	$('.fm-main.notifications').removeClass('hidden');	
 	$('.fm-main.default').addClass('hidden');
+    $(window).trigger('resize'); 
 }
 
 function accountUI()
@@ -4482,9 +4482,12 @@ function fm_resize_handler() {
             )
         });
 
-
-    initContactsBlocksScrolling();
-    initContactsGridScrolling();
+	
+	if (M.currentdirid == 'contacts')
+	{
+		if (M.viewmode) initContactsBlocksScrolling();
+		else initContactsGridScrolling();
+	}
 
     var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({

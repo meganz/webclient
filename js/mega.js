@@ -166,7 +166,7 @@ function MegaData ()
 	{
 		this.filterBy(function(node)
 		{
-		  if (node.p == id) return true;
+		  if (node.name && node.p == id) return true;
 		});
 	};
 
@@ -332,24 +332,41 @@ function MegaData ()
 				}
 				if (!u || $(t + ' '+el).length == 0)
 				{
+					// if the current view does not have any nodes, just append it
 					if (d) console.log('option1');
 					$(t).append(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
+					// if there is a node before the new node in the current view, add it after that node:
 					if (d) console.log('option2');
 					$(t+' #'+this.v[i-1].h).after(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
 				{
+					// if there is a node after the new node in the current view, add it before that node:
 					if (d) console.log('option3');
 					$(t+' #'+this.v[i+1].h).before(html);
 				}
-				else if ($(t+' #'+this.v[i].h).length == 0)
+				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
 				{
-					if (d) console.log('option4');
+					// new folder: insert new node before the first folder in the current view
+					if (d) console.log('option4 (folder)');
 					$($(t+' '+el)[0]).before(html);
 				}
+				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
+				{
+					// new file: insert new node before the first file in the current view
+					if (d) console.log('option5 (file)');					
+					var a = $(t+' '+el).not('.folder');
+					if (a.length > 0) $(a[0]).before(html);
+					else
+					{
+						// if this view does not have any files, insert after the last folder
+						a = $(t+' '+el);
+						$(a[a.length-1]).after(html);
+					}
+				}				
 			}
 		}
 		$('.grid-url-arrow').unbind('click');
@@ -500,6 +517,32 @@ function MegaData ()
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 	};
+	
+	
+	this.runbugfix = function()
+	{
+		for (var i in M.d)
+		{
+			if (M.d[i].t && M.d[i].shares)
+			{
+				var nodes = fm_getnodes(M.d[i].h);
+				console.log(nodes);
+				
+				for (var j in nodes)
+				{
+					var n = M.d[nodes[j]];
+					if (n.name)
+					{
+						 
+						console.log(n.name);
+						console.log(n.key);
+					}
+				}
+			}
+		}
+	};
+	
+	
 
 	this.buildtree = function(n)
 	{
@@ -848,9 +891,6 @@ function MegaData ()
 		for(var i in r)
 		{
 			var n = M.d[r[i]];
-
-			console.log(n);
-
 			if (n)
 			{
 				var ar = clone(n.ar);

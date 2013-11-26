@@ -763,9 +763,9 @@ function decrypt_ab_cbc(cipher,ab)
 
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher,a)
-{
+{	
+	if (!a) a = [];
 	if (a.length == 4) return cipher.encrypt(a);
-
 	var x = [];
 	for (var i = 0; i < a.length; i += 4) x = x.concat(cipher.encrypt([a[i],a[i+1],a[i+2],a[i+3]]));
 	return x;

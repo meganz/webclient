@@ -6,8 +6,7 @@ function init_help()
 	{
 		search = subpage.replace('search/','');
 		subpage='';
-	}
-	
+	}	
 	$('.new-left-menu-link,.help-block').unbind('click');
 	$('.new-left-menu-link,.help-block').bind('click',function(e)
 	{
@@ -21,15 +20,14 @@ function init_help()
 		else if (c.indexOf('ios') > -1) document.location.hash = 'help/ios';
 		else if (c.indexOf('android') > -1) document.location.hash = 'help/android';
 		else document.location.hash = 'help';
-	});
-	
+	});	
 	$('.new-left-menu-link').removeClass('active');	
 	if (subpage) $('.new-left-menu-link.'+subpage).addClass('active');
 	else $('.new-left-menu-link.home').addClass('active');	
 	$('.new-right-content-block').addClass('hidden');	
 	if (search)
 	{
-		var html = '<h1 class="help-home-header">Help Centre - <span class="red">search</span></h1><div class="blog-new-search"><input value="' + htmlentities(search) + '" class="help_search"/></div><div class="blog-new-div"><div></div></div>';		
+		var html = '<h1 class="help-home-header">Help Centre - <span class="red">search</span></h1><div class="blog-new-search"><input value="" class="help_search"/></div><div class="blog-new-div"><div></div></div>';		
 		var a=0;
 		for (var i in helpdata)
 		{
@@ -42,6 +40,7 @@ function init_help()
 		if (a == 0) html += '<h2>' + l[978] + '</h2>';		
 		$('.new-right-content-block.help-info-pages').html(html);
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
+		$('.help_search').val(search);
 		mainScroll();
 		scrollMenu();
 	}	

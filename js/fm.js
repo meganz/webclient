@@ -2900,8 +2900,6 @@ function getDDhelper()
 
 function contextmenuUI(e,ll)
 {
-    console.warn(ll);
-//    debugger;
 	if (localStorage.contextmenu) return true;	
 	var t = '.context-menu.files-menu .context-menu-item';	
 	if (ll == 2)

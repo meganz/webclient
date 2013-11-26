@@ -11955,6 +11955,7 @@ code, c {
 	background-image: url(../images/mega/notification-icons.png);
 	background-position: -109px top;
 	background-repeat: repeat-y;
+    margin-left: -104px;
 }
 .new-notification-pad {
 	padding: 19px 0 19px 0;

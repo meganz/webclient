@@ -4457,6 +4457,12 @@ function fm_resize_handler() {
         });
     });
 
+    $('.fm-main.notifications > .new-notification-top').each(function() {
+        $(this).css({
+            'margin-left':  right_panel_margin
+        });
+    });
+
     $([
         '.files-grid-view .grid-scrolling-table',
         '.file-block-scrolling',

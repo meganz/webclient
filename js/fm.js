@@ -4476,6 +4476,10 @@ function fm_resize_handler() {
             )
         });
 
+
+    initContactsBlocksScrolling();
+    initContactsGridScrolling();
+
     var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({
         'height': right_blocks_height + "px",

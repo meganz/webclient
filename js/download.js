@@ -884,8 +884,6 @@ function dl_flashdldata(p,data,httpcode)
 
 function dl_dispatch_read()
 {
-	console.log('CHECK THIS',dl_cipherqlen+dl_plainqlen);
-
 	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+40) return;
 
 	if (!dl_chunks.length) return;

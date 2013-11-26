@@ -1264,8 +1264,7 @@ function MegaData ()
 				if (M.d[n[i]].t)
 				{
 					if(!z) this.makeDir(n[i]);
-					var subids = fm_getnodes(n[i]);
-					
+					var subids = fm_getnodes(n[i]);					
 					for(var j in subids)
 					{
 						var p = this.getPath(subids[j]);

@@ -547,6 +547,7 @@ function openTransferpanel()
 	else initGridScrolling();	
 	initTreeScroll();
 	if (!ul_uploading) startupload();
+	$(window).trigger('resize');
 }
 
 

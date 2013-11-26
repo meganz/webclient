@@ -4464,6 +4464,12 @@ function fm_resize_handler() {
         });
     });
 
+    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
+        $(this).css({
+            'margin-left':  (304 - right_panel_margin) * -1
+        });
+    });
+
     $([
         '.files-grid-view .grid-scrolling-table',
         '.file-block-scrolling',

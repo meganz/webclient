@@ -65,7 +65,6 @@ function initTransferScroll()
 }
 function initTreeScroll() 
 {
-
     if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth) {
         $('.fm-left-panel').css({
             'width': localStorage.leftPaneWidth + "px"
@@ -84,8 +83,6 @@ function initTreeScroll()
 		},100);
 	});
 	jScrollFade('.fm-tree-panel');
-
-
 }
 
 
@@ -529,7 +526,8 @@ function initUI()
         $(window).trigger('resize');
     });
 
-
+	$(window).unbind('resize.fmrh hashchange.fmrh');
+	$(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
     // because setTimeout was used in treeUI, we should trigger a `resize` evt
     // we need to use setTimeout again :/
@@ -2847,7 +2845,7 @@ function transferPanelUI()
 			$('#fmholder').removeClass('transfer-panel-opened');
             $('.transfer-panel').css({'height': ''});
 		}
-		initTreeScroll();		
+		initTreeScroll();
 		if (M.currentdirid == 'notifications') notificationsScroll();
 		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
@@ -4651,7 +4649,21 @@ function fm_resize_handler() {
         });
     }
 }
-$(window).on('resize.fm hashchange.fm', fm_resize_handler);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Implements the behavior of "File Manager - Resizable Panes":

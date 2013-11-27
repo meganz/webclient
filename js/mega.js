@@ -1390,7 +1390,6 @@ function MegaData ()
 //		$.transferHeader();
 
         openTransferpanel();
-
 		initGridScrolling();
 		initFileblocksScrolling();
 		initTreeScroll();

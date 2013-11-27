@@ -820,6 +820,12 @@ function initContextUI()
 		if (typeof mDB !== 'undefined' && !pfid) mDBreload();
 		else loadfm();
 	});
+
+    $(c+'.select-all').unbind('click');
+	$(c+'.select-all').bind('click',function(event)
+	{
+        selectionManager.select_all();
+	});
 	
 	$(c+'.canceltransfer-item').unbind('click');
 	$(c+'.canceltransfer-item').bind('click',function(event) 
@@ -1893,6 +1899,7 @@ $.fn.getParentJScrollPane = function() {
 }
 
 
+
 /**
  * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
  * Pretty similar to the $.inArray, but will match the object IDs.
@@ -1925,6 +1932,89 @@ jQuery.expr[':'].istartswith = function(a, i, m) {
         .indexOf(m[3].toUpperCase()) == 0;
 };
 
+/**
+ * Really simple shortcut logic for select all, copy, paste, delete
+ *
+ * @constructor
+ */
+var FMShortcuts = function() {
+
+    var current_operation = null;
+
+    // unbind if already bound.
+    $(window).unbind('keydown.fmshortcuts');
+
+    // bind
+    $(window).bind('keydown.fmshortcuts', function(e) {
+        e = e || window.event;
+
+        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
+        // contact field)
+        if($(e.target).is("input, textarea, select") || $.dialog) {
+            return;
+        }
+        var charCode = e.which || e.keyCode; // ff
+        var charTyped = String.fromCharCode(charCode).toLowerCase();
+
+        if(charTyped == "a" && (e.ctrlKey || e.metaKey)) {
+            selectionManager.select_all();
+            return false; // stop prop.
+        } else if(
+            (charTyped == "c" || charTyped == "x") &&
+            (e.ctrlKey || e.metaKey)
+        ) {
+            var $items = selectionManager.get_selected();
+            if($items.size() == 0) {
+                return; // dont do anything.
+            }
+
+            current_operation = {
+                'op': charTyped == "c" ? 'copy' : 'cut',
+                'src': $items
+            };
+            return false; // stop prop.
+        } else if(charTyped == "v" && (e.ctrlKey || e.metaKey)) {
+            if(!current_operation) {
+                return false; // stop prop.
+            }
+
+            $.each(current_operation.src, function(k, v) {
+                if(current_operation.op == "copy") {
+                    M.copyNodes([$(v).attr('id')], M.currentdirid);
+                } else if(current_operation.op == "cut") {
+                    M.moveNodes([$(v).attr('id')], M.currentdirid);
+                }
+            });
+
+            if(current_operation.op == "cut") {
+                current_operation = null;
+            }
+
+            return false; // stop prop.
+        } else if(charCode == 8) {
+            var $items = selectionManager.get_selected();
+            if($items.size() == 0) {
+                return; // dont do anything.
+            }
+
+            $.selected = [];
+            $items.each(function() {
+                $.selected.push($(this).attr('id'));
+            });
+
+            fmremove();
+
+            // force remove, no confirmation
+            if(e.ctrlKey || e.metaKey) {
+                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
+            }
+
+            return false;
+        }
+    });
+}
+
+var fmShortcuts = new FMShortcuts();
 
 /**
  * Simple way for searching for nodes by their first letter.
@@ -2033,7 +2123,10 @@ var QuickFinder = function(searchable_elements, containers) {
             $(self).trigger('search');
 
 
-            return false;
+            if($target_elm && $target_elm.size() > 0) {
+                // ^^ DONT stop prop. if there are no found elements.
+                return false;
+            }
         }
     });
 
@@ -2073,6 +2166,10 @@ var quickFinder = new QuickFinder(
     '.files-grid-view, .fm-blocks-view, .contacts-grid-table'
 );
 
+
+
+
+
 /**
  * This should take care of flagging the LAST selected item in those cases:
  *
@@ -2088,7 +2185,7 @@ var quickFinder = new QuickFinder(
  * @returns {*}
  * @constructor
  */
-var CurrentlySelectedManager = function($selectable) {
+var SelectionManager = function($selectable) {
     var self = this;
 
     $selectable.unbind('selectableselecting');
@@ -2162,6 +2259,58 @@ var CurrentlySelectedManager = function($selectable) {
 
     };
 
+    /**
+     * Simple helper func, for selecting all elements in the current view.
+     */
+    this.select_all = function() {
+        var $selectable_containers = $(
+            [
+                ".fm-blocks-view",
+                ".files-grid-view",
+                ".contacts-grid-view",
+                ".fm-contacts-blocks-view"
+            ].join(",")
+        ).filter(":visible");
+
+        var $selectables = $(
+            [
+                ".file-block",
+                "tr.ui-draggable",
+                "tr.ui-selectee",
+                ".contact-block-view.ui-draggable"
+            ].join(","),
+            $selectable_containers
+        ).filter(":visible");
+
+        $selectables.addClass("ui-selected");
+    };
+
+    /**
+     * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
+     */
+    this.get_selected = function() {
+        var $selectable_containers = $(
+            [
+                ".fm-blocks-view",
+                ".files-grid-view",
+                ".contacts-grid-view",
+                ".fm-contacts-blocks-view"
+            ].join(",")
+        ).filter(":visible");
+
+        var $selected = $(
+            [
+                ".file-block",
+                "tr.ui-draggable",
+                "tr.ui-selectee",
+                ".contact-block-view.ui-draggable"
+            ].join(","),
+            $selectable_containers
+        ).filter(":visible.ui-selected");
+
+        return $selected;
+    };
+
 
     /**
      * Push the last selected item to the end of the selected_list array.
@@ -2210,12 +2359,12 @@ var CurrentlySelectedManager = function($selectable) {
     return this;
 };
 
-var currentlySelectedManager;
+var selectionManager;
 
 function UIkeyevents()
 {
-	$(window).unbind('keydown');
-	$(window).bind('keydown', function (e) 
+	$(window).unbind('keydown.uikeyevents');
+	$(window).bind('keydown.uikeyevents', function (e)
 	{
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
@@ -2231,7 +2380,7 @@ function UIkeyevents()
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
 
             if(e.keyCode == 37) { // left
-                var current = currentlySelectedManager.get_currently_selected("first");
+                var current = selectionManager.get_currently_selected("first");
                 if(!e.shiftKey) { // clear old selection if no shiftKey
                     s.removeClass("ui-selected");
                 }
@@ -2245,11 +2394,11 @@ function UIkeyevents()
 
                 if($target_element) {
                     $target_element.addClass('ui-selected');
-                    currentlySelectedManager.set_currently_selected($target_element);
+                    selectionManager.set_currently_selected($target_element);
                 }
 
             } else if(e.keyCode == 39) { // right
-                var current = currentlySelectedManager.get_currently_selected("last");
+                var current = selectionManager.get_currently_selected("last");
                 if(!e.shiftKey) {
                     s.removeClass("ui-selected");
                 }
@@ -2265,11 +2414,11 @@ function UIkeyevents()
 
                 if($target_element) {
                     $target_element.addClass('ui-selected');
-                    currentlySelectedManager.set_currently_selected($target_element);
+                    selectionManager.set_currently_selected($target_element);
                 }
 
             } else if(e.keyCode == 38 || e.keyCode == 40) { // up & down
-                var current = currentlySelectedManager.get_currently_selected("first");
+                var current = selectionManager.get_currently_selected("first");
                 var current_idx = $.elementInArray(
                     current,
                     $('.file-block')
@@ -2296,7 +2445,7 @@ function UIkeyevents()
                 var $target = $('.file-block:eq(' + target_element_num + ')');
 
                 $target.addClass("ui-selected");
-                currentlySelectedManager.set_currently_selected(
+                selectionManager.set_currently_selected(
                     $target
                 );
 
@@ -2470,12 +2619,12 @@ function selectddUI()
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }});
 
     /**
-     * (Re)Init the currentlySelectedManager, because the .selectable() is reinitialized and we need to reattach to its
+     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
      * events.
      *
-     * @type {CurrentlySelectedManager}
+     * @type {SelectionManager}
      */
-    currentlySelectedManager = new CurrentlySelectedManager(
+    selectionManager = new SelectionManager(
         $('.file-block-scrolling')
     );
 
@@ -2515,14 +2664,14 @@ function selectddUI()
 				$(e).addClass('ui-selected');		
 			});
 
-            currentlySelectedManager.set_currently_selected($(this));
+            selectionManager.set_currently_selected($(this));
 		}
 		else if (e.ctrlKey == false && e.metaKey == false)
 		{
 			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
 			$(this).addClass('ui-selected');
 			$.gridLastSelected = this;
-            currentlySelectedManager.set_currently_selected($(this));
+            selectionManager.set_currently_selected($(this));
 		}
 		else 
 		{
@@ -2531,7 +2680,7 @@ function selectddUI()
 			{
 				$(this).addClass("ui-selected");
 				$.gridLastSelected = this;
-                currentlySelectedManager.set_currently_selected($(this));
+                selectionManager.set_currently_selected($(this));
 			}
 		}
 		$.hideContextMenu(e);
@@ -2589,7 +2738,7 @@ function iconUI()
 	$('.fm-blocks-view').bind('contextmenu',function(e)
 	{		
 		$('.file-block').removeClass('ui-selected');
-		currentlySelectedManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
+		selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
 		$.selected=[];
 		if (contextmenuUI(e,2)) return true;
 		else return false;	
@@ -2685,7 +2834,10 @@ function transferPanelUI()
 
             if(localStorage.transferPaneHeight) {
                 $('.transfer-panel').css({
-                    'height': localStorage.transferPaneHeight + "px"
+                    'height': Math.max(
+                            $.transferPaneResizable.options.minHeight,
+                            localStorage.transferPaneHeight
+                        ) + "px"
                 });
             } else {
                 $('.transfer-panel').css({
@@ -2758,7 +2910,7 @@ function contextmenuUI(e,ll)
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
 			$('.context-menu-item').hide();
-			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
+			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item,.select-all').show();
 			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
@@ -2770,7 +2922,9 @@ function contextmenuUI(e,ll)
 		var id = $(e.currentTarget).attr('id');
 		if (id) id = id.replace('treea_','');	
 		if (id && !M.d[id]) id = undefined;
-		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();		
+		if (id && id.length == 11) {
+            $(t).filter('.refresh-item,.remove-item,.select-all').show();
+        }
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();
@@ -2809,7 +2963,7 @@ function contextmenuUI(e,ll)
 			if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) $(t).filter('.sharing-item').show();			
 			if (sourceRoot == M.RootID && !folderlink) $(t).filter('.move-item,.getlink-item').show();
 			else if (sourceRoot == M.RubbishID && !folderlink) $(t).filter('.move-item').show();
-			$(t).filter('.download-item,.zipdownload-item,.copy-item,.properties-item,.refresh-item').show();
+			$(t).filter('.download-item,.zipdownload-item,.copy-item,.properties-item,.refresh-item,.select-all').show();
 
 			if (folderlink) $(t).filter('.properties-item,.copy-item,.add-star-item').hide();
 		}
@@ -3208,7 +3362,7 @@ function msgDialog(type,title,msg,submsg,callback)
 	{
 		$('#msgDialog').addClass('clear-bin-dialog');
 		$('#msgDialog .icon').addClass('fm-bin-clear-icon');
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active">' + l[82] + '</div><div class="fm-dialog-button notification-button active">' + l[1018] + '</div><div class="clear"></div>');		
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{			
 			closeMsg();
@@ -3235,7 +3389,7 @@ function msgDialog(type,title,msg,submsg,callback)
 	}
 	else if (type == 'confirmation')
 	{
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active">' + l[79] + '</div><div class="fm-dialog-button notification-button active">' + l[78] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="clear"></div>');
 		
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{			

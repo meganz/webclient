@@ -1389,7 +1389,7 @@ function MegaData ()
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
 
-        $('.tranfer-view-icon').trigger('click');
+        openTransferpanel();
 
 		initGridScrolling();
 		initFileblocksScrolling();

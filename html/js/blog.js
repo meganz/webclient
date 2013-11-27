@@ -13,7 +13,7 @@ var blogposts = [
 	"simg": "images/mega/blogs/retina_iOS_thumb.png",
 	"by": "Admin",
 	"id": 23
-},,
+},
 {
 	"h" : "MEGA exits beta",
 	"t" :  1383741738,

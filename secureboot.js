@@ -22,6 +22,16 @@ function isMobile()
 	return false;
 }
 
+
+
+
+if (isMobile() && document.location.hostname == 'mega.co.nz' && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) && (ua.indexOf('crios') > -1))
+{
+	if (document.location.hash.substr(0,5) == '#blog' || document.location.hash.substr(0,8) == '#confirm') document.location = 'https://eu.static.mega.co.nz/' + document.location.hash;
+	else document.location = 'https://eu.static.mega.co.nz/';		
+	stopexecute();
+}
+
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
 else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
 else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
@@ -229,6 +239,7 @@ if (isMobile() || (typeof localStorage !== 'undefined' && localStorage.mobile))
 }
 var silent_loading=false;
 
+
 if (m)
 {
 	var app,mobileblog,android,ios;
@@ -237,7 +248,7 @@ if (m)
 	link.type = 'text/css';
 	link.href = staticpath + 'css/mobile-app.css';
 	document.head.appendChild(link);
-	document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited 2013</div><div class="language-block"><div class="select-box"> <span class="select-txt" id="sel_txt2">English</span><select id="sel_txt2_option" name="custom"></select></div></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
+	document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited 2013</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
 	if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
 	if (ua.indexOf('android') > -1)
 	{
@@ -249,8 +260,7 @@ if (m)
 	{
 		app='https://itunes.apple.com/app/mega/id706857885';
 		document.body.className = 'ios full-mode supported';
-		document.getElementById('m_title').innerHTML = 'Our iOS app is currently with Apple for review.';
-		document.getElementById('m_desc').innerHTML = 'Follow us on witter or Facebook for updates.';
+		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
 		ios=1;
 	}
 	else document.body.className = 'another-os full-mode unsupported';

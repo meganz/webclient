@@ -499,16 +499,18 @@ function initUI()
         'persistanceKey': 'transferPaneHeight',
         'handle': '.transfer-drag-handle'
     });
-    $($.transferPaneResizable).on('resize', function(e, resize_event, ui) {
-        if($('#fmholder.transfer-panel-opened').size() == 0) {
-            $('.tranfer-view-icon').trigger('click');
+    $($.transferPaneResizable).on('resize', function(e, resize_event, ui) 
+	{
+        if($('#fmholder.transfer-panel-opened').size() == 0) 
+		{
+            $.transferOpen();
             $.transferHeader();
         }
     });
 
     $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
         if($.transferPaneResizable.options.minHeight >= ui.size.height) {
-            $('.tranfer-view-icon').trigger('click');
+            $.transferOpen();
             $.transferHeader();
         };
     });
@@ -540,8 +542,7 @@ function initUI()
 
 function openTransferpanel()
 {
-	$('.tranfer-view-icon:not(.active)').trigger('click');
-
+	$.transferOpen(1);
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
@@ -2827,43 +2828,34 @@ function transferPanelUI()
 	$('.tranfer-view-icon').unbind('click');
 	$('.tranfer-view-icon').bind('click', function (e) 
 	{
-        if($(this).attr('class').indexOf('active') == -1) 
+		$.transferOpen();
+    });
+	
+	$.transferOpen = function(force)
+	{
+		if($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
 		{
-			$(this).addClass('active');
+			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-
-            if(localStorage.transferPaneHeight) {
-                $('.transfer-panel').css({
-                    'height': Math.max(
-                            $.transferPaneResizable.options.minHeight,
-                            localStorage.transferPaneHeight
-                        ) + "px"
-                });
-            } else {
-                $('.transfer-panel').css({
-                    'height': '193px'
-                });
-            }
+            if(localStorage.transferPaneHeight) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
+			else  $('.transfer-panel').css({'height': '193px'});            
 			$.transferHeader();
 		}
 		else 
 		{
-			$(this).removeClass('active');
+			$('.tranfer-view-icon').removeClass('active');
 			$('#fmholder').removeClass('transfer-panel-opened');
-            $('.transfer-panel').css({
-                'height': ''
-            });
+            $('.transfer-panel').css({'height': ''});
 		}
-
-		initTreeScroll();
-		
+		initTreeScroll();		
 		if (M.currentdirid == 'notifications') notificationsScroll();
 		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
 		else initGridScrolling();
-
-        $(window).trigger('resize');
-    });
+        $(window).trigger('resize');	
+	};
+	
+	
 	$('.transfer-settings-icon').unbind('click');
 	$('.transfer-settings-icon').bind('click',function()
 	{
@@ -2910,7 +2902,7 @@ function contextmenuUI(e,ll)
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
 			$('.context-menu-item').hide();
-			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item,.select-all').show();
+			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
 			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
@@ -2923,7 +2915,7 @@ function contextmenuUI(e,ll)
 		if (id) id = id.replace('treea_','');	
 		if (id && !M.d[id]) id = undefined;
 		if (id && id.length == 11) {
-            $(t).filter('.refresh-item,.remove-item,.select-all').show();
+            $(t).filter('.refresh-item,.remove-item').show();
         }
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
@@ -2963,7 +2955,7 @@ function contextmenuUI(e,ll)
 			if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) $(t).filter('.sharing-item').show();			
 			if (sourceRoot == M.RootID && !folderlink) $(t).filter('.move-item,.getlink-item').show();
 			else if (sourceRoot == M.RubbishID && !folderlink) $(t).filter('.move-item').show();
-			$(t).filter('.download-item,.zipdownload-item,.copy-item,.properties-item,.refresh-item,.select-all').show();
+			$(t).filter('.download-item,.zipdownload-item,.copy-item,.properties-item,.refresh-item').show();
 
 			if (folderlink) $(t).filter('.properties-item,.copy-item,.add-star-item').hide();
 		}

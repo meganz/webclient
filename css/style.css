@@ -10511,7 +10511,7 @@ span.browsers-update {
 	text-align: center;
 	padding: 49px 20px 49px 20px;
 }
-.sync-button, .google-play-button, .ff-bott-button {
+.sync-button, .google-play-button,.ios-button, .ff-bott-button {
 	min-width: 209px;
 	height: 64px;
 	display: inline-block;
@@ -10533,7 +10533,7 @@ span.browsers-update {
 	text-align: left;
 	white-space: nowrap;
 }
-.google-play-button {
+.google-play-button,.ios-button {
 	background-position: -343px -1447px;
 }
 .ff-bott-button {
@@ -10541,7 +10541,14 @@ span.browsers-update {
 	padding: 16px 15px 0 0;
 	min-width: 259px;
 }
-.sync-button:hover, .google-play-button:hover, .ff-bott-button:hover {
+
+
+.ios-button {
+	background-image: url(../images/mega/ios.png);
+	background-position: 0px 0px;
+}
+
+.sync-button:hover,.ios-button:hover, .google-play-button:hover, .ff-bott-button:hover {
 	border: 5px solid #DB3200;
 	margin: 0;
 	min-width: 215px;

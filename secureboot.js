@@ -247,7 +247,8 @@ if (m)
 	}
 	else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
 	{
-		document.body.className = 'ios full-mode unsupported';
+		app='https://itunes.apple.com/app/mega/id706857885';
+		document.body.className = 'ios full-mode supported';
 		document.getElementById('m_title').innerHTML = 'Our iOS app is currently with Apple for review.';
 		document.getElementById('m_desc').innerHTML = 'Follow us on witter or Facebook for updates.';
 		ios=1;

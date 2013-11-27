@@ -2834,7 +2834,10 @@ function transferPanelUI()
 
             if(localStorage.transferPaneHeight) {
                 $('.transfer-panel').css({
-                    'height': localStorage.transferPaneHeight + "px"
+                    'height': Math.max(
+                            $.transferPaneResizable.options.minHeight,
+                            localStorage.transferPaneHeight
+                        ) + "px"
                 });
             } else {
                 $('.transfer-panel').css({

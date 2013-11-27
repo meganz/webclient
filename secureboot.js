@@ -40,6 +40,7 @@ try
 		var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 
 		Cu['import']("resource://gre/modules/Services.jsm");
+		Cu['import']("resource://gre/modules/NetUtil.jsm");
 
 		(function(global) {
 			global.loadSubScript = function(file,scope) {
@@ -554,7 +555,68 @@ else
 			jsl_perc = 0;
 			jsli=0;
 			for (var i = jsl.length; i--;) if (!jsl[i].text) jsl_total += jsl[i].w || 1;
-			for (var i = xhr_progress.length; i--; ) jsl_load(i);
+			if (fx_startup_cache)
+			{
+				var step = function(jsi)
+				{
+					jsl_current += jsl[jsi].w || 1;
+					jsl_progress();
+					if (++jslcomplete == jsl.length) initall();
+					else
+					{
+						// mozRunAsync(next.bind(this, jsli++));
+						next(jsli++);
+					}
+				};
+				var next = function(jsi)
+				{
+					var file = bootstaticpath + jsl[jsi].f;
+
+					if (jsl[jsi].j == 1)
+					{
+						try
+						{
+							loadSubScript(file);
+						}
+						catch(e)
+						{
+							Cu.reportError(e);
+
+							alert('An error occurred while loading MEGA.\n\nFilename: '
+								+ file + "\n" + e + '\n\n' + mozBrowserID);
+						}
+						step(jsi);
+					}
+					else
+					{
+						var ch = NetUtil.newChannel(file);
+						ch.contentType = jsl[jsi].j == 3
+							? "application/json":"text/plain";
+
+						NetUtil.asyncFetch(ch, function(is, s)
+						{
+							if (!Components.isSuccessCode(s))
+							{
+								alert('An error occurred while loading MEGA.' +
+									' The file ' + file + ' could not be loaded.');
+							}
+							else
+							{
+								jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
+
+								if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
+
+								step(jsi);
+							}
+						});
+					}
+				};
+				next(jsli++);
+			}
+			else
+			{
+				for (var i = xhr_progress.length; i--; ) jsl_load(i);
+			}
 		}
 
 		function xhr_load(url,jsi,xhri)
@@ -592,25 +654,8 @@ else
 				xhr_progress[this.xhri] = 0;
 				xhr_load(this.url,this.jsi,this.xhri);
 			  }
-			  var fx_load = fx_startup_cache && 1 == jsl[jsi].j;
-			  if (jsl[jsi].text || fx_load)
+			  if (jsl[jsi].text)
 			  {
-				if (fx_load)
-				{
-					try
-					{
-						if (jsl[jsi].n !== 'firefox')
-						{
-							loadSubScript(url);
-						}
-					}
-					catch(e)
-					{
-						Cu.reportError(e);
-					}
-					jsl_current += jsl[jsi].w || 1;
-					jsl_progress();
-				}
 				if (++jslcomplete == jsl.length) initall();
 				else jsl_load(xhri);
 			  }

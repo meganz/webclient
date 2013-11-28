@@ -1044,7 +1044,29 @@ function accountUI()
 		if (id == '#fm/account/settings')
 		{
 			$('.fm-account-settings-button').addClass('active');
-			$('.fm-account-settings').removeClass('hidden');			
+			$('.fm-account-settings').removeClass('hidden');
+
+			if (is_chrome_firefox)
+			{
+				if (!$('#acc_dls_folder').length) 
+				{
+					$('#acc_use_ssl').before(
+						$('<div id="acc_dls_folder" style="margin-top:25px">' +
+							'<div class="account-bandwidth-txt">Downloads folder:</div>' +
+							'<input type="button" value="Browse..." style="-moz-appearance:' +
+								'progressbar;margin-right:12px;cursor:pointer" />' +
+							'</div>'));
+					$('#acc_dls_folder').append($('<span/>').text(mozPrefs.getCharPref('dir')));
+					$('#acc_dls_folder input').click(function()
+					{
+						var fs = mozFilePicker(0,2);
+						if (fs) {
+							mozPrefs.setCharPref('dir', fs.path);
+							$(this).next().text(fs.path);
+						}
+					});
+				}
+			}
 		}
 		else if (id == '#fm/account/profile')
 		{

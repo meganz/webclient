@@ -12,8 +12,10 @@ else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
 
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
+var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
 function isMobile()
 {
+	if (is_chrome_firefox) return false;
 	if (typeof sessionStorage == 'undefined') return false;
 	if (sessionStorage && sessionStorage.desktop) return false;
 	else if (localStorage.mobile) return true;
@@ -42,7 +44,6 @@ var firefoxv = '2.0.0';
 
 if (b_u) document.location = 'update.html';
 
-var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
 try
 {
 	if (is_chrome_firefox)

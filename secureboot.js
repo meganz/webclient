@@ -14,9 +14,6 @@ var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 function isMobile()
 {
-	if (typeof sessionStorage == 'undefined') return false;
-	if (sessionStorage && sessionStorage.desktop) return false;
-	else if (localStorage.mobile) return true;
 	mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
 	for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
 	return false;

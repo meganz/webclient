@@ -1893,7 +1893,7 @@ function execsc(ap)
 			{
 				for (var b in a.t.f)
 				{
-					if (rootsharenodes[a.t.f[b].h])
+					if (rootsharenodes[a.t.f[b].h] && M.d[a.t.f[b].h])
 					{
 						a.t.f[b].r  = M.d[a.t.f[b].h].r;
 						a.t.f[b].su = M.d[a.t.f[b].h].su;

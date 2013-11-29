@@ -2778,6 +2778,7 @@ function transferPanelUI()
 {
     $.transferHeader = function()
 	{		
+		fm_resize_handler();
 		var el = $('.transfer-table-header th');
 		var i=1;
 		var w=0;		
@@ -2872,7 +2873,7 @@ function transferPanelUI()
 		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
 		else initGridScrolling();
-        $(window).trigger('resize');	
+        $(window).trigger('resize');
 	};
 	
 	

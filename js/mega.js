@@ -724,10 +724,8 @@ function MegaData ()
 			if (n.sk) n.p = n.u;
 			else if (n.su) n.p = n.su;
 		}
-
 		if (n.p.length == 11 && !M.d[n.p])
 		{
-			console.log('CHECK THIS',n.p);
 			var u = this.u[n.p];
 			if (u)
 			{

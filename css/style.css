@@ -12882,10 +12882,11 @@ a.ff-extension-button:hover {
 }
 .search-path-icon {
 	float: left;
-	margin: 3px 7px 0 5px;
+	margin: 3px 0 0 5px;
 	width: 24px;
 	background-repeat: no-repeat;
 	height: 30px;
+	cursor:pointer;
 }
 .search-path-icon.cloud-drive {
 	background-image: url(../images/mega/main-sprite.png?v=4);
@@ -12920,6 +12921,8 @@ a.ff-extension-button:hover {
 	font-size: 13px;
 	line-height: 28px;
 	color: #333333;
+	cursor:pointer;
+	padding:0 0 0 7px;
 }
 .search-path-arrow {
 	float: left;

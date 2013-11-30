@@ -671,10 +671,16 @@ function MegaData ()
 
 		if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
 		{
-			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs cloud-drive contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
+			$('.search-files-result .search-number').text(M.v.length);
+			$('.search-files-result').removeClass('hidden');			
+			$('.search-files-result').addClass('last-button');
 		}
-		else  $('.fm-breadcrumbs-block').html(html);
-
+		else 
+		{
+			$('.search-files-result').addClass('hidden');
+			$('.fm-breadcrumbs-block').html(html);
+		}
 		$('.fm-new-folder span').text(l[68]);
 		$('.fm-file-upload span').text(l[99]);
 		$('.fm-folder-upload span').text(l[98]);
@@ -696,10 +702,10 @@ function MegaData ()
 			$(el[i]).text('');
 			i++;
 		}
-
 		$('.fm-breadcrumbs-block a').unbind('click');
 		$('.fm-breadcrumbs-block a').bind('click',function(event)
 		{
+			if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;		
 			M.openFolder($(this).attr('id').replace('path_',''));
 		});
 	};
@@ -859,7 +865,7 @@ function MegaData ()
 		if (mDB && !ignoreDB && !pfkey) mDBadd('u',clone(u));
 	};
 
-	this.copyNodes = function(cn,t)
+	this.copyNodes = function(cn,t,del)
 	{
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
@@ -901,11 +907,9 @@ function MegaData ()
 				if (t.length == 11) key = base64urlencode(encryptto(t,a32_to_str(mkat[1])));
 				else key = a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
 				var nn = {h:n.h,t:n.t,a:attr,k:key};
-
 				var p=n.p;
 				for (var j in cn) if (cn[j] == nn.h) p=false;
 				if (p) nn.p=p;
-
 				a.push(nn);
 			}
 		}
@@ -919,9 +923,21 @@ function MegaData ()
 		}
 		api_req(ops,
 		{
+			cn:cn,
+			del:del,
 			t:t,
 			callback : function (json,ctx)
 			{
+				if (ctx.del)
+				{
+					var j =[];
+					for (var i in ctx.cn)
+					{
+						M.delNode(ctx.cn[i]);			
+						j.push({a:'d',n:cn[i],i:requesti});
+					}					
+					api_req(j);
+				}			
 				newnodes = [];
 				if (json[0].u) process_u(json[0].u,true);
 				if (json[0].f) process_f(json[0].f);

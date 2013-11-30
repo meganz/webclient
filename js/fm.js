@@ -700,6 +700,13 @@ function fmremove()
 		});
 		$('.fm-dialog-button.notification-button').each(function(i,e) { if ($(e).text() == l[1018]) $(e).text(l[83]);});
 	}
+	else if (RootbyId($.selected[0]) == 'contacts')
+	{		
+		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+		{
+			if (e) M.copyNodes($.selected,M.RubbishID,1);			
+		});
+	}
 	else
 	{
 		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
@@ -2376,6 +2383,10 @@ var SelectionManager = function($selectable) {
 
         selected_list = []; // reset the state of the last selected items for the next selectablestart
     });
+	
+	
+	
+	
 
     return this;
 };
@@ -2395,45 +2406,39 @@ function UIkeyevents()
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if(!$.dialog && M.viewmode == 1) {
-
+        if(!$.dialog && M.viewmode == 1) 
+		{	
             var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
 
-            if(e.keyCode == 37) { // left
+            if(e.keyCode == 37) 
+			{ 
+				// left
                 var current = selectionManager.get_currently_selected("first");
-                if(!e.shiftKey) { // clear old selection if no shiftKey
-                    s.removeClass("ui-selected");
-                }
+				// clear old selection if no shiftKey
+                if(!e.shiftKey) s.removeClass("ui-selected");                
                 var $target_element = null;
-
-                if(current.length > 0 && current.prev(".file-block").length > 0) {
-                    $target_element = current.prev(".file-block");
-                } else {
-                    $target_element = $('.file-block:last');
-                }
-
-                if($target_element) {
+                if(current.length > 0 && current.prev(".file-block").length > 0)  $target_element = current.prev(".file-block");
+                else $target_element = $('.file-block:last');
+                if($target_element) 
+				{
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
 
-            } else if(e.keyCode == 39) { // right
+            } 
+			else if(e.keyCode == 39) 
+			{ 
+				// right
                 var current = selectionManager.get_currently_selected("last");
-                if(!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-
+                if(!e.shiftKey) s.removeClass("ui-selected");
                 var $target_element = null;
-
                 var next = current.next(".file-block");
-                if(next.length > 0) { // clear old selection if no shiftKey
-                    $target_element = next;
-                } else {
-                    $target_element = $('.file-block:first');
-                }
-
-                if($target_element) {
+				// clear old selection if no shiftKey
+                if(next.length > 0) $target_element = next;
+                else $target_element = $('.file-block:first');
+                if($target_element) 
+				{
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
@@ -2498,7 +2503,7 @@ function UIkeyevents()
                 quickFinder.disable_if_active();
 			}
 		}
-		else if (e.keyCode == 46 && s.length > 0 && !$.dialog)
+		else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
 		{
 			$.selected=[];
 			s.each(function(i,e)
@@ -2551,9 +2556,38 @@ function UIkeyevents()
 		{			
 			var jsp = $('.grid-scrolling-table').data('jsp');
 			jsp.scrollToElement(sl);
-		}		
+		}
+		searchPath();
 	});
 }
+
+
+function searchPath()
+{
+	if (M.currentdirid.substr(0,7) == 'search/')
+	{
+		var sel;
+		if (M.viewmode) sel = $('.fm-blocks-view .ui-selected');		
+		else sel = $('.grid-table .ui-selected');
+		
+		
+		if (sel.length == 1)
+		{
+			console.log('show path:',M.getPath($(selected[0]).attr('id')));		
+		}
+		else
+		{
+			console.log('hide panel');		
+		}
+	}
+	else
+	{
+		console.log('hide panel');
+		// hide panel
+	}
+}
+
+
 
 function selectddUI()
 {
@@ -2637,7 +2671,7 @@ function selectddUI()
 		}
 	});
 	
-	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }});
+	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) { searchPath(); }});
 
     /**
      * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
@@ -2658,6 +2692,7 @@ function selectddUI()
 			$(this).addClass('ui-selected');
 		}
 		cacheselect();
+		searchPath();
 		if (contextmenuUI(e,1)) return true;
 		else return false;
 	});
@@ -2704,6 +2739,7 @@ function selectddUI()
                 selectionManager.set_currently_selected($(this));
 			}
 		}
+		searchPath();
 		$.hideContextMenu(e);
 		if ($.hideTopMenu) $.hideTopMenu();
 		return false;

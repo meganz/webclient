@@ -516,6 +516,7 @@ function MegaData ()
 			},1);
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
+		searchPath();
 	};
 	
 	
@@ -718,7 +719,7 @@ function MegaData ()
 
 	this.addNode = function(n,ignoreDB)
 	{
-		if (!M.d[n.p])
+		if (!M.d[n.p] && n.p !== 'contacts')
 		{
 			if (n.sk) n.p = n.u;
 			else if (n.su) n.p = n.su;
@@ -726,6 +727,7 @@ function MegaData ()
 
 		if (n.p.length == 11 && !M.d[n.p])
 		{
+			console.log('CHECK THIS',n.p);
 			var u = this.u[n.p];
 			if (u)
 			{
@@ -735,6 +737,7 @@ function MegaData ()
 				u.p = 'contacts';
 				M.addNode(u);
 			}
+			else console.log('something went wrong!',n.p,this.u[n.p]);
 		}
 
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
@@ -2310,11 +2313,10 @@ function loadfm_callback(json)
 		M.RootID = json[0].f[0].h;
 		u_sharekeys[json[0].f[0].h] = base64_to_a32(pfkey);
 		folderlink=pfid;
-	}
-
-	if (json[0].ok) process_ok(json[0].ok);
-	process_f(json[0].f);
+	}	
 	if (json[0].u) process_u(json[0].u);
+	if (json[0].ok) process_ok(json[0].ok);
+	process_f(json[0].f);	
 	if (json[0].s) for(var i in json[0].s) M.nodeShare(json[0].s[i].h,json[0].s[i]);
 	maxaction = json[0].sn;
 	localStorage[u_handle + '_maxaction'] = maxaction;

@@ -2569,22 +2569,78 @@ function searchPath()
 		var sel;
 		if (M.viewmode) sel = $('.fm-blocks-view .ui-selected');		
 		else sel = $('.grid-table .ui-selected');
-		
-		
 		if (sel.length == 1)
 		{
-			console.log('show path:',M.getPath($(selected[0]).attr('id')));		
+			var html = '';			
+			var path = M.getPath($(sel[0]).attr('id'));
+			path.reverse();			
+			for (var i in path)
+			{
+				var c,name,id=false,iconimg='';;
+				var n = M.d[path[i]];
+				if (path[i].length == 11 && M.u[path[i]])
+				{
+					id = path[i];
+					c = 'contacts-item';
+					name = M.u[path[i]].m;
+				}
+				else if (path[i] == M.RootID)
+				{
+					id = M.RootID;
+					c = 'cloud-drive';
+					name = 'Rubbish Bin';
+				}
+				else if (path[i] == M.RubbishID)
+				{
+					id = M.RubbishID;
+					c = 'recycle-item';
+					name = 'Rubbish Bin';
+				}
+				else if (path[i] == M.InboxID)
+				{
+					id = M.RubbishID;
+					c = 'inbox-item';
+					name = 'Inbox';
+				}
+				else if (n)
+				{
+					id = n.h;
+					c = '';
+					name = n.name;
+					if (n.t) c = 'folder';
+					else iconimg = '<img alt="" src="' + fileicon(n,'s') + '" />';
+				}				
+				if (id)
+				{
+					html += '<div class="search-path-icon '+c+'" id="spathicon_'+htmlentities(id) + '">' + iconimg + '</div><div class="search-path-txt" id="spathname_'+htmlentities(id) + '">' + htmlentities(name) + '</div>';					
+					if (i < path.length-1) html += '<div class="search-path-arrow"></div>';
+				}				
+			}	
+			html += '<div class="clear"></div>';			
+			$('.search-bottom-menu').html(html);
+			$('.fm-blocks-view,.files-grid-view').addClass('search');
+			$('.search-path-icon,.search-path-icon').unbind('click');
+			$('.search-path-icon,.search-path-txt').bind('click',function(e)
+			{
+				var id = $(this).attr('id');				
+				if (id)
+				{
+					id = id.replace('spathicon_','').replace('spathname_','');					
+					var n = M.d[id];
+					$.selected=[];
+					if (!n.t)
+					{
+						$.selected.push(id);
+						id = n.p;
+					}
+					if (n) M.openFolder(id);					
+					if ($.selected.length > 0) reselect(1);
+				}		
+			});
 		}
-		else
-		{
-			console.log('hide panel');		
-		}
+		else $('.fm-blocks-view,.files-grid-view').removeClass('search');		
 	}
-	else
-	{
-		console.log('hide panel');
-		// hide panel
-	}
+	else $('.fm-blocks-view,.files-grid-view').removeClass('search');
 }
 
 

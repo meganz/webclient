@@ -181,6 +181,8 @@ function mozPlaySound(n) {
 						}
 						this.guid = this.startTime + this.name;
 						try {
+							var dbc = Services.downloads.DBConnection;
+
 							var dl = {
 								name      : fn,
 								source    : document.location.href,
@@ -193,7 +195,7 @@ function mozPlaySound(n) {
 								mimeType  : this.type,
 								guid      : this.guid
 							};
-							var stm = Services.downloads.DBConnection.createAsyncStatement(
+							var stm = dbc.createAsyncStatement(
 									'INSERT INTO moz_downloads ('+Object.keys(dl)+')' +
 									'VALUES                    ('+Object.keys(dl).map(function(n) ':'+n)+')');
 
@@ -205,13 +207,46 @@ function mozPlaySound(n) {
 							} finally {
 								stm.finalize();
 							}
-							f = null;
+							this.downloadDone(fn);
 						} catch(e) {
-							Cu.reportError(e);
+							// Cu.reportError(e);
+
+							try {
+								var { Downloads } = Cu.import("resource://gre/modules/Downloads.jsm", {});
+
+								Downloads.getList(Downloads.PUBLIC).then(function(aList) {
+
+									var mOptions = {
+										target : f,
+										source : {
+											url: location.href,
+											referrer: location.href
+										},
+										startTime   : this.startTime,
+										totalBytes  : parseInt(this.filesize),
+										succeeded   : true,
+										contentType : this.type
+									};
+									Downloads.createDownload(mOptions).then(function(aDownload) {
+										// LOG(aDownload.getSerializationHash());
+										aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
+										aList.add(aDownload).then(function() {
+											// aDownload.refresh().then(null,Cu.reportError);
+											mozRunAsync(this.downloadDone.bind(this,fn,null));
+										}.bind(this), Cu.reportError);
+									}.bind(this), Cu.reportError);
+								}.bind(this), Cu.reportError);
+							} catch(e) {
+								Cu.reportError(e);
+								this.downloadDone(fn,1);
+							}
 						}
+					},
+					downloadDone: function(fn,f) {
 						if(!f) {
 							mozAlert(fn,'Download Finished.',function(s,t) {
 								if(t == 'alertclickcallback') try {
+									if(parseInt(Services.appinfo.version) > 23) throw 2;
 									Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
 										.getService(Ci.nsIDownloadManagerUI).show();
 								} catch(e) {
@@ -223,7 +258,6 @@ function mozPlaySound(n) {
 						} else {
 							mozAlert('Download ' + fn + ' finished.');
 						}
-						return 'imega:/' + this.name;
 					},
 					handleCompletion : function(r) {
 						if(d) console.log('handleCompletion with reason ' + r);
@@ -515,7 +549,7 @@ function mozPlaySound(n) {
 						}
 					}
 				}
-				
+
 				mozOnSavingDownload(File,osd_cb);
 			}
 		}

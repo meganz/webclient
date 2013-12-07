@@ -19,7 +19,7 @@ function doregister()
 	{
 		alert(l[213]);
 		document.getElementById('register_email').focus();
-	}	
+	}
 	else if (localStorage.signupcode && (document.getElementById('register_password').value != document.getElementById('register_password_confirm').value))
 	{
 		alert(l[715]);
@@ -117,9 +117,9 @@ function registeraccount()
 				else
 				{
 					ops.terms = 'Mq';
-					ops.firstname = base64urlencode($('#register-firstname').val());
-					ops.lastname = base64urlencode($('#register-lastname').val());
-					ops.name2 = $('#register-firstname') + ' ' + $('#register-lastname').val();
+					ops.firstname = base64urlencode(to8($('#register-firstname').val()));
+					ops.lastname = base64urlencode(to8($('#register-lastname').val()));
+					ops.name2 = base64urlencode(to8($('#register-firstname') + ' ' + $('#register-lastname').val()));
 					u_attr.terms=1;
 				}				
 				api_req([ops]);

@@ -391,7 +391,7 @@ function initUI()
 		$.hideContextMenu(e);
 		if ($.hideTopMenu) $.hideTopMenu(e);		
 		var c = $(e.target).attr('class');		
-		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1)) return false;
+		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
     });	
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 
@@ -1084,6 +1084,11 @@ function accountUI()
 		{
 			$('.fm-account-history-button').addClass('active');
 			$('.fm-account-history').removeClass('hidden');
+		}		
+		else if (id == '#fm/account/reseller' && M.account.reseller)
+		{
+			$('.fm-account-reseller-button').addClass('active');
+			$('.fm-account-reseller').removeClass('hidden');
 		}
 		else
 		{
@@ -1327,13 +1332,23 @@ function accountUI()
 		$('.fm-account-select select').unbind('change');
 		$('.fm-account-select select').bind('change',function(e)
 		{
-			var val = $(this).val();		
-			if ($(this).attr('name') == 'account-country') val = isocountries[val];			
+			var val = $(this).val();	
+			if ($(this).attr('name') == 'account-vouchertype')
+			{
+				$(this).find('option').each(function(i,e)
+				{
+					if (val == $(e).val()) val =  $(e).text();
+				});	
+			}
+			else
+			{
+				if ($(this).attr('name') == 'account-country') val = isocountries[val];
+				$('.fm-account-save-block').removeClass('hidden');
+			}			
 			$(this).parent().find('.account-select-txt').text(val);
-			$('.fm-account-save-block').removeClass('hidden');
 		});				
-		$('#account-name').unbind('keyup');
-		$('#account-name').bind('keyup',function(e)
+		$('#account-firstname,#account-lastname').unbind('keyup');
+		$('#account-firstname,#account-lastname').bind('keyup',function(e)
 		{
 			$('.fm-account-save-block').removeClass('hidden');
 		});
@@ -1346,12 +1361,13 @@ function accountUI()
 		$('.fm-account-save').unbind('click');
 		$('.fm-account-save').bind('click',function(e)
 		{
-			u_attr.name = $('#account-name').val();
+			u_attr.firstname = $('#account-firstname').val();
+			u_attr.lastname = $('#account-lastname').val();
 			u_attr.birthday = $('.fm-account-select.day select').val();
 			u_attr.birthmonth = $('.fm-account-select.month select').val();
 			u_attr.birthyear = $('.fm-account-select.year select').val();
-			u_attr.country = $('.fm-account-select.country select').val();			
-			api_req([{a:'up',name:u_attr.name,birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)}]);		
+			u_attr.country = $('.fm-account-select.country select').val();		
+			api_req([{a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)}]);		
 			$('.fm-account-save-block').addClass('hidden');			
 			if (M.account.dl_maxSlots) 
 			{
@@ -1425,9 +1441,9 @@ function accountUI()
 			}
 			else $('#account-confirm-password,#account-password,#account-new-password').val('');
 			accountUI();
-		});
-		
-		$('#account-name').val(u_attr.name);		
+		});		
+		$('#account-firstname').val(u_attr.firstname);
+		$('#account-lastname').val(u_attr.lastname);		
 		$('.account-history-dropdown-button').unbind('click');	
 		$('.account-history-dropdown-button').bind('click',function()  
 		{
@@ -1435,8 +1451,7 @@ function accountUI()
 			$('.account-history-dropdown').addClass('hidden');
 			$(this).next().removeClass('hidden');						
 			
-		});
-		
+		});		
 		$('.account-history-drop-items').unbind('click');
 		$('.account-history-drop-items').bind('click',function()  
 		{	
@@ -1460,24 +1475,21 @@ function accountUI()
 			$(this).addClass('active');
 			$(this).closest('.account-history-dropdown').addClass('hidden');
 			accountUI();
-		});
-		
+		});		
         $("#slider-range-max").slider({ 	
 			min: 1,max: 6,range: "min",value:dl_maxSlots,slide:function(e,ui) 
 			{
 				M.account.dl_maxSlots = ui.value;
 				$('.fm-account-save-block').removeClass('hidden');
 			}
-        });
-		
+        });		
 		$("#slider-range-max2").slider({ 	
 			min: 1,max: 6,range: "min",value:ul_maxSlots,slide:function(e,ui) 
 			{
 				M.account.ul_maxSlots = ui.value;
 				$('.fm-account-save-block').removeClass('hidden');
 			}
-        });				
-			
+        });
 		$('.ulspeedradio').removeClass('radioOn').addClass('radioOff');			
 		var i=3;
 		if (ul_maxSpeed == 0) i=1;
@@ -1577,7 +1589,7 @@ function accountUI()
 				{
 				   voucherCentering($('.redeem-voucher'));
 				});
-			} 
+			}
 			else 
 			{
 				$(this).removeClass('active');
@@ -1605,7 +1617,7 @@ function accountUI()
 			{
 				loadingDialog.show();
 				api_req([{a: 'uavr',v: $('.fm-voucher-body input').val()}],
-				{ 
+				{
 					callback : function (json,params)
 					{
 						loadingDialog.hide();
@@ -1620,10 +1632,70 @@ function accountUI()
 						}
 					}
 				});
-			}		
+			}
 		});
 		
+		$('.vouchercreate').unbind('click');
+		$('.vouchercreate').bind('click',function(e)
+		{
+			var vouchertype = $('.fm-account-select.vouchertype select').val();
+			var voucheramount = parseInt($('#account-voucheramount').val());			
+			var proceed=false;
+			for (var i in M.account.prices) if (M.account.prices[i][0] == vouchertype) proceed=true;			
+			if (!proceed)
+			{
+				msgDialog('warninga','Error','Please select the voucher type.');
+				return false;			
+			}			
+			if (!voucheramount) 
+			{
+				msgDialog('warninga','Error','Please enter a valid voucher amount.');
+				return false;			
+			}
+			if (vouchertype == '19.99') vouchertype = '19.991';
+			loadingDialog.show();					
+			api_req([{a: 'uavi',d: vouchertype,n: voucheramount,c: 'EUR'}],
+			{
+				callback : function (json,params)
+				{
+					M.account.lastupdate=0;
+					accountUI();
+				}
+			});
+		});
 		
+		if (M.account.reseller)
+		{
+			$('.fm-account-reseller-button').removeClass('hidden');		
+			$('.account-history-dropdown-button.vouchers').text(l['466a'].replace('[X]',$.voucherlimit));		
+			$('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]',10));
+			$('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]',100));
+			$('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]',250));			
+			M.account.vouchers.sort(function(a,b)
+			{				
+				if (a['date'] < b['date']) return 1;
+				else return -1;			
+			});
+			$('.grid-table.vouchers tr').remove();
+			var html = '<tr><th>' + l[475] + '</th><th>' + l[487] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
+			$(account.vouchers).each(function(i,el)
+			{
+				if (i > $.voucherlimit) return false;
+				var status = l[489];			
+				if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0) status = l[490] + ' ' + time2date(el.redeemed);			
+				else if (el.revoked > 0 && el.cancelled > 0) status = l[491] + ' ' + time2date(el.revoked);
+				else if (el.cancelled > 0) status = l[492] + ' ' + time2date(el.cancelled);		
+				html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + htmlentities(el.code) + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';								
+			});
+			$('.grid-table.vouchers').html(html);			
+			$('.fm-account-select.vouchertype select option').remove();
+			var prices = [];
+			for (var i in M.account.prices) prices.push(M.account.prices[i][0]);	
+			prices.sort(function(a,b) { return (a-b) })		
+			var voucheroptions = '';
+			for (var i in prices) voucheroptions += '<option value="'+ htmlentities(prices[i]) +'">&euro;' + htmlentities(prices[i]) + ' voucher</option>';
+			$('.fm-account-select.vouchertype select').html(voucheroptions);
+		}
 		
 		$('.fm-purchase-voucher,.membershtip-medium-txt.topup').unbind('click');
 		$('.fm-purchase-voucher,.membershtip-medium-txt.topup').bind('click',function(e)
@@ -1662,12 +1734,14 @@ function accountUI()
 		$(window).bind('resize.account', function () 
 		{			
 			if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
-		});		
+		});
 		
 		initAccountScroll();
 	},1);
+		
+	if (u_attr.firstname) $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);			
+	else $('.membership-big-txt.name').text(u_attr.name);
 	
-	$('.membership-big-txt.name').text(u_attr.name);	
 	$('.editprofile').unbind('click');
 	$('.editprofile').bind('click',function(event) 
 	{
@@ -1693,6 +1767,9 @@ function accountUI()
                break;
 		   case ($(this).attr('class').indexOf('fm-account-history-button') >= 0):
 			   document.location.hash = 'fm/account/history';
+               break;
+		   case ($(this).attr('class').indexOf('fm-account-reseller-button') >= 0):
+			   document.location.hash = 'fm/account/reseller';
                break;
          }		 
 	  }
@@ -1893,8 +1970,6 @@ function gridUI()
 		$.hideTopMenu();
 	});	
 	if (d) console.log('gridUI() time:',new Date().getTime() - t);
-	
-	
 	$('.grid-table-header .arrow').unbind('click');
 	$('.grid-table-header .arrow').bind('click',function(e)
 	{
@@ -2564,7 +2639,7 @@ function UIkeyevents()
 
 function searchPath()
 {
-	if (M.currentdirid.substr(0,7) == 'search/')
+	if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/')
 	{
 		var sel;
 		if (M.viewmode) sel = $('.fm-blocks-view .ui-selected');		
@@ -2643,10 +2718,9 @@ function searchPath()
 	else $('.fm-blocks-view,.files-grid-view').removeClass('search');
 }
 
-
-
 function selectddUI()
 {
+	if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') return false;	
 	$($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable( 
 	{
 		tolerance: 'pointer',

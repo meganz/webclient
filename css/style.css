@@ -739,6 +739,12 @@ a.account-manage-button:hover {
 	color: #8A8A8A;
 	padding: 12px 0 0 0;
 }
+
+
+.account-italic-txt.light
+{
+ color: #BBBBBB;
+}
 .account-manage-block {
 	min-height: 16px;
 }
@@ -849,6 +855,7 @@ input.radioOn, input.radioOff {
 }
 option[selected], option selected, option[selected=selected] {
 	background-color: #D9290B !important;
+	color:#FFFFFF !important;
 }
 .terms-main {
 	color: #595959;
@@ -7829,6 +7836,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	width: 90px;
 	margin-right: 10px;
 }
+
+
+.fm-account-select.vouchertype {
+	float: left;
+	width: 180px;
+	margin-right: 10px;
+}
+
+.fm-account-input.voucheramount {
+	float: left;
+	width: 50px;
+	padding: 0px 0px;
+}
+
 .fm-account-select.month {
 	float: left;
 	width: 70px;

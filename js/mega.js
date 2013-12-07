@@ -1012,7 +1012,7 @@ function MegaData ()
 							balance: json[0].balance,
 							reseller: json[0].reseller,
 							prices: json[0].prices,
-							vouchers: json[1],
+							vouchers: voucherData(json[1]),
 							transactions: json[2],
 							purchases: json[3],
 							sessions: json[4],
@@ -1662,6 +1662,42 @@ function MegaData ()
 	}
 }
 
+
+function voucherData(arr)
+{
+	var vouchers = [];
+	var varr = arr[0];
+	var tindex = {};
+	for (var i in arr[1]) tindex[arr[1][i][0]]=arr[1][i];			
+	for (var i in varr)				
+	{									
+		var redeemed = 0;
+		var cancelled = 0;
+		var revoked = 0;
+		var redeem_email = '';					
+		if ((varr[i].rdm) && (tindex[varr[i].rdm]))
+		{
+			redeemed = tindex[varr[i].rdm][1];
+			redeemed_email = tindex[varr[i].rdm][2];					
+		}					
+		if (varr[i].xl) cancelled = tindex[varr[i].xl][1];					
+		if (varr[i].rvk) revoked = tindex[varr[i].rvk][1];		
+		vouchers.push({
+			id: varr[i].id,
+			amount: varr[i].g,
+			currency: varr[i].c,
+			iss: varr[i].iss,
+			date: tindex[varr[i].iss][1],
+			code: varr[i].v,
+			redeemed: redeemed,
+			redeem_email: redeem_email,
+			cancelled: cancelled,
+			revoked: revoked						
+		});
+	}
+	return vouchers;
+}
+
 function onUploadError(fileid,error)
 {
 	if (d) console.log('OnUploadError ' + fileid + ' ' + error);
@@ -1778,6 +1814,7 @@ function rendernew()
 		M.sort();
 		M.renderMain(true);
 		M.renderPath();
+		$(window).trigger('resize');
 	}
 
 	if (UItree)

@@ -951,8 +951,13 @@ function getsc(fm)
 	ctx = 
 	{		
 		callback : function(res,ctx)
-		{
-			if (res.w)
+		{			
+			if (ctx.fm && res == ETOOMANY)
+			{
+				loadfm();
+				return false;			
+			}
+			else if (res.w)
 			{				
 				waiturl = res.w;
 				if (waitbackoff > 1000) setTimeout(waitsc,waitbackoff);

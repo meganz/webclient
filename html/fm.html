@@ -381,23 +381,25 @@
   
   <div class="fm-right-account-block">
     <div class="fm-account-top">
-        <div class="fm-account-top-title">
-           
+        <div class="fm-account-top-title">           
         </div>
         <div class="fm-account-button fm-account-overview-button active">
            [$983]
         </div>
-        <div class="fm-account-button  fm-account-profile-button">
+        <div class="fm-account-button fm-account-profile-button">
            [$984]
         </div>
         <div class="fm-account-button fm-account-history-button">
            [$985]
         </div>
-        <div class="fm-account-button  fm-account-settings-button">
+        <div class="fm-account-button fm-account-settings-button">
            [$823]
         </div> 
+		<div class="fm-account-button fm-account-reseller-button hidden">
+           Reseller
+        </div> 
     </div>
-    
+		
     
     <div class="fm-account-save-block hidden">
        <div class="fm-account-save">[$776]</div>
@@ -550,6 +552,8 @@ Please delete files or <a href="">upgrade your account.</a></span>
          </div>
          <div class="clear"></div>
        </div>
+	   
+	   
        
        <div class="fm-voucher-popup hidden">
          <div class="fm-voucher-body">
@@ -580,7 +584,10 @@ Please delete files or <a href="">upgrade your account.</a></span>
          <div class="fm-account-header">[$994]:</div>
          <div class="fm-account-labels">
           <div class="labels-block">
-           <label for="account-name">[$86] <span class="red">*</span></label>
+           <label for="account-firstname">[$1096] <span class="red">*</span></label>
+          </div>         
+		  <div class="labels-block">
+           <label for="account-lastname">[$1097] <span class="red">*</span></label>
           </div>         
           <div class="labels-block">
            <label >[$995]</label>
@@ -591,7 +598,10 @@ Please delete files or <a href="">upgrade your account.</a></span>
          </div>
          <div class="fm-accout-inputs-blocks">
            <div class="fm-account-input">
-              <input type="text" value="" name="account-name" id="account-name" />
+              <input type="text" value="" name="account-firstname" id="account-firstname" />
+           </div>
+		   <div class="fm-account-input">
+              <input type="text" value="" name="account-lastname" id="account-lastname" />
            </div>
            <div class="fm-account-input">
               <div class="fm-account-select year">
@@ -668,7 +678,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
 			  <div class="radio-txt">[$1385]</div>
 			  </div>
 			  <div class="clear"></div>
-			  <div class="account-italic-txt">[$1383]</div>			  
+			  <div class="account-italic-txt light">[$1383]</div>			  
 			  <div style="margin-top:25px;">			  
 			  <div class="account-bandwidth-txt" style="margin-bottom:7px;">[$1386]:</div>
 			  <div class="clear"></div>
@@ -678,7 +688,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
 			  <div class="radio-txt">[$1385]</div>			  
 			  </div>
 			  <div class="clear"></div>
-			  <div class="account-italic-txt">[$1387]</div>
+			  <div class="account-italic-txt light">[$1387]</div>
 		</div>
 		
 	  
@@ -827,7 +837,55 @@ Please delete files or <a href="">upgrade your account.</a></span>
         </div> 
         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table transactions"></table>
         <hr />
-      </div>      
+      </div>  
+
+	 <div class="fm-account-reseller hidden fm-account-sections">	 
+	  <div class="fm-account-blocks multiple triple">
+		<div class="fm-account-mutliple-bl huge">
+             <div class="fm-account-header">[$449]:</div>             
+             <div class="fm-account-info-block">
+               <div class="membership-big-txt balance">
+                 &euro; 99.99
+               </div>
+               <a href="mailto:resellers@mega.co.nz" class="membershtip-medium-txt red-bg resellerbuy">resellers@mega.co.nz</a>
+               <div class="clear"></div>
+             </div>
+         </div>	  
+         <div class="fm-account-mutliple-bl">
+            <div class="fm-account-header">Create vouchers:</div>		
+			<div class="fm-account-input">
+              <div class="fm-account-select vouchertype">
+                <span class="account-select-txt">Voucher type</span>
+                <select name="account-vouchertype">
+				</select>
+              </div>			  
+			  <div class="fm-account-input voucheramount">
+              <input type="text" value="1" name="account-voucheramount" id="account-voucheramount">
+              </div>		   
+              <div class="clear"></div>
+           </div>
+		   <div class="membershtip-medium-txt red-bg vouchercreate">Create voucher</div>
+         </div>
+       </div>
+	  <hr />
+	 
+        <div class="fm-account-history-head">
+          <div class="fm-account-header left">Your vouchers:</div>		  
+		  <div>
+          <div class="account-history-dropdown-button vouchers"></div>          
+		  <div class="account-history-dropdown hidden">
+            <div class="account-history-drop-items voucher10- active">Last 10 Vouchers</div>
+            <div class="account-history-drop-items voucher100-">Last 100 Vouchers</div>
+            <div class="account-history-drop-items voucher250-">Last 250 Vouchers</div>
+          </div>
+		  </div>
+          <div class="clear"></div>
+        </div> 
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table vouchers"></table>       
+        
+      </div>  
+
+	  
     </div>
   
   </div>

@@ -139,8 +139,10 @@ function populate_l()
 	l[438] = l[438].replace('[X]','');
 	l['439a'] = l[439];
 	l[439] = l[439].replace('[X1]','').replace('[X2]','');
-	l[466] = l[466].replace('[X]','');
+	l['466a'] = l[466];
+	l[466] = l[466].replace('[X]','');	
 	l[543] = l[543].replace('[X]','');	
+	l[456] = l[456].replace(':','');	
 	l['471a'] = l[471].replace('[X]',10);
 	l['471b'] = l[471].replace('[X]',100);
 	l['471c'] = l[471].replace('[X]',250);

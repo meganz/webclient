@@ -85,8 +85,7 @@ function init_page()
 	{
 		if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) page = 'firefox';
 		else page = 'chrome';
-	}
-	
+	}	
 	else if (page == 'notifications') page = 'fm/notifications';
 		
 	

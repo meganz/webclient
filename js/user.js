@@ -111,8 +111,18 @@ function u_checklogin3a(res,ctx)
 		u_attr = res[0];		
 		var exclude = ['c','email','k','name','p','privk','pubk','s','ts','u','currk'];		
 		for (var n in u_attr)
-		{				
-			if (exclude.indexOf(n) == -1) u_attr[n] = base64urldecode(u_attr[n]);			
+		{			
+			if (exclude.indexOf(n) == -1)
+			{
+				try
+				{
+					u_attr[n] = from8(base64urldecode(u_attr[n]));
+				}
+				catch(e)
+				{
+					u_attr[n] = base64urldecode(u_attr[n]);
+				}				
+			}
 		}
 		
 		u_storage.attr = JSON.stringify(u_attr);

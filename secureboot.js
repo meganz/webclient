@@ -129,6 +129,7 @@ if (is_chrome_firefox)
 
 		loadSubScript(bootstaticpath + 'fileapi.js');
 	} catch(e) {
+		b_u = 1;
 		Cu.reportError(e);
 		alert('Unable to initialize core functionality:\n\n'
 			+ e + '\n\n' + mozBrowserID);

@@ -181,6 +181,8 @@ function mozPlaySound(n) {
 						}
 						this.guid = this.startTime + this.name;
 						try {
+							var dbc = Services.downloads.DBConnection;
+
 							var dl = {
 								name      : fn,
 								source    : document.location.href,
@@ -193,7 +195,7 @@ function mozPlaySound(n) {
 								mimeType  : this.type,
 								guid      : this.guid
 							};
-							var stm = Services.downloads.DBConnection.createAsyncStatement(
+							var stm = dbc.createAsyncStatement(
 									'INSERT INTO moz_downloads ('+Object.keys(dl)+')' +
 									'VALUES                    ('+Object.keys(dl).map(function(n) ':'+n)+')');
 
@@ -205,13 +207,64 @@ function mozPlaySound(n) {
 							} finally {
 								stm.finalize();
 							}
-							f = null;
+							this.downloadDone(fn);
 						} catch(e) {
-							Cu.reportError(e);
+							// Cu.reportError(e);
+
+							try {
+								var { Downloads, DownloadsData }
+									= Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
+
+								Downloads.getList(Downloads.PUBLIC).then(function(aList) {
+
+									var mOptions = {
+										target : f,
+										source : {
+											url: location.href,
+											referrer: location.href
+										},
+										startTime   : this.startTime,
+										totalBytes  : parseInt(this.filesize),
+										succeeded   : true,
+										contentType : this.type
+									};
+									Downloads.createDownload(mOptions).then(function(aDownload) {
+										// LOG(aDownload.getSerializationHash());
+										try {
+											/**
+											 * This is a private function which might get replaced
+											 * so wrapping in a try/catch since we'll not rely on
+											 * its presence for the download being properly added
+											 * to the Library. Its only purpose here is that the
+											 * correct file size is reported there.
+											 */
+											aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
+										} catch(e) {
+											Cu.reportError(e);
+										}
+										aList.add(aDownload).then(function() {
+											// aDownload.refresh().then(null,Cu.reportError);
+											mozRunAsync(function() {
+												this.downloadDone(fn);
+												DownloadsData._notifyDownloadEvent("finish");
+												// DownloadsData.onDownloadChanged(aDownload);
+												// var dataItem = DownloadsData._downloadToDataItemMap.get(aDownload);
+												// console.log('dataItem', dataItem);
+											}.bind(this));
+										}.bind(this), Cu.reportError);
+									}.bind(this), Cu.reportError);
+								}.bind(this), Cu.reportError);
+							} catch(e) {
+								Cu.reportError(e);
+								this.downloadDone(fn,1);
+							}
 						}
+					},
+					downloadDone: function(fn,f) {
 						if(!f) {
 							mozAlert(fn,'Download Finished.',function(s,t) {
 								if(t == 'alertclickcallback') try {
+									if(parseInt(Services.appinfo.version) > 23) throw 2;
 									Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
 										.getService(Ci.nsIDownloadManagerUI).show();
 								} catch(e) {
@@ -223,7 +276,6 @@ function mozPlaySound(n) {
 						} else {
 							mozAlert('Download ' + fn + ' finished.');
 						}
-						return 'imega:/' + this.name;
 					},
 					handleCompletion : function(r) {
 						if(d) console.log('handleCompletion with reason ' + r);
@@ -515,7 +567,7 @@ function mozPlaySound(n) {
 						}
 					}
 				}
-				
+
 				mozOnSavingDownload(File,osd_cb);
 			}
 		}

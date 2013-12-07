@@ -212,7 +212,8 @@ function mozPlaySound(n) {
 							// Cu.reportError(e);
 
 							try {
-								var { Downloads } = Cu.import("resource://gre/modules/Downloads.jsm", {});
+								var { Downloads, DownloadsData }
+									= Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
 
 								Downloads.getList(Downloads.PUBLIC).then(function(aList) {
 
@@ -229,10 +230,27 @@ function mozPlaySound(n) {
 									};
 									Downloads.createDownload(mOptions).then(function(aDownload) {
 										// LOG(aDownload.getSerializationHash());
-										aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
+										try {
+											/**
+											 * This is a private function which might get replaced
+											 * so wrapping in a try/catch since we'll not rely on
+											 * its presence for the download being properly added
+											 * to the Library. Its only purpose here is that the
+											 * correct file size is reported there.
+											 */
+											aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
+										} catch(e) {
+											Cu.reportError(e);
+										}
 										aList.add(aDownload).then(function() {
 											// aDownload.refresh().then(null,Cu.reportError);
-											mozRunAsync(this.downloadDone.bind(this,fn,null));
+											mozRunAsync(function() {
+												this.downloadDone(fn);
+												DownloadsData._notifyDownloadEvent("finish");
+												// DownloadsData.onDownloadChanged(aDownload);
+												// var dataItem = DownloadsData._downloadToDataItemMap.get(aDownload);
+												// console.log('dataItem', dataItem);
+											}.bind(this));
 										}.bind(this), Cu.reportError);
 									}.bind(this), Cu.reportError);
 								}.bind(this), Cu.reportError);

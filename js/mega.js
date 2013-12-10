@@ -301,7 +301,9 @@ function MegaData ()
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><img alt=""  src="' + fileicon(this.v[i],'m') + '" /><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						
+
 					}
 				}
 				else
@@ -326,7 +328,7 @@ function MegaData ()
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon(this.v[i],'s') + '" /></span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="50" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="50" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
 						t = '.grid-table.fm';
 					}
 				}
@@ -1395,13 +1397,13 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon(n,'s') +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '></span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 			}
 		}
 
 		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);
 
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon({name:'archive.zip'},'s') + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
@@ -1572,7 +1574,7 @@ function MegaData ()
 			f.target = M.currentdirid;
 			f.id = ul_id;
 			ul_queue.push(f);
-			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon"><img alt="" src="' + fileicon({name:f.name},'s') +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		}
 		if (page !== 'start') openTransferpanel();
 	}

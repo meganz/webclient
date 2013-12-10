@@ -601,8 +601,8 @@ function removeUInode(h)
 
 function sharedUInode(h,s)
 {	
-	$('.grid-table.fm #'+h + ' .transfer-filtype-icon img').attr('src',fileicon({t:1,shares:s},'s'));
-	$('.file-block#'+h + ' img').attr('src',fileicon({t:1,shares:s},'m'));
+	$('.grid-table.fm #'+h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
+	$('.file-block#'+h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
 	if (s) $('#treea_' + h).addClass('shared-folder');
 	else $('#treea_' + h).removeClass('shared-folder');
 }
@@ -2683,7 +2683,7 @@ function searchPath()
 					c = '';
 					name = n.name;
 					if (n.t) c = 'folder';
-					else iconimg = '<img alt="" src="' + fileicon(n,'s') + '" />';
+					else iconimg = '<span class="search-path-icon-span ' + fileicon(n) + '"></span>';
 				}				
 				if (id)
 				{
@@ -2767,11 +2767,11 @@ function selectddUI()
 				if (a == 0) cl = 'third';
 				else if (a == 1) cl = 'second';
 				else if (a == 2) cl = 'first';
-				var ico = fileicon(M.d[$.selected[i]],'d');				
+				var ico = fileicon(M.d[$.selected[i]]);				
 				if (a < 3 && !done[ico])
 				{
 					done[ico]=1;
-					html = '<div class="dragger-icon '+cl+'" style="background-image:url('+ ico +');"></div>' + html;
+					html = '<div class="dragger-icon '+cl+' '+ ico +'"></div>' + html;
 					a++;
 				}
 			}
@@ -3273,7 +3273,7 @@ function treeUI()
 			var html = '';
 			var id = $(e.target).attr('id');			
 			if (id) id = id.replace('treea_','');
-			if (id && M.d[id]) html = '<div class="dragger-icon" style="background-image:url('+ fileicon(M.d[id],'d') +');"></div>'
+			if (id && M.d[id]) html = '<div class="dragger-icon '+ fileicon(M.d[id]) +'"></div>'
 			$('#draghelper .dragger-icon').remove();
 			$(html).insertBefore('#draghelper .dragger-status');
 		},
@@ -3748,7 +3748,7 @@ function shareDialog(close)
 				{		
 					if (d) console.log('remove shared folder...');
 				}});
-				$('.share-folder-icon img').attr('src',fileicon(n,'m'));
+				$('.share-folder-icon div').addClass(fileicon(n));
 				$('.share-folder-block').removeClass('hidden');
 				$('.share-folder-info .propreties-dark-txt').text(n.name);
 				if (!n.ph)
@@ -4078,7 +4078,7 @@ function linksDialog(close)
 		
 		if (n && n.ph)
 		{
-			html += '<div class="export-link-item"><img alt="" src="' + fileicon(n,'m') + '" /><div class="export-link-text-pad"><div class="export-link-txt">' + htmlentities(n.name) + ' <span class="export-link-gray-txt"> ' + s + '</span></div><div class="export-link-txt">https://mega.co.nz/#'+F+'!' + htmlentities(n.ph) + '<span class="export-link-gray-txt file-key">!' + a32_to_base64(key) + '</span></div></div></div>';
+			html += '<div class="export-link-item"><div class="export-icon ' + fileicon(n) + '" ></div><div class="export-link-text-pad"><div class="export-link-txt">' + htmlentities(n.name) + ' <span class="export-link-gray-txt"> ' + s + '</span></div><div class="export-link-txt">https://mega.co.nz/#'+F+'!' + htmlentities(n.ph) + '<span class="export-link-gray-txt file-key">!' + a32_to_base64(key) + '</span></div></div></div>';
 		}	
 	}
 	$('.export-links-warning-close').unbind('click');
@@ -4520,18 +4520,18 @@ function propertiesDialog(close)
 	}
 	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="propreties-dark-txt">'+ p.t2 + '</div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt">' + p.t9 +'</div>';	
 	$('.properties-txt-pad').html(html);	
-	if ((filecnt + foldercnt) == 1) $('.properties-file-icon').html('<img alt="" src="'+ fileicon(n,'l') + '">');
+	if ((filecnt + foldercnt) == 1) $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
 	else
 	{		
 		var a = 0,done = {};
 		$('.properties-file-icon').html('');
 		for (var i in $.selected)
 		{
-			var ico = fileicon(M.d[$.selected[i]],'l');
+			var ico = fileicon(M.d[$.selected[i]]);
 			if (a < 3 && !done[ico])
 			{
 				done[ico]=1;
-				$('.properties-file-icon').prepend('<img alt="" src="'+ ico + '">');			
+				$('.properties-file-icon').prepend('<div class="'+ ico + '"></div>');			
 				a++;
 			}
 		}	
@@ -4685,7 +4685,7 @@ function fm_thumbnails()
 					if ($('.file-block#' + n.h).length > 0) 
 					{
 						$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
-						$('.file-block#' + n.h + ' img').addClass('thumb');
+						$('.file-block#' + n.h + ' img').parent().addClass('thumb');
 					}
 					if (($('#mobilethumb_' + n.h).length > 0) && ($('#mobilethumb_' + n.h + ' img')[0].src != thumbnails[n.h]))
 					{
@@ -4706,7 +4706,7 @@ function fm_thumbnails()
 				if ($('.file-block#' + node).length > 0)
 				{
 					$('.file-block#' + node + ' img').attr('src',thumbnails[node]);
-					$('.file-block#' + node + ' img').addClass('thumb');
+					$('.file-block#' + node + ' img').parent().addClass('thumb');
 				}
 				if ($('#mobilethumb_' + node).length > 0)
 				{

@@ -1,47 +1,47 @@
 var ext = {};
 var extensions = 
 {
-	'3D.png': [['3ds','3dm','max','obj'],'3D'],
-	'aftereffects.png': [['aep','aet'],'Adobe Aftereffects'],
-	'audio.png': [['mp3','wav','3ga','aif','aiff','flac','iff','m4a','wma'],'Audio'],
-	'cad.png': [['dxf','dwg'],'CAD'],
-	'compressed.png': [['zip','rar','tgz','gz','bz2','tbz','tar','7z','sitx'],'Compressed'],
-	'database.png': [['sql','accdb','db','dbf','mdb','pdb'],'Database'],
-	'dreamweaver.png': [['dwt'],'Database'],
-	'excel.png': [['xls','xlsx','xlt','xltm'],'Excel'],
-	'executable.png': [['exe','com','bin','apk','app','msi','cmd','gadget'],'Executable'],
-	'fla_lang.png': [['as','ascs','asc'],'ActionScript'],
-	'flash.png': [['fla'],'Flash'],
-	'font.png': [['fnt','otf','ttf','fon'],'Font'],
-	'generic.png': [['*'],'File'],
-	'GIS.png': [['gpx','kml','kmz'],'GPS File'],
-	'graphic.png': [['gif','tiff','tif','bmp','png','tga'],'Image'],
-	'html.png': [['html','htm','dhtml','xhtml'],'HTML'],
-	'Illustrator.png': [['ai','ait'],'Adobe Illustrator'],
-	'image.png': [['jpg','jpeg'],'Image'],
-	'indesign.png': [['indd'],'Adobe InDesign'],
-	'java.png': [['jar','java','class'],'Java'],
-	'midi.png': [['mid','midi'],'Midi'],
-	'pdf.png': [['pdf'],'PDF'],
-	'photoshop.png': [['abr','psb','psd'],'Adobe Photoshop'],
-	'playlist.png': [['pls','m3u','asx'],'Playlist'],
-	'podcast.png': [['pcast'],'Podcast'],
-	'powerpoint.png': [['pps','ppt','pptx'],'Powerpoint'],
-	'Premiere.png': [['prproj','ppj'],'Adobe Premiere'],
-	'raw.png': [['3fr','arw','bay','cr2','dcr','dng','fff','mef','mrw','nef','pef','rw2','srf','orf','rwl'],'RAW'],
-	'real_audio.png': [['rm','ra','ram'],'Real Audio'],
-	'sourcecode.png': [['sh','c','cc','cpp','cxx','h','hpp','dll'],'Source code'],
-	'spreadsheet.png': [['ods','ots','gsheet','nb','xlr','numbers'],'Spreadsheet'],
-	'swf.png': [['swf'],'SWF'],
-	'torrent.png': [['torrent'],'Torrent'],
-	'text.png': [['txt','rtf','ans','ascii','log','odt','wpd'],'Text','pages'],
-	'vcard.png': [['vcf'],'Vcard'],
-	'vector.png': [['svgz','svg','cdr','eps'],'Vector'],
-	'video.png': [['mkv','webm','avi','mp4','m4v','mpg','mpeg','mov','3g2','3gp','asf','wmv'],'Video'],
-	'flash_video.png': [['flv'],'Flash Video'],
-	'video_subtitle.png': [['srt'],'Subtitle'],
-	'web_data.png': [['html','xml','shtml','dhtml','js','css'],'Web Client Code'],
-	'web_lang.png': [['php','php3','php4','php5','phtml','inc','asp','pl','cgi','py'],'Web Server Code'],
+	'threed': [['3ds','3dm','max','obj'],'3D'],
+	'aftereffects': [['aep','aet'],'Adobe Aftereffects'],
+	'audio': [['mp3','wav','3ga','aif','aiff','flac','iff','m4a','wma'],'Audio'],
+	'cad': [['dxf','dwg'],'CAD'],
+	'compressed': [['zip','rar','tgz','gz','bz2','tbz','tar','7z','sitx'],'Compressed'],
+	'database': [['sql','accdb','db','dbf','mdb','pdb'],'Database'],
+	'dreamweaver': [['dwt'],'Database'],
+	'excel': [['xls','xlsx','xlt','xltm'],'Excel'],
+	'executable': [['exe','com','bin','apk','app','msi','cmd','gadget'],'Executable'],
+	'fla-lang': [['as','ascs','asc'],'ActionScript'],
+	'flash': [['fla'],'Flash'],
+	'font': [['fnt','otf','ttf','fon'],'Font'],
+	'generic': [['*'],'File'],
+	'gis': [['gpx','kml','kmz'],'GPS File'],
+	'graphic': [['gif','tiff','tif','bmp','png','tga'],'Image'],
+	'html': [['html','htm','dhtml','xhtml'],'HTML'],
+	'illustrator': [['ai','ait'],'Adobe Illustrator'],
+	'image': [['jpg','jpeg'],'Image'],
+	'indesign': [['indd'],'Adobe InDesign'],
+	'java': [['jar','java','class'],'Java'],
+	'midi': [['mid','midi'],'Midi'],
+	'pdf': [['pdf'],'PDF'],
+	'photoshop': [['abr','psb','psd'],'Adobe Photoshop'],
+	'playlist': [['pls','m3u','asx'],'Playlist'],
+	'podcast': [['pcast'],'Podcast'],
+	'powerpoint': [['pps','ppt','pptx'],'Powerpoint'],
+	'premiere': [['prproj','ppj'],'Adobe Premiere'],
+	'raw': [['3fr','arw','bay','cr2','dcr','dng','fff','mef','mrw','nef','pef','rw2','srf','orf','rwl'],'RAW'],
+	'real-audio': [['rm','ra','ram'],'Real Audio'],
+	'sourcecode': [['sh','c','cc','cpp','cxx','h','hpp','dll'],'Source code'],
+	'spreadsheet': [['ods','ots','gsheet','nb','xlr','numbers'],'Spreadsheet'],
+	'swf': [['swf'],'SWF'],
+	'torrent': [['torrent'],'Torrent'],
+	'text': [['txt','rtf','ans','ascii','log','odt','wpd'],'Text','pages'],
+	'vcard': [['vcf'],'Vcard'],
+	'vector': [['svgz','svg','cdr','eps'],'Vector'],
+	'video': [['mkv','webm','avi','mp4','m4v','mpg','mpeg','mov','3g2','3gp','asf','wmv'],'Video'],
+	'flash-video': [['flv'],'Flash Video'],
+	'video-subtitle': [['srt'],'Subtitle'],
+	'web-data': [['html','xml','shtml','dhtml','js','css'],'Web Client Code'],
+	'web-lang': [['php','php3','php4','php5','phtml','inc','asp','pl','cgi','py'],'Web Server Code'],
 	'word.png': [['doc','docx','dotx','wps'],'MS Word']
 };
 
@@ -231,21 +231,15 @@ function filetype(n)
 	else return 'File';
 }
  
-function fileicon(n,s)
+function fileicon(n)
 {	
-	var ico,size;	
-	var name = n.name;	
-	if (s == 's') size = 'small';
-	else if (s == 'm') size = 'medium';
-	else if (s == 'l') size = 'large';
-	else if (s == 'd') size = 'drag';
-	else size = 'medium';	
-	if (n.t && n.shares) ico = 'folder_shared.png';
-	else if (n.t) ico = 'folder.png';
+	var ico;	
+	var name = n.name;		
+	if (n.t && n.shares) ico = 'folder-shared';
+	else if (n.t) ico = 'folder';
 	else if (ext[fileext(n.name)]) ico = ext[fileext(n.name)][0];
-	else ico = 'generic.png';
-	var iconurl = staticpath + 'images/mega/icons/regular/' + size + '_' + ico;				
-	if (window.devicePixelRatio > 1) iconurl = iconurl.replace('/regular/','/retina/').replace('.png','@2x.png');
+	else ico = 'generic';
+	var iconurl = ico;			
 	return iconurl;
 }
 

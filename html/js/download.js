@@ -98,7 +98,7 @@ function dlinfo(ph,key,next)
 					};
 					$('.new-download-file-title').text(fdl_file.n);						
 					$('.new-download-file-size').text(bytesToSize(json[0].s));
-					$('.new-download-file-icon').attr('src',fileicon({name:fdl_file.n},'d'));								
+					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 				}
 				else dlkeyDialog();				
 			}
@@ -288,7 +288,7 @@ function dlkeyDialog()
 {
 	$('.new-download-buttons').addClass('hidden');
 	$('.new-download-file-title').text(l[1199]);	
-	$('.new-download-file-icon').attr('src',fileicon({name:'unknown.unknown'},'d'));	
+	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
 	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
 	$('.fm-dialog-overlay').removeClass('hidden');	
 	$('.fm-dialog.dlkey-dialog input').unbind('focus');

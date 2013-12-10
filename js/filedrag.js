@@ -36,7 +36,7 @@ function FileDragHover(e)
 	if ($.ddhelper)
 	{			
 		$('#draghelper .dragger-icon').remove();			
-		$('<div class="dragger-icon" style="background-image:url('+ fileicon({name:''},'d') +');"></div>').insertAfter('#draghelper .dragger-status');
+		$('<div class="dragger-icon '+ fileicon({name:''}) +'"></div>').insertAfter('#draghelper .dragger-status');
 		$('.dragger-icon.fade').fadeTo(500, 0.1);
 		$($.ddhelper).css({left: (e.pageX+35 + "px"),top: (e.pageY-5 + "px")});
 		$('.dragger-block').removeClass('move copy warning drag');

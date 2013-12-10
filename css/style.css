@@ -8992,6 +8992,7 @@ body.new-startpage {
 	padding: 14px 0;
 }
 .st-gray-block {
+	position: relative;
 	background-color: #f2f2f2;
 }
 .st-devices-icon {

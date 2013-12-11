@@ -127,7 +127,7 @@ var helpdata =
 {
 	//q: 'Is MEGA legal?',
 	q: l[692],
-	a: '<p>' + l[264].replace('[B]','<i>').replace('[/B]','</i>').replace('[A]','<a href="/#terms">').replace('[/A]','</A>') + '</p> ',
+	a: '<p>' + l[264].replace('[B]','<i>').replace('[/B]','</i>').replace('[A]','<a href="#terms">').replace('[/A]','</A>') + '</p> ',
 	c: [0],
 	i:1,
 },
@@ -189,7 +189,7 @@ var helpdata =
 {
 	// q: 'Do you offer an API?',
 	q: l[359],
-	a: '<p>' + l[361].replace('[A]','<a href="/#developers">').replace('[/A]','</A>') + '</p>',
+	a: '<p>' + l[361].replace('[A]','<a href="#dev">').replace('[/A]','</A>') + '</p>',
 	c: [0]
 },
 {
@@ -306,7 +306,7 @@ var helpdata =
 {
 	// q: 'What do I get with my free account?',
 	q: l[348],
-	a: '<p>' + l[349].replace('[X]','50 GB').replace('[A1]','<a href="/#pro">').replace('[/A1]','</a>').replace('[A2]','<a href="/#fm/account">').replace('[/A2]','</a>') + '</p>',
+	a: '<p>' + l[349].replace('[X]','50 GB').replace('[A1]','<a href="#pro">').replace('[/A1]','</a>').replace('[A2]','<a href="#fm/account">').replace('[/A2]','</a>') + '</p>',
 	c: [3],
 	i: 1,
 },

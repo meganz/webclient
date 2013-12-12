@@ -1,23 +1,23 @@
-function FileDragHover(e) 
+function FileDragHover(e)
 {
-	console.log('hover',$.dragging);
-	if (folderlink) return false;	
-	$.dragging=new Date().getTime();	
+	if (d) console.log('hover',$.dragging);
+	if (folderlink) return false;
+	$.dragging=new Date().getTime();
 	e.stopPropagation();
-	e.preventDefault();	
+	e.preventDefault();
 	if (document.getElementById('start_uploadbutton')) document.getElementById('start_uploadbutton').style.display = 'none';
-	if (!$.ddhelper) 
-	{					
-		var filecnt=0;			
+	if (!$.ddhelper)
+	{
+		var filecnt=0;
 		if (e && e.target && e.target.files)
 		{
-			var files = e.target.files || e.dataTransfer.files;	
+			var files = e.target.files || e.dataTransfer.files;
 			for (var i in files) filecnt++;
-		}		
+		}
 		else if (e && e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry)
-		{	
-			var items = e.dataTransfer.items;			
-			for (var i in items) if (items[i].kind) filecnt++;				
+		{
+			var items = e.dataTransfer.items;
+			for (var i in items) if (items[i].kind) filecnt++;
 		}
 		else if (e && e.dataTransfer && e.dataTransfer.files)
 		{
@@ -25,23 +25,23 @@ function FileDragHover(e)
 			for (var i in files) filecnt++;
 		}
 		else if (e && e.dataTransfer && e.dataTransfer.mozItemCount) filecnt = e.dataTransfer.mozItemCount;
-		else filecnt=1;			
+		else filecnt=1;
 		if (filecnt > 0) $.ddhelper = getDDhelper();
 		if (filecnt > 1)
 		{
 			$('.dragger-files-number').text(filecnt);
-			$('.dragger-files-number').show();			
+			$('.dragger-files-number').show();
 		}
-	}	
+	}
 	if ($.ddhelper)
-	{			
-		$('#draghelper .dragger-icon').remove();			
+	{
+		$('#draghelper .dragger-icon').remove();
 		$('<div class="dragger-icon '+ fileicon({name:''}) +'"></div>').insertAfter('#draghelper .dragger-status');
 		$('.dragger-icon.fade').fadeTo(500, 0.1);
 		$($.ddhelper).css({left: (e.pageX+35 + "px"),top: (e.pageY-5 + "px")});
 		$('.dragger-block').removeClass('move copy warning drag');
 		$('.dragger-block').addClass('copy');
-	}	
+	}
 	if (page == 'start')
 	{
 		$('.st-main-cursor,.st-main-info').fadeOut(30);
@@ -51,7 +51,7 @@ function FileDragHover(e)
 
 function FileDragLeave(e)
 {
-	console.log(e);
+	if (d) console.log(e);
 	if (folderlink) return false;
 	e.stopPropagation();
 	e.preventDefault();
@@ -67,8 +67,8 @@ function FileDragLeave(e)
 	{
 		if (page == 'start' && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging+500 < new Date().getTime())
 		{
-			$.dragging=false;			
-			start_out();		
+			$.dragging=false;
+			start_out();
 			$('.st-main-cursor,.st-main-info').fadeIn(30);
 		}
 	},500);
@@ -78,16 +78,16 @@ var dir_inflight = 0;
 var file_inflight=0;
 var filedrag_u = [];
 
-function traverseFileTree(item, path) 
+function traverseFileTree(item, path)
 {
   path = path || "";
-  if (item.isFile) 
+  if (item.isFile)
   {
-	dir_inflight++;	
-    item.file(function(file) 
+	dir_inflight++;
+    item.file(function(file)
 	{
-	  console.log(file);
-	  file.path = path;	  
+	  if (d) console.log(file);
+	  file.path = path;
 	  filedrag_u.push(file);
 	  dir_inflight--;
 	  if (dir_inflight == 0 && $.dostart)
@@ -96,26 +96,24 @@ function traverseFileTree(item, path)
 		if (page == 'start') start_upload();
 	  }
     });
-  } 
-  else if (item.isDirectory) 
+  }
+  else if (item.isDirectory)
   {
 	dir_inflight++;
     var dirReader = item.createReader();
-    dirReader.readEntries(function(entries) 
-	{	  
+    dirReader.readEntries(function(entries)
+	{
       for (var i=0; i < entries.length; i++)
 	  {
         traverseFileTree(entries[i], path + item.name + "/");
       }
 	  dir_inflight--;
-	  if (dir_inflight == 0) addupload(filedrag_u);		
-	  
+	  if (dir_inflight == 0) addupload(filedrag_u);
+
     });
-  }  
-  if (dir_inflight == 0) console.log('end'); 
+  }
+  if (d && dir_inflight == 0) console.log('end');
 }
-
-
 
 function start_upload()
 {
@@ -123,13 +121,12 @@ function start_upload()
 	{
 		msgDialog('confirmation','Starting new account','Do you want to upload your files to a new session?','"No" will allow you to log in and start your upload.',function(e)
 		{
-			if(e) start_anoupload();		
+			if(e) start_anoupload();
 			else loginDialog();
 		});
 	}
 	else start_anoupload();
 }
-
 
 function start_anoupload()
 {
@@ -137,77 +134,99 @@ function start_anoupload()
 	u_checklogin(
 	{
 		checkloginresult: function(u_ctx,r)
-		{			
+		{
 			u_type = r;
 			u_checked=true;
 			loadingDialog.hide();
-			document.location.hash = 'fm';	
+			document.location.hash = 'fm';
 		}
 	},true);
 }
 
-
 // file selection
-function FileSelectHandler(e) 
-{		
-	
+function FileSelectHandler(e)
+{
 
 	if (folderlink) return false;
 
 	if (e.stopPropagation) e.stopPropagation();
 	if (e.preventDefault) e.preventDefault();
-	
+
 	$($.ddhelper).remove();
 	$.ddhelper=undefined;
-	
-	if (page == 'start')	
+
+	if (page == 'start')
 	{
 		if ($('#fmholder').html() == '') $('#fmholder').html('<div id="topmenu"></div>' + translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
-		start_out();		
+		start_out();
 		setTimeout(function()
 		{
 			$('.st-main-cursor,.st-main-info').show();
 		},500);
 	}
-	
-	
-	
-	var files = e.target.files || e.dataTransfer.files;	
-	if (files.length == 0) return false;	
+
+	var files = e.target.files || e.dataTransfer.files;
+	if (files.length == 0) return false;
 	if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry)
 	{
 		var items = e.dataTransfer.items;
-		for (var i=0; i<items.length; i++) 
+		for (var i=0; i<items.length; i++)
 		{
 			if (items[i].webkitGetAsEntry)
 			{
 				var item = items[i].webkitGetAsEntry();
 				if (item)
-				{	
-					filedrag_u=[];					
-					if (i == items.length-1) $.dostart=true;					
-					traverseFileTree(item);				
+				{
+					filedrag_u=[];
+					if (i == items.length-1) $.dostart=true;
+					traverseFileTree(item);
 				}
 			}
-		}	
+		}
+	}
+	else if (is_chrome_firefox && e.type[0] == 'd') // XXX
+	{
+		try
+		{
+			for (var i=0, m=e.dataTransfer.mozItemCount ; i<m ; ++i)
+			{
+				var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
+			    if (file instanceof Ci.nsIFile)
+				{
+					filedrag_u=[];
+					if (i == m-1) $.dostart=true;
+					traverseFileTree(new mozDirtyGetAsEntry(file,e.dataTransfer));
+				}
+				else
+				{
+					if (d) console.log('FileSelectHandler: Not a nsIFile', file);
+				}
+				// e.dataTransfer.mozClearDataAt("application/x-moz-file", i);
+			}
+		}
+		catch (e)
+		{
+			alert(e);
+			Cu.reportError(e);
+		}
 	}
 	else
 	{
 		var u=[];
-		for (var i = 0, f; f = files[i]; i++) 
-		{	
+		for (var i = 0, f; f = files[i]; i++)
+		{
 			if (f.webkitRelativePath) f.path = f.webkitRelativePath;
 			if (f.name != '.') u.push(f);
 		}
 		addupload(u);
-		if (page == 'start') start_upload();		
-		$('.fm-file-upload input').remove();		
+		if (page == 'start') start_upload();
+		$('.fm-file-upload input').remove();
 		$('.fm-file-upload').append('<input type="file" id="fileselect1" multiple="">');
-		$('.fm-folder-upload input').remove();		
-		$('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');	
+		$('.fm-folder-upload input').remove();
+		$('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
 		$('.context-menu-item.fileupload-item label input').remove();
 		$('.context-menu-item.fileupload-item label').append('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
-		
+
 		$('.context-menu-item.folderupload-item label input').remove();
 		$('.context-menu-item.folderupload-item label').append('<input type="file" id="fileselect4" name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
 		InitFileDrag();
@@ -215,26 +234,19 @@ function FileSelectHandler(e)
 	return true;
 }
 
-
-
-
 // initialize
-function InitFileDrag() 
+function InitFileDrag()
 {
-	if (document.getElementById("fileselect1")) document.getElementById("fileselect1").addEventListener("change", FileSelectHandler, false);	
+	if (document.getElementById("fileselect1")) document.getElementById("fileselect1").addEventListener("change", FileSelectHandler, false);
 	if (document.getElementById('fileselect2')) document.getElementById("fileselect2").addEventListener("change", FileSelectHandler, false);
-	if (document.getElementById("fileselect3")) document.getElementById("fileselect3").addEventListener("change", FileSelectHandler, false);	
+	if (document.getElementById("fileselect3")) document.getElementById("fileselect3").addEventListener("change", FileSelectHandler, false);
 	if (document.getElementById('fileselect4')) document.getElementById("fileselect4").addEventListener("change", FileSelectHandler, false);
 	if (document.getElementById('start-upload')) document.getElementById("start-upload").addEventListener("change", FileSelectHandler, false);
 	document.getElementById("fmholder").addEventListener("dragover", FileDragHover, false);
 	document.getElementById("fmholder").addEventListener("dragleave", FileDragLeave, false);
 	document.getElementById("fmholder").addEventListener("drop", FileSelectHandler, false);
-	
-	
-	
+
 	document.getElementById("startholder").addEventListener("dragover", FileDragHover, false);
-	document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);	
+	document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);
 	document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
 }
-
-	

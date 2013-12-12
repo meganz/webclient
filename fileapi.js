@@ -116,6 +116,79 @@ function mozPlaySound(n) {
 	return false;
 }
 
+function mozDirtyGetAsEntry(aFile,aDataTransfer)
+{
+	this.__defineGetter__('isFile', function()
+	{
+		return aFile.isFile();
+	});
+	this.__defineGetter__('isDirectory', function()
+	{
+		return aFile.isDirectory();
+	});
+	this.__defineGetter__('name', function()
+	{
+		return aFile.leafName;
+	});
+
+	this.file = function(aCallback)
+	{
+		try {
+			var type = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService).getTypeFromFile(aFile);
+		} catch(e) {}
+
+		aCallback({
+			name : aFile.leafName,
+			size : aFile.fileSize,
+			type : type || '',
+			lastModifiedDate : aFile.lastModifiedTime,
+			slice: function(aStart,aEnd,aType)
+			{
+				var nsIFileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
+					.createInstance(Ci.nsIFileInputStream);
+				nsIFileInputStream.QueryInterface(Ci.nsISeekableStream);
+				nsIFileInputStream.init(aFile, -1, -1, false);
+
+				var nsIBinaryInputStream = Cc["@mozilla.org/binaryinputstream;1"]
+					.createInstance(Ci.nsIBinaryInputStream);
+				nsIBinaryInputStream.setInputStream(nsIFileInputStream);
+
+				this.slice = function(aStart,aEnd,aType)
+				{
+					if (d) console.log('mozDirtyGetAsEntry', aStart,aEnd,aType);
+
+					nsIFileInputStream.seek(0,aStart);
+					var data = nsIBinaryInputStream.readByteArray(aEnd-aStart);
+					if(aEnd == aFile.fileSize) nsIFileInputStream.close();
+					return new Blob([new Uint8Array(data)], { type : aType || 'application/octet-stream'});
+				};
+
+				return this.slice(aStart,aEnd,aType);
+			}
+		});
+	};
+
+	this.readEntries = function(aCallback)
+	{
+		var entries = [], de = aFile.directoryEntries;
+
+		while (de.hasMoreElements())
+		{
+			var file = de.getNext().QueryInterface(Ci.nsIFile);
+			entries.push(new mozDirtyGetAsEntry(file,aDataTransfer));
+		}
+
+		aCallback(entries);
+	};
+
+	this.createReader = function()
+	{
+		return this;
+	};
+
+	if (d) console.log('mozDirtyGetAsEntry', aFile.path);
+}
+
 (function(scope) {
 	var LOG = function(m) (console.log(m), Services.console.logStringMessage('MEGA :: ' + m));
 

@@ -1001,7 +1001,7 @@ function fmtopUI()
 	{
 		$('.fm-new-folder').removeClass('hidden');
 		$('.fm-file-upload').removeClass('hidden');		
-		if ('webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
 		else $('.fm-file-upload').addClass('last-button');		
 	}	
 	$('.fm-clearbin-button').unbind('click');

@@ -5,7 +5,6 @@ var ul_queue_num = 0;
 
 var totalbytessent;
 
-
 if (localStorage.use_ssl) use_ssl = parseInt(localStorage.use_ssl);
 
 var ul_reader;
@@ -89,12 +88,12 @@ function startupload()
 			if (!ul_skipIdentical || !file_exists(ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path || ul_queue[ul_queue_num].name,ul_queue[ul_queue_num].size)) break;
 			onUploadSuccess(ul_queue_num);
 		}
-		
+
 		ul_queue_num++;
 	}
 
 	ul_uploading=true;
-	
+
 	if (ul_queue[ul_queue_num].flashid)
 	{
 		ul_maxSlots = 1;
@@ -112,7 +111,7 @@ function startupload()
 		var ctx = { callback : initupload2, reqindex : [] };
 		var req = [];
 		var maxpf = 128*1048576;
-		
+
 		for (var i = ul_queue_num; i < ul_queue.length && i < ul_queue_num+8 && maxpf > 0; i++)
 		{
 			if (!ul_queue[ul_queue_num].posturl)
@@ -122,7 +121,7 @@ function startupload()
 				maxpf -= ul_queue[i].size
 			}
 		}
-		
+
 		api_req(req,ctx);
 	}
 }
@@ -138,27 +137,27 @@ function initupload2(res,ctx)
 	}
 
 	for (var i = 0; i < res.length; i++) if (typeof(res[i]) == 'object') ul_queue[ctx.reqindex[i]].posturl = res[i].p;
-	
+
 	initupload3();
 }
-	
+
 function initupload3()
 {
 	ul_uploadurl = ul_queue[ul_queue_num].posturl;
-	
+
 	if (!ul_uploadurl)
 	{
 		// TODO: upload over quota reporting
 		return;
 	}
-	
+
 	ul_key = Array(6);
 
 	// generate ul_key and nonce
 	for (i = 6; i--; ) ul_key[i] = rand(0x100000000);
 
 	ul_keyNonce = JSON.stringify(ul_key);
-	
+
 	ul_macs = [];
 
 	totalbytessent = 0;
@@ -185,7 +184,7 @@ function initupload3()
 		if (!(ul_readq[pp] = ul_queue[ul_queue_num].size-pp) && ul_queue[ul_queue_num].size) delete ul_readq[pp];
 	}
 	else ul_readq[0] = 0;
-	
+
 	ul_plainq = {};
 
 	ul_intransit = 0;
@@ -205,7 +204,7 @@ function initupload3()
 		ul_workerbusy = Array(ul_max_workers);
 		for (var id = ul_max_workers; id--; ) ul_workerbusy[id] = 0;
 	}
-	
+
 	ul_aes = new sjcl.cipher.aes([ul_key[0],ul_key[1],ul_key[2],ul_key[3]]);
 
 	ul_xhrs = Array(ul_maxSlots);
@@ -221,11 +220,11 @@ function initupload3()
 	}
 
 	if (is_image(ul_queue[ul_queue_num].name))
-	{	
+	{
 		ul_queue[ul_queue_num].faid = ++ul_faid;
 		if (have_ab) createthumbnail(ul_queue[ul_queue_num],ul_aes,ul_faid);
 	}
-	
+
 	onUploadStart(ul_queue_num);
 	ul_dispatch_chain();
 }
@@ -255,7 +254,7 @@ function ul_dispatch_encryption()
 	if (use_workers)
 	{
 		for (id = ul_max_workers; id--; ) if (!ul_workerbusy[id]) break;
-		
+
 		if (id >= 0)
 		{
 			for (var p in ul_plainq)
@@ -266,7 +265,7 @@ function ul_dispatch_encryption()
 				{
 					delete ul_workers[id].onmessage;
 					ul_workers[id].terminate();
-					ul_workers[id] = undefined;			
+					ul_workers[id] = undefined;
 				}
 
 				ul_workers[id] = new Worker('encrypter.js');
@@ -299,7 +298,7 @@ function ul_dispatch_encryption()
 				ul_workers[id].postMessage(ul_keyNonce);
 
 				if (d) console.log("WORKER: Queueing " + ul_plainq[p].length + " bytes at " + p);
-	
+
 				ul_workers[id].pos = parseInt(p);
 				ul_workers[id].postMessage(parseInt(p)/16);
 				ul_workers[id].postMessage(ul_plainq[p]);
@@ -392,7 +391,7 @@ function ul_dispatch_send(slot)
 						ul_lastactive[this.slot] = new Date().getTime();
 
 						if (e.lengthComputable && ul_xhrs[this.slot].pos != 1)
-						{ 
+						{
 							ul_progress[this.slot] = e.loaded;
 							ul_updateprogress();
 						}
@@ -410,7 +409,7 @@ function ul_dispatch_send(slot)
 					send8 = new Uint8Array(ul_sendbuf[slot],0,data8.length);
 
 					send8.set(data8);
-					
+
 					// plug extreme Chrome memory leak
 					var t = ul_uploadurl.lastIndexOf('/ul/');
 					ul_xhrs[slot].open('POST', ul_uploadurl.substr(0,t+1));
@@ -422,7 +421,7 @@ function ul_dispatch_send(slot)
 					ul_xhrs[slot].open('POST',ul_uploadurl+suffix);
 					ul_xhrs[slot].send(ul_sendchunks[p].buffer);
 				}
-				
+
 				ul_watchdog();
 			}
 			else
@@ -430,7 +429,7 @@ function ul_dispatch_send(slot)
 				ul_flashpos[slot] = p;
 				flash_uploadchunk(slot,base64urlencode(ul_sendchunks[p].buffer),ul_uploadurl+suffix);
 			}
-				
+
 			break;
 		}
 	}
@@ -463,7 +462,6 @@ function ul_watchdog()
 	}
 }
 
-
 function ul_failed(next)
 {
 	onUploadError(ul_queue_num,"Upload failed - " + (next ? "read error" : "retrying"));
@@ -484,11 +482,10 @@ function ul_updateprogress()
 		for (var slot = ul_maxSlots; slot--; ) tp += ul_progress[slot];
 
 		if (tp > ul_queue[ul_queue_num].size) tp = ul_queue[ul_queue_num].size;
-		
-		
+
 		if (ul_lastprogress+250 > new Date().getTime()) return false;
 		else ul_lastprogress=new Date().getTime();
-		
+
 		onUploadProgress(ul_queue_num, tp, ul_queue[ul_queue_num].size);
 	}
 }
@@ -501,7 +498,7 @@ function ul_completepending(target)
 	if (ul_completion.length)
 	{
 		var ul = ul_completion.shift();
-	
+
 		var ctx = {
 			target : target,
 			ul_queue_num : ul[5],
@@ -517,9 +514,9 @@ function ul_completepending(target)
 function ul_completepending2(res,ctx)
 {
 	if (typeof res == 'object' && res[0].f)
-	{		
-		newnodes = [];	
-		process_f(res[0].f);		
+	{
+		newnodes = [];
+		process_f(res[0].f);
 		rendernew();
 		fm_thumbnails();
 		api_attachfileattr(res[0].f[0].h,ctx.faid);
@@ -555,7 +552,7 @@ function file_exists2(node,p,size)
 		}
 	}
 	else for (i = n.length; i--; ) if (n[i].size < 0) return file_exists2(n[i].id,p,size);
-	
+
 	return false;
 }
 
@@ -565,7 +562,7 @@ function ul_chunkcomplete(slot,pos,response)
 	delete ul_inflight[pos];
 
 	if (response.length > 27) response = base64urldecode(response);
-	
+
 	if (!response.length || response == 'OK' || response.length == 27)
 	{
 		ul_lastcompletion = new Date().getTime();
@@ -590,11 +587,11 @@ function ul_chunkcomplete(slot,pos,response)
 			for (var i = 0; i < t.length; i++) t[i] = ul_macs[t[i]];
 
 			var mac = condenseMacs(t,ul_key);
-		
+
 			ul_settimeout(-1);
 
 			var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
-			
+
 			// TODO: add further attributes, such as filemtime...
 			if (u_k_aes && !ul_completing)
 			{
@@ -623,7 +620,7 @@ function ul_chunkcomplete(slot,pos,response)
 
 	// TODO: add processing for re-requests
 	ul_xhrbusy[slot] = 0;
-	
+
 	ul_dispatch_chain();
 }
 
@@ -649,8 +646,17 @@ function ul_dispatch_read()
 			{
 				p = parseInt(p);
 
-				var blob;
+				if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
+				{
+					ul_plainq[p] = ul_queue[ul_queue_num].u8(p,ul_readq[p]);
+					delete ul_readq[p];
 
+					ul_intransit++;
+					ul_dispatch_chain();
+					break;
+				}
+
+				var blob;
 				if ((ul = ul_queue[ul_queue_num].slice) || (ul_queue[ul_queue_num].mozSlice))
 				{
 					if (ul_queue[ul_queue_num].mozSlice) blob = ul_queue[ul_queue_num].mozSlice(p,p+ul_readq[p]);
@@ -663,23 +669,23 @@ function ul_dispatch_read()
 				ul_reader.readAsArrayBuffer(blob);
 				ul_reader.instance = ul_instance;
 
-				ul_reader.onloadend = function(evt) 
+				ul_reader.onloadend = function(evt)
 				{
 					if (this.instance == ul_instance)
 					{
-						if (evt.target.readyState == FileReader.DONE) 
+						if (evt.target.readyState == FileReader.DONE)
 						{
 							delete ul_readq[this.pos];
 
 							ul_plainq[this.pos] = new Uint8Array(evt.target.result);
 
 							ul_intransit++;
-							
+
 							ul_dispatch_chain();
 						}
 					}
 				}
-				
+
 				ul_reader.onerror = function(evt)
 				{
 					if (this.instance == ul_instance)
@@ -749,7 +755,7 @@ function ul_cancel()
 			ul_xhrs[i] = undefined;
 		}
 	}
-	
+
 	// TODO: properly abort active Flash components
 	ul_instance++;
 	ul_settimeout(-1);

@@ -142,7 +142,8 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			size : aFile.fileSize,
 			type : type || '',
 			lastModifiedDate : aFile.lastModifiedTime,
-			slice: function(aStart,aEnd,aType)
+
+			u8: function(aStart,aBytes)
 			{
 				var nsIFileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
 					.createInstance(Ci.nsIFileInputStream);
@@ -153,17 +154,20 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					.createInstance(Ci.nsIBinaryInputStream);
 				nsIBinaryInputStream.setInputStream(nsIFileInputStream);
 
-				this.slice = function(aStart,aEnd,aType)
+				this.u8 = function(aStart,aBytes)
 				{
-					if (d) console.log('mozDirtyGetAsEntry', aStart,aEnd,aType);
+					if (d) console.log('mozDirtyGetAsEntry', aStart,aBytes);
 
 					nsIFileInputStream.seek(0,aStart);
-					var data = nsIBinaryInputStream.readByteArray(aEnd-aStart);
-					if(aEnd == aFile.fileSize) nsIFileInputStream.close();
-					return new Blob([new Uint8Array(data)], { type : aType || 'application/octet-stream'});
+					var data = nsIBinaryInputStream.readByteArray(aBytes);
+					if(aBytes+aStart == aFile.fileSize)
+					{
+						nsIFileInputStream.close();
+					}
+					return new Uint8Array(data);
 				};
 
-				return this.slice(aStart,aEnd,aType);
+				return this.u8(aStart,aBytes);
 			}
 		});
 	};

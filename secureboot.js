@@ -386,7 +386,6 @@ else
 			'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
 			'register': {f:'html/register.html', n: 'register', j:0},
 			'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-			'android': {f:'html/android.html', n: 'android', j:0},
 			'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
 			'download': {f:'html/download.html', n: 'download', j:0},
 			'download_js': {f:'html/js/download.js', n: 'download_js', j:1},

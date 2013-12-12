@@ -3844,11 +3844,9 @@ function mcDialog(close)
 		$('.move-dialog #mainsub').html('');
 		return true;	
 	}
-	
-	
+	$.mcselected = M.RootID;	
 	var jsp = $('.fm-move-dialog-body').data('jsp');
-	if (jsp) jsp.scrollTo(0,0,false);
-	
+	if (jsp) jsp.scrollTo(0,0,false);	
 	if ($.selected.length > 0)
 	{
 		$.dialog = 'mc';		
@@ -3897,7 +3895,7 @@ function mcDialog(close)
 				M.buildtree(M.d[$.mcselected]);			
 				var html = $('#treesub_'+$.mcselected).html();
 				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
-				$.mctreeUI();				
+				$.mctreeUI();
 				var c = $(this).attr('class');
 				if (c.indexOf('contains-folders') > -1)
 				{
@@ -3983,7 +3981,7 @@ function mcDialog(close)
 			}
 			else if ($.mctype.substr(0,4) == 'copy')
 			{
-				if ($.mctype == 'copy-contacts' && t.length == '8')
+				if ($.mctype == 'copy-contacts' && t.length == 8)
 				{
 					if (RightsbyID(t) == 0) 
 					{

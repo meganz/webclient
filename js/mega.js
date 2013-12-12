@@ -726,7 +726,7 @@ function MegaData ()
 			if (n.sk) n.p = n.u;
 			else if (n.su) n.p = n.su;
 		}
-		if (n.p.length == 11 && !M.d[n.p])
+		if (n.p && n.p.length == 11 && !M.d[n.p])
 		{
 			var u = this.u[n.p];
 			if (u)
@@ -966,7 +966,7 @@ function MegaData ()
 			});
 			if (M.d[h] && M.d[h].p)
 			{
-				this.delIndex(M.d[h].p,h);
+				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];				
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
 				removeUInode(h);

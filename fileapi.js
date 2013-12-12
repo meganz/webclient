@@ -29,10 +29,12 @@ var mozOnSavingDownload = function(file,callback,ask) {
 	callback(options);
 };
 
-function mozFilePicker(f,m) {
+function mozFilePicker(f,m,o) {
+	o = o || {};
+	var title = o.title || (m === 2 ? 'Select Folder':'Save File As');
 	var nsIFilePicker = Ci.nsIFilePicker,
 		fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	fp.init(window,'MEGA :: ' + (m === 2 ? 'Select Folder':'Save File As')+'...',m||nsIFilePicker.modeSave);
+	fp.init(window,'MEGA :: ' + title + '...',m||nsIFilePicker.modeSave);
 	fp.appendFilters(nsIFilePicker.filterAll); // TODO: ext2filter?
 	if(m !== 2) {
 		fp.defaultString = f;
@@ -40,7 +42,7 @@ function mozFilePicker(f,m) {
 			fp.defaultExtension = f.replace(/^.*\./,'');
 		}
 	}
-	return fp.show() != nsIFilePicker.returnCancel ? fp.file : null;
+	return fp.show() != nsIFilePicker.returnCancel ? (o.gfp ? fp:fp.file) : null;
 }
 
 function mozFile(p,f,e) {

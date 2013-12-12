@@ -1,3 +1,5 @@
+(function(scope) {
+
 function FileDragHover(e)
 {
 	if (d) console.log('hover',$.dragging);
@@ -145,7 +147,6 @@ function start_anoupload()
 // file selection
 function FileSelectHandler(e)
 {
-
 	if (folderlink) return false;
 
 	if (e.stopPropagation) e.stopPropagation();
@@ -183,7 +184,7 @@ function FileSelectHandler(e)
 			}
 		}
 	}
-	else if (is_chrome_firefox && e.type[0] == 'd') // XXX
+	else if (is_chrome_firefox && e.dataTransfer)
 	{
 		try
 		{
@@ -225,7 +226,6 @@ function FileSelectHandler(e)
 		$('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
 		$('.context-menu-item.fileupload-item label input').remove();
 		$('.context-menu-item.fileupload-item label').append('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
-
 		$('.context-menu-item.folderupload-item label input').remove();
 		$('.context-menu-item.folderupload-item label').append('<input type="file" id="fileselect4" name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
 		InitFileDrag();
@@ -234,18 +234,50 @@ function FileSelectHandler(e)
 }
 
 // initialize
-function InitFileDrag()
+scope.InitFileDrag = function()
 {
-	if (document.getElementById("fileselect1")) document.getElementById("fileselect1").addEventListener("change", FileSelectHandler, false);
-	if (document.getElementById('fileselect2')) document.getElementById("fileselect2").addEventListener("change", FileSelectHandler, false);
-	if (document.getElementById("fileselect3")) document.getElementById("fileselect3").addEventListener("change", FileSelectHandler, false);
-	if (document.getElementById('fileselect4')) document.getElementById("fileselect4").addEventListener("change", FileSelectHandler, false);
-	if (document.getElementById('start-upload')) document.getElementById("start-upload").addEventListener("change", FileSelectHandler, false);
+	var i = 5;
+	while(i--)
+	{
+		var o = document.getElementById(i? 'fileselect' + i : 'start-upload');
+		if (o) o.addEventListener("change", FileSelectHandler, false);
+	}
+
 	document.getElementById("fmholder").addEventListener("dragover", FileDragHover, false);
 	document.getElementById("fmholder").addEventListener("dragleave", FileDragLeave, false);
 	document.getElementById("fmholder").addEventListener("drop", FileSelectHandler, false);
-
 	document.getElementById("startholder").addEventListener("dragover", FileDragHover, false);
 	document.getElementById("startholder").addEventListener("dragleave", FileDragLeave, false);
 	document.getElementById("startholder").addEventListener("drop", FileSelectHandler, false);
+
+	if(is_chrome_firefox)
+	{
+		$('input[webkitdirectory]').click(function(e)
+		{
+			var file = mozFilePicker(0,2,{/*gfp:1,*/title:l[98]});
+
+			if ( file )
+			{
+				e.target = {
+					files : [-1]
+				};
+				e.dataTransfer = {
+					mozItemCount : 1,
+					mozGetDataAt : function()
+					{
+						return file;
+					}
+				};
+				FileSelectHandler(e);
+				file = undefined;
+			}
+			else
+			{
+				if (e.stopPropagation) e.stopPropagation();
+				if (e.preventDefault) e.preventDefault();
+			}
+		});
+	}
 }
+
+})(this);

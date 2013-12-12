@@ -13591,8 +13591,8 @@ background-size:64px auto;
  background-image: url(../images/mega/large-icons@2x.png);
 background-size:220px auto;
 }
- .transfer-filtype-icon, .search-path-icon-span {
- background-image: url(images/mega/small-icons@2x.png);
+.transfer-filtype-icon, .search-path-icon-span {
+ background-image: url(../images/mega/small-icons@2x.png);
  background-size:24px auto;
 }
 .ff-extension-icon, .ff-extension-button {

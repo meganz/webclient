@@ -80,39 +80,38 @@ var filedrag_u = [];
 
 function traverseFileTree(item, path)
 {
-  path = path || "";
-  if (item.isFile)
-  {
-	dir_inflight++;
-    item.file(function(file)
+	path = path || "";
+	if (item.isFile)
 	{
-	  if (d) console.log(file);
-	  file.path = path;
-	  filedrag_u.push(file);
-	  dir_inflight--;
-	  if (dir_inflight == 0 && $.dostart)
-	  {
-		addupload(filedrag_u);
-		if (page == 'start') start_upload();
-	  }
-    });
-  }
-  else if (item.isDirectory)
-  {
-	dir_inflight++;
-    var dirReader = item.createReader();
-    dirReader.readEntries(function(entries)
+		dir_inflight++;
+		item.file(function(file)
+		{
+			if (d) console.log(file);
+			file.path = path;
+			filedrag_u.push(file);
+			dir_inflight--;
+			if (dir_inflight == 0 && $.dostart)
+			{
+				addupload(filedrag_u);
+				if (page == 'start') start_upload();
+			}
+		});
+	}
+	else if (item.isDirectory)
 	{
-      for (var i=0; i < entries.length; i++)
-	  {
-        traverseFileTree(entries[i], path + item.name + "/");
-      }
-	  dir_inflight--;
-	  if (dir_inflight == 0) addupload(filedrag_u);
-
-    });
-  }
-  if (d && dir_inflight == 0) console.log('end');
+		dir_inflight++;
+		var dirReader = item.createReader();
+		dirReader.readEntries(function(entries)
+		{
+			for (var i=0; i < entries.length; i++)
+			{
+				traverseFileTree(entries[i], path + item.name + "/");
+			}
+			dir_inflight--;
+			if (dir_inflight == 0) addupload(filedrag_u);
+		});
+	}
+	if (d && dir_inflight == 0) console.log('end');
 }
 
 function start_upload()

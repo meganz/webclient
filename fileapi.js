@@ -145,7 +145,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			type : type || '',
 			lastModifiedDate : aFile.lastModifiedTime,
 
-			u8: function(aStart,aBytes)
+			u8: function(aStart,aBytes,aKeepOpen)
 			{
 				var nsIFileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
 					.createInstance(Ci.nsIFileInputStream);
@@ -156,20 +156,26 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					.createInstance(Ci.nsIBinaryInputStream);
 				nsIBinaryInputStream.setInputStream(nsIFileInputStream);
 
-				this.u8 = function(aStart,aBytes)
+				this.u8 = function(aStart,aBytes,aKeepOpen)
 				{
-					if (d) console.log('mozDirtyGetAsEntry', aStart,aBytes);
+					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
 
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
-					if(aBytes+aStart == aFile.fileSize)
+					if(aBytes+aStart == aFile.fileSize && !aKeepOpen)
 					{
 						nsIFileInputStream.close();
 					}
 					return new Uint8Array(data);
 				};
 
-				return this.u8(aStart,aBytes);
+				return this.u8(aStart,aBytes,aKeepOpen);
+			},
+			blob: function()
+			{
+				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type);
+
+				return new Blob([this.u8(0,this.size,1)], { type : this.type || 'application/octet-stream'});
 			}
 		});
 	};

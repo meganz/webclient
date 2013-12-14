@@ -1,96 +1,76 @@
-importScripts('sjcl.js');
+importScripts('asmcrypto.js');
 
 postMessage = self.webkitPostMessage || self.postMessage;
 
-var aes, ctr;
+var aes = new asmCrypto.CCM_AES( undefined, { heapSize: 0x101000 } ), // 4 KiB + 1 MiB
+    nonce = new Uint8Array(8),
+    iv  = new Uint8Array(16),
+    ctr = 0;
 
 onmessage = function(e)
 {
 	if (typeof(e.data) == 'string')
 	{
-		var key = JSON.parse(e.data);
-		ctr = [key[4],key[5]];
-		aes = new sjcl.cipher.aes([key[0],key[1],key[2],key[3]]);
+		var arr = JSON.parse(e.data);
+
+		var nonceView = new DataView(nonce.buffer);
+		nonceView.setUint32( 0, arr[4], false );
+		nonceView.setUint32( 4, arr[5], false );
+        iv.set( nonce, 0 );
+        iv.set( nonce, 8 );
+
+        var key = new Uint8Array(16);
+        var keyView = new DataView(key.buffer);
+        keyView.setUint32(  0, arr[0], false );
+        keyView.setUint32(  4, arr[1], false );
+        keyView.setUint32(  8, arr[2], false );
+        keyView.setUint32( 12, arr[3], false );
+
+		aes.reset(key);
 	}
 	else if (typeof(e.data) == 'number')
 	{
-		ctr[3] = e.data >>> 0;
-		ctr[2] = (e.data/0x100000000) >>> 0;
+	    ctr = e.data;
 	}
 	else
 	{
-		var enc, mac, macs = [], i, ni = 0, j, len, v, data0, data1, data2, data3;
-		var b = e.data.buffer || e.data;
+		var data = new Uint8Array( e.data.buffer || e.data ),
+		    heapView = new DataView( aes.heap.buffer );
+		    macs = [];
 
-		len = b.byteLength-16;
+	    for ( var i = 0; i < data.length; i += 0x100000 )
+	    {
+	        // put data chunk into the heap
+	        var j = ( i + 0x100000 < data.length ) ? i + 0x100000 : data.length;
+	        aes.heap.set( data.subarray(i,j), 0x1000 );
 
-		var dv = new DataView(b);
+            // init mac state
+	        aes.asm.init_state.apply( aes.asm, iv );
 
-		for (i = 0; i < len; i += 16)
-		{
-			if (i == ni)
-			{
-				if (i) macs.push(mac[0],mac[1],mac[2],mac[3]);
-				mac = [ctr[0],ctr[1],ctr[0],ctr[1]];
-				ni = i+1048576;
-			}
+            // decrypt data
+            aes.asm.ccm_encrypt(
+                0x1000, j-i,
+                nonce[0], nonce[1], nonce[2], nonce[3], nonce[4], nonce[5], nonce[6], nonce[7],
+                0, 0, 0, 0, 0, 0,
+                (ctr/0x100000000) >>> 0,
+                ctr >>> 0
+            );
 
-			data0 = dv.getUint32(i,false);
-			data1 = dv.getUint32(i+4,false);
-			data2 = dv.getUint32(i+8,false);
-			data3 = dv.getUint32(i+12,false);
-			
-			mac[0] ^= data0;
-			mac[1] ^= data1;
-			mac[2] ^= data2;
-			mac[3] ^= data3;
+            // get decrypted data from the heap
+            data.set( aes.heap.subarray( 0x1000, 0x1000+j-i ), i );
 
-			mac = aes.encrypt(mac);
-			enc = aes.encrypt(ctr);
-	
-			dv.setUint32(i,data0 ^ enc[0],false);
-			dv.setUint32(i+4,data1 ^ enc[1],false);
-			dv.setUint32(i+8,data2 ^ enc[2],false);
-			dv.setUint32(i+12,data3 ^ enc[3],false);
-		
-			ctr[3]++;
-			if (!ctr[3]) ctr[2]++;
-		}
+            // store mac
+            aes.asm.save_state(0x1000);
+            macs.push( heapView.getUint32( 0x1000, false ) );
+            macs.push( heapView.getUint32( 0x1004, false ) );
+            macs.push( heapView.getUint32( 0x1008, false ) );
+            macs.push( heapView.getUint32( 0x100c, false ) );
 
-		if (i < dv.buffer.byteLength)
-		{
-			var fullbuf = new Uint8Array(dv.buffer);
-			var tmpbuf = new ArrayBuffer(16);
-			var tmparray = new Uint8Array(tmpbuf);
-			
-			tmparray.set(fullbuf.subarray(i));
-			v = new DataView(tmpbuf);
-			enc = aes.encrypt(ctr);
-			
-			data0 = v.getUint32(0,false);
-			data1 = v.getUint32(4,false);
-			data2 = v.getUint32(8,false);
-			data3 = v.getUint32(12,false);
-			
-			mac[0] ^= data0;
-			mac[1] ^= data1;
-			mac[2] ^= data2;
-			mac[3] ^= data3;
-			
-			mac = aes.encrypt(mac);
-			enc = aes.encrypt(ctr);
-			
-			v.setUint32(0,data0 ^ enc[0],false);
-			v.setUint32(4,data1 ^ enc[1],false);
-			v.setUint32(8,data2 ^ enc[2],false);
-			v.setUint32(12,data3 ^ enc[3],false);
-			
-			fullbuf.set(tmparray.subarray(0,fullbuf.length-i),i);
-		}
-
-		macs.push(mac[0],mac[1],mac[2],mac[3]);
+            // adjust counter
+            ctr += Math.ceil( (j-i)/16 );
+	    }
 
 		postMessage(JSON.stringify(macs));
-		postMessage(dv.buffer,[dv.buffer]);
+		postMessage(data.buffer,[data.buffer]);
 	}
 };

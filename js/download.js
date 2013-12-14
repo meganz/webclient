@@ -188,7 +188,7 @@ function dl_dispatch_decryption()
 				
 				dl_workers[id].dl_pos = parseInt(p);
 				dl_workers[id].postMessage(dl_workers[id].dl_pos/16);
-				dl_workers[id].postMessage(dl_cipherq[p].buffer);
+				dl_workers[id].postMessage(dl_cipherq[p].buffer,[dl_cipherq[p].buffer]);
 
 				delete dl_cipherq[p];
 				dl_cipherqlen--;

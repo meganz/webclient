@@ -4055,6 +4055,7 @@ function linksDialog(close)
 		$('.export-links-warning').addClass('hidden');
 		return true;	
 	}
+	
 	$.dialog = 'links';
 	var html = '';	
 	for (var i in M.links)
@@ -4138,13 +4139,16 @@ function linksDialog(close)
 				$('#chromeclipboard').select();
 				document.execCommand('copy');
 			}
-		});
-		$('#clipboardswf1').remove();
-		$('#clipboardswf2').remove();			
+		});		
+		$('#clipboardbtn1').text(l[370]);
+		$('#clipboardbtn2').text(l[1033]);
 	}
 	else
 	{
-		// regular browsers:
+		$('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+	
+		$('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+		
 		$('#clipboardbtn1').unbind('mouseover');
 		$('#clipboardbtn1').bind('mouseover',function()
 		{

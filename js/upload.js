@@ -1,5 +1,3 @@
-
-
 var ul_queue = [];
 var ul_queue_num = 0;
 
@@ -268,7 +266,7 @@ function ul_dispatch_encryption()
 					ul_workers[id] = undefined;
 				}
 
-				ul_workers[id] = new Worker('encrypter.js');
+				ul_workers[id] = new Worker('encrypter.js?v=3');
 				ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 				ul_workers[id].id = id;
 				ul_workers[id].instance = ul_instance;
@@ -301,7 +299,7 @@ function ul_dispatch_encryption()
 
 				ul_workers[id].pos = parseInt(p);
 				ul_workers[id].postMessage(parseInt(p)/16);
-				ul_workers[id].postMessage(ul_plainq[p]);
+				ul_workers[id].postMessage(ul_plainq[p].buffer,[ul_plainq[p].buffer]);
 
 				delete ul_plainq[p];
 

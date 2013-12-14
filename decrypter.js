@@ -1,10 +1,10 @@
 importScripts('sjcl.js');
 
-self.postMessage = self.webkitPostMessage || self.postMessage;
+postMessage = self.webkitPostMessage || self.postMessage;
 
 var aes, ctr;
 
-self.onmessage = function(e)
+onmessage = function(e)
 {
 	if (typeof(e.data) == 'string')
 	{
@@ -19,14 +19,22 @@ self.onmessage = function(e)
 	}
 	else
 	{
-		var enc, mac, i, j, len, v, data0, data1, data2, data3;
-		mac = [ctr[0],ctr[1],ctr[0],ctr[1]];
-		len = e.data.buffer.byteLength-16;
+		var enc, mac, macs = [], i, ni = 0, j, len, v, data0, data1, data2, data3;
+		var b = e.data.buffer || e.data;
+		
+		len = b.byteLength-16;
 
-		var dv = new DataView(e.data.buffer);
+		var dv = new DataView(b);
 
 		for (i = 0; i < len; i += 16)
 		{
+			if (i == ni)
+			{
+				if (i) macs.push(mac[0],mac[1],mac[2],mac[3]);
+				mac = [ctr[0],ctr[1],ctr[0],ctr[1]];
+				ni = i+1048576;
+			}
+			
 			enc = aes.encrypt(ctr);
 
 			data0 = dv.getUint32(i,false)^enc[0];
@@ -83,7 +91,9 @@ self.onmessage = function(e)
 			mac = aes.encrypt(mac);
 		}
 
-		self.postMessage(JSON.stringify(mac));
+		macs.push(mac[0],mac[1],mac[2],mac[3]);
+
+		self.postMessage(JSON.stringify(macs));
 		self.postMessage(dv.buffer);
 	}
 };

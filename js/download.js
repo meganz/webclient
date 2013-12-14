@@ -1,11 +1,8 @@
-
-
 var dl_fs, dl_fw;
 
 var dl_queue = [];
 var dl_queue_num = 0;
 var dl_retryinterval = 1000;
-
 
 var dl_method;
 // 0: Filesystem API (Chrome / Firefox Extension polyfill
@@ -15,10 +12,10 @@ var dl_method;
 // 4: Arraybuffer/Blob Memory Based
 // 5: MediaSource (experimental streaming solution)
 // 6: IndexedDB blob based (Firefox 20+)
-
-
 var blob_urls = [];
 
+// largest chunk size that can be requested
+var dl_maxchunk = 16*1048576;
 
 var dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined');
 var dl_flash_connections = 0;
@@ -80,13 +77,9 @@ var dl_chunklen;
 
 var skipcheck = 0;
 
-
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.OIndexedDB || window.msIndexedDB;
 
-
 var use_idb = false;
-
-
 
 var dl_db;
 
@@ -124,7 +117,7 @@ function dl_dispatch_decryption()
 					delete dl_workers[id];
 				}
 				
-				dl_workers[id] = new Worker('decrypter.js');
+				dl_workers[id] = new Worker('decrypter.js?v=3');
 				dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
 				dl_workers[id].id = id;
 				dl_workers[id].instance = dl_instance;
@@ -135,7 +128,12 @@ function dl_dispatch_decryption()
 					{
 						if (typeof(e.data) == "string")
 						{
-							if (e.data[0] == '[') dl_macs[this.dl_pos] = JSON.parse(e.data);
+							if (e.data[0] == '[')
+							{
+								var t = JSON.parse(e.data), pos = this.dl_pos;
+
+								for (var i = 0; i < t.length; i += 4, pos = pos+1048576) dl_macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+							}
 							else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
 						}
 						else
@@ -190,7 +188,7 @@ function dl_dispatch_decryption()
 				
 				dl_workers[id].dl_pos = parseInt(p);
 				dl_workers[id].postMessage(dl_workers[id].dl_pos/16);
-				dl_workers[id].postMessage(dl_cipherq[p]);
+				dl_workers[id].postMessage(dl_cipherq[p].buffer);
 
 				delete dl_cipherq[p];
 				dl_cipherqlen--;
@@ -314,8 +312,6 @@ function dl_write_block()
 			break;
 			
 		case 3:		// Deprecated Firefox Extension
-			console.log(dl_write_position);
-		
 			ffe_writechunk(ab_to_str(dl_plainq[dl_write_position]),dl_write_position);
 			dl_ack_write();
 			break;
@@ -648,7 +644,8 @@ function dl_setcredentials(g,s,n)
 
 	while (p < dl_filesize)
 	{
-		dl_chunksizes[p] = 1048576;
+		dl_chunksizes[p] = Math.floor((dl_filesize-p)/1048576+1)*1048576;
+		if (dl_chunksizes[p] > dl_maxchunk) dl_chunksizes[p] = dl_maxchunk;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
@@ -659,7 +656,7 @@ function dl_setcredentials(g,s,n)
 		delete dl_chunksizes[pp];
 		delete dl_chunks[dl_chunks.length-1];
 	}
-	
+
 	if (dl_zip)
 	{
 		delete dl_zip.crc32;
@@ -884,9 +881,11 @@ function dl_flashdldata(p,data,httpcode)
 
 function dl_dispatch_read()
 {
-	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+40) return;
+	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+12) return;
+	
 
 	if (!dl_chunks.length) return;
+	
 
 	if (dl_legacy_ie)
 	{
@@ -901,9 +900,12 @@ function dl_dispatch_read()
 	}
 
 	for (var slot = dl_maxSlots; slot--; )
+	{
 		if (dl_pos[slot] == -1) break;
+	}
 
 	if (slot < 0) return;
+	
 
 	dl_pos[slot] = dl_chunks[0];
 	dl_chunks.splice(0,1);
@@ -913,6 +915,7 @@ function dl_dispatch_read()
 
 	dl_xhrs[slot].onprogress = function(e) 
 	{
+		
 		if (this.instance == dl_instance)
 		{
 			dl_lastactive[this.slot] = new Date().getTime();	
@@ -1001,9 +1004,6 @@ var dl_lastprogress = 0;
 
 function dl_updateprogress()
 {
-
-	
-	
 	var p = dl_bytesreceived;
 
 	if (dl_queue[dl_queue_num])

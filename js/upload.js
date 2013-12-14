@@ -1,3 +1,5 @@
+
+
 var ul_queue = [];
 var ul_queue_num = 0;
 
@@ -266,7 +268,7 @@ function ul_dispatch_encryption()
 					ul_workers[id] = undefined;
 				}
 
-				ul_workers[id] = new Worker('encrypter.js?v=3');
+				ul_workers[id] = new Worker('encrypter.js');
 				ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 				ul_workers[id].id = id;
 				ul_workers[id].instance = ul_instance;

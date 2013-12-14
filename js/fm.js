@@ -3036,7 +3036,7 @@ function transferPanelUI()
 		}
 		initTreeScroll();
 		if (M.currentdirid == 'notifications') notificationsScroll();
-		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
+		else if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
 		else initGridScrolling();
         $(window).trigger('resize');

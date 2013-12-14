@@ -93,7 +93,7 @@ onmessage = function(e)
 
 		macs.push(mac[0],mac[1],mac[2],mac[3]);
 
-		self.postMessage(JSON.stringify(macs));
-		self.postMessage(dv.buffer);
+		postMessage(JSON.stringify(macs));
+		postMessage(dv.buffer,[dv.buffer]);
 	}
 };

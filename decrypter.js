@@ -2,7 +2,7 @@ importScripts('asmcrypto.js');
 
 postMessage = self.webkitPostMessage || self.postMessage;
 
-var aes = new asmCrypto.CCM_AES( undefined, { heapSize: 0x101000 } ), // 4 KiB + 1 MiB
+var aes = new asmCrypto.CCM_AES( undefined, { heapSize: 0x104000 } ), // first valid heap size after 0x101000
     nonce = new Uint8Array(8),
     iv  = new Uint8Array(16),
     ctr = 0;

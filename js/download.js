@@ -110,77 +110,80 @@ function dl_dispatch_decryption()
 			{
 				dl_workerbusy[id] = 1;
 
-				if (typeof(dl_workers[id]) == "object")
+/*				if (typeof(dl_workers[id]) == "object")
 				{
 					dl_workers[id].terminate();
 					dl_workers[id] = null;
 					delete dl_workers[id];
-				}
+				}*/
 				
-				dl_workers[id] = new Worker('decrypter.js?v=3');
-				dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
-				dl_workers[id].id = id;
-				dl_workers[id].instance = dl_instance;
-
-				dl_workers[id].onmessage = function(e)
-				{				
-					if (this.instance == dl_instance)
+				if (typeof(dl_workers[id]) != "object")
+				{
+					dl_workers[id] = new Worker('decrypter.js?v=4');
+					dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
+					dl_workers[id].onmessage = function(e)
 					{
-						if (typeof(e.data) == "string")
+						if (this.instance == dl_instance)
 						{
-							if (e.data[0] == '[')
+							if (typeof(e.data) == "string")
 							{
-								var t = JSON.parse(e.data), pos = this.dl_pos;
-
-								for (var i = 0; i < t.length; i += 4, pos = pos+1048576) dl_macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
-							}
-							else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
-						}
-						else
-						{
-							var databuf = new Uint8Array(e.data);
-
-							if (d) console.log("WORKER" + this.id + ": Received " + databuf.length + " decrypted bytes at " + this.dl_pos);
-
-							if (dl_zip && !this.dl_pos)
-							{
-								var prefix = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t).fileHeader;
-								var prefixlen = prefix.length;
-
-								if (dl_zip.suffix)
+								if (e.data[0] == '[')
 								{
-									dl_zip.pos += dl_zip.suffix.length;
+									var t = JSON.parse(e.data), pos = this.dl_pos;
 
-									t = new Uint8Array(dl_zip.suffix.length+prefix.length);
-									
-									t.set(dl_zip.suffix);
-									t.set(prefix,dl_zip.suffix.length);
-									
-									prefix = t;
+									for (var i = 0; i < t.length; i += 4, pos = pos+1048576) dl_macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+								}
+								else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
+							}
+							else
+							{
+								var databuf = new Uint8Array(e.data.buffer || e.data);
+
+								if (d) console.log("WORKER" + this.id + ": Received " + databuf.length + " decrypted bytes at " + this.dl_pos);
+
+								if (dl_zip && !this.dl_pos)
+								{
+									var prefix = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t).fileHeader;
+									var prefixlen = prefix.length;
+
+									if (dl_zip.suffix)
+									{
+										dl_zip.pos += dl_zip.suffix.length;
+
+										t = new Uint8Array(dl_zip.suffix.length+prefix.length);
+										
+										t.set(dl_zip.suffix);
+										t.set(prefix,dl_zip.suffix.length);
+										
+										prefix = t;
+									}
+
+									dl_zip.headerpos = dl_zip.pos;
+
+									dl_zip.pos += prefixlen+dl_queue[dl_queue_num].size;
+
+									var i, t = new Uint8Array(databuf.length+prefix.length);
+
+									t.set(prefix);
+									t.set(databuf,prefix.length);
+
+									dl_chunklen[this.dl_pos] = databuf.length;
+									databuf = t;
 								}
 
-								dl_zip.headerpos = dl_zip.pos;
+								dl_plainq[this.dl_pos] = databuf;
+								dl_plainqlen++;
 
-								dl_zip.pos += prefixlen+dl_queue[dl_queue_num].size;
+								dl_workerbusy[this.id] = 0;
 
-								var i, t = new Uint8Array(databuf.length+prefix.length);
-
-								t.set(prefix);
-								t.set(databuf,prefix.length);
-
-								dl_chunklen[this.dl_pos] = databuf.length;
-								databuf = t;
+								dl_dispatch_chain();
 							}
-
-							dl_plainq[this.dl_pos] = databuf;
-							dl_plainqlen++;
-
-							dl_workerbusy[this.id] = 0;
-
-							dl_dispatch_chain();
 						}
-					}
-				};
+					};
+				}
+	
+				dl_workers[id].id = id;
+				dl_workers[id].instance = dl_instance;
 
 				dl_workers[id].postMessage(dl_keyNonce);
 
@@ -188,7 +191,9 @@ function dl_dispatch_decryption()
 				
 				dl_workers[id].dl_pos = parseInt(p);
 				dl_workers[id].postMessage(dl_workers[id].dl_pos/16);
-				dl_workers[id].postMessage(dl_cipherq[p].buffer,[dl_cipherq[p].buffer]);
+				
+				if (typeof MSBlobBuilder == "function") dl_workers[id].postMessage(dl_cipherq[p]);
+				else dl_workers[id].postMessage(dl_cipherq[p].buffer,[dl_cipherq[p].buffer]);
 
 				delete dl_cipherq[p];
 				dl_cipherqlen--;

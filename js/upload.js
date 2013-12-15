@@ -259,39 +259,43 @@ function ul_dispatch_encryption()
 			{
 				ul_workerbusy[id] = 1;
 
-				if (typeof(ul_workers[id]) == 'object')
+/*				if (typeof(ul_workers[id]) == 'object')
 				{
 					delete ul_workers[id].onmessage;
 					ul_workers[id].terminate();
 					ul_workers[id] = undefined;
+				}*/
+
+				if (typeof(ul_workers[id]) != "object")
+				{
+					ul_workers[id] = new Worker('encrypter.js?v=4');
+					ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
+
+					ul_workers[id].onmessage = function(e)
+					{
+						if (this.instance == ul_instance)
+						{
+							if (typeof(e.data) == 'string')
+							{
+								if (e.data[0] == '[') ul_macs[this.pos] = JSON.parse(e.data);
+								else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
+							}
+							else
+							{
+								if (d) console.log("WORKER" + this.id + ": Received " + e.data.byteLength + " encrypted bytes at " + this.pos);
+
+								ul_sendchunks[this.pos] = new Uint8Array(e.data.buffer || e.data);
+
+								ul_dispatch_chain();
+
+								ul_workerbusy[this.id] = 0;
+							}
+						}
+					};
 				}
 
-				ul_workers[id] = new Worker('encrypter.js?v=3');
-				ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 				ul_workers[id].id = id;
 				ul_workers[id].instance = ul_instance;
-
-				ul_workers[id].onmessage = function(e)
-				{
-					if (this.instance == ul_instance)
-					{
-						if (typeof(e.data) == 'string')
-						{
-							if (e.data[0] == '[') ul_macs[this.pos] = JSON.parse(e.data);
-							else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
-						}
-						else
-						{
-							if (d) console.log("WORKER" + this.id + ": Received " + e.data.byteLength + " encrypted bytes at " + this.pos);
-
-							ul_sendchunks[this.pos] = new Uint8Array(e.data);
-
-							ul_dispatch_chain();
-
-							ul_workerbusy[this.id] = 0;
-						}
-					}
-				};
 
 				ul_workers[id].postMessage(ul_keyNonce);
 
@@ -299,7 +303,9 @@ function ul_dispatch_encryption()
 
 				ul_workers[id].pos = parseInt(p);
 				ul_workers[id].postMessage(parseInt(p)/16);
-				ul_workers[id].postMessage(ul_plainq[p].buffer,[ul_plainq[p].buffer]);
+
+				if (typeof MSBlobBuilder == "function") ul_workers[id].postMessage(ul_plainq[p]);
+				else ul_workers[id].postMessage(ul_plainq[p].buffer,[ul_plainq[p].buffer]);
 
 				delete ul_plainq[p];
 

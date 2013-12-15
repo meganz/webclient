@@ -7,6 +7,10 @@ if (document.location.href.indexOf('preview.mega.co.nz') > -1)
 	localStorage.dd=1;
 }
 
+	localStorage.staticpath = 'http://localhost:8080/';
+	localStorage.dd=1;
+	localStorage.d=1;
+
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
 else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
 
@@ -376,7 +380,7 @@ else
 		jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
 		jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-		jsl.push({f:'js/zip.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},

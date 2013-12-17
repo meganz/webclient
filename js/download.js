@@ -146,7 +146,11 @@ function dl_dispatch_decryption()
 
 							if (dl_zip && !this.dl_pos)
 							{
-								var prefix = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t).fileHeader;
+								var prefix = (new ZIP64).writeHeader(
+                                    dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
+                                    dl_queue[dl_queue_num].size,
+                                    dl_queue[dl_queue_num].t
+                                );
 								var prefixlen = prefix.length;
 
 								if (dl_zip.suffix)

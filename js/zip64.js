@@ -1,17 +1,66 @@
-var ZIPSignature = {
-   LOCAL_FILE_HEADER : 0x504b0304,
-   CENTRAL_FILE_HEADER : 0x504b0102,
-   CENTRAL_DIRECTORY_END : 0x504b0506,
-   ZIP64_CENTRAL_DIRECTORY_LOCATOR : 0x504b0607,
-   ZIP64_CENTRAL_DIRECTORY_END : 0x504b0606,
-   DATA_DESCRIPTOR : 0x504b0708,
-    ZIP64_EXTRA_ID: 0x01,
+/* ezBuffer {{{ */
+/**
+ *  Your best friend when dealing with buffers
+ *
+ *  TODO: Perhaps I should be public
+ */
+function ezBuffer(size) {
+    var obj  = new Uint8Array(size)
+        , buffer = new DataView(obj.buffer)
+        , offset = 0;
+    return {
+        getBytes: function() {
+            return obj;
+        },
+        writeStr: function(text) {
+            if (text instanceof Uint8Array) {
+                text = text.buffer;
+            }
+	            for (var i = text.length; i--; ) obj[offset+i] = text.charCodeAt(i);
+            offset += text.length
+        },
+        i64: function(number, bigendian) {
+            // FIXME: Later I'll fix this, for now
+            // it'll work fine for 32 bits numbers
+            buffer.setInt32(offset, 0, !bigendian);
+            buffer.setInt32(offset+4, number, !bigendian);
+            offset+=8;
+        },
+        i32: function(number, bigendian) {
+            buffer.setInt32(offset, number, !bigendian);
+            offset+=4;
+        },
+        i16: function(number, bigendian) {
+            buffer.setInt16(offset, number, !bigendian);
+            offset+=2;
+        },
+        i8: function(number, bigendian) {
+            buffer.setInt8(offset, number, !bigendian);
+            offset+=1;
+        }, 
+        resize: function (newsize) {
+            var zclass = obj.constructor
+                , zobj = new zclass(newsize)
+            zobj.set(obj, 0);
+            obj = zobj;
+            return obj;
+        },
+        /**
+         *  Check if the current bytestream has enough 
+         *  size to add "size" more bytes. If it doesn't have
+         *  we return a new bytestream object
+         */
+        resizeIfNeeded: function(size) {
+            if (obj.length < (size+offset)) {
+                return this.resize(size+offset);
+            }
+            return obj;
+        }
+    };
+}
+/* }}} */
 
-    //
-    null: null
-};
-
-var ZIP64 = function() {
+var ZIPClass = function() {
     var self = this;
 
     // Constants
@@ -19,63 +68,133 @@ var ZIP64 = function() {
         , noCompression = 0
         , zipVersion = 45
         , defaultFlags = 0x808
-        , isZip64 = true
+        , isZip64 = false
         , i32max = 0xffffffff
+        , i16max = 0xffff
         , zip64ExtraId = 0x0001
+        , directory64LocLen = 20
+        , directory64EndLen = 55
+        , directoryEndLen = 22
+        , fileHeaderSignature      = 0x04034b50
+        , directory64EndSignature  = 0x06064b50
+        , directoryEndSignature    = 0x06054b50
+        , dataDescriptorSignature  = 0x08074b50 // de-facto standard; required by OS X Finder
+        , directoryHeaderSignature = 0x02014b50
+        , dataDescriptorLen = 16
+        , dataDescriptor64Len = 24
+        , directoryHeaderLen = 46
 
-
-
+    /* ZipHeader  {{{ */ 
     /**
-     *  Your best friend when dealing with buffers
-     *
-     *  TODO: Perhaps I should be public
+     *  ZipHeader struct
      */
-    function ezBuffer(obj) {
-        var buffer = new DataView(obj.buffer)
-            , offset = 0;
-        return {
-            writeStr: function(text, offset) {
-	            for (var i = text.length; i--; ) obj[offset+i] = text.charCodeAt(i);
-                offset += text.length
-            },
-            int64: function(number, little) {
-                // FIXME: Later I'll fix this, for now
-                // it'll work fine for 32 bits numbers
-                buffer.setInt32(offset, 0, little);
-                buffer.setInt32(offset+8, number, little);
-                offset+=8;
-            },
-            int32: function(number, little) {
-                buffer.setInt32(offset, number, little);
-                offset+=4;
-            },
-            int16: function(number, little) {
-                buffer.setInt16(offset, number, little);
-                offset+=2;
-            },
-            int8: function(number, little) {
-                buffer.setInt8(offset, number, little);
-                offset+=1;
-            }, 
-            /**
-             *  Check if the current bytestream has enough 
-             *  size to add "size" more bytes. If it doesn't have
-             *  we return a new bytestream object
-             */
-            resizeIfNeeded: function(size) {
-                if (obj.length < (size+offset)) {
-                    var zclass = obj.constructor
-                        , zobj = new zclass(size+offset)
-                    zobj.set(obj, 0);
-                    obj = zobj;
-                }
-                return obj;
+    function ZipHeader() {
+        this.readerVersion = zipVersion;
+        this.Flags    = defaultFlags;
+        this.Method   = noCompression;
+        this.date     = 0
+        this.crc32    = 0;
+        this.size     = 0;
+        this.unsize   = 0;
+        this.file     = ""; 
+        this.extra    = [];
+
+        this.getBytes = function() {
+            var buf = ezBuffer(fileHeaderLen + this.file.length + this.extra.length);
+            buf.i32(fileHeaderSignature)
+            buf.i16(this.readerVersion);
+            buf.i16(this.Flags)
+            buf.i16(this.Method)
+            DosDateTime(this.date, buf)
+            buf.i32(this.crc32); // crc32
+            buf.i32(this.size); // compress size
+            buf.i32(this.unsize); // uncompress size
+            buf.i16(this.file.length);
+            buf.i16(this.extra.length);
+            buf.writeStr(this.file);
+            buf.writeStr(this.extra);
+            return buf.getBytes();
+        }
+    }
+    /** }}} */
+
+    // ZipCentralDirectory {{{
+    function ZipCentralDirectory() {
+        this.creatorVersion = zipVersion;
+        this.readerVersion  = zipVersion;
+        this.Flags          = defaultFlags;
+        this.Method         = noCompression;
+        this.date           = 0;
+        this.crc32          = 0;
+        this.file           = ""
+        this.size           = 0; // compressed size
+        this.unsize         = 0; // uncompressed size
+        this.offset         = 0;
+        this.externalAttr   = 0;
+
+        this.getBytes  = function() {
+            var extra = [];
+            if (isZip64) {
+                var ebuf = ezBuffer(28); // 2xi16 + 3xi64
+                ebuf.i16(zip64ExtraId);
+                ebuf.i16(24);
+                ebuf.i64(this.size);
+                ebuf.i64(this.unsize);
+                ebuf.i64(this.offset);
+                extra = ebuf.getBytes();
             }
+            var buf = ezBuffer(directoryHeaderLen + this.file.length + extra.length);
+            buf.i32(directoryHeaderSignature);
+            buf.i16(this.creatorVersion);
+            buf.i16(this.readerVersion);
+            buf.i16(this.Flags)
+            buf.i16(this.Method)
+            DosDateTime(this.date, buf)
+            buf.i32(this.crc32);
+            buf.i32(isZip64 ? i32max : this.size);
+            buf.i32(isZip64 ? i32max : this.unsize);
+            buf.i16(this.file.length);
+            buf.i16(extra.length);
+            buf.i16(0); // no comments
+            buf.i32(0); // disk number
+            buf.i32(this.externalAttr);
+            buf.i32(isZip64 ? i32max : this.offset);
+            buf.writeStr(this.file);
+            buf.writeStr(extra);
+
+            return buf.getBytes();
+        }
+    }
+    // }}}
+
+    // ZipDataDescriptor {{{
+    function ZipDataDescriptor() {
+        this.crc32   = 0;
+        this.size    = 0;
+        this.unsize  = 0;
+
+        this.getBytes = function() {
+            var buf = ezBuffer(isZip64 ? dataDescriptor64Len : dataDescriptorLen);
+            buf.i32(dataDescriptorSignature);
+            buf.i32(this.crc32);
+            if (isZip64) {
+                buf.i64(this.size);
+                buf.i64(this.unsize);
+            } else {
+                buf.i32(this.size);
+                buf.i32(this.unsize);
+            }
+            return buf.getBytes();
         };
     }
+    // }}}
 
-    function DosTime(sec, buf)
-    {
+    // DosDateTime {{{
+    /**
+     *  Set an unix time (or now if missing) in the zip
+     *  expected format
+     */
+    function DosDateTime(sec, buf) {
         var date = new Date()
             , dosTime
             , dosDate
@@ -96,183 +215,62 @@ var ZIP64 = function() {
         dosDate = dosDate << 5;
         dosDate = dosDate | date.getDate();
 
-        buf.int16(dosTime);
-        buf.int16(dosDate);
+        buf.i16(dosTime);
+        buf.i16(dosDate);
     }
+    // }}}
 
     self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos)
     {
-        var header = new Uint8Array(fileHeaderLen)
-            , buf   = ezBuffer(header)
-            , extra = []
+        var dirRecord = new ZipCentralDirectory();
+        dirRecord.file   = filename;
+        dirRecord.date   = time;
+        dirRecord.size   = size;
+        dirRecord.unsize = size;
+        dirRecord.crc32  = crc32;
+        dirRecord.offset = headerpos;
+        dirRecord.externalAttr = directory ? 1 : 0;
 
-        buf.int32(ZIPSignature.LOCAL_FILE_HEADER);
-        buf.int16(zipVersion); // writer version
-        buf.int16(zipVersion); // reader version
-        buf.int16(defaultFlags);
-        buf.int16(noCompression);
-        DosDate(time, buf);
-        buf.int32(crc32);
-        if (isZip64) {
-            buf.int32(i32max); //compressed size
-            buf.int32(i32max); //uncompressed size
-
-            extra = new Uint8Array(28); // 2xint16 + 3xint64
-            var ebuf  = ezBuffer(extra);
-            extra.int16(zip64ExtraId);
-            extra.int16(24);
-            extra.int64(size);
-            extra.int64(size);
-            extra.int64(offset);
-        } else {
-            buf.int32(size); // compressed
-            buf.int32(size); // uncompressed
-        }
-
-        buf.int16(filename.length);
-        buf.int16(extra.length);
-        buf.int16(0); // No comments
-        buf.int32(0); // External Attr
-
-        if (isZip64) {
-            buf.int32(i32max);
-        } else {
-            buf.int32(offset);
-        }
-
-        // file name
-        header = buf.resizeIfNeeded(filename.length);
-        buf.writeStr(filename, filename.length);
-
-        if (extra.length > 0) {
-            // extra 
-            header = buf.resizeIfNeeded(extra.length);
-            buf.writeString(extra, extra.length);
-        }
-
+        var dataDescriptor = new ZipDataDescriptor();
+        dataDescriptor.crc32    = crc32;
+        dataDescriptor.size     = size;
+        dataDescriptor.unsize   = size;
 
         return {
-            fileHeader: header,
+            dirRecord: dirRecord.getBytes(),
+		    dataDescriptor: dataDescriptor.getBytes()
         };
     }
 
-    self.writeHeader = function(filename, size, time) {
-        var header = new Uint8Array(fileHeaderLen)
-            , buf  = ezBuffer(header);
+    self.writeSuffix = function(pos) {
+    	var dirDatalength=0;	
+    	for (var i in dl_zip.dirData) dirDatalength += dl_zip.dirData[i].length;
+    	
+        var buf = ezBuffer(22);
+        buf.i32(directoryEndSignature)
+        buf.i32(0); // skip
+        buf.i16(dl_zip.dirData.length)
+        buf.i16(dl_zip.dirData.length)
+        buf.i32(dirDatalength);
+    	buf.i32(dl_zip.pos);
+    	
+    	return buf.getBytes();
+    };
 
-        buf.int32(ZIPSignature.LOCAL_FILE_HEADER); // Signature
-        buf.int16(zipVersion); // Reader version
-        buf.int16(defaultFlags); // Flags
-        buf.int16(noCompression); // Compression method
-        DosTime(time, buf); // Time
-        buf.int32(0); // No crc32
-        buf.int32(0); // No compress size
-        buf.int32(0); // No size
-        buf.int16(filename.length);
-        buf.int16(0); // No extra
-
-        // Add filename
-        header = buf.resizeIfNeeded(filename.length);
-        buf.writeStr(filename, filename.length);
-
-        // Return the header, never its buffer
-        return header;
+    self.writeHeader = function(filename, size, date) {
+        var header = new ZipHeader();
+        header.file = filename;
+        header.size = size;
+        header.date = date;
+        return header.getBytes();
     }
 }
 
-
-
-function ZIPheader(filename,filesize,filetime,crc32,directory,headerpos)
-{
-	var dosTime, dosDate, fileDate;
-
-	filename = to8(filename);
-	
-	if (!filetime) fileDate = new Date();
-	else fileDate = new Date(filetime*1000);
-	
-    dosTime = fileDate.getHours();
-    dosTime = dosTime << 6;
-    dosTime = dosTime | fileDate.getMinutes();
-    dosTime = dosTime << 5;
-    dosTime = dosTime | fileDate.getSeconds() / 2;
-
-    dosDate = fileDate.getFullYear()-1980;
-    dosDate = dosDate << 4;
-    dosDate = dosDate | (fileDate.getMonth() + 1);
-    dosDate = dosDate << 5;
-    dosDate = dosDate | fileDate.getDate();
-
-	var header = new Uint8Array(26);
-	var descriptor = new Uint8Array(12);
-	
-	var vheader = new DataView(header.buffer);
-	var vdescriptor = new DataView(descriptor.buffer);
-	
-	vheader.setInt16(0,10,true);
-	vheader.setInt16(2,0x808);
-	vheader.setInt16(4,0);
-
-	vheader.setInt16(6,dosTime,true);
-	vheader.setInt16(8,dosDate,true);
-
-	vdescriptor.setInt32(0, crc32 ? crc32 : 0,true);
-	vdescriptor.setInt32(4, crc32 ? UINT32MAX : 0);
-	vdescriptor.setInt32(8, crc32 ? UINT32MAX : 0);
-
-	header.set(descriptor,10);
-
-	vheader.setInt16(22,filename.length,true);
-
-    // we store more data in the extra field
-    var EXTRA_LEN = 24;
-    var extra  = new Uint8Array(EXTRA_LEN);
-    var vextra = new DataView(extra.buffer);
-    if (crc32) {
-	    vheader.setInt16(24, EXTRA_LEN); // Extra-field size
-        vextra.setInt16(0, ZIPSignature.ZIP64_EXTRA_ID); // Tag
-        vextra.setInt16(2, 24); // Size of the extra field?
-        vextra.setInt32(6, filesize);
-        vextra.setInt32(10, filesize);
-        vextra.setInt16(12, 0x0); // Disk start number?
-    }
-
-    // add bytes to store extra info
-	var fileHeader = new Uint8Array(header.length+filename.length+4 + EXTRA_LEN);
-
-	new DataView(fileHeader.buffer).setInt32(0, ZIPSignature.LOCAL_FILE_HEADER, false);
-	fileHeader.set(header, ZIPVERSION);
-    // add filename
-	putString(fileHeader, filename, header.length+4);
-    if (crc32) {
-        // Add extra field
-        fileHeader.set(extra, header.length+4 + filename.length);
-    }
-	
-    // ZIP64: +8 bytes for descriptor
-	var dataDescriptor = new Uint8Array(descriptor.length+ 4 + 8);
-	var vd = new DataView(dataDescriptor.buffer)
-    vd.setInt32(0, ZIPSignature.DATA_DESCRIPTOR);
-    vd.setInt32(8, crc32);
-    alert(crc32);
-
-	var dirRecord = new Uint8Array(header.length+filename.length+20);
-	
-	var vdirRecord = new DataView(dirRecord.buffer);
-	
-	vdirRecord.setInt32(0,ZIPSignature.CENTRAL_FILE_HEADER,false);
-	vdirRecord.setInt16(4,20,true);
-	dirRecord.set(header,6);
-	vdirRecord.setInt32(36,directory ? 1 : 0,true);
-	vdirRecord.setInt32(42,headerpos,true);
-	putString(dirRecord,filename,46);
-		
-	return {
-		fileHeader: fileHeader,
-		dataDescriptor: dataDescriptor,
-		dirRecord: dirRecord
-	};
-}
+// TODO: 
+// This is wrong in so many levels, we're using 
+// the class as a singleton. Basically, when download
+// is rewritten it should be better integrated with it
+var ZIP = new ZIPClass;
 
 function ZIPfolders(zipid,headerpos)
 {
@@ -288,7 +286,7 @@ function ZIPfolders(zipid,headerpos)
 			{
 				zpaths[dl_queue[i].p]=1;
 				
-				t = ZIPheader(dl_queue[i].p,0,false,false,true,headerpos);
+                t = ZIP.writeCentralDir(dl_queue[i].p,0,false,false,true,headerpos);
 				re.push(t);
 				l += t.fileHeader.length+t.dataDescriptor.length;
 				headerpos += t.fileHeader.length+t.dataDescriptor.length;
@@ -310,28 +308,7 @@ function ZIPfolders(zipid,headerpos)
 	return re;
 }
 
-function ZIPsuffix(pos)
-{
-	var dirDatalengh=0;	
-	for (var i in dl_zip.dirData) dirDatalengh += dl_zip.dirData[i].length;
-	
-	var zipEnd = new Uint8Array(22);
-	var vzipEnd = new DataView(zipEnd.buffer);
-	
-	vzipEnd.setInt32(0,ZIPSignature.ZIP64_CENTRAL_DIRECTORY_END,false);
-	vzipEnd.setInt16(8,dl_zip.dirData.length,true);
-	vzipEnd.setInt16(10,dl_zip.dirData.length,true);
-	vzipEnd.setInt32(12,dirDatalengh,true);
-	vzipEnd.setInt32(16,dl_zip.pos,true);
-	
-	return zipEnd;
-}
-
-function putString(t,s,o)
-{
-	for (var i = s.length; i--; ) t[o+i] = s.charCodeAt(i);
-}
-
+// crc32 {{{
 var crc32table = [
 	0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
 	0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -422,3 +399,4 @@ function crc32(data, crc, len)
 
 	return crc ^ -1;
 }
+// }}}

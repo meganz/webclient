@@ -146,7 +146,7 @@ function dl_dispatch_decryption()
 
 							if (dl_zip && !this.dl_pos)
 							{
-								var prefix = (new ZIP64).writeHeader(
+								var prefix = ZIP.writeHeader(
                                     dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
                                     dl_queue[dl_queue_num].size,
                                     dl_queue[dl_queue_num].t
@@ -436,7 +436,7 @@ function dl_next()
 			dl_zip.pos += t[0].length; //+t[1].length;
 
 			for (i = 0; i < dl_zip.dirData.length; i++) t.push(dl_zip.dirData[i]);
-			t.push(ZIPsuffix(p));
+			t.push(ZIP.writeSuffix(p));
 
 			var l = 0;
 			for (i = t.length; i--; ) l += t[i].length;
@@ -745,7 +745,7 @@ function dl_checklostchunk()
 			if (!dl_zip) dl_complete();
 			else
 			{
-				t = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t,dl_zip.crc32,false,dl_zip.headerpos);
+				t = ZIP.writeCentralDir(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t,dl_zip.crc32,false,dl_zip.headerpos);
 				dl_zip.suffix = t.dataDescriptor;
 				dl_zip.dirData.push(t.dirRecord);
 				dl_queue[dl_queue_num].complete = true;

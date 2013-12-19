@@ -15,7 +15,7 @@ function ezBuffer(size) {
         getBytes: function() {
             return obj;
         },
-        writeStr: function(text) {
+        appendBytes: function(text) {
             var isArray = typeof text != "string";
             for (var i = text.length; i--; ) {
                 if (isArray) {
@@ -39,7 +39,7 @@ function ezBuffer(size) {
                 buffer = nbuffer;
             }
             // append the buffer
-            this.writeStr(buffer);
+            this.appendBytes(buffer);
         },
         i32: function(number, bigendian) {
             buffer.setInt32(offset, number, !bigendian);
@@ -127,8 +127,8 @@ var ZIPClass = function(isZip64) {
             buf.i32(this.unsize); // uncompress size
             buf.i16(this.file.length);
             buf.i16(this.extra.length);
-            buf.writeStr(this.file);
-            buf.writeStr(this.extra);
+            buf.appendBytes(this.file);
+            buf.appendBytes(this.extra);
             return buf.getBytes();
         }
     }
@@ -175,8 +175,8 @@ var ZIPClass = function(isZip64) {
             buf.i32(0); // disk number
             buf.i32(this.externalAttr);
             buf.i32(isZip64 ? i32max : this.offset);
-            buf.writeStr(this.file);
-            buf.writeStr(extra);
+            buf.appendBytes(this.file);
+            buf.appendBytes(extra);
 
             return buf.getBytes();
         }
@@ -281,7 +281,7 @@ var ZIPClass = function(isZip64) {
             xbuf.i64(pos)
             xbuf.i32(1) // total number of disks
             buf.resize(22 + xbuf.getBytes().length)
-            buf.writeStr(xbuf.getBytes());
+            buf.appendBytes(xbuf.getBytes());
         }
         
         buf.i32(directoryEndSignature)

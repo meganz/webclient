@@ -20,11 +20,17 @@ function ezBuffer(size) {
             offset += text.length
         },
         i64: function(number, bigendian) {
-            // FIXME: Later I'll fix this, for now
-            // it'll work fine for 32 bits numbers
-            buffer.setInt32(offset, 0, !bigendian);
-            buffer.setInt32(offset+4, number, !bigendian);
-            offset+=8;
+            var buffer = new Int64(number).buffer
+            if (!bigendian) {
+                // swap the by orders
+                var nbuffer = new Uint8Array
+                for (var i = 0; i < buffer.length;i++) {
+                    nbuffer[i] = buffer[buffer.length-1]
+                }
+                buffer = nbuffer;
+            }
+            // append the buffer
+            this.writeStr(buffer);
         },
         i32: function(number, bigendian) {
             buffer.setInt32(offset, number, !bigendian);
@@ -60,7 +66,7 @@ function ezBuffer(size) {
 }
 /* }}} */
 
-var ZIPClass = function() {
+var ZIPClass = function(isZip64) {
     var self = this;
 
     // Constants
@@ -68,7 +74,6 @@ var ZIPClass = function() {
         , noCompression = 0
         , zipVersion = 45
         , defaultFlags = 0x808
-        , isZip64 = false
         , i32max = 0xffffffff
         , i16max = 0xffff
         , zip64ExtraId = 0x0001
@@ -80,6 +85,7 @@ var ZIPClass = function() {
         , directoryEndSignature    = 0x06054b50
         , dataDescriptorSignature  = 0x08074b50 // de-facto standard; required by OS X Finder
         , directoryHeaderSignature = 0x02014b50
+        , directory64LocSignature  = 0x07064b50
         , dataDescriptorLen = 16
         , dataDescriptor64Len = 24
         , directoryHeaderLen = 46
@@ -245,14 +251,35 @@ var ZIPClass = function() {
     self.writeSuffix = function(pos) {
         var dirDatalength=0;    
         for (var i in dl_zip.dirData) dirDatalength += dl_zip.dirData[i].length;
-        
+
         var buf = ezBuffer(22);
+        if (isZip64) {
+            var xbuf = new ezBuffer(directory64EndLen + directory64LocLen)
+            xbuf.i32(directory64EndSignature)
+            xbuf.i32(directory64EndLen)
+            xbuf.i16(zipVersion)
+            xbuf.i16(zipVersion)
+            xbuf.i32(0) // disk number
+            xbuf.i32(0) // number of the disk with the start of the central directory
+            xbuf.i64(dl_zip.dirData.length)
+            xbuf.i64(dl_zip.dirData.length)
+            xbuf.i64(dirDatalength);
+            xbuf.i64(dl_zip.pos);
+
+            xbuf.i32(directory64LocSignature)
+            xbuf.i32(0)
+            xbuf.i64(pos)
+            xbuf.i32(1) // total number of disks
+            buf.resize( 22 + directory64EndLen + directory64LocLen)
+            buf.writeStr(xbuf.getBytes());
+        }
+        
         buf.i32(directoryEndSignature)
         buf.i32(0); // skip
-        buf.i16(dl_zip.dirData.length)
-        buf.i16(dl_zip.dirData.length)
-        buf.i32(dirDatalength);
-        buf.i32(dl_zip.pos);
+        buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
+        buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
+        buf.i32(isZip64 ? i32max : dirDatalength);
+        buf.i32(isZip64 ? i32max : dl_zip.pos);
         
         return buf.getBytes();
     };
@@ -270,7 +297,7 @@ var ZIPClass = function() {
 // This is wrong in so many levels, we're using 
 // the class as a singleton. Basically, when download
 // is rewritten it should be better integrated with it
-var ZIP = new ZIPClass;
+var ZIP = new ZIPClass(true);
 
 function ZIPfolders(zipid,headerpos)
 {

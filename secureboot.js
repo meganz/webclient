@@ -380,6 +380,7 @@ else
 		jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
 		jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
+		jsl.push({f:'js/contrib/Int64.js', n: 'zip_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
 		var jsl2 =
 		{

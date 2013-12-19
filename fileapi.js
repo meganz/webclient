@@ -425,6 +425,9 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							},
 							seek : function(p) {
 								File.fs.seek(0,p);
+							},
+							close : function() {
+								mozCloseStream(File.fs);
 							}
 						};
 

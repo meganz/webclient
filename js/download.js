@@ -1038,10 +1038,15 @@ function dl_cancel()
 {
 	dl_settimer(-1);
 	dl_instance++;
+	downloading = dl_writing = dl_zip = false;
+
+	for (var slot = dl_maxSlots; slot--; dl_xhrs[slot].abort());
 	dl_xhrs = dl_pos = dl_workers = dl_progress = dl_cipherq = dl_plainq = dl_progress = dl_chunks = dl_chunksizes = undefined;
-	downloading = false;
-	dl_writing = false;
-	dl_zip = false;
+
+	if(is_chrome_firefox)
+	{
+		dl_fw.close();
+	}
 }
 
 var fs_instance;

@@ -23,9 +23,10 @@ function ezBuffer(size) {
             var buffer = new Int64(number).buffer
             if (!bigendian) {
                 // swap the by orders
-                var nbuffer = new Uint8Array
-                for (var i = 0; i < buffer.length;i++) {
-                    nbuffer[i] = buffer[buffer.length-1]
+                var nbuffer = new Uint8Array(buffer.length)
+                    , len = buffer.length-1
+                for (var i = len; i >= 0; i--) {
+                    nbuffer[i] = buffer[len-i]
                 }
                 buffer = nbuffer;
             }

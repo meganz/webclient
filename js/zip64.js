@@ -309,42 +309,6 @@ var ZIPClass = function(isZip64) {
 // is rewritten it should be better integrated with it
 var ZIP = new ZIPClass(true);
 
-function ZIPfolders(zipid,headerpos)
-{
-    var zpaths = [];        
-    var re = [];
-    var l = 0;
-
-    for (var i in dl_queue)
-    {
-        if (dl_queue[i].zipid == zipid)
-        {
-            if ((dl_queue[i].p.length > 0) && (!zpaths[dl_queue[i].p]))
-            {
-                zpaths[dl_queue[i].p]=1;
-                
-                t = ZIP.writeCentralDir(dl_queue[i].p,0,false,false,true,headerpos);
-                re.push(t);
-                l += t.fileHeader.length+t.dataDescriptor.length;
-                headerpos += t.fileHeader.length+t.dataDescriptor.length;
-                dl_zip.dirData.push(t.dirRecord);
-            }
-        }
-    }
-    
-    var reb = new Uint8Array(l);
-    
-    l = 0;
-    
-    for (var i = 0; i < re.length; i++)
-    {
-        reb.set(re[i],l);
-        l += re[i].length;
-    }
-    
-    return re;
-}
-
 // crc32 {{{
 var crc32table = [
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,

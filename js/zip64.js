@@ -9,14 +9,22 @@ function ezBuffer(size) {
         , buffer = new DataView(obj.buffer)
         , offset = 0;
     return {
+        debug: function() {
+            console.log(["DEBUG", offset, obj.length]);
+        },
         getBytes: function() {
             return obj;
         },
         writeStr: function(text) {
-            if (text instanceof Uint8Array) {
-                text = text.buffer;
+            var isArray = typeof text != "string";
+            for (var i = text.length; i--; ) {
+                if (isArray) {
+                    obj[offset+i] = text[i];
+                } else {
+                    // We assume it is an string
+                    obj[offset+i] = text.charCodeAt(i);
+                }
             }
-            for (var i = text.length; i--; ) obj[offset+i] = text.charCodeAt(i);
             offset += text.length
         },
         i64: function(number, bigendian) {
@@ -50,6 +58,7 @@ function ezBuffer(size) {
                 , zobj = new zclass(newsize)
             zobj.set(obj, 0);
             obj = zobj;
+            buffer = new DataView(obj.buffer)
             return obj;
         },
         /**
@@ -79,7 +88,7 @@ var ZIPClass = function(isZip64) {
         , i16max = 0xffff
         , zip64ExtraId = 0x0001
         , directory64LocLen = 20
-        , directory64EndLen = 55
+        , directory64EndLen = 56
         , directoryEndLen = 22
         , fileHeaderSignature      = 0x04034b50
         , directory64EndSignature  = 0x06064b50
@@ -257,7 +266,7 @@ var ZIPClass = function(isZip64) {
         if (isZip64) {
             var xbuf = new ezBuffer(directory64EndLen + directory64LocLen)
             xbuf.i32(directory64EndSignature)
-            xbuf.i32(directory64EndLen)
+            xbuf.i64(directory64EndLen)
             xbuf.i16(zipVersion)
             xbuf.i16(zipVersion)
             xbuf.i32(0) // disk number
@@ -271,7 +280,7 @@ var ZIPClass = function(isZip64) {
             xbuf.i32(0)
             xbuf.i64(pos)
             xbuf.i32(1) // total number of disks
-            buf.resize( 22 + directory64EndLen + directory64LocLen)
+            buf.resize(22 + xbuf.getBytes().length)
             buf.writeStr(xbuf.getBytes());
         }
         

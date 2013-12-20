@@ -346,6 +346,7 @@ else
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
+		jsl.push({f:'js/stacktrace.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});

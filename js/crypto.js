@@ -2215,3 +2215,13 @@ function crypto_share_rsa2aes()
 		rsasharekeys = {};
 	}
 }
+
+/*
+window.onerror = function(e,e1,e2,e3) 
+{
+    
+}
+dada();
+*/
+
+

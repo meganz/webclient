@@ -2,7 +2,7 @@ importScripts('aesasm.js');
 
 postMessage = self.webkitPostMessage || self.postMessage;
 
-var heap = new Uint8Array(0x104000), // first valid heap size after 0x101000
+var heap = new Uint8Array(0x200000), // first valid heap size after 0x101000
     asm = aesasm(heap),
     nonce = new Uint8Array(8),
     iv  = new Uint8Array(16),

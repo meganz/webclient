@@ -2812,6 +2812,7 @@ function selectddUI()
     selectionManager = new SelectionManager(
         $('.file-block-scrolling')
     );
+	
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function (e) 

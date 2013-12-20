@@ -119,7 +119,7 @@ function dl_dispatch_decryption()
 				
 				if (typeof(dl_workers[id]) != "object")
 				{
-					dl_workers[id] = new Worker('decrypter.js?v=4');
+					dl_workers[id] = new Worker('decrypter.js?v=5');
 					dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
 					dl_workers[id].onmessage = function(e)
 					{
@@ -887,10 +887,8 @@ function dl_flashdldata(p,data,httpcode)
 function dl_dispatch_read()
 {
 	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+12) return;
-	
 
 	if (!dl_chunks.length) return;
-	
 
 	if (dl_legacy_ie)
 	{
@@ -910,7 +908,6 @@ function dl_dispatch_read()
 	}
 
 	if (slot < 0) return;
-	
 
 	dl_pos[slot] = dl_chunks[0];
 	dl_chunks.splice(0,1);
@@ -920,7 +917,6 @@ function dl_dispatch_read()
 
 	dl_xhrs[slot].onprogress = function(e) 
 	{
-		
 		if (this.instance == dl_instance)
 		{
 			dl_lastactive[this.slot] = new Date().getTime();	
@@ -943,18 +939,25 @@ function dl_dispatch_read()
 			
 			if (this.readyState == this.DONE)
 			{
+				if (navigator.appName != 'Opera') dl_progress[this.slot] = 0;
+				dl_updateprogress();
+
 				if (dl_pos[this.slot] >= 0)
 				{
-					if (this.response != null)
+					var r = this.response;
+
+					if (r != null && dl_pos[this.slot] >= 0 && r.byteLength == dl_chunksizes[dl_pos[this.slot]])
 					{
+						dl_settimer(-1);
+
 						var p = dl_pos[this.slot];
 
 						if (have_ab)
 						{
 							if (p >= 0)
 							{
-								if (navigator.appName != 'Opera') dl_bytesreceived += this.response.byteLength;
-								dl_cipherq[p] = new Uint8Array(this.response);
+								if (navigator.appName != 'Opera') dl_bytesreceived += r.byteLength;
+								dl_cipherq[p] = new Uint8Array(r);
 							}
 						}
 						else
@@ -968,19 +971,20 @@ function dl_dispatch_read()
 						}
 
 						dl_cipherqlen++;
-						if (navigator.appName != 'Opera') dl_progress[this.slot] = 0;
-						dl_updateprogress();
 
 						dl_pos[this.slot] = -1;	
 						dl_dispatch_chain();
 					}
 					else
 					{
+						if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
+						
 						if (dl_pos[this.slot] != -1)
 						{
 							dl_chunks.unshift(dl_pos[this.slot]);
 							dl_pos[this.slot] = -1;	
 							dl_httperror(this.status);
+							dl_dispatch_chain();
 						}
 					}
 				}

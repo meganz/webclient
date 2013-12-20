@@ -505,12 +505,12 @@ function ul_completepending(target)
 
 		var ctx = {
 			target : target,
-			ul_queue_num : ul[5],
+			ul_queue_num : ul[3],
 			callback : ul_completepending2,
-			faid : ul[6]
+			faid : ul[1].faid
 		};
 
-		api_completeupload(ul[0],ul[1],ul[2],ul[3],ul[4],ul[6],ctx);
+		api_completeupload(ul[0],ul[1],ul[2],ctx);
 	}
 	else ul_completing = false;
 }
@@ -605,9 +605,9 @@ function ul_chunkcomplete(slot,pos,response)
 				};
 
 				ul_completing = true;
-				api_completeupload(response,ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path,ul_queue[ul_queue_num].name,filekey,ul_queue[ul_queue_num].faid,ctx);
+				api_completeupload(response,ul_queue[ul_queue_num],filekey,ctx);
 			}
-			else ul_completion.push([response,ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path,ul_queue[ul_queue_num].name,filekey,ul_queue_num,ul_queue[ul_queue_num].faid]);
+			else ul_completion.push([response,ul_queue[ul_queue_num],filekey,ul_queue_num]);
 
 			ul_queue_num++;
 

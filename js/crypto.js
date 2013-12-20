@@ -1538,11 +1538,36 @@ function crypto_rsadecrypt(ciphertext,privk)
 // Complete upload
 // We construct a special node put command that uses the upload token
 // as the source handle
-function api_completeupload(t,ut,path,n,k,faid,ctx)
+function api_completeupload(t,uq,k,ctx)
 {
-	ctx2 = { callback : api_completeupload2, t : base64urlencode(t), path : path, n : n, k : k, fa : api_getfa(faid), ctx : ctx };
+	ctx2 = { callback : api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx };
 
-	api_completeupload2(ctx2,ut);
+	api_genfingerprint(uq,ctx2);
+}
+
+function api_genfingerprint(uq,ctx)
+{
+	var finish = function(hash)
+	{
+		ctx.hash = hash;
+		ctx.callback(ctx,uq.target);
+		
+		if(is_chrome_firefox && uq._close)
+		{
+			// Close nsIFile Stream
+			uq._close();
+		}
+	};
+	
+	try
+	{
+		fingerprint(uq,finish);
+	}
+	catch(e)
+	{
+		console.log('api_genfingerprint', e);
+		finish();
+	}
 }
 
 function api_completeupload2(ctx,ut)
@@ -1560,6 +1585,11 @@ function api_completeupload2(ctx,ut)
 	else
 	{
 		a = { n : ctx.n };
+
+		if(ctx.hash)
+		{
+			a.c = ctx.hash;
+		}
 
 		if (d) console.log(ctx.k);
 
@@ -2216,12 +2246,115 @@ function crypto_share_rsa2aes()
 	}
 }
 
-/*
-window.onerror = function(e,e1,e2,e3) 
-{
-    
-}
-dada();
-*/
 
 
+(function __FileFingerprint(scope) {
+	
+	var CRC_SIZE   = 32;
+	var BLOCK_SIZE = CRC_SIZE*4;
+	var SCRC_SIZE  = CRC_SIZE*CRC_SIZE;
+	
+	function i2s(i)
+	{
+		return String.fromCharCode.call(String,
+			i       & 0xff,
+			i >>  8 & 0xff,
+			i >> 16 & 0xff,
+			i >> 24 & 0xff);
+	}
+	
+	function serialize(v)
+	{
+		var p = 0, b = [];
+		v = parseInt(v);
+		while (v)
+		{
+			b[++p] = String.fromCharCode(v & 0xff);
+			v >>= 8;
+		}
+		b[0] = String.fromCharCode(p);
+		return b.join("");
+	}
+	
+	scope.fingerprint = function(uq_entry,callback)
+	{
+		var fr = new FileReader();
+		var size = uq_entry.size;
+		
+		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+		
+		function Finish(crc)
+		{
+			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),uq_entry);
+		}
+		
+		var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice':'webkitSlice');
+		
+		if(size <= SCRC_SIZE)
+		{
+			var blob = uq_entry[sfn](0,size <= CRC_SIZE ? size : SCRC_SIZE);
+			
+			fr.onload = function(e)
+			{
+				var crc;
+				var data = e.target.result;
+				
+				if(size <= CRC_SIZE)
+				{
+					crc = data;
+					var i = CRC_SIZE - crc.length;
+					while(i--)
+						crc += "\x00";
+				}
+				else
+				{
+					crc = [];
+					for (var i = 0 ; i < CRC_SIZE ; i++)
+					{
+						crc.push(data[i*(size-1)/(CRC_SIZE-1)]);
+					}
+					crc = crc.join("");
+				}
+				
+				Finish(crc);
+			};
+			fr.readAsBinaryString(blob);
+		}
+		else
+		{
+			var tmp = [], i = 0, m = CRC_SIZE / 4;
+			var blocks = parseInt(size/SCRC_SIZE);
+			if(blocks > 32) blocks = 32;
+			
+			var step = function()
+			{
+				if(m == i)
+				{
+					return Finish(tmp.join(""));
+				}
+				
+				var offset = parseInt((size-BLOCK_SIZE)*(i*blocks)/(CRC_SIZE/4*blocks-1));
+				var blob = uq_entry[sfn](offset,offset+(blocks*BLOCK_SIZE));
+				
+				fr.onload = function(e)
+				{
+					var crc = 0;
+					var data = e.target.result;
+					
+					for( var j = 0 ; j < blocks ; ++j )
+					{
+						var block = data.substr(j*BLOCK_SIZE,BLOCK_SIZE);
+						
+						// console.log(toHexString(block));
+						crc = crc32(block,crc,BLOCK_SIZE);
+					}
+					
+					tmp.push(i2s(crc));
+					step(++i);
+				};
+				fr.readAsBinaryString(blob);
+			};
+			step();
+		}	
+	};
+})(this);

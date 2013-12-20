@@ -145,7 +145,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			type : type || '',
 			lastModifiedDate : aFile.lastModifiedTime,
 
-			u8: function(aStart,aBytes,aKeepOpen)
+			u8: function(aStart,aBytes)
 			{
 				var nsIFileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
 					.createInstance(Ci.nsIFileInputStream);
@@ -156,26 +156,33 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					.createInstance(Ci.nsIBinaryInputStream);
 				nsIBinaryInputStream.setInputStream(nsIFileInputStream);
 
-				this.u8 = function(aStart,aBytes,aKeepOpen)
+				this.u8 = function(aStart,aBytes)
 				{
 					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
 
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
-					if(aBytes+aStart == aFile.fileSize && !aKeepOpen)
-					{
-						nsIFileInputStream.close();
-					}
 					return new Uint8Array(data);
 				};
+				this._close = function()
+				{
+					mozCloseStream(nsIFileInputStream);
+				};
 
-				return this.u8(aStart,aBytes,aKeepOpen);
+				return this.u8(aStart,aBytes);
 			},
-			blob: function()
+			blob: function(aStart,aBytes)
 			{
-				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type);
+				aStart = aStart || 0;
+				aBytes = aBytes || this.size;
 
-				return new Blob([this.u8(0,this.size,1)], { type : this.type || 'application/octet-stream'});
+				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type, aStart,aBytes);
+
+				return new Blob([this.u8(aStart,aBytes)], { type : this.type || 'application/octet-stream'});
+			},
+			slice: function(aStart,aEnd)
+			{
+				return this.blob(aStart,aEnd-aStart);
 			}
 		});
 	};
@@ -425,6 +432,9 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							},
 							seek : function(p) {
 								File.fs.seek(0,p);
+							},
+							close : function() {
+								mozCloseStream(File.fs);
 							}
 						};
 

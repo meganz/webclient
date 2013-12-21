@@ -726,7 +726,7 @@ function MegaData ()
 			if (n.sk) n.p = n.u;
 			else if (n.su) n.p = n.su;
 		}
-		if (n.p.length == 11 && !M.d[n.p])
+		if (n.p && n.p.length == 11 && !M.d[n.p])
 		{
 			var u = this.u[n.p];
 			if (u)
@@ -966,7 +966,7 @@ function MegaData ()
 			});
 			if (M.d[h] && M.d[h].p)
 			{
-				this.delIndex(M.d[h].p,h);
+				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];				
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
 				removeUInode(h);
@@ -1364,8 +1364,6 @@ function MegaData ()
 		if (!$.totalDL) $.totalDL=0;
 		for (var i in nodes)
 		{
-			console.log('paths',paths);
-			
 			n = M.d[nodes[i]];
 			if (paths[nodes[i]]) path = paths[nodes[i]];
 			else path ='';
@@ -1397,7 +1395,7 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '></span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 			}
 		}
 

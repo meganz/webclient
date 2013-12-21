@@ -1001,7 +1001,7 @@ function fmtopUI()
 	{
 		$('.fm-new-folder').removeClass('hidden');
 		$('.fm-file-upload').removeClass('hidden');		
-		if ('webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
 		else $('.fm-file-upload').addClass('last-button');		
 	}	
 	$('.fm-clearbin-button').unbind('click');
@@ -2812,6 +2812,7 @@ function selectddUI()
     selectionManager = new SelectionManager(
         $('.file-block-scrolling')
     );
+	
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function (e) 
@@ -3036,7 +3037,7 @@ function transferPanelUI()
 		}
 		initTreeScroll();
 		if (M.currentdirid == 'notifications') notificationsScroll();
-		else if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
+		else if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		else if (M.viewmode == 1) initFileblocksScrolling();
 		else initGridScrolling();
         $(window).trigger('resize');
@@ -3844,11 +3845,9 @@ function mcDialog(close)
 		$('.move-dialog #mainsub').html('');
 		return true;	
 	}
-	
-	
+	$.mcselected = M.RootID;	
 	var jsp = $('.fm-move-dialog-body').data('jsp');
-	if (jsp) jsp.scrollTo(0,0,false);
-	
+	if (jsp) jsp.scrollTo(0,0,false);	
 	if ($.selected.length > 0)
 	{
 		$.dialog = 'mc';		
@@ -3897,7 +3896,7 @@ function mcDialog(close)
 				M.buildtree(M.d[$.mcselected]);			
 				var html = $('#treesub_'+$.mcselected).html();
 				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
-				$.mctreeUI();				
+				$.mctreeUI();
 				var c = $(this).attr('class');
 				if (c.indexOf('contains-folders') > -1)
 				{
@@ -3983,7 +3982,7 @@ function mcDialog(close)
 			}
 			else if ($.mctype.substr(0,4) == 'copy')
 			{
-				if ($.mctype == 'copy-contacts' && t.length == '8')
+				if ($.mctype == 'copy-contacts' && t.length == 8)
 				{
 					if (RightsbyID(t) == 0) 
 					{
@@ -4057,6 +4056,7 @@ function linksDialog(close)
 		$('.export-links-warning').addClass('hidden');
 		return true;	
 	}
+	
 	$.dialog = 'links';
 	var html = '';	
 	for (var i in M.links)
@@ -4140,13 +4140,16 @@ function linksDialog(close)
 				$('#chromeclipboard').select();
 				document.execCommand('copy');
 			}
-		});
-		$('#clipboardswf1').remove();
-		$('#clipboardswf2').remove();			
+		});		
+		$('#clipboardbtn1').text(l[370]);
+		$('#clipboardbtn2').text(l[1033]);
 	}
 	else
 	{
-		// regular browsers:
+		$('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+	
+		$('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+		
 		$('#clipboardbtn1').unbind('mouseover');
 		$('#clipboardbtn1').bind('mouseover',function()
 		{

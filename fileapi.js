@@ -29,10 +29,12 @@ var mozOnSavingDownload = function(file,callback,ask) {
 	callback(options);
 };
 
-function mozFilePicker(f,m) {
+function mozFilePicker(f,m,o) {
+	o = o || {};
+	var title = o.title || (m === 2 ? 'Select Folder':'Save File As');
 	var nsIFilePicker = Ci.nsIFilePicker,
 		fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	fp.init(window,'MEGA :: ' + (m === 2 ? 'Select Folder':'Save File As')+'...',m||nsIFilePicker.modeSave);
+	fp.init(window,'MEGA :: ' + title + '...',m||nsIFilePicker.modeSave);
 	fp.appendFilters(nsIFilePicker.filterAll); // TODO: ext2filter?
 	if(m !== 2) {
 		fp.defaultString = f;
@@ -40,7 +42,7 @@ function mozFilePicker(f,m) {
 			fp.defaultExtension = f.replace(/^.*\./,'');
 		}
 	}
-	return fp.show() != nsIFilePicker.returnCancel ? fp.file : null;
+	return fp.show() != nsIFilePicker.returnCancel ? (o.gfp ? fp:fp.file) : null;
 }
 
 function mozFile(p,f,e) {
@@ -156,18 +158,31 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 				this.u8 = function(aStart,aBytes)
 				{
-					if (d) console.log('mozDirtyGetAsEntry', aStart,aBytes);
+					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
 
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
-					if(aBytes+aStart == aFile.fileSize)
-					{
-						nsIFileInputStream.close();
-					}
 					return new Uint8Array(data);
+				};
+				this._close = function()
+				{
+					mozCloseStream(nsIFileInputStream);
 				};
 
 				return this.u8(aStart,aBytes);
+			},
+			blob: function(aStart,aBytes)
+			{
+				aStart = aStart || 0;
+				aBytes = aBytes || this.size;
+
+				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type, aStart,aBytes);
+
+				return new Blob([this.u8(aStart,aBytes)], { type : this.type || 'application/octet-stream'});
+			},
+			slice: function(aStart,aEnd)
+			{
+				return this.blob(aStart,aEnd-aStart);
 			}
 		});
 	};
@@ -417,6 +432,9 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							},
 							seek : function(p) {
 								File.fs.seek(0,p);
+							},
+							close : function() {
+								mozCloseStream(File.fs);
 							}
 						};
 

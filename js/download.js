@@ -1,11 +1,8 @@
-
-
 var dl_fs, dl_fw;
 
 var dl_queue = [];
 var dl_queue_num = 0;
 var dl_retryinterval = 1000;
-
 
 var dl_method;
 // 0: Filesystem API (Chrome / Firefox Extension polyfill
@@ -15,10 +12,10 @@ var dl_method;
 // 4: Arraybuffer/Blob Memory Based
 // 5: MediaSource (experimental streaming solution)
 // 6: IndexedDB blob based (Firefox 20+)
-
-
 var blob_urls = [];
 
+// largest chunk size that can be requested
+var dl_maxchunk = 16*1048576;
 
 var dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined');
 var dl_flash_connections = 0;
@@ -80,13 +77,9 @@ var dl_chunklen;
 
 var skipcheck = 0;
 
-
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.OIndexedDB || window.msIndexedDB;
 
-
 var use_idb = false;
-
-
 
 var dl_db;
 
@@ -117,76 +110,84 @@ function dl_dispatch_decryption()
 			{
 				dl_workerbusy[id] = 1;
 
-				if (typeof(dl_workers[id]) == "object")
+/*				if (typeof(dl_workers[id]) == "object")
 				{
 					dl_workers[id].terminate();
 					dl_workers[id] = null;
 					delete dl_workers[id];
-				}
+				}*/
 				
-				dl_workers[id] = new Worker('decrypter.js');
-				dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
-				dl_workers[id].id = id;
-				dl_workers[id].instance = dl_instance;
-
-				dl_workers[id].onmessage = function(e)
-				{				
-					if (this.instance == dl_instance)
+				if (typeof(dl_workers[id]) != "object")
+				{
+					dl_workers[id] = new Worker('decrypter.js?v=5');
+					dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
+					dl_workers[id].onmessage = function(e)
 					{
-						if (typeof(e.data) == "string")
+						if (this.instance == dl_instance)
 						{
-							if (e.data[0] == '[') dl_macs[this.dl_pos] = JSON.parse(e.data);
-							else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
-						}
-						else
-						{
-							var databuf = new Uint8Array(e.data);
-
-							if (d) console.log("WORKER" + this.id + ": Received " + databuf.length + " decrypted bytes at " + this.dl_pos);
-
-							if (dl_zip && !this.dl_pos)
+							if (typeof(e.data) == "string")
 							{
-								var prefix = ZIP.writeHeader(
-                                    dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
-                                    dl_queue[dl_queue_num].size,
-                                    dl_queue[dl_queue_num].t
-                                );
-								var prefixlen = prefix.length;
-
-								if (dl_zip.suffix)
+								if (e.data[0] == '[')
 								{
-									dl_zip.pos += dl_zip.suffix.length;
+									var t = JSON.parse(e.data), pos = this.dl_pos;
 
-									t = new Uint8Array(dl_zip.suffix.length+prefix.length);
-									
-									t.set(dl_zip.suffix);
-									t.set(prefix,dl_zip.suffix.length);
-									
-									prefix = t;
+									for (var i = 0; i < t.length; i += 4, pos = pos+1048576) dl_macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+								}
+								else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
+							}
+							else
+							{
+								var databuf = new Uint8Array(e.data.buffer || e.data);
+
+								if (d) console.log("WORKER" + this.id + ": Received " + databuf.length + " decrypted bytes at " + this.dl_pos);
+
+								if (dl_zip && !this.dl_pos)
+								{
+								    var prefix = ZIP.writeHeader(
+                                        dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
+                                        dl_queue[dl_queue_num].size,
+                                        dl_queue[dl_queue_num].t
+                                    );
+								    var prefixlen = prefix.length;
+
+									if (dl_zip.suffix)
+									{
+										dl_zip.pos += dl_zip.suffix.length;
+
+										t = new Uint8Array(dl_zip.suffix.length+prefix.length);
+										
+										t.set(dl_zip.suffix);
+										t.set(prefix,dl_zip.suffix.length);
+										
+										prefix = t;
+									}
+
+									dl_zip.headerpos = dl_zip.pos;
+
+									dl_zip.pos += prefixlen+dl_queue[dl_queue_num].size;
+
+									var i, t = new Uint8Array(databuf.length+prefix.length);
+
+									t.set(prefix);
+									t.set(databuf,prefix.length);
+
+									dl_chunklen[this.dl_pos] = databuf.length;
+									databuf = t;
 								}
 
-								dl_zip.headerpos = dl_zip.pos;
+								dl_plainq[this.dl_pos] = databuf;
+								dl_plainqlen++;
 
-								dl_zip.pos += prefixlen+dl_queue[dl_queue_num].size;
+								dl_workerbusy[this.id] = 0;
 
-								var i, t = new Uint8Array(databuf.length+prefix.length);
-
-								t.set(prefix);
-								t.set(databuf,prefix.length);
-
-								dl_chunklen[this.dl_pos] = databuf.length;
-								databuf = t;
+								dl_dispatch_chain();
 							}
-
-							dl_plainq[this.dl_pos] = databuf;
-							dl_plainqlen++;
-
-							dl_workerbusy[this.id] = 0;
-
-							dl_dispatch_chain();
 						}
-					}
-				};
+					};
+				}
+	
+				dl_workers[id].id = id;
+				dl_workers[id].instance = dl_instance;
 
 				dl_workers[id].postMessage(dl_keyNonce);
 
@@ -194,7 +195,9 @@ function dl_dispatch_decryption()
 				
 				dl_workers[id].dl_pos = parseInt(p);
 				dl_workers[id].postMessage(dl_workers[id].dl_pos/16);
-				dl_workers[id].postMessage(dl_cipherq[p]);
+				
+				if (typeof MSBlobBuilder == "function") dl_workers[id].postMessage(dl_cipherq[p]);
+				else dl_workers[id].postMessage(dl_cipherq[p].buffer,[dl_cipherq[p].buffer]);
 
 				delete dl_cipherq[p];
 				dl_cipherqlen--;
@@ -318,8 +321,6 @@ function dl_write_block()
 			break;
 			
 		case 3:		// Deprecated Firefox Extension
-			console.log(dl_write_position);
-		
 			ffe_writechunk(ab_to_str(dl_plainq[dl_write_position]),dl_write_position);
 			dl_ack_write();
 			break;
@@ -652,7 +653,8 @@ function dl_setcredentials(g,s,n)
 
 	while (p < dl_filesize)
 	{
-		dl_chunksizes[p] = 1048576;
+		dl_chunksizes[p] = Math.floor((dl_filesize-p)/1048576+1)*1048576;
+		if (dl_chunksizes[p] > dl_maxchunk) dl_chunksizes[p] = dl_maxchunk;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
@@ -663,7 +665,7 @@ function dl_setcredentials(g,s,n)
 		delete dl_chunksizes[pp];
 		delete dl_chunks[dl_chunks.length-1];
 	}
-	
+
 	if (dl_zip)
 	{
 		delete dl_zip.crc32;
@@ -888,7 +890,7 @@ function dl_flashdldata(p,data,httpcode)
 
 function dl_dispatch_read()
 {
-	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+40) return;
+	if (uldl_hold || dl_cipherqlen+dl_plainqlen > dl_maxSlots+12) return;
 
 	if (!dl_chunks.length) return;
 
@@ -905,7 +907,9 @@ function dl_dispatch_read()
 	}
 
 	for (var slot = dl_maxSlots; slot--; )
+	{
 		if (dl_pos[slot] == -1) break;
+	}
 
 	if (slot < 0) return;
 
@@ -939,18 +943,25 @@ function dl_dispatch_read()
 			
 			if (this.readyState == this.DONE)
 			{
+				if (navigator.appName != 'Opera') dl_progress[this.slot] = 0;
+				dl_updateprogress();
+
 				if (dl_pos[this.slot] >= 0)
 				{
-					if (this.response != null)
+					var r = this.response;
+
+					if (r != null && dl_pos[this.slot] >= 0 && r.byteLength == dl_chunksizes[dl_pos[this.slot]])
 					{
+						dl_settimer(-1);
+
 						var p = dl_pos[this.slot];
 
 						if (have_ab)
 						{
 							if (p >= 0)
 							{
-								if (navigator.appName != 'Opera') dl_bytesreceived += this.response.byteLength;
-								dl_cipherq[p] = new Uint8Array(this.response);
+								if (navigator.appName != 'Opera') dl_bytesreceived += r.byteLength;
+								dl_cipherq[p] = new Uint8Array(r);
 							}
 						}
 						else
@@ -964,19 +975,20 @@ function dl_dispatch_read()
 						}
 
 						dl_cipherqlen++;
-						if (navigator.appName != 'Opera') dl_progress[this.slot] = 0;
-						dl_updateprogress();
 
 						dl_pos[this.slot] = -1;	
 						dl_dispatch_chain();
 					}
 					else
 					{
+						if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
+						
 						if (dl_pos[this.slot] != -1)
 						{
 							dl_chunks.unshift(dl_pos[this.slot]);
 							dl_pos[this.slot] = -1;	
 							dl_httperror(this.status);
+							dl_dispatch_chain();
 						}
 					}
 				}
@@ -1005,9 +1017,6 @@ var dl_lastprogress = 0;
 
 function dl_updateprogress()
 {
-
-	
-	
 	var p = dl_bytesreceived;
 
 	if (dl_queue[dl_queue_num])
@@ -1037,10 +1046,15 @@ function dl_cancel()
 {
 	dl_settimer(-1);
 	dl_instance++;
+	downloading = dl_writing = dl_zip = false;
+
+	for (var slot = dl_maxSlots; slot--; dl_xhrs[slot].abort());
 	dl_xhrs = dl_pos = dl_workers = dl_progress = dl_cipherq = dl_plainq = dl_progress = dl_chunks = dl_chunksizes = undefined;
-	downloading = false;
-	dl_writing = false;
-	dl_zip = false;
+
+	if(is_chrome_firefox)
+	{
+		dl_fw.close();
+	}
 }
 
 var fs_instance;

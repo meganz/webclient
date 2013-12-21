@@ -350,6 +350,7 @@ else
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
+		jsl.push({f:'js/stacktrace.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
@@ -391,7 +392,6 @@ else
 			'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
 			'register': {f:'html/register.html', n: 'register', j:0},
 			'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-			'android': {f:'html/android.html', n: 'android', j:0},
 			'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
 			'download': {f:'html/download.html', n: 'download', j:0},
 			'download_js': {f:'html/js/download.js', n: 'download_js', j:1},

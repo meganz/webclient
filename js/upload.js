@@ -1,5 +1,3 @@
-
-
 var ul_queue = [];
 var ul_queue_num = 0;
 
@@ -261,39 +259,43 @@ function ul_dispatch_encryption()
 			{
 				ul_workerbusy[id] = 1;
 
-				if (typeof(ul_workers[id]) == 'object')
+/*				if (typeof(ul_workers[id]) == 'object')
 				{
 					delete ul_workers[id].onmessage;
 					ul_workers[id].terminate();
 					ul_workers[id] = undefined;
+				}*/
+
+				if (typeof(ul_workers[id]) != "object")
+				{
+					ul_workers[id] = new Worker('encrypter.js?v=5');
+					ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
+
+					ul_workers[id].onmessage = function(e)
+					{
+						if (this.instance == ul_instance)
+						{
+							if (typeof(e.data) == 'string')
+							{
+								if (e.data[0] == '[') ul_macs[this.pos] = JSON.parse(e.data);
+								else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
+							}
+							else
+							{
+								if (d) console.log("WORKER" + this.id + ": Received " + e.data.byteLength + " encrypted bytes at " + this.pos);
+
+								ul_sendchunks[this.pos] = new Uint8Array(e.data.buffer || e.data);
+
+								ul_dispatch_chain();
+
+								ul_workerbusy[this.id] = 0;
+							}
+						}
+					};
 				}
 
-				ul_workers[id] = new Worker('encrypter.js');
-				ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 				ul_workers[id].id = id;
 				ul_workers[id].instance = ul_instance;
-
-				ul_workers[id].onmessage = function(e)
-				{
-					if (this.instance == ul_instance)
-					{
-						if (typeof(e.data) == 'string')
-						{
-							if (e.data[0] == '[') ul_macs[this.pos] = JSON.parse(e.data);
-							else if (d) console.log("WORKER" + this.id + ": '" + e.data + "'");
-						}
-						else
-						{
-							if (d) console.log("WORKER" + this.id + ": Received " + e.data.byteLength + " encrypted bytes at " + this.pos);
-
-							ul_sendchunks[this.pos] = new Uint8Array(e.data);
-
-							ul_dispatch_chain();
-
-							ul_workerbusy[this.id] = 0;
-						}
-					}
-				};
 
 				ul_workers[id].postMessage(ul_keyNonce);
 
@@ -301,7 +303,9 @@ function ul_dispatch_encryption()
 
 				ul_workers[id].pos = parseInt(p);
 				ul_workers[id].postMessage(parseInt(p)/16);
-				ul_workers[id].postMessage(ul_plainq[p]);
+
+				if (typeof MSBlobBuilder == "function") ul_workers[id].postMessage(ul_plainq[p]);
+				else ul_workers[id].postMessage(ul_plainq[p].buffer,[ul_plainq[p].buffer]);
 
 				delete ul_plainq[p];
 
@@ -501,12 +505,12 @@ function ul_completepending(target)
 
 		var ctx = {
 			target : target,
-			ul_queue_num : ul[5],
+			ul_queue_num : ul[3],
 			callback : ul_completepending2,
-			faid : ul[6]
+			faid : ul[1].faid
 		};
 
-		api_completeupload(ul[0],ul[1],ul[2],ul[3],ul[4],ul[6],ctx);
+		api_completeupload(ul[0],ul[1],ul[2],ctx);
 	}
 	else ul_completing = false;
 }
@@ -601,9 +605,9 @@ function ul_chunkcomplete(slot,pos,response)
 				};
 
 				ul_completing = true;
-				api_completeupload(response,ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path,ul_queue[ul_queue_num].name,filekey,ul_queue[ul_queue_num].faid,ctx);
+				api_completeupload(response,ul_queue[ul_queue_num],filekey,ctx);
 			}
-			else ul_completion.push([response,ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path,ul_queue[ul_queue_num].name,filekey,ul_queue_num,ul_queue[ul_queue_num].faid]);
+			else ul_completion.push([response,ul_queue[ul_queue_num],filekey,ul_queue_num]);
 
 			ul_queue_num++;
 

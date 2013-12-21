@@ -44,6 +44,7 @@ var dl_storagetype = 0;
 var dl_req_storage = false;
 
 var downloading = false;
+var ZIP; /* ZIP object, by default nothing */
 
 var dl_maxSlots = 4;
 if (localStorage.dl_maxSlots) dl_maxSlots = localStorage.dl_maxSlots;
@@ -143,17 +144,17 @@ function dl_dispatch_decryption()
 
 								if (dl_zip && !this.dl_pos)
 								{
-                                    var total_dl_size = 0;
-                                    $.each(dl_queue, function(key, value) {
-                                        total_dl_size += value.size
-                                    });
-                                    ZIP = new ZIPClass(total_dl_size);
-								    var prefix = ZIP.writeHeader(
-                                        dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
-                                        dl_queue[dl_queue_num].size,
-                                        dl_queue[dl_queue_num].t
-                                    );
-								    var prefixlen = prefix.length;
+									var total_dl_size = 0;
+									$.each(dl_queue, function(key, value) {
+										total_dl_size += value.size
+									});
+									ZIP = new ZIPClass(total_dl_size);
+									var prefix = ZIP.writeHeader(
+										dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
+										dl_queue[dl_queue_num].size,
+										dl_queue[dl_queue_num].t
+									);
+									var prefixlen = prefix.length;
 
 									if (dl_zip.suffix)
 									{

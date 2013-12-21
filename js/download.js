@@ -143,6 +143,11 @@ function dl_dispatch_decryption()
 
 								if (dl_zip && !this.dl_pos)
 								{
+                                    var total_dl_size = 0;
+                                    $.each(dl_queue, function(key, value) {
+                                        total_dl_size += value.size
+                                    });
+                                    ZIP = new ZIPClass(total_dl_size);
 								    var prefix = ZIP.writeHeader(
                                         dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
                                         dl_queue[dl_queue_num].size,

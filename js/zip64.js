@@ -76,8 +76,11 @@ function ezBuffer(size) {
 }
 /* }}} */
 
-var ZIPClass = function(isZip64) {
-    var self = this;
+var ZIP;
+var ZIPClass = function(totalSize) {
+    var self = this
+        , maxZipSize = Math.pow(2,32) - 4098 /* for headers */
+        , isZip64    = totalSize > maxZipSize
 
     // Constants
     var fileHeaderLen = 30
@@ -302,12 +305,6 @@ var ZIPClass = function(isZip64) {
         return header.getBytes();
     }
 }
-
-// TODO: 
-// This is wrong in so many levels, we're using 
-// the class as a singleton. Basically, when download
-// is rewritten it should be better integrated with it
-var ZIP = new ZIPClass(true);
 
 // crc32 {{{
 var crc32table = [

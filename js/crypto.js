@@ -2276,12 +2276,49 @@ function crypto_share_rsa2aes()
 		return b.join("");
 	}
 	
+	function makeCRCTable()
+	{
+		var c,crcTable = [];
+		
+		for (var n = 0 ; n < 256 ; ++n )
+		{
+			c = n;
+			
+			for (var k = 0 ; k < 8 ; ++k )
+			{
+				c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+			}
+			
+			crcTable[n] = c;
+		}
+		
+		return crcTable;
+	}
+	
+	function crc32(str,crc,len)
+	{
+		crc = crc ^ (-1);
+		
+		for (var i = 0 ; i < len ; ++i )
+		{
+			crc = (crc >>> 8) ^ crc32table[(crc ^ str.charCodeAt(i)) & 0xFF];
+		}
+		
+		return (crc ^ (-1)) >>> 0;
+	}
+	
 	scope.fingerprint = function(uq_entry,callback)
 	{
 		var fr = new FileReader();
 		var size = uq_entry.size;
 		
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+		
+		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
+		if (crc32table[1] != 0x77073096)
+		{
+			throw new Error('Unexpected CRC32 Table...');
+		}
 		
 		function Finish(crc)
 		{

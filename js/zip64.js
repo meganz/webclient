@@ -10,7 +10,7 @@ function ezBuffer(size) {
 		, offset = 0;
 	return {
 		debug: function() {
-			console.log(["DEBUG", offset, obj.length]);
+			console.error(["DEBUG", offset, obj.length]);
 		},
 		getBytes: function() {
 			return obj;
@@ -79,28 +79,30 @@ function ezBuffer(size) {
 var ZIPClass = function(totalSize) {
 	var self = this
 		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
-		, isZip64	= totalSize > maxZipSize
+		, isZip64	= totalSize > maxZipSize || localStorage.zip64 == 1
+
+	console.error(isZip64 ? 'zip64' : 'zip')
 
 	// Constants
-	var fileHeaderLen = 30
-		, noCompression = 0
-		, zipVersion = 45
-		, defaultFlags = 0x808
-		, i32max = 0xffffffff
-		, i16max = 0xffff
-		, zip64ExtraId = 0x0001
-		, directory64LocLen = 20
-		, directory64EndLen = 56
-		, directoryEndLen = 22
-		, fileHeaderSignature	  = 0x04034b50
-		, directory64EndSignature  = 0x06064b50
-		, directoryEndSignature	= 0x06054b50
-		, dataDescriptorSignature  = 0x08074b50 // de-facto standard; required by OS X Finder
-		, directoryHeaderSignature = 0x02014b50
-		, directory64LocSignature  = 0x07064b50
-		, dataDescriptorLen = 16
-		, dataDescriptor64Len = 24
-		, directoryHeaderLen = 46
+	var fileHeaderLen				= 30
+		, noCompression				= 0
+		, zipVersion				= isZip64 ? 45 : 20
+		, defaultFlags				= 0x808
+		, i32max					= 0xffffffff
+		, i16max					= 0xffff
+		, zip64ExtraId				= 0x0001
+		, directory64LocLen			= 20
+		, directory64EndLen			= 56
+		, directoryEndLen			= 22
+		, fileHeaderSignature		= 0x04034b50
+		, directory64LocSignature	= 0x07064b50
+		, directory64EndSignature	= 0x06064b50
+		, directoryEndSignature		= 0x06054b50
+		, dataDescriptorSignature	= 0x08074b50 // de-facto standard; required by OS X Finder
+		, directoryHeaderSignature	= 0x02014b50
+		, dataDescriptorLen			= 16
+		, dataDescriptor64Len		= 24
+		, directoryHeaderLen		= 46
 
 	/* ZipHeader  {{{ */ 
 	/**
@@ -109,12 +111,12 @@ var ZIPClass = function(totalSize) {
 	function ZipHeader() {
 		this.readerVersion = zipVersion;
 		this.Flags	= defaultFlags;
-		this.Method   = noCompression;
-		this.date	 = 0
+		this.Method	= noCompression;
+		this.date	= 0
 		this.crc32	= 0;
-		this.size	 = 0;
-		this.unsize   = 0;
-		this.file	 = ""; 
+		this.size	= 0;
+		this.unsize	= 0;
+		this.file	= ""; 
 		this.extra	= [];
 
 		this.getBytes = function() {
@@ -139,18 +141,18 @@ var ZIPClass = function(totalSize) {
 	// ZipCentralDirectory {{{
 	function ZipCentralDirectory() {
 		this.creatorVersion = zipVersion;
-		this.readerVersion  = zipVersion;
-		this.Flags		  = defaultFlags;
-		this.Method		 = noCompression;
-		this.date		   = 0;
-		this.crc32		  = 0;
-		this.file		   = ""
-		this.size		   = 0; // compressed size
-		this.unsize		 = 0; // uncompressed size
-		this.offset		 = 0;
-		this.externalAttr   = 0;
+		this.readerVersion	= zipVersion;
+		this.Flags			= defaultFlags;
+		this.Method			= noCompression;
+		this.date			= 0;
+		this.crc32			= 0;
+		this.file			= ""
+		this.size			= 0; // compressed size
+		this.unsize			= 0; // uncompressed size
+		this.offset			= 0;
+		this.externalAttr	= 0;
 
-		this.getBytes  = function() {
+		this.getBytes = function() {
 			var extra = [];
 			if (isZip64) {
 				var ebuf = ezBuffer(28); // 2xi16 + 3xi64
@@ -187,9 +189,9 @@ var ZIPClass = function(totalSize) {
 
 	// ZipDataDescriptor {{{
 	function ZipDataDescriptor() {
-		this.crc32   = 0;
+		this.crc32	= 0;
 		this.size	= 0;
-		this.unsize  = 0;
+		this.unsize	= 0;
 
 		this.getBytes = function() {
 			var buf = ezBuffer(isZip64 ? dataDescriptor64Len : dataDescriptorLen);
@@ -241,17 +243,17 @@ var ZIPClass = function(totalSize) {
 	self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos)
 	{
 		var dirRecord = new ZipCentralDirectory();
-		dirRecord.file   = filename;
-		dirRecord.date   = time;
-		dirRecord.size   = size;
-		dirRecord.unsize = size;
-		dirRecord.crc32  = crc32;
-		dirRecord.offset = headerpos;
+		dirRecord.file		= filename;
+		dirRecord.date		= time;
+		dirRecord.size		= size;
+		dirRecord.unsize	= size;
+		dirRecord.crc32		= crc32;
+		dirRecord.offset	= headerpos;
 		dirRecord.externalAttr = directory ? 1 : 0;
 
 		var dataDescriptor = new ZipDataDescriptor();
 		dataDescriptor.crc32	= crc32;
-		dataDescriptor.size	 = size;
+		dataDescriptor.size		= size;
 		dataDescriptor.unsize   = size;
 
 		return {
@@ -280,7 +282,7 @@ var ZIPClass = function(totalSize) {
 
 			xbuf.i32(directory64LocSignature)
 			xbuf.i32(0)
-			xbuf.i64(pos)
+			xbuf.i64(pos + dirDatalength)
 			xbuf.i32(1) // total number of disks
 			buf.resize(22 + xbuf.getBytes().length)
 			buf.appendBytes(xbuf.getBytes());
@@ -292,6 +294,7 @@ var ZIPClass = function(totalSize) {
 		buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
 		buf.i32(isZip64 ? i32max : dirDatalength);
 		buf.i32(isZip64 ? i32max : dl_zip.pos);
+		buf.i16(0); // no comments
 		
 		return buf.getBytes();
 	};

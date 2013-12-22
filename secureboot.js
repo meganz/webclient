@@ -7,6 +7,7 @@ if (document.location.href.indexOf('preview.mega.co.nz') > -1)
 	localStorage.dd=1;
 }
 
+
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
 else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
 

@@ -81,8 +81,6 @@ var ZIPClass = function(totalSize) {
 		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
 		, isZip64	= totalSize > maxZipSize || localStorage.zip64 == 1
 
-	console.error(isZip64 ? 'zip64' : 'zip')
-
 	// Constants
 	var fileHeaderLen				= 30
 		, noCompression				= 0
@@ -270,7 +268,7 @@ var ZIPClass = function(totalSize) {
 		if (isZip64) {
 			var xbuf = new ezBuffer(directory64EndLen + directory64LocLen)
 			xbuf.i32(directory64EndSignature)
-			xbuf.i64(directory64EndLen)
+			xbuf.i64(44) // don't know why but it works
 			xbuf.i16(zipVersion)
 			xbuf.i16(zipVersion)
 			xbuf.i32(0) // disk number

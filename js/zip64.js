@@ -251,7 +251,7 @@ var ZIPClass = function(totalSize) {
 
 		var dataDescriptor = new ZipDataDescriptor();
 		dataDescriptor.crc32	= crc32;
-		dataDescriptor.size	 = size;
+		dataDescriptor.size		= size;
 		dataDescriptor.unsize   = size;
 
 		return {
@@ -280,7 +280,7 @@ var ZIPClass = function(totalSize) {
 
 			xbuf.i32(directory64LocSignature)
 			xbuf.i32(0)
-			xbuf.i64(pos)
+			xbuf.i64(pos + dirDatalength)
 			xbuf.i32(1) // total number of disks
 			buf.resize(22 + xbuf.getBytes().length)
 			buf.appendBytes(xbuf.getBytes());
@@ -292,6 +292,7 @@ var ZIPClass = function(totalSize) {
 		buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
 		buf.i32(isZip64 ? i32max : dirDatalength);
 		buf.i32(isZip64 ? i32max : dl_zip.pos);
+		buf.i16(0); // no comments
 		
 		return buf.getBytes();
 	};

@@ -81,6 +81,8 @@ var ZIPClass = function(totalSize) {
 		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
 		, isZip64	= totalSize > maxZipSize || localStorage.zip64 == 1
 
+	console.error(isZip64 ? 'zip64' : 'zip')
+
 	// Constants
 	var fileHeaderLen				= 30
 		, noCompression				= 0

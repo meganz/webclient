@@ -2247,20 +2247,18 @@ function crypto_share_rsa2aes()
 }
 
 
-
 (function __FileFingerprint(scope) {
 	
-	var CRC_SIZE   = 32;
+	var CRC_SIZE   = 16;
 	var BLOCK_SIZE = CRC_SIZE*4;
-	var SCRC_SIZE  = CRC_SIZE*CRC_SIZE;
-	
+
 	function i2s(i)
 	{
 		return String.fromCharCode.call(String,
-			i       & 0xff,
-			i >>  8 & 0xff,
+			i >> 24 & 0xff,
 			i >> 16 & 0xff,
-			i >> 24 & 0xff);
+			i >>  8 & 0xff,
+			i       & 0xff);
 	}
 	
 	function serialize(v)
@@ -2275,67 +2273,67 @@ function crypto_share_rsa2aes()
 		b[0] = String.fromCharCode(p);
 		return b.join("");
 	}
-	
+
 	function makeCRCTable()
 	{
 		var c,crcTable = [];
-		
+
 		for (var n = 0 ; n < 256 ; ++n )
 		{
 			c = n;
-			
+
 			for (var k = 0 ; k < 8 ; ++k )
 			{
 				c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
 			}
-			
+
 			crcTable[n] = c;
 		}
-		
+
 		return crcTable;
 	}
-	
+
 	function crc32(str,crc,len)
 	{
 		crc = crc ^ (-1);
-		
+
 		for (var i = 0 ; i < len ; ++i )
 		{
 			crc = (crc >>> 8) ^ crc32table[(crc ^ str.charCodeAt(i)) & 0xFF];
 		}
-		
+
 		return (crc ^ (-1)) >>> 0;
 	}
-	
+
 	scope.fingerprint = function(uq_entry,callback)
 	{
 		var fr = new FileReader();
 		var size = uq_entry.size;
-		
+
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
-		
+
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)
 		{
 			throw new Error('Unexpected CRC32 Table...');
 		}
-		
+
 		function Finish(crc)
 		{
 			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),uq_entry);
 		}
-		
+
 		var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice':'webkitSlice');
-		
-		if(size <= SCRC_SIZE)
+
+		if (size <= 8192)
 		{
-			var blob = uq_entry[sfn](0,size <= CRC_SIZE ? size : SCRC_SIZE);
-			
+			var blob = uq_entry[sfn](0,size);
+
 			fr.onload = function(e)
 			{
 				var crc;
 				var data = e.target.result;
-				
+
 				if(size <= CRC_SIZE)
 				{
 					crc = data;
@@ -2345,31 +2343,35 @@ function crypto_share_rsa2aes()
 				}
 				else
 				{
-					crc = [];
-					for (var i = 0 ; i < CRC_SIZE ; i++)
+					var tmp = [];
+
+					for (var i = 0; i < 4; i++)
 					{
-						crc.push(data[i*(size-1)/(CRC_SIZE-1)]);
+						var begin = parseInt(i*size/4);
+						var len = parseInt(((i+1)*size/4) - begin);
+
+						tmp.push(i2s(crc32(data.substr(begin,len),0,len)));
 					}
-					crc = crc.join("");
+
+					crc = tmp.join("");
 				}
-				
+
 				Finish(crc);
 			};
 			fr.readAsBinaryString(blob);
 		}
 		else
 		{
-			var tmp = [], i = 0, m = CRC_SIZE / 4;
-			var blocks = parseInt(size/SCRC_SIZE);
-			if(blocks > 32) blocks = 32;
-			
+			var tmp = [], i = 0, m = 4;
+			var blocks = parseInt(8192/(BLOCK_SIZE*4));
+
 			var step = function()
 			{
 				if(m == i)
 				{
 					return Finish(tmp.join(""));
 				}
-				
+
 				var crc = 0, j = 0;
 				var next = function()
 				{
@@ -2378,16 +2380,16 @@ function crypto_share_rsa2aes()
 						tmp.push(i2s(crc));
 						return step(++i);;
 					}
-					
-					var offset = parseInt((size-BLOCK_SIZE)*(i*blocks+j)/(CRC_SIZE/4*blocks-1));
+
+					var offset = parseInt((size-BLOCK_SIZE)*(i*blocks+j)/(4*blocks-1));
 					var blob = uq_entry[sfn](offset,offset+BLOCK_SIZE);
 					fr.onload = function(e)
 					{
 						var block = e.target.result;
-						
+
 						// console.log(toHexString(block));
 						crc = crc32(block,crc,BLOCK_SIZE);
-						
+
 						next(++j);
 					};
 					fr.readAsBinaryString(blob);
@@ -2395,6 +2397,6 @@ function crypto_share_rsa2aes()
 				next();
 			};
 			step();
-		}	
+		}
 	};
 })(this);

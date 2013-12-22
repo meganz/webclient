@@ -2370,26 +2370,29 @@ function crypto_share_rsa2aes()
 					return Finish(tmp.join(""));
 				}
 				
-				var offset = parseInt((size-BLOCK_SIZE)*(i*blocks)/(CRC_SIZE/4*blocks-1));
-				var blob = uq_entry[sfn](offset,offset+(blocks*BLOCK_SIZE));
-				
-				fr.onload = function(e)
+				var crc = 0, j = 0;
+				var next = function()
 				{
-					var crc = 0;
-					var data = e.target.result;
-					
-					for( var j = 0 ; j < blocks ; ++j )
+					if(blocks == j)
 					{
-						var block = data.substr(j*BLOCK_SIZE,BLOCK_SIZE);
+						tmp.push(i2s(crc));
+						return step(++i);;
+					}
+					
+					var offset = parseInt((size-BLOCK_SIZE)*(i*blocks+j)/(CRC_SIZE/4*blocks-1));
+					var blob = uq_entry[sfn](offset,offset+BLOCK_SIZE);
+					fr.onload = function(e)
+					{
+						var block = e.target.result;
 						
 						// console.log(toHexString(block));
 						crc = crc32(block,crc,BLOCK_SIZE);
-					}
-					
-					tmp.push(i2s(crc));
-					step(++i);
+						
+						next(++j);
+					};
+					fr.readAsBinaryString(blob);
 				};
-				fr.readAsBinaryString(blob);
+				next();
 			};
 			step();
 		}	

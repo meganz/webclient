@@ -44,6 +44,7 @@ var dl_storagetype = 0;
 var dl_req_storage = false;
 
 var downloading = false;
+var ZIP; /* ZIP object, by default nothing */
 
 var dl_maxSlots = 4;
 if (localStorage.dl_maxSlots) dl_maxSlots = localStorage.dl_maxSlots;
@@ -143,7 +144,16 @@ function dl_dispatch_decryption()
 
 								if (dl_zip && !this.dl_pos)
 								{
-									var prefix = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t).fileHeader;
+									var total_dl_size = 0;
+									$.each(dl_queue, function(key, value) {
+										total_dl_size += value.size
+									});
+									ZIP = new ZIPClass(total_dl_size);
+									var prefix = ZIP.writeHeader(
+										dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
+										dl_queue[dl_queue_num].size,
+										dl_queue[dl_queue_num].t
+									);
 									var prefixlen = prefix.length;
 
 									if (dl_zip.suffix)
@@ -433,7 +443,7 @@ function dl_next()
 			dl_zip.pos += t[0].length; //+t[1].length;
 
 			for (i = 0; i < dl_zip.dirData.length; i++) t.push(dl_zip.dirData[i]);
-			t.push(ZIPsuffix(p));
+			t.push(ZIP.writeSuffix(p));
 
 			var l = 0;
 			for (i = t.length; i--; ) l += t[i].length;
@@ -743,7 +753,7 @@ function dl_checklostchunk()
 			if (!dl_zip) dl_complete();
 			else
 			{
-				t = ZIPheader(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t,dl_zip.crc32,false,dl_zip.headerpos);
+				t = ZIP.writeCentralDir(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t,dl_zip.crc32,false,dl_zip.headerpos);
 				dl_zip.suffix = t.dataDescriptor;
 				dl_zip.dirData.push(t.dirRecord);
 				dl_queue[dl_queue_num].complete = true;

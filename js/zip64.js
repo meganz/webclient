@@ -268,7 +268,8 @@ var ZIPClass = function(totalSize) {
 		if (isZip64) {
 			var xbuf = new ezBuffer(directory64EndLen + directory64LocLen)
 			xbuf.i32(directory64EndSignature)
-			xbuf.i64(44) // don't know why but it works
+			// directory64EndLen - 4 bytes - 8 bytes
+			xbuf.i64(directory64EndLen - 4 - 8)
 			xbuf.i16(zipVersion)
 			xbuf.i16(zipVersion)
 			xbuf.i32(0) // disk number

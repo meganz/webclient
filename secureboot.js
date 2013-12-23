@@ -340,6 +340,8 @@ else
 		jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
 		jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
+		jsl.push({f:'js/inherits.js', n: 'crypto_js', j:1,w:5});
+		jsl.push({f:'js/events.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
 		jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -347,6 +349,7 @@ else
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/stacktrace.js', n: 'cleartemp_js', j:1});
+		jsl.push({f:'js/queue.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});

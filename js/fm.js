@@ -3025,7 +3025,7 @@ function transferPanelUI()
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-            if(localStorage.transferPaneHeight) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
+            if(localStorage.transferPaneHeight && $.transferPaneResizable) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
 			else  $('.transfer-panel').css({'height': '193px'});            
 			$.transferHeader();
 		}

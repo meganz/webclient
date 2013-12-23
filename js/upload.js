@@ -154,6 +154,7 @@ function ul_deduplicate(identical)
 
 function ul_Identical(target,path,hash,size)
 {
+	if (!target || !path) return false;
 	var p = path.split('/');	
 	var n = M.d[target];
 	for (var i in p)

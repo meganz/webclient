@@ -1551,19 +1551,13 @@ function api_completeupload(t,uq,k,ctx)
 
 function api_completeupload2(ctx,uq)
 {
-	console.log(ctx.k);
-
 	var p,ut = uq.target;
 	
-
 	if (ctx.path && ctx.path != ctx.n && (p = ctx.path.indexOf('/')) > 0)
 	{
-		var pc = ctx.path.substr(0,p);
-		
+		var pc = ctx.path.substr(0,p);		
 		ctx.path = ctx.path.substr(p+1);
 		
-		console.log(ctx);
-
 		fm_requestfolderid(ut,pc,
 		{
 			uq:uq,

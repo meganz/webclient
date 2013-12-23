@@ -2801,6 +2801,8 @@ function selectddUI()
 		}
 	});
 	
+	$('.ui-selectable-helper').remove();
+	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) { searchPath(); }});
 
     /**

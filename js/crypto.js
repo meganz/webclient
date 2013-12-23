@@ -1540,71 +1540,54 @@ function crypto_rsadecrypt(ciphertext,privk)
 // as the source handle
 function api_completeupload(t,uq,k,ctx)
 {
-	ctx2 = { callback : api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx };
-
-	api_genfingerprint(uq,ctx2);
-}
-
-function api_genfingerprint(uq,ctx)
-{
-	var finish = function(hash)
-	{
-		ctx.hash = hash;
-		ctx.callback(ctx,uq.target);
-		
-		if(is_chrome_firefox && uq._close)
-		{
-			// Close nsIFile Stream
-			uq._close();
-		}
-	};
+	// Close nsIFile Stream
+	if(is_chrome_firefox && uq._close) uq._close();
 	
-	try
-	{
-		fingerprint(uq,finish);
-	}
-	catch(e)
-	{
-		console.log('api_genfingerprint', e);
-		finish();
-	}
+	if (uq.repair) uq.target = M.RubbishID;
+	
+	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx },uq);
 }
 
-function api_completeupload2(ctx,ut)
+
+function api_completeupload2(ctx,uq)
 {
-	var p;
+	console.log(ctx.k);
+
+	var p,ut = uq.target;
+	
 
 	if (ctx.path && ctx.path != ctx.n && (p = ctx.path.indexOf('/')) > 0)
 	{
 		var pc = ctx.path.substr(0,p);
 		
 		ctx.path = ctx.path.substr(p+1);
+		
+		console.log(ctx);
 
-		fm_requestfolderid(ut,pc,ctx);
+		fm_requestfolderid(ut,pc,
+		{
+			uq:uq,
+			ctx:ctx,
+			callback: function(ctx,h)
+			{
+				if (h) ctx.uq.target = h;
+				api_completeupload2(ctx.ctx,ctx.uq);
+			}
+		});
 	}
 	else
 	{
 		a = { n : ctx.n };
-
-		if(ctx.hash)
-		{
-			a.c = ctx.hash;
-		}
-
+		if (uq.hash) 	a.c = uq.hash;
+		if (uq.ts) 		a.t = uq.ts;
 		if (d) console.log(ctx.k);
-
-		var ea = enc_attr(a,ctx.k);
-		
+		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
-		
-		
-
 		var req = { a : 'p',
 			t : ut,
 			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
 			i : requesti
 		};
-
 		if (ut)
 		{
 			// a target has been supplied: encrypt to all relevant shares
@@ -1616,7 +1599,6 @@ function api_completeupload2(ctx,ut)
 				req.cr[1][0] = ctx.t;
 			}
 		}
-
 		api_req([req],ctx.ctx);
 	}
 }
@@ -2064,7 +2046,8 @@ function crypto_processkey(me,master_aes,file)
 				{
 					u_nodekeys[file.h] = k;
 					if (key.length >= 46) rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
-				}				
+				}
+				if (typeof o.c == 'string') file.hash = o.c;
 				file.key = k;
 				file.ar = o;
 				file.name = file.ar.n;
@@ -2320,7 +2303,7 @@ function crypto_share_rsa2aes()
 
 		function Finish(crc)
 		{
-			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),uq_entry);
+			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),((uq_entry.lastModifiedDate||0)/1000));
 		}
 
 		var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice':'webkitSlice');

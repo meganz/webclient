@@ -70,39 +70,113 @@ function startupload()
 	ul_instance++;
 
 	if (ul_uploading) return;
-
-	for (;;)
+	
+	if (ul_queue_num >= ul_queue.length)
 	{
-		if (ul_queue_num >= ul_queue.length)
-		{
-			if (d) console.log("No further uploads, clearing ul_queue");
-			ul_queue = [];
-			ul_queue_num = 0;
-			return;
-		}
-
-		if (ul_queue[ul_queue_num])
-		{
-			if (!ul_skipIdentical || !file_exists(ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path || ul_queue[ul_queue_num].name,ul_queue[ul_queue_num].size)) break;
-			onUploadSuccess(ul_queue_num);
-		}
-
-		ul_queue_num++;
+		if (d) console.log("No further uploads, clearing ul_queue");
+		ul_queue = [];
+		ul_queue_num = 0;
+		return;
 	}
-
+	
 	ul_uploading=true;
-
 	if (ul_queue[ul_queue_num].flashid)
 	{
 		ul_maxSlots = 1;
 		ul_flashreaderactive = false;
 	}
 	else ul_reader = new FileReader();
-
 	if (d) console.log(ul_queue_num + ' - ' + ul_queue.length);
+	ul_queue[ul_queue_num].retries = ul_queue[ul_queue_num].retries+1 || 0;	
+	
+	try
+	{
+		fingerprint(ul_queue[ul_queue_num],function(hash,ts)
+		{
+			ul_queue[ul_queue_num].hash = hash;
+			ul_queue[ul_queue_num].ts = ts;
+			var identical = ul_Identical(ul_queue[ul_queue_num].target,ul_queue[ul_queue_num].path || ul_queue[ul_queue_num].name,ul_queue[ul_queue_num].hash,ul_queue[ul_queue_num].size);
+			if (M.h[hash] || identical) ul_deduplicate(identical);
+			else initupload1();		
+		});
+	}
+	catch(e)
+	{
+		initupload1();	
+	}
+}
 
-	ul_queue[ul_queue_num].retries = ul_queue[ul_queue_num].retries+1 || 0;
 
+function ul_deduplicate(identical)
+{
+	var uq = ul_queue[ul_queue_num];	
+	if (identical && ul_skipIdentical) var n = identical;
+	else if (!M.h[uq.hash] && !identical) initupload1();
+	else var n = M.d[M.h[uq.hash][0]];
+	if (!n) initupload1();	
+	api_req([{a:'g',g:1,ssl:use_ssl,n:n.h}],
+	{
+		uq:uq,
+		n:n,
+		skipfile:(ul_skipIdentical && identical),
+		callback: function(res,ctx)
+		{
+			if ((res[0] == ETEMPUNAVAIL || (res[0] && res[0].e == ETEMPUNAVAIL)) && ctx.skipfile)
+			{
+				ctx.uq.repair = ctx.n.key;
+				initupload1();		
+			}
+			else if (typeof res[0] == 'number' || (res[0] && res[0].e)) initupload1();
+			else
+			{				
+				if (ctx.skipfile) onUploadSuccess(ul_queue_num);
+				else
+				{
+					api_completeupload2(
+					{
+						callback: api_completeupload2, 
+						t : 	ctx.n.h, 
+						path: 	ctx.uq.path, 
+						n: 		ctx.uq.name, 
+						k: 		ctx.n.key, 
+						fa: 	ctx.n.fa, 
+						ctx: 	{target:ctx.uq,ul_queue_num:ul_queue_num,callback:ul_completepending2}
+					},ctx.uq);
+				}
+				ul_queue_num++;
+				ul_uploading = false;
+				startupload();
+			}
+		}
+	});
+}
+
+
+function ul_Identical(target,path,hash,size)
+{
+	var p = path.split('/');	
+	var n = M.d[target];
+	for (var i in p)
+	{		
+		var foldername = p[i];
+		var h = n.h;		
+		if (!n) return false;		
+		var n = false;		
+		for (var j in M.c[h])
+		{
+			if (M.d[j] && M.d[j].name == foldername)
+			{
+				if (M.d[j].t) n = M.d[j];
+				else if (p.length == parseInt(i)+1 && (hash == M.d[j].hash || size == M.d[j].s)) return M.d[j];
+			}			
+		}
+	}
+	return false;
+}
+
+
+function initupload1()
+{
 	if (ul_queue[ul_queue_num].posturl) initupload3();
 	else
 	{
@@ -119,7 +193,6 @@ function startupload()
 				maxpf -= ul_queue[i].size
 			}
 		}
-
 		api_req(req,ctx);
 	}
 }
@@ -148,13 +221,23 @@ function initupload3()
 		// TODO: upload over quota reporting
 		return;
 	}
+	
+	if (ul_queue[ul_queue_num].repair)
+	{
+		ul_key = ul_queue[ul_queue_num].repair;
+		ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]	
+	}
+	else
+	{
+		ul_key = Array(6);
+		// generate ul_key and nonce
+		for (i = 6; i--; ) ul_key[i] = rand(0x100000000);
+	}
+		
+		
 
-	ul_key = Array(6);
-
-	// generate ul_key and nonce
-	for (i = 6; i--; ) ul_key[i] = rand(0x100000000);
-
-	ul_keyNonce = JSON.stringify(ul_key);
+		ul_keyNonce = JSON.stringify(ul_key);
+	
 
 	ul_macs = [];
 
@@ -224,6 +307,7 @@ function initupload3()
 	}
 
 	onUploadStart(ul_queue_num);
+
 	ul_dispatch_chain();
 }
 
@@ -523,7 +607,7 @@ function ul_completepending2(res,ctx)
 		process_f(res[0].f);
 		rendernew();
 		fm_thumbnails();
-		api_attachfileattr(res[0].f[0].h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(res[0].f[0].h,ctx.faid);
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}

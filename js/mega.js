@@ -40,6 +40,7 @@ function MegaData ()
 	this.c = {};
 	this.u = {};
 	this.t = {};
+	this.h = {};
 	this.sn = false;
 	this.filter = false;
 	this.sortfn = false;
@@ -739,7 +740,6 @@ function MegaData ()
 			}
 			else console.log('something went wrong!',n.p,this.u[n.p]);
 		}
-
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
 		{
@@ -767,6 +767,11 @@ function MegaData ()
 					newmissingkeys = true;
 				  }
 				}
+			}			
+			if (n.hash)
+			{
+				if (!this.h[n.hash]) this.h[n.hash]=[];
+				this.h[n.hash].push(n.h);
 			}
 		}
 		if (this.d[n.h] && this.d[n.h].shares) n.shares = this.d[n.h].shares;
@@ -787,7 +792,8 @@ function MegaData ()
 			if (mDB && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
-				M.delIndex(M.d[h].p,h);
+				M.delIndex(M.d[h].p,h);				
+				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
 			if (M.v[h]) delete M.v[h];
@@ -795,6 +801,22 @@ function MegaData ()
 		}
 		ds(h);
 	};
+	
+	this.delHash = function(n)
+	{
+		if (n.hash && M.h[n.hash])
+		{
+			for (var i in M.h[n.hash])
+			{
+				if (M.h[n.hash][i] == n.h) 
+				{
+					M.h[n.hash].splice(i,1);
+					break;
+				}
+			}			
+			if (M.h[n.hash].length == 0) delete M.h[n.hash];
+		}
+	}
 
 	this.addContact = function(email)
 	{
@@ -1541,9 +1563,8 @@ function MegaData ()
 		else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
 		else if (error == ESID) errorstr = l[19];
 		else if (error == ETEMPUNAVAIL) errorstr = l[233];
-		else if (error == EBLOCKED) errorstr=l[21];
+		else if (error == EBLOCKED || error == ETOOMANY || error == EACCESS) errorstr=l[23];
 		else if (error == ENOENT) errorstr=l[22];
-		else if (error == EACCESS) errorstr = l[23];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
 		else errorstr = l[233];

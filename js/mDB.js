@@ -50,9 +50,9 @@ if (indexedDB)
 		}
 		request.onsuccess = function(event)
 		{
-			if (localStorage[u_handle + '_mDBcount'] && (!localStorage.mDBv || parseInt(localStorage.mDBv) < 1))
+			if (localStorage[u_handle + '_mDBcount'] && (!localStorage.mDBv || parseInt(localStorage.mDBv) < 2))
 			{
-				localStorage.mDBv=1;
+				localStorage.mDBv=2;
 				delete localStorage[u_handle + '_mDBcount'];			
 			}
 			if (!mDB) return false;

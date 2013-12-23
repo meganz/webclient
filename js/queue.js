@@ -1,3 +1,4 @@
+// cr@mega.co.nz
 var DEFAULT_CONCURRENCY = 6;
 (function(window) {
 	function queue(worker, concurrency) {
@@ -16,9 +17,10 @@ var DEFAULT_CONCURRENCY = 6;
 	}
 	inherits(queue, MegaEvents)
 
-	function Context(queue, worker) {
+	function Context(queue, args) {
 		this.done = function() {
 			queue._running.splice($.inArray(this, queue._running),1);
+			queue.trigger('done', args)
 			queue.process();
 		}
 	}

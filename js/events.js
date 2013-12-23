@@ -1,3 +1,4 @@
+// cr@mega.co.nz
 function MegaEvents() {
    this._events = {}; 
 }

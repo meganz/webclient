@@ -1063,12 +1063,13 @@ function accountUI()
 							'<input type="button" value="Browse..." style="-moz-appearance:' +
 								'progressbar;margin-right:12px;cursor:pointer" />' +
 							'</div>'));
-					$('#acc_dls_folder').append($('<span/>').text(mozPrefs.getCharPref('dir')));
+					var fld = mozGetDownloadsFolder();
+					$('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
 					$('#acc_dls_folder input').click(function()
 					{
 						var fs = mozFilePicker(0,2);
 						if (fs) {
-							mozPrefs.setCharPref('dir', fs.path);
+							mozSetDownloadsFolder(fs);
 							$(this).next().text(fs.path);
 						}
 					});

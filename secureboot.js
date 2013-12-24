@@ -118,16 +118,6 @@ if (is_chrome_firefox)
 	staticpath = 'https://eu.static.mega.co.nz/';
 
 	if(!b_u) try {
-		var mozPrefs = Services.prefs.getBranch('extensions.mega.');
-
-		if(!mozPrefs.getPrefType('dir')) {
-
-			/**
-			 * Downloads will be saved on the Desktop by default
-			 */
-			mozPrefs.setCharPref('dir',Services.dirsvc.get("Desk", Ci.nsIFile).path);
-		}
-
 		loadSubScript(bootstaticpath + 'fileapi.js');
 	} catch(e) {
 		b_u = 1;

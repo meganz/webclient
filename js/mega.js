@@ -1311,8 +1311,8 @@ function MegaData ()
 
 		if(is_chrome_firefox) 
 		{
-			var root = mozPrefs.getCharPref('dir');
-			dirs.forEach(function(p) 
+			var root = mozGetDownloadsFolder();
+			if (root) dirs.forEach(function(p) 
 			{
 				try 
 				{

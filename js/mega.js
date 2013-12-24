@@ -40,6 +40,7 @@ function MegaData ()
 	this.c = {};
 	this.u = {};
 	this.t = {};
+	this.h = {};
 	this.sn = false;
 	this.filter = false;
 	this.sortfn = false;
@@ -739,7 +740,6 @@ function MegaData ()
 			}
 			else console.log('something went wrong!',n.p,this.u[n.p]);
 		}
-
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
 		{
@@ -767,6 +767,11 @@ function MegaData ()
 					newmissingkeys = true;
 				  }
 				}
+			}			
+			if (n.hash)
+			{
+				if (!this.h[n.hash]) this.h[n.hash]=[];
+				this.h[n.hash].push(n.h);
 			}
 		}
 		if (this.d[n.h] && this.d[n.h].shares) n.shares = this.d[n.h].shares;
@@ -787,7 +792,8 @@ function MegaData ()
 			if (mDB && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
-				M.delIndex(M.d[h].p,h);
+				M.delIndex(M.d[h].p,h);				
+				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
 			if (M.v[h]) delete M.v[h];
@@ -795,6 +801,22 @@ function MegaData ()
 		}
 		ds(h);
 	};
+	
+	this.delHash = function(n)
+	{
+		if (n.hash && M.h[n.hash])
+		{
+			for (var i in M.h[n.hash])
+			{
+				if (M.h[n.hash][i] == n.h) 
+				{
+					M.h[n.hash].splice(i,1);
+					break;
+				}
+			}			
+			if (M.h[n.hash].length == 0) delete M.h[n.hash];
+		}
+	}
 
 	this.addContact = function(email)
 	{
@@ -1289,8 +1311,8 @@ function MegaData ()
 
 		if(is_chrome_firefox) 
 		{
-			var root = mozPrefs.getCharPref('dir');
-			dirs.forEach(function(p) 
+			var root = mozGetDownloadsFolder();
+			if (root) dirs.forEach(function(p) 
 			{
 				try 
 				{
@@ -1399,9 +1421,9 @@ function MegaData ()
 			}
 		}
 
-		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);
+		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
@@ -1541,9 +1563,8 @@ function MegaData ()
 		else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
 		else if (error == ESID) errorstr = l[19];
 		else if (error == ETEMPUNAVAIL) errorstr = l[233];
-		else if (error == EBLOCKED) errorstr=l[21];
+		else if (error == EBLOCKED || error == ETOOMANY || error == EACCESS) errorstr=l[23];
 		else if (error == ENOENT) errorstr=l[22];
-		else if (error == EACCESS) errorstr = l[23];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
 		else errorstr = l[233];
@@ -1571,7 +1592,8 @@ function MegaData ()
 			if (!f.flashid) f.flashid = false;
 			f.target = M.currentdirid;
 			f.id = ul_id;
-			ul_queue.push(f);
+			ul_queue.push(f);			
+			
 			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		}
 		if (page !== 'start') openTransferpanel();

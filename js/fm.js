@@ -1063,12 +1063,13 @@ function accountUI()
 							'<input type="button" value="Browse..." style="-moz-appearance:' +
 								'progressbar;margin-right:12px;cursor:pointer" />' +
 							'</div>'));
-					$('#acc_dls_folder').append($('<span/>').text(mozPrefs.getCharPref('dir')));
+					var fld = mozGetDownloadsFolder();
+					$('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
 					$('#acc_dls_folder input').click(function()
 					{
 						var fs = mozFilePicker(0,2);
 						if (fs) {
-							mozPrefs.setCharPref('dir', fs.path);
+							mozSetDownloadsFolder(fs);
 							$(this).next().text(fs.path);
 						}
 					});
@@ -2801,6 +2802,8 @@ function selectddUI()
 		}
 	});
 	
+	$('.ui-selectable-helper').remove();
+	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) { searchPath(); }});
 
     /**
@@ -3025,7 +3028,7 @@ function transferPanelUI()
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-            if(localStorage.transferPaneHeight) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
+            if(localStorage.transferPaneHeight && $.transferPaneResizable) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
 			else  $('.transfer-panel').css({'height': '193px'});            
 			$.transferHeader();
 		}
@@ -3636,7 +3639,15 @@ function shareDialog(close)
 			var u = [];
 			var html='';
 			for(var i in M.c['contacts']) if (M.u[i]) u.push(M.u[i]);
-			u.sort(function(a,b){if (u.name) return u.name.localeCompare(b.name);});			
+			u.sort(function(a,b)
+			{
+				if (a.name && b.name) return a.name.localeCompare(b.name); 
+				else 
+				{ 
+					console.log('huh',a,b); 
+					return -1; 
+				}
+			});
 			for (var i in u)
 			{
 				var avatar= staticpath + 'images/mega/default-top-avatar.png';
@@ -4482,11 +4493,20 @@ function propertiesDialog(close)
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
+		p.t6='';
+		p.t7='';
+		
 		$('.fm-dialog.properties-dialog').removeClass('multiple');
 		if (filecnt) 
 		{
 			p.t3 = l[87] + ':';
-			p.t5 = ' second';		
+			p.t5 = ' second';
+			
+			if (n.mtime)
+			{			
+				p.t6 = l[94] + ':';		
+				p.t7 = htmlentities(time2date(n.mtime));
+			}
 		}
 		else
 		{
@@ -4499,13 +4519,9 @@ function propertiesDialog(close)
 		if (foldercnt)
 		{
 			p.t6 = l[897] + ':';		
-			p.t7 = fm_contains(sfilecnt,sfoldercnt);		
+			p.t7 = fm_contains(sfilecnt,sfoldercnt);
 		}
-		else
-		{
-			p.t6='';
-			p.t7='';
-		}
+		
 		
 		p.t8 = l[896] + ':';
 		p.t9 = htmlentities(time2date(n.ts));
@@ -4538,7 +4554,7 @@ function propertiesDialog(close)
 				a++;
 			}
 		}	
-	}	
+	}
 	$('.on_off :checkbox').iphoneStyle({checkedLabel:l[1021],uncheckedLabel:l[1022],resizeContainer: false, resizeHandle: false, onChange: function(elem, data) 
 	{
 		if(data) $(elem).closest('.on_off').addClass('active');

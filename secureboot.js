@@ -7,6 +7,7 @@ if (document.location.href.indexOf('preview.mega.co.nz') > -1)
 	localStorage.dd=1;
 }
 
+
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
 else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
 
@@ -117,16 +118,6 @@ if (is_chrome_firefox)
 	staticpath = 'https://eu.static.mega.co.nz/';
 
 	if(!b_u) try {
-		var mozPrefs = Services.prefs.getBranch('extensions.mega.');
-
-		if(!mozPrefs.getPrefType('dir')) {
-
-			/**
-			 * Downloads will be saved on the Desktop by default
-			 */
-			mozPrefs.setCharPref('dir',Services.dirsvc.get("Desk", Ci.nsIFile).path);
-		}
-
 		loadSubScript(bootstaticpath + 'fileapi.js');
 	} catch(e) {
 		b_u = 1;
@@ -380,7 +371,8 @@ else
 		jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
 		jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-		jsl.push({f:'js/zip.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/contrib/Int64.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},

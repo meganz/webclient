@@ -187,11 +187,11 @@ function init_page()
 					register_txt = l[1041];
 					document.location.hash='register';
 				}
-			}		
+			}
+			else document.location.hash='fm/account';			
 		}});
 		return false;
-	}
-	
+	}	
 	
 	if (localStorage.voucher && u_type !== false)
 	{

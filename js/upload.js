@@ -111,9 +111,13 @@ function ul_deduplicate(identical)
 {
 	var uq = ul_queue[ul_queue_num];	
 	if (identical && ul_skipIdentical) var n = identical;
-	else if (!M.h[uq.hash] && !identical) initupload1();
+	else if (!M.h[uq.hash] && !identical)
+	{
+		initupload1();
+		return;
+	}
 	else var n = M.d[M.h[uq.hash][0]];
-	if (!n) initupload1();	
+	if (!n) initupload1();
 	api_req([{a:'g',g:1,ssl:use_ssl,n:n.h}],
 	{
 		uq:uq,

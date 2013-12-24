@@ -951,11 +951,17 @@ function getsc(fm)
 	ctx = 
 	{		
 		callback : function(res,ctx)
-		{			
-			if (ctx.fm && res == ETOOMANY)
+		{		
+			if (res == ESID)
 			{
-				loadfm();
-				return false;			
+				u_logout();
+				document.location.hash = 'login';
+				return false;
+			}
+			else if (ctx.fm && typeof res == 'number' && mDB)
+			{
+				mDBreload();
+				return false;
 			}
 			else if (res.w)
 			{				
@@ -968,7 +974,7 @@ function getsc(fm)
 				if (res.sn) maxaction = res.sn;				
 				execsc(res.a);
 				if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid) localStorage[u_handle + '_maxaction'] = maxaction;
-			}			
+			}
 			if (ctx.fm)
 			{
 				mDBloaded=true;
@@ -1573,7 +1579,6 @@ function api_completeupload2(ctx,uq)
 	{
 		a = { n : ctx.n };
 		if (uq.hash) 	a.c = uq.hash;
-		if (uq.ts) 		a.t = uq.ts;
 		if (d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
@@ -2042,6 +2047,17 @@ function crypto_processkey(me,master_aes,file)
 					if (key.length >= 46) rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
 				}
 				if (typeof o.c == 'string') file.hash = o.c;
+				
+				if (file.hash)
+				{				
+					var h = base64urldecode('9HKWk0WYLhgOqQGbKD87pgTcoZ5S');
+					var t = 0;
+					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
+					file.mtime=t;
+				}
+				
+				if (typeof o.t != 'undefined') file.mtime = o.t;
+				
 				file.key = k;
 				file.ar = o;
 				file.name = file.ar.n;

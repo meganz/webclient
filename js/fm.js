@@ -3639,7 +3639,15 @@ function shareDialog(close)
 			var u = [];
 			var html='';
 			for(var i in M.c['contacts']) if (M.u[i]) u.push(M.u[i]);
-			u.sort(function(a,b){if (u.name) return u.name.localeCompare(b.name);});			
+			u.sort(function(a,b)
+			{
+				if (a.name && b.name) return a.name.localeCompare(b.name); 
+				else 
+				{ 
+					console.log('huh',a,b); 
+					return -1; 
+				}
+			});
 			for (var i in u)
 			{
 				var avatar= staticpath + 'images/mega/default-top-avatar.png';
@@ -4485,11 +4493,20 @@ function propertiesDialog(close)
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
+		p.t6='';
+		p.t7='';
+		
 		$('.fm-dialog.properties-dialog').removeClass('multiple');
 		if (filecnt) 
 		{
 			p.t3 = l[87] + ':';
-			p.t5 = ' second';		
+			p.t5 = ' second';
+			
+			if (n.mtime)
+			{			
+				p.t6 = l[94] + ':';		
+				p.t7 = htmlentities(time2date(n.mtime));
+			}
 		}
 		else
 		{
@@ -4502,13 +4519,9 @@ function propertiesDialog(close)
 		if (foldercnt)
 		{
 			p.t6 = l[897] + ':';		
-			p.t7 = fm_contains(sfilecnt,sfoldercnt);		
+			p.t7 = fm_contains(sfilecnt,sfoldercnt);
 		}
-		else
-		{
-			p.t6='';
-			p.t7='';
-		}
+		
 		
 		p.t8 = l[896] + ':';
 		p.t9 = htmlentities(time2date(n.ts));
@@ -4541,7 +4554,7 @@ function propertiesDialog(close)
 				a++;
 			}
 		}	
-	}	
+	}
 	$('.on_off :checkbox').iphoneStyle({checkedLabel:l[1021],uncheckedLabel:l[1022],resizeContainer: false, resizeHandle: false, onChange: function(elem, data) 
 	{
 		if(data) $(elem).closest('.on_off').addClass('active');

@@ -2,7 +2,7 @@
 var mozOnSavingDownload = function(file,callback,ask) {
 
 	var options = {
-		folder: mozPrefs.getCharPref('dir'),
+		folder: mozGetDownloadsFolder(),
 		saveFolder: 2 == ask
 	}, f;
 
@@ -22,7 +22,7 @@ var mozOnSavingDownload = function(file,callback,ask) {
 	}
 
 	options.saveto = f;
-	options.folder = f && f.parent && f.parent.path;
+	options.folder = f && f.parent;// && f.parent.path;
 	mozOnSavingDownload.last_path = file.folder && f && mozGetPath(f.path,file.folder).path;
 	if(d) console.log('Saving To: ' + (f && f.path) + ' -- Next path: ' + mozOnSavingDownload.last_path);
 
@@ -46,8 +46,12 @@ function mozFilePicker(f,m,o) {
 }
 
 function mozFile(p,f,e) {
-	var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-	file.initWithPath(p);
+	if(p instanceof Ci.nsIFile) {
+		var file = p;
+	} else {
+		var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+		file.initWithPath(p);
+	}
 	if(e) e.forEach(function(s) file.append(s));
 	if(f) file.append(f);
 	return file;
@@ -67,7 +71,7 @@ function mozGetPath(p,e) {
 
 function mozAlert(m,x,cb) {
 	if(d) console.log('mozAlert: '+m);
-	var i = 'resource://mega/icon.png', t = 'MEGA '+(x || '2.0');
+	var i = 'resource://mega/icon.png', t = 'MEGA '+(x || mozPrefs.getCharPref('version'));
 	try {
 		Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService)
 			.showAlertNotification(i,t,m,!!cb,"",cb, 'MEGA');
@@ -208,7 +212,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 	if (d) console.log('mozDirtyGetAsEntry', aFile.path);
 }
 
-(function(scope) {
+(function __FileSystemAPI(scope) {
 	var LOG = function(m) (console.log(m), Services.console.logStringMessage('MEGA :: ' + m));
 
 	if(scope.requestFileSystem || scope.webkitRequestFileSystem) {
@@ -583,8 +587,8 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 					if((File.fs = fs)) {
 						if(options.saveFolder && options.folder) {
-							if(d) console.log('Using new downloads folder: ' + options.folder);
-							mozPrefs.setCharPref('dir', options.folder);
+							if(d) console.log('Using new downloads folder: ' + options.folder.path);
+							mozSetDownloadsFolder(options.folder);
 						}
 
 						File.sBufSize = Math.min(4*1024*1024,File.filesize * 1.3 / 100);
@@ -676,4 +680,67 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 	scope.webkitRequestFileSystem = scope.requestFileSystem = FakeFileAPI;
 
+})(self);
+
+(function __mozPreferences(scope) {
+	scope.mozPrefs = Services.prefs.getBranch('extensions.mega.');
+
+	scope.mozGetDownloadsFolder = function()
+	{
+		try
+		{
+			return mozPrefs.getComplexValue('dir', Ci.nsIFile );
+		}
+		catch(e)
+		{
+			return mozAskDownloadsFolder();
+		}
+	};
+
+	scope.mozSetDownloadsFolder = function(folder)
+	{
+		if (typeof folder === 'string') folder = mozFile(folder);
+
+		mozPrefs.setComplexValue('dir', Ci.nsIFile, folder );
+	};
+
+	scope.mozAskDownloadsFolder = function(m)
+	{
+		var folder = mozFilePicker(null,2,{title : m || 'Please choose downloads folder'});
+
+		if (folder)
+		{
+			mozSetDownloadsFolder(folder);
+		}
+		else
+		{
+			mozAlert('Mandatory downloads folder not chosen.');
+		}
+
+		return folder;
+	};
+
+	if (!mozPrefs.getPrefType('dir'))
+	{
+		/**
+		 * Downloads will be saved on the Desktop by default
+		 */
+		mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+	}
+
+	try
+	{
+		var test = mozGetDownloadsFolder();
+
+		if (!(test && test.exists() && test.isDirectory()))
+		{
+			// throw new Error('The chosen downloads folder is not valid.');
+			mozAskDownloadsFolder();
+		}
+	}
+	catch(e)
+	{
+		Cu.reportError(e);
+		alert(e);
+	}
 })(self);

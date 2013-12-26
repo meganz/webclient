@@ -5,12 +5,11 @@ function MegaEvents() {
 
 MegaEvents.prototype.trigger = function(name, args) {
 	args = args || []
-	if (!this._events[name]) {
-		return 0;
-	}
-	$.each(this._events[name], function(index, callback) {
+	$.each(this._events[name] || [], function(index, callback) {
+		done++;
 		return callback.apply(null, args)
 	});
+	return done;
 };
 
 MegaEvents.prototype.on = function(name, callback) {
@@ -20,7 +19,3 @@ MegaEvents.prototype.on = function(name, callback) {
 	this._events[name].push(callback);
 	return this;
 };
-
-function xxx() {
-}
-inherits(xxx, MegaEvents);

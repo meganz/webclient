@@ -1,6 +1,6 @@
 var dl_fs, dl_fw;
 
-var dl_queue = [];
+var dl_queue = new DownloadQueue
 var dl_queue_num = 0;
 var dl_retryinterval = 1000;
 
@@ -461,7 +461,7 @@ function dl_next()
 			dl_write_position = -1;
 			dl_write_block(-1);
 		}
-		else dl_queue = [];
+		else dl_queue = new DownloadQueue
 	
 		return -1;
 	}

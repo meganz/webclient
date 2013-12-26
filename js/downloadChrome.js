@@ -1,0 +1,141 @@
+/*global window, FileError,alert,document, DEBUG */
+"use strict";
+
+function FileSystemAPI(dl_id) {
+	var dl_storagetype
+		, dl_quotabytes = 0
+		, dl_instance = 0
+		, self = this
+		, fs_instance
+		, Fs
+		, dirid = "mega"
+		, testSize = 1024 * 1024 * 1024 * 25
+		, dlMain
+		;
+
+	window.requestFileSystem = window.webkitRequestFileSystem;
+
+	// errorHandler {{{
+	function errorHandler(type) {
+		return function (e) {
+		  switch (e.code) {
+			case FileError.QUOTA_EXCEEDED_ERR:
+			  alert('Error writing file, is your harddrive almost full? (' + type + ')');
+			  break;
+			case FileError.NOT_FOUND_ERR:
+			  alert('NOT_FOUND_ERR in ' + type);
+			  break;
+			case FileError.SECURITY_ERR:
+			  alert('File transfers do not work with Chrome Incognito.<br>' + '(Security Error in ' + type + ')');
+			  break;
+			case FileError.INVALID_MODIFICATION_ERR:
+			  alert('INVALID_MODIFICATION_ERR in ' + type);
+			  break;
+			case FileError.INVALID_STATE_ERR:
+				fs_instance = dl_instance;
+				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
+				setTimeout(function() {
+					self.check();				
+				}, 500);
+				break;
+			default:
+			  alert('webkitRequestFileSystem failed in ' + type);
+		  }
+		};	
+	}
+	// }}}
+
+	// dl_getspace {{{
+	function dl_getspace(storagetype,minsize) {		
+		if (!storagetype) storagetype = 0;		
+		if (!minsize) minsize = 0;
+
+		window.webkitStorageInfo.queryUsageAndQuota(1, function(used, remaining)  {		
+			if (remaining > 0) {
+				dl_quotabytes = remaining;
+				dl_storagetype=1;
+				if (dl_quotabytes < 1073741824) clearit(1,3600);
+				else clearit(1);
+				dlMain();
+			} else {
+				var requestbytes = testSize * 4;
+				if (storagetype == 0) requestbytes = testSize
+
+				if (storagetype == 1) dl_req_storage = true; 
+
+				window.webkitStorageInfo.requestQuota(storagetype,requestbytes,function(grantedBytes)  {
+				   window.webkitStorageInfo.queryUsageAndQuota(storagetype, function(used, remaining) {						
+						if (storagetype == 1) dl_req_storage = false;
+						
+						dl_quotabytes = remaining;						
+						
+						if (dl_quotabytes < 1073741824) clearit(storagetype,3600);	
+						
+						if ((remaining == 0) && (storagetype == 1))
+						{
+							if (!dl_req_storage) dl_getspace(1,minsize);
+							return false;				
+						}
+						else if ((minsize > dl_quotabytes) && (storagetype == 0)) 
+						{
+							if (!dl_req_storage) dl_getspace(1,minsize)
+							return false;						
+						}						
+						else if ((minsize > dl_quotabytes) && (storagetype == 1)) clearit(storagetype,3600);
+						
+						if (remaining > 0) dl_storagetype = storagetype;							
+												
+						dlMain();
+					},  dlError('error: could not query usage and storage quota. (FSFileSystem)'));
+				},  dlError('ERROR: Could not grant storage space (FSFileSystem)'));
+			}		
+		}, dlError('ERROR: Could not query usage and storage quota.'));
+	}
+	// }}}
+
+	function dl_createtmpfile(fs) {
+		Fs = fs;
+		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
+			DEBUG('Directory "' + dirid + '" created')
+			document.dirEntry = dirEntry;
+		}, errorHandler('getDirectory'));
+		DEBUG("Opening file for writing: " + dl_id);
+	}
+
+	// Check if the file can be written, return true
+	// or fail otherwise
+	function check() {
+		window.requestFileSystem(
+			dl_storagetype, 
+			testSize, 
+			dl_createtmpfile,
+			errorHandler('RequestFileSystem')
+		);
+	}
+
+	self.writeBlock = function() {
+	};
+
+	self.setCreds = function(url, size, filename) {
+		check();
+	};
+
+	self.complete = function() {
+	};
+
+	self.verifyBoot = function(main) {
+		dlMain = main;
+		dl_getspace(0);
+	}
+}
+
+/**
+ *	Static Method Check
+ *
+ *	Run all the needed async tests to make sure the selected
+ *	download method works on the current browser
+ *
+ */
+FileSystemAPI.check = function(main) {
+	(new this).verifyBoot(main);
+};

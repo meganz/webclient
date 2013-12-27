@@ -370,6 +370,7 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/contrib/Int64.js', n: 'zip_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/contrib/asmcrypto.js',n:'asmcrypto_js',j:1});
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},

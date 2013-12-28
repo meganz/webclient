@@ -2070,7 +2070,8 @@ function execsc(ap)
 	}
 	if (newnodes.length > 0 && fminitialized) rendernew();
 	if (loadavatars) M.avatars();
-	fm_thumbnails();
+	fm_thumbnails();	
+	if ($.dialog == 'properties') propertiesDialog();	
 	getsc();
 }
 

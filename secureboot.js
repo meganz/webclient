@@ -337,7 +337,6 @@ else
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
-		jsl.push({f:'js/stacktrace.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
@@ -368,7 +367,7 @@ else
 		jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
 		jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
-		jsl.push({f:'js/contrib/Int64.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
 		var jsl2 =
 		{
@@ -686,6 +685,7 @@ else
 			var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
 			if ((p > jsl_perc) && (p <= 100))
 			{
+				if (p < 100 && ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox)) return false;
 				jsl_perc = p;
 				if (document.getElementById('loading_progress_fill')) document.getElementById('loading_progress_fill').style.width = jsl_perc+'%';
 				else if(document.getElementById('loadinganim')) document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+jsl_perc;

@@ -233,6 +233,22 @@ function a32_to_str(a)
 	return b;
 }
 
+// array of 32-bit words ArrayBuffer (big endian)
+function a32_to_ab(a)
+{
+	var ab = have_ab ? new Uint8Array(4*a.length)
+	                 : new Array(4*a.length);
+
+	for ( var i = 0; i < a.length; i++ ) {
+	    ab[4*i] = a[i]>>>24;
+	    ab[4*i+1] = a[i]>>>16&255;
+	    ab[4*i+2] = a[i]>>>8&255;
+	    ab[4*i+3] = a[i]&255;
+	}
+
+	return ab;
+}
+
 function a32_to_base64(a)
 {
 	return base64urlencode(a32_to_str(a));
@@ -658,109 +674,6 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 	return mac;
 }
 
-// encrypt ArrayBuffer in CBC mode (zero IV)
-function encrypt_ab_cbc(cipher,ab)
-{
-	if (have_ab)
-	{
-		var v = new DataView(ab);
-		var iv = [0,0,0,0], d = Array(4);
-		var i;
-		
-		for (i = 0; i < ab.byteLength; i += 16)
-		{
-			d[0] = v.getUint32(i,false) ^ iv[0];
-			d[1] = v.getUint32(i+4,false) ^ iv[1];
-			d[2] = v.getUint32(i+8,false) ^ iv[2];
-			d[3] = v.getUint32(i+12,false) ^ iv[3];
-		
-			iv = cipher.encrypt(d);
-			
-			v.setUint32(i,iv[0],false);
-			v.setUint32(i+4,iv[1],false);
-			v.setUint32(i+8,iv[2],false);
-			v.setUint32(i+12,iv[3],false);
-		}
-	}
-	else
-	{
-		var ab32 = str_to_a32(ab.buffer);
-		var iv = [0,0,0,0], d = Array(4);
-		var i;
-		
-		for (i = 0; i < ab32.length; i += 4)
-		{
-			d[0] = ab32[i] ^ iv[0];
-			d[1] = ab32[i+1] ^ iv[1];
-			d[2] = ab32[i+2] ^ iv[2];
-			d[3] = ab32[i+3] ^ iv[3];
-		
-			iv = cipher.encrypt(d);
-			
-			ab32[i] = iv[0];
-			ab32[i+1] = iv[1];
-			ab32[i+2] = iv[2];
-			ab32[i+3] = iv[3];
-		}
-		
-		ab.buffer = a32_to_str(ab32);
-	}
-}
-
-// decrypt ArrayBuffer in CBC mode (zero IV)
-function decrypt_ab_cbc(cipher,ab)
-{
-	if (have_ab)
-	{
-		var v = new DataView(ab);
-		var iv = [0,0,0,0], d = Array(4), t = Array(4);
-		var i;
-		
-		for (i = 0; i < ab.byteLength; i += 16)
-		{
-			d[0] = v.getUint32(i,false);
-			d[1] = v.getUint32(i+4,false);
-			d[2] = v.getUint32(i+8,false);
-			d[3] = v.getUint32(i+12,false);
-			t = d;
-		
-			d = cipher.decrypt(d);
-
-			v.setUint32(i,d[0] ^ iv[0],false);
-			v.setUint32(i+4,d[1] ^ iv[1],false);
-			v.setUint32(i+8,d[2] ^ iv[2],false);
-			v.setUint32(i+12,d[3] ^ iv[3],false);
-			iv = t;
-		}
-	}
-	else
-	{
-		// no offset/length support needed
-		var ab32 = str_to_a32(ab.buffer);
-		var iv = [0,0,0,0], d = Array(4), t = Array(4);
-		var i;
-		
-		for (i = 0; i < ab32.length; i += 4)
-		{
-			d[0] = ab32[i];
-			d[1] = ab32[i+1];
-			d[2] = ab32[i+2];
-			d[3] = ab32[i+3];
-			t = d;
-		
-			d = cipher.decrypt(d);
-			
-			ab32[i] = d[0] ^ iv[0];
-			ab32[i+1] = d[1] ^ iv[1];
-			ab32[i+2] = d[2] ^ iv[2];
-			ab32[i+3] = d[3] ^ iv[3];
-			iv = t;
-		}
-
-		ab.buffer = a32_to_str(ab32);
-	}
-}
-
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher,a)
 {	
@@ -785,18 +698,14 @@ function decrypt_key(cipher,a)
 // returns [ArrayBuffer data,Array key]
 function enc_attr(attr,key)
 {
-	var aes;
 	var ab;
-	var b;
 
 	ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
 
 	// if no key supplied, generate a random one
 	if (!key.length) for (i = 4; i--; ) key[i] = rand(0x100000000);
 
-	aes = new sjcl.cipher.aes([key[0]^key[4],key[1]^key[5],key[2]^key[6],key[3]^key[7]]);
-
-	encrypt_ab_cbc(aes,ab);
+	ab = asmCrypto.AES_CBC.encrypt( ab, a32_to_ab( [ key[0]^key[4], key[1]^key[5], key[2]^key[6], key[3]^key[7] ] ), false );
 
 	return [ab,key];
 }
@@ -808,9 +717,8 @@ function dec_attr(attr,key)
 {
 	var aes;
 	var b;
-	
-	aes = new sjcl.cipher.aes([key[0]^key[4],key[1]^key[5],key[2]^key[6],key[3]^key[7]]);
-	decrypt_ab_cbc(aes,attr);
+
+	attr = asmCrypto.AES_CBC.decrypt( attr, a32_to_ab( [ key[0]^key[4], key[1]^key[5], key[2]^key[6], key[3]^key[7] ] ), false );
 
 	b = ab_to_str_depad(attr);
 
@@ -1637,13 +1545,13 @@ var storedattr = {};
 var faxhrs = [];
 
 // data.byteLength & 15 must be 0
-function api_storefileattr(id,type,aes,data,ctx)
+function api_storefileattr(id,type,key,data,ctx)
 {	
 	if (!ctx)
 	{
 		if (!storedattr[id]) storedattr[id] = {};
 
-		if (aes) encrypt_ab_cbc(aes,data);
+		if (key) data = asmCrypto.AES_CBC.encrypt( data, a32_to_ab(key), false );
 
 		var ctx = { callback : api_fareq, id : id, type : type, data : data };
 	}
@@ -1717,11 +1625,8 @@ function api_fareq(res,ctx)
 								if (k = ctx.k[h])
 								{
 									var ts = new Uint8Array(this.response,p,l);
-									var td = new Uint8Array(l);
 
-									td.set(ts);
-
-									decrypt_ab_cbc(new sjcl.cipher.aes([k[0]^k[4],k[1]^k[5],k[2]^k[6],k[3]^k[7]]),td.buffer);
+									var td = asmCrypto.AES_CBC.decrypt( ts, a32_to_ab( [ k[0]^k[4], k[1]^k[5], k[2]^k[6], k[3]^k[7] ] ), false );
 
 									ctx.procfa(ctx,ctx.h[h],td);
 								}

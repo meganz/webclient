@@ -48,7 +48,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 			myURL.revokeObjectURL(this.src);
 			var dataURI = canvas.toDataURL('image/jpeg',0.85);
 			var ab = dataURLToAB(dataURI);
-			api_storefileattr(this.id,0,this.aes,ab.buffer);
+			api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
 			if (d) console.log('total time:', new Date().getTime()-t);
 		};
 		try

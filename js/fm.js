@@ -2664,19 +2664,19 @@ function searchPath()
 				{
 					id = M.RootID;
 					c = 'cloud-drive';
-					name = 'Rubbish Bin';
+					name = l[164];
 				}
 				else if (path[i] == M.RubbishID)
 				{
 					id = M.RubbishID;
 					c = 'recycle-item';
-					name = 'Rubbish Bin';
+					name = l[168];
 				}
 				else if (path[i] == M.InboxID)
 				{
-					id = M.RubbishID;
+					id = M.InboxID;
 					c = 'inbox-item';
-					name = 'Inbox';
+					name = l[166];
 				}
 				else if (n)
 				{

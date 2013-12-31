@@ -1,4 +1,4 @@
-/*global window, FileError,alert,document, DEBUG */
+/*global window, FileError,alert,document, DEBUG, dl_method */
 "use strict";
 
 function FileSystemAPI(dl_id) {
@@ -8,10 +8,16 @@ function FileSystemAPI(dl_id) {
 		, self = this
 		, fs_instance
 		, Fs
+		, dl_fs
 		, dirid = "mega"
 		, testSize = 1024 * 1024 * 1024 * 25
 		, dlMain
 		;
+
+	// We should stop relying on dl_method
+	// instead we should use instanceof or
+	// dlMethod.getType()
+	dl_method = 0;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
 
@@ -100,6 +106,21 @@ function FileSystemAPI(dl_id) {
 			document.dirEntry = dirEntry;
 		}, errorHandler('getDirectory'));
 		DEBUG("Opening file for writing: " + dl_id);
+
+		var path = dirid + '/' + dl_id;
+		Fs.root.getFile(path, {create: true}, function(fileEntry) {
+			fileEntry.createWriter(function(fileWriter) {
+				DEBUG('FILE "' + path + '" created');
+				dl_fw = fileWriter;
+				dl_fw.truncate(0);
+				dl_fw.onerror = function(e) {
+					DEBUG("Write failed: " + e.toString())
+					if (this.instance == dl_instance) {
+					}
+				};
+
+			}, errorHandler('createWriter'));
+		}, errorHandler('getFile'));
 	}
 
 	// Check if the file can be written, return true

@@ -483,3 +483,22 @@ function checkMail(email)
 	if (filter.test(email)) return false;	
 	else return true;	
 }
+
+/**
+ *	Global function to help debugging
+ */
+function DEBUG(x) {
+	if (d) {
+		console.log.apply(console, arguments)
+	}
+}
+
+/**
+ *	Return a default callback for error handlign
+ */
+function dlError(text) {
+	return function(e) {
+		console.log(text + ' ' + e);
+		alert(text + ' ' + e);
+	};
+}

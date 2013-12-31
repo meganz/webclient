@@ -1432,7 +1432,6 @@ function MegaData ()
 		initGridScrolling();
 		initFileblocksScrolling();
 		initTreeScroll();
-		startdownload();
 
 		delete $.dlhash;
 	}

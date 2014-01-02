@@ -490,6 +490,7 @@ function checkMail(email)
 function DEBUG(x) {
 	if (d) {
 		console.log.apply(console, arguments)
+		console.error.apply(console, arguments)
 	}
 }
 

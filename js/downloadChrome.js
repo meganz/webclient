@@ -1,7 +1,7 @@
 /*global window, FileError,alert,document, DEBUG, dl_method */
 "use strict";
 
-function FileSystemAPI(dl_id) {
+function FileSystemAPI(dl_id, dl) {
 	var dl_storagetype
 		, dl_quotabytes = 0
 		, dl_instance = 0
@@ -12,6 +12,11 @@ function FileSystemAPI(dl_id) {
 		, dirid = "mega"
 		, testSize = 1024 * 1024 * 1024 * 25
 		, dlMain
+		, dl_chunks = []
+		, dl_chunksizes = []
+		, dl_geturl
+		, dl_filesize
+		, dl_filename
 		;
 
 	// We should stop relying on dl_method
@@ -137,7 +142,12 @@ function FileSystemAPI(dl_id) {
 	self.writeBlock = function() {
 	};
 
-	self.setCreds = function(url, size, filename) {
+	self.setCredentials = function(url, size, filename, chunks, sizes) {
+		dl_geturl = url;
+		dl_filesize = size;
+		dl_filename = filename;
+		dl_chunks   = chunks;
+		dl_chunksizes = sizes;
 		check();
 	};
 

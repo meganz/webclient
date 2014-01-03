@@ -1571,7 +1571,7 @@ function MegaData ()
 		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
 	}
 
-	this.dlstart = function(id,name,size)
+	this.dlstart = function(id,name,size, dl_queue_num)
 	{
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		if (dl_queue[dl_queue_num].zipid) id = 'zip_' + dl_queue[dl_queue_num].zipid;

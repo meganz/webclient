@@ -1,7 +1,7 @@
 /*global window, FileError,alert,document, DEBUG, dl_method */
 "use strict";
 
-function FileSystemAPI(dl_id, dl) {
+function FileSystemAPI(dl_id, dl, pos) {
 	var dl_storagetype
 		, dl_quotabytes = 0
 		, dl_instance = 0
@@ -14,9 +14,11 @@ function FileSystemAPI(dl_id, dl) {
 		, dlMain
 		, dl_chunks = []
 		, dl_chunksizes = []
+		, dl_writing
 		, dl_geturl
 		, dl_filesize
 		, dl_filename
+		, zfileEntry
 		;
 
 	// We should stop relying on dl_method
@@ -103,6 +105,17 @@ function FileSystemAPI(dl_id, dl) {
 		}, dlError('ERROR: Could not query usage and storage quota.'));
 	}
 	// }}}
+	
+	function dl_run() {
+		if (dl_filesize) {
+			for (var i = dl_maxSlots; i--; ) dl_dispatch_read();
+			dl.onDownloadStart(dl_id, dl_filename, dl_filesize, pos);
+		}
+		else {
+			dl_checklostchunk();
+		}
+	}
+
 
 	function dl_createtmpfile(fs) {
 		Fs = fs;
@@ -119,11 +132,26 @@ function FileSystemAPI(dl_id, dl) {
 				dl_fw = fileWriter;
 				dl_fw.truncate(0);
 				dl_fw.onerror = function(e) {
+					if (this.instance != dl_instance) return;
+
 					DEBUG("Write failed: " + e.toString())
-					if (this.instance == dl_instance) {
+					dl_writing = false;
+					dl_write_failed(e);
+				};
+				dl_fw.onwriteend = function() {
+					if (this.instance != dl_instance) return;
+					DEBUG("fileWriter: onwriteend, position: " + this.position + ", expected: " + this.targetpos);
+					dl_writing = false;
+
+					if (this.position == this.targetpos) { 
+						dl_ack_write();
+					} else {
+						dl_write_failed('Short write (' + this.position + ' / ' + this.targetpos + ')');
 					}
 				};
 
+				zfileEntry = fileEntry;
+				dl_run();
 			}, errorHandler('createWriter'));
 		}, errorHandler('getFile'));
 	}

@@ -54,7 +54,7 @@ DownloadQueue.prototype.push = function() {
 		, dl  = this[dl_id]
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
-		, dlObject = new dlMethod(dl_id, dl)
+		, dlObject = new dlMethod(dl.ph || dl.id, dl, dl_id)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]]);
 
 	DEBUG("dl_key " + dl_key);

@@ -1436,7 +1436,7 @@ function MegaData ()
 		delete $.dlhash;
 	}
 
-	this.dlprogress = function (id, bl, bt,kbps)
+	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
 	{
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
@@ -1578,7 +1578,7 @@ function MegaData ()
 		else id = 'dl_' + id;
 		$('.transfer-table').prepend($('.transfer-table #' + id));
 		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id);
+		M.dlprogress(id, 0, 0, 0, dl_queue_num);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];

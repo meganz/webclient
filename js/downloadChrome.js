@@ -106,17 +106,6 @@ function FileSystemAPI(dl_id, dl, pos) {
 	}
 	// }}}
 	
-	function dl_run() {
-		if (dl_filesize) {
-			for (var i = dl_maxSlots; i--; ) dl_dispatch_read();
-			dl.onDownloadStart(dl_id, dl_filename, dl_filesize, pos);
-		}
-		else {
-			dl_checklostchunk();
-		}
-	}
-
-
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
@@ -151,7 +140,7 @@ function FileSystemAPI(dl_id, dl, pos) {
 				};
 
 				zfileEntry = fileEntry;
-				dl_run();
+				self.begin();
 			}, errorHandler('createWriter'));
 		}, errorHandler('getFile'));
 	}
@@ -167,15 +156,20 @@ function FileSystemAPI(dl_id, dl, pos) {
 		);
 	}
 
+	self.isDone = function() {
+		return dl_queue.length == 0;
+	}
+
 	self.writeBlock = function() {
 	};
 
-	self.setCredentials = function(url, size, filename, chunks, sizes) {
+	self.setCredentials = function(url, size, filename, chunks, sizes, urls) {
 		dl_geturl = url;
 		dl_filesize = size;
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
+		dl_urls      = urls;;
 		check();
 	};
 

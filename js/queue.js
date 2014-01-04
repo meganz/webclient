@@ -1,5 +1,6 @@
 // cr@mega.co.nz
-var DEFAULT_CONCURRENCY = 6;
+var DEFAULT_CONCURRENCY = 6
+	, QueueClass
 (function(window) {
 	function queue(worker, concurrency) {
 		if (concurrency === undefined) {
@@ -44,5 +45,5 @@ var DEFAULT_CONCURRENCY = 6;
 		this.process();
 	}
 
-	window.Queue = queue;
+	QueueClass = queue;
 })(this)

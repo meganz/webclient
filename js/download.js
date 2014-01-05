@@ -1023,13 +1023,8 @@ var dl_lastprogress = 0;
 
 function dl_updateprogress()
 {
-	var p = dl_bytesreceived;
-
-	if (dl_queue[dl_queue_num])
-	{
-		if (dl_legacy_ie) for (var pp in dl_flash_progress) p += dl_flash_progress[pp];
-		else for (var slot = dl_maxSlots; slot--; ) p += dl_progress[slot];
-		
+	$.each(dl_queue, function(key, dl) {
+		var p = dl_bytesreceived;
 		
 		if (dl_lastprogress+250 > new Date().getTime()) return false;
 		else dl_lastprogress=new Date().getTime();
@@ -1037,7 +1032,7 @@ function dl_updateprogress()
 		dl_queue[dl_queue_num].onDownloadProgress(dl_id, p, dl_filesize, dl_xr.update(p-dl_prevprogress));
 
 		dl_prevprogress = p;
-	}
+	});
 }
 
 function appendBuffer( buffer1, buffer2 ) 

@@ -5,6 +5,7 @@ function MegaEvents() {
 
 MegaEvents.prototype.trigger = function(name, args) {
 	args = args || []
+	var done = 0;
 	$.each(this._events[name] || [], function(index, callback) {
 		done++;
 		return callback.apply(null, args)

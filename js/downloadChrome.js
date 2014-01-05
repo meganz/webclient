@@ -160,16 +160,27 @@ function FileSystemAPI(dl_id, dl, pos) {
 		return dl_queue.length == 0;
 	}
 
+	var last_update = new Date();
+	self.update = function() {
+		last_update = new Date();
+		return self;
+	}
+
+	self.getLastUpdate = function () {
+		return last_update.getTime();
+	}
+
+
+
 	self.writeBlock = function() {
 	};
 
-	self.setCredentials = function(url, size, filename, chunks, sizes, urls) {
+	self.setCredentials = function(url, size, filename, chunks, sizes) {
 		dl_geturl = url;
 		dl_filesize = size;
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		dl_urls      = urls;;
 		check();
 	};
 

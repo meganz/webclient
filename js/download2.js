@@ -19,11 +19,21 @@ function DownloadQueue() {
 }
 inherits(DownloadQueue, Array);
 
-DownloadQueue.prototype.splitFile = function(dl_filesize)
-{
+DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
+	var dl_urls = []
+	$.each(dl_chunks, function(key, pos) {
+		dl_urls.push({
+			url: url + '/' + pos + '-' + (pos+dl_chunksizes[pos]-1),
+			size: dl_chunksizes[pos]
+		})
+	});
+
+	return dl_urls;
+}
+
+DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	var dl_chunks = []
 		, dl_chunksizes = []
-		, dl_urls = []
 	
 	var p = pp = 0;
 	for (var i = 1; i <= 8 && p < dl_filesize-i*131072; i++) {
@@ -46,11 +56,7 @@ DownloadQueue.prototype.splitFile = function(dl_filesize)
 		delete dl_chunks[dl_chunks.length-1];
 	}
 
-	$.each(dl_chunks, function(key, pos) {
-		dl_urls.push(dl_geturl + '/' + pos + '-' + (pos+dl_chunksizes[pos]-1))
-	});
-
-	return { chunks: dl_chunks, offsets: dl_chunksizes, urls: dl_urls};
+	return {chunks: dl_chunks, offsets: dl_chunksizes};
 }
 
 DownloadQueue.prototype.push = function() {
@@ -60,10 +66,13 @@ DownloadQueue.prototype.push = function() {
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
 		, dlObject = new dlMethod(dl.ph || dl.id, dl, dl_id)
-		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]]);
+		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
+		, dl_urls = []
 
 	dlObject.begin = function() {
-		alert("here");
+		$.each(dl_urls||[], function(key, url) {
+			dlQueue.push({url: url.url, size: url.size, instance: dlObject});
+		});
 	}
 
 	DEBUG("dl_key " + dl_key);
@@ -81,12 +90,12 @@ DownloadQueue.prototype.push = function() {
 						, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 
 					if (typeof o == 'object' && typeof o.n == 'string') {
-						var split = dl_queue.splitFile(res.s);
+						var info = dl_queue.splitFile(res.s);
+						dl_urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
-							alert("DEBUG ME");
 							dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
 						} else {
-							return dlObject.setCredentials(res.g, res.s, o.n, split.chunks, split.offsets, split.urls);
+							return dlObject.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 						}
 					} else {
 						dl_reportstatus(dl_id, EKEY);

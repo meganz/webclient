@@ -344,6 +344,7 @@ else
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 		jsl.push({f:'index.js', n: 'index', j:1,w:4});

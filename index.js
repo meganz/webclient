@@ -569,16 +569,23 @@ function init_page()
 		$('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
-		$('#fmholder').show();
+		if ($('#fmholder:visible').length == 0) 
+		{
+			$('#fmholder').show();			
+			if (fminitialized)
+			{			
+				if (M.viewmode == 1) iconUI();
+				else gridUI();
+				treeUI();
+				if ($.transferHeader) $.transferHeader();
+			}
+		}
+		
 		if (fminitialized)
 		{
 			if (M.currentdirid == 'account') accountUI();			
 			else if (M.currentdirid == 'notifications') notificationsUI();
 			else if (M.currentdirid == 'search') searchFM();
-			else if (M.viewmode == 1) iconUI();
-			else gridUI();
-			treeUI();
-			if ($.transferHeader) $.transferHeader();
 		}		
 	}
 	else if (page.substr(0,2) == 'fm' && !u_type)

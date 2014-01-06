@@ -447,11 +447,13 @@ function MegaData ()
 		treeUI();
 	};
 
-	this.openFolder = function(id,force)
+	this.openFolder = function(id,force,chat)
 	{
+		$('.fm-files-view-icon').removeClass('hidden');
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') == -1) notificationsUI(1);
 		this.search=false;
+		this.chat=false;
 		if (!fminitialized)
 		{
 			fminitialized=true;
@@ -465,12 +467,20 @@ function MegaData ()
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
+		else if (id && id.substr(0,5) == 'chat/') this.chat=true;
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
 		if (id == this.RootID) $('.fm-connector-first').removeClass('active');
-
-		if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
+		
+		if (this.chat)
+		{
+			treeUIopen(M.currentdirid.replace('chat/',''),1);			
+			chatui();
+			fmtopUI();
+			M.renderPath();
+		}
+		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			$('.fm-right-account-block').addClass('hidden');
@@ -673,7 +683,13 @@ function MegaData ()
 			hasnext = 'has-next-button';
 		}
 
-		if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
+		if (this.currentdirid && this.currentdirid.substr(0,5) == 'chat/')
+		{			
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>Andrei.d</span></span></a>');
+			
+			$('.search-files-result').addClass('hidden');						
+		}
+		else if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
 		{
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
 			$('.search-files-result .search-number').text(M.v.length);
@@ -709,7 +725,8 @@ function MegaData ()
 		$('.fm-breadcrumbs-block a').unbind('click');
 		$('.fm-breadcrumbs-block a').bind('click',function(event)
 		{
-			if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;		
+			if ($(this).attr('id') == 'chatcrumb') return false;
+			else if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;
 			M.openFolder($(this).attr('id').replace('path_',''));
 		});
 	};
@@ -1360,9 +1377,7 @@ function MegaData ()
 						if (!M.d[subids[j]].t)
 						{
 							nodes.push(subids[j]);
-							paths[subids[j]]=path;
-							
-							console.log('1 path',path, subids[j]);
+							paths[subids[j]]=path;							
 						}
 						else console.log('0 path',path);
 					}
@@ -2133,6 +2148,7 @@ function isCircular(fromid,toid)
 
 function RootbyId(id)
 {
+	if (id) id = id.replace('chat/','');
 	var p = M.getPath(id);
 	return p[p.length-1];
 }

@@ -866,11 +866,11 @@ function getsc(fm)
 				document.location.hash = 'login';
 				return false;
 			}
-			else if (ctx.fm && typeof res == 'number' && mDB)
+			else if (typeof res == 'number' && mDB)
 			{
 				mDBreload();
 				return false;
-			}
+			}			
 			else if (res.w)
 			{				
 				waiturl = res.w;

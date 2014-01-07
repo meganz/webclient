@@ -21,7 +21,8 @@ var DEFAULT_CONCURRENCY = 6
 	function Context(queue, args) {
 		this.done = function() {
 			queue._running.splice($.inArray(this, queue._running),1);
-			queue.trigger('done', args)
+			queue.trigger('done', args.task)
+			args.callback(args.task);
 			queue.process();
 		}
 	}
@@ -32,7 +33,7 @@ var DEFAULT_CONCURRENCY = 6
 				, context = new Context(this, args)
 
 			this._running.push(context)
-			this._worker.apply(context, args)
+			this._worker.apply(context, [args.task])
 		}
 
 		if (this._queue.length == 0) {
@@ -40,8 +41,24 @@ var DEFAULT_CONCURRENCY = 6
 		}
 	}
 
-	queue.prototype.push = function() {
-		this._queue.push(arguments)
+	queue.prototype.pushAll = function(tasks, done) {
+		var that = this;
+		function check_finish(task) {
+			tasks.splice($.inArray(task, tasks),1);
+			if (tasks.length == 0) {
+				// done!
+				done();
+			}
+		};
+
+		$.each(tasks, function(key, value) {
+			value.__id = key;
+			that.push(value, check_finish);
+		});
+	};
+
+	queue.prototype.push = function(task, done) {
+		this._queue.push({task: task, callback: done || function() {}});
 		this.process();
 	}
 

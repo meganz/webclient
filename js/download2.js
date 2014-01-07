@@ -80,8 +80,14 @@ DownloadQueue.prototype.push = function() {
 	dl.macs  = {}
 
 	dlObject.begin = function() {
+		var tasks = [];
 		$.each(dl_urls||[], function(pos, url) {
-			dlQueue.push({url: url.url, pos: url.offset, size: url.size, io: dlObject , download: dl});
+			tasks.push({url: url.url, pos: url.offset, size: url.size, io: dlObject , download: dl});
+		});
+
+		dlQueue.pushAll(tasks, function() {
+			dl.onBeforeDownloadComplete(dl.pos);
+			dl.io.download(dl.n, dl.p);
 		});
 
 		// notify the UI

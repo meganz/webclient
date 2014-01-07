@@ -179,6 +179,14 @@ function FileSystemAPI(dl_id, dl, pos) {
 		dl_fw.write(new Blob([buffer]));
 	};
 
+	self.download = function(name, path) {
+		document.getElementById('dllink').download = name;
+		document.getElementById('dllink').href = zfileEntry.toURL();
+		if (!is_chrome_firefox)  {
+			document.getElementById('dllink').click();
+		}
+	}
+
 	self.setCredentials = function(url, size, filename, chunks, sizes) {
 		dl_geturl = url;
 		dl_filesize = size;

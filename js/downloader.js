@@ -59,7 +59,7 @@ function downloader(task) {
 		, url = task.url
 		, size = task.size
 		, io = task.io
-		, chunk = task.download
+		, download = task.download
 		, prevProgress = 0
 		, dl_lastprogress = 0
 
@@ -72,14 +72,14 @@ function downloader(task) {
 			return false;
 		}
 
-		chunk.onDownloadProgress(
-			chunk.dl_id, 
-			chunk.progress, // global progress
-			chunk.size, // total download size
-			io.dl_xr.update(chunk.progress - dl_prevprogress), 
-			chunk.pos // this download position
+		download.onDownloadProgress(
+			download.dl_id, 
+			download.progress, // global progress
+			download.size, // total download size
+			io.dl_xr.update(download.progress - dl_prevprogress), 
+			download.pos // this download position
 		);
-		dl_prevprogress = chunk.progress
+		dl_prevprogress = download.progress
 		dl_lastprogress = new Date().getTime();
 	}
 
@@ -100,7 +100,7 @@ function downloader(task) {
 	var prev = 0;
 	xhr.onprogress = function(e) {
 		io.update();
-		chunk.progress += e.loaded - prev;
+		download.progress += e.loaded - prev;
 		prev = e.loaded
 		updateProgress();
 	};
@@ -110,7 +110,7 @@ function downloader(task) {
 		if (this.readyState == this.DONE) {
 
 			var r = this.response || {};
-			chunk.progress += r.byteLength - prev;
+			download.progress += r.byteLength - prev;
 			updateProgress(true);
 
 			if (r.byteLength == size) {
@@ -118,13 +118,13 @@ function downloader(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: chunk, pos: task.pos})
+					dlDecrypter.push({ data: new Uint8Array(r), download: download, pos: task.pos})
 				} else {
 					io.dl_bytesreceived += this.response.length;
-					dlDecrypter.push({data: { buffer : this.response }, donwload: chunk, pos: task.pos})
+					dlDecrypter.push({data: { buffer : this.response }, donwload: download, pos: task.pos})
 				}
 			} else {
-				// we must reschedule this chunk	
+				// we must reschedule this download	
 				dlQueue.push(task);
 				dl_httperror(this.status);
 			}

@@ -86,6 +86,7 @@ DownloadQueue.prototype.push = function() {
 		});
 
 		dlQueue.pushAll(tasks, function() {
+			dl.onDownloadComplete(dl_id);
 			dl.onBeforeDownloadComplete(dl.pos);
 			dl.io.download(dl.n, dl.p);
 		});

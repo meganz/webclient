@@ -14,6 +14,7 @@ function downloader(task)
 		return;
 	}
 	var xhr = getXhr()
+		, Scheduler = this
 		, url = task.url
 		, size = task.size
 		, io = task.io
@@ -82,6 +83,7 @@ function downloader(task)
 				dlQueue.push(task);
 				dl_httperror(this.status);
 			}
+			Scheduler.done();
 		}
 	}
 	xhr.responseType = have_ab ? 'arraybuffer' : 'text';

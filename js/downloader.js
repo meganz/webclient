@@ -8,16 +8,36 @@ function getXhr() {
 
 function decrypter(task)
 {
+	var download = task.download;
+
 	if (use_workers) {
 		var worker = new Worker('decrypter.js?v=5');
 		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
 		worker.onmessage = function(e) {
 			if (typeof(e.data) == "string") {
-				if (e,data[0] == '[') {
+				if (e.data[0] == '[') {
+					var t = JSON.parse(e.data), pos = task.pos
+					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
+						download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+					}
 				}
+				DEBUG("worker replied string", e.data, download.macs);
+			} else {
+				var databuf = new Uint8Array(e.data.buffer || e.data);
+				if (download.zipid) {
+					DEBUG("ZIP not implemented yet");
+				}
+
+				var plain = databuf;
+				download.io.write(plain, task.pos);
 			}
 		};
 		worker.postMessage(task.download.nonce);
+		if (typeof MSBlobBuilder == "function") {
+			worker.postMessage(task.data);
+		} else {
+			worker.postMessage(task.data.buffer, [task.data.buffer]);
+		}
 		DEBUG("decrypt with workers " + task.data.length + " bytes");
 	} else {
 		DEBUG("decrypt without workers")
@@ -95,10 +115,10 @@ function downloader(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: chunk })
+					dlDecrypter.push({ data: new Uint8Array(r), download: chunk, pos: task.pos})
 				} else {
 					io.dl_bytesreceived += this.response.length;
-					dlDecrypter.push({data: { buffer : this.response }, donwload: chunk})
+					dlDecrypter.push({data: { buffer : this.response }, donwload: chunk, pos: task.pos})
 				}
 			} else {
 				// we must reschedule this chunk	

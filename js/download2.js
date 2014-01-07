@@ -25,7 +25,8 @@ DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
 	$.each(dl_chunks, function(key, pos) {
 		dl_urls.push({
 			url: url + '/' + pos + '-' + (pos+dl_chunksizes[pos]-1),
-			size: dl_chunksizes[pos]
+			size: dl_chunksizes[pos],
+			offset: pos
 		})
 	});
 
@@ -76,10 +77,11 @@ DownloadQueue.prototype.push = function() {
 	dl.io    = dlObject;
 	dl.nonce = dl_keyNonce
 	dl.progress = 0;
+	dl.macs  = {}
 
 	dlObject.begin = function() {
-		$.each(dl_urls||[], function(key, url) {
-			dlQueue.push({url: url.url, size: url.size, io: dlObject , download: dl});
+		$.each(dl_urls||[], function(pos, url) {
+			dlQueue.push({url: url.url, pos: url.offset, size: url.size, io: dlObject , download: dl});
 		});
 
 		// notify the UI

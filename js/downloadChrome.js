@@ -156,10 +156,6 @@ function FileSystemAPI(dl_id, dl, pos) {
 		);
 	}
 
-	self.isDone = function() {
-		return dl_queue.length == 0;
-	}
-
 	var last_update = new Date();
 	self.update = function() {
 		last_update = new Date();
@@ -170,9 +166,8 @@ function FileSystemAPI(dl_id, dl, pos) {
 		return last_update.getTime();
 	}
 
-
-
-	self.writeBlock = function() {
+	self.write = function(buffer, position) {
+		DEBUG("Write " + buffer.length + " bytes at " + position);
 	};
 
 	self.setCredentials = function(url, size, filename, chunks, sizes) {

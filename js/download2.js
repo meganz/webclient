@@ -3,6 +3,7 @@ var dlMethod
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new QueueClass(downloader)
+	, dlDecrypter = new QueueClass(decrypter)
 
 if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;
@@ -73,6 +74,7 @@ DownloadQueue.prototype.push = function() {
 	dl.pos   = id // download position in the queue
 	dl.dl_id = dl_id;  // download id
 	dl.io    = dlObject;
+	dl.nonce = dl_keyNonce
 	dl.progress = 0;
 
 	dlObject.begin = function() {

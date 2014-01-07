@@ -6,8 +6,26 @@ function getXhr() {
 	return dl_xhr;
 }
 
-function downloader(task)
+function decrypter(task)
 {
+	if (use_workers) {
+		var worker = new Worker('decrypter.js?v=5');
+		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
+		worker.onmessage = function(e) {
+			if (typeof(e.data) == "string") {
+				if (e,data[0] == '[') {
+				}
+			}
+		};
+		worker.postMessage(task.download.nonce);
+		DEBUG("decrypt with workers " + task.data.length + " bytes");
+	} else {
+		DEBUG("decrypt without workers")
+	}
+}
+
+
+function downloader(task) {
 	if (dl_legacy_ie) {
 		alert("not yet implemented");
 		console.trace();
@@ -20,15 +38,16 @@ function downloader(task)
 		, io = task.io
 		, chunk = task.download
 		, prevProgress = 0
-		, dl_cipherq = []
 		, dl_lastprogress = 0
 
 	io.dl_xr = io.dl_xr || getxr() // one instance per download
 
 
-	function updateProgress() {
-		if (dl_lastprogress+250 > new Date().getTime()) return false;
-		else dl_lastprogress=new Date().getTime();
+	function updateProgress(force) {
+		if (dl_lastprogress+250 > new Date().getTime() && !force) {
+			// too soon
+			return false;
+		}
 
 		chunk.onDownloadProgress(
 			chunk.dl_id, 
@@ -38,6 +57,7 @@ function downloader(task)
 			chunk.pos // this download position
 		);
 		dl_prevprogress = chunk.progress
+		dl_lastprogress = new Date().getTime();
 	}
 
 
@@ -65,18 +85,20 @@ function downloader(task)
 	xhr.onreadystatechange = function() {
 		io.update();
 		if (this.readyState == this.DONE) {
-			updateProgress();
 
 			var r = this.response || {};
+			chunk.progress += r.byteLength - prev;
+			updateProgress(true);
+
 			if (r.byteLength == size) {
 				if (have_ab) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dl_cipherq[chunk.pos] = new Uint8Array(r);
+					dlDecrypter.push({ data: new Uint8Array(r), download: chunk })
 				} else {
 					io.dl_bytesreceived += this.response.length;
-					dl_cipherq[chunk.pos] = { buffer : this.response };						
+					dlDecrypter.push({data: { buffer : this.response }, donwload: chunk})
 				}
 			} else {
 				// we must reschedule this chunk	

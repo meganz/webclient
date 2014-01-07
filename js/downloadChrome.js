@@ -8,7 +8,7 @@ function FileSystemAPI(dl_id) {
 		, self = this
 		, fs_instance
 		, Fs
-		, dl_fs
+		, dl_fw
 		, dirid = "mega"
 		, testSize = 1024 * 1024 * 1024 * 25
 		, dlMain
@@ -22,11 +22,6 @@ function FileSystemAPI(dl_id) {
 		, dl_filename
 		, zfileEntry
 		;
-
-	// We should stop relying on dl_method
-	// instead we should use instanceof or
-	// dlMethod.getType()
-	dl_method = 0;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
 
@@ -62,15 +57,18 @@ function FileSystemAPI(dl_id) {
 
 	// dl_getspace {{{
 	function dl_getspace(storagetype,minsize) {		
-		if (!storagetype) storagetype = 0;		
-		if (!minsize) minsize = 0;
+		storagetype = storagetype || 0;		
+		minsize =  minsize || 0;
 
 		window.webkitStorageInfo.queryUsageAndQuota(1, function(used, remaining)  {		
 			if (remaining > 0) {
 				dl_quotabytes = remaining;
 				dl_storagetype=1;
-				if (dl_quotabytes < 1073741824) clearit(1,3600);
-				else clearit(1);
+				if (dl_quotabytes < 1073741824) {
+					clearit(1,3600);
+				} else {
+					clearit(1);
+				}
 				dlMain();
 			} else {
 				var requestbytes = testSize * 4;

@@ -124,7 +124,6 @@ function downloader(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					DEBUG([task.offset, r.byteLength])
 					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset})
 				} else {
 					io.dl_bytesreceived += this.response.length;

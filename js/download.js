@@ -1025,7 +1025,6 @@ function dl_updateprogress()
 {
 	$.each(dl_queue, function(key, dl) {
 		var p = dl_bytesreceived;
-		
 		if (dl_lastprogress+250 > new Date().getTime()) return false;
 		else dl_lastprogress=new Date().getTime();
 

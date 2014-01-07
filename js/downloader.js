@@ -16,7 +16,29 @@ function downloader(task)
 	var xhr = getXhr()
 		, url = task.url
 		, size = task.size
-		, instance = task.instance
+		, io = task.io
+		, chunk = task.download
+		, prevProgress = 0
+		, dl_cipherq = []
+		, dl_lastprogress = 0
+
+	io.dl_xr = io.dl_xr || getxr() // one instance per download
+
+
+	function updateProgress() {
+		if (dl_lastprogress+250 > new Date().getTime()) return false;
+		else dl_lastprogress=new Date().getTime();
+
+		chunk.onDownloadProgress(
+			chunk.dl_id, 
+			chunk.progress, // global progress
+			chunk.size, // total download size
+			io.dl_xr.update(chunk.progress - dl_prevprogress), 
+			chunk.pos // this download position
+		);
+		dl_prevprogress = chunk.progress
+	}
+
 
 	if (dlMethod == FileSystemAPI) {
 		var t = url.lastIndexOf('/dl/');
@@ -25,35 +47,35 @@ function downloader(task)
 	} else {
 		xhr.open('POST', url, true);
 	}
+	DEBUG("Fetch " + url);
 	
-	if (!instance.dl_bytesreceived) {
-		instance.dl_bytesreceived = 0;
+	if (!io.dl_bytesreceived) {
+		io.dl_bytesreceived = 0;
 	}
 
+	var prev = 0;
 	xhr.onprogress = function(e) {
-		instance.update();
-		instance.progress = e.loaded;
-		dl_updateprogress();
+		io.update();
+		chunk.progress += e.loaded - prev;
+		prev = e.loaded
+		updateProgress();
 	};
 
 	xhr.onreadystatechange = function() {
-		instance.update();
+		io.update();
 		if (this.readyState == this.DONE) {
-			if (navigator.appName != 'Opera') {
-				instance.progress = 0;
-			}
-			dl_updateprogress();
+			updateProgress();
 
+			var r = this.response || {};
 			if (r.byteLength == size) {
 				if (have_ab) {
-					var r = this.response || {};
 					if (navigator.appName != 'Opera') {
-						instance.dl_bytesreceived += r.byteLength;
+						io.dl_bytesreceived += r.byteLength;
 					}
-					dl_cipherq[p] = new Uint8Array(r);
+					dl_cipherq[chunk.pos] = new Uint8Array(r);
 				} else {
-					instance.dl_bytesreceived += this.response.length;
-					dl_cipherq[p] = { buffer : this.response };						
+					io.dl_bytesreceived += this.response.length;
+					dl_cipherq[chunk.pos] = { buffer : this.response };						
 				}
 			} else {
 				// we must reschedule this chunk	

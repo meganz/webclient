@@ -61,18 +61,27 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 
 DownloadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments)
-		, dl_id = pos -1
-		, dl  = this[dl_id]
+		, id = pos -1
+		, dl  = this[id]
+		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
 		, dlObject = new dlMethod(dl.ph || dl.id, dl, dl_id)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
 		, dl_urls = []
 
+	dl.pos   = id // download position in the queue
+	dl.dl_id = dl_id;  // download id
+	dl.io    = dlObject;
+	dl.progress = 0;
+
 	dlObject.begin = function() {
 		$.each(dl_urls||[], function(key, url) {
-			dlQueue.push({url: url.url, size: url.size, instance: dlObject});
+			dlQueue.push({url: url.url, size: url.size, io: dlObject , download: dl});
 		});
+
+		// notify the UI
+		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 	}
 
 	DEBUG("dl_key " + dl_key);

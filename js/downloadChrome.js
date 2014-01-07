@@ -15,6 +15,8 @@ function FileSystemAPI(dl_id, dl, pos) {
 		, dl_chunks = []
 		, dl_chunksizes = []
 		, dl_writing
+		, dl_ack_write = function() {}
+		, targetpos = 0
 		, dl_geturl
 		, dl_filesize
 		, dl_filename
@@ -121,21 +123,18 @@ function FileSystemAPI(dl_id, dl, pos) {
 				dl_fw = fileWriter;
 				dl_fw.truncate(0);
 				dl_fw.onerror = function(e) {
-					if (this.instance != dl_instance) return;
-
 					DEBUG("Write failed: " + e.toString())
 					dl_writing = false;
 					dl_write_failed(e);
 				};
 				dl_fw.onwriteend = function() {
-					if (this.instance != dl_instance) return;
-					DEBUG("fileWriter: onwriteend, position: " + this.position + ", expected: " + this.targetpos);
+					DEBUG("fileWriter: onwriteend, position: " + this.position + ", expected: " + targetpos);
 					dl_writing = false;
 
-					if (this.position == this.targetpos) { 
+					if (this.position == targetpos) { 
 						dl_ack_write();
 					} else {
-						dl_write_failed('Short write (' + this.position + ' / ' + this.targetpos + ')');
+						dl_write_failed('Short write (' + this.position + ' / ' + targetpos + ')');
 					}
 				};
 
@@ -166,8 +165,18 @@ function FileSystemAPI(dl_id, dl, pos) {
 		return last_update.getTime();
 	}
 
-	self.write = function(buffer, position) {
+	self.write = function(buffer, position, done) {
+		if (dl_writing) {
+			// busy
+			return setTimeout(function() {
+				self.write(buffer, position, done);
+			}, 100);
+		}
+		dl_writing   = true;
+		dl_ack_write = done;
+		targetpos    = buffer.length + dl_fw.position;
 		DEBUG("Write " + buffer.length + " bytes at " + position);
+		dl_fw.write(new Blob([buffer]));
 	};
 
 	self.setCredentials = function(url, size, filename, chunks, sizes) {

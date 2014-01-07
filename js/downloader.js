@@ -8,7 +8,8 @@ function getXhr() {
 
 function decrypter(task)
 {
-	var download = task.download;
+	var download = task.download
+		, Decrypter = this
 
 	if (use_workers) {
 		var worker = new Worker('decrypter.js?v=5');
@@ -29,7 +30,9 @@ function decrypter(task)
 				}
 
 				var plain = databuf;
-				download.io.write(plain, task.pos);
+				download.io.write(plain, task.pos, function() {
+					Decrypter.done();
+				});
 			}
 		};
 		worker.postMessage(task.download.nonce);

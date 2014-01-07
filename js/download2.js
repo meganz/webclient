@@ -68,7 +68,7 @@ DownloadQueue.prototype.push = function() {
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
-		, dlObject = new dlMethod(dl.ph || dl.id, dl, dl_id)
+		, dlObject = new dlMethod(dl_id)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
 		, dl_urls = []
 
@@ -81,14 +81,20 @@ DownloadQueue.prototype.push = function() {
 
 	dlObject.begin = function() {
 		var tasks = [];
-		$.each(dl_urls||[], function(pos, url) {
-			tasks.push({url: url.url, pos: url.offset, size: url.size, io: dlObject , download: dl});
+		$.each(dl_urls||[], function(key, url) {
+			tasks.push({url: url.url, offset: url.offset, size: url.size, io: dlObject , download: dl, chunk_id: key});
 		});
 
+		dl.decrypt = 0;
 		dlQueue.pushAll(tasks, function() {
 			dl.onDownloadComplete(dl_id);
-			dl.onBeforeDownloadComplete(dl.pos);
-			dl.io.download(dl.n, dl.p);
+			var checker = setInterval(function() {
+				if (dl.decrypt == 0) {
+					clearInterval(checker);
+					dl.onBeforeDownloadComplete(dl.pos);
+					dl.io.download(dl.n, dl.p);
+				}
+			}, 100);
 		});
 
 		// notify the UI

@@ -11,13 +11,15 @@ function decrypter(task)
 	var download = task.download
 		, Decrypter = this
 
+	download.decrypt++;
+
 	if (use_workers) {
 		var worker = new Worker('decrypter.js?v=5');
 		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
 		worker.onmessage = function(e) {
 			if (typeof(e.data) == "string") {
 				if (e.data[0] == '[') {
-					var t = JSON.parse(e.data), pos = task.pos
+					var t = JSON.parse(e.data), pos = task.offset
 					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
 						download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
 					}
@@ -30,18 +32,22 @@ function decrypter(task)
 				}
 
 				var plain = databuf;
-				download.io.write(plain, task.pos, function() {
+				download.io.write(plain, task.offset, function() {
 					Decrypter.done();
+					download.decrypt--;
 				});
 			}
 		};
 		worker.postMessage(task.download.nonce);
+		worker.dl_pos = task.offset;
+		worker.postMessage(task.offset/16);
+
 		if (typeof MSBlobBuilder == "function") {
 			worker.postMessage(task.data);
 		} else {
 			worker.postMessage(task.data.buffer, [task.data.buffer]);
 		}
-		DEBUG("decrypt with workers " + task.data.length + " bytes");
+		DEBUG("decrypt with workers");
 	} else {
 		DEBUG("decrypt without workers")
 	}
@@ -118,10 +124,11 @@ function downloader(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: download, pos: task.pos})
+					DEBUG([task.offset, r.byteLength])
+					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset})
 				} else {
 					io.dl_bytesreceived += this.response.length;
-					dlDecrypter.push({data: { buffer : this.response }, donwload: download, pos: task.pos})
+					dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset})
 				}
 			} else {
 				// we must reschedule this download	

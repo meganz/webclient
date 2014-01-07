@@ -1,7 +1,7 @@
 /*global window, FileError,alert,document, DEBUG, dl_method */
 "use strict";
 
-function FileSystemAPI(dl_id, dl, pos) {
+function FileSystemAPI(dl_id) {
 	var dl_storagetype
 		, dl_quotabytes = 0
 		, dl_instance = 0
@@ -166,8 +166,9 @@ function FileSystemAPI(dl_id, dl, pos) {
 	}
 
 	self.write = function(buffer, position, done) {
-		if (dl_writing) {
-			// busy
+		if (dl_writing || position !== dl_fw.position) {
+			// busy or not there yet
+			DEBUG("Writer is busy, I'll retry in a bit");
 			return setTimeout(function() {
 				self.write(buffer, position, done);
 			}, 100);
@@ -175,7 +176,7 @@ function FileSystemAPI(dl_id, dl, pos) {
 		dl_writing   = true;
 		dl_ack_write = done;
 		targetpos    = buffer.length + dl_fw.position;
-		DEBUG("Write " + buffer.length + " bytes at " + position);
+		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
 		dl_fw.write(new Blob([buffer]));
 	};
 

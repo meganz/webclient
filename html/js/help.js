@@ -141,7 +141,7 @@ var helpdata =
 {
 	// q: 'Can I access MEGA on my mobile device?',
 	q: l[269],
-	a: '<p>' + l[270] + '</p>',
+	a: '<p>We are providing dedicated <a href="#mobile">apps</a> for your mobile device, including for <a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">iOS</a> & <a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">Android</a>.</p>',
 	c: [0],
 	i: 1
 },
@@ -321,6 +321,26 @@ var helpdata =
 	q: l[346],
 	a: '<p>' + l[347] + '</p>',
 	c: [3]
+},
+
+
+// iOS
+{
+	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
+	q: 'Where can I find your iOS app?',
+	a: '<p>You can download and install our iOS app on the <a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">App Store</a>.</p>',
+	c: [5]
+},
+
+
+// Android
+{
+	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
+	q: 'Where can I find your Android app?',
+	a: '<p>You can download and install our Android app on <a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">Google Play</a>.</p>',
+	c: [6]
 }
+
+
 ]
 

@@ -19,6 +19,7 @@ var DEFAULT_CONCURRENCY = 6
 	inherits(queue, MegaEvents)
 
 	function Context(queue, args) {
+		this.task = args;
 		this.done = function() {
 			queue._running.splice($.inArray(this, queue._running),1);
 			queue.trigger('done', args.task)
@@ -27,10 +28,15 @@ var DEFAULT_CONCURRENCY = 6
 		}
 	}
 
+	queue.prototype.getNextTask = function() {
+		return this._queue.shift();
+	};
+
 	queue.prototype.process = function() {
+		var args, context;
 		while (this._running.length != this._concurrency && this._queue.length > 0) {
-			var args = this._queue.shift()
-				, context = new Context(this, args)
+			args = this.getNextTask();
+			context = new Context(this, args)
 
 			this._running.push(context)
 			this._worker.apply(context, [args.task])

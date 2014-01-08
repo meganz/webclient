@@ -5,6 +5,39 @@ var dlMethod
 	, dlQueue = new QueueClass(downloader)
 	, dlDecrypter = new QueueClass(decrypter)
 
+/**
+ *	Override the downloader scheduler method.
+ *	Basically pick up chunks from different files if possible:
+ */
+dlQueue.getNextTask = function() {
+	var queue = {}
+		, self = this
+		, status = []
+		, candidate = null
+
+	$.each(self._running, function(p, pzTask) {
+		var id = pzTask.task.task.download.dl_id;
+		if (!queue[id]) { 
+			queue[id] = 0;
+		}
+		queue[id]++;
+	});
+
+	$.each(self._queue, function(p, task) {
+		if (!queue[task.task.download]) {
+			candidate = task;
+			self._queue.splice(p, 1);
+			return false; /* break */
+		}
+	});
+
+	if (!candidate) {
+		candidate = self._queue.shift();
+	}
+
+	return candidate;
+};
+
 if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;
 }
@@ -82,7 +115,14 @@ DownloadQueue.prototype.push = function() {
 	dlObject.begin = function() {
 		var tasks = [];
 		$.each(dl_urls||[], function(key, url) {
-			tasks.push({url: url.url, offset: url.offset, size: url.size, io: dlObject , download: dl, chunk_id: key});
+			tasks.push({
+				url: url.url, 
+				offset: url.offset, 
+				size: url.size, 
+				io: dlObject , 
+				download: dl, 
+				chunk_id: key
+			});
 		});
 
 		dl.decrypt = 0;

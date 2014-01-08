@@ -5689,7 +5689,7 @@ div .fm-tree-folder.dragover {
 	padding-right: 12px;
 	display: block;
 	border-right: 2px solid #d0d1d1;
-	float:left;
+	float: left;
 }
 .fm-chat-filesize {
 	margin: 30px 10px 0 0;
@@ -5698,11 +5698,11 @@ div .fm-tree-folder.dragover {
 	color: #666666;
 	padding-left: 10px;
 	display: block;
-	float:left;
+	float: left;
 }
 .fm-chat-button-pad {
-	padding-top:16px;
-	float:left;
+	padding-top: 16px;
+	float: left;
 }
 .fm-chat-view-icon {
 	float: right;
@@ -5729,8 +5729,8 @@ div .fm-tree-folder.dragover {
 	padding: 0 15px;
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
-	border:2px solid #b2b2b2;
-	color:#434343;
+	border: 2px solid #b2b2b2;
+	color: #434343;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
@@ -5741,13 +5741,13 @@ div .fm-tree-folder.dragover {
 }
 .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head {
 	font-size: 15px;
-line-height: 21px;
-padding: 8px 0 12px 40px;
-color: #666666;
-font-family: 'Open Sans Semibold';
-background-image: url(../images/mega/chat-sprite.png);
-background-position: 0 -39px;
-background-repeat: no-repeat;
+	line-height: 21px;
+	padding: 8px 0 12px 40px;
+	color: #666666;
+	font-family: 'Open Sans Semibold';
+	background-image: url(../images/mega/chat-sprite.png);
+	background-position: 0 -39px;
+	background-repeat: no-repeat;
 }
 .fm-chat-verification-skipped {
 	background-position: 0 -166px;
@@ -5756,23 +5756,27 @@ background-repeat: no-repeat;
 	background-position: 0 -300px;
 }
 .user {
-	color:#333333;
-	cursor:default;
+	color: #333333;
+	cursor: default;
 }
 .fm-chat-messages-pad .block-view-file-type {
-	float:left;margin: 8px -2px 6px -3px;
+	float: left;
+	margin: 8px -2px 6px -3px;
 }
 .fm-chat-shared-files {
-	background-color:#f3f3f3; margin:10px 15px 5px -10px; -moz-border-radius: 8px;
+	background-color: #f3f3f3;
+	margin: 10px 15px 5px -10px;
+	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
-	border-radius: 8px; padding:3px 10px 0 0;
+	border-radius: 8px;
+	padding: 3px 10px 0 0;
 }
 .fm-chat-shared-files .fm-chat-file-button.save-button {
 	margin: 10px 10px 10px 10px;
 }
 .fm-chat-file-button:hover {
 	background-color: #d11e00;
-	border:2px solid #d11e00;
+	border: 2px solid #d11e00;
 	color: white;
 }
 .fm-chat-line-block {
@@ -5829,15 +5833,13 @@ background-repeat: no-repeat;
 	overflow: hidden;
 	position: relative;
 }
-
 .fm-chat-messages-pad .fm-chat-shared-files .block-view-file-type {
 	margin: 8px auto 0 auto;
-	float:none;
+	float: none;
 }
 .fm-chat-messages-pad .file-block, .fm-chat-messages-pad .contact-block-view {
-	background-color:white;
-	border-color:#e7e7e7;
-	
+	background-color: white;
+	border-color: #e7e7e7;
 }
 .fm-chat-messages-pad .file-status-icon {
 	background-image: url(../images/mega/main-sprite.png?v=4);
@@ -6014,7 +6016,10 @@ background-repeat: no-repeat;
 	background-position: center -47px;
 }
 .fm-chat-download-popup {
-	width:344px; height:124px; border:2px solid rgba(0,0,0,0.1); -webkit-background-clip: padding-box;
+	width: 344px;
+	height: 124px;
+	border: 2px solid rgba(0,0,0,0.1);
+	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -6022,37 +6027,58 @@ background-repeat: no-repeat;
 	box-sizing: border-box;
 	border-radius: 8px;
 	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px; background-color:white; position:absolute; padding:10px 10px 10px 0; z-index:100;
-	margin-left:-172px;
+	-webkit-border-radius: 8px;
+	background-color: white;
+	position: absolute;
+	padding: 10px 10px 10px 0;
+	z-index: 100;
+	margin-left: -172px;
 }
 .fm-chat-download-arrow {
-	width:18px; height:12px; position:absolute; background-image: url(../images/mega/chat-sprite.png);
+	width: 18px;
+	height: 12px;
+	position: absolute;
+	background-image: url(../images/mega/chat-sprite.png);
 	background-position: -12px -516px;
-	background-repeat: no-repeat; margin:-22px 0 0 -9px; left:50%;
+	background-repeat: no-repeat;
+	margin: -22px 0 0 -9px;
+	left: 50%;
 }
 .top .fm-chat-download-arrow {
 	background-position: -52px -516px;
-bottom: -10px;
+	bottom: -10px;
 }
 .fm-chat-download-button {
-	border:2px solid #d9d9d9; border-radius: 6px;
+	border: 2px solid #d9d9d9;
+	border-radius: 6px;
 	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px; -webkit-box-sizing: border-box;
+	-webkit-border-radius: 6px;
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
-	box-sizing: border-box; width:100px; height:100px; float:left; overflow:hidden; padding:0px 13px 10px 13px; margin-left:10px;
-	cursor:pointer;
+	box-sizing: border-box;
+	width: 100px;
+	height: 100px;
+	float: left;
+	overflow: hidden;
+	padding: 0px 13px 10px 13px;
+	margin-left: 10px;
+	cursor: pointer;
 }
 .fm-chat-download-icon {
 	background-image: url(../images/mega/chat-sprite.png);
 	background-position: center -619px;
-	background-repeat: no-repeat; height:62px;
+	background-repeat: no-repeat;
+	height: 62px;
 }
 .fm-chat-download-txt {
-	font-size:11px; color:#555959; line-height:14px; text-align:center;
+	font-size: 11px;
+	color: #555959;
+	line-height: 14px;
+	text-align: center;
 }
 .fm-chat-download-button:hover .fm-chat-download-txt {
-	color:white;
+	color: white;
 }
 .to-cloud .fm-chat-download-icon {
 	background-position: center -619px;
@@ -6064,16 +6090,16 @@ bottom: -10px;
 	background-position: center -789px;
 }
 .to-cloud:hover {
-	background-color:#D42400;
-	border-color:#D42400;
+	background-color: #D42400;
+	border-color: #D42400;
 }
 .as-zip:hover {
-	background-color:#b2b2b2;
-	border-color:#b2b2b2;
+	background-color: #b2b2b2;
+	border-color: #b2b2b2;
 }
 .to-computer:hover {
-	background-color:#6BB219;
-	border-color:#6BB219;
+	background-color: #6BB219;
+	border-color: #6BB219;
 }
 .to-cloud:hover .fm-chat-download-icon {
 	background-position: center -889px;
@@ -6117,7 +6143,6 @@ bottom: -10px;
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-
 .fm-add-contact-popup {
 	position: absolute;
 	z-index: 900;
@@ -14802,4 +14827,16 @@ transform: rotate(900deg);
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	right: -2px;
+}
+body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl input, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-number input, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl .blog-new-search input, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .top-search-input, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl .top-login-input-block input, .rtl .affiliate-input-block input, .rtl .login-register-input input, .rtl .affiliate-input-block.textarea-block textarea {
+	font-family: Arial, Helvetica, sans-serif;
+}
+.rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+.rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-style: italic;
 }

@@ -105,14 +105,12 @@ function downloader(task) {
 
 	var prev = 0;
 	xhr.onprogress = function(e) {
-		io.update();
 		download.progress += e.loaded - prev;
 		prev = e.loaded
 		updateProgress();
 	};
 
 	xhr.onreadystatechange = function() {
-		io.update();
 		if (this.readyState == this.DONE) {
 
 			var r = this.response || {};

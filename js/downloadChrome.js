@@ -1,11 +1,11 @@
-/*global window, FileError,alert,document, DEBUG, dl_method */
+/*global window, FileError,alert,document, DEBUG, clearit */
 "use strict";
 
 function FileSystemAPI(dl_id) {
 	var dl_storagetype
 		, dl_quotabytes = 0
 		, dl_instance = 0
-		, self = this
+		, IO = this
 		, fs_instance
 		, Fs
 		, dl_fw
@@ -19,6 +19,7 @@ function FileSystemAPI(dl_id) {
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize
+		, dl_req_storage
 		, dl_filename
 		, zfileEntry
 		;
@@ -45,7 +46,7 @@ function FileSystemAPI(dl_id) {
 				fs_instance = dl_instance;
 				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
 				setTimeout(function() {
-					self.check();				
+					IO.check();				
 				}, 500);
 				break;
 			default:
@@ -72,31 +73,44 @@ function FileSystemAPI(dl_id) {
 				dlMain();
 			} else {
 				var requestbytes = testSize * 4;
-				if (storagetype == 0) requestbytes = testSize
+				switch (storagetype) {
+				case 0:
+					requestbytes = testSize;
+					break;
+				case 1:
+					dl_req_storage = true; 
+					break;
+				}
 
-				if (storagetype == 1) dl_req_storage = true; 
-
-				window.webkitStorageInfo.requestQuota(storagetype,requestbytes,function(grantedBytes)  {
+				window.webkitStorageInfo.requestQuota(storagetype, requestbytes,function(grantedBytes)  {
 				   window.webkitStorageInfo.queryUsageAndQuota(storagetype, function(used, remaining) {						
-						if (storagetype == 1) dl_req_storage = false;
+						if (storagetype === 1) {
+							dl_req_storage = false;
+						}
 						
 						dl_quotabytes = remaining;						
 						
-						if (dl_quotabytes < 1073741824) clearit(storagetype,3600);	
-						
-						if ((remaining == 0) && (storagetype == 1))
-						{
-							if (!dl_req_storage) dl_getspace(1,minsize);
-							return false;				
+						if (dl_quotabytes < 1073741824) {
+							clearit(storagetype,3600);	
 						}
-						else if ((minsize > dl_quotabytes) && (storagetype == 0)) 
-						{
-							if (!dl_req_storage) dl_getspace(1,minsize)
-							return false;						
-						}						
-						else if ((minsize > dl_quotabytes) && (storagetype == 1)) clearit(storagetype,3600);
 						
-						if (remaining > 0) dl_storagetype = storagetype;							
+						if ((remaining == 0) && (storagetype == 1)) {
+							if (!dl_req_storage) { 
+								dl_getspace(1,minsize);
+							}
+							return false;				
+						} else if ((minsize > dl_quotabytes) && (storagetype == 0)) {
+							if (!dl_req_storage) {
+								dl_getspace(1,minsize)
+							}
+							return false;						
+						}	else if ((minsize > dl_quotabytes) && (storagetype == 1)) {
+							clearit(storagetype,3600);
+						}
+						
+						if (remaining > 0) { 
+							dl_storagetype = storagetype;							
+						}
 												
 						dlMain();
 					},  dlError('error: could not query usage and storage quota. (FSFileSystem)'));
@@ -137,7 +151,7 @@ function FileSystemAPI(dl_id) {
 				};
 
 				zfileEntry = fileEntry;
-				self.begin();
+				IO.begin();
 			}, errorHandler('createWriter'));
 		}, errorHandler('getFile'));
 	}
@@ -153,22 +167,12 @@ function FileSystemAPI(dl_id) {
 		);
 	}
 
-	var last_update = new Date();
-	self.update = function() {
-		last_update = new Date();
-		return self;
-	}
-
-	self.getLastUpdate = function () {
-		return last_update.getTime();
-	}
-
-	self.write = function(buffer, position, done) {
+	IO.write = function(buffer, position, done) {
 		if (dl_writing || position !== dl_fw.position) {
 			// busy or not there yet
 			DEBUG("Writer is busy, I'll retry in a bit");
 			return setTimeout(function() {
-				self.write(buffer, position, done);
+				IO.write(buffer, position, done);
 			}, 100);
 		}
 		dl_writing   = true;
@@ -178,7 +182,7 @@ function FileSystemAPI(dl_id) {
 		dl_fw.write(new Blob([buffer]));
 	};
 
-	self.download = function(name, path) {
+	IO.download = function(name, path) {
 		document.getElementById('dllink').download = name;
 		document.getElementById('dllink').href = zfileEntry.toURL();
 		if (!is_chrome_firefox)  {
@@ -186,7 +190,7 @@ function FileSystemAPI(dl_id) {
 		}
 	}
 
-	self.setCredentials = function(url, size, filename, chunks, sizes) {
+	IO.setCredentials = function(url, size, filename, chunks, sizes) {
 		dl_geturl = url;
 		dl_filesize = size;
 		dl_filename = filename;
@@ -195,22 +199,15 @@ function FileSystemAPI(dl_id) {
 		check();
 	};
 
-	self.complete = function() {
-	};
-
-	self.verifyBoot = function(main) {
+    /**
+     *	Static Method Check
+     *
+     *	Run all the needed async tests to make sure the selected
+     *	download method works on the current browser
+     *
+     */
+	IO.check = function(main) {
 		dlMain = main;
 		dl_getspace(0);
 	}
 }
-
-/**
- *	Static Method Check
- *
- *	Run all the needed async tests to make sure the selected
- *	download method works on the current browser
- *
- */
-FileSystemAPI.check = function(main) {
-	(new this).verifyBoot(main);
-};

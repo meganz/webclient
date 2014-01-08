@@ -170,6 +170,6 @@ if (window.webkitRequestFileSystem) {
 
 // check if the download method works
 // and boot everything!
-dlMethod.check(function() {
+(new dlMethod).check(function() {
 	//
 });

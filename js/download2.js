@@ -14,7 +14,9 @@ dlQueue.getNextTask = function() {
 		, self = this
 		, status = []
 		, candidate = null
+		, dlCandidate
 
+	/** check which files are being downloaded now */
 	$.each(self._running, function(p, pzTask) {
 		var id = pzTask.task.task.download.dl_id;
 		if (!queue[id]) { 
@@ -23,19 +25,41 @@ dlQueue.getNextTask = function() {
 		queue[id]++;
 	});
 
-	$.each(self._queue, function(p, task) {
-		if (!queue[task.task.download]) {
-			candidate = task;
-			self._queue.splice(p, 1);
-			return false; /* break */
+	/** select the file with dlCandidate chunks being downloaded */
+	var tmp = 0xffffff
+	$.each(queue, function(p, total) {
+		if (tmp > total) {
+			tmp = total;
+			dlCandidate = p
 		}
 	});
 
-	if (!candidate) {
-		candidate = self._queue.shift();
+	/** select our candidate file **/
+	$.each(self._queue, function(p, task) {
+		var id = task.task.download.dl_id
+		if (!queue[id]) {
+			candidate = id;
+			return false; /* break */
+		} else if (id == dlCandidate) {
+			candidate = id;
+		}
+	});
+
+	if (candidate) {
+		/** select the first chunk from our candidate */
+		var Task = null;
+		$.each(self._queue, function(p, task) {
+			if (task.task.download.dl_id == candidate) {
+				Task = task;
+				self._queue.splice(p, 1);
+				return false;
+			}
+		});
+		if (Task) return Task;
 	}
 
-	return candidate;
+	/** just pick up the older chunk */
+	return self._queue.shift();
 };
 
 if (localStorage.dl_maxSlots) {

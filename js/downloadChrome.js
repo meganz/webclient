@@ -128,8 +128,26 @@ function FileSystemAPI(dl_id) {
 		}, errorHandler('getDirectory'));
 		DEBUG("Opening file for writing: " + dl_id);
 
-		var path = dirid + '/' + dl_id;
-		Fs.root.getFile(path, {create: true}, function(fileEntry) {
+		var path = dirid + '/' + dl_id, options = {create: true};
+		
+		if(is_chrome_firefox) {
+			var q = {};
+			for(var o in dl_queue) {
+				if(dl_queue[o].dl_id == dl_id) {
+					q = dl_queue[o];
+					break;
+				}
+			}
+			options._firefox = {
+				filesize : dl_filesize,
+				filename : dl_filename,
+				zip      : !1, // XXX
+				path     : q.p,
+				mtime    : q.t
+			};
+		}
+		
+		Fs.root.getFile(path, options, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
 				DEBUG('FILE "' + path + '" created');
 				dl_fw = fileWriter;
@@ -160,7 +178,7 @@ function FileSystemAPI(dl_id) {
 	// or fail otherwise
 	function check() {
 		window.requestFileSystem(
-			dl_storagetype, 
+			dl_storagetype || 0,
 			testSize, 
 			dl_createtmpfile,
 			errorHandler('RequestFileSystem')

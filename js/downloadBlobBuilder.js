@@ -19,5 +19,8 @@ function BlobBuilderIO(dl_id) {
 		dl_blob = new MSBlobBuilder();
 	};
 	
-	this.check = function() {};
+	this.check = function(main) {
+		// ???
+		main();
+	};
 }

@@ -32,8 +32,11 @@ function decrypter(task)
 				}
 
 				var plain = databuf;
+				Decrypter.done(); // release slot
 				download.io.write(plain, task.offset, function() {
-					Decrypter.done();
+					// decrease counter
+					// useful to avoid downloading before writing
+					// all
 					download.decrypt--;
 				});
 			}
@@ -66,7 +69,7 @@ function downloader(task) {
 		, size = task.size
 		, io = task.io
 		, download = task.download
-		, prevProgress = 0
+		, dl_prevprogress
 		, dl_lastprogress = 0
 
 	io.dl_xr = io.dl_xr || getxr() // one instance per download
@@ -77,6 +80,8 @@ function downloader(task) {
 			// too soon
 			return false;
 		}
+
+		DEBUG([download.dl_id, download.progress / download.size * 100])
 
 		download.onDownloadProgress(
 			download.dl_id, 

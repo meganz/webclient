@@ -25,7 +25,7 @@ dlQueue.getNextTask = function() {
 		queue[id]++;
 	});
 
-	/** select the file with dlCandidate chunks being downloaded */
+	/** select the file with less chunks being downloaded */
 	var tmp = 0xffffff
 	$.each(queue, function(p, total) {
 		if (tmp > total) {
@@ -38,6 +38,7 @@ dlQueue.getNextTask = function() {
 	$.each(self._queue, function(p, task) {
 		var id = task.task.download.dl_id
 		if (!queue[id]) {
+			/** file with no chunks downloaded at all */
 			candidate = id;
 			return false; /* break */
 		} else if (id == dlCandidate) {

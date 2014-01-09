@@ -342,6 +342,7 @@ else
 		jsl.push({f:'js/stacktrace.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/queue.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_js', j:1,w:3});
+		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});

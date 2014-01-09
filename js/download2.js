@@ -229,6 +229,8 @@ function dlGetUrl(id, callback) {
 
 if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
+} else if (navigator.msSaveOrOpenBlob) {
+	dlMethod = BlobBuilderIO;
 } else {
 	alert("dlMethod is not yet defined");
 }

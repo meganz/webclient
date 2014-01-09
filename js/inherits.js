@@ -1,5 +1,5 @@
 // Public: https://github.com/crodas/inherits/
-if (typeof Object.create === 'function') {
+if (0 && typeof Object.create === 'function') {
 	// implementation from standard node.js 'util' module
 	function inherits(ctor, superCtor) {
 		ctor.super_ = superCtor

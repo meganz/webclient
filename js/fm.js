@@ -479,7 +479,7 @@ function initUI()
 	});
 	
 	
-	if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
+	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
 		setTimeout(function()
 		{

@@ -234,7 +234,7 @@ if (window.webkitRequestFileSystem) {
 } else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
 	dlMethod = MemoryIO;
 } else {
-	alert("dlMethod is not yet defined");
+	dlMethod = FlashIO;
 }
 
 // check if the download method works

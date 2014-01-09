@@ -1412,7 +1412,7 @@ function MegaData ()
 				zipsize += n.s;
 
 				var flashhtml='';
-				if (dl_method == 1)
+				if (dlMethod == FlashIO)
 				{
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
@@ -1421,7 +1421,7 @@ function MegaData ()
 			}
 		}
 
-		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
+		if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
@@ -1523,7 +1523,7 @@ function MegaData ()
 		}
 		$.transferHeader();
 
-		if (dl_method === 0)
+		if (dlMethod == FileSystemAPI)
 		{
 			setTimeout(fm_chromebar,250,$.dlheight);
 			setTimeout(fm_chromebar,500,$.dlheight);

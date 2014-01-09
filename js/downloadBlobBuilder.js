@@ -24,3 +24,4 @@ function BlobBuilderIO(dl_id) {
 		main();
 	};
 }
+BlobBuilderIO.warn = true;

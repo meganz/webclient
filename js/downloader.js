@@ -56,6 +56,18 @@ function decrypter(task)
 	}
 }
 
+/** 
+ *	Keep in track real active downloads.
+ *	
+ *	Despite the fact that the DownloadQueue has a limitted size,
+ *	to speed up things for tiny downloads each download is able to
+ *	report to the scheduler that they are done when it may not be necessarily
+ *	true (but they are for instance close to their finish)
+ */
+var iRealDownloads = 0
+	// ETA (in seconds) to consider a download finished, used to speed up chunks
+	, dlDoneThreshold = 3
+
 
 function downloader(task) {
 	if (dl_legacy_ie) {
@@ -63,24 +75,54 @@ function downloader(task) {
 		console.trace();
 		return;
 	}
+
+	iRealDownloads++;
+
 	var xhr = getXhr()
 		, Scheduler = this
 		, url = task.url
 		, size = task.size
 		, io = task.io
 		, download = task.download
-		, dl_prevprogress
-		, dl_lastprogress = 0
+		, average_throughput = [0, 0]
+		, done = false
+		, prevProgress = 0    // Keep in track how far are we in the downloads
+		, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
+		, progress = getxr()  // chunk progress
+		, speed = 0 // speed of the current chunk
+		, lastUpdate // FIXME: I should be abstracted at getxr()
 
-	io.dl_xr = io.dl_xr || getxr() // one instance per download
+	io.dl_xr = io.dl_xr || getxr() // global download progress
 
+	/**
+	 *	Check if the current chunk is small or close to its
+	 *	end, so it can cheat to the scheduler telling they are 
+	 *	actually done
+	 */
+	function shouldIReportDone() {
+		if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
+			Scheduler.done();
+			done = true;
+		}
+	}
 
 	function updateProgress(force) {
 		if (dlQueue.isPaused()) {
 			// do not update the UI
 			return false;
 		}
-		if (dl_lastprogress+250 > new Date().getTime() && !force) {
+
+		// keep in track of the current progress
+		if (lastUpdate+250 < new Date().getTime()) {
+			speed = progress.update(prevProgress - pprevProgress)
+			pprevProgress = prevProgress;
+			lastUpdate = new Date().getTime()
+			shouldIReportDone();
+		}
+
+		// Update global progress (per download) and aditionally
+		// update the UI
+		if (download.dl_lastprogress+250 > new Date().getTime() && !force) {
 			// too soon
 			return false;
 		}
@@ -89,11 +131,12 @@ function downloader(task) {
 			download.dl_id, 
 			download.progress, // global progress
 			download.size, // total download size
-			io.dl_xr.update(download.progress - dl_prevprogress), 
+			io.dl_xr.update(download.progress - download.dl_prevprogress),  // speed
 			download.pos // this download position
 		);
-		dl_prevprogress = download.progress
-		dl_lastprogress = new Date().getTime();
+
+		download.dl_prevprogress = download.progress
+		download.dl_lastprogress = new Date().getTime();
 	}
 
 
@@ -114,27 +157,27 @@ function downloader(task) {
 		if (download.cancelled) {
 			DEBUG("Chunk aborting itself because download was cancelled");
 			xhr.abort();
-			Scheduler.done();
+			!done && Scheduler.done();
+			iRealDownloads--;
 			return true;
 		}
 	}
 
-	var prev = 0;
 	xhr.onprogress = function(e) {
 		if (isCancelled()) return;
 
-		download.progress += e.loaded - prev;
-		prev = e.loaded
+		download.progress += e.loaded - prevProgress;
+		prevProgress = e.loaded
 		updateProgress();
 	};
 
 	xhr.onreadystatechange = function() {
 		if (isCancelled()) return;
 		if (this.readyState == this.DONE) {
-
 			var r = this.response || {};
-			download.progress += r.byteLength - prev;
+			download.progress += r.byteLength - prevProgress;
 			updateProgress(true);
+			iRealDownloads--;
 
 			if (r.byteLength == size) {
 				if (have_ab) {
@@ -152,9 +195,15 @@ function downloader(task) {
 				DEBUG("HTTP FAILED WITH " + this.status);
 
 				// tell the scheduler that we failed
+				if (done) {
+					// We already told the scheduler we were done
+					// with no erro and this happened. Should I reschedule this 
+					// task?
+					throw new Error("Fixme")
+				}
 				return Scheduler.done(false);
 			}
-			Scheduler.done();
+			!done && Scheduler.done();
 		}
 	}
 	xhr.responseType = have_ab ? 'arraybuffer' : 'text';

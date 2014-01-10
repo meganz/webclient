@@ -1,5 +1,5 @@
 // cr@mega.co.nz
-var DEFAULT_CONCURRENCY = 6
+var DEFAULT_CONCURRENCY = 4
 	, QueueClass
 (function(window) {
 	function queue(worker, concurrency) {

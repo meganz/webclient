@@ -85,8 +85,6 @@ function downloader(task) {
 			return false;
 		}
 
-		DEBUG([download.dl_id, download.progress / download.size * 100])
-
 		download.onDownloadProgress(
 			download.dl_id, 
 			download.progress, // global progress
@@ -114,7 +112,9 @@ function downloader(task) {
 
 	function isCancelled() {
 		if (download.cancelled) {
+			DEBUG("Chunk aborting itself because download was cancelled");
 			xhr.abort();
+			Scheduler.done();
 			return true;
 		}
 	}
@@ -146,10 +146,13 @@ function downloader(task) {
 					io.dl_bytesreceived += this.response.length;
 					dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset})
 				}
-			} else {
+			} else if (!download.cancelled) {
 				// we must reschedule this download	
-				dlQueue.push(task);
-				dl_httperror(this.status);
+				DEBUG(this.status, r.bytesLength, size);
+				DEBUG("HTTP FAILED WITH " + this.status);
+
+				// tell the scheduler that we failed
+				return Scheduler.done(false);
 			}
 			Scheduler.done();
 		}

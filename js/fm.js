@@ -875,10 +875,10 @@ function initContextUI()
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
 			if (typeof $.sd != 'undefined') { 
 				DEBUG("cancelled file " + $.sd);
-				dl_queue[$.sd].cancelled = true;
 				dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-					return !obj.task.download.cancelled;
+					return obj.task.download.dl_id !== dl_queue[$.sd].dl_id;
 				});
+				dl_queue[$.sd].cancelled = true;
 			}
 		}
 		delete $.su;

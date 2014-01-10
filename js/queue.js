@@ -62,11 +62,13 @@ var DEFAULT_CONCURRENCY = 6
 	}
 
 	queue.prototype.pushAll = function(tasks, done) {
-		var that = this;
+		var that = this
+			, triggered = false
 		function check_finish(task) {
 			tasks.splice($.inArray(task, tasks),1);
-			if (tasks.length == 0) {
+			if (!triggered && tasks.length == 0) {
 				// done!
+				triggered = true;
 				done();
 			}
 		};

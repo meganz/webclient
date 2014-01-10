@@ -152,6 +152,7 @@ DownloadQueue.prototype.push = function() {
 
 		dl.decrypt = 0;
 		dlQueue.pushAll(tasks, function() {
+			if (dl.cancelled) return;
 			dl.onDownloadComplete(dl_id);
 			var checker = setInterval(function() {
 				if (dl.decrypt == 0) {

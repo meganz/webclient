@@ -35,10 +35,5 @@ function FlashIO(dl_id) {
 		// dl_chunks   = chunks;
 		// dl_chunksizes = sizes;
 	};
-
-	this.check = function (main) {
-		// ???
-		main();
-	};
 }
 FlashIO.warn = true;

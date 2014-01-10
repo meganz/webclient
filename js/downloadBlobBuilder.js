@@ -18,10 +18,5 @@ function BlobBuilderIO(dl_id) {
 		// dl_chunksizes = sizes;
 		dl_blob = new MSBlobBuilder();
 	};
-	
-	this.check = function(main) {
-		// ???
-		main();
-	};
 }
 BlobBuilderIO.warn = true;

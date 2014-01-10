@@ -237,8 +237,4 @@ if (window.webkitRequestFileSystem) {
 	dlMethod = FlashIO;
 }
 
-// check if the download method works
-// and boot everything!
-(new dlMethod).check(function() {
-	//
-});
+if(dlMethod.init) dlMethod.init();

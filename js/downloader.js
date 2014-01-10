@@ -112,14 +112,24 @@ function downloader(task) {
 		io.dl_bytesreceived = 0;
 	}
 
+	function isCancelled() {
+		if (download.cancelled) {
+			xhr.abort();
+			return true;
+		}
+	}
+
 	var prev = 0;
 	xhr.onprogress = function(e) {
+		if (isCancelled()) return;
+
 		download.progress += e.loaded - prev;
 		prev = e.loaded
 		updateProgress();
 	};
 
 	xhr.onreadystatechange = function() {
+		if (isCancelled()) return;
 		if (this.readyState == this.DONE) {
 
 			var r = this.response || {};

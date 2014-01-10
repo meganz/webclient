@@ -843,20 +843,13 @@ function initContextUI()
 			if ((id && id.indexOf('dl_') > -1) || (id && id.indexOf('zip_') > -1))
 			{				
 				var abort=false;				
-				for (var i in dl_queue)
-				{
-					if (dl_queue[i])
-					{
-						if (dl_queue[i].id == id.replace('dl_','') || dl_queue[i].zipid == id.replace('zip_',''))
-						{
-							if (dl_queue[i].zipid) $.zipkill = dl_queue[i].zipid;
-							if (i == dl_queue_num && dl_queue[dl_queue_num].zipid) abort=true;
-							else if (i == dl_queue_num && dl_legacy_ie) document.getElementById('start_downloaderswf').abort();
-							else if (i == dl_queue_num && !dl_queue[dl_queue_num].zipid) $.sd=i;							
-							else if (!dl_queue[i].zipid) dl_queue[i] = false;						
-						}
-					}					
-				}
+				$.each(dl_queue, function(i, queue) {
+					if (queue.id == id.replace('dl_','') || queue.zipid == id.replace('zip_','')) {
+						if (queue.zipid) $.zipkill = dl_queue[i].zipid;
+						else $.sd=i;							
+						return false; /* break */
+					}
+				});
 				if ($.zipkill) dl_killzip($.zipkill);				
 			}
 			else if (id && id.indexOf('ul_') > -1)
@@ -879,13 +872,15 @@ function initContextUI()
 			}
 			$(this).remove();
 		});				
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined')
-		{
-			if ($.sd != 'undefined') dl_queue[$.sd]=false;			
-			dl_cancel();
-			startdownload();
+		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
+			if (typeof $.sd != 'undefined') { 
+				DEBUG("cancelled file " + $.sd);
+				dl_queue[$.sd].cancelled = true;
+				$.grep(dlQueue._queue, function(obj) {
+					return obj.task.download.cancelled;
+				});
+			}
 		}
-		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		

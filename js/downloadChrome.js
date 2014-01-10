@@ -1,6 +1,7 @@
 /*global window, FileError,alert,document, DEBUG, clearit */
 "use strict";
 
+var testSize = 1024 * 1024 * 1024 * 25
 function FileSystemAPI(dl_id) {
 	var dl_quotabytes = 0
 		, dl_instance = 0
@@ -9,7 +10,6 @@ function FileSystemAPI(dl_id) {
 		, Fs
 		, dl_fw
 		, dirid = "mega"
-		, testSize = 1024 * 1024 * 1024 * 25
 		, dl_chunks = []
 		, dl_chunksizes = []
 		, dl_writing

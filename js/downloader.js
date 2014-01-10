@@ -76,6 +76,10 @@ function downloader(task) {
 
 
 	function updateProgress(force) {
+		if (dlQueue.isPaused()) {
+			// do not update the UI
+			return false;
+		}
 		if (dl_lastprogress+250 > new Date().getTime() && !force) {
 			// too soon
 			return false;

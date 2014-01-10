@@ -15,6 +15,7 @@ var DEFAULT_CONCURRENCY = 6
 		this._queue			= [];
 		this._worker		= worker;
 		this._running		= [];
+		this._paused		= false;
 	}
 	inherits(queue, MegaEvents)
 
@@ -32,9 +33,22 @@ var DEFAULT_CONCURRENCY = 6
 		return this._queue.shift();
 	};
 
+	queue.prototype.resume = function() {
+		this._paused = false;
+		this.process();
+	};
+
+	queue.prototype.pause = function() {
+		this._paused = true;
+	};
+
+	queue.prototype.isPaused = function() {
+		return this._paused;
+	}
+
 	queue.prototype.process = function() {
 		var args, context;
-		while (this._running.length != this._concurrency && this._queue.length > 0) {
+		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			context = new Context(this, args)
 

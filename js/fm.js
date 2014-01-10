@@ -3059,12 +3059,12 @@ function transferPanelUI()
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
 			$(this).removeClass('active');
-			uldl_resume();
+			dlQueue.resume();
 		}
 		else
 		{
 			$(this).addClass('active');
-			uldl_pause();
+			dlQueue.pause();
 		}	
 	});
 }

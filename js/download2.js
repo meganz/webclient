@@ -161,6 +161,8 @@ DownloadQueue.prototype.push = function() {
 					dl.io.download(dl.n, dl.p);
 				}
 			}, 100);
+		}, function(reschedule, args) {
+			DEBUG("Network failed")	
 		});
 
 		// notify the UI

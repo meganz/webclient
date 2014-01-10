@@ -24,7 +24,7 @@ var DEFAULT_CONCURRENCY = 6
 		this.done = function() {
 			queue._running.splice($.inArray(this, queue._running),1);
 			queue.trigger('done', args.task)
-			args.callback(args.task);
+			args.callback(args.task, Array.prototype.slice.call(arguments, 0))
 			queue.process();
 		}
 	}
@@ -61,11 +61,35 @@ var DEFAULT_CONCURRENCY = 6
 		}
 	}
 
-	queue.prototype.pushAll = function(tasks, done) {
+	/**
+	 *	Queue a group of related tasks. Similar to .push(<task>, callback), but 
+	 *	it is useful when you care about a set of tasks succeeding instead of
+	 *	individuals
+	 *
+	 *	@Array tasks		Array of tasks
+	 *	@Callback done		Callback function when everything is done
+	 *	@Callback error		A particular task failed, what do we do with it?
+	 */
+	queue.prototype.pushAll = function(tasks, done, error) {
 		var that = this
 			, triggered = false
-		function check_finish(task) {
+		function check_finish(task, args) {
 			tasks.splice($.inArray(task, tasks),1);
+
+			if (args.length && args[0] === false) {
+				/**
+				 *	The first argument of .done(false) is false, which 
+				 *	means that something went wrong
+				 */
+				function reschedule(ztask) {
+					ztask = ztask || task
+					tasks.push(task);
+					that.push(task, check_finish);
+				}
+
+				return error(reschedule, args);
+			}
+
 			if (!triggered && tasks.length == 0) {
 				// done!
 				triggered = true;

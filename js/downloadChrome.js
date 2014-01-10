@@ -2,8 +2,7 @@
 "use strict";
 
 function FileSystemAPI(dl_id) {
-	var dl_storagetype
-		, dl_quotabytes = 0
+	var dl_quotabytes = 0
 		, dl_instance = 0
 		, IO = this
 		, fs_instance
@@ -11,7 +10,6 @@ function FileSystemAPI(dl_id) {
 		, dl_fw
 		, dirid = "mega"
 		, testSize = 1024 * 1024 * 1024 * 25
-		, dlMain
 		, dl_chunks = []
 		, dl_chunksizes = []
 		, dl_writing
@@ -56,70 +54,6 @@ function FileSystemAPI(dl_id) {
 	}
 	// }}}
 
-	// dl_getspace {{{
-	function dl_getspace(storagetype,minsize) {		
-		storagetype = storagetype || 0;		
-		minsize =  minsize || 0;
-
-		window.webkitStorageInfo.queryUsageAndQuota(1, function(used, remaining)  {		
-			if (remaining > 0) {
-				dl_quotabytes = remaining;
-				dl_storagetype=1;
-				if (dl_quotabytes < 1073741824) {
-					clearit(1,3600);
-				} else {
-					clearit(1);
-				}
-				dlMain();
-			} else {
-				var requestbytes = testSize * 4;
-				switch (storagetype) {
-				case 0:
-					requestbytes = testSize;
-					break;
-				case 1:
-					dl_req_storage = true; 
-					break;
-				}
-
-				window.webkitStorageInfo.requestQuota(storagetype, requestbytes,function(grantedBytes)  {
-				   window.webkitStorageInfo.queryUsageAndQuota(storagetype, function(used, remaining) {						
-						if (storagetype === 1) {
-							dl_req_storage = false;
-						}
-						
-						dl_quotabytes = remaining;						
-						
-						if (dl_quotabytes < 1073741824) {
-							clearit(storagetype,3600);	
-						}
-						
-						if ((remaining == 0) && (storagetype == 1)) {
-							if (!dl_req_storage) { 
-								dl_getspace(1,minsize);
-							}
-							return false;				
-						} else if ((minsize > dl_quotabytes) && (storagetype == 0)) {
-							if (!dl_req_storage) {
-								dl_getspace(1,minsize)
-							}
-							return false;						
-						}	else if ((minsize > dl_quotabytes) && (storagetype == 1)) {
-							clearit(storagetype,3600);
-						}
-						
-						if (remaining > 0) { 
-							dl_storagetype = storagetype;							
-						}
-												
-						dlMain();
-					},  dlError('error: could not query usage and storage quota. (FSFileSystem)'));
-				},  dlError('ERROR: Could not grant storage space (FSFileSystem)'));
-			}		
-		}, dlError('ERROR: Could not query usage and storage quota.'));
-	}
-	// }}}
-	
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
@@ -177,8 +111,11 @@ function FileSystemAPI(dl_id) {
 	// Check if the file can be written, return true
 	// or fail otherwise
 	function check() {
+		if(typeof FileSystemAPI.storagetype === 'undefined') {
+			DEBUG('StorageType is not yet initialized...');
+		}
 		window.requestFileSystem(
-			dl_storagetype || 0,
+			FileSystemAPI.storagetype || 0,
 			testSize, 
 			dl_createtmpfile,
 			errorHandler('RequestFileSystem')
@@ -216,16 +153,70 @@ function FileSystemAPI(dl_id) {
 		dl_chunksizes = sizes;
 		check();
 	};
-
-    /**
-     *	Static Method Check
-     *
-     *	Run all the needed async tests to make sure the selected
-     *	download method works on the current browser
-     *
-     */
-	IO.check = function(main) {
-		dlMain = main;
-		dl_getspace(0);
-	}
 }
+FileSystemAPI.init = function dl_getspace(storagetype, minsize) {
+	storagetype = storagetype || 0;
+	minsize = minsize || 0;
+	
+	/**
+	 * XXX Chrome warning: 'window.webkitStorageInfo' is deprecated.
+	 * Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead. 
+	 */
+	var StorageInfo = window.webkitStorageInfo;
+
+	StorageInfo.queryUsageAndQuota(1, function (used, remaining) {
+		if (remaining > 0) {
+			dl_quotabytes = remaining;
+			FileSystemAPI.storagetype = 1;
+			if (dl_quotabytes < 1073741824) {
+				clearit(1, 3600);
+			} else {
+				clearit(1);
+			}
+		} else {
+			var requestbytes = testSize * 4;
+			switch (storagetype) {
+			case 0:
+				requestbytes = testSize;
+				break;
+			case 1:
+				dl_req_storage = true;
+				break;
+			}
+
+			StorageInfo.requestQuota(storagetype, requestbytes, function (grantedBytes)
+			{
+				StorageInfo.queryUsageAndQuota(storagetype, function (used, remaining)
+				{
+					if (storagetype === 1) {
+						dl_req_storage = false;
+					}
+
+					dl_quotabytes = remaining;
+
+					if (dl_quotabytes < 1073741824) {
+						clearit(storagetype, 3600);
+					}
+
+					if ((remaining == 0) && (storagetype == 1)) {
+						if (!dl_req_storage) {
+							dl_getspace(1, minsize);
+						}
+						return false;
+					} else if ((minsize > dl_quotabytes) && (storagetype == 0)) {
+						if (!dl_req_storage) {
+							dl_getspace(1, minsize)
+						}
+						return false;
+					} else if ((minsize > dl_quotabytes) && (storagetype == 1)) {
+						clearit(storagetype, 3600);
+					}
+
+					FileSystemAPI.storagetype = remaining > 0 && storagetype || 0;
+					FileSystemAPI.init = undefined; // no longer needed
+
+				}, dlError('error: could not query usage and storage quota. (FSFileSystem)'));
+			}, dlError('ERROR: Could not grant storage space (FSFileSystem)'));
+		}
+	}, dlError('ERROR: Could not query usage and storage quota.'));
+};

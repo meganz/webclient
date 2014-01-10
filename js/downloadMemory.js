@@ -26,9 +26,4 @@ function MemoryIO(dl_id) {
 		// dl_chunksizes = sizes;
 		dl_blob_array = [];
 	};
-
-	this.check = function (main) {
-		// ???
-		main();
-	};
 }

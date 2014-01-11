@@ -29,10 +29,6 @@ var login_next=false;
 var loggedout=false;
 
 
-
-
-
-
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 
@@ -81,7 +77,9 @@ function scrollMenu()
 
 
 function init_page()
-{	
+{		
+	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
+
 	if ($.startscroll) delete $.startscroll;
 	if ($.dlscroll) delete $.dlscroll
 	if ($.infoscroll) delete $.infoscroll;
@@ -187,11 +185,11 @@ function init_page()
 					register_txt = l[1041];
 					document.location.hash='register';
 				}
-			}		
+			}
+			else document.location.hash='fm/account';			
 		}});
 		return false;
-	}
-	
+	}	
 	
 	if (localStorage.voucher && u_type !== false)
 	{
@@ -569,16 +567,23 @@ function init_page()
 		$('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
-		$('#fmholder').show();
+		if ($('#fmholder:visible').length == 0) 
+		{
+			$('#fmholder').show();			
+			if (fminitialized)
+			{			
+				if (M.viewmode == 1) iconUI();
+				else gridUI();
+				treeUI();
+				if ($.transferHeader) $.transferHeader();
+			}
+		}
+		
 		if (fminitialized)
 		{
 			if (M.currentdirid == 'account') accountUI();			
 			else if (M.currentdirid == 'notifications') notificationsUI();
 			else if (M.currentdirid == 'search') searchFM();
-			else if (M.viewmode == 1) iconUI();
-			else gridUI();
-			treeUI();
-			if ($.transferHeader) $.transferHeader();
 		}		
 	}
 	else if (page.substr(0,2) == 'fm' && !u_type)
@@ -1302,17 +1307,23 @@ function languageDialog(close)
 		$.dialog=false;
 		return false;
 	}
-	var html = '<div class="nlanguage-txt-block">';	
-	var i=1,total=0,a=0,sel='';
-	for (var la in languages) total++;
-	for (var la in languages)
-	{			
+	var html = '<div class="nlanguage-txt-block">';
+	var larray = [];
+	for (var la in languages) if (ln2[la]) larray.push({l:ln[la],l2:ln2[la],c:la});	
+	larray.sort(function(a,b)
+	{
+		return a.l.localeCompare(b.l);
+	});	
+	var i=1,a=0,sel='';
+	for (var j in larray)
+	{
+		var la = larray[j].c;		
 		if (ln2[la])
-		{	
+		{
 			if (la == lang) sel = ' selected';
 			else sel='';
 			html += '<a href="#" id="nlanguagelnk_'+la+'" class="nlanguage-lnk'+sel+'"><span class="nlanguage-tooltip"> <span class="nlanguage-tooltip-bg"> <span class="nlanguage-tooltip-main"> '+ ln2[la] + '</span></span></span>'+ ln[la] + '</a><div class="clear"></div>';		
-			if (i == Math.round(total/4) && a+1 < total)
+			if (i == Math.ceil(larray.length/4) && a+1 < larray.length)
 			{
 				html +='</div><div class="nlanguage-txt-block">';
 				i=0;		

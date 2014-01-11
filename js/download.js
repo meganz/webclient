@@ -987,7 +987,7 @@ function dl_dispatch_read()
 					}
 					else
 					{
-						if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
+						//if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
 						
 						if (dl_pos[this.slot] != -1)
 						{

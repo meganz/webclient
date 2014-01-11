@@ -3,6 +3,8 @@ var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedD
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
+var mDBv=1;
+
 if (indexedDB)
 {
 	var mDB=1;
@@ -50,9 +52,9 @@ if (indexedDB)
 		}
 		request.onsuccess = function(event)
 		{
-			if (localStorage[u_handle + '_mDBcount'] && (!localStorage.mDBv || parseInt(localStorage.mDBv) < 1))
+			if (localStorage[u_handle + '_mDBcount'] && (!localStorage[u_handle + '_mDBv'] || parseInt(localStorage[u_handle + '_mDBv']) < mDBv))
 			{
-				localStorage.mDBv=1;
+				localStorage[u_handle + '_mDBv']=mDBv;
 				delete localStorage[u_handle + '_mDBcount'];			
 			}
 			if (!mDB) return false;
@@ -112,7 +114,7 @@ if (indexedDB)
 	var mDBt = {};
 
 	function mDBprocess()
-	{
+	{	
 		if (!Qt) Qt = new Date().getTime();
 		for (var t in mDBqueue)
 		{
@@ -130,7 +132,7 @@ if (indexedDB)
 					else if (mDBqueue[t][i].d) var request=objectStore.delete(mDBqueue[t][i].d);
 					request.onsuccess = function(event)
 					{
-						localStorage[u_handle + '_mDBcount']--;
+						if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) localStorage[u_handle + '_mDBcount']--;
 						mDBprocess();
 					};
 					request.onerror = function(event)
@@ -220,9 +222,11 @@ if (indexedDB)
 	{
 		mDB.close();
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
+		dbreq.callback = callback;
 		dbreq.onsuccess = function(event)
-		{
+		{			
 			if (d) console.log('db deleted');
+			if (dbreq.callback) dbreq.callback();
 		};
 	}
 

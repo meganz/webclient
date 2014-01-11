@@ -233,6 +233,22 @@ function a32_to_str(a)
 	return b;
 }
 
+// array of 32-bit words ArrayBuffer (big endian)
+function a32_to_ab(a)
+{
+	var ab = have_ab ? new Uint8Array(4*a.length)
+	                 : new Array(4*a.length);
+
+	for ( var i = 0; i < a.length; i++ ) {
+	    ab[4*i] = a[i]>>>24;
+	    ab[4*i+1] = a[i]>>>16&255;
+	    ab[4*i+2] = a[i]>>>8&255;
+	    ab[4*i+3] = a[i]&255;
+	}
+
+	return ab;
+}
+
 function a32_to_base64(a)
 {
 	return base64urlencode(a32_to_str(a));
@@ -658,109 +674,6 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 	return mac;
 }
 
-// encrypt ArrayBuffer in CBC mode (zero IV)
-function encrypt_ab_cbc(cipher,ab)
-{
-	if (have_ab)
-	{
-		var v = new DataView(ab);
-		var iv = [0,0,0,0], d = Array(4);
-		var i;
-		
-		for (i = 0; i < ab.byteLength; i += 16)
-		{
-			d[0] = v.getUint32(i,false) ^ iv[0];
-			d[1] = v.getUint32(i+4,false) ^ iv[1];
-			d[2] = v.getUint32(i+8,false) ^ iv[2];
-			d[3] = v.getUint32(i+12,false) ^ iv[3];
-		
-			iv = cipher.encrypt(d);
-			
-			v.setUint32(i,iv[0],false);
-			v.setUint32(i+4,iv[1],false);
-			v.setUint32(i+8,iv[2],false);
-			v.setUint32(i+12,iv[3],false);
-		}
-	}
-	else
-	{
-		var ab32 = str_to_a32(ab.buffer);
-		var iv = [0,0,0,0], d = Array(4);
-		var i;
-		
-		for (i = 0; i < ab32.length; i += 4)
-		{
-			d[0] = ab32[i] ^ iv[0];
-			d[1] = ab32[i+1] ^ iv[1];
-			d[2] = ab32[i+2] ^ iv[2];
-			d[3] = ab32[i+3] ^ iv[3];
-		
-			iv = cipher.encrypt(d);
-			
-			ab32[i] = iv[0];
-			ab32[i+1] = iv[1];
-			ab32[i+2] = iv[2];
-			ab32[i+3] = iv[3];
-		}
-		
-		ab.buffer = a32_to_str(ab32);
-	}
-}
-
-// decrypt ArrayBuffer in CBC mode (zero IV)
-function decrypt_ab_cbc(cipher,ab)
-{
-	if (have_ab)
-	{
-		var v = new DataView(ab);
-		var iv = [0,0,0,0], d = Array(4), t = Array(4);
-		var i;
-		
-		for (i = 0; i < ab.byteLength; i += 16)
-		{
-			d[0] = v.getUint32(i,false);
-			d[1] = v.getUint32(i+4,false);
-			d[2] = v.getUint32(i+8,false);
-			d[3] = v.getUint32(i+12,false);
-			t = d;
-		
-			d = cipher.decrypt(d);
-
-			v.setUint32(i,d[0] ^ iv[0],false);
-			v.setUint32(i+4,d[1] ^ iv[1],false);
-			v.setUint32(i+8,d[2] ^ iv[2],false);
-			v.setUint32(i+12,d[3] ^ iv[3],false);
-			iv = t;
-		}
-	}
-	else
-	{
-		// no offset/length support needed
-		var ab32 = str_to_a32(ab.buffer);
-		var iv = [0,0,0,0], d = Array(4), t = Array(4);
-		var i;
-		
-		for (i = 0; i < ab32.length; i += 4)
-		{
-			d[0] = ab32[i];
-			d[1] = ab32[i+1];
-			d[2] = ab32[i+2];
-			d[3] = ab32[i+3];
-			t = d;
-		
-			d = cipher.decrypt(d);
-			
-			ab32[i] = d[0] ^ iv[0];
-			ab32[i+1] = d[1] ^ iv[1];
-			ab32[i+2] = d[2] ^ iv[2];
-			ab32[i+3] = d[3] ^ iv[3];
-			iv = t;
-		}
-
-		ab.buffer = a32_to_str(ab32);
-	}
-}
-
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher,a)
 {	
@@ -785,18 +698,14 @@ function decrypt_key(cipher,a)
 // returns [ArrayBuffer data,Array key]
 function enc_attr(attr,key)
 {
-	var aes;
 	var ab;
-	var b;
 
 	ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
 
 	// if no key supplied, generate a random one
 	if (!key.length) for (i = 4; i--; ) key[i] = rand(0x100000000);
 
-	aes = new sjcl.cipher.aes([key[0]^key[4],key[1]^key[5],key[2]^key[6],key[3]^key[7]]);
-
-	encrypt_ab_cbc(aes,ab);
+	ab = asmCrypto.AES_CBC.encrypt( ab, a32_to_ab( [ key[0]^key[4], key[1]^key[5], key[2]^key[6], key[3]^key[7] ] ), false );
 
 	return [ab,key];
 }
@@ -808,9 +717,8 @@ function dec_attr(attr,key)
 {
 	var aes;
 	var b;
-	
-	aes = new sjcl.cipher.aes([key[0]^key[4],key[1]^key[5],key[2]^key[6],key[3]^key[7]]);
-	decrypt_ab_cbc(aes,attr);
+
+	attr = asmCrypto.AES_CBC.decrypt( attr, a32_to_ab( [ key[0]^key[4], key[1]^key[5], key[2]^key[6], key[3]^key[7] ] ), false );
 
 	b = ab_to_str_depad(attr);
 
@@ -951,12 +859,18 @@ function getsc(fm)
 	ctx = 
 	{		
 		callback : function(res,ctx)
-		{			
-			if (ctx.fm && res == ETOOMANY)
+		{		
+			if (res == ESID)
 			{
-				loadfm();
-				return false;			
+				u_logout();
+				document.location.hash = 'login';
+				return false;
 			}
+			else if (typeof res == 'number' && mDB)
+			{
+				mDBreload();
+				return false;
+			}			
 			else if (res.w)
 			{				
 				waiturl = res.w;
@@ -968,7 +882,7 @@ function getsc(fm)
 				if (res.sn) maxaction = res.sn;				
 				execsc(res.a);
 				if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid) localStorage[u_handle + '_maxaction'] = maxaction;
-			}			
+			}
 			if (ctx.fm)
 			{
 				mDBloaded=true;
@@ -1540,71 +1454,47 @@ function crypto_rsadecrypt(ciphertext,privk)
 // as the source handle
 function api_completeupload(t,uq,k,ctx)
 {
-	ctx2 = { callback : api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx };
-
-	api_genfingerprint(uq,ctx2);
-}
-
-function api_genfingerprint(uq,ctx)
-{
-	var finish = function(hash)
-	{
-		ctx.hash = hash;
-		ctx.callback(ctx,uq.target);
-		
-		if(is_chrome_firefox && uq._close)
-		{
-			// Close nsIFile Stream
-			uq._close();
-		}
-	};
+	// Close nsIFile Stream
+	if(is_chrome_firefox && uq._close) uq._close();
 	
-	try
-	{
-		fingerprint(uq,finish);
-	}
-	catch(e)
-	{
-		console.log('api_genfingerprint', e);
-		finish();
-	}
+	if (uq.repair) uq.target = M.RubbishID;
+	
+	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx },uq);
 }
 
-function api_completeupload2(ctx,ut)
-{
-	var p;
 
+function api_completeupload2(ctx,uq)
+{
+	var p,ut = uq.target;
+	
 	if (ctx.path && ctx.path != ctx.n && (p = ctx.path.indexOf('/')) > 0)
 	{
-		var pc = ctx.path.substr(0,p);
-		
+		var pc = ctx.path.substr(0,p);		
 		ctx.path = ctx.path.substr(p+1);
-
-		fm_requestfolderid(ut,pc,ctx);
+		
+		fm_requestfolderid(ut,pc,
+		{
+			uq:uq,
+			ctx:ctx,
+			callback: function(ctx,h)
+			{
+				if (h) ctx.uq.target = h;
+				api_completeupload2(ctx.ctx,ctx.uq);
+			}
+		});
 	}
 	else
 	{
 		a = { n : ctx.n };
-
-		if(ctx.hash)
-		{
-			a.c = ctx.hash;
-		}
-
+		if (uq.hash) 	a.c = uq.hash;
 		if (d) console.log(ctx.k);
-
-		var ea = enc_attr(a,ctx.k);
-		
+		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
-		
-		
-
 		var req = { a : 'p',
 			t : ut,
 			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
 			i : requesti
 		};
-
 		if (ut)
 		{
 			// a target has been supplied: encrypt to all relevant shares
@@ -1616,7 +1506,6 @@ function api_completeupload2(ctx,ut)
 				req.cr[1][0] = ctx.t;
 			}
 		}
-
 		api_req([req],ctx.ctx);
 	}
 }
@@ -1656,13 +1545,13 @@ var storedattr = {};
 var faxhrs = [];
 
 // data.byteLength & 15 must be 0
-function api_storefileattr(id,type,aes,data,ctx)
+function api_storefileattr(id,type,key,data,ctx)
 {	
 	if (!ctx)
 	{
 		if (!storedattr[id]) storedattr[id] = {};
 
-		if (aes) encrypt_ab_cbc(aes,data);
+		if (key) data = asmCrypto.AES_CBC.encrypt( data, a32_to_ab(key), false );
 
 		var ctx = { callback : api_fareq, id : id, type : type, data : data };
 	}
@@ -1736,11 +1625,8 @@ function api_fareq(res,ctx)
 								if (k = ctx.k[h])
 								{
 									var ts = new Uint8Array(this.response,p,l);
-									var td = new Uint8Array(l);
 
-									td.set(ts);
-
-									decrypt_ab_cbc(new sjcl.cipher.aes([k[0]^k[4],k[1]^k[5],k[2]^k[6],k[3]^k[7]]),td.buffer);
+									var td = asmCrypto.AES_CBC.decrypt( ts, a32_to_ab( [ k[0]^k[4], k[1]^k[5], k[2]^k[6], k[3]^k[7] ] ), false );
 
 									ctx.procfa(ctx,ctx.h[h],td);
 								}
@@ -2064,7 +1950,19 @@ function crypto_processkey(me,master_aes,file)
 				{
 					u_nodekeys[file.h] = k;
 					if (key.length >= 46) rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
-				}				
+				}
+				if (typeof o.c == 'string') file.hash = o.c;
+				
+				if (file.hash)
+				{				
+					var h = base64urldecode('9HKWk0WYLhgOqQGbKD87pgTcoZ5S');
+					var t = 0;
+					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
+					file.mtime=t;
+				}
+				
+				if (typeof o.t != 'undefined') file.mtime = o.t;
+				
 				file.key = k;
 				file.ar = o;
 				file.name = file.ar.n;
@@ -2247,20 +2145,18 @@ function crypto_share_rsa2aes()
 }
 
 
-
 (function __FileFingerprint(scope) {
 	
-	var CRC_SIZE   = 32;
+	var CRC_SIZE   = 16;
 	var BLOCK_SIZE = CRC_SIZE*4;
-	var SCRC_SIZE  = CRC_SIZE*CRC_SIZE;
-	
+
 	function i2s(i)
 	{
 		return String.fromCharCode.call(String,
-			i       & 0xff,
-			i >>  8 & 0xff,
+			i >> 24 & 0xff,
 			i >> 16 & 0xff,
-			i >> 24 & 0xff);
+			i >>  8 & 0xff,
+			i       & 0xff);
 	}
 	
 	function serialize(v)
@@ -2275,30 +2171,67 @@ function crypto_share_rsa2aes()
 		b[0] = String.fromCharCode(p);
 		return b.join("");
 	}
-	
+
+	function makeCRCTable()
+	{
+		var c,crcTable = [];
+
+		for (var n = 0 ; n < 256 ; ++n )
+		{
+			c = n;
+
+			for (var k = 0 ; k < 8 ; ++k )
+			{
+				c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+			}
+
+			crcTable[n] = c;
+		}
+
+		return crcTable;
+	}
+
+	function crc32(str,crc,len)
+	{
+		crc = crc ^ (-1);
+
+		for (var i = 0 ; i < len ; ++i )
+		{
+			crc = (crc >>> 8) ^ crc32table[(crc ^ str.charCodeAt(i)) & 0xFF];
+		}
+
+		return (crc ^ (-1)) >>> 0;
+	}
+
 	scope.fingerprint = function(uq_entry,callback)
 	{
 		var fr = new FileReader();
 		var size = uq_entry.size;
-		
+
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
-		
+
+		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
+		if (crc32table[1] != 0x77073096)
+		{
+			throw new Error('Unexpected CRC32 Table...');
+		}
+
 		function Finish(crc)
 		{
-			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),uq_entry);
+			callback(base64urlencode(crc+serialize((uq_entry.lastModifiedDate||0)/1000)),((uq_entry.lastModifiedDate||0)/1000));
 		}
-		
+
 		var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice':'webkitSlice');
-		
-		if(size <= SCRC_SIZE)
+
+		if (size <= 8192)
 		{
-			var blob = uq_entry[sfn](0,size <= CRC_SIZE ? size : SCRC_SIZE);
-			
+			var blob = uq_entry[sfn](0,size);
+
 			fr.onload = function(e)
 			{
 				var crc;
 				var data = e.target.result;
-				
+
 				if(size <= CRC_SIZE)
 				{
 					crc = data;
@@ -2308,53 +2241,60 @@ function crypto_share_rsa2aes()
 				}
 				else
 				{
-					crc = [];
-					for (var i = 0 ; i < CRC_SIZE ; i++)
+					var tmp = [];
+
+					for (var i = 0; i < 4; i++)
 					{
-						crc.push(data[i*(size-1)/(CRC_SIZE-1)]);
+						var begin = parseInt(i*size/4);
+						var len = parseInt(((i+1)*size/4) - begin);
+
+						tmp.push(i2s(crc32(data.substr(begin,len),0,len)));
 					}
-					crc = crc.join("");
+
+					crc = tmp.join("");
 				}
-				
+
 				Finish(crc);
 			};
 			fr.readAsBinaryString(blob);
 		}
 		else
 		{
-			var tmp = [], i = 0, m = CRC_SIZE / 4;
-			var blocks = parseInt(size/SCRC_SIZE);
-			if(blocks > 32) blocks = 32;
-			
+			var tmp = [], i = 0, m = 4;
+			var blocks = parseInt(8192/(BLOCK_SIZE*4));
+
 			var step = function()
 			{
 				if(m == i)
 				{
 					return Finish(tmp.join(""));
 				}
-				
-				var offset = parseInt((size-BLOCK_SIZE)*(i*blocks)/(CRC_SIZE/4*blocks-1));
-				var blob = uq_entry[sfn](offset,offset+(blocks*BLOCK_SIZE));
-				
-				fr.onload = function(e)
+
+				var crc = 0, j = 0;
+				var next = function()
 				{
-					var crc = 0;
-					var data = e.target.result;
-					
-					for( var j = 0 ; j < blocks ; ++j )
+					if(blocks == j)
 					{
-						var block = data.substr(j*BLOCK_SIZE,BLOCK_SIZE);
-						
+						tmp.push(i2s(crc));
+						return step(++i);;
+					}
+
+					var offset = parseInt((size-BLOCK_SIZE)*(i*blocks+j)/(4*blocks-1));
+					var blob = uq_entry[sfn](offset,offset+BLOCK_SIZE);
+					fr.onload = function(e)
+					{
+						var block = e.target.result;
+
 						// console.log(toHexString(block));
 						crc = crc32(block,crc,BLOCK_SIZE);
-					}
-					
-					tmp.push(i2s(crc));
-					step(++i);
+
+						next(++j);
+					};
+					fr.readAsBinaryString(blob);
 				};
-				fr.readAsBinaryString(blob);
+				next();
 			};
 			step();
-		}	
+		}
 	};
 })(this);

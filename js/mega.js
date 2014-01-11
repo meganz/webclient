@@ -40,6 +40,7 @@ function MegaData ()
 	this.c = {};
 	this.u = {};
 	this.t = {};
+	this.h = {};
 	this.sn = false;
 	this.filter = false;
 	this.sortfn = false;
@@ -446,11 +447,13 @@ function MegaData ()
 		treeUI();
 	};
 
-	this.openFolder = function(id,force)
+	this.openFolder = function(id,force,chat)
 	{
+		$('.fm-files-view-icon').removeClass('hidden');
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') == -1) notificationsUI(1);
 		this.search=false;
+		this.chat=false;
 		if (!fminitialized)
 		{
 			fminitialized=true;
@@ -464,12 +467,20 @@ function MegaData ()
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
+		else if (id && id.substr(0,5) == 'chat/') this.chat=true;
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
 		if (id == this.RootID) $('.fm-connector-first').removeClass('active');
-
-		if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
+		
+		if (this.chat)
+		{
+			treeUIopen(M.currentdirid.replace('chat/',''),1);			
+			chatui();
+			fmtopUI();
+			M.renderPath();
+		}
+		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			$('.fm-right-account-block').addClass('hidden');
@@ -672,7 +683,13 @@ function MegaData ()
 			hasnext = 'has-next-button';
 		}
 
-		if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
+		if (this.currentdirid && this.currentdirid.substr(0,5) == 'chat/')
+		{			
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>Andrei.d</span></span></a>');
+			
+			$('.search-files-result').addClass('hidden');						
+		}
+		else if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
 		{
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
 			$('.search-files-result .search-number').text(M.v.length);
@@ -708,7 +725,8 @@ function MegaData ()
 		$('.fm-breadcrumbs-block a').unbind('click');
 		$('.fm-breadcrumbs-block a').bind('click',function(event)
 		{
-			if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;		
+			if ($(this).attr('id') == 'chatcrumb') return false;
+			else if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;
 			M.openFolder($(this).attr('id').replace('path_',''));
 		});
 	};
@@ -739,7 +757,6 @@ function MegaData ()
 			}
 			else console.log('something went wrong!',n.p,this.u[n.p]);
 		}
-
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
 		{
@@ -767,6 +784,11 @@ function MegaData ()
 					newmissingkeys = true;
 				  }
 				}
+			}			
+			if (n.hash)
+			{
+				if (!this.h[n.hash]) this.h[n.hash]=[];
+				this.h[n.hash].push(n.h);
 			}
 		}
 		if (this.d[n.h] && this.d[n.h].shares) n.shares = this.d[n.h].shares;
@@ -787,7 +809,8 @@ function MegaData ()
 			if (mDB && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
-				M.delIndex(M.d[h].p,h);
+				M.delIndex(M.d[h].p,h);				
+				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
 			if (M.v[h]) delete M.v[h];
@@ -795,6 +818,22 @@ function MegaData ()
 		}
 		ds(h);
 	};
+	
+	this.delHash = function(n)
+	{
+		if (n.hash && M.h[n.hash])
+		{
+			for (var i in M.h[n.hash])
+			{
+				if (M.h[n.hash][i] == n.h) 
+				{
+					M.h[n.hash].splice(i,1);
+					break;
+				}
+			}			
+			if (M.h[n.hash].length == 0) delete M.h[n.hash];
+		}
+	}
 
 	this.addContact = function(email)
 	{
@@ -1289,8 +1328,8 @@ function MegaData ()
 
 		if(is_chrome_firefox) 
 		{
-			var root = mozPrefs.getCharPref('dir');
-			dirs.forEach(function(p) 
+			var root = mozGetDownloadsFolder();
+			if (root) dirs.forEach(function(p) 
 			{
 				try 
 				{
@@ -1338,9 +1377,7 @@ function MegaData ()
 						if (!M.d[subids[j]].t)
 						{
 							nodes.push(subids[j]);
-							paths[subids[j]]=path;
-							
-							console.log('1 path',path, subids[j]);
+							paths[subids[j]]=path;							
 						}
 						else console.log('0 path',path);
 					}
@@ -1399,9 +1436,9 @@ function MegaData ()
 			}
 		}
 
-		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);
+		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
@@ -1541,9 +1578,8 @@ function MegaData ()
 		else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
 		else if (error == ESID) errorstr = l[19];
 		else if (error == ETEMPUNAVAIL) errorstr = l[233];
-		else if (error == EBLOCKED) errorstr=l[21];
+		else if (error == EBLOCKED || error == ETOOMANY || error == EACCESS) errorstr=l[23];
 		else if (error == ENOENT) errorstr=l[22];
-		else if (error == EACCESS) errorstr = l[23];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
 		else errorstr = l[233];
@@ -1571,7 +1607,8 @@ function MegaData ()
 			if (!f.flashid) f.flashid = false;
 			f.target = M.currentdirid;
 			f.id = ul_id;
-			ul_queue.push(f);
+			ul_queue.push(f);			
+			
 			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		}
 		if (page !== 'start') openTransferpanel();
@@ -2048,7 +2085,8 @@ function execsc(ap)
 	}
 	if (newnodes.length > 0 && fminitialized) rendernew();
 	if (loadavatars) M.avatars();
-	fm_thumbnails();
+	fm_thumbnails();	
+	if ($.dialog == 'properties') propertiesDialog();	
 	getsc();
 }
 
@@ -2110,6 +2148,7 @@ function isCircular(fromid,toid)
 
 function RootbyId(id)
 {
+	if (id) id = id.replace('chat/','');
 	var p = M.getPath(id);
 	return p[p.length-1];
 }

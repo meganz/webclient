@@ -396,7 +396,7 @@ function initUI()
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 
 	{
-		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/') window.history.back();
+		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/' || M.currentdirid.substr(0,5) == 'chat/') window.history.back();
 		else
 		{
 			var n = M.d[M.currentdirid];		
@@ -1063,12 +1063,13 @@ function accountUI()
 							'<input type="button" value="Browse..." style="-moz-appearance:' +
 								'progressbar;margin-right:12px;cursor:pointer" />' +
 							'</div>'));
-					$('#acc_dls_folder').append($('<span/>').text(mozPrefs.getCharPref('dir')));
+					var fld = mozGetDownloadsFolder();
+					$('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
 					$('#acc_dls_folder input').click(function()
 					{
 						var fs = mozFilePicker(0,2);
 						if (fs) {
-							mozPrefs.setCharPref('dir', fs.path);
+							mozSetDownloadsFolder(fs);
 							$(this).next().text(fs.path);
 						}
 					});
@@ -1881,7 +1882,7 @@ function avatarDialog(close)
 }
 
 function gridUI()
-{   
+{
 	var t = new Date().getTime();
 	$.gridDragging=false;
 	$.gridLastSelected=false;
@@ -2476,6 +2477,8 @@ function UIkeyevents()
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
+		
+		if (M.chat) return true;		
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
@@ -2663,19 +2666,19 @@ function searchPath()
 				{
 					id = M.RootID;
 					c = 'cloud-drive';
-					name = 'Rubbish Bin';
+					name = l[164];
 				}
 				else if (path[i] == M.RubbishID)
 				{
 					id = M.RubbishID;
 					c = 'recycle-item';
-					name = 'Rubbish Bin';
+					name = l[168];
 				}
 				else if (path[i] == M.InboxID)
 				{
-					id = M.RubbishID;
+					id = M.InboxID;
 					c = 'inbox-item';
-					name = 'Inbox';
+					name = l[166];
 				}
 				else if (n)
 				{
@@ -2800,6 +2803,8 @@ function selectddUI()
 			},500);
 		}
 	});
+	
+	$('.ui-selectable-helper').remove();
 	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) { searchPath(); }});
 
@@ -3025,7 +3030,7 @@ function transferPanelUI()
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-            if(localStorage.transferPaneHeight) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
+            if(localStorage.transferPaneHeight && $.transferPaneResizable) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
 			else  $('.transfer-panel').css({'height': '193px'});            
 			$.transferHeader();
 		}
@@ -3251,7 +3256,7 @@ function treeUI()
 			$(this).removeClass('opened expanded');
 			$(this).prev().removeClass('active');
 		}		
-		$.selectingHeader($(this)); 		   
+		$.selectingHeader($(this));
 		if (id) M.openFolder(id);		
 		return false;
 	});
@@ -3320,17 +3325,19 @@ function treeUI()
 		}
 		if (e.offsetX) e.layerX=false;		
 		var eoffsetX=e.offsetX;
-		if (!eoffsetX)eoffsetX=e.pageX-$(this).offset().left;
-		
-		
+		if (!eoffsetX)eoffsetX=e.pageX-$(this).offset().left;		
 		var c = $(e.target).parent().attr('class');		
-		if (!c || c.indexOf('fm-tree-folder') == -1) eoffsetX=25;
+		if (!c || c.indexOf('fm-tree-folder') == -1) eoffsetX=25;		
+		if (MegaChat && id && id.length == 11) id = 'chat/' + id;
 		
 		if ((eoffsetX < 23) || ($(this).attr('class').indexOf('active') > -1 && $(this).attr('class').indexOf('expanded') == -1) || id == M.currentdirid) 
 		{
 			treeUIexpand(id);			
 		}
-		else if ((eoffsetX > 23) || $(this).attr('class').indexOf('active') > -1) M.openFolder(id);		
+		else if ((eoffsetX > 23) || $(this).attr('class').indexOf('active') > -1)
+		{			
+			M.openFolder(id);
+		}
 		return false;		
 	});		
 	$(window).unbind('resize.tree');
@@ -3345,6 +3352,7 @@ function treeUI()
 
 function treeUIexpand(id,force)
 {
+	if (id) id = id.replace('chat/','');
 	if (id == 'contacts') M.buildtree({h:'contacts'});
 	else M.buildtree(M.d[id]);
 	var b = $('#treea_' + id);	
@@ -3636,7 +3644,15 @@ function shareDialog(close)
 			var u = [];
 			var html='';
 			for(var i in M.c['contacts']) if (M.u[i]) u.push(M.u[i]);
-			u.sort(function(a,b){if (u.name) return u.name.localeCompare(b.name);});			
+			u.sort(function(a,b)
+			{
+				if (a.name && b.name) return a.name.localeCompare(b.name); 
+				else 
+				{ 
+					console.log('huh',a,b); 
+					return -1; 
+				}
+			});
 			for (var i in u)
 			{
 				var avatar= staticpath + 'images/mega/default-top-avatar.png';
@@ -4482,11 +4498,20 @@ function propertiesDialog(close)
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
+		p.t6='';
+		p.t7='';
+		
 		$('.fm-dialog.properties-dialog').removeClass('multiple');
 		if (filecnt) 
 		{
 			p.t3 = l[87] + ':';
-			p.t5 = ' second';		
+			p.t5 = ' second';
+			
+			if (n.mtime)
+			{			
+				p.t6 = l[94] + ':';		
+				p.t7 = htmlentities(time2date(n.mtime));
+			}
 		}
 		else
 		{
@@ -4499,13 +4524,9 @@ function propertiesDialog(close)
 		if (foldercnt)
 		{
 			p.t6 = l[897] + ':';		
-			p.t7 = fm_contains(sfilecnt,sfoldercnt);		
+			p.t7 = fm_contains(sfilecnt,sfoldercnt);
 		}
-		else
-		{
-			p.t6='';
-			p.t7='';
-		}
+		
 		
 		p.t8 = l[896] + ':';
 		p.t9 = htmlentities(time2date(n.ts));
@@ -4538,7 +4559,7 @@ function propertiesDialog(close)
 				a++;
 			}
 		}	
-	}	
+	}
 	$('.on_off :checkbox').iphoneStyle({checkedLabel:l[1021],uncheckedLabel:l[1022],resizeContainer: false, resizeHandle: false, onChange: function(elem, data) 
 	{
 		if(data) $(elem).closest('.on_off').addClass('active');
@@ -4824,6 +4845,9 @@ function fm_resize_handler() {
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
 	}
+	
+	
+	if (M.chat) initChatScrolling();	
 
     var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({

@@ -241,7 +241,7 @@ var ZIPClass = function(totalSize) {
 	self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos)
 	{
 		var dirRecord = new ZipCentralDirectory();
-		dirRecord.file		= filename;
+		dirRecord.file		= to8(filename);
 		dirRecord.date		= time;
 		dirRecord.size		= size;
 		dirRecord.unsize	= size;
@@ -300,7 +300,7 @@ var ZIPClass = function(totalSize) {
 
 	self.writeHeader = function(filename, size, date) {
 		var header = new ZipHeader();
-		header.file = filename;
+		header.file = to8(filename);
 		header.size = size;
 		header.date = date;
 		return header.getBytes();

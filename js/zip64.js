@@ -121,7 +121,7 @@ var ZIPClass = function(totalSize) {
 			var buf = ezBuffer(fileHeaderLen + this.file.length + this.extra.length);
 			buf.i32(fileHeaderSignature)
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags)
+			buf.i16(this.Flags, true);
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32); // crc32
@@ -165,7 +165,7 @@ var ZIPClass = function(totalSize) {
 			buf.i32(directoryHeaderSignature);
 			buf.i16(this.creatorVersion);
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags)
+			buf.i16(this.Flags, true);
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32);

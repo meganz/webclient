@@ -85,7 +85,7 @@ var ZIPClass = function(totalSize) {
 	var fileHeaderLen				= 30
 		, noCompression				= 0
 		, zipVersion				= isZip64 ? 45 : 20
-		, defaultFlags				= 0x808
+		, defaultFlags				= 0x0808
 		, i32max					= 0xffffffff
 		, i16max					= 0xffff
 		, zip64ExtraId				= 0x0001
@@ -121,7 +121,7 @@ var ZIPClass = function(totalSize) {
 			var buf = ezBuffer(fileHeaderLen + this.file.length + this.extra.length);
 			buf.i32(fileHeaderSignature)
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags, true);
+			buf.i16(this.Flags);
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32); // crc32
@@ -165,7 +165,7 @@ var ZIPClass = function(totalSize) {
 			buf.i32(directoryHeaderSignature);
 			buf.i16(this.creatorVersion);
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags, true);
+			buf.i16(this.Flags);
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32);
@@ -240,8 +240,9 @@ var ZIPClass = function(totalSize) {
 
 	self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos)
 	{
+		filename = to8(filename)
 		var dirRecord = new ZipCentralDirectory();
-		dirRecord.file		= to8(filename);
+		dirRecord.file		= filename;
 		dirRecord.date		= time;
 		dirRecord.size		= size;
 		dirRecord.unsize	= size;
@@ -299,8 +300,9 @@ var ZIPClass = function(totalSize) {
 	};
 
 	self.writeHeader = function(filename, size, date) {
+		filename = to8(filename)
 		var header = new ZipHeader();
-		header.file = to8(filename);
+		header.file = filename;
 		header.size = size;
 		header.date = date;
 		return header.getBytes();
@@ -381,7 +383,7 @@ function crc32(data, crc, len)
 	{
 		crc = 0;
 	}
-	
+
 	var x = 0;
 	var y = 0;
 	

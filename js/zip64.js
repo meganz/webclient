@@ -12,6 +12,13 @@ function ezBuffer(size) {
 		debug: function() {
 			console.error(["DEBUG", offset, obj.length]);
 		},
+		getArray: function() {
+			var bytes = []
+			$.each(obj, function(i, val) {
+				bytes.push(val);
+			});
+			return bytes;
+		},
 		getBytes: function() {
 			return obj;
 		},
@@ -89,6 +96,7 @@ var ZIPClass = function(totalSize) {
 		, i32max					= 0xffffffff
 		, i16max					= 0xffff
 		, zip64ExtraId				= 0x0001
+		, zipUtf8ExtraId			= 0x7075
 		, directory64LocLen			= 20
 		, directory64EndLen			= 56
 		, directoryEndLen			= 22
@@ -151,16 +159,26 @@ var ZIPClass = function(totalSize) {
 		this.externalAttr	= 0;
 
 		this.getBytes = function() {
-			var extra = [];
+			var extra = []
+				, ebuf
+
+			ebuf = ezBuffer(4 + 4 + this.file.length)
+			ebuf.i16(zipUtf8ExtraId)
+			ebuf.i16(4+this.file.length) // size
+			ebuf.i32(this.crc32)
+			ebuf.appendBytes(this.file);
+			extra = extra.concat( ebuf.getArray() );
+
 			if (isZip64) {
-				var ebuf = ezBuffer(28); // 2xi16 + 3xi64
+				ebuf = ezBuffer(28); // 2xi16 + 3xi64
 				ebuf.i16(zip64ExtraId);
 				ebuf.i16(24);
 				ebuf.i64(this.size);
 				ebuf.i64(this.unsize);
 				ebuf.i64(this.offset);
-				extra = ebuf.getBytes();
+				extra = extra.concat( ebuf.getArray() );
 			}
+
 			var buf = ezBuffer(directoryHeaderLen + this.file.length + extra.length);
 			buf.i32(directoryHeaderSignature);
 			buf.i16(this.creatorVersion);
@@ -305,7 +323,7 @@ var ZIPClass = function(totalSize) {
 		header.file  = filename;
 		header.size  = size;
 		header.date  = date;
-		header.extra = [0x0, 0x8];
+		header.extra = [0x0, 0x8, 0x0];
 		return header.getBytes();
 	}
 }

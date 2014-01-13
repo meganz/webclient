@@ -85,7 +85,7 @@ var ZIPClass = function(totalSize) {
 	var fileHeaderLen				= 30
 		, noCompression				= 0
 		, zipVersion				= isZip64 ? 45 : 20
-		, defaultFlags				= 0x0808
+		, defaultFlags				= 0x808 /* UTF-8 */
 		, i32max					= 0xffffffff
 		, i16max					= 0xffff
 		, zip64ExtraId				= 0x0001
@@ -121,7 +121,7 @@ var ZIPClass = function(totalSize) {
 			var buf = ezBuffer(fileHeaderLen + this.file.length + this.extra.length);
 			buf.i32(fileHeaderSignature)
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags);
+			buf.i16(this.Flags)
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32); // crc32
@@ -302,9 +302,10 @@ var ZIPClass = function(totalSize) {
 	self.writeHeader = function(filename, size, date) {
 		filename = to8(filename)
 		var header = new ZipHeader();
-		header.file = filename;
-		header.size = size;
-		header.date = date;
+		header.file  = filename;
+		header.size  = size;
+		header.date  = date;
+		header.extra = [0x0, 0x8];
 		return header.getBytes();
 	}
 }

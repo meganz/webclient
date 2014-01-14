@@ -753,7 +753,14 @@ function dl_checklostchunk()
 			if (!dl_zip) dl_complete();
 			else
 			{
-				t = ZIP.writeCentralDir(dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,dl_queue[dl_queue_num].size,dl_queue[dl_queue_num].t,dl_zip.crc32,false,dl_zip.headerpos);
+				t = ZIP.writeCentralDir(
+					dl_queue[dl_queue_num].p+dl_queue[dl_queue_num].n,
+					dl_queue[dl_queue_num].size,
+					dl_queue[dl_queue_num].t,
+					dl_zip.crc32,
+					false,
+					dl_zip.headerpos
+				);
 				dl_zip.suffix = t.dataDescriptor;
 				dl_zip.dirData.push(t.dirRecord);
 				dl_queue[dl_queue_num].complete = true;

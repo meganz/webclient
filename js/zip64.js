@@ -12,6 +12,13 @@ function ezBuffer(size) {
 		debug: function() {
 			console.error(["DEBUG", offset, obj.length]);
 		},
+		getArray: function() {
+			var bytes = []
+			$.each(obj, function(i, val) {
+				bytes.push(val);
+			});
+			return bytes;
+		},
 		getBytes: function() {
 			return obj;
 		},
@@ -85,10 +92,11 @@ var ZIPClass = function(totalSize) {
 	var fileHeaderLen				= 30
 		, noCompression				= 0
 		, zipVersion				= isZip64 ? 45 : 20
-		, defaultFlags				= 0x808
+		, defaultFlags				= 0x808 /* UTF-8 */
 		, i32max					= 0xffffffff
 		, i16max					= 0xffff
 		, zip64ExtraId				= 0x0001
+		, zipUtf8ExtraId			= 0x7075
 		, directory64LocLen			= 20
 		, directory64EndLen			= 56
 		, directoryEndLen			= 22
@@ -151,21 +159,24 @@ var ZIPClass = function(totalSize) {
 		this.externalAttr	= 0;
 
 		this.getBytes = function() {
-			var extra = [];
+			var extra = []
+				, ebuf
+
 			if (isZip64) {
-				var ebuf = ezBuffer(28); // 2xi16 + 3xi64
+				ebuf = ezBuffer(28); // 2xi16 + 3xi64
 				ebuf.i16(zip64ExtraId);
 				ebuf.i16(24);
 				ebuf.i64(this.size);
 				ebuf.i64(this.unsize);
 				ebuf.i64(this.offset);
-				extra = ebuf.getBytes();
+				extra = extra.concat( ebuf.getArray() );
 			}
+
 			var buf = ezBuffer(directoryHeaderLen + this.file.length + extra.length);
 			buf.i32(directoryHeaderSignature);
 			buf.i16(this.creatorVersion);
 			buf.i16(this.readerVersion);
-			buf.i16(this.Flags)
+			buf.i16(this.Flags);
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32);
@@ -240,6 +251,7 @@ var ZIPClass = function(totalSize) {
 
 	self.writeCentralDir = function(filename, size, time, crc32, directory, headerpos)
 	{
+		filename = to8(filename)
 		var dirRecord = new ZipCentralDirectory();
 		dirRecord.file		= filename;
 		dirRecord.date		= time;
@@ -299,10 +311,20 @@ var ZIPClass = function(totalSize) {
 	};
 
 	self.writeHeader = function(filename, size, date) {
+		filename = to8(filename)
 		var header = new ZipHeader();
-		header.file = filename;
-		header.size = size;
-		header.date = date;
+		header.file  = filename;
+		header.size  = size;
+		header.date  = date;
+
+		var ebuf = ezBuffer(1 + 4 + 4 + filename.length)
+		ebuf.i16(zipUtf8ExtraId)
+		ebuf.i16(5+filename.length) // size
+		ebuf.i8(1) // version
+		ebuf.i32(crc32(filename))
+		ebuf.appendBytes(filename)
+		header.extra = ebuf.getArray();
+
 		return header.getBytes();
 	}
 }
@@ -381,7 +403,7 @@ function crc32(data, crc, len)
 	{
 		crc = 0;
 	}
-	
+
 	var x = 0;
 	var y = 0;
 	

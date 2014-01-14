@@ -1,0 +1,1496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() { 
+   
+	
+	function startpageScroll(scrollingVal) 
+    {
+      var element = $('.st-main-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
+	  if(scrollingVal) {
+		  var api = element.data('jsp');
+		  api.scrollToElement($('.st-red-block'), true, true);
+	  }
+    }
+	startpageScroll();
+	$(window).bind('resize', function (e) 
+	{	
+         startpageScroll();
+    });
+	
+	// Demo of scrolling
+	$(".st-bottom-scroll-button").bind('click',function(event) 
+    {
+		  $('.donwload-mid-white-block').addClass('active');
+		  $('.donwload-mid-white-block').height($('.st-main-block').outerHeight()-50);
+		  $('.st-full-block').removeClass('hidden');
+		  $('.st-main-bottom').addClass('scroll');
+		  startpageScroll('true');
+    });
+	
+
+});
+
+</script>
+
+
+
+<!-- New ads scripts !-->
+<script src="js/ads.min.js"></script>
+    <script>
+            window.baboomAds([
+                {
+                    url: 'audio/01.mp3',
+                    title: 'Amazing'
+                    // title: 'Amazing (feat. Laughton Kora)',
+                    // fontSize: 45,
+                    //top: -35
+                },
+                {
+                    url: 'audio/02.mp3',
+                    title: 'Good Times'
+                    // title: 'Good Times (feat. llati)',
+                    // fontSize: 45,
+                    // top: -35
+                },
+                {
+                    url: 'audio/03.mp3',
+                    title: 'Dance Dance Dance',
+                    fontSize: 48
+                },
+                {
+                    url: 'audio/04.mp3',
+                    title: 'Keeps Getting Better',
+                    fontSize: 45,
+                    // title: 'Keeps Getting Better (feat. llati)',
+                    // fontSize: 39,
+                    // top: -30
+                },
+                {
+                    url: 'audio/01.mp3',
+                    title: 'Change Your Life',
+                    fontSize: 48,
+                    // title: 'Change Your Life (feat. Laughton Kora)',
+                    // fontSize: 35,
+                    // top: -30
+                },
+                {
+                    url: 'audio/02.mp3',
+                    title: 'Universe',
+                    // title: 'Universe (feat. Amari)',
+                    // fontSize: 45,
+                    // top: -35
+                },
+                {
+                    url: 'audio/03.mp3',
+                    title: 'Little Bit Of Me',
+                    fontSize: 48
+                    // title: 'Little Bit Of Me (feat. Tiki Taane)',
+                    // fontSize: 42,
+                    // top: -30
+                },
+                {
+                    url: 'audio/04.mp3',
+                    title: 'Party Electricity'
+                    // title: 'Party Electricity (feat. Amari)',
+                    // fontSize: 45,
+                    // top: -35
+                },
+                {
+                    url: 'audio/01.mp3',
+                    title: 'Wunderbar (Interlude)',
+                    top: -35
+                },
+                {
+                    url: 'audio/02.mp3',
+                    title: 'To Be With You',
+                    // title: 'To Be With You (feat. llati)',
+                    // fontSize: 45,
+                    // top: -35
+                },
+                {
+                    url: 'audio/03.mp3',
+                    title: 'Good Life',
+                    // title: 'Good Life (feat. Printz Board)',
+                    // fontSize: 45,
+                    // top: -35
+                },
+                {
+                    url: 'audio/04.mp3',
+                    title: 'Party Amplifier',
+                    // title: 'Party Amplifier (feat. Printz Board)',
+                    // fontSize: 38,
+                    // top: -32
+                },
+                {
+                    url: 'audio/01.mp3',
+                    title: 'Take Me Away',
+                    // title: 'Take Me Away (feat. Mona Dotcom)',
+                    // fontSize: 37,
+                    // top: -30
+                },
+                {
+                    url: 'audio/02.mp3',
+                    title: 'Beathoven (Interlude)',
+                    top: -35
+                },
+                {
+                    url: 'audio/03.mp3',
+                    title: 'Firework The Final Ever Eq 2',
+                    fontSize: 45,
+                    top: -15
+                },
+                {
+                    url: 'audio/04.mp3',
+                    title: 'Live My Life'
+                },
+                {
+                    url: 'audio/01.mp3',
+                    title: 'Beathoven Slow'
+                }
+            ], function (err) {
+                // TODO: handle err
+            });
+        </script>
+
+    <!-- MIXPANEL STATES -->
+    <script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
+b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
+mixpanel.init("06d3d92a8f059240b88f88bbedaf1ccb");</script>
+
+<!-- end !-->
+
+</head>
+
+<body id="bodyel" class="bottom-pages adv">
+<div class="loading-main-block" id="loading" style="display: none;"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-100" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br>Sunday 04:00 - 10:00 UTC </div></div><div class="loading-main-bottom" id="bootbottom" style="display: none;"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="loading-bottom-button st-facebook-button"></a><a href="https://twitter.com/MEGAprivacy" class="loading-bottom-button st-twitter-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="follow-txt">follow us</a><div class="clear"></div></div></div></div>
+<div id="overlay" style="display:none; width:100%; height:100%; position:absolute; left:0px; right:0px; cursor:wait; z-index:999999;"></div>
+<div class="download-overlay" id="download_overlay" style="display:none;"></div>
+<div id="pageholder" style="display: none;"></div>
+<div id="startholder" class="fmholder" style="display: block;"><div class="widget-block hidden" style="opacity: 1;">
+      <div class="widget-circle percents-0">
+         <div class="widget-arrows">  
+             <div class="widget-tooltip">
+                <div class="widget-icon uploading hidden">
+                  <span class="widget-txt">Uploading</span>
+                  <span class="widget-speed-block ulspeed">
+                    KB/s
+                  </span>
+                </div>
+                <div class="widget-icon downloading hidden">
+                  <span class="widget-txt">Downloading</span>
+                  <span class="widget-speed-block dlspeed">
+                    KB/s
+                  </span>
+                </div>
+             </div>
+             <div class="widget-arrow"></div>
+         </div>
+      </div>  
+  </div>
+  <div class="st-main-block">  
+    <div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="top-menu-icon">Menu</a> 
+    <div class="top-menu-popup">
+       <div class="top-menu-arrow" style="margin-right: 17.5px;"></div>
+       <div class="top-menu-item upgrade-your-account" style="display: block;">Upgrade your account</div>
+       <div class="context-menu-divider upgrade-your-account" style="display: block;"></div>
+       <div class="top-menu-item contains-submenu">
+          MEGA
+          <div class="top-submenu-popup">
+            <div class="top-menu-item privacycompany">The Privacy Company</div>
+            <div class="top-menu-item aboutus">About us</div>
+			<div class="top-menu-item credits">Credits</div>
+            <div class="top-menu-item megablog">Blog</div>            
+          </div>
+       </div>
+       <div class="top-menu-item contains-submenu">
+          Apps
+          <div class="top-submenu-popup">
+            <div class="top-menu-item mobile">Mobile Apps</div>
+			<div class="top-menu-item sync">Sync Client</div>
+            <div class="top-menu-item chrome">Chrome App</div>
+			<div class="top-menu-item firefox">Firefox App</div>            
+          </div>
+       </div> 
+       <div class="top-menu-item contains-submenu">
+          Support
+          <div class="top-submenu-popup">
+            <div class="top-menu-item help">Help Centre</div>
+            <div class="top-menu-item contact">Contact Us</div>
+			<div class="top-menu-item resellers">Resellers</div>
+          </div>
+       </div> 
+       <div class="top-menu-item contains-submenu">
+          Developers
+          <div class="top-submenu-popup">
+            <div class="top-menu-item sdk">Software Development Kit</div>
+            <div class="top-menu-item doc">Documentation</div>
+            <div class="top-menu-item aff">Affiliate Program</div>
+          </div>
+       </div> 
+       <div class="top-menu-item contains-submenu">
+          Legal &amp; policies
+          <div class="top-submenu-popup">
+            <div class="top-menu-item terms">Terms of Service</div>
+            <div class="top-menu-item privacypolicy">Privacy Policy</div>
+            <div class="top-menu-item copyright">Copyright</div>
+            <div class="top-menu-item takedown">Takedown Guidance</div>
+			<div class="top-menu-item affiliateterms">Affiliate Terms of Service</div>
+          </div>
+       </div>   
+       <div class="context-menu-divider"></div>	   
+	   <div class="top-menu-item login" style="display: none;">Login</div>
+	   <div class="top-menu-item register" style="display: none;">Register</div>	   
+	   <div class="top-menu-item clouddrive" style="display: block;">Cloud Drive</div> 
+       <div class="top-menu-item account" style="display: block;">My account</div>	   
+       <div class="top-menu-item languages">Language</div>        
+       <div class="context-menu-divider logout" style="display: block;"></div> 
+       <div class="top-menu-item logout" style="display: block;">Logout</div>
+    </div>
+    <a class="create-account-button hidden">
+      Create Account
+    </a>
+    <a class="top-login-button hidden">
+      Login
+    </a>
+    <div class="top-login-popup"> 
+       <div class="top-login-arrow"></div> 
+       <div class="top-login-full"></div>
+       <div class="clear"></div>
+       <div class="top-login-pad">
+          <div class="top-login-input-tooltip both-incorrect">
+                <div class="top-login-tooltip-arrow">
+                   <div class="top-loginp-tooltip-txt">
+                      Invalid e-mail and/or password.
+                      <div class="white-txt">Please try again</div>
+                   </div>
+                </div>
+          </div>
+          <div class="top-login-input-block e-mail">
+              <div class="top-login-input-tooltip">
+                <div class="top-login-tooltip-arrow">
+                   <div class="top-loginp-tooltip-txt">
+                      Please enter a valid e-mail address.
+                   </div>
+                </div>
+              </div>
+              <input type="text" name="login-name" id="login-name" value="Your Email">
+          </div>
+          <div class="top-login-input-block password">
+              <div class="top-login-input-tooltip">
+                <div class="top-login-tooltip-arrow">
+                   <div class="top-loginp-tooltip-txt">
+                      Please enter a valid password.
+                   </div>
+                </div>
+              </div>
+              <input type="text" name="login-password" id="login-password" value="Password">
+          </div>
+          <div class="checkboxOn login-checkbox"></div>
+          <label class="radio-txt">Remember me</label>
+		  
+          <div class="top-dialog-login-button">Login <img alt="" src="https://eu.static.mega.co.nz/images/mega/ajax-loader.gif"></div>
+          <div class="clear"></div>
+       </div>
+       <div class="top-login-warning">
+            <div class="top-login-warning-arrow"></div>
+            <div class="top-login-warning-close"></div>
+            <div class="top-login-warning-pad">
+               <div class="top-login-warning-icon"></div>
+               <div class="top-login-warning-txt">
+                 Never enter your password on a device that you do not fully trust. Do not log into your account from a shared or public computer.<br>
+               </div>  
+               <div class="clear"></div>
+               For enhanced security, install our <a href="#plugin">browser extension</a> and load MEGA from your computer rather than from our servers.
+               <div class="top-login-warning-bott">
+                  <div class="loginwarning-checkbox checkboxOff"></div>				  
+                  <label class="radio-txt">Do not show again</label>
+                  <div class="clear"></div>
+               </div>
+            </div>
+       </div>
+     </div>
+    
+    
+    <a class="fm-avatar" style="display: block;"><img alt="" src="blob:https://mega.co.nz/3226ee5e-5eed-4fca-b044-ba97c04b8920"></a>
+    <div class="activity-status-block" style="display: none;">
+      <div class="activity-status online" style="display: none;"></div>
+    </div>
+    <div class="top-user-status-popup">
+       <div class="top-user-status-arrow"></div>
+       <div class="top-user-status-item active">
+         <div class="activity-status online" style="display: none;"></div>
+         <div class="top-user-status-txt">Online</div>
+       </div>
+       <div class="top-user-status-item">
+         <div class="activity-status away" style="display: none;"></div>
+         <div class="top-user-status-txt">Away</div>
+       </div>
+       <div class="top-user-status-item">
+         <div class="activity-status busy" style="display: none;"></div>
+         <div class="top-user-status-txt">Busy</div>
+       </div>
+       <div class="context-menu-divider"></div> 
+       <div class="top-user-status-item">
+         <div class="activity-status offline" style="display: none;"></div>
+         <div class="top-user-status-txt">Offline</div>
+       </div>
+    </div>
+    <div class="membership-status-block">
+       <div class="membership-status free" style="display: block;">FREE</div>
+    </div>
+    <div class="membership-popup pro-popup">
+      <div class="membership-popup-arrow" style="margin-right: 145.5px;"></div>
+
+      <div class="membership-loading">
+          <div class="cr-fountaing">
+              <div class="fountaing-circle cr-fountaing_1"></div>
+              <div class="fountaing-circle cr-fountaing_2"></div>
+              <div class="fountaing-circle cr-fountaing_3"></div>
+              <div class="fountaing-circle cr-fountaing_4"></div>
+              <div class="fountaing-circle cr-fountaing_5"></div>
+              <div class="fountaing-circle cr-fountaing_6"></div>
+              <div class="fountaing-circle cr-fountaing_7"></div>
+              <div class="fountaing-circle cr-fountaing_8"></div>
+          </div>
+      </div>
+      <div class="membership-main-block hidden">
+      <div class="membership-top-bl">
+          <div class="membership-icon-pad">
+             <div class="membership-icon pro2"></div>
+             <div class="membership-icon-txt-bl">
+                 <div class="membership-big-txt red">Pro II</div>
+                 <div class="membershtip-medium-txt">Expires on <span class="red">January 1st 2020</span></div>
+             </div>
+             <div class="clear"></div>
+          </div>
+          <div class="membership-price-txt">
+                <div class="membership-big-txt red">€ 99.99</div>
+                <div class="membershtip-medium-txt balancetxt">Account balance</div>
+          </div>
+          <div class="clear"></div>
+      </div>
+      <div>
+          <!-- Add "exceeded" class !-->
+          <div class="membership-usage-bl">
+             <div class="membership-circle">
+                 <div class="membership-circle-bg blue-circle percents-33">
+                   22<span class="membershtip-small-txt">%</span>
+                 </div>
+             </div>
+             <div class="membership-usage-txt storage">
+                <div class="membership-big-txt">
+                  <span class="blue">400 <span class="membershtip-small-txt">GB</span></span> <span class="membershtip-small-txt">of</span> 2 <span class="membershtip-small-txt">TB</span>
+                  
+                </div>
+                <div class="membershtip-medium-txt">
+                  Used space
+                </div>
+             </div>
+          </div>
+          <!-- Add "exceeded" class !-->
+          <div class="membership-usage-bl bandwidth">
+             <div class="membership-circle">
+                 <div class="membership-circle-bg green-circle percents-22">
+                    22<span class="membershtip-small-txt">%</span>
+                 </div>
+             </div>
+             <div class="membership-usage-txt bandwidth">
+                <div class="membership-big-txt">
+                  <span class="green">20 <span class="membershtip-small-txt">GB</span></span> <span class="membershtip-small-txt">of</span> 4 <span class="membershtip-small-txt">TB</span> 
+                </div>
+                <div class="membershtip-medium-txt">
+                  Used bandwidth
+                  <div class="account-warning-icon">
+                    <span class="membership-notification">
+                       <span><span class="yellow">Warning:</span> <span class="red">bandwidth quota exceeded.</span><br>
+You will need to wait <span class="green">30:10</span> until more bandwidth is assigned to your account.<br>
+Don't want to wait? <a href="">Upgrade your account.</a></span>
+                       <span class="membership-arrow"></span>
+                    </span>
+                   &nbsp;
+                  </div>
+                  <!-- end !-->  
+                </div>
+             </div>
+          </div>
+          
+          <div class="clear"></div>
+      
+      </div>
+      </div>
+      <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button membership-button active">Manage your account</div>
+      </div>
+    </div>
+    <div class="membership-popup free-popup">
+      <div class="membership-popup-arrow" style="margin-right: 145.5px;"></div>
+	  <div class="membership-loading">
+          <div class="cr-fountaing">
+              <div class="fountaing-circle cr-fountaing_1"></div>
+              <div class="fountaing-circle cr-fountaing_2"></div>
+              <div class="fountaing-circle cr-fountaing_3"></div>
+              <div class="fountaing-circle cr-fountaing_4"></div>
+              <div class="fountaing-circle cr-fountaing_5"></div>
+              <div class="fountaing-circle cr-fountaing_6"></div>
+              <div class="fountaing-circle cr-fountaing_7"></div>
+              <div class="fountaing-circle cr-fountaing_8"></div>
+          </div>
+      </div>
+	  <div class="membership-main-block hidden">
+      <div class="membership-top-bl">
+          <div class="membership-icon-pad">
+             <div class="membership-icon free"></div>
+             <div class="membership-icon-txt-bl">
+                 <div class="membership-big-txt green">FREE</div>
+                 <div class="membershtip-medium-txt green-bg upgrade-account">Upgrade your account</div>
+             </div>
+             <div class="clear"></div>
+          </div>
+          <div class="membership-price-txt">
+                <div class="membership-big-txt">€ 0.00</div>
+                <div class="membershtip-medium-txt balancetxt">Account balance</div>
+          </div>
+          <div class="clear"></div>
+      </div>
+      <div>
+          <div class="membership-usage-bl">
+             <div class="membership-circle">
+                 <div class="membership-circle-bg blue-circle percents-0">
+                   22<span class="membershtip-small-txt">%</span> 
+                 </div>
+             </div>
+             <div class="membership-usage-txt storage">
+                <div class="membership-big-txt"><span class="blue">25 <span class="membershtip-small-txt">GB</span></span> <span class="membershtip-small-txt">of</span> 50 <span class="membershtip-small-txt">GB</span></div>
+                <div class="membershtip-medium-txt">
+                  Used space
+                  <!-- New warning icon for storage. Please add it to fm.js line 838. It will be showen automaticaly if "exceeded" class will be added to "membership-usage-bl" block !-->
+                 <div class="account-warning-icon">
+                   <span class="membership-notification">
+                       <span><span class="yellow">Warning:</span> <span class="red">storage quota exceeded.</span><br>
+Please delete files or <a href="">upgrade your account.</a></span>
+                       <span class="membership-arrow"></span>
+                   </span>
+                   &nbsp;
+                </div>
+                <!-- end !-->
+                </div>
+             </div>
+          </div>
+          <div class="membership-usage-bl">
+             <div class="membership-circle">
+                 <div class="membership-circle-bg green-circle percents-50">
+                    23<span class="membershtip-small-txt">%</span>
+                 </div>
+             </div>
+             <div class="membership-usage-txt bandwidth">
+                <div class="membership-big-txt">
+                  <span class="green">420 <span class="membershtip-small-txt">MB</span></span> 
+                  <span class="membership-question">
+                     ?
+                     <span class="membership-notification">
+                       <span style="display:block">This limit is dynamic. You will have  an extra 500 GB available in the next 30 minutes.</span>
+                       <span class="membership-arrow"></span>
+                     </span>
+                  </span>
+                </div>
+                <div class="membershtip-medium-txt">
+                  of available <br> bandwidth
+                  <!-- New warning icon for bandwidth. Please add it to fm.js line 838. It will be showen automaticaly if "exceeded" class will be added to "membership-usage-bl" block !-->
+                  <div class="account-warning-icon">
+                    <span class="membership-notification">
+                       <span><span class="yellow">Warning:</span> <span class="red">bandwidth quota exceeded.</span><br>
+You will need to wait <span class="green">30:10</span> until more bandwidth is assigned to your account.<br>
+Don't want to wait? <a href="">Upgrade your account.</a></span>
+                       <span class="membership-arrow"></span>
+                    </span>
+                    &nbsp;
+                  </div>
+                <!-- end !-->
+                </div>
+             </div>
+          </div>
+          
+          <div class="clear"></div>
+      
+      </div>
+	  </div>
+      <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button membership-button active">Manage your account</div>
+      </div>
+    </div>
+    
+    <a class="user-name" style="display: none;"></a>
+    <div class="language-popup-icon hidden"></div> 
+    
+    
+    <div class="cloud-popup-icon" style="display: none;"><span class="notification-num" style="display:none">0</span></div>
+    <div class="notification-popup empty hidden">
+      <div class="notification-arrow"></div>
+      <div class="notification-header"> 
+        <a href="#notificationsettings" class="notification-settings hidden"></a>
+        <div class="notification-txt">Notifications</div>
+      </div>
+      <div class="notification-scroll">
+        <div class="notification-scr-list">
+           
+        </div>
+      </div>
+      <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button notifications-button active">See all</div>
+      </div>
+      <div class="notification-popup-empty"> 
+        <div class="notification-popup-empty-txt"></div>
+      </div>
+    </div>
+	
+	<div class="warning-popup-icon hidden">
+		<div class="warning-icon-area"></div>
+		<div class="top-warning-popup">
+		  <div class="membership-popup-arrow" style="margin-right: 145.5px;"></div> 
+		  <div class="warning-popup-body">
+			<div class="warning-gray-icon"></div>
+			You are using an ephemeral session. The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your free 50 GB of secure storage space in the cloud!
+			<div class="warning-green-icon"></div>
+		  </div>
+		  <div class="fm-notifications-bottom"> 
+			<div class="fm-dialog-button active warning-button">Register now</div> 
+		  </div>
+		</div>
+	</div>
+    
+    <div class="top-search-bl" style="display: none;">
+       <div class="top-search-clear">
+           <div class="top-clear-button"></div>
+           <input type="text" value="Search" class="top-search-input">
+       </div>
+    </div>
+  </div>
+         <div class="download-mid-white-block logged-in">
+         
+             <!-- "GOOD TIMES AD" - Column left -->
+          <div class="good-times-left-block">
+            <a href="http://baboom.com/kimdotcom" target="_blank">
+                <div class="background-picture"></div>
+                <div class="title-image"></div>
+                <div class="left-bottom">
+                    <div class="bottom-gradient"></div>
+                    <div class="kimdotcom-logo"></div>
+                    <div class="baboom-logo"></div>
+                </div>
+            </a>
+          </div>
+          <!-- end "GOOD TIMES AD" - Column left -->
+
+          <!-- "GOOD TIMES AD" - Column right -->
+          <div class="good-times-right-block">
+            <div class="audio-player">
+              <a href="http://baboom.com/kimdotcom/" target="_blank">
+                <div class="music-title"></div>
+              </a>
+              <a href="http://baboom.com/kimdotcom/" target="_blank">
+                <div class="cover-wrapper">
+                  <div class="cover-image"></div>
+                  <div class="playing-circle">
+                    <div class="mask">
+                      <div class="masked-circle"></div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              <div class="controls-wrapper">
+                <div class="btn-control prev"></div>
+                <div class="btn-control play-pause"></div>
+                <div class="btn-control next"></div>
+              </div>
+              <div class="play-preview-text"></div>
+            </div>
+            <a href="http://baboom.com/kimdotcom/" target="_blank">
+                <div class="baboom-logo"></div>
+            </a>
+          </div>
+          <!-- end "GOOD TIMES AD" - Column right -->
+         
+         
+             <div class="download-mid-centered-block downloading download-complete">
+               <div class="new-download-icon"><div>100<span>%</span></div></div>
+               <div class="new-download-right-block">
+                 <div class="new-download-pad">
+                     <div class="file-info-block">
+                       <div class="download-message-icon"></div>
+                       <div class="download-complete-icon"></div>
+                       <div class="new-download-file-icon compressed"></div>
+                     
+                       <div class="new-download-file-info">
+                          <div class="new-download-file-title">mega-ads_20140111-1918.zip</div>
+                          <div class="new-download-file-size">4.3 MB</div>
+                       </div>
+                       <div class="clear"></div>
+                     </div>
+                     <div class="new-download-buttons">
+                       <div class="new-download-red-button"><div class="new-download-button-txt1">Download</div> <div class="new-download-button-txt2">to your computer</div></div>
+                       <div class="new-download-gray-button"><div class="new-download-button-txt1">Import</div> <div class="new-download-button-txt2">to your Cloud Drive</div></div>
+                       <div class="clear"></div>
+                     </div>                     
+                     <div class="download-message-txt">
+                         You can close this tab, your download is managed from another tab where you have your file manager open.
+                     </div>                     
+                     <div class="downloading-block">
+                        <div class="downloading-progress">
+                             <div class="downloading-progress-bar" style="width: 100%;"></div>
+                        </div>
+						<div class="downloadings-icons">
+                          <div class="download-pause" style="display: none;"></div>
+                          <div class="downloading-txt speed">1.4 MB/s</div>
+                          <div class="downloading-txt time">00:00:00</div>
+                        </div>
+						
+						<div class="downloading-txt temporary-error hidden">
+                         Temporary error, retrying.
+                        </div>
+						
+                        <div class="clear"></div>
+                     </div>                     
+                     <div class="some-reason-block">
+                        <div class="download-error-title">
+                           The file you are trying to download is no longer available.
+                        </div>
+                        <div class="download-error-txt">
+                           This could be due to the following reasons:
+                        </div>
+                        <div class="download-error-ul">
+                           The file has been removed because of a ToS/AUP violation.
+                        </div>
+                        <div class="download-error-ul">
+                           Invalid URL - the link you are trying to access does not exist
+                        </div>
+                        <div class="download-error-ul">
+                           The file has been deleted by the user.
+                        </div>
+                     </div>                     
+                     <div class="user-block">
+                        <div class="download-error-title">
+                           The file you are trying to download is no longer available.
+                        </div>
+                        <div class="download-user-icon">
+                           The associated user account has been terminated due to multiple violations of our <a href="#terms">Terms of Service</a>.
+                        </div>
+                     </div>                     
+                     <div class="temporary-block">
+                        <div class="download-error-title">
+                           The file you are trying to download is temporary unavailable.
+                        </div>
+                        <div class="download-error-temp-txt">
+                           Please try again later.
+                        </div>
+                     </div>                     
+                 </div>
+               </div>
+               <div class="clear"></div>
+             </div>
+			 
+			 <div class="st-social-block">
+                 <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>
+                 <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>
+                 <a href="http://www.instra.com" target="_blank" class="st-bottom-button st-thunder-button">
+                   <span class="powered-popup">
+                         <span class="powered-txt">
+                            powered by:
+                         </span>
+                         <span class="powered-logo"></span>
+                   </span>
+                   <span class="powered-arrow"></span>
+                 </a>
+             </div>
+             
+             <div class="st-scroll-to"></div>
+                          
+             <div class="st-main-bottom">                
+                 <div class="st-bottom-scroll-button scrolldown">
+                    What is MEGA? Click or scroll
+                 </div>
+                 <div class="clear"></div>
+             </div>
+
+         </div>         
+        <div class="st-full-block hidden">
+<div class="st-main-bottom scroll floating">
+	 <div class="st-bottom-scroll-button scrollup">
+		Back to Startpage
+	 </div>
+	 <div class="clear"></div>
+ </div> 
+ <div style="height:40px;"></div>
+         
+           <div class="st-main-logo"></div>
+           <div class="st-gray-block">  
+             <div class="st-gray-block-pad small-pad">
+               <div class="st-top-italic-txt infotxt1">
+                       No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence.<br>
+					   Everyone has the right to the protection of the law against such interference.
+               </div>
+               <div class="st-top-red-txt">
+                      Universal Declaration of Human Rights, Article 12
+               </div>
+             </div>
+           </div>            
+           <div class="st-secure-block-pad">
+               <div class="st-red-small-blocks">
+                       <div class="st-red-header privacy infotxt2">End-to-End Encryption</div>
+                       <div class="st-red-block-text infotxt3">Unlike with other cloud storage providers, your<br>
+						data is encrypted &amp; decrypted during transfer<br>
+						by your client devices only and never by us.</div>
+              </div>
+              <div class="st-red-small-blocks">
+                       <div class="st-red-header online infotxt4">Secure Global Access</div>
+                       <div class="st-red-block-text infotxt5">Your data is accessible any time, from any<br> device, anywhere. Only you control the <br> keys to your files.</div>
+              </div>
+              <div class="st-red-small-blocks">
+                       <div class="st-red-header collaboration infotxt6">Secure Collaboration </div>
+                       <div class="st-red-block-text infotxt7">Share folders with your contacts and see their<br> updates in real time. Online collaboration has<br> never been more private and secure.</div>
+              </div>
+              <div class="clear"></div>
+           </div>             
+           <div class="st-gray-block">  
+               <div class="st-green-note">
+                  <div class="st-green-note-txt">
+                     <span>get</span> 50 <span>GB</span>  FREE 
+                  </div>
+               </div>
+               <div class="st-gray-block-pad small-pad">
+                 <div class="st-membership-left-bl">
+                   <div class="st-blocks-header infotxt8">Membership Plans</div>
+                   <div class="st-privacy-tool-txt">
+                       Get 50 GB for free, or sign up for one of our Pro packages and get up to 4 TB of encrypted storage starting at €8.33 per month.
+                   </div>
+                   <a href="#register" class="new-start-arrow-button how-it-works-button active">Create an account</a>
+                 </div>
+                 <div class="st-member-ship-right-bl storage">
+                     <span class="st-small-gray-txt infotxt10">and</span>
+                     96 <span class="st-small-red-txt tb">TB</span>
+                     <span class="st-small-gray-txt">Bandwidth</span>
+                 </div>
+                 <div class="st-member-ship-right-bl bandwidth">
+                    <span class="st-small-gray-txt infotxt9">up to</span>
+                     4 <span class="st-small-red-txt tb">TB</span>
+                    <span class="st-small-gray-txt">Storage</span>
+                 </div>
+                 <div class="clear"></div>
+               </div>
+             </div>            
+             <div class="st-gray-block-pad small-pad short-blocks-pad">
+                  <div class="st-short-block left">
+                      <div class="st-apps-icon mobile"></div>
+                      <div class="st-apps-title"> MEGA <span class="red">Mobile Apps</span></div>
+                      <div class="st-apps-txt">
+                           The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.
+                      </div>
+                  </div>
+                  <div class="st-short-block right">
+                      <div class="st-apps-icon sync"></div>
+                      <div class="st-apps-title"> MEGA <span class="blue">Sync Client</span></div>
+                      <div class="st-apps-txt">
+                           Easy automated syncing between your computers and your MEGA cloud drive.
+                      </div>
+                  </div>
+                  <div class="clear"></div>
+             </div>             
+             <div class="st-gray-div"></div>             
+             <div class="st-gray-block-pad small-pad short-blocks-pad">
+                  <div class="st-short-block left">
+                      <div class="st-apps-icon chat"></div>
+                      <div class="st-apps-title"> MEGA <span class="blue">Email and Chat</span></div>
+                      <div class="st-apps-txt">
+                          Our encrypted communication package is coming in early 2014.
+						  Get ready for MEGA chat, email, calling &amp; video conferencing.
+                      </div>
+                  </div>
+                  <div class="st-short-block right">
+                      <div class="st-apps-icon browser"></div>
+                      <div class="st-apps-title"> MEGA <span class="red">Browser Apps</span></div>
+                      <div class="st-apps-txt">
+                           Our browser extensions will install MEGA into your browser for faster loading and added resilience against attacks.
+                      </div>
+                  </div>
+                  <div class="clear"></div>
+             </div>
+             <div class="nw-bottom-block en">
+<div class="nw-bottom-pad">
+<div class="nw-bottom-column">
+	<div class="nw-bottom-header">MEGA</div>
+	<a href="#privacycompany" class="nw-bottom-link">The Privacy Company</a>
+	<a href="#about" class="nw-bottom-link">About us</a>
+	<a href="#credits" class="nw-bottom-link">Credits</a>	
+	<a href="#blog" class="nw-bottom-link">Blog</a>
+</div>
+<div class="nw-bottom-column">
+	<div class="nw-bottom-header">Apps</div>
+	<a href="#mobile" class="nw-bottom-link">Mobile Apps</a>
+	<a href="#sync" class="nw-bottom-link">Sync Client</a>
+	<a href="#chrome" class="nw-bottom-link">Chrome App</a>
+	<a href="#firefox" class="nw-bottom-link">Firefox App</a>
+</div>
+<div class="nw-bottom-column">
+	<div class="nw-bottom-header">Support</div>
+	<a href="#help" class="nw-bottom-link">Help Centre</a>
+	<a href="#contact" class="nw-bottom-link">Contact Us</a>
+	<a href="#resellers" class="nw-bottom-link">Resellers</a>
+</div>
+<div class="nw-bottom-column">
+	<div class="nw-bottom-header">Developers</div>
+	<a href="#dev" class="nw-bottom-link">SDK</a>
+	<a href="#doc" class="nw-bottom-link">Documentation</a>
+	<a href="#affiliates" class="nw-bottom-link">Affiliate Program</a>
+</div>
+<div class="nw-bottom-column">
+	<div class="nw-bottom-header">Legal &amp; policies</div>
+	<a href="#terms" class="nw-bottom-link">Terms of Service</a>
+	<a href="#privacy" class="nw-bottom-link">Privacy Policy</a>
+	<a href="#copyright" class="nw-bottom-link">Copyright</a>
+	<a href="#takedown" class="nw-bottom-link">Takedown Guidance</a>
+</div>
+<div class="nw-start-nz"></div>
+<div class="clear"></div>
+</div>
+<div class="nw-bottom-pad-with-border">
+<div class="nw-bottom-copyrigths">
+	Mega Limited 2014 <span>All rights reserved</span>
+</div>
+<a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="nw-bottom-social facebook"></a>
+<a href="https://twitter.com/MEGAprivacy" target="_blank" class="nw-bottom-social twitter"></a>
+<div class="clear"></div>
+</div>
+</div>             
+         </div>
+  </div></div>
+<div id="fmholder" class="fmholder" style="display: none;"></div>
+<div id="mobilefmholder" style="display:none; width:100%;"></div>
+<a href="" download="filename" id="dllink" style="display:none;"></a>
+<div style="position:absolute;" id="startswfdiv"></div>
+<div id="tooltip"></div>
+<div style="position:absolute; left:0px; width:100%; top:0px; height:60px; z-index:99; display:none;" id="topmenufm">
+</div>
+<div id="popnotifications"></div>
+
+<div class="dark-overlay" style="display: none;"></div>  
+<div class="loading-spinner" style="display: none;">
+  <div class="main-loader">
+    <div class="wBall" id="wBall_1">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_2">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_3">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_4">
+      <div class="wInnerBall"> </div>
+    </div>
+    <div class="wBall" id="wBall_5">
+      <div class="wInnerBall"> </div>
+    </div>
+  </div>
+</div>
+
+<div class="fm-dialog-overlay hidden"></div>
+
+
+
+
+<div class="fm-dialog create-folder-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">New folder</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="Folder Name"></div>
+        </div>
+        <div class="fm-dialog-new-folder-button">Create</div>
+    </div>
+</div>
+
+
+<div class="fm-dialog add-contact-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Add contact</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-add-contact-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-add-contact-pad"><input name="dialog-add-contact" type="text" value=""></div>
+        </div>
+        <div class="fm-dialog-add-contact-button">Add</div>
+    </div>
+</div>
+
+
+<div class="fm-dialog dlkey-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Enter decryption key</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-new-folder" type="text" value="Decryption Key"></div>
+        </div>
+        <div class="fm-dialog-new-folder-button">Decrypt</div>
+    </div>
+</div>
+
+
+
+<div class="fm-dialog registration-success hidden">
+     <div class="reg-success-icon"></div>
+     <div class="reg-success-header">Awesome!</div>
+     <div class="reg-success-txt"> Please check your e-mail and click the link to confirm your account.</div>
+  </div>
+
+<div class="fm-dialog rename-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Rename Folder</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+        <div class="fm-dialog-new-folder-input">
+          <div class="fm-dialog-input-clear"></div>
+          <div class="fm-dialog-new-folder-pad"><input name="dialog-rename" type="text" value="Folder Name"></div>
+        </div>
+        <div class="fm-dialog-rename-button">Rename</div>
+    </div>
+</div>
+
+<div class="fm-dialog move-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Move</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-move-dialog-body">
+      <div class="fm-move-dialog-pad">
+        <span class="fm-connector-first"></span>
+         <a class="fm-tree-header cloud-drive-item active opened expanded" id="topheader">
+             <span>
+                Cloud Drive
+             </span> 
+         </a>          
+         <ul class="fm-subfolders opened" id="mainsub">   
+         </ul>
+       </div>
+     </div>
+     <div class="fm-move-trashbin">
+        <span class="fm-connector-first"></span>
+        <a class="fm-tree-header recycle-item" id="bottomheader">
+           <span>
+             Rubbish Bin
+           </span>    
+        </a>
+     </div>
+     <div class="fm-move-bottom-block">
+        <div class="fm-dialog-button move-button">Move</div>
+        <div class="fm-dialog-button cancel-button active">Cancel</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog share-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Sharing</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="share-folder-block hidden">
+       <div class="share-folder-icon">
+          <div></div>
+       </div>
+       <div class="share-folder-info">
+          <div class="properties-small-gray">Name:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+       </div>
+       <div class="clear"></div> 
+       <div class="share-folder-link-bl">
+         <div class="properties-file-txt">Public link</div>
+		 <div id="share_on_off">
+         <div class="on_off public-checkbox">
+               <input type="checkbox" id="public-checkbox">
+         </div>
+		 </div>
+         <div class="clear"></div> 
+         <div class="properties-file-link">
+		
+         </div>
+       </div>
+     </div> 
+     <div class="fm-share-body">
+        <div class="fm-share-empty">
+           <div>Select from your contacts, or add email addresses</div>
+           <div class="fm-share-pointer"></div>
+        </div>
+        <div class="fm-shared-to">           
+        </div>     
+     </div>     
+     <div class="fm-share-bottom-block">
+        <div class="fm-share-add-contacts"><div class="fm-share-contacts-arrow"></div></div>
+
+        <div class="fm-share-contacts-popup hidden">
+           <div class="fm-share-contacts-head">
+              <input name="email-search" type="text" value="Add an email address">
+              <div class="fm-share-contacts-search"></div>
+           </div>
+           <div class="fm-share-contacts-body">
+           </div>
+           <div class="fm-share-contacts-bottom">
+              <div class="fm-dialog-button add-contact-button">Add</div>
+              <div class="fm-dialog-button cancel-contact-button active">Cancel</div>
+              <div class="clear"></div>
+           </div>
+        </div>
+        <div class="fm-dialog-button cancel-button active">Done</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog hidden" id="msgDialog">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Confirm deletion</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-notification-body">
+        <div class="fm-notification-icon"></div>
+        <div class="fm-notification-info">
+          <p>Are you sure you want to permanently remove all items from your Rubbish Bin?</p>
+          <div class="fm-notification-warning">You cannot undo this action.</div>
+        </div>
+        <div class="clear"></div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button notification-button active">Empty</div>
+        <div class="fm-dialog-button notification-button active">Cancel</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog export-links-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Export file links and decryption keys</div>
+	   <div class="fm-dialog-chrome-clipboard hidden"><textarea id="chromeclipboard" style="width:10px; height:20px;"></textarea></div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>   
+     <div class="export-link-body">      
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="export-checkbox" id="export-checkbox" class="checkboxOff"> </div>
+        <label for="export-checkbox" class="radio-txt">Include file key</label> 
+		<div class="fm-dialog-button links-button active" id="clipboardbtn1">
+          
+        </div>
+		
+		<div class="fm-dialog-button links-button active copy-keys-button" id="clipboardbtn2">
+          
+        </div>
+        <div class="clear"></div>
+		
+     </div>
+</div>
+
+
+<div class="export-links-warning hidden">
+   <div class="export-links-warning-close"></div>
+   <p>
+     <span class="orange">Caution:</span> MEGA's cryptographic security model depends on the confidentiality of the keys displayed above. Avoid transmitting them through insecure channels!
+   </p>
+   <p>
+     <span class="red">Copyright warning</span> MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.
+   </p>
+</div>
+
+
+<div class="fm-dialog browsers-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Browser compatibility warning</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div>
+      <div class="browsers-top-icon safari"></div>
+      <div class="browsers-info-block">
+         <div class="browsers-info-header">Safari is not fully compatible with MEGA</div>
+         <p>Safari lacks the HTML5 features MEGA relies on to perform client-side in-browser cryptography. HTML5 file transfers will be emulated through a very limited Flash workaround. Please consider upgrading to a modern browser at your earliest convenience.</p>
+      </div>
+      <div class="clear"></div>
+      <div class="browsers-gray-notification">
+        MEGA works best with the following browsers:
+      </div>
+      <div class="browsers-logos-block">
+        <div class="browsers-logo opera-next hidden">
+          <a href="http://www.opera.com" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info"></span></span>
+             </span>
+             <span class="browsers-title">
+               Opera
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo firefox">
+          <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">Highly Recommended</span></span>
+             </span>
+             <span class="browsers-title">
+               Firefox
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo chrome">
+          <a href="http://www.google.com/chrome" class="browsers-logo-lnk" target="_blank">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">Highly Recommended</span></span>
+             </span>
+             <span class="browsers-title">
+               Chrome
+             </span>
+          </a>
+        </div>
+        <div class="browsers-logo opera">
+          <a href="http://www.opera.com/" target="_blank" class="browsers-logo-lnk">
+             <span class="browsers-compatibility">
+               <span class="fm-pause-notification hidden"><span class="fm-pause-info">Recommended</span></span>
+             </span>
+             <span class="browsers-title">
+               Opera
+             </span>
+          </a>
+        </div>
+        <div class="clear"></div>
+      </div> 
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOn"> <input type="checkbox" name="browsers-checkbox" id="browsers-checkbox" class="checkboxOn" checked="checked"> </div>
+        <label for="browsers-checkbox" class="radio-txt">Do not show again</label>    
+        <div class="fm-dialog-button browsers-button active">Close</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog chrome-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Download multiple files</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="chrome-dialog-body">
+         <div class="chrome-dialog-logo"></div>
+         <div class="chrome-dialog-notification">
+            <div class="chrome-dialog-arrow"></div> 
+            Click "allow" for download completion
+         </div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="chrome-checkbox" id="chrome-checkbox" class="checkboxOff"> </div>
+        <label for="chrome-checkbox" class="radio-txt">Do not show again</label>    
+        <div class="fm-dialog-button browsers-button active">Close</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+
+<div class="fm-dialog bandwidth-quota hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Complementary bandwidth quota exceeded</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-bandwidth-body">
+        <div class="fm-bandwidth-icon"></div>
+        <div class="fm-bandwidth-icon-text">
+            Your download cannot proceed, because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.
+        </div>
+        <div class="clear"></div>
+        <div class="fm-bandwidth-dashed">
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                    <div class="fm-bandwidth-number-txt">532 <span class="small">MB</span></div>
+                    <div class="fm-bandwidth-small-txt">download usage <span class="red">*</span></div>
+              </div>
+           </div>
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                    <div class="fm-bandwidth-number-txt green">532 <span class="small">MB</span></div>
+                    <div class="fm-bandwidth-small-txt">will become available in <br><span class="green">34 minutes *</span></div>
+              </div>
+           </div>
+           <div class="fm-short-blocks">
+              <div class="fm-bandwidth-gray-bl">
+                   <div class="fm-bandwidth-number-txt">22 <span class="small">GB</span></div>
+                   <div class="fm-bandwidth-small-txt">storage usage </div>
+              </div>
+           </div>
+           <div class="clear"></div>
+           <p>
+              <span class="red">*</span> Only transfers made during the last <span class="red">five or six hours</span> count.
+           </p>
+           <p>
+              * For your convenience, your queued downloads will be put on hold until you have enough quota available, and then resume automatically.
+           </p>
+        </div>
+        <div class="fm-bandwidth-dashed quota-bottom-block">
+             <div class="fm-bandwidth-icon pro-icon"></div>
+        
+             <div class="fm-bandwidth-icon-text">
+                If you do not wish to wait, you may consider signing up for a bandwidth package that also gives you ample extra storage.
+             </div>
+             <div class="clear"></div>
+        </div> 
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button quota-upgrade-button active">Upgrade to Pro</div>
+        <div class="fm-dialog-button quota-later-button active">I'll wait</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+<div class="fm-dialog avatar-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Change Avatar</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="avatar-body">	 
+	 </div>
+</div>
+
+<div class="fm-dialog properties-dialog multiple shared hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Properties</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="properties-body">
+       <div class="properties-file-icon">
+       </div>
+       <div class="properties-txt-pad">
+          <div class="properties-small-gray">Name:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+          <div class="properties-float-bl">
+            <span class="properties-small-gray">Size:</span>
+            <span class="propreties-dark-txt">100kb</span>
+          </div>
+          <div class="properties-float-bl second">
+            <span class="properties-small-gray">Size:</span>
+            <span class="propreties-dark-txt">100kb</span>
+          </div>
+          <div class="properties-small-gray">Name:</div>
+          <div class="propreties-dark-txt">Filename.ext</div>
+       </div>
+       <div class="clear"></div>
+       <div class="properties-shared-block">
+          <div class="properties-file-txt">Shared with</div>
+          <div class="clear"></div>
+          <div class="properties-contacts-block">
+              <div class="properties-contact">
+                  <span class="avatar"><span><img src="" alt=""></span></span>
+                  <div class="properties-contact-close"></div>
+                  <span class="add-contact-username"></span>
+              </div>
+          </div>
+          <div class="properties-contacts-block">          
+              <div class="fm-share-contacts-popup properties-contacts-popup ">                  
+                  <div class="fm-share-contacts-body">
+                       <a class="add-contact-item properties-shared-to">
+                          <span class="add-contact-pad">
+                            <span class="avatar">
+                              <span>
+                              <img src="" alt="">
+                              </span>
+                            </span>
+                            <span class="properties-contact-delete"></span>
+                            <span class="add-contact-username"></span>
+                          </span>
+                      </a>
+                  </div> 
+                  <div class="properties-arrow"></div>
+                </div>          
+              <div class="properties-more-contacts"> and <span class="red">10 more contacts</span>
+              </div>
+          </div>
+       </div>
+       <div class="properties-link-block">
+           <div class="properties-file-lnk-pad">
+              <div class="properties-file-txt">Folder Link</div>
+              <div class="on_off">
+               <input type="checkbox" id="on_off">
+              </div>
+              <div class="clear"></div>
+              <div class="properties-file-link">
+                <div class="left">https://mega.co.nz/#!qhozTJLa<span class="properties-file-key">!AuOcZqqJoTPFCEpD2iodtBh9FpeR3FnjYLpDznLyWdk</span></div>
+                <div class="properties-caution-icon">
+                    <div class="properties-caution">
+                       <div class="properties-caution-bg">
+                            <span class="red">Caution:</span>  MEGA's cryptographic security model depends on the confidentiality of the keys displayed above. Avoid transmitting them through insecure channels!
+                       </div>
+                       <div class="properties-caution-arrow"></div>
+                    </div>
+               </div>
+              </div>
+           </div>
+           <div class="clear"></div>
+       </div>
+     </div>
+     <div class="fm-notifications-bottom">
+		<div id="keyoption">
+        <div class="checkboxOff"> <input type="checkbox" name="properties-checkbox" id="propertiescheckbox" class="checkboxOff"> </div>
+        <label for="propertiescheckbox" class="radio-txt">Include file key</label> 
+		</div>
+        <div class="fm-dialog-button close-button active">Close</div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+<div class="fm-dialog terms-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Terms of Service</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="terms-body">
+        <div class="terms-main">
+        </div>
+	 </div>
+     <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button fm-terms-agree active">Agree</div>
+          <div class="fm-dialog-button fm-terms-cancel active">Cancel</div>
+          <div class="clear"></div>
+     </div> 
+</div>
+
+<div class="fm-dialog slingshot-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Welcome, Slingshot Customer!</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="slingshot-body">
+        <div class="slingshot-main">
+		Thank you for activating your complimentary MEGA Pro account! Upon completion, you will receive 500 GB of secure encrypted high-performance online storage space for one year. All transfers from and to MEGA are unmetered and therefore uncapped from all Slingshot broadband connections.		
+		<br><br>
+		Questions or comments? Please contact our <a href="mailto:support@mega.co.nz" class="red">customer support department</a> for assistance. <br>		
+		<div style="width:100%; text-align:center; margin-top:15px;">
+		<img src="https://eu.static.mega.co.nz/images/mega/slingshot.png"> <img src="https://eu.static.mega.co.nz/images/mega/m-logo.png"> 
+		</div>		
+        </div>
+	 </div>
+     <div class="fm-notifications-bottom">
+          <div class="fm-dialog-button fm-terms-agree active">Continue</div>
+          <div class="clear"></div>
+     </div> 
+</div>
+
+<div class="fm-dialog languages-dialog hidden">
+  <div class="fm-dialog-header">
+    <div class="fm-dialog-title">Choose language</div>
+    <div class="fm-dialog-close"></div>
+    <div class="clear"></div>
+  </div>
+  <div id="language_menu_options" class="languages-dialog-body">       
+  </div>
+  <div class="fm-notifications-bottom">
+    <div class="fm-dialog-button fm-languages-save active">Save</div>
+    <div class="nlanguage-bottom"> Do you speak multiple languages? <a href="mailto:translate@mega.co.nz">Help us translate!</a> </div>
+    <div class="clear"></div>
+  </div>
+</div>
+
+<div class="fm-dialog paypal-dialog hidden">
+  <div class="fm-dialog-header">
+    <div class="fm-dialog-title">Pay with PayPal</div>
+    <div class="fm-dialog-close"></div>
+    <div class="clear"></div>
+  </div>
+  <div class="paypal-body">
+  <a href="" target="_blank"><img src="https://eu.static.mega.co.nz/images/mega/paypal-checkout.png"></a><br>
+  <a href="" target="_blank"><img src="https://eu.static.mega.co.nz/images/mega/paypal-cards.png"></a>
+  </div>
+</div>
+
+<div class="fm-dialog download-dialog hidden" style="left: 50%;">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Download completed</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+          <div class="download-dialog-icon">
+             In order to complete the file transfer process, you need to manually save your file. 
+             <a href="https://www.google.com/chrome" class="download-chrome-lnk" target="_blank">
+                Update to Chrome to enjoy MEGA's full power
+             </a>
+          </div>
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button notification-button active">
+          <div class="download-save-your-file"></div>
+          Save your file
+        </div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+<div class="fm-dialog firefox-dialog hidden">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">MEGA Firefox extension</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>   
+     <div>
+       <div class="ff-extension-icon"></div>
+       <div class="ff-extension-content">
+          <div class="ff-extension-head">MEGA Firefox extension</div>
+          <div class="ff-extension-txt">
+			Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
+          </div>
+          <a href="https://mega.co.nz/mega.xpi" target="_blank" class="ff-extension-button">
+            Download MEGA for Firefox
+          </a>
+          <div class="clear"></div>
+       </div>
+       <div class="clear"></div> 
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="checkboxOff"> <input type="checkbox" name="firefox-checkbox" id="firefox-checkbox" class="checkboxOff"> </div>
+        <label for="firefox-checkbox" class="radio-txt">Do not show again</label> 
+		<div class="fm-dialog-button close-button  active">
+          Close
+        </div>
+        <div class="clear"></div>
+     </div>
+</div></body>
+</html>

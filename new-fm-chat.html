@@ -1,0 +1,758 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+
+    //Demo of scripts. You can use optimized as always. jScrollPane is a bit buggy here. 
+
+    function initChatScrolling() {
+	   $('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    }
+	initChatScrolling();
+	$(window).bind('resize', function () {
+		initChatScrolling();
+	});
+	
+	
+	
+	$('.message-textarea').keyup(function() {
+		  $(this).height('auto');
+		  var text = $(this).val();   
+          var lines = text.split("\n");
+          var count = lines.length;
+		   
+		  if ($(this).val().length != 0 && count>1) {
+		         $(this).height($(this).prop("scrollHeight"));
+				 var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - 80;
+				 if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight()) {
+				     $('.fm-chat-message-scroll').height(scrollBlockHeight);
+				     initChatScrolling();
+				 }
+				 
+				 // If any popup is opened - moving with buttons
+				 if ($('.fm-chat-emotions-icon').attr('class').indexOf('active') > -1) {
+					 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-emotion-arrow').position().top;
+			         $('.fm-chat-emotion-popup').css('bottom', positionY - 17 + 'px');
+				 }
+				 if ($('.fm-chat-attach-file').attr('class').indexOf('active') > -1) {
+					 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-attach-arrow').position().top;
+			         $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
+				 } 
+		  }
+		  else  $(this).height('27px');
+	});
+	
+	$('.fm-chat-emotions-icon').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') > -1) {
+			 $('.fm-chat-emotion-popup').addClass('hidden');
+			 $(this).removeClass('active');
+		} else {
+			 $('.fm-chat-emotion-popup').removeClass('hidden');
+			 $(this).addClass('active');
+			 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-emotion-arrow').position().top;
+			 $('.fm-chat-emotion-popup').css('bottom', positionY - 17 + 'px');
+		}
+	});
+	
+	$('.fm-chat-attach-file').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') > -1) {
+			 $('.fm-chat-attach-popup').addClass('hidden');
+			 $(this).removeClass('active');
+		} else {
+			 $('.fm-chat-attach-popup').removeClass('hidden');
+			 $(this).addClass('active');
+			 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-attach-arrow').position().top;
+			 $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
+		}
+	});
+	
+	$('.fm-chat-file-button.save-button').bind('mouseover click', function() {
+		var chatDownloadPopup = $('.fm-chat-download-popup');
+			 var p = $(this);
+			 var positionY = $(this).closest('.jspPane').outerHeight() - $(this).position().top;
+			 var positionX = $(this).position().left;
+	         if (positionY - 174 > 0) {
+			   $(chatDownloadPopup).css('bottom', positionY - 174 + 'px');
+			   $(chatDownloadPopup).removeClass('top');
+			 } else {
+			   $(chatDownloadPopup).css('bottom', positionY + 'px');
+			   $(chatDownloadPopup).addClass('top');
+			 }
+			 $(chatDownloadPopup).css('left', positionX + $(this).outerWidth()/2 + 10 + 'px');
+		     $(this).addClass('active');
+			 $(chatDownloadPopup).removeClass('hidden');
+	});
+	
+	$('.fm-chat-message-scroll').bind('click', function() {
+		$('.fm-chat-download-popup').addClass('hidden');
+	});
+	
+	$('.fm-add-user').bind('click', function() {
+	    var positionX = $(this).position().left;
+		var addUserPopup = $('.fm-add-contact-popup');
+		if ($(this).attr('class').indexOf('active') > -1) {
+			 $(addUserPopup).addClass('hidden');
+			 $(this).removeClass('active');
+		} else {
+			 $(addUserPopup).removeClass('hidden');
+			 $(this).addClass('active');
+			 $(addUserPopup).css('left', positionX -8 + 'px'); 
+		}
+	});
+	
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="dark-overlay" style="display:none;"></div>  
+<div class="loading-spinner" style="display:none;"></div>
+
+
+<div class="dark-overlay hidden"></div>  
+<div class="loading-spinner hidden"></div>
+
+<!-- add "transfer-panel-opened" to next block to show treepanel. "active" class shoud be added to "tranfer-view-icon" block !-->
+<div class="fmholder" id="fmholder">
+
+  <div id="topmenu"><div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="top-menu-icon">Menu</a> 
+    
+    <a class="fm-avatar" style="display: block;"><img alt="" src=""></a>
+    <div class="activity-status-block" style="display: none;">
+      <div class="activity-status online" style="display: none;"></div>
+    </div>
+
+    <div class="membership-status-block">
+       <div class="membership-status free" style="display: block;">FREE</div>
+    </div>
+    
+    <a class="user-name" style="display: none;"></a>
+    <div class="language-popup-icon hidden"></div>     
+    
+    <div class="cloud-popup-icon" style="display: block;"><span class="notification-num" style="">9</span></div>
+    
+    <div class="top-search-bl" style="display: block;">
+       <div class="top-search-clear">
+           <div class="top-clear-button"></div>
+           <input type="text" value="Search" class="top-search-input">
+       </div>
+    </div>
+  </div></div>
+  
+  
+ 
+  
+  <div class="fm-main">
+    
+    <div class="fm-left-panel" >
+     
+      <div class="fm-left-menu">
+         <a class="fm-menu-item cloud active"></a> 
+         <a class="fm-menu-item recycle"></a>
+         <a class="fm-menu-item contacts"></a>
+         <a class="fm-menu-item messages"></a>
+      </div>       
+       
+      <div class="fm-tree-panel">
+        <div class="fm-tree-pad">
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header cloud-drive-item">
+             <span>
+                Cloud drive
+             </span>    
+          </a>          
+          <ul class="fm-subfolders" id="cloudsub"></ul>
+		  
+		            
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header recycle-item">
+             <span>
+                Rubbish-bin
+             </span>    
+          </a>
+          <ul class="fm-subfolders" id="rubbishsub"></ul>
+          
+          
+          <span class="fm-connector-first active"></span>
+          <a class="fm-tree-header contacts-item ui-droppable opened active contains-subfolders expanded">
+             <span class="contacts-arrows" style="display: none;"></span> 
+             <span>
+                Contacts
+             </span>  
+          </a>
+          
+          <ul class="fm-subfolders contacts opened" id="treesub_contacts">
+            <li>
+              <span class="fm-connector contact vertical-line last"></span>
+              <span class="fm-horizontal-connector contact active"></span>
+              <!-- Add/remove class "verified" !-->
+              <a class="fm-tree-folder contact online-status  ui-droppable active verified" >
+                <span>
+                  <span class="avatar">
+                    <span class="fm-chat-verified"></span>
+                    <span>
+                     <img src="images/mega/default-avatar.png" alt="">
+                    </span>
+                  </span>
+                  <span class="messages-icon">
+                    <span class="active">2</span>
+                  </span>
+                  <span class="contact-name">Andrei.Dymovich</span>
+                </span>
+               </a>
+            </li>
+            
+            <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact away-status  ui-droppable" >
+                <span>
+                  <span class="avatar">
+                    <span class="fm-chat-verified"></span>
+                    <span>
+                     <img src="images/mega/default-avatar.png" alt="">
+                    </span>
+                  </span>
+                  <span class="messages-icon">
+                    <span class="active">2</span>
+                  </span>
+                  <span class="contact-name">Andrei.Dymovich</span>
+                </span>
+               </a>
+            </li>
+            
+            <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact offline-status  ui-droppable" >
+                <span>
+                  <span class="avatar">
+                    <span class="fm-chat-verified"></span>
+                    <span>
+                     <img src="images/mega/default-avatar.png" alt="">
+                    </span>
+                  </span>
+                  <span class="messages-icon">
+                    <span class="active">2</span>
+                  </span>
+                  <span class="contact-name">Andrei.Dymovich</span>
+                </span>
+               </a>
+            </li>
+            
+            <li>
+              <span class="fm-connector contact"></span>
+              <span class="fm-horizontal-connector contact"></span>
+              <a class="fm-tree-folder contact online-status ui-droppable verified" >
+                <span>
+                  <span class="avatar">
+                    <span class="fm-chat-verified"></span>
+                    <span>
+                     <img src="images/mega/default-avatar.png" alt="">
+                    </span>
+                  </span>
+                  <span class="messages-icon">
+                    <span class="active">2</span>
+                  </span>
+                  <span class="contact-name">Andrei.Dymovich</span>
+                </span>
+               </a>
+            </li>
+          </ul>
+         
+		 
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header messages-item">
+             <span>
+                Messaging
+             </span>    
+          </a>
+		  <ul class="fm-subfolders" id="treesub_messaging"></ul>
+        </div>
+      </div>
+  
+  </div>
+  <div class="fm-right-files-block">
+       <div class="fm-right-header">
+         <a class="fm-back-button"></a>
+         <div class="fm-breadcrumbs-block">
+           <a class="fm-breadcrumbs contacts contains-directories has-next-button ui-droppable">
+              <span class="right-arrow-bg">
+                <span>Contacts</span>
+              </span>
+           </a>
+           <!-- Add "chat" classname" !-->
+           <a class="fm-breadcrumbs chat">
+              <span class="right-arrow-bg">
+                <span>Andrei.d</span>
+              </span>
+           </a>
+           <div class="clear"></div>
+         </div>
+         
+         <!-- Add user button !-->
+         <div class="fm-add-user">
+           <span>Add to conversation</span>
+         </div>
+         
+         <div class="fm-add-contact-popup hidden">
+            <div class="fm-add-contact-arrow"></div>
+            <div class="fm-add-contact-scrolling">
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/default-avatar.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/default-avatar.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+            </div>
+            <div class="fm-add-contact-bottom">
+               <div class="fm-chat-contact-button">
+                   Add
+               </div>
+               <div class="fm-chat-contact-button active">
+                   Cancel
+               </div>
+               <div class="clear"></div>
+            </div>
+         </div>
+         
+         <div class="clear"></div>
+       </div>
+       
+       <!--Chat block !-->
+       
+       <div class="fm-chat-block">
+
+           <div class="fm-chat-header">
+               <!-- Add/remove "verfified" class !-->
+               <div class="fm-chat-avatar-block verified"> 
+                    <div class="fm-chat-top-verified"></div>
+                    <div class="fm-chat-avatar">
+                         <img alt="" src="images/mega/default-avatar.png" />
+                    </div>
+               </div>
+               <div class="fm-chat-user-info star">
+                  <div class="fm-chat-user-star"></div>
+                  <div class="fm-chat-user">Bram Van Der Kolk</div>
+                  <div class="fm-chat-user-status online">
+                    Online
+                  </div>
+               </div>
+               <div class="clear"></div>
+           </div>
+           
+           <div class="fm-chat-message-scroll">
+           
+             <!-- Unhide on "save-button" mouseover !-->
+             <div class="fm-chat-download-popup hidden">
+                       <div class="fm-chat-download-arrow"></div>
+                       <div class="fm-chat-download-button to-cloud">
+                           <div class="fm-chat-download-icon"></div>
+                           <div class="fm-chat-download-txt">
+                             To your Cloud Drive
+                           </div>
+                       </div>
+                       <div class="fm-chat-download-button as-zip">
+                           <div class="fm-chat-download-icon"></div>
+                           <div class="fm-chat-download-txt">
+                             To your Cloud Drive
+                           </div>
+                       </div>
+                       <div class="fm-chat-download-button to-computer">
+                           <div class="fm-chat-download-icon"></div>
+                           <div class="fm-chat-download-txt">
+                             To your Cloud Drive
+                           </div>
+                       </div>
+                       <div class="clear"></div>
+             </div>
+           
+             <!-- notification block !-->
+             <div class="fm-chat-messages-block"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verification-head">
+                   Waiting verification
+                 </div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="fm-chat-file-button verify-button">Verify Contact</div>
+                 <div class="fm-chat-file-button skip-button">Skip</div>  
+              </div>
+             </div>
+             <!-- end !-->
+             
+             <!-- Verification skipped block !-->
+             <div class="fm-chat-messages-block"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verification-skipped">
+                   Verification skipped
+                 </div>
+              </div>
+             </div>
+             <!-- end !-->
+             
+              <!-- verified block !-->
+             <div class="fm-chat-messages-block"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verified-head">
+                   You successfully verified <span class="user">George Smith</span>. You can now communicate and collaborate securely with this contact.
+                 </div>
+              </div>
+             </div>
+             <!-- end !-->
+           
+           
+             <!-- block with messages from one user !-->
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <!-- messages from one user !-->
+              <div class="fm-chat-messages-pad">
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+                 
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+              </div>
+              <div class="clear"></div>
+              <!-- end of messages from one user !-->
+             </div>
+             <!-- end of block with messages from one user !-->
+             
+             <div class="fm-chat-messages-block">
+              <div class="fm-chat-username current-name">
+                 Andre.d
+              </div>
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    <a href="">http://www.lorem-ipsum.com </a>
+                 </div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+              
+              
+             </div>
+             
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+                  
+                 <div class="block-view-file-type generic" style="float:left;margin: 8px -2px 6px -3px;"></div>
+                 <div class="fm-chat-filename">
+                     FileName.doc
+                 </div>
+                 <div class="fm-chat-filesize">
+                     750 kb
+                 </div>
+                 <div class="fm-chat-button-pad">
+                   <div class="fm-chat-file-button save-button hidden">Save...</div> 
+                 </div> 
+                 
+                 <!-- unhide this icon if file is saved !-->                    
+                 <div class="fm-chat-view-icon"></div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+
+             </div>
+             
+             
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+                  
+                 <div class="fm-chat-shared-files">
+                     <div class="file-block folder" >
+                       <span class="file-status-icon"></span>
+                       <span class="block-view-file-type folder"></span>
+                       <span class="file-block-title">Folder</span>
+                     </div>
+                     <div class="file-block folder" >
+                       <span class="file-status-icon"></span>
+                       <span class="block-view-file-type img"></span>
+                       <span class="file-block-title">Image</span>
+                     </div>
+                     <div class="file-block folder" >
+                       <span class="file-status-icon"></span>
+                       <span class="block-view-file-type swf"></span>
+                       <span class="file-block-title">Flash</span>
+                     </div>
+                     <div class="clear"></div>
+                     <div class="fm-chat-file-button save-button">Save all...</div>
+                     <div class="clear"></div> 
+                 </div>
+                 
+                 <!-- unhide this icon if file is saved !-->                    
+                 <div class="fm-chat-view-icon hidden"></div>
+                 <div class="clear"></div>
+
+              </div>
+              <div class="clear"></div>
+
+             </div>
+            
+             
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 Bram van der Kolk
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+
+                 <div class="block-view-file-type folder"></div>
+                 <div class="fm-chat-filename">
+                     FileName.doc
+                 </div>
+                 <div class="fm-chat-filesize">
+                     750 kb
+                 </div>
+                 <div class="fm-chat-button-pad">
+                   <div class="fm-chat-file-button save-button">Save...</div> 
+                 </div>
+              </div>
+              <div class="clear"></div>
+
+             </div>
+             
+             <!-- Add/remove "typing" class !-->
+             <div class="fm-chat-typing-txt typing">
+                 George Smith is typing...
+             </div>
+             
+           </div>
+           
+           <div class="fm-chat-line-block">
+             
+             <div class="fm-chat-attach-file">
+                <div class="fm-chat-attach-arrow"></div>
+             </div>
+             <div class="fm-chat-attach-popup hidden">
+                  <div class="fm-chat-attach-top">
+                    <a class="fm-back-button"></a>
+                    <div class="fm-share-breadcrumbs-block">
+                      <a class="fm-share-breadcrumbs cloud-drive contains-directories">
+                        <span class="right-arrow-bg">
+                          <span>Cloud Drive</span>
+                        </span>
+                      </a>
+                    </div>             
+                  </div>
+                  <div class="fm-chat-attach-scrolling">
+                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-share-table">
+                       <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                      <tr>
+                          <td>
+                             <span class="transfer-filtype-icon folder"> </span>
+                             <span class="tranfer-filetype-txt">ShockwaveFlash.swfe</span>
+                          </td>
+                         <td>678 MB</td>
+                         <td><a class="grid-url-arrow"></a></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="fm-chat-attach-bottom">
+                    <div class="fm-chat-attach-button attach-send">
+                       Send
+                    </div>
+                    <div class="fm-chat-attach-button attach-cancel active">
+                       Cancel
+                    </div>
+                    <div class="clear"></div>
+                  </div>
+             </div>
+             
+             <div class="fm-chat-emotions-icon">
+               <div class="fm-chat-emotion-arrow"></div>
+             </div>
+             <div class="fm-chat-emotion-popup hidden">
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="fm-chat-smile"></div>
+                  <div class="clear"></div>
+             </div>
+             
+             <div class="fm-chat-input-block">
+               <div class="fm-chat-input-icon"></div>
+               <textarea class="message-textarea"></textarea>
+             </div>
+             <div class="clear"></div>
+           </div>
+           
+       </div>
+       
+       <!--end !-->
+       
+  </div>
+  
+</div>
+
+<div class="transfer-panel">
+      <div class="transfer-panel-title">
+         File Transfers
+      </div>
+      <a class="tranfer-view-icon"></a>
+      <a class="transfer-settings-icon"></a>
+      <div class="transfer-points"></div>
+      <div class="clear"></div>
+      <div class="tranfer-table">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
+            <tr>
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+              <th width="110">Remaining Time</th>
+            </tr>
+        </table>
+        <div class="transfer-scrolling-table">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
+            <tr class="clone-of-header">
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+			  <th width="110">Remaining Time</th>
+            </tr>                       
+        </table>
+       </div>
+      </div> 
+</div>
+  
+</div>
+<a href="" download="filename" id="dllink" style="display:none;"></a>
+</body>
+</html>

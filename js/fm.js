@@ -396,7 +396,7 @@ function initUI()
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 
 	{
-		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/') window.history.back();
+		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/' || M.currentdirid.substr(0,5) == 'chat/') window.history.back();
 		else
 		{
 			var n = M.d[M.currentdirid];		
@@ -1877,7 +1877,7 @@ function avatarDialog(close)
 }
 
 function gridUI()
-{   
+{
 	var t = new Date().getTime();
 	$.gridDragging=false;
 	$.gridLastSelected=false;
@@ -2472,6 +2472,8 @@ function UIkeyevents()
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
+		
+		if (M.chat) return true;		
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
@@ -2659,19 +2661,19 @@ function searchPath()
 				{
 					id = M.RootID;
 					c = 'cloud-drive';
-					name = 'Rubbish Bin';
+					name = l[164];
 				}
 				else if (path[i] == M.RubbishID)
 				{
 					id = M.RubbishID;
 					c = 'recycle-item';
-					name = 'Rubbish Bin';
+					name = l[168];
 				}
 				else if (path[i] == M.InboxID)
 				{
-					id = M.RubbishID;
+					id = M.InboxID;
 					c = 'inbox-item';
-					name = 'Inbox';
+					name = l[166];
 				}
 				else if (n)
 				{
@@ -3249,7 +3251,7 @@ function treeUI()
 			$(this).removeClass('opened expanded');
 			$(this).prev().removeClass('active');
 		}		
-		$.selectingHeader($(this)); 		   
+		$.selectingHeader($(this));
 		if (id) M.openFolder(id);		
 		return false;
 	});
@@ -3318,17 +3320,19 @@ function treeUI()
 		}
 		if (e.offsetX) e.layerX=false;		
 		var eoffsetX=e.offsetX;
-		if (!eoffsetX)eoffsetX=e.pageX-$(this).offset().left;
-		
-		
+		if (!eoffsetX)eoffsetX=e.pageX-$(this).offset().left;		
 		var c = $(e.target).parent().attr('class');		
-		if (!c || c.indexOf('fm-tree-folder') == -1) eoffsetX=25;
+		if (!c || c.indexOf('fm-tree-folder') == -1) eoffsetX=25;		
+		if (MegaChat && id && id.length == 11) id = 'chat/' + id;
 		
 		if ((eoffsetX < 23) || ($(this).attr('class').indexOf('active') > -1 && $(this).attr('class').indexOf('expanded') == -1) || id == M.currentdirid) 
 		{
 			treeUIexpand(id);			
 		}
-		else if ((eoffsetX > 23) || $(this).attr('class').indexOf('active') > -1) M.openFolder(id);		
+		else if ((eoffsetX > 23) || $(this).attr('class').indexOf('active') > -1)
+		{			
+			M.openFolder(id);
+		}
 		return false;		
 	});		
 	$(window).unbind('resize.tree');
@@ -3343,6 +3347,7 @@ function treeUI()
 
 function treeUIexpand(id,force)
 {
+	if (id) id = id.replace('chat/','');
 	if (id == 'contacts') M.buildtree({h:'contacts'});
 	else M.buildtree(M.d[id]);
 	var b = $('#treea_' + id);	
@@ -4835,6 +4840,9 @@ function fm_resize_handler() {
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
 	}
+	
+	
+	if (M.chat) initChatScrolling();	
 
     var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({

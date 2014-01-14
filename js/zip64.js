@@ -162,13 +162,6 @@ var ZIPClass = function(totalSize) {
 			var extra = []
 				, ebuf
 
-			ebuf = ezBuffer(4 + 4 + this.file.length)
-			ebuf.i16(zipUtf8ExtraId)
-			ebuf.i16(4+this.file.length) // size
-			ebuf.i32(this.crc32)
-			ebuf.appendBytes(this.file);
-			extra = extra.concat( ebuf.getArray() );
-
 			if (isZip64) {
 				ebuf = ezBuffer(28); // 2xi16 + 3xi64
 				ebuf.i16(zip64ExtraId);
@@ -323,7 +316,15 @@ var ZIPClass = function(totalSize) {
 		header.file  = filename;
 		header.size  = size;
 		header.date  = date;
-		header.extra = [0x0, 0x8, 0x0];
+
+		var ebuf = ezBuffer(1 + 4 + 4 + filename.length)
+		ebuf.i16(zipUtf8ExtraId)
+		ebuf.i16(5+filename.length) // size
+		ebuf.i8(1) // version
+		ebuf.i32(crc32(filename))
+		ebuf.appendBytes(filename)
+		header.extra = ebuf.getArray();
+
 		return header.getBytes();
 	}
 }

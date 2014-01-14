@@ -14828,6 +14828,539 @@ transform: rotate(900deg);
 	box-sizing: border-box;
 	right: -2px;
 }
-body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl input, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-number input, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl .blog-new-search input, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .top-search-input, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl .top-login-input-block input, .rtl .affiliate-input-block input, .rtl .login-register-input input, .rtl .affiliate-input-block.textarea-block textarea, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
-	direction:rtl;
+body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
+	direction: rtl;
 }
+.rtl .fm-tree-header.cloud-drive-item, .rtl .fm-tree-header.cloud-drive-item.active.dragover, .rtl .fm-tree-header.cloud-drive-item.dragover {
+	background-position: 97% -2253px;
+	background-position: -webkit-calc(100% - 18px) -2253px;
+	background-position: right 18px -2253px;
+}
+.rtl .fm-tree-header.cloud-drive-item.active {
+	background-position: 97% -1193px;
+	background-position: -webkit-calc(100% - 18px) -1193px;
+	background-position: right 18px -1193px;
+}
+.rtl .fm-tree-header span {
+	padding-right: 64px;
+	padding-left: 0;
+}
+.rtl .fm-tree-header.contains-subfolders span, .rtl .fm-tree-header.contains-subfolders.active.dragover span, .rtl .fm-tree-header.contains-subfolders.dragover span {
+	background-position: 110% -1339px;
+	background-position: -webkit-calc(100% + 12px) -1339px;
+	background-position: right -12px -1339px;
+}
+.rtl .fm-tree-header.active.contains-subfolders span {
+	background-position: 110% -1419px;
+	background-position: -webkit-calc(100% + 12px) -1419px;
+	background-position: right -12px -1419px;
+}
+.rtl .fm-tree-header.contains-subfolders.expanded span, .rtl .fm-tree-header.expanded span, .rtl .fm-tree-header.contains-subfolders.expanded.active.dragover span, .rtl .fm-tree-header.expanded.active.dragover span, .rtl .fm-tree-header.contains-subfolders.expanded.dragover span, .rtl .fm-tree-header.expanded.dragover span {
+	background-position: 110% -1380px;
+	background-position: -webkit-calc(100% + 12px) -1380px;
+	background-position: right -12px -1380px;
+}
+.rtl .fm-tree-header.active.contains-subfolders.expanded span, .rtl .fm-tree-header.active.expanded span {
+	background-position: 110% -1300px;
+	background-position: -webkit-calc(100% + 12px) -1300px;
+	background-position: right -12px -1300px;
+}
+.rtl .fm-tree-folder {
+	background-position: right -2114px;
+}
+.rtl .fm-tree-folder span {
+	background-position: 110% -1307px;
+	background-position: -webkit-calc(100% + 12px) -1307px;
+	background-position: right -12px -1307px;
+	padding: 0 64px 0 10px;
+}
+.rtl .fm-tree-folder.active {
+	background-position: right -2144px;
+}
+.rtl .fm-tree-folder.contains-folders span, .rtl .fm-tree-folder.contains-folders.active.dragover span, .rtl .fm-tree-folder.contains-folders.dragover {
+	background-position: 110% -1346px;
+	background-position: -webkit-calc(100% + 12px) -1346px;
+	background-position: right -12px -1346px;
+}
+.rtl .fm-tree-folder.contains-folders.active span {
+	background-position: 110% -1426px;
+	background-position: -webkit-calc(100% + 12px) -1426px;
+	background-position: right -12px -1426px;
+}
+.rtl .fm-tree-folder.contains-folders.expanded span, .rtl .fm-tree-folder.expanded span, .rtl .fm-tree-folder.contains-folders.expanded.active.dragover span, .rtl .fm-tree-folder.expanded.active.dragover span, .rtl .fm-tree-folder.contains-folders.expanded.dragover span, .rtl .fm-tree-folder.expanded.dragover span {
+	background-position: 110% -1388px;
+	background-position: -webkit-calc(100% + 12px) -1388px;
+	background-position: right -12px -1388px;
+}
+.rtl .fm-tree-folder.contains-folders.active.expanded span, .rtl .fm-tree-folder.active.expanded span {
+	background-position: 110% -1308px;
+	background-position: -webkit-calc(100% + 12px) -1308px;
+	background-position: right -12px -1308px;
+}
+.rtl .fm-tree-folder.shared-folder, .rtl .fm-tree-folder.shared-folder.active.dragover, .rtl .fm-tree-folder.shared-folder.dragover {
+	background-position: right -2174px;
+}
+.rtl .fm-tree-folder.shared-folder.active, .rtl .fm-tree-folder.shared-folder.active.expanded {
+	background-position: right -2205px;
+}
+.rtl .fm-tree-header.recycle-item, .rtl .fm-tree-header.recycle-item.active.dragover, .rtl .fm-tree-header.recycle-item.dragover {
+	background-position: 97% -2302px;
+	background-position: -webkit-calc(100% - 16px) -2302px;
+	background-position: right 16px -2302px;
+}
+.rtl .fm-tree-header.recycle-item.active {
+	background-position: 97% -2443px;
+	background-position: -webkit-calc(100% - 16px) -2443px;
+	background-position: right 16px -2443px;
+}
+.rtl .fm-tree-header.contacts-item, .rtl .fm-tree-header.contacts-item.active.dragover, .rtl .fm-tree-header.contacts-item.dragover {
+	background-position: 97% -2392px;
+	background-position: -webkit-calc(100% - 16px) -2392px;
+	background-position: right 16px -2392px;
+}
+.rtl .fm-tree-header.contacts-item.active {
+	background-position: 97% -2543px;
+	background-position: -webkit-calc(100% - 16px) -2543px;
+	background-position: right 16px -2543px;
+}
+.rtl .fm-tree-header.contacts-item span.contacts-arrows, .rtl .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .rtl .fm-tree-header.active.expanded span.contacts-arrows {
+	float: right;
+	margin: 10px 0 0 10px;
+}
+.rtl .fm-tree-header.messages-item, .rtl .fm-tree-header.messages-item.active.dragover, .rtl .fm-tree-header.messages-item.dragover {
+	background-position: 97% -2347px;
+	background-position: -webkit-calc(100% - 16px) -2347px;
+	background-position: right 16px -2347px;
+}
+.rtl .fm-tree-header.messages-item.active {
+	background-position: 97% -2599px;
+	background-position: -webkit-calc(100% - 16px) -2599px;
+	background-position: right 16px -2599px;
+}
+/* Ads css */
+@font-face {
+	font-family: FreestyleScriptBold;
+	src: url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.eot);
+	src: url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.eot?#iefix) format("embedded-opentype"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.woff) format("woff"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.ttf) format("truetype"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.svg#FreestyleScriptBold) format("svg");
+	font-weight: 400;
+	font-style: normal
+}
+@-webkit-keyframes playing-circle {
+from {
+-webkit-transform:rotate(0deg)
+}
+to {
+	-webkit-transform: rotate(360deg)
+}
+}
+@-moz-keyframes playing-circle {
+from {
+-moz-transform:rotate(0deg)
+}
+to {
+	-moz-transform: rotate(360deg)
+}
+}
+@-o-keyframes playing-circle {
+from {
+-o-transform:rotate(0deg)
+}
+to {
+	-o-transform: rotate(360deg)
+}
+}
+@keyframes playing-circle {
+from {
+transform:rotate(0deg)
+}
+to {
+	transform: rotate(360deg)
+}
+}
+.good-times-left-block, .good-times-right-block {
+	position: absolute;
+	display: none;
+	width: 341px;
+	height: 100%;
+	background: #fff;
+	background: -moz-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
+	background: -webkit-gradient(radial, center center, 0, center center, 100%, color-stop(25%, #fff), color-stop(100%, #c5c5c3));
+	background: -webkit-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
+	background: -o-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
+	background: -ms-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
+	background: radial-gradient(ellipse at center, #fff 25%, #c5c5c3 100%)
+}
+.adv .good-times-left-block, .adv .good-times-right-block {
+	display: block;
+}
+.good-times-left-block .background-picture {
+	background-image: url(../images/mega/ads/kim_photo_big.png);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 30% 100%;
+	width: 100%;
+	max-height: 580px;
+	position: absolute;
+	bottom: 0;
+	top: 40%
+}
+.good-times-left-block .title-image {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -0px;
+	background-repeat: no-repeat;
+	width: 263px;
+	height: 156px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 35%
+}
+.good-times-left-block .left-bottom {
+	position: absolute;
+	bottom: 50px;
+	width: 100%;
+	height: 108px;
+	z-index: 1
+}
+.good-times-left-block .bottom-gradient {
+	width: 100%;
+	height: 100%;
+	background: -moz-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0,0,0,0)), color-stop(100%, rgba(0,0,0,1)));
+	background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
+	background: -o-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
+	background: -ms-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
+	background: linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
+	display: none
+}
+.good-times-left-block .kimdotcom-logo {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -156px;
+	background-repeat: no-repeat;
+	position: absolute;
+	left: 25px;
+	top: 25px;
+	width: 58px;
+	height: 58px;
+	cursor: pointer
+}
+.good-times-left-block .baboom-logo {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -214px;
+	background-repeat: no-repeat;
+	position: absolute;
+	right: 25px;
+	top: 31px;
+	width: 119px;
+	height: 46px;
+	display: none;
+	cursor: pointer
+}
+.good-times-right-block {
+	right: 0
+}
+.good-times-right-block .audio-player {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 300px;
+	margin-top: -215px;
+	margin-left: -150px;
+	text-align: center
+}
+.good-times-right-block .audio-player .music-title {
+	position: relative;
+	font-family: FreestyleScriptBold, Arial;
+	line-height: 1;
+	height: 52px;
+	font-size: 52px;
+	letter-spacing: -2px;
+	color: #111;
+	opacity: 1;
+	transform: rotate(-15deg);
+	-ms-transform: rotate(-15deg);
+	-webkit-transform: rotate(-15deg)
+}
+.good-times-right-block .audio-player .cover-wrapper {
+	position: relative;
+	width: 195px;
+	margin-top: 45px;
+	margin-left: auto;
+	margin-right: auto
+}
+.good-times-right-block .audio-player .cover-image {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -260px;
+	background-repeat: no-repeat;
+	width: 195px;
+	height: 195px
+}
+.good-times-right-block .audio-player .playing-circle {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 188px;
+	height: 188px;
+	opacity: 0;
+	-webkit-animation: playing-circle 2s infinite linear;
+	-moz-animation: playing-circle 2s infinite linear;
+	-o-animation: playing-circle 2s infinite linear;
+	animation: playing-circle 2s infinite linear;
+	-webkit-transition: opacity .3s ease-out;
+	-moz-transition: opacity .3s ease-out;
+	-ms-transition: opacity .3s ease-out;
+	-o-transition: opacity .3s ease-out;
+	transition: opacity .3s ease-out
+}
+.good-times-right-block .audio-player.paused .playing-circle {
+	opacity: 1;
+	-webkit-animation-play-state: paused;
+	-moz-animation-play-state: paused;
+	-o-animation-play-state: paused;
+	animation-play-state: paused
+}
+.good-times-right-block .audio-player.playing .playing-circle {
+	opacity: 1;
+	-webkit-animation-play-state: running;
+	-moz-animation-play-state: running;
+	-o-animation-play-state: running;
+	animation-play-state: running
+}
+.good-times-right-block .audio-player .playing-circle .mask {
+	width: 100%;
+	height: 50%;
+	overflow: hidden
+}
+.good-times-right-block .audio-player .playing-circle .masked-circle {
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	border: 4px solid #fff
+}
+.good-times-right-block .audio-player .controls-wrapper {
+	position: relative;
+	width: 127px;
+	left: 50%;
+	margin-top: 22px;
+	margin-left: -64px
+}
+.good-times-right-block .audio-player .btn-control {
+	background-repeat: no-repeat;
+	width: 25px;
+	height: 25px;
+	float: left;
+	margin-top: 14px;
+	cursor: pointer
+}
+.good-times-right-block .audio-player .btn-control.prev {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -455px
+}
+.good-times-right-block .audio-player .btn-control.prev:hover {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -480px
+}
+.good-times-right-block .audio-player .btn-control.play-pause, .good-times-right-block .audio-player.paused .play-pause {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -505px;
+	width: 47px;
+	height: 45px;
+	margin: 0 15px;
+	margin-top: 0
+}
+.good-times-right-block .audio-player.playing .play-pause {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -550px
+}
+.good-times-right-block .audio-player .btn-control.next {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -595px
+}
+.good-times-right-block .audio-player .btn-control.next:hover {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -620px
+}
+.good-times-right-block .audio-player .play-preview-text {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -645px;
+	background-repeat: no-repeat;
+	width: 90px;
+	height: 56px;
+	margin-top: 85px;
+	margin-left: 45px
+}
+.good-times-right-block .baboom-logo {
+	background-image: url(../images/mega/ads/ads_sprite.png);
+	background-position: left -701px;
+	background-repeat: no-repeat;
+	width: 119px;
+	height: 46px;
+	position: absolute;
+	right: 25px;
+	bottom: 75px;
+	cursor: pointer;
+	z-index: 1
+}
+@media (-webkit-min-device-pixel-ratio:1.325), (min-device-pixel-ratio:1.325) {
+.good-times-left-block .title-image {
+	background-image: url(../images/mega/ads/goodtimes_title@2x.png);
+	background-size: 263px 156px;
+	background-position: 0 0
+}
+.good-times-left-block .kimdotcom-logo {
+	background-image: url(../images/mega/ads/kim_logo@2x.png);
+	background-size: 58px 58px;
+	background-position: 0 0
+}
+.good-times-left-block .baboom-logo {
+	background-image: url(../images/mega/ads/available_baboom_white@2x.png);
+	background-size: 119px 46px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player .cover-image {
+	background-image: url(../images/mega/ads/album@2x.png);
+	background-size: 195px 195px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player .btn-control.prev {
+	background-image: url(../images/mega/ads/next_left@2x.png);
+	background-size: 25px 25px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player .btn-control.prev:hover {
+	background-image: url(../images/mega/ads/next_left_hover@2x.png)
+}
+.good-times-right-block .audio-player .btn-control.play-pause, .good-times-right-block .audio-player.paused .play-pause {
+	background-image: url(../images/mega/ads/play@2x.png);
+	background-size: 47px 45px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player.playing .play-pause {
+	background-image: url(../images/mega/ads/pause@2x.png);
+	background-size: 47px 45px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player .btn-control.next {
+	background-image: url(../images/mega/ads/next_right@2x.png);
+	background-size: 25px 25px;
+	background-position: 0 0
+}
+.good-times-right-block .audio-player .btn-control.next:hover {
+	background-image: url(../images/mega/ads/next_right_hover@2x.png)
+}
+.good-times-right-block .audio-player .play-preview-text {
+	background-image: url(../images/mega/ads/play_the_preview@2x.png);
+	background-size: 90px 56px;
+	background-position: 0 0
+}
+.good-times-right-block .baboom-logo {
+	background-image: url(../images/mega/ads/available_baboom@2x.png);
+	background-size: 119px 46px;
+	background-position: 0 0
+}
+}
+@media all and (max-height:900px) {
+.good-times-left-block .title-image {
+	margin-top: 30%
+}
+}
+@media all and (max-height:850px) {
+.good-times-left-block .title-image {
+	margin-top: 27%
+}
+}
+@media all and (max-height:800px) {
+.good-times-left-block .title-image {
+	margin-top: 25%
+}
+}
+@media all and (max-height:780px) {
+.good-times-left-block .title-image {
+	margin-top: 25%
+}
+}
+@media all and (max-height:730px) {
+.good-times-left-block .title-image {
+	margin-top: 21%
+}
+}
+@media all and (max-height:700px) {
+.good-times-left-block .title-image {
+	margin-top: 30%
+}
+}
+@media all and (max-height:680px) {
+.good-times-left-block .title-image {
+	margin-top: 25%
+}
+}
+@media all and (max-height:650px) {
+.good-times-left-block .title-image {
+	margin-top: 20%
+}
+}
+@media all and (max-height:620px) {
+.good-times-left-block .title-image {
+	margin-top: 15%
+}
+}
+@media all and (max-height:590px) {
+.good-times-left-block, .good-times-right-block {
+	display: none
+}
+}
+@media all and (max-width:1390px) {
+.good-times-left-block, .good-times-right-block {
+	width: 320px
+}
+}
+@media all and (max-width:1180px) {
+.adv .good-times-right-block {
+	display: none
+}
+.good-times-left-block {
+	width: 341px
+}
+.good-times-left-block .baboom-logo, .good-times-left-block .bottom-gradient {
+	display: block
+}
+}
+@media all and (min-height:1100px) {
+.good-times-left-block .background-picture {
+	top: auto;
+	height: 580px;
+	max-height: none
+}
+}
+.adv .download-mid-centered-block {
+	pointer-events: none;
+	margin: -130px 0 0 -325px
+}
+.adv .download-mid-centered-block .new-download-pad {
+	pointer-events: all
+}
+@media all and (max-width:1280px) {
+.adv .download-mid-centered-block {
+	margin: -130px 0 0 -324px
+}
+}
+@media all and (max-width:1180px) {
+.adv .download-mid-centered-block {
+	margin: -130px 0 0 -140px
+}
+.adv .st-social-block {
+	left: 341px;
+	right: 0;
+	width: auto
+}
+}
+ @media all and (max-width:1335px) {
+.adv .downloading-progress {
+	width: 300px;
+}
+}
+@media all and (max-width:1217px) {
+.adv .downloading-progress {
+	width: 290px;
+}
+}
+/*end */

@@ -344,7 +344,30 @@ else
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-		jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
+
+
+        // Strophe
+        jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
+
+        // OTR
+        jsl.push({f:'js/vendor/chat/salsa20.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/bigint.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/crypto.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/eventemitter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/otr.js', n: 'mega_js', j:1,w:7});
+
+        jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+
+		jsl.push({f:'js/chat/karere.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/chat/chat.js', n: 'mega_js', j:1,w:7});
+
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 		jsl.push({f:'index.js', n: 'index', j:1,w:4});

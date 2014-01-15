@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <!-- language patch -->
+    <script type="text/javascript">l = [];</script>
+
+    <script type="text/javascript" src="../js/jquery-min-1.8.1.js"></script>
+    <script type="text/javascript" src="../js/functions.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.disco.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.jingle.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.jingle.session.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.jingle.sdp.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.jingle.adapter.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.muc.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/strophe.roster.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/wildemitter.patched.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/hark.patched.js"></script>
+
+    <script type="text/javascript" src="../js/vendor/chat/salsa20.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/bigint.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/crypto.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/eventemitter.js"></script>
+    <script type="text/javascript" src="../js/vendor/chat/otr.js"></script>
+
+    <script type="text/javascript" src="../js/chat/rtcSession.js"></script>
+
+    <script type="text/javascript" src="../js/chat/karere.js"></script>
+
+
+    <script type="text/javascript">
+        /**
+         * Basic XMPP Connect test case
+         */
+        $(function() {
+            /* global */
+            k1 = new Karere({
+                "clientName": 'karere-testcase'
+            });
+
+            var k1_connect_promise = k1.connect(
+                    "lpetrov@jabber.de",
+                    "megatestpass"
+            );
+
+            /* global */
+            k2 = new Karere({
+                "clientName": 'karere-testcase'
+            });
+
+
+            var k2_connect_promise = k2.connect(
+                    "lpetrov2@jabber.de",
+                    "megatestpass2"
+            );
+            //todo: why this is replacing my Adium connection?!
+
+
+            var simple_chat_bot = function(e, msg) {
+                var k = msg.karere;
+                if(k.getJid() == msg.from) {
+                    return; // forwarded msg, skip.
+                }
+
+                console.log(k.getBareJid(), " got message from ", msg.from, " saying: ", msg.message);
+
+                if(msg.message.indexOf("Hello") >= 0) {
+                    k._rawSendMessage(msg.from, "chat", "Nice to meet you " + msg.from + "! How are you today?");
+                } else if(msg.message.indexOf("How are you") >= 0) {
+                    k._rawSendMessage(msg.from, "chat", "I'm fine...you?");
+                } else if(msg.message.indexOf("I&apos;m fine...you?") >= 0) {
+                    k._rawSendMessage(msg.from, "chat", "I'm fine too...but going out now...c ya tomorrow!");
+                }
+            };
+
+            $.when(
+                   k1_connect_promise,
+                   k2_connect_promise
+                )
+                .done(function(statuses) {
+                    /**
+                     * Send message test
+                     */
+                    {
+
+                        k2.on('onChatMessage', simple_chat_bot);
+                        k1.on('onChatMessage', simple_chat_bot);
+
+                        // start the chat w/ the bot func
+                        k1._rawSendMessage(k2._jid, "chat", "Hello there " + k2._jid + " from " + k1._jid + " at " + (new Date()) + ".");
+                    }
+
+                    /**
+                     * Presence test
+                     */
+                    {
+                        k1.on('onPresence', function(e, msg) {
+                            console.debug(msg.karere.getJid(), "Got presence for ", msg.from, msg.status, msg.show);
+                        });
+
+                        k2.setPresence("dnd", "drinking beer");
+                        k1.setPresence("xa", "AFK");
+                        setTimeout(function() {
+                            k2.setPresence("chat", "i'm back.");
+                        }, 5000);
+                    }
+
+
+                });
+
+
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

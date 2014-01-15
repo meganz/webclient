@@ -320,6 +320,9 @@ function time2date(unixtime,ignoretime)
     return MyDateString;
 }	
 
+// in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
+if(typeof(l) == 'undefined') { l = []; };
+
 var date_months = [l[408],l[409],l[410],l[411],l[412],l[413],l[414],l[415],l[416],l[417],l[418],l[419]];
 
 function acc_time2date(unixtime)
@@ -482,4 +485,113 @@ function checkMail(email)
 	var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (filter.test(email)) return false;	
 	else return true;	
+}
+
+function funcAlias(context, fn) {
+    return function aliasClosure() {
+        return fn.apply(context, arguments);
+    };
+}
+
+function makeObservable(kls) {
+    var $obj = $(kls.prototype);
+    kls.prototype.on = funcAlias($obj, $obj.on);
+    kls.prototype.bind = funcAlias($obj, $obj.bind);
+    kls.prototype.unbind = funcAlias($obj, $obj.unbind);
+    kls.prototype.one = funcAlias($obj, $obj.one);
+    kls.prototype.trigger = funcAlias($obj, $obj.trigger);
+};
+
+function makeMetaAware(kls) {
+    kls.prototype.setMeta = function(prefix, namespace, k, val) {
+        var self = this;
+
+        if(self["_" + prefix] == undefined) {
+            self["_" + prefix] = {};
+        } if(self["_" + prefix][namespace] == undefined) {
+            self["_" + prefix][namespace] = {};
+        }
+        self["_" + prefix][namespace][k] = val;
+
+        if(self.trigger) {
+            self.trigger("onMetaChange", prefix, namespace, k, val);
+        }
+    };
+
+    kls.prototype.getMeta = function(prefix, namespace, k, default_value) {
+        var self = this;
+
+        // support for calling only with 2 args.
+        if(k == undefined) {
+            if(self["_" + prefix] == undefined) {
+                return default_value;
+            } else {
+                return self["_" + prefix][namespace] || default_value;
+            }
+        } else {
+            // all args
+
+            if(self["_" + prefix] == undefined) {
+                return default_value;
+            } else if(self["_" + prefix][namespace] == undefined) {
+                return default_value;
+            } else {
+                return self["_" + prefix][namespace][k] || default_value;
+            }
+        }
+    };
+};
+
+function generateEventSuffixFromArguments(event_name, name) {
+    var args = Array.prototype.splice.call(arguments, 2);
+    var result = "";
+    $.each(args, function(k, v) {
+        result += v;
+    });
+
+    return event_name + "." + name + "_" + ("" + simpleStringHashCode(result)).replace("-", "_");
+};
+
+/**
+ * @see http://stackoverflow.com/q/7616461/940217
+ * @return {number}
+ */
+function simpleStringHashCode(str){
+    if (Array.prototype.reduce){
+        return str.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+    }
+    var hash = 0;
+    if (str.length === 0) return hash;
+    for (var i = 0; i < str.length; i++) {
+        var character  = str.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+character;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+};
+
+
+function createTimeoutPromise(validate_fn, tick, timeout) {
+    var $promise = new $.Deferred();
+    var tick_interval = setInterval(function() {
+        if(validate_fn()) {
+            $promise.resolve();
+        }
+    }, tick);
+
+    var timeout_timer = setTimeout(function() {
+        $promise.reject();
+    }, timeout);
+
+    // stop any running timers and timeouts
+    $promise.always(function() {
+        clearInterval(tick_interval);
+        clearTimeout(timeout_timer)
+    });
+
+    return $promise;
+};
+
+function toArray(val) {
+    return Array.prototype.slice.call(val, val);
 }

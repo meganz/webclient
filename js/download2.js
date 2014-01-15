@@ -119,6 +119,8 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	return {chunks: dl_chunks, offsets: dl_chunksizes};
 }
 
+var Zips = {};
+
 DownloadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments)
 		, id = pos -1
@@ -126,25 +128,34 @@ DownloadQueue.prototype.push = function() {
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
-		, dlObject = new dlMethod(dl_id)
+		, dlIO = dl.zipid ? null : new dlMethod(dl_id)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
 		, dl_urls = []
 
+	if (dl.zipid) {
+		Zips[dl.zipid] = dlIO = Zips[dl.zipid] || new dlMethod(dl_id)
+		return DEBUG(dl);
+	}
+	if (!use_workers) {
+		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
+		alert(dl.aes);
+	}
+
 	dl.pos   = id // download position in the queue
 	dl.dl_id = dl_id;  // download id
-	dl.io    = dlObject;
+	dl.io    = dlIO;
 	dl.nonce = dl_keyNonce
 	dl.progress = 0;
 	dl.macs  = {}
 
-	dlObject.begin = function() {
+	dlIO.begin = function() {
 		var tasks = [];
 		$.each(dl_urls||[], function(key, url) {
 			tasks.push({
 				url: url.url, 
 				offset: url.offset, 
 				size: url.size, 
-				io: dlObject , 
+				io: dlIO , 
 				download: dl, 
 				chunk_id: key
 			});
@@ -158,7 +169,7 @@ DownloadQueue.prototype.push = function() {
 				if (dl.decrypt == 0) {
 					clearInterval(checker);
 					dl.onBeforeDownloadComplete(dl.pos);
-					dl.io.download(dl.n, dl.p);
+					dl.io.download(dl.zipname || dl.n, dl.p);
 				}
 			}, 100);
 		}, function(reschedule, args) {
@@ -189,7 +200,7 @@ DownloadQueue.prototype.push = function() {
 						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
 							dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
 						} else {
-							return dlObject.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+							return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 						}
 					} else {
 						dl_reportstatus(dl_id, EKEY);

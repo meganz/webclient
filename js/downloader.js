@@ -53,6 +53,20 @@ function decrypter(task)
 		DEBUG("decrypt with workers");
 	} else {
 		DEBUG("decrypt without workers")
+		download.macs[task.offset] = decrypt_ab_ctr(
+			download.aes,
+			task.data,
+			[download.key[4],download.key[5]],
+			task.offset
+		);
+
+		Decrypter.done(); // release slot
+		download.io.write(task.data, task.offset, function() {
+			// decrease counter
+			// useful to avoid downloading before writing
+			// all
+			download.decrypt--;
+		});
 	}
 }
 

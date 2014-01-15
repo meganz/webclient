@@ -136,9 +136,9 @@ DownloadQueue.prototype.push = function() {
 		Zips[dl.zipid] = dlIO = Zips[dl.zipid] || new dlMethod(dl_id)
 		return DEBUG(dl);
 	}
+
 	if (!use_workers) {
 		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
-		alert(dl.aes);
 	}
 
 	dl.pos   = id // download position in the queue

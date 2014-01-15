@@ -103,7 +103,10 @@ function FileSystemAPI(dl_id) {
 				};
 
 				zfileEntry = fileEntry;
-				IO.begin();
+				setTimeout(function() {
+					// deferred execution
+					IO.begin();
+				});
 			}, errorHandler('createWriter'));
 		}, errorHandler('getFile'));
 	}
@@ -134,6 +137,7 @@ function FileSystemAPI(dl_id) {
 		dl_ack_write = done;
 		targetpos    = buffer.length + dl_fw.position;
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
+		DEBUG(['buffer', buffer]);
 		dl_fw.write(new Blob([buffer]));
 	};
 

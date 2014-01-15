@@ -5,6 +5,15 @@ var dlMethod
 	, dlQueue = new QueueClass(downloader)
 	, dlDecrypter = new QueueClass(decrypter)
 
+/** @FIXME: move me somewhere else */
+$.len = function(obj) {
+	var L=0;
+	$.each(obj, function(i, elem) {
+		L++;
+	});
+	return L;
+}
+
 /**
  *	Override the downloader scheduler method.
  *	Basically pick up chunks from different files if possible:
@@ -128,13 +137,21 @@ DownloadQueue.prototype.push = function() {
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
 		, dl_retryinterval = 1000
-		, dlIO = dl.zipid ? null : new dlMethod(dl_id)
+		, dlIO = new dlMethod(dl_id)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
-		, dl_urls = []
 
 	if (dl.zipid) {
-		Zips[dl.zipid] = dlIO = Zips[dl.zipid] || new dlMethod(dl_id)
-		return DEBUG(dl);
+		if (!Zips[dl.zipid]) {
+			Zips[dl.zipid] = {
+				IO: new dlMethod(dl_id),
+				size: 0,
+				queue: {},
+				url: [],
+			};
+			dlIO = Zips[dl.zipid].IO;
+		}
+		Zips[dl.zipid].queue[dl_id] = [dl, Zips[dl.zipid].size];
+		Zips[dl.zipid].size += dl.size
 	}
 
 	if (!use_workers) {
@@ -147,10 +164,45 @@ DownloadQueue.prototype.push = function() {
 	dl.nonce = dl_keyNonce
 	dl.progress = 0;
 	dl.macs  = {}
+	dl.urls	 = []
 
 	dlIO.begin = function() {
 		var tasks = [];
-		$.each(dl_urls||[], function(key, url) {
+		if (dl.zipid) {
+			var Zip = Zips[dl.zipid]
+				, queue = Zip.queue[dl_id]
+				, object = queue[0]
+				, offset = queue[1]
+
+			if (!Zip.ZipObject) {
+				Zip.ZipObject = new ZIPClass(Zip.size)
+			}
+
+			$.each(object.urls, function(id, url) {
+				if (url.offset == 0) {
+					// Start of file, well, write zip header instead
+					var header = Zip.ZipObject.writeHeader(dl.p + dl.n, dl.size, dl.t);
+					Zip.IO.write(
+						header, 
+						offset + url.offset, 
+						function(){}
+					);
+					url.offset  += header.length;
+					url.zipStart = true;
+				}
+				url.offset += offset;
+				Zip.url.push(url);
+			});
+
+			delete Zip.queue[dl_id];
+			if ($.len(Zip.queue) === 0) {
+				// Done with the queue, now fetch everything :-)
+				DEBUG(Zip.url)
+			}
+			return;
+		}
+
+		$.each(dl.urls||[], function(key, url) {
 			tasks.push({
 				url: url.url, 
 				offset: url.offset, 
@@ -196,7 +248,7 @@ DownloadQueue.prototype.push = function() {
 
 					if (typeof o == 'object' && typeof o.n == 'string') {
 						var info = dl_queue.splitFile(res.s);
-						dl_urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+						dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
 							dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
 						} else {

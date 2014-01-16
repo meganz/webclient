@@ -140,6 +140,7 @@ function dlZipIO(realIO, dl) {
 		, offset = 0
 		, hashes = {}
 		, dirData = []
+		, pos = 0
 
 	this.download = function(name) {
 		$.each(dirData, function(key, value) {
@@ -147,10 +148,12 @@ function dlZipIO(realIO, dl) {
 			offset += value.length;
 		});
 
+		DEBUG(dirData);
 		var end = ZipObject.writeSuffix(offset, dirData);
 		realIO.write(end, offset, function() {
 			var doDownload = setInterval(function(){
 				if (dl.decrypt == 0) {
+					DEBUG(dirData);
 					realIO.download(name);
 					clearInterval(doDownload);
 				}
@@ -163,7 +166,7 @@ function dlZipIO(realIO, dl) {
 			qZips.push(task.download.id)
 		}
 
-		if (qZips[0] !== task.download.id) {
+		if (qZips[0] !== task.download.id || task.pos != pos) {
 			return setTimeout(function() {
 				self.write(buffer, position, next, task);
 			}, 100);
@@ -180,6 +183,7 @@ function dlZipIO(realIO, dl) {
 			hashes[task.download.id] = 0;
 		}
 		hashes[task.download.id] = crc32(buffer, hashes[task.download.id], buffer.length);
+		pos++;
 
 		realIO.write(buffer, offset, function() {
 			if (task.last) {
@@ -195,6 +199,7 @@ function dlZipIO(realIO, dl) {
 				dirData.push(centralDir.dirRecord)
 				realIO.write(centralDir.dataDescriptor, offset, next);
 				offset += centralDir.dataDescriptor.length;
+				pos     = 0;
 				return;
 			}
 			next();
@@ -267,6 +272,7 @@ DownloadQueue.prototype.push = function() {
 				, object = queue[0]
 				, offset = queue[1]
 
+			var pos = 0;
 			$.each(object.urls, function(id, url) {
 				url.first		= id == 0
 				url.last		= object.urls.length-1 == id
@@ -274,6 +280,7 @@ DownloadQueue.prototype.push = function() {
 				url.path		= dl.p + dl.n;
 				url.download	= dl;
 				url.download.io	= Zip.IO;
+				url.pos         = pos++;
 				Zip.url.push(url);
 			});
 

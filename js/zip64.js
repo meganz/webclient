@@ -327,6 +327,20 @@ var ZIPClass = function(totalSize) {
 
 		return header.getBytes();
 	}
+
+
+	q('writeHeader');
+	q('writeCentralDir');
+	q('writeSuffix');
+
+	function q(name) {
+		var method = self[name];
+		self[name] = function() {
+			var args = Array.prototype.slice.call(arguments);
+			console.warn.apply(console, [name, args]);
+			return method.apply(self, args)
+		};
+	}
 }
 
 // crc32 {{{

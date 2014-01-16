@@ -272,9 +272,9 @@ var ZIPClass = function(totalSize) {
 		};
 	}
 
-	self.writeSuffix = function(pos, dirDatalength) {
+	self.writeSuffix = function(pos, dirData) {
 		var dirDatalength=0;	
-		for (var i in dl_zip.dirData) dirDatalength += dl_zip.dirData[i].length;
+		for (var i in dirData) dirDatalength += dirData[i].length;
 
 		var buf = ezBuffer(22);
 		if (isZip64) {
@@ -286,10 +286,10 @@ var ZIPClass = function(totalSize) {
 			xbuf.i16(zipVersion)
 			xbuf.i32(0) // disk number
 			xbuf.i32(0) // number of the disk with the start of the central directory
-			xbuf.i64(dl_zip.dirData.length)
-			xbuf.i64(dl_zip.dirData.length)
+			xbuf.i64(dirData.length)
+			xbuf.i64(dirData.length)
 			xbuf.i64(dirDatalength);
-			xbuf.i64(dl_zip.pos);
+			xbuf.i64(pos);
 
 			xbuf.i32(directory64LocSignature)
 			xbuf.i32(0)
@@ -301,10 +301,10 @@ var ZIPClass = function(totalSize) {
 		
 		buf.i32(directoryEndSignature)
 		buf.i32(0); // skip
-		buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
-		buf.i16(isZip64 ? i16max : dl_zip.dirData.length)
+		buf.i16(isZip64 ? i16max : dirData.length)
+		buf.i16(isZip64 ? i16max : dirData.length)
 		buf.i32(isZip64 ? i32max : dirDatalength);
-		buf.i32(isZip64 ? i32max : dl_zip.pos);
+		buf.i32(isZip64 ? i32max : pos);
 		buf.i16(0); // no comments
 		
 		return buf.getBytes();

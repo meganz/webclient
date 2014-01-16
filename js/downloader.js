@@ -34,7 +34,7 @@ function decrypter(task)
 					// useful to avoid downloading before writing
 					// all
 					download.decrypt--;
-				});
+				}, task.info);
 			}
 		};
 		worker.postMessage(task.download.nonce);
@@ -194,10 +194,10 @@ function downloader(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset})
+					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
 				} else {
 					io.dl_bytesreceived += this.response.length;
-					dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset})
+					dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
 				}
 			} else if (!download.cancelled) {
 				// we must reschedule this download	

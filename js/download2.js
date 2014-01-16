@@ -134,16 +134,82 @@ var Zips = {};
  *	Pseudo-IO method to simplify zip writings
  */
 function dlZipIO(realIO, dl) {
-	var self = this;
+	var self = this
+		, qZips = []
+		, ZipObject
+		, offset = 0
+		, hashes = {}
+		, dirData = []
 
-	this.write = function(buffer, position, done) {
-		throw new Error;
+	this.download = function(name) {
+		var end = ZipObject.writeSuffix(offset, dirData);
+
+		realIO.write(end, offset, function() {
+			realIO.download(name);
+		});
+	}
+
+	this.write = function(buffer, position, next, task) {
+		if ($.inArray(task.download.id, qZips)==-1) {
+			qZips.push(task.download.id)
+		}
+
+		if (qZips[0] !== task.download.id) {
+			return setTimeout(function() {
+				self.write(buffer, position, next, task);
+			}, 100);
+		}
+
+		if (task.first) {
+			var header = ZipObject.writeHeader(
+				task.path,
+				task.size,
+				null /* ignore date */
+			);
+			realIO.write(header, offset, function() {});
+			offset += header.length;
+			hashes[task.download.id] = 0;
+		}
+		hashes[task.download.id] = crc32(buffer, hashes[task.download.id], buffer.length);
+
+		realIO.write(buffer, offset, function() {
+			if (task.last) {
+				qZips.shift();
+				var centralDir = ZipObject.writeCentralDir(
+					task.path,
+					task.download.size,
+					null,
+					hashes[task.download.id],
+					false,
+					offset
+				);
+				dirData.push(centralDir.dirRecord)
+				realIO.write(centralDir.dataDescriptor, offset, next);
+				offset += centralDir.dataDescriptor.length;
+				return;
+			}
+			next();
+		}, task);
+		offset += buffer.length;
 	};
 
-	this.begin = function() {
-		DEBUG("starting download " + dl.zipname);
+	this.begin = function(total_size) {
+		ZipObject = new ZIPClass(total_size);
+		DEBUG("starting download " + dl.zipname + " " + total_size + " bytes");
+		dl.decrypt = 0;
 		dlQueue.pushAll(this.urls, function() {
-			DEBUG("herexxx");
+			if (dl.cancelled) return;
+			dl.onDownloadComplete(dl_id);
+			var checker = setInterval(function() {
+				DEBUG("XXXYYY: " + dl.decrypt);
+				if (dl.decrypt == 0) {
+					clearInterval(checker);
+					dl.onBeforeDownloadComplete(dl.pos);
+					dl.io.download(dl.zipname || dl.n, dl.p);
+				}
+			}, 100);
+		}, function(reschedule, args) {
+			DEBUG("Network failed")	
 		});
 	}
 
@@ -193,22 +259,15 @@ DownloadQueue.prototype.push = function() {
 				, object = queue[0]
 				, offset = queue[1]
 
-			var lastUrl = null;
 			$.each(object.urls, function(id, url) {
-				url.offset  += offset;
-				url.path     = dl.p + dl.n;
+				url.first		= id == 0
+				url.last		= object.urls.length-1 == id
+				url.zoffset		= url.offset + offset;
+				url.path		= dl.p + dl.n;
 				url.download	= dl;
 				url.download.io	= Zip.IO;
-
-				/** 
-				 * Keep in track of the last chunk Url
-				 * to flag it differently
-				 */
-				lastUrl = url;
 				Zip.url.push(url);
 			});
-
-			lastUrl.last = true
 
 			delete Zip.queue[dl_id];
 			if ($.len(Zip.queue) === 0) {
@@ -217,10 +276,10 @@ DownloadQueue.prototype.push = function() {
 				Zip.IO.urls = Zip.url.sort(function(a, b) {
 					// Sort by offset write often to avoid
 					// keeping thing in RAM 
-					return a.offset - b.offset;
+					return a.zoffset - b.zoffset;
 				});
 				// Trigger real download
-				Zip.IO.begin();
+				Zip.IO.begin(Zip.size);
 			}
 			return;
 		}

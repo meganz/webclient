@@ -130,6 +130,25 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 
 var Zips = {};
 
+/**
+ *	Pseudo-IO method to simplify zip writings
+ */
+function dlZipIO(realIO, dl) {
+	var self = this;
+
+	this.write = function(buffer, position, done) {
+		throw new Error;
+	};
+
+	this.begin = function() {
+		DEBUG("starting download " + dl.zipname);
+		dlQueue.pushAll(this.urls, function() {
+			DEBUG("herexxx");
+		});
+	}
+
+}
+
 DownloadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments)
 		, id = pos -1
@@ -143,15 +162,15 @@ DownloadQueue.prototype.push = function() {
 	if (dl.zipid) {
 		if (!Zips[dl.zipid]) {
 			Zips[dl.zipid] = {
-				IO: new dlMethod(dl_id),
+				IO: new dlZipIO(dlIO, dl),
 				size: 0,
 				queue: {},
 				url: [],
 			};
-			dlIO = Zips[dl.zipid].IO;
 		}
 		Zips[dl.zipid].queue[dl_id] = [dl, Zips[dl.zipid].size];
-		Zips[dl.zipid].size += dl.size
+		Zips[dl.zipid].size += dl.size;
+		Zips[dl.zipid].offset = 0;
 	}
 
 	if (!use_workers) {
@@ -174,30 +193,34 @@ DownloadQueue.prototype.push = function() {
 				, object = queue[0]
 				, offset = queue[1]
 
-			if (!Zip.ZipObject) {
-				Zip.ZipObject = new ZIPClass(Zip.size)
-			}
-
+			var lastUrl = null;
 			$.each(object.urls, function(id, url) {
-				if (url.offset == 0) {
-					// Start of file, well, write zip header instead
-					var header = Zip.ZipObject.writeHeader(dl.p + dl.n, dl.size, dl.t);
-					Zip.IO.write(
-						header, 
-						offset + url.offset, 
-						function(){}
-					);
-					url.offset  += header.length;
-					url.zipStart = true;
-				}
-				url.offset += offset;
+				url.offset  += offset;
+				url.path     = dl.p + dl.n;
+				url.download	= dl;
+				url.download.io	= Zip.IO;
+
+				/** 
+				 * Keep in track of the last chunk Url
+				 * to flag it differently
+				 */
+				lastUrl = url;
 				Zip.url.push(url);
 			});
 
+			lastUrl.last = true
+
 			delete Zip.queue[dl_id];
 			if ($.len(Zip.queue) === 0) {
+				// start real downloading!
 				// Done with the queue, now fetch everything :-)
-				DEBUG(Zip.url)
+				Zip.IO.urls = Zip.url.sort(function(a, b) {
+					// Sort by offset write often to avoid
+					// keeping thing in RAM 
+					return a.offset - b.offset;
+				});
+				// Trigger real download
+				Zip.IO.begin();
 			}
 			return;
 		}
@@ -207,7 +230,6 @@ DownloadQueue.prototype.push = function() {
 				url: url.url, 
 				offset: url.offset, 
 				size: url.size, 
-				io: dlIO , 
 				download: dl, 
 				chunk_id: key
 			});

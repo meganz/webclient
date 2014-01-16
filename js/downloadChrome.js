@@ -128,7 +128,7 @@ function FileSystemAPI(dl_id) {
 	IO.write = function(buffer, position, done) {
 		if (dl_writing || position !== dl_fw.position) {
 			// busy or not there yet
-			DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
+			//DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
 			return setTimeout(function() {
 				IO.write(buffer, position, done);
 			}, 100);
@@ -137,7 +137,6 @@ function FileSystemAPI(dl_id) {
 		dl_ack_write = done;
 		targetpos    = buffer.length + dl_fw.position;
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
-		DEBUG(['buffer', buffer]);
 		dl_fw.write(new Blob([buffer]));
 	};
 

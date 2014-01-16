@@ -27,10 +27,6 @@ function decrypter(task)
 				DEBUG("worker replied string", e.data, download.macs);
 			} else {
 				var databuf = new Uint8Array(e.data.buffer || e.data);
-				if (download.zipid) {
-					DEBUG("ZIP not implemented yet");
-				}
-
 				var plain = databuf;
 				Decrypter.done(); // release slot
 				download.io.write(plain, task.offset, function() {
@@ -96,8 +92,8 @@ function downloader(task) {
 		, Scheduler = this
 		, url = task.url
 		, size = task.size
-		, io = task.io
 		, download = task.download
+		, io = download.io
 		, average_throughput = [0, 0]
 		, done = false
 		, prevProgress = 0    // Keep in track how far are we in the downloads

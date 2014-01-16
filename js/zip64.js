@@ -272,7 +272,7 @@ var ZIPClass = function(totalSize) {
 		};
 	}
 
-	self.writeSuffix = function(pos) {
+	self.writeSuffix = function(pos, dirDatalength) {
 		var dirDatalength=0;	
 		for (var i in dl_zip.dirData) dirDatalength += dl_zip.dirData[i].length;
 

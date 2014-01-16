@@ -83,6 +83,108 @@ function ezBuffer(size) {
 }
 /* }}} */
 
+var Zips = {};
+
+/**
+ *	Pseudo-IO method to simplify zip writings
+ */
+function dlZipIO(realIO, dl) {
+	var self = this
+		, qZips = []
+		, ZipObject
+		, offset = 0
+		, hashes = {}
+		, dirData = []
+		, pos = 0
+		, entryPos = 0
+
+	this.download = function(name) {
+		var doDownload = setInterval(function(){
+			if (dl.decrypt != 0) return;
+			
+			var end = ZipObject.writeSuffix(offset, dirData);
+			$.each(dirData, function(key, value) {
+				realIO.write(value, offset, function() {});
+				offset += value.length;
+			});
+
+			realIO.write(end, offset, function() {
+				realIO.download(name);
+			});
+			clearInterval(doDownload);
+		}, 100);
+	}
+
+	this.write = function(buffer, position, next, task) {
+		if ($.inArray(task.download.id, qZips)==-1) {
+			qZips.push(task.download.id)
+		}
+
+		if (qZips[0] !== task.download.id || task.pos != pos) {
+			DEBUG("retry ", pos, task.pos, qZips[0], task.download.id);
+			return setTimeout(function() {
+				self.write(buffer, position, next, task);
+			}, 100);
+		}
+
+		if (task.first) {
+			var header = ZipObject.writeHeader(
+				task.path,
+				task.fsize,
+				task.download.t
+			);
+			entryPos = offset;
+			realIO.write(header, offset, function() {});
+			offset += header.length;
+			hashes[task.download.id] = 0;
+		}
+		hashes[task.download.id] = crc32(buffer, hashes[task.download.id], buffer.length);
+
+		realIO.write(buffer, offset, function() {
+			offset += buffer.length;
+			if (task.last) {
+				var centralDir = ZipObject.writeCentralDir(
+					task.path,
+					task.fsize,
+					task.download.t,
+					hashes[task.download.id],
+					false,
+					entryPos 
+				);
+				dirData.push(centralDir.dirRecord)
+				realIO.write(centralDir.dataDescriptor, offset, next);
+				offset += centralDir.dataDescriptor.length;
+				pos     = 0;
+				qZips.shift();
+				return;
+			}
+			next();
+			pos++;
+		}, task);
+	};
+
+	this.begin = function(total_size) {
+		ZipObject = new ZIPClass(total_size);
+		DEBUG("starting download " + dl.zipname + " " + total_size + " bytes");
+		dl.decrypt = 0;
+		dlQueue.pushAll(this.urls, function() {
+			if (dl.cancelled) return;
+			dl.onDownloadComplete(dl_id);
+			var checker = setInterval(function() {
+				if (qZips.length == 0 && dl.decrypt == 0) {
+					clearInterval(checker);
+					dl.onBeforeDownloadComplete(dl.pos);
+					dl.io.download(dl.zipname || dl.n, dl.p);
+				}
+			}, 100);
+		}, function(reschedule, args) {
+			DEBUG("Network failed")	
+		});
+	}
+
+}
+
+
 var ZIPClass = function(totalSize) {
 	var self = this
 		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
@@ -329,18 +431,9 @@ var ZIPClass = function(totalSize) {
 	}
 
 
-	q('writeHeader');
-	q('writeCentralDir');
-	q('writeSuffix');
-
-	function q(name) {
-		var method = self[name];
-		self[name] = function() {
-			var args = Array.prototype.slice.call(arguments);
-			console.warn.apply(console, [name, args]);
-			return method.apply(self, args)
-		};
-	}
+	DEBUG(self, 'writeHeader');
+	DEBUG(self, 'writeCentralDir')
+	DEBUG(self, 'writeSuffix')
 }
 
 // crc32 {{{

@@ -142,10 +142,19 @@ function dlZipIO(realIO, dl) {
 		, dirData = []
 
 	this.download = function(name) {
-		var end = ZipObject.writeSuffix(offset, dirData);
+		$.each(dirData, function(key, value) {
+			realIO.write(value, offset, function() {});
+			offset += value.length;
+		});
 
+		var end = ZipObject.writeSuffix(offset, dirData);
 		realIO.write(end, offset, function() {
-			realIO.download(name);
+			var doDownload = setInterval(function(){
+				if (dl.decrypt == 0) {
+					realIO.download(name);
+					clearInterval(doDownload);
+				}
+			}, 100);
 		});
 	}
 
@@ -201,7 +210,6 @@ function dlZipIO(realIO, dl) {
 			if (dl.cancelled) return;
 			dl.onDownloadComplete(dl_id);
 			var checker = setInterval(function() {
-				DEBUG("XXXYYY: " + dl.decrypt);
 				if (dl.decrypt == 0) {
 					clearInterval(checker);
 					dl.onBeforeDownloadComplete(dl.pos);

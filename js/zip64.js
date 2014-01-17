@@ -166,7 +166,6 @@ function dlZipIO(realIO, dl) {
 	this.begin = function(total_size) {
 		ZipObject = new ZIPClass(total_size);
 		DEBUG("starting download " + dl.zipname + " " + total_size + " bytes");
-		dl.decrypt = 0;
 		dlQueue.pushAll(this.urls, function() {
 			if (dl.cancelled) return;
 			dl.onDownloadComplete(dl_id);
@@ -177,9 +176,7 @@ function dlZipIO(realIO, dl) {
 					dl.io.download(dl.zipname || dl.n, dl.p);
 				}
 			}, 100);
-		}, function(reschedule, args) {
-			DEBUG("Network failed")	
-		});
+		}, failureFunction);
 	}
 
 }

@@ -128,6 +128,9 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	return {chunks: dl_chunks, offsets: dl_chunksizes};
 }
 
+function failureFunction(reschedule, args) {
+}
+
 DownloadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments)
 		, id = pos -1
@@ -163,6 +166,7 @@ DownloadQueue.prototype.push = function() {
 	dl.progress = 0;
 	dl.macs  = {}
 	dl.urls	 = []
+	dl.decrypt = 0;
 
 	dlIO.begin = function() {
 		var tasks = [];
@@ -210,7 +214,6 @@ DownloadQueue.prototype.push = function() {
 			});
 		});
 
-		dl.decrypt = 0;
 		dlQueue.pushAll(tasks, function() {
 			if (dl.cancelled) return;
 			dl.onDownloadComplete(dl_id);
@@ -221,9 +224,7 @@ DownloadQueue.prototype.push = function() {
 					dl.io.download(dl.zipname || dl.n, dl.p);
 				}
 			}, 100);
-		}, function(reschedule, args) {
-			DEBUG("Network failed")	
-		});
+		}, failureFunction);
 
 		// notify the UI
 		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);

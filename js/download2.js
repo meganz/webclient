@@ -150,9 +150,11 @@ DownloadQueue.prototype.push = function() {
 				url: [],
 			};
 		}
-		Zips[dl.zipid].queue[dl_id] = [dl, Zips[dl.zipid].size];
-		Zips[dl.zipid].size += dl.size;
-		Zips[dl.zipid].offset = 0;
+		var tZip = Zips[dl.zipid];
+		tZip.queue[dl_id] = [dl, Zips[dl.zipid].size];
+		tZip.offset = 0;
+		tZip.IO.progress = 0;
+		tZip.size += dl.size;
 	}
 
 	if (!use_workers) {
@@ -163,7 +165,11 @@ DownloadQueue.prototype.push = function() {
 	dl.dl_id = dl_id;  // download id
 	dl.io    = dlIO;
 	dl.nonce = dl_keyNonce
-	dl.progress = 0;
+	// Use IO object to keep in track of progress
+	// and speed
+	dl.io.progress = 0;
+	dl.io.size     = dl.size;
+
 	dl.macs  = {}
 	dl.urls	 = []
 	dl.decrypt = 0;
@@ -177,6 +183,7 @@ DownloadQueue.prototype.push = function() {
 				, offset = queue[1]
 
 			var pos = 0;
+			Zip.IO.size = Zip.size;
 			$.each(object.urls, function(id, url) {
 				url.first		= id == 0
 				url.last		= object.urls.length-1 == id

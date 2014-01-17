@@ -132,21 +132,23 @@ function downloader(task) {
 
 		// Update global progress (per download) and aditionally
 		// update the UI
-		if (download.dl_lastprogress+250 > new Date().getTime() && !force) {
+		if (io.dl_lastprogress+250 > new Date().getTime() && !force) {
 			// too soon
 			return false;
 		}
 
+		DEBUG([download.dl_id, io.size, io.progress, download.zipid]);
+
 		download.onDownloadProgress(
 			download.dl_id, 
-			download.progress, // global progress
-			download.size, // total download size
-			io.dl_xr.update(download.progress - download.dl_prevprogress),  // speed
+			io.progress, // global progress
+			io.size, // total download size
+			io.dl_xr.update(io.progress - io.dl_prevprogress),  // speed
 			download.pos // this download position
 		);
 
-		download.dl_prevprogress = download.progress
-		download.dl_lastprogress = new Date().getTime();
+		io.dl_prevprogress = io.progress
+		io.dl_lastprogress = new Date().getTime();
 	}
 
 
@@ -176,7 +178,7 @@ function downloader(task) {
 	xhr.onprogress = function(e) {
 		if (isCancelled()) return;
 
-		download.progress += e.loaded - prevProgress;
+		io.progress += e.loaded - prevProgress;
 		prevProgress = e.loaded
 		updateProgress();
 	};
@@ -185,7 +187,7 @@ function downloader(task) {
 		if (isCancelled()) return;
 		if (this.readyState == this.DONE) {
 			var r = this.response || {};
-			download.progress += r.byteLength - prevProgress;
+			io.progress += r.byteLength - prevProgress;
 			updateProgress(true);
 			iRealDownloads--;
 

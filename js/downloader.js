@@ -137,8 +137,6 @@ function downloader(task) {
 			return false;
 		}
 
-		DEBUG([download.dl_id, io.size, io.progress, download.zipid]);
-
 		download.onDownloadProgress(
 			download.dl_id, 
 			io.progress, // global progress

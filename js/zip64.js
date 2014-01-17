@@ -168,7 +168,7 @@ function dlZipIO(realIO, dl) {
 		DEBUG("starting download " + dl.zipname + " " + total_size + " bytes");
 		dlQueue.pushAll(this.urls, function() {
 			if (dl.cancelled) return;
-			dl.onDownloadComplete(dl_id);
+			fm_zipcomplete(dl.zipid);
 			var checker = setInterval(function() {
 				if (qZips.length == 0 && dl.decrypt == 0) {
 					clearInterval(checker);

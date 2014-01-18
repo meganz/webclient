@@ -34,6 +34,7 @@ function FlashIO(dl_id) {
 		// dl_filename = filename;
 		// dl_chunks   = chunks;
 		// dl_chunksizes = sizes;
+		IO.begin();
 	};
 }
 FlashIO.warn = true;

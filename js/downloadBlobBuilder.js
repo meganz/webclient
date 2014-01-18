@@ -1,5 +1,6 @@
 function BlobBuilderIO(dl_id) {
-	var dl_blob;
+	var dl_blob
+		, IO = this
 
 	this.write = function (buffer, position, done) {
 		dl_blob.append(have_ab ? buffer : buffer.buffer);
@@ -17,6 +18,7 @@ function BlobBuilderIO(dl_id) {
 		// dl_chunks   = chunks;
 		// dl_chunksizes = sizes;
 		dl_blob = new MSBlobBuilder();
+		IO.begin();
 	};
 }
 BlobBuilderIO.warn = true;

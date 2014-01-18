@@ -1,5 +1,6 @@
 function MemoryIO(dl_id) {
-	var dl_blob_array;
+	var dl_blob_array
+		, IO = this
 
 	this.write = function (buffer, position, done) {
 		dl_blob_array.push(new Blob([buffer]));
@@ -25,5 +26,6 @@ function MemoryIO(dl_id) {
 		// dl_chunks   = chunks;
 		// dl_chunksizes = sizes;
 		dl_blob_array = [];
+		IO.begin();
 	};
 }

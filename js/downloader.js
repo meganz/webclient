@@ -1,5 +1,6 @@
-function getXhr() {
-	var dl_xhr = new XMLHttpRequest;			
+
+function getXhrObject() {
+	var dl_xhr = new XMLHttpRequest;
 	if (dl_xhr.overrideMimeType) {
 		dl_xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
@@ -80,15 +81,9 @@ var iRealDownloads = 0
 
 
 function downloader(task) {
-	if (dl_legacy_ie) {
-		alert("not yet implemented");
-		console.trace();
-		return;
-	}
-
 	iRealDownloads++;
 
-	var xhr = getXhr()
+	var xhr = getXhrObject()
 		, Scheduler = this
 		, url = task.url
 		, size = task.size

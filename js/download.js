@@ -882,7 +882,7 @@ function flash_dlprogress(p,numbytes)
 	dl_updateprogress();
 }
 
-function dl_flashdldata(p,data,httpcode)
+function dl_flashdldatax(p,data,httpcode)
 {
 	dl_flash_connections--;
 	if (data == 'ERROR' || httpcode != 200)

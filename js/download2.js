@@ -16,61 +16,41 @@ $.len = function(obj) {
 
 /**
  *	Override the downloader scheduler method.
- *	Basically pick up chunks from different files if possible:
+ *	The idea is to select chunks from the same
+ *	file_id, always
  */
-dlQueue.getNextTask = function() {
-	var queue = {}
-		, self = this
-		, status = []
-		, candidate = null
-		, dlCandidate
+dlQueue.getNextTask = (function() {
+	/* private variable to keep in track
+	   the current file id */
+	var current = null; 
+	return function() {
+		var queue = {}
+			, self = this
+			, candidate
 
-	/** check which files are being downloaded now */
-	$.each(self._running, function(p, pzTask) {
-		var id = pzTask.task.task.download.dl_id;
-		if (!queue[id]) { 
-			queue[id] = 0;
+		if (current) {
+			$.each(self._queue, function(p, pzTask) {
+				if (pzTask.task.download.dl_id == current) {
+					candidate = p;
+					return false; /* break */
+				}
+			});
 		}
-		queue[id]++;
-	});
 
-	/** select the file with less chunks being downloaded */
-	var tmp = 0xffffff
-	$.each(queue, function(p, total) {
-		if (tmp > total) {
-			tmp = total;
-			dlCandidate = p
+		if (candidate) {
+			candidate = self._queue.splice(candidate, 1);
+		} else {
+			/** just pick up the older chunk */
+			candidate =  self._queue.shift();
 		}
-	});
 
-	/** select our candidate file **/
-	$.each(self._queue, function(p, task) {
-		var id = task.task.download.dl_id
-		if (!queue[id]) {
-			/** file with no chunks downloaded at all */
-			candidate = id;
-			return false; /* break */
-		} else if (id == dlCandidate) {
-			candidate = id;
-		}
-	});
+		current = candidate ? candidate.task.download.dl_id : null;
 
-	if (candidate) {
-		/** select the first chunk from our candidate */
-		var Task = null;
-		$.each(self._queue, function(p, task) {
-			if (task.task.download.dl_id == candidate) {
-				Task = task;
-				self._queue.splice(p, 1);
-				return false;
-			}
-		});
-		if (Task) return Task;
-	}
+		console.warn(['current_id', current]);
 
-	/** just pick up the older chunk */
-	return self._queue.shift();
-};
+		return candidate;
+	};
+})();
 
 if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;

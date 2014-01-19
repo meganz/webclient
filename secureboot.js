@@ -348,7 +348,6 @@ else
 		jsl.push({f:'js/downloadFlash.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});

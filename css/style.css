@@ -4724,8 +4724,7 @@ th.grid-first-th {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 10px 0 0 10px;
-	overflow: hidden;
+	padding: 10px 0 0 10px;	
 	white-space: nowrap;
 	margin-bottom: 9px;
 	position: relative;

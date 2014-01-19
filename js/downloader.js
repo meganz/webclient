@@ -214,3 +214,44 @@ function downloader(task) {
 	xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 	xhr.send();
 }
+
+function getxr()
+{
+	return {
+		update : function(b)
+		{
+			var ts = new Date().getTime();
+			if (b < 0)
+			{
+				this.tb = {};
+				this.st = 0;
+				return 0;
+			}
+			if (b) this.tb[ts] = this.tb[ts] ? this.tb[ts]+b : b;
+			b = 0;			
+			for (t in this.tb)
+			{
+				t = parseInt(t);
+				if (t < ts-this.window) delete this.tb[t];
+				else b += this.tb[t];
+			}			
+			if (!b)
+			{
+				this.st = 0;
+				return 0;
+			}
+			else if (!this.st) this.st = ts;
+
+			if (!(ts -= this.st)) return 0;
+			
+			if (ts > this.window) ts = this.window;
+			
+			return b/ts;
+		},
+
+		tb : {},
+		st : 0,
+		window : 60000
+	}
+}
+

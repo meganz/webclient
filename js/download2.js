@@ -56,6 +56,31 @@ if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;
 }
 
+function checkLostChunks(file)
+{
+	var t = []
+		, dl_key = file.key
+
+	$.each(file.macs, function(i, mac) {
+		t.push(i);
+	});
+	t.sort(function(a, b) {
+		return parseInt(a) - parseInt(b);
+	});
+
+	$.each(t, function(i, v) {
+		t[v] = file.macs[v];
+	});
+
+	var mac = condenseMacs(t,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
+
+	if (have_ab && (dl_key[6] != (mac[0]^mac[1]) || dl_key[7] != (mac[2]^mac[3]))) {
+		return false;
+	}
+
+	return true;
+}
+
 /**
  *	DownloadQueue
  *	
@@ -207,6 +232,10 @@ DownloadQueue.prototype.push = function() {
 			var checker = setInterval(function() {
 				if (dl.decrypt == 0) {
 					clearInterval(checker);
+					if (!checkLostChunks(dl)) {
+						alert("failed");
+						return;
+					}
 					dl.onBeforeDownloadComplete(dl.pos);
 					dl.io.download(dl.zipname || dl.n, dl.p);
 				}
@@ -289,3 +318,5 @@ if (window.webkitRequestFileSystem) {
 }
 
 if(dlMethod.init) dlMethod.init();
+
+var dl_queue = new DownloadQueue

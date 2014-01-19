@@ -723,6 +723,7 @@ function dl_checklostchunk()
 
 	if (dl_write_position == dl_filesize)
 	{
+		debug.trace();
 		if (dl_filesize)
 		{
 			var t = [];

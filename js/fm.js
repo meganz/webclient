@@ -850,7 +850,6 @@ function initContextUI()
 						return false; /* break */
 					}
 				});
-				if ($.zipkill) dl_killzip($.zipkill);				
 			}
 			else if (id && id.indexOf('ul_') > -1)
 			{				
@@ -873,12 +872,18 @@ function initContextUI()
 			$(this).remove();
 		});				
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
-			if (typeof $.sd != 'undefined') { 
-				DEBUG("cancelled file " + $.sd);
-				dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-					return obj.task.download.dl_id !== dl_queue[$.sd].dl_id;
+			DEBUG("cancelled file " + $.sd);
+			dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
+				return $.zipkill ? obj.task.download.zipid !== $.zipkill
+					: obj.task.download.dl_id !== dl_queue[$.sd].dl_id;
+			});
+			dl_queue[$.sd].cancelled = true;
+			if ($.zipkill) {
+				$.each(dl_queue, function(i, file) {
+					if (file.zipid == $.zipkill) {
+						file.cancelled = true;
+					}
 				});
-				dl_queue[$.sd].cancelled = true;
 			}
 		}
 		delete $.su;

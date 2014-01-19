@@ -289,6 +289,15 @@ DownloadQueue.prototype.push = function() {
 	return pos;
 };
 
+function dl_reportstatus(num, code)
+{
+	if (dl_queue[num]) {
+		dl_queue[num].lasterror = code;
+		dl_queue[num].onDownloadError(dl_queue[num].id || dl_queue[num].ph,code);
+	}
+}
+
+
 function dlGetUrl(id, callback) {
 	var object = dl_queue[id] ? dl_queue : id
 		, req = { 

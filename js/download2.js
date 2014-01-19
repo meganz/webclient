@@ -274,6 +274,8 @@ DownloadQueue.prototype.push = function() {
 					dl_reportstatus(dl_id, res.e);
 				}
 			}
+		} else {
+			dl_reportstatus(dl_id, EAGAIN);
 		}
 
 		dl_retryinterval *= 1.2;

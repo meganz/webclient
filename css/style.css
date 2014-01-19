@@ -5141,7 +5141,7 @@ span.search-number {
 	cursor: pointer;
 }
 .context-menu-item.hidden {
-	display:none;
+	display: none;
 }
 .contacts-sorting-by, .contacts-sorting-type {
 	background-position: 0 -4847px;
@@ -11250,9 +11250,12 @@ span.browsers-update {
 	text-align: center;
 	padding: 49px 20px 14px 20px;
 }
+.main-mid-pad.sync-bottom-block.button {
+	padding: 49px 20px 38px 20px;
+}
 .m-client-bottom-block {
 	text-align: center;
-	padding: 49px 20px 49px 20px;
+	padding: 41px 20px 22px 20px;
 }
 .ff-bottom-block {
 	text-align: center;
@@ -13678,15 +13681,15 @@ a.ff-extension-button:hover {
 }
 .top-icons-block {
 	margin-right: 55px;
-	overflow:hidden;
-	height:35px;
+	overflow: hidden;
+	height: 35px;
 }
 .top-icons-block .context-menu-item {
 	display: block;
 	float: left;
 	height: 35px;
 	line-height: 32px;
-	padding-left:50px;
+	padding-left: 50px;
 }
 .top-icons-block .context-menu-divider {
 	height: 35px;
@@ -13867,12 +13870,102 @@ a.ff-extension-button:hover {
 .context-menu-item.more-item:hover {
 	background-position: 15px -348px;
 }
+.sync-top-logo {
+	width: 150px;
+	height: 35px;
+	background-image: url(../images/mega/sync_nw.png);
+	background-size: 148px auto;
+	background-position: center 1px;
+	background-repeat: no-repeat;
+	margin: 38px auto 26px auto;
+}
+.sync-top-txt {
+	font-size: 13px;
+	text-align: center;
+	color: #333333;
+	padding-bottom: 13px;
+}
+.sync-top-txt strong, .sync-short-block li strong {
+	color: #D32600;
+	font-family: 'Open Sans', Arial;
+	font-weight: bold;
+}
+.sync-main-img {
+	width: 700px;
+	height: 446px;
+	margin: 0 auto -26px auto;
+	background-image: url(../images/mega/img_sync.png);
+	background-position: center 1px;
+	background-repeat: no-repeat;
+}
+.sync-white-bl {
+	padding: 33px 20px 18px 20px;
+	width: 980px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0 auto;
+}
+.sync-short-block {
+	width: 50%;
+	float: right;
+	padding: 0 0 0 45px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.sync-short-block:first-child {
+	padding: 0 5px 0 0;
+	float:left;
+}
+.sync-short-block ul {
+	padding: 0;
+	margin: 0;
+}
+.sync-short-block li {
+	list-style: none;
+	font-size: 13px;
+	color: #666666;
+	margin: 0;
+	padding: 7px 0 7px 25px;
+	line-height: 28px;
+	background-image: url(../images/mega/sync_nw.png);
+	background-position: left -128px;
+	background-repeat: no-repeat;
+}
+.main-mid-pad.sync-bottom-block.sync-pad {
+	padding: 0 20px;
+}
+.sync-apps-block {
+	width: 50%;
+	float: left;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border-left: 2px solid white;
+	margin-left: -2px;
+	padding: 49px 0 40px 45px;
+}
+.sync-apps-block:first-child {
+	border-right: 2px solid white;
+	padding: 49px 45px 40px 0;
+	margin: 0;
+	border-left: 0;
+}
  @media only screen and (max-width: 1143px) {
 .powered-popup {
 	margin-left: -30px;
 }
 }
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.sync-top-logo, .sync-short-block li {
+	background-image: url(../images/mega/sync_nw@2x.png);
+	background-size: 148px auto;
+}
+.sync-main-img {
+	background-image: url(../images/mega/img_sync_@2x.png);
+	background-size: 700px auto;
+}
 .top-context-close, .context-menu-item.dropdown span, .context-menu-item.more-item, .top-icons-block .context-menu-item.dropdown span {
  background-image:url(../images/mega/context-top@2x.png);
 background-size:27px auto;

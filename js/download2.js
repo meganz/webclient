@@ -252,7 +252,7 @@ DownloadQueue.prototype.push = function() {
 		if (typeof res == 'object') {
 			res = res[0];
 			if (typeof res == 'number') {
-				dl_reportstatus(dl_id, res.d ? 2 : 1)
+				dl_reportstatus(dl_id, res);
 			} else {
 				if (res.d) {
 					dl_reportstatus(dl_id, res.d ? 2 : 1)

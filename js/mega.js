@@ -1565,7 +1565,7 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid,error)
+	this.dlerror = function(fileid, error)
 	{
 		var errorstr=false;
 		if (d) console.log('dlerror',fileid,error);

@@ -265,9 +265,8 @@ DownloadQueue.prototype.push = function() {
 						dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
 							dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
-						} else {
-							return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 						}
+						return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 					} else {
 						dl_reportstatus(dl_id, EKEY);
 					}

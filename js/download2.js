@@ -133,7 +133,29 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	return {chunks: dl_chunks, offsets: dl_chunksizes};
 }
 
+var dl_lastquotawarning = 0
+	, dl_retryinterval  = 1000
+
 function failureFunction(reschedule, args) {
+	var code = args[1] || 0
+		, task = args[2] || {}
+
+	if (code == 509) {
+		var t = new Date().getTime();
+		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
+			dl_lastquotawarning = t;
+			dl_reportstatus(task.download.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
+			setTimeout(function() {
+				reschedule();
+			}, 60000);
+		}		
+		return;
+	}
+	dl_reportstatus(task.download.pos, EAGAIN);
+	dl_retryinterval *= 1.2;
+	setTimeout(function() {
+		
+	}, dl_retryinterval);
 }
 
 DownloadQueue.prototype.push = function() {
@@ -168,12 +190,12 @@ DownloadQueue.prototype.push = function() {
 
 	dl.pos   = id // download position in the queue
 	dl.dl_id = dl_id;  // download id
-	dl.io    = dlIO;
+	dl.io	= dlIO;
 	dl.nonce = dl_keyNonce
 	// Use IO object to keep in track of progress
 	// and speed
-	dl.io.progress = 0;
-	dl.io.size     = dl.size;
+	dl.io.progress 	= 0;
+	dl.io.size		= dl.size;
 
 	dl.macs  = {}
 	dl.urls	 = []
@@ -197,7 +219,7 @@ DownloadQueue.prototype.push = function() {
 				url.fsize		= dl.size;
 				url.download	= dl;
 				url.download.io	= Zip.IO;
-				url.pos         = pos++;
+				url.pos		 = pos++;
 				Zip.url.push(url);
 			});
 
@@ -233,8 +255,7 @@ DownloadQueue.prototype.push = function() {
 				if (dl.decrypt == 0) {
 					clearInterval(checker);
 					if (!checkLostChunks(dl)) {
-						alert("failed");
-						return;
+						return dl_reportstatus(dl.id, EKEY);
 					}
 					dl.onBeforeDownloadComplete(dl.pos);
 					dl.io.download(dl.zipname || dl.n, dl.p);
@@ -252,10 +273,10 @@ DownloadQueue.prototype.push = function() {
 		if (typeof res == 'object') {
 			res = res[0];
 			if (typeof res == 'number') {
-				dl_reportstatus(dl_id, res);
+				dl_reportstatus(id, res);
 			} else {
 				if (res.d) {
-					dl_reportstatus(dl_id, res.d ? 2 : 1)
+					dl_reportstatus(id, res.d ? 2 : 1)
 				} else if (res.g) {
 					var ab = base64_to_ab(res.at)
 						, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
@@ -268,14 +289,14 @@ DownloadQueue.prototype.push = function() {
 						}
 						return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 					} else {
-						dl_reportstatus(dl_id, EKEY);
+						dl_reportstatus(id, EKEY);
 					}
 				} else {
-					dl_reportstatus(dl_id, res.e);
+					dl_reportstatus(id, res.e);
 				}
 			}
 		} else {
-			dl_reportstatus(dl_id, EAGAIN);
+			dl_reportstatus(id, EAGAIN);
 		}
 
 		dl_retryinterval *= 1.2;

@@ -206,7 +206,7 @@ function downloader(task) {
 					// task?
 					throw new Error("Fixme")
 				}
-				return Scheduler.done(false);
+				return Scheduler.done(false, this.status);
 			}
 			!done && Scheduler.done();
 		}

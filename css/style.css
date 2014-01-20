@@ -15165,7 +15165,7 @@ to {
 	height: 58px;
 	cursor: pointer
 }
-.good-times-left-block .baboom-logo {
+.good-times-left-block .baboom-logo, .good-times-left-block .itunes-logo {
 	background-image: url(../images/mega/ads/ads_sprite.png);
 	background-position: left -214px;
 	background-repeat: no-repeat;
@@ -15176,6 +15176,12 @@ to {
 	height: 46px;
 	display: none;
 	cursor: pointer
+}
+.good-times-left-block .itunes-logo {
+	background-image: url(../images/mega/ads/available_itunes_white.png);
+	background-position: 0 0;
+	right: auto;
+	left:25px;
 }
 .good-times-right-block {
 	right: 0
@@ -15310,7 +15316,7 @@ to {
 	margin-top: 85px;
 	margin-left: 45px
 }
-.good-times-right-block .baboom-logo {
+.good-times-right-block .baboom-logo, .good-times-right-block .itunes-logo {
 	background-image: url(../images/mega/ads/ads_sprite.png);
 	background-position: left -701px;
 	background-repeat: no-repeat;
@@ -15322,7 +15328,17 @@ to {
 	cursor: pointer;
 	z-index: 1
 }
+.good-times-right-block .itunes-logo {
+	background-image: url(../images/mega/ads/available_itunes.png);
+	background-position: 0 0;
+	right:auto;
+	left:25px;
+}
 @media (-webkit-min-device-pixel-ratio:1.325), (min-device-pixel-ratio:1.325) {
+.good-times-right-block .itunes-logo {
+	background-image: url(../images/mega/ads/available_itunes@2x.png);
+	background-size:119px auto;
+}
 .good-times-left-block .title-image {
 	background-image: url(../images/mega/ads/goodtimes_title@2x.png);
 	background-size: 263px 156px;
@@ -15337,6 +15353,10 @@ to {
 	background-image: url(../images/mega/ads/available_baboom_white@2x.png);
 	background-size: 119px 46px;
 	background-position: 0 0
+}
+.good-times-left-block .itunes-logo {
+	background-image: url(../images/mega/ads/available_itunes_white@2x.png);
+	background-size: 119px 46px;
 }
 .good-times-right-block .audio-player .cover-image {
 	background-image: url(../images/mega/ads/album@2x.png);
@@ -15442,7 +15462,7 @@ to {
 .good-times-left-block {
 	width: 341px
 }
-.good-times-left-block .baboom-logo, .good-times-left-block .bottom-gradient {
+.good-times-left-block .baboom-logo, .good-times-left-block .itunes-logo, .good-times-left-block .bottom-gradient {
 	display: block
 }
 }

@@ -83,11 +83,11 @@ var DEFAULT_CONCURRENCY = 4
 				 */
 				function reschedule(ztask) {
 					ztask = ztask || task
-					tasks.push(task);
-					that.push(task, check_finish);
+					tasks.unshift(ztask);
+					that.push(ztask, check_finish);
 				}
 
-				return error(reschedule, args);
+				return error(reschedule, task, args);
 			}
 
 			if (!triggered && tasks.length == 0) {

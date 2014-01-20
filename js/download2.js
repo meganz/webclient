@@ -46,8 +46,6 @@ dlQueue.getNextTask = (function() {
 
 		current = candidate ? candidate.task.download.dl_id : null;
 
-		console.warn(['current_id', current]);
-
 		return candidate;
 	};
 })();
@@ -69,7 +67,7 @@ function checkLostChunks(file)
 	});
 
 	$.each(t, function(i, v) {
-		t[v] = file.macs[v];
+		t[i] = file.macs[v];
 	});
 
 	var mac = condenseMacs(t,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
@@ -136,9 +134,8 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
-function failureFunction(reschedule, args) {
+function failureFunction(reschedule, task, args) {
 	var code = args[1] || 0
-		, task = args[2] || {}
 
 	if (code == 509) {
 		var t = new Date().getTime();
@@ -148,13 +145,14 @@ function failureFunction(reschedule, args) {
 			setTimeout(function() {
 				reschedule();
 			}, 60000);
+			return;
 		}		
-		return;
 	}
+
 	dl_reportstatus(task.download.pos, EAGAIN);
 	dl_retryinterval *= 1.2;
 	setTimeout(function() {
-		
+		reschedule();	
 	}, dl_retryinterval);
 }
 

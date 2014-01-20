@@ -1,9 +1,16 @@
 function MemoryIO(dl_id) {
 	var dl_blob_array
 		, IO = this
+		, offset = 0
 
 	this.write = function (buffer, position, done) {
+		if (position !== offset) {
+			return setTimeout(function() {
+				IO.write(buffer, position, done);
+			}, 100);
+		}
 		dl_blob_array.push(new Blob([buffer]));
+		offset += (have_ab ? buffer : buffer.buffer).length;
 		done();
 	};
 

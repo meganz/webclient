@@ -1,8 +1,9 @@
 function FlashIO(dl_id) {
-	var IO = this;
+	var IO = this
+		, offset = 0
 
 	this.write = function (buffer, position, done) {
-		if (!document.getElementById('dlswf_' + dl_id)) {
+		if (!document.getElementById('dlswf_' + dl_id) || offset !== position) {
 			if (d) console.log("Flash element not yet initialized", dl_id);
 			return setTimeout(function () {
 				IO.write(buffer, position, done);
@@ -21,6 +22,7 @@ function FlashIO(dl_id) {
 			subdata = base64urlencode(buffer.buffer);
 
 		document.getElementById('dlswf_' + dl_id).flashdata(dl_id, subdata);
+		offset += len
 		done();
 	};
 

@@ -1,8 +1,6 @@
-{
-    "devDependencies": {
-        "karma": "~0.10",
-        "karma-jasmine": "~0.1",
-        "karma-coverage": "~0.1"
-    },
-
+ {
+  "devDependencies": {
+    "karma": "~0.10",
+    "karma-mocha": "~0.1"
+  }
 }

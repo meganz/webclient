@@ -494,12 +494,13 @@ function funcAlias(context, fn) {
 }
 
 function makeObservable(kls) {
-    var $obj = $(kls.prototype);
-    kls.prototype.on = funcAlias($obj, $obj.on);
-    kls.prototype.bind = funcAlias($obj, $obj.bind);
-    kls.prototype.unbind = funcAlias($obj, $obj.unbind);
-    kls.prototype.one = funcAlias($obj, $obj.one);
-    kls.prototype.trigger = funcAlias($obj, $obj.trigger);
+    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
+
+    $.each(aliases, function(k, v) {
+        kls.prototype[v] = function() {
+            return $(this)[v].apply($(this), toArray(arguments));
+        }
+    });
 };
 
 function makeMetaAware(kls) {

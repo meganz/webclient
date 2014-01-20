@@ -1,14 +1,14 @@
 module.exports = function(config) {
     config.set({
-        frameworks: ['jasmine'],
+        frameworks: ['mocha'],
 
         files: [
-            "vendor/jasmine-2.0.0/jasmine.js",
-            "vendor/jasmine-2.0.0/jasmine-html.js",
-            "vendor/jasmine-2.0.0/boot.js",
+            "vendor/mocha/mocha.js",
+            "vendor/mocha/chai.js",
+            "vendor/mocha/sinon-chai.js",
+            "vendor/sinon-1.7.3.js",
 
-             "../jquery-min-1.8.1.js",
-             "vendor/jasmine-jquery.js",
+            "../jquery-min-1.8.1.js",
     
              "../functions.js",
              "../vendor/chat/strophe.js",
@@ -28,6 +28,10 @@ module.exports = function(config) {
              "../vendor/chat/otr.js",
              "../chat/rtcSession.js",
              "../chat/karere.js",
+
+            "../tests/src/helpers.js",
+             "../tests/src/unit/*.js",
+             "../tests/src/integration/*.js"
         ],
         // coverage reporter generates the coverage
         reporters: ['progress', 'coverage'],
@@ -43,6 +47,11 @@ module.exports = function(config) {
         coverageReporter: {
             type : 'html',
             dir : 'coverage/'
+        },
+        client: {
+            mocha: {
+                ui: 'bdd'
+            }
         }
     });
 };

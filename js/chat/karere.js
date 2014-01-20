@@ -3,8 +3,36 @@
  */
 
 //TODO: Fix naming conv: https://basecamp.com/1763244/projects/4428869-mega-encrypted-chat/messages/20278286-javascript-dev#comment_121454400
-//TODO: Disconnect on unbeforepageunload - https://github.com/metajack/strophejs/pull/102
 
+
+// Because of several bugs in Strophe's connection handler for Bosh (throwing uncatchable exceptions) this is currently
+// not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
+// Exception:
+// Uncaught InvalidStateError: Failed to execute 'send' on 'XMLHttpRequest': the object's state must be OPENED.
+
+Strophe.Bosh.prototype._hitError = function (reqStatus) {
+    var self = this;
+    var karere = this._conn.karere;
+
+    if(!karere._errors) {
+        karere._errors = 0;
+    }
+    karere._errors++;
+
+    if(localStorage.d)
+        console.warn("request errored, status: " + reqStatus + ", number of errors: " + karere._errors);
+
+    if (karere._errors > karere.options.maxConnectionRetries) {
+        this._onDisconnectTimeout();
+    } else {
+        setTimeout(function() {
+            karere.disconnect()
+                .done(function() {
+                    karere.reconnect();
+                });
+        }, karere._errors * 1000)
+    }
+};
 
 var Karere = function(opts) {
     var self = this;
@@ -64,11 +92,13 @@ var Karere = function(opts) {
         wait_for_user_presence_in_room_timeout: 2000,
 
         disconnect_timeout: 2000,
-        disconnect_queue_timeout: 2000
+        disconnect_queue_timeout: 2000,
+        maxConnectionRetries: 10
     };
     self.options = $.extend(true, {}, defaults, opts);
 
     self.connection = new Strophe.Connection(self.options.boshServiceUrl, self.options.stropheOptions);
+    self.connection.karere = self;
 
     if(localStorage.dxmpp == 1) {
         self.connection.rawInput = function (data) { console.error('RECV: ' + data); };
@@ -83,6 +113,41 @@ var Karere = function(opts) {
 
     // initialize the connection state
     self._connection_state = Karere.CONNECTION_STATE.DISCONNECTED;
+
+    // Implement a straight forward, naive cleanup logic to be executed before the page is reloaded
+    // ideas and references:
+    // - https://github.com/metajack/strophejs/issues/16
+    // -
+    $(window).on("beforeunload", function() {
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            var msg = $pres({
+                type: 'unavailable'
+            });
+
+            self.connection.sync = true;
+
+            self.connection.send(msg);
+
+            self.connection.flush();
+
+            self.connection.disconnect();
+
+            console.warn("flushing out and disconnecting onbeforeunload");
+        }
+    });
+
+
+    // Local in-memory Presence cache implementation
+    self._presence_cache = {};
+
+    self.bind("onPresence", function(e, evt_data) {
+        if(evt_data.show != "unavailable") {
+            self._presence_cache[evt_data.from] = evt_data.show ? evt_data.show : "available";
+        } else {
+            delete self._presence_cache[evt_data.from];
+        }
+    });
 
     // helper functions for simple way of storing/caching some meta info
     return this;
@@ -172,9 +237,9 @@ makeMetaAware(Karere);
                 } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
                     if(localStorage.d) console.warn(self.getJid(), 'Karere failed to connect.');
 
-                    //TODO: Implement auto-retry here?
-
-                    $promise.reject(status);
+                    if(self._errors >= self.options.maxConnectionRetries) {
+                        $promise.reject(status);
+                    }
                     self.trigger('onConnfail');
                 } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
                     if(localStorage.d) console.warn(self.getJid(), 'Karere failed to connect - Authentication issue.');
@@ -186,12 +251,17 @@ makeMetaAware(Karere);
                         console.warn(self.getJid(), 'Karere is disconnecting.');
                     }
 
-                    $promise.reject(status);
+                    if(self._errors >= self.options.maxConnectionRetries) {
+                        $promise.reject(status);
+                    }
+
                     self.trigger('onDisconnecting');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
                     if(localStorage.d) console.info(self.getJid(), 'Karere is disconnected.');
 
-                    $promise.reject(status);
+                    if(self._errors >= self.options.maxConnectionRetries) {
+                        $promise.reject(status);
+                    }
                     self.trigger('onDisconnected');
                 } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
                     if(localStorage.d) console.info(self.getJid(), 'Karere is connected.');
@@ -199,6 +269,8 @@ makeMetaAware(Karere);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
 
+
+                    self._errors = 0; // reset connection errors
 
                     self.setPresence(); // really important...if we dont call this...the user will not be visible/online to the others in the roster
                                         // so no messages will get delivered.
@@ -231,18 +303,26 @@ makeMetaAware(Karere);
             /**
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and _password
              */
-            if(self.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+            if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+                console.warn("Tried to call ", fn_name, ", while Karere is still in CONNECTING state.");
+
+                internal_promises.push(
+                    createTimeoutPromise(
+                        function() {
+                            self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
+                        },
+                        200,
+                        1000
+                    )
+                );
+            }
+            else if(self.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
                 console.warn("Tried to call ", fn_name, ", but Karere is not connected. Will try to reconnect first.");
 
                 internal_promises.push(
                     self.reconnect()
                 );
             }
-
-            /**
-             * TODO: do some kind of connection retry + counting and timeout
-             * PS: http://stackoverflow.com/a/9427465
-             */
 
             $.when.apply($, internal_promises)
                 .done(function() {
@@ -267,7 +347,8 @@ makeMetaAware(Karere);
         var self = this;
 
         if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED) {
-           throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
+            debugger;
+            throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
         }
         if(!self._jid || !self._password) {
             throw new Error("Missing jid or password.");
@@ -321,7 +402,7 @@ makeMetaAware(Karere);
             function() {
                 return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED;
             },
-            500,
+            200,
             self.options.disconnect_timeout
         );
     };
@@ -376,6 +457,11 @@ makeMetaAware(Karere);
     Karere.prototype.getJid = function() {
         var self = this;
         return self.connection.jid;
+    };
+
+    Karere.prototype.getNickname = function() {
+        var self = this;
+        return self.connection.jid.split("@")[0];
     };
 
     Karere.error = function() {
@@ -472,14 +558,32 @@ makeMetaAware(Karere);
 
                     // if not...set the message property
                 evt_data['message'] = Strophe.getText(elems[0]);
+
+                // is this a forwarded message? if yes, trigger event only for that
+                if(msg.getElementsByTagName("forwarded").length > 0) {
+                    self._onIncomingStanza(msg.getElementsByTagName("forwarded")[0].childNodes[1]);
+
+                    // stop
+                    return true;
+                }
             } else if(_type == "groupchat") {
                 stanza_type = "ChatMessage";
+
+                evt_data['message'] = Strophe.getText(elems[0]);
+
+                // is this a forwarded message? if yes, trigger event only for that
+                if(msg.getElementsByTagName("forwarded").length > 0) {
+                    self._onIncomingStanza(msg.getElementsByTagName("forwarded")[0].childNodes[1]);
+
+                    // stop
+                    return true;
+                }
 
                 /**
                  * XXX: check the message, maybe this is an OTR req?
                  */
 
-                evt_data['message'] = Strophe.getText(elems[0]);
+
             } else if(!_type && msg.getElementsByTagName("event").length > 0) {
                 stanza_type = "EventMessage";
             } else if(x.length > 0 && x[0].getAttribute("xmlns") == "jabber:x:conference") {
@@ -632,7 +736,7 @@ makeMetaAware(Karere);
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
-            x = self.connection.send(
+            self.connection.send(
                 $pres()
                     .c("show")
                     .t(presence)
@@ -643,6 +747,13 @@ makeMetaAware(Karere);
             );
         }
     };
+
+
+    Karere.prototype.getPresence = function(jid) {
+        var self = this;
+
+        return self._presence_cache[jid] ? self._presence_cache[jid] : false;
+    }
 }
 
 /**
@@ -666,18 +777,24 @@ makeMetaAware(Karere);
 
     Karere.prototype.sendIsComposing = function(to_jid) {
         var self = this;
-        self._rawSendMessage(to_jid, "chat", Karere._$chatState('composing'));
+
+        return self._rawSendMessage(to_jid, "chat", Karere._$chatState('composing'));
     };
 
     Karere.prototype.sendComposingPaused = function(to_jid) {
         var self = this;
         self._rawSendMessage(to_jid, "chat", Karere._$chatState('paused'));
-        self.sendIsActive(to_jid);
+
+        return $.when(
+            self.sendIsActive(to_jid),
+            self._rawSendMessage(to_jid, "chat", Karere._$chatState('paused'))
+        );
+
     };
 
     Karere.prototype.sendIsActive = function(to_jid) {
         var self = this;
-        self._rawSendMessage(to_jid, "chat", Karere._$chatState('active'));
+        return self._rawSendMessage(to_jid, "chat", Karere._$chatState('active'));
     };
 }
 
@@ -955,12 +1072,12 @@ makeMetaAware(Karere);
 }
 
 
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsComposing'); //XXX: MUST return a promise, some day.
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendComposingPaused'); //XXX: MUST return a promise, some day.
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsActive'); //XXX: MUST return a promise, some day.
-//Karere._requiresConnectionWrapper(Karere.prototype, 'setPresence'); //XXX: MUST return a promise, some day.
-//Karere._requiresConnectionWrapper(Karere.prototype, '_rawSendMessage'); //XXX: MUST return a promise, some day.
-//Karere._requiresConnectionWrapper(Karere.prototype, 'getUsersInChat'); //XXX: MUST return a promise, some day.
+//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsComposing'); //XXX: MUST return a promise, some day - Feature #49
+//Karere._requiresConnectionWrapper(Karere.prototype, 'sendComposingPaused'); //XXX: MUST return a promise, some day - Feature #49
+//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsActive'); //XXX: MUST return a promise, some day - Feature #49
+//Karere._requiresConnectionWrapper(Karere.prototype, 'setPresence'); //XXX: MUST return a promise, some day - Feature #49
+//Karere._requiresConnectionWrapper(Karere.prototype, '_rawSendMessage'); //XXX: MUST return a promise, some day - Feature #49
+//Karere._requiresConnectionWrapper(Karere.prototype, 'getUsersInChat'); //XXX: MUST return a promise, some day - Feature #49
 
 
 Karere._requiresConnectionWrapper(Karere.prototype, 'startChat');

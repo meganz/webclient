@@ -1,17 +1,23 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <title>Mocha</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Jasmine Spec Runner v2.0.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="vendor/mocha/mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="vendor/mocha/mocha.js"></script>
+    <script src="vendor/mocha/chai.js"></script>
+    <script src="vendor/mocha/sinon-chai.js"></script>
+    <script src="vendor/sinon-1.7.3.js"></script>
 
-    <link rel="shortcut icon" type="image/png" href="vendor/jasmine-2.0.0/jasmine_favicon.png">
-    <link rel="stylesheet" type="text/css" href="vendor/jasmine-2.0.0/jasmine.css">
-
-    <script type="text/javascript" src="vendor/jasmine-2.0.0/jasmine.js"></script>
-    <script type="text/javascript" src="vendor/jasmine-2.0.0/console.js"></script>
-    <script type="text/javascript" src="vendor/jasmine-2.0.0/jasmine-html.js"></script>
-    <script type="text/javascript" src="vendor/jasmine-2.0.0/boot.js"></script>
-
+    <script>
+        // Disabled because of Stropheks
+//        mocha.checkLeaks();
+        mocha.setup('bdd');
+    </script>
 
 
     <!-- test - required libs -->
@@ -47,39 +53,15 @@
     <script type="text/javascript" src="src/helpers.js"></script>
 
     <!-- include spec files here... -->
-    <script type="text/javascript" src="spec/SpecHelper.js"></script>
+    <!--<script type="text/javascript" src="spec/SpecHelper.js"></script>-->
 
     <!-- include source files here... -->
     <script type="text/javascript" src="src/unit/eventmocker.js"></script>
     <script type="text/javascript" src="src/unit/karere.js"></script>
     <script type="text/javascript" src="src/integration/chat_integration.js"></script>
 
-
-
-    <script type="text/javascript">
-        function fixIt() {
-            window.it = function() {
-                return jasmine.getEnv().it.apply(jasmine.getEnv(), arguments);
-            }
-        }
-
-        function immediateErrorOutput() {
-            var theOriginalFail = jasmine.Spec.prototype.fail;
-            jasmine.Spec.prototype.fail = function (e) {
-                theOriginalFail.apply(this, arguments);
-                console.error(e ? jasmine.util.formatException(e) : "Exception");
-            };
-        }
-
-        fixIt();
-        immediateErrorOutput();
-
-        jasmine.getEnv().addReporter(
-                new getJasmineRequireObj().ConsoleReporter()
-        );
+    <script>
+      mocha.run();
     </script>
-</head>
-
-<body>
-</body>
+  </body>
 </html>

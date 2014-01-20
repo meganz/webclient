@@ -11,19 +11,18 @@ beforeEach(function () {
 //                }
 //            };
 //        },
-        toBeResolved: function () {
+        forceFail: function () {
             return {
                 compare: function (actual, msg) {
                     var $promise = actual;
 
                     var result = {
-                        pass: $promise.state() === "resolved"
+                        pass: false
                     };
 
-                    if(!result.pass) {
-                        result.message = "Expected promise to be resolved: " + msg;
-                        console.error(result.message);
-                    }
+
+                    result.message = "Test failed: " + msg;
+                    console.error(result.message);
 
                     return result;
                 }

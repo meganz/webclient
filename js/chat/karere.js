@@ -34,6 +34,14 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
     }
 };
 
+/**
+ * Create new Karere instance.
+ *
+ *
+ * @param opts
+ * @returns {Karere}
+ * @constructor
+ */
 var Karere = function(opts) {
     var self = this;
 
@@ -80,10 +88,6 @@ var Karere = function(opts) {
             "muc#roomconfig_allowvoicerequests": 1,
             "muc#roomconfig_voicerequestmininterval": 1800
         },
-        /**
-         * Will be auto populated from the username@... on connect
-         */
-        "displayName": false,
 
         /**
          * Timeout for the addUserToChat promise...will wait for that much ms and reject the promise
@@ -91,8 +95,19 @@ var Karere = function(opts) {
          */
         wait_for_user_presence_in_room_timeout: 2000,
 
+        /**
+         * Timeout for waiting before rejecting the .disconnect promise
+         */
         disconnect_timeout: 2000,
+
+        /**
+         * Timeout for waiting the queue of waiting stanzas to be send before rejecting and doing forced disconnect
+         */
         disconnect_queue_timeout: 2000,
+
+        /**
+         * Maximum connection retry in case of error
+         */
         maxConnectionRetries: 10
     };
     self.options = $.extend(true, {}, defaults, opts);
@@ -153,7 +168,11 @@ var Karere = function(opts) {
     return this;
 };
 
-// alias the Strophe Connection Status states
+
+/**
+ * alias the Strophe Connection Status states
+ * @type {Status|*}
+ */
 Karere.CONNECTION_STATE = Strophe.Status;
 
 // make observable via .on, .bind, .trigger, etc
@@ -167,17 +186,27 @@ makeMetaAware(Karere);
  * Connection handling
  */
 {
+    /**
+     * Returns the current connection's state.
+     * See Karere.CONNECTION_STATE
+     *
+     * @returns {.Status.*|*}
+     */
     Karere.prototype.getConnectionState = function() {
         var self = this;
         return self._connection_state;
     };
-
 
     /**
      * Strophe will remove ANY handler if it raises an exception... so this is a helper wrapper to catch and log exceptions
      * with stack trace (if any).
      *
      * To be used when calling Strophe.addHandler
+     *
+     * @param fn
+     * @param context
+     * @returns {Function}
+     * @private
      */
     Karere._exceptionSafeProxy = function(fn, context) {
         return function() {
@@ -190,6 +219,13 @@ makeMetaAware(Karere);
         }
     };
 
+    /**
+     * Connect to a XMPP account
+     *
+     * @param jid
+     * @param password
+     * @returns {Deferred}
+     */
     Karere.prototype.connect = function(jid, password) {
         var self = this;
 
@@ -212,11 +248,6 @@ makeMetaAware(Karere);
 
         // parse and cache the muc_domain
         self.options.muc_domain = "conference." + jid.split("@")[1].split("/")[0];
-
-        if(!self.options.displayName) {
-            self.options.displayName = jid.split("@")[0];
-        }
-
 
 
 
@@ -290,6 +321,16 @@ makeMetaAware(Karere);
     };
 
 
+    /**
+     * Helper wrapper, that should be used in conjuction w/ ANY method of Karere, which requires a XMPP connection to
+     * be available when called.
+     * This wrapper will wrap around the original method and create a proxy promise (if needed), that will create the
+     * connection before calling the actual method which is wrapped.
+     *
+     * @param proto
+     * @param fn_name
+     * @private
+     */
     Karere._requiresConnectionWrapper = function (proto, fn_name) {
         var fn = proto[fn_name];
         proto[fn_name] = function() {
@@ -343,6 +384,11 @@ makeMetaAware(Karere);
     };
 
 
+    /**
+     * Simple reconnect method
+     *
+     * @returns {Deferred}
+     */
     Karere.prototype.reconnect = function() {
         var self = this;
 
@@ -358,6 +404,13 @@ makeMetaAware(Karere);
     };
 
 
+    /**
+     * Simple internal method that will return a promise, which will be marked as resolved only when there are no more
+     * queued stanzas or fail if the waiting exceed self.options.disconnect_queue_timeout
+     *
+     * @returns {*}
+     * @private
+     */
     Karere.prototype._waitForRequestQueueToBeEmpty = function() {
         var self = this;
 
@@ -366,6 +419,11 @@ makeMetaAware(Karere);
         }, 500, self.options.disconnect_queue_timeout)
     };
 
+    /**
+     * Disconnect Karere from the XMPP server
+     *
+     * @returns {Deferred|*}
+     */
     Karere.prototype.disconnect = function() {
         var self = this;
 
@@ -412,6 +470,13 @@ makeMetaAware(Karere);
  * Utils
  */
 {
+    /**
+     * Internal method to be used for generating incremental indexes (specially designed to be used for generating
+     * /resource-ids, but used in many places in the Karere code)
+     *
+     * @returns {number}
+     * @private
+     */
     Karere.prototype._generateNewIdx = function() {
         if(!localStorage.karereIdx) {
             localStorage.karereIdx = 0;
@@ -426,11 +491,23 @@ makeMetaAware(Karere);
         return localStorage.karereIdx;
     };
 
+    /**
+     * Helper for generating an MD5 hexdigest that can be used as a XMPP /resource
+     *
+     * @returns {*}
+     * @private
+     */
     Karere.prototype._generateNewResourceIdx = function () {
         var self = this;
         return MD5.hexdigest(window.navigator.userAgent.toString() + "-" + (new Date()).getTime() + "-" + self._generateNewIdx());
     };
 
+    /**
+     * Generator for semi-random Room IDs
+     *
+     * @returns {string}
+     * @private
+     */
     Karere.prototype._generateNewRoomIdx = function() {
         var self = this;
         return self.getJid().split("@")[0] + "-" + MD5.hexdigest(
@@ -438,6 +515,12 @@ makeMetaAware(Karere);
         );
     };
 
+    /**
+     * Generate new semi-random room password
+     *
+     * @returns {*}
+     * @private
+     */
     Karere.prototype._generateNewRoomPassword = function() {
         var self = this;
         return MD5.hexdigest(
@@ -449,21 +532,42 @@ makeMetaAware(Karere);
         );
     };
 
+
+    /**
+     * Returns a string of the Bare JID (e.g. user@domain.com)
+     *
+     * @returns {*}
+     */
     Karere.prototype.getBareJid = function() {
         var self = this;
         return Strophe.getBareJidFromJid(self.connection.jid);
     };
 
+    /**
+     * Return the full jid of the user (e.g. user@domain.com/resource)
+     *
+     * @returns {iq.jid|*|jid|item.jid|Occupant.jid|string}
+     */
     Karere.prototype.getJid = function() {
         var self = this;
         return self.connection.jid;
     };
 
+    /**
+     * Returns the nickname/username of the currently connected user (e.g. lpetrov, in case of the bare jid is
+     * lpetrov@mega.co.nz)
+     *
+     * @returns {*}
+     */
     Karere.prototype.getNickname = function() {
         var self = this;
         return self.connection.jid.split("@")[0];
     };
 
+    /**
+     * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
+     * console.
+     */
     Karere.error = function() {
         console.error(toArray(arguments).join(" "));
     }
@@ -476,6 +580,13 @@ makeMetaAware(Karere);
 {
     //TODO: Refactor this to be moooore easier to read and debug.
 
+    /**
+     * THE handler of incoming stanzas (both msg and presence)
+     *
+     * @param msg
+     * @returns {boolean}
+     * @private
+     */
     Karere.prototype._onIncomingStanza = function (msg) {
         var self = this;
 
@@ -598,7 +709,7 @@ makeMetaAware(Karere);
 
                 self.connection.muc.join(
                     evt_data['room'],
-                    self.options.displayName,
+                    self.getNickname(),
                     undefined,
                     undefined,
                     undefined,
@@ -666,6 +777,14 @@ makeMetaAware(Karere);
         return true;
     };
 
+    /**
+     * Helper method that should be used when triggering events on specific Stanzas
+     *
+     * @param stanza_type
+     * @param evt_data
+     * @returns {boolean}
+     * @private
+     */
     Karere.prototype._triggerEvent = function (stanza_type, evt_data) {
         var self = this;
 
@@ -718,9 +837,9 @@ makeMetaAware(Karere);
  * Presence impl.
  */
 {
-    //TODO: Roster support cache locally - in-mem
     //TODO: Send new presence to Group chat presence when this is called
     /**
+     * Change the currently logged in user presence
      *
      * @param presence - string - see rfc3921:
      *   away -- The entity or resource is temporarily away.
@@ -749,6 +868,12 @@ makeMetaAware(Karere);
     };
 
 
+    /**
+     * Get presence for a specific jid (full jid!)
+     *
+     * @param jid
+     * @returns {*} presence OR false if not online.
+     */
     Karere.prototype.getPresence = function(jid) {
         var self = this;
 
@@ -775,12 +900,24 @@ makeMetaAware(Karere);
         );
     };
 
+    /**
+     * Send Is Composing chat state
+     *
+     * @param to_jid
+     * @returns {*}
+     */
     Karere.prototype.sendIsComposing = function(to_jid) {
         var self = this;
 
         return self._rawSendMessage(to_jid, "chat", Karere._$chatState('composing'));
     };
 
+    /**
+     * Send Composing stopped/paused chat state
+     *
+     * @param to_jid
+     * @returns {*}
+     */
     Karere.prototype.sendComposingPaused = function(to_jid) {
         var self = this;
         self._rawSendMessage(to_jid, "chat", Karere._$chatState('paused'));
@@ -792,6 +929,13 @@ makeMetaAware(Karere);
 
     };
 
+
+    /**
+     * Send Is Active chat state
+     *
+     * @param to_jid
+     * @returns {*}
+     */
     Karere.prototype.sendIsActive = function(to_jid) {
         var self = this;
         return self._rawSendMessage(to_jid, "chat", Karere._$chatState('active'));
@@ -804,6 +948,14 @@ makeMetaAware(Karere);
  * One to one and Group Chat Implementation (Karere logic for translating Karere calls <-> XMPP stanzas and events)
  */
 {
+    /**
+     * Messaging, encapsulated in one method
+     *
+     * @param to_jid
+     * @param type should be chat or groupchat
+     * @param contents
+     * @private
+     */
     Karere.prototype._rawSendMessage = function (to_jid, type, contents) {
         var self = this;
 
@@ -838,6 +990,13 @@ makeMetaAware(Karere);
         //XXX: Use promise and wait for confirmation of this message to resolve/reject (timeout) it.
     };
 
+    /**
+     * Generates room config XML from the self.options.roomConfig to be used and sent as stanza when creating new rooms
+     *
+     * @param room_password
+     * @returns {HTMLElement[]}
+     * @private
+     */
     Karere.prototype._getRoomConfig = function(room_password) {
         var self = this;
 
@@ -863,6 +1022,12 @@ makeMetaAware(Karere);
         return Strophe.xmlHtmlNode(config_data).children[0].children;
     };
 
+    /**
+     * Start/create new chat, wait for the room creations, send invites and wait for all users to join.
+     *
+     * @param jid_list array of jids to be invited to the chat
+     * @returns {Deferred}
+     */
     Karere.prototype.startChat = function(jid_list) {
         var self = this;
 
@@ -874,7 +1039,7 @@ makeMetaAware(Karere);
 
         self.setMeta("rooms", room_jid, 'password', room_password);
 
-        self.connection.muc.join(room_jid, self.options.displayName, undefined, undefined, undefined, room_password, undefined);
+        self.connection.muc.join(room_jid, self.getNickname(), undefined, undefined, undefined, room_password, undefined);
 
         var i_had_joined_promise = self.waitForUserToJoin(room_jid, self.getJid());
 
@@ -926,6 +1091,15 @@ makeMetaAware(Karere);
         return $promise;
     };
 
+    /**
+     * Helper/internal method for waiting for a user's presence in a specific room.
+     *
+     * @param event_type Joined/Left
+     * @param chat_jid
+     * @param user_jid
+     * @returns {Deferred}
+     * @private
+     */
     Karere.prototype._waitForUserPresenceInRoom = function(event_type, chat_jid, user_jid) {
         var self = this;
 
@@ -973,13 +1147,36 @@ makeMetaAware(Karere);
 
         return $promise;
     };
+
+    /**
+     * Wait for user to join
+     *
+     * @param chat_jid
+     * @param user_jid
+     * @returns {Deferred}
+     */
     Karere.prototype.waitForUserToJoin = function(chat_jid, user_jid) {
         return this._waitForUserPresenceInRoom("Joined", chat_jid, user_jid);
     };
+
+    /**
+     * Wait for user to leave
+     *
+     * @param chat_jid
+     * @param user_jid
+     * @returns {Deferred}
+     */
     Karere.prototype.waitForUserToLeave = function(chat_jid, user_jid) {
         return this._waitForUserPresenceInRoom("Left", chat_jid, user_jid);
     };
 
+    /**
+     * Leave chat
+     *
+     * @param chat_jid
+     * @param exit_msg
+     * @returns {Deferred}
+     */
     Karere.prototype.leaveChat = function(chat_jid, exit_msg) {
         var self = this;
 
@@ -997,6 +1194,14 @@ makeMetaAware(Karere);
         return $promise;
     };
 
+    /**
+     * Invite a user to a specific chat
+     *
+     * @param chat_jid
+     * @param user_jid
+     * @param password
+     * @returns {Deferred}
+     */
     Karere.prototype.addUserToChat = function(chat_jid, user_jid, password) {
         var self = this;
 
@@ -1013,6 +1218,14 @@ makeMetaAware(Karere);
         return $promise;
     };
 
+    /**
+     * Remove a user from a chat room
+     *
+     * @param chat_jid
+     * @param user_jid
+     * @param reason
+     * @returns {Deferred}
+     */
     Karere.prototype.removeUserFromChat = function(chat_jid, user_jid, reason) {
         var self = this;
 
@@ -1064,6 +1277,12 @@ makeMetaAware(Karere);
         return $promise;
     };
 
+    /**
+     * Get users in chat
+     *
+     * @param chat_jid
+     * @returns {*}
+     */
     Karere.prototype.getUsersInChat = function(chat_jid) {
         var self = this;
         var users = self.getMeta('rooms', chat_jid, 'users', {});
@@ -1072,15 +1291,20 @@ makeMetaAware(Karere);
 }
 
 
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsComposing'); //XXX: MUST return a promise, some day - Feature #49
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendComposingPaused'); //XXX: MUST return a promise, some day - Feature #49
-//Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsActive'); //XXX: MUST return a promise, some day - Feature #49
-//Karere._requiresConnectionWrapper(Karere.prototype, 'setPresence'); //XXX: MUST return a promise, some day - Feature #49
-//Karere._requiresConnectionWrapper(Karere.prototype, '_rawSendMessage'); //XXX: MUST return a promise, some day - Feature #49
-//Karere._requiresConnectionWrapper(Karere.prototype, 'getUsersInChat'); //XXX: MUST return a promise, some day - Feature #49
+/**
+ * Wrap all methods which require a connection to actually use the ._requiresConnectionWrapper helper
+ */
+{
+    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsComposing'); //XXX: MUST return a promise, some day - Feature #49
+    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendComposingPaused'); //XXX: MUST return a promise, some day - Feature #49
+    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsActive'); //XXX: MUST return a promise, some day - Feature #49
+    //Karere._requiresConnectionWrapper(Karere.prototype, 'setPresence'); //XXX: MUST return a promise, some day - Feature #49
+    //Karere._requiresConnectionWrapper(Karere.prototype, '_rawSendMessage'); //XXX: MUST return a promise, some day - Feature #49
+    //Karere._requiresConnectionWrapper(Karere.prototype, 'getUsersInChat'); //XXX: MUST return a promise, some day - Feature #49
 
+    Karere._requiresConnectionWrapper(Karere.prototype, 'startChat');
+    Karere._requiresConnectionWrapper(Karere.prototype, 'leaveChat');
+    Karere._requiresConnectionWrapper(Karere.prototype, 'addUserToChat');
+    Karere._requiresConnectionWrapper(Karere.prototype, 'removeUserFromChat');
 
-Karere._requiresConnectionWrapper(Karere.prototype, 'startChat');
-Karere._requiresConnectionWrapper(Karere.prototype, 'leaveChat');
-Karere._requiresConnectionWrapper(Karere.prototype, 'addUserToChat');
-Karere._requiresConnectionWrapper(Karere.prototype, 'removeUserFromChat');
+}

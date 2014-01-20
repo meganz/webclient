@@ -10,7 +10,7 @@ function fail(msg) {
 function expectToBeResolved($promise, msg) {
     $promise
         .fail(function() {
-            expect(true).to.equal(false, msg)
+            expect(true).to.equal(false, msg + ", fail arguments: " + toArray(arguments).join(", "));
         });
 
     return $promise;

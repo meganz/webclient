@@ -448,7 +448,8 @@ function MegaData ()
 	};
 
 	this.openFolder = function(id,force,chat)
-	{
+	{		
+		topContextMenu(1);
 		$('.fm-files-view-icon').removeClass('hidden');
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') == -1) notificationsUI(1);

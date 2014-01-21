@@ -78,6 +78,14 @@ function scrollMenu()
 
 function init_page()
 {		
+	if (window.stopBaboom) 
+	{
+		window.stopBaboom();
+		window.stopBaboom=undefined;	
+	}
+	
+	$('body').removeClass('adv');
+
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -467,7 +475,22 @@ function init_page()
 	}
 	else if (page == 'sync')
 	{
-		parsepage(pages['sync']);		
+		parsepage(pages['sync']);
+		
+		$('.st-apps-icon.mobile').unbind('click');
+		$('.st-apps-icon.mobile').bind('click', function ()
+		{
+			document.location.hash = 'mobile';
+		});
+		
+		$('.st-apps-icon.browser').unbind('click');
+		$('.st-apps-icon.browser').bind('click', function ()
+		{
+			document.location.hash = 'plugin';
+		});
+		
+		
+		
 	}
 	else if (page == 'mobile')
 	{

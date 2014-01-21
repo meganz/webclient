@@ -9,7 +9,7 @@ function pollnotifications()
 	{
 		notifications = [];		
 		if (M.currentdirid == 'notifications') loadingDialog.show();		
-		api_req('sc?c=100',
+		api_req2('sc?c=100',
 		{
 			callback: function (json,params)
 			{
@@ -20,19 +20,19 @@ function pollnotifications()
 					var nread=false;
 					for (var i in json.c)
 					{
-					if (json.la == i) nread=true;		
-					notifications.push({
-						id: 		makeid(10),
-						type: 		json.c[i].t,
-						timestamp:  (new Date().getTime()/1000)-json.c[i].td,
-						user:		json.c[i].u,
-						folderid: 	json.c[i].n,
-						nodes:		json.c[i].f,
-						read:		nread,
-						popup:		true,
-						count:		nread,
-						rendered:	true
-					});
+						if (json.la == i) nread=true;		
+						notifications.push({
+							id: 		makeid(10),
+							type: 		json.c[i].t,
+							timestamp:  (new Date().getTime()/1000)-json.c[i].td,
+							user:		json.c[i].u,
+							folderid: 	json.c[i].n,
+							nodes:		json.c[i].f,
+							read:		nread,
+							popup:		true,
+							count:		nread,
+							rendered:	true
+						});
 					}
 					var c = $('.notification-popup').attr('class');
 					donotify();

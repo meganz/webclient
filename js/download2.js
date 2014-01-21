@@ -75,6 +75,15 @@ function checkLostChunks(file)
 	if (have_ab && (dl_key[6] != (mac[0]^mac[1]) || dl_key[7] != (mac[2]^mac[3]))) {
 		return false;
 	}
+	
+	if (file.data) {
+		createnodethumbnail(
+			file.id,
+			new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]),
+			++ul_faid,
+			file.data
+		);
+	}
 
 	return true;
 }
@@ -283,8 +292,9 @@ DownloadQueue.prototype.push = function() {
 						var info = dl_queue.splitFile(res.s);
 						dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
-							dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
+							dl.data = new ArrayBuffer(res.s);
 						}
+						dl.data = "rodas";
 						return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 					} else {
 						dl_reportstatus(id, EKEY);

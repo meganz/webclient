@@ -83,8 +83,17 @@ var iRealDownloads = 0
 function downloader(task) {
 	iRealDownloads++;
 
+	var Scheduler = this;
+
+	if (task.busy === true) {
+		return setTimeout(function() {
+			// retry!
+			downloader.apply(Scheduler, [task]);
+		}, 200);
+	}
+
+
 	var xhr = getXhrObject()
-		, Scheduler = this
 		, url = task.url
 		, size = task.size
 		, download = task.download

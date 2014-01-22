@@ -146,13 +146,17 @@ var dl_lastquotawarning = 0
 function failureFunction(reschedule, task, args) {
 	var code = args[1] || 0
 
+	/**  block the task and reschedule */
+	task.busy = true; 
+	reschedule(); 
+
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(task.download.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
-				reschedule();
+				task.busy = false; /* let it go */
 			}, 60000);
 			return;
 		}		
@@ -161,7 +165,11 @@ function failureFunction(reschedule, task, args) {
 	dl_reportstatus(task.download.pos, EAGAIN);
 	dl_retryinterval *= 1.2;
 	setTimeout(function() {
-		reschedule();	
+		var range = (task.url||"").replace(/.+\//, '');
+		dlGetUrl(task.download, function (res, o) {
+			task.url = res.g + '/' + range;
+			task.busy = false; /* let it go */
+		});
 	}, dl_retryinterval);
 }
 
@@ -276,47 +284,12 @@ DownloadQueue.prototype.push = function() {
 
 	DEBUG("dl_key " + dl_key);
 
-	function dlHandler (res, ctx) {
-		if (typeof res == 'object') {
-			res = res[0];
-			if (typeof res == 'number') {
-				dl_reportstatus(id, res);
-			} else {
-				if (res.d) {
-					dl_reportstatus(id, res.d ? 2 : 1)
-				} else if (res.g) {
-					var ab = base64_to_ab(res.at)
-						, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-
-					if (typeof o == 'object' && typeof o.n == 'string') {
-						var info = dl_queue.splitFile(res.s);
-						dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-						if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
-							dl.data = new ArrayBuffer(res.s);
-						}
-						dl.data = "rodas";
-						return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-					} else {
-						dl_reportstatus(id, EKEY);
-					}
-				} else {
-					dl_reportstatus(id, res.e);
-				}
-			}
-		} else {
-			dl_reportstatus(id, EAGAIN);
-		}
-
-		dl_retryinterval *= 1.2;
-		// Do not use dl_settimer, better use
-		// a private timeout function
-		setTimeout(function() {
-			dlGetUrl(dl, dlHandler);
-		}, dl_retryinterval);
-	}
+	dlGetUrl(dl, function(res, o) {
+		var info = dl_queue.splitFile(res.s);
+		dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+		return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+	});
 	
-	dlGetUrl(dl, dlHandler);
-
 	return pos;
 };
 
@@ -329,13 +302,12 @@ function dl_reportstatus(num, code)
 }
 
 
-function dlGetUrl(id, callback) {
-	var object = dl_queue[id] ? dl_queue : id
-		, req = { 
-			a : 'g', 
-			g : 1, 
-			ssl : use_ssl,
-		};
+function dlGetUrl(object, callback) {
+	var req = { 
+		a : 'g', 
+		g : 1, 
+		ssl : use_ssl,
+	}, dl_key = object.key
 
 	if (object.ph) {
 		req.p = object.ph;
@@ -343,7 +315,42 @@ function dlGetUrl(id, callback) {
 		req.n = object.id;
 	}
 
-	api_req([req], {callback:callback});
+	api_req([req], {
+		callback: function(res, rex) {
+			if (typeof res == 'object') {
+				res = res[0];
+				if (typeof res == 'number') {
+					dl_reportstatus(object.pos, res);
+				} else {
+					if (res.d) {
+						dl_reportstatus(object.pos, res.d ? 2 : 1)
+					} else if (res.g) {
+						var ab = base64_to_ab(res.at)
+							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
+	
+						if (typeof o == 'object' && typeof o.n == 'string') {
+							if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
+								dl.data = new ArrayBuffer(res.s);
+							}
+							return callback(res, o, object);
+						} else {
+							dl_reportstatus(object.pos, EKEY);
+						}
+					} else {
+						dl_reportstatus(object.pos, res.e);
+					}
+				}
+			} else {
+				dl_reportstatus(object.pos, EAGAIN);
+			}
+			
+			dl_retryinterval *= 1.2;
+			setTimeout(function() {
+				// try later!
+				dlGetUrl(object, callback);
+			}, dl_retryinterval);
+		}
+	});
 }
 
 if (window.webkitRequestFileSystem) {

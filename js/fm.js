@@ -479,7 +479,7 @@ function initUI()
 	});
 	
 	
-	if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
+	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
 		setTimeout(function()
 		{
@@ -843,21 +843,13 @@ function initContextUI()
 			if ((id && id.indexOf('dl_') > -1) || (id && id.indexOf('zip_') > -1))
 			{				
 				var abort=false;				
-				for (var i in dl_queue)
-				{
-					if (dl_queue[i])
-					{
-						if (dl_queue[i].id == id.replace('dl_','') || dl_queue[i].zipid == id.replace('zip_',''))
-						{
-							if (dl_queue[i].zipid) $.zipkill = dl_queue[i].zipid;
-							if (i == dl_queue_num && dl_queue[dl_queue_num].zipid) abort=true;
-							else if (i == dl_queue_num && dl_legacy_ie) document.getElementById('start_downloaderswf').abort();
-							else if (i == dl_queue_num && !dl_queue[dl_queue_num].zipid) $.sd=i;							
-							else if (!dl_queue[i].zipid) dl_queue[i] = false;						
-						}
-					}					
-				}
-				if ($.zipkill) dl_killzip($.zipkill);				
+				$.each(dl_queue, function(i, queue) {
+					if (queue.id == id.replace('dl_','') || queue.zipid == id.replace('zip_','')) {
+						if (queue.zipid) $.zipkill = dl_queue[i].zipid;
+						else $.sd=i;							
+						return false; /* break */
+					}
+				});
 			}
 			else if (id && id.indexOf('ul_') > -1)
 			{				
@@ -879,13 +871,21 @@ function initContextUI()
 			}
 			$(this).remove();
 		});				
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined')
-		{
-			if ($.sd != 'undefined') dl_queue[$.sd]=false;			
-			dl_cancel();
-			startdownload();
+		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
+			DEBUG("cancelled file " + $.sd);
+			dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
+				return $.zipkill ? obj.task.download.zipid !== $.zipkill
+					: obj.task.download.dl_id !== dl_queue[$.sd].dl_id;
+			});
+			dl_queue[$.sd].cancelled = true;
+			if ($.zipkill) {
+				$.each(dl_queue, function(i, file) {
+					if (file.zipid == $.zipkill) {
+						file.cancelled = true;
+					}
+				});
+			}
 		}
-		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		
@@ -3061,12 +3061,12 @@ function transferPanelUI()
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
 			$(this).removeClass('active');
-			uldl_resume();
+			dlQueue.resume();
 		}
 		else
 		{
 			$(this).addClass('active');
-			uldl_pause();
+			dlQueue.pause();
 		}	
 	});
 }

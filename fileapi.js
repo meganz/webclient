@@ -404,12 +404,12 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							written : 0,
 							write : function(x) {
 								this.readyState = this.WRITING;
-								this.position = this.targetpos;
 
 								var fr = new window.FileReader();
 								fr.onload = function(ev) {
 									var c = File.fs.write(ev.target.result,x.size);
 									File.Writer.readyState = File.Writer.DONE;
+									File.Writer.position += c;
 									File.Writer[c?'onwriteend':'onerror']();
 
 									if(File.sNode) {
@@ -539,14 +539,18 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				};
 
-				File.filesize = scope.dl_filesize;
-				File.filename = (scope.dl_zip && scope.dl_zip.name || scope.dl_filename)
+				var o = opts._firefox;
+				var dl_filesize = o.filesize, dl_filename = o.filename,
+					dl_zip = o.zip, dl_path = o.path, dl_filetime = o.mtime;
+				
+				File.filesize = dl_filesize;
+				File.filename = (dl_zip && dl_zip.name || dl_filename)
 					.replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.').substr(0,256);
 
 				try {
-					if(scope.dl_queue[scope.dl_queue_num].p && !scope.dl_zip)
-						File.folder = ('' + scope.dl_queue[scope.dl_queue_num].p).split(/[\\\/]+/).filter(String);
-					File.filetime = scope.dl_queue[scope.dl_queue_num].t;
+					if(dl_path && !dl_zip)
+						File.folder = ('' + dl_path).split(/[\\\/]+/).filter(String);
+					File.filetime = dl_filetime || 0;
 				} catch(e) {}
 
 				function osd_cb(options) {

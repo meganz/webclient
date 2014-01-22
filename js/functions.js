@@ -483,3 +483,38 @@ function checkMail(email)
 	if (filter.test(email)) return false;	
 	else return true;	
 }
+
+/**
+ *	Global function to help debugging
+ */
+function DEBUG() {
+	if (arguments.length == 2 && typeof arguments[0] == "object"
+		  && typeof arguments[0][arguments[1]] == "function") {
+		  
+		var self = arguments[0]
+			, method = arguments[1]
+			, fnc    = self[method]
+
+		self[method] = function() {
+			var args = Array.prototype.slice.call(arguments);
+			console.warn.apply(console, [method, args]);
+			return fnc.apply(self, arguments);
+		};
+		return;
+	}
+	if (d) {
+		console.log.apply(console, arguments)
+		console.error.apply(console, arguments)
+	}
+}
+
+
+/**
+ *	Return a default callback for error handlign
+ */
+function dlError(text) {
+	return function(e) {
+		console.log(text + ' ' + e);
+		alert(text + ' ' + e);
+	};
+}

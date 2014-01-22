@@ -1427,7 +1427,7 @@ function MegaData ()
 				zipsize += n.s;
 
 				var flashhtml='';
-				if (dl_method == 1)
+				if (dlMethod == FlashIO)
 				{
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
@@ -1436,7 +1436,7 @@ function MegaData ()
 			}
 		}
 
-		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
+		if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
@@ -1447,12 +1447,11 @@ function MegaData ()
 		initGridScrolling();
 		initFileblocksScrolling();
 		initTreeScroll();
-		startdownload();
 
 		delete $.dlhash;
 	}
 
-	this.dlprogress = function (id, bl, bt,kbps)
+	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
 	{
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
@@ -1539,7 +1538,7 @@ function MegaData ()
 		}
 		$.transferHeader();
 
-		if (dl_method === 0)
+		if (dlMethod == FileSystemAPI)
 		{
 			setTimeout(fm_chromebar,250,$.dlheight);
 			setTimeout(fm_chromebar,500,$.dlheight);
@@ -1566,7 +1565,7 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid,error)
+	this.dlerror = function(fileid, error)
 	{
 		var errorstr=false;
 		if (d) console.log('dlerror',fileid,error);
@@ -1587,14 +1586,14 @@ function MegaData ()
 		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
 	}
 
-	this.dlstart = function(id,name,size)
+	this.dlstart = function(id,name,size, dl_queue_num)
 	{
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		if (dl_queue[dl_queue_num].zipid) id = 'zip_' + dl_queue[dl_queue_num].zipid;
 		else id = 'dl_' + id;
 		$('.transfer-table').prepend($('.transfer-table #' + id));
 		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id);
+		M.dlprogress(id, 0, 0, 0, dl_queue_num);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];

@@ -167,7 +167,7 @@ function failureFunction(reschedule, task, args) {
 	setTimeout(function() {
 		var range = (task.url||"").replace(/.+\//, '');
 		dlGetUrl(task.download, function (res, o) {
-			task.url = res.g + '/' + range;
+			task.url = res.g + '/' + range; /* new url */
 			task.busy = false; /* let it go */
 		});
 	}, dl_retryinterval);

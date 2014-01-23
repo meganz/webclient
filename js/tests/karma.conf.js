@@ -29,7 +29,9 @@ module.exports = function(config) {
              "../chat/rtcSession.js",
              "../chat/karere.js",
 
-            "../tests/src/helpers.js",
+            "src/helpers/eventmocker.js",
+            "src/helpers/strophemocker.js",
+            "src/helpers/utils.js",
              "../tests/src/unit/*.js",
              "../tests/src/integration/*.js"
         ],

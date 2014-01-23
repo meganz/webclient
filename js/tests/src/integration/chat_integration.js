@@ -210,14 +210,14 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
                 expectToBeResolved(
                     createTimeoutPromise(
                         function() {
-                            var is_found = false;
+                            var isFound = false;
                             $.each(em_k1.mocks['onPresence'].triggeredArgs, function(k, v) {
                                 if(v[1]['from'] == k2.getJid()) {
-                                    is_found = true;
+                                    isFound = true;
                                 }
                             });
 
-                            return is_found;
+                            return isFound;
                         },
                         200,
                         2000
@@ -237,14 +237,14 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
                                 expectToBeResolved(
                                     createTimeoutPromise(
                                         function() {
-                                            var is_found = 0;
+                                            var isFound = 0;
                                             $.each(em_k1.mocks['onPresence'].triggeredArgs, function(k, v) {
                                                 if(v[1]['from'] == k2.getJid()) {
-                                                    is_found++;
+                                                    isFound++;
                                                 }
                                             });
 
-                                            return is_found >= 2;
+                                            return isFound >= 2;
                                         },
                                         200,
                                         2000
@@ -282,7 +282,7 @@ describe("Integration Test - Rooms", function() {
     var k1_event_mocker;
     var k2_event_mocker;
 
-    var room_jid;
+    var roomJid;
 
     beforeEach(function(done) {
         sinon.spy(Karere, "error");
@@ -335,12 +335,12 @@ describe("Integration Test - Rooms", function() {
                             'could not start chat'
                         )
                         .done(function(_room_jid) {
-                            room_jid = _room_jid;
+                            roomJid = _room_jid;
 
-                            // there are 2 users visible in `room_jid` by k1
+                            // there are 2 users visible in `roomJid` by k1
                             expect(
                                 Object.keys(
-                                    k1.getUsersInChat(room_jid)
+                                    k1.getUsersInChat(roomJid)
                                 ).length
                             ).to.equal(2);
 
@@ -385,18 +385,18 @@ describe("Integration Test - Rooms", function() {
     // since the user is already added to the chat by the beforeEach() we can do a leaveChat test first
     it("leave chat", function(done) {
         expectToBeResolved(
-                k2.leaveChat(room_jid),
+                k2.leaveChat(roomJid),
                 'k2 failed to leave chat.'
             )
             .done(function() {
                 expect(
                     Object.keys(
-                        k1.getUsersInChat(room_jid)
+                        k1.getUsersInChat(roomJid)
                     ).length
                 ).to.equal(1);
 
                 expect(
-                    k1.getUsersInChat(room_jid)[k1.getJid()]
+                    k1.getUsersInChat(roomJid)[k1.getJid()]
                 ).to.equal("moderator");
 
                 done();
@@ -407,13 +407,13 @@ describe("Integration Test - Rooms", function() {
     it("add to chat manually", function(done) {
         // need to leave first!
         expectToBeResolved(
-               k2.leaveChat(room_jid),
+               k2.leaveChat(roomJid),
                'k2 failed to leave chat.'
             )
             .done(function() {
                 expectToBeResolved(
                         k1.addUserToChat(
-                            room_jid,
+                            roomJid,
                             k2.getJid()
                         ),
                         'failed to add k2 to chat'
@@ -421,12 +421,12 @@ describe("Integration Test - Rooms", function() {
                     .done(function() {
                         expect(
                             Object.keys(
-                                k1.getUsersInChat(room_jid)
+                                k1.getUsersInChat(roomJid)
                             ).length
                         ).to.equal(2);
 
                         expect(
-                            k1.getUsersInChat(room_jid)[k2.getJid()]
+                            k1.getUsersInChat(roomJid)[k2.getJid()]
                         ).to.equal("participant");
 
                         done();
@@ -439,7 +439,7 @@ describe("Integration Test - Rooms", function() {
     it("remove user and add it back", function(done) {
         expectToBeResolved(
                 k1.removeUserFromChat(
-                    room_jid,
+                    roomJid,
                     k2.getJid()
                 ),
                 'failed to remove k2 from chat'
@@ -447,7 +447,7 @@ describe("Integration Test - Rooms", function() {
             .done(function() {
                 expectToBeResolved(
                         k1.addUserToChat(
-                            room_jid,
+                            roomJid,
                             k2.getJid()
                         ),
                         'failed to add k2 back to the chat'
@@ -455,12 +455,12 @@ describe("Integration Test - Rooms", function() {
                     .done(function() {
                         expect(
                             Object.keys(
-                                k1.getUsersInChat(room_jid)
+                                k1.getUsersInChat(roomJid)
                             ).length
                         ).to.equal(2);
 
                         expect(
-                            k1.getUsersInChat(room_jid)[k2.getJid()]
+                            k1.getUsersInChat(roomJid)[k2.getJid()]
                         ).to.equal("participant");
 
                         done();
@@ -481,8 +481,8 @@ describe("Integration Test - Rooms", function() {
             expectToBeResolved($promise1, 'Did not send message to k2');
             expectToBeResolved($promise2, 'Did not received message from k1');
 
-            expect(k1_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].my_own).to.be.true;
-            expect(k2_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].my_own).to.be.false;
+            expect(k1_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].myOwn).to.be.true;
+            expect(k2_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].myOwn).to.be.false;
 
             expect(k1_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].message).to.equal(msg);
             expect(k2_event_mocker.mocks['onPrivateMessage'].triggeredArgs[0][1].message).to.equal(msg);
@@ -522,8 +522,8 @@ describe("Integration Test - Rooms", function() {
                     expectToBeResolved($promise1, 'Did not received message in the group chat (k1)');
                     expectToBeResolved($promise2, 'Did not received message in the group chat (k2)');
 
-                    expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].my_own).to.be.true;
-                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].my_own).to.be.false;
+                    expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].myOwn).to.be.true;
+                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].myOwn).to.be.false;
 
                     expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].message).to.equal(msg);
                     expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].message).to.equal(msg);
@@ -561,9 +561,9 @@ describe("Integration Test - Rooms", function() {
             expect(k2_event_mocker.mocks['onActiveMessage'].triggeredCount).to.be.equal(1);
             expect(k2_event_mocker.mocks['onComposingMessage'].triggeredCount).to.be.equal(1);
 
-            expect(k2_event_mocker.mocks['onPausedMessage'].triggeredArgs[0][1].my_own).to.be.false;
-            expect(k2_event_mocker.mocks['onActiveMessage'].triggeredArgs[0][1].my_own).to.be.false;
-            expect(k2_event_mocker.mocks['onComposingMessage'].triggeredArgs[0][1].my_own).to.be.false;
+            expect(k2_event_mocker.mocks['onPausedMessage'].triggeredArgs[0][1].myOwn).to.be.false;
+            expect(k2_event_mocker.mocks['onActiveMessage'].triggeredArgs[0][1].myOwn).to.be.false;
+            expect(k2_event_mocker.mocks['onComposingMessage'].triggeredArgs[0][1].myOwn).to.be.false;
 
             expect(k2_event_mocker.mocks['onPausedMessage'].triggeredArgs[0][1].from).to.equal(k1.getJid());
             expect(k2_event_mocker.mocks['onActiveMessage'].triggeredArgs[0][1].from).to.equal(k1.getJid());

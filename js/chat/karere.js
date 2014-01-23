@@ -19,8 +19,11 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
     }
     karere._errors++;
 
-    if(localStorage.d)
-        console.warn("request errored, status: " + reqStatus + ", number of errors: " + karere._errors);
+
+    if(localStorage.d) {
+		console.warn("request errored, status: " + reqStatus + ", number of errors: " + karere._errors);
+    }
+
 
     if (karere._errors > karere.options.maxConnectionRetries) {
         this._onDisconnectTimeout();
@@ -38,11 +41,11 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
  * Create new Karere instance.
  *
  *
- * @param opts
+ * @param user_options
  * @returns {Karere}
  * @constructor
  */
-var Karere = function(opts) {
+var Karere = function(user_options) {
     var self = this;
 
     var defaults = {
@@ -110,24 +113,37 @@ var Karere = function(opts) {
          */
         maxConnectionRetries: 10
     };
-    self.options = $.extend(true, {}, defaults, opts);
+    self.options = $.extend(true, {}, defaults, user_options);
 
     self.connection = new Strophe.Connection(self.options.boshServiceUrl, self.options.stropheOptions);
     self.connection.karere = self;
 
     if(localStorage.dxmpp == 1) {
-        self.connection.rawInput = function (data) { console.error('RECV: ' + data); };
-        self.connection.rawOutput = function (data) { console.error('SEND: ' + data); };
+        self.connection.rawInput = function (data) {
+            if(localStorage.d) {
+		        console.error('RECV: ' + data);
+            }
+        };
+
+        self.connection.rawOutput = function (data) {
+		    if(localStorage.d) {
+		        console.error('SEND: ' + data);
+            }
+        };
     }
 
     // Uncomment the following line to see all the debug output.
-//    Strophe.log = function (level, msg) { console.log(level, 'LOG: ' + msg); };
+//    Strophe.log = function (level, msg) { if(localStorage.d) {
+    if(localStorage.d) {
+        console.log(level, 'LOG: ' + msg);
+    }
+
     Strophe.fatal = function (msg) { Karere.error(msg); };
     Strophe.error = function (msg) { Karere.error(msg); };
 
 
     // initialize the connection state
-    self._connection_state = Karere.CONNECTION_STATE.DISCONNECTED;
+    self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
 
     // Implement a straight forward, naive cleanup logic to be executed before the page is reloaded
     // ideas and references:
@@ -148,19 +164,21 @@ var Karere = function(opts) {
 
             self.connection.disconnect();
 
-            console.warn("flushing out and disconnecting onbeforeunload");
+            if(localStorage.d) {
+		        console.warn("flushing out and disconnecting onbeforeunload");
+            }
         }
     });
 
 
     // Local in-memory Presence cache implementation
-    self._presence_cache = {};
+    self._presenceCache = {};
 
-    self.bind("onPresence", function(e, evt_data) {
-        if(evt_data.show != "unavailable") {
-            self._presence_cache[evt_data.from] = evt_data.show ? evt_data.show : "available";
+    self.bind("onPresence", function(e, eventData) {
+        if(eventData.show != "unavailable") {
+            self._presenceCache[eventData.from] = eventData.show ? eventData.show : "available";
         } else {
-            delete self._presence_cache[evt_data.from];
+            delete self._presenceCache[eventData.from];
         }
     });
 
@@ -194,7 +212,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.getConnectionState = function() {
         var self = this;
-        return self._connection_state;
+        return self._connectionState;
     };
 
     /**
@@ -213,7 +231,9 @@ makeMetaAware(Karere);
             try {
                 return fn.apply(context, toArray(arguments))
             } catch(e) {
-                console.error(e, e.stack);
+                if(localStorage.d) {
+		            console.error(e, e.stack);
+                }
                 return true;
             }
         }
@@ -247,8 +267,8 @@ makeMetaAware(Karere);
         self._password = password;
 
 
-        // parse and cache the muc_domain
-        self.options.muc_domain = "conference." + jid.split("@")[1].split("/")[0];
+        // parse and cache the mucDomain
+        self.options.mucDomain = "conference." + jid.split("@")[1].split("/")[0];
 
 
 
@@ -258,29 +278,37 @@ makeMetaAware(Karere);
             full_jid,
             self._password,
             function(status) {
-                console.warn("Got connection status: ", full_jid, self._password, status);
+                if(localStorage.d) {
+		            console.warn("Got connection status: ", full_jid, self._password, status);
+                }
 
-                self._connection_state = status;
+                self._connectionState = status;
 
                 if (status == Karere.CONNECTION_STATE.CONNECTING) {
-                    if(localStorage.d) console.debug(self.getJid(), 'Karere is connecting.');
+                    if(localStorage.d) {
+		                console.debug(self.getJid(), 'Karere is connecting.');
+                    }
 
                     self.trigger('onConnecting');
                 } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
-                    if(localStorage.d) console.warn(self.getJid(), 'Karere failed to connect.');
+                    if(localStorage.d) {
+		                console.warn(self.getJid(), 'Karere failed to connect.');
+                    }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onConnfail');
                 } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
-                    if(localStorage.d) console.warn(self.getJid(), 'Karere failed to connect - Authentication issue.');
+                    if(localStorage.d) {
+		                console.warn(self.getJid(), 'Karere failed to connect - Authentication issue.');
+                    }
 
                     $promise.reject(status);
                     self.trigger('onAuthfail');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
                     if(localStorage.d) {
-                        console.warn(self.getJid(), 'Karere is disconnecting.');
+		                console.warn(self.getJid(), 'Karere is disconnecting.');
                     }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
@@ -289,14 +317,18 @@ makeMetaAware(Karere);
 
                     self.trigger('onDisconnecting');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
-                    if(localStorage.d) console.info(self.getJid(), 'Karere is disconnected.');
+                    if(localStorage.d) {
+                        console.info(self.getJid(), 'Karere is disconnected.');
+                    }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onDisconnected');
                 } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
-                    if(localStorage.d) console.info(self.getJid(), 'Karere is connected.');
+                    if(localStorage.d) {
+                        console.info(self.getJid(), 'Karere is connected.');
+                    }
                     // connection.jid
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
@@ -329,12 +361,12 @@ makeMetaAware(Karere);
      * connection before calling the actual method which is wrapped.
      *
      * @param proto
-     * @param fn_name
+     * @param functionName
      * @private
      */
-    Karere._requiresConnectionWrapper = function (proto, fn_name) {
-        var fn = proto[fn_name];
-        proto[fn_name] = function() {
+    Karere._requiresConnectionWrapper = function (proto, functionName) {
+        var fn = proto[functionName];
+        proto[functionName] = function() {
             var self = this;
 
             var args = toArray(arguments);
@@ -346,7 +378,9 @@ makeMetaAware(Karere);
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and _password
              */
             if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
-                console.warn("Tried to call ", fn_name, ", while Karere is still in CONNECTING state.");
+                if(localStorage.d) {
+		            console.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state.");
+                }
 
                 internal_promises.push(
                     createTimeoutPromise(
@@ -359,7 +393,9 @@ makeMetaAware(Karere);
                 );
             }
             else if(self.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-                console.warn("Tried to call ", fn_name, ", but Karere is not connected. Will try to reconnect first.");
+                if(localStorage.d) {
+		            console.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
+                }
 
                 internal_promises.push(
                     self.reconnect()
@@ -435,16 +471,22 @@ makeMetaAware(Karere);
                 self.getConnectionState() == Karere.CONNECTION_STATE.ATTACHED
             ) {
 
-            console.debug("Will try to wait for the queue to get empty before disconnecting...");
+            if(localStorage.d) {
+		        console.debug("Will try to wait for the queue to get empty before disconnecting...");
+            }
 
-            self._connection_state = Karere.CONNECTION_STATE.DISCONNECTING;
+            self._connectionState = Karere.CONNECTION_STATE.DISCONNECTING;
 
             self._waitForRequestQueueToBeEmpty()
                 .fail(function() {
-                    console.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
+                    if(localStorage.d) {
+		                console.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
+                    }
                 })
                 .done(function() {
-                    console.debug("Queue is empty. Calling disconnect.");
+                    if(localStorage.d) {
+		                console.debug("Queue is empty. Calling disconnect.");
+                    }
                 })
                 .always(function() {
                     self.connection.disconnect();
@@ -453,7 +495,7 @@ makeMetaAware(Karere);
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
             // do nothing, we are already in the process of disconnecting.
         } else {
-            self._connection_state = Karere.CONNECTION_STATE.DISCONNECTED
+            self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED
         }
 
         return createTimeoutPromise(
@@ -478,7 +520,7 @@ makeMetaAware(Karere);
      * @private
      */
     Karere.prototype._generateNewIdx = function() {
-        if(!localStorage.karereIdx) {
+        if(typeof(localStorage.karereIdx) == "undefined") {
             localStorage.karereIdx = 0;
         } else {
             localStorage.karereIdx = parseInt(localStorage.karereIdx, 10) + 1;
@@ -497,7 +539,7 @@ makeMetaAware(Karere);
      * @returns {*}
      * @private
      */
-    Karere.prototype._generateNewResourceIdx = function () {
+    Karere.prototype._generateNewResourceIdx = function() {
         var self = this;
         return MD5.hexdigest(window.navigator.userAgent.toString() + "-" + (new Date()).getTime() + "-" + self._generateNewIdx());
     };
@@ -528,7 +570,9 @@ makeMetaAware(Karere);
                 window.navigator.userAgent.toString() + "-" +
                 (new Date()).getTime() + "-" + self._generateNewIdx() + "-" +
 
-                Math.random() * 10000000000000000 /* TODO: better solution? */
+                Math.random() * 10000000000000000 /* don't really need to use special rand() method, because we already
+                                                     have a localStorage sequence that solves the Math.random() issues
+                                                     in a little bit easier way then doing native crypto/random magic */
         );
     };
 
@@ -569,7 +613,9 @@ makeMetaAware(Karere);
      * console.
      */
     Karere.error = function() {
-        console.error(toArray(arguments).join(" "));
+        if(localStorage.d) {
+		console.error(toArray(arguments).join(" "));
+}
     }
 }
 
@@ -581,48 +627,48 @@ makeMetaAware(Karere);
     //TODO: Refactor this to be moooore easier to read and debug.
 
     /**
-     * THE handler of incoming stanzas (both msg and presence)
+     * THE handler of incoming stanzas (both <message/> and <presence/>)
      *
-     * @param msg
+     * @param message
      * @returns {boolean}
      * @private
      */
-    Karere.prototype._onIncomingStanza = function (msg) {
+    Karere.prototype._onIncomingStanza = function (message) {
         var self = this;
 
 
-        var _type = msg.getAttribute('type');
+        var _type = message.getAttribute('type');
 
 
-        var evt_data = {
+        var eventData = {
             'karere': self,
-            'my_own': false
+            "myOwn": false
         };
 
         // flag own/forwarded messages, because of the <forward/> stanzas, we can receive back our own messages
-        if(msg.getAttribute('from') == self.getJid()) {
-            evt_data['my_own'] = true;
+        if(message.getAttribute('from') == self.getJid()) {
+            eventData['myOwn'] = true;
         }
 
-        var stanza_type = "Unknown";
+        var stanzaType = "Unknown";
 
 
 
-        var x = msg.getElementsByTagName("x");
-        var to = msg.getAttribute('to');
-        var from = msg.getAttribute('from');
+        var x = message.getElementsByTagName("x");
+        var to = message.getAttribute('to');
+        var from = message.getAttribute('from');
 
-        evt_data['to'] = to;
-        evt_data['from'] = from;
+        eventData['to'] = to;
+        eventData['from'] = from;
 
         // x handling
         if(x.length > 0 && x[0].getAttribute('xmlns') == 'http://jabber.org/protocol/muc#user') {
-            evt_data['room_jid'] = evt_data['from'].split("/")[0];
+            eventData['roomJid'] = eventData['from'].split("/")[0];
 
-            var users = self.getMeta('rooms', evt_data['room_jid'], 'users', {});
+            var users = self.getMeta('rooms', eventData['roomJid'], 'users', {});
 
-            var joined_users = {};
-            var left_users = {};
+            var joinedUsers = {};
+            var leftUsers = {};
 
             $.each(x[0].getElementsByTagName("item"), function(i, item) {
                 var role = item.getAttribute('role');
@@ -630,38 +676,40 @@ makeMetaAware(Karere);
 
                 if(role != "unavailable" && role != "none") {
                     users[jid] = role;
-                    joined_users[jid] = item.getAttribute('role');
+                    joinedUsers[jid] = item.getAttribute('role');
                 } else { // left/kicked
                     delete users[jid];
-                    delete joined_users[jid];
-                    left_users[jid] = true;
+                    delete joinedUsers[jid];
+                    leftUsers[jid] = true;
                 }
             });
 
-            self.setMeta('rooms', evt_data['room_jid'], 'users', users);
+            self.setMeta('rooms', eventData['roomJid'], 'users', users);
 
-            evt_data['current_users'] = users;
+            eventData['current_users'] = users;
 
-            if(Object.keys(joined_users).length > 0) {
-                evt_data['new_users'] = joined_users;
-                self._triggerEvent("UsersJoined", evt_data);
+            if(Object.keys(joinedUsers).length > 0) {
+                eventData['newUsers'] = joinedUsers;
+                self._triggerEvent("UsersJoined", eventData);
             }
-            if(Object.keys(left_users).length > 0) {
-                evt_data['left_users'] = left_users;
-                self._triggerEvent("UsersLeft", evt_data);
+            if(Object.keys(leftUsers).length > 0) {
+                eventData['leftUsers'] = leftUsers;
+                self._triggerEvent("UsersLeft", eventData);
             }
         }
         // end of x handling
 
 
-        if(msg.tagName.toLowerCase() == "message") {
-            console.warn(self.getJid(), "Message: ", _type, msg.innerHTML);
+        if(message.tagName.toLowerCase() == "message") {
+            if(localStorage.d) {
+		        console.warn(self.getJid(), "Message: ", _type, message.innerHTML);
+            }
 
-            var elems = msg.getElementsByTagName('body');
+            var elems = message.getElementsByTagName('body');
 
-            stanza_type = "Message";
+            stanzaType = "Message";
             if(_type == "chat" && elems.length > 0) {
-                stanza_type = "PrivateMessage";
+                stanzaType = "PrivateMessage";
 
 
                 /**
@@ -669,23 +717,23 @@ makeMetaAware(Karere);
                  */
 
                     // if not...set the message property
-                evt_data['message'] = Strophe.getText(elems[0]);
+                eventData['message'] = Strophe.getText(elems[0]);
 
                 // is this a forwarded message? if yes, trigger event only for that
-                if(msg.getElementsByTagName("forwarded").length > 0) {
-                    self._onIncomingStanza(msg.getElementsByTagName("forwarded")[0].childNodes[1]);
+                if(message.getElementsByTagName("forwarded").length > 0) {
+                    self._onIncomingStanza(message.getElementsByTagName("forwarded")[0].childNodes[1]);
 
                     // stop
                     return true;
                 }
             } else if(_type == "groupchat") {
-                stanza_type = "ChatMessage";
+                stanzaType = "ChatMessage";
 
-                evt_data['message'] = Strophe.getText(elems[0]);
+                eventData['message'] = Strophe.getText(elems[0]);
 
                 // is this a forwarded message? if yes, trigger event only for that
-                if(msg.getElementsByTagName("forwarded").length > 0) {
-                    self._onIncomingStanza(msg.getElementsByTagName("forwarded")[0].childNodes[1]);
+                if(message.getElementsByTagName("forwarded").length > 0) {
+                    self._onIncomingStanza(message.getElementsByTagName("forwarded")[0].childNodes[1]);
 
                     // stop
                     return true;
@@ -696,60 +744,63 @@ makeMetaAware(Karere);
                  */
 
 
-            } else if(!_type && msg.getElementsByTagName("event").length > 0) {
-                stanza_type = "EventMessage";
+            } else if(!_type && message.getElementsByTagName("event").length > 0) {
+                stanzaType = "EventMessage";
             } else if(x.length > 0 && x[0].getAttribute("xmlns") == "jabber:x:conference") {
-                stanza_type = "InviteMessage";
-                evt_data['room'] = x[0].getAttribute("jid");
-                evt_data['password'] = x[0].getAttribute("password");
+                stanzaType = "InviteMessage";
+                eventData['room'] = x[0].getAttribute("jid");
+                eventData['password'] = x[0].getAttribute("password");
 
-                self.setMeta("rooms", evt_data['room'], 'password', evt_data['password']);
+                self.setMeta("rooms", eventData['room'], 'password', eventData['password']);
 
 
-                console.warn(self.getJid(), "Got invited to join room: ", evt_data['room']);
+                if(localStorage.d) {
+		            console.warn(self.getJid(), "Got invited to join room: ", eventData['room']);
+                }
 
                 self.connection.muc.join(
-                    evt_data['room'],
+                    eventData['room'],
                     self.getNickname(),
                     undefined,
                     undefined,
                     undefined,
-                    evt_data['password'],
+                    eventData['password'],
                     undefined
                 );
             } else {
-                stanza_type = "UnknownMessage";
+                stanzaType = "UnknownMessage";
             }
 
-            evt_data['from'] = from;
-            evt_data['to'] = to;
-            evt_data['raw_type'] = _type;
-            evt_data['type'] = stanza_type;
-            evt_data['elems'] = elems;
-            evt_data['raw_message'] = msg;
-        } else if(msg.tagName == "presence") {
-            stanza_type = "Presence";
+            eventData['from'] = from;
+            eventData['to'] = to;
+            eventData['rawType'] = _type;
+            eventData['type'] = stanzaType;
+            eventData['elems'] = elems;
+            eventData['rawMessage'] = message;
+        } else if(message.tagName == "presence") {
+            stanzaType = "Presence";
 
-            var show = msg.getElementsByTagName("show");
+            var show = message.getElementsByTagName("show");
             if(show.length > 0) {
-                evt_data['show'] = $(show[0]).text();
-            } else if(show.length == 0 && msg.getAttribute('type')) {
-                evt_data['show'] = msg.getAttribute('type');
+                eventData['show'] = $(show[0]).text();
+            } else if(show.length == 0 && message.getAttribute('type')) {
+                eventData['show'] = message.getAttribute('type');
             }
 
-            var status = msg.getElementsByTagName("status");
+            var status = message.getElementsByTagName("status");
             if(status.length > 0) {
-                evt_data['status'] = $(status[0]).text();
+                eventData['status'] = $(status[0]).text();
             }
 
-            if(evt_data['show'] == undefined && evt_data['status'] == undefined) {
-                //TODO: This means that the user is online. Impl please.
-//                debugger;
+            if(eventData['show'] == undefined && eventData['status'] == undefined) {
+                // is handled in the onPresence in Karere
             }
         } else {
-            console.debug("Unknown stanza type: ", msg.innerHTML);
-            evt_data['unknown'] = true;
-            evt_data['tag'] = msg.tagName;
+            if(localStorage.d) {
+		        console.debug("Unknown stanza type: ", message.innerHTML);
+            }
+            eventData['unknown'] = true;
+            eventData['tag'] = message.tagName;
         }
 
 
@@ -757,21 +808,21 @@ makeMetaAware(Karere);
         // XEP-0085 - Chat State Notifications
         // Because they can be embedded into other tags, we will trigger one additional event here...and if some of the
         // event handlers tried to stop the propagation, then we will stop the on$StanzaType triggering.
-        if(msg.getElementsByTagName("active").length > 0) {
-            if(!self._triggerEvent("ActiveMessage", evt_data)) {
+        if(message.getElementsByTagName("active").length > 0) {
+            if(!self._triggerEvent("ActiveMessage", eventData)) {
                 return true;  // always return true, because of how Strophe.js handlers work.
             }
-        } else if(msg.getElementsByTagName("paused").length > 0) {
-            if(!self._triggerEvent("PausedMessage", evt_data)) {
+        } else if(message.getElementsByTagName("paused").length > 0) {
+            if(!self._triggerEvent("PausedMessage", eventData)) {
                 return true; // always return true, because of how Strophe.js handlers work.
             }
-        } else if(msg.getElementsByTagName("composing").length > 0) {
-            if(!self._triggerEvent("ComposingMessage", evt_data)) {
+        } else if(message.getElementsByTagName("composing").length > 0) {
+            if(!self._triggerEvent("ComposingMessage", eventData)) {
                 return true; // always return true, because of how Strophe.js handlers work.
             }
         }
 
-        self._triggerEvent(stanza_type, evt_data);
+        self._triggerEvent(stanzaType, eventData);
 
         // we must return true to keep the handler alive.
         // returning false would remove it after it finishes.
@@ -781,47 +832,53 @@ makeMetaAware(Karere);
     /**
      * Helper method that should be used when triggering events on specific Stanzas
      *
-     * @param stanza_type
-     * @param evt_data
+     * @param stanzaType
+     * @param eventData
      * @returns {boolean}
      * @private
      */
-    Karere.prototype._triggerEvent = function (stanza_type, evt_data) {
+    Karere.prototype._triggerEvent = function (stanzaType, eventData) {
         var self = this;
 
-        if(evt_data['raw_msg'] && evt_data['raw_msg'].getElementsByTagName("delay").length > 0) {
-            stanza_type = "Delayed" + stanza_type;
+        if(eventData['rawMessage'] && eventData['rawMessage'].getElementsByTagName("delay").length > 0) {
+            stanzaType = "Delayed" + stanzaType;
         }
 
-        var targetted_type_evt = new $.Event("on" + stanza_type);
+        var targettedTypeEvent = new $.Event("on" + stanzaType);
 
-//        console.debug(self.getJid(), "Triggering Event for: ", stanza_type, "with event data:", evt_data);
+        if(localStorage.d) {
+    		console.debug(self.getJid(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
+        }
 
         try {
             /**
              * Strophe will remove this handler if it raises an exception... so we need to be sure that our attached
              * handlers WOULD NEVER throw an exception.
              */
-            self.trigger(targetted_type_evt, evt_data);
+            self.trigger(targettedTypeEvent, eventData);
         } catch(e) {
-            console.error('ERROR: ' + (e.stack ? e.stack : e));
+            if(localStorage.d) {
+		        console.error('ERROR: ' + (e.stack ? e.stack : e));
+            }
         }
 
         // if none of the handlers have not stopped the event propagation, trigger a more generic event.
-        if(!targetted_type_evt.isPropagationStopped()) {
-            var generic_evt = new $.Event("onStanza");
-            generic_evt.data = evt_data;
+        if(!targettedTypeEvent.isPropagationStopped()) {
+            var genericEventInstance = new $.Event("onStanza");
+            genericEventInstance.data = eventData;
 
             try {
                 /**
                  * Strophe will remove this handler if it raises an exception... so we need to be sure that our attached
                  * handlers WOULD NEVER throw an exception.
                  */
-                self.trigger(generic_evt, evt_data);
+                self.trigger(genericEventInstance, eventData);
             } catch(e) {
-                console.log('ERROR: ' + (e.stack ? e.stack : e));
+                if(localStorage.d) {
+		            console.log('ERROR: ' + (e.stack ? e.stack : e));
+                }
             }
-            if(generic_evt.isPropagationStopped()) {
+            if(genericEventInstance.isPropagationStopped()) {
                 return false;
             }
         } else {
@@ -878,7 +935,7 @@ makeMetaAware(Karere);
     Karere.prototype.getPresence = function(jid) {
         var self = this;
 
-        return self._presence_cache[jid] ? self._presence_cache[jid] : false;
+        return self._presenceCache[jid] ? self._presenceCache[jid] : false;
     }
 }
 
@@ -904,28 +961,28 @@ makeMetaAware(Karere);
     /**
      * Send Is Composing chat state
      *
-     * @param to_jid
+     * @param toJid
      * @returns {*}
      */
-    Karere.prototype.sendIsComposing = function(to_jid) {
+    Karere.prototype.sendIsComposing = function(toJid) {
         var self = this;
 
-        return self._rawSendMessage(to_jid, "chat", Karere._$chatState('composing'));
+        return self._rawSendMessage(toJid, "chat", Karere._$chatState('composing'));
     };
 
     /**
      * Send Composing stopped/paused chat state
      *
-     * @param to_jid
+     * @param toJid
      * @returns {*}
      */
-    Karere.prototype.sendComposingPaused = function(to_jid) {
+    Karere.prototype.sendComposingPaused = function(toJid) {
         var self = this;
-        self._rawSendMessage(to_jid, "chat", Karere._$chatState('paused'));
+        self._rawSendMessage(toJid, "chat", Karere._$chatState('paused'));
 
         return $.when(
-            self.sendIsActive(to_jid),
-            self._rawSendMessage(to_jid, "chat", Karere._$chatState('paused'))
+            self.sendIsActive(toJid),
+            self._rawSendMessage(toJid, "chat", Karere._$chatState('paused'))
         );
 
     };
@@ -934,12 +991,12 @@ makeMetaAware(Karere);
     /**
      * Send Is Active chat state
      *
-     * @param to_jid
+     * @param toJid
      * @returns {*}
      */
-    Karere.prototype.sendIsActive = function(to_jid) {
+    Karere.prototype.sendIsActive = function(toJid) {
         var self = this;
-        return self._rawSendMessage(to_jid, "chat", Karere._$chatState('active'));
+        return self._rawSendMessage(toJid, "chat", Karere._$chatState('active'));
     };
 }
 
@@ -952,17 +1009,17 @@ makeMetaAware(Karere);
     /**
      * Messaging, encapsulated in one method
      *
-     * @param to_jid
+     * @param toJid
      * @param type should be chat or groupchat
      * @param contents
      * @private
      */
-    Karere.prototype._rawSendMessage = function (to_jid, type, contents) {
+    Karere.prototype._rawSendMessage = function (toJid, type, contents) {
         var self = this;
 
         type = type || "chat";
         var timestamp = (new Date()).getTime();
-        var message = $msg({from: self.connection.jid, to: to_jid, type: type, id: timestamp})
+        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: timestamp})
 
         if(contents.toUpperCase) { // is string (better way?)
             message
@@ -994,57 +1051,57 @@ makeMetaAware(Karere);
     /**
      * Generates room config XML from the self.options.roomConfig to be used and sent as stanza when creating new rooms
      *
-     * @param room_password
+     * @param roomPassword
      * @returns {HTMLElement[]}
      * @private
      */
-    Karere.prototype._getRoomConfig = function(room_password) {
+    Karere.prototype._getRoomConfig = function(roomPassword) {
         var self = this;
 
-        var config_data = "<x xmlns='jabber:x:data' type='submit'>" +
+        var configXml = "<x xmlns='jabber:x:data' type='submit'>" +
             "<field var='FORM_TYPE'>" +
             "<value>http://jabber.org/protocol/muc#roomconfig</value>" +
             "</field>";
 
         var config_dict = $.extend({}, self.options.roomConfig, {
-            "muc#roomconfig_roomsecret": room_password ? room_password : ""
+            "muc#roomconfig_roomsecret": roomPassword ? roomPassword : ""
         });
 
         $.each(Object.keys(config_dict), function(i, k) {
-            config_data += "<field var='" + k + "'>" +
+            configXml += "<field var='" + k + "'>" +
                 "<value>" + config_dict[k] + "</value>" +
                 "</field>";
         });
 
 
-        config_data += "<field var='muc#roomconfig_captcha_whitelist'/>" +
+        configXml += "<field var='muc#roomconfig_captcha_whitelist'/>" +
             "</x>";
 
-        return Strophe.xmlHtmlNode(config_data).children[0].children;
+        return Strophe.xmlHtmlNode(configXml).children[0].children;
     };
 
     /**
      * Start/create new chat, wait for the room creations, send invites and wait for all users to join.
      *
-     * @param jid_list array of jids to be invited to the chat
+     * @param jidList array of jids to be invited to the chat
      * @returns {Deferred}
      */
-    Karere.prototype.startChat = function(jid_list) {
+    Karere.prototype.startChat = function(jidList) {
         var self = this;
 
         var $promise = new $.Deferred();
 
-        var room_name = self._generateNewRoomIdx();
-        var room_password = self._generateNewRoomPassword();
-        var room_jid = room_name + "@" + self.options.muc_domain;
+        var roomName = self._generateNewRoomIdx();
+        var roomPassword = self._generateNewRoomPassword();
+        var roomJid = roomName + "@" + self.options.mucDomain;
 
-        self.setMeta("rooms", room_jid, 'password', room_password);
+        self.setMeta("rooms", roomJid, 'password', roomPassword);
 
-        self.connection.muc.join(room_jid, self.getNickname(), undefined, undefined, undefined, room_password, undefined);
+        self.connection.muc.join(roomJid, self.getNickname(), undefined, undefined, undefined, roomPassword, undefined);
 
-        var i_had_joined_promise = self.waitForUserToJoin(room_jid, self.getJid());
+        var iHadJoinedPromise = self.waitForUserToJoin(roomJid, self.getJid());
 
-        i_had_joined_promise
+        iHadJoinedPromise
             .done(function() {
                 if(typeof Form == "undefined") {
                     window.Form = function() {}; // bug in Strophe.plugins.muc
@@ -1052,14 +1109,14 @@ makeMetaAware(Karere);
                 }
 
                 self.connection.muc.saveConfiguration(
-                    room_jid,
-                    self._getRoomConfig(room_password),
+                    roomJid,
+                    self._getRoomConfig(roomPassword),
                     Karere._exceptionSafeProxy(function() {
                         var promises = [];
 
-                        $.each(jid_list, function(i, jid) {
+                        $.each(jidList, function(i, jid) {
                             promises.push(
-                                self.addUserToChat(room_jid, jid, room_password)
+                                self.addUserToChat(roomJid, jid, roomPassword)
                             );
                         });
 
@@ -1067,7 +1124,7 @@ makeMetaAware(Karere);
 
                         $.when.apply($, promises)
                             .done(function() {
-                                $promise.resolve(room_jid, room_password);
+                                $promise.resolve(roomJid, roomPassword);
                             })
                             .fail(function() {
                                 $promise.reject(toArray(arguments));
@@ -1083,7 +1140,9 @@ makeMetaAware(Karere);
                 }
             })
             .fail(function() {
-                console.error("Could not join my newly created room.")
+                if(localStorage.d) {
+		            console.error("Could not join my newly created room.")
+                }
                 $promise.reject();
             });
 
@@ -1094,58 +1153,65 @@ makeMetaAware(Karere);
     /**
      * Helper/internal method for waiting for a user's presence in a specific room.
      *
-     * @param event_type Joined/Left
-     * @param room_jid
-     * @param user_jid
+     * @param eventName Joined/Left
+     * @param roomJid
+     * @param userJid
      * @returns {Deferred}
      * @private
      */
-    Karere.prototype._waitForUserPresenceInRoom = function(event_type, room_jid, user_jid) {
+    Karere.prototype._waitForUserPresenceInRoom = function(eventName, roomJid, userJid) {
         var self = this;
 
         var $promise = new $.Deferred();
-        var evt_name = generateEventSuffixFromArguments("onUsers" + event_type, "inv", room_jid, user_jid, Math.random());
+        var generatedEventName = generateEventSuffixFromArguments("onUsers" + eventName, "inv", roomJid, userJid, Math.random());
 
-        var joined_timeout = setTimeout(function() {
-            console.error(self.getJid(), "Timeout waiting for user to " + (event_type == "Joined" ? "join" : "leave") + ": ", user_jid);
+        var joinedTimeout = setTimeout(function() {
+            if(localStorage.d) {
+		        console.error(self.getJid(), "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ", userJid);
+            }
 
-            self.unbind(evt_name);
-            $promise.reject(room_jid, user_jid);
+            self.unbind(generatedEventName);
+            $promise.reject(roomJid, userJid);
         }, self.options.wait_for_user_presence_in_room_timeout);
 
-        var search_key = event_type == "Joined" ? "new_users" : "left_users";
+        var searchKey = eventName == "Joined" ? "newUsers" : "leftUsers";
 
-        self.bind(evt_name, function(e, evt_data) {
+        self.bind(generatedEventName, function(e, eventData) {
             var joined = false;
 
-//            console.error(event_type, room_jid, user_jid, evt_data[search_key]);
+            if(localStorage.d) {
+        		console.error(eventName, roomJid, userJid, eventData[searchKey]);
+            }
 
-            if(evt_data.from.split("/")[0] != room_jid) {
+            if(eventData.from.split("/")[0] != roomJid) {
                 return;
             }
 
-            if(user_jid.indexOf("/") == -1) { // bare jid
-                // search for $user_jid/
-                $.each(evt_data[search_key], function(k, v) {
-                    if(k.indexOf(user_jid + "/") != -1) {
+            if(userJid.indexOf("/") == -1) { // bare jid
+                // search for $userJid/
+                $.each(eventData[searchKey], function(k, v) {
+                    if(k.indexOf(userJid + "/") != -1) {
                         joined = true;
                         return false; //break;
                     }
                 });
             } else { // full jid
-                if(evt_data[search_key][user_jid]) {
+                if(eventData[searchKey][userJid]) {
                     joined = true;
                 }
             }
 
 
             if(joined) {
-                console.warn(self.getJid(), "User " + event_type + ": ", room_jid, user_jid);
-                self.unbind(evt_name);
-                clearTimeout(joined_timeout);
+                if(localStorage.d) {
+	            	console.warn(self.getJid(), "User " + eventName + ": ", roomJid, userJid);
+                }
+
+                self.unbind(generatedEventName);
+                clearTimeout(joinedTimeout);
 
                 $promise.resolve(
-                    room_jid, user_jid
+                    roomJid, userJid
                 );
             }
         });
@@ -1157,45 +1223,45 @@ makeMetaAware(Karere);
     /**
      * Wait for user to join
      *
-     * @param room_jid
-     * @param user_jid
+     * @param roomJid
+     * @param userJid
      * @returns {Deferred}
      */
-    Karere.prototype.waitForUserToJoin = function(room_jid, user_jid) {
-        return this._waitForUserPresenceInRoom("Joined", room_jid, user_jid);
+    Karere.prototype.waitForUserToJoin = function(roomJid, userJid) {
+        return this._waitForUserPresenceInRoom("Joined", roomJid, userJid);
     };
 
     /**
      * Wait for user to leave
      *
-     * @param room_jid
-     * @param user_jid
+     * @param roomJid
+     * @param userJid
      * @returns {Deferred}
      */
-    Karere.prototype.waitForUserToLeave = function(room_jid, user_jid) {
-        return this._waitForUserPresenceInRoom("Left", room_jid, user_jid);
+    Karere.prototype.waitForUserToLeave = function(roomJid, userJid) {
+        return this._waitForUserPresenceInRoom("Left", roomJid, userJid);
     };
 
     /**
      * Leave chat
      *
-     * @param room_jid
-     * @param exit_msg
+     * @param roomJid
+     * @param exitMessage
      * @returns {Deferred}
      */
-    Karere.prototype.leaveChat = function(room_jid, exit_msg) {
+    Karere.prototype.leaveChat = function(roomJid, exitMessage) {
         var self = this;
-        exit_msg = exit_msg || undefined;
+        exitMessage = exitMessage || undefined;
 
         var $promise = new $.Deferred();
 
         self.connection.muc.leave(
-            room_jid,
+            roomJid,
             undefined,
             Karere._exceptionSafeProxy(function() {
                 $promise.resolve();
             }),
-            exit_msg
+            exitMessage
         );
 
         return $promise;
@@ -1204,23 +1270,25 @@ makeMetaAware(Karere);
     /**
      * Invite a user to a specific chat
      *
-     * @param room_jid
-     * @param user_jid
+     * @param roomJid
+     * @param userJid
      * @param password
      * @returns {Deferred}
      */
-    Karere.prototype.addUserToChat = function(room_jid, user_jid, password) {
+    Karere.prototype.addUserToChat = function(roomJid, userJid, password) {
         var self = this;
 
-        if(!password && self.getMeta("rooms", room_jid, 'password')) {
-            password = self.getMeta("rooms", room_jid, 'password');
+        if(!password && self.getMeta("rooms", roomJid, 'password')) {
+            password = self.getMeta("rooms", roomJid, 'password');
         }
 
-        var $promise = self.waitForUserToJoin(room_jid, user_jid)
+        var $promise = self.waitForUserToJoin(roomJid, userJid)
 
-        self.connection.muc.directInvite(room_jid, user_jid, undefined, password);
+        self.connection.muc.directInvite(roomJid, userJid, undefined, password);
 
-        console.warn(self.getJid(), "Inviting: ", user_jid, "to", room_jid, "with password", password);
+        if(localStorage.d) {
+		    console.warn(self.getJid(), "Inviting: ", userJid, "to", roomJid, "with password", password);
+        }
 
         return $promise;
     };
@@ -1228,40 +1296,42 @@ makeMetaAware(Karere);
     /**
      * Remove a user from a chat room
      *
-     * @param room_jid
-     * @param user_jid
+     * @param roomJid
+     * @param userJid
      * @param reason
      * @returns {Deferred}
      */
-    Karere.prototype.removeUserFromChat = function(room_jid, user_jid, reason) {
+    Karere.prototype.removeUserFromChat = function(roomJid, userJid, reason) {
         var self = this;
 
         reason = reason || "";
 
         var $promise = new $.Deferred();
-        var nick_name = false;
+        var nickname = false;
 
-        if(!self.connection.muc.rooms[room_jid] || !self.connection.muc.rooms[room_jid].roster) {
+        if(!self.connection.muc.rooms[roomJid] || !self.connection.muc.rooms[roomJid].roster) {
             $promise.reject("Room user list is currently not available.");
             return $promise;
         }
-        $.each(self.connection.muc.rooms[room_jid].roster, function(_nick, item) {
-            if(item.jid == user_jid) {
-                nick_name = _nick;
+        $.each(self.connection.muc.rooms[roomJid].roster, function(_nick, item) {
+            if(item.jid == userJid) {
+                nickname = _nick;
                 return false; // break.
             }
         });
 
-        console.warn(self.getJid(), "Removing user: ", user_jid, "from chat", room_jid);
+        if(localStorage.d) {
+            console.warn(self.getJid(), "Removing user: ", userJid, "from chat", roomJid);
+        }
 
-        if(!nick_name) {
+        if(!nickname) {
             $promise.reject(
-                'User not found for jid: ' + user_jid
+                'User not found for jid: ' + userJid
             );
         } else {
             // pair/proxy the waitForUserToLeave w/ the returned promise, so that it will be resolved only
             // when the user is actually out of the chat room.
-            self.waitForUserToLeave(room_jid, user_jid)
+            self.waitForUserToLeave(roomJid, userJid)
                 .done(function() {
                     $promise.resolve();
                 })
@@ -1270,8 +1340,8 @@ makeMetaAware(Karere);
                 });
 
             self.connection.muc.kick(
-                room_jid,
-                nick_name,
+                roomJid,
+                nickname,
                 reason,
                 Karere._exceptionSafeProxy(function() {
                     // do nothing, waitForUserToLeave should handle this.
@@ -1289,12 +1359,12 @@ makeMetaAware(Karere);
     /**
      * Get users in chat
      *
-     * @param room_jid
+     * @param roomJid
      * @returns {*}
      */
-    Karere.prototype.getUsersInChat = function(room_jid) {
+    Karere.prototype.getUsersInChat = function(roomJid) {
         var self = this;
-        var users = self.getMeta('rooms', room_jid, 'users', {});
+        var users = self.getMeta('rooms', roomJid, 'users', {});
         return users;
     };
 }

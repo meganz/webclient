@@ -80,7 +80,7 @@ describe("Karere Unit Test", function() {
         expect(k1.getConnectionState()).to.equal(Karere.CONNECTION_STATE.DISCONNECTING);
         expect(promise2.state()).to.equal('pending');
 
-        k1._connection_state = Karere.CONNECTION_STATE.DISCONNECTED;
+        k1._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
 
 
         expectToBeResolved(
@@ -128,8 +128,6 @@ describe("Karere Unit Test", function() {
 
     it("can retrieve different jid formats", function(done) {
         k1.fakeConnect("user@jid.com", "password");
-
-        console.log(k1);
 
         expect(k1.getJid()).to.contain("user@jid.com/");
         expect(k1.getBareJid()).to.equal("user@jid.com");
@@ -196,8 +194,8 @@ describe("Karere Unit Test", function() {
         em1.mock("onUsersJoined");
         em1.mock("onUsersLeft");
 
-        var promise_joined = k1.waitForUserToJoin("room@jid.com", "user2@jid.com");
-        var promise_left = k1.waitForUserToLeave("room@jid.com", "user2@jid.com");
+        var promiseJoined = k1.waitForUserToJoin("room@jid.com", "user2@jid.com");
+        var promiseLeft = k1.waitForUserToLeave("room@jid.com", "user2@jid.com");
 
         k1._onIncomingStanza(
             stringToXml(
@@ -228,10 +226,10 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onUsersJoined'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['new_users']).to.not.be.empty;
-        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['new_users']['user2@jid.com/r1']).to.equal("participant");
+        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['newUsers']).to.not.be.empty;
+        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['newUsers']['user2@jid.com/r1']).to.equal("participant");
 
-        expect(promise_joined.state()).to.equal("resolved");
+        expect(promiseJoined.state()).to.equal("resolved");
 
         expect(
             Object.keys(
@@ -253,10 +251,10 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onUsersLeft'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['left_users']).to.not.be.empty;
-        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['left_users']['user2@jid.com/r1']).to.be.true;
+        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['leftUsers']).to.not.be.empty;
+        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['leftUsers']['user2@jid.com/r1']).to.be.true;
 
-        expect(promise_left.state()).to.equal("resolved");
+        expect(promiseLeft.state()).to.equal("resolved");
 
         expect(
             Object.keys(
@@ -317,33 +315,25 @@ describe("Karere Unit Test", function() {
     });
 
     it("can create room, leave room, add user to room, remove user from room", function(done) {
-        var room_jid;
-        var room_password;
+        var roomJid;
+        var roomPassword;
 
         k1.fakeConnect("user@jid.com", "password");
 
-        var promise_start = k1.startChat([
+        var promiseStart = k1.startChat([
                 'user2@jid.com/r1'
             ]);
-//                .done(function(room_jid) {
-//                    var promise_add = k1.addUserToChat(room_jid, "user2@jid.com")
-//                    var promise_remove = k1.removeUserFromChat(room_jid, "user2@jid.com")
-//
-//                    var promise_leave = k1.leaveChat(room_jid);
-//
-//                    done();
-//                });
 
         expect(m1.calls['muc.join'].length).to.equal(1);
-        room_jid = m1.calls['muc.join'][0][0];
-        room_password = m1.calls['muc.join'][0][5];
+        roomJid = m1.calls['muc.join'][0][0];
+        roomPassword = m1.calls['muc.join'][0][5];
 
-        expect(room_password).to.not.be.empty;
+        expect(roomPassword).to.not.be.empty;
 
         // Stanza that says that I'd just joined
         k1._onIncomingStanza(
             stringToXml(
-                "<presence xmlns='jabber:client' from='" + room_jid + "/user2' to='" + k1.getJid() + "'>" +
+                "<presence xmlns='jabber:client' from='" + roomJid + "/user2' to='" + k1.getJid() + "'>" +
                     "<show>away</show>" +
                     "<status>Away</status>" +
                     "<c xmlns='http://jabber.org/protocol/caps' node='http://pidgin.im/' hash='sha-1' ver='DdnydQG7RGhP9E3k9Sf+b+bF0zo='/>" +
@@ -355,7 +345,7 @@ describe("Karere Unit Test", function() {
         );
 
         expect(m1.calls['muc.saveConfiguration'].length).to.equal(1);
-        expect(m1.calls['muc.saveConfiguration'][0][0]).to.equal(room_jid);
+        expect(m1.calls['muc.saveConfiguration'][0][0]).to.equal(roomJid);
 
         m1.calls['muc.saveConfiguration'][0][2](); // call the saveConfiguration success handler
 
@@ -363,15 +353,15 @@ describe("Karere Unit Test", function() {
 
 
         expect(m1.calls['muc.directInvite'].length).to.equal(1);
-        expect(m1.calls['muc.directInvite'][0][0]).to.equal(room_jid);
+        expect(m1.calls['muc.directInvite'][0][0]).to.equal(roomJid);
         expect(m1.calls['muc.directInvite'][0][1]).to.equal("user2@jid.com/r1");
-        expect(m1.calls['muc.directInvite'][0][3]).to.equal(room_password);
+        expect(m1.calls['muc.directInvite'][0][3]).to.equal(roomPassword);
 
 
         // Stanza that says that user2 had joined
         k1._onIncomingStanza(
             stringToXml(
-                "<presence xmlns='jabber:client' from='" + room_jid + "/r1' to='" + k1.getJid() + "'>" +
+                "<presence xmlns='jabber:client' from='" + roomJid + "/r1' to='" + k1.getJid() + "'>" +
                     "<show>away</show>" +
                     "<status>Away</status>" +
                     "<c xmlns='http://jabber.org/protocol/caps' node='http://pidgin.im/' hash='sha-1' ver='DdnydQG7RGhP9E3k9Sf+b+bF0zo='/>" +
@@ -382,25 +372,25 @@ describe("Karere Unit Test", function() {
             )
         );
 
-        expect(promise_start.state()).to.equal('resolved');
+        expect(promiseStart.state()).to.equal('resolved');
 
         // we need to mock the rooms{}.roster[] obj
-        k1.connection.muc.rooms[room_jid].roster = {
+        k1.connection.muc.rooms[roomJid].roster = {
             'r1': {
                 'jid': 'user2@jid.com/r1'
             }
         };
 
-        var promise_left = k1.removeUserFromChat(room_jid, "user2@jid.com/r1");
+        var promiseLeft = k1.removeUserFromChat(roomJid, "user2@jid.com/r1");
 
         expect(m1.calls['muc.kick'].length).to.equal(1);
-        expect(m1.calls['muc.kick'][0][0]).to.equal(room_jid);
+        expect(m1.calls['muc.kick'][0][0]).to.equal(roomJid);
         expect(m1.calls['muc.kick'][0][1]).to.equal("r1");
 
         // Stanza that says that user2 was kicked
         k1._onIncomingStanza(
             stringToXml(
-                "<presence xmlns='jabber:client' from='" + room_jid + "/r1' to='user@jid.com' type='unavailable'>" +
+                "<presence xmlns='jabber:client' from='" + roomJid + "/r1' to='user@jid.com' type='unavailable'>" +
                     "<x xmlns='http://jabber.org/protocol/muc#user'>" +
                         "<item affiliation='none' role='none' jid='user2@jid.com/r1'/>" +
                         "<status code='307'/>" +
@@ -410,18 +400,18 @@ describe("Karere Unit Test", function() {
         );
 
 
-        expect(promise_left.state()).to.equal("resolved");
+        expect(promiseLeft.state()).to.equal("resolved");
 
 
-        var promise_leave = k1.leaveChat(room_jid);
+        var promiseLeave = k1.leaveChat(roomJid);
 
         expect(m1.calls['muc.leave'].length).to.equal(1);
-        expect(m1.calls['muc.leave'][0][0]).to.equal(room_jid);
+        expect(m1.calls['muc.leave'][0][0]).to.equal(roomJid);
 
         // fake call to trigger the handler
         m1.calls['muc.leave'][0][2]();
 
-        expect(promise_leave.state()).to.equal('resolved');
+        expect(promiseLeave.state()).to.equal('resolved');
 
         done();
     });

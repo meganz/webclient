@@ -229,11 +229,6 @@ makeMetaAware(Karere);
     Karere.prototype.connect = function(jid, password) {
         var self = this;
 
-
-        /// we may need this to reconnect in case of disconnect or connection issues.
-        self._jid = jid;
-        self._password = password;
-
         var $promise = new $.Deferred();
 
 
@@ -245,6 +240,12 @@ makeMetaAware(Karere);
             var resource = self.options.clientName + "-" + self._generateNewResourceIdx();
             full_jid = full_jid + "/" + resource;
         }
+
+        /// we may need this to reconnect in case of disconnect or connection issues.
+        // also, we should reuse the original generated resource, so we cache the full jid here.
+        self._jid = full_jid;
+        self._password = password;
+
 
         // parse and cache the muc_domain
         self.options.muc_domain = "conference." + jid.split("@")[1].split("/")[0];
@@ -393,7 +394,6 @@ makeMetaAware(Karere);
         var self = this;
 
         if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED) {
-            debugger;
             throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
         }
         if(!self._jid || !self._password) {
@@ -540,7 +540,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.getBareJid = function() {
         var self = this;
-        return Strophe.getBareJidFromJid(self.connection.jid);
+        return Strophe.getBareJidFromJid(self.getJid());
     };
 
     /**
@@ -550,7 +550,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.getJid = function() {
         var self = this;
-        return self.connection.jid;
+        return self._jid ? self._jid : "";
     };
 
     /**
@@ -561,7 +561,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.getNickname = function() {
         var self = this;
-        return self.connection.jid.split("@")[0];
+        return self.getJid().split("@")[0];
     };
 
     /**
@@ -653,8 +653,9 @@ makeMetaAware(Karere);
         }
         // end of x handling
 
-        if(msg.tagName == "message") {
-            console.warn(self.getJid(), "Message: ", msg);
+
+        if(msg.tagName.toLowerCase() == "message") {
+            console.warn(self.getJid(), "Message: ", _type, msg.innerHTML);
 
             var elems = msg.getElementsByTagName('body');
 
@@ -746,7 +747,7 @@ makeMetaAware(Karere);
 //                debugger;
             }
         } else {
-            console.debug("Unknown stanza type: ", msg);
+            console.debug("Unknown stanza type: ", msg.innerHTML);
             evt_data['unknown'] = true;
             evt_data['tag'] = msg.tagName;
         }
@@ -794,7 +795,7 @@ makeMetaAware(Karere);
 
         var targetted_type_evt = new $.Event("on" + stanza_type);
 
-        console.debug(self.getJid(), "Triggering Event for: ", stanza_type, "with event data:", evt_data);
+//        console.debug(self.getJid(), "Triggering Event for: ", stanza_type, "with event data:", evt_data);
 
         try {
             /**
@@ -1086,7 +1087,6 @@ makeMetaAware(Karere);
                 $promise.reject();
             });
 
-
         // returns promise that when solved will get the chat's JID
         return $promise;
     };
@@ -1095,28 +1095,34 @@ makeMetaAware(Karere);
      * Helper/internal method for waiting for a user's presence in a specific room.
      *
      * @param event_type Joined/Left
-     * @param chat_jid
+     * @param room_jid
      * @param user_jid
      * @returns {Deferred}
      * @private
      */
-    Karere.prototype._waitForUserPresenceInRoom = function(event_type, chat_jid, user_jid) {
+    Karere.prototype._waitForUserPresenceInRoom = function(event_type, room_jid, user_jid) {
         var self = this;
 
         var $promise = new $.Deferred();
-        var evt_name = generateEventSuffixFromArguments("onUsers" + event_type, "inv", chat_jid, user_jid, Math.random());
+        var evt_name = generateEventSuffixFromArguments("onUsers" + event_type, "inv", room_jid, user_jid, Math.random());
 
         var joined_timeout = setTimeout(function() {
             console.error(self.getJid(), "Timeout waiting for user to " + (event_type == "Joined" ? "join" : "leave") + ": ", user_jid);
 
             self.unbind(evt_name);
-            $promise.reject(chat_jid, user_jid);
+            $promise.reject(room_jid, user_jid);
         }, self.options.wait_for_user_presence_in_room_timeout);
 
         var search_key = event_type == "Joined" ? "new_users" : "left_users";
 
         self.bind(evt_name, function(e, evt_data) {
             var joined = false;
+
+//            console.error(event_type, room_jid, user_jid, evt_data[search_key]);
+
+            if(evt_data.from.split("/")[0] != room_jid) {
+                return;
+            }
 
             if(user_jid.indexOf("/") == -1) { // bare jid
                 // search for $user_jid/
@@ -1125,7 +1131,7 @@ makeMetaAware(Karere);
                         joined = true;
                         return false; //break;
                     }
-                })
+                });
             } else { // full jid
                 if(evt_data[search_key][user_jid]) {
                     joined = true;
@@ -1134,12 +1140,12 @@ makeMetaAware(Karere);
 
 
             if(joined) {
-                console.warn(self.getJid(), "User " + event_type + ": ", chat_jid, user_jid);
+                console.warn(self.getJid(), "User " + event_type + ": ", room_jid, user_jid);
                 self.unbind(evt_name);
                 clearTimeout(joined_timeout);
 
                 $promise.resolve(
-                    chat_jid, user_jid
+                    room_jid, user_jid
                 );
             }
         });
@@ -1151,39 +1157,40 @@ makeMetaAware(Karere);
     /**
      * Wait for user to join
      *
-     * @param chat_jid
+     * @param room_jid
      * @param user_jid
      * @returns {Deferred}
      */
-    Karere.prototype.waitForUserToJoin = function(chat_jid, user_jid) {
-        return this._waitForUserPresenceInRoom("Joined", chat_jid, user_jid);
+    Karere.prototype.waitForUserToJoin = function(room_jid, user_jid) {
+        return this._waitForUserPresenceInRoom("Joined", room_jid, user_jid);
     };
 
     /**
      * Wait for user to leave
      *
-     * @param chat_jid
+     * @param room_jid
      * @param user_jid
      * @returns {Deferred}
      */
-    Karere.prototype.waitForUserToLeave = function(chat_jid, user_jid) {
-        return this._waitForUserPresenceInRoom("Left", chat_jid, user_jid);
+    Karere.prototype.waitForUserToLeave = function(room_jid, user_jid) {
+        return this._waitForUserPresenceInRoom("Left", room_jid, user_jid);
     };
 
     /**
      * Leave chat
      *
-     * @param chat_jid
+     * @param room_jid
      * @param exit_msg
      * @returns {Deferred}
      */
-    Karere.prototype.leaveChat = function(chat_jid, exit_msg) {
+    Karere.prototype.leaveChat = function(room_jid, exit_msg) {
         var self = this;
+        exit_msg = exit_msg || undefined;
 
         var $promise = new $.Deferred();
 
         self.connection.muc.leave(
-            chat_jid,
+            room_jid,
             undefined,
             Karere._exceptionSafeProxy(function() {
                 $promise.resolve();
@@ -1197,23 +1204,23 @@ makeMetaAware(Karere);
     /**
      * Invite a user to a specific chat
      *
-     * @param chat_jid
+     * @param room_jid
      * @param user_jid
      * @param password
      * @returns {Deferred}
      */
-    Karere.prototype.addUserToChat = function(chat_jid, user_jid, password) {
+    Karere.prototype.addUserToChat = function(room_jid, user_jid, password) {
         var self = this;
 
-        if(!password && self.getMeta("rooms", chat_jid, 'password')) {
-            password = self.getMeta("rooms", chat_jid, 'password');
+        if(!password && self.getMeta("rooms", room_jid, 'password')) {
+            password = self.getMeta("rooms", room_jid, 'password');
         }
 
-        var $promise = self.waitForUserToJoin(chat_jid, user_jid)
+        var $promise = self.waitForUserToJoin(room_jid, user_jid)
 
-        self.connection.muc.directInvite(chat_jid, user_jid, undefined, password);
+        self.connection.muc.directInvite(room_jid, user_jid, undefined, password);
 
-        console.warn(self.getJid(), "Inviting: ", user_jid, "to", chat_jid, "with password", password);
+        console.warn(self.getJid(), "Inviting: ", user_jid, "to", room_jid, "with password", password);
 
         return $promise;
     };
@@ -1221,29 +1228,31 @@ makeMetaAware(Karere);
     /**
      * Remove a user from a chat room
      *
-     * @param chat_jid
+     * @param room_jid
      * @param user_jid
      * @param reason
      * @returns {Deferred}
      */
-    Karere.prototype.removeUserFromChat = function(chat_jid, user_jid, reason) {
+    Karere.prototype.removeUserFromChat = function(room_jid, user_jid, reason) {
         var self = this;
+
+        reason = reason || "";
 
         var $promise = new $.Deferred();
         var nick_name = false;
 
-        if(!self.connection.muc.rooms[chat_jid] || !self.connection.muc.rooms[chat_jid].roster) {
+        if(!self.connection.muc.rooms[room_jid] || !self.connection.muc.rooms[room_jid].roster) {
             $promise.reject("Room user list is currently not available.");
             return $promise;
         }
-        $.each(self.connection.muc.rooms[chat_jid].roster, function(_nick, item) {
+        $.each(self.connection.muc.rooms[room_jid].roster, function(_nick, item) {
             if(item.jid == user_jid) {
                 nick_name = _nick;
                 return false; // break.
             }
         });
 
-        console.warn(self.getJid(), "Removing user: ", user_jid, "from chat", chat_jid);
+        console.warn(self.getJid(), "Removing user: ", user_jid, "from chat", room_jid);
 
         if(!nick_name) {
             $promise.reject(
@@ -1252,7 +1261,7 @@ makeMetaAware(Karere);
         } else {
             // pair/proxy the waitForUserToLeave w/ the returned promise, so that it will be resolved only
             // when the user is actually out of the chat room.
-            self.waitForUserToLeave(chat_jid, user_jid)
+            self.waitForUserToLeave(room_jid, user_jid)
                 .done(function() {
                     $promise.resolve();
                 })
@@ -1261,7 +1270,7 @@ makeMetaAware(Karere);
                 });
 
             self.connection.muc.kick(
-                chat_jid,
+                room_jid,
                 nick_name,
                 reason,
                 Karere._exceptionSafeProxy(function() {
@@ -1280,12 +1289,12 @@ makeMetaAware(Karere);
     /**
      * Get users in chat
      *
-     * @param chat_jid
+     * @param room_jid
      * @returns {*}
      */
-    Karere.prototype.getUsersInChat = function(chat_jid) {
+    Karere.prototype.getUsersInChat = function(room_jid) {
         var self = this;
-        var users = self.getMeta('rooms', chat_jid, 'users', {});
+        var users = self.getMeta('rooms', room_jid, 'users', {});
         return users;
     };
 }

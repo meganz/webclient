@@ -207,9 +207,11 @@ pip-log.txt
 # Unit test / coverage reports
 .coverage
 .tox
+js/tests/coverage
 
 #Translations
 *.mo
 
 #Mr Developer
 .mr.developer.cfg
+

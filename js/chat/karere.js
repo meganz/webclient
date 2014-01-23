@@ -1041,8 +1041,6 @@ makeMetaAware(Karere);
 
         self.connection.send(message);
         self.connection.send(forwarded);
-
-        //XXX: Use promise and wait for confirmation of this message to resolve/reject (timeout) it.
     };
 
     /**
@@ -1373,13 +1371,6 @@ makeMetaAware(Karere);
  * Wrap all methods which require a connection to actually use the ._requiresConnectionWrapper helper
  */
 {
-    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsComposing'); //XXX: MUST return a promise, some day - Feature #49
-    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendComposingPaused'); //XXX: MUST return a promise, some day - Feature #49
-    //Karere._requiresConnectionWrapper(Karere.prototype, 'sendIsActive'); //XXX: MUST return a promise, some day - Feature #49
-    //Karere._requiresConnectionWrapper(Karere.prototype, 'setPresence'); //XXX: MUST return a promise, some day - Feature #49
-    //Karere._requiresConnectionWrapper(Karere.prototype, '_rawSendMessage'); //XXX: MUST return a promise, some day - Feature #49
-    //Karere._requiresConnectionWrapper(Karere.prototype, 'getUsersInChat'); //XXX: MUST return a promise, some day - Feature #49
-
     Karere._requiresConnectionWrapper(Karere.prototype, 'startChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'leaveChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'addUserToChat');

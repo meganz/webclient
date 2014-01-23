@@ -486,13 +486,24 @@ function checkMail(email)
 	if (filter.test(email)) return false;	
 	else return true;	
 }
-
+/**
+ * Helper function for creating alias of a method w/ specific context
+ *
+ * @param context
+ * @param fn
+ * @returns {aliasClosure}
+ */
 function funcAlias(context, fn) {
     return function aliasClosure() {
         return fn.apply(context, arguments);
     };
 }
 
+/**
+ * Adds on, bind, unbind, one and trigger methods to a specific class's prototype.
+ *
+ * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
+ */
 function makeObservable(kls) {
     var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
 
@@ -503,7 +514,21 @@ function makeObservable(kls) {
     });
 };
 
+/**
+ * Adds simple .setMeta and .getMeta functions, which can be used to store some meta information on the fly.
+ * Also triggers `onMetaChange` events (only if the `kls` have a `trigger` method !)
+ *
+ * @param kls {Class} on which prototype's this method should add the setMeta and getMeta
+ */
 function makeMetaAware(kls) {
+    /**
+     * Store meta data
+     *
+     * @param prefix string
+     * @param namespace string
+     * @param k string
+     * @param val {*}
+     */
     kls.prototype.setMeta = function(prefix, namespace, k, val) {
         var self = this;
 
@@ -519,6 +544,15 @@ function makeMetaAware(kls) {
         }
     };
 
+    /**
+     * Retrieve meta data
+     *
+     * @param prefix {string}
+     * @param namespace {string}
+     * @param k {string}
+     * @param default_value {*}
+     * @returns {*}
+     */
     kls.prototype.getMeta = function(prefix, namespace, k, default_value) {
         var self = this;
 
@@ -543,14 +577,22 @@ function makeMetaAware(kls) {
     };
 };
 
-function generateEventSuffixFromArguments(event_name, name) {
+/**
+ * Simple method for generating unique event name with a .suffix that is a hash of the passed 3-n arguments
+ * Main purpose is to be used with jQuery.bind and jQuery.unbind.
+ *
+ * @param eventName {string} event name
+ * @param name {string} name of the handler (e.g. .suffix)
+ * @returns {string} e.g. $eventName.$name_$ShortHashOfTheAdditionalArguments
+ */
+function generateEventSuffixFromArguments(eventName, name) {
     var args = Array.prototype.splice.call(arguments, 2);
     var result = "";
     $.each(args, function(k, v) {
         result += v;
     });
 
-    return event_name + "." + name + "_" + ("" + simpleStringHashCode(result)).replace("-", "_");
+    return eventName + "." + name + "_" + ("" + simpleStringHashCode(result)).replace("-", "_");
 };
 
 /**
@@ -571,28 +613,45 @@ function simpleStringHashCode(str){
     return hash;
 };
 
-
-function createTimeoutPromise(validate_fn, tick, timeout) {
+/**
+ * Creates a promise, which will fail if the validateFunction() don't return true in a timely manner (e.g. < timeout).
+ *
+ * @param validateFunction {Function}
+ * @param tick {int}
+ * @param timeout {int}
+ * @returns {Deferred}
+ */
+function createTimeoutPromise(validateFunction, tick, timeout) {
     var $promise = new $.Deferred();
-    var tick_interval = setInterval(function() {
-        if(validate_fn()) {
+    var tickInterval = setInterval(function() {
+        if(validateFunction()) {
             $promise.resolve();
         }
     }, tick);
 
-    var timeout_timer = setTimeout(function() {
-        $promise.reject();
+    var timeoutTimer = setTimeout(function() {
+        if(validateFunction()) {
+            $promise.resolve();
+        } else {
+            $promise.reject();
+        }
     }, timeout);
 
     // stop any running timers and timeouts
     $promise.always(function() {
-        clearInterval(tick_interval);
-        clearTimeout(timeout_timer)
+        clearInterval(tickInterval);
+        clearTimeout(timeoutTimer)
     });
 
     return $promise;
 };
 
+/**
+ * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
+ *
+ * @param val {Arguments}
+ * @returns {Array}
+ */
 function toArray(val) {
     return Array.prototype.slice.call(val, val);
-}
+};

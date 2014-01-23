@@ -2,9 +2,6 @@
  * Karere - Mega XMPP Client
  */
 
-//TODO: Fix naming conv: https://basecamp.com/1763244/projects/4428869-mega-encrypted-chat/messages/20278286-javascript-dev#comment_121454400
-
-
 // Because of several bugs in Strophe's connection handler for Bosh (throwing uncatchable exceptions) this is currently
 // not working. We should isolate and prepare a test case to to submit as a bug to Strophe's devs.
 // Exception:
@@ -21,7 +18,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
 
 
     if(localStorage.d) {
-		console.warn("request errored, status: " + reqStatus + ", number of errors: " + karere._errors);
+		console.warn("request error, status: " + reqStatus + ", number of errors: " + karere._errors);
     }
 
 
@@ -61,7 +58,7 @@ var Karere = function(user_options) {
         "clientName": 'karere',
 
         /**
-         * Default Strophe Options, which can be overriden in `opts`
+         * Default Strophe Options, which can be overridden in `opts`
          */
         "stropheOptions": {
         },
@@ -133,10 +130,11 @@ var Karere = function(user_options) {
     }
 
     // Uncomment the following line to see all the debug output.
-//    Strophe.log = function (level, msg) { if(localStorage.d) {
-    if(localStorage.d) {
-        console.log(level, 'LOG: ' + msg);
-    }
+//    Strophe.log = function (level, msg) {
+//        if(localStorage.d) {
+//            console.log(level, 'LOG: ' + msg);
+//        }
+//    }
 
     Strophe.fatal = function (msg) { Karere.error(msg); };
     Strophe.error = function (msg) { Karere.error(msg); };
@@ -208,7 +206,7 @@ makeMetaAware(Karere);
      * Returns the current connection's state.
      * See Karere.CONNECTION_STATE
      *
-     * @returns {.Status.*|*}
+     * @returns {Karere.CONNECTION_STATE}
      */
     Karere.prototype.getConnectionState = function() {
         var self = this;
@@ -252,18 +250,18 @@ makeMetaAware(Karere);
         var $promise = new $.Deferred();
 
 
-        var bare_jid = Strophe.getBareJidFromJid(jid);
-        var full_jid = jid;
+        var bareJid = Strophe.getBareJidFromJid(jid);
+        var fullJid = jid;
 
         // if there is no /resource defined, generate one on the fly.
-        if(bare_jid == full_jid) {
+        if(bareJid == fullJid) {
             var resource = self.options.clientName + "-" + self._generateNewResourceIdx();
-            full_jid = full_jid + "/" + resource;
+            fullJid = fullJid + "/" + resource;
         }
 
         /// we may need this to reconnect in case of disconnect or connection issues.
         // also, we should reuse the original generated resource, so we cache the full jid here.
-        self._jid = full_jid;
+        self._jid = fullJid;
         self._password = password;
 
 
@@ -275,11 +273,11 @@ makeMetaAware(Karere);
         self.connection.reset(); // clear any old attached handlers
 
         self.connection.connect(
-            full_jid,
+            fullJid,
             self._password,
             function(status) {
                 if(localStorage.d) {
-		            console.warn("Got connection status: ", full_jid, self._password, status);
+		            console.warn("Got connection status: ", fullJid, self._password, status);
                 }
 
                 self._connectionState = status;
@@ -371,7 +369,7 @@ makeMetaAware(Karere);
 
             var args = toArray(arguments);
 
-            var internal_promises = [];
+            var internalPromises = [];
             var $promise = new $.Deferred();
 
             /**
@@ -382,10 +380,10 @@ makeMetaAware(Karere);
 		            console.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state.");
                 }
 
-                internal_promises.push(
+                internalPromises.push(
                     createTimeoutPromise(
                         function() {
-                            self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
+                            return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
                         },
                         200,
                         1000
@@ -397,12 +395,12 @@ makeMetaAware(Karere);
 		            console.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
                 }
 
-                internal_promises.push(
+                internalPromises.push(
                     self.reconnect()
                 );
             }
 
-            $.when.apply($, internal_promises)
+            $.when.apply($, internalPromises)
                 .done(function() {
                     fn.apply(self, args)
                         .done(function() {
@@ -624,7 +622,6 @@ makeMetaAware(Karere);
  * onMessage and onPresence handlers that act as proxy to trigger events
  */
 {
-    //TODO: Refactor this to be moooore easier to read and debug.
 
     /**
      * THE handler of incoming stanzas (both <message/> and <presence/>)
@@ -844,7 +841,7 @@ makeMetaAware(Karere);
             stanzaType = "Delayed" + stanzaType;
         }
 
-        var targettedTypeEvent = new $.Event("on" + stanzaType);
+        var targetedTypeEvent = new $.Event("on" + stanzaType);
 
         if(localStorage.d) {
     		console.debug(self.getJid(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
@@ -855,7 +852,7 @@ makeMetaAware(Karere);
              * Strophe will remove this handler if it raises an exception... so we need to be sure that our attached
              * handlers WOULD NEVER throw an exception.
              */
-            self.trigger(targettedTypeEvent, eventData);
+            self.trigger(targetedTypeEvent, eventData);
         } catch(e) {
             if(localStorage.d) {
 		        console.error('ERROR: ' + (e.stack ? e.stack : e));
@@ -863,7 +860,7 @@ makeMetaAware(Karere);
         }
 
         // if none of the handlers have not stopped the event propagation, trigger a more generic event.
-        if(!targettedTypeEvent.isPropagationStopped()) {
+        if(!targetedTypeEvent.isPropagationStopped()) {
             var genericEventInstance = new $.Event("onStanza");
             genericEventInstance.data = eventData;
 
@@ -1019,7 +1016,7 @@ makeMetaAware(Karere);
 
         type = type || "chat";
         var timestamp = (new Date()).getTime();
-        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: timestamp})
+        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: timestamp});
 
         if(contents.toUpperCase) { // is string (better way?)
             message
@@ -1063,13 +1060,13 @@ makeMetaAware(Karere);
             "<value>http://jabber.org/protocol/muc#roomconfig</value>" +
             "</field>";
 
-        var config_dict = $.extend({}, self.options.roomConfig, {
+        var configDict = $.extend({}, self.options.roomConfig, {
             "muc#roomconfig_roomsecret": roomPassword ? roomPassword : ""
         });
 
-        $.each(Object.keys(config_dict), function(i, k) {
+        $.each(Object.keys(configDict), function(i, k) {
             configXml += "<field var='" + k + "'>" +
-                "<value>" + config_dict[k] + "</value>" +
+                "<value>" + configDict[k] + "</value>" +
                 "</field>";
         });
 
@@ -1180,7 +1177,7 @@ makeMetaAware(Karere);
             var joined = false;
 
             if(localStorage.d) {
-        		console.error(eventName, roomJid, userJid, eventData[searchKey]);
+        		console.debug(eventName, roomJid, userJid, eventData[searchKey]);
             }
 
             if(eventData.from.split("/")[0] != roomJid) {
@@ -1189,7 +1186,8 @@ makeMetaAware(Karere);
 
             if(userJid.indexOf("/") == -1) { // bare jid
                 // search for $userJid/
-                $.each(eventData[searchKey], function(k, v) {
+                //noinspection FunctionWithInconsistentReturnsJS
+                $.each(eventData[searchKey], function(k) {
                     if(k.indexOf(userJid + "/") != -1) {
                         joined = true;
                         return false; //break;
@@ -1282,7 +1280,7 @@ makeMetaAware(Karere);
             password = self.getMeta("rooms", roomJid, 'password');
         }
 
-        var $promise = self.waitForUserToJoin(roomJid, userJid)
+        var $promise = self.waitForUserToJoin(roomJid, userJid);
 
         self.connection.muc.directInvite(roomJid, userJid, undefined, password);
 
@@ -1313,6 +1311,7 @@ makeMetaAware(Karere);
             $promise.reject("Room user list is currently not available.");
             return $promise;
         }
+        //noinspection FunctionWithInconsistentReturnsJS
         $.each(self.connection.muc.rooms[roomJid].roster, function(_nick, item) {
             if(item.jid == userJid) {
                 nickname = _nick;

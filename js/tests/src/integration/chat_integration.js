@@ -47,6 +47,11 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
         k1 = new Karere({
             "clientName": 'karere-inttest'
         });
+
+//        window.k1 = k1;
+//        window.k2 = k2;
+
+
         expectToBeResolved(
                 k1.connect(
                     "test1@sandbox.developers.mega.co.nz",
@@ -64,6 +69,10 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
             "clientName": 'karere-inttest'
         });
 
+//        window.k1 = k1;
+//        window.k2 = k2;
+
+
         expectToBeResolved(
                 k1.connect(
                     "test1@sandbox.developers.mega.co.nz",
@@ -73,6 +82,7 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
             )
             .done(function() {
                 console.warn("CONNECTED, will disconnect.");
+
 
                 expectToBeResolved(
                         k1.disconnect(),

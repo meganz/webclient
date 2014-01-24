@@ -50,7 +50,12 @@ function u_login2(ctx,ks)
 // if valid session present, return user type
 function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 {
-	if (!(u_sid = u_storage.sid))
+	if (u_sid = u_storage.sid)
+	{
+		api_setsid(u_sid);
+		u_checklogin3(ctx);
+	}
+	else
 	{
 		if (!force) ctx.checkloginresult(ctx,false);
 		else
@@ -64,17 +69,15 @@ function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 			createanonuser(ctx,passwordkey,invitecode,invitename,uh);
 		}
 	}
-	else u_checklogin3(ctx);
-}		
+}
 		
-function u_checklogin2(ctx,up)
+function u_checklogin2(ctx,u)
 {
-	if (up === false) ctx.checkloginresult(ctx,false);
+	if (u === false) ctx.checkloginresult(ctx,false);
 	else
 	{
 		ctx.result = u_checklogin2a;
-
-		api_getsid(ctx,up[0],ctx.passwordkey);
+		api_getsid(ctx,u,ctx.passwordkey);
 	}
 }
 
@@ -85,6 +88,7 @@ function u_checklogin2a(ctx,ks)
 	{
 		u_k = ks[0];
 		u_sid = ks[1];		
+		api_setsid(u_sid);
 		u_storage.k = JSON.stringify(u_k);
 		u_storage.sid = u_sid;		
 		u_checklogin3(ctx);
@@ -101,25 +105,23 @@ function u_checklogin3a(res,ctx)
 {
 	var r = false;
 
-	if (typeof res != 'object' || typeof res[0] != 'object')
+	if (typeof res != 'object')
 	{
 		u_logout();
 		r = res;
 	}
 	else
 	{
-		u_attr = res[0];		
-		var exclude = ['c','email','k','name','p','privk','pubk','s','ts','u','currk'];		
+		u_attr = res;
+		var exclude = ['c','email','k','name','p','privk','pubk','s','ts','u','currk'];
+	
 		for (var n in u_attr)
-		{			
+		{
 			if (exclude.indexOf(n) == -1)
 			{
-				try
-				{
+				try {
 					u_attr[n] = from8(base64urldecode(u_attr[n]));
-				}
-				catch(e)
-				{
+				} catch(e) {
 					u_attr[n] = base64urldecode(u_attr[n]);
 				}				
 			}
@@ -127,19 +129,20 @@ function u_checklogin3a(res,ctx)
 		
 		u_storage.attr = JSON.stringify(u_attr);
 		u_storage.handle = u_handle = u_attr.u;
-		try 
-		{
+	
+		try {
 			u_k = JSON.parse(u_storage.k);
 			if (u_attr.privk) u_privk = JSON.parse(u_storage.privk);
 		} catch(e) {
 		}
+
 		u_k_aes = new sjcl.cipher.aes(u_k);
 		if (!u_attr.email) r = 0;
 		else if (!u_attr.c) r = 1;
 		else if (!u_attr.privk) r = 2;
 		else r = 3;
 	}
-	
+
 	ctx.checkloginresult(ctx,r);
 }
 
@@ -159,22 +162,19 @@ function u_logout(logout)
 	
 	if (logout)
 	{
-		fminitialized=false;
+		fminitialized = false;
 		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-		u_sharekeys={};
-		u_nodekeys={};
-		u_type=false;
-		loggedout=true;
+		api_setsid(false);
+		u_sharekeys = {};
+		u_nodekeys = {};
+		u_type = false;
+		loggedout = true;
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
 		M = new MegaData();
-		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};	
-		$.hideContextMenu= function () {};
-		if (waitxhr)
-		{
-			waitxhr.abort();
-			waitxhr=undefined;	
-		}
+		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
+		$.hideContextMenu = function () {};
+		api_reset();
 	}
 }
 
@@ -194,39 +194,39 @@ function createanonuser(ctx,passwordkey,invitecode,invitename,uh)
 	api_createuser(ctx,invitecode,invitename,uh);
 }
 
-function createanonuser2(up,ctx)
+function createanonuser2(u,ctx)
 {
-	if (up === false || !(localStorage.p = ctx.passwordkey) || !(localStorage.handle = up[0])) up = false;
+	if (u === false || !(localStorage.p = ctx.passwordkey) || !(localStorage.handle = u)) u = false;
 
-	ctx.createanonuserresult(ctx,up);
+	ctx.createanonuserresult(ctx,u);
 }
 
 function setpwreq(newpw,ctx)
 {
 	var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
 	
-	api_req([{ a : 'upkm',
+	api_req({ a : 'upkm',
 		k : a32_to_base64(encrypt_key(pw_aes,u_k)),
 		uh : stringhash(u_attr['email'].toLowerCase(),pw_aes)
-	}],ctx);
+	},ctx);
 }
 
 function setpwset(confstring,ctx)
 {
-	api_req([{ a : 'up',
+	api_req({ a : 'up',
 		uk : confstring
-	}],ctx);
+	},ctx);
 }
 
 function changepw(currentpw,newpw,ctx)
 {
 	var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
 
-	api_req([{ a : 'up',
+	api_req({ a : 'up',
 		currk : a32_to_base64(encrypt_key(new sjcl.cipher.aes(prepare_key_pw(currentpw)),u_k)),
 		k : a32_to_base64(encrypt_key(pw_aes,u_k)),
 		uh : stringhash(u_attr['email'].toLowerCase(),pw_aes)
-	}],ctx);
+	},ctx);
 }
 
 // an anonymous account must be present - check / create before calling
@@ -234,17 +234,17 @@ function sendsignuplink(name,email,password,ctx)
 {
 	var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
 	var req = { a : 'uc', c : base64urlencode(a32_to_str(encrypt_key(pw_aes,u_k))+a32_to_str(encrypt_key(pw_aes,[rand(0x100000000),0,0,rand(0x100000000)]))), n : base64urlencode(to8(name)), m : base64urlencode(email) };
-	
-	api_req([req],ctx);
+
+	api_req(req,ctx);
 }
 
 function verifysignupcode(code,ctx)
 {
 	var req = { a : 'ud', c : code };
-	
+
 	ctx.callback = verifysignupcode2;
 
-	api_req([req],ctx);
+	api_req(req,ctx);
 }
 
 var u_signupenck;
@@ -252,14 +252,14 @@ var u_signuppwcheck;
 
 function verifysignupcode2(res,ctx)
 {
-	if (typeof res == 'object' && typeof res[0] == 'object')
+	if (typeof res == 'object')
 	{
-		u_signupenck = base64_to_a32(res[0][3]);
-		u_signuppwcheck = base64_to_a32(res[0][4]);
+		u_signupenck = base64_to_a32(res[3]);
+		u_signuppwcheck = base64_to_a32(res[4]);
 		
-		ctx.signupcodeok(base64urldecode(res[0][0]),base64urldecode(res[0][1]));
+		ctx.signupcodeok(base64urldecode(res[0]),base64urldecode(res[1]));
 	}
-	else ctx.signupcodebad(res[0]);
+	else ctx.signupcodebad(res);
 }
 
 function checksignuppw(password)
@@ -278,14 +278,14 @@ function checkquota(ctx)
 {
 	var req = { a : 'uq', xfer : 1 };
 	
-	api_req([req],ctx);
+	api_req(req,ctx);
 }
 
 function processquota1(res,ctx)
 {
-	if (typeof res == 'object' && typeof res[0] == 'object')
+	if (typeof res == 'object')
 	{
-		if (res[0].tah)
+		if (res.tah)
 		{
 			var i;
 			
@@ -293,22 +293,19 @@ function processquota1(res,ctx)
 			var tft = 0;
 			var tfh = -1;
 			
-			for (i = 0; i < res[0].tah.length; i++)
+			for (i = 0; i < res.tah.length; i++)
 			{
-				tt += res[0].tah[i];
+				tt += res.tah[i];
 				
 				if (tfh < 0)
 				{
-					tft += res[0].tah[i];
+					tft += res.tah[i];
 					
-					if (tft > 1048576)
-					{
-						tfh = i;
-					}
+					if (tft > 1048576) tfh = i;
 				}
 			}
 			
-			ctx.processquotaresult(ctx,[tt,tft,(6-tfh)*3600-res[0].bt,res[0].tar,res[0].tal]);
+			ctx.processquotaresult(ctx,[tt,tft,(6-tfh)*3600-res.bt,res.tar,res.tal]);
 		}
 		else ctx.processquotaresult(ctx,false);
 	}

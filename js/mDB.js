@@ -28,8 +28,15 @@ if (indexedDB)
 
 	function mDBstart()
 	{
+		if (localStorage[u_handle + '_mDBactive'])
+		{
+			if (d) console.log('already an active mDB session, fetching live data');
+			mDB=undefined;
+			loadfm();
+			return;
+		}
+	
 		loadingDialog.show();
-
 		if (d) console.log('mDBstart()');
 		request = indexedDB.open("MEGA_" + u_handle,2);
 		request.onerror = function(event)
@@ -52,6 +59,7 @@ if (indexedDB)
 		}
 		request.onsuccess = function(event)
 		{
+			localStorage[u_handle + '_mDBactive']=1;
 			if (localStorage[u_handle + '_mDBcount'] && (!localStorage[u_handle + '_mDBv'] || parseInt(localStorage[u_handle + '_mDBv']) < mDBv))
 			{
 				localStorage[u_handle + '_mDBv']=mDBv;
@@ -77,6 +85,7 @@ if (indexedDB)
 				if (d) console.log('fetching live data');
 				mDBfetch();
 			}
+			
 		};
 		request.onupgradeneeded = function(event)
 		{

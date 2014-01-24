@@ -559,31 +559,25 @@ function dl_getsourceurl(callback)
 	if (dl_queue[dl_queue_num].ph) req.p = dl_queue[dl_queue_num].ph;
 	else if (dl_queue[dl_queue_num].id) req.n = dl_queue[dl_queue_num].id;
 	
-	api_req([req],{ callback : callback });
+	api_req(req,{ callback : callback },n_h ? 1 : 0);
 }
 
 function dl_renewsourceurl2(res,ctx)
 {
-	if (typeof res == 'object')
+	if (typeof res == 'number') dl_reportstatus(dl_queue_num,res);
+	else
 	{
-		if (typeof res[0] == 'number')
+		if (res.g)
 		{
-			dl_reportstatus(dl_queue_num,res[0]);
+			dl_geturl = res.g;
+			dl_dispatch_chain()
+			return;
 		}
-		else
-		{
-			if (res[0].g)
-			{
-				dl_geturl = res[0].g;
-				dl_dispatch_chain()
-				return;
-			}
-			else if (res[0].e) dl_reportstatus(dl_queue_num,res[0].e);
-		}
-
-		dl_queue[dl_queue_num].retryafter = new Date().getTime()+30000;
-		startdownload();
+		else if (res.e) dl_reportstatus(dl_queue_num,res.e);
 	}
+
+	dl_queue[dl_queue_num].retryafter = new Date().getTime()+30000;
+	startdownload();
 }
 	
 function dl_reportstatus(num,code)
@@ -597,36 +591,29 @@ function dl_reportstatus(num,code)
 
 function startdownload2(res,ctx)
 {
-	if (typeof res == 'object')
+	if (typeof res == 'number') dl_reportstatus(dl_queue_num,res);
+	else
 	{
-		if (typeof res[0] == 'number')
+		if (res.d)
 		{
-			dl_reportstatus(dl_queue_num,res[0]);
+			dl_reportstatus(dl_queue_num,res.d ? 2 : 1);
+			dl_queue[dl_queue_num] = false;
 		}
-		else
+		else if (res.g)
 		{
-			if (res[0].d)
-			{
-				dl_reportstatus(dl_queue_num,res[0].d ? 2 : 1);
-				dl_queue[dl_queue_num] = false;
-			}
-			else if (res[0].g)
-			{
-				var ab = base64_to_ab(res[0].at);
-				var o = dec_attr(ab,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
+			var ab = base64_to_ab(res.at);
+			var o = dec_attr(ab,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 
-				if (typeof o == 'object' && typeof o.n == 'string')
-				{
-					if (have_ab && res[0].pfa && res[0].s <= 48*1048576 && is_image(o.n) && (!res[0].fa || res[0].fa.indexOf(':0*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res[0].s);
-					return dl_setcredentials(res[0].g,res[0].s,o.n);
-				}
-				else dl_reportstatus(dl_queue_num,EKEY);
+			if (typeof o == 'object' && typeof o.n == 'string')
+			{
+				if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
+				return dl_setcredentials(res.g,res.s,o.n);
 			}
-			else dl_reportstatus(dl_queue_num,res[0].e);
+			else dl_reportstatus(dl_queue_num,EKEY);
 		}
+		else dl_reportstatus(dl_queue_num,res.e);
 	}
-	else dl_reportstatus(dl_queue_num,EAGAIN);
-	
+
 	downloading = false;
 
 	dl_queue_num++;
@@ -1061,7 +1048,7 @@ function dl_cancel()
 	dl_instance++;
 	downloading = dl_writing = dl_zip = false;
 
-	for (var slot = dl_maxSlots; slot--; dl_xhrs[slot].abort());
+	for (var slot = dl_maxSlots; slot--; ) if (dl_xhrs[slot]) dl_xhrs[slot].abort();
 	dl_xhrs = dl_pos = dl_workers = dl_progress = dl_cipherq = dl_plainq = dl_progress = dl_chunks = dl_chunksizes = undefined;
 
 	if(is_chrome_firefox)

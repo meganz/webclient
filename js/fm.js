@@ -434,7 +434,7 @@ function initUI()
 		$.termsAgree = function()
 		{
 			u_attr.terms=1;
-			api_req([{a:'up', terms:'Mq'}]);
+			api_req({a:'up',terms:'Mq'});
 		};
 		$.termsDeny = function()
 		{
@@ -695,13 +695,11 @@ function fmremove()
 		{
 			if (e)
 			{
-				var ops = [];				
 				for(var i in $.selected)
 				{					
 					M.delNode($.selected[i]);					
-					ops.push({a:'ur',u:$.selected[i],l: '0',i: requesti});
+					api_req({a:'ur',u:$.selected[i],l:'0',i: requesti});
 				}
-				api_req(ops);
 			}
 		});
 	}
@@ -1416,7 +1414,7 @@ function accountUI()
 			u_attr.birthmonth = $('.fm-account-select.month select').val();
 			u_attr.birthyear = $('.fm-account-select.year select').val();
 			u_attr.country = $('.fm-account-select.country select').val();		
-			api_req([{a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)}]);		
+			api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
 			$('.fm-account-save-block').addClass('hidden');			
 			if (M.account.dl_maxSlots) 
 			{
@@ -1665,19 +1663,22 @@ function accountUI()
 			else
 			{
 				loadingDialog.show();
-				api_req([{a: 'uavr',v: $('.fm-voucher-body input').val()}],
+				api_req({a:'uavr',v:$('.fm-voucher-body input').val()},
 				{
-					callback : function (json,params)
+					callback : function(res,ctx)
 					{
 						loadingDialog.hide();
 						$('.fm-voucher-popup').addClass('hidden');
-						$('.fm-voucher-body input').val(l[487])
-						if (json[0] == -11) msgDialog('warninga',l[135],l[714]);
-						else if ((typeof json[0] == 'number') && (json[0] < 0)) msgDialog('warninga',l[135],l[473]);
-						else
+						$('.fm-voucher-body input').val(l[487]);
+						if (typeof res == 'number')
 						{
-							if (M.account) M.account.lastupdate=0;
-							accountUI();
+							if (res == -11) msgDialog('warninga',l[135],l[714]);
+							else if (res < 0) msgDialog('warninga',l[135],l[473]);
+							else
+							{
+								if (M.account) M.account.lastupdate=0;
+								accountUI();
+							}
 						}
 					}
 				});
@@ -1703,9 +1704,9 @@ function accountUI()
 			}
 			if (vouchertype == '19.99') vouchertype = '19.991';
 			loadingDialog.show();					
-			api_req([{a: 'uavi',d: vouchertype,n: voucheramount,c: 'EUR'}],
+			api_req({a:'uavi',d:vouchertype,n:voucheramount,c:'EUR'},
 			{
-				callback : function (json,params)
+				callback : function (res,ctx)
 				{
 					M.account.lastupdate=0;
 					accountUI();
@@ -1900,7 +1901,7 @@ function avatarDialog(close)
 		onCrop: function(croppedDataURI)
 		{
 			var data = dataURLToAB(croppedDataURI);			
-			api_req([{'a':'up','+a':base64urlencode(ab_to_str(data))}]);			
+			api_req({'a':'up','+a':base64urlencode(ab_to_str(data))});
 			var blob = new Blob([data],{ type: 'image/jpeg'});
 			avatars[u_handle] = 
 			{
@@ -4007,13 +4008,13 @@ function shareDialog(close)
 				$('.share-folder-info .propreties-dark-txt').text(n.name);
 				if (!n.ph)
 				{
-					api_req([{a: 'l',n: $.selected[0]}],
+					api_req({a:'l',n:$.selected[0]},
 					{
 						n:n,
-						callback: function(json,params)
-						{							
-							M.nodeAttr({h:params.n.h,ph:json[0]});
-							$('.share-folder-block .properties-file-link').html('https://mega.co.nz/#F!' + htmlentities(json[0]) + '!' + htmlentities(a32_to_base64(u_sharekeys[params.n.h])));
+						callback : function(res,ctx)
+						{
+							M.nodeAttr({h:ctx.n.h,ph:res});
+							$('.share-folder-block .properties-file-link').html('https://mega.co.nz/#F!' + htmlentities(res) + '!' + htmlentities(a32_to_base64(u_sharekeys[ctx.n.h])));
 						}
 					});
 				}
@@ -4029,9 +4030,9 @@ function shareDialog(close)
 		if ($('.share-folder-block').attr('class').indexOf('hidden') == -1 && !$('.public-checkbox input').attr('checked'))
 		{
 			M.delnodeShare($.selected[0],'EXP');
-			api_req([{a: 'l',n: $.selected[0]}],
+			api_req({a: 'l',n: $.selected[0]},
 			{
-			  callback : function (json) { if (json[0]) api_req([{a: 'l',p: json[0]}]); }
+			  callback : function (res) { if (typeof res != 'number') api_req({a:'l',p:res}); }
 			});
 			sops.push({u:'EXP',r:''});
 		}		
@@ -4044,7 +4045,7 @@ function shareDialog(close)
 			}		
 			delete $.delShare;
 		}		
-		if (sops.length > 0) api_req([{a: 's',n:$.selected[0],s:sops,ha:'',i: requesti}]);		
+		if (sops.length > 0) api_req({a:'s',n:$.selected[0],s:sops,ha:'',i: requesti});
 		shareDialog(1);
 	});
 	$('.fm-share-dropdown').unbind('click');	

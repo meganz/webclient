@@ -67,16 +67,16 @@ function dev_init(pp,appkey)
 					else
 					{
 						loadingDialog.show();
-						api_req([{a:'apc'}],
+						api_req({a:'apc'},
 						{
-							callback : function (json,params)
+							callback : function (res)
 							{				
 								loadingDialog.hide();
-								if (typeof json[0] == 'string')	
+								if (typeof res == 'string')	
 								{
-									sdk_keys.push({'key':json[0]});
-									sdk_app = {'key':json[0],'new':1};
-									document.location.hash = 'sdk_' +json[0];					
+									sdk_keys.push({'key':res});
+									sdk_app = {'key':res,'new':1};
+									document.location.hash = 'sdk_' + res;					
 								}
 							}
 						});
@@ -215,9 +215,9 @@ function dev_app()
 		var status = 0;		
 		if ($('#rad2').attr('class').indexOf('radioOn') > -1) status = 1;
 		loadingDialog.show();
-		api_req([{a:'apu', 'ah': sdk_app.key, 'name':$('#app-name').val(), 'site': $('#website').val(), 'description': $('#appdesc').val(), 'publisher': $('#publisher-name').val(), 'status': status }],
+		api_req({a:'apu', 'ah': sdk_app.key, 'name':$('#app-name').val(), 'site': $('#website').val(), 'description': $('#appdesc').val(), 'publisher': $('#publisher-name').val(), 'status': status },
 		{
-			callback : function (json,params)
+			callback : function ()
 			{
 				loadingDialog.hide();
 				document.location.hash = 'sdk';
@@ -234,9 +234,9 @@ function dev_app()
 			if (e) 
 			{
 				loadingDialog.show();
-				api_req([{a:'apd', 'ah': sdk_app.key}],
+				api_req({a:'apd', 'ah': sdk_app.key},
 				{					
-					callback : function (json,params)
+					callback : function ()
 					{
 						loadingDialog.hide();
 						document.location.hash = 'sdk';
@@ -253,23 +253,23 @@ function dev_app()
 
 function load_sdkkeys(cb)
 {
-	api_req([{a:'apg'}],
+	api_req({a:'apg'},
 	{
 		cb: cb,
-		callback : function (json,params)
+		callback : function (res,ctx)
 		{
-			if (typeof json[0] == 'object')
+			if (typeof res == 'object')
 			{			
 				sdk_keys=[];						
-				for(var key in json[0])
+				for (var key in res)
 				{									
-					if (json[0][key])
+					if (res[key])
 					{
-						json[0][key]['key'] = key;
-						sdk_keys.push(json[0][key]);
+						res[key]['key'] = key;
+						sdk_keys.push(res[key]);
 					}							
 				}
-				if (params.cb) params.cb();
+				if (ctx.cb) ctx.cb();
 			}
 		}
 	});

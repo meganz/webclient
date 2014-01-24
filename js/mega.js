@@ -1,7 +1,7 @@
 var newnodes;
 var fminitialized=false;
 
-if (typeof seqno == 'undefined') var seqno = Math.ceil(Math.random()*1000000000);
+if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
 if (typeof requesti == 'undefined') var requesti = makeid(10);
 if (typeof folderlink == 'undefined') var folderlink = false;
@@ -27,11 +27,6 @@ var fmconfig ={};
 if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=0;
-
-function jsrand()
-{
-	return Math.floor(Math.random()*Math.random()*Math.random()*Math.random()*10000000);
-}
 
 function MegaData ()
 {
@@ -176,38 +171,39 @@ function MegaData ()
 		str = str.replace('search/','');
 		this.filterBy(function(node)
 		{
-		  if (node.name && str && node.name.toLowerCase().indexOf(str.toLowerCase()) > -1) return true;
+		  if (node.name && str && node.name.toLowerCase().indexOf(str.toLowerCase()) >= 0) return true;
 		});
 	};
 
 	this.avatars = function()
 	{
-		var ops = [];
-		for (var u in M.c['contacts']) if (!avatars[u]) ops.push({"a":"uga","u":u,"ua":"+a"});
-		if (!avatars[u_handle]) ops.push({"a":"uga","u":u_handle,"ua":"+a"});
-		api_req(ops,
+		if (!M.c.contacts) M.c.contacts = { };
+		M.c.contacts[u_handle] = 1;
+		
+		for (var u in M.c['contacts']) if (!avatars[u])
 		{
-			ops:ops,
-			callback: function(e,ctx)
-			{
-				for (var i in e)
+			api_req({a:'uga',u:u,ua:'+a'},{
+				u : u,
+				callback: function(res,ctx)
 				{
-					if (typeof e[i] !== 'number')
+					if (typeof res !== 'number')
 					{
-						var blob = new Blob([str_to_ab(base64urldecode(e[i]))],{ type: 'image/jpeg' });
-						avatars[ctx.ops[i].u] =
+						var blob = new Blob([str_to_ab(base64urldecode(res))],{ type: 'image/jpeg' });
+						avatars[ctx.u] =
 						{
 							data: blob,
 							url: myURL.createObjectURL(blob)
 						}
-						var el = $('.contact-block-view-avatar.' + ctx.ops[i].u + ',.avatar.' + ctx.ops[i].u + ',.contacts-avatar.' + ctx.ops[i].u);
-						if (el.length > 0) el.find('img').attr('src',avatars[ctx.ops[i].u].url);
+						var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
+						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
 
-						if (u_handle == ctx.ops[i].u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.ops[i].u].url);
+						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
 					}
 				}
-			}
-		});
+			});
+		}
+		
+		delete M.c.contacts[u_handle];
 	}
 
 	this.renderAvatars = function()
@@ -452,7 +448,7 @@ function MegaData ()
 		topContextMenu(1);
 		$('.fm-files-view-icon').removeClass('hidden');
 		if (d) console.log('openFolder()',M.currentdirid,id);
-		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') == -1) notificationsUI(1);
+		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) notificationsUI(1);
 		this.search=false;
 		this.chat=false;
 		if (!fminitialized)
@@ -503,7 +499,7 @@ function MegaData ()
 				{
 					var ext = fileext(M.v[i].name);
 					var images = '|jpg|gif|png|';
-					if (images.indexOf('|'+ext+'|') > -1) viewmode=1;
+					if (images.indexOf('|'+ext+'|') >= 0) viewmode=1;
 				}
 			}
 			M.viewmode=viewmode;
@@ -522,7 +518,8 @@ function MegaData ()
 				}
 				treeUIopen(M.currentdirid,1);
 			}
-			if (d) console.log('time for rendering:',tt-new Date().getTime());
+
+			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
 			setTimeout(function()
 			{
@@ -634,15 +631,15 @@ function MegaData ()
 	{
 		var length=0;
 		var c = $('.fm-new-folder').attr('class');
-		if (c && c.indexOf('hidden') == -1) length += $('.fm-new-folder').width();
+		if (c && c.indexOf('hidden') < 0) length += $('.fm-new-folder').width();
 		var c = $('.fm-folder-upload').attr('class');
-		if (c && c.indexOf('hidden') == -1) length += $('.fm-folder-upload').width();
+		if (c && c.indexOf('hidden') < 0) length += $('.fm-folder-upload').width();
 		var c = $('.fm-file-upload').attr('class');
-		if (c && c.indexOf('hidden') == -1) length += $('.fm-file-upload').width();
+		if (c && c.indexOf('hidden') < 0) length += $('.fm-file-upload').width();
 		var c = $('.fm-clearbin-button').attr('class');
-		if (c && c.indexOf('hidden') == -1) length += $('.fm-clearbin-button').width();
+		if (c && c.indexOf('hidden') < 0) length += $('.fm-clearbin-button').width();
 		var c = $('.fm-add-user').attr('class');
-		if (c && c.indexOf('hidden') == -1) length += $('.fm-add-user').width();
+		if (c && c.indexOf('hidden') < 0) length += $('.fm-add-user').width();
 		length += $('.fm-breadcrumbs-block').width();
 		length += $('.fm-back-button').width();
 		return length;
@@ -838,23 +835,26 @@ function MegaData ()
 
 	this.addContact = function(email)
 	{
-		api_req([{a: 'ur',u: email,l: '1',i: requesti}],
+		api_req({a:'ur',u:email,l:'1',i:requesti},
 		{
-		  callback : function (json,params)
+		  callback : function (res,params)
 		  {
-			if (json[0].u)
+			if (typeof res == 'object')
 			{
-				newnodes=[];
-				process_u([{ c: 1, m: json[0].m,h:json[0].u, u: json[0].u, ts: (new Date().getTime()/1000) }],false);
-				rendernew();
+				if (res.u)
+				{
+					newnodes=[];
+					process_u([{ c: 1, m: res.m, h:res.u, u: res.u, ts: (new Date().getTime()/1000) }],false);
+					rendernew();
+				}
 			}
-			else if ((json[0] == 0) || (json[0] == -303))
+			else if ((res == 0) || (res == -303))
 			{
 				var talready='';
-				if (json[0] == -303) talready = 'already ';
+				if (res == -303) talready = 'already ';
 				msgDialog('info',l[150],l[151].replace('[X]',talready));
 			}
-			else if (json[0] == -2) msgDialog('info',l[135],l[152]);
+			else if (res == -2) msgDialog('info',l[135],l[152]);
 			$('.add-user-popup input').val('');
 			loadingDialog.hide();
 		  }
@@ -865,13 +865,13 @@ function MegaData ()
 	{
 		var selids = [];
 		if (sel && $.selected) for (var i in $.selected) selids[$.selected[i]]=1;
-		var j = [];
+
 		for (var h in M.c[M.RubbishID])
 		{
 			if (!sel || selids[h])
 			{
 				this.delNode(h);
-				j.push({a:'d',n:h,i:requesti});
+				api_req({a:'d',n:h,i:requesti});
 				if (sel)
 				{
 					$('.grid-table.fm#'+h).remove();
@@ -899,7 +899,6 @@ function MegaData ()
 		}
 		this.rubbishIco();
 		treeUI();
-		api_req(j);
 	}
 
 	this.addUser = function(u,ignoreDB)
@@ -913,9 +912,8 @@ function MegaData ()
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
 		{
-			api_cachepubkeys(
-			{
-				cachepubkeyscomplete: function(ctx)
+			api_cachepubkeys({
+				cachepubkeyscomplete : function(ctx)
 				{
 					if (u_pubkeys[ctx.t]) M.copyNodes(ctx.cn,ctx.t);
 					else
@@ -929,6 +927,7 @@ function MegaData ()
 			},[t]);
 			return false;
 		}
+
 		var a=[];
 		var r=[];
 		for (var i in cn)
@@ -956,20 +955,20 @@ function MegaData ()
 				a.push(nn);
 			}
 		}
-		var ops = [{a:'p',t:t,n:a,i:requesti}];
+		var ops = {a:'p',t:t,n:a,i:requesti};
 		var s = fm_getsharenodes(t);
 		if (s.length > 0)
 		{
 			var mn = [];
 			for (i in a) mn.push(a[i].h);
-			ops[0].cr =  crypto_makecr(mn,s,true);
+			ops.cr = crypto_makecr(mn,s,true);
 		}
 		api_req(ops,
 		{
 			cn:cn,
 			del:del,
 			t:t,
-			callback : function (json,ctx)
+			callback : function (res,ctx)
 			{
 				if (ctx.del)
 				{
@@ -982,8 +981,8 @@ function MegaData ()
 					api_req(j);
 				}			
 				newnodes = [];
-				if (json[0].u) process_u(json[0].u,true);
-				if (json[0].f) process_f(json[0].f);
+				if (res.u) process_u(res.u,true);
+				if (res.f) process_f(res.f);
 				loadingDialog.hide();
 				rendernew();
 			}
@@ -1025,62 +1024,111 @@ function MegaData ()
 		else
 		{
 			if (blockui) loadingDialog.show();
-			api_req([{a:'uq',strg:1,xfer:1,pro:1},{a:'uavl'},{a:'utt'},{a: 'utp'},{a: 'usl'},{a:'ug'}],
-			{
-				cb: cb,
-				callback: function(json,ctx)
+			
+			account = { };
+
+			api_req({a:'uq',strg:1,xfer:1,pro:1},{
+				account : account,
+				callback: function(res,ctx)
 				{
 					loadingDialog.hide();
-					if (json[5] && json[5].p)
+
+					if (typeof res == 'object')
 					{
-						u_attr.p = json[5].p;
-						if (u_attr.p) topmenuUI();
-					}
-					if (json)
-					{
-						M.account =
-						{
-							type: json[0].utype,
-							stype: json[0].stype,
-							stime: json[0].scycle,
-							scycle: json[0].snext,
-							expiry: json[0].suntil,
-							space: Math.round(json[0].mstrg),
-							space_used: Math.round(json[0].cstrg),
-							bw: Math.round(json[0].mxfer),
-							servbw_used: Math.round(json[0].csxfer),
-							downbw_used: Math.round(json[0].caxfer),
-							servbw_limit: json[0].srvratio,
-							balance: json[0].balance,
-							reseller: json[0].reseller,
-							prices: json[0].prices,
-							vouchers: voucherData(json[1]),
-							transactions: json[2],
-							purchases: json[3],
-							sessions: json[4],
-							lastupdate: new Date().getTime()
-						}
+						ctx.account.type = res.utype;
+						ctx.account.stype = res.stype;
+						ctx.account.stime = res.scycle;
+						ctx.account.scycle = res.snext;
+						ctx.account.expiry = res.suntil;
+						ctx.account.space = Math.round(res.mstrg);
+						ctx.account.space_used = Math.round(res.cstrg);
+						ctx.account.bw = Math.round(res.mxfer);
+						ctx.account.servbw_used = Math.round(res.csxfer);
+						ctx.account.downbw_used = Math.round(res.caxfer);
+						ctx.account.servbw_limit = res.srvratio;
+						ctx.account.balance = res.balance;
+						ctx.account.reseller = res.reseller;
+						ctx.account.prices = res.prices;
+
+						if (!ctx.balance) ctx.account.balance = [['0.00','EUR']];
+
 						if (!u_attr.p)
 						{
-							M.account.servbw_used=0;
+							ctx.account.servbw_used = 0;
 
-							if (json[0].tah)
+							if (res.tah)
 							{
-								var t=0;
-								for (var i in json[0].tah)
-								{
-									t+=json[0].tah[i];
-								}
-								M.account.downbw_used = t;
-								M.account.bw = json[0].tal;
+								var t = 0;
+
+								for (var i in res.tah) t += res.tah[i];
+
+								ctx.account.downbw_used = t;
+								ctx.account.bw = res.tal;
 							}
 						}
-						if (!M.account.bw) M.account.bw=1024*1024*1024*10;
-						if (!M.account.servbw_used) M.account.servbw_used=0;
-						if (!M.account.downbw_used) M.account.downbw_used=0;
-						if (json[0].balance.length == 0) M.account.balance = [['0.00','EUR']];
-						if (ctx.cb) ctx.cb(M.account);
 					}
+				}
+			});
+
+			api_req({a:'uavl'},{
+				account : account,
+				callback: function(res,ctx)
+				{
+					if (typeof res != 'object') res = [];
+					ctx.account.vouchers = voucherData(res);
+				}
+			});
+
+			api_req({a:'utt'},{
+				account : account,
+				callback: function(res,ctx)
+				{
+					if (typeof res != 'object') res = [];				
+					ctx.account.transactions = res;
+				}
+			});
+
+			api_req({a:'utp'},{
+				account : account,
+				callback: function(res,ctx)
+				{
+					if (typeof res != 'object') res = [];
+					ctx.account.purchases = res;
+				}
+			});
+
+			api_req({a:'usl'},{
+				account : account,
+				callback: function(res,ctx)
+				{
+					if (typeof res != 'object') res = [];
+					ctx.account.sessions = res;
+				}
+			});
+
+			api_req({a:'ug'},{
+				cb : cb,
+				account : account,
+				callback: function(res,ctx)
+				{
+					if (typeof res == 'object')
+					{
+						if (res.p)
+						{
+							u_attr.p = res.p;
+							if (u_attr.p) topmenuUI();
+						}
+					}
+					
+					ctx.account.lastupdate = new Date().getTime();
+
+					if (!ctx.account.bw) ctx.account.bw = 1024*1024*1024*10;
+					if (!ctx.account.servbw_used) ctx.account.servbw_used = 0;
+					if (!ctx.account.downbw_used) ctx.account.downbw_used = 0;
+
+					M.account = ctx.account;
+					
+					if (ctx.cb) ctx.cb(ctx.account);
 				}
 			});
 		}
@@ -1133,7 +1181,7 @@ function MegaData ()
 				var attr = ab_to_base64(mkat[0]);
 				var key = a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
 				M.nodeAttr({h:h,name:name,a:attr});
-				api_req([{a:'a',n:h,attr:attr,key:key,i:requesti}]);
+				api_req({a:'a',n:h,attr:attr,key:key,i:requesti});
 				$('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
 				$('.file-block#' + h + ' .file-block-title').text(name);
 				$('#treea_' + h + ' span').text(name);
@@ -1146,7 +1194,7 @@ function MegaData ()
 	{
 		if (del) del=0;
 		else del=1;
-		var ops = [];
+
 		for (var i in h_ar)
 		{
 			if (M.d[h_ar[i]])
@@ -1159,7 +1207,7 @@ function MegaData ()
 					var attr = ab_to_base64(mkat[0]);
 					var key = a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
 					M.nodeAttr({h:n.h,fav:del,a:attr});
-					ops.push({a:'a',n:n.h,attr:attr,key:key,i:requesti});
+					api_req({a:'a',n:n.h,attr:attr,key:key,i:requesti});
 					if (!m)
 					{
 						if (del)
@@ -1176,7 +1224,6 @@ function MegaData ()
 				}
 			}
 		}
-		if (ops.length > 0) api_req(ops);
 	}
 
 	this.nodeShare = function(h,s,ignoreDB)
@@ -1238,28 +1285,19 @@ function MegaData ()
 
 	this.getlinksDone = function()
 	{
-		var ops = [];
-		for (var i in this.links) ops.push({a: 'l',n: this.links[i]});
-		api_req(ops,
-		{
-		  callback : function (json,params)
-		  {
-			if (typeof json == 'object')
+		for (var i in this.links) api_req({a:'l',n:this.links[i]},{
+			node : this.links[i],
+			last : i == this.links.length-1,
+			callback : function(res,ctx)
 			{
-				for(var i in json)
+				if (typeof res != 'number') M.nodeAttr({h:M.d[ctx.node].h,ph:res});
+
+				if (ctx.last)
 				{
-					var r=[];
-					if (!((typeof json[i] == 'number') && (json[i] < 0)))
-					{
-						var n = M.d[M.links[i]];
-						M.nodeAttr({h:n.h,ph:json[i]});
-					}
+					linksDialog();
+					loadingDialog.hide();
 				}
-				linksDialog();
-				loadingDialog.hide();
 			}
-			else loadingDialog.hide();
-		  }
 		});
 	}
 
@@ -1269,6 +1307,7 @@ function MegaData ()
 		{
 			var n = M.d[this.folderlinks[0]];
 			this.folderlinks.splice(0,1);
+
 			if (n)
 			{
 				this.fln=n;
@@ -1277,21 +1316,13 @@ function MegaData ()
 				{
 					var h = fm_getnodes(n.h);
 					h.push(n.h);
-					api_setshare1(n.h,[{u: 'EXP',r: 0}],h,
+
+					api_setshare(n.h,[{u:'EXP',r:0}],h,
 					{
-						userid : 'EXP',
-						done: function(c)
+						done : function(res)
 						{
-							c.req.i = requesti;
-							api_req([c.req],
-							{
-							  callback : function (j,params)
-							  {
-								api_setshare2(j,M.fln.h);
-								if (j[0].r && j[0].r[0] == 0) M.nodeShare(M.fln.h,{h:M.fln.h,r:0,u:'EXP',ts:Math.ceil(new Date().getTime()/1000)});
-								M.getFolderlinks();
-							  }
-							});
+							if (res.r && res.r[0] == 0) M.nodeShare(M.fln.h,{h:M.fln.h,r:0,u:'EXP',ts:Math.floor(new Date().getTime()/1000)});
+							M.getFolderlinks();
 						}
 					});
 				}
@@ -1312,12 +1343,9 @@ function MegaData ()
 				if(M.d[e].t == 1 && M.d[e].p == d) 
 				{
 					var p = o || [];
-					if(!o) p.push(fm_safename(M.d[d].name));
+					if (!o) p.push(fm_safename(M.d[d].name));
 					p.push(fm_safename(M.d[e].name));
-					if(!getfolders(M.d[e].h,p)) 
-					{
-						dirs.push(p);
-					}
+					if (!getfolders(M.d[e].h,p)) dirs.push(p);
 					++c;
 				}
 			}
@@ -1765,7 +1793,7 @@ function fm_zipcomplete(id)
 
 function fm_chromebar(height)
 {
-	if (window.navigator.userAgent.toLowerCase().indexOf('mac') > -1 || localStorage.chromeDialog == 1) return false;
+	if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) return false;
 	var h = height - $('body').height();
 	if ((h > 33) && (h < 41))
 	{
@@ -1811,7 +1839,7 @@ function renderfm()
 	M.renderTree();
 	M.renderPath();
 	var c = $('#treesub_' + M.RootID).attr('class');
-	if (c && c.indexOf('opened') == -1)
+	if (c && c.indexOf('opened') < 0)
 	{
 		$('.fm-tree-header.cloud-drive-item').addClass('opened');
 		$('#treesub_' + M.RootID).addClass('opened');
@@ -1977,7 +2005,7 @@ function execsc(ap)
 		{
 			if (a.sr) crypto_procsr(a.sr);
 			else if (a.cr) crypto_proccr(a.cr);
-			else api_req([{a:'k',cr:crypto_makecr(a.n,[a.h],true)}]);
+			else api_req({a:'k',cr:crypto_makecr(a.n,[a.h],true)});
 		}
 		else if (a.a == 't')
 		{
@@ -2112,12 +2140,12 @@ function fm_commitkeyupdate()
 
 function loadfm()
 {
+	M.reset();
 	fminitialized=false;
 	loadingDialog.show();
-	api_req([{a:'f', c:1, r:1}],
-	{
+	api_req({a:'f',c:1,r:1},{
 		callback : loadfm_callback
-	});
+	},n_h ? 1 : 0);
 }
 
 function RightsbyID(id)
@@ -2243,25 +2271,24 @@ function createfolder(toid,name,ulparams)
 	var sn = fm_getsharenodes(toid);
 	if (sn.length)
 	{
-
 		req.cr = crypto_makecr([mkat[1]],sn,false);
 		req.cr[1][0] = 'xxxxxxxx';
 	}
 	if (!ulparams) loadingDialog.show();
-	api_req([req],
+	api_req(req,
 	{
 	  ulparams: ulparams,
-	  callback : function (json,params)
+	  callback : function(res,ctx)
 	  {
-		if (typeof json[0] !== 'number')
+		if (typeof res != 'number')
 		{
 			$('.fm-new-folder').removeClass('active');
 			$('.create-folder-input-bl input').val('');
 			newnodes=[];
-			M.addNode(json[0].f[0]);
+			M.addNode(res.f[0]);
 			rendernew();
 			loadingDialog.hide();
-			if (params.ulparams) ulparams.callback(params.ulparams,json[0].f[0].h);
+			if (ctx.ulparams) ulparams.callback(ctx.ulparams,res.f[0].h);
 		}
 	  }
 	});
@@ -2277,50 +2304,41 @@ function doshare(h,t)
 {
 	nodeids = fm_getnodes(h);
 	nodeids.push(h);
-	api_setshare1(h,t,nodeids,
+
+	api_setshare(h,t,nodeids,
 	{
 		t : t,
 		h : h,
-		done: function(c)
-		{
-			c.req.i = requesti;
-			api_req([c.req],
-			{
-			  t: c.t,
-			  h: c.h,
-			  callback : function (json,c)
-			  {
-				api_setshare2(json,c.h);
-				if (json[0].r && json[0].r[0] == '0')
-				{
-					if (json[0])
-					{
-						for (var i in json[0].u) M.addUser(json[0].u[i]);
 
-						for (var i in json[0].r)
-						{
-							if (json[0].r[i] == 0)
-							{
-								var rights = c.t[i].r;
-								var user = c.t[i].u;
-								if (user.indexOf('@') > -1) user = getuid(c.t[i].u);
-								M.nodeShare(c.h,{h:$.selected[0],r:rights,u:user,ts:Math.ceil(new Date().getTime()/1000)});
-							}
-						}
-						$('.fm-dialog.share-dialog').removeClass('hidden');
-						loadingDialog.hide();
-						M.renderShare($.selected[0]);
-						shareDialog();
-						renderfm();
+		done : function(res,ctx)
+		{
+			var i;
+
+			if (res.r && res.r[0] == '0')
+			{
+				for (i in res.u) M.addUser(res.u[i]);
+
+				for (i in res.r)
+				{
+					if (res.r[i] == 0)
+					{
+						var rights = ctx.t[i].r;
+						var user = ctx.t[i].u;
+						if (user.indexOf('@') >= 0) user = getuid(ctx.t[i].u);
+						M.nodeShare(ctx.h,{h:$.selected[0],r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
 					}
 				}
-				else
-				{
-					$('.fm-dialog.share-dialog').removeClass('hidden');
-					loadingDialog.hide();
-				}
-			  }
-			});
+				$('.fm-dialog.share-dialog').removeClass('hidden');
+				loadingDialog.hide();
+				M.renderShare($.selected[0]);
+				shareDialog();
+				renderfm();
+			}
+			else
+			{
+				$('.fm-dialog.share-dialog').removeClass('hidden');
+				loadingDialog.hide();
+			}
 		}
 	});
 }
@@ -2330,14 +2348,16 @@ function processmove(jsonmove)
 	for (i in jsonmove)
 	{
 		var sharingnodes = fm_getsharenodes(jsonmove[i].t);
-		if (sharingnodes.length > 0)
+
+		if (sharingnodes.length)
 		{
 			var movingnodes = fm_getnodes(jsonmove[i].n);
 			movingnodes.push(jsonmove[i].n);
 			jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
 		}
+
+		api_req(jsonmove[i]);
 	}
-	api_req(jsonmove);
 }
 
 function process_f(f)
@@ -2371,9 +2391,9 @@ function process_ok(ok)
 	}
 }
 
-function loadfm_callback(json)
+function loadfm_callback(res)
 {
-	if (pfid && ((typeof json == 'number' && json < 0) || (json[0] && typeof json[0] == 'number' && json[0] < 0)))
+	if (pfid && typeof res == 'number' && res < 0)
 	{
 		loadingDialog.hide();
 		msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
@@ -2383,23 +2403,23 @@ function loadfm_callback(json)
 		});
 		return false;
 	}
-	else if (pfkey && json[0] && json[0].f && json[0].f[0])
+	else if (pfkey && res.f && res.f[0])
 	{
-		M.RootID = json[0].f[0].h;
-		u_sharekeys[json[0].f[0].h] = base64_to_a32(pfkey);
+		M.RootID = res.f[0].h;
+		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
 		folderlink=pfid;
 	}	
-	if (json[0].u) process_u(json[0].u);
-	if (json[0].ok) process_ok(json[0].ok);
-	process_f(json[0].f);	
-	if (json[0].s) for(var i in json[0].s) M.nodeShare(json[0].s[i].h,json[0].s[i]);
-	maxaction = json[0].sn;
+	if (res.u) process_u(res.u);
+	if (res.ok) process_ok(res.ok);
+	process_f(res.f);	
+	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
+	maxaction = res.sn;
 	localStorage[u_handle + '_maxaction'] = maxaction;
 	renderfm();
 	if (!pfkey) pollnotifications();
 
-	if (json[0].cr) crypto_procmcr(json[0].cr);
-	if (json[0].sr) crypto_procsr(json[0].sr);
+	if (res.cr) crypto_procmcr(res.cr);
+	if (res.sr) crypto_procsr(res.sr);
 
 	getsc();
 }
@@ -2499,41 +2519,39 @@ function clone(obj)
 
 function balance2pro(callback)
 {
-	api_req([{a: 'uq',pro: 1}],
+	api_req({a:'uq',pro:1},
 	{
 		cb: callback,
-		callback : function (json,params)
+		callback : function (res,ctx)
 		{
-			if (json[0] && json[0]['balance'] && json[0]['balance'][0])
+			if (typeof res == 'object' && res['balance'] && res['balance'][0])
 			{
 				var pjson = JSON.parse(pro_json);
+
 				for (var i in pjson[0])
 				{
-					if (pjson[0][i][5] == json[0]['balance'][0][0])
+					if (pjson[0][i][5] == res['balance'][0][0])
 					{
-						api_req([{a:'uts',it:0,si:pjson[0][i][0],p:pjson[0][i][5], c: pjson[0][i][6]}],
+						api_req({a:'uts',it:0,si:pjson[0][i][0],p:pjson[0][i][5],c:pjson[0][i][6]},
 						{
-							cb: params.cb,
-							callback : function (json,params)
+							cb: ctx.cb,
+							callback : function (res,ctx)
 							{
-								if (typeof json[0] == 'number' && json[0] < 0 && params.cb) params.cb(false);
+								if (typeof res == 'number' && res < 0 && ctx.cb) ctx.cb(false);
 								else
 								{
-									api_req([{ a : 'utc', s: [json[0]], m: 0}],
+									api_req({ a : 'utc', s: [res], m: 0},
 									{
-										cb: params.cb,
-										callback : function (json,params)
+										cb: ctx.cb,
+										callback : function (res,ctx)
 										{
-											if (params.cb) params.cb(true);
+											if (ctx.cb) ctx.cb(true);
 											u_checklogin({checkloginresult: function(u_ctx,r)
 											{
 												if (M.account) M.account.lastupdate=0;
 												u_type = r;
 												topmenuUI();
-												if (u_attr.p)
-												{
-													msgDialog('info',l[1047],l[1048]);
-												}
+												if (u_attr.p) msgDialog('info',l[1047],l[1048]);
 											}});
 										}
 									});

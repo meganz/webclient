@@ -9,7 +9,7 @@ function pollnotifications()
 	{
 		notifications = [];		
 		if (M.currentdirid == 'notifications') loadingDialog.show();		
-		api_req2('sc?c=100',
+		api_req('c=100',
 		{
 			callback: function (json,params)
 			{
@@ -39,12 +39,11 @@ function pollnotifications()
 					$('.cloud-popup-icon').show();
 				}
 			}
-		 });		
+		 },3);	
 	}
 }
 
 var lastnotification=0;
-
 
 function notifycounter()
 {
@@ -283,7 +282,6 @@ function remove_notipop()
 	});	
 }
 
-
 function notifymarkcount(nread)
 {	
 	var a=0;
@@ -300,10 +298,9 @@ function notifymarkcount(nread)
 	if (nread && $.maxnotification !== maxaction && a > 0)
 	{
 		$.maxnotification=maxaction;
-		api_req([{a:'sla',i: requesti}]);	
+		api_req({a:'sla',i:requesti});
 	}
 }
-
 
 function render_notifications()
 {

@@ -113,16 +113,16 @@ function dev_init(sub,reload)
 		if (reload || !sdk_apps)
 		{		
 			
-			api_req([{a:'apg'}],
+			api_req({a:'apg'},
 			{
-				callback : function (json,params)
+				callback : function (res)
 				{
 					sdk_apps = {};			
-					if (typeof json[0] == 'object')
+					if (typeof res == 'object')
 					{
-						for(var key in json[0])
+						for(var key in res)
 						{							
-							if (json[0][key]) sdk_apps[key] = json[0][key];																
+							if (res[key]) sdk_apps[key] = res[key];																
 						}			
 					}
 					dev_renderapps();
@@ -151,11 +151,10 @@ function dev_init(sub,reload)
 			if (but === 'yes') 
 			{
 				loadingDialog.show();
-				api_req([{a:'apd', 'ah': sdk_appid }],
+				api_req({a:'apd', 'ah': sdk_appid },
 				{
-					callback : function (json,params)
+					callback : function ()
 					{
-						console.log(json);
 						dev_init('sdk',true);
 					}
 				});				
@@ -167,15 +166,15 @@ function dev_init(sub,reload)
 	$('#dev_createapbtn').bind('click', function(e) 
 	{	
 		loadingDialog.show();
-		api_req([{a:'apc'}],
+		api_req({a:'apc'},
 		{
-			callback : function (json,params)
+			callback : function (res)
 			{				
 				loadingDialog.hide();
-				if (typeof json[0] == 'string')	
+				if (typeof res == 'string')	
 				{
-					sdk_apps[json[0]]={};
-					dev_app(json[0]);
+					sdk_apps[res]={};
+					dev_app(res);
 				}
 				else alert(l[200]);
 			}
@@ -188,9 +187,9 @@ function dev_init(sub,reload)
 		var status = 0;
 		if ($('#a_landing_rad2')[0].checked) status = 1;	
 		loadingDialog.show();
-		api_req([{a:'apu', 'ah': sdk_appid, 'name':$('#sdk_appname').val(), 'site': $('#sdk_appsite').val(), 'description': $('#sdk_appdescription').val(), 'publisher': $('#sdk_apppublisher').val(), 'status': status  }],
+		api_req({a:'apu', 'ah': sdk_appid, 'name':$('#sdk_appname').val(), 'site': $('#sdk_appsite').val(), 'description': $('#sdk_appdescription').val(), 'publisher': $('#sdk_apppublisher').val(), 'status': status  },
 		{
-			callback : function (json,params)
+			callback : function ()
 			{								
 				dev_init('sdk',true);
 			}

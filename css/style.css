@@ -13337,6 +13337,12 @@ h1.help-home-header {
 .tr .st-green-note {
 	background-image: url(../images/mega/tr/start-green-note.png);
 }
+.ka .st-green-note {
+	background-image: url(../images/mega/ka/start-green-note.png);
+}
+.be .st-green-note {
+	background-image: url(../images/mega/be/start-green-note.png);
+}
 .transfer-table td {
 	position: relative;
 }
@@ -13480,6 +13486,12 @@ h1.help-home-header {
 }
 .br .pro-recommended {
 	background-image: url(../images/mega/br/recommended.png);
+}
+.ka .pro-recommended {
+	background-image: url(../images/mega/ka/recommended.png);
+}
+.be .pro-recommended {
+	background-image: url(../images/mega/be/recommended.png);
 }
 .arrow {
 	background-repeat: no-repeat;
@@ -14069,8 +14081,14 @@ background-size: 90px auto;
 .dk .st-green-note {
  background-image: url(../images/mega/dk/start-green-note@2x.png);
 }
+.ka .st-green-note {
+ background-image: url(../images/mega/ka/start-green-note@2x.png);
+}
 .tr .st-green-note {
  background-image: url(../images/mega/tr/start-green-note@2x.png);
+}
+.be .st-green-note {
+ background-image: url(../images/mega/be/start-green-note@2x.png);
 }
  .pro-recommended {
  background-image: url(../images/mega/en/recommended@2x.png);
@@ -14195,6 +14213,12 @@ background-size: 90px auto;
 }
 .br .pro-recommended {
  background-image: url(../images/mega/br/recommended@2x.png);
+}
+.ka .pro-recommended {
+ background-image: url(../images/mega/ka/recommended@2x.png);
+}
+.be .pro-recommended {
+ background-image: url(../images/mega/be/recommended@2x.png);
 }
  .register-info-icon {
  background-image:url(../images/mega/register-info@2x.png);

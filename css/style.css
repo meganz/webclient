@@ -10373,6 +10373,7 @@ h5.main-italic-header {
 .new-download-right-block {
 	margin-left: 299px;
 	height: 210px;
+	overflow:hidden;
 }
 .new-download-pad {
 	height: 210px;
@@ -13963,11 +13964,22 @@ a.ff-extension-button:hover {
 	margin: 0;
 	border-left: 0;
 }
+@media only screen and (max-width: 1593px) {
+.adv .download-mid-centered-block {
+	min-width: 648px;
+}
+}
+@media only screen and (max-width: 1323px) {
+.adv .download-mid-centered-block {
+	min-width: 595px;
+}
+}
  @media only screen and (max-width: 1143px) {
 .powered-popup {
 	margin-left: -30px;
 }
 }
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .sync-top-logo, .sync-short-block li {
 	background-image: url(../images/mega/sync_nw@2x.png);

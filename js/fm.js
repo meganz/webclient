@@ -3036,7 +3036,7 @@ function topContextMenu(close)
 	if (close)
 	{
 		fmtopUI();	
-		$('.top-context-menu').fadeOut(close, function() 
+		$('.top-context-menu').fadeOut(350, function() 
 		{
 			$('.fm-right-header').removeClass('context');
 		});

@@ -372,7 +372,18 @@ function initUI()
 		return false;
 	});
 	$.hideContextMenu = function(e)
-	{
+	{		
+		if (e && e.target)
+		{
+			var c = $(e.target).attr('class');		
+			if (!c) 
+			{
+				c = $(e.target).parent();
+				if (c) c = $(c).attr('class');		
+			}
+			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
+		}
+		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.fm-tree-folder').removeClass('dragover');
 		if ($('.contacts-arrows').attr('class').indexOf('active') > -1)	
@@ -423,7 +434,7 @@ function initUI()
 		$.termsAgree = function()
 		{
 			u_attr.terms=1;
-			api_req([{a:'up', terms:'Mq'}]);
+			api_req({a:'up',terms:'Mq'});
 		};
 		$.termsDeny = function()
 		{
@@ -534,6 +545,8 @@ function initUI()
     setTimeout(function() {
         $(window).trigger('resize');
     },50);
+	
+	if (lang != 'en') $('.download-standart-item').text(l[58]);
 }
 
 
@@ -682,13 +695,11 @@ function fmremove()
 		{
 			if (e)
 			{
-				var ops = [];				
 				for(var i in $.selected)
 				{					
 					M.delNode($.selected[i]);					
-					ops.push({a:'ur',u:$.selected[i],l: '0',i: requesti});
+					api_req({a:'ur',u:$.selected[i],l:'0',i: requesti});
 				}
-				api_req(ops);
 			}
 		});
 	}
@@ -696,22 +707,30 @@ function fmremove()
 	{		
 		msgDialog('clear-bin',l[1003],l[76].replace('[X]',(filecnt+foldercnt)) + ' ' + l[77],l[1007],function(e)
 		{			
-			if (e) M.clearRubbish(1);
+			if (e) M.clearRubbish(1);			
 		});
 		$('.fm-dialog-button.notification-button').each(function(i,e) { if ($(e).text() == l[1018]) $(e).text(l[83]);});
 	}
 	else if (RootbyId($.selected[0]) == 'contacts')
-	{		
+	{
 		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
 		{
-			if (e) M.copyNodes($.selected,M.RubbishID,1);			
+			if (e)
+			{
+				M.copyNodes($.selected,M.RubbishID,1);
+				topContextMenu(1);
+			}
 		});
 	}
 	else
 	{
 		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
 		{
-			if (e) M.moveNodes($.selected,M.RubbishID);			
+			if (e)
+			{
+				M.moveNodes($.selected,M.RubbishID);
+				topContextMenu(1);
+			}
 		});
 	}
 }
@@ -722,6 +741,32 @@ function initContextUI()
 	var c = '.context-menu-item';
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
+	{
+		var c = $(this).attr('class');
+		
+		if (c && c.indexOf('dropdown') > -1)
+		{
+			$('.context-menu-item.more-item.dropdown').removeClass('active');
+			if (c.indexOf('active') > -1) 
+			{
+				$('.context-menu.files-menu').addClass('hidden');
+				$(this).removeClass('active');
+				return false;			
+			}
+			$(this).addClass('active');
+			$('.context-menu.files-menu .context-menu-divider').hide();
+			$('.context-menu.files-menu .context-menu-item').hide();			
+			$('.context-menu.files-menu .download-standart-item').show();
+			$('.context-menu.files-menu .zipdownload-item').show();
+			$('.context-menu.files-menu').removeClass('hidden');
+            var offset = $(this).offset();
+            $('.context-menu.files-menu').css({top: offset.top+35, left: offset.left});
+		}
+		else M.addDownload($.selected);
+	});
+	
+	$(c+'.download-standart-item').unbind('click');
+	$(c+'.download-standart-item').bind('click',function(event) 
 	{
 		M.addDownload($.selected);
 	});
@@ -798,7 +843,8 @@ function initContextUI()
 	{
 		M.favourite($.selected,$.delfav);		
 		if (M.viewmode) $('.file-block').removeClass('ui-selected');
-		else $('.grid-table.fm tr').removeClass('ui-selected');		
+		else $('.grid-table.fm tr').removeClass('ui-selected');
+		topContextMenu(1);
 	});
 	
 	$(c+'.open-item').unbind('click');
@@ -1000,7 +1046,7 @@ function fmtopUI()
 	else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
 	{
 		$('.fm-new-folder').removeClass('hidden');
-		$('.fm-file-upload').removeClass('hidden');		
+		$('.fm-file-upload').removeClass('hidden');
 		if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
 		else $('.fm-file-upload').addClass('last-button');		
 	}	
@@ -1368,7 +1414,7 @@ function accountUI()
 			u_attr.birthmonth = $('.fm-account-select.month select').val();
 			u_attr.birthyear = $('.fm-account-select.year select').val();
 			u_attr.country = $('.fm-account-select.country select').val();		
-			api_req([{a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)}]);		
+			api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
 			$('.fm-account-save-block').addClass('hidden');			
 			if (M.account.dl_maxSlots) 
 			{
@@ -1617,19 +1663,22 @@ function accountUI()
 			else
 			{
 				loadingDialog.show();
-				api_req([{a: 'uavr',v: $('.fm-voucher-body input').val()}],
+				api_req({a:'uavr',v:$('.fm-voucher-body input').val()},
 				{
-					callback : function (json,params)
+					callback : function(res,ctx)
 					{
 						loadingDialog.hide();
 						$('.fm-voucher-popup').addClass('hidden');
-						$('.fm-voucher-body input').val(l[487])
-						if (json[0] == -11) msgDialog('warninga',l[135],l[714]);
-						else if ((typeof json[0] == 'number') && (json[0] < 0)) msgDialog('warninga',l[135],l[473]);
-						else
+						$('.fm-voucher-body input').val(l[487]);
+						if (typeof res == 'number')
 						{
-							if (M.account) M.account.lastupdate=0;
-							accountUI();
+							if (res == -11) msgDialog('warninga',l[135],l[714]);
+							else if (res < 0) msgDialog('warninga',l[135],l[473]);
+							else
+							{
+								if (M.account) M.account.lastupdate=0;
+								accountUI();
+							}
 						}
 					}
 				});
@@ -1655,9 +1704,9 @@ function accountUI()
 			}
 			if (vouchertype == '19.99') vouchertype = '19.991';
 			loadingDialog.show();					
-			api_req([{a: 'uavi',d: vouchertype,n: voucheramount,c: 'EUR'}],
+			api_req({a:'uavi',d:vouchertype,n:voucheramount,c:'EUR'},
 			{
-				callback : function (json,params)
+				callback : function (res,ctx)
 				{
 					M.account.lastupdate=0;
 					accountUI();
@@ -1852,7 +1901,7 @@ function avatarDialog(close)
 		onCrop: function(croppedDataURI)
 		{
 			var data = dataURLToAB(croppedDataURI);			
-			api_req([{'a':'up','+a':base64urlencode(ab_to_str(data))}]);			
+			api_req({'a':'up','+a':base64urlencode(ab_to_str(data))});
 			var blob = new Blob([data],{ type: 'image/jpeg'});
 			avatars[u_handle] = 
 			{
@@ -2050,6 +2099,8 @@ var FMShortcuts = function() {
 
     // bind
     $(window).bind('keydown.fmshortcuts', function(e) {
+				
+	
         e = e || window.event;
 
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
@@ -2115,6 +2166,8 @@ var FMShortcuts = function() {
 
             return false;
         }
+		
+		
     });
 }
 
@@ -2160,6 +2213,7 @@ var QuickFinder = function(searchable_elements, containers) {
 
     // bind
     $(window).bind('keypress.quickFinder', function(e) {
+	
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
@@ -2226,6 +2280,7 @@ var QuickFinder = function(searchable_elements, containers) {
 
             $(self).trigger('search');
 
+			
 
             if($target_elm && $target_elm.size() > 0) {
                 // ^^ DONT stop prop. if there are no found elements.
@@ -2348,7 +2403,8 @@ var SelectionManager = function($selectable) {
      *
      * @param element
      */
-    this.set_currently_selected = function($element) {
+    this.set_currently_selected = function($element) {		
+	
         self.clear();
         $element.addClass("currently-selected");
         quickFinder.disable_if_active();
@@ -2359,8 +2415,13 @@ var SelectionManager = function($selectable) {
             if($jsp) {
                 $jsp.scrollToElement($element);
             }
-        }
-
+        }		
+		var r = Math.random();
+		$.topcR = r;
+		setTimeout(function(r)
+		{
+			if ($.topcR == r) topContextMenu();
+		},50,r);
     };
 
     /**
@@ -2387,6 +2448,13 @@ var SelectionManager = function($selectable) {
         ).filter(":visible");
 
         $selectables.addClass("ui-selected");
+		
+		var r = Math.random();
+		$.topcR = r;
+		setTimeout(function(r)
+		{
+			if ($.topcR == r) topContextMenu();
+		},50,r);
     };
 
     /**
@@ -2442,7 +2510,8 @@ var SelectionManager = function($selectable) {
     /**
      * After the user finished selecting the icons, flag the last selected one as .currently-selecting
      */
-    $selectable.bind('selectablestop', function(e, data) {
+    $selectable.bind('selectablestop', function(e, data) {		
+	
         self.clear();
 
         // remove `undefined` from the list
@@ -2458,6 +2527,7 @@ var SelectionManager = function($selectable) {
         }
 
         selected_list = []; // reset the state of the last selected items for the next selectablestart
+				
     });
 	
 	
@@ -2567,6 +2637,12 @@ function UIkeyevents()
 
                 quickFinder.disable_if_active();
 			}
+			var r = Math.random();
+			$.topcR = r;
+			setTimeout(function(r)
+			{
+				if ($.topcR == r) topContextMenu();
+			},50,r);
 		}
 		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
 		{		
@@ -2580,6 +2656,12 @@ function UIkeyevents()
 
                 quickFinder.disable_if_active();
 			}
+			var r = Math.random();
+			$.topcR = r;
+			setTimeout(function(r)
+			{
+				if ($.topcR == r) topContextMenu();
+			},50,r);
 		}
 		else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
 		{
@@ -2804,9 +2886,12 @@ function selectddUI()
 		}
 	});
 	
-	$('.ui-selectable-helper').remove();
-	
-	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) { searchPath(); }});
+	$('.ui-selectable-helper').remove();	
+	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u) 
+	{ 
+		searchPath();
+		topContextMenu();
+	}});
 
     /**
      * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
@@ -2837,6 +2922,10 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
 	{
 		if (d) console.log(e);
+		
+		
+		
+		
 		if ($.gridDragging) return false;
 		if (e.shiftKey && s.length > 0)
 		{
@@ -2877,7 +2966,7 @@ function selectddUI()
 		}
 		searchPath();
 		$.hideContextMenu(e);
-		if ($.hideTopMenu) $.hideTopMenu();
+		if ($.hideTopMenu) $.hideTopMenu();		
 		return false;
 	});
 		
@@ -2942,7 +3031,118 @@ function iconUI()
 
 
 
-
+function topContextMenu(close)
+{
+	if (close)
+	{
+		fmtopUI();	
+		$('.top-context-menu').fadeOut(close, function() 
+		{
+			$('.fm-right-header').removeClass('context');
+		});
+		delete $.topContextR;
+		return;	
+	}
+	cacheselect();
+	if ($.selected.length == 0)
+	{
+		topContextMenu(1);
+		return false;
+	}
+	
+	var items = menuItems();
+	
+	delete items['zipdownload'];
+	delete items['refresh'];
+	$('.top-icons-block .context-menu-item').hide();
+	$('.top-icons-block .context-menu-divider').hide();
+	
+	$('.top-context-menu').width();
+	$('.top-context-menu').fadeIn(350);
+	setTimeout(function()
+	{	
+		$('.fm-right-header').addClass('context');
+		$('.fm-file-upload').addClass('hidden');
+		$('.fm-folder-upload').addClass('hidden');
+	},180);
+	
+	$.topContextSub = {};
+	var moreWidth = $('.top-icons-block .context-menu-item.more-item').outerWidth();
+	var w = 0,i=0, total=0;
+	for (var item in items) total++;	
+	$('.top-icons-block .context-menu-item').each(function(j,e)
+	{		
+		var c = $(e).attr('class');
+		for (var item in items)
+		{						
+			if (c && c.indexOf(' ' + item + '-item') > -1)
+			{
+				w = w + $('.top-icons-block .context-menu-item').filter('.' + item + '-item').outerWidth()+3;				
+				if ((w > $('.top-context-menu').width()-50) || (w+moreWidth > $('.top-context-menu').width()-50 && i < total-1))
+				{
+					w=w+200;
+					$.topContextSub[item]=1;
+					$('.context-menu-item.more-item').show();
+				}
+				else 
+				{
+					$('.top-icons-block .context-menu-item').filter('.' + item + '-item').show();
+					$('.top-icons-block .context-menu-divider').filter('.' + item).show();		
+				}
+				i++;
+			}						
+		}		
+	});
+	
+	$('.top-icons-block .context-menu-item.more-item').unbind('click');
+	$('.top-icons-block .context-menu-item.more-item').bind('click',function(e)
+	{
+		$('.context-menu-item.download-item.dropdown').removeClass('active');
+		var c = $(this).attr('class');		
+		if (c && c.indexOf('active') > -1)
+		{
+			$(this).removeClass('active');
+			$.hideContextMenu(e);
+		}
+		else
+		{
+			if (c.indexOf('active') > -1) 
+			{
+				$('.context-menu.files-menu').addClass('hidden');
+				$(this).removeClass('active');
+				return false;			
+			}
+			$(this).addClass('active');
+			$('.context-menu.files-menu .context-menu-divider').hide();
+			$('.context-menu.files-menu .context-menu-item').hide();
+			for (var item in $.topContextSub) $('.context-menu.files-menu .' + item + '-item').show();
+			$('.context-menu.files-menu').removeClass('hidden');
+            var offset = $(this).offset();
+            $('.context-menu.files-menu').css({top: offset.top+35, left: offset.left});
+		}
+	});	
+	
+	$('.top-icons-block').unbind('mouseover');
+	$('.top-icons-block').bind('mouseover',function(e)
+	{
+		delete $.topContextR;
+	});
+	
+	var r = Math.random();	
+	$.topContextR = r;	
+	setTimeout(function(r)
+	{
+		if (r == $.topContextR)
+		{
+			topContextMenu(300);
+		}
+	},5000,r);	
+	$('.top-context-close').unbind('click');
+	$('.top-context-close').bind('click',function()
+	{
+		topContextMenu(10);
+	});
+}
 
 
 
@@ -3085,16 +3285,80 @@ function getDDhelper()
 }
 
 
+function menuItems()
+{
+	var items = [];
+	var sourceRoot = RootbyId($.selected[0]);			
+	if ($.selected.length == 1 && RightsbyID($.selected[0]) > 0)
+	{					
+		// $(t).filter('.rename-item').show();				
+		items['rename'] = 1;
+	}
+	if (RightsbyID($.selected[0]) > 0)
+	{
+		//$(t).filter('.remove-item,.add-star-item').show();	
+		
+		items['remove'] = 1;
+		items['add-star'] = 1;
+		
+		$.delfav=1;
+		for (var i in $.selected)
+		{
+			var n = M.d[$.selected[i]];					
+			if (n && !n.fav) $.delfav=0;
+		}				
+		if ($.delfav) $('.add-star-item').text(l[976]);				
+		else $('.add-star-item').text(l[975]);
+	}
+	if ($.selected.length == 1 && M.d[$.selected[0]].t)
+	{
+		//$(t).filter('.open-item').show();				
+		items['open'] = 1;				
+	}
+	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink)
+	{
+		//$(t).filter('.sharing-item').show();			
+		items['sharing'] = 1;
+	}
+	if (sourceRoot == M.RootID && !folderlink)
+	{
+		//$(t).filter('.move-item,.getlink-item').show();
+		items['move'] = 1;
+		items['getlink'] = 1;
+	}
+	else if (sourceRoot == M.RubbishID && !folderlink)
+	{
+		//$(t).filter('.move-item').show();
+		items['move'] = 1;
+	}
+	
+	items['download'] = 1;
+	items['zipdownload'] = 1;
+	items['copy'] = 1;
+	items['properties'] = 1;
+	items['refresh'] = 1;
+	
+	if (folderlink)
+	{
+		delete items['properties'];
+		delete items['copy'];
+		delete items['add-star'];
+	}
 
-function contextmenuUI(e,ll)
+	return items;
+}
+
+
+function contextmenuUI(e,ll,topmenu)
 {
 	if (localStorage.contextmenu) return true;	
+	topContextMenu(1);	
 	var t = '.context-menu.files-menu .context-menu-item';	
 	if (ll == 2)
 	{
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
-			$('.context-menu-item').hide();
+			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
 			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
@@ -3105,24 +3369,16 @@ function contextmenuUI(e,ll)
 		$(t).hide();
 		var c = $(e.currentTarget).attr('class');
 		var id = $(e.currentTarget).attr('id');
-		if (id) id = id.replace('treea_','');	
+		if (id) id = id.replace('treea_','');
 		if (id && !M.d[id]) id = undefined;
-		if (id && id.length == 11) {
-            $(t).filter('.refresh-item,.remove-item').show();
-        }
+		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
-			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();
-			if (folderlink) $(t).filter('.newfolder-item').hide();
+			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();			
+			if (folderlink) $(t).filter('.newfolder-item').hide();			
 		}
-		else if (c && c.indexOf('recycle-item') > -1)
-		{
-			$(t).filter('.refresh-item,.clearbin-item').show();
-		}
-		else if (c && c.indexOf('contacts-item') > -1)
-		{
-			$(t).filter('.refresh-item,.addcontact-item').show();
-		}
+		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
+		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
 		else if (c && c.indexOf('messages-item') > -1)
 		{
 			e.preventDefault();
@@ -3130,30 +3386,12 @@ function contextmenuUI(e,ll)
 		}
 		else if (c && (c.indexOf('file-block') > -1 || c.indexOf('folder') > -1 || c.indexOf('fm-tree-folder') > -1) || id)
 		{
-			var sourceRoot = RootbyId($.selected[0]);			
-			if ($.selected.length == 1 && RightsbyID($.selected[0]) > 0) $(t).filter('.rename-item').show();
-			if (RightsbyID($.selected[0]) > 0)
-			{
-				$(t).filter('.remove-item,.add-star-item').show();				
-				$.delfav=1;
-				for (var i in $.selected)
-				{
-					var n = M.d[$.selected[i]];					
-					if (n && !n.fav) $.delfav=0;
-				}				
-				if ($.delfav) $('.add-star-item').text(l[976]);				
-				else $('.add-star-item').text(l[975]);
-			}
-			if ($.selected.length == 1 && M.d[$.selected[0]].t) $(t).filter('.open-item').show();			
-			if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) $(t).filter('.sharing-item').show();			
-			if (sourceRoot == M.RootID && !folderlink) $(t).filter('.move-item,.getlink-item').show();
-			else if (sourceRoot == M.RubbishID && !folderlink) $(t).filter('.move-item').show();
-			$(t).filter('.download-item,.zipdownload-item,.copy-item,.properties-item,.refresh-item').show();
-
-			if (folderlink) $(t).filter('.properties-item,.copy-item,.add-star-item').hide();
+			var items = menuItems();
+			for (var item in items) $(t).filter('.' + item + '-item').show();
 		}
 		else return false;		
 	}
+	
 	var m = $('.context-menu.files-menu');
 	m.removeClass('hidden');
 	var r = $('body').outerWidth()-$(m).outerWidth();
@@ -3770,13 +4008,13 @@ function shareDialog(close)
 				$('.share-folder-info .propreties-dark-txt').text(n.name);
 				if (!n.ph)
 				{
-					api_req([{a: 'l',n: $.selected[0]}],
+					api_req({a:'l',n:$.selected[0]},
 					{
 						n:n,
-						callback: function(json,params)
-						{							
-							M.nodeAttr({h:params.n.h,ph:json[0]});
-							$('.share-folder-block .properties-file-link').html('https://mega.co.nz/#F!' + htmlentities(json[0]) + '!' + htmlentities(a32_to_base64(u_sharekeys[params.n.h])));
+						callback : function(res,ctx)
+						{
+							M.nodeAttr({h:ctx.n.h,ph:res});
+							$('.share-folder-block .properties-file-link').html('https://mega.co.nz/#F!' + htmlentities(res) + '!' + htmlentities(a32_to_base64(u_sharekeys[ctx.n.h])));
 						}
 					});
 				}
@@ -3792,9 +4030,9 @@ function shareDialog(close)
 		if ($('.share-folder-block').attr('class').indexOf('hidden') == -1 && !$('.public-checkbox input').attr('checked'))
 		{
 			M.delnodeShare($.selected[0],'EXP');
-			api_req([{a: 'l',n: $.selected[0]}],
+			api_req({a: 'l',n: $.selected[0]},
 			{
-			  callback : function (json) { if (json[0]) api_req([{a: 'l',p: json[0]}]); }
+			  callback : function (res) { if (typeof res != 'number') api_req({a:'l',p:res}); }
 			});
 			sops.push({u:'EXP',r:''});
 		}		
@@ -3807,7 +4045,7 @@ function shareDialog(close)
 			}		
 			delete $.delShare;
 		}		
-		if (sops.length > 0) api_req([{a: 's',n:$.selected[0],s:sops,ha:'',i: requesti}]);		
+		if (sops.length > 0) api_req({a:'s',n:$.selected[0],s:sops,ha:'',i: requesti});
 		shareDialog(1);
 	});
 	$('.fm-share-dropdown').unbind('click');	
@@ -3989,12 +4227,13 @@ function mcDialog(close)
 		$('.move-dialog .move-button').unbind('click');
 		$('.move-dialog .move-button').bind('click',function()  
 		{
-			var t = $.mcselected;			
+			var t = $.mcselected;		
 			if ($.mctype == 'move')
 			{			
 				var n=[];
 				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
 				M.moveNodes(n,t);
+				topContextMenu(1);
 			}
 			else if ($.mctype.substr(0,4) == 'copy')
 			{
@@ -4010,7 +4249,7 @@ function mcDialog(close)
 				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
 				M.copyNodes(n,t);
 			}
-			mcDialog(1);
+			mcDialog(1);			
 		});
 	}
 }

@@ -90,15 +90,11 @@ function registeraccount()
 {
 	var ctx = 
 	{
-		callback: function(res,ctx)
+		callback : function(res)
 		{
 			loadingDialog.hide();
-			if (typeof res == 'undefined') 
+			if (res == 0)
 			{
-				alert(l[215]);												
-			}			
-			else if (res[0] == 0)
-			{			
 				if (m)
 				{
 					done_text1 = l[216];
@@ -122,12 +118,12 @@ function registeraccount()
 					ops.name2 = base64urlencode(to8($('#register-firstname') + ' ' + $('#register-lastname').val()));
 					u_attr.terms=1;
 				}				
-				api_req([ops]);
+				api_req(ops);
 			}
 			else
 			{		
-				if (res[0] == EACCESS) alert(l[218]);				
-				else if (res[0] == EEXIST) 
+				if (res == EACCESS) alert(l[218]);				
+				else if (res == EEXIST) 
 				{
 					if (m) alert(l[219]);
 					else

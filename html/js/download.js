@@ -25,18 +25,18 @@ function dlinfo(ph,key,next)
 	$('.download-mid-white-block').addClass('hidden');	
 	dlpage_ph 	= ph;
 	dlpage_key 	= key;
-	api_req('[{"a":"g","p":"' + ph + '","ssl": "1"}]',
+	api_req({ a : 'g', p : ph },
 	{
-		callback : function (json,params)
+		callback : function (res)
 		{
 			$('.widget-block').addClass('hidden');
 			loadingDialog.hide();
 			$('.download-mid-white-block').removeClass('hidden');		
-			if (json[0] == ETOOMANY) $('.download-mid-centered-block').addClass('not-available-user');			
-			else if (typeof json[0] == 'number' && json[0] < 0) $('.download-mid-centered-block').addClass('not-available-some-reason');
-			else if (json[0].e == ETEMPUNAVAIL) $('.download-mid-centered-block').addClass('not-available-temporary');
-			else if (json[0].d) $('.download-mid-centered-block').addClass('not-available-some-reason');
-			else if (json[0].at)
+			if (res == ETOOMANY) $('.download-mid-centered-block').addClass('not-available-user');			
+			else if (typeof res == 'number' && res < 0) $('.download-mid-centered-block').addClass('not-available-some-reason');
+			else if (res.e == ETEMPUNAVAIL) $('.download-mid-centered-block').addClass('not-available-temporary');
+			else if (res.d) $('.download-mid-centered-block').addClass('not-available-some-reason');
+			else if (res.at)
 			{
 				$('.download-pause').unbind('click');
 				$('.download-pause').bind('click',function(e)
@@ -72,10 +72,10 @@ function dlinfo(ph,key,next)
 				{
 					var base64key = key;
 					key = base64_to_a32(key);					
-					dl_attr = json[0].at;
-					var dl_a = base64_to_ab(json[0].at);	
+					dl_attr = res.at;
+					var dl_a = base64_to_ab(res.at);	
 					fdl_file = dec_attr(dl_a,key);
-					fdl_filesize = json[0].s;
+					fdl_filesize = res.s;
 				}				
 				if (fdl_file)
 				{
@@ -88,7 +88,7 @@ function dlinfo(ph,key,next)
 					fdl_queue_var = {
 						ph:		ph,						
 						key: 	key,
-						s: 		json[0].s,
+						s: 		res.s,
 						n: 		fdl_file.n,
 						onDownloadProgress: dlprogress,
 						onDownloadComplete: dlcomplete,
@@ -97,10 +97,11 @@ function dlinfo(ph,key,next)
 						onBeforeDownloadComplete: function() { }
 					};
 					$('.new-download-file-title').text(fdl_file.n);						
-					$('.new-download-file-size').text(bytesToSize(json[0].s));
+					$('.new-download-file-size').text(bytesToSize(res.s));
 					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 				}
 				else dlkeyDialog();				
+				if (baboom) dl_ad();				
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
 			if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
@@ -114,6 +115,107 @@ function dlinfo(ph,key,next)
 	});
 }
 
+
+
+function dl_ad()
+{
+	if (u_attr && u_attr.p) return false;
+	var audiopath = 'https://m.static.mega.co.nz/';	
+	$('body').addClass('adv');
+	window.baboomAds([
+	{
+		url:audiopath + 'audio/01.mp3',
+		title: 'Amazing',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/02.mp3',
+		title: 'Good Times<br>',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/03.mp3',
+		title: 'Dance Dance Dance',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/04.mp3',
+		title: 'Keeps Getting Better<br>',
+		top: -45
+	},
+	{
+		url:audiopath + 'audio/05.mp3',
+		title: 'Change Your Life',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/06.mp3',
+		title: 'Universe<br>',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/07.mp3',
+		title: 'Little Bit Of Me',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/08.mp3',
+		title: 'Party Electricity',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/09.mp3',
+		title: 'Wunderbar (Interlude)',
+		top: -45
+	},
+	{
+		url:audiopath + 'audio/10.mp3',
+		title: 'To Be With You',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/11.mp3',
+		title: 'Good Life',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/12.mp3',
+		title: 'Party Amplifier',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/13.mp3',
+		title: 'Take Me Away',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/14.mp3',
+		title: 'Beathoven (Interlude)',
+		top: -45
+	},
+	{
+		url:audiopath + 'audio/15.mp3',
+		title: 'Firework',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/16.mp3',
+		title: 'Live My Life',
+		top: -20
+	},
+	{
+		url:audiopath + 'audio/17.mp3',
+		title: 'Beathoven Slow',
+		top: -20
+	}], function (err) {
+	// TODO: handle err
+});
+
+
+}
+
+
+
 function closedlpopup()
 {
 	document.getElementById('download_overlay').style.display='none';
@@ -123,14 +225,11 @@ function closedlpopup()
 function dl_fm_import()
 {	
 	api_req(
-	[{	
+	{	
 		a: 'p',
 		t: M.RootID,
 		n: [{ ph: dl_import, t: 0, a: dl_attr, k: a32_to_base64(encrypt_key(u_k_aes,base64_to_a32(dlkey))) }]
-	}],{ callback: function ()
-	{
-		
-	}});
+	});
 	dl_import=false;
 }
 

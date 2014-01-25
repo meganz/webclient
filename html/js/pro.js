@@ -10,11 +10,11 @@ function init_pro()
 	if (u_type == 3)
 	{
 		api_req(
-		[{ a: 'uq',pro: 1,}],
+		{ a : 'uq',pro : 1,},
 		{ 
-			callback : function (json,params) 
+			callback : function (res) 
 			{ 
-				if (json[0] && json[0]['balance'] && json[0]['balance'][0]) pro_balance = json[0]['balance'][0][0];											
+				if (typeof res == 'object' && json.balance && json.balance[0]) pro_balance = json.balance[0][0];
 			}
 		});	
 	}	
@@ -146,48 +146,48 @@ function pro_pay()
 	var aff=0;	
 	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;	
 	loadingDialog.show();
-	api_req([{ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff}],
+	api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff},
 	{
-		callback : function (json,params) 
+		callback : function (res)
 		{ 
-			if ((typeof json[0] == 'number') && (json[0] < 0))
+			if (typeof res == 'number' && res < 0)
 			{
 				loadingDialog.hide();
-				alert(l[200]);			
+				alert(l[200]);
 			}
 			else
 			{
-				if ((pro_paymentmethod == 'pro_voucher') || (pro_paymentmethod == 'pro_prepaid')) pro_m=0;
-				else pro_m=1;				
-				api_req([{ a : 'utc', s: [json[0]], m: pro_m}],
+				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
+				else pro_m = 1;
+				api_req({ a : 'utc', s : [res], m : pro_m },
 				{ 
-					callback : function (json,params) 
-					{ 			
+					callback : function (res)
+					{ 
 						if (pro_paymentmethod == 'pro_prepaid')
 						{
 							loadingDialog.hide();
-							if ((typeof json[0] == 'number') && (json[0] < 0))
+							if (typeof res == 'number' && res < 0)
 							{
-								if (json[0] == 502) alert(l[514]);
+								if (res == EOVERQUOTA) alert(l[514]);
 								else alert(l[200]);
 							}
 							else
 							{
 								if (M.account) M.account.lastupdate=0;
 								document.location.hash = 'account';								
-							}						
+							}
 						}
 						else
 						{					
 							var ppurl = 'https://www.paypal.com/cgi-bin/webscr';
-							if ((json[0]) && (json[0]['EUR']))
+							if (res && res.EUR)
 							{	
 								var j = 0;
-								for (var i in json[0]['EUR'])
+								for (var i in res.EUR)
 								{
 									if (j == 0) ppurl += '?';
 									else ppurl += '&';
-									ppurl += i + '=' + encodeURIComponent(json[0]['EUR'][i]);	
+									ppurl += i + '=' + encodeURIComponent(res.EUR[i]);
 									j++;
 								}
 								if (d) console.log(ppurl);
@@ -201,7 +201,7 @@ function pro_pay()
 							else
 							{
 								loadingDialog.hide();
-								alert(l[200]);							
+								alert(l[200]);
 							}
 						}
 					}

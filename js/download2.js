@@ -30,7 +30,7 @@ dlQueue.getNextTask = (function() {
 
 		if (current) {
 			$.each(self._queue, function(p, pzTask) {
-				if (pzTask.task.download.dl_id == current) {
+				if (pzTask.task.download && pzTask.task.download.dl_id == current) {
 					candidate = p;
 					return false; /* break */
 				}
@@ -44,7 +44,7 @@ dlQueue.getNextTask = (function() {
 			candidate =  self._queue.shift();
 		}
 
-		current = candidate ? candidate.task.download.dl_id : null;
+		current = candidate ? (candidate.task.download||{}).dl_id : null;
 
 		return candidate;
 	};
@@ -216,80 +216,8 @@ DownloadQueue.prototype.push = function() {
 	dl.urls	 = []
 	dl.decrypt = 0;
 
-	dlIO.begin = function() {
-		var tasks = [];
-		if (dl.zipid) {
-			var Zip = Zips[dl.zipid]
-				, queue = Zip.queue[dl_id]
-				, object = queue[0]
-				, offset = queue[1]
+	dlQueue.push(new ClassFile(dl));
 
-			var pos = 0;
-			Zip.IO.size = Zip.size;
-			$.each(object.urls, function(id, url) {
-				url.first		= id == 0
-				url.last		= object.urls.length-1 == id
-				url.zoffset		= url.offset + offset;
-				url.path		= dl.p + dl.n;
-				url.fsize		= dl.size;
-				url.download	= dl;
-				url.download.io	= Zip.IO;
-				url.pos		 = pos++;
-				Zip.url.push(url);
-			});
-
-			delete Zip.queue[dl_id];
-			if ($.len(Zip.queue) === 0) {
-				// start real downloading!
-				// Done with the queue, now fetch everything :-)
-				Zip.IO.urls = Zip.url.sort(function(a, b) {
-					// Sort by offset write often to avoid
-					// keeping thing in RAM 
-					return a.zoffset - b.zoffset;
-				});
-				// Trigger real download
-				Zip.IO.begin(Zip.size);
-			}
-			return;
-		}
-
-		$.each(dl.urls||[], function(key, url) {
-			tasks.push({
-				url: url.url, 
-				offset: url.offset, 
-				size: url.size, 
-				download: dl, 
-				chunk_id: key
-			});
-		});
-
-		dlQueue.pushAll(tasks, function() {
-			if (dl.cancelled) return;
-			dl.onDownloadComplete(dl_id);
-			var checker = setInterval(function() {
-				if (dl.decrypt == 0) {
-					clearInterval(checker);
-					if (!checkLostChunks(dl)) {
-						return dl_reportstatus(dl.id, EKEY);
-					}
-					dl.onBeforeDownloadComplete(dl.pos);
-					dl.io.download(dl.zipname || dl.n, dl.p);
-				}
-			}, 100);
-		}, failureFunction);
-
-		// notify the UI
-		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
-	}
-
-	DEBUG("dl_key " + dl_key);
-
-	dlGetUrl(dl, function(res, o) {
-		var info = dl_queue.splitFile(res.s);
-		dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-		return dlIO.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-	});
-	
 	return pos;
 };
 
@@ -315,10 +243,9 @@ function dlGetUrl(object, callback) {
 		req.n = object.id;
 	}
 
-	api_req([req], {
+	api_req(req, {
 		callback: function(res, rex) {
 			if (typeof res == 'object') {
-				res = res[0];
 				if (typeof res == 'number') {
 					dl_reportstatus(object.pos, res);
 				} else {

@@ -134,21 +134,21 @@ function ul_deduplicate(identical)
 	}
 	else if (M.h[uq.hash]) n = M.d[M.h[uq.hash][0]];
 	if (!n) initupload1();
-	api_req([{a:'g',g:1,ssl:use_ssl,n:n.h}],
+	api_req({a:'g',g:1,ssl:use_ssl,n:n.h},
 	{
 		uq:uq,
 		n:n,
 		skipfile:(ul_skipIdentical && identical),
 		callback: function(res,ctx)
 		{
-			if ((res[0] == ETEMPUNAVAIL || (res[0] && res[0].e == ETEMPUNAVAIL)) && ctx.skipfile)
+			if (res.e == ETEMPUNAVAIL && ctx.skipfile)
 			{
 				ctx.uq.repair = ctx.n.key;
 				initupload1();		
 			}
-			else if (typeof res[0] == 'number' || (res[0] && res[0].e)) initupload1();
+			else if (typeof res == 'number' || res.e) initupload1();
 			else
-			{				
+			{
 				if (ctx.skipfile) onUploadSuccess(ul_queue_num);
 				else
 				{
@@ -163,6 +163,7 @@ function ul_deduplicate(identical)
 						ctx: 	{target:ctx.uq,ul_queue_num:ul_queue_num,callback:ul_completepending2}
 					},ctx.uq);
 				}
+
 				ul_queue_num++;
 				ul_uploading = false;
 				startupload();
@@ -201,36 +202,32 @@ function initupload1()
 	if (ul_queue[ul_queue_num].posturl) initupload3();
 	else
 	{
-		var ctx = { callback : initupload2, reqindex : [] };
 		var req = [];
 		var maxpf = 128*1048576;
 
 		for (var i = ul_queue_num; i < ul_queue.length && i < ul_queue_num+8 && maxpf > 0; i++)
 		{
-			if (!ul_queue[ul_queue_num].posturl)
+			if (!ul_queue[i].posturl)
 			{
-				ctx.reqindex.push(i);
-				req.push({ a : 'u', ssl : use_ssl, ms : ul_maxSpeed, s : ul_queue[i].size, r : ul_queue[i].retries, e : ul_lastreason });
+				api_req({ a : 'u', ssl : use_ssl, ms : ul_maxSpeed, s : ul_queue[i].size, r : ul_queue[i].retries, e : ul_lastreason },{ reqindex : i, callback : initupload2 });
 				maxpf -= ul_queue[i].size
 			}
 		}
-		api_req(req,ctx);
 	}
 }
 
 function initupload2(res,ctx)
 {
-	var p, pp;
+	if (typeof res == 'object')
+	{
+		ul_queue[ctx.reqindex].posturl = res.p;
 
-	if (typeof res != 'object')
+		initupload3();
+	}
+	else
 	{
 		// TODO: process upload error
-		return;
 	}
-
-	for (var i = 0; i < res.length; i++) if (typeof(res[i]) == 'object') ul_queue[ctx.reqindex[i]].posturl = res[i].p;
-
-	initupload3();
 }
 
 function initupload3()
@@ -254,11 +251,8 @@ function initupload3()
 		// generate ul_key and nonce
 		for (i = 6; i--; ) ul_key[i] = rand(0x100000000);
 	}
-		
-		
-
-		ul_keyNonce = JSON.stringify(ul_key);
 	
+	ul_keyNonce = JSON.stringify(ul_key);
 
 	ul_macs = [];
 
@@ -622,13 +616,13 @@ function ul_completepending(target)
 
 function ul_completepending2(res,ctx)
 {
-	if (typeof res == 'object' && res[0].f)
+	if (typeof res == 'object' && res.f)
 	{
 		newnodes = [];
-		process_f(res[0].f);
+		process_f(res.f);
 		rendernew();
 		fm_thumbnails();
-		if (ctx.faid) api_attachfileattr(res[0].f[0].h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(res.f.h,ctx.faid);
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}
@@ -873,5 +867,5 @@ function ul_cancel()
 
 	delete ul_queue[ul_queue_num].posturl;
 
-	api_req([{ a : 'u', t : ul_uploadurl }]);
+	api_req({ a : 'u', t : ul_uploadurl });
 }

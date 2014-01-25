@@ -7,6 +7,231 @@ function getXhrObject() {
 	return dl_xhr;
 }
 
+// Chunk fetch {{{
+function ClassChunk(task) {
+	this.run = function(Scheduler) {
+		var xhr = getXhrObject()
+			, url = task.url
+			, size = task.size
+			, download = task.download
+			, io = download.io
+			, average_throughput = [0, 0]
+			, done = false
+			, prevProgress = 0    // Keep in track how far are we in the downloads
+			, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
+			, progress = getxr()  // chunk progress
+			, speed = 0 // speed of the current chunk
+			, lastUpdate // FIXME: I should be abstracted at getxr()
+	
+		io.dl_xr = io.dl_xr || getxr() // global download progress
+	
+		/**
+		 *	Check if the current chunk is small or close to its
+		 *	end, so it can cheat to the scheduler telling they are 
+		 *	actually done
+		 */
+		function shouldIReportDone() {
+			if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
+				Scheduler.done();
+				done = true;
+			}
+		}
+	
+		function updateProgress(force) {
+			if (dlQueue.isPaused()) {
+				// do not update the UI
+				return false;
+			}
+	
+			// keep in track of the current progress
+			if (lastUpdate+250 < new Date().getTime()) {
+				speed = progress.update(prevProgress - pprevProgress)
+				pprevProgress = prevProgress;
+				lastUpdate = new Date().getTime()
+				shouldIReportDone();
+			}
+	
+			// Update global progress (per download) and aditionally
+			// update the UI
+			if (io.dl_lastprogress+250 > new Date().getTime() && !force) {
+				// too soon
+				return false;
+			}
+	
+			download.onDownloadProgress(
+				download.dl_id, 
+				io.progress, // global progress
+				io.size, // total download size
+				io.dl_xr.update(io.progress - io.dl_prevprogress),  // speed
+				download.pos // this download position
+			);
+	
+			io.dl_prevprogress = io.progress
+			io.dl_lastprogress = new Date().getTime();
+		}
+	
+	
+		if (dlMethod == FileSystemAPI) {
+			var t = url.lastIndexOf('/dl/');
+			xhr.open('POST', url.substr(0, t+1));
+			xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
+		} else {
+			xhr.open('POST', url, true);
+		}
+		DEBUG("Fetch " + url);
+		
+		if (!io.dl_bytesreceived) {
+			io.dl_bytesreceived = 0;
+		}
+	
+		function isCancelled() {
+			if (download.cancelled) {
+				DEBUG("Chunk aborting itself because download was cancelled");
+				xhr.abort();
+				!done && Scheduler.done();
+				iRealDownloads--;
+				return true;
+			}
+		}
+	
+		xhr.onprogress = function(e) {
+			if (isCancelled()) return;
+	
+			io.progress += e.loaded - prevProgress;
+			prevProgress = e.loaded
+			updateProgress();
+		};
+	
+		xhr.onreadystatechange = function() {
+			if (isCancelled()) return;
+			if (this.readyState == this.DONE) {
+				var r = this.response || {};
+				io.progress += r.byteLength - prevProgress;
+				updateProgress(true);
+				iRealDownloads--;
+	
+				if (r.byteLength == size) {
+					if (have_ab) {
+						if (navigator.appName != 'Opera') {
+							io.dl_bytesreceived += r.byteLength;
+						}
+						dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+					} else {
+						io.dl_bytesreceived += this.response.length;
+						dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
+					}
+				} else if (!download.cancelled) {
+					// we must reschedule this download	
+					DEBUG(this.status, r.bytesLength, size);
+					DEBUG("HTTP FAILED WITH " + this.status);
+	
+					// tell the scheduler that we failed
+					if (done) {
+						// We already told the scheduler we were done
+						// with no erro and this happened. Should I reschedule this 
+						// task?
+						throw new Error("Fixme")
+					}
+					return Scheduler.done(false, this.status);
+				}
+				!done && Scheduler.done();
+			}
+		}
+		xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+		xhr.send();
+	}
+}
+// }}}
+
+// File fetch {{{
+function ClassFile(dl) {
+
+	// run task {{{
+	this.run = function(Scheduler)  {
+		if (!use_workers) {
+			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
+		}
+	
+		DEBUG("dl_key " + dl.key);
+	
+		dl.io.begin = function() {
+			var tasks = [];
+			if (dl.zipid) {
+				var Zip = Zips[dl.zipid]
+					, queue = Zip.queue[dl.dl_id]
+					, object = queue[0]
+					, offset = queue[1]
+	
+				var pos = 0;
+				Zip.IO.size = Zip.size;
+				$.each(object.urls, function(id, url) {
+					url.first		= id == 0
+					url.last		= object.urls.length-1 == id
+					url.zoffset		= url.offset + offset;
+					url.path		= dl.p + dl.n;
+					url.fsize		= dl.size;
+					url.download	= dl;
+					url.download.io	= Zip.IO;
+					url.pos		 = pos++;
+					Zip.url.push(url);
+				});
+	
+				delete Zip.queue[dl.dl_id];
+				if ($.len(Zip.queue) === 0) {
+					// start real downloading!
+					// Done with the queue, now fetch everything :-)
+					Zip.IO.urls = Zip.url.sort(function(a, b) {
+						// Sort by offset write often to avoid
+						// keeping thing in RAM 
+						return a.zoffset - b.zoffset;
+					});
+					// Trigger real download
+					Zip.IO.begin(Zip.size);
+				}
+				return;
+			}
+	
+			$.each(dl.urls||[], function(key, url) {
+				tasks.push(new ClassChunk({
+					url: url.url, 
+					offset: url.offset, 
+					size: url.size, 
+					download: dl, 
+					chunk_id: key
+				}));
+			});
+	
+			dlQueue.pushAll(tasks, function() {
+				if (dl.cancelled) return;
+				dl.onDownloadComplete(dl.dl_id);
+				var checker = setInterval(function() {
+					if (dl.decrypt == 0) {
+						clearInterval(checker);
+						if (!checkLostChunks(dl)) {
+							return dl_reportstatus(dl.id, EKEY);
+						}
+						dl.onBeforeDownloadComplete(dl.pos);
+						dl.io.download(dl.zipname || dl.n, dl.p);
+					}
+				}, 100);
+			}, failureFunction);
+	
+			// notify the UI
+			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
+		}
+	
+		dlGetUrl(dl, function(res, o) {
+			var info = dl_queue.splitFile(res.s);
+			dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+		});
+	}
+	// }}}
+
+}
+// }}}
+
+// Decrypter worker {{{
 function decrypter(task)
 {
 	var download = task.download
@@ -66,6 +291,7 @@ function decrypter(task)
 		});
 	}
 }
+// }}}
 
 /** 
  *	Keep in track real active downloads.
@@ -86,142 +312,19 @@ function downloader(task) {
 	var Scheduler = this;
 
 	if (task.busy === true) {
+		/**
+		 *	The worker is busy, it happens when the worker failed
+		 *	the error handler is called and it reschedule the task ASAP
+		 *	so the slot is reserved and it can be re-download as soon as 
+		 *	possible
+		 */
 		return setTimeout(function() {
 			// retry!
 			downloader.apply(Scheduler, [task]);
 		}, 200);
 	}
 
-
-	var xhr = getXhrObject()
-		, url = task.url
-		, size = task.size
-		, download = task.download
-		, io = download.io
-		, average_throughput = [0, 0]
-		, done = false
-		, prevProgress = 0    // Keep in track how far are we in the downloads
-		, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
-		, progress = getxr()  // chunk progress
-		, speed = 0 // speed of the current chunk
-		, lastUpdate // FIXME: I should be abstracted at getxr()
-
-	io.dl_xr = io.dl_xr || getxr() // global download progress
-
-	/**
-	 *	Check if the current chunk is small or close to its
-	 *	end, so it can cheat to the scheduler telling they are 
-	 *	actually done
-	 */
-	function shouldIReportDone() {
-		if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
-			Scheduler.done();
-			done = true;
-		}
-	}
-
-	function updateProgress(force) {
-		if (dlQueue.isPaused()) {
-			// do not update the UI
-			return false;
-		}
-
-		// keep in track of the current progress
-		if (lastUpdate+250 < new Date().getTime()) {
-			speed = progress.update(prevProgress - pprevProgress)
-			pprevProgress = prevProgress;
-			lastUpdate = new Date().getTime()
-			shouldIReportDone();
-		}
-
-		// Update global progress (per download) and aditionally
-		// update the UI
-		if (io.dl_lastprogress+250 > new Date().getTime() && !force) {
-			// too soon
-			return false;
-		}
-
-		download.onDownloadProgress(
-			download.dl_id, 
-			io.progress, // global progress
-			io.size, // total download size
-			io.dl_xr.update(io.progress - io.dl_prevprogress),  // speed
-			download.pos // this download position
-		);
-
-		io.dl_prevprogress = io.progress
-		io.dl_lastprogress = new Date().getTime();
-	}
-
-
-	if (dlMethod == FileSystemAPI) {
-		var t = url.lastIndexOf('/dl/');
-		xhr.open('POST', url.substr(0, t+1));
-		xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
-	} else {
-		xhr.open('POST', url, true);
-	}
-	DEBUG("Fetch " + url);
-	
-	if (!io.dl_bytesreceived) {
-		io.dl_bytesreceived = 0;
-	}
-
-	function isCancelled() {
-		if (download.cancelled) {
-			DEBUG("Chunk aborting itself because download was cancelled");
-			xhr.abort();
-			!done && Scheduler.done();
-			iRealDownloads--;
-			return true;
-		}
-	}
-
-	xhr.onprogress = function(e) {
-		if (isCancelled()) return;
-
-		io.progress += e.loaded - prevProgress;
-		prevProgress = e.loaded
-		updateProgress();
-	};
-
-	xhr.onreadystatechange = function() {
-		if (isCancelled()) return;
-		if (this.readyState == this.DONE) {
-			var r = this.response || {};
-			io.progress += r.byteLength - prevProgress;
-			updateProgress(true);
-			iRealDownloads--;
-
-			if (r.byteLength == size) {
-				if (have_ab) {
-					if (navigator.appName != 'Opera') {
-						io.dl_bytesreceived += r.byteLength;
-					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-				} else {
-					io.dl_bytesreceived += this.response.length;
-					dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
-				}
-			} else if (!download.cancelled) {
-				// we must reschedule this download	
-				DEBUG(this.status, r.bytesLength, size);
-				DEBUG("HTTP FAILED WITH " + this.status);
-
-				// tell the scheduler that we failed
-				if (done) {
-					// We already told the scheduler we were done
-					// with no erro and this happened. Should I reschedule this 
-					// task?
-					throw new Error("Fixme")
-				}
-				return Scheduler.done(false, this.status);
-			}
-			!done && Scheduler.done();
-		}
-	}
-	xhr.responseType = have_ab ? 'arraybuffer' : 'text';
-	xhr.send();
+	return task.run(Scheduler);
 }
 
 function getxr()

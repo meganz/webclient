@@ -315,10 +315,9 @@ function dlGetUrl(object, callback) {
 		req.n = object.id;
 	}
 
-	api_req([req], {
+	api_req(req, {
 		callback: function(res, rex) {
 			if (typeof res == 'object') {
-				res = res[0];
 				if (typeof res == 'number') {
 					dl_reportstatus(object.pos, res);
 				} else {

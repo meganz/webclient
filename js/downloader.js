@@ -7,6 +7,7 @@ function getXhrObject() {
 	return dl_xhr;
 }
 
+// Chunk fetch {{{
 function ClassChunk(task) {
 	this.run = function(Scheduler) {
 		var xhr = getXhrObject()
@@ -140,7 +141,9 @@ function ClassChunk(task) {
 		xhr.send();
 	}
 }
+// }}}
 
+// File fetch {{{
 function ClassFile(dl) {
 
 	// run task {{{
@@ -226,7 +229,9 @@ function ClassFile(dl) {
 	// }}}
 
 }
+// }}}
 
+// Decrypter worker {{{
 function decrypter(task)
 {
 	var download = task.download
@@ -286,6 +291,7 @@ function decrypter(task)
 		});
 	}
 }
+// }}}
 
 /** 
  *	Keep in track real active downloads.

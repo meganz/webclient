@@ -680,9 +680,8 @@ function dl_setcredentials(g,s,n)
 		
 		switch (dl_method)
 		{
-			case 0:	// Chrome (aync)			
-				if (is_chrome_firefox) dl_run();
-				else dl_createtmp(size);
+			case 0:	// Chrome (async)
+				dl_createtmp(size);
 				return;		
 			case 2:
 				dl_blob = new MSBlobBuilder();
@@ -703,10 +702,6 @@ function dl_setcredentials(g,s,n)
 				dl_run();
 		}
 	}
-	
-	dl_run();
-
-	
 }
 	
 function dl_run()

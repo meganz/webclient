@@ -226,13 +226,19 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		requestQuota: function(t,s,f) f(s),
 		queryUsageAndQuota: function(t,f) f(0,1e11)
 	};
+	navigator.webkitPersistentStorage = navigator.webkitTemporaryStorage = {
+		requestQuota: function(t,s,f) f(s),
+		queryUsageAndQuota: function(f) f(0,1e11)
+	};
 
 	scope.TEMPORARY = 0;
 
 	const fs = {
 		name : location.host,
 		root : {
-			getDirectory : function() {},
+			getDirectory : function(d,o,f) {
+				f(this);
+			},
 			createReader : function() {
 				return { readEntries : function() {}}
 			},

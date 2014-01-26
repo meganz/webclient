@@ -1,38 +1,60 @@
-function clearit(storagetype,t)
+function clearit(storagetype,t,callback)
 {
-	var tsec = 86400;
-	
+	var tsec = 86400;	
 	if (t) tsec = t;
-
 	function errorHandler2(e) 
 	{
-	  //console.log('Error',e);
-	  //console.log(e);
+	 if (d) console.error('error',e);
 	}
 	function toArray(list) 
 	{
 	  return Array.prototype.slice.call(list || [], 0);
 	}	
 	function readentry()
-	{	
-	
-		if (i < entries.length)
+	{
+		if (entries.length == 0)
+		{
+			if (callback) callback(0);
+		}
+		else if (i < entries.length)
 		{
 			var file = entries[i];
 			if (file.isFile)
-			{			
-				
+			{				
 				file.getMetadata(function(metadata)
-				{		
-					if ((metadata.modificationTime.getTime()+tsec*1000) < (new Date().getTime()))
-					{				
-						file.remove(function() { if (d) console.log('temp file removed') }, function() { if (d) console.log('temp file removal failed') });
-					}					
-				
+				{	
+					// do not delete file while it's being copied from FS to DL folder
+					// conservative assumption that a file is being written at 1024 bytes per ms					
+					// add 100000 ms margin	
+					
+					var deltime = metadata.modificationTime.getTime()+tsec*1000+metadata.size/1024+100000;
+					
+					if (deltime < new Date().getTime() && deltime < lastactive)
+					{						
+						file.remove(function() 
+						{ 
+							totalsize += metadata.size;
+							if (d) console.log('temp file removed');
+							del++;
+							if (del == entries.length && callback) callback(totalsize);							
+						}, 
+						function() 
+						{ 
+							if (d) console.log('temp file removal failed');
+							del++;
+							if (del == entries.length && callback) callback(totalsize);							
+						});
+					}
+					else
+					{
+						if (d) console.log('tmp file too new to remove');
+						del++;
+						if (del == entries.length && callback) callback(totalsize);
+					}
 				});
 			}	
 			i++;
-			readentry();
+			readentry();			
 		}
 	}
 	function onInitFs(fs) 
@@ -52,14 +74,26 @@ function clearit(storagetype,t)
 				{
 					entries = entries.concat(toArray(results));
 					readEntries();
-			  }
-			}, errorHandler2);
+				}	
+			}, 
+			function(e) 
+			{ 
+				if (callback) callback(0); 
+			});
 		  };
-		  readEntries(); // Start reading dirs.
-		  
-	 }, errorHandler2);
+		  readEntries();		  
+	 },
+	 function(e) 
+	 { 
+		if (callback) callback(0); 
+	 });
 	}
 	var i = 0;
-	var entries = [];	
-	if (window.webkitRequestFileSystem) window.webkitRequestFileSystem(storagetype, 1024*1024, onInitFs, errorHandler2);	
+	var del = 0;
+	var entries = [];
+	var totalsize = 0;
+	if (window.webkitRequestFileSystem) window.webkitRequestFileSystem(storagetype, 1024*1024, onInitFs, function(e) 
+	{ 
+		if (callback) callback(0);
+	});	
 }

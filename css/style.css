@@ -10373,6 +10373,7 @@ h5.main-italic-header {
 .new-download-right-block {
 	margin-left: 299px;
 	height: 210px;
+	overflow:hidden;
 }
 .new-download-pad {
 	height: 210px;
@@ -13337,6 +13338,12 @@ h1.help-home-header {
 .tr .st-green-note {
 	background-image: url(../images/mega/tr/start-green-note.png);
 }
+.ka .st-green-note {
+	background-image: url(../images/mega/ka/start-green-note.png);
+}
+.be .st-green-note {
+	background-image: url(../images/mega/be/start-green-note.png);
+}
 .transfer-table td {
 	position: relative;
 }
@@ -13480,6 +13487,12 @@ h1.help-home-header {
 }
 .br .pro-recommended {
 	background-image: url(../images/mega/br/recommended.png);
+}
+.ka .pro-recommended {
+	background-image: url(../images/mega/ka/recommended.png);
+}
+.be .pro-recommended {
+	background-image: url(../images/mega/be/recommended.png);
 }
 .arrow {
 	background-repeat: no-repeat;
@@ -13951,11 +13964,22 @@ a.ff-extension-button:hover {
 	margin: 0;
 	border-left: 0;
 }
+@media only screen and (max-width: 1593px) {
+.adv .download-mid-centered-block {
+	min-width: 648px;
+}
+}
+@media only screen and (max-width: 1323px) {
+.adv .download-mid-centered-block {
+	min-width: 595px;
+}
+}
  @media only screen and (max-width: 1143px) {
 .powered-popup {
 	margin-left: -30px;
 }
 }
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .sync-top-logo, .sync-short-block li {
 	background-image: url(../images/mega/sync_nw@2x.png);
@@ -14069,8 +14093,14 @@ background-size: 90px auto;
 .dk .st-green-note {
  background-image: url(../images/mega/dk/start-green-note@2x.png);
 }
+.ka .st-green-note {
+ background-image: url(../images/mega/ka/start-green-note@2x.png);
+}
 .tr .st-green-note {
  background-image: url(../images/mega/tr/start-green-note@2x.png);
+}
+.be .st-green-note {
+ background-image: url(../images/mega/be/start-green-note@2x.png);
 }
  .pro-recommended {
  background-image: url(../images/mega/en/recommended@2x.png);
@@ -14195,6 +14225,12 @@ background-size: 90px auto;
 }
 .br .pro-recommended {
  background-image: url(../images/mega/br/recommended@2x.png);
+}
+.ka .pro-recommended {
+ background-image: url(../images/mega/ka/recommended@2x.png);
+}
+.be .pro-recommended {
+ background-image: url(../images/mega/be/recommended@2x.png);
 }
  .register-info-icon {
  background-image:url(../images/mega/register-info@2x.png);

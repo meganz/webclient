@@ -1,6 +1,6 @@
 function clearit(storagetype,t,callback)
 {
-	var tsec = 86400;	
+	var tsec = 3600;	
 	if (t) tsec = t;
 	function errorHandler2(e) 
 	{
@@ -25,11 +25,11 @@ function clearit(storagetype,t,callback)
 				{	
 					// do not delete file while it's being copied from FS to DL folder
 					// conservative assumption that a file is being written at 1024 bytes per ms					
-					// add 100000 ms margin	
+					// add 30000 ms margin					
 					
-					var deltime = metadata.modificationTime.getTime()+tsec*1000+metadata.size/1024+100000;
+					var deltime = metadata.modificationTime.getTime()+tsec*1000+metadata.size/1024+30000;
 					
-					if (deltime < new Date().getTime() && deltime < lastactive)
+					if (deltime < new Date().getTime() && deltime < lastactive && file.name != dl_id)
 					{						
 						file.remove(function() 
 						{ 

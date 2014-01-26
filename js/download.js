@@ -301,7 +301,8 @@ function dl_write_block()
 	{
 		case 0:		// Filesystem API (Chrome / Firefox Extension polyfill
 			dl_writing = true;
-			dl_fw.instance = dl_instance;			
+			dl_fw.instance = dl_instance;		
+			dl_fw.lastposition = dl_fw.position;
 			dl_fw.targetpos = dl_fw.position+dl_plainq[dl_write_position].length;
 			dl_fw.write(new Blob([dl_plainq[dl_write_position]]));
 			break;
@@ -383,14 +384,14 @@ function dl_ack_write()
 
 function dl_write_failed(e)
 {
-	console.log("WRITE FAILED: " + e);
+	if (d) console.log("WRITE FAILED: " + e);
 
 	if (dl_write_position < 0)
 	{
 		// zip trailer - retry
-		dl_setTimeout(dl_write_block,1000);
+		setTimeout(dl_write_block,1000);
 	}
-	else dl_dispatch_chain();
+	else setTimeout(dl_dispatch_chain,1000);
 }
 
 function dl_settimer(timeout,target)
@@ -667,31 +668,43 @@ function dl_setcredentials(g,s,n)
 	
 	if (!dl_zip || !dl_zip.open)
 	{
-		if (dl_zip) dl_zip.open = true;
-
+		var size = 0;
+		
+		if (dl_zip)
+		{
+			dl_zip.open = true;
+			// todo: sum size of the ZIP file + margin for header info
+			size = 1024*1024*1024;
+		}
+		else size = dl_queue[dl_queue_num].size;
+		
 		switch (dl_method)
 		{
 			case 0:	// Chrome (aync)
-				dl_createtmp();
+				dl_createtmp(size);
 				return;
 				
 			case 2:
 				dl_blob = new MSBlobBuilder();
+				dl_run();
 				break;
 				
 			case 3:
 				ffe_createtmp();
+				dl_run();
 				break;
 			
 			case 4:
 				dl_blob_array = [];
+				dl_run();
 				break;				
 			case 6:
 				DBWriter.init();
+				dl_run();
 		}
 	}
 
-	dl_run();
+	
 }
 	
 function dl_run()
@@ -1059,62 +1072,82 @@ function dl_cancel()
 
 var fs_instance;
 
-function dl_retryfsop()
+function dl_retryfsop(dl_size,callback)
 {
-	if (fs_instance == dl_instance) dl_createtmp();
+	if (fs_instance == dl_instance) dl_createtmp(dl_size,callback);
 }
+
+var chrome_write_error_msg=20;
 
 function dl_createtmpfile(fs) 
 {
 	dl_fs = fs;
 
-	dl_fs.root.getDirectory(dirid, {create: true}, function(dirEntry) 
+	dl_fs.root.getDirectory('mega', {create: true}, function(dirEntry) 
 	{		
-		if (d) console.log('Directory "' + dirid + '" created')
-		document.dirEntry = dirEntry;
+		if (d) console.log('Directory "mega" created');
+		
+		if (d) console.log("Opening file for writing: " + dl_id);
+
+		fs.root.getFile('mega/' + dl_id, {create: true}, function(fileEntry)
+		{
+			fileEntry.createWriter(function(fileWriter) 
+			{		  
+				if (d) console.log('File "mega/' + dl_id + '" created');
+
+				dl_fw = fileWriter;
+				dl_fw.truncate(0);
+
+				dl_fw.onerror = function(e)
+				{
+					if (d) console.log('Write failed: ' + e.toString());
+
+					if (this.instance == dl_instance)
+					{
+						dl_writing = false;
+
+						dl_write_failed(e);
+					}
+				}
+
+				dl_fw.onwriteend = function()
+				{
+					if (this.instance == dl_instance)
+					{
+						if (d) console.log("fileWriter: onwriteend, position: " + this.position + ", expected: " + this.targetpos);
+
+						dl_writing = false;
+
+						if (this.position == this.targetpos) dl_ack_write();
+						else 
+						{
+							// clear temporary files:
+							clearit(0,0,function(s)
+							{
+								// clear persistent files:
+								clearit(1,0,function(s)
+								{
+									if (chrome_write_error_msg == 21 && !$.msgDialog)
+									{
+										chrome_write_error_msg=0;
+										msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+									}
+									chrome_write_error_msg++;
+								});
+							});							
+							this.position = this.lastposition;
+							this.seek(this.position);							
+							setTimeout(dl_write_failed('Short write (' + this.position + ' / ' + this.targetpos + ')'),2000);
+						}
+					}
+				}
+				document.fileEntry = fileEntry;
+				
+				dl_run();
+				
+			}, createWriter_errorHandler);
+		}, getFile_errorHandler);	
 	}, getDirectory_errorHandler);
-
-	if (d) console.log("Opening file for writing: " + dl_id);
-
-	fs.root.getFile(dirid + '/' + dl_id, {create: true}, function(fileEntry)
-	{
-		fileEntry.createWriter(function(fileWriter) 
-		{		  
-			if (d) console.log('File "' + dirid + '/' + dl_id + '" created');
-
-			dl_fw = fileWriter;
-			dl_fw.truncate(0);
-
-			dl_fw.onerror = function(e)
-			{
-				if (d) console.log('Write failed: ' + e.toString());
-
-				if (this.instance == dl_instance)
-				{
-					dl_writing = false;
-
-					dl_write_failed(e);
-				}
-			}
-
-			dl_fw.onwriteend = function()
-			{
-				if (this.instance == dl_instance)
-				{
-					if (d) console.log("fileWriter: onwriteend, position: " + this.position + ", expected: " + this.targetpos);
-
-					dl_writing = false;
-
-					if (this.position == this.targetpos) dl_ack_write();
-					else dl_write_failed('Short write (' + this.position + ' / ' + this.targetpos + ')');
-				}
-			}
-
-			document.fileEntry = fileEntry;
-
-			dl_run();
-		}, createWriter_errorHandler);
-	}, getFile_errorHandler);
 }
 
 function RequestFileSystem_errorHandler(e)
@@ -1155,93 +1188,98 @@ function errorHandler(e,type)
 	case FileError.INVALID_STATE_ERR:
 		fs_instance = dl_instance;
 		console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
-		setTimeout(dl_retryfsop,500);
+		setTimeout(dl_retryfsop,500,dl_size,callback);
 		break;
 	default:
 	  alert('webkitRequestFileSystem failed in ' + type);
   }
-}	
+}
 
-var dirid = "mega";
 
-function dl_createtmp()
+function dl_createtmp(dl_size)
 {
-	window.requestFileSystem(dl_storagetype,1024*1024*1024*25,dl_createtmpfile,RequestFileSystem_errorHandler);
+	dl_getspace(dl_size,function()
+	{
+		window.requestFileSystem(dl_storagetype,dl_size,dl_createtmpfile,RequestFileSystem_errorHandler);		
+	});		
 }
 
 
 if (window.webkitRequestFileSystem)
 {
 	window.requestFileSystem = window.webkitRequestFileSystem;
-
-	function dl_getspace(storagetype,minsize)
-	{		
-		if (!storagetype) storagetype = 0;		
-		if (!minsize) minsize = 0;
-
-		window.webkitStorageInfo.queryUsageAndQuota(1, function(used, remaining) 
-		{		
-			if (remaining > 0)
-			{
-				dl_quotabytes = remaining;
-				dl_storagetype=1;
-				if (dl_quotabytes < 1073741824) clearit(1,3600);
-				else clearit(1);
-				startdownload();
-			}
-			else
-			{
-				var requestbytes = 1024*1024*1024*100;				
-				if (storagetype == 0) requestbytes = 1024*1024*1024*25;
-
-				if (storagetype == 1) dl_req_storage = true; 
-
-				window.webkitStorageInfo.requestQuota(storagetype,requestbytes,function(grantedBytes) 
+	var dl_storagetype=0;	
+	
+	
+	function dl_getspace(reqsize,callback)
+	{
+		if (d) console.log('reqsize',reqsize);
+	
+		// check if persistent usage has already been granted before:
+		navigator.webkitPersistentStorage.queryUsageAndQuota(function(used, remaining) 
+		{
+			navigator.webkitTemporaryStorage.queryUsageAndQuota(function(tused,tremaining)
+			{				
+				if (used > 0 || remaining > 0)
 				{
-				   window.webkitStorageInfo.queryUsageAndQuota(storagetype, function(used, remaining) 
-				   {						
-						if (storagetype == 1) dl_req_storage = false;
-						
-						dl_quotabytes = remaining;						
-						
-						if (dl_quotabytes < 1073741824) clearit(storagetype,3600);	
-						
-						if ((remaining == 0) && (storagetype == 1))
+					dl_storagetype=1;			
+					if (remaining < reqsize)
+					{
+						// attempt to purge old data, and retry ->
+						clearit(1,300,function()
 						{
-							if (!dl_req_storage) dl_getspace(1,minsize);
-							return false;				
-						}
-						else if ((minsize > dl_quotabytes) && (storagetype == 0)) 
-						{
-							if (!dl_req_storage) dl_getspace(1,minsize)
-							return false;						
-						}						
-						else if ((minsize > dl_quotabytes) && (storagetype == 1)) clearit(storagetype,3600);
-						
-						if (remaining > 0) dl_storagetype = storagetype;							
-												
-						startdownload();
-					}, 
-					function(e) 
-					{						
-						console.log('ERROR: Could not query usage and storage quota. (' + dl_storagetype + ') ' + e);
-						alert('Could not query usage and storage quota. (' + dl_storagetype + ') ' + e);
-					});
-				}, 
-				function(e) 
+							dl_getspace(reqsize,callback);
+						});
+					}
+					else callback(true);
+				}
+				else
 				{
-				  console.log('ERROR: Could not grant storage space (' + dl_storagetype + ') ' + e);
-				  alert('Could not grant storage space (' + dl_storagetype + ') ' + e);
-				});
-			}		
-		}, 
+					// check if standard temporary quota is sufficient to proceed:
+					
+					if (tremaining > reqsize)
+					{
+						callback(true);					
+					}
+					else if (tused+tremaining > reqsize)
+					{
+						clearit(0,300,function()
+						{
+							dl_getspace(reqsize,callback);
+						});
+					}
+					else
+					{
+						// ran out of 20% of 50% of free diskspace -> request persistent storage to be able to use all remaining disk space:
+						navigator.webkitPersistentStorage.requestQuota(1024*1024*1024*100, function(grantedBytes) 
+						{
+							if (grantedBytes == 0) dl_getspace(reqsize,callback);
+							else
+							{
+								dl_storagetype=1;
+								window.webkitRequestFileSystem(PERSISTENT, grantedBytes, function(fs)
+								{
+									callback(true);
+								},
+								function(e)
+								{
+									dl_getspace(reqsize,callback);
+								});
+							}
+						},
+						function(e) 
+						{
+							dl_getspace(reqsize,callback);
+						});		
+					}
+				}
+			});				
+		},
 		function(e) 
 		{
-			console.log('ERROR: Could not query usage and storage quota. (' + dl_storagetype + ') ' + e);
-			alert('Could not query usage and storage quota. (' + dl_storagetype + ') ' + e);
+			callback(e);
 		});
 	}
-	dl_getspace(0);
 	dl_method = 0;
 }
 else if (navigator.msSaveOrOpenBlob)

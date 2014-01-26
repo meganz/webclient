@@ -755,7 +755,7 @@ else
 				document.head.appendChild(link);
 				cssar=undefined;
 				if (typeof u_checked !== 'undefined' && u_checked) jsar.push('startMega();');
-				else  jsar.push('populate_l(); var insist=false; if (localStorage.dlimport) insist=true; u_checklogin( { checkloginresult: function(u_ctx,r) { u_type = r; u_checked=true; startMega(); } },insist); clearit(0);');
+				else  jsar.push('populate_l(); var insist=false; if (localStorage.dlimport) insist=true; u_checklogin( { checkloginresult: function(u_ctx,r) { u_type = r; u_checked=true; startMega(); } },insist);');
 				evalscript_url(jsar);
 				jsar=undefined;
 			}
@@ -773,7 +773,6 @@ else
 						u_checked=true;
 						startMega();
 					}},insist);
-					clearit(0);
 				}
 			}
 		}

@@ -22,6 +22,10 @@ var mouseRead = 0;
 var mouseNext = 0;
 var mouseArray = new Array(256);
 
+var lastactive = new Date().getTime();
+
+
+
 var entropy=0;
 
 // ----------------------------------------
@@ -83,9 +87,11 @@ function keyPressEntropy(e) { rc4Next(timeByte()); }
 
 function mouseMoveEntropy(e)
 {
- var c;
 
- if (!e) { e = window.event; }	    // Internet Explorer event model
+  lastactive = new Date().getTime();
+  var c;
+
+  if (!e) { e = window.event; }	    // Internet Explorer event model
 
  if(mouseMoveSkip-- <= 0)
  {

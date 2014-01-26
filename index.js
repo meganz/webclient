@@ -1395,7 +1395,7 @@ window.onbeforeunload = function ()
 {
 	if (downloading || ul_uploading) return l[377];
 	
-	if (mDB && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
+	if (mDB && mDBact && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
 }
 
 

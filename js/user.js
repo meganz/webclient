@@ -162,6 +162,11 @@ function u_logout(logout)
 	
 	if (logout)
 	{
+		if (mDBact)
+		{
+			mDBact=false;
+			localStorage[u_handle + '_mDBactive'];
+		}
 		fminitialized = false;
 		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
 		api_setsid(false);
@@ -174,7 +179,7 @@ function u_logout(logout)
 		M = new MegaData();
 		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
 		$.hideContextMenu = function () {};
-		api_reset();
+		api_reset();		
 	}
 }
 

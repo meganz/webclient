@@ -258,7 +258,7 @@ function popup(id,html)
 }
 
 function hide_notipop(id)
-{	
+{
 	if ((id) && ($('#popup_' + id).css('opacity') == 1))
 	{
 		$('#popup_' + id).css('opacity',1).show().animate({opacity:0});	
@@ -397,8 +397,8 @@ function donotifypopup(id,html)
 			hide_notipop(id);			
 		}
 		console.log('click');		
-	});	
-	setTimeout(hide_notipop,30000,id);
+	});
+	setTimeout(hide_notipop,5000,id);
 }
 
 function initNotifications()

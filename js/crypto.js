@@ -952,7 +952,6 @@ function getsc(fm)
 {
 	api_req('sn=' + maxaction + '&ssl=1',{		
 		fm : fm,
-		test123 : 456,
 		callback : function(res,ctx)
 		{
 			if (typeof res == 'object')
@@ -966,7 +965,7 @@ function getsc(fm)
 				{
 					if (res.sn) maxaction = res.sn;				
 					execsc(res.a);
-					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid) localStorage[u_handle + '_maxaction'] = maxaction;
+					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
 				}
 
 				if (ctx.fm)
@@ -1021,11 +1020,26 @@ function waitsc()
 	if (!waitxhr) waitxhr = getxhr();
 	waitxhr.waitid = newid;
 
-	waitxhr.onerror = waitsc;
-	waitxhr.onload = completewait;
+	if (waittimeout) clearTimeout(waittimeout);
+	waittimeout = setTimeout(waitsc,300000);
 
-	waittimeout = setTimeout(waitsc,60000);
+	waitxhr.onerror = function()
+	{
+		clearTimeout(waittimeout);
+		waittimeout = false;
 
+		waitbackoff += waitbackoff;
+		if (waitbackoff > 1024000) waitbackoff = 1024000;
+		waittimeout = setTimeout(waitsc,waitbackoff);
+	}
+	
+	waitxhr.onload = function()
+	{
+		clearTimeout(waittimeout);
+		waittimeout = false;
+		completewait();
+	}
+	
 	waitbegin = new Date().getTime();
 	waitxhr.open('POST',waiturl,true);
 	waitxhr.send();
@@ -1289,9 +1303,9 @@ function api_setshare(node,targets,sharenodes,ctx)
 {
 	// cache all targets' public keys
 	var u = [];
-console.log("setshare " + node + " targets=" + JSON.stringify(targets) + " sharenodes=" + sharenodes);
+
 	for (var i = targets.length; i--; ) u.push(targets[i].u);
-console.log("Trying to get pubkeys for users: " + JSON.stringify(u));
+
 	api_cachepubkeys({
 		node : node,
 		targets : targets,
@@ -1306,7 +1320,7 @@ function api_setshare1(ctx)
 	var i, j, n, nk, sharekey, ssharekey;
 	var req, res;
 	var newkey = false;
-console.log("api_setshare1(" + JSON.stringify(ctx) + ")");
+
 	req = { a : 's',
 			n : ctx.node,
 			s : ctx.targets,
@@ -1334,9 +1348,9 @@ console.log("api_setshare1(" + JSON.stringify(ctx) + ")");
 			}
 		}
 	}
-console.log("newkey=" + newkey);
+
 	if (newkey) req.cr = crypto_makecr(ctx.sharenodes,[ctx.node],true);
-console.log("req.cr=" + JSON.stringify(req.cr));
+
 	ctx.maxretry = 4;
 	ctx.ssharekey = ssharekey;
 
@@ -1368,7 +1382,7 @@ console.log("req.cr=" + JSON.stringify(req.cr));
 
 				return api_req(ctx.req,ctx);
 			}
-			else ctx.ctx.done(res,ctx.ctx);
+			else return ctx.ctx.done(res,ctx.ctx);
 		}
 
 		api_req(ctx.req,ctx);
@@ -1385,8 +1399,7 @@ function api_setrsa(privk,pubk)
 	
 	for (i = (-t.length)&15; i--; ) t = t + String.fromCharCode(rand(256));
 
-	ctx = { callback : function(res,ctx)
-		{
+	ctx = { callback : function(res,ctx) {
 			if (d) console.log("RSA key put result=" + res);
 			
 			u_privk = ctx.privk;
@@ -2046,7 +2059,7 @@ function crypto_reqmissingkeys()
 		}
 	}
 
-	if (!cr[1].length /*&& !missingsharekeys.length*/)
+	if (!cr[1].length)
 	{
 		if (d) console.log('No missing keys');
 		return;
@@ -2293,7 +2306,6 @@ function crypto_share_rsa2aes()
 					{
 						var block = e.target.result;
 
-						// console.log(toHexString(block));
 						crc = crc32(block,crc,BLOCK_SIZE);
 
 						next(++j);

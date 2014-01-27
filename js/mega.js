@@ -332,31 +332,26 @@ function MegaData ()
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
-					if (d) console.log('option1');
 					$(t).append(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
 					// if there is a node before the new node in the current view, add it after that node:
-					if (d) console.log('option2');
 					$(t+' #'+this.v[i-1].h).after(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
 				{
 					// if there is a node after the new node in the current view, add it before that node:
-					if (d) console.log('option3');
 					$(t+' #'+this.v[i+1].h).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
 				{
 					// new folder: insert new node before the first folder in the current view
-					if (d) console.log('option4 (folder)');
 					$($(t+' '+el)[0]).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
 				{
 					// new file: insert new node before the first file in the current view
-					if (d) console.log('option5 (file)');					
 					var a = $(t+' '+el).not('.folder');
 					if (a.length > 0) $(a[0]).before(html);
 					else
@@ -767,6 +762,7 @@ function MegaData ()
 		if (!n.c)
 		{
 			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
 				crypto_processkey(u_handle,u_k_aes,n);
@@ -1136,7 +1132,6 @@ function MegaData ()
 
 	this.delIndex = function(p,h)
 	{
-		if (d) console.log('delIndex',p,h);
 		if (M.c[p] && M.c[p][h]) delete M.c[p][h];
 		var a=0;
 		for (var i in M.c[p]) a++;
@@ -1246,6 +1241,9 @@ function MegaData ()
 
 	this.delnodeShare = function(h,u)
 	{
+		console.log('delnodeShare');
+
+		
 		if (this.d[h] && typeof this.d[h].shares !== 'undefined')
 		{
 			delete this.d[h].shares[u];
@@ -2413,7 +2411,7 @@ function loadfm_callback(res)
 	process_f(res.f);	
 	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
 	maxaction = res.sn;
-	localStorage[u_handle + '_maxaction'] = maxaction;
+	if (mDB) localStorage[u_handle + '_maxaction'] = maxaction;
 	renderfm();
 	if (!pfkey) pollnotifications();
 

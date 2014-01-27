@@ -609,15 +609,22 @@ function removeUInode(h)
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
+	
+	
 	treeheaderArrows();	
 }
 
 function sharedUInode(h,s)
 {	
+	if (s) $('#treea_' + h).addClass('shared-folder');	
+	else
+	{
+		$('#treea_' + h).removeClass('shared-folder');		
+		$('.grid-table.fm #'+h + ' .transfer-filtype-icon').removeClass('folder-shared');
+		$('.file-block#'+h + ' .block-view-file-type').removeClass('folder-shared');		
+	}
 	$('.grid-table.fm #'+h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
 	$('.file-block#'+h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
-	if (s) $('#treea_' + h).addClass('shared-folder');
-	else $('#treea_' + h).removeClass('shared-folder');
 }
 
 
@@ -2548,7 +2555,7 @@ function UIkeyevents()
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
 		
-		if (M.chat) return true;		
+		if (M.chat) return true;
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
@@ -2702,6 +2709,11 @@ function UIkeyevents()
 		{
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(false);
+		}
+		else if (e.keyCode == 13 && $.msgDialog == 'confirmation')
+		{
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(true);
 		}
 		else if (e.keyCode == 27)
 		{
@@ -2921,11 +2933,6 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
 	{
-		if (d) console.log(e);
-		
-		
-		
-		
 		if ($.gridDragging) return false;
 		if (e.shiftKey && s.length > 0)
 		{
@@ -3360,7 +3367,7 @@ function contextmenuUI(e,ll,topmenu)
 		{
 			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
+			if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
 	}
@@ -3584,7 +3591,11 @@ function treeUI()
 		initTreeScroll();	
 	});	
 	setTimeout(initTreeScroll,10);	
-	treeheaderArrows();	
+	treeheaderArrows();
+	
+	
+	
+	
 	if (d) console.log('treeUI()',new Date().getTime()-tt);
 }
 
@@ -3594,20 +3605,38 @@ function treeUIexpand(id,force)
 	if (id == 'contacts') M.buildtree({h:'contacts'});
 	else M.buildtree(M.d[id]);
 	var b = $('#treea_' + id);	
-	var d = b.attr('class');	
+	var d = b.attr('class');
+	
+	if (M.currentdirid !== id) 
+	{			
+		var path = M.getPath(M.currentdirid),pid={},active_sub=false;
+		for (var i in path) pid[path[i]]=i;		
+		if (pid[M.currentdirid] < pid[id]) active_sub=true;
+	}
+	
 	if (d && d.indexOf('expanded') > -1 && !force)
-	{
+	{	
 		fmtreenode(id,false);
 		$('#treesub_' + id).removeClass('opened');
 		b.removeClass('opened');
-		b.removeClass('expanded');
+		b.removeClass('expanded');		
+		if (active_sub) 
+		{
+			$('#treeli_' + id + ' .fm-connector').first().removeClass('mid');
+			$('#treeli_' + id + ' .fm-connector').first().addClass('vertical-line last');
+		}
 	}
 	else if (d && d.indexOf('contains-folders') > -1)
 	{
+		if (active_sub)
+		{
+			$('#treeli_' + id + ' .fm-connector').first().addClass('mid');
+			$('#treeli_' + id + ' .fm-connector').first().removeClass('vertical-line last');
+		}
 		fmtreenode(id,true);
 		$('#treesub_' + id).addClass('opened');
 		b.addClass('opened')
-		b.addClass('expanded');
+		b.addClass('expanded');		
 	}
 	if ($('.fm-connector-first.active').length > 0)
 	{	
@@ -3619,7 +3648,7 @@ function treeUIexpand(id,force)
 			else if (c && c.indexOf('fm-connector-first') > -1) connectorst=true;
 			else if (connectorst && (!c || c.indexOf('mid') == -1)) $(e).addClass('vertical-line');				
 		});
-	}	
+	}
 	treeUI();
 }
 

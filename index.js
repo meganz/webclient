@@ -1210,7 +1210,10 @@ function topmenuUI()
 	}
 	
 	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+90+'px');
-	initNotifications();		
+	initNotifications();
+
+	clearit(0);
+	clearit(1);	
 }
 
 
@@ -1395,7 +1398,7 @@ window.onbeforeunload = function ()
 {
 	if (downloading || ul_uploading) return l[377];
 	
-	if (mDB && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
+	if (mDB && mDBact && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
 }
 
 

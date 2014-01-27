@@ -10456,6 +10456,9 @@ h5.main-italic-header {
 	-moz-border-radius: 10px;
 	border-radius: 10px;
 }
+.adv .downloading-progress {
+	width: 344px;
+}
 .downloading-progress-bar {
 	width: 0%;
 	-webkit-border-radius: 8px;
@@ -15532,11 +15535,6 @@ to {
 }
 }
  @media all and (max-width:1335px) {
-.adv .downloading-progress {
-	width: 300px;
-}
-}
-@media all and (max-width:1217px) {
 .adv .downloading-progress {
 	width: 290px;
 }

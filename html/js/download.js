@@ -60,8 +60,7 @@ function dlinfo(ph,key,next)
 					dl_queue.push(fdl_queue_var);					
 					$('.download-mid-centered-block').addClass('downloading');
 					$.dlhash = window.location.hash;
-					if (dl_method == 0 && fdl_filesize > dl_quotabytes) dl_getspace(0,fdl_filesize);					
-					else startdownload();
+					startdownload();
 				});				
 				$('.new-download-gray-button').unbind('click');
 				$('.new-download-gray-button').bind('click',function(e)
@@ -90,6 +89,7 @@ function dlinfo(ph,key,next)
 						key: 	key,
 						s: 		res.s,
 						n: 		fdl_file.n,
+						size:   fdl_filesize,
 						onDownloadProgress: dlprogress,
 						onDownloadComplete: dlcomplete,
 						onDownloadStart: dlstart,

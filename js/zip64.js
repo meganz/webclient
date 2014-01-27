@@ -106,7 +106,6 @@ function dlZipIO(dl, dl_id) {
 
 	this.done = function() {
 		current = null
-		console.warn(queue.length);
 		if (queue.length === 0) {
 			var end = ZipObject.writeSuffix(gOffset, dirData);
 			$.each(dirData, function(key, value) {
@@ -152,7 +151,7 @@ function dlZipIO(dl, dl_id) {
 				var my = arguments.callee
 					, args = Array.prototype.slice.call(arguments)
 					, self = this
-				console.warn("retry");
+
 				return setTimeout(function() {
 					my.apply(self, args);
 				}, 100);

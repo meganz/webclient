@@ -181,6 +181,19 @@ function ClassFile(dl) {
 					chunk_id: key
 				}));
 			});
+
+			var emptyFile;
+			if (tasks.length == 0) {
+				emptyFile = true;
+				tasks.push({ 
+					run: function(Scheduler) {
+						dl.io.write("", 0, function() {
+							Scheduler.done();	
+						});
+					}
+				});
+				console.warn("empty file");
+			}
 	
 			dlQueue.pushAll(tasks, function() {
 				if (dl.cancelled) return;
@@ -188,7 +201,7 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						if (tasks.length > 0 && !checkLostChunks(dl)) {
+						if (!emptyFile && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
 						}
 						if (dl.zipid) {

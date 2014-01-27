@@ -290,10 +290,6 @@ function pageregister()
 }
 
 
-
-
-
-
 function init_register()
 {
 	
@@ -301,11 +297,14 @@ function init_register()
 	{
 		$('.main-top-info-block').removeClass('hidden');
 		$('.main-top-info-text').text(register_txt);
-		register_txt=false;	
+		register_txt=false;		
 	}
 	
-	if (localStorage.registeremail) $('#register-email').val(localStorage.registeremail);	
-	
+	if (localStorage.registeremail)
+	{
+		$('#register-email').val(localStorage.registeremail);
+		$('#register-email').attr('readonly',true);
+	}	
 
 	$('#register-firstname').unbind('focus');
 	$('#register-firstname').bind('focus',function(e)

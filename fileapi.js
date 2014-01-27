@@ -232,7 +232,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			var q = Services.prompt.confirmEx(scope,
 				'MEGA :: Out of disk space',
 				'Your drive is running out of disk space. '+
-				'Would you like to chose another downloads folder?',1027,'','','',null,{value:!1});
+				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
 			
 			if (!q) mozAskDownloadsFolder();
 			

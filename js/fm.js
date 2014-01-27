@@ -4547,6 +4547,19 @@ function addContactDialog(close)
 			else doAddContact(e,1);
 		}
 	});
+	
+	$('.fm-dialog-add-contact-button').unbind('click');
+	$('.fm-dialog-add-contact-button').bind('click',function(e) 
+	{
+		if ($('.add-contact-dialog input').val() !== '') 
+		{
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e,1);
+		}
+	});
+	
+	
+
 	$('.add-contact-dialog .fm-dialog-close').unbind('click');
 	$('.add-contact-dialog .fm-dialog-close').bind('click',function()  
 	{

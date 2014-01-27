@@ -254,12 +254,22 @@ function init_page()
 				else msgDialog('warningb',l[135],l[1290]);				
 				document.location.hash = 'start';
 			}
-			else
+			else if(u_type === false)			
 			{	
-				localStorage.signupcode = signupcode;			
+				localStorage.signupcode = signupcode;
 				localStorage.registeremail = res;
 				document.location.hash = 'register';
 				if (!register_txt) register_txt = l[1289];							
+			}
+			else
+			{
+				var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';				
+				if (l[1824]) confirmtxt = l[1824];
+				msgDialog('confirmation',l[968],confirmtxt,'',function(e)
+				{
+					if (e) mLogout();	
+					else document.location.hash = '';			
+				});
 			}
 		  }
 		});			
@@ -866,8 +876,7 @@ function topmenuUI()
 			{
 				$('.top-warning-popup').removeClass('active');
 				document.location.hash = 'register';
-			});
-			
+			});			
 		}
 		$('.top-menu-item.upgrade-your-account').show();
 		$('.top-menu-item.upgrade-your-account').text(l[129]);

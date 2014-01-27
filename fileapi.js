@@ -220,18 +220,50 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			scope.webkitRequestFileSystem = scope.requestFileSystem;
 		return;
 	}
-
-	scope.webkitStorageInfo = {
+	
+	var StorageInfo = Object.freeze({
 		TEMPORARY: 0,
-		requestQuota: function(t,s,f) f(s),
-		queryUsageAndQuota: function(t,f) f(0,1e11)
-	};
-	navigator.webkitPersistentStorage = navigator.webkitTemporaryStorage = {
-		requestQuota: function(t,s,f) f(s),
-		queryUsageAndQuota: function(f) f(0,1e11)
-	};
+		requestQuota: function(t,s,f) {
+			if(typeof s === 'function') {
+				f = s;
+				s = t;
+			}
+			
+			var q = Services.prompt.confirmEx(scope,
+				'MEGA :: Out of disk space',
+				'Your drive is running out of disk space. '+
+				'Would you like to chose another downloads folder?',1027,'','','',null,{value:!1});
+			
+			if (!q) mozAskDownloadsFolder();
+			
+			var fld = mozGetDownloadsFolder();
+			if (d) console.log('requestQuota',fld && fld.diskSpaceAvailable);
+			
+			f(fld && fld.diskSpaceAvailable || 0);
+		},
+		queryUsageAndQuota: function(t,f) {
+			if (typeof t === 'function') f=t;
+			
+			var fld = mozGetDownloadsFolder();
+			if (d) console.log('queryUsageAndQuota',fld && fld.diskSpaceAvailable);
+			
+			f(0, fld && fld.diskSpaceAvailable || 0);
+		}
+	});
+	
+	Object.defineProperty(scope,     'webkitStorageInfo',       { value : StorageInfo });
+	Object.defineProperty(navigator, 'webkitTemporaryStorage',  { value : StorageInfo });
+	// Object.defineProperty(navigator, 'webkitPersistentStorage', { value : StorageInfo });
+	Object.defineProperty(navigator, 'webkitPersistentStorage', {
+		value : Object.create(StorageInfo, {
+			queryUsageAndQuota : {
+				value : function(f) f(0,0)
+			}
+		})
+	});
 
-	scope.TEMPORARY = 0;
+	scope.TEMPORARY  = 0;
+	scope.PERSISTENT = 1;
 
 	const fs = {
 		name : location.host,
@@ -240,7 +272,21 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				f(this);
 			},
 			createReader : function() {
-				return { readEntries : function() {}}
+				return Object.freeze({
+					readEntries : function(f,e) {
+						/**
+						 * Used at cleartemp.js - To make this working somehow as in Chrome we'd need
+						 * to explicitly differentiate temporal and final files on the downloads folder,
+						 * so that we would free up space when needed. Thing is, nsISafeOutputStream
+						 * should already handle temp files and moving them back to the former when
+						 * finished. However, the interface does that for canceled downloads too. So,
+						 * perhaps we should tag them (?)
+						 * In any case, we're merely calling back 'f' here so that the dialog for 
+						 * "running out of disk space" is shown when required.
+						 */
+						f([]);
+					}
+				});
 			},
 			getFile : function(name,opts,callback) {
 				var File = {
@@ -410,13 +456,23 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							written : 0,
 							write : function(x) {
 								this.readyState = this.WRITING;
-								this.position = this.targetpos;
 
 								var fr = new window.FileReader();
 								fr.onload = function(ev) {
-									var c = File.fs.write(ev.target.result,x.size);
+									try {
+										var c = File.fs.write(ev.target.result,x.size);
+										File.Writer.position += c;
+									} catch(e) {
+									// Likely 0x80520010 (NS_ERROR_FILE_NO_DEVICE_SPACE)
+										Cu.reportError(e);
+									}
 									File.Writer.readyState = File.Writer.DONE;
-									File.Writer[c?'onwriteend':'onerror']();
+									/**
+									 * Er, onerror() causes a race condition when running
+									 * out of disk space, so... :$
+									 */
+									// File.Writer[c?'onwriteend':'onerror']('');
+									File.Writer.onwriteend();
 
 									if(File.sNode) {
 										File.Writer.written += x.size;

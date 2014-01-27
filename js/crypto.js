@@ -844,7 +844,7 @@ function api_proc(q)
 		if (!this.q.cancelled)
 		{
 			if (d) console.log("API request error - retrying");
-			api_result(-3,this.q);
+			api_reqerror(q,-3);
 		}
 	}
 

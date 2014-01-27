@@ -34,6 +34,10 @@ dlQueue.getNextTask = (function() {
 					candidate = p;
 					return false; /* break */
 				}
+				if (pzTask.task instanceof ClassChunk) {
+					/* make it our candidate but don't break the loop */
+					candidate = p;
+				}
 			});
 		}
 
@@ -185,28 +189,21 @@ DownloadQueue.prototype.push = function() {
 
 	if (dl.zipid) {
 		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = {
-				IO: new dlZipIO(dlIO, dl),
-				size: 0,
-				queue: {},
-				url: [],
-			};
+			Zips[dl.zipid] = new dlZipIO(dl, dl_id); 
 		}
 		var tZip = Zips[dl.zipid];
-		tZip.queue[dl_id] = [dl, Zips[dl.zipid].size];
-		tZip.offset = 0;
-		tZip.IO.progress = 0;
-		tZip.size += dl.size;
+		dlIO.write = tZip.getWriter(dl);
+		dlIO.dl_xr = tZip.dl_xr
 	}
 
 	if (!use_workers) {
 		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 	}
 
-	dl.pos   = id // download position in the queue
-	dl.dl_id = dl_id;  // download id
-	dl.io	= dlIO;
-	dl.nonce = dl_keyNonce
+	dl.pos		= id // download position in the queue
+	dl.dl_id	= dl_id;  // download id
+	dl.io		= dlIO;
+	dl.nonce	= dl_keyNonce
 	// Use IO object to keep in track of progress
 	// and speed
 	dl.io.progress 	= 0;

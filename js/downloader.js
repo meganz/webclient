@@ -22,6 +22,7 @@ function ClassChunk(task) {
 			, progress = getxr()  // chunk progress
 			, speed = 0 // speed of the current chunk
 			, lastUpdate // FIXME: I should be abstracted at getxr()
+			, Progress = download.zipid ? Zips[download.zipid] : io
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 	
@@ -50,24 +51,27 @@ function ClassChunk(task) {
 				lastUpdate = new Date().getTime()
 				shouldIReportDone();
 			}
-	
+
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (io.dl_lastprogress+250 > new Date().getTime() && !force) {
+			if (Progress.dl_lastprogress+250 > new Date().getTime() && !force) {
 				// too soon
 				return false;
 			}
+
+			console.warn(p, Progress.progres)
+
 	
 			download.onDownloadProgress(
 				download.dl_id, 
-				io.progress, // global progress
-				io.size, // total download size
-				io.dl_xr.update(io.progress - io.dl_prevprogress),  // speed
+				Progress.progress, // global progress
+				Progress.size, // total download size
+				Progress.dl_xr.update(Progress.progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
 	
-			io.dl_prevprogress = io.progress
-			io.dl_lastprogress = new Date().getTime();
+			Progress.dl_prevprogress = Progress.progress
+			Progress.dl_lastprogress = new Date().getTime();
 		}
 	
 	
@@ -97,7 +101,7 @@ function ClassChunk(task) {
 		xhr.onprogress = function(e) {
 			if (isCancelled()) return;
 	
-			io.progress += e.loaded - prevProgress;
+			Progress.progress += e.loaded - prevProgress;
 			prevProgress = e.loaded
 			updateProgress();
 		};
@@ -106,7 +110,7 @@ function ClassChunk(task) {
 			if (isCancelled()) return;
 			if (this.readyState == this.DONE) {
 				var r = this.response || {};
-				io.progress += r.byteLength - prevProgress;
+				Progress.progress += r.byteLength - prevProgress;
 				updateProgress(true);
 				iRealDownloads--;
 	
@@ -144,10 +148,25 @@ function ClassChunk(task) {
 // }}}
 
 // File fetch {{{
+var fetchingFile = null
 function ClassFile(dl) {
 
-	// run task {{{
 	this.run = function(Scheduler)  {
+		/**
+		 *	Make sure that only one task of this kind
+		 *	runs in parallel (because their chunks are important)
+		 */
+		if (fetchingFile) {
+			Scheduler.done();
+			var task = this;
+			setTimeout(function() {
+				dlQueue.push(task);
+			}, 100);
+			return;
+		}
+
+		fetchingFile = 1;
+
 		if (!use_workers) {
 			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 		}
@@ -156,41 +175,7 @@ function ClassFile(dl) {
 	
 		dl.io.begin = function() {
 			var tasks = [];
-			if (dl.zipid) {
-				var Zip = Zips[dl.zipid]
-					, queue = Zip.queue[dl.dl_id]
-					, object = queue[0]
-					, offset = queue[1]
-	
-				var pos = 0;
-				Zip.IO.size = Zip.size;
-				$.each(object.urls, function(id, url) {
-					url.first		= id == 0
-					url.last		= object.urls.length-1 == id
-					url.zoffset		= url.offset + offset;
-					url.path		= dl.p + dl.n;
-					url.fsize		= dl.size;
-					url.download	= dl;
-					url.download.io	= Zip.IO;
-					url.pos		 = pos++;
-					Zip.url.push(url);
-				});
-	
-				delete Zip.queue[dl.dl_id];
-				if ($.len(Zip.queue) === 0) {
-					// start real downloading!
-					// Done with the queue, now fetch everything :-)
-					Zip.IO.urls = Zip.url.sort(function(a, b) {
-						// Sort by offset write often to avoid
-						// keeping thing in RAM 
-						return a.zoffset - b.zoffset;
-					});
-					// Trigger real download
-					Zip.IO.begin(Zip.size);
-				}
-				return;
-			}
-	
+
 			$.each(dl.urls||[], function(key, url) {
 				tasks.push(new ClassChunk({
 					url: url.url, 
@@ -200,6 +185,18 @@ function ClassFile(dl) {
 					chunk_id: key
 				}));
 			});
+
+			var emptyFile;
+			if (tasks.length == 0) {
+				emptyFile = true;
+				tasks.push({ 
+					run: function(Scheduler) {
+						dl.io.write("", 0, function() {
+							Scheduler.done();	
+						});
+					}
+				});
+			}
 	
 			dlQueue.pushAll(tasks, function() {
 				if (dl.cancelled) return;
@@ -207,8 +204,11 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						if (!checkLostChunks(dl)) {
+						if (!emptyFile && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
+						}
+						if (dl.zipid) {
+							return Zips[dl.zipid].done();
 						}
 						dl.onBeforeDownloadComplete(dl.pos);
 						dl.io.download(dl.zipname || dl.n, dl.p);
@@ -218,6 +218,8 @@ function ClassFile(dl) {
 	
 			// notify the UI
 			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
+			fetchingFile = 0;
+			Scheduler.done();
 		}
 	
 		dlGetUrl(dl, function(res, o) {
@@ -226,7 +228,6 @@ function ClassFile(dl) {
 			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 		});
 	}
-	// }}}
 
 }
 // }}}

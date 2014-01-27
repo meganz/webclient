@@ -101,6 +101,11 @@ var DEFAULT_CONCURRENCY = 4
 			value.__id = key;
 			that.push(value, check_finish);
 		});
+
+		if (tasks.length == 0) {
+			// fix bug with empty files
+			check_finish({}, []);
+		}
 	};
 
 	queue.prototype.push = function(task, done) {

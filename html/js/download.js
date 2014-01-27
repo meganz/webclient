@@ -267,6 +267,7 @@ function dlerror(id,error)
 
 function dlprogress(fileid, bytesloaded, bytestotal,kbps)
 {
+	if (kbps == 0) return;
 	$('.downloading-txt.temporary-error').addClass('hidden');
 	$('.downloadings-icons').removeClass('hidden');
 	if (uldl_hold) return false;
@@ -298,7 +299,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps)
 		$('.widget-icon.downloading').removeClass('hidden');
 		$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 		$('.widget-block').addClass('active');
-	}	
+	}
 }
 
 function dlstart(id,name,filesize)

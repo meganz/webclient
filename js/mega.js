@@ -1045,8 +1045,8 @@ function MegaData ()
 						ctx.account.balance = res.balance;
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
-
-						if (!ctx.balance) ctx.account.balance = [['0.00','EUR']];
+						
+						if (!res.balance) ctx.account.balance = [['0.00','EUR']];					
 
 						if (!u_attr.p)
 						{
@@ -1481,6 +1481,7 @@ function MegaData ()
 
 	this.dlprogress = function (id, bl, bt,kbps)
 	{
+		if (kbps == 0) return;
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
 		{

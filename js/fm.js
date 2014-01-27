@@ -1674,6 +1674,8 @@ function accountUI()
 				{
 					callback : function(res,ctx)
 					{
+						console.log('check this',res,ctx);
+					
 						loadingDialog.hide();
 						$('.fm-voucher-popup').addClass('hidden');
 						$('.fm-voucher-body input').val(l[487]);

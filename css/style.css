@@ -4724,7 +4724,7 @@ th.grid-first-th {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 10px 0 0 10px;	
+	padding: 10px 0 0 10px;
 	white-space: nowrap;
 	margin-bottom: 9px;
 	position: relative;
@@ -10373,7 +10373,7 @@ h5.main-italic-header {
 .new-download-right-block {
 	margin-left: 299px;
 	height: 210px;
-	overflow:hidden;
+	overflow: hidden;
 }
 .new-download-pad {
 	height: 210px;
@@ -13931,7 +13931,7 @@ a.ff-extension-button:hover {
 }
 .sync-short-block:first-child {
 	padding: 0 5px 0 0;
-	float:left;
+	float: left;
 }
 .sync-short-block ul {
 	padding: 0;
@@ -13982,15 +13982,14 @@ a.ff-extension-button:hover {
 	margin-left: -30px;
 }
 }
-
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+ @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .sync-top-logo, .sync-short-block li {
-	background-image: url(../images/mega/sync_nw@2x.png);
-	background-size: 148px auto;
+ background-image: url(../images/mega/sync_nw@2x.png);
+ background-size: 148px auto;
 }
 .sync-main-img {
-	background-image: url(../images/mega/img_sync_@2x.png);
-	background-size: 700px auto;
+ background-image: url(../images/mega/img_sync_@2x.png);
+ background-size: 700px auto;
 }
 .top-context-close, .context-menu-item.dropdown span, .context-menu-item.more-item, .top-icons-block .context-menu-item.dropdown span {
  background-image:url(../images/mega/context-top@2x.png);
@@ -14245,9 +14244,8 @@ background-size: 50px auto;
 }
 .warning-popup-icon, .warning-popup-icon:hover, .warning-popup-icon.active {
 background-position: -9px -10828px;
-}top-login-spr
-
-.nlanguage-tooltip-bg, .nlanguage-bottom {
+}
+top-login-spr  .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/language-sprite@2x.png);
  background-size: 18px auto;
 }
@@ -15219,8 +15217,9 @@ to {
 .good-times-left-block .itunes-logo {
 	background-image: url(../images/mega/ads/available_itunes_white.png);
 	background-position: 0 0;
-	right: auto;
-	left:25px;
+	left: auto;
+	right: 25px;
+	top: -65px;
 }
 .good-times-right-block {
 	right: 0
@@ -15370,13 +15369,13 @@ to {
 .good-times-right-block .itunes-logo {
 	background-image: url(../images/mega/ads/available_itunes.png);
 	background-position: 0 0;
-	right:auto;
-	left:25px;
+	right: auto;
+	left: 25px;
 }
 @media (-webkit-min-device-pixel-ratio:1.325), (min-device-pixel-ratio:1.325) {
 .good-times-right-block .itunes-logo {
 	background-image: url(../images/mega/ads/available_itunes@2x.png);
-	background-size:119px auto;
+	background-size: 119px auto;
 }
 .good-times-left-block .title-image {
 	background-image: url(../images/mega/ads/goodtimes_title@2x.png);

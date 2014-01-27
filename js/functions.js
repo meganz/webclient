@@ -508,7 +508,6 @@ function DEBUG() {
 	}
 }
 
-
 /**
  *	Return a default callback for error handlign
  */

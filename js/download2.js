@@ -189,18 +189,10 @@ DownloadQueue.prototype.push = function() {
 
 	if (dl.zipid) {
 		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = {
-				IO: new dlZipIO(dlIO, dl),
-				size: 0,
-				queue: {},
-				url: [],
-			};
+			Zips[dl.zipid] = new dlZipIO(dl, dl_id); 
 		}
 		var tZip = Zips[dl.zipid];
-		tZip.queue[dl_id] = [dl, Zips[dl.zipid].size];
-		tZip.offset = 0;
-		tZip.IO.progress = 0;
-		tZip.size += dl.size;
+		dlIO.write = tZip.getWriter(dl);
 	}
 
 	if (!use_workers) {

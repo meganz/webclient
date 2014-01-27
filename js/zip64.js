@@ -88,31 +88,107 @@ var Zips = {};
 /**
  *	Pseudo-IO method to simplify zip writings
  */
-function dlZipIO(realIO, dl) {
+function dlZipIO(dl, dl_id) {
 	var self = this
 		, qZips = []
 		, ZipObject
-		, offset = 0
 		, hashes = {}
 		, dirData = []
-		, pos = 0
-		, entryPos = 0
+		, queue = []
+		, current = null
+		, gOffset = 0
+		, total_size  = 0
+		, realIO = new dlMethod(dl_id) 
 
-	this.download = function(name) {
-		var doDownload = setInterval(function(){
-			if (dl.decrypt != 0) return;
-			
-			var end = ZipObject.writeSuffix(offset, dirData);
+	// fake set credentials
+	realIO.begin = function() {}
+	realIO.setCredentials();
+
+	this.done = function() {
+		current = null
+		console.warn(queue.length);
+		if (queue.length === 0) {
+			var end = ZipObject.writeSuffix(gOffset, dirData);
 			$.each(dirData, function(key, value) {
-				realIO.write(value, offset, function() {});
-				offset += value.length;
+				doWrite(value);
+			});
+			doWrite(end, function() {
+				fm_zipcomplete(dl.zipid);
+				dl.onDownloadComplete(dl.dl_id);
+				dl.onBeforeDownloadComplete(dl.pos);
+				realIO.download(dl.zipname);
 			});
 
-			realIO.write(end, offset, function() {
-				realIO.download(name);
-			});
-			clearInterval(doDownload);
-		}, 100);
+		}
+	}
+
+	/**
+	 *	Peform real write 
+	 */
+	function doWrite(buffer, next) {
+		realIO.write(buffer, gOffset, next || function() {});
+		gOffset += buffer.length;
+	}
+
+	this.getWriter = function(file) {
+		var entryPos = 0
+			, expected = 0 /* next chunk */
+
+		total_size += file.size
+
+		queue.push(file.id);
+
+		return function (buffer, pos, next) {
+			if (!ZipObject) {
+				ZipObject = new ZIPClass(total_size);
+			}
+
+			if (current === null) {
+				current = file.id;
+				queue.splice($.inArray(file.id, queue),1);
+			}
+
+			if (current != file.id || expected != pos) {
+				var my = arguments.callee
+					, args = Array.prototype.slice.call(arguments)
+					, self = this
+				console.warn("retry");
+				return setTimeout(function() {
+					my.apply(self, args);
+				}, 100);
+			}
+
+			expected = pos + buffer.length
+			if (pos === 0) {
+				var header = ZipObject.writeHeader(
+					file.p + file.n,
+					file.size,
+					file.t
+				);
+				entryPos = gOffset;
+				doWrite(header);
+				hashes[file.id] = 0;
+			}
+
+			hashes[file.id] = crc32(buffer, hashes[file.id], buffer.length);
+
+
+			if (pos + buffer.length == file.size ) {
+				var centralDir = ZipObject.writeCentralDir(
+					file.p + file.n,
+					file.size,
+					file.t,
+					hashes[file.id],
+					false,
+					entryPos 
+				);
+				dirData.push(centralDir.dirRecord)
+				doWrite(buffer);
+				doWrite(centralDir.dataDescriptor, next);
+			} else {
+				doWrite(buffer, next);
+			}
+		};
 	}
 
 	this.write = function(buffer, position, next, task) {
@@ -162,23 +238,6 @@ function dlZipIO(realIO, dl) {
 			pos++;
 		}, task);
 	};
-
-	this.begin = function(total_size) {
-		ZipObject = new ZIPClass(total_size);
-		DEBUG("starting download " + dl.zipname + " " + total_size + " bytes");
-		dlQueue.pushAll(this.urls, function() {
-			if (dl.cancelled) return;
-			fm_zipcomplete(dl.zipid);
-			var checker = setInterval(function() {
-				if (qZips.length == 0 && dl.decrypt == 0) {
-					clearInterval(checker);
-					dl.onBeforeDownloadComplete(dl.pos);
-					dl.io.download(dl.zipname || dl.n, dl.p);
-				}
-			}, 100);
-		}, failureFunction);
-	}
-
 }
 
 

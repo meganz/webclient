@@ -144,7 +144,7 @@ function ClassChunk(task) {
 // }}}
 
 // File fetch {{{
-var fetchingFile = null;
+var fetchingFile = null
 function ClassFile(dl) {
 
 	this.run = function(Scheduler)  {
@@ -171,40 +171,6 @@ function ClassFile(dl) {
 	
 		dl.io.begin = function() {
 			var tasks = [];
-			if (dl.zipid) {
-				var Zip = Zips[dl.zipid]
-					, queue = Zip.queue[dl.dl_id]
-					, object = queue[0]
-					, offset = queue[1]
-	
-				var pos = 0;
-				Zip.IO.size = Zip.size;
-				$.each(object.urls, function(id, url) {
-					url.first		= id == 0
-					url.last		= object.urls.length-1 == id
-					url.zoffset		= url.offset + offset;
-					url.path		= dl.p + dl.n;
-					url.fsize		= dl.size;
-					url.download	= dl;
-					url.download.io	= Zip.IO;
-					url.pos		 = pos++;
-					Zip.url.push(url);
-				});
-	
-				delete Zip.queue[dl.dl_id];
-				if ($.len(Zip.queue) === 0) {
-					// start real downloading!
-					// Done with the queue, now fetch everything :-)
-					Zip.IO.urls = Zip.url.sort(function(a, b) {
-						// Sort by offset write often to avoid
-						// keeping thing in RAM 
-						return a.zoffset - b.zoffset;
-					});
-					// Trigger real download
-					Zip.IO.begin(Zip.size);
-				}
-				return;
-			}
 
 			$.each(dl.urls||[], function(key, url) {
 				tasks.push(new ClassChunk({
@@ -224,6 +190,9 @@ function ClassFile(dl) {
 						clearInterval(checker);
 						if (tasks.length > 0 && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
+						}
+						if (dl.zipid) {
+							return Zips[dl.zipid].done();
 						}
 						dl.onBeforeDownloadComplete(dl.pos);
 						dl.io.download(dl.zipname || dl.n, dl.p);

@@ -1133,8 +1133,11 @@ function dl_createtmpfile(fs)
 								});
 							});							
 							this.position = this.lastposition;
-							this.seek(this.position);							
-							setTimeout(dl_write_failed('Short write (' + this.position + ' / ' + this.targetpos + ')'),2000);
+							this.seek(this.position);
+							var dlwf_msg = 'Short write (' + this.position + ' / ' + this.targetpos + ')';
+							setTimeout(function() {
+								dl_write_failed(dlwf_msg);
+							},2000);
 						}
 					}
 				}

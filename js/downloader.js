@@ -22,6 +22,7 @@ function ClassChunk(task) {
 			, progress = getxr()  // chunk progress
 			, speed = 0 // speed of the current chunk
 			, lastUpdate // FIXME: I should be abstracted at getxr()
+			, Progress = download.zipid ? Zips[download.zipid] : io
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 	
@@ -50,24 +51,27 @@ function ClassChunk(task) {
 				lastUpdate = new Date().getTime()
 				shouldIReportDone();
 			}
-	
+
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (io.dl_lastprogress+250 > new Date().getTime() && !force) {
+			if (Progress.dl_lastprogress+250 > new Date().getTime() && !force) {
 				// too soon
 				return false;
 			}
+
+			console.warn(p, Progress.progres)
+
 	
 			download.onDownloadProgress(
 				download.dl_id, 
-				io.progress, // global progress
-				io.size, // total download size
-				io.dl_xr.update(io.progress - io.dl_prevprogress),  // speed
+				Progress.progress, // global progress
+				Progress.size, // total download size
+				Progress.dl_xr.update(Progress.progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
 	
-			io.dl_prevprogress = io.progress
-			io.dl_lastprogress = new Date().getTime();
+			Progress.dl_prevprogress = Progress.progress
+			Progress.dl_lastprogress = new Date().getTime();
 		}
 	
 	
@@ -97,7 +101,7 @@ function ClassChunk(task) {
 		xhr.onprogress = function(e) {
 			if (isCancelled()) return;
 	
-			io.progress += e.loaded - prevProgress;
+			Progress.progress += e.loaded - prevProgress;
 			prevProgress = e.loaded
 			updateProgress();
 		};
@@ -106,7 +110,7 @@ function ClassChunk(task) {
 			if (isCancelled()) return;
 			if (this.readyState == this.DONE) {
 				var r = this.response || {};
-				io.progress += r.byteLength - prevProgress;
+				Progress.progress += r.byteLength - prevProgress;
 				updateProgress(true);
 				iRealDownloads--;
 	
@@ -192,7 +196,6 @@ function ClassFile(dl) {
 						});
 					}
 				});
-				console.warn("empty file");
 			}
 	
 			dlQueue.pushAll(tasks, function() {

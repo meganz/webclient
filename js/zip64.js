@@ -97,12 +97,15 @@ function dlZipIO(dl, dl_id) {
 		, queue = []
 		, current = null
 		, gOffset = 0
-		, total_size  = 0
 		, realIO = new dlMethod(dl_id) 
 
 	// fake set credentials
 	realIO.begin = function() {}
 	realIO.setCredentials();
+
+	this.size = 0
+	this.progress	= 0
+	this.dl_xr	= getxr()
 
 	this.done = function() {
 		current = null
@@ -133,13 +136,13 @@ function dlZipIO(dl, dl_id) {
 		var entryPos = 0
 			, expected = 0 /* next chunk */
 
-		total_size += file.size
+		this.size += file.size
 
 		queue.push(file.id);
 
 		return function (buffer, pos, next) {
 			if (!ZipObject) {
-				ZipObject = new ZIPClass(total_size);
+				ZipObject = new ZIPClass(self.size);
 			}
 
 			if (current === null) {
@@ -150,10 +153,10 @@ function dlZipIO(dl, dl_id) {
 			if (current != file.id || expected != pos) {
 				var my = arguments.callee
 					, args = Array.prototype.slice.call(arguments)
-					, self = this
+					, zself = this
 
 				return setTimeout(function() {
-					my.apply(self, args);
+					my.apply(zself, args);
 				}, 100);
 			}
 

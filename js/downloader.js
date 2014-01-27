@@ -203,7 +203,7 @@ function ClassFile(dl) {
 				}
 				return;
 			}
-	
+
 			$.each(dl.urls||[], function(key, url) {
 				tasks.push(new ClassChunk({
 					url: url.url, 
@@ -220,7 +220,7 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						if (!checkLostChunks(dl)) {
+						if (tasks.length > 0 && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
 						}
 						dl.onBeforeDownloadComplete(dl.pos);

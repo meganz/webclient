@@ -9,6 +9,8 @@ function getXhrObject() {
 
 // Chunk fetch {{{
 function ClassChunk(task) {
+	this.task = task;
+
 	this.run = function(Scheduler) {
 		var xhr = getXhrObject()
 			, url = task.url
@@ -59,9 +61,6 @@ function ClassChunk(task) {
 				return false;
 			}
 
-			console.warn(p, Progress.progres)
-
-	
 			download.onDownloadProgress(
 				download.dl_id, 
 				Progress.progress, // global progress
@@ -150,6 +149,7 @@ function ClassChunk(task) {
 // File fetch {{{
 var fetchingFile = null
 function ClassFile(dl) {
+	this.task = dl;
 
 	this.run = function(Scheduler)  {
 		/**

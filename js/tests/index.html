@@ -14,9 +14,11 @@
     <script src="vendor/sinon-1.7.3.js"></script>
 
     <script>
-        // Disabled because of Stropheks
+        // Disabled because of Strophejs
 //        mocha.checkLeaks();
-        mocha.setup('bdd');
+        mocha.setup({
+            ui: 'bdd'
+        });
     </script>
 
 
@@ -57,13 +59,18 @@
     <!-- include spec files here... -->
     <!--<script type="text/javascript" src="spec/SpecHelper.js"></script>-->
 
+    <script>
+        // Patch Mocha to make it more `console.log` friendly
+        var mochaHelper = ConsoleMochaHelper();
+    </script>
+
     <!-- include source files here... -->
     <script type="text/javascript" src="src/unit/eventmocker.js"></script>
     <script type="text/javascript" src="src/unit/karere.js"></script>
     <script type="text/javascript" src="src/integration/chat_integration.js"></script>
 
     <script>
-      mocha.run();
+        mocha.run();
     </script>
   </body>
 </html>

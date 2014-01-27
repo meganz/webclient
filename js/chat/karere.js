@@ -93,12 +93,12 @@ var Karere = function(user_options) {
          * Timeout for the addUserToChat promise...will wait for that much ms and reject the promise
          * if the user have not joined
          */
-        wait_for_user_presence_in_room_timeout: 2000,
+        wait_for_user_presence_in_room_timeout: 2500,
 
         /**
          * Timeout for waiting before rejecting the .disconnect promise
          */
-        disconnect_timeout: 2000,
+        disconnect_timeout: 2500,
 
         /**
          * Timeout for waiting the queue of waiting stanzas to be send before rejecting and doing forced disconnect
@@ -118,13 +118,15 @@ var Karere = function(user_options) {
     if(localStorage.dxmpp == 1) {
         self.connection.rawInput = function (data) {
             if(localStorage.d) {
-		        console.error('RECV: ' + data);
+                var d = new Date();
+		        console.debug(self.getNickname(), d, 'RECV: ' + data);
             }
         };
 
         self.connection.rawOutput = function (data) {
 		    if(localStorage.d) {
-		        console.error('SEND: ' + data);
+                var d = new Date();
+		        console.debug(self.getNickname(), d, 'SEND: ' + data);
             }
         };
     }
@@ -284,13 +286,13 @@ makeMetaAware(Karere);
 
                 if (status == Karere.CONNECTION_STATE.CONNECTING) {
                     if(localStorage.d) {
-		                console.debug(self.getJid(), 'Karere is connecting.');
+		                console.debug(self.getNickname(), 'Karere is connecting.');
                     }
 
                     self.trigger('onConnecting');
                 } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
                     if(localStorage.d) {
-		                console.warn(self.getJid(), 'Karere failed to connect.');
+		                console.warn(self.getNickname(), 'Karere failed to connect.');
                     }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
@@ -299,14 +301,14 @@ makeMetaAware(Karere);
                     self.trigger('onConnfail');
                 } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
                     if(localStorage.d) {
-		                console.warn(self.getJid(), 'Karere failed to connect - Authentication issue.');
+		                console.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
                     }
 
                     $promise.reject(status);
                     self.trigger('onAuthfail');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
                     if(localStorage.d) {
-		                console.warn(self.getJid(), 'Karere is disconnecting.');
+		                console.warn(self.getNickname(), 'Karere is disconnecting.');
                     }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
@@ -316,7 +318,7 @@ makeMetaAware(Karere);
                     self.trigger('onDisconnecting');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
                     if(localStorage.d) {
-                        console.info(self.getJid(), 'Karere is disconnected.');
+                        console.info(self.getNickname(), 'Karere is disconnected.');
                     }
 
                     if(self._errors >= self.options.maxConnectionRetries) {
@@ -325,7 +327,7 @@ makeMetaAware(Karere);
                     self.trigger('onDisconnected');
                 } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
                     if(localStorage.d) {
-                        console.info(self.getJid(), 'Karere is connected.');
+                        console.info(self.getNickname(), 'Karere is connected.');
                     }
                     // connection.jid
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
@@ -611,9 +613,11 @@ makeMetaAware(Karere);
      * console.
      */
     Karere.error = function() {
-        if(localStorage.d) {
-		console.error(toArray(arguments).join(" "));
-}
+        var additional = "";
+        if(arguments[0] instanceof Error) {
+            additional = arguments[0].stack;
+        }
+		console.error(toArray(arguments).join(" "), additional);
     }
 }
 
@@ -645,7 +649,13 @@ makeMetaAware(Karere);
         // flag own/forwarded messages, because of the <forward/> stanzas, we can receive back our own messages
         if(message.getAttribute('from') == self.getJid()) {
             eventData['myOwn'] = true;
+        } else if(
+            message.getAttribute('from').indexOf("conference.") != -1 &&
+            message.getAttribute('from').split("/")[1] == self.getNickname()
+            ) {
+            eventData['myOwn'] = true;
         }
+
 
         var stanzaType = "Unknown";
 
@@ -662,7 +672,8 @@ makeMetaAware(Karere);
         if(x.length > 0 && x[0].getAttribute('xmlns') == 'http://jabber.org/protocol/muc#user') {
             eventData['roomJid'] = eventData['from'].split("/")[0];
 
-            var users = self.getMeta('rooms', eventData['roomJid'], 'users', {});
+            //copy please!
+            var users = $.extend(true, {}, self.getMeta('rooms', eventData['roomJid'], 'users', {}));
 
             var joinedUsers = {};
             var leftUsers = {};
@@ -683,7 +694,7 @@ makeMetaAware(Karere);
 
             self.setMeta('rooms', eventData['roomJid'], 'users', users);
 
-            eventData['current_users'] = users;
+            eventData['currentUsers'] = users;
 
             if(Object.keys(joinedUsers).length > 0) {
                 eventData['newUsers'] = joinedUsers;
@@ -699,7 +710,7 @@ makeMetaAware(Karere);
 
         if(message.tagName.toLowerCase() == "message") {
             if(localStorage.d) {
-		        console.warn(self.getJid(), "Message: ", _type, message.innerHTML);
+		        console.warn(self.getNickname(), "Message: ", _type);
             }
 
             var elems = message.getElementsByTagName('body');
@@ -752,7 +763,7 @@ makeMetaAware(Karere);
 
 
                 if(localStorage.d) {
-		            console.warn(self.getJid(), "Got invited to join room: ", eventData['room']);
+		            console.warn(self.getNickname(), "Got invited to join room: ", eventData['room']);
                 }
 
                 self.connection.muc.join(
@@ -794,7 +805,7 @@ makeMetaAware(Karere);
             }
         } else {
             if(localStorage.d) {
-		        console.debug("Unknown stanza type: ", message.innerHTML);
+//		        console.debug("Unknown stanza type: ", message.innerHTML);
             }
             eventData['unknown'] = true;
             eventData['tag'] = message.tagName;
@@ -844,7 +855,7 @@ makeMetaAware(Karere);
         var targetedTypeEvent = new $.Event("on" + stanzaType);
 
         if(localStorage.d) {
-    		console.debug(self.getJid(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
+    		console.debug(self.getNickname(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
         }
 
         try {
@@ -1158,11 +1169,28 @@ makeMetaAware(Karere);
         var self = this;
 
         var $promise = new $.Deferred();
-        var generatedEventName = generateEventSuffixFromArguments("onUsers" + eventName, "inv", roomJid, userJid, Math.random());
+        var generatedEventName = generateEventSuffixFromArguments("onUsers" + eventName, "inv", roomJid, userJid, self._generateNewIdx());
+
+        if(localStorage.d) {
+            console.warn(
+                self.getNickname(),
+                (new Date()),
+                "Starting to wait for user to" + (eventName == "Joined" ? "join" : "leave") + ": ",
+                userJid,
+                "event idx:",
+                generatedEventName
+            );
+        }
+
 
         var joinedTimeout = setTimeout(function() {
             if(localStorage.d) {
-		        console.error(self.getJid(), "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ", userJid);
+		        console.error(
+                    self.getNickname(),
+                    (new Date()),
+                    "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ",
+                    userJid
+                );
             }
 
             self.unbind(generatedEventName);
@@ -1175,7 +1203,7 @@ makeMetaAware(Karere);
             var joined = false;
 
             if(localStorage.d) {
-        		console.debug(eventName, roomJid, userJid, eventData[searchKey]);
+//        		console.debug(eventName, roomJid, userJid, eventData[searchKey]);
             }
 
             if(eventData.from.split("/")[0] != roomJid) {
@@ -1200,7 +1228,7 @@ makeMetaAware(Karere);
 
             if(joined) {
                 if(localStorage.d) {
-	            	console.warn(self.getJid(), "User " + eventName + ": ", roomJid, userJid);
+	            	console.warn(self.getNickname(), "User " + eventName + ": ", roomJid, userJid);
                 }
 
                 self.unbind(generatedEventName);
@@ -1283,7 +1311,7 @@ makeMetaAware(Karere);
         self.connection.muc.directInvite(roomJid, userJid, undefined, password);
 
         if(localStorage.d) {
-		    console.warn(self.getJid(), "Inviting: ", userJid, "to", roomJid, "with password", password);
+		    console.warn(self.getNickname(), "Inviting: ", userJid, "to", roomJid, "with password", password);
         }
 
         return $promise;
@@ -1318,7 +1346,7 @@ makeMetaAware(Karere);
         });
 
         if(localStorage.d) {
-            console.warn(self.getJid(), "Removing user: ", userJid, "from chat", roomJid);
+            console.warn(self.getNickname(), "Removing user: ", userJid, "from chat", roomJid);
         }
 
         if(!nickname) {

@@ -625,14 +625,21 @@ function createTimeoutPromise(validateFunction, tick, timeout) {
     var $promise = new $.Deferred();
     var tickInterval = setInterval(function() {
         if(validateFunction()) {
+            if(localStorage.d) {
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()));
+            }
             $promise.resolve();
         }
     }, tick);
 
     var timeoutTimer = setTimeout(function() {
         if(validateFunction()) {
+            if(localStorage.d) {
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()));
+            }
             $promise.resolve();
         } else {
+            console.error("Timed out after waiting", timeout, "ms", "at", (new Date()));
             $promise.reject();
         }
     }, timeout);

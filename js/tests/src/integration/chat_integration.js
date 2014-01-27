@@ -163,6 +163,11 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
         });
 
 
+        var em1 = new EventMocker(k1);
+        var em2 = new EventMocker(k2);
+
+
+
         expectToBeResolved(
             $.when(
                 k1.connect(
@@ -175,11 +180,23 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
                 )
             )
             .done(function() {
+                em1.mock("onUsersJoined", 4000);
+                em2.mock("onUsersJoined", 4000);
+
                 expectToBeResolved(
                     k1.startChat([
                         k2.getJid()
                     ])
                     .done(function() {
+
+                        expect(em1.mocks['onUsersJoined'].triggeredCount).to.equal(2);
+
+                        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1].newUsers[k1.getJid()]).to.equal("moderator");
+                        expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[0][1].currentUsers).length).to.equal(1);
+
+                        expect(em1.mocks['onUsersJoined'].triggeredArgs[1][1].newUsers[k2.getJid()]).to.equal("participant");
+                        expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[1][1].currentUsers).length).to.equal(2);
+
                         done();
                     }),
                     "Could not start chat."
@@ -282,7 +299,7 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
 });
 
 describe("Integration Test - Rooms", function() {
-    this.timeout(10000);
+    this.timeout(40000); // because my connection is slow some times + the ejabberd auth stanza takes a lot of time
 
 
 
@@ -399,6 +416,7 @@ describe("Integration Test - Rooms", function() {
                 'k2 failed to leave chat.'
             )
             .done(function() {
+                console.warn("users in chat: ", k1.getUsersInChat(roomJid));
                 expect(
                     Object.keys(
                         k1.getUsersInChat(roomJid)
@@ -479,8 +497,8 @@ describe("Integration Test - Rooms", function() {
     });
 
     it("send and receive message", function(done) {
-        var $promise1 = k1_event_mocker.mockAndWait("onPrivateMessage", 1000);
-        var $promise2 = k2_event_mocker.mockAndWait("onPrivateMessage", 1000);
+        var $promise1 = k1_event_mocker.mockAndWait("onPrivateMessage", 3000);
+        var $promise2 = k2_event_mocker.mockAndWait("onPrivateMessage", 3000);
 
         var msg = "hello world!";
 
@@ -509,6 +527,10 @@ describe("Integration Test - Rooms", function() {
 
 
     it("send and receive message - group chat", function(done) {
+        var $promise1 = k1_event_mocker.mockAndWait("onChatMessage", 3000);
+        var $promise2 = k2_event_mocker.mockAndWait("onChatMessage", 3000);
+
+
         expectToBeResolved(
             k1.startChat([
                 k2.getJid()
@@ -518,10 +540,8 @@ describe("Integration Test - Rooms", function() {
                 var msg = "hello world!";
 
 
-                var $promise1 = k1_event_mocker.mockAndWait("onChatMessage", 1000);
-                var $promise2 = k2_event_mocker.mockAndWait("onChatMessage", 1000);
 
-                //wait for the second trigger (1st is some XMPP default message to the new users who join)
+                //wait for the second trigger (1st is the "This room is not anonymous" message from XMPP)
                 var $promise3 = createTimeoutPromise(function() {
                     return k2_event_mocker.mocks['onChatMessage'].triggeredCount == 2
                 }, 100, 1000);
@@ -533,16 +553,16 @@ describe("Integration Test - Rooms", function() {
                     expectToBeResolved($promise2, 'Did not received message in the group chat (k2)');
 
                     expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].myOwn).to.be.true;
-                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].myOwn).to.be.false;
+                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[1][1].myOwn).to.be.false;
 
-                    expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].message).to.equal(msg);
-                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].message).to.equal(msg);
+                    expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].message).to.equal(msg, "k1 did not got the correct message");
+                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[1][1].message).to.equal(msg, "k2 did not got the correct message");
 
                     expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].from).to.equal(k1.getJid());
-                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].from).to.equal(room_jid + "/" + k1.getNickname());
+                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[1][1].from).to.equal(room_jid + "/" + k1.getNickname());
 
                     expect(k1_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].to).to.equal(room_jid);
-                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[0][1].to).to.equal(k2.getJid());
+                    expect(k2_event_mocker.mocks['onChatMessage'].triggeredArgs[1][1].to).to.equal(k2.getJid());
 
                     done();
                 })
@@ -551,9 +571,9 @@ describe("Integration Test - Rooms", function() {
 
 
     it("send isActive, isComposing, isPausedComposing", function(done) {
-        var $promise2_paused = k2_event_mocker.mockAndWait("onPausedMessage", 1000);
-        var $promise2_active = k2_event_mocker.mockAndWait("onActiveMessage", 1000);
-        var $promise2_composing = k2_event_mocker.mockAndWait("onComposingMessage", 1000);
+        var $promise2_paused = k2_event_mocker.mockAndWait("onPausedMessage", 3000);
+        var $promise2_active = k2_event_mocker.mockAndWait("onActiveMessage", 3000);
+        var $promise2_composing = k2_event_mocker.mockAndWait("onComposingMessage", 3000);
 
 
 

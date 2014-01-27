@@ -57,6 +57,12 @@ EventMocker.prototype.mock = function(eventName, timeout) {
     }
     self.mocks[eventName] = mock;
 
+    if(localStorage.d) {
+        console.debug(
+            (new Date()),
+            "Starting to wait for event:", eventName
+        );
+    }
 
     var start_timeout_timer = function() {
         if(mock.timeout_timer) {
@@ -64,7 +70,7 @@ EventMocker.prototype.mock = function(eventName, timeout) {
         }
 
         mock.timeout_timer = setTimeout(function() {
-            console.error("EventMock timed out waiting on: ", eventName);
+            console.error("EventMock timed out waiting on: ", eventName, (new Date()));
 
             mock.timeout_timer = false;
             mock.timeouts+=1;

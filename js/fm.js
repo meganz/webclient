@@ -3367,7 +3367,7 @@ function contextmenuUI(e,ll,topmenu)
 		{
 			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
+			if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
 	}

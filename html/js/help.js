@@ -323,10 +323,94 @@ var helpdata =
 	c: [3]
 },
 
+// Sync
+{
+	q: 'What is MEGAsync?',
+	a: '<p>MEGAsync is an installable application that synchronizes folders between your computer and your MEGA cloud drive. All files and subfolders will be replicated both ways. Changes that you make on one side will appear on the other side in near real time (within the limits of link/system latency and file transfer times).</p>',
+	c: [4]
+},
+{
+	q: 'How do I install MEGAsync?',
+	a: '<p>Go to the <a href="#sync">download page</a> and follow the instructions. During the installation, you will be asked to enter or create your MEGA account and to set up the folders to replicate (either your full MEGA cloud drive to a single local folder or specific subfolders in your cloud drive to corresponding local folders). After the installation completes, MEGAsync will start automatically. Under Windows, you will see a clickable MEGA logo in the system tray while the sync tool is running that gives you access to a status popup and the settings page.</p>',
+	c: [4]
+},
+{
+	q: 'Can I use MEGAsync on multiple computers?',
+	a: '<p>Yes. By synchronizing multiple devices with the same cloud folder, you can achieve cross-computer syncing.</p>',
+	c: [4]
+},
+{
+	q: 'How can I monitor the sync status of my local files and folders?',
+	a: '<p>Icons of files and folders that are in sync with the cloud will be tagged with a green circle. Transfers in progress are indicated by a blue circle; pending transfers show in red.</p>',
+	c: [4]
+},
+{
+	q: 'MEGAsync stores my login credentials to perform autologin. Isn\'t that a security concern?',
+	a: '<p>Not if you keep your local drive encrypted (please do &mdash; why would you want to sync from an encrypted cloud drive to an unencrypted local drive?).</p>',
+	c: [4]
+},
+{
+	q: 'I deleted a file from a local synced folder while MEGAsync was not running. Then I started it, and the file reappeared. Why?',
+	a: '<p>The current incarnation of MEGAsync does not remember your local filesystem state across restarts. It has no way of knowing that a local file has gone missing since the last time it was run. Therefore, always keep MEGAsync running if you want your local deletions to be replicated properly.</p>',
+	c: [4]
+},
+{
+	q: 'An important file was overwritten or deleted by the sync client. What can I do to get it back?',
+	a: '<p>On the cloud side, deleted files will be moved to a special "SyncDebris" subfolder structure in your Rubbish Bin and can be retrieved from there (use MEGA\'s built-in search if needed). On the local computer, each sync\'s root folder will have a hidden "Debris" folder in which deleted items are placed. </p>',
+	c: [4]
+},
+{
+	q: 'Does MEGAsync perform explicit file versioning?',
+	a: '<p>No. However, you can access overwritten files in the respective debris folders until they are purged.</p>',
+	c: [4]
+},
+{
+	q: 'Does MEGAsync support modifying existing files?',
+	a: '<p>No. If a synced file changes, it is always replaced as a whole. Therefore, it is not recommended to sync e.g. large log files or database tables. Encrypted delta writes are planned for a future release.</p>',
+	c: [4]
+},
+{
+	q: 'With large sync folders configured, MEGAsync takes a long time to start. Why?',
+	a: '<p>Each time MEGAsync is launched, a full integrity check of the local file trees is performed. Future versions will offer an option to skip this check.</p>',
+	c: [4]
+},
+{
+	q: 'Are there any restrictions with regards to filenames?',
+	a: '<p>MacOS/UNIX filenames are case sensitive, Windows filenames are not. A folder containing both "ABC.TXT" and "abc.txt" can be synced to a UNIX machine without problems, but when synced to a Windows machine, only one of the two files will survive.</p><p>MEGA imposes no restrictions on filenames &mdash; they can contain characters that are incompatible with the operating system, such as : or *. These will be rewritten as %xx on the local side and converted back to the original character when synced back. The Windows Explorer also has trouble with a number of seemingly innocuous file and folder names &mdash; "con.doc", for example, would not be accessible (to understand why, you have to be a geek or a veteran, or both). If you encounter such a situation, simply rename the file on the cloud side. Foreign characters in filenames are fully supported.</p><p>MEGAsync supports fairly deep folder structures (MEGA itself is limited to a maximum of 63 levels) and very long pathnames (up to 32,000 characters under Windows). Unfortunately, most Windows software (including the Explorer) is unable to access files whose path is longer than 260 characters.</p> ',
+	c: [4]
+},
+{
+	q: 'How can I make sure that I always have the latest version of MEGAsync?',
+	a: '<p>MEGAsync checks for a new version every two hours and updates itself once one is available (you can turn this off in the settings &mdash; the next check is then performed when you turn it back on). For security reasons, only the account that initially installed MEGAsync is allowed to update it.</p>',
+	c: [4]
+},
+
+{
+	q: 'Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?',
+	a: '<p>No. The current incarnation of MEGAsync always syncs via MEGA\'s cloud infrastructure.</p>',
+	c: [4]
+},
+
+{
+	q: 'What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?',
+	a: '<p>The current incarnation of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.</p>',
+	c: [4]
+},
+
+{
+	q: 'Does MEGAsync support advanced filesystem features such as links, attributes, ACLs, streams/forks or sparse files?',
+	a: '<p>No. Do not expect these to be replicated to the cloud.</p>',
+	c: [4]
+},
+
+{
+	q: 'Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?',
+	a: '<p>No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.</p>',
+	c: [4]
+},
 
 // iOS
 {
-	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
 	q: 'Where can I find your iOS app?',
 	a: '<p>You can download and install our iOS app on the <a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">App Store</a>.</p>',
 	c: [5]
@@ -335,12 +419,9 @@ var helpdata =
 
 // Android
 {
-	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
 	q: 'Where can I find your Android app?',
 	a: '<p>You can download and install our Android app on <a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">Google Play</a>.</p>',
 	c: [6]
 }
 
-
 ]
-

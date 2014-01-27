@@ -203,10 +203,10 @@ DownloadQueue.prototype.push = function() {
 		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 	}
 
-	dl.pos   = id // download position in the queue
-	dl.dl_id = dl_id;  // download id
-	dl.io	= dlIO;
-	dl.nonce = dl_keyNonce
+	dl.pos		= id // download position in the queue
+	dl.dl_id	= dl_id;  // download id
+	dl.io		= dlIO;
+	dl.nonce	= dl_keyNonce
 	// Use IO object to keep in track of progress
 	// and speed
 	dl.io.progress 	= 0;

@@ -144,10 +144,22 @@ function ClassChunk(task) {
 // }}}
 
 // File fetch {{{
+var fetchingFile = null;
 function ClassFile(dl) {
 
-	// run task {{{
 	this.run = function(Scheduler)  {
+		/**
+		 *	Make sure that only one task of this kind
+		 *	runs in parallel (because their chunks are important)
+		 */
+		if (fetchingFile) {
+			Scheduler.done();
+			dlQueue.push(dl);
+			return;
+		}
+
+		fetchingFile = 1;
+
 		if (!use_workers) {
 			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 		}
@@ -156,6 +168,7 @@ function ClassFile(dl) {
 	
 		dl.io.begin = function() {
 			var tasks = [];
+			fetchingFile = 0;
 			if (dl.zipid) {
 				var Zip = Zips[dl.zipid]
 					, queue = Zip.queue[dl.dl_id]
@@ -226,7 +239,6 @@ function ClassFile(dl) {
 			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 		});
 	}
-	// }}}
 
 }
 // }}}

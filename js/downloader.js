@@ -153,8 +153,12 @@ function ClassFile(dl) {
 		 *	runs in parallel (because their chunks are important)
 		 */
 		if (fetchingFile) {
+			console.warn("retrying");
 			Scheduler.done();
-			dlQueue.push(dl);
+			var task = this;
+			setTimeout(function() {
+				dlQueue.push(task);
+			}, 100);
 			return;
 		}
 
@@ -168,7 +172,6 @@ function ClassFile(dl) {
 	
 		dl.io.begin = function() {
 			var tasks = [];
-			fetchingFile = 0;
 			if (dl.zipid) {
 				var Zip = Zips[dl.zipid]
 					, queue = Zip.queue[dl.dl_id]
@@ -231,6 +234,8 @@ function ClassFile(dl) {
 	
 			// notify the UI
 			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
+			fetchingFile = 0;
+			Scheduler.done();
 		}
 	
 		dlGetUrl(dl, function(res, o) {

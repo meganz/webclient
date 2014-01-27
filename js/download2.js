@@ -34,6 +34,10 @@ dlQueue.getNextTask = (function() {
 					candidate = p;
 					return false; /* break */
 				}
+				if (pzTask.task instanceof ClassChunk) {
+					/* make it our candidate but don't break the loop */
+					candidate = p;
+				}
 			});
 		}
 

@@ -153,7 +153,6 @@ function ClassFile(dl) {
 		 *	runs in parallel (because their chunks are important)
 		 */
 		if (fetchingFile) {
-			console.warn("retrying");
 			Scheduler.done();
 			var task = this;
 			setTimeout(function() {

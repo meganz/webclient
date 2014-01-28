@@ -124,6 +124,8 @@ function mozPlaySound(n) {
 
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
+	// const aFile = aFilePtr.clone();
+	
 	this.__defineGetter__('isFile', function()
 	{
 		return aFile.isFile();
@@ -162,10 +164,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 				this.u8 = function(aStart,aBytes)
 				{
-					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
-
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
+
+					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,''+data.slice(0,16).map(function(n) n.toString(16)));
+
 					return new Uint8Array(data);
 				};
 				this._close = function()
@@ -179,8 +182,6 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			{
 				aStart = aStart || 0;
 				aBytes = aBytes || this.size;
-
-				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type, aStart,aBytes);
 
 				return new Blob([this.u8(aStart,aBytes)], { type : this.type || 'application/octet-stream'});
 			},

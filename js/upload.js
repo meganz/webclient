@@ -736,11 +736,16 @@ function ul_dispatch_read()
 
 				if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
 				{
-					ul_plainq[p] = ul_queue[ul_queue_num].u8(p,ul_readq[p]);
-					delete ul_readq[p];
+					var len = ul_readq[p];
 
-					ul_intransit++;
-					ul_dispatch_chain();
+					setTimeout(function() {
+						ul_plainq[p] = ul_queue[ul_queue_num].u8(p,len);
+						delete ul_readq[p];
+
+						ul_intransit++;
+						ul_dispatch_chain();
+					}, 30);
+
 					break;
 				}
 

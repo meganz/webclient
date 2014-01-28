@@ -11191,7 +11191,7 @@ span.browsers-update {
 	line-height: 21px;
 	color: #666666;
 	padding: 15px 0 0px 22px;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: -813px -1536px;
 }
@@ -11204,7 +11204,7 @@ span.browsers-update {
 	float: left;
 	width: 448px;
 	height: 200px;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: -488px -433px;
 	margin-bottom: 28px;
@@ -11258,13 +11258,13 @@ span.browsers-update {
 }
 .m-client-bottom-block {
 	text-align: center;
-	padding: 41px 20px 22px 20px;
+	padding: 41px 20px 36px 20px;
 }
 .ff-bottom-block {
 	text-align: center;
 	padding: 49px 20px 49px 20px;
 }
-.sync-button, .google-play-button, .ios-button, .ff-bott-button {
+.sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button {
 	min-width: 209px;
 	height: 64px;
 	display: inline-block;
@@ -11273,7 +11273,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -11288,6 +11288,9 @@ span.browsers-update {
 .google-play-button {
 	background-position: -343px -1447px;
 }
+.blackberry-button {
+	background-position: 12px -1558px;
+}
 .ios-button {
 	background-position: -343px -1563px;
 }
@@ -11296,7 +11299,7 @@ span.browsers-update {
 	padding: 16px 15px 0 0;
 	min-width: 259px;
 }
-.sync-button:hover, .ios-button:hover, .google-play-button:hover, .ff-bott-button:hover {
+.sync-button:hover, .ios-button:hover, .google-play-button:hover, .ff-bott-button:hover, .blackberry-button:hover {
 	border: 5px solid #DB3200;
 	margin: 0;
 	min-width: 215px;
@@ -11330,7 +11333,7 @@ span.browsers-update {
 	width: 80px;
 	height: 78px;
 	float: left;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: -465px -1122px;
 	margin: 15px 0 17px 0;
@@ -11392,7 +11395,7 @@ span.browsers-update {
 }
 .chrome-bott-icons {
 	height: 140px;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: 0 -768px;
 }
@@ -11412,7 +11415,7 @@ span.browsers-update {
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
 	padding: 16px 15px 0 70px;
-	background-image: url(../images/mega/mobile-sprite.png?v=2);
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
 	background-repeat: no-repeat;
 	background-position: -4px -917px;
 	-moz-box-sizing: border-box;
@@ -14301,8 +14304,8 @@ top-login-spr  .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/pro-new-sprite@2x.png);
  background-size: 853px auto;
 }
-.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button {
- background-image: url(../images/mega/mobile-sprite@2x.png?v=2);
+.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button {
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=3);
  background-size: 836px auto;
 }
  .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {

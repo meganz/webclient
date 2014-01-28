@@ -741,7 +741,9 @@ function dl_checklostchunk()
 		{
 			dl_reportstatus(dl_queue_num,EKEY);
 			if (dl_zip) dl_killzip(dl_zip.id);
-			else dl_queue[dl_queue_num] = false;			
+			else dl_queue[dl_queue_num] = false;
+
+			dl_cancel();
 		}
 		else
 		{
@@ -1058,7 +1060,7 @@ function dl_cancel()
 	dl_instance++;
 	downloading = dl_writing = dl_zip = false;
 
-	for (var slot = dl_maxSlots; slot--; ) if (dl_xhrs[slot]) dl_xhrs[slot].abort();
+	for (var slot = dl_maxSlots; slot--; ) if (dl_xhrs&&dl_xhrs[slot]) dl_xhrs[slot].abort();
 	dl_xhrs = dl_pos = dl_workers = dl_progress = dl_cipherq = dl_plainq = dl_progress = dl_chunks = dl_chunksizes = undefined;
 
 	if(is_chrome_firefox)

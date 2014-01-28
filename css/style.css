@@ -13350,6 +13350,33 @@ h1.help-home-header {
 .be .st-green-note {
 	background-image: url(../images/mega/be/start-green-note.png);
 }
+.cy .st-green-note {
+	background-image: url(../images/mega/cy/start-green-note.png);
+}
+.ee .st-green-note {
+	background-image: url(../images/mega/ee/start-green-note.png);
+}
+.fa .st-green-note {
+	background-image: url(../images/mega/fa/start-green-note.png);
+}
+.hi .st-green-note {
+	background-image: url(../images/mega/hi/start-green-note.png);
+}
+.mk .st-green-note {
+	background-image: url(../images/mega/mk/start-green-note.png);
+}
+.ms .st-green-note {
+	background-image: url(../images/mega/ms/start-green-note.png);
+}
+.se .st-green-note {
+	background-image: url(../images/mega/se/start-green-note.png);
+}
+.sr .st-green-note {
+	background-image: url(../images/mega/sr/start-green-note.png);
+}
+.tl .st-green-note {
+	background-image: url(../images/mega/tl/start-green-note.png);
+}
 .transfer-table td {
 	position: relative;
 }
@@ -13499,6 +13526,33 @@ h1.help-home-header {
 }
 .be .pro-recommended {
 	background-image: url(../images/mega/be/recommended.png);
+}
+.cy .pro-recommended {
+	background-image: url(../images/mega/cy/recommended.png);
+}
+.ee .pro-recommended {
+	background-image: url(../images/mega/ee/recommended.png);
+}
+.fa .pro-recommended {
+	background-image: url(../images/mega/fa/recommended.png);
+}
+.hi .pro-recommended {
+	background-image: url(../images/mega/hi/recommended.png);
+}
+.mk .pro-recommended {
+	background-image: url(../images/mega/mk/recommended.png);
+}
+.ms .pro-recommended {
+	background-image: url(../images/mega/ms/recommended.png);
+}
+.se .pro-recommended {
+	background-image: url(../images/mega/se/recommended.png);
+}
+.sr .pro-recommended {
+	background-image: url(../images/mega/sr/recommended.png);
+}
+.tl .pro-recommended {
+	background-image: url(../images/mega/tl/recommended.png);
 }
 .arrow {
 	background-repeat: no-repeat;
@@ -14107,6 +14161,33 @@ background-size: 90px auto;
 .be .st-green-note {
  background-image: url(../images/mega/be/start-green-note@2x.png);
 }
+.cy .st-green-note {
+ background-image: url(../images/mega/cy/start-green-note@2x.png);
+}
+.ee .st-green-note {
+ background-image: url(../images/mega/ee/start-green-note@2x.png);
+}
+.fa .st-green-note {
+ background-image: url(../images/mega/fa/start-green-note@2x.png);
+}
+.hi .st-green-note {
+ background-image: url(../images/mega/hi/start-green-note@2x.png);
+}
+.mk .st-green-note {
+ background-image: url(../images/mega/mk/start-green-note@2x.png);
+}
+.ms .st-green-note {
+ background-image: url(../images/mega/ms/start-green-note@2x.png);
+}
+.se .st-green-note {
+ background-image: url(../images/mega/se/start-green-note@2x.png);
+}
+.sr .st-green-note {
+ background-image: url(../images/mega/sr/start-green-note@2x.png);
+}
+.tl .st-green-note {
+ background-image: url(../images/mega/tl/start-green-note@2x.png);
+}
  .pro-recommended {
  background-image: url(../images/mega/en/recommended@2x.png);
  background-size:108px auto;
@@ -14237,6 +14318,33 @@ background-size: 90px auto;
 .be .pro-recommended {
  background-image: url(../images/mega/be/recommended@2x.png);
 }
+.cy .pro-recommended {
+ background-image: url(../images/mega/cy/recommended@2x.png);
+}
+.ee .pro-recommended {
+ background-image: url(../images/mega/ee/recommended@2x.png);
+}
+.fa .pro-recommended {
+ background-image: url(../images/mega/fa/recommended@2x.png);
+}
+.hi .pro-recommended {
+ background-image: url(../images/mega/hi/recommended@2x.png);
+}
+.mk .pro-recommended {
+ background-image: url(../images/mega/mk/recommended@2x.png);
+}
+.ms .pro-recommended {
+ background-image: url(../images/mega/ms/recommended@2x.png);
+}
+.se .pro-recommended {
+ background-image: url(../images/mega/se/recommended@2x.png);
+}
+.sr .pro-recommended {
+ background-image: url(../images/mega/sr/recommended@2x.png);
+}
+.tl .pro-recommended {
+ background-image: url(../images/mega/tl/recommended@2x.png);
+}
  .register-info-icon {
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
@@ -14248,7 +14356,7 @@ background-size: 50px auto;
 .warning-popup-icon, .warning-popup-icon:hover, .warning-popup-icon.active {
 background-position: -9px -10828px;
 }
-top-login-spr  .nlanguage-tooltip-bg, .nlanguage-bottom {
+top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/language-sprite@2x.png);
  background-size: 18px auto;
 }

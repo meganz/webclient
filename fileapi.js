@@ -124,8 +124,6 @@ function mozPlaySound(n) {
 
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
-	// const aFile = aFilePtr.clone();
-	
 	this.__defineGetter__('isFile', function()
 	{
 		return aFile.isFile();
@@ -167,7 +165,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
 
-					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,''+data.slice(0,16).map(function(n) n.toString(16)));
+					if (d && (aBytes != 64 || d > 1)) { // 64 == fingerprint
+						console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,
+							this.size, ''+data.slice(0,16).map(function(n) n.toString(16)));
+					}
 
 					return new Uint8Array(data);
 				};

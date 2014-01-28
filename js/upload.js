@@ -102,6 +102,8 @@ function startupload()
 	}
 	catch(e)
 	{
+		if (d) console.log('FINGERPRINT ERROR', e.message || e);
+
 		initupload1();	
 	}
 }

@@ -12,6 +12,8 @@ function ClassChunk(task) {
 	this.task = task;
 
 	this.run = function(Scheduler) {
+		iRealDownloads++;
+
 		var xhr = getXhrObject()
 			, url = task.url
 			, size = task.size
@@ -24,10 +26,11 @@ function ClassChunk(task) {
 			, progress = getxr()  // chunk progress
 			, speed = 0 // speed of the current chunk
 			, lastUpdate // FIXME: I should be abstracted at getxr()
+			, localId = iRealDownloads
 			, Progress = download.zipid ? Zips[download.zipid] : io
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
-	
+
 		/**
 		 *	Check if the current chunk is small or close to its
 		 *	end, so it can cheat to the scheduler telling they are 
@@ -87,12 +90,18 @@ function ClassChunk(task) {
 			io.dl_bytesreceived = 0;
 		}
 	
+		var _cancelled = false;
 		function isCancelled() {
+			if (_cancelled) {
+				/* aborted already */
+				return;
+			}
 			if (download.cancelled) {
-				DEBUG("Chunk aborting itself because download was cancelled");
+				_cancelled = true;
+				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
-				!done && Scheduler.done();
 				iRealDownloads--;
+				!done && Scheduler.done();
 				return true;
 			}
 		}
@@ -110,8 +119,8 @@ function ClassChunk(task) {
 			if (this.readyState == this.DONE) {
 				var r = this.response || {};
 				Progress.progress += r.byteLength - prevProgress;
-				updateProgress(true);
 				iRealDownloads--;
+				updateProgress(true);
 	
 				if (r.byteLength == size) {
 					if (have_ab) {
@@ -182,7 +191,9 @@ function ClassFile(dl) {
 					offset: url.offset, 
 					size: url.size, 
 					download: dl, 
-					chunk_id: key
+					chunk_id: key,
+					zipid: dl.zipid,
+					id: dl.id
 				}));
 			});
 
@@ -308,8 +319,6 @@ var iRealDownloads = 0
 
 
 function downloader(task) {
-	iRealDownloads++;
-
 	var Scheduler = this;
 
 	if (task.busy === true) {

@@ -928,7 +928,7 @@ function initContextUI()
 			DEBUG("cancelled file " + $.sd);
 			dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 				return $.zipkill ? obj.task.task.zipid !== $.zipkill
-					: obj.task.task.download.id !== dl_queue[$.sd].dl_id;
+					: obj.task.task.id !== dl_queue[$.sd].dl_id;
 			});
 			if ($.sd) {
 				dl_queue[$.sd].cancelled = true;

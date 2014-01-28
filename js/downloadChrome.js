@@ -14,12 +14,14 @@ function FileSystemAPI(dl_id) {
 		, dl_chunksizes = []
 		, dl_writing
 		, dl_ack_write = function() {}
+		, chrome_write_error_msg = 20
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize
 		, dl_req_storage
 		, dl_filename
 		, zfileEntry
+		, failed = false
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -56,6 +58,72 @@ function FileSystemAPI(dl_id) {
 
 	function dl_createtmpfile(fs) {
 		Fs = fs;
+		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
+			DEBUG('Directory "mega" created');
+			DEBUG("Opening file for writing: " + dl_id);
+
+			if(is_chrome_firefox) {
+				var q = {};
+				for(var o in dl_queue) {
+					if(dl_queue[o].dl_id == dl_id) {
+						q = dl_queue[o];
+						break;
+					}
+				}
+				options._firefox = {
+					filesize : dl_filesize,
+					filename : dl_filename,
+					zip      : !1, // XXX
+					path     : q.p,
+					mtime    : q.t
+				};
+			}
+		
+			fs.root.getFile('mega/' + dl_id, {create: true}, function(fileEntry) {
+				fileEntry.createWriter(function(fileWriter) {     
+					DEBUG('File "mega/' + dl_id + '" created');
+					dl_fw = fileWriter
+					dl_fw.truncate(0);
+	
+					dl_fw.onerror = function(e) {
+						failed = e;
+						dl_ack_write();
+					}
+	
+					dl_fw.onwriteend = function() {
+						if (this.position == targetpos) return dl_ack_write();
+	
+						/* error */
+						clearit(0,0,function(s) {
+							// clear persistent files:
+							clearit(1,0,function(s) {
+								if (chrome_write_error_msg == 21 && !$.msgDialog) {
+									chrome_write_error_msg=0;
+									msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+								}
+								chrome_write_error_msg++;
+							});
+						});
+	
+						setTimeout(function() {
+							failed = 'Short write (' + this.position + ' / ' + this.targetpos + ')';
+							dl_ack_write();
+						}, 2000);
+					}
+	
+					zfileEntry = fileEntry;
+					setTimeout(function() {
+						// deferred execution
+						IO.begin();
+					});
+				}, errorHandler('createWriter'));
+			}, errorHandler('getFile'));
+		}, errorHandler('getDirectory'));
+
+	}
+
+	function dl_createtmpfile_old(fs) {
+		Fs = fs;
 		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
 			DEBUG('Directory "' + dirid + '" created')
 			document.dirEntry = dirEntry;
@@ -63,23 +131,6 @@ function FileSystemAPI(dl_id) {
 		DEBUG("Opening file for writing: " + dl_id);
 
 		var path = dirid + '/' + dl_id, options = {create: true};
-		
-		if(is_chrome_firefox) {
-			var q = {};
-			for(var o in dl_queue) {
-				if(dl_queue[o].dl_id == dl_id) {
-					q = dl_queue[o];
-					break;
-				}
-			}
-			options._firefox = {
-				filesize : dl_filesize,
-				filename : dl_filename,
-				zip      : !1, // XXX
-				path     : q.p,
-				mtime    : q.t
-			};
-		}
 		
 		Fs.root.getFile(path, options, function(fileEntry) {
 			fileEntry.createWriter(function(fileWriter) {
@@ -133,9 +184,21 @@ function FileSystemAPI(dl_id) {
 				IO.write(buffer, position, done);
 			}, 100);
 		}
-		dl_writing   = true;
-		dl_ack_write = done;
-		targetpos    = buffer.length + dl_fw.position;
+		dl_writing = true;
+		failed     = false;
+		targetpos  = buffer.length + dl_fw.position;
+
+		dl_ack_write = function() {
+			dl_writing = false;
+			if (failed) {
+				failed = false; /* reset error flag */
+				this.seek(position);
+				dl_fw.write(new Blob([buffer]));
+				return;
+			}
+			done(); /* notify writer */
+		};
+
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
 		dl_fw.write(new Blob([buffer]));
 	};
@@ -157,6 +220,7 @@ function FileSystemAPI(dl_id) {
 		check();
 	};
 }
+
 FileSystemAPI.init = function dl_getspace(storagetype, minsize) {
 	storagetype = storagetype || 0;
 	minsize = minsize || 0;

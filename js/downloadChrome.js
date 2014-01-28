@@ -4,9 +4,7 @@
 var testSize = 1024 * 1024 * 1024 * 25
 function FileSystemAPI(dl_id) {
 	var dl_quotabytes = 0
-		, dl_instance = 0
 		, IO = this
-		, fs_instance
 		, Fs
 		, dl_fw
 		, dirid = "mega"
@@ -43,10 +41,9 @@ function FileSystemAPI(dl_id) {
 			  alert('INVALID_MODIFICATION_ERR in ' + type);
 			  break;
 			case FileError.INVALID_STATE_ERR:
-				fs_instance = dl_instance;
 				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
 				setTimeout(function() {
-					IO.check();				
+					FileSystemAPI.check();
 				}, 500);
 				break;
 			default:
@@ -120,46 +117,6 @@ function FileSystemAPI(dl_id) {
 			}, errorHandler('getFile'));
 		}, errorHandler('getDirectory'));
 
-	}
-
-	function dl_createtmpfile_old(fs) {
-		Fs = fs;
-		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
-			DEBUG('Directory "' + dirid + '" created')
-			document.dirEntry = dirEntry;
-		}, errorHandler('getDirectory'));
-		DEBUG("Opening file for writing: " + dl_id);
-
-		var path = dirid + '/' + dl_id, options = {create: true};
-		
-		Fs.root.getFile(path, options, function(fileEntry) {
-			fileEntry.createWriter(function(fileWriter) {
-				DEBUG('FILE "' + path + '" created');
-				dl_fw = fileWriter;
-				dl_fw.truncate(0);
-				dl_fw.onerror = function(e) {
-					DEBUG("Write failed: " + e.toString())
-					dl_writing = false;
-					dl_write_failed(e);
-				};
-				dl_fw.onwriteend = function() {
-					DEBUG("fileWriter: onwriteend, position: " + this.position + ", expected: " + targetpos);
-					dl_writing = false;
-
-					if (this.position == targetpos) { 
-						dl_ack_write();
-					} else {
-						dl_write_failed('Short write (' + this.position + ' / ' + targetpos + ')');
-					}
-				};
-
-				zfileEntry = fileEntry;
-				setTimeout(function() {
-					// deferred execution
-					IO.begin();
-				});
-			}, errorHandler('createWriter'));
-		}, errorHandler('getFile'));
 	}
 
 	// Check if the file can be written, return true

@@ -743,7 +743,7 @@ function dl_checklostchunk()
 			if (dl_zip) dl_killzip(dl_zip.id);
 			else dl_queue[dl_queue_num] = false;
 
-			dl_cancel();
+			dl_cancel(EKEY);
 		}
 		else
 		{
@@ -862,7 +862,7 @@ function dl_httperror(code)
 
 	if (!dl_write_position)
 	{
-		dl_cancel();
+		dl_cancel(EAGAIN);
 
 		dl_queue_num++;
 		dl_settimer(dl_retryinterval,startdownload);
@@ -1054,7 +1054,7 @@ function appendBuffer( buffer1, buffer2 )
   return tmp.buffer;
 }
 
-function dl_cancel()
+function dl_cancel(error)
 {
 	dl_settimer(-1);
 	dl_instance++;
@@ -1065,7 +1065,7 @@ function dl_cancel()
 
 	if(is_chrome_firefox)
 	{
-		dl_fw.close();
+		dl_fw.close(error);
 	}
 }
 

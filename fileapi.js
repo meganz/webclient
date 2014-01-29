@@ -501,8 +501,15 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							seek : function(p) {
 								File.fs.seek(0,p);
 							},
-							close : function() {
+							close : function(aError) {
 								mozCloseStream(File.fs);
+
+								if (aError)
+								{
+									mozRunAsync(function() {
+										File.options.saveto.remove(!1);
+									});
+								}
 							}
 						};
 

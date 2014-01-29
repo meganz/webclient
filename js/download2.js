@@ -270,9 +270,16 @@ function dlGetUrl(object, callback) {
 			}
 			
 			dl_retryinterval *= 1.2;
+			fetchingFile = false;
 			setTimeout(function() {
 				// try later!
-				dlGetUrl(object, callback);
+				var retry = setInterval(function() {
+					if (!fetchingFile) {
+						fetchingFile = true;
+						dlGetUrl(object, callback);
+						clearInterval(retry);
+					}
+				}, 100);
 			}, dl_retryinterval);
 		}
 	});

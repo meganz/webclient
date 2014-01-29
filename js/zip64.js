@@ -97,7 +97,7 @@ function dlZipIO(dl, dl_id) {
 		, queue = []
 		, current = null
 		, gOffset = 0
-		, realIO = new dlMethod(dl_id) 
+		, realIO = new dlMethod(dl_id, dl) 
 
 	// fake set credentials
 	realIO.begin = function() {}

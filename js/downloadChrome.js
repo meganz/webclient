@@ -2,7 +2,7 @@
 "use strict";
 
 var testSize = 1024 * 1024 * 1024 * 25
-function FileSystemAPI(dl_id) {
+function FileSystemAPI(dl_id, dl) {
 	var dl_quotabytes = 0
 		, IO = this
 		, Fs
@@ -20,6 +20,7 @@ function FileSystemAPI(dl_id) {
 		, dl_filename
 		, zfileEntry
 		, failed = false
+		, dl_storagetype = 0
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -53,6 +54,7 @@ function FileSystemAPI(dl_id) {
 	}
 	// }}}
 
+	// dl_createtmpfile  {{{
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
@@ -118,19 +120,62 @@ function FileSystemAPI(dl_id) {
 		}, errorHandler('getDirectory'));
 
 	}
+	// }}}
+
+	function dl_getspace(reqsize, next) {
+		DEBUG("reqsize", reqsize);
+
+		function retry() {
+			dl_getspace(reqsize, next);
+		}
+
+		navigator.webkitPersistentStorage.queryUsageAndQuota(function(used, remaining)  {
+			navigator.webkitTemporaryStorage.queryUsageAndQuota(function(tused,tremaining) {				
+				if (used > 0 || remaining > 0) {
+					dl_storagetype = 1
+					if (remaining < reqsize) {
+						clearit(1, 300, function() {
+							retry();
+						});
+					} else {
+						next(true);
+					}
+				} else {
+					// check if standard temporary quota is sufficient to proceed:
+					dl_storagetype = 0
+					if (tremaining > reqsize) {
+						next(true);
+					} else if (tused+tremaining > reqsize) {
+						clearit(0,300,function() {
+							retry();
+						});
+					} else {
+						// ran out of 20% of 50% of free diskspace -> request persistent storage to be able to use all remaining disk space:
+						navigator.webkitPersistentStorage.requestQuota(1024*1024*1024*100, function(grantedBytes) {
+							if (grantedBytes == 0) return retry();
+
+							dl_storagetype = 1;
+							window.webkitRequestFileSystem(PERSISTENT, grantedBytes, function(fs) {
+								next(true);
+							}, retry);
+						}, retry);
+					}	
+				}
+			});
+		}, next);
+	}
 
 	// Check if the file can be written, return true
 	// or fail otherwise
 	function check() {
-		if(typeof FileSystemAPI.storagetype === 'undefined') {
-			DEBUG('StorageType is not yet initialized...');
-		}
-		window.requestFileSystem(
-			FileSystemAPI.storagetype || 0,
-			testSize, 
-			dl_createtmpfile,
-			errorHandler('RequestFileSystem')
-		);
+		dl_getspace(dl.size, function() {
+			window.requestFileSystem(
+				dl_storagetype,
+				dl.size,
+				dl_createtmpfile,
+				errorHandler('RequestFileSystem')
+			);
+		});
 	}
 
 	IO.write = function(buffer, position, done) {
@@ -177,6 +222,8 @@ function FileSystemAPI(dl_id) {
 		check();
 	};
 }
+
+window.requestFileSystem = window.webkitRequestFileSystem;
 
 FileSystemAPI.init = function dl_getspace(storagetype, minsize) {
 	storagetype = storagetype || 0;

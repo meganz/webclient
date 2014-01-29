@@ -98,12 +98,15 @@ function dlZipIO(dl, dl_id) {
 		, current = null
 		, gOffset = 0
 		, realIO = new dlMethod(dl_id, dl) 
+		, ready = false;
 
 	// fake set credentials
-	realIO.begin = function() {}
-	realIO.setCredentials();
+	realIO.begin = function() {
+		ready = true;
+	}
 
 	this.size = 0
+	this.files = 0
 	this.progress	= 0
 	this.dl_xr	= getxr()
 
@@ -128,7 +131,22 @@ function dlZipIO(dl, dl_id) {
 	 *	Peform real write 
 	 */
 	function doWrite(buffer, next) {
-		realIO.write(buffer, gOffset, next || function() {});
+		if (!ready) {
+			/**
+			 * writer is not ready but 
+			 * we cannot call ourself, the system is counting that
+			 * gOffset is modified right away
+			 */
+			var pos = gOffset;
+			var retry = setInterval(function() {
+				if (ready) {
+					realIO.write(buffer, pos, next || function() {});
+					clearInterval(retry);
+				}
+			}, 100)
+		} else {
+			realIO.write(buffer, gOffset, next || function() {});
+		}
 		gOffset += buffer.length;
 	}
 
@@ -137,12 +155,15 @@ function dlZipIO(dl, dl_id) {
 			, expected = 0 /* next chunk */
 
 		this.size += file.size
+		this.files++;
 
 		queue.push(file.id);
 
 		return function (buffer, pos, next) {
 			if (!ZipObject) {
-				ZipObject = new ZIPClass(self.size);
+				realIO.is_zip = true
+				realIO.setCredentials("", self.size + self.files*1024);
+				ZipObject = new ZIPClass(self.size + self.files*1024);
 			}
 
 			if (current === null) {

@@ -935,7 +935,7 @@ function initContextUI()
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined')
 		{
 			if ($.sd != 'undefined') dl_queue[$.sd]=false;			
-			dl_cancel();
+			dl_cancel(0xBADF);
 			startdownload();
 		}
 		if ($.su) startupload();

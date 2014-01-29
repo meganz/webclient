@@ -102,6 +102,8 @@ function startupload()
 	}
 	catch(e)
 	{
+		if (d) console.log('FINGERPRINT ERROR', e.message || e);
+
 		initupload1();	
 	}
 }
@@ -734,7 +736,7 @@ function ul_dispatch_read()
 			{
 				p = parseInt(p);
 
-				if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
+		/*		if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
 				{
 					var len = ul_readq[p];
 
@@ -747,7 +749,7 @@ function ul_dispatch_read()
 					}, 30);
 
 					break;
-				}
+				} */
 
 				var blob;
 				if ((ul = ul_queue[ul_queue_num].slice) || (ul_queue[ul_queue_num].mozSlice))

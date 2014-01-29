@@ -2226,10 +2226,17 @@ function crypto_share_rsa2aes()
 
 	scope.fingerprint = function(uq_entry,callback)
 	{
+		if (!(uq_entry && uq_entry.name))
+		{
+			if (d) console.log('CHECK THIS', 'Unable to generate fingerprint');
+			if (d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+			
+			throw new Error('Invalid upload entry for fingerprint');
+		}
+		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+
 		var fr = new FileReader();
 		var size = uq_entry.size;
-
-		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
 
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)

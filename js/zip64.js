@@ -168,7 +168,7 @@ function dlZipIO(dl, dl_id) {
 
 			if (current === null) {
 				current = file.id;
-				queue.splice($.inArray(file.id, queue),1);
+				removeValue(file.id, queue);
 			}
 
 			if (current != file.id || expected != pos) {

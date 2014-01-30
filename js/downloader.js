@@ -238,9 +238,10 @@ function ClassFile(dl) {
 			if (error) {
 				/* failed */
 				fetchingFile = 0;
-				Scheduler.done();
+				Scheduler.done(); /* finish task */
 				setTimeout(function() {
-					dlQueue.push(self);
+					/* retry !*/
+					dlQueue.pushFirst(self);
 				}, dl_retryinterval);
 				return false;
 			}
@@ -330,20 +331,6 @@ var iRealDownloads = 0
 
 function downloader(task) {
 	var Scheduler = this;
-
-	if (task.busy === true) {
-		/**
-		 *	The worker is busy, it happens when the worker failed
-		 *	the error handler is called and it reschedule the task ASAP
-		 *	so the slot is reserved and it can be re-download as soon as 
-		 *	possible
-		 */
-		return setTimeout(function() {
-			// retry!
-			downloader.apply(Scheduler, [task]);
-		}, 200);
-	}
-
 	return task.run(Scheduler);
 }
 

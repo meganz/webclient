@@ -50,6 +50,12 @@ var DEFAULT_CONCURRENCY = 4
 		var args, context;
 		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
+			if (args === null) {
+				/* nothing on the queue? */
+				DEBUG("queue is empty");
+				return false;
+			}
+
 			context = new Context(this, args)
 
 			this._running.push(context)
@@ -84,7 +90,7 @@ var DEFAULT_CONCURRENCY = 4
 				function reschedule(ztask) {
 					ztask = ztask || task
 					tasks.unshift(ztask);
-					that.push(ztask, check_finish);
+					that.pushFirst(ztask, check_finish);
 				}
 
 				return error(reschedule, task, args);
@@ -108,6 +114,18 @@ var DEFAULT_CONCURRENCY = 4
 		}
 	};
 
+	/**
+	 *	Schedule a task to be processed right away (or as soon as possible)
+	 */	
+	queue.prototype.pushFirst = function(task, done) {
+		this._queue.unshift({task: task, callback: done || function() {}});
+		this.process();
+	}
+
+
+	/**
+	 *	Schedule a task, it'll be added last in the queue
+	 */
 	queue.prototype.push = function(task, done) {
 		this._queue.push({task: task, callback: done || function() {}});
 		this.process();

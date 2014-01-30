@@ -16,6 +16,30 @@ $.len = function(obj) {
 }
 
 /**
+ *	Global object which can be used to pause/resume
+ *	a given file (and their chunks/files)
+ */
+var DownloadManager = new function() {
+	var self = this
+		, locks = []
+
+	self.pause = function(pattern) {
+		if (typeof pattern == "object") {
+			locks.push(pattern);
+		}
+	}
+
+	self.release = function(pattern) {
+		removeValue(locks, pattern);
+	}
+
+	self.enabled = function(task) {
+		return true;
+	}
+
+}
+
+/**
  *	Override the downloader scheduler method.
  *	The idea is to select chunks from the same
  *	file_id, always
@@ -23,33 +47,30 @@ $.len = function(obj) {
 dlQueue.getNextTask = (function() {
 	/* private variable to keep in track
 	   the current file id */
-	var current = null; 
+	var current = null
+		, DM = DownloadManager
+
 	return function() {
 		var queue = {}
 			, self = this
-			, candidate
+			, candidate = null
 
-		if (current) {
-			$.each(self._queue, function(p, pzTask) {
-				if (pzTask.task.download && pzTask.task.download.dl_id == current) {
-					candidate = p;
-					return false; /* break */
-				}
-				if (pzTask.task instanceof ClassChunk) {
-					/* make it our candidate but don't break the loop */
-					candidate = p;
-				}
-			});
+		$.each(self._queue, function(p, pzTask) {
+			if (!DM.enabled(pzTask.task)) return;
+			if (pzTask.task.download && pzTask.task.download.dl_id == current) {
+				candidate = p;
+				return false; /* break */
+			}
+			if (candidate === null) {
+				/* make it our candidate but don't break the loop */
+				candidate = p;
+			}
+		});
+
+		if (candidate !== null)  {
+			candidate = self._queue.splice(candidate, 1)[0]
+			current = (candidate.task.download||{}).dl_id;
 		}
-
-		if (candidate) {
-			candidate = self._queue.splice(candidate, 1);
-		} else {
-			/** just pick up the older chunk */
-			candidate =  self._queue.shift();
-		}
-
-		current = candidate ? (candidate.task.download||{}).dl_id : null;
 
 		return candidate;
 	};
@@ -152,8 +173,6 @@ function failureFunction(reschedule, task, args) {
 	var code = args[1] || 0
 
 	/**  block the task and reschedule */
-	task.busy = true; 
-	reschedule(); 
 
 	if (code == 509) {
 		var t = new Date().getTime();
@@ -161,7 +180,7 @@ function failureFunction(reschedule, task, args) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(task.download.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
-				task.busy = false; /* let it go */
+				reschedule(); 
 			}, 60000);
 			return;
 		}		
@@ -172,9 +191,11 @@ function failureFunction(reschedule, task, args) {
 	setTimeout(function() {
 		var range = (task.url||"").replace(/.+\//, '');
 		dlGetUrl(task.download, function (error, res, o) {
-			task.url = res.g + '/' + range; /* new url */
-			task.busy = false; /* let it go */
-		}, true);
+			if (!error) {
+				task.url = res.g + '/' + range; /* new url */
+			}
+			reschedule(); 
+		});
 	}, dl_retryinterval);
 }
 
@@ -227,7 +248,7 @@ function dl_reportstatus(num, code)
 	}
 }
 
-function dlGetUrl(object, callback, do_retry) {
+function dlGetUrl(object, callback) {
 	var req = { 
 		a : 'g', 
 		g : 1, 
@@ -269,15 +290,7 @@ function dlGetUrl(object, callback, do_retry) {
 			}
 			
 			dl_retryinterval *= 1.2;
-			fetchingFile = 0;
-			if (do_retry) {
-				setTimeout(function() {
-					// try later!
-					dlGetUrl(object, callback, do_retry);
-				}, dl_retryinterval);
-			} else {
-				callback(new Error("failed"))
-			}
+			callback(new Error("failed"))
 		}
 	});
 }

@@ -517,3 +517,10 @@ function dlError(text) {
 		alert(text + ' ' + e);
 	};
 }
+
+/**
+ *	Remove an element from an *array*
+ */
+function removeValue(array, value) {
+	array.splice($.inArray(value, array), 1);
+};

@@ -26,6 +26,9 @@ var DEFAULT_CONCURRENCY = 4
 			queue._running.splice($.inArray(this, queue._running),1);
 			queue.trigger('done', args)
 			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
+			if (args.__ondone) {
+				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
+			}
 			queue.process();
 		}
 	}

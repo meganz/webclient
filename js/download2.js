@@ -25,6 +25,12 @@ var DownloadManager = new function() {
 
 	function doesMatch(task, pattern) {
 		var _match = true;
+		if (typeof pattern == "string") {
+			var parts = pattern.split(/:/);
+			pattern = {};
+			pattern[parts[0]] = parts[1];
+		}
+
 		$.each(pattern, function(key, value) {
 			if (!task.task[key] || !task.task[key] === value) {
 				_match = false;
@@ -46,14 +52,20 @@ var DownloadManager = new function() {
 		if (work instanceof ClassFile || work instanceof ClassChunk) {
 			var pattern = {};
 			if (work.task.zipid >= 0) { 
-				pattern = {zipid: work.task.zipid};
+				pattern = 'zipid:' + work.task.zipid;
 			} else {
-				pattern = {id: work.task.dl_id};
+				pattern = 'id:' + work.task.dl_id;
 			}
-			DEBUG("file failed, pausing", pattern);
-			console.warn("file failed, pausing", pattern);
-			locks.__onsuccess = function() {
-				DEBUG("release");
+
+			if ($.inArray(pattern, locks) == -1) {
+				// we want to save locks once
+				locks.push(pattern);
+			}
+
+			DEBUG("file failed, pausing", pattern, locks);
+			work.__canretry = true;
+			work.__ondone   = function() {
+				self.release(pattern);
 			};
 		}
 	}
@@ -70,7 +82,7 @@ var DownloadManager = new function() {
 				return false; /* break */
 			}
 		});
-		return enabled;
+		return enabled || task.__canretry;
 	}
 
 }

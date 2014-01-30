@@ -219,6 +219,7 @@ var dl_lastquotawarning = 0
 
 function failureFunction(reschedule, task, args) {
 	var code = args[1] || 0
+		, dl = task.task.download
 
 	DownloadManager.pause(task);
 
@@ -226,7 +227,7 @@ function failureFunction(reschedule, task, args) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
 			dl_lastquotawarning = t;
-			dl_reportstatus(task.download.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
+			dl_reportstatus(dl.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
 				reschedule(); 
 			}, 60000);
@@ -234,11 +235,12 @@ function failureFunction(reschedule, task, args) {
 		}		
 	}
 
-	dl_reportstatus(task.download.pos, EAGAIN);
+	dl_reportstatus(dl.pos, EAGAIN);
+
 	dl_retryinterval *= 1.2;
 	setTimeout(function() {
-		var range = (task.url||"").replace(/.+\//, '');
-		dlGetUrl(task.download, function (error, res, o) {
+		var range = (dl.url||"").replace(/.+\//, '');
+		dlGetUrl(dl, function (error, res, o) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}

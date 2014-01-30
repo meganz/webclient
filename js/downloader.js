@@ -229,7 +229,10 @@ function ClassFile(dl) {
 			}, failureFunction);
 	
 			// notify the UI
-			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
+			dl.startUI = function() {
+				dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
+			};
+			dl.startUI();
 			fetchingFile = 0;
 			Scheduler.done();
 		}

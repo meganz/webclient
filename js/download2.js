@@ -51,7 +51,7 @@ var DownloadManager = new function() {
 	self.pause = function(work) {
 		if (work instanceof ClassFile || work instanceof ClassChunk) {
 			var pattern = {};
-			if (work.task.zipid >= 0) { 
+			if (typeof work.task.zipid == "number") { 
 				pattern = 'zipid:' + work.task.zipid;
 			} else {
 				pattern = 'id:' + work.task.dl_id;
@@ -271,6 +271,9 @@ DownloadQueue.prototype.push = function() {
 	if (!use_workers) {
 		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 	}
+
+	/* In case it failed and it was manually cancelled and retried */
+	DownloadManager.remove("id:" + dl_id);
 
 	dl.pos		= id // download position in the queue
 	dl.dl_id	= dl_id;  // download id

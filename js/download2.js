@@ -62,10 +62,11 @@ var DownloadManager = new function() {
 				locks.push(pattern);
 			}
 
-			DEBUG("file failed, pausing", pattern, locks);
 			work.__canretry = true;
 			work.__ondone   = function() {
-				self.release(pattern);
+				work.__ondone = function() {
+					self.release(pattern);
+				};
 			};
 		}
 	}

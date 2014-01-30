@@ -54,7 +54,7 @@ var DownloadManager = new function() {
 			if (typeof work.task.zipid == "number") { 
 				pattern = 'zipid:' + work.task.zipid;
 			} else {
-				pattern = 'id:' + work.task.dl_id;
+				pattern = 'id:' + work.task.id;
 			}
 
 			if ($.inArray(pattern, locks) == -1) {

@@ -237,8 +237,9 @@ function ClassFile(dl) {
 		dlGetUrl(dl, function(error, res, o) {
 			if (error) {
 				/* failed */
+				DownloadManager.pause(self); 
 				fetchingFile = 0;
-				Scheduler.done(); /* finish task */
+				Scheduler.done(); /* release worker */
 				setTimeout(function() {
 					/* retry !*/
 					dlQueue.pushFirst(self);

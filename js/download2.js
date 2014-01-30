@@ -23,9 +23,38 @@ var DownloadManager = new function() {
 	var self = this
 		, locks = []
 
-	self.pause = function(pattern) {
-		if (typeof pattern == "object") {
-			locks.push(pattern);
+	function doesMatch(task, pattern) {
+		var _match = true;
+		$.each(pattern, function(key, value) {
+			if (!task.task[key] || !task.task[key] === value) {
+				_match = false;
+				return false;
+			}
+		});
+		return _match;
+	}
+
+	self.remove = function(pattern) {
+		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
+			var match = doesMatch(obj, pattern);
+			if (match) DEBUG("remove task " + obj.__tid);
+			return !match;
+		});
+	};
+
+	self.pause = function(work) {
+		if (work instanceof ClassFile || work instanceof ClassChunk) {
+			var pattern = {};
+			if (work.task.zipid >= 0) { 
+				pattern = {zipid: work.task.zipid};
+			} else {
+				pattern = {id: work.task.dl_id};
+			}
+			DEBUG("file failed, pausing", pattern);
+			console.warn("file failed, pausing", pattern);
+			locks.__onsuccess = function() {
+				DEBUG("release");
+			};
 		}
 	}
 
@@ -34,7 +63,14 @@ var DownloadManager = new function() {
 	}
 
 	self.enabled = function(task) {
-		return true;
+		var enabled = true;
+		$.each(locks, function(i, pattern) {
+			if (doesMatch(task, pattern)) {
+				enabled = false;
+				return false; /* break */
+			}
+		});
+		return enabled;
 	}
 
 }
@@ -56,8 +92,8 @@ dlQueue.getNextTask = (function() {
 			, candidate = null
 
 		$.each(self._queue, function(p, pzTask) {
-			if (!DM.enabled(pzTask.task)) return;
-			if (pzTask.task.download && pzTask.task.download.dl_id == current) {
+			if (!DM.enabled(pzTask)) return;
+			if (pzTask.download && pzTask.download.dl_id == current) {
 				candidate = p;
 				return false; /* break */
 			}
@@ -69,7 +105,7 @@ dlQueue.getNextTask = (function() {
 
 		if (candidate !== null)  {
 			candidate = self._queue.splice(candidate, 1)[0]
-			current = (candidate.task.download||{}).dl_id;
+			current = (candidate.download||{}).dl_id;
 		}
 
 		return candidate;
@@ -172,7 +208,7 @@ var dl_lastquotawarning = 0
 function failureFunction(reschedule, task, args) {
 	var code = args[1] || 0
 
-	/**  block the task and reschedule */
+	DownloadManager.pause(task);
 
 	if (code == 509) {
 		var t = new Date().getTime();

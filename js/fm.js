@@ -926,14 +926,12 @@ function initContextUI()
 		});				
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
 			DEBUG("cancelled file " + $.sd);
-			dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-				return $.zipkill ? obj.task.task.zipid !== $.zipkill
-					: obj.task.task.id !== dl_queue[$.sd].dl_id;
-			});
-			if ($.sd) {
+
+			if (dl_queue[$.sd]) {
+				DownloadManager.remove({ id: dl_queue[$.sd].dl_id });
 				dl_queue[$.sd].cancelled = true;
-			}
-			if ($.zipkill) {
+			} else if ($.zipkill >= 0) {
+				DownloadManager.remove({ zipid: $.zipkill });
 				$.each(dl_queue, function(i, file) {
 					if (file.zipid == $.zipkill) {
 						file.cancelled = true;

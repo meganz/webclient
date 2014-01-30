@@ -168,7 +168,7 @@ function dlZipIO(dl, dl_id) {
 
 			if (current === null) {
 				current = file.id;
-				removeValue(file.id, queue);
+				removeValue(queue,file.id);
 			}
 
 			if (current != file.id || expected != pos) {

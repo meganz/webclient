@@ -12,6 +12,7 @@ var DEFAULT_CONCURRENCY = 4
 		}
 
 		this._concurrency	= concurrency;
+		this._callback		= [];
 		this._queue			= [];
 		this._worker		= worker;
 		this._running		= [];
@@ -23,8 +24,8 @@ var DEFAULT_CONCURRENCY = 4
 		this.task = args;
 		this.done = function() {
 			queue._running.splice($.inArray(this, queue._running),1);
-			queue.trigger('done', args.task)
-			args.callback(args.task, Array.prototype.slice.call(arguments, 0))
+			queue.trigger('done', args)
+			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
 			queue.process();
 		}
 	}
@@ -46,20 +47,24 @@ var DEFAULT_CONCURRENCY = 4
 		return this._paused;
 	}
 
+
 	queue.prototype.process = function() {
 		var args, context;
 		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
 				/* nothing on the queue? */
-				DEBUG("queue is empty");
+				var that = this;
+				setTimeout(function() {
+					that.process(); /* re-run scheduler */
+				}, 100);
 				return false;
 			}
 
 			context = new Context(this, args)
 
 			this._running.push(context)
-			this._worker.apply(context, [args.task])
+			this._worker.apply(context, [args])
 		}
 
 		if (this._queue.length == 0) {
@@ -118,16 +123,21 @@ var DEFAULT_CONCURRENCY = 4
 	 *	Schedule a task to be processed right away (or as soon as possible)
 	 */	
 	queue.prototype.pushFirst = function(task, done) {
-		this._queue.unshift({task: task, callback: done || function() {}});
+		this.process();
+		task.__tid = id++;
+		this._queue.unshift(task);
+		this._callback[task.__tid] = done || function() {};
 		this.process();
 	}
-
 
 	/**
 	 *	Schedule a task, it'll be added last in the queue
 	 */
+	var id = 0;
 	queue.prototype.push = function(task, done) {
-		this._queue.push({task: task, callback: done || function() {}});
+		task.__tid = id++;
+		this._queue.push(task);
+		this._callback[task.__tid] = done || function() {};
 		this.process();
 	}
 

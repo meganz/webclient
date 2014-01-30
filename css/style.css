@@ -6619,7 +6619,6 @@ div .fm-tree-folder.dragover {
 .fm-share-empty {
 	background-image: url(../images/mega/share-folder.png);
 	background-position: center 60px;
-	background-size: 200px auto;
 	background-repeat: no-repeat;
 	font-size: 20px;
 	text-align: center;
@@ -14040,6 +14039,10 @@ a.ff-extension-button:hover {
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.fm-share-empty {
+ background-image: url(../images/mega/share-folder@2x.png);
+ background-size: 200px auto;
+}
 .sync-top-logo, .sync-short-block li {
  background-image: url(../images/mega/sync_nw@2x.png);
  background-size: 148px auto;

@@ -158,6 +158,7 @@ function ClassChunk(task) {
 // File fetch {{{
 var fetchingFile = null
 function ClassFile(dl) {
+	var self = this
 	this.task = dl;
 
 	this.run = function(Scheduler)  {
@@ -169,7 +170,7 @@ function ClassFile(dl) {
 			Scheduler.done();
 			var task = this;
 			setTimeout(function() {
-				dlQueue.push(task);
+				dlQueue.push(self);
 			}, 100);
 			return;
 		}
@@ -233,7 +234,16 @@ function ClassFile(dl) {
 			Scheduler.done();
 		}
 	
-		dlGetUrl(dl, function(res, o) {
+		dlGetUrl(dl, function(error, res, o) {
+			if (error) {
+				/* failed */
+				fetchingFile = 0;
+				Scheduler.done();
+				setTimeout(function() {
+					dlQueue.push(self);
+				}, dl_retryinterval);
+				return false;
+			}
 			var info = dl_queue.splitFile(res.s);
 			dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);

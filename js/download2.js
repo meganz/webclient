@@ -171,10 +171,10 @@ function failureFunction(reschedule, task, args) {
 	dl_retryinterval *= 1.2;
 	setTimeout(function() {
 		var range = (task.url||"").replace(/.+\//, '');
-		dlGetUrl(task.download, function (res, o) {
+		dlGetUrl(task.download, function (error, res, o) {
 			task.url = res.g + '/' + range; /* new url */
 			task.busy = false; /* let it go */
-		});
+		}, true);
 	}, dl_retryinterval);
 }
 
@@ -227,8 +227,7 @@ function dl_reportstatus(num, code)
 	}
 }
 
-
-function dlGetUrl(object, callback) {
+function dlGetUrl(object, callback, do_retry) {
 	var req = { 
 		a : 'g', 
 		g : 1, 
@@ -257,7 +256,7 @@ function dlGetUrl(object, callback) {
 							if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
 								dl.data = new ArrayBuffer(res.s);
 							}
-							return callback(res, o, object);
+							return callback(false, res, o, object);
 						} else {
 							dl_reportstatus(object.pos, EKEY);
 						}
@@ -270,17 +269,15 @@ function dlGetUrl(object, callback) {
 			}
 			
 			dl_retryinterval *= 1.2;
-			fetchingFile = false;
-			setTimeout(function() {
-				// try later!
-				var retry = setInterval(function() {
-					if (!fetchingFile) {
-						fetchingFile = true;
-						dlGetUrl(object, callback);
-						clearInterval(retry);
-					}
-				}, 100);
-			}, dl_retryinterval);
+			fetchingFile = 0;
+			if (do_retry) {
+				setTimeout(function() {
+					// try later!
+					dlGetUrl(object, callback, do_retry);
+				}, dl_retryinterval);
+			} else {
+				callback(new Error("failed"))
+			}
 		}
 	});
 }

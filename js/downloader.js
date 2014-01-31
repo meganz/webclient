@@ -148,6 +148,7 @@ function ClassChunk(task) {
 					}
 				} else if (!download.cancelled) {
 					// we must reschedule this download	
+					Progress.progress -= prevProgress; /* this never happened */
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED WITH " + this.status);
 	

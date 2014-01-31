@@ -274,7 +274,7 @@ DownloadQueue.prototype.push = function() {
 	}
 
 	/* In case it failed and it was manually cancelled and retried */
-	DownloadManager.remove("id:" + dl_id);
+	DownloadManager.release("id:" + dl_id);
 
 	dl.pos		= id // download position in the queue
 	dl.dl_id	= dl_id;  // download id

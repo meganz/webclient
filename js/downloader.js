@@ -1,8 +1,19 @@
+if (d) {
+	var _allxhr = [];
+	function abortAll() {
+		$.each(_allxhr, function(k, xhr) {
+			try { xhr.abort(); } catch (e) {}
+		});
+	}
+}
 
 function getXhrObject() {
 	var dl_xhr = new XMLHttpRequest;
 	if (dl_xhr.overrideMimeType) {
 		dl_xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	}
+	if (d) {
+		_allxhr.push(dl_xhr);
 	}
 	return dl_xhr;
 }

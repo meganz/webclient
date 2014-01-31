@@ -53,6 +53,7 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.process = function() {
 		var args, context;
+		DEBUG("queue");
 		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {

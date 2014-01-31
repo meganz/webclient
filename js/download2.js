@@ -65,7 +65,6 @@ var DownloadManager = new function() {
 			work.__canretry = true;
 			work.__ondone   = function() {
 				work.__ondone = function() {
-					DEBUG("FIXED");
 					self.release(pattern);
 				};
 			};

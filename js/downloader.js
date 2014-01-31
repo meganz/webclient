@@ -21,6 +21,7 @@ function getXhrObject() {
 // Chunk fetch {{{
 function ClassChunk(task) {
 	this.task = task;
+	this.dl   = task.download;
 
 	this.run = function(Scheduler) {
 		iRealDownloads++;
@@ -74,7 +75,7 @@ function ClassChunk(task) {
 				// too soon
 				return false;
 			}
-
+			
 			download.onDownloadProgress(
 				download.dl_id, 
 				Progress.progress, // global progress
@@ -122,18 +123,20 @@ function ClassChunk(task) {
 	
 			Progress.progress += e.loaded - prevProgress;
 			prevProgress = e.loaded
+
 			updateProgress();
 		};
-	
+
 		xhr.onreadystatechange = function() {
 			if (isCancelled()) return;
 			if (this.readyState == this.DONE) {
 				var r = this.response || {};
-				Progress.progress += r.byteLength - prevProgress;
-				iRealDownloads--;
-				updateProgress(true);
 	
 				if (r.byteLength == size) {
+					Progress.progress += r.byteLength - prevProgress;
+					iRealDownloads--;
+					updateProgress(true);
+
 					if (have_ab) {
 						if (navigator.appName != 'Opera') {
 							io.dl_bytesreceived += r.byteLength;
@@ -171,6 +174,7 @@ var fetchingFile = null
 function ClassFile(dl) {
 	var self = this
 	this.task = dl;
+	this.dl   = dl;
 
 	this.run = function(Scheduler)  {
 		/**

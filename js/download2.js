@@ -72,6 +72,7 @@ var DownloadManager = new function() {
 	}
 
 	self.release = function(pattern) {
+		DEBUG("release lock to ", pattern);
 		removeValue(locks, pattern);
 	}
 

@@ -23,7 +23,13 @@ var DEFAULT_CONCURRENCY = 4
 	function Context(queue, args) {
 		this.task = args;
 		this.done = function() {
-			queue._running.splice($.inArray(this, queue._running),1);
+			var id = $.inArray(this, queue._running);
+			if (id == -1) {
+				DEBUG("task already finished");
+				return;
+			}
+
+			queue._running.splice(id,1);
 			queue.trigger('done', args)
 			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
 			delete queue._callback[args.__tid];
@@ -54,7 +60,6 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.process = function() {
 		var args, context;
-		DEBUG("queue");
 		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {

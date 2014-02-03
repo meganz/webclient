@@ -17,6 +17,10 @@ var DEFAULT_CONCURRENCY = 4
 		this._worker		= worker;
 		this._running		= [];
 		this._paused		= false;
+		var self = this;
+		setInterval(function() {
+			//self.process();	
+		}, 100);
 	}
 	inherits(queue, MegaEvents)
 
@@ -26,7 +30,7 @@ var DEFAULT_CONCURRENCY = 4
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
 				DEBUG("task already finished");
-				return;
+				return queue.process();
 			}
 
 			queue._running.splice(id,1);
@@ -38,6 +42,15 @@ var DEFAULT_CONCURRENCY = 4
 			}
 			queue.process();
 		}
+	}
+
+	queue.prototype.debug = function() {
+		DEBUG({ 
+			running: this._running.length, 
+			queued:  this._queue.length,
+			paused:  this._paused,
+			size:    this._concurrency,
+		});
 	}
 
 	queue.prototype.getNextTask = function() {
@@ -57,7 +70,6 @@ var DEFAULT_CONCURRENCY = 4
 		return this._paused;
 	}
 
-
 	queue.prototype.process = function() {
 		var args, context;
 		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
@@ -65,9 +77,9 @@ var DEFAULT_CONCURRENCY = 4
 			if (args === null) {
 				/* nothing on the queue? */
 				var that = this;
-				setTimeout(function() {
+				Later(function() {
 					that.process(); /* re-run scheduler */
-				}, 100);
+				});
 				return false;
 			}
 

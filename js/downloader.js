@@ -218,6 +218,7 @@ function ClassFile(dl) {
 			if (tasks.length == 0) {
 				emptyFile = true;
 				tasks.push({ 
+					task: {  zipid: dl.zipid, id: dl.id },
 					run: function(Scheduler) {
 						dl.io.write("", 0, function() {
 							Scheduler.done();	

@@ -6,6 +6,13 @@ var dlMethod
 	, dlDecrypter = new QueueClass(decrypter)
 	, dl_id
 
+dlQueue.push = function(x) {
+	if (!x.task) {
+		throw new Error("invalid error");
+	}
+	QueueClass.prototype.push.apply(dlQueue, arguments);
+};
+
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
 	var L=0;
@@ -32,13 +39,17 @@ var DownloadManager = new function() {
 		}
 
 		$.each(pattern, function(key, value) {
-			if (!task.task[key] || !task.task[key] === value) {
+			if (task.task[key] || task.task[key] === value) {
 				_match = false;
 				return false;
 			}
 		});
 		return _match;
 	}
+
+	self.debug = function() {
+		DEBUG("blocked patterns", locks);
+	};
 
 	self.remove = function(pattern) {
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
@@ -120,6 +131,11 @@ dlQueue.getNextTask = (function() {
 		if (candidate !== null)  {
 			candidate = self._queue.splice(candidate, 1)[0]
 			current = (candidate.download||{}).dl_id;
+		}
+
+		if (false && !candidate) {
+			DEBUG("next task is", candidate, fetchingFile, self._queue);
+			DM.debug();
 		}
 
 		return candidate;
@@ -315,6 +331,8 @@ function dlGetUrl(object, callback) {
 	} else if (object.id) {
 		req.n = object.id;
 	}
+
+	DEBUG("get file info for ", req);
 
 	api_req(req, {
 		callback: function(res, rex) {

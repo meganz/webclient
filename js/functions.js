@@ -7,6 +7,11 @@ function asciionly(text)
 	else return true;
 }
 
+function Later(callback) {
+	setTimeout(function() {
+		callback();
+	}, 1000);
+}
 
 function jScrollFade(id)
 {

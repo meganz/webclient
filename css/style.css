@@ -6149,6 +6149,55 @@ div .fm-tree-folder.dragover {
 	height: 126px;
 	margin: -63px 0 0 -250px;
 }
+.fm-dialog.slideshow {
+	min-width: 500px;
+	max-width:100%;
+	max-height:100%;
+	margin: -250px 0 0 -250px;
+}
+.slideshow-content {
+	position: relative;
+}
+.slideshow-back, .slideshow-next {
+	width: 54px;
+	height: 54px;
+	position: absolute;
+	top: 50%;
+	left: 20px;
+	margin: -27px 0 0 0;
+	background-image: url(../images/mega/photo-navigation.png);
+	background-position: 0 0;
+	background-repeat: no-repeat;
+	-webkit-transition: all 300ms ease-in-out;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-ms-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	z-index: 100;
+}
+.slideshow-next {
+	left: auto;
+	right: 20px;
+	background-position: right 0;
+}
+.slideshow-back.active {
+	background-position: 0 bottom;
+	cursor: pointer;
+}
+.slideshow-next.active {
+	background-position: right bottom;
+	cursor: pointer;
+}
+.slideshow-content:hover .slideshow-back, .slideshow-content:hover .slideshow-next {
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
 .fm-dialog.download-dialog {
 	width: 504px;
 	min-height: 100px;
@@ -6619,9 +6668,8 @@ div .fm-tree-folder.dragover {
 	-moz-box-sizing: border-box;
 }
 .fm-share-empty {
-	background-image: url(../images/mega/share-folder.png);
+	background-image: url(../images/mega/share-folder.png?v=1);
 	background-position: center 60px;
-	background-size: 200px auto;
 	background-repeat: no-repeat;
 	font-size: 20px;
 	text-align: center;
@@ -14042,6 +14090,13 @@ a.ff-extension-button:hover {
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.slideshow-back, .slideshow-next {
+ background-image:url(../images/mega/photo-navigation@2x.png);
+}
+.fm-share-empty {
+ background-image: url(../images/mega/share-folder@2x.png?v=1);
+ background-size: 200px auto;
+}
 .sync-top-logo, .sync-short-block li {
  background-image: url(../images/mega/sync_nw@2x.png);
  background-size: 148px auto;
@@ -15103,6 +15158,36 @@ transform: rotate(900deg);
 body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
 	direction: rtl;
 }
+.rtl .nlanguage-bottom {
+	padding: 12px 30px 0 20px;
+	float: left;
+	background-position: right -252px;
+}
+.rtl .blog-new-search input, .rtl .new-bottom-pages.affiliate h1, .rtl .new-affiliate-mid-header, .rtl .top-login-input-block input, .rtl .affiliate-input-block input, .rtl input, .rtl select, .rtl .select div {
+	text-align: left;
+}
+.rtl .dev-new-button, .rtl .copyrights-bottom div.checkdiv {
+	float: right;
+}
+.rtl .terms-agent-info {
+	padding: 0 32px 0 32px;
+}
+.rtl .terms-agent-info.name {
+	background-position: right 6px;
+}
+.rtl .terms-agent-info.adress {
+	background-position: right -101px;
+}
+.rtl .terms-agent-info.email {
+	margin: 0;
+	background-position: right -229px;
+}
+.rtl .copyrights-bottom .new-registration-checkbox .radio-txt {
+	margin: -1px 35px 0 0;
+}
+.rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div {
+	direction: ltr;
+}
 .rtl .fm-tree-header.cloud-drive-item, .rtl .fm-tree-header.cloud-drive-item.active.dragover, .rtl .fm-tree-header.cloud-drive-item.dragover {
 	background-position: 97% -2253px;
 	background-position: -webkit-calc(100% - 18px) -2253px;
@@ -15208,6 +15293,321 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 	background-position: 97% -2599px;
 	background-position: -webkit-calc(100% - 16px) -2599px;
 	background-position: right 16px -2599px;
+}
+.rtl .tranfer-filetype-txt, .rtl .fm-browsers-txt, .rtl .fm-flags-txt, .rtl.fm-member-icon-txt {
+	padding: 0 28px 0 0;
+	text-align: right;
+}
+.rtl .transfer-table th, .rtl .transfer-table td, .rtl .transfer-table-header th, .rtl .grid-table th, .rtl .grid-table td, .rtl .grid-share-table th, .rtl .grid-share-table td, .rtl .grid-table-header th, .rtl .contacts-grid-header th, .rtl .contacts-grid-table th, .rtl .contacts-grid-table td {
+	padding-right: 12px;
+	padding-left: 0;
+	text-align: right;
+	border-right: 2px solid white;
+	border-left: 0;
+}
+.rtl .transfer-table td, .rtl .grid-table td, .rtl .grid-share-table td, .rtl .contacts-grid-table td {
+	padding-right: 12px;
+	padding-left: 0;
+	text-align: right;
+	border-right: 0;
+}
+.rtl th.grid-first-th {
+	padding: 0;
+}
+.rtl .fm-new-folder, .rtl .search-files-result {
+	padding: 0 44px 0 10px;
+	background-position: 109% -3357px;
+	background-position: -webkit-calc(100% + 13px) -3357px;
+	background-position: right -13px -3357px;
+}
+.rtl .search-files-result {
+	padding: 0 32px 0 10px;
+	background-position: 104% -11446px;
+	background-position: -webkit-calc(100% + 7px) -11446px;
+	background-position: right -7px -11446px;
+}
+.rtl .fm-new-folder.active, .rtl .fm-new-folder.hovered {
+	background-position: 113% -4513px;
+	background-position: -webkit-calc(100% + 18px) -4513px;
+	background-position: right -18px -4513px;
+}
+.rtl .fm-file-upload, .rtl .search-messages-result {
+	padding: 0 41px 0 10px;
+	background-position: 109% -3422px;
+	background-position: -webkit-calc(100% + 13px) -3422px;
+	background-position: right -13px -3422px;
+}
+.rtl .search-messages-result {
+	padding: 0 40px 0 10px;
+	background-position: 104% -11536px;
+	background-position: -webkit-calc(100% + 6px) -11536px;
+	background-position: right -6px -11536px;
+}
+.rtl .fm-file-upload:hover, .rtl .fm-file-upload.active, .rtl .search-files-result.active, .rtl .search-files-result:hover, .rtl .search-messages-result.active, .rtl .search-messages-result:hover {
+	background-position: 120% -4568px;
+	background-position: -webkit-calc(100% + 20px) -4568px;
+	background-position: right -20px -4568px;
+}
+.rtl .search-files-result:hover, .rtl .search-files-result.active {
+	background-position: 101% -11496px;
+	background-position: -webkit-calc(100% + 1px) -11496px;
+	background-position: right -1px -11496px;
+}
+.rtl .search-messages-result.active, .rtl .search-messages-result:hover {
+	background-position: 104% -11576px;
+	background-position: -webkit-calc(100% + 6px) -11576px;
+	background-position: right -6px -11576px;
+}
+.rtl .fm-folder-upload {
+	padding: 0 41px 0 10px;
+	background-position: 109% -3497px;
+	background-position: -webkit-calc(100% + 13px) -3497px;
+	background-position: right -13px -3497px;
+}
+.rtl .fm-folder-upload:hover, .rtl .fm-folder-upload.active {
+	background-position: 120% -4622px;
+	background-position: -webkit-calc(100% + 20px) -4622px;
+	background-position: right -20px -4622px;
+}
+.rtl .fm-add-user, .rtl .fm-clearbin-button, .rtl .fm-notification-settings {
+	padding: 0 41px 0 10px;
+	background-position: 103% -5571px;
+	background-position: -webkit-calc(100% + 4px) -5571px;
+	background-position: right -4px -5571px;
+}
+.rtl .fm-add-user:hover, .rtl .fm-add-user.active {
+	background-position: 103% -5646px;
+	background-position: -webkit-calc(100% + 4px) -5646px;
+	background-position: right -4px -5646px;
+}
+.rtl .fm-notification-settings {
+	background-position: 108% 4px;
+	background-position: -webkit-calc(100% + 9px) 4px;
+	background-position: right -9px 4px;
+	padding: 0 37px 0 10px;
+}
+.rtl .fm-notification-settings:hover {
+	background-position: 108% -66px;
+	background-position: -webkit-calc(100% + 9px) -66px;
+	background-position: right -9px -66px;
+}
+.rtl .fm-clearbin-button {
+	padding: 0 35px 0 10px;
+	background-position: 106% -8941px;
+	background-position: -webkit-calc(100% + 9px) -8941px;
+	background-position: right -9px -8941px;
+}
+.rtl .fm-clearbin-button:hover, .rtl .fm-clearbin-button.active {
+	background-position: 106% -9006px;
+	background-position: -webkit-calc(100% + 9px) -9006px;
+	background-position: right -9px -9006px;
+}
+.rtl th.grid-first-th {
+	border-right: 0;
+}
+.rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item {
+	padding: 0 35px 0 15px;
+}
+.rtl .context-menu-item {
+	padding: 0 47px 0 15px;
+}
+.rtl .context-menu-item.open-item {
+	background-position: right -6700px;
+}
+.rtl .context-menu-item.open-item:hover {
+	background-position: right -6750px;
+}
+.rtl .context-menu-item.fileupload-item {
+	background-position: 103% -3420px;
+	background-position: -webkit-calc(100% + 6px) -3420px;
+	background-position: right -6px -3420px;
+	padding: 0;
+}
+.rtl .folderupload-item label, .rtl .fileupload-item label {
+	padding: 0 47px 0 15px;
+}
+.rtl .context-menu-item.fileupload-item:hover {
+	background-position: 109% -4566px;
+	background-position: -webkit-calc(100% + 13px) -4566px;
+	background-position: right -13px -4566px;
+}
+.rtl .context-menu-item.folderupload-item {
+	background-position: 103% -3495px;
+	background-position: -webkit-calc(100% + 6px) -3495px;
+	background-position: right -6px -3495px;
+	padding: 0;
+}
+.rtl .context-menu-item.folderupload-item:hover {
+	background-position: 109% -4620px;
+	background-position: -webkit-calc(100% + 13px) -4620px;
+	background-position: right -13px -4620px;
+}
+.rtl .context-menu-item.newfolder-item {
+	background-position: right -6800px;
+}
+.rtl .context-menu-item.newfolder-item:hover {
+	background-position: right -6850px;
+}
+.rtl .context-menu-item.properties-item {
+	background-position: right -6900px;
+}
+.rtl .context-menu-item.properties-item:hover {
+	background-position: right -6950px;
+}
+.rtl .context-menu-item.download-item {
+	background-position: right -7000px;
+}
+.rtl .context-menu-item.download-item:hover {
+	background-position: right -7050px;
+}
+.rtl .context-menu-item.download-standart-item {
+	background-position: right -7100px;
+}
+.rtl .context-menu-item.download-standart-item:hover {
+	background-position: right -7150px;
+}
+.rtl .context-menu-item.rename-item {
+	background-position: right -7200px;
+}
+.rtl .context-menu-item.rename-item:hover {
+	background-position: right -7250px;
+}
+.rtl .context-menu-item.copy-item {
+	background-position: right -7300px;
+}
+.rtl .context-menu-item.copy-item:hover {
+	background-position: right -7350px;
+}
+.rtl .context-menu-item.refresh-item {
+	background-position: right -7400px;
+}
+.rtl .context-menu-item.refresh-item:hover {
+	background-position: right -7440px;
+}
+.rtl .context-menu-item.reply-item {
+	background-position: right -7480px;
+}
+.rtl .context-menu-item.reply-item:hover {
+	background-position: right -7520px;
+}
+.rtl .context-menu-item.forward-item {
+	background-position: right -7560px;
+}
+.rtl .context-menu-item.forward-item:hover {
+	background-position: right -7600px;
+}
+.rtl .context-menu-item.zipdownload-item {
+	background-position: right -7644px;
+}
+.rtl .context-menu-item.zipdownload-item:hover {
+	background-position: right -7694px;
+}
+.rtl .context-menu-item.getlink-item {
+	background-position: right -7744px;
+}
+.rtl .context-menu-item.getlink-item:hover {
+	background-position: right -7794px;
+}
+.rtl .context-menu-item.sharing-item {
+	background-position: right -7844px;
+}
+.rtl .context-menu-item.sharing-item:hover {
+	background-position: right -7894px;
+}
+.rtl .context-menu-item.send-to-contact-item {
+	background-position: right -7944px;
+}
+.rtl .context-menu-item.send-to-contact-item:hover {
+	background-position: right -7994px;
+}
+.rtl .context-menu-item.move-item {
+	background-position: right -8044px;
+}
+.rtl .context-menu-item.move-item:hover {
+	background-position: right -8094px;
+}
+.rtl .context-menu-item.remove-item, .rtl .context-menu-item.clearbin-item, .rtl .context-menu-item.canceltransfer-item {
+	background-position: right -8144px;
+}
+.rtl .context-menu-item.remove-item:hover, .rtl .context-menu-item.clearbin-item:hover, .rtl .context-menu-item.canceltransfer-item:hover {
+	background-position: right -8194px;
+}
+.rtl .context-menu-item.addcontact-item {
+	background-position: right -8244px;
+}
+.rtl .context-menu-item.addcontact-item:hover {
+	background-position: right -8284px;
+}
+.rtl .context-menu-item.add-star-item {
+	background-position: right -8322px;
+}
+.rtl .context-menu-item.add-star-item:hover {
+	background-position: right -8362px;
+}
+.rtl .context-menu-item.reply-to-all {
+	background-position: right -8403px;
+}
+.rtl .context-menu-item.reply-to-all:hover {
+	background-position: right -8443px;
+}
+.rtl .context-menu-item.permissions-item {
+	background-position: -100px -8403px;
+}
+.rtl .context-menu-item.permissions-item:hover {
+	background-position: -100px -8443px;
+}
+.rtl .context-menu-item.select-all {
+	background-position: right -11302px;
+}
+.rtl .context-menu-item.select-all:hover {
+	background-position: right -11372px;
+}
+.rtl .top-search-input {
+	text-align: left;
+}
+.rtl .transfer-type, .rtl .transfer-status {
+	padding: 0 27px 0 0;
+}
+.rtl .transfer-type.safari-downloaded {
+	background-position: 115% -10990px;
+	background-position: -webkit-calc(100% + 30px) -10990px;
+	background-position: right -30px -10990px;
+}
+.rtl .transfer-type.download {
+	background-position: 115% -3979px;
+	background-position: -webkit-calc(100% + 30px) -3979px;
+	background-position: right -30px -3979px;
+}
+.rtl .transfer-type.upload {
+	background-position: 115% -4034px;
+	background-position: -webkit-calc(100% + 30px) -4034px;
+	background-position: right -30px -4034px;
+}
+.rtl .transfer-status.completed {
+	background-position: 115% -4083px;
+	background-position: -webkit-calc(100% + 30px) -4083px;
+	background-position: right -30px -4083px;
+}
+.rtl .transfer-status.queued {
+	background-position: 115% -4138px;
+	background-position: -webkit-calc(100% + 30px) -4138px;
+	background-position: right -30px -4138px;
+}
+.rtl .transfer-status.error {
+	background-position: 115% -10574px;
+	background-position: -webkit-calc(100% + 30px) -10574px;
+	background-position: right -30px -10574px;
+}
+.rtl .transfer-status.initiliazing {
+	background-position: 115% -10513px;
+	background-position: -webkit-calc(100% + 30px) -10513px;
+	background-position: right -30px -10513px;
+}
+.rtl .fm-file-upload, .rtl .search-messages-result {
+	padding: 0 41px 0 10px;
+}
+.rtl .fm-new-folder, .rtl .search-files-result {
+	padding: 0 44px 0 10px;
 }
 /* Ads css */
 @font-face {

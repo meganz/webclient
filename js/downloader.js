@@ -69,6 +69,11 @@ function ClassChunk(task) {
 				shouldIReportDone();
 			}
 
+			if (!download.started) {
+				download.onDownloadStart(download.dl_id, download.n, download.size, download.pos);
+				download.started = true;
+			}
+
 			// Update global progress (per download) and aditionally
 			// update the UI
 			if (Progress.dl_lastprogress+250 > new Date().getTime() && !force) {
@@ -246,7 +251,6 @@ function ClassFile(dl) {
 			}, failureFunction);
 	
 			// notify the UI
-			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 			fetchingFile = 0;
 			Scheduler.done();
 		}

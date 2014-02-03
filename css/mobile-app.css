@@ -380,6 +380,9 @@ span.select-txt {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+.blackberry .main-button, .blackberry.ios .main-button {
+	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-blackberry.png);
+}
 .ios .main-button, .another-os .main-button {
 	background-image: url(https://eu.static.mega.co.nz/images/mobile/main-bg-ios.png);
 	background-position: 33px -203px;

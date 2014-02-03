@@ -303,7 +303,7 @@ function init_register()
 	if (localStorage.registeremail)
 	{
 		$('#register-email').val(localStorage.registeremail);
-		$('#register-email').attr('readonly',true);
+		if (localStorage.signupcode) $('#register-email').attr('readonly',true);
 	}	
 
 	$('#register-firstname').unbind('focus');

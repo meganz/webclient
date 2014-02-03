@@ -466,7 +466,6 @@ function ul_dispatch_send(slot)
 								ul_xhrbusy[this.upload.slot] = 0;
 								ul_progress[this.upload.slot] = 0;
 								ul_updateprogress();
-
 								if (++ul_errors > 64) ul_failed();
 								else ul_settimeout(ul_errors*1000,ul_dispatch_chain);
 							}

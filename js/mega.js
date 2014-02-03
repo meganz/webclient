@@ -1046,7 +1046,7 @@ function MegaData ()
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
 						
-						if (!res.balance) ctx.account.balance = [['0.00','EUR']];					
+						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];					
 
 						if (!u_attr.p)
 						{
@@ -2390,19 +2390,20 @@ function process_ok(ok)
 	}
 }
 
+
+function folderreqerr(c,e)
+{
+    loadingDialog.hide();
+	msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
+	{
+		folderlink=pfid;
+		document.location.hash='';
+	});
+}
+
 function loadfm_callback(res)
 {
-	if (pfid && typeof res == 'number' && res < 0)
-	{
-		loadingDialog.hide();
-		msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
-		{
-			folderlink=pfid;
-			document.location.hash='';
-		});
-		return false;
-	}
-	else if (pfkey && res.f && res.f[0])
+	if (pfkey && res.f && res.f[0])
 	{
 		M.RootID = res.f[0].h;
 		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);

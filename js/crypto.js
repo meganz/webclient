@@ -776,16 +776,16 @@ function api_setsid(sid)
 function api_setfolder(h)
 {
 	h = 'n=' + h;
+	
+	if (u_sid) h += '&sid=' + u_sid;
 
 	apixs[1].sid = h;
+	apixs[1].failhandler = folderreqerr;
 	apixs[2].sid = h;
 }
 
 function api_init(c,service)
 {
-//	var url = (apiq[0][0].substr(0,4) == 'https') ? apiq[0][0] : (apipath + (apiq[0][0].substr(0,1) == '[' ? ('cs?id=' + apiq[0][2]) : apiq[0][0]) + (n_h_api ? '&n=' + n_h_api : (u_sid ? ('&sid=' + u_sid) : '')));
-//	var n_h_api = false;
-//	if ((apiq[0][0].indexOf('"a":"f"') > -1 || apiq[0][0].indexOf('"a":"ufa"') > -1 || apiq[0][0].indexOf('"a":"g"') > -1 || apiq[0][0].indexOf('sc?sn') > -1) && n_h) n_h_api = n_h;
 	var q = apixs[c];
 
 	if (q)
@@ -802,6 +802,7 @@ function api_init(c,service)
 				seqno : -Math.floor(Math.random()*0x100000000),	// unique request start ID
 				xhr : false,		// channel XMLHttpRequest
 				timer : false,		// timer for exponential backoff
+				failhandler : api_reqfailed,	// request-level error handler
 				backoff : 0,
 				service : service,	// base URI component
 				sid : '',			// sid URI component (optional)
@@ -923,7 +924,7 @@ function api_reqerror(q,e)
 
 		q.timer = setTimeout(api_send,q.backoff,q);
 	}
-	else api_reqfailed(q.c,e);
+	else q.failhandler(q.c,e);
 }
 
 function api_reqfailed(c,e)
@@ -1511,6 +1512,9 @@ function api_completeupload2(ctx,uq)
 		if (d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
+		
+		if (!ut) ut = M.RootID;
+		
 		var req = { a : 'p',
 			t : ut,
 			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
@@ -1745,8 +1749,11 @@ function api_attachfileattr(node,id)
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});
 }
 
-function api_getfileattr(fa,type,procfa)
+function api_getfileattr(fa,type,procfa,errfa)
 {
+	
+	
+	
 	var r, n, t;
 
 	var p = {};
@@ -1760,7 +1767,6 @@ function api_getfileattr(fa,type,procfa)
 		if (r = re.exec(fa[n].fa))
 		{
 			t = base64urldecode(r[2]);
-
 			if (t.length == 8)
 			{
 				if (!h[t])
@@ -1773,7 +1779,14 @@ function api_getfileattr(fa,type,procfa)
 				else p[r[1]] += t;
 			}
 		}
+		else
+		{
+			errfa(n);
+		}
 	}
+	
+	
+	
 
 	for (n in p)
 	{

@@ -6142,6 +6142,8 @@ div .fm-tree-folder.dragover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+
+
 .fm-dialog.create-folder-dialog, .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
 	min-width: 500px;
 	height: 126px;

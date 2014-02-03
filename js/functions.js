@@ -185,9 +185,7 @@ function populate_l()
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
-	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');	
 }
 
 
@@ -260,16 +258,17 @@ function browserdetails(useragent)
 	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';	
 	else if (useragent.toLowerCase().indexOf('mac') > 0) os = 'Apple';
 	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'Linux';
+	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.toLowerCase().indexOf('blackberry') > 0) os = 'Blackberry';
 	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';	
 	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';	
 	else if (useragent.toLowerCase().indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';	
 	else if (useragent.toLowerCase().indexOf('msie') > 0) browser = 'Internet Explorer';
+	else if (useragent.toLowerCase().indexOf('megasync') > 0) browser = 'MEGAsync';
 	if ((os) && (browser))
 	{
-		name = browser + ' on ' + os;
-		
+		name = browser + ' on ' + os;		
 		if (browser == 'Internet Explorer') icon = 'ie.png';
 		else icon = browser.toLowerCase() + '.png';
 	}

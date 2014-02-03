@@ -607,7 +607,7 @@ function startdownload2(res,ctx)
 
 			if (typeof o == 'object' && typeof o.n == 'string')
 			{
-				if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
+				if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
 				return dl_setcredentials(res.g,res.s,o.n);
 			}
 			else dl_reportstatus(dl_queue_num,EKEY);

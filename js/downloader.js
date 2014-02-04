@@ -43,6 +43,11 @@ function ClassChunk(task) {
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
+		if (size <= 3*1024) {
+			done = true;
+			Scheduler.done();
+		}
+
 		/**
 		 *	Check if the current chunk is small or close to its
 		 *	end, so it can cheat to the scheduler telling they are 
@@ -300,11 +305,13 @@ function decrypter(task)
 				var databuf = new Uint8Array(e.data.buffer || e.data);
 				var plain = databuf;
 				Decrypter.done(); // release slot
+				DEBUG("Decrypt done");
 				download.io.write(plain, task.offset, function() {
 					// decrease counter
 					// useful to avoid downloading before writing
 					// all
 					download.decrypt--;
+					DEBUG("Decrypt wrote");
 				}, task.info);
 			}
 		};

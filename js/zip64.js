@@ -112,6 +112,7 @@ function dlZipIO(dl, dl_id) {
 
 	this.done = function() {
 		current = null
+		DEBUG("done write", queue.length, "missing");
 		if (queue.length === 0) {
 			var end = ZipObject.writeSuffix(gOffset, dirData);
 			$.each(dirData, function(key, value) {

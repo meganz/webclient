@@ -207,9 +207,9 @@ function initupload2(res,ctx)
 {
 	if (typeof res == 'object')
 	{
-		ul_queue[ctx.reqindex].posturl = res.p;
+		ul_queue[ctx.reqindex].posturl = res.p;		
 
-		initupload3();
+		if (ctx.reqindex == ul_queue_num) initupload3();
 	}
 	else
 	{
@@ -461,7 +461,6 @@ function ul_dispatch_send(slot)
 							else
 							{
 								if (d) console.log("HTTP POST failed with " + this.status + ", error count=" + ul_errors);
-
 								delete ul_inflight[this.pos];
 								ul_xhrbusy[this.upload.slot] = 0;
 								ul_progress[this.upload.slot] = 0;
@@ -604,11 +603,13 @@ function ul_completepending2(res,ctx)
 {
 	if (typeof res == 'object' && res.f)
 	{
+		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
+
 		newnodes = [];
 		process_f(res.f);
 		rendernew();
 		fm_thumbnails();
-		if (ctx.faid) api_attachfileattr(res.f.h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}

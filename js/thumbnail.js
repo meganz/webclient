@@ -1,7 +1,8 @@
 
 
 function createnodethumbnail(node,aes,id,imagedata)
-{
+{	
+	storedattr[id] = {};
 	storedattr[id] = { target : node };
 	createthumbnail(false,aes,id,imagedata,node);
 }
@@ -23,8 +24,6 @@ function createthumbnail(file,aes,id,imagedata,node)
 			// thumbnail:			
 			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
 			{
-				console.error('create thumbnail');
-				
 				var canvas = document.createElement('canvas');
 				
 				var sx=0;
@@ -65,9 +64,8 @@ function createthumbnail(file,aes,id,imagedata,node)
 			}		
 			
 			// preview image:			
-			if (/*localStorage.previewimage &&*/ (!n || !n.fa || n.fa.indexOf(':1*') < 0))
-			{
-				console.log(this.width,this.height);
+			if (localStorage.previewimage && (!n || !n.fa || n.fa.indexOf(':1*') < 0))
+			{			
 				var canvas2 = document.createElement('canvas');
 				var preview_x=this.width,preview_y=this.height;
 				if (preview_x*0.7 > preview_y && preview_x > 1000)
@@ -79,28 +77,22 @@ function createthumbnail(file,aes,id,imagedata,node)
 				{					
 					preview_x=Math.round(preview_x*700/preview_y);
 					preview_y=700;
-				}
-				
-				console.log('preview_x',preview_x);
-				console.log('preview_y',preview_y);
+				}				
 				
 				var ctx2 = canvas2.getContext("2d");
 				canvas2.width  = preview_x;
 				canvas2.height = preview_y;			
 				ctx2.drawImage(this, 0, 0, preview_x, preview_y);
 				
-				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);			
+				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);						
+				
 				var ab2 = dataURLToAB(dataURI2);
 				
-				//api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
 				
 				if (node) previewimg(node,ab2);
 				
 				if (d) console.log('total time:', new Date().getTime()-t);
-			}
-			else if (!n || !n.fa || n.fa.indexOf(':1*') < 0)
-			{
-				console.error('create preview img');			
 			}
 		};
 		try

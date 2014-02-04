@@ -391,8 +391,8 @@ var helpdata =
 },
 
 {
-	q: 'I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.',
-	a: '<p>' + 'The folder you are trying to rename contains a hidden file called desktop.ini with a LocalizedResourceName= field that your renames went to - the actual folder name didn\'t change at all! Please delete desktop.ini and try again.' + '</p>',
+	q: l[1886],
+	a: '<p>' + l[1887] + '</p>',
 	c: [4]
 },
 

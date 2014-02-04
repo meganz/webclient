@@ -1478,11 +1478,11 @@ function crypto_rsadecrypt(ciphertext,privk)
 function api_completeupload(t,uq,k,ctx)
 {
 	// Close nsIFile Stream
-	if(is_chrome_firefox && uq._close) uq._close();
+	if (is_chrome_firefox && uq._close) uq._close();
 	
 	if (uq.repair) uq.target = M.RubbishID;
 	
-	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx },uq);
+	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : uq.faid ? api_getfa(uq.faid) : false, ctx : ctx },uq);
 }
 
 function api_completeupload2(ctx,uq)
@@ -1517,9 +1517,12 @@ function api_completeupload2(ctx,uq)
 		
 		var req = { a : 'p',
 			t : ut,
-			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
+			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k))}],
 			i : requesti
 		};
+
+		if (ctx.fa) req.n[0].fa = ctx.fa;
+
 		if (ut)
 		{
 			// a target has been supplied: encrypt to all relevant shares
@@ -1531,6 +1534,7 @@ function api_completeupload2(ctx,uq)
 				req.cr[1][0] = ctx.t;
 			}
 		}
+
 		api_req(req,ctx.ctx);
 	}
 }
@@ -1554,6 +1558,7 @@ function is_devnull(email)
 
 function is_image(name)
 {
+	if (!name) return false;
 	var p;
 	
 	if ((p = name.lastIndexOf('.')) >= 0)
@@ -1571,7 +1576,7 @@ var faxhrs = [];
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id,type,key,data,ctx)
-{	
+{
 	if (!ctx)
 	{
 		if (!storedattr[id]) storedattr[id] = {};
@@ -1661,7 +1666,7 @@ function api_fareq(res,ctx)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" +ctx.type);
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -1737,23 +1742,20 @@ function api_getfa(id)
 
 	storedattr[id] = {};
 
-	return f.join('/');
+	return f.length ? f.join('/') : false;
 }
 
 function api_attachfileattr(node,id)
 {
 	var fa = api_getfa(id);
-	
+
 	storedattr[id].target = node;
-	
+
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});
 }
 
 function api_getfileattr(fa,type,procfa,errfa)
 {
-	
-	
-	
 	var r, n, t;
 
 	var p = {};
@@ -1779,14 +1781,8 @@ function api_getfileattr(fa,type,procfa,errfa)
 				else p[r[1]] += t;
 			}
 		}
-		else
-		{
-			errfa(n);
-		}
+		else if (errfa) errfa(n);		
 	}
-	
-	
-	
 
 	for (n in p)
 	{

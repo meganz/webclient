@@ -2231,9 +2231,8 @@ var QuickFinder = function(searchable_elements, containers) {
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
+        if($(e.target).is("input, textarea, select") || $.dialog)  return;
+        
         var charCode = e.which || e.keyCode; // ff
 
         if(
@@ -2703,6 +2702,14 @@ function UIkeyevents()
 		else if (e.keyCode == 13 && $.dialog == 'rename')
 		{			
 			dorename();
+		}
+		else if (e.keyCode == 37 && $.dialog == 'slideshow')
+		{			
+			slideshow_prev();
+		}
+		else if (e.keyCode == 39 && $.dialog == 'slideshow')
+		{
+			slideshow_next();
 		}
 		else if (e.keyCode == 27 && $.dialog)
 		{
@@ -4982,6 +4989,32 @@ var previews = {};
 var p_requested = {};
 var slideshowid;
 
+function slideshowsteps()
+{
+	var check=false, forward = [], backward=[];
+	for (var i in M.v)
+	{
+		if (M.v[i].name && is_image(M.v[i].name))
+		{	
+			if (M.v[i].h == slideshowid) check=true;
+			else if (check) forward.push(M.v[i].h);
+			else backward.push(M.v[i].h);			
+		}
+	}
+	return {backward:backward,forward:forward};
+}
+
+function slideshow_next()
+{
+	var steps = slideshowsteps();
+	if (steps.forward.length > 0) slideshow(steps.forward[0]);
+}
+
+function slideshow_prev()
+{
+	var steps = slideshowsteps();
+	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
+}
 
 
 function slideshow(id,close)
@@ -4993,16 +5026,44 @@ function slideshow(id,close)
 		$('.fm-dialog.slideshow').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		return false;
-	}
-	$('.fm-dialog.slideshow img').attr('src','');
-	slideshowid=id;	
+	}	
 	$('.fm-dialog.slideshow .fm-dialog-close').unbind('click');
 	$('.fm-dialog.slideshow .fm-dialog-close').bind('click',function(e)
 	{
 		slideshow(false,1);
-	});
+	});	
+	$('.fm-dialog.slideshow img').unbind('load');
+	$('.fm-dialog.slideshow img').bind('load',function(e)
+	{
+		$('.fm-dialog.slideshow').css('margin-top',$('.fm-dialog.slideshow').height()/2*-1);
+		$('.fm-dialog.slideshow').css('margin-left',$('.fm-dialog.slideshow').width()/2*-1);
+	});	
+	
+	
+	
 	var n = M.d[id];	
-	if (!n) return;	
+	if (!n) return;
+	$('.fm-dialog.slideshow img').attr('src','');
+	slideshowid=id;
+
+	$('.slideshow-back,.slideshow-next').removeClass('active');
+	var steps = slideshowsteps();
+	if (steps.backward.length > 0) $('.slideshow-back').addClass('active');
+	if (steps.forward.length > 0) $('.slideshow-next').addClass('active');
+	
+	$('.slideshow-back,.slideshow-next').unbind('click');
+	$('.slideshow-back,.slideshow-next').bind('click',function(e)
+	{
+		var c = $(this).attr('class');
+		if (c && c.indexOf('active') > -1)
+		{
+			var steps = slideshowsteps();			
+			if (c.indexOf('back') > -1 && steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
+			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow(steps.forward[0]);	
+		}
+	});
+	
+	
 	if (previews[id]) $('.fm-dialog.slideshow img').attr('src',previews[id].src);	
 	else
 	{	
@@ -5015,9 +5076,8 @@ function slideshow(id,close)
 		},function(id)
 		{
 			M.addDownload([id]);
-			console.error('start download',id);
 		});
-	}	
+	}
 	$.dialog='slideshow';
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.slideshow').removeClass('hidden');

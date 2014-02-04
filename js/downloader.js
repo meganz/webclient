@@ -44,6 +44,7 @@ function ClassChunk(task) {
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
 		if (size <= 3*1024) {
+			download.decrypt++; /* avoid run condition */
 			done = true;
 			Scheduler.done();
 		}
@@ -55,8 +56,9 @@ function ClassChunk(task) {
 		 */
 		function shouldIReportDone() {
 			if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
-				Scheduler.done();
+				download.decrypt++; /* avoid run condition */
 				done = true;
+				Scheduler.done();
 			}
 		}
 	
@@ -123,7 +125,11 @@ function ClassChunk(task) {
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
 				iRealDownloads--;
-				!done && Scheduler.done();
+				if (done) {
+					download.decrypt--;
+				} else {
+					Scheduler.done();
+				}
 				return true;
 			}
 		}
@@ -171,7 +177,11 @@ function ClassChunk(task) {
 					}
 					return Scheduler.done(false, this.status);
 				}
-				!done && Scheduler.done();
+				if (done) {
+					download.decrypt--;
+				} else {
+					Scheduler.done();
+				}
 			}
 		}
 		xhr.responseType = have_ab ? 'arraybuffer' : 'text';

@@ -26,7 +26,7 @@ if (typeof loadingDialog == 'undefined')
 var fmconfig ={};
 if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
-var zipid=0;
+var zipid=1;
 
 function MegaData ()
 {

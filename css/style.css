@@ -14042,14 +14042,15 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .slideshow-dialog {
 	min-width: 700px;
-	min-height: 400px;
+	min-height: 500px;
 	max-height: 90%;
+	max-width: 90%;
 	position: absolute;
 	z-index: 410;
 	background-color: rgba(0,0,0,0.3);
 	left: 50%;
 	top: 50%;
-	margin: -200px 0 0 -350px;
+	margin: -250px 0 0 -350px;
 	overflow: hidden;
 }
 .slideshow-top-bar {

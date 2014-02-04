@@ -11,7 +11,25 @@
 <script type="text/javascript">
 $(document).ready(function() {  
     
-	
+	/*Scripts demo for context menues*/
+    $('.slideshow-download').bind('click', function() {
+		var contextMenu = $('.context-menu.files-menu');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			$(this).addClass('active');
+			contextMenu.removeClass('hidden');
+			contextMenu.find('.download-standart-item').removeClass('hidden');
+			contextMenu.find('.zipdownload-item').removeClass('hidden');
+            var offset = $(this).offset();
+            contextMenu.css({top: offset.top+25, left: offset.left});
+			
+		} else {
+			contextMenu.addClass('hidden');
+			contextMenu.find('.context-menu-item').each(function() {
+                if ($(this).attr('class').indexOf('hidden') == -1) $(this).addClass('hidden'); 	  
+            });
+			$(this).removeClass('active');
+		}
+	});
 	
 });
 </script>
@@ -30,7 +48,7 @@ Remove hidden classname if slideshow is opened.
 Please set height if the image is too small and it should be centered in dialog.
 Please set width and height = width and height of the image, please set margin-top = -height/2 and margin-left = -width/2.
 !-->
-<div class="slideshow-dialog" style="width:700px;">
+<div class="slideshow-dialog" style="width:700px; height:500px;">
    <div class="slideshow-top-bar">
       <div class="slideshow-filename">filename.jpg</div>
       <div class="slideshow-icon close-slideshow"></div>

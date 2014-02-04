@@ -47,8 +47,8 @@ $(document).ready(function() {
 Remove hidden classname if slideshow is opened. 
 Please set height if the image is too small and it should be centered in dialog.
 Please set width and height = width and height of the image, please set margin-top = -height/2 and margin-left = -width/2.
- !-->
-<div class="slideshow-dialog" style="width:700px; height:500px;">
+!-->
+<div class="slideshow-dialog hidden" style="width:700px; height:500px;">
    <div class="slideshow-top-bar">
       <div class="slideshow-filename">filename.jpg</div>
       <div class="slideshow-icon close-slideshow"></div>
@@ -76,7 +76,7 @@ Please set width and height = width and height of the image, please set margin-t
       <div class="slideshow-next-icon"></div>
    </div>
    <!-- Add "hidden" class if we need any of another case: pending image / image error / loading image !--> 
-   <div class="slideshow-image-bl">
+   <div class="slideshow-image-bl hidden">
       <img alt="" src="images/temp/img01.jpg" class="slideshow-image" />
    </div>
    
@@ -102,7 +102,7 @@ Please set width and height = width and height of the image, please set margin-t
       </div>
    </div>
    <!-- Remove hidden classname if image is loading !-->
-   <div class="slideshow-progress percents-78 hidden">
+   <div class="slideshow-progress percents-78">
      <div class="slideshow-progress-icon"></div>
    </div>
    
@@ -111,7 +111,7 @@ Please set width and height = width and height of the image, please set margin-t
 <!-- Remove hidden classname if gallery is pending !-->
 <div class="slideshow-pending hidden"></div>
 
-<!-- Remove hidden classname if error has occured during glallery was loading !-->
+<!-- Remove hidden classname if error has occured during gallery was loading !-->
 <div class="slideshow-error hidden">
    <div class="slideshow-error-icon"></div>
    <div class="slideshow-error-header">
@@ -130,47 +130,12 @@ Please set width and height = width and height of the image, please set margin-t
    </div>
 </div>
 <!-- Remove hidden classname if gallery is loading !-->
-<div class="slideshow-progress percents-78 hidden">
+<div class="slideshow-progress percents-55">
   <div class="slideshow-progress-icon"></div>
 </div>
 
 <div class="dark-overlay hidden"></div>  
 <div class="loading-spinner hidden"></div>
-
-<!-- Right-Click Context menu !-->
-  <div class="context-menu files-menu hidden">
-	<a class="context-menu-item open-item hidden">Open</a>
-	<a class="context-menu-item download-item hidden">Download</a>
-    <a class="context-menu-item download-standart-item hidden">Standard download</a>
-	<a class="context-menu-item zipdownload-item hidden">Download as ZIP</a>
-	<a class="context-menu-item send-to-contact-item hidden">Send to contact</a>
-    <a class="context-menu-item getlink-item hidden">Get link</a>
-	<a class="context-menu-item sharing-item hidden">Sharing</a>
-	<a class="context-menu-item rename-item hidden">Rename</a>
-	<a class="context-menu-item move-item hidden">Move</a>
-	<a class="context-menu-item copy-item hidden">Copy</a>
-	<a class="context-menu-item newfolder-item hidden">New folder</a>
-	<a class="context-menu-item fileupload-item hidden">
-      <label for="fileselect3" class=""><input type="file" id="fileselect3" name="fileselect3" class="hidden">File Upload</label>
-    </a>
-	<a class="context-menu-item folderupload-item hidden">
-      <label for="fileselect4" class=""><input type="file" id="fileselect4" name="fileselect4" webkitdirectory="" multiple="" class="hidden">Folder Upload</label>
-    </a>
-	<a class="context-menu-item remove-item hidden">Remove</a>
-	<a class="context-menu-item properties-item hidden">Properties</a>
-	<a class="context-menu-item permissions-item hidden">Permissions</a>	
-	<a class="context-menu-item clearbin-item hidden">Clear Rubbish Bin</a>
-	<a class="context-menu-item addcontact-item hidden">Add contact</a>      
-	<a class="context-menu-item reply-item hidden">Reply</a> 
-    <a class="context-menu-item reply-to-all hidden">Reply to all</a> 
-    <a class="context-menu-item forward-item hidden">Forward</a>    
-    <a class="context-menu-item add-star-item hidden">Add Star</a> 
-    <a class="context-menu-item canceltransfer-item hidden">Cancel transfer</a>
-    <div class="context-menu-divider hidden"></div>
-    <a class="context-menu-item select-all hidden">Select all</a>
-    <a class="context-menu-item refresh-item hidden">Reload</a>
-  </div>
-<!-- End of Right-Click Context menu !-->
 
 
 <div class="fmholder" id="fmholder">

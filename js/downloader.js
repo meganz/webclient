@@ -43,7 +43,7 @@ function ClassChunk(task) {
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
-		if (size <= 3*1024) {
+		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
 			download.decrypt++; /* avoid run condition */
 			done = true;
 			Scheduler.done();
@@ -55,7 +55,7 @@ function ClassChunk(task) {
 		 *	actually done
 		 */
 		function shouldIReportDone() {
-			if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
+			if (!done && iRealDownloads <= dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
 				download.decrypt++; /* avoid run condition */
 				done = true;
 				Scheduler.done();

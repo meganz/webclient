@@ -39,7 +39,7 @@ var DownloadManager = new function() {
 		}
 
 		$.each(pattern, function(key, value) {
-			if (task.task[key] || task.task[key] === value) {
+			if (typeof task.task[key] == "undefined" || task.task[key] != value) {
 				_match = false;
 				return false;
 			}
@@ -262,6 +262,7 @@ function failureFunction(reschedule, task, args) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}
+			DownloadManager.pause(task); 
 			reschedule(); 
 		});
 	}, dl_retryinterval);
@@ -331,8 +332,6 @@ function dlGetUrl(object, callback) {
 	} else if (object.id) {
 		req.n = object.id;
 	}
-
-	DEBUG("get file info for ", req);
 
 	api_req(req, {
 		callback: function(res, rex) {

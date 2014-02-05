@@ -87,7 +87,7 @@ function ClassChunk(task) {
 				// too soon
 				return false;
 			}
-			
+
 			download.onDownloadProgress(
 				download.dl_id, 
 				Progress.progress, // global progress

@@ -29,6 +29,7 @@ $.len = function(obj) {
 var DownloadManager = new function() {
 	var self = this
 		, locks = []
+		, removed = []
 
 	function doesMatch(task, pattern) {
 		var _match = true;
@@ -52,12 +53,28 @@ var DownloadManager = new function() {
 	};
 
 	self.remove = function(pattern) {
+		if (pattern.zipid) {
+			removed.push("zipid:" + pattern.zipid);
+		} else {
+			removed.push("id:" + pattern.id);
+		}
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj, pattern);
-			if (match) DEBUG("remove task " + obj.__tid);
+			if (match) DEBUG("remove task " + obj.__tid, pattern);
 			return !match;
 		});
 	};
+
+	self.isRemoved = function(task) {
+		var enabled = true;
+		$.each(removed, function(i, pattern) {
+			if (doesMatch(task, pattern)) {
+				enabled = false;
+				return false; /* break */
+			}
+		});
+		return !enabled;
+	}
 
 	self.pause = function(work) {
 		if (work instanceof ClassFile || work instanceof ClassChunk) {
@@ -85,6 +102,7 @@ var DownloadManager = new function() {
 	self.release = function(pattern) {
 		DEBUG("release lock to ", pattern);
 		removeValue(locks, pattern);
+		removeValue(removed, pattern);
 	}
 
 	self.enabled = function(task) {

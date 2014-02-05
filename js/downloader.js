@@ -370,6 +370,10 @@ var iRealDownloads = 0
 
 function downloader(task) {
 	var Scheduler = this;
+	if (DownloadManager.isRemoved(task)) {
+		DEBUG("removing old task");
+		return Scheduler.done();
+	}
 	return task.run(Scheduler);
 }
 

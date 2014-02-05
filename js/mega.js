@@ -1610,7 +1610,22 @@ function MegaData ()
 		else if (error == EAGAIN) errorstr = l[233];
 		else errorstr = l[233];
 
-		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+		var file = null;
+		$.each(dl_queue, function(id, f) {
+			if (f.id == fileid) {
+				file = f;
+				return false;
+			}
+		});
+
+		if (errorstr)  {
+			if (file) file.failed = new Date;
+			if (file && file.zipid) {
+				$('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			} else {
+				$('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			}
+		}
 	}
 
 	this.dlstart = function(id,name,size, dl_queue_num)

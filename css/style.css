@@ -14048,6 +14048,9 @@ a.ff-extension-button:hover {
 	text-align: center;
 	padding: 107px 0 25px 0;
 }
+.sync-help-center .st-apps-title {
+	cursor:pointer;
+}
 .slideshow-overlay {
 	position: absolute;
 	height: 100%;

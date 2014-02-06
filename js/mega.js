@@ -1631,8 +1631,7 @@ function MegaData ()
 		else if (error == ENOENT) errorstr=l[22];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
-		else errorstr = l[233];
-		
+		else errorstr = l[233];		
 				
 		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
 		{

@@ -5000,7 +5000,7 @@ function slingshotDialog(close)
 
 
 var previews = {};
-var p_requested = {};
+var preqs = {};
 var slideshowid;
 
 function slideshowsteps()
@@ -5040,8 +5040,19 @@ function slideshow(id,close)
 		$('.slideshow-overlay').addClass('hidden');
 		return false;
 	}
-	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').unbind('click');
-	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').bind('click',function(e)
+	
+	if (folderlink)
+	{
+		$('.slideshow-getlink').hide();
+		$('.slideshow-line').hide();
+	}
+	else
+	{
+		$('.slideshow-getlink').show();
+		$('.slideshow-line').show();	
+	}	
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click',function(e)
 	{
 		slideshow(false,1);
 	});	
@@ -5070,7 +5081,7 @@ function slideshow(id,close)
 			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow(steps.forward[0]);	
 		}
-	});
+	});		
 	
 	$('.slideshow-download').unbind('click');
 	$('.slideshow-download').bind('click',function(e)
@@ -5094,22 +5105,39 @@ function slideshow(id,close)
 		else M.getlinks([slideshowid]);
 	});
 	
-	if (previews[id]) previewsrc(previews[id].src);
-	else
-	{	
-		var treq = {};
-		treq[id] = {fa:n.fa,k:n.key};
-		api_getfileattr(treq,1,function(ctx,id,uint8arr)
-		{
-			previewimg(id,uint8arr);
-			if (id == slideshowid) $('.slideshow-image').attr('src',previews[id].src);
-		},function(id)
-		{
-			M.addDownload([id],false,true);			
-		});
+	if (previews[id])
+	{
+		previewsrc(previews[id].src);
+		fetchnext();
 	}
+	else if (!preqs[id]) fetchsrc(id);
+	
 	$('.slideshow-overlay').removeClass('hidden');
 	$('.slideshow-dialog').removeClass('hidden');
+}
+
+function fetchnext()
+{
+	var n = M.d[slideshowsteps().forward[0]];
+	if (!n || !n.fa) return;	
+	if (n.fa.indexOf(':1*') > -1 && !preqs[n.h] && !previews[n.h]) fetchsrc(n.h);
+}
+
+
+function fetchsrc(id)
+{
+	var n = M.d[id];
+	preqs[id]=1;
+	var treq = {};
+	treq[id] = {fa:n.fa,k:n.key};
+	api_getfileattr(treq,1,function(ctx,id,uint8arr)
+	{		
+		previewimg(id,uint8arr);
+		if (id == slideshowid) fetchnext();
+	},function(id)
+	{
+		M.addDownload([id],false,true);
+	});
 }
 
 function previewsrc(src)
@@ -5149,7 +5177,10 @@ function previewimg(id,uint8arr)
 		src: myURL.createObjectURL(blob),
 		time: new Date().getTime()	
 	}
-	if (id == slideshowid) previewsrc(previews[id].src);
+	if (id == slideshowid)
+	{
+		previewsrc(previews[id].src);		
+	}
 }
 
 

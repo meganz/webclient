@@ -13962,7 +13962,7 @@ a.ff-extension-button:hover {
 .sync-top-logo {
 	width: 150px;
 	height: 35px;
-	background-image: url(../images/mega/sync_nw.png);
+	background-image: url(../images/mega/sync_nw.png?v=1);
 	background-size: 148px auto;
 	background-position: center 1px;
 	background-repeat: no-repeat;
@@ -14018,7 +14018,7 @@ a.ff-extension-button:hover {
 	margin: 0;
 	padding: 7px 0 7px 25px;
 	line-height: 28px;
-	background-image: url(../images/mega/sync_nw.png);
+	background-image: url(../images/mega/sync_nw.png?v=1);
 	background-position: left -128px;
 	background-repeat: no-repeat;
 }
@@ -14040,6 +14040,13 @@ a.ff-extension-button:hover {
 	padding: 49px 45px 40px 0;
 	margin: 0;
 	border-left: 0;
+}
+.sync-help-center {
+	background-image: url(../images/mega/sync_nw.png?v=1);
+	background-position: center -352px;
+	background-repeat: no-repeat;
+	text-align: center;
+	padding: 107px 0 25px 0;
 }
 .slideshow-overlay {
 	position: absolute;
@@ -14437,8 +14444,8 @@ background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
  background-image: url(../images/mega/share-folder@2x.png?v=1);
  background-size: 200px auto;
 }
-.sync-top-logo, .sync-short-block li {
- background-image: url(../images/mega/sync_nw@2x.png);
+.sync-top-logo, .sync-short-block li, .sync-help-center {
+ background-image: url(../images/mega/sync_nw@2x.png?v=1);
  background-size: 148px auto;
 }
 .sync-main-img {

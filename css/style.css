@@ -14133,10 +14133,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: 1px -77px;
 }
 .slideshow-download span {
-	background-image: url(../images/mega/slideshow-sprite.png);
-	background-position: right -140px;
-	background-repeat: no-repeat;
-	padding-right: 17px;
+	padding-right: 10px;
 }
 .slideshow-download.active span {
 	background-position: right -180px;

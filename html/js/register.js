@@ -48,11 +48,12 @@ function doregister()
 		else document.getElementById('overlay').style.display='';
 		
 		if (localStorage.signupcode)
-		{		
+		{	
+			u_storage = localStorage;
 			var ctx = 
-			{
+			{				
 				checkloginresult: function(u_ctx,r)
-				{			
+				{
 					if (m) loadingDialog.hide();
 					else document.getElementById('overlay').style.display='none';					
 					if ((typeof r[0] == 'number') && (r[0] < 0))					
@@ -72,6 +73,7 @@ function doregister()
 		}
 		else if (u_type === false) 
 		{
+			u_storage = localStorage;
 			var u_ctx = 
 			{
 				checkloginresult: function(u_ctx,r)
@@ -254,6 +256,7 @@ function pageregister()
 			if (localStorage.signupcode)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				var ctx = 
 				{
 					checkloginresult: function(u_ctx,r)
@@ -275,6 +278,7 @@ function pageregister()
 			else if (u_type === false)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				u_checklogin(
 				{
 					checkloginresult: function(u_ctx,r)

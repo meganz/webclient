@@ -64,21 +64,20 @@ function createthumbnail(file,aes,id,imagedata,node)
 			}		
 			
 			// preview image:			
-			if (localStorage.previewimage && (!n || !n.fa || n.fa.indexOf(':1*') < 0))
+			if (!n || !n.fa || n.fa.indexOf(':1*') < 0)
 			{			
 				var canvas2 = document.createElement('canvas');
 				var preview_x=this.width,preview_y=this.height;
-				if (preview_x*0.7 > preview_y && preview_x > 1000)
+				if (preview_x > 1000)
 				{					
 					preview_y=Math.round(preview_y*1000/preview_x);
 					preview_x=1000;
 				}
-				else if (preview_y > 700)
+				else if (preview_y > 1000)
 				{					
-					preview_x=Math.round(preview_x*700/preview_y);
-					preview_y=700;
+					preview_x=Math.round(preview_x*1000/preview_y);
+					preview_y=1000;
 				}				
-				
 				var ctx2 = canvas2.getContext("2d");
 				canvas2.width  = preview_x;
 				canvas2.height = preview_y;			
@@ -88,7 +87,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 				
 				var ab2 = dataURLToAB(dataURI2);
 				
-				//api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
 				
 				if (node) previewimg(node,ab2);
 				

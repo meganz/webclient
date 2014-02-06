@@ -125,6 +125,7 @@ function pro_continue()
 	pro_paymentmethod='';
 	if (u_type === false)
 	{
+		u_storage = localStorage;
 		loadingDialog.show();
 		u_checklogin({ checkloginresult: function(u_ctx,r) 
 		{ 

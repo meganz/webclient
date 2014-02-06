@@ -1376,7 +1376,7 @@ function MegaData ()
 		}
 	}
 
-	this.addDownload = function(n,z)
+	this.addDownload = function(n,z,preview)
 	{
 		delete $.dlhash;
 		var zipname,path;
@@ -1449,7 +1449,8 @@ function MegaData ()
 					onDownloadError: this.dlerror,
 					onDownloadStart: this.dlstart,
 					zipid: z,
-					zipname: zipname
+					zipname: zipname,
+					preview: preview
 				});
 				zipsize += n.s;
 
@@ -1470,11 +1471,16 @@ function MegaData ()
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
 
-        openTransferpanel();
-		initGridScrolling();
-		initFileblocksScrolling();
-		initTreeScroll();
+	
+        if (!preview) 
+		{
+			openTransferpanel();
+			initGridScrolling();
+			initFileblocksScrolling();
+			initTreeScroll();
+		}
 		startdownload();
+		
 
 		delete $.dlhash;
 	}
@@ -1522,10 +1528,10 @@ function MegaData ()
 			$.transferprogress[id] = Math.floor(bl/bt*100);
 			if (!uldl_hold)
 			{
-				if (slideshowid == dl_queue[dl_queue_num].id) 
+				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
 				{					
+					$('.slideshow-error').addClass('hidden');
 					$('.slideshow-pending').addClass('hidden');
-					$('.slideshow-progress').removeClass('hidden');
 					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
 				}
 			
@@ -1536,7 +1542,6 @@ function MegaData ()
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
 				if ((!ul_uploading) && (perc == 100)) megatitle();
 				else if (!ul_uploading) megatitle(' ' + perc + '%');
-				$.transferHeader();
 
 				if (page.substr(0,2) !== 'fm')
 				{
@@ -1555,8 +1560,12 @@ function MegaData ()
 
 	this.dlcomplete = function (id,z)
 	{
-		if (slideshowid == dl_queue[dl_queue_num].id) $('.slideshow-progress').attr('class','slideshow-progress percents-100');
-		
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-error').addClass('hidden');
+			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
+		}		
 	
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
@@ -1623,6 +1632,16 @@ function MegaData ()
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
 		else errorstr = l[233];
+		
+				
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-image-bl').addClass('hidden');
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-progress').addClass('hidden');
+			$('.slideshow-error').removeClass('hidden');
+			$('.slideshow-error-txt').text(errorstr);
+		}
 
 		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
 	}

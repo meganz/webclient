@@ -2556,7 +2556,8 @@ function UIkeyevents()
 {
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
-	{
+	{		
+	
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
@@ -2567,7 +2568,7 @@ function UIkeyevents()
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if(!$.dialog && M.viewmode == 1) 
+        if(!$.dialog && !slideshowid && M.viewmode == 1) 
 		{	
             var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
@@ -2586,7 +2587,6 @@ function UIkeyevents()
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
-
             } 
 			else if(e.keyCode == 39) 
 			{ 
@@ -2696,21 +2696,14 @@ function UIkeyevents()
 			{
 				var n = M.d[$.selected[0]];
 				if (n && n.t) M.openFolder(n.h);
-				else M.addDownload($.selected);			
+				else if ($.selected.length == 1 && M.d[$.selected[0]] && M.d[$.selected[0]].name && is_image(M.d[$.selected[0]].name)) slideshow($.selected[0]);
+				else M.addDownload($.selected);
 			}			
 		}
 		else if (e.keyCode == 13 && $.dialog == 'rename')
 		{			
 			dorename();
-		}
-		else if (e.keyCode == 37 && $.dialog == 'slideshow')
-		{			
-			slideshow_prev();
-		}
-		else if (e.keyCode == 39 && $.dialog == 'slideshow')
-		{
-			slideshow_next();
-		}
+		}		
 		else if (e.keyCode == 27 && $.dialog)
 		{
 			$('.fm-dialog').addClass('hidden');
@@ -2728,21 +2721,35 @@ function UIkeyevents()
 		{
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(true);
+		}		
+		else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
+		{
+			$('.grid-table.fm tr').addClass('ui-selected');
+			$('.file-block').addClass('ui-selected');
+		}
+		else if (e.keyCode == 37 && slideshowid)
+		{			
+			slideshow_prev();
+		}
+		else if (e.keyCode == 39 && slideshowid)
+		{
+			slideshow_next();
+		}
+		else if (e.keyCode == 27 && slideshowid)
+		{
+			slideshow(false,true);		
 		}
 		else if (e.keyCode == 27)
 		{
 			$.hideTopMenu();
 		}
-		else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
-		{
-			$('.grid-table.fm tr').addClass('ui-selected');
-			$('.file-block').addClass('ui-selected');
-		}	
+		
 		if (sl && $.selectddUIgrid == '.grid-scrolling-table')
 		{			
 			var jsp = $('.grid-scrolling-table').data('jsp');
 			jsp.scrollToElement(sl);
 		}
+		
 		searchPath();
 	});
 }
@@ -2997,9 +3004,10 @@ function selectddUI()
 		var h = $(e.currentTarget).attr('id');
 		if (M.d[h] && M.d[h].t)
 		{
-			M.openFolder(h);
 			$('.top-context-menu').hide();
+			M.openFolder(h);
 		}
+		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
 		else M.addDownload([h]);
 	});
 }
@@ -3082,7 +3090,6 @@ function topContextMenu(close)
 	$('.top-icons-block .context-menu-item').hide();
 	$('.top-icons-block .context-menu-divider').hide();
 	
-	$('.top-context-menu').width();
 	$('.top-context-menu').fadeIn(350);
 	setTimeout(function(id)
 	{
@@ -3162,7 +3169,7 @@ function topContextMenu(close)
 		{
 			topContextMenu(300);
 		}
-	},5000,r);	
+	},2000,r);	
 	$('.top-context-close').unbind('click');
 	$('.top-context-close').bind('click',function()
 	{
@@ -3244,6 +3251,13 @@ function transferPanelUI()
 	{	
          $.transferHeader();
     });
+	
+	$(window).unbind('resize.slideshow');
+	$(window).bind('resize.slideshow', function (e) 
+	{
+		if (slideshowid && previews[slideshowid]) previewsrc(previews[slideshowid].src);		
+    });
+	
 	$('.tranfer-view-icon').unbind('click');
 	$('.tranfer-view-icon').bind('click', function (e) 
 	{
@@ -5022,38 +5036,30 @@ function slideshow(id,close)
 	if (close)
 	{
 		slideshowid=false;
-		delete $.dialog;		
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
 		return false;
-	}	
+	}
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').unbind('click');
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').bind('click',function(e)
 	{
 		slideshow(false,1);
 	});	
-	
-	
-	
 	var n = M.d[id];	
 	if (!n) return;
-	
 	$('.slideshow-filename').text(n.name);
-	
-	$('.slideshow-image').attr('src','');	
+	$('.slideshow-image').attr('src','');
 	$('.slideshow-pending').removeClass('hidden');
 	$('.slideshow-progress').addClass('hidden');
+	$('.slideshow-error').addClass('hidden');
 	$('.slideshow-image').width(0);
 	$('.slideshow-image').height(0);
-	
-	
+	$('.slideshow-image-bl').addClass('hidden');
+	$('.slideshow-prev-button,.slideshow-next-button').removeClass('active');	
 	slideshowid=id;
-
-	$('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
-	var steps = slideshowsteps();
+	var steps = slideshowsteps();	
 	if (steps.backward.length > 0) $('.slideshow-prev-button').addClass('active');
-	if (steps.forward.length > 0) $('.slideshow-next-button').addClass('active');
-	
+	if (steps.forward.length > 0) $('.slideshow-next-button').addClass('active');	
 	$('.slideshow-prev-button,.slideshow-next-button').unbind('click');
 	$('.slideshow-prev-button,.slideshow-next-button').bind('click',function(e)
 	{
@@ -5066,6 +5072,27 @@ function slideshow(id,close)
 		}
 	});
 	
+	$('.slideshow-download').unbind('click');
+	$('.slideshow-download').bind('click',function(e)
+	{
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == slideshowid)
+			{
+				dl_queue[i].preview=false;
+				openTransferpanel();
+				return;
+			}		
+		}		
+		M.addDownload([slideshowid]);
+	});
+	
+	$('.slideshow-getlink').unbind('click');
+	$('.slideshow-getlink').bind('click',function(e)
+	{
+		if (u_type === 0) ephemeralDialog(l[1005]);
+		else M.getlinks([slideshowid]);
+	});
 	
 	if (previews[id]) previewsrc(previews[id].src);
 	else
@@ -5078,10 +5105,9 @@ function slideshow(id,close)
 			if (id == slideshowid) $('.slideshow-image').attr('src',previews[id].src);
 		},function(id)
 		{
-			M.addDownload([id]);			
+			M.addDownload([id],false,true);			
 		});
 	}
-	$.dialog='slideshow';
 	$('.slideshow-overlay').removeClass('hidden');
 	$('.slideshow-dialog').removeClass('hidden');
 }
@@ -5090,12 +5116,24 @@ function previewsrc(src)
 {
 	var img = new Image();
 	img.onload = function()
-	{	
+	{
+		if (this.height > $(window).height()-100)
+		{
+			var factor = this.height/($(window).height()-100);
+			this.height = $(window).height()-100;
+			this.width = Math.round(this.width/factor);			
+		}		
+		var w = this.width, h = this.height;
+		if (w < 700) w=700;
+		if (h < 500) h=500;		
 		$('.slideshow-image').attr('src',this.src);
-		$('.slideshow-dialog').css('margin-top',this.height/2*-1);
-		$('.slideshow-dialog').css('margin-left',this.width/2*-1);
-		$('.slideshow-dialog,.slideshow-image').width(this.width);
-		$('.slideshow-dialog,.slideshow-image').height(this.height);
+		$('.slideshow-dialog').css('margin-top',h/2*-1);
+		$('.slideshow-dialog').css('margin-left',w/2*-1);
+		$('.slideshow-image').width(this.width);
+		$('.slideshow-image').height(this.height);		
+		$('.slideshow-dialog').width(w);
+		$('.slideshow-dialog').height(h);		
+		$('.slideshow-image-bl').removeClass('hidden');
 		$('.slideshow-pending').addClass('hidden');
 		$('.slideshow-progress').addClass('hidden');
 	};
@@ -5297,6 +5335,7 @@ function fm_resize_handler() {
             'bottom': ''
         });
     }
+		
 }
 
 

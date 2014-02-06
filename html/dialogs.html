@@ -617,61 +617,52 @@
 
 
 
-<!-- 
-Remove hidden classname if slideshow is opened. 
-Please set height if the image is too small and it should be centered in dialog.
-Please set width and height = width and height of the image, please set margin-top = -height/2 and margin-left = -width/2.
- !-->
-<div class="slideshow-dialog hidden" style="width:700px;">
+
+<div class="slideshow-dialog hidden" style="width:700px; height:500px;">
    <div class="slideshow-top-bar">
       <div class="slideshow-filename">filename.jpg</div>
       <div class="slideshow-icon close-slideshow"></div>
-      <div class="slideshow-icon slideshow-line"></div>
-      <div class="slideshow-icon slideshow-getlink">
-        Get link
-      </div>
-      <div class="slideshow-icon slideshow-line"></div>
-      <!-- Add "active" if is pressed !-->
-      <div class="slideshow-icon slideshow-download">
-        <span>Download...</span>
+      <div class="slideshow-image-buttons">
+        <div class="slideshow-icon slideshow-line"></div>
+        <div class="slideshow-icon slideshow-getlink">
+          [$59]
+        </div>
+        <div class="slideshow-icon slideshow-line"></div>
+        <div class="slideshow-icon slideshow-download">
+          <span>[$58]</span>
+        </div>
+        <div class="clear"></div>
       </div>
       <div class="clear"></div>
    </div>
-   <!-- Please bind click event and add "active" class if button could be clicked !-->
    <div class="slideshow-prev-button">
      <div class="slideshow-prev-icon"></div>
    </div>
-   <!-- Please bind click event and add "active" class if button could be clicked !-->
    <div class="slideshow-next-button active">
       <div class="slideshow-next-icon"></div>
    </div>
-   <!-- Add "hidden" class if we need any of another case: pending image / image error / loading image !--> 
    <div class="slideshow-image-bl">
-      <img alt="" src="images/temp/img01.jpg" class="slideshow-image" />
+      <img alt="" src="" class="slideshow-image" />
    </div>
    
-   <!-- Remove hidden classname if image is pending !-->
    <div class="slideshow-pending hidden"></div>
 
-   <!-- Remove hidden classname if error has occured during image was loading !-->
    <div class="slideshow-error hidden">
       <div class="slideshow-error-icon"></div>
       <div class="slideshow-error-header">
-          Unexpected error
+          [$135]
       </div>
-      <div class="slideshow-error-txt">
-          Unexpected errorLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+      <div class="slideshow-error-txt">          
       </div>
       <div class="slideshow-error-buttons">
          <div class="slideshow-error-button slideshow-refresh">
-            Refresh
+            [$85]
          </div>
          <div class="slideshow-error-button slideshow-error-close">
-            Press Esc to close
+            [$1898]
          </div>
       </div>
    </div>
-   <!-- Remove hidden classname if image is loading !-->
    <div class="slideshow-progress percents-78 hidden">
      <div class="slideshow-progress-icon"></div>
    </div>

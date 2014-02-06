@@ -1522,6 +1522,13 @@ function MegaData ()
 			$.transferprogress[id] = Math.floor(bl/bt*100);
 			if (!uldl_hold)
 			{
+				if (slideshowid == dl_queue[dl_queue_num].id) 
+				{					
+					$('.slideshow-pending').addClass('hidden');
+					$('.slideshow-progress').removeClass('hidden');
+					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
+				}
+			
 				$('.transfer-table #' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
@@ -1540,12 +1547,17 @@ function MegaData ()
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
 				}
+				
+				
 			}
 		}
 	}
 
 	this.dlcomplete = function (id,z)
 	{
+		if (slideshowid == dl_queue[dl_queue_num].id) $('.slideshow-progress').attr('class','slideshow-progress percents-100');
+		
+	
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');

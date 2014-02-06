@@ -5023,48 +5023,51 @@ function slideshow(id,close)
 	{
 		slideshowid=false;
 		delete $.dialog;		
-		$('.fm-dialog.slideshow').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');
+		$('.slideshow-dialog').addClass('hidden');
+		$('.slideshow-overlay').addClass('hidden');
 		return false;
 	}	
-	$('.fm-dialog.slideshow .fm-dialog-close').unbind('click');
-	$('.fm-dialog.slideshow .fm-dialog-close').bind('click',function(e)
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').unbind('click');
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay').bind('click',function(e)
 	{
 		slideshow(false,1);
-	});	
-	$('.fm-dialog.slideshow img').unbind('load');
-	$('.fm-dialog.slideshow img').bind('load',function(e)
-	{
-		$('.fm-dialog.slideshow').css('margin-top',$('.fm-dialog.slideshow').height()/2*-1);
-		$('.fm-dialog.slideshow').css('margin-left',$('.fm-dialog.slideshow').width()/2*-1);
 	});	
 	
 	
 	
 	var n = M.d[id];	
 	if (!n) return;
-	$('.fm-dialog.slideshow img').attr('src','');
+	
+	$('.slideshow-filename').text(n.name);
+	
+	$('.slideshow-image').attr('src','');	
+	$('.slideshow-pending').removeClass('hidden');
+	$('.slideshow-progress').addClass('hidden');
+	$('.slideshow-image').width(0);
+	$('.slideshow-image').height(0);
+	
+	
 	slideshowid=id;
 
-	$('.slideshow-back,.slideshow-next').removeClass('active');
+	$('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
 	var steps = slideshowsteps();
-	if (steps.backward.length > 0) $('.slideshow-back').addClass('active');
-	if (steps.forward.length > 0) $('.slideshow-next').addClass('active');
+	if (steps.backward.length > 0) $('.slideshow-prev-button').addClass('active');
+	if (steps.forward.length > 0) $('.slideshow-next-button').addClass('active');
 	
-	$('.slideshow-back,.slideshow-next').unbind('click');
-	$('.slideshow-back,.slideshow-next').bind('click',function(e)
+	$('.slideshow-prev-button,.slideshow-next-button').unbind('click');
+	$('.slideshow-prev-button,.slideshow-next-button').bind('click',function(e)
 	{
 		var c = $(this).attr('class');
 		if (c && c.indexOf('active') > -1)
 		{
 			var steps = slideshowsteps();			
-			if (c.indexOf('back') > -1 && steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
+			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow(steps.forward[0]);	
 		}
 	});
 	
 	
-	if (previews[id]) $('.fm-dialog.slideshow img').attr('src',previews[id].src);	
+	if (previews[id]) previewsrc(previews[id].src);
 	else
 	{	
 		var treq = {};
@@ -5072,17 +5075,32 @@ function slideshow(id,close)
 		api_getfileattr(treq,1,function(ctx,id,uint8arr)
 		{
 			previewimg(id,uint8arr);
-			if (id == slideshowid) $('.fm-dialog.slideshow img').attr('src',previews[id].src);
+			if (id == slideshowid) $('.slideshow-image').attr('src',previews[id].src);
 		},function(id)
 		{
-			M.addDownload([id]);
+			M.addDownload([id]);			
 		});
 	}
 	$.dialog='slideshow';
-	$('.fm-dialog-overlay').removeClass('hidden');
-	$('.fm-dialog.slideshow').removeClass('hidden');
+	$('.slideshow-overlay').removeClass('hidden');
+	$('.slideshow-dialog').removeClass('hidden');
 }
 
+function previewsrc(src)
+{
+	var img = new Image();
+	img.onload = function()
+	{	
+		$('.slideshow-image').attr('src',this.src);
+		$('.slideshow-dialog').css('margin-top',this.height/2*-1);
+		$('.slideshow-dialog').css('margin-left',this.width/2*-1);
+		$('.slideshow-dialog,.slideshow-image').width(this.width);
+		$('.slideshow-dialog,.slideshow-image').height(this.height);
+		$('.slideshow-pending').addClass('hidden');
+		$('.slideshow-progress').addClass('hidden');
+	};
+	img.src = src;
+}
 
 function previewimg(id,uint8arr)
 {
@@ -5093,7 +5111,7 @@ function previewimg(id,uint8arr)
 		src: myURL.createObjectURL(blob),
 		time: new Date().getTime()	
 	}
-	if (id == slideshowid) $('.fm-dialog.slideshow img').attr('src',previews[id].src);
+	if (id == slideshowid) previewsrc(previews[id].src);
 }
 
 

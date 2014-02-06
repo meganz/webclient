@@ -120,7 +120,7 @@ function dl_dispatch_decryption()
 				
 				if (typeof(dl_workers[id]) != "object")
 				{
-					dl_workers[id] = new Worker('decrypter.js?v=5');
+					dl_workers[id] = new Worker('decrypter.js');
 					dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
 					dl_workers[id].onmessage = function(e)
 					{
@@ -620,7 +620,7 @@ function startdownload2(res,ctx)
 	dl_queue_num++;
 
 	dl_retryinterval *= 1.2;
-	
+
 	dl_settimer(dl_retryinterval,startdownload);
 }
 
@@ -682,21 +682,25 @@ function dl_setcredentials(g,s,n)
 		{
 			case 0:	// Chrome (async)
 				dl_createtmp(size);
-				return;		
+				return;
+
 			case 2:
 				dl_blob = new MSBlobBuilder();
+				// fall through
+			case 1:
 				dl_run();
 				break;
-				
+
 			case 3:
 				ffe_createtmp();
 				dl_run();
 				break;
-			
+
 			case 4:
 				dl_blob_array = [];
 				dl_run();
-				break;				
+				break;
+
 			case 6:
 				DBWriter.init();
 				dl_run();
@@ -993,8 +997,6 @@ function dl_dispatch_read()
 					}
 					else
 					{
-						//if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
-						
 						if (dl_pos[this.slot] != -1)
 						{
 							dl_chunks.unshift(dl_pos[this.slot]);

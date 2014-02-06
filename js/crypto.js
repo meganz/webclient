@@ -854,18 +854,26 @@ function api_proc(q)
 		if (!this.q.cancelled)
 		{
 			var t;
-			
-			if (this.responseText) this.response = this.responseText;
 
-			if (d) console.log('API response: ' + this.response);
-			
-			try {
-				t = JSON.parse(this.response);
-				if (this.response[0] == '{') t = [t];
-			} catch (e) {
-				// bogus response, try again
-				console.log("Bad JSON data in response: " + this.response);
-				t = -3;
+			if (this.status == 200)
+			{
+				if (this.responseText) this.response = this.responseText;
+
+				if (d) console.log('API response: ' + this.response);
+				
+				try {
+					t = JSON.parse(this.response);
+					if (this.response[0] == '{') t = [t];
+				} catch (e) {
+					// bogus response, try again
+					console.log("Bad JSON data in response: " + this.response);
+					t = EAGAIN;
+				}
+			}
+			else
+			{
+				if (d) console.log('API server connection failed (error ' + this.status + ')');
+				t = ERATELIMIT;
 			}
 
 			if (typeof t == 'object')
@@ -916,7 +924,7 @@ function api_send(q)
 
 function api_reqerror(q,e)
 {
-	if (e == -3)
+	if (e == EAGAIN || e == ERATELIMIT)
 	{
 		// request failed - retry with exponential backoff
 		if (q.backoff) q.backoff *= 2;

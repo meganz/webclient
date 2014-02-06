@@ -274,7 +274,7 @@ input[type="checkbox"] {
 	width: 21px;
 	height: 21px;
 	background-position: left -8514px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	float: left;
 	cursor: pointer;
@@ -291,7 +291,7 @@ input[type="checkbox"] {
 	width: 21px;
 	height: 21px;
 	background-position: left -8554px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	float: left;
 	cursor: pointer;
@@ -1166,7 +1166,7 @@ a.blog-button:hover {
 	width: 22px;
 	height: 22px;
 	background-position: 1px -9746px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: 4px 5px 0 0;
 	cursor: pointer;
@@ -2833,19 +2833,19 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 }
 .fm-connector-first.active {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-connector.mid {
 	background-position: 4px -1947px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-connector.vertical-line {
 	background-position: 4px -2007px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-connector.last, .current .fm-connector {
 	background-position: 4px -2037px !important;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-tree-header {
 	display: block;
@@ -2857,7 +2857,7 @@ label.iPhoneCheckLabelOff span {
 	color: black;
 	font-size: 13px;
 	line-height: 40px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin-bottom: 6px;
 	cursor: default;
@@ -2927,24 +2927,24 @@ label.iPhoneCheckLabelOff span {
 	padding-left: 64px
 }
 .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -5px -1339px;
 }
 .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -5px -1380px;
 }
 .fm-tree-header.active.contains-subfolders span {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -5px -1419px;
 }
 .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -5px -1300px;
 }
 .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows {
 	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -23px -2655px;
 	padding-left: 0;
 	float: right;
@@ -2965,7 +2965,7 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: repeat-x;
 }
 .fm-horizontal-connector.active {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 ul .fm-horizontal-connector {
 	width: 10px;
@@ -3013,7 +3013,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
 	color: #333333;
 	font-size: 13px;
 	line-height: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: 32px -2114px;
 	background-repeat: no-repeat;
 	white-space: nowrap;
@@ -3077,18 +3077,18 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
 }
 .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span {
 	background-position: -5px -1346px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span {
 	background-position: -5px -1388px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-tree-folder.contains-folders.active span {
 	background-position: -5px -1426px;
 }
 .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span {
 	background-position: -5px -1308px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-tree-folder.contact span, .fm-tree-folder.contact.active.dragover span, .fm-tree-folder.contact.dragover span {
 	background-position: -5px -1300px;
@@ -3308,7 +3308,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 }
 .top-menu-icon {
 	background-position: left -9452px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	height: 26px;
@@ -3480,7 +3480,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: 30px;
 	width: 32px;
 	margin: 10px 20px 0 0;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -9px -115px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -3493,7 +3493,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: 30px;
 	width: 32px;
 	margin: 10px 20px 0 0;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -9px -250px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -3507,7 +3507,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: 30px;
 	width: 32px;
 	margin: 10px 20px 0 0;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -9px -390px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -3528,7 +3528,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	width: 37px;
 	height: 56px;
 	background-position: -6px -10868px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: 0 auto;
 }
@@ -3558,7 +3558,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -10px top;
 	background-repeat: no-repeat;
 	position: relative;
@@ -3571,7 +3571,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	color: #737271;
 }
 .contains-value .top-search-clear {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .contains-value .top-search-clear {
 	cursor: pointer;
@@ -3632,7 +3632,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	width: 25%;
 	height: inherit;
 	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	float: left;
 	cursor: pointer;
@@ -3706,7 +3706,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	padding: 0 0 0 39px;
 	font-size: 13px;
 	color: #383b3d;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 10px -3067px;
 }
@@ -3715,7 +3715,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	float: right;
 	height: 25px;
 	width: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -27px -3212px;
 	margin-left: 2px;
@@ -3735,7 +3735,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	float: right;
 	height: 25px;
 	width: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 0 -3212px;
 	margin-left: 2px;
@@ -3749,7 +3749,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	float: right;
 	height: 25px;
 	width: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -27px -8855px;
 	margin-left: 2px;
@@ -3768,7 +3768,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	width: 38px;
 	margin: 0 auto;
 	height: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -6px -3135px;
 }
@@ -3814,7 +3814,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: 25px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 6px -3574px;
 }
@@ -3841,7 +3841,7 @@ th.grid-first-th {
 	height: 25px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 6px -3674px;
 }
@@ -3849,7 +3849,7 @@ th.grid-first-th {
 	background-image: none;
 }
 .file-status-icon.star {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .grid-status-icon.star, .file-status-icon.star, .contact-status-icon.star {
 	background-position: 6px -3624px;
@@ -4021,7 +4021,7 @@ th.grid-first-th {
 	height: 25px;
 	width: 25px;
 	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -13px -4795px;
 }
@@ -4681,7 +4681,7 @@ th.grid-first-th {
 	height: 26px;
 	padding: 0 0 0 27px;
 	white-space: nowrap;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	display: block;
 }
@@ -4747,7 +4747,7 @@ th.grid-first-th {
 	-moz-border-radius-topleft: 4px;
 	border-top-left-radius: 4px;
 	margin-right: 2px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 8px -3724px;
 	float: left;
@@ -4769,7 +4769,7 @@ th.grid-first-th {
 	height: 30px;
 	line-height: 29px;
 	padding: 0 8px 0 33px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	color: white;
 	font-size: 13px;
@@ -4812,7 +4812,7 @@ th.grid-first-th {
 	padding: 0 22px 0 0;
 }
 .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: right -1763px;
 	display: block;
@@ -4820,7 +4820,7 @@ th.grid-first-th {
 	color: white;
 }
 .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: right -4417px;
 	padding: 0 20px 0 0;
@@ -4840,7 +4840,7 @@ th.grid-first-th {
 	line-height: 25px;
 	color: #3f3f3f;
 	padding: 0 10px 0 44px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 3px -3357px;
 	-webkit-box-sizing: border-box;
@@ -4868,7 +4868,7 @@ th.grid-first-th {
 	line-height: 25px;
 	color: #3f3f3f;
 	padding: 0 10px 0 41px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 3px -3422px;
 	-webkit-box-sizing: border-box;
@@ -4936,7 +4936,7 @@ span.search-number {
 	line-height: 25px;
 	color: #3f3f3f;
 	padding: 0 10px 0 41px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 3px -3497px;
 	-webkit-box-sizing: border-box;
@@ -4974,7 +4974,7 @@ span.search-number {
 	line-height: 25px;
 	color: #3f3f3f;
 	padding: 0 10px 0 41px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -6px -5571px;
 	-webkit-box-sizing: border-box;
@@ -5030,7 +5030,7 @@ span.search-number {
 	display: block;
 	float: right;
 	margin-right: 10px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -5156,7 +5156,7 @@ span.search-number {
 	color: white;
 }
 .contacts-sorting-by.active, .contacts-sorting-type.active {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
@@ -5214,7 +5214,7 @@ span.search-number {
 	width: 125px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 4px -4987px;
 	margin: -12px 0 0 -2px;
@@ -5247,7 +5247,7 @@ span.search-number {
 }
 .fm-account-select {
 	background-position: right -6596px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0;
 	position: relative;
@@ -5327,7 +5327,7 @@ span.search-number {
 	width: 12px;
 	height: 12px;
 	position: absolute;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: 6px 0 0 -15px;
 }
@@ -5525,14 +5525,14 @@ div .fm-tree-folder.dragover {
 	float: right;
 }
 .star .fm-chat-user-star {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: 8px -3626px;
 	background-repeat: no-repeat;
 }
 .fm-chat-user-status {
 	font-size: 13px;
 	line-height: 21px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0 0 0 20px;
 	color: #353a3a;
@@ -5625,7 +5625,7 @@ div .fm-tree-folder.dragover {
 	width: 18px;
 	height: 18px;
 	background-position: 0 -5821px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	margin: 30px 90px 0 0;
@@ -5710,7 +5710,7 @@ div .fm-tree-folder.dragover {
 	height: 32px;
 	margin: 0 10px 0 161px;
 	background-position: -9px -5231px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	position: relative;
@@ -5724,7 +5724,7 @@ div .fm-tree-folder.dragover {
 	height: 32px;
 	margin: 0 41px 0 10px;
 	background-position: -9px -5401px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	position: relative;
@@ -5755,10 +5755,10 @@ div .fm-tree-folder.dragover {
 	border-color: #e7e7e7;
 }
 .fm-chat-messages-pad .file-status-icon {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-chat-input-icon {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: -9px -2802px;
 	position: absolute;
@@ -5869,7 +5869,7 @@ div .fm-tree-folder.dragover {
 	width: 16px;
 	height: 12px;
 	background-position: center -5890px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	top: -10px;
 	left: 8px;
@@ -5884,7 +5884,7 @@ div .fm-tree-folder.dragover {
 	width: 16px;
 	height: 12px;
 	background-position: center -5950px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	top: -10px;
 	left: 8px;
@@ -6070,7 +6070,7 @@ div .fm-tree-folder.dragover {
 .fm-add-contact-arrow {
 	position: absolute;
 	background-position: center -6002px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	width: 16px;
 	height: 12px;
@@ -6105,7 +6105,7 @@ div .fm-tree-folder.dragover {
 .add-contact-pad {
 	display: block;
 	background-position: -7px -2913px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	height: 52px;
 	position: relative;
@@ -6292,7 +6292,7 @@ div .fm-tree-folder.dragover {
 	width: 30px;
 	float: right;
 	background-position: -10px -6054px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin-right: 1px;
 }
@@ -6360,7 +6360,7 @@ div .fm-tree-folder.dragover {
 	display: block;
 }
 .active .fm-dialog-input-clear {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	cursor: pointer;
 }
 .fm-dialog-new-folder-pad, .fm-dialog-add-contact-pad {
@@ -6549,7 +6549,7 @@ div .fm-tree-folder.dragover {
 }
 .fm-dialog-button.notifications-button {
 	background-position: 8px -9834px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	text-align: left;
 	padding: 0 10px 0 38px;
@@ -6586,7 +6586,7 @@ div .fm-tree-folder.dragover {
 	height: 32px;
 	width: 32px;
 	background-position: -8px -6238px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	float: left;
 	margin: 10px 0 0 10px;
@@ -6601,7 +6601,7 @@ div .fm-tree-folder.dragover {
 	width: 16px;
 	height: 12px;
 	background-position: center -5890px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: -12px 0 0 9px;
 }
@@ -6639,7 +6639,7 @@ div .fm-tree-folder.dragover {
 	width: 60px;
 	height: 37px;
 	background-position: 13px -6384px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 }
 .fm-share-contacts-popup {
@@ -6686,7 +6686,7 @@ div .fm-tree-folder.dragover {
 	height: 32px;
 	margin: 9px 10px 0 0;
 	background-position: center -6462px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	float: right;
 	cursor: pointer;
@@ -6727,7 +6727,7 @@ div .fm-tree-folder.dragover {
 .fm-share-contacts-body .ui-selected .add-contact-pad {
 	background-color: #EEEEEE;
 	background-position: right -4838px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-share-dropdown, .account-history-dropdown-button {
 	border: 2px solid #b2b2b2;
@@ -6748,7 +6748,7 @@ div .fm-tree-folder.dragover {
 	padding: 0 25px 0 10px;
 	color: #363b3b;
 	background-position: right -6596px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	user-select: none;
@@ -6772,7 +6772,7 @@ div .fm-tree-folder.dragover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-position: right -10018px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	min-height: 50px;
 	z-index: 10;
@@ -6801,7 +6801,7 @@ div .fm-tree-folder.dragover {
 	min-width: 168px;
 }
 .fm-share-permissions.active, .account-history-drop-items.active {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 }
 .fm-notification-body {
 	padding: 15px 20px 20px 20px;
@@ -6852,7 +6852,7 @@ div .fm-tree-folder.dragover {
 }
 .context-menu-item {
 	background-position: left -6642px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0 15px 0 47px;
 }
@@ -7002,6 +7002,12 @@ div .fm-tree-folder.dragover {
 }
 .context-menu-item.select-all:hover {
 	background-position: left -11372px;
+}
+.context-menu-item.preview-item {
+	background-position: -1px -11868px;
+}
+.context-menu-item.preview-item:hover {
+	background-position: -1px -11947px;
 }
 .export-link-body {
 	max-height: 420px;
@@ -7223,7 +7229,7 @@ span.orange {
 	width: 30px;
 	float: right;
 	background-position: -5px -9067px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: -15px -17px 0 0;
 }
@@ -7509,7 +7515,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .properties-caution-arrow {
 	height: 6px;
 	background-position: center -9206px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 }
 .properties-contacts-block {
@@ -7538,7 +7544,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	float: right;
 	margin: 9px 10px 0 0;
 	background-position: -20px -9372px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	display: none;
@@ -7593,7 +7599,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	width: 100%;
 	height: 12px;
 	background-position: center -5921px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: 0;
 }
@@ -7602,7 +7608,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	width: 20px;
 	height: 20px;
 	background-position: center -6059px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin: 10px 10px 0 0;
 	cursor: pointer;
@@ -7918,7 +7924,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .membership-arrow {
 	height: 6px;
 	background-position: center -9207px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	height: 5px;
 	width: 10px;
@@ -7972,7 +7978,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	height: 7px;
 	margin-top: -12px;
 	background-position: center -9616px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	width: 52px;
 	float: right;
@@ -8009,7 +8015,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .top-user-status-item.active {
 	background-position: right -5707px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 }
 .top-user-status-item .activity-status {
@@ -8030,7 +8036,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	color: white;
 }
 .top-menu-item.contains-submenu {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	font-family: 'Open Sans', Arial;
 	background-repeat: no-repeat;
 	background-position: 3px -9657px;
@@ -8652,7 +8658,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	z-index: 100;
 	top: 45px;
 	right: 18px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: left -10359px;
 	padding: 22px 20px 0 54px;
@@ -11180,7 +11186,7 @@ span.browsers-update {
 }
 .account-warning-icon {
 	width: 19px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	margin-left: 3px;
 	background-position: 2px -10665px;
@@ -12687,7 +12693,7 @@ code, c {
 	font-size: 14px;
 	padding: 0 0 0 64px;
 	line-height: 47px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	background-position: 9px -631px;
 }
@@ -13566,11 +13572,11 @@ h1.help-home-header {
 	cursor: pointer;
 }
 .arrow.asc {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: right -11072px;
 }
 .arrow.desc {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: right -11122px;
 }
 .ff-extension-icon {
@@ -13663,27 +13669,27 @@ a.ff-extension-button:hover {
 	cursor: pointer;
 }
 .search-path-icon.cloud-drive {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -13px -2260px;
 }
 .search-path-icon.folder {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: 1px -2114px;
 }
 .search-path-icon.shared-folder {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: 1px -2174px;
 }
 .search-path-icon.recycle-item {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -13px -2310px;
 }
 .search-path-icon.contacts-item {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -13px -2400px;
 }
 .search-path-icon.inbox-item {
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: -13px -2355px;
 }
 .search-path-icon img {
@@ -13702,7 +13708,7 @@ a.ff-extension-button:hover {
 	float: left;
 	width: 10px;
 	height: 30px;
-	background-image: url(../images/mega/main-sprite.png?v=6);
+	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-position: center -11636px;
 	background-repeat: no-repeat;
 	background-size: 50px auto;
@@ -13941,6 +13947,12 @@ a.ff-extension-button:hover {
 .top-icons-block .context-menu-item.select-all:hover {
 	background-position: 3px -11370px;
 }
+.top-icons-block .context-menu-item.preview-item {
+	background-position: 2px -11866px;
+}
+.top-icons-block .context-menu-item.preview-item:hover {
+	background-position: 2px -11945px;
+}
 .context-menu-item.more-item {
 	background-image: url(../images/mega/context-top.png);
 	background-position: 15px -98px;
@@ -14044,8 +14056,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .slideshow-dialog {
 	min-width: 700px;
-	min-height: 400px;
+	min-height: 500px;
 	max-height: 90%;
+	max-width: 90%;
 	position: absolute;
 	z-index: 410;
 	background-color: rgba(0,0,0,0.3);
@@ -14164,21 +14177,24 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	vertical-align: middle;
 	text-align: center;
 	height: inherit;
+	width: inherit;
+	min-width: inherit;
 }
 .slideshow-image-bl.hidden {
-	display:none;
+	display: none;
 }
 .slideshow-image {
 	max-height: 100%;
 	max-width: 100%;
 }
-.active .slideshow-prev-icon:hover {
-	background-position: 0 -591px;
+.slideshow-prev-button.active, .slideshow-next-button.active {
 	cursor: pointer;
 }
-.active .slideshow-next-icon:hover {
+.slideshow-prev-button.active:hover .slideshow-prev-icon {
+	background-position: 0 -591px;
+}
+.slideshow-next-button.active:hover .slideshow-next-icon {
 	background-position: -6px -731px;
-	cursor: pointer;
 }
 .slideshow-pending {
 	width: 156px;
@@ -14733,7 +14749,7 @@ background-size: 90px auto;
 background-size:120px auto;
 }
 .orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .top-menu-icon, .language-popup-icon, .notification-popup-icon, .cloud-popup-icon, .top-search-bl, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .grid-header-star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .grid-url-arrow, .transfer-type, .transfer-status, .fm-back-button, .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs, .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow, .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-new-folder, .fm-file-upload, .fm-folder-upload, .fm-add-user, .fm-clearbin-button, .fm-files-view-icon, .fm-contacts-view-icon, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-dialog-button.notifications-button, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .top-user-status-item.active, .top-menu-item.contains-submenu, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-popup-icon, .warning-gray-icon, .arrow.asc, .arrow.desc, .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
-background-image: url(../images/mega/main-sprite@2x.png?v=6);
+background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
 .warning-popup-icon, .warning-popup-icon:hover, .warning-popup-icon.active {
@@ -15887,6 +15903,187 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 }
 .rtl .context-menu-item.select-all:hover {
 	background-position: right -11372px;
+}
+.rtl .context-menu-item.preview-item {
+	background-position: right -11868px;
+}
+.rtl .context-menu-item.preview-item:hover {
+	background-position: right -11947px;
+}
+.rtl .top-icons-block .context-menu-item.open-item {
+	background-position: right -6698px;
+}
+.rtl .top-icons-block .context-menu-item.open-item:hover {
+	background-position: right -6748px;
+}
+.rtl .top-icons-block .context-menu-item.fileupload-item {
+	background-position: 103% -3418px;
+	background-position: -webkit-calc(100% + 6px) -3418px;
+	background-position: right -6px -3418px;
+}
+.rtl .top-icons-block .context-menu-item.fileupload-item:hover {
+	background-position: 109% -4564px;
+	background-position: -webkit-calc(100% + 13px) -4564px;
+	background-position: right -13px -4564px;
+}
+.rtl .top-icons-block .context-menu-item.folderupload-item {
+	background-position: 103% -3493px;
+	background-position: -webkit-calc(100% + 6px) -3493px;
+	background-position: right -6px -3493px;
+}
+.rtl .top-icons-block .context-menu-item.folderupload-item:hover {
+	background-position: 109% -4618px;
+	background-position: -webkit-calc(100% + 13px) -4618px;
+	background-position: right -13px -4618px;
+}
+.rtl .top-icons-block .context-menu-item.newfolder-item {
+	background-position: right -6798px;
+}
+.rtl .top-icons-block .context-menu-item.newfolder-item:hover {
+	background-position: right -6848px;
+}
+.rtl .top-icons-block .context-menu-item.properties-item {
+	background-position: right -6898px;
+}
+.rtl .top-icons-block .context-menu-item.properties-item:hover {
+	background-position: right -6948px;
+}
+.rtl .top-icons-block .context-menu-item.download-item {
+	background-position: right -6998px;
+}
+.rtl .top-icons-block .context-menu-item.download-item:hover {
+	background-position: right -7048px;
+}
+.rtl .top-icons-block .context-menu-item.download-standart-item {
+	background-position: right -7098px;
+}
+.rtl .top-icons-block .context-menu-item.download-standart-item:hover {
+	background-position: right -7148px;
+}
+.rtl .top-icons-block .context-menu-item.rename-item {
+	background-position: right -7198px;
+}
+.rtl .top-icons-block .context-menu-item.rename-item:hover {
+	background-position: right -7248px;
+}
+.rtl .top-icons-block .context-menu-item.copy-item {
+	background-position: right -7298px;
+}
+.rtl .top-icons-block .context-menu-item.copy-item:hover {
+	background-position: right -7348px;
+}
+.rtl .top-icons-block .context-menu-item.refresh-item {
+	background-position: right -7398px;
+}
+.rtl .top-icons-block .context-menu-item.refresh-item:hover {
+	background-position: right -7438px;
+}
+.rtl .top-icons-block .context-menu-item.reply-item {
+	background-position: right -7478px;
+}
+.rtl .top-icons-block .context-menu-item.reply-item:hover {
+	background-position: right -7518px;
+}
+.rtl .top-icons-block .context-menu-item.forward-item {
+	background-position: right -7558px;
+}
+.rtl .top-icons-block .context-menu-item.forward-item:hover {
+	background-position: right -7598px;
+}
+.rtl .top-icons-block .context-menu-item.zipdownload-item {
+	background-position: right -7644px;
+}
+.rtl .top-icons-block .context-menu-item.zipdownload-item:hover {
+	background-position: right -7692px;
+}
+.rtl .top-icons-block .context-menu-item.getlink-item {
+	background-position: right -7742px;
+}
+.rtl .top-icons-block .context-menu-item.getlink-item:hover {
+	background-position: right -7792px;
+}
+.rtl .top-icons-block .context-menu-item.sharing-item {
+	background-position: right -7842px;
+}
+.rtl .top-icons-block .context-menu-item.sharing-item:hover {
+	background-position: right -7892px;
+}
+.rtl .top-icons-block .context-menu-item.send-to-contact-item {
+	background-position: right -7942px;
+}
+.rtl .top-icons-block .context-menu-item.send-to-contact-item:hover {
+	background-position: right -7992px;
+}
+.rtl .top-icons-block .context-menu-item.move-item {
+	background-position: right -8042px;
+}
+.rtl .top-icons-block .context-menu-item.move-item:hover {
+	background-position: right -8092px;
+}
+.rtl .top-icons-block .context-menu-item.remove-item, .rtl .top-icons-block .context-menu-item.clearbin-item, .rtl .top-icons-block .context-menu-item.canceltransfer-item {
+	background-position: right -8142px;
+}
+.rtl .top-icons-block .context-menu-item.remove-item:hover, .rtl .top-icons-block .context-menu-item.clearbin-item:hover, .rtl .top-icons-block .context-menu-item.canceltransfer-item:hover {
+	background-position: right -8192px;
+}
+.rtl .top-icons-block .context-menu-item.addcontact-item {
+	background-position: right -8242px;
+}
+.rtl .top-icons-block .context-menu-item.addcontact-item:hover {
+	background-position: right -8282px;
+}
+.rtl .top-icons-block .context-menu-item.add-star-item {
+	background-position: right -8320px;
+}
+.rtl .top-icons-block .context-menu-item.add-star-item:hover {
+	background-position: right -8360px;
+}
+.rtl .top-icons-block .context-menu-item.reply-to-all {
+	background-position: right -8401px;
+}
+.rtl .top-icons-block .context-menu-item.reply-to-all:hover {
+	background-position: right -8441px;
+}
+.rtl .top-icons-block .context-menu-item.permissions-item {
+	background-position: -100px -8401px;
+}
+.rtl .top-icons-block .context-menu-item.permissions-item:hover {
+	background-position: -100px -8441px;
+}
+.rtl .top-icons-block .context-menu-item.select-all {
+	background-position: right -11300px;
+}
+.rtl .top-icons-block .context-menu-item.select-all:hover {
+	background-position: right -11370px;
+}
+.rtl .top-icons-block .context-menu-item.preview-item {
+	background-position: right -11866px;
+}
+.rtl .top-icons-block .context-menu-item.preview-item:hover {
+	background-position: right -11945px;
+}
+.rtl .context-menu-item.more-item {
+	background-position: 103% -98px;
+	background-position: -webkit-calc(100% - 6px) -98px;
+	background-position: right 6px -98px;
+}
+.rtl .top-icons-block .context-menu-item.more-item:hover {
+	background-position: 103% -348px;
+	background-position: -webkit-calc(100% - 6px) -348px;
+	background-position: right 6px -348px;
+}
+.rtl .top-icons-block .context-menu-item.dropdown span {
+	background-position: -15px 11px;
+	padding: 0 0 0 18px;
+}
+.rtl .top-icons-block .context-menu-item.dropdown:hover span {
+	background-position: -15px -239px;
+}
+.rtl .top-icons-block .context-menu-item.dropdown.active span {
+	background-position: -15px -49px;
+}
+.rtl .top-icons-block .context-menu-item.dropdown.active:hover span {
+	background-position: -15px -299px;
 }
 .rtl .top-search-input {
 	text-align: left;

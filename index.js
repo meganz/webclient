@@ -505,8 +505,11 @@ function init_page()
 			document.location.hash = 'plugin';
 		});
 		
-		
-		
+		$('.sync-help-center').unbind('click');
+		$('.sync-help-center').bind('click',function(e)
+		{
+			document.location.hash = 'help/sync';
+		});
 	}
 	else if (page == 'mobile')
 	{

@@ -14049,6 +14049,7 @@ a.ff-extension-button:hover {
 	background-repeat: no-repeat;
 	text-align: center;
 	padding: 107px 0 25px 0;
+	cursor:pointer;
 }
 .sync-help-center .st-apps-title {
 	cursor:pointer;

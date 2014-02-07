@@ -3951,11 +3951,7 @@ function shareDialog(close)
 			u.sort(function(a,b)
 			{
 				if (a.name && b.name) return a.name.localeCompare(b.name); 
-				else 
-				{ 
-					console.log('huh',a,b); 
-					return -1; 
-				}
+				else  return -1;				
 			});
 			for (var i in u)
 			{
@@ -5020,12 +5016,14 @@ function slideshowsteps()
 
 function slideshow_next()
 {
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
 	var steps = slideshowsteps();
 	if (steps.forward.length > 0) slideshow(steps.forward[0]);
 }
 
 function slideshow_prev()
 {
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
 	var steps = slideshowsteps();
 	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 }
@@ -5078,8 +5076,8 @@ function slideshow(id,close)
 		if (c && c.indexOf('active') > -1)
 		{
 			var steps = slideshowsteps();			
-			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
-			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow(steps.forward[0]);	
+			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow_prev();
+			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow_next();
 		}
 	});		
 	
@@ -5136,6 +5134,7 @@ function fetchsrc(id)
 		if (id == slideshowid) fetchnext();
 	},function(id)
 	{
+		delete preqs[id];
 		M.addDownload([id],false,true);
 	});
 }

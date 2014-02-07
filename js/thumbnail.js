@@ -86,8 +86,9 @@ function createthumbnail(file,aes,id,imagedata,node)
 				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);						
 				
 				var ab2 = dataURLToAB(dataURI2);
+								
 				
-				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key	
 				
 				if (node) previewimg(node,ab2);
 				

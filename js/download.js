@@ -604,10 +604,9 @@ function startdownload2(res,ctx)
 		{
 			var ab = base64_to_ab(res.at);
 			var o = dec_attr(ab,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-
 			if (typeof o == 'object' && typeof o.n == 'string')
 			{
-				if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
+				if (have_ab && res.fa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);				
 				return dl_setcredentials(res.g,res.s,o.n);
 			}
 			else dl_reportstatus(dl_queue_num,EKEY);

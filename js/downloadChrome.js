@@ -177,6 +177,12 @@ function FileSystemAPI(dl_id, dl) {
 		});
 	}
 
+	IO.abort = function(e) {
+		zfileEntry.remove(function() {
+			// try to remove
+		});
+	}
+
 	IO.write = function(buffer, position, done) {
 		if (dl_writing || position !== dl_fw.position) {
 			// busy or not there yet

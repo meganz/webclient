@@ -47,6 +47,15 @@ body {
 	height: 100%;
 	min-width: 987px;
 }
+::selection {
+  background: #d22000;
+  color: white;
+}
+
+::-moz-selection {
+  background: #d22000;
+  color: white;
+}
 .div, span, input {
 	outline: none;
 }
@@ -2861,6 +2870,7 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	margin-bottom: 6px;
 	cursor: default;
+	overflow:hidden;
 }
 .fm-tree-header.cloud-drive-item, .fm-tree-header.cloud-drive-item.active.dragover, .fm-tree-header.cloud-drive-item.dragover {
 	background-position: 18px -2253px;

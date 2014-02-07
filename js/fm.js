@@ -3418,8 +3418,8 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
-			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();			
-			if (folderlink) $(t).filter('.newfolder-item').hide();			
+			$.selected = [M.RootID];
+			$(t).filter('.refresh-item,.properties-item').show();
 		}
 		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
 		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
@@ -5036,6 +5036,17 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
+		
+		// todo cesar: cancel all existing preview downloads (queued & running) when closing the slideshow dialog
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i].preview)
+			{
+				if (i == dl_queue_num) dl_cancel(0xBADF);
+				$('.transfer-table #dl_' + dl_queue[i].id).remove();
+				dl_queue[i]=false;				
+			}
+		}		
 		return false;
 	}
 	
@@ -5088,6 +5099,7 @@ function slideshow(id,close)
 		{
 			if (dl_queue[i] && dl_queue[i].id == slideshowid)
 			{
+				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
 				dl_queue[i].preview=false;
 				openTransferpanel();
 				return;
@@ -5134,7 +5146,7 @@ function fetchsrc(id)
 		if (id == slideshowid) fetchnext();
 	},function(id)
 	{
-		delete preqs[id];
+		delete preqs[id];		
 		M.addDownload([id],false,true);
 	});
 }
@@ -5172,7 +5184,8 @@ function previewimg(id,uint8arr)
 	try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
 	if (!blob || blob.size < 25) blob = new Blob([uint8arr.buffer]);
 	previews[id] = 
-	{		
+	{	
+		blob: blob,
 		src: myURL.createObjectURL(blob),
 		time: new Date().getTime()	
 	}
@@ -5184,6 +5197,7 @@ function previewimg(id,uint8arr)
 
 
 var thumbnails = [];
+var thumbnailblobs = [];
 var th_requested = [];
 
 function fm_thumbnails()
@@ -5226,7 +5240,8 @@ function fm_thumbnails()
 			api_getfileattr(treq,0,function(ctx,node,uint8arr)
 			{
 				try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
-				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);				
+				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);
+				thumbnailblobs[node] = blob;
 				thumbnails[node] = myURL.createObjectURL(blob);
 				if ($('.file-block#' + node).length > 0)
 				{

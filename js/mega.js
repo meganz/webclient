@@ -649,8 +649,9 @@ function MegaData ()
 		{
 			if (a[i] == this.RootID)
 			{
-				typeclass = 'cloud-drive';
-				name = l[164];
+				typeclass = 'folder';
+				if (folderlink && M.d[this.RootID]) name = M.d[this.RootID].name;
+				else name = l[164];
 			}
 			else if (a[i] == 'contacts')
 			{
@@ -1378,6 +1379,7 @@ function MegaData ()
 
 	this.addDownload = function(n,z,preview)
 	{
+		// todo cesar: preview parameter indicates that this is a image preview download
 		delete $.dlhash;
 		var zipname,path;
 		var nodes = [];
@@ -2095,7 +2097,7 @@ function execsc(ap)
 				}
 			}
 		}
-		else if (a.a == 'u' && !folderlink)
+		else if (a.a == 'u')
 		{
 			var n = M.d[a.n];
 			if (n)
@@ -2110,7 +2112,8 @@ function execsc(ap)
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' span').text(f.name);
-						if ($('#path_' + n.h).length > 0) newpath=1;
+						if ($('#path_' + n.h).length > 0) newpath=1;						
+						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
 					{

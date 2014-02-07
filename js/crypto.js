@@ -1599,8 +1599,6 @@ function api_storefileattr(id,type,key,data,ctx)
 
 function api_fareq(res,ctx)
 {
-	console.log('check',res,ctx);
-
 	if (typeof res == 'object' && res.p)
 	{
 		var data;			
@@ -1676,9 +1674,7 @@ function api_fareq(res,ctx)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
-							
-							console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);						
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -1759,12 +1755,8 @@ function api_getfa(id)
 
 function api_attachfileattr(node,id)
 {
-	console.log('api_attachfileattr()');
-
 	var fa = api_getfa(id);
 	
-	console.log('fa',fa);
-
 	storedattr[id].target = node;	
 
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});

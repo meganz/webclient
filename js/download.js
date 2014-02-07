@@ -798,21 +798,23 @@ function dl_complete()
 		name = dl_queue[dl_queue_num].n;
 		path = dl_queue[dl_queue_num].p;
 	}
+	
+	// todo cesar: incorporate similar logic to prevent download from being pushed as a real download when it's an image preview
 	switch (dl_method)
 	{
 		case 0:
 			if (dl_queue_num >= 0) dl_queue[dl_queue_num].onBeforeDownloadComplete();
 			document.getElementById('dllink').download = name;
 			document.getElementById('dllink').href = document.fileEntry.toURL();
-			if (!is_chrome_firefox) document.getElementById('dllink').click();
+			if (!is_chrome_firefox && !dl_queue[dl_queue_num].preview) document.getElementById('dllink').click();
 			break;
 
 		case 1:
-			document.getElementById('dlswf_' + dl_id).flashdata(dl_id,'',name);
+			if (!dl_queue[dl_queue_num].preview) document.getElementById('dlswf_' + dl_id).flashdata(dl_id,'',name);
 			break;
 
 		case 2:
-			navigator.msSaveOrOpenBlob(dl_blob.getBlob(),name);
+			if (!dl_queue[dl_queue_num].preview) navigator.msSaveOrOpenBlob(dl_blob.getBlob(),name);
 			break;
 
 		case 3:
@@ -822,7 +824,7 @@ function dl_complete()
 			document.getElementById('dllink').download = name;
 			blob_urls.push(myURL.createObjectURL(new Blob(dl_blob_array)));
 			document.getElementById('dllink').href = blob_urls[blob_urls.length-1];
-			document.getElementById('dllink').click();
+			if (!dl_queue[dl_queue_num].preview) document.getElementById('dllink').click();
 			setTimeout(function()
 			{
 				myURL.revokeObjectURL(document.getElementById('dllink').href);

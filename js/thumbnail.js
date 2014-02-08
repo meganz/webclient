@@ -20,7 +20,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 		{
 			var t = new Date().getTime();
 			var n = M.d[node];
-			
+					
 			// thumbnail:			
 			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
 			{

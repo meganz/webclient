@@ -5016,14 +5016,14 @@ function slideshowsteps()
 
 function slideshow_next()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num] && dl_queue[dl_queue_num].id == slideshowid) return;
 	var steps = slideshowsteps();
 	if (steps.forward.length > 0) slideshow(steps.forward[0]);
 }
 
 function slideshow_prev()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num] && dl_queue[dl_queue_num].id == slideshowid) return;
 	var steps = slideshowsteps();
 	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 }

@@ -120,7 +120,7 @@ function dlZipIO(dl, dl_id) {
 			});
 			doWrite(end, function() {
 				fm_zipcomplete(dl.zipid);
-				dl.onDownloadComplete(dl.dl_id);
+				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
 				realIO.download(dl.zipname);
 			});

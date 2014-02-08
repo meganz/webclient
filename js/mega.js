@@ -1557,7 +1557,7 @@ function MegaData ()
 		}
 	}
 
-	this.dlcomplete = function (id,z)
+	this.dlcomplete = function (id,z, dl_queue_num)
 	{
 		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
 		{
@@ -1614,7 +1614,7 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid, error)
+	this.dlerror = function(fileid, error, dl_queue_num)
 	{
 		var errorstr=false;
 		if (d) console.log('dlerror',fileid,error);

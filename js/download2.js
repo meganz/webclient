@@ -334,7 +334,7 @@ function dl_reportstatus(num, code)
 {
 	if (dl_queue[num]) {
 		dl_queue[num].lasterror = code;
-		dl_queue[num].onDownloadError(dl_queue[num].id || dl_queue[num].ph,code);
+		dl_queue[num].onDownloadError(dl_queue[num].id || dl_queue[num].ph, code, num);
 	}
 }
 
@@ -364,8 +364,8 @@ function dlGetUrl(object, callback) {
 							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 	
 						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0))  {
-								dl.data = new ArrayBuffer(res.s);
+							if (have_ab && res.fa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) {
+								object.data = new ArrayBuffer(res.s);				
 							}
 							return callback(false, res, o, object);
 						} else {

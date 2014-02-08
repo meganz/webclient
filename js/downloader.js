@@ -249,7 +249,7 @@ function ClassFile(dl) {
 	
 			dlQueue.pushAll(tasks, function() {
 				if (dl.cancelled) return;
-				dl.onDownloadComplete(dl.dl_id);
+				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
@@ -260,7 +260,9 @@ function ClassFile(dl) {
 							return Zips[dl.zipid].done();
 						}
 						dl.onBeforeDownloadComplete(dl.pos);
-						dl.io.download(dl.zipname || dl.n, dl.p);
+						if (!dl.preview) {
+							dl.io.download(dl.zipname || dl.n, dl.p);
+						}
 					}
 				}, 100);
 			}, failureFunction);
@@ -317,6 +319,13 @@ function decrypter(task)
 				Decrypter.done(); // release slot
 				DEBUG("Decrypt done");
 				download.io.write(plain, task.offset, function() {
+					if (task.download.data) {
+						new Uint8Array(
+							task.download.data,
+							task.offset,
+							plain.length
+						).set(plain);
+					}
 					// decrease counter
 					// useful to avoid downloading before writing
 					// all

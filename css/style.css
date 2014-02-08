@@ -48,13 +48,13 @@ body {
 	min-width: 987px;
 }
 ::selection {
-  background: #d22000;
-  color: white;
+	background: #d22000;
+	color: white;
 }
 
 ::-moz-selection {
-  background: #d22000;
-  color: white;
+ background: #d22000;
+ color: white;
 }
 .div, span, input {
 	outline: none;
@@ -2870,7 +2870,7 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	margin-bottom: 6px;
 	cursor: default;
-	overflow:hidden;
+	overflow: hidden;
 }
 .fm-tree-header.cloud-drive-item, .fm-tree-header.cloud-drive-item.active.dragover, .fm-tree-header.cloud-drive-item.dragover {
 	background-position: 18px -2253px;
@@ -6158,8 +6158,6 @@ div .fm-tree-folder.dragover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-
-
 .fm-dialog.create-folder-dialog, .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
 	min-width: 500px;
 	height: 126px;
@@ -11287,7 +11285,7 @@ span.browsers-update {
 	text-align: center;
 	padding: 49px 20px 49px 20px;
 }
-.sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button {
+.sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button {
 	min-width: 209px;
 	height: 64px;
 	display: inline-block;
@@ -11311,6 +11309,50 @@ span.browsers-update {
 .google-play-button {
 	background-position: -343px -1447px;
 }
+.chrome-app-button {
+	background-image: url(../images/mega/chrome-app.png);
+	background-position: center -155px;
+	background-repeat: no-repeat;
+}
+.chrome-app-logo {
+	width: 220px;
+	height: 60px;
+	margin: 38px auto 26px auto;
+	background-image: url(../images/mega/chrome-app.png);
+	background-position: center top;
+	background-repeat: no-repeat;
+}
+.chrome-app-scr {
+	width: 700px;
+	height: 418px;
+	margin: 30px auto -26px auto;
+	background-image: url(../images/mega/chrome-app.png);
+	background-position: center -155px;
+	background-repeat: no-repeat;
+}
+.chrome-app-button.new-app {
+	background-image: url(../images/mega/chrome-app.png);
+	background-repeat: no-repeat;
+	background-position: -230px -612px;
+}
+.new-app .sync-button-txt {
+	font-size: 16px;
+	color: #999999;
+}
+.new-app .pro-mid-header {
+	padding-top: 46px;
+	margin-bottom: 14px;
+	font-family: 'Open Sans Semibold', Arial;
+}
+.new-app .pro-mid-header span {
+	color: #666666;
+}
+.new-app .sync-button-txt.small {
+	font-size: 11px;
+	color: #666666;
+	line-height: 14px;
+	padding-top: 7px;
+}
 .blackberry-button {
 	background-position: 12px -1558px;
 }
@@ -11322,7 +11364,7 @@ span.browsers-update {
 	padding: 16px 15px 0 0;
 	min-width: 259px;
 }
-.sync-button:hover, .ios-button:hover, .google-play-button:hover, .ff-bott-button:hover, .blackberry-button:hover {
+.sync-button:hover, .ios-button:hover, .google-play-button:hover, .ff-bott-button:hover, .blackberry-button:hover, .chrome-app-button:hover {
 	border: 5px solid #DB3200;
 	margin: 0;
 	min-width: 215px;
@@ -11434,13 +11476,13 @@ span.browsers-update {
 .chrome-download-button, a.chrome-download-button {
 	height: 60px;
 	display: block;
-	background-color: #DB0605;
+	background-color: white;
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
-	padding: 16px 15px 0 70px;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	padding: 0 15px 0 70px;
+	background-image: url(../images/mega/chrome-app.png);
 	background-repeat: no-repeat;
-	background-position: -4px -917px;
+	background-position: -644px 8px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
@@ -11449,9 +11491,24 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
+	color: #666666;
+	font-size: 12px;
+	line-height: 21px;
+	border: 2px solid #d0d0d0;
+}
+.chrome-download-txt {
+	font-size: 16px;
+	font-family: 'Open Sans Semibold', Arial;
+	display: block;
+	padding: 8px 0 0 0;
+}
+.chrome-download-button:hover, a.chrome-download-button:hover {
+	background-color: #DB0605;
+	border: 2px solid #DB0605;
+	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-repeat: no-repeat;
+	background-position: -4px -919px;
 	color: white;
-	font-size: 13px;
-	line-height: 24px;
 }
 .chrome-bottom-txt {
 	font-size: 13px;
@@ -14059,10 +14116,10 @@ a.ff-extension-button:hover {
 	background-repeat: no-repeat;
 	text-align: center;
 	padding: 107px 0 25px 0;
-	cursor:pointer;
+	cursor: pointer;
 }
 .sync-help-center .st-apps-title {
-	cursor:pointer;
+	cursor: pointer;
 }
 .slideshow-overlay {
 	position: absolute;
@@ -14938,6 +14995,14 @@ background-size: 240px auto;
 }
 .fm-breadcrumbs.search, .fm-share-breadcrumbs.search {
  background-position: 8px -11211px;
+}
+.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-app-button.new-app, .chrome-download-button, a.chrome-download-button {
+background-image: url(../images/mega/chrome-app@2x.png);
+background-size: 700px auto;
+}
+.chrome-download-button:hover, a.chrome-download-button:hover {
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=3);
+background-size: 836px auto;
 }
 }
 /* loader*/

@@ -120,7 +120,7 @@ function dl_dispatch_decryption()
 				
 				if (typeof(dl_workers[id]) != "object")
 				{
-					dl_workers[id] = new Worker('decrypter.js?v=5');
+					dl_workers[id] = new Worker('decrypter.js');
 					dl_workers[id].postMessage = dl_workers[id].webkitPostMessage || dl_workers[id].postMessage;
 					dl_workers[id].onmessage = function(e)
 					{
@@ -604,10 +604,9 @@ function startdownload2(res,ctx)
 		{
 			var ab = base64_to_ab(res.at);
 			var o = dec_attr(ab,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-
 			if (typeof o == 'object' && typeof o.n == 'string')
 			{
-				if (have_ab && res.pfa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);
+				if (have_ab && res.fa && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) dl_queue[dl_queue_num].data = new ArrayBuffer(res.s);				
 				return dl_setcredentials(res.g,res.s,o.n);
 			}
 			else dl_reportstatus(dl_queue_num,EKEY);
@@ -620,7 +619,7 @@ function startdownload2(res,ctx)
 	dl_queue_num++;
 
 	dl_retryinterval *= 1.2;
-	
+
 	dl_settimer(dl_retryinterval,startdownload);
 }
 
@@ -682,21 +681,25 @@ function dl_setcredentials(g,s,n)
 		{
 			case 0:	// Chrome (async)
 				dl_createtmp(size);
-				return;		
+				return;
+
 			case 2:
 				dl_blob = new MSBlobBuilder();
+				// fall through
+			case 1:
 				dl_run();
 				break;
-				
+
 			case 3:
 				ffe_createtmp();
 				dl_run();
 				break;
-			
+
 			case 4:
 				dl_blob_array = [];
 				dl_run();
-				break;				
+				break;
+
 			case 6:
 				DBWriter.init();
 				dl_run();
@@ -742,7 +745,9 @@ function dl_checklostchunk()
 		{
 			dl_reportstatus(dl_queue_num,EKEY);
 			if (dl_zip) dl_killzip(dl_zip.id);
-			else dl_queue[dl_queue_num] = false;			
+			else dl_queue[dl_queue_num] = false;
+
+			dl_cancel(EKEY);
 		}
 		else
 		{
@@ -794,21 +799,23 @@ function dl_complete()
 		name = dl_queue[dl_queue_num].n;
 		path = dl_queue[dl_queue_num].p;
 	}
+	
+	// todo cesar: incorporate similar logic to prevent download from being pushed as a real download when it's an image preview
 	switch (dl_method)
 	{
 		case 0:
 			if (dl_queue_num >= 0) dl_queue[dl_queue_num].onBeforeDownloadComplete();
 			document.getElementById('dllink').download = name;
 			document.getElementById('dllink').href = document.fileEntry.toURL();
-			if (!is_chrome_firefox) document.getElementById('dllink').click();
+			if (!is_chrome_firefox && !dl_queue[dl_queue_num].preview) document.getElementById('dllink').click();
 			break;
 
 		case 1:
-			document.getElementById('dlswf_' + dl_id).flashdata(dl_id,'',name);
+			if (!dl_queue[dl_queue_num].preview) document.getElementById('dlswf_' + dl_id).flashdata(dl_id,'',name);
 			break;
 
 		case 2:
-			navigator.msSaveOrOpenBlob(dl_blob.getBlob(),name);
+			if (!dl_queue[dl_queue_num].preview) navigator.msSaveOrOpenBlob(dl_blob.getBlob(),name);
 			break;
 
 		case 3:
@@ -818,7 +825,7 @@ function dl_complete()
 			document.getElementById('dllink').download = name;
 			blob_urls.push(myURL.createObjectURL(new Blob(dl_blob_array)));
 			document.getElementById('dllink').href = blob_urls[blob_urls.length-1];
-			document.getElementById('dllink').click();
+			if (!dl_queue[dl_queue_num].preview) document.getElementById('dllink').click();
 			setTimeout(function()
 			{
 				myURL.revokeObjectURL(document.getElementById('dllink').href);
@@ -861,7 +868,7 @@ function dl_httperror(code)
 
 	if (!dl_write_position)
 	{
-		dl_cancel();
+		dl_cancel(EAGAIN);
 
 		dl_queue_num++;
 		dl_settimer(dl_retryinterval,startdownload);
@@ -992,8 +999,6 @@ function dl_dispatch_read()
 					}
 					else
 					{
-						//if (d) console.log("onreadystatechange with " + this.status + ", response=" + typeof(r) + ", len=" + (typeof r == 'object' ? r.byteLength : -1) + ", p=" + dl_pos[this.slot]);
-						
 						if (dl_pos[this.slot] != -1)
 						{
 							dl_chunks.unshift(dl_pos[this.slot]);
@@ -1047,18 +1052,18 @@ function appendBuffer( buffer1, buffer2 )
   return tmp.buffer;
 }
 
-function dl_cancel()
+function dl_cancel(error)
 {
 	dl_settimer(-1);
 	dl_instance++;
 	downloading = dl_writing = dl_zip = false;
 
-	for (var slot = dl_maxSlots; slot--; ) if (dl_xhrs[slot]) dl_xhrs[slot].abort();
+	for (var slot = dl_maxSlots; slot--; ) if (dl_xhrs&&dl_xhrs[slot]) dl_xhrs[slot].abort();
 	dl_xhrs = dl_pos = dl_workers = dl_progress = dl_cipherq = dl_plainq = dl_progress = dl_chunks = dl_chunksizes = undefined;
 
 	if(is_chrome_firefox)
 	{
-		dl_fw.close();
+		dl_fw.close(error);
 	}
 }
 

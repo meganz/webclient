@@ -1,12 +1,13 @@
 
 
 function createnodethumbnail(node,aes,id,imagedata)
-{
+{	
+	storedattr[id] = {};
 	storedattr[id] = { target : node };
 	createthumbnail(false,aes,id,imagedata,node);
 }
 
-var ab;
+
 
 function createthumbnail(file,aes,id,imagedata,node)
 {
@@ -18,38 +19,81 @@ function createthumbnail(file,aes,id,imagedata,node)
 		img.onload = function ()
 		{
 			var t = new Date().getTime();
-			var canvas = document.createElement('canvas');
-			var sx=0;
-			var sy=0;
-			var x = this.width;
-			var y = this.height;
-			if (d) console.log(x + ' by ' + y);
-			if (this.width > this.height)
+			var n = M.d[node];
+			
+			// thumbnail:			
+			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
 			{
-				if (d) console.log('landscape');
-				sx = Math.floor((this.width - this.height)/2);
-				x = y;
+				var canvas = document.createElement('canvas');
+				
+				var sx=0;
+				var sy=0;
+				var x = this.width;
+				var y = this.height;
+				
+				if (d) console.log(x + ' by ' + y);
+				if (this.width > this.height)
+				{
+					if (d) console.log('landscape');
+					sx = Math.floor((this.width - this.height)/2);
+					x = y;
+				}
+				else if(this.height > this.width)
+				{
+					if (d) console.log('portrait');
+					sy = Math.floor((this.height - this.width)*0.66/2);
+					y = x;
+				}
+				else
+				{
+					if (d) console.log('square');
+				}
+				
+				var ctx = canvas.getContext("2d");
+				canvas.width  = 120;
+				canvas.height = 120;
+				ctx.drawImage(this, sx, sy, x, y, 0, 0, 120, 120);
+				
+				if (d) console.log('resizing time:', new Date().getTime()-t);
+				myURL.revokeObjectURL(this.src);
+				var dataURI = canvas.toDataURL('image/jpeg',0.85);
+				
+				var ab = dataURLToAB(dataURI);
+				
+				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key			
+			}		
+			
+			// preview image:			
+			if (!n || !n.fa || n.fa.indexOf(':1*') < 0)
+			{			
+				var canvas2 = document.createElement('canvas');
+				var preview_x=this.width,preview_y=this.height;
+				if (preview_x > 1000)
+				{					
+					preview_y=Math.round(preview_y*1000/preview_x);
+					preview_x=1000;
+				}
+				else if (preview_y > 1000)
+				{					
+					preview_x=Math.round(preview_x*1000/preview_y);
+					preview_y=1000;
+				}				
+				var ctx2 = canvas2.getContext("2d");
+				canvas2.width  = preview_x;
+				canvas2.height = preview_y;			
+				ctx2.drawImage(this, 0, 0, preview_x, preview_y);
+				
+				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);						
+				
+				var ab2 = dataURLToAB(dataURI2);
+								
+				
+				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key	
+				
+				if (node) previewimg(node,ab2);
+				
+				if (d) console.log('total time:', new Date().getTime()-t);
 			}
-			else if(this.height > this.width)
-			{
-				if (d) console.log('portrait');
-				sy = Math.floor((this.height - this.width)*0.66/2);
-				y = x;
-			}
-			else
-			{
-				if (d) console.log('square');
-			}
-			var ctx = canvas.getContext("2d");
-			canvas.width  = 120;
-			canvas.height = 120;
-			ctx.drawImage(this, sx, sy, x, y, 0, 0, 120, 120);
-			if (d) console.log('resizing time:', new Date().getTime()-t);
-			myURL.revokeObjectURL(this.src);
-			var dataURI = canvas.toDataURL('image/jpeg',0.85);
-			var ab = dataURLToAB(dataURI);
-			api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
-			if (d) console.log('total time:', new Date().getTime()-t);
 		};
 		try
 		{
@@ -65,7 +109,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 					else var mpImg = new MegaPixImage(thumbnailBlob);
 					var orientation = 1;
 					if (img.exif.Orientation) orientation = img.exif.Orientation;
-					mpImg.render(img, { maxWidth: 500, maxHeight: 500, quality: 0.8, orientation: orientation });
+					mpImg.render(img, { maxWidth: 1000, maxHeight: 1000, quality: 0.8, orientation: orientation });
 				}
 				if (file)
 				{

@@ -7,7 +7,7 @@ function voucherCentering(button)
 	var buttonMid = button.width()/2;
 	popupBlock.css('top', button.position().top + 30);
 	popupBlock.css('left', button.position().left + buttonMid + 20 - popupBlock.width()/2);
-	if(rigthPosition - 20 < popupBlock.position().left) 
+	if(rigthPosition - 20 < popupBlock.position().left)
 	{
 		popupBlock.css('left', rigthPosition - 20);
 	}
@@ -860,6 +860,13 @@ function initContextUI()
 		M.openFolder($.selected[0]);
 	});
 	
+	
+	$(c+'.preview-item').unbind('click');
+	$(c+'.preview-item').bind('click',function(event) 
+	{
+		slideshow($.selected[0]);
+	});
+	
 	$(c+'.clearbin-item').unbind('click');
 	$(c+'.clearbin-item').bind('click',function(event) 
 	{
@@ -924,6 +931,7 @@ function initContextUI()
 			}
 			$(this).remove();
 		});				
+
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
 			DEBUG("cancelled file " + $.sd);
 
@@ -1245,7 +1253,7 @@ function accountUI()
 		$('.fm-account-main .pro-upgrade').bind('click',function(e)
 		{
 			window.location.hash = 'pro';	
-		});		
+		});
 		$('.membership-big-txt.balance').html('&euro; ' + htmlentities(account.balance[0][0]));
 		var a = 0;
 		if (M.c['contacts']) for(var i in M.c['contacts']) a++;		
@@ -2224,9 +2232,8 @@ var QuickFinder = function(searchable_elements, containers) {
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
+        if($(e.target).is("input, textarea, select") || $.dialog)  return;
+        
         var charCode = e.which || e.keyCode; // ff
 
         if(
@@ -2550,7 +2557,8 @@ function UIkeyevents()
 {
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
-	{
+	{		
+	
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
@@ -2561,7 +2569,7 @@ function UIkeyevents()
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if(!$.dialog && M.viewmode == 1) 
+        if(!$.dialog && !slideshowid && M.viewmode == 1) 
 		{	
             var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
@@ -2580,7 +2588,6 @@ function UIkeyevents()
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
-
             } 
 			else if(e.keyCode == 39) 
 			{ 
@@ -2690,13 +2697,14 @@ function UIkeyevents()
 			{
 				var n = M.d[$.selected[0]];
 				if (n && n.t) M.openFolder(n.h);
-				else M.addDownload($.selected);			
+				else if ($.selected.length == 1 && M.d[$.selected[0]] && M.d[$.selected[0]].name && is_image(M.d[$.selected[0]].name)) slideshow($.selected[0]);
+				else M.addDownload($.selected);
 			}			
 		}
 		else if (e.keyCode == 13 && $.dialog == 'rename')
 		{			
 			dorename();
-		}
+		}		
 		else if (e.keyCode == 27 && $.dialog)
 		{
 			$('.fm-dialog').addClass('hidden');
@@ -2714,21 +2722,35 @@ function UIkeyevents()
 		{
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(true);
+		}		
+		else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
+		{
+			$('.grid-table.fm tr').addClass('ui-selected');
+			$('.file-block').addClass('ui-selected');
+		}
+		else if (e.keyCode == 37 && slideshowid)
+		{			
+			slideshow_prev();
+		}
+		else if (e.keyCode == 39 && slideshowid)
+		{
+			slideshow_next();
+		}
+		else if (e.keyCode == 27 && slideshowid)
+		{
+			slideshow(false,true);		
 		}
 		else if (e.keyCode == 27)
 		{
 			$.hideTopMenu();
 		}
-		else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
-		{
-			$('.grid-table.fm tr').addClass('ui-selected');
-			$('.file-block').addClass('ui-selected');
-		}	
+		
 		if (sl && $.selectddUIgrid == '.grid-scrolling-table')
 		{			
 			var jsp = $('.grid-scrolling-table').data('jsp');
 			jsp.scrollToElement(sl);
 		}
+		
 		searchPath();
 	});
 }
@@ -2981,7 +3003,12 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e) 
 	{
 		var h = $(e.currentTarget).attr('id');
-		if (M.d[h] && M.d[h].t) M.openFolder(h);
+		if (M.d[h] && M.d[h].t)
+		{
+			$('.top-context-menu').hide();
+			M.openFolder(h);
+		}
+		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
 		else M.addDownload([h]);
 	});
 }
@@ -3042,7 +3069,7 @@ function topContextMenu(close)
 {
 	if (close)
 	{
-		fmtopUI();	
+		fmtopUI();
 		$('.top-context-menu').fadeOut(350, function() 
 		{
 			$('.fm-right-header').removeClass('context');
@@ -3064,14 +3091,14 @@ function topContextMenu(close)
 	$('.top-icons-block .context-menu-item').hide();
 	$('.top-icons-block .context-menu-divider').hide();
 	
-	$('.top-context-menu').width();
 	$('.top-context-menu').fadeIn(350);
-	setTimeout(function()
-	{	
+	setTimeout(function(id)
+	{
+		if (id !== M.currentdirid) return;
 		$('.fm-right-header').addClass('context');
 		$('.fm-file-upload').addClass('hidden');
 		$('.fm-folder-upload').addClass('hidden');
-	},180);
+	},180,M.currentdirid);
 	
 	$.topContextSub = {};
 	var moreWidth = $('.top-icons-block .context-menu-item.more-item').outerWidth();
@@ -3143,7 +3170,7 @@ function topContextMenu(close)
 		{
 			topContextMenu(300);
 		}
-	},5000,r);	
+	},2000,r);	
 	$('.top-context-close').unbind('click');
 	$('.top-context-close').bind('click',function()
 	{
@@ -3225,6 +3252,13 @@ function transferPanelUI()
 	{	
          $.transferHeader();
     });
+	
+	$(window).unbind('resize.slideshow');
+	$(window).bind('resize.slideshow', function (e) 
+	{
+		if (slideshowid && previews[slideshowid]) previewsrc(previews[slideshowid].src);		
+    });
+	
 	$('.tranfer-view-icon').unbind('click');
 	$('.tranfer-view-icon').bind('click', function (e) 
 	{
@@ -3319,8 +3353,12 @@ function menuItems()
 	}
 	if ($.selected.length == 1 && M.d[$.selected[0]].t)
 	{
-		//$(t).filter('.open-item').show();				
+		//$(t).filter('.open-item').show();
 		items['open'] = 1;				
+	}
+	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name))
+	{					
+		items['preview'] = 1;
 	}
 	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink)
 	{
@@ -3381,8 +3419,8 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
-			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();			
-			if (folderlink) $(t).filter('.newfolder-item').hide();			
+			$.selected = [M.RootID];
+			$(t).filter('.refresh-item,.properties-item').show();
 		}
 		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
 		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
@@ -3914,11 +3952,7 @@ function shareDialog(close)
 			u.sort(function(a,b)
 			{
 				if (a.name && b.name) return a.name.localeCompare(b.name); 
-				else 
-				{ 
-					console.log('huh',a,b); 
-					return -1; 
-				}
+				else  return -1;				
 			});
 			for (var i in u)
 			{
@@ -4545,6 +4579,19 @@ function addContactDialog(close)
 			else doAddContact(e,1);
 		}
 	});
+	
+	$('.fm-dialog-add-contact-button').unbind('click');
+	$('.fm-dialog-add-contact-button').bind('click',function(e) 
+	{
+		if ($('.add-contact-dialog input').val() !== '') 
+		{
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e,1);
+		}
+	});
+	
+	
+
 	$('.add-contact-dialog .fm-dialog-close').unbind('click');
 	$('.add-contact-dialog .fm-dialog-close').bind('click',function()  
 	{
@@ -4934,7 +4981,7 @@ function slingshotDialog(close)
 	if (close)
 	{
 		$('.fm-dialog.slingshot-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');		
+		$('.fm-dialog-overlay').addClass('hidden');	
 		$.dialog=false;
 		return false;
 	}	
@@ -4949,9 +4996,210 @@ function slingshotDialog(close)
 }
 
 
-var thumbnails = [];
-var th_requested = [];
+var previews = {};
+var preqs = {};
+var slideshowid;
 
+function slideshowsteps()
+{
+	var check=false, forward = [], backward=[];
+	for (var i in M.v)
+	{
+		if (M.v[i].name && is_image(M.v[i].name))
+		{	
+			if (M.v[i].h == slideshowid) check=true;
+			else if (check) forward.push(M.v[i].h);
+			else backward.push(M.v[i].h);			
+		}
+	}
+	return {backward:backward,forward:forward};
+}
+
+function slideshow_next()
+{
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	var steps = slideshowsteps();
+	if (steps.forward.length > 0) slideshow(steps.forward[0]);
+}
+
+function slideshow_prev()
+{
+	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	var steps = slideshowsteps();
+	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
+}
+
+
+function slideshow(id,close)
+{
+	if (close)
+	{
+		slideshowid=false;
+		$('.slideshow-dialog').addClass('hidden');
+		$('.slideshow-overlay').addClass('hidden');
+		
+		// todo cesar: cancel all existing preview downloads (queued & running) when closing the slideshow dialog
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i].preview)
+			{
+				if (i == dl_queue_num) dl_cancel(0xBADF);
+				$('.transfer-table #dl_' + dl_queue[i].id).remove();
+				dl_queue[i]=false;				
+			}
+		}		
+		return false;
+	}
+	
+	if (folderlink)
+	{
+		$('.slideshow-getlink').hide();
+		$('.slideshow-line').hide();
+	}
+	else
+	{
+		$('.slideshow-getlink').show();
+		$('.slideshow-line').show();	
+	}	
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click',function(e)
+	{
+		slideshow(false,1);
+	});	
+	var n = M.d[id];	
+	if (!n) return;
+	$('.slideshow-filename').text(n.name);
+	$('.slideshow-image').attr('src','');
+	$('.slideshow-pending').removeClass('hidden');
+	$('.slideshow-progress').addClass('hidden');
+	$('.slideshow-error').addClass('hidden');
+	$('.slideshow-image').width(0);
+	$('.slideshow-image').height(0);
+	$('.slideshow-image-bl').addClass('hidden');
+	$('.slideshow-prev-button,.slideshow-next-button').removeClass('active');	
+	slideshowid=id;
+	var steps = slideshowsteps();	
+	if (steps.backward.length > 0) $('.slideshow-prev-button').addClass('active');
+	if (steps.forward.length > 0) $('.slideshow-next-button').addClass('active');	
+	$('.slideshow-prev-button,.slideshow-next-button').unbind('click');
+	$('.slideshow-prev-button,.slideshow-next-button').bind('click',function(e)
+	{
+		var c = $(this).attr('class');
+		if (c && c.indexOf('active') > -1)
+		{
+			var steps = slideshowsteps();			
+			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow_prev();
+			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow_next();
+		}
+	});		
+	
+	$('.slideshow-download').unbind('click');
+	$('.slideshow-download').bind('click',function(e)
+	{
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == slideshowid)
+			{
+				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
+				dl_queue[i].preview=false;
+				openTransferpanel();
+				return;
+			}		
+		}		
+		M.addDownload([slideshowid]);
+	});
+	
+	$('.slideshow-getlink').unbind('click');
+	$('.slideshow-getlink').bind('click',function(e)
+	{
+		if (u_type === 0) ephemeralDialog(l[1005]);
+		else M.getlinks([slideshowid]);
+	});
+	
+	if (previews[id])
+	{
+		previewsrc(previews[id].src);
+		fetchnext();
+	}
+	else if (!preqs[id]) fetchsrc(id);
+	
+	$('.slideshow-overlay').removeClass('hidden');
+	$('.slideshow-dialog').removeClass('hidden');
+}
+
+function fetchnext()
+{
+	var n = M.d[slideshowsteps().forward[0]];
+	if (!n || !n.fa) return;	
+	if (n.fa.indexOf(':1*') > -1 && !preqs[n.h] && !previews[n.h]) fetchsrc(n.h);
+}
+
+
+function fetchsrc(id)
+{
+	var n = M.d[id];
+	preqs[id]=1;
+	var treq = {};
+	treq[id] = {fa:n.fa,k:n.key};
+	api_getfileattr(treq,1,function(ctx,id,uint8arr)
+	{		
+		previewimg(id,uint8arr);
+		if (id == slideshowid) fetchnext();
+	},function(id)
+	{
+		delete preqs[id];		
+		M.addDownload([id],false,true);
+	});
+}
+
+function previewsrc(src)
+{
+	var img = new Image();
+	img.onload = function()
+	{
+		if (this.height > $(window).height()-100)
+		{
+			var factor = this.height/($(window).height()-100);
+			this.height = $(window).height()-100;
+			this.width = Math.round(this.width/factor);			
+		}		
+		var w = this.width, h = this.height;
+		if (w < 700) w=700;
+		if (h < 500) h=500;		
+		$('.slideshow-image').attr('src',this.src);
+		$('.slideshow-dialog').css('margin-top',h/2*-1);
+		$('.slideshow-dialog').css('margin-left',w/2*-1);
+		$('.slideshow-image').width(this.width);
+		$('.slideshow-image').height(this.height);		
+		$('.slideshow-dialog').width(w);
+		$('.slideshow-dialog').height(h);		
+		$('.slideshow-image-bl').removeClass('hidden');
+		$('.slideshow-pending').addClass('hidden');
+		$('.slideshow-progress').addClass('hidden');
+	};
+	img.src = src;
+}
+
+function previewimg(id,uint8arr)
+{
+	try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
+	if (!blob || blob.size < 25) blob = new Blob([uint8arr.buffer]);
+	previews[id] = 
+	{	
+		blob: blob,
+		src: myURL.createObjectURL(blob),
+		time: new Date().getTime()	
+	}
+	if (id == slideshowid)
+	{
+		previewsrc(previews[id].src);		
+	}
+}
+
+
+var thumbnails = [];
+var thumbnailblobs = [];
+var th_requested = [];
 
 function fm_thumbnails()
 {
@@ -4962,9 +5210,9 @@ function fm_thumbnails()
 		{
 			var n = M.v[i];			
 			if (n.fa)
-			{			
+			{
 				if (!thumbnails[n.h] && !th_requested[n.h])
-				{				
+				{
 					treq[n.h] = 
 					{
 						fa: n.fa,
@@ -4993,7 +5241,8 @@ function fm_thumbnails()
 			api_getfileattr(treq,0,function(ctx,node,uint8arr)
 			{
 				try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
-				if (blob.size < 25) blob = new Blob([uint8arr.buffer],{ type: 'image/jpeg' });				
+				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);
+				thumbnailblobs[node] = blob;
 				thumbnails[node] = myURL.createObjectURL(blob);
 				if ($('.file-block#' + node).length > 0)
 				{
@@ -5132,6 +5381,7 @@ function fm_resize_handler() {
             'bottom': ''
         });
     }
+		
 }
 
 

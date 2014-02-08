@@ -162,10 +162,14 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 				this.u8 = function(aStart,aBytes)
 				{
-					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
-
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
+
+					if (d && (aBytes != 64 || d > 1)) { // 64 == fingerprint
+						console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,
+							this.size, ''+data.slice(0,16).map(function(n) n.toString(16)));
+					}
+
 					return new Uint8Array(data);
 				};
 				this._close = function()
@@ -179,8 +183,6 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			{
 				aStart = aStart || 0;
 				aBytes = aBytes || this.size;
-
-				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type, aStart,aBytes);
 
 				return new Blob([this.u8(aStart,aBytes)], { type : this.type || 'application/octet-stream'});
 			},
@@ -232,7 +234,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			var q = Services.prompt.confirmEx(scope,
 				'MEGA :: Out of disk space',
 				'Your drive is running out of disk space. '+
-				'Would you like to chose another downloads folder?',1027,'','','',null,{value:!1});
+				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
 			
 			if (!q) mozAskDownloadsFolder();
 			
@@ -499,8 +501,15 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							seek : function(p) {
 								File.fs.seek(0,p);
 							},
-							close : function() {
+							close : function(aError) {
 								mozCloseStream(File.fs);
+
+								if (aError)
+								{
+									mozRunAsync(function() {
+										File.options.saveto.remove(!1);
+									});
+								}
 							}
 						};
 

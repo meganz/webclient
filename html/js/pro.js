@@ -13,8 +13,8 @@ function init_pro()
 		{ a : 'uq',pro : 1,},
 		{ 
 			callback : function (res) 
-			{ 
-				if (typeof res == 'object' && json.balance && json.balance[0]) pro_balance = json.balance[0][0];
+			{
+				if (typeof res == 'object' && res.balance && res.balance[0]) pro_balance = res.balance[0][0];
 			}
 		});	
 	}	
@@ -122,8 +122,10 @@ function pro_proceed(e)
 
 function pro_continue()
 {
+	pro_paymentmethod='';
 	if (u_type === false)
 	{
+		u_storage = localStorage;
 		loadingDialog.show();
 		u_checklogin({ checkloginresult: function(u_ctx,r) 
 		{ 
@@ -159,12 +161,13 @@ function pro_pay()
 			{
 				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
 				else pro_m = 1;
+				
 				api_req({ a : 'utc', s : [res], m : pro_m },
 				{ 
 					callback : function (res)
 					{ 
 						if (pro_paymentmethod == 'pro_prepaid')
-						{
+						{							
 							loadingDialog.hide();
 							if (typeof res == 'number' && res < 0)
 							{

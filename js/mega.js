@@ -649,8 +649,9 @@ function MegaData ()
 		{
 			if (a[i] == this.RootID)
 			{
-				typeclass = 'cloud-drive';
-				name = l[164];
+				typeclass = 'folder';
+				if (folderlink && M.d[this.RootID]) name = M.d[this.RootID].name;
+				else name = l[164];
 			}
 			else if (a[i] == 'contacts')
 			{
@@ -1045,8 +1046,8 @@ function MegaData ()
 						ctx.account.balance = res.balance;
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
-
-						if (!ctx.balance) ctx.account.balance = [['0.00','EUR']];
+						
+						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];					
 
 						if (!u_attr.p)
 						{
@@ -1376,8 +1377,9 @@ function MegaData ()
 		}
 	}
 
-	this.addDownload = function(n,z)
+	this.addDownload = function(n,z,preview)
 	{
+		// todo cesar: preview parameter indicates that this is a image preview download
 		delete $.dlhash;
 		var zipname,path;
 		var nodes = [];
@@ -1449,7 +1451,8 @@ function MegaData ()
 					onDownloadError: this.dlerror,
 					onDownloadStart: this.dlstart,
 					zipid: z,
-					zipname: zipname
+					zipname: zipname,
+					preview: preview
 				});
 				zipsize += n.s;
 
@@ -1470,16 +1473,20 @@ function MegaData ()
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
 
-        openTransferpanel();
-		initGridScrolling();
-		initFileblocksScrolling();
-		initTreeScroll();
+        if (!preview) 
+		{
+			openTransferpanel();
+			initGridScrolling();
+			initFileblocksScrolling();
+			initTreeScroll();
+		}
 
 		delete $.dlhash;
 	}
 
 	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
 	{
+		if (kbps == 0) return;
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
 		{
@@ -1520,6 +1527,13 @@ function MegaData ()
 			$.transferprogress[id] = Math.floor(bl/bt*100);
 			if (!uldl_hold)
 			{
+				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
+				{					
+					$('.slideshow-error').addClass('hidden');
+					$('.slideshow-pending').addClass('hidden');
+					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
+				}
+			
 				$('.transfer-table #' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
@@ -1527,7 +1541,6 @@ function MegaData ()
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
 				if ((!ul_uploading) && (perc == 100)) megatitle();
 				else if (!ul_uploading) megatitle(' ' + perc + '%');
-				$.transferHeader();
 
 				if (page.substr(0,2) !== 'fm')
 				{
@@ -1538,12 +1551,21 @@ function MegaData ()
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
 				}
+				
+				
 			}
 		}
 	}
 
 	this.dlcomplete = function (id,z)
 	{
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-error').addClass('hidden');
+			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
+		}		
+	
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
@@ -1608,7 +1630,16 @@ function MegaData ()
 		else if (error == ENOENT) errorstr=l[22];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
-		else errorstr = l[233];
+		else errorstr = l[233];		
+				
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-image-bl').addClass('hidden');
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-progress').addClass('hidden');
+			$('.slideshow-error').removeClass('hidden');
+			$('.slideshow-error-txt').text(errorstr);
+		}
 
 		var file = null;
 		$.each(dl_queue, function(id, f) {
@@ -2078,7 +2109,7 @@ function execsc(ap)
 				}
 			}
 		}
-		else if (a.a == 'u' && !folderlink)
+		else if (a.a == 'u')
 		{
 			var n = M.d[a.n];
 			if (n)
@@ -2093,7 +2124,8 @@ function execsc(ap)
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' span').text(f.name);
-						if ($('#path_' + n.h).length > 0) newpath=1;
+						if ($('#path_' + n.h).length > 0) newpath=1;						
+						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
 					{
@@ -2403,19 +2435,20 @@ function process_ok(ok)
 	}
 }
 
+
+function folderreqerr(c,e)
+{
+    loadingDialog.hide();
+	msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
+	{
+		folderlink=pfid;
+		document.location.hash='';
+	});
+}
+
 function loadfm_callback(res)
 {
-	if (pfid && typeof res == 'number' && res < 0)
-	{
-		loadingDialog.hide();
-		msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
-		{
-			folderlink=pfid;
-			document.location.hash='';
-		});
-		return false;
-	}
-	else if (pfkey && res.f && res.f[0])
+	if (pfkey && res.f && res.f[0])
 	{
 		M.RootID = res.f[0].h;
 		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);

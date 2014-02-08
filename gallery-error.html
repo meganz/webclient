@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+    
+	/*Scripts demo for context menues*/
+    $('.slideshow-download').bind('click', function() {
+		var contextMenu = $('.context-menu.files-menu');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			$(this).addClass('active');
+			contextMenu.removeClass('hidden');
+			contextMenu.find('.download-standart-item').removeClass('hidden');
+			contextMenu.find('.zipdownload-item').removeClass('hidden');
+            var offset = $(this).offset();
+            contextMenu.css({top: offset.top+25, left: offset.left});
+			
+		} else {
+			contextMenu.addClass('hidden');
+			contextMenu.find('.context-menu-item').each(function() {
+                if ($(this).attr('class').indexOf('hidden') == -1) $(this).addClass('hidden'); 	  
+            });
+			$(this).removeClass('active');
+		}
+	});
+	
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="dark-overlay" style="display:none;"></div>  
+<div class="loading-spinner" style="display:none;"></div>
+
+<!-- Remove hidden classname if slideshow is opened !-->
+<div class="slideshow-overlay"></div>
+<!-- 
+Remove hidden classname if slideshow is opened. 
+Please set height if the image is too small and it should be centered in dialog.
+Please set width and height = width and height of the image, please set margin-top = -height/2 and margin-left = -width/2.
+!-->
+<div class="slideshow-dialog hidden" style="width:700px; height:500px;">
+   <div class="slideshow-top-bar">
+      <div class="slideshow-filename">filename.jpg</div>
+      <div class="slideshow-icon close-slideshow"></div>
+      <!-- Add "hidden" classname if image wasn't loaded !-->
+      <div class="slideshow-image-buttons">
+        <div class="slideshow-icon slideshow-line"></div>
+        <div class="slideshow-icon slideshow-getlink">
+          Get link
+        </div>
+        <div class="slideshow-icon slideshow-line"></div>
+        <!-- Add "active" if is pressed !-->
+        <div class="slideshow-icon slideshow-download">
+          <span>Download...</span>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div class="clear"></div>
+   </div>
+   <!-- Please bind click event and add "active" class if button could be clicked !-->
+   <div class="slideshow-prev-button">
+     <div class="slideshow-prev-icon"></div>
+   </div>
+   <!-- Please bind click event and add "active" class if button could be clicked !-->
+   <div class="slideshow-next-button active">
+      <div class="slideshow-next-icon"></div>
+   </div>
+   <!-- Add "hidden" class if we need any of another case: pending image / image error / loading image !--> 
+   <div class="slideshow-image-bl hidden">
+      <img alt="" src="images/temp/img01.jpg" class="slideshow-image" />
+   </div>
+   
+   <!-- Remove hidden classname if image is pending !-->
+   <div class="slideshow-pending hidden"></div>
+
+   <!-- Remove hidden classname if error has occured during image was loading !-->
+   <div class="slideshow-error hidden">
+      <div class="slideshow-error-icon"></div>
+      <div class="slideshow-error-header">
+          Unexpected error
+      </div>
+      <div class="slideshow-error-txt">
+          Unexpected errorLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+      </div>
+      <div class="slideshow-error-buttons">
+         <div class="slideshow-error-button slideshow-refresh">
+            Refresh
+         </div>
+         <div class="slideshow-error-button slideshow-error-close">
+            Press Esc to close
+         </div>
+      </div>
+   </div>
+   <!-- Remove hidden classname if image is loading !-->
+   <div class="slideshow-progress percents-78">
+     <div class="slideshow-progress-icon"></div>
+   </div>
+   
+</div>
+
+<!-- Remove hidden classname if gallery is pending !-->
+<div class="slideshow-pending hidden"></div>
+
+<!-- Remove hidden classname if error has occured during gallery was loading !-->
+<div class="slideshow-error">
+   <div class="slideshow-error-icon"></div>
+   <div class="slideshow-error-header">
+       Unexpected error
+   </div>
+   <div class="slideshow-error-txt">
+       Unexpected errorLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+   </div>
+   <div class="slideshow-error-buttons">
+      <div class="slideshow-error-button slideshow-refresh">
+         Refresh
+      </div>
+      <div class="slideshow-error-button slideshow-error-close">
+         Press Esc to close
+      </div>
+   </div>
+</div>
+<!-- Remove hidden classname if gallery is loading !-->
+<div class="slideshow-progress percents-78 hidden">
+  <div class="slideshow-progress-icon"></div>
+</div>
+
+<div class="dark-overlay hidden"></div>  
+<div class="loading-spinner hidden"></div>
+
+
+<div class="fmholder" id="fmholder">
+
+  <div id="topmenu"><div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="top-menu-icon">Menu</a> 
+    
+    <a class="fm-avatar" style="display: block;"><img alt="" src=""></a>
+    <div class="activity-status-block" style="display: none;">
+      <div class="activity-status online" style="display: none;"></div>
+    </div>
+
+    <div class="membership-status-block">
+       <div class="membership-status free" style="display: block;">FREE</div>
+    </div>
+    
+    <a class="user-name" style="display: none;"></a>
+    <div class="language-popup-icon hidden"></div>     
+    
+    <div class="cloud-popup-icon" style="display: block;"><span class="notification-num" style="">9</span></div>
+    
+    <div class="top-search-bl" style="display: block;">
+       <div class="top-search-clear">
+           <div class="top-clear-button"></div>
+           <input type="text" value="Search" class="top-search-input">
+       </div>
+    </div>
+  </div></div>
+
+  <div class="fm-main">
+    <div class="fm-left-panel" >
+      <div class="fm-left-menu">
+         <a class="fm-menu-item cloud active"></a> 
+         <a class="fm-menu-item recycle"></a>
+         <a class="fm-menu-item contacts"></a>
+         <a class="fm-menu-item messages"></a>
+      </div>       
+      <div class="fm-tree-panel">
+        <div class="fm-tree-pad">
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header cloud-drive-item">
+             <span>
+                Cloud drive
+             </span>    
+          </a>          
+          <ul class="fm-subfolders" id="cloudsub"></ul>         
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header recycle-item">
+             <span>
+                Rubbish-bin
+             </span>    
+          </a>
+          <span class="fm-connector-first"></span>
+          <a class="fm-tree-header messages-item">
+             <span>
+                Messaging
+             </span>    
+          </a>
+		  <ul class="fm-subfolders" id="treesub_messaging"></ul>
+        </div>
+      </div>
+  
+  </div>
+  <div class="fm-right-files-block">
+  
+       <!-- Plaese add "context" class when unhidding top context menu !-->
+       <div class="fm-right-header context">
+       
+         <!-- Top context menu !-->
+         <div class="top-context-menu">
+             <div class="top-context-border">
+             <!-- Set hide event to "top-context-close" and remove "context" class from "fm-right-header" !--> 
+             <div class="top-context-close"></div>
+             <div class="top-icons-block">
+                 <a class="context-menu-item open-item">Open</a>
+                 <div class="context-menu-divider short"></div>
+                 <a class="context-menu-item properties-item">Properties</a>
+                 <div class="context-menu-divider"></div>
+                 <a class="context-menu-item download-item dropdown">
+                   <span>Download...</span>
+                 </a>
+                 <div class="context-menu-divider short"></div>
+                 <a class="context-menu-item getlink-item">Get link</a>
+                 <div class="context-menu-divider short"></div>
+                 <a class="context-menu-item send-to-contact-item">Send by mail</a>
+                 <div class="context-menu-divider"></div>
+                 <a class="context-menu-item move-item dropdown">Move</a>
+                 <div class="context-menu-divider short"></div>
+                 <a class="context-menu-item copy-item">Copy</a>
+                 <div class="context-menu-divider"></div>
+                 <a class="context-menu-item more-item dropdown">
+                   <span>More</span>
+                 </a>
+                 <div class="clear"></div>
+              </div>
+             </div>
+         </div>
+         <!-- End of Top context menu !-->
+       
+         <a class="fm-back-button"></a>
+         <div class="fm-breadcrumbs-block">
+           <a class="fm-breadcrumbs contacts contains-directories has-next-button ui-droppable">
+              <span class="right-arrow-bg">
+                <span>Contacts</span>
+              </span>
+           </a>
+           <!-- Add "chat" classname" !-->
+           <a class="fm-breadcrumbs chat">
+              <span class="right-arrow-bg">
+                <span>Andrei.d</span>
+              </span>
+           </a>
+           <div class="clear"></div>
+         </div>
+         
+         <!-- Add user button !-->
+         <div class="fm-add-user">
+           <span>Add to conversation</span>
+         </div>
+         
+         <div class="fm-add-contact-popup hidden">
+            <div class="fm-add-contact-arrow"></div>
+            <div class="fm-add-contact-scrolling">
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/default-avatar.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+              <a class="add-contact-item">
+                 <span class="add-contact-pad">
+                   <span class="avatar"><span><img src="images/mega/default-avatar.png" alt=""/></span></span>
+                   <span class="add-contact-username">Andrei.d</span>
+                 </span>    
+              </a> 
+            </div>
+            <div class="fm-add-contact-bottom">
+               <div class="fm-chat-contact-button">
+                   Add
+               </div>
+               <div class="fm-chat-contact-button active">
+                   Cancel
+               </div>
+               <div class="clear"></div>
+            </div>
+         </div>
+         
+         <div class="clear"></div>
+       </div>
+       
+       <!--Chat block !-->
+       
+       <div class="fm-chat-block">
+
+           
+           
+       </div>
+       
+       <!--end !-->
+       
+  </div>
+  
+</div>
+
+<div class="transfer-panel">
+      <div class="transfer-panel-title">
+         File Transfers
+      </div>
+      <a class="tranfer-view-icon"></a>
+      <a class="transfer-settings-icon"></a>
+      <div class="transfer-points"></div>
+      <div class="clear"></div>
+      <div class="tranfer-table">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
+            <tr>
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+              <th width="110">Remaining Time</th>
+            </tr>
+        </table>
+        <div class="transfer-scrolling-table">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
+            <tr class="clone-of-header">
+              <th>Name</th>
+              <th width="120">Size</th>
+              <th width="180">Transfer Type</th>
+              <th width="250">Status</th>
+              <th width="100">Speed</th>
+              <th width="100">Elapsed Time</th>
+			  <th width="110">Remaining Time</th>
+            </tr>                       
+        </table>
+       </div>
+      </div> 
+</div>
+  
+</div>
+<a href="" download="filename" id="dllink" style="display:none;"></a>
+</body>
+</html>

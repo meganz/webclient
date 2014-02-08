@@ -162,6 +162,8 @@ function u_logout(logout)
 	
 	if (logout)
 	{
+		delete localStorage.signupcode;
+		delete localStorage.registeremail;
 		if (mDBact)
 		{
 			mDBact=false;
@@ -179,7 +181,7 @@ function u_logout(logout)
 		M = new MegaData();
 		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
 		$.hideContextMenu = function () {};
-		api_reset();		
+		api_reset();	
 	}
 }
 

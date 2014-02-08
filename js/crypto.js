@@ -776,16 +776,16 @@ function api_setsid(sid)
 function api_setfolder(h)
 {
 	h = 'n=' + h;
+	
+	if (u_sid) h += '&sid=' + u_sid;
 
 	apixs[1].sid = h;
+	apixs[1].failhandler = folderreqerr;
 	apixs[2].sid = h;
 }
 
 function api_init(c,service)
 {
-//	var url = (apiq[0][0].substr(0,4) == 'https') ? apiq[0][0] : (apipath + (apiq[0][0].substr(0,1) == '[' ? ('cs?id=' + apiq[0][2]) : apiq[0][0]) + (n_h_api ? '&n=' + n_h_api : (u_sid ? ('&sid=' + u_sid) : '')));
-//	var n_h_api = false;
-//	if ((apiq[0][0].indexOf('"a":"f"') > -1 || apiq[0][0].indexOf('"a":"ufa"') > -1 || apiq[0][0].indexOf('"a":"g"') > -1 || apiq[0][0].indexOf('sc?sn') > -1) && n_h) n_h_api = n_h;
 	var q = apixs[c];
 
 	if (q)
@@ -802,6 +802,7 @@ function api_init(c,service)
 				seqno : -Math.floor(Math.random()*0x100000000),	// unique request start ID
 				xhr : false,		// channel XMLHttpRequest
 				timer : false,		// timer for exponential backoff
+				failhandler : api_reqfailed,	// request-level error handler
 				backoff : 0,
 				service : service,	// base URI component
 				sid : '',			// sid URI component (optional)
@@ -844,7 +845,7 @@ function api_proc(q)
 		if (!this.q.cancelled)
 		{
 			if (d) console.log("API request error - retrying");
-			api_result(-3,this.q);
+			api_reqerror(q,-3);
 		}
 	}
 
@@ -853,18 +854,26 @@ function api_proc(q)
 		if (!this.q.cancelled)
 		{
 			var t;
-			
-			if (this.responseText) this.response = this.responseText;
 
-			if (d) console.log('API response: ' + this.response);
-			
-			try {
-				t = JSON.parse(this.response);
-				if (this.response[0] == '{') t = [t];
-			} catch (e) {
-				// bogus response, try again
-				console.log("Bad JSON data in response: " + this.response);
-				t = -3;
+			if (this.status == 200)
+			{
+				if (this.responseText) this.response = this.responseText;
+
+				if (d) console.log('API response: ' + this.response);
+				
+				try {
+					t = JSON.parse(this.response);
+					if (this.response[0] == '{') t = [t];
+				} catch (e) {
+					// bogus response, try again
+					console.log("Bad JSON data in response: " + this.response);
+					t = EAGAIN;
+				}
+			}
+			else
+			{
+				if (d) console.log('API server connection failed (error ' + this.status + ')');
+				t = ERATELIMIT;
 			}
 
 			if (typeof t == 'object')
@@ -915,7 +924,7 @@ function api_send(q)
 
 function api_reqerror(q,e)
 {
-	if (e == -3)
+	if (e == EAGAIN || e == ERATELIMIT)
 	{
 		// request failed - retry with exponential backoff
 		if (q.backoff) q.backoff *= 2;
@@ -923,7 +932,7 @@ function api_reqerror(q,e)
 
 		q.timer = setTimeout(api_send,q.backoff,q);
 	}
-	else api_reqfailed(q.c,e);
+	else q.failhandler(q.c,e);
 }
 
 function api_reqfailed(c,e)
@@ -1477,11 +1486,11 @@ function crypto_rsadecrypt(ciphertext,privk)
 function api_completeupload(t,uq,k,ctx)
 {
 	// Close nsIFile Stream
-	if(is_chrome_firefox && uq._close) uq._close();
+	if (is_chrome_firefox && uq._close) uq._close();
 	
 	if (uq.repair) uq.target = M.RubbishID;
 	
-	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx },uq);
+	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : uq.faid ? api_getfa(uq.faid) : false, ctx : ctx },uq);
 }
 
 function api_completeupload2(ctx,uq)
@@ -1511,11 +1520,17 @@ function api_completeupload2(ctx,uq)
 		if (d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
+		
+		if (!ut) ut = M.RootID;
+		
 		var req = { a : 'p',
 			t : ut,
-			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
+			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k))}],
 			i : requesti
 		};
+
+		if (ctx.fa) req.n[0].fa = ctx.fa;
+
 		if (ut)
 		{
 			// a target has been supplied: encrypt to all relevant shares
@@ -1527,6 +1542,7 @@ function api_completeupload2(ctx,uq)
 				req.cr[1][0] = ctx.t;
 			}
 		}
+
 		api_req(req,ctx.ctx);
 	}
 }
@@ -1550,6 +1566,7 @@ function is_devnull(email)
 
 function is_image(name)
 {
+	if (!name) return false;
 	var p;
 	
 	if ((p = name.lastIndexOf('.')) >= 0)
@@ -1567,7 +1584,7 @@ var faxhrs = [];
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id,type,key,data,ctx)
-{	
+{
 	if (!ctx)
 	{
 		if (!storedattr[id]) storedattr[id] = {};
@@ -1657,7 +1674,7 @@ function api_fareq(res,ctx)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" +ctx.type);
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);						
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -1733,19 +1750,19 @@ function api_getfa(id)
 
 	storedattr[id] = {};
 
-	return f.join('/');
+	return f.length ? f.join('/') : false;
 }
 
 function api_attachfileattr(node,id)
 {
 	var fa = api_getfa(id);
 	
-	storedattr[id].target = node;
-	
+	storedattr[id].target = node;	
+
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});
 }
 
-function api_getfileattr(fa,type,procfa)
+function api_getfileattr(fa,type,procfa,errfa)
 {
 	var r, n, t;
 
@@ -1760,7 +1777,6 @@ function api_getfileattr(fa,type,procfa)
 		if (r = re.exec(fa[n].fa))
 		{
 			t = base64urldecode(r[2]);
-
 			if (t.length == 8)
 			{
 				if (!h[t])
@@ -1773,6 +1789,7 @@ function api_getfileattr(fa,type,procfa)
 				else p[r[1]] += t;
 			}
 		}
+		else if (errfa) errfa(n);		
 	}
 
 	for (n in p)
@@ -2226,10 +2243,17 @@ function crypto_share_rsa2aes()
 
 	scope.fingerprint = function(uq_entry,callback)
 	{
+		if (!(uq_entry && uq_entry.name))
+		{
+			if (d) console.log('CHECK THIS', 'Unable to generate fingerprint');
+			if (d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+			
+			throw new Error('Invalid upload entry for fingerprint');
+		}
+		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+
 		var fr = new FileReader();
 		var size = uq_entry.size;
-
-		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
 
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)

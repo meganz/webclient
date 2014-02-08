@@ -52,6 +52,10 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
+	self.abort = function(pattern) {
+		self.remove(pattern);
+	}
+
 	self.remove = function(pattern) {
 		if (pattern.zipid) {
 			removed.push("zipid:" + pattern.zipid);

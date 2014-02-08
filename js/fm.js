@@ -5037,17 +5037,7 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
-		
-		// todo cesar: cancel all existing preview downloads (queued & running) when closing the slideshow dialog
-		for (var i in dl_queue)
-		{
-			if (dl_queue[i].preview)
-			{
-				if (i == dl_queue_num) dl_cancel(0xBADF);
-				$('.transfer-table #dl_' + dl_queue[i].id).remove();
-				dl_queue[i]=false;				
-			}
-		}		
+		self.abort({id: id});
 		return false;
 	}
 	

@@ -49,6 +49,9 @@ function ClassChunk(task) {
 			Scheduler.done();
 		}
 
+		if(!Progress.dl_lastprogress) Progress.dl_lastprogress = 0;
+		if(!Progress.dl_prevprogress) Progress.dl_prevprogress = 0;
+
 		/**
 		 *	Check if the current chunk is small or close to its
 		 *	end, so it can cheat to the scheduler telling they are 
@@ -67,12 +70,14 @@ function ClassChunk(task) {
 				// do not update the UI
 				return false;
 			}
-	
+
+			var now = new Date().getTime();
+
 			// keep in track of the current progress
-			if (lastUpdate+250 < new Date().getTime()) {
+			if (lastUpdate+250 < now) {
 				speed = progress.update(prevProgress - pprevProgress)
 				pprevProgress = prevProgress;
-				lastUpdate = new Date().getTime()
+				lastUpdate = now;
 				shouldIReportDone();
 			}
 
@@ -83,7 +88,7 @@ function ClassChunk(task) {
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > new Date().getTime() && !force) {
+			if (Progress.dl_lastprogress+250 > now && !force) {
 				// too soon
 				return false;
 			}
@@ -97,7 +102,7 @@ function ClassChunk(task) {
 			);
 	
 			Progress.dl_prevprogress = Progress.progress
-			Progress.dl_lastprogress = new Date().getTime();
+			Progress.dl_lastprogress = now;
 		}
 	
 	

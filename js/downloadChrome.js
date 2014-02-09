@@ -179,10 +179,15 @@ function FileSystemAPI(dl_id, dl) {
 		});
 	}
 
-	IO.abort = function(e) {
-		zfileEntry.remove(function() {
+	// IO.abort = function(e) {
+		// zfileEntry.remove(function() {
 			// try to remove
-		});
+		// });
+	// };
+	if(is_chrome_firefox) {
+		IO.abort = function(err) {
+			dl_fw.close(err);
+		};
 	}
 
 	IO.write = function(buffer, position, done) {

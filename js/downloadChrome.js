@@ -60,6 +60,8 @@ function FileSystemAPI(dl_id, dl) {
 			DEBUG('Directory "mega" created');
 			DEBUG("Opening file for writing: " + dl_id);
 
+			var options = {create: true};
+
 			if(is_chrome_firefox) {
 				var q = {};
 				for(var o in dl_queue) {
@@ -77,7 +79,7 @@ function FileSystemAPI(dl_id, dl) {
 				};
 			}
 		
-			fs.root.getFile('mega/' + dl_id, {create: true}, function(fileEntry) {
+			fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
 				fileEntry.createWriter(function(fileWriter) {     
 					DEBUG('File "mega/' + dl_id + '" created');
 					dl_fw = fileWriter

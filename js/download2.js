@@ -319,6 +319,7 @@ DownloadQueue.prototype.push = function() {
 		}
 		var tZip = Zips[dl.zipid];
 		dlIO.write = tZip.getWriter(dl);
+		dlIO.abort = tZip.IO.abort;
 		dlIO.dl_xr = tZip.dl_xr
 	}
 

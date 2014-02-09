@@ -105,6 +105,7 @@ function dlZipIO(dl, dl_id) {
 		ready = true;
 	}
 
+	this.IO   = realIO;
 	this.size = 0
 	this.files = 0
 	this.progress	= 0
@@ -119,7 +120,6 @@ function dlZipIO(dl, dl_id) {
 				doWrite(value);
 			});
 			doWrite(end, function() {
-				fm_zipcomplete(dl.zipid);
 				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
 				realIO.download(dl.zipname);

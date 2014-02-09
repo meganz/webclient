@@ -1829,11 +1829,6 @@ function onUploadSuccess(id, bl, bt)
 	M.ulcomplete(id,bl,bt);
 }
 
-function fm_zipcomplete(id)
-{
-	M.dlcomplete(false,id);
-}
-
 function fm_chromebar(height)
 {
 	if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) return false;

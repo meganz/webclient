@@ -249,7 +249,6 @@ function ClassFile(dl) {
 	
 			dlQueue.pushAll(tasks, function() {
 				if (dl.cancelled) return;
-				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
@@ -259,6 +258,7 @@ function ClassFile(dl) {
 						if (dl.zipid) {
 							return Zips[dl.zipid].done();
 						}
+						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 						dl.onBeforeDownloadComplete(dl.pos);
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);

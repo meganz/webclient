@@ -53,13 +53,15 @@ var DownloadManager = new function() {
 	};
 
 	self.abort = function(pattern) {
-		if (!pattern) {
-			throw new Error;
-		}
 		DEBUG("cancelled file ", pattern);
+		var trigger = false;
 		self.remove(pattern, function(file) {
 			if (!file.dl) throw new Error("Invalid task");
 			file.dl.cancelled = true;
+			if (!trigger && typeof file.dl.io.abort == "function") {
+				file.dl.io.abort("User cancelled");
+				trigger = true;
+			}
 		});
 	}
 

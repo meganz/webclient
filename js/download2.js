@@ -53,10 +53,18 @@ var DownloadManager = new function() {
 	};
 
 	self.abort = function(pattern) {
-		self.remove(pattern);
+		if (!pattern) {
+			throw new Error;
+		}
+		DEBUG("cancelled file ", pattern);
+		self.remove(pattern, function(file) {
+			if (!file.dl) throw new Error("Invalid task");
+			file.dl.cancelled = true;
+		});
 	}
 
-	self.remove = function(pattern) {
+	self.remove = function(pattern, check) {
+		check = check || function() {}
 		if (pattern.zipid) {
 			removed.push("zipid:" + pattern.zipid);
 		} else {
@@ -64,7 +72,10 @@ var DownloadManager = new function() {
 		}
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj, pattern);
-			if (match) DEBUG("remove task " + obj.__tid, pattern);
+			if (match) {
+				check(obj);
+				DEBUG("remove task " + obj.__tid, pattern);
+			}
 			return !match;
 		});
 	};

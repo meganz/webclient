@@ -263,6 +263,7 @@ function ClassFile(dl) {
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
+						dl_queue[dl.pos] = {}; /* remove it */
 					}
 				}, 100);
 			}, failureFunction);

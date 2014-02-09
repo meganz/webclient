@@ -933,18 +933,10 @@ function initContextUI()
 		});				
 
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
-			DEBUG("cancelled file " + $.sd);
-
 			if (dl_queue[$.sd]) {
-				DownloadManager.remove({ id: dl_queue[$.sd].dl_id });
-				dl_queue[$.sd].cancelled = true;
+				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
 			} else if ($.zipkill >= 0) {
-				DownloadManager.remove({ zipid: $.zipkill });
-				$.each(dl_queue, function(i, file) {
-					if (file.zipid == $.zipkill) {
-						file.cancelled = true;
-					}
-				});
+				DownloadManager.abort({ zipid: $.zipkill });
 			}
 		}
 		delete $.su;
@@ -5017,14 +5009,28 @@ function slideshowsteps()
 
 function slideshow_next()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
 	var steps = slideshowsteps();
 	if (steps.forward.length > 0) slideshow(steps.forward[0]);
 }
 
 function slideshow_prev()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num].id == slideshowid) return;
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
 	var steps = slideshowsteps();
 	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 }
@@ -5037,7 +5043,7 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
-		self.abort({id: id});
+		DownloadManager.abort({id: id});
 		return false;
 	}
 	

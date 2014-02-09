@@ -243,7 +243,7 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	var dl_chunks = []
 		, dl_chunksizes = []
 	
-	var p = pp = 0;
+	var pp, p = pp = 0;
 	for (var i = 1; i <= 8 && p < dl_filesize-i*131072; i++) {
 		dl_chunksizes[p] = i*131072;
 		dl_chunks.push(p);
@@ -280,7 +280,7 @@ function failureFunction(reschedule, task, args) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
 			dl_lastquotawarning = t;
-			dl_reportstatus(dl.pos, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
+			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
 				reschedule(); 
 			}, 60000);
@@ -288,7 +288,7 @@ function failureFunction(reschedule, task, args) {
 		}		
 	}
 
-	dl_reportstatus(dl.pos, EAGAIN);
+	dl_reportstatus(dl, EAGAIN);
 
 	dl_retryinterval *= 1.2;
 	setTimeout(function() {
@@ -348,11 +348,26 @@ DownloadQueue.prototype.push = function() {
 	return pos;
 };
 
-function dl_reportstatus(num, code)
+function dl_reportstatus(dl, code)
 {
+	var num = dl.pos;
+	
 	if (dl_queue[num]) {
 		dl_queue[num].lasterror = code;
 		dl_queue[num].onDownloadError(dl_queue[num].id || dl_queue[num].ph, code, num);
+	}
+	
+	if(code === EKEY || code === EAGAIN) {
+		// TODO: Check if other codes should raise abort()
+		
+		try
+		{
+			dl.io.abort(code);
+		}
+		catch(e)
+		{
+			if (d) console.log(e.message, e);
+		}
 	}
 }
 
@@ -373,10 +388,10 @@ function dlGetUrl(object, callback) {
 		callback: function(res, rex) {
 			if (typeof res == 'object') {
 				if (typeof res == 'number') {
-					dl_reportstatus(object.pos, res);
+					dl_reportstatus(object, res);
 				} else {
 					if (res.d) {
-						dl_reportstatus(object.pos, res.d ? 2 : 1)
+						dl_reportstatus(object, res.d ? 2 : 1)
 					} else if (res.g) {
 						var ab = base64_to_ab(res.at)
 							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
@@ -387,14 +402,14 @@ function dlGetUrl(object, callback) {
 							}
 							return callback(false, res, o, object);
 						} else {
-							dl_reportstatus(object.pos, EKEY);
+							dl_reportstatus(object, EKEY);
 						}
 					} else {
-						dl_reportstatus(object.pos, res.e);
+						dl_reportstatus(object, res.e);
 					}
 				}
 			} else {
-				dl_reportstatus(object.pos, EAGAIN);
+				dl_reportstatus(object, EAGAIN);
 			}
 			
 			dl_retryinterval *= 1.2;

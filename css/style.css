@@ -14608,8 +14608,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: -6px -408px;
 	background-repeat: no-repeat;
 }
+.campaign .downloading .new-download-icon {
+	background-position: -6px -608px;
+}
 .campaign .new-download-red-button {
 	background-color: #F1C359;
+}
+.campaign .new-download-icon div {
+	color:#f0c55c;
 }
 .campaign .new-download-red-button .new-download-button-txt1, .campaign .new-download-red-button .new-download-button-txt2 {
 	color: #333333;
@@ -14678,7 +14684,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .campaign-close-button:hover {
 	background-position: right -369px;
 }
-.logged-in-user  @media only screen and (max-width: 1593px) {
+@media only screen and (max-width: 1593px) {
 .adv .download-mid-centered-block {
  min-width: 648px;
 }

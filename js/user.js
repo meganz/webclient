@@ -175,6 +175,13 @@ function u_logout(logout)
 			waitxhr.abort();
 			waitxhr=undefined;	
 		}
+
+
+        if(MegaChatEnabled) {
+            if(megaChat.is_initialized) {
+                megaChat.destroy();
+            }
+        }
 	}
 }
 

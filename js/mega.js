@@ -163,6 +163,23 @@ function MegaData ()
 		}
 	};
 
+
+    /**
+     * The sme as filterBy, but instead of pushing the stuff in M.v, will return a new array.
+     *
+     * @param f function, with 1 arguments (node) that returns true when a specific node should be returned in the list
+     * of filtered results
+     */
+    this.getFilterBy = function (f)
+    {
+        var v= [];
+        for (var i in this.d) {
+            if (f(this.d[i])) v.push(this.d[i]);
+        }
+
+        return v;
+    };
+
 	this.filterByParent = function(id)
 	{
 		this.filterBy(function(node)
@@ -244,6 +261,9 @@ function MegaData ()
 		}
 		return {files:files,folders:folders,ts:ts};
 	};
+
+
+
 
 	this.renderMain = function(u)
 	{
@@ -587,7 +607,7 @@ function MegaData ()
 					statusc = 'no-status';
 					var avatar = staticpath + 'images/mega/default-avatar.png';
 					if (avatars[folders[i].h]) avatar = avatars[folders[i].h].url;
-					treenode = '<span><span class="avatar ' + folders[i].h + '"><span><img src="'+ avatar + '" alt=""/></span></span><span class="messages-icon"><span class="active">2</span></span><span class="contact-name">' + htmlentities(folders[i].name) +'</span></span>';
+					treenode = '<span><span class="avatar ' + folders[i].h + '"><span><img src="'+ avatar + '" alt=""/></span></span><span class="messages-icon"><span class="active"></span></span><span class="contact-name">' + htmlentities(folders[i].name) +'</span></span>';
 				}
 				var s = '';
 				if (typeof folders[i].shares != 'undefined') s = 'shared-folder';
@@ -684,8 +704,10 @@ function MegaData ()
 		}
 
 		if (this.currentdirid && this.currentdirid.substr(0,5) == 'chat/')
-		{			
-			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>Andrei.d</span></span></a>');
+		{
+
+            var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
 			
 			$('.search-files-result').addClass('hidden');						
 		}
@@ -2479,6 +2501,7 @@ function clone(obj)
     }
     if (obj instanceof Array)
 	{
+
         var copy = [];
         for (var i = 0, len = obj.length; i < len; i++) {
             copy[i] = clone(obj[i]);

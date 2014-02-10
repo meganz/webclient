@@ -433,6 +433,7 @@ function initUI()
 		termsDialog();
 	}
 	M.avatars();
+
 	if (typeof dl_import !== 'undefined' && dl_import) dl_fm_import();
 	
 	$('.fm-menu-item').unbind('mouseover');
@@ -1936,7 +1937,8 @@ function gridUI()
 		}
     });	
 	$('.fm-blocks-view').addClass('hidden');
-	$('.fm-contacts-blocks-view').addClass('hidden');	
+	$('.fm-chat-block').addClass('hidden');
+	$('.fm-contacts-blocks-view').addClass('hidden');
 	if (M.currentdirid == 'contacts')
 	{
 		$('.files-grid-view').addClass('hidden');
@@ -2148,7 +2150,8 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).bind('hashchange', function() {
+    $(window).unbind('hashchange.quickfinder');
+    $(window).bind('hashchange.quickfinder', function() {
         if(self.is_active()) {
             self.deactivate();
         }
@@ -3328,7 +3331,7 @@ function treeUI()
 		if (!eoffsetX)eoffsetX=e.pageX-$(this).offset().left;		
 		var c = $(e.target).parent().attr('class');		
 		if (!c || c.indexOf('fm-tree-folder') == -1) eoffsetX=25;		
-		if (MegaChat && id && id.length == 11) id = 'chat/' + id;
+		if (MegaChatEnabled && id && id.length == 11) id = 'chat/' + id;
 		
 		if ((eoffsetX < 23) || ($(this).attr('class').indexOf('active') > -1 && $(this).attr('class').indexOf('expanded') == -1) || id == M.currentdirid) 
 		{

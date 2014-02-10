@@ -27,7 +27,10 @@
     <script type="text/javascript">l = [];</script>
 
     <script type="text/javascript" src="../jquery-min-1.8.1.js"></script>
+    <script type="text/javascript" src="../jquery.jscrollpane.min.js"></script>
     <script type="text/javascript" src="../functions.js"></script>
+    <script type="text/javascript" src="../mega.js"></script>
+
     <script type="text/javascript" src="../vendor/chat/strophe.js"></script>
     <script type="text/javascript" src="../vendor/chat/strophe.disco.js"></script>
     <script type="text/javascript" src="../vendor/chat/strophe.jingle.js"></script>
@@ -48,12 +51,16 @@
     <script type="text/javascript" src="../chat/rtcSession.js"></script>
 
     <script type="text/javascript" src="../chat/karere.js"></script>
+    <script type="text/javascript" src="../chat/chat.js"></script>
 
 
 
     <!-- some helper funcs -->
     <script type="text/javascript" src="src/helpers/eventmocker.js"></script>
+    <script type="text/javascript" src="src/helpers/objectmocker.js"></script>
     <script type="text/javascript" src="src/helpers/strophemocker.js"></script>
+    <script type="text/javascript" src="src/helpers/fixtures.js"></script>
+    <script type="text/javascript" src="src/helpers/kareremocker.js"></script>
     <script type="text/javascript" src="src/helpers/utils.js"></script>
 
     <!-- include spec files here... -->
@@ -67,7 +74,10 @@
     <!-- include source files here... -->
     <script type="text/javascript" src="src/unit/eventmocker.js"></script>
     <script type="text/javascript" src="src/unit/karere.js"></script>
+    <script type="text/javascript" src="src/unit/chat.js"></script>
+
     <script type="text/javascript" src="src/integration/chat_integration.js"></script>
+
 
     <script>
         mocha.run();

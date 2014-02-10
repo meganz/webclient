@@ -11,6 +11,7 @@ module.exports = function(config) {
             "../jquery-min-1.8.1.js",
     
              "../functions.js",
+             "../mega.js",
              "../vendor/chat/strophe.js",
              "../vendor/chat/strophe.disco.js",
              "../vendor/chat/strophe.jingle.js",

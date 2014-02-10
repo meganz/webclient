@@ -108,7 +108,13 @@ var Karere = function(user_options) {
         /**
          * Maximum connection retry in case of error
          */
-        maxConnectionRetries: 10
+        maxConnectionRetries: 10,
+
+        /**
+         * When a method which requires connection is called, Karere would try to connect and execute that method.
+         * However, what is the timeout that should be used to determinate if the connect operation had timed out?
+         */
+        connectionRequiredTimeout: 3500
     };
     self.options = $.extend(true, {}, defaults, user_options);
 
@@ -193,6 +199,23 @@ var Karere = function(user_options) {
  */
 Karere.CONNECTION_STATE = Strophe.Status;
 
+/**
+ * Helper enum, based on rfc3921:
+ *   away -- The entity or resource is temporarily away.
+ *   chat -- The entity or resource is actively interested in chatting.
+ *   dnd -- The entity or resource is busy (dnd = "Do Not Disturb").
+ *   xa -- The entity or resource is away for an extended period (xa = "eXtended Away").
+ *
+ * @type Karere.PRESENCE
+ */
+Karere.PRESENCE = {
+    'ONLINE': "chat",
+    'AWAY': "away",
+    'BUSY': "dnd",
+    'EXTENDED_AWAY': "xa",
+    'OFFLINE': "unavailable"
+};
+
 // make observable via .on, .bind, .trigger, etc
 makeObservable(Karere);
 
@@ -249,7 +272,19 @@ makeMetaAware(Karere);
     Karere.prototype.connect = function(jid, password) {
         var self = this;
 
+
+
         var $promise = new $.Deferred();
+
+        // don't call Strophe.connect again if already connected/connecting
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            $promise.resolve(Karere.CONNECTION_STATE.CONNECTED);
+            return $promise;
+        } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+            return createTimeoutPromise(function() {
+                return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
+            }, 100, 4500);
+        }
 
 
         var bareJid = Strophe.getBareJidFromJid(jid);
@@ -388,7 +423,7 @@ makeMetaAware(Karere);
                             return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
                         },
                         200,
-                        1000
+                        self.options.connectionRequiredTimeout
                     )
                 );
             }
@@ -552,7 +587,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype._generateNewRoomIdx = function() {
         var self = this;
-        return self.getJid().split("@")[0] + "-" + MD5.hexdigest(
+        return self.getUsername() + "-" + MD5.hexdigest(
             window.navigator.userAgent.toString() + "-" + (new Date()).getTime() + "-" + self._generateNewIdx()
         );
     };
@@ -598,14 +633,42 @@ makeMetaAware(Karere);
     };
 
     /**
-     * Returns the nickname/username of the currently connected user (e.g. lpetrov, in case of the bare jid is
-     * lpetrov@mega.co.nz)
+     * Returns a specially formatted username__resource of the currently connected user (e.g. lpetrov__resource-1, in case of the
+     * bare jid is lpetrov@mega.co.nz/resource-1)
      *
      * @returns {*}
      */
     Karere.prototype.getNickname = function() {
         var self = this;
+        return self.getUsername() + "__" + self.getResource();
+    };
+
+
+    Karere.getNicknameFromJid = function(jid) {
+        return jid.split("@")[0] + "__" + jid.split("/")[1];
+    };
+
+    /**
+     * Returns the username of the currently connected user (e.g. lpetrov, in case of the bare jid is
+     * lpetrov@mega.co.nz)
+     *
+     * @returns {*}
+     */
+    Karere.prototype.getUsername = function() {
+        var self = this;
         return self.getJid().split("@")[0];
+    };
+
+    /**
+     * Returns the resource of the currently connected user (e.g. resource-1, in case of the bare jid is
+     * lpetrov@mega.co.nz/resource-1)
+     *
+     * @returns {*}
+     */
+    Karere.prototype.getResource = function() {
+        var self = this;
+        var res = self.getJid().split("/");
+        return res[1];
     };
 
     /**
@@ -634,17 +697,25 @@ makeMetaAware(Karere);
      * @returns {boolean}
      * @private
      */
-    Karere.prototype._onIncomingStanza = function (message) {
+    Karere.prototype._onIncomingStanza = function (message, eventData) {
         var self = this;
 
 
         var _type = message.getAttribute('type');
 
 
-        var eventData = {
-            'karere': self,
-            "myOwn": false
-        };
+        eventData = eventData || {};
+
+        eventData = $.extend(
+            true,
+            {
+                'myOwn': false
+            },
+            eventData,
+            {
+                'karere': self
+            }
+        );
 
         // flag own/forwarded messages, because of the <forward/> stanzas, we can receive back our own messages
         if(message.getAttribute('from') == self.getJid()) {
@@ -664,9 +735,21 @@ makeMetaAware(Karere);
         var x = message.getElementsByTagName("x");
         var to = message.getAttribute('to');
         var from = message.getAttribute('from');
+        var eventId = message.getAttribute('id');
 
         eventData['to'] = to;
         eventData['from'] = from;
+        eventData['id'] = eventId;
+
+        var json_data = message.getElementsByTagName("json");
+        if(json_data.length > 0) {
+            eventData['meta'] = JSON.parse(json_data[0].childNodes[0].data);
+        }
+
+        var errors = message.getElementsByTagName("error");
+        if(errors.length > 0) {
+            eventData['error'] = errors[0].childNodes[0].tagName.toLowerCase();
+        }
 
         // x handling
         if(x.length > 0 && x[0].getAttribute('xmlns') == 'http://jabber.org/protocol/muc#user') {
@@ -674,8 +757,9 @@ makeMetaAware(Karere);
 
             //copy please!
             var users = $.extend(true, {}, self.getMeta('rooms', eventData['roomJid'], 'users', {}));
+            eventData['currentUsers'] = clone(users);
 
-            var joinedUsers = {};
+            var newUsers = {};
             var leftUsers = {};
 
             $.each(x[0].getElementsByTagName("item"), function(i, item) {
@@ -683,26 +767,30 @@ makeMetaAware(Karere);
                 var jid = item.getAttribute('jid');
 
                 if(role != "unavailable" && role != "none") {
-                    users[jid] = role;
-                    joinedUsers[jid] = item.getAttribute('role');
+                    if(users[jid] != role) {
+                        users[jid] = role;
+                        newUsers[jid] = item.getAttribute('role');
+                    }
                 } else { // left/kicked
                     delete users[jid];
-                    delete joinedUsers[jid];
+                    delete newUsers[jid];
                     leftUsers[jid] = true;
                 }
             });
 
             self.setMeta('rooms', eventData['roomJid'], 'users', users);
 
-            eventData['currentUsers'] = users;
-
-            if(Object.keys(joinedUsers).length > 0) {
-                eventData['newUsers'] = joinedUsers;
+            if(Object.keys(newUsers).length > 0) {
+                eventData['newUsers'] = newUsers;
                 self._triggerEvent("UsersJoined", eventData);
             }
             if(Object.keys(leftUsers).length > 0) {
                 eventData['leftUsers'] = leftUsers;
                 self._triggerEvent("UsersLeft", eventData);
+            }
+
+            if($('status[code="110"]', x).size() == 1) {
+                self._triggerEvent("UsersUpdatedDone", eventData);
             }
         }
         // end of x handling
@@ -715,8 +803,24 @@ makeMetaAware(Karere);
 
             var elems = message.getElementsByTagName('body');
 
+            if(from.indexOf(self.options.mucDomain) != -1) {
+                eventData['roomJid'] = from.split("/")[0];
+            } else if(to.indexOf(self.options.mucDomain) != -1) {
+                eventData['roomJid'] = to.split("/")[0];
+            }
+
             stanzaType = "Message";
-            if(_type == "chat" && elems.length > 0) {
+            eventData['from'] = from;
+            eventData['to'] = to;
+            eventData['rawType'] = _type;
+            eventData['type'] = stanzaType;
+            eventData['elems'] = elems;
+            eventData['rawMessage'] = message;
+
+            if(_type == "action") {
+                self._triggerEvent("ActionMessage", eventData);
+                return true;
+            } else if(_type == "chat" && elems.length > 0) {
                 stanzaType = "PrivateMessage";
 
 
@@ -728,8 +832,14 @@ makeMetaAware(Karere);
                 eventData['message'] = Strophe.getText(elems[0]);
 
                 // is this a forwarded message? if yes, trigger event only for that
-                if(message.getElementsByTagName("forwarded").length > 0) {
-                    self._onIncomingStanza(message.getElementsByTagName("forwarded")[0].childNodes[1]);
+                if($('forwarded', message).size() > 0) {
+                    $('forwarded', message).each(function(k, v) {
+                        self._onIncomingStanza($('message', v)[0], {
+                            'isForwarded': true,
+                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined
+                        });
+                    })
+
 
                     // stop
                     return true;
@@ -740,8 +850,14 @@ makeMetaAware(Karere);
                 eventData['message'] = Strophe.getText(elems[0]);
 
                 // is this a forwarded message? if yes, trigger event only for that
-                if(message.getElementsByTagName("forwarded").length > 0) {
-                    self._onIncomingStanza(message.getElementsByTagName("forwarded")[0].childNodes[1]);
+                if($('forwarded', message).size() > 0) {
+                    $('forwarded', message).each(function(k, v) {
+                        self._onIncomingStanza($('message', v)[0], {
+                            'isForwarded': true,
+                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined
+                        });
+                    })
+
 
                     // stop
                     return true;
@@ -766,25 +882,24 @@ makeMetaAware(Karere);
 		            console.warn(self.getNickname(), "Got invited to join room: ", eventData['room']);
                 }
 
-                self.connection.muc.join(
-                    eventData['room'],
-                    self.getNickname(),
-                    undefined,
-                    undefined,
-                    undefined,
-                    eventData['password'],
-                    undefined
-                );
+                if(!self._triggerEvent("InviteMessage", eventData)) { /// stop auto join by event prop. ?
+                    return true;
+                } else {
+                    self.connection.muc.join(
+                        eventData['room'],
+                        self.getNickname(),
+                        undefined,
+                        undefined,
+                        undefined,
+                        eventData['password'],
+                        undefined
+                    );
+
+                    return true;
+                }
             } else {
                 stanzaType = "UnknownMessage";
             }
-
-            eventData['from'] = from;
-            eventData['to'] = to;
-            eventData['rawType'] = _type;
-            eventData['type'] = stanzaType;
-            eventData['elems'] = elems;
-            eventData['rawMessage'] = message;
         } else if(message.tagName == "presence") {
             stanzaType = "Presence";
 
@@ -802,6 +917,13 @@ makeMetaAware(Karere);
 
             if(eventData['show'] == undefined && eventData['status'] == undefined) {
                 // is handled in the onPresence in Karere
+            }
+
+            var delay = message.getElementsByTagName("delay");
+            if(delay.length > 0) {
+                var stamp = delay[0].getAttribute('stamp');
+                var d = Date.parse(stamp);
+                eventData.delay = d/1000;
             }
         } else {
             if(localStorage.d) {
@@ -903,32 +1025,40 @@ makeMetaAware(Karere);
  * Presence impl.
  */
 {
-    //TODO: Send new presence to Group chat presence when this is called
     /**
      * Change the currently logged in user presence
      *
-     * @param presence - string - see rfc3921:
-     *   away -- The entity or resource is temporarily away.
-     *   chat -- The entity or resource is actively interested in chatting.
-     *   dnd -- The entity or resource is busy (dnd = "Do Not Disturb").
-     *   xa -- The entity or resource is away for an extended period (xa = "eXtended Away").
+     * @param presence {Karere.PRESENCE}
      * @param status
      */
-    Karere.prototype.setPresence = function(presence, status) {
+    Karere.prototype.setPresence = function(presence, status, delay) {
         presence = presence || "chat";
         status = status || "";
+        delay = delay ? parseFloat(delay) : undefined;
 
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            var msg = $pres()
+                .c("show")
+                .t(presence)
+                .up()
+                .c("status")
+                .t(status ? status : presence)
+                .up();
+
+            if(delay) {
+                msg = msg
+                    .c("delay", {
+                        'xmlns': 'urn:xmpp:delay',
+                        'stamp': (new Date(delay * 1000).toISOString()),
+                        'from': self.getJid()
+                    })
+                .up();
+            }
+
             self.connection.send(
-                $pres()
-                    .c("show")
-                    .t(presence)
-                    .up()
-                    .c("status")
-                    .t(status ? status : presence)
-                    .tree()
+                msg.tree()
             );
         }
     };
@@ -943,7 +1073,18 @@ makeMetaAware(Karere);
     Karere.prototype.getPresence = function(jid) {
         var self = this;
 
-        return self._presenceCache[jid] ? self._presenceCache[jid] : false;
+        if(jid.indexOf("/") != -1) {
+            return self._presenceCache[jid] ? self._presenceCache[jid] : false;
+        } else {
+            var result = false;
+            $.each(self._presenceCache, function(k, v) {
+                if(k.indexOf(jid) === 0) {
+                    result = v;
+                }
+            });
+
+            return result;
+        }
     }
 }
 
@@ -975,7 +1116,7 @@ makeMetaAware(Karere);
     Karere.prototype.sendIsComposing = function(toJid) {
         var self = this;
 
-        return self._rawSendMessage(toJid, "chat", Karere._$chatState('composing'));
+        return self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('composing'));
     };
 
     /**
@@ -986,11 +1127,11 @@ makeMetaAware(Karere);
      */
     Karere.prototype.sendComposingPaused = function(toJid) {
         var self = this;
-        self._rawSendMessage(toJid, "chat", Karere._$chatState('paused'));
+        self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'));
 
         return $.when(
             self.sendIsActive(toJid),
-            self._rawSendMessage(toJid, "chat", Karere._$chatState('paused'))
+            self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'))
         );
 
     };
@@ -1004,7 +1145,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.sendIsActive = function(toJid) {
         var self = this;
-        return self._rawSendMessage(toJid, "chat", Karere._$chatState('active'));
+        return self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('active'));
     };
 }
 
@@ -1022,12 +1163,16 @@ makeMetaAware(Karere);
      * @param contents
      * @private
      */
-    Karere.prototype._rawSendMessage = function (toJid, type, contents) {
+    Karere.prototype._rawSendMessage = function (toJid, type, contents, meta) {
         var self = this;
+        meta = meta || {};
 
         type = type || "chat";
+
         var timestamp = (new Date()).getTime();
-        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: timestamp});
+        var message_id = simpleStringHashCode(self.getJid() + toJid) + "_" + timestamp;
+
+        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: message_id});
 
         if(contents.toUpperCase) { // is string (better way?)
             message
@@ -1040,18 +1185,45 @@ makeMetaAware(Karere);
                 .node.appendChild(contents.tree())
         }
 
+        if(Object.keys(meta).length > 0) {
+            var json = Strophe.xmlHtmlNode("<json></json>").childNodes[0];
+            json.textContent = JSON.stringify(meta);
 
-        var forwarded = $msg({
-            to: Strophe.getBareJidFromJid(self.connection.jid),
-            type: type,
-            id:timestamp
-        })
-            .c('forwarded', {xmlns:'urn:xmpp:forward:0'})
-            .c('delay', {xmns:'urn:xmpp:delay',stamp:timestamp}).up()
-            .cnode(message.tree());
+            message.nodeTree.appendChild(
+                json
+            );
+        }
+
+
+        //TODO: Do we really need this in case that type == groupchat?
+//
+//        var forwarded = $msg({
+//            to: Strophe.getBareJidFromJid(self.connection.jid),
+//            type: type,
+//            id:message_id
+//        })
+//            .c('forwarded', {xmlns:'urn:xmpp:forward:0'})
+//            .c('delay', {xmns:'urn:xmpp:delay',stamp:timestamp}).up()
+//            .cnode(message.tree());
 
         self.connection.send(message);
-        self.connection.send(forwarded);
+//        self.connection.send(forwarded);
+
+        return message_id;
+    };
+
+    Karere.prototype.sendAction = function(toJid, action, meta) {
+        return this._rawSendMessage(
+            toJid,
+            "action",
+            "",
+            $.extend(
+                true,
+                {},
+                meta,
+                {'action': action}
+            )
+        );
     };
 
     /**
@@ -1090,18 +1262,23 @@ makeMetaAware(Karere);
      * Start/create new chat, wait for the room creations, send invites and wait for all users to join.
      *
      * @param jidList array of jids to be invited to the chat
+     * @param type string private/group
      * @returns {Deferred}
      */
-    Karere.prototype.startChat = function(jidList) {
+    Karere.prototype.startChat = function(jidList, type, roomName) {
         var self = this;
+
+        type = type || "private";
+        roomName = roomName || self._generateNewRoomIdx();
 
         var $promise = new $.Deferred();
 
-        var roomName = self._generateNewRoomIdx();
+
         var roomPassword = self._generateNewRoomPassword();
         var roomJid = roomName + "@" + self.options.mucDomain;
 
         self.setMeta("rooms", roomJid, 'password', roomPassword);
+        self.setMeta("rooms", roomJid, 'type', type);
 
         self.connection.muc.join(roomJid, self.getNickname(), undefined, undefined, undefined, roomPassword, undefined);
 
@@ -1155,6 +1332,7 @@ makeMetaAware(Karere);
         // returns promise that when solved will get the chat's JID
         return $promise;
     };
+
 
     /**
      * Helper/internal method for waiting for a user's presence in a specific room.
@@ -1270,11 +1448,12 @@ makeMetaAware(Karere);
      * Leave chat
      *
      * @param roomJid
-     * @param exitMessage
+     * @param exitMessage optional
      * @returns {Deferred}
      */
     Karere.prototype.leaveChat = function(roomJid, exitMessage) {
         var self = this;
+
         exitMessage = exitMessage || undefined;
 
         var $promise = new $.Deferred();
@@ -1299,16 +1478,55 @@ makeMetaAware(Karere);
      * @param password
      * @returns {Deferred}
      */
-    Karere.prototype.addUserToChat = function(roomJid, userJid, password) {
+    Karere.prototype.addUserToChat = function(roomJid, userJid, password, type, meta) {
         var self = this;
+
+        type = type || "private";
+        meta = meta || {};
 
         if(!password && self.getMeta("rooms", roomJid, 'password')) {
             password = self.getMeta("rooms", roomJid, 'password');
         }
+        type = type || self.getMeta("rooms", roomJid, 'type');
 
         var $promise = self.waitForUserToJoin(roomJid, userJid);
 
-        self.connection.muc.directInvite(roomJid, userJid, undefined, password);
+//        self.connection.muc.directInvite(roomJid, userJid, undefined, password);
+
+        // construct directInvite (fork of muc.directInvite, so that we can add extra type arguments)
+        var attrs, invitation, msgid;
+        msgid = self.connection.getUniqueId();
+        attrs = {
+            xmlns: 'jabber:x:conference',
+            jid: roomJid
+        };
+
+        if(password) {
+            attrs.password = password;
+        }
+
+        invitation = $msg({
+            from: self.getJid(),
+            to: userJid,
+            id: msgid
+        })
+            .c('x', attrs)
+            .c("json");
+
+        meta = $.extend(
+            true,
+            {},
+            meta,
+            {
+                'type': type
+            }
+        );
+        var json = JSON.stringify(meta);
+
+        // because strophe's builder is doing some very bad sanitization that will break the json string.
+        invitation.node.appendChild(Strophe.xmlTextNode(json));
+
+        self.connection.send(invitation);
 
         if(localStorage.d) {
 		    console.warn(self.getNickname(), "Inviting: ", userJid, "to", roomJid, "with password", password);
@@ -1392,6 +1610,30 @@ makeMetaAware(Karere);
         var users = self.getMeta('rooms', roomJid, 'users', {});
         return users;
     };
+
+    Karere.prototype.userExistsInChat = function(roomJid, userJid) {
+        var self = this;
+        var users = self.getUsersInChat(roomJid);
+
+        return users.hasOwnProperty(userJid);
+    };
+
+    Karere.prototype.joinChat = function(roomJid, password) {
+        var self = this;
+        password = password || undefined;
+
+        self.connection.muc.join(
+            roomJid,
+            self.getNickname(),
+            undefined,
+            undefined,
+            undefined,
+            password,
+            undefined
+        );
+
+        return self.waitForUserToJoin(roomJid, self.getJid());
+    }
 }
 
 
@@ -1401,6 +1643,7 @@ makeMetaAware(Karere);
 {
     Karere._requiresConnectionWrapper(Karere.prototype, 'startChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'leaveChat');
+    Karere._requiresConnectionWrapper(Karere.prototype, 'joinChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'addUserToChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'removeUserFromChat');
 

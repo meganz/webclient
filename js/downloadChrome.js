@@ -70,15 +70,9 @@ function FileSystemAPI(dl_id, dl) {
 						break;
 					}
 				}
-				options._firefox = {
-					filesize : dl_filesize,
-					filename : dl_filename,
-					zip      : !1, // XXX
-					path     : q.p,
-					mtime    : q.t
-				};
+				options.fxo = Object.create( q, { size : { value : dl_filesize }});
 			}
-		
+
 			fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
 				fileEntry.createWriter(function(fileWriter) {     
 					DEBUG('File "mega/' + dl_id + '" created');
@@ -118,6 +112,7 @@ function FileSystemAPI(dl_id, dl) {
 					});
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
+			options = undefined;
 		}, errorHandler('getDirectory'));
 
 	}

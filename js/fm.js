@@ -5060,7 +5060,7 @@ function slideshow(id,close)
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click',function(e)
 	{
-		slideshow(false,1);
+		slideshow(id,1);
 	});	
 	var n = M.d[id];	
 	if (!n) return;

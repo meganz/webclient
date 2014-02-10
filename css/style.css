@@ -14,13 +14,29 @@
 }
 @font-face {
 	font-family: "Open Sans Semibold Italic";
-	src: url("../fonts/OpenSans-SemiboldItalic.eot?") format("eot"), url("../fonts/OpenSans-SemiboldItalic.woff") format("woff"), url("../fonts/OpenSans-SemiboldItalic.ttf") format("truetype"), url("../fonts/OpenSans-SemiboldItalic.svg#OpenSans-SemiboldItalic") format("svg");
+	src: url("../fonts/OpenSans-SemiboldItalic.eot");
+	src: url("../fonts/OpenSans-SemiboldItalic.eot?#iefix") format('embedded-opentype'), url("../fonts/OpenSans-SemiboldItalic.woff") format("woff"), url("../fonts/OpenSans-SemiboldItalic.ttf") format("truetype"), url("../fonts/OpenSans-SemiboldItalic.svg#OpenSans-SemiboldItalic") format("svg");
 	font-weight: normal;
 	font-style: normal;
 }
 @font-face {
 	font-family: "Open Sans Light";
-	src: url("../fonts/OpenSans-Light.eot?") format("eot"), url("../fonts/OpenSans-Light.woff") format("woff"), url("../fonts/OpenSans-Light.ttf") format("truetype"), url("../fonts/OpenSans-Light.svg#OpenSans-Light") format("svg");
+	src: url("../fonts/OpenSans-Light.eot");
+	src: url("../fonts/OpenSans-Light.eot?#iefix") format('embedded-opentype'), url("../fonts/OpenSans-Light.woff") format("woff"), url("../fonts/OpenSans-Light.ttf") format("truetype"), url("../fonts/OpenSans-Light.svg#OpenSans-Light") format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'brandon_textbold_italic';
+	src: url('../fonts/brandontext-bolditalic-webfont.eot');
+	src: url('../fonts/brandontext-bolditalic-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/brandontext-bolditalic-webfont.woff') format('woff'), url('../fonts/brandontext-bolditalic-webfont.ttf') format('truetype'), url('../fonts/brandontext-bolditalic-webfont.svg#brandon_textbold_italic') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'brandon_textmedium';
+	src: url('../fonts/brandontext-medium-webfont.eot');
+	src: url('../fonts/brandontext-medium-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/brandontext-medium-webfont.woff') format('woff'), url('../fonts/brandontext-medium-webfont.ttf') format('truetype'), url('../fonts/brandontext-medium-webfont.svg#brandon_textmedium') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -114,6 +130,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .top-head {
 	height: 50px;
 	background-color: #151412;
+	position: relative;
 }
 .logo {
 	display: block;
@@ -8856,7 +8873,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .st-social-block {
 	position: absolute;
-	bottom: 60px;
+	bottom: 55px;
 	width: 100%;
 	height: 43px;
 	text-align: center;
@@ -10480,7 +10497,7 @@ h5.main-italic-header {
 .adv .downloading-progress {
 	width: 344px;
 }
-.downslideshow-progress {
+.downslideshow-progress, .downloading-progress-bar {
 	width: 0%;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
@@ -14486,14 +14503,197 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .slideshow-progress.percents-100 {
 	background-position: 0 -2000px;
 }
- @media only screen and (max-width: 1593px) {
+.campaign-logo {
+	width: 244px;
+	height: 31px;
+	position: absolute;
+	left: 50%;
+	margin: 0 0 0 -122px;
+	background-image: url(../images/mega/new-download.png);
+	background-position: center top;
+	background-repeat: no-repeat;
+	z-index: 10;
+	top: 11px;
+	display: none;
+	cursor: default;
+}
+.campaign .campaign-logo {
+	display: block;
+}
+.campaign-widget {
+	width: 400px;
+	position: absolute;
+	background-color: #222222;
+	-webkit-border-bottom-left-radius: 6px;
+	-moz-border-radius-bottomleft: 6px;
+	border-bottom-left-radius: 6px;
+	-webkit-border-bottom-right-radius: 6px;
+	-moz-border-radius-bottomright: 6px;
+	border-bottom-right-radius: 6px;
+	border-top: 2px solid #F1C552;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	top: 37px;
+	left: 50%;
+	margin-left: -200px;
+	display: none;
+}
+.campaign-logo:hover .campaign-widget {
+	display: block;
+}
+.campaign-bottom-banner .campaign-logo:hover .campaign-widget {
+	display: none;
+}
+.campaign-bottom-banner .campaign-logo {
+	cursor: pointer;
+}
+.campaign-arrow {
+	background-image: url(../images/mega/new-download.png);
+	background-position: center -32px;
+	background-repeat: no-repeat;
+	height: 9px;
+	position: absolute;
+	top: -9px;
+	width: 100%;
+}
+.campaign-txt {
+	color: #999999;
+	font-size: 16px;
+	line-height: 28px;
+	font-family: 'brandon_textmedium';
+	padding: 20px 24px;
+}
+.campaign-mega-logo {
+	display: inline-block;
+	width: 70px;
+	color: rgba(0,0,0,0);
+	background-image: url(../images/mega/new-download.png);
+	background-position: -72px -67px;
+	background-repeat: no-repeat;
+}
+.campaign-yellow-txt {
+	color: #F1C552;
+}
+.campaign-widget-bottom {
+	background-color: #111111;
+	padding: 20px 24px;
+}
+.campaign-take-action {
+	height: 40px;
+	background-color: #F1C359;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	text-align: center;
+	cursor: pointer;
+}
+.campaign-take-action span {
+	background-image: url(../images/mega/new-download.png);
+	background-position: right -179px;
+	background-repeat: no-repeat;
+	display: inline-block;
+	font-family: 'brandon_textbold_italic';
+	padding-right: 30px;
+	line-height: 39px;
+	font-size: 24px;
+	color: black;
+}
+.campaign .download-mid-centered-block {
+	margin-top: -100px;
+	min-height: 450px;
+}
+.campaign .new-download-icon {
+	background-image: url(../images/mega/new-download.png);
+	background-position: -6px -408px;
+	background-repeat: no-repeat;
+}
+.campaign .new-download-red-button {
+	background-color: #F1C359;
+}
+.campaign .new-download-red-button .new-download-button-txt1, .campaign .new-download-red-button .new-download-button-txt2 {
+	color: #333333;
+}
+.campaign-icon {
+	position: absolute;
+	width: 120px;
+	height: 67px;
+	left: 50%;
+	top: 12%;
+	margin: 0 0 0 -60px;
+	background-image: url(../images/mega/new-download.png);
+	background-position: center -280px;
+	background-repeat: no-repeat;
+	display: none;
+}
+.campaign .campaign-icon {
+	display: block;
+}
+.campaign-bottom-block {
+	width: 100%;
+	height: 100px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	background-color: black;
+	z-index: 10;
+	display: none;
+}
+.campaign-bottom-banner .campaign-bottom-block {
+	display: block;
+}
+.campaign-bottom-pad {
+	width: 916px;
+	margin: 0 auto;
+}
+.campaign-bottom-pad .campaign-take-action {
+	float: right;
+	width: 290px;
+	height: 40px;
+	margin-top: 30px;
+}
+.campaign-bottom-pad .campaign-txt {
+	width: 495px;
+	line-height: 20px;
+	display: table-cell;
+	vertical-align: middle;
+	height: 100px;
+	padding: 0;
+}
+.campaign-bottom-pad .campaign-mega-logo {
+	background-position: -72px -72px;
+}
+.campaign-close-button {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	right: 10px;
+	top: 5px;
+	z-index: 10;
+	background-image: url(../images/mega/new-download.png);
+	background-position: right -329px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.campaign-close-button:hover {
+	background-position: right -369px;
+}
+.logged-in-user  @media only screen and (max-width: 1593px) {
 .adv .download-mid-centered-block {
-	min-width: 648px;
+ min-width: 648px;
 }
 }
 @media only screen and (max-width: 1323px) {
 .adv .download-mid-centered-block {
 	min-width: 595px;
+}
+}
+ @media only screen and (max-width: 1280px) {
+.logged-in-user .campaign-logo {
+	position: relative;
+	left: auto;
+	margin: 0 20px 0 0;
+	float: right;
 }
 }
  @media only screen and (max-width: 1143px) {
@@ -15003,6 +15203,10 @@ background-size: 700px auto;
 .chrome-download-button:hover, a.chrome-download-button:hover {
  background-image: url(../images/mega/mobile-sprite@2x.png?v=3);
 background-size: 836px auto;
+}
+.campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {
+background-image: url(../images/mega/new-download@2x.png);
+background-size: 340px auto;
 }
 }
 /* loader*/

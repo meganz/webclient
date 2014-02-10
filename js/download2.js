@@ -53,9 +53,18 @@ var DownloadManager = new function() {
 	};
 
 	self.abort = function(pattern) {
-		DEBUG("cancelled file ", pattern);
+		var _pattern = pattern
+		if (typeof pattern == "object") {
+			if (pattern.zipid) {
+				_pattern = "zipid:" + pattern.zipid;
+			} else {
+				_pattern = "id:" + pattern.id;
+			}
+		}
+
+		DEBUG("cancelled file ", _pattern);
 		var trigger = false;
-		self.remove(pattern, function(file) {
+		self.remove(_pattern, function(file) {
 			if (!file.dl) throw new Error("Invalid task");
 			file.dl.cancelled = true;
 			if (!trigger && typeof file.dl.io.abort == "function") {
@@ -359,14 +368,10 @@ function dl_reportstatus(dl, code)
 	
 	if(code === EKEY || code === EAGAIN) {
 		// TODO: Check if other codes should raise abort()
-		
-		try
-		{
-			if(typeof dl.io.abort == "function") dl.io.abort(code);
-		}
-		catch(e)
-		{
-			if (d) console.log(e.message, e);
+		try {
+			DownloadManager.abort(dl);
+		} catch(e) {
+			DEBUG(e.message, e);
 		}
 	}
 }

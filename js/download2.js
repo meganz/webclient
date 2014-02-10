@@ -362,7 +362,7 @@ function dl_reportstatus(dl, code)
 		
 		try
 		{
-			dl.io.abort(code);
+			if(typeof dl.io.abort == "function") dl.io.abort(code);
 		}
 		catch(e)
 		{

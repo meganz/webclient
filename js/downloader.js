@@ -257,6 +257,7 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
+						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
 						}

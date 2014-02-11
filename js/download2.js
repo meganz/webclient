@@ -64,9 +64,14 @@ var DownloadManager = new function() {
 
 		DEBUG("cancelled file ", _pattern);
 		var trigger = false;
+		$.each(dl_queue, function(i, dl) {
+			if (doesMatch({task:dl}, _pattern)) {
+				dl.cancelled = true;
+				return false;
+			}
+		});
 		self.remove(_pattern, function(file) {
 			if (!file.dl) throw new Error("Invalid task");
-			file.dl.cancelled = true;
 			if (!trigger && typeof file.dl.io.abort == "function") {
 				file.dl.io.abort("User cancelled");
 				trigger = true;

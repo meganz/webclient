@@ -174,23 +174,20 @@ function FileSystemAPI(dl_id, dl) {
 		});
 	}
 
-	// IO.abort = function(e) {
-		// zfileEntry.remove(function() {
-			// try to remove
-		// });
-	// };
-	if(is_chrome_firefox) {
-		IO.abort = function(err) {
+	var aborted = false;
+	IO.abort = function(err) {
+		aborted = true;
+		if(is_chrome_firefox) {
 			dl_fw.close(err);
-		};
-	}
+		}
+	};
 
 	IO.write = function(buffer, position, done) {
 		if (dl_writing || position !== dl_fw.position) {
 			// busy or not there yet
 			// DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
 			return setTimeout(function() {
-				IO.write(buffer, position, done);
+				if (!aborted) IO.write(buffer, position, done);
 			}, 100);
 		}
 		dl_writing = true;

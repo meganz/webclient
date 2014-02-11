@@ -30,16 +30,20 @@ var DownloadManager = new function() {
 	var self = this
 		, locks = []
 		, removed = []
-
+	
+	function s2o(s) {
+		if (typeof s == "string") {
+			var parts = s.split(":");
+			s = {};
+			s[parts[0]] = parts[1];
+		}
+		return s;
+	}
+	
 	function doesMatch(task, pattern) {
 		var _match = true;
-		if (typeof pattern == "string") {
-			var parts = pattern.split(/:/);
-			pattern = {};
-			pattern[parts[0]] = parts[1];
-		}
 
-		$.each(pattern, function(key, value) {
+		$.each(s2o(pattern), function(key, value) {
 			if (typeof task.task[key] == "undefined" || task.task[key] != value) {
 				_match = false;
 				return false;
@@ -63,24 +67,29 @@ var DownloadManager = new function() {
 		}
 
 		DEBUG("cancelled file ", _pattern);
-		var trigger = false;
+		// var trigger = false;
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
+				if (!dl.cancelled && typeof dl.io.abort == "function") {
+					dl.io.abort("User cancelled");
+				}
 				dl.cancelled = true;
 				return false;
 			}
 		});
-		self.remove(_pattern, function(file) {
-			if (!file.dl) throw new Error("Invalid task");
-			if (!trigger && typeof file.dl.io.abort == "function") {
-				file.dl.io.abort("User cancelled");
-				trigger = true;
-			}
-		});
+		self.remove(_pattern);
+		// self.remove(_pattern, function(file) {
+			// if (!file.dl) throw new Error("Invalid task");
+			// if (!trigger && typeof file.dl.io.abort == "function") {
+				// file.dl.io.abort("User cancelled");
+				// trigger = true;
+			// }
+		// });
 	}
 
 	self.remove = function(pattern, check) {
-		check = check || function() {}
+		check = check || function() {};
+		pattern = s2o(pattern);
 		if (pattern.zipid) {
 			removed.push("zipid:" + pattern.zipid);
 		} else {

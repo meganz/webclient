@@ -9,7 +9,7 @@ function FlashIO(dl_id) {
 				IO.write(buffer, position, done);
 			}, 300);
 		}
-		var j,k,len;
+		var j,k,len,subdata;
 
 		if (have_ab)
 			len = buffer.length;

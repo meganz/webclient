@@ -227,7 +227,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			scope.webkitRequestFileSystem = scope.requestFileSystem;
 		return;
 	}
-	
+
 	var StorageInfo = Object.freeze({
 		TEMPORARY: 0,
 		requestQuota: function(t,s,f) {
@@ -235,29 +235,29 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				f = s;
 				s = t;
 			}
-			
+
 			var q = Services.prompt.confirmEx(scope,
 				'MEGA :: Out of disk space',
 				'Your drive is running out of disk space. '+
 				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
-			
+
 			if (!q) mozAskDownloadsFolder();
-			
+
 			var fld = mozGetDownloadsFolder();
 			if (d) console.log('requestQuota',fld && fld.diskSpaceAvailable);
-			
+
 			f(fld && fld.diskSpaceAvailable || 0);
 		},
 		queryUsageAndQuota: function(t,f) {
 			if (typeof t === 'function') f=t;
-			
+
 			var fld = mozGetDownloadsFolder();
 			if (d) console.log('queryUsageAndQuota',fld && fld.diskSpaceAvailable);
-			
+
 			f(0, fld && fld.diskSpaceAvailable || 0);
 		}
 	});
-	
+
 	Object.defineProperty(scope,     'webkitStorageInfo',       { value : StorageInfo });
 	Object.defineProperty(navigator, 'webkitTemporaryStorage',  { value : StorageInfo });
 	// Object.defineProperty(navigator, 'webkitPersistentStorage', { value : StorageInfo });
@@ -282,13 +282,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				return Object.freeze({
 					readEntries : function(f,e) {
 						/**
-						 * Used at cleartemp.js - To make this working somehow as in Chrome we'd need
-						 * to explicitly differentiate temporal and final files on the downloads folder,
-						 * so that we would free up space when needed. Thing is, nsISafeOutputStream
-						 * should already handle temp files and moving them back to the former when
-						 * finished. However, the interface does that for canceled downloads too. So,
-						 * perhaps we should tag them (?)
-						 * In any case, we're merely calling back 'f' here so that the dialog for 
+						 * Used at cleartemp.js - calling back 'f' here so that the dialog for
 						 * "running out of disk space" is shown when required.
 						 */
 						f([]);
@@ -507,11 +501,13 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 								File.fs.seek(0,p);
 							},
 							close : function(aError) {
+								if(d) console.log('Closing stream', File.options.saveto.path);
 								mozCloseStream(File.fs);
 
 								if (aError)
 								{
 									mozRunAsync(function() {
+										if(d) console.log('Removing file', File.options.saveto.path);
 										File.options.saveto.remove(!1);
 									});
 								}
@@ -744,7 +740,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 						}
 					}
 				}
-				
+
 				if(q.preview) {
 				// Why is the preview writing to disk? :(
 					osd_cb({

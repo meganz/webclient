@@ -324,9 +324,10 @@ function decrypter(task)
 				var databuf = new Uint8Array(e.data.buffer || e.data);
 				var plain = databuf;
 				Decrypter.done(); // release slot
-				DEBUG("Decrypt done");
+				DEBUG("Decrypt done", download.cancelled);
 				if (download.cancelled) {
 					download.decrypt--;
+					// DownloadManager.abort(download);
 					return;
 				}
 				download.io.write(plain, task.offset, function() {
@@ -354,7 +355,7 @@ function decrypter(task)
 		} else {
 			worker.postMessage(task.data.buffer, [task.data.buffer]);
 		}
-		DEBUG("decrypt with workers");
+		DEBUG("decrypt with workers", download.cancelled);
 	} else {
 		DEBUG("decrypt without workers")
 		download.macs[task.offset] = decrypt_ab_ctr(

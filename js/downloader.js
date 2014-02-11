@@ -324,6 +324,10 @@ function decrypter(task)
 				var plain = databuf;
 				Decrypter.done(); // release slot
 				DEBUG("Decrypt done");
+				if (download.cancelled) {
+					download.decrypt--;
+					return;
+				}
 				download.io.write(plain, task.offset, function() {
 					if (task.download.data) {
 						new Uint8Array(

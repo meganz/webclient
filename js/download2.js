@@ -74,17 +74,10 @@ var DownloadManager = new function() {
 					dl.io.abort("User cancelled");
 				}
 				dl.cancelled = true;
-				return false;
+				/* do not break the look, it may be a multi-files zip */
 			}
 		});
 		self.remove(_pattern);
-		// self.remove(_pattern, function(file) {
-			// if (!file.dl) throw new Error("Invalid task");
-			// if (!trigger && typeof file.dl.io.abort == "function") {
-				// file.dl.io.abort("User cancelled");
-				// trigger = true;
-			// }
-		// });
 	}
 
 	self.remove = function(pattern, check) {

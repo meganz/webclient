@@ -73,8 +73,7 @@ function benchmark()
 // compute final MAC from block MACs
 function condenseMacs(macs,key)
 {
-	var i, aes;
-	mac = [0,0,0,0];
+	var i, aes, mac = [0,0,0,0];
 
 	aes = new sjcl.cipher.aes([key[0],key[1],key[2],key[3]]);
 
@@ -857,16 +856,16 @@ function api_proc(q)
 
 			if (this.status == 200)
 			{
-				if (this.responseText) this.response = this.responseText;
+				var response = this.responseText || this.response;
 
 				if (d) console.log('API response: ' + this.response);
 				
 				try {
-					t = JSON.parse(this.response);
-					if (this.response[0] == '{') t = [t];
+					t = JSON.parse(response);
+					if (response[0] == '{') t = [t];
 				} catch (e) {
 					// bogus response, try again
-					console.log("Bad JSON data in response: " + this.response);
+					console.log("Bad JSON data in response: " + response);
 					t = EAGAIN;
 				}
 			}
@@ -1746,7 +1745,7 @@ function api_getfa(id)
 {
 	var f = [];
 
-	if (storedattr[id]) for (type in storedattr[id]) if (type != 'target') f.push(type + '*' + storedattr[id][type]);
+	if (storedattr[id]) for (var type in storedattr[id]) if (type != 'target') f.push(type + '*' + storedattr[id][type]);
 
 	storedattr[id] = {};
 

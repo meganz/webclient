@@ -1,18 +1,12 @@
-function BlobBuilderIO(dl_id) {
+function BlobBuilderIO(dl_id, dl) {
 	var dl_blob
 		, IO = this
 		, offset = 0
-		, aborted = false
-
-	this.abort = function() {
-		aborted = true;
-	}
-
 
 	this.write = function (buffer, position, done) {
 		if (position !== offset) {
 			return setTimeout(function() {
-				if (!aborted) IO.write(buffer, position, done);
+				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 100);
 		}
 		dl_blob.append(have_ab ? buffer : buffer.buffer);

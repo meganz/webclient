@@ -321,13 +321,11 @@ function decrypter(task)
 				}
 				DEBUG("worker replied string", e.data, download.macs);
 			} else {
-				var databuf = new Uint8Array(e.data.buffer || e.data);
-				var plain = databuf;
+				var plain = new Uint8Array(e.data.buffer || e.data);
 				Decrypter.done(); // release slot
 				DEBUG("Decrypt done", download.cancelled);
 				if (download.cancelled) {
 					download.decrypt--;
-					// DownloadManager.abort(download);
 					return;
 				}
 				download.io.write(plain, task.offset, function() {

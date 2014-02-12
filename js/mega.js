@@ -642,7 +642,7 @@ function MegaData ()
 
 	this.renderPath = function()
 	{
-		var hasnext='';
+		var hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
 		var a = this.getPath(this.currentdirid);
 		for (var i in a)
@@ -1423,7 +1423,7 @@ function MegaData ()
 			zipid++;
 			z=zipid;
 			if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-			else zipname = 'Archive.zip';
+			else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
 			var zipsize = 0;
 		}
 		else z = false;

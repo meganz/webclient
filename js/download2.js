@@ -67,14 +67,15 @@ var DownloadManager = new function() {
 		}
 
 		DEBUG("cancelled file ", _pattern);
-		// var trigger = false;
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
-				if (!dl.cancelled && typeof dl.io.abort == "function") {
+				if (!dl.cancelled && typeof dl.io.abort == "function") try {
 					dl.io.abort("User cancelled");
+				} catch(e) {
+					DEBUG(e.message, e);
 				}
 				dl.cancelled = true;
-				/* do not break the look, it may be a multi-files zip */
+				/* do not break the loop, it may be a multi-files zip */
 			}
 		});
 		self.remove(_pattern);
@@ -375,11 +376,7 @@ function dl_reportstatus(dl, code)
 	
 	if(code === EKEY || code === EAGAIN) {
 		// TODO: Check if other codes should raise abort()
-		try {
-			DownloadManager.abort(dl);
-		} catch(e) {
-			DEBUG(e.message, e);
-		}
+		DownloadManager.abort(dl);
 	}
 }
 

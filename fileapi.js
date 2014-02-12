@@ -501,14 +501,16 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 								File.fs.seek(0,p);
 							},
 							close : function(aError) {
-								if(d) console.log('Closing stream', File.options.saveto.path);
+								var f = File.options.saveto;
+
+								if(d) console.log('Closing stream', f.path);
 								mozCloseStream(File.fs);
 
 								if (aError)
 								{
 									mozRunAsync(function() {
-										if(d) console.log('Removing file', File.options.saveto.path);
-										File.options.saveto.remove(!1);
+										if(d) console.log('Removing file', f.path);
+										if (f.exists()) f.remove(!1);
 									});
 								}
 							}
@@ -611,7 +613,8 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				};
 
-				var q = opts.fxo;LOG(q)
+				var q = opts.fxo;
+				if (d) LOG(q);
 				File.filesize = q.size;
 				File.filename = (q.zipname || q.n)
 					.replace(/[:\/\\<">|?*]+/g,'.')

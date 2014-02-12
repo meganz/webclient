@@ -1,6 +1,6 @@
 describe("Chat.js - Karere UI integration", function() {
 
-    var fixtureManager = new Fixtures("src/unit/fixtures/chat/");
+    var fixtureManager = new Fixtures("./src/unit/fixtures/chat/");
 
     window.u_handle = "testcase1";
     window.avatars = {};
@@ -30,11 +30,61 @@ describe("Chat.js - Karere UI integration", function() {
 
                 $container = $(contents);
                 $(document.body).append($container);
+
+
+                $.each(M.u, function(k, v) {
+                    if(v.c == 0 || v.c == 1) {
+                        var tpl = '<li id="treeli_$hash"><span class="fm-connector contact"></span><span class="fm-horizontal-connector contact"></span><a class="fm-tree-folder contact    ui-droppable offline-status dragover" id="treea_$hash" data-jid="$jid"><span><span class="avatar $hash"><span><img src="/images/mega/default-avatar.png" alt=""></span></span><span class="messages-icon"><span class="active"></span></span><span class="contact-name">$name</span></span></a><ul id="treesub_$hash"></ul></li>';
+                        $('#treesub_contacts').append(
+                            tpl
+                                .replace(
+                                    /\$hash/gi,
+                                    v.u
+                                )
+                                .replace(
+                                    /\$name/gi,
+                                    v.m
+                                )
+                                .replace(
+                                    /\$jid/gi,
+                                    megaChat.getJidFromNodeId(v.u)
+                                )
+                        );
+                    }
+                });
+
                 karereMocker = new KarereMocker(megaChat.karere);
 
                 window.km = karereMocker;
 
                 megaChat.init();
+
+                expect(
+                    $('.activity-status-block').is(":visible")
+                ).to.be.ok;
+
+                expect(
+                    $('.activity-status').is(":visible")
+                ).to.be.ok;
+
+                expect(
+                    $('.activity-status-block .activity-status').is('.online')
+                ).to.be.ok;
+
+                expect(
+                    $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').is('.active')
+                ).to.be.ok;
+                expect(
+                    $('.top-user-status-popup .top-user-status-item[data-presence="away"]').is('.active')
+                ).not.to.be.ok;
+
+                expect(
+                    $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').is('.active')
+                ).not.to.be.ok;
+
+                expect(
+                    $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').is('.active')
+                ).not.to.be.ok;
 
                 expectToBeResolved(
                     createTimeoutPromise(function() {
@@ -44,6 +94,7 @@ describe("Chat.js - Karere UI integration", function() {
                 ).done(function() {
                     done();
                 });
+
             })
             .fail(function() {
                 expect(true).to.equal(false, "Failed to load templates.html, fail arguments: " + toArray(arguments).join(", "));
@@ -57,6 +108,7 @@ describe("Chat.js - Karere UI integration", function() {
         megaChat.destroy();
 
         karereMocker.restore();
+
         $container.remove();
         done();
     });
@@ -232,7 +284,7 @@ describe("Chat.js - Karere UI integration", function() {
         users[user2jid] = "moderator";
 
 
-        // recieve invitation
+        // receive invitation
         var eventTriggerShouldReturnFalse = megaChat.karere._triggerEvent("InviteMessage", {
             elems: [],
             from: user2jid,
@@ -398,12 +450,238 @@ describe("Chat.js - Karere UI integration", function() {
             }
         ]);
 
+        expect(
+            $('.fm-chat-header').data("roomJid")
+        ).to.eql(roomJid);
+
+        expect(
+            $('.fm-chat-header').data("roomJid")
+        ).to.eql(roomJid);
+
+        expect(
+            $('.messages-icon').is(":hidden")
+        ).to.be.ok;
+
+        expect(
+            $('#treea_' + Object.keys(M.u)[1]).data("roomJid")
+        ).to.eql(roomJid);
 
         done();
     });
+
+    it("Presence sync across devices and auto invite to private rooms (resume/created chat support)", function(done) {
+
+
+        var user1jid2 = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u) + "/res2";
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u) + "/res";
+
+
+        localStorage.megaChatPresence = megaChat._myPresence = "away";
+        var origPresenceMtime = localStorage.megaChatPresenceMtime = unixtime();
+
+        // receive outdated presence
+        var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
+            from: user1jid2,
+            id: null,
+            karere: null,
+            myOwn: false,
+            rawMessage: null,
+            rawType: null,
+            show: Karere.PRESENCE.ONLINE,
+            status: Karere.PRESENCE.ONLINE,
+            delay: unixtime() - 1000,
+            to: megaChat.karere.getJid()
+        });
+
+        expect(eventTriggerShouldNOTReturnFalse).to.be.ok;
+        expect(localStorage.megaChatPresence).to.eql("away");
+        expect(localStorage.megaChatPresenceMtime).to.eql("" + origPresenceMtime);
+        expect(megaChat.karere.setPresence).to.not.have.been.called;
+
+        expect(
+            $('.activity-status-block .activity-status').is('.away')
+        ).to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').is('.active')
+        ).not.to.be.ok;
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="away"]').is('.active')
+        ).to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').is('.active')
+        ).not.to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').is('.active')
+        ).not.to.be.ok;
+
+
+        // receive new presence
+        var newUnixtime = unixtime() + 1000;
+        var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
+            from: user1jid2,
+            id: null,
+            karere: null,
+            myOwn: false,
+            rawMessage: null,
+            rawType: null,
+            show: Karere.PRESENCE.ONLINE,
+            status: Karere.PRESENCE.ONLINE,
+            delay: newUnixtime,
+            to: megaChat.karere.getJid()
+        });
+
+        expect(eventTriggerShouldNOTReturnFalse).to.be.ok;
+        expect(localStorage.megaChatPresence).to.eql("chat");
+        expect(localStorage.megaChatPresenceMtime).to.eql("" + newUnixtime);
+        expect(megaChat.karere.setPresence).to.have.been.calledOnce;
+
+        expect(
+            $('.activity-status-block .activity-status').is('.online')
+        ).to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').is('.active')
+        ).to.be.ok;
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="away"]').is('.active')
+        ).not.to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').is('.active')
+        ).not.to.be.ok;
+
+        expect(
+            $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').is('.active')
+        ).not.to.be.ok;
+
+        // Test auto invitation
+        var $promise = megaChat.openChat(
+            [
+                megaChat.karere.getBareJid(),
+                Strophe.getBareJidFromJid(user2jid)
+            ],
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+
+                var roomJid = "roomjid@conference.example.com";
+                expect(
+                    megaChat.karere.addUserToChat
+                ).to.have.been.calledOnce;
+
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[0]
+                ).to.equal(roomJid);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[1]
+                ).to.equal(megaChat.karere.getBareJid());
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[2]
+                ).to.equal(undefined);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[3]
+                ).to.equal("private");
+
+                var args4 = megaChat.karere.addUserToChat.getCall(0).args[4];
+                expect(args4).to.have.property('ctime');
+                expect(args4).to.have.property('invitationType', 'created');
+                expect(args4).to.have.property('participants').to.eql([megaChat.karere.getBareJid(), Strophe.getBareJidFromJid(user2jid)]);
+                expect(args4).to.have.property('users').to.be.empty;
+
+
+
+                // trigger outdated presence
+                var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
+                    from: user1jid2,
+                    id: null,
+                    karere: null,
+                    myOwn: false,
+                    rawMessage: null,
+                    rawType: null,
+                    show: Karere.PRESENCE.ONLINE,
+                    status: Karere.PRESENCE.ONLINE,
+                    delay: unixtime() - 1000,
+                    to: megaChat.karere.getJid()
+                });
+
+                expect(eventTriggerShouldNOTReturnFalse).to.be.ok;
+
+
+                // validate that the invitation was sent
+                expect(
+                    megaChat.karere.addUserToChat
+                ).to.have.been.calledTwice;
+
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(1).args[0]
+                ).to.equal(roomJid);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(1).args[1]
+                ).to.equal(user1jid2);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(1).args[2]
+                ).to.equal(undefined);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(1).args[3]
+                ).to.equal("private");
+
+                var args4 = megaChat.karere.addUserToChat.getCall(1).args[4];
+                expect(args4).to.have.property('ctime');
+                expect(args4).to.have.property('invitationType', 'resume');
+                expect(args4).to.have.property('participants').to.eql([megaChat.karere.getBareJid(), Strophe.getBareJidFromJid(user2jid)]);
+                expect(args4).to.have.property('users').to.be.empty;
+
+
+
+                // verify DOM update when presence is received from a 3rd party
+                var presenceCssClassMap = [
+                    [Karere.PRESENCE.ONLINE, '.online-status'],
+                    [Karere.PRESENCE.AWAY, '.away-status'],
+                    [Karere.PRESENCE.BUSY, '.busy-status'],
+                    [Karere.PRESENCE.OFFLINE, '.offline-status']
+                ];
+                $.each(presenceCssClassMap, function(k, v) {
+                    var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
+                        from: user2jid,
+                        id: null,
+                        karere: null,
+                        myOwn: false,
+                        rawMessage: null,
+                        rawType: null,
+                        show: v[0],
+                        status: v[0],
+                        delay: unixtime() - 1000,
+                        to: megaChat.karere.getJid()
+                    });
+
+                    expect(
+                        $('#treea_' + Object.keys(M.u)[1]).is(v[1])
+                    ).to.be.ok;
+                });
+
+                done();
+            });
+    });
 });
-
-
-// TODO: Presence sync (using fake events)
-// TODO: Add checks for the propper attrs set on dom elements (e.g. $('#treesub_contacts li a[data-room-jid="' + self.roomJid + '"]'))
-// TODO: verify unread

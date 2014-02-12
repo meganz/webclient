@@ -539,7 +539,9 @@ makeMetaAware(Karere);
             },
             200,
             self.options.disconnect_timeout
-        );
+        ).done(function() {
+            self.clearMeta('rooms');
+        });
     };
 }
 
@@ -1057,6 +1059,8 @@ makeMetaAware(Karere);
                 .up();
             }
 
+            self._presenceCache[self.getJid()] = presence;
+
             self.connection.send(
                 msg.tree()
             );
@@ -1195,7 +1199,7 @@ makeMetaAware(Karere);
         }
 
 
-        //TODO: Do we really need this in case that type == groupchat?
+        // XX: Do we really need this in case that type == groupchat?
 //
 //        var forwarded = $msg({
 //            to: Strophe.getBareJidFromJid(self.connection.jid),
@@ -1646,5 +1650,4 @@ makeMetaAware(Karere);
     Karere._requiresConnectionWrapper(Karere.prototype, 'joinChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'addUserToChat');
     Karere._requiresConnectionWrapper(Karere.prototype, 'removeUserFromChat');
-
 }

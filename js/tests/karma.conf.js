@@ -11,7 +11,9 @@ module.exports = function(config) {
             "../jquery-min-1.8.1.js",
     
              "../functions.js",
+             "../jquery.jscrollpane.min.js",
              "../mega.js",
+
              "../vendor/chat/strophe.js",
              "../vendor/chat/strophe.disco.js",
              "../vendor/chat/strophe.jingle.js",
@@ -29,12 +31,19 @@ module.exports = function(config) {
              "../vendor/chat/otr.js",
              "../chat/rtcSession.js",
              "../chat/karere.js",
+             "../chat/chat.js",
 
             "src/helpers/eventmocker.js",
+            "src/helpers/fixtures.js",
+            "src/helpers/objectmocker.js",
+            "src/helpers/kareremocker.js",
             "src/helpers/strophemocker.js",
             "src/helpers/utils.js",
              "../tests/src/unit/*.js",
-             "../tests/src/integration/*.js"
+             "../tests/src/integration/*.js",
+
+            { pattern: 'src/unit/fixtures/**/*.html', included: false, served: true }
+
         ],
         // coverage reporter generates the coverage
         reporters: ['progress', 'coverage'],

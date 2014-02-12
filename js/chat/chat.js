@@ -737,7 +737,12 @@ MegaChat.prototype.renderMyStatus = function() {
                 self.karere.getPresence(self.karere.getJid()) :
                 localStorage.megaChatPresence;
     if(!presence && self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
-        presence = localStorage.megaChatPresence = "chat"; // default
+        if(!localStorage.megaChatPresence) {
+            presence = localStorage.megaChatPresence = "chat"; // default
+        } else { // cached
+            presence = localStorage.megaChatPresence;
+        }
+
     }
 
     $('.top-user-status-popup .top-user-status-item').removeClass("active");

@@ -549,6 +549,29 @@ function makeMetaAware(kls) {
     };
 
     /**
+     * Clear/delete meta data
+     *
+     * @param prefix string
+     * @param namespace string
+     * @param k string
+     */
+    kls.prototype.clearMeta = function(prefix, namespace, k) {
+        var self = this;
+
+        if(prefix && !namespace && !k) {
+            delete self["_" + prefix];
+        } else if(prefix && namespace && !k) {
+            delete self["_" + prefix][namespace];
+        } else if(prefix && namespace && k) {
+            delete self["_" + prefix][namespace][k];
+        }
+
+        if(self.trigger) {
+            self.trigger("onMetaChange", prefix, namespace, k);
+        }
+    };
+
+    /**
      * Retrieve meta data
      *
      * @param prefix {string}

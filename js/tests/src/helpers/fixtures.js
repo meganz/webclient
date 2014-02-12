@@ -1,4 +1,7 @@
 function Fixtures(path) {
+    if(window.location.toString().indexOf("context.html") != -1) {
+        path = "/base/" + path;
+    }
     this.path = path;
     this.loaded = {};
 

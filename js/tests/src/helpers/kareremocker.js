@@ -32,6 +32,7 @@ var KarereMocker = function(objectInstance) {
                 $promise.resolve();
 
                 this._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
+                this.clearMeta('rooms');
 
                 return $promise;
             },
@@ -86,6 +87,9 @@ var KarereMocker = function(objectInstance) {
             },
             '_rawSendMessage': function(toJid, type, contents, meta) {
                 return 123;
+            },
+            'setPresence': function(presence, status, delay) {
+                return;
             }
         });
 

@@ -1,6 +1,8 @@
 /**
  * How to make this work in your browser? copy/paste this in your browser console:
  * localStorage.staticpath = "http://localhost:5280/"; localStorage.dd=1; localStorage.contextmenu=1; localStorage.megachat=1; localStorage.jj=true;
+ * and optionally:
+ * localStorage.dxmpp = 1; localStorage.stopOnAssertFail = true; localStorage.d = 1;
  * @type {boolean}
  */
 var MegaChatEnabled = false;
@@ -26,17 +28,22 @@ var chatui;
 
         var $promise;
 
-        if(megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-            megaChat.connect()
-                .done(function() {
-                    chatJids.push(megaChat.karere.getBareJid());
+        if(localStorage.megaChatPresence != "unavailable") {
+            if(megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+                megaChat.connect()
+                    .done(function() {
+                        chatJids.push(megaChat.karere.getBareJid());
 
-                    $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
-                });
+                        $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
+                    });
+            } else {
+                chatJids.push(megaChat.karere.getBareJid());
+
+                $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
+            }
         } else {
-            chatJids.push(megaChat.karere.getBareJid());
-
-            $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
+            alert("You are currently offline. To chat, you need to change your state back to online, away or busy.");
+            // TODO: Better error message?
         }
 
 
@@ -213,9 +220,14 @@ var chatui;
 
 
 
-function initChatScrolling() 
+function initChatScrolling()
 {
-	$('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    var $messages = $('.fm-chat-message-scroll');
+    if(!$messages.data("jsp")) {
+        $('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    } else {
+        $messages.data("jsp").reinitialise();
+    }
 }
 
 
@@ -252,7 +264,9 @@ var MegaChat = function() {
                     }
 
                     if(room.participantExistsInRoom(baseJid) && !self.karere.userExistsInChat(roomJid, eventData.from)) {
-                        console.debug(self.karere.getNickname(), "Auto inviting: ", eventData.from, "to: ", roomJid);
+                        if(localStorage.d) {
+                            console.debug(self.karere.getNickname(), "Auto inviting: ", eventData.from, "to: ", roomJid);
+                        }
 
                         self.karere.addUserToChat(roomJid, eventData.from, undefined, room.type, {
                             'ctime': room.ctime,
@@ -298,7 +312,9 @@ var MegaChat = function() {
         if(eventData.myOwn == true) {
             return;
         }
-        console.debug(self.karere.getNickname(), "Got invitation to join", eventData.room, "with eventData:", eventData);
+        if(localStorage.d) {
+            console.debug(self.karere.getNickname(), "Got invitation to join", eventData.room, "with eventData:", eventData);
+        }
 
 
         if(eventData.meta && eventData.meta.type == "private") {
@@ -310,12 +326,15 @@ var MegaChat = function() {
                 }
 
                 if(room.type == "private" && room.participantExistsInRoom(bareFromJid)) {
-                    console.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventData.room, roomJid, "with eventData:", eventData);
+                    if(localStorage.d) {
+                        console.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventData.room, roomJid, "with eventData:", eventData);
+                    }
 
                     // decide if i should leave MY room and accept this invitation
                     if(room.ctime > eventData.meta.ctime) {
-
-                        console.debug(self.karere.getNickname(), "Their room is older.");
+                        if(localStorage.d) {
+                            console.debug(self.karere.getNickname(), "Their room is older.");
+                        }
 
                         if(self.currentlyOpenedChat == room.roomJid) {
 
@@ -337,7 +356,9 @@ var MegaChat = function() {
                         e.stopPropagation();
                         return false;
                     } else {
-                        console.debug(self.karere.getNickname(), "My room is older.");
+                        if(localStorage.d) {
+                            console.debug(self.karere.getNickname(), "My room is older.");
+                        }
                         // my room is newer, so i'll reject the invitation and re-invite the user to join my room
 
                         // Send invite back
@@ -355,7 +376,9 @@ var MegaChat = function() {
                         );
 
                         e.stopPropagation();
-                        console.debug(self.karere.getNickname(), "i'm already in a private session w/ user", bareFromJid, "at room", roomJid);
+                        if(localStorage.d) {
+                            console.debug(self.karere.getNickname(), "i'm already in a private session w/ user", bareFromJid, "at room", roomJid);
+                        }
 
 
                         return false; // break;
@@ -367,19 +390,24 @@ var MegaChat = function() {
             }
         }
         if(self.chats[eventData.room]) { //already joined
-            console.warn("I'm already in", eventData.room, "(ignoring invitation from: ", eventData.from, ")");
+            if(localStorage.d) {
+                console.warn("I'm already in", eventData.room, "(ignoring invitation from: ", eventData.from, ")");
+            }
 
             e.stopPropagation();
             return false; // stop doing anything
         }
 
         // if we are here..then join the room
-        console.debug("Initializing UI for new room: ", eventData.room, "");
+        if(localStorage.d) {
+            console.debug("Initializing UI for new room: ", eventData.room, "");
+        }
         self.chats[eventData.room] = new MegaChatRoom(self, eventData.room);
         self.chats[eventData.room].setType(eventData.meta.type);
         self.chats[eventData.room].ctime = eventData.meta.ctime;
         self.chats[eventData.room].setUsers(eventData.meta.participants);
 
+//        debugger;
         self.karere.joinChat(eventData.room, eventData.password);
 
 
@@ -492,11 +520,22 @@ var MegaChat = function() {
     });
 
     $(window).unbind('hashchange.megaChat');
+    var lastOpenedRoom = null;
     $(window).bind('hashchange.megaChat' + this.instanceId, function() {
         var room = self.getCurrentRoom();
-        if(!room.$messages.is(":visible")) {
+
+        if(room && !room.$messages.is(":visible")) { // opened window, different then one from the chat ones
+            room.hide();
             self.currentlyOpenedChat = null;
         }
+        if(lastOpenedRoom && (!room || room.roomJid != lastOpenedRoom)) { // have opened a chat window before, but now
+                                                                           // navigated away from it
+            if(self.chats[lastOpenedRoom]) {
+                self.chats[lastOpenedRoom].hide();
+            }
+        }
+
+        lastOpenedRoom = room.roomJid;
     });
 
     return this;
@@ -584,8 +623,10 @@ MegaChat.prototype._onChatMessage = function(e, eventData) {
             id: eventData.id
         });
     } else {
-        debugger;
-        console.debug("Room not found: ", eventData.roomJid);
+        if(localStorage.d) {
+            debugger;
+            console.debug("Room not found: ", eventData.roomJid);
+        }
     }
 };
 
@@ -683,7 +724,6 @@ MegaChat.prototype.getContactFromJid = function(jid) {
     }
     return contact;
 };
-
 
 MegaChat.prototype.getContactNameFromJid = function(jid) {
     var self = this;
@@ -915,7 +955,9 @@ MegaChat.prototype.hideChat = function(roomJid) {
     if(room) {
         room.hide();
     } else {
-        console.warn("Room not found: ", roomJid);
+        if(localStorage.d) {
+            console.warn("Room not found: ", roomJid);
+        }
     }
 };
 
@@ -944,9 +986,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
     this.messagesIndex = {};
     this.isTemporary = false;
     this.options = {
-        'requestMessagesSyncTimeout': 1000
+        'requestMessagesSyncTimeout': 1500
     };
-    this._syncTimeouts = {};
+    this._syncRequests = {};
 
     // TODO: Implement room states (required by the megaENC), maybe find a better place to add the states, not here?
 
@@ -1137,6 +1179,7 @@ MegaChatRoom.prototype.show = function() {
 MegaChatRoom.prototype.hide = function() {
     var self = this;
 
+
     self.$header.detach();
     self.$messages.detach();
 
@@ -1208,7 +1251,9 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         return; // dont show any system messages (from the conf room)
     }
     if(self.messagesIndex[message.id] != undefined) {
-        console.debug(self.roomJid.split("@")[0], message.id, "This message is already added to the message list (and displayed).");
+        if(localStorage.d) {
+            console.debug(self.roomJid.split("@")[0], message.id, "This message is already added to the message list (and displayed).");
+        }
         return false;
     }
 
@@ -1243,6 +1288,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         date.getHours() + ":" + date.getMinutes() + "." + date.getSeconds()
     );
     $message.attr('data-timestamp', message.timestamp);
+    $message.attr('data-id', message.id);
 
 
     $('.fm-chat-message', $message).text(
@@ -1338,7 +1384,9 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     }
 
     if(validUsers.length == 0) {
-        console.error("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
+        if(localStorage.d) {
+            console.error("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
+        }
         return;
     }
     var userNum = Math.floor(Math.random() * validUsers.length) + 0;
@@ -1352,17 +1400,19 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         }
     );
 
-    if(self._syncTimeouts[self.roomJid]) {
-        clearTimeout(self._syncTimeouts[self.roomJid].timer);
-        delete self._syncTimeouts[self.roomJid];
+    if(!self._syncRequests[self.roomJid]) {
+        self._syncRequests[self.roomJid] = {};
     }
-
-    self._syncTimeouts[self.roomJid] = {
+    self._syncRequests[self.roomJid][messageId] = {
         'messageId': messageId,
         'userJid': userJid,
         'timer': setTimeout(function() {
             // timed out
-            delete self._syncTimeouts[self.roomJid];
+            if(localStorage.d) {
+                console.warn("Timeout waiting for", userJid, "to send sync message action. Will eventually, retry with some of the other users.");
+            }
+
+            delete self._syncRequests[self.roomJid][messageId];
             exceptFromUsers.push(userJid);
             self.requestMessageSync(exceptFromUsers);
         }, self.options.requestMessagesSyncTimeout)
@@ -1375,7 +1425,9 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
     var karere = megaChat.karere;
 
     if(!karere.getUsersInChat(self.roomJid)[request.from]) {
-        console.error("Will not send message sync response to user who is not currently in the chat room for which he requested the sync.")
+        if(localStorage.d) {
+            console.error("Will not send message sync response to user who is not currently in the chat room for which he requested the sync.")
+        }
         return false;
     }
 
@@ -1404,17 +1456,32 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
     var karere = megaChat.karere;
 
     if(!karere.getUsersInChat(self.roomJid)[response.from]) {
-        console.error("Will not accept message sync response from user who is currently not in the chat room for which I'd requested the sync.")
+        if(localStorage.d) {
+            console.error("Will not accept message sync response from user who is currently not in the chat room for which I'd requested the sync.")
+        }
         return false;
     }
-    if(self._syncTimeouts[self.roomJid]) {
-        var messageId = self._syncTimeouts[self.roomJid].messageId;
-        if(response.meta.inResponseTo != messageId) {
-            console.error("Will not accept message sync response because inResponseTo, did not matched my original messageID, got: ", response.meta.inResponseTo, " while expecting: ", messageId);
+    if(self._syncRequests[self.roomJid]) {
+        if(!self._syncRequests[self.roomJid][response.meta.inResponseTo]) {
+            if(localStorage.d) {
+                console.warn("Will not accept message sync response because inResponseTo, did not matched my original messageID, got: ", response.meta.inResponseTo, ". Most likely they had sent the response too late.");
+            }
             return false;
         }
-        clearTimeout(self._syncTimeouts[self.roomJid].timer);
+        clearTimeout(self._syncRequests[self.roomJid][response.meta.inResponseTo].timer);
+    } else {
+        if(localStorage.d) {
+            console.warn("Invalid sync response, room not found:", response);
+        }
+        return false;
     }
+
+    // cleanup
+    $.each(self._syncRequests[self.roomJid], function(messageId, request) {
+        clearTimeout(request.timer);
+    });
+
+    delete self._syncRequests[self.roomJid];
 
     $.each(response.meta.messages, function(k, msg) {
         self.appendMessage(msg);

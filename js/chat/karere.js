@@ -879,7 +879,6 @@ makeMetaAware(Karere);
 
                 self.setMeta("rooms", eventData['room'], 'password', eventData['password']);
 
-
                 if(localStorage.d) {
 		            console.warn(self.getNickname(), "Got invited to join room: ", eventData['room']);
                 }
@@ -1213,6 +1212,9 @@ makeMetaAware(Karere);
         self.connection.send(message);
 //        self.connection.send(forwarded);
 
+        if(localStorage.dxmpp) {
+            console.debug(self.getNickname(), "sendin message w/ id", message_id, message);
+        }
         return message_id;
     };
 

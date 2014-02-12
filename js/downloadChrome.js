@@ -174,20 +174,18 @@ function FileSystemAPI(dl_id, dl) {
 		});
 	}
 
-	var aborted = false;
-	IO.abort = function(err) {
-		aborted = true;
-		if(is_chrome_firefox) {
+	if(is_chrome_firefox) {
+		IO.abort = function(err) {
 			dl_fw.close(err);
-		}
-	};
+		};
+	}
 
 	IO.write = function(buffer, position, done) {
 		if (dl_writing || position !== dl_fw.position) {
 			// busy or not there yet
 			// DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
 			return setTimeout(function() {
-				if (!aborted) IO.write(buffer, position, done);
+				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 100);
 		}
 		dl_writing = true;

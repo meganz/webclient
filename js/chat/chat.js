@@ -352,6 +352,8 @@ var MegaChat = function() {
                                 );
                             }
                         }
+                        room.setState(MegaChatRoom.STATE.JOINING);
+
                         self.karere.joinChat(eventData.room, eventData.password);
                         e.stopPropagation();
                         return false;
@@ -408,6 +410,7 @@ var MegaChat = function() {
         self.chats[eventData.room].setUsers(eventData.meta.participants);
 
 //        debugger;
+        self.chats[eventData.room].setState(MegaChatRoom.STATE.JOINING);
         self.karere.joinChat(eventData.room, eventData.password);
 
 
@@ -441,7 +444,9 @@ var MegaChat = function() {
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventData) {
         if(self.chats[eventData.roomJid]) {
-            self.chats[eventData.roomJid].requestMessageSync();
+            self.chats[eventData.roomJid].setState(
+                MegaChatRoom.STATE.JOINED
+            );
         }
     });
 
@@ -971,10 +976,6 @@ MegaChat.prototype.sendMessage = function(roomJid, val) {
 };
 
 
-MegaChat.prototype._pickRoomLeader = function(jids) {
-  // really simple algo, to pick one
-  return clone(jids).sort()[0];
-};
 
 var MegaChatRoom = function(megaChat, roomJid) {
     this.megaChat = megaChat;
@@ -990,12 +991,73 @@ var MegaChatRoom = function(megaChat, roomJid) {
     };
     this._syncRequests = {};
 
-    // TODO: Implement room states (required by the megaENC), maybe find a better place to add the states, not here?
+    this.state = MegaChatRoom.STATE.INITIALIZED;
 
     this.$messages = megaChat.$messages_tpl.clone();
     this.$header = megaChat.$header_tpl.clone();
 
+
+
+    // Events
+    var self = this;
+    this.bind('onStateChange', function(e, oldState, newState) {
+        debugger;
+        if(newState == MegaChatRoom.STATE.JOINED) {
+            self.requestMessageSync();
+        }
+    });
+
     return this;
+};
+
+makeObservable(MegaChatRoom);
+
+MegaChatRoom.STATE = {
+    'INITIALIZED': 5,
+    'JOINING': 10,
+    'JOINED': 20,
+
+    'SYNCING': 30,
+    'SYNCED': 40,
+
+    'DONE': 150,
+
+    'LEAVING': 200,
+
+    'LEFT': 250
+};
+MegaChatRoom.stateToText = function(state) {
+    var txt = null;
+    $.each(MegaChatRoom.STATE, function(k, v) {
+        if(state == v) {
+            txt = k;
+
+            return false; // break
+        }
+    });
+
+    return txt;
+};
+
+MegaChatRoom.prototype.setState = function(newState) {
+    var self = this;
+
+    assert(newState, 'Missing state');
+
+    assert(
+        newState > self.state,
+        'Invalid state change. Current:' + MegaChatRoom.stateToText(self.state) +  "to" + MegaChatRoom.stateToText(newState)
+    );
+
+    var oldState = self.state;
+    self.state = newState;
+
+    self.trigger('onStateChange', [oldState, newState]);
+};
+
+MegaChatRoom.prototype.getStateAsText = function() {
+    var self = this;
+    return MegaChatRoom.stateToText(self.state);
 };
 
 MegaChatRoom.prototype.setType = function(type) {
@@ -1126,12 +1188,23 @@ MegaChatRoom.prototype.refreshUI = function() {
     }
 };
 
-MegaChatRoom.prototype.destroy = function() {
+MegaChatRoom.prototype.leave = function() {
     var self = this;
 
     if(self.roomJid.indexOf("@") != -1) {
-        self.megaChat.karere.leaveChat(self.roomJid);
+        self.setState(MegaChatRoom.STATE.LEAVING);
+        return self.megaChat.karere.leaveChat(self.roomJid).done(function() {
+            self.setState(MegaChatRoom.STATE.LEFT);
+        });
+    } else {
+        self.setState(MegaChatRoom.STATE.LEFT);
     }
+};
+
+MegaChatRoom.prototype.destroy = function() {
+    var self = this;
+
+    self.leave();
 
     self.$header.remove();
     self.$messages.remove();
@@ -1229,19 +1302,21 @@ MegaChatRoom.prototype.replaceWith = function(newJid, users, ctime) {
     }
     var oldJid = self.roomJid;
 
+    var oldRoom = $.extend(true, {}, self);
+
     self.roomJid = newJid;
     self.users = clone(users);
     self.ctime = ctime;
 
-    delete self.megaChat.chats[oldJid];
+//    delete self.megaChat.chats[oldJid];
     self.megaChat.chats[newJid] = self;
 
 
     self.refreshUI();
 
-    if(oldJid.indexOf("@") != -1) {
-        self.megaChat.karere.leaveChat(oldJid);
-    }
+    oldRoom.leave();
+
+    delete self.megaChat.chats[oldJid];
 };
 
 MegaChatRoom.prototype.appendMessage = function(message) {
@@ -1351,6 +1426,12 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
+
+    assert(
+        self.state == MegaChatRoom.STATE.JOINED || self.state == MegaChatRoom.STATE.SYNCING,
+        "Current state != [JOINED || SYNCING]. I should not request message sync when I'm in different state"
+    );
+
     exceptFromUsers = exceptFromUsers || [];
 
     var users = karere.getUsersInChat(self.roomJid);
@@ -1403,6 +1484,11 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     if(!self._syncRequests[self.roomJid]) {
         self._syncRequests[self.roomJid] = {};
     }
+
+    if(self.state != MegaChatRoom.STATE.SYNCING) {
+        self.setState(MegaChatRoom.STATE.SYNCING);
+    }
+
     self._syncRequests[self.roomJid][messageId] = {
         'messageId': messageId,
         'userJid': userJid,
@@ -1482,10 +1568,11 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
     });
 
     delete self._syncRequests[self.roomJid];
-
     $.each(response.meta.messages, function(k, msg) {
         self.appendMessage(msg);
     });
+
+    self.setState(MegaChatRoom.STATE.SYNCED);
 };
 
 

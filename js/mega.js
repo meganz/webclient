@@ -2492,6 +2492,7 @@ function fm_requestfolderid(h,name,ulparams)
 
 function clone(obj)
 {
+
     if (null == obj || "object" != typeof obj) return obj;
     if (obj instanceof Date)
 	{

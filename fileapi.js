@@ -316,7 +316,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							if(o) o.textContent = o.textContent.replace(/\s\(.*$/,'');
 						}
 
-						mozCloseStream(this.fs);
+						// mozCloseStream(this.fs);
+						this.Writer.close(!!this.preview);
+						if (this.preview) return;
+
 						if(this.filetime)
 						{
 							try
@@ -613,12 +616,19 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				};
 
+<<<<<<< HEAD
 				var q = opts.fxo;
 				if (d) LOG(q);
 				File.filesize = q.size;
 				File.filename = (q.zipname || q.n)
 					.replace(/[:\/\\<">|?*]+/g,'.')
 					.replace(/\s*\.+/g,'.').substr(0,256);
+=======
+				File.filesize = scope.dl_filesize;
+				File.preview = !!dl_queue[dl_queue_num].preview;
+				File.filename = (scope.dl_zip && scope.dl_zip.name || scope.dl_filename)
+					.replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.').substr(0,256);
+>>>>>>> main/master
 
 				try {
 					if(q.p && !q.zipid)
@@ -744,7 +754,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				}
 
+<<<<<<< HEAD
 				if(q.preview) {
+=======
+				if(File.preview) {
+>>>>>>> main/master
 				// Why is the preview writing to disk? :(
 					osd_cb({
 						saveto : mozFile(":TmpD", Math.random())

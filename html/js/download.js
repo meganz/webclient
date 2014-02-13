@@ -104,7 +104,7 @@ function dlinfo(ph,key,next)
 				if (baboom) dl_ad();				
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
-			if ((dlMethod == FlashIO || dlMethod == BlobBuilerdIO) && !localStorage.browserDialog && !$.browserDialog)
+			if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO() && !localStorage.browserDialog && !$.browserDialog)
 			{
 				setTimeout(function()
 				{

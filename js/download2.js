@@ -61,8 +61,10 @@ var DownloadManager = new function() {
 		if (typeof pattern == "object") {
 			if (pattern.zipid) {
 				_pattern = "zipid:" + pattern.zipid;
+				$('#zip_' + pattern.zipid).remove();
 			} else {
 				_pattern = "id:" + pattern.id;
+				$('#dl_' + pattern.id).remove();
 			}
 		}
 

@@ -257,6 +257,8 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
+						dl_queue[dl.pos] = {}; /* remove it */
+						DEBUG("done with ", dl);
 						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {
 							return dl_reportstatus(dl.id, EKEY);
@@ -269,7 +271,6 @@ function ClassFile(dl) {
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
-						dl_queue[dl.pos] = {}; /* remove it */
 					}
 				}, 100);
 			}, failureFunction);
@@ -340,7 +341,7 @@ function decrypter(task)
 					// useful to avoid downloading before writing
 					// all
 					download.decrypt--;
-					DEBUG("Decrypt wrote");
+					DEBUG("Decrypt wrote => ", download.decrypt);
 				}, task.info);
 			}
 		};

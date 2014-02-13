@@ -101,7 +101,7 @@ function dlinfo(ph,key,next)
 					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 				}
 				else dlkeyDialog();				
-				if (baboom) dl_ad();				
+				if (baboom) dl_ad();
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
 			if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)

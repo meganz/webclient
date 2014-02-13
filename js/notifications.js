@@ -17,10 +17,10 @@ function pollnotifications()
 				{
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
 					notifications = [];	
-					var nread=false;
+					var nread=true;
 					for (var i in json.c)
 					{
-						if (json.la == i) nread=true;		
+						if (json.la == i) nread=false;
 						notifications.push({
 							id: 		makeid(10),
 							type: 		json.c[i].t,

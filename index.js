@@ -1270,6 +1270,7 @@ function parsepage(pagehtml,pp)
 }
 
 
+
 function parsetopmenu()
 {
 	var top = pages['top'].replace(/{staticpath}/g,staticpath);	

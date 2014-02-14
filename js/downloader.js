@@ -102,7 +102,7 @@ function ClassChunk(task) {
 			);
 
 			if (Progress.size < Progress.process) {
-				//throw new Error;
+				throw new Error;
 			}
 	
 			Progress.dl_prevprogress = Progress.progress

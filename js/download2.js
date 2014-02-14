@@ -382,7 +382,7 @@ function dl_reportstatus(dl, code)
 		dl.onDownloadError(dl.dl_id, code, dl.pos);
 	}
 	
-	if(code === EKEY || code === EAGAIN) {
+	if(code === EKEY) {
 		// TODO: Check if other codes should raise abort()
 		DownloadManager.abort(dl, true);
 	}

@@ -100,6 +100,10 @@ function ClassChunk(task) {
 				Progress.dl_xr.update(Progress.progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
+
+			if (Progress.size < Progress.process) {
+				//throw new Error;
+			}
 	
 			Progress.dl_prevprogress = Progress.progress
 			Progress.dl_lastprogress = now;
@@ -261,7 +265,7 @@ function ClassFile(dl) {
 						DEBUG("done with ", dl);
 						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {
-							return dl_reportstatus(dl.id, EKEY);
+							return dl_reportstatus(dl, EKEY);
 						}
 						if (dl.zipid) {
 							return Zips[dl.zipid].done();

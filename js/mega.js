@@ -650,7 +650,7 @@ function MegaData ()
 			if (a[i] == this.RootID)
 			{
 				typeclass = 'folder';
-				if (folderlink && M.d[this.RootID]) name = M.d[this.RootID].name;
+				if (folderlink && M.d[this.RootID]) name = htmlentities(M.d[this.RootID].name);
 				else name = l[164];
 			}
 			else if (a[i] == 'contacts')

@@ -14515,7 +14515,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	z-index: 10;
 	top: 11px;
 	display: none;
-	cursor: default;
+	cursor: pointer;
 }
 .campaign .campaign-logo {
 	display: block;
@@ -14538,6 +14538,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	left: 50%;
 	margin-left: -200px;
 	display: none;
+	cursor: default;
 }
 .campaign-logo:hover .campaign-widget {
 	display: block;

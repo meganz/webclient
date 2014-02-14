@@ -328,7 +328,7 @@ function blog_archive()
 	for (var mm in blogmonths)
 	{
 		var y='';
-		if  (mm.split('_')[0] != new Date().getFullYear()) y = ' ' + mm.split('_')[0] + ' ';
+		y = ' ' + mm.split('_')[0] + ' ';
 		blogarchive += '<a href="#blog_' + mm + '" class="blog-new-archive-lnk">' + date_months[parseInt(mm.split('_')[1])-1] + y + ' <span class="blog-archive-number">' + blogmonths[mm] + '</span></a>';
 	}
 	$('#blog_archive').html(blogarchive);

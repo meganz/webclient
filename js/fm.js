@@ -402,7 +402,7 @@ function initUI()
 		$.hideContextMenu(e);
 		if ($.hideTopMenu) $.hideTopMenu(e);		
 		var c = $(e.target).attr('class');		
-		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
+		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
     });	
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 

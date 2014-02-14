@@ -59,7 +59,7 @@ var DownloadManager = new function() {
 	self.cleanupUI = function(dl) {
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
-				if (file.zipid == dl.zipid) 
+				if (file.zipid == dl.zipid) {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});

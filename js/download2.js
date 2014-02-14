@@ -56,16 +56,24 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
+	self.cleanupUI = function(dl) {
+		if (dl.zipid) {
+			$.each(dl_queue, function(i, file) {
+				if (file.zipid == dl.zipid) 
+					dl_queue[i] = {}; /* remove it */
+				}
+			});
+			$('#zip_' + dl.zipid).remove();
+		} else {
+			dl_queue[dl.pos] = {}; /* remove it */
+			$('#dl_' + dl.id).remove();
+		}
+	}
+
 	self.abort = function(pattern) {
 		var _pattern = pattern
 		if (typeof pattern == "object") {
-			if (pattern.zipid) {
-				_pattern = "zipid:" + pattern.zipid;
-				$('#zip_' + pattern.zipid).remove();
-			} else {
-				_pattern = "id:" + pattern.id;
-				$('#dl_' + pattern.id).remove();
-			}
+			self.cleanupUI(pattern);
 		}
 
 		DEBUG("cancelled file ", _pattern);

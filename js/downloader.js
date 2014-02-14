@@ -175,7 +175,7 @@ function ClassChunk(task) {
 					// we must reschedule this download	
 					Progress.progress -= prevProgress; /* this never happened */
 					DEBUG(this.status, r.bytesLength, size);
-					DEBUG("HTTP FAILED WITH " + this.status);
+					DEBUG("HTTP FAILED WITH ", this.status, "am i done?", done);
 	
 					// tell the scheduler that we failed
 					if (done) {

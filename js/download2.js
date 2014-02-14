@@ -418,9 +418,8 @@ function dlGetUrl(object, callback) {
 								object.data = new ArrayBuffer(res.s);				
 							}
 							return callback(false, res, o, object);
-						} else {
-							dl_reportstatus(object, EKEY);
 						}
+						dl_reportstatus(object, EGAIN);
 					} else {
 						dl_reportstatus(object, res.e);
 					}

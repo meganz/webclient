@@ -510,7 +510,7 @@ function DEBUG() {
 
 		self[method] = function() {
 			var args = Array.prototype.slice.call(arguments);
-			console.warn.apply(console, [method, args]);
+			if (d) console.warn.apply(console, [method, args]);
 			return fnc.apply(self, arguments);
 		};
 		return;

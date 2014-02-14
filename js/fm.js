@@ -490,7 +490,7 @@ function initUI()
 	});
 	
 	
-	if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
+	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
 		setTimeout(function()
 		{
@@ -903,21 +903,13 @@ function initContextUI()
 			if ((id && id.indexOf('dl_') > -1) || (id && id.indexOf('zip_') > -1))
 			{				
 				var abort=false;				
-				for (var i in dl_queue)
-				{
-					if (dl_queue[i])
-					{
-						if (dl_queue[i].id == id.replace('dl_','') || dl_queue[i].zipid == id.replace('zip_',''))
-						{
-							if (dl_queue[i].zipid) $.zipkill = dl_queue[i].zipid;
-							if (i == dl_queue_num && dl_queue[dl_queue_num].zipid) abort=true;
-							else if (i == dl_queue_num && dl_legacy_ie) document.getElementById('start_downloaderswf').abort();
-							else if (i == dl_queue_num && !dl_queue[dl_queue_num].zipid) $.sd=i;							
-							else if (!dl_queue[i].zipid) dl_queue[i] = false;						
-						}
-					}					
-				}
-				if ($.zipkill) dl_killzip($.zipkill);				
+				$.each(dl_queue, function(i, queue) {
+					if (queue.id == id.replace('dl_','') || queue.zipid == id.replace('zip_','')) {
+						if (queue.zipid) $.zipkill = dl_queue[i].zipid;
+						else $.sd=i;							
+						return false; /* break */
+					}
+				});
 			}
 			else if (id && id.indexOf('ul_') > -1)
 			{				
@@ -939,13 +931,14 @@ function initContextUI()
 			}
 			$(this).remove();
 		});				
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined')
-		{
-			if ($.sd != 'undefined') dl_queue[$.sd]=false;			
-			dl_cancel(0xBADF);
-			startdownload();
+
+		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
+			if (dl_queue[$.sd]) {
+				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
+			} else if ($.zipkill >= 0) {
+				DownloadManager.abort({ zipid: $.zipkill });
+			}
 		}
-		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		
@@ -3301,12 +3294,12 @@ function transferPanelUI()
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
 			$(this).removeClass('active');
-			uldl_resume();
+			dlQueue.resume();
 		}
 		else
 		{
 			$(this).addClass('active');
-			uldl_pause();
+			dlQueue.pause();
 		}	
 	});
 }
@@ -5016,14 +5009,28 @@ function slideshowsteps()
 
 function slideshow_next()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num] && dl_queue[dl_queue_num].id == slideshowid) return;
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
 	var steps = slideshowsteps();
 	if (steps.forward.length > 0) slideshow(steps.forward[0]);
 }
 
 function slideshow_prev()
 {
-	if (dl_queue.length > 0 && dl_queue[dl_queue_num] && dl_queue[dl_queue_num].id == slideshowid) return;
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
 	var steps = slideshowsteps();
 	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
 }
@@ -5036,17 +5043,7 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
-		
-		// todo cesar: cancel all existing preview downloads (queued & running) when closing the slideshow dialog
-		for (var i in dl_queue)
-		{
-			if (dl_queue[i].preview)
-			{
-				if (i == dl_queue_num) dl_cancel(0xBADF);
-				$('.transfer-table #dl_' + dl_queue[i].id).remove();
-				dl_queue[i]=false;				
-			}
-		}		
+		DownloadManager.abort({id: id});
 		return false;
 	}
 	
@@ -5063,7 +5060,7 @@ function slideshow(id,close)
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
 	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click',function(e)
 	{
-		slideshow(false,1);
+		slideshow(id,1);
 	});	
 	var n = M.d[id];	
 	if (!n) return;

@@ -1,4 +1,3 @@
-
 var mozOnSavingDownload = function(file,callback,ask) {
 
 	var options = {
@@ -217,7 +216,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 }
 
 (function __FileSystemAPI(scope) {
-	var LOG = function(m) (console.log(m), Services.console.logStringMessage('MEGA :: ' + m));
+	var LOG = function(m) {
+		var stack = new Error().stack.split("\n").map(s => s.replace(/^(.*@).+\//,'$1')).join("\n");
+		console.log(m,stack); Services.console.logStringMessage('MEGA :: ' + m);
+	};
 
 	if(scope.requestFileSystem || scope.webkitRequestFileSystem) {
 		if(!scope.webkitRequestFileSystem)
@@ -501,12 +503,16 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 								File.fs.seek(0,p);
 							},
 							close : function(aError) {
+								var f = File.options.saveto;
+
+								if(d) console.log('Closing stream', f.path);
 								mozCloseStream(File.fs);
 
 								if (aError)
 								{
 									mozRunAsync(function() {
-										File.options.saveto.remove(!1);
+										if(d) console.log('Removing file', f.path);
+										if (f.exists()) f.remove(!1);
 									});
 								}
 							}
@@ -609,15 +615,17 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				};
 
-				File.filesize = scope.dl_filesize;
-				File.preview = !!dl_queue[dl_queue_num].preview;
-				File.filename = (scope.dl_zip && scope.dl_zip.name || scope.dl_filename)
-					.replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.').substr(0,256);
+				var q = opts.fxo;
+				if (d) LOG(q);
+				File.filesize = q.size;
+				File.filename = (q.zipname || q.n)
+					.replace(/[:\/\\<">|?*]+/g,'.')
+					.replace(/\s*\.+/g,'.').substr(0,256);
 
 				try {
-					if(scope.dl_queue[scope.dl_queue_num].p && !scope.dl_zip)
-						File.folder = ('' + scope.dl_queue[scope.dl_queue_num].p).split(/[\\\/]+/).filter(String);
-					File.filetime = scope.dl_queue[scope.dl_queue_num].t;
+					if(q.p && !q.zipid)
+						File.folder = ('' + q.p).split(/[\\\/]+/).filter(String);
+					File.filetime = q.t || 0;
 				} catch(e) {}
 
 				function osd_cb(options) {
@@ -738,7 +746,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				}
 
-				if(File.preview) {
+				if(q.preview) {
 				// Why is the preview writing to disk? :(
 					osd_cb({
 						saveto : mozFile(":TmpD", Math.random())

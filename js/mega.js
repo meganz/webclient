@@ -26,7 +26,7 @@ if (typeof loadingDialog == 'undefined')
 var fmconfig ={};
 if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
-var zipid=0;
+var zipid=1;
 
 function MegaData ()
 {
@@ -642,7 +642,7 @@ function MegaData ()
 
 	this.renderPath = function()
 	{
-		var hasnext='';
+		var hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
 		var a = this.getPath(this.currentdirid);
 		for (var i in a)
@@ -1423,7 +1423,7 @@ function MegaData ()
 			zipid++;
 			z=zipid;
 			if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-			else zipname = 'Archive.zip';
+			else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
 			var zipsize = 0;
 		}
 		else z = false;
@@ -1457,7 +1457,7 @@ function MegaData ()
 				zipsize += n.s;
 
 				var flashhtml='';
-				if (dl_method == 1)
+				if (dlMethod == FlashIO)
 				{
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
@@ -1466,14 +1466,13 @@ function MegaData ()
 			}
 		}
 
-		if (dl_method == 4 && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
+		if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
 
-	
         if (!preview) 
 		{
 			openTransferpanel();
@@ -1481,13 +1480,11 @@ function MegaData ()
 			initFileblocksScrolling();
 			initTreeScroll();
 		}
-		startdownload();
-		
 
 		delete $.dlhash;
 	}
 
-	this.dlprogress = function (id, bl, bt,kbps)
+	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
 	{
 		if (kbps == 0) return;
 		var st;
@@ -1560,7 +1557,7 @@ function MegaData ()
 		}
 	}
 
-	this.dlcomplete = function (id,z)
+	this.dlcomplete = function (id,z, dl_queue_num)
 	{
 		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
 		{
@@ -1590,7 +1587,7 @@ function MegaData ()
 		}
 		$.transferHeader();
 
-		if (dl_method === 0)
+		if (dlMethod == FileSystemAPI)
 		{
 			setTimeout(fm_chromebar,250,$.dlheight);
 			setTimeout(fm_chromebar,500,$.dlheight);
@@ -1617,7 +1614,7 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid,error)
+	this.dlerror = function(fileid, error, dl_queue_num)
 	{
 		var errorstr=false;
 		if (d) console.log('dlerror',fileid,error);
@@ -1644,17 +1641,32 @@ function MegaData ()
 			$('.slideshow-error-txt').text(errorstr);
 		}
 
-		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+		var file = null;
+		$.each(dl_queue, function(id, f) {
+			if (f.id == fileid) {
+				file = f;
+				return false;
+			}
+		});
+
+		if (errorstr)  {
+			if (file) file.failed = new Date;
+			if (file && file.zipid) {
+				$('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			} else {
+				$('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			}
+		}
 	}
 
-	this.dlstart = function(id,name,size)
+	this.dlstart = function(id,name,size, dl_queue_num)
 	{
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		if (dl_queue[dl_queue_num].zipid) id = 'zip_' + dl_queue[dl_queue_num].zipid;
 		else id = 'dl_' + id;
 		$('.transfer-table').prepend($('.transfer-table #' + id));
 		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id);
+		M.dlprogress(id, 0, 0, 0, dl_queue_num);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];
@@ -1815,11 +1827,6 @@ function onUploadProgress(id, bl, bt)
 function onUploadSuccess(id, bl, bt)
 {
 	M.ulcomplete(id,bl,bt);
-}
-
-function fm_zipcomplete(id)
-{
-	M.dlcomplete(false,id);
 }
 
 function fm_chromebar(height)

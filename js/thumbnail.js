@@ -99,7 +99,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 		{
 			if (typeof FileReader !== 'undefined')
 			{
-				ThumbFR = new FileReader();
+				var ThumbFR = new FileReader();
 				ThumbFR.onload = function(e)
 				{
 					if (ThumbFR.ab) var thumbstr = ab_to_str(ThumbFR.result);

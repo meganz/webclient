@@ -1,6 +1,6 @@
 var dl_fs, dl_fw;
 
-var dl_queue = [];
+var dl_queue = new DownloadQueue
 var dl_queue_num = 0;
 var dl_retryinterval = 1000;
 
@@ -462,7 +462,7 @@ function dl_next()
 			dl_write_position = -1;
 			dl_write_block(-1);
 		}
-		else dl_queue = [];
+		else dl_queue = new DownloadQueue
 	
 		return -1;
 	}
@@ -723,6 +723,7 @@ function dl_checklostchunk()
 
 	if (dl_write_position == dl_filesize)
 	{
+		debug.trace();
 		if (dl_filesize)
 		{
 			var t = [];
@@ -886,7 +887,7 @@ function flash_dlprogress(p,numbytes)
 	dl_updateprogress();
 }
 
-function dl_flashdldata(p,data,httpcode)
+function dl_flashdldatax(p,data,httpcode)
 {
 	dl_flash_connections--;
 	if (data == 'ERROR' || httpcode != 200)
@@ -1032,21 +1033,15 @@ var dl_lastprogress = 0;
 
 function dl_updateprogress()
 {
-	var p = dl_bytesreceived;
-
-	if (dl_queue[dl_queue_num])
-	{
-		if (dl_legacy_ie) for (var pp in dl_flash_progress) p += dl_flash_progress[pp];
-		else for (var slot = dl_maxSlots; slot--; ) p += dl_progress[slot];
-		
-		
+	$.each(dl_queue, function(key, dl) {
+		var p = dl_bytesreceived;
 		if (dl_lastprogress+250 > new Date().getTime()) return false;
 		else dl_lastprogress=new Date().getTime();
 
 		dl_queue[dl_queue_num].onDownloadProgress(dl_id, p, dl_filesize, dl_xr.update(p-dl_prevprogress));
 
 		dl_prevprogress = p;
-	}
+	});
 }
 
 function appendBuffer( buffer1, buffer2 ) 

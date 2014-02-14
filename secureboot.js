@@ -346,7 +346,6 @@ else
 			jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 			jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 			jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
-			jsl.push({f:'js/download.js', n: 'dl_js', j:1,w:3});
 			jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 			jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 			jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
@@ -356,6 +355,17 @@ else
 			jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
 			jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 			jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+			/* better download */
+			jsl.push({f:'js/events.js', n: 'index', j:1,w:4});
+			jsl.push({f:'js/queue.js', n: 'index', j:1,w:4});
+			jsl.push({f:'js/downloadChrome.js', n: 'dl_js', j:1,w:3});
+			jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_js', j:1,w:3});
+			jsl.push({f:'js/downloadMemory.js', n: 'dl_js', j:1,w:3});
+			jsl.push({f:'js/downloadFlash.js', n: 'dl_js', j:1,w:3});
+			jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
+			jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+			/* end better download */
+
 			jsl.push({f:'index.js', n: 'index', j:1,w:4});
 			jsl.push({f:'html/start.html', n: 'start', j:0});
 			jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});

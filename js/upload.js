@@ -1,5 +1,20 @@
 var ul_queue = [];
+var uldl_hold = false;
 var ul_queue_num = 0;
+
+function uldl_pause()
+{
+	uldl_hold = true;
+}
+
+function uldl_resume()
+{
+	var i;
+	uldl_hold = false;
+
+	if (downloading) for (i = dl_maxSlots; i--; ) dl_dispatch_chain();
+	if (ul_uploading) for (i = ul_maxSlots; i--; ) ul_dispatch_chain();
+}
 
 var totalbytessent;
 

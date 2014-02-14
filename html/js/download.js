@@ -15,7 +15,7 @@ function dlinfo(ph,key,next)
 
 	$('.widget-block').addClass('hidden');
 	if (!m) init_start();
-	if (dl_method == 1)
+	if (dlMethod == FlashIO) 
 	{
 		$('.fm-dialog.download-dialog').removeClass('hidden');
 		$('.fm-dialog.download-dialog').css('left','-1000px');
@@ -55,12 +55,11 @@ function dlinfo(ph,key,next)
 				$('.new-download-red-button').unbind('click');
 				$('.new-download-red-button').bind('click',function(e)
 				{
-					if (dl_method == 4 && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
+					if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
 					
 					dl_queue.push(fdl_queue_var);					
 					$('.download-mid-centered-block').addClass('downloading');
 					$.dlhash = window.location.hash;
-					startdownload();
 				});				
 				$('.new-download-gray-button').unbind('click');
 				$('.new-download-gray-button').bind('click',function(e)
@@ -104,7 +103,7 @@ function dlinfo(ph,key,next)
 				if (baboom) dl_ad();
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
-			if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
+			if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
 			{
 				setTimeout(function()
 				{
@@ -265,7 +264,7 @@ function dlerror(id,error)
 	}
 }
 
-function dlprogress(fileid, bytesloaded, bytestotal,kbps)
+function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
 	if (kbps == 0) return;
 	$('.downloading-txt.temporary-error').addClass('hidden');

@@ -257,7 +257,7 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						DownloadManger.cleanupUI(dl);
+						if (!dl.zipid) DownloadManager.cleanupUI(dl);
 						DEBUG("done with ", dl);
 						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {

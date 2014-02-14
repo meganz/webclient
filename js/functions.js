@@ -497,6 +497,10 @@ function checkMail(email)
 	else return true;	
 }
 
+function NOW() {
+	return (new Date()).getTime();
+}
+
 /**
  *	Global function to help debugging
  */

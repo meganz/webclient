@@ -36,8 +36,8 @@ function ClassChunk(task) {
 			, prevProgress = 0    // Keep in track how far are we in the downloads
 			, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
 			, progress = getxr()  // chunk progress
-			, speed = 0 // speed of the current chunk
-			, lastUpdate // FIXME: I should be abstracted at getxr()
+			, speed = 1 // speed of the current chunk
+			, lastUpdate  = NOW()
 			, localId = iRealDownloads
 			, Progress = download.zipid ? Zips[download.zipid] : io
 	
@@ -58,10 +58,13 @@ function ClassChunk(task) {
 		 *	actually done
 		 */
 		function shouldIReportDone() {
-			if (!done && iRealDownloads <= dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
+			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
 				download.decrypt++; /* avoid run condition */
 				done = true;
 				Scheduler.done();
+				setTimeout(function() {
+					xhr.abort();
+				}, 1);
 			}
 		}
 	
@@ -71,7 +74,7 @@ function ClassChunk(task) {
 				return false;
 			}
 
-			var now = new Date().getTime();
+			var now = NOW();
 
 			// keep in track of the current progress
 			if (lastUpdate+250 < now) {

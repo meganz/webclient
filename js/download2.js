@@ -70,9 +70,9 @@ var DownloadManager = new function() {
 		}
 	}
 
-	self.abort = function(pattern) {
+	self.abort = function(pattern, dontCleanUI) {
 		var _pattern = pattern
-		if (typeof pattern == "object") {
+		if (typeof pattern == "object" && !dontCleanUI) {
 			self.cleanupUI(pattern);
 		}
 
@@ -377,16 +377,14 @@ DownloadQueue.prototype.push = function() {
 
 function dl_reportstatus(dl, code)
 {
-	var num = dl.pos;
-	
-	if (dl_queue[num]) {
-		dl_queue[num].lasterror = code;
-		dl_queue[num].onDownloadError(dl_queue[num].id || dl_queue[num].ph, code, num);
+	if (dl) {
+		dl.lasterror = code;
+		dl.onDownloadError(dl.dl_id, code, num);
 	}
 	
 	if(code === EKEY || code === EAGAIN) {
 		// TODO: Check if other codes should raise abort()
-		DownloadManager.abort(dl);
+		DownloadManager.abort(dl, true);
 	}
 }
 

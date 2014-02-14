@@ -148,8 +148,8 @@ describe("Chat.js - Karere UI integration", function() {
 
         expectToBeResolved($promise, 'cant open chat')
             .done(function() {
-
                 var roomJid = "roomjid@conference.example.com";
+
                 expect(
                     megaChat.karere.addUserToChat
                 ).to.have.been.calledOnce;
@@ -360,6 +360,11 @@ describe("Chat.js - Karere UI integration", function() {
             "newUsers":users
         });
 
+        assert(
+            megaChat.chats[roomJid].state == MegaChatRoom.STATE.SYNCING,
+            "Invalid state found. Expected: SYNCING, got: " + megaChat.chats[roomJid].getStateAsText()
+        );
+
 
         expect(
             megaChat.karere.sendAction
@@ -412,6 +417,12 @@ describe("Chat.js - Karere UI integration", function() {
             type: "Message"
         });
 
+
+        assert(
+            megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY,
+            "Invalid state found. Expected: READY, got: " + megaChat.chats[roomJid].getStateAsText()
+        );
+
         var messagesInOrderedList = [];
         $('.fm-chat-messages-block').each(function() {
             messagesInOrderedList.push({
@@ -426,25 +437,25 @@ describe("Chat.js - Karere UI integration", function() {
         expect(messagesInOrderedList).to.eql([
             {
                 "ts": "50",
-                "time": "2:0.50",
+                "time": "02:00.50",
                 "msg": "hopala1",
                 "name": "lp@mega.co.nz"
             },
             {
                 "ts": "100",
-                "time": "2:1.40",
+                "time": "02:01.40",
                 "msg": "hopala2",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "200",
-                "time": "2:3.20",
+                "time": "02:03.20",
                 "msg": "hopala3",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "300",
-                "time": "2:5.0",
+                "time": "02:05.00",
                 "msg": "hopala4",
                 "name": "lpetrov@me.com"
             }

@@ -614,6 +614,12 @@ makeMetaAware(Karere);
     };
 
 
+    Karere.prototype.generateMessageId = function(toJid) {
+        var self = this;
+        return simpleStringHashCode(self.getJid() + toJid) + "_" + unixtime()
+    };
+
+
     /**
      * Returns a string of the Bare JID (e.g. user@domain.com)
      *
@@ -973,6 +979,14 @@ makeMetaAware(Karere);
 
         if(eventData['rawMessage'] && eventData['rawMessage'].getElementsByTagName("delay").length > 0) {
             stanzaType = "Delayed" + stanzaType;
+
+
+            var delay = eventData['rawMessage'].getElementsByTagName("delay");
+            if(delay.length > 0) {
+                var stamp = delay[0].getAttribute('stamp');
+                var d = Date.parse(stamp);
+                eventData.delay = d/1000;
+            }
         }
 
         var targetedTypeEvent = new $.Event("on" + stanzaType);
@@ -1136,7 +1150,6 @@ makeMetaAware(Karere);
             self.sendIsActive(toJid),
             self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'))
         );
-
     };
 
 
@@ -1166,16 +1179,15 @@ makeMetaAware(Karere);
      * @param contents
      * @private
      */
-    Karere.prototype._rawSendMessage = function (toJid, type, contents, meta) {
+    Karere.prototype._rawSendMessage = function (toJid, type, contents, meta, messageId, delay) {
         var self = this;
         meta = meta || {};
 
         type = type || "chat";
 
-        var timestamp = (new Date()).getTime();
-        var message_id = simpleStringHashCode(self.getJid() + toJid) + "_" + timestamp;
+        messageId = messageId || self.generateMessageId(toJid);
 
-        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: message_id});
+        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: messageId});
 
         if(contents.toUpperCase) { // is string (better way?)
             message
@@ -1197,13 +1209,24 @@ makeMetaAware(Karere);
             );
         }
 
+        if(delay && delay > 0) {
+            var $delay = $("<delay></delay>")
+            $delay.attr('xmlns', 'urn:xmpp:delay');
+            $delay.attr('from', self.getJid());
+            $delay.attr('stamp', (new Date(delay * 1000).toISOString()));
+
+            message.nodeTree.appendChild(
+                $delay[0]
+            );
+        }
+
 
         // XX: Do we really need this in case that type == groupchat?
 //
 //        var forwarded = $msg({
 //            to: Strophe.getBareJidFromJid(self.connection.jid),
 //            type: type,
-//            id:message_id
+//            id:messageId
 //        })
 //            .c('forwarded', {xmlns:'urn:xmpp:forward:0'})
 //            .c('delay', {xmns:'urn:xmpp:delay',stamp:timestamp}).up()
@@ -1213,9 +1236,9 @@ makeMetaAware(Karere);
 //        self.connection.send(forwarded);
 
         if(localStorage.dxmpp) {
-            console.debug(self.getNickname(), "sendin message w/ id", message_id, message);
+            console.debug(self.getNickname(), "sendin message w/ id", messageId, message);
         }
-        return message_id;
+        return messageId;
     };
 
     Karere.prototype.sendAction = function(toJid, action, meta) {

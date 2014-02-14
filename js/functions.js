@@ -789,3 +789,12 @@ function assert(test, message) {
         throw new AssertionFailed(message);
     }
 }
+
+function addZeroIfLenLessThen(val, len) {
+    if(val.toString().length < len) {
+        for(var i = val.toString().length; i<len; i++) {
+            val = "0" + val;
+        }
+    }
+    return val;
+}

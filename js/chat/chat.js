@@ -171,7 +171,11 @@ var chatui;
         var stoppedTyping = function() {
             if(typingTimeout) {
                 clearTimeout(typingTimeout);
-                megaChat.karere.sendComposingPaused(megaChat.getCurrentRoomJid());
+
+                var room = megaChat.getCurrentRoom();
+                if(room && room.state == MegaChatRoom.STATE.READY) {
+                    megaChat.karere.sendComposingPaused(megaChat.getCurrentRoomJid());
+                }
                 typingTimeout = null;
             }
         };
@@ -180,7 +184,10 @@ var chatui;
         $('.message-textarea').bind('keyup.send', function(e) {
             if($(this).val().length > 0) {
                 if(!typingTimeout) {
-                    megaChat.karere.sendIsComposing(megaChat.getCurrentRoomJid());
+                    var room = megaChat.getCurrentRoom();
+                    if(room && room.state == MegaChatRoom.STATE.READY) {
+                        megaChat.karere.sendIsComposing(megaChat.getCurrentRoomJid());
+                    }
                 } else if(typingTimeout) {
                     clearTimeout(typingTimeout);
                     typingTimeout = null;
@@ -241,6 +248,10 @@ var MegaChat = function() {
     this.chats = {};
     this.currentlyOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
+
+    this.options = {
+        'delaySendMessageIfRoomNotAvailableTimeout': 3000
+    };
 
     this.instanceId = megaChatInstanceId++;
 
@@ -455,6 +466,10 @@ var MegaChat = function() {
         self._onChatMessage.apply(self, toArray(arguments));
     });
 
+    this.karere.bind("onDelayedChatMessage", function() {
+        self._onChatMessage.apply(self, toArray(arguments));
+    });
+
     this.karere.bind("onActionMessage", function(e, eventData) {
         if(eventData.myOwn == true) {
             return;
@@ -617,13 +632,20 @@ MegaChat.prototype._onChatMessage = function(e, eventData) {
         return;
     }
 
-    var roomJid = eventData.roomJid;
+    // try first with delay -> timestamp -> currentime (if no time info is attached to the message)
+    var timestamp = eventData.delay;
+    if(!timestamp) {
+        timestamp = eventData.timestamp;
+    }
+    if(!timestamp) {
+        timestamp = unixtime();
+    }
     var room = self.chats[eventData.roomJid];
     if(room) {
         room.appendMessage({
             from: eventData.from,
             message: eventData.message,
-            timestamp: eventData.timestamp ? eventData.timestamp : unixtime(),
+            timestamp: timestamp,
             meta: eventData.meta,
             id: eventData.id
         });
@@ -970,9 +992,17 @@ MegaChat.prototype.hideChat = function(roomJid) {
 MegaChat.prototype.sendMessage = function(roomJid, val) {
     var self = this;
 
-    //TODO: queue if room is not ready.
-    //TODO: Encrypt messages
-    self.karere._rawSendMessage(roomJid, "groupchat", val);
+    // queue if room is not ready.
+    if(!self.chats[roomJid]) {
+        createTimeoutPromise(function() {
+            return !!self.chats[roomJid]
+        }, 100, self.options.delaySendMessageIfRoomNotAvailableTimeout)
+            .done(function() {
+                self.chats[roomJid].sendMessage(val);
+            });
+    } else {
+        self.chats[roomJid].sendMessage(val);
+    }
 };
 
 
@@ -987,9 +1017,12 @@ var MegaChatRoom = function(megaChat, roomJid) {
     this.messagesIndex = {};
     this.isTemporary = false;
     this.options = {
-        'requestMessagesSyncTimeout': 1500
+        'requestMessagesSyncTimeout': 1500,
+        'sendMessageQueueIfNotReadyTimeout': 3500, // XX: why is this so slow? optimise please.
+        'messageSyncFailAfterTimeout': 10000 // XX: why is this so slow? optimise please.
     };
     this._syncRequests = {};
+    this._messagesQueue = [];
 
     this.state = MegaChatRoom.STATE.INITIALIZED;
 
@@ -1001,9 +1034,38 @@ var MegaChatRoom = function(megaChat, roomJid) {
     // Events
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
-        debugger;
         if(newState == MegaChatRoom.STATE.JOINED) {
             self.requestMessageSync();
+            createTimeoutPromise(
+                function() {
+                    return self.state == MegaChatRoom.STATE.READY || self.state == MegaChatRoom.STATE.SYNCED
+                },
+                200,
+                self.options.messageSyncFailAfterTimeout
+            )
+                .fail(function() {
+                    if(localStorage.d) {
+                        debugger;
+                        console.warn("Sync failed, setting state to READY.");
+                    }
+                    self.state = MegaChatRoom.STATE.READY; // its ok, if the sync failed...change the state to DONE
+                })
+        } else if(newState == MegaChatRoom.STATE.SYNCED) {
+            // XX: we should add the encryption stuff just after state == SYNCED and before state == READY
+            self.setState(MegaChatRoom.STATE.READY);
+        } else if(newState == MegaChatRoom.STATE.READY) {
+            if(self._messagesQueue.length > 0) {
+                $.each(self._messagesQueue, function(k, v) {
+                    if(!v) {
+                        return; //continue;
+                    }
+
+
+                    //TODO: Encrypt messages
+                    self.megaChat.karere._rawSendMessage(self.roomJid, "groupchat", v.message, v.meta, v.id, v.timestamp);
+                });
+                self._messagesQueue = [];
+            }
         }
     });
 
@@ -1020,7 +1082,7 @@ MegaChatRoom.STATE = {
     'SYNCING': 30,
     'SYNCED': 40,
 
-    'DONE': 150,
+    'READY': 150,
 
     'LEAVING': 200,
 
@@ -1360,7 +1422,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     var date = new Date(message.timestamp * 1000);
 
     $('.fm-chat-message-time', $message).text(
-        date.getHours() + ":" + date.getMinutes() + "." + date.getSeconds()
+        addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
     );
     $message.attr('data-timestamp', message.timestamp);
     $message.attr('data-id', message.id);
@@ -1583,6 +1645,30 @@ MegaChatRoom.prototype.getNavElement = function() {
         return $('#treesub_contacts li a[data-room-jid="' + self.roomJid + '"]');
     } else {
         throw new Error("Not implemented.");
+    }
+};
+
+
+MegaChatRoom.prototype.sendMessage = function(message) {
+    var self = this;
+    var megaChat = this.megaChat;
+
+    if(self.state != MegaChatRoom.STATE.READY) {
+        var messageId = megaChat.karere.generateMessageId(self.roomJid);
+        var messageData = {
+            from: megaChat.karere.getJid(),
+            message: message,
+            timestamp: unixtime() - 60 * 60 * 60,
+            meta: {},
+            id: messageId
+        };
+        self._messagesQueue.push(messageData);
+
+        self.appendMessage(messageData);
+    } else {
+
+        //TODO: Encrypt messages
+        megaChat.karere._rawSendMessage(self.roomJid, "groupchat", message);
     }
 };
 

@@ -429,7 +429,10 @@ function dlGetUrl(object, callback) {
 	});
 }
 
-if (window.webkitRequestFileSystem) {
+if(localStorage.dlMethod) {
+	dlMethod = window[localStorage.dlMethod];
+}
+else if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
 } else if (navigator.msSaveOrOpenBlob) {
 	dlMethod = BlobBuilderIO;

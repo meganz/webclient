@@ -2730,7 +2730,7 @@ function UIkeyevents()
 		}
 		else if (e.keyCode == 27 && slideshowid)
 		{
-			slideshow(false,true);		
+			slideshow(slideshowid,true);		
 		}
 		else if (e.keyCode == 27)
 		{
@@ -5043,7 +5043,18 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
-		DownloadManager.abort({id: id});
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == id)
+			{
+				if (!dl_queue[i].ppersist)
+				{
+					DownloadManager.abort({id: id});
+				}
+				
+				break;
+			}
+		}
 		return false;
 	}
 	
@@ -5098,6 +5109,7 @@ function slideshow(id,close)
 			{
 				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
 				dl_queue[i].preview=false;
+				dl_queue[i].ppersist=true;
 				openTransferpanel();
 				return;
 			}		

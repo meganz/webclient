@@ -74,12 +74,6 @@ function ClassChunk(task) {
 				return false;
 			}
 
-			clearTimeout(timeoutCheck);
-			timeoutCheck = setTimeout(function() {
-				DEBUG("TIMEOUT FOR CHUNK");
-				xhr.abort();
-			}, 20*1000);
-
 			lastPing = NOW();
 
 			// keep in track of the current progress
@@ -117,6 +111,13 @@ function ClassChunk(task) {
 			Progress.dl_prevprogress = Progress.progress
 			Progress.dl_lastprogress = lastPing
 		}
+
+		function timeout() {
+			clearTimeout(timeoutCheck);
+			timeoutCheck = setTimeout(function() {
+				xhr.abort();
+			}, 5*1000);
+		}
 	
 		function request() {
 			if (dlMethod == FileSystemAPI) {
@@ -128,6 +129,7 @@ function ClassChunk(task) {
 			}
 			xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 			xhr.send();
+			timeout();
 			DEBUG("Fetch " + url);
 		}
 		
@@ -158,7 +160,7 @@ function ClassChunk(task) {
 	
 		xhr.onprogress = function(e) {
 			if (isCancelled()) return;
-	
+
 			Progress.progress += e.loaded - prevProgress;
 			prevProgress = e.loaded
 

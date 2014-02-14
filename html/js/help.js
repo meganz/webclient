@@ -1,7 +1,7 @@
 function init_help()
 {
 	var subpage='',search ='';	
-	if (page.length > 4) subpage = page.substr(5,page.length-1);	
+	if (page.length > 4) subpage = page.substr(5,page.length-1);
 	if (subpage.substr(0,6) == 'search')
 	{
 		search = subpage.replace('search/','');
@@ -21,9 +21,11 @@ function init_help()
 		else if (c.indexOf('android') > -1) document.location.hash = 'help/android';
 		else document.location.hash = 'help';
 	});	
-	$('.new-left-menu-link').removeClass('active');	
-	if (subpage) $('.new-left-menu-link.'+subpage).addClass('active');
-	else $('.new-left-menu-link.home').addClass('active');	
+	
+	
+	
+	$('.new-left-menu-link.home').addClass('active');
+	
 	$('.new-right-content-block').addClass('hidden');	
 	if (search)
 	{
@@ -46,41 +48,49 @@ function init_help()
 	}	
 	else if (subpage)
 	{
+		$('.new-left-menu-link').removeClass('active');			
 		var id,title;		
 		if (subpage == 'basics')
 		{
 			id=0;
 			title = 'Basics';
+			$('.new-left-menu-link.basics').addClass('active');
 		}
 		else if (subpage == 'sharing')
 		{
 			id=1;
 			title = 'Sharing';
+			$('.new-left-menu-link.sharing').addClass('active');
 		}
 		else if (subpage == 'security')
 		{
 			id=2;
 			title = 'Security & Privacy';
+			$('.new-left-menu-link.security').addClass('active');
 		}
 		else if (subpage == 'account')
 		{
 			id=3;
 			title = 'Account';
+			$('.new-left-menu-link.account').addClass('active');
 		}
 		else if (subpage == 'sync')
 		{
 			id=4;
 			title = 'Sync Client';
+			$('.new-left-menu-link.sync').addClass('active');
 		}
 		else if (subpage == 'ios')
 		{
 			id=5;
 			title = 'iOS App';
+			$('.new-left-menu-link.ios').addClass('active');
 		}
 		else if (subpage == 'android')
 		{
 			id=6;
 			title = 'Android App';
+			$('.new-left-menu-link.android').addClass('active');
 		}
 		var html = '<h1 class="help-home-header">Help Centre - <span class="red">' + title + '</span></h1>';
 		for (var i in helpdata) if (helpdata[i].c == id) html +='<h2>' + helpdata[i].q + '</h2>' + helpdata[i].a + '';
@@ -88,7 +98,10 @@ function init_help()
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		mainScroll();
 	}
-	else $('.new-right-content-block.home').removeClass('hidden');		
+	else
+	{
+		$('.new-right-content-block.home').removeClass('hidden');		
+	}
 	$('.help_search').unbind('keyup');
 	$('.help_search').bind('keyup',function(e)
 	{

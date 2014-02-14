@@ -38,6 +38,7 @@ function ClassChunk(task) {
 			, progress = getxr()  // chunk progress
 			, speed = 1 // speed of the current chunk
 			, lastUpdate  = NOW()
+			, lastPing    = NOW()
 			, localId = iRealDownloads
 			, Progress = download.zipid ? Zips[download.zipid] : io
 	
@@ -61,26 +62,31 @@ function ClassChunk(task) {
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
 				download.decrypt++; /* avoid run condition */
 				done = true;
+
 				Scheduler.done();
-				setTimeout(function() {
-					xhr.abort();
-				}, 1);
 			}
 		}
 	
+		var timeoutCheck = null;
 		function updateProgress(force) {
 			if (dlQueue.isPaused()) {
 				// do not update the UI
 				return false;
 			}
 
-			var now = NOW();
+			clearTimeout(timeoutCheck);
+			timeoutCheck = setTimeout(function() {
+				DEBUG("TIMEOUT FOR CHUNK");
+				xhr.abort();
+			}, 20*1000);
+
+			lastPing = NOW();
 
 			// keep in track of the current progress
-			if (lastUpdate+250 < now) {
+			if (lastUpdate+250 < lastPing) {
 				speed = progress.update(prevProgress - pprevProgress)
 				pprevProgress = prevProgress;
-				lastUpdate = now;
+				lastUpdate = lastPing
 				shouldIReportDone();
 			}
 
@@ -91,7 +97,7 @@ function ClassChunk(task) {
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > now && !force) {
+			if (Progress.dl_lastprogress+250 > lastPing && !force) {
 				// too soon
 				return false;
 			}
@@ -109,18 +115,21 @@ function ClassChunk(task) {
 			}
 	
 			Progress.dl_prevprogress = Progress.progress
-			Progress.dl_lastprogress = now;
+			Progress.dl_lastprogress = lastPing
 		}
 	
-	
-		if (dlMethod == FileSystemAPI) {
-			var t = url.lastIndexOf('/dl/');
-			xhr.open('POST', url.substr(0, t+1));
-			xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
-		} else {
-			xhr.open('POST', url, true);
+		function request() {
+			if (dlMethod == FileSystemAPI) {
+				var t = url.lastIndexOf('/dl/');
+				xhr.open('POST', url.substr(0, t+1));
+				xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
+			} else {
+				xhr.open('POST', url, true);
+			}
+			xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+			xhr.send();
+			DEBUG("Fetch " + url);
 		}
-		DEBUG("Fetch " + url);
 		
 		if (!io.dl_bytesreceived) {
 			io.dl_bytesreceived = 0;
@@ -135,6 +144,7 @@ function ClassChunk(task) {
 			if (download.cancelled) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
+				clearTimeout(timeoutCheck);
 				xhr.abort();
 				iRealDownloads--;
 				if (done) {
@@ -195,9 +205,10 @@ function ClassChunk(task) {
 					Scheduler.done();
 				}
 			}
+			clearTimeout(timeoutCheck);
 		}
-		xhr.responseType = have_ab ? 'arraybuffer' : 'text';
-		xhr.send();
+
+		request();
 	}
 }
 // }}}

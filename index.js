@@ -787,7 +787,7 @@ function mLogout()
 					if (downloading) 
 					{
 						dl_cancel();
-						dl_queue=[];
+						dl_queue= new DownloadQueue;
 					}
 					if (ul_uploading)
 					{

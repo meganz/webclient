@@ -22,6 +22,10 @@ $.len = function(obj) {
 	return L;
 }
 
+function dl_cancel() {
+	DownloadManager.abortAll();
+}
+
 /**
  *	Global object which can be used to pause/resume
  *	a given file (and their chunks/files)
@@ -68,6 +72,14 @@ var DownloadManager = new function() {
 			dl_queue[dl.pos] = {}; /* remove it */
 			$('#dl_' + dl.id).remove();
 		}
+	}
+
+	self.abortAll = function() {
+		$.each(dl_queue, function(i, file) {
+			if (file.id or file.zipid) {
+				self.abort(file);
+			}
+		});
 	}
 
 	self.abort = function(pattern, dontCleanUI) {

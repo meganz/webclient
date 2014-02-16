@@ -41,6 +41,7 @@ function ClassChunk(task) {
 			, lastPing    = NOW()
 			, localId = iRealDownloads
 			, Progress = download.zipid ? Zips[download.zipid] : io
+			, backoff = 1000
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
@@ -115,8 +116,9 @@ function ClassChunk(task) {
 		function timeout() {
 			clearTimeout(timeoutCheck);
 			timeoutCheck = setTimeout(function() {
+				DEBUG("TIMEOUT ERROR");
 				xhr.abort();
-			}, 5*1000);
+			}, 20*1000);
 		}
 	
 		function request() {
@@ -197,14 +199,16 @@ function ClassChunk(task) {
 						// We already told the scheduler we were done
 						// with no erro and this happened. Should I reschedule this 
 						// task?
-						throw new Error("Fixme")
+						return setTimeout(function() {
+							request();
+						}, backoff *= 1.2);
 					}
 					return Scheduler.done(false, this.status);
 				}
-				if (done) {
-					download.decrypt--;
-				} else {
+				if (!done) {
 					Scheduler.done();
+				} else { 
+					download.decrypt--;
 				}
 			}
 			clearTimeout(timeoutCheck);

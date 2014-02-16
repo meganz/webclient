@@ -26,7 +26,7 @@ function ClassChunk(task) {
 	this.run = function(Scheduler) {
 		iRealDownloads++;
 
-		var xhr = getXhrObject()
+		var xhr
 			, url = task.url
 			, size = task.size
 			, download = task.download
@@ -122,6 +122,7 @@ function ClassChunk(task) {
 		}
 	
 		function request() {
+			xhr = getXhrObject()
 			if (dlMethod == FileSystemAPI) {
 				var t = url.lastIndexOf('/dl/');
 				xhr.open('POST', url.substr(0, t+1));

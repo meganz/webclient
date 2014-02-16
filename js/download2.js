@@ -76,7 +76,7 @@ var DownloadManager = new function() {
 
 	self.abortAll = function() {
 		$.each(dl_queue, function(i, file) {
-			if (file.id or file.zipid) {
+			if (file.id || file.zipid) {
 				self.abort(file);
 			}
 		});

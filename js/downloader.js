@@ -42,6 +42,7 @@ function ClassChunk(task) {
 			, localId = iRealDownloads
 			, Progress = download.zipid ? Zips[download.zipid] : io
 			, backoff = 1000
+			, failed = false
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
@@ -123,6 +124,66 @@ function ClassChunk(task) {
 	
 		function request() {
 			xhr = getXhrObject()
+
+			// onprogress {{{
+			xhr.onprogress = function(e) {
+				if (isCancelled()) return;
+
+				Progress.progress += e.loaded - prevProgress;
+				prevProgress = e.loaded
+
+				updateProgress();
+			};
+			// }}}
+		
+			// on ready {{{
+			xhr.onreadystatechange = function() {
+				if (isCancelled()) return;
+				if (this.readyState == this.DONE) {
+					var r = this.response || {};
+	
+					if (r.byteLength == size) {
+						Progress.progress += r.byteLength - prevProgress;
+						iRealDownloads--;
+						updateProgress(true);
+
+						if (have_ab) {
+							if (navigator.appName != 'Opera') {
+								io.dl_bytesreceived += r.byteLength;
+							}
+							dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+						} else {
+							io.dl_bytesreceived += this.response.length;
+							dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
+						}
+						failed = false
+					} else if (!download.cancelled) {
+						// we must reschedule this download	
+						Progress.progress -= prevProgress; /* this never happened */
+						DEBUG(this.status, r.bytesLength, size);
+						DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
+	
+						// tell the scheduler that we failed
+						if (done) {
+							// We already told the scheduler we were done
+							// with no erro and this happened. Should I reschedule this 
+							// task?
+							clearTimeout(timeoutCheck);
+							return setTimeout(function() {
+								failed = true
+								request();
+							}, backoff *= 1.2);
+						}
+						return Scheduler.done(false, this.status);
+					}
+
+					if (!done) Scheduler.done();
+					else if (!failed) download.decrypt--;
+				}
+				clearTimeout(timeoutCheck);
+			}
+			// }}}
+
 			if (dlMethod == FileSystemAPI) {
 				var t = url.lastIndexOf('/dl/');
 				xhr.open('POST', url.substr(0, t+1));
@@ -161,59 +222,6 @@ function ClassChunk(task) {
 			}
 		}
 	
-		xhr.onprogress = function(e) {
-			if (isCancelled()) return;
-
-			Progress.progress += e.loaded - prevProgress;
-			prevProgress = e.loaded
-
-			updateProgress();
-		};
-
-		xhr.onreadystatechange = function() {
-			if (isCancelled()) return;
-			if (this.readyState == this.DONE) {
-				var r = this.response || {};
-	
-				if (r.byteLength == size) {
-					Progress.progress += r.byteLength - prevProgress;
-					iRealDownloads--;
-					updateProgress(true);
-
-					if (have_ab) {
-						if (navigator.appName != 'Opera') {
-							io.dl_bytesreceived += r.byteLength;
-						}
-						dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-					} else {
-						io.dl_bytesreceived += this.response.length;
-						dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
-					}
-				} else if (!download.cancelled) {
-					// we must reschedule this download	
-					Progress.progress -= prevProgress; /* this never happened */
-					DEBUG(this.status, r.bytesLength, size);
-					DEBUG("HTTP FAILED WITH ", this.status, "am i done?", done);
-	
-					// tell the scheduler that we failed
-					if (done) {
-						// We already told the scheduler we were done
-						// with no erro and this happened. Should I reschedule this 
-						// task?
-						return setTimeout(function() {
-							request();
-						}, backoff *= 1.2);
-					}
-					return Scheduler.done(false, this.status);
-				}
-				if (!done) {
-					Scheduler.done();
-				} else { 
-					download.decrypt--;
-				}
-			}
-			clearTimeout(timeoutCheck);
-		}
 
 		request();
 	}

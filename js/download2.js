@@ -106,11 +106,7 @@ var DownloadManager = new function() {
 	self.remove = function(pattern, check) {
 		check = check || function() {};
 		pattern = s2o(pattern);
-		if (pattern.zipid) {
-			removed.push("zipid:" + pattern.zipid);
-		} else {
-			removed.push("id:" + pattern.id);
-		}
+		removed.push(task2id(pattern))
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj, pattern);
 			if (match) {
@@ -133,30 +129,36 @@ var DownloadManager = new function() {
 	}
 
 	self.pause = function(work) {
-		if (work instanceof ClassFile || work instanceof ClassChunk) {
-			var pattern = {};
-			if (typeof work.task.zipid == "number") { 
-				pattern = 'zipid:' + work.task.zipid;
-			} else {
-				pattern = 'id:' + work.task.id;
-			}
+		var pattern = task2id(work)
+		DEBUG("PAUSED ", pattern);
 
-			if ($.inArray(pattern, locks) == -1) {
-				// we want to save locks once
-				locks.push(pattern);
-			}
-
-			work.__canretry = true;
-			work.__ondone   = function() {
-				work.__ondone = function() {
-					self.release(pattern);
-				};
-			};
+		if ($.inArray(pattern, locks) == -1) {
+			// we want to save locks once
+			locks.push(pattern);
 		}
+
+		work.__canretry = true;
+		work.__ondone   = function() {
+			work.__ondone = function() {
+				self.release(pattern);
+			};
+		};
+	}
+
+	function task2id(pattern) {
+		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) {
+			if (typeof pattern.task.zipid == "number") { 
+				pattern = 'zipid:' + pattern.task.zipid;
+			} else {
+				pattern = 'id:' + pattern.task.id;
+			}
+		}
+		return pattern;
 	}
 
 	self.release = function(pattern) {
-		DEBUG("release lock to ", pattern);
+		var pattern = task2id(pattern)
+		DEBUG("RELEASE LOCK TO ", pattern);
 		removeValue(locks, pattern);
 		removeValue(removed, pattern);
 	}

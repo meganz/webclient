@@ -23,6 +23,8 @@ function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
 
+	var self = this;
+
 	this.run = function(Scheduler) {
 		iRealDownloads++;
 
@@ -43,6 +45,7 @@ function ClassChunk(task) {
 			, Progress = download.zipid ? Zips[download.zipid] : io
 			, backoff = 1000
 			, failed = false
+			, _cancelled = false
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
@@ -64,7 +67,6 @@ function ClassChunk(task) {
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
 				download.decrypt++; /* avoid run condition */
 				done = true;
-
 				Scheduler.done();
 			}
 		}
@@ -156,6 +158,7 @@ function ClassChunk(task) {
 							io.dl_bytesreceived += this.response.length;
 							dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
 						}
+						if (failed) DownloadManager.release(self);
 						failed = false
 					} else if (!download.cancelled) {
 						// we must reschedule this download	
@@ -171,6 +174,7 @@ function ClassChunk(task) {
 							clearTimeout(timeoutCheck);
 							return setTimeout(function() {
 								failed = true
+								DownloadManager.pause(self);
 								request();
 							}, backoff *= 1.2);
 						}
@@ -201,7 +205,6 @@ function ClassChunk(task) {
 			io.dl_bytesreceived = 0;
 		}
 	
-		var _cancelled = false;
 		function isCancelled() {
 			if (_cancelled) {
 				/* aborted already */

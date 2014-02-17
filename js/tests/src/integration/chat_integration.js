@@ -503,7 +503,7 @@ describe("Integration Test - Rooms", function() {
 
         var msg = "hello world!";
 
-        k1._rawSendMessage(k2.getJid(), "chat", msg);
+        k1.sendRawMessage(k2.getJid(), "chat", msg);
 
 
         $.when($promise2).always(function() {
@@ -542,7 +542,7 @@ describe("Integration Test - Rooms", function() {
                     return k2_event_mocker.mocks['onChatMessage'].triggeredCount == 2
                 }, 100, 1000);
 
-                k1._rawSendMessage(room_jid, "groupchat", msg);
+                k1.sendRawMessage(room_jid, "groupchat", msg);
 
                 $.when($promise1, $promise2, $promise3).always(function() {
                     expectToBeResolved($promise1, 'Did not received message in the group chat (k1)');

@@ -551,9 +551,9 @@ function makeMetaAware(kls) {
     /**
      * Clear/delete meta data
      *
-     * @param prefix string
-     * @param namespace string
-     * @param k string
+     * @param prefix string  optional
+     * @param namespace string  optional
+     * @param k string optional
      */
     kls.prototype.clearMeta = function(prefix, namespace, k) {
         var self = this;
@@ -575,13 +575,17 @@ function makeMetaAware(kls) {
      * Retrieve meta data
      *
      * @param prefix {string}
-     * @param namespace {string}
-     * @param k {string}
-     * @param default_value {*}
+     * @param namespace {string} optional
+     * @param k {string} optional
+     * @param default_value {*} optional
      * @returns {*}
      */
     kls.prototype.getMeta = function(prefix, namespace, k, default_value) {
         var self = this;
+
+        namespace = namespace || undefined; /* optional */
+        k = k || undefined; /* optional */
+        default_value = default_value || undefined; /* optional */
 
         // support for calling only with 2 args.
         if(k == undefined) {
@@ -790,6 +794,13 @@ function assert(test, message) {
     }
 }
 
+/**
+ * Pad/prepend `val` with "0" (zeros) until the length is == `length`
+ *
+ * @param val {String} value to add "0" to
+ * @param len {Number} expected length
+ * @returns {String}
+ */
 function addZeroIfLenLessThen(val, len) {
     if(val.toString().length < len) {
         for(var i = val.toString().length; i<len; i++) {

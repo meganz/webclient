@@ -1,3 +1,10 @@
+/**
+ * Fixtures loader helper
+ *
+ * @param path {String} Base path (dir) where the fixtures can be found.
+ * @returns {Fixtures}
+ * @constructor
+ */
 function Fixtures(path) {
     if(window.location.toString().indexOf("context.html") != -1) {
         path = "/base/" + path;
@@ -8,6 +15,14 @@ function Fixtures(path) {
     return this;
 }
 
+/**
+ * Returns a Deferred object which will get resolved when the fixture is loaded with 2 arguments:
+ * 1) filename
+ * 2) file contents (text/String)
+ *
+ * @param filename
+ * @returns {Deferred}
+ */
 Fixtures.prototype.get = function(filename) {
     var self = this;
     var $promise = new $.Deferred();

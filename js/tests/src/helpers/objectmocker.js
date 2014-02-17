@@ -28,7 +28,15 @@ var ObjectMocker = function(objectInstance, methods) {
     return this;
 };
 
-
+/**
+ * Helper function to do a recursion on a passed list of functions to be mocked (`_map`) on `_objectInstance`
+ *
+ * @param _objectInstance {Object}
+ * @param _map {Object} A hashmap containing keys - function names which should me mocked and values which should be
+ * functions that will replace the original ones
+ * @param [fn] {Function} Function which should replace the original
+ * @private
+ */
 ObjectMocker.prototype._recurseObject = function(_objectInstance, _map, fn) {
     var self = this;
 
@@ -40,7 +48,9 @@ ObjectMocker.prototype._recurseObject = function(_objectInstance, _map, fn) {
         }
     });
 };
-
+/**
+ * Restore the mocked functions
+ */
 ObjectMocker.prototype.restore = function() {
     var self = this;
 
@@ -49,6 +59,13 @@ ObjectMocker.prototype.restore = function() {
     });
 };
 
+/**
+ * Simple internal logger that will collect all function calls in `self.calls`.
+ *
+ * @param name
+ * @param fn
+ * @returns {Function}
+ */
 ObjectMocker.prototype.logFunctionCallWrapper = function(name, fn) {
     var self = this;
     if(typeof(self.calls[name]) == 'undefined') {

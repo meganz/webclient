@@ -93,17 +93,17 @@ var Karere = function(user_options) {
          * Timeout for the addUserToChat promise...will wait for that much ms and reject the promise
          * if the user have not joined
          */
-        wait_for_user_presence_in_room_timeout: 2500,
+        waitForUserPresenceInRoomTimeout: 2500,
 
         /**
          * Timeout for waiting before rejecting the .disconnect promise
          */
-        disconnect_timeout: 2500,
+        disconnectTimeout: 2500,
 
         /**
          * Timeout for waiting the queue of waiting stanzas to be send before rejecting and doing forced disconnect
          */
-        disconnect_queue_timeout: 2000,
+        disconnectQueueTimeout: 2000,
 
         /**
          * Maximum connection retry in case of error
@@ -245,11 +245,12 @@ makeMetaAware(Karere);
      * To be used when calling Strophe.addHandler
      *
      * @param fn
-     * @param context
+     * @param [context] Object
      * @returns {Function}
      * @private
      */
     Karere._exceptionSafeProxy = function(fn, context) {
+
         return function() {
             try {
                 return fn.apply(context, toArray(arguments))
@@ -477,7 +478,7 @@ makeMetaAware(Karere);
 
     /**
      * Simple internal method that will return a promise, which will be marked as resolved only when there are no more
-     * queued stanzas or fail if the waiting exceed self.options.disconnect_queue_timeout
+     * queued stanzas or fail if the waiting exceed self.options.disconnectQueueTimeout
      *
      * @returns {*}
      * @private
@@ -486,8 +487,8 @@ makeMetaAware(Karere);
         var self = this;
 
         return createTimeoutPromise(function() {
-            return self.connection._data.length == 0
-        }, 500, self.options.disconnect_queue_timeout)
+            return self.connection._data.length === 0
+        }, 500, self.options.disconnectQueueTimeout)
     };
 
     /**
@@ -538,7 +539,7 @@ makeMetaAware(Karere);
                 return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED;
             },
             200,
-            self.options.disconnect_timeout
+            self.options.disconnectTimeout
         ).done(function() {
             self.clearMeta('rooms');
         });
@@ -614,6 +615,11 @@ makeMetaAware(Karere);
     };
 
 
+    /**
+     * Helper method to generate a message ID, based on the target JID
+     * @param toJid {String} jid of the recipient
+     * @returns {String}
+     */
     Karere.prototype.generateMessageId = function(toJid) {
         var self = this;
         return simpleStringHashCode(self.getJid() + toJid) + "_" + unixtime()
@@ -703,6 +709,7 @@ makeMetaAware(Karere);
      *
      * @param message
      * @returns {boolean}
+     * @param eventData {Object}
      * @private
      */
     Karere.prototype._onIncomingStanza = function (message, eventData) {
@@ -749,9 +756,9 @@ makeMetaAware(Karere);
         eventData['from'] = from;
         eventData['id'] = eventId;
 
-        var json_data = message.getElementsByTagName("json");
-        if(json_data.length > 0) {
-            eventData['meta'] = JSON.parse(json_data[0].childNodes[0].data);
+        var jsonData = message.getElementsByTagName("json");
+        if(jsonData.length > 0) {
+            eventData['meta'] = JSON.parse(jsonData[0].childNodes[0].data);
         }
 
         var errors = message.getElementsByTagName("error");
@@ -892,6 +899,7 @@ makeMetaAware(Karere);
                 if(!self._triggerEvent("InviteMessage", eventData)) { /// stop auto join by event prop. ?
                     return true;
                 } else {
+                    //noinspection JSUnresolvedVariable
                     self.connection.muc.join(
                         eventData['room'],
                         self.getNickname(),
@@ -1045,6 +1053,7 @@ makeMetaAware(Karere);
      *
      * @param presence {Karere.PRESENCE}
      * @param status
+     * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
         presence = presence || "chat";
@@ -1133,7 +1142,7 @@ makeMetaAware(Karere);
     Karere.prototype.sendIsComposing = function(toJid) {
         var self = this;
 
-        return self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('composing'));
+        return self.sendRawMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('composing'));
     };
 
     /**
@@ -1144,11 +1153,11 @@ makeMetaAware(Karere);
      */
     Karere.prototype.sendComposingPaused = function(toJid) {
         var self = this;
-        self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'));
+        self.sendRawMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'));
 
         return $.when(
             self.sendIsActive(toJid),
-            self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'))
+            self.sendRawMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('paused'))
         );
     };
 
@@ -1161,7 +1170,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.sendIsActive = function(toJid) {
         var self = this;
-        return self._rawSendMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('active'));
+        return self.sendRawMessage(toJid, toJid.indexOf("conference.") == -1 ? "chat" : "groupchat", Karere._$chatState('active'));
     };
 }
 
@@ -1176,15 +1185,16 @@ makeMetaAware(Karere);
      *
      * @param toJid
      * @param type should be chat or groupchat
-     * @param contents
-     * @private
+     * @param contents {String|DOMElement} content of the messages
+     * @param [meta] {Object} pass optional meta object, that should be serialized and sent w/ the message
+     * @param [messageId] {String} specify your own message id (if needed)
+     * @param [delay] {Number} use this to specify the urn:xmpp:delay value that is going to be sent w/ the message
      */
-    Karere.prototype._rawSendMessage = function (toJid, type, contents, meta, messageId, delay) {
+    Karere.prototype.sendRawMessage = function (toJid, type, contents, meta, messageId, delay) {
         var self = this;
+
         meta = meta || {};
-
         type = type || "chat";
-
         messageId = messageId || self.generateMessageId(toJid);
 
         var message = $msg({from: self.connection.jid, to: toJid, type: type, id: messageId});
@@ -1201,7 +1211,7 @@ makeMetaAware(Karere);
         }
 
         if(Object.keys(meta).length > 0) {
-            var json = Strophe.xmlHtmlNode("<json></json>").childNodes[0];
+            var json = Strophe.xmlHtmlNode("<json><\/json>").childNodes[0];
             json.textContent = JSON.stringify(meta);
 
             message.nodeTree.appendChild(
@@ -1210,7 +1220,7 @@ makeMetaAware(Karere);
         }
 
         if(delay && delay > 0) {
-            var $delay = $("<delay></delay>")
+            var $delay = $("<delay><\/delay>")
             $delay.attr('xmlns', 'urn:xmpp:delay');
             $delay.attr('from', self.getJid());
             $delay.attr('stamp', (new Date(delay * 1000).toISOString()));
@@ -1235,6 +1245,7 @@ makeMetaAware(Karere);
         self.connection.send(message);
 //        self.connection.send(forwarded);
 
+        //noinspection JSUnresolvedVariable
         if(localStorage.dxmpp) {
             console.debug(self.getNickname(), "sendin message w/ id", messageId, message);
         }
@@ -1242,7 +1253,7 @@ makeMetaAware(Karere);
     };
 
     Karere.prototype.sendAction = function(toJid, action, meta) {
-        return this._rawSendMessage(
+        return this.sendRawMessage(
             toJid,
             "action",
             "",
@@ -1267,8 +1278,8 @@ makeMetaAware(Karere);
 
         var configXml = "<x xmlns='jabber:x:data' type='submit'>" +
             "<field var='FORM_TYPE'>" +
-            "<value>http://jabber.org/protocol/muc#roomconfig</value>" +
-            "</field>";
+            "<value>http://jabber.org/protocol/muc#roomconfig<\/value>" +
+            "<\/field>";
 
         var configDict = $.extend({}, self.options.roomConfig, {
             "muc#roomconfig_roomsecret": roomPassword ? roomPassword : ""
@@ -1276,13 +1287,13 @@ makeMetaAware(Karere);
 
         $.each(Object.keys(configDict), function(i, k) {
             configXml += "<field var='" + k + "'>" +
-                "<value>" + configDict[k] + "</value>" +
-                "</field>";
+                "<value>" + configDict[k] + "<\/value>" +
+                "<\/field>";
         });
 
 
         configXml += "<field var='muc#roomconfig_captcha_whitelist'/>" +
-            "</x>";
+            "<\/x>";
 
         return Strophe.xmlHtmlNode(configXml).children[0].children;
     };
@@ -1290,8 +1301,9 @@ makeMetaAware(Karere);
     /**
      * Start/create new chat, wait for the room creations, send invites and wait for all users to join.
      *
-     * @param jidList array of jids to be invited to the chat
-     * @param type string private/group
+     * @param jidList {Array} of jids to be invited to the chat
+     * @param [type] {String} private/group, by default its "private"
+     * @param [roomName] {String} optionally, you can set your own room name
      * @returns {Deferred}
      */
     Karere.prototype.startChat = function(jidList, type, roomName) {
@@ -1402,7 +1414,7 @@ makeMetaAware(Karere);
 
             self.unbind(generatedEventName);
             $promise.reject(roomJid, userJid);
-        }, self.options.wait_for_user_presence_in_room_timeout);
+        }, self.options.waitForUserPresenceInRoomTimeout);
 
         var searchKey = eventName == "Joined" ? "newUsers" : "leftUsers";
 
@@ -1477,13 +1489,11 @@ makeMetaAware(Karere);
      * Leave chat
      *
      * @param roomJid
-     * @param exitMessage optional
+     * @param [exitMessage] {String} optional
      * @returns {Deferred}
      */
     Karere.prototype.leaveChat = function(roomJid, exitMessage) {
         var self = this;
-
-        exitMessage = exitMessage || undefined;
 
         var $promise = new $.Deferred();
 
@@ -1504,7 +1514,11 @@ makeMetaAware(Karere);
      *
      * @param roomJid
      * @param userJid
-     * @param password
+     * @param [password] {String} if not passed, Karere will lookup the local cache to use the password stored when
+     * joining or creating the room was used.
+     *
+     * @param [type] {String} by default = "private"
+     * @param [meta] {Object} by default = {}
      * @returns {Deferred}
      */
     Karere.prototype.addUserToChat = function(roomJid, userJid, password, type, meta) {
@@ -1640,6 +1654,13 @@ makeMetaAware(Karere);
         return users;
     };
 
+    /**
+     * Check if user exists in a chat room (MUC)
+     *
+     * @param roomJid {String} full room JID
+     * @param userJid {String} must be full JID
+     * @returns {boolean}
+     */
     Karere.prototype.userExistsInChat = function(roomJid, userJid) {
         var self = this;
         var users = self.getUsersInChat(roomJid);
@@ -1647,6 +1668,13 @@ makeMetaAware(Karere);
         return users.hasOwnProperty(userJid);
     };
 
+    /**
+     * Join XMPP MUC
+     *
+     * @param roomJid {String}
+     * @param [password] {String}
+     * @returns {Deferred}
+     */
     Karere.prototype.joinChat = function(roomJid, password) {
         var self = this;
         password = password || undefined;

@@ -73,7 +73,7 @@ var KarereMocker = function(objectInstance) {
                 return $promise;
             },
             'sendAction': function(toJid, action, meta) {
-                return this._rawSendMessage(
+                return this.sendRawMessage(
                     toJid,
                     "action",
                     "",
@@ -85,7 +85,7 @@ var KarereMocker = function(objectInstance) {
                     )
                 );
             },
-            '_rawSendMessage': function(toJid, type, contents, meta) {
+            "sendRawMessage": function(toJid, type, contents, meta) {
                 return 123;
             },
             'setPresence': function(presence, status, delay) {

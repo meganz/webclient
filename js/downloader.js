@@ -7,7 +7,7 @@ if (d) {
 	}
 }
 
-function getXhrObject() {
+function getXhrObject(s) {
 	var dl_xhr = new XMLHttpRequest;
 	if (dl_xhr.overrideMimeType) {
 		dl_xhr.overrideMimeType('text/plain; charset=x-user-defined');
@@ -15,6 +15,31 @@ function getXhrObject() {
 	if (d) {
 		_allxhr.push(dl_xhr);
 	}
+
+	// timeout {{{
+	var ts = null;
+	dl_xhr.timeout = s || 40000;
+	dl_xhr.ontimeout = function() {
+		dl_xhr.abort();
+	};
+
+	function timeout() {
+		clearTimeout(ts);
+		ts = setTimeout(function() {
+			dl_xhr.abort();
+		}, dl_xhr.timeout*1.5);
+	}
+	// }}}
+
+	dl_xhr.onprogress = function() {
+		timeout();
+		return dl_xhr.progress.apply(dl_xhr, arguments);
+	}
+
+	dl_xhr.onreadystatechange = function() {
+		clearTimeout(ts);
+		return dl_xhr.ready.apply(dl_xhr, arguments);
+	};
 	return dl_xhr;
 }
 
@@ -71,7 +96,6 @@ function ClassChunk(task) {
 			}
 		}
 	
-		var timeoutCheck = null;
 		function updateProgress(force) {
 			if (dlQueue.isPaused()) {
 				// do not update the UI
@@ -116,19 +140,11 @@ function ClassChunk(task) {
 			Progress.dl_lastprogress = lastPing
 		}
 
-		function timeout() {
-			clearTimeout(timeoutCheck);
-			timeoutCheck = setTimeout(function() {
-				DEBUG("TIMEOUT ERROR");
-				xhr.abort();
-			}, 20*1000);
-		}
-	
 		function request() {
 			xhr = getXhrObject()
 
 			// onprogress {{{
-			xhr.onprogress = function(e) {
+			xhr.progress = function(e) {
 				if (isCancelled()) return;
 
 				Progress.progress += e.loaded - prevProgress;
@@ -139,7 +155,7 @@ function ClassChunk(task) {
 			// }}}
 		
 			// on ready {{{
-			xhr.onreadystatechange = function() {
+			xhr.ready = function() {
 				if (isCancelled()) return;
 				if (this.readyState == this.DONE) {
 					var r = this.response || {};
@@ -171,7 +187,6 @@ function ClassChunk(task) {
 							// We already told the scheduler we were done
 							// with no erro and this happened. Should I reschedule this 
 							// task?
-							clearTimeout(timeoutCheck);
 							return setTimeout(function() {
 								failed = true
 								DownloadManager.pause(self);
@@ -184,7 +199,6 @@ function ClassChunk(task) {
 					if (!done) Scheduler.done();
 					else if (!failed) download.decrypt--;
 				}
-				clearTimeout(timeoutCheck);
 			}
 			// }}}
 
@@ -197,7 +211,6 @@ function ClassChunk(task) {
 			}
 			xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 			xhr.send();
-			timeout();
 			DEBUG("Fetch " + url);
 		}
 		
@@ -213,7 +226,6 @@ function ClassChunk(task) {
 			if (download.cancelled) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
-				clearTimeout(timeoutCheck);
 				xhr.abort();
 				iRealDownloads--;
 				if (done) {

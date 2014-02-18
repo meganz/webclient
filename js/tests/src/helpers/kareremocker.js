@@ -36,9 +36,9 @@ var KarereMocker = function(objectInstance) {
 
                 return $promise;
             },
-            'startChat': function() {
+            'startChat': function(jidList, type, roomName, password) {
                 var $promise = new $.Deferred();
-                $promise.resolve("roomjid@conference.example.com");
+                $promise.resolve(roomName ? roomName + "@" + this.options.mucDomain : "roomjid@conference.example.com");
 
                 return $promise;
             },
@@ -62,6 +62,7 @@ var KarereMocker = function(objectInstance) {
             },
             'leaveChat': function() {
                 var $promise = new $.Deferred();
+
                 $promise.resolve();
 
                 return $promise;
@@ -90,6 +91,9 @@ var KarereMocker = function(objectInstance) {
             },
             'setPresence': function(presence, status, delay) {
                 return;
+            },
+            'options': {
+                'mucDomain': "conference.example.com"
             }
         });
 

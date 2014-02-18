@@ -129,11 +129,13 @@ describe("Chat.js - Karere UI integration", function() {
         var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
 
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
         var $promise = megaChat.openChat(
-            [
-                user1jid,
-                user2jid
-            ],
+            jids,
             "private"
         );
 
@@ -148,7 +150,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         expectToBeResolved($promise, 'cant open chat')
             .done(function() {
-                var roomJid = "roomjid@conference.example.com";
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
                 expect(
                     megaChat.karere.addUserToChat
@@ -202,38 +204,10 @@ describe("Chat.js - Karere UI integration", function() {
                 expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
 
 
-                // reject invitation
-                var eventTriggerShouldReturnFalse = megaChat.karere._triggerEvent("InviteMessage", {
-                    elems: [],
-                    from: user2jid,
-                    id: "4",
-                    karere: null,
-                    meta: {
-                        ctime: unixtime() + 1000 /* date in the future */,
-                        invitationType: "resume",
-                        participants: [
-                            Strophe.getBareJidFromJid(user1jid),
-                            Strophe.getBareJidFromJid(user2jid)
-                        ],
-                        type: "private",
-                        users: users
-                    },
-                    myOwn: false,
-                    password: "password",
-                    rawMessage: null,
-                    rawType: null,
-                    room: "conflicting-" + roomJid,
-                    to: user1jid,
-                    type: "Message"
-                });
-
-                expect(eventTriggerShouldReturnFalse).to.not.be.ok;
-
-                expect(
-                    megaChat.karere.leaveChat
-                ).not.to.have.been.called;
-
                 // accept invitation
+                // first leave the room
+                delete megaChat.chats[roomJid];
+
                 var eventTriggerShouldReturnFalse2 = megaChat.karere._triggerEvent("InviteMessage", {
                     elems: [],
                     from: user2jid,
@@ -250,21 +224,21 @@ describe("Chat.js - Karere UI integration", function() {
                         users: users
                     },
                     myOwn: false,
-                    password: "password",
+                    password: undefined,
                     rawMessage: null,
                     rawType: null,
-                    room: "conflicting-" + roomJid,
+                    room: roomJid,
                     to: user1jid,
                     type: "Message"
                 });
 
                 expect(
-                    megaChat.karere.leaveChat
+                    megaChat.karere.joinChat
                 ).to.have.been.calledOnce;
 
 
                 expect(
-                    megaChat.karere.leaveChat.getCall(0).args[0]
+                    megaChat.karere.joinChat.getCall(0).args[0]
                 ).to.equal(roomJid);
 
                 expect(eventTriggerShouldReturnFalse2).to.not.be.ok;
@@ -274,10 +248,15 @@ describe("Chat.js - Karere UI integration", function() {
     });
 
     it("1on1 chat invitation accept, sync messages and order them correctly when adding to the dom", function(done) {
-        var roomJid = "roomjid@conference.example.com";
-
         var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
         // fake user join
         var users = {};
@@ -314,6 +293,7 @@ describe("Chat.js - Karere UI integration", function() {
         expect(
             megaChat.karere.joinChat
         ).to.have.been.called;
+
 
         expect(
             megaChat.karere.joinChat.getCall(0).args[0]
@@ -463,11 +443,11 @@ describe("Chat.js - Karere UI integration", function() {
 
         expect(
             $('.fm-chat-header').data("roomJid")
-        ).to.eql(roomJid);
+        ).to.eql(roomJid.split("@")[0]);
 
         expect(
             $('.fm-chat-header').data("roomJid")
-        ).to.eql(roomJid);
+        ).to.eql(roomJid.split("@")[0]);
 
         expect(
             $('.messages-icon').is(":hidden")
@@ -475,7 +455,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         expect(
             $('#treea_' + Object.keys(M.u)[1]).data("roomJid")
-        ).to.eql(roomJid);
+        ).to.eql(roomJid.split("@")[0]);
 
         done();
     });
@@ -569,11 +549,13 @@ describe("Chat.js - Karere UI integration", function() {
         ).not.to.be.ok;
 
         // Test auto invitation
+        var jids = [
+            megaChat.karere.getBareJid(),
+            Strophe.getBareJidFromJid(user2jid)
+        ];
+
         var $promise = megaChat.openChat(
-            [
-                megaChat.karere.getBareJid(),
-                Strophe.getBareJidFromJid(user2jid)
-            ],
+            jids,
             "private"
         );
 
@@ -589,7 +571,7 @@ describe("Chat.js - Karere UI integration", function() {
         expectToBeResolved($promise, 'cant open chat')
             .done(function() {
 
-                var roomJid = "roomjid@conference.example.com";
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
                 expect(
                     megaChat.karere.addUserToChat
                 ).to.have.been.calledOnce;

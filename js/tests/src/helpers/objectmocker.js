@@ -21,7 +21,13 @@ var ObjectMocker = function(objectInstance, methods) {
 
 
     self._recurseObject(objectInstance, self.methods, function(obj, k, v) {
-        sinon.stub(obj, k, v);
+        if(typeof(obj[k]) != "function") {
+            var oldVal = obj[k];
+            obj[k] = v;
+            obj[k].oldVal = oldVal;
+        } else {
+            sinon.stub(obj, k, v);
+        }
     });
 
 
@@ -55,7 +61,11 @@ ObjectMocker.prototype.restore = function() {
     var self = this;
 
     self._recurseObject(self.objectInstance, self.methods, function(obj, k, v) {
-        obj[k].restore();
+        if(typeof(obj[k]) == "function") {
+            obj[k].restore();
+        } else {
+            obj[k] = obj[k].oldVal;
+        }
     });
 };
 

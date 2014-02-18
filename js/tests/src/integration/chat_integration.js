@@ -195,7 +195,7 @@ describe("Integration Test - Basic Connect/Disconnect", function() {
                         expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[0][1].currentUsers).length).to.equal(0);
                         expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[0][1].newUsers).length).to.equal(1);
 
-                        expect(em1.mocks['onUsersJoined'].triggeredArgs[1][1].newUsers[k2.getJid()]).to.equal("participant");
+                        expect(em1.mocks['onUsersJoined'].triggeredArgs[1][1].newUsers[k2.getJid()]).to.equal("moderator");
                         expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[1][1].currentUsers).length).to.equal(1);
                         expect(Object.keys(em1.mocks['onUsersJoined'].triggeredArgs[1][1].newUsers).length).to.equal(1);
 
@@ -457,7 +457,7 @@ describe("Integration Test - Rooms", function() {
 
                         expect(
                             k1.getUsersInChat(roomJid)[k2.getJid()]
-                        ).to.equal("participant");
+                        ).to.equal("moderator");
 
                         done();
                     });
@@ -491,7 +491,7 @@ describe("Integration Test - Rooms", function() {
 
                         expect(
                             k1.getUsersInChat(roomJid)[k2.getJid()]
-                        ).to.equal("participant");
+                        ).to.equal("moderator");
 
                         done();
                     });

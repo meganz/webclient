@@ -66,23 +66,22 @@ var Karere = function(user_options) {
         /**
          * Default config when creating rooms
          */
-
         "roomConfig": {
             "muc#roomconfig_roomdesc": "",
             "muc#roomconfig_persistentroom": 0,
             "muc#roomconfig_publicroom": 0,
             "public_list": 0,
-            "muc#roomconfig_passwordprotectedroom": 1,
+            "muc#roomconfig_passwordprotectedroom": 0,
             "muc#roomconfig_maxusers": 200,
             "muc#roomconfig_whois": "anyone",
-            "muc#roomconfig_membersonly": 0,
+            "muc#roomconfig_membersonly": 1,
             "muc#roomconfig_moderatedroom": 1,
             "members_by_default": 1,
             "muc#roomconfig_changesubject": 0,
             "allow_private_messages": 0,
             "allow_private_messages_from_visitors": "anyone",
             "allow_query_users": 0,
-            "muc#roomconfig_allowinvites": 0,
+            "muc#roomconfig_allowinvites": 1,
             "muc#roomconfig_allowvisitorstatus": 1,
             "muc#roomconfig_allowvisitornickchange": 0,
             "muc#roomconfig_allowvoicerequests": 1,
@@ -114,7 +113,12 @@ var Karere = function(user_options) {
          * When a method which requires connection is called, Karere would try to connect and execute that method.
          * However, what is the timeout that should be used to determinate if the connect operation had timed out?
          */
-        connectionRequiredTimeout: 3500
+        connectionRequiredTimeout: 3500,
+
+        /**
+         * The default affiliation set when adding new users in membersOnly rooms.
+         */
+        newUsersAffiliation: "owner"
     };
     self.options = $.extend(true, {}, defaults, user_options);
 
@@ -1306,7 +1310,7 @@ makeMetaAware(Karere);
      * @param [roomName] {String} optionally, you can set your own room name
      * @returns {Deferred}
      */
-    Karere.prototype.startChat = function(jidList, type, roomName) {
+    Karere.prototype.startChat = function(jidList, type, roomName, password) {
         var self = this;
 
         type = type || "private";
@@ -1315,7 +1319,14 @@ makeMetaAware(Karere);
         var $promise = new $.Deferred();
 
 
-        var roomPassword = self._generateNewRoomPassword();
+        var roomPassword;
+        if(password === false) {
+            roomPassword = "";
+        } else if(password !== undefined) {
+            roomPassword = password;
+        } else {
+            roomPassword = self._generateNewRoomPassword();
+        }
         var roomJid = roomName + "@" + self.options.mucDomain;
 
         self.setMeta("rooms", roomJid, 'password', roomPassword);
@@ -1536,6 +1547,37 @@ makeMetaAware(Karere);
 
 //        self.connection.muc.directInvite(roomJid, userJid, undefined, password);
 
+        if(self.options.roomConfig["muc#roomconfig_membersonly"] == 1) {
+            // grant membership
+    //        <iq from='crone1@shakespeare.lit/desktop'
+    //        id='member1'
+    //        to='coven@chat.shakespeare.lit'
+    //        type='set'>
+    //            <query xmlns='http://jabber.org/protocol/muc#admin'>
+    //                <item affiliation='member'
+    //                jid='hag66@shakespeare.lit'
+    //                nick='thirdwitch'/>
+    //            </query>
+    //        </iq>
+
+            var $grantMembershipIQ = $iq({
+                from: self.getJid(),
+                id: self.connection.getUniqueId(),
+                to: roomJid,
+                type: "set"
+            })
+                .c("query", {
+                    'xmlns': 'http://jabber.org/protocol/muc#admin'
+                })
+                    .c("item", {
+                        affiliation: self.options.newUsersAffiliation,
+                        jid: Strophe.getBareJidFromJid(userJid)
+                    });
+
+
+            self.connection.send($grantMembershipIQ);
+        }
+
         // construct directInvite (fork of muc.directInvite, so that we can add extra type arguments)
         var attrs, invitation, msgid;
         msgid = self.connection.getUniqueId();
@@ -1624,6 +1666,25 @@ makeMetaAware(Karere);
                 .fail(function() {
                     $promise.reject();
                 });
+
+            if(self.options.roomConfig["muc#roomconfig_membersonly"] == 1) {
+                var $grantMembershipIQ = $iq({
+                    from: self.getJid(),
+                    id: self.connection.getUniqueId(),
+                    to: roomJid,
+                    type: "set"
+                })
+                    .c("query", {
+                        'xmlns': 'http://jabber.org/protocol/muc#admin'
+                    })
+                    .c("item", {
+                        affiliation: "member",
+                        jid: Strophe.getBareJidFromJid(userJid)
+                    });
+
+
+                self.connection.send($grantMembershipIQ);
+            }
 
             self.connection.muc.kick(
                 roomJid,

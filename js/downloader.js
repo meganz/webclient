@@ -8,40 +8,55 @@ if (d) {
 }
 
 function getXhrObject(s) {
-	var dl_xhr = new XMLHttpRequest;
-	if (dl_xhr.overrideMimeType) {
-		dl_xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	var xhr = new XMLHttpRequest;
+	if (xhr.overrideMimeType) {
+		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
 	if (d) {
-		_allxhr.push(dl_xhr);
+		_allxhr.push(xhr);
 	}
 
 	// timeout {{{
 	var ts = null;
-	dl_xhr.timeout = s || 40000;
-	dl_xhr.ontimeout = function() {
+	xhr.timeout = s || 40000;
+	xhr.ontimeout = function() {
 		DEBUG("xhr failed by timeout");
-		dl_xhr.abort();
+		xhr.abort();
 	};
 
 	function timeout() {
 		clearTimeout(ts);
 		ts = setTimeout(function() {
-			dl_xhr.ontimeout();
-		}, dl_xhr.timeout*1.5);
+			xhr.ontimeout();
+		}, xhr.timeout*1.5);
 	}
 	// }}}
 
-	dl_xhr.onprogress = function() {
+	// default callbacks {{{
+	xhr.progress = function() {
+	};
+
+	xhr.changestate = function() {
+	};
+
+	xhr.ready = function() {
+	};
+	// }}}
+
+	xhr.onprogress = function() {
 		timeout();
-		return dl_xhr.progress.apply(dl_xhr, arguments);
+		return xhr.progress.apply(xhr, arguments);
 	}
 
-	dl_xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function() {
 		clearTimeout(ts);
-		return dl_xhr.ready.apply(dl_xhr, arguments);
+		xhr.changestate.apply(xhr, arguments);
+		if (this.readyState == this.DONE) {
+			return xhr.ready.apply(xhr, arguments);
+		}
 	};
-	return dl_xhr;
+
+	return xhr;
 }
 
 // Chunk fetch {{{
@@ -158,48 +173,46 @@ function ClassChunk(task) {
 			// on ready {{{
 			xhr.ready = function() {
 				if (isCancelled()) return;
-				if (this.readyState == this.DONE) {
-					var r = this.response || {};
-	
-					if (r.byteLength == size) {
-						Progress.progress += r.byteLength - prevProgress;
-						iRealDownloads--;
-						updateProgress(true);
+				var r = this.response || {};
 
-						if (have_ab) {
-							if (navigator.appName != 'Opera') {
-								io.dl_bytesreceived += r.byteLength;
-							}
-							dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-						} else {
-							io.dl_bytesreceived += this.response.length;
-							dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
+				if (r.byteLength == size) {
+					Progress.progress += r.byteLength - prevProgress;
+					iRealDownloads--;
+					updateProgress(true);
+
+					if (have_ab) {
+						if (navigator.appName != 'Opera') {
+							io.dl_bytesreceived += r.byteLength;
 						}
-						if (failed) DownloadManager.release(self);
-						failed = false
-					} else if (!download.cancelled) {
-						// we must reschedule this download	
-						Progress.progress -= prevProgress; /* this never happened */
-						DEBUG(this.status, r.bytesLength, size);
-						DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
-	
-						// tell the scheduler that we failed
-						if (done) {
-							// We already told the scheduler we were done
-							// with no erro and this happened. Should I reschedule this 
-							// task?
-							return setTimeout(function() {
-								failed = true
-								DownloadManager.pause(self);
-								request();
-							}, backoff *= 1.2);
-						}
-						return Scheduler.done(false, this.status);
+						dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+					} else {
+						io.dl_bytesreceived += this.response.length;
+						dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
 					}
+					if (failed) DownloadManager.release(self);
+					failed = false
+				} else if (!download.cancelled) {
+					// we must reschedule this download	
+					Progress.progress -= prevProgress; /* this never happened */
+					DEBUG(this.status, r.bytesLength, size);
+					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
 
-					if (!done) Scheduler.done();
-					else if (!failed) download.decrypt--;
+					// tell the scheduler that we failed
+					if (done) {
+						// We already told the scheduler we were done
+						// with no erro and this happened. Should I reschedule this 
+						// task?
+						return setTimeout(function() {
+							failed = true
+							DownloadManager.pause(self);
+							request();
+						}, backoff *= 1.2);
+					}
+					return Scheduler.done(false, this.status);
 				}
+
+				if (!done) Scheduler.done();
+				else if (!failed) download.decrypt--;
 			}
 			// }}}
 

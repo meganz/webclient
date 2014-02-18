@@ -20,13 +20,14 @@ function getXhrObject(s) {
 	var ts = null;
 	dl_xhr.timeout = s || 40000;
 	dl_xhr.ontimeout = function() {
+		DEBUG("xhr failed by timeout");
 		dl_xhr.abort();
 	};
 
 	function timeout() {
 		clearTimeout(ts);
 		ts = setTimeout(function() {
-			dl_xhr.abort();
+			dl_xhr.ontimeout();
 		}, dl_xhr.timeout*1.5);
 	}
 	// }}}

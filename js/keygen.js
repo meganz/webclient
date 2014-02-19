@@ -5,48 +5,47 @@
  * GPL for details.
  *  -- Latest version found at http://sourceforge.net/projects/shop-js
  */
- 
- 
 
 var Sr, Rsl, Rbits, Rbits2;
 var Rx=0, Ry=0;
 var cbuf;
 
-if (typeof window.crypto == 'object' && typeof window.crypto.getRandomValues == 'function')
-{
-	cbuf = new Uint32Array(new ArrayBuffer(4));
-}
+if (typeof window.crypto == 'object' && typeof window.crypto.getRandomValues == 'function') cbuf = new Uint32Array(1);
 
 // random number between 0 .. n -- based on repeated calls to rc
 function rand(n)
 {
- if(n==2)
- {
-  if(!Rbits)
-  {
-   Rbits=8;
-   Rbits2=rc4Next(randomByte());
-  }
-  Rbits--;
-  var r=Rbits2 & 1;
-  Rbits2>>=1;
-  return r;
- }
+	if (cbuf) window.crypto.getRandomValues(cbuf);
 
- var m=1;
+	if (n == 2)
+	{
+		if (!Rbits)
+		{
+			Rbits = 8;
+			Rbits2 = rc4Next(randomByte()) ^ cbuf[0];
+		}
 
- r = 0;
- while (n>m && m > 0)
- {
-  m<<=8; r=(r<<8) | rc4Next(randomByte());
- }
- if (cbuf)
- {
-	window.crypto.getRandomValues(cbuf);
-	r ^= cbuf[0];
- }
- if(r<0) r ^= 0x80000000;
- return r % n;
+		Rbits--;
+		var r = Rbits2 & 1;
+		Rbits2 >>= 1;
+		return r;
+	}
+
+	var m = 1;
+
+	r = 0;
+
+	while (n > m && m > 0)
+	{
+		m <<= 8;
+		r = (r << 8) | rc4Next(randomByte());
+	}
+
+	if (cbuf) r ^= cbuf[0];
+
+	if (r < 0) r += 0x100000000;
+
+	return r % n;
 }
 
 // ------------------------------------------------------------

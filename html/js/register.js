@@ -48,11 +48,12 @@ function doregister()
 		else document.getElementById('overlay').style.display='';
 		
 		if (localStorage.signupcode)
-		{		
+		{	
+			u_storage = localStorage;
 			var ctx = 
-			{
+			{				
 				checkloginresult: function(u_ctx,r)
-				{			
+				{
 					if (m) loadingDialog.hide();
 					else document.getElementById('overlay').style.display='none';					
 					if ((typeof r[0] == 'number') && (r[0] < 0))					
@@ -72,6 +73,7 @@ function doregister()
 		}
 		else if (u_type === false) 
 		{
+			u_storage = localStorage;
 			var u_ctx = 
 			{
 				checkloginresult: function(u_ctx,r)
@@ -90,15 +92,11 @@ function registeraccount()
 {
 	var ctx = 
 	{
-		callback: function(res,ctx)
+		callback : function(res)
 		{
 			loadingDialog.hide();
-			if (typeof res == 'undefined') 
+			if (res == 0)
 			{
-				alert(l[215]);												
-			}			
-			else if (res[0] == 0)
-			{			
 				if (m)
 				{
 					done_text1 = l[216];
@@ -122,12 +120,12 @@ function registeraccount()
 					ops.name2 = base64urlencode(to8($('#register-firstname') + ' ' + $('#register-lastname').val()));
 					u_attr.terms=1;
 				}				
-				api_req([ops]);
+				api_req(ops);
 			}
 			else
 			{		
-				if (res[0] == EACCESS) alert(l[218]);				
-				else if (res[0] == EEXIST) 
+				if (res == EACCESS) alert(l[218]);				
+				else if (res == EEXIST) 
 				{
 					if (m) alert(l[219]);
 					else
@@ -258,6 +256,7 @@ function pageregister()
 			if (localStorage.signupcode)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				var ctx = 
 				{
 					checkloginresult: function(u_ctx,r)
@@ -279,6 +278,7 @@ function pageregister()
 			else if (u_type === false)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				u_checklogin(
 				{
 					checkloginresult: function(u_ctx,r)
@@ -294,10 +294,6 @@ function pageregister()
 }
 
 
-
-
-
-
 function init_register()
 {
 	
@@ -305,11 +301,14 @@ function init_register()
 	{
 		$('.main-top-info-block').removeClass('hidden');
 		$('.main-top-info-text').text(register_txt);
-		register_txt=false;	
+		register_txt=false;		
 	}
 	
-	if (localStorage.registeremail) $('#register-email').val(localStorage.registeremail);	
-	
+	if (localStorage.registeremail)
+	{
+		$('#register-email').val(localStorage.registeremail);
+		if (localStorage.signupcode) $('#register-email').attr('readonly',true);
+	}	
 
 	$('#register-firstname').unbind('focus');
 	$('#register-firstname').bind('focus',function(e)

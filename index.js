@@ -29,10 +29,6 @@ var login_next=false;
 var loggedout=false;
 
 
-
-
-
-
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 
@@ -81,7 +77,17 @@ function scrollMenu()
 
 
 function init_page()
-{	
+{		
+	if (window.stopBaboom) 
+	{
+		window.stopBaboom();
+		window.stopBaboom=undefined;	
+	}
+	
+	$('body').removeClass('adv');
+
+	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
+
 	if ($.startscroll) delete $.startscroll;
 	if ($.dlscroll) delete $.dlscroll
 	if ($.infoscroll) delete $.infoscroll;
@@ -120,13 +126,20 @@ function init_page()
 		var ar = page.substr(2,page.length-1).split('!');		
 		if (ar[0]) pfid  = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 		if (ar[1]) pfkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g,"");		
-		n_h = pfid;	
+		n_h = pfid;
+		api_setfolder(n_h);
+		if (waitxhr) waitsc();
 		u_n = pfid;
 		page = 'fm';	
 	}
 	else
 	{
 		n_h = false;
+		if (u_sid)
+		{
+			api_setsid(u_sid);
+			if (waitxhr) waitsc();
+		}
 		u_n = false;
 		pfkey = false;
 		pfid  = false;			
@@ -157,23 +170,23 @@ function init_page()
 	{
 		loadingDialog.show();
 		var vouchercode = page.substr(7,page.length-7);
-		api_req([{a:'uavq',v:vouchercode}],{
-		callback: function(json)
+		api_req({a:'uavq',v:vouchercode},{
+		callback: function(res)
 		{
-			if (typeof json[0] == 'number')
+			if (typeof res == 'number')
 			{
 				document.location.hash = '';
 				return false;
 			}
-			else if (json[0] && !json[0][3])
+			else if (res && !res[3])
 			{
 				msgDialog('warninga','Invalid URL','Did you already activate your Pro membership? Please log in to your account.',false,function()
-				{					
+				{
 					document.location.hash = 'login';
 				});
 				return false;
 			}
-			else if (json[0][0] == 'vGuzSLMU7WA') slingshotDialog();			
+			else if (res[0] == 'vGuzSLMU7WA') slingshotDialog();
 			localStorage.voucher = page.replace("voucher","");
 			if (!u_type) 
 			{
@@ -195,11 +208,11 @@ function init_page()
 	
 	if (localStorage.voucher && u_type !== false)
 	{
-		api_req([{a: 'uavr',v: localStorage.voucher}],
-		{ 
-			callback : function (json,params)
+		api_req({a: 'uavr',v: localStorage.voucher},
+		{
+			callback : function(res)
 			{
-				if (!(typeof json[0] == 'number' && json[0] < 0)) balance2pro();				
+				if (typeof res != 'number' || res >= 0) balance2pro();				
 			}
 		});
 		delete localStorage.voucher;
@@ -208,7 +221,7 @@ function init_page()
 	if (page.substr(0,10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));	
-		if (!blogsearch) document.location.hash = '#blog';
+		if (!blogsearch) document.location.hash = 'blog';
 		page = 'blog';
 	}
 	else if (page.substr(0,4) == 'blog' && page.length > 4 && page.length < 10)
@@ -221,20 +234,17 @@ function init_page()
 		blogmonth = page.substr(5,page.length-2);	
 		page = 'blog';			
 	}
-	
-	
-	
-	
+
 	if (page.substr(0,6) == 'signup')
 	{
 		var signupcode = page.substr(6,page.length-1);
 		loadingDialog.show();
-		api_req([{ a: 'uv',c: signupcode}],
+		api_req({ a: 'uv',c: signupcode},
 		{ 
-		  callback : function (json,params)
+		  callback : function(res)
 		  {
 			loadingDialog.hide();
-			if (typeof json[0] == 'number' && json[0] < 0)
+			if (typeof res == 'number' && res < 0)
 			{
 				if (localStorage.signupcode)
 				{
@@ -244,12 +254,22 @@ function init_page()
 				else msgDialog('warningb',l[135],l[1290]);				
 				document.location.hash = 'start';
 			}
-			else
+			else if(u_type === false)			
 			{	
-				localStorage.signupcode = signupcode;			
-				localStorage.registeremail = json[0];
+				localStorage.signupcode = signupcode;
+				localStorage.registeremail = res;
 				document.location.hash = 'register';
 				if (!register_txt) register_txt = l[1289];							
+			}
+			else
+			{
+				var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';				
+				if (l[1824]) confirmtxt = l[1824];
+				msgDialog('confirmation',l[968],confirmtxt,'',function(e)
+				{
+					if (e) mLogout();	
+					else document.location.hash = '';			
+				});
 			}
 		  }
 		});			
@@ -292,7 +312,8 @@ function init_page()
 				init_login();
 				$('#login-name2').val(email);
 				$('.register-st2-button').addClass('active');
-				topmenuUI();								
+				$('#login-name2').attr('readonly', true);
+				topmenuUI();
 			},
 			signupcodebad: function(res)
 			{
@@ -397,7 +418,8 @@ function init_page()
 			}
 			else html += e.outerHTML;
 			a++;
-		});
+		});		
+		$('#emailp').html($('#emailp').text().replace('jobs@mega.co.nz','<a href="mailto:jobs@mega.co.nz">jobs@mega.co.nz</a>'));		
 		$('.new-bottom-pages.about').html(html + '<div class="clear"></div>');
 		mainScroll();
 	}
@@ -469,7 +491,25 @@ function init_page()
 	}
 	else if (page == 'sync')
 	{
-		parsepage(pages['sync']);		
+		parsepage(pages['sync']);
+		
+		$('.st-apps-icon.mobile').unbind('click');
+		$('.st-apps-icon.mobile').bind('click', function ()
+		{
+			document.location.hash = 'mobile';
+		});
+		
+		$('.st-apps-icon.browser').unbind('click');
+		$('.st-apps-icon.browser').bind('click', function ()
+		{
+			document.location.hash = 'plugin';
+		});
+		
+		$('.sync-help-center').unbind('click');
+		$('.sync-help-center').bind('click',function(e)
+		{
+			document.location.hash = 'help/sync';
+		});
 	}
 	else if (page == 'mobile')
 	{
@@ -496,7 +536,7 @@ function init_page()
 	{
 		if (loggedout)
 		{
-			document.location.hash = '#start';
+			document.location.hash = 'start';
 			return false;
 		}
 		login_txt = l[376];
@@ -510,11 +550,6 @@ function init_page()
 	}
 	else if (page == 'done')
 	{
-		if (!done_text1)
-		{
-			done_text1 = 'Test123';
-			done_text2 = 'Test1234';
-		}		
 		parsepage(pages['done']);
 		init_done();
 	}
@@ -592,7 +627,7 @@ function init_page()
 	{
 		if (loggedout)
 		{
-			document.location.hash = '#start';
+			document.location.hash = 'start';
 			return false;
 		}
 		login_next = page;
@@ -760,7 +795,7 @@ function mLogout()
 					if (downloading) 
 					{
 						dl_cancel();
-						dl_queue=[];
+						dl_queue= new DownloadQueue;
 					}
 					if (ul_uploading)
 					{
@@ -857,8 +892,7 @@ function topmenuUI()
 			{
 				$('.top-warning-popup').removeClass('active');
 				document.location.hash = 'register';
-			});
-			
+			});			
 		}
 		$('.top-menu-item.upgrade-your-account').show();
 		$('.top-menu-item.upgrade-your-account').text(l[129]);
@@ -1158,7 +1192,7 @@ function topmenuUI()
 	{
 		if (e.keyCode == 13 && ($('.top-search-input').val().length > 2 || !asciionly($('.top-search-input').val())))
 		{
-			document.location.hash = '#fm/search/' + $('.top-search-input').val();
+			document.location.hash = 'fm/search/' + $('.top-search-input').val();
 		}
     });
 	
@@ -1201,7 +1235,10 @@ function topmenuUI()
 	}
 	
 	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+90+'px');
-	initNotifications();		
+	initNotifications();
+
+	clearit(0);
+	clearit(1);	
 }
 
 
@@ -1244,6 +1281,7 @@ function parsepage(pagehtml,pp)
 	$('.nw-bottom-block').addClass(lang);
 	UIkeyevents();	
 }
+
 
 
 function parsetopmenu()
@@ -1324,17 +1362,23 @@ function languageDialog(close)
 		$.dialog=false;
 		return false;
 	}
-	var html = '<div class="nlanguage-txt-block">';	
-	var i=1,total=0,a=0,sel='';
-	for (var la in languages) total++;
-	for (var la in languages)
-	{			
+	var html = '<div class="nlanguage-txt-block">';
+	var larray = [];
+	for (var la in languages) if (ln2[la]) larray.push({l:ln[la],l2:ln2[la],c:la});	
+	larray.sort(function(a,b)
+	{
+		return a.l.localeCompare(b.l);
+	});	
+	var i=1,a=0,sel='';
+	for (var j in larray)
+	{
+		var la = larray[j].c;		
 		if (ln2[la])
-		{	
+		{
 			if (la == lang) sel = ' selected';
 			else sel='';
 			html += '<a href="#" id="nlanguagelnk_'+la+'" class="nlanguage-lnk'+sel+'"><span class="nlanguage-tooltip"> <span class="nlanguage-tooltip-bg"> <span class="nlanguage-tooltip-main"> '+ ln2[la] + '</span></span></span>'+ ln[la] + '</a><div class="clear"></div>';		
-			if (i == Math.round(total/4) && a+1 < total)
+			if (i == Math.ceil(larray.length/4) && a+1 < larray.length)
 			{
 				html +='</div><div class="nlanguage-txt-block">';
 				i=0;		
@@ -1381,6 +1425,8 @@ function languageDialog(close)
 window.onbeforeunload = function ()
 {
 	if (downloading || ul_uploading) return l[377];
+	
+	if (mDB && mDBact && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
 }
 
 

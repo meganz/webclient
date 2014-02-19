@@ -131,6 +131,7 @@ function start_upload()
 
 function start_anoupload()
 {
+	u_storage = localStorage;
 	loadingDialog.show();
 	u_checklogin(
 	{

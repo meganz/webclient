@@ -9,6 +9,7 @@
   
   <div class="context-menu files-menu hidden">
 	<a class="context-menu-item open-item">[$865]</a>
+	<a class="context-menu-item preview-item">[$1899]</a>
 	<a class="context-menu-item download-item">[$58]</a>
     <a class="context-menu-item download-standart-item">Standard download</a>
 	<a class="context-menu-item zipdownload-item">[$864]</a>
@@ -109,7 +110,47 @@
   </div>
 
   <div class="fm-right-files-block">
+  
        <div class="fm-right-header hidden">
+	      <div class="top-context-menu hidden">
+             <div class="top-context-border">
+             <div class="top-context-close"></div>
+             <div class="top-icons-block">
+				 <a class="context-menu-item preview-item">[$1899]</a>
+                 <div class="context-menu-divider preview short"></div>
+				 
+                 <a class="context-menu-item open-item">[$865]</a>
+                 <div class="context-menu-divider open short"></div>		 
+                 <a class="context-menu-item properties-item">[$892]</a>
+                 <div class="context-menu-divider properties short"></div>
+				 <a class="context-menu-item download-item dropdown">
+                   <span>[$58]...</span>
+                 </a>				 
+				 <div class="context-menu-divider download short"></div>				 
+				 <a class="context-menu-item sharing-item">[$60]</a>				 
+                 <div class="context-menu-divider sharing short"></div>				 
+                 <a class="context-menu-item getlink-item">[$59]</a>                 
+				 <div class="context-menu-divider getlink short"></div>				 
+                 <a class="context-menu-item send-to-contact-item">Send by mail</a>                 
+				 <div class="context-menu-divider send-to-contact short"></div>				 
+                 <a class="context-menu-item move-item dropdown">[$62]</a>                 
+				 <div class="context-menu-divider move short"></div>				 
+                 <a class="context-menu-item copy-item">[$63]</a>				 
+				 <div class="context-menu-divider copy short"></div>				 
+				 <a class="context-menu-item remove-item">[$83]</a>                 
+				 <div class="context-menu-divider short remove"></div>				 
+				 <a class="context-menu-item add-star-item">[$975]</a> 
+				 <div class="context-menu-divider short add-star"></div>				 
+				 <a class="context-menu-item rename-item">[$61]</a>
+				 <div class="context-menu-divider short rename"></div>				 
+                 <a class="context-menu-item more-item dropdown">
+                   <span>[$1817]</span>
+                 </a>
+                 <div class="clear"></div>
+              </div>
+             </div>
+         </div>
+		
          <a class="fm-back-button"></a>
          <div class="fm-breadcrumbs-block">
          </div>
@@ -347,7 +388,7 @@
                <div class="fm-chat-avatar-block"> 
                     <div class="fm-chat-top-verified"></div>
                     <div class="fm-chat-avatar">
-                         <img alt="" src="images/mega/default-avatar.png" />
+                         <img alt="" src="{staticpath}images/mega/default-avatar.png" />
                     </div>
                </div>
                <div class="fm-chat-user-info star">
@@ -386,8 +427,126 @@
                        <div class="clear"></div>
              </div>
            
+             <!-- notification block !-->
+             <div class="fm-chat-messages-block hidden"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verification-head">
+                   Waiting verification
+                 </div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="fm-chat-file-button verify-button">Verify Contact</div>
+                 <div class="fm-chat-file-button skip-button">Skip</div>  
+              </div>
+             </div>
+             <!-- end !-->
+             
+             <!-- Verification skipped block !-->
+             <div class="fm-chat-messages-block hidden"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verification-skipped">
+                   Verification skipped
+                 </div>
+              </div>
+             </div>
+             <!-- end !-->
+             
+              <!-- verified block !-->
+             <div class="fm-chat-messages-block hidden"> 
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-verified-head">
+                   You successfully verified <span class="user">George Smith</span>. You can now communicate and collaborate securely with this contact.
+                 </div>
+              </div>
+             </div>
+             <!-- end !-->
+           
+           
+             <!-- block with messages from one user !-->
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 bk@mega.co.nz
+              </div>
+              
+              <!-- messages from one user !-->
+              <div class="fm-chat-messages-pad">
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+                 
+                 <!-- one message !-->
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                 </div>
+                 <div class="clear"></div>
+                 <!--end !-->
+              </div>
+              <div class="clear"></div>
+              <!-- end of messages from one user !-->
+             </div>
+             <!-- end of block with messages from one user !-->
+             
+             <div class="fm-chat-messages-block">
+              <div class="fm-chat-username current-name">
+                 ad@mega.co.nz
+              </div>
+              <div class="fm-chat-messages-pad">
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                 </div>
+                 <div class="clear"></div>
+                 
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    <a href="">http://www.lorem-ipsum.com </a>
+                 </div>
+                 <div class="clear"></div>
 
              
+             <div class="fm-chat-messages-block">
+              
+              <!-- please add "current-name" classname !-->
+              <div class="fm-chat-username">
+                 bk@mega.co.nz
+              </div>
+              
+              <div class="fm-chat-messages-pad">
+              
+                 <div class="fm-chat-message-time">2:00 PM</div>
+                 <div class="fm-chat-message">
+                    Is sharing a document with you:
+                 </div>
+                 <div class="clear"></div>
+                  
+                 <div class="block-view-file-type generic" style="float:left;margin: 8px -2px 6px -3px;"></div>
+                 <div class="fm-chat-filename">
+                     FileName.doc
+                 </div>
+                 <div class="fm-chat-filesize">
+                     750 kb
+                 </div>
+                 <div class="fm-chat-button-pad">
+                   <div class="fm-chat-file-button save-button hidden">Save...</div> 
+                 </div> 
+                 
+                 <!-- unhide this icon if file is saved !-->                    
+                 <div class="fm-chat-view-icon"></div>
+                 <div class="clear"></div>
 
              <div class="fm-chat-typing-txt typing hidden">
                  <span>George Smith</span> is typing...
@@ -657,7 +816,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
              
              <div class="fm-account-info-block">
                <div class="membership-big-txt balance">
-                 &euro; 99.99
+                 &euro; 0.00
                </div>
                <div class="membershtip-medium-txt red-bg topup">[$450]</div>
               

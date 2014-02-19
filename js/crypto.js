@@ -70,12 +70,10 @@ function benchmark()
 	console.log((a.length*16/1024)/(t/1000) + " KB/s");
 }
 
-
 // compute final MAC from block MACs
 function condenseMacs(macs,key)
 {
-	var i, aes;
-	mac = [0,0,0,0];
+	var i, aes, mac = [0,0,0,0];
 
 	aes = new sjcl.cipher.aes([key[0],key[1],key[2],key[3]]);
 
@@ -751,179 +749,305 @@ function getxhr()
 // All commands are executed in sequence, with no overlap
 // @@@ user warning after backoff > 1000
 
-var apiq = new Array;
-var apiqtimer = false;
-var apixhr;
+// FIXME: proper OOP!
+var apixs = [];
 
-function api_req(req,params)
+api_reset();
+
+function api_reset()
 {
-	apiq.push([typeof req == 'string' ? req : to8(JSON.stringify(req)),params,seqno++,0]);
-
-	if (apiq.length == 1) api_proc();
+	api_init(0,'cs');	// main API interface
+	api_init(1,'cs');	// exported folder access
+	api_init(2,'sc');	// SC queries
+	api_init(3,'sc');	// notification queries
 }
 
-// execute first pending event
-function api_proc()
+function api_setsid(sid)
 {
-	if (apiqtimer)
-	{
-		// delete timer (should not ever happen)
-		clearTimeout(apiqtimer);
-		apiqtimer = false;
-	}
+	if (sid !== false) sid = 'sid=' + sid;
+	else sid = '';
 
-	if (apixhr && apixhr.readyState && apixhr.readyState != apixhr.DONE)
-	{
-		// wait for apixhr to get ready
-		if (d) console.log("XHR not in DONE state: " + apixhr.readyState);
-		apiqtimer = setTimeout(api_proc,1000);
-		return;
-	}
+	apixs[0].sid = sid;
+	apixs[2].sid = sid;
+	apixs[3].sid = sid;
+}
 
-	// no more commands pending?
-	if (!apiq.length) return;
+function api_setfolder(h)
+{
+	h = 'n=' + h;
 	
-	// request ready for (re)execution: execute
-	apixhr = getxhr();
+	if (u_sid) h += '&sid=' + u_sid;
 
-	apixhr.onerror = function()
+	apixs[1].sid = h;
+	apixs[1].failhandler = folderreqerr;
+	apixs[2].sid = h;
+}
+
+function api_init(c,service)
+{
+	var q = apixs[c];
+
+	if (q)
 	{
-		if (d) console.log("API request error - retrying");
-		api_result(-3);
+		q.cancelled = true;
+		if (q.xhr) q.xhr.abort();
+		if (q.timer) clearTimeout(q.timer);
 	}
 
-	apixhr.onload = function()
-	{		
-		var t;
-		
-		if (this.responseText) this.response = this.responseText;
+	apixs[c] = { c : c,				// channel
+				cmds : [[],[]],		// queued/executing commands (double-buffered)
+				ctxs : [[],[]],		// associated command contexts
+				i : 0,				// currently executing buffer
+				seqno : -Math.floor(Math.random()*0x100000000),	// unique request start ID
+				xhr : false,		// channel XMLHttpRequest
+				timer : false,		// timer for exponential backoff
+				failhandler : api_reqfailed,	// request-level error handler
+				backoff : 0,
+				service : service,	// base URI component
+				sid : '',			// sid URI component (optional)
+				rawreq : false,
+				setimmediate : false };
+}
 
-		if (d) console.log('API response: ' + this.response);
-		
-		try {
-			t = JSON.parse(from8(this.response));
-		} catch (e) {
-			// bogus response, requeue
-			console.log("Bad JSON data in response: " + this.response);
-			t = -3;
+function api_req(req,ctx,c)
+{
+	if (typeof c == 'undefined') c = 0;
+	if (typeof ctx == 'undefined') ctx = { };
+
+	var q = apixs[c];
+
+	q.cmds[q.i^1].push(req);
+	q.ctxs[q.i^1].push(ctx);
+
+	if (!q.setimmediate) q.setimmediate = setTimeout(api_proc,0,q);
+}
+
+// send pending API request on channel q
+function api_proc(q)
+{
+	if (q.setimmediate)
+	{
+		clearTimeout(q.setimmediate);
+		q.setimmediate = false;
+	}
+
+	if (q.ctxs[q.i].length || !q.ctxs[q.i^1].length) return;
+
+	q.i ^= 1;
+	
+	if (!q.xhr) q.xhr = getxhr();
+
+	q.xhr.q = q;
+
+	q.xhr.onerror = function()
+	{
+		if (!this.q.cancelled)
+		{
+			if (d) console.log("API request error - retrying");
+			api_reqerror(q,-3);
 		}
-
-		api_result(t);
 	}
 
-	if (d) console.log("Making API request: " + apiq[0][0]);
+	q.xhr.onload = function()
+	{
+		if (!this.q.cancelled)
+		{
+			var t;
+
+			if (this.status == 200)
+			{
+				var response = this.responseText || this.response;
+
+				if (d) console.log('API response: ' + this.response);
+				
+				try {
+					t = JSON.parse(response);
+					if (response[0] == '{') t = [t];
+				} catch (e) {
+					// bogus response, try again
+					console.log("Bad JSON data in response: " + response);
+					t = EAGAIN;
+				}
+			}
+			else
+			{
+				if (d) console.log('API server connection failed (error ' + this.status + ')');
+				t = ERATELIMIT;
+			}
+
+			if (typeof t == 'object')
+			{
+				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i]);
+
+				this.q.rawreq = false;	
+				this.q.backoff = 0;			// request succeeded - reset backoff timer
+				this.q.cmds[this.q.i] = [];
+				this.q.ctxs[this.q.i] = [];
+				
+				api_proc(q);
+			}
+			else api_reqerror(this.q,t);
+		}
+	}
+
+	if (q.rawreq === false)
+	{
+		q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid;
+
+		if (typeof q.cmds[q.i][0] == 'string')
+		{
+			q.url += '&' + q.cmds[q.i][0];
+			q.rawreq = '';
+		}
+		else q.rawreq = JSON.stringify(q.cmds[q.i]);
+	}
 	
-	var n_h_api = false;	
-	if ((apiq[0][0].indexOf('"a":"f"') > -1 || apiq[0][0].indexOf('"a":"ufa"') > -1 || apiq[0][0].indexOf('"a":"g"') > -1 || apiq[0][0].indexOf('sc?sn') > -1) && n_h) n_h_api = n_h;
+	api_send(q);
+}
 
-	var url = (apiq[0][0].substr(0,4) == 'https') ? apiq[0][0] : (apipath + (apiq[0][0].substr(0,1) == '[' ? ('cs?id=' + apiq[0][2]) : apiq[0][0]) + (n_h_api ? '&n=' + n_h_api : (u_sid ? ('&sid=' + u_sid) : '')));
-
+function api_send(q)
+{
 	if (chromehack)
 	{
 		// plug extreme Chrome memory leak
-		var t = url.indexOf('/',9);
-		apixhr.open('POST', url.substr(0,t+1), true);
-		apixhr.setRequestHeader("MEGA-Chrome-Antileak",url.substr(t));
+		var t = q.url.indexOf('/',9);
+		q.xhr.open('POST', q.url.substr(0,t+1), true);
+		q.xhr.setRequestHeader("MEGA-Chrome-Antileak",q.url.substr(t));
 	}
-	else 
-	{		
-		apixhr.open('POST', url, true);	
-	}
+	else q.xhr.open('POST',q.url,true);	
 
-	apixhr.send(apiq[0][0]);
+	if (d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
+
+	q.xhr.send(q.rawreq);
 }
 
-function api_result(res)
+function api_reqerror(q,e)
 {
-	if (res === -3)
+	if (e == EAGAIN || e == ERATELIMIT)
 	{
-		// exponential backoff
-		if (apiq[0][3]) apiq[0][3] *= 2;
-		else apiq[0][3] = 125;
-		
-		if (d) console.log('Temporary error (' + res + ') - retrying after: ' + (apiq[0][3]/1000));
+		// request failed - retry with exponential backoff
+		if (q.backoff) q.backoff *= 2;
+		else q.backoff = 125;
 
-		apiqtimer = setTimeout(api_proc,apiq[0][3]);
+		q.timer = setTimeout(api_send,q.backoff,q);
 	}
-	else
+	else q.failhandler(q.c,e);
+}
+
+function api_reqfailed(c,e)
+{
+	if (e == ESID)
 	{
-		if (apiq[0][1]) apiq[0][1].callback(res,apiq[0][1]);
-		apiq.shift();
-		api_proc();
+		u_logout(true);
+		document.location.hash = 'login';
+	}
+	else if (c == 2 && e == ETOOMANY)
+	{
+		if (mDB) mDBreload();
+		else loadfm();
 	}
 }
+
+var waiturl;
+var waitxhr;
+var waitbackoff = 125;
+var waittimeout;
+var waitbegin;
+var waitid = 0;
 
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-	ctx = 
-	{		
+	api_req('sn=' + maxaction + '&ssl=1',{		
+		fm : fm,
 		callback : function(res,ctx)
-		{		
-			if (res == ESID)
+		{
+			if (typeof res == 'object')
 			{
-				u_logout();
-				document.location.hash = 'login';
-				return false;
+				if (res.w)
+				{
+					waiturl = res.w;
+					waittimeout = setTimeout(waitsc,waitbackoff);
+				}
+				else
+				{
+					if (res.sn) maxaction = res.sn;				
+					execsc(res.a);
+					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
+				}
+
+				if (ctx.fm)
+				{
+					mDBloaded=true;
+					renderfm();
+					pollnotifications();
+				}
 			}
-			else if (typeof res == 'number' && mDB)
-			{
-				mDBreload();
-				return false;
-			}			
-			else if (res.w)
-			{				
-				waiturl = res.w;
-				if (waitbackoff > 1000) setTimeout(waitsc,waitbackoff);
-				else waitsc();
-			}
-			else
-			{
-				if (res.sn) maxaction = res.sn;				
-				execsc(res.a);
-				if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid) localStorage[u_handle + '_maxaction'] = maxaction;
-			}
-			if (ctx.fm)
-			{
-				mDBloaded=true;
-				renderfm();
-				pollnotifications();
-			}
-		},
-		fm: fm
-	};
-	api_req('sc?sn=' + maxaction + '&ssl=1',ctx);
+		}
+	},2);
 }
 
-var waiturl;
-var waitxhr = false;
-var waitbackoff = 125;
-var waitbegin;
-var waitid = 0;
+function completewait(recheck)
+{
+	if (this.waitid != waitid) return;
+
+	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
+	{
+		waitxhr.abort();
+		waitxhr = false;
+	}
+	
+	if (waittimeout)
+	{
+		clearTimeout(waittimeout);
+		waittimeout = false;
+	}
+
+	var t = new Date().getTime()-waitbegin;
+
+	if (t < 1000)
+	{
+		waitbackoff += waitbackoff;
+		if (waitbackoff > 256000) waitbackoff = 256000;
+	}
+	else waitbackoff = 250;
+
+	getsc();
+}
 
 function waitsc()
 {
 	var newid = ++waitid;
 
-	if (waitxhr && waitxhr.readyState != apixhr.DONE) waitxhr.abort();
+	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
+	{
+		waitxhr.abort();
+		waitxhr = false;
+	}
 
-	waitxhr = getxhr();
+	if (!waitxhr) waitxhr = getxhr();
 	waitxhr.waitid = newid;
+
+	if (waittimeout) clearTimeout(waittimeout);
+	waittimeout = setTimeout(waitsc,300000);
 
 	waitxhr.onerror = function()
 	{
-		if (d) console.log("Error while waiting - retrying, backoff: " + waitbackoff);
-		if (this.waitid == waitid) getsc();
-	}
+		clearTimeout(waittimeout);
+		waittimeout = false;
 
+		waitbackoff += waitbackoff;
+		if (waitbackoff > 1024000) waitbackoff = 1024000;
+		waittimeout = setTimeout(waitsc,waitbackoff);
+	}
+	
 	waitxhr.onload = function()
 	{
-		var t = new Date().getTime()-waitbegin;
-		if (t < 1000) waitbackoff += waitbackoff;
-		else waitbackoff = 125;
-		if (this.waitid == waitid) getsc();
+		clearTimeout(waittimeout);
+		waittimeout = false;
+		completewait();
 	}
-
+	
 	waitbegin = new Date().getTime();
 	waitxhr.open('POST',waiturl,true);
 	waitxhr.send();
@@ -970,12 +1094,12 @@ function api_createuser(ctx,invitecode,invitename,uh)
 	//if (confirmcode) req.c = confirmcode;
 	if (d) console.log("Storing key: " + req.k);
 
-	api_req([req],ctx);
+	api_req(req,ctx);
 }
 
 function api_checkconfirmcode(ctx,c)
 {
-	res = api_req([{ a : 'uc', c : c }],ctx);
+	res = api_req({ a : 'uc', c : c },ctx);
 }
 
 // We query the sid using the supplied user handle (or entered email address, if already attached)
@@ -987,11 +1111,11 @@ function api_getsid(ctx,user,passwordkey,hash)
 	ctx.callback = api_getsid2;
 	ctx.passwordkey = passwordkey;
 	
-	api_req([{ a : 'us', user : user, uh : hash }],ctx);
+	api_req({ a : 'us', user : user, uh : hash },ctx);
 }
 
 function api_getsid2(res,ctx)
-{	
+{
 	var t, k;
 	var r = false;
 
@@ -1000,9 +1124,9 @@ function api_getsid2(res,ctx)
 		var aes = new sjcl.cipher.aes(ctx.passwordkey);
 		
 		// decrypt master key
-		if (typeof res[0].k == 'string')
+		if (typeof res.k == 'string')
 		{
-			k = base64_to_a32(res[0].k);
+			k = base64_to_a32(res.k);
 
 			if (k.length == 4)
 			{
@@ -1010,16 +1134,16 @@ function api_getsid2(res,ctx)
 
 				aes = new sjcl.cipher.aes(k);
 				
-				if (typeof res[0].tsid == 'string')
+				if (typeof res.tsid == 'string')
 				{
-					t = base64urldecode(res[0].tsid);
-					if (a32_to_str(encrypt_key(aes,str_to_a32(t.substr(0,16)))) == t.substr(-16)) r = [k,res[0].tsid];
+					t = base64urldecode(res.tsid);
+					if (a32_to_str(encrypt_key(aes,str_to_a32(t.substr(0,16)))) == t.substr(-16)) r = [k,res.tsid];
 				}
-				else if (typeof res[0].csid == 'string')
+				else if (typeof res.csid == 'string')
 				{
-					var t = mpi2b(base64urldecode(res[0].csid));
+					var t = mpi2b(base64urldecode(res.csid));
 
-					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res[0].privk)));
+					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res.privk)));
 
 					var rsa_privk = Array(4);
 					
@@ -1043,8 +1167,6 @@ function api_getsid2(res,ctx)
 			}
 		}
 	}
-	
-
 
 	ctx.result(ctx,r);
 }
@@ -1053,7 +1175,7 @@ function api_getsid2(res,ctx)
 // Returns user credentials (.k being the decrypted master key) or false in case of an error.
 function api_getuser(ctx)
 {
-	api_req([{ a : 'ug' }],ctx);
+	api_req({ a : 'ug' },ctx);
 }
 
 // User must be logged in, sid and passwordkey must be valid
@@ -1096,7 +1218,7 @@ function api_changepw(ctx,passwordkey,masterkey,oldpw,newpw,email)
 
 	if (email.length) req.email = email;
 
-	api_req([req],ctx);
+	api_req(req,ctx);
 }
 
 function stringhash(s,aes)
@@ -1117,65 +1239,43 @@ function api_updateuser(ctx,newuser)
 {
 	newuser.a = 'up';
 	
-	res = api_req([newuser],ctx);
+	res = api_req(newuser,ctx);
 }
 
 var u_pubkeys = {};
 
-// Query missing keys for the given users
+// query missing keys for the given users
 function api_cachepubkeys(ctx,users)
 {
-	ctx.users = [];
-	req = [];
-	
-	for (var i = users.length; i--; )
-	{
-		if (!u_pubkeys[users[i]])
-		{
-			ctx.users.push(users[i]);
-			req.push({ a : 'uk', u : users[i] });
-		}
-	}
+	var u = [];
+	var i;
 
-	if (req.length)
+	for (i = users.length; i--; ) if (users[i] != 'EXP' && !u_pubkeys[users[i]]) u.push(users[i]);
+
+	if (ctx.remaining = u.length)
 	{
-		ctx.callback = api_cachepubkeys2;
-		api_req(req,ctx);
+		for (i = u.length; i--; )
+		{
+			api_req({ a : 'uk', u : u[i] },{
+				ctx : ctx,
+				u : u[i],
+				callback : api_cachepubkeys2
+			});
+		}
 	}
 	else ctx.cachepubkeyscomplete(ctx);
 }
 
 function api_cachepubkeys2(res,ctx)
 {
-	var spubkey, keylen, pubkey;
-	
-	for (var i = res.length; i--; )
+	if (typeof res == 'object')
 	{
-		if (res[i].pubk)
-		{
-			spubkey = base64urldecode(res[i].pubk);
-			keylen = spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1);
-			pubkey = Array(3);
-
-			// decompose public key
-			for (var j = 0; j < 2; j++)
-			{
-				var l = ((spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1)+7)>>3)+2;
-
-				pubkey[j] = mpi2b(spubkey.substr(0,l));
-				if (typeof pubkey[j] == 'number') break;
-				spubkey = spubkey.substr(l);
-			}
-			
-			// check format
-			if (j == 2 && spubkey.length < 16)
-			{
-				pubkey[2] = keylen;
-				u_pubkeys[ctx.users[i]] = pubkey;
-			}
-		}
+		var spubkey, keylen, pubkey;
+		
+		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(res.pubk);
 	}
-	if (ctx.cachepubkeyscomplete) ctx.cachepubkeyscomplete(ctx);
+
+	if (!--ctx.ctx.remaining) ctx.ctx.cachepubkeyscomplete(ctx.ctx);
 }
 
 function encryptto(user,data)
@@ -1207,112 +1307,96 @@ var u_nodekeys = {};
 // everything to it. In case of a mismatch, the API call returns
 // an error, and the whole operation gets repeated (exceedingly
 // rare race condition).
-function api_setshare1(node,targets,sharenodes,ctx)
+function api_setshare(node,targets,sharenodes,ctx)
+{
+	// cache all targets' public keys
+	var u = [];
+
+	for (var i = targets.length; i--; ) u.push(targets[i].u);
+
+	api_cachepubkeys({
+		node : node,
+		targets : targets,
+		sharenodes : sharenodes,
+		ctx : ctx,
+		cachepubkeyscomplete : api_setshare1
+	},u);
+}
+
+function api_setshare1(ctx)
 {
 	var i, j, n, nk, sharekey, ssharekey;
 	var req, res;
 	var newkey = false;
 
 	req = { a : 's',
-			n : node,
-			s : []
-		};
+			n : ctx.node,
+			s : ctx.targets,
+			i : requesti };
 
-	ctx.sharenodes = sharenodes;
-	ctx.targets = targets;
-	
-	// we only need to generate a key if one or more shares are added
-	for (i = targets.length; i--; )
+	for (i = req.s.length; i--; )
 	{
-		if (typeof targets[i].r == 'undefined')
+		if (typeof req.s[i].r != 'undefined')
 		{
-			// share cancellation
-			req.s.push({ u : targets[i].u });
-		}
-		else
-		{	
 			if (!req.ok)
 			{			
-				if (u_sharekeys[node]) sharekey = u_sharekeys[node];
+				if (u_sharekeys[ctx.node]) sharekey = u_sharekeys[ctx.node];
 				else
 				{
-				
-					sharekey = Array(4);
-					for (j = 4; j--; ) sharekey[j] = rand(0x100000000);
-					u_sharekeys[node] = sharekey;
+					// we only need to generate a key if one or more shares are being added to a previously unshared node
+					sharekey = [];
+					for (j = 4; j--; ) sharekey.push(rand(0x100000000));
+					u_sharekeys[ctx.node] = sharekey;
 					newkey = true;
 				}
 
 				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
-				req.ha = crypto_handleauth(node);
+				req.ha = crypto_handleauth(ctx.node);
 				ssharekey = a32_to_str(sharekey);
 			}
 		}
 	}
-	
 
-	u_sharekeys[node] = sharekey;
+	if (newkey) req.cr = crypto_makecr(ctx.sharenodes,[ctx.node],true);
 
-	if (newkey) req.cr = crypto_makecr(sharenodes,[node],true);
-
-	ctx.tried = -1;
+	ctx.maxretry = 4;
 	ctx.ssharekey = ssharekey;
+
+	// encrypt ssharekey to known users
+	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[req.s[i].u],ssharekey));
+	
 	ctx.req = req;
-	ctx.i = 0;
-	ctx.node = node;
-	ctx.targets = targets;
-	ctx.sharenodes = sharenodes;
 
 	ctx.callback = function(res,ctx)
 	{
-		var pubkey;
-		var i;
+		var i, n;
 
-		if (typeof res == 'object' && typeof res[0] == 'object')
-		{
-			if (typeof res[0].pubk == 'string') u_pubkeys[ctx.targets[ctx.i].u] = crypto_decodepubkey(res[0].pubk);
-			else if (res[0].ok)
-			{
-				u_sharekeys[node] = decrypt_key(u_k_aes,base64_to_a32(res[0].ok));
-				return api_setshare(ctx.node,ctx.targets,ctx.sharenodes,ctx);
-			}
-		}
+		if (!ctx.maxretry) return;
 		
-		if (ctx.i == ctx.targets.length) ctx.done(ctx);
-		else if (!(pubkey = u_pubkeys[ctx.targets[ctx.i].u]) && ctx.tried < ctx.i)
+		ctx.maxretry--;
+		
+		if (typeof res == 'object')
 		{
-			ctx.tried = ctx.i;
-			
-			// no public key cached for this user: get it!
-			api_req([{ a : 'uk', u : ctx.targets[ctx.i].u }],ctx);
-		}
-		else
-		{
-			n = false;
-			
-			if (pubkey)
+			if (res.ok)
 			{
+				// sharekey clash: set & try again
+				ctx.req.ok = res.ok;
+				u_sharekeys[ctx.node] = decrypt_key(u_k_aes,base64_to_a32(res.ok));
+				ctx.req.ha = crypto_handleauth(ctx.node);
 				
-			
-				// pubkey found: encrypt share key to it
-				n = crypto_rsaencrypt(pubkey,ctx.ssharekey);
-			}
+				var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
 
-			if (n) ctx.req.s.push({ u : ctx.targets[ctx.i].u, r : ctx.targets[ctx.i].r, k : base64urlencode(n) });
-			else ctx.req.s.push({ u : ctx.targets[ctx.i].u, r : ctx.targets[ctx.i].r });
-			
-			ctx.i++;
-			
-			ctx.callback(false,ctx);
+				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[ctx.req.s[i].u],ssharekey));
+
+				return api_req(ctx.req,ctx);
+			}
+			else return ctx.ctx.done(res,ctx.ctx);
 		}
+
+		api_req(ctx.req,ctx);
 	}
 	
-	ctx.callback(false,ctx);
-}
-
-function api_setshare2(res,node)
-{
-	if (res[0].ok) u_sharekeys[node] = decrypt_key(u_k_aes,base64_to_a32(res[0].ok));
+	api_req(ctx.req,ctx);
 }
 
 function api_setrsa(privk,pubk)
@@ -1323,8 +1407,7 @@ function api_setrsa(privk,pubk)
 	
 	for (i = (-t.length)&15; i--; ) t = t + String.fromCharCode(rand(256));
 
-	ctx = { callback : function(res,ctx)
-		{
+	ctx = { callback : function(res,ctx) {
 			if (d) console.log("RSA key put result=" + res);
 			
 			u_privk = ctx.privk;
@@ -1336,7 +1419,7 @@ function api_setrsa(privk,pubk)
 		privk : privk
 	};
 		
-	api_req([{ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(t))), pubk : base64urlencode(b2mpi(pubk[0])+b2mpi(pubk[1])) }],ctx);
+	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(t))), pubk : base64urlencode(b2mpi(pubk[0])+b2mpi(pubk[1])) },ctx);
 }
 
 function crypto_handleauth(h)
@@ -1373,61 +1456,8 @@ function crypto_decodepubkey(pubk)
 	return false;
 }
 
-u_contactkeys = {};
-
-// generate and set missing contact keys
-// (contact keys can only be generated contacts with a full account)
-function api_contactkeys(ctx,users)
-{
-	ctx.users = users;
-	
-	var missingpubk = [];
-
-	ctx.cachepubkeyscomplete = api_contactkeys2;
-	
-	// step 1: fetch missing RSA keys
-	for (var i = users.length; i--; ) if (!u_contactkeys[users[i]] && !u_pubkeys[users[i]]) missing.push(users[i]);
-
-	if (!users.length) api_contactkeys2(false,ctx);
-	else api_cachepubkeys(ctx,missingpubk)
-}
-
-function api_contactkeys2(res,ctx)		
-{
-	var newkey;
-	var j;
-	var req = [];
-
-	for (var i = ctx.users.length; i--; )
-	{
-		if (!u_contactkeys[ctx.users[i]] && u_pubkeys[ctx.users[i]])
-		{
-			newkey = Array(4);
-
-			// generate contact key and attempt to set it
-			// if a race condition occurs (because another terminal or the peer did so already),
-			// store the concurrently generated key.
-			for (j = 4; j--; ) newkey[j] = rand(0x100000000);
-
-			ck = encrypt_key(u_k_aes,newkey);
-			ack = encryptto(ctx.users[i],a32_to_str(newkey));
-
-			req.push({a : 'ck', u : ctx.users[i], ck : ck, ack : ack});
-		}
-	}
-
-	if (req.length)
-	{
-		ctx.callback = ctx.contactkeysset;
-		api_req(req,ctx);
-	}
-	else ctx.contactkeysset(false,ctx);
-}
-
 function crypto_rsaencrypt(pubkey,data)
 {
-	
-
 	var i;
 	
 	// random padding
@@ -1455,13 +1485,12 @@ function crypto_rsadecrypt(ciphertext,privk)
 function api_completeupload(t,uq,k,ctx)
 {
 	// Close nsIFile Stream
-	if(is_chrome_firefox && uq._close) uq._close();
+	if (is_chrome_firefox && uq._close) uq._close();
 	
 	if (uq.repair) uq.target = M.RubbishID;
 	
-	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : api_getfa(uq.faid), ctx : ctx },uq);
+	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : uq.faid ? api_getfa(uq.faid) : false, ctx : ctx },uq);
 }
-
 
 function api_completeupload2(ctx,uq)
 {
@@ -1490,11 +1519,17 @@ function api_completeupload2(ctx,uq)
 		if (d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);		
 		if (d) console.log(ea);
+		
+		if (!ut) ut = M.RootID;
+		
 		var req = { a : 'p',
 			t : ut,
-			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k)), fa : ctx.fa}],
+			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k))}],
 			i : requesti
 		};
+
+		if (ctx.fa) req.n[0].fa = ctx.fa;
+
 		if (ut)
 		{
 			// a target has been supplied: encrypt to all relevant shares
@@ -1506,7 +1541,8 @@ function api_completeupload2(ctx,uq)
 				req.cr[1][0] = ctx.t;
 			}
 		}
-		api_req([req],ctx.ctx);
+
+		api_req(req,ctx.ctx);
 	}
 }
 
@@ -1529,6 +1565,7 @@ function is_devnull(email)
 
 function is_image(name)
 {
+	if (!name) return false;
 	var p;
 	
 	if ((p = name.lastIndexOf('.')) >= 0)
@@ -1546,7 +1583,7 @@ var faxhrs = [];
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id,type,key,data,ctx)
-{	
+{
 	if (!ctx)
 	{
 		if (!storedattr[id]) storedattr[id] = {};
@@ -1556,18 +1593,18 @@ function api_storefileattr(id,type,key,data,ctx)
 		var ctx = { callback : api_fareq, id : id, type : type, data : data };
 	}
 
-	api_req([{a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl}],ctx);
+	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
 }
 
 function api_fareq(res,ctx)
 {
-	if (typeof res == 'object' && res[0].p)
+	if (typeof res == 'object' && res.p)
 	{
 		var data;			
 		var slot, i, t;
-		var p, pp = [res[0].p], m;
+		var p, pp = [res.p], m;
 
-		for (i = 0; p = res[0]['p'+i]; i++) pp.push(p);
+		for (i = 0; p = res['p'+i]; i++) pp.push(p);
 
 		if (ctx.p && pp.length > 1) dd = ctx.p.length/pp.length;
 		
@@ -1636,7 +1673,7 @@ function api_fareq(res,ctx)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" +ctx.type);
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);						
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -1708,23 +1745,23 @@ function api_getfa(id)
 {
 	var f = [];
 
-	if (storedattr[id]) for (type in storedattr[id]) if (type != 'target') f.push(type + '*' + storedattr[id][type]);
+	if (storedattr[id]) for (var type in storedattr[id]) if (type != 'target') f.push(type + '*' + storedattr[id][type]);
 
 	storedattr[id] = {};
 
-	return f.join('/');
+	return f.length ? f.join('/') : false;
 }
 
 function api_attachfileattr(node,id)
 {
 	var fa = api_getfa(id);
 	
-	storedattr[id].target = node;
-	
-	if (fa) api_req([{a : 'pfa', n : node, fa : fa}]);
+	storedattr[id].target = node;	
+
+	if (fa) api_req({a : 'pfa', n : node, fa : fa});
 }
 
-function api_getfileattr(fa,type,procfa)
+function api_getfileattr(fa,type,procfa,errfa)
 {
 	var r, n, t;
 
@@ -1739,7 +1776,6 @@ function api_getfileattr(fa,type,procfa)
 		if (r = re.exec(fa[n].fa))
 		{
 			t = base64urldecode(r[2]);
-
 			if (t.length == 8)
 			{
 				if (!h[t])
@@ -1752,12 +1788,13 @@ function api_getfileattr(fa,type,procfa)
 				else p[r[1]] += t;
 			}
 		}
+		else if (errfa) errfa(n);		
 	}
 
 	for (n in p)
 	{
 		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa };
-		api_req([{a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl}],ctx);
+		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl},ctx);
 	}
 }
 
@@ -1809,7 +1846,7 @@ function crypto_procsr(sr)
 			{
 				if (ctx.sr[ctx.i].length == 11 && !(pubkey = u_pubkeys[ctx.sr[ctx.i]]))
 				{
-					api_req([{ a : 'uk', u : ctx.sr[ctx.i] }],ctx);
+					api_req({ a : 'uk', u : ctx.sr[ctx.i] },ctx);
 					return;
 				}
 
@@ -1839,7 +1876,7 @@ function crypto_procsr(sr)
 				else sh = ctx.sr[i];
 			}
 
-			if (rsr.length) api_req([{ a : 'k', sr : rsr }]);
+			if (rsr.length) api_req({ a : 'k', sr : rsr });
 		}
 	}
 	
@@ -1990,7 +2027,7 @@ function crypto_sendrsa2aes()
 	
 	for (n in rsa2aes) nk.push(n,base64urlencode(rsa2aes[n]));
 		
-	if (nk.length) api_req([{ a : 'k', nk : nk }]);
+	if (nk.length) api_req({ a : 'k', nk : nk });
 
 	rsa2aes = {};
 }
@@ -2038,7 +2075,7 @@ function crypto_reqmissingkeys()
 		}
 	}
 
-	if (!cr[1].length /*&& !missingsharekeys.length*/)
+	if (!cr[1].length)
 	{
 		if (d) console.log('No missing keys');
 		return;
@@ -2055,7 +2092,7 @@ function crypto_reqmissingkeys()
 			if (typeof res == 'object' && typeof res[0] == 'object') crypto_proccr(res[0]);
 		}
 
-		res = api_req([{ a : 'k', cr : cr }],ctx);
+		res = api_req({ a : 'k', cr : cr },ctx);
 	}
 	else if (d) console.log("Keys " + cr[1] + " missing, but no related shares found.");
 }
@@ -2107,7 +2144,7 @@ function crypto_procmcr(mcr)
 		}
 	}
 
-	if (cr[0].length) api_req([{ a : 'k', cr : cr }]);
+	if (cr[0].length) api_req({ a : 'k', cr : cr });
 }
 
 var rsasharekeys = {};
@@ -2139,7 +2176,7 @@ function crypto_share_rsa2aes()
 
 	if (rsr.length)
 	{
-		api_req([{ a : 'k', sr : rsr }]);
+		api_req({ a : 'k', sr : rsr });
 		rsasharekeys = {};
 	}
 }
@@ -2205,10 +2242,17 @@ function crypto_share_rsa2aes()
 
 	scope.fingerprint = function(uq_entry,callback)
 	{
+		if (!(uq_entry && uq_entry.name))
+		{
+			if (d) console.log('CHECK THIS', 'Unable to generate fingerprint');
+			if (d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+			
+			throw new Error('Invalid upload entry for fingerprint');
+		}
+		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+
 		var fr = new FileReader();
 		var size = uq_entry.size;
-
-		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
 
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)
@@ -2285,7 +2329,6 @@ function crypto_share_rsa2aes()
 					{
 						var block = e.target.result;
 
-						// console.log(toHexString(block));
 						crc = crc32(block,crc,BLOCK_SIZE);
 
 						next(++j);

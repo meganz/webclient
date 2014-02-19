@@ -115,11 +115,10 @@ function init_cn()
 			});
 			var cn_works_json = JSON.stringify([cn_post_urls,cn_post_works]);			
 			loadingDialog.show();
-			api_req([{ a : 'cn' , infr_type: $('.select.content select').val(), takedown_type: $('.select.type select').val(), works: cn_works_json, owner: $('input.copyrightowner').val(), jobtitle: $('input.jobtitle').val(), email: $('input.email').val(), fax: $('input.fax').val(), city: $('input.city').val(), postalcode: $('input.zip').val(), name: $('input.agent').val(), company: $('input.company').val(), phone: $('input.phone').val(), address: $('input.address').val(), province: $('input.province').val(), country: $('.select.country select').val()}],
+			api_req({ a : 'cn' , infr_type: $('.select.content select').val(), takedown_type: $('.select.type select').val(), works: cn_works_json, owner: $('input.copyrightowner').val(), jobtitle: $('input.jobtitle').val(), email: $('input.email').val(), fax: $('input.fax').val(), city: $('input.city').val(), postalcode: $('input.zip').val(), name: $('input.agent').val(), company: $('input.company').val(), phone: $('input.phone').val(), address: $('input.address').val(), province: $('input.province').val(), country: $('.select.country select').val()},
 			{ 
-				callback : function (json,params) 
+				callback : function () 
 				{ 	
-					console.log(json);
 					loadingDialog.hide();					
 					msgDialog('info',l[1287],l[1288],false,function(e)
 					{

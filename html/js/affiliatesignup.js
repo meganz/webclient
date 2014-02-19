@@ -124,7 +124,7 @@ function aff_signup()
 	loadingDialog.show();
 	u_attr.aff_payment = aff_payment;
 	
-	api_req([{a:'up',
+	api_req({a:'up',
 	'aff' 				: base64urlencode('1'),
 	'aff_birthday' 		: base64urlencode($('#aff_day').val()),
 	'aff_birthmonth'	: base64urlencode($('#aff_month').val()),
@@ -144,16 +144,16 @@ function aff_signup()
 	'aff_bankname' 		: base64urlencode($('#aff_bankname').val()),
 	'aff_benificiary' 	: base64urlencode($('#aff_benificiary').val()),
 	'aff_info' 			: base64urlencode($('#aff_info').val())
-	}],
+	},
 	{ 
-	  callback : function (json,params)
+	  callback : function ()
 	  {	
-		api_req([{a:'afc'}],
+		api_req({a:'afc'},
 		{
-			callback : function (json,params)
+			callback : function (res)
 			{	
 				loadingDialog.hide();
-				if (json.r)
+				if (res.r)
 				{
 					u_attr.aff=1;
 					u_attr.aff_paypal = $('#aff_paypal').val();

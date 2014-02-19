@@ -69,14 +69,14 @@ function init_affiliatemember()
 	
 	loadingDialog.show();
 	
-	api_req([{a:'afg'}],
+	api_req({a:'afg'},
 	{
-		callback : function (json,params)
+		callback : function (res)
 		{	
-			if (json.r)
+			if (res.r)
 			{
 				var pid;
-				for (var p in json.r) pid=p;				
+				for (var p in res.r) pid = p;
 				$('#aff_id').html('Partner ID: ' + htmlentities(pid));
 				$('#aff_url').html('https://mega.co.nz/#pro/' + htmlentities(pid));
 				$('#aff_url').attr('href','https://mega.co.nz/#pro/' + htmlentities(pid));				
@@ -123,15 +123,15 @@ function aff_updatepayment()
 		return false;	
 	}
 	loadingDialog.show();
-	api_req([{a:'up',	
+	api_req({a:'up',	
 	'aff_payment' 		: base64urlencode(u_attr.aff_payment),
 	'aff_paypal' 		: base64urlencode($('#aff_paypal').val()),
 	'aff_bankaccount' 	: base64urlencode($('#aff_bankaccount').val()),
 	'aff_bankname' 		: base64urlencode($('#aff_bankname').val()),
 	'aff_benificiary' 	: base64urlencode($('#aff_benificiary').val())
-	}],
+	},
 	{ 
-	  callback : function (json,params)
+	  callback : function ()
 	  {	
 		loadingDialog.hide();
 	  }

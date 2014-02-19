@@ -1,3 +1,12 @@
+function inherits(ctor, superCtor) {
+	ctor.super_ = superCtor
+	var TempCtor = function () {
+		ctor.super_.prototype.constructor.apply(this, arguments)
+	}
+	TempCtor.prototype = superCtor.prototype
+	ctor.prototype = new TempCtor()
+	ctor.prototype.constructor = ctor
+}
 
 
 function asciionly(text)
@@ -7,6 +16,11 @@ function asciionly(text)
 	else return true;
 }
 
+function Later(callback) {
+	setTimeout(function() {
+		callback();
+	}, 1000);
+}
 
 function jScrollFade(id)
 {
@@ -185,9 +199,7 @@ function populate_l()
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
-	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');	
 }
 
 
@@ -260,16 +272,17 @@ function browserdetails(useragent)
 	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';	
 	else if (useragent.toLowerCase().indexOf('mac') > 0) os = 'Apple';
 	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'Linux';
+	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.toLowerCase().indexOf('blackberry') > 0) os = 'Blackberry';
 	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';	
 	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';	
 	else if (useragent.toLowerCase().indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';	
 	else if (useragent.toLowerCase().indexOf('msie') > 0) browser = 'Internet Explorer';
+	else if (useragent.toLowerCase().indexOf('megasync') > 0) browser = 'MEGAsync';
 	if ((os) && (browser))
 	{
-		name = browser + ' on ' + os;
-		
+		name = browser + ' on ' + os;		
 		if (browser == 'Internet Explorer') icon = 'ie.png';
 		else icon = browser.toLowerCase() + '.png';
 	}
@@ -808,4 +821,51 @@ function addZeroIfLenLessThen(val, len) {
         }
     }
     return val;
+}}
+
+function NOW() {
+	return (new Date()).getTime();
 }
+
+/**
+ *	Global function to help debugging
+ */
+function DEBUG() {
+	if (arguments.length == 2 && typeof arguments[0] == "object"
+		  && typeof arguments[0][arguments[1]] == "function") {
+		  
+		var self = arguments[0]
+			, method = arguments[1]
+			, fnc    = self[method]
+
+		self[method] = function() {
+			var args = Array.prototype.slice.call(arguments);
+			if (d) console.warn.apply(console, [method, args]);
+			return fnc.apply(self, arguments);
+		};
+		return;
+	}
+	if (d) {
+		console.log.apply(console, arguments)
+		if (!is_chrome_firefox) {
+			console.error.apply(console, arguments)
+		}
+	}
+}
+
+/**
+ *	Return a default callback for error handlign
+ */
+function dlError(text) {
+	return function(e) {
+		console.log(text + ' ' + e);
+		alert(text + ' ' + e);
+	};
+}
+
+/**
+ *	Remove an element from an *array*
+ */
+function removeValue(array, value) {
+	array.splice($.inArray(value, array), 1);
+};

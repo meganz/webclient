@@ -9,7 +9,7 @@ function pollnotifications()
 	{
 		notifications = [];		
 		if (M.currentdirid == 'notifications') loadingDialog.show();		
-		api_req('sc?c=100',
+		api_req('c=100',
 		{
 			callback: function (json,params)
 			{
@@ -17,34 +17,33 @@ function pollnotifications()
 				{
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
 					notifications = [];	
-					var nread=false;
+					var nread=true;
 					for (var i in json.c)
 					{
-					if (json.la == i) nread=true;		
-					notifications.push({
-						id: 		makeid(10),
-						type: 		json.c[i].t,
-						timestamp:  (new Date().getTime()/1000)-json.c[i].td,
-						user:		json.c[i].u,
-						folderid: 	json.c[i].n,
-						nodes:		json.c[i].f,
-						read:		nread,
-						popup:		true,
-						count:		nread,
-						rendered:	true
-					});
+						if (json.la == i) nread=false;
+						notifications.push({
+							id: 		makeid(10),
+							type: 		json.c[i].t,
+							timestamp:  (new Date().getTime()/1000)-json.c[i].td,
+							user:		json.c[i].u,
+							folderid: 	json.c[i].n,
+							nodes:		json.c[i].f,
+							read:		nread,
+							popup:		true,
+							count:		nread,
+							rendered:	true
+						});
 					}
 					var c = $('.notification-popup').attr('class');
 					donotify();
 					$('.cloud-popup-icon').show();
 				}
 			}
-		 });		
+		 },3);	
 	}
 }
 
 var lastnotification=0;
-
 
 function notifycounter()
 {
@@ -259,7 +258,7 @@ function popup(id,html)
 }
 
 function hide_notipop(id)
-{	
+{
 	if ((id) && ($('#popup_' + id).css('opacity') == 1))
 	{
 		$('#popup_' + id).css('opacity',1).show().animate({opacity:0});	
@@ -283,7 +282,6 @@ function remove_notipop()
 	});	
 }
 
-
 function notifymarkcount(nread)
 {	
 	var a=0;
@@ -300,10 +298,9 @@ function notifymarkcount(nread)
 	if (nread && $.maxnotification !== maxaction && a > 0)
 	{
 		$.maxnotification=maxaction;
-		api_req([{a:'sla',i: requesti}]);	
+		api_req({a:'sla',i:requesti});
 	}
 }
-
 
 function render_notifications()
 {
@@ -400,8 +397,8 @@ function donotifypopup(id,html)
 			hide_notipop(id);			
 		}
 		console.log('click');		
-	});	
-	setTimeout(hide_notipop,30000,id);
+	});
+	setTimeout(hide_notipop,5000,id);
 }
 
 function initNotifications()

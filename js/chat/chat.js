@@ -1030,7 +1030,7 @@ MegaChat.prototype.generatePrivateRoomName = function(jids) {
     newJids.sort();
     var roomName = "prv";
     $.each(newJids, function(k, jid) {
-        roomName = roomName + "_" + simpleStringHashCode(jid.split("@")[0]);
+        roomName = roomName + "_" + fastHashFunction(jid.split("@")[0]);
     });
 
     return roomName;

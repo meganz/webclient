@@ -11,6 +11,7 @@ module.exports = function(config) {
             "../jquery-min-1.8.1.js",
     
              "../functions.js",
+             "../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
 

@@ -636,8 +636,18 @@ function generateEventSuffixFromArguments(eventName, name) {
         result += v;
     });
 
-    return eventName + "." + name + "_" + ("" + simpleStringHashCode(result)).replace("-", "_");
+    return eventName + "." + name + "_" + ("" + fastHashFunction(result)).replace("-", "_");
 };
+
+/**
+ * This is a placeholder, which will be used anywhere in our code where we need a simple and FAST hash function.
+ * Later on, we can change the implementation (to use md5 or murmur) by just changing the function body of this
+ * function.
+ * @param {String}
+ */
+function fastHashFunction(val) {
+    return asmCrypto.SHA256.hex(val).substr(0, 16);
+}
 
 /**
  * @see http://stackoverflow.com/q/7616461/940217

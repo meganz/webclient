@@ -626,7 +626,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.generateMessageId = function(toJid) {
         var self = this;
-        return simpleStringHashCode(self.getJid() + toJid) + "_" + unixtime()
+        return fastHashFunction(self.getJid() + toJid) + "_" + unixtime()
     };
 
 

@@ -1126,9 +1126,29 @@ var MegaChatRoom = function(megaChat, roomJid) {
     this.messagesIndex = {};
     this.isTemporary = false;
     this.options = {
+        /**
+         * Maximum time for waiting a message sync, before trying to send a request to someone else in the room or
+         * failing the SYNC operation at all (if there are no other users to query for the sync op).
+         */
         'requestMessagesSyncTimeout': 1500,
+
+        /**
+         * Send any queued messages if the room is not READY
+         */
         'sendMessageQueueIfNotReadyTimeout': 3500, // XX: why is this so slow? optimise please.
-        'messageSyncFailAfterTimeout': 10000 // XX: why is this so slow? optimise please.
+
+        /**
+         * Change the state of the room to READY in case there was no response in timely manner. (e.g. there were no
+         * users who responded for a sync call).
+         */
+        'messageSyncFailAfterTimeout': 10000, // XX: why is this so slow? optimise please.
+
+        /**
+         * Used to cleanup the memory from sent sync requests.
+         * This should be high enough, so that it will be enough for a response to be generated (message log to be
+         * encrypted), send and recieved.
+         */
+        'syncRequestCleanupTimeout': 5000
     };
     this._syncRequests = {};
     this._messagesQueue = [];
@@ -1842,12 +1862,20 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
         clearTimeout(request.timer);
     });
 
-    delete self._syncRequests[self.roomJid];
+    if(self._syncRequests[self.roomJid].cleanupTimeout) {
+        clearTimeout(self._syncRequests[self.roomJid].cleanupTimeout);
+    }
+    self._syncRequests[self.roomJid].cleanupTimeout = setTimeout(function() {
+        delete self._syncRequests[self.roomJid];
+    }, self.options.syncRequestCleanupTimeout);
+
     $.each(response.meta.messages, function(k, msg) {
         self.appendMessage(msg);
     });
 
-    self.setState(MegaChatRoom.STATE.SYNCED);
+    if(self.state < MegaChatRoom.STATE.SYNCED) {
+        self.setState(MegaChatRoom.STATE.SYNCED);
+    }
 };
 
 /**

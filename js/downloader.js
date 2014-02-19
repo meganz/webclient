@@ -17,8 +17,8 @@ function getXhrObject(s) {
 	}
 
 	// timeout {{{
-	var ts = null,
-		Open = xhr.open;
+	var ts = null
+		, Open = xhr.open
 	xhr.open = function() {
 		Open.apply(xhr, arguments);
 		xhr.timeout = s || 40000;

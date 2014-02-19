@@ -939,6 +939,7 @@ function initContextUI()
 				DownloadManager.abort({ zipid: $.zipkill });
 			}
 		}
+		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		

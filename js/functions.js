@@ -821,7 +821,9 @@ function addZeroIfLenLessThen(val, len) {
         }
     }
     return val;
-}}
+};
+
+
 
 function NOW() {
 	return (new Date()).getTime();

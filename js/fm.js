@@ -932,7 +932,7 @@ function initContextUI()
 			$(this).remove();
 		});				
 
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
+		if ($.sd ||$.zipkill) {
 			if (dl_queue[$.sd]) {
 				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
 			} else if ($.zipkill >= 0) {

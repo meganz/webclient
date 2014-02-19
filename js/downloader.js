@@ -17,11 +17,15 @@ function getXhrObject(s) {
 	}
 
 	// timeout {{{
-	var ts = null;
-	xhr.timeout = s || 40000;
-	xhr.ontimeout = function() {
-		DEBUG("xhr failed by timeout");
-		xhr.abort();
+	var ts = null,
+		Open = xhr.open;
+	xhr.open = function() {
+		Open.apply(xhr, arguments);
+		xhr.timeout = s || 40000;
+		xhr.ontimeout = function() {
+			DEBUG("xhr failed by timeout");
+			xhr.abort();
+		};
 	};
 
 	function timeout() {

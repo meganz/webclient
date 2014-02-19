@@ -492,7 +492,6 @@ var MegaChat = function() {
     $(window).bind('hashchange.megaChat' + this.instanceId, function() {
         var room = self.getCurrentRoom();
 
-        console.warn("Hashchange start: ", lastOpenedRoom, self.getCurrentRoomJid());
         if(room && !room.$messages.is(":visible") && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
             room.hide();
             self.currentlyOpenedChat = null;
@@ -503,14 +502,19 @@ var MegaChat = function() {
                 self.chats[lastOpenedRoom].hide();
             }
         }
+        if(lastOpenedRoom && $('.fm-chat-block').is(".hidden")) { // have opened a chat window before, but now
+                                                                           // navigated away from it
+            if(self.chats[lastOpenedRoom]) {
+                self.chats[lastOpenedRoom].hide();
+                lastOpenedRoom = null;
+            }
+        }
 
         if(room) {
             lastOpenedRoom = room.roomJid;
         } else {
             lastOpenedRoom = null;
         }
-
-        console.warn("Hashchange end: ", lastOpenedRoom, self.getCurrentRoomJid());
     });
 
     return this;

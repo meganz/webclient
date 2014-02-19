@@ -3,12 +3,14 @@
 var b_u=0;
 var ie9=0;
 
-if (document.location.href.indexOf('preview.mega.co.nz') > -1)
-{
-	localStorage.staticpath = 'http://preview.mega.co.nz/';
+if (document.location.href.indexOf('preview.mega.co.nz') > -1) {
 	localStorage.dd=1;
 }
 
+if (localStorage.dd) {
+	localStorage.staticpath = "//" + location.host + location.pathname;
+	alert(localStorage.staticpath)
+}
 
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
 else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;

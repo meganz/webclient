@@ -8,7 +8,7 @@ if (document.location.href.indexOf('preview.mega.co.nz') > -1) {
 }
 
 if (localStorage.dd) {
-	localStorage.staticpath = "//" + location.host + location.pathname;
+	localStorage.staticpath = location.protocol + "//" + location.host + location.pathname;
 }
 
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;

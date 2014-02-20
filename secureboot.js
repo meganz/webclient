@@ -3,7 +3,7 @@
 var b_u=0;
 var ie9=0;
 
-if (document.location.href.indexOf('preview.mega.co.nz') > -1) {
+if (location.hostname === 'preview.mega.co.nz' || location.hostname === 'localhost') {
 	localStorage.dd=1;
 }
 

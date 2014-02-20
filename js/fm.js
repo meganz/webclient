@@ -5044,18 +5044,6 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
-		for (var i in dl_queue)
-		{
-			if (dl_queue[i] && dl_queue[i].id == id)
-			{
-				if (!dl_queue[i].ppersist)
-				{
-					DownloadManager.abort({id: id});
-				}
-				
-				break;
-			}
-		}
 		return false;
 	}
 	
@@ -5110,7 +5098,6 @@ function slideshow(id,close)
 			{
 				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
 				dl_queue[i].preview=false;
-				dl_queue[i].ppersist=true;
 				openTransferpanel();
 				return;
 			}		

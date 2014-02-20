@@ -69,7 +69,15 @@ var DownloadManager = new function() {
 			});
 			$('#zip_' + dl.zipid).remove();
 		} else {
-			dl_queue[dl.pos] = {}; /* remove it */
+			if(typeof dl.pos !== 'undefined') {
+				dl_queue[dl.pos] = {}; /* remove it */
+			} else {
+				$.each(dl_queue, function(i, file) {
+					if (file.id == dl.id) {
+						dl_queue[i] = {}; /* remove it */
+					}
+				});
+			}
 			$('#dl_' + dl.id).remove();
 		}
 	}

@@ -1511,9 +1511,9 @@ function MegaData ()
 			st = dl_queue[dl_queue_num].st;
 		}
 
-		var failed = $('#' + id).data('failed');
+		var failed = parseInt($('#' + id).data('failed') || "0");
 		// failed not long ago
-		if (failed && failed+30000 > NOW()) return;
+		if (failed+30000 > NOW()) return;
 
 		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
 			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');

@@ -8,7 +8,8 @@ if (d) {
 }
 
 function getXhrObject(s) {
-	var xhr = new XMLHttpRequest;
+	var xhr = new XMLHttpRequest
+		, timeout = s || 40000
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
@@ -21,18 +22,16 @@ function getXhrObject(s) {
 		, Open = xhr.open
 	xhr.open = function() {
 		Open.apply(xhr, arguments);
-		xhr.timeout = s || 40000;
-		xhr.ontimeout = function() {
-			DEBUG("xhr failed by timeout");
-			xhr.abort();
-		};
+		checkTimeout();
 	};
 
-	function timeout() {
+	function checkTimeout() {
 		clearTimeout(ts);
 		ts = setTimeout(function() {
-			xhr.ontimeout();
-		}, xhr.timeout*1.5);
+			ontimeout();
+			DEBUG("xhr failed by timeout");
+			xhr.abort();
+		}, timeout*1.5);
 	}
 	// }}}
 
@@ -48,14 +47,15 @@ function getXhrObject(s) {
 	// }}}
 
 	xhr.onprogress = function() {
-		timeout();
+		checkTimeout();
 		return xhr.progress.apply(xhr, arguments);
 	}
 
 	xhr.onreadystatechange = function() {
-		clearTimeout(ts);
 		xhr.changestate.apply(xhr, arguments);
+		checkTimeout();
 		if (this.readyState == this.DONE) {
+			clearTimeout(ts);
 			return xhr.ready.apply(xhr, arguments);
 		}
 	};

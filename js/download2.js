@@ -142,6 +142,7 @@ var DownloadManager = new function() {
 		work.__canretry = true;
 		work.__ondone   = function() {
 			work.__ondone = function() {
+				DEBUG("here __ondone()->->");
 				self.release(pattern);
 			};
 		};
@@ -167,13 +168,17 @@ var DownloadManager = new function() {
 
 	self.enabled = function(task) {
 		var enabled = true;
+		if (task.__canretry) {
+			DEBUG("RETRYING TASK");
+			return true;
+		}
 		$.each(locks, function(i, pattern) {
 			if (doesMatch(task, pattern)) {
 				enabled = false;
 				return false; /* break */
 			}
 		});
-		return enabled || task.__canretry;
+		return enabled;
 	}
 
 }

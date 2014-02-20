@@ -20,12 +20,22 @@ function getXhrObject(s) {
 	// timeout {{{
 	var ts = null
 		, Open = xhr.open
+		, Abort = xhr.abort
+		, aborted = false
+
+	xhr.abort = function() {
+		clearTimeout(ts);
+		aborted = true
+		Abort.apply(xhr, arguments);
+	};
+
 	xhr.open = function() {
 		Open.apply(xhr, arguments);
 		checkTimeout();
 	};
 
 	function checkTimeout() {
+		if (aborted) return;
 		clearTimeout(ts);
 		ts = setTimeout(function() {
 			DEBUG("xhr failed by timeout");
@@ -46,11 +56,13 @@ function getXhrObject(s) {
 	// }}}
 
 	xhr.onprogress = function() {
+		if (aborted) return;
 		checkTimeout();
 		return xhr.progress.apply(xhr, arguments);
 	}
 
 	xhr.onreadystatechange = function() {
+		if (aborted) return;
 		xhr.changestate.apply(xhr, arguments);
 		checkTimeout();
 		if (this.readyState == this.DONE) {

@@ -1,10 +1,11 @@
 function FlashIO(dl_id, dl) {
 	var IO = this
 		, offset = 0
+		, dl_id  = dl.zip_dl_id || dl_id
 
 	this.write = function (buffer, position, done) {
 		if (!document.getElementById('dlswf_' + dl_id) || offset !== position) {
-			if (d) console.log("Flash element not yet initialized", dl_id);
+			DEBUG("Flash element not yet initialized", dl_id);
 			return setTimeout(function () {
 				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 300);

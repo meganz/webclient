@@ -347,7 +347,6 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						if (!dl.zipid) DownloadManager.cleanupUI(dl);
 						DEBUG("done with ", dl);
 						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {
@@ -361,6 +360,7 @@ function ClassFile(dl) {
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
+						DownloadManager.cleanupUI(dl, true);
 					}
 				}, 100);
 			}, failureFunction);

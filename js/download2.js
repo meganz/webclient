@@ -60,14 +60,14 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
-	self.cleanupUI = function(dl) {
+	self.cleanupUI = function(dl, done) {
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
 				if (file.zipid == dl.zipid) {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			$('#zip_' + dl.zipid).remove();
+			if (dlMethod != FlashIO || !done) $('#zip_' + dl.zipid).remove();
 		} else {
 			if(typeof dl.pos !== 'undefined') {
 				dl_queue[dl.pos] = {}; /* remove it */
@@ -78,7 +78,7 @@ var DownloadManager = new function() {
 					}
 				});
 			}
-			$('#dl_' + dl.id).remove();
+			if (dlMethod != FlashIO || !done) $('#dl_' + dl.id).remove();
 		}
 	}
 
@@ -473,6 +473,7 @@ else if (window.webkitRequestFileSystem) {
 } else {
 	dlMethod = FlashIO;
 }
+dlMethod = FlashIO;
 
 if(dlMethod.init) dlMethod.init();
 

@@ -253,7 +253,17 @@ function ClassChunk(task) {
 				return;
 			}
 
-			var is_running = typeof dl_queue[download.pos].id != 'undefined';
+			var is_running = false;
+			if (typeof download.post == 'undefined') {
+				$.each(dl_queue, function(pos, dl) {
+					if (dl.id == download.id) {
+						download.pos = pos;
+						is_running = true;
+					}
+				});
+			} else {
+				is_running = typeof dl_queue[download.pos].id != 'undefined';
+			}
 
 			if (!is_running || download.cancelled) {
 				_cancelled = true;

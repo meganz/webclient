@@ -7,10 +7,6 @@ if (document.location.href.indexOf('preview.mega.co.nz') > -1) {
 	localStorage.dd=1;
 }
 
-if (localStorage.dd) {
-	localStorage.staticpath = location.protocol + "//" + location.host + location.pathname;
-}
-
 if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
 else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
 
@@ -87,6 +83,9 @@ else
 		}
 		else
 		{
+			if (localStorage.dd) {
+				localStorage.staticpath = location.protocol + "//" + location.host + location.pathname;
+			}
 			var staticpath = localStorage.staticpath || 'https://eu.static.mega.co.nz/';
 			var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 

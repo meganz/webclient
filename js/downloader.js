@@ -40,6 +40,7 @@ function getXhrObject(s) {
 		ts = setTimeout(function() {
 			DEBUG("xhr failed by timeout");
 			xhr.abort();
+			xhr.failure("timeout");
 		}, timeout*1.5);
 	}
 	// }}}
@@ -49,6 +50,9 @@ function getXhrObject(s) {
 	};
 
 	xhr.changestate = function() {
+	};
+
+	xhr.failure = function() {
 	};
 
 	xhr.ready = function() {
@@ -184,6 +188,23 @@ function ClassChunk(task) {
 				updateProgress();
 			};
 			// }}}
+
+			xhr.failure = function(e) {
+				// we must reschedule this download	
+				Progress.progress -= prevProgress; /* this never happened */
+				// tell the scheduler that we failed
+				if (done) {
+					// We already told the scheduler we were done
+					// with no erro and this happened. Should I reschedule this 
+					// task?
+					return setTimeout(function() {
+						failed = true
+						DownloadManager.pause(self);
+						request();
+					}, backoff *= 1.2);
+				}
+				return Scheduler.done(false, this.status);
+			};
 		
 			// on ready {{{
 			xhr.ready = function() {
@@ -207,23 +228,9 @@ function ClassChunk(task) {
 					if (failed) DownloadManager.release(self);
 					failed = false
 				} else if (!download.cancelled) {
-					// we must reschedule this download	
-					Progress.progress -= prevProgress; /* this never happened */
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
-
-					// tell the scheduler that we failed
-					if (done) {
-						// We already told the scheduler we were done
-						// with no erro and this happened. Should I reschedule this 
-						// task?
-						return setTimeout(function() {
-							failed = true
-							DownloadManager.pause(self);
-							request();
-						}, backoff *= 1.2);
-					}
-					return Scheduler.done(false, this.status);
+					return xhr.failure();
 				}
 
 				if (!done) Scheduler.done();
@@ -253,7 +260,17 @@ function ClassChunk(task) {
 				return;
 			}
 
-			var is_running = typeof dl_queue[download.pos].id != 'undefined';
+			var is_running = false;
+			if (typeof download.post == 'undefined') {
+				$.each(dl_queue, function(pos, dl) {
+					if (dl.id == download.id) {
+						download.pos = pos;
+						is_running = true;
+					}
+				});
+			} else {
+				is_running = typeof dl_queue[download.pos].id != 'undefined';
+			}
 
 			if (!is_running || download.cancelled) {
 				_cancelled = true;
@@ -337,7 +354,6 @@ function ClassFile(dl) {
 				var checker = setInterval(function() {
 					if (dl.decrypt == 0) {
 						clearInterval(checker);
-						if (!dl.zipid) DownloadManager.cleanupUI(dl);
 						DEBUG("done with ", dl);
 						if (dl.cancelled) return;
 						if (!emptyFile && !checkLostChunks(dl)) {
@@ -351,6 +367,7 @@ function ClassFile(dl) {
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
+						DownloadManager.cleanupUI(dl, true);
 					}
 				}, 100);
 			}, failureFunction);

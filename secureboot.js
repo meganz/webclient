@@ -3,7 +3,7 @@
 var b_u=0;
 var ie9=0;
 
-if (document.location.href.indexOf('preview.mega.co.nz') > -1) {
+if (location.hostname === 'preview.mega.co.nz' || location.hostname === 'localhost') {
 	localStorage.dd=1;
 }
 
@@ -84,7 +84,7 @@ else
 		else
 		{
 			if (localStorage.dd) {
-				localStorage.staticpath = location.protocol + "//" + location.host + location.pathname;
+				localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
 			}
 			var staticpath = localStorage.staticpath || 'https://eu.static.mega.co.nz/';
 			var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';

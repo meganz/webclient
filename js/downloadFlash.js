@@ -1,10 +1,11 @@
 function FlashIO(dl_id, dl) {
 	var IO = this
 		, offset = 0
+		, dl_id  = dl.zip_dl_id || dl_id
+		, swfid  = 'dlswf_' + (dl.zipid ? 'zip_' + dl.zipid : dl_id)
 
 	this.write = function (buffer, position, done) {
-		if (!document.getElementById('dlswf_' + dl_id) || offset !== position) {
-			if (d) console.log("Flash element not yet initialized", dl_id);
+		if (!document.getElementById(swfid) || offset !== position) {
 			return setTimeout(function () {
 				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 300);
@@ -21,13 +22,13 @@ function FlashIO(dl_id, dl) {
 		else
 			subdata = base64urlencode(buffer.buffer);
 
-		document.getElementById('dlswf_' + dl_id).flashdata(dl_id, subdata);
+		document.getElementById(swfid).flashdata(dl_id, subdata);
 		offset += len
 		done();
 	};
 
 	this.download = function (name, path) {
-		document.getElementById('dlswf_' + dl_id).flashdata(dl_id,'',name);
+		document.getElementById(swfid).flashdata(dl_id,'',name);
 	};
 
 	this.setCredentials = function (url, size, filename, chunks, sizes) {

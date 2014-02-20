@@ -5048,11 +5048,10 @@ function slideshow(id,close)
 		{
 			if (dl_queue[i] && dl_queue[i].id == id)
 			{
-				if (!dl_queue[i].ppersist)
+				if (dl_queue[i].preview)
 				{
 					DownloadManager.abort({id: id});
 				}
-				
 				break;
 			}
 		}
@@ -5110,7 +5109,6 @@ function slideshow(id,close)
 			{
 				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
 				dl_queue[i].preview=false;
-				dl_queue[i].ppersist=true;
 				openTransferpanel();
 				return;
 			}		

@@ -5044,6 +5044,17 @@ function slideshow(id,close)
 		slideshowid=false;
 		$('.slideshow-dialog').addClass('hidden');
 		$('.slideshow-overlay').addClass('hidden');
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == id)
+			{
+				if (dl_queue[i].preview)
+				{
+					DownloadManager.abort({id: id});
+				}
+				break;
+			}
+		}
 		return false;
 	}
 	

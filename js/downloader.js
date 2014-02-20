@@ -250,22 +250,24 @@ function ClassChunk(task) {
 		function isCancelled() {
 			if (_cancelled) {
 				/* aborted already */
-				return;
+				console.warn('CHECK THIS', 'It shouldnt be reached since we xhr.abort()ed it.');
+				return true;
 			}
 
-			var is_running = false;
-			if (typeof download.post == 'undefined') {
-				$.each(dl_queue, function(pos, dl) {
-					if (dl.id == download.id) {
-						download.pos = pos;
-						is_running = true;
-					}
-				});
-			} else {
-				is_running = typeof dl_queue[download.pos].id != 'undefined';
+			var is_canceled = !!download.cancelled;
+			if(!is_canceled) {
+				if(typeof(download.pos) === 'number') {
+					is_canceled = !dl_queue[download.pos].id;
+				} else {
+					if(d) console.warn('CHECK THIS', JSON.stringify(download));
+					is_canceled = true;
+					$.each(dl_queue, function(pos, dl) {
+						return dl.id != download.id || (is_canceled=!1);
+					});
+				}
 			}
 
-			if (!is_running || download.cancelled) {
+			if (is_canceled) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();

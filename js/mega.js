@@ -1510,11 +1510,16 @@ function MegaData ()
 			id = 'dl_' + id;
 			st = dl_queue[dl_queue_num].st;
 		}
-		if ($('.transfer-table #' + id + ' .progress-block').length == 0)
-		{
+
+		var failed = $('#' + id).data('failed');
+		// failed not long ago
+		if (failed && failed+30000 > NOW()) return;
+
+		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
 			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
+
 		if (!bl) return false;
 		if (!$.transferprogress) $.transferprogress=[];
 		if (kbps == 0) return false;
@@ -1651,11 +1656,13 @@ function MegaData ()
 
 		if (errorstr)  {
 			if (file) file.failed = new Date;
+			var dom = null;
 			if (file && file.zipid) {
-				$('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+				dom = $('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
 			} else {
-				$('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+				dom = $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
 			}
+			dom.parents('tr').data({'failed' : NOW()});
 		}
 	}
 

@@ -1,4 +1,4 @@
-﻿var baboom = true;
+﻿var baboom = false;
 
 var b_u=0;
 var ie9=0;
@@ -352,7 +352,7 @@ else
 			jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
 			jsl.push({f:'js/user.js', n: 'user_js', j:1});
 			jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-			jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
+			jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 			jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 			jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 			/* better download */
@@ -365,7 +365,6 @@ else
 			jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
 			jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 			/* end better download */
-
 			jsl.push({f:'index.js', n: 'index', j:1,w:4});
 			jsl.push({f:'html/start.html', n: 'start', j:0});
 			jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -389,9 +388,7 @@ else
 			jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 			jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 			jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-			jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});	
-			jsl.push({f:'js/baboom.js',n:'baboom_js',j:1});
-
+			jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
 			var jsl2 =
 			{
 				'about': {f:'html/about.html', n: 'about', j:0},

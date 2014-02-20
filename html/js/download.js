@@ -99,8 +99,7 @@ function dlinfo(ph,key,next)
 					$('.new-download-file-size').text(bytesToSize(res.s));
 					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 				}
-				else dlkeyDialog();				
-				if (baboom) dl_ad();
+				else dlkeyDialog();
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
 			if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
@@ -112,105 +111,6 @@ function dlinfo(ph,key,next)
 			}			
 		}
 	});
-}
-
-
-
-function dl_ad()
-{
-	if (u_attr && u_attr.p) return false;
-	var audiopath = 'https://m.static.mega.co.nz/';	
-	$('body').addClass('adv');
-	window.baboomAds([
-	{
-		url:audiopath + 'audio/01.mp3',
-		title: 'Amazing',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/02.mp3',
-		title: 'Good Times<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/03.mp3',
-		title: 'Dance Dance Dance',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/04.mp3',
-		title: 'Keeps Getting Better<br>',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/05.mp3',
-		title: 'Change Your Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/06.mp3',
-		title: 'Universe<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/07.mp3',
-		title: 'Little Bit Of Me',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/08.mp3',
-		title: 'Party Electricity',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/09.mp3',
-		title: 'Wunderbar (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/10.mp3',
-		title: 'To Be With You',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/11.mp3',
-		title: 'Good Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/12.mp3',
-		title: 'Party Amplifier',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/13.mp3',
-		title: 'Take Me Away',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/14.mp3',
-		title: 'Beathoven (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/15.mp3',
-		title: 'Firework',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/16.mp3',
-		title: 'Live My Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/17.mp3',
-		title: 'Beathoven Slow',
-		top: -20
-	}], function (err) {
-	// TODO: handle err
-});
-
-
 }
 
 

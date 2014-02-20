@@ -28,7 +28,6 @@ function getXhrObject(s) {
 	function checkTimeout() {
 		clearTimeout(ts);
 		ts = setTimeout(function() {
-			ontimeout();
 			DEBUG("xhr failed by timeout");
 			xhr.abort();
 		}, timeout*1.5);

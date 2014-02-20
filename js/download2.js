@@ -473,7 +473,6 @@ else if (window.webkitRequestFileSystem) {
 } else {
 	dlMethod = FlashIO;
 }
-dlMethod = FlashIO;
 
 if(dlMethod.init) dlMethod.init();
 

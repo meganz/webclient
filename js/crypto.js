@@ -1632,8 +1632,8 @@ function api_fareq(res,ctx)
 					var ctx = this.ctx;
 
 					if (this.status == 200 && typeof this.response == 'object')
-					{				
-						if (this.response == null) return;
+					{
+						if (this.response == null || this.response.byteLength === 0) return;
 
 						if (ctx.p)
 						{

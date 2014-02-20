@@ -84,7 +84,7 @@ else
 		else
 		{
 			if (localStorage.dd) {
-				localStorage.staticpath = location.protocol + "//" + location.host + location.pathname;
+				localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
 			}
 			var staticpath = localStorage.staticpath || 'https://eu.static.mega.co.nz/';
 			var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';

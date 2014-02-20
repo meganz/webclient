@@ -84,12 +84,7 @@ var DownloadManager = new function() {
 	}
 
 	self.abort = function(pattern, dontCleanUI) {
-		var _pattern = pattern
-		if (typeof pattern == "object" && !dontCleanUI) {
-			self.cleanupUI(pattern);
-		}
-
-		DEBUG("cancelled file ", _pattern);
+		var _pattern = s2o(pattern);
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
 				if (!dl.cancelled && typeof dl.io.abort == "function") try {
@@ -101,6 +96,10 @@ var DownloadManager = new function() {
 				/* do not break the loop, it may be a multi-files zip */
 			}
 		});
+		if (typeof pattern == "object" && !dontCleanUI) {
+			self.cleanupUI(pattern);
+		}
+
 		self.remove(_pattern);
 		megatitle();
 	}

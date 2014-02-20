@@ -240,7 +240,10 @@ function ClassChunk(task) {
 				/* aborted already */
 				return;
 			}
-			if (download.cancelled) {
+
+			var is_running = typeof dl_queue[download.pos].id != 'undefined';
+
+			if (!is_running || download.cancelled) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();

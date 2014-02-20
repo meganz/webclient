@@ -345,7 +345,6 @@ function failureFunction(reschedule, task, args) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}
-			DownloadManager.pause(task); 
 			reschedule(); 
 		});
 	}, dl_retryinterval);

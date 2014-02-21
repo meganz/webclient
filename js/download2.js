@@ -4,7 +4,6 @@ var dlMethod
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new QueueClass(downloader)
 	, dlDecrypter = new QueueClass(decrypter)
-	, dl_id
 
 dlQueue.push = function(x) {
 	if (!x.task) {
@@ -195,6 +194,24 @@ var DownloadManager = new function() {
 	}
 
 }
+
+// downloading variable {{{
+dlQueue.on('working', function() {
+	downloading = true;
+});
+
+dlQueue.on('resume', function() {
+	downloading = true;
+});
+
+dlQueue.on('pause', function() {
+	downloading = false;
+});
+
+dlQueue.on('drain', function() {
+	downloading = false;
+});
+// }}}
 
 /**
  *	Override the downloader scheduler method.

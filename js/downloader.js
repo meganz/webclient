@@ -189,6 +189,9 @@ function ClassChunk(task) {
 			// }}}
 
 			xhr.failure = function(e, len) {
+				if (xhr.has_failed) return;
+				xhr.has_failed = true;
+
 				// we must reschedule this download	
 				Progress.progress -= len || prevProgress; /* this never happened */
 				prevProgress = pprevProgress = 0 // reset variables

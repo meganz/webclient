@@ -1582,9 +1582,10 @@ function MegaData ()
 			var flashid = id.replace('dl_','');
 			$('#dlswf_'+flashid).width(170);
 			$('#dlswf_'+flashid).height(22);
-			$('#' + id + ' .transfer-type').removeClass('download');
-			$('#' + id + ' .transfer-type').addClass('safari-downloaded');
-			$('#' + id + ' .transfer-type').text('Save File');
+			$('#' + id + ' .transfer-type')
+				.removeClass('download')
+				.addClass('safari-downloaded')
+				.text('Save File');
 		}
 		else
 		{

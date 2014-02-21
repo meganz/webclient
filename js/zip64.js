@@ -120,10 +120,10 @@ function dlZipIO(dl, dl_id) {
 				doWrite(value);
 			});
 			doWrite(end, function() {
-				DownloadManager.cleanupUI(dl, true);
 				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
 				realIO.download(dl.zipname);
+				if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 			});
 
 		}

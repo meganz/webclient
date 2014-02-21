@@ -364,12 +364,12 @@ function ClassFile(dl) {
 						if (dl.zipid) {
 							return Zips[dl.zipid].done();
 						}
-						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 						dl.onBeforeDownloadComplete(dl.pos);
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
-						DownloadManager.cleanupUI(dl, true);
+						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
+						if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 					}
 				}, 100);
 			}, failureFunction);

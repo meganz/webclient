@@ -355,6 +355,12 @@ function failureFunction(reschedule, task, args) {
 
 	DownloadManager.pause(task);
 
+	if (!task.dl.retry_time) {
+		task.dl.retry_time = 1000
+	} else {
+		task.dl.retry_time = Math.min(task.dl.retry_time*1.2, 3600*1000);
+	}
+
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
@@ -369,12 +375,6 @@ function failureFunction(reschedule, task, args) {
 
 	dl_reportstatus(dl, EAGAIN);
 
-	if (code == ETEMPUNAVAIL) {
-		dl_retryinterval *= 2
-		dl_retryinterval = Math.min(dl_retryinterval, 3600*1000)
-	} else {
-		dl_retryinterval *= 1.2;
-	}
 	setTimeout(function() {
 		var range = (dl.url||"").replace(/.+\//, '');
 		dlGetUrl(dl, function (error, res, o) {
@@ -383,7 +383,7 @@ function failureFunction(reschedule, task, args) {
 			}
 			reschedule(); 
 		});
-	}, dl_retryinterval);
+	}, task.dl.retry_time);
 }
 
 DownloadQueue.prototype.push = function() {

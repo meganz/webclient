@@ -152,8 +152,9 @@ var DEFAULT_CONCURRENCY = 4
 		task.__tid = id++;
 		this._queue.unshift(task);
 		this._callback[task.__tid] = done || function() {};
+		var self = this;
 		setTimeout(function() {
-			this.process();
+			self.process();
 		}, 0);
 	}
 

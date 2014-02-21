@@ -147,11 +147,6 @@ function ClassChunk(task) {
 				shouldIReportDone();
 			}
 
-			if (!download.started) {
-				download.onDownloadStart(download.dl_id, download.n, download.size, download.pos);
-				download.started = true;
-			}
-
 			// Update global progress (per download) and aditionally
 			// update the UI
 			if (Progress.dl_lastprogress+250 > lastPing && !force) {
@@ -262,16 +257,11 @@ function ClassChunk(task) {
 			}
 
 			var is_canceled = !!download.cancelled;
-			if(!is_canceled) {
-				if(typeof(download.pos) === 'number') {
-					is_canceled = !dl_queue[download.pos].id;
-				} else {
-					if(d) console.warn('CHECK THIS', JSON.stringify(download));
-					is_canceled = true;
-					$.each(dl_queue, function(pos, dl) {
-						return dl.id != download.id || (is_canceled=!1);
-					});
+			if (!is_canceled) {
+				if(typeof(download.pos) !== 'number') {
+					download.pos = IdToFile(download).pos
 				}
+				is_canceled = !dl_queue[download.pos].n;
 			}
 
 			if (is_canceled) {
@@ -322,6 +312,8 @@ function ClassFile(dl) {
 		}
 	
 		DEBUG("dl_key " + dl.key);
+		
+		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 	
 		dl.io.begin = function() {
 			var tasks = [];
@@ -364,12 +356,12 @@ function ClassFile(dl) {
 						if (dl.zipid) {
 							return Zips[dl.zipid].done();
 						}
-						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 						dl.onBeforeDownloadComplete(dl.pos);
 						if (!dl.preview) {
 							dl.io.download(dl.zipname || dl.n, dl.p);
 						}
-						DownloadManager.cleanupUI(dl, true);
+						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
+						if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 					}
 				}, 100);
 			}, failureFunction);

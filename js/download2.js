@@ -4,7 +4,6 @@ var dlMethod
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new QueueClass(downloader)
 	, dlDecrypter = new QueueClass(decrypter)
-	, dl_id
 
 dlQueue.push = function(x) {
 	if (!x.task) {
@@ -60,14 +59,15 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
-	self.cleanupUI = function(dl, done) {
+	self.cleanupUI = function(dl, force) {
+		var selector = null
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
 				if (file.zipid == dl.zipid) {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			if (dlMethod != FlashIO || !done) $('#zip_' + dl.zipid).remove();
+			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
 				dl_queue[dl.pos] = {}; /* remove it */
@@ -78,7 +78,12 @@ var DownloadManager = new function() {
 					}
 				});
 			}
-			if (dlMethod != FlashIO || !done) $('#dl_' + dl.id).remove();
+			selector = '#dl_' + dl.id;
+		}
+		if (dlMethod != FlashIO || force) {
+			$(selector).fadeOut('slow', function() {
+				$(this).remove();
+			});
 		}
 	}
 
@@ -189,6 +194,24 @@ var DownloadManager = new function() {
 	}
 
 }
+
+// downloading variable {{{
+dlQueue.on('working', function() {
+	downloading = true;
+});
+
+dlQueue.on('resume', function() {
+	downloading = true;
+});
+
+dlQueue.on('pause', function() {
+	downloading = false;
+});
+
+dlQueue.on('drain', function() {
+	downloading = false;
+});
+// }}}
 
 /**
  *	Override the downloader scheduler method.
@@ -460,6 +483,18 @@ function dlGetUrl(object, callback) {
 			callback(new Error("failed"))
 		}
 	});
+}
+
+function IdToFile(id) {
+	var dl = {}
+	$.each(dl_queue, function(i, _dl) {
+		if (id == _dl.id) {
+			dl = _dl
+			dl.pos = i
+			return false;
+		}
+	});
+	return dl;
 }
 
 if(localStorage.dlMethod) {

@@ -5298,7 +5298,9 @@ function savecomplete(id)
 	$('.fm-dialog-overlay').addClass('hidden');
 	if (!$.dialog) 
 	$('#dlswf_'+id).remove();
-	M.dlcomplete(id);
+	var dl = IdToFile(id);
+	M.dlcomplete(dl.id, dl.zipid, dl.pos);
+	DownloadManager.cleanupUI(dl, true);
 }
 
 /**

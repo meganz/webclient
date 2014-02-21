@@ -59,10 +59,12 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.resume = function() {
 		this._paused = false;
+		this.trigger('resume')
 		this.process();
 	};
 
 	queue.prototype.pause = function() {
+		this.trigger('pause')
 		this._paused = true;
 	};
 
@@ -83,6 +85,7 @@ var DEFAULT_CONCURRENCY = 4
 				return false;
 			}
 
+			this.trigger('working', args)
 			context = new Context(this, args)
 
 			this._running.push(context)
@@ -160,7 +163,10 @@ var DEFAULT_CONCURRENCY = 4
 		task.__tid = id++;
 		this._queue.push(task);
 		this._callback[task.__tid] = done || function() {};
-		this.process();
+		var self = this;
+		setTimeout(function() {
+			self.process();
+		}, 0);
 	}
 
 	QueueClass = queue;

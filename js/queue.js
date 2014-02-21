@@ -160,7 +160,10 @@ var DEFAULT_CONCURRENCY = 4
 		task.__tid = id++;
 		this._queue.push(task);
 		this._callback[task.__tid] = done || function() {};
-		this.process();
+		var self = this;
+		setTimeout(function() {
+			self.process();
+		}, 0);
 	}
 
 	QueueClass = queue;

@@ -167,7 +167,7 @@ function ClassChunk(task) {
 				download.pos // this download position
 			);
 
-			if (Progress.size < Progress.process) {
+			if (Progress.size < Progress.progress) {
 				throw new Error;
 			}
 	

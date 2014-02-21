@@ -257,13 +257,14 @@ function checkLostChunks(file)
 	if (have_ab && (dl_key[6] != (mac[0]^mac[1]) || dl_key[7] != (mac[2]^mac[3]))) {
 		return false;
 	}
-	
+
 	if (file.data) {
 		createnodethumbnail(
 			file.id,
 			new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]),
 			++ul_faid,
-			file.data
+			file.data,
+			file.preview === -1
 		);
 	}
 
@@ -441,7 +442,7 @@ function dlGetUrl(object, callback) {
 							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 	
 						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) {
+							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || object.preview === -1)) {
 								object.data = new ArrayBuffer(res.s);				
 							}
 							return callback(false, res, o, object);

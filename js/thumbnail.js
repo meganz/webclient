@@ -1,15 +1,15 @@
 
 
-function createnodethumbnail(node,aes,id,imagedata)
+function createnodethumbnail(node,aes,id,imagedata,onPreviewRetry)
 {	
 	storedattr[id] = {};
 	storedattr[id] = { target : node };
-	createthumbnail(false,aes,id,imagedata,node);
+	createthumbnail(false,aes,id,imagedata,node,onPreviewRetry);
 }
 
 
 
-function createthumbnail(file,aes,id,imagedata,node)
+function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 {
 	if (myURL)
 	{
@@ -64,7 +64,7 @@ function createthumbnail(file,aes,id,imagedata,node)
 			}		
 			
 			// preview image:			
-			if (!n || !n.fa || n.fa.indexOf(':1*') < 0)
+			if (!n || !n.fa || n.fa.indexOf(':1*') < 0 || onPreviewRetry)
 			{			
 				var canvas2 = document.createElement('canvas');
 				var preview_x=this.width,preview_y=this.height;

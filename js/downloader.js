@@ -110,7 +110,7 @@ function ClassChunk(task) {
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
 		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
-			download.decrypt++; /* avoid run condition */
+			download.decrypt++; /* avoid race condition */
 			done = true;
 			Scheduler.done();
 		}
@@ -125,7 +125,7 @@ function ClassChunk(task) {
 		 */
 		function shouldIReportDone() {
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
-				download.decrypt++; /* avoid run condition */
+				download.decrypt++; /* avoid race condition */
 				done = true;
 				Scheduler.done();
 			}
@@ -215,17 +215,12 @@ function ClassChunk(task) {
 						io.dl_bytesreceived += r.byteLength;
 					}
 					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-
-					if (failed) DownloadManager.release(self);
-					failed = false
-				} else if (!download.cancelled) {
-					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
 					return xhr.failure();
 				}
 
 				if (!done) Scheduler.done();
-				else if (!failed) download.decrypt--;
+				else if (done && !failed) download.decrypt--;
 			}
 			// }}}
 

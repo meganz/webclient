@@ -196,7 +196,7 @@ function FileSystemAPI(dl_id, dl) {
 			dl_writing = false;
 			if (failed) {
 				failed = false; /* reset error flag */
-				this.seek(position);
+				dl_fw.seek(position);
 				dl_fw.write(new Blob([buffer]));
 				return;
 			}

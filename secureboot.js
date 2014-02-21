@@ -705,10 +705,9 @@ else
 				var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
 				if ((p > jsl_perc) && (p <= 100))
 				{
-					if (p < 100 && ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox)) return false;
 					jsl_perc = p;
-					if (document.getElementById('loading_progress_fill')) document.getElementById('loading_progress_fill').style.width = jsl_perc+'%';
-					else if(document.getElementById('loadinganim')) document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+jsl_perc;
+					if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;					
+					document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
 				}
 			}
 			var jsl_loaded={};

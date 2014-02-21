@@ -60,14 +60,15 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
-	self.cleanupUI = function(dl, done) {
+	self.cleanupUI = function(dl, force) {
+		var selector = null
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
 				if (file.zipid == dl.zipid) {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			if (dlMethod != FlashIO || !done) $('#zip_' + dl.zipid).remove();
+			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
 				dl_queue[dl.pos] = {}; /* remove it */
@@ -78,7 +79,12 @@ var DownloadManager = new function() {
 					}
 				});
 			}
-			if (dlMethod != FlashIO || !done) $('#dl_' + dl.id).remove();
+			selector = '#dl_' + dl.id;
+		}
+		if (dlMethod != FlashIO || force) {
+			$(selector).fadeOut('slow', function() {
+				$(this).remove();
+			});
 		}
 	}
 
@@ -459,6 +465,17 @@ function dlGetUrl(object, callback) {
 			callback(new Error("failed"))
 		}
 	});
+}
+
+function IdToFile(id) {
+	var dl = null;
+	$.each(dl_queue, function(i, _dl) {
+		if (id == _dl.id) {
+			dl = _dl
+			return false;
+		}
+	});
+	return dl;
 }
 
 if(localStorage.dlMethod) {

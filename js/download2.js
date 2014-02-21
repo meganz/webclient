@@ -355,6 +355,13 @@ function failureFunction(reschedule, task, args) {
 
 	DownloadManager.pause(task);
 
+	if (code == ETEMPUNAVAIL) {
+		dl_reportstatus(dl, code);
+		return setTimeout(function() {
+				reschedule(); 
+		}, 3600*1000);
+	}
+
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {

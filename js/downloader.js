@@ -388,66 +388,48 @@ function decrypter(task)
 	var download = task.download
 		, Decrypter = this
 
-	if (use_workers) {
-		var worker = new Worker('decrypter.js?v=5');
-		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
-		worker.onmessage = function(e) {
-			if (typeof(e.data) == "string") {
-				if (e.data[0] == '[') {
-					var t = JSON.parse(e.data), pos = task.offset
-					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
-						download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
-					}
+	var worker = new Worker('decrypter.js?v=5');
+	worker.postMessage = worker.webkitPostMessage || worker.postMessage;
+	worker.onmessage = function(e) {
+		if (typeof(e.data) == "string") {
+			if (e.data[0] == '[') {
+				var t = JSON.parse(e.data), pos = task.offset
+				for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
+					download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
 				}
-				DEBUG("worker replied string", e.data, download.macs);
-			} else {
-				var plain = new Uint8Array(e.data.buffer || e.data);
-				Decrypter.done(); // release slot
-				DEBUG("Decrypt done", download.cancelled);
-				if (download.cancelled) return;
-				download.io.write(plain, task.offset, function() {
-					if (task.download.data) {
-						new Uint8Array(
-							task.download.data,
-							task.offset,
-							plain.length
-						).set(plain);
-					}
-					// decrease counter
-					// useful to avoid downloading before writing
-					// all
-					download.decrypt--;
-					DEBUG("Decrypt wrote => ", download.decrypt);
-				}, task.info);
 			}
-		};
-		worker.postMessage(task.download.nonce);
-		worker.dl_pos = task.offset;
-		worker.postMessage(task.offset/16);
-
-		if (typeof MSBlobBuilder == "function") {
-			worker.postMessage(task.data);
+			DEBUG("worker replied string", e.data, download.macs);
 		} else {
-			worker.postMessage(task.data.buffer, [task.data.buffer]);
+			var plain = new Uint8Array(e.data.buffer || e.data);
+			Decrypter.done(); // release slot
+			DEBUG("Decrypt done", download.cancelled);
+			if (download.cancelled) return;
+			download.io.write(plain, task.offset, function() {
+				if (task.download.data) {
+					new Uint8Array(
+						task.download.data,
+						task.offset,
+						plain.length
+					).set(plain);
+				}
+				// decrease counter
+				// useful to avoid downloading before writing
+				// all
+				download.decrypt--;
+				DEBUG("Decrypt wrote => ", download.decrypt);
+			}, task.info);
 		}
-		DEBUG("decrypt with workers", download.cancelled);
-	} else {
-		DEBUG("decrypt without workers")
-		download.macs[task.offset] = decrypt_ab_ctr(
-			download.aes,
-			task.data,
-			[download.key[4],download.key[5]],
-			task.offset
-		);
+	};
+	worker.postMessage(task.download.nonce);
+	worker.dl_pos = task.offset;
+	worker.postMessage(task.offset/16);
 
-		Decrypter.done(); // release slot
-		download.io.write(task.data, task.offset, function() {
-			// decrease counter
-			// useful to avoid downloading before writing
-			// all
-			download.decrypt--;
-		});
+	if (typeof MSBlobBuilder == "function") {
+		worker.postMessage(task.data);
+	} else {
+		worker.postMessage(task.data.buffer, [task.data.buffer]);
 	}
+	DEBUG("decrypt with workers", download.cancelled);
 }
 // }}}
 

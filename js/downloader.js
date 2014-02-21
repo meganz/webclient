@@ -147,11 +147,6 @@ function ClassChunk(task) {
 				shouldIReportDone();
 			}
 
-			if (!download.started) {
-				download.onDownloadStart(download.dl_id, download.n, download.size, download.pos);
-				download.started = true;
-			}
-
 			// Update global progress (per download) and aditionally
 			// update the UI
 			if (Progress.dl_lastprogress+250 > lastPing && !force) {
@@ -262,7 +257,7 @@ function ClassChunk(task) {
 			}
 
 			var is_canceled = !!download.cancelled;
-			if(!is_canceled) {
+			if (!is_canceled) {
 				if(typeof(download.pos) === 'number') {
 					is_canceled = !dl_queue[download.pos].id;
 				} else {
@@ -322,6 +317,8 @@ function ClassFile(dl) {
 		}
 	
 		DEBUG("dl_key " + dl.key);
+		
+		download.onDownloadStart(download.dl_id, download.n, download.size, download.pos);
 	
 		dl.io.begin = function() {
 			var tasks = [];

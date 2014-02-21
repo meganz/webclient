@@ -187,6 +187,7 @@ function ClassChunk(task) {
 			xhr.failure = function(e) {
 				// we must reschedule this download	
 				Progress.progress -= prevProgress; /* this never happened */
+				prevProgress = pprevProgress = 0 // reset variables
 				// tell the scheduler that we failed
 				if (done) {
 					// We already told the scheduler we were done
@@ -216,7 +217,7 @@ function ClassChunk(task) {
 					}
 					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
 					if (failed) DownloadManager.release(self);
-					failed = false:
+					failed = false;
 				} else if (!download.cancelled) {
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);

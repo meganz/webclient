@@ -1,4 +1,4 @@
-﻿var baboom = true;
+﻿var baboom = false;
 
 var b_u=0;
 var ie9=0;
@@ -23,7 +23,7 @@ function isMobile()
 
 
 
-if (isMobile() && document.location.hostname == 'mega.co.nz' && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) && (ua.indexOf('crios') > -1))
+if (isMobile() && (document.location.hostname == 'mega.co.nz') && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) && (ua.indexOf('crios') > -1))
 {
 	if (document.location.hash.substr(0,5) == '#blog' || document.location.hash.substr(0,8) == '#confirm') document.location = 'https://eu.static.mega.co.nz/' + document.location.hash;
 	else document.location = 'https://eu.static.mega.co.nz/';
@@ -352,7 +352,7 @@ else
 			jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
 			jsl.push({f:'js/user.js', n: 'user_js', j:1});
 			jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-			jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
+			jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 			jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 			jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 			/* better download */
@@ -365,7 +365,6 @@ else
 			jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
 			jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 			/* end better download */
-
 			jsl.push({f:'index.js', n: 'index', j:1,w:4});
 			jsl.push({f:'html/start.html', n: 'start', j:0});
 			jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -389,9 +388,7 @@ else
 			jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 			jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 			jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-			jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});	
-			jsl.push({f:'js/baboom.js',n:'baboom_js',j:1});
-
+			jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
 			var jsl2 =
 			{
 				'about': {f:'html/about.html', n: 'about', j:0},
@@ -708,10 +705,9 @@ else
 				var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
 				if ((p > jsl_perc) && (p <= 100))
 				{
-					if (p < 100 && ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox)) return false;
 					jsl_perc = p;
-					if (document.getElementById('loading_progress_fill')) document.getElementById('loading_progress_fill').style.width = jsl_perc+'%';
-					else if(document.getElementById('loadinganim')) document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+jsl_perc;
+					if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;					
+					document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
 				}
 			}
 			var jsl_loaded={};

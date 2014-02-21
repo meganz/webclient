@@ -81,11 +81,11 @@ function FileSystemAPI(dl_id, dl) {
 	
 					dl_fw.onerror = function(e) {
 						failed = e;
-						dl_ack_write();
+						//dl_ack_write();
 					}
 	
 					dl_fw.onwriteend = function() {
-						if (this.position == targetpos) return dl_ack_write();
+						if (dl_fw.position == targetpos) return dl_ack_write();
 	
 						/* error */
 						clearit(0,0,function(s) {
@@ -100,7 +100,7 @@ function FileSystemAPI(dl_id, dl) {
 						});
 	
 						setTimeout(function() {
-							failed = 'Short write (' + this.position + ' / ' + this.targetpos + ')';
+							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
 							dl_ack_write();
 						}, 2000);
 					}
@@ -193,13 +193,15 @@ function FileSystemAPI(dl_id, dl) {
 		targetpos  = buffer.length + dl_fw.position;
 
 		dl_ack_write = function() {
-			dl_writing = false;
 			if (failed) {
 				failed = false; /* reset error flag */
 				dl_fw.seek(position);
-				dl_fw.write(new Blob([buffer]));
-				return;
+				return setTimeout(function() {
+					dl_fw.write(new Blob([buffer]));
+				}, 2000);
 			}
+
+			dl_writing = false;
 			done(); /* notify writer */
 		};
 

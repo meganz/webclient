@@ -2,7 +2,11 @@ if (d) {
 	var _allxhr = [];
 	function abortAll() {
 		$.each(_allxhr, function(k, xhr) {
-			try { xhr.abort(); } catch (e) {}
+			try { 
+				xhr.abort(); xhr.failure(); 
+			} catch (e) {
+				DEBUG('exception', e);
+			}
 		});
 	}
 }
@@ -13,7 +17,7 @@ function getXhrObject(s) {
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
-	if (d) {
+	if (d && typeof _allxhr == 'object') {
 		_allxhr.push(xhr);
 	}
 
@@ -184,9 +188,9 @@ function ClassChunk(task) {
 			};
 			// }}}
 
-			xhr.failure = function(e) {
+			xhr.failure = function(e, len) {
 				// we must reschedule this download	
-				Progress.progress -= prevProgress; /* this never happened */
+				Progress.progress -= len || prevProgress; /* this never happened */
 				prevProgress = pprevProgress = 0 // reset variables
 				// tell the scheduler that we failed
 				if (done) {
@@ -221,7 +225,7 @@ function ClassChunk(task) {
 				} else if (!download.cancelled) {
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
-					return xhr.failure();
+					return xhr.failure(null, r.byteLength);
 				}
 
 				if (!done) Scheduler.done();

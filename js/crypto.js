@@ -1633,7 +1633,17 @@ function api_fareq(res,ctx)
 
 					if (this.status == 200 && typeof this.response == 'object')
 					{
-						if (this.response == null || this.response.byteLength === 0) return;
+						if (this.response == null) return;
+						if (this.response.byteLength === 0)
+						{
+							if (d) console.warn('api_fareq: got empty response...');
+							
+							if (ctx.errfa && ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]])
+							{
+								ctx.errfa(ctx.h[ctx.p],!0);
+							}
+							return;
+						}
 
 						if (ctx.p)
 						{
@@ -1793,7 +1803,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in p)
 	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa };
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa };
 		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl},ctx);
 	}
 }

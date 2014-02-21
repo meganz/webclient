@@ -29,7 +29,7 @@ function clearit(storagetype,t,callback)
 					
 					var deltime = metadata.modificationTime.getTime()+tsec*1000+metadata.size/1024+30000;
 					
-					if (deltime < new Date().getTime() && deltime < lastactive && file.name != dl_id)
+					if (deltime < new Date().getTime() && deltime < lastactive)
 					{						
 						file.remove(function() 
 						{ 

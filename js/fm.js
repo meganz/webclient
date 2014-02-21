@@ -5152,10 +5152,10 @@ function fetchsrc(id)
 	{		
 		previewimg(id,uint8arr);
 		if (id == slideshowid) fetchnext();
-	},function(id)
+	},function(id, onerr)
 	{
 		delete preqs[id];		
-		M.addDownload([id],false,true);
+		M.addDownload([id],false,onerr ? -1:true);
 	});
 }
 

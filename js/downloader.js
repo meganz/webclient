@@ -109,8 +109,9 @@ function ClassChunk(task) {
 	
 		io.dl_xr = io.dl_xr || getxr() // global download progress
 
+		download.decrypt++; /* avoid race condition */
+
 		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
-			download.decrypt++; /* avoid race condition */
 			done = true;
 			Scheduler.done();
 		}
@@ -125,7 +126,6 @@ function ClassChunk(task) {
 		 */
 		function shouldIReportDone() {
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
-				download.decrypt++; /* avoid race condition */
 				done = true;
 				Scheduler.done();
 			}
@@ -225,7 +225,6 @@ function ClassChunk(task) {
 				}
 
 				if (!done) Scheduler.done();
-				else if (!failed) download.decrypt--;
 			}
 			// }}}
 
@@ -265,11 +264,6 @@ function ClassChunk(task) {
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
 				iRealDownloads--;
-				if (done) {
-					download.decrypt--;
-				} else {
-					Scheduler.done();
-				}
 				return true;
 			}
 		}
@@ -394,8 +388,6 @@ function decrypter(task)
 	var download = task.download
 		, Decrypter = this
 
-	download.decrypt++;
-
 	if (use_workers) {
 		var worker = new Worker('decrypter.js?v=5');
 		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
@@ -412,10 +404,7 @@ function decrypter(task)
 				var plain = new Uint8Array(e.data.buffer || e.data);
 				Decrypter.done(); // release slot
 				DEBUG("Decrypt done", download.cancelled);
-				if (download.cancelled) {
-					download.decrypt--;
-					return;
-				}
+				if (download.cancelled) return;
 				download.io.write(plain, task.offset, function() {
 					if (task.download.data) {
 						new Uint8Array(

@@ -211,15 +211,11 @@ function ClassChunk(task) {
 					iRealDownloads--;
 					updateProgress(true);
 
-					if (have_ab) {
-						if (navigator.appName != 'Opera') {
-							io.dl_bytesreceived += r.byteLength;
-						}
-						dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-					} else {
-						io.dl_bytesreceived += this.response.length;
-						dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
+					if (navigator.appName != 'Opera') {
+						io.dl_bytesreceived += r.byteLength;
 					}
+					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+
 					if (failed) DownloadManager.release(self);
 					failed = false
 				} else if (!download.cancelled) {

@@ -258,15 +258,10 @@ function ClassChunk(task) {
 
 			var is_canceled = !!download.cancelled;
 			if (!is_canceled) {
-				if(typeof(download.pos) === 'number') {
-					is_canceled = !dl_queue[download.pos].id;
-				} else {
-					if(d) console.warn('CHECK THIS', JSON.stringify(download));
-					is_canceled = true;
-					$.each(dl_queue, function(pos, dl) {
-						return dl.id != download.id || (is_canceled=!1);
-					});
+				if(typeof(download.pos) !== 'number') {
+					download.pos = IdToFile(download).pos
 				}
+				is_canceled = !dl_queue[download.pos].n;
 			}
 
 			if (is_canceled) {
@@ -318,7 +313,7 @@ function ClassFile(dl) {
 	
 		DEBUG("dl_key " + dl.key);
 		
-		download.onDownloadStart(download.dl_id, download.n, download.size, download.pos);
+		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 	
 		dl.io.begin = function() {
 			var tasks = [];

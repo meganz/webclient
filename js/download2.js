@@ -468,10 +468,11 @@ function dlGetUrl(object, callback) {
 }
 
 function IdToFile(id) {
-	var dl = null;
+	var dl = {}
 	$.each(dl_queue, function(i, _dl) {
 		if (id == _dl.id) {
 			dl = _dl
+			dl.pos = i
 			return false;
 		}
 	});

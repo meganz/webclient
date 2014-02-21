@@ -192,8 +192,8 @@ function ClassChunk(task) {
 					// We already told the scheduler we were done
 					// with no erro and this happened. Should I reschedule this 
 					// task?
+					failed = true
 					return setTimeout(function() {
-						failed = true
 						DownloadManager.pause(self);
 						request();
 					}, backoff *= 1.2);
@@ -215,12 +215,16 @@ function ClassChunk(task) {
 						io.dl_bytesreceived += r.byteLength;
 					}
 					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+					if (failed) DownloadManager.release(self);
+					failed = false:
+				} else if (!download.cancelled) {
+					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
 					return xhr.failure();
 				}
 
 				if (!done) Scheduler.done();
-				else if (done && !failed) download.decrypt--;
+				else if (!failed) download.decrypt--;
 			}
 			// }}}
 

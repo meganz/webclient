@@ -199,7 +199,9 @@ function populate_l()
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');	
+	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
+	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
+	l['year'] = new Date().getFullYear();
 }
 
 

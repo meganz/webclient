@@ -21,11 +21,10 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 			var t = new Date().getTime();
 			var n = M.d[node];
 					
-			// thumbnail:			
+			// thumbnail:
 			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
 			{
-				var canvas = document.createElement('canvas');
-				
+				var canvas = document.createElement('canvas');				
 				var sx=0;
 				var sy=0;
 				var x = this.width;
@@ -86,9 +85,10 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);						
 				
 				var ab2 = dataURLToAB(dataURI2);
-								
 				
-				api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key	
+				// only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
+				
+				if (!onPreviewRetry || !n || (n && n.u == u_handle)) api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key				
 				
 				if (node) previewimg(node,ab2);
 				

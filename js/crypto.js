@@ -1736,15 +1736,16 @@ function api_fareq(res,ctx)
 			if (data)
 			{
 				if (chromehack) t = pp[m].lastIndexOf('/');
-				else t = pp[m].length;
+				else t = -1;
 
 				pp[m] += '/'+ctx.type;
+                
+                if (t < 0) t = pp[m].length-1;
 
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
 
 				faxhrs[slot].responseType = 'arraybuffer';
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
-
 				faxhrs[slot].send(data);
 			}
 		}

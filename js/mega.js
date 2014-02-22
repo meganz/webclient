@@ -375,6 +375,7 @@ function MegaData ()
 		{
 			$('.file-block-scrolling').append('<div class="clear"></div>');
 			iconUI();
+			fa_duplicates = {};
 			fm_thumbnails();
 		}
 		else gridUI();

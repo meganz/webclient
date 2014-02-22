@@ -5107,7 +5107,6 @@ function slideshow(id,close)
 		{
 			if (dl_queue[i] && dl_queue[i].id == slideshowid)
 			{
-				// todo cesar: if the download button in the slideshow dialog is pressed AND the preview image is already in the queue, simply remove the preview flag
 				dl_queue[i].preview=false;
 				openTransferpanel();
 				return;
@@ -5207,17 +5206,21 @@ function previewimg(id,uint8arr)
 var thumbnails = [];
 var thumbnailblobs = [];
 var th_requested = [];
+var fa_duplicates = {};
 
 function fm_thumbnails()
 {
-	var treq = {},a=0;
+	var treq = {},a=0;	
 	if (myURL)
 	{
 		for (var i in M.v)
 		{
 			var n = M.v[i];			
 			if (n.fa)
-			{
+			{				
+				if (typeof fa_duplicates[n.fa] == 'undefined') fa_duplicates[n.fa]=0;				
+				else fa_duplicates[n.fa]=1;
+				
 				if (!thumbnails[n.h] && !th_requested[n.h])
 				{
 					treq[n.h] = 
@@ -5227,19 +5230,7 @@ function fm_thumbnails()
 					};
 					th_requested.push(n.h);					
 				}
-				else
-				{
-					if ($('.file-block#' + n.h).length > 0) 
-					{
-						$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
-						$('.file-block#' + n.h + ' img').parent().addClass('thumb');
-					}
-					if (($('#mobilethumb_' + n.h).length > 0) && ($('#mobilethumb_' + n.h + ' img')[0].src != thumbnails[n.h]))
-					{
-						$('#mobilethumb_' + n.h + ' img')[0].src = thumbnails[n.h];
-						$('#mobilethumb_' + n.h).addClass('thumb');
-					}
-				}
+				else fm_thumbnail_render(n);
 			}
 			a++;
 		}				
@@ -5250,19 +5241,35 @@ function fm_thumbnails()
 				try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
 				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);
 				thumbnailblobs[node] = blob;
-				thumbnails[node] = myURL.createObjectURL(blob);
-				if ($('.file-block#' + node).length > 0)
-				{
-					$('.file-block#' + node + ' img').attr('src',thumbnails[node]);
-					$('.file-block#' + node + ' img').parent().addClass('thumb');
+				thumbnails[node] = myURL.createObjectURL(blob);				
+				fm_thumbnail_render(M.d[node]);
+				
+				// deduplicate in view when there is a duplicate fa:
+				if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
+				{				
+					for (var i in M.v)
+					{
+						if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
+						{
+							thumbnails[M.v[i].h] = thumbnails[node];
+							fm_thumbnail_render(M.v[i]);						
+						}
+					}
 				}
-				if ($('#mobilethumb_' + node).length > 0)
-				{
-					$('#mobilethumb_' + node + ' img')[0].src = thumbnails[node];
-					$('#mobilethumb_' + node).addClass('image');
-				}
-			});
+			});			
 		}
+	}
+}
+
+
+
+function fm_thumbnail_render(n)
+{
+	if (!n || !thumbnails[n.h]) return;
+	if ($('.file-block#' + n.h).length > 0) 
+	{
+		$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
+		$('.file-block#' + n.h + ' img').parent().addClass('thumb');
 	}
 }
 

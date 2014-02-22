@@ -235,7 +235,7 @@ dlQueue.getNextTask = (function() {
 				candidate = p;
 				return false; /* break */
 			}
-			if (candidate === null) {
+			if (candidate === null || (pzTask instanceof ClassChunk && self._queue[candidate] instanceof ClassFile)) {
 				/* make it our candidate but don't break the loop */
 				candidate = p;
 			}

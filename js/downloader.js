@@ -270,6 +270,7 @@ function ClassChunk(task) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
+				if (!done) Scheduler.done();
 				iRealDownloads--;
 				return true;
 			}

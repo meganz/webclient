@@ -131,6 +131,7 @@ function ClassChunk(task) {
 		 *	actually done
 		 */
 		function shouldIReportDone() {
+			if (!Progress.data[url]) return;
 			var remain = Progress.data[url][1]-Progress.data[url][0]
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
@@ -211,9 +212,9 @@ function ClassChunk(task) {
 
 				if (r.byteLength == size) {
 					iRealDownloads--;
-					updateProgress(true);
 					Progress.done += r.byteLength;
 					delete Progress.data[url];
+					updateProgress(true);
 
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;

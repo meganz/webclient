@@ -1665,8 +1665,6 @@ function api_fareq(res,ctx)
 
 			faxhrs[slot].onreadystatechange = function()
 			{
-				if (this.onprogress) this.onprogress();
-
 				if (this.readyState == this.DONE)
 				{
 					var ctx = this.ctx;
@@ -1747,6 +1745,10 @@ function api_fareq(res,ctx)
 							api_storefileattr(null,null,null,null,ctx);
 						}
 					}
+				}
+				else
+				{
+					if (this.onprogress) this.onprogress();
 				}
 			}
 

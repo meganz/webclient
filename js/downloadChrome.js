@@ -109,7 +109,7 @@ function FileSystemAPI(dl_id, dl) {
 					setTimeout(function() {
 						// deferred execution
 						IO.begin();
-					});
+					}, 1);
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;

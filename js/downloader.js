@@ -112,10 +112,12 @@ function ClassChunk(task) {
 		var Progress = GlobalProgress[gid];
 
 		Progress.dl_xr = Progress.dl_xr || getxr() // global download progress
-		Progress[task.url] = [0, task.size];
-
-		if(!Progress.dl_lastprogress) Progress.dl_lastprogress = 0;
-		if(!Progress.dl_prevprogress) Progress.dl_prevprogress = 0;
+		Progress.speed = Progress.speed || 1
+		Progress.size  = Progress.size  || (download.zipid ? Zips[download.zipid].size : io.size)
+		Progress.dl_lastprogress = Progress.dl_lastprogress || 0;
+		Progress.dl_prevprogress = Progress.dl_prevprogress || 0;
+		Progress.data = Progress.data || {}
+		Progress.data[task.url] = [0, task.size];
 
 		download.decrypt++; /* avoid race condition */
 
@@ -130,7 +132,8 @@ function ClassChunk(task) {
 		 *	actually done
 		 */
 		function shouldIReportDone() {
-			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && (size-prevProgress)/speed <= dlDoneThreshold) {
+			var remain = Progress.data[task.url][1]-Progress.data[task.url][0]
+			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
 				Scheduler.done();
 			}
@@ -142,41 +145,36 @@ function ClassChunk(task) {
 				return false;
 			}
 
-			lastPing = NOW();
-
-			// keep in track of the current progress
-			/*
-			if (lastUpdate+250 < lastPing) {
-				speed = progress.update(prevProgress - pprevProgress)
-				pprevProgress = prevProgress;
-				lastUpdate = lastPing
-				shouldIReportDone();
-			}
-			*/
+			shouldIReportDone();
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > lastPing && !force) {
+			if (Progress.dl_lastprogress+250 > NOW() && !force) {
 				// too soon
 				return false;
 			}
 
-			var progress = 0;
-			$.each(Progress, function(i, val) {
-				if (!(val instanceof Array)) return;
-				progress += val[0];
+			var _progress = 0;
+			var tmp = 0
+			$.each(Progress.data, function(i, val) {
+				_progress += val[0];
+				tmp++
 			});
 
 			download.onDownloadProgress(
 				download.dl_id, 
-				progress, // global progress
-				download.size, // total download size
-				Progress.dl_xr.update(progress - Progress.dl_prevprogress),  // speed
+				_progress, // global progress
+				Progress.size, // total download size
+				Progress.speed = Progress.dl_xr.update(_progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
 
-			Progress.dl_prevprogress = progress
-			Progress.dl_lastprogress = lastPing
+			DEBUG(_progress, tmp, Progress.size, Progress.speed);
+			if (Progress.dl_prevprogress > _progress) {
+				throw new Error;
+			}
+			Progress.dl_prevprogress = _progress
+			Progress.dl_lastprogress = NOW()
 		}
 
 		function request() {
@@ -186,7 +184,7 @@ function ClassChunk(task) {
 			xhr.progress = function(e) {
 				if (isCancelled()) return;
 
-				Progress[task.url][0] = e.loaded
+				Progress.data[task.url][0] = e.loaded
 				updateProgress(true)
 			};
 			// }}}
@@ -196,7 +194,7 @@ function ClassChunk(task) {
 				xhr.has_failed = true;
 
 				// we must reschedule this download	
-				Progress[task.url][0] = 0;
+				Progress.data[task.url][0] = 0; /* we're at 0 bytes */
 				updateProgress(true)
 
 				// tell the scheduler that we failed
@@ -220,7 +218,7 @@ function ClassChunk(task) {
 
 				if (r.byteLength == size) {
 					iRealDownloads--;
-					Progress[task.url][0] = r.byteLength;
+					Progress.data[task.url][0] = r.byteLength;
 					updateProgress(true)
 
 					if (navigator.appName != 'Opera') {

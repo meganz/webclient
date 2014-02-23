@@ -153,7 +153,7 @@ function ClassChunk(task) {
 				return false;
 			}
 
-			var _progress = 0;
+			var _progress = Progress.done
 			$.each(Progress.data, function(i, val) {
 				_progress += val[0];
 			});
@@ -211,8 +211,9 @@ function ClassChunk(task) {
 
 				if (r.byteLength == size) {
 					iRealDownloads--;
-					Progress.data[url][0] = r.byteLength;
-					updateProgress(true)
+					updateProgress(true);
+					Progress.done += r.byteLength;
+					delete Progress.data[url];
 
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
@@ -306,7 +307,7 @@ function ClassFile(dl) {
 
 		var gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
 		if (!dl.zipid || !GlobalProgress[gid]) {
-			GlobalProgress[gid] = {data: {}};
+			GlobalProgress[gid] = {data: {}, done: 0};
 		}
 	
 		DEBUG("dl_key " + dl.key);

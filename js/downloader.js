@@ -83,6 +83,7 @@ function getXhrObject(s) {
 }
 
 // Chunk fetch {{{
+var GlobalProgress = {};
 function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
@@ -99,19 +100,22 @@ function ClassChunk(task) {
 			, io = download.io
 			, average_throughput = [0, 0]
 			, done = false
-			, prevProgress = 0    // Keep in track how far are we in the downloads
-			, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
-			, progress = getxr()  // chunk progress
 			, speed = 1 // speed of the current chunk
 			, lastUpdate  = NOW()
 			, lastPing    = NOW()
 			, localId = iRealDownloads
-			, Progress = download.zipid ? Zips[download.zipid] : io
 			, backoff = 1000
 			, failed = false
+			, gid    = download.zipid ? 'zip_' + download.zipid : 'file_' + download.dl_id
 			, _cancelled = false
-	
-		io.dl_xr = io.dl_xr || getxr() // global download progress
+
+		var Progress = GlobalProgress[gid];
+
+		Progress.dl_xr = Progress.dl_xr || getxr() // global download progress
+		Progress[task.url] = [0, task.size];
+
+		if(!Progress.dl_lastprogress) Progress.dl_lastprogress = 0;
+		if(!Progress.dl_prevprogress) Progress.dl_prevprogress = 0;
 
 		download.decrypt++; /* avoid race condition */
 
@@ -119,9 +123,6 @@ function ClassChunk(task) {
 			done = true;
 			Scheduler.done();
 		}
-
-		if(!Progress.dl_lastprogress) Progress.dl_lastprogress = 0;
-		if(!Progress.dl_prevprogress) Progress.dl_prevprogress = 0;
 
 		/**
 		 *	Check if the current chunk is small or close to its
@@ -144,12 +145,14 @@ function ClassChunk(task) {
 			lastPing = NOW();
 
 			// keep in track of the current progress
+			/*
 			if (lastUpdate+250 < lastPing) {
 				speed = progress.update(prevProgress - pprevProgress)
 				pprevProgress = prevProgress;
 				lastUpdate = lastPing
 				shouldIReportDone();
 			}
+			*/
 
 			// Update global progress (per download) and aditionally
 			// update the UI
@@ -158,19 +161,21 @@ function ClassChunk(task) {
 				return false;
 			}
 
+			var progress = 0;
+			$.each(Progress, function(i, val) {
+				if (!(val instanceof Array)) return;
+				progress += val[0];
+			});
+
 			download.onDownloadProgress(
 				download.dl_id, 
-				Progress.progress, // global progress
-				Progress.size, // total download size
-				Progress.dl_xr.update(Progress.progress - Progress.dl_prevprogress),  // speed
+				progress, // global progress
+				download.size, // total download size
+				Progress.dl_xr.update(progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
 
-			if (Progress.size < Progress.progress) {
-				throw new Error;
-			}
-	
-			Progress.dl_prevprogress = Progress.progress
+			Progress.dl_prevprogress = progress
 			Progress.dl_lastprogress = lastPing
 		}
 
@@ -181,10 +186,8 @@ function ClassChunk(task) {
 			xhr.progress = function(e) {
 				if (isCancelled()) return;
 
-				Progress.progress += e.loaded - prevProgress;
-				prevProgress = e.loaded
-
-				updateProgress();
+				Progress[task.url][0] = e.loaded
+				updateProgress(true)
 			};
 			// }}}
 
@@ -193,8 +196,9 @@ function ClassChunk(task) {
 				xhr.has_failed = true;
 
 				// we must reschedule this download	
-				Progress.progress -= len || prevProgress; /* this never happened */
-				prevProgress = pprevProgress = 0 // reset variables
+				Progress[task.url][0] = 0;
+				updateProgress(true)
+
 				// tell the scheduler that we failed
 				if (done) {
 					// We already told the scheduler we were done
@@ -215,9 +219,9 @@ function ClassChunk(task) {
 				var r = this.response || {};
 
 				if (r.byteLength == size) {
-					Progress.progress += r.byteLength - prevProgress;
 					iRealDownloads--;
-					updateProgress(true);
+					Progress[task.url][0] = r.byteLength;
+					updateProgress(true)
 
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
@@ -308,6 +312,9 @@ function ClassFile(dl) {
 		if (!use_workers) {
 			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 		}
+
+		var gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
+		GlobalProgress[gid] = {};
 	
 		DEBUG("dl_key " + dl.key);
 		

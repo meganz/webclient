@@ -116,8 +116,7 @@ function ClassChunk(task) {
 		Progress.size  = Progress.size  || (download.zipid ? Zips[download.zipid].size : io.size)
 		Progress.dl_lastprogress = Progress.dl_lastprogress || 0;
 		Progress.dl_prevprogress = Progress.dl_prevprogress || 0;
-		Progress.data = Progress.data || {}
-		Progress.data[task.url] = [0, task.size];
+		Progress.data[url] = [0, task.size];
 
 		download.decrypt++; /* avoid race condition */
 
@@ -132,7 +131,7 @@ function ClassChunk(task) {
 		 *	actually done
 		 */
 		function shouldIReportDone() {
-			var remain = Progress.data[task.url][1]-Progress.data[task.url][0]
+			var remain = Progress.data[url][1]-Progress.data[url][0]
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
 				Scheduler.done();
@@ -155,10 +154,8 @@ function ClassChunk(task) {
 			}
 
 			var _progress = 0;
-			var tmp = 0
 			$.each(Progress.data, function(i, val) {
 				_progress += val[0];
-				tmp++
 			});
 
 			download.onDownloadProgress(
@@ -169,10 +166,6 @@ function ClassChunk(task) {
 				download.pos // this download position
 			);
 
-			DEBUG(_progress, tmp, Progress.size, Progress.speed);
-			if (Progress.dl_prevprogress > _progress) {
-				throw new Error;
-			}
 			Progress.dl_prevprogress = _progress
 			Progress.dl_lastprogress = NOW()
 		}
@@ -184,7 +177,7 @@ function ClassChunk(task) {
 			xhr.progress = function(e) {
 				if (isCancelled()) return;
 
-				Progress.data[task.url][0] = e.loaded
+				Progress.data[url][0] = e.loaded
 				updateProgress(true)
 			};
 			// }}}
@@ -194,7 +187,7 @@ function ClassChunk(task) {
 				xhr.has_failed = true;
 
 				// we must reschedule this download	
-				Progress.data[task.url][0] = 0; /* we're at 0 bytes */
+				Progress.data[url][0] = 0; /* we're at 0 bytes */
 				updateProgress(true)
 
 				// tell the scheduler that we failed
@@ -218,7 +211,7 @@ function ClassChunk(task) {
 
 				if (r.byteLength == size) {
 					iRealDownloads--;
-					Progress.data[task.url][0] = r.byteLength;
+					Progress.data[url][0] = r.byteLength;
 					updateProgress(true)
 
 					if (navigator.appName != 'Opera') {
@@ -312,7 +305,9 @@ function ClassFile(dl) {
 		}
 
 		var gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
-		GlobalProgress[gid] = {};
+		if (!dl.zipid || !GlobalProgress[gid]) {
+			GlobalProgress[gid] = {data: {}};
+		}
 	
 		DEBUG("dl_key " + dl.key);
 		

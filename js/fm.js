@@ -4991,6 +4991,7 @@ function slingshotDialog(close)
 
 var previews = {};
 var preqs = {};
+var pfails = {};
 var slideshowid;
 
 function slideshowsteps()
@@ -5143,19 +5144,29 @@ function fetchnext()
 
 function fetchsrc(id)
 {
+	function eot(id, err)
+	{
+		delete preqs[id];
+		delete pfails[id];
+		M.addDownload([id],false,err? -1:true);
+	}
+	eot.timeout = 5100;
+
+	if (pfails[id])
+	{ // for slideshow_next/prev
+		if (slideshowid == id) return eot(id,1);
+		delete pfails[id];
+	}
+
 	var n = M.d[id];
 	preqs[id]=1;
 	var treq = {};
 	treq[id] = {fa:n.fa,k:n.key};
 	api_getfileattr(treq,1,function(ctx,id,uint8arr)
-	{		
+	{
 		previewimg(id,uint8arr);
 		if (id == slideshowid) fetchnext();
-	},function(id, onerr)
-	{
-		delete preqs[id];		
-		M.addDownload([id],false,onerr ? -1:true);
-	});
+	},eot);
 }
 
 function previewsrc(src)
@@ -5191,14 +5202,24 @@ function previewimg(id,uint8arr)
 	try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
 	if (!blob || blob.size < 25) blob = new Blob([uint8arr.buffer]);
 	previews[id] = 
-	{	
+	{
 		blob: blob,
 		src: myURL.createObjectURL(blob),
 		time: new Date().getTime()	
-	}
+	};
 	if (id == slideshowid)
 	{
-		previewsrc(previews[id].src);		
+		previewsrc(previews[id].src);
+	}
+	if (Object.keys(previews).length == 1)
+	{
+		$(window).unload(function()
+		{
+			for (var id in previews)
+			{
+				myURL.revokeObjectURL(previews[id].src);
+			}
+		});
 	}
 }
 

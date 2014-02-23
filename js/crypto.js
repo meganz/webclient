@@ -1620,16 +1620,58 @@ function api_fareq(res,ctx)
 
 				if (faxhrs[slot].readyState == XMLHttpRequest.DONE) break;
 			}
-		
+
 			faxhrs[slot].ctx = ctx;
 
 			if (d) console.log("Using file attribute channel " + slot);
-			
+
+			if (ctx.errfa && ctx.errfa.timeout)
+			{
+				faxhrs[slot].onprogress = function()
+				{
+					if (this.fart) clearTimeout(this.fart);
+					this.fart = setTimeout(this.faeot.bind(this), this.ctx.errfa.timeout);
+				};
+			}
+
+			faxhrs[slot].faid = function()
+			{
+				var ctx = this.ctx;
+
+				return ctx.errfa && ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+			};
+
+			faxhrs[slot].faeot = function()
+			{
+				if (this.fart) clearTimeout(this.fart);
+				if (d) console.log('FAEOT', this);
+
+				var id = this.faid();
+				if (id !== slideshowid)
+				{
+					if (id)
+					{
+						pfails[id] = 1;
+						delete preqs[id];
+					}
+
+					return;
+				}
+
+				this.abort();
+				this.ctx.errfa(id,1);
+				delete this.ctx.errfa;
+			};
+
 			faxhrs[slot].onreadystatechange = function()
 			{
+				if (this.onprogress) this.onprogress();
+
 				if (this.readyState == this.DONE)
 				{
 					var ctx = this.ctx;
+
+					if (this.fart) clearTimeout(this.fart);
 
 					if (this.status == 200 && typeof this.response == 'object')
 					{
@@ -1637,12 +1679,8 @@ function api_fareq(res,ctx)
 						if (this.response.byteLength === 0)
 						{
 							if (d) console.warn('api_fareq: got empty response...');
-							
-							if (ctx.errfa && ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]])
-							{
-								ctx.errfa(ctx.h[ctx.p],!0);
-							}
-							return;
+
+							return this.faeot();
 						}
 
 						if (ctx.p)

@@ -242,7 +242,10 @@ var MegaChat = function() {
     this._myPresence = localStorage.megaChatPresence;
 
     this.options = {
-        'delaySendMessageIfRoomNotAvailableTimeout': 3000
+        'delaySendMessageIfRoomNotAvailableTimeout': 3000,
+        'rtcSession': {
+            iceServers:[{url: 'stun:stun.l.google.com:19302'}]
+        }
     };
 
     this.instanceId = megaChatInstanceId++;
@@ -313,7 +316,8 @@ var MegaChat = function() {
     });
     this.karere.bind("onInviteMessage", function(e, eventData) {
         if(eventData.myOwn === true) {
-            return;
+            e.stopPropagation();
+            return false;
         }
         if(localStorage.d) {
             console.debug(self.karere.getNickname(), "Got invitation to join", eventData.room, "with eventData:", eventData);
@@ -367,12 +371,14 @@ var MegaChat = function() {
         self.chats[eventData.room].ctime = eventData.meta.ctime;
         self.chats[eventData.room].setUsers(eventData.meta.participants);
 
-//        debugger;
         self.chats[eventData.room].setState(MegaChatRoom.STATE.JOINING);
         self.karere.joinChat(eventData.room, eventData.password);
 
 
         self.chats[eventData.room].refreshUI();
+
+
+        e.stopPropagation();
 
         return false; // stop propagation, we are manually handling the join on invite case
     });
@@ -401,7 +407,7 @@ var MegaChat = function() {
         return self._onUsersUpdate("left", e, eventData);
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventData) {
-        if(self.chats[eventData.roomJid]) {
+        if(self.chats[eventData.roomJid] && self.chats[eventData.roomJid].state == MegaChatRoom.STATE.JOINING) {
             self.chats[eventData.roomJid].setState(
                 MegaChatRoom.STATE.JOINED
             );
@@ -463,7 +469,6 @@ var MegaChat = function() {
     });
 
     // UI events
-
     $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
 
     $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
@@ -530,22 +535,33 @@ MegaChat.prototype.init = function() {
     self.$header_tpl = $('.fm-chat-header', self.$container).clone().removeClass("template");
     self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
 
-    self.$message_tpl = $('.fm-chat-messages-block.template', self.$container).clone();
+    self.$message_tpl = $('.fm-chat-messages-block.message.template', self.$container).clone();
     self.$message_tpl
         .removeClass("template")
+        .removeClass("message")
+        .removeClass("hidden");
+
+    self.$inline_dialog_tpl = $('.fm-chat-messages-block.inline-dialog.template', self.$container).clone();
+
+    self.$inline_dialog_tpl
+        .removeClass("template")
+        .removeClass("message")
         .removeClass("hidden");
 
 
     // cleanup dom nodes that were used as templates
     $('.fm-chat-header', self.$container).remove();
     $('.fm-chat-message-scroll', self.$container).remove();
-    $('.fm-chat-messages-block.template', self.$container).remove();
+    $('.fm-chat-messages-block.message.template', self.$container).remove();
+    $('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
 
     if(self.is_initialized) {
         self.destroy()
             .always(function() {
                 self.init();
             });
+
+        return;
     }
     self.is_initialized = true;
 
@@ -559,6 +575,59 @@ MegaChat.prototype.init = function() {
     } else {
         self.renderMyStatus();
     }
+
+    // Initialize RTC
+    RtcSession.globalInit();
+
+    self.rtc = self.karere.connection.rtc = new RtcSession(self.karere.connection, self.options.rtcSession);
+
+
+    // bind rtc events
+
+
+    var rtcEventProxyToRoom = function(e, eventData) {
+        console.error("RTC: ", e, eventData);
+
+        var peer = eventData.peer;
+
+        if(peer) {
+            var fromBareJid = Karere.getNormalizedBareJid(peer);
+            if(fromBareJid == self.karere.getBareJid()) {
+                console.warn("Ignoring my own incoming request.");
+
+                return;
+            }
+            var $promise = self.openChat([fromBareJid], "private");
+
+            $promise.done(function(roomJid, room) {
+                room.trigger(e, eventData);
+            });
+        } else {
+            // local-stream-obtained = most likely this is the currently active window/room
+            var room = self.getCurrentRoom();
+            if(room) {
+                room.trigger(e, eventData);
+            }
+        }
+
+
+        // TODO: Multi group calls?
+    };
+
+    $(self.rtc).on('call-incoming-request', rtcEventProxyToRoom);
+    $(self.rtc).on('call-answered', rtcEventProxyToRoom);
+    $(self.rtc).on('call-declined', rtcEventProxyToRoom);
+    $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
+    $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
+    $(self.rtc).on('media-recv', rtcEventProxyToRoom);
+    $(self.rtc).on('local-stream-obtained', rtcEventProxyToRoom);
+    $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
+    $(self.rtc).on('local-player-remove', rtcEventProxyToRoom);
+    $(self.rtc).on('local-media-fail', rtcEventProxyToRoom);
+    $(self.rtc).on('call-init', rtcEventProxyToRoom);
+    $(self.rtc).on('call-ended', rtcEventProxyToRoom);
+    $(self.rtc).on('muted', rtcEventProxyToRoom);
+    $(self.rtc).on('unmuted', rtcEventProxyToRoom);
 };
 
 /**
@@ -625,7 +694,6 @@ MegaChat.prototype._onChatMessage = function(e, eventData) {
         });
     } else {
         if(localStorage.d) {
-            debugger;
             console.debug("Room not found: ", eventData.roomJid);
         }
     }
@@ -716,22 +784,6 @@ MegaChat.prototype.getContacts = function() {
 };
 
 /**
- * Normalize Jids (e.g. conference jids -> local muc jids)
- *
- * @param jid
- * @returns {*}
- */
-MegaChat.prototype.getNormalisedBareJid = function(jid) {
-    if(jid.indexOf("conference.") != -1) {
-        jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "");
-    } else {
-        jid = jid.split("/")[0];
-    }
-
-    return jid;
-};
-
-/**
  * Get Contact object from the Mega's Contacts that corresponds to the given jid
  *
  * @param jid {String} full or bare jid...does not mather
@@ -743,7 +795,7 @@ MegaChat.prototype.getContactFromJid = function(jid) {
 
     assert(jid, "Missing jid");
 
-    jid = self.getNormalisedBareJid(jid); // always convert to bare jid
+    jid = Karere.getNormalizedBareJid(jid); // always convert to bare jid
 
     var contact = null;
     $.each(M.u, function(k, v) {
@@ -927,7 +979,6 @@ MegaChat.prototype.getMyXMPPPassword = function() {
  * @returns {Deferred}
  */
 MegaChat.prototype.openChat = function(jids, type) {
-//    debugger;
     var self = this;
     type = type || "private";
 
@@ -985,15 +1036,14 @@ MegaChat.prototype.openChat = function(jids, type) {
 
 
 
-    var jidsWithoutMyself = clone(jids);
-    jidsWithoutMyself.splice($.inArray(self.karere.getJid(), jidsWithoutMyself), 1);
+    var jidsWithoutMyself = room.getParticipantsExceptMe(jids);
+
+    room.setState(MegaChatRoom.STATE.JOINING);
 
     var $startChatPromise = self.karere.startChat([], type, roomJid, (type == "private" ? false : undefined));
 
     $startChatPromise
         .done(function(roomJid) {
-//            debugger;
-
             $.each(jidsWithoutMyself, function(k, userJid) {
 
                 if(self.chats[roomJid]) {
@@ -1104,13 +1154,25 @@ MegaChat.prototype.sendMessage = function(roomJid, val) {
     }
 };
 
-
+//TODO: Docs
 MegaChat.prototype.resized = function() {
     var $jsp = $('.fm-chat-message-scroll').data("jsp");
     if($jsp) {
         $jsp.reinitialise();
     }
-}
+};
+
+
+
+//TODO: Docs
+MegaChat.prototype.getPrivateRoomJidFor = function(jid) {
+    jid = Karere.getNormalizedBareJid(jid);
+    var roomJid = $('#treesub_contacts a[data-jid="' + jid + '"]').attr("data-room-jid");
+
+    assert(roomJid, "Missing private room jid for user jid: " + jid);
+    return roomJid;
+};
+
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -1152,41 +1214,58 @@ var MegaChatRoom = function(megaChat, roomJid) {
          * This should be high enough, so that it will be enough for a response to be generated (message log to be
          * encrypted), send and recieved.
          */
-        'syncRequestCleanupTimeout': 5000
+        'syncRequestCleanupTimeout': 5000,
+
+
+        /**
+         * Default media options
+         */
+        'mediaOptions': {
+            audio: true,
+            video: true
+        }
     };
     this._syncRequests = {};
     this._messagesQueue = [];
 
-    this.state = MegaChatRoom.STATE.INITIALIZED;
+    this.setState(MegaChatRoom.STATE.INITIALIZED);
 
     this.$messages = megaChat.$messages_tpl.clone();
     this.$header = megaChat.$header_tpl.clone();
-
-
-    this.$messages.jScrollPane
 
     // Events
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
         if(newState == MegaChatRoom.STATE.JOINED) {
-            self.requestMessageSync();
-            createTimeoutPromise(
-                function() {
-                    return self.state == MegaChatRoom.STATE.READY || self.state == MegaChatRoom.STATE.SYNCED
-                },
-                200,
-                self.options.messageSyncFailAfterTimeout
-            )
-                .fail(function() {
-                    if(localStorage.d) {
-                        console.warn("Sync failed, setting state to READY.");
-                    }
-                    self.state = MegaChatRoom.STATE.READY; // its ok, if the sync failed...change the state to DONE
-                })
+            if(self.requestMessageSync()) {
+                createTimeoutPromise(
+                    function() {
+                        return self.state == MegaChatRoom.STATE.READY || self.state == MegaChatRoom.STATE.SYNCED
+                    },
+                    200,
+                    self.options.messageSyncFailAfterTimeout
+                )
+                    .fail(function() {
+                        if(localStorage.d) {
+                            console.warn("Sync failed, setting state to READY.");
+                        }
+                        self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+                    })
+            } else {
+                if(localStorage.d) {
+                    console.warn("Sync failed immediately, setting state to READY.");
+                }
+                self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+            }
+
+
         } else if(newState == MegaChatRoom.STATE.SYNCED) {
             // XX: we should add the encryption stuff just after state == SYNCED and before state == READY
             self.setState(MegaChatRoom.STATE.READY);
         } else if(newState == MegaChatRoom.STATE.READY) {
+            if(localStorage.dd) {
+                console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+            }
             if(self._messagesQueue.length > 0) {
                 $.each(self._messagesQueue, function(k, v) {
                     if(!v) {
@@ -1213,6 +1292,272 @@ var MegaChatRoom = function(megaChat, roomJid) {
     );
 
     this.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+
+
+    /**
+     * Audio/Video button handlers
+     */
+    $('.call-actions', self.$header).unbind('click.megaChat');
+
+    $('.btn-chat-call', self.$header).bind('click.megaChat', function() {
+        var participants = self.getParticipantsExceptMe();
+        assert(participants.length > 0, "No participants.");
+
+        self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
+
+        var doCancel = function() {
+            if(self.callRequest && self.callRequest.cancel) {
+                self.callRequest.cancel();
+
+                resetCallStateNoCall();
+            }
+            self.megaChat.karere.connection.rtc.hangup();
+        };
+
+        $('.btn-chat-cancel-active-call', self.$header).bind('click.megaChat', function() {
+            doCancel();
+        });
+
+
+        resetCallStateInCall();
+
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + "...",
+                "outgoing-call",
+                undefined,
+                {
+                    'reject': {
+                        'type': 'secondary',
+                        'text': "Cancel",
+                        'callback': doCancel
+                    }
+                }
+            )
+        );
+    });
+
+
+    $('.btn-chat-mute', self.$header).bind('click.megaChat', function() {
+        self.options.mediaOptions.audio = false;
+        self.megaChat.karere.connection.rtc.muteUnmute(true, {audio:true});
+
+        resetCallStateInCall();
+    });
+    $('.btn-chat-unmute', self.$header).bind('click.megaChat', function() {
+        self.options.mediaOptions.audio = true;
+        self.megaChat.karere.connection.rtc.muteUnmute(false, {audio:true});
+
+        resetCallStateInCall();
+    });
+
+    $('.btn-chat-video-mute', self.$header).bind('click.megaChat', function() {
+        self.options.mediaOptions.video = false;
+        self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
+
+        resetCallStateInCall();
+    });
+    $('.btn-chat-video-unmute', self.$header).bind('click.megaChat', function() {
+        self.options.mediaOptions.video = true;
+        self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
+
+        resetCallStateInCall();
+    });
+
+    self.bind('call-incoming-request', function(e, eventData) {
+        $('.call-actions', self.$header).hide();
+
+        var doAnswer = function() {
+            eventData.answer(true, {
+                mediaOptions: self.getMediaOptions()
+            });
+        };
+
+        var doCancel = function() {
+            eventData.answer(false, {reason:'busy'});
+
+            self.trigger('call-declined', eventData);
+        };
+
+        var $answer = $('.btn-chat-answer-incoming-call', self.$header);
+        $answer.unbind('click.megaChat');
+        $answer.bind('click.megaChat', doAnswer);
+        $answer.show();
+
+        var $cancel = $('.btn-chat-reject-incoming-call', self.$header);
+        $cancel.unbind('click.megaChat');
+        $cancel.bind('click.megaChat', doCancel);
+        $cancel.show();
+
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
+                "incoming-call",
+                undefined,
+                {
+                    'answer': {
+                        'type': 'primary',
+                        'text': "Answer",
+                        'callback': doAnswer
+                    },
+                    'reject': {
+                        'type': 'secondary',
+                        'text': "Cancel",
+                        'callback': doCancel
+                    }
+                }
+            )
+        );
+    });
+
+    var callStartedState = function(e, eventData) {
+        $('.call-actions', self.$header).hide();
+
+        var $cancel = $('.btn-chat-cancel-active-call', self.$header);
+        $cancel.unbind('click.megaChat');
+        $cancel.bind('click.megaChat', function() {
+            self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
+        });
+        $cancel.show();
+        resetCallStateInCall();
+    };
+
+    var resetCallStateNoCall = function() {
+        $('.call-actions', self.$header).hide();
+        $('.btn-chat-call', self.$header).show();
+
+        self.getInlineDialogInstance("incoming-call").slideUp(function() {
+            $(this).remove();
+        });
+        self.getInlineDialogInstance("outgoing-call").slideUp(function() {
+            $(this).remove();
+        });
+    };
+    var resetCallStateInCall = function() {
+        $('.call-actions', self.$header).hide();
+        if(!self.options.mediaOptions.audio) {
+            $('.btn-chat-unmute', self.$header).show();
+        } else {
+            $('.btn-chat-mute', self.$header).show();
+        }
+
+        if(!self.options.mediaOptions.video) {
+            $('.btn-chat-video-unmute', self.$header).show();
+        } else {
+            $('.btn-chat-video-mute', self.$header).show();
+        }
+
+        $('.btn-chat-cancel-active-call', self.$header).show();
+
+        self.getInlineDialogInstance("incoming-call").slideUp(function() {
+            $(this).remove();
+        });
+        self.getInlineDialogInstance("outgoing-call").slideUp(function() {
+            $(this).remove();
+        });
+    };
+
+    self.bind('call-init', function(e, eventData) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                "started-call-" + unixtime()
+            )
+        );
+        callStartedState(e, eventData);
+    });
+    self.bind('call-answered', function(e, eventData) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                "started-call-" + unixtime()
+            )
+        );
+
+        callStartedState(e, eventData);
+    });
+
+    self.bind('call-answer-timeout', function(e, eventData) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
+                "rejected-call-" + unixtime()
+            )
+        );
+        resetCallStateNoCall();
+    });
+    self.bind('call-declined', function(e, eventData) {
+        var msg;
+        var peer = eventData.peer;
+        if(Strophe.getBareJidFromJid(peer) == self.megaChat.karere.getBareJid()) {
+            msg = "Incoming Call with " + self.megaChat.getContactNameFromJid(self.getParticipantsExceptMe()[0]) + " was rejected.";
+        }  else {
+            msg = "Incoming Call with " + self.megaChat.getContactNameFromJid(peer) + " was rejected.";
+        }
+
+
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                msg,
+                "rejected-call-" + unixtime()
+            )
+        );
+
+        resetCallStateNoCall();
+    });
+
+    self.bind('call-canceled', function(e, eventData) {
+        if(eventData.info && eventData.info.event == "handled-elsewhere") {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was handled on some other device.",
+                    "canceled-call-" + unixtime()
+                )
+            );
+        } else {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was canceled.",
+                    "canceled-call-" + unixtime()
+                )
+            );
+        }
+        resetCallStateNoCall();
+    });
+
+    self.bind('call-ended', function(e, eventData) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.",
+                "ended-call-" + unixtime()
+            )
+        );
+
+        resetCallStateNoCall();
+    });
+
+    self.bind('media-recv', function(event, obj) {
+        $('.remote-video-container', self.$header).append(obj.player);
+        resetCallStateInCall();
+    });
+    self.bind('local-stream-obtained', function(event, obj) {
+        $('.local-video-container', self.$header).append(obj.player);
+    });
+
+    self.bind('local-player-remove', function(event, obj) {
+        $(obj.player).remove();
+    });
+
+    self.bind('remote-player-remove', function(event, obj) {
+        $(obj.id).remove();
+    });
+
+    self.bind('muted', function(e, eventData) {
+        //TODO: Impl.
+    });
+    self.bind('unmuted', function(e, eventData) {
+        //TODO: Impl.
+    });
 
 
     return this;
@@ -1271,10 +1616,12 @@ MegaChatRoom.prototype.setState = function(newState) {
 
     assert(newState, 'Missing state');
 
-    assert(
-        newState > self.state,
-        'Invalid state change. Current:' + MegaChatRoom.stateToText(self.state) +  "to" + MegaChatRoom.stateToText(newState)
-    );
+    if(self.state) { // if not == null, e.g. setting to INITIALIZED
+        assert(
+            newState > self.state,
+            'Invalid state change. Current:' + MegaChatRoom.stateToText(self.state) +  "to" + MegaChatRoom.stateToText(newState)
+        );
+    }
 
     var oldState = self.state;
     self.state = newState;
@@ -1411,6 +1758,17 @@ MegaChatRoom.prototype.getParticipants = function() {
     return Object.keys(participants);
 };
 
+MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
+    var self = this;
+    if(!jids) {
+        jids = self.getParticipants();
+    }
+    var jidsWithoutMyself = clone(jids);
+    jidsWithoutMyself.splice($.inArray(self.megaChat.karere.getBareJid(), jidsWithoutMyself), 1);
+
+    return jidsWithoutMyself;
+};
+
 /**
  * Refreshes the UI of the chat room.
  */
@@ -1434,14 +1792,7 @@ MegaChatRoom.prototype.refreshUI = function() {
     }
 
     if(self.type == "private") {
-        var participants = self.getParticipants();
-        var myIndex = participants.indexOf(self.megaChat.karere.getBareJid());
-
-        assert(myIndex != -1, "My jid not found in the participants list.");
-
-        if(myIndex != -1) {
-            participants.splice(myIndex, 1);
-        }
+        var participants = self.getParticipantsExceptMe();
 
         assert(participants[0], "No participants found.");
 
@@ -1471,6 +1822,14 @@ MegaChatRoom.prototype.refreshUI = function() {
     } else {
         throw new Error("Not implemented"); //TODO: Groups, TBD
     }
+
+
+    /**
+     * Audio/Video buttons
+     */
+    $('.call-actions', self.$header).hide();
+
+    $('.btn-chat-call', self.$header).show();
 };
 
 
@@ -1562,38 +1921,6 @@ MegaChatRoom.prototype.hide = function() {
 };
 
 /**
- * Replace one room with a new one
- *
- * @param newJid {String} Full jid of the room
- * @param users {Array} array with participants
- * @param ctime {Number} unixtimestamp when the room was created.
- */
-MegaChatRoom.prototype.replaceWith = function(newJid, users, ctime) {
-    var self = this;
-
-    if(self.megaChat.currentlyOpenedChat == self.roomJid || self.$header.is(":visible")) {
-        self.megaChat.currentlyOpenedChat = newJid;
-    }
-    var oldJid = self.roomJid;
-
-    var oldRoom = $.extend(true, {}, self);
-
-    self.roomJid = newJid;
-    self.users = clone(users);
-    self.ctime = ctime;
-
-//    delete self.megaChat.chats[oldJid];
-    self.megaChat.chats[newJid] = self;
-
-
-    self.refreshUI();
-
-    oldRoom.leave();
-
-    delete self.megaChat.chats[oldJid];
-};
-
-/**
  * Append message to the UI of this room.
  * Note: This method will also log the message, so that later when someone asks for message sync this log will be used.
  *
@@ -1650,6 +1977,12 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     );
 
 
+    return self.appendDomMessage($message, message);
+};
+
+MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
+    var self = this;
+
     var $jsp = self.$messages.data('jsp');
 
     assert($jsp, "JSP not available.");
@@ -1657,10 +1990,19 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     var $before = null;
     var $after = null;
 
+    if(!messageData) {
+        messageData = {};
+    }
+    if(!messageData.timestamp) {
+        messageData.timestamp = unixtime();
+    }
+
+    $message.attr('data-timestamp', messageData.timestamp);
+
     $('.jspContainer > .jspPane .fm-chat-messages-block', self.$messages).each(function() {
-        if(message.timestamp >= $(this).attr('data-timestamp')) {
+        if(messageData.timestamp >= $(this).attr('data-timestamp')) {
             $after = $(this);
-        } else if($before === null && message.timestamp < $(this).attr('data-timestamp')) {
+        } else if($before === null && messageData.timestamp < $(this).attr('data-timestamp')) {
             $before = $(this);
         }
     });
@@ -1699,6 +2041,43 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 };
 
 
+MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageContents, buttons) {
+    var self = this;
+
+    var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
+
+    $inlineDialog.attr('id', 'fm-chat-inline-dialog-' + type);
+
+    $('.fm-chat-verification-head', $inlineDialog).text(title);
+    $('.fm-chat-message', $inlineDialog).text(messageContents ? messageContents : "");
+
+    var $pad = $('.fm-chat-messages-pad', $inlineDialog);
+
+    var $primaryButton = $('.verify-button', $inlineDialog).detach();
+    var $secondaryButton = $('.skip-button', $inlineDialog).detach();
+
+    if(buttons) {
+        $.each(buttons, function(k, v) {
+            var $button = v.type == "primary" ? $primaryButton.clone() : $secondaryButton.clone();
+            $button.attr("id", 'fm-chat-inline-dialog-button-' + k);
+            $button.text(v.text);
+            $button.bind('click', function(e) {
+                v.callback(e);
+            });
+            $pad.append($button);
+        });
+    }
+
+    return $inlineDialog;
+};
+
+MegaChatRoom.prototype.getInlineDialogInstance = function(type) {
+    var self = this;
+
+    return $('#fm-chat-inline-dialog-' + type);
+};
+
+
 /**
  * Request a messages sync for this room
  *
@@ -1713,12 +2092,6 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
-
-    assert(
-        self.state == MegaChatRoom.STATE.JOINED || self.state == MegaChatRoom.STATE.SYNCING,
-        "Current state != [JOINED || SYNCING]. I should not request message sync when I'm in different state"
-    );
-
     exceptFromUsers = exceptFromUsers || [];
 
     var users = karere.getUsersInChat(self.roomJid);
@@ -1727,7 +2100,8 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
 
     if(Object.keys(users).length == 1) {
         // empty room
-        return;
+        console.debug("Will not sync room: ", self.roomJid, ", because its empty (no participants).");
+        return false;
     }
 
     var validUsers = [];
@@ -1755,10 +2129,14 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         if(localStorage.d) {
             console.error("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
         }
-        return;
+        return false;
     }
     var userNum = Math.floor(Math.random() * validUsers.length) + 0;
     var userJid = validUsers[userNum];
+
+    if(localStorage.dd) {
+        console.debug("Potential message sync users: ", validUsers);
+    }
 
     var messageId = karere.sendAction(
         userJid,
@@ -1772,7 +2150,7 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         self._syncRequests[self.roomJid] = {};
     }
 
-    if(self.state != MegaChatRoom.STATE.SYNCING) {
+    if(self.state != MegaChatRoom.STATE.SYNCING && self.state != MegaChatRoom.STATE.READY) {
         self.setState(MegaChatRoom.STATE.SYNCING);
     }
 
@@ -1790,6 +2168,8 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
             self.requestMessageSync(exceptFromUsers);
         }, self.options.requestMessagesSyncTimeout)
     };
+
+    return true;
 };
 
 /**
@@ -1849,7 +2229,11 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
     if(self._syncRequests[self.roomJid]) {
         if(!self._syncRequests[self.roomJid][response.meta.inResponseTo]) {
             if(localStorage.d) {
-                console.warn("Will not accept message sync response because inResponseTo, did not matched my original messageID, got: ", response.meta.inResponseTo, ". Most likely they had sent the response too late.");
+                console.warn(
+                    "Will not accept message sync response because inResponseTo, did not matched any cached messageIDs, " +
+                    "got: ", response.meta.inResponseTo, ". Most likely they had sent the response too late. Requests " +
+                    "currently active:", self._syncRequests
+                );
             }
             return false;
         }
@@ -1916,6 +2300,10 @@ MegaChatRoom.prototype.sendMessage = function(message) {
             meta: {},
             id: messageId
         };
+        if(localStorage.dd) {
+            console.debug("Queueing: ", messageData);
+        }
+
         self._messagesQueue.push(messageData);
 
         self.appendMessage(messageData);
@@ -1923,6 +2311,10 @@ MegaChatRoom.prototype.sendMessage = function(message) {
         //TODO: Encrypt messages
         megaChat.karere.sendRawMessage(self.roomJid, "groupchat", message);
     }
+};
+
+MegaChatRoom.prototype.getMediaOptions = function() {
+    return this.options.mediaOptions;
 };
 
 window.megaChat = new MegaChat();

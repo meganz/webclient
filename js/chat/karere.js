@@ -49,7 +49,7 @@ var Karere = function(user_options) {
         /**
          * Used to connect to the BOSH service endpoint
          */
-        "boshServiceUrl": 'http://localhost:5280/http-bind',
+        "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/http-bind',
 
         /**
          * Used when /resource is not passed when calling .connect() to generate a unique new resource id
@@ -690,6 +690,22 @@ makeMetaAware(Karere);
     };
 
     /**
+     * Normalize Jids (e.g. conference jids -> local muc jids)
+     *
+     * @param jid
+     * @returns {*}
+     */
+    Karere.getNormalizedBareJid = function(jid) {
+        if(jid.indexOf("conference.") != -1) {
+            jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "");
+        } else {
+            jid = jid.split("/")[0];
+        }
+
+        return jid;
+    };
+
+    /**
      * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
      * console.
      */
@@ -916,6 +932,8 @@ makeMetaAware(Karere);
 
                     return true;
                 }
+            } else if(_type) {
+                stanzaType = _type.substr(0, 1).toUpperCase() + _type.substr(1) + "Message";
             } else {
                 stanzaType = "UnknownMessage";
             }
@@ -1067,7 +1085,7 @@ makeMetaAware(Karere);
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
-            var msg = $pres()
+            var msg = $pres({id: self.generateMessageId()})
                 .c("show")
                 .t(presence)
                 .up()

@@ -9,7 +9,7 @@ module.exports = function(config) {
             "vendor/sinon-1.7.3.js",
 
             "../jquery-min-1.8.1.js",
-    
+
              "../functions.js",
              "../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
@@ -25,11 +25,6 @@ module.exports = function(config) {
              "../vendor/chat/strophe.roster.js",
              "../vendor/chat/wildemitter.patched.js",
              "../vendor/chat/hark.patched.js",
-             "../vendor/chat/salsa20.js",
-             "../vendor/chat/bigint.js",
-             "../vendor/chat/crypto.js",
-             "../vendor/chat/eventemitter.js",
-             "../vendor/chat/otr.js",
              "../vendor/Autolinker.js",
 
              "../chat/rtcSession.js",

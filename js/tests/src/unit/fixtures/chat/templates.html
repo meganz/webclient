@@ -26,7 +26,20 @@
 <ul class="fm-subfolders contacts" id="treesub_contacts"></ul>
 
 <div class="fm-chat-block hidden">
-    <div class="fm-chat-messages-block template hidden">
+    <div class="fm-chat-messages-block inline-dialog template hidden">
+        <div class="fm-chat-messages-pad">
+            <div class="fm-chat-verification-head">
+                Header
+            </div>
+            <div class="fm-chat-message">
+                Message
+            </div>
+            <div class="fm-chat-file-button verify-button">Primary button</div>
+            <div class="fm-chat-file-button skip-button">Secondary button</div>
+        </div>
+    </div>
+
+    <div class="fm-chat-messages-block message template hidden">
 
         <!-- please add "current-name" classname !-->
         <div class="fm-chat-username">
@@ -48,7 +61,7 @@
         <!-- end of messages from one user !-->
     </div>
 
-    <div class="fm-chat-header">
+    <div class="fm-chat-header template">
         <!-- Add/remove "verfified" class !-->
         <div class="fm-chat-avatar-block">
             <div class="fm-chat-top-verified"></div>
@@ -57,43 +70,36 @@
             </div>
         </div>
         <div class="fm-chat-user-info star">
-            <div class="fm-chat-user-star hidden"></div>
+            <div class="fm-chat-user-star"></div>
             <div class="fm-chat-user">Bram Van Der Kolk</div>
             <div class="fm-chat-user-status online">
                 Online
             </div>
+
+            <div class="temp-controls">
+                <!-- TODO: Move those somewhere else -->
+                <a href="javascript:;" class="btn-chat-call call-actions">Call</a>
+                <a href="javascript:;" class="btn-chat-answer-incoming-call call-actions">Answer</a>
+                <a href="javascript:;" class="btn-chat-reject-incoming-call call-actions">Reject</a>
+                <a href="javascript:;" class="btn-chat-cancel-active-call call-actions">Cancel</a>
+                <a href="javascript:;" class="btn-chat-mute call-actions">Audio Mute</a>
+                <a href="javascript:;" class="btn-chat-unmute call-actions">Audio Unmute</a>
+                <a href="javascript:;" class="btn-chat-video-mute call-actions">Video Mute</a>
+                <a href="javascript:;" class="btn-chat-video-unmute call-actions">Video Unmute</a>
+            </div>
         </div>
+
+
+        <div class="remote-video-container"></div>
+        <div class="local-video-container"></div>
+
         <div class="clear"></div>
     </div>
 
-    <div class="fm-chat-message-scroll">
-        <div class="fm-chat-download-popup hidden">
-            <div class="fm-chat-download-arrow"></div>
-            <div class="fm-chat-download-button to-cloud">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    To your Cloud Drive
-                </div>
-            </div>
-            <div class="fm-chat-download-button as-zip">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    To your Cloud Drive
-                </div>
-            </div>
-            <div class="fm-chat-download-button to-computer">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    To your Cloud Drive
-                </div>
-            </div>
-            <div class="clear"></div>
+    <div class="fm-chat-message-scroll template">
+        <div class="fm-chat-typing-txt">
+            George Smith is typing...
         </div>
-
-        <div class="fm-chat-typing-txt typing hidden">
-            <span>George Smith</span> is typing...
-        </div>
-
     </div>
 
     <div class="fm-chat-line-block">
@@ -203,5 +209,7 @@
         </div>
         <div class="clear"></div>
     </div>
+
+</div>
 
 </div>

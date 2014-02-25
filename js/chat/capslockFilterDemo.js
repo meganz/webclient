@@ -32,11 +32,11 @@ var CapslockFilterDemo = function(megaChat) {
 CapslockFilterDemo.prototype.processMessage = function(e, eventData) {
     var self = this;
 
-    var message = eventData.message;
+    var message = eventData.messageHtml ? eventData.messageHtml : eventData.message;
 
     if(!message) {
         return; // ignore, maybe its a system message (or composing/paused composing notification)
     }
 
-    eventData.message = message.toUpperCase();
+    eventData.message = eventData.messageHtml = message.toUpperCase();
 };

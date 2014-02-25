@@ -545,15 +545,21 @@ MegaChat.prototype.init = function() {
 
     self.$container = $('.fm-chat-block');
     self.$header_tpl = $('.fm-chat-header', self.$container).clone().removeClass("template");
+    assert(self.$header_tpl.length > 0, "Header template not found.");
+
     self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
+    assert(self.$messages_tpl.length > 0, "Messages template not found.");
 
     self.$message_tpl = $('.fm-chat-messages-block.message.template', self.$container).clone();
+    assert(self.$message_tpl.length > 0, "Message template not found.");
+
     self.$message_tpl
         .removeClass("template")
         .removeClass("message")
         .removeClass("hidden");
 
     self.$inline_dialog_tpl = $('.fm-chat-messages-block.inline-dialog.template', self.$container).clone();
+    assert(self.$inline_dialog_tpl.length > 0, "Inline dialog template not found.");
 
     self.$inline_dialog_tpl
         .removeClass("template")
@@ -589,7 +595,11 @@ MegaChat.prototype.init = function() {
     }
 
     // Initialize RTC
-    RtcSession.globalInit();
+    if(!MegaChat.rtcIsInitialized) {
+        RtcSession.globalInit();
+        MegaChat.rtcIsInitialized = true; // static var!
+    }
+
 
     self.rtc = self.karere.connection.rtc = new RtcSession(self.karere.connection, self.options.rtcSession);
 
@@ -779,6 +789,24 @@ MegaChat.prototype.destroy = function() {
         room.destroy();
         delete self.chats[roomJid];
     });
+
+//    debugger;
+//
+//    // push DOM templates back to the actual DOM
+//    // cleanup dom nodes that were used as templates
+//    self.$container.append(self.$header_tpl.addClass("template"));
+//    delete self.$header_tpl;
+//
+//    self.$messages_tpl.append(self.$message_tpl.addClass("template").addClass("message"));
+//    delete self.$message_tpl;
+//
+//    self.$messages_tpl.append(self.$inline_dialog_tpl.addClass("template").addClass("message"));
+//    delete self.$inline_dialog_tpl;
+//
+//    self.$container.append(self.$messages_tpl.addClass("template"));
+//    delete self.$messages_tpl;
+
+
 
     return self.karere.disconnect()
         .done(function() {
@@ -1254,6 +1282,15 @@ var MegaChatRoom = function(megaChat, roomJid) {
     // Events
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
+        var resetStateToReady = function() {
+            if(self.state != MegaChatRoom.STATE.LEFT) {
+                if(localStorage.d) {
+                    console.warn("Sync failed, setting state to READY.");
+                }
+                self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+            }
+        };
+
         if(newState == MegaChatRoom.STATE.JOINED) {
             if(self.requestMessageSync()) {
                 createTimeoutPromise(
@@ -1264,16 +1301,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
                     self.options.messageSyncFailAfterTimeout
                 )
                     .fail(function() {
-                        if(localStorage.d) {
-                            console.warn("Sync failed, setting state to READY.");
-                        }
-                        self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+                        resetStateToReady();
                     })
             } else {
-                if(localStorage.d) {
-                    console.warn("Sync failed immediately, setting state to READY.");
-                }
-                self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+                resetStateToReady();
             }
 
 

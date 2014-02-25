@@ -125,7 +125,7 @@ describe("Chat.js - Karere UI integration", function() {
     });
 
 
-    it("1on1 chat, conflicted/invitation accept for 1on1 chat rooms", function(done) {
+    it("1on1 chat, invitation accept for 1on1 chat rooms", function(done) {
         var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
 
@@ -156,14 +156,13 @@ describe("Chat.js - Karere UI integration", function() {
                     megaChat.karere.addUserToChat
                 ).to.have.been.calledOnce;
 
-
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[0]
                 ).to.equal(roomJid);
 
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[1]
-                ).to.equal(user1jid);
+                ).to.equal(user2jid);
 
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[2]
@@ -576,14 +575,13 @@ describe("Chat.js - Karere UI integration", function() {
                     megaChat.karere.addUserToChat
                 ).to.have.been.calledOnce;
 
-
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[0]
                 ).to.equal(roomJid);
 
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[1]
-                ).to.equal(megaChat.karere.getBareJid());
+                ).to.equal(Karere.getNormalizedBareJid(user2jid));
 
                 expect(
                     megaChat.karere.addUserToChat.getCall(0).args[2]

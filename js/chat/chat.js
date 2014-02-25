@@ -2271,13 +2271,22 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
     var messagesCount = self.messages.length;
     var messagesChunkSize = 10;
     for(var i = 0; i < messagesCount; i+=messagesChunkSize) {
+        var messages = self.messages.slice(i, i + messagesChunkSize);
+
+        // cleanup some non-needed data from the messages
+        $.each(messages, function(k, v) {
+            if(messages[k].messageHtml) {
+                delete messages[k].messageHtml;
+            }
+        });
+
         karere.sendAction(
             request.from,
             'syncResponse',
             {
                 'inResponseTo': request.id,
                 'roomJid': request.meta.roomJid,
-                'messages': self.messages.slice(i, i + messagesChunkSize),
+                'messages': messages,
                 'offset': i,
                 'total': messagesCount
             }

@@ -215,3 +215,5 @@ js/tests/coverage
 #Mr Developer
 .mr.developer.cfg
 
+# JS Docs
+js/docs/

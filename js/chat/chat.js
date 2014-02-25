@@ -201,7 +201,7 @@ var chatui;
             var key = e.keyCode || e.which;
 
 
-            if(key == 13 && e.shiftKey === true) {
+            if(key == 13 && e.shiftKey !== true) {
                 var msg = $(this).val();
                 if(msg.trim().length > 0) {
                     megaChat.sendMessage(
@@ -245,10 +245,20 @@ var MegaChat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'rtcSession': {
             iceServers:[{url: 'stun:stun.l.google.com:19302'}]
+        },
+        /**
+         * Really simple plugin architecture
+         */
+        'plugins': {
+            'urlFilter': UrlFilter,
+            'emoticonsFilter': EmoticonsFilter,
+            'capslockFilterDemo': CapslockFilterDemo
         }
     };
 
     this.instanceId = megaChatInstanceId++;
+
+    this.plugins = {};
 
 
     this.karere = new Karere({
@@ -525,6 +535,8 @@ var MegaChat = function() {
     return this;
 };
 
+makeObservable(MegaChat);
+
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
  */
@@ -628,6 +640,12 @@ MegaChat.prototype.init = function() {
     $(self.rtc).on('call-ended', rtcEventProxyToRoom);
     $(self.rtc).on('muted', rtcEventProxyToRoom);
     $(self.rtc).on('unmuted', rtcEventProxyToRoom);
+
+    // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
+    self.plugins = {};
+    $.each(self.options.plugins, function(k, v) {
+        self.plugins[k] = new v(self);
+    });
 };
 
 /**
@@ -1273,8 +1291,22 @@ var MegaChatRoom = function(megaChat, roomJid) {
                     }
 
 
-                    //TODO: Encrypt messages
-                    self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", v.message, v.meta, v.id, v.timestamp);
+                    var event = new $.Event("onSendMessage");
+                    var eventData = $.extend(
+                        {
+                            from: self.megaChat.karere.getJid(),
+                            roomJid: self.roomJid
+                        },
+                        v
+                    );
+
+                    self.megaChat.trigger(event, eventData);
+
+                    if(event.isPropagationStopped()) {
+                        return false;
+                    }
+
+                    self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message, eventData.meta, eventData.id, eventData.timestamp);
                 });
                 self._messagesQueue = [];
             }
@@ -1426,12 +1458,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
         $('.call-actions', self.$header).hide();
         $('.btn-chat-call', self.$header).show();
 
-        self.getInlineDialogInstance("incoming-call").slideUp(function() {
-            $(this).remove();
-        });
-        self.getInlineDialogInstance("outgoing-call").slideUp(function() {
-            $(this).remove();
-        });
+        self.getInlineDialogInstance("incoming-call").remove();
+        self.getInlineDialogInstance("outgoing-call").remove();
     };
     var resetCallStateInCall = function() {
         $('.call-actions', self.$header).hide();
@@ -1449,12 +1477,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         $('.btn-chat-cancel-active-call', self.$header).show();
 
-        self.getInlineDialogInstance("incoming-call").slideUp(function() {
-            $(this).remove();
-        });
-        self.getInlineDialogInstance("outgoing-call").slideUp(function() {
-            $(this).remove();
-        });
+        self.getInlineDialogInstance("incoming-call").remove();
+        self.getInlineDialogInstance("outgoing-call").remove();
     };
 
     self.bind('call-init', function(e, eventData) {
@@ -1972,9 +1996,30 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     $message.attr('data-id', message.id);
 
 
-    $('.fm-chat-message', $message).text(
-        message.message
-    );
+    if(!message.messageHtml) {
+        message.messageHtml = htmlentities(message.message).replace(/\n/gi, "<br/>");
+    }
+    var event = new $.Event("onReceiveMessage");
+    self.megaChat.trigger(event, message);
+
+    if(event.isPropagationStopped()) {
+        if(localStorage.d) {
+            console.warn("Event propagation stopped recieving (rendering) of message: ", message)
+        }
+        return false;
+    }
+
+
+    if(message.messageHtml) {
+        $('.fm-chat-message', $message).html(
+            message.messageHtml
+        );
+    } else {
+        $('.fm-chat-message', $message).html(
+            htmlentities(message.message).replace(/\n/gi, "<br/>")
+        );
+    }
+
 
 
     return self.appendDomMessage($message, message);
@@ -2046,7 +2091,7 @@ MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageConte
 
     var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
 
-    $inlineDialog.attr('id', 'fm-chat-inline-dialog-' + type);
+    $inlineDialog.addClass('fm-chat-inline-dialog-' + type);
 
     $('.fm-chat-verification-head', $inlineDialog).text(title);
     $('.fm-chat-message', $inlineDialog).text(messageContents ? messageContents : "");
@@ -2059,7 +2104,7 @@ MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageConte
     if(buttons) {
         $.each(buttons, function(k, v) {
             var $button = v.type == "primary" ? $primaryButton.clone() : $secondaryButton.clone();
-            $button.attr("id", 'fm-chat-inline-dialog-button-' + k);
+            $button.addClass('fm-chat-inline-dialog-button-' + k);
             $button.text(v.text);
             $button.bind('click', function(e) {
                 v.callback(e);
@@ -2074,7 +2119,7 @@ MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageConte
 MegaChatRoom.prototype.getInlineDialogInstance = function(type) {
     var self = this;
 
-    return $('#fm-chat-inline-dialog-' + type);
+    return $('.fm-chat-inline-dialog-' + type, self.$messages);
 };
 
 
@@ -2291,6 +2336,9 @@ MegaChatRoom.prototype.sendMessage = function(message) {
     var self = this;
     var megaChat = this.megaChat;
 
+
+    message.roomJid = self.roomJid;
+
     if(self.state != MegaChatRoom.STATE.READY) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
         var messageData = {
@@ -2300,6 +2348,15 @@ MegaChatRoom.prototype.sendMessage = function(message) {
             meta: {},
             id: messageId
         };
+
+        var event = new $.Event("onQueueMessage");
+
+        self.megaChat.trigger(event, messageData);
+
+        if(event.isPropagationStopped()) {
+            return false;
+        }
+
         if(localStorage.dd) {
             console.debug("Queueing: ", messageData);
         }
@@ -2308,8 +2365,20 @@ MegaChatRoom.prototype.sendMessage = function(message) {
 
         self.appendMessage(messageData);
     } else {
-        //TODO: Encrypt messages
-        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", message);
+        var event = new $.Event("onSendMessage");
+        var eventData = {
+            from: self.megaChat.karere.getJid(),
+            roomJid: self.roomJid,
+            message: message,
+        };
+
+        self.megaChat.trigger(event, eventData);
+
+        if(event.isPropagationStopped()) {
+            return false;
+        }
+
+        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message);
     }
 };
 

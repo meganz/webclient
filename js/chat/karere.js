@@ -1264,6 +1264,24 @@ makeMetaAware(Karere);
 //            .c('delay', {xmns:'urn:xmpp:delay',stamp:timestamp}).up()
 //            .cnode(message.tree());
 
+
+        var event = new $.Event("onSendMessage");
+        self.trigger(event, {
+            toJid: toJid,
+            type: type,
+            contents: contents,
+            meta: meta,
+            messageId: messageId,
+            message: message,
+            delay: delay
+        });
+
+        if(event.isPropagationStopped()) {
+            if(localStorage.d) {
+                console.warn("Event propagation stopped sending of message: ", message)
+            }
+            return false;
+        }
         self.connection.send(message);
 //        self.connection.send(forwarded);
 

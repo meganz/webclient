@@ -881,3 +881,15 @@ function dlError(text) {
 function removeValue(array, value) {
 	array.splice($.inArray(value, array), 1);
 };
+
+
+/**
+ * Original: http://stackoverflow.com/questions/7317299/regex-matching-list-of-emoticons-of-various-type
+ *
+ * @param text
+ * @returns {XML|string|void}
+ * @constructor
+ */
+function RegExpEscape(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};

@@ -6072,6 +6072,19 @@ div .fm-tree-folder.dragover {
 
 /** debug chat audio/video **/
 
+/** debug emoticons **/
+.fm-chat-emoticon {
+    width: 25px;
+    height: 25px;
+    background-image: url(../images/mega/chat-smiles.png);
+    background-position: center 3px;
+    background-repeat: no-repeat;
+    background-size: 58px auto;
+    text-indent: -9999px;
+    display: inline-block;
+}
+/** end of debug emoticons **/
+
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
 	background-image: url(../images/mega/chat-sprite.png);
 	background-position: 0 0;

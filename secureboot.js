@@ -373,11 +373,21 @@ else
             jsl.push({f:'js/vendor/chat/otr.js', n: 'mega_js', j:1,w:7});
 
 
+            // Other
+            jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
+
+
 
             // MEGA CHAT
             jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+
+            jsl.push({f:'js/chat/urlFilter.js', n: 'mega_js', j:1,w:7});
+            jsl.push({f:'js/chat/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
+            jsl.push({f:'js/chat/capslockFilterDemo.js', n: 'mega_js', j:1,w:7});
+
             jsl.push({f:'js/chat/karere.js', n: 'mega_js', j:1,w:7});
             jsl.push({f:'js/chat/chat.js', n: 'mega_js', j:1,w:7});
+
 
             jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
             jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});

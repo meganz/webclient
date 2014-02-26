@@ -365,7 +365,7 @@ Strophe.addConnectionPlugin('jingle', {
         var sess = this.jid2session[jid];
         if (!sess)
             return false;
-        return this.terminate(sess, null, null, true);
+        return this.terminate(sess, null, null);
     },
     sessionIsValid: function(sess)
     {

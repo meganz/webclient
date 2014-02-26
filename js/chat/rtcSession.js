@@ -274,7 +274,7 @@ RtcSession.prototype = {
         $(self).trigger('call-declined', {
             peer: fullPeerJid,
             reason: $(stanza).attr('reason'),
-            text : body.length ? this.xmlUnescape(body[0].textContent) : undefined
+            text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined
         });
     },
     null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
@@ -314,6 +314,7 @@ RtcSession.prototype = {
         self.connection.deleteHandler(declineHandler);
         declineHandler = null;
 
+        self._freeLocalStreamIfUnused();
         self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaCallCancel'}));
         return true;
   }};
@@ -407,7 +408,7 @@ RtcSession.prototype = {
         This is the place to customize the player before it is shown. Also, this is the
         place to attach a mic volume callback, if used, via volMonAttachCallback().
         The callback will start being called just after the video element is shown.
-        @event "local-media-obtained.rtc"
+        @event "local-stream-obtained.rtc"
         @type {object}
         @property {object} stream The local media stream object
         @property {DOM} player
@@ -449,7 +450,12 @@ RtcSession.prototype = {
 
         self._myGetUserMedia({audio:true, video:true},
           function(sessStream) {
-            ansFunc(true, {options:{localStream: sessStream, muted: RtcSession.mediaOptionsToMutedState(obj.mediaOptions)}});
+            ansFunc(true, {
+                options:{
+                    localStream: sessStream,
+                    muted: RtcSession.mediaOptionsToMutedState(obj.mediaOptions, sessStream)
+                }
+            });
           },
           function(err) {
             ansFunc(false, {reason: 'error', text: "There was a problem accessing user's camera or microphone. Error: "+err});

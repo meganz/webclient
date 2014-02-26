@@ -273,13 +273,23 @@ var MegaChat = function() {
 
         if(eventData.show != "unavailable") {
             if(eventData.myOwn === false) {
-                var baseJid = eventData.from.split("/")[0];
+                // update M.u
+                var contact = self.getContactFromJid(eventData.from);
+                if(contact) {
+                    if(!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventData.delay) {
+                        contact.presence = eventData.show;
+                        contact.presenceMtime = eventData.delay;
+                    }
+                }
+
+                var bareJid = eventData.from.split("/")[0];
+
                 $.each(self.chats, function(roomJid, room) {
                     if(room.isTemporary) {
                         return; // continue
                     }
 
-                    if(room.participantExistsInRoom(baseJid) && !self.karere.userExistsInChat(roomJid, eventData.from)) {
+                    if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventData.from)) {
                         if(localStorage.d) {
                             console.debug(self.karere.getNickname(), "Auto inviting: ", eventData.from, "to: ", roomJid);
                         }
@@ -292,6 +302,11 @@ var MegaChat = function() {
                         });
 
                         return false; // break;
+                    } else if(room.participantExistsInRoom(bareJid) && self.karere.userExistsInChat(roomJid, eventData.from)) {
+                        // if this user is part of the currently visible room, then refresh the UI
+                        if(self.getCurrentRoomJid() == room.roomJid) {
+                            room.refreshUI();
+                        }
                     }
                 });
                 // Sync presence across devices (will check the delayed val!)
@@ -306,15 +321,6 @@ var MegaChat = function() {
                           undefined,
                           eventData.delay
                         );
-                    }
-                }
-
-                // update M.u
-                var contact = self.getContactFromJid(eventData.from);
-                if(contact) {
-                    if(!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventData.delay) {
-                        contact.presence = eventData.show;
-                        contact.presenceMtime = eventData.delay;
                     }
                 }
 
@@ -1855,7 +1861,11 @@ MegaChatRoom.prototype.refreshUI = function() {
             self.megaChat.getContactNameFromJid(participants[0])
         );
         var contact = self.megaChat.getContactFromJid(participants[0]);
-        var presenceCssClass = self.megaChat.xmppPresenceToCssClass(contact.presence);
+        var presenceCssClass = self.megaChat.xmppPresenceToCssClass(
+            self.megaChat.karere.getPresence(
+                self.megaChat.getJidFromNodeId(contact.u)
+            )
+        );
 
         $('.fm-chat-user-status', self.$header)
             .removeClass('online')
@@ -1940,6 +1950,7 @@ MegaChatRoom.prototype.show = function() {
             oldRoom.hide();
         }
     }
+    
     self.megaChat.currentlyOpenedChat = self.roomJid;
 
     // update unread messages count

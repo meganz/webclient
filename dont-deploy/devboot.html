@@ -4,8 +4,11 @@
     <title></title>
     <script>
         var devhost = window.location.host;
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
+
         localStorage.clear();
-        localStorage.staticpath = "http://" + devhost + "/";
+        localStorage.staticpath = window.location.protocol + "//" + devhost + (pathSuffix ? pathSuffix : "/");
         localStorage.dd=1;
         localStorage.contextmenu=1;
         localStorage.megachat=1;

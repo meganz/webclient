@@ -467,7 +467,7 @@ var MegaChat = function() {
                 self.getContactNameFromJid(eventData.from)
             );
 
-            $element.removeClass("hidden");
+            $element.removeClass("hidden").addClass("typing");
         }
     });
 
@@ -480,7 +480,7 @@ var MegaChat = function() {
         if(room) {
             var $element = $('.fm-chat-typing-txt', room.$messages);
             $('span', $element).text("");
-            $element.addClass("hidden");
+            $element.addClass("hidden").removeClass("typing");
         }
     });
 
@@ -1950,7 +1950,7 @@ MegaChatRoom.prototype.show = function() {
             oldRoom.hide();
         }
     }
-    
+
     self.megaChat.currentlyOpenedChat = self.roomJid;
 
     // update unread messages count

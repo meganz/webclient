@@ -8,7 +8,7 @@
         pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
 
         localStorage.clear();
-        localStorage.staticpath = window.location.protocol + "//" + devhost + (pathSuffix ? pathSuffix : "/");
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
         localStorage.dd=1;
         localStorage.contextmenu=1;
         localStorage.megachat=1;
@@ -16,7 +16,7 @@
         localStorage.dxmpp = 1;
         localStorage.stopOnAssertFail = true;
         localStorage.d = 1;
-        window.location = '../';
+        window.location = '../index.html';
     </script>
 </head>
 <body>

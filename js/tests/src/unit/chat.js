@@ -418,7 +418,7 @@ describe("Chat.js - Karere UI integration", function() {
         });
 
         //XX: maybe generate dynamic time and name fields for the reference values?
-        expect(messagesInOrderedList).to.eql([
+        var expectedMessagesList = [
             {
                 "ts": "50",
                 "time": "02:00.50",
@@ -443,7 +443,10 @@ describe("Chat.js - Karere UI integration", function() {
                 "msg": "hopala4",
                 "name": "lpetrov@me.com"
             }
-        ]);
+        ];
+        console.warn(messagesInOrderedList);
+        console.warn(expectedMessagesList);
+        expect(messagesInOrderedList).to.eql(expectedMessagesList);
 
         expect(
             $('.fm-chat-header').data("roomJid")

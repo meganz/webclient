@@ -1736,7 +1736,7 @@ Strophe.Builder.prototype = {
  *  Returns:
  *    A new Strophe.Handler object.
  */
-Strophe.Handler = function (handler, ns, name, type, id, from, options)
+Strophe.Handler = function (handler, ns, name, type, id, from, options, validateFunc)
 {
     this.handler = handler;
     this.ns = ns;
@@ -1744,6 +1744,7 @@ Strophe.Handler = function (handler, ns, name, type, id, from, options)
     this.type = type;
     this.id = id;
     this.options = options || {matchBare: false};
+    this.validateFunc = validateFunc;
 
     // default matchBare to false if undefined
     if (!this.options.matchBare) {
@@ -1798,6 +1799,7 @@ Strophe.Handler.prototype = {
         if (nsMatch &&
             (!this.name || Strophe.isTagEqual(elem, this.name)) &&
             (!this.type || elem.getAttribute("type") == this.type) &&
+            (!this.validateFunc || validateFunc(this, elem)) &&
             (!this.id || elem.getAttribute("id") == this.id) &&
             (!this.from || from == this.from)) {
                 return true;
@@ -2420,10 +2422,13 @@ Strophe.Connection.prototype = {
             } else {
                 throw {
                     name: "StropheError",
-            message: "Got bad IQ type of " + iqtype
+                    message: "Got bad IQ type of " + iqtype,
+                    sentIQ: elem
                 };
             }
-        }, null, 'iq', null, id);
+        }, null, 'iq', null, id, undefined, undefined, function(handler, elem) {
+            return elem.getAttribute("type") == "result" || elem.getAttribute("type") == "error";
+        });
 
         // if timeout specified, setup timeout handler.
         if (timeout) {
@@ -2557,9 +2562,9 @@ Strophe.Connection.prototype = {
      *  Returns:
      *    A reference to the handler that can be used to remove it.
      */
-    addHandler: function (handler, ns, name, type, id, from, options)
+    addHandler: function (handler, ns, name, type, id, from, options, validateFunc)
     {
-        var hand = new Strophe.Handler(handler, ns, name, type, id, from, options);
+        var hand = new Strophe.Handler(handler, ns, name, type, id, from, options, validateFunc);
         this.addHandlers.push(hand);
         return hand;
     },

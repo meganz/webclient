@@ -213,7 +213,7 @@ function initUI()
 		$('.fm-left-menu .folderlink').addClass('hidden');
 	}
 	$.selectingHeader = function(currentHeader) 
-	{ 
+	{
 		initTreeScroll();
 		var c = currentHeader.attr('class');		
 		if(c && c.indexOf('active') == -1) 
@@ -464,11 +464,10 @@ function initUI()
 	$('.fm-menu-item').unbind('mouseout');
 	$('.fm-menu-item').bind('mouseout',function(e)
 	{
-		if ($(this).attr('class').indexOf('contacts') > -1 && RootbyId(M.currentdirid) == 'contacts') return false;
+		if ($(this).attr('class').indexOf('contacts') > -1 && (RootbyId(M.currentdirid) == 'contacts' || $('.fm-tree-header.contacts-item').attr('class').indexOf('active') > -1)) return false;
 		else if ($(this).attr('class').indexOf('messages') > -1 && RootbyId(M.currentdirid) == M.InboxID) return false;
 		else if ($(this).attr('class').indexOf('recycle') > -1 && RootbyId(M.currentdirid) == M.RubbishID) return false;
-		else if ($(this).attr('class').indexOf('cloud') > -1 && RootbyId(M.currentdirid) == M.RootID) return false;	
-		
+		else if ($(this).attr('class').indexOf('cloud') > -1 && RootbyId(M.currentdirid) == M.RootID) return false;
 		$(this).removeClass('active');
 	});
 	
@@ -950,7 +949,6 @@ function initContextUI()
 
 function cSortMenuUI()
 {
-	$('.contacts-arrows').hide();
 	$('.contacts-arrows').unbind('click');
 	$('.contacts-arrows').bind('click', function(e) 
 	{
@@ -960,8 +958,10 @@ function cSortMenuUI()
 		{
 			menuBlock.removeClass('hidden');
 			$(this).addClass('active');
-			menuBlock.css('top', $(this).position().top - 10);
-			menuBlock.css('left', $(this).position().left + 30);
+			var topl=0,jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) topl = jsp.getContentPositionY();
+			menuBlock.css('top', $(this).position().top - topl + 95);
+			menuBlock.css('left', $(this).position().left + 35);
 			if(bottomPosition- $(menuBlock).position().top < 50) menuBlock.css('top', bottomPosition-50);				
 		} 
 		else 
@@ -976,23 +976,29 @@ function cSortMenuUI()
 	$('.contacts-sorting-by').unbind('click');
 	$('.contacts-sorting-by').bind('click', function(e) 
 	{
-		if($(this).attr('class').indexOf('active') == -1) 
+		var c = $(this).attr('class');		
+		if (c && c.indexOf('name') > -1)
 		{
-			$('.contacts-sorting-by').removeClass('active');
-			$(this).addClass('active');
-		} 
-		return false;
+			localStorage.csort = 'name';
+			localStorage.csortd = 1;
+		}
+		else if (c && c.indexOf('shares') > -1)
+		{
+			localStorage.csort = 'shares';
+			localStorage.csortd = -1;
+		}
+		M.renderContacts();
 	});
+	
+	
 
 	$('.contacts-sorting-type').unbind('click');
 	$('.contacts-sorting-type').bind('click', function(e) 
 	{
-		if($(this).attr('class').indexOf('active') == -1) 
-		{
-			$('.contacts-sorting-type').removeClass('active');
-			$(this).addClass('active');
-		} 
-		return false;
+		var c = $(this).attr('class');		
+		if (c && c.indexOf('desc') > -1) localStorage.csortd = -1;
+		else localStorage.csortd = 1;
+		M.renderContacts();		
 	});
 }
 
@@ -3445,21 +3451,22 @@ function contextmenuUI(e,ll,topmenu)
 var tt;
 
 function treeUI()
-{
+{	
 	tt = new Date().getTime();
 	$('.fm-menu-item').unbind('click');
 	$('.fm-menu-item').bind('click',function(event) 
 	{
 		$('.fm-menu-item').removeClass('active');
 		if ($(this).attr('class').indexOf('cloud') > -1)
-		{	
+		{
+			treeUIopen(M.RootID,1);	
 			$(this).addClass('active');
 			M.openFolder(M.RootID);
 			var jsp = $('.fm-tree-panel').data('jsp');
 			if (jsp) jsp.scrollTo(0,0);
 		}		
 		else if ($(this).attr('class').indexOf('recycle') > -1)
-		{	
+		{					
 			$(this).addClass('active');
 			M.openFolder(M.RubbishID);
 			var pos = $('.fm-tree-header.recycle-item').position();			
@@ -3467,12 +3474,12 @@ function treeUI()
 			if (jsp) jsp.scrollTo(0,pos.top);
 		}		
 		else if ($(this).attr('class').indexOf('contacts') > -1)
-		{	
+		{			
+			treeUIopen('contacts',1);
 			$(this).addClass('active');
-			M.openFolder('contacts');
 			var pos = $('.fm-tree-header.contacts-item').position();			
 			var jsp = $('.fm-tree-panel').data('jsp');
-			if (jsp) jsp.scrollTo(0,pos.top);		
+			if (jsp) jsp.scrollTo(0,pos.top);
 		}		
 		else if ($(this).attr('class').indexOf('messages') > -1)
 		{	
@@ -3507,9 +3514,9 @@ function treeUI()
 		else if ($(this).attr('class').indexOf('contacts-item') > -1)
 		{
 			var c = $(e.target).attr('class');	
-			if (c && c.indexOf('contacts-arrows') > -1) return false;			
-			id = 'contacts';			
-		}		
+			if (c && c.indexOf('contacts-arrows') > -1) return false;
+			id = 'contacts';
+		}
 		else if ($(this).attr('class').indexOf('messages-item') > -1) id = M.InboxID;					
 		var isSubfolders = $(this).attr('class').indexOf('contains-subfolders');
 		if(isSubfolders > -1 && $(this).attr('class').indexOf('opened') == -1) 
@@ -3533,7 +3540,7 @@ function treeUI()
 			$(this).prev().removeClass('active');
 		}		
 		$.selectingHeader($(this));
-		if (id) M.openFolder(id);		
+		if (id && id !== 'contacts') M.openFolder(id);
 		return false;
 	});
 	

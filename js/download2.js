@@ -487,7 +487,7 @@ function dlGetUrl(object, callback) {
 			dl_retryinterval *= 1.2;
 			callback(new Error("failed"))
 		}
-	});
+	},n_h ? 1 : 0);
 }
 
 function IdToFile(id) {

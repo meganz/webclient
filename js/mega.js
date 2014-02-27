@@ -43,6 +43,9 @@ function MegaData ()
 	this.rendered = false;
 	this.currentdirid = false;
 	this.viewmode = 0;
+	
+	this.csortd = -1;
+	this.csort = 'name';
 
 	this.reset = function()
 	{
@@ -78,7 +81,6 @@ function MegaData ()
 
 	this.sort = function()
 	{
-		this.sortBy(this.sortfn,this.sortd);
 		this.sortBy(this.sortfn,this.sortd);
 		this.sortBy(this.sortfn,this.sortd);
 	};
@@ -438,6 +440,13 @@ function MegaData ()
 		this.buildtree({h:M.RubbishID});
 		treeUI();
 	};
+	
+	this.renderContacts = function()
+	{
+		$('#treesub_contacts').html('');
+		this.buildtree({h:'contacts'});
+		treeUI();
+	};
 
 	this.openFolder = function(id,force,chat)
 	{		
@@ -468,7 +477,7 @@ function MegaData ()
 		
 		if (this.chat)
 		{
-			treeUIopen(M.currentdirid.replace('chat/',''),1);			
+			treeUIopen(M.currentdirid.replace('chat/',''),1);
 			chatui();
 			fmtopUI();
 			M.renderPath();
@@ -566,10 +575,48 @@ function MegaData ()
 				else if (n.h == 'contacts') $('.fm-left-panel .fm-tree-header.contacts-item').addClass('contains-subfolders');
 				else $('#treesub_'+n.h).siblings('a').addClass('contains-folders');
 			}
+			
+			// sort by name is default in the tree
 			folders.sort(function(a,b)
 			{
 				if (a.name) return a.name.localeCompare(b.name);
 			});
+			
+			if (n.h == 'contacts')
+			{
+				// in case of contacts we have custom sort/grouping:
+				if (localStorage.csort) this.csort = localStorage.csort;
+				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+				
+				
+				
+				if (this.csort == 'shares')
+				{				
+					folders.sort(function(a,b)
+					{
+						if (M.c[a.h] && M.c[b.h])
+						{
+							if (a.name) return a.name.localeCompare(b.name);
+						}
+						else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+						else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+						return 0;
+					});
+				}
+				else if (this.csort == 'name')
+				{				
+					folders.sort(function(a,b)
+					{						
+						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
+					});
+				}
+				
+				$('.contacts-sorting-by').removeClass('active');
+				$('.contacts-sorting-by.' + this.csort).addClass('active');				
+				$('.contacts-sorting-type').removeClass('active');				
+				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
+			}
+			
 			for (var i in folders)
 			{
 				var treenode = '<span>' + htmlentities(folders[i].name) + '</span>';
@@ -595,7 +642,7 @@ function MegaData ()
 					buildnode = true;
 				}
 				var containsc='';
-				var cns = M.c[folders[i].h];
+				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				if ($('#treeli_'+folders[i].h).length == 0)
@@ -604,7 +651,7 @@ function MegaData ()
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
 					else $('#treesub_' + n.h).append(html);
 				}
-				if (buildnode) this.buildtree(folders[i]);
+				if (buildnode) this.buildtree(folders[i]);				
 			}
 		}
 	};
@@ -731,6 +778,8 @@ function MegaData ()
 		if (this.d[id]) return this.d[id];
 		else return false;
 	};
+	
+	
 
 	this.addNode = function(n,ignoreDB)
 	{
@@ -754,7 +803,7 @@ function MegaData ()
 		}
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
-		{
+		{			
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
 		}

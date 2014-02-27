@@ -5,7 +5,7 @@ nodesetup:
 	npm install
 
 test:
-	@$(KARMA) start --singleRun=true karma.conf.js --browsers PhantomJS
+	@$(KARMA) start --singleRun=true karma.conf.js --browsers PhantomJS_custom
 
 docs:
 	$(JSDOC) --directory=../docs/ --allfunctions -D="title:MegaChat" \

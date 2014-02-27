@@ -1310,7 +1310,7 @@ makeMetaAware(Karere);
      * Generates room config XML from the self.options.roomConfig to be used and sent as stanza when creating new rooms
      *
      * @param roomPassword
-     * @returns {HTMLElement[]}
+     * @returns {HTMLElement}
      * @private
      */
     Karere.prototype._getRoomConfig = function(roomPassword) {
@@ -1335,7 +1335,7 @@ makeMetaAware(Karere);
         configXml += "<field var='muc#roomconfig_captcha_whitelist'/>" +
             "<\/x>";
 
-        return Strophe.xmlHtmlNode(configXml).children[0].children;
+        return $.parseXML(configXml).documentElement;
     };
 
     /**
@@ -1374,10 +1374,13 @@ makeMetaAware(Karere);
 
         iHadJoinedPromise
             .done(function() {
+
                 if(typeof Form == "undefined") {
                     window.Form = function() {}; // bug in Strophe.plugins.muc
                     window.Form._do_cleanup = true;
                 }
+
+
 
                 self.connection.muc.saveConfiguration(
                     roomJid,
@@ -1405,6 +1408,7 @@ makeMetaAware(Karere);
                         $promise.reject();
                     })
                 );
+
 
                 if(window.Form._do_cleanup) {
                     delete window.Form;

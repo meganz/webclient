@@ -20,10 +20,9 @@ function expectToBeResolved($promise, msg) {
 }
 
 
-var stringToXml = function(str) {
-    // helper method for unit tests which will be mocking XML stanzas
-    // main assumption is that Strophe is loaded
-    return Strophe.xmlHtmlNode(str).children[0];
+var stringToXml = function(xmlStr) {
+    var doc = $.parseXML(xmlStr);
+    return doc.documentElement;
 };
 
 /**

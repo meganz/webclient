@@ -9,7 +9,11 @@ describe("Chat.js - Karere UI integration", function() {
 
     var karereMocker = null;
 
+    var functionsMocker;
     beforeEach(function(done) {
+        localStorage.clear();
+
+        functionsMocker = new FunctionsMocker();
 
         localStorage.removeItem("megaChatPresence");
 
@@ -103,6 +107,7 @@ describe("Chat.js - Karere UI integration", function() {
 
 
     afterEach(function(done) {
+        functionsMocker.restore();
 
         window.M = window.oldM;
         megaChat.destroy();

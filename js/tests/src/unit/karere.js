@@ -7,8 +7,13 @@ describe("Karere Unit Test", function() {
     var m1;
     var m2;
 
+    var functionsMocker;
+
 
     beforeEach(function(done) {
+        localStorage.clear();
+        functionsMocker = new FunctionsMocker();
+
         k1 = new Karere();
         k2 = new Karere();
 
@@ -23,11 +28,13 @@ describe("Karere Unit Test", function() {
 
 
     afterEach(function(done) {
+        functionsMocker.restore();
+
         m1.restore();
+
         m2.restore();
 
         k1 = k2 = em1 = em2 = m1 = m2 = null;
-
         done();
     });
 
@@ -317,6 +324,8 @@ describe("Karere Unit Test", function() {
     });
 
     it("can create room, leave room, add user to room, remove user from room", function(done) {
+
+
         var roomJid;
         var roomPassword;
 
@@ -325,6 +334,7 @@ describe("Karere Unit Test", function() {
         var promiseStart = k1.startChat([
                 'user2@jid.com/r1'
             ]);
+
 
 
         expect(m1.calls['muc.join'].length).to.equal(1);
@@ -337,13 +347,13 @@ describe("Karere Unit Test", function() {
         k1._onIncomingStanza(
             stringToXml(
                 "<presence xmlns='jabber:client' from='" + roomJid + "/user2' to='" + k1.getJid() + "'>" +
-                    "<show>away</show>" +
-                    "<status>Away</status>" +
+                    "<show>away<\/show>" +
+                    "<status>Away<\/status>" +
                     "<c xmlns='http://jabber.org/protocol/caps' node='http://pidgin.im/' hash='sha-1' ver='DdnydQG7RGhP9E3k9Sf+b+bF0zo='/>" +
                     "<x xmlns='http://jabber.org/protocol/muc#user'>" +
-                    "<item jid='" + k1.getJid() + "' affiliation='none' role='participant'/>" +
-                    "</x>" +
-                "</presence>"
+                    "<item jid='" + k1.getJid() + "' affiliation='owner' role='participant'/>" +
+                    "<\/x>" +
+                "<\/presence>"
             )
         );
 

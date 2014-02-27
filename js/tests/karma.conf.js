@@ -11,7 +11,7 @@ module.exports = function(config) {
             "../jquery-min-1.8.1.js",
 
              "../functions.js",
-             "../asmcrypto.js",
+//             "../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
 
@@ -36,6 +36,7 @@ module.exports = function(config) {
              "../chat/karere.js",
              "../chat/chat.js",
 
+            "src/helpers/functionsmocker.js",
             "src/helpers/eventmocker.js",
             "src/helpers/fixtures.js",
             "src/helpers/objectmocker.js",
@@ -56,6 +57,25 @@ module.exports = function(config) {
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
             '../**/*.js': ['coverage']
+        },
+
+        browsers: ['PhantomJS_custom', 'PhantomJS'],
+
+        // you can define custom flags
+        customLaunchers: {
+            'PhantomJS_custom': {
+                base: 'PhantomJS',
+                options: {
+                    windowName: 'my-window',
+                    settings: {
+                        webSecurityEnabled: false
+                    }
+                },
+                flags: [
+                    '--web-security=false',
+                    '--local-to-remote-url-access=true'
+                ]
+            }
         },
 
         // optionally, configure the reporter

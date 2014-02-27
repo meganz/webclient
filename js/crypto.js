@@ -1627,26 +1627,32 @@ function api_fareq(res,ctx)
 
 			if (ctx.errfa && ctx.errfa.timeout)
 			{
+				faxhrs[slot].fa_timeout = ctx.errfa.timeout;
+
 				faxhrs[slot].onprogress = function()
 				{
 					if (this.fart) clearTimeout(this.fart);
-					this.fart = setTimeout(this.faeot.bind(this), this.ctx.errfa.timeout);
+					this.fart = setTimeout(this.faeot.bind(this), this.fa_timeout);
 				};
 			}
-
-			faxhrs[slot].faid = function()
+			else
 			{
-				var ctx = this.ctx;
+				delete faxhrs[slot].onprogress;
 
-				return ctx.errfa && ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-			};
+				if (faxhrs[slot].onprogress)
+				{ // Huh? Gecko..
+					faxhrs[slot].onprogress = function() {};
+				}
+			}
 
 			faxhrs[slot].faeot = function()
 			{
 				if (this.fart) clearTimeout(this.fart);
+				if (!this.ctx.errfa) return;
 				if (d) console.log('FAEOT', this);
 
-				var id = this.faid();
+				var ctx = this.ctx;
+				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 				if (id !== slideshowid)
 				{
 					if (id)
@@ -1660,11 +1666,12 @@ function api_fareq(res,ctx)
 
 				this.abort();
 				this.ctx.errfa(id,1);
-				delete this.ctx.errfa;
 			};
 
 			faxhrs[slot].onreadystatechange = function()
 			{
+				if (this.onprogress) this.onprogress();
+
 				if (this.readyState == this.DONE)
 				{
 					var ctx = this.ctx;
@@ -1738,17 +1745,28 @@ function api_fareq(res,ctx)
 						if (ctx.p)
 						{
 							if (d) console.log("File attribute retrieval failed (" + this.status + ")");
+							this.faeot();
 						}
 						else
 						{
-							if (d) console.log("Attribute storage failed (" + this.status + "), retrying...");
-							api_storefileattr(null,null,null,null,ctx);
+							if (!ctx.fastrgri) ctx.fastrgri = 400;
+
+							if (ctx.fastrgri < 7601)
+							{
+								if (d) console.log("Attribute storage failed (" + this.status + "), retrying...", ctx.fastrgri);
+
+								setTimeout(function()
+								{
+									api_storefileattr(null,null,null,null,ctx);
+
+								}, ctx.fastrgri += 800);
+							}
+							else
+							{
+								if (d) console.log("Attribute storage failed (" + this.status + ")");
+							}
 						}
 					}
-				}
-				else
-				{
-					if (this.onprogress) this.onprogress();
 				}
 			}
 

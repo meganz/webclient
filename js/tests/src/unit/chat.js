@@ -421,25 +421,25 @@ describe("Chat.js - Karere UI integration", function() {
         var expectedMessagesList = [
             {
                 "ts": "50",
-                "time": "02:00.50",
+                "time": unixtimeToTimeString(testMessages[2].timestamp),
                 "msg": "hopala1",
                 "name": "lp@mega.co.nz"
             },
             {
                 "ts": "100",
-                "time": "02:01.40",
+                "time": unixtimeToTimeString(testMessages[0].timestamp),
                 "msg": "hopala2",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "200",
-                "time": "02:03.20",
+                "time": unixtimeToTimeString(testMessages[1].timestamp),
                 "msg": "hopala3",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "300",
-                "time": "02:05.00",
+                "time": unixtimeToTimeString(testMessages[3].timestamp),
                 "msg": "hopala4",
                 "name": "lpetrov@me.com"
             }

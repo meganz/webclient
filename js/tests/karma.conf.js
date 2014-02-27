@@ -44,7 +44,7 @@ module.exports = function(config) {
             "src/helpers/strophemocker.js",
             "src/helpers/utils.js",
              "../tests/src/unit/*.js",
-             "../tests/src/integration/*.js",
+//             "../tests/src/integration/*.js",
 
             { pattern: 'src/unit/fixtures/**/*.html', included: false, served: true }
 

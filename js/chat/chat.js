@@ -2031,11 +2031,8 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         name
     );
 
-    //XXX: UTC?
-    var date = new Date(message.timestamp * 1000);
-
     $('.fm-chat-message-time', $message).text(
-        addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+        unixtimeToTimeString(message.timestamp)
     );
     $message.attr('data-timestamp', message.timestamp);
     $message.attr('data-id', message.id);

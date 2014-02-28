@@ -797,21 +797,24 @@ makeMetaAware(Karere);
             var newUsers = {};
             var leftUsers = {};
 
-            $.each(x[0].getElementsByTagName("item"), function(i, item) {
-                var role = item.getAttribute('role');
-                var jid = item.getAttribute('jid');
+            $.each(x, function(ii, _x) {
+                $.each(_x.getElementsByTagName("item"), function(i, item) {
+                    var role = item.getAttribute('role');
+                    var jid = item.getAttribute('jid');
 
-                if(role != "unavailable" && role != "none") {
-                    if(users[jid] != role) {
-                        users[jid] = role;
-                        newUsers[jid] = item.getAttribute('role');
+                    if(role != "unavailable" && role != "none") {
+                        if(users[jid] != role) {
+                            users[jid] = role;
+                            newUsers[jid] = item.getAttribute('role');
+                        }
+                    } else { // left/kicked
+                        delete users[jid];
+                        delete newUsers[jid];
+                        leftUsers[jid] = true;
                     }
-                } else { // left/kicked
-                    delete users[jid];
-                    delete newUsers[jid];
-                    leftUsers[jid] = true;
-                }
+                });
             });
+
 
             self.setMeta('rooms', eventData['roomJid'], 'users', users);
 

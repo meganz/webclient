@@ -46,6 +46,12 @@ var chatui;
             // TODO: Better error message?
         }
 
+        if($promise) {
+            $promise.done(function(roomJid, room) {
+                room.show();
+            });
+        }
+
 
 
         $('.fm-chat-block').removeClass('hidden');
@@ -273,6 +279,7 @@ var MegaChat = function() {
 
         if(eventData.show != "unavailable") {
             if(eventData.myOwn === false) {
+
                 // update M.u
                 var contact = self.getContactFromJid(eventData.from);
                 if(contact) {
@@ -357,9 +364,13 @@ var MegaChat = function() {
                         room.ctime = eventData.meta.ctime;
                         room.syncUsers(eventData.meta.participants);
                     }
-                    room.setState(MegaChatRoom.STATE.JOINING);
 
-                    self.karere.joinChat(eventData.room, eventData.password);
+                    // if not already in
+                    if(room.state < MegaChatRoom.STATE.JOINING) {
+                        room.setState(MegaChatRoom.STATE.JOINING);
+                        self.karere.joinChat(eventData.room, eventData.password);
+                    }
+
                     e.stopPropagation();
                     return false;
                 }
@@ -760,22 +771,40 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventData) {
     }
 
 
-    // i had joined
+    // i had joined OR left
     if($.inArray(self.karere.getJid(), diffUsers) != -1) {
-        if(type != "joined") {
+        if(type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
             if(self.chats[eventData.roomJid]) {
                 self.chats[eventData.roomJid].destroy();
             }
-        } else {
+        } else { // i'd joined
 
         }
     } else { //some one else had joined/left the room
-        if(type != "joined") {
-            //TODO: If this is a private room and the only user left count == 1, then destroy the room (an UI elements)
+        if(type != "joined") { // they left the room
+            //XX: If this is a private room and the only user left count == 1, then destroy the room (an UI elements)
+
+            // this code should trigger timeout immediately if there is a request pending for a user who had left the
+            // room
+            if(self._syncRequests) {
+                $.each(self._syncRequests, function(k, v) {
+                    if(v.userJid == diffUsers[0]) {
+                        console.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
+                        v.timeoutHandler();
+                        clearTimeout(v.timer);
+                        return false; // break;
+                    }
+                })
+            }
+        } else { // they had joined
+
         }
-        assert(self.chats[eventData.roomJid], "Room not found!");
-        self.chats[eventData.roomJid].syncUsers(clone(updatedJids));
+        var room = self.chats[eventData.roomJid];
+        assert(room, "Room not found!");
+
+        room.syncUsers(clone(updatedJids));
+        room.refreshUI();
     }
     //TODO: group chats?
 };
@@ -795,24 +824,6 @@ MegaChat.prototype.destroy = function() {
         room.destroy();
         delete self.chats[roomJid];
     });
-
-//    debugger;
-//
-//    // push DOM templates back to the actual DOM
-//    // cleanup dom nodes that were used as templates
-//    self.$container.append(self.$header_tpl.addClass("template"));
-//    delete self.$header_tpl;
-//
-//    self.$messages_tpl.append(self.$message_tpl.addClass("template").addClass("message"));
-//    delete self.$message_tpl;
-//
-//    self.$messages_tpl.append(self.$inline_dialog_tpl.addClass("template").addClass("message"));
-//    delete self.$inline_dialog_tpl;
-//
-//    self.$container.append(self.$messages_tpl.addClass("template"));
-//    delete self.$messages_tpl;
-
-
 
     return self.karere.disconnect()
         .done(function() {
@@ -857,8 +868,13 @@ MegaChat.prototype.getContactFromJid = function(jid) {
         }
     });
     if(!contact) {
+        // this can happen if:
+        // user A added user B
+        // user B's contacts list is still not updated
+        // user B receives a XMPP presence info that user A is online and tries to render a DOM element which requires
+        // the user's name..so this method gets called.
         if(localStorage.d) {
-            debugger;
+            //debugger;
         }
     }
     return contact;
@@ -1040,7 +1056,7 @@ MegaChat.prototype.openChat = function(jids, type) {
         var $element = $('#treesub_contacts li a[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
         if(self.chats[roomJid]) {
-            self.chats[roomJid].show();
+//            self.chats[roomJid].show();
             $promise.resolve(roomJid, self.chats[roomJid]);
             return $promise;
         } else {
@@ -1065,7 +1081,9 @@ MegaChat.prototype.openChat = function(jids, type) {
     room.setType(type);
     room.setUsers(jids);
     room.ctime = unixtime();
-    room.show();
+    if(!self.currentlyOpenedChat) {
+        room.show();
+    }
 
     self.chats[room.roomJid] = room;
 
@@ -1248,12 +1266,12 @@ var MegaChatRoom = function(megaChat, roomJid) {
          * Maximum time for waiting a message sync, before trying to send a request to someone else in the room or
          * failing the SYNC operation at all (if there are no other users to query for the sync op).
          */
-        'requestMessagesSyncTimeout': 1500,
+        'requestMessagesSyncTimeout': 2500,
 
         /**
          * Send any queued messages if the room is not READY
          */
-        'sendMessageQueueIfNotReadyTimeout': 3500, // XX: why is this so slow? optimise please.
+        'sendMessageQueueIfNotReadyTimeout': 6500, // XX: why is this so slow? optimise please.
 
         /**
          * Change the state of the room to READY in case there was no response in timely manner. (e.g. there were no
@@ -1264,9 +1282,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
         /**
          * Used to cleanup the memory from sent sync requests.
          * This should be high enough, so that it will be enough for a response to be generated (message log to be
-         * encrypted), send and recieved.
+         * encrypted), send and received.
          */
-        'syncRequestCleanupTimeout': 5000,
+        'syncRequestCleanupTimeout': 15000,
 
 
         /**
@@ -1288,8 +1306,11 @@ var MegaChatRoom = function(megaChat, roomJid) {
     // Events
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
+        if(localStorage.d) {
+            console.debug("Will change state from: ", MegaChatRoom.stateToText(oldState), " to ", MegaChatRoom.stateToText(newState));
+        }
         var resetStateToReady = function() {
-            if(self.state != MegaChatRoom.STATE.LEFT) {
+            if(self.state != MegaChatRoom.STATE.LEFT && self.state != MegaChatRoom.STATE.READY && self.state != MegaChatRoom.STATE.SYNCED) {
                 if(localStorage.d) {
                     console.warn("Sync failed, setting state to READY.");
                 }
@@ -1497,7 +1518,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.getInlineDialogInstance("incoming-call").remove();
         self.getInlineDialogInstance("outgoing-call").remove();
-        //TODO: jsp reinitialize
+        self.refreshScrollUI();
     };
     var resetCallStateInCall = function() {
         $('.call-actions', self.$header).hide();
@@ -1518,7 +1539,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         self.getInlineDialogInstance("incoming-call").remove();
         self.getInlineDialogInstance("outgoing-call").remove();
 
-        //TODO: jsp reinitialize
+        self.refreshScrollUI();
     };
 
     self.bind('call-init', function(e, eventData) {
@@ -1925,6 +1946,15 @@ MegaChatRoom.prototype.leave = function() {
 MegaChatRoom.prototype.destroy = function() {
     var self = this;
 
+    // destroy any waiting sync requests
+    if(self._syncRequests) {
+        $.each(self._syncRequests, function(messageId, req) {
+
+            clearTimeout(req.timer);
+        });
+        delete self._syncRequests;
+    };
+
     self.leave();
 
     self.$header.remove();
@@ -1943,7 +1973,6 @@ MegaChatRoom.prototype.destroy = function() {
 MegaChatRoom.prototype.show = function() {
     var self = this;
 
-
     self.$header.show();
     self.$messages.show();
 
@@ -1957,7 +1986,11 @@ MegaChatRoom.prototype.show = function() {
     self.megaChat.currentlyOpenedChat = self.roomJid;
 
     // update unread messages count
+    $('.fm-chat-messages-block.unread', self.$messages).removeClass('unread');
+
+    // render ui for the new/empty messages count
     var $navElement = self.getNavElement();
+
     var $count = $('.messages-icon span', $navElement);
     $count.text('');
     $count.parent().hide();
@@ -2016,14 +2049,12 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     var $message = self.megaChat.$message_tpl.clone().removeClass("template");
 
-    var jid = message.from;
-    if(jid.indexOf("conference.") != -1) { // MUC jid, convert it to bare jid
-        jid = message.from.split("/")[1];
-        jid = jid.split("__")[0] + "@" + self.megaChat.karere.options.mucDomain.replace("conference.", "");
-    } else { // xmpp resource jid, convert to bare jid
-        jid = message.from.split("/")[0];
-    }
+    var jid = Karere.getNormalizedBareJid(message.from);
 
+
+    if(jid != self.megaChat.karere.getBareJid() && self.roomJid != self.megaChat.getCurrentRoomJid()) {
+        $message.addClass('unread');
+    }
 
     var name = self.megaChat.getContactNameFromJid(jid);
 
@@ -2067,6 +2098,17 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     return self.appendDomMessage($message, message);
 };
 
+
+//TODO: Docs
+MegaChatRoom.prototype.refreshScrollUI = function() {
+    var self = this;
+    var $jsp = self.$messages.data('jsp');
+
+    assert($jsp, "JSP not available.");
+    $jsp.reinitialise();
+};
+
+//TODO: Docs
 MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
     var self = this;
 
@@ -2112,26 +2154,30 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
     );
 
     // update unread messages count
-    if(self.roomJid != self.megaChat.getCurrentRoomJid()) {
+    if(self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
         var $navElement = self.getNavElement();
         var $count = $('.messages-icon span', $navElement);
-        var count = parseInt($count.text(), 10);
 
+        var count = $('.fm-chat-messages-block.unread', self.$messages).size();
         if(count > 0) {
-            count += 1;
-        } else {
-            count = 1;
+            $count.text(count);
+            $count.parent().show();
+        } else if(count == 0) {
+            $count.text('');
+            $count.parent().hide();
         }
-        $count.text(count);
-        $count.parent().show();
     }
 };
 
 
-MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageContents, buttons) {
+MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageContents, buttons, read) {
     var self = this;
 
     var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
+
+    if(!read && self.roomJid != self.megaChat.getCurrentRoomJid()) {
+        $inlineDialog.addClass('unread');
+    }
 
     $inlineDialog.addClass('fm-chat-inline-dialog-' + type);
 
@@ -2233,28 +2279,34 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         }
     );
 
-    if(!self._syncRequests[self.roomJid]) {
-        self._syncRequests[self.roomJid] = {};
+    if(!self._syncRequests) {
+        self._syncRequests = {};
     }
 
     if(self.state != MegaChatRoom.STATE.SYNCING && self.state != MegaChatRoom.STATE.READY) {
         self.setState(MegaChatRoom.STATE.SYNCING);
     }
 
-    self._syncRequests[self.roomJid][messageId] = {
+    self._syncRequests[messageId] = {
         'messageId': messageId,
         'userJid': userJid,
+        'timeoutHandler': function() {
+            console.warn(new Date(), "Sync request timed out from user: ", userJid, " for room: ", self.roomJid);
+
+            delete self._syncRequests[messageId];
+            exceptFromUsers.push(userJid);
+            self.requestMessageSync(exceptFromUsers);
+        },
         'timer': setTimeout(function() {
             // timed out
             if(localStorage.d) {
                 console.warn("Timeout waiting for", userJid, "to send sync message action. Will eventually, retry with some of the other users.");
             }
 
-            delete self._syncRequests[self.roomJid][messageId];
-            exceptFromUsers.push(userJid);
-            self.requestMessageSync(exceptFromUsers);
+            self._syncRequests[messageId].timeoutHandler();
         }, self.options.requestMessagesSyncTimeout)
     };
+    console.warn(new Date(), "Sent a sync request to user: ", userJid, " for room: ", self.roomJid);
 
     return true;
 };
@@ -2299,6 +2351,7 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
                 'roomJid': request.meta.roomJid,
                 'messages': messages,
                 'offset': i,
+                'chunkSize': messagesChunkSize,
                 'total': messagesCount
             }
         );
@@ -2322,8 +2375,8 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
         }
         return false;
     }
-    if(self._syncRequests[self.roomJid]) {
-        if(!self._syncRequests[self.roomJid][response.meta.inResponseTo]) {
+    if(self._syncRequests) {
+        if(!self._syncRequests[response.meta.inResponseTo]) {
             if(localStorage.d) {
                 console.warn(
                     "Will not accept message sync response because inResponseTo, did not matched any cached messageIDs, " +
@@ -2333,7 +2386,7 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
             }
             return false;
         }
-        clearTimeout(self._syncRequests[self.roomJid][response.meta.inResponseTo].timer);
+        clearTimeout(self._syncRequests[response.meta.inResponseTo].timer);
     } else {
         if(localStorage.d) {
             console.warn("Invalid sync response, room not found:", response);
@@ -2342,24 +2395,35 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
     }
 
     // cleanup
-    $.each(self._syncRequests[self.roomJid], function(messageId, request) {
+    $.each(self._syncRequests, function(messageId, request) {
         clearTimeout(request.timer);
     });
 
-    if(self._syncRequests[self.roomJid].cleanupTimeout) {
-        clearTimeout(self._syncRequests[self.roomJid].cleanupTimeout);
+    if(self._syncRequests.cleanupTimeout) {
+        clearTimeout(self._syncRequests.cleanupTimeout);
     }
-    self._syncRequests[self.roomJid].cleanupTimeout = setTimeout(function() {
-        delete self._syncRequests[self.roomJid];
+    self._syncRequests.cleanupTimeout = setTimeout(function() {
+        delete self._syncRequests;
     }, self.options.syncRequestCleanupTimeout);
 
     $.each(response.meta.messages, function(k, msg) {
         self.appendMessage(msg);
     });
 
-    if(self.state < MegaChatRoom.STATE.SYNCED) {
-        self.setState(MegaChatRoom.STATE.SYNCED);
+    if((response.meta.chunkSize + response.meta.offset) >= response.meta.total) {
+        if(localStorage.d) {
+            console.warn(new Date(), "finished sync from: ", response.from, self.roomJid, response.meta.total);
+        }
+
+        if(self.state < MegaChatRoom.STATE.SYNCED) {
+            self.setState(MegaChatRoom.STATE.SYNCED);
+        }
+    } else {
+        if(localStorage.d) {
+            console.debug("waiting for more messages from sync: ", response.meta.total - (response.meta.chunkSize + response.meta.offset));
+        }
     }
+
 };
 
 /**

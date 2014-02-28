@@ -389,8 +389,29 @@ describe("Chat.js - Karere UI integration", function() {
             meta: {
                 action: "syncResponse",
                 inResponseTo: "123",
-                messages: testMessages,
+                messages: [testMessages[0], testMessages[1]],
                 offset: 0,
+                chunkSize: 2,
+                roomJid: roomJid,
+                total: testMessages.length
+            },
+            myOwn: false,
+            rawMessage: null,
+            rawType: "action",
+            to: megaChat.karere.getJid(),
+            type: "Message"
+        });
+
+        megaChat.karere._triggerEvent("ActionMessage", {
+            from: megaChat.karere.sendAction.getCall(0).args[0],
+            id: "-870315190_1392060886770",
+            karere: null,
+            meta: {
+                action: "syncResponse",
+                inResponseTo: "123",
+                messages: [testMessages[2], testMessages[3]],
+                offset: 2,
+                chunkSize: 2,
                 roomJid: roomJid,
                 total: testMessages.length
             },
@@ -417,7 +438,6 @@ describe("Chat.js - Karere UI integration", function() {
             });
         });
 
-        //XX: maybe generate dynamic time and name fields for the reference values?
         var expectedMessagesList = [
             {
                 "ts": "50",
@@ -444,8 +464,7 @@ describe("Chat.js - Karere UI integration", function() {
                 "name": "lpetrov@me.com"
             }
         ];
-        console.warn(messagesInOrderedList);
-        console.warn(expectedMessagesList);
+
         expect(messagesInOrderedList).to.eql(expectedMessagesList);
 
         expect(

@@ -271,6 +271,8 @@ describe("Karere Unit Test", function() {
             ).length
         ).to.equal(0);
 
+        expect(k1.userExistsInChat("room@jid.com", k1.getJid())).not.to.be.ok;
+
         done();
     });
 
@@ -393,6 +395,8 @@ describe("Karere Unit Test", function() {
                 'jid': 'user2@jid.com/r1'
             }
         };
+
+        expect(k1.userExistsInChat(roomJid, "user2@jid.com/r1")).to.be.ok;
 
         var promiseLeft = k1.removeUserFromChat(roomJid, "user2@jid.com/r1");
 

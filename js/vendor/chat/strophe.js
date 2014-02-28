@@ -1736,7 +1736,7 @@ Strophe.Builder.prototype = {
  *  Returns:
  *    A new Strophe.Handler object.
  */
-Strophe.Handler = function (handler, ns, name, type, id, from, options, validateFunc)
+Strophe.Handler = function (handler, ns, name, type, id, from, options)
 {
     this.handler = handler;
     this.ns = ns;
@@ -1744,7 +1744,6 @@ Strophe.Handler = function (handler, ns, name, type, id, from, options, validate
     this.type = type;
     this.id = id;
     this.options = options || {matchBare: false};
-    this.validateFunc = validateFunc;
 
     // default matchBare to false if undefined
     if (!this.options.matchBare) {
@@ -1773,14 +1772,16 @@ Strophe.Handler.prototype = {
      */
     isMatch: function (elem)
     {
+        var nsMatch;
         var from = null;
+
         if (this.options.matchBare) {
             from = Strophe.getBareJidFromJid(elem.getAttribute('from'));
         } else {
             from = elem.getAttribute('from');
         }
 
-        var nsMatch = false;
+        nsMatch = false;
         if (!this.ns) {
             nsMatch = true;
         } else {
@@ -1794,19 +1795,15 @@ Strophe.Handler.prototype = {
             nsMatch = nsMatch || elem.getAttribute("xmlns") == this.ns;
         }
 
-        if (!nsMatch)
-            return false;
-
-        if (this.validateFunc)
-            return (
-            (!this.name || Strophe.isTagEqual(elem, this.name)) &&
-              this.validateFunc(this, elem));
-          else
-            return (
+        if (nsMatch &&
             (!this.name || Strophe.isTagEqual(elem, this.name)) &&
             (!this.type || elem.getAttribute("type") == this.type) &&
-            (!this.id   || elem.getAttribute("id") == this.id) &&
-            (!this.from || from == this.from));
+            (!this.id || elem.getAttribute("id") == this.id) &&
+            (!this.from || from == this.from)) {
+                return true;
+        }
+
+        return false;
     },
 
     /** PrivateFunction: run
@@ -2423,15 +2420,10 @@ Strophe.Connection.prototype = {
             } else {
                 throw {
                     name: "StropheError",
-                    message: "Got bad IQ type of " + iqtype,
-                    sentIQ: elem
+            message: "Got bad IQ type of " + iqtype
                 };
             }
-        }, null, 'iq', function(handle, elem) {
-            var type = elem.getAttribute('type');
-            return ((elem.getAttribute('id') == id) &&
-                ((type === 'result') || (type === 'error')));
-        });
+        }, null, 'iq', null, id);
 
         // if timeout specified, setup timeout handler.
         if (timeout) {
@@ -2567,12 +2559,7 @@ Strophe.Connection.prototype = {
      */
     addHandler: function (handler, ns, name, type, id, from, options)
     {
-        var hand;
-	if(typeof type === 'function') {
-	    hand = new Strophe.Handler(handler, ns, name, null, null, null, null, type);
-	} else {
-	    hand = new Strophe.Handler(handler, ns, name, type, id, from, options, null);
-	}
+        var hand = new Strophe.Handler(handler, ns, name, type, id, from, options);
         this.addHandlers.push(hand);
         return hand;
     },

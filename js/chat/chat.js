@@ -1292,7 +1292,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
          */
         'mediaOptions': {
             audio: true,
-            video: false
+            video: true
         }
     };
     this._syncRequests = {};

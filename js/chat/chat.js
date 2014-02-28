@@ -614,7 +614,7 @@ MegaChat.prototype.init = function() {
 
 
     var rtcEventProxyToRoom = function(e, eventData) {
-        console.error("RTC: ", e, eventData);
+        console.debug("RTC: ", e, eventData);
 
         var peer = eventData.peer;
 
@@ -1274,7 +1274,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
          */
         'mediaOptions': {
             audio: true,
-            video: true
+            video: false
         }
     };
     this._syncRequests = {};
@@ -1497,6 +1497,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.getInlineDialogInstance("incoming-call").remove();
         self.getInlineDialogInstance("outgoing-call").remove();
+        //TODO: jsp reinitialize
     };
     var resetCallStateInCall = function() {
         $('.call-actions', self.$header).hide();
@@ -1516,6 +1517,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.getInlineDialogInstance("incoming-call").remove();
         self.getInlineDialogInstance("outgoing-call").remove();
+
+        //TODO: jsp reinitialize
     };
 
     self.bind('call-init', function(e, eventData) {
@@ -2028,11 +2031,8 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         name
     );
 
-    //XXX: UTC?
-    var date = new Date(message.timestamp * 1000);
-
     $('.fm-chat-message-time', $message).text(
-        addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+        unixtimeToTimeString(message.timestamp)
     );
     $message.attr('data-timestamp', message.timestamp);
     $message.attr('data-id', message.id);

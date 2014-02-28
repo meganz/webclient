@@ -59,8 +59,8 @@ describe("Chat Filters", function() {
         };
         megaChat.trigger("onSendMessage", messageData);
 
-        expect(messageData.messageHtml).not.to.be.empty;
-        expect(messageData.messageHtml).to.equal("HEY");
+        expect(messageData.message).not.to.be.empty;
+        expect(messageData.message).to.equal("HEY");
 
         // capslock test2
         var messageData = {
@@ -68,8 +68,8 @@ describe("Chat Filters", function() {
         };
         megaChat.trigger("onQueueMessage", messageData);
 
-        expect(messageData.messageHtml).not.to.be.empty;
-        expect(messageData.messageHtml).to.equal("HEY");
+        expect(messageData.message).not.to.be.empty;
+        expect(messageData.message).to.equal("HEY");
 
 
         // valid url
@@ -89,6 +89,7 @@ describe("Chat Filters", function() {
 
         expect(messageData.messageHtml).not.to.be.empty;
         expect(messageData.messageHtml).not.to.contain("<a ");
+
         done();
     });
 });

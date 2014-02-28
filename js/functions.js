@@ -893,3 +893,9 @@ function removeValue(array, value) {
 function RegExpEscape(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
+
+
+function unixtimeToTimeString(timestamp) {
+    var date = new Date(timestamp * 1000);
+    return addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+}

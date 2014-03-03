@@ -219,7 +219,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dl.decrypt.push({ data: new Uint8Array(r), offset: task.offset, info: task})
+					download.decrypt.push({ data: new Uint8Array(r), offset: task.offset, info: task})
 					if (failed) DownloadManager.release(self);
 					failed = false;
 				} else if (!download.cancelled) {
@@ -411,7 +411,7 @@ function dl_writer(dl) {
 };
 
 // Decrypter worker {{{
-function dl_decrypt(dl) {
+function dl_decrypter(dl) {
 	return function(task) {
 		var Decrypter = this;
 		var worker = new Worker('decrypter.js?v=5');
@@ -421,19 +421,19 @@ function dl_decrypt(dl) {
 				if (e.data[0] == '[') {
 					var t = JSON.parse(e.data), pos = task.offset
 					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
-						download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+						dl.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
 					}
 				}
-				DEBUG("worker replied string", e.data, download.macs);
+				DEBUG("worker replied string", e.data, dl.macs);
 			} else {
 				var plain = new Uint8Array(e.data.buffer || e.data);
 				Decrypter.done(); // release slot
-				DEBUG("Decrypt done", download.cancelled);
-				if (download.cancelled) return;
+				DEBUG("Decrypt done", dl.cancelled);
+				if (dl.cancelled) return;
 				dl.writer.push({ data: plain, offset: task.offset});
 			}
 		};
-		worker.postMessage(task.download.nonce);
+		worker.postMessage(dl.nonce);
 		worker.dl_pos = task.offset;
 		worker.postMessage(task.offset/16);
 	
@@ -442,7 +442,7 @@ function dl_decrypt(dl) {
 		} else {
 			worker.postMessage(task.data.buffer, [task.data.buffer]);
 		}
-		DEBUG("decrypt with workers", download.cancelled);
+		DEBUG("decrypt with workers", dl.cancelled);
 
 	};
 }

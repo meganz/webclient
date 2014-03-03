@@ -44,6 +44,11 @@ var DEFAULT_CONCURRENCY = 4
 		}
 	}
 
+	queue.prototype.isEmpty = function() {
+		return this._running.length == 0 
+			&& this._queue.length == 0;
+	}
+
 	queue.prototype.debug = function() {
 		DEBUG({ 
 			running: this._running.length, 

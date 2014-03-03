@@ -181,12 +181,8 @@ function FileSystemAPI(dl_id, dl) {
 	}
 
 	IO.write = function(buffer, position, done) {
-		if (dl_writing || position !== dl_fw.position) {
-			// busy or not there yet
-			// DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
-			return setTimeout(function() {
-				if (!dl.cancelled) IO.write(buffer, position, done);
-			}, 100);
+		if (position != dl_fw.position) {
+			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
 		dl_writing = true;
 		failed     = false;

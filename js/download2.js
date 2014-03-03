@@ -424,18 +424,17 @@ DownloadQueue.prototype.push = function() {
 	dl.io.size		= dl.size;
 
 	dl.decrypt = new QueueClass(dl_decrypter(dl))
-	dl.writer  = new QueueClass(dl_writer(dl))
+	dl.writer  = new QueueClass(dl_writer(dl), 1)
 	dl.writer.pos = 0;
 	dl.writer.getNextTask = function() {
 		var task = null;
 		$.each(this._queue, function(p, pTask) {
-			DEBUG('debug ', pTask.offset, dl.writer.pos);
 			if (pTask.offset == dl.writer.pos) {
-				task = pTask;
+				task = p;
 				return false; /* break */
 			}
 		});
-		if (task) {
+		if (task !== null) {
 			task = this._queue.splice(task, 1)[0]
 		}
 		return task;

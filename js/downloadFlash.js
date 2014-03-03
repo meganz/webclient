@@ -5,7 +5,7 @@ function FlashIO(dl_id, dl) {
 		, swfid  = 'dlswf_' + (dl.zipid ? 'zip_' + dl.zipid : dl_id)
 
 	this.write = function (buffer, position, done) {
-		if (!document.getElementById(swfid) || offset !== position) {
+		if (!document.getElementById(swfid)) {
 			return setTimeout(function () {
 				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 300);

@@ -223,9 +223,7 @@ function dlZipIO(dl, dl_id) {
 
 		if (qZips[0] !== task.download.id || task.pos != pos) {
 			DEBUG("retry ", pos, task.pos, qZips[0], task.download.id);
-			return setTimeout(function() {
-				self.write(buffer, position, next, task);
-			}, 100);
+			throw new Error;
 		}
 
 		if (task.first) {

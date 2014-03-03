@@ -98,18 +98,26 @@ function dlZipIO(dl, dl_id) {
 		, current = null
 		, gOffset = 0
 		, realIO = new dlMethod(dl_id, dl) 
-		, ready = false;
+		, ready = false
 
 	// fake set credentials
 	realIO.begin = function() {
 		ready = true;
 	}
 
-	this.IO   = realIO;
+	dl_writer(this, function() {
+		return ready;
+	});
+
+
+	this.IO   = this.io = realIO;
 	this.size = 0
 	this.files = 0
 	this.progress	= 0
 	this.dl_xr	= getxr()
+
+	this.ready = function() {
+	};
 
 	this.done = function() {
 		current = null
@@ -129,26 +137,16 @@ function dlZipIO(dl, dl_id) {
 		}
 	}
 
+
 	/**
 	 *	Peform real write 
 	 */
 	function doWrite(buffer, next) {
-		if (!ready) {
-			/**
-			 * writer is not ready but 
-			 * we cannot call ourself, the system is counting that
-			 * gOffset is modified right away
-			 */
-			var pos = gOffset;
-			var retry = setInterval(function() {
-				if (ready) {
-					realIO.write(buffer, pos, next || function() {});
-					clearInterval(retry);
-				}
-			}, 100)
-		} else {
-			realIO.write(buffer, gOffset, next || function() {});
-		}
+		self.writer.push({
+			data: buffer,
+			offset: gOffset,
+			callback: next
+		});
 		gOffset += buffer.length;
 	}
 
@@ -223,9 +221,7 @@ function dlZipIO(dl, dl_id) {
 
 		if (qZips[0] !== task.download.id || task.pos != pos) {
 			DEBUG("retry ", pos, task.pos, qZips[0], task.download.id);
-			return setTimeout(function() {
-				self.write(buffer, position, next, task);
-			}, 100);
+			throw new Error;
 		}
 
 		if (task.first) {
@@ -263,6 +259,7 @@ function dlZipIO(dl, dl_id) {
 			pos++;
 		}, task);
 	};
+
 }
 
 

@@ -3,7 +3,6 @@ var dlMethod
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new QueueClass(downloader)
-	, dlDecrypter = new QueueClass(decrypter)
 
 dlQueue.push = function(x) {
 	if (!x.task) {
@@ -213,6 +212,7 @@ dlQueue.on('drain', function() {
 });
 // }}}
 
+// chunk scheduler {{{
 /**
  *	Override the downloader scheduler method.
  *	The idea is to select chunks from the same
@@ -254,6 +254,7 @@ dlQueue.getNextTask = (function() {
 		return candidate;
 	};
 })();
+// }}}
 
 if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;
@@ -422,9 +423,11 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
+	dl_decrypter(dl);
+	dl_writer(dl);
+
 	dl.macs  = {}
 	dl.urls	 = []
-	dl.decrypt = 0;
 
 	dlQueue.push(new ClassFile(dl));
 

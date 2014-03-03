@@ -341,13 +341,13 @@ else
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 		/* better download */
-		jsl.push({f:'js/events.js', n: 'index', j:1,w:4});
-		jsl.push({f:'js/queue.js', n: 'index', j:1,w:4});
-		jsl.push({f:'js/downloadChrome.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
+		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
+		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
+		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 		/* end better download */
 		jsl.push({f:'index.js', n: 'index', j:1,w:4});

@@ -18,9 +18,6 @@ var DEFAULT_CONCURRENCY = 4
 		this._running		= [];
 		this._paused		= false;
 		var self = this;
-		setInterval(function() {
-			//self.process();	
-		}, 100);
 	}
 	inherits(queue, MegaEvents)
 
@@ -42,6 +39,11 @@ var DEFAULT_CONCURRENCY = 4
 			}
 			queue.process();
 		}
+	}
+
+	queue.prototype.isEmpty = function() {
+		return this._running.length == 0 
+			&& this._queue.length == 0;
 	}
 
 	queue.prototype.debug = function() {

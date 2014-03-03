@@ -7,12 +7,6 @@ function MemoryIO(dl_id, dl) {
 	if (d) DEBUG('Creating new MemoryIO instance', dl_id, new Error().stack, dl);
 
 	this.write = function (buffer, position, done) {
-		if (position !== offset) {
-			return setTimeout(function() {
-				if (!dl.cancelled) IO.write(buffer, position, done);
-			}, 100);
-		}
-
 		if(msie) {
 			dblob.append(have_ab ? buffer : buffer.buffer);
 		} else {

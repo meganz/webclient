@@ -11,6 +11,7 @@ if (d) {
 	}
 }
 
+// getXhrObject {{{
 function getXhrObject(s) {
 	var xhr = new XMLHttpRequest
 		, timeout = s || 40000
@@ -81,6 +82,7 @@ function getXhrObject(s) {
 
 	return xhr;
 }
+// }}}
 
 // Chunk fetch {{{
 var GlobalProgress = {};
@@ -117,8 +119,6 @@ function ClassChunk(task) {
 		Progress.dl_lastprogress = Progress.dl_lastprogress || 0;
 		Progress.dl_prevprogress = Progress.dl_prevprogress || 0;
 		Progress.data[url] = [0, task.size];
-
-		download.decrypt++; /* avoid race condition */
 
 		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
 			done = true;
@@ -219,7 +219,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
+					download.decrypt.push({ data: new Uint8Array(r), offset: task.offset, info: task})
 					if (failed) DownloadManager.release(self);
 					failed = false;
 				} else if (!download.cancelled) {
@@ -342,28 +342,28 @@ function ClassFile(dl) {
 					}
 				});
 			}
+
+			var chunkFinished = false
+			dl.ready = function() {
+				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
+					if (dl.cancelled) return;
+					if (!emptyFile && !checkLostChunks(dl)) {
+						return dl_reportstatus(dl, EKEY);
+					}
+					if (dl.zipid) {
+						return Zips[dl.zipid].done();
+					}
+					dl.onBeforeDownloadComplete(dl.pos);
+					if (!dl.preview) {
+						dl.io.download(dl.zipname || dl.n, dl.p);
+					}
+					dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
+					if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
+				}
+			};
 	
 			dlQueue.pushAll(tasks, function() {
-				if (dl.cancelled) return;
-				var checker = setInterval(function() {
-					if (dl.decrypt == 0) {
-						clearInterval(checker);
-						DEBUG("done with ", dl);
-						if (dl.cancelled) return;
-						if (!emptyFile && !checkLostChunks(dl)) {
-							return dl_reportstatus(dl, EKEY);
-						}
-						if (dl.zipid) {
-							return Zips[dl.zipid].done();
-						}
-						dl.onBeforeDownloadComplete(dl.pos);
-						if (!dl.preview) {
-							dl.io.download(dl.zipname || dl.n, dl.p);
-						}
-						dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
-						if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
-					}
-				}, 100);
+				chunkFinished = true
 			}, failureFunction);
 	
 			// notify the UI
@@ -392,54 +392,80 @@ function ClassFile(dl) {
 }
 // }}}
 
-// Decrypter worker {{{
-function decrypter(task)
-{
-	var download = task.download
-		, Decrypter = this
-
-	var worker = new Worker('decrypter.js?v=5');
-	worker.postMessage = worker.webkitPostMessage || worker.postMessage;
-	worker.onmessage = function(e) {
-		if (typeof(e.data) == "string") {
-			if (e.data[0] == '[') {
-				var t = JSON.parse(e.data), pos = task.offset
-				for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
-					download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
-				}
+function dl_writer(dl, is_ready) {
+	is_ready = is_ready || function() { return true; };
+	dl.writer = new QueueClass(function (task) {
+		var Scheduler = this;
+		dl.io.write(task.data, task.offset, function() {
+			dl.writer.pos += task.data.length;
+			if (dl.data) {
+				new Uint8Array(
+					dl.data,
+					task.offset,
+					task.data.length
+				).set(task.data);
 			}
-			DEBUG("worker replied string", e.data, download.macs);
-		} else {
-			var plain = new Uint8Array(e.data.buffer || e.data);
-			Decrypter.done(); // release slot
-			DEBUG("Decrypt done", download.cancelled);
-			if (download.cancelled) return;
-			download.io.write(plain, task.offset, function() {
-				if (task.download.data) {
-					new Uint8Array(
-						task.download.data,
-						task.offset,
-						plain.length
-					).set(plain);
-				}
-				// decrease counter
-				// useful to avoid downloading before writing
-				// all
-				download.decrypt--;
-				DEBUG("Decrypt wrote => ", download.decrypt);
-			}, task.info);
-		}
-	};
-	worker.postMessage(task.download.nonce);
-	worker.dl_pos = task.offset;
-	worker.postMessage(task.offset/16);
+			Scheduler.done();
+			if (typeof task.callback == "function") {
+				task.callback();
+			}
+			dl.ready(); /* tell the download scheduler we're done */
+		});
+	}, 1);
 
-	if (typeof MSBlobBuilder == "function") {
-		worker.postMessage(task.data);
-	} else {
-		worker.postMessage(task.data.buffer, [task.data.buffer]);
-	}
-	DEBUG("decrypt with workers", download.cancelled);
+	dl.writer.pos = 0
+
+	dl.writer.getNextTask = function() {
+		if (!is_ready()) return null;
+		var task = null;
+		$.each(this._queue, function(p, pTask) {
+			if (pTask.offset == dl.writer.pos) {
+				task = p;
+				return false; /* break */
+			}
+		});
+		if (task !== null) {
+			task = this._queue.splice(task, 1)[0]
+		}
+		return task;
+	};
+};
+
+// Decrypter worker {{{
+function dl_decrypter(dl) {
+	dl.decrypt = new QueueClass(function(task) {
+		var Decrypter = this;
+		var worker = new Worker('decrypter.js?v=5');
+		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
+		worker.onmessage = function(e) {
+			if (typeof(e.data) == "string") {
+				if (e.data[0] == '[') {
+					var t = JSON.parse(e.data), pos = task.offset
+					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
+						dl.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+					}
+				}
+				DEBUG("worker replied string", e.data, dl.macs);
+			} else {
+				var plain = new Uint8Array(e.data.buffer || e.data);
+				Decrypter.done(); // release slot
+				DEBUG("Decrypt done", dl.cancelled);
+				if (dl.cancelled) return;
+				dl.writer.push({ data: plain, offset: task.offset});
+			}
+		};
+		worker.postMessage(dl.nonce);
+		worker.dl_pos = task.offset;
+		worker.postMessage(task.offset/16);
+	
+		if (typeof MSBlobBuilder == "function") {
+			worker.postMessage(task.data);
+		} else {
+			worker.postMessage(task.data.buffer, [task.data.buffer]);
+		}
+		DEBUG("decrypt with workers", dl.cancelled);
+
+	});
 }
 // }}}
 

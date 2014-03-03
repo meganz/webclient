@@ -392,8 +392,9 @@ function ClassFile(dl) {
 }
 // }}}
 
-function dl_writer(dl) {
-	return function (task) {
+function dl_writer(dl, is_ready) {
+	is_ready = is_ready || function() { return true; };
+	dl.writer = new QueueClass(function (task) {
 		var Scheduler = this;
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
@@ -405,14 +406,34 @@ function dl_writer(dl) {
 				).set(task.data);
 			}
 			Scheduler.done();
+			if (typeof task.callback == "function") {
+				task.callback();
+			}
 			dl.ready(); /* tell the download scheduler we're done */
 		});
+	}, 1);
+
+	dl.writer.pos = 0
+
+	dl.writer.getNextTask = function() {
+		if (!is_ready()) return null;
+		var task = null;
+		$.each(this._queue, function(p, pTask) {
+			if (pTask.offset == dl.writer.pos) {
+				task = p;
+				return false; /* break */
+			}
+		});
+		if (task !== null) {
+			task = this._queue.splice(task, 1)[0]
+		}
+		return task;
 	};
 };
 
 // Decrypter worker {{{
 function dl_decrypter(dl) {
-	return function(task) {
+	dl.decrypt = new QueueClass(function(task) {
 		var Decrypter = this;
 		var worker = new Worker('decrypter.js?v=5');
 		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
@@ -444,7 +465,7 @@ function dl_decrypter(dl) {
 		}
 		DEBUG("decrypt with workers", dl.cancelled);
 
-	};
+	});
 }
 // }}}
 

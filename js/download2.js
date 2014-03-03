@@ -423,25 +423,8 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
-	dl.decrypt = new QueueClass(dl_decrypter(dl))
-	dl.writer  = new QueueClass(dl_writer(dl), 1)
-	dl.writer.pos = 0;
-	dl.writer.getNextTask = function() {
-		var task = null;
-		$.each(this._queue, function(p, pTask) {
-			if (pTask.offset == dl.writer.pos) {
-				task = p;
-				return false; /* break */
-			}
-		});
-		if (task !== null) {
-			task = this._queue.splice(task, 1)[0]
-		}
-		return task;
-	};
-
-	dl.ready = function() {
-	};
+	dl_decrypter(dl);
+	dl_writer(dl);
 
 	dl.macs  = {}
 	dl.urls	 = []

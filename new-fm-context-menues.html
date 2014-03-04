@@ -23,7 +23,7 @@ $(document).ready(function() {
 				contextMenu.find('.zipdownload-item').removeClass('hidden');
 			}
             var offset = $(this).offset();
-            contextMenu.css({top: offset.top+27, left: offset.left + 6});
+            contextMenu.css({top: offset.top+25, left: offset.left});
 			
 		} else {
 			contextMenu.addClass('hidden');
@@ -38,7 +38,6 @@ $(document).ready(function() {
 		$('.top-context-menu').fadeOut(500, function() {
 			$('.fm-right-header').removeClass('context');
 		});
-		
     });
 	
 });

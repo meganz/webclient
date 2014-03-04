@@ -1,4 +1,3 @@
-
 var mozOnSavingDownload = function(file,callback,ask) {
 
 	var options = {
@@ -48,6 +47,8 @@ function mozFilePicker(f,m,o) {
 function mozFile(p,f,e) {
 	if(p instanceof Ci.nsIFile) {
 		var file = p;
+	} else if(":" == p[0]) {
+		var file = Services.dirsvc.get(p.substr(1), Ci.nsIFile);
 	} else {
 		var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
 		file.initWithPath(p);
@@ -162,10 +163,14 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 				this.u8 = function(aStart,aBytes)
 				{
-					if (d) console.log('mozDirtyGetAsEntry.u8', aStart,aBytes);
-
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
+
+					if (d && (aBytes != 64 || d > 1)) { // 64 == fingerprint
+						console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,
+							this.size, ''+data.slice(0,16).map(function(n) n.toString(16)));
+					}
+
 					return new Uint8Array(data);
 				};
 				this._close = function()
@@ -179,8 +184,6 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			{
 				aStart = aStart || 0;
 				aBytes = aBytes || this.size;
-
-				if (d) console.log('mozDirtyGetAsEntry.blob', this.name, this.type, aStart,aBytes);
 
 				return new Blob([this.u8(aStart,aBytes)], { type : this.type || 'application/octet-stream'});
 			},
@@ -213,7 +216,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 }
 
 (function __FileSystemAPI(scope) {
-	var LOG = function(m) (console.log(m), Services.console.logStringMessage('MEGA :: ' + m));
+	var LOG = function(m) {
+		var stack = new Error().stack.split("\n").map(s => s.replace(/^(.*@).+\//,'$1')).join("\n");
+		console.log(m,stack); Services.console.logStringMessage('MEGA :: ' + m);
+	};
 
 	if(scope.requestFileSystem || scope.webkitRequestFileSystem) {
 		if(!scope.webkitRequestFileSystem)
@@ -221,20 +227,66 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		return;
 	}
 
-	scope.webkitStorageInfo = {
+	var StorageInfo = Object.freeze({
 		TEMPORARY: 0,
-		requestQuota: function(t,s,f) f(s),
-		queryUsageAndQuota: function(t,f) f(0,1e11)
-	};
+		requestQuota: function(t,s,f) {
+			if(typeof s === 'function') {
+				f = s;
+				s = t;
+			}
 
-	scope.TEMPORARY = 0;
+			var q = Services.prompt.confirmEx(scope,
+				'MEGA :: Out of disk space',
+				'Your drive is running out of disk space. '+
+				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
+
+			if (!q) mozAskDownloadsFolder();
+
+			var fld = mozGetDownloadsFolder();
+			if (d) console.log('requestQuota',fld && fld.diskSpaceAvailable);
+
+			f(fld && fld.diskSpaceAvailable || 0);
+		},
+		queryUsageAndQuota: function(t,f) {
+			if (typeof t === 'function') f=t;
+
+			var fld = mozGetDownloadsFolder();
+			if (d) console.log('queryUsageAndQuota',fld && fld.diskSpaceAvailable);
+
+			f(0, fld && fld.diskSpaceAvailable || 0);
+		}
+	});
+
+	Object.defineProperty(scope,     'webkitStorageInfo',       { value : StorageInfo });
+	Object.defineProperty(navigator, 'webkitTemporaryStorage',  { value : StorageInfo });
+	// Object.defineProperty(navigator, 'webkitPersistentStorage', { value : StorageInfo });
+	Object.defineProperty(navigator, 'webkitPersistentStorage', {
+		value : Object.create(StorageInfo, {
+			queryUsageAndQuota : {
+				value : function(f) f(0,0)
+			}
+		})
+	});
+
+	scope.TEMPORARY  = 0;
+	scope.PERSISTENT = 1;
 
 	const fs = {
 		name : location.host,
 		root : {
-			getDirectory : function() {},
+			getDirectory : function(d,o,f) {
+				f(this);
+			},
 			createReader : function() {
-				return { readEntries : function() {}}
+				return Object.freeze({
+					readEntries : function(f,e) {
+						/**
+						 * Used at cleartemp.js - calling back 'f' here so that the dialog for
+						 * "running out of disk space" is shown when required.
+						 */
+						f([]);
+					}
+				});
 			},
 			getFile : function(name,opts,callback) {
 				var File = {
@@ -263,7 +315,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							if(o) o.textContent = o.textContent.replace(/\s\(.*$/,'');
 						}
 
-						mozCloseStream(this.fs);
+						// mozCloseStream(this.fs);
+						this.Writer.close(!!this.preview);
+						if (this.preview) return;
+
 						if(this.filetime)
 						{
 							try
@@ -407,10 +462,20 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 								var fr = new window.FileReader();
 								fr.onload = function(ev) {
-									var c = File.fs.write(ev.target.result,x.size);
+									try {
+										var c = File.fs.write(ev.target.result,x.size);
+										File.Writer.position += c;
+									} catch(e) {
+									// Likely 0x80520010 (NS_ERROR_FILE_NO_DEVICE_SPACE)
+										Cu.reportError(e);
+									}
 									File.Writer.readyState = File.Writer.DONE;
-									File.Writer.position += c;
-									File.Writer[c?'onwriteend':'onerror']();
+									/**
+									 * Er, onerror() causes a race condition when running
+									 * out of disk space, so... :$
+									 */
+									// File.Writer[c?'onwriteend':'onerror']('');
+									File.Writer.onwriteend();
 
 									if(File.sNode) {
 										File.Writer.written += x.size;
@@ -437,8 +502,19 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							seek : function(p) {
 								File.fs.seek(0,p);
 							},
-							close : function() {
+							close : function(aError) {
+								var f = File.options.saveto;
+
+								if(d) console.log('Closing stream', f.path);
 								mozCloseStream(File.fs);
+
+								if (aError)
+								{
+									mozRunAsync(function() {
+										if(d) console.log('Removing file', f.path);
+										if (f.exists()) f.remove(!1);
+									});
+								}
 							}
 						};
 
@@ -539,18 +615,17 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				};
 
-				var o = opts._firefox;
-				var dl_filesize = o.filesize, dl_filename = o.filename,
-					dl_zip = o.zip, dl_path = o.path, dl_filetime = o.mtime;
-				
-				File.filesize = dl_filesize;
-				File.filename = (dl_zip && dl_zip.name || dl_filename)
-					.replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.').substr(0,256);
+				var q = opts.fxo;
+				if (d) LOG(q);
+				File.filesize = q.size;
+				File.filename = (q.zipname || q.n)
+					.replace(/[:\/\\<">|?*]+/g,'.')
+					.replace(/\s*\.+/g,'.').substr(0,256);
 
 				try {
-					if(dl_path && !dl_zip)
-						File.folder = ('' + dl_path).split(/[\\\/]+/).filter(String);
-					File.filetime = dl_filetime || 0;
+					if(q.p && !q.zipid)
+						File.folder = ('' + q.p).split(/[\\\/]+/).filter(String);
+					File.filetime = q.t || 0;
 				} catch(e) {}
 
 				function osd_cb(options) {
@@ -671,7 +746,14 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					}
 				}
 
-				mozOnSavingDownload(File,osd_cb);
+				if(q.preview) {
+				// Why is the preview writing to disk? :(
+					osd_cb({
+						saveto : mozFile(":TmpD", Math.random())
+					});
+				} else {
+					mozOnSavingDownload(File,osd_cb);
+				}
 			}
 		}
 	};

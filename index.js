@@ -254,12 +254,22 @@ function init_page()
 				else msgDialog('warningb',l[135],l[1290]);				
 				document.location.hash = 'start';
 			}
-			else
+			else if(u_type === false)			
 			{	
-				localStorage.signupcode = signupcode;			
+				localStorage.signupcode = signupcode;
 				localStorage.registeremail = res;
 				document.location.hash = 'register';
 				if (!register_txt) register_txt = l[1289];							
+			}
+			else
+			{
+				var confirmtxt = 'You are currently logged in. Would you like to log out and register a new account?';				
+				if (l[1824]) confirmtxt = l[1824];
+				msgDialog('confirmation',l[968],confirmtxt,'',function(e)
+				{
+					if (e) mLogout();	
+					else document.location.hash = '';			
+				});
 			}
 		  }
 		});			
@@ -348,7 +358,18 @@ function init_page()
 			if ($(e).height() > h) h = $(e).height();
 		});
 		$('.chrome-bottom-block').height(h);
-		if ('-en-'.indexOf('-'+lang+'-') == -1) $('.chrome-download-button').css('font-size','12px');		
+		if ('-en-'.indexOf('-'+lang+'-') == -1) $('.chrome-download-button').css('font-size','12px');
+		
+		if (!chrome.app.isInstalled && document.location.href.substr(0,19) !== 'chrome-extension://')
+		{		
+			$('.chrome-app-button,.chrome-app-scr').unbind('click');
+			$('.chrome-app-button,.chrome-app-scr').bind('click', function ()
+			{			
+				chrome.webstore.install();
+				return false;
+			});
+			$('.chrome-app-scr').css('cursor','pointer');
+		}		
 	}
 	else if (page == 'key')
 	{
@@ -495,8 +516,11 @@ function init_page()
 			document.location.hash = 'plugin';
 		});
 		
-		
-		
+		$('.sync-help-center').unbind('click');
+		$('.sync-help-center').bind('click',function(e)
+		{
+			document.location.hash = 'help/sync';
+		});
 	}
 	else if (page == 'mobile')
 	{
@@ -774,7 +798,7 @@ function mLogout()
 					if (downloading) 
 					{
 						dl_cancel();
-						dl_queue=[];
+						dl_queue= new DownloadQueue;
 					}
 					if (ul_uploading)
 					{
@@ -866,8 +890,7 @@ function topmenuUI()
 			{
 				$('.top-warning-popup').removeClass('active');
 				document.location.hash = 'register';
-			});
-			
+			});			
 		}
 		$('.top-menu-item.upgrade-your-account').show();
 		$('.top-menu-item.upgrade-your-account').text(l[129]);
@@ -1210,7 +1233,10 @@ function topmenuUI()
 	}
 	
 	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+90+'px');
-	initNotifications();		
+	initNotifications();
+
+	clearit(0);
+	clearit(1);	
 }
 
 
@@ -1253,6 +1279,7 @@ function parsepage(pagehtml,pp)
 	$('.nw-bottom-block').addClass(lang);
 	UIkeyevents();	
 }
+
 
 
 function parsetopmenu()
@@ -1395,7 +1422,7 @@ window.onbeforeunload = function ()
 {
 	if (downloading || ul_uploading) return l[377];
 	
-	if (mDB && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
+	if (mDB && mDBact && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
 }
 
 

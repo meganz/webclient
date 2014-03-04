@@ -85,10 +85,15 @@ function startupload()
 	ul_instance++;
 
 	if (ul_uploading) return;
+
+	while (ul_queue_num < ul_queue.length && !ul_queue[ul_queue_num])
+		ul_queue_num++;
+
+	DEBUG("uploading", ul_uploading, ul_queue_num)
 	
 	if (ul_queue_num >= ul_queue.length)
 	{
-		if (d) console.log("No further uploads, clearing ul_queue");
+		DEBUG("No further uploads, clearing ul_queue");
 		ul_queue = [];
 		ul_queue_num = 0;
 		return;
@@ -101,7 +106,7 @@ function startupload()
 		ul_flashreaderactive = false;
 	}
 	else ul_reader = new FileReader();
-	if (d) console.log(ul_queue_num + ' - ' + ul_queue.length);
+	DEBUG(ul_queue_num + ' - ' + ul_queue.length);
 	ul_queue[ul_queue_num].retries = ul_queue[ul_queue_num].retries+1 || 0;	
 	
 	try
@@ -117,6 +122,8 @@ function startupload()
 	}
 	catch(e)
 	{
+		DEBUG('FINGERPRINT ERROR', e.message || e);
+
 		initupload1();	
 	}
 }
@@ -220,9 +227,9 @@ function initupload2(res,ctx)
 {
 	if (typeof res == 'object')
 	{
-		ul_queue[ctx.reqindex].posturl = res.p;
+		ul_queue[ctx.reqindex].posturl = res.p;		
 
-		initupload3();
+		if (ctx.reqindex == ul_queue_num) initupload3();
 	}
 	else
 	{
@@ -367,7 +374,7 @@ function ul_dispatch_encryption()
 
 				if (typeof(ul_workers[id]) != "object")
 				{
-					ul_workers[id] = new Worker('encrypter.js?v=5');
+					ul_workers[id] = new Worker('encrypter.js');
 					ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 
 					ul_workers[id].onmessage = function(e)
@@ -474,12 +481,10 @@ function ul_dispatch_send(slot)
 							else
 							{
 								if (d) console.log("HTTP POST failed with " + this.status + ", error count=" + ul_errors);
-
 								delete ul_inflight[this.pos];
 								ul_xhrbusy[this.upload.slot] = 0;
 								ul_progress[this.upload.slot] = 0;
 								ul_updateprogress();
-
 								if (++ul_errors > 64) ul_failed();
 								else ul_settimeout(ul_errors*1000,ul_dispatch_chain);
 							}
@@ -618,11 +623,13 @@ function ul_completepending2(res,ctx)
 {
 	if (typeof res == 'object' && res.f)
 	{
+		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
+
 		newnodes = [];
 		process_f(res.f);
 		rendernew();
 		fm_thumbnails();
-		if (ctx.faid) api_attachfileattr(res.f.h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}
@@ -749,15 +756,20 @@ function ul_dispatch_read()
 			{
 				p = parseInt(p);
 
-				if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
+		/*		if (is_chrome_firefox && ul_queue[ul_queue_num].u8)
 				{
-					ul_plainq[p] = ul_queue[ul_queue_num].u8(p,ul_readq[p]);
-					delete ul_readq[p];
+					var len = ul_readq[p];
 
-					ul_intransit++;
-					ul_dispatch_chain();
+					setTimeout(function() {
+						ul_plainq[p] = ul_queue[ul_queue_num].u8(p,len);
+						delete ul_readq[p];
+
+						ul_intransit++;
+						ul_dispatch_chain();
+					}, 30);
+
 					break;
-				}
+				} */
 
 				var blob;
 				if ((ul = ul_queue[ul_queue_num].slice) || (ul_queue[ul_queue_num].mozSlice))

@@ -3,7 +3,7 @@ var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedD
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-var mDBv=1;
+var mDBact,mDBv=2;
 
 if (indexedDB)
 {
@@ -25,17 +25,25 @@ if (indexedDB)
 			else mDBreload();
 		});
 	}
+	
+	function mDBactive(act)
+	{
+		if (act !== mDBact) return;
+		localStorage[u_handle + '_mDBactive']=new Date().getTime();
+		setTimeout(mDBactive,500,act);
+	}
 
 	function mDBstart()
 	{
-		if (localStorage[u_handle + '_mDBactive'])
-		{
-			if (d) console.log('already an active mDB session, fetching live data');
+		if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+1000 > new Date().getTime())
+		{	
+			if (d) console.log('existing mDB session, fetch live data');
 			mDB=undefined;
 			loadfm();
 			return;
 		}
-	
+		mDBact = Math.random();		
+		mDBactive(mDBact);	
 		loadingDialog.show();
 		if (d) console.log('mDBstart()');
 		request = indexedDB.open("MEGA_" + u_handle,2);
@@ -58,16 +66,18 @@ if (indexedDB)
 			}
 		}
 		request.onsuccess = function(event)
-		{
-			localStorage[u_handle + '_mDBactive']=1;
+		{	
+			if (!mDB) return false;
+			mDB=request.result;
 			if (localStorage[u_handle + '_mDBcount'] && (!localStorage[u_handle + '_mDBv'] || parseInt(localStorage[u_handle + '_mDBv']) < mDBv))
 			{
+				if (d) console.log('mDB version change, fetch live site for new mDB');
 				localStorage[u_handle + '_mDBv']=mDBv;
-				delete localStorage[u_handle + '_mDBcount'];			
-			}
-			if (!mDB) return false;
-			if (d) console.log('mDB success');
-			mDB=request.result;
+				mDBact=false;
+				mDBreload();
+				return false;
+			}	
+			if (d) console.log('mDB success');			
 			if (localStorage[u_handle + '_mDBcount'] && localStorage[u_handle + '_mDBcount'] == 0 && localStorage[u_handle + '_maxaction'])
 			{
 				mDBcount('f',function(c)
@@ -111,7 +121,7 @@ if (indexedDB)
 	var mDBqueue = {};
 
 	function mDBadd(t,n)
-	{
+	{	
 		var a = n;
 		if (a.name && a.p !== 'contacts') delete a.name;
 		if (a.ar && a.p !== 'contacts') delete a.ar;

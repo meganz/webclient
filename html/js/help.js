@@ -1,7 +1,7 @@
 function init_help()
 {
 	var subpage='',search ='';	
-	if (page.length > 4) subpage = page.substr(5,page.length-1);	
+	if (page.length > 4) subpage = page.substr(5,page.length-1);
 	if (subpage.substr(0,6) == 'search')
 	{
 		search = subpage.replace('search/','');
@@ -21,9 +21,11 @@ function init_help()
 		else if (c.indexOf('android') > -1) document.location.hash = 'help/android';
 		else document.location.hash = 'help';
 	});	
-	$('.new-left-menu-link').removeClass('active');	
-	if (subpage) $('.new-left-menu-link.'+subpage).addClass('active');
-	else $('.new-left-menu-link.home').addClass('active');	
+	
+	
+	
+	$('.new-left-menu-link.home').addClass('active');
+	
 	$('.new-right-content-block').addClass('hidden');	
 	if (search)
 	{
@@ -46,41 +48,49 @@ function init_help()
 	}	
 	else if (subpage)
 	{
+		$('.new-left-menu-link').removeClass('active');			
 		var id,title;		
 		if (subpage == 'basics')
 		{
 			id=0;
 			title = 'Basics';
+			$('.new-left-menu-link.basics').addClass('active');
 		}
 		else if (subpage == 'sharing')
 		{
 			id=1;
 			title = 'Sharing';
+			$('.new-left-menu-link.sharing').addClass('active');
 		}
 		else if (subpage == 'security')
 		{
 			id=2;
 			title = 'Security & Privacy';
+			$('.new-left-menu-link.security').addClass('active');
 		}
 		else if (subpage == 'account')
 		{
 			id=3;
 			title = 'Account';
+			$('.new-left-menu-link.account').addClass('active');
 		}
 		else if (subpage == 'sync')
 		{
 			id=4;
 			title = 'Sync Client';
+			$('.new-left-menu-link.sync').addClass('active');
 		}
 		else if (subpage == 'ios')
 		{
 			id=5;
 			title = 'iOS App';
+			$('.new-left-menu-link.ios').addClass('active');
 		}
 		else if (subpage == 'android')
 		{
 			id=6;
 			title = 'Android App';
+			$('.new-left-menu-link.android').addClass('active');
 		}
 		var html = '<h1 class="help-home-header">Help Centre - <span class="red">' + title + '</span></h1>';
 		for (var i in helpdata) if (helpdata[i].c == id) html +='<h2>' + helpdata[i].q + '</h2>' + helpdata[i].a + '';
@@ -88,7 +98,10 @@ function init_help()
 		$('.new-right-content-block.help-info-pages').removeClass('hidden');
 		mainScroll();
 	}
-	else $('.new-right-content-block.home').removeClass('hidden');		
+	else
+	{
+		$('.new-right-content-block.home').removeClass('hidden');		
+	}
 	$('.help_search').unbind('keyup');
 	$('.help_search').bind('keyup',function(e)
 	{
@@ -106,6 +119,16 @@ function init_help()
 	});
 	scrollMenu()
 }
+
+
+l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
+l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');		
+l[1863] = l[1863].replace('[A]','<a href="#mobile">').replace('[/A]','</a>');
+l[1863] = l[1863].replace('[B]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/B]','</a>');
+l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">').replace('[/C]','</a>');	
+l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">').replace('[/A]','</a>');
+l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/A]','</a>');	
+l[1828] = l[1828].replace('[A]','<a href="#sync">').replace('[/A]','</a>');
 
 
 
@@ -141,7 +164,7 @@ var helpdata =
 {
 	// q: 'Can I access MEGA on my mobile device?',
 	q: l[269],
-	a: '<p>We are providing dedicated <a href="#mobile">apps</a> for your mobile device, including for <a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">iOS</a> & <a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">Android</a>.</p>',
+	a: '<p>' + l[1863] + '</p>',
 	c: [0],
 	i: 1
 },
@@ -323,24 +346,112 @@ var helpdata =
 	c: [3]
 },
 
+// Sync
+{
+	q: l[1825],
+	a: '<p>' + l[1826] + '</p>',
+	c: [4]
+},
+{
+	q: l[1827],
+	a: '<p>' + l[1828] + '</p>',
+	c: [4]
+},
+{
+	q: l[1829],
+	a: '<p>' + l[1830] + '</p>',
+	c: [4]
+},
+{
+	q: l[1831],
+	a: '<p>' + l[1832] + '</p>',
+	c: [4]
+},
+{
+	q: l[1833],
+	a: '<p>' + l[1834] + '</p>',
+	c: [4]
+},
+{
+	q: l[1835],
+	a: '<p>' + l[1836] + '</p>',
+	c: [4]
+},
+{
+	q: l[1837],
+	a: '<p>' + l[1838] + '</p>',
+	c: [4]
+},
+{
+	q: l[1839],
+	a: '<p>' + l[1840] + '</p>',
+	c: [4]
+},
+{
+	q: l[1841],
+	a: '<p>' + l[1842] + '</p>',
+	c: [4]
+},
+{
+	q: l[1843],
+	a: '<p>' + l[1844] + '</p>',
+	c: [4]
+},
+{
+	q: l[1845],
+	a: '<p>' + l[1846] + '</p><p>' + l[1847] + '</p><p>' + l[1848] + '</p> ',
+	c: [4]
+},
+
+{
+	q: l[1886],
+	a: '<p>' + l[1887] + '</p>',
+	c: [4]
+},
+
+{
+	q: l[1849],
+	a: '<p>' + l[1850] + '</p>',
+	c: [4]
+},
+
+{
+	q: l[1851],
+	a: '<p>' + l[1852] + '</p>',
+	c: [4]
+},
+
+{
+	q: l[1853],
+	a: '<p>' + l[1854] + '</p>',
+	c: [4]
+},
+
+{
+	q: l[1855],
+	a: '<p>' + l[1856] + '</p>',
+	c: [4]
+},
+
+{
+	q: l[1857],
+	a: '<p>' + l[1858] + '</p>',
+	c: [4]
+},
 
 // iOS
 {
-	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
-	q: 'Where can I find your iOS app?',
-	a: '<p>You can download and install our iOS app on the <a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">App Store</a>.</p>',
+	q: l[1859],
+	a: '<p>' + l[1860] + '</p>',
 	c: [5]
 },
 
 
 // Android
 {
-	// q: 'Why is there an option to limit my uploading speed, and why is it enabled by default?',
-	q: 'Where can I find your Android app?',
-	a: '<p>You can download and install our Android app on <a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">Google Play</a>.</p>',
+	q: l[1861],
+	a: '<p>' + l[1862] + '</p>',
 	c: [6]
 }
 
-
 ]
-

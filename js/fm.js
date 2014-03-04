@@ -7,7 +7,7 @@ function voucherCentering(button)
 	var buttonMid = button.width()/2;
 	popupBlock.css('top', button.position().top + 30);
 	popupBlock.css('left', button.position().left + buttonMid + 20 - popupBlock.width()/2);
-	if(rigthPosition - 20 < popupBlock.position().left) 
+	if(rigthPosition - 20 < popupBlock.position().left)
 	{
 		popupBlock.css('left', rigthPosition - 20);
 	}
@@ -213,7 +213,7 @@ function initUI()
 		$('.fm-left-menu .folderlink').addClass('hidden');
 	}
 	$.selectingHeader = function(currentHeader) 
-	{ 
+	{
 		initTreeScroll();
 		var c = currentHeader.attr('class');		
 		if(c && c.indexOf('active') == -1) 
@@ -402,7 +402,7 @@ function initUI()
 		$.hideContextMenu(e);
 		if ($.hideTopMenu) $.hideTopMenu(e);		
 		var c = $(e.target).attr('class');		
-		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
+		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
     });	
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 
@@ -464,11 +464,10 @@ function initUI()
 	$('.fm-menu-item').unbind('mouseout');
 	$('.fm-menu-item').bind('mouseout',function(e)
 	{
-		if ($(this).attr('class').indexOf('contacts') > -1 && RootbyId(M.currentdirid) == 'contacts') return false;
+		if ($(this).attr('class').indexOf('contacts') > -1 && (RootbyId(M.currentdirid) == 'contacts' || $('.fm-tree-header.contacts-item').attr('class').indexOf('active') > -1)) return false;
 		else if ($(this).attr('class').indexOf('messages') > -1 && RootbyId(M.currentdirid) == M.InboxID) return false;
 		else if ($(this).attr('class').indexOf('recycle') > -1 && RootbyId(M.currentdirid) == M.RubbishID) return false;
-		else if ($(this).attr('class').indexOf('cloud') > -1 && RootbyId(M.currentdirid) == M.RootID) return false;	
-		
+		else if ($(this).attr('class').indexOf('cloud') > -1 && RootbyId(M.currentdirid) == M.RootID) return false;
 		$(this).removeClass('active');
 	});
 	
@@ -609,15 +608,22 @@ function removeUInode(h)
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
+	
+	
 	treeheaderArrows();	
 }
 
 function sharedUInode(h,s)
 {	
+	if (s) $('#treea_' + h).addClass('shared-folder');	
+	else
+	{
+		$('#treea_' + h).removeClass('shared-folder');		
+		$('.grid-table.fm #'+h + ' .transfer-filtype-icon').removeClass('folder-shared');
+		$('.file-block#'+h + ' .block-view-file-type').removeClass('folder-shared');		
+	}
 	$('.grid-table.fm #'+h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
 	$('.file-block#'+h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
-	if (s) $('#treea_' + h).addClass('shared-folder');
-	else $('#treea_' + h).removeClass('shared-folder');
 }
 
 
@@ -853,6 +859,13 @@ function initContextUI()
 		M.openFolder($.selected[0]);
 	});
 	
+	
+	$(c+'.preview-item').unbind('click');
+	$(c+'.preview-item').bind('click',function(event) 
+	{
+		slideshow($.selected[0]);
+	});
+	
 	$(c+'.clearbin-item').unbind('click');
 	$(c+'.clearbin-item').bind('click',function(event) 
 	{
@@ -917,21 +930,15 @@ function initContextUI()
 			}
 			$(this).remove();
 		});				
+
 		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
-			DEBUG("cancelled file " + $.sd);
-			dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-				return $.zipkill ? obj.task.download.zipid !== $.zipkill
-					: obj.task.download.dl_id !== dl_queue[$.sd].dl_id;
-			});
-			dl_queue[$.sd].cancelled = true;
-			if ($.zipkill) {
-				$.each(dl_queue, function(i, file) {
-					if (file.zipid == $.zipkill) {
-						file.cancelled = true;
-					}
-				});
+			if (dl_queue[$.sd]) {
+				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
+			} else if ($.zipkill >= 0) {
+				DownloadManager.abort({ zipid: $.zipkill });
 			}
 		}
+		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		
@@ -942,7 +949,6 @@ function initContextUI()
 
 function cSortMenuUI()
 {
-	$('.contacts-arrows').hide();
 	$('.contacts-arrows').unbind('click');
 	$('.contacts-arrows').bind('click', function(e) 
 	{
@@ -952,8 +958,10 @@ function cSortMenuUI()
 		{
 			menuBlock.removeClass('hidden');
 			$(this).addClass('active');
-			menuBlock.css('top', $(this).position().top - 10);
-			menuBlock.css('left', $(this).position().left + 30);
+			var topl=0,jsp = $('.fm-tree-panel').data('jsp');
+			if (jsp) topl = jsp.getContentPositionY();
+			menuBlock.css('top', $(this).position().top - topl + 95);
+			menuBlock.css('left', $(this).position().left + 35);
 			if(bottomPosition- $(menuBlock).position().top < 50) menuBlock.css('top', bottomPosition-50);				
 		} 
 		else 
@@ -968,23 +976,29 @@ function cSortMenuUI()
 	$('.contacts-sorting-by').unbind('click');
 	$('.contacts-sorting-by').bind('click', function(e) 
 	{
-		if($(this).attr('class').indexOf('active') == -1) 
+		var c = $(this).attr('class');		
+		if (c && c.indexOf('name') > -1)
 		{
-			$('.contacts-sorting-by').removeClass('active');
-			$(this).addClass('active');
-		} 
-		return false;
+			localStorage.csort = 'name';
+			localStorage.csortd = 1;
+		}
+		else if (c && c.indexOf('shares') > -1)
+		{
+			localStorage.csort = 'shares';
+			localStorage.csortd = -1;
+		}
+		M.renderContacts();
 	});
+	
+	
 
 	$('.contacts-sorting-type').unbind('click');
 	$('.contacts-sorting-type').bind('click', function(e) 
 	{
-		if($(this).attr('class').indexOf('active') == -1) 
-		{
-			$('.contacts-sorting-type').removeClass('active');
-			$(this).addClass('active');
-		} 
-		return false;
+		var c = $(this).attr('class');		
+		if (c && c.indexOf('desc') > -1) localStorage.csortd = -1;
+		else localStorage.csortd = 1;
+		M.renderContacts();		
 	});
 }
 
@@ -1238,7 +1252,7 @@ function accountUI()
 		$('.fm-account-main .pro-upgrade').bind('click',function(e)
 		{
 			window.location.hash = 'pro';	
-		});		
+		});
 		$('.membership-big-txt.balance').html('&euro; ' + htmlentities(account.balance[0][0]));
 		var a = 0;
 		if (M.c['contacts']) for(var i in M.c['contacts']) a++;		
@@ -2217,9 +2231,8 @@ var QuickFinder = function(searchable_elements, containers) {
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
+        if($(e.target).is("input, textarea, select") || $.dialog)  return;
+        
         var charCode = e.which || e.keyCode; // ff
 
         if(
@@ -2543,18 +2556,19 @@ function UIkeyevents()
 {
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
-	{
+	{		
+	
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
 		
-		if (M.chat) return true;		
+		if (M.chat) return true;
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
          * other day :)
          */
-        if(!$.dialog && M.viewmode == 1) 
+        if(!$.dialog && !slideshowid && M.viewmode == 1) 
 		{	
             var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
             var total_rows = Math.ceil($('.file-block').size() / items_per_row);
@@ -2573,7 +2587,6 @@ function UIkeyevents()
                     $target_element.addClass('ui-selected');
                     selectionManager.set_currently_selected($target_element);
                 }
-
             } 
 			else if(e.keyCode == 39) 
 			{ 
@@ -2683,13 +2696,14 @@ function UIkeyevents()
 			{
 				var n = M.d[$.selected[0]];
 				if (n && n.t) M.openFolder(n.h);
-				else M.addDownload($.selected);			
+				else if ($.selected.length == 1 && M.d[$.selected[0]] && M.d[$.selected[0]].name && is_image(M.d[$.selected[0]].name)) slideshow($.selected[0]);
+				else M.addDownload($.selected);
 			}			
 		}
 		else if (e.keyCode == 13 && $.dialog == 'rename')
 		{			
 			dorename();
-		}
+		}		
 		else if (e.keyCode == 27 && $.dialog)
 		{
 			$('.fm-dialog').addClass('hidden');
@@ -2703,20 +2717,39 @@ function UIkeyevents()
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(false);
 		}
-		else if (e.keyCode == 27)
+		else if (e.keyCode == 13 && $.msgDialog == 'confirmation')
 		{
-			$.hideTopMenu();
-		}
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(true);
+		}		
 		else if (e.keyCode == 65 && e.ctrlKey && !$.dialog)
 		{
 			$('.grid-table.fm tr').addClass('ui-selected');
 			$('.file-block').addClass('ui-selected');
-		}	
+		}
+		else if (e.keyCode == 37 && slideshowid)
+		{			
+			slideshow_prev();
+		}
+		else if (e.keyCode == 39 && slideshowid)
+		{
+			slideshow_next();
+		}
+		else if (e.keyCode == 27 && slideshowid)
+		{
+			slideshow(slideshowid,true);		
+		}
+		else if (e.keyCode == 27)
+		{
+			$.hideTopMenu();
+		}
+		
 		if (sl && $.selectddUIgrid == '.grid-scrolling-table')
 		{			
 			var jsp = $('.grid-scrolling-table').data('jsp');
 			jsp.scrollToElement(sl);
 		}
+		
 		searchPath();
 	});
 }
@@ -2921,11 +2954,6 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
 	{
-		if (d) console.log(e);
-		
-		
-		
-		
 		if ($.gridDragging) return false;
 		if (e.shiftKey && s.length > 0)
 		{
@@ -2974,7 +3002,12 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e) 
 	{
 		var h = $(e.currentTarget).attr('id');
-		if (M.d[h] && M.d[h].t) M.openFolder(h);
+		if (M.d[h] && M.d[h].t)
+		{
+			$('.top-context-menu').hide();
+			M.openFolder(h);
+		}
+		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
 		else M.addDownload([h]);
 	});
 }
@@ -3035,7 +3068,7 @@ function topContextMenu(close)
 {
 	if (close)
 	{
-		fmtopUI();	
+		fmtopUI();
 		$('.top-context-menu').fadeOut(350, function() 
 		{
 			$('.fm-right-header').removeClass('context');
@@ -3057,14 +3090,14 @@ function topContextMenu(close)
 	$('.top-icons-block .context-menu-item').hide();
 	$('.top-icons-block .context-menu-divider').hide();
 	
-	$('.top-context-menu').width();
 	$('.top-context-menu').fadeIn(350);
-	setTimeout(function()
-	{	
+	setTimeout(function(id)
+	{
+		if (id !== M.currentdirid) return;
 		$('.fm-right-header').addClass('context');
 		$('.fm-file-upload').addClass('hidden');
 		$('.fm-folder-upload').addClass('hidden');
-	},180);
+	},180,M.currentdirid);
 	
 	$.topContextSub = {};
 	var moreWidth = $('.top-icons-block .context-menu-item.more-item').outerWidth();
@@ -3136,7 +3169,7 @@ function topContextMenu(close)
 		{
 			topContextMenu(300);
 		}
-	},5000,r);	
+	},2000,r);	
 	$('.top-context-close').unbind('click');
 	$('.top-context-close').bind('click',function()
 	{
@@ -3218,6 +3251,13 @@ function transferPanelUI()
 	{	
          $.transferHeader();
     });
+	
+	$(window).unbind('resize.slideshow');
+	$(window).bind('resize.slideshow', function (e) 
+	{
+		if (slideshowid && previews[slideshowid]) previewsrc(previews[slideshowid].src);		
+    });
+	
 	$('.tranfer-view-icon').unbind('click');
 	$('.tranfer-view-icon').bind('click', function (e) 
 	{
@@ -3312,8 +3352,12 @@ function menuItems()
 	}
 	if ($.selected.length == 1 && M.d[$.selected[0]].t)
 	{
-		//$(t).filter('.open-item').show();				
+		//$(t).filter('.open-item').show();
 		items['open'] = 1;				
+	}
+	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name))
+	{					
+		items['preview'] = 1;
 	}
 	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink)
 	{
@@ -3360,7 +3404,7 @@ function contextmenuUI(e,ll,topmenu)
 		{
 			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-			if ('webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
+			if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
 	}
@@ -3374,8 +3418,8 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
-			$(t).filter('.refresh-item,.newfolder-item,.properties-item').show();			
-			if (folderlink) $(t).filter('.newfolder-item').hide();			
+			$.selected = [M.RootID];
+			$(t).filter('.refresh-item,.properties-item').show();
 		}
 		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
 		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
@@ -3407,21 +3451,22 @@ function contextmenuUI(e,ll,topmenu)
 var tt;
 
 function treeUI()
-{
+{	
 	tt = new Date().getTime();
 	$('.fm-menu-item').unbind('click');
 	$('.fm-menu-item').bind('click',function(event) 
 	{
 		$('.fm-menu-item').removeClass('active');
 		if ($(this).attr('class').indexOf('cloud') > -1)
-		{	
+		{
+			treeUIopen(M.RootID,1);	
 			$(this).addClass('active');
 			M.openFolder(M.RootID);
 			var jsp = $('.fm-tree-panel').data('jsp');
 			if (jsp) jsp.scrollTo(0,0);
 		}		
 		else if ($(this).attr('class').indexOf('recycle') > -1)
-		{	
+		{					
 			$(this).addClass('active');
 			M.openFolder(M.RubbishID);
 			var pos = $('.fm-tree-header.recycle-item').position();			
@@ -3429,12 +3474,12 @@ function treeUI()
 			if (jsp) jsp.scrollTo(0,pos.top);
 		}		
 		else if ($(this).attr('class').indexOf('contacts') > -1)
-		{	
+		{			
+			treeUIopen('contacts',1);
 			$(this).addClass('active');
-			M.openFolder('contacts');
 			var pos = $('.fm-tree-header.contacts-item').position();			
 			var jsp = $('.fm-tree-panel').data('jsp');
-			if (jsp) jsp.scrollTo(0,pos.top);		
+			if (jsp) jsp.scrollTo(0,pos.top);
 		}		
 		else if ($(this).attr('class').indexOf('messages') > -1)
 		{	
@@ -3469,9 +3514,9 @@ function treeUI()
 		else if ($(this).attr('class').indexOf('contacts-item') > -1)
 		{
 			var c = $(e.target).attr('class');	
-			if (c && c.indexOf('contacts-arrows') > -1) return false;			
-			id = 'contacts';			
-		}		
+			if (c && c.indexOf('contacts-arrows') > -1) return false;
+			id = 'contacts';
+		}
 		else if ($(this).attr('class').indexOf('messages-item') > -1) id = M.InboxID;					
 		var isSubfolders = $(this).attr('class').indexOf('contains-subfolders');
 		if(isSubfolders > -1 && $(this).attr('class').indexOf('opened') == -1) 
@@ -3495,7 +3540,7 @@ function treeUI()
 			$(this).prev().removeClass('active');
 		}		
 		$.selectingHeader($(this));
-		if (id) M.openFolder(id);		
+		if (id && id !== 'contacts') M.openFolder(id);
 		return false;
 	});
 	
@@ -3584,7 +3629,11 @@ function treeUI()
 		initTreeScroll();	
 	});	
 	setTimeout(initTreeScroll,10);	
-	treeheaderArrows();	
+	treeheaderArrows();
+	
+	
+	
+	
 	if (d) console.log('treeUI()',new Date().getTime()-tt);
 }
 
@@ -3594,20 +3643,38 @@ function treeUIexpand(id,force)
 	if (id == 'contacts') M.buildtree({h:'contacts'});
 	else M.buildtree(M.d[id]);
 	var b = $('#treea_' + id);	
-	var d = b.attr('class');	
+	var d = b.attr('class');
+	
+	if (M.currentdirid !== id) 
+	{			
+		var path = M.getPath(M.currentdirid),pid={},active_sub=false;
+		for (var i in path) pid[path[i]]=i;		
+		if (pid[M.currentdirid] < pid[id]) active_sub=true;
+	}
+	
 	if (d && d.indexOf('expanded') > -1 && !force)
-	{
+	{	
 		fmtreenode(id,false);
 		$('#treesub_' + id).removeClass('opened');
 		b.removeClass('opened');
-		b.removeClass('expanded');
+		b.removeClass('expanded');		
+		if (active_sub) 
+		{
+			$('#treeli_' + id + ' .fm-connector').first().removeClass('mid');
+			$('#treeli_' + id + ' .fm-connector').first().addClass('vertical-line last');
+		}
 	}
 	else if (d && d.indexOf('contains-folders') > -1)
 	{
+		if (active_sub)
+		{
+			$('#treeli_' + id + ' .fm-connector').first().addClass('mid');
+			$('#treeli_' + id + ' .fm-connector').first().removeClass('vertical-line last');
+		}
 		fmtreenode(id,true);
 		$('#treesub_' + id).addClass('opened');
 		b.addClass('opened')
-		b.addClass('expanded');
+		b.addClass('expanded');		
 	}
 	if ($('.fm-connector-first.active').length > 0)
 	{	
@@ -3619,7 +3686,7 @@ function treeUIexpand(id,force)
 			else if (c && c.indexOf('fm-connector-first') > -1) connectorst=true;
 			else if (connectorst && (!c || c.indexOf('mid') == -1)) $(e).addClass('vertical-line');				
 		});
-	}	
+	}
 	treeUI();
 }
 
@@ -3885,11 +3952,7 @@ function shareDialog(close)
 			u.sort(function(a,b)
 			{
 				if (a.name && b.name) return a.name.localeCompare(b.name); 
-				else 
-				{ 
-					console.log('huh',a,b); 
-					return -1; 
-				}
+				else  return -1;				
 			});
 			for (var i in u)
 			{
@@ -4516,6 +4579,19 @@ function addContactDialog(close)
 			else doAddContact(e,1);
 		}
 	});
+	
+	$('.fm-dialog-add-contact-button').unbind('click');
+	$('.fm-dialog-add-contact-button').bind('click',function(e) 
+	{
+		if ($('.add-contact-dialog input').val() !== '') 
+		{
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e,1);
+		}
+	});
+	
+	
+
 	$('.add-contact-dialog .fm-dialog-close').unbind('click');
 	$('.add-contact-dialog .fm-dialog-close').bind('click',function()  
 	{
@@ -4905,7 +4981,7 @@ function slingshotDialog(close)
 	if (close)
 	{
 		$('.fm-dialog.slingshot-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');		
+		$('.fm-dialog-overlay').addClass('hidden');	
 		$.dialog=false;
 		return false;
 	}	
@@ -4920,22 +4996,261 @@ function slingshotDialog(close)
 }
 
 
-var thumbnails = [];
-var th_requested = [];
+var previews = {};
+var preqs = {};
+var pfails = {};
+var slideshowid;
 
+function slideshowsteps()
+{
+	var check=false, forward = [], backward=[];
+	for (var i in M.v)
+	{
+		if (M.v[i].name && is_image(M.v[i].name))
+		{	
+			if (M.v[i].h == slideshowid) check=true;
+			else if (check) forward.push(M.v[i].h);
+			else backward.push(M.v[i].h);			
+		}
+	}
+	return {backward:backward,forward:forward};
+}
+
+function slideshow_next()
+{
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
+	var steps = slideshowsteps();
+	if (steps.forward.length > 0) slideshow(steps.forward[0]);
+}
+
+function slideshow_prev()
+{
+	var valid = true;
+	$.each(dl_queue || [], function(id, file) {
+		if (file.id == slideshowid) {
+			valid = false;
+			return false; /* break loop */
+		}
+	});
+	if (!valid) return;
+	var steps = slideshowsteps();
+	if (steps.backward.length > 0) slideshow(steps.backward[steps.backward.length-1]);
+}
+
+
+function slideshow(id,close)
+{
+	if (close)
+	{
+		slideshowid=false;
+		$('.slideshow-dialog').addClass('hidden');
+		$('.slideshow-overlay').addClass('hidden');
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == id)
+			{
+				if (dl_queue[i].preview)
+				{
+					DownloadManager.abort({id: id});
+				}
+				break;
+			}
+		}
+		return false;
+	}
+	
+	if (folderlink)
+	{
+		$('.slideshow-getlink').hide();
+		$('.slideshow-line').hide();
+	}
+	else
+	{
+		$('.slideshow-getlink').show();
+		$('.slideshow-line').show();	
+	}	
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
+	$('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click',function(e)
+	{
+		slideshow(id,1);
+	});	
+	var n = M.d[id];	
+	if (!n) return;
+	$('.slideshow-filename').text(n.name);
+	$('.slideshow-image').attr('src','');
+	$('.slideshow-pending').removeClass('hidden');
+	$('.slideshow-progress').addClass('hidden');
+	$('.slideshow-error').addClass('hidden');
+	$('.slideshow-image').width(0);
+	$('.slideshow-image').height(0);
+	$('.slideshow-image-bl').addClass('hidden');
+	$('.slideshow-prev-button,.slideshow-next-button').removeClass('active');	
+	slideshowid=id;
+	var steps = slideshowsteps();	
+	if (steps.backward.length > 0) $('.slideshow-prev-button').addClass('active');
+	if (steps.forward.length > 0) $('.slideshow-next-button').addClass('active');	
+	$('.slideshow-prev-button,.slideshow-next-button').unbind('click');
+	$('.slideshow-prev-button,.slideshow-next-button').bind('click',function(e)
+	{
+		var c = $(this).attr('class');
+		if (c && c.indexOf('active') > -1)
+		{
+			var steps = slideshowsteps();			
+			if (c.indexOf('prev') > -1 && steps.backward.length > 0) slideshow_prev();
+			else if (c.indexOf('next') > -1 && steps.forward.length > 0) slideshow_next();
+		}
+	});		
+	
+	$('.slideshow-download').unbind('click');
+	$('.slideshow-download').bind('click',function(e)
+	{
+		for (var i in dl_queue)
+		{
+			if (dl_queue[i] && dl_queue[i].id == slideshowid)
+			{
+				dl_queue[i].preview=false;
+				openTransferpanel();
+				return;
+			}		
+		}		
+		M.addDownload([slideshowid]);
+	});
+	
+	$('.slideshow-getlink').unbind('click');
+	$('.slideshow-getlink').bind('click',function(e)
+	{
+		if (u_type === 0) ephemeralDialog(l[1005]);
+		else M.getlinks([slideshowid]);
+	});
+	
+	if (previews[id])
+	{
+		previewsrc(previews[id].src);
+		fetchnext();
+	}
+	else if (!preqs[id]) fetchsrc(id);
+	
+	$('.slideshow-overlay').removeClass('hidden');
+	$('.slideshow-dialog').removeClass('hidden');
+}
+
+function fetchnext()
+{
+	var n = M.d[slideshowsteps().forward[0]];
+	if (!n || !n.fa) return;	
+	if (n.fa.indexOf(':1*') > -1 && !preqs[n.h] && !previews[n.h]) fetchsrc(n.h);
+}
+
+
+function fetchsrc(id)
+{
+	function eot(id, err)
+	{
+		delete preqs[id];
+		delete pfails[id];
+		M.addDownload([id],false,err? -1:true);
+	}
+	eot.timeout = 5100;
+
+	if (pfails[id])
+	{ // for slideshow_next/prev
+		if (slideshowid == id) return eot(id,1);
+		delete pfails[id];
+	}
+
+	var n = M.d[id];
+	preqs[id]=1;
+	var treq = {};
+	treq[id] = {fa:n.fa,k:n.key};
+	api_getfileattr(treq,1,function(ctx,id,uint8arr)
+	{
+		previewimg(id,uint8arr);
+		if (id == slideshowid) fetchnext();
+	},eot);
+}
+
+function previewsrc(src)
+{
+	var img = new Image();
+	img.onload = function()
+	{
+		if (this.height > $(window).height()-100)
+		{
+			var factor = this.height/($(window).height()-100);
+			this.height = $(window).height()-100;
+			this.width = Math.round(this.width/factor);			
+		}		
+		var w = this.width, h = this.height;
+		if (w < 700) w=700;
+		if (h < 500) h=500;		
+		$('.slideshow-image').attr('src',this.src);
+		$('.slideshow-dialog').css('margin-top',h/2*-1);
+		$('.slideshow-dialog').css('margin-left',w/2*-1);
+		$('.slideshow-image').width(this.width);
+		$('.slideshow-image').height(this.height);		
+		$('.slideshow-dialog').width(w);
+		$('.slideshow-dialog').height(h);		
+		$('.slideshow-image-bl').removeClass('hidden');
+		$('.slideshow-pending').addClass('hidden');
+		$('.slideshow-progress').addClass('hidden');
+	};
+	img.src = src;
+}
+
+function previewimg(id,uint8arr)
+{
+	try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
+	if (!blob || blob.size < 25) blob = new Blob([uint8arr.buffer]);
+	previews[id] = 
+	{
+		blob: blob,
+		src: myURL.createObjectURL(blob),
+		time: new Date().getTime()	
+	};
+	if (id == slideshowid)
+	{
+		previewsrc(previews[id].src);
+	}
+	if (Object.keys(previews).length == 1)
+	{
+		$(window).unload(function()
+		{
+			for (var id in previews)
+			{
+				myURL.revokeObjectURL(previews[id].src);
+			}
+		});
+	}
+}
+
+
+var thumbnails = [];
+var thumbnailblobs = [];
+var th_requested = [];
+var fa_duplicates = {};
 
 function fm_thumbnails()
 {
-	var treq = {},a=0;
+	var treq = {},a=0;	
 	if (myURL)
 	{
 		for (var i in M.v)
 		{
 			var n = M.v[i];			
 			if (n.fa)
-			{			
+			{				
+				if (typeof fa_duplicates[n.fa] == 'undefined') fa_duplicates[n.fa]=0;				
+				else fa_duplicates[n.fa]=1;
+				
 				if (!thumbnails[n.h] && !th_requested[n.h])
-				{				
+				{
 					treq[n.h] = 
 					{
 						fa: n.fa,
@@ -4943,19 +5258,7 @@ function fm_thumbnails()
 					};
 					th_requested.push(n.h);					
 				}
-				else
-				{
-					if ($('.file-block#' + n.h).length > 0) 
-					{
-						$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
-						$('.file-block#' + n.h + ' img').parent().addClass('thumb');
-					}
-					if (($('#mobilethumb_' + n.h).length > 0) && ($('#mobilethumb_' + n.h + ' img')[0].src != thumbnails[n.h]))
-					{
-						$('#mobilethumb_' + n.h + ' img')[0].src = thumbnails[n.h];
-						$('#mobilethumb_' + n.h).addClass('thumb');
-					}
-				}
+				else fm_thumbnail_render(n);
 			}
 			a++;
 		}				
@@ -4964,20 +5267,37 @@ function fm_thumbnails()
 			api_getfileattr(treq,0,function(ctx,node,uint8arr)
 			{
 				try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
-				if (blob.size < 25) blob = new Blob([uint8arr.buffer],{ type: 'image/jpeg' });				
-				thumbnails[node] = myURL.createObjectURL(blob);
-				if ($('.file-block#' + node).length > 0)
-				{
-					$('.file-block#' + node + ' img').attr('src',thumbnails[node]);
-					$('.file-block#' + node + ' img').parent().addClass('thumb');
+				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);
+				thumbnailblobs[node] = blob;
+				thumbnails[node] = myURL.createObjectURL(blob);				
+				fm_thumbnail_render(M.d[node]);
+				
+				// deduplicate in view when there is a duplicate fa:
+				if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
+				{				
+					for (var i in M.v)
+					{
+						if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
+						{
+							thumbnails[M.v[i].h] = thumbnails[node];
+							fm_thumbnail_render(M.v[i]);						
+						}
+					}
 				}
-				if ($('#mobilethumb_' + node).length > 0)
-				{
-					$('#mobilethumb_' + node + ' img')[0].src = thumbnails[node];
-					$('#mobilethumb_' + node).addClass('image');
-				}
-			});
+			});			
 		}
+	}
+}
+
+
+
+function fm_thumbnail_render(n)
+{
+	if (!n || !thumbnails[n.h]) return;
+	if ($('.file-block#' + n.h).length > 0) 
+	{
+		$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
+		$('.file-block#' + n.h + ' img').parent().addClass('thumb');
 	}
 }
 
@@ -5013,7 +5333,9 @@ function savecomplete(id)
 	$('.fm-dialog-overlay').addClass('hidden');
 	if (!$.dialog) 
 	$('#dlswf_'+id).remove();
-	M.dlcomplete(id);
+	var dl = IdToFile(id);
+	M.dlcomplete(dl.id, dl.zipid, dl.pos);
+	DownloadManager.cleanupUI(dl, true);
 }
 
 /**
@@ -5103,6 +5425,7 @@ function fm_resize_handler() {
             'bottom': ''
         });
     }
+		
 }
 
 

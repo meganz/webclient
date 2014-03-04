@@ -328,7 +328,7 @@ function blog_archive()
 	for (var mm in blogmonths)
 	{
 		var y='';
-		if  (mm.split('_')[0] != new Date().getFullYear()) y = ' ' + mm.split('_')[0] + ' ';
+		y = ' ' + mm.split('_')[0] + ' ';
 		blogarchive += '<a href="#blog_' + mm + '" class="blog-new-archive-lnk">' + date_months[parseInt(mm.split('_')[1])-1] + y + ' <span class="blog-archive-number">' + blogmonths[mm] + '</span></a>';
 	}
 	$('#blog_archive').html(blogarchive);
@@ -356,7 +356,7 @@ if (typeof mobileblog !== 'undefined')
 			content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
 			var date = new Date(blogposts[i].t*1000);			
 			var blogdate =  date.getDate() + '-' + (parseInt(date.getMonth())+1) + '-' + date.getFullYear();
-			var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">MEGA exits beta</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + blogposts[i].by + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited 2013</div><div class="language-block"><div class="select-box"> <span class="select-txt" id="sel_txt2">English</span><select id="sel_txt2_option" name="custom" ></select></div></div><div class="clear"></div></div></div></div>';
+			var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">MEGA exits beta</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + blogposts[i].by + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="clear"></div></div></div></div>';
 			document.body.innerHTML = html;			
 			if (android) document.body.className = 'android blog';
 			else if (ios) document.body.className = 'ios blog';

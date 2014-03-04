@@ -15,7 +15,7 @@ function dlinfo(ph,key,next)
 
 	$('.widget-block').addClass('hidden');
 	if (!m) init_start();
-	if (dl_method == 1)
+	if (dlMethod == FlashIO) 
 	{
 		$('.fm-dialog.download-dialog').removeClass('hidden');
 		$('.fm-dialog.download-dialog').css('left','-1000px');
@@ -55,13 +55,11 @@ function dlinfo(ph,key,next)
 				$('.new-download-red-button').unbind('click');
 				$('.new-download-red-button').bind('click',function(e)
 				{
-					if (dl_method == 4 && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
+					if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
 					
 					dl_queue.push(fdl_queue_var);					
 					$('.download-mid-centered-block').addClass('downloading');
 					$.dlhash = window.location.hash;
-					if (dl_method == 0 && fdl_filesize > dl_quotabytes) dl_getspace(0,fdl_filesize);					
-					else startdownload();
 				});				
 				$('.new-download-gray-button').unbind('click');
 				$('.new-download-gray-button').bind('click',function(e)
@@ -90,6 +88,7 @@ function dlinfo(ph,key,next)
 						key: 	key,
 						s: 		res.s,
 						n: 		fdl_file.n,
+						size:   fdl_filesize,
 						onDownloadProgress: dlprogress,
 						onDownloadComplete: dlcomplete,
 						onDownloadStart: dlstart,
@@ -100,11 +99,10 @@ function dlinfo(ph,key,next)
 					$('.new-download-file-size').text(bytesToSize(res.s));
 					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 				}
-				else dlkeyDialog();				
-				if (baboom) dl_ad();				
+				else dlkeyDialog();
 			}
 			else $('.download-mid-centered-block').addClass('not-available-some-reason');
-			if ((dl_method == 1 || dl_method == 2) && !localStorage.browserDialog && !$.browserDialog)
+			if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
 			{
 				setTimeout(function()
 				{
@@ -113,105 +111,6 @@ function dlinfo(ph,key,next)
 			}			
 		}
 	});
-}
-
-
-
-function dl_ad()
-{
-	if (u_attr && u_attr.p) return false;
-	var audiopath = 'https://m.static.mega.co.nz/';	
-	$('body').addClass('adv');
-	window.baboomAds([
-	{
-		url:audiopath + 'audio/01.mp3',
-		title: 'Amazing',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/02.mp3',
-		title: 'Good Times<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/03.mp3',
-		title: 'Dance Dance Dance',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/04.mp3',
-		title: 'Keeps Getting Better<br>',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/05.mp3',
-		title: 'Change Your Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/06.mp3',
-		title: 'Universe<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/07.mp3',
-		title: 'Little Bit Of Me',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/08.mp3',
-		title: 'Party Electricity',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/09.mp3',
-		title: 'Wunderbar (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/10.mp3',
-		title: 'To Be With You',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/11.mp3',
-		title: 'Good Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/12.mp3',
-		title: 'Party Amplifier',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/13.mp3',
-		title: 'Take Me Away',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/14.mp3',
-		title: 'Beathoven (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/15.mp3',
-		title: 'Firework',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/16.mp3',
-		title: 'Live My Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/17.mp3',
-		title: 'Beathoven Slow',
-		top: -20
-	}], function (err) {
-	// TODO: handle err
-});
-
-
 }
 
 
@@ -265,8 +164,9 @@ function dlerror(id,error)
 	}
 }
 
-function dlprogress(fileid, bytesloaded, bytestotal,kbps)
+function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
+	if (kbps == 0) return;
 	$('.downloading-txt.temporary-error').addClass('hidden');
 	$('.downloadings-icons').removeClass('hidden');
 	if (uldl_hold) return false;
@@ -298,7 +198,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps)
 		$('.widget-icon.downloading').removeClass('hidden');
 		$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 		$('.widget-block').addClass('active');
-	}	
+	}
 }
 
 function dlstart(id,name,filesize)

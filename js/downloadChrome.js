@@ -1,12 +1,9 @@
 /*global window, FileError,alert,document, DEBUG, clearit */
 "use strict";
 
-var testSize = 1024 * 1024 * 1024 * 25
-function FileSystemAPI(dl_id) {
+function FileSystemAPI(dl_id, dl) {
 	var dl_quotabytes = 0
-		, dl_instance = 0
 		, IO = this
-		, fs_instance
 		, Fs
 		, dl_fw
 		, dirid = "mega"
@@ -14,12 +11,15 @@ function FileSystemAPI(dl_id) {
 		, dl_chunksizes = []
 		, dl_writing
 		, dl_ack_write = function() {}
+		, chrome_write_error_msg = 20
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize
 		, dl_req_storage
 		, dl_filename
 		, zfileEntry
+		, failed = false
+		, dl_storagetype = 0
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -41,10 +41,9 @@ function FileSystemAPI(dl_id) {
 			  alert('INVALID_MODIFICATION_ERR in ' + type);
 			  break;
 			case FileError.INVALID_STATE_ERR:
-				fs_instance = dl_instance;
 				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
 				setTimeout(function() {
-					IO.check();				
+					FileSystemAPI.check();
 				}, 500);
 				break;
 			default:
@@ -54,88 +53,154 @@ function FileSystemAPI(dl_id) {
 	}
 	// }}}
 
+	// dl_createtmpfile  {{{
 	function dl_createtmpfile(fs) {
 		Fs = fs;
-		Fs.root.getDirectory(dirid, {create: true}, function(dirEntry)  {		
-			DEBUG('Directory "' + dirid + '" created')
-			document.dirEntry = dirEntry;
-		}, errorHandler('getDirectory'));
-		DEBUG("Opening file for writing: " + dl_id);
+		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
+			DEBUG('Directory "mega" created');
+			DEBUG("Opening file for writing: " + dl_id);
 
-		var path = dirid + '/' + dl_id, options = {create: true};
-		
-		if(is_chrome_firefox) {
-			var q = {};
-			for(var o in dl_queue) {
-				if(dl_queue[o].dl_id == dl_id) {
-					q = dl_queue[o];
-					break;
-				}
-			}
-			options._firefox = {
-				filesize : dl_filesize,
-				filename : dl_filename,
-				zip      : !1, // XXX
-				path     : q.p,
-				mtime    : q.t
-			};
-		}
-		
-		Fs.root.getFile(path, options, function(fileEntry) {
-			fileEntry.createWriter(function(fileWriter) {
-				DEBUG('FILE "' + path + '" created');
-				dl_fw = fileWriter;
-				dl_fw.truncate(0);
-				dl_fw.onerror = function(e) {
-					DEBUG("Write failed: " + e.toString())
-					dl_writing = false;
-					dl_write_failed(e);
-				};
-				dl_fw.onwriteend = function() {
-					DEBUG("fileWriter: onwriteend, position: " + this.position + ", expected: " + targetpos);
-					dl_writing = false;
+			var options = {create: true};
 
-					if (this.position == targetpos) { 
-						dl_ack_write();
-					} else {
-						dl_write_failed('Short write (' + this.position + ' / ' + targetpos + ')');
+			if(is_chrome_firefox) {
+				var q = {};
+				for(var o in dl_queue) {
+					if(dl_queue[o].dl_id == dl_id) {
+						q = dl_queue[o];
+						break;
 					}
-				};
+				}
+				options.fxo = Object.create( q, { size : { value : dl_filesize }});
+			}
 
-				zfileEntry = fileEntry;
-				setTimeout(function() {
-					// deferred execution
-					IO.begin();
-				});
-			}, errorHandler('createWriter'));
-		}, errorHandler('getFile'));
+			fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
+				fileEntry.createWriter(function(fileWriter) {     
+					DEBUG('File "mega/' + dl_id + '" created');
+					dl_fw = fileWriter
+					dl_fw.truncate(0);
+	
+					dl_fw.onerror = function(e) {
+						failed = e;
+						//dl_ack_write();
+					}
+	
+					dl_fw.onwriteend = function() {
+						if (dl_fw.position == targetpos) return dl_ack_write();
+	
+						/* error */
+						clearit(0,0,function(s) {
+							// clear persistent files:
+							clearit(1,0,function(s) {
+								if (chrome_write_error_msg == 21 && !$.msgDialog) {
+									chrome_write_error_msg=0;
+									msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+								}
+								chrome_write_error_msg++;
+							});
+						});
+	
+						setTimeout(function() {
+							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
+							dl_ack_write();
+						}, 2000);
+					}
+	
+					zfileEntry = fileEntry;
+					setTimeout(function() {
+						// deferred execution
+						IO.begin();
+					}, 1);
+				}, errorHandler('createWriter'));
+			}, errorHandler('getFile'));
+			options = undefined;
+		}, errorHandler('getDirectory'));
+
+	}
+	// }}}
+
+	function dl_getspace(reqsize, next) {
+		DEBUG("reqsize", reqsize);
+
+		function retry() {
+			dl_getspace(reqsize, next);
+		}
+
+		navigator.webkitPersistentStorage.queryUsageAndQuota(function(used, remaining)  {
+			navigator.webkitTemporaryStorage.queryUsageAndQuota(function(tused,tremaining) {				
+				if (used > 0 || remaining > 0) {
+					dl_storagetype = 1
+					if (remaining < reqsize) {
+						clearit(1, 300, function() {
+							retry();
+						});
+					} else {
+						next(true);
+					}
+				} else {
+					// check if standard temporary quota is sufficient to proceed:
+					dl_storagetype = 0
+					if (tremaining > reqsize) {
+						next(true);
+					} else if (tused+tremaining > reqsize) {
+						clearit(0,300,function() {
+							retry();
+						});
+					} else {
+						// ran out of 20% of 50% of free diskspace -> request persistent storage to be able to use all remaining disk space:
+						navigator.webkitPersistentStorage.requestQuota(1024*1024*1024*100, function(grantedBytes) {
+							if (grantedBytes == 0) return retry();
+
+							dl_storagetype = 1;
+							window.webkitRequestFileSystem(PERSISTENT, grantedBytes, function(fs) {
+								next(true);
+							}, retry);
+						}, retry);
+					}	
+				}
+			});
+		}, next);
 	}
 
 	// Check if the file can be written, return true
 	// or fail otherwise
 	function check() {
-		if(typeof FileSystemAPI.storagetype === 'undefined') {
-			DEBUG('StorageType is not yet initialized...');
-		}
-		window.requestFileSystem(
-			FileSystemAPI.storagetype || 0,
-			testSize, 
-			dl_createtmpfile,
-			errorHandler('RequestFileSystem')
-		);
+		dl_getspace(dl_filesize, function() {
+			window.requestFileSystem(
+				dl_storagetype,
+				dl_filesize,
+				dl_createtmpfile,
+				errorHandler('RequestFileSystem')
+			);
+		});
+	}
+
+	if(is_chrome_firefox) {
+		IO.abort = function(err) {
+			dl_fw.close(err);
+		};
 	}
 
 	IO.write = function(buffer, position, done) {
-		if (dl_writing || position !== dl_fw.position) {
-			// busy or not there yet
-			// DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
-			return setTimeout(function() {
-				IO.write(buffer, position, done);
-			}, 100);
+		if (position != dl_fw.position) {
+			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
-		dl_writing   = true;
-		dl_ack_write = done;
-		targetpos    = buffer.length + dl_fw.position;
+		dl_writing = true;
+		failed     = false;
+		targetpos  = buffer.length + dl_fw.position;
+
+		dl_ack_write = function() {
+			if (failed) {
+				failed = false; /* reset error flag */
+				dl_fw.seek(position);
+				return setTimeout(function() {
+					dl_fw.write(new Blob([buffer]));
+				}, 2000);
+			}
+
+			dl_writing = false;
+			done(); /* notify writer */
+		};
+
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
 		dl_fw.write(new Blob([buffer]));
 	};
@@ -154,72 +219,15 @@ function FileSystemAPI(dl_id) {
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		check();
+		if (IO.is_zip || !dl.zipid) {
+			check();
+		} else {
+			// tell the writter everything was fine
+			// only on zip, where the IO objects are not
+			// doing any write
+			IO.begin(); 
+		}
 	};
 }
-FileSystemAPI.init = function dl_getspace(storagetype, minsize) {
-	storagetype = storagetype || 0;
-	minsize = minsize || 0;
-	
-	/**
-	 * XXX Chrome warning: 'window.webkitStorageInfo' is deprecated.
-	 * Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead. 
-	 */
-	var StorageInfo = window.webkitStorageInfo;
 
-	StorageInfo.queryUsageAndQuota(1, function (used, remaining) {
-		if (remaining > 0) {
-			dl_quotabytes = remaining;
-			FileSystemAPI.storagetype = 1;
-			if (dl_quotabytes < 1073741824) {
-				clearit(1, 3600);
-			} else {
-				clearit(1);
-			}
-		} else {
-			var requestbytes = testSize * 4;
-			switch (storagetype) {
-			case 0:
-				requestbytes = testSize;
-				break;
-			case 1:
-				dl_req_storage = true;
-				break;
-			}
-
-			StorageInfo.requestQuota(storagetype, requestbytes, function (grantedBytes)
-			{
-				StorageInfo.queryUsageAndQuota(storagetype, function (used, remaining)
-				{
-					if (storagetype === 1) {
-						dl_req_storage = false;
-					}
-
-					dl_quotabytes = remaining;
-
-					if (dl_quotabytes < 1073741824) {
-						clearit(storagetype, 3600);
-					}
-
-					if ((remaining == 0) && (storagetype == 1)) {
-						if (!dl_req_storage) {
-							dl_getspace(1, minsize);
-						}
-						return false;
-					} else if ((minsize > dl_quotabytes) && (storagetype == 0)) {
-						if (!dl_req_storage) {
-							dl_getspace(1, minsize)
-						}
-						return false;
-					} else if ((minsize > dl_quotabytes) && (storagetype == 1)) {
-						clearit(storagetype, 3600);
-					}
-
-					FileSystemAPI.storagetype = remaining > 0 && storagetype || 0;
-					FileSystemAPI.init = undefined; // no longer needed
-
-				}, dlError('error: could not query usage and storage quota. (FSFileSystem)'));
-			}, dlError('ERROR: Could not grant storage space (FSFileSystem)'));
-		}
-	}, dlError('ERROR: Could not query usage and storage quota.'));
-};
+window.requestFileSystem = window.webkitRequestFileSystem;

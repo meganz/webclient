@@ -1,38 +1,19 @@
-﻿var baboom = true;
+﻿
 
 var b_u=0;
-var ie9=0;
-
-if (document.location.href.indexOf('preview.mega.co.nz') > -1)
-{
-	localStorage.staticpath = 'http://preview.mega.co.nz/';
-	localStorage.dd=1;
-}
-
-
-if (document.getElementsByTagName('html')[0].className == 'ie8') b_u=true;
-else if (document.getElementsByTagName('html')[0].className == 'ie9') ie9=true;
-
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
 function isMobile()
 {
 	if (is_chrome_firefox) return false;
-	mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
+	mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
 	for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
 	return false;
 }
 
 
 
-
-if (isMobile() && document.location.hostname == 'mega.co.nz' && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) && (ua.indexOf('crios') > -1))
-{
-	if (document.location.hash.substr(0,5) == '#blog' || document.location.hash.substr(0,8) == '#confirm') document.location = 'https://eu.static.mega.co.nz/' + document.location.hash;
-	else document.location = 'https://eu.static.mega.co.nz/';		
-	stopexecute();
-}
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
 else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
@@ -87,6 +68,9 @@ try
 	}
 	else
 	{
+		if (localStorage.dd) {
+			localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+		}
 		var staticpath = localStorage.staticpath || 'https://eu.static.mega.co.nz/';
 		var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 
@@ -229,13 +213,13 @@ var silent_loading=false;
 
 if (m)
 {
-	var app,mobileblog,android,ios;
+	var app,mobileblog,android;
 	var link = document.createElement('link');
 	link.setAttribute('rel', 'stylesheet');
 	link.type = 'text/css';
 	link.href = staticpath + 'css/mobile-app.css';
 	document.head.appendChild(link);
-	document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited 2013</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
+	document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-txt" id="m_desc"></div><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
 	if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
 	if (ua.indexOf('android') > -1)
 	{
@@ -243,14 +227,20 @@ if (m)
 		document.body.className = 'android full-mode supported';
 		android=1;
 	}
+	else if (ua.indexOf('bb10') > -1)
+	{
+		app='http://appworld.blackberry.com/webstore/content/46810890/';
+		document.body.className = 'blackberry full-mode supported';
+		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';		
+	}
 	else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
 	{
 		app='https://itunes.apple.com/app/mega/id706857885';
 		document.body.className = 'ios full-mode supported';
 		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
-		ios=1;
 	}
 	else document.body.className = 'another-os full-mode unsupported';
+	
 	if (app)
 	{
 		document.getElementById('m_appbtn').href = app;
@@ -335,30 +325,31 @@ else
 		jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
 		jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
-		jsl.push({f:'js/inherits.js', n: 'crypto_js', j:1,w:5});
-		jsl.push({f:'js/events.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
 		jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
-		jsl.push({f:'js/queue.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadChrome.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/downloader.js', n: 'dl_js', j:1,w:3});
-		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
-		jsl.push({f:'js/chat.js', n: 'mega_js', j:1,w:7});
+		jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+		/* better download */
+		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
+		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
+		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
+		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
+		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
+		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+		/* end better download */
 		jsl.push({f:'index.js', n: 'index', j:1,w:4});
 		jsl.push({f:'html/start.html', n: 'start', j:0});
 		jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -382,9 +373,7 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});	
-		jsl.push({f:'js/baboom.js',n:'baboom_js',j:1});
-
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},
@@ -681,6 +670,7 @@ else
 				  xhr_stack[xhri].url = url;
 				  xhr_stack[xhri].jsi = jsi;
 				  xhr_stack[xhri].xhri = xhri;
+				  if (localStorage.dd) url += '?t=' + Date.now();
 				  xhr_stack[xhri].open("GET", url, true);
 				  if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
 				  xhr_stack[xhri].send(null);
@@ -701,10 +691,9 @@ else
 			var p = Math.floor((jsl_current+jsl_fm_current)/jsl_total*100);
 			if ((p > jsl_perc) && (p <= 100))
 			{
-				if (p < 100 && ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox)) return false;
 				jsl_perc = p;
-				if (document.getElementById('loading_progress_fill')) document.getElementById('loading_progress_fill').style.width = jsl_perc+'%';
-				else if(document.getElementById('loadinganim')) document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+jsl_perc;
+				if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;					
+				document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
 			}
 		}
 		var jsl_loaded={};
@@ -763,7 +752,7 @@ else
 				document.head.appendChild(link);
 				cssar=undefined;
 				if (typeof u_checked !== 'undefined' && u_checked) jsar.push('startMega();');
-				else  jsar.push('populate_l(); var insist=false; if (localStorage.dlimport) insist=true; u_checklogin( { checkloginresult: function(u_ctx,r) { u_type = r; u_checked=true; startMega(); } },insist); clearit(0);');
+				else  jsar.push('populate_l(); var insist=false; if (localStorage.dlimport) insist=true; u_checklogin( { checkloginresult: function(u_ctx,r) { u_type = r; u_checked=true; startMega(); } },insist);');
 				evalscript_url(jsar);
 				jsar=undefined;
 			}
@@ -781,7 +770,6 @@ else
 						u_checked=true;
 						startMega();
 					}},insist);
-					clearit(0);
 				}
 			}
 		}
@@ -812,7 +800,8 @@ else
 		var istaticpath = staticpath;
 		if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
 		else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
-
-		document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;cursor: pointer;}.loading-bottom-button.st-facebook-button {float: right;background-position: -40px -2376px;margin-left: 11px;}.loading-bottom-button.st-facebook-button:hover {background-position: -40px -2336px;}.loading-bottom-button.st-twitter-button {float: right;background-position: -1px -2376px;margin-left: 11px;}.loading-bottom-button.st-twitter-button:hover {background-position: -1px -2336px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130x -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite@2x.png);	background-size: 222px auto;	}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="loading-main-bottom" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="loading-bottom-button st-facebook-button"></a><a href="https://twitter.com/MEGAprivacy" class="loading-bottom-button st-twitter-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="follow-txt" target="_blank">follow us</a><div class="clear"></div></div></div></div>');
+		
+		document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;cursor: pointer;}.loading-bottom-button.st-facebook-button {float: right;background-position: -40px -2376px;margin-left: 11px;}.loading-bottom-button.st-facebook-button:hover {background-position: -40px -2336px;}.loading-bottom-button.st-twitter-button {float: right;background-position: -1px -2376px;margin-left: 11px;}.loading-bottom-button.st-twitter-button:hover {background-position: -1px -2336px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite@2x.png);	background-size: 222px auto;	}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="loading-main-bottom" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="loading-bottom-button st-facebook-button"></a><a href="https://twitter.com/MEGAprivacy" class="loading-bottom-button st-twitter-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="follow-txt" target="_blank">follow us</a><div class="clear"></div></div></div></div>');
 	}
 }
+

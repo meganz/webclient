@@ -26,7 +26,7 @@ if (typeof loadingDialog == 'undefined')
 var fmconfig ={};
 if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
-var zipid=0;
+var zipid=1;
 
 function MegaData ()
 {
@@ -43,6 +43,9 @@ function MegaData ()
 	this.rendered = false;
 	this.currentdirid = false;
 	this.viewmode = 0;
+	
+	this.csortd = -1;
+	this.csort = 'name';
 
 	this.reset = function()
 	{
@@ -78,7 +81,6 @@ function MegaData ()
 
 	this.sort = function()
 	{
-		this.sortBy(this.sortfn,this.sortd);
 		this.sortBy(this.sortfn,this.sortd);
 		this.sortBy(this.sortfn,this.sortd);
 	};
@@ -332,31 +334,26 @@ function MegaData ()
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
-					if (d) console.log('option1');
 					$(t).append(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
 					// if there is a node before the new node in the current view, add it after that node:
-					if (d) console.log('option2');
 					$(t+' #'+this.v[i-1].h).after(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
 				{
 					// if there is a node after the new node in the current view, add it before that node:
-					if (d) console.log('option3');
 					$(t+' #'+this.v[i+1].h).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
 				{
 					// new folder: insert new node before the first folder in the current view
-					if (d) console.log('option4 (folder)');
 					$($(t+' '+el)[0]).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
 				{
 					// new file: insert new node before the first file in the current view
-					if (d) console.log('option5 (file)');					
 					var a = $(t+' '+el).not('.folder');
 					if (a.length > 0) $(a[0]).before(html);
 					else
@@ -380,6 +377,7 @@ function MegaData ()
 		{
 			$('.file-block-scrolling').append('<div class="clear"></div>');
 			iconUI();
+			fa_duplicates = {};
 			fm_thumbnails();
 		}
 		else gridUI();
@@ -442,6 +440,13 @@ function MegaData ()
 		this.buildtree({h:M.RubbishID});
 		treeUI();
 	};
+	
+	this.renderContacts = function()
+	{
+		$('#treesub_contacts').html('');
+		this.buildtree({h:'contacts'});
+		treeUI();
+	};
 
 	this.openFolder = function(id,force,chat)
 	{		
@@ -472,7 +477,7 @@ function MegaData ()
 		
 		if (this.chat)
 		{
-			treeUIopen(M.currentdirid.replace('chat/',''),1);			
+			treeUIopen(M.currentdirid.replace('chat/',''),1);
 			chatui();
 			fmtopUI();
 			M.renderPath();
@@ -570,10 +575,48 @@ function MegaData ()
 				else if (n.h == 'contacts') $('.fm-left-panel .fm-tree-header.contacts-item').addClass('contains-subfolders');
 				else $('#treesub_'+n.h).siblings('a').addClass('contains-folders');
 			}
+			
+			// sort by name is default in the tree
 			folders.sort(function(a,b)
 			{
 				if (a.name) return a.name.localeCompare(b.name);
 			});
+			
+			if (n.h == 'contacts')
+			{
+				// in case of contacts we have custom sort/grouping:
+				if (localStorage.csort) this.csort = localStorage.csort;
+				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+				
+				
+				
+				if (this.csort == 'shares')
+				{				
+					folders.sort(function(a,b)
+					{
+						if (M.c[a.h] && M.c[b.h])
+						{
+							if (a.name) return a.name.localeCompare(b.name);
+						}
+						else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+						else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+						return 0;
+					});
+				}
+				else if (this.csort == 'name')
+				{				
+					folders.sort(function(a,b)
+					{						
+						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
+					});
+				}
+				
+				$('.contacts-sorting-by').removeClass('active');
+				$('.contacts-sorting-by.' + this.csort).addClass('active');				
+				$('.contacts-sorting-type').removeClass('active');				
+				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
+			}
+			
 			for (var i in folders)
 			{
 				var treenode = '<span>' + htmlentities(folders[i].name) + '</span>';
@@ -599,7 +642,7 @@ function MegaData ()
 					buildnode = true;
 				}
 				var containsc='';
-				var cns = M.c[folders[i].h];
+				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				if ($('#treeli_'+folders[i].h).length == 0)
@@ -608,7 +651,7 @@ function MegaData ()
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
 					else $('#treesub_' + n.h).append(html);
 				}
-				if (buildnode) this.buildtree(folders[i]);
+				if (buildnode) this.buildtree(folders[i]);				
 			}
 		}
 	};
@@ -647,15 +690,16 @@ function MegaData ()
 
 	this.renderPath = function()
 	{
-		var hasnext='';
+		var hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
 		var a = this.getPath(this.currentdirid);
 		for (var i in a)
 		{
 			if (a[i] == this.RootID)
 			{
-				typeclass = 'cloud-drive';
-				name = l[164];
+				typeclass = 'folder';
+				if (folderlink && M.d[this.RootID]) name = htmlentities(M.d[this.RootID].name);
+				else name = l[164];
 			}
 			else if (a[i] == 'contacts')
 			{
@@ -734,6 +778,8 @@ function MegaData ()
 		if (this.d[id]) return this.d[id];
 		else return false;
 	};
+	
+	
 
 	this.addNode = function(n,ignoreDB)
 	{
@@ -757,7 +803,7 @@ function MegaData ()
 		}
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
-		{
+		{			
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
 		}
@@ -767,6 +813,7 @@ function MegaData ()
 		if (!n.c)
 		{
 			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
 				crypto_processkey(u_handle,u_k_aes,n);
@@ -1049,8 +1096,8 @@ function MegaData ()
 						ctx.account.balance = res.balance;
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
-
-						if (!ctx.balance) ctx.account.balance = [['0.00','EUR']];
+						
+						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];					
 
 						if (!u_attr.p)
 						{
@@ -1136,7 +1183,6 @@ function MegaData ()
 
 	this.delIndex = function(p,h)
 	{
-		if (d) console.log('delIndex',p,h);
 		if (M.c[p] && M.c[p][h]) delete M.c[p][h];
 		var a=0;
 		for (var i in M.c[p]) a++;
@@ -1246,6 +1292,9 @@ function MegaData ()
 
 	this.delnodeShare = function(h,u)
 	{
+		console.log('delnodeShare');
+
+		
 		if (this.d[h] && typeof this.d[h].shares !== 'undefined')
 		{
 			delete this.d[h].shares[u];
@@ -1378,8 +1427,9 @@ function MegaData ()
 		}
 	}
 
-	this.addDownload = function(n,z)
+	this.addDownload = function(n,z,preview)
 	{
+		// todo cesar: preview parameter indicates that this is a image preview download
 		delete $.dlhash;
 		var zipname,path;
 		var nodes = [];
@@ -1423,7 +1473,7 @@ function MegaData ()
 			zipid++;
 			z=zipid;
 			if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-			else zipname = 'Archive.zip';
+			else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
 			var zipsize = 0;
 		}
 		else z = false;
@@ -1451,13 +1501,13 @@ function MegaData ()
 					onDownloadError: this.dlerror,
 					onDownloadStart: this.dlstart,
 					zipid: z,
-					zipname: zipname
+					zipname: zipname,
+					preview: preview
 				});
 				zipsize += n.s;
 
 				var flashhtml='';
-				if (dlMethod == FlashIO)
-				{
+				if (dlMethod == FlashIO) {
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
@@ -1467,21 +1517,29 @@ function MegaData ()
 
 		if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
 
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+		var flashhtml='';
+		if (dlMethod == FlashIO) {
+			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
+		}
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
 
-        openTransferpanel();
-		initGridScrolling();
-		initFileblocksScrolling();
-		initTreeScroll();
+        if (!preview) 
+		{
+			openTransferpanel();
+			initGridScrolling();
+			initFileblocksScrolling();
+			initTreeScroll();
+		}
 
 		delete $.dlhash;
 	}
 
 	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
 	{
+		if (kbps == 0) return;
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
 		{
@@ -1505,11 +1563,16 @@ function MegaData ()
 			id = 'dl_' + id;
 			st = dl_queue[dl_queue_num].st;
 		}
-		if ($('.transfer-table #' + id + ' .progress-block').length == 0)
-		{
+
+		var failed = parseInt($('#' + id).data('failed') || "0");
+		// failed not long ago
+		if (failed+30000 > NOW()) return;
+
+		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
 			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
+
 		if (!bl) return false;
 		if (!$.transferprogress) $.transferprogress=[];
 		if (kbps == 0) return false;
@@ -1522,6 +1585,13 @@ function MegaData ()
 			$.transferprogress[id] = Math.floor(bl/bt*100);
 			if (!uldl_hold)
 			{
+				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
+				{					
+					$('.slideshow-error').addClass('hidden');
+					$('.slideshow-pending').addClass('hidden');
+					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
+				}
+			
 				$('.transfer-table #' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
@@ -1529,7 +1599,6 @@ function MegaData ()
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
 				if ((!ul_uploading) && (perc == 100)) megatitle();
 				else if (!ul_uploading) megatitle(' ' + perc + '%');
-				$.transferHeader();
 
 				if (page.substr(0,2) !== 'fm')
 				{
@@ -1540,12 +1609,21 @@ function MegaData ()
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
 				}
+				
+				
 			}
 		}
 	}
 
-	this.dlcomplete = function (id,z)
+	this.dlcomplete = function (id,z, dl_queue_num)
 	{
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-error').addClass('hidden');
+			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
+		}		
+	
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
@@ -1554,9 +1632,10 @@ function MegaData ()
 			var flashid = id.replace('dl_','');
 			$('#dlswf_'+flashid).width(170);
 			$('#dlswf_'+flashid).height(22);
-			$('#' + id + ' .transfer-type').removeClass('download');
-			$('#' + id + ' .transfer-type').addClass('safari-downloaded');
-			$('#' + id + ' .transfer-type').text('Save File');
+			$('#' + id + ' .transfer-type')
+				.removeClass('download')
+				.addClass('safari-downloaded')
+				.text('Save File');
 		}
 		else
 		{
@@ -1594,7 +1673,7 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid, error)
+	this.dlerror = function(fileid, error, dl_queue_num)
 	{
 		var errorstr=false;
 		if (d) console.log('dlerror',fileid,error);
@@ -1610,9 +1689,35 @@ function MegaData ()
 		else if (error == ENOENT) errorstr=l[22];
 		else if (error == EKEY) errorstr = l[24];
 		else if (error == EAGAIN) errorstr = l[233];
-		else errorstr = l[233];
+		else errorstr = l[233];		
+				
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		{
+			$('.slideshow-image-bl').addClass('hidden');
+			$('.slideshow-pending').addClass('hidden');
+			$('.slideshow-progress').addClass('hidden');
+			$('.slideshow-error').removeClass('hidden');
+			$('.slideshow-error-txt').text(errorstr);
+		}
 
-		if (errorstr) $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+		var file = null;
+		$.each(dl_queue, function(id, f) {
+			if (f.id == fileid) {
+				file = f;
+				return false;
+			}
+		});
+
+		if (errorstr)  {
+			if (file) file.failed = new Date;
+			var dom = null;
+			if (file && file.zipid) {
+				dom = $('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			} else {
+				dom = $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			}
+			dom.parents('tr').data({'failed' : NOW()});
+		}
 	}
 
 	this.dlstart = function(id,name,size, dl_queue_num)
@@ -1783,11 +1888,6 @@ function onUploadProgress(id, bl, bt)
 function onUploadSuccess(id, bl, bt)
 {
 	M.ulcomplete(id,bl,bt);
-}
-
-function fm_zipcomplete(id)
-{
-	M.dlcomplete(false,id);
 }
 
 function fm_chromebar(height)
@@ -2065,7 +2165,7 @@ function execsc(ap)
 				}
 			}
 		}
-		else if (a.a == 'u' && !folderlink)
+		else if (a.a == 'u')
 		{
 			var n = M.d[a.n];
 			if (n)
@@ -2080,7 +2180,8 @@ function execsc(ap)
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' span').text(f.name);
-						if ($('#path_' + n.h).length > 0) newpath=1;
+						if ($('#path_' + n.h).length > 0) newpath=1;						
+						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
 					{
@@ -2390,19 +2491,20 @@ function process_ok(ok)
 	}
 }
 
+
+function folderreqerr(c,e)
+{
+    loadingDialog.hide();
+	msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
+	{
+		folderlink=pfid;
+		document.location.hash='';
+	});
+}
+
 function loadfm_callback(res)
 {
-	if (pfid && typeof res == 'number' && res < 0)
-	{
-		loadingDialog.hide();
-		msgDialog('warninga',l[1043],l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>',false,function()
-		{
-			folderlink=pfid;
-			document.location.hash='';
-		});
-		return false;
-	}
-	else if (pfkey && res.f && res.f[0])
+	if (pfkey && res.f && res.f[0])
 	{
 		M.RootID = res.f[0].h;
 		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
@@ -2413,7 +2515,7 @@ function loadfm_callback(res)
 	process_f(res.f);	
 	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
 	maxaction = res.sn;
-	localStorage[u_handle + '_maxaction'] = maxaction;
+	if (mDB) localStorage[u_handle + '_maxaction'] = maxaction;
 	renderfm();
 	if (!pfkey) pollnotifications();
 

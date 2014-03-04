@@ -97,38 +97,56 @@ function dlZipIO(dl, dl_id) {
 		, queue = []
 		, current = null
 		, gOffset = 0
-		, realIO = new dlMethod(dl_id) 
+		, realIO = new dlMethod(dl_id, dl) 
+		, ready = false
 
 	// fake set credentials
-	realIO.begin = function() {}
-	realIO.setCredentials();
+	realIO.begin = function() {
+		ready = true;
+	}
 
+	dl_writer(this, function() {
+		return ready;
+	});
+
+
+	this.IO   = this.io = realIO;
 	this.size = 0
+	this.files = 0
 	this.progress	= 0
 	this.dl_xr	= getxr()
 
+	this.ready = function() {
+	};
+
 	this.done = function() {
 		current = null
+		DEBUG("done write", queue.length, "missing");
 		if (queue.length === 0) {
 			var end = ZipObject.writeSuffix(gOffset, dirData);
 			$.each(dirData, function(key, value) {
 				doWrite(value);
 			});
 			doWrite(end, function() {
-				fm_zipcomplete(dl.zipid);
-				dl.onDownloadComplete(dl.dl_id);
+				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
 				realIO.download(dl.zipname);
+				if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 			});
 
 		}
 	}
 
+
 	/**
 	 *	Peform real write 
 	 */
 	function doWrite(buffer, next) {
-		realIO.write(buffer, gOffset, next || function() {});
+		self.writer.push({
+			data: buffer,
+			offset: gOffset,
+			callback: next
+		});
 		gOffset += buffer.length;
 	}
 
@@ -137,17 +155,20 @@ function dlZipIO(dl, dl_id) {
 			, expected = 0 /* next chunk */
 
 		this.size += file.size
+		this.files++;
 
 		queue.push(file.id);
 
 		return function (buffer, pos, next) {
 			if (!ZipObject) {
-				ZipObject = new ZIPClass(self.size);
+				realIO.is_zip = true
+				realIO.setCredentials("", self.size + self.files*1024);
+				ZipObject = new ZIPClass(self.size + self.files*1024);
 			}
 
 			if (current === null) {
 				current = file.id;
-				queue.splice($.inArray(file.id, queue),1);
+				removeValue(queue,file.id);
 			}
 
 			if (current != file.id || expected != pos) {
@@ -200,9 +221,7 @@ function dlZipIO(dl, dl_id) {
 
 		if (qZips[0] !== task.download.id || task.pos != pos) {
 			DEBUG("retry ", pos, task.pos, qZips[0], task.download.id);
-			return setTimeout(function() {
-				self.write(buffer, position, next, task);
-			}, 100);
+			throw new Error;
 		}
 
 		if (task.first) {
@@ -240,6 +259,7 @@ function dlZipIO(dl, dl_id) {
 			pos++;
 		}, task);
 	};
+
 }
 
 

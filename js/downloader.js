@@ -1,40 +1,141 @@
-
-function getXhrObject() {
-	var dl_xhr = new XMLHttpRequest;
-	if (dl_xhr.overrideMimeType) {
-		dl_xhr.overrideMimeType('text/plain; charset=x-user-defined');
+if (d) {
+	var _allxhr = [];
+	function abortAll() {
+		$.each(_allxhr, function(k, xhr) {
+			try { 
+				xhr.abort(); xhr.failure(); 
+			} catch (e) {
+				DEBUG('exception', e);
+			}
+		});
 	}
-	return dl_xhr;
 }
 
+// getXhrObject {{{
+function getXhrObject(s) {
+	var xhr = new XMLHttpRequest
+		, timeout = s || 40000
+	if (xhr.overrideMimeType) {
+		xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	}
+	if (d && typeof _allxhr == 'object') {
+		_allxhr.push(xhr);
+	}
+
+	// timeout {{{
+	var ts = null
+		, Open = xhr.open
+		, Abort = xhr.abort
+		, aborted = false
+
+	xhr.abort = function() {
+		clearTimeout(ts);
+		aborted = true
+		Abort.apply(xhr, arguments);
+	};
+
+	xhr.open = function() {
+		Open.apply(xhr, arguments);
+		checkTimeout();
+	};
+
+	function checkTimeout() {
+		if (aborted) return;
+		clearTimeout(ts);
+		ts = setTimeout(function() {
+			DEBUG("xhr failed by timeout");
+			xhr.abort();
+			xhr.failure("timeout");
+		}, timeout*1.5);
+	}
+	// }}}
+
+	// default callbacks {{{
+	xhr.progress = function() {
+	};
+
+	xhr.changestate = function() {
+	};
+
+	xhr.failure = function() {
+	};
+
+	xhr.ready = function() {
+	};
+	// }}}
+
+	xhr.onprogress = function() {
+		if (aborted) return;
+		checkTimeout();
+		return xhr.progress.apply(xhr, arguments);
+	}
+
+	xhr.onreadystatechange = function() {
+		if (aborted) return;
+		xhr.changestate.apply(xhr, arguments);
+		checkTimeout();
+		if (this.readyState == this.DONE) {
+			clearTimeout(ts);
+			return xhr.ready.apply(xhr, arguments);
+		}
+	};
+
+	return xhr;
+}
+// }}}
+
 // Chunk fetch {{{
+var GlobalProgress = {};
 function ClassChunk(task) {
+	this.task = task;
+	this.dl   = task.download;
+
+	var self = this;
+
 	this.run = function(Scheduler) {
-		var xhr = getXhrObject()
+		iRealDownloads++;
+
+		var xhr
 			, url = task.url
 			, size = task.size
 			, download = task.download
 			, io = download.io
 			, average_throughput = [0, 0]
 			, done = false
-			, prevProgress = 0    // Keep in track how far are we in the downloads
-			, pprevProgress = 0	  // temporary variable to meassure progress. FIXME: it should handled by getxr()
-			, progress = getxr()  // chunk progress
-			, speed = 0 // speed of the current chunk
-			, lastUpdate // FIXME: I should be abstracted at getxr()
-			, Progress = download.zipid ? Zips[download.zipid] : io
-	
-		io.dl_xr = io.dl_xr || getxr() // global download progress
-	
+			, speed = 1 // speed of the current chunk
+			, lastUpdate  = NOW()
+			, lastPing    = NOW()
+			, localId = iRealDownloads
+			, backoff = 1000
+			, failed = false
+			, gid    = download.zipid ? 'zip_' + download.zipid : 'file_' + download.dl_id
+			, _cancelled = false
+
+		var Progress = GlobalProgress[gid];
+
+		Progress.dl_xr = Progress.dl_xr || getxr() // global download progress
+		Progress.speed = Progress.speed || 1
+		Progress.size  = Progress.size  || (download.zipid ? Zips[download.zipid].size : io.size)
+		Progress.dl_lastprogress = Progress.dl_lastprogress || 0;
+		Progress.dl_prevprogress = Progress.dl_prevprogress || 0;
+		Progress.data[url] = [0, task.size];
+
+		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
+			done = true;
+			Scheduler.done();
+		}
+
 		/**
 		 *	Check if the current chunk is small or close to its
 		 *	end, so it can cheat to the scheduler telling they are 
 		 *	actually done
 		 */
 		function shouldIReportDone() {
-			if (!done && iRealDownloads < dlQueue._concurrency * .5 && (size-prevProgress)/speed <= dlDoneThreshold) {
-				Scheduler.done();
+			if (!Progress.data[url]) return;
+			var remain = Progress.data[url][1]-Progress.data[url][0]
+			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
+				Scheduler.done();
 			}
 		}
 	
@@ -43,106 +144,137 @@ function ClassChunk(task) {
 				// do not update the UI
 				return false;
 			}
-	
-			// keep in track of the current progress
-			if (lastUpdate+250 < new Date().getTime()) {
-				speed = progress.update(prevProgress - pprevProgress)
-				pprevProgress = prevProgress;
-				lastUpdate = new Date().getTime()
-				shouldIReportDone();
-			}
+
+			shouldIReportDone();
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > new Date().getTime() && !force) {
+			if (Progress.dl_lastprogress+250 > NOW() && !force) {
 				// too soon
 				return false;
 			}
 
-			console.warn(p, Progress.progres)
+			var _progress = Progress.done
+			$.each(Progress.data, function(i, val) {
+				_progress += val[0];
+			});
 
-	
 			download.onDownloadProgress(
 				download.dl_id, 
-				Progress.progress, // global progress
+				_progress, // global progress
 				Progress.size, // total download size
-				Progress.dl_xr.update(Progress.progress - Progress.dl_prevprogress),  // speed
+				Progress.speed = Progress.dl_xr.update(_progress - Progress.dl_prevprogress),  // speed
 				download.pos // this download position
 			);
-	
-			Progress.dl_prevprogress = Progress.progress
-			Progress.dl_lastprogress = new Date().getTime();
+
+			Progress.dl_prevprogress = _progress
+			Progress.dl_lastprogress = NOW()
 		}
-	
-	
-		if (dlMethod == FileSystemAPI) {
-			var t = url.lastIndexOf('/dl/');
-			xhr.open('POST', url.substr(0, t+1));
-			xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
-		} else {
-			xhr.open('POST', url, true);
+
+		function request() {
+			xhr = getXhrObject()
+
+			// onprogress {{{
+			xhr.progress = function(e) {
+				if (isCancelled()) return;
+
+				Progress.data[url][0] = e.loaded
+				updateProgress(true)
+			};
+			// }}}
+
+			xhr.failure = function(e, len) {
+				if (xhr.has_failed) return;
+				xhr.has_failed = true;
+
+				// we must reschedule this download	
+				Progress.data[url][0] = 0; /* we're at 0 bytes */
+				updateProgress(true)
+
+				// tell the scheduler that we failed
+				if (done) {
+					// We already told the scheduler we were done
+					// with no erro and this happened. Should I reschedule this 
+					// task?
+					failed = true
+					return setTimeout(function() {
+						DownloadManager.pause(self);
+						request();
+					}, backoff *= 1.2);
+				}
+				return Scheduler.done(false, this.status);
+			};
+		
+			// on ready {{{
+			xhr.ready = function() {
+				if (isCancelled()) return;
+				var r = this.response || {};
+
+				if (r.byteLength == size) {
+					iRealDownloads--;
+					Progress.done += r.byteLength;
+					delete Progress.data[url];
+					updateProgress(true);
+
+					if (navigator.appName != 'Opera') {
+						io.dl_bytesreceived += r.byteLength;
+					}
+					download.decrypt.push({ data: new Uint8Array(r), offset: task.offset, info: task})
+					if (failed) DownloadManager.release(self);
+					failed = false;
+				} else if (!download.cancelled) {
+					DEBUG(this.status, r.bytesLength, size);
+					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
+					return xhr.failure(null, r.byteLength);
+				}
+
+				if (!done) Scheduler.done();
+			}
+			// }}}
+
+			if (dlMethod == FileSystemAPI) {
+				var t = url.lastIndexOf('/dl/');
+				xhr.open('POST', url.substr(0, t+1));
+				xhr.setRequestHeader("MEGA-Chrome-Antileak", url.substr(t) + url);
+			} else {
+				xhr.open('POST', url, true);
+			}
+			xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+			xhr.send();
+			DEBUG("Fetch " + url);
 		}
-		DEBUG("Fetch " + url);
 		
 		if (!io.dl_bytesreceived) {
 			io.dl_bytesreceived = 0;
 		}
 	
 		function isCancelled() {
-			if (download.cancelled) {
-				DEBUG("Chunk aborting itself because download was cancelled");
+			if (_cancelled) {
+				/* aborted already */
+				console.warn('CHECK THIS', 'It shouldnt be reached since we xhr.abort()ed it.');
+				return true;
+			}
+
+			var is_canceled = !!download.cancelled;
+			if (!is_canceled) {
+				if(typeof(download.pos) !== 'number') {
+					download.pos = IdToFile(download).pos
+				}
+				is_canceled = !dl_queue[download.pos].n;
+			}
+
+			if (is_canceled) {
+				_cancelled = true;
+				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
-				!done && Scheduler.done();
+				if (!done) Scheduler.done();
 				iRealDownloads--;
 				return true;
 			}
 		}
 	
-		xhr.onprogress = function(e) {
-			if (isCancelled()) return;
-	
-			Progress.progress += e.loaded - prevProgress;
-			prevProgress = e.loaded
-			updateProgress();
-		};
-	
-		xhr.onreadystatechange = function() {
-			if (isCancelled()) return;
-			if (this.readyState == this.DONE) {
-				var r = this.response || {};
-				Progress.progress += r.byteLength - prevProgress;
-				updateProgress(true);
-				iRealDownloads--;
-	
-				if (r.byteLength == size) {
-					if (have_ab) {
-						if (navigator.appName != 'Opera') {
-							io.dl_bytesreceived += r.byteLength;
-						}
-						dlDecrypter.push({ data: new Uint8Array(r), download: download, offset: task.offset, info: task})
-					} else {
-						io.dl_bytesreceived += this.response.length;
-						dlDecrypter.push({data: { buffer : this.response }, donwload: download, offset: task.offset, info: task})
-					}
-				} else if (!download.cancelled) {
-					// we must reschedule this download	
-					DEBUG(this.status, r.bytesLength, size);
-					DEBUG("HTTP FAILED WITH " + this.status);
-	
-					// tell the scheduler that we failed
-					if (done) {
-						// We already told the scheduler we were done
-						// with no erro and this happened. Should I reschedule this 
-						// task?
-						throw new Error("Fixme")
-					}
-					return Scheduler.done(false, this.status);
-				}
-				!done && Scheduler.done();
-			}
-		}
-		xhr.responseType = have_ab ? 'arraybuffer' : 'text';
-		xhr.send();
+
+		request();
 	}
 }
 // }}}
@@ -150,6 +282,9 @@ function ClassChunk(task) {
 // File fetch {{{
 var fetchingFile = null
 function ClassFile(dl) {
+	var self = this
+	this.task = dl;
+	this.dl   = dl;
 
 	this.run = function(Scheduler)  {
 		/**
@@ -160,7 +295,7 @@ function ClassFile(dl) {
 			Scheduler.done();
 			var task = this;
 			setTimeout(function() {
-				dlQueue.push(task);
+				dlQueue.push(self);
 			}, 100);
 			return;
 		}
@@ -170,8 +305,15 @@ function ClassFile(dl) {
 		if (!use_workers) {
 			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
 		}
+
+		var gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
+		if (!dl.zipid || !GlobalProgress[gid]) {
+			GlobalProgress[gid] = {data: {}, done: 0};
+		}
 	
 		DEBUG("dl_key " + dl.key);
+		
+		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 	
 		dl.io.begin = function() {
 			var tasks = [];
@@ -182,7 +324,9 @@ function ClassFile(dl) {
 					offset: url.offset, 
 					size: url.size, 
 					download: dl, 
-					chunk_id: key
+					chunk_id: key,
+					zipid: dl.zipid,
+					id: dl.id
 				}));
 			});
 
@@ -190,6 +334,7 @@ function ClassFile(dl) {
 			if (tasks.length == 0) {
 				emptyFile = true;
 				tasks.push({ 
+					task: {  zipid: dl.zipid, id: dl.id },
 					run: function(Scheduler) {
 						dl.io.write("", 0, function() {
 							Scheduler.done();	
@@ -197,32 +342,47 @@ function ClassFile(dl) {
 					}
 				});
 			}
-	
-			dlQueue.pushAll(tasks, function() {
-				if (dl.cancelled) return;
-				dl.onDownloadComplete(dl.dl_id);
-				var checker = setInterval(function() {
-					if (dl.decrypt == 0) {
-						clearInterval(checker);
-						if (!emptyFile && !checkLostChunks(dl)) {
-							return dl_reportstatus(dl.id, EKEY);
-						}
-						if (dl.zipid) {
-							return Zips[dl.zipid].done();
-						}
-						dl.onBeforeDownloadComplete(dl.pos);
+
+			var chunkFinished = false
+			dl.ready = function() {
+				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
+					if (dl.cancelled) return;
+					if (!emptyFile && !checkLostChunks(dl)) {
+						return dl_reportstatus(dl, EKEY);
+					}
+					if (dl.zipid) {
+						return Zips[dl.zipid].done();
+					}
+					dl.onBeforeDownloadComplete(dl.pos);
+					if (!dl.preview) {
 						dl.io.download(dl.zipname || dl.n, dl.p);
 					}
-				}, 100);
+					dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
+					if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
+				}
+			};
+	
+			dlQueue.pushAll(tasks, function() {
+				chunkFinished = true
 			}, failureFunction);
 	
 			// notify the UI
-			dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
 			fetchingFile = 0;
 			Scheduler.done();
 		}
 	
-		dlGetUrl(dl, function(res, o) {
+		dlGetUrl(dl, function(error, res, o) {
+			if (error) {
+				/* failed */
+				DownloadManager.pause(self); 
+				fetchingFile = 0;
+				Scheduler.done(); /* release worker */
+				setTimeout(function() {
+					/* retry !*/
+					dlQueue.pushFirst(self);
+				}, dl_retryinterval);
+				return false;
+			}
 			var info = dl_queue.splitFile(res.s);
 			dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
@@ -232,15 +392,49 @@ function ClassFile(dl) {
 }
 // }}}
 
+function dl_writer(dl, is_ready) {
+	is_ready = is_ready || function() { return true; };
+	dl.writer = new QueueClass(function (task) {
+		var Scheduler = this;
+		dl.io.write(task.data, task.offset, function() {
+			dl.writer.pos += task.data.length;
+			if (dl.data) {
+				new Uint8Array(
+					dl.data,
+					task.offset,
+					task.data.length
+				).set(task.data);
+			}
+			Scheduler.done();
+			if (typeof task.callback == "function") {
+				task.callback();
+			}
+			dl.ready(); /* tell the download scheduler we're done */
+		});
+	}, 1);
+
+	dl.writer.pos = 0
+
+	dl.writer.getNextTask = function() {
+		if (!is_ready()) return null;
+		var task = null;
+		$.each(this._queue, function(p, pTask) {
+			if (pTask.offset == dl.writer.pos) {
+				task = p;
+				return false; /* break */
+			}
+		});
+		if (task !== null) {
+			task = this._queue.splice(task, 1)[0]
+		}
+		return task;
+	};
+};
+
 // Decrypter worker {{{
-function decrypter(task)
-{
-	var download = task.download
-		, Decrypter = this
-
-	download.decrypt++;
-
-	if (use_workers) {
+function dl_decrypter(dl) {
+	dl.decrypt = new QueueClass(function(task) {
+		var Decrypter = this;
 		var worker = new Worker('decrypter.js?v=5');
 		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
 		worker.onmessage = function(e) {
@@ -248,49 +442,30 @@ function decrypter(task)
 				if (e.data[0] == '[') {
 					var t = JSON.parse(e.data), pos = task.offset
 					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
-						download.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+						dl.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
 					}
 				}
-				DEBUG("worker replied string", e.data, download.macs);
+				DEBUG("worker replied string", e.data, dl.macs);
 			} else {
-				var databuf = new Uint8Array(e.data.buffer || e.data);
-				var plain = databuf;
+				var plain = new Uint8Array(e.data.buffer || e.data);
 				Decrypter.done(); // release slot
-				download.io.write(plain, task.offset, function() {
-					// decrease counter
-					// useful to avoid downloading before writing
-					// all
-					download.decrypt--;
-				}, task.info);
+				DEBUG("Decrypt done", dl.cancelled);
+				if (dl.cancelled) return;
+				dl.writer.push({ data: plain, offset: task.offset});
 			}
 		};
-		worker.postMessage(task.download.nonce);
+		worker.postMessage(dl.nonce);
 		worker.dl_pos = task.offset;
 		worker.postMessage(task.offset/16);
-
+	
 		if (typeof MSBlobBuilder == "function") {
 			worker.postMessage(task.data);
 		} else {
 			worker.postMessage(task.data.buffer, [task.data.buffer]);
 		}
-		DEBUG("decrypt with workers");
-	} else {
-		DEBUG("decrypt without workers")
-		download.macs[task.offset] = decrypt_ab_ctr(
-			download.aes,
-			task.data,
-			[download.key[4],download.key[5]],
-			task.offset
-		);
+		DEBUG("decrypt with workers", dl.cancelled);
 
-		Decrypter.done(); // release slot
-		download.io.write(task.data, task.offset, function() {
-			// decrease counter
-			// useful to avoid downloading before writing
-			// all
-			download.decrypt--;
-		});
-	}
+	});
 }
 // }}}
 
@@ -308,23 +483,11 @@ var iRealDownloads = 0
 
 
 function downloader(task) {
-	iRealDownloads++;
-
 	var Scheduler = this;
-
-	if (task.busy === true) {
-		/**
-		 *	The worker is busy, it happens when the worker failed
-		 *	the error handler is called and it reschedule the task ASAP
-		 *	so the slot is reserved and it can be re-download as soon as 
-		 *	possible
-		 */
-		return setTimeout(function() {
-			// retry!
-			downloader.apply(Scheduler, [task]);
-		}, 200);
+	if (DownloadManager.isRemoved(task)) {
+		DEBUG("removing old task");
+		return Scheduler.done();
 	}
-
 	return task.run(Scheduler);
 }
 

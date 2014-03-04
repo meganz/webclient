@@ -48,11 +48,12 @@ function doregister()
 		else document.getElementById('overlay').style.display='';
 		
 		if (localStorage.signupcode)
-		{		
+		{	
+			u_storage = localStorage;
 			var ctx = 
-			{
+			{				
 				checkloginresult: function(u_ctx,r)
-				{			
+				{
 					if (m) loadingDialog.hide();
 					else document.getElementById('overlay').style.display='none';					
 					if ((typeof r[0] == 'number') && (r[0] < 0))					
@@ -72,6 +73,7 @@ function doregister()
 		}
 		else if (u_type === false) 
 		{
+			u_storage = localStorage;
 			var u_ctx = 
 			{
 				checkloginresult: function(u_ctx,r)
@@ -254,6 +256,7 @@ function pageregister()
 			if (localStorage.signupcode)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				var ctx = 
 				{
 					checkloginresult: function(u_ctx,r)
@@ -275,6 +278,7 @@ function pageregister()
 			else if (u_type === false)
 			{
 				loadingDialog.show();
+				u_storage = localStorage;
 				u_checklogin(
 				{
 					checkloginresult: function(u_ctx,r)
@@ -290,10 +294,6 @@ function pageregister()
 }
 
 
-
-
-
-
 function init_register()
 {
 	
@@ -301,11 +301,14 @@ function init_register()
 	{
 		$('.main-top-info-block').removeClass('hidden');
 		$('.main-top-info-text').text(register_txt);
-		register_txt=false;	
+		register_txt=false;		
 	}
 	
-	if (localStorage.registeremail) $('#register-email').val(localStorage.registeremail);	
-	
+	if (localStorage.registeremail)
+	{
+		$('#register-email').val(localStorage.registeremail);
+		if (localStorage.signupcode) $('#register-email').attr('readonly',true);
+	}	
 
 	$('#register-firstname').unbind('focus');
 	$('#register-firstname').bind('focus',function(e)

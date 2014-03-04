@@ -292,10 +292,6 @@ var MegaChat = function() {
                 var bareJid = eventData.from.split("/")[0];
 
                 $.each(self.chats, function(roomJid, room) {
-                    if(room.isTemporary) {
-                        return; // continue
-                    }
-
                     if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventData.from)) {
                         if(localStorage.d) {
                             console.debug(self.karere.getNickname(), "Auto inviting: ", eventData.from, "to: ", roomJid);
@@ -309,11 +305,6 @@ var MegaChat = function() {
                         });
 
                         return false; // break;
-                    } else if(room.participantExistsInRoom(bareJid) && self.karere.userExistsInChat(roomJid, eventData.from)) {
-                        // if this user is part of the currently visible room, then refresh the UI
-                        if(self.getCurrentRoomJid() == room.roomJid) {
-                            room.refreshUI();
-                        }
                     }
                 });
                 // Sync presence across devices (will check the delayed val!)
@@ -332,6 +323,21 @@ var MegaChat = function() {
                 }
 
             }
+        }
+
+        // should we trigger refreshUI ?
+        if(eventData.myOwn === false) {
+            var bareJid = eventData.from.split("/")[0];
+
+            $.each(self.chats, function(roomJid, room) {
+
+                if(room.participantExistsInRoom(bareJid)) {
+                    // if this user is part of the currently visible room, then refresh the UI
+                    if(self.getCurrentRoomJid() == room.roomJid) {
+                        room.refreshUI();
+                    }
+                }
+            });
         }
         self.renderMyStatus();
         self.renderChatStatus();
@@ -915,7 +921,7 @@ MegaChat.prototype.getContactNameFromJid = function(jid) {
  * @returns {String}
  */
 MegaChat.prototype.xmppPresenceToCssClass = function(presence) {
-    if(presence== Karere.PRESENCE.ONLINE || presence === true) {
+    if(presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
         return 'online';
     } else if(presence == Karere.PRESENCE.AWAY || presence == "xa") {
         return 'away';
@@ -996,13 +1002,13 @@ MegaChat.prototype.renderChatStatus = function() {
 
         var presence = self.karere.getPresence(self.getJidFromNodeId(contact.u));
 
-        if(!presence) {
+        if(!presence || presence == Karere.PRESENCE.OFFLINE) {
             $element.addClass("offline-status");
         } else if(presence == Karere.PRESENCE.AWAY) {
             $element.addClass("away-status");
         } else if(presence == Karere.PRESENCE.BUSY) {
             $element.addClass("busy-status");
-        } else if(presence === true || presence == Karere.PRESENCE.ONLINE) {
+        } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
             $element.addClass("online-status");
         } else {
             $element.addClass("offline-status");
@@ -1260,7 +1266,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     this.type = null;
     this.messages = [];
     this.messagesIndex = {};
-    this.isTemporary = false;
+
+    this.callRequest = null;
+    this.callIsActive = false;
+
     this.options = {
         /**
          * Maximum time for waiting a message sync, before trying to send a request to someone else in the room or
@@ -1509,18 +1518,25 @@ var MegaChatRoom = function(megaChat, roomJid) {
             self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
         });
         $cancel.show();
+
         resetCallStateInCall();
     };
 
     var resetCallStateNoCall = function() {
+        self.callIsActive = false;
         $('.call-actions', self.$header).hide();
         $('.btn-chat-call', self.$header).show();
 
         self.getInlineDialogInstance("incoming-call").remove();
         self.getInlineDialogInstance("outgoing-call").remove();
+
         self.refreshScrollUI();
+
+        self.refreshUI();
     };
     var resetCallStateInCall = function() {
+        self.callIsActive = true;
+
         $('.call-actions', self.$header).hide();
         if(!self.options.mediaOptions.audio) {
             $('.btn-chat-unmute', self.$header).show();
@@ -1540,6 +1556,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
         self.getInlineDialogInstance("outgoing-call").remove();
 
         self.refreshScrollUI();
+
+        self.refreshUI();
     };
 
     self.bind('call-init', function(e, eventData) {
@@ -1916,9 +1934,16 @@ MegaChatRoom.prototype.refreshUI = function() {
     /**
      * Audio/Video buttons
      */
-    $('.call-actions', self.$header).hide();
 
-    $('.btn-chat-call', self.$header).show();
+    if(self.callIsActive === false) {
+        $('.call-actions', self.$header).hide();
+
+        if(presenceCssClass == "offline") {
+            $('.btn-chat-call', self.$header).hide();
+        } else {
+            $('.btn-chat-call', self.$header).show();
+        }
+    }
 };
 
 

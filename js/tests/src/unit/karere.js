@@ -318,9 +318,64 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(3);
-        expect(em1.mocks['onPresence'].triggeredArgs[1][1]['from']).to.equal("user2@jid.com");
-        expect(em1.mocks['onPresence'].triggeredArgs[1][1]['to']).to.equal(k1.getJid());
-        expect(k1.getPresence("user2@jid.com")).to.be.false;
+        expect(em1.mocks['onPresence'].triggeredArgs[2][1]['from']).to.equal("user2@jid.com");
+        expect(em1.mocks['onPresence'].triggeredArgs[2][1]['to']).to.equal(k1.getJid());
+        expect(k1.getPresence("user2@jid.com")).to.be.falsy;
+
+
+        // when we have 2 devices with 'away' presence and one of them went offine, the presence should be away
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d1' to='" + k1.getJid() + "'>" +
+                    "<show>away</show>" +
+                    "<status>Away</status>" +
+                    "</presence>"
+            )
+        );
+
+        expect(em1.mocks['onPresence'].triggeredCount).to.equal(4);
+        expect(em1.mocks['onPresence'].triggeredArgs[3][1]['from']).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[3][1]['to']).to.equal(k1.getJid());
+        expect(k1.getPresence("user2@jid.com")).to.equal("away");
+
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d2' to='" + k1.getJid() + "'>" +
+                    "<show>away</show>" +
+                    "<status>Away</status>" +
+                    "</presence>"
+            )
+        );
+
+        expect(em1.mocks['onPresence'].triggeredCount).to.equal(5);
+        expect(em1.mocks['onPresence'].triggeredArgs[4][1]['from']).to.equal("user2@jid.com/d2");
+        expect(em1.mocks['onPresence'].triggeredArgs[4][1]['to']).to.equal(k1.getJid());
+        expect(k1.getPresence("user2@jid.com")).to.equal("away");
+
+
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d1' to='" + k1.getJid() + "' type='unavailable' />"
+            )
+        );
+
+        expect(em1.mocks['onPresence'].triggeredCount).to.equal(6);
+        expect(em1.mocks['onPresence'].triggeredArgs[5][1]['from']).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[5][1]['to']).to.equal(k1.getJid());
+        expect(k1.getPresence("user2@jid.com")).to.equal("away");
+
+
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d1' to='" + k1.getJid() + "' type='unavailable' />"
+            )
+        );
+
+        expect(em1.mocks['onPresence'].triggeredCount).to.equal(7);
+        expect(em1.mocks['onPresence'].triggeredArgs[6][1]['from']).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[6][1]['to']).to.equal(k1.getJid());
+        expect(k1.getPresence("user2@jid.com")).to.be.falsy;
+
 
         done();
     });

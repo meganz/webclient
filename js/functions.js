@@ -898,4 +898,23 @@ function RegExpEscape(text) {
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
-}
+};
+
+/**
+ * Simple wrapper function that will log all calls of `fnName`.
+ * This function is intended to be used for dev/debugging/testing purposes only.
+ *
+ * @param ctx
+ * @param fnName
+ * @param loggerFn
+ */
+function callLoggerWrapper(ctx, fnName, loggerFn) {
+    var origFn = ctx[fnName];
+    ctx[fnName] = function() {
+        loggerFn.apply(console, ["Called: ", fnName, toArray(arguments)]);
+        var res = origFn.apply(this, toArray(arguments));
+        loggerFn.apply(console, ["Got result: ", fnName, res]);
+
+        return res;
+    };
+};

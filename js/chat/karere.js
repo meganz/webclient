@@ -183,12 +183,27 @@ var Karere = function(user_options) {
 
     // Local in-memory Presence cache implementation
     self._presenceCache = {};
+    self._presenceBareCache = {};
 
     self.bind("onPresence", function(e, eventData) {
+        var bareJid = Karere.getNormalizedBareJid(eventData.from);
+
         if(eventData.show != "unavailable") {
             self._presenceCache[eventData.from] = eventData.show ? eventData.show : "available";
+            self._presenceBareCache[bareJid] = eventData.show ? eventData.show : "available";
         } else {
             delete self._presenceCache[eventData.from];
+
+            var foundPresenceForOtherDevices = false;
+            $.each(self._presenceCache, function(fullJid, pres) {
+                if(fullJid.indexOf(bareJid) != -1) {
+                    foundPresenceForOtherDevices = true;
+                    return false;
+                }
+            });
+            if(!foundPresenceForOtherDevices) {
+                delete self._presenceBareCache[bareJid];
+            }
         }
     });
 
@@ -214,6 +229,7 @@ Karere.CONNECTION_STATE = Strophe.Status;
  */
 Karere.PRESENCE = {
     'ONLINE': "chat",
+    'AVAILABLE': "available",
     'AWAY': "away",
     'BUSY': "dnd",
     'EXTENDED_AWAY': "xa",
@@ -1124,19 +1140,14 @@ makeMetaAware(Karere);
     Karere.prototype.getPresence = function(jid) {
         var self = this;
 
-        if(jid.indexOf("/") != -1) {
+        if(jid.indexOf("/") != -1) { // found full jid
             return self._presenceCache[jid] ? self._presenceCache[jid] : false;
-        } else {
+        } else { // found bare jid
             var result = false;
-            $.each(self._presenceCache, function(k, v) {
-                if(k.indexOf(jid) === 0) {
-                    result = v;
-                }
-            });
-
-            return result;
+            var bareJid = Karere.getNormalizedBareJid(jid);
+            return self._presenceBareCache[bareJid];
         }
-    }
+    };
 }
 
 /**

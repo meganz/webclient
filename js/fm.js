@@ -557,7 +557,6 @@ function openTransferpanel()
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
 	initTreeScroll();
-	if (!ul_uploading) startupload();
 	$(window).trigger('resize');
 }
 
@@ -938,7 +937,6 @@ function initContextUI()
 				DownloadManager.abort({ zipid: $.zipkill });
 			}
 		}
-		if ($.su) startupload();
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		

@@ -16,6 +16,7 @@ var StropheMocker = function(stropheInstance) {
 
     self.calls = {};
 
+    self.mockedDiscoInfoResponse = null;
 
     var _call_logger = function(name) {
         if(typeof(self.calls[name]) == 'undefined') {
@@ -47,6 +48,13 @@ var StropheMocker = function(stropheInstance) {
         'leave': _call_logger('muc.leave')
     };
 
+    var STROPHE_DISCO_METHODS_TO_BE_MOCKED = {
+        'info': function(jid, callback) {
+            callback(self.mockedDiscoInfoResponse);
+            return;
+        }
+    };
+
 
     /**
      * Private method, that will go thru all STROPHE_METHODS_TO_BE_MOCKED and STROPHE_MUC_METHODS_TO_BE_MOCKED and
@@ -62,6 +70,10 @@ var StropheMocker = function(stropheInstance) {
         });
         $.each(STROPHE_MUC_METHODS_TO_BE_MOCKED, function(k, v) {
             sinon.stub(stropheInstance.muc, k, v);
+        });
+
+        $.each(STROPHE_DISCO_METHODS_TO_BE_MOCKED, function(k, v) {
+            sinon.stub(stropheInstance.disco, k, v);
         });
 
         if(stropheInstance.karere) {
@@ -88,6 +100,9 @@ var StropheMocker = function(stropheInstance) {
         });
         $.each(STROPHE_MUC_METHODS_TO_BE_MOCKED, function(k, v) {
             stropheInstance.muc[k].restore();
+        });
+        $.each(STROPHE_DISCO_METHODS_TO_BE_MOCKED, function(k, v) {
+            stropheInstance.disco[k].restore();
         });
     };
 

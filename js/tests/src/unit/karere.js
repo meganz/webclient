@@ -380,6 +380,111 @@ describe("Karere Unit Test", function() {
         done();
     });
 
+
+    it("can discover disco capabilities", function(done) {
+        k1.fakeConnect("user@jid.com", "password");
+
+        em1.mock("onDiscoCapabilities");
+
+        // prepare mocked disco response
+        // no audio, no video and no karere
+        m1.mockedDiscoInfoResponse = $.parseXML(
+            "<iq xmlns='jabber:client' from='user2@jid.com/d1' to='" + k1.getJid() + "' type='result' id='13:sendIQ'>" +
+                "<query xmlns='http://jabber.org/protocol/disco#info'>" +
+                    "<identity name='strophe'/>" +
+                    "<feature var='http://jabber.org/protocol/disco#info'/>" +
+                    "<feature var='http://jabber.org/protocol/disco#items'/>" +
+                    "<feature var='urn:xmpp:jingle:1'/>" +
+                    "<feature var='urn:xmpp:jingle:apps:rtp:1'/>" +
+                    "<feature var='urn:xmpp:jingle:transports:ice-udp:1'/>" +
+//                    "<feature var='urn:xmpp:jingle:apps:rtp:audio'/>" +
+//                    "<feature var='urn:xmpp:jingle:apps:rtp:video'/>" +
+                    "<feature var='urn:ietf:rfc:5761'/>" +
+                "</query>" +
+            "</iq>"
+        );
+
+        // online
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d1' to='" + k1.getJid() + "'>" +
+                "</presence>"
+            )
+        );
+
+        expect(k1.connection.disco.info.callCount).to.equal(1);
+        expect(
+            k1.connection.disco.info.getCall(0).args[0]
+        ).to.equal("user2@jid.com/d1");
+
+        expect(k1._discoCache["user2@jid.com/d1"]).to.eql({
+            'audio': false,
+            'video': false,
+            'karere': false
+        });
+
+
+        // audio + video + karere
+        m1.mockedDiscoInfoResponse = $.parseXML(
+            "<iq xmlns='jabber:client' from='user2@jid.com/d2' to='" + k1.getJid() + "' type='result' id='13:sendIQ'>" +
+                "<query xmlns='http://jabber.org/protocol/disco#info'>" +
+                "<identity name='strophe'/>" +
+                "<feature var='http://jabber.org/protocol/disco#info'/>" +
+                "<feature var='http://jabber.org/protocol/disco#items'/>" +
+                "<feature var='karere'/>" +
+                "<feature var='urn:xmpp:jingle:1'/>" +
+                "<feature var='urn:xmpp:jingle:apps:rtp:1'/>" +
+                "<feature var='urn:xmpp:jingle:transports:ice-udp:1'/>" +
+                "<feature var='urn:xmpp:jingle:apps:rtp:audio'/>" +
+                "<feature var='urn:xmpp:jingle:apps:rtp:video'/>" +
+                "<feature var='urn:ietf:rfc:5761'/>" +
+                "</query>" +
+                "</iq>"
+        );
+
+        // online
+        k1._onIncomingStanza(
+            stringToXml(
+                "<presence xmlns='jabber:client' from='user2@jid.com/d2' to='" + k1.getJid() + "'>" +
+                    "</presence>"
+            )
+        );
+
+        expect(k1.connection.disco.info.callCount).to.equal(2);
+        expect(
+            k1.connection.disco.info.getCall(1).args[0]
+        ).to.equal("user2@jid.com/d2");
+
+        expect(k1._discoCache["user2@jid.com/d2"]).to.eql({
+            'audio': true,
+            'video': true,
+            'karere': true
+        });
+
+        expect(k1.getCapabilities("user2@jid.com/d2")).to.eql({
+            'audio': true,
+            'video': true,
+            'karere': true
+        });
+
+        // verify that the user's bare JID cache is set all to true, since he have at least 1 device capable of all
+        // features
+
+        expect(k1._discoBareCache["user2@jid.com"]).to.eql({
+            'audio': true,
+            'video': true,
+            'karere': true
+        });
+
+        expect(k1.getCapabilities("user2@jid.com")).to.eql({
+            'audio': true,
+            'video': true,
+            'karere': true
+        });
+
+        done();
+    });
+
     it("can create room, leave room, add user to room, remove user from room", function(done) {
 
 

@@ -25,6 +25,7 @@ function WebrtcApi() {
         
         this.RTCSessionDescription = mozRTCSessionDescription;
         this.RTCIceCandidate = mozRTCIceCandidate;
+        this.MediaStreamTrack = MediaStreamTrack;
     } else if (navigator.webkitGetUserMedia) {
         console.log('This appears to be Chrome');
         this.peerconnection =  webkitRTCPeerConnection;
@@ -49,6 +50,7 @@ function WebrtcApi() {
 		}
         this.RTCSessionDescription = RTCSessionDescription;
         this.RTCIceCandidate = RTCIceCandidate;
+        this.MediaStreamTrack = MediaStreamTrack;
         if (!webkitMediaStream.prototype.getVideoTracks) {
             webkitMediaStream.prototype.getVideoTracks = function () {
                 return this.videoTracks;

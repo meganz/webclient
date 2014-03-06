@@ -8,10 +8,19 @@ describe("Chat.js - Karere UI integration", function() {
     var $container = null;
 
     var karereMocker = null;
+    var stropheMocker = null;
 
     var functionsMocker;
     beforeEach(function(done) {
         localStorage.clear();
+
+        localStorage.dd=1;
+        localStorage.contextmenu=1;
+        localStorage.megachat=1;
+        localStorage.jj=true;
+        localStorage.dxmpp = 1;
+        localStorage.stopOnAssertFail = true;
+        localStorage.d = 1;
 
         functionsMocker = new FunctionsMocker();
 
@@ -58,8 +67,7 @@ describe("Chat.js - Karere UI integration", function() {
                 });
 
                 karereMocker = new KarereMocker(megaChat.karere);
-
-                window.km = karereMocker;
+                stropheMocker = new StropheMocker(megaChat.karere.connection);
 
                 megaChat.init();
 
@@ -113,6 +121,7 @@ describe("Chat.js - Karere UI integration", function() {
         megaChat.destroy();
 
         karereMocker.restore();
+        stropheMocker.restore();
 
         $container.remove();
         done();
@@ -515,16 +524,21 @@ describe("Chat.js - Karere UI integration", function() {
         expect(localStorage.megaChatPresenceMtime).to.eql("" + origPresenceMtime);
         expect(megaChat.karere.setPresence).to.not.have.been.called;
 
+
         expect(
             $('.activity-status-block .activity-status').is('.away')
         ).to.be.ok;
 
+
         expect(
             $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').is('.active')
         ).not.to.be.ok;
+
+
         expect(
             $('.top-user-status-popup .top-user-status-item[data-presence="away"]').is('.active')
         ).to.be.ok;
+
 
         expect(
             $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').is('.active')
@@ -533,6 +547,7 @@ describe("Chat.js - Karere UI integration", function() {
         expect(
             $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').is('.active')
         ).not.to.be.ok;
+
 
 
         // receive new presence
@@ -675,12 +690,31 @@ describe("Chat.js - Karere UI integration", function() {
 
                 // verify DOM update when presence is received from a 3rd party
                 var presenceCssClassMap = [
-                    [Karere.PRESENCE.ONLINE, '.online-status'],
+                    [Karere.PRESENCE.AVAILABLE, '.online-status'],
                     [Karere.PRESENCE.AWAY, '.away-status'],
                     [Karere.PRESENCE.BUSY, '.busy-status'],
                     [Karere.PRESENCE.OFFLINE, '.offline-status']
                 ];
                 $.each(presenceCssClassMap, function(k, v) {
+                    // prepare mocked disco response
+                    // no audio, no video and no karere
+                    stropheMocker.mockedDiscoInfoResponse = $.parseXML(
+                        "<iq xmlns='jabber:client' from='user2@jid.com/d1' to='" + megaChat.karere.getJid() + "' type='result' id='13:sendIQ'>" +
+                            "<query xmlns='http://jabber.org/protocol/disco#info'>" +
+                                "<identity name='strophe'/>" +
+                                "<feature var='karere'/>" +
+                                "<feature var='http://jabber.org/protocol/disco#info'/>" +
+                                "<feature var='http://jabber.org/protocol/disco#items'/>" +
+                                "<feature var='urn:xmpp:jingle:1'/>" +
+                                "<feature var='urn:xmpp:jingle:apps:rtp:1'/>" +
+                                "<feature var='urn:xmpp:jingle:transports:ice-udp:1'/>" +
+                                "<feature var='urn:xmpp:jingle:apps:rtp:audio'/>" +
+                                "<feature var='urn:xmpp:jingle:apps:rtp:video'/>" +
+                                "<feature var='urn:ietf:rfc:5761'/>" +
+                            "</query>" +
+                        "</iq>"
+                    );
+
                     var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
                         from: user2jid,
                         id: null,
@@ -694,9 +728,26 @@ describe("Chat.js - Karere UI integration", function() {
                         to: megaChat.karere.getJid()
                     });
 
+
                     expect(
                         $('#treea_' + Object.keys(M.u)[1]).is(v[1])
                     ).to.be.ok;
+
+                    if(v[0] != Karere.PRESENCE.OFFLINE) {
+                        // confirm that the chat-capability-* classes are added in the UI if the presence
+                        // was not offline
+                        expect(
+                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-audio")
+                        ).to.be.ok;
+
+                        expect(
+                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-video")
+                        ).to.be.ok;
+
+                        expect(
+                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-karere")
+                        ).to.be.ok;
+                    }
                 });
 
                 done();

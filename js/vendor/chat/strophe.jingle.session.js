@@ -589,9 +589,9 @@ JingleSession.prototype.sendIq = function(iq, src, successCb, errorCb)
               if($(stanza).find('error').length) {
                 error.code = $(stanza).find('error').attr('code');
                 error.reason = $(stanza).find('error :first')[0].tagName;
-              } else {
-                error.isTimeout = true;
               }
+            } else { // !stanza
+                error.isTimeout = true;
             }
             self.jingle.onJingleError.call(self.eventHandler, self, error, stanza, iq);
         },

@@ -1,4 +1,9 @@
-/* jshint -W117 */
+
+/* This code is based on strophe.jingle.js by ESTOS */
+
+var RTC = null;
+var RtcOptions = {};
+
 Strophe.addConnectionPlugin('jingle', {
 
     init: function (conn) {
@@ -46,29 +51,66 @@ Strophe.addConnectionPlugin('jingle', {
 // and the actual call answered. The period starts at the time the
 // request is received from the network
         this.callAnswerTimeout = 50000;
+        this.rtcInit();
+        if (RTC)
+            this.registerDiscoCaps();
     },
     registerDiscoCaps:function() {
         if (!this.connection.disco)
             return;
-        
+        var self = this;
         // http://xmpp.org/extensions/xep-0167.html#support
         // http://xmpp.org/extensions/xep-0176.html#support
         this.connection.disco.addNode('urn:xmpp:jingle:1', {});
         this.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:1', {});
         this.connection.disco.addNode('urn:xmpp:jingle:transports:ice-udp:1', {});
-        this.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:audio', {});
-        this.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:video', {});
 
-        // this is dealt with by SDP O/A so we don't need to annouce this
-        //this.connection.disco.addFeature('urn:xmpp:jingle:apps:rtp:rtcp-fb:0'); // XEP-0293
-        //this.connection.disco.addFeature('urn:xmpp:jingle:apps:rtp:rtp-hdrext:0'); // XEP-0294
         this.connection.disco.addNode('urn:ietf:rfc:5761', {}); // rtcp-mux
         //this.connection.disco.addNode('urn:ietf:rfc:5888', {}); // a=group, e.g. bundle
         //this.connection.disco.addNode('urn:ietf:rfc:5576', {}); // a=ssrc
+        function addAudioCaps() {
+            self.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:audio', {});
+        }
+        function addVideoCaps() {
+            self.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:video', {});
+        }
+        
+        if (RTC.MediaStreamTrack && RTC.MediaStreamTrack.getSources) {
+            RTC.MediaStreamTrack.getSources(function(sources) {
+                var hasAudio = false;
+                var hasVideo = false;
+                for (var i=0; i<sources.length; i++) {
+                    var s = sources[i];
+                    if (s.kind === 'audio')
+                        hasAudio = true;
+                    else if (s.kind === 'video')
+                        hasVideo = true;
+                }
+            if (hasAudio)
+                addAudioCaps();
+            if (hasVideo)
+                addVideoCaps();
+            });
+        } else { //if we can't detect, we assume we have both
+            addAudioCaps();
+            addVideoCaps();
+        }
+    },
+    rtcInit: function() {
+        if (RTC)
+            return;
+        RTC = new WebrtcApi;
+        if (RtcOptions && RtcOptions.NO_DTLS)
+        {
+            RTC.pc_constraints.optional.forEach(function(opt)
+            {
+                if (opt.DtlsSrtpKeyAgreement)
+                    delete opt.DtlsSrtpKeyAgreement;
+            });
+        }
     },
     statusChanged: function (status, condition) {
         if (status === Strophe.Status.CONNECTED) {
-        this.registerDiscoCaps();
             this.connection.addHandler(this.onJingle.bind(this), 'urn:xmpp:jingle:1', 'iq', 'set', null, null);
             this.connection.addHandler(this.onIncomingCallMsg.bind(this), null, 'message', 'megaCall', null, null);
         }

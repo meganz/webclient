@@ -341,8 +341,22 @@ var MegaChat = function() {
         }
         self.renderMyStatus();
         self.renderChatStatus();
-
     });
+
+    // Disco capabilities updated
+    this.karere.bind("onDiscoCapabilities", function(e, eventData) {
+        var $treeElement = $('#treesub_contacts li a[data-jid="' + eventData.userBareJid + '"]');
+
+        $.each(eventData.capabilities, function(capability, capable) {
+            if(capable) {
+                $treeElement.addClass('chat-capability-' + capability);
+            } else {
+                $treeElement.removeClass('chat-capability-' + capability);
+            }
+        })
+    });
+
+    // Invite messages
     this.karere.bind("onInviteMessage", function(e, eventData) {
         if(eventData.myOwn === true) {
             e.stopPropagation();
@@ -617,62 +631,57 @@ MegaChat.prototype.init = function() {
         self.renderMyStatus();
     }
 
-    // Initialize RTC
-    if(!MegaChat.rtcIsInitialized) {
-        RtcSession.globalInit();
-        MegaChat.rtcIsInitialized = true; // static var!
+    try {
+        self.rtc = self.karere.connection.rtc = new RtcSession(self.karere.connection, self.options.rtcSession);
+
+        // bind rtc events
+        var rtcEventProxyToRoom = function(e, eventData) {
+            console.debug("RTC: ", e, eventData);
+
+            var peer = eventData.peer;
+
+            if(peer) {
+                var fromBareJid = Karere.getNormalizedBareJid(peer);
+                if(fromBareJid == self.karere.getBareJid()) {
+                    console.warn("Ignoring my own incoming request.");
+
+                    return;
+                }
+                var $promise = self.openChat([fromBareJid], "private");
+
+                $promise.done(function(roomJid, room) {
+                    room.trigger(e, eventData);
+                });
+            } else {
+                // local-stream-obtained = most likely this is the currently active window/room
+                var room = self.getCurrentRoom();
+                if(room) {
+                    room.trigger(e, eventData);
+                }
+            }
+
+
+            // TODO: Multi group calls?
+        };
+
+        $(self.rtc).on('call-incoming-request', rtcEventProxyToRoom);
+        $(self.rtc).on('call-answered', rtcEventProxyToRoom);
+        $(self.rtc).on('call-declined', rtcEventProxyToRoom);
+        $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
+        $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
+        $(self.rtc).on('media-recv', rtcEventProxyToRoom);
+        $(self.rtc).on('local-stream-obtained', rtcEventProxyToRoom);
+        $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
+        $(self.rtc).on('local-player-remove', rtcEventProxyToRoom);
+        $(self.rtc).on('local-media-fail', rtcEventProxyToRoom);
+        $(self.rtc).on('call-init', rtcEventProxyToRoom);
+        $(self.rtc).on('call-ended', rtcEventProxyToRoom);
+        $(self.rtc).on('muted', rtcEventProxyToRoom);
+        $(self.rtc).on('unmuted', rtcEventProxyToRoom);
+
+    } catch(e) {
+        // no RTC support.
     }
-
-
-    self.rtc = self.karere.connection.rtc = new RtcSession(self.karere.connection, self.options.rtcSession);
-
-
-    // bind rtc events
-
-
-    var rtcEventProxyToRoom = function(e, eventData) {
-        console.debug("RTC: ", e, eventData);
-
-        var peer = eventData.peer;
-
-        if(peer) {
-            var fromBareJid = Karere.getNormalizedBareJid(peer);
-            if(fromBareJid == self.karere.getBareJid()) {
-                console.warn("Ignoring my own incoming request.");
-
-                return;
-            }
-            var $promise = self.openChat([fromBareJid], "private");
-
-            $promise.done(function(roomJid, room) {
-                room.trigger(e, eventData);
-            });
-        } else {
-            // local-stream-obtained = most likely this is the currently active window/room
-            var room = self.getCurrentRoom();
-            if(room) {
-                room.trigger(e, eventData);
-            }
-        }
-
-
-        // TODO: Multi group calls?
-    };
-
-    $(self.rtc).on('call-incoming-request', rtcEventProxyToRoom);
-    $(self.rtc).on('call-answered', rtcEventProxyToRoom);
-    $(self.rtc).on('call-declined', rtcEventProxyToRoom);
-    $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
-    $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
-    $(self.rtc).on('media-recv', rtcEventProxyToRoom);
-    $(self.rtc).on('local-stream-obtained', rtcEventProxyToRoom);
-    $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
-    $(self.rtc).on('local-player-remove', rtcEventProxyToRoom);
-    $(self.rtc).on('local-media-fail', rtcEventProxyToRoom);
-    $(self.rtc).on('call-init', rtcEventProxyToRoom);
-    $(self.rtc).on('call-ended', rtcEventProxyToRoom);
-    $(self.rtc).on('muted', rtcEventProxyToRoom);
-    $(self.rtc).on('unmuted', rtcEventProxyToRoom);
 
     // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
     self.plugins = {};
@@ -1887,6 +1896,8 @@ MegaChatRoom.prototype.refreshUI = function() {
 
     $('.fm-chat-user', this.$header).text(this.roomJid.split("@")[0]);
 
+    var participants = self.getParticipantsExceptMe();
+
     if(self.type == "private") {
         $.each(self.users, function(k, v) {
             var $element = $('#treesub_contacts li a[data-jid="' + v + '"]');
@@ -1895,7 +1906,6 @@ MegaChatRoom.prototype.refreshUI = function() {
     }
 
     if(self.type == "private") {
-        var participants = self.getParticipantsExceptMe();
 
         assert(participants[0], "No participants found.");
 
@@ -1941,7 +1951,21 @@ MegaChatRoom.prototype.refreshUI = function() {
         if(presenceCssClass == "offline") {
             $('.btn-chat-call', self.$header).hide();
         } else {
-            $('.btn-chat-call', self.$header).show();
+            var haveCallCapability = false;
+            $.each(participants, function(k, p) {
+               var capabilities = self.megaChat.karere.getCapabilities(p);
+
+               if(!capabilities) {
+                   return; // continue;
+               }
+               if(capabilities['audio'] || capabilities['video']) {
+                   haveCallCapability = true;
+               }
+            });
+
+            if(haveCallCapability) {
+                $('.btn-chat-call', self.$header).show();
+            }
         }
     }
 };
@@ -2509,7 +2533,7 @@ MegaChatRoom.prototype.sendMessage = function(message) {
         var eventData = {
             from: self.megaChat.karere.getJid(),
             roomJid: self.roomJid,
-            message: message,
+            message: message
         };
 
         self.megaChat.trigger(event, eventData);

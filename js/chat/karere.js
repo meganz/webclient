@@ -118,12 +118,24 @@ var Karere = function(user_options) {
         /**
          * The default affiliation set when adding new users in membersOnly rooms.
          */
-        newUsersAffiliation: "owner"
+        newUsersAffiliation: "owner",
+
+        /**
+         * Default capabilities and their settings (used when initializing the local disco capab. cache)
+         */
+        defaultCapabilities: {
+            'audio': false,
+            'video': false,
+            'karere': false
+        }
     };
     self.options = $.extend(true, {}, defaults, user_options);
 
     self.connection = new Strophe.Connection(self.options.boshServiceUrl, self.options.stropheOptions);
     self.connection.karere = self;
+
+    self.connection.disco.addNode('karere', {}); // identify as a Karere client.
+
 
     if(localStorage.dxmpp == 1) {
         self.connection.rawInput = function (data) {
@@ -181,9 +193,13 @@ var Karere = function(user_options) {
     });
 
 
-    // Local in-memory Presence cache implementation
+    // Local in-memory Presence & Disco cache implementation
     self._presenceCache = {};
     self._presenceBareCache = {};
+
+    self._discoCache = {};
+    self._discoBareCache = {};
+
 
     self.bind("onPresence", function(e, eventData) {
         var bareJid = Karere.getNormalizedBareJid(eventData.from);
@@ -191,8 +207,13 @@ var Karere = function(user_options) {
         if(eventData.show != "unavailable") {
             self._presenceCache[eventData.from] = eventData.show ? eventData.show : "available";
             self._presenceBareCache[bareJid] = eventData.show ? eventData.show : "available";
+
+            if(!self._discoCache[eventData.from]) {
+                self._requestDiscoCapabilities(eventData.from);
+            }
         } else {
             delete self._presenceCache[eventData.from];
+            delete self._discoCache[eventData.from];
 
             var foundPresenceForOtherDevices = false;
             $.each(self._presenceCache, function(fullJid, pres) {
@@ -201,8 +222,16 @@ var Karere = function(user_options) {
                     return false;
                 }
             });
+
             if(!foundPresenceForOtherDevices) {
                 delete self._presenceBareCache[bareJid];
+                delete self._discoBareCache[bareJid];
+
+                self.trigger('onDiscoCapabilities', [{
+                    'userJid': eventData.from,
+                    'userBareJid': bareJid,
+                    'capabilities': $.extend({}, self.options.defaultCapabilities)
+                }]);
             }
         }
     });
@@ -1805,7 +1834,82 @@ makeMetaAware(Karere);
         );
 
         return self.waitForUserToJoin(roomJid, self.getJid());
-    }
+    };
+
+
+    /**
+     * Send and process a request/response to fullJid for disco capabilities
+     *
+     * @param fullJid
+     * @private
+     */
+    Karere.prototype._requestDiscoCapabilities = function(fullJid) {
+        var self = this;
+        var meta = $.extend({}, self.options.defaultCapabilities);
+
+        self.connection.disco.info(fullJid, function(response) {
+            meta['audio'] = $('feature[var="urn:xmpp:jingle:apps:rtp:audio"]', response).size() > 0;
+            meta['video'] = $('feature[var="urn:xmpp:jingle:apps:rtp:video"]', response).size() > 0;
+            meta['karere'] = $('feature[var="karere"]', response).size() > 0;
+
+            self._discoCache[fullJid] = meta;
+
+            self._reindexDiscoBareCapabilities(fullJid);
+        });
+    };
+
+
+    /**
+     * This method will go thru all resources based on `fullJid` and generate a index
+     * of all features available across them
+     *
+     * @param fullJid
+     * @private
+     */
+    Karere.prototype._reindexDiscoBareCapabilities = function(fullJid) {
+        var self = this;
+
+        var bareJid = Karere.getNormalizedBareJid(fullJid);
+
+        if(!self._discoBareCache[bareJid]) {
+            self._discoBareCache[bareJid] = $.extend({}, self.options.defaultCapabilities);
+        }
+
+        // merge only `true` values
+        $.each(self._discoCache, function(fJid, meta) {
+            if(fJid.indexOf(bareJid) === 0) {
+                $.each(meta, function(k, capable) {
+                    if(capable && !self._discoBareCache[bareJid][k]) {
+                        self._discoBareCache[bareJid][k] = capable; // true
+                    }
+                });
+            }
+        });
+        self.trigger('onDiscoCapabilities', [{
+            'userJid': fullJid,
+            'userBareJid': bareJid,
+            'capabilities': self._discoBareCache[bareJid]
+        }]);
+    };
+
+
+    /**
+     * Retrieve cached capabilities for user with jid = `jid`
+     * If a bare jid is passed, the result will be a merged list of all user's devices/resources
+     * and their capabilities
+     *
+     * @param jid can be full jid or a bare jid
+     * @returns {*}
+     */
+    Karere.prototype.getCapabilities = function(jid) {
+        var self = this;
+
+        if(jid.indexOf("/") == -1) {
+            return self._discoBareCache[jid];
+        } else {
+            return self._discoCache[jid];
+        }
+    };
 }
 
 

@@ -68,7 +68,7 @@ var chatui;
                 var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - 80;
                 if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight())
                 {
-                    $('.fm-chat-message-scroll').height(scrollBlockHeight);
+                   
                     megaChat.resized();
                 }
 

@@ -2001,7 +2001,7 @@ MegaChatRoom.prototype.show = function() {
     var $lastMsg = $('.fm-chat-messages-block:last');
     if($jsp && $lastMsg.size() > 0) {
         $jsp.scrollToElement(
-            $('.fm-chat-messages-block:last')
+            $('.fm-chat-typing-txt')
         );
     }
 };
@@ -2150,7 +2150,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 
     $jsp.reinitialise();
     $jsp.scrollToElement(
-        $message
+        $('.fm-chat-typing-txt')
     );
 
     // update unread messages count

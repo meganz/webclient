@@ -4915,7 +4915,7 @@ th.grid-first-th {
 span.search-number {
 	background-color: #22A6E5;
 	height: 14px;
-	line-height: 12px;
+	line-height: 13px;
 	font-size: 11px;
 	color: white;
 	margin: 6px 0 0 9px;
@@ -5420,7 +5420,12 @@ div .fm-tree-folder.dragover {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-bottom: 30px;
+}
+.fm-chat-message-scroll .jspPane {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-bottom:30px !important;
 }
 .fm-chat-message a {
 	color: #D21F00;

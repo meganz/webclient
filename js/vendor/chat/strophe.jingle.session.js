@@ -52,10 +52,10 @@ JingleSession.prototype.initiate = function(isInitiator)
     this.initiator = isInitiator ? this.me : this.peerjid;
     this.responder = !isInitiator ? this.me : this.peerjid;
     
-    console.log('create PeerConnection ' + JSON.stringify(this.ice_config));
+    //console.log('create PeerConnection ' + JSON.stringify(this.ice_config));
     try {
         this.peerconnection = new RTC.peerconnection(this.ice_config, this.pc_constraints);
-        console.log('Created RTCPeerConnnection');
+        //console.log('Created RTCPeerConnnection');
     } catch (e) {
         console.error('Failed to create PeerConnection, exception: ', e.stack);
         return;
@@ -96,7 +96,7 @@ JingleSession.prototype.initiate = function(isInitiator)
     };
 };
 
-JingleSession.prototype.accept = function () {
+JingleSession.prototype.accept = function (cb) {
     var ob = this;
     this.state = 'active';
 
@@ -125,7 +125,6 @@ JingleSession.prototype.accept = function () {
            responder: this.responder,
            sid: this.sid });
     prsdp.toJingle(accept, this.initiator == this.me ? 'initiator' : 'responder');
-    this.sendIq(accept, 'answer');
 
     var sdp = this.peerconnection.localDescription.sdp;
     while (SDPUtil.find_line(sdp, 'a=inactive')) {
@@ -134,10 +133,11 @@ JingleSession.prototype.accept = function () {
     }
     this.peerconnection.setLocalDescription(new RTC.RTCSessionDescription({type: 'answer', sdp: sdp}),
         function () {
-            console.log('setLocalDescription success');
+            this.sendIq(accept, 'answer', cb,
+              function() {this.reportError({type:'jingle', op:'sendIq session-accept'})});
         },
         function (e) {
-            this.reportError({type: jingle, op:'setLocalDescription'}, e);
+            this.reportError({type: 'jingle', op:'setLocalDescription'}, e);
         }
     );
 };
@@ -248,7 +248,7 @@ JingleSession.prototype.sendIceCandidate = function (candidate) {
             debugLog("sent ICE candidates to", this.peerjid);
         } //end if (useTrickle)
     } else { //if (candidate && !this.lasticecandidate)
-        console.log('sendIceCandidate: last candidate.');
+        //console.log('sendIceCandidate: last candidate.');
         if (!this.usetrickle) {
             console.log('should send full offer now...');
             var action = (this.peerconnection.localDescription.type == 'offer') ? 'session-initiate' : 'session-accept';
@@ -277,7 +277,7 @@ JingleSession.prototype.sendIceCandidate = function (candidate) {
 };
 
 JingleSession.prototype.sendOffer = function (cb) {
-    console.log('sendOffer...');
+    //console.log('sendOffer...');
     var ob = this;
     this.peerconnection.createOffer(function (sdp) {
             ob.createdOffer(sdp, cb);
@@ -290,13 +290,13 @@ JingleSession.prototype.sendOffer = function (cb) {
 };
 
 JingleSession.prototype.createdOffer = function (sdp, cb) {
-    console.log('createdOffer', sdp);
+    //console.log('createdOffer', sdp);
     var self = this;
     this.localSDP = new SDP(sdp.sdp);
     //this.localSDP.mangle();
     sdp.sdp = this.localSDP.raw;
     this.peerconnection.setLocalDescription(sdp, function () {
-      console.log('setLocalDescription success');
+      //console.log('setLocalDescription success');
       if (self.usetrickle) {
         var init = $iq({to: self.peerjid, type: 'set'})
           .c('jingle', {xmlns: 'urn:xmpp:jingle:1',
@@ -331,7 +331,7 @@ JingleSession.prototype.createdOffer = function (sdp, cb) {
 
 JingleSession.prototype.setRemoteDescription = function (elem, desctype, successCb, failCb)
 {
-    console.log('setting remote description... ', desctype);
+//    console.log('setting remote description... ', desctype);
     this.remoteSDP = new SDP('');
     this.remoteSDP.fromJingle(elem);
     if (this.peerconnection.remoteDescription !== null) {
@@ -363,14 +363,13 @@ JingleSession.prototype.setRemoteDescription = function (elem, desctype, success
     }
     var remotedesc = new RTC.RTCSessionDescription({type: desctype, sdp: this.remoteSDP.raw});
      
-    console.log('setRemoteDescription for session', this.sid);
+    //console.log('setRemoteDescription for session', this.sid);
 //setRemoteDescription() takes some time on Firefox, and meanwhile ICE candidated start
 //being processed - the code thinks that ICE candidates start arriving before the answer,
 //and tries to use pranswer
     this.peerconnection.setRemoteDescription(remotedesc,
         function ()
         {
-            console.log('setRemoteDescription success');
             successCb();
         },
         function (e) 
@@ -534,7 +533,6 @@ JingleSession.prototype.createdAnswer = function (sdp, cb, provisional) {
         function () {
             if (cb)
                 cb();
-  //          console.log('setLocalDescription success');
         },
         function (e) {
             this.reportError({type:'webrtc', op:'setLocalDescription'}, e);
@@ -724,5 +722,5 @@ MutedState.prototype.set = function(audio, video) {
 }
 
 function debugLog() {
-    console.log.apply(console, arguments);
+//    console.log.apply(console, arguments);
 }

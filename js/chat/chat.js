@@ -2136,6 +2136,11 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         name
     );
 
+    // add .current-name if this is my own message
+    if(jid == self.megaChat.karere.getBareJid()) {
+        $('.fm-chat-username', $message).addClass("current-name");
+    }
+
     $('.fm-chat-message-time', $message).text(
         unixtimeToTimeString(message.timestamp)
     );
@@ -2221,6 +2226,16 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 //        console.log("after: ", message.message, $after.text());
         $message.insertAfter($after);
     }
+
+    // group messages by hidding the author's name
+    var $authorElement = $('.fm-chat-username', $message);
+    var $prevMessage = $message.prev();
+    if($authorElement.size() > 0 && $prevMessage.is(".fm-chat-messages-block")) {
+        if($('.fm-chat-username', $prevMessage).text() == $authorElement.text()) {
+            $message.addClass('grouped-message');
+        }
+    }
+
 
     $jsp.reinitialise();
     $jsp.scrollToElement(

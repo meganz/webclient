@@ -5603,6 +5603,14 @@ div .fm-tree-folder.dragover {
 .fm-chat-messages-pad {
 	margin-left: 203px;
 }
+
+.fm-chat-messages-block.grouped-message .fm-chat-username {
+    visibility: hidden;
+}
+.fm-chat-messages-block.grouped-message {
+    border-top: 0;
+}
+
 .fm-chat-message-time {
 	width: 90px;
 	float: right;

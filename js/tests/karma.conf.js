@@ -9,6 +9,7 @@ module.exports = function(config) {
             "vendor/sinon-1.7.3.js",
 
             "../jquery-min-1.8.1.js",
+            "../jquery-ui.js",
 
              "../functions.js",
 //             "../asmcrypto.js",

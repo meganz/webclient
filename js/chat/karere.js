@@ -1896,7 +1896,7 @@ makeMetaAware(Karere);
     /**
      * Retrieve cached capabilities for user with jid = `jid`
      * If a bare jid is passed, the result will be a merged list of all user's devices/resources
-     * and their capabilities
+     * and their capabilities combined in
      *
      * @param jid can be full jid or a bare jid
      * @returns {*}

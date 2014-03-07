@@ -274,9 +274,10 @@ function initUI()
 			var c = $(e.target).attr('class');			
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');			
 		}
-		
+
+
 		if (ids.length && t) dd = ddtype(ids,t);
-		
+
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
 		{			
@@ -311,13 +312,21 @@ function initUI()
 				}			
 			},1000);
 			
-			
+
+
 			if (t == M.RubbishID) $('.dragger-block').addClass('warning');
 			else if (dd == 'move') $('.dragger-block').addClass('move');
 			else if (dd == 'copy') $('.dragger-block').addClass('copy');
+            else if($(e.target).parents('.fm-chat-block').size() > 0) {
+                // drag over a chat window
+                //TODO: Missing css for drag-share
+                $('.dragger-block').addClass('share');
+            }
 			else $('.dragger-block').addClass('drag');
+
 			$(e.target).addClass('dragover');
 		}
+
 		if (a == 'drop' && dd) 
 		{
 			if (dd == 'move')
@@ -342,7 +351,16 @@ function initUI()
 				},50);
 			}
 			$('.dragger-block').hide();	
-		}
+		} else if(a == 'drop' && !dd && $(e.target).parents('.fm-chat-block').size() > 0) {
+            $(ui.draggable).draggable( "option", "revert", false );
+
+            // drop over a chat window
+            var currentRoom = megaChat.getCurrentRoom();
+            assert(currentRoom, 'Current room missing - this drop action should be impossible.');
+            currentRoom.attachNodes(ids);
+
+            $('.dragger-block').hide();
+        }
 	};
 	InitFileDrag();
 	createfolderUI();

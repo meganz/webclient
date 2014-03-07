@@ -1325,6 +1325,27 @@ var MegaChatRoom = function(megaChat, roomJid) {
     this.$messages = megaChat.$messages_tpl.clone();
     this.$header = megaChat.$header_tpl.clone();
 
+    var droppableConfig = {
+        tolerance: 'pointer',
+        drop: function(e, ui)
+        {
+            $.doDD(e,ui,'drop',1);
+        },
+        over: function (e, ui)
+        {
+            $.doDD(e,ui,'over',1);
+        },
+        out: function (e, ui)
+        {
+            var c1 = $(e.srcElement).attr('class'),c2 = $(e.target).attr('class');
+            if (c2 && c2.indexOf('fm-menu-item') > -1 && c1 && (c1.indexOf('cloud') > -1 || c1.indexOf('cloud') > -1)) return false;
+            $.doDD(e,ui,'out',1);
+        }
+    };
+
+    this.$messages.droppable(droppableConfig);
+    this.$header.droppable(droppableConfig);
+
     // Events
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
@@ -2222,7 +2243,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
     }
 };
 
-
+//TODO: Docs
 MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageContents, buttons, read) {
     var self = this;
 
@@ -2257,6 +2278,7 @@ MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageConte
     return $inlineDialog;
 };
 
+//TODO: Docs
 MegaChatRoom.prototype.getInlineDialogInstance = function(type) {
     var self = this;
 
@@ -2499,13 +2521,12 @@ MegaChatRoom.prototype.getNavElement = function() {
  * Send message to this room
  *
  * @param message {String}
+ * @param [meta] {Object}
  */
-MegaChatRoom.prototype.sendMessage = function(message) {
+MegaChatRoom.prototype.sendMessage = function(message, meta) {
     var self = this;
     var megaChat = this.megaChat;
-
-
-    message.roomJid = self.roomJid;
+    meta = meta || {};
 
     if(self.state != MegaChatRoom.STATE.READY) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
@@ -2513,7 +2534,7 @@ MegaChatRoom.prototype.sendMessage = function(message) {
             from: megaChat.karere.getJid(),
             message: message,
             timestamp: unixtime(),
-            meta: {},
+            meta: meta,
             id: messageId
         };
 
@@ -2537,7 +2558,8 @@ MegaChatRoom.prototype.sendMessage = function(message) {
         var eventData = {
             from: self.megaChat.karere.getJid(),
             roomJid: self.roomJid,
-            message: message
+            message: message,
+            meta: meta
         };
 
         self.megaChat.trigger(event, eventData);
@@ -2546,12 +2568,34 @@ MegaChatRoom.prototype.sendMessage = function(message) {
             return false;
         }
 
-        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message);
+        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message, meta);
     }
 };
 
+/**
+ * Helper for accessing options.mediaOptions;
+ *
+ * @returns {*}
+ */
 MegaChatRoom.prototype.getMediaOptions = function() {
     return this.options.mediaOptions;
+};
+/**
+ * Attach/share (send as message) file/folder nodes to the chat
+ * @param ids
+ * @param [message]
+ */
+MegaChatRoom.prototype.attachNodes = function(ids, message) {
+    var self = this;
+    message = message || "Shared files/folders:";
+
+    if(ids.length == 0) {
+        return;
+    }
+
+    return self.sendMessage(message, {
+        'attached': ids
+    });
 };
 
 window.megaChat = new MegaChat();

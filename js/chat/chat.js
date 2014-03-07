@@ -68,7 +68,7 @@ var chatui;
                 var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - 80;
                 if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight())
                 {
-                    $('.fm-chat-message-scroll').height(scrollBlockHeight);
+                   
                     megaChat.resized();
                 }
 
@@ -2075,7 +2075,7 @@ MegaChatRoom.prototype.show = function() {
     var $lastMsg = $('.fm-chat-messages-block:last');
     if($jsp && $lastMsg.size() > 0) {
         $jsp.scrollToElement(
-            $('.fm-chat-messages-block:last')
+            $('.fm-chat-typing-txt')
         );
     }
 };
@@ -2224,7 +2224,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 
     $jsp.reinitialise();
     $jsp.scrollToElement(
-        $message
+        $('.fm-chat-typing-txt')
     );
 
     // update unread messages count

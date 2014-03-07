@@ -3094,7 +3094,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
 	background-position: 10px -8763px;
 }
 .fm-tree-folder.contact.busy-status, .fm-tree-folder.contact.busy-status.active.dragover, .fm-tree-folder.contact.black-busy.dragover, .fm-tree-folder.contact.busy-status.active, .fm-tree-folder.contact.busy-status.expanded.active, .fm-tree-folder.contact.busy-status.opened.active {
-	background-position: 10px -9948px;
+	background-position: 10px -10347px;
 }
 .fm-tree-folder span {
 	display: block;
@@ -4915,7 +4915,7 @@ th.grid-first-th {
 span.search-number {
 	background-color: #22A6E5;
 	height: 14px;
-	line-height: 12px;
+	line-height: 13px;
 	font-size: 11px;
 	color: white;
 	margin: 6px 0 0 9px;
@@ -5420,7 +5420,12 @@ div .fm-tree-folder.dragover {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-bottom: 30px;
+}
+.fm-chat-message-scroll .jspPane {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-bottom:30px !important;
 }
 .fm-chat-message a {
 	color: #D21F00;
@@ -5479,7 +5484,7 @@ div .fm-tree-folder.dragover {
 	position: relative;
 }
 .fm-chat-top-verified {
-	background-image: url(../images/mega/chat-sprite.png);
+	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: -1px -447px;
 	background-repeat: no-repeat;
 	width: 22px;
@@ -5681,14 +5686,14 @@ div .fm-tree-folder.dragover {
 .fm-chat-file-button.verify-button, .fm-chat-file-button.skip-button {
 	margin: 9px 10px 0 0;
 }
-.fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head {
+.fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head, .fm-chat-missed-call, .fm-chat-rejected-call, .fm-chat-call-started, .fm-chat-call-ended, .fm-chat-different-device-call {
 	font-size: 15px;
 	line-height: 21px;
-	padding: 8px 40px 12px 40px;
+	padding: 8px 40px 12px 43px;
 	color: #666666;
 	font-family: 'Open Sans Semibold';
-	background-image: url(../images/mega/chat-sprite.png);
-	background-position: 0 -39px;
+	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-position: 0 -37px;
 	background-repeat: no-repeat;
 }
 .fm-chat-verification-skipped {
@@ -5697,6 +5702,22 @@ div .fm-tree-folder.dragover {
 .fm-chat-verified-head {
 	background-position: 0 -300px;
 }
+.fm-chat-missed-call {
+	background-position: -22px -1115px;
+}
+.fm-chat-rejected-call {
+	background-position: -20px -1179px;
+}
+.fm-chat-call-started {
+	background-position: -21px -1236px;
+}
+.fm-chat-call-ended {
+	background-position: -21px -1296px;
+}
+.fm-chat-different-device-call {
+	background-position: -21px -1357px;
+}
+
 .user {
 	color: #333333;
 	cursor: default;
@@ -5972,7 +5993,7 @@ div .fm-tree-folder.dragover {
 	width: 18px;
 	height: 12px;
 	position: absolute;
-	background-image: url(../images/mega/chat-sprite.png);
+	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: -12px -516px;
 	background-repeat: no-repeat;
 	margin: -22px 0 0 -9px;
@@ -5999,7 +6020,7 @@ div .fm-tree-folder.dragover {
 	cursor: pointer;
 }
 .fm-chat-download-icon {
-	background-image: url(../images/mega/chat-sprite.png);
+	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: center -619px;
 	background-repeat: no-repeat;
 	height: 62px;
@@ -6086,7 +6107,7 @@ div .fm-tree-folder.dragover {
 /** end of debug emoticons **/
 
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
-	background-image: url(../images/mega/chat-sprite.png);
+	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 	width: 10px;
@@ -14779,7 +14800,7 @@ background-size:27px auto;
  background-position: 0 -10573px;
 }
 .fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head, .fm-chat-download-arrow, .fm-chat-download-icon {
- background-image: url(../images/mega/chat-sprite@2x.png);
+ background-image: url(../images/mega/chat-sprite@2x.png?v=1);
  background-size:72px auto;
 }
  .dragger-icon, .export-icon, .new-download-file-icon {

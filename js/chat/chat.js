@@ -150,19 +150,17 @@ var chatui;
             $('.fm-chat-download-popup').addClass('hidden');
         });
 
-        $('.fm-add-user').unbind('click');
-        $('.fm-add-user').bind('click', function()
+
+
+        $('.fm-add-user').unbind('click.megaChat');
+        $('.fm-add-user').bind('click.megaChat', function()
         {
+            // This was causing a bug for the "Add contact" popup (in the #fm/contacts) because that button have the
+            // same .fm-add-user class names
+
             var positionX = $(this).position().left;
             var addUserPopup = $('.fm-add-contact-popup');
-            if ($(this).attr('class').indexOf('active') > -1)
-            {
-                $(addUserPopup).addClass('hidden');
-                $(this).removeClass('active');
-            }
-            else
-            {
-                $(addUserPopup).removeClass('hidden');
+            if ($(this).attr('class').indexOf('active') == -1) {                $(addUserPopup).removeClass('hidden');
                 $(this).addClass('active');
                 $(addUserPopup).css('left', positionX -8 + 'px');
             }

@@ -60,7 +60,7 @@ function ul_deduplicate(File, identical) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
 				onUploadSuccess(uq.pos);
-				ul_uploading = false
+				file.done_starting();
 			} else {
 				api_completeupload2({
 					callback: api_completeupload2, 
@@ -75,7 +75,7 @@ function ul_deduplicate(File, identical) {
 						callback:ul_completepending2
 					}
 				},ctx.uq);
-				ul_uploading = false
+				file.done_starting();
 			}
 		}
 	});
@@ -119,45 +119,48 @@ function ul_get_posturl(File) {
 }
 
 function ul_upload(File) {
-	var ul_key, i
-		, file = File.file
+	var i, file = File.file
 
 	if (file.repair) {
-		ul_key = file.repair;
-		ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]	
+		file.ul_key = file.repair;
+		file.ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]	
 	} else {
-		ul_key = Array(6);
+		file.ul_key = Array(6);
 		// generate ul_key and nonce
-		for (i = 6; i--; ) ul_key[i] = rand(0x100000000);
+		for (i = 6; i--; ) file.ul_key[i] = rand(0x100000000);
 	}
 
-	var ul_keyNonce = JSON.stringify(ul_key)
-		, ul_macs = []
-		, totalbytessent = 0
-		, p, pp
-		, ul_readq  = []
-		, ul_plainq = {}
-		, ul_intransit = 0
-		, ul_inflight = {}
-		, ul_sendchunks = {};
+	file.ul_keyNonce = JSON.stringify(file.ul_key)
+	file.ul_macs = []
+	file.totalbytessent = 0
+	file.ul_readq  = []
+	file.ul_plainq = {}
+	file.ul_intransit = 0
+	file.ul_inflight = {}
+	file.ul_sendchunks = {};
+	file.ul_aes = new sjcl.cipher.aes([
+		file.ul_key[0],file.ul_key[1],file.ul_key[2],file.ul_key[3]
+	]);
 
 	if (file.size) {
-		p = 0;
-		for (i = 1; i <= 8 && p < file.size-i*131072; i++) {
-			ul_readq[p] = i*131072;
+		var pp, p = 0;
+		for (i = 1; i <= 8 && p < file.size-i*ul_block_size; i++) {
+			ulQueue.push(new ChunkUpload(file, p, i*ul_block_size))
 			pp 	= p;
-			p += ul_readq[p];
+			p += i * ul_block_size
 		}
 
 		while (p < file.size) {
-			ul_readq[p] = 1048576;
+			ulQueue.push(new ChunkUpload(file, p, ul_block_extra_size));
 			pp 	= p;
-			p += ul_readq[p];
+			p += ul_block_extra_size
 		}
 
-		if (!(ul_readq[pp] = file.size-pp) && file.size) delete file.ul_readq[pp];
+		if (file.size-pp) {
+			ulQueue.push(new ChunkUpload(file, pp, file.size-pp))
+		}
 	} else {
-		ul_readq[0] = 0;
+		ulQueue.push(new ChunkUpload(file, 0,  0));
 	}
 
 	if (is_image(file.name)) {
@@ -166,6 +169,8 @@ function ul_upload(File) {
 	}
 
 	onUploadStart(file.pos);
+	
+	file.done_starting();
 }
 
 
@@ -189,6 +194,21 @@ function ul_start(File) {
 	});
 }
 
+function ChunkUpload(file, start, bytes)
+{
+	var self = this;
+	this.file = file;
+	this.ul   = file;
+
+	this.run = function(next) {
+		DEBUG("here ", start, bytes);
+		var read = { start: start, bytes: bytes}
+		file.ul_reader.push(read, function() {
+			alert(read.bytes);
+		});
+	}
+}
+
 function FileUpload(file) {
 	var self = this;
 	this.file = file;
@@ -197,8 +217,16 @@ function FileUpload(file) {
 	this.run = function(next) {
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
+		if (ul_uploading) {
+			return next.reschedule();
+		}
 
 		ul_uploading = true;
+
+		file.done_starting = function() {
+			ul_uploading = false;
+			next.done();
+		};
 
 		try {
 			fingerprint(file, function(hash, ts) {
@@ -221,14 +249,39 @@ UploadQueue.prototype.push = function() {
 
 	file.pos = pos;
 
-	var ul_reader = new FileReader;
+	file.ul_reader = ul_filereader(new FileReader, file);
 	ulQueue.push(new FileUpload(file));
 
 	return pos+1;
 };
 
+function ul_filereader(fs, file) {
+	return new QueueClass(function(task) {
+		var Scheduler = this;
+		if (fs.readyState == fs.LOADING) {
+			return this.reschedule();
+		}
+		if (file.slice || file.mozSlice) {
+			if (file.mozSlice) blob = file.mozSlice(task.start, task.end);
+			else blob = file.slice(task.start, task.end);
+			xhr_supports_typed_arrays = true;
+		} else {
+			blob = file.webkitSlice(task.start, start.end);
+		}
+
+		fs.pos = task.start;
+		fs.readAsArrayBuffer(blob);
+		fs.onloadend = function(evt) {
+			if (evt.target.readyState == FileReader.DONE) {
+				task.bytes = new Uint8Array(evt.target.result);
+				Scheduler.done();
+			}
+		}	
+	}, 1);
+}
+
 function worker_uploader(task) {
-	task.run(this.done);
+	task.run(this);
 }
 
 var ul_queue  = new UploadQueue
@@ -236,6 +289,9 @@ var ul_queue  = new UploadQueue
 	, ulQueue = new QueueClass(worker_uploader)
 	, ul_uploading = false
 	, ul_maxSpeed = 0
+	, ul_faid = 0
+	, ul_block_size = 131072
+	, ul_block_extra_size = 1048576
 
 if (localStorage.ul_maxSpeed) ul_maxSpeed=parseInt(localStorage.ul_maxSpeed);
 

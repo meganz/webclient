@@ -23,6 +23,12 @@ var DEFAULT_CONCURRENCY = 4
 
 	function Context(queue, args) {
 		this.task = args;
+		this.reschedule = function() {
+			this.done();
+			setTimeout(function() {
+				queue.push(args);
+			}, 100);
+		};
 		this.done = function() {
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {

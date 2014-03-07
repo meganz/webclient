@@ -1315,7 +1315,12 @@ var MegaChatRoom = function(megaChat, roomJid) {
         'mediaOptions': {
             audio: true,
             video: true
-        }
+        },
+
+        /**
+         * Should we add scrolling animation when a new message is received ?
+         */
+        'animateScrollOnNewMessage': true
     };
     this._syncRequests = {};
     this._messagesQueue = [];
@@ -1424,7 +1429,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         this.$messages
     );
 
-    this.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    this.$messages.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, animateDuration: 70});
 
 
     /**
@@ -1908,8 +1913,10 @@ MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
 
 /**
  * Refreshes the UI of the chat room.
+ *
+ * @param [scrollToBottom] boolean set to true if you want to automatically scroll the messages pane to the bottom
  */
-MegaChatRoom.prototype.refreshUI = function() {
+MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
     var self = this;
 
     this.$header.attr("data-room-jid", this.roomJid.split("@")[0]);
@@ -1918,6 +1925,12 @@ MegaChatRoom.prototype.refreshUI = function() {
     assert($jsp, "JSP not available?!");
 
     $jsp.reinitialise();
+
+    if(scrollToBottom) {
+        self.$messages.one('jsp-initialised', function() {
+            $jsp.scrollToBottom();
+        });
+    }
 
     $('.fm-chat-user', this.$header).text(this.roomJid.split("@")[0]);
 
@@ -2069,15 +2082,7 @@ MegaChatRoom.prototype.show = function() {
     $count.text('');
     $count.parent().hide();
 
-    self.refreshUI();
-
-    var $jsp = self.$messages.data('jsp');
-    var $lastMsg = $('.fm-chat-messages-block:last');
-    if($jsp && $lastMsg.size() > 0) {
-        $jsp.scrollToElement(
-            $('.fm-chat-typing-txt')
-        );
-    }
+    self.refreshUI(true /* scroll to bottom */);
 };
 
 
@@ -2238,9 +2243,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 
 
     $jsp.reinitialise();
-    $jsp.scrollToElement(
-        $('.fm-chat-typing-txt')
-    );
+    $jsp.scrollToBottom(self.options.animateScrollOnNewMessage);
 
     // update unread messages count
     if(self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {

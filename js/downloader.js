@@ -64,6 +64,12 @@ function getXhrObject(s) {
 	};
 	// }}}
 
+	xhr.upload.onprogress = function() {
+		if (aborted) return;
+		checkTimeout();
+		return xhr.upload_progress.apply(xhr, arguments);
+	}
+
 	xhr.onprogress = function() {
 		if (aborted) return;
 		checkTimeout();

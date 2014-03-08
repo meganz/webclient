@@ -268,6 +268,8 @@ UploadQueue.prototype.push = function() {
 	file.pos = pos;
 
 	file.ul_reader = ul_filereader(new FileReader, file);
+	file.progress  = {};
+	file.sent      = 0;
 	ulQueue.push(new FileUpload(file));
 
 	return pos+1;
@@ -275,10 +277,36 @@ UploadQueue.prototype.push = function() {
 
 function ul_chunk_upload(chunk, file, next) {
 	var xhr = getXhrObject();
-	xhr.failure = function(e, len) {
+	function ul_updateprogress() {
+		var tp = file.sent
+		$.each(file.progress, function(i, p) {
+			tp += p;
+		});
+		onUploadProgress(file.pos, tp, file.size);
+	}
+
+	xhr.upload_progress = function(e) {
+		file.progress[chunk.start] = e.loaded
+		ul_updateprogress();
 	};
 
-	xhr.ready = function() {
+	xhr.ready = function(e) {
+		if (this.status == 200 && typeof this.response == 'string' && this.statusText == 'OK') {
+			var response = this.response
+			if (response.length > 27) {
+				response = base64urldecode(response);
+			}
+			if (!response.length || response == 'OK' || response.length == 27) {
+				file.sent += chunk.end;
+				delete file.progress[chunk.start];
+				if (response.length == 27) {
+				}
+			}
+			//ul_chunkcomplete(this.upload.slot,this.pos,this.response);
+			return next.done();
+		}
+		ul_progress[chunk.start] = 0;
+		ul_updateprogress();
 	};
 
 	if (chromehack) {
@@ -334,6 +362,7 @@ var ul_queue  = new UploadQueue
 	, ul_faid = 0
 	, ul_block_size = 131072
 	, ul_block_extra_size = 1048576
+	, uldl_hold = false
 
 if (localStorage.ul_maxSpeed) ul_maxSpeed=parseInt(localStorage.ul_maxSpeed);
 

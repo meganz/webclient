@@ -194,17 +194,35 @@ function ul_start(File) {
 	});
 }
 
-function ChunkUpload(file, start, bytes)
+function ChunkUpload(file, start, end)
 {
 	var self = this;
 	this.file = file;
 	this.ul   = file;
 
 	this.run = function(next) {
-		DEBUG("here ", start, bytes);
-		var read = { start: start, bytes: bytes}
-		file.ul_reader.push(read, function() {
-			alert(read.bytes);
+		var chunk = { start: start, end: end}
+		file.ul_reader.push(chunk, function() {
+			var encrypter = new Worker('encrypter.js');
+			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
+			encrypter.onmessage = function(e) {
+				if (typeof e.data == 'string') {
+					if (e.data[0] == '[') file.ul_macs[start] = JSON.parse(e.data);
+					else DEBUG('WORKER:', e.data);
+				} else {
+					chunk.bytes = new Uint8Array(e.data.buffer || e.data);
+					chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
+					ul_chunk_upload(chunk, file, next);
+				}
+			};
+			encrypter.pos = start
+			encrypter.postMessage(file.ul_keyNonce);
+			encrypter.postMessage(start/16)
+			if (typeof MSBlobBuilder == "function") {
+				encrypter.postMessage(chunk.bytes);
+			} else { 
+				encrypter.postMessage(chunk.bytes.buffer,[chunk.bytes.buffer]);
+			}
 		});
 	}
 }
@@ -255,18 +273,42 @@ UploadQueue.prototype.push = function() {
 	return pos+1;
 };
 
+function ul_chunk_upload(chunk, file, next) {
+	var xhr = getXhrObject();
+	xhr.failure = function(e, len) {
+	};
+
+	xhr.ready = function() {
+	};
+
+	if (chromehack) {
+		var data8 = new Uint8Array(chunk.bytes.buffer);
+		var send8 = new Uint8Array(chunk.bytes.buffer, 0, data8.length);
+		send8.set(data8);
+
+		var t = file.posturl.lastIndexOf('/ul/');
+		xhr.open('POST', file.posturl.substr(0,t+1));
+		xhr.setRequestHeader("MEGA-Chrome-Antileak", file.posturl.substr(t)+chunk.suffix);
+		xhr.send(send8);
+	} else {
+		xhr.open('POST', file.posturl+chunk.suffix);
+		xhr.send(chunk.bytes.buffer);
+	}
+}
+
 function ul_filereader(fs, file) {
 	return new QueueClass(function(task) {
 		var Scheduler = this;
 		if (fs.readyState == fs.LOADING) {
 			return this.reschedule();
 		}
+		var end = task.start+task.end
 		if (file.slice || file.mozSlice) {
-			if (file.mozSlice) blob = file.mozSlice(task.start, task.end);
-			else blob = file.slice(task.start, task.end);
+			if (file.mozSlice) blob = file.mozSlice(task.start, end);
+			else blob = file.slice(task.start, end);
 			xhr_supports_typed_arrays = true;
 		} else {
-			blob = file.webkitSlice(task.start, start.end);
+			blob = file.webkitSlice(task.start, end);
 		}
 
 		fs.pos = task.start;

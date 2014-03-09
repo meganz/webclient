@@ -143,29 +143,32 @@ function ul_upload(File) {
 	]);
 
 	if (file.size) {
-		var pp, p = 0;
+		var pp, p = 0, tasks = {}
 		for (i = 1; i <= 8 && p < file.size-i*ul_block_size; i++) {
-			ulQueue.push(new ChunkUpload(file, p, i*ul_block_size))
+			tasks[p] = new ChunkUpload(file, p, i*ul_block_size);
 			pp 	= p;
 			p += i * ul_block_size
 		}
 
 		while (p < file.size) {
-			ulQueue.push(new ChunkUpload(file, p, ul_block_extra_size));
+			tasks[p] = new ChunkUpload(file, p, ul_block_extra_size);
 			pp 	= p;
 			p += ul_block_extra_size
 		}
 
-		if (file.size-pp) {
-			ulQueue.push(new ChunkUpload(file, pp, file.size-pp))
+		if (file.size-pp > 0) {
+			tasks[pp] = new ChunkUpload(file, pp, file.size-pp)
 		}
+		$.each(tasks, function(i, task) {
+			ulQueue.push(task);
+		});
 	} else {
 		ulQueue.push(new ChunkUpload(file, 0,  0));
 	}
 
 	if (is_image(file.name)) {
 		file.faid = ++ul_faid;
-		if (have_ab) createthumbnail(file, ul_aes, ul_faid);
+		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
 	onUploadStart(file.pos);
@@ -267,9 +270,10 @@ UploadQueue.prototype.push = function() {
 
 	file.pos = pos;
 
-	file.ul_reader = ul_filereader(new FileReader, file);
-	file.progress  = {};
-	file.sent      = 0;
+	file.ul_reader  = ul_filereader(new FileReader, file);
+	file.progress   = {};
+	file.sent       = 0;
+	file.completion = [];
 	ulQueue.push(new FileUpload(file));
 
 	return pos+1;
@@ -297,14 +301,43 @@ function ul_chunk_upload(chunk, file, next) {
 				response = base64urldecode(response);
 			}
 			if (!response.length || response == 'OK' || response.length == 27) {
-				file.sent += chunk.end;
+				file.sent += chunk.bytes.buffer.length || chunk.bytes.length;
 				delete file.progress[chunk.start];
+				DEBUG("done", chunk);
+				ul_updateprogress();
 				if (response.length == 27) {
+					var t = [], ul_key = file.ul_key
+					for (p in file.ul_macs) t.push(p);
+					t.sort(function(a,b) { return parseInt(a)-parseInt(b) });
+					for (var i = 0; i < t.length; i++) t[i] = file.ul_macs[t[i]];
+					var mac = condenseMacs(t, file.ul_key);
+
+					var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
+					
+					if (u_k_aes && !file.ul_completing) {
+						var ctx = { 
+							ul_queue_num : file.pos,
+							callback : ul_completepending2,
+							faid : file.faid
+						};
+						file.ul_completing = true;
+						api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+					} else {
+						file.completion.push([
+							response.url, file, filekey, file.pos
+						]);
+					}
 				}
+			} else { 
+				DEBUG("Invalid upload response: " + response);
+				if (response != EKEY) return ul_failed()
 			}
-			//ul_chunkcomplete(this.upload.slot,this.pos,this.response);
+
 			return next.done();
 		}
+
+		DEBUG("error");
+
 		ul_progress[chunk.start] = 0;
 		ul_updateprogress();
 	};

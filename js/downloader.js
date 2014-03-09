@@ -62,6 +62,9 @@ function getXhrObject(s) {
 
 	xhr.ready = function() {
 	};
+
+	xhr.upload_progress = function() {
+	};
 	// }}}
 
 	xhr.upload.onprogress = function() {

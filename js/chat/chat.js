@@ -278,7 +278,7 @@ var MegaChat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'rtcSession': {
             iceServers:[
-//                {url: 'stun:stun.l.google.com:19302'},
+//                 {url: 'stun:stun.l.google.com:19302'},
                 {url: 'turn:j100.server.lu:3478?transport=udp'},
                 {url: 'turn:j100.server.lu:3478?transport=tcp'}
             ]

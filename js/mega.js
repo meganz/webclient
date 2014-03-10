@@ -2395,7 +2395,8 @@ function doshare(h,t)
 						M.nodeShare(ctx.h,{h:$.selected[0],r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
 					}
 				}
-				$('.fm-dialog.share-dialog').removeClass('hidden');
+				$('.fm-dialog.share-dialog').remjiktak
+                oveClass('hidden');
 				loadingDialog.hide();
 				M.renderShare($.selected[0]);
 				shareDialog();

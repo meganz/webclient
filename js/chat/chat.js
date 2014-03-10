@@ -121,26 +121,55 @@ var chatui;
             }
         });
 
-        $('.fm-chat-file-button.save-button').unbind('mouseover click');
-        $('.fm-chat-file-button.save-button').bind('mouseover click', function()
-        {
-            var chatDownloadPopup = $('.fm-chat-download-popup');
+        $('.fm-chat-block').off('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button');
+        $('.fm-chat-block').on('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button', function() {
+            var currentRoom = megaChat.getCurrentRoom();
+
+            var $chatDownloadPopup = $('.fm-chat-download-popup',currentRoom.$messages);
             var p = $(this);
             var positionY = $(this).closest('.jspPane').outerHeight() - $(this).position().top;
             var positionX = $(this).position().left;
             if (positionY - 174 > 0)
             {
-                $(chatDownloadPopup).css('bottom', positionY - 174 + 'px');
-                $(chatDownloadPopup).removeClass('top');
+                $($chatDownloadPopup).css('bottom', positionY - 174 + 'px');
+                $($chatDownloadPopup).removeClass('top');
             }
             else
             {
-                $(chatDownloadPopup).css('bottom', positionY + 'px');
-                $(chatDownloadPopup).addClass('top');
+                $($chatDownloadPopup).css('bottom', positionY + 'px');
+                $($chatDownloadPopup).addClass('top');
             }
-            $(chatDownloadPopup).css('left', positionX + $(this).outerWidth()/2 + 10 + 'px');
+            $($chatDownloadPopup).css('left', positionX + $(this).outerWidth()/2 + 10 + 'px');
             $(this).addClass('active');
-            (chatDownloadPopup).removeClass('hidden');
+            $($chatDownloadPopup).removeClass('hidden');
+
+            var $button = $(this);
+            var $attachmentContainer = $button.parents('.attachments-container');
+            var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
+
+            var attachments = message.meta.attachments; //alias
+            var nodeIds = Object.keys(attachments);
+            $('.to-cloud', $chatDownloadPopup).unbind('click.megachat');
+            $('.to-cloud', $chatDownloadPopup).bind('click.megachat', function() {
+                $.selected = clone(nodeIds);
+                $.mctype = 'copy-cloud';
+                mcDialog();
+            });
+
+            $('.as-zip', $chatDownloadPopup).unbind('click.megachat');
+            $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
+                $.each(nodeIds, function(k, v) {
+                    M.addDownload(v, true);
+                });
+
+            });
+
+            $('.to-computer', $chatDownloadPopup).unbind('click.megachat');
+            $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
+                $.each(nodeIds, function(k, v) {
+                    M.addDownload(v);
+                });
+            });
         });
 
 
@@ -249,7 +278,7 @@ var MegaChat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'rtcSession': {
             iceServers:[
-                {url: 'stun:stun.l.google.com:19302'},
+//                {url: 'stun:stun.l.google.com:19302'},
                 {url: 'turn:j100.server.lu:3478?transport=udp'},
                 {url: 'turn:j100.server.lu:3478?transport=tcp'}
             ]
@@ -2646,9 +2675,79 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
         return;
     }
 
-    return self.sendMessage(message, {
-        'attachments': ids
+    loadingDialog.show();
+
+    var $promises = [];
+    $.each(ids, function(i, id) {
+        var $promise = new $.Deferred();
+        $promises.push(
+            $promise
+        );
+
+        api_req({a:'l',n: id},{
+            node : id,
+//            last : i == this.links.length-1,
+            callback : function(res,ctx)
+            {
+                if (typeof res != 'number')  {
+                    M.nodeAttr({h:id,ph:res});
+                    $promise.resolve(M.d[id]);
+                } else {
+                    $promise.reject(res);
+                }
+
+            }
+        });
     });
+
+
+    var $promise = new $.Deferred();
+
+    $.when.apply($, $promises)
+        .done(function(responses) {
+            var attachments = {};
+            $.each(ids, function(k, nodeId) {
+                var node = M.d[nodeId];
+                attachments[nodeId] = {
+                    'name': node.name,
+                    'h': nodeId,
+                    's': node.s,
+                    't': node.t,
+                    'ph': node.ph,
+                    'sharekeys': a32_to_base64(u_sharekeys[nodeId])
+                };
+            });
+
+            var messageId = self.sendMessage(message, {
+                'attachments': attachments
+            });
+            $promise.resolve(
+                messageId,
+                attachments,
+                message
+            );
+        })
+        .fail(function(r) {
+            $promise.reject(r);
+        })
+        .always(function() {
+            loadingDialog.hide();
+        });
+
+    return $promise;
+};
+
+MegaChatRoom.prototype.getMessageById = function(messageId) {
+    var self = this;
+    var found = false;
+    $.each(self.messages, function(k, v) {
+        if(v.id == messageId) {
+            found = v;
+            return false; //break;
+        }
+    });
+
+    return found;
 };
 
 window.megaChat = new MegaChat();

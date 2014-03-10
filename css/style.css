@@ -14133,8 +14133,8 @@ a.ff-extension-button:hover {
 }
 .sync-top-txt strong, .sync-short-block li strong {
 	color: #D32600;
-	font-family: 'Open Sans', Arial;
-	font-weight: bold;
+	font-family: 'Open Sans Semibold', Arial;
+	font-weight: normal;
 }
 .sync-main-img {
 	width: 700px;

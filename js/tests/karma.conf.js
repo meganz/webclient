@@ -30,6 +30,7 @@ module.exports = function(config) {
 
              "../chat/rtcSession.js",
 
+             "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",
              "../chat/emoticonsFilter.js",
              "../chat/capslockFilterDemo.js",

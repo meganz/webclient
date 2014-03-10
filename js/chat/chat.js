@@ -260,7 +260,8 @@ var MegaChat = function() {
         'plugins': {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
-            'capslockFilterDemo': CapslockFilterDemo
+            'capslockFilterDemo': CapslockFilterDemo,
+            'attachmentsFilter': AttachmentsFilter
         }
     };
 
@@ -733,7 +734,7 @@ MegaChat.prototype._onChatMessage = function(e, eventData) {
     if(eventData.myOwn === true && eventData.isForwarded === true) {
         return;
     }
-    if(!eventData.message) {
+    if(!eventData.message && !eventData.meta) {
         return;
     }
 
@@ -1459,10 +1460,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.appendDomMessage(
             self.generateInlineDialog(
-                "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + "...",
                 "outgoing-call",
+                "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + "...",
                 undefined,
-                {
+                ['fm-chat-call-started'], {
                     'reject': {
                         'type': 'secondary',
                         'text': "Cancel",
@@ -1527,9 +1528,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.appendDomMessage(
             self.generateInlineDialog(
-                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
                 "incoming-call",
+                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
                 undefined,
+                ['fm-chat-call-started'],
                 {
                     'answer': {
                         'type': 'primary',
@@ -1600,8 +1602,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     self.bind('call-init', function(e, eventData) {
         self.appendDomMessage(
             self.generateInlineDialog(
+                "started-call-" + unixtime(),
                 "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
-                "started-call-" + unixtime()
+                undefined,
+                ['fm-chat-call-started']
             )
         );
         callStartedState(e, eventData);
@@ -1609,9 +1613,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     self.bind('call-answered', function(e, eventData) {
         self.appendDomMessage(
             self.generateInlineDialog(
+                "started-call-" + unixtime(),
                 "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
-                "started-call-" + unixtime()
-            )
+                undefined,
+                ['fm-chat-call-started'])
         );
 
         callStartedState(e, eventData);
@@ -1620,8 +1625,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     self.bind('call-answer-timeout', function(e, eventData) {
         self.appendDomMessage(
             self.generateInlineDialog(
+                "rejected-call-" + unixtime(),
                 "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
-                "rejected-call-" + unixtime()
+                undefined,
+                ['fm-chat-missed-call']
             )
         );
         resetCallStateNoCall();
@@ -1638,8 +1645,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         self.appendDomMessage(
             self.generateInlineDialog(
+                "rejected-call-" + unixtime(),
                 msg,
-                "rejected-call-" + unixtime()
+                undefined,
+                ['fm-chat-rejected-call']
             )
         );
 
@@ -1650,15 +1659,19 @@ var MegaChatRoom = function(megaChat, roomJid) {
         if(eventData.info && eventData.info.event == "handled-elsewhere") {
             self.appendDomMessage(
                 self.generateInlineDialog(
+                    "canceled-call-" + unixtime(),
                     "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was handled on some other device.",
-                    "canceled-call-" + unixtime()
+                    undefined,
+                    ['fm-chat-different-device-call']
                 )
             );
         } else {
             self.appendDomMessage(
                 self.generateInlineDialog(
+                    "canceled-call-" + unixtime(),
                     "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was canceled.",
-                    "canceled-call-" + unixtime()
+                    undefined,
+                    ['fm-chat-rejected-call']
                 )
             );
         }
@@ -1668,8 +1681,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     self.bind('call-ended', function(e, eventData) {
         self.appendDomMessage(
             self.generateInlineDialog(
+                "ended-call-" + unixtime(),
                 "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.",
-                "ended-call-" + unixtime()
+                undefined,
+                ['fm-chat-call-ended']
             )
         );
 
@@ -2159,7 +2174,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     if(event.isPropagationStopped()) {
         if(localStorage.d) {
-            console.warn("Event propagation stopped recieving (rendering) of message: ", message)
+            console.warn("Event propagation stopped receiving (rendering) of message: ", message)
         }
         return false;
     }
@@ -2177,6 +2192,19 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
 
 
+    var event = new $.Event("onBeforeRenderMessage");
+    self.megaChat.trigger(event, {
+        message: message,
+        $message: $message,
+        room: self
+    });
+
+    if(event.isPropagationStopped()) {
+        if(localStorage.d) {
+            console.warn("Event propagation stopped receiving (rendering) of message: ", message)
+        }
+        return false;
+    }
     return self.appendDomMessage($message, message);
 };
 
@@ -2260,7 +2288,9 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 };
 
 //TODO: Docs
-MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageContents, buttons, read) {
+MegaChatRoom.prototype.generateInlineDialog = function(type, title, messageContents, headingCssClasses, buttons, read) {
+    headingCssClasses = headingCssClasses || [];
+
     var self = this;
 
     var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
@@ -2271,7 +2301,14 @@ MegaChatRoom.prototype.generateInlineDialog = function(title, type, messageConte
 
     $inlineDialog.addClass('fm-chat-inline-dialog-' + type);
 
-    $('.fm-chat-verification-head', $inlineDialog).text(title);
+    var $heading = $('.fm-chat-inline-dialog-header', $inlineDialog);
+
+    $.each(headingCssClasses, function(k, v) {
+        $heading.addClass(v);
+    });
+
+    $heading.text(title);
+
     $('.fm-chat-message', $inlineDialog).text(messageContents ? messageContents : "");
 
     var $pad = $('.fm-chat-messages-pad', $inlineDialog);
@@ -2603,14 +2640,14 @@ MegaChatRoom.prototype.getMediaOptions = function() {
  */
 MegaChatRoom.prototype.attachNodes = function(ids, message) {
     var self = this;
-    message = message || "Shared files/folders:";
+    message = message || "";
 
     if(ids.length == 0) {
         return;
     }
 
     return self.sendMessage(message, {
-        'attached': ids
+        'attachments': ids
     });
 };
 

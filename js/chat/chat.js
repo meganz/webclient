@@ -279,8 +279,16 @@ var MegaChat = function() {
         'rtcSession': {
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
-                {url: 'turn:j100.server.lu:3478?transport=udp'},
-                {url: 'turn:j100.server.lu:3478?transport=tcp'}
+                {
+                    url: 'turn:j100.server.lu:3478?transport=udp',
+                    username: "alex",
+                    credential: 'alexsecret'
+                },
+                {
+                    url: 'turn:j100.server.lu:3478?transport=tcp',
+                    username: "alex",
+                    credential: 'alexsecret'
+                }
             ]
         },
         /**

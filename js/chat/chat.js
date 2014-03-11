@@ -297,7 +297,6 @@ var MegaChat = function() {
         'plugins': {
             'urlFilter': UrlFilter,
             'emoticonsFilter': EmoticonsFilter,
-            'capslockFilterDemo': CapslockFilterDemo,
             'attachmentsFilter': AttachmentsFilter
         }
     };
@@ -725,6 +724,10 @@ MegaChat.prototype.init = function() {
 
     // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
     self.plugins = {};
+    if(localStorage.capslockFilterDemoEnabled) {
+        self.options.plugins['capslockFilterDemo'] = CapslockFilterDemo;
+    }
+
     $.each(self.options.plugins, function(k, v) {
         self.plugins[k] = new v(self);
     });

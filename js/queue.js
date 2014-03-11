@@ -29,6 +29,7 @@ var DEFAULT_CONCURRENCY = 4
 				queue.push(args);
 			}, 100);
 		};
+
 		this.done = function() {
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
@@ -36,7 +37,7 @@ var DEFAULT_CONCURRENCY = 4
 				return queue.process();
 			}
 
-			queue._running.splice(id,1);
+			queue._running.splice(id, 1);
 			queue.trigger('done', args)
 			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
 			delete queue._callback[args.__tid];

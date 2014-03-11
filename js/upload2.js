@@ -105,6 +105,33 @@ function ul_Identical(target, path, hash,size)
 }
 /* }}} */ 
 
+var UploadManager = new function() {
+	var self = this;
+
+	self.retry = function(file, chunk, Worker) {
+		file.retries++;
+
+		// pause file upload
+		file.paused = true;
+
+		// release worker
+		Worker.done();
+
+		// reschedule
+		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
+		newTask.__retry = true
+		ulQueue.push(newTask, function() {
+			/* release error pausing */
+			file.paused = false;
+		});
+	};
+
+	self.isReady = function(Task) {
+		return !Task.file.paused || Task.__retry;
+	}
+
+};
+
 function ul_get_posturl(File) {
 	return function(res, ctx) {
 		if (typeof res == 'object') {
@@ -294,12 +321,20 @@ function ul_chunk_upload(chunk, file, next) {
 		ul_updateprogress();
 	};
 
+	xhr.failure = function() {
+		file.progress[chunk.start] = 0;
+		ul_updateprogress();
+		UploadManager.retry(file, chunk, next);
+		xhr = null;
+	}
+
 	xhr.ready = function(e) {
 		if (this.status == 200 && typeof this.response == 'string' && this.statusText == 'OK') {
 			var response = this.response
 			if (response.length > 27) {
 				response = base64urldecode(response);
 			}
+
 			if (!response.length || response == 'OK' || response.length == 27) {
 				file.sent += chunk.bytes.buffer.length || chunk.bytes.length;
 				delete file.progress[chunk.start];
@@ -328,18 +363,16 @@ function ul_chunk_upload(chunk, file, next) {
 						]);
 					}
 				}
+				return next.done();
+
 			} else { 
 				DEBUG("Invalid upload response: " + response);
-				if (response != EKEY) return ul_failed()
+				if (response != EKEY) return xhr.failure(EKEY)
 			}
 
-			return next.done();
 		}
 
-		DEBUG("error");
-
-		ul_progress[chunk.start] = 0;
-		ul_updateprogress();
+		return xhr.failure();
 	};
 
 	if (chromehack) {
@@ -396,6 +429,19 @@ var ul_queue  = new UploadQueue
 	, ul_block_size = 131072
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
+
+ulQueue.getNextTask = function() {
+	var candidate = null
+	$.each(ulQueue._queue, function(i, task) {
+		if (UploadManager.isReady(task)) {
+			ulQueue._queue.splice(i, 1);
+			candidate = task;
+			return false;
+		}
+	});
+
+	return candidate;
+};
 
 if (localStorage.ul_maxSpeed) ul_maxSpeed=parseInt(localStorage.ul_maxSpeed);
 

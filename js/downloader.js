@@ -5,7 +5,7 @@ if (d) {
 			try { 
 				xhr.abort(); xhr.failure(); 
 			} catch (e) {
-				DEBUG('exception', e);
+				throw e;
 			}
 		});
 	}
@@ -158,7 +158,7 @@ function ClassChunk(task) {
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > NOW() && !force) {
+			if (Progress.dl_lastprogress+500 > NOW() && !force) {
 				// too soon
 				return false;
 			}

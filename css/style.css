@@ -5425,7 +5425,7 @@ div .fm-tree-folder.dragover {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-bottom:30px !important;
+	padding-bottom: 30px !important;
 }
 .fm-chat-message a {
 	color: #D21F00;
@@ -5603,14 +5603,12 @@ div .fm-tree-folder.dragover {
 .fm-chat-messages-pad {
 	margin-left: 203px;
 }
-
 .fm-chat-messages-block.grouped-message .fm-chat-username {
-    visibility: hidden;
+	visibility: hidden;
 }
 .fm-chat-messages-block.grouped-message {
-    border-top: 0;
+	border-top: 0;
 }
-
 .fm-chat-message-time {
 	width: 90px;
 	float: right;
@@ -5725,7 +5723,6 @@ div .fm-tree-folder.dragover {
 .fm-chat-different-device-call {
 	background-position: -21px -1357px;
 }
-
 .user {
 	color: #333333;
 	cursor: default;
@@ -6073,44 +6070,40 @@ div .fm-tree-folder.dragover {
 	background-position: center -999px;
 }
 /** debug chat audio/video **/
-.fm-chat-header .local-video-container,
-    .fm-chat-header .remote-video-container {
-    width: 70px;
-    height: 70px;
-    float: right;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    margin-right: 8px;
+.fm-chat-header .local-video-container, .fm-chat-header .remote-video-container {
+	width: 70px;
+	height: 70px;
+	float: right;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin-right: 8px;
 }
 .fm-chat-header .local-video-container {
-    border: 1px solid red;
+	border: 1px solid red;
 }
 .fm-chat-header .remote-video-container {
-    border: 1px solid blue;
+	border: 1px solid blue;
 }
-
-.fm-chat-header .local-video-container video,
-    .fm-chat-header .remote-video-container video {
-    width: 70px;
-    height: 70px;
+.fm-chat-header .local-video-container video, .fm-chat-header .remote-video-container video {
+	width: 70px;
+	height: 70px;
 }
-
 /** debug chat audio/video **/
 
 /** debug emoticons **/
 .fm-chat-emoticon {
-    width: 25px;
-    height: 25px;
-    background-image: url(../images/mega/chat-smiles.png);
-    background-position: center 3px;
-    background-repeat: no-repeat;
-    background-size: 58px auto;
-    text-indent: -9999px;
-    display: inline-block;
+	width: 25px;
+	height: 25px;
+	background-image: url(../images/mega/chat-smiles.png);
+	background-position: center 3px;
+	background-repeat: no-repeat;
+	background-size: 58px auto;
+	text-indent: -9999px;
+	display: inline-block;
 }
 /** end of debug emoticons **/
 
@@ -6265,6 +6258,21 @@ div .fm-tree-folder.dragover {
 	width: 364px;
 	min-height: 254px;
 	margin: -127px 0 0 -182px
+}
+.fm-dialog.restore-success {
+	width: 364px;
+	min-height: 274px;
+	margin: -137px 0 0 -182px
+}
+.fm-dialog.reset-success {
+	width: 364px;
+	min-height: 243px;
+	margin: -121px 0 0 -182px
+}
+.fm-dialog.password-dialog {
+	width: 604px;
+	min-height: 100px;
+	margin: -97px 0 0 -302px
 }
 .fm-dialog.clear-bin-dialog, .fm-dialog.notification-dialog, .fm-dialog.warning-dialog-b, .fm-dialog.warning-dialog-a, .fm-dialog.confirmation-dialog {
 	width: 504px;
@@ -14133,8 +14141,8 @@ a.ff-extension-button:hover {
 }
 .sync-top-txt strong, .sync-short-block li strong {
 	color: #D32600;
-	font-family: 'Open Sans', Arial;
-	font-weight: bold;
+	font-family: 'Open Sans Semibold', Arial;
+	font-weight: normal;
 }
 .sync-main-img {
 	width: 700px;
@@ -14574,212 +14582,274 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .slideshow-progress.percents-100 {
 	background-position: 0 -2000px;
 }
-.campaign-logo {
-	width: 244px;
-	height: 31px;
-	position: absolute;
-	left: 50%;
-	margin: 0 0 0 -122px;
-	background-image: url(../images/mega/new-download.png);
-	background-position: center top;
-	background-repeat: no-repeat;
-	z-index: 10;
-	top: 11px;
-	display: none;
-	cursor: pointer;
+.main-mid-pad.backup-recover.notification {
+	padding-bottom: 90px;
 }
-.campaign .campaign-logo {
+.backup-recover h3.main-italic-header {
+	padding: 25px 0 20px 0;
+}
+.backup-recover .main-left-block .register-st2-txt-block {
+	padding: 0;
+}
+.backup-recover h5.main-italic-header {
+	padding: 0px 0 13px 0;
+}
+.backup-recover .main-right-block .register-st2-txt-block {
+	padding-top: 85px;
+}
+.backup-download-block, .recover-upload-block {
+	padding: 15px 0 0 100px;
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: 0 15px;
+	background-repeat: no-repeat;
+	height: 125px;
+}
+.recover-upload-block {
+	background-position: 0 -302px;
+}
+.backup-download-block.downloading, .recover-upload-block.uploading {
+	background-position: 0 -442px;
+	position: relative;
+}
+.backup-download-percents, .restore-upload-percents {
+	position: absolute;
+	color: #D22400;
+	font-size: 20px;
+	text-align: center;
+	line-height: 24px;
+	padding-top: 22px;
+	font-family: 'Open Sans';
+	width: 79px;
+	margin-left: -100px;
+	display: none;
+}
+.downloading .backup-download-percents, .uploading .restore-upload-percents {
 	display: block;
 }
-.campaign-widget {
-	width: 400px;
-	position: absolute;
-	background-color: #222222;
-	-webkit-border-bottom-left-radius: 6px;
-	-moz-border-radius-bottomleft: 6px;
-	border-bottom-left-radius: 6px;
-	-webkit-border-bottom-right-radius: 6px;
-	-moz-border-radius-bottomright: 6px;
-	border-bottom-right-radius: 6px;
-	border-top: 2px solid #F1C552;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	top: 37px;
-	left: 50%;
-	margin-left: -200px;
-	display: none;
-	cursor: default;
+.backup-download-block .transfer-filtype-icon {
+	margin: -1px 0 0 -3px;
 }
-.campaign-logo:hover .campaign-widget {
-	display: block;
+.backup-download-block .tranfer-filetype-txt {
+	line-height: 26px;
+	padding-left: 25px;
+	line-height: 21px;
 }
-.campaign-bottom-banner .campaign-logo:hover .campaign-widget {
-	display: none;
-}
-.campaign-bottom-banner .campaign-logo {
-	cursor: pointer;
-}
-.campaign-arrow {
-	background-image: url(../images/mega/new-download.png);
-	background-position: center -32px;
-	background-repeat: no-repeat;
-	height: 9px;
-	position: absolute;
-	top: -9px;
-	width: 100%;
-}
-.campaign-txt {
-	color: #999999;
-	font-size: 16px;
-	line-height: 28px;
-	font-family: 'brandon_textmedium';
-	padding: 20px 24px;
-}
-.campaign-mega-logo {
-	display: inline-block;
-	width: 70px;
-	color: rgba(0,0,0,0);
-	background-image: url(../images/mega/new-download.png);
-	background-position: -72px -67px;
-	background-repeat: no-repeat;
-}
-.campaign-yellow-txt {
-	color: #F1C552;
-}
-.campaign-widget-bottom {
-	background-color: #111111;
-	padding: 20px 24px;
-}
-.campaign-take-action {
-	height: 40px;
-	background-color: #F1C359;
+.backup-download-button {
+	height: 26px;
+	background-color: #D32200;
+	padding: 0 15px;
+	float: left;
+	line-height: 24px;
+	color: white;
+	margin-top: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	text-align: center;
 	cursor: pointer;
 }
-.campaign-take-action span {
-	background-image: url(../images/mega/new-download.png);
-	background-position: right -179px;
-	background-repeat: no-repeat;
-	display: inline-block;
-	font-family: 'brandon_textbold_italic';
-	padding-right: 30px;
-	line-height: 39px;
-	font-size: 24px;
-	color: black;
+.backup-recover .login-register-input {
+	padding-right: 70px;
+	margin-top: 6px;
 }
-.campaign .download-mid-centered-block {
-	margin-top: -100px;
-	min-height: 450px;
-}
-.campaign .new-download-icon {
-	background-image: url(../images/mega/new-download.png);
-	background-position: -6px -408px;
-	background-repeat: no-repeat;
-}
-.campaign .downloading .new-download-icon {
-	background-position: -6px -608px;
-}
-.campaign .new-download-red-button {
-	background-color: #F1C359;
-}
-.campaign .new-download-icon div {
-	color:#f0c55c;
-}
-.campaign .new-download-red-button .new-download-button-txt1, .campaign .new-download-red-button .new-download-button-txt2 {
-	color: #333333;
-}
-.campaign-icon {
+.backup-input-button {
+	height: 26px;
+	min-width: 60px;
+	text-align: center;
+	background-color: #b2b2b2;
 	position: absolute;
-	width: 120px;
-	height: 67px;
-	left: 50%;
-	top: 12%;
-	margin: 0 0 0 -60px;
-	background-image: url(../images/mega/new-download.png);
-	background-position: center -280px;
-	background-repeat: no-repeat;
-	display: none;
-}
-.campaign .campaign-icon {
-	display: block;
-}
-.campaign-bottom-block {
-	width: 100%;
-	height: 100px;
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	background-color: black;
 	z-index: 10;
-	display: none;
+	right: 5px;
+	top: 5px;
+	color: white;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 10px;
+	line-height: 24px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	cursor: pointer;
 }
-.campaign-bottom-banner .campaign-bottom-block {
-	display: block;
+.backup-input-button:hover, .focused .backup-input-button {
+	background-color: #D42400;
 }
-.campaign-bottom-pad {
-	width: 916px;
+.backup-recover .login-register-input input {
+	color: #858585
+}
+.backup-notification-block {
+	height: 90px;
+	width: 100%;
+	position: absolute;
+	bottom: 228px;
+	background-color: rgba(16,16,16,0.8);
+	z-index: 10;
+}
+.backup-notification-icon {
+	width: 980px;
 	margin: 0 auto;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 20px 0 73px;
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: 15px -222px;
+	background-repeat: no-repeat;
 }
-.campaign-bottom-pad .campaign-take-action {
-	float: right;
-	width: 290px;
-	height: 40px;
-	margin-top: 30px;
-}
-.campaign-bottom-pad .campaign-txt {
-	width: 495px;
-	line-height: 20px;
-	display: table-cell;
+.backup-notification-txt {
+	font-size: 11px;
+	color: white;
+	font-family: 'Open Sans';
+	height: 90px;
 	vertical-align: middle;
-	height: 100px;
+	line-height: 16px;
+	display: table-cell;
+}
+.backup-notification-txt span {
+	color: #FFB800;
+}
+.recover-button {
+	width: 70px;
+	height: 70px;
+	background-color: #b2b2b2;
+	border: 5px solid white;
+	margin: 0 35px 0 -5px;
+	text-align: center;
+	font-size: 16px;
+	line-height: 58px;
+	font-family: 'Open Sans';
+	text-transform: uppercase;
+	float: left;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	color: white;
+	font-weight: bold;
+	-moz-border-radius: 100%;
+	-ms-border-radius: 100%;
+	-o-border-radius: 100%;
+	border-radius: 100%;
+	cursor: pointer;
+}
+.recover-button.yes:hover {
+	border: 5px solid #89c147;
+	background-color: #89c147;
+}
+.recover-button.yes.active:hover, .recover-button.yes.active {
+	border: 5px solid #6BB219;
+	background-color: #6BB219;
+}
+.recover-button.no:hover {
+	border: 5px solid #dd5133;
+	background-color: #dd5133;
+}
+.recover-button.no.active:hover, .recover-button.no.active {
+	border: 5px solid #d52600;
+	background-color: #d52600;
+}
+.main-right-block.recover-block {
+	padding-top: 10px;
+}
+.backup-recover .recover-block .register-st2-txt-block {
 	padding: 0;
 }
-.campaign-bottom-pad .campaign-mega-logo {
-	background-position: -72px -72px;
+.recover-block span.green {
+	color: #6BB219;
 }
-.campaign-close-button {
-	width: 20px;
-	height: 20px;
+.light-gray {
+	color: #999999;
+}
+.backup-file-info {
+	height: 26px;
+}
+.recover-upload-block .tranfer-filetype-txt {
+	padding-left: 24px;
+}
+.restore-uploading-status-icon {
+	display: block;
 	position: absolute;
-	right: 10px;
-	top: 5px;
-	z-index: 10;
-	background-image: url(../images/mega/new-download.png);
-	background-position: right -329px;
+	width: 24px;
+	height: 24px;
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: -4px -594px;
 	background-repeat: no-repeat;
+}
+.restore-uploading-status-icon.fail {
+	background-position: -4px -662px;
+}
+.restore-verify-button {
+	height: 40px;
+	line-height: 38px;
+	color: white;
+	padding: 0 15px;
 	cursor: pointer;
-}
-.campaign-close-button:hover {
-	background-position: right -369px;
-}
-@media only screen and (max-width: 1593px) {
-.adv .download-mid-centered-block {
- min-width: 648px;
-}
-}
-@media only screen and (max-width: 1323px) {
-.adv .download-mid-centered-block {
-	min-width: 595px;
-}
-}
- @media only screen and (max-width: 1280px) {
-.logged-in-user .campaign-logo {
-	position: relative;
-	left: auto;
-	margin: 0 20px 0 0;
+	background-color: #f2f2f2;
 	float: right;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	margin: 10px 0 30px 0;
+	cursor: default;
 }
+.restore-verify-button.reset-account {
+	margin-top: 0;
+	float: left;
 }
- @media only screen and (max-width: 1143px) {
-.powered-popup {
-	margin-left: -30px;
+.restore-verify-button.active {
+	cursor: pointer;
+	background-color: #D42400;
 }
+.backup-recover .new-registration .password-stutus-txt {
+	margin-bottom: -15px;
+}
+.login-register-input.fail {
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: 4px -653px;
+	background-repeat: no-repeat;
+}
+.restore-close-button {
+	text-align: center;
+	margin-top: -10px;
+	padding-bottom: 20px;
+}
+.restore-success .fm-dialog-button.browsers-button, .reset-success .fm-dialog-button.browsers-button {
+	display: inline-block;
+	float: none;
+	margin: 0;
+	color: #333333;
+}
+.restore-success .fm-dialog-button.browsers-button:hover, .reset-success .fm-dialog-button.browsers-button:hover {
+	border-color: #D42400;
+	background-color: #D42400;
+	color: white;
+}
+.reset-account-lock-image {
+	height: 375px;
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: center -860px;
+	background-repeat: no-repeat
+}
+.password-dialog-icon {
+	font-size: 13px;
+	line-height: 21px;
+	padding-left: 90px;
+	background-image: url(../images/mega/encr-sprite.png);
+	background-position: -10px -745px;
+	background-repeat: no-repeat;
+}
+.password-dialog p {
+	margin: 0;
+	padding: 0 0 9px 0;
+	color: #333333;
+}
+.password-dialog .fm-dialog-body {
+	padding: 14px 20px 14px 20px;
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon {
+background-image: url(../images/mega/encr-sprite@2x.png);
+	background-size: 216px;
+}
 .slideshow-progress {
  background-image: url(../images/mega/gallery-pr-bar@2x.png);
  background-size: 222px auto;
@@ -16497,446 +16567,3 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }
-/* Ads css */
-@font-face {
-	font-family: FreestyleScriptBold;
-	src: url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.eot);
-	src: url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.eot?#iefix) format("embedded-opentype"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.woff) format("woff"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.ttf) format("truetype"), url(../fonts/freestyle-script/freestyle_script_d_bold-webfont.svg#FreestyleScriptBold) format("svg");
-	font-weight: 400;
-	font-style: normal
-}
-@-webkit-keyframes playing-circle {
-from {
--webkit-transform:rotate(0deg)
-}
-to {
-	-webkit-transform: rotate(360deg)
-}
-}
-@-moz-keyframes playing-circle {
-from {
--moz-transform:rotate(0deg)
-}
-to {
-	-moz-transform: rotate(360deg)
-}
-}
-@-o-keyframes playing-circle {
-from {
--o-transform:rotate(0deg)
-}
-to {
-	-o-transform: rotate(360deg)
-}
-}
-@keyframes playing-circle {
-from {
-transform:rotate(0deg)
-}
-to {
-	transform: rotate(360deg)
-}
-}
-.good-times-left-block, .good-times-right-block {
-	position: absolute;
-	display: none;
-	width: 341px;
-	height: 100%;
-	background: #fff;
-	background: -moz-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
-	background: -webkit-gradient(radial, center center, 0, center center, 100%, color-stop(25%, #fff), color-stop(100%, #c5c5c3));
-	background: -webkit-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
-	background: -o-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
-	background: -ms-radial-gradient(center, ellipse cover, #fff 25%, #c5c5c3 100%);
-	background: radial-gradient(ellipse at center, #fff 25%, #c5c5c3 100%)
-}
-.adv .good-times-left-block, .adv .good-times-right-block {
-	display: block;
-}
-.good-times-left-block .background-picture {
-	background-image: url(../images/mega/ads/kim_photo_big.png);
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: 30% 100%;
-	width: 100%;
-	max-height: 580px;
-	position: absolute;
-	bottom: 0;
-	top: 40%
-}
-.good-times-left-block .title-image {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -0px;
-	background-repeat: no-repeat;
-	width: 263px;
-	height: 156px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 35%
-}
-.good-times-left-block .left-bottom {
-	position: absolute;
-	bottom: 50px;
-	width: 100%;
-	height: 108px;
-	z-index: 1
-}
-.good-times-left-block .bottom-gradient {
-	width: 100%;
-	height: 100%;
-	background: -moz-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0,0,0,0)), color-stop(100%, rgba(0,0,0,1)));
-	background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
-	background: -o-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
-	background: -ms-linear-gradient(top, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
-	background: linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,1) 100%);
-	display: none
-}
-.good-times-left-block .kimdotcom-logo {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -156px;
-	background-repeat: no-repeat;
-	position: absolute;
-	left: 25px;
-	top: 25px;
-	width: 58px;
-	height: 58px;
-	cursor: pointer
-}
-.good-times-left-block .baboom-logo, .good-times-left-block .itunes-logo {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -214px;
-	background-repeat: no-repeat;
-	position: absolute;
-	right: 25px;
-	top: 31px;
-	width: 119px;
-	height: 46px;
-	display: none;
-	cursor: pointer
-}
-.good-times-left-block .itunes-logo {
-	background-image: url(../images/mega/ads/available_itunes_white.png);
-	background-position: 0 0;
-	left: auto;
-	right: 25px;
-	top: -65px;
-}
-.good-times-right-block {
-	right: 0
-}
-.good-times-right-block .audio-player {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 300px;
-	margin-top: -215px;
-	margin-left: -150px;
-	text-align: center
-}
-.good-times-right-block .audio-player .music-title {
-	position: relative;
-	font-family: FreestyleScriptBold, Arial;
-	line-height: 1;
-	height: 52px;
-	font-size: 52px;
-	letter-spacing: -2px;
-	color: #111;
-	opacity: 1;
-	transform: rotate(-15deg);
-	-ms-transform: rotate(-15deg);
-	-webkit-transform: rotate(-15deg)
-}
-.good-times-right-block .audio-player .cover-wrapper {
-	position: relative;
-	width: 195px;
-	margin-top: 45px;
-	margin-left: auto;
-	margin-right: auto
-}
-.good-times-right-block .audio-player .cover-image {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -260px;
-	background-repeat: no-repeat;
-	width: 195px;
-	height: 195px
-}
-.good-times-right-block .audio-player .playing-circle {
-	position: absolute;
-	top: 3px;
-	left: 3px;
-	width: 188px;
-	height: 188px;
-	opacity: 0;
-	-webkit-animation: playing-circle 2s infinite linear;
-	-moz-animation: playing-circle 2s infinite linear;
-	-o-animation: playing-circle 2s infinite linear;
-	animation: playing-circle 2s infinite linear;
-	-webkit-transition: opacity .3s ease-out;
-	-moz-transition: opacity .3s ease-out;
-	-ms-transition: opacity .3s ease-out;
-	-o-transition: opacity .3s ease-out;
-	transition: opacity .3s ease-out
-}
-.good-times-right-block .audio-player.paused .playing-circle {
-	opacity: 1;
-	-webkit-animation-play-state: paused;
-	-moz-animation-play-state: paused;
-	-o-animation-play-state: paused;
-	animation-play-state: paused
-}
-.good-times-right-block .audio-player.playing .playing-circle {
-	opacity: 1;
-	-webkit-animation-play-state: running;
-	-moz-animation-play-state: running;
-	-o-animation-play-state: running;
-	animation-play-state: running
-}
-.good-times-right-block .audio-player .playing-circle .mask {
-	width: 100%;
-	height: 50%;
-	overflow: hidden
-}
-.good-times-right-block .audio-player .playing-circle .masked-circle {
-	width: 180px;
-	height: 180px;
-	border-radius: 50%;
-	border: 4px solid #fff
-}
-.good-times-right-block .audio-player .controls-wrapper {
-	position: relative;
-	width: 127px;
-	left: 50%;
-	margin-top: 22px;
-	margin-left: -64px
-}
-.good-times-right-block .audio-player .btn-control {
-	background-repeat: no-repeat;
-	width: 25px;
-	height: 25px;
-	float: left;
-	margin-top: 14px;
-	cursor: pointer
-}
-.good-times-right-block .audio-player .btn-control.prev {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -455px
-}
-.good-times-right-block .audio-player .btn-control.prev:hover {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -480px
-}
-.good-times-right-block .audio-player .btn-control.play-pause, .good-times-right-block .audio-player.paused .play-pause {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -505px;
-	width: 47px;
-	height: 45px;
-	margin: 0 15px;
-	margin-top: 0
-}
-.good-times-right-block .audio-player.playing .play-pause {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -550px
-}
-.good-times-right-block .audio-player .btn-control.next {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -595px
-}
-.good-times-right-block .audio-player .btn-control.next:hover {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -620px
-}
-.good-times-right-block .audio-player .play-preview-text {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -645px;
-	background-repeat: no-repeat;
-	width: 90px;
-	height: 56px;
-	margin-top: 85px;
-	margin-left: 45px
-}
-.good-times-right-block .baboom-logo, .good-times-right-block .itunes-logo {
-	background-image: url(../images/mega/ads/ads_sprite.png);
-	background-position: left -701px;
-	background-repeat: no-repeat;
-	width: 119px;
-	height: 46px;
-	position: absolute;
-	right: 25px;
-	bottom: 75px;
-	cursor: pointer;
-	z-index: 1
-}
-.good-times-right-block .itunes-logo {
-	background-image: url(../images/mega/ads/available_itunes.png);
-	background-position: 0 0;
-	right: auto;
-	left: 25px;
-}
-@media (-webkit-min-device-pixel-ratio:1.325), (min-device-pixel-ratio:1.325) {
-.good-times-right-block .itunes-logo {
-	background-image: url(../images/mega/ads/available_itunes@2x.png);
-	background-size: 119px auto;
-}
-.good-times-left-block .title-image {
-	background-image: url(../images/mega/ads/goodtimes_title@2x.png);
-	background-size: 263px 156px;
-	background-position: 0 0
-}
-.good-times-left-block .kimdotcom-logo {
-	background-image: url(../images/mega/ads/kim_logo@2x.png);
-	background-size: 58px 58px;
-	background-position: 0 0
-}
-.good-times-left-block .baboom-logo {
-	background-image: url(../images/mega/ads/available_baboom_white@2x.png);
-	background-size: 119px 46px;
-	background-position: 0 0
-}
-.good-times-left-block .itunes-logo {
-	background-image: url(../images/mega/ads/available_itunes_white@2x.png);
-	background-size: 119px 46px;
-}
-.good-times-right-block .audio-player .cover-image {
-	background-image: url(../images/mega/ads/album@2x.png);
-	background-size: 195px 195px;
-	background-position: 0 0
-}
-.good-times-right-block .audio-player .btn-control.prev {
-	background-image: url(../images/mega/ads/next_left@2x.png);
-	background-size: 25px 25px;
-	background-position: 0 0
-}
-.good-times-right-block .audio-player .btn-control.prev:hover {
-	background-image: url(../images/mega/ads/next_left_hover@2x.png)
-}
-.good-times-right-block .audio-player .btn-control.play-pause, .good-times-right-block .audio-player.paused .play-pause {
-	background-image: url(../images/mega/ads/play@2x.png);
-	background-size: 47px 45px;
-	background-position: 0 0
-}
-.good-times-right-block .audio-player.playing .play-pause {
-	background-image: url(../images/mega/ads/pause@2x.png);
-	background-size: 47px 45px;
-	background-position: 0 0
-}
-.good-times-right-block .audio-player .btn-control.next {
-	background-image: url(../images/mega/ads/next_right@2x.png);
-	background-size: 25px 25px;
-	background-position: 0 0
-}
-.good-times-right-block .audio-player .btn-control.next:hover {
-	background-image: url(../images/mega/ads/next_right_hover@2x.png)
-}
-.good-times-right-block .audio-player .play-preview-text {
-	background-image: url(../images/mega/ads/play_the_preview@2x.png);
-	background-size: 90px 56px;
-	background-position: 0 0
-}
-.good-times-right-block .baboom-logo {
-	background-image: url(../images/mega/ads/available_baboom@2x.png);
-	background-size: 119px 46px;
-	background-position: 0 0
-}
-}
-@media all and (max-height:900px) {
-.good-times-left-block .title-image {
-	margin-top: 30%
-}
-}
-@media all and (max-height:850px) {
-.good-times-left-block .title-image {
-	margin-top: 27%
-}
-}
-@media all and (max-height:800px) {
-.good-times-left-block .title-image {
-	margin-top: 25%
-}
-}
-@media all and (max-height:780px) {
-.good-times-left-block .title-image {
-	margin-top: 25%
-}
-}
-@media all and (max-height:730px) {
-.good-times-left-block .title-image {
-	margin-top: 21%
-}
-}
-@media all and (max-height:700px) {
-.good-times-left-block .title-image {
-	margin-top: 30%
-}
-}
-@media all and (max-height:680px) {
-.good-times-left-block .title-image {
-	margin-top: 25%
-}
-}
-@media all and (max-height:650px) {
-.good-times-left-block .title-image {
-	margin-top: 20%
-}
-}
-@media all and (max-height:620px) {
-.good-times-left-block .title-image {
-	margin-top: 15%
-}
-}
-@media all and (max-height:590px) {
-.good-times-left-block, .good-times-right-block {
-	display: none
-}
-}
-@media all and (max-width:1390px) {
-.good-times-left-block, .good-times-right-block {
-	width: 320px
-}
-}
-@media all and (max-width:1180px) {
-.adv .good-times-right-block {
-	display: none
-}
-.good-times-left-block {
-	width: 341px
-}
-.good-times-left-block .baboom-logo, .good-times-left-block .itunes-logo, .good-times-left-block .bottom-gradient {
-	display: block
-}
-}
-@media all and (min-height:1100px) {
-.good-times-left-block .background-picture {
-	top: auto;
-	height: 580px;
-	max-height: none
-}
-}
-.adv .download-mid-centered-block {
-	pointer-events: none;
-	margin: -130px 0 0 -325px
-}
-.adv .download-mid-centered-block .new-download-pad {
-	pointer-events: all
-}
-@media all and (max-width:1280px) {
-.adv .download-mid-centered-block {
-	margin: -130px 0 0 -324px
-}
-}
-@media all and (max-width:1180px) {
-.adv .download-mid-centered-block {
-	margin: -130px 0 0 -140px
-}
-.adv .st-social-block {
-	left: 341px;
-	right: 0;
-	width: auto
-}
-}
- @media all and (max-width:1335px) {
-.adv .downloading-progress {
-	width: 290px;
-}
-}
-/*end */

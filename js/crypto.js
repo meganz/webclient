@@ -1339,20 +1339,20 @@ function api_setshare1(ctx)
 		if (typeof req.s[i].r != 'undefined')
 		{
 			if (!req.ok)
-			{			
+			{						
 				if (u_sharekeys[ctx.node]) sharekey = u_sharekeys[ctx.node];
 				else
 				{
 					// we only need to generate a key if one or more shares are being added to a previously unshared node
 					sharekey = [];
-					for (j = 4; j--; ) sharekey.push(rand(0x100000000));
+					for (j = 4; j--; ) sharekey.push(rand(0x100000000));					
+					
 					u_sharekeys[ctx.node] = sharekey;
 					newkey = true;
 				}
-
 				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
 				req.ha = crypto_handleauth(ctx.node);
-				ssharekey = a32_to_str(sharekey);
+				ssharekey = a32_to_str(sharekey);				
 			}
 		}
 	}
@@ -1944,8 +1944,7 @@ function crypto_procsr(sr)
 				}
 				else sh = ctx.sr[i];
 			}
-
-			if (rsr.length) api_req({ a : 'k', sr : rsr });
+			if (rsr.length) api_req({ a : 'k', sr : rsr });			
 		}
 	}
 	

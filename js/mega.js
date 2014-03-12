@@ -1273,7 +1273,7 @@ function MegaData ()
 	}
 
 	this.nodeShare = function(h,s,ignoreDB)
-	{
+	{		
 		if (this.d[h])
 		{
 			if (typeof this.d[h].shares == 'undefined') this.d[h].shares = [];
@@ -1285,7 +1285,6 @@ function MegaData ()
 			}
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
-			
 			if (mDB && !pfkey) mDBadd('ok',{h:h,k:a32_to_base64(encrypt_key(u_k_aes,u_sharekeys[h])),ha:crypto_handleauth(h)});
 		}
 	}
@@ -2025,31 +2024,34 @@ function execsc(ap)
 		else if (a.a == 's' && !folderlink)
 		{
 			var tsharekey = '';
-			var prockey = false;
-			if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
-			{
-				u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
-				tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
-				prockey=true;
-			}
+			var prockey = false;			
 
 			if (a.o == u_handle)
 			{
 				if (typeof a.r == "undefined")
 				{
-					// I deleted my share
+					// I deleted my share							
 					M.delnodeShare(a.n,a.u);
 				}
 				else if (typeof M.d[a.n].shares != 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
 				{
 					// I updated or created my share
-					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});
+					u_sharekeys[a.n] = decrypt_key(u_k_aes,base64_to_a32(a.ok));
+					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
 				}
 			}
 			else if (typeof a.o != 'undefined')
 			{
+				if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
+				{				
+					u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
+					tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
+					prockey=true;
+				}
+			
 				if (typeof a.r == "undefined")
 				{
+					console.log('delete a share');
 					// delete a share:
 					var n = M.d[a.n];
 					if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
@@ -2059,6 +2061,7 @@ function execsc(ap)
 				}
 				else
 				{
+					console.log('I receive a share, prepare for receiving tree a');
 					// I receive a share, prepare for receiving tree a
 					tparentid 	= a.o;
 					trights 	= a.r;
@@ -2069,6 +2072,7 @@ function execsc(ap)
 					}
 					else
 					{
+						console.log('look up other root-share-nodes from this user');
 						// look up other root-share-nodes from this user:
 						if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
 

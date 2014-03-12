@@ -109,8 +109,8 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.restart = function(file) {
-		file.retries = 0;
-		file.sent    = 0;
+		file.retries  = 0;
+		file.sent     = 0;
 		file.progress = {};
 		file.posturl  = "";
 		file.completion = [];
@@ -253,7 +253,7 @@ function ChunkUpload(file, start, end)
 	this.file = file;
 	this.ul   = file;
 
-	this.run = function(next) {
+	this.run = function(Worker) {
 		var chunk = { start: start, end: end, task: this}
 		file.ul_reader.push(chunk, function() {
 			var encrypter = new Worker('encrypter.js');
@@ -265,7 +265,7 @@ function ChunkUpload(file, start, end)
 				} else {
 					chunk.bytes = new Uint8Array(e.data.buffer || e.data);
 					chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
-					ul_chunk_upload(chunk, file, next);
+					ul_chunk_upload(chunk, file, Worker);
 				}
 			};
 			encrypter.pos = start
@@ -285,18 +285,18 @@ function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
 
-	this.run = function(next) {
+	this.run = function(Worker) {
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
 		if (ul_uploading) {
-			return next.reschedule();
+			return Worker.reschedule();
 		}
 
 		ul_uploading = true;
 
 		file.done_starting = function() {
 			ul_uploading = false;
-			next.done();
+			Worker.done();
 		};
 
 		try {

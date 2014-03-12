@@ -158,9 +158,15 @@ function ClassChunk(task) {
 			$.each(Progress.data, function(i, val) {
 				_progress += val[0];
 			});
+			
+			var percentage = Math.floor(_progress/Progress.size*100);
+			if (percentage == 100) {
+				percentage = 99
+			}
 
 			download.onDownloadProgress(
 				download.dl_id, 
+				percentage, 
 				_progress, // global progress
 				Progress.size, // total download size
 				Progress.speed = Progress.dl_xr.update(_progress - Progress.dl_prevprogress),  // speed
@@ -353,6 +359,16 @@ function ClassFile(dl) {
 					if (dl.zipid) {
 						return Zips[dl.zipid].done();
 					}
+
+					dl.onDownloadProgress(
+						dl.dl_id,
+						100,
+						dl.size,
+						dl.size,
+						0,
+						dl.pos
+					);
+
 					dl.onBeforeDownloadComplete(dl.pos);
 					if (!dl.preview) {
 						dl.io.download(dl.zipname || dl.n, dl.p);

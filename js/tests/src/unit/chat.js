@@ -21,6 +21,7 @@ describe("Chat.js - Karere UI integration", function() {
         localStorage.dxmpp = 1;
         localStorage.stopOnAssertFail = true;
         localStorage.d = 1;
+        localStorage.capslockFilterDemoEnabled = 1;
 
         functionsMocker = new FunctionsMocker();
 

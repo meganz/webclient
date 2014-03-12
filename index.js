@@ -33,13 +33,15 @@ var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500
 
 
 function startMega()
-{
+{	
 	if (silent_loading)
 	{
 		silent_loading();
 		silent_loading=false;
 		return false;
 	}
+	else populate_l();
+	
 	if (pages['dialogs'])
 	{	
 		$('body').append(translate(pages['dialogs'].replace(/{staticpath}/g,staticpath)));

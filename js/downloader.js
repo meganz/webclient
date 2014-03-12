@@ -348,7 +348,7 @@ function ClassFile(dl) {
 				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
 					if (dl.cancelled) return;
 					if (!emptyFile && !checkLostChunks(dl)) {
-						return dl_reportstatus(dl, EKEY);
+						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
 					if (dl.zipid) {
 						return Zips[dl.zipid].done();

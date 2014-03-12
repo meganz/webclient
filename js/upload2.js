@@ -131,14 +131,14 @@ var UploadManager = new function() {
 		ulQueue.push(new FileUpload(file));
 	};
 
-	self.retry = function(file, chunk, Worker) {
+	self.retry = function(file, chunk, Job) {
 		file.retries++;
 
 		// pause file upload
 		file.paused = true;
 
 		// release worker
-		Worker.done();
+		Job.done();
 
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
@@ -253,7 +253,7 @@ function ChunkUpload(file, start, end)
 	this.file = file;
 	this.ul   = file;
 
-	this.run = function(Worker) {
+	this.run = function(Job) {
 		var chunk = { start: start, end: end, task: this}
 		file.ul_reader.push(chunk, function() {
 			var encrypter = new Worker('encrypter.js');
@@ -265,7 +265,7 @@ function ChunkUpload(file, start, end)
 				} else {
 					chunk.bytes = new Uint8Array(e.data.buffer || e.data);
 					chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
-					ul_chunk_upload(chunk, file, Worker);
+					ul_chunk_upload(chunk, file, Job);
 				}
 			};
 			encrypter.pos = start
@@ -285,18 +285,18 @@ function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
 
-	this.run = function(Worker) {
+	this.run = function(Job) {
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
 		if (ul_uploading) {
-			return Worker.reschedule();
+			return Job.reschedule();
 		}
 
 		ul_uploading = true;
 
 		file.done_starting = function() {
 			ul_uploading = false;
-			Worker.done();
+			Job.done();
 		};
 
 		try {
@@ -329,7 +329,7 @@ UploadQueue.prototype.push = function() {
 	return pos+1;
 };
 
-function ul_chunk_upload(chunk, file, Worker) {
+function ul_chunk_upload(chunk, file, Job) {
 	var xhr = getXhrObject();
 	function ul_updateprogress() {
 		var tp = file.sent
@@ -342,7 +342,7 @@ function ul_chunk_upload(chunk, file, Worker) {
 	xhr.upload_progress = function(e) {
 		if (chunk.task.abort) {
 			xhr.abort();
-			return Worker.done();
+			return Job.done();
 		}
 		file.progress[chunk.start] = e.loaded
 		ul_updateprogress();
@@ -351,7 +351,7 @@ function ul_chunk_upload(chunk, file, Worker) {
 	xhr.failure = function() {
 		file.progress[chunk.start] = 0;
 		ul_updateprogress();
-		UploadManager.retry(file, chunk, Worker);
+		UploadManager.retry(file, chunk, Job);
 		xhr = null;
 	}
 
@@ -390,7 +390,7 @@ function ul_chunk_upload(chunk, file, Worker) {
 						]);
 					}
 				}
-				return Worker.done();
+				return Job.done();
 
 			} else { 
 				DEBUG("Invalid upload response: " + response);

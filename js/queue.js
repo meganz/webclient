@@ -27,6 +27,7 @@ var DEFAULT_CONCURRENCY = 4
 			this.done();
 			setTimeout(function() {
 				queue.push(args);
+				DEBUG('reschedule', queue, args);
 			}, 100);
 		};
 

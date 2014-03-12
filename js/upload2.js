@@ -108,6 +108,29 @@ function ul_Identical(target, path, hash,size)
 var UploadManager = new function() {
 	var self = this;
 
+	self.restart = function(file) {
+		file.retries = 0;
+		file.sent    = 0;
+		file.progress = {};
+		file.posturl  = "";
+		file.completion = [];
+
+		ulQueue._queue = $.grep(dlQueue._queue, function(task) {
+			return task.file != file;
+		});
+
+		$.each(ulQueue._running, function(i, worker) {
+			if (worker.task.file == file) {
+				worker.task.abort = true;
+			}
+		});
+
+		onUploadError(file.pos,"Upload failed - retrying");
+
+		// reschedule
+		ulQueue.push(new FileUpload(file));
+	};
+
 	self.retry = function(file, chunk, Worker) {
 		file.retries++;
 
@@ -231,7 +254,7 @@ function ChunkUpload(file, start, end)
 	this.ul   = file;
 
 	this.run = function(next) {
-		var chunk = { start: start, end: end}
+		var chunk = { start: start, end: end, task: this}
 		file.ul_reader.push(chunk, function() {
 			var encrypter = new Worker('encrypter.js');
 			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
@@ -306,7 +329,7 @@ UploadQueue.prototype.push = function() {
 	return pos+1;
 };
 
-function ul_chunk_upload(chunk, file, next) {
+function ul_chunk_upload(chunk, file, Worker) {
 	var xhr = getXhrObject();
 	function ul_updateprogress() {
 		var tp = file.sent
@@ -317,6 +340,10 @@ function ul_chunk_upload(chunk, file, next) {
 	}
 
 	xhr.upload_progress = function(e) {
+		if (chunk.task.abort) {
+			xhr.abort();
+			return Worker.done();
+		}
 		file.progress[chunk.start] = e.loaded
 		ul_updateprogress();
 	};
@@ -324,7 +351,7 @@ function ul_chunk_upload(chunk, file, next) {
 	xhr.failure = function() {
 		file.progress[chunk.start] = 0;
 		ul_updateprogress();
-		UploadManager.retry(file, chunk, next);
+		UploadManager.retry(file, chunk, Worker);
 		xhr = null;
 	}
 
@@ -363,7 +390,7 @@ function ul_chunk_upload(chunk, file, next) {
 						]);
 					}
 				}
-				return next.done();
+				return Worker.done();
 
 			} else { 
 				DEBUG("Invalid upload response: " + response);
@@ -407,6 +434,8 @@ function ul_filereader(fs, file) {
 
 		fs.pos = task.start;
 		fs.readAsArrayBuffer(blob);
+		fs.onerror = function(evt) {
+		}
 		fs.onloadend = function(evt) {
 			if (evt.target.readyState == FileReader.DONE) {
 				task.bytes = new Uint8Array(evt.target.result);

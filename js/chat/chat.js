@@ -2004,28 +2004,33 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
             self.megaChat.getContactNameFromJid(participants[0])
         );
         var contact = self.megaChat.getContactFromJid(participants[0]);
-        var presenceCssClass = self.megaChat.xmppPresenceToCssClass(
-            self.megaChat.karere.getPresence(
-                self.megaChat.getJidFromNodeId(contact.u)
-            )
-        );
 
-        $('.fm-chat-user-status', self.$header)
-            .removeClass('online')
-            .removeClass('away')
-            .removeClass('busy')
-            .removeClass('offline')
-            .removeClass('black')
-            .addClass(presenceCssClass)
-            .text(
-                $.trim($('.top-user-status-item .activity-status.' + presenceCssClass).parent().text())
+        if(!contact) {
+            console.warn("Contact not found: ", participants[0]);
+        } else {
+            var presenceCssClass = self.megaChat.xmppPresenceToCssClass(
+                self.megaChat.karere.getPresence(
+                    self.megaChat.getJidFromNodeId(contact.u)
+                )
             );
 
-        if(avatars[contact.u]) {
-            $('.fm-chat-avatar > img', self.$header).attr(
-                'src',
-                avatars[contact.u].url
-            );
+            $('.fm-chat-user-status', self.$header)
+                .removeClass('online')
+                .removeClass('away')
+                .removeClass('busy')
+                .removeClass('offline')
+                .removeClass('black')
+                .addClass(presenceCssClass)
+                .text(
+                    $.trim($('.top-user-status-item .activity-status.' + presenceCssClass).parent().text())
+                );
+
+            if(avatars[contact.u]) {
+                $('.fm-chat-avatar > img', self.$header).attr(
+                    'src',
+                    avatars[contact.u].url
+                );
+            }
         }
     } else {
         throw new Error("Not implemented"); //TODO: Groups, TBD
@@ -2222,11 +2227,11 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     if(message.messageHtml) {
         $('.fm-chat-message', $message).html(
-            message.messageHtml
+            message.messageHtml.replace(/\s{2}/gi, "&nbsp;")
         );
     } else {
         $('.fm-chat-message', $message).html(
-            htmlentities(message.message).replace(/\n/gi, "<br/>")
+            htmlentities(message.message).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;")
         );
     }
 

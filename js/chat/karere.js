@@ -912,7 +912,7 @@ makeMetaAware(Karere);
                  */
 
                     // if not...set the message property
-                eventData['message'] = Strophe.getText(elems[0]);
+                eventData['message'] = $(elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
                 if($('forwarded', message).size() > 0) {
@@ -930,7 +930,7 @@ makeMetaAware(Karere);
             } else if(_type == "groupchat") {
                 stanzaType = "ChatMessage";
 
-                eventData['message'] = Strophe.getText(elems[0]);
+                eventData['message'] = $(elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
                 if($('forwarded', message).size() > 0) {

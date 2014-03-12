@@ -1339,20 +1339,20 @@ function api_setshare1(ctx)
 		if (typeof req.s[i].r != 'undefined')
 		{
 			if (!req.ok)
-			{			
+			{						
 				if (u_sharekeys[ctx.node]) sharekey = u_sharekeys[ctx.node];
 				else
 				{
 					// we only need to generate a key if one or more shares are being added to a previously unshared node
 					sharekey = [];
-					for (j = 4; j--; ) sharekey.push(rand(0x100000000));
+					for (j = 4; j--; ) sharekey.push(rand(0x100000000));					
+					
 					u_sharekeys[ctx.node] = sharekey;
 					newkey = true;
 				}
-
 				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
 				req.ha = crypto_handleauth(ctx.node);
-				ssharekey = a32_to_str(sharekey);
+				ssharekey = a32_to_str(sharekey);				
 			}
 		}
 	}
@@ -1620,20 +1620,73 @@ function api_fareq(res,ctx)
 
 				if (faxhrs[slot].readyState == XMLHttpRequest.DONE) break;
 			}
-		
+
 			faxhrs[slot].ctx = ctx;
 
 			if (d) console.log("Using file attribute channel " + slot);
-			
+
+			if (ctx.errfa && ctx.errfa.timeout)
+			{
+				faxhrs[slot].fa_timeout = ctx.errfa.timeout;
+
+				faxhrs[slot].onprogress = function()
+				{
+					if (this.fart) clearTimeout(this.fart);
+					this.fart = setTimeout(this.faeot.bind(this), this.fa_timeout);
+				};
+			}
+			else
+			{
+				delete faxhrs[slot].onprogress;
+
+				if (faxhrs[slot].onprogress)
+				{ // Huh? Gecko..
+					faxhrs[slot].onprogress = function() {};
+				}
+			}
+
+			faxhrs[slot].faeot = function()
+			{
+				if (this.fart) clearTimeout(this.fart);
+				if (!this.ctx.errfa) return;
+				if (d) console.log('FAEOT', this);
+
+				var ctx = this.ctx;
+				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+				if (id !== slideshowid)
+				{
+					if (id)
+					{
+						pfails[id] = 1;
+						delete preqs[id];
+					}
+
+					return;
+				}
+
+				this.abort();
+				this.ctx.errfa(id,1);
+			};
+
 			faxhrs[slot].onreadystatechange = function()
 			{
+				if (this.onprogress) this.onprogress();
+
 				if (this.readyState == this.DONE)
 				{
 					var ctx = this.ctx;
 
+					if (this.fart) clearTimeout(this.fart);
+
 					if (this.status == 200 && typeof this.response == 'object')
-					{				
+					{
 						if (this.response == null) return;
+						if (this.response.byteLength === 0)
+						{
+							if (d) console.warn('api_fareq: got empty response...');
+
+							return this.faeot();
+						}
 
 						if (ctx.p)
 						{
@@ -1692,11 +1745,26 @@ function api_fareq(res,ctx)
 						if (ctx.p)
 						{
 							if (d) console.log("File attribute retrieval failed (" + this.status + ")");
+							this.faeot();
 						}
 						else
 						{
-							if (d) console.log("Attribute storage failed (" + this.status + "), retrying...");
-							api_storefileattr(null,null,null,null,ctx);
+							if (!ctx.fastrgri) ctx.fastrgri = 400;
+
+							if (ctx.fastrgri < 7601)
+							{
+								if (d) console.log("Attribute storage failed (" + this.status + "), retrying...", ctx.fastrgri);
+
+								setTimeout(function()
+								{
+									api_storefileattr(null,null,null,null,ctx);
+
+								}, ctx.fastrgri += 800);
+							}
+							else
+							{
+								if (d) console.log("Attribute storage failed (" + this.status + ")");
+							}
 						}
 					}
 				}
@@ -1726,15 +1794,16 @@ function api_fareq(res,ctx)
 			if (data)
 			{
 				if (chromehack) t = pp[m].lastIndexOf('/');
-				else t = pp[m].length;
+				else t = -1;
 
 				pp[m] += '/'+ctx.type;
+                
+                if (t < 0) t = pp[m].length-1;
 
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
 
 				faxhrs[slot].responseType = 'arraybuffer';
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
-
 				faxhrs[slot].send(data);
 			}
 		}
@@ -1793,7 +1862,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in p)
 	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa };
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa };
 		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl},ctx);
 	}
 }
@@ -1875,8 +1944,7 @@ function crypto_procsr(sr)
 				}
 				else sh = ctx.sr[i];
 			}
-
-			if (rsr.length) api_req({ a : 'k', sr : rsr });
+			if (rsr.length) api_req({ a : 'k', sr : rsr });			
 		}
 	}
 	

@@ -3,8 +3,6 @@ var dlMethod
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new QueueClass(downloader)
-	, dlDecrypter = new QueueClass(decrypter)
-	, dl_id
 
 dlQueue.push = function(x) {
 	if (!x.task) {
@@ -60,17 +58,31 @@ var DownloadManager = new function() {
 		DEBUG("blocked patterns", locks);
 	};
 
-	self.cleanupUI = function(dl) {
+	self.cleanupUI = function(dl, force) {
+		var selector = null
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
 				if (file.zipid == dl.zipid) {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			$('#zip_' + dl.zipid).remove();
+			selector = '#zip_' + dl.zipid;
 		} else {
-			dl_queue[dl.pos] = {}; /* remove it */
-			$('#dl_' + dl.id).remove();
+			if(typeof dl.pos !== 'undefined') {
+				dl_queue[dl.pos] = {}; /* remove it */
+			} else {
+				$.each(dl_queue, function(i, file) {
+					if (file.id == dl.id) {
+						dl_queue[i] = {}; /* remove it */
+					}
+				});
+			}
+			selector = '#dl_' + dl.id;
+		}
+		if (dlMethod != FlashIO || force) {
+			$(selector).fadeOut('slow', function() {
+				$(this).remove();
+			});
 		}
 	}
 
@@ -80,15 +92,11 @@ var DownloadManager = new function() {
 				self.abort(file);
 			}
 		});
+		megatitle();
 	}
 
 	self.abort = function(pattern, dontCleanUI) {
-		var _pattern = pattern
-		if (typeof pattern == "object" && !dontCleanUI) {
-			self.cleanupUI(pattern);
-		}
-
-		DEBUG("cancelled file ", _pattern);
+		var _pattern = s2o(pattern);
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
 				if (!dl.cancelled && typeof dl.io.abort == "function") try {
@@ -100,7 +108,12 @@ var DownloadManager = new function() {
 				/* do not break the loop, it may be a multi-files zip */
 			}
 		});
+		if (typeof pattern == "object" && !dontCleanUI) {
+			self.cleanupUI(pattern);
+		}
+
 		self.remove(_pattern);
+		megatitle();
 	}
 
 	self.remove = function(pattern, check) {
@@ -140,6 +153,7 @@ var DownloadManager = new function() {
 		work.__canretry = true;
 		work.__ondone   = function() {
 			work.__ondone = function() {
+				DEBUG("here __ondone()->->");
 				self.release(pattern);
 			};
 		};
@@ -165,17 +179,40 @@ var DownloadManager = new function() {
 
 	self.enabled = function(task) {
 		var enabled = true;
+		if (task.__canretry) {
+			DEBUG("RETRYING TASK");
+			return true;
+		}
 		$.each(locks, function(i, pattern) {
 			if (doesMatch(task, pattern)) {
 				enabled = false;
 				return false; /* break */
 			}
 		});
-		return enabled || task.__canretry;
+		return enabled;
 	}
 
 }
 
+// downloading variable {{{
+dlQueue.on('working', function() {
+	downloading = true;
+});
+
+dlQueue.on('resume', function() {
+	downloading = true;
+});
+
+dlQueue.on('pause', function() {
+	downloading = false;
+});
+
+dlQueue.on('drain', function() {
+	downloading = false;
+});
+// }}}
+
+// chunk scheduler {{{
 /**
  *	Override the downloader scheduler method.
  *	The idea is to select chunks from the same
@@ -198,7 +235,7 @@ dlQueue.getNextTask = (function() {
 				candidate = p;
 				return false; /* break */
 			}
-			if (candidate === null) {
+			if (candidate === null || (pzTask instanceof ClassChunk && self._queue[candidate] instanceof ClassFile)) {
 				/* make it our candidate but don't break the loop */
 				candidate = p;
 			}
@@ -217,6 +254,7 @@ dlQueue.getNextTask = (function() {
 		return candidate;
 	};
 })();
+// }}}
 
 if (localStorage.dl_maxSlots) {
 	dl_maxSlots = localStorage.dl_maxSlots;
@@ -243,13 +281,14 @@ function checkLostChunks(file)
 	if (have_ab && (dl_key[6] != (mac[0]^mac[1]) || dl_key[7] != (mac[2]^mac[3]))) {
 		return false;
 	}
-	
+
 	if (file.data) {
 		createnodethumbnail(
 			file.id,
 			new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]),
 			++ul_faid,
-			file.data
+			file.data,
+			file.preview === -1
 		);
 	}
 
@@ -317,6 +356,12 @@ function failureFunction(reschedule, task, args) {
 
 	DownloadManager.pause(task);
 
+	if (!task.dl.retry_time) {
+		task.dl.retry_time = 1000
+	} else {
+		task.dl.retry_time = Math.min(task.dl.retry_time*1.2, 3600*1000);
+	}
+
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
@@ -331,17 +376,15 @@ function failureFunction(reschedule, task, args) {
 
 	dl_reportstatus(dl, EAGAIN);
 
-	dl_retryinterval *= 1.2;
 	setTimeout(function() {
 		var range = (dl.url||"").replace(/.+\//, '');
 		dlGetUrl(dl, function (error, res, o) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}
-			DownloadManager.pause(task); 
 			reschedule(); 
 		});
-	}, dl_retryinterval);
+	}, task.dl.retry_time);
 }
 
 DownloadQueue.prototype.push = function() {
@@ -380,9 +423,11 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
+	dl_decrypter(dl);
+	dl_writer(dl);
+
 	dl.macs  = {}
 	dl.urls	 = []
-	dl.decrypt = 0;
 
 	dlQueue.push(new ClassFile(dl));
 
@@ -428,7 +473,7 @@ function dlGetUrl(object, callback) {
 							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 	
 						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0)) {
+							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || object.preview === -1)) {
 								object.data = new ArrayBuffer(res.s);				
 							}
 							return callback(false, res, o, object);
@@ -445,7 +490,19 @@ function dlGetUrl(object, callback) {
 			dl_retryinterval *= 1.2;
 			callback(new Error("failed"))
 		}
+	},n_h ? 1 : 0);
+}
+
+function IdToFile(id) {
+	var dl = {}
+	$.each(dl_queue, function(i, _dl) {
+		if (id == _dl.id) {
+			dl = _dl
+			dl.pos = i
+			return false;
+		}
 	});
+	return dl;
 }
 
 if(localStorage.dlMethod) {

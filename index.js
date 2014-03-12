@@ -33,13 +33,15 @@ var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500
 
 
 function startMega()
-{
+{	
 	if (silent_loading)
 	{
 		silent_loading();
 		silent_loading=false;
 		return false;
 	}
+	else populate_l();
+	
 	if (pages['dialogs'])
 	{	
 		$('body').append(translate(pages['dialogs'].replace(/{staticpath}/g,staticpath)));
@@ -358,7 +360,18 @@ function init_page()
 			if ($(e).height() > h) h = $(e).height();
 		});
 		$('.chrome-bottom-block').height(h);
-		if ('-en-'.indexOf('-'+lang+'-') == -1) $('.chrome-download-button').css('font-size','12px');		
+		if ('-en-'.indexOf('-'+lang+'-') == -1) $('.chrome-download-button').css('font-size','12px');
+		
+		if (!chrome.app.isInstalled && document.location.href.substr(0,19) !== 'chrome-extension://')
+		{		
+			$('.chrome-app-button,.chrome-app-scr').unbind('click');
+			$('.chrome-app-button,.chrome-app-scr').bind('click', function ()
+			{			
+				chrome.webstore.install();
+				return false;
+			});
+			$('.chrome-app-scr').css('cursor','pointer');
+		}		
 	}
 	else if (page == 'key')
 	{

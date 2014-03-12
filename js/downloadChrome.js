@@ -81,11 +81,11 @@ function FileSystemAPI(dl_id, dl) {
 	
 					dl_fw.onerror = function(e) {
 						failed = e;
-						dl_ack_write();
+						//dl_ack_write();
 					}
 	
 					dl_fw.onwriteend = function() {
-						if (this.position == targetpos) return dl_ack_write();
+						if (dl_fw.position == targetpos) return dl_ack_write();
 	
 						/* error */
 						clearit(0,0,function(s) {
@@ -100,7 +100,7 @@ function FileSystemAPI(dl_id, dl) {
 						});
 	
 						setTimeout(function() {
-							failed = 'Short write (' + this.position + ' / ' + this.targetpos + ')';
+							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
 							dl_ack_write();
 						}, 2000);
 					}
@@ -109,7 +109,7 @@ function FileSystemAPI(dl_id, dl) {
 					setTimeout(function() {
 						// deferred execution
 						IO.begin();
-					});
+					}, 1);
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -181,25 +181,23 @@ function FileSystemAPI(dl_id, dl) {
 	}
 
 	IO.write = function(buffer, position, done) {
-		if (dl_writing || position !== dl_fw.position) {
-			// busy or not there yet
-			// DEBUG(dl_writing ? "Writer is busy, I'll retry in a bit" : "Queueing future chunk");
-			return setTimeout(function() {
-				if (!dl.cancelled) IO.write(buffer, position, done);
-			}, 100);
+		if (position != dl_fw.position) {
+			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
 		dl_writing = true;
 		failed     = false;
 		targetpos  = buffer.length + dl_fw.position;
 
 		dl_ack_write = function() {
-			dl_writing = false;
 			if (failed) {
 				failed = false; /* reset error flag */
-				this.seek(position);
-				dl_fw.write(new Blob([buffer]));
-				return;
+				dl_fw.seek(position);
+				return setTimeout(function() {
+					dl_fw.write(new Blob([buffer]));
+				}, 2000);
 			}
+
+			dl_writing = false;
 			done(); /* notify writer */
 		};
 

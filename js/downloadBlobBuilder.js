@@ -4,11 +4,6 @@ function BlobBuilderIO(dl_id, dl) {
 		, offset = 0
 
 	this.write = function (buffer, position, done) {
-		if (position !== offset) {
-			return setTimeout(function() {
-				if (!dl.cancelled) IO.write(buffer, position, done);
-			}, 100);
-		}
 		dl_blob.append(have_ab ? buffer : buffer.buffer);
 		offset += (have_ab ? buffer : buffer.buffer).length;
 		done();

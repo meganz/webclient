@@ -85,10 +85,15 @@ function startupload()
 	ul_instance++;
 
 	if (ul_uploading) return;
+
+	while (ul_queue_num < ul_queue.length && !ul_queue[ul_queue_num])
+		ul_queue_num++;
+
+	DEBUG("uploading", ul_uploading, ul_queue_num)
 	
 	if (ul_queue_num >= ul_queue.length)
 	{
-		if (d) console.log("No further uploads, clearing ul_queue");
+		DEBUG("No further uploads, clearing ul_queue");
 		ul_queue = [];
 		ul_queue_num = 0;
 		return;
@@ -101,7 +106,7 @@ function startupload()
 		ul_flashreaderactive = false;
 	}
 	else ul_reader = new FileReader();
-	if (d) console.log(ul_queue_num + ' - ' + ul_queue.length);
+	DEBUG(ul_queue_num + ' - ' + ul_queue.length);
 	ul_queue[ul_queue_num].retries = ul_queue[ul_queue_num].retries+1 || 0;	
 	
 	try
@@ -117,7 +122,7 @@ function startupload()
 	}
 	catch(e)
 	{
-		if (d) console.log('FINGERPRINT ERROR', e.message || e);
+		DEBUG('FINGERPRINT ERROR', e.message || e);
 
 		initupload1();	
 	}

@@ -1,4 +1,4 @@
-var dlpage_key,dlpage_ph;
+var dlpage_key,dlpage_ph,dl_next;
 var fdl_filename, fdl_filesize, fdl_key, fdl_url, fdl_starttime;
 var fdl_file=false;
 var dl_import=false;
@@ -7,6 +7,7 @@ var fdl_queue_var=false;
 
 function dlinfo(ph,key,next)
 {
+	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
 	{
 		$('.new-download-red-button').html(l[1388].replace('[B]','<div class="new-download-button-txt1">').replace('[/B]','</div>').replace('[A]','<div class="new-download-button-txt2">').replace('[/A]','</div>'));		
@@ -25,192 +26,100 @@ function dlinfo(ph,key,next)
 	$('.download-mid-white-block').addClass('hidden');	
 	dlpage_ph 	= ph;
 	dlpage_key 	= key;
-	api_req({ a : 'g', p : ph },
+	if (dl_res)
 	{
-		callback : function (res)
-		{
-			$('.widget-block').addClass('hidden');
-			loadingDialog.hide();
-			$('.download-mid-white-block').removeClass('hidden');		
-			if (res == ETOOMANY) $('.download-mid-centered-block').addClass('not-available-user');			
-			else if (typeof res == 'number' && res < 0) $('.download-mid-centered-block').addClass('not-available-some-reason');
-			else if (res.e == ETEMPUNAVAIL) $('.download-mid-centered-block').addClass('not-available-temporary');
-			else if (res.d) $('.download-mid-centered-block').addClass('not-available-some-reason');
-			else if (res.at)
-			{
-				$('.download-pause').unbind('click');
-				$('.download-pause').bind('click',function(e)
-				{
-					if ($(this).attr('class').indexOf('active') == -1) 
-					{
-						uldl_pause();
-						$(this).addClass('active');
-					}
-					else 
-					{
-						uldl_resume();
-						$(this).removeClass('active');
-					}					
-				});				
-				$('.new-download-red-button').unbind('click');
-				$('.new-download-red-button').bind('click',function(e)
-				{
-					if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
-					
-					dl_queue.push(fdl_queue_var);					
-					$('.download-mid-centered-block').addClass('downloading');
-					$.dlhash = window.location.hash;
-				});				
-				$('.new-download-gray-button').unbind('click');
-				$('.new-download-gray-button').bind('click',function(e)
-				{
-					start_import();
-				});
-				if (key)
-				{
-					var base64key = key;
-					key = base64_to_a32(key);					
-					dl_attr = res.at;
-					var dl_a = base64_to_ab(res.at);	
-					fdl_file = dec_attr(dl_a,key);
-					fdl_filesize = res.s;
-				}				
-				if (fdl_file)
-				{
-					if (next === 2)
-					{
-						dlkey = dlpage_key;
-						dlclickimport();
-						return false;
-					}
-					fdl_queue_var = {
-						ph:		ph,						
-						key: 	key,
-						s: 		res.s,
-						n: 		fdl_file.n,
-						size:   fdl_filesize,
-						onDownloadProgress: dlprogress,
-						onDownloadComplete: dlcomplete,
-						onDownloadStart: dlstart,
-						onDownloadError: dlerror,
-						onBeforeDownloadComplete: function() { }
-					};
-					$('.new-download-file-title').text(fdl_file.n);						
-					$('.new-download-file-size').text(bytesToSize(res.s));
-					$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
-				}
-				else dlkeyDialog();				
-				if (baboom) dl_ad();
-			}
-			else $('.download-mid-centered-block').addClass('not-available-some-reason');
-			if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
-			{
-				setTimeout(function()
-				{
-					browserDialog();
-				},2000);
-			}			
-		}
-	});
+		dl_g(dl_res);
+		dl_res = false;
+	}
+	else api_req({a:'g',p:ph},{callback:dl_g});
 }
 
 
-
-function dl_ad()
-{
-	if (u_attr && u_attr.p) return false;
-	var audiopath = 'https://m.static.mega.co.nz/';	
-	$('body').addClass('adv');
-	window.baboomAds([
+function dl_g(res)
+{	
+	$('.widget-block').addClass('hidden');
+	loadingDialog.hide();
+	$('.download-mid-white-block').removeClass('hidden');		
+	if (res == ETOOMANY) $('.download-mid-centered-block').addClass('not-available-user');			
+	else if (typeof res == 'number' && res < 0) $('.download-mid-centered-block').addClass('not-available-some-reason');
+	else if (res.e == ETEMPUNAVAIL) $('.download-mid-centered-block').addClass('not-available-temporary');
+	else if (res.d) $('.download-mid-centered-block').addClass('not-available-some-reason');
+	else if (res.at)
 	{
-		url:audiopath + 'audio/01.mp3',
-		title: 'Amazing',
-		top: -20
-	},
+		$('.download-pause').unbind('click');
+		$('.download-pause').bind('click',function(e)
+		{
+			if ($(this).attr('class').indexOf('active') == -1) 
+			{
+				uldl_pause();
+				$(this).addClass('active');
+			}
+			else 
+			{
+				uldl_resume();
+				$(this).removeClass('active');
+			}					
+		});				
+		$('.new-download-red-button').unbind('click');
+		$('.new-download-red-button').bind('click',function(e)
+		{
+			if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
+			
+			dl_queue.push(fdl_queue_var);					
+			$('.download-mid-centered-block').addClass('downloading');
+			$.dlhash = window.location.hash;
+		});				
+		$('.new-download-gray-button').unbind('click');
+		$('.new-download-gray-button').bind('click',function(e)
+		{
+			start_import();
+		});
+		
+		var key = dlpage_key;
+		
+		if (key)
+		{
+			var base64key = key;
+			key = base64_to_a32(key);					
+			dl_attr = res.at;
+			var dl_a = base64_to_ab(res.at);	
+			fdl_file = dec_attr(dl_a,key);
+			fdl_filesize = res.s;
+		}				
+		if (fdl_file)
+		{
+			if (dl_next === 2)
+			{
+				dlkey = dlpage_key;
+				dlclickimport();
+				return false;
+			}
+			fdl_queue_var = {
+				ph:		dlpage_ph,						
+				key: 	key,
+				s: 		res.s,
+				n: 		fdl_file.n,
+				size:   fdl_filesize,
+				onDownloadProgress: dlprogress,
+				onDownloadComplete: dlcomplete,
+				onDownloadStart: dlstart,
+				onDownloadError: dlerror,
+				onBeforeDownloadComplete: function() { }
+			};
+			$('.new-download-file-title').text(fdl_file.n);						
+			$('.new-download-file-size').text(bytesToSize(res.s));
+			$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
+		}
+		else dlkeyDialog();
+	}
+	else $('.download-mid-centered-block').addClass('not-available-some-reason');
+	if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
 	{
-		url:audiopath + 'audio/02.mp3',
-		title: 'Good Times<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/03.mp3',
-		title: 'Dance Dance Dance',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/04.mp3',
-		title: 'Keeps Getting Better<br>',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/05.mp3',
-		title: 'Change Your Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/06.mp3',
-		title: 'Universe<br>',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/07.mp3',
-		title: 'Little Bit Of Me',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/08.mp3',
-		title: 'Party Electricity',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/09.mp3',
-		title: 'Wunderbar (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/10.mp3',
-		title: 'To Be With You',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/11.mp3',
-		title: 'Good Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/12.mp3',
-		title: 'Party Amplifier',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/13.mp3',
-		title: 'Take Me Away',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/14.mp3',
-		title: 'Beathoven (Interlude)',
-		top: -45
-	},
-	{
-		url:audiopath + 'audio/15.mp3',
-		title: 'Firework',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/16.mp3',
-		title: 'Live My Life',
-		top: -20
-	},
-	{
-		url:audiopath + 'audio/17.mp3',
-		title: 'Beathoven Slow',
-		top: -20
-	}], function (err) {
-	// TODO: handle err
-});
-
-
+		setTimeout(function()
+		{
+			browserDialog();
+		},2000);
+	}
 }
 
 
@@ -264,7 +173,7 @@ function dlerror(id,error)
 	}
 }
 
-function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
+function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
 	if (kbps == 0) return;
 	$('.downloading-txt.temporary-error').addClass('hidden');
@@ -272,7 +181,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
 	if (uldl_hold) return false;
 	if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
 	if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;	
-	var perc = Math.round(bytesloaded/bytestotal*100);	
+
 	if (!m)
 	{
 		$('.download-mid-centered-block').addClass('downloading');

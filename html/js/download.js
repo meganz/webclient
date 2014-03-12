@@ -173,7 +173,7 @@ function dlerror(id,error)
 	}
 }
 
-function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
+function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
 	if (kbps == 0) return;
 	$('.downloading-txt.temporary-error').addClass('hidden');
@@ -181,7 +181,7 @@ function dlprogress(fileid, bytesloaded, bytestotal,kbps, dl_queue_num)
 	if (uldl_hold) return false;
 	if ((typeof dl_limit_shown != 'undefined') && (dl_limit_shown < new Date().getTime()+20000) && (!m)) bwDialog.close();
 	if (!dl_queue[dl_queue_num].starttime) dl_queue[dl_queue_num].starttime = new Date().getTime()-100;	
-	var perc = Math.round(bytesloaded/bytestotal*100);	
+
 	if (!m)
 	{
 		$('.download-mid-centered-block').addClass('downloading');

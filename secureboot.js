@@ -809,7 +809,12 @@ else
 					loginresponse= false;
 					boot_done();
 				}
-			}		
+			}
+			else
+			{
+				loginresponse= false;
+				boot_done();
+			}
 		}
 		lxhr.onerror = function()
 		{
@@ -855,7 +860,12 @@ else
 					dl_res = false;
 					boot_done();
 				}
-			}		
+			}
+			else
+			{
+				dl_res = false;
+				boot_done();			
+			}
 		}
 		dlxhr.onerror = function()
 		{

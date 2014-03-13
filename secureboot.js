@@ -379,8 +379,8 @@ else
         jsl.push({f:'js/chat/karere.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/chat.js', n: 'mega_js', j:1,w:7});
         // END OF MEGA CHAT
-        
-        
+
+
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
         /* better download */
@@ -861,7 +861,8 @@ else
                 try
                 {
                     loginresponse = this.response || this.responseText;
-                    if (loginresponse[0] == '{') loginresponse = JSON.parse(loginresponse);
+                    if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+                    else loginresponse = false;
                     boot_done();
                 }
                 catch (e)
@@ -929,7 +930,7 @@ else
         }
         dlxhr.onerror = function()
         {
-            loginresponse= false;
+            dl_res= false;
             boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);

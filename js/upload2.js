@@ -222,8 +222,6 @@ function ul_upload(File) {
 	}
 
 	onUploadStart(file.pos);
-	
-	file.done_starting();
 }
 
 
@@ -255,6 +253,7 @@ function ChunkUpload(file, start, end)
 
 	this.run = function(Job) {
 		var chunk = { start: start, end: end, task: this}
+	
 		file.ul_reader.push(chunk, function() {
 			var encrypter = new Worker('encrypter.js');
 			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
@@ -294,7 +293,10 @@ function FileUpload(file) {
 
 		ul_uploading = true;
 
+		var started = false;
 		file.done_starting = function() {
+			if (started) return;
+			started = true;
 			console.warn("done with file_start");
 			ul_uploading = false;
 			Job.done();
@@ -368,6 +370,8 @@ function ul_chunk_upload(chunk, file, Job) {
 				delete file.progress[chunk.start];
 				DEBUG("done", chunk);
 				ul_updateprogress();
+				file.done_starting(); 
+
 				if (response.length == 27) {
 					var t = [], ul_key = file.ul_key
 					for (p in file.ul_macs) t.push(p);

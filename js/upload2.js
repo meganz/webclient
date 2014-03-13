@@ -463,6 +463,7 @@ var ul_queue  = new UploadQueue
 	, ul_block_size = 131072
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
+	, ul_dom = []
 
 ulQueue.getNextTask = function() {
 	var candidate = null

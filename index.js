@@ -805,7 +805,8 @@ function mLogout()
 					if (ul_uploading)
 					{
 						ul_cancel();
-						ul_queue=[];
+						ul_queue = new UploadQueue;
+						ul_dom   = []
 					}
 					$.dologout();
 				}

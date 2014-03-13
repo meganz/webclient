@@ -60,7 +60,7 @@ function ul_deduplicate(File, identical) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
 				onUploadSuccess(uq.pos);
-				file.done_starting();
+				File.file.done_starting();
 			} else {
 				api_completeupload2({
 					callback: api_completeupload2, 
@@ -75,7 +75,7 @@ function ul_deduplicate(File, identical) {
 						callback:ul_completepending2
 					}
 				},ctx.uq);
-				file.done_starting();
+				File.file.done_starting();
 			}
 		}
 	});
@@ -143,7 +143,7 @@ var UploadManager = new function() {
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		newTask.__retry = true
-		ulQueue.push(newTask, function() {
+		ulQueue.pushFirst(newTask, function() {
 			/* release error pausing */
 			file.paused = false;
 		});
@@ -228,7 +228,7 @@ function ul_upload(File) {
 
 
 function ul_start(File) {
-	if (File.posturl) return ul_upload(File);
+	if (File.file.posturl) return ul_upload(File);
 	var maxpf = 128*1048576
 		, next = ul_get_posturl(File);
 
@@ -295,6 +295,7 @@ function FileUpload(file) {
 		ul_uploading = true;
 
 		file.done_starting = function() {
+			console.warn("done with file_start");
 			ul_uploading = false;
 			Job.done();
 		};
@@ -462,12 +463,17 @@ var ul_queue  = new UploadQueue
 ulQueue.getNextTask = function() {
 	var candidate = null
 	$.each(ulQueue._queue, function(i, task) {
-		if (UploadManager.isReady(task)) {
+		if (task instanceof ChunkUpload && UploadManager.isReady(task)) {
 			ulQueue._queue.splice(i, 1);
 			candidate = task;
 			return false;
 		}
 	});
+
+	if (!candidate && ulQueue._queue.length > 0 &&
+			ulQueue._queue[0] instanceof FileUpload) {
+		return ulQueue._queue.shift();
+	}
 
 	return candidate;
 };

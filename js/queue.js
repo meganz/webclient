@@ -24,10 +24,10 @@ var DEFAULT_CONCURRENCY = 4
 	function Context(queue, args) {
 		this.task = args;
 		this.reschedule = function() {
+			var callback = queue._callback[args.__tid];
 			this.done();
 			setTimeout(function() {
-				queue.push(args);
-				DEBUG('reschedule', queue, args);
+				queue.pushFirst(args, callback);
 			}, 100);
 		};
 

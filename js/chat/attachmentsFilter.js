@@ -76,7 +76,9 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
         if(attachment.t == 0) {
             // case 1 - one file
             $('.fm-chat-size', $element).text(bytesToSize(attachment.s));
-            $('.block-view-file-type', $element).addClass('generic');
+            $('.block-view-file-type', $element).addClass(
+                fileicon({'name': attachment.name})
+            );
             // TBD
 
         } else if(attachment.t == 1) {

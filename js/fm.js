@@ -795,7 +795,7 @@ function initContextUI()
 	{
 		M.addDownload($.selected);
 	});
-	
+
 	$(c+'.zipdownload-item').unbind('click');
 	$(c+'.zipdownload-item').bind('click',function(event) 
 	{
@@ -806,7 +806,11 @@ function initContextUI()
 	$(c+'.getlink-item').bind('click',function(event) 
 	{
 		if (u_type === 0) ephemeralDialog(l[1005]);
-		else M.getlinks($.selected);
+		else {
+            M.getlinks($.selected).done(function() {
+                linksDialog();
+            });
+        }
 	});
 	
 	$(c+'.sharing-item').unbind('click');
@@ -5148,7 +5152,11 @@ function slideshow(id,close)
 	$('.slideshow-getlink').bind('click',function(e)
 	{
 		if (u_type === 0) ephemeralDialog(l[1005]);
-		else M.getlinks([slideshowid]);
+		else {
+            M.getlinks([slideshowid]).done(function() {
+                linksDialog();
+            });
+        }
 	});
 	
 	if (previews[id])

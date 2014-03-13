@@ -390,7 +390,11 @@ function MegaData ()
 		{
 			$.selected = [$(this).closest('tr').attr('id')];
 			if (u_type === 0) ephemeralDialog(l[1005]);
-			else M.getlinks([$.selected]);
+			else {
+                M.getlinks([$.selected]).done(function() {
+                    linksDialog();
+                });
+            }
 		});
 
 		if (this.viewmode == 1)
@@ -1342,6 +1346,8 @@ function MegaData ()
 
 	this.getlinks = function(h)
 	{
+        this.$getLinkPromise = new $.Deferred();
+
 		loadingDialog.show();
 		this.links = [];
 		this.folderlinks = [];
@@ -1357,10 +1363,14 @@ function MegaData ()
 		if (d) console.log('getlinks',this.links);
 		if (this.folderlinks.length > 0) this.getFolderlinks();
 		else this.getlinksDone();
+
+        return this.$getLinkPromise;
 	}
 
 	this.getlinksDone = function()
 	{
+        var self = this;
+
 		for (var i in this.links) api_req({a:'l',n:this.links[i]},{
 			node : this.links[i],
 			last : i == this.links.length-1,
@@ -1370,7 +1380,7 @@ function MegaData ()
 
 				if (ctx.last)
 				{
-					linksDialog();
+                    self.$getLinkPromise.resolve();
 					loadingDialog.hide();
 				}
 			}
@@ -2459,8 +2469,7 @@ function doshare(h,t)
 						M.nodeShare(ctx.h,{h:$.selected[0],r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
 					}
 				}
-				$('.fm-dialog.share-dialog').remjiktak
-                oveClass('hidden');
+				$('.fm-dialog.share-dialog').removeClass('hidden');
 				loadingDialog.hide();
 				M.renderShare($.selected[0]);
 				shareDialog();

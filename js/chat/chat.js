@@ -158,17 +158,12 @@ var chatui;
 
             $('.as-zip', $chatDownloadPopup).unbind('click.megachat');
             $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
-                $.each(nodeIds, function(k, v) {
-                    M.addDownload(v, true);
-                });
-
+                M.addDownload(nodeIds, true);
             });
 
             $('.to-computer', $chatDownloadPopup).unbind('click.megachat');
             $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
-                $.each(nodeIds, function(k, v) {
-                    M.addDownload(v);
-                });
+                M.addDownload(nodeIds, false);
             });
         });
 
@@ -2693,33 +2688,12 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
 
     loadingDialog.show();
 
-    var $promises = [];
-    $.each(ids, function(i, id) {
-        var $promise = new $.Deferred();
-        $promises.push(
-            $promise
-        );
 
-        api_req({a:'l',n: id},{
-            node : id,
-//            last : i == this.links.length-1,
-            callback : function(res,ctx)
-            {
-                if (typeof res != 'number')  {
-                    M.nodeAttr({h:id,ph:res});
-                    $promise.resolve(M.d[id]);
-                } else {
-                    $promise.reject(res);
-                }
-
-            }
-        });
-    });
 
 
     var $promise = new $.Deferred();
 
-    $.when.apply($, $promises)
+    M.getlinks(ids)
         .done(function(responses) {
             var attachments = {};
             $.each(ids, function(k, nodeId) {

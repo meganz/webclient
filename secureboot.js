@@ -81,7 +81,16 @@ try
     }
     else
     {
-        if (localStorage.dd) localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+        if (localStorage.dd) {
+            var devhost = window.location.host;
+
+            // handle subdirs
+            var pathSuffix = window.location.pathname;
+            pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
+
+            // set the staticpath for debug mode
+            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        }
         var staticpath = localStorage.staticpath || geoStaticpath();
         var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
         var contenterror = 0;
@@ -549,6 +558,28 @@ else
                 i++;
             }
         }
+
+        if (jj)
+        {
+            var l=[];
+            var i=0;
+            while (i < 1500)
+            {
+                l[i]='l';
+                i++;
+            }
+            i=0;
+            for (var i in jsl)
+            {
+                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + Math.random() + '"></sc' + 'ript>');
+                else if (jsl[i].j === 2)
+                {
+                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
+                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
+                }
+            }
+        }
+
         var pages = [];
         function getxhr()
         {

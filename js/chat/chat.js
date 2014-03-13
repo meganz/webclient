@@ -126,6 +126,47 @@ var chatui;
             var currentRoom = megaChat.getCurrentRoom();
 
             var $chatDownloadPopup = $('.fm-chat-download-popup',currentRoom.$messages);
+
+            var $button = $(this);
+            var $attachmentContainer = $button.parents('.attachments-container');
+            var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
+
+            var attachments = message.meta.attachments; //alias
+            var nodeIds = Object.keys(attachments);
+
+            var accessibleNodeIds = [];
+            $.each(nodeIds, function(k, v) {
+                if(M.d[v]) {
+                    accessibleNodeIds.push(v);
+                }
+            });
+
+            $('.to-cloud', $chatDownloadPopup).unbind('click.megachat');
+            $('.as-zip', $chatDownloadPopup).unbind('click.megachat');
+            $('.to-computer', $chatDownloadPopup).unbind('click.megachat');
+
+            if(accessibleNodeIds.length > 0) {
+                $('.save-button', $attachmentContainer).removeClass('disabled');
+
+                $('.to-cloud', $chatDownloadPopup).bind('click.megachat', function() {
+                    $.selected = clone(nodeIds);
+                    $.mctype = 'copy-cloud';
+                    mcDialog();
+                });
+
+                $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
+                    M.addDownload(nodeIds, true);
+                });
+
+                $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
+                    M.addDownload(nodeIds, false);
+                });
+            } else {
+                $('.save-button', $attachmentContainer).addClass('disabled');
+                return;
+            }
+
+
             var p = $(this);
             var positionY = $(this).closest('.jspPane').outerHeight() - $(this).position().top;
             var positionX = $(this).position().left;
@@ -143,29 +184,9 @@ var chatui;
             $(this).addClass('active');
             $($chatDownloadPopup).removeClass('hidden');
 
-            var $button = $(this);
-            var $attachmentContainer = $button.parents('.attachments-container');
-            var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
 
-            var attachments = message.meta.attachments; //alias
-            var nodeIds = Object.keys(attachments);
-            $('.to-cloud', $chatDownloadPopup).unbind('click.megachat');
-            $('.to-cloud', $chatDownloadPopup).bind('click.megachat', function() {
-                $.selected = clone(nodeIds);
-                $.mctype = 'copy-cloud';
-                mcDialog();
-            });
-
-            $('.as-zip', $chatDownloadPopup).unbind('click.megachat');
-            $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
-                M.addDownload(nodeIds, true);
-            });
-
-            $('.to-computer', $chatDownloadPopup).unbind('click.megachat');
-            $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
-                M.addDownload(nodeIds, false);
-            });
         });
+
 
 
         $('.fm-chat-message-scroll').unbind('click');
@@ -2688,12 +2709,24 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
 
     loadingDialog.show();
 
+    var users = [];
 
+    $.each(self.getParticipantsExceptMe(), function(k, v) {
+        users.push({
+            u: self.megaChat.getContactFromJid(v).h,
+            r: 0 /* READ ONLY */
+        });
+    });
 
+    var $promises = [];
+    $.each(ids, function(kk, h) {
+        $promises.push(
+            doshare(h, users, true)
+        );
+    });
 
-    var $promise = new $.Deferred();
-
-    M.getlinks(ids)
+    var $masterPromise = new $.Deferred();
+    $.when.apply($, $promises)
         .done(function(responses) {
             var attachments = {};
             $.each(ids, function(k, nodeId) {
@@ -2703,28 +2736,27 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
                     'h': nodeId,
                     's': node.s,
                     't': node.t,
-                    'ph': node.ph,
-                    'sharekeys': a32_to_base64(u_sharekeys[nodeId])
+                    'sharedWith': users
                 };
             });
 
             var messageId = self.sendMessage(message, {
                 'attachments': attachments
             });
-            $promise.resolve(
+            $masterPromise.resolve(
                 messageId,
                 attachments,
                 message
             );
         })
         .fail(function(r) {
-            $promise.reject(r);
+            $masterPromise.reject(r);
         })
         .always(function() {
             loadingDialog.hide();
         });
 
-    return $promise;
+    return $masterPromise;
 };
 
 MegaChatRoom.prototype.getMessageById = function(messageId) {

@@ -2441,8 +2441,10 @@ function getuid(email)
 	return false;
 }
 
-function doshare(h,t)
+function doshare(h,t, dontShowShareDialog)
 {
+    var $promise = new $.Deferred();
+
 	nodeids = fm_getnodes(h);
 	nodeids.push(h);
 
@@ -2466,22 +2468,31 @@ function doshare(h,t)
 						var rights = ctx.t[i].r;
 						var user = ctx.t[i].u;
 						if (user.indexOf('@') >= 0) user = getuid(ctx.t[i].u);
-						M.nodeShare(ctx.h,{h:$.selected[0],r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
+						M.nodeShare(ctx.h,{h:h,r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
 					}
 				}
-				$('.fm-dialog.share-dialog').removeClass('hidden');
+                if(dontShowShareDialog != true) {
+				    $('.fm-dialog.share-dialog').removeClass('hidden');
+                }
 				loadingDialog.hide();
-				M.renderShare($.selected[0]);
-				shareDialog();
+				M.renderShare(h);
+
+                if(dontShowShareDialog != true) {
+                    shareDialog();
+                }
+
 				renderfm();
+                $promise.resolve();
 			}
 			else
 			{
 				$('.fm-dialog.share-dialog').removeClass('hidden');
 				loadingDialog.hide();
+                $promise.reject(res);
 			}
 		}
 	});
+    return $promise;
 }
 
 function processmove(jsonmove)

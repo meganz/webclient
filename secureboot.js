@@ -86,7 +86,7 @@ try
 
             // handle subdirs
             var pathSuffix = window.location.pathname;
-            pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
+            pathSuffix = pathSuffix.split("/").slice(0,-1).join("/");
 
             // set the staticpath for debug mode
             localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";

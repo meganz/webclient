@@ -5537,13 +5537,17 @@ div .fm-tree-folder.dragover {
 }
 .fm-chat-messages-block {
 	border-top: 2px solid #eeeeee;
-	padding: 20px 0 16px 0;
+	padding: 10px 0 4px 0;
 	display: inline-block;
 	width: 100%;
 }
 .fm-chat-messages-block:first-child {
 	border: 0;
 }
+.fm-chat-messages-block.grouped-message {
+    padding-bottom: 0;
+}
+
 .fm-chat-user {
 	font-size: 15px;
 	line-height: 22px;

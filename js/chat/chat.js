@@ -65,12 +65,6 @@ var chatui;
 
             if ($(this).val().length !== 0 && count>1) {
                 $(this).height($(this).prop("scrollHeight"));
-                var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - 80;
-                if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight())
-                {
-                   
-                    megaChat.resized();
-                }
 
                 // If any popup is opened - moving with buttons
                 if ($('.fm-chat-emotions-icon').attr('class').indexOf('active') > -1)
@@ -85,6 +79,8 @@ var chatui;
                 }
             }
             else $(this).height('27px');
+
+            megaChat.resized();
         });
 
         $('.fm-chat-emotions-icon').unbind('click');
@@ -258,7 +254,10 @@ var chatui;
                         msg
                     );
                     $(this).val('');
+
                     stoppedTyping();
+
+                    megaChat.resized();
                     return false;
                 }
             }
@@ -542,7 +541,7 @@ var MegaChat = function() {
 
 
     this.karere.bind("onComposingMessage", function(e, eventData) {
-        if(eventData.myOwn && eventData.isForwarded) {
+        if(eventData.myOwn || eventData.isForwarded) {
             return;
         }
 
@@ -558,7 +557,7 @@ var MegaChat = function() {
     });
 
     this.karere.bind("onPausedMessage", function(e, eventData) {
-        if(eventData.myOwn && eventData.isForwarded) {
+        if(eventData.myOwn || eventData.isForwarded) {
             return;
         }
 
@@ -1098,7 +1097,7 @@ MegaChat.prototype.getJidFromNodeId = function(nodeId) {
 
     // TODO: fake function that should be replaced with a real node ID -> jabber id conversion
     var hash = simpleStringHashCode(nodeId) + "";
-    return "test-" + hash[hash.length - 1] + "@sandbox.developers.mega.co.nz";
+    return "test-" + hash.substr(-1) + "@sandbox.developers.mega.co.nz";
 };
 
 /**
@@ -1300,9 +1299,18 @@ MegaChat.prototype.sendMessage = function(roomJid, val) {
 
 //TODO: Docs
 MegaChat.prototype.resized = function() {
-    var $jsp = $('.fm-chat-message-scroll').data("jsp");
-    if($jsp) {
-        $jsp.reinitialise();
+    var self = this;
+    var room = self.getCurrentRoom();
+    if(room) {
+        var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - 80;
+        if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight())
+        {
+            $('.fm-chat-message-scroll').height(
+                scrollBlockHeight
+            );
+        }
+
+        room.refreshUI(true);
     }
 };
 
@@ -1321,7 +1329,7 @@ MegaChat.prototype.getPrivateRoomJidFor = function(jid) {
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
- * @param megaChat
+ * @param megaChat {MegaChat}
  * @param roomJid
  * @returns {MegaChatRoom}
  * @constructor

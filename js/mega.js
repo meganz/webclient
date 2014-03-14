@@ -1730,7 +1730,27 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
+	var elementQueues = []
+		, DOM_TRANSFER_LIMIT = 5
+	$(document).on('remove', '.transfer-table tr', function() {
+		$.each(elementQueues, function(i, html) {
+			if ($('.transfer-table tr').length-1 > DOM_TRANSFER_LIMIT) {
+				return false;
+			}
+			$(html).appendTo('.transfer-table')
+			elementQueues[i] = null;
+		});
+		elementsQueue = $.grep(elementQueues, function(html) {
+			return html !== null;
+		});
+	});
 
+	this.addToTransferTable = function(elem) {
+		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
+			return elementQueues.push(elem);
+		}
+		$(elem).appendTo('.transfer-table')
+	}
 
 	this.addUpload = function(u)
 	{
@@ -1742,9 +1762,9 @@ function MegaData ()
 			f.target = M.currentdirid;
 			f.id = ul_id;
 
-			ul_dom.push(function() {
-				$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
-			});
+			this.addToTransferTable(
+				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>'
+			);
 			ul_queue.push(f);			
 			
 		}

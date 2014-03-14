@@ -333,6 +333,7 @@ else
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
 		jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
 		jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+		jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});

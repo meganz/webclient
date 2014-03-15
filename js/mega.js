@@ -1731,7 +1731,7 @@ function MegaData ()
 	this.mobileuploads = [];
 
 	var elementQueues = []
-		, DOM_TRANSFER_LIMIT = 5
+		, DOM_TRANSFER_LIMIT = 15
 	$(document).on('remove', '.transfer-table tr', function() {
 		$.each(elementQueues, function(i, html) {
 			if ($('.transfer-table tr').length-1 > DOM_TRANSFER_LIMIT) {

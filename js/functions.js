@@ -1,12 +1,16 @@
-function inherits(ctor, superCtor) {
-	ctor.super_ = superCtor
-	var TempCtor = function () {
-		ctor.super_.prototype.constructor.apply(this, arguments)
+var inherits = (function(){
+	var createObject = Object.create || function createObject(source) {
+		var Host = function () {};
+		Host.prototype = source;
+		return new Host();
+	};
+
+	return function (destination, source) {
+		var proto = destination.prototype = createObject(source.prototype);
+		proto.constructor = destination;
+		proto._super = source.prototype;
 	}
-	TempCtor.prototype = superCtor.prototype
-	ctor.prototype = new TempCtor()
-	ctor.prototype.constructor = ctor
-}
+})();
 
 
 function asciionly(text)

@@ -84,7 +84,7 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.process = function() {
 		var args, context;
-		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
+		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
 				/* nothing on the queue? */
@@ -102,7 +102,7 @@ var DEFAULT_CONCURRENCY = 4
 			this._worker.apply(context, [args])
 		}
 
-		if (this._queue.length == 0) {
+		if (this._queue.length == 0 && this._running.length == 0) {
 			this.trigger('drain');
 		}
 	}
@@ -158,7 +158,6 @@ var DEFAULT_CONCURRENCY = 4
 	 *	Schedule a task to be processed right away (or as soon as possible)
 	 */	
 	queue.prototype.pushFirst = function(task, done) {
-		this.process();
 		task.__tid = id++;
 		this._queue.unshift(task);
 		this._callback[task.__tid] = done || function() {};

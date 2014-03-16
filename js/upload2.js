@@ -224,7 +224,6 @@ function ul_upload(File) {
 	onUploadStart(file.pos);
 }
 
-
 function ul_start(File) {
 	if (File.file.posturl) return ul_upload(File);
 	var maxpf = 128*1048576
@@ -287,18 +286,18 @@ function FileUpload(file) {
 	this.run = function(Job) {
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
-		if (ul_uploading) {
+		if (start_uploading) {
 			return Job.reschedule();
 		}
 
-		ul_uploading = true;
+		start_uploading = true;
 
 		var started = false;
 		file.done_starting = function() {
 			if (started) return;
 			started = true;
 			console.warn("done with file_start");
-			ul_uploading = false;
+			start_uploading = false;
 			Job.done();
 		};
 
@@ -457,13 +456,32 @@ function worker_uploader(task) {
 var ul_queue  = new UploadQueue
 	, ul_skipIdentical = 0
 	, ulQueue = new QueueClass(worker_uploader)
-	, ul_uploading = false
+	, start_uploading = false
 	, ul_maxSpeed = 0
 	, ul_faid = 0
 	, ul_block_size = 131072
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
 	, ul_dom = []
+
+// ul_uploading variable {{{
+ulQueue.on('working', function() {
+	ul_uploading = true;
+});
+
+ulQueue.on('resume', function() {
+	ul_uploading = true;
+});
+
+ulQueue.on('pause', function() {
+	ul_uploading = false;
+});
+
+ulQueue.on('drain', function() {
+	ul_uploading = false;
+	DEBUG("DRAIN", ulQueue._queue.length, ulQueue._running.length)
+});
+// }}}
 
 ulQueue.getNextTask = function() {
 	var candidate = null

@@ -128,7 +128,7 @@ var UploadManager = new function() {
 			}
 		});
 
-		onUploadError(file.pos, "Upload failed - retrying");
+		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
 		ulQueue.push(new FileUpload(file));
@@ -362,6 +362,7 @@ function ul_chunk_upload(chunk, file, Job) {
 	};
 
 	xhr.failure = function() {
+		if (chunk.task.abort) return;
 		file.progress[chunk.start] = 0;
 		ul_updateprogress();
 		UploadManager.retry(file, chunk, Job);

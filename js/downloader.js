@@ -3,7 +3,9 @@ if (d) {
 	function abortAll() {
 		$.each(_allxhr, function(k, xhr) {
 			try { 
-				xhr.abort(); xhr.failure(); 
+				if (!xhr.__finished) {
+					xhr.abort(); xhr.failure(); 
+				}
 			} catch (e) {
 				throw e;
 			}
@@ -85,6 +87,7 @@ function getXhrObject(s) {
 		checkTimeout();
 		if (this.readyState == this.DONE) {
 			clearTimeout(ts);
+			xhr.__finished = true;
 			return xhr.ready.apply(xhr, arguments);
 		}
 	};

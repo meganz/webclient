@@ -135,6 +135,9 @@ var UploadManager = new function() {
 	};
 
 	self.retry = function(file, chunk, Job) {
+		if (file.retries >= 15) {
+			return self.restart(file);
+		}
 		file.retries++;
 
 		// pause file upload

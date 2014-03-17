@@ -128,7 +128,7 @@ var UploadManager = new function() {
 			}
 		});
 
-		onUploadError(file.pos,"Upload failed - retrying");
+		onUploadError(file.pos, "Upload failed - retrying");
 
 		// reschedule
 		ulQueue.push(new FileUpload(file));
@@ -150,6 +150,8 @@ var UploadManager = new function() {
 			/* release error pausing */
 			file.paused = false;
 		});
+
+		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
 	self.isReady = function(Task) {
@@ -257,7 +259,7 @@ function ChunkUpload(file, start, end)
 		var chunk = { start: start, end: end, task: this}
 	
 		file.ul_reader.push(chunk, function(error) {
-			if (error) 
+			if (error) {
 				return UploadManager.retry(file, chunk, Job);
 			}
 			var encrypter = new Worker('encrypter.js');

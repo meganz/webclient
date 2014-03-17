@@ -1891,9 +1891,13 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid,error)
+function onUploadError(fileid, errorstr)
 {
-	if (d) console.log('OnUploadError ' + fileid + ' ' + error);
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+
+	$('.transfer-table #ul_' + fileid + ' td:eq(3)')
+		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
+		.parents('tr').data({'failed' : NOW()});
 }
 
 function addupload(u)

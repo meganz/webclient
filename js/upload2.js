@@ -256,7 +256,10 @@ function ChunkUpload(file, start, end)
 	this.run = function(Job) {
 		var chunk = { start: start, end: end, task: this}
 	
-		file.ul_reader.push(chunk, function() {
+		file.ul_reader.push(chunk, function(error) {
+			if (error) 
+				return UploadManager.retry(file, chunk, Job);
+			}
 			var encrypter = new Worker('encrypter.js');
 			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
 			encrypter.onmessage = function(e) {
@@ -443,11 +446,12 @@ function ul_filereader(fs, file) {
 		fs.pos = task.start;
 		fs.readAsArrayBuffer(blob);
 		fs.onerror = function(evt) {
+			Scheduler.done(new Error(evt))
 		}
 		fs.onloadend = function(evt) {
 			if (evt.target.readyState == FileReader.DONE) {
 				task.bytes = new Uint8Array(evt.target.result);
-				Scheduler.done();
+				Scheduler.done(null)
 			}
 		}	
 	}, 1);

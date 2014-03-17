@@ -40,10 +40,10 @@ var DEFAULT_CONCURRENCY = 4
 
 			queue._running.splice(id, 1);
 			queue.trigger('done', args)
-			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
+			queue._callback[args.__tid].apply(args, Array.prototype.slice.call(arguments, 0))
 			delete queue._callback[args.__tid];
 			if (args.__ondone) {
-				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
+				args.__ondone.apply(args, Array.prototype.slice.call(arguments, 0))
 			}
 			queue.process();
 		}

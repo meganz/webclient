@@ -13,6 +13,7 @@ function ul_completepending(target)
 		var ctx = {
 			target : target,
 			ul_queue_num : ul[3],
+			size: ul_queue[ul[3]].size,
 			callback : ul_completepending2,
 			faid : ul[1].faid
 		};
@@ -33,6 +34,7 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		onUploadProgress(ctx.ul_queue_num, 100, ctx.size, ctx.size);
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}
@@ -70,6 +72,7 @@ function ul_deduplicate(File, identical) {
 					k: 		ctx.n.key, 
 					fa: 	ctx.n.fa, 
 					ctx: 	{
+						size: uq.size,
 						target:ctx.uq,
 						ul_queue_num:uq.pos,
 						callback:ul_completepending2
@@ -338,7 +341,7 @@ function ul_chunk_upload(chunk, file, Job) {
 		$.each(file.progress, function(i, p) {
 			tp += p;
 		});
-		onUploadProgress(file.pos, tp, file.size);
+		onUploadProgress(file.pos, Math.min(Math.floor(tp/file.size*100), 99), tp, file.size);
 	}
 
 	xhr.upload_progress = function(e) {
@@ -382,6 +385,7 @@ function ul_chunk_upload(chunk, file, Job) {
 					
 					if (u_k_aes && !file.ul_completing) {
 						var ctx = { 
+							size: file.size,
 							ul_queue_num : file.pos,
 							callback : ul_completepending2,
 							faid : file.faid
@@ -479,7 +483,6 @@ ulQueue.on('pause', function() {
 
 ulQueue.on('drain', function() {
 	ul_uploading = false;
-	DEBUG("DRAIN", ulQueue._queue.length, ulQueue._running.length)
 });
 // }}}
 

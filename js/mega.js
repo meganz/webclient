@@ -1771,7 +1771,7 @@ function MegaData ()
 		if (page !== 'start') openTransferpanel();
 	}
 
-	this.ulprogress = function(id,bl,bt)
+	this.ulprogress = function(id, perc, bl,bt)
 	{
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
@@ -1785,12 +1785,11 @@ function MegaData ()
 		var bps = Math.round(bl / eltime);
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress=[];
-		var perc = Math.floor(bl/bt*100);
 		if (bl && bt && !uldl_hold)
 		{
 			$.transferprogress[id] = Math.floor(bl/bt*100);
-			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
-			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
+			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
+			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
 			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
@@ -1851,7 +1850,7 @@ function MegaData ()
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id);
+		M.ulprogress(id, 0);
 		$.transferHeader();
 	}
 }
@@ -1905,9 +1904,9 @@ function onUploadStart(id)
 {
 	M.ulstart(id);
 }
-function onUploadProgress(id, bl, bt)
+function onUploadProgress(id, p, bl, bt)
 {
-	M.ulprogress(id,bl,bt);
+	M.ulprogress(id, p, bl, bt);
 }
 function onUploadSuccess(id, bl, bt)
 {

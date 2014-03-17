@@ -12,6 +12,29 @@ var inherits = (function(){
 	}
 })();
 
+/**
+ *	Simple interface to run things in parallel (safely) once, and 
+ *	get a safe callback
+ *	@crodas
+ */
+function Parallel(task) {
+	var callbacks = {};
+	return function(args, next) {
+		var id = JSON.stringify(args)
+		if (callbacks[id]) {
+			return callbacks[id].push(next);
+		}
+		callbacks[id] = [next];
+		task(args, function() {
+			var args = arguments;
+			$.each(callbacks[id], function(i, next) {
+				next.apply(null, args);
+			});
+			delete callbacks[id];
+		});
+	};
+}
+
 
 function asciionly(text)
 {

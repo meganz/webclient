@@ -342,6 +342,18 @@ UploadQueue.prototype.push = function() {
 	return pos+1;
 };
 
+var Mkdir = Parallel(fm_requestfolderid);
+
+function ul_finalize(file) {
+	var p
+
+	if (file.path && file.path != file.name && (p = ctx.path.indexOf('/')) > 0) {
+		var pc = file.path.substr(0,p);		
+		file.path = file.path.substr(p+1);
+		fm_request(file.path, pc, file.path);
+	}		
+}
+
 function ul_chunk_upload(chunk, file, Job) {
 	var xhr = getXhrObject();
 	function ul_updateprogress() {

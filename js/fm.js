@@ -3300,11 +3300,13 @@ function transferPanelUI()
 		{
 			$(this).removeClass('active');
 			dlQueue.resume();
+			ulQueue.resume();
 		}
 		else
 		{
 			$(this).addClass('active');
 			dlQueue.pause();
+			ulQueue.pause();
 		}	
 	});
 }

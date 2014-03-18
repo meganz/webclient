@@ -292,9 +292,11 @@ function FileUpload(file) {
 	this.run = function(Job) {
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
-		if (start_uploading) {
+		if (start_uploading || $('#ul_' + file.id).length == 0) {
 			return Job.reschedule();
 		}
+
+		DEBUG("uploading", file.name, file.id)
 
 		start_uploading = true;
 

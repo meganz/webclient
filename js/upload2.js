@@ -67,8 +67,12 @@ function ul_deduplicate(File, identical) {
 				onUploadSuccess(uq.pos);
 				File.file.done_starting();
 			} else {
-				ul_finalize(File.file)
+				File.file.filekey = ctx.n.key
+				File.file.faid    = ctx.n.fa
+				File.file.path    = ctx.uq.path
+				File.file.name    = ctx.uq.name
 				File.file.done_starting();
+				ul_finalize(File.file)
 			}
 		}
 	});
@@ -298,7 +302,6 @@ function FileUpload(file) {
 		file.done_starting = function() {
 			if (started) return;
 			started = true;
-			console.warn("done with file_start");
 			start_uploading = false;
 			Job.done();
 		};
@@ -353,6 +356,8 @@ function ul_finalize(file) {
 	var dirs = file.path.split(/\//g).filter(function(a) { 
 		return a.length > 0; 
 	})
+
+	if (!file.filekey) throw new Error("filekey is missing")
 
 
 	Cascade(dirs, Mkdir, function(dir) {

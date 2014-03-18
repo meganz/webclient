@@ -125,13 +125,14 @@ var UploadManager = new function() {
 			}
 		});
 
+		DEBUG("fatal error restarting")
 		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
 		ulQueue.push(new FileUpload(file));
 	};
 
-	self.retry = function(file, chunk, Job) {
+	self.retry = function(file, chunk, Job, reason) {
 		if (file.retries >= 15) {
 			return self.restart(file);
 		}
@@ -151,6 +152,7 @@ var UploadManager = new function() {
 			file.paused = false;
 		});
 
+		DEBUG("fatal error restarting because of", reason)
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -259,9 +261,9 @@ function ChunkUpload(file, start, end)
 	this.run = function(Job) {
 		var chunk = { start: start, end: end, task: this}
 	
-		file.ul_reader.push(chunk, function(error) {
-			if (error) {
-				return UploadManager.retry(file, chunk, Job);
+		file.ul_reader.push(chunk, function(task, args) {
+			if (args[0]) {
+				return UploadManager.retry(file, chunk, Job, args[0])
 			}
 			var encrypter = new Worker('encrypter.js');
 			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
@@ -426,7 +428,7 @@ function ul_chunk_upload(chunk, file, Job) {
 		if (chunk.task.abort) return;
 		file.progress[chunk.start] = 0;
 		ul_updateprogress();
-		UploadManager.retry(file, chunk, Job);
+		UploadManager.retry(file, chunk, Job, "xhr failed");
 		xhr = null;
 	}
 

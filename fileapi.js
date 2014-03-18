@@ -440,11 +440,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 						Services.downloads.getDownloadByGUID(guid, function(s, r) {
 							if(!Components.isSuccessCode(s)) {
 								Cu.reportError(new Components.Exception("Huh, invalid GUID: " + guid));
-							} else {
+							} else try {
 								var {DownloadsData} = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
 								DownloadsData._getOrAddDataItem(r, !1);
 								DownloadsData._notifyDownloadEvent("finish");
-							}
+							} catch(e) {}
 						});
 					},
 					handleError : function(e) {
@@ -811,7 +811,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		/**
 		 * Downloads will be saved on the Desktop by default
 		 */
-		mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		try {
+			mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		} catch(e) {
+			mozSetDownloadsFolder(Services.dirsvc.get("DfltDwnld", Ci.nsIFile));
+		}
 	}
 
 	try

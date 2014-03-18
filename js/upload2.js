@@ -18,7 +18,10 @@ function ul_completepending(target)
 			faid : ul[1].faid
 		};
 
-		api_completeupload(ul[0],ul[1],ul[2],ctx);
+		file.response = ul[0]
+		file.filekey  = ul[2]
+		ul_finalize(file)
+		//api_completeupload(ul[0],ul[1],ul[2],ctx);
 	}
 	else ul_completing = false;
 }
@@ -64,20 +67,7 @@ function ul_deduplicate(File, identical) {
 				onUploadSuccess(uq.pos);
 				File.file.done_starting();
 			} else {
-				api_completeupload2({
-					callback: api_completeupload2, 
-					t : 	ctx.n.h, 
-					path: 	ctx.uq.path, 
-					n: 		ctx.uq.name, 
-					k: 		ctx.n.key, 
-					fa: 	ctx.n.fa, 
-					ctx: 	{
-						size: uq.size,
-						target:ctx.uq,
-						ul_queue_num:uq.pos,
-						callback:ul_completepending2
-					}
-				},ctx.uq);
+				ul_finalize(File.file)
 				File.file.done_starting();
 			}
 		}
@@ -342,16 +332,60 @@ UploadQueue.prototype.push = function() {
 	return pos+1;
 };
 
-var Mkdir = Parallel(fm_requestfolderid);
+/**
+ *	Wrap fm_requestfolderid to make it parallel friendly
+ */
+var Mkdir = Parallel(function(args, next) {
+	fm_requestfolderid(args[0], args[1], {
+		callback: function(ctx, h) {
+			next(h);
+		}
+	});
+});
 
 function ul_finalize(file) {
 	var p
 
-	if (file.path && file.path != file.name && (p = ctx.path.indexOf('/')) > 0) {
-		var pc = file.path.substr(0,p);		
-		file.path = file.path.substr(p+1);
-		fm_request(file.path, pc, file.path);
-	}		
+	if (is_chrome_firefox && file._close) file._close();
+	if (file.repair) file.target = M.RubbishID;
+
+	var dirs = file.path.split(/\//g).filter(function(a) { 
+		return a.length > 0; 
+	})
+
+
+	Cascade(dirs, Mkdir, function(dir) {
+		var body  = { n: file.name }
+		if (file.hash) body.c = file.hash
+		var ea  = enc_attr(req, file.filekey)
+		var faid = file.faid ? api_getfa(file.faid) : false
+		var req = { a : 'p',
+			t : dir,
+			n : [{ 
+				h : base64urlencode(file.response), 
+				t : 0, 
+				a : ab_to_base64(ea[0]), 
+				k : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
+			}],
+			i : requesti
+		};
+		if (faid) req.n[0].fa = faid;
+		if (dir) {
+			var sn = fm_getsharenodes(dir);
+			if (sn.length) {
+				req.cr = crypto_makecr([file.filekey],sn,false);
+				req.cr[1][0] = base64encode(file.response);
+			}
+		}
+		
+		api_req(req, {
+			target: dir,
+			ul_queue_num: file.pos,
+			size: file.size,
+			faid: file.faid,
+			callback: ul_completepending2
+		});
+	}, file.target || M.RootID);	
 }
 
 function ul_chunk_upload(chunk, file, Job) {
@@ -393,7 +427,6 @@ function ul_chunk_upload(chunk, file, Job) {
 				delete file.progress[chunk.start];
 				DEBUG("done", chunk);
 				ul_updateprogress();
-				file.done_starting(); 
 
 				if (response.length == 27) {
 					var t = [], ul_key = file.ul_key
@@ -412,7 +445,10 @@ function ul_chunk_upload(chunk, file, Job) {
 							faid : file.faid
 						};
 						file.ul_completing = true;
-						api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+						file.filekey       = filekey
+						file.response      = response;
+						ul_finalize(file);
+						//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
 					} else {
 						file.completion.push([
 							response.url, file, filekey, file.pos

@@ -13,9 +13,33 @@ var inherits = (function(){
 })();
 
 /**
+ *	Cascade:
+ *
+ *	Tiny helper to queue related tasks, in which the output of one function
+ *	is the input of the next task. It is asynchronous
+ *	
+ *		function([prevarg, arg], next)
+ *	
+ *	Author: @crodas
+ */
+function Cascade(tasks, fnc, done, value)
+{
+	function scheduler(value) {
+		if (tasks.length == 0) {
+			return done(value);
+		}
+
+		fnc([value, tasks.shift()], scheduler)
+	}
+
+	scheduler(value);
+}
+
+/**
  *	Simple interface to run things in parallel (safely) once, and 
  *	get a safe callback
- *	@crodas
+ *
+ *	Author: @crodas
  */
 function Parallel(task) {
 	var callbacks = {};

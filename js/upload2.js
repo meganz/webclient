@@ -536,8 +536,8 @@ function worker_uploader(task) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_skipIdentical = 0
-	, ulQueue = new QueueClass(worker_uploader)
+	, ul_maxSlots = 4
+	, ulQueue = new QueueClass(worker_uploader, ul_maxSlots)
 	, start_uploading = false
 	, ul_maxSpeed = 0
 	, ul_faid = 0

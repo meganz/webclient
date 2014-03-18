@@ -35,7 +35,9 @@ var DEFAULT_CONCURRENCY = 4
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
 				DEBUG("task already finished");
-				return queue.process();
+				return setTimeout(function() {
+					queue.process();
+				});
 			}
 
 			queue._running.splice(id, 1);
@@ -45,7 +47,9 @@ var DEFAULT_CONCURRENCY = 4
 			if (args.__ondone) {
 				args.__ondone.apply(args, Array.prototype.slice.call(arguments, 0))
 			}
-			queue.process();
+			setTimeout(function() {
+				queue.process();
+			});
 		}
 	}
 

@@ -220,6 +220,7 @@ function ul_upload(File) {
 	}
 
 	onUploadStart(file.pos);
+	file.done_starting();
 }
 
 function ul_start(File) {

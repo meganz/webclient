@@ -28,6 +28,7 @@ function ul_completepending(target)
 
 function ul_completepending2(res,ctx)
 {
+	DEBUG("ul_completepending2", res, ctx)
 	if (typeof res == 'object' && res.f)
 	{
 		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
@@ -53,6 +54,7 @@ function ul_deduplicate(File, identical) {
 		n = M.d[M.h[uq.hash][0]];
 	}
 	if (!n) ul_start(File);
+	DEBUG(File.file.name, "ul_deduplicate")
 	api_req({a:'g',g:1,ssl:use_ssl,n:n.h}, {
 		uq:uq,
 		n:n,
@@ -67,10 +69,11 @@ function ul_deduplicate(File, identical) {
 				onUploadSuccess(uq.pos);
 				File.file.done_starting();
 			} else {
-				File.file.filekey = ctx.n.key
-				File.file.faid    = ctx.n.fa
-				File.file.path    = ctx.uq.path
-				File.file.name    = ctx.uq.name
+				File.file.filekey  = ctx.n.key
+				File.file.response = ctx.n.h
+				File.file.faid     = ctx.n.fa
+				File.file.path     = ctx.uq.path
+				File.file.name     = ctx.uq.name
 				File.file.done_starting();
 				ul_finalize(File.file)
 			}
@@ -296,7 +299,7 @@ function FileUpload(file) {
 			return Job.reschedule();
 		}
 
-		DEBUG("uploading", file.name, file.id)
+		DEBUG(file.name, "starting upload", file.id)
 
 		start_uploading = true;
 
@@ -313,11 +316,12 @@ function FileUpload(file) {
 				file.hash = hash;
 				file.ts   = ts;
 				var identical = ul_Identical(file.target, file.path || file.name, file.hash, file.size);
+				DEBUG(file.name, "fingerprint", M.h[hash] || identical)
 				if (M.h[hash] || identical) ul_deduplicate(self, identical);
 				else ul_start(self);
 			});
 		} catch (e) {
-			DEBUG('FINGERPRINT ERROR', e.message || e);
+			DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
 			ul_start(self);
 		}
 	}
@@ -352,6 +356,7 @@ var Mkdir = Parallel(function(args, next) {
 function ul_finalize(file) {
 	var p
 
+	DEBUG(file.name, "ul_finalize")
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 
@@ -370,7 +375,7 @@ function ul_finalize(file) {
 		var req = { a : 'p',
 			t : dir,
 			n : [{ 
-				h : base64urlencode(file.response), 
+				h : file.response, 
 				t : 0, 
 				a : ab_to_base64(ea[0]), 
 				k : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
@@ -382,9 +387,11 @@ function ul_finalize(file) {
 			var sn = fm_getsharenodes(dir);
 			if (sn.length) {
 				req.cr = crypto_makecr([file.filekey],sn,false);
-				req.cr[1][0] = base64encode(file.response);
+				req.cr[1][0] = file.response;
 			}
 		}
+		
+		DEBUG(file.name, "save to dir", file, dir, req)
 		
 		api_req(req, {
 			target: dir,
@@ -454,7 +461,7 @@ function ul_chunk_upload(chunk, file, Job) {
 						};
 						file.ul_completing = true;
 						file.filekey       = filekey
-						file.response      = response;
+						file.response      = base64urlencode(response)
 						ul_finalize(file);
 						//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
 					} else {

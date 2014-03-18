@@ -538,6 +538,7 @@ function worker_uploader(task) {
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = 4
 	, ulQueue = new QueueClass(worker_uploader, ul_maxSlots)
+	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0
 	, ul_faid = 0
@@ -545,6 +546,8 @@ var ul_queue  = new UploadQueue
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
 	, ul_dom = []
+
+if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 
 // ul_uploading variable {{{
 ulQueue.on('working', function() {

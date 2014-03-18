@@ -358,7 +358,7 @@ function ul_finalize(file) {
 	Cascade(dirs, Mkdir, function(dir) {
 		var body  = { n: file.name }
 		if (file.hash) body.c = file.hash
-		var ea  = enc_attr(req, file.filekey)
+		var ea  = enc_attr(body, file.filekey)
 		var faid = file.faid ? api_getfa(file.faid) : false
 		var req = { a : 'p',
 			t : dir,

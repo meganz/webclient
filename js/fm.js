@@ -917,12 +917,8 @@ function initContextUI()
 					{					
 						if (ul_queue[i].id == id.replace('ul_',''))
 						{
-							if (i == ul_queue_num)
-							{
-								ul_cancel();
-								$.su=1;
-							}
-							ul_queue[i] = {};
+							UploadManager.abort(ul_queue[i]);
+							$.su=1;
 						}
 					}
 				}	

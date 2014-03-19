@@ -368,7 +368,7 @@ function ul_finalize(file) {
 		return a.length > 0;
 	})
 
-	if (dirs[dirs.length-1] == file.name) {
+	if (dirs.length > 0 && dirs[dirs.length-1] == file.name) {
 		dirs.pop();
 	}
 

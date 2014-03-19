@@ -110,6 +110,28 @@ function ul_Identical(target, path, hash,size)
 var UploadManager = new function() {
 	var self = this;
 
+	self.abort = function(file) {
+		ulQueue._queue = $.grep(dlQueue._queue, function(task) {
+			return task.file != file;
+		});
+
+		$.each(ulQueue._running, function(i, worker) {
+			if (worker.task.file == file) {
+				worker.task.abort = true;
+			}
+		});
+
+		$('#ul_' + file.id).remove();
+		ul_queue[file.pos] = {};
+	}
+
+	self.abortAll = function() {
+		panelDomQueue = [];
+		$.each(ul_queue, function(i, f) {
+			if (typeof f.id != "undefined") self.abort(f);
+		});
+	}
+
 	self.restart = function(file) {
 		file.retries  = 0;
 		file.sent     = 0;
@@ -356,6 +378,10 @@ var Mkdir = Parallel(function(args, next) {
 		}
 	});
 });
+
+function ul_cancel() {
+	UploadManager.abortAll();
+}
 
 function ul_finalize(file) {
 	var p

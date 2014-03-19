@@ -922,7 +922,7 @@ function initContextUI()
 								ul_cancel();
 								$.su=1;
 							}
-							ul_queue[i] = false;							
+							ul_queue[i] = {};
 						}
 					}
 				}	

@@ -1,5 +1,7 @@
 var newnodes;
 var fminitialized=false;
+var panelDomQueue = []
+	, DOM_TRANSFER_LIMIT = 15
 
 if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
@@ -1730,28 +1732,26 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
-	var elementQueues = []
-		, DOM_TRANSFER_LIMIT = 15
 	$(document).on('remove', '.transfer-table tr', function() {
-		$.each(elementQueues, function(i, html) {
+		var toClean = 0
+		$.each(panelDomQueue, function(i, html) {
 			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
 				return false;
 			}
 			$(html).appendTo('.transfer-table')
-			elementQueues[i] = null;
-		});
-		elementQueue = $.grep(elementQueues, function(html) {
-			return html !== null;
+			toClean++
 		});
 
-		if (elementQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+		panelDomQueue.splice(0, toClean);
+
+		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
 			$.transferClose();
 		}
 	});
 
 	this.addToTransferTable = function(elem) {
 		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
-			return elementQueues.push(elem);
+			return panelDomQueue.push(elem);
 		}
 		$(elem).appendTo('.transfer-table')
 	}

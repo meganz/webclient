@@ -111,7 +111,7 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.abort = function(file) {
-		ulQueue._queue = $.grep(dlQueue._queue, function(task) {
+		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task.file != file;
 		});
 

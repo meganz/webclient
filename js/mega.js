@@ -1734,15 +1734,19 @@ function MegaData ()
 		, DOM_TRANSFER_LIMIT = 15
 	$(document).on('remove', '.transfer-table tr', function() {
 		$.each(elementQueues, function(i, html) {
-			if ($('.transfer-table tr').length-1 > DOM_TRANSFER_LIMIT) {
+			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
 				return false;
 			}
 			$(html).appendTo('.transfer-table')
 			elementQueues[i] = null;
 		});
-		elementsQueue = $.grep(elementQueues, function(html) {
+		elementQueue = $.grep(elementQueues, function(html) {
 			return html !== null;
 		});
+
+		if (elementQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+			$.transferClose();
+		}
 	});
 
 	this.addToTransferTable = function(elem) {

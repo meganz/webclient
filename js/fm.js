@@ -3261,6 +3261,13 @@ function transferPanelUI()
 	{
 		$.transferOpen();
     });
+
+	$.transferClose = function() {
+		$('.tranfer-view-icon').removeClass('active');
+		$('#fmholder').removeClass('transfer-panel-opened');
+        $('.transfer-panel').css({'height': ''});
+        $(window).trigger('resize');
+	}
 	
 	$.transferOpen = function(force)
 	{
@@ -3274,9 +3281,7 @@ function transferPanelUI()
 		}
 		else 
 		{
-			$('.tranfer-view-icon').removeClass('active');
-			$('#fmholder').removeClass('transfer-panel-opened');
-            $('.transfer-panel').css({'height': ''});
+			$.transferClose();
 		}
 		initTreeScroll();
 		if (M.currentdirid == 'notifications') notificationsScroll();

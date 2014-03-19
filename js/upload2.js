@@ -365,8 +365,12 @@ function ul_finalize(file) {
 	if (file.repair) file.target = M.RubbishID;
 
 	var dirs = (file.path||"").split(/\//g).filter(function(a) { 
-		return a.length > 0; 
+		return a.length > 0;
 	})
+
+	if (dirs[dirs.length-1] == file.name) {
+		dirs.pop();
+	}
 
 	if (!file.filekey) throw new Error("filekey is missing")
 

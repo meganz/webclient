@@ -3046,6 +3046,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
 	white-space: nowrap;
 	cursor: default;
 }
+.fm-tree-folder.tree-file {
+	background-image: none;
+}
 .fm-tree-folder.active.dragover, .fm-tree-folder.dragover {
 	color: #333333;
 	background-position: 32px -2114px;
@@ -3101,6 +3104,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
 	background-position: -5px -1307px;
 	background-repeat: no-repeat;
 	padding: 0 10px 0 64px;
+}
+.fm-tree-folder span.transfer-filtype-icon {
+	padding: 0;
+	margin: 0 0 0 30px;
 }
 .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span {
 	background-position: -5px -1346px;
@@ -5863,6 +5870,7 @@ div .fm-tree-folder.dragover {
 	-webkit-border-radius: 6px;
 	bottom: 54px;
 	left: 10px;
+	overflow: hidden;
 }
 .fm-chat-attach-top {
 	height: 40px;
@@ -5876,9 +5884,9 @@ div .fm-tree-folder.dragover {
 }
 .fm-chat-attach-scrolling {
 	height: 100%;
-	height: -webkit-calc(100% - 100px);
-	height: -moz-calc(100% - 100px);
-	height: calc(100% - 100px);
+	height: -webkit-calc(100% - 50px);
+	height: -moz-calc(100% - 50px);
+	height: calc(100% - 50px);
 	background-color: white;
 	overflow: hidden;
 }
@@ -6272,6 +6280,11 @@ div .fm-tree-folder.dragover {
 .fm-dialog.password-dialog {
 	width: 604px;
 	min-height: 100px;
+	margin: -97px 0 0 -302px
+}
+.fm-dialog.chat-confirm-dialog {
+	width: 604px;
+	min-height: 50px;
 	margin: -97px 0 0 -302px
 }
 .fm-dialog.clear-bin-dialog, .fm-dialog.notification-dialog, .fm-dialog.warning-dialog-b, .fm-dialog.warning-dialog-a, .fm-dialog.confirmation-dialog {
@@ -14848,7 +14861,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon {
 background-image: url(../images/mega/encr-sprite@2x.png);
-	background-size: 216px;
+ background-size: 216px;
 }
 .slideshow-progress {
  background-image: url(../images/mega/gallery-pr-bar@2x.png);

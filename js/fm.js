@@ -1009,6 +1009,10 @@ function cSortMenuUI()
 		{
 			localStorage.csort = 'shares';
 			localStorage.csortd = -1;
+		} else if (c && c.indexOf('chat-activity') > -1)
+        {
+			localStorage.csort = 'chat-activity';
+			localStorage.csortd = -1;
 		}
 		M.renderContacts();
 	});

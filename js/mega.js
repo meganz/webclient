@@ -470,6 +470,10 @@ function MegaData ()
 		$('#treesub_contacts').html('');
 		this.buildtree({h:'contacts'});
 		treeUI();
+
+        if(MegaChatEnabled) {
+            megaChat.renderContactTree();
+        }
 	};
 
 	this.openFolder = function(id,force,chat)
@@ -583,14 +587,19 @@ function MegaData ()
 		}
 	};
 	
-	
+
+    this.getContacts = function(n) {
+        var folders = [];
+        for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
+
+        return folders;
+    };
 
 	this.buildtree = function(n)
 	{
 		if (this.c[n.h])
 		{
-			var folders = [];
-			for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
+			var folders = this.getContacts(n);
 			if (n.h == M.RubbishID) $('.fm-tree-header.recycle-item').addClass('recycle-notification');
 			if (folders.length > 0)
 			{
@@ -608,32 +617,7 @@ function MegaData ()
 			
 			if (n.h == 'contacts')
 			{
-				// in case of contacts we have custom sort/grouping:
-				if (localStorage.csort) this.csort = localStorage.csort;
-				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-				
-				
-				
-				if (this.csort == 'shares')
-				{				
-					folders.sort(function(a,b)
-					{
-						if (M.c[a.h] && M.c[b.h])
-						{
-							if (a.name) return a.name.localeCompare(b.name);
-						}
-						else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
-						else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
-						return 0;
-					});
-				}
-				else if (this.csort == 'name')
-				{				
-					folders.sort(function(a,b)
-					{						
-						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
-					});
-				}
+				folders = this.sortContacts(folders);
 				
 				$('.contacts-sorting-by').removeClass('active');
 				$('.contacts-sorting-by.' + this.csort).addClass('active');				
@@ -685,6 +669,60 @@ function MegaData ()
 			}
 		}
 	};
+
+    this.sortContacts = function(folders) {
+        // in case of contacts we have custom sort/grouping:
+        if (localStorage.csort) this.csort = localStorage.csort;
+        if (localStorage.csortd) this.csortd = parseInt(localStorage.csortd);
+
+
+
+        if (this.csort == 'shares')
+        {
+            folders.sort(function(a,b)
+            {
+                if (M.c[a.h] && M.c[b.h])
+                {
+                    if (a.name) return a.name.localeCompare(b.name);
+                }
+                else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+                else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+                return 0;
+            });
+        }
+        else if (this.csort == 'name')
+        {
+            folders.sort(function(a,b)
+            {
+                if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
+            });
+        }
+        else if (this.csort == 'chat-activity')
+        {
+            folders.sort(function(a,b)
+            {
+                var aTime = M.u[a.h].lastChatActivity;
+                var bTime = M.u[b.h].lastChatActivity;
+
+                if (aTime && bTime)
+                {
+                    if (aTime > bTime) {
+                        return 1 * M.csortd;
+                    } else if(aTime < bTime) {
+                        return -1 * M.csortd;
+                    } else {
+                        return 0;
+                    }
+                }
+                else if (aTime && !bTime) return 1*M.csortd;
+                else if (!aTime && bTime) return -1*M.csortd;
+
+                return 0;
+            });
+        }
+
+        return folders;
+    }
 
 	this.getPath = function(id)
 	{
@@ -759,7 +797,7 @@ function MegaData ()
 		{
 
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="path_'+htmlentities(M.currentdirid.replace("chat/", ""))+'"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
 			
 			$('.search-files-result').addClass('hidden');						
 		}
@@ -1572,7 +1610,9 @@ function MegaData ()
 		}
 
 		delete $.dlhash;
-	}
+	};
+
+
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
 	{
@@ -1980,6 +2020,10 @@ function renderfm()
 		$('#treesub_' + M.RootID).addClass('opened');
 	}
 	M.openFolder(M.currentdirid);
+    if(MegaChatEnabled) {
+        megaChat.renderContactTree();
+        megaChat.renderMyStatus();
+    }
 	if (d) console.log('renderfm() time:',t-new Date().getTime());
 }
 
@@ -2029,6 +2073,11 @@ function rendernew()
 		M.buildtree({h:'contacts'});
 		treeUIopen('contacts');
 		treeUI();
+
+        if(MegaChatEnabled) {
+            megaChat.renderContactTree();
+            megaChat.renderMyStatus();
+        }
 	}
 
 	if (newpath) M.renderPath();

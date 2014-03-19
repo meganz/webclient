@@ -14,12 +14,16 @@ if (localStorage.megachat) {
 var chatui;
 (function() {
     chatui = function() {
+        console.error('chatui called');
         hideEmptyMsg();
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
         $('.contacts-grid-view').addClass('hidden');
         $('.fm-contacts-blocks-view').addClass('hidden');
+        $('.fm-right-account-block').addClass('hidden');
+
+        $('.fm-right-files-block').removeClass('hidden');
 
         var chatJids = M.currentdirid.replace('chat/','').split(",");
         $.each(chatJids, function(k, v) {
@@ -51,7 +55,6 @@ var chatui;
                 room.show();
             });
         }
-
 
 
         $('.fm-chat-block').removeClass('hidden');
@@ -394,7 +397,7 @@ var MegaChat = function() {
             });
         }
         self.renderMyStatus();
-        self.renderChatStatus();
+        self.renderContactTree();
     });
 
     // Disco capabilities updated
@@ -1054,9 +1057,9 @@ MegaChat.prototype.renderMyStatus = function() {
 
 
 /**
- * Used to pre/render my contacts statuses
+ * Used to pre/render my contacts statuses + unread counts (in the Tree panel)
  */
-MegaChat.prototype.renderChatStatus = function() {
+MegaChat.prototype.renderContactTree = function() {
     var self = this;
     $.each(self.getContacts(), function(k, contact) {
         var $element = $('#treesub_contacts #treea_' + contact.u);
@@ -1082,6 +1085,48 @@ MegaChat.prototype.renderChatStatus = function() {
         }
 
         $element.attr("data-jid", self.getJidFromNodeId(contact.u));
+
+        var room = self.chats[
+            $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain
+        ];
+        if(room) {
+            room.renderContactTree($element);
+        }
+    });
+};
+
+/**
+ * Reorders the contact tree by last activity (THIS is going to just move DOM nodes, it will NOT recreate them from
+ * scratch, the main goal is to be fast and clever.)
+ */
+MegaChat.prototype.reorderContactTree = function() {
+    var self = this;
+
+    var folders = M.getContacts({
+        'h': 'contacts'
+    });
+
+    folders = M.sortContacts(folders);
+
+    var $container = $('#treesub_contacts');
+
+    var $prevNode = null;
+    $.each(folders, function(k, v) {
+        var $currentNode = $('#treeli_' + v.h);
+
+        if(!$prevNode) {
+            var $first = $('li:first:not(#treeli_' + v.h + ')', $container);
+            if($first.size() > 0) {
+                $currentNode.insertBefore($first);
+            } else {
+                $container.append($currentNode)
+            }
+        } else {
+            $currentNode.insertAfter($prevNode);
+        }
+
+
+        $prevNode = $currentNode;
     });
 };
 
@@ -1387,6 +1432,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
     };
     this._syncRequests = {};
     this._messagesQueue = [];
+
+    this.lastActivity = [];
 
     this.setState(MegaChatRoom.STATE.INITIALIZED);
 
@@ -1779,6 +1826,32 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
 
+
+    // activity on a specific room (show, hidden, got new message, etc)
+    self.bind('activity', function(e) {
+        self.lastActivity = unixtime();
+
+        if(self.type == "private") {
+            var targetUserJid = self.getParticipantsExceptMe()[0];
+            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+            if(targetUserNode) {
+                M.u[targetUserNode.h].lastChatActivity = self.lastActivity;
+            }
+        } else {
+            throw new Error("Not implemented");
+        }
+
+        if(M.csort == "chat-activity") {
+            // Trigger manual reorder, if M.renderContacts() is called it will remove some important .opened classes
+            self.megaChat.reorderContactTree();
+        }
+
+
+//        if(M.csort == "chat-activity") {
+//            M.renderContacts();
+//        };
+    });
+
     return this;
 };
 
@@ -2088,6 +2161,8 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
             }
         }
     }
+
+    self.renderContactTree();
 };
 
 
@@ -2156,15 +2231,12 @@ MegaChatRoom.prototype.show = function() {
 
     // update unread messages count
     $('.fm-chat-messages-block.unread', self.$messages).removeClass('unread');
-
-    // render ui for the new/empty messages count
-    var $navElement = self.getNavElement();
-
-    var $count = $('.messages-icon span', $navElement);
-    $count.text('');
-    $count.parent().hide();
+    self.unreadCount = 0;
 
     self.refreshUI(true /* scroll to bottom */);
+
+
+    self.trigger('activity');
 };
 
 
@@ -2347,13 +2419,14 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
 
         var count = $('.fm-chat-messages-block.unread', self.$messages).size();
         if(count > 0) {
-            $count.text(count);
-            $count.parent().show();
+            self.unreadCount = count;
         } else if(count == 0) {
-            $count.text('');
-            $count.parent().hide();
+            self.unreadCount = 0;
         }
+        self.renderContactTree();
     }
+
+    self.trigger('activity');
 };
 
 //TODO: Docs
@@ -2434,7 +2507,6 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         return false;
     }
 
-    var validUsers = [];
     var ownUsers = [];
     $.each(users, function(k, v) {
         if(k == karere.getJid()) {
@@ -2444,28 +2516,21 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         } else { // only from mine users: if(k.split("/")[0] == karere.getBareJid())
             if(k.split("/")[0] == karere.getBareJid()) {
                 ownUsers.push(k);
-            } else {
-                validUsers.push(k);
             }
         }
     });
 
-
-    if(ownUsers.length > 0) {
-        validUsers = ownUsers; // prefer own users, e.g. my other resources
-    }
-
-    if(validUsers.length === 0) {
+    if(ownUsers.length === 0) {
         if(localStorage.d) {
             console.error("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
         }
         return false;
     }
-    var userNum = Math.floor(Math.random() * validUsers.length) + 0;
-    var userJid = validUsers[userNum];
+    var userNum = Math.floor(Math.random() * ownUsers.length) + 0;
+    var userJid = ownUsers[userNum];
 
     if(localStorage.dd) {
-        console.debug("Potential message sync users: ", validUsers);
+        console.debug("Potential message sync users: ", ownUsers);
     }
 
     var messageId = karere.sendAction(
@@ -2720,22 +2785,24 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
     var users = [];
 
     $.each(self.getParticipantsExceptMe(), function(k, v) {
-        users.push({
-            u: self.megaChat.getContactFromJid(v).h,
-            r: 0 /* READ ONLY */
-        });
+        users.push(
+            self.megaChat.getContactFromJid(v).h
+        );
     });
 
     var $promises = [];
-    $.each(ids, function(kk, h) {
+    $.each(users, function(k, targetUserHash) {
         $promises.push(
-            doshare(h, users, true)
+            M.copyNodes2(ids, targetUserHash)
         );
     });
 
     var $masterPromise = new $.Deferred();
     $.when.apply($, $promises)
         .done(function(responses) {
+            console.log(responses);
+            debugger;
+
             var attachments = {};
             $.each(ids, function(k, nodeId) {
                 var node = M.d[nodeId];
@@ -2778,6 +2845,29 @@ MegaChatRoom.prototype.getMessageById = function(messageId) {
     });
 
     return found;
+};
+
+/**
+ * Used to update the DOM element containing data about this room.
+ * E.g. unread count
+ */
+MegaChatRoom.prototype.renderContactTree = function() {
+    var self = this;
+
+    var $navElement = self.getNavElement();
+
+    var $count = $('.messages-icon span', $navElement);
+
+    var count = self.unreadCount;
+    if(count > 0) {
+        $count.text(count);
+        $count.parent().show();
+    } else if(count == 0) {
+        $count.text('');
+        $count.parent().hide();
+    }
+
+    $navElement.data('chatroom', self);
 };
 
 window.megaChat = new MegaChat();

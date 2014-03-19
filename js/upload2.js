@@ -364,7 +364,7 @@ function ul_finalize(file) {
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 
-	var dirs = file.path.split(/\//g).filter(function(a) { 
+	var dirs = (file.path||"").split(/\//g).filter(function(a) { 
 		return a.length > 0; 
 	})
 

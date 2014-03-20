@@ -1746,6 +1746,7 @@ function MegaData ()
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
 			$.transferClose();
+			resetUploadDownload();
 		}
 	});
 

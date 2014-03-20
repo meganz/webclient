@@ -41,6 +41,7 @@ function ul_completepending2(res,ctx)
 		if (!dlQueue.isPaused()) {
 			onUploadProgress(ctx.ul_queue_num, 100, ctx.size, ctx.size);
 		}
+		ul_queue[ctx.ul_queue_num] = {}
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
 	}
@@ -581,6 +582,21 @@ var ul_queue  = new UploadQueue
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
 	, ul_dom = []
+
+function resetUploadDownload() {
+	var ul_len = 0, dl_len = 0;
+	$.each(ul_queue, function(i, f) {
+		if (typeof f.id != 'undefined') ul_len++;
+	});
+
+	$.each(dl_queue, function(i, f) {
+		if (typeof f.id != 'undefined') dl_len++;
+	});
+	if (ul_len == 0) ul_queue = new UploadQueue
+	if (dl_len == 0) dl_queue = new DownloadQueue
+	DEBUG("resetUploadDownload", ul_len, dl_len);
+}
+
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 

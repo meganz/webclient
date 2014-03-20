@@ -127,8 +127,13 @@ var UploadManager = new function() {
 
 	self.abortAll = function() {
 		panelDomQueue = [];
-		$.each(ul_queue, function(i, f) {
-			if (typeof f.id != "undefined") self.abort(f);
+		ulQueue._queue = [];
+		$.each(ul_queue, function(i, file) {
+			$('#ul_' + file.id).remove();
+		});
+
+		$.each(ulQueue._running, function(i, worker) {
+			worker.task.abort = true;
 		});
 	}
 

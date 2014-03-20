@@ -538,7 +538,7 @@ else
 		{
 			jslcomplete = 0;
 			xhr_progress = [0,0];
-			xhr_stack = Array(xhr_progress.size);
+			xhr_stack = Array(xhr_progress.length);
 			jsl_fm_current = 0;
 			jsl_current = 0;
 			jsl_total = 0;

@@ -358,7 +358,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							} finally {
 								stm.finalize();
 							}
-							this.downloadDone(fn);
+							this.downloadDone(fn,f);
 						} catch(e) {
 							// Cu.reportError(e);
 
@@ -396,7 +396,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 										aList.add(aDownload).then(function() {
 											// aDownload.refresh().then(null,Cu.reportError);
 											mozRunAsync(function() {
-												this.downloadDone(fn);
+												this.downloadDone(fn,f);
 												DownloadsData._notifyDownloadEvent("finish");
 												// DownloadsData.onDownloadChanged(aDownload);
 												// var dataItem = DownloadsData._downloadToDataItemMap.get(aDownload);
@@ -407,21 +407,32 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 								}.bind(this), Cu.reportError);
 							} catch(e) {
 								Cu.reportError(e);
-								this.downloadDone(fn,1);
+								this.downloadDone(fn);
 							}
 						}
 					},
 					downloadDone: function(fn,f) {
-						if(!f) {
+						if(f) {
 							mozAlert(fn,'Download Finished.',function(s,t) {
 								if(t == 'alertclickcallback') try {
 									if(parseInt(Services.appinfo.version) > 23) throw 2;
 									Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
 										.getService(Ci.nsIDownloadManagerUI).show();
 								} catch(e) {
-									var fe = 'chrome,dialog=no,menubar=no,status=no,'
-									 + 'scrollbars=yes,toolbar=no,location=no,resizable=yes';
-									Services.ww.openWindow(null,'about:downloads','mega:downloads',fe,null);
+									var dllib = 'about:downloads';
+									try {
+										Services.io.newChannel(dllib,null,null);
+									} catch(e) {
+										dllib = 'chrome://communicator/content/downloads/downloadmanager.xul';
+									}
+									if(BrowserApp) {
+										// BrowserApp.addTab('about:downloads');
+										f.launch();
+									} else {
+										var fe = 'chrome,dialog=no,menubar=no,status=no,'
+											+ 'scrollbars=yes,toolbar=no,location=no,resizable=yes';
+										Services.ww.openWindow(null,dllib,'mega:downloads',fe,null);
+									}
 								}
 							});
 						} else {
@@ -440,11 +451,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 						Services.downloads.getDownloadByGUID(guid, function(s, r) {
 							if(!Components.isSuccessCode(s)) {
 								Cu.reportError(new Components.Exception("Huh, invalid GUID: " + guid));
-							} else {
+							} else try {
 								var {DownloadsData} = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
 								DownloadsData._getOrAddDataItem(r, !1);
 								DownloadsData._notifyDownloadEvent("finish");
-							}
+							} catch(e) {}
 						});
 					},
 					handleError : function(e) {
@@ -811,7 +822,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		/**
 		 * Downloads will be saved on the Desktop by default
 		 */
-		mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		try {
+			mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		} catch(e) {
+			mozSetDownloadsFolder(Services.dirsvc.get("DfltDwnld", Ci.nsIFile));
+		}
 	}
 
 	try
@@ -830,3 +845,6 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		alert(e);
 	}
 })(self);
+
+const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;
+if(!BrowserApp) is_chrome_firefox |= 2;

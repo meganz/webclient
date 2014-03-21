@@ -1061,7 +1061,7 @@ function fmtopUI()
 	{
 		$('.fm-new-folder').removeClass('hidden');
 		$('.fm-file-upload').removeClass('hidden');
-		if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
 		else $('.fm-file-upload').addClass('last-button');		
 	}	
 	$('.fm-clearbin-button').unbind('click');
@@ -3404,7 +3404,7 @@ function contextmenuUI(e,ll,topmenu)
 		{
 			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-			if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
+			if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
 	}

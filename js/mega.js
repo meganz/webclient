@@ -28,6 +28,11 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
+
+
+
+
+
 function MegaData ()
 {
 	this.d = {};

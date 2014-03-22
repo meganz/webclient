@@ -270,10 +270,13 @@ function ul_start(File) {
 	var maxpf = 128*1048576
 		, next = ul_get_posturl(File)
 		, total = 0
+		, len   = ul_queue.length
+		, max   = File.file.pos+8
 
+	/* CPU INTENSIVE
 	$.each(ul_queue, function(i, cfile) {
-		if (i < File.file.pos || cfile.posturl) return; /* continue */
-		if (i >= File.file.pos+8 || maxpf <= 0) return false; /* break */
+		if (i < File.file.pos || cfile.posturl) return; // continue 
+		if (i >= File.file.pos+8 || maxpf <= 0) return false; // break 
 		api_req({ 
 			a : 'u', 
 			ssl : use_ssl, 
@@ -285,6 +288,21 @@ function ul_start(File) {
 		maxpf -= cfile.size
 		total++;
 	});
+	*/
+
+	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
+		var cfile = ul_queue[i];
+		api_req({ 
+			a : 'u', 
+			ssl : use_ssl, 
+			ms : ul_maxSpeed, 
+			s : cfile.size, 
+			r : cfile.retries, 
+			e : cfile.ul_lastreason 
+		}, { reqindex : i, callback : next });
+		maxpf -= cfile.size
+		total++;
+	}
 	DEBUG2('request urls for ', total, ' files')
 }
 
@@ -637,7 +655,7 @@ ulQueue.getNextTask = function() {
 	});
 
 	if (!candidate && ulQueue._queue.length > 0 &&
-			ulQueue._queue[0] instanceof FileUpload) {
+		ulQueue._queue[0] instanceof FileUpload && !start_uploading) {
 		return ulQueue._queue.shift();
 	}
 

@@ -112,7 +112,7 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.abort = function(file) {
-		DEBUG("abort()", file);
+		DEBUG("abort()", file.name);
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task.file != file;
 		});
@@ -147,7 +147,7 @@ var UploadManager = new function() {
 		file.posturl  = "";
 		file.completion = [];
 
-		DEBUG("restart()")
+		DEBUG("restart()", file.name)
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task.file != file;
 		});
@@ -158,7 +158,7 @@ var UploadManager = new function() {
 			}
 		});
 
-		DEBUG("fatal error restarting")
+		DEBUG("fatal error restarting", file.name)
 		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
@@ -185,7 +185,7 @@ var UploadManager = new function() {
 			file.paused = false;
 		});
 
-		DEBUG("fatal error restarting because of", reason)
+		DEBUG("fatal error restarting because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -457,7 +457,7 @@ function ul_finalize(file) {
 			}
 		}
 		
-		DEBUG(file.name, "save to dir", file, dir, req)
+		DEBUG(file.name, "save to dir", dir, req)
 		
 		api_req(req, {
 			target: dir,
@@ -472,7 +472,7 @@ function ul_finalize(file) {
 function ul_chunk_upload(chunk, file, Job) {
 	var xhr = getXhrObject();
 	function ul_updateprogress() {
-		var tp = file.sent
+		var tp = file.sent || 0
 		if (ulQueue.isPaused()) return;
 		$.each(file.progress, function(i, p) {
 			tp += p;
@@ -507,7 +507,7 @@ function ul_chunk_upload(chunk, file, Job) {
 			if (!response.length || response == 'OK' || response.length == 27) {
 				file.sent += chunk.bytes.buffer.length || chunk.bytes.length;
 				delete file.progress[chunk.start];
-				DEBUG("done", chunk);
+				DEBUG("done", chunk.__tid);
 				ul_updateprogress();
 
 				if (response.length == 27) {
@@ -646,6 +646,9 @@ ulQueue.on('drain', function() {
 
 ulQueue.getNextTask = function() {
 	var candidate = null
+		, len = ulQueue._queue.length
+
+	/* cpu intensive 
 	$.each(ulQueue._queue, function(i, task) {
 		if (task instanceof ChunkUpload && UploadManager.isReady(task)) {
 			ulQueue._queue.splice(i, 1);
@@ -653,6 +656,15 @@ ulQueue.getNextTask = function() {
 			return false;
 		}
 	});
+	*/
+	for (var i = 0; i < len; i++) {
+		var task = ulQueue._queue[i];
+		if (task instanceof ChunkUpload && (!task.file.paused || task.__retry)) {
+			ulQueue._queue.splice(i, 1);
+			candidate = task;
+			break;
+		}
+	}
 
 	if (!candidate && ulQueue._queue.length > 0 &&
 		ulQueue._queue[0] instanceof FileUpload && !start_uploading) {

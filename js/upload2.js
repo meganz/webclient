@@ -166,6 +166,9 @@ var UploadManager = new function() {
 	};
 
 	self.retry = function(file, chunk, Job, reason) {
+		// release worker
+		Job.done();
+
 		if (file.retries >= 15) {
 			return self.restart(file);
 		}
@@ -173,9 +176,6 @@ var UploadManager = new function() {
 
 		// pause file upload
 		file.paused = true;
-
-		// release worker
-		Job.done();
 
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);

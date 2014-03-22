@@ -712,10 +712,17 @@ function MegaData ()
 		for (var i in a)
 		{
 			if (a[i] == this.RootID)
-			{
-				typeclass = 'folder';
-				if (folderlink && M.d[this.RootID]) name = htmlentities(M.d[this.RootID].name);
-				else name = l[164];
+			{				
+				if (folderlink && M.d[this.RootID])
+				{
+					name = htmlentities(M.d[this.RootID].name);
+					typeclass = 'folder';
+				}
+				else
+				{
+					name = l[164];
+					typeclass = 'cloud-drive';
+				}
 			}
 			else if (a[i] == 'contacts')
 			{

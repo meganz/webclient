@@ -296,6 +296,8 @@ function ChunkUpload(file, start, end)
 	
 		file.ul_reader.push(chunk, function(task, args) {
 			if (args[0]) {
+				DEBUG("IO error");
+				file.done_starting();
 				return UploadManager.retry(file, chunk, Job, args[0])
 			}
 			var encrypter = new Worker('encrypter.js');

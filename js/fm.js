@@ -596,20 +596,24 @@ function searchFM()
 
 function removeUInode(h)
 {
-	var n = M.d[h];	
+	var n = M.d[h];
 	var i=0;
 	if (n && n.t)
 	{
 		var cns = M.c[n.p];			
-		if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) i++;		
+		if (cns) 
+		{
+			for (var cn in cns) 
+			{
+				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
+			}
+		}	
 		if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 	}
 	$('#' + h).remove();
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
-	
-	
 	treeheaderArrows();	
 }
 

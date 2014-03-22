@@ -611,7 +611,7 @@ else
 
 		function xhr_error()
 		{
-			xhr_timeout=+1000;
+			xhr_timeout+=1000;
 			console.log(xhr_timeout);
 			if (bootstaticpath.indexOf('cdn') > -1)
 			{
@@ -653,7 +653,7 @@ else
 			  {
 				try
 				{
-					if (this.readyState == 2) this.timeout=0;
+					if (this.readyState == 1) this.timeout=0;
 				}
 				catch(e)
 				{

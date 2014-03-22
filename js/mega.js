@@ -640,12 +640,23 @@ function MegaData ()
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
+				
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
-					ulc = 'class="opened"';
-					expandedc = 'expanded';
-					buildnode = true;
+					for (var h in M.c[folders[i].h])
+					{
+						var n = M.d[h];						
+						if (n && n.t) buildnode = true;
+					}
 				}
+				
+				if (buildnode)
+				{
+					ulc = 'class="opened"';
+					expandedc = 'expanded';				
+				}
+				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
+				
 				var containsc='';
 				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
@@ -851,6 +862,7 @@ function MegaData ()
 		var a =0;
 		function ds(h)
 		{
+			removeUInode(h);
 			if (M.c[h] && h.length < 11)
 			{
 				for(var h2 in M.c[h]) ds(h2);
@@ -863,8 +875,7 @@ function MegaData ()
 				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
-			if (M.v[h]) delete M.v[h];
-			removeUInode(h);
+			if (M.v[h]) delete M.v[h];			
 		}
 		ds(h);
 	};

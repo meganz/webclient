@@ -595,20 +595,24 @@ function searchFM()
 
 function removeUInode(h)
 {
-	var n = M.d[h];	
+	var n = M.d[h];
 	var i=0;
 	if (n && n.t)
 	{
 		var cns = M.c[n.p];			
-		if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) i++;		
+		if (cns) 
+		{
+			for (var cn in cns) 
+			{
+				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
+			}
+		}	
 		if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 	}
 	$('#' + h).remove();
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
-	
-	
 	treeheaderArrows();	
 }
 
@@ -1055,7 +1059,7 @@ function fmtopUI()
 	{
 		$('.fm-new-folder').removeClass('hidden');
 		$('.fm-file-upload').removeClass('hidden');
-		if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
 		else $('.fm-file-upload').addClass('last-button');		
 	}	
 	$('.fm-clearbin-button').unbind('click');
@@ -3405,7 +3409,7 @@ function contextmenuUI(e,ll,topmenu)
 		{
 			$(t).filter('.context-menu-item').hide();
 			$(t).filter('.fileupload-item,.newfolder-item,.refresh-item').show();
-			if (is_chrome_firefox || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
+			if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $(t).filter('.folderupload-item').show();
 		}
 		else return false;
 	}

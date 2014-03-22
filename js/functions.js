@@ -557,6 +557,14 @@ function NOW() {
 /**
  *	Global function to help debugging
  */
+function DEBUG2() {
+	if (d) {
+		console.log.apply(console, arguments)
+		if (!is_chrome_firefox) {
+			console.warn.apply(console, arguments)
+		}
+	}
+}
 function DEBUG() {
 	if (arguments.length == 2 && typeof arguments[0] == "object"
 		  && typeof arguments[0][arguments[1]] == "function") {

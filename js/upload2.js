@@ -272,7 +272,7 @@ function ul_start(File) {
 		, total = 0
 
 	$.each(ul_queue, function(i, cfile) {
-		if (cfile.posturl) return; /* continue */
+		if (i < File.file.pos || cfile.posturl) return; /* continue */
 		if (i >= File.file.pos+8 || maxpf <= 0) return false; /* break */
 		api_req({ 
 			a : 'u', 
@@ -285,7 +285,7 @@ function ul_start(File) {
 		maxpf -= cfile.size
 		total++;
 	});
-	DEBUG('request urls for ', total, ' files')
+	DEBUG2('request urls for ', total, ' files')
 }
 
 function ChunkUpload(file, start, end)

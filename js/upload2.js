@@ -38,7 +38,7 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
-		if (!dlQueue.isPaused()) {
+		if (!ulQueue.isPaused()) {
 			onUploadProgress(ctx.ul_queue_num, 100, ctx.size, ctx.size);
 		}
 		ul_queue[ctx.ul_queue_num] = {}
@@ -112,6 +112,7 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.abort = function(file) {
+		DEBUG("abort()", file);
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task.file != file;
 		});
@@ -127,6 +128,7 @@ var UploadManager = new function() {
 	}
 
 	self.abortAll = function() {
+		DEBUG("abortAll()");
 		panelDomQueue = [];
 		ulQueue._queue = [];
 		$.each(ul_queue, function(i, file) {
@@ -145,7 +147,8 @@ var UploadManager = new function() {
 		file.posturl  = "";
 		file.completion = [];
 
-		ulQueue._queue = $.grep(dlQueue._queue, function(task) {
+		DEBUG("restart()")
+		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task.file != file;
 		});
 
@@ -447,7 +450,7 @@ function ul_chunk_upload(chunk, file, Job) {
 	var xhr = getXhrObject();
 	function ul_updateprogress() {
 		var tp = file.sent
-		if (dlQueue.isPaused()) return;
+		if (ulQueue.isPaused()) return;
 		$.each(file.progress, function(i, p) {
 			tp += p;
 		});

@@ -56,8 +56,8 @@ function ul_deduplicate(File, identical) {
 	} else if (M.h[uq.hash]) {
 		n = M.d[M.h[uq.hash][0]];
 	}
-	if (!n) ul_start(File);
-	DEBUG(File.file.name, "ul_deduplicate")
+	if (!n) return ul_start(File);
+	DEBUG(File.file.name, "ul_deduplicate", n)
 	api_req({a:'g',g:1,ssl:use_ssl,n:n.h}, {
 		uq:uq,
 		n:n,
@@ -203,7 +203,7 @@ function ul_get_posturl(File) {
 				ul_upload(File);
 			}
 		} else {
-			DEBUG('request failed');
+			//DEBUG('request failed');
 		}
 	};
 }
@@ -268,11 +268,12 @@ function ul_upload(File) {
 function ul_start(File) {
 	if (File.file.posturl) return ul_upload(File);
 	var maxpf = 128*1048576
-		, next = ul_get_posturl(File);
+		, next = ul_get_posturl(File)
+		, total = 0
 
 	$.each(ul_queue, function(i, cfile) {
 		if (cfile.posturl) return; /* continue */
-		if (i >= File.pos+8 || maxpf <- 0) return false; /* break */
+		if (i >= File.file.pos+8 || maxpf <= 0) return false; /* break */
 		api_req({ 
 			a : 'u', 
 			ssl : use_ssl, 
@@ -282,7 +283,9 @@ function ul_start(File) {
 			e : cfile.ul_lastreason 
 		}, { reqindex : i, callback : next });
 		maxpf -= cfile.size
+		total++;
 	});
+	DEBUG('request urls for ', total, ' files')
 }
 
 function ChunkUpload(file, start, end)

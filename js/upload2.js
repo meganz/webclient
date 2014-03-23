@@ -306,6 +306,47 @@ function ul_start(File) {
 	DEBUG2('request urls for ', total, ' files')
 }
 
+function CreateWorkers(url, message, size) {
+	size = size || 4
+	var worker = []
+		, instances = [];
+
+	function handler(id) {
+		return function(e) {
+			message(this.context, e, function(r) {
+				worker[id].busy = false; /* release worker */
+				instances[id].done(r);
+			});
+		}
+	}
+
+	for (var i = 0; i < size; i++) {
+		var w  = new Worker(url);
+		w.id   = i;
+		w.busy = false;
+		w.postMessage = w.webkitPostMessage || w.postMessage;
+		w.onmessage   = handler(i);
+		worker.push(w);
+	}
+
+	return new QueueClass(function(task) {
+		for (var i = 0; i < size; i++) {
+			if (!worker[i].busy) break;
+		}
+		worker[i].busy = true;
+		instances[i]    = this;
+		$.each(task, function(e, t) {
+			if (e == 0) {
+				worker[i].context = t;
+			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
+				worker[i].postMessage(t.buffer,[t.buffer]);
+			} else {
+				worker[i].postMessage(t);
+			}
+		});
+	}, size);
+}
+
 function ChunkUpload(file, start, end)
 {
 	var self = this;
@@ -321,26 +362,9 @@ function ChunkUpload(file, start, end)
 				file.done_starting();
 				return UploadManager.retry(file, chunk, Job, args[0])
 			}
-			var encrypter = new Worker('encrypter.js');
-			encrypter.postMessage = encrypter.webkitPostMessage || encrypter.postMessage;
-			encrypter.onmessage = function(e) {
-				if (typeof e.data == 'string') {
-					if (e.data[0] == '[') file.ul_macs[start] = JSON.parse(e.data);
-					else DEBUG('WORKER:', e.data);
-				} else {
-					chunk.bytes = new Uint8Array(e.data.buffer || e.data);
-					chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
-					ul_chunk_upload(chunk, file, Job);
-				}
-			};
-			encrypter.pos = start
-			encrypter.postMessage(file.ul_keyNonce);
-			encrypter.postMessage(start/16)
-			if (typeof MSBlobBuilder == "function") {
-				encrypter.postMessage(chunk.bytes);
-			} else { 
-				encrypter.postMessage(chunk.bytes.buffer,[chunk.bytes.buffer]);
-			}
+			Encrypter.push([[file, chunk, start], file.ul_keyNonce, start/16, chunk.bytes], function() {
+				ul_chunk_upload(chunk, file, Job);
+			});
 		});
 	}
 }
@@ -549,6 +573,7 @@ function ul_chunk_upload(chunk, file, Job) {
 		return xhr.failure();
 	};
 
+	DEBUG("pushing", file.posturl + chunk.suffix)
 	if (chromehack) {
 		var data8 = new Uint8Array(chunk.bytes.buffer);
 		var send8 = new Uint8Array(chunk.bytes.buffer, 0, data8.length);
@@ -599,6 +624,7 @@ function worker_uploader(task) {
 
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = 4
+	, Encrypter
 	, ulQueue = new QueueClass(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
 	, start_uploading = false
@@ -608,6 +634,21 @@ var ul_queue  = new UploadQueue
 	, ul_block_extra_size = 1048576
 	, uldl_hold = false
 	, ul_dom = []
+
+Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
+	var file = context[0]
+		, chunk = context[1]
+		, start = context[2]
+
+	if (typeof e.data == 'string') {
+		if (e.data[0] == '[') file.ul_macs[start] = JSON.parse(e.data);
+		else DEBUG('WORKER:', e.data);
+	} else {
+		chunk.bytes = new Uint8Array(e.data.buffer || e.data);
+		chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
+		done();
+	}
+}, 4);
 
 function resetUploadDownload() {
 	var ul_len = 0, dl_len = 0;

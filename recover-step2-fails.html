@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initMainScroll()
+  {
+	  $('.main-scroll-block').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  initMainScroll();
+  $(window).bind('resize', function () 
+  {
+	  initMainScroll();
+  });
+    $('.login-register-input input').unbind('focus');
+    $('.login-register-input input').bind('focus',function(e)
+	{
+		$(this).parent().addClass('focused');
+	});	
+	$('.login-register-input input').unbind('blur');
+	$('.login-register-input input').bind('blur',function(e)
+	{
+		$(this).parent().removeClass('focused');
+	});	
+	
+	
+  
+});
+
+</script>
+</head>
+
+<body id="bodyel" class="bottom-pages">
+
+<div id="startholder" class="fmholder" style="display: block;">
+  <div class="widget-block hidden">
+    <div class="widget-circle percents-0">
+      <div class="widget-arrows">
+        <div class="widget-tooltip">
+          <div class="widget-icon uploading hidden"> <span class="widget-txt">Uploading</span> <span class="widget-speed-block ulspeed"> KB/s </span> </div>
+          <div class="widget-icon downloading hidden"> <span class="widget-txt">Downloading</span> <span class="widget-speed-block dlspeed"> KB/s </span> </div>
+        </div>
+        <div class="widget-arrow"></div>
+      </div>
+    </div>
+  </div>
+  <div class="main-scroll-block">
+  
+        <div class="main-pad-block">
+          <div class="top-head"> <a class="logo"></a> <a class="top-menu-icon">Menu</a>
+           
+            <a class="create-account-button hidden"> Create Account </a> <a class="top-login-button hidden"> Login </a>
+            
+            <a class="fm-avatar" style="display: block;"><img alt="" src="blob:https://mega.co.nz/90e87c80-31fa-45ff-9b5b-c2e10621458b"></a>
+            <div class="activity-status-block" style="display: none;">
+              <div class="activity-status online" style="display: none;"></div>
+            </div>
+            <div class="top-search-bl">
+              <div class="top-search-clear">
+                <div class="top-clear-button"></div>
+                <input type="text" value="Search" class="top-search-input">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recover-page step2 !-->
+          <div class="main-mid-pad backup-recover">
+            <div class="main-left-block">
+              <h3 class="main-italic-header">Account recovery</h3>
+              <div class="register-st2-txt-block">
+               <p>
+                   Your password is also your encryption key, so when you lose it you risk losing access to your data.</span>
+               </p>
+               <h5 class="main-italic-header">
+                    <span class="red">Download to your computer</span>
+               </h5>
+               <!-- Add class "uploading" to show percents !-->
+               <div class="recover-upload-block uploading">
+                  <div class="restore-upload-percents">
+                      100%
+                  </div>
+                  <div class="backup-file-info">
+                      <!-- please hide 2 spans if its needed. Please add "success" or "fail" classnames according uploading status. !-->
+                      <span class="restore-uploading-status-icon fail"> </span>
+                      <span class="tranfer-filetype-txt">README.txt</span>
+                  </div>
+                  <div class="backup-download-button">
+                      Upload
+                  </div>
+               </div>
+               <!-- Please add "fail" class to add fail icon !-->
+               <div class="login-register-input fail">
+                  <div class="backup-input-button">Verify</div>
+                  <input type="text" name="key-input2" id="key-input2" value="Your Key">
+               </div>
+               
+               
+              </div>
+            </div>
+            
+            <!-- Remove "hidden" class if upload is success !-->
+            <div class="main-right-block recover-block hidden">
+               <h3 class="main-italic-header"><span class="green">Congratulations!</span></h3>
+               <div class="register-st2-txt-block">
+                  <p>
+                     You were able to regain access to your account. Please choose a new password below:
+                  </p>
+                  
+                  <div class="login-register-input password first">
+			        <div class="top-login-input-tooltip">
+				      <div class="top-login-tooltip-arrow">
+					    <div class="top-loginp-tooltip-txt password">
+					       Invalid password.
+					       <div class="white-txt password">Please strengthen your password.</div>
+					    </div>
+				      </div>
+			        </div>
+			        <div class="password-status-icon">
+					  <div class="password-status-warning hidden">                           
+					  </div>
+			        </div>
+			        <div class="register-loading-icon"><img alt="" src="https://eu.static.mega.co.nz/images/mega/ajax-loader-gray.gif"></div>
+			        <input type="text" name="login-password" id="register-password" value="Password">
+                  </div>
+                  
+                  <div class="new-registration good2"> 
+			        <div class="register-pass-status-line1"></div> 
+			        <div class="register-pass-status-line2"></div> 
+			        <div class="register-pass-status-line3"></div> 
+			        <div class="register-pass-status-line4"></div> 
+			        <div class="register-pass-status-line5"></div> 
+			        <div class="password-stutus-txt hidden">
+			          <div class="new-reg-status-pad">
+			            <strong>Strength:</strong>
+			            Password status
+			          </div>
+			          <div class="new-reg-status-description">
+                        Your password is easily guessed. Try making your password longer. Combine uppercase & lowercase letters. Add special characters. Do not use names or dictionary words.                       
+			          </div>
+			        </div>
+                  </div>
+                  
+                  <div class="login-register-input password confirm">
+			        <div class="top-login-input-tooltip">
+				      <div class="top-login-tooltip-arrow">
+					     <div class="top-loginp-tooltip-txt">
+					       Passwords do not match.
+					      <div class="white-txt">Please try again</div>
+					     </div>
+				      </div>
+			        </div>
+			        <input type="text" name="login-password2" id="register-password2" value="Retype Password">
+		          </div>
+                  
+                  <div class="restore-verify-button active">
+                    Validate password
+                  </div>
+                  <div class="clear"></div>
+                  
+                 
+               </div>
+            </div>
+            
+            <!-- Remove "hidden" class if user clicked "No" !-->
+            <div class="main-right-block recover-block">
+               <h3 class="main-italic-header"><span class="red">Oops.</span></h3>
+               <div class="register-st2-txt-block">
+                  <p>
+                     Something went wrong. Either this key is not associated with your account, or is a wrong file.
+                  </p>
+                  <p>
+                     The file where your key is stored should be in plain text format, with the name “Document_name.txt”.
+                  </p>
+                  <p>
+                     If you’re sure that you uploaded the correct file, please <a href="">contact support</a>.
+                  </p>
+               </div>
+            </div>
+            
+            
+            <div class="clear"></div>  
+          </div>
+          <!-- end !-->
+          
+          <div class="nw-bottom-block en">
+            <div class="nw-bottom-pad">
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">MEGA</div>
+                <a href="#privacycompany" class="nw-bottom-link">The Privacy Company</a> <a href="#about" class="nw-bottom-link">About us</a> <a href="#credits" class="nw-bottom-link">Credits</a> <a href="#blog" class="nw-bottom-link">Blog</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Apps</div>
+                <a href="#mobile" class="nw-bottom-link">Mobile Apps</a> <a href="#sync" class="nw-bottom-link">Sync Client</a> <a href="#chrome" class="nw-bottom-link">Chrome App</a> <a href="#firefox" class="nw-bottom-link">Firefox App</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Support</div>
+                <a href="#help" class="nw-bottom-link">Help Centre</a> <a href="#contact" class="nw-bottom-link">Contact Us</a> <a href="#resellers" class="nw-bottom-link">Resellers</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Developers</div>
+                <a href="#dev" class="nw-bottom-link">SDK</a> <a href="#doc" class="nw-bottom-link">Documentation</a> <a href="#affiliates" class="nw-bottom-link">Affiliate Program</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Legal &amp; policies</div>
+                <a href="#terms" class="nw-bottom-link">Terms of Service</a> <a href="#privacy" class="nw-bottom-link">Privacy Policy</a> <a href="#copyright" class="nw-bottom-link">Copyright</a> <a href="#takedown" class="nw-bottom-link">Takedown Guidance</a> </div>
+              <div class="nw-start-nz"></div>
+              <div class="clear"></div>
+            </div>
+            <div class="nw-bottom-pad-with-border">
+              <div class="nw-bottom-copyrigths"> Mega Limited 2014 <span>All rights reserved</span> </div>
+              <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="nw-bottom-social facebook"></a> <a href="https://twitter.com/MEGAprivacy" target="_blank" class="nw-bottom-social twitter"></a>
+              <div class="clear"></div>
+            </div>
+          </div>
+        </div>
+   </div>
+  </div>
+</div>
+
+<div class="fm-dialog-overlay hidden"></div>
+<div class="fm-dialog restore-success hidden">
+     <div class="reg-success-icon"></div>
+     <div class="reg-success-header">Awesome!</div>
+     <div class="reg-success-txt"> You successfully changed your password.</div>
+     <div class="restore-close-button">
+       <div class="fm-dialog-button browsers-button active">Close</div>
+     </div>
+</div>
+
+</body>
+</html>

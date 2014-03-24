@@ -158,9 +158,15 @@ function ClassChunk(task) {
 			$.each(Progress.data, function(i, val) {
 				_progress += val[0];
 			});
+			
+			var percentage = Math.floor(_progress/Progress.size*100);
+			if (percentage == 100) {
+				percentage = 99
+			}
 
 			download.onDownloadProgress(
 				download.dl_id, 
+				percentage, 
 				_progress, // global progress
 				Progress.size, // total download size
 				Progress.speed = Progress.dl_xr.update(_progress - Progress.dl_prevprogress),  // speed
@@ -219,7 +225,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					download.decrypt.push({ data: new Uint8Array(r), offset: task.offset, info: task})
+					Decrypter.push([[download, task.offset], download.nonce, task.offset/16, new Uint8Array(r)]);
 					if (failed) DownloadManager.release(self);
 					failed = false;
 				} else if (!download.cancelled) {
@@ -345,14 +351,24 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
-				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
+				if (chunkFinished && dl.writer.isEmpty() && Decrypter.isEmpty()) {
 					if (dl.cancelled) return;
 					if (!emptyFile && !checkLostChunks(dl)) {
-						return dl_reportstatus(dl, EKEY);
+						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
 					if (dl.zipid) {
 						return Zips[dl.zipid].done();
 					}
+
+					dl.onDownloadProgress(
+						dl.dl_id,
+						100,
+						dl.size,
+						dl.size,
+						0,
+						dl.pos
+					);
+
 					dl.onBeforeDownloadComplete(dl.pos);
 					if (!dl.preview) {
 						dl.io.download(dl.zipname || dl.n, dl.p);
@@ -431,43 +447,27 @@ function dl_writer(dl, is_ready) {
 	};
 };
 
-// Decrypter worker {{{
-function dl_decrypter(dl) {
-	dl.decrypt = new QueueClass(function(task) {
-		var Decrypter = this;
-		var worker = new Worker('decrypter.js?v=5');
-		worker.postMessage = worker.webkitPostMessage || worker.postMessage;
-		worker.onmessage = function(e) {
-			if (typeof(e.data) == "string") {
-				if (e.data[0] == '[') {
-					var t = JSON.parse(e.data), pos = task.offset
-					for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
-						dl.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
-					}
-				}
-				DEBUG("worker replied string", e.data, dl.macs);
-			} else {
-				var plain = new Uint8Array(e.data.buffer || e.data);
-				Decrypter.done(); // release slot
-				DEBUG("Decrypt done", dl.cancelled);
-				if (dl.cancelled) return;
-				dl.writer.push({ data: plain, offset: task.offset});
-			}
-		};
-		worker.postMessage(dl.nonce);
-		worker.dl_pos = task.offset;
-		worker.postMessage(task.offset/16);
-	
-		if (typeof MSBlobBuilder == "function") {
-			worker.postMessage(task.data);
-		} else {
-			worker.postMessage(task.data.buffer, [task.data.buffer]);
-		}
-		DEBUG("decrypt with workers", dl.cancelled);
+var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
+	var dl = context[0]
+		, offset = context[1]
 
-	});
-}
-// }}}
+	if (typeof(e.data) == "string") {
+		if (e.data[0] == '[') {
+			var t = JSON.parse(e.data), pos = offset
+			for (var i = 0; i < t.length; i += 4, pos = pos+1048576) {
+				dl.macs[pos] = [t[i],t[i+1],t[i+2],t[i+3]];
+			}
+		}
+		DEBUG("worker replied string", e.data, dl.macs);
+	} else {
+		var plain = new Uint8Array(e.data.buffer || e.data);
+		DEBUG("Decrypt done", dl.cancelled);
+		if (!dl.cancelled) {
+			dl.writer.push({ data: plain, offset: offset});
+		}
+		done();
+	}
+}, 4);
 
 /** 
  *	Keep in track real active downloads.

@@ -4,6 +4,8 @@ var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
+var page = document.location.hash;
+
 function isMobile()
 {
 	if (is_chrome_firefox) return false;
@@ -13,6 +15,17 @@ function isMobile()
 }
 
 
+function geoIP()
+{
+    return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent('geoip').replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || false;
+}
+
+
+function geoStaticpath(eu)
+{
+	if (!eu && !sessionStorage.skipcdn && geoIP() && 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW'.indexOf(geoIP()) == -1) return 'https://g.cdn1.mega.co.nz/';
+	else return 'https://eu.static.mega.co.nz/';
+}
 
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
@@ -68,19 +81,17 @@ try
 	}
 	else
 	{
-		if (localStorage.dd) {
-			localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-		}
-		var staticpath = localStorage.staticpath || 'https://eu.static.mega.co.nz/';
+		if (localStorage.dd) localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+		var staticpath = localStorage.staticpath || geoStaticpath();
 		var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
-
 		var contenterror = 0;
 		var nocontentcheck = localStorage.dd;
 	}
 }
 catch(e)
 {
-	if(e.message != 'FxEx') {
+	if(e.message != 'FxEx')
+	{
 		alert('Your browser does not allow data to be written. Please make sure you use default browser settings.');
 	}
 	b_u = 1;
@@ -88,11 +99,11 @@ catch(e)
 }
 var bootstaticpath = staticpath;
 var urlrootfile = '';
+
 if (document.location.href.substr(0,19) == 'chrome-extension://')
 {
 	bootstaticpath = chrome.extension.getURL("mega/");
 	urlrootfile = 'mega/secure.html';
-	//nocontentcheck=true;
 }
 
 if (is_chrome_firefox)
@@ -100,16 +111,16 @@ if (is_chrome_firefox)
 	bootstaticpath = 'chrome://mega/content/';
 	urlrootfile = 'secure.html';
 	nocontentcheck=true;
-
 	staticpath = 'https://eu.static.mega.co.nz/';
-
-	if(!b_u) try {
+	if(!b_u) try
+	{
 		loadSubScript(bootstaticpath + 'fileapi.js');
-	} catch(e) {
+	}
+	catch(e)
+	{
 		b_u = 1;
 		Cu.reportError(e);
-		alert('Unable to initialize core functionality:\n\n'
-			+ e + '\n\n' + mozBrowserID);
+		alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
 	}
 }
 
@@ -231,7 +242,7 @@ if (m)
 	{
 		app='http://appworld.blackberry.com/webstore/content/46810890/';
 		document.body.className = 'blackberry full-mode supported';
-		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';		
+		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
 	}
 	else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
 	{
@@ -240,7 +251,7 @@ if (m)
 		document.getElementById('m_desc').innerHTML = 'Free 50 GB - End-to-end encryption';
 	}
 	else document.body.className = 'another-os full-mode unsupported';
-	
+
 	if (app)
 	{
 		document.getElementById('m_appbtn').href = app;
@@ -279,7 +290,7 @@ if (m)
 		script.src = 'https://mega.co.nz/blog.js';
 	}
 }
-else if (document.location.hash == '#android')
+else if (page == '#android')
 {
 	document.location = 'https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega';
 }
@@ -291,13 +302,7 @@ else
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'sq':['||'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
-		
-		
-		// 'el':['el'] (greek),
-		// 'mi':['maori'],
-		// 'vn':['vi'],
-		
-		
+
 		function detectlang()
 		{
 			return 'en';
@@ -317,6 +322,7 @@ else
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
 		jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
@@ -335,7 +341,6 @@ else
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
-		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 		jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
@@ -364,7 +369,6 @@ else
 		jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
 		jsl.push({f:'html/top.html', n: 'top', j:0});
 		jsl.push({f:'js/notifications.js', n: 'notifications_js', j:1});
-		if (typeof JSON == 'undefined') jsl.push({f:'js/json.js', n: 'json', j:1});
 		jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
 		jsl.push({f:'js/avatar.js', n: 'avatar_js', j:1,w:3});
 		jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
@@ -441,16 +445,13 @@ else
 			'plugin': ['chrome','firefox'],
 			'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js']
 		};
-		var page = document.location.hash;
-		if (page)
-		{
-			page = page.replace('#','');
-			if (page.indexOf('%21') > -1)
-			{
-				page = page.replace('%21','!').replace('%21','!');
-				document.location.hash = '#' + page;
-			}
-		}
+
+
+
+
+	    if (page && page.indexOf('%21') > -1) document.location.hash = page.replace('%21','!').replace('%21','!');
+		if (page) page = page.replace('#','');
+
 
 		for (var p in subpages)
 		{
@@ -494,10 +495,13 @@ else
 						}
 						if (!nocontentcheck && !cmparrays(e.data.hash,sh1[jsl[e.data.jsi].f]))
 						{
-							console.log(jsl[e.data.jsi].f);
-							console.log(sha256(jsl[e.data.jsi].text));
-							console.log(sh1[jsl[e.data.jsi].f]);
-							alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+							if (bootstaticpath.indexOf('cdn') > -1)
+							{
+								sessionStorage.skipcdn=1;
+								document.location.reload();
+							}
+							else alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[e.data.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
+
 							contenterror=1;
 						}
 						if (!contenterror)
@@ -514,26 +518,6 @@ else
 					hash_workers = undefined;
 				}
 				i++;
-			}
-		}
-		if (jj)
-		{
-			var l=[];
-			var i=0;
-			while (i < 1500)
-			{
-				l[i]='l';
-				i++;
-			}
-			i=0;
-			for (var i in jsl)
-			{
-				if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + Math.random() + '"></sc' + 'ript>');
-				else if (jsl[i].j === 2)
-				{
-					if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
-					document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
-				}
 			}
 		}
 		var pages = [];
@@ -554,7 +538,7 @@ else
 		{
 			jslcomplete = 0;
 			xhr_progress = [0,0];
-			xhr_stack = Array(xhr_progress.size);
+			xhr_stack = Array(xhr_progress.length);
 			jsl_fm_current = 0;
 			jsl_current = 0;
 			jsl_total = 0;
@@ -609,9 +593,7 @@ else
 							else
 							{
 								jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
-
 								if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
-
 								step(jsi);
 							}
 						});
@@ -625,10 +607,25 @@ else
 			}
 		}
 
+		var xhr_timeout=5000;
+
+		function xhr_error()
+		{
+			xhr_timeout+=1000;
+			console.log(xhr_timeout);
+			if (bootstaticpath.indexOf('cdn') > -1)
+			{
+				bootstaticpath = geoStaticpath(1);
+				staticpath = geoStaticpath(1);
+			}
+			xhr_progress[this.xhri] = 0;
+			xhr_load(this.url,this.jsi,this.xhri);
+		}
+
 		function xhr_load(url,jsi,xhri)
 		{
 			  xhr_stack[xhri] = getxhr();
-			  xhr_stack[xhri].onload = function(oEvent)
+			  xhr_stack[xhri].onload = function()
 			  {
 				jsl[this.jsi].text = this.response || this.responseText;
 
@@ -640,9 +637,6 @@ else
 				{
 					if (!nocontentcheck && !cmparrays(sha256(jsl[this.jsi].text),sh1[jsl[this.jsi].f]))
 					{
-						console.log(jsl[this.jsi].f);
-						console.log(sha256(jsl[this.jsi].text));
-						console.log(sh1[jsl[this.jsi].f]);
 						alert('An error occurred while loading MEGA. The file ' + bootstaticpath+jsl[this.jsi].f + ' is corrupt. Please try again later. We apologize for the inconvenience.');
 						contenterror=1;
 					}
@@ -655,11 +649,19 @@ else
 					}
 				}
 			  }
-			  xhr_stack[xhri].onerror = function(oEvent)
+			  xhr_stack[xhri].onreadystatechange = function()
 			  {
-				xhr_progress[this.xhri] = 0;
-				xhr_load(this.url,this.jsi,this.xhri);
+				try
+				{
+					if (this.readyState == 1) this.timeout=0;
+				}
+				catch(e)
+				{
+				
+				}				
 			  }
+			  xhr_stack[xhri].onerror = xhr_error;
+			  xhr_stack[xhri].ontimeout = xhr_error;
 			  if (jsl[jsi].text)
 			  {
 				if (++jslcomplete == jsl.length) initall();
@@ -671,9 +673,10 @@ else
 				  xhr_stack[xhri].jsi = jsi;
 				  xhr_stack[xhri].xhri = xhri;
 				  if (localStorage.dd) url += '?t=' + Date.now();
-				  xhr_stack[xhri].open("GET", url, true);
+				  xhr_stack[xhri].open("GET", bootstaticpath + url, true);
+				  xhr_stack[xhri].timeout = xhr_timeout;
 				  if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
-				  xhr_stack[xhri].send(null);
+				  xhr_stack[xhri].send(null);				  
 			  }
 		}
 		window.onload = function ()
@@ -682,7 +685,7 @@ else
 		}
 		function jsl_load(xhri)
 		{
-			if (jsl[jsli]) xhr_load(bootstaticpath + jsl[jsli].f, jsli++,xhri);
+			if (jsl[jsli]) xhr_load(jsl[jsli].f, jsli++,xhri);
 		}
 		function jsl_progress()
 		{
@@ -692,7 +695,7 @@ else
 			if ((p > jsl_perc) && (p <= 100))
 			{
 				jsl_perc = p;
-				if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;					
+				if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;
 				document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
 			}
 		}
@@ -751,26 +754,14 @@ else
 				link.href = window.URL.createObjectURL(blob);
 				document.head.appendChild(link);
 				cssar=undefined;
-				if (typeof u_checked !== 'undefined' && u_checked) jsar.push('startMega();');
-				else  jsar.push('populate_l(); var insist=false; if (localStorage.dlimport) insist=true; u_checklogin( { checkloginresult: function(u_ctx,r) { u_type = r; u_checked=true; startMega(); } },insist);');
+				jsar.push('jsl_done=true; boot_done();');
 				evalscript_url(jsar);
 				jsar=undefined;
 			}
 			else
 			{
-				populate_l();
-				if (typeof u_checked !== 'undefined' && u_checked) startMega();
-				else
-				{
-					var insist=false;
-					if (localStorage.dlimport) insist=true;
-					u_checklogin({ checkloginresult: function(u_ctx,r)
-					{
-						u_type = r;
-						u_checked=true;
-						startMega();
-					}},insist);
-				}
+				jsl_done=true;
+				boot_done();
 			}
 		}
 	}
@@ -800,8 +791,96 @@ else
 		var istaticpath = staticpath;
 		if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
 		else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
-		
+
 		document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;cursor: pointer;}.loading-bottom-button.st-facebook-button {float: right;background-position: -40px -2376px;margin-left: 11px;}.loading-bottom-button.st-facebook-button:hover {background-position: -40px -2336px;}.loading-bottom-button.st-twitter-button {float: right;background-position: -1px -2376px;margin-left: 11px;}.loading-bottom-button.st-twitter-button:hover {background-position: -1px -2336px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite@2x.png);	background-size: 222px auto;	}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="loading-main-bottom" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="loading-bottom-button st-facebook-button"></a><a href="https://twitter.com/MEGAprivacy" class="loading-bottom-button st-twitter-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="follow-txt" target="_blank">follow us</a><div class="clear"></div></div></div></div>');
 	}
+	var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
+	if (localStorage.sid) u_storage = localStorage;
+	else u_storage = sessionStorage;
+	if (u_sid = u_storage.sid)
+	{
+		loginresponse = true;
+		var lxhr = getxhr();
+		lxhr.onload = function()
+		{
+			if (this.status == 200)
+			{
+				try
+				{
+					loginresponse = this.response || this.responseText;
+					if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
+					else loginresponse = false;
+					boot_done();
+				}
+				catch (e)
+				{
+					loginresponse= false;
+					boot_done();
+				}
+			}
+			else
+			{
+				loginresponse= false;
+				boot_done();
+			}
+		}
+		lxhr.onerror = function()
+		{
+			loginresponse= false;
+			boot_done();
+		}
+		lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
+		lxhr.send(JSON.stringify([{'a':'ug'}]));
+	}
+	function boot_auth(u_ctx,r)
+	{
+		u_type = r;
+		u_checked=true;
+		startMega();
+	}
+	function boot_done()
+	{
+		lxhr, dxhr = undefined;
+		if (loginresponse === true || dl_res === true || !jsl_done) return;
+		else if (loginresponse)
+		{
+			api_setsid(u_sid);
+			u_checklogin3a(loginresponse[0],{checkloginresult:boot_auth});
+		}
+		else u_checklogin({checkloginresult:boot_auth},false);
+	}
+	if (page.substr(0,1) == '!' && page.length > 1)
+	{
+		var dlxhr = getxhr(),dl_res = true;
+		dlxhr.onload = function()
+		{
+			if (this.status == 200)
+			{
+				try
+				{
+					dl_res = this.response || this.responseText;
+					if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
+					if (dl_res[0]) dl_res = dl_res[0];
+					boot_done();
+				}
+				catch (e)
+				{
+					dl_res = false;
+					boot_done();
+				}
+			}
+			else
+			{
+				dl_res = false;
+				boot_done();
+			}
+		}
+		dlxhr.onerror = function()
+		{
+			dl_res= false;
+			boot_done();
+		}
+		dlxhr.open("POST", apipath + 'cs?id=0', true);
+		dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));
+	}
 }
-

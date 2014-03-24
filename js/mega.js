@@ -28,6 +28,11 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
+
+
+
+
+
 function MegaData ()
 {
 	this.d = {};
@@ -635,12 +640,23 @@ function MegaData ()
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
+				
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
-					ulc = 'class="opened"';
-					expandedc = 'expanded';
-					buildnode = true;
+					for (var h in M.c[folders[i].h])
+					{
+						var n = M.d[h];						
+						if (n && n.t) buildnode = true;
+					}
 				}
+				
+				if (buildnode)
+				{
+					ulc = 'class="opened"';
+					expandedc = 'expanded';				
+				}
+				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
+				
 				var containsc='';
 				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
@@ -696,10 +712,17 @@ function MegaData ()
 		for (var i in a)
 		{
 			if (a[i] == this.RootID)
-			{
-				typeclass = 'folder';
-				if (folderlink && M.d[this.RootID]) name = htmlentities(M.d[this.RootID].name);
-				else name = l[164];
+			{				
+				if (folderlink && M.d[this.RootID])
+				{
+					name = htmlentities(M.d[this.RootID].name);
+					typeclass = 'folder';
+				}
+				else
+				{
+					name = l[164];
+					typeclass = 'cloud-drive';
+				}
 			}
 			else if (a[i] == 'contacts')
 			{
@@ -846,6 +869,7 @@ function MegaData ()
 		var a =0;
 		function ds(h)
 		{
+			removeUInode(h);
 			if (M.c[h] && h.length < 11)
 			{
 				for(var h2 in M.c[h]) ds(h2);
@@ -858,8 +882,7 @@ function MegaData ()
 				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
-			if (M.v[h]) delete M.v[h];
-			removeUInode(h);
+			if (M.v[h]) delete M.v[h];			
 		}
 		ds(h);
 	};
@@ -1273,7 +1296,7 @@ function MegaData ()
 	}
 
 	this.nodeShare = function(h,s,ignoreDB)
-	{
+	{		
 		if (this.d[h])
 		{
 			if (typeof this.d[h].shares == 'undefined') this.d[h].shares = [];
@@ -1285,7 +1308,6 @@ function MegaData ()
 			}
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
-			
 			if (mDB && !pfkey) mDBadd('ok',{h:h,k:a32_to_base64(encrypt_key(u_k_aes,u_sharekeys[h])),ha:crypto_handleauth(h)});
 		}
 	}
@@ -1537,7 +1559,7 @@ function MegaData ()
 		delete $.dlhash;
 	}
 
-	this.dlprogress = function (id, bl, bt,kbps, dl_queue_num)
+	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
 	{
 		if (kbps == 0) return;
 		var st;
@@ -1579,7 +1601,6 @@ function MegaData ()
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = (bt-bl)/bps;
-		var perc = Math.floor(bl/bt*100);
 		if (bl && bt)
 		{
 			$.transferprogress[id] = Math.floor(bl/bt*100);
@@ -1592,8 +1613,8 @@ function MegaData ()
 					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
 				}
 			
-				$('.transfer-table #' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
-				$('.transfer-table #' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
+				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
+				$('.transfer-table #' + id + ' .progressbar-percents').text(perc+'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
@@ -1727,7 +1748,7 @@ function MegaData ()
 		else id = 'dl_' + id;
 		$('.transfer-table').prepend($('.transfer-table #' + id));
 		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id, 0, 0, 0, dl_queue_num);
+		M.dlprogress(id, 0, 0, 0, 0, dl_queue_num);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];
@@ -2026,31 +2047,34 @@ function execsc(ap)
 		else if (a.a == 's' && !folderlink)
 		{
 			var tsharekey = '';
-			var prockey = false;
-			if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
-			{
-				u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
-				tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
-				prockey=true;
-			}
+			var prockey = false;			
 
 			if (a.o == u_handle)
 			{
 				if (typeof a.r == "undefined")
 				{
-					// I deleted my share
+					// I deleted my share							
 					M.delnodeShare(a.n,a.u);
 				}
 				else if (typeof M.d[a.n].shares != 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
 				{
 					// I updated or created my share
-					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});
+					u_sharekeys[a.n] = decrypt_key(u_k_aes,base64_to_a32(a.ok));
+					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
 				}
 			}
 			else if (typeof a.o != 'undefined')
 			{
+				if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
+				{				
+					u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
+					tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
+					prockey=true;
+				}
+			
 				if (typeof a.r == "undefined")
 				{
+					console.log('delete a share');
 					// delete a share:
 					var n = M.d[a.n];
 					if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
@@ -2060,6 +2084,7 @@ function execsc(ap)
 				}
 				else
 				{
+					console.log('I receive a share, prepare for receiving tree a');
 					// I receive a share, prepare for receiving tree a
 					tparentid 	= a.o;
 					trights 	= a.r;
@@ -2070,6 +2095,7 @@ function execsc(ap)
 					}
 					else
 					{
+						console.log('look up other root-share-nodes from this user');
 						// look up other root-share-nodes from this user:
 						if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
 

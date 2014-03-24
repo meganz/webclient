@@ -1,19 +1,8 @@
 
 
-if (typeof localStorage == 'undefined')
-{
-	console.log('Web storage NOT supported');
-	// TODO: redirect to browser upgrade page
-}
-
-var u_storage;
-
-if (localStorage.sid) u_storage = localStorage;
-else u_storage = sessionStorage;
 
 // global variables holding the user's identity
 var u_handle;	// user handle
-var u_sid;		// session ID
 var u_k;		// master key
 var u_k_aes;	// master key AES engine
 var u_p;		// prepared password

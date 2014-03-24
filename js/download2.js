@@ -423,7 +423,6 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
-	dl_decrypter(dl);
 	dl_writer(dl);
 
 	dl.macs  = {}

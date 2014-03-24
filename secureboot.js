@@ -333,11 +333,11 @@ else
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
 		jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
 		jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
+		jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
 		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
-		jsl.push({f:'js/upload.js', n: 'upload_js', j:1,w:2});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
@@ -354,6 +354,7 @@ else
 		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
 		jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
+		jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
 		/* end better download */
 		jsl.push({f:'index.js', n: 'index', j:1,w:4});
 		jsl.push({f:'html/start.html', n: 'start', j:0});

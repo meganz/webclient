@@ -306,47 +306,6 @@ function ul_start(File) {
 	DEBUG2('request urls for ', total, ' files')
 }
 
-function CreateWorkers(url, message, size) {
-	size = size || 4
-	var worker = []
-		, instances = [];
-
-	function handler(id) {
-		return function(e) {
-			message(this.context, e, function(r) {
-				worker[id].busy = false; /* release worker */
-				instances[id].done(r);
-			});
-		}
-	}
-
-	for (var i = 0; i < size; i++) {
-		var w  = new Worker(url);
-		w.id   = i;
-		w.busy = false;
-		w.postMessage = w.webkitPostMessage || w.postMessage;
-		w.onmessage   = handler(i);
-		worker.push(w);
-	}
-
-	return new QueueClass(function(task) {
-		for (var i = 0; i < size; i++) {
-			if (!worker[i].busy) break;
-		}
-		worker[i].busy = true;
-		instances[i]    = this;
-		$.each(task, function(e, t) {
-			if (e == 0) {
-				worker[i].context = t;
-			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
-				worker[i].postMessage(t.buffer,[t.buffer]);
-			} else {
-				worker[i].postMessage(t);
-			}
-		});
-	}, size);
-}
-
 function ChunkUpload(file, start, end)
 {
 	var self = this;

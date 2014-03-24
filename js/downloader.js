@@ -1,39 +1,75 @@
 
 // getXhrObject {{{
+var __xhrs = [];
+function checkTimeout(xhr) {
+	if (!xhr.__busy) return;
+	clearTimeout(xhr.ts);
+	xhr.ts = setTimeout(function() {
+		DEBUG("xhr failed by timeout");
+		xhr.abort();
+		xhr.failure("timeout");
+	}, xhr.timeout_ts *1.5);
+}
+	
 function getXhrObject(s) {
-	var xhr = new XMLHttpRequest
-		, timeout = s || 40000
+	var xhr, timeout = s || 40000
+
+	$.each(__xhrs, function(i, _xhr) {
+		if (!_xhr.__busy) {
+			xhr = _xhr;
+			return false; /* break */
+		}
+	});
+
+	if (!xhr) {
+		xhr = new XMLHttpRequest
+		xhr.Open = xhr.open
+		xhr.Abort = xhr.abort
+
+		xhr.abort = function() {
+			clearTimeout(xhr.ts);
+			xhr.Abort.apply(xhr, arguments);
+			xhr.__busy = false;
+		};
+
+		xhr.open = function() {
+			xhr.Open.apply(xhr, arguments);
+			checkTimeout(xhr);
+		};
+
+
+		xhr.upload.onprogress = function() {
+			if (!xhr.__busy) return;
+			checkTimeout(xhr);
+			return xhr.upload_progress.apply(xhr, arguments);
+		}
+
+		xhr.onprogress = function() {
+			if (!xhr.__busy) return;
+			checkTimeout(xhr);
+			return xhr.progress.apply(xhr, arguments);
+		}
+
+		xhr.onreadystatechange = function() {
+			if (!xhr.__busy) return;
+			xhr.changestate.apply(xhr, arguments);
+			checkTimeout(xhr);
+			if (this.readyState == this.DONE) {
+				clearTimeout(xhr.ts);
+				xhr.__busy = false;
+				return xhr.ready.apply(xhr, arguments);
+			}
+		};
+
+		__xhrs.push(xhr);
+	}
+
+	xhr.__busy = true;
+	xhr.timeout_ts = timeout;
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
 
-	// timeout {{{
-	var ts = null
-		, Open = xhr.open
-		, Abort = xhr.abort
-		, aborted = false
-
-	xhr.abort = function() {
-		clearTimeout(ts);
-		aborted = true
-		Abort.apply(xhr, arguments);
-	};
-
-	xhr.open = function() {
-		Open.apply(xhr, arguments);
-		checkTimeout();
-	};
-
-	function checkTimeout() {
-		if (aborted) return;
-		clearTimeout(ts);
-		ts = setTimeout(function() {
-			DEBUG("xhr failed by timeout");
-			xhr.abort();
-			xhr.failure("timeout");
-		}, timeout*1.5);
-	}
-	// }}}
 
 	// default callbacks {{{
 	xhr.progress = function() {
@@ -51,29 +87,6 @@ function getXhrObject(s) {
 	xhr.upload_progress = function() {
 	};
 	// }}}
-
-	xhr.upload.onprogress = function() {
-		if (aborted) return;
-		checkTimeout();
-		return xhr.upload_progress.apply(xhr, arguments);
-	}
-
-	xhr.onprogress = function() {
-		if (aborted) return;
-		checkTimeout();
-		return xhr.progress.apply(xhr, arguments);
-	}
-
-	xhr.onreadystatechange = function() {
-		if (aborted) return;
-		xhr.changestate.apply(xhr, arguments);
-		checkTimeout();
-		if (this.readyState == this.DONE) {
-			clearTimeout(ts);
-			xhr.__finished = true;
-			return xhr.ready.apply(xhr, arguments);
-		}
-	};
 
 	return xhr;
 }

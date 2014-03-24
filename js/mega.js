@@ -1878,7 +1878,7 @@ function MegaData ()
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id, 0);
+		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
 	}
 }

@@ -38,9 +38,6 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
-		if (!ulQueue.isPaused()) {
-			onUploadProgress(ctx.ul_queue_num, 100, ctx.size, ctx.size);
-		}
 		ul_queue[ctx.ul_queue_num] = {}
 		onUploadSuccess(ctx.ul_queue_num);
 		ul_completepending(ctx.target);
@@ -460,7 +457,7 @@ function ul_chunk_upload(chunk, file, Job) {
 		$.each(file.progress, function(i, p) {
 			tp += p;
 		});
-		onUploadProgress(file.pos, Math.min(Math.floor(tp/file.size*100), 99), tp, file.size);
+		onUploadProgress(file.pos, Math.floor(tp/file.size*100), tp, file.size);
 	}
 
 	xhr.upload_progress = function(e) {

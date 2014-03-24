@@ -1,5 +1,7 @@
 var newnodes;
 var fminitialized=false;
+var panelDomQueue = []
+	, DOM_TRANSFER_LIMIT = 15
 
 if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
@@ -1751,6 +1753,32 @@ function MegaData ()
 		$.transferHeader();
 	}
 	this.mobileuploads = [];
+
+	$(document).on('remove', '.transfer-table tr', function() {
+		var toClean = 0
+		$.each(panelDomQueue, function(i, html) {
+			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
+				return false;
+			}
+			$(html).appendTo('.transfer-table')
+			toClean++
+		});
+
+		panelDomQueue.splice(0, toClean);
+
+		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+			$.transferClose();
+			resetUploadDownload();
+		}
+	});
+
+	this.addToTransferTable = function(elem) {
+		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
+			return panelDomQueue.push(elem);
+		}
+		$(elem).appendTo('.transfer-table')
+	}
+
 	this.addUpload = function(u)
 	{
 		for (var i in u)
@@ -1760,14 +1788,17 @@ function MegaData ()
 			if (!f.flashid) f.flashid = false;
 			f.target = M.currentdirid;
 			f.id = ul_id;
+
+			this.addToTransferTable(
+				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>'
+			);
 			ul_queue.push(f);			
 			
-			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		}
 		if (page !== 'start') openTransferpanel();
 	}
 
-	this.ulprogress = function(id,bl,bt)
+	this.ulprogress = function(id, perc, bl,bt)
 	{
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
@@ -1781,12 +1812,11 @@ function MegaData ()
 		var bps = Math.round(bl / eltime);
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress=[];
-		var perc = Math.floor(bl/bt*100);
 		if (bl && bt && !uldl_hold)
 		{
 			$.transferprogress[id] = Math.floor(bl/bt*100);
-			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
-			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
+			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
+			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
 			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
@@ -1847,7 +1877,7 @@ function MegaData ()
 		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id);
+		M.ulprogress(id, 0);
 		$.transferHeader();
 	}
 }
@@ -1888,9 +1918,13 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid,error)
+function onUploadError(fileid, errorstr)
 {
-	if (d) console.log('OnUploadError ' + fileid + ' ' + error);
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+
+	$('.transfer-table #ul_' + fileid + ' td:eq(3)')
+		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
+		.parents('tr').data({'failed' : NOW()});
 }
 
 function addupload(u)
@@ -1901,9 +1935,9 @@ function onUploadStart(id)
 {
 	M.ulstart(id);
 }
-function onUploadProgress(id, bl, bt)
+function onUploadProgress(id, p, bl, bt)
 {
-	M.ulprogress(id,bl,bt);
+	M.ulprogress(id, p, bl, bt);
 }
 function onUploadSuccess(id, bl, bt)
 {

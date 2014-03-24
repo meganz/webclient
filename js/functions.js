@@ -1,11 +1,62 @@
-function inherits(ctor, superCtor) {
-	ctor.super_ = superCtor
-	var TempCtor = function () {
-		ctor.super_.prototype.constructor.apply(this, arguments)
+var inherits = (function(){
+	var createObject = Object.create || function createObject(source) {
+		var Host = function () {};
+		Host.prototype = source;
+		return new Host();
+	};
+
+	return function (destination, source) {
+		var proto = destination.prototype = createObject(source.prototype);
+		proto.constructor = destination;
+		proto._super = source.prototype;
 	}
-	TempCtor.prototype = superCtor.prototype
-	ctor.prototype = new TempCtor()
-	ctor.prototype.constructor = ctor
+})();
+
+/**
+ *	Cascade:
+ *
+ *	Tiny helper to queue related tasks, in which the output of one function
+ *	is the input of the next task. It is asynchronous
+ *	
+ *		function([prevarg, arg], next)
+ *	
+ *	Author: @crodas
+ */
+function Cascade(tasks, fnc, done, value)
+{
+	function scheduler(value) {
+		if (tasks.length == 0) {
+			return done(value);
+		}
+
+		fnc([value, tasks.shift()], scheduler)
+	}
+
+	scheduler(value);
+}
+
+/**
+ *	Simple interface to run things in parallel (safely) once, and 
+ *	get a safe callback
+ *
+ *	Author: @crodas
+ */
+function Parallel(task) {
+	var callbacks = {};
+	return function(args, next) {
+		var id = JSON.stringify(args)
+		if (callbacks[id]) {
+			return callbacks[id].push(next);
+		}
+		callbacks[id] = [next];
+		task(args, function() {
+			var args = arguments;
+			$.each(callbacks[id], function(i, next) {
+				next.apply(null, args);
+			});
+			delete callbacks[id];
+		});
+	};
 }
 
 
@@ -506,6 +557,14 @@ function NOW() {
 /**
  *	Global function to help debugging
  */
+function DEBUG2() {
+	if (d) {
+		console.log.apply(console, arguments)
+		if (!is_chrome_firefox) {
+			console.warn.apply(console, arguments)
+		}
+	}
+}
 function DEBUG() {
 	if (arguments.length == 2 && typeof arguments[0] == "object"
 		  && typeof arguments[0][arguments[1]] == "function") {
@@ -545,3 +604,50 @@ function dlError(text) {
 function removeValue(array, value) {
 	array.splice($.inArray(value, array), 1);
 };
+
+/**
+ *	Create a pool of workers, it returns a Queue object
+ *	so it can be called many times and it'd be throttled 
+ *	by the queue
+ */
+function CreateWorkers(url, message, size) {
+	size = size || 4
+	var worker = []
+		, instances = [];
+
+	function handler(id) {
+		return function(e) {
+			message(this.context, e, function(r) {
+				worker[id].busy = false; /* release worker */
+				instances[id].done(r);
+			});
+		}
+	}
+
+	for (var i = 0; i < size; i++) {
+		var w  = new Worker(url);
+		w.id   = i;
+		w.busy = false;
+		w.postMessage = w.webkitPostMessage || w.postMessage;
+		w.onmessage   = handler(i);
+		worker.push(w);
+	}
+
+	return new QueueClass(function(task) {
+		for (var i = 0; i < size; i++) {
+			if (!worker[i].busy) break;
+		}
+		worker[i].busy = true;
+		instances[i]    = this;
+		$.each(task, function(e, t) {
+			if (e == 0) {
+				worker[i].context = t;
+			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
+				worker[i].postMessage(t.buffer,[t.buffer]);
+			} else {
+				worker[i].postMessage(t);
+			}
+		});
+	}, size);
+}
+

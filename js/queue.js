@@ -23,21 +23,33 @@ var DEFAULT_CONCURRENCY = 4
 
 	function Context(queue, args) {
 		this.task = args;
+		this.reschedule = function() {
+			var callback = queue._callback[args.__tid];
+			this.done();
+			setTimeout(function() {
+				queue.pushFirst(args, callback);
+			}, 100);
+		};
+
 		this.done = function() {
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
 				DEBUG("task already finished");
-				return queue.process();
+				return setTimeout(function() {
+					queue.process();
+				});
 			}
 
-			queue._running.splice(id,1);
+			queue._running.splice(id, 1);
 			queue.trigger('done', args)
 			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
 			delete queue._callback[args.__tid];
 			if (args.__ondone) {
 				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
 			}
-			queue.process();
+			setTimeout(function() {
+				queue.process();
+			});
 		}
 	}
 
@@ -76,7 +88,7 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.process = function() {
 		var args, context;
-		while (!this._paused && this._running.length != this._concurrency && this._queue.length > 0) {
+		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
 				/* nothing on the queue? */
@@ -94,7 +106,7 @@ var DEFAULT_CONCURRENCY = 4
 			this._worker.apply(context, [args])
 		}
 
-		if (this._queue.length == 0) {
+		if (this._queue.length == 0 && this._running.length == 0) {
 			this.trigger('drain');
 		}
 	}
@@ -150,7 +162,6 @@ var DEFAULT_CONCURRENCY = 4
 	 *	Schedule a task to be processed right away (or as soon as possible)
 	 */	
 	queue.prototype.pushFirst = function(task, done) {
-		this.process();
 		task.__tid = id++;
 		this._queue.unshift(task);
 		this._callback[task.__tid] = done || function() {};

@@ -423,6 +423,17 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
+	/**
+	 *	Internal queue to wrap Decrypter (which is another queue)
+	 *	It makes us easier to check if the current file has something
+	 *	decryptying
+	 */
+	dl.decrypt = new QueueClass(function(task) {
+		var that = this;
+		Decrypter.push([[dl, task.offset], dl.nonce, task.offset/16, task.data], function() {
+			that.done();
+		});
+	}, 4);
 	dl_writer(dl);
 
 	dl.macs  = {}

@@ -237,7 +237,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					Decrypter.push([[download, task.offset], download.nonce, task.offset/16, new Uint8Array(r)]);
+					download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
 					if (failed) DownloadManager.release(self);
 					failed = false;
 				} else if (!download.cancelled) {
@@ -363,7 +363,7 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
-				if (chunkFinished && dl.writer.isEmpty() && Decrypter.isEmpty()) {
+				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
 					if (dl.cancelled) return;
 					if (!emptyFile && !checkLostChunks(dl)) {
 						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);

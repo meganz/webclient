@@ -467,7 +467,7 @@ var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
 		}
 		done();
 	}
-});
+}, 4);
 
 /** 
  *	Keep in track real active downloads.

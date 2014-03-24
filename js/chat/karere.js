@@ -821,8 +821,8 @@ makeMetaAware(Karere);
         eventData['from'] = from;
         eventData['id'] = eventId;
 
-        var jsonData = message.getElementsByTagName("json");
-        if(jsonData.length > 0) {
+        var jsonData = $('json', message);
+        if(jsonData.size() > 0) {
             eventData['meta'] = JSON.parse(jsonData[0].childNodes[0].data);
         }
 
@@ -912,7 +912,7 @@ makeMetaAware(Karere);
                  */
 
                     // if not...set the message property
-                eventData['message'] = $(elems[0]).text();
+                eventData['message'] = $('messageContents', elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
                 if($('forwarded', message).size() > 0) {
@@ -1267,6 +1267,7 @@ makeMetaAware(Karere);
         if(contents.toUpperCase) { // is string (better way?)
             message
                 .c('body')
+                .c('messageContents')
                 .t(contents)
                 .up()
                 .c('active', {'xmlns': 'http://jabber.org/protocol/chatstates'});
@@ -1279,9 +1280,14 @@ makeMetaAware(Karere);
             var json = Strophe.xmlHtmlNode("<json><\/json>").childNodes[0];
             json.textContent = JSON.stringify(meta);
 
-            message.nodeTree.appendChild(
-                json
-            );
+            var $body = $('body', message.nodeTree);
+            if($body[0]) {
+                $body[0].appendChild(
+                    json
+                );
+            } else {
+                assert(false, 'missing <body></body>');
+            }
         }
 
         if(delay && delay > 0) {

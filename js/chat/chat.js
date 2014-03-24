@@ -14,7 +14,6 @@ if (localStorage.megachat) {
 var chatui;
 (function() {
     chatui = function() {
-        console.error('chatui called');
         hideEmptyMsg();
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
@@ -1834,6 +1833,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
         if(self.type == "private") {
             var targetUserJid = self.getParticipantsExceptMe()[0];
             var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+            assert(M.u, 'M.u does not exists');
+            assert(targetUserNode.h, 'No hash found for participant');
+            assert(M.u[targetUserNode.h], 'User not found in M.u');
+
             if(targetUserNode) {
                 M.u[targetUserNode.h].lastChatActivity = self.lastActivity;
             }
@@ -2767,6 +2770,78 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
 MegaChatRoom.prototype.getMediaOptions = function() {
     return this.options.mediaOptions;
 };
+
+
+/**
+ * Internal method to notify the server that the specified `nodeids` are sent/shared to `users`
+ * @param nodeids
+ * @param users
+ * @private
+ */
+MegaChatRoom.prototype._sendNodes = function(nodeids, users) {
+    var json = [], apinodes=[];
+
+    var cloneChatNode = function(n,keepParent) {
+        var n2 = clone(n);
+        n2.k = a32_to_base64(n2.key);
+        delete n2.key,n2.ph,n2.ar;
+        if (!keepParent) delete n2.p;
+        return n2;
+    };
+
+    var $promise = new $.Deferred();
+
+    for (var i in nodeids)
+    {
+        var n = M.d[nodeids[i]];
+        if (n)
+        {
+            if (n.t)
+            {
+                var subnodes = fm_getnodes(nodeids[i]);
+                for (var j in subnodes)
+                {
+                    var n2 = M.d[subnodes[j]];
+                    // subnodes retain their parent nodeid to retain the same folder structure
+                    if (n2) json.push(cloneChatNode(n2,true));
+                }
+            }
+            // root nodes do not retain their parent nodeid, because they become "root nodes" in the chat - access will be granted to these nodes and subnode access can be determined based on parent node access rights
+
+            json.push(cloneChatNode(n));
+            apinodes.push(n.h);
+        }
+    }
+
+
+    // TODO: implement API call to grant access to the root nodes, pass following data in API call:
+    // - apinodes
+    // - users
+    // for now simulate a random API call:
+
+    console.error("sendNodes: ", apinodes, apinodes);
+
+    api_req({a:'uq'},
+        {
+            callback2: function() {
+                $promise.resolve(toArray(arguments));
+            },
+            failhandler: function() {
+                $promise.reject(toArray(arguments));
+            },
+            json: json,
+            callback: function(res,ctx)
+            {
+                // check if result is all positive  (should be) and fire off callback:
+                if (ctx.callback2) ctx.callback2(ctx.json);
+            }
+        });
+
+    return $promise;
+}
+
+
+
 /**
  * Attach/share (send as message) file/folder nodes to the chat
  * @param ids
@@ -2784,24 +2859,23 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
 
     var users = [];
 
-    $.each(self.getParticipantsExceptMe(), function(k, v) {
-        users.push(
-            self.megaChat.getContactFromJid(v).h
-        );
-    });
-
-    var $promises = [];
-    $.each(users, function(k, targetUserHash) {
-        $promises.push(
-            M.copyNodes2(ids, targetUserHash)
-        );
+    $.each(self.getParticipants(), function(k, v) {
+        var contact = self.megaChat.getContactFromJid(v);
+        if(contact && contact.h) {
+            users.push(
+                contact.h
+            );
+        }
     });
 
     var $masterPromise = new $.Deferred();
-    $.when.apply($, $promises)
+
+    self._sendNodes(
+            ids,
+            users
+        )
         .done(function(responses) {
-            console.log(responses);
-            debugger;
+            console.error(responses);
 
             var attachments = {};
             $.each(ids, function(k, nodeId) {

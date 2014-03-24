@@ -31,10 +31,10 @@ describe("Chat.js - Karere UI integration", function() {
         window.M = {
             'u': {
                 "testcase1": {
-                    "u": "testcase1", "c": 2, "m": "lpetrov@me.com", "presence": "chat", "presenceMtime": 1391783363.743
+                    "u": "testcase1", "c": 2, "m": "lpetrov@me.com", "presence": "chat", "presenceMtime": 1391783363.743, "h": "testcase1"
                 },
                 "someid": {
-                    "u": "someid", "c": 1, "m": "lp@mega.co.nz", "ts": 1390835777, "name": "lp@mega.co.nz", "h": "hsxs0LUdV1s", "t": 1, "p": "contacts", "presence": "chat", "presenceMtime": 1392042647
+                    "u": "someid", "c": 1, "m": "lp@mega.co.nz", "ts": 1390835777, "name": "lp@mega.co.nz", "h": "someid", "t": 1, "p": "contacts", "presence": "chat", "presenceMtime": 1392042647
                 }
             }
         };

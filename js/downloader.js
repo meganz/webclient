@@ -3,9 +3,11 @@ if (d) {
 	function abortAll() {
 		$.each(_allxhr, function(k, xhr) {
 			try { 
-				xhr.abort(); xhr.failure(); 
+				if (!xhr.__finished) {
+					xhr.abort(); xhr.failure(); 
+				}
 			} catch (e) {
-				DEBUG('exception', e);
+				throw e;
 			}
 		});
 	}
@@ -62,7 +64,16 @@ function getXhrObject(s) {
 
 	xhr.ready = function() {
 	};
+
+	xhr.upload_progress = function() {
+	};
 	// }}}
+
+	xhr.upload.onprogress = function() {
+		if (aborted) return;
+		checkTimeout();
+		return xhr.upload_progress.apply(xhr, arguments);
+	}
 
 	xhr.onprogress = function() {
 		if (aborted) return;
@@ -76,6 +87,7 @@ function getXhrObject(s) {
 		checkTimeout();
 		if (this.readyState == this.DONE) {
 			clearTimeout(ts);
+			xhr.__finished = true;
 			return xhr.ready.apply(xhr, arguments);
 		}
 	};
@@ -149,7 +161,7 @@ function ClassChunk(task) {
 
 			// Update global progress (per download) and aditionally
 			// update the UI
-			if (Progress.dl_lastprogress+250 > NOW() && !force) {
+			if (Progress.dl_lastprogress+500 > NOW() && !force) {
 				// too soon
 				return false;
 			}

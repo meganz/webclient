@@ -797,16 +797,13 @@ function mLogout()
 			{
 				if (e)
 				{
-					if (downloading) 
-					{
+					if (downloading) {
 						dl_cancel();
-						dl_queue= new DownloadQueue;
 					}
-					if (ul_uploading)
-					{
+					if (ul_uploading) {
 						ul_cancel();
-						ul_queue=[];
 					}
+					resetUploadDownload();
 					$.dologout();
 				}
 			});

@@ -64,7 +64,6 @@ function MegaData ()
 		this.sortfn = false;
 		this.sortd = false;
 		this.rendered = false;
-		this.currentdirid = false;
 		this.RootID=undefined;
 		this.RubbishID=undefined;
 		this.InboxID=undefined;
@@ -712,7 +711,7 @@ function MegaData ()
 		for (var i in a)
 		{
 			if (a[i] == this.RootID)
-			{				
+			{
 				if (folderlink && M.d[this.RootID])
 				{
 					name = htmlentities(M.d[this.RootID].name);

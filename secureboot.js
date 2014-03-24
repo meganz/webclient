@@ -395,6 +395,13 @@ else
 			'copyrightnotice_js': {f:'html/js/copyrightnotice.js', n: 'copyrightnotice_js', j:1},
 			'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
 			'terms': {f:'html/terms.html', n: 'terms', j:0},
+			'backup': {f:'html/backup.html', n: 'backup', j:0},
+			'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
+			'reset': {f:'html/reset.html', n: 'reset', j:0},
+			'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
+			'filesaver': {f:'js/filesaver.js', n: 'filesaver', j:1},
+			'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
+			'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
 			'credits': {f:'html/credits.html', n: 'credits', j:0},
 			'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
 			'dev': {f:'html/dev.html', n: 'dev', j:0},
@@ -423,6 +430,9 @@ else
 			'about': ['about'],
 			'terms': ['terms'],
 			'credits': ['credits'],
+			'backup': ['backup','backup_js','filesaver'],			
+			'recovery': ['recovery','recovery_js'],
+			'reset': ['reset','reset_js'],
 			'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
 			'register': ['register','register_js'],
 			'android': ['android'],
@@ -443,7 +453,8 @@ else
 			'help': ['help','help_js'],
 			'chrome': ['chrome'],
 			'plugin': ['chrome','firefox'],
-			'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js']
+			'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
+			'recover': ['reset','reset_js']
 		};
 
 

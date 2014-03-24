@@ -385,8 +385,8 @@ function init_page()
 	}
 	else if (page.substr(0,4) == 'help')
 	{		
-			parsepage(pages['help']);
-			init_help();
+		parsepage(pages['help']);
+		init_help();
 	}
 	else if (page == 'privacy')
 	{
@@ -406,6 +406,27 @@ function init_page()
 		parsepage(pages['dev']);
 		dev_init('doc');
 	}
+	else if (page == 'backup' && !u_type)
+	{
+		login_next = page;
+		login_txt = l[1298];
+		document.location.hash = 'login';
+	}
+	else if (page == 'backup')
+	{
+		parsepage(pages['backup']);		
+		init_backup();
+	}
+	else if (page == 'recovery')
+	{
+		parsepage(pages['recovery']);		
+		init_recovery();
+	}
+	else if (page.substr(0,7) == 'recover' && page.length > 25)
+	{
+		parsepage(pages['reset']);		
+		init_reset();
+	}	
 	else if (page == 'sdkterms')
 	{
 		parsepage(pages['sdkterms']);		

@@ -1,17 +1,3 @@
-if (d) {
-	var _allxhr = [];
-	function abortAll() {
-		$.each(_allxhr, function(k, xhr) {
-			try { 
-				if (!xhr.__finished) {
-					xhr.abort(); xhr.failure(); 
-				}
-			} catch (e) {
-				throw e;
-			}
-		});
-	}
-}
 
 // getXhrObject {{{
 function getXhrObject(s) {
@@ -19,9 +5,6 @@ function getXhrObject(s) {
 		, timeout = s || 40000
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
-	}
-	if (d && typeof _allxhr == 'object') {
-		_allxhr.push(xhr);
 	}
 
 	// timeout {{{

@@ -490,6 +490,8 @@ function ul_chunk_upload(chunk, file, Job) {
 			if (!response.length || response == 'OK' || response.length == 27) {
 				file.sent += chunk.bytes.buffer.length || chunk.bytes.length;
 				delete file.progress[chunk.start];
+				delete chunk.bytes;
+				delete chunk;
 				DEBUG("done", chunk.__tid);
 				ul_updateprogress();
 

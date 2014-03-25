@@ -265,6 +265,8 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
+				DEBUG('check is download is empty', chunkFinished, dl.writer.isEmpty(), dl.decrypt.isEmpty())
+				DEBUG('is cancelled?', dl.cancelled)
 				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
 					if (dl.cancelled) return;
 					if (!emptyFile && !checkLostChunks(dl)) {

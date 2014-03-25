@@ -198,6 +198,7 @@ function FileSystemAPI(dl_id, dl) {
 			}
 
 			dl_writing = false;
+			dl_ack_write = null;  /* destroy function so it does release memory */
 			done(); /* notify writer */
 		};
 

@@ -21,7 +21,7 @@ var DEFAULT_CONCURRENCY = 4
 	}
 	inherits(queue, MegaEvents)
 
-	function Context(queue, args) {
+	function zContext(queue, args) {
 		this.task = args;
 		this.reschedule = function() {
 			var callback = queue._callback[args.__tid];
@@ -100,7 +100,7 @@ var DEFAULT_CONCURRENCY = 4
 			}
 
 			this.trigger('working', args)
-			context = new Context(this, args)
+			context = new zContext(this, args)
 
 			this._running.push(context)
 			this._worker.apply(context, [args])

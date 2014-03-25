@@ -10,7 +10,8 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_chunks = []
 		, dl_chunksizes = []
 		, dl_writing
-		, dl_ack_write = function() {}
+		, dl_position = 0
+		, dl_buffer
 		, chrome_write_error_msg = 20
 		, targetpos = 0
 		, dl_geturl
@@ -20,6 +21,7 @@ function FileSystemAPI(dl_id, dl) {
 		, zfileEntry
 		, failed = false
 		, dl_storagetype = 0
+		, dl_done = function() {}
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -180,27 +182,33 @@ function FileSystemAPI(dl_id, dl) {
 		};
 	}
 
+	function dl_ack_write() {
+		if (failed) {
+			failed = false; /* reset error flag */
+			dl_fw.seek(dl_position);
+			return setTimeout(function() {
+				dl_fw.write(new Blob([buffer]));
+			}, 2000);
+		}
+		dl_writing = false;
+		dl_done(); /* notify writer */
+
+		/* release references to callback and buffer */
+		dl_buffer = null;
+		dl_done   = null;
+	}
+
 	IO.write = function(buffer, position, done) {
 		if (position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
-		dl_writing = true;
-		failed     = false;
-		targetpos  = buffer.length + dl_fw.position;
+		dl_writing  = true;
+		failed      = false;
+		targetpos   = buffer.length + dl_fw.position;
+		dl_position = position
+		dl_buffer   = buffer
+		dl_done     = done
 
-		dl_ack_write = function() {
-			if (failed) {
-				failed = false; /* reset error flag */
-				dl_fw.seek(position);
-				return setTimeout(function() {
-					dl_fw.write(new Blob([buffer]));
-				}, 2000);
-			}
-
-			dl_writing = false;
-			dl_ack_write = null;  /* destroy function so it does release memory */
-			done(); /* notify writer */
-		};
 
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
 		dl_fw.write(new Blob([buffer]));

@@ -653,7 +653,8 @@ function CreateWorkers(url, message, size) {
 }
 
 // getXhrObject {{{
-var __xhrs = [];
+var __xhrs = []
+	, xhrCallback = ['progress', 'changestate', 'failure', 'ready', 'upload_progres']
 function checkTimeout(xhr) {
 	if (!xhr.__busy) return;
 	clearTimeout(xhr.ts);
@@ -679,10 +680,17 @@ function getXhrObject(s) {
 		xhr.Open = xhr.open
 		xhr.Abort = xhr.abort
 
+		xhr.cleanUp = function() {
+			xhr.__busy = false;
+			for (var i = 0; i < xhrCallback.length; i++) {
+				xhr[xhrCallback[i]] = null;
+			}
+		};
+
 		xhr.abort = function() {
 			clearTimeout(xhr.ts);
 			xhr.Abort.apply(xhr, arguments);
-			xhr.__busy = false;
+			xhr.cleanUp();
 		};
 
 		xhr.open = function() {
@@ -709,8 +717,9 @@ function getXhrObject(s) {
 			checkTimeout(xhr);
 			if (this.readyState == this.DONE) {
 				clearTimeout(xhr.ts);
-				xhr.__busy = false;
-				return xhr.ready.apply(xhr, arguments);
+				var data = xhr.ready.apply(xhr, arguments);
+				xhr.cleanUp();
+				return data;
 			}
 		};
 
@@ -725,19 +734,9 @@ function getXhrObject(s) {
 
 
 	// default callbacks {{{
-	xhr.progress = function() {
-	};
-
-	xhr.changestate = function() {
-	};
-
-	xhr.failure = function() {
-	};
-
-	xhr.ready = function() {
-	};
-
-	xhr.upload_progress = function() {
+	for (var i = 0; i < xhrCallback.length; i++) {
+		xhr[xhrCallback[i]] = function() {
+		};
 	};
 	// }}}
 

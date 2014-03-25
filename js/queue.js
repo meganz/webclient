@@ -53,6 +53,12 @@ var DEFAULT_CONCURRENCY = 4
 		}
 	}
 
+	queue.prototype.destroy = function() {
+		this._callback		= null;
+		this._queue			= null;
+		this._worker		= null;
+	};
+
 	queue.prototype.isEmpty = function() {
 		return this._running.length == 0 
 			&& this._queue.length == 0;

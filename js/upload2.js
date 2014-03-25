@@ -609,17 +609,34 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 }, 4);
 
 function resetUploadDownload() {
-	var ul_len = 0, dl_len = 0;
-	$.each(ul_queue, function(i, f) {
-		if (typeof f.id != 'undefined') ul_len++;
-	});
+	var has_ul = false
+		, has_dl = false
+		, usize = ul_queue.size
+		, dsize = dl_queue.size
 
-	$.each(dl_queue, function(i, f) {
-		if (typeof f.id != 'undefined') dl_len++;
-	});
-	if (ul_len == 0) ul_queue = new UploadQueue
-	if (dl_len == 0) dl_queue = new DownloadQueue
-	DEBUG("resetUploadDownload", ul_len, dl_len);
+	for (var i = 0; i < usize; i++) {
+		if (typeof ul_queue[i].id != 'undefined') {
+			has_ul = true
+			break;
+		}
+	}
+
+	for (var i = 0; i < dsize; i++) {
+		if (typeof dl_queue[i].id != 'undefined') {
+			has_dl = true
+			break;
+		}
+	}
+
+	if (!has_ul) {
+		ul_queue = null
+		ul_queue = new UploadQueue
+	}
+	if (has_dl) {
+		ul_queue = null
+		dl_queue = new DownloadQueue
+	}
+	DEBUG("resetUploadDownload", has_ul, has_ul);
 }
 
 

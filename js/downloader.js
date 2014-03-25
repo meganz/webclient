@@ -1,4 +1,3 @@
-
 // Chunk fetch {{{
 var GlobalProgress = {};
 function ClassChunk(task) {

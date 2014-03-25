@@ -639,15 +639,16 @@ function CreateWorkers(url, message, size) {
 		}
 		worker[i].busy = true;
 		instances[i]    = this;
-		$.each(task, function(e, t) {
+		for (var e = 0; e < task.length; e++) {
 			if (e == 0) {
-				worker[i].context = t;
-			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
-				worker[i].postMessage(t.buffer,[t.buffer]);
+				worker[i].context = task[e];
+			} else if (task[e].constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
+				worker[i].postMessage(task[e].buffer,[task[e].buffer]);
 			} else {
-				worker[i].postMessage(t);
+				worker[i].postMessage(task[e]);
 			}
-		});
+			task[e] = null; /* release memory */
+		}
 	}, size);
 }
 

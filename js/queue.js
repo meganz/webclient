@@ -30,11 +30,39 @@ MegaQueue.prototype.isPaused = function() {
 	return this._paused;
 }
 
+function _queue_checker(queue, tasks, next, error) {
+	return function(task, response) {
+		tasks.splice($.inArray(task, tasks), 1);
+		if (response.length && response[0] === false) {
+			/**
+			 *	The first argument of .done(false) is false, which 
+			 *	means that something went wrong
+			 */
+			return error(task, arguments);
+		}
+		if (tasks.length == 0) {
+			next();
+		}
+	};
+};
+
+MegaQueue.prototype.pushAll = function(tasks, next, error) {
+	var i = 0
+		, len = tasks.length
+		, callback = _queue_checker(this,tasks, next, error)
+
+	for (i=0; i < len; i++) {
+		this.push(tasks[i], callback);
+	}
+};
+
 MegaQueue.prototype.run_in_context = function(task) {
 	var self = this;
 	self._running++
 	this._worker(task[0], function() {
-        task[1].apply(null, arguments);
+        task[1].apply(null, [task[0], arguments]);
+		task[0] = null;
+		task[1] = null;
 		self._running--;
         self._process();
 		self = null;

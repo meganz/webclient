@@ -2,14 +2,8 @@ var dlMethod
 	, dl_maxSlots = 4
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
-	, dlQueue = new QueueClass(downloader)
-
-dlQueue.push = function(x) {
-	if (!x.task) {
-		throw new Error("invalid error");
-	}
-	QueueClass.prototype.push.apply(dlQueue, arguments);
-};
+	, dlQueue = new MegaQueue(downloader)
+	, preparing_download
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
@@ -214,12 +208,24 @@ dlQueue.on('drain', function() {
 // }}}
 
 // chunk scheduler {{{
+dlQueue.validateTask = function(pzTask) {
+	if (DownloadManager.enabled(pzTask)) {
+		if (pzTask instanceof ClassChunk) {
+			return true;
+		} else if (pzTask instanceof ClassFile && !fetchingFile) {
+			return true;
+		}
+	}
+	return false;
+};
+
+
 /**
  *	Override the downloader scheduler method.
  *	The idea is to select chunks from the same
  *	file_id, always
  */
-dlQueue.getNextTask = (function() {
+dlQueue.getNextTaskz = (function() {
 	/* private variable to keep in track
 	   the current file id */
 	var current = null
@@ -351,7 +357,7 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
-function failureFunction(reschedule, task, args) {
+function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
@@ -369,7 +375,7 @@ function failureFunction(reschedule, task, args) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
-				reschedule(); 
+				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
 		}		
@@ -383,7 +389,7 @@ function failureFunction(reschedule, task, args) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}
-			reschedule(); 
+			dlQueue.pushFirst(task);
 		});
 	}, task.dl.retry_time);
 }
@@ -429,11 +435,7 @@ DownloadQueue.prototype.push = function() {
 	 *	It makes us easier to check if the current file has something
 	 *	decryptying
 	 */
-	dl.decrypt = new MegaQueue(function(task, done) {
-		Decrypter.push([[dl, task.offset], dl.nonce, task.offset/16, task.data], function() {
-			done();
-		});
-	}, 4);
+	dl_decrypt(dl);
 	dl_writer(dl);
 
 	dl.macs  = {}

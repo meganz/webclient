@@ -12,7 +12,7 @@ function ClassChunk(task) {
 		self = null;
 	};
 
-	this.run = function(Scheduler) {
+	this.run = function(task_done) {
 		iRealDownloads++;
 
 		var xhr
@@ -42,7 +42,7 @@ function ClassChunk(task) {
 
 		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
 			done = true;
-			Scheduler.done();
+			task_done();
 		}
 
 		/**
@@ -55,7 +55,7 @@ function ClassChunk(task) {
 			var remain = Progress.data[url][1]-Progress.data[url][0]
 			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
-				Scheduler.done();
+				task_done();
 			}
 		}
 	
@@ -131,7 +131,7 @@ function ClassChunk(task) {
 
 				xhr = null;
 
-				return Scheduler.done(false, this.status);
+				return task_done(false, this.status);
 			};
 		
 			// on ready {{{
@@ -162,7 +162,7 @@ function ClassChunk(task) {
 				self.destroy();
 				xhr = null;
 
-				if (!done) Scheduler.done();
+				if (!done) task_done();
 			}
 			// }}}
 
@@ -201,7 +201,7 @@ function ClassChunk(task) {
 				_cancelled = true;
 				DEBUG("Chunk aborting itself because download was cancelled ", localId);
 				xhr.abort();
-				if (!done) Scheduler.done();
+				if (!done) task_done();
 				iRealDownloads--;
 				return true;
 			}
@@ -219,21 +219,8 @@ function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
 
-	this.run = function(Scheduler)  {
+	this.run = function(task_done)  {
 		var self = this
-
-		/**
-		 *	Make sure that only one task of this kind
-		 *	runs in parallel (because their chunks are important)
-		 */
-		if (fetchingFile) {
-			Scheduler.done();
-			Scheduler = null;
-			setTimeout(function() {
-				dlQueue.push(self);
-			}, 100);
-			return;
-		}
 
 		fetchingFile = 1;
 
@@ -270,9 +257,9 @@ function ClassFile(dl) {
 				emptyFile = true;
 				tasks.push({ 
 					task: {  zipid: dl.zipid, id: dl.id },
-					run: function(Scheduler) {
+					run: function(done) {
 						dl.io.write("", 0, function() {
-							Scheduler.done();	
+							task_done();	
 						});
 					}
 				});
@@ -280,7 +267,6 @@ function ClassFile(dl) {
 
 			function free() {
 				/* release memory */
-				Scheduler = null;
 				dl.decrypt.destroy();
 				dl.writer.destroy();
 				XDESTROY(dl.io);
@@ -337,7 +323,7 @@ function ClassFile(dl) {
 	
 			// notify the UI
 			fetchingFile = 0;
-			Scheduler.done();
+			task_done();
 		}
 	
 		dlGetUrl(dl, function(error, res, o) {
@@ -345,8 +331,7 @@ function ClassFile(dl) {
 				/* failed */
 				DownloadManager.pause(self); 
 				fetchingFile = 0;
-				Scheduler.done(); /* release worker */
-				Scheduler = null
+				task_done(); /* release worker */
 				setTimeout(function() {
 					/* retry !*/
 					dlQueue.pushFirst(self);
@@ -361,6 +346,13 @@ function ClassFile(dl) {
 
 }
 // }}}
+function dl_decrypt(dl) {
+	dl.decrypt = new MegaQueue(function(task, done) {
+		Decrypter.push([[dl, task.offset], dl.nonce, task.offset/16, task.data], function() {
+			done();
+		});
+	}, 4);
+}
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };
@@ -432,12 +424,12 @@ var iRealDownloads = 0
 	, dlDoneThreshold = 3
 
 
-function downloader(task, Scheduler) {
+function downloader(task, done) {
 	if (DownloadManager.isRemoved(task)) {
 		DEBUG("removing old task");
-		return Scheduler.done();
+		return done();
 	}
-	return task.run(Scheduler);
+	return task.run(done);
 }
 
 function getxr()

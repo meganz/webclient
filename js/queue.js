@@ -73,6 +73,12 @@ MegaQueue.prototype.process = function() {
 	return true;
 };
 
+MegaQueue.prototype.destroy = function() {
+	clearTimeout(this._later);
+	this._limit = -1
+	this._queue = null;
+}
+
 MegaQueue.prototype._process = function() {
 	clearTimeout(this._later);
 	this._later = setTimeout(function(q) {

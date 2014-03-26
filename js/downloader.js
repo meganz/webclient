@@ -280,7 +280,6 @@ function ClassFile(dl) {
 
 			function free() {
 				/* release memory */
-				return;
 				Scheduler = null;
 				dl.decrypt.destroy();
 				dl.writer.destroy();

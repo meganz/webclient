@@ -54,6 +54,7 @@ var DEFAULT_CONCURRENCY = 4
 			this.task = null;
 			this.reschedule = null;
 			queue  = null;
+			args   = null;
 			job    = null;
 		}
 	}
@@ -121,9 +122,9 @@ var DEFAULT_CONCURRENCY = 4
 
 			this.trigger('working', args)
 			context = new zContext(this, args)
-
 			this._running.push(context)
 			this._worker.apply(context, [args])
+			context = null
 		}
 
 		if (this._queue.length == 0 && this._running.length == 0) {

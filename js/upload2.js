@@ -554,6 +554,7 @@ function ul_filereader(fs, file) {
 			return this.reschedule();
 		}
 		var end = task.start+task.end
+			, blob
 		if (file.slice || file.mozSlice) {
 			if (file.mozSlice) blob = file.mozSlice(task.start, end);
 			else blob = file.slice(task.start, end);
@@ -627,6 +628,7 @@ function resetUploadDownload() {
 			break;
 		}
 	}
+	return;
 
 	if (!has_ul) {
 		ul_queue = null

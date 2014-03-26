@@ -706,22 +706,28 @@ function getXhrObject(s) {
 		xhr.upload.onprogress = function() {
 			if (!xhr.__busy) return;
 			checkTimeout(xhr);
+			if (!xhr.upload_progress) return;
 			return xhr.upload_progress.apply(xhr, arguments);
 		}
 
 		xhr.onprogress = function() {
 			if (!xhr.__busy) return;
 			checkTimeout(xhr);
+			if (!xhr.progress) return;
 			return xhr.progress.apply(xhr, arguments);
 		}
 
 		xhr.onreadystatechange = function() {
 			if (!xhr.__busy) return;
-			xhr.changestate.apply(xhr, arguments);
+			if (xhr.changestate) {
+				xhr.changestate.apply(xhr, arguments);
+			}
 			checkTimeout(xhr);
 			if (this.readyState == this.DONE) {
 				clearTimeout(xhr.ts);
-				var data = xhr.ready.apply(xhr, arguments);
+				if (xhr.ready) {
+					var data = xhr.ready.apply(xhr, arguments);
+				}
 				xhr.cleanUp();
 				return data;
 			}
@@ -731,6 +737,7 @@ function getXhrObject(s) {
 	}
 
 	xhr.__busy = true;
+	xhr.response   = null;
 	xhr.timeout_ts = timeout;
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
@@ -739,8 +746,7 @@ function getXhrObject(s) {
 
 	// default callbacks {{{
 	for (var i = 0; i < xhrCallback.length; i++) {
-		xhr[xhrCallback[i]] = function() {
-		};
+		xhr[xhrCallback[i]] = null;
 	};
 	// }}}
 

@@ -110,7 +110,7 @@ function ClassChunk(task) {
 			// }}}
 
 			xhr.failure = function(e, len) {
-				if (xhr.has_failed) return;
+				if (!xhr || xhr.has_failed) return;
 				xhr.has_failed = true;
 
 				// we must reschedule this download	
@@ -128,6 +128,8 @@ function ClassChunk(task) {
 						request();
 					}, backoff *= 1.2);
 				}
+
+				xhr = null;
 
 				return Scheduler.done(false, this.status);
 			};

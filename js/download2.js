@@ -84,6 +84,7 @@ var DownloadManager = new function() {
 				$(this).remove();
 			});
 		}
+		dl = null;
 	}
 
 	self.abortAll = function() {

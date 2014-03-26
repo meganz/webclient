@@ -148,8 +148,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					//download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
-					if (!done) Scheduler.done();
+					download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
 					if (failed) DownloadManager.release(self);
 					r = null;
 					failed = false;
@@ -362,13 +361,6 @@ function ClassFile(dl) {
 
 }
 // }}}
-
-function xxx() {
-	alert("here")
-	window.ArrayBuffer = function() {
-		throw new Error;
-	}
-}
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };

@@ -665,7 +665,7 @@ function checkTimeout(xhr) {
 	xhr.ts = setTimeout(function() {
 		DEBUG("xhr failed by timeout");
 		xhr.abort();
-		xhr.failure("timeout");
+		xhr.failure && xhr.failure("timeout");
 	}, xhr.timeout_ts *1.5);
 }
 

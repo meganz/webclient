@@ -150,10 +150,12 @@ function ClassChunk(task) {
 					}
 					download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
 					if (failed) DownloadManager.release(self);
+					r = null;
 					failed = false;
 				} else if (!download.cancelled) {
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
+					r = null;
 					return xhr.failure(null, r.byteLength);
 				}
 

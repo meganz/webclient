@@ -280,6 +280,7 @@ function ClassFile(dl) {
 
 			function free() {
 				/* release memory */
+				return;
 				Scheduler = null;
 				dl.decrypt.destroy();
 				dl.writer.destroy();
@@ -298,7 +299,7 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
-				DEBUG('check is download is empty', chunkFinished, dl.writer._queue.length, dl.decrypt._queue.length);
+				DEBUG('check is download is empty', chunkFinished, dl.writer.isEmpty(), dl.decrypt.isEmpty())
 				DEBUG('is cancelled?', dl.cancelled)
 				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
 					if (dl.cancelled) return free();
@@ -364,7 +365,7 @@ function ClassFile(dl) {
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };
-	dl.writer = new QueueClass(function (task, Scheduler) {
+	dl.writer = new MegaQueue(function (task, done) {
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
 			if (dl.data) {
@@ -374,11 +375,13 @@ function dl_writer(dl, is_ready) {
 					task.data.length
 				).set(task.data);
 			}
-			Scheduler.done();
+
+			done();
 
 			if (typeof task.callback == "function") {
 				task.callback();
 			}
+
 			dl.ready(); /* tell the download scheduler we're done */
 
 			task.data = null
@@ -388,19 +391,9 @@ function dl_writer(dl, is_ready) {
 
 	dl.writer.pos = 0
 
-	dl.writer.getNextTask = function() {
+	dl.writer.validateTask = function(t) {
 		if (!is_ready()) return null;
-		var task = null;
-		$.each(this._queue, function(p, pTask) {
-			if (pTask.offset == dl.writer.pos) {
-				task = p;
-				return false; /* break */
-			}
-		});
-		if (task !== null) {
-			task = this._queue.splice(task, 1)[0]
-		}
-		return task;
+		return t.offset == dl.writer.pos;
 	};
 };
 

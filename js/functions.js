@@ -651,7 +651,7 @@ function CreateWorkers(url, message, size) {
 			} else {
 				worker[i].postMessage(task[e]);
 			}
-			task[e] = null; /* release memory */
+			//task[e] = null; /* release memory */
 		}
 	}, size);
 }

@@ -620,6 +620,10 @@ function CreateWorkers(url, message, size) {
 			message(this.context, e, function(r) {
 				worker[id].busy = false; /* release worker */
 				instances[id].done(r);
+
+				/* cleanup memory */
+				worker[id].context = null;
+				instances[id] = null; /* release zContext */
 			});
 		}
 	}
@@ -638,7 +642,7 @@ function CreateWorkers(url, message, size) {
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
-		instances[i]    = this;
+		instances[i]   = this;
 		for (var e = 0; e < task.length; e++) {
 			if (e == 0) {
 				worker[i].context = task[e];

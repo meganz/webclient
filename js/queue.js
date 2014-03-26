@@ -17,7 +17,7 @@ var DEFAULT_CONCURRENCY = 4
 		this._worker		= worker;
 		this._running		= [];
 		this._paused		= false;
-		var self = this;
+		this._alive			= true;
 	}
 	inherits(queue, MegaEvents)
 
@@ -35,12 +35,11 @@ var DEFAULT_CONCURRENCY = 4
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
 				DEBUG("task already finished");
-				return setTimeout(function() {
-					queue.process();
-				});
+				return this._process();
 			}
 
-			queue._running.splice(id, 1);
+			var job = queue._running.splice(id, 1);
+
 			queue.trigger('done', args)
 			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
 			delete queue._callback[args.__tid];
@@ -48,13 +47,14 @@ var DEFAULT_CONCURRENCY = 4
 				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
 			}
 
-			setTimeout(function() {
-				queue.process();
-			});
+			queue._process();
 
 			/* cleanup memory */
 			this.done = null; 
 			this.task = null;
+			this.reschedule = null;
+			queue  = null;
+			job    = null;
 		}
 	}
 
@@ -62,6 +62,8 @@ var DEFAULT_CONCURRENCY = 4
 		this._callback		= null;
 		this._queue			= null;
 		this._worker		= null;
+		this._alive			= false;
+		clearTimeout(this.__later);
 	};
 
 	queue.prototype.isEmpty = function() {
@@ -85,7 +87,7 @@ var DEFAULT_CONCURRENCY = 4
 	queue.prototype.resume = function() {
 		this._paused = false;
 		this.trigger('resume')
-		this.process();
+		this._process();
 	};
 
 	queue.prototype.pause = function() {
@@ -97,16 +99,23 @@ var DEFAULT_CONCURRENCY = 4
 		return this._paused;
 	}
 
+	queue.prototype._process = function() {
+		clearTimeout(this.__later);
+		this.__later = setTimeout(function(self) {
+			if (self._alive) self.process();
+		}, 0,  this);
+	}
+
+
 	queue.prototype.process = function() {
 		var args, context;
+		if (!this._alive) return;
+
 		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
 				/* nothing on the queue? */
-				var that = this;
-				Later(function() {
-					that.process(); /* re-run scheduler */
-				});
+				this._process();
 				return false;
 			}
 
@@ -176,10 +185,7 @@ var DEFAULT_CONCURRENCY = 4
 		task.__tid = id++;
 		this._queue.unshift(task);
 		this._callback[task.__tid] = done || function() {};
-		var self = this;
-		setTimeout(function() {
-			self.process();
-		}, 0);
+		this._process();
 	}
 
 	/**
@@ -190,10 +196,7 @@ var DEFAULT_CONCURRENCY = 4
 		task.__tid = id++;
 		this._queue.push(task);
 		this._callback[task.__tid] = done || function() {};
-		var self = this;
-		setTimeout(function() {
-			self.process();
-		}, 0);
+		this._process();
 	}
 
 	QueueClass = queue;

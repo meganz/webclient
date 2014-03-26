@@ -6,6 +6,12 @@ function ClassChunk(task) {
 
 	var self = this;
 
+	this.destroy = function() {
+		this.dl   = null;
+		this.task = null;
+		self = null;
+	};
+
 	this.run = function(Scheduler) {
 		iRealDownloads++;
 
@@ -122,6 +128,7 @@ function ClassChunk(task) {
 						request();
 					}, backoff *= 1.2);
 				}
+
 				return Scheduler.done(false, this.status);
 			};
 		
@@ -147,6 +154,8 @@ function ClassChunk(task) {
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
 					return xhr.failure(null, r.byteLength);
 				}
+
+				self.destroy();
 
 				if (!done) Scheduler.done();
 			}
@@ -202,18 +211,18 @@ function ClassChunk(task) {
 // File fetch {{{
 var fetchingFile = null
 function ClassFile(dl) {
-	var self = this
 	this.task = dl;
 	this.dl   = dl;
 
 	this.run = function(Scheduler)  {
+		var self = this
+
 		/**
 		 *	Make sure that only one task of this kind
 		 *	runs in parallel (because their chunks are important)
 		 */
 		if (fetchingFile) {
 			Scheduler.done();
-			var task = this;
 			setTimeout(function() {
 				dlQueue.push(self);
 			}, 100);
@@ -263,17 +272,34 @@ function ClassFile(dl) {
 				});
 			}
 
+			function free() {
+				/* release memory */
+				dl.decrypt.destroy();
+				dl.writer.destroy();
+				XDESTROY(dl.io);
+				XDESTROY(dl);
+				dl.io		= null;
+				dl.decrypt	= null;
+				dl.writer	= null;
+				dl.ready	= null;
+				dl			= null;
+				self.run    = null;
+				self.dl		= null;
+				self.task	= null;
+				self		= null;
+			}
+
 			var chunkFinished = false
 			dl.ready = function() {
 				DEBUG('check is download is empty', chunkFinished, dl.writer._queue.length, dl.decrypt._queue.length);
 				DEBUG('is cancelled?', dl.cancelled)
 				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
-					if (dl.cancelled) return;
+					if (dl.cancelled) return free();
 					if (!emptyFile && !checkLostChunks(dl)) {
 						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
 					if (dl.zipid) {
-						return Zips[dl.zipid].done();
+						return  Zips[dl.zipid].done();
 					}
 
 					dl.onDownloadProgress(
@@ -291,12 +317,16 @@ function ClassFile(dl) {
 					}
 					dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 					if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
+
+					free();
 				}
 			};
 	
 			dlQueue.pushAll(tasks, function() {
 				chunkFinished = true
 			}, failureFunction);
+
+			tasks = null;
 	
 			// notify the UI
 			fetchingFile = 0;
@@ -338,10 +368,14 @@ function dl_writer(dl, is_ready) {
 				).set(task.data);
 			}
 			Scheduler.done();
+
 			if (typeof task.callback == "function") {
 				task.callback();
 			}
 			dl.ready(); /* tell the download scheduler we're done */
+
+			task.data = null
+			task.null = null
 		});
 	}, 1);
 
@@ -381,6 +415,7 @@ var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
 		if (!dl.cancelled) {
 			dl.writer.push({ data: plain, offset: offset});
 		}
+		plain = null
 		done();
 	}
 }, 4);

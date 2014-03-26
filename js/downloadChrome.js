@@ -3,7 +3,6 @@
 
 function FileSystemAPI(dl_id, dl) {
 	var dl_quotabytes = 0
-		, IO = this
 		, Fs
 		, dl_fw
 		, dirid = "mega"
@@ -45,7 +44,7 @@ function FileSystemAPI(dl_id, dl) {
 			case FileError.INVALID_STATE_ERR:
 				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
 				setTimeout(function() {
-					FileSystemAPI.check();
+					check();
 				}, 500);
 				break;
 			default:
@@ -56,6 +55,7 @@ function FileSystemAPI(dl_id, dl) {
 	// }}}
 
 	// dl_createtmpfile  {{{
+	var that = this;
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
@@ -110,7 +110,8 @@ function FileSystemAPI(dl_id, dl) {
 					zfileEntry = fileEntry;
 					setTimeout(function() {
 						// deferred execution
-						IO.begin();
+						that.begin();
+						that = null;
 					}, 1);
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
@@ -177,7 +178,7 @@ function FileSystemAPI(dl_id, dl) {
 	}
 
 	if(is_chrome_firefox) {
-		IO.abort = function(err) {
+		this.abort = function(err) {
 			dl_fw.close(err);
 		};
 	}
@@ -198,7 +199,7 @@ function FileSystemAPI(dl_id, dl) {
 		dl_done   = null;
 	}
 
-	IO.write = function(buffer, position, done) {
+	this.write = function(buffer, position, done) {
 		if (position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
@@ -214,7 +215,7 @@ function FileSystemAPI(dl_id, dl) {
 		dl_fw.write(new Blob([buffer]));
 	};
 
-	IO.download = function(name, path) {
+	this.download = function(name, path) {
 		document.getElementById('dllink').download = name;
 		document.getElementById('dllink').href = zfileEntry.toURL();
 		if (!is_chrome_firefox)  {
@@ -222,21 +223,20 @@ function FileSystemAPI(dl_id, dl) {
 		}
 	}
 
-	IO.setCredentials = function(url, size, filename, chunks, sizes) {
+	this.setCredentials = function(url, size, filename, chunks, sizes) {
 		dl_geturl = url;
 		dl_filesize = size;
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		if (IO.is_zip || !dl.zipid) {
+		if (this.is_zip || !dl.zipid) {
 			check();
 		} else {
 			// tell the writter everything was fine
 			// only on zip, where the IO objects are not
 			// doing any write
-			IO.begin(); 
+			this.begin(); 
 		}
 	};
 }
-
 window.requestFileSystem = window.webkitRequestFileSystem;

@@ -747,3 +747,10 @@ function getXhrObject(s) {
 	return xhr;
 }
 // }}}
+
+function XDESTROY(obj) {
+	for (var i in obj) {
+		obj[i] = null;
+	}
+	obj = null;
+}

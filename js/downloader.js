@@ -225,6 +225,7 @@ function ClassFile(dl) {
 		 */
 		if (fetchingFile) {
 			Scheduler.done();
+			Scheduler = null;
 			setTimeout(function() {
 				dlQueue.push(self);
 			}, 100);
@@ -276,6 +277,7 @@ function ClassFile(dl) {
 
 			function free() {
 				/* release memory */
+				Scheduler = null;
 				dl.decrypt.destroy();
 				dl.writer.destroy();
 				XDESTROY(dl.io);
@@ -341,6 +343,7 @@ function ClassFile(dl) {
 				DownloadManager.pause(self); 
 				fetchingFile = 0;
 				Scheduler.done(); /* release worker */
+				Scheduler = null
 				setTimeout(function() {
 					/* retry !*/
 					dlQueue.pushFirst(self);
@@ -358,8 +361,7 @@ function ClassFile(dl) {
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };
-	dl.writer = new QueueClass(function (task) {
-		var Scheduler = this;
+	dl.writer = new QueueClass(function (task, Scheduler) {
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
 			if (dl.data) {
@@ -435,8 +437,7 @@ var iRealDownloads = 0
 	, dlDoneThreshold = 3
 
 
-function downloader(task) {
-	var Scheduler = this;
+function downloader(task, Scheduler) {
 	if (DownloadManager.isRemoved(task)) {
 		DEBUG("removing old task");
 		return Scheduler.done();

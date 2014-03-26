@@ -637,12 +637,12 @@ function CreateWorkers(url, message, size) {
 		worker.push(w);
 	}
 
-	return new QueueClass(function(task) {
+	return new QueueClass(function(task, scheduler) {
 		for (var i = 0; i < size; i++) {
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
-		instances[i]   = this;
+		instances[i]   = scheduler
 		for (var e = 0; e < task.length; e++) {
 			if (e == 0) {
 				worker[i].context = task[e];
@@ -668,6 +668,64 @@ function checkTimeout(xhr) {
 		xhr.failure("timeout");
 	}, xhr.timeout_ts *1.5);
 }
+
+function createNewXhr() {
+	var xhr = new XMLHttpRequest
+	xhr.Open = xhr.open
+	xhr.Abort = xhr.abort
+
+	xhr.cleanUp = function() {
+		this.__busy = false;
+		for (var i = 0; i < xhrCallback.length; i++) {
+			this[xhrCallback[i]] = null;
+		}
+	};
+
+	xhr.abort = function() {
+		clearTimeout(this.ts);
+		this.Abort.apply(this, arguments);
+		this.cleanUp();
+	};
+
+	xhr.open = function() {
+		this.Open.apply(this, arguments);
+		checkTimeout(this);
+	};
+
+
+	xhr.upload.onprogress = function() {
+		if (!this.__busy) return;
+		checkTimeout(this);
+		if (!this.upload_progress) return;
+		return this.upload_progress.apply(this, arguments);
+	}
+
+	xhr.onprogress = function() {
+		if (!this.__busy) return;
+		checkTimeout(this);
+		if (!this.progress) return;
+		return this.progress.apply(this, arguments);
+	}
+
+	xhr.onreadystatechange = function() {
+		if (!this.__busy) return;
+		if (this.changestate) {
+			this.changestate.apply(this, arguments);
+		}
+		checkTimeout(this);
+		if (this.readyState == this.DONE) {
+			clearTimeout(this.ts);
+			if (this.ready) {
+				var data = this.ready.apply(this, arguments);
+			}
+			this.cleanUp();
+			return data;
+		}
+	};
+
+	return xhr;
+}
+	
 	
 function getXhrObject(s) {
 	var xhr, timeout = s || 40000
@@ -680,65 +738,13 @@ function getXhrObject(s) {
 	});
 
 	if (!xhr) {
-		xhr = new XMLHttpRequest
-		xhr.Open = xhr.open
-		xhr.Abort = xhr.abort
-
-		xhr.cleanUp = function() {
-			xhr.__busy = false;
-			for (var i = 0; i < xhrCallback.length; i++) {
-				xhr[xhrCallback[i]] = null;
-			}
-		};
-
-		xhr.abort = function() {
-			clearTimeout(xhr.ts);
-			xhr.Abort.apply(xhr, arguments);
-			xhr.cleanUp();
-		};
-
-		xhr.open = function() {
-			xhr.Open.apply(xhr, arguments);
-			checkTimeout(xhr);
-		};
-
-
-		xhr.upload.onprogress = function() {
-			if (!xhr.__busy) return;
-			checkTimeout(xhr);
-			if (!xhr.upload_progress) return;
-			return xhr.upload_progress.apply(xhr, arguments);
-		}
-
-		xhr.onprogress = function() {
-			if (!xhr.__busy) return;
-			checkTimeout(xhr);
-			if (!xhr.progress) return;
-			return xhr.progress.apply(xhr, arguments);
-		}
-
-		xhr.onreadystatechange = function() {
-			if (!xhr.__busy) return;
-			if (xhr.changestate) {
-				xhr.changestate.apply(xhr, arguments);
-			}
-			checkTimeout(xhr);
-			if (this.readyState == this.DONE) {
-				clearTimeout(xhr.ts);
-				if (xhr.ready) {
-					var data = xhr.ready.apply(xhr, arguments);
-				}
-				xhr.cleanUp();
-				return data;
-			}
-		};
-
+		xhr = createNewXhr();
 		__xhrs.push(xhr);
 	}
 
-	xhr.__busy = true;
-	xhr.response   = null;
-	xhr.timeout_ts = timeout;
+	xhr.__busy		= true;
+	xhr.response	= null;
+	xhr.timeout_ts	= timeout;
 	if (xhr.overrideMimeType) {
 		xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}

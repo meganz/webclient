@@ -429,8 +429,7 @@ DownloadQueue.prototype.push = function() {
 	 *	It makes us easier to check if the current file has something
 	 *	decryptying
 	 */
-	dl.decrypt = new QueueClass(function(task) {
-		var that = this;
+	dl.decrypt = new QueueClass(function(task, that) {
 		Decrypter.push([[dl, task.offset], dl.nonce, task.offset/16, task.data], function() {
 			that.done();
 		});

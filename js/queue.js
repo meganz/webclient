@@ -123,7 +123,7 @@ var DEFAULT_CONCURRENCY = 4
 			this.trigger('working', args)
 			context = new zContext(this, args)
 			this._running.push(context)
-			this._worker.apply(context, [args])
+			this._worker.apply(null, [args, context]);
 			context = null
 		}
 

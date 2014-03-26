@@ -1141,7 +1141,7 @@ function api_getsid2(res,ctx)
 				}
 				else if (typeof res.csid == 'string')
 				{
-					var t = mpi2b(base64urldecode(res.csid));
+					var t = base64urldecode(res.csid);
 
 					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res.privk)));
 
@@ -1285,13 +1285,7 @@ function encryptto(user,data)
 
 	if (pubkey = u_pubkeys[user])
 	{
-		// random padding
-		for (i = (pubkey[2]>>3)-1-data.length; i-- > 0; ) data = data+String.fromCharCode(rand(256));
-
-		i = data.length*8;
-		data = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + data;
-
-		return b2mpi(RSAencrypt(mpi2b(data),pubkey[1],pubkey[0]));
+		return crypto_rsaencrypt(data,pubkey);
 	}
 
 	return false;
@@ -1363,7 +1357,7 @@ function api_setshare1(ctx)
 	ctx.ssharekey = ssharekey;
 
 	// encrypt ssharekey to known users
-	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[req.s[i].u],ssharekey));
+	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
 	
 	ctx.req = req;
 
@@ -1386,7 +1380,7 @@ function api_setshare1(ctx)
 				
 				var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
 
-				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[ctx.req.s[i].u],ssharekey));
+				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[ctx.req.s[i].u]));
 
 				return api_req(ctx.req,ctx);
 			}
@@ -1456,23 +1450,27 @@ function crypto_decodepubkey(pubk)
 	return false;
 }
 
-function crypto_rsaencrypt(pubkey,data)
+// encrypts cleartext string to the supplied pubkey
+// returns string representing an MPI-formatted big number
+function crypto_rsaencrypt(cleartext,pubkey)
 {
 	var i;
 	
 	// random padding
-	for (i = (pubkey[2]>>3)-1-data.length; i-- > 0; ) data = data+String.fromCharCode(rand(256));
+	for (i = (pubkey[2]>>3)-1-cleartext.length; i-- > 0; ) cleartext = cleartext+String.fromCharCode(rand(256));
 
-	i = data.length*8;
-	data = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + data;
+	i = cleartext.length*8;
+	cleartext = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + cleartext;
 
-	return b2mpi(RSAencrypt(mpi2b(data),pubkey[1],pubkey[0]));
+	return b2mpi(RSAencrypt(mpi2b(cleartext),pubkey[1],pubkey[0]));
 }
 
-function crypto_rsadecrypt(ciphertext,privk)
+// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
+// returns cleartext string
+function crypto_rsadecrypt(ciphertext,privkey)
 {
-	var l = ((privk[2].length*28-1)>>5<<2)-2;
-	var c = b2s(RSAdecrypt(ciphertext,privk[2],privk[0],privk[1],privk[3]));
+	var l = ((privkey[2].length*28-1)>>5<<2)-2;
+	var c = b2s(RSAdecrypt(mpi2b(ciphertext),privkey[2],privkey[0],privkey[1],privkey[3]));
 
 	if (c.length < l) c = new Array(l-c.length+1).join(String.fromCharCode(0))+c;
 	
@@ -1938,7 +1936,7 @@ function crypto_procsr(sr)
 						if (pubkey = u_pubkeys[ctx.sr[i]])
 						{
 							// pubkey found: encrypt share key to it
-							if (n = crypto_rsaencrypt(pubkey,a32_to_str(u_sharekeys[sh]))) rsr.push(sh,ctx.sr[i],base64urlencode(n));
+							if (n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey)) rsr.push(sh,ctx.sr[i],base64urlencode(n));
 						}
 					}
 				}
@@ -2028,7 +2026,7 @@ function crypto_processkey(me,master_aes,file)
 			// long keys: RSA
 			if (u_privk)
 			{
-				var t = mpi2b(base64urldecode(key));
+				var t = base64urldecode(key);
 				
 				if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
 				else
@@ -2221,7 +2219,7 @@ function crypto_process_sharekey(handle,key)
 {
 	if (key.length > 22)
 	{
-		key = mpi2b(base64urldecode(key));
+		key = base64urldecode(key);
 		var k = str_to_a32(crypto_rsadecrypt(key,u_privk).substr(0,16));
 		rsasharekeys[handle] = true;
 		return k;

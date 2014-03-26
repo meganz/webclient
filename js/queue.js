@@ -47,9 +47,14 @@ var DEFAULT_CONCURRENCY = 4
 			if (args.__ondone) {
 				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
 			}
+
 			setTimeout(function() {
 				queue.process();
 			});
+
+			/* cleanup memory */
+			this.done = null; 
+			this.task = null;
 		}
 	}
 

@@ -632,7 +632,7 @@ function resetUploadDownload() {
 		ul_queue = null
 		ul_queue = new UploadQueue
 	}
-	if (has_dl) {
+	if (!has_dl) {
 		ul_queue = null
 		dl_queue = new DownloadQueue
 	}

@@ -5943,6 +5943,11 @@ div .fm-tree-folder.dragover {
 .active .fm-chat-attach-arrow, .active .fm-chat-emotion-arrow {
 	display: block;
 }
+
+.fm-chat-attach-popup .fm-move-dialog-body {
+    height: 100%;
+}
+
 .fm-chat-emotion-arrow {
 	position: absolute;
 	z-index: 901;

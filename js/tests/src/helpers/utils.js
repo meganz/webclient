@@ -41,10 +41,14 @@ var ConsoleMochaHelper = function() {
         'beforeEach': beforeEach,
         'afterEach': afterEach
     };
+    var logMethod = "group";
+    if(window.location.toString().indexOf("logcollapsed=1") != -1) {
+        logMethod = 'groupCollapsed';
+    }
 
     it = function(title, fn) {
         _it(title, function(done) {
-            console.groupCollapsed(this.test.parent.title, title);
+            console[logMethod](this.test.parent.title, title);
 
             fn.call(this, function() {
                 console.groupEnd();
@@ -63,7 +67,7 @@ var ConsoleMochaHelper = function() {
     $.each(['beforeEach', 'afterEach'], function(k, v) {
         window[v] = function(fn, done) {
             _refs[v](function(done) {
-                console.groupCollapsed(this.currentTest.parent.title, this.currentTest.title, "[" + v + "]");
+                console[logMethod](this.currentTest.parent.title, this.currentTest.title, "[" + v + "]");
 
                 fn.call(this, function() {
                     console.groupEnd();

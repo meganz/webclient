@@ -2,15 +2,13 @@ describe("Chat.js - Karere UI integration", function() {
 
     var fixtureManager = new Fixtures("./src/unit/fixtures/chat/");
 
-    window.u_handle = "testcase1";
-    window.avatars = {};
-
     var $container = null;
 
     var karereMocker = null;
     var stropheMocker = null;
 
     var functionsMocker;
+    var megaDataMocker;
     beforeEach(function(done) {
         localStorage.clear();
 
@@ -27,17 +25,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         localStorage.removeItem("megaChatPresence");
 
-        window.oldM = M;
-        window.M = {
-            'u': {
-                "testcase1": {
-                    "u": "testcase1", "c": 2, "m": "lpetrov@me.com", "presence": "chat", "presenceMtime": 1391783363.743, "h": "testcase1"
-                },
-                "someid": {
-                    "u": "someid", "c": 1, "m": "lp@mega.co.nz", "ts": 1390835777, "name": "lp@mega.co.nz", "h": "someid", "t": 1, "p": "contacts", "presence": "chat", "presenceMtime": 1392042647
-                }
-            }
-        };
+        megaDataMocker = new MegaDataMocker();
 
         fixtureManager.get("templates.html")
             .done(function(filename, contents) {
@@ -118,7 +106,8 @@ describe("Chat.js - Karere UI integration", function() {
     afterEach(function(done) {
         functionsMocker.restore();
 
-        window.M = window.oldM;
+        megaDataMocker.restore();
+
         megaChat.destroy();
 
         karereMocker.restore();
@@ -249,6 +238,7 @@ describe("Chat.js - Karere UI integration", function() {
                 expect(
                     megaChat.karere.joinChat
                 ).to.have.been.calledOnce;
+
 
 
                 expect(
@@ -750,6 +740,223 @@ describe("Chat.js - Karere UI integration", function() {
                         ).to.be.ok;
                     }
                 });
+
+                done();
+            });
+    });
+
+
+
+    it("1on1 chat with file attachments", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UserJoined", {
+                    "myOwn":true,
+                    "to": user1jid,
+                    "from": roomJid + "/" + megaChat.karere.getNickname(),
+                    "id":null,
+                    "roomJid":roomJid,
+                    "currentUsers":{},
+                    "newUsers":users
+                });
+
+
+                expect(megaChat.chats[roomJid].getParticipants())
+                    .to.eql(
+                        megaChat.chats[roomJid].users
+                    );
+
+                expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
+
+
+                // accept invitation
+                // first leave the room
+                delete megaChat.chats[roomJid];
+
+                var eventTriggerShouldReturnFalse2 = megaChat.karere._triggerEvent("InviteMessage", {
+                    elems: [],
+                    from: user2jid,
+                    id: "4",
+                    karere: null,
+                    meta: {
+                        ctime: unixtime() - 10000 /* date in the future */,
+                        invitationType: "resume",
+                        participants: [
+                            Strophe.getBareJidFromJid(user1jid),
+                            Strophe.getBareJidFromJid(user2jid)
+                        ],
+                        type: "private",
+                        users: users
+                    },
+                    myOwn: false,
+                    password: undefined,
+                    rawMessage: null,
+                    rawType: null,
+                    room: roomJid,
+                    to: user1jid,
+                    type: "Message"
+                });
+
+                expect(
+                    megaChat.karere.joinChat
+                ).to.have.been.calledOnce;
+
+
+
+                expect(
+                    megaChat.karere.joinChat.getCall(0).args[0]
+                ).to.equal(roomJid);
+
+                expect(eventTriggerShouldReturnFalse2).to.not.be.ok;
+
+
+                // File attachment test
+                $('.fm-chat-attach-file').trigger('click');
+
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li').size()
+                ).to.equal(
+                    Object.keys(M.d).length - 1 /* -1, because there is 1 file which is not in the RootID node */
+                );
+                expect(
+                    $('.fm-chat-attach-popup .root > li#n_d1123456 > a').is(".contains-folders")
+                ).to.be.ok;
+
+
+                var expandedEvent = new jQuery.Event("mouseup");
+                expandedEvent.offsetX = expandedEvent.layerX = 20;
+
+                $('.fm-chat-attach-popup .root > li#n_d1123456 > a').trigger(expandedEvent);
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li#n_d1123456 > ul > li').size()
+                ).to.equal(
+                    1
+                );
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li#n_d1123456 > a').is(".opened.expanded")
+                ).to.be.ok;
+
+
+                var selectSingleEvent = function() {
+                    return new jQuery.Event("mouseup");
+                };
+
+                var selectShiftEvent = function() {
+                    var e = new jQuery.Event("mouseup");
+                    e.shiftKey = true;
+                    return e;
+                };
+
+
+                var selectCtrlEvent = function() {
+                    var e = new jQuery.Event("mouseup");
+                    e.ctrlKey = true;
+                    return e;
+                };
+
+
+                // select multiple using shift
+                $('.fm-chat-attach-popup .root > li:last').prev().find('> a').trigger(selectSingleEvent());
+                $('.fm-chat-attach-popup .root > li:first').next().find('> a').trigger(selectShiftEvent());
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                ).to.equal(
+                        2
+                );
+
+                // select single item and reset of the old selection
+                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectSingleEvent());
+
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                ).to.equal(
+                        1
+                    );
+
+                // unselect single item
+                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectCtrlEvent());
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                ).to.equal(
+                        0
+                    );
+
+
+                // pick diff items using ctrl
+                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectCtrlEvent());
+                $('.fm-chat-attach-popup .root > li:last').find('> a').trigger(selectCtrlEvent());
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                ).to.equal(
+                        2
+                    );
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li:first').find('> a').is('.active')
+                ).to.be.ok;
+
+                expect(
+                    $('.fm-chat-attach-popup .root > li:last').find('> a').is('.active')
+                ).to.be.ok;
+
+                // click send
+                $('.attach-send').trigger('click');
+
+                expect(
+                    megaChat.getCurrentRoom().messages.length
+                ).to.equal(1);
+
+                var attachmentIds = Object.keys(megaChat.getCurrentRoom().messages[0].meta.attachments);
+
+                expect(
+                    attachmentIds.length
+                ).to.equal(2);
+
+                var sharedWith = [Object.keys(M.u)[0], Object.keys(M.u)[1]];
+
+                expect(
+                    megaChat.getCurrentRoom().messages[0].meta.attachments[attachmentIds[0]].sharedWith
+                ).to.eql(sharedWith);
+
+                expect(
+                    megaChat.getCurrentRoom().messages[0].meta.attachments[attachmentIds[1]].sharedWith
+                ).to.eql(sharedWith);
 
                 done();
             });

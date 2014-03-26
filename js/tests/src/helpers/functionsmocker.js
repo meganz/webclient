@@ -12,6 +12,14 @@ var FunctionsMocker = function() {
         {
             'fastHashFunction': function(val) {
                 return simpleStringHashCode(val);
+            },
+            'a32_to_base64': function(v) {
+                return "cmkSy1LZCrBVzUcRGEsT1w";
+            },
+            'api_req': function(op, ctx) {
+                if(ctx['callback']) {
+                    ctx['callback']({}, ctx);
+                }
             }
         });
 

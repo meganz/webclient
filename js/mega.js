@@ -162,7 +162,7 @@ function MegaData ()
 
 
     /**
-     * The sme as filterBy, but instead of pushing the stuff in M.v, will return a new array.
+     * The same as filterBy, but instead of pushing the stuff in M.v, will return a new array.
      *
      * @param f function, with 1 arguments (node) that returns true when a specific node should be returned in the list
      * of filtered results
@@ -1905,7 +1905,16 @@ function MegaData ()
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
 		M.ulprogress(id);
 		$.transferHeader();
-	}
+	};
+
+
+    this.cloneChatNode = function(n,keepParent) {
+        var n2 = clone(n);
+        n2.k = a32_to_base64(n2.key);
+        delete n2.key,n2.ph,n2.ar;
+        if (!keepParent) delete n2.p;
+        return n2;
+    };
 }
 
 

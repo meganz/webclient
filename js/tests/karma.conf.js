@@ -30,6 +30,8 @@ module.exports = function(config) {
 
              "../chat/rtcSession.js",
 
+             "../megafilepicker.js",
+
              "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",
              "../chat/emoticonsFilter.js",
@@ -39,6 +41,7 @@ module.exports = function(config) {
              "../chat/chat.js",
 
             "src/helpers/functionsmocker.js",
+            "src/helpers/megadatamocker.js",
             "src/helpers/eventmocker.js",
             "src/helpers/fixtures.js",
             "src/helpers/objectmocker.js",

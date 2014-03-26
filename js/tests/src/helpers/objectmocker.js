@@ -21,11 +21,16 @@ var ObjectMocker = function(objectInstance, methods) {
 
 
     self._recurseObject(objectInstance, self.methods, function(obj, k, v) {
-        if(typeof(obj[k]) != "function") {
+        var objType = typeof(obj[k]) != "undefined" ? typeof(obj[k]) : typeof(v);
+
+        if(objType != "function") {
             var oldVal = obj[k];
             obj[k] = v;
             obj[k].oldVal = oldVal;
         } else {
+            if(!obj[k]) {
+                obj[k] = function() {};
+            }
             sinon.stub(obj, k, v);
         }
     });
@@ -48,8 +53,22 @@ ObjectMocker.prototype._recurseObject = function(_objectInstance, _map, fn) {
 
     $.each(_map, function(k, v) {
         if(!$.isArray(v) && !$.isPlainObject(v)) {
+            if(!_objectInstance) {
+                _objectInstance = undefined;
+            }
+            if(!_objectInstance[k]) {
+                _objectInstance[k] = undefined;
+            }
+
             fn(_objectInstance, k, $.isFunction(v) ? self.logFunctionCallWrapper(k, v) : v);
         } else {
+            if(!_objectInstance) {
+                _objectInstance = {};
+            }
+            if(!_objectInstance[k]) {
+                _objectInstance[k] = {};
+            }
+
             self._recurseObject(_objectInstance[k], v, fn);
         }
     });
@@ -62,7 +81,11 @@ ObjectMocker.prototype.restore = function() {
 
     self._recurseObject(self.objectInstance, self.methods, function(obj, k, v) {
         if(typeof(obj[k]) == "function") {
-            obj[k].restore();
+            if(typeof(obj[k].restore) == "function") {
+                obj[k].restore();
+            } else {
+                console.error("Could not find .restore on", obj[k]);
+            }
         } else {
             obj[k] = obj[k].oldVal;
         }

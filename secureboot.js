@@ -371,6 +371,8 @@ else
         // MEGA CHAT
         jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
 
+        jsl.push({f:'js/megafilepicker.js', n: 'mega_js', j:1,w:7});
+
         jsl.push({f:'js/chat/urlFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/attachmentsFilter.js', n: 'mega_js', j:1,w:7});

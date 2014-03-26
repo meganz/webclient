@@ -102,23 +102,6 @@ var chatui;
             }
         });
 
-        $('.fm-chat-attach-file').unbind('click');
-        $('.fm-chat-attach-file').bind('click', function()
-        {
-            if ($(this).attr('class').indexOf('active') > -1)
-            {
-                $('.fm-chat-attach-popup').addClass('hidden');
-                $(this).removeClass('active');
-            }
-            else
-            {
-                $('.fm-chat-attach-popup').removeClass('hidden');
-                $(this).addClass('active');
-                var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-attach-arrow').position().top;
-                $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
-            }
-        });
-
         $('.fm-chat-block').off('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button');
         $('.fm-chat-block').on('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button', function() {
             var currentRoom = megaChat.getCurrentRoom();
@@ -308,6 +291,9 @@ var MegaChat = function() {
                 }
             ]
         },
+        filePickerOptions: {
+            'buttonElement': '.fm-chat-attach-file'
+        },
         /**
          * Really simple plugin architecture
          */
@@ -326,6 +312,8 @@ var MegaChat = function() {
     this.karere = new Karere({
         'clientName': 'mc'
     });
+
+    self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
     // Karere Events
     this.karere.bind("onPresence", function(e, eventData) {
@@ -748,6 +736,24 @@ MegaChat.prototype.init = function() {
     $.each(self.options.plugins, function(k, v) {
         self.plugins[k] = new v(self);
     });
+
+    if(!self.filePicker) {
+        self.filePicker = new MegaFilePicker(self.options.filePickerOptions);
+        self.filePicker.bind('doneSelecting', function(e, selection) {
+            console.error("args: ", toArray(arguments));
+
+            if(selection.length == 0) {
+                return;
+            }
+
+            var room = self.getCurrentRoom();
+            if(room) {
+                room.attachNodes(
+                    selection
+                );
+            }
+        })
+    }
 };
 
 /**
@@ -894,6 +900,11 @@ MegaChat.prototype.destroy = function() {
     var self = this;
     localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
     localStorage.megaChatPresenceMtime = unixtime();
+
+    if(self.filePicker) {
+        self.filePicker.destroy();
+        self.filePicker = null;
+    }
 
     $.each(self.chats, function(roomJid, room) {
         room.destroy();
@@ -2771,7 +2782,6 @@ MegaChatRoom.prototype.getMediaOptions = function() {
     return this.options.mediaOptions;
 };
 
-
 /**
  * Internal method to notify the server that the specified `nodeids` are sent/shared to `users`
  * @param nodeids
@@ -2780,14 +2790,6 @@ MegaChatRoom.prototype.getMediaOptions = function() {
  */
 MegaChatRoom.prototype._sendNodes = function(nodeids, users) {
     var json = [], apinodes=[];
-
-    var cloneChatNode = function(n,keepParent) {
-        var n2 = clone(n);
-        n2.k = a32_to_base64(n2.key);
-        delete n2.key,n2.ph,n2.ar;
-        if (!keepParent) delete n2.p;
-        return n2;
-    };
 
     var $promise = new $.Deferred();
 
@@ -2803,12 +2805,12 @@ MegaChatRoom.prototype._sendNodes = function(nodeids, users) {
                 {
                     var n2 = M.d[subnodes[j]];
                     // subnodes retain their parent nodeid to retain the same folder structure
-                    if (n2) json.push(cloneChatNode(n2,true));
+                    if (n2) json.push(M.cloneChatNode(n2,true));
                 }
             }
             // root nodes do not retain their parent nodeid, because they become "root nodes" in the chat - access will be granted to these nodes and subnode access can be determined based on parent node access rights
 
-            json.push(cloneChatNode(n));
+            json.push(M.cloneChatNode(n));
             apinodes.push(n.h);
         }
     }
@@ -2838,7 +2840,7 @@ MegaChatRoom.prototype._sendNodes = function(nodeids, users) {
         });
 
     return $promise;
-}
+};
 
 
 
@@ -2888,7 +2890,6 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
                     'sharedWith': users
                 };
             });
-
             var messageId = self.sendMessage(message, {
                 'attachments': attachments
             });

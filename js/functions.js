@@ -658,7 +658,7 @@ function CreateWorkers(url, message, size) {
 
 // getXhrObject {{{
 var __xhrs = []
-	, xhrCallback = ['progress', 'changestate', 'failure', 'ready', 'upload_progres']
+	, xhrCallback = ['progress', 'changestate', 'failure', 'ready', 'upload_progres', 'response']
 function checkTimeout(xhr) {
 	if (!xhr.__busy) return;
 	clearTimeout(xhr.ts);

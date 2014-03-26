@@ -110,8 +110,8 @@ function ClassChunk(task) {
 			// }}}
 
 			xhr.failure = function(e, len) {
-				if (!xhr || xhr.has_failed) return;
-				xhr.has_failed = true;
+				if (!this || this.has_failed) return;
+				this.has_failed = true;
 
 				// we must reschedule this download	
 				Progress.data[url][0] = 0; /* we're at 0 bytes */
@@ -148,7 +148,8 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
+					//download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
+					if (!done) Scheduler.done();
 					if (failed) DownloadManager.release(self);
 					r = null;
 					failed = false;
@@ -156,10 +157,11 @@ function ClassChunk(task) {
 					DEBUG(this.status, r.bytesLength, size);
 					DEBUG("HTTP FAILED", download.n, this.status, "am i done?", done);
 					r = null;
-					return xhr.failure(null, r.byteLength);
+					return this.failure(null, r.byteLength);
 				}
 
 				self.destroy();
+				xhr = null;
 
 				if (!done) Scheduler.done();
 			}
@@ -360,6 +362,13 @@ function ClassFile(dl) {
 
 }
 // }}}
+
+function xxx() {
+	alert("here")
+	window.ArrayBuffer = function() {
+		throw new Error;
+	}
+}
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };

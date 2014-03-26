@@ -457,12 +457,42 @@ function dl_reportstatus(dl, code)
 	}
 }
 
+function dlGetUrlDone(res, ctx) {
+	if (typeof res == 'object') {
+		if (typeof res == 'number') {
+			dl_reportstatus(ctx.object, res);
+		} else {
+			if (res.d) {
+				dl_reportstatus(ctx.object, res.d ? 2 : 1)
+			} else if (res.g) {
+				var ab = base64_to_ab(res.at)
+					, o = dec_attr(ab ,[ctx.dl_key[0]^ctx.dl_key[4],ctx.dl_key[1]^ctx.dl_key[5],ctx.dl_key[2]^ctx.dl_key[6],ctx.dl_key[3]^ctx.dl_key[7]]);
+
+				if (typeof o == 'object' && typeof o.n == 'string') {
+					if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
+						ctx.object.data = new ArrayBuffer(res.s);				
+					}
+					return ctx.next(false, res, o, ctx.object);
+				}
+				dl_reportstatus(ctx.object, EGAIN);
+			} else {
+				dl_reportstatus(ctx.object, res.e);
+			}
+		}
+	} else {
+		dl_reportstatus(ctx.object, EAGAIN);
+	}
+	
+	dl_retryinterval *= 1.2;
+	ctx.next(new Error("failed"))
+}
+
 function dlGetUrl(object, callback) {
 	var req = { 
 		a : 'g', 
 		g : 1, 
 		ssl : use_ssl,
-	}, dl_key = object.key
+	} 
 
 	if (object.ph) {
 		req.p = object.ph;
@@ -471,35 +501,10 @@ function dlGetUrl(object, callback) {
 	}
 
 	api_req(req, {
-		callback: function(res, rex) {
-			if (typeof res == 'object') {
-				if (typeof res == 'number') {
-					dl_reportstatus(object, res);
-				} else {
-					if (res.d) {
-						dl_reportstatus(object, res.d ? 2 : 1)
-					} else if (res.g) {
-						var ab = base64_to_ab(res.at)
-							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-	
-						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || object.preview === -1)) {
-								object.data = new ArrayBuffer(res.s);				
-							}
-							return callback(false, res, o, object);
-						}
-						dl_reportstatus(object, EGAIN);
-					} else {
-						dl_reportstatus(object, res.e);
-					}
-				}
-			} else {
-				dl_reportstatus(object, EAGAIN);
-			}
-			
-			dl_retryinterval *= 1.2;
-			callback(new Error("failed"))
-		}
+		object: object,
+		next: callback,
+		dl_key: object.key,
+		callback: dlGetUrlDone
 	},n_h ? 1 : 0);
 }
 

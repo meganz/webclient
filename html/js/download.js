@@ -33,6 +33,12 @@ function Mads()
 	{
 		$('.ads-laptop .sync-button-txt').css('font-size','13px');
 	}
+	
+	if (u_type)
+	{
+		$('.ads-top-arrow').hide();
+		$('.ads-top-notification').hide();	
+	}
 
 	$('body').addClass('ads');
 	if (typeof swiffy == 'undefined' && !silent_loading)
@@ -131,7 +137,7 @@ function nextAd()
 
 function dlinfo(ph,key,next)
 {
-	if (!u_type) Mads();	
+	if (!(u_attr && u_attr.p)) Mads();
 
 	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))

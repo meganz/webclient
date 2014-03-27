@@ -1278,6 +1278,7 @@ function is_fm()
 
 function parsepage(pagehtml,pp)
 {
+	$('body').removeClass('ads');
 	$('#fmholder').hide();
 	$('#pageholder').hide();
 	$('#startholder').hide();

@@ -51,12 +51,12 @@ function dl_g(res)
 		{
 			if ($(this).attr('class').indexOf('active') == -1) 
 			{
-				uldl_pause();
+				dlQueue.pause();
 				$(this).addClass('active');
 			}
 			else 
 			{
-				uldl_resume();
+				dlQueue.resume();
 				$(this).removeClass('active');
 			}					
 		});				

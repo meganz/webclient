@@ -11321,7 +11321,7 @@ span.browsers-update {
 	line-height: 21px;
 	color: #666666;
 	padding: 15px 0 0px 22px;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -813px -1536px;
 }
@@ -11334,7 +11334,7 @@ span.browsers-update {
 	float: left;
 	width: 448px;
 	height: 200px;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -488px -433px;
 	margin-bottom: 28px;
@@ -11403,7 +11403,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -11507,7 +11507,7 @@ span.browsers-update {
 	width: 80px;
 	height: 78px;
 	float: left;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -465px -1122px;
 	margin: 15px 0 17px 0;
@@ -11569,7 +11569,7 @@ span.browsers-update {
 }
 .chrome-bott-icons {
 	height: 140px;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: 0 -768px;
 }
@@ -11614,7 +11614,7 @@ span.browsers-update {
 .chrome-download-button:hover, a.chrome-download-button:hover {
 	background-color: #DB0605;
 	border: 2px solid #DB0605;
-	background-image: url(../images/mega/mobile-sprite.png?v=3);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -4px -919px;
 	color: white;
@@ -14858,6 +14858,206 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .password-dialog .fm-dialog-body {
 	padding: 14px 20px 14px 20px;
 }
+.ads-left-block, .ads-right-block {
+	background-color: #d9d8d8;
+	height: 100%;
+	width: 300px;
+	position: absolute;
+	min-height: 620px;
+	display:none;
+}
+.ads .ads-left-block, .ads .ads-right-block {
+	display:block;
+}
+.ads-top-txt {
+	padding: 0 30px;
+	position: absolute;
+	font-size: 13px;
+	text-align: center;
+	color: #333333;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	top: 18%;
+	line-height: 26px;
+}
+.ads-svg-container {
+	width: 260px;
+	height: 200px;
+	left: 20px;
+	position: absolute;
+	top: 50%;
+	margin-top: -125px;
+}
+.ads-iphone .ads-svg-container {
+	height: 222px;
+	top: 49%;
+}
+.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
+	height: 275px;
+    top: 46.3%;
+}
+.ads-bottom-block {
+	height: 130px;
+	width: 100%;
+	position: absolute;
+	bottom: 50px;
+	padding: 30px 34px 0 34px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: #c5c3c3;
+}
+.ads-bottom-block .sync-bottom-txt {
+	font-size: 11px;
+	padding: 2px 0 0 0;
+	color: #3F4646;
+}
+.ads-right-block {
+	background-color: #d9d8d8;
+	height: 100%;
+	width: 300px;
+	position: absolute;
+	right: 0;
+	min-height: 647px;
+}
+.ads-top-arrow {
+	position: absolute;
+	width: 20px;
+	height: 9px;
+	left: 145px;
+	top: 2px;
+	background-image: url(../images/mega/mobile-sprite.png?v=1);
+	background-position: right -1449px;
+	background-repeat: no-repeat;
+}
+.ads-top-notification {
+	position: absolute;
+	background-color: #221e1f;
+	width: 220px;
+	left: 40px;
+	top: 10px;
+	min-height: 20px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+.ads-top-white-txt1 {
+	font-size: 30px;
+	font-weight: bold;
+	color: white;
+	text-align: center;
+	line-height: 46px;
+	padding: 10px 0 0 0;
+}
+.ads-top-white-txt2 {
+	font-size: 14px;
+	font-weight: bold;
+	color: white;
+	text-align: center;
+	line-height: 18px;
+	padding: 0 0 18px 0;
+}
+.ads-slides-block {
+	height: 100%;
+}
+.ads-right-bottom-txt {
+	font-size: 11px;
+	text-align: center;
+	padding: 0 40px;
+	position: absolute;
+	bottom: 240px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.ads-slides-buttons {
+	width: 100%;
+	bottom: 198px;
+	text-align: center;
+	position: absolute;
+}
+.ads-slides-button {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	background-color: #c6c6c6;
+	margin: 0 2px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	-ms-border-radius: 100%;
+	-o-border-radius: 100%;
+	border-radius: 100%;
+	cursor: pointer;
+}
+.ads-slides-button.active {
+	background-color: white;
+}
+.ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
+	display:block; border-color:#8d8c8c;
+}
+.ads-bottom-block .sync-button:hover, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
+	border-color:#DB3200;
+}
+.ads-left-block rect, .ads-right-block rect {
+  fill: rgba(255,55,255,0);
+}
+.ads .new-download-right-block {
+	overflow:visible;
+}
+@media only screen and (max-width: 1593px) {
+.ads .download-mid-centered-block {
+ min-width: 648px;
+ margin-left: -334px;
+}
+}
+@media only screen and (max-width: 1362px) {
+.ads .download-mid-centered-block {
+ min-width: 648px;
+}
+.ads .downloading-progress {
+	width:300px;
+}
+}
+@media only screen and (max-width: 1323px) {
+.ads .download-mid-centered-block {
+	min-width: 595px;
+}
+}
+@media only screen and (max-width: 1157px) {
+.ads .ads-right-block {
+	display:none;
+}
+.ads .download-mid-centered-block {
+	margin-left: -190px;
+}
+}
+@media only screen and (max-height:  833px) {
+	.ads-tablet .ads-right-bottom-txt, .ads-ipad .ads-right-bottom-txt {
+	    display:none;
+	}
+	.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
+	   top: 48%;
+	}
+}
+@media only screen and (max-height: 758px) {
+	.ads-svg-container {
+	   top: 53%;
+	}
+	.ads-iphone .ads-svg-container {
+	   top: 52%;
+	}
+	.ads-right-bottom-txt {
+	    display:none;
+	}
+	.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
+	   height: 230px;
+		top: 51%;
+	}
+}
+
+
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon {
 background-image: url(../images/mega/encr-sprite@2x.png);
@@ -15247,8 +15447,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/pro-new-sprite@2x.png);
  background-size: 853px auto;
 }
-.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button {
- background-image: url(../images/mega/mobile-sprite@2x.png?v=3);
+.sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow {
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
  background-size: 836px auto;
 }
  .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
@@ -15362,7 +15562,7 @@ background-image: url(../images/mega/chrome-app@2x.png);
 background-size: 700px auto;
 }
 .chrome-download-button:hover, a.chrome-download-button:hover {
- background-image: url(../images/mega/mobile-sprite@2x.png?v=3);
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
 background-size: 836px auto;
 }
 .campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {

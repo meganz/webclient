@@ -8,28 +8,97 @@ var fdl_queue_var=false;
 
 function Mads()
 {	
-	
+	$('body').addClass('ads');
 	if (typeof swiffy == 'undefined' && !silent_loading)
 	{
 		silent_loading=function()
-		{			
-			$('body').addClass('ads');			
-			stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);
-			ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
-			ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
-			ads3 = new swiffy.Stage(document.getElementById('tablet-app'), swiffyobject4);
-			ads4 = new swiffy.Stage(document.getElementById('ipad-app'), swiffyobject5);
-			ads5 = new swiffy.Stage(document.getElementById('phone-app'), swiffyobject6);
-			stage.start();
-			ads1.start();
-			ads2.start();
-			ads2.start();
-			ads3.start();
-			ads4.start();
-			ads5.start();
+		{
+			startMads();			
 		};
 		jsl.push(jsl2['mads_js']);
 		jsl_start();
+	}
+	else startMads();
+}
+
+var adTime,ads1,ads2,ads3,ads4,ads5,stage,swiffyobject;
+
+function startMads()
+{
+	adTime=new Date().getTime();
+	stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);	
+	ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
+	ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
+	ads3 = new swiffy.Stage(document.getElementById('tablet-app'), swiffyobject4);
+	ads4 = new swiffy.Stage(document.getElementById('ipad-app'), swiffyobject5);
+	ads5 = new swiffy.Stage(document.getElementById('phone-app'), swiffyobject6);	
+	stage.start();
+	ads1.start();
+	ads2.start();
+	ads2.start();
+	ads3.start();
+	ads4.start();
+	ads5.start();	
+	$('.ads-slides-button').unbind('click');
+	$('.ads-slides-button').bind('click',function()
+	{
+		if ($(this).attr('class').indexOf('active') == -1) 
+		{
+			showAd(this);
+		1}
+	});	
+	setTimeout(nextAd,10000);	
+	setTimeout(function()
+	{
+		$('.ads-svg-container svg').css('cursor','pointer');		
+		$('.ads-left-block .ads-svg-container svg').unbind('click');
+		$('.ads-left-block .ads-svg-container svg').bind('click',function()
+		{
+			document.location.hash = 'sync';
+		});		
+		$('.ads-top-notification').unbind('click');
+		$('.ads-top-notification').bind('click',function()
+		{
+			document.location.hash = 'register';
+		});		
+		$('.ads-laptop svg').unbind('click');
+		$('.ads-laptop svg').bind('click',function()
+		{
+			document.location.hash = 'chrome';
+		});
+		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').unbind('click');
+		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').bind('click',function()
+		{
+			document.location.hash = 'mobile';
+		});
+		
+		//1062
+	},500);
+}
+
+function showAd(el)
+{
+	adTime=new Date().getTime();
+	$('.ads-slides-block.active').fadeOut(50);
+	$('.ads-slides-block').removeClass('active');
+	var slideBlock = '#' + $(el).attr('id') + '-slide';
+	$(slideBlock).fadeIn(100);
+	$(slideBlock).addClass('active');
+	$(slideBlock).removeClass('hidden');
+	$('.ads-slides-button').removeClass('active');
+	$(el).addClass('active');
+	setTimeout(nextAd,10000);
+}
+
+function nextAd()
+{
+	if (new Date().getTime()-9900 > adTime)
+	{
+		var id = $('.ads-slides-button.active').attr('id');
+		if (!id) return false;
+		id = parseInt(id.replace('ads',''))+1;
+		if (id > 5) id=1;		
+		showAd($('.ads-slides-button#ads'+id)[0]);
 	}
 }
 

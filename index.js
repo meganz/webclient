@@ -811,10 +811,12 @@ function tooltiplogin()
 
 function mLogout()
 {
-	$.dologout = function()
+	$.dologout = function(Quiet)
 	{
 		if ((fminitialized && downloading) || ul_uploading)
 		{
+			if(Quiet) return true;
+
 			msgDialog('confirmation',l[967],l[377] + ' ' + l[507]+'?',false,function(e)
 			{
 				if (e)
@@ -826,7 +828,12 @@ function mLogout()
 						ul_cancel();
 					}
 					resetUploadDownload();
-					$.dologout();
+					loadingDialog.show();
+					var t = setInterval(function() {
+						if(!$.dologout(!0)) {
+							clearInterval(t);
+						}
+					}, 200);
 				}
 			});
 		}

@@ -133,6 +133,7 @@ var UploadManager = new function() {
 		ulQueue._queue = [];
 		$.each(ul_queue, function(i, file) {
 			$('#ul_' + file.id).remove();
+			ul_queue[file.pos] = {};
 		});
 
 		$.each(ulQueue._running, function(i, worker) {

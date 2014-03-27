@@ -14942,6 +14942,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+	cursor:pointer;
 }
 .ads-top-white-txt1 {
 	font-size: 30px;

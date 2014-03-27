@@ -1145,20 +1145,9 @@ function api_getsid2(res,ctx)
 
 					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res.privk)));
 
-					var rsa_privk = Array(4);
-					
-					// decompose private key
-					for (var i = 0; i < 4; i++)
-					{
-						var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
+					var rsa_privk = crypto_decodeprivkey(privk);
 
-						rsa_privk[i] = mpi2b(privk.substr(0,l));
-						if (typeof rsa_privk[i] == 'number') break;
-						privk = privk.substr(l);
-					}
-
-					// check format
-					if (i == 4 && privk.length < 16)
+					if (rsa_privk)
 					{
 						// TODO: check remaining padding for added early wrong password detection likelihood
 						r = [k,base64urlencode(crypto_rsadecrypt(t,rsa_privk).substr(0,43)),rsa_privk];
@@ -1272,7 +1261,7 @@ function api_cachepubkeys2(res,ctx)
 	{
 		var spubkey, keylen, pubkey;
 		
-		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(res.pubk);
+		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
 	}
 
 	if (!--ctx.ctx.remaining) ctx.ctx.cachepubkeyscomplete(ctx.ctx);
@@ -1395,12 +1384,6 @@ function api_setshare1(ctx)
 
 function api_setrsa(privk,pubk)
 {
-	var t, i;
-	
-	for (t = '', i = 0; i < privk.length; i++) t = t+b2mpi(privk[i]);
-	
-	for (i = (-t.length)&15; i--; ) t = t + String.fromCharCode(rand(256));
-
 	ctx = { callback : function(res,ctx) {
 			if (d) console.log("RSA key put result=" + res);
 			
@@ -1413,7 +1396,7 @@ function api_setrsa(privk,pubk)
 		privk : privk
 	};
 		
-	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(t))), pubk : base64urlencode(b2mpi(pubk[0])+b2mpi(pubk[1])) },ctx);
+	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(crypto_encodeprivkey(t)))), pubk : base64urlencode(crypto_encodepubkey(pubk)) },ctx);
 }
 
 function crypto_handleauth(h)
@@ -1421,33 +1404,69 @@ function crypto_handleauth(h)
 	return a32_to_base64(encrypt_key(u_k_aes,str_to_a32(h+h)));
 }
 
+function crypto_encodepubkey(pubkey)
+{
+    return b2mpi(pubkey[0]) + b2mpi(pubkey[1]);
+}
+
 function crypto_decodepubkey(pubk)
 {
-	var i;
-	
-	var spubkey = base64urldecode(pubk);
-
-	var keylen = spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1);
-
 	var pubkey = Array(3);
 
-	// decompose public key
-	for (i = 0; i < 2; i++)
-	{
-		var l = ((spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1)+7)>>3)+2;
+	var keylen = pubk.charCodeAt(0)*256+pubk.charCodeAt(1);
 
-		pubkey[i] = mpi2b(spubkey.substr(0,l));
+	// decompose public key
+	for (var i = 0; i < 2; i++)
+	{
+		var l = ((pubk.charCodeAt(0)*256+pubk.charCodeAt(1)+7)>>3)+2;
+
+		pubkey[i] = mpi2b(pubk.substr(0,l));
 		if (typeof pubkey[i] == 'number') break;
-		spubkey = spubkey.substr(l);
+		pubk = pubk.substr(l);
 	}
 
 	// check format
-	if (i == 2 && spubkey.length < 16)
+	if (i == 2 && pubk.length < 16)
 	{
 		pubkey[2] = keylen;
 		return pubkey;
 	}
 	return false;
+}
+
+function crypto_encodeprivkey(privk)
+{
+    var t = '', i;
+
+	for (i = 0; i < privk.length; i++) t += b2mpi(privk[i]);
+
+	for (i = (-t.length)&15; i--; ) t += String.fromCharCode(rand(256));
+
+    return t;
+}
+
+function crypto_decodeprivkey(privk)
+{
+    var privkey = Array(4);
+
+    // decompose private key
+    for (var i = 0; i < 4; i++)
+    {
+	    var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
+
+	    privkey[i] = mpi2b(privk.substr(0,l));
+	    if (typeof privkey[i] == 'number') break;
+	    privk = privk.substr(l);
+    }
+
+    // check format
+    if (i == 4 && privk.length < 16)
+    {
+	    // TODO: check remaining padding for added early wrong password detection likelihood
+	    return privkey;
+    }
+
+    return false;
 }
 
 // encrypts cleartext string to the supplied pubkey
@@ -1906,7 +1925,7 @@ function crypto_procsr(sr)
 		{
 			var pubkey;
 
-			if (typeof res == 'object' && typeof res[0] == 'object' && typeof res[0].pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(res[0].pubk);
+			if (typeof res == 'object' && typeof res[0] == 'object' && typeof res[0].pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res[0].pubk));
 
 			// collect all required pubkeys	
 			while (ctx.i < ctx.sr.length)

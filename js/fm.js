@@ -348,7 +348,6 @@ function initUI()
 	createfolderUI();
 	cSortMenuUI();
 	initContextUI();	
-	transferPanelUI();	
 	UIkeyevents();	
 	addUserUI();
 	$('.fm-files-view-icon').unbind('click');
@@ -548,7 +547,9 @@ function initUI()
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 }
 
-
+$(function() {
+	transferPanelUI();	
+});
 
 function openTransferpanel()
 {

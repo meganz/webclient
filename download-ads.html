@@ -17,7 +17,9 @@
 
 $(document).ready(function() { 
 	var changeAds, anymationDefine, animationActivate;
+
 	anymationDefine = function() {
+
 	  stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);
 	  ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
 	  ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
@@ -29,7 +31,16 @@ $(document).ready(function() {
 	anymationDefine();
 	stage.start();
 	ads1.start();
+
+	ads2.start();
+	ads2.start();
+	ads3.start();
+	ads4.start();
+	ads5.start();
 	
+
+	
+
 	$('.ads-slides-button').click(function(){
         if ($(this).attr('class').indexOf('active') == -1) {
 			var slideBlock = '#' + $(this).attr('id') + '-slide';
@@ -92,7 +103,12 @@ $(document).ready(function() {
     };
 
     setInterval(changeAds, 5000);
+
+	
+
+
 });
+
 	
 	
 	

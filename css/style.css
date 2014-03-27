@@ -5316,7 +5316,7 @@ span.search-number {
 .add-user-popup-button, a.add-user-popup-button {
 	background-color: #1B9EEB;
 }
-.fmholder div, .fmholder a, .fmholder span, .fmholder td {
+.fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button{
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -13262,7 +13262,7 @@ h1.help-home-header {
 .new-bottom-pages .blog-new-full p.strong-paragraph.new-blog-icon {
 	color: #737477;
 }
-.blog-new-full, .blog-new-full div, .blog-new-full p, .blog-new-full h1, .blog-new-full h2, .blog-new-full h3, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block div, .new-right-content-block p, .new-right-content-block h1, .new-right-content-block h2, .new-right-content-block h3, .new-right-content-block span, .fm-chat-messages-block div, .fm-chat-messages-block span, .fm-chat-messages-block a {
+.blog-new-full, .blog-new-full div, .blog-new-full p, .blog-new-full h1, .blog-new-full h2, .blog-new-full h3, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block div, .new-right-content-block p, .new-right-content-block h1, .new-right-content-block h2, .new-right-content-block h3, .new-right-content-block span, .fm-chat-messages-block div, .fm-chat-messages-block span, .fm-chat-messages-block a, div.new-bottom-pages div, div.new-bottom-pages h1, div.new-bottom-pages h2, div.new-bottom-pages h3, div.new-bottom-pages h4, div.new-bottom-pages h5, div.new-bottom-pages ul, div.new-bottom-pages span, div.new-bottom-pages p, div.new-bottom-pages a {
 	-webkit-touch-callout: text;
 	-webkit-user-select: text;
 	-khtml-user-select: text;
@@ -15030,6 +15030,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 @media only screen and (max-width: 1323px) {
 .ads .download-mid-centered-block {
 	min-width: 635px;
+}
+.ads.fr .new-download-button-txt2 {
+  font-size: 10px;
+  line-height: 18px;
 }
 }
 @media only screen and (max-width: 1157px) {

@@ -2315,7 +2315,7 @@ a.blog-new-archive-lnk {
 	font-family: 'Open Sans Semibold', Arial;
 	color: #3F4646;
 	padding-top: 0;
-	padding-bottom:10px
+	padding-bottom: 30px
 }
 .new-bottom-pages .blog-new-full p .italic-quote {
 	color: #919091;
@@ -5556,7 +5556,7 @@ div .fm-tree-folder.dragover {
 	line-height: 22px;
 	color: #353a3a;
 	margin-right: 25px;
-	font-family: 'Open Sans Semibold', Arial;
+	font-family: 'Open Sans Semibold';
 }
 .fm-chat-user-star {
 	width: 25px;
@@ -5704,7 +5704,7 @@ div .fm-tree-folder.dragover {
 	line-height: 21px;
 	padding: 8px 40px 12px 43px;
 	color: #666666;
-	font-family: 'Open Sans Semibold',Arial;
+	font-family: 'Open Sans Semibold';
 	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: 0 -37px;
 	background-repeat: no-repeat;
@@ -11328,7 +11328,7 @@ span.browsers-update {
 .sync-subheader {
 	font-size: 13px;
 	color: #666666;
-	font-family: 'Open Sans Semibold',Arial;
+	font-family: 'Open Sans Semibold';
 }
 .sync-icon, .mobile-icon, .ff-icon, .chrome-icon {
 	float: left;
@@ -11487,7 +11487,7 @@ span.browsers-update {
 	font-size: 16px;
 	line-height: 24px;
 	color: #666666;
-	font-family: 'Open Sans Semibold', Arial;
+	font-family: 'Open Sans Semibold';
 	white-space: nowrap;
 }
 .sync-button-txt.small {
@@ -14866,6 +14866,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	min-height: 620px;
 	display:none;
 }
+.ads-left-block {
+	left:0;
+}
+.ads-right-block {
+	right:0;
+}
 .ads .ads-left-block, .ads .ads-right-block {
 	display:block;
 }
@@ -14942,7 +14948,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
-	cursor:pointer;
 }
 .ads-top-white-txt1 {
 	font-size: 30px;

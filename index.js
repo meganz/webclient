@@ -37,6 +37,7 @@ function startMega()
 	if (silent_loading)
 	{
 		silent_loading();
+		jsl=[];
 		silent_loading=false;
 		return false;
 	}

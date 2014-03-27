@@ -424,7 +424,8 @@ else
 			'contact': {f:'html/contact.html', n: 'contact', j:0},
 			'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
 			'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-			'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
+			'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1},
+			'mads_js': {f:'js/mads.js', n: 'mads_js', j:1}
 		};
 		var subpages =
 		{

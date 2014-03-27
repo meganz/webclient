@@ -5,8 +5,39 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 
+
+function Mads()
+{	
+	
+	if (typeof swiffy == 'undefined' && !silent_loading)
+	{
+		silent_loading=function()
+		{			
+			$('body').addClass('ads');			
+			stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);
+			ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
+			ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
+			ads3 = new swiffy.Stage(document.getElementById('tablet-app'), swiffyobject4);
+			ads4 = new swiffy.Stage(document.getElementById('ipad-app'), swiffyobject5);
+			ads5 = new swiffy.Stage(document.getElementById('phone-app'), swiffyobject6);
+			stage.start();
+			ads1.start();
+			ads2.start();
+			ads2.start();
+			ads3.start();
+			ads4.start();
+			ads5.start();
+		};
+		jsl.push(jsl2['mads_js']);
+		jsl_start();
+	}
+}
+
+
 function dlinfo(ph,key,next)
 {
+	if (!u_type) Mads();	
+
 	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
 	{

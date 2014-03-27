@@ -5556,7 +5556,7 @@ div .fm-tree-folder.dragover {
 	line-height: 22px;
 	color: #353a3a;
 	margin-right: 25px;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans Semibold', Arial;
 }
 .fm-chat-user-star {
 	width: 25px;
@@ -5704,7 +5704,7 @@ div .fm-tree-folder.dragover {
 	line-height: 21px;
 	padding: 8px 40px 12px 43px;
 	color: #666666;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans Semibold',Arial;
 	background-image: url(../images/mega/chat-sprite.png?v=1);
 	background-position: 0 -37px;
 	background-repeat: no-repeat;
@@ -11328,7 +11328,7 @@ span.browsers-update {
 .sync-subheader {
 	font-size: 13px;
 	color: #666666;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans Semibold',Arial;
 }
 .sync-icon, .mobile-icon, .ff-icon, .chrome-icon {
 	float: left;
@@ -11487,7 +11487,7 @@ span.browsers-update {
 	font-size: 16px;
 	line-height: 24px;
 	color: #666666;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans Semibold', Arial;
 	white-space: nowrap;
 }
 .sync-button-txt.small {

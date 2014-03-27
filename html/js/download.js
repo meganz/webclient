@@ -8,6 +8,32 @@ var fdl_queue_var=false;
 
 function Mads()
 {	
+	if ('fr-de-ms-be-bs-ca-cy-ee-eu-hr-lv-lt-ru-sl-mk-uk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-left-block .ads-bottom-block').css('padding-left','8px').css('padding-right','10px');	
+	}
+	if ('ms-bs-be-ca-cz-cy-eu-fr-hr-lv-lt-hu-pl-ru-ro-sk-bg-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','20px');
+	}
+	if ('uk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','18px');
+		$('.ads-top-notification .ads-top-white-txt2').css('font-size','13px');
+	}
+	if ('ms-de-eu-fr-hu-pt-ru-sk-bg-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-tablet .ads-top-txt').css('line-height','22px');
+	}	
+	if ('pt-ru-ro-sl-sk-tr-bg-mk-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-right-block .ads-bottom-block,.ads-left-block .ads-bottom-block').css('padding-left','23px').css('padding-right','23px');		
+	}
+	if ('ru-ro-sl-sk-tr-bg-mk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-laptop .sync-button-txt').css('font-size','13px');
+	}
+
 	$('body').addClass('ads');
 	if (typeof swiffy == 'undefined' && !silent_loading)
 	{

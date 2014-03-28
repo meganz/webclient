@@ -200,15 +200,15 @@ dlQueue.on('working', function() {
 });
 
 dlQueue.on('resume', function() {
-	downloading = true;
+	downloading = !dlQueue.isEmpty();
 });
 
 dlQueue.on('pause', function() {
-	downloading = false;
+	downloading = !dlQueue.isEmpty();
 });
 
 dlQueue.on('drain', function() {
-	downloading = false;
+	downloading = !dlQueue.isEmpty();
 });
 // }}}
 

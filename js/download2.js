@@ -92,7 +92,7 @@ var DownloadManager = new function() {
 				self.abort(file);
 			}
 		});
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.abort = function(pattern, dontCleanUI) {
@@ -113,7 +113,7 @@ var DownloadManager = new function() {
 		}
 
 		self.remove(_pattern);
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.remove = function(pattern, check) {

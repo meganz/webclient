@@ -348,6 +348,7 @@ function initUI()
 	createfolderUI();
 	cSortMenuUI();
 	initContextUI();	
+	transferPanelUI();	
 	UIkeyevents();	
 	addUserUI();
 	$('.fm-files-view-icon').unbind('click');
@@ -547,9 +548,6 @@ function initUI()
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 }
 
-$(function() {
-	transferPanelUI();	
-});
 
 function openTransferpanel()
 {
@@ -557,10 +555,10 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
+	ulQueue.resume();
 	initTreeScroll();
 	$(window).trigger('resize');
 }
-
 
 function doAddContact(e,dialog)
 {	

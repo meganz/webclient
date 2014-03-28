@@ -657,13 +657,15 @@ function percent_megatitle()
 		, total = 0
 
 	$('.transfer-table .progressbar-percents').each(function() {
-		percentage += parseInt($(this).text());
+		var p = parseInt($(this).text());
+		if (isNaN(p)) return;
+		percentage += p;
 		total++;
 	});
 	
 	percentage = Math.floor(percentage / total)
 
-	if (percentage == 0 || percentage == 100) {
+	if (total == 0 || percentage == 0 || percentage == 100) {
 		megatitle();
 	} else {
 		megatitle(" " + percentage + "%");

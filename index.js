@@ -81,6 +81,8 @@ function scrollMenu()
 
 function init_page()
 {		
+	if (typeof clearAds !== 'undefined') clearAds();	
+
 	if (window.stopBaboom) 
 	{
 		window.stopBaboom();
@@ -546,6 +548,12 @@ function init_page()
 			document.location.hash = 'help/sync';
 		});
 		
+		$('#syncanim').unbind('click');
+		$('#syncanim').bind('click',function(e)
+		{
+			document.location = 'https://mega.co.nz/MEGAsyncSetup.exe';
+		});
+		
 		if (typeof swiffy == 'undefined' && !silent_loading)
 		{
 			silent_loading=function()
@@ -555,12 +563,16 @@ function init_page()
 			jsl.push(jsl2['mads_js']);
 			jsl_start();
 		}
-		else startSync();
+		else startSync();		
 		
 		function startSync()
 		{
 			stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
-			stage.start();		
+			stage.start();
+			setTimeout(function()
+			{
+				$('#syncanim svg').css('cursor','pointer');
+			},500);
 		}
 	}
 	else if (page == 'mobile')

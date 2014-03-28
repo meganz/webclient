@@ -633,15 +633,15 @@ ulQueue.on('working', function() {
 });
 
 ulQueue.on('resume', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('pause', function() {
-	ul_uploading = false;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('drain', function() {
-	ul_uploading = false;
+	ul_uploading = !ulQueue.isEmpty();
 });
 // }}}
 

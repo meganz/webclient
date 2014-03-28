@@ -545,6 +545,23 @@ function init_page()
 		{
 			document.location.hash = 'help/sync';
 		});
+		
+		if (typeof swiffy == 'undefined' && !silent_loading)
+		{
+			silent_loading=function()
+			{
+				startSync();			
+			};
+			jsl.push(jsl2['mads_js']);
+			jsl_start();
+		}
+		else startSync();
+		
+		function startSync()
+		{
+			stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
+			stage.start();		
+		}
 	}
 	else if (page == 'mobile')
 	{

@@ -14876,7 +14876,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	display:block;
 }
 .ads-top-txt {
-	padding: 0 30px;
+	padding: 0 20px;
 	position: absolute;
 	font-size: 13px;
 	text-align: center;
@@ -14948,6 +14948,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+	cursor:pointer;
 }
 .ads-top-white-txt1 {
 	font-size: 30px;

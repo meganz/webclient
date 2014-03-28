@@ -1796,6 +1796,7 @@ function MegaData ()
 			
 		}
 		if (page == 'start') ulQueue.pause();
+		else openTransferpanel();
 	}
 
 	this.ulprogress = function(id, perc, bl,bt)

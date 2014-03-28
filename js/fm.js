@@ -939,7 +939,7 @@ function initContextUI()
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		
-		megatitle();
+		percent_megatitle();
 	});
 }
 

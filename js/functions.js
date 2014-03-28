@@ -651,3 +651,21 @@ function CreateWorkers(url, message, size) {
 	}, size);
 }
 
+function percent_megatitle()
+{
+	var percentage = 0
+		, total = 0
+
+	$('.transfer-table .progressbar-percents').each(function() {
+		percentage += parseInt($(this).text());
+		total++;
+	});
+	
+	percentage = Math.floor(percentage / total)
+
+	if (percentage == 0 || percentage == 100) {
+		megatitle();
+	} else {
+		megatitle(" " + percentage + "%");
+	}
+}

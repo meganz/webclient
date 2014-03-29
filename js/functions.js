@@ -694,10 +694,10 @@ function createNewXhr() {
 
 
 	xhr.upload.onprogress = function() {
-		if (!this.__busy) return;
-		checkTimeout(this);
-		if (!this.upload_progress) return;
-		return this.upload_progress.apply(this, arguments);
+		if (!xhr.__busy) return;
+		checkTimeout(xhr);
+		if (!xhr.upload_progress) return;
+		return xhr.upload_progress.apply(xhr, arguments);
 	}
 
 	xhr.onprogress = function() {

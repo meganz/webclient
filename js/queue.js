@@ -91,6 +91,7 @@ MegaQueue.prototype.getNextTask = function() {
 
 MegaQueue.prototype.process = function() {
 	var args;
+	if (this._paused) return;
 	clearTimeout(this._later);
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();

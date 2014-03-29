@@ -232,8 +232,7 @@ MegaQueue.prototype.push = function(arg, next) {
 
 	queue.prototype.process = function() {
 		var args, context;
-		if (!this._alive) return;
-
+		if (!this._alive || this._paused) return;
 		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {

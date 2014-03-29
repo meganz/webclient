@@ -5,8 +5,138 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 
+
+function Mads()
+{	
+	if ('fr-de-ms-be-bs-ca-cy-ee-eu-hr-lv-lt-ru-sl-mk-uk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-left-block .ads-bottom-block').css('padding-left','8px').css('padding-right','10px');	
+	}
+	if ('ms-bs-be-ca-cz-cy-eu-fr-hr-lv-lt-hu-pl-ru-ro-sk-bg-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','20px');
+	}
+	if ('uk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','18px');
+		$('.ads-top-notification .ads-top-white-txt2').css('font-size','13px');
+	}
+	if ('ms-de-eu-fr-hu-pt-ru-sk-bg-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-tablet .ads-top-txt').css('line-height','22px');
+	}	
+	if ('pt-ru-ro-sl-sk-tr-bg-mk-sr-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-right-block .ads-bottom-block,.ads-left-block .ads-bottom-block').css('padding-left','23px').css('padding-right','23px');		
+	}
+	if ('ru-ro-sl-sk-tr-bg-mk-'.indexOf(lang+'-') > -1)
+	{
+		$('.ads-laptop .sync-button-txt').css('font-size','13px');
+	}
+	
+	if (u_type)
+	{
+		$('.ads-top-arrow').hide();
+		$('.ads-top-notification').hide();	
+	}
+
+	$('body').addClass('ads');
+	if (typeof swiffy == 'undefined' && !silent_loading)
+	{
+		silent_loading=function()
+		{
+			startMads();			
+		};
+		jsl.push(jsl2['mads_js']);
+		jsl_start();
+	}
+	else startMads();
+}
+
+function startMads()
+{
+	adTime=new Date().getTime();
+	stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);	
+	ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
+	ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
+	ads3 = new swiffy.Stage(document.getElementById('tablet-app'), swiffyobject4);
+	ads4 = new swiffy.Stage(document.getElementById('ipad-app'), swiffyobject5);
+	ads5 = new swiffy.Stage(document.getElementById('phone-app'), swiffyobject6);	
+	stage.start();
+	ads1.start();
+	ads2.start();
+	ads2.start();
+	ads3.start();
+	ads4.start();
+	ads5.start();	
+	$('.ads-slides-button').unbind('click');
+	$('.ads-slides-button').bind('click',function()
+	{
+		if ($(this).attr('class').indexOf('active') == -1) 
+		{
+			showAd(this);
+		1}
+	});	
+	setTimeout(nextAd,10000);	
+	setTimeout(function()
+	{
+		$('.ads-svg-container svg').css('cursor','pointer');		
+		$('.ads-left-block .ads-svg-container svg').unbind('click');
+		$('.ads-left-block .ads-svg-container svg').bind('click',function()
+		{
+			document.location.hash = 'sync';
+		});		
+		$('.ads-top-notification').unbind('click');
+		$('.ads-top-notification').bind('click',function()
+		{
+			document.location.hash = 'register';
+		});		
+		$('.ads-laptop svg').unbind('click');
+		$('.ads-laptop svg').bind('click',function()
+		{
+			document.location.hash = 'chrome';
+		});
+		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').unbind('click');
+		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').bind('click',function()
+		{
+			document.location.hash = 'mobile';
+		});
+		
+		//1062
+	},500);
+}
+
+function showAd(el)
+{
+	adTime=new Date().getTime();
+	$('.ads-slides-block.active').fadeOut(50);
+	$('.ads-slides-block').removeClass('active');
+	var slideBlock = '#' + $(el).attr('id') + '-slide';
+	$(slideBlock).fadeIn(100);
+	$(slideBlock).addClass('active');
+	$(slideBlock).removeClass('hidden');
+	$('.ads-slides-button').removeClass('active');
+	$(el).addClass('active');
+	setTimeout(nextAd,10000);
+}
+
+function nextAd()
+{
+	if (new Date().getTime()-9900 > adTime)
+	{
+		var id = $('.ads-slides-button.active').attr('id');
+		if (!id) return false;
+		id = parseInt(id.replace('ads',''))+1;
+		if (id > 5) id=1;		
+		showAd($('.ads-slides-button#ads'+id)[0]);
+	}
+}
+
+
 function dlinfo(ph,key,next)
 {
+	if (!(u_attr && u_attr.p)) Mads();
+
 	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
 	{
@@ -51,12 +181,14 @@ function dl_g(res)
 		{
 			if ($(this).attr('class').indexOf('active') == -1) 
 			{
-				uldl_pause();
+				ulQueue.pause();
+				dlQueue.pause();
 				$(this).addClass('active');
 			}
 			else 
 			{
-				uldl_resume();
+				dlQueue.resume();
+				ulQueue.resume();
 				$(this).removeClass('active');
 			}					
 		});				

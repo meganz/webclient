@@ -66,7 +66,6 @@ function MegaData ()
 		this.sortfn = false;
 		this.sortd = false;
 		this.rendered = false;
-		this.currentdirid = false;
 		this.RootID=undefined;
 		this.RubbishID=undefined;
 		this.InboxID=undefined;
@@ -714,7 +713,7 @@ function MegaData ()
 		for (var i in a)
 		{
 			if (a[i] == this.RootID)
-			{				
+			{
 				if (folderlink && M.d[this.RootID])
 				{
 					name = htmlentities(M.d[this.RootID].name);
@@ -1620,8 +1619,7 @@ function MegaData ()
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
-				if ((!ul_uploading) && (perc == 100)) megatitle();
-				else if (!ul_uploading) megatitle(' ' + perc + '%');
+				percent_megatitle();
 
 				if (page.substr(0,2) !== 'fm')
 				{
@@ -1675,7 +1673,7 @@ function MegaData ()
 			setTimeout(fm_chromebar,500,$.dlheight);
 			setTimeout(fm_chromebar,1000,$.dlheight);
 		}
-		megatitle();
+		percent_megatitle();
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
@@ -1796,7 +1794,8 @@ function MegaData ()
 			ul_queue.push(f);			
 			
 		}
-		if (page !== 'start') openTransferpanel();
+		if (page == 'start') ulQueue.pause();
+		else openTransferpanel();
 	}
 
 	this.ulprogress = function(id, perc, bl,bt)
@@ -1821,8 +1820,7 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
-			if ((!ul_uploading) && (perc == 100)) megatitle();
-			else if (!ul_uploading) megatitle(' ' + perc + '%');
+			percent_megatitle();
 			$.transferHeader();
 
 			if (page.substr(0,2) !== 'fm')

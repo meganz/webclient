@@ -549,17 +549,16 @@ function initUI()
 }
 
 
-
 function openTransferpanel()
 {
 	$.transferOpen(1);
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
+	ulQueue.resume();
 	initTreeScroll();
 	$(window).trigger('resize');
 }
-
 
 function doAddContact(e,dialog)
 {	
@@ -940,7 +939,7 @@ function initContextUI()
 		delete $.su;
 		delete $.sd;
 		delete $.zipkill;		
-		megatitle();
+		percent_megatitle();
 	});
 }
 

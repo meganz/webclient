@@ -37,6 +37,7 @@ function startMega()
 	if (silent_loading)
 	{
 		silent_loading();
+		jsl=[];
 		silent_loading=false;
 		return false;
 	}
@@ -80,6 +81,8 @@ function scrollMenu()
 
 function init_page()
 {		
+	if (typeof clearAds !== 'undefined') clearAds();	
+
 	if (window.stopBaboom) 
 	{
 		window.stopBaboom();
@@ -385,8 +388,8 @@ function init_page()
 	}
 	else if (page.substr(0,4) == 'help')
 	{		
-			parsepage(pages['help']);
-			init_help();
+		parsepage(pages['help']);
+		init_help();
 	}
 	else if (page == 'privacy')
 	{
@@ -406,6 +409,27 @@ function init_page()
 		parsepage(pages['dev']);
 		dev_init('doc');
 	}
+	else if (page == 'backup' && !u_type)
+	{
+		login_next = page;
+		login_txt = l[1298];
+		document.location.hash = 'login';
+	}
+	else if (page == 'backup')
+	{
+		parsepage(pages['backup']);		
+		init_backup();
+	}
+	else if (page == 'recovery')
+	{
+		parsepage(pages['recovery']);		
+		init_recovery();
+	}
+	else if (page.substr(0,7) == 'recover' && page.length > 25)
+	{
+		parsepage(pages['reset']);		
+		init_reset();
+	}	
 	else if (page == 'sdkterms')
 	{
 		parsepage(pages['sdkterms']);		
@@ -523,6 +547,33 @@ function init_page()
 		{
 			document.location.hash = 'help/sync';
 		});
+		
+		$('#syncanim').unbind('click');
+		$('#syncanim').bind('click',function(e)
+		{
+			document.location = 'https://mega.co.nz/MEGAsyncSetup.exe';
+		});
+		
+		if (typeof swiffy == 'undefined' && !silent_loading)
+		{
+			silent_loading=function()
+			{
+				startSync();			
+			};
+			jsl.push(jsl2['mads_js']);
+			jsl_start();
+		}
+		else startSync();		
+		
+		function startSync()
+		{
+			stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
+			stage.start();
+			setTimeout(function()
+			{
+				$('#syncanim svg').css('cursor','pointer');
+			},500);
+		}
 	}
 	else if (page == 'mobile')
 	{
@@ -789,10 +840,12 @@ function tooltiplogin()
 
 function mLogout()
 {
-	$.dologout = function()
+	$.dologout = function(Quiet)
 	{
 		if ((fminitialized && downloading) || ul_uploading)
 		{
+			if(Quiet) return true;
+
 			msgDialog('confirmation',l[967],l[377] + ' ' + l[507]+'?',false,function(e)
 			{
 				if (e)
@@ -804,7 +857,12 @@ function mLogout()
 						ul_cancel();
 					}
 					resetUploadDownload();
-					$.dologout();
+					loadingDialog.show();
+					var t = setInterval(function() {
+						if(!$.dologout(!0)) {
+							clearInterval(t);
+						}
+					}, 200);
 				}
 			});
 		}
@@ -1249,6 +1307,7 @@ function is_fm()
 
 function parsepage(pagehtml,pp)
 {
+	$('body').removeClass('ads');
 	$('#fmholder').hide();
 	$('#pageholder').hide();
 	$('#startholder').hide();

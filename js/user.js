@@ -26,7 +26,7 @@ function u_login2(ctx,ks)
 	{
 		localStorage.wasloggedin = true;
 		u_logout();
-		u_storage = ctx.permanent ? localStorage : sessionStorage;
+		u_storage = init_storage( ctx.permanent ? localStorage : sessionStorage );
 		u_storage.k = JSON.stringify(ks[0]);
 		u_storage.sid = ks[1];
 		if (ks[2]) u_storage.privk = JSON.stringify(ks[2]);
@@ -147,7 +147,6 @@ function u_logout(logout)
 		a[i].removeItem('handle');
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
-		a[i].removeItem('v');
 	}
 
 	if (logout)

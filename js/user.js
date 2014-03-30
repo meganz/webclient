@@ -29,7 +29,7 @@ function u_login2(ctx,ks)
 		u_storage = init_storage( ctx.permanent ? localStorage : sessionStorage );
 		u_storage.k = JSON.stringify(ks[0]);
 		u_storage.sid = ks[1];
-		if (ks[2]) u_storage.privk = JSON.stringify(ks[2]);
+		if (ks[2]) u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
 		u_checklogin(ctx,false);
 	}
 	else ctx.checkloginresult(ctx,false);
@@ -121,7 +121,7 @@ function u_checklogin3a(res,ctx)
 
 		try {
 			u_k = JSON.parse(u_storage.k);
-			if (u_attr.privk) u_privk = JSON.parse(u_storage.privk);
+			if (u_attr.privk) u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));
 		} catch(e) {
 		}
 
@@ -188,7 +188,7 @@ function u_setrsa(rsakey)
 	        if (d) console.log("RSA key put result=" + res);
 
 	        u_privk = rsakey;
-	        u_storage.privk = JSON.stringify(rsakey);
+	        u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
 	        u_type = 3;
 
 	        ui_keycomplete();

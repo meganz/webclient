@@ -48,6 +48,7 @@ function genkey()
 
     var rsakey = asmCrypto.RSA.generateKey(bits,pexp);
     for ( var i = 0; i < rsakey.length; i++ ) {
+        if ( typeof rsakey[i] === 'number' ) rsakey[i] = (new asmCrypto.BigNumber(rsakey[i])).toBytes();
         rsakey[i] = asmCrypto.bytes_to_string(rsakey[i]);
     }
 

@@ -11,7 +11,7 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_chunksizes = []
 		, dl_writing
 		, dl_ack_write = function() {}
-		, chrome_write_error_msg = 20
+		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize

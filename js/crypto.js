@@ -1143,14 +1143,12 @@ function api_getsid2(res,ctx)
 				{
 					var t = base64urldecode(res.csid);
 
-					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res.privk)));
+					var privk = crypto_decodeprivkey( a32_to_str(decrypt_key(aes,base64_to_a32(res.privk))) );
 
-					var rsa_privk = crypto_decodeprivkey(privk);
-
-					if (rsa_privk)
+					if (privk)
 					{
 						// TODO: check remaining padding for added early wrong password detection likelihood
-						r = [k,base64urlencode(crypto_rsadecrypt(t,rsa_privk).substr(0,43)),rsa_privk];
+						r = [k,base64urlencode(crypto_rsadecrypt(t,privk).substr(0,43)),privk];
 					}
 				}
 			}
@@ -1382,23 +1380,6 @@ function api_setshare1(ctx)
 	api_req(ctx.req,ctx);
 }
 
-function api_setrsa(privk,pubk)
-{
-	ctx = { callback : function(res,ctx) {
-			if (d) console.log("RSA key put result=" + res);
-			
-			u_privk = ctx.privk;
-			u_storage.privk = JSON.stringify(u_privk);
-			u_type = 3;
-			
-			ui_keycomplete();
-		},
-		privk : privk
-	};
-		
-	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(crypto_encodeprivkey(t)))), pubk : base64urlencode(crypto_encodepubkey(pubk)) },ctx);
-}
-
 function crypto_handleauth(h)
 {
 	return a32_to_base64(encrypt_key(u_k_aes,str_to_a32(h+h)));
@@ -1406,94 +1387,118 @@ function crypto_handleauth(h)
 
 function crypto_encodepubkey(pubkey)
 {
-    return b2mpi(pubkey[0]) + b2mpi(pubkey[1]);
+    var mlen = pubkey[0].length * 8,
+        elen = pubkey[1].length * 8;
+
+    return String.fromCharCode(mlen/256)+String.fromCharCode(mlen%256) + pubkey[0]
+         + String.fromCharCode(elen/256)+String.fromCharCode(elen%256) + pubkey[1];
 }
 
 function crypto_decodepubkey(pubk)
 {
-	var pubkey = Array(3);
+	var pubkey = [];
 
 	var keylen = pubk.charCodeAt(0)*256+pubk.charCodeAt(1);
 
 	// decompose public key
 	for (var i = 0; i < 2; i++)
 	{
-		var l = ((pubk.charCodeAt(0)*256+pubk.charCodeAt(1)+7)>>3)+2;
+		if (pubk.length < 2) break;
 
-		pubkey[i] = mpi2b(pubk.substr(0,l));
-		if (typeof pubkey[i] == 'number') break;
-		pubk = pubk.substr(l);
+		var l = (pubk.charCodeAt(0)*256+pubk.charCodeAt(1)+7)>>3;
+		if (l > pubk.length-2) break;
+
+		pubkey[i] = pubk.substr(2,l);
+		pubk = pubk.substr(l+2);
 	}
 
 	// check format
-	if (i == 2 && pubk.length < 16)
-	{
-		pubkey[2] = keylen;
-		return pubkey;
-	}
-	return false;
+	if (i !== 2 || pubk.length >= 16) return false;
+
+	pubkey[2] = keylen;
+
+	return pubkey;
 }
 
 function crypto_encodeprivkey(privk)
 {
-    var t = '', i;
+    var plen = privk[3].length * 8,
+        qlen = privk[4].length * 8,
+        dlen = privk[2].length * 8,
+        ulen = privk[7].length * 8;
 
-	for (i = 0; i < privk.length; i++) t += b2mpi(privk[i]);
+    var t = String.fromCharCode(qlen/256)+String.fromCharCode(qlen%256) + privk[4]
+          + String.fromCharCode(plen/256)+String.fromCharCode(plen%256) + privk[3]
+          + String.fromCharCode(dlen/256)+String.fromCharCode(dlen%256) + privk[2]
+          + String.fromCharCode(ulen/256)+String.fromCharCode(ulen%256) + privk[7];
 
-	for (i = (-t.length)&15; i--; ) t += String.fromCharCode(rand(256));
+	while ( t.length & 15 ) t += String.fromCharCode(rand(256));
 
     return t;
 }
 
 function crypto_decodeprivkey(privk)
 {
-    var privkey = Array(4);
+    var privkey = [];
 
     // decompose private key
     for (var i = 0; i < 4; i++)
     {
-	    var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
+		if (privk.length < 2) break;
 
-	    privkey[i] = mpi2b(privk.substr(0,l));
-	    if (typeof privkey[i] == 'number') break;
-	    privk = privk.substr(l);
+		var l = (privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3;
+		if (l > privk.length-2) break;
+
+	    privkey[i] = new asmCrypto.BigNumber( privk.substr(2,l) );
+	    privk = privk.substr(l+2);
     }
 
     // check format
-    if (i == 4 && privk.length < 16)
-    {
-	    // TODO: check remaining padding for added early wrong password detection likelihood
-	    return privkey;
+    if (i !== 4 || privk.length >= 16) return false;
+
+    // TODO: check remaining padding for added early wrong password detection likelihood
+
+    // restore privkey components via the known ones
+    var q = privkey[0], p = privkey[1], d = privkey[2], u = privkey[3],
+        q1 = q.subtract(1), p1 = p.subtract(1),
+        m = new asmCrypto.Modulus( p.multiply(q) ),
+        e = new asmCrypto.Modulus( p1.multiply(q1) ).inverse(d),
+        dp = d.divide(p1).remainder,
+        dq = d.divide(q1).remainder;
+
+    privkey = [ m, e, d, p, q, dp, dq, u ];
+    for (i = 0; i < privkey.length; i++) {
+        privkey[i] = asmCrypto.bytes_to_string( privkey[i].toBytes() );
     }
 
-    return false;
+    return privkey;
 }
 
 // encrypts cleartext string to the supplied pubkey
 // returns string representing an MPI-formatted big number
 function crypto_rsaencrypt(cleartext,pubkey)
 {
-	var i;
-	
 	// random padding
-	for (i = (pubkey[2]>>3)-1-cleartext.length; i-- > 0; ) cleartext = cleartext+String.fromCharCode(rand(256));
+	for (var i = (pubkey[0].length)-1-cleartext.length; i-- > 0; ) cleartext += String.fromCharCode(rand(256));
 
-	i = cleartext.length*8;
-	cleartext = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + cleartext;
+    var ciphertext = asmCrypto.bytes_to_string( asmCrypto.RSA.encrypt(cleartext,pubkey) );
 
-	return b2mpi(RSAencrypt(mpi2b(cleartext),pubkey[1],pubkey[0]));
+    var clen = ciphertext.length * 8;
+    ciphertext = String.fromCharCode(clen/256)+String.fromCharCode(clen%256) + ciphertext;
+
+    return ciphertext;
 }
 
 // decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
 // returns cleartext string
 function crypto_rsadecrypt(ciphertext,privkey)
 {
-	var l = ((privkey[2].length*28-1)>>5<<2)-2;
-	var c = b2s(RSAdecrypt(mpi2b(ciphertext),privkey[2],privkey[0],privkey[1],privkey[3]));
+    var l = (ciphertext.charCodeAt(0)*256+ciphertext.charCodeAt(1)+7)>>3;
+    ciphertext = ciphertext.substr(2,l);
 
-	if (c.length < l) c = new Array(l-c.length+1).join(String.fromCharCode(0))+c;
-	
-	return c;
+    var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA.decrypt(ciphertext,privkey) );
+
+	return cleartext.substr(1);
 }
 
 // Complete upload

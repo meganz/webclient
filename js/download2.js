@@ -195,15 +195,15 @@ dlQueue.on('working', function() {
 });
 
 dlQueue.on('resume', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = true;
 });
 
 dlQueue.on('pause', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = true;
 });
 
 dlQueue.on('drain', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = false;
 });
 // }}}
 

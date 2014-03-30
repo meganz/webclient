@@ -449,30 +449,30 @@ function ul_finalize(file) {
 	}, file.target || M.RootID);	
 }
 
+function ul_updateprogress(file) {
+	var tp = file.sent || 0
+	if (ulQueue.isPaused()) return;
+	$.each(file.progress, function(i, p) {
+		tp += p;
+	});
+	onUploadProgress(file.pos, Math.floor(tp/file.size*100), tp, file.size);
+}
+
 function ul_chunk_upload(chunk, file, done) {
 	var xhr = getXhrObject();
-	function ul_updateprogress() {
-		var tp = file.sent || 0
-		if (ulQueue.isPaused()) return;
-		$.each(file.progress, function(i, p) {
-			tp += p;
-		});
-		onUploadProgress(file.pos, Math.floor(tp/file.size*100), tp, file.size);
-	}
-
 	xhr.upload_progress = function(e) {
 		if (chunk.task.abort) {
 			xhr.abort();
 			return done();
 		}
 		file.progress[chunk.start] = e.loaded
-		ul_updateprogress();
+		ul_updateprogress(file);
 	};
 
 	xhr.failure = function() {
 		if (chunk.task.abort) return;
 		file.progress[chunk.start] = 0;
-		ul_updateprogress();
+		ul_updateprogress(file);
 		done(); /* release worker */
 		UploadManager.retry(file, chunk, "xhr failed");
 		xhr = null;
@@ -491,7 +491,7 @@ function ul_chunk_upload(chunk, file, done) {
 				delete chunk.bytes;
 				delete chunk;
 				DEBUG("done", chunk.__tid);
-				ul_updateprogress();
+				ul_updateprogress(file);
 
 				if (response.length == 27) {
 					var t = [], ul_key = file.ul_key
@@ -650,15 +650,15 @@ ulQueue.on('working', function() {
 });
 
 ulQueue.on('resume', function() {
-	ul_uploading = !ulQueue.isEmpty();
+	ul_uploading = true;
 });
 
 ulQueue.on('pause', function() {
-	ul_uploading = !ulQueue.isEmpty();
+	ul_uploading = true;
 });
 
 ulQueue.on('drain', function() {
-	ul_uploading = !ulQueue.isEmpty();
+	ul_uploading = false;
 });
 // }}}
 

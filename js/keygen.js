@@ -47,10 +47,8 @@ function genkey()
     var startTime = new Date();
 
     var rsakey = asmCrypto.RSA.generateKey(bits,pexp);
-    for ( var i = 0; i < rsakey.length; i++ ) {
-        if ( typeof rsakey[i] === 'number' ) rsakey[i] = (new asmCrypto.BigNumber(rsakey[i])).toBytes();
-        rsakey[i] = asmCrypto.bytes_to_string(rsakey[i]);
-    }
+    if ( typeof rsakey[1] === 'number' ) rsakey[1] = asmCrypto.hex_to_bytes( rsakey[1].toString(16) ); // fix exponent
+    for ( var i = 0; i < rsakey.length; i++ ) rsakey[i] = asmCrypto.bytes_to_string( rsakey[i] );
 
 	var endTime = new Date();
 

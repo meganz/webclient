@@ -628,17 +628,22 @@ function CreateWorkers(url, message, size) {
 		}
 	}
 
-	for (var i = 0; i < size; i++) {
+	function create(i) {
 		var w  = new Worker(url);
 		w.id   = i;
 		w.busy = false;
 		w.postMessage = w.webkitPostMessage || w.postMessage;
 		w.onmessage   = handler(i);
-		worker.push(w);
+		return w;
+	}
+
+	for (var i = 0; i < size; i++) {
+		worker.push(null);
 	}
 
 	return new MegaQueue(function(task, scheduler) {
 		for (var i = 0; i < size; i++) {
+			if (worker[i] === null) worker[i] = create(i);
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;

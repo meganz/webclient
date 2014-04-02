@@ -11,7 +11,7 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_writing
 		, dl_position = 0
 		, dl_buffer
-		, chrome_write_error_msg = 20
+		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize

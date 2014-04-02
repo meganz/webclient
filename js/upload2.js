@@ -431,9 +431,12 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 		this.upload, 
 		this
 	);
+
+	this.bytes = null;
 };
 
 ChunkUpload.prototype.done = function() {
+	DEBUG("release", this.start);
 	/* release worker */
 	this._done();
 

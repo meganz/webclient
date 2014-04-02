@@ -309,25 +309,139 @@ function ul_start(File) {
 
 function ChunkUpload(file, start, end)
 {
-	var self = this;
 	this.file = file;
 	this.ul   = file;
-
-	this.run = function(Job) {
-		var chunk = { start: start, end: end, task: this}
-	
-		file.ul_reader.push(chunk, function(task, args) {
-			if (args[0]) {
-				DEBUG("IO error");
-				file.done_starting();
-				return UploadManager.retry(file, chunk, Job, args[0])
-			}
-			Encrypter.push([[file, chunk, start], file.ul_keyNonce, start/16, chunk.bytes], function() {
-				ul_chunk_upload(chunk, file, Job);
-			});
-		});
-	}
+	this.start = start;
+	this.end	= end;
 }
+
+ChunkUpload.updateprogress = function() {
+	var tp = this.file.sent || 0
+	if (ulQueue.isPaused()) return;
+	$.each(this.file.progress, function(i, p) {
+		tp += p;
+	});
+
+	onUploadProgress(
+		this.file.pos, 
+		Math.min(Math.floor(tp/file.size*100), 99), 
+		tp, 
+		this.file.size
+	);
+};
+
+ChunkUpload.prototype.upload = function() {
+	var xhr = getXhrObject()
+		, self = this
+
+	xhr.upload_progress = function(e) {
+		if (self.file.abort) {
+			xhr.abort();
+			return self.done();
+		}
+		file.progress[self.start] = e.loaded
+		self.updateprogress();
+	};
+
+	xhr.failure = function() {
+		if (self.file.abort) return;
+		file.progress[self.start] = 0;
+		self.updateprogress();
+		UploadManager.retry(self, "xhr failed");
+		xhr = null;
+	}
+
+	xhr.ready = function(e) {
+		if (this.status == 200 && typeof this.response == 'string' && this.statusText == 'OK') {
+			var response = this.response
+			if (response.length > 27) {
+				response = base64urldecode(response);
+			}
+
+			if (!response.length || response == 'OK' || response.length == 27) {
+				file.sent += self.bytes.buffer.length || self.bytes.length;
+				delete file.progress[self.start];
+				self.updateprogress();
+
+				if (response.length == 27) {
+					var t = [], ul_key = self.file.ul_key
+					for (p in file.ul_macs) t.push(p);
+					t.sort(function(a,b) { return parseInt(a)-parseInt(b) });
+					for (var i = 0; i < t.length; i++) t[i] = file.ul_macs[t[i]];
+					var mac = condenseMacs(t, self.file.ul_key);
+
+					var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
+					
+					if (u_k_aes && !file.ul_completing) {
+						var ctx = { 
+							size: file.size,
+							ul_queue_num : file.pos,
+							callback : ul_completepending2,
+							faid : file.faid
+						};
+						file.ul_completing = true;
+						file.filekey       = filekey
+						file.response      = base64urlencode(response)
+						ul_finalize(file);
+						//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+					} else {
+						file.completion.push([
+							response.url, file, filekey, file.pos
+						]);
+					}
+				}
+				return self.done();
+
+			} else { 
+				DEBUG("Invalid upload response: " + response);
+				if (response != EKEY) return xhr.failure(EKEY)
+			}
+
+		}
+
+		return xhr.failure();
+	};
+
+	DEBUG("pushing", self.file.posturl + self.suffix)
+	if (chromehack) {
+		var data8 = new Uint8Array(self.bytes.buffer);
+		var send8 = new Uint8Array(self.bytes.buffer, 0, data8.length);
+		send8.set(data8);
+
+		var t = self.file.posturl.lastIndexOf('/ul/');
+		xhr.open('POST', self.file.posturl.substr(0,t+1));
+		xhr.setRequestHeader("MEGA-Chrome-Antileak", self.file.posturl.substr(t)+self.suffix);
+		xhr.send(send8);
+	} else {
+		xhr.open('POST', self.file.posturl+self.suffix);
+		xhr.send(self.bytes.buffer);
+	}
+};
+
+ChunkUpload.prototype.io_ready = function(task, args) {
+	if (args[0]) {
+		DEBUG("IO error");
+		this.file.done_starting();
+		return UploadManager.retry(file, chunk, Job, args[0])
+	}
+
+	Encrypter.push([this, this.file.ul_keyNonce, this.start/16, this.bytes], this.upload);
+};
+
+ChunkUpload.prototype.done = function() {
+	/* release worker */
+	this._done();
+
+	/* clean up references */
+	this.bytes = null;
+	this.file  = null;
+	this.ul    = null;
+};
+
+ChunkUpload.prototype.run = function(done) {
+	this._done = done;
+	this.file.ul_reader.push(this, this.io_ready);
+};
 
 function FileUpload(file) {
 	var self = this;
@@ -454,99 +568,6 @@ function ul_finalize(file) {
 }
 
 function ul_chunk_upload(chunk, file, Job) {
-	var xhr = getXhrObject();
-	function ul_updateprogress() {
-		var tp = file.sent || 0
-		if (ulQueue.isPaused()) return;
-		$.each(file.progress, function(i, p) {
-			tp += p;
-		});
-		onUploadProgress(file.pos, Math.min(Math.floor(tp/file.size*100), 99), tp, file.size);
-	}
-
-	xhr.upload_progress = function(e) {
-		if (chunk.task.abort) {
-			xhr.abort();
-			return Job.done();
-		}
-		file.progress[chunk.start] = e.loaded
-		ul_updateprogress();
-	};
-
-	xhr.failure = function() {
-		if (chunk.task.abort) return;
-		file.progress[chunk.start] = 0;
-		ul_updateprogress();
-		UploadManager.retry(file, chunk, Job, "xhr failed");
-		xhr = null;
-	}
-
-	xhr.ready = function(e) {
-		if (this.status == 200 && typeof this.response == 'string' && this.statusText == 'OK') {
-			var response = this.response
-			if (response.length > 27) {
-				response = base64urldecode(response);
-			}
-
-			if (!response.length || response == 'OK' || response.length == 27) {
-				file.sent += chunk.bytes.buffer.length || chunk.bytes.length;
-				delete file.progress[chunk.start];
-				DEBUG("done", chunk.__tid);
-				ul_updateprogress();
-
-				if (response.length == 27) {
-					var t = [], ul_key = file.ul_key
-					for (p in file.ul_macs) t.push(p);
-					t.sort(function(a,b) { return parseInt(a)-parseInt(b) });
-					for (var i = 0; i < t.length; i++) t[i] = file.ul_macs[t[i]];
-					var mac = condenseMacs(t, file.ul_key);
-
-					var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
-					
-					if (u_k_aes && !file.ul_completing) {
-						var ctx = { 
-							size: file.size,
-							ul_queue_num : file.pos,
-							callback : ul_completepending2,
-							faid : file.faid
-						};
-						file.ul_completing = true;
-						file.filekey       = filekey
-						file.response      = base64urlencode(response)
-						ul_finalize(file);
-						//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
-					} else {
-						file.completion.push([
-							response.url, file, filekey, file.pos
-						]);
-					}
-				}
-				return Job.done();
-
-			} else { 
-				DEBUG("Invalid upload response: " + response);
-				if (response != EKEY) return xhr.failure(EKEY)
-			}
-
-		}
-
-		return xhr.failure();
-	};
-
-	DEBUG("pushing", file.posturl + chunk.suffix)
-	if (chromehack) {
-		var data8 = new Uint8Array(chunk.bytes.buffer);
-		var send8 = new Uint8Array(chunk.bytes.buffer, 0, data8.length);
-		send8.set(data8);
-
-		var t = file.posturl.lastIndexOf('/ul/');
-		xhr.open('POST', file.posturl.substr(0,t+1));
-		xhr.setRequestHeader("MEGA-Chrome-Antileak", file.posturl.substr(t)+chunk.suffix);
-		xhr.send(send8);
-	} else {
-		xhr.open('POST', file.posturl+chunk.suffix);
-		xhr.send(chunk.bytes.buffer);
-	}
 }
 
 function ul_filereader(fs, file) {
@@ -596,16 +617,14 @@ var ul_queue  = new UploadQueue
 	, ul_dom = []
 
 Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
-	var file = context[0]
-		, chunk = context[1]
-		, start = context[2]
+	var file = context.file
 
 	if (typeof e.data == 'string') {
-		if (e.data[0] == '[') file.ul_macs[start] = JSON.parse(e.data);
+		if (e.data[0] == '[') context.file.ul_macs[start] = JSON.parse(e.data);
 		else DEBUG('WORKER:', e.data);
 	} else {
-		chunk.bytes = new Uint8Array(e.data.buffer || e.data);
-		chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
+		context.bytes = new Uint8Array(e.data.buffer || e.data);
+		context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
 		done();
 	}
 }, 4);

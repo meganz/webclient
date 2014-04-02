@@ -619,7 +619,7 @@ function CreateWorkers(url, message, size) {
 		return function(e) {
 			message(this.context, e, function(r) {
 				worker[id].busy = false; /* release worker */
-				instances[id].done(r);
+				instances[id](r);
 
 				/* cleanup memory */
 				worker[id].context = null;
@@ -637,7 +637,7 @@ function CreateWorkers(url, message, size) {
 		worker.push(w);
 	}
 
-	return new QueueClass(function(task, scheduler) {
+	return new MegaQueue(function(task, scheduler) {
 		for (var i = 0; i < size; i++) {
 			if (!worker[i].busy) break;
 		}

@@ -15,8 +15,8 @@ MegaQueue.prototype.isEmpty = function() {
 		&& this._queue.length == 0;
 }
 
-MegaQueue.prototype.pushFirst = function(arg, next) {
-    this._queue.push([arg, next || function() {}]);
+MegaQueue.prototype.pushFirst = function(arg, next, self) {
+    this._queue.push([arg, next || function() {}, self]);
 };
 
 MegaQueue.prototype.resume = function() {
@@ -64,9 +64,10 @@ MegaQueue.prototype.run_in_context = function(task) {
 	var self = this;
 	self._running++
 	this._worker(task[0], function() {
-        task[1].apply(null, [task[0], arguments]);
+        task[1].apply(task[2], [task[0], arguments]);
 		task[0] = null;
 		task[1] = null;
+		task[2] = null;
 		self._running--;
         self._process();
 		self = null;
@@ -119,8 +120,8 @@ MegaQueue.prototype._process = function() {
 	}, 0, this);
 };
 
-MegaQueue.prototype.push = function(arg, next) {
-    this._queue.push([arg, next || function() {}]);
+MegaQueue.prototype.push = function(arg, next, self) {
+    this._queue.push([arg, next || function() {}, self || null]);
     this._process();
 };
 

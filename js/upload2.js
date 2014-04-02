@@ -309,7 +309,7 @@ function ChunkUpload(file, start, end)
 	this.end	= end;
 }
 
-ChunkUpload.updateprogress = function() {
+ChunkUpload.prototype.updateprogress = function() {
 	var tp = this.file.sent || 0
 	if (ulQueue.isPaused()) return;
 	$.each(this.file.progress, function(i, p) {
@@ -318,7 +318,7 @@ ChunkUpload.updateprogress = function() {
 
 	onUploadProgress(
 		this.file.pos, 
-		Math.min(Math.floor(tp/file.size*100), 99), 
+		Math.min(Math.floor(tp/this.file.size*100), 99), 
 		tp, 
 		this.file.size
 	);
@@ -328,23 +328,28 @@ ChunkUpload.prototype.upload = function() {
 	var xhr = getXhrObject()
 		, self = this
 
+	// upload_progress {{{
 	xhr.upload_progress = function(e) {
 		if (self.file.abort) {
 			xhr.abort();
 			return self.done();
 		}
-		file.progress[self.start] = e.loaded
+		self.file.progress[self.start] = e.loaded
 		self.updateprogress();
 	};
+	// }}}
 
+	// failure {{{
 	xhr.failure = function() {
 		if (self.file.abort) return;
-		file.progress[self.start] = 0;
+		self.file.progress[self.start] = 0;
 		self.updateprogress();
 		UploadManager.retry(self, "xhr failed");
 		xhr = null;
 	}
+	// }}}
 
+	// ready {{{
 	xhr.ready = function(e) {
 		if (this.status == 200 && typeof this.response == 'string' && this.statusText == 'OK') {
 			var response = this.response
@@ -353,34 +358,34 @@ ChunkUpload.prototype.upload = function() {
 			}
 
 			if (!response.length || response == 'OK' || response.length == 27) {
-				file.sent += self.bytes.buffer.length || self.bytes.length;
-				delete file.progress[self.start];
+				self.file.sent += self.bytes.buffer.length || self.bytes.length;
+				delete self.file.progress[self.start];
 				self.updateprogress();
 
 				if (response.length == 27) {
 					var t = [], ul_key = self.file.ul_key
-					for (p in file.ul_macs) t.push(p);
+					for (p in self.file.ul_macs) t.push(p);
 					t.sort(function(a,b) { return parseInt(a)-parseInt(b) });
-					for (var i = 0; i < t.length; i++) t[i] = file.ul_macs[t[i]];
+					for (var i = 0; i < t.length; i++) t[i] = self.file.ul_macs[t[i]];
 					var mac = condenseMacs(t, self.file.ul_key);
 
 					var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
 					
-					if (u_k_aes && !file.ul_completing) {
+					if (u_k_aes && !self.file.ul_completing) {
 						var ctx = { 
-							size: file.size,
-							ul_queue_num : file.pos,
+							size: self.file.size,
+							ul_queue_num : self.file.pos,
 							callback : ul_completepending2,
-							faid : file.faid
+							faid : self.file.faid
 						};
-						file.ul_completing = true;
-						file.filekey       = filekey
-						file.response      = base64urlencode(response)
-						ul_finalize(file);
+						self.file.ul_completing = true;
+						self.file.filekey       = filekey
+						self.file.response      = base64urlencode(response)
+						ul_finalize(self.file);
 						//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
 					} else {
-						file.completion.push([
-							response.url, file, filekey, file.pos
+						self.file.completion.push([
+							response.url, self.file, filekey, self.file.pos
 						]);
 					}
 				}
@@ -395,8 +400,10 @@ ChunkUpload.prototype.upload = function() {
 
 		return xhr.failure();
 	};
+	// }}}
 
 	DEBUG("pushing", self.file.posturl + self.suffix)
+
 	if (chromehack) {
 		var data8 = new Uint8Array(self.bytes.buffer);
 		var send8 = new Uint8Array(self.bytes.buffer, 0, data8.length);
@@ -419,7 +426,11 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 		return UploadManager.retry(file, chunk, Job, args[0])
 	}
 
-	Encrypter.push([this, this.file.ul_keyNonce, this.start/16, this.bytes], this.upload);
+	Encrypter.push(
+		[this, this.file.ul_keyNonce, this.start/16, this.bytes], 
+		this.upload, 
+		this
+	);
 };
 
 ChunkUpload.prototype.done = function() {
@@ -434,7 +445,7 @@ ChunkUpload.prototype.done = function() {
 
 ChunkUpload.prototype.run = function(done) {
 	this._done = done;
-	this.file.ul_reader.push(this, this.io_ready);
+	this.file.ul_reader.push(this, this.io_ready, this);
 };
 
 function FileUpload(file) {
@@ -612,7 +623,7 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	var file = context.file
 
 	if (typeof e.data == 'string') {
-		if (e.data[0] == '[') context.file.ul_macs[start] = JSON.parse(e.data);
+		if (e.data[0] == '[') context.file.ul_macs[context.start] = JSON.parse(e.data);
 		else DEBUG('WORKER:', e.data);
 	} else {
 		context.bytes = new Uint8Array(e.data.buffer || e.data);

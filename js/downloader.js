@@ -356,6 +356,7 @@ function ClassFile(dl) {
 					run: function(Scheduler) {
 						dl.io.write("", 0, function() {
 							Scheduler.done();	
+							dl.ready(); /* tell the download scheduler we're done */
 						});
 					}
 				});

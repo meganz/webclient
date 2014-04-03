@@ -548,11 +548,20 @@ function init_page()
 			document.location.hash = 'help/sync';
 		});
 		
+		
 		$('#syncanim').unbind('click');
 		$('#syncanim').bind('click',function(e)
 		{
-			document.location = 'https://mega.co.nz/MEGAsyncSetup.exe';
+			$('.sync-button').click();
 		});
+		
+		
+		/*
+		$('#syncanim').css('height','');
+		$('#syncanim').css('width','');		
+		$('#syncanim').addClass('sync-main-img');
+		*/
+		
 		
 		if (typeof swiffy == 'undefined' && !silent_loading)
 		{
@@ -574,6 +583,7 @@ function init_page()
 				$('#syncanim svg').css('cursor','pointer');
 			},500);
 		}
+	
 	}
 	else if (page == 'mobile')
 	{

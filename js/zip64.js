@@ -127,6 +127,9 @@ function dlZipIO(dl, dl_id) {
 			$.each(dirData, function(key, value) {
 				doWrite(value);
 			});
+			
+			delete GlobalProgress['zip_' + dl.zipid];
+
 			doWrite(end, function() {
 				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);

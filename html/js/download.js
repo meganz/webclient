@@ -53,8 +53,6 @@ function Mads()
 	else startMads();
 }
 
-var adTime,ads1,ads2,ads3,ads4,ads5,stage,swiffyobject;
-
 function startMads()
 {
 	adTime=new Date().getTime();

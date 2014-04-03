@@ -92,7 +92,7 @@ var DownloadManager = new function() {
 				self.abort(file);
 			}
 		});
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.abort = function(pattern, dontCleanUI) {
@@ -113,7 +113,7 @@ var DownloadManager = new function() {
 		}
 
 		self.remove(_pattern);
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.remove = function(pattern, check) {
@@ -200,15 +200,15 @@ dlQueue.on('working', function() {
 });
 
 dlQueue.on('resume', function() {
-	downloading = true;
+	downloading = !dlQueue.isEmpty();
 });
 
 dlQueue.on('pause', function() {
-	downloading = false;
+	downloading = !dlQueue.isEmpty();
 });
 
 dlQueue.on('drain', function() {
-	downloading = false;
+	downloading = !dlQueue.isEmpty();
 });
 // }}}
 

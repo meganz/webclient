@@ -149,6 +149,7 @@ MegaQueue.prototype.push = function(arg, next, self) {
 		this.task = args;
 		this.reschedule = function() {
 			var callback = queue._callback[args.__tid];
+			delete queue._callback[args.__tid];
 			this.done();
 			setTimeout(function() {
 				queue.pushFirst(args, callback);

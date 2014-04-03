@@ -148,7 +148,10 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
-					download.decrypt.push({offset: task.offset, data: new Uint8Array(r)});
+
+					download.decrypter++;
+					Decrypter.push([[download, task.offset], download.nonce, task.offset/16, new Uint8Array(r)])
+
 					if (failed) DownloadManager.release(self);
 					r = null;
 					failed = false;
@@ -260,6 +263,7 @@ function ClassFile(dl) {
 					run: function(done) {
 						dl.io.write("", 0, function() {
 							task_done();	
+							dl.ready(); /* tell the download scheduler we're done */
 						});
 					}
 				});
@@ -267,12 +271,10 @@ function ClassFile(dl) {
 
 			function free() {
 				/* release memory */
-				dl.decrypt.destroy();
 				dl.writer.destroy();
 				XDESTROY(dl.io);
 				XDESTROY(dl);
 				dl.io		= null;
-				dl.decrypt	= null;
 				dl.writer	= null;
 				dl.ready	= null;
 				dl			= null;
@@ -284,16 +286,18 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
-				DEBUG('check is download is empty', chunkFinished, dl.writer.isEmpty(), dl.decrypt.isEmpty())
 				DEBUG('is cancelled?', dl.cancelled)
-				if (chunkFinished && dl.writer.isEmpty() && dl.decrypt.isEmpty()) {
+				if (chunkFinished && dl.writer.isEmpty() && dl.decrypter == 0) {
 					if (dl.cancelled) return free();
 					if (!emptyFile && !checkLostChunks(dl)) {
 						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
+
 					if (dl.zipid) {
 						return  Zips[dl.zipid].done();
 					}
+					
+					delete GlobalProgress['file_' + dl.dl_id];
 
 					dl.onDownloadProgress(
 						dl.dl_id,
@@ -346,17 +350,14 @@ function ClassFile(dl) {
 
 }
 // }}}
-function dl_decrypt(dl) {
-	dl.decrypt = new MegaQueue(function(task, done) {
-		Decrypter.push([[dl, task.offset], dl.nonce, task.offset/16, task.data], function() {
-			done();
-		});
-	}, 4);
-}
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };
+
+	dl.decrypter = 0;
+
 	dl.writer = new MegaQueue(function (task, done) {
+		var Scheduler = this;
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
 			if (dl.data) {
@@ -403,6 +404,7 @@ var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
 	} else {
 		var plain = new Uint8Array(e.data.buffer || e.data);
 		DEBUG("Decrypt done", dl.cancelled);
+		dl.decrypter--;
 		if (!dl.cancelled) {
 			dl.writer.push({ data: plain, offset: offset});
 		}

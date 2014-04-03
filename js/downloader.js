@@ -237,6 +237,7 @@ function ClassChunk(task) {
 					if (navigator.appName != 'Opera') {
 						io.dl_bytesreceived += r.byteLength;
 					}
+					download.decrypter++
 					Decrypter.push([[download, task.offset], download.nonce, task.offset/16, new Uint8Array(r)]);
 					if (failed) DownloadManager.release(self);
 					failed = false;
@@ -484,7 +485,7 @@ var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
 	} else {
 		var plain = new Uint8Array(e.data.buffer || e.data);
 		DEBUG("Decrypt done", dl.cancelled);
-		dl.decrypter = 0;
+		dl.decrypter--
 		if (!dl.cancelled) {
 			dl.writer.push({ data: plain, offset: offset});
 		}

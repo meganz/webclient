@@ -364,14 +364,20 @@ function ClassFile(dl) {
 
 			var chunkFinished = false
 			dl.ready = function() {
-				if (chunkFinished && dl.writer.isEmpty() && Decrypter.isEmpty()) {
+				DEBUG('db.ready', dl.dl_id, chunkFinished, dl.writer.isEmpty(), dl.decrypter)
+				if (chunkFinished && dl.writer.isEmpty() && dl.decrypter == 0) {
 					if (dl.cancelled) return;
 					if (!emptyFile && !checkLostChunks(dl)) {
 						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
+
+					dl.writer.Destroy()
+
 					if (dl.zipid) {
 						return Zips[dl.zipid].done();
 					}
+					
+					delete GlobalProgress['file_' + dl.dl_id];
 
 					dl.onDownloadProgress(
 						dl.dl_id,
@@ -423,6 +429,9 @@ function ClassFile(dl) {
 
 function dl_writer(dl, is_ready) {
 	is_ready = is_ready || function() { return true; };
+
+	dl.decrypter = 0;
+
 	dl.writer = new QueueClass(function (task) {
 		var Scheduler = this;
 		dl.io.write(task.data, task.offset, function() {
@@ -475,6 +484,7 @@ var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
 	} else {
 		var plain = new Uint8Array(e.data.buffer || e.data);
 		DEBUG("Decrypt done", dl.cancelled);
+		dl.decrypter = 0;
 		if (!dl.cancelled) {
 			dl.writer.push({ data: plain, offset: offset});
 		}

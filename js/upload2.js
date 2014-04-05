@@ -389,6 +389,9 @@ ChunkUpload.prototype.upload = function() {
 						]);
 					}
 				}
+
+				self.bytes = null;
+
 				return self.done();
 
 			} else { 

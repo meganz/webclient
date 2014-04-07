@@ -1,5 +1,5 @@
 /**
- * This is an example of how to use the onSendMessage to alter messages before they are actually sent.
+ * This is an example of how to use the onOutgoingMessage to alter messages before they are actually sent.
  *
  * @param megaChat
  * @returns {CapslockFilterDemo}
@@ -12,7 +12,7 @@ var CapslockFilterDemo = function(megaChat) {
     /**
      * This event is thrown before the message sent to the XMPP
      */
-    megaChat.bind("onSendMessage", function(e, eventData) {
+    megaChat.bind("onOutgoingMessage", function(e, eventData) {
         self.processMessage(e, eventData);
     });
 

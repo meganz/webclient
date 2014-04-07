@@ -376,8 +376,9 @@ else
         jsl.push({f:'js/chat/urlFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/capslockFilterDemo.js', n: 'mega_js', j:1,w:7});
 
+
+        jsl.push({f:'js/chat/karereEventObjects.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/karere.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/chat.js', n: 'mega_js', j:1,w:7});
         // END OF MEGA CHAT

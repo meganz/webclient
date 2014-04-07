@@ -15,6 +15,7 @@ module.exports = function(config) {
 //             "../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
+             "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
 
              "../vendor/chat/strophe.js",
              "../vendor/chat/strophe.disco.js",
@@ -35,8 +36,9 @@ module.exports = function(config) {
              "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",
              "../chat/emoticonsFilter.js",
-             "../chat/capslockFilterDemo.js",
+             "../chat/encryptionFilterDemo.js",
 
+             "../chat/karereEventObjects.js",
              "../chat/karere.js",
              "../chat/chat.js",
 

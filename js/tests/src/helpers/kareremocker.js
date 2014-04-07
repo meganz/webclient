@@ -87,6 +87,36 @@ var KarereMocker = function(objectInstance) {
                 );
             },
             "sendRawMessage": function(toJid, type, contents, meta) {
+                var event = new $.Event("onOutgoingMessage");
+                console.debug("Preparing to send message:", toJid, type, contents, meta);
+
+                var outgoingMessage = new KarereEventObjects.OutgoingMessage(
+                    toJid,
+                    this.getJid(),
+                    type,
+                    "123",
+                    contents,
+                    meta,
+                    unixtime()
+                );
+
+                this.trigger(
+                    event,
+                    [
+                        outgoingMessage,
+                        this
+                    ]
+                );
+                if(event.isPropagationStopped()) {
+                    if(localStorage.d) {
+                        console.warn("Event propagation stopped sending of message: ", contents, meta, type, toJid)
+                    }
+                    return false;
+                } else {
+                    console.debug("Sending message: ", toJid, type, contents, meta);
+                }
+
+
                 return 123;
             },
             'setPresence': function(presence, status, delay) {

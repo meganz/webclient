@@ -18,8 +18,9 @@ describe("Chat.js - Karere UI integration", function() {
         localStorage.jj=true;
         localStorage.dxmpp = 1;
         localStorage.stopOnAssertFail = true;
-        localStorage.d = 1;
+        localStorage.d = localStorage.dd = 1;
         localStorage.capslockFilterDemoEnabled = 1;
+        localStorage.encryptionFilterDemo = 1;
 
         functionsMocker = new FunctionsMocker();
 
@@ -188,20 +189,17 @@ describe("Chat.js - Karere UI integration", function() {
                 users[user1jid] = "moderator";
                 users[user2jid] = "participant";
 
-                megaChat.karere._triggerEvent("UserJoined", {
-                    "myOwn":true,
-                    "to": user1jid,
-                    "from": roomJid + "/" + megaChat.karere.getNickname(),
-                    "id":null,
-                    "roomJid":roomJid,
-                    "currentUsers":{},
-                    "newUsers":users
-                });
-
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
 
                 expect(megaChat.chats[roomJid].getParticipants())
                     .to.eql(
-                        megaChat.chats[roomJid].users
+                        Object.keys(users)
                     );
 
                 expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
@@ -311,43 +309,47 @@ describe("Chat.js - Karere UI integration", function() {
 
         // receive user list
 
-        megaChat.karere._triggerEvent("UsersJoined", {
-            "myOwn":false,
-            "to": user1jid,
-            "from": roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
-            "id":null,
-            "roomJid":roomJid,
-            "currentUsers":{},
-            "newUsers":users
-        });
+        megaChat.karere._triggerEvent("UsersJoined",
+            new KarereEventObjects.UsersJoined(
+                roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
+                user1jid,
+                roomJid,
+                {},
+                users
+            )
+        );
 
         megaChat.karere.setMeta('rooms', roomJid, 'users', users);
 
         users[user1jid] = "participant";
 
-        megaChat.karere._triggerEvent("UsersJoined", {
-            "myOwn":true,
-            "to": user1jid,
-            "from": roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
-            "id":null,
-            "roomJid":roomJid,
-            "currentUsers":users,
-            "newUsers":users
-        });
-        megaChat.karere._triggerEvent("UsersUpdatedDone", {
-            "myOwn":true,
-            "to": user1jid,
-            "from": roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
-            "id":null,
-            "roomJid":roomJid,
-            "currentUsers":users,
-            "newUsers":users
-        });
+        megaChat.karere._triggerEvent("UsersJoined",
+            new KarereEventObjects.UsersJoined(
+                roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
+                user1jid,
+                roomJid,
+                users,
+                users
+            )
+        );
+
+        megaChat.karere._triggerEvent("UsersUpdatedDone",
+            new KarereEventObjects.UsersUpdated(
+                roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
+                user1jid,
+                roomJid,
+                users,
+                users
+            )
+        );
 
         assert(
             megaChat.chats[roomJid].state == MegaChatRoom.STATE.SYNCING,
             "Invalid state found. Expected: SYNCING, got: " + megaChat.chats[roomJid].getStateAsText()
         );
+
+        expect(megaChat.chats[roomJid].getParticipants()).to.have.members(Object.keys(users));
+        expect(megaChat.chats[roomJid].getParticipants().length).to.eql(2);
 
 
         expect(
@@ -356,30 +358,58 @@ describe("Chat.js - Karere UI integration", function() {
 
 
         var testMessages = [
-            {
-                "from": user1jid,
-                "message":"hopala2",
-                "timestamp":100,
-                "id":"2"
-            },
-            {
-                "from": user1jid,
-                "message":"hopala3",
-                "timestamp":200,
-                "id":"3"
-            },
-            {
-                "from": user2jid,
-                "message":"hopala1",
-                "timestamp":50,
-                "id":"1"
-            },
-            {
-                "from": user1jid,
-                "message":"hopala4",
-                "timestamp":300,
-                "id":"4"
-            }
+            new KarereEventObjects.IncomingMessage(
+                roomJid,
+                user1jid,
+                "ChatMessage",
+                "Message",
+                "2",
+                undefined,
+                roomJid,
+                {},
+                "hopala2",
+                undefined,
+                100
+            ),
+            new KarereEventObjects.IncomingMessage(
+                roomJid,
+                user1jid,
+                "groupchat",
+                "Message",
+                "3",
+                undefined,
+                roomJid,
+                {},
+                "hopala3",
+                undefined,
+                200
+            ),
+            new KarereEventObjects.IncomingMessage(
+                roomJid,
+                user2jid,
+                "groupchat",
+                "Message",
+                "1",
+                undefined,
+                roomJid,
+                {},
+                "hopala1",
+                undefined,
+                50
+            ),
+            new KarereEventObjects.IncomingMessage(
+                roomJid,
+                user1jid,
+                "groupchat",
+                "Message",
+                "4",
+                undefined,
+                roomJid,
+                {},
+                "hopala4",
+                undefined,
+                300
+            )
         ];
 
         megaChat.karere._triggerEvent("ActionMessage", {
@@ -441,25 +471,25 @@ describe("Chat.js - Karere UI integration", function() {
         var expectedMessagesList = [
             {
                 "ts": "50",
-                "time": unixtimeToTimeString(testMessages[2].timestamp),
+                "time": unixtimeToTimeString(testMessages[2].getDelay()),
                 "msg": "hopala1",
                 "name": "lp@mega.co.nz"
             },
             {
                 "ts": "100",
-                "time": unixtimeToTimeString(testMessages[0].timestamp),
+                "time": unixtimeToTimeString(testMessages[0].getDelay()),
                 "msg": "hopala2",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "200",
-                "time": unixtimeToTimeString(testMessages[1].timestamp),
+                "time": unixtimeToTimeString(testMessages[1].getDelay()),
                 "msg": "hopala3",
                 "name": "lpetrov@me.com"
             },
             {
                 "ts": "300",
-                "time": unixtimeToTimeString(testMessages[3].timestamp),
+                "time": unixtimeToTimeString(testMessages[3].getDelay()),
                 "msg": "hopala4",
                 "name": "lpetrov@me.com"
             }
@@ -514,7 +544,6 @@ describe("Chat.js - Karere UI integration", function() {
         expect(localStorage.megaChatPresence).to.eql("away");
         expect(localStorage.megaChatPresenceMtime).to.eql("" + origPresenceMtime);
         expect(megaChat.karere.setPresence).to.not.have.been.called;
-
 
         expect(
             $('.activity-status-block .activity-status').is('.away')
@@ -779,19 +808,19 @@ describe("Chat.js - Karere UI integration", function() {
                 users[user1jid] = "moderator";
                 users[user2jid] = "participant";
 
-                megaChat.karere._triggerEvent("UserJoined", {
-                    "myOwn":true,
-                    "to": user1jid,
-                    "from": roomJid + "/" + megaChat.karere.getNickname(),
-                    "id":null,
-                    "roomJid":roomJid,
-                    "currentUsers":{},
-                    "newUsers":users
-                });
+                megaChat.karere._triggerEvent("UsersJoined",
+                    new KarereEventObjects.UsersJoined(
+                        roomJid + "/" + megaChat.karere.getNickname(),
+                        user1jid,
+                        roomJid,
+                        {},
+                        users
+                    )
+                );
 
 
                 expect(megaChat.chats[roomJid].getParticipants())
-                    .to.eql(
+                    .to.have.members(
                         megaChat.chats[roomJid].users
                     );
 
@@ -960,5 +989,174 @@ describe("Chat.js - Karere UI integration", function() {
 
                 done();
             });
+    });
+
+    it("Advanced room flow creation and message filtering via .preventDefault", function(done) {
+        var DemoFilterPlugin = function(megaChat) {
+            var self = this;
+
+            self.megaChat = megaChat;
+
+            self.ready = {};
+            megaChat.bind("onPluginsWait", function(e, room) {
+                if(!self.ready[room.roomJid]) {
+                    e.stopPropagation();
+                }
+            });
+
+            this.toggleReady = function(roomJid) {
+                if(!self.ready[roomJid]) {
+                    self.ready[roomJid] = true;
+                    self.megaChat.chats[roomJid].setState(MegaChatRoom.STATE.PLUGINS_READY);
+                } else {
+                    self.ready[roomJid] = false;
+                }
+            };
+        };
+        megaChat.plugins['demoFilterPlugin'] = new DemoFilterPlugin(megaChat);
+
+        localStorage.dd = true;
+
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u) + "/res";
+
+        var jids = [
+            megaChat.karere.getBareJid(),
+            Strophe.getBareJidFromJid(user2jid)
+        ];
+
+        var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+        // fake user join
+        var users = {};
+        users[megaChat.karere.getJid()] = "moderator";
+//        users[user2jid] = "participant";
+
+        megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+            roomJid + "/" + megaChat.karere.getNickname(),
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
+
+        megaChat.karere._triggerEvent("UsersUpdatedDone", new KarereEventObjects.UsersUpdated(
+            roomJid + "/" + megaChat.karere.getNickname(),
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
+
+        expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
+
+        $promise.done(function() {
+            assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.PLUGINS_WAIT, "Plugin did not halted the room creation");
+
+
+            megaChat.plugins['demoFilterPlugin'].toggleReady(roomJid);
+
+            assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY, "Plugin did not managed to set the state to ready");
+
+
+            done();
+        });
+
+    });
+
+    it("Buffer incoming and outgoing messages", function(done) {
+
+        localStorage.dd = true;
+
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u) + "/res";
+
+        var jids = [
+            megaChat.karere.getBareJid(),
+            Strophe.getBareJidFromJid(user2jid)
+        ];
+
+        var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+        // fake user join
+        var users = {};
+        users[megaChat.karere.getJid()] = "moderator";
+//        users[user2jid] = "participant";
+
+        megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+            roomJid + "/" + megaChat.karere.getNickname(),
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
+
+        megaChat.karere._triggerEvent("UsersUpdatedDone", new KarereEventObjects.UsersUpdated(
+            roomJid + "/" + megaChat.karere.getNickname(),
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
+
+        // new user joined
+        users[user2jid] = "participant";
+        megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+            user2jid,
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
+
+        expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
+
+        $promise.done(function() {
+
+            var room = megaChat.chats[roomJid];
+            room.sendMessage("text message", {
+                'meta': true
+            });
+
+            assert(
+                megaChat.karere.sendRawMessage.secondCall.args[2].indexOf("mpENC:") === 0,
+                "message was not encrypted"
+            );
+
+            megaChat.karere.trigger("onChatMessage", new KarereEventObjects.IncomingMessage(
+                megaChat.karere.getJid(),
+                user2jid,
+                "Message",
+                "groupchat",
+                "123",
+                undefined,
+                roomJid,
+                {},
+                megaChat.karere.sendRawMessage.secondCall.args[2]
+            ));
+
+            assert(
+                megaChat.chats[roomJid].messages[0].getContents() == "text message",
+                "could not decrypt the incoming message"
+            );
+
+            assert(
+                megaChat.chats[roomJid].messages[0].getMeta()['meta'] == true,
+                "could not decrypt the incoming message's meta"
+            );
+
+
+            done();
+
+        });
+
     });
 });

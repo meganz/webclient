@@ -223,6 +223,11 @@
             var $ulContainer = $('ul', $nodeContainer);
 
             // detect SELECT vs Folder expand call
+            // firefox fix
+            if(!e.offsetX) {
+                e.offsetX = e.pageX - $(this).offset().left;
+            }
+
             if ($this.is('.contains-folders') && (e.offsetX < 25 || e.layerX < 25)) {
                 // create UL and expand
                 if($ulContainer.is('.opened')) {

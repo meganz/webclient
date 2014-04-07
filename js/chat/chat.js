@@ -112,7 +112,8 @@ var chatui;
             var $attachmentContainer = $button.parents('.attachments-container');
             var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
 
-            var attachments = message.meta.attachments; //alias
+            var attachments = message.getMeta().attachments; //alias
+            assert(attachments, "no attachments found..something went wrong.")
             var nodeIds = Object.keys(attachments);
 
             var accessibleNodeIds = [];
@@ -315,33 +316,73 @@ var MegaChat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
+    return this;
+};
+
+makeObservable(MegaChat);
+
+/**
+ * Initialize the MegaChat (also will connect to the XMPP)
+ */
+MegaChat.prototype.init = function() {
+    var self = this;
+
+    // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
+    self.plugins = {};
+
+
+    if(localStorage.encryptionFilterDemo) {
+        // since this plugin act as filter, it should be added first.
+        self.plugins['encryptionFilterDemo'] = new EncryptionFilterDemo(self);
+    };
+
+    $.each(self.options.plugins, function(k, v) {
+        self.plugins[k] = new v(self);
+    });
+
+    if(!self.filePicker) {
+        self.filePicker = new MegaFilePicker(self.options.filePickerOptions);
+        self.filePicker.bind('doneSelecting', function(e, selection) {
+            if(selection.length == 0) {
+                return;
+            }
+
+            var room = self.getCurrentRoom();
+            if(room) {
+                room.attachNodes(
+                    selection
+                );
+            }
+        })
+    }
+
     // Karere Events
-    this.karere.bind("onPresence", function(e, eventData) {
-        if(eventData.error) {
+    this.karere.bind("onPresence", function(e, eventObject) {
+        if(eventObject.error) {
             return;
         }
 
-        if(eventData.show != "unavailable") {
-            if(eventData.myOwn === false) {
+        var bareJid = eventObject.getFromJid().split("/")[0];
+
+        if(eventObject.getShow() != "unavailable") {
+            if(eventObject.isMyOwn(self.karere) === false) {
 
                 // update M.u
-                var contact = self.getContactFromJid(eventData.from);
+                var contact = self.getContactFromJid(eventObject.getFromJid());
                 if(contact) {
-                    if(!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventData.delay) {
-                        contact.presence = eventData.show;
-                        contact.presenceMtime = eventData.delay;
+                    if(!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+                        contact.presence = eventObject.getShow();
+                        contact.presenceMtime = eventObject.getDelay();
                     }
                 }
 
-                var bareJid = eventData.from.split("/")[0];
-
                 $.each(self.chats, function(roomJid, room) {
-                    if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventData.from)) {
+                    if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
                         if(localStorage.d) {
-                            console.debug(self.karere.getNickname(), "Auto inviting: ", eventData.from, "to: ", roomJid);
+                            console.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
                         }
 
-                        self.karere.addUserToChat(roomJid, eventData.from, undefined, room.type, {
+                        self.karere.addUserToChat(roomJid, eventObject.getFromJid(), undefined, room.type, {
                             'ctime': room.ctime,
                             'invitationType': 'resume',
                             'participants': room.users,
@@ -352,16 +393,16 @@ var MegaChat = function() {
                     }
                 });
                 // Sync presence across devices (will check the delayed val!)
-                if(eventData.from.split("/")[0] == self.karere.getBareJid()) {
-                    if(eventData.delay && eventData.delay >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventData.show) {
-                        self._myPresence = eventData.show;
-                        localStorage.megaChatPresence = eventData.show;
-                        localStorage.megaChatPresenceMtime = eventData.delay;
+                if(bareJid == self.karere.getBareJid()) {
+                    if(eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
+                        self._myPresence = eventObject.getShow();
+                        localStorage.megaChatPresence = eventObject.getShow();
+                        localStorage.megaChatPresenceMtime = eventObject.getDelay();
 
                         self.karere.setPresence(
-                          eventData.show,
-                          undefined,
-                          eventData.delay
+                            eventObject.getShow(),
+                            undefined,
+                            eventObject.getDelay()
                         );
                     }
                 }
@@ -370,9 +411,7 @@ var MegaChat = function() {
         }
 
         // should we trigger refreshUI ?
-        if(eventData.myOwn === false) {
-            var bareJid = eventData.from.split("/")[0];
-
+        if(eventObject.isMyOwn(self.karere) === false) {
             $.each(self.chats, function(roomJid, room) {
 
                 if(room.participantExistsInRoom(bareJid)) {
@@ -388,10 +427,10 @@ var MegaChat = function() {
     });
 
     // Disco capabilities updated
-    this.karere.bind("onDiscoCapabilities", function(e, eventData) {
-        var $treeElement = $('#treesub_contacts li a[data-jid="' + eventData.userBareJid + '"]');
+    this.karere.bind("onDiscoCapabilities", function(e, eventObject) {
+        var $treeElement = $('#treesub_contacts li a[data-jid="' + eventObject.getFromUserBareJid() + '"]');
 
-        $.each(eventData.capabilities, function(capability, capable) {
+        $.each(eventObject.getCapabilities(), function(capability, capable) {
             if(capable) {
                 $treeElement.addClass('chat-capability-' + capability);
             } else {
@@ -401,38 +440,39 @@ var MegaChat = function() {
     });
 
     // Invite messages
-    this.karere.bind("onInviteMessage", function(e, eventData) {
-        if(eventData.myOwn === true) {
+    this.karere.bind("onInviteMessage", function(e, eventObject) {
+        if(eventObject.isMyOwn(self.karere) === true) {
             e.stopPropagation();
             return false;
         }
         if(localStorage.d) {
-            console.debug(self.karere.getNickname(), "Got invitation to join", eventData.room, "with eventData:", eventData);
+            console.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
         }
 
 
-        if(eventData.meta && eventData.meta.type == "private") {
+        var meta = eventObject.getMeta()
+        if(meta && meta.type == "private") {
 
-            var bareFromJid = eventData.from.split("/")[0];
+            var bareFromJid = eventObject.getFromJid().split("/")[0];
             $.each(self.chats, function(roomJid, room) {
-                if(roomJid == eventData.room) {
+                if(roomJid == eventObject.getRoomJid()) {
                     return; // continue
                 }
 
                 if(room.type == "private" && room.participantExistsInRoom(bareFromJid)) {
                     if(localStorage.d) {
-                        console.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventData.room, roomJid, "with eventData:", eventData);
+                        console.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
                     }
 
                     if(self.currentlyOpenedChat == room.roomJid) {
-                        room.ctime = eventData.meta.ctime;
-                        room.syncUsers(eventData.meta.participants);
+                        room.ctime = meta.ctime;
+                        room.syncUsers(meta.participants);
                     }
 
                     // if not already in
                     if(room.state < MegaChatRoom.STATE.JOINING) {
                         room.setState(MegaChatRoom.STATE.JOINING);
-                        self.karere.joinChat(eventData.room, eventData.password);
+                        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
                     }
 
                     e.stopPropagation();
@@ -444,9 +484,9 @@ var MegaChat = function() {
                 return false;
             }
         }
-        if(self.chats[eventData.room]) { //already joined
+        if(self.chats[eventObject.getRoomJid()]) { //already joined
             if(localStorage.d) {
-                console.warn("I'm already in", eventData.room, "(ignoring invitation from: ", eventData.from, ")");
+                console.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
             }
 
             e.stopPropagation();
@@ -455,18 +495,18 @@ var MegaChat = function() {
 
         // if we are here..then join the room
         if(localStorage.d) {
-            console.debug("Initializing UI for new room: ", eventData.room, "");
+            console.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
         }
-        self.chats[eventData.room] = new MegaChatRoom(self, eventData.room);
-        self.chats[eventData.room].setType(eventData.meta.type);
-        self.chats[eventData.room].ctime = eventData.meta.ctime;
-        self.chats[eventData.room].setUsers(eventData.meta.participants);
+        self.chats[eventObject.getRoomJid()] = new MegaChatRoom(self, eventObject.getRoomJid());
+        self.chats[eventObject.getRoomJid()].setType(meta.type);
+        self.chats[eventObject.getRoomJid()].ctime = meta.ctime;
+        self.chats[eventObject.getRoomJid()].setUsers(meta.participants);
 
-        self.chats[eventData.room].setState(MegaChatRoom.STATE.JOINING);
-        self.karere.joinChat(eventData.room, eventData.password);
+        self.chats[eventObject.getRoomJid()].setState(MegaChatRoom.STATE.JOINING);
+        self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
 
 
-        self.chats[eventData.room].refreshUI();
+        self.chats[eventObject.getRoomJid()].refreshUI();
 
 
         e.stopPropagation();
@@ -497,9 +537,9 @@ var MegaChat = function() {
     this.karere.bind("onUsersLeft", function(e, eventData) {
         return self._onUsersUpdate("left", e, eventData);
     });
-    this.karere.bind("onUsersUpdatedDone", function(e, eventData) {
-        if(self.chats[eventData.roomJid] && self.chats[eventData.roomJid].state == MegaChatRoom.STATE.JOINING) {
-            self.chats[eventData.roomJid].setState(
+    this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
+        if(self.chats[eventObject.getRoomJid()] && self.chats[eventObject.getRoomJid()].state == MegaChatRoom.STATE.JOINING) {
+            self.chats[eventObject.getRoomJid()].setState(
                 MegaChatRoom.STATE.JOINED
             );
         }
@@ -510,48 +550,46 @@ var MegaChat = function() {
         self._onChatMessage.apply(self, toArray(arguments));
     });
 
-    this.karere.bind("onDelayedChatMessage", function() {
-        self._onChatMessage.apply(self, toArray(arguments));
-    });
-
-    this.karere.bind("onActionMessage", function(e, eventData) {
-        if(eventData.myOwn === true) {
+    this.karere.bind("onActionMessage", function(e, eventObject) {
+        if(eventObject.isMyOwn(self.karere) === true) {
             return;
         }
 
         var room;
-        if(eventData.meta.action == "sync") {
-            room = self.chats[eventData.meta.roomJid];
-            room.sendMessagesSyncResponse(eventData);
-        } else if(eventData.meta.action == "syncResponse") {
-            room = self.chats[eventData.meta.roomJid];
-            room.handleSyncResponse(eventData);
+        var meta = eventObject.getMeta();
+
+        if(eventObject.getAction() == "sync") {
+            room = self.chats[meta.roomJid];
+            room.sendMessagesSyncResponse(eventObject);
+        } else if(eventObject.getAction() == "syncResponse") {
+            room = self.chats[meta.roomJid];
+            room.handleSyncResponse(eventObject);
         }
     });
 
 
-    this.karere.bind("onComposingMessage", function(e, eventData) {
-        if(eventData.myOwn || eventData.isForwarded) {
+    this.karere.bind("onComposingMessage", function(e, eventObject) {
+        if(eventObject.isMyOwn(self.karere)) {
             return;
         }
 
-        var room = self.chats[eventData.roomJid];
+        var room = self.chats[eventObject.getRoomJid()];
         if(room) {
             var $element = $('.fm-chat-typing-txt', room.$messages);
             $('span', $element).text(
-                self.getContactNameFromJid(eventData.from)
+                self.getContactNameFromJid(eventObject.getFromJid())
             );
 
             $element.removeClass("hidden").addClass("typing");
         }
     });
 
-    this.karere.bind("onPausedMessage", function(e, eventData) {
-        if(eventData.myOwn || eventData.isForwarded) {
+    this.karere.bind("onPausedMessage", function(e, eventObject) {
+        if(eventObject.isMyOwn(self.karere)) {
             return;
         }
 
-        var room = self.chats[eventData.roomJid];
+        var room = self.chats[eventObject.getRoomJid()];
         if(room) {
             var $element = $('.fm-chat-typing-txt', room.$messages);
             $('span', $element).text("");
@@ -593,13 +631,13 @@ var MegaChat = function() {
             self.currentlyOpenedChat = null;
         }
         if(lastOpenedRoom && (!room || room.roomJid != lastOpenedRoom)) { // have opened a chat window before, but now
-                                                                           // navigated away from it
+            // navigated away from it
             if(self.chats[lastOpenedRoom]) {
                 self.chats[lastOpenedRoom].hide();
             }
         }
         if(lastOpenedRoom && $('.fm-chat-block').is(".hidden")) { // have opened a chat window before, but now
-                                                                           // navigated away from it
+            // navigated away from it
             if(self.chats[lastOpenedRoom]) {
                 self.chats[lastOpenedRoom].hide();
                 lastOpenedRoom = null;
@@ -612,17 +650,6 @@ var MegaChat = function() {
             lastOpenedRoom = null;
         }
     });
-
-    return this;
-};
-
-makeObservable(MegaChat);
-
-/**
- * Initialize the MegaChat (also will connect to the XMPP)
- */
-MegaChat.prototype.init = function() {
-    var self = this;
 
     self.$container = $('.fm-chat-block');
     self.$header_tpl = $('.fm-chat-header', self.$container).clone().removeClass("template");
@@ -727,33 +754,7 @@ MegaChat.prototype.init = function() {
         // no RTC support.
     }
 
-    // really simple plugin architecture that will initialize all plugins into self.options.plugins[name] = instance
-    self.plugins = {};
-    if(localStorage.capslockFilterDemoEnabled) {
-        self.options.plugins['capslockFilterDemo'] = CapslockFilterDemo;
-    }
 
-    $.each(self.options.plugins, function(k, v) {
-        self.plugins[k] = new v(self);
-    });
-
-    if(!self.filePicker) {
-        self.filePicker = new MegaFilePicker(self.options.filePickerOptions);
-        self.filePicker.bind('doneSelecting', function(e, selection) {
-            console.error("args: ", toArray(arguments));
-
-            if(selection.length == 0) {
-                return;
-            }
-
-            var room = self.getCurrentRoom();
-            if(room) {
-                room.attachNodes(
-                    selection
-                );
-            }
-        })
-    }
 };
 
 /**
@@ -787,40 +788,23 @@ MegaChat.prototype.connect = function() {
  * Incoming chat message handler
  *
  * @param e
- * @param eventData
+ * @param eventObject {KarereEventObjects.IncomingMessage}
  * @private
  */
-MegaChat.prototype._onChatMessage = function(e, eventData) {
+MegaChat.prototype._onChatMessage = function(e, eventObject) {
     var self = this;
 
-    // ignore my own forwarded messages
-    if(eventData.myOwn === true && eventData.isForwarded === true) {
-        return;
-    }
-    if(!eventData.message && !eventData.meta) {
+    // ignore empty messages (except attachments)
+    if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
         return;
     }
 
-    // try first with delay -> timestamp -> currentime (if no time info is attached to the message)
-    var timestamp = eventData.delay;
-    if(!timestamp) {
-        timestamp = eventData.timestamp;
-    }
-    if(!timestamp) {
-        timestamp = unixtime();
-    }
-    var room = self.chats[eventData.roomJid];
+    var room = self.chats[eventObject.getRoomJid()];
     if(room) {
-        room.appendMessage({
-            from: eventData.from,
-            message: eventData.message,
-            timestamp: timestamp,
-            meta: eventData.meta,
-            id: eventData.id
-        });
+        room.appendMessage(eventObject);
     } else {
         if(localStorage.d) {
-            console.debug("Room not found: ", eventData.roomJid);
+            console.debug("Room not found: ", eventObject.getRoomJid());
         }
     }
 };
@@ -834,11 +818,11 @@ MegaChat.prototype._onChatMessage = function(e, eventData) {
  * @param eventData
  * @private
  */
-MegaChat.prototype._onUsersUpdate = function(type, e, eventData) {
+MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
     var self = this;
-    var updatedJids = Object.keys(eventData.currentUsers);
+    var updatedJids = Object.keys(eventObject.getCurrentUsers());
 
-    var diffUsers = Object.keys(eventData[type == "joined" ? "newUsers" : "leftUsers"]);
+    var diffUsers = Object.keys(eventObject[type == "joined" ? "getNewUsers" : "getLeftUsers"]());
 
     if(type == "joined") {
         $.each(diffUsers, function(k, v) {
@@ -856,8 +840,8 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventData) {
     if($.inArray(self.karere.getJid(), diffUsers) != -1) {
         if(type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
-            if(self.chats[eventData.roomJid]) {
-                self.chats[eventData.roomJid].destroy();
+            if(self.chats[eventObject.getRoomJid()]) {
+                self.chats[eventObject.getRoomJid()].destroy();
             }
         } else { // i'd joined
 
@@ -881,7 +865,7 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventData) {
         } else { // they had joined
 
         }
-        var room = self.chats[eventData.roomJid];
+        var room = self.chats[eventObject.getRoomJid()];
         assert(room, "Room not found!");
 
         room.syncUsers(clone(updatedJids));
@@ -906,6 +890,7 @@ MegaChat.prototype.destroy = function() {
         self.filePicker = null;
     }
 
+
     $.each(self.chats, function(roomJid, room) {
         room.destroy();
         delete self.chats[roomJid];
@@ -913,6 +898,10 @@ MegaChat.prototype.destroy = function() {
 
     return self.karere.disconnect()
         .done(function() {
+            self.karere = new Karere({
+                'clientName': 'mc'
+            });
+
             self.is_initialized = false;
         });
 };
@@ -1352,7 +1341,9 @@ MegaChat.prototype.sendMessage = function(roomJid, val) {
     }
 };
 
-//TODO: Docs
+/**
+ * Simple function that takes care to reposition some elements, when the window is resized
+ */
 MegaChat.prototype.resized = function() {
     var self = this;
     var room = self.getCurrentRoom();
@@ -1370,8 +1361,11 @@ MegaChat.prototype.resized = function() {
 };
 
 
-
-//TODO: Docs
+/**
+ * Generates a room JID for a private chat with `jid`
+ * @param jid {string} this should be a bare jid (however, it will get normalized in case you pass a full jid)
+ * @returns {*|jQuery}
+ */
 MegaChat.prototype.getPrivateRoomJidFor = function(jid) {
     jid = Karere.getNormalizedBareJid(jid);
     var roomJid = $('#treesub_contacts a[data-jid="' + jid + '"]').attr("data-room-jid");
@@ -1486,7 +1480,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
             }
         };
 
-        if(newState == MegaChatRoom.STATE.JOINED) {
+        if(newState == MegaChatRoom.STATE.PLUGINS_READY) {
             if(self.requestMessageSync()) {
                 createTimeoutPromise(
                     function() {
@@ -1503,6 +1497,18 @@ var MegaChatRoom = function(megaChat, roomJid) {
             }
 
 
+        } else if(newState == MegaChatRoom.STATE.JOINED) {
+            self.setState(MegaChatRoom.STATE.PLUGINS_WAIT);
+
+        } else if(newState == MegaChatRoom.STATE.PLUGINS_WAIT) {
+            var $event = new $.Event("onPluginsWait");
+            self.megaChat.trigger($event, [self]);
+
+            if($event.isPropagationStopped()) {
+                return;
+            }
+
+            self.setState(MegaChatRoom.STATE.PLUGINS_READY);
         } else if(newState == MegaChatRoom.STATE.SYNCED) {
             // XX: we should add the encryption stuff just after state == SYNCED and before state == READY
             self.setState(MegaChatRoom.STATE.READY);
@@ -1516,23 +1522,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
                         return; //continue;
                     }
 
-
-                    var event = new $.Event("onSendMessage");
-                    var eventData = $.extend(
-                        {
-                            from: self.megaChat.karere.getJid(),
-                            roomJid: self.roomJid
-                        },
-                        v
-                    );
-
-                    self.megaChat.trigger(event, eventData);
-
-                    if(event.isPropagationStopped()) {
-                        return false;
-                    }
-
-                    self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message, eventData.meta, eventData.id, eventData.timestamp);
+                    self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", v.getContents(), v.getMeta(), v.getMessageId(), v.getDelay());
                 });
                 self._messagesQueue = [];
             }
@@ -1883,8 +1873,11 @@ MegaChatRoom.STATE = {
     'JOINING': 10,
     'JOINED': 20,
 
-    'SYNCING': 30,
-    'SYNCED': 40,
+    'PLUGINS_WAIT': 30,
+    'PLUGINS_READY': 40,
+
+    'SYNCING': 50,
+    'SYNCED': 60,
 
     'READY': 150,
 
@@ -2273,30 +2266,30 @@ MegaChatRoom.prototype.hide = function() {
  * Append message to the UI of this room.
  * Note: This method will also log the message, so that later when someone asks for message sync this log will be used.
  *
- * @param message
+ * @param message {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage|Object}
  * @returns {boolean}
  */
 MegaChatRoom.prototype.appendMessage = function(message) {
     var self = this;
 
-    if(message.from == self.roomJid) {
+    if(message.getFromJid() == self.roomJid) {
         return; // dont show any system messages (from the conf room)
     }
-    if(self.messagesIndex[message.id] !== undefined) {
+    if(self.messagesIndex[message.getMessageId()] !== undefined) {
         if(localStorage.d) {
-            console.debug(self.roomJid.split("@")[0], message.id, "This message is already added to the message list (and displayed).");
+            console.debug(self.roomJid.split("@")[0], message.getMessageId(), "This message is already added to the message list (and displayed).");
         }
         return false;
     }
 
-    self.messagesIndex[message.id] = self.messages.push(
+    self.messagesIndex[message.getMessageId()] = self.messages.push(
         message
     );
 
 
     var $message = self.megaChat.$message_tpl.clone().removeClass("template");
 
-    var jid = Karere.getNormalizedBareJid(message.from);
+    var jid = Karere.getNormalizedBareJid(message.getFromJid());
 
 
     if(jid != self.megaChat.karere.getBareJid() && self.roomJid != self.megaChat.getCurrentRoomJid()) {
@@ -2314,16 +2307,20 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         $('.fm-chat-username', $message).addClass("current-name");
     }
 
+    var timestamp = message.getDelay() ? message.getDelay() : unixtime();
+
     $('.fm-chat-message-time', $message).text(
-        unixtimeToTimeString(message.timestamp)
+        unixtimeToTimeString(timestamp)
     );
-    $message.attr('data-timestamp', message.timestamp);
-    $message.attr('data-id', message.id);
+
+    $message.attr('data-timestamp', timestamp);
+    $message.attr('data-id', message.getMessageId());
 
 
     if(!message.messageHtml) {
-        message.messageHtml = htmlentities(message.message).replace(/\n/gi, "<br/>");
+        message.messageHtml = htmlentities(message.getContents()).replace(/\n/gi, "<br/>");
     }
+
     var event = new $.Event("onReceiveMessage");
     self.megaChat.trigger(event, message);
 
@@ -2341,7 +2338,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         );
     } else {
         $('.fm-chat-message', $message).html(
-            htmlentities(message.message).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;")
+            htmlentities(message.getContents()).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;")
         );
     }
 
@@ -2364,7 +2361,9 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 };
 
 
-//TODO: Docs
+/**
+ * Will refresh the room's chat messages scroll pane
+ */
 MegaChatRoom.prototype.refreshScrollUI = function() {
     var self = this;
     var $jsp = self.$messages.data('jsp');
@@ -2373,8 +2372,13 @@ MegaChatRoom.prototype.refreshScrollUI = function() {
     $jsp.reinitialise();
 };
 
-//TODO: Docs
-MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
+/**
+ * Should be used to append messages in the message pane
+ *
+ * @param $message {*|jQuery} jQuery object containing the DOM Element that should be appended to the messages pane
+ * @param messageObject {(KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage)} contains message data
+ */
+MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     var self = this;
 
     var $jsp = self.$messages.data('jsp');
@@ -2384,19 +2388,22 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
     var $before = null;
     var $after = null;
 
-    if(!messageData) {
-        messageData = {};
-    }
-    if(!messageData.timestamp) {
-        messageData.timestamp = unixtime();
+    if(!messageObject) {
+        messageObject = {};
     }
 
-    $message.attr('data-timestamp', messageData.timestamp);
+    var timestamp = unixtime();
+
+    if(messageObject.getDelay) {
+        timestamp = messageObject.getDelay();
+    }
+
+    $message.attr('data-timestamp', timestamp);
 
     $('.jspContainer > .jspPane .fm-chat-messages-block', self.$messages).each(function() {
-        if(messageData.timestamp >= $(this).attr('data-timestamp')) {
+        if(timestamp >= $(this).attr('data-timestamp')) {
             $after = $(this);
-        } else if($before === null && messageData.timestamp < $(this).attr('data-timestamp')) {
+        } else if($before === null && timestamp < $(this).attr('data-timestamp')) {
             $before = $(this);
         }
     });
@@ -2443,7 +2450,17 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageData) {
     self.trigger('activity');
 };
 
-//TODO: Docs
+/**
+ * Generates a DOM Element containing the required UI elements for an inline dialog (buttons, text message, icon, etc)
+ *
+ * @param type {string} used internally, if late access to the DOM element of the dialog is required (e.g. to remove it)
+ * @param title {string} text that will be used as title
+ * @param messageContents {string} text that will be used as message content
+ * @param headingCssClasses {Array} array of css class names to be added to the heading (used to append icons with css)
+ * @param [buttons] {Array} Array of objects in the format of {type: "primary|seconday", text: "button 1", callback: fn(e)}
+ * @param [read] {boolean} set to `true` if you want to mark only this message/dialog as ready (e.g. ignore the unread UI logic)
+ * @returns {jQuery|HTMLElement}
+ */
 MegaChatRoom.prototype.generateInlineDialog = function(type, title, messageContents, headingCssClasses, buttons, read) {
     headingCssClasses = headingCssClasses || [];
 
@@ -2487,7 +2504,12 @@ MegaChatRoom.prototype.generateInlineDialog = function(type, title, messageConte
     return $inlineDialog;
 };
 
-//TODO: Docs
+/**
+ * Simple getter to get an inline dialog by `type` from the current message pane
+ *
+ * @param type {string} whatever type you'd used before when calling `.generateInlineDialog`
+ * @returns {*|jQuery|HTMLElement}
+ */
 MegaChatRoom.prototype.getInlineDialogInstance = function(type) {
     var self = this;
 
@@ -2590,7 +2612,7 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
 /**
  * Send messages sync response
  *
- * @param request {Object} with the `meta` from the actual request XMPP message
+ * @param request {KarereEventObjects.ActionMessage} with the `meta` from the actual request XMPP message
  * @returns {boolean}
  */
 MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
@@ -2598,7 +2620,7 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
-    if(!karere.getUsersInChat(self.roomJid)[request.from]) {
+    if(!karere.getUsersInChat(self.roomJid)[request.getFromJid()]) {
         if(localStorage.d) {
             console.error("Will not send message sync response to user who is not currently in the chat room for which he requested the sync.")
         }
@@ -2612,6 +2634,16 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
     for(var i = 0; i < messagesCount; i+=messagesChunkSize) {
         var messages = self.messages.slice(i, i + messagesChunkSize);
 
+        // remove Non-Plain Objects from messages
+        $.each(messages, function(k, v) {
+            $.each(v, function(prop, val) {
+                if(typeof(val) == "object" && !$.isPlainObject(val)) {
+                    delete messages[k][prop];
+                }
+            });
+        });
+
+
         // cleanup some non-needed data from the messages
         $.each(messages, function(k, v) {
             if(messages[k].messageHtml) {
@@ -2620,11 +2652,11 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
         });
 
         karere.sendAction(
-            request.from,
+            request.getFromJid(),
             'syncResponse',
             {
-                'inResponseTo': request.id,
-                'roomJid': request.meta.roomJid,
+                'inResponseTo': request.getMessageId(),
+                'roomJid': request.getMeta().roomJid,
                 'messages': messages,
                 'offset': i,
                 'chunkSize': messagesChunkSize,
@@ -2637,7 +2669,7 @@ MegaChatRoom.prototype.sendMessagesSyncResponse = function(request) {
 /**
  * This is a handler of message sync responses
  *
- * @param response {Object} with the `meta` of the message sync response
+ * @param response {KarereEventObjects.ActionMessage} with the `meta` of the message sync response
  * @returns {boolean}
  */
 MegaChatRoom.prototype.handleSyncResponse = function(response) {
@@ -2645,24 +2677,26 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
-    if(!karere.getUsersInChat(self.roomJid)[response.from]) {
+    var meta = response.getMeta();
+
+    if(!karere.getUsersInChat(self.roomJid)[response.getFromJid()]) {
         if(localStorage.d) {
             console.error("Will not accept message sync response from user who is currently not in the chat room for which I'd requested the sync.")
         }
         return false;
     }
     if(self._syncRequests) {
-        if(!self._syncRequests[response.meta.inResponseTo]) {
+        if(!self._syncRequests[meta.inResponseTo]) {
             if(localStorage.d) {
                 console.warn(
                     "Will not accept message sync response because inResponseTo, did not matched any cached messageIDs, " +
-                    "got: ", response.meta.inResponseTo, ". Most likely they had sent the response too late. Requests " +
+                    "got: ", meta.inResponseTo, ". Most likely they had sent the response too late. Requests " +
                     "currently active:", self._syncRequests
                 );
             }
             return false;
         }
-        clearTimeout(self._syncRequests[response.meta.inResponseTo].timer);
+        clearTimeout(self._syncRequests[meta.inResponseTo].timer);
     } else {
         if(localStorage.d) {
             console.warn("Invalid sync response, room not found:", response);
@@ -2682,13 +2716,27 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
         delete self._syncRequests;
     }, self.options.syncRequestCleanupTimeout);
 
-    $.each(response.meta.messages, function(k, msg) {
-        self.appendMessage(msg);
+    $.each(meta.messages, function(k, msg) {
+        // msg is a plain javascript object, since it passed JSON serialization, so now we will convert it to propper
+        // {KarereEventObjects.IncomingMessage}
+        self.appendMessage(new KarereEventObjects.IncomingMessage(
+            self.roomJid,
+            msg.fromJid,
+            "Message",
+            "Message",
+            msg.messageId,
+            undefined,
+            self.roomJid,
+            msg.meta,
+            msg.contents,
+            undefined,
+            msg.delay
+        ));
     });
 
-    if((response.meta.chunkSize + response.meta.offset) >= response.meta.total) {
+    if((meta.chunkSize + meta.offset) >= meta.total) {
         if(localStorage.d) {
-            console.warn(new Date(), "finished sync from: ", response.from, self.roomJid, response.meta.total);
+            console.warn(new Date(), "finished sync from: ", response.getFromJid(), self.roomJid, meta.total);
         }
 
         if(self.state < MegaChatRoom.STATE.SYNCED) {
@@ -2696,7 +2744,7 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
         }
     } else {
         if(localStorage.d) {
-            console.debug("waiting for more messages from sync: ", response.meta.total - (response.meta.chunkSize + response.meta.offset));
+            console.debug("waiting for more messages from sync: ", meta.total - (meta.chunkSize + meta.offset));
         }
     }
 
@@ -2731,45 +2779,37 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
 
     if(self.state != MegaChatRoom.STATE.READY) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
-        var messageData = {
-            from: megaChat.karere.getJid(),
-            message: message,
-            timestamp: unixtime(),
-            meta: meta,
-            id: messageId
-        };
+        var eventObject = new KarereEventObjects.OutgoingMessage(
+            self.roomJid,
+            megaChat.karere.getJid(),
+            "groupchat",
+            messageId,
+            message,
+            meta,
+            unixtime()
+        );
+
 
         var event = new $.Event("onQueueMessage");
 
-        self.megaChat.trigger(event, messageData);
+        self.megaChat.trigger(event, [
+            eventObject,
+            self
+        ]);
 
         if(event.isPropagationStopped()) {
             return false;
         }
 
         if(localStorage.dd) {
-            console.debug("Queueing: ", messageData);
+            console.debug("Queueing: ", eventObject);
         }
 
-        self._messagesQueue.push(messageData);
+        self._messagesQueue.push(eventObject);
 
-        self.appendMessage(messageData);
+        self.appendMessage(eventObject);
     } else {
-        var event = new $.Event("onSendMessage");
-        var eventData = {
-            from: self.megaChat.karere.getJid(),
-            roomJid: self.roomJid,
-            message: message,
-            meta: meta
-        };
-
-        self.megaChat.trigger(event, eventData);
-
-        if(event.isPropagationStopped()) {
-            return false;
-        }
-
-        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", eventData.message, meta);
+        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", message, meta);
     }
 };
 
@@ -2909,11 +2949,16 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
     return $masterPromise;
 };
 
+/**
+ * Get message by Id
+ * @param messageId {string} message id
+ * @returns {boolean}
+ */
 MegaChatRoom.prototype.getMessageById = function(messageId) {
     var self = this;
     var found = false;
     $.each(self.messages, function(k, v) {
-        if(v.id == messageId) {
+        if(v.messageId == messageId) {
             found = v;
             return false; //break;
         }

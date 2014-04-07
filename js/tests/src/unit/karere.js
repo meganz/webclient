@@ -161,13 +161,13 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPrivateMessage'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onPrivateMessage'].triggeredArgs[0][1].from).to.equal("from@jid.com");
-        expect(em1.mocks['onPrivateMessage'].triggeredArgs[0][1].to).to.equal(k1.getJid());
+        expect(em1.mocks['onPrivateMessage'].triggeredArgs[0][1].getFromJid()).to.equal("from@jid.com");
+        expect(em1.mocks['onPrivateMessage'].triggeredArgs[0][1].getToJid()).to.equal(k1.getJid());
 
 
         expect(em1.mocks['onActiveMessage'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onActiveMessage'].triggeredArgs[0][1].from).to.equal("from@jid.com");
-        expect(em1.mocks['onActiveMessage'].triggeredArgs[0][1].to).to.equal(k1.getJid());
+        expect(em1.mocks['onActiveMessage'].triggeredArgs[0][1].getFromJid()).to.equal("from@jid.com");
+        expect(em1.mocks['onActiveMessage'].triggeredArgs[0][1].getToJid()).to.equal(k1.getJid());
 
         k1._onIncomingStanza(
             stringToXml(
@@ -177,8 +177,8 @@ describe("Karere Unit Test", function() {
             )
         );
         expect(em1.mocks['onComposingMessage'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onComposingMessage'].triggeredArgs[0][1].from).to.equal("from@jid.com");
-        expect(em1.mocks['onComposingMessage'].triggeredArgs[0][1].to).to.equal(k1.getJid());
+        expect(em1.mocks['onComposingMessage'].triggeredArgs[0][1].getFromJid()).to.equal("from@jid.com");
+        expect(em1.mocks['onComposingMessage'].triggeredArgs[0][1].getToJid()).to.equal(k1.getJid());
 
         k1._onIncomingStanza(
             stringToXml(
@@ -188,8 +188,8 @@ describe("Karere Unit Test", function() {
             )
         );
         expect(em1.mocks['onPausedMessage'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onPausedMessage'].triggeredArgs[0][1].from).to.equal("from@jid.com");
-        expect(em1.mocks['onPausedMessage'].triggeredArgs[0][1].to).to.equal(k1.getJid());
+        expect(em1.mocks['onPausedMessage'].triggeredArgs[0][1].getFromJid()).to.equal("from@jid.com");
+        expect(em1.mocks['onPausedMessage'].triggeredArgs[0][1].getToJid()).to.equal(k1.getJid());
 
         done();
     });
@@ -235,8 +235,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onUsersJoined'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['newUsers']).to.not.be.empty;
-        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1]['newUsers']['user2@jid.com/r1']).to.equal("participant");
+        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1].getNewUsers()).to.not.be.empty;
+        expect(em1.mocks['onUsersJoined'].triggeredArgs[0][1].getNewUsers()['user2@jid.com/r1']).to.equal("participant");
 
         expect(promiseJoined.state()).to.equal("resolved");
 
@@ -260,8 +260,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onUsersLeft'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['leftUsers']).to.not.be.empty;
-        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1]['leftUsers']['user2@jid.com/r1']).to.be.true;
+        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1].getLeftUsers()).to.not.be.empty;
+        expect(em1.mocks['onUsersLeft'].triggeredArgs[0][1].getLeftUsers()['user2@jid.com/r1']).to.be.true;
 
         expect(promiseLeft.state()).to.equal("resolved");
 
@@ -291,8 +291,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(1);
-        expect(em1.mocks['onPresence'].triggeredArgs[0][1]['from']).to.equal("user2@jid.com");
-        expect(em1.mocks['onPresence'].triggeredArgs[0][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[0][1].getFromJid()).to.equal("user2@jid.com");
+        expect(em1.mocks['onPresence'].triggeredArgs[0][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.equal("available");
 
 
@@ -306,8 +306,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(2);
-        expect(em1.mocks['onPresence'].triggeredArgs[1][1]['from']).to.equal("user2@jid.com");
-        expect(em1.mocks['onPresence'].triggeredArgs[1][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[1][1].getFromJid()).to.equal("user2@jid.com");
+        expect(em1.mocks['onPresence'].triggeredArgs[1][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.equal("away");
 
 
@@ -318,8 +318,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(3);
-        expect(em1.mocks['onPresence'].triggeredArgs[2][1]['from']).to.equal("user2@jid.com");
-        expect(em1.mocks['onPresence'].triggeredArgs[2][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[2][1].getFromJid()).to.equal("user2@jid.com");
+        expect(em1.mocks['onPresence'].triggeredArgs[2][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.be.falsy;
 
 
@@ -334,8 +334,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(4);
-        expect(em1.mocks['onPresence'].triggeredArgs[3][1]['from']).to.equal("user2@jid.com/d1");
-        expect(em1.mocks['onPresence'].triggeredArgs[3][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[3][1].getFromJid()).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[3][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.equal("away");
 
         k1._onIncomingStanza(
@@ -348,8 +348,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(5);
-        expect(em1.mocks['onPresence'].triggeredArgs[4][1]['from']).to.equal("user2@jid.com/d2");
-        expect(em1.mocks['onPresence'].triggeredArgs[4][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[4][1].getFromJid()).to.equal("user2@jid.com/d2");
+        expect(em1.mocks['onPresence'].triggeredArgs[4][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.equal("away");
 
 
@@ -360,8 +360,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(6);
-        expect(em1.mocks['onPresence'].triggeredArgs[5][1]['from']).to.equal("user2@jid.com/d1");
-        expect(em1.mocks['onPresence'].triggeredArgs[5][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[5][1].getFromJid()).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[5][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.equal("away");
 
 
@@ -372,8 +372,8 @@ describe("Karere Unit Test", function() {
         );
 
         expect(em1.mocks['onPresence'].triggeredCount).to.equal(7);
-        expect(em1.mocks['onPresence'].triggeredArgs[6][1]['from']).to.equal("user2@jid.com/d1");
-        expect(em1.mocks['onPresence'].triggeredArgs[6][1]['to']).to.equal(k1.getJid());
+        expect(em1.mocks['onPresence'].triggeredArgs[6][1].getFromJid()).to.equal("user2@jid.com/d1");
+        expect(em1.mocks['onPresence'].triggeredArgs[6][1].getToJid()).to.equal(k1.getJid());
         expect(k1.getPresence("user2@jid.com")).to.be.falsy;
 
 

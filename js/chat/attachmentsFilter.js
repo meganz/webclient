@@ -21,22 +21,24 @@ var AttachmentsFilter = function(megaChat) {
     return this;
 };
 
-AttachmentsFilter.prototype.processMessage = function(e, eventData) {
+AttachmentsFilter.prototype.processMessage = function(e, eventObject) {
     var self = this;
 
 
-    if(!eventData.meta || !eventData.meta.attachments) {
+    if(!eventObject.getMeta() || !eventObject.getMeta().attachments) {
         return; // ignore, this is not an attachments message
     }
 
-    eventData.message = "Is sharing a document with you:"; // XX: use ll[]
+    eventObject.setContents("Is sharing a document with you:"); // XX: use ll[]
 
 };
 
 AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) {
     var self = this;
 
-    if(!eventData.message.meta || !eventData.message.meta.attachments) {
+    var meta = eventData.message.getMeta();
+
+    if(!meta || !meta.attachments) {
         return; // ignore, this is not an attachments message
     }
 
@@ -48,8 +50,8 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
     // 2. one folder
     // 3. multiple files/folders
 
-    var nodeIds = Object.keys(eventData.message.meta.attachments);
-    var attachments = eventData.message.meta.attachments; // alias
+    var nodeIds = Object.keys(meta.attachments);
+    var attachments = meta.attachments; // alias
 
     // case 1 & 2
 
@@ -70,7 +72,7 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
                 '</div>' +
             '</div>'
         );
-        $element.attr('data-message-id', eventData.message.id)
+        $element.attr('data-message-id', m.getMessageId())
         $('.fm-chat-filename', $element).text(attachment.name);
 
         if(attachment.t == 0) {

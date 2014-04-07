@@ -201,19 +201,19 @@ var Karere = function(user_options) {
     self._discoBareCache = {};
 
 
-    self.bind("onPresence", function(e, eventData) {
-        var bareJid = Karere.getNormalizedBareJid(eventData.from);
+    self.bind("onPresence", function(e, eventObject) {
+        var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
-        if(eventData.show != "unavailable") {
-            self._presenceCache[eventData.from] = eventData.show ? eventData.show : "available";
-            self._presenceBareCache[bareJid] = eventData.show ? eventData.show : "available";
+        if(eventObject.getShow() != "unavailable") {
+            self._presenceCache[eventObject.getFromJid()] = eventObject.getShow() ? eventObject.getShow() : "available";
+            self._presenceBareCache[bareJid] = eventObject.getShow() ? eventObject.getShow() : "available";
 
-            if(!self._discoCache[eventData.from]) {
-                self._requestDiscoCapabilities(eventData.from);
+            if(!self._discoCache[eventObject.getFromJid()]) {
+                self._requestDiscoCapabilities(eventObject.getFromJid());
             }
         } else {
-            delete self._presenceCache[eventData.from];
-            delete self._discoCache[eventData.from];
+            delete self._presenceCache[eventObject.getFromJid()];
+            delete self._discoCache[eventObject.getFromJid()];
 
             var foundPresenceForOtherDevices = false;
             $.each(self._presenceCache, function(fullJid, pres) {
@@ -227,11 +227,13 @@ var Karere = function(user_options) {
                 delete self._presenceBareCache[bareJid];
                 delete self._discoBareCache[bareJid];
 
-                self.trigger('onDiscoCapabilities', [{
-                    'userJid': eventData.from,
-                    'userBareJid': bareJid,
-                    'capabilities': $.extend({}, self.options.defaultCapabilities)
-                }]);
+                self.trigger('onDiscoCapabilities', [
+                    new KarereEventObjects.DiscoCapabilities(
+                        eventObject.getFromJid(),
+                        bareJid,
+                        $.extend({}, self.options.defaultCapabilities)
+                    )
+                ]);
             }
         }
     });
@@ -270,6 +272,7 @@ makeObservable(Karere);
 
 // support for .setMeta and .getMeta
 makeMetaAware(Karere);
+
 
 
 /**
@@ -424,9 +427,7 @@ makeMetaAware(Karere);
                     self.setPresence(); // really important...if we dont call this...the user will not be visible/online to the others in the roster
                                         // so no messages will get delivered.
 
-                    self.trigger('onConnected', [
-                        self.connection.jid
-                    ]);
+                    self.trigger('onConnected');
 
                     $promise.resolve(status);
                 }
@@ -751,6 +752,19 @@ makeMetaAware(Karere);
     };
 
     /**
+     * Normalize FULL Jids (e.g. conference jids -> local muc jids)
+     *
+     * @param jid
+     * @returns {*}
+     */
+    Karere.getNormalizedFullJid = function(jid) {
+        if(jid.indexOf("conference.") != -1) {
+            jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "") + "/" + jid.split("/")[1].split("__")[1];
+        }
+        return jid;
+    };
+
+    /**
      * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
      * console.
      */
@@ -865,15 +879,34 @@ makeMetaAware(Karere);
 
             if(Object.keys(newUsers).length > 0) {
                 eventData['newUsers'] = newUsers;
-                self._triggerEvent("UsersJoined", eventData);
+                self._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    eventData.from,
+                    eventData.to,
+                    eventData.roomJid,
+                    eventData.currentUsers,
+                    eventData.newUsers
+                ));
             }
             if(Object.keys(leftUsers).length > 0) {
                 eventData['leftUsers'] = leftUsers;
-                self._triggerEvent("UsersLeft", eventData);
+                self._triggerEvent("UsersLeft", new KarereEventObjects.UsersLeft(
+                    eventData.from,
+                    eventData.to,
+                    eventData.roomJid,
+                    eventData.currentUsers,
+                    eventData.leftUsers
+                ));
             }
 
             if($('status[code="110"]', x).size() == 1) {
-                self._triggerEvent("UsersUpdatedDone", eventData);
+                self._triggerEvent("UsersUpdatedDone", new KarereEventObjects.UsersUpdated(
+                    eventData.from,
+                    eventData.to,
+                    eventData.roomJid,
+                    eventData.currentUsers,
+                    eventData.newUsers,
+                    eventData.leftUsers
+                ));
             }
         }
         // end of x handling
@@ -921,7 +954,7 @@ makeMetaAware(Karere);
                             'isForwarded': true,
                             'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined
                         });
-                    })
+                    });
 
 
                     // stop
@@ -930,7 +963,7 @@ makeMetaAware(Karere);
             } else if(_type == "groupchat") {
                 stanzaType = "ChatMessage";
 
-                eventData['message'] = $(elems[0]).text();
+                eventData['message'] = $('messageContents', elems[0]).text();
 
                 // is this a forwarded message? if yes, trigger event only for that
                 if($('forwarded', message).size() > 0) {
@@ -1056,9 +1089,6 @@ makeMetaAware(Karere);
         var self = this;
 
         if(eventData['rawMessage'] && eventData['rawMessage'].getElementsByTagName("delay").length > 0) {
-            stanzaType = "Delayed" + stanzaType;
-
-
             var delay = eventData['rawMessage'].getElementsByTagName("delay");
             if(delay.length > 0) {
                 var stamp = delay[0].getAttribute('stamp');
@@ -1073,12 +1103,109 @@ makeMetaAware(Karere);
     		console.debug(self.getNickname(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
         }
 
+
+        var eventDataObject = null;
+        if(stanzaType == "ChatMessage") {
+            /**
+             *
+             * @type {KarereEventObjects.IncomingMessage}
+             */
+            eventDataObject = new KarereEventObjects.IncomingMessage(
+                eventData.to,
+                eventData.from,
+                eventData.type,
+                eventData.rawType,
+                eventData.id,
+                eventData.rawMessage,
+                eventData.roomJid,
+                eventData.meta,
+                eventData.message,
+                eventData.elements,
+                eventData.delay
+            );
+        } else if(stanzaType == "PrivateMessage") {
+            eventDataObject = new KarereEventObjects.IncomingPrivateMessage(
+                eventData.to,
+                eventData.from,
+                eventData.type,
+                eventData.rawType,
+                eventData.id,
+                eventData.rawMessage,
+                eventData.meta,
+                eventData.message,
+                eventData.elements,
+                eventData.delay
+            );
+        } else if(stanzaType == "Presence") {
+            eventDataObject = new KarereEventObjects.Presence(
+                eventData.to,
+                eventData.from,
+                eventData.show,
+                eventData.status,
+                eventData.delay
+            );
+        } else if(stanzaType == "ActiveMessage") {
+            eventDataObject = new KarereEventObjects.StateActiveMessage(
+                eventData.to,
+                eventData.from,
+                eventData.roomJid,
+                eventData.delay
+            );
+        } else if(stanzaType == "ComposingMessage") {
+            eventDataObject = new KarereEventObjects.StateComposingMessage(
+                eventData.to,
+                eventData.from,
+                eventData.roomJid,
+                eventData.delay
+            );
+        } else if(stanzaType == "PausedMessage") {
+            eventDataObject = new KarereEventObjects.StateComposingMessage(
+                eventData.to,
+                eventData.from,
+                eventData.roomJid,
+                eventData.delay
+            );
+        } else if(stanzaType == "InviteMessage") {
+            eventDataObject = new KarereEventObjects.InviteMessage(
+                eventData.to,
+                eventData.from,
+                eventData.room,
+                eventData.password,
+                eventData.meta,
+                eventData.delay
+            );
+        } else if(stanzaType == "ActionMessage") {
+            eventDataObject = new KarereEventObjects.ActionMessage(
+                eventData.to,
+                eventData.from,
+                eventData.id,
+                eventData.meta.action,
+                eventData.meta,
+                eventData.delay
+            );
+        } else {
+            eventDataObject = eventData;
+            if($.isPlainObject(eventDataObject)) {
+                if(localStorage.d) {
+                    console.error("Don't know how to convert event of type: " + stanzaType + " to EventObject, with eventData:", eventData);
+                }
+            }
+
+            //throw new Error("Don't know how to convert event of type: " + stanzaType + " to EventObject");
+        }
+
         try {
             /**
              * Strophe will remove this handler if it raises an exception... so we need to be sure that our attached
              * handlers WOULD NEVER throw an exception.
              */
-            self.trigger(targetedTypeEvent, eventData);
+            self.trigger(
+                targetedTypeEvent,
+                [
+                    eventDataObject,
+                    self
+                ]
+            );
         } catch(e) {
             if(localStorage.d) {
 		        console.error('ERROR: ' + (e.stack ? e.stack : e));
@@ -1087,28 +1214,10 @@ makeMetaAware(Karere);
 
         // if none of the handlers have not stopped the event propagation, trigger a more generic event.
         if(!targetedTypeEvent.isPropagationStopped()) {
-            var genericEventInstance = new $.Event("onStanza");
-            genericEventInstance.data = eventData;
-
-            try {
-                /**
-                 * Strophe will remove this handler if it raises an exception... so we need to be sure that our attached
-                 * handlers WOULD NEVER throw an exception.
-                 */
-                self.trigger(genericEventInstance, eventData);
-            } catch(e) {
-                if(localStorage.d) {
-		            console.log('ERROR: ' + (e.stack ? e.stack : e));
-                }
-            }
-            if(genericEventInstance.isPropagationStopped()) {
-                return false;
-            }
+            return true;
         } else {
             return false;
         }
-
-        return true;
     };
 }
 
@@ -1250,7 +1359,7 @@ makeMetaAware(Karere);
      *
      * @param toJid
      * @param type should be chat or groupchat
-     * @param contents {String|DOMElement} content of the messages
+     * @param contents {String|Element} content of the messages
      * @param [meta] {Object} pass optional meta object, that should be serialized and sent w/ the message
      * @param [messageId] {String} specify your own message id (if needed)
      * @param [delay] {Number} use this to specify the urn:xmpp:delay value that is going to be sent w/ the message
@@ -1262,23 +1371,53 @@ makeMetaAware(Karere);
         type = type || "chat";
         messageId = messageId || self.generateMessageId(toJid);
 
-        var message = $msg({from: self.connection.jid, to: toJid, type: type, id: messageId});
+        var outgoingMessage = new KarereEventObjects.OutgoingMessage(
+            toJid,
+            self.getJid(),
+            type,
+            messageId,
+            contents,
+            meta,
+            delay
+        );
 
-        if(contents.toUpperCase) { // is string (better way?)
+        var event = new $.Event("onOutgoingMessage");
+        self.trigger(
+            event,
+            [
+                outgoingMessage,
+                self
+            ]
+        );
+        if(event.isPropagationStopped()) {
+            if(localStorage.d) {
+                console.warn("Event propagation stopped sending of message: ", outgoingMessage)
+            }
+            return false;
+        }
+
+        var message = $msg({
+            from: self.connection.jid,
+            to: outgoingMessage.getToJid(),
+            type: outgoingMessage.getType(),
+            id: outgoingMessage.getMessageId()
+        });
+
+        if(outgoingMessage.getContents().toUpperCase) { // is string (better way?)
             message
                 .c('body')
                 .c('messageContents')
-                .t(contents)
+                .t(outgoingMessage.getContents())
                 .up()
                 .c('active', {'xmlns': 'http://jabber.org/protocol/chatstates'});
         } else {
             message
-                .node.appendChild(contents.tree())
+                .node.appendChild(outgoingMessage.getContents().tree())
         }
 
-        if(Object.keys(meta).length > 0) {
+        if(Object.keys(outgoingMessage.getMeta()).length > 0) {
             var json = Strophe.xmlHtmlNode("<json><\/json>").childNodes[0];
-            json.textContent = JSON.stringify(meta);
+            json.textContent = JSON.stringify(outgoingMessage.getMeta());
 
             var $body = $('body', message.nodeTree);
             if($body[0]) {
@@ -1290,55 +1429,25 @@ makeMetaAware(Karere);
             }
         }
 
-        if(delay && delay > 0) {
+        if(outgoingMessage.getDelay() && outgoingMessage.getDelay() > 0) {
             var $delay = $("<delay><\/delay>")
             $delay.attr('xmlns', 'urn:xmpp:delay');
             $delay.attr('from', self.getJid());
-            $delay.attr('stamp', (new Date(delay * 1000).toISOString()));
+            $delay.attr('stamp', (new Date(outgoingMessage.getDelay() * 1000).toISOString()));
 
             message.nodeTree.appendChild(
                 $delay[0]
             );
         }
 
-
-        // XX: Do we really need this in case that type == groupchat?
-//
-//        var forwarded = $msg({
-//            to: Strophe.getBareJidFromJid(self.connection.jid),
-//            type: type,
-//            id:messageId
-//        })
-//            .c('forwarded', {xmlns:'urn:xmpp:forward:0'})
-//            .c('delay', {xmns:'urn:xmpp:delay',stamp:timestamp}).up()
-//            .cnode(message.tree());
-
-
-        var event = new $.Event("onSendMessage");
-        self.trigger(event, {
-            toJid: toJid,
-            type: type,
-            contents: contents,
-            meta: meta,
-            messageId: messageId,
-            message: message,
-            delay: delay
-        });
-
-        if(event.isPropagationStopped()) {
-            if(localStorage.d) {
-                console.warn("Event propagation stopped sending of message: ", message)
-            }
-            return false;
-        }
         self.connection.send(message);
 //        self.connection.send(forwarded);
 
         //noinspection JSUnresolvedVariable
         if(localStorage.dxmpp) {
-            console.debug(self.getNickname(), "sendin message w/ id", messageId, message);
+            console.debug(self.getNickname(), "sendin message w/ id", outgoingMessage);
         }
-        return messageId;
+        return outgoingMessage.getMessageId();
     };
 
     Karere.prototype.sendAction = function(toJid, action, meta) {
@@ -1518,28 +1627,28 @@ makeMetaAware(Karere);
 
         var searchKey = eventName == "Joined" ? "newUsers" : "leftUsers";
 
-        self.bind(generatedEventName, function(e, eventData) {
+        self.bind(generatedEventName, function(e, eventObject) {
             var joined = false;
 
             if(localStorage.d) {
 //        		console.debug(eventName, roomJid, userJid, eventData[searchKey]);
             }
 
-            if(eventData.from.split("/")[0] != roomJid) {
+            if(eventObject.getFromJid().split("/")[0] != roomJid) {
                 return;
             }
 
             if(userJid.indexOf("/") == -1) { // bare jid
                 // search for $userJid/
                 //noinspection FunctionWithInconsistentReturnsJS
-                $.each(eventData[searchKey], function(k) {
+                $.each(eventObject[searchKey], function(k) {
                     if(k.indexOf(userJid + "/") != -1) {
                         joined = true;
                         return false; //break;
                     }
                 });
             } else { // full jid
-                if(eventData[searchKey][userJid]) {
+                if(eventObject[searchKey][userJid]) {
                     joined = true;
                 }
             }
@@ -1891,11 +2000,13 @@ makeMetaAware(Karere);
                 });
             }
         });
-        self.trigger('onDiscoCapabilities', [{
-            'userJid': fullJid,
-            'userBareJid': bareJid,
-            'capabilities': self._discoBareCache[bareJid]
-        }]);
+        self.trigger('onDiscoCapabilities', [
+            new KarereEventObjects.DiscoCapabilities(
+                fullJid,
+                bareJid,
+                self._discoBareCache[bareJid]
+            )
+        ]);
     };
 
 

@@ -374,7 +374,13 @@ function ul_dispatch_encryption()
 
 				if (typeof(ul_workers[id]) != "object")
 				{
-					ul_workers[id] = new SecureWorker('encrypter.js');
+					try {
+					    ul_workers[id] = new SecureWorker('encrypter.js');
+					}
+					catch (e) {
+					    ul_workers[id] = new Worker('encrypter.js');
+					}
+
 					ul_workers[id].postMessage = ul_workers[id].webkitPostMessage || ul_workers[id].postMessage;
 
 					ul_workers[id].onmessage = function(e)

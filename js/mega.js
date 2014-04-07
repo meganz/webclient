@@ -1597,14 +1597,15 @@ function MegaData ()
 		}
 
 		if (!bl) return false;
-		if (!$.transferprogress) $.transferprogress=[];
+		if (!$.transferprogress) $.transferprogress={};
 		if (kbps == 0) return false;
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = (bt-bl)/bps;
 		if (bl && bt)
 		{
-			$.transferprogress[id] = Math.floor(bl/bt*100);
+			// $.transferprogress[id] = Math.floor(bl/bt*100);
+			$.transferprogress[id] = [bl,bt];
 			if (!uldl_hold)
 			{
 				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
@@ -1644,7 +1645,7 @@ function MegaData ()
 			$('.slideshow-error').addClass('hidden');
 			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
 		}		
-	
+		
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
@@ -1687,6 +1688,9 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
+		if (!$.transferprogress['dlc']) $.transferprogress['dlc'] = 0;
+		$.transferprogress['dlc'] += $.transferprogress[id][1];
+		delete $.transferprogress[id];
 	}
 
 	this.dlbeforecomplete = function()
@@ -1811,10 +1815,11 @@ function MegaData ()
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var bps = Math.round(bl / eltime);
 		var retime = (bt-bl)/bps;
-		if (!$.transferprogress) $.transferprogress=[];
+		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
 		{
-			$.transferprogress[id] = Math.floor(bl/bt*100);
+			// $.transferprogress[id] = Math.floor(bl/bt*100);
+			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
 			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
 			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
@@ -1868,6 +1873,9 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
+		if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
+		$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
+		delete $.transferprogress['ul_' + id];
 	}
 
 	this.ulstart = function(id)

@@ -106,10 +106,10 @@ function FileSystemAPI(dl_id, dl) {
 					}
 	
 					zfileEntry = fileEntry;
-					setTimeout(function() {
+					Soon(function() {
 						// deferred execution
 						IO.begin();
-					}, 1);
+					});
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -176,7 +176,7 @@ function FileSystemAPI(dl_id, dl) {
 
 	if(is_chrome_firefox) {
 		IO.abort = function(err) {
-			dl_fw.close(err);
+			if (dl_fw) dl_fw.close(err);
 		};
 	}
 

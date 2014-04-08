@@ -68,10 +68,13 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(function() {
-		callback();
-	}, 1000);
+	setTimeout(callback, 1000);
 }
+
+var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
+{
+	setTimeout(callback, 0);
+};
 
 function jScrollFade(id)
 {

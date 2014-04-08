@@ -610,18 +610,16 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	}
 }, 4);
 
+function isQueueActive(q) {
+	return typeof q.id !== 'undefined';
+}
 function resetUploadDownload() {
-	var ul_len = 0, dl_len = 0;
-	$.each(ul_queue, function(i, f) {
-		if (typeof f.id != 'undefined') ul_len++;
-	});
+	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
+	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
 
-	$.each(dl_queue, function(i, f) {
-		if (typeof f.id != 'undefined') dl_len++;
-	});
-	if (ul_len == 0) ul_queue = new UploadQueue
-	if (dl_len == 0) dl_queue = new DownloadQueue
-	DEBUG("resetUploadDownload", ul_len, dl_len);
+	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
+
+	Soon(percent_megatitle);
 }
 
 
@@ -634,10 +632,12 @@ ulQueue.on('working', function() {
 
 ulQueue.on('resume', function() {
 	ul_uploading = !ulQueue.isEmpty();
+	uldl_hold = false;
 });
 
 ulQueue.on('pause', function() {
 	ul_uploading = !ulQueue.isEmpty();
+	uldl_hold = true;
 });
 
 ulQueue.on('drain', function() {

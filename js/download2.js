@@ -13,12 +13,8 @@ dlQueue.push = function(x) {
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
-	var L=0;
-	$.each(obj, function(i, elem) {
-		L++;
-	});
-	return L;
-}
+	return Object.keys(obj).length;
+};
 
 function dl_cancel() {
 	DownloadManager.abortAll();

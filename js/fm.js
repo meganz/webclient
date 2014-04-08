@@ -555,7 +555,7 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
-	ulQueue.resume();
+	if (!uldl_hold) ulQueue.resume();
 	initTreeScroll();
 	$(window).trigger('resize');
 }

@@ -17,7 +17,6 @@ var DEFAULT_CONCURRENCY = 4
 		this._worker		= worker;
 		this._running		= [];
 		this._paused		= false;
-		var self = this;
 	}
 	inherits(queue, MegaEvents)
 
@@ -36,19 +35,22 @@ var DEFAULT_CONCURRENCY = 4
 			var id = $.inArray(this, queue._running);
 			if (id == -1) {
 				DEBUG("task already finished");
-				return setTimeout(function() {
-					queue.process();
-				});
+			} else {
+				queue._running.splice(id, 1);
+				queue.trigger('done', args)
+				try {
+					queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
+				} catch(ex) {
+					console.error(ex);
+					if (d) console.trace();
+				}
+				delete queue._callback[args.__tid];
+				if (args.__ondone) {
+					args.__ondone(args, Array.prototype.slice.call(arguments, 0))
+				}
 			}
 
-			queue._running.splice(id, 1);
-			queue.trigger('done', args)
-			queue._callback[args.__tid](args, Array.prototype.slice.call(arguments, 0))
-			delete queue._callback[args.__tid];
-			if (args.__ondone) {
-				args.__ondone(args, Array.prototype.slice.call(arguments, 0))
-			}
-			setTimeout(function() {
+			Soon(function() {
 				queue.process();
 			});
 		}
@@ -177,9 +179,9 @@ var DEFAULT_CONCURRENCY = 4
 		this._queue.unshift(task);
 		this._callback[task.__tid] = done || function() {};
 		var self = this;
-		setTimeout(function() {
+		Soon(function() {
 			self.process();
-		}, 0);
+		});
 	}
 
 	/**
@@ -191,9 +193,9 @@ var DEFAULT_CONCURRENCY = 4
 		this._queue.push(task);
 		this._callback[task.__tid] = done || function() {};
 		var self = this;
-		setTimeout(function() {
+		Soon(function() {
 			self.process();
-		}, 0);
+		});
 	}
 
 	QueueClass = queue;

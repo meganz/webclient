@@ -931,8 +931,12 @@ function initContextUI()
 		$.each($.zipkill, function(i) {
 			DownloadManager.abort({ zipid: i });
 		});
-		delete $.zipkill;		
-		percent_megatitle();
+		delete $.zipkill;
+		Soon(function() {
+			// XXX: better way to stretch the scrollbar?
+			$(window).trigger('resize');
+			resetUploadDownload();
+		});
 	});
 }
 

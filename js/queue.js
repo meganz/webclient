@@ -236,6 +236,7 @@ MegaQueue.prototype.push = function(arg, next, self) {
 	queue.prototype.process = function() {
 		var args, context;
 		if (!this._alive || this._paused) return;
+		if (this._paused || !this._queue) return;
 		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
@@ -250,6 +251,8 @@ MegaQueue.prototype.push = function(arg, next, self) {
 			this._worker.apply(null, [args, context]);
 			context = null
 		}
+
+		if (!this._queue) return;
 
 		if (this._queue.length == 0 && this._running.length == 0) {
 			this.trigger('drain');

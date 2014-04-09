@@ -897,18 +897,18 @@ function initContextUI()
 	$(c+'.canceltransfer-item').unbind('click');
 	$(c+'.canceltransfer-item').bind('click',function(event) 
 	{			
-		$.zipkill=false;		
+		$.zipkill={};
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
-		{		
-			var id = $(el).attr('id');			
-			if ((id && id.indexOf('dl_') > -1) || (id && id.indexOf('zip_') > -1))
-			{				
-				var abort=false;				
+		{
+			var id = $(el).attr('id');
+			if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
+			{
+				id = id.replace('dl_','').replace('zip_','');
+
 				$.each(dl_queue, function(i, queue) {
-					if (queue.id == id.replace('dl_','') || queue.zipid == id.replace('zip_','')) {
-						if (queue.zipid) $.zipkill = dl_queue[i].zipid;
-						else $.sd=i;							
-						return false; /* break */
+					if (queue.id == id || queue.zipid == id) {
+						if (queue.zipid) $.zipkill[queue.zipid] = 1;
+						else DownloadManager.abort({ id: queue.dl_id });
 					}
 				});
 			}
@@ -921,23 +921,16 @@ function initContextUI()
 						if (ul_queue[i].id == id.replace('ul_',''))
 						{
 							UploadManager.abort(ul_queue[i]);
-							$.su=1;
 						}
 					}
 				}	
 			}
 			$(this).remove();
-		});				
+		});
 
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
-			if (dl_queue[$.sd]) {
-				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
-			} else if ($.zipkill >= 0) {
-				DownloadManager.abort({ zipid: $.zipkill });
-			}
-		}
-		delete $.su;
-		delete $.sd;
+		$.each($.zipkill, function(i) {
+			DownloadManager.abort({ zipid: i });
+		});
 		delete $.zipkill;		
 		percent_megatitle();
 	});

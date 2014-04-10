@@ -11,26 +11,12 @@
  * key press timing code thanks to Nigel Johnstone
  */
 
-var oldKeyHandler;    // For saving and restoring key press handler in IE4
-var keyRead = 0;
-var keyNext = 0;
-var keyArray = new Array(256);
-
 var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
-var oldMoveHandler;    // For saving and restoring mouse move handler in IE4
-var mouseRead = 0;
-var mouseNext = 0;
-var mouseArray = new Array(256);
-
 var lastactive = new Date().getTime();
-
-
-
-var entropy=0;
 
 // ----------------------------------------
 
-var s=new Array(256);
+var s = new Array(256);
 var rc4x, rc4y;
 
 function rc4Init()
@@ -87,16 +73,11 @@ function keyPressEntropy(e) { rc4Next(timeByte()); }
 
 function mouseMoveEntropy(e)
 {
-
-  lastactive = new Date().getTime();
-  var c;
-
-  if (!e) { e = window.event; }	    // Internet Explorer event model
+ lastactive = new Date().getTime();
 
  if(mouseMoveSkip-- <= 0)
  {
-  if(oldMoveHandler) { c = ((e.clientX << 4) | (e.clientY & 15)); }
-  else { c = ((e.screenX << 4) | (e.screenY & 15)); }
+  var c = ((e.screenX << 4) | (e.screenY & 15));
   if (typeof arkanoid_entropy !== 'undefined') arkanoid_entropy();
   rc4Next(c&255);
   rc4Next(timeByte());
@@ -118,16 +99,6 @@ function eventsEnd()
   document.detachEvent("onmousemove", mouseMoveEntropy);
   document.detachEvent("onkeypress", keyPressEntropy);
  }
- else if(document.releaseEvents)
- {
-  document.releaseEvents(EVENT.MOUSEMOVE); document.onMousemove = 0;
-  document.releaseEvents(EVENT.KEYPRESS); document.onKeypress = 0;
- }
- else
- {
-  document.onMousemove = oldMoveHandler;
-  document.onKeypress = oldKeyHandler;
- }
 }
 
 // Start collection of entropy.
@@ -144,20 +115,6 @@ function eventsCollect()
  {
   document.attachEvent("onmousemove", mouseMoveEntropy);
   document.attachEvent("onkeypress", keyPressEntropy);
- }
- else if(document.captureEvents) // Netscape 4.0
- {
-  document.captureEvents(Event.MOUSEMOVE);
-  document.onMousemove = mouseMoveEntropy;
-  document.captureEvents(Event.KEYPRESS);
-  document.onMousemove = keyPressEntropy;
- }
- else // IE 4 event model
- {
-  oldMoveHandler = document.onmousemove;
-  document.onMousemove = mouseMoveEntropy;
-  oldKeyHandler = document.onkeypress;
-  document.onKeypress = keyPressEntropy;
  }
 
  rc4Init();

@@ -606,6 +606,59 @@ function removeValue(array, value) {
 };
 
 /**
+ * Secure worker consturctor, allows to spawn new worker only from the code
+ * verified by secureboot process; `importScripts` calls inside worker are also
+ * restricted to verified scritps.
+ */
+function SecureWorker ( url ) {
+    if ( typeof url !== 'string' )
+        throw new TypeError();
+
+    var scode = "(function () {\n"
+              + "    var _scripts = " + JSON.stringify(scripts) + ";\n"
+              + "    var _importScripts = self.importScripts;\n"
+              + "    self.importScripts = function () {\n"
+              + "        for ( var i = 0; i < arguments.length; i++ ) {\n"
+              + "            var surl = _scripts[ arguments[i] ];\n"
+              + "            if ( typeof surl !== 'string' ) throw new Error();\n"
+              + "            arguments[i] = surl;\n"
+              + "        }\n"
+              + "        _importScripts.apply( self, arguments );\n"
+              + "    };\n"
+              + "})();\n"
+              + "importScripts('"+url+"')"
+
+    var sblob;
+    if ( typeof BlobBuilder === 'function' ) {
+        var bb = new BlobBuilder();
+        bb.append(scode);
+        sblob = bb.getBlob('text/javascript');
+    }
+    else {
+        sblob = new Blob( [ scode ], { type: "text/javascript" } );
+    }
+
+    var surl = window.URL.createObjectURL(sblob);
+
+    var thiz = this;
+    var sworker = new Worker(surl);
+
+    sworker.onmessage = function ( e ) {
+        (thiz.onmessage||function(){}).call( thiz, e );
+    }
+
+    thiz.postMessage = function () {
+        sworker.postMessage.apply( sworker, arguments );
+    };
+
+    thiz.terminate = function () {
+        sworker.terminate();
+        window.URL.revokeObjectURL(surl);
+        sworker = null;
+    };
+}
+
+/**
  *	Create a pool of workers, it returns a Queue object
  *	so it can be called many times and it'd be throttled 
  *	by the queue
@@ -624,17 +677,27 @@ function CreateWorkers(url, message, size) {
 		}
 	}
 
-	for (var i = 0; i < size; i++) {
-		var w  = new Worker(url);
+	function create(i) {
+		try {
+			var w  = new SecureWorker(url);
+		} catch (e) {
+			// IE10/IE11 fallback
+			var w  = new Worker(url);
+		}
 		w.id   = i;
 		w.busy = false;
 		w.postMessage = w.webkitPostMessage || w.postMessage;
 		w.onmessage   = handler(i);
-		worker.push(w);
+		return w;
+	}
+
+	for (var i = 0; i < size; i++) {
+		worker.push(null);
 	}
 
 	return new QueueClass(function(task) {
 		for (var i = 0; i < size; i++) {
+			if (worker[i] === null) worker[i] = create(i);
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
@@ -642,7 +705,7 @@ function CreateWorkers(url, message, size) {
 		$.each(task, function(e, t) {
 			if (e == 0) {
 				worker[i].context = t;
-			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
+			} else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
 				worker[i].postMessage(t.buffer,[t.buffer]);
 			} else {
 				worker[i].postMessage(t);
@@ -652,6 +715,64 @@ function CreateWorkers(url, message, size) {
 }
 
 function percent_megatitle()
+{
+	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {};
+	
+	for (var i in dl_queue)
+	{
+		var q = dl_queue[i];
+		var t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+		
+		if (t)
+		{
+			dl_r += t[0];
+			dl_t += t[1];
+		}
+		else
+		{
+			dl_t += q.size || 0;
+		}
+	}
+	
+	for (var i in ul_queue)
+	{
+		var t = tp['ul_' + ul_queue[i].id];
+		
+		if (t)
+		{
+			ul_r += t[0];
+			ul_t += t[1];
+		}
+		else
+		{
+			ul_t += ul_queue[i].size || 0;
+		}
+	}
+	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
+	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
+	
+	if (dl_t && ul_t)
+	{
+		t = ' \u2191 ' + Math.floor(ul_r/ul_t*100) + '% \u2193 ' + Math.floor(dl_r/dl_t*100) + '%';
+	}
+	else if (dl_t)
+	{
+		t = ' ' + Math.floor(dl_r/dl_t*100) + '%';
+	}
+	else if (ul_t)
+	{
+		t = ' ' + Math.floor(ul_r/ul_t*100) + '%';
+	}
+	else
+	{
+		t = '';
+		$.transferprogress = {};
+	}
+	
+	megatitle(t);
+}
+
+function __percent_megatitle()
 {
 	var percentage = 0
 		, total = 0

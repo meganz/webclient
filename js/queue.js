@@ -25,6 +25,7 @@ var DEFAULT_CONCURRENCY = 4
 		this.task = args;
 		this.reschedule = function() {
 			var callback = queue._callback[args.__tid];
+			delete queue._callback[args.__tid];
 			this.done();
 			setTimeout(function() {
 				queue.pushFirst(args, callback);
@@ -52,6 +53,15 @@ var DEFAULT_CONCURRENCY = 4
 			});
 		}
 	}
+
+	queue.prototype.Destroy = function() {
+		this._concurrency	= null
+		this._callback		= null
+		this._queue			= null
+		this._worker		= null
+		this._running		= null
+		this._paused		= true
+	};
 
 	queue.prototype.isEmpty = function() {
 		return this._running.length == 0 
@@ -88,7 +98,7 @@ var DEFAULT_CONCURRENCY = 4
 
 	queue.prototype.process = function() {
 		var args, context;
-		if (this._paused) return;
+		if (this._paused || !this._queue) return;
 		while (!this._paused && this._running.length < this._concurrency && this._queue.length > 0) {
 			args = this.getNextTask();
 			if (args === null) {
@@ -106,6 +116,8 @@ var DEFAULT_CONCURRENCY = 4
 			this._running.push(context)
 			this._worker.apply(context, [args])
 		}
+
+		if (!this._queue) return;
 
 		if (this._queue.length == 0 && this._running.length == 0) {
 			this.trigger('drain');

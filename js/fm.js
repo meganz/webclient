@@ -3311,6 +3311,11 @@ function transferPanelUI()
 			$(this).addClass('active');
 			dlQueue.pause();
 			ulQueue.pause();
+
+			$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+			{
+				$(this).text('');
+			});
 		}	
 	});
 }

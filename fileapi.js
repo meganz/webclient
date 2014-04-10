@@ -166,7 +166,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
 
-					if (d && (aBytes != 64 || d > 1)) { // 64 == fingerprint
+					if (d && (aBytes != 64 || d > 2)) { // 64 == fingerprint
 						console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,
 							this.size, ''+data.slice(0,16).map(function(n) n.toString(16)));
 					}

@@ -125,6 +125,8 @@ function mozPlaySound(n) {
 
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
+	aFile = aFile.clone();
+
 	this.__defineGetter__('isFile', function()
 	{
 		return aFile.isFile();
@@ -149,6 +151,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			size : aFile.fileSize,
 			type : type || '',
 			lastModifiedDate : aFile.lastModifiedTime,
+			get mozFile() aFile,
 
 			u8: function(aStart,aBytes)
 			{
@@ -845,6 +848,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		alert(e);
 	}
 })(self);
+
+try {
+	const { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
+} catch(e) {}
 
 const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;
 if(!BrowserApp) is_chrome_firefox |= 2;

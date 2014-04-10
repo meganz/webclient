@@ -121,10 +121,9 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 							{
 								file = new Blob([u8],{type:file.type});
 								ThumbFR.onload({ target : {
-									result : new TextDecoder().decode(u8)
+									result : (new TextDecoder('ISO-8859-1')).decode(u8)
 								}});
-							},
-							function(e)
+							}).then(null,function(e)
 							{
 								console.error(e);
 								ThumbFR.readAsBinaryString(file=file.blob());

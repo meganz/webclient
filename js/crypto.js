@@ -552,6 +552,75 @@ function chksum(buf)
 	return d;
 }
 
+
+/* moved from js/keygen.js {{{ */
+
+var Rbits, Rbits2;
+var cbuf;
+
+if (typeof window.crypto == 'object' && typeof window.crypto.getRandomValues == 'function') cbuf = new Uint32Array(1);
+
+// random number between 0 .. n -- based on repeated calls to rc
+function rand(n)
+{
+	if (cbuf) window.crypto.getRandomValues(cbuf);
+
+	if (n == 2)
+	{
+		if (!Rbits)
+		{
+			Rbits = 8;
+			Rbits2 = rc4Next(randomByte()) ^ cbuf[0];
+		}
+
+		Rbits--;
+		var r = Rbits2 & 1;
+		Rbits2 >>= 1;
+		return r;
+	}
+
+	var m = 1;
+
+	r = 0;
+
+	while (n > m && m > 0)
+	{
+		m <<= 8;
+		r = (r << 8) | rc4Next(randomByte());
+	}
+
+	if (cbuf) r ^= cbuf[0];
+
+	if (r < 0) r += 0x100000000;
+
+	return r % n;
+}
+
+function crypto_rsagenkey ()
+{
+    try {
+        var w = new SecureWorker('keygen.js');
+    }
+    catch (e) {
+        var w = new Worker('keygen.js');
+    }
+
+    var startTime = new Date();
+
+    w.onmessage = function (e) {
+        w.terminate();
+
+        var endTime = new Date();
+        console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
+
+        u_setrsa(e.data);
+    };
+
+    w.postMessage([ /* TODO seed from arkanoid */ ]);
+}
+
+/* }}} */
+
 // decrypt ArrayBuffer in CTR mode, return MAC
 function decrypt_ab_ctr(aes,ab,nonce,pos)
 {

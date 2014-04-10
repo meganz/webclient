@@ -16,7 +16,7 @@ function init_key()
 {
 	if (m)
 	{
-		genkey();
+		crypto_rsagenkey();
 		return false;	
 	}		
 	$('.register-game-button.start').unbind('click');
@@ -50,7 +50,7 @@ function key_step2()
 	$.killarkanoid=true;
 	$('.key1').addClass('hidden');
 	$('.key2').removeClass('hidden');
-	if (typeof u_privk == 'undefined') genkey();
+	if (typeof u_privk == 'undefined') crypto_rsagenkey();
 	else ui_keycomplete();
 }
 

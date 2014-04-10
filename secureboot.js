@@ -334,7 +334,6 @@ else
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
 		jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-		jsl.push({f:'js/keygen.js', n: 'keygen_js', j:1});
 		jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
 		jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
@@ -390,6 +389,7 @@ else
 		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:4});
 		jsl.push({f:'encrypter.js',n:'encrypter_js',j:4});
 		jsl.push({f:'decrypter.js',n:'decrypter_js',j:4});
+		jsl.push({f:'keygen.js',n:'keygen_js',j:4});
 		/* }}} */
 		var jsl2 =
 		{

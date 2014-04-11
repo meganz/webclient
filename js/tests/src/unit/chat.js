@@ -26,10 +26,11 @@ describe("Chat.js - Karere UI integration", function() {
 
         localStorage.removeItem("megaChatPresence");
 
-        megaDataMocker = new MegaDataMocker();
 
         fixtureManager.get("templates.html")
             .done(function(filename, contents) {
+
+                megaDataMocker = new MegaDataMocker();
 
                 $container = $(contents);
                 $(document.body).append($container);
@@ -107,14 +108,15 @@ describe("Chat.js - Karere UI integration", function() {
     afterEach(function(done) {
         functionsMocker.restore();
 
-        megaDataMocker.restore();
-
         megaChat.destroy();
 
         karereMocker.restore();
         stropheMocker.restore();
 
         $container.remove();
+
+        megaDataMocker.restore();
+
         done();
     });
 
@@ -319,7 +321,13 @@ describe("Chat.js - Karere UI integration", function() {
             )
         );
 
-        megaChat.karere.setMeta('rooms', roomJid, 'users', users);
+        expect(
+            megaChat.chats[roomJid].getOrderedUsers()
+        ).to.eql([
+                user2jid
+            ]);
+
+//        megaChat.karere.setMeta('rooms', roomJid, 'users', users);
 
         users[user1jid] = "participant";
 
@@ -350,6 +358,13 @@ describe("Chat.js - Karere UI integration", function() {
 
         expect(megaChat.chats[roomJid].getParticipants()).to.have.members(Object.keys(users));
         expect(megaChat.chats[roomJid].getParticipants().length).to.eql(2);
+
+        expect(
+            megaChat.chats[roomJid].getOrderedUsers()
+        ).to.eql([
+                user2jid,
+                user1jid
+            ]);
 
 
         expect(
@@ -1091,6 +1106,10 @@ describe("Chat.js - Karere UI integration", function() {
         users[megaChat.karere.getJid()] = "moderator";
 //        users[user2jid] = "participant";
 
+//        megaChat.karere.setMeta('rooms', roomJid, 'users', [
+//            megaChat.karere.getJid()
+//        ]);
+
         megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
             roomJid + "/" + megaChat.karere.getNickname(),
             megaChat.karere.getJid(),
@@ -1107,6 +1126,18 @@ describe("Chat.js - Karere UI integration", function() {
             users
         ));
 
+
+        expect(
+            megaChat.chats[roomJid].getOrderedUsers()
+        ).to.eql([
+                megaChat.karere.getJid()
+            ]);
+
+//        megaChat.karere.setMeta('rooms', roomJid, 'users', [
+//            megaChat.karere.getJid(),
+//            user2jid
+//        ]);
+
         // new user joined
         users[user2jid] = "participant";
         megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
@@ -1119,12 +1150,27 @@ describe("Chat.js - Karere UI integration", function() {
 
         expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
 
+        expect(
+            megaChat.chats[roomJid].getOrderedUsers()
+        ).to.eql([
+                megaChat.karere.getJid(),
+                user2jid
+            ]);
+
+        // TODO: assert that the encryptionHandler.cliquesMember.members.length == 1 or 2? (me + user2jid)
+
         $promise.done(function() {
 
             var room = megaChat.chats[roomJid];
             room.sendMessage("text message", {
                 'meta': true
             });
+
+            setTimeout(function() {
+                done();
+                //TODO: Wait for
+            }, 1000);
+            return;
 
             assert(
                 megaChat.karere.sendRawMessage.secondCall.args[2].indexOf("mpENC:") === 0,

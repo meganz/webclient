@@ -352,7 +352,8 @@ else
         jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
-        // Strophe
+        jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
+
         jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'mega_js', j:1,w:7});
@@ -376,6 +377,7 @@ else
         jsl.push({f:'js/chat/urlFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/encryptionFilter.js', n: 'mega_js', j:1,w:7});
 
 
         jsl.push({f:'js/chat/karereEventObjects.js', n: 'mega_js', j:1,w:7});

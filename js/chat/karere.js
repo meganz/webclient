@@ -38,102 +38,19 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
  * Create new Karere instance.
  *
  *
- * @param user_options
+ * @param [user_options] {Object} see Karere.DEFAULTS for options that you can overwrite
  * @returns {Karere}
  * @constructor
  */
 var Karere = function(user_options) {
     var self = this;
 
-    var defaults = {
-        /**
-         * Used to connect to the BOSH service endpoint
-         */
-        "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/http-bind',
-
-        /**
-         * Used when /resource is not passed when calling .connect() to generate a unique new resource id
-         * that can be easily identified by this name when looking at server side XMPP logs.
-         */
-        "clientName": 'karere',
-
-        /**
-         * Default Strophe Options, which can be overridden in `opts`
-         */
-        "stropheOptions": {
-        },
-
-        /**
-         * Default config when creating rooms
-         */
-        "roomConfig": {
-            "muc#roomconfig_roomdesc": "",
-            "muc#roomconfig_persistentroom": 0,
-            "muc#roomconfig_publicroom": 0,
-            "public_list": 0,
-            "muc#roomconfig_passwordprotectedroom": 0,
-            "muc#roomconfig_maxusers": 200,
-            "muc#roomconfig_whois": "anyone",
-            "muc#roomconfig_membersonly": 1,
-            "muc#roomconfig_moderatedroom": 1,
-            "members_by_default": 1,
-            "muc#roomconfig_changesubject": 0,
-            "allow_private_messages": 0,
-            "allow_private_messages_from_visitors": "anyone",
-            "allow_query_users": 0,
-            "muc#roomconfig_allowinvites": 1,
-            "muc#roomconfig_allowvisitorstatus": 1,
-            "muc#roomconfig_allowvisitornickchange": 0,
-            "muc#roomconfig_allowvoicerequests": 1,
-            "muc#roomconfig_voicerequestmininterval": 1800
-        },
-
-        /**
-         * Timeout for the addUserToChat promise...will wait for that much ms and reject the promise
-         * if the user have not joined
-         */
-        waitForUserPresenceInRoomTimeout: 2500,
-
-        /**
-         * Timeout for waiting before rejecting the .disconnect promise
-         */
-        disconnectTimeout: 2500,
-
-        /**
-         * Timeout for waiting the queue of waiting stanzas to be send before rejecting and doing forced disconnect
-         */
-        disconnectQueueTimeout: 2000,
-
-        /**
-         * Maximum connection retry in case of error
-         */
-        maxConnectionRetries: 10,
-
-        /**
-         * When a method which requires connection is called, Karere would try to connect and execute that method.
-         * However, what is the timeout that should be used to determinate if the connect operation had timed out?
-         */
-        connectionRequiredTimeout: 3500,
-
-        /**
-         * The default affiliation set when adding new users in membersOnly rooms.
-         */
-        newUsersAffiliation: "owner",
-
-        /**
-         * Default capabilities and their settings (used when initializing the local disco capab. cache)
-         */
-        defaultCapabilities: {
-            'audio': false,
-            'video': false,
-            'karere': false
-        }
-    };
-    self.options = $.extend(true, {}, defaults, user_options);
+    self.options = $.extend(true, {}, Karere.DEFAULTS, user_options);
 
     self.connection = new Strophe.Connection(self.options.boshServiceUrl, self.options.stropheOptions);
     self.connection.karere = self;
 
+    self.connection.disco.addNode('urn:xmpp:ping', {}); // supports pings
     self.connection.disco.addNode('karere', {}); // identify as a Karere client.
 
 
@@ -200,6 +117,8 @@ var Karere = function(user_options) {
     self._discoCache = {};
     self._discoBareCache = {};
 
+    self._iqRequests = {};
+
 
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
@@ -238,8 +157,152 @@ var Karere = function(user_options) {
         }
     });
 
+    var usersUpdatedHandler = function(e, eventObject) {
+
+        var newUsers = eventObject.getNewUsers ? eventObject.getNewUsers() : {};
+        var leftUsers = eventObject.getLeftUsers ? eventObject.getLeftUsers() : {};
+        var users = self.getMeta('rooms', eventObject.getRoomJid(), 'users', {});
+
+        // ordered users list
+        var orderedUsers = self.getMeta('rooms', eventObject.getRoomJid(), 'orderedUsers', []).slice() /* clone */;
+
+        $.each(newUsers, function(jid, role) {
+            if(orderedUsers.indexOf(jid) === -1) {
+                orderedUsers.push(
+                    jid
+                );
+                users[jid] = role;
+            }
+        });
+
+        $.each(leftUsers, function(jid, role) {
+            var arrIdx = orderedUsers.indexOf(jid);
+            if(arrIdx !== -1) {
+                orderedUsers.splice(arrIdx, 1);
+            }
+            delete users[jid];
+        });
+
+        self.setMeta('rooms', eventObject.getRoomJid(), 'orderedUsers', orderedUsers);
+
+        self.setMeta('rooms', eventObject.getRoomJid(), 'users', users);
+    };
+
+    self.bind("onUsersJoined", usersUpdatedHandler);
+    self.bind("onUsersLeft", usersUpdatedHandler);
+
+    self.bind("onPingRequest", function(e, eventObject) {
+        if(eventObject.isMyOwn(self) || e.isPropagationStopped() === true) {
+            return;
+        }
+
+        console.error("Sending pong: ", eventObject);
+        self.sendPong(eventObject.getFromJid(), eventObject.getMessageId());
+    });
+
     // helper functions for simple way of storing/caching some meta info
     return this;
+};
+
+/**
+ * Default options for Karere
+ */
+Karere.DEFAULTS = {
+    /**
+     * Used to connect to the BOSH service endpoint
+     */
+    "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/http-bind',
+
+    /**
+     * Used when /resource is not passed when calling .connect() to generate a unique new resource id
+     * that can be easily identified by this name when looking at server side XMPP logs.
+     */
+    "clientName": 'karere',
+
+    /**
+     * Default Strophe Options, which can be overridden in `opts`
+     */
+    "stropheOptions": {
+    },
+
+    /**
+     * Default config when creating rooms
+     */
+    "roomConfig": {
+        "muc#roomconfig_roomdesc": "",
+        "muc#roomconfig_persistentroom": 0,
+        "muc#roomconfig_publicroom": 0,
+        "public_list": 0,
+        "muc#roomconfig_passwordprotectedroom": 0,
+        "muc#roomconfig_maxusers": 200,
+        "muc#roomconfig_whois": "anyone",
+        "muc#roomconfig_membersonly": 1,
+        "muc#roomconfig_moderatedroom": 1,
+        "members_by_default": 1,
+        "muc#roomconfig_changesubject": 0,
+        "allow_private_messages": 0,
+        "allow_private_messages_from_visitors": "anyone",
+        "allow_query_users": 0,
+        "muc#roomconfig_allowinvites": 1,
+        "muc#roomconfig_allowvisitorstatus": 1,
+        "muc#roomconfig_allowvisitornickchange": 0,
+        "muc#roomconfig_allowvoicerequests": 1,
+        "muc#roomconfig_voicerequestmininterval": 1800
+    },
+
+    /**
+     * Timeout for the addUserToChat promise...will wait for that much ms and reject the promise
+     * if the user have not joined
+     */
+    waitForUserPresenceInRoomTimeout: 2500,
+
+    /**
+     * Timeout for waiting before rejecting the .disconnect promise
+     */
+    disconnectTimeout: 2500,
+
+    /**
+     * Timeout for waiting the queue of waiting stanzas to be send before rejecting and doing forced disconnect
+     */
+    disconnectQueueTimeout: 2000,
+
+    /**
+     * Maximum connection retry in case of error
+     */
+    maxConnectionRetries: 10,
+
+    /**
+     * When a method which requires connection is called, Karere would try to connect and execute that method.
+     * However, what is the timeout that should be used to determinate if the connect operation had timed out?
+     */
+    connectionRequiredTimeout: 21000,
+
+
+    /**
+     * Timeout when connecting
+     */
+    connectTimeout: 15000,
+
+
+    /**
+     * Timeout waiting for a ping response from user (note: using client-to-client xmpp ping)
+     */
+    pingTimeout: 5000,
+
+    /**
+     * The default affiliation set when adding new users in membersOnly rooms.
+     */
+    newUsersAffiliation: "owner",
+
+    /**
+     * Default capabilities and their settings (used when initializing the local disco capab. cache)
+     */
+    defaultCapabilities: {
+        'audio': false,
+        'video': false,
+        'karere': false,
+        'ping': false
+    }
 };
 
 
@@ -336,7 +399,7 @@ makeMetaAware(Karere);
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
             return createTimeoutPromise(function() {
                 return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
-            }, 100, 4500);
+            }, 100, self.options.connectTimeout);
         }
 
 
@@ -420,6 +483,7 @@ makeMetaAware(Karere);
                     // connection.jid
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
+                    self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingIq, self), null, 'iq', null, null,  null);
 
 
                     self._errors = 0; // reset connection errors
@@ -845,6 +909,7 @@ makeMetaAware(Karere);
             eventData['error'] = errors[0].childNodes[0].tagName.toLowerCase();
         }
 
+
         // x handling
         if(x.length > 0 && x[0].getAttribute('xmlns') == 'http://jabber.org/protocol/muc#user') {
             eventData['roomJid'] = eventData['from'].split("/")[0];
@@ -873,9 +938,10 @@ makeMetaAware(Karere);
                     }
                 });
             });
+            eventData['currentUsers'] = users;
 
 
-            self.setMeta('rooms', eventData['roomJid'], 'users', users);
+
 
             if(Object.keys(newUsers).length > 0) {
                 eventData['newUsers'] = newUsers;
@@ -1070,10 +1136,44 @@ makeMetaAware(Karere);
             }
         }
 
+
         self._triggerEvent(stanzaType, eventData);
 
         // we must return true to keep the handler alive.
         // returning false would remove it after it finishes.
+        return true;
+    };
+
+    /**
+     * Handler for IQs
+     *
+     * @param message
+     * @private
+     */
+    Karere.prototype._onIncomingIq = function(message) {
+        var self = this;
+        var $message = $(message);
+
+        if($message.attr("type") == "result") {
+            var reqType = self._iqRequests[$message.attr('id')];
+            if(reqType) {
+                self._triggerEvent(reqType, {
+                    fromJid: $message.attr('from'),
+                    toJid: $message.attr('to'),
+                    messageId: $message.attr('id'),
+                    rawMessage: message
+                });
+            }
+        }
+        else if($message.attr("type") == "get") {
+            if($('ping', $message).size() > 0) {
+                self._triggerEvent("PingRequest", {
+                    fromJid: $message.attr('from'),
+                    toJid: $message.attr('to'),
+                    messageId: $message.attr('id')
+                });
+            }
+        }
         return true;
     };
 
@@ -1183,6 +1283,20 @@ makeMetaAware(Karere);
                 eventData.meta,
                 eventData.delay
             );
+        } else if(stanzaType == "PingRequest") {
+            eventDataObject = new KarereEventObjects.PingRequest(
+                eventData.toJid,
+                eventData.fromJid,
+                eventData.messageId
+            );
+            console.error(stanzaType, eventDataObject);
+        } else if(stanzaType == "PingResponse") {
+            eventDataObject = new KarereEventObjects.PingResponse(
+                eventData.toJid,
+                eventData.fromJid,
+                eventData.messageId
+            );
+            console.error(stanzaType, eventDataObject);
         } else {
             eventDataObject = eventData;
             if($.isPlainObject(eventDataObject)) {
@@ -1393,7 +1507,7 @@ makeMetaAware(Karere);
             if(localStorage.d) {
                 console.warn("Event propagation stopped sending of message: ", outgoingMessage)
             }
-            return false;
+            return messageId;
         }
 
         var message = $msg({
@@ -1450,6 +1564,14 @@ makeMetaAware(Karere);
         return outgoingMessage.getMessageId();
     };
 
+    /**
+     * Simple method of sending actions (message that have a predefined action (string) and optionally meta)
+     *
+     * @param toJid
+     * @param action
+     * @param [meta]
+     * @returns {*}
+     */
     Karere.prototype.sendAction = function(toJid, action, meta) {
         return this.sendRawMessage(
             toJid,
@@ -1914,6 +2036,18 @@ makeMetaAware(Karere);
     };
 
     /**
+     * Get an ordered list of users in chat (ordered by joining time)
+     *
+     * @param roomJid
+     * @returns {*}
+     */
+    Karere.prototype.getOrderedUsersInChat = function(roomJid) {
+        var self = this;
+        var users = self.getMeta('rooms', roomJid, 'orderedUsers', []);
+        return users.slice(); /* ALWAYS return a copy of the array...its dangerous to work with arrays directly */
+    };
+
+    /**
      * Check if user exists in a chat room (MUC)
      *
      * @param roomJid {String} full room JID
@@ -1966,6 +2100,7 @@ makeMetaAware(Karere);
             meta['audio'] = $('feature[var="urn:xmpp:jingle:apps:rtp:audio"]', response).size() > 0;
             meta['video'] = $('feature[var="urn:xmpp:jingle:apps:rtp:video"]', response).size() > 0;
             meta['karere'] = $('feature[var="karere"]', response).size() > 0;
+            meta['ping'] = $('feature[var="urn:xmpp:ping"]', response).size() > 0;
 
             self._discoCache[fullJid] = meta;
 
@@ -2025,6 +2160,84 @@ makeMetaAware(Karere);
             return self._discoBareCache[jid];
         } else {
             return self._discoCache[jid];
+        }
+    };
+
+
+    /**
+     * Send ping
+     *
+     * @param targetFullUserJid
+     */
+    Karere.prototype.sendPing = function(targetFullUserJid) {
+        var self = this;
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            if(!self._pingRequests) {
+                self._pingRequests = {};
+            }
+            self._pingRequests[targetFullUserJid] = true;
+
+            var evtName = generateEventSuffixFromArguments("onPingResponse", "respWait", targetFullUserJid);
+
+            var gotResponse = false;
+
+            self.bind(evtName, function(e, eventObject) {
+                if(eventObject.getFromJid() == targetFullUserJid) {
+                    gotResponse = true;
+                }
+            });
+
+            var messageId = self.generateMessageId(targetFullUserJid);
+
+            var msg = $iq({
+                from: self.getJid(),
+                to: targetFullUserJid,
+                type: "get",
+                id: messageId
+            }).c("ping", {
+                'xmlns': 'urn:xmpp:ping'
+            });
+            self._iqRequests[messageId] = "PingResponse";
+
+            self.connection.send(
+                msg.tree()
+            );
+
+            return createTimeoutPromise(function() {
+                return gotResponse;
+            }, 133, self.options.pingTimeout, targetFullUserJid).always(function() {
+                // cleanup
+                self.unbind(evtName);
+            });
+        }
+    };
+
+
+    /**
+     * Send pong
+     *
+     * @param targetFullUserJid
+     */
+    Karere.prototype.sendPong = function(targetFullUserJid, messageId) {
+        var self = this;
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            if(!self._pingRequests) {
+                self._pingRequests = {};
+            }
+            self._pingRequests[targetFullUserJid] = true;
+
+            var msg = $iq({
+                from: self.getJid(),
+                to: targetFullUserJid,
+                type: "result",
+                id: messageId
+            });
+
+            self.connection.send(
+                msg.tree()
+            );
         }
     };
 }

@@ -17,6 +17,8 @@ module.exports = function(config) {
              "../mega.js",
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
 
+             "../chat/mpenc.js",
+
              "../vendor/chat/strophe.js",
              "../vendor/chat/strophe.disco.js",
              "../vendor/chat/strophe.jingle.js",
@@ -36,7 +38,7 @@ module.exports = function(config) {
              "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",
              "../chat/emoticonsFilter.js",
-             "../chat/encryptionFilterDemo.js",
+             "../chat/encryptionFilter.js",
 
              "../chat/karereEventObjects.js",
              "../chat/karere.js",

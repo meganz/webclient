@@ -240,11 +240,18 @@ describe("Karere Unit Test", function() {
 
         expect(promiseJoined.state()).to.equal("resolved");
 
+
         expect(
             Object.keys(
                 k1.getUsersInChat('room@jid.com')
             ).length
         ).to.equal(1);
+
+        expect(
+            k1.getOrderedUsersInChat('room@jid.com')
+        ).to.eql([
+                'user2@jid.com/r1'
+            ]);
 
         k1._onIncomingStanza(
             stringToXml(
@@ -270,6 +277,10 @@ describe("Karere Unit Test", function() {
                 k1.getUsersInChat('room@jid.com')
             ).length
         ).to.equal(0);
+
+        expect(
+            k1.getOrderedUsersInChat('room@jid.com')
+        ).to.eql([]);
 
         expect(k1.userExistsInChat("room@jid.com", k1.getJid())).not.to.be.ok;
 
@@ -397,6 +408,7 @@ describe("Karere Unit Test", function() {
                     "<feature var='urn:xmpp:jingle:1'/>" +
                     "<feature var='urn:xmpp:jingle:apps:rtp:1'/>" +
                     "<feature var='urn:xmpp:jingle:transports:ice-udp:1'/>" +
+//                    "<feature var='urn:xmpp:ping'/>" +
 //                    "<feature var='urn:xmpp:jingle:apps:rtp:audio'/>" +
 //                    "<feature var='urn:xmpp:jingle:apps:rtp:video'/>" +
                     "<feature var='urn:ietf:rfc:5761'/>" +
@@ -420,7 +432,8 @@ describe("Karere Unit Test", function() {
         expect(k1._discoCache["user2@jid.com/d1"]).to.eql({
             'audio': false,
             'video': false,
-            'karere': false
+            'karere': false,
+            'ping': false
         });
 
 
@@ -438,6 +451,7 @@ describe("Karere Unit Test", function() {
                 "<feature var='urn:xmpp:jingle:apps:rtp:audio'/>" +
                 "<feature var='urn:xmpp:jingle:apps:rtp:video'/>" +
                 "<feature var='urn:ietf:rfc:5761'/>" +
+                "<feature var='urn:xmpp:ping'/>" +
                 "</query>" +
                 "</iq>"
         );
@@ -458,13 +472,15 @@ describe("Karere Unit Test", function() {
         expect(k1._discoCache["user2@jid.com/d2"]).to.eql({
             'audio': true,
             'video': true,
-            'karere': true
+            'karere': true,
+            'ping': true
         });
 
         expect(k1.getCapabilities("user2@jid.com/d2")).to.eql({
             'audio': true,
             'video': true,
-            'karere': true
+            'karere': true,
+            'ping': true
         });
 
         // verify that the user's bare JID cache is set all to true, since he have at least 1 device capable of all
@@ -473,13 +489,15 @@ describe("Karere Unit Test", function() {
         expect(k1._discoBareCache["user2@jid.com"]).to.eql({
             'audio': true,
             'video': true,
-            'karere': true
+            'karere': true,
+            'ping': true
         });
 
         expect(k1.getCapabilities("user2@jid.com")).to.eql({
             'audio': true,
             'video': true,
-            'karere': true
+            'karere': true,
+            'ping': true
         });
 
         done();
@@ -558,6 +576,13 @@ describe("Karere Unit Test", function() {
 
         expect(k1.userExistsInChat(roomJid, "user2@jid.com/r1")).to.be.ok;
 
+        expect(
+            k1.getOrderedUsersInChat(roomJid)
+        ).to.eql([
+                k1.getJid(),
+                "user2@jid.com/r1"
+            ]);
+
         var promiseLeft = k1.removeUserFromChat(roomJid, "user2@jid.com/r1");
 
         expect(m1.calls['muc.kick'].length).to.equal(1);
@@ -589,6 +614,13 @@ describe("Karere Unit Test", function() {
         m1.calls['muc.leave'][0][2]();
 
         expect(promiseLeave.state()).to.equal('resolved');
+
+
+        expect(
+            k1.getOrderedUsersInChat(roomJid)
+        ).to.eql([
+                k1.getJid()
+            ]);
 
         done();
     });

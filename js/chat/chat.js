@@ -331,10 +331,11 @@ MegaChat.prototype.init = function() {
     self.plugins = {};
 
 
-    if(localStorage.encryptionFilterDemo) {
-        // since this plugin act as filter, it should be added first.
-        self.plugins['encryptionFilterDemo'] = new EncryptionFilterDemo(self);
-    };
+
+    // since this plugin act as filter, it should be added first. (only if in the real app!)
+    if(typeof(mocha) == "undefined") {
+        self.plugins['encryptionFilter'] = new EncryptionFilter(self);
+    }
 
     $.each(self.options.plugins, function(k, v) {
         self.plugins[k] = new v(self);
@@ -551,9 +552,10 @@ MegaChat.prototype.init = function() {
     });
 
     this.karere.bind("onActionMessage", function(e, eventObject) {
-        if(eventObject.isMyOwn(self.karere) === true) {
+        if(eventObject.isMyOwn(self.karere) === true || e.isPropagationStopped() === true) {
             return;
         }
+        console.error("GOT ACTION MESSAGE: ", eventObject);
 
         var room;
         var meta = eventObject.getMeta();
@@ -793,6 +795,13 @@ MegaChat.prototype.connect = function() {
  */
 MegaChat.prototype._onChatMessage = function(e, eventObject) {
     var self = this;
+
+    if(e.isPropagationStopped()) {
+        return;
+    }
+    if(localStorage.d) {
+        console.error("MegaChat is now processing incoming message: ", eventObject);
+    }
 
     // ignore empty messages (except attachments)
     if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
@@ -1835,7 +1844,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
             var targetUserJid = self.getParticipantsExceptMe()[0];
             var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
             assert(M.u, 'M.u does not exists');
-            assert(targetUserNode.h, 'No hash found for participant');
+            assert(targetUserNode && targetUserNode.h, 'No hash found for participant');
             assert(M.u[targetUserNode.h], 'User not found in M.u');
 
             if(targetUserNode) {
@@ -1856,6 +1865,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
 //        };
     });
 
+    self.megaChat.trigger('onRoomCreated', [self]);
     return this;
 };
 
@@ -1866,7 +1876,8 @@ makeObservable(MegaChatRoom);
 
 /**
  * Room states
- * @type {{INITIALIZED: number, JOINING: number, JOINED: number, SYNCING: number, SYNCED: number, READY: number, LEAVING: number, LEFT: number}}
+ *
+ * @type {{INITIALIZED: number, JOINING: number, JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, SYNCING: number, SYNCED: number, READY: number, LEAVING: number, LEFT: number}}
  */
 MegaChatRoom.STATE = {
     'INITIALIZED': 5,
@@ -2057,6 +2068,41 @@ MegaChatRoom.prototype.getParticipants = function() {
     return Object.keys(participants);
 };
 
+/**
+ * Get all users in the chat room.
+ *
+ * @returns {Array}
+ */
+MegaChatRoom.prototype.getUsers = function() {
+    var self = this;
+
+    return self.megaChat.karere.getUsersInChat(self.roomJid);
+};
+
+/**
+ * Get all users in the chat room ordered by joining time.
+ *
+ * @returns {Array}
+ */
+MegaChatRoom.prototype.getOrderedUsers = function() {
+    var self = this;
+
+    return self.megaChat.karere.getOrderedUsersInChat(self.roomJid);
+};
+
+/**
+ * Get room owner (e.g. the oldest user who joined and is currently in the room)
+ *
+ * @returns {(string|null)}
+ */
+MegaChatRoom.prototype.getRoomOwner = function() {
+    var self = this;
+
+    var users = self.megaChat.karere.getOrderedUsersInChat(self.roomJid);
+
+    return users[0];
+};
+
 MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
     var self = this;
     if(!jids) {
@@ -2196,6 +2242,8 @@ MegaChatRoom.prototype.leave = function() {
  */
 MegaChatRoom.prototype.destroy = function() {
     var self = this;
+
+    self.megaChat.trigger('onRoomDestroy', [self]);
 
     // destroy any waiting sync requests
     if(self._syncRequests) {
@@ -2585,6 +2633,8 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         self.setState(MegaChatRoom.STATE.SYNCING);
     }
 
+    console.error("!!! SENT REQ WITH ID: ", messageId);
+
     self._syncRequests[messageId] = {
         'messageId': messageId,
         'userJid': userJid,
@@ -2777,7 +2827,7 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
     var megaChat = this.megaChat;
     meta = meta || {};
 
-    if(self.state != MegaChatRoom.STATE.READY) {
+    if(self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
         var eventObject = new KarereEventObjects.OutgoingMessage(
             self.roomJid,

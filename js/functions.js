@@ -677,28 +677,34 @@ function simpleStringHashCode(str){
  * @param validateFunction {Function}
  * @param tick {int}
  * @param timeout {int}
+ * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
  * @returns {Deferred}
  */
-function createTimeoutPromise(validateFunction, tick, timeout) {
+function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs) {
     var $promise = new $.Deferred();
+    resolveRejectArgs = resolveRejectArgs || [];
+    if(!$.isArray(resolveRejectArgs)) {
+        resolveRejectArgs = [resolveRejectArgs]
+    }
+
     var tickInterval = setInterval(function() {
         if(validateFunction()) {
             if(localStorage.d) {
-                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()));
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
-            $promise.resolve();
+            $promise.resolve.apply($promise, resolveRejectArgs);
         }
     }, tick);
 
     var timeoutTimer = setTimeout(function() {
         if(validateFunction()) {
             if(localStorage.d) {
-                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()));
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
-            $promise.resolve();
+            $promise.resolve.apply($promise, resolveRejectArgs);
         } else {
-            console.error("Timed out after waiting", timeout, "ms", "at", (new Date()));
-            $promise.reject();
+            console.error("Timed out after waiting", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+            $promise.reject.apply($promise, resolveRejectArgs);
         }
     }, timeout);
 
@@ -910,13 +916,54 @@ function unixtimeToTimeString(timestamp) {
  * @param fnName
  * @param loggerFn
  */
-function callLoggerWrapper(ctx, fnName, loggerFn) {
+function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
+    if(!localStorage.d) {
+        return;
+    }
+
     var origFn = ctx[fnName];
+    var textPrefix = textPrefix || "noname";
+    textPrefix = "[call logger: " + textPrefix + "]";
+
+    if(ctx[fnName].haveCallLogger) { // recursion
+        return;
+    }
     ctx[fnName] = function() {
-        loggerFn.apply(console, ["Called: ", fnName, toArray(arguments)]);
+        loggerFn.apply(console, [textPrefix, "Called: ", fnName, toArray(arguments)]);
         var res = origFn.apply(this, toArray(arguments));
-        loggerFn.apply(console, ["Got result: ", fnName, res]);
+        loggerFn.apply(console, [textPrefix, "Got result: ", fnName, res]);
 
         return res;
     };
+    ctx[fnName].haveCallLogger = true; // recursion
+};
+
+/**
+ * Simple Object instance call log helper
+ * This function is intended to be used for dev/debugging/testing purposes only.
+ *
+ *
+ * WARNING: This function will create tons of references in the window.callLoggerObjects & also may flood your console.
+ *
+ * @param ctx
+ * @param [loggerFn] {Function}
+ * @param [recursive] {boolean}
+ */
+function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix) {
+    if(!localStorage.d) {
+        return;
+    }
+    loggerFn = loggerFn || console.debug;
+
+    if(!window.callLoggerObjects) {
+        window.callLoggerObjects = [];
+    }
+    $.each(ctx, function(k, v) {
+        if(typeof(v) == "function") {
+            callLoggerWrapper(ctx, k, loggerFn, textPrefix);
+        } else if(typeof(v) == "object" && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
+            window.callLoggerObjects.push(v);
+            logAllCallsOnObject(v, loggerFn, recursive, textPrefix + "." + k);
+        }
+    });
 };

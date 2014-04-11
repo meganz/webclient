@@ -1129,6 +1129,246 @@ KarereEventObjects.OutgoingMessage.prototype.isEmptyMessage = function() {
     }
 };
 /**
+ * Event Object `Ping`
+ *
+ * @param toJid {string} recipient's JID
+ * @param fromJid {string} sender's JID
+ * @constructor
+ */
+KarereEventObjects.Ping = function(toJid, fromJid) {
+    this.setToJid(toJid);
+    this.setFromJid(fromJid);
+};
+/**
+ * Getter for property `toJid`
+ *
+ * @returns {(string)} recipient's JID
+ */
+KarereEventObjects.Ping.prototype.getToJid = function() {
+    return this.toJid;
+};
+/**
+ * Setter for property `toJid`
+ *
+ * @param val {string} recipient's JID
+ * @returns {KarereEventObjects.Ping}
+ */
+KarereEventObjects.Ping.prototype.setToJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    this.toJid = val;
+    return this;
+};
+/**
+ * Getter for property `fromJid`
+ *
+ * @returns {(string)} sender's JID
+ */
+KarereEventObjects.Ping.prototype.getFromJid = function() {
+    return this.fromJid;
+};
+/**
+ * Setter for property `fromJid`
+ *
+ * @param val {string} sender's JID
+ * @returns {KarereEventObjects.Ping}
+ */
+KarereEventObjects.Ping.prototype.setFromJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    this.fromJid = val;
+    return this;
+};
+/**
+ * Returns true if .fromJid equals the current jid of the passed Karere instance
+ *
+ * @param karere {Karere} Karere instance that should be used to determinate my JID
+ * @returns {boolean}
+ */
+KarereEventObjects.Ping.prototype.isMyOwn = function(karere) {
+    return Karere.getNormalizedFullJid(karere.getJid()) == Karere.getNormalizedFullJid(this.getFromJid())
+};
+/**
+ * Debug helper
+ *
+ * @returns {string}
+ */
+KarereEventObjects.Ping.prototype.toString = function() {
+    return "EventObject " + this.getType() + "(...)";
+};
+/**
+ * Event Object `PingRequest`
+ *
+ * @param toJid {string} recipient's JID
+ * @param fromJid {string} sender's JID
+ * @param messageId {string} unique ID of the message
+ * @constructor
+ */
+KarereEventObjects.PingRequest = function(toJid, fromJid, messageId) {
+    this.setToJid(toJid);
+    this.setFromJid(fromJid);
+    this.setMessageId(messageId);
+};
+/**
+ * Getter for property `toJid`
+ *
+ * @returns {(string)} recipient's JID
+ */
+KarereEventObjects.PingRequest.prototype.getToJid = function() {
+    return this.toJid;
+};
+/**
+ * Setter for property `toJid`
+ *
+ * @param val {string} recipient's JID
+ * @returns {KarereEventObjects.PingRequest}
+ */
+KarereEventObjects.PingRequest.prototype.setToJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    this.toJid = val;
+    return this;
+};
+/**
+ * Getter for property `fromJid`
+ *
+ * @returns {(string)} sender's JID
+ */
+KarereEventObjects.PingRequest.prototype.getFromJid = function() {
+    return this.fromJid;
+};
+/**
+ * Setter for property `fromJid`
+ *
+ * @param val {string} sender's JID
+ * @returns {KarereEventObjects.PingRequest}
+ */
+KarereEventObjects.PingRequest.prototype.setFromJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    this.fromJid = val;
+    return this;
+};
+/**
+ * Getter for property `messageId`
+ *
+ * @returns {(string)} unique ID of the message
+ */
+KarereEventObjects.PingRequest.prototype.getMessageId = function() {
+    return this.messageId;
+};
+/**
+ * Setter for property `messageId`
+ *
+ * @param val {string} unique ID of the message
+ * @returns {KarereEventObjects.PingRequest}
+ */
+KarereEventObjects.PingRequest.prototype.setMessageId = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    this.messageId = val;
+    return this;
+};
+/**
+ * Returns true if .fromJid equals the current jid of the passed Karere instance
+ *
+ * @param karere {Karere} Karere instance that should be used to determinate my JID
+ * @returns {boolean}
+ */
+KarereEventObjects.PingRequest.prototype.isMyOwn = function(karere) {
+    return Karere.getNormalizedFullJid(karere.getJid()) == Karere.getNormalizedFullJid(this.getFromJid())
+};
+/**
+ * Debug helper
+ *
+ * @returns {string}
+ */
+KarereEventObjects.PingRequest.prototype.toString = function() {
+    return "EventObject " + this.getType() + "(...)";
+};
+/**
+ * Event Object `PingResponse`
+ *
+ * @param toJid {string} recipient's JID
+ * @param fromJid {string} sender's JID
+ * @param messageId {string} unique ID of the message
+ * @constructor
+ */
+KarereEventObjects.PingResponse = function(toJid, fromJid, messageId) {
+    this.setToJid(toJid);
+    this.setFromJid(fromJid);
+    this.setMessageId(messageId);
+};
+/**
+ * Getter for property `toJid`
+ *
+ * @returns {(string)} recipient's JID
+ */
+KarereEventObjects.PingResponse.prototype.getToJid = function() {
+    return this.toJid;
+};
+/**
+ * Setter for property `toJid`
+ *
+ * @param val {string} recipient's JID
+ * @returns {KarereEventObjects.PingResponse}
+ */
+KarereEventObjects.PingResponse.prototype.setToJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
+    this.toJid = val;
+    return this;
+};
+/**
+ * Getter for property `fromJid`
+ *
+ * @returns {(string)} sender's JID
+ */
+KarereEventObjects.PingResponse.prototype.getFromJid = function() {
+    return this.fromJid;
+};
+/**
+ * Setter for property `fromJid`
+ *
+ * @param val {string} sender's JID
+ * @returns {KarereEventObjects.PingResponse}
+ */
+KarereEventObjects.PingResponse.prototype.setFromJid = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
+    this.fromJid = val;
+    return this;
+};
+/**
+ * Getter for property `messageId`
+ *
+ * @returns {(string)} unique ID of the message
+ */
+KarereEventObjects.PingResponse.prototype.getMessageId = function() {
+    return this.messageId;
+};
+/**
+ * Setter for property `messageId`
+ *
+ * @param val {string} unique ID of the message
+ * @returns {KarereEventObjects.PingResponse}
+ */
+KarereEventObjects.PingResponse.prototype.setMessageId = function(val) {
+    assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
+    this.messageId = val;
+    return this;
+};
+/**
+ * Returns true if .fromJid equals the current jid of the passed Karere instance
+ *
+ * @param karere {Karere} Karere instance that should be used to determinate my JID
+ * @returns {boolean}
+ */
+KarereEventObjects.PingResponse.prototype.isMyOwn = function(karere) {
+    return Karere.getNormalizedFullJid(karere.getJid()) == Karere.getNormalizedFullJid(this.getFromJid())
+};
+/**
+ * Debug helper
+ *
+ * @returns {string}
+ */
+KarereEventObjects.PingResponse.prototype.toString = function() {
+    return "EventObject " + this.getType() + "(...)";
+};
+/**
  * Event Object `Presence`
  *
  * @param toJid {string} recipient's JID

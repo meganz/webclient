@@ -1,4 +1,4 @@
-importScripts('aesasm.js');
+importScripts('js/aesasm.js');
 
 postMessage = self.webkitPostMessage || self.postMessage;
 

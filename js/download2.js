@@ -253,7 +253,7 @@ dlQueue.getNextTask = (function() {
 // }}}
 
 if (localStorage.dl_maxSlots) {
-	dl_maxSlots = localStorage.dl_maxSlots;
+	dl_maxSlots = parseInt( localStorage.dl_maxSlots );
 }
 
 function checkLostChunks(file)

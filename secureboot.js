@@ -321,11 +321,12 @@ else
 		var jsl = []
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
+		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
 		jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
 		jsl.push({f:'js/rsa.js', n: 'rsa_js', j:1});
 		jsl.push({f:'js/keygen.js', n: 'keygen_js', j:1});
 		jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
@@ -378,7 +379,12 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
+		/* SecureWorker stuff {{{ */
+		jsl.push({f:'js/aesasm.js',n:'aesasm_js',j:4}); // Will be replaced with asmCrypto soon
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:4});
+		jsl.push({f:'encrypter.js',n:'encrypter_js',j:4});
+		jsl.push({f:'decrypter.js',n:'decrypter_js',j:4});
+		/* }}} */
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},
@@ -533,7 +539,7 @@ else
 				i++;
 			}
 		}
-		var pages = [];
+		var pages = [], scripts = {};
 		function getxhr()
 		{
 			return (typeof XDomainRequest != 'undefined' && typeof ArrayBuffer == 'undefined') ? new XDomainRequest() : new XMLHttpRequest();
@@ -746,6 +752,7 @@ else
 				}
 			  }
 			  else if (jsl[i].j == 3) l = JSON.parse(jsl[i].text);
+			  else if (jsl[i].j == 4) scripts[jsl[i].f] = jsl[i].text;
 			  else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
 			}
 			if (window.URL)
@@ -753,6 +760,7 @@ else
 				try
 				{
 					var blob = new Blob(cssar, { type: "text/css" });
+					for ( var f in scripts ) scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
 				}
 				catch(e)
 				{
@@ -760,6 +768,11 @@ else
 					var bb = new BlobBuilder();
 					for (var i in cssar) bb.append(cssar[i]);
 					var blob = bb.getBlob('text/css');
+					for ( var f in scripts ) {
+					    bb = new BlobBuilder();
+					    bb.append( scripts[f] );
+					    scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
+				    }
 				}
 				var link = document.createElement('link');
 				link.setAttribute('rel', 'stylesheet');

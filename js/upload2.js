@@ -583,7 +583,7 @@ function worker_uploader(task) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = 4
+	, ul_maxSlots = localStorage.ul_maxSlots ? parseInt( localStorage.ul_maxSlots ) : 4
 	, Encrypter
 	, ulQueue = new QueueClass(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
@@ -608,7 +608,7 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 		chunk.suffix = '/' + start + '?c=' + base64urlencode(chksum(chunk.bytes.buffer));
 		done();
 	}
-}, 4);
+}, ul_maxSlots );
 
 function isQueueActive(q) {
 	return typeof q.id !== 'undefined';

@@ -609,6 +609,59 @@ function removeValue(array, value) {
 };
 
 /**
+ * Secure worker consturctor, allows to spawn new worker only from the code
+ * verified by secureboot process; `importScripts` calls inside worker are also
+ * restricted to verified scritps.
+ */
+function SecureWorker ( url ) {
+    if ( typeof url !== 'string' )
+        throw new TypeError();
+
+    var scode = "(function () {\n"
+              + "    var _scripts = " + JSON.stringify(scripts) + ";\n"
+              + "    var _importScripts = self.importScripts;\n"
+              + "    self.importScripts = function () {\n"
+              + "        for ( var i = 0; i < arguments.length; i++ ) {\n"
+              + "            var surl = _scripts[ arguments[i] ];\n"
+              + "            if ( typeof surl !== 'string' ) throw new Error();\n"
+              + "            arguments[i] = surl;\n"
+              + "        }\n"
+              + "        _importScripts.apply( self, arguments );\n"
+              + "    };\n"
+              + "})();\n"
+              + "importScripts('"+url+"')"
+
+    var sblob;
+    if ( typeof BlobBuilder === 'function' ) {
+        var bb = new BlobBuilder();
+        bb.append(scode);
+        sblob = bb.getBlob('text/javascript');
+    }
+    else {
+        sblob = new Blob( [ scode ], { type: "text/javascript" } );
+    }
+
+    var surl = window.URL.createObjectURL(sblob);
+
+    var thiz = this;
+    var sworker = new Worker(surl);
+
+    sworker.onmessage = function ( e ) {
+        (thiz.onmessage||function(){}).call( thiz, e );
+    }
+
+    thiz.postMessage = function () {
+        sworker.postMessage.apply( sworker, arguments );
+    };
+
+    thiz.terminate = function () {
+        sworker.terminate();
+        window.URL.revokeObjectURL(surl);
+        sworker = null;
+    };
+}
+
+/**
  *	Create a pool of workers, it returns a Queue object
  *	so it can be called many times and it'd be throttled 
  *	by the queue
@@ -628,7 +681,12 @@ function CreateWorkers(url, message, size) {
 	}
 
 	function create(i) {
-		var w  = new Worker(url);
+		try {
+			var w  = new SecureWorker(url);
+		} catch (e) {
+			// IE10/IE11 fallback
+			var w  = new Worker(url);
+		}
 		w.id   = i;
 		w.busy = false;
 		w.postMessage = w.webkitPostMessage || w.postMessage;
@@ -650,7 +708,7 @@ function CreateWorkers(url, message, size) {
 		$.each(task, function(e, t) {
 			if (e == 0) {
 				worker[i].context = t;
-			} else if (t.constructor == 'Uint8Array' && typeof MSBlobBuilder !== "function") {
+			} else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
 				worker[i].postMessage(t.buffer,[t.buffer]);
 			} else {
 				worker[i].postMessage(t);

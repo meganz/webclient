@@ -1,10 +1,14 @@
 (function(w) {
 
 function MegaXHR() {
-	this.xhr    = new XMLHttpRequest;
 	this.caller = null;
-	this.xhr.onprogress = this.on_progress;
-	this.xhr.upload.progress = this.uploadprogress;
+	this.newXhr();
+}
+
+MegaXHR.prototype.newXhr = function() {
+	this.xhr = new XMLHttpRequest;
+	this.xhr.onprogress = this.onprogress;
+	this.xhr.upload.progress = this.upload_progress;
 	this.xhr.onreadystatechange = this.onreadystatechange;
 }
 
@@ -18,6 +22,13 @@ MegaXHR.prototype.attach = function(caller) {
 		return true;
 	}
 	return false;
+}
+
+MegaXHR.prototype.error = function() {
+	if (this.caller.error) {
+		this.caller.error(arguments, this.xhr);
+		this.newXhr(); /* it failed, let's create a new xhr object */
+	}
 }
 
 MegaXHR.prototype.upload_progress = function() {
@@ -38,10 +49,11 @@ MegaXHR.prototype.onreadystatechange = function() {
 	}
 }
 
-MegaXHR.prototype.send = function() {
+MegaXHR.prototype.send = function(data) {
 	if (this.xhr.overrideMimeType) {
 		this.xhr.overrideMimeType('text/plain; charset=x-user-defined');
 	}
+	this.xhr.send(data);
 }
 
 var _xhr_queue = [];

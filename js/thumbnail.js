@@ -120,13 +120,12 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 							return OS.File.read(file.mozFile.path).then(function(u8)
 							{
 								file = new Blob([u8],{type:file.type});
-								ThumbFR.onload({ target : {
-									result : (new TextDecoder('ISO-8859-1')).decode(u8)
-								}});
+								ThumbFR.onload({target:{result:mozAB2S(u8)}});
 							}).then(null,function(e)
 							{
 								console.error(e);
-								ThumbFR.readAsBinaryString(file=file.blob());
+								if (!(file instanceof Blob)) file=file.blob();
+								ThumbFR.readAsBinaryString(file);
 							});
 						} catch(e) {}
 

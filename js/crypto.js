@@ -266,7 +266,7 @@ function base64_to_a32(s)
 }
 
 // ArrayBuffer to binary string
-function ab_to_str(ab)
+var ab_to_str = is_chrome_firefox ? mozAB2S : function(ab)
 {
 	var b = '', i;
 	
@@ -293,7 +293,7 @@ function ab_to_base64(ab)
 }
 
 // ArrayBuffer to binary with depadding
-function ab_to_str_depad(ab)
+var ab_to_str_depad = is_chrome_firefox ? mozAB2SDepad : function(ab)
 {
 	var b, i;
 
@@ -730,12 +730,12 @@ function dec_attr(attr,key)
 	}
 }
 
-function to8(unicode)
+var to8 = is_chrome_firefox ? mozTo8 : function(unicode)
 {
 	return unescape(encodeURIComponent(unicode));
 }
 
-function from8(utf8)
+var from8 = is_chrome_firefox ? mozFrom8 : function(utf8)
 {
 	return decodeURIComponent(escape(utf8));
 }

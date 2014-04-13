@@ -218,6 +218,32 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 	if (d) console.log('mozDirtyGetAsEntry', aFile.path);
 }
 
+function mozAB2S(ab,len) {
+	var i = Cc['@mozilla.org/io/arraybuffer-input-stream;1']
+			.createInstance(Ci.nsIArrayBufferInputStream),
+		s = Cc["@mozilla.org/scriptableinputstream;1"]
+			.createInstance(Ci.nsIScriptableInputStream);
+	i.setData(ab.buffer || ab, 0, len || ab.byteLength);
+	s.init(i);
+	return s.readBytes(i.available());
+}
+function mozAB2SDepad(ab) {
+	var ab8 = new Uint8Array(ab), i = ab8.length;
+	while (i-- && !ab8[i]);
+	return mozAB2S(ab,++i);
+}
+
+const mozUConv = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+	.createInstance(Ci.nsIScriptableUnicodeConverter);
+mozUConv.charset = "UTF-8";
+
+function mozTo8(unicode) {
+	return mozUConv.ConvertFromUnicode(unicode);
+}
+function mozFrom8(utf8) {
+	return mozUConv.ConvertToUnicode(utf8);
+}
+
 (function __FileSystemAPI(scope) {
 	var LOG = function(m) {
 		var stack = new Error().stack.split("\n").map(s => s.replace(/^(.*@).+\//,'$1')).join("\n");

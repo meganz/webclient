@@ -2,14 +2,8 @@ var dlMethod
 	, dl_maxSlots = 4
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
-	, dlQueue = new QueueClass(downloader)
-
-dlQueue.push = function(x) {
-	if (!x.task) {
-		throw new Error("invalid error");
-	}
-	QueueClass.prototype.push.apply(dlQueue, arguments);
-};
+	, dlQueue = new MegaQueue(downloader)
+	, preparing_download
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
@@ -84,6 +78,7 @@ var DownloadManager = new function() {
 				$(this).remove();
 			});
 		}
+		dl = null;
 	}
 
 	self.abortAll = function() {
@@ -200,25 +195,37 @@ dlQueue.on('working', function() {
 });
 
 dlQueue.on('resume', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = true;
 });
 
 dlQueue.on('pause', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = true;
 });
 
 dlQueue.on('drain', function() {
-	downloading = !dlQueue.isEmpty();
+	downloading = false;
 });
 // }}}
 
 // chunk scheduler {{{
+dlQueue.validateTask = function(pzTask) {
+	if (DownloadManager.enabled(pzTask)) {
+		if (pzTask instanceof ClassChunk) {
+			return true;
+		} else if (pzTask instanceof ClassFile && !fetchingFile) {
+			return true;
+		}
+	}
+	return false;
+};
+
+
 /**
  *	Override the downloader scheduler method.
  *	The idea is to select chunks from the same
  *	file_id, always
  */
-dlQueue.getNextTask = (function() {
+dlQueue.getNextTaskz = (function() {
 	/* private variable to keep in track
 	   the current file id */
 	var current = null
@@ -350,7 +357,7 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
-function failureFunction(reschedule, task, args) {
+function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
@@ -368,7 +375,7 @@ function failureFunction(reschedule, task, args) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
-				reschedule(); 
+				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
 		}		
@@ -382,7 +389,7 @@ function failureFunction(reschedule, task, args) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */
 			}
-			reschedule(); 
+			dlQueue.pushFirst(task);
 		});
 	}, task.dl.retry_time);
 }
@@ -446,12 +453,42 @@ function dl_reportstatus(dl, code)
 	}
 }
 
+function dlGetUrlDone(res, ctx) {
+	if (typeof res == 'object') {
+		if (typeof res == 'number') {
+			dl_reportstatus(ctx.object, res);
+		} else {
+			if (res.d) {
+				dl_reportstatus(ctx.object, res.d ? 2 : 1)
+			} else if (res.g) {
+				var ab = base64_to_ab(res.at)
+					, o = dec_attr(ab ,[ctx.dl_key[0]^ctx.dl_key[4],ctx.dl_key[1]^ctx.dl_key[5],ctx.dl_key[2]^ctx.dl_key[6],ctx.dl_key[3]^ctx.dl_key[7]]);
+
+				if (typeof o == 'object' && typeof o.n == 'string') {
+					if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
+						ctx.object.data = new ArrayBuffer(res.s);				
+					}
+					return ctx.next(false, res, o, ctx.object);
+				}
+				dl_reportstatus(ctx.object, EGAIN);
+			} else {
+				dl_reportstatus(ctx.object, res.e);
+			}
+		}
+	} else {
+		dl_reportstatus(ctx.object, EAGAIN);
+	}
+	
+	dl_retryinterval *= 1.2;
+	ctx.next(new Error("failed"))
+}
+
 function dlGetUrl(object, callback) {
 	var req = { 
 		a : 'g', 
 		g : 1, 
 		ssl : use_ssl,
-	}, dl_key = object.key
+	} 
 
 	if (object.ph) {
 		req.p = object.ph;
@@ -460,35 +497,10 @@ function dlGetUrl(object, callback) {
 	}
 
 	api_req(req, {
-		callback: function(res, rex) {
-			if (typeof res == 'object') {
-				if (typeof res == 'number') {
-					dl_reportstatus(object, res);
-				} else {
-					if (res.d) {
-						dl_reportstatus(object, res.d ? 2 : 1)
-					} else if (res.g) {
-						var ab = base64_to_ab(res.at)
-							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-	
-						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || object.preview === -1)) {
-								object.data = new ArrayBuffer(res.s);				
-							}
-							return callback(false, res, o, object);
-						}
-						dl_reportstatus(object, EGAIN);
-					} else {
-						dl_reportstatus(object, res.e);
-					}
-				}
-			} else {
-				dl_reportstatus(object, EAGAIN);
-			}
-			
-			dl_retryinterval *= 1.2;
-			callback(new Error("failed"))
-		}
+		object: object,
+		next: callback,
+		dl_key: object.key,
+		callback: dlGetUrlDone
 	},n_h ? 1 : 0);
 }
 

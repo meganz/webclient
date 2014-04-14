@@ -8,6 +8,7 @@ function newXhr() {
 	xhr.onreadystatechange = function() {
 		if (this.readyState == this.DONE && this.listener.on_ready) {
 			this.listener.on_ready(arguments, this);
+			this.listener = null; /* we're done here, release this slot */
 		}
 	}
 	xhr.onerror = function() {
@@ -37,7 +38,6 @@ function newXhr() {
 	xhr.onprogress = function() {
 		if (this.listener.on_progress) {
 			this.listener.on_progress(arguments, this)
-			this.listener = null; /* we're done here, release this slot */
 		}	
 	}
 

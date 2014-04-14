@@ -1,16 +1,150 @@
 // Chunk fetch {{{
 var GlobalProgress = {};
+
+function ClassChunk(task) {
+	this.task = task;
+	this.dl   = task.download;
+	this.url  = task.url
+	this.size = task.size
+	this.io	  = task.download.io
+	this.done = false
+	this.avg  = [0, 0]
+	this.gid      = this.dl.zipid ? 'zip_' + this.dl.zipid : 'file_' + this.dl.dl_id
+	this.failed   = false
+	this.backoff  = 1000
+	this.lastPing = NOW()
+	this.lastUpdate = NOW()
+	this.Progress   = GlobalProgress[gid]
+	this.Progress.dl_xr = this.Progress.dl_xr || getxr() // global download progress
+	this.Progress.speed = this.Progress.speed || 1
+	this.Progress.size  = this.Progress.size  || (download.zipid ? Zips[download.zipid].size : io.size)
+	this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
+	this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
+	this.Progress.data[url] = [0, task.size];
+}
+
+// destroy {{{
+ClassChunk.destroy = function() {
+	this.dl   = null;
+	this.task = null;
+};
+// }}}
+
+// shouldIReportDone {{{
+ClassChunk.prototype.shouldIReportDone = function() {
+	if (!this.Progress.data[this.url]) return;
+	var remain = this.Progress.data[this.url][1]-this.Progress.data[this.url][0]
+	if (!this.done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/this.Progress.speed <= dlDoneThreshold) {
+		this.done = true;
+		task_done();
+	}
+};
+// }}}
+
+// updateProgress {{{
+ClassChunk.prototype.updateProgress = function(force) {
+	if (dlQueue.isPaused()) {
+		// do not update the UI
+		return false;
+	}
+
+	this.shouldIReportDone();
+	if (this.Progress.dl_lastprogress+500 > NOW() && !force) {
+		// too soon
+		return false;
+	}
+	var _progress = this.Progress.done
+	$.each(this.Progress.data, function(i, val) {
+		_progress += val[0];
+	});
+			
+	var percentage = Math.floor(_progress/this.Progress.size*100);
+	percentage = (percentage == 100) ? 99 : percentage;
+
+	this.dl.onDownloadProgress(
+		this.dl.dl_id, 
+		percentage, 
+		_progress, // global progress
+		this.Progress.size, // total download size
+		this.Progress.speed = this.Progress.dl_xr.update(_progress - this.Progress.dl_prevprogress),  // speed
+		this.dl.pos // this download position
+	);
+
+	this.Progress.dl_prevprogress = _progress
+	this.Progress.dl_lastprogress = NOW()
+}
+// }}}
+
+// isCancelled {{{
+ClassChunk.prototype.isCancelled = function() {
+	if (this._cancelled) {
+		/* aborted already */
+		console.warn('CHECK THIS', 'It shouldnt be reached since we xhr.abort()ed it.');
+		return true;
+	}
+	var is_cancelled = !!this.dl.cancelled;
+	if (!is_cancelled) {
+		if(typeof(this.dl.pos) !== 'number') {
+			this.dl.pos = IdToFile(this.dl).pos
+		}
+		is_canceled = !dl_queue[download.pos].n;
+	}
+	if (is_cancelled) {
+		this._cancelled = true;
+		DEBUG("Chunk aborting itself because download was cancelled ", localId);
+		this.xhr.abort();
+		this.finish_upload();
+		return true;
+	}
+}
+// }}}
+
+// finish_upload {{{
+ClassChunk.prototype.finish_upload = function() {
+	if (this.is_finished) return;
+	this.is_finished  = true;
+	this.xhr = null;
+	if (!this.done) this.task_done();
+	iRealDownloads--;
+}
+// }}}
+
+// XHR::on_progress {{{
+ClassChunk.prototype.on_progress = function(e) {
+	if (this.isCancelled()) return;
+	this.Progress.data[this.url][0] = e.loaded;
+	this.updateProgress();
+};
+// }}}
+
+ClassChunk.prototype.on_error = function() {
+	if (!this || this.has_failed) return;
+};
+
+ClassChunk.prototype.request = function() {
+	this.xhr = getXhr(this);
+}
+
+ClassChunk.prototype.run = function(task_done) {
+	iRealDownloads++;
+	if (size < 100 * 1024 && iRealDownloads <= dlQueue._concurrency * 0.5) {
+		/** 
+		 *	It is an small chunk and we *should* finish soon if everything goes
+		 *	fine. We release our slot so another chunk can start now. It is useful
+		 *	to speed up tiny downloads on a ZIP file
+		 */
+		this.done = true;
+		task_done();
+	}
+	
+	this.task_done = task_done;
+};
+
 function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
 
 	var self = this;
-
-	this.destroy = function() {
-		this.dl   = null;
-		this.task = null;
-		self = null;
-	};
 
 	this.run = function(task_done) {
 		iRealDownloads++;

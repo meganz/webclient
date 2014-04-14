@@ -2,10 +2,13 @@
 /* This code is based on strophe.jingle.js by ESTOS */
 
 var RTC = null;
-var RtcOptions = {};
 
-Strophe.addConnectionPlugin('jingle', {
-
+var JinglePlugin = {
+    DISABLE_MIC: 1,
+    DISABLE_CAM: 2,
+    HAS_MIC: 4,
+    HAS_CAM: 8,
+    RtcOptions: {},
     init: function (conn) {
         this.sessions = {};
         this.jid2session = {};
@@ -33,7 +36,7 @@ Strophe.addConnectionPlugin('jingle', {
         this.onMuted = function(sess, affected){};
         this.onUnmuted = function(sess, affected){};
         this.onInternalError = function(info, e)  {
-            console.error("Internal error:", jsonStringifyOneLevel(info),
+            console.error("Internal error:", JinglePlugin.jsonStringifyOneLevel(info),
             ((e instanceof Error)?e.stack:e.toString()));
         };
 // Callbacks called by session objects
@@ -74,33 +77,37 @@ Strophe.addConnectionPlugin('jingle', {
         function addVideoCaps() {
             self.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:video', {});
         }
-        
-        if (RTC.MediaStreamTrack && RTC.MediaStreamTrack.getSources) {
-            RTC.MediaStreamTrack.getSources(function(sources) {
-                var hasAudio = false;
-                var hasVideo = false;
-                for (var i=0; i<sources.length; i++) {
-                    var s = sources[i];
-                    if (s.kind === 'audio')
-                        hasAudio = true;
-                    else if (s.kind === 'video')
-                        hasVideo = true;
-                }
-            if (hasAudio)
-                addAudioCaps();
-            if (hasVideo)
-                addVideoCaps();
+//        if (localStorage.megaDisableMediaInputs === undefined)
+//            RTC.queryMediaInputPermissions();
+        var o = JinglePlugin;
+        var mediaFlags = localStorage.megaMediaInputFlags;
+        if (mediaFlags === undefined)
+            mediaFlags = (o.HAS_MIC | o.HAS_CAM);
+
+        if (RTC.getMediaInputTypesFromScan) {
+            RTC.getMediaInputTypesFromScan(function(types) {
+                hasAudio = (types.audio && !(mediaFlags & o.DISABLE_MIC));
+                hasVideo = (types.video && !(mediaFlags & o.DISABLE_CAM));
+                if (hasAudio)
+                    addAudioCaps();
+                if (hasVideo)
+                    addVideoCaps();
             });
         } else { //if we can't detect, we assume we have both
-            addAudioCaps();
-            addVideoCaps();
+            if ((mediaFlags & o.HAS_MIC) && !(mediaFlags & o.DISABLE_MIC))
+                addAudioCaps();
+            if ((mediaFlags & o.HAS_CAM) && !(mediaFlags & o.DISABLE_CAM))
+                addVideoCaps();
         }
     },
+    /*
+        Globally initializes the webRTC abstraction layer, and creates the global variable <i>RTC</i>
+    */
     rtcInit: function() {
         if (RTC)
             return;
         RTC = new WebrtcApi;
-        if (RtcOptions && RtcOptions.NO_DTLS)
+        if (this.RtcOptions && this.RtcOptions.NO_DTLS)
         {
             RTC.pc_constraints.optional.forEach(function(opt)
             {
@@ -122,8 +129,8 @@ Strophe.addConnectionPlugin('jingle', {
      try {
         var sid = $(iq).find('jingle').attr('sid');
         var sess = this.sessions[sid];
-        if (sess && sess.answerWaitQueue) {
-            sess.answerWaitQueue.push(iq);
+        if (sess && sess.inputQueue) {
+            sess.inputQueue.push(iq);
             return true;
         }
         var action = $(iq).find('jingle').attr('action');
@@ -183,12 +190,12 @@ Strophe.addConnectionPlugin('jingle', {
             sess.ice_config = this.ice_config;
             
             var self = this;
-            sess.answerWaitQueue = [];
+            sess.inputQueue = [];
             var ret = this.onCallIncoming.call(this.eventHandler, sess);
             if (ret != true)
             {
                 self.terminate(sess, ret.reason, ret.text);
-                delete sess.answerWaitQueue;
+                delete sess.inputQueue;
                 return true;
             }
                 
@@ -198,18 +205,16 @@ Strophe.addConnectionPlugin('jingle', {
             sess.setRemoteDescription($(iq).find('>jingle'), 'offer',
              function() {
                 sess.sendAnswer(function() {
-                    sess.accept();
-                    sess.sendMutedState();
-                    self.onCallAnswered.call(self.eventHandler, {peer: peerjid});
+                    sess.accept(function() {
+                        sess.sendMutedState();
+                        self.onCallAnswered.call(self.eventHandler, {peer: peerjid});
 //now handle all packets queued up while we were waiting for user's accept of the call
-                    var queue = sess.answerWaitQueue;
-                    delete sess.answerWaitQueue;
-                    for (var i=0; i<queue.length; i++)
-                        self.onJingle(queue[i]);
+                        self.processAndDeleteInputQueue(sess);
+                    });
                 });
              }, 
              function(e) {
-                    delete sess.answerWaitQueue;
+                    delete sess.inputQueue;
                     self.terminate(sess, obj.reason, obj.text);
                     return true;
              }
@@ -218,8 +223,18 @@ Strophe.addConnectionPlugin('jingle', {
         }
         case 'session-accept':
             debugLog("received ACCEPT from", sess.peerjid);
+//We are likely to start receiving ice candidates before setRemoteDescription()
+//has completed, esp on Firefox, so we want to queue these and feed them only
+//after setRemoteDescription() completes
+            var self = this;
+            sess.inputQueue = [];
             sess.setRemoteDescription($(iq).find('>jingle'), 'answer', 
-             function(){sess.accept();});
+              function(){sess.accept(
+                function() {
+                    if (sess.inputQueue)
+                        self.processAndDeleteInputQueue(sess);
+                })
+              });
             break;
         case 'session-terminate':
             console.log('terminating...');
@@ -357,6 +372,12 @@ Strophe.addConnectionPlugin('jingle', {
                 delete self.acceptCallsFrom[k];
         }
     },
+    processAndDeleteInputQueue: function(sess) {
+        var queue = sess.inputQueue;
+        delete sess.inputQueue;
+        for (var i=0; i<queue.length; i++)
+            this.onJingle(queue[i]);
+    },
     initiate: function (peerjid, myjid, sessStream, mutedState) { // initiate a new jinglesession to peerjid
         var sess = this.createSession(myjid, peerjid,
             Math.random().toString(36).substr(2, 12), // random string
@@ -472,18 +493,8 @@ Strophe.addConnectionPlugin('jingle', {
             }
         );
         // implement push?
-    }
-});
-
-function MuteInfo(affected) {
-    if (affected.match(/voice/i))
-        this.audio = true;
-    if (affected.match(/video/i))
-        this.video = true;
-}
-
-    
-function jsonStringifyOneLevel(obj) {
+ },
+ jsonStringifyOneLevel: function(obj) {
     var str = '{';
     for (var k in obj) {
         if (!obj.hasOwnProperty(k))
@@ -507,4 +518,14 @@ function jsonStringifyOneLevel(obj) {
     if (str.length > 1)
         str = str.substr(0, str.length-2)+'}';
     return str;
+ }
+};
+
+function MuteInfo(affected) {
+    if (affected.match(/voice/i))
+        this.audio = true;
+    if (affected.match(/video/i))
+        this.video = true;
 }
+
+Strophe.addConnectionPlugin('jingle', JinglePlugin);

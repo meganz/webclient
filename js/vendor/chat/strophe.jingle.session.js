@@ -83,7 +83,7 @@ JingleSession.prototype.initiate = function(isInitiator)
     };
     this.peerconnection.oniceconnectionstatechange = function (event) {
         if (!(obj && obj.peerconnection)) return;
- //       console.log('iceconnectionstatechange', obj.peerconnection.iceConnectionState, event);
+        console.log('iceconnectionstatechange', obj.peerconnection.iceConnectionState, event);
         switch (obj.peerconnection.iceConnectionState) {
         case 'connected':
             this.startTime = new Date();
@@ -101,7 +101,11 @@ JingleSession.prototype.accept = function (cb) {
     this.state = 'active';
 
     var pranswer = this.peerconnection.localDescription;
-    if (!pranswer || pranswer.type != 'pranswer') {
+    if (!pranswer) {
+        throw new Error('BUG: sesson.accept() called, but no local description has been set');
+    }
+    if (pranswer.type != 'pranswer') {
+        cb();
         return;
     }
     console.log('going from pranswer to answer');

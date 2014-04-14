@@ -4260,7 +4260,6 @@ define('mpenc/greet/cliques',[
         this.groupKey = null;
         // For debugging: Chain of all scalar multiplication keys.
         this._debugIntKeys = null;
-        this._debugPrivKeys = null;
         this._debugGroupKey = null;
 
         return this;
@@ -4279,16 +4278,29 @@ define('mpenc/greet/cliques',[
         _assert(otherMembers && otherMembers.length !== 0, 'No members to add.');
         this.intKeys = null;
         this._debugIntKeys = null;
-        if (this.privKey) {
-            utils._clearmem(this.privKey);
-            this.privKey = null;
-            this._debugPrivKey = null;
-        }
+        this.privKey = null;
+        this._debugPrivKey = null;
         var startMessage = new ns.CliquesMessage(this.id);
         startMessage.members = [this.id].concat(otherMembers);
         startMessage.agreement = 'ika';
         startMessage.flow = 'upflow';
         return this.upflow(startMessage);
+    };
+
+
+    /**
+     * Start the IKA (Initial Key Agreement) for a full/complete refresh of
+     * all keys.
+     *
+     * @returns {CliquesMessage}
+     * @method
+     */
+    ns.CliquesMember.prototype.ikaFullRefresh = function() {
+        // Start with the other members.
+        var otherMembers = utils.clone(this.members);
+        var myPos = otherMembers.indexOf(this.id);
+        otherMembers.splice(myPos, 1);
+        return this.ika(otherMembers);
     };
 
 
@@ -4357,10 +4369,6 @@ define('mpenc/greet/cliques',[
         var retValue = this._renewPrivKey();
 
         // Discard old and make new group key.
-        if (this.groupKey) {
-            utils._clearmem(this.groupKey);
-            this.groupKey = null;
-        }
         this.groupKey = retValue.cardinal;
         this._debugGroupKey = retValue.cardinalDebugKey;
 
@@ -4392,7 +4400,6 @@ define('mpenc/greet/cliques',[
             this.members.splice(myPos, 1);
             this.intKeys = [];
             this._debugIntKeys = [];
-            utils._clearmem(this.privKey);
             this.privKey = null;
             this.pubKey = null;
         }
@@ -4410,10 +4417,7 @@ define('mpenc/greet/cliques',[
         var retValue = this._renewPrivKey();
 
         // Discard old and make new group key.
-        if (this.groupKey) {
-            utils._clearmem(this.groupKey);
-            this.groupKey = null;
-        }
+        this.groupKey = null;
         this.groupKey = retValue.cardinalKey;
         this._debugGroupKey = retValue.cardinalDebugKey;
 
@@ -4450,6 +4454,12 @@ define('mpenc/greet/cliques',[
             // We're the first, so let's initialise it.
             this.intKeys = [null];
             this._debugIntKeys = [null];
+        }
+
+        // To not confuse _renewPrivKey() in full refresh situation.
+        if (message.agreement === 'ika') {
+            this.privKey = null;
+            this._debugPrivKey = null;
         }
 
         // Renew all keys.
@@ -4565,11 +4575,9 @@ define('mpenc/greet/cliques',[
      * @private
      */
     ns.CliquesMember.prototype._setKeys = function(intKeys, debugKeys) {
-        if ((this.intKeys) && (this.groupKey)) {
-            utils._clearmem(this.groupKey);
-            this.groupKey = null;
-            this._debugGroupKey = null;
-        }
+        this.groupKey = null;
+        this._debugGroupKey = null;
+
         // New objects for intermediate keys.
         var myPos = this.members.indexOf(this.id);
         this.intKeys = intKeys;
@@ -5565,11 +5573,6 @@ define('mpenc/greet/ske',[
         _assert(excludeMembers.indexOf(this.id) < 0,
                 'Cannot exclude mysefl.');
 
-        console.error("exclude: ", excludeMembers);
-        $.each(excludeMembers.slice(), function(k, v) {
-            _assert(typeof(v) == "string", "Invalid member passed to .exclude: " + v);
-        });
-
         // Kick 'em.
         for (var i = 0; i < excludeMembers.length; i++) {
             var index = this.members.indexOf(excludeMembers[i]);
@@ -5638,6 +5641,40 @@ define('mpenc/greet/ske',[
         broadcastMessage.signingKey = this.oldEphemeralKeys[this.id].priv;
 
         return broadcastMessage;
+    };
+
+
+    /**
+     * Fully re-run whole key agreements, but retain the ephemeral signing key.
+     *
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.fullRefresh = function() {
+        // Store away old ephemeral keys of members.
+        for (var i = 0; i < this.members.length; i++) {
+            if (this.ephemeralPubKeys && (i < this.ephemeralPubKeys.length)) {
+                this.oldEphemeralKeys[this.members[i]] = {
+                    pub: this.ephemeralPubKeys[i],
+                    priv: null,
+                };
+                if (this.ephemeralPubKeys && (i < this.authenticatedMembers.length)) {
+                    this.oldEphemeralKeys[this.members[i]].authenticated = this.authenticatedMembers[i];
+                } else {
+                    this.oldEphemeralKeys[this.members[i]].authenticated = false;
+                }
+            }
+        }
+        this.oldEphemeralKeys[this.id].priv = this.ephemeralPrivKey;
+
+        // Force complete new exchange of session info.
+        this.sessionId = null;
+
+        // Start with the other members.
+        var otherMembers = utils.clone(this.members);
+        var myPos = otherMembers.indexOf(this.id);
+        otherMembers.splice(myPos, 1);
+        return this.commit(otherMembers);
     };
 
 
@@ -6214,7 +6251,7 @@ define('mpenc/handler',[
 
 
     /**
-     * Fully re-run whole key agreements, but retain the ephemeral signing key..
+     * Fully re-run whole key agreements, but retain the ephemeral signing key.
      *
      * @method
      */
@@ -6270,7 +6307,7 @@ define('mpenc/handler',[
                 this.state = ns.STATE.AUX_DOWNFLOW;
                 this.stateUpdatedCallback(this);
 
-                var outContent = this._exclude(excludeMembers);
+                var outContent = this._exclude(toExclude);
                 if (outContent) {
                     var outMessage = {
                         from: this.id,
@@ -6291,13 +6328,9 @@ define('mpenc/handler',[
                 this.fullRefresh();
             }
         }
-        // easy case: refresh
-        // * only if it happens in downflow
-        // * if all authenticated, call refresh
-
         // harder case: fullRefresh
         // * else run fullRefresh():
-        // *      set sessionId = null, privKey = null, intermediateKeys = []
+        // *      set privKey = null, intermediateKeys = []
         // *      run _start()
     };
 

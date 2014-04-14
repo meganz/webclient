@@ -212,16 +212,22 @@ RtcSession.prototype = {
  {
   var ansHandler;
   var declineHandler;
+  var state = 0; //state 0 means not yet got usermedia, 1 means got user media and waiting for peer, state 2 means pear answered or timed out, 4 means call was canceled by us via the cancel() method of the returned object
   var self = this;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
   
   self._myGetUserMedia({audio:true, video:true},
    function(sessStream) {
+        if (state === 4) {//call was canceled before we got user media
+            self._freeLocalStreamIfUnused();
+            return;
+        }
+        state = 1;
 // Call accepted handler
         ansHandler = this.connection.addHandler(function(stanza) {
-        if (!ansHandler)
+        if (state !== 1)
             return;
-
+        state = 2;
         self.connection.deleteHandler(declineHandler);
         declineHandler = null;
         ansHandler = null;
@@ -244,9 +250,10 @@ RtcSession.prototype = {
 
 //Call declined handler
     declineHandler = this.connection.addHandler(function(stanza) {
-        if (!ansHandler)
+        if (state !== 1)
             return;
             
+        state = 2;
         self.connection.deleteHandler(ansHandler);
         ansHandler = null;
         declineHandler = null;
@@ -282,9 +289,10 @@ RtcSession.prototype = {
     this.connection.send($msg({to:targetJid, type:'megaCall'}));
 
     setTimeout(function() {
-        if (!ansHandler)
+        if (state !== 1)
             return;
-        
+            
+        state = 2;
         self.connection.deleteHandler(ansHandler);
         ansHandler = null;
         self.connection.deleteHandler(declineHandler);
@@ -306,20 +314,27 @@ RtcSession.prototype = {
     
   //return an object with a cancel() method
   return {cancel: function() {
-        if (!ansHandler)
+        if (state === 2)
             return false;
-
-        self.connection.deleteHandler(ansHandler);
-        ansHandler = null;
-        self.connection.deleteHandler(declineHandler);
-        declineHandler = null;
-
-        self._freeLocalStreamIfUnused();
-        self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaCallCancel'}));
-        return true;
+        if (state === 1) { //same as if (ansHandler)
+            state = 4;
+            self.connection.deleteHandler(ansHandler);
+            ansHandler = null;
+            self.connection.deleteHandler(declineHandler);
+            declineHandler = null;
+        
+            self._freeLocalStreamIfUnused();
+            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaCallCancel'}));
+            return true;
+        } else if (state === 0) {
+            state = 4;
+            return true;
+        }
+        console.warn("RtcSession: BUG: cancel() called when state has an unexpected value of", state);
+        return false;
   }};
  },
- 
+
  /**
     Terminates an ongoing call
     @param {string} [jid]
@@ -374,7 +389,12 @@ RtcSession.prototype = {
  },
  _onPresenceUnavailable: function(pres)
  {
-    this.jingle.terminateByJid($(pres).attr('from'));
+    try {
+        this.jingle.terminateByJid($(pres).attr('from'));
+    } catch(e) {
+        console.error("_onPresenceUnavailable: Exception in handler:", e.stack);
+    }
+    return true; //We dont want this handler to be deleted
  },
 
  _onMediaReady: function(localStream) {

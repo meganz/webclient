@@ -64,6 +64,36 @@ function WebrtcApi() {
     } else {
         console.log('Browser does not appear to be WebRTC-capable');
     }
+    var mst = this.MediaStreamTrack;
+    if (mst && mst.getSources) {
+        this.getMediaInputTypesFromScan = function(cb) {
+            mst.getSources(function(sources) {
+                var hasAudio = false;
+                var hasVideo = false;
+                for (var i=0; i<sources.length; i++) {
+                    var s = sources[i];
+                    if (s.kind === 'audio')
+                        hasAudio = true;
+                    else if (s.kind === 'video')
+                        hasVideo = true;
+                }
+                cb({audio:hasAudio, video:hasVideo});
+            });
+        }
+        this.getMediaInputTypes = this.getMediaInputTypesFromScan;
+    } else {
+        this.getMediaInputTypesFromStream = function(cb) {
+            this.getUserMedia({audio:true, video:true},
+                function(stream) {
+                    cb({audio: (stream.getAudioTracks().length > 0), video: (stream.getVideoTracks().length > 0)});
+                },
+                function() {
+                    cb({error: true})
+                }
+            );
+        }
+        this.getMediaInputTypes = this.getMediaInputTypesFromStream;
+    }
 }
 
 WebrtcApi.prototype.createUserMediaConstraints = function(um)

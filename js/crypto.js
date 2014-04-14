@@ -611,7 +611,7 @@ function crypto_rsagenkey ()
         w.terminate();
 
         var endTime = new Date();
-        console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
+        if (d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
 
         u_setrsa(e.data);
     };

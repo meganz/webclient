@@ -14,13 +14,13 @@ function ClassChunk(task) {
 	this.backoff  = 1000
 	this.lastPing = NOW()
 	this.lastUpdate = NOW()
-	this.Progress   = GlobalProgress[gid]
+	this.Progress   = GlobalProgress[this.gid]
 	this.Progress.dl_xr = this.Progress.dl_xr || getxr() // global download progress
 	this.Progress.speed = this.Progress.speed || 1
-	this.Progress.size  = this.Progress.size  || (download.zipid ? Zips[download.zipid].size : io.size)
+	this.Progress.size  = this.Progress.size  || (this.dl.zipid ? Zips[this.dl.zipid].size : this.io.size)
 	this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
 	this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
-	this.Progress.data[url] = [0, task.size];
+	this.Progress.data[this.url] = [0, task.size];
 }
 
 // destroy {{{
@@ -87,7 +87,7 @@ ClassChunk.prototype.isCancelled = function() {
 		if(typeof(this.dl.pos) !== 'number') {
 			this.dl.pos = IdToFile(this.dl).pos
 		}
-		is_canceled = !dl_queue[download.pos].n;
+		is_canceled = !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		this._cancelled = true;
@@ -110,24 +110,86 @@ ClassChunk.prototype.finish_upload = function() {
 // }}}
 
 // XHR::on_progress {{{
-ClassChunk.prototype.on_progress = function(e) {
+ClassChunk.prototype.on_progress = function(args) {
 	if (this.isCancelled()) return;
-	this.Progress.data[this.url][0] = e.loaded;
+	this.Progress.data[this.url][0] = args[0].loaded;
 	this.updateProgress();
 };
 // }}}
 
-ClassChunk.prototype.on_error = function() {
-	if (!this || this.has_failed) return;
+// XHR::on_error {{{
+ClassChunk.prototype.on_error = function(args, xhr) {
+	if (this.has_failed) return;
+	this.has_failed = true;
+
+	this.Progress.data[this.url][0] = 0; /* reset progress */
+	this.updateProgress(true);
+
+	if (this.done) {
+		// We already told the scheduler we were done
+		// with no error and this happened. Should I reschedule this 
+		// task?
+		this.failed = true;
+		return setTimeout(function() {
+
+		}, this.backoff *= 1.2);
+	}
+
+	this.xhr = null;
+	return this.task_done(false, xhr.status);
+}
+// }}}
+
+// XHR::on_ready {{{
+ClassChunk.prototype.on_ready = function(args, xhr) {
+	if (this.isCancelled()) return;
+	var r = xhr.response || {};
+	if (r.byteLength == this.size) {
+		this.Progress.done += r.byteLength;
+		delete this.Progress.data[this.url];
+		this.updateProgress(true);
+		if (navigator.appName != 'Opera') {
+			this.io.dl_bytesreceived += r.byteLength;
+		}
+		this.dl.decrypter++;
+		Decrypter.push([
+			[this.dl, this.task.offset], 
+			this.dl.nonce, 
+			this.task.offset/16, 
+			new Uint8Array(r)
+		])
+		if (this.failed) DownloadManager.release(this);
+		r = null
+		this.failed = false
+		this.finish_upload();
+	} else if (!this.dl.cancelled) {
+		DEBUG(xhr.status, r.bytesLength, this.size);
+		DEBUG("HTTP FAILED", this.dl.n, xhr.status, "am i done?", this.done);
+		r = null;
+		return this.on_error(null, xhr);
+	}
 };
+// }}}
 
 ClassChunk.prototype.request = function() {
 	this.xhr = getXhr(this);
+	
+	if (dlMethod == FileSystemAPI) {
+		var t = this.url.lastIndexOf('/dl/');
+		this.xhr.open('POST', this.url.substr(0, t+1));
+		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t) + this.url);
+	} else {
+		this.xhr.open('POST', this.url, true);
+	}
+	
+	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+	this.xhr.send();
+	DEBUG("Fetch " + this.url);
 }
 
 ClassChunk.prototype.run = function(task_done) {
 	iRealDownloads++;
-	if (size < 100 * 1024 && iRealDownloads <= dlQueue._concurrency * 0.5) {
+	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._concurrency * 0.5) {
 		/** 
 		 *	It is an small chunk and we *should* finish soon if everything goes
 		 *	fine. We release our slot so another chunk can start now. It is useful
@@ -138,9 +200,14 @@ ClassChunk.prototype.run = function(task_done) {
 	}
 	
 	this.task_done = task_done;
+	if (!this.io.dl_bytesreceived) {
+		this.io.dl_bytesreceived = 0;
+	}
+
+	this.request(); /* let the fun begin! */
 };
 
-function ClassChunk(task) {
+function XClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
 

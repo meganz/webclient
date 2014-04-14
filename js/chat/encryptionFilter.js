@@ -214,8 +214,6 @@ var EncryptionFilter = function(megaChat) {
         while(handler.protocolOutQueue.length) {
             var msg = handler.protocolOutQueue.shift();
             if(msg.to) {
-                //TODO: Mark as "DONT QUEUE" and "DONT LOG", by using some kind of flag in the meta
-
                 megaRoom.megaChat.karere.sendRawMessage(
                     msg.to,
                     msg.to.indexOf("conference.") != -1 ? "groupchat" : "chat",
@@ -261,7 +259,7 @@ var EncryptionFilter = function(megaChat) {
                     var eventObject = new KarereEventObjects.ActionMessage(
                         /* toJid */ wireMessage.toJid,
                         /* fromJid */ Karere.getNormalizedFullJid(wireMessage.fromJid),
-                        /* messageId */ wireMessage.messageId,  //TODO: something is wrong.. i get duplicated messages in the UI because of diff msgIDs
+                        /* messageId */ wireMessage.messageId,
                         /* action */ msgPayload[1].action,
                         /* meta */ msgPayload[1],
                         /* delay */ wireMessage.delay
@@ -273,7 +271,7 @@ var EncryptionFilter = function(megaChat) {
                         /* fromJid */ wireMessage.fromJid,
                         /* type */ "Message",
                         /* rawType */ wireMessage.rawType,
-                        /* messageId */ wireMessage.messageId, //TODO: something is wrong.. i get duplicated messages in the UI because of diff msgIDs
+                        /* messageId */ wireMessage.messageId,
                         /* rawMessage */ undefined,
                         /* roomJid */ wireMessage.roomJid,
                         /* meta */ msgPayload[1],
@@ -408,9 +406,9 @@ var EncryptionFilter = function(megaChat) {
         });
 
         // now ping ALL of the users so that we are 100% sure that they ARE active (else, the mpENC algo will block)
-        //TODO: this is sooooo bad idea! because someone can quit (without notifying the owner, because of conn. error)
-        // at the next moment after the PingResponse...there is NO way to guarantee 100% that all of the joinUsers
-        // will be available and will notify when leaving (conn. errors)
+        // this will not solve all possible encryption-flow crashes, but may save some! because someone can quit
+        // (without notifying the owner, because of conn. error) at the next moment after the PingResponse...there is
+        // NO way to guarantee 100% that all of the joinUsers will be available and will notify when leaving (conn. errors)
         // we should find a way to fix that in the crypto's flow, or introduce .restart() method that will be triggered
         // if multiple messages were not SENT in a timely manner (and they will get retried)
         var promises = [];
@@ -498,16 +496,6 @@ var EncryptionFilter = function(megaChat) {
 
         if(users[0] == megaChat.karere.getJid()) {
             // i'm the new "owner"
-//            console.error("I'm the owner of the room! [3]");
-
-
-//            $.each(users, function(k, v) {
-//                if(v == megaChat.karere.getJid()) {
-//                    // i had joined...ignore me, i should wait for someone to add me to the room encryption member list
-//                    return; // continue;
-//                }
-//                addUserToMpEnc(megaRoom, v);
-//            });
 
             // sync users list w/ encryption (join/exclude);
             syncRoomUsersWithEncMembers(megaRoom);
@@ -543,17 +531,7 @@ var EncryptionFilter = function(megaChat) {
 //        console.error("got state change1?: ", users[0], megaRoom.megaChat.karere.getJid());
         if(users[0] == megaChat.karere.getJid()) {
             // i'm the "owner"
-//            console.error("I'm the owner of the room! [2]");
 
-            var h = megaRoom.encryptionHandler;
-
-//            $.each(Object.keys(eventObject.getNewUsers()), function(k, v) {
-//                if(v == megaChat.karere.getJid()) {
-//                    // i had joined...ignore me, i should wait for someone to add me to the room encryption member list
-//                    return; // continue;
-//                }
-//                addUserToMpEnc(megaRoom, v);
-//            });
             // sync users list w/ encryption (join/exclude);
             syncRoomUsersWithEncMembers(megaRoom);
         }
@@ -571,45 +549,11 @@ var EncryptionFilter = function(megaChat) {
         if($.inArray(users[0], leftUsers) !== -1 && users[1] == megaRoom.megaChat.karere.getJid()) {
 //            console.error("I'm the new owner of the room!")
 
-//            $.each(users, function(k, v) {
-//                if(v == megaChat.karere.getJid() || $.inArray(v, leftUsers) !== -1) {
-//                    // i had joined...ignore me, i should wait for someone to add me to the room encryption member list
-//                    // or the user had left
-//                    return; // continue;
-//                }
-//                addUserToMpEnc(
-//                    megaRoom,
-//                    v
-//                );
-//            });
-//
-//            if(megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED) {
-//                megaRoom.encryptionOpQueue.queue('exclude', leftUsers);
-//            }
-
             // sync users list w/ encryption (join/exclude);
             syncRoomUsersWithEncMembers(megaRoom);
 
         } else if(users[0] == megaRoom.megaChat.karere.getJid()) {
             // i'm the owner
-//            console.error("I'm room owner, i will remove the user(s) who left from the particip. list: ", leftUsers);
-
-//            $.each(users, function(k, v) {
-//                if(v == megaChat.karere.getJid() || $.inArray(v, leftUsers) !== -1) {
-//                    // i had joined...ignore me, i should wait for someone to add me to the room encryption member list
-//                    // or the user had left
-//                    return; // continue;
-//                }
-//                addUserToMpEnc(
-//                    megaRoom,
-//                    v
-//                );
-//            });
-//
-//            if(megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED) {
-//                megaRoom.encryptionOpQueue.queue('exclude', leftUsers);
-//            }
-
 
             // sync users list w/ encryption (join/exclude);
             syncRoomUsersWithEncMembers(megaRoom);
@@ -623,11 +567,6 @@ var EncryptionFilter = function(megaChat) {
         if(self.messageShouldNotBeEncrypted(eventObject) === true) {
             return;
         }
-
-        // ignore messages which are my own.
-//        if(eventObject.isMyOwn(self.megaChat.karere)) {
-//            return;
-//        }
 
         self.processIncomingMessage(e, eventObject, karere);
     };

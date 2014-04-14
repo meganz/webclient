@@ -80,6 +80,7 @@ TBD.STATIC_PUB_KEY_DIR = {
 var OpQueue = function(ctx, validateFn, recoverFailFn) {
     this.ctx = ctx;
     this._queue = [];
+
     this.validateFn = validateFn;
     this.recoverFailFn = recoverFailFn;
     this.MAX_ERROR_RETRIES = 10; /* todo */
@@ -130,10 +131,10 @@ OpQueue.prototype.pop = function() {
 
         if($.isArray(op[1])) { // supports combining multiple ops
             /**
-             * if the next 3 ops are the same, combine them (call the op, with args = args1 + args2 + args3)
+             * if the next X ops are the same, combine them (call the op, with args = args1 + args2 + args3)
              */
             var lastRemovedElementId = -1;
-            $.each(this._queue, function(k, v) {
+            $.each(this._queue.slice(), function(k, v) {
                 if(v[0] == op[0]) {
                     op[1].push(
                         v[1]
@@ -147,7 +148,40 @@ OpQueue.prototype.pop = function() {
                 this._queue = this._queue.splice(lastRemovedElementId + 1);
             }
         }
-        this.ctx[op[0]](op[1], op[2]);
+
+        var self = this;
+
+        // per OP optimisations and safe guards
+        if(op[0] == "exclude") {
+            // exclude only users who are CURRENTLY in the cliquesMember members list
+            var op1 = [];
+            $.each(op[1], function(k, v) {
+                if(self.ctx.cliquesMember.members.indexOf(v) !== -1) {
+                    op1.push(
+                        v
+                    );
+                }
+            });
+            op[1] = op1; // replace
+        } else if(op[0] == "join") {
+            // join only users who are NOT CURRENTLY in the cliquesMember members list
+            var op1 = [];
+            $.each(op[1], function(k, v) {
+                if(self.ctx.cliquesMember.members.indexOf(v) === -1) {
+                    op1.push(
+                        v
+                    );
+                }
+            });
+            op[1] = op1; // replace
+        }
+        if(op[1].length == 0) {
+            if(localStorage.d) {
+                console.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
+            }
+        } else {
+            this.ctx[op[0]](op[1], op[2]);
+        }
 
         return this.pop();
     } else {

@@ -5491,7 +5491,7 @@ div .fm-tree-folder.dragover {
 	position: relative;
 }
 .fm-chat-top-verified {
-	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: -1px -447px;
 	background-repeat: no-repeat;
 	width: 22px;
@@ -5705,7 +5705,7 @@ div .fm-tree-folder.dragover {
 	padding: 8px 40px 12px 43px;
 	color: #666666;
 	font-family: 'Open Sans Semibold';
-	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: 0 -37px;
 	background-repeat: no-repeat;
 }
@@ -6006,7 +6006,7 @@ div .fm-tree-folder.dragover {
 	width: 18px;
 	height: 12px;
 	position: absolute;
-	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: -12px -516px;
 	background-repeat: no-repeat;
 	margin: -22px 0 0 -9px;
@@ -6033,7 +6033,7 @@ div .fm-tree-folder.dragover {
 	cursor: pointer;
 }
 .fm-chat-download-icon {
-	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: center -619px;
 	background-repeat: no-repeat;
 	height: 62px;
@@ -6116,7 +6116,7 @@ div .fm-tree-folder.dragover {
 /** end of debug emoticons **/
 
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
-	background-image: url(../images/mega/chat-sprite.png?v=1);
+	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 	width: 10px;
@@ -15101,7 +15101,7 @@ background-size:27px auto;
  background-position: 0 -10573px;
 }
 .fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head, .fm-chat-download-arrow, .fm-chat-download-icon {
- background-image: url(../images/mega/chat-sprite@2x.png?v=1);
+ background-image: url(../images/mega/chat-sprite@2x.png?v=2);
  background-size:72px auto;
 }
  .dragger-icon, .export-icon, .new-download-file-icon {

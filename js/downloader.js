@@ -27,6 +27,7 @@ function ClassChunk(task) {
 ClassChunk.destroy = function() {
 	this.dl   = null;
 	this.task = null;
+	this.io   = null;
 };
 // }}}
 
@@ -156,7 +157,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			[this.dl, this.task.offset], 
 			this.dl.nonce, 
 			this.task.offset/16, 
-			new Uint8Array(r)
+			new Uint8Array()
 		])
 		if (this.failed) DownloadManager.release(this);
 		r = null
@@ -206,7 +207,9 @@ ClassChunk.prototype.run = function(task_done) {
 
 	this.request(); /* let the fun begin! */
 };
+// }}}
 
+// {{{
 function XClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
@@ -415,9 +418,127 @@ function XClassChunk(task) {
 }
 // }}}
 
+function ClassFile(dl) {
+	this.task = dl;
+	this.dl   = dl;
+	this.gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
+	if (!dl.zipid || !GlobalProgress[this.gid]) {
+		GlobalProgress[this.gid] = {data: {}, done: 0};
+	}
+}
+
+ClassFile.prototype.destroy = function() {
+	if (!this.emptyFile && !checkLostChunks(this.dl) &&  
+		(typeof skipcheck == 'undefined' || !skipcheck)) {
+		dl_reportstatus(this.dl, EKEY);
+	}
+
+	if (!this.dl.cancelled) {
+		if (this.dl.zipid) {
+			Zips[this.dl.zipid].done();
+		} else {
+			this.dl.onDownloadProgress(
+				this.dl.dl_id,
+				100,
+				this.dl.size,
+				this.dl.size,
+				0,
+				this.dl.pos
+			);
+			
+			this.dl.onBeforeDownloadComplete(this.dl.pos);
+			if (!this.dl.preview) {
+				this.dl.io.download(dl.zipname || dl.n, dl.p);
+			}
+			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+		}
+	}
+
+	if (this.dl.zipid) {
+		GlobalProgress[this.gid];
+	}
+
+	this.task = null;
+	this.dl.writer.destroy();
+	this.dl.io = null;
+	this.dl.writer	= null;
+	this.dl.ready	= null;
+	this.dl   = null;
+}
+
+ClassFile.prototype.run = function(task_done) {
+	fetchingFile = 1;
+	DEBUG("dl_key " + this.dl.key);
+	this.dl.onDownloadStart(this.dl.dl_id, this.dl.n, this.dl.size, this.dl.pos);
+
+	var self = this;
+
+	this.dl.ready = function() {
+		DEBUG('is cancelled?', self.chunkFinished, self.dl.writer.isEmpty(), self.dl.decrypter == 0) 
+		if (self.chunkFinished && self.dl.writer.isEmpty() && self.dl.decrypter == 0) {
+			DEBUG('destory');
+			self.destroy();
+			self = null;
+		}
+	}
+
+	this.dl.io.begin = function() {
+		var tasks = [];
+		$.each(self.dl.urls||[], function(key, url) {
+			tasks.push(new ClassChunk({
+				url: url.url, 
+				offset: url.offset, 
+				size: url.size, 
+				download: self.dl, 
+				chunk_id: key,
+				zipid: self.dl.zipid,
+				id: self.dl.id
+			}));
+		});
+
+		self.emptyFile = false;
+		if (tasks.length == 0) {
+			self.emptyFile = true;
+			tasks.push({ 
+				task: {  zipid: sel.fdl.zipid, id: self.dl.id },
+				run: function(done) {
+					self.dl.io.write("", 0, function() {
+						task_done();	
+						self.dl.ready(); /* tell the download scheduler we're done */
+					});
+				}
+			});
+		}
+		self.dl.io.begin = null;
+		
+		dlQueue.pushAll(tasks, function() {
+			self.chunkFinished = true
+		}, failureFunction);
+	};
+
+	dlGetUrl(this.dl, function(error, res, o) {
+		if (error) {
+			/* failed */
+			DownloadManager.pause(self); 
+			fetchingFile = 0;
+			task_done(); /* release worker */
+			setTimeout(function() {
+				/* retry !*/
+				dlQueue.pushFirst(self);
+			}, dl_retryinterval);
+			return false;
+		}
+		var info = dl_queue.splitFile(res.s);
+		self.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+		return self.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+	});
+
+};
+
 // File fetch {{{
 var fetchingFile = null
-function ClassFile(dl) {
+function XClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
 
@@ -488,7 +609,7 @@ function ClassFile(dl) {
 				DEBUG('is cancelled?', dl.cancelled)
 				if (chunkFinished && dl.writer.isEmpty() && dl.decrypter == 0) {
 					if (dl.cancelled) return free();
-					if (!emptyFile && !checkLostChunks(dl)) {
+					if (!emptyFile && !checkLostChunks(self.dl)) {
 						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
 					}
 

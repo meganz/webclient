@@ -35,7 +35,11 @@ function FileSystemAPI(dl_id, dl) {
 			  alert('NOT_FOUND_ERR in ' + type);
 			  break;
 			case FileError.SECURITY_ERR:
-			  alert('File transfers do not work with Chrome Incognito.<br>' + '(Security Error in ' + type + ')');
+			  dl.io = new MemoryIO(dl_id, dl);
+			  dl.io.begin = IO.begin;
+			  dl.io.size  = IO.size;
+			  dl.io.progress  = IO.progress;
+			  dl.io.setCredentials(dl_geturl, dl_filesize, dl_filename, dl_chunks, dl_chunksizes);
 			  break;
 			case FileError.INVALID_MODIFICATION_ERR:
 			  alert('INVALID_MODIFICATION_ERR in ' + type);

@@ -470,7 +470,7 @@ function dl_writer(dl, is_ready) {
 	};
 };
 
-var Decrypter = CreateWorkers('decrypter.js?v=5', function(context, e, done) {
+var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
 	var dl = context[0]
 		, offset = context[1]
 

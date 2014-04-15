@@ -336,7 +336,7 @@ ChunkUpload.prototype.on_error = function(args, xhr) {
 	if (this.file.abort) return;
 	this.file.progress[this.start] = 0;
 	this.updateprogress();
-	UploadManager.retry(this, "xhr failed");
+	UploadManager.retry(this.file, this, "xhr failed");
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
@@ -418,7 +418,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
 		DEBUG("IO error");
 		this.file.done_starting();
-		return UploadManager.retry(file, chunk, Job, args[0])
+		return UploadManager.retry(this.file, this, args[0])
 	}
 
 	Encrypter.push(

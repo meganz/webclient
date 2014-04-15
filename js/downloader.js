@@ -157,7 +157,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			[this.dl, this.task.offset], 
 			this.dl.nonce, 
 			this.task.offset/16, 
-			new Uint8Array()
+			new Uint8Array(r)
 		])
 		if (this.failed) DownloadManager.release(this);
 		r = null
@@ -448,7 +448,7 @@ ClassFile.prototype.destroy = function() {
 			
 			this.dl.onBeforeDownloadComplete(this.dl.pos);
 			if (!this.dl.preview) {
-				this.dl.io.download(dl.zipname || dl.n, dl.p);
+				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
 			}
 			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
 			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);

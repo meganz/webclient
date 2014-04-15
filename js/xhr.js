@@ -8,7 +8,7 @@ function newXhr() {
 	xhr.__timeout = null;
 	xhr.setup_timeout = function() {
 		clearTimeout(xhr.__timeout);
-		setTimeout(function(q) {
+		xhr.__timeout = setTimeout(function(q) {
 			q.ontimeout();
 		}, 2*60*1000, xhr);
 	};
@@ -22,10 +22,10 @@ function newXhr() {
 		}
 	}
 	xhr.onerror = function() {
+		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error) {
 			this.listener.on_error(arguments, this, 'error');
 			this.listener = null; /* release */
-			clearTimeout(xhr.__timeout);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -35,10 +35,10 @@ function newXhr() {
 		}
 	}
 	xhr.ontimeout = function() {
+		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error) {
 			this.listener.on_error(arguments, this, 'timeout');
 			this.listener = null; /* release */
-			clearTimeout(xhr.__timeout);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);

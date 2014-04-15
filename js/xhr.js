@@ -5,8 +5,18 @@ var _xhr_queue = [];
 function newXhr() {
 	var xhr = new XMLHttpRequest;
 	xhr.__id = parseInt(Math.random() * 0xffffffff);
+	xhr.__timeout = null;
+	xhr.setup_timeout = function() {
+		clearTimeout(xhr.__timeout);
+		setTimeout(function(q) {
+			q.ontimeout();
+		}, 2*60*1000, xhr);
+	};
+
 	xhr.onreadystatechange = function() {
+		xhr.setup_timeout();
 		if (this.readyState == this.DONE && this.listener.on_ready) {
+			clearTimeout(xhr.__timeout);
 			this.listener.on_ready(arguments, this);
 			this.listener = null; /* we're done here, release this slot */
 		}
@@ -15,6 +25,7 @@ function newXhr() {
 		if (this.listener.on_error) {
 			this.listener.on_error(arguments, this, 'error');
 			this.listener = null; /* release */
+			clearTimeout(xhr.__timeout);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -27,6 +38,7 @@ function newXhr() {
 		if (this.listener.on_error) {
 			this.listener.on_error(arguments, this, 'timeout');
 			this.listener = null; /* release */
+			clearTimeout(xhr.__timeout);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -36,6 +48,7 @@ function newXhr() {
 		}
 	}
 	xhr.onprogress = function() {
+		xhr.setup_timeout();
 		if (this.listener.on_progress) {
 			this.listener.on_progress(arguments, this)
 		}	

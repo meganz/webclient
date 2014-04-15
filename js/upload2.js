@@ -439,6 +439,8 @@ ChunkUpload.prototype.done = function() {
 	this.bytes = null;
 	this.file  = null;
 	this.ul    = null;
+
+	megatitle();
 };
 
 ChunkUpload.prototype.run = function(done) {

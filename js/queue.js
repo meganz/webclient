@@ -104,6 +104,9 @@ MegaQueue.prototype.process = function() {
 		this.run_in_context(args);
 	}
 
+	if (this.isEmpty()) {
+		this.trigger('drain');
+	}
 	return true;
 };
 

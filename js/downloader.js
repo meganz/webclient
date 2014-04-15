@@ -1,3 +1,5 @@
+var fetchingFile = null
+
 // Chunk fetch {{{
 var GlobalProgress = {};
 
@@ -418,6 +420,7 @@ function XClassChunk(task) {
 }
 // }}}
 
+// ClassFile {{{
 function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
@@ -465,6 +468,7 @@ ClassFile.prototype.destroy = function() {
 	this.dl.writer	= null;
 	this.dl.ready	= null;
 	this.dl   = null;
+	megatitle();
 }
 
 ClassFile.prototype.run = function(task_done) {
@@ -477,7 +481,7 @@ ClassFile.prototype.run = function(task_done) {
 	this.dl.ready = function() {
 		DEBUG('is cancelled?', self.chunkFinished, self.dl.writer.isEmpty(), self.dl.decrypter == 0) 
 		if (self.chunkFinished && self.dl.writer.isEmpty() && self.dl.decrypter == 0) {
-			DEBUG('destory');
+			DEBUG('destroy');
 			self.destroy();
 			self = null;
 		}
@@ -504,7 +508,6 @@ ClassFile.prototype.run = function(task_done) {
 				task: {  zipid: sel.fdl.zipid, id: self.dl.id },
 				run: function(done) {
 					self.dl.io.write("", 0, function() {
-						task_done();	
 						self.dl.ready(); /* tell the download scheduler we're done */
 					});
 				}
@@ -515,6 +518,9 @@ ClassFile.prototype.run = function(task_done) {
 		dlQueue.pushAll(tasks, function() {
 			self.chunkFinished = true
 		}, failureFunction);
+		
+		fetchingFile = 0;
+		task_done();	
 	};
 
 	dlGetUrl(this.dl, function(error, res, o) {
@@ -535,140 +541,6 @@ ClassFile.prototype.run = function(task_done) {
 	});
 
 };
-
-// File fetch {{{
-var fetchingFile = null
-function XClassFile(dl) {
-	this.task = dl;
-	this.dl   = dl;
-
-	this.run = function(task_done)  {
-		var self = this
-
-		fetchingFile = 1;
-
-		if (!use_workers) {
-			dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
-		}
-
-		var gid  = dl.zipid ? 'zip_' + dl.zipid : 'file_' + dl.dl_id
-		if (!dl.zipid || !GlobalProgress[gid]) {
-			GlobalProgress[gid] = {data: {}, done: 0};
-		}
-	
-		DEBUG("dl_key " + dl.key);
-		
-		dl.onDownloadStart(dl.dl_id, dl.n, dl.size, dl.pos);
-	
-		dl.io.begin = function() {
-			var tasks = [];
-
-			$.each(dl.urls||[], function(key, url) {
-				tasks.push(new ClassChunk({
-					url: url.url, 
-					offset: url.offset, 
-					size: url.size, 
-					download: dl, 
-					chunk_id: key,
-					zipid: dl.zipid,
-					id: dl.id
-				}));
-			});
-
-			var emptyFile;
-			if (tasks.length == 0) {
-				emptyFile = true;
-				tasks.push({ 
-					task: {  zipid: dl.zipid, id: dl.id },
-					run: function(done) {
-						dl.io.write("", 0, function() {
-							task_done();	
-							dl.ready(); /* tell the download scheduler we're done */
-						});
-					}
-				});
-			}
-
-			function free() {
-				/* release memory */
-				dl.writer.destroy();
-				XDESTROY(dl.io);
-				XDESTROY(dl);
-				dl.io		= null;
-				dl.writer	= null;
-				dl.ready	= null;
-				dl			= null;
-				self.run    = null;
-				self.dl		= null;
-				self.task	= null;
-				self		= null;
-			}
-
-			var chunkFinished = false
-			dl.ready = function() {
-				DEBUG('is cancelled?', dl.cancelled)
-				if (chunkFinished && dl.writer.isEmpty() && dl.decrypter == 0) {
-					if (dl.cancelled) return free();
-					if (!emptyFile && !checkLostChunks(self.dl)) {
-						if (typeof skipcheck == 'undefined' || !skipcheck) return dl_reportstatus(dl, EKEY);
-					}
-
-					if (dl.zipid) {
-						return  Zips[dl.zipid].done();
-					}
-					
-					delete GlobalProgress['file_' + dl.dl_id];
-
-					dl.onDownloadProgress(
-						dl.dl_id,
-						100,
-						dl.size,
-						dl.size,
-						0,
-						dl.pos
-					);
-
-					dl.onBeforeDownloadComplete(dl.pos);
-					if (!dl.preview) {
-						dl.io.download(dl.zipname || dl.n, dl.p);
-					}
-					dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
-					if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
-
-					free();
-				}
-			};
-	
-			dlQueue.pushAll(tasks, function() {
-				chunkFinished = true
-			}, failureFunction);
-
-			tasks = null;
-	
-			// notify the UI
-			fetchingFile = 0;
-			task_done();
-		}
-	
-		dlGetUrl(dl, function(error, res, o) {
-			if (error) {
-				/* failed */
-				DownloadManager.pause(self); 
-				fetchingFile = 0;
-				task_done(); /* release worker */
-				setTimeout(function() {
-					/* retry !*/
-					dlQueue.pushFirst(self);
-				}, dl_retryinterval);
-				return false;
-			}
-			var info = dl_queue.splitFile(res.s);
-			dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-			return dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-		});
-	}
-
-}
 // }}}
 
 function dl_writer(dl, is_ready) {

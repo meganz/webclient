@@ -191,19 +191,19 @@ var DownloadManager = new function() {
 
 // downloading variable {{{
 dlQueue.on('working', function() {
-	downloading = true;
+	downloading =!dlQueue.isEmpty();
 });
 
 dlQueue.on('resume', function() {
-	downloading = true;
+	downloading =!dlQueue.isEmpty();
 });
 
 dlQueue.on('pause', function() {
-	downloading = true;
+	downloading =!dlQueue.isEmpty();
 });
 
 dlQueue.on('drain', function() {
-	downloading = false;
+	downloading =!dlQueue.isEmpty();
 });
 // }}}
 

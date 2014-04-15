@@ -667,19 +667,19 @@ if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_sk
 
 // ul_uploading variable {{{
 ulQueue.on('working', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('resume', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('pause', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('drain', function() {
-	ul_uploading = false;
+	ul_uploading = !ulQueue.isEmpty();
 });
 // }}}
 

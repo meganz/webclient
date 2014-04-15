@@ -249,6 +249,8 @@ function populate_l()
 	l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
 	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');	
+	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
 	l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
@@ -675,7 +677,7 @@ function CreateWorkers(url, message, size) {
 		return function(e) {
 			message(this.context, e, function(r) {
 				worker[id].busy = false; /* release worker */
-				instances[id].done(r);
+				instances[id](r);
 			});
 		}
 	}
@@ -698,13 +700,13 @@ function CreateWorkers(url, message, size) {
 		worker.push(null);
 	}
 
-	return new QueueClass(function(task) {
+	return new MegaQueue(function(task, done) {
 		for (var i = 0; i < size; i++) {
 			if (worker[i] === null) worker[i] = create(i);
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
-		instances[i]    = this;
+		instances[i]   = done;
 		$.each(task, function(e, t) {
 			if (e == 0) {
 				worker[i].context = t;

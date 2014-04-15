@@ -1,6 +1,7 @@
 function init_affiliate()
 {
 	
+	
 
 
 }

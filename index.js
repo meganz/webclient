@@ -417,7 +417,7 @@ function init_page()
 	}
 	else if (page == 'backup')
 	{
-		parsepage(pages['backup']);		
+		parsepage(pages['backup']);
 		init_backup();
 	}
 	else if (page == 'recovery')
@@ -548,11 +548,20 @@ function init_page()
 			document.location.hash = 'help/sync';
 		});
 		
+		
 		$('#syncanim').unbind('click');
 		$('#syncanim').bind('click',function(e)
 		{
-			document.location = 'https://mega.co.nz/MEGAsyncSetup.exe';
+			$('.sync-button').click();
 		});
+		
+		
+		/*
+		$('#syncanim').css('height','');
+		$('#syncanim').css('width','');		
+		$('#syncanim').addClass('sync-main-img');
+		*/
+		
 		
 		if (typeof swiffy == 'undefined' && !silent_loading)
 		{
@@ -573,7 +582,7 @@ function init_page()
 			{
 				$('#syncanim svg').css('cursor','pointer');
 			},500);
-		}
+		}	
 	}
 	else if (page == 'mobile')
 	{
@@ -585,7 +594,7 @@ function init_page()
 		init_affiliatemember();
 	}
 	else if (page == 'affiliates')
-	{
+	{	
 		parsepage(pages['affiliates']);
 	}
 	else if (page == 'resellers')
@@ -845,17 +854,13 @@ function mLogout()
 		if ((fminitialized && downloading) || ul_uploading)
 		{
 			if(Quiet) return true;
-
 			msgDialog('confirmation',l[967],l[377] + ' ' + l[507]+'?',false,function(e)
 			{
 				if (e)
 				{
-					if (downloading) {
-						dl_cancel();
-					}
-					if (ul_uploading) {
-						ul_cancel();
-					}
+					if (downloading) dl_cancel();				
+					if (ul_uploading) ul_cancel();
+					
 					resetUploadDownload();
 					loadingDialog.show();
 					var t = setInterval(function() {
@@ -871,6 +876,7 @@ function mLogout()
 			u_logout(1);
 			if (is_chrome_firefox) document.location.href =  'chrome://mega/content/' + urlrootfile;
 			else init_page();
+			document.location.reload();
 		}
 	}
 

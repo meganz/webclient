@@ -884,6 +884,8 @@ function initContextUI()
 	$(c+'.refresh-item').unbind('click');
 	$(c+'.refresh-item').bind('click',function(event) 
 	{
+		stopsc();
+		stopapi();
 		if (typeof mDB !== 'undefined' && !pfid) mDBreload();
 		else loadfm();
 	});

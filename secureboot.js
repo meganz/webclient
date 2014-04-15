@@ -347,6 +347,7 @@ else
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 		/* better download */
+		jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});

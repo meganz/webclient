@@ -669,7 +669,7 @@ if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_sk
 
 // ul_uploading variable {{{
 ulQueue.on('working', function() {
-	ul_uploading = !ulQueue.isEmpty();
+	ul_uploading = true;
 });
 
 ulQueue.on('resume', function() {

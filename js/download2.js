@@ -191,7 +191,7 @@ var DownloadManager = new function() {
 
 // downloading variable {{{
 dlQueue.on('working', function() {
-	downloading =!dlQueue.isEmpty();
+	downloading = true;
 });
 
 dlQueue.on('resume', function() {

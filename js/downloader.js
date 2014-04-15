@@ -136,9 +136,9 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 		// with no error and this happened. Should I reschedule this 
 		// task?
 		this.failed = true;
-		return setTimeout(function() {
-
-		}, this.backoff *= 1.2);
+		return setTimeout(function(q) {
+			q.request();
+		}, this.backoff *= 1.2, this);
 	}
 
 	this.xhr = null;

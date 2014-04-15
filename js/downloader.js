@@ -39,7 +39,7 @@ ClassChunk.prototype.shouldIReportDone = function() {
 	var remain = this.Progress.data[this.url][1]-this.Progress.data[this.url][0]
 	if (!this.done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/this.Progress.speed <= dlDoneThreshold) {
 		this.done = true;
-		task_done();
+		this.task_done();
 	}
 };
 // }}}

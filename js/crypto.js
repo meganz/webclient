@@ -783,16 +783,30 @@ function api_setfolder(h)
 	apixs[2].sid = h;
 }
 
-function api_init(c,service)
+function stopapi()
 {
-	var q = apixs[c];
+    for (var i = 4; i--; )
+    {
+        api_cancel(apixs[i]);
+        apixs[i].cmds = [[],[]];
+        apixs[i].ctxs = [[],[]];
+        apixs[i].cancelled = false;
+    }
+}
 
+function api_cancel(q)
+{
 	if (q)
 	{
 		q.cancelled = true;
 		if (q.xhr) q.xhr.abort();
 		if (q.timer) clearTimeout(q.timer);
 	}
+}
+
+function api_init(c,service)
+{
+    api_cancel(apixs[c]);
 
 	apixs[c] = { c : c,				// channel
 				cmds : [[],[]],		// queued/executing commands (double-buffered)
@@ -955,6 +969,21 @@ var waittimeout;
 var waitbegin;
 var waitid = 0;
 
+function stopsc()
+{
+	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
+	{
+		waitxhr.abort();
+		waitxhr = false;
+	}
+	
+	if (waittimeout)
+	{
+		clearTimeout(waittimeout);
+		waittimeout = false;
+	}
+}
+
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
@@ -991,18 +1020,8 @@ function completewait(recheck)
 {
 	if (this.waitid != waitid) return;
 
-	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
-	{
-		waitxhr.abort();
-		waitxhr = false;
-	}
-	
-	if (waittimeout)
-	{
-		clearTimeout(waittimeout);
-		waittimeout = false;
-	}
-
+    stopsc();
+    
 	var t = new Date().getTime()-waitbegin;
 
 	if (t < 1000)
@@ -1040,14 +1059,16 @@ function waitsc()
 		if (waitbackoff > 1024000) waitbackoff = 1024000;
 		waittimeout = setTimeout(waitsc,waitbackoff);
 	}
-	
+
 	waitxhr.onload = function()
 	{
+        if (this.status == 200) waitbackoff = 250;
+
 		clearTimeout(waittimeout);
 		waittimeout = false;
 		completewait();
 	}
-	
+
 	waitbegin = new Date().getTime();
 	waitxhr.open('POST',waiturl,true);
 	waitxhr.send();

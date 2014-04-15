@@ -566,6 +566,8 @@ function MegaData ()
 	};
 	
 	
+	
+	
 
 	this.buildtree = function(n)
 	{
@@ -593,9 +595,6 @@ function MegaData ()
 				// in case of contacts we have custom sort/grouping:
 				if (localStorage.csort) this.csort = localStorage.csort;
 				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-				
-				
-				
 				if (this.csort == 'shares')
 				{				
 					folders.sort(function(a,b)
@@ -646,8 +645,8 @@ function MegaData ()
 				{
 					for (var h in M.c[folders[i].h])
 					{
-						var n = M.d[h];						
-						if (n && n.t) buildnode = true;
+						var n2 = M.d[h];						
+						if (n2 && n2.t) buildnode = true;
 					}
 				}
 				
@@ -662,11 +661,12 @@ function MegaData ()
 				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				
 				if ($('#treeli_'+folders[i].h).length == 0)
 				{
-					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
-					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
-					else $('#treesub_' + n.h).append(html);
+					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
+					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
+					else $('#treesub_' + n.h).append(html);					
 				}
 				if (buildnode) this.buildtree(folders[i]);				
 			}
@@ -802,8 +802,6 @@ function MegaData ()
 		if (this.d[id]) return this.d[id];
 		else return false;
 	};
-	
-	
 
 	this.addNode = function(n,ignoreDB)
 	{

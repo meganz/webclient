@@ -672,7 +672,7 @@ function CreateWorkers(url, message, size) {
 		return function(e) {
 			message(this.context, e, function(r) {
 				worker[id].busy = false; /* release worker */
-				instances[id].done(r);
+				instances[id](r);
 			});
 		}
 	}
@@ -695,13 +695,13 @@ function CreateWorkers(url, message, size) {
 		worker.push(null);
 	}
 
-	return new QueueClass(function(task) {
+	return new MegaQueue(function(task, done) {
 		for (var i = 0; i < size; i++) {
 			if (worker[i] === null) worker[i] = create(i);
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
-		instances[i]    = this;
+		instances[i]   = done;
 		$.each(task, function(e, t) {
 			if (e == 0) {
 				worker[i].context = t;

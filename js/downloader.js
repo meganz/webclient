@@ -37,7 +37,10 @@ ClassChunk.destroy = function() {
 ClassChunk.prototype.shouldIReportDone = function() {
 	if (!this.Progress.data[this.url]) return;
 	var remain = this.Progress.data[this.url][1]-this.Progress.data[this.url][0]
-	if (!this.done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/this.Progress.speed <= dlDoneThreshold) {
+		, report_done = !this.done && iRealDownloads <= dlQueue._limit * 1.2 && remain/this.Progress.speed <= dlDoneThreshold
+
+	if (report_done) {
+		DEBUG('reporting done() earlier to start another download');
 		this.done = true;
 		this.task_done();
 	}
@@ -192,7 +195,7 @@ ClassChunk.prototype.request = function() {
 
 ClassChunk.prototype.run = function(task_done) {
 	iRealDownloads++;
-	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._concurrency * 0.5) {
+	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
 		/** 
 		 *	It is an small chunk and we *should* finish soon if everything goes
 		 *	fine. We release our slot so another chunk can start now. It is useful
@@ -246,7 +249,7 @@ function XClassChunk(task) {
 		Progress.dl_prevprogress = Progress.dl_prevprogress || 0;
 		Progress.data[url] = [0, task.size];
 
-		if (size <= 100*1024 && iRealDownloads <= dlQueue._concurrency * .5) {
+		if (size <= 100*1024 && iRealDownloads <= dlQueue._limit * .5) {
 			done = true;
 			task_done();
 		}
@@ -259,7 +262,7 @@ function XClassChunk(task) {
 		function shouldIReportDone() {
 			if (!Progress.data[url]) return;
 			var remain = Progress.data[url][1]-Progress.data[url][0]
-			if (!done && iRealDownloads <= dlQueue._concurrency * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
+			if (!done && iRealDownloads <= dlQueue._limit * 1.2 && remain/Progress.speed <= dlDoneThreshold) {
 				done = true;
 				task_done();
 			}

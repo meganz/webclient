@@ -100,8 +100,8 @@ MegaQueue.prototype.process = function() {
 			this._process();
 			return false;
 		}
-		this.trigger('working', args);
 		this.run_in_context(args);
+		this.trigger('working', args);
 	}
 
 	if (this.isEmpty()) {

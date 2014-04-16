@@ -326,7 +326,7 @@ ChunkUpload.prototype.updateprogress = function() {
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	if (this.file.abort) {
-		return xhr.abort();
+		return xhr.abort()
 	}
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
@@ -385,12 +385,12 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		} else { 
 			DEBUG("Invalid upload response: " + response);
-			if (response != EKEY) return xhr.on_error(EKEY)
+			if (response != EKEY) return this.on_error(EKEY)
 		}
 
 	}
 
-	return xhr.on_error();
+	return this.on_error();
 }
 
 

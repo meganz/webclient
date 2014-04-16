@@ -443,7 +443,9 @@ function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
 
+
 	this.run = function(done) {
+		file.abort = false; /* fix in case it restarts from scratch */
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
 		if (start_uploading || $('#ul_' + file.id).length == 0) {

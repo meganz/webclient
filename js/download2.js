@@ -218,49 +218,6 @@ dlQueue.validateTask = function(pzTask) {
 	}
 	return false;
 };
-
-
-/**
- *	Override the downloader scheduler method.
- *	The idea is to select chunks from the same
- *	file_id, always
- */
-dlQueue.getNextTaskz = (function() {
-	/* private variable to keep in track
-	   the current file id */
-	var current = null
-		, DM = DownloadManager
-
-	return function() {
-		var queue = {}
-			, self = this
-			, candidate = null
-
-		$.each(self._queue, function(p, pzTask) {
-			if (!DM.enabled(pzTask)) return;
-			if (pzTask.download && pzTask.download.dl_id == current) {
-				candidate = p;
-				return false; /* break */
-			}
-			if (candidate === null || (pzTask instanceof ClassChunk && self._queue[candidate] instanceof ClassFile)) {
-				/* make it our candidate but don't break the loop */
-				candidate = p;
-			}
-		});
-
-		if (candidate !== null)  {
-			candidate = self._queue.splice(candidate, 1)[0]
-			current = (candidate.download||{}).dl_id;
-		}
-
-		if (false && !candidate) {
-			DEBUG("next task is", candidate, fetchingFile, self._queue);
-			DM.debug();
-		}
-
-		return candidate;
-	};
-})();
 // }}}
 
 if (localStorage.dl_maxSlots) {

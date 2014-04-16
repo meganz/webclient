@@ -24,6 +24,7 @@ function newXhr() {
 	xhr.onerror = function() {
 		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error) {
+			this.abort();
 			this.listener.on_error(arguments, this, 'error');
 			this.listener = null; /* release */
 			for(var i = 0; i < _xhr_queue.length; i++) {
@@ -37,6 +38,7 @@ function newXhr() {
 	xhr.ontimeout = function() {
 		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error) {
+			this.abort();
 			this.listener.on_error(arguments, this, 'timeout');
 			this.listener = null; /* release */
 			for(var i = 0; i < _xhr_queue.length; i++) {

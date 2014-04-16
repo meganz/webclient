@@ -109,16 +109,12 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.abort = function(file) {
-		DEBUG("abort()", file.name);
+		DEBUG("abort()", file.name, file.id);
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task.file != file;
+			return task[0].file != file;
 		});
 
-		$.each(ulQueue._running, function(i, worker) {
-			if (worker.task.file == file) {
-				worker.task.abort = true;
-			}
-		});
+		file.abort = true;
 
 		$('#ul_' + file.id).remove();
 		ul_queue[file.pos] = {};
@@ -147,14 +143,10 @@ var UploadManager = new function() {
 
 		DEBUG("restart()", file.name)
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task.file != file;
+			return task[0].file != file;
 		});
 
-		$.each(ulQueue._running, function(i, worker) {
-			if (worker.task.file == file) {
-				worker.task.abort = true;
-			}
-		});
+		file.abort = true;
 
 		DEBUG("fatal error restarting", file.name)
 		onUploadError(file.pos, "Upload failed - restarting upload");
@@ -326,7 +318,8 @@ ChunkUpload.prototype.updateprogress = function() {
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	if (this.file.abort) {
-		return xhr.abort()
+		xhr.abort()
+		return this.done();
 	}
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
@@ -523,6 +516,13 @@ function ul_finalize(file) {
 	var p
 
 	DEBUG(file.name, "ul_finalize")
+
+	onUploadProgress(
+		file.pos, 
+		100, 
+		file.size,
+		file.size
+	);
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 

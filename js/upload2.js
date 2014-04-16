@@ -324,9 +324,9 @@ ChunkUpload.prototype.updateprogress = function() {
 	);
 };
 
-ChunkUpload.prototype.upload_progress = function(args, xhr) {
+ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	if (this.file.abort) {
-		alert("implement file alert");
+		return xhr.abort();
 	}
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();

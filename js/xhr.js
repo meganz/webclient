@@ -13,6 +13,13 @@ function newXhr() {
 		}, 2*60*1000, xhr);
 	};
 
+	xhr._abort = xhr.abort;
+
+	xhr.abort = function() {
+		xhr._abort();
+		this.listener = null; /* we're done here, release this slot */
+	}
+
 	xhr.onreadystatechange = function() {
 		xhr.setup_timeout();
 		if (this.readyState == this.DONE && this.listener.on_ready) {
@@ -21,6 +28,14 @@ function newXhr() {
 			this.listener = null; /* we're done here, release this slot */
 		}
 	}
+
+	xhr.upload.onprogress = function() {
+		xhr.setup_timeout();
+		if (xhr.listener.on_upload_progress) {
+			xhr.listener.on_upload_progress(arguments, xhr);
+		}
+	}
+
 	xhr.onerror = function() {
 		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error) {

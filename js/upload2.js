@@ -385,12 +385,12 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		} else { 
 			DEBUG("Invalid upload response: " + response);
-			if (response != EKEY) return xhr.failure(EKEY)
+			if (response != EKEY) return xhr.on_error(EKEY)
 		}
 
 	}
 
-	return xhr.failure();
+	return xhr.on_error();
 }
 
 

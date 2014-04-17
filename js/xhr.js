@@ -16,12 +16,19 @@ function newXhr() {
 	xhr._abort = xhr.abort;
 
 	xhr.abort = function() {
+		DEBUG('Socket: aborting', this._id);
 		xhr._abort();
 		this.listener = null; /* we're done here, release this slot */
 	}
 
+	xhr.nolistener = function() {
+		DEBUG('Socket: no listener for socket', this._id);
+		this._abort();
+	}
+
 	xhr.onreadystatechange = function() {
 		xhr.setup_timeout();
+		if (!this.listener) return this.nolistener();
 		if (this.readyState == this.DONE && this.listener.on_ready) {
 			clearTimeout(xhr.__timeout);
 			this.listener.on_ready(arguments, this);
@@ -31,6 +38,8 @@ function newXhr() {
 
 	xhr.upload.onprogress = function() {
 		xhr.setup_timeout();
+		if (!xhr.listener) return xhr.nolistener(); /* no one is listening */
+
 		if (xhr.listener.on_upload_progress) {
 			xhr.listener.on_upload_progress(arguments, xhr);
 		}
@@ -38,10 +47,12 @@ function newXhr() {
 
 	xhr.onerror = function() {
 		clearTimeout(xhr.__timeout);
+		if (!this.listener) return this.nolistener();
 		if (this.listener.on_error) {
 			this.abort();
 			this.listener.on_error(arguments, this, 'error');
 			this.listener = null; /* release */
+			DEBUG('Socket: onerror', this._id);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -52,10 +63,12 @@ function newXhr() {
 	}
 	xhr.ontimeout = function() {
 		clearTimeout(xhr.__timeout);
+		if (!this.listener) return this.nolistener();
 		if (this.listener.on_error) {
 			this.abort();
 			this.listener.on_error(arguments, this, 'timeout');
 			this.listener = null; /* release */
+			DEBUG('Socket: ontimeout', this._id);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -66,10 +79,13 @@ function newXhr() {
 	}
 	xhr.onprogress = function() {
 		xhr.setup_timeout();
+		if (!this.listener) return this.nolistener();
 		if (this.listener.on_progress) {
 			this.listener.on_progress(arguments, this)
 		}	
 	}
+
+	xhr._id = parseInt(Math.random() * 0xfffffffff)
 
 	return xhr;
 }

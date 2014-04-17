@@ -119,7 +119,7 @@ var DownloadManager = new function() {
 			var match = doesMatch(obj[0], pattern);
 			if (match) {
 				check(obj[0]);
-				DEBUG("remove task " + obj.__tid, pattern);
+				DEBUG("remove task", pattern);
 			}
 			return !match;
 		});

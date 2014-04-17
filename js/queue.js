@@ -15,7 +15,8 @@ MegaQueue.prototype.isEmpty = function() {
 }
 
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
-    this._queue.push([arg, next || function() {}, self]);
+    this._queue.unshift([arg, next || function() {}, self]);
+	this._process();
 };
 
 MegaQueue.prototype.resume = function() {

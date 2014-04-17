@@ -321,13 +321,14 @@ ClassFile.prototype.run = function(task_done) {
 	dlGetUrl(this.dl, function(error, res, o) {
 		if (error) {
 			/* failed */
-			DownloadManager.pause(self); 
 			fetchingFile = 0;
 			task_done(); /* release worker */
 			setTimeout(function() {
 				/* retry !*/
+				DEBUG('retrying');
 				dlQueue.pushFirst(self);
 			}, dl_retryinterval);
+			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
 			return false;
 		}
 		var info = dl_queue.splitFile(res.s);

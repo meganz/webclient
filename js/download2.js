@@ -116,9 +116,9 @@ var DownloadManager = new function() {
 		pattern = s2o(pattern);
 		removed.push(task2id(pattern))
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-			var match = doesMatch(obj, pattern);
+			var match = doesMatch(obj[0], pattern);
 			if (match) {
-				check(obj);
+				check(obj[0]);
 				DEBUG("remove task " + obj.__tid, pattern);
 			}
 			return !match;

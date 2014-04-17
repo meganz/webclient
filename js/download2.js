@@ -208,11 +208,21 @@ dlQueue.on('drain', function() {
 // }}}
 
 // chunk scheduler {{{
-dlQueue.validateTask = function(pzTask) {
+dlQueue.prepareNextTask = function() {
+	this.has_chunk = false;
+	for (var i = 0; i < this._queue.length; i++) {
+		if (this._queue[i][0] instanceof ClassChunk) {
+			this.has_chunk = true;
+			break;
+		}
+	}
+};
+
+dlQueue.validateTask = function(pzTask, next) {
 	if (DownloadManager.enabled(pzTask)) {
 		if (pzTask instanceof ClassChunk) {
 			return true;
-		} else if (pzTask instanceof ClassFile && !fetchingFile) {
+		} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
 			return true;
 		}
 	}

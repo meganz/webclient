@@ -11,7 +11,8 @@ function ClassChunk(task) {
 	this.io	  = task.download.io
 	this.done = false
 	this.avg  = [0, 0]
-	this.gid      = this.dl.zipid ? 'zip_' + this.dl.zipid : 'file_' + this.dl.dl_id
+	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'file_' + this.dl.dl_id
+	this.xid  = this.gid + "_" + parseInt(Math.random() * 0xfffffffffff)
 	this.failed   = false
 	this.backoff  = 1000
 	this.lastPing = NOW()
@@ -22,7 +23,7 @@ function ClassChunk(task) {
 	this.Progress.size  = this.Progress.size  || (this.dl.zipid ? Zips[this.dl.zipid].size : this.io.size)
 	this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
 	this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
-	this.Progress.data[this.url] = [0, task.size];
+	this.Progress.data[this.xid] = [0, task.size];
 }
 
 // destroy {{{
@@ -35,8 +36,8 @@ ClassChunk.destroy = function() {
 
 // shouldIReportDone {{{
 ClassChunk.prototype.shouldIReportDone = function() {
-	if (!this.Progress.data[this.url]) return;
-	var remain = this.Progress.data[this.url][1]-this.Progress.data[this.url][0]
+	if (!this.Progress.data[this.xid]) return;
+	var remain = this.Progress.data[this.xid][1]-this.Progress.data[this.xid][0]
 		, report_done = !this.done && iRealDownloads <= dlQueue._limit * 1.2 && remain/this.Progress.speed <= dlDoneThreshold
 
 	if (report_done) {
@@ -118,7 +119,7 @@ ClassChunk.prototype.finish_upload = function() {
 // XHR::on_progress {{{
 ClassChunk.prototype.on_progress = function(args) {
 	if (this.isCancelled()) return;
-	this.Progress.data[this.url][0] = args[0].loaded;
+	this.Progress.data[this.xid][0] = args[0].loaded;
 	this.updateProgress();
 };
 // }}}
@@ -128,7 +129,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	if (this.has_failed) return;
 	this.has_failed = true;
 
-	this.Progress.data[this.url][0] = 0; /* reset progress */
+	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(true);
 
 	if (this.done) {
@@ -152,7 +153,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 	var r = xhr.response || {};
 	if (r.byteLength == this.size) {
 		this.Progress.done += r.byteLength;
-		delete this.Progress.data[this.url];
+		delete this.Progress.data[this.xid];
 		this.updateProgress(true);
 		if (navigator.appName != 'Opera') {
 			this.io.dl_bytesreceived += r.byteLength;

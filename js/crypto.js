@@ -552,49 +552,29 @@ function chksum(buf)
 	return d;
 }
 
-
 /* moved from js/keygen.js {{{ */
-
-var Rbits, Rbits2;
-var cbuf;
-
-if (typeof window.crypto == 'object' && typeof window.crypto.getRandomValues == 'function') cbuf = new Uint32Array(1);
 
 // random number between 0 .. n -- based on repeated calls to rc
 function rand(n)
 {
-	if (cbuf) window.crypto.getRandomValues(cbuf);
-
-	if (n == 2)
-	{
-		if (!Rbits)
-		{
-			Rbits = 8;
-			Rbits2 = rc4Next(randomByte()) ^ cbuf[0];
-		}
-
-		Rbits--;
-		var r = Rbits2 & 1;
-		Rbits2 >>= 1;
-		return r;
-	}
-
-	var m = 1;
-
-	r = 0;
-
-	while (n > m && m > 0)
-	{
-		m <<= 8;
-		r = (r << 8) | rc4Next(randomByte());
-	}
-
-	if (cbuf) r ^= cbuf[0];
-
-	if (r < 0) r += 0x100000000;
-
-	return r % n;
+    var r = new Uint32Array(1);
+    asmCrypto.getRandomValues(r);
+    return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
 }
+
+/*
+if(is_chrome_firefox) {
+	var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
+		.createInstance(Ci.nsIRandomGenerator);
+
+	var rand = function fx_rand(n) {
+		var r = nsIRandomGenerator.generateRandomBytes(4);
+		r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
+		if(r<0) r ^= 0x80000000;
+		return r % n; // oops, it's not uniformly distributed
+	};
+}
+*/
 
 function crypto_rsagenkey ()
 {
@@ -616,7 +596,7 @@ function crypto_rsagenkey ()
         u_setrsa(e.data);
     };
 
-    w.postMessage([ /* TODO seed from arkanoid */ ]);
+    w.postMessage([ 2048, 257, randomSeed ]);
 }
 
 /* }}} */

@@ -5,71 +5,29 @@
  * We don't use every successive mouse movement event.
  * Instead, we use some bits from random() to determine how many
  * subsequent mouse movements we ignore before capturing the next one.
- * rc4 is used as a mixing function for the captured mouse events.
+ *
+ * Collected entropy is used to salt ISAAC PRNG.
  *
  * mouse motion event code originally from John Walker
- * key press timing code thanks to Nigel Johnstone
- */
+ * key press timing code thanks to Nigel Johnstone */
 
 var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
 var lastactive = new Date().getTime();
 
-// ----------------------------------------
-
-var s = new Array(256);
-var rc4x, rc4y;
-
-function rc4Init()
-{
- if(is_chrome_firefox)
- {
-  s = nsIRandomGenerator.generateRandomBytes(256);
- }
- else
- {
-  var i, t, x, y;
-  var key = new Array(256);
-
-  for(i=0; i<256; i++)
-  {
-   s[i]=i;
-   key[i] = randomByte()^timeByte();
-  }
-
-  y=0;
-  for(i=0; i<2; i++)
-  {
-   for(x=0; x<256; x++)
-   {
-    y=(key[i] + s[x] + y) % 256;
-    t=s[x]; s[x]=s[y]; s[y]=t;
-   }
-  }
- }
- rc4x=0;
- rc4y=0;
-}
-
-function rc4Next(b)
-{
- var t;
-
- rc4x=(rc4x+1) & 255;
- rc4y=(s[rc4x] + rc4y) & 255;
- t=s[rc4x]; s[rc4x]=s[rc4y]; s[rc4y]=t ^ b;
- return (b ^ s[(s[rc4x] + s[rc4y]) % 256]) & 255;
-}
+var randomSeed = new Array(256);
+var randomCounter = 0;
 
 // ----------------------------------------
+
 if (window.performance !== undefined && window.performance.now !== undefined) {
 	var timeByte = function() { return ((window.performance.now()%512)>>>1)&255 };
 } else {
 	var timeByte = function() { return ((new Date().getTime())>>>2)&255 };
 }
 
-function randomByte() { return Math.round(Math.random()*255)&255; }
+function randomByte() { return Math.round(Math.random()*256)&255; }
 
-function keyPressEntropy(e) { rc4Next(timeByte()); }
+function keyPressEntropy(e) { randomSeed[randomCounter++ & 255] ^= timeByte(); }
 
 function mouseMoveEntropy(e)
 {
@@ -79,8 +37,7 @@ function mouseMoveEntropy(e)
  {
   var c = ((e.screenX << 4) | (e.screenY & 15));
   if (typeof arkanoid_entropy !== 'undefined') arkanoid_entropy();
-  rc4Next(c&255);
-  rc4Next(timeByte());
+  randomSeed[randomCounter++ & 255] ^= ( timeByte() ^ c );
   mouseMoveSkip = randomByte() & 7;
  }
 }
@@ -116,21 +73,6 @@ function eventsCollect()
   document.attachEvent("onmousemove", mouseMoveEntropy);
   document.attachEvent("onkeypress", keyPressEntropy);
  }
-
- rc4Init();
-}
-
-if(is_chrome_firefox) {
-	var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
-		.createInstance(Ci.nsIRandomGenerator);
-
-	// We're overwriting the rand() function defined at keygen.js
-	var rand = function fx_rand(n) {
-		var r = nsIRandomGenerator.generateRandomBytes(4);
-		r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
-		if(r<0) r ^= 0x80000000;
-		return r % n;
-	};
 }
 
 // keyboard/mouse entropy

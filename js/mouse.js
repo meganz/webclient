@@ -25,7 +25,7 @@ if (window.performance !== undefined && window.performance.now !== undefined) {
 	var timeByte = function() { return ((new Date().getTime())>>>2)&255 };
 }
 
-function randomByte() { return Math.round(Math.random()*256)&255; }
+function randomByte() { return ( Math.random() * 256 ) & 255; }
 
 function keyPressEntropy(e) { randomSeed[randomCounter++ & 255] ^= timeByte(); }
 

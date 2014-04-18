@@ -109,16 +109,12 @@ var UploadManager = new function() {
 	var self = this;
 
 	self.abort = function(file) {
-		DEBUG("abort()", file.name);
+		DEBUG("abort()", file.name, file.id);
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task.file != file;
+			return task[0].file != file;
 		});
 
-		$.each(ulQueue._running, function(i, worker) {
-			if (worker.task.file == file) {
-				worker.task.abort = true;
-			}
-		});
+		file.abort = true;
 
 		$('#ul_' + file.id).remove();
 		ul_queue[file.pos] = {};
@@ -130,11 +126,8 @@ var UploadManager = new function() {
 		ulQueue._queue = [];
 		$.each(ul_queue, function(i, file) {
 			$('#ul_' + file.id).remove();
+			file.abort = true;
 			ul_queue[file.pos] = {};
-		});
-
-		$.each(ulQueue._running, function(i, worker) {
-			worker.task.abort = true;
 		});
 	}
 
@@ -147,14 +140,10 @@ var UploadManager = new function() {
 
 		DEBUG("restart()", file.name)
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task.file != file;
+			return task[0].file != file;
 		});
 
-		$.each(ulQueue._running, function(i, worker) {
-			if (worker.task.file == file) {
-				worker.task.abort = true;
-			}
-		});
+		file.abort = true;
 
 		DEBUG("fatal error restarting", file.name)
 		onUploadError(file.pos, "Upload failed - restarting upload");
@@ -324,19 +313,22 @@ ChunkUpload.prototype.updateprogress = function() {
 	);
 };
 
-ChunkUpload.prototype.upload_progress = function(args, xhr) {
+ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	if (this.file.abort) {
-		alert("implement file alert");
+		xhr.abort()
+		return this.done();
 	}
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
 };
 
 ChunkUpload.prototype.on_error = function(args, xhr) {
-	if (this.file.abort) return;
+	if (this.file.abort) {
+		return this.done();
+	}
 	this.file.progress[this.start] = 0;
 	this.updateprogress();
-	UploadManager.retry(this, "xhr failed");
+	UploadManager.retry(this.file, this, "xhr failed");
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
@@ -385,12 +377,12 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		} else { 
 			DEBUG("Invalid upload response: " + response);
-			if (response != EKEY) return xhr.failure(EKEY)
+			if (response != EKEY) return this.on_error(EKEY)
 		}
 
 	}
 
-	return xhr.failure();
+	return this.on_error();
 }
 
 
@@ -418,7 +410,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
 		DEBUG("IO error");
 		this.file.done_starting();
-		return UploadManager.retry(file, chunk, Job, args[0])
+		return UploadManager.retry(this.file, this, args[0])
 	}
 
 	Encrypter.push(
@@ -439,6 +431,8 @@ ChunkUpload.prototype.done = function() {
 	this.bytes = null;
 	this.file  = null;
 	this.ul    = null;
+
+	megatitle();
 };
 
 ChunkUpload.prototype.run = function(done) {
@@ -451,7 +445,9 @@ function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
 
+
 	this.run = function(done) {
+		file.abort = false; /* fix in case it restarts from scratch */
 		file.retries = file.retries+1 || 0
 		file.ul_lastreason = file.ul_lastreason || 0
 		if (start_uploading || $('#ul_' + file.id).length == 0) {
@@ -521,6 +517,13 @@ function ul_finalize(file) {
 	var p
 
 	DEBUG(file.name, "ul_finalize")
+
+	onUploadProgress(
+		file.pos, 
+		100, 
+		file.size,
+		file.size
+	);
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 
@@ -671,15 +674,15 @@ ulQueue.on('working', function() {
 });
 
 ulQueue.on('resume', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('pause', function() {
-	ul_uploading = true;
+	ul_uploading = !ulQueue.isEmpty();
 });
 
 ulQueue.on('drain', function() {
-	ul_uploading = false;
+	ul_uploading = !ulQueue.isEmpty();
 });
 // }}}
 

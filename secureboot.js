@@ -761,7 +761,11 @@ else
 				try
 				{
 					var blob = new Blob(cssar, { type: "text/css" });
-					for ( var f in scripts ) scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
+					for ( var f in scripts ) {
+						if (!scripts[f].match(/^blob:/)) {
+							scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
+						}
+					}
 				}
 				catch(e)
 				{
@@ -770,9 +774,11 @@ else
 					for (var i in cssar) bb.append(cssar[i]);
 					var blob = bb.getBlob('text/css');
 					for ( var f in scripts ) {
-					    bb = new BlobBuilder();
-					    bb.append( scripts[f] );
-					    scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
+						if (!scripts[f].match(/^blob:/)) {
+							bb = new BlobBuilder();
+							bb.append( scripts[f] );
+							scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
+						}
 				    }
 				}
 				var link = document.createElement('link');

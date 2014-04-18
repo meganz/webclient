@@ -774,7 +774,8 @@ function percent_megatitle()
 		$.transferprogress = {};
 	}
 	
-	megatitle(t);
+	if (!t || parseInt(t) >= 100) megatitle();
+	else megatitle(t);
 }
 
 function __percent_megatitle()
@@ -796,4 +797,17 @@ function __percent_megatitle()
 	} else {
 		megatitle(" " + percentage + "%");
 	}
+}
+
+function hostname(url) {
+	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+}
+
+String.prototype.seconds = function() {
+	return parseInt(this) * 1000;
+}
+
+// Helper to manage time in a friendly way
+String.prototype.minutes = function() {
+	return parseInt(this) * 1000 * 60;
 }

@@ -772,7 +772,7 @@ function MegaData ()
 		$('.fm-folder-upload span').text(l[98]);
 
 		$('.fm-right-header').removeClass('long-path');
-		if (M.pathLength()+250 > $('.fm-right-header').width())
+		if (M.pathLength()+260 > $('.fm-right-header').width())
 		{
 			$('.fm-right-header').addClass('long-path');
 			$('.fm-new-folder span').text('');
@@ -783,7 +783,7 @@ function MegaData ()
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;
 
-		while (M.pathLength()+250 > $('.fm-right-header').width() && i < el.length)
+		while (M.pathLength()+260 > $('.fm-right-header').width() && i < el.length)
 		{
 			$(el[i]).text('');
 			i++;
@@ -1818,6 +1818,9 @@ function MegaData ()
 		if (!bl) return false;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var bps = Math.round(bl / eltime);
+		if (isNaN(bps)) {
+			bps = 1;
+		}
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -1892,7 +1895,7 @@ function MegaData ()
 		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id, 0);
+		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
 	}
 }

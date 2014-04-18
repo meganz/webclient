@@ -2534,19 +2534,23 @@ var SelectionManager = function($selectable) {
         if(selected_list.length > 0) {
             $(selected_list[selected_list.length - 1]).addClass('currently-selected');
         }
-
-        selected_list = []; // reset the state of the last selected items for the next selectablestart
-				
+        selected_list = []; // reset the state of the last selected items for the next selectablestart			
     });
-	
-	
-	
-	
-
     return this;
 };
 
 var selectionManager;
+
+
+function closeDialog()
+{
+	$('.fm-dialog').addClass('hidden');
+	$('.fm-dialog-overlay').addClass('hidden');
+	$('.export-links-warning').addClass('hidden');			
+	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
+	delete $.dialog;
+}
+
 
 function UIkeyevents()
 {
@@ -2702,11 +2706,7 @@ function UIkeyevents()
 		}		
 		else if (e.keyCode == 27 && $.dialog)
 		{
-			$('.fm-dialog').addClass('hidden');
-			$('.fm-dialog-overlay').addClass('hidden');
-			$('.export-links-warning').addClass('hidden');			
-			if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
-			delete $.dialog;
+			closeDialog();
 		}
 		else if (e.keyCode == 27 && $.msgDialog)
 		{
@@ -3802,11 +3802,7 @@ function renameDialog()
 {
 	if ($.selected.length > 0)
 	{
-		$.dialog = 'rename';		
-		var n = M.d[$.selected[0]];	
-		$('.rename-dialog input').val(n.name);
-		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
-		else $('.rename-dialog .fm-dialog-title').text(l[426]);
+		$.dialog = 'rename';
 		
 		$('.rename-dialog').removeClass('hidden');
 		$('.rename-dialog').addClass('active');
@@ -3830,11 +3826,41 @@ function renameDialog()
 			if ($(this).val() == '') $('.rename-dialog').removeClass('active');
 			else $('.rename-dialog').addClass('active');
 		});		
-		$('.rename-dialog input').focus();		
 		$('.fm-dialog-rename-button').unbind('click');
 		$('.fm-dialog-rename-button').bind('click',function()  
 		{
 			dorename();
+		});
+		var n = M.d[$.selected[0]];		
+		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
+		else $('.rename-dialog .fm-dialog-title').text(l[426]);		
+		$('.rename-dialog input').val(n.name);		
+		if (!n.t)
+		{
+			var ext = fileext(n.name);
+			$('.rename-dialog input')[0].selectionStart=0;
+			$('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
+		}
+		$('.rename-dialog input').unbind('click keydown keyup keypress');
+		$('.rename-dialog input').focus();
+		$('.rename-dialog input').bind('click keydown keyup keypress',function(e)
+		{
+			var n = M.d[$.selected[0]];
+			if (!n.t)
+			{
+				var ext = fileext(n.name);
+				if (this.selectionStart > $('.rename-dialog input').val().length - ext.length-2)
+				{
+					this.selectionStart = $('.rename-dialog input').val().length - ext.length-1;
+					this.selectionEnd = $('.rename-dialog input').val().length - ext.length-1;				
+					if (e.which == 46) return false;
+				}
+				else if (this.selectionEnd > $('.rename-dialog input').val().length - ext.length-1)
+				{
+					this.selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
+					return false;
+				}
+			}
 		});
 	}
 }

@@ -323,7 +323,9 @@ ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 };
 
 ChunkUpload.prototype.on_error = function(args, xhr) {
-	if (this.file.abort) return;
+	if (this.file.abort) {
+		return this.done();
+	}
 	this.file.progress[this.start] = 0;
 	this.updateprogress();
 	UploadManager.retry(this.file, this, "xhr failed");

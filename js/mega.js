@@ -1812,6 +1812,9 @@ function MegaData ()
 		if (!bl) return false;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var bps = Math.round(bl / eltime);
+		if (isNaN(bps)) {
+			bps = 1;
+		}
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)

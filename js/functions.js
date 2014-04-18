@@ -771,7 +771,8 @@ function percent_megatitle()
 		$.transferprogress = {};
 	}
 	
-	megatitle(t);
+	if (!t || parseInt(t) >= 100) megatitle();
+	else megatitle(t);
 }
 
 function __percent_megatitle()

@@ -965,7 +965,7 @@ function api_reqfailed(c,e)
 var failxhr;
 var failtime = 0;
 
-function api_reportfailure(url,callback)
+function api_reportfailure(hostname,callback)
 {
 	var t = new Date().getTime();
 
@@ -983,7 +983,7 @@ function api_reportfailure(url,callback)
 		if (this.status == 200)	failxhr.callback();
 	}
 
-	failxhr.send(url);
+	failxhr.send(hostname);
 }
 
 var waiturl;

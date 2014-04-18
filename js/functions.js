@@ -795,3 +795,8 @@ function __percent_megatitle()
 		megatitle(" " + percentage + "%");
 	}
 }
+
+// Helper to manage time in a friendly way
+String.prototype.minutes = function() {
+	return NOW() + parseInt(this) * 1000 * 60;
+}

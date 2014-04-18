@@ -153,10 +153,16 @@ var UploadManager = new function() {
 	};
 
 	self.retry = function(file, chunk, reason) {
-		if (file.retries >= 15) {
+		if (!file.last_error || file.last_error + "5".minutes() <= NOW()) {
+			// If it is the first error or the last_error happen more than 5 minutes 
+			// ago (probably the machine went to sleep) let's reset it
+			file.last_error = NOW()
+			file.retries    = 0;
+		}
+
+		if (file.retries++ >= 30) {
 			return self.restart(file);
 		}
-		file.retries++;
 
 		// pause file upload
 		file.paused = true;

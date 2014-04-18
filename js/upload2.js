@@ -160,7 +160,7 @@ var UploadManager = new function() {
 			file.retries    = 0;
 		}
 
-		if (file.retries++ >= 30) {
+		if (file.retries++ >= 20) {
 			return self.restart(file);
 		}
 

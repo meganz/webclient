@@ -2364,8 +2364,9 @@ function crypto_share_rsa2aes()
 		}
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
 
-		var fr = new FileReader();
 		var size = uq_entry.size;
+		var fr = new FileReader();
+		if (!fr.readAsBinaryString) fr.ab = 1;
 
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)
@@ -2387,7 +2388,7 @@ function crypto_share_rsa2aes()
 			fr.onload = function(e)
 			{
 				var crc;
-				var data = e.target.result;
+				var data = fr.ab ? ab_to_str(fr.result) : e.target.result;
 
 				if(size <= CRC_SIZE)
 				{
@@ -2413,7 +2414,8 @@ function crypto_share_rsa2aes()
 
 				Finish(crc);
 			};
-			fr.readAsBinaryString(blob);
+			if (fr.ab) fr.readAsArrayBuffer(blob);
+			else fr.readAsBinaryString(blob);
 		}
 		else
 		{
@@ -2440,13 +2442,14 @@ function crypto_share_rsa2aes()
 					var blob = uq_entry[sfn](offset,offset+BLOCK_SIZE);
 					fr.onload = function(e)
 					{
-						var block = e.target.result;
+						var block = fr.ab ? ab_to_str(fr.result) : e.target.result;
 
 						crc = crc32(block,crc,BLOCK_SIZE);
 
 						next(++j);
 					};
-					fr.readAsBinaryString(blob);
+					if (fr.ab) fr.readAsArrayBuffer(blob);
+					else fr.readAsBinaryString(blob);
 				};
 				next();
 			};

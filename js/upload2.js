@@ -648,40 +648,17 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	}
 }, 4);
 
-function resetUploadDownload() {
-	Soon(percent_megatitle);
-
-	var has_ul = false
-		, has_dl = false
-		, usize = ul_queue.size
-		, dsize = dl_queue.size
-
-	for (var i = 0; i < usize; i++) {
-		if (typeof ul_queue[i].id != 'undefined') {
-			has_ul = true
-			break;
-		}
-	}
-
-	for (var i = 0; i < dsize; i++) {
-		if (typeof dl_queue[i].id != 'undefined') {
-			has_dl = true
-			break;
-		}
-	}
-	return;
-
-	if (!has_ul) {
-		ul_queue = null
-		ul_queue = new UploadQueue
-	}
-	if (!has_dl) {
-		ul_queue = null
-		dl_queue = new DownloadQueue
-	}
-	DEBUG("resetUploadDownload", has_ul, has_ul);
+function isQueueActive(q) {
+	return typeof q.id !== 'undefined';
 }
+function resetUploadDownload() {
+	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
+	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
 
+	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
+
+	Soon(percent_megatitle);
+}
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 

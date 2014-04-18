@@ -972,6 +972,8 @@ function api_reportfailure(url,callback)
 	if (t-failtime < 60000) return;
 	failtime = t;
 
+	if (failxhr) failxhr.abort();
+	
 	failxhr = getxhr();
 	failxhr.open('POST', apipath + 'pf?h', true);
 	failxhr.callback = callback;

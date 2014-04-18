@@ -796,7 +796,15 @@ function __percent_megatitle()
 	}
 }
 
+function hostname(url) {
+	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+}
+
+String.prototype.seconds = function() {
+	return parseInt(this) * 1000;
+}
+
 // Helper to manage time in a friendly way
 String.prototype.minutes = function() {
-	return NOW() + parseInt(this) * 1000 * 60;
+	return parseInt(this) * 1000 * 60;
 }

@@ -109,6 +109,22 @@ function ul_Identical(target, path, hash,size)
 }
 /* }}} */ 
 
+/**
+ *	Check if the network is up!
+ *
+ *	This function is called when an error happen at the upload
+ *	stage *and* it is anything *but* network issue.
+ */
+function upload_error_check() {
+	for (var i = 0; i < ul_queue.length; i++) {
+		if (ul_queue[i] && ul_queue[i].ul_failed) {
+			if (ul_queue[i].retries++ == 10) {
+				UploadManager.restart( ul_queue[i] );
+			}
+		}
+	}
+}
+
 var UploadManager = new function() {
 	var self = this;
 
@@ -157,22 +173,12 @@ var UploadManager = new function() {
 	};
 
 	self.retry = function(file, chunk, reason) {
-		if (!file.ul_failed) {
-		}
-		if (file.retries++ >= 20) {
-			return self.restart(file);
-		}
-
-		// pause file upload
-		file.paused = true;
+		file.ul_failed = true;
+		api_reportfailure(hostname(chunk.url), upload_error_check);
 
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
-		newTask.__retry = true
-		ulQueue.pushFirst(newTask, function() {
-			/* release error pausing */
-			file.paused = false;
-		});
+		ulQueue.pushFirst(newTask);
 
 		DEBUG("fatal error restarting because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");

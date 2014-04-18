@@ -772,7 +772,7 @@ function MegaData ()
 		$('.fm-folder-upload span').text(l[98]);
 
 		$('.fm-right-header').removeClass('long-path');
-		if (M.pathLength()+250 > $('.fm-right-header').width())
+		if (M.pathLength()+260 > $('.fm-right-header').width())
 		{
 			$('.fm-right-header').addClass('long-path');
 			$('.fm-new-folder span').text('');
@@ -783,7 +783,7 @@ function MegaData ()
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;
 
-		while (M.pathLength()+250 > $('.fm-right-header').width() && i < el.length)
+		while (M.pathLength()+260 > $('.fm-right-header').width() && i < el.length)
 		{
 			$(el[i]).text('');
 			i++;

@@ -40,6 +40,8 @@ function ul_completepending2(res,ctx)
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
 		ul_queue[ctx.ul_queue_num] = {}
 		onUploadSuccess(ctx.ul_queue_num);
+		file.ul_failed = false;
+		file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
 }
@@ -67,6 +69,8 @@ function ul_deduplicate(File, identical) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
 				onUploadSuccess(uq.pos);
+				file.ul_failed = false;
+				file.retries   = 0;
 				File.file.done_starting();
 			} else {
 				File.file.filekey  = ctx.n.key
@@ -153,13 +157,8 @@ var UploadManager = new function() {
 	};
 
 	self.retry = function(file, chunk, reason) {
-		if (!file.last_error || file.last_error + "5".minutes() <= NOW()) {
-			// If it is the first error or the last_error happen more than 5 minutes 
-			// ago (probably the machine went to sleep) let's reset it
-			file.last_error = NOW()
-			file.retries    = 0;
+		if (!file.ul_failed) {
 		}
-
 		if (file.retries++ >= 20) {
 			return self.restart(file);
 		}
@@ -334,7 +333,11 @@ ChunkUpload.prototype.on_error = function(args, xhr) {
 	}
 	this.file.progress[this.start] = 0;
 	this.updateprogress();
-	UploadManager.retry(this.file, this, "xhr failed");
+	if (args == EKEY) {
+		UploadManager.restart(this.file);
+	} else {
+		UploadManager.retry(this.file, this, "xhr failed");
+	}
 	this.done();
 }
 
@@ -453,7 +456,8 @@ function FileUpload(file) {
 
 	this.run = function(done) {
 		file.abort = false; /* fix in case it restarts from scratch */
-		file.retries = file.retries+1 || 0
+		file.ul_failed = false;
+		file.retries   = 0;
 		file.ul_lastreason = file.ul_lastreason || 0
 		if (start_uploading || $('#ul_' + file.id).length == 0) {
 			done(); 

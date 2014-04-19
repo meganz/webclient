@@ -80,6 +80,7 @@ function start_arkanoid()
 function ui_keycomplete()
 {
     $('.reg-st5-spin').hide();
+    $('.reg-st5-progressbar span').hide();
 	if (m)
 	{
 		mobilekeygen=false;

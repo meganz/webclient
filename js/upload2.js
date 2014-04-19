@@ -551,12 +551,6 @@ function ul_finalize(file) {
 
 	DEBUG(file.name, "ul_finalize")
 
-	onUploadProgress(
-		file.pos, 
-		100, 
-		file.size,
-		file.size
-	);
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 

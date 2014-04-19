@@ -1694,7 +1694,6 @@ function MegaData ()
 			$.transferprogress['dlc'] += $.transferprogress[id][1];
 			delete $.transferprogress[id];
 		}
-		else if (d) console.log('CHECK THIS', JSON.stringify($.transferprogress)), console.trace();
 	}
 
 	this.dlbeforecomplete = function()
@@ -1883,7 +1882,6 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
-		else if (d) console.log('CHECK THIS', JSON.stringify($.transferprogress)), console.trace();
 	}
 
 	this.ulstart = function(id)

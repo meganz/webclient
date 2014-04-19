@@ -567,7 +567,7 @@ function DEBUG2() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.warn.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 function DEBUG() {
@@ -589,7 +589,7 @@ function DEBUG() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.error.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 

@@ -520,6 +520,7 @@ UploadQueue.prototype.push = function() {
 		, file = this[pos]
 
 	file.pos = pos;
+	if (d && d > 1) console.log('UploadQueue.push', pos, file );
 
 	file.ul_reader  = ul_filereader(new FileReader, file);
 	file.progress   = {};
@@ -637,6 +638,7 @@ function ul_filereader(fs, file) {
 }
 
 function worker_uploader(task, done) {
+	if (d && d > 1) console.log('worker_uploader', task, done);
 	task.run(done);
 }
 

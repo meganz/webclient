@@ -683,12 +683,15 @@ function CreateWorkers(url, message, size) {
 	}
 
 	function create(i) {
+		var w;
 		try {
-			var w  = new SecureWorker(url);
+			if (is_extension) w  = new Worker(url);
+			else w  = new SecureWorker(url);
 		} catch (e) {
 			// IE10/IE11 fallback
-			var w  = new Worker(url);
+			w  = new Worker(url);
 		}
+
 		w.id   = i;
 		w.busy = false;
 		w.postMessage = w.webkitPostMessage || w.postMessage;

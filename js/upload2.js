@@ -42,7 +42,7 @@ function ul_completepending2(res,ctx)
 		ul_queue[ctx.ul_queue_num] = {}
 		onUploadSuccess(ctx.ul_queue_num);
 		ctx.file.ul_failed = false;
-		Ctx.file.retries   = 0;
+		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
 }

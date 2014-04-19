@@ -190,7 +190,7 @@ var UploadManager = new function() {
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
-		DEBUG("fatal error restarting because of", reason + "")
+		DEBUG("retrying chunk because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -404,12 +404,18 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		} else { 
 			DEBUG("Invalid upload response: " + response);
-			if (response != EKEY) return this.on_error(EKEY)
+			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
 
 	}
 
-	return this.on_error();
+	DEBUG("bad response from server", [
+		xhr.status == 200,
+		typeof xhr.response == 'string',
+		xhr.statusText
+	]);
+
+	return this.on_error(null, null, "bad response from server");
 }
 
 

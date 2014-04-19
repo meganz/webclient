@@ -68,10 +68,13 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(function() {
-		callback();
-	}, 1000);
+	setTimeout(callback, 1000);
 }
+
+var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
+{
+	setTimeout(callback, 0);
+};
 
 function jScrollFade(id)
 {
@@ -564,7 +567,7 @@ function DEBUG2() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.warn.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 function DEBUG() {
@@ -586,7 +589,7 @@ function DEBUG() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.error.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 

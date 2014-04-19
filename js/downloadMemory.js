@@ -38,10 +38,10 @@ function MemoryIO(dl_id, dl) {
 			dlLinkNode.download = name;
 			dlLinkNode.href = blob_url;
 			dlLinkNode.click();
-			setTimeout(function () {
+			Later(function () {
 				myURL.revokeObjectURL(blob_url);
 				blob_url = undefined;
-			}, 100);
+			});
 		}
 
 		this.abort();

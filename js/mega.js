@@ -1560,7 +1560,6 @@ function MegaData ()
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
 	{
-		if (kbps == 0) return;
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
 		{
@@ -1596,7 +1595,10 @@ function MegaData ()
 
 		if (!bl) return false;
 		if (!$.transferprogress) $.transferprogress={};
-		if (kbps == 0) return false;
+		if (kbps == 0) {
+			if (perc != 100 || $.transferprogress[id]) return false;
+			kbps = bl;
+		}
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = (bt-bl)/bps;
@@ -1686,9 +1688,12 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
-		if (!$.transferprogress['dlc']) $.transferprogress['dlc'] = 0;
-		$.transferprogress['dlc'] += $.transferprogress[id][1];
-		delete $.transferprogress[id];
+		if ($.transferprogress && $.transferprogress[id])
+		{
+			if (!$.transferprogress['dlc']) $.transferprogress['dlc'] = 0;
+			$.transferprogress['dlc'] += $.transferprogress[id][1];
+			delete $.transferprogress[id];
+		}
 	}
 
 	this.dlbeforecomplete = function()
@@ -1809,12 +1814,9 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
-		if (!bl) return false;
+		if (!bl || !ul_queue[id]['starttime']) return false;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var bps = Math.round(bl / eltime);
-		if (isNaN(bps)) {
-			bps = 1;
-		}
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -1874,15 +1876,18 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
-		if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
-		$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
-		delete $.transferprogress['ul_' + id];
+		if ($.transferprogress && $.transferprogress['ul_'+ id])
+		{
+			if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
+			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
+			delete $.transferprogress['ul_'+ id];
+		}
 	}
 
 	this.ulstart = function(id)
 	{
 		if (d) console.log('ulstart',id);
-		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
 		M.ulprogress(id, 0, 0, 0);

@@ -174,7 +174,7 @@ var UploadManager = new function() {
 
 	self.retry = function(file, chunk, reason) {
 		file.ul_failed = true;
-		api_reportfailure(hostname(chunk.url), upload_error_check);
+		api_reportfailure(hostname(file.posturl), upload_error_check);
 
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);

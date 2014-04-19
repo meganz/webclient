@@ -328,7 +328,7 @@ ChunkUpload.prototype.updateprogress = function() {
 
 	onUploadProgress(
 		this.file.pos, 
-		Math.min(Math.floor(tp/this.file.size*100), 99), 
+		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size
 	);

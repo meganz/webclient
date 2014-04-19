@@ -182,9 +182,10 @@ ClassChunk.prototype.request = function() {
 	this.xhr = getXhr(this);
 	
 	if (dlMethod == FileSystemAPI) {
-		var t = this.url.lastIndexOf('/dl/');
+		var t = this.url.lastIndexOf('/dl/')
+			, r = this.url.lastIndexOf('/dl/')
 		this.xhr.open('POST', this.url.substr(0, t+1));
-		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t) + this.url);
+		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t));
 	} else {
 		this.xhr.open('POST', this.url, true);
 	}

@@ -347,7 +347,7 @@ function failureFunction(task, args) {
 	dl_reportstatus(dl, EAGAIN);
 
 	setTimeout(function() {
-		var range = (dl.url||"").replace(/.+\//, '');
+		var range = (task.url||"").replace(/.+\//, '');
 		dlGetUrl(dl, function (error, res, o) {
 			if (!error) {
 				task.url = res.g + '/' + range; /* new url */

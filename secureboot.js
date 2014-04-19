@@ -466,11 +466,9 @@ else
 			'recover': ['reset','reset_js']
 		};
 
-
-
-
 	    if (page && page.indexOf('%21') > -1) document.location.hash = page.replace('%21','!').replace('%21','!');
-		if (page) page = page.replace('#','');
+		
+		if (page) page = page.replace('#','').replace('%21','!');
 
 
 		for (var p in subpages)

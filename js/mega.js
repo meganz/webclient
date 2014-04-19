@@ -32,9 +32,6 @@ var zipid=1;
 
 
 
-
-
-
 function MegaData ()
 {
 	this.d = {};

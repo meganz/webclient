@@ -3802,8 +3802,7 @@ function renameDialog()
 {
 	if ($.selected.length > 0)
 	{
-		$.dialog = 'rename';
-		
+		$.dialog = 'rename';		
 		$('.rename-dialog').removeClass('hidden');
 		$('.rename-dialog').addClass('active');
 		$('.fm-dialog-overlay').removeClass('hidden');		
@@ -4704,16 +4703,19 @@ function firefoxDialog(close)
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.fm-dialog.firefox-dialog').addClass('hidden');
 		return true;
-	}	
-	if (lang !== 'en') $('.ff-extension-txt').text(l[1174]);
+	}
+	
+	if (page == 'download') $('.ff-extension-txt').text(l[1932]);
+	else $('.ff-extension-txt').text(l[1174]);
+	
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.firefox-dialog').removeClass('hidden');	
-	$.dialog = 'firefox';	
+	$.dialog = 'firefox';
 	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
 	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click',function()
 	{
 		firefoxDialog(1);
-	});	
+	});
 	$('#firefox-checkbox').unbind('click');
     $('#firefox-checkbox').bind('click',function()  
 	{
@@ -4737,7 +4739,6 @@ function firefoxDialog(close)
 
 function browserDialog(close)
 {
-	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style) return false;
 	if (close)
 	{
 		$.dialog = false;
@@ -4774,17 +4775,32 @@ function browserDialog(close)
 	});	
 	$('.browsers-top-icon').removeClass('ie9 ie10 safari');
 	var bc,bh,bt;
-	if (navigator.userAgent.indexOf('MSIE 10') > -1)
+	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
+	{
+		if (page !== 'download')
+		{
+			browserDialog(1);
+			return false;
+		}
+		// IE11
+		bc = 'ie10';		
+		bh = l[884].replace('[X]','IE 11');
+		if (page == 'download') bt = l[1933];		
+		else bt = l[886];
+	}
+	else if (navigator.userAgent.indexOf('MSIE 10') > -1)
 	{	
 		bc = 'ie10';
 		bh = l[884].replace('[X]','Internet Explorer 10');
-		bt = l[886];
+		if (page == 'download') bt = l[1933];		
+		else bt = l[886];
 	}
 	else if ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1))
 	{		
 		bc = 'safari';
-		bh = l[884].replace('[X]','Safari');
-		bt = l[887].replace('[X]','Safari');
+		bh = l[884].replace('[X]','Safari');		
+		if (page == 'download') bt = l[1933];
+		else bt = l[887].replace('[X]','Safari');
 	}
 	else
 	{

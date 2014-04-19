@@ -8,7 +8,6 @@ var n_h = false;
 var n_k_aes = false;
 var fmdirid=false;
 var u_type,cur_page,u_checked
-var page = '';
 var confirmcode = false;
 var confirmok = false;
 var hash = window.location.hash;
@@ -49,7 +48,6 @@ function startMega()
 		delete pages['dialogs'];
 	}
 	jsl=[];
-	page = document.location.hash.replace('#','');
 	init_page();
 }
 
@@ -80,7 +78,9 @@ function scrollMenu()
 
 
 function init_page()
-{		
+{
+	closeDialog();
+
 	if (typeof clearAds !== 'undefined') clearAds();	
 
 	if (window.stopBaboom) 
@@ -102,9 +102,7 @@ function init_page()
 		if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) page = 'firefox';
 		else page = 'chrome';
 	}	
-	else if (page == 'notifications') page = 'fm/notifications';
-		
-	
+	else if (page == 'notifications') page = 'fm/notifications';	
 	
 	if (localStorage.signupcode && u_type !== false) delete localStorage.signupcode;	
 	else if (localStorage.signupcode && page.substr(0,6) !== 'signup' && page !== 'register' && page !== 'terms' && page !== 'privacy' && page !== 'chrome' && page !== 'firefox')
@@ -117,7 +115,10 @@ function init_page()
 	$('.top-head').remove();
 	$('#loading').hide();
 	if (loadingDialog) loadingDialog.hide();	
-	page = page.replace('%21','!');		
+		
+	
+	page = page.replace('%21','!').replace('%21','!');
+	
 	if (page.substr(0,1) == '!' && page.length > 1)
 	{							
 		dlkey=false;

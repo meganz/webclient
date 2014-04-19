@@ -610,58 +610,7 @@ function removeValue(array, value) {
 	array.splice($.inArray(value, array), 1);
 };
 
-/**
- * Secure worker consturctor, allows to spawn new worker only from the code
- * verified by secureboot process; `importScripts` calls inside worker are also
- * restricted to verified scritps.
- */
-function SecureWorker ( url ) {
-    if ( typeof url !== 'string' )
-        throw new TypeError();
 
-    var scode = "(function () {\n"
-              + "    var _scripts = " + JSON.stringify(scripts) + ";\n"
-              + "    var _importScripts = self.importScripts;\n"
-              + "    self.importScripts = function () {\n"
-              + "        for ( var i = 0; i < arguments.length; i++ ) {\n"
-              + "            var surl = _scripts[ arguments[i] ];\n"
-              + "            if ( typeof surl !== 'string' ) throw new Error();\n"
-              + "            arguments[i] = surl;\n"
-              + "        }\n"
-              + "        _importScripts.apply( self, arguments );\n"
-              + "    };\n"
-              + "})();\n"
-              + "importScripts('"+url+"')"
-
-    var sblob;
-    if ( typeof BlobBuilder === 'function' ) {
-        var bb = new BlobBuilder();
-        bb.append(scode);
-        sblob = bb.getBlob('text/javascript');
-    }
-    else {
-        sblob = new Blob( [ scode ], { type: "text/javascript" } );
-    }
-
-    var surl = window.URL.createObjectURL(sblob);
-
-    var thiz = this;
-    var sworker = new Worker(surl);
-
-    sworker.onmessage = function ( e ) {
-        (thiz.onmessage||function(){}).call( thiz, e );
-    }
-
-    thiz.postMessage = function () {
-        sworker.postMessage.apply( sworker, arguments );
-    };
-
-    thiz.terminate = function () {
-        sworker.terminate();
-        window.URL.revokeObjectURL(surl);
-        sworker = null;
-    };
-}
 
 /**
  *	Create a pool of workers, it returns a Queue object
@@ -683,14 +632,9 @@ function CreateWorkers(url, message, size) {
 	}
 
 	function create(i) {
-		var w;
-		try {
-			if (is_extension) w  = new Worker(url);
-			else w  = new SecureWorker(url);
-		} catch (e) {
-			// IE10/IE11 fallback
-			w  = new Worker(url);
-		}
+		var w;		
+		
+		w  = new Worker(url);
 
 		w.id   = i;
 		w.busy = false;

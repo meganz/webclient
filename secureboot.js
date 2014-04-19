@@ -381,16 +381,6 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-
-		if (!is_extension) {
-			/* SecureWorker stuff {{{ */
-			jsl.push({f:'js/aesasm.js',n:'aesasm_js',j:4}); // Will be replaced with asmCrypto soon
-			jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:4});
-			jsl.push({f:'encrypter.js',n:'encrypter_js',j:4});
-			jsl.push({f:'decrypter.js',n:'decrypter_js',j:4});
-			/* }}} */
-		}
-
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},

@@ -2303,7 +2303,6 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if(self.is_active()) {
-            console.log("Deactivating quick finder.");
             self.deactivate();
             return false;
         }

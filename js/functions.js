@@ -803,11 +803,19 @@ function hostname(url) {
 	return (url || "").match(/https?:\/\/([^.]+)/)[1];
 }
 
+// Helper to manage time/sizes in a friendly way
 String.prototype.seconds = function() {
 	return parseInt(this) * 1000;
 }
 
-// Helper to manage time in a friendly way
 String.prototype.minutes = function() {
 	return parseInt(this) * 1000 * 60;
+}
+
+String.prototype.MB = function() {
+	return parseInt(this) * 1024 * 1024;
+}
+
+String.prototype.KB = function() {
+	return parseInt(this) * 1024;
 }

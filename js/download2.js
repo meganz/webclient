@@ -294,16 +294,20 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 		, dl_chunksizes = []
 	
 	var pp, p = pp = 0;
-	for (var i = 1; i <= 8 && p < dl_filesize-i*131072; i++) {
-		dl_chunksizes[p] = i*131072;
+	for (var i = 1; i <= 8 && p < dl_filesize-i*"128".KB(); i++) {
+		dl_chunksizes[p] = i*"128".KB()
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
 	}
 
+	var chunksize = dl_filesize / dlQueue._limit;
+	if (chunksize > "16".MB()) chunksize = "16".MB()
+	else if (c <= "1".MB()) c = "1".MB();
+	else chunksize = "1".MB() * Math.floor(chunksize / "1".MB())
+
 	while (p < dl_filesize) {
-		dl_chunksizes[p] = Math.floor((dl_filesize-p)/1048576+1)*1048576;
-		if (dl_chunksizes[p] > dl_maxchunk) dl_chunksizes[p] = dl_maxchunk;
+		dl_chunksizes[p] = chunksize;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];

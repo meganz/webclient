@@ -301,9 +301,10 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 		p += dl_chunksizes[p];
 	}
 
-	var chunksize = dl_filesize / dlQueue._limit / 2;
+	var chunksize = dl_filesize / dlQueue._limit / 2
+
 	if (chunksize > "16".MB()) chunksize = "16".MB()
-	else if (c <= "1".MB()) c = "1".MB();
+	else if (chunksize <= "1".MB()) chunksize = "1".MB();
 	else chunksize = "1".MB() * Math.floor(chunksize / "1".MB())
 
 	var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))

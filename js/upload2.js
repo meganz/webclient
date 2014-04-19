@@ -329,8 +329,6 @@ ChunkUpload.prototype.updateprogress = function() {
 		this.file.xr.update(tp - this.file.prevprogress)  // speed
 	);
 	
-	DEBUG(tp - this.file.prevprogress, this.file.xr.update(tp - this.file.prevprogress))
-
 	this.file.prevprogress = tp;
 	this.file.last_update  = NOW()+1000
 };

@@ -15,7 +15,8 @@ function ul_completepending(target)
 			ul_queue_num : ul[3],
 			size: ul_queue[ul[3]].size,
 			callback : ul_completepending2,
-			faid : ul[1].faid
+			faid : ul[1].faid,
+			file : ul[1]
 		};
 
 		file.response = ul[0]
@@ -585,6 +586,7 @@ function ul_finalize(file) {
 			ul_queue_num: file.pos,
 			size: file.size,
 			faid: file.faid,
+			file: file,
 			callback: ul_completepending2
 		});
 	}, file.target || M.RootID);	

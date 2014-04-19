@@ -1802,7 +1802,7 @@ function MegaData ()
 		else openTransferpanel();
 	}
 
-	this.ulprogress = function(id, perc, bl,bt)
+	this.ulprogress = function(id, perc, bl,bt, kbps)
 	{
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
@@ -1812,8 +1812,8 @@ function MegaData ()
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
+		var bps    = kbps*1000;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
-		var bps = Math.round(bl / eltime);
 		var retime = (bt-bl)/bps;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -1945,9 +1945,9 @@ function onUploadStart(id)
 {
 	M.ulstart(id);
 }
-function onUploadProgress(id, p, bl, bt)
+function onUploadProgress(id, p, bl, bt, speed)
 {
-	M.ulprogress(id, p, bl, bt);
+	M.ulprogress(id, p, bl, bt, speed);
 }
 function onUploadSuccess(id, bl, bt)
 {

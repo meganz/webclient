@@ -317,12 +317,22 @@ ChunkUpload.prototype.updateprogress = function() {
 		tp += p;
 	});
 
+	if (this.file.last_update > NOW()) {
+		return; /* too soon */
+	}
+
 	onUploadProgress(
 		this.file.pos, 
 		Math.floor(tp/this.file.size*100),
 		tp, 
-		this.file.size
+		this.file.size,
+		this.file.xr.update(tp - this.file.prevprogress)  // speed
 	);
+	
+	DEBUG(tp - this.file.prevprogress, this.file.xr.update(tp - this.file.prevprogress))
+
+	this.file.prevprogress = tp;
+	this.file.last_update  = NOW()+1000
 };
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
@@ -472,11 +482,12 @@ FileUpload.prototype.run = function(done) {
 	var file = this.file
 		, self = this
 
-	file.abort = false; /* fix in case it restarts from scratch */
-	file.ul_failed	= false;
-	file.retries	= 0;
-	file.xr			= getxr();
-	file.ul_lastreason = file.ul_lastreason || 0
+	file.abort			= false; /* fix in case it restarts from scratch */
+	file.ul_failed		= false;
+	file.retries		= 0;
+	file.xr				= getxr();
+	file.prevprogress	= 0;
+	file.ul_lastreason	= file.ul_lastreason || 0
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 
 		return dlQueue.pushFirst(this);

@@ -40,8 +40,8 @@ function ul_completepending2(res,ctx)
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
 		ul_queue[ctx.ul_queue_num] = {}
 		onUploadSuccess(ctx.ul_queue_num);
-		file.ul_failed = false;
-		file.retries   = 0;
+		ctx.file.ul_failed = false;
+		Ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
 }
@@ -69,8 +69,8 @@ function ul_deduplicate(File, identical) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
 				onUploadSuccess(uq.pos);
-				file.ul_failed = false;
-				file.retries   = 0;
+				File.file.ul_failed = false;
+				File.file.retries   = 0;
 				File.file.done_starting();
 			} else {
 				File.file.filekey  = ctx.n.key
@@ -370,6 +370,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 				
 				if (u_k_aes && !this.file.ul_completing) {
 					var ctx = { 
+						file: this.file,
 						size: this.file.size,
 						ul_queue_num : this.file.pos,
 						callback : ul_completepending2,

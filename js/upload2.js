@@ -126,15 +126,6 @@ function upload_error_check() {
 	}
 }
 
-
-function change_url() {
-	for (var i = 0; i < ul_queue.length; i++) {
-		if (ul_queue[i] && ul_queue[i]) {
-			ul_queue[i].posturl = "http://localhost:8080/";
-		}
-	}
-}
-
 var UploadManager = new function() {
 	var self = this;
 
@@ -471,49 +462,56 @@ ChunkUpload.prototype.run = function(done) {
 	this.file.ul_reader.push(this, this.io_ready, this);
 };
 
+
 function FileUpload(file) {
-	var self = this;
 	this.file = file;
 	this.ul   = file;
-
-
-	this.run = function(done) {
-		file.abort = false; /* fix in case it restarts from scratch */
-		file.ul_failed = false;
-		file.retries   = 0;
-		file.ul_lastreason = file.ul_lastreason || 0
-		if (start_uploading || $('#ul_' + file.id).length == 0) {
-			done(); 
-			return dlQueue.pushFirst(this);
-		}
-
-		DEBUG(file.name, "starting upload", file.id)
-
-		start_uploading = true;
-
-		var started = false;
-		file.done_starting = function() {
-			if (started) return;
-			started = true;
-			start_uploading = false;
-			done();
-		};
-
-		try {
-			fingerprint(file, function(hash, ts) {
-				file.hash = hash;
-				file.ts   = ts;
-				var identical = ul_Identical(file.target, file.path || file.name, file.hash, file.size);
-				DEBUG(file.name, "fingerprint", M.h[hash] || identical)
-				if (M.h[hash] || identical) ul_deduplicate(self, identical);
-				else ul_start(self);
-			});
-		} catch (e) {
-			DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
-			ul_start(self);
-		}
-	}
 }
+
+FileUpload.prototype.run = function(done) {
+	var file = this.file
+		, self = this
+
+	file.abort = false; /* fix in case it restarts from scratch */
+	file.ul_failed	= false;
+	file.retries	= 0;
+	file.xr			= getxr();
+	file.ul_lastreason = file.ul_lastreason || 0
+	if (start_uploading || $('#ul_' + file.id).length == 0) {
+		done(); 
+		return dlQueue.pushFirst(this);
+	}
+
+	DEBUG(file.name, "starting upload", file.id)
+
+	start_uploading = true;
+
+	var started = false;
+	file.done_starting = function() {
+		if (started) return;
+		started = true;
+		start_uploading = false;
+		done();
+	};
+
+	try {
+		fingerprint(file, function(hash, ts) {
+			file.hash = hash;
+			file.ts   = ts;
+			var identical = ul_Identical(file.target, file.path || file.name, file.hash, file.size);
+			DEBUG(file.name, "fingerprint", M.h[hash] || identical)
+			if (M.h[hash] || identical) ul_deduplicate(self, identical);
+			else ul_start(self);
+			self = null;
+			file = null;
+		});
+	} catch (e) {
+		DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
+		ul_start(this);
+		file = null;
+		self = null;
+	}
+};
 
 UploadQueue.prototype.push = function() {
 	var pos = Array.prototype.push.apply(this, arguments) - 1

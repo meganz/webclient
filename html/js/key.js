@@ -77,19 +77,9 @@ function start_arkanoid()
 	};
 }
 
-function ui_keyprogress(num)
-{
-	if (m) document.getElementById('key_progress').style.width= num + '%';
-	else
-	{
-		$('.reg-st5-key-gen').attr('class','reg-st5-key-gen percents-'+num);
-		if (num > 50) $('.reg-st5-info-txt').text(l[1145]);
-	}
-}
-
 function ui_keycomplete()
 {
-	ui_keyprogress(100);	
+    $('.reg-st5-spin').hide();
 	if (m)
 	{
 		mobilekeygen=false;
@@ -108,7 +98,6 @@ function ui_keycomplete()
 		},500);
 	}
 }
-
 
 function key_step3()
 {

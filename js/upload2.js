@@ -126,6 +126,15 @@ function upload_error_check() {
 	}
 }
 
+
+function change_url() {
+	for (var i = 0; i < ul_queue.length; i++) {
+		if (ul_queue[i] && ul_queue[i]) {
+			ul_queue[i].posturl = "http://localhost:8080/";
+		}
+	}
+}
+
 var UploadManager = new function() {
 	var self = this;
 
@@ -334,7 +343,7 @@ ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	this.updateprogress();
 };
 
-ChunkUpload.prototype.on_error = function(args, xhr) {
+ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 	if (this.file.abort) {
 		return this.done();
 	}
@@ -343,7 +352,7 @@ ChunkUpload.prototype.on_error = function(args, xhr) {
 	if (args == EKEY) {
 		UploadManager.restart(this.file);
 	} else {
-		UploadManager.retry(this.file, this, "xhr failed");
+		UploadManager.retry(this.file, this, "xhr failed: " + reason);
 	}
 	this.done();
 }

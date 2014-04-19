@@ -126,6 +126,15 @@ function upload_error_check() {
 	}
 }
 
+
+function change_url() {
+	for (var i = 0; i < ul_queue.length; i++) {
+		if (ul_queue[i] && ul_queue[i]) {
+			ul_queue[i].posturl = "http://localhost:8080/";
+		}
+	}
+}
+
 var UploadManager = new function() {
 	var self = this;
 
@@ -181,7 +190,7 @@ var UploadManager = new function() {
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
-		DEBUG("fatal error restarting because of", reason + "")
+		DEBUG("retrying chunk because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -319,7 +328,7 @@ ChunkUpload.prototype.updateprogress = function() {
 
 	onUploadProgress(
 		this.file.pos, 
-		Math.min(Math.floor(tp/this.file.size*100), 99), 
+		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size
 	);
@@ -334,7 +343,7 @@ ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	this.updateprogress();
 };
 
-ChunkUpload.prototype.on_error = function(args, xhr) {
+ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 	if (this.file.abort) {
 		return this.done();
 	}
@@ -343,7 +352,7 @@ ChunkUpload.prototype.on_error = function(args, xhr) {
 	if (args == EKEY) {
 		UploadManager.restart(this.file);
 	} else {
-		UploadManager.retry(this.file, this, "xhr failed");
+		UploadManager.retry(this.file, this, "xhr failed: " + reason);
 	}
 	this.done();
 }
@@ -395,12 +404,18 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		} else { 
 			DEBUG("Invalid upload response: " + response);
-			if (response != EKEY) return this.on_error(EKEY)
+			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
 
 	}
 
-	return this.on_error();
+	DEBUG("bad response from server", [
+		xhr.status == 200,
+		typeof xhr.response == 'string',
+		xhr.statusText
+	]);
+
+	return this.on_error(null, null, "bad response from server");
 }
 
 

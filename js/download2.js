@@ -301,13 +301,14 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 		p += dl_chunksizes[p];
 	}
 
-	var chunksize = dl_filesize / dlQueue._limit;
+	var chunksize = dl_filesize / dlQueue._limit / 2;
 	if (chunksize > "16".MB()) chunksize = "16".MB()
 	else if (c <= "1".MB()) c = "1".MB();
 	else chunksize = "1".MB() * Math.floor(chunksize / "1".MB())
 
+	var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
 	while (p < dl_filesize) {
-		dl_chunksizes[p] = chunksize;
+		dl_chunksizes[p] = p > reserved ? "1".MB() : chunksize;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];

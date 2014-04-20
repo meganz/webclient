@@ -311,26 +311,29 @@ function ChunkUpload(file, start, end)
 }
 
 ChunkUpload.prototype.updateprogress = function() {
-	var tp = this.file.sent || 0
+	if (this.file.complete) return;
+
+	var tp = this.file.sent || 0;
 	if (ulQueue.isPaused()) return;
+
 	$.each(this.file.progress, function(i, p) {
 		tp += p;
 	});
 
-	if (this.file.last_update > NOW()) {
-		return; /* too soon */
-	}
+	// only start measuring progress once the TCP buffers are filled
+	// (assumes a modern TCP stack with a large intial window)
+	if (!this.file.speedometer && this.file.progressevents > 5) this.file.speedometer = bucketspeedometer(tp);
+	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
 		this.file.pos, 
 		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size,
-		this.file.xr.update(tp - this.file.prevprogress)  // speed
+		this.file.speedometer ? this.file.speedometer.progress(tp) : 0  // speed
 	);
 	
-	this.file.prevprogress = tp;
-	this.file.last_update  = NOW()+1000
+	if (tp == this.file.size) this.file.complete = true;
 };
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
@@ -484,7 +487,6 @@ FileUpload.prototype.run = function(done) {
 	file.ul_failed		= false;
 	file.retries		= 0;
 	file.xr				= getxr();
-	file.prevprogress	= 0;
 	file.ul_lastreason	= file.ul_lastreason || 0
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 

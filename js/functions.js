@@ -430,7 +430,8 @@ function uplpad(number, length)
 
 function secondsToTime(secs)
 {
-	if (!(secs >= 0)) secs = 0;
+	if (secs < 0) return '';
+
 	var hours = uplpad(Math.floor(secs / (60 * 60)),2);	
 	var divisor_for_minutes = secs % (60 * 60);
 	var minutes = uplpad(Math.floor(divisor_for_minutes / 60),2);
@@ -765,4 +766,51 @@ String.prototype.MB = function() {
 
 String.prototype.KB = function() {
 	return parseInt(this) * 1024;
+}
+
+// Quick hack for sane average speed readings
+function bucketspeedometer(initialp)
+{
+	return {
+		interval : 200,
+		num : 300,
+		prevp : initialp,
+
+		h : {},
+
+		progress : function(p)
+		{
+			var now, min, oldest;
+			var total;
+			var t;
+			
+			now = NOW();
+			now -= now % this.interval;
+
+			this.h[now] = (this.h[now] || 0)+p-this.prevp;
+			this.prevp = p;
+			
+			min = now-this.interval*this.num;
+			
+			oldest = now;
+			total = 0;
+
+			for (t in this.h)
+			{
+				if (t < min) delete this.h.bt;
+				else
+				{
+					if (t < oldest) oldest = t;
+					total += this.h[t];
+				}
+			}
+
+			if (now-oldest < 1000) return 0;
+			
+			p = 1000*total/(now-oldest);
+
+			// protect against negative returns due to repeated chunks etc.
+			return p > 0 ? p : 0;
+		}
+	}
 }

@@ -1802,7 +1802,7 @@ function MegaData ()
 		else openTransferpanel();
 	}
 
-	this.ulprogress = function(id, perc, bl,bt, kbps)
+	this.ulprogress = function(id, perc, bl, bt, bps)
 	{
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
@@ -1812,9 +1812,8 @@ function MegaData ()
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
-		var bps    = kbps*1000;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
-		var retime = (bt-bl)/bps;
+		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
 		{
@@ -1822,7 +1821,7 @@ function MegaData ()
 			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
 			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
-			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
+			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bps ? bytesToSize(bps,1) +'/s' : '');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
 			percent_megatitle();

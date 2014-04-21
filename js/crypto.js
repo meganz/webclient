@@ -265,8 +265,10 @@ function base64_to_a32(s)
 	return str_to_a32(base64urldecode(s));
 }
 
+var is_chrome_firefox_enable=false;
+
 // ArrayBuffer to binary string
-var ab_to_str = is_chrome_firefox ? mozAB2S : function(ab)
+var ab_to_str = is_chrome_firefox_enable ? mozAB2S : function(ab)
 {
 	var b = '', i;
 	
@@ -293,7 +295,7 @@ function ab_to_base64(ab)
 }
 
 // ArrayBuffer to binary with depadding
-var ab_to_str_depad = is_chrome_firefox ? mozAB2SDepad : function(ab)
+var ab_to_str_depad = is_chrome_firefox_enable ? mozAB2SDepad : function(ab)
 {
 	var b, i;
 
@@ -730,12 +732,12 @@ function dec_attr(attr,key)
 	}
 }
 
-var to8 = is_chrome_firefox ? mozTo8 : function(unicode)
+var to8 = is_chrome_firefox_enable ? mozTo8 : function(unicode)
 {
 	return unescape(encodeURIComponent(unicode));
 }
 
-var from8 = is_chrome_firefox ? mozFrom8 : function(utf8)
+var from8 = is_chrome_firefox_enable ? mozFrom8 : function(utf8)
 {
 	return decodeURIComponent(escape(utf8));
 }

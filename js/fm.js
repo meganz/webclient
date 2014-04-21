@@ -555,7 +555,7 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
-	ulQueue.resume();
+	if (!uldl_hold) ulQueue.resume();
 	initTreeScroll();
 	$(window).trigger('resize');
 }
@@ -884,6 +884,8 @@ function initContextUI()
 	$(c+'.refresh-item').unbind('click');
 	$(c+'.refresh-item').bind('click',function(event) 
 	{
+		stopsc();
+		stopapi();
 		if (typeof mDB !== 'undefined' && !pfid) mDBreload();
 		else loadfm();
 	});
@@ -897,18 +899,18 @@ function initContextUI()
 	$(c+'.canceltransfer-item').unbind('click');
 	$(c+'.canceltransfer-item').bind('click',function(event) 
 	{			
-		$.zipkill=false;		
+		$.zipkill={};
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
-		{		
-			var id = $(el).attr('id');			
-			if ((id && id.indexOf('dl_') > -1) || (id && id.indexOf('zip_') > -1))
-			{				
-				var abort=false;				
+		{
+			var id = $(el).attr('id');
+			if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
+			{
+				id = id.replace('dl_','').replace('zip_','');
+
 				$.each(dl_queue, function(i, queue) {
-					if (queue.id == id.replace('dl_','') || queue.zipid == id.replace('zip_','')) {
-						if (queue.zipid) $.zipkill = dl_queue[i].zipid;
-						else $.sd=i;							
-						return false; /* break */
+					if (queue.id == id || queue.zipid == id) {
+						if (queue.zipid) $.zipkill[queue.zipid] = 1;
+						else DownloadManager.abort({ id: queue.dl_id });
 					}
 				});
 			}
@@ -921,25 +923,22 @@ function initContextUI()
 						if (ul_queue[i].id == id.replace('ul_',''))
 						{
 							UploadManager.abort(ul_queue[i]);
-							$.su=1;
 						}
 					}
 				}	
 			}
 			$(this).remove();
-		});				
+		});
 
-		if (typeof $.sd != 'undefined' || typeof $.zipkill != 'undefined') {
-			if (dl_queue[$.sd]) {
-				DownloadManager.abort({ id: dl_queue[$.sd].dl_id });
-			} else if ($.zipkill >= 0) {
-				DownloadManager.abort({ zipid: $.zipkill });
-			}
-		}
-		delete $.su;
-		delete $.sd;
-		delete $.zipkill;		
-		percent_megatitle();
+		$.each($.zipkill, function(i) {
+			DownloadManager.abort({ zipid: i });
+		});
+		delete $.zipkill;
+		Soon(function() {
+			// XXX: better way to stretch the scrollbar?
+			$(window).trigger('resize');
+			resetUploadDownload();
+		});
 	});
 }
 
@@ -2304,7 +2303,6 @@ var QuickFinder = function(searchable_elements, containers) {
     // hide the search field when the user had clicked somewhere in the document
     $(document.body).delegate('> *', 'mousedown', function(e) {
         if(self.is_active()) {
-            console.log("Deactivating quick finder.");
             self.deactivate();
             return false;
         }
@@ -2535,19 +2533,23 @@ var SelectionManager = function($selectable) {
         if(selected_list.length > 0) {
             $(selected_list[selected_list.length - 1]).addClass('currently-selected');
         }
-
-        selected_list = []; // reset the state of the last selected items for the next selectablestart
-				
+        selected_list = []; // reset the state of the last selected items for the next selectablestart			
     });
-	
-	
-	
-	
-
     return this;
 };
 
 var selectionManager;
+
+
+function closeDialog()
+{
+	$('.fm-dialog').addClass('hidden');
+	$('.fm-dialog-overlay').addClass('hidden');
+	$('.export-links-warning').addClass('hidden');			
+	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
+	delete $.dialog;
+}
+
 
 function UIkeyevents()
 {
@@ -2703,11 +2705,7 @@ function UIkeyevents()
 		}		
 		else if (e.keyCode == 27 && $.dialog)
 		{
-			$('.fm-dialog').addClass('hidden');
-			$('.fm-dialog-overlay').addClass('hidden');
-			$('.export-links-warning').addClass('hidden');			
-			if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
-			delete $.dialog;
+			closeDialog();
 		}
 		else if (e.keyCode == 27 && $.msgDialog)
 		{
@@ -3804,11 +3802,6 @@ function renameDialog()
 	if ($.selected.length > 0)
 	{
 		$.dialog = 'rename';		
-		var n = M.d[$.selected[0]];	
-		$('.rename-dialog input').val(n.name);
-		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
-		else $('.rename-dialog .fm-dialog-title').text(l[426]);
-		
 		$('.rename-dialog').removeClass('hidden');
 		$('.rename-dialog').addClass('active');
 		$('.fm-dialog-overlay').removeClass('hidden');		
@@ -3831,11 +3824,41 @@ function renameDialog()
 			if ($(this).val() == '') $('.rename-dialog').removeClass('active');
 			else $('.rename-dialog').addClass('active');
 		});		
-		$('.rename-dialog input').focus();		
 		$('.fm-dialog-rename-button').unbind('click');
 		$('.fm-dialog-rename-button').bind('click',function()  
 		{
 			dorename();
+		});
+		var n = M.d[$.selected[0]];		
+		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
+		else $('.rename-dialog .fm-dialog-title').text(l[426]);		
+		$('.rename-dialog input').val(n.name);		
+		if (!n.t)
+		{
+			var ext = fileext(n.name);
+			$('.rename-dialog input')[0].selectionStart=0;
+			$('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
+		}
+		$('.rename-dialog input').unbind('click keydown keyup keypress');
+		$('.rename-dialog input').focus();
+		$('.rename-dialog input').bind('click keydown keyup keypress',function(e)
+		{
+			var n = M.d[$.selected[0]];
+			if (!n.t)
+			{
+				var ext = fileext(n.name);
+				if (this.selectionStart > $('.rename-dialog input').val().length - ext.length-2)
+				{
+					this.selectionStart = $('.rename-dialog input').val().length - ext.length-1;
+					this.selectionEnd = $('.rename-dialog input').val().length - ext.length-1;				
+					if (e.which == 46) return false;
+				}
+				else if (this.selectionEnd > $('.rename-dialog input').val().length - ext.length-1)
+				{
+					this.selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
+					return false;
+				}
+			}
 		});
 	}
 }
@@ -4679,16 +4702,19 @@ function firefoxDialog(close)
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.fm-dialog.firefox-dialog').addClass('hidden');
 		return true;
-	}	
-	if (lang !== 'en') $('.ff-extension-txt').text(l[1174]);
+	}
+	
+	if (page == 'download') $('.ff-extension-txt').text(l[1932]);
+	else $('.ff-extension-txt').text(l[1174]);
+	
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.firefox-dialog').removeClass('hidden');	
-	$.dialog = 'firefox';	
+	$.dialog = 'firefox';
 	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
 	$('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').bind('click',function()
 	{
 		firefoxDialog(1);
-	});	
+	});
 	$('#firefox-checkbox').unbind('click');
     $('#firefox-checkbox').bind('click',function()  
 	{
@@ -4712,7 +4738,6 @@ function firefoxDialog(close)
 
 function browserDialog(close)
 {
-	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style) return false;
 	if (close)
 	{
 		$.dialog = false;
@@ -4749,17 +4774,32 @@ function browserDialog(close)
 	});	
 	$('.browsers-top-icon').removeClass('ie9 ie10 safari');
 	var bc,bh,bt;
-	if (navigator.userAgent.indexOf('MSIE 10') > -1)
+	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
+	{
+		if (page !== 'download')
+		{
+			browserDialog(1);
+			return false;
+		}
+		// IE11
+		bc = 'ie10';		
+		bh = l[884].replace('[X]','IE 11');
+		if (page == 'download') bt = l[1933];		
+		else bt = l[886];
+	}
+	else if (navigator.userAgent.indexOf('MSIE 10') > -1)
 	{	
 		bc = 'ie10';
 		bh = l[884].replace('[X]','Internet Explorer 10');
-		bt = l[886];
+		if (page == 'download') bt = l[1933];		
+		else bt = l[886];
 	}
 	else if ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1))
 	{		
 		bc = 'safari';
-		bh = l[884].replace('[X]','Safari');
-		bt = l[887].replace('[X]','Safari');
+		bh = l[884].replace('[X]','Safari');		
+		if (page == 'download') bt = l[1933];
+		else bt = l[887].replace('[X]','Safari');
 	}
 	else
 	{

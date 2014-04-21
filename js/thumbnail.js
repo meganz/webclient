@@ -115,6 +115,20 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				{
 					if(is_chrome_firefox && "blob" in file)
 					{
+						if (OS && file.size > 2e6) try
+						{
+							return OS.File.read(file.mozFile.path).then(function(u8)
+							{
+								file = new Blob([u8],{type:file.type});
+								ThumbFR.onload({target:{result:mozAB2S(u8)}});
+							}).then(null,function(e)
+							{
+								console.error(e);
+								if (!(file instanceof Blob)) file=file.blob();
+								ThumbFR.readAsBinaryString(file);
+							});
+						} catch(e) {}
+
 						file = file.blob();
 					}
 

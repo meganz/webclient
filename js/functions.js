@@ -68,10 +68,13 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(function() {
-		callback();
-	}, 1000);
+	setTimeout(callback, 1000);
 }
+
+var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
+{
+	setTimeout(callback, 0);
+};
 
 function jScrollFade(id)
 {
@@ -246,6 +249,8 @@ function populate_l()
 	l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
 	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');	
+	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
 	l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
@@ -425,7 +430,8 @@ function uplpad(number, length)
 
 function secondsToTime(secs)
 {
-	if (!(secs >= 0)) secs = 0;
+	if (secs < 0) return '';
+
 	var hours = uplpad(Math.floor(secs / (60 * 60)),2);	
 	var divisor_for_minutes = secs % (60 * 60);
 	var minutes = uplpad(Math.floor(divisor_for_minutes / 60),2);
@@ -562,7 +568,7 @@ function DEBUG2() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.warn.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 function DEBUG() {
@@ -584,7 +590,7 @@ function DEBUG() {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
 			console.error.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 
@@ -605,58 +611,7 @@ function removeValue(array, value) {
 	array.splice($.inArray(value, array), 1);
 };
 
-/**
- * Secure worker consturctor, allows to spawn new worker only from the code
- * verified by secureboot process; `importScripts` calls inside worker are also
- * restricted to verified scritps.
- */
-function SecureWorker ( url ) {
-    if ( typeof url !== 'string' )
-        throw new TypeError();
 
-    var scode = "(function () {\n"
-              + "    var _scripts = " + JSON.stringify(scripts) + ";\n"
-              + "    var _importScripts = self.importScripts;\n"
-              + "    self.importScripts = function () {\n"
-              + "        for ( var i = 0; i < arguments.length; i++ ) {\n"
-              + "            var surl = _scripts[ arguments[i] ];\n"
-              + "            if ( typeof surl !== 'string' ) throw new Error();\n"
-              + "            arguments[i] = surl;\n"
-              + "        }\n"
-              + "        _importScripts.apply( self, arguments );\n"
-              + "    };\n"
-              + "})();\n"
-              + "importScripts('"+url+"')"
-
-    var sblob;
-    if ( typeof BlobBuilder === 'function' ) {
-        var bb = new BlobBuilder();
-        bb.append(scode);
-        sblob = bb.getBlob('text/javascript');
-    }
-    else {
-        sblob = new Blob( [ scode ], { type: "text/javascript" } );
-    }
-
-    var surl = window.URL.createObjectURL(sblob);
-
-    var thiz = this;
-    var sworker = new Worker(surl);
-
-    sworker.onmessage = function ( e ) {
-        (thiz.onmessage||function(){}).call( thiz, e );
-    }
-
-    thiz.postMessage = function () {
-        sworker.postMessage.apply( sworker, arguments );
-    };
-
-    thiz.terminate = function () {
-        sworker.terminate();
-        window.URL.revokeObjectURL(surl);
-        sworker = null;
-    };
-}
 
 /**
  *	Create a pool of workers, it returns a Queue object
@@ -672,18 +627,16 @@ function CreateWorkers(url, message, size) {
 		return function(e) {
 			message(this.context, e, function(r) {
 				worker[id].busy = false; /* release worker */
-				instances[id].done(r);
+				instances[id](r);
 			});
 		}
 	}
 
 	function create(i) {
-		try {
-			var w  = new SecureWorker(url);
-		} catch (e) {
-			// IE10/IE11 fallback
-			var w  = new Worker(url);
-		}
+		var w;		
+		
+		w  = new Worker(url);
+
 		w.id   = i;
 		w.busy = false;
 		w.postMessage = w.webkitPostMessage || w.postMessage;
@@ -695,13 +648,13 @@ function CreateWorkers(url, message, size) {
 		worker.push(null);
 	}
 
-	return new QueueClass(function(task) {
+	return new MegaQueue(function(task, done) {
 		for (var i = 0; i < size; i++) {
 			if (worker[i] === null) worker[i] = create(i);
 			if (!worker[i].busy) break;
 		}
 		worker[i].busy = true;
-		instances[i]    = this;
+		instances[i]   = done;
 		$.each(task, function(e, t) {
 			if (e == 0) {
 				worker[i].context = t;
@@ -769,7 +722,8 @@ function percent_megatitle()
 		$.transferprogress = {};
 	}
 	
-	megatitle(t);
+	if (!t || parseInt(t) >= 100) megatitle();
+	else megatitle(t);
 }
 
 function __percent_megatitle()
@@ -790,5 +744,73 @@ function __percent_megatitle()
 		megatitle();
 	} else {
 		megatitle(" " + percentage + "%");
+	}
+}
+
+function hostname(url) {
+	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+}
+
+// Helper to manage time/sizes in a friendly way
+String.prototype.seconds = function() {
+	return parseInt(this) * 1000;
+}
+
+String.prototype.minutes = function() {
+	return parseInt(this) * 1000 * 60;
+}
+
+String.prototype.MB = function() {
+	return parseInt(this) * 1024 * 1024;
+}
+
+String.prototype.KB = function() {
+	return parseInt(this) * 1024;
+}
+
+// Quick hack for sane average speed readings
+function bucketspeedometer(initialp)
+{
+	return {
+		interval : 200,
+		num : 300,
+		prevp : initialp,
+
+		h : {},
+
+		progress : function(p)
+		{
+			var now, min, oldest;
+			var total;
+			var t;
+			
+			now = NOW();
+			now -= now % this.interval;
+
+			this.h[now] = (this.h[now] || 0)+p-this.prevp;
+			this.prevp = p;
+			
+			min = now-this.interval*this.num;
+			
+			oldest = now;
+			total = 0;
+
+			for (t in this.h)
+			{
+				if (t < min) delete this.h.bt;
+				else
+				{
+					if (t < oldest) oldest = t;
+					total += this.h[t];
+				}
+			}
+
+			if (now-oldest < 1000) return 0;
+			
+			p = 1000*total/(now-oldest);
+
+			// protect against negative returns due to repeated chunks etc.
+			return p > 0 ? p : 0;
+		}
 	}
 }

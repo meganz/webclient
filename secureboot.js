@@ -4,6 +4,7 @@ var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
+var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var page = document.location.hash;
 
 function isMobile()
@@ -329,7 +330,7 @@ else
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
+		jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
@@ -352,6 +353,7 @@ else
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 		/* better download */
+		jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
@@ -384,13 +386,6 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
-		/* SecureWorker stuff {{{ */
-		jsl.push({f:'js/aesasm.js',n:'aesasm_js',j:4}); // Will be replaced with asmCrypto soon
-		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:4});
-		jsl.push({f:'encrypter.js',n:'encrypter_js',j:4});
-		jsl.push({f:'decrypter.js',n:'decrypter_js',j:4});
-		jsl.push({f:'keygen.js',n:'keygen_js',j:4});
-		/* }}} */
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},
@@ -471,11 +466,9 @@ else
 			'recover': ['reset','reset_js']
 		};
 
-
-
-
 	    if (page && page.indexOf('%21') > -1) document.location.hash = page.replace('%21','!').replace('%21','!');
-		if (page) page = page.replace('#','');
+		
+		if (page) page = page.replace('#','').replace('%21','!');
 
 
 		for (var p in subpages)
@@ -766,7 +759,11 @@ else
 				try
 				{
 					var blob = new Blob(cssar, { type: "text/css" });
-					for ( var f in scripts ) scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
+					for ( var f in scripts ) {
+						if (!scripts[f].match(/^blob:/)) {
+							scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
+						}
+					}
 				}
 				catch(e)
 				{
@@ -775,9 +772,11 @@ else
 					for (var i in cssar) bb.append(cssar[i]);
 					var blob = bb.getBlob('text/css');
 					for ( var f in scripts ) {
-					    bb = new BlobBuilder();
-					    bb.append( scripts[f] );
-					    scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
+						if (!scripts[f].match(/^blob:/)) {
+							bb = new BlobBuilder();
+							bb.append( scripts[f] );
+							scripts[f] = window.URL.createObjectURL( bb.getBlob('text/javascript') );
+						}
 				    }
 				}
 				var link = document.createElement('link');

@@ -195,11 +195,23 @@ function dl_g(res)
 		$('.new-download-red-button').unbind('click');
 		$('.new-download-red-button').bind('click',function(e)
 		{
-			if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600) setTimeout(firefoxDialog,3000);
-			
-			dl_queue.push(fdl_queue_var);					
-			$('.download-mid-centered-block').addClass('downloading');
-			$.dlhash = window.location.hash;
+			if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600 && navigator.userAgent.indexOf('Firefox') > -1) 
+			{
+				firefoxDialog();
+			}			
+			else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
+			|| (navigator.userAgent.indexOf('MSIE 10') > -1)
+			|| ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1))) 
+			&& fdl_filesize > 104857600 && !localStorage.browserDialog)
+			{
+			  browserDialog();
+			}
+			else
+			{			
+				dl_queue.push(fdl_queue_var);					
+				$('.download-mid-centered-block').addClass('downloading');
+				$.dlhash = window.location.hash;
+			}
 		});				
 		$('.new-download-gray-button').unbind('click');
 		$('.new-download-gray-button').bind('click',function(e)
@@ -245,13 +257,6 @@ function dl_g(res)
 		else dlkeyDialog();
 	}
 	else $('.download-mid-centered-block').addClass('not-available-some-reason');
-	if ((dlMethod == FlashIO || dlMethod == BlobBuilderIO) && !localStorage.browserDialog && !$.browserDialog)
-	{
-		setTimeout(function()
-		{
-			browserDialog();
-		},2000);
-	}
 }
 
 
@@ -410,7 +415,7 @@ function dlcomplete(id)
 	}
 	megatitle();		
 	var a=0;
-	for(var i in dl_queue) if (dl_queue[i]) a++;
+	for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
 	if (a < 2 && !ul_uploading)
 	{			
 		$('.widget-block').fadeOut('slow',function(e)

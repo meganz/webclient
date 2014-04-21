@@ -125,6 +125,8 @@ function mozPlaySound(n) {
 
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
+	aFile = aFile.clone();
+
 	this.__defineGetter__('isFile', function()
 	{
 		return aFile.isFile();
@@ -149,6 +151,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			size : aFile.fileSize,
 			type : type || '',
 			lastModifiedDate : aFile.lastModifiedTime,
+			get mozFile() aFile,
 
 			u8: function(aStart,aBytes)
 			{
@@ -213,6 +216,32 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 	};
 
 	if (d) console.log('mozDirtyGetAsEntry', aFile.path);
+}
+
+function mozAB2S(ab,len) {
+	var i = Cc['@mozilla.org/io/arraybuffer-input-stream;1']
+			.createInstance(Ci.nsIArrayBufferInputStream),
+		s = Cc["@mozilla.org/scriptableinputstream;1"]
+			.createInstance(Ci.nsIScriptableInputStream);
+	i.setData(ab.buffer || ab, 0, len || ab.byteLength);
+	s.init(i);
+	return s.readBytes(i.available());
+}
+function mozAB2SDepad(ab) {
+	var ab8 = new Uint8Array(ab), i = ab8.length;
+	while (i-- && !ab8[i]);
+	return mozAB2S(ab,++i);
+}
+
+const mozUConv = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+	.createInstance(Ci.nsIScriptableUnicodeConverter);
+mozUConv.charset = "UTF-8";
+
+function mozTo8(unicode) {
+	return mozUConv.ConvertFromUnicode(unicode);
+}
+function mozFrom8(utf8) {
+	return mozUConv.ConvertToUnicode(utf8);
 }
 
 (function __FileSystemAPI(scope) {
@@ -845,6 +874,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		alert(e);
 	}
 })(self);
+
+try {
+	const { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
+} catch(e) {}
 
 const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;
 if(!BrowserApp) is_chrome_firefox |= 2;

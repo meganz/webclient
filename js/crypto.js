@@ -265,8 +265,10 @@ function base64_to_a32(s)
 	return str_to_a32(base64urldecode(s));
 }
 
+var is_chrome_firefox_enable=false;
+
 // ArrayBuffer to binary string
-function ab_to_str(ab)
+var ab_to_str = is_chrome_firefox_enable ? mozAB2S : function(ab)
 {
 	var b = '', i;
 	
@@ -293,7 +295,7 @@ function ab_to_base64(ab)
 }
 
 // ArrayBuffer to binary with depadding
-function ab_to_str_depad(ab)
+var ab_to_str_depad = is_chrome_firefox_enable ? mozAB2SDepad : function(ab)
 {
 	var b, i;
 
@@ -578,12 +580,7 @@ if(is_chrome_firefox) {
 
 function crypto_rsagenkey ()
 {
-    try {
-        var w = new SecureWorker('keygen.js');
-    }
-    catch (e) {
-        var w = new Worker('keygen.js');
-    }
+    var w = new Worker('keygen.js');
 
     var startTime = new Date();
 
@@ -779,12 +776,12 @@ function dec_attr(attr,key)
 	}
 }
 
-function to8(unicode)
+var to8 = is_chrome_firefox_enable ? mozTo8 : function(unicode)
 {
 	return unescape(encodeURIComponent(unicode));
 }
 
-function from8(utf8)
+var from8 = is_chrome_firefox_enable ? mozFrom8 : function(utf8)
 {
 	return decodeURIComponent(escape(utf8));
 }
@@ -832,16 +829,30 @@ function api_setfolder(h)
 	apixs[2].sid = h;
 }
 
-function api_init(c,service)
+function stopapi()
 {
-	var q = apixs[c];
+    for (var i = 4; i--; )
+    {
+        api_cancel(apixs[i]);
+        apixs[i].cmds = [[],[]];
+        apixs[i].ctxs = [[],[]];
+        apixs[i].cancelled = false;
+    }
+}
 
+function api_cancel(q)
+{
 	if (q)
 	{
 		q.cancelled = true;
 		if (q.xhr) q.xhr.abort();
 		if (q.timer) clearTimeout(q.timer);
 	}
+}
+
+function api_init(c,service)
+{
+    api_cancel(apixs[c]);
 
 	apixs[c] = { c : c,				// channel
 				cmds : [[],[]],		// queued/executing commands (double-buffered)
@@ -997,12 +1008,51 @@ function api_reqfailed(c,e)
 	}
 }
 
+var failxhr;
+var failtime = 0;
+
+function api_reportfailure(hostname,callback)
+{
+	var t = new Date().getTime();
+
+	if (t-failtime < 60000) return;
+	failtime = t;
+
+	if (failxhr) failxhr.abort();
+	
+	failxhr = getxhr();
+	failxhr.open('POST', apipath + 'pf?h', true);
+	failxhr.callback = callback;
+
+	failxhr.onload = function()
+	{
+		if (this.status == 200)	failxhr.callback();
+	}
+
+	failxhr.send(hostname);
+}
+
 var waiturl;
 var waitxhr;
 var waitbackoff = 125;
 var waittimeout;
 var waitbegin;
 var waitid = 0;
+
+function stopsc()
+{
+	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
+	{
+		waitxhr.abort();
+		waitxhr = false;
+	}
+	
+	if (waittimeout)
+	{
+		clearTimeout(waittimeout);
+		waittimeout = false;
+	}
+}
 
 // calls execsc() with server-client requests received
 function getsc(fm)
@@ -1040,18 +1090,8 @@ function completewait(recheck)
 {
 	if (this.waitid != waitid) return;
 
-	if (waitxhr && waitxhr.readyState != waitxhr.DONE)
-	{
-		waitxhr.abort();
-		waitxhr = false;
-	}
-	
-	if (waittimeout)
-	{
-		clearTimeout(waittimeout);
-		waittimeout = false;
-	}
-
+    stopsc();
+    
 	var t = new Date().getTime()-waitbegin;
 
 	if (t < 1000)
@@ -1089,14 +1129,16 @@ function waitsc()
 		if (waitbackoff > 1024000) waitbackoff = 1024000;
 		waittimeout = setTimeout(waitsc,waitbackoff);
 	}
-	
+
 	waitxhr.onload = function()
 	{
+        if (this.status == 200) waitbackoff = 250;
+
 		clearTimeout(waittimeout);
 		waittimeout = false;
 		completewait();
 	}
-	
+
 	waitbegin = new Date().getTime();
 	waitxhr.open('POST',waiturl,true);
 	waitxhr.send();
@@ -2390,8 +2432,9 @@ function crypto_share_rsa2aes()
 		}
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
 
-		var fr = new FileReader();
 		var size = uq_entry.size;
+		var fr = new FileReader();
+		if (!fr.readAsBinaryString) fr.ab = 1;
 
 		crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
 		if (crc32table[1] != 0x77073096)
@@ -2413,7 +2456,7 @@ function crypto_share_rsa2aes()
 			fr.onload = function(e)
 			{
 				var crc;
-				var data = e.target.result;
+				var data = fr.ab ? ab_to_str(fr.result) : e.target.result;
 
 				if(size <= CRC_SIZE)
 				{
@@ -2439,7 +2482,8 @@ function crypto_share_rsa2aes()
 
 				Finish(crc);
 			};
-			fr.readAsBinaryString(blob);
+			if (fr.ab) fr.readAsArrayBuffer(blob);
+			else fr.readAsBinaryString(blob);
 		}
 		else
 		{
@@ -2466,13 +2510,14 @@ function crypto_share_rsa2aes()
 					var blob = uq_entry[sfn](offset,offset+BLOCK_SIZE);
 					fr.onload = function(e)
 					{
-						var block = e.target.result;
+						var block = fr.ab ? ab_to_str(fr.result) : e.target.result;
 
 						crc = crc32(block,crc,BLOCK_SIZE);
 
 						next(++j);
 					};
-					fr.readAsBinaryString(blob);
+					if (fr.ab) fr.readAsArrayBuffer(blob);
+					else fr.readAsBinaryString(blob);
 				};
 				next();
 			};

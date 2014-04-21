@@ -1,4 +1,4 @@
-importScripts('js/asmcrypto.js');
+importScripts('asmcrypto.js');
 
 self.postMessage = self.webkitPostMessage || self.postMessage;
 

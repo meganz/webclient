@@ -1,6 +1,5 @@
 function MemoryIO(dl_id, dl) {
 	var dblob
-		, IO = this
 		, offset = 0
 		, msie = typeof MSBlobBuilder === 'function'
 
@@ -13,6 +12,7 @@ function MemoryIO(dl_id, dl) {
 			dblob.push(new Blob([buffer]));
 		}
 		offset += (have_ab ? buffer : buffer.buffer).length;
+		buffer  = null;
 		done();
 	};
 
@@ -38,19 +38,19 @@ function MemoryIO(dl_id, dl) {
 			dlLinkNode.download = name;
 			dlLinkNode.href = blob_url;
 			dlLinkNode.click();
-			setTimeout(function () {
+			Later(function () {
 				myURL.revokeObjectURL(blob_url);
 				blob_url = undefined;
-			}, 100);
+			});
 		}
 
-		IO.abort();
+		this.abort();
 	};
 
 	this.setCredentials = function (url, size, filename, chunks, sizes) {
 		if (d) DEBUG('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
 		dblob = msie ? new MSBlobBuilder() : [];
-		IO.begin();
+		this.begin();
 	};
 
 	this.abort = function() {

@@ -25,6 +25,11 @@ MegaQueue.prototype.resume = function() {
 	this._process();
 };
 
+MegaQueue.prototype.shrink = function() {
+	this._limit = Math.max(this._limit-1, 1);
+	return this._limit;
+}
+
 MegaQueue.prototype.pause = function() {
 	this.trigger('pause')
 	this._paused = true;

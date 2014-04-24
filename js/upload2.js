@@ -116,14 +116,57 @@ function ul_Identical(target, path, hash,size)
  *	This function is called when an error happen at the upload
  *	stage *and* it is anything *but* network issue.
  */
-function upload_error_check() {
-	for (var i = 0; i < ul_queue.length; i++) {
-		if (ul_queue[i] && ul_queue[i].ul_failed) {
-			if (ul_queue[i].retries++ == 10) {
-				UploadManager.restart( ul_queue[i] );
+function network_error_check() {
+	var i =0
+		, ul = { error: 0, retries: 0}
+		, dl = { error: 0, retries: 0}
+
+	for (i = 0; i < ul_queue.length; i++) {
+		if (dl_queue[i] && dl_queue[i].dl_failed) {
+			dl.retries += dl_queue[i].retries
+			if (dl_queue[i].retries++ == 5) {
+				/**
+				 *	The user has internet yet the download keeps failing
+				 *	we request the server a new download url but unlike in upload
+				 *	this is fine because we resume the download
+				 */
+				DownloadManager.newUrl( dl_queue[i] );
+				dl.error++
 			}
 		}
 	}
+
+	for (i = 0; i < ul_queue.length; i++) {
+		if (ul_queue[i] && ul_queue[i].ul_failed) {
+			ul.retries += ul_queue[i].retries
+			if (ul_queue[i].retries++ == 10) {
+				/**
+				 *	Worst case ever. The client has internet *but*
+				 *	this upload keeps failing in the last 10 minutes.
+				 *
+				 *	We request a new upload URL to the server, and the upload
+				 *	starts from scratch
+				 */
+				UploadManager.restart( ul_queue[i] );
+				ul.error++;
+			}
+		}
+	}
+
+	/**
+	 *	Check for error on upload and downloads
+	 *
+	 *	If we have many errors (average of 3 errors) 
+	 *	we try to shrink the number of connections to the
+	 *	server to see if that fixes the problem
+	 */
+	$([ul, dl]).each(function(i, k) {
+		if (k.retries/k.error > 3) {
+			// if we're failing in average for the 3rd time,
+			// lets shrink our upload queue size
+			(k == ul ? ulQueue : dlQueue).shrink();
+		}
+	});
 }
 
 var UploadManager = new function() {
@@ -175,7 +218,7 @@ var UploadManager = new function() {
 
 	self.retry = function(file, chunk, reason) {
 		file.ul_failed = true;
-		api_reportfailure(hostname(file.posturl), upload_error_check);
+		api_reportfailure(hostname(file.posturl), network_error_check);
 
 		// reschedule
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
@@ -490,7 +533,7 @@ FileUpload.prototype.run = function(done) {
 	file.ul_lastreason	= file.ul_lastreason || 0
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 
-		return dlQueue.pushFirst(this);
+		return ulQueue.pushFirst(this);
 	}
 
 	DEBUG(file.name, "starting upload", file.id)

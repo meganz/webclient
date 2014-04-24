@@ -44,6 +44,24 @@ var DownloadManager = new function() {
 		return _match;
 	}
 
+	self.newUrl = function(dl) {
+		dlQueue.pause(); /* pause *all* downloads */
+		DEBUG("ask for new URL for", dl.dl_id);
+		dlGetUrl(dl, function (error, res, o) {
+			if (error) return self.newUrl(dl);
+			var changed = 0
+			for (var i = 0; i < dlQueue._queue.length; i++) {
+				if (dlQueue._queue[i][0].dl === dl) {
+					dlQueue._queue[i][0].url = res.g + "/" +
+						dlQueue._queue[i][0].url.replace(/.+\//, '')
+					changed++
+				}
+			}
+			dlQueue.resume(); /* resume *all* downloads */
+			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
+		});
+	}
+
 	self.debug = function() {
 		DEBUG("blocked patterns", locks);
 	};
@@ -330,14 +348,6 @@ function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
-	DownloadManager.pause(task);
-
-	if (!task.dl.retry_time) {
-		task.dl.retry_time = 1000
-	} else {
-		task.dl.retry_time = Math.min(task.dl.retry_time*1.2, 3600*1000);
-	}
-
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
@@ -350,17 +360,12 @@ function failureFunction(task, args) {
 		}		
 	}
 
-	dl_reportstatus(dl, EAGAIN);
+	/* update UI */
+	dl_reportstatus(dl, EAGAIN); 
 
-	setTimeout(function() {
-		var range = (task.url||"").replace(/.+\//, '');
-		dlGetUrl(dl, function (error, res, o) {
-			if (!error) {
-				task.url = res.g + '/' + range; /* new url */
-			}
-			dlQueue.pushFirst(task);
-		});
-	}, task.dl.retry_time);
+	/* check for network error  */
+	api_reportfailure(hostname(file.url), network_error_check);
+	dlQueue.pushFirst(task);
 }
 
 DownloadQueue.prototype.push = function() {

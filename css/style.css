@@ -337,7 +337,11 @@ input[type="checkbox"] {
 	margin: 9px 11px 0 0;
 }
 .new-registration-checkbox .checkboxOn, .new-registration-checkbox .checkboxOff {
-	margin: 0 11px 20px 0;
+	margin: 0 7px 20px 0;
+}
+.new-registration-checkbox .register-st2-button {
+	float: right;
+	margin-top: -8px;
 }
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
 	padding-top: 17px;
@@ -4701,6 +4705,12 @@ th.grid-first-th {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.backup-file-info span.tranfer-filetype-txt.backup {
+	padding: 0;
+}
+.backup-recover h3.main-italic-header .red, .backup-recover h5.main-italic-header .red {
+	font-family: 'Open Sans Semibold', Arial;
 }
 .fm-browsers-txt {
 	padding: 0 0 0 23px;
@@ -9423,10 +9433,9 @@ body.new-startpage {
 	width: 20px;
 	height: 20px;
 	float: right;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: 1px 4px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	margin: 0 12px 5px 0;
 	cursor: pointer;
 	display: block;
@@ -9447,7 +9456,7 @@ body.new-startpage {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin-bottom: 10px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: 5px -74px;
 	background-repeat: no-repeat;
 	padding: 0 10px 0 30px;
@@ -9494,10 +9503,9 @@ body.new-startpage {
 	margin-top: 14px;
 }
 .top-login-warning-arrow {
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -10px -506px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	width: 30px;
 	height: 5px;
 	margin: -5px auto 0 auto;
@@ -9507,10 +9515,9 @@ body.new-startpage {
 	width: 13px;
 	height: 14px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -3px -237px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	cursor: pointer;
 	margin: 8px 8px 0 0;
 }
@@ -9527,10 +9534,9 @@ body.new-startpage {
 	float: left;
 	width: 55px;
 	height: 57px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -2px -289px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 }
 .top-login-warning-txt {
 	margin-left: 62px;
@@ -9543,7 +9549,7 @@ body.new-startpage {
 	padding-top: 5px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff {
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -2px -392px;
 	background-repeat: no-repeat;
 	background-size: auto;
@@ -9573,20 +9579,53 @@ body.new-startpage {
 	width: 5px;
 	height: 26px;
 	position: relative;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -3px -554px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	margin-left: -13px;
+}
+.login-notification-icon {
+	width: 16px;
+	height: 16px;
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-position: 0 -1497px;
+	background-repeat: no-repeat;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	cursor: pointer;
+}
+.login-notification-icon:hover {
+	background-position: 0 -1537px;
+}
+.top-login-forgot-pass-bl {
+	border-bottom: 2px solid #f2f2f2;
+	padding: 3px 15px 13px 0;
+	margin: 0 -15px 10px -15px;
+}
+.top-login-forgot-pass {
+	font-size: 11px;
+	color: #999999;
+	line-height: 21px;
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-position: 0 -1582px;
+	background-repeat: no-repeat;
+	float: right;
+	padding: 0 0 0 23px;
+	cursor: pointer;
+}
+.top-login-forgot-pass:hover {
+	background-position: 0 -1582px;
+	color: #D72300;
+	background-position: 0 -1622px;
 }
 .password-tooltip-arrow {
 	width: 12px;
 	height: 5px;
 	position: absolute;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: 0 -912px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	margin: 0 0 -10px -6px;
 	left: 50%;
 }
@@ -9672,10 +9711,9 @@ body.new-startpage {
 	line-height: 28px;
 	padding-left: 50px;
 	color: white;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: -18px -622px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	font-size: 13px;
 }
 .main-mid-pad {
@@ -9722,10 +9760,9 @@ h5.main-italic-header {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	margin-bottom: 20px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: 9px -69px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	padding: 0 10px 0 35px;
 	position: relative;
 }
@@ -9764,6 +9801,11 @@ h5.main-italic-header {
 .login-register-input.password {
 	background-position: 9px -109px;
 }
+.login-register-input.green-tick {
+	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-position: 6px -585px;
+	background-repeat: no-repeat;
+}
 .login-register-input.name {
 	background-position: 9px -1049px;
 }
@@ -9782,6 +9824,20 @@ h5.main-italic-header {
 .login-register-input.name.incorrect {
 	background-position: 9px -1099px;
 }
+.login-forgot-password {
+	font-size: 13px;
+	line-height: 21px;
+	cursor: pointer;
+	color: #999999;
+	padding: 0 0 0 37px;
+	margin: 11px 0 22px 0;
+	background-image: url(..//images/mega/top-login-sprite.png?v=4);
+	background-position: 9px -1670px;
+	background-repeat: no-repeat;
+}
+.new-registration-checkbox {
+	padding-left: 9px;
+}
 .register-st2-txt-block {
 	padding-top: 80px;
 }
@@ -9799,10 +9855,9 @@ h5.main-italic-header {
 	float: left;
 	padding-right: 20px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: right -772px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	margin-bottom: 20px;
 }
 .register-st2-button-arrow {
@@ -9818,10 +9873,9 @@ h5.main-italic-header {
 	-webkit-border-top-left-radius: 5px;
 	-moz-border-radius-topleft: 5px;
 	border-top-left-radius: 5px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: right -662px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 }
 .register-st2-button.back {
 	padding-right: 0;
@@ -9900,10 +9954,9 @@ h5.main-italic-header {
 .password-status-icon {
 	height: 36px;
 	width: 30px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=4);
 	background-position: 2px -1000px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
 	position: absolute;
 	z-index: 10;
 	right: 0;
@@ -14524,14 +14577,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	padding-top: 85px;
 }
 .backup-download-block, .recover-upload-block {
-	padding: 15px 0 0 100px;
-	background-image: url(../images/mega/encr-sprite.png);
-	background-position: 0 15px;
+	padding: 15px 0 0 76px;
+	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-position: 0 6px;
 	background-repeat: no-repeat;
 	height: 125px;
 }
 .recover-upload-block {
-	background-position: 0 -302px;
+	background-position: 0 -314px;
 }
 .backup-download-block.downloading, .recover-upload-block.uploading {
 	background-position: 0 -442px;
@@ -14597,6 +14650,15 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	border-radius: 2px;
 	cursor: pointer;
 }
+.backup-input-button object {
+	position: absolute;
+	left: 0;
+	top: 0;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+}
 .backup-input-button:hover, .focused .backup-input-button {
 	background-color: #D42400;
 }
@@ -14618,7 +14680,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px 0 73px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: 15px -222px;
 	background-repeat: no-repeat;
 }
@@ -14696,7 +14758,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	width: 24px;
 	height: 24px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: -4px -594px;
 	background-repeat: no-repeat;
 }
@@ -14729,7 +14791,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	margin-bottom: -15px;
 }
 .login-register-input.fail {
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: 4px -653px;
 	background-repeat: no-repeat;
 }
@@ -14751,7 +14813,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .reset-account-lock-image {
 	height: 375px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: center -860px;
 	background-repeat: no-repeat
 }
@@ -14759,7 +14821,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	font-size: 13px;
 	line-height: 21px;
 	padding-left: 90px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: -10px -745px;
 	background-repeat: no-repeat;
 }
@@ -14932,8 +14994,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	right: 13px;
 	top: 13px;
-	cursor:pointer;
-	z-index:10;
+	cursor: pointer;
+	z-index: 10;
 }
 .icoming-call-header {
 	text-align: center;
@@ -14941,7 +15003,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	font-size: 15px;
 	font-family: 'Open Sans Semibold', Arial;
 	padding: 20px 0;
-	margin:0 40px;
+	margin: 0 40px;
 }
 .incoming-call-avatar {
 	width: 140px;
@@ -15006,7 +15068,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-border-radius: 23px;
 	-webkit-border-radius: 23px;
 	border-radius: 23px;
-	cursor:pointer;
+	cursor: pointer;
 }
 .icoming-call-button.audio-call {
 	background-color: #9aca71;
@@ -15083,10 +15145,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .icoming-call-button {
  background-image:url(../images/mega/chat-sprite@2x.png?v=2);
 background-size:72px auto;
-}
-.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon {
-background-image: url(../images/mega/encr-sprite@2x.png);
- background-size: 216px;
 }
 .slideshow-progress {
  background-image: url(../images/mega/gallery-pr-bar@2x.png);
@@ -15440,8 +15498,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/bottom-sprite@2x.png);
  background-size: 170px auto;
 }
- .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon {
- background-image: url(../images/mega/top-login-sprite@2x.png?v=1);
+ .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
+ background-image: url(../images/mega/top-login-sprite@2x.png?v=4);
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-membership-icon, .reg-st3-storage, .reg-st3-bandwidth, .reg-st3-save-icon, .reg-st3-save-icon {
@@ -15593,6 +15651,10 @@ background-size: 836px auto;
 .campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {
 background-image: url(../images/mega/new-download@2x.png);
 background-size: 340px auto;
+}
+.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
+background-image: url(../images/mega/encr-sprite@2x.png?v=1);
+ background-size: 216px;
 }
 }
 /* loader*/

@@ -1193,6 +1193,48 @@ function api_checkconfirmcode(ctx,c)
 	res = api_req({ a : 'uc', c : c },ctx);
 }
 
+function api_resetkeykey(ctx,c,key,email,pw)
+{
+    ctx.c = c;
+    ctx.email = email;
+    ctx.k = key;
+    ctx.pw = pw;
+    ctx.callback = api_resetkeykey2;
+
+    api_req({ a : 'erx', r : 'gk', c : c },ctx);
+}
+
+function api_resetkeykey2(res,ctx)
+{
+    if (typeof res == 'string')
+    {
+        var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k),base64_to_a32(res)));
+
+        // verify the integrity of the decrypted private key
+        for (var i = 0; i < 4; i++)
+        {
+            var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
+            if (typeof mpi2b(privk.substr(0,l)) == 'number') break;
+            privk = privk.substr(l);
+        }
+
+        if (i != 4 || privk.length >= 16) ctx.result(EKEY);
+        else if (ctx.email)
+        {
+            var pw_aes = new sjcl.cipher.aes(prepare_key_pw(ctx.pw));
+
+            ctx.callback = ctx.result;
+            api_req({ a : 'erx',
+                      r : 'sk',
+                      c : ctx.c,
+                      x : a32_to_base64(encrypt_key(pw_aes,ctx.k)),
+                      y : stringhash(ctx.email.toLowerCase(),pw_aes) },ctx);
+        }
+        else ctx.result(0);
+    }
+    else ctx.result(res);
+}
+
 // We query the sid using the supplied user handle (or entered email address, if already attached)
 // and check the supplied password key.
 // Returns [decrypted master key,verified session ID(,RSA private key)] or false if API error or

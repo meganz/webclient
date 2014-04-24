@@ -255,16 +255,11 @@ ClassFile.prototype.destroy = function() {
 		}
 	}
 
-	if (this.dl.zipid) {
-		GlobalProgress[this.gid];
-	}
+	delete GlobalProgress[this.gid];
 
 	this.task = null;
 	this.dl.writer.destroy();
-	this.dl.io = null;
-	this.dl.writer	= null;
-	this.dl.ready	= null;
-	this.dl   = null;
+	delete this.dl;
 	megatitle();
 }
 

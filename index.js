@@ -55,7 +55,7 @@ function startMega()
 
 function mainScroll()
 {
-	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,mouseWheelSpeed:100,verticalDragMinHeight:150});	
+	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,verticalDragMinHeight:150,enableKeyboardNavigation:true});
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
 	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
@@ -729,7 +729,10 @@ function loginDialog(close)
 		$('.top-login-popup').removeClass('active');
 		return false;
 	}
-	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) $('.top-login-warning').addClass('hidden');	
+	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) {
+		$('.top-login-warning').addClass('hidden');	
+		$('.login-notification-icon').removeClass('hidden');
+	}
 	$('.login-checkbox,.top-login-popup .radio-txt').unbind('click');
 	$('.login-checkbox,.top-login-popup .radio-txt').bind('click',function(e)
 	{
@@ -790,8 +793,15 @@ function loginDialog(close)
 	$('.top-login-warning-close').bind('click',function(e)
 	{
 		if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) localStorage.hideloginwarning=1;
-		$('.top-login-warning').addClass('hidden');	
+		$('.top-login-warning').addClass('hidden');
+		$('.login-notification-icon').removeClass('hidden');	
 	});	
+	$('.login-notification-icon').unbind('click');
+	$('.login-notification-icon').bind('click',function(e)
+	{
+		$('.top-login-warning').removeClass('hidden');
+		$(this).addClass('hidden');
+	});
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').unbind('click');
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').bind('click',function(e)
 	{		
@@ -874,9 +884,7 @@ function mLogout()
 		}
 		else
 		{
-			u_logout(1);
-			if (is_chrome_firefox) document.location.href =  'chrome://mega/content/' + urlrootfile;
-			else init_page();
+			u_logout(1);			
 			document.location.reload();
 		}
 	}

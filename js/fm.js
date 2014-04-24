@@ -47,31 +47,30 @@ function initContactsGridScrolling()
 {
 	var jsp = $('.contacts-grid-scrolling-table').data('jsp');
 	if (jsp) jsp.destroy();
-	$('.contacts-grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	$('.contacts-grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-grid-scrolling-table');
 }
 function initContactsBlocksScrolling() 
 {
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
-	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-blocks-scrolling');
 }
 
 function initTransferScroll()
 {
-	$('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, verticalDragMinHeight: 20});	
+	$('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5, verticalDragMinHeight:20});	
 	jScrollFade('.transfer-scrolling-table');
 }
 function initTreeScroll() 
 {
-    if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth) {
-        $('.fm-left-panel').css({
-            'width': localStorage.leftPaneWidth + "px"
-        });
-    }
-
-	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+    if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth) 
+	{
+        $('.fm-left-panel').css({'width': localStorage.leftPaneWidth + "px"});
+    }	
+	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});	
+	$('.fm-tree-panel .jspPane').css('padding-top','10px');	
 	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
 	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
 	{
@@ -120,7 +119,7 @@ function treeDroppable()
 
 function notificationsScroll()
 {
-	$('.new-notifications-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5, verticalDragMinHeight:250,mouseWheelSpeed:100});	
+	$('.new-notifications-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5,verticalDragMinHeight:250});	
 	jScrollFade('.new-notifications-scroll');
 }
 
@@ -1478,7 +1477,7 @@ function accountUI()
 				changepw($('#account-password').val(),$('#account-confirm-password').val(),{callback: function(res) 
 				{
 					loadingDialog.hide();
-					if (res[0] == EACCESS)
+					if (res == EACCESS)
 					{
 						msgDialog('warninga',l[135],l[724],false,function()
 						{
@@ -1486,7 +1485,7 @@ function accountUI()
 							$('#account-password').focus();
 						});
 					}
-					else if ((typeof res[0] == 'number') && (res[0] < 0)) msgDialog('warninga','Error',l[200]);
+					else if (typeof res == 'number' && res < 0) msgDialog('warninga','Error',l[200]);
 					else 
 					{
 						 msgDialog('info',l[726],l[725],false,function()

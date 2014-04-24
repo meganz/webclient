@@ -9423,10 +9423,10 @@ body.new-startpage {
 	width: 20px;
 	height: 20px;
 	float: right;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: 1px 4px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	margin: 0 12px 5px 0;
 	cursor: pointer;
 	display: block;
@@ -9447,7 +9447,7 @@ body.new-startpage {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin-bottom: 10px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: 5px -74px;
 	background-repeat: no-repeat;
 	padding: 0 10px 0 30px;
@@ -9494,10 +9494,10 @@ body.new-startpage {
 	margin-top: 14px;
 }
 .top-login-warning-arrow {
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -10px -506px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	width: 30px;
 	height: 5px;
 	margin: -5px auto 0 auto;
@@ -9507,10 +9507,10 @@ body.new-startpage {
 	width: 13px;
 	height: 14px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -3px -237px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	cursor: pointer;
 	margin: 8px 8px 0 0;
 }
@@ -9527,10 +9527,10 @@ body.new-startpage {
 	float: left;
 	width: 55px;
 	height: 57px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -2px -289px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 }
 .top-login-warning-txt {
 	margin-left: 62px;
@@ -9543,7 +9543,7 @@ body.new-startpage {
 	padding-top: 5px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff {
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -2px -392px;
 	background-repeat: no-repeat;
 	background-size: auto;
@@ -9573,20 +9573,56 @@ body.new-startpage {
 	width: 5px;
 	height: 26px;
 	position: relative;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -3px -554px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	margin-left: -13px;
+}
+.login-notification-icon {
+	width:16px;
+	height:16px;
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
+	background-position: 0 -1497px;
+	background-repeat: no-repeat;
+	position:absolute;
+	top:5px;
+	right:5px;
+	cursor:pointer;
+}
+.login-notification-icon:hover {
+	background-position: 0 -1537px;
+}
+.top-login-forgot-pass-bl {
+	border-bottom: 2px solid #f2f2f2;
+padding: 3px 15px 13px 0;
+margin: 0 -15px 10px -15px;
+	
+}
+.top-login-forgot-pass {
+	font-size:11px;
+	color:#999999;
+	line-height:21px;
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
+	background-position: 0 -1582px;
+background-repeat: no-repeat;
+float: right;
+padding: 0 0 0 23px;
+cursor:pointer;
+}
+.top-login-forgot-pass:hover {
+	background-position: 0 -1582px;
+	color:#D72300;
+	background-position: 0 -1622px;
 }
 .password-tooltip-arrow {
 	width: 12px;
 	height: 5px;
 	position: absolute;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: 0 -912px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	margin: 0 0 -10px -6px;
 	left: 50%;
 }
@@ -9672,10 +9708,10 @@ body.new-startpage {
 	line-height: 28px;
 	padding-left: 50px;
 	color: white;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: -18px -622px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	font-size: 13px;
 }
 .main-mid-pad {
@@ -9722,10 +9758,10 @@ h5.main-italic-header {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	margin-bottom: 20px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: 9px -69px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	padding: 0 10px 0 35px;
 	position: relative;
 }
@@ -9799,10 +9835,10 @@ h5.main-italic-header {
 	float: left;
 	padding-right: 20px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: right -772px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	margin-bottom: 20px;
 }
 .register-st2-button-arrow {
@@ -9818,10 +9854,10 @@ h5.main-italic-header {
 	-webkit-border-top-left-radius: 5px;
 	-moz-border-radius-topleft: 5px;
 	border-top-left-radius: 5px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: right -662px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 }
 .register-st2-button.back {
 	padding-right: 0;
@@ -9900,10 +9936,10 @@ h5.main-italic-header {
 .password-status-icon {
 	height: 36px;
 	width: 30px;
-	background-image: url(../images/mega/top-login-sprite.png?v=1);
+	background-image: url(../images/mega/top-login-sprite.png?v=2);
 	background-position: 2px -1000px;
 	background-repeat: no-repeat;
-	background-size: 48px auto;
+	
 	position: absolute;
 	z-index: 10;
 	right: 0;
@@ -15496,8 +15532,8 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/bottom-sprite@2x.png);
  background-size: 170px auto;
 }
- .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon {
- background-image: url(../images/mega/top-login-sprite@2x.png?v=1);
+ .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon, .login-notification-icon, .top-login-forgot-pass {
+ background-image: url(../images/mega/top-login-sprite@2x.png?v=2);
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-membership-icon, .reg-st3-storage, .reg-st3-bandwidth, .reg-st3-save-icon, .reg-st3-save-icon {

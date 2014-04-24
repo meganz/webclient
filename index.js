@@ -55,7 +55,7 @@ function startMega()
 
 function mainScroll()
 {
-	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,mouseWheelSpeed:100,verticalDragMinHeight:150});	
+	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,verticalDragMinHeight:150,enableKeyboardNavigation:true});
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
 	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
@@ -874,9 +874,7 @@ function mLogout()
 		}
 		else
 		{
-			u_logout(1);
-			if (is_chrome_firefox) document.location.href =  'chrome://mega/content/' + urlrootfile;
-			else init_page();
+			u_logout(1);			
 			document.location.reload();
 		}
 	}

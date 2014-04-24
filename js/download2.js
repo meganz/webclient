@@ -74,6 +74,7 @@ var DownloadManager = new function() {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
+			delete Zips[dl.zipid];
 			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
@@ -91,6 +92,9 @@ var DownloadManager = new function() {
 			$(selector).fadeOut('slow', function() {
 				$(this).remove();
 			});
+		}
+		if (dl.io instanceof MemoryIO) {
+			dl.io.abort();
 		}
 		dl = null;
 	}

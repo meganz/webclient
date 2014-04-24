@@ -5,6 +5,7 @@ var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
+var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
 
 function isMobile()
@@ -177,10 +178,19 @@ function cmparrays(a,b)
 	return true;
 }
 
-var sv = '1'; // clear storage when version doesn't match
 function init_storage ( storage ) {
-    if ( storage.v !== sv ) storage.clear();
-    storage.v = sv;
+    var v = storage.v,
+        d = storage.d,
+        dd = storage.dd,
+        sp = storage.staticpath;
+
+    if ( v !== storage_version ) storage.clear();
+    storage.v = storage_version;
+
+    if ( d ) storage.d = d;
+    if ( dd ) storage.dd = dd;
+    if ( sp ) storage.staticpath = sp;
+
     return storage;
 }
 

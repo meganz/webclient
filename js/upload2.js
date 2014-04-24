@@ -489,8 +489,8 @@ FileUpload.prototype.run = function(done) {
 	file.xr				= getxr();
 	file.ul_lastreason	= file.ul_lastreason || 0
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
-		done(); 
-		return dlQueue.pushFirst(this);
+		done();
+		return ulQueue.pushFirst(this);
 	}
 
 	DEBUG(file.name, "starting upload", file.id)

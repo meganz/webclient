@@ -4702,6 +4702,12 @@ th.grid-first-th {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.backup-file-info span.tranfer-filetype-txt.backup {
+	padding:0;
+}
+.backup-recover h3.main-italic-header .red, .backup-recover h5.main-italic-header .red {
+	font-family: 'Open Sans Semibold', Arial;
+}
 .fm-browsers-txt {
 	padding: 0 0 0 23px;
 }
@@ -9791,6 +9797,11 @@ h5.main-italic-header {
 .login-register-input.password {
 	background-position: 9px -109px;
 }
+.login-register-input.green-tick {
+	background-image: url(../images/mega/encr-sprite.png?v=1);
+    background-position: 6px -585px;
+    background-repeat: no-repeat;
+}
 .login-register-input.name {
 	background-position: 9px -1049px;
 }
@@ -14595,14 +14606,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	padding-top: 85px;
 }
 .backup-download-block, .recover-upload-block {
-	padding: 15px 0 0 100px;
-	background-image: url(../images/mega/encr-sprite.png);
-	background-position: 0 15px;
+	padding: 15px 0 0 76px;
+	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-position: 0 6px;
 	background-repeat: no-repeat;
 	height: 125px;
 }
 .recover-upload-block {
-	background-position: 0 -302px;
+	background-position: 0 -314px;
 }
 .backup-download-block.downloading, .recover-upload-block.uploading {
 	background-position: 0 -442px;
@@ -14698,7 +14709,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px 0 73px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: 15px -222px;
 	background-repeat: no-repeat;
 }
@@ -14776,7 +14787,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	width: 24px;
 	height: 24px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: -4px -594px;
 	background-repeat: no-repeat;
 }
@@ -14809,7 +14820,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	margin-bottom: -15px;
 }
 .login-register-input.fail {
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: 4px -653px;
 	background-repeat: no-repeat;
 }
@@ -14831,7 +14842,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .reset-account-lock-image {
 	height: 375px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: center -860px;
 	background-repeat: no-repeat
 }
@@ -14839,7 +14850,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	font-size: 13px;
 	line-height: 21px;
 	padding-left: 90px;
-	background-image: url(../images/mega/encr-sprite.png);
+	background-image: url(../images/mega/encr-sprite.png?v=1);
 	background-position: -10px -745px;
 	background-repeat: no-repeat;
 }
@@ -15163,10 +15174,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .icoming-call-button {
  background-image:url(../images/mega/chat-sprite@2x.png?v=2);
 background-size:72px auto;
-}
-.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon {
-background-image: url(../images/mega/encr-sprite@2x.png);
- background-size: 216px;
 }
 .slideshow-progress {
  background-image: url(../images/mega/gallery-pr-bar@2x.png);
@@ -15673,6 +15680,10 @@ background-size: 836px auto;
 .campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {
 background-image: url(../images/mega/new-download@2x.png);
 background-size: 340px auto;
+}
+.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
+background-image: url(../images/mega/encr-sprite@2x.png?v=1);
+ background-size: 216px;
 }
 }
 /* loader*/

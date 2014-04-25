@@ -337,11 +337,28 @@ input[type="checkbox"] {
 	margin: 9px 11px 0 0;
 }
 .new-registration-checkbox .checkboxOn, .new-registration-checkbox .checkboxOff {
-	margin: 0 7px 20px 0;
+	margin: 0 11px 20px 0;
 }
 .new-registration-checkbox .register-st2-button {
 	float: right;
 	margin-top: -8px;
+	background-image: none;
+	padding: 0;
+}
+.new-registration-checkbox .register-st2-button-arrow {
+	padding: 0 15px 0 15px;
+	background-image: none;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+}
+.login-page-create-new {
+	float: right;
+	font-size: 13px;
+	padding: 35px 0 0 0;
+}
+.login-page-create-new span {
+	cursor: pointer;
 }
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
 	padding-top: 17px;
@@ -4708,9 +4725,6 @@ th.grid-first-th {
 }
 .backup-file-info span.tranfer-filetype-txt.backup {
 	padding: 0;
-}
-.backup-recover h3.main-italic-header .red, .backup-recover h5.main-italic-header .red {
-	font-family: 'Open Sans Semibold', Arial;
 }
 .fm-browsers-txt {
 	padding: 0 0 0 23px;
@@ -9735,7 +9749,7 @@ body.new-startpage {
 h3.main-italic-header {
 	font-size: 20px;
 	line-height: 30px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'Open Sans Semibold', Arial;
 	margin: 0;
 	padding: 25px 0 25px 0;
 	font-weight: normal;
@@ -9744,7 +9758,7 @@ h3.main-italic-header {
 h5.main-italic-header {
 	font-size: 16px;
 	line-height: 28px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'Open Sans Semibold', Arial;
 	margin: 0;
 	padding: 0px 0 5px 0;
 	font-weight: normal;
@@ -9824,19 +9838,9 @@ h5.main-italic-header {
 .login-register-input.name.incorrect {
 	background-position: 9px -1099px;
 }
-.login-forgot-password {
-	font-size: 13px;
-	line-height: 21px;
-	cursor: pointer;
-	color: #999999;
-	padding: 0 0 0 37px;
-	margin: 11px 0 22px 0;
-	background-image: url(..//images/mega/top-login-sprite.png?v=4);
-	background-position: 9px -1670px;
-	background-repeat: no-repeat;
-}
-.new-registration-checkbox {
-	padding-left: 9px;
+.login-page-forgot-bl {
+	padding: 0 0 30px 0;
+	margin-top: -10px;
 }
 .register-st2-txt-block {
 	padding-top: 80px;

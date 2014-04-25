@@ -1612,11 +1612,15 @@ var MegaChatRoom = function(megaChat, roomJid) {
         self.options.mediaOptions.video = false;
         self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
 
+        $('.local-video-container', self.$header).addClass("muted");
+
         resetCallStateInCall();
     });
     $('.btn-chat-video-unmute', self.$header).bind('click.megaChat', function() {
         self.options.mediaOptions.video = true;
         self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
+
+        $('.local-video-container', self.$header).removeClass("muted");
 
         resetCallStateInCall();
     });
@@ -1628,6 +1632,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
             eventData.answer(true, {
                 mediaOptions: self.getMediaOptions()
             });
+
+            resetCallStateInCall();
         };
 
         var doCancel = function() {
@@ -1890,7 +1896,10 @@ MegaChatRoom.STATE = {
     'SYNCING': 50,
     'SYNCED': 60,
 
+
     'READY': 150,
+
+    'PLUGINS_PAUSED': 175,
 
     'LEAVING': 200,
 
@@ -1927,8 +1936,10 @@ MegaChatRoom.prototype.setState = function(newState) {
     assert(newState, 'Missing state');
 
     if(self.state) { // if not == null, e.g. setting to INITIALIZED
+        // only allow state changes to be increasing the .state value (5->10->....150...) with the exception when a
+        // PLUGINS_PAUSED is the current or new state
         assert(
-            newState > self.state,
+            newState === MegaChatRoom.STATE.PLUGINS_PAUSED || self.state === MegaChatRoom.STATE.PLUGINS_PAUSED || newState > self.state,
             'Invalid state change. Current:' + MegaChatRoom.stateToText(self.state) +  "to" + MegaChatRoom.stateToText(newState)
         );
     }
@@ -2741,7 +2752,7 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
                 console.warn(
                     "Will not accept message sync response because inResponseTo, did not matched any cached messageIDs, " +
                     "got: ", meta.inResponseTo, ". Most likely they had sent the response too late. Requests " +
-                    "currently active:", self._syncRequests
+                    "currently active:", JSON.stringify(self._syncRequests)
                 );
             }
             return false;

@@ -967,3 +967,10 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix) {
         }
     });
 };
+
+
+function array_unique(arr) {
+    return $.grep(arr, function(v, k){
+        return $.inArray(v ,arr) === k;
+    });
+}

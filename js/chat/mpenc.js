@@ -534,27 +534,11 @@ define('mpenc/messages',[
      */
 
     /**
-     * Carries message content for the mpEnc protocol flow.
+     * Carries message content for the mpEnc protocol flow and data messages.
      *
      * @constructor
      * @param source {string}
      *     Message originator (from).
-     * @param dest {string}
-     *     Message destination (to).
-     * @param agreement {string}
-     *     Type of key agreement. "initial" or "auxilliary".
-     * @param flow {string}
-     *     Direction of message flow. "upflow" or "downflow".
-     * @param members {Array}
-     *     List (array) of all participating members.
-     * @param intKeys {Array}
-     *     List (array) of intermediate keys for group key agreement.
-     * @param nonces {Array}
-     *     Nonces of members for ASKE.
-     * @param pubKeys {Array}
-     *     List (array) of all participants' ephemeral public keys.
-     * @param sessionSignature {string}
-     *     Signature to acknowledge the session.
      * @returns {ProtocolMessage}
      *
      * @property source {string}
@@ -579,46 +563,6 @@ define('mpenc/messages',[
      *     Session acknowledgement signature using sender's static key.
      * @property signingKey {string}
      *     Ephemeral private signing key for session (upon quitting participation).
-     */
-    ns.ProtocolMessage = function(source, dest, agreement, flow, members,
-                                  intKeys, debugKeys, nonces, pubKeys,
-                                  sessionSignature) {
-        this.source = source || '';
-        this.dest = dest || '';
-        this.agreement = agreement || '';
-        this.flow = flow || '';
-        this.members = members || [];
-        this.intKeys = intKeys || [];
-        this.debugKeys = debugKeys || [];
-        this.nonces = nonces || [];
-        this.pubKeys = pubKeys || [];
-        this.sessionSignature = sessionSignature || null;
-        this.signingKey = null;
-
-        return this;
-    };
-
-
-    /**
-     * Carries a data message's content.
-     *
-     * @constructor
-     * @param signature {string}
-     *     Binary signature string for the message
-     * @param signatureOk {bool}
-     *     Indicator whether the message validates. after message decoding.
-     *     (Has to be done at time of message decoding as the symmetric block
-     *     cipher employs padding.)
-     * @param rawMessage {string}
-     *     The raw message, after splitting off the signature. Can be used to
-     *     re-verify the signature, if needed.
-     * @param protocol {string}
-     *     Single byte string indicating the protocol version using the binary
-     *     version of the character.
-     * @param data {string}
-     *     Binary string containing the decrypted pay load of the message.
-     * @returns {ProtocolMessage}
-     *
      * @property signature {string}
      *     Binary signature string for the message
      * @property signatureOk {bool}
@@ -634,16 +578,26 @@ define('mpenc/messages',[
      * @property data {string}
      *     Binary string containing the decrypted pay load of the message.
      */
-    ns.DataMessage = function(signature, signatureOk, rawMessage, protocol, data) {
-        this.signature = signature || '';
-        this.signatureOk = signatureOk || false;
-        this.rawMessage = rawMessage || '';
-        this.protocol = protocol || '';
-        this.data = data | '';
+    ns.ProtocolMessage = function(source) {
+        this.source = source || '';
+        this.dest = '';
+        this.agreement = null;
+        this.flow = null;
+        this.members = [];
+        this.intKeys = [];
+        this.debugKeys = [];
+        this.nonces = [];
+        this.pubKeys = [];
+        this.sessionSignature = null;
+        this.signingKey = null;
+        this.signature = null;
+        this.signatureOk = false;
+        this.rawMessage = null;
+        this.protocol = null;
+        this.data = null;
 
         return this;
     };
-
 
 
     return ns;
@@ -1923,6 +1877,8 @@ function chr(n) { return String.fromCharCode(n); }
 function ord(c) { return c.charCodeAt(0); }
 
 function map(f, l) {
+  assert(!!l, 'passed argument l is invalid.');
+
   result = new Array(l.length);
   for (var i=0; i<l.length; i++) result[i]=f(l[i]);
   return result;
@@ -2701,7 +2657,9 @@ define('mpenc/helper/utils',[
      */
     ns.clone = function(obj) {
         // Handle the 3 simple types, and null or undefined.
-        if (null == obj || "object" != typeof obj) return obj;
+        if (null == obj || "object" != typeof obj) {
+            return obj;
+        }
 
         // Handle date.
         if (obj instanceof Date) {
@@ -2973,35 +2931,42 @@ define('mpenc/codec',[
 
 
     /**
-     * "Enumeration" for TLV types.
+     * "Enumeration" for TLV record types.
      *
      * @property PADDING {integer}
      *     Can be used for arbitrary length of padding byte sequences.
      * @property PROTOCOL_VERSION {integer}
      *     Indicates the protocol version to be used as a 16-bit unsigned integer.
-     * @property MESSAGE_TYPE {integer}
-     *     A single byte indicating the type of message transmitted.
+     * @property DATA_MESSAGE {string}
+     *     Data payload (chat message) content of the message.
+     * @property MESSAGE_SIGNATURE {string}
+     *     Signature of the entire message sent (must be the first TLV sent,
+     *     and sign *all* remaining binary content).
+     * @property MESSAGE_IV {string}
+     *     Random initialisation vector for encrypted message payload.
      * @property SOURCE {integer}
-     *     Message originator (from, should be only one).
+     *     Message originator ("from", must be only one).
      * @property DEST {integer}
-     *     Message destination (to, should be only one, broadcast if not present).
+     *     Message destination ("to", should be only one, broadcast if not
+     *     present or empty).
      * @property AUX_AGREEMENT {integer}
-     *     Type of key agreement. 0 for "initial" or 1 for "auxilliary".
+     *     Type of key agreement. Binary 0 for "initial" or 1 for "auxiliary".
      * @property MEMBER {integer}
-     *     A participating member ID.
+     *     A participating member's ID.
      * @property INT_KEY {integer}
-     *     An intermediate key for the group key agreement (max occurrence is
+     *     An intermediate key for the group key agreement (max. occurrence is
      *     the number of members present).
      * @property NONCE {integer}
-     *     A nonce of a member for ASKE (max occurrence is the number of
+     *     A nonce of a member for ASKE (max. occurrence is the number of
      *     members present).
      * @property PUB_KEY {integer}
-     *     Ephemeral public signing key of a member (max occurrence is the
+     *     Ephemeral public signing key of a member (max. occurrence is the
      *     number of members present).
      * @property SESSION_SIGNATURE {integer}
      *     Session acknowledgement signature using sender's static key.
      * @property SIGNING_KEY {integer}
-     *     Session's ephemeral (private) signing key.
+     *     Session's ephemeral (private) signing key, published upon departing
+     *     from a chat.
      */
     ns.TLV_TYPE = {
         PADDING:           0x0000,
@@ -3081,20 +3046,16 @@ define('mpenc/codec',[
             return null;
         }
 
-        var out = null;
-        var protocol = null;
+        var out = new messages.ProtocolMessage();
 
-        // members, intKeys, nonces, pubKeys, sessionSignature
         while (message.length > 0) {
             var tlv = ns.decodeTLV(message);
             switch (tlv.type) {
+                case ns.TLV_TYPE.PADDING:
+                    // Completely ignore this.
+                    break;
                 case ns.TLV_TYPE.PROTOCOL_VERSION:
-                    // This is the first TLV in a protocol message.
-                    // Let's make a new message object if we don't have one, yet.
-                    if (!out) {
-                        out = new messages.ProtocolMessage();
-                    }
-                    protocol = tlv.value;
+                    out.protocol = tlv.value;
                     break;
                 case ns.TLV_TYPE.SOURCE:
                     out.source = tlv.value;
@@ -3137,15 +3098,7 @@ define('mpenc/codec',[
                     out.signingKey = tlv.value;
                     break;
                 case ns.TLV_TYPE.MESSAGE_SIGNATURE:
-                    // This is the first TLV in a data message.
-                    // Let's make a new message object if we don't have one, yet.
-                    if (!out) {
-                        out = new messages.DataMessage();
-                    }
                     out.signature = tlv.value;
-                    out.signatureOk = ns.verifyDataMessage(tlv.rest,
-                                                           out.signature,
-                                                           pubKey);
                     out.rawMessage = tlv.rest;
                     break;
                 case ns.TLV_TYPE.MESSAGE_IV:
@@ -3161,9 +3114,12 @@ define('mpenc/codec',[
 
             message = tlv.rest;
         }
-        // Some specifics depending on the type of mpENC message.
 
-        if (out.data === undefined) {
+        // Some specifics depending on the type of mpENC message.
+        if (out.data) {
+            // Some further crypto processing on data messages.
+            out.data = ns.decryptDataMessage(out.data, groupKey, out.iv);
+        } else {
             // Some sanity checks for keying messages.
             _assert(out.intKeys.length <= out.members.length,
                     'Number of intermediate keys cannot exceed number of members.');
@@ -3171,13 +3127,23 @@ define('mpenc/codec',[
                     'Number of nonces cannot exceed number of members.');
             _assert(out.pubKeys.length <= out.members.length,
                     'Number of public keys cannot exceed number of members.');
-        } else {
-            // Some further crypto processing on data messages.
-            out.protocol = protocol;
-            out.data = ns.decryptDataMessage(out.data, groupKey, out.iv);
         }
-        _assert(protocol === version.PROTOCOL_VERSION,
-                'Received wrong protocol version: ' + protocol.charCodeAt(0) + '.');
+
+        // Check signature, if present.
+        if (out.signature) {
+            if (!pubKey) {
+                var index = out.members.indexOf(out.source);
+                pubKey = out.pubKeys[index];
+            }
+            out.signatureOk = ns.verifyDataMessage(out.rawMessage,
+                                                   out.signature,
+                                                   pubKey);
+            _assert(out.signatureOk,
+                    'Signature of message does not verify!');
+        }
+
+        _assert(out.protocol === version.PROTOCOL_VERSION,
+                'Received wrong protocol version: ' + out.protocol.charCodeAt(0) + '.');
 
         return out;
     };
@@ -3298,15 +3264,11 @@ define('mpenc/codec',[
 
             // We want message attributes in this order:
             // signature, protocol version, iv, message data
-            out += ns.encodeTLV(ns.TLV_TYPE.MESSAGE_IV,
-                                         encrypted.iv);
-            out += ns.encodeTLV(ns.TLV_TYPE.DATA_MESSAGE,
-                                         encrypted.data);
+            out += ns.encodeTLV(ns.TLV_TYPE.MESSAGE_IV, encrypted.iv);
+            out += ns.encodeTLV(ns.TLV_TYPE.DATA_MESSAGE, encrypted.data);
             // Sign `out` and prepend signature.
             var signature = ns.signDataMessage(out, privKey, pubKey);
-            out = ns.encodeTLV(ns.TLV_TYPE.MESSAGE_SIGNATURE,
-                                        signature)
-                + out;
+            out = ns.encodeTLV(ns.TLV_TYPE.MESSAGE_SIGNATURE, signature) + out;
         } else {
             // Process message attributes in this order:
             // source, dest, agreement, members, intKeys, nonces, pubKeys,
@@ -3337,6 +3299,9 @@ define('mpenc/codec',[
             if (message.signingKey) {
                 out += ns.encodeTLV(ns.TLV_TYPE.SIGNING_KEY, message.signingKey);
             }
+            // Sign `out` and prepend signature.
+            var signature = ns.signDataMessage(out, privKey, pubKey);
+            out = ns.encodeTLV(ns.TLV_TYPE.MESSAGE_SIGNATURE, signature) + out;
         }
 
         return out;
@@ -3508,6 +3473,15 @@ define('mpenc/codec',[
     ns.getQueryMessage = function(text) {
         return _PROTOCOL_PREFIX + 'v' + version.PROTOCOL_VERSION.charCodeAt(0) + '?' + text;
     };
+
+
+//    ns.test = function() {
+//        dump(djbec.sig_test('msg','key'));
+//        dump(djbec.sig_test('foo','baz'));
+//        dump(djbec.sig_test());
+//        dump(djbec.dh_test());
+//    };
+
 
 
     return ns;
@@ -4209,7 +4183,7 @@ define('mpenc/greet/cliques',[
      *     List (array) of keying debugging strings.
      */
     ns.CliquesMessage = function(source, dest, agreement, flow, members,
-                                            intKeys, debugKeys) {
+                                 intKeys, debugKeys) {
         this.source = source || '';
         this.dest = dest || '';
         this.agreement = agreement || '';
@@ -5159,7 +5133,8 @@ define('mpenc/greet/ske',[
     "mpenc/helper/assert",
     "mpenc/helper/utils",
     "rsa",
-], function(assert, utils, rsa) {
+    "djbec",
+], function(assert, utils, rsa, djbec) {
     
 
     /**
@@ -6066,7 +6041,9 @@ define('mpenc/handler',[
             var outMessage = {
                 from: this.id,
                 to: outContent.dest,
-                message: codec.encodeMessage(outContent),
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
             };
             this.protocolOutQueue.push(outMessage);
             this.queueUpdatedCallback(this);
@@ -6111,7 +6088,9 @@ define('mpenc/handler',[
             var outMessage = {
                 from: this.id,
                 to: outContent.dest,
-                message: codec.encodeMessage(outContent),
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
             };
             this.protocolOutQueue.push(outMessage);
             this.queueUpdatedCallback(this);
@@ -6158,7 +6137,9 @@ define('mpenc/handler',[
             var outMessage = {
                 from: this.id,
                 to: outContent.dest,
-                message: codec.encodeMessage(outContent),
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
             };
             this.protocolOutQueue.push(outMessage);
             this.queueUpdatedCallback(this);
@@ -6203,7 +6184,9 @@ define('mpenc/handler',[
             var outMessage = {
                 from: this.id,
                 to: outContent.dest,
-                message: codec.encodeMessage(outContent),
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
             };
             this.protocolOutQueue.push(outMessage);
             this.queueUpdatedCallback(this);
@@ -6242,7 +6225,9 @@ define('mpenc/handler',[
             var outMessage = {
                 from: this.id,
                 to: outContent.dest,
-                message: codec.encodeMessage(outContent),
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
             };
             this.protocolOutQueue.push(outMessage);
             this.queueUpdatedCallback(this);
@@ -6253,27 +6238,38 @@ define('mpenc/handler',[
     /**
      * Fully re-run whole key agreements, but retain the ephemeral signing key.
      *
+     * @param keepMembers {Array}
+     *     Iterable of members to keep in the group (exclude others). This list
+     *     should include the one self. (Optional parameter.)
      * @method
      */
-    ns.ProtocolHandler.prototype.fullRefresh = function() {
-        _assert(false, 'Not implemented.');
-//        _assert((this.state === ns.STATE.INITIALISED)
-//                || (this.state === ns.STATE.INIT_DOWNFLOW)
-//                || (this.state === ns.STATE.AUX_DOWNFLOW),
-//                'refresh() can only be called from an initialised or downflow states.');
-//        this.state = ns.STATE.INITIALISED;
-//        this.stateUpdatedCallback(this);
-//
-//        var outContent = this._refresh();
-//        if (outContent) {
-//            var outMessage = {
-//                from: this.id,
-//                to: outContent.dest,
-//                message: codec.encodeMessage(outContent),
-//            };
-//            this.protocolOutQueue.push(outMessage);
-//            this.queueUpdatedCallback(this);
-//        }
+    ns.ProtocolHandler.prototype.fullRefresh = function(keepMembers) {
+        this.state = ns.STATE.INIT_UPFLOW;
+        this.stateUpdatedCallback(this);
+
+        // Remove ourselves from members list to keep (if we're in there).
+        var otherMembers = utils.clone(this.cliquesMember.members);
+        if (keepMembers) {
+            otherMembers = utils.clone(keepMembers);
+        }
+        var myPos = otherMembers.indexOf(this.id);
+        if (myPos >= 0) {
+            otherMembers.splice(myPos, 1);
+        }
+
+        // Now start a normal upflow for an initial agreement.
+        var outContent = this._start(otherMembers);
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
     };
 
 
@@ -6303,20 +6299,23 @@ define('mpenc/handler',[
             }
             _assert(toKeep.length === keepMembers.length,
                     'Mismatch between members to keep and current members.');
-            if (toExclude.length > 0) {
-                this.state = ns.STATE.AUX_DOWNFLOW;
-                this.stateUpdatedCallback(this);
+        }
 
-                var outContent = this._exclude(toExclude);
-                if (outContent) {
-                    var outMessage = {
-                        from: this.id,
-                        to: outContent.dest,
-                        message: codec.encodeMessage(outContent),
-                    };
-                    this.protocolOutQueue.push(outMessage);
-                    this.queueUpdatedCallback(this);
-                }
+        if (toExclude.length > 0) {
+            this.state = ns.STATE.AUX_DOWNFLOW;
+            this.stateUpdatedCallback(this);
+
+            var outContent = this._exclude(toExclude);
+            if (outContent) {
+                var outMessage = {
+                    from: this.id,
+                    to: outContent.dest,
+                    message: codec.encodeMessage(outContent, null,
+                                                 this.askeMember.ephemeralPrivKey,
+                                                 this.askeMember.ephemeralPubKey),
+                };
+                this.protocolOutQueue.push(outMessage);
+                this.queueUpdatedCallback(this);
             }
         } else {
             if (this.askeMember.isSessionAcknowledged() &&
@@ -6325,13 +6324,9 @@ define('mpenc/handler',[
                             || (this.state === ns.STATE.AUX_DOWNFLOW))) {
                 this.refresh();
             } else {
-                this.fullRefresh();
+                this.fullRefresh((toKeep.length > 0) ? toKeep : undefined);
             }
         }
-        // harder case: fullRefresh
-        // * else run fullRefresh():
-        // *      set privKey = null, intermediateKeys = []
-        // *      run _start()
     };
 
 
@@ -6352,7 +6347,6 @@ define('mpenc/handler',[
         }
 
         switch (classify.category) {
-            // FIXME: When setting the out-bound wire message's `to` field, make sure that a broadcast goes to the room JID!
             case codec.MESSAGE_CATEGORY.MPENC_ERROR:
                 this.uiQueue.push({
                     type: 'error',
@@ -6390,7 +6384,7 @@ define('mpenc/handler',[
                     decodedMessage = codec.decodeMessageContent(classify.content);
                 }
 
-                if (decodedMessage.data !== undefined) {
+                if (decodedMessage.data) {
                     // This is a normal communication/data message.
                     if (decodedMessage.signatureOk === false) {
                         // Signature failed, abort!
@@ -6410,7 +6404,9 @@ define('mpenc/handler',[
                         var outMessage = {
                             from: this.id,
                             to: outContent.dest,
-                            message: codec.encodeMessage(outContent),
+                            message: codec.encodeMessage(outContent, null,
+                                                         this.askeMember.ephemeralPrivKey,
+                                                         this.askeMember.ephemeralPubKey),
                         };
                         this.protocolOutQueue.push(outMessage);
                         this.queueUpdatedCallback(this);
@@ -6432,16 +6428,59 @@ define('mpenc/handler',[
      * @method
      * @param messageContent {string}
      *     Unencrypted message content to be sent (plain text or HTML).
-     * @param extra {*}
-     *     Use this argument to pass any additional metadata that you want to be used later in your implementation code
+     * @param metadata {*}
+     *     Use this argument to pass additional meta-data to be used later in
+     *     plain text (unencrypted) in the implementation.
      */
-    ns.ProtocolHandler.prototype.send = function(messageContent, extra) {
+    ns.ProtocolHandler.prototype.send = function(messageContent, metadata) {
         _assert(this.state === ns.STATE.INITIALISED,
                 'Messages can only be sent in initialised state.');
         var outMessage = {
             from: this.id,
-            to: '', // FIXME: use proper room JID.
-            extra: extra,
+            to: '',
+            metadata: metadata,
+            message: codec.encodeMessage(messageContent,
+                                         this.cliquesMember.groupKey.substring(0, 16),
+                                         this.askeMember.ephemeralPrivKey,
+                                         this.askeMember.ephemeralPubKey),
+        };
+        this.messageOutQueue.push(outMessage);
+        this.queueUpdatedCallback(this);
+    };
+
+
+    /**
+     * Sends a message confidentially to an individual participant.
+     *
+     * *Warning:*
+     *
+     * A directed message is sent to one recipient only *to avoid network
+     * traffic.* For the current implementation, from a protection point of
+     * view the message has to be considered public in a group communication
+     * context. This means, that this mechanism is unsuitable for exchanging
+     * conversation transcripts with group participants in the presence of
+     * participants who are not entitled to *all* messages within the
+     * transcript!
+     *
+     * @method
+     * @param messageContent {string}
+     *     Unencrypted message content to be sent (plain text or HTML).
+     * @param to {string}
+     *     Recipient of a directed message (optional, default is to send to
+     *     entire group). *Note:* See warning on confidentiality above!
+     * @param metadata {*}
+     *     Use this argument to pass additional meta-data to be used later in
+     *     plain text (unencrypted) in the implementation.
+     */
+    ns.ProtocolHandler.prototype.sendTo = function(messageContent, to, metadata) {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'Messages can only be sent in initialised state.');
+        _assert(to && (to.length > 0),
+                'A recipient has to be given.');
+        var outMessage = {
+            from: this.id,
+            to: to,
+            metadata: metadata,
             message: codec.encodeMessage(messageContent,
                                          this.cliquesMember.groupKey.substring(0, 16),
                                          this.askeMember.ephemeralPrivKey,

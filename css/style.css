@@ -5472,7 +5472,7 @@ div .fm-tree-folder.dragover {
 	box-sizing: border-box;
 }
 .fm-chat-header {
-	height: 80px;
+	height: 90px;
 	background-color: #f6f6f6;
 }
 .fm-chat-avatar-block {
@@ -6098,6 +6098,8 @@ div .fm-tree-folder.dragover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin-right: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
 }
 .fm-chat-header .local-video-container {
 	border: 1px solid red;
@@ -6109,6 +6111,14 @@ div .fm-tree-folder.dragover {
 	width: 70px;
 	height: 70px;
 }
+
+.fm-chat-header .local-video-container.muted * {
+    visibility: hidden;
+}
+.fm-chat-header .local-video-container.muted {
+    background-color: black;
+}
+
 /** debug chat audio/video **/
 
 /** debug emoticons **/
@@ -6124,6 +6134,34 @@ div .fm-tree-folder.dragover {
 }
 /** end of debug emoticons **/
 
+
+/** debug call action buttons **/
+.fm-chat-header .temp-controls {
+    margin-top: 6px;
+}
+.fm-chat-header .call-actions {
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+
+    padding: 1px 4px;
+    margin-right: 4px;
+
+    border: 2px solid #b2b2b2;
+    background-color: white;
+    color: #363b3b;
+}
+
+.fm-chat-header .call-actions:hover {
+    border: 2px solid #b2b2b2;
+    background-color: #b2b2b2;
+    color: white;
+}
+/** end of debug call action buttons **/
 .fm-tree-folder.contact span.avatar span.fm-chat-verified {
 	background-image: url(../images/mega/chat-sprite.png?v=2);
 	background-position: 0 0;

@@ -740,6 +740,14 @@ function loginDialog(close)
 		if (c.indexOf('checkboxOff') > -1) $('.login-checkbox').attr('class','login-checkbox checkboxOn');
 		else $('.login-checkbox').attr('class','login-checkbox checkboxOff');
 	});	
+	
+	$('.top-login-forgot-pass').unbind('click');
+	$('.top-login-forgot-pass').bind('click',function(e)
+	{
+		document.location.hash = 'recovery';
+		loginDialog(1);
+	});
+	
 	$('.top-dialog-login-button').unbind('click');
 	$('.top-dialog-login-button').bind('click',function(e)
 	{
@@ -802,6 +810,13 @@ function loginDialog(close)
 		$('.top-login-warning').removeClass('hidden');
 		$(this).addClass('hidden');
 	});
+	
+	$('.top-login-input-block').unbind('click');
+	$('.top-login-input-block').bind('click',function(e)
+	{
+		$(this).find('input').focus();
+	});
+	
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').unbind('click');
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').bind('click',function(e)
 	{		
@@ -888,7 +903,6 @@ function mLogout()
 			document.location.reload();
 		}
 	}
-
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;			
 	if (u_type === 0 && cnt > 0)

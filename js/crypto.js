@@ -1149,6 +1149,22 @@ function api_checkconfirmcode(ctx,c)
 	res = api_req({ a : 'uc', c : c },ctx);
 }
 
+function api_resetuser(ctx,c,email,pw)
+{
+    // start fresh account
+    api_create_u_k();
+    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
+
+    var ssc = Array(4);
+	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
+    
+    api_req({ a : 'erx',
+              c : c,
+              x : a32_to_base64(encrypt_key(pw_aes,u_k)),
+              y : stringhash(email.toLowerCase(),pw_aes),
+              z : base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k),ssc))) },ctx);
+}
+
 function api_resetkeykey(ctx,c,key,email,pw)
 {
     ctx.c = c;

@@ -1,4 +1,4 @@
-var login_txt=false;
+var login_txt=false,login_email=false;
 
 function dologin()
 {
@@ -226,6 +226,8 @@ function pagelogin()
 
 function init_login()
 {
+	if (login_email) $('#login-name2').val(login_email);
+
 	if (confirmok)
 	{
 		$('.main-top-info-block').removeClass('hidden');
@@ -306,8 +308,19 @@ function init_login()
 			$('.login-check').removeClass('checkboxOff');		
 		}
 	});
+	
+	$('.login-forgot-password').unbind('click');
+	$('.login-forgot-password').bind('click',function(e)
+	{
+		document.location.hash = 'recovery';
+	});
+	
+	$('.login-register-input').unbind('click');
+	$('.login-register-input').bind('click',function(e)
+	{
+		$(this).find('input').focus();
+	});
 }
-
 
 function postlogin()
 {

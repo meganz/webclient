@@ -11,7 +11,7 @@ function init_backup()
 	$('.backup-download-button').bind('click',function()
 	{
 		var blob = new Blob([a32_to_base64(u_k)], {type: "text/plain;charset=utf-8"});
-		saveAs(blob, 'MEGA-KEY-BACKUP.txt');		
+		saveAs(blob, 'MEGA-MASTERKEY.txt');		
 	});	
 	
 	

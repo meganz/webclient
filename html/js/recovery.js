@@ -36,11 +36,18 @@ function init_recovery()
 		if (e.keyCode == 13) startRecovery();
 	});
 		
-	if (u_type)
-	{
-		msgDialog('info','Please log out','You cannot use the account recovery procedure while being logged in.',false,function(e)
+	if (u_type === 0)
+	{		
+		msgDialog('info',l[135],l[1944],false,function(e)
 		{
 			document.location.hash = 'start';
+		});
+	}
+	else if (u_type)
+	{
+		msgDialog('warninga',l[135],l[1945].replace('[X]',u_attr.email),false,function(e)
+		{
+			document.location.hash = 'backup';
 		});
 	}
 }
@@ -65,7 +72,7 @@ function startRecovery()
 			callback : function (res) 
 			{
 				loadingDialog.hide();
-				if (res == ENOENT) msgDialog('warningb','Email not found','We have account on record with the email address you provided.');
+				if (res == ENOENT) msgDialog('warningb',l[1513],l[1946]);
 				else if (res == '0') 
 				{
 					$('.fm-dialog.reset-success .reg-success-txt').text(l[735]);

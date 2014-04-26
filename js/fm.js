@@ -4460,7 +4460,7 @@ function linksDialog(close)
 	});	
 	
 
-	if (document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox)
+	if (is_extension)
 	{
 		if (!is_chrome_firefox) 
 		{			

@@ -4,14 +4,14 @@ function init_reset()
 {
 	if (u_type)
 	{
-		msgDialog('warningb','Error','You cannot use the account recovery procedure while being logged in. Please log out and try again.',false,function(e)
+		msgDialog('warningb',l[135],l[1971],false,function(e)
 		{
-			document.location.hash = 'help';
+			document.location.hash = 'help/account';
 		});	
 		return false;	
 	}
 	loadingDialog.show();	
-	recoverycode = page.replace('recover','');	
+	recoverycode = page.replace('recover','');
 	api_req({a:'erv',c:recoverycode},
 	{ 
 		callback : function (res) 
@@ -20,15 +20,15 @@ function init_reset()
 			if (typeof res == 'number')
 			{
 				if (res == EEXPIRED) 				
-					msgDialog('warninga','Reovery Link Expired','This recovery link has expired, please try again.','',function()
+					msgDialog('warninga',l[1966],l[1967],'',function()
 					{
 						document.location.hash = 'recovery';					
 					});			
 				else					
-					msgDialog('warninga','Invalid Recovery Link','Invalid link, please try again.','',function()
+					msgDialog('warninga',l[1968],l[1969],'',function()
 					{
 						document.location.hash = 'recovery';					
-					});							
+					});
 			}
 			else
 			{
@@ -44,7 +44,7 @@ function init_reset()
 					$('.withkey #key-input2').unbind('blur');
 					$('.withkey #key-input2').bind('blur',function()
 					{
-						if ($(this).val() == '') $(this).val('Or enter your key here');
+						if ($(this).val() == '') $(this).val(l[1970]);
 					});		
 					
 					$('.withkey .backup-input-button').unbind('click');
@@ -68,7 +68,7 @@ function init_reset()
 							var f = e.target.files[0];
 							if (f && f.size > 100) 
 							{
-								msgDialog('warningb','Filesize too large','The file you selected appears to be too large. Please make sure you select the correct file containing your 22 character master key.');
+								msgDialog('warningb',l[1972],l[1973]);
 							}
 							else if (f)
 							{					
@@ -85,6 +85,7 @@ function init_reset()
 				}
 				else if (res[0] == 10)
 				{
+					recoveryemail = res[1];
 					$('.main-mid-pad.backup-recover.withoutkey').removeClass('hidden');	
 					$('.backup-notification-block').removeClass('hidden');
 				}			
@@ -112,9 +113,76 @@ function init_reset()
 	$('.restore-verify-button').unbind('click');
 	$('.restore-verify-button').bind('click',function(e)
 	{
-		recovery_reset_pw();
+		var c = $(this).attr('class');
+		if (c && c.indexOf('reset-account') > -1) delete_reset_pw();
+		else recovery_reset_pw();
 	});	
 	init_reset_pw();
+	
+	$('.new-registration-checkbox').unbind('click');
+	$('.new-registration-checkbox').bind('click',function(e)
+	{
+		var c = $('.register-check').attr('class');
+		if (c && c.indexOf('checkboxOn') > -1)  $('.register-check').removeClass('checkboxOn').addClass('checkboxOff');		
+		else $('.register-check').addClass('checkboxOn').removeClass('checkboxOff');		
+	});
+	
+	$('.login-register-input').unbind('click');
+	$('.login-register-input').bind('click',function(e)
+	{
+		$(this).closest('input').focus();
+	});
+}
+
+function delete_reset_pw()
+{
+	var c = $('.register-check').attr('class');	
+	if ($('#withoutkey-password').val() == l[909])
+	{
+		msgDialog('warninga',l[135],l[741]);
+		return;	
+	}
+	else if ($('#withoutkey-password').val() !== $('#withoutkey-password2').val())
+	{
+		msgDialog('warninga',l[135],l[715]);
+		return;	
+	}
+	else if (c && c.indexOf('checkboxOff') > -1)
+	{
+		msgDialog('warninga',l[135],l[1974]);
+		return;	
+	}
+	loadingDialog.show();
+	api_resetuser({callback:function(code)
+	{
+		loadingDialog.hide();
+		if (code == 0)
+		{
+			msgDialog('info',l[1975],l[1976],'',function()
+			{
+				login_email = recoveryemail;
+				document.location.hash = 'login';
+			});
+		}
+		else if (code == EKEY)
+		{
+			msgDialog('warningb',l[1977],l[1978]);
+			$('.recover-block.error').removeClass('hidden');
+		}
+		else if (code == EBLOCKED)
+		{
+			msgDialog('warningb',l[1979],l[1980]);
+		}
+		else if (code == EEXPIRED || code == ENOENT)
+		{
+			msgDialog('warninga',l[1966],l[1967],'',function()
+			{
+				document.location.hash = 'recovery';					
+			});
+		}
+	}},recoverycode,recoveryemail,$('#withoutkey-password').val());
+
+
 }
 
 function recovery_reset_pw()
@@ -129,32 +197,35 @@ function recovery_reset_pw()
 		msgDialog('warninga',l[135],l[715]);
 		return;	
 	}
-	var recoverypassword = $('#withkey-password').val();
 	loadingDialog.show();
 	api_resetkeykey({result:function(code) 
-	{	
+	{
 		loadingDialog.hide();
 		if (code == 0)
 		{
-			msgDialog('info','Password reset','Your password has been reset successfully. Please log into your account now.','',function()
+			msgDialog('info',l[1955],l[1981],'',function()
 			{
 				login_email = recoveryemail;
 				document.location.hash = 'login';
-			});			
+			});
 		}
 		else if (code == EKEY)
 		{
-			msgDialog('warningb','Invalid key','The key you supplied does not match with this account. Please make sure you use the correct key and try again.');
+			msgDialog('warningb',l[1977],l[1978]);
 			$('.recover-block.error').removeClass('hidden');
+		}
+		else if (code == EBLOCKED)
+		{
+			msgDialog('warningb',l[1979],l[1980]);
 		}
 		else if (code == EEXPIRED || code == ENOENT)
 		{
-			msgDialog('warninga','Recovery link expired','Your recovery link has expired, please try again.','',function()
+			msgDialog('warninga',l[1966],l[1967],'',function()
 			{
 				document.location.hash = 'recovery';					
 			});
 		}
-	} },recoverycode,base64_to_a32(recoverykey),recoveryemail,recoverypassword);
+	} },recoverycode,base64_to_a32(recoverykey),recoveryemail,$('#withkey-password').val());
 }
 
 
@@ -172,15 +243,19 @@ function verify_key(key)
 		}
 		else if (code == EKEY)
 		{
-			msgDialog('warningb','Invalid key','The key you supplied does not match with this account. Please make sure you use the correct key and try again.');
+			msgDialog('warningb',l[1977],l[1978]);
 			$('.recover-block.error').removeClass('hidden');
+		}
+		else if (code == EBLOCKED)
+		{
+			msgDialog('warningb',l[1979],l[1980]);
 		}
 		else if (code == EEXPIRED || code == ENOENT)
 		{
-			msgDialog('warninga','Recovery link expired','Your recovery link has expired, please try again.','',function()
+			msgDialog('warninga',l[1966],l[1967],'',function()
 			{
 				document.location.hash = 'recovery';					
-			});	
+			});
 		}
 		loadingDialog.hide();	
 	} },recoverycode,base64_to_a32(key));

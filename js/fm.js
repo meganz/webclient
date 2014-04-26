@@ -2108,7 +2108,8 @@ var FMShortcuts = function() {
 
     // bind
     $(window).bind('keydown.fmshortcuts', function(e) {
-				
+		
+		if (!is_fm()) return true;
 	
         e = e || window.event;
 

@@ -309,10 +309,16 @@ function init_login()
 		}
 	});
 	
-	$('.login-forgot-password').unbind('click');
-	$('.login-forgot-password').bind('click',function(e)
+	$('.top-login-forgot-pass').unbind('click');
+	$('.top-login-forgot-pass').bind('click',function(e)
 	{
 		document.location.hash = 'recovery';
+	});
+	
+	$('.login-page-create-new span').unbind('click');
+	$('.login-page-create-new span').bind('click',function(e)
+	{
+		document.location.hash = 'register';
 	});
 	
 	$('.login-register-input').unbind('click');

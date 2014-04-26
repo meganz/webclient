@@ -708,7 +708,7 @@ else
 			if ((p > jsl_perc) && (p <= 100))
 			{
 				jsl_perc = p;
-				if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) p=100;
+				if (is_extension) p=100;
 				document.getElementById('loadinganim').className = 'loading-progress-bar percents-'+p;
 			}
 		}
@@ -866,7 +866,7 @@ else
 	}
 	function boot_done()
 	{
-		lxhr, dxhr = undefined;
+		lxhr = dlxhr = undefined;
 		if (loginresponse === true || dl_res === true || !jsl_done) return;
 		else if (loginresponse)
 		{

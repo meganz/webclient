@@ -1762,7 +1762,7 @@ function accountUI()
 			document.location.hash = 'resellers';		
 		});
 		
-		if (ssl_needed() || (document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) $('#acc_use_ssl').hide();
+		if (is_extension || ssl_needed()) $('#acc_use_ssl').hide();
 		
 		$('.usessl').removeClass('radioOn').addClass('radioOff');		
 		var i = 7;

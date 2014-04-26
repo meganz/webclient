@@ -881,6 +881,11 @@ input.radioOn, input.radioOff {
 	padding-right: 25px;
 	padding-top: 7px;
 }
+.reset-pass .radio-txt {
+	display:block;
+	margin-left:32px;
+	float:none;
+}
 .nt-settings .radio-txt {
 	padding-bottom: 7px;
 }
@@ -14861,7 +14866,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	border-color: #D42400;
 	background-color: #D42400;
 	color: white;
-}
+}	
 .reset-account-lock-image {
 	height: 375px;
 	background-image: url(../images/mega/encr-sprite.png?v=1);

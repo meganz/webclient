@@ -13120,7 +13120,7 @@ h1.help-home-header {
 .help-block:hover {
 	border: 5px solid #D21F00;
 	margin: 37px 0 -3px 0;
-	height: 136px;
+	min-height: 136px;
 }
 .help-short-icon {
 	display: table-cell;

@@ -316,6 +316,9 @@ var MegaChat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
+
+    self.incomingCallDialog = new MegaIncomingCallDialog();
+
     return this;
 };
 
@@ -1612,15 +1615,13 @@ var MegaChatRoom = function(megaChat, roomJid) {
         self.options.mediaOptions.video = false;
         self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
 
-        $('.local-video-container', self.$header).addClass("muted");
-
         resetCallStateInCall();
     });
     $('.btn-chat-video-unmute', self.$header).bind('click.megaChat', function() {
         self.options.mediaOptions.video = true;
         self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
 
-        $('.local-video-container', self.$header).removeClass("muted");
+
 
         resetCallStateInCall();
     });
@@ -1633,6 +1634,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
                 mediaOptions: self.getMediaOptions()
             });
 
+            if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
+                self.activateWindow();
+            }
+
             resetCallStateInCall();
         };
 
@@ -1641,6 +1646,51 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
             self.trigger('call-declined', eventData);
         };
+
+        var participants = self.getParticipantsExceptMe();
+
+        if(self.type == "private") {
+
+            assert(participants[0], "No participants found.");
+
+
+            var contact = self.megaChat.getContactFromJid(participants[0]);
+
+            if(!contact) {
+                console.warn("Contact not found: ", participants[0]);
+            } else {
+
+                var avatar = undefined;
+                if(avatars[contact.u]) {
+                    avatar = avatars[contact.u].url;
+                }
+
+                self.megaChat.incomingCallDialog.show(
+                    self.megaChat.getContactNameFromJid(participants[0]),
+                    avatar,
+                    function() {
+                        self.options.mediaOptions.audio = true;
+                        self.options.mediaOptions.video = false;
+
+                        doAnswer();
+                    },
+                    function() {
+                        self.options.mediaOptions.audio = true;
+                        self.options.mediaOptions.video = true;
+
+                        doAnswer();
+                    },
+                    function() {
+                        doCancel();
+                    }
+                );
+            }
+
+        } else {
+            throw new Error("Not implemented"); //TODO: Groups, TBD
+        }
+
+
 
         var $answer = $('.btn-chat-answer-incoming-call', self.$header);
         $answer.unbind('click.megaChat');
@@ -1711,8 +1761,14 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
         if(!self.options.mediaOptions.video) {
             $('.btn-chat-video-unmute', self.$header).show();
+
+            $('.local-video-container', self.$header).addClass("muted");
+
         } else {
             $('.btn-chat-video-mute', self.$header).show();
+
+            $('.local-video-container', self.$header).removeClass("muted");
+
         }
 
         $('.btn-chat-cancel-active-call', self.$header).show();
@@ -2305,6 +2361,23 @@ MegaChatRoom.prototype.show = function() {
     self.trigger('activity');
 };
 
+
+/**
+ * If this is not the currently active room, then this method will navigate the user to this room (using window.location)
+ */
+MegaChatRoom.prototype.activateWindow = function() {
+    var self = this;
+
+    if(self.type == "private") {
+        var participants = self.getParticipantsExceptMe();
+        var contact = self.megaChat.getContactFromJid(participants[0]);
+        if(contact) {
+            window.location = "#fm/chat/" + contact.h;
+        }
+    } else {
+        throw new Error("Not implemented");
+    }
+};
 
 /**
  * Hide the UI elements of this room

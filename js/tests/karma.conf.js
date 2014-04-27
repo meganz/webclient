@@ -34,6 +34,7 @@ module.exports = function(config) {
              "../chat/rtcSession.js",
 
              "../megafilepicker.js",
+             "../chat/megaIncomingCallDialog.js",
 
              "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",

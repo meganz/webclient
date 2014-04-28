@@ -14,7 +14,6 @@ function init_backup()
 		saveAs(blob, 'MEGA-MASTERKEY.txt');		
 	});	
 	
-	
 	if (is_extension)
 	{
 		$('.backup-input-button').unbind('mouseover');

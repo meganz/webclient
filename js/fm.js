@@ -3815,27 +3815,29 @@ function renameDialog()
 		$('.rename-dialog .fm-dialog-input-clear').unbind('click');
 		$('.rename-dialog .fm-dialog-input-clear').bind('click',function()  
 		{
-			$('.rename-dialog input').val('');			
+			var n = M.d[$.selected[0]];
+			var ext = fileext(n.name);			
+			if (ext.length > 0) ext = '.' + ext;			
+			if (n.t) ext = '';
+			$('.rename-dialog input').val(ext);
 			$('.rename-dialog').removeClass('active');
-		});		
-		$('.rename-dialog input').unbind('keyup');
-		$('.rename-dialog input').bind('keyup',function()  
-		{
-			if ($(this).val() == '') $('.rename-dialog').removeClass('active');
-			else $('.rename-dialog').addClass('active');
-		});		
+			$('.rename-dialog input')[0].selectionStart=0;
+			$('.rename-dialog input')[0].selectionEnd=0;
+			$('.rename-dialog input').focus();
+		});				
 		$('.fm-dialog-rename-button').unbind('click');
 		$('.fm-dialog-rename-button').bind('click',function()  
 		{
-			dorename();
+			var c = $('.rename-dialog').attr('class');
+			if (c && c.indexOf('active') > -1) dorename();
 		});
-		var n = M.d[$.selected[0]];		
+		var n = M.d[$.selected[0]];
 		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
 		else $('.rename-dialog .fm-dialog-title').text(l[426]);		
 		$('.rename-dialog input').val(n.name);		
-		if (!n.t)
-		{
-			var ext = fileext(n.name);
+		var ext = fileext(n.name);
+		if (!n.t && ext.length > 0)
+		{			
 			$('.rename-dialog input')[0].selectionStart=0;
 			$('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
 		}
@@ -3844,9 +3846,11 @@ function renameDialog()
 		$('.rename-dialog input').bind('click keydown keyup keypress',function(e)
 		{
 			var n = M.d[$.selected[0]];
-			if (!n.t)
-			{
-				var ext = fileext(n.name);
+			var ext = fileext(n.name);			
+			if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) $('.rename-dialog').removeClass('active');
+			else $('.rename-dialog').addClass('active');			
+			if (!n.t && ext.length > 0)
+			{			
 				if (this.selectionStart > $('.rename-dialog input').val().length - ext.length-2)
 				{
 					this.selectionStart = $('.rename-dialog input').val().length - ext.length-1;

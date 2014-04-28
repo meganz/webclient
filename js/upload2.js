@@ -720,6 +720,10 @@ function isQueueActive(q) {
 function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
 	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
+	
+	if (dl_queue.length == 0 && ul_queue == 0) {
+		clearXhr(); /* destroy all xhr */
+	}	
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
 

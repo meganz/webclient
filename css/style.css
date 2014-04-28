@@ -7117,10 +7117,10 @@ div .fm-tree-folder.dragover {
 .context-menu-item.move-item:hover {
 	background-position: left -8094px;
 }
-.context-menu-item.remove-item, .context-menu-item.clearbin-item, .context-menu-item.canceltransfer-item {
+.context-menu-item.remove-item, .context-menu-item.clearbin-item, .context-menu-item.canceltransfer-item, .context-menu-item.removeshare-item {
 	background-position: left -8144px;
 }
-.context-menu-item.remove-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.canceltransfer-item:hover {
+.context-menu-item.remove-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.canceltransfer-item:hover, .context-menu-item.removeshare-item:hover {
 	background-position: left -8194px;
 }
 .context-menu-item.addcontact-item {
@@ -16830,10 +16830,10 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .top-icons-block .context-menu-item.move-item:hover {
 	background-position: right -8092px;
 }
-.rtl .top-icons-block .context-menu-item.remove-item, .rtl .top-icons-block .context-menu-item.clearbin-item, .rtl .top-icons-block .context-menu-item.canceltransfer-item {
+.rtl .top-icons-block .context-menu-item.remove-item, .rtl .top-icons-block .context-menu-item.clearbin-item, .rtl .top-icons-block .context-menu-item.canceltransfer-item,.rtl .top-icons-block .context-menu-item.removeshare-item {
 	background-position: right -8142px;
 }
-.rtl .top-icons-block .context-menu-item.remove-item:hover, .rtl .top-icons-block .context-menu-item.clearbin-item:hover, .rtl .top-icons-block .context-menu-item.canceltransfer-item:hover {
+.rtl .top-icons-block .context-menu-item.remove-item:hover, .rtl .top-icons-block .context-menu-item.clearbin-item:hover, .rtl .top-icons-block .context-menu-item.canceltransfer-item:hover, .rtl .top-icons-block .context-menu-item.removeshare-item:hover {
 	background-position: right -8192px;
 }
 .rtl .top-icons-block .context-menu-item.addcontact-item {

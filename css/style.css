@@ -15114,11 +15114,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	min-width: 648px;
 	margin-left: -334px;
 }
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 728px;
+	margin-left: -384px;
+}
 }
 @media only screen and (max-width: 1362px) {
-.ads .download-mid-centered-block {
-	min-width: 648px;
-}
 .ads .downloading-progress {
 	width: 300px;
 }
@@ -15127,9 +15128,25 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads .download-mid-centered-block {
 	min-width: 635px;
 }
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 728px;
+	margin-left: -384px;
+}
 .ads.fr .new-download-button-txt2 {
 	font-size: 10px;
 	line-height: 18px;
+}
+}
+@media only screen and (max-width: 1296px) {
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 428px;
+	margin-left: -214px;
+}
+.ads .download-mid-centered-block.not-available-some-reason .new-download-icon {
+	display:none;
+}
+.ads .download-mid-centered-block.not-available-some-reason .new-download-right-block {
+	margin-left:0;
 }
 }
 @media only screen and (max-width: 1157px) {
@@ -15138,6 +15155,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .ads .download-mid-centered-block {
 	margin-left: -190px;
+}
+.ads .download-mid-centered-block.not-available-some-reason {
+	margin-left: -64px;
 }
 }
 @media only screen and (max-height:  833px) {

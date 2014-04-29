@@ -1041,11 +1041,10 @@ function MegaData ()
 					var j =[];
 					for (var i in ctx.cn)
 					{
-						M.delNode(ctx.cn[i]);			
-						j.push({a:'d',n:cn[i],i:requesti});
+						M.delNode(ctx.cn[i]);									
+						api_req({a:'d',n:cn[i],i:requesti});
 					}					
-					api_req(j);
-				}			
+				}		
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
 				if (res.f) process_f(res.f);

@@ -192,7 +192,7 @@ function FileSystemAPI(dl_id, dl) {
 			failed = false; /* reset error flag */
 			dl_fw.seek(dl_position);
 			return setTimeout(function() {
-				dl_fw.write(new Blob([buffer]));
+				dl_fw.write(new Blob([dl_buffer]));
 			}, 2000);
 		}
 		dl_writing = false;

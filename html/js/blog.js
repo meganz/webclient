@@ -275,8 +275,7 @@ function blog_load()
 			{
 				var by = 'Admin';
 				
-				if (blogposts[i].by) by = blogposts[i].by;				
-				if (parseInt(i) > 0) blogcontent += '<div class="blog-new-div"><div></div></div>';		
+				if (blogposts[i].by) by = blogposts[i].by;		
 				blogcontent +='<div class="blog-new-item">';
 				blogcontent +='<h2>' + blogposts[i].h + '</h2>';
 				blogcontent +='<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';

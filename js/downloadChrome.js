@@ -11,6 +11,8 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_writing
 		, dl_position = 0
 		, dl_buffer
+		, dl_paused = false
+		, dl_paused = false
 		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl
@@ -191,10 +193,20 @@ function FileSystemAPI(dl_id, dl) {
 		if (failed) {
 			failed = false; /* reset error flag */
 			dl_fw.seek(dl_position);
+			DEBUG('IO: error, retrying and pausing dlQueue');
+			dlQueue.pause(); /* pause all downloads */
+			dl_paused = true;
 			return setTimeout(function() {
 				dl_fw.write(new Blob([dl_buffer]));
 			}, 2000);
 		}
+
+		if (dl_paused) {
+			dlQueue.resume();
+			DEBUG('IO: done, resuming dlQueue');
+			dl_paused = false;
+		}
+
 		dl_writing = false;
 		dl_done(); /* notify writer */
 

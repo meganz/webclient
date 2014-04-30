@@ -82,7 +82,7 @@ body {
 	display: none;
 }
 .italic {
-	font-style:italic;
+	font-style: italic;
 }
 a, a:link, a:visited, a:hover, a:active {
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
@@ -2072,6 +2072,12 @@ a.blog-new-archive-lnk {
 	color: #3F4646;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	margin-top: 10px;
+}
+.blog-search-header {
+	padding: 40px 0 0 0;
+}
+.blog-text-selection {
+	background:#f6d3cc;
 }
 .blog-pagination-button {
 	display: inline-block;
@@ -4909,7 +4915,7 @@ th.grid-first-th {
 }
 .fm-breadcrumbs.calendar {
 	background-image: url(../images/mega/blog-new-sprite_v2.png);
-    background-repeat: no-repeat;
+	background-repeat: no-repeat;
 	background-position: -194px -151px;
 }
 .fm-breadcrumbs.recycle-bin, .fm-share-breadcrumbs.recycle-bin {

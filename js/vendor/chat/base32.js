@@ -3,7 +3,7 @@
 // This would be the place to edit if you want a different
 // Base32 implementation
 
-    var alphabet = '0123456789abcdefghjkmnpqrtuvwxyz'
+    var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'.toLowerCase();
     var alias = { o:0, i:1, l:1, s:5 }
 
     /**

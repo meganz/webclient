@@ -67,11 +67,10 @@ function FileSystemAPI(dl_id, dl) {
 		clearit(0,0,function(s) {
 			// clear persistent files:
 			clearit(1,0,function(s) {
-				if (chrome_write_error_msg == 21 && !$.msgDialog) {
+				if (++chrome_write_error_msg % 21 == 0 && !$.msgDialog) {
 					chrome_write_error_msg=0;
 					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
 				}
-				chrome_write_error_msg++;
 				
 				setTimeout(function() {
 					failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';

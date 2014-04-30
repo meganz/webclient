@@ -365,6 +365,8 @@ else
         jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'mega_js', j:1,w:7});
 
+        jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
+
         // Other
         jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
 

@@ -29,6 +29,7 @@ module.exports = function(config) {
              "../vendor/chat/strophe.roster.js",
              "../vendor/chat/wildemitter.patched.js",
              "../vendor/chat/hark.patched.js",
+             "../vendor/chat/base32.js",
              "../vendor/Autolinker.js",
 
              "../chat/rtcSession.js",

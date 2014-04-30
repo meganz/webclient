@@ -1,23 +1,18 @@
  <div class="main-scroll-block">
    <div class="main-pad-block">
       ((TOP))
-	  
-	  
-		<!-- reset without key -->
-			
           <div class="main-mid-pad backup-recover withoutkey notification hidden">
             <div class="main-left-block">
-              <h3 class="main-italic-header">Reset password</h3>
+              <h3 class="main-italic-header">[$1947]</h3>
               <div class="register-st2-txt-block">
-               <p>
-                   Your password is also your encryption key, so when you lose it you risk losing access to your data.</span>
-               </p>
+               <p>[$1948]</p>
+			   <h3 class="main-italic-header">[$1949]</h3>
                <div class="login-register-input password first">
 			        <div class="top-login-input-tooltip">
 				      <div class="top-login-tooltip-arrow">
 					    <div class="top-loginp-tooltip-txt password">
-					       Invalid password.
-					       <div class="white-txt password">Please strengthen your password.</div>
+					       [$1102]
+					       <div class="white-txt password">[$1104]</div>
 					    </div>
 				      </div>
 			        </div>
@@ -28,7 +23,6 @@
 			        <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif"></div>
 			        <input type="text" name="login-password" id="withoutkey-password" value="[$909]">
                </div>
-                  
                <div class="new-registration good1"> 
 			        <div class="register-pass-status-line1"></div> 
 			        <div class="register-pass-status-line2"></div> 
@@ -37,105 +31,77 @@
 			        <div class="register-pass-status-line5"></div> 
 			        <div class="password-stutus-txt hidden">
 			          <div class="new-reg-status-pad">
-			            <strong>Strength:</strong>
-			            Password status
+			            <strong>[$1105]</strong>
+			            [$1106]
 			          </div>
-			          <div class="new-reg-status-description">
-                        Your password is easily guessed. Try making your password longer. Combine uppercase & lowercase letters. Add special characters. Do not use names or dictionary words.                       
-			          </div>
+			          <div class="new-reg-status-description">[$1120]</div>
 			        </div>
-               </div>
-                  
+               </div>                  
                <div class="login-register-input password confirm">
 			        <div class="top-login-input-tooltip">
 				      <div class="top-login-tooltip-arrow">
 					     <div class="top-loginp-tooltip-txt">
-					       Passwords do not match.
-					      <div class="white-txt">Please try again</div>
+					       [$1107]
+					      <div class="white-txt">[$969]</div>
 					     </div>
 				      </div>
 			        </div>
 			        <input type="text" name="login-password2" id="withoutkey-password2" value="[$1114]">
-               </div>
-               
-               <div class="new-registration-checkbox">
+               </div>               
+               <div class="new-registration-checkbox reset-pass">
 			     <div class="register-check checkboxOff"></div>
-			     <label class="radio-txt">I am aware that all my files will be deleted.</label>
+			     <label class="radio-txt" style="line-height:25px; margin-bottom:20px;">[$1950]</label>
 			     <div class="clear"></div>
 		       </div>
-               <!-- Please add "active" classname to activate the button !-->   
-               <div class="restore-verify-button reset-account active">
-                    Reset password
-               </div>
+               <div class="restore-verify-button reset-account active">[$1951]</div>
                <div class="clear"></div>
               </div>
-            </div>
-            
+            </div>            
             <div class="main-right-block">
                <div class="reset-account-lock-image"></div>
-            </div>
-            
+            </div>            
             <div class="clear"></div>  
-          </div>
-                    
+          </div>                   
           <div class="backup-notification-block hidden">
              <div class="backup-notification-icon">
                   <div class="backup-notification-txt">
-                      <span>Note:</span> we do keep a backup of your data for at least another 60 days.<br/> Should you do remember your password, please contact our support department who can assist you in your attempt to regain access to your data.
+                      <span>[$1952]</span> [$1953]<br/> [$1954]
                   </div>
              </div>
-          </div>
-		  
-		  
-		  
-		  
-		  
-		  
-		  <!-- reset with key -->
+          </div>		  
           <div class="main-mid-pad backup-recover withkey hidden">
             <div class="main-left-block">
-              <h3 class="main-italic-header">Account recovery</h3>
+              <h3 class="main-italic-header">[$1955]</h3>
               <div class="register-st2-txt-block">
-               <p>
-                   To proceed, please submit the encryption key of your account. If you lost your encryption key you can still <a href="#recover">reset</a> your account, but you will then not be able to regain access to your data.</span>
-               </p>
+               <p>[$1956]</p>
+			   <p>[$1957]</p>
                <h5 class="main-italic-header">
-                    <span class="red">Use your local key backup</span>
+                    <span class="red">[$1958]</span>
                </h5>
-               <!-- Add class "uploading" to show percents !-->
                <div class="recover-upload-block">                  
                   <div class="backup-file-info hidden">
-                      <!-- please hide 2 spans if its needed. Please add "success" or "fail" classnames according uploading status. !-->
                       <span class="restore-uploading-status-icon success"> </span>
-                      <span class="tranfer-filetype-txt">README.txt</span>
+                      <span class="tranfer-filetype-txt">file.txt</span>
                   </div>
 				  <input type="file" id="key-upload-field" style="display:none;">
-                  <label for="key-upload-field" class="backup-download-button">Select key file</label>
+                  <label for="key-upload-field" class="backup-download-button">[$1959]</label>
                </div>
-               <!-- Please add "fail" class to add fail icon !-->
                <div class="login-register-input">
-                  <div class="backup-input-button">Verify</div>
-                  <input type="text" name="key-input2" id="key-input2" value="Or enter your key here">
+                  <div class="backup-input-button">[$1960]</div>
+                  <input type="text" name="key-input2" id="key-input2" value="[$1970]">
                </div>
-               
-               
               </div>
-            </div>
-            
-            <!-- Remove "hidden" class if upload is succes !-->
+            </div>            
             <div class="main-right-block recover-block success hidden">
-               <h3 class="main-italic-header"><span class="green">Great!</span></h3>
+               <h3 class="main-italic-header"><span class="green">[$1938]</span></h3>
                <div class="register-st2-txt-block">
-                  <p>
-                     You have successfully regained access to your account. Please choose a new password below:
-                  </p>
-                  
+                  <p>[$1961]</p>                  
                   <div class="login-register-input password first">
 			        <div class="top-login-input-tooltip">
 				      <div class="top-login-tooltip-arrow">
 					    <div class="top-loginp-tooltip-txt password">
-					       Invalid password.
-					       <div class="white-txt password">Please strengthen your password.</div>
+					       [$1102]
+					       <div class="white-txt password">[$1104]</div>
 					    </div>
 				      </div>
 			        </div>
@@ -145,8 +111,7 @@
 			        </div>
 			        <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif"></div>
 			        <input type="text" name="login-password" id="withkey-password" value="Password">
-                  </div>
-                  
+                  </div>                  
                   <div class="new-registration"> 
 			        <div class="register-pass-status-line1"></div> 
 			        <div class="register-pass-status-line2"></div> 
@@ -155,59 +120,41 @@
 			        <div class="register-pass-status-line5"></div> 
 			        <div class="password-stutus-txt hidden">
 			          <div class="new-reg-status-pad">
-			            <strong>Strength:</strong>
-			            Password status
+			            <strong>[$1105]</strong>
+			            [$1106]
 			          </div>
 			          <div class="new-reg-status-description">
-                        Your password is easily guessed. Try making your password longer. Combine uppercase & lowercase letters. Add special characters. Do not use names or dictionary words.                       
+                        [$1120]                      
 			          </div>
 			        </div>
-                  </div>
-                  
+                  </div>                  
                   <div class="login-register-input password confirm">
 			        <div class="top-login-input-tooltip">
 				      <div class="top-login-tooltip-arrow">
 					     <div class="top-loginp-tooltip-txt">
-					       Passwords do not match.
-					      <div class="white-txt">Please try again</div>
+					       [$1107]
+					      <div class="white-txt">[$969]</div>
 					     </div>
 				      </div>
 			        </div>
 			        <input type="text" name="login-password2" id="withkey-password2" value="Retype Password">
-		          </div>
-                  
+		          </div>                  
                   <div class="restore-verify-button active">
-                    Validate password
+                    [$1962]
                   </div>
-                  <div class="clear"></div>
-                  
-                 
+                  <div class="clear"></div>                     
                </div>
-            </div>
-            
-            <!-- Remove "hidden" class if user clicked "No" !-->
+            </div>            
             <div class="main-right-block recover-block error hidden">
                <h3 class="main-italic-header"><span class="red">Oops.</span></h3>
                <div class="register-st2-txt-block">
-                  <p>
-                    It seems that the key that you provided is incorrect.
-                  </p>
-				  <p>
-                    Are you sure you provided the correct key?
-                  </p>
-                  <p>
-                    If you don't have the correct key, you can still do a full <a href="#recovery">account reset</a>.
-                  </p>
+                  <p>[$1963]</p>
+				  <p>[$1964]</p>
+                  <p>[$1965]</p>
                </div>
-            </div>
-            
-            
+            </div>			
             <div class="clear"></div>  
-          </div>
-          <!-- end !-->
-	  
-      
-	  	  
+          </div>	  	  
 		  ((BOTTOM))
   </div>
 </div>

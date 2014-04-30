@@ -2,27 +2,31 @@ window.URL = window.URL || window.webkitURL;
 var have_ab = typeof ArrayBuffer != 'undefined' && typeof DataView != 'undefined';
 var use_workers = have_ab && typeof Worker != 'undefined';
 
-if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0))
+if (is_extension)
 {
-	use_workers=false;
-	have_ab=false;
+	var use_ssl = 0;
 }
-
-var ssl_off = [ 'Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16' ];
-var ssl_opt = [ 'Chrome/' ];
-
-function ssl_needed()
+else
 {
-	for (var i = ssl_opt.length; i--; ) if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) return 0;
-	for (var i = ssl_off.length; i--; ) if (navigator.userAgent.indexOf(ssl_off[i]) >= 0) return -1;
-	return 1;
+	if ((navigator.appVersion.indexOf('Safari') > 0) && (navigator.appVersion.indexOf('Version/5') > 0))
+	{
+		use_workers=false;
+		have_ab=false;
+	}
+
+	var ssl_off = [ 'Firefox/14', 'Firefox/15', 'Firefox/17', 'Safari', 'Firefox/16' ];
+	var ssl_opt = [ 'Chrome/' ];
+
+	function ssl_needed()
+	{
+		for (var i = ssl_opt.length; i--; ) if (navigator.userAgent.indexOf(ssl_opt[i]) >= 0) return 0;
+		for (var i = ssl_off.length; i--; ) if (navigator.userAgent.indexOf(ssl_off[i]) >= 0) return -1;
+		return 1;
+	}
+	var use_ssl = ssl_needed();
+	if (!use_ssl && localStorage.use_ssl) use_ssl = 1;
+	else use_ssl++;
 }
-
-var use_ssl = ssl_needed();
-if (!use_ssl && localStorage.use_ssl) use_ssl = 1;
-else use_ssl++;
-
-if ((document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) use_ssl=0;
 
 var chromehack = navigator.appVersion.indexOf('Chrome/');
 chromehack = chromehack >= 0 && parseInt(navigator.appVersion.substr(chromehack+7)) > 21;
@@ -265,10 +269,10 @@ function base64_to_a32(s)
 	return str_to_a32(base64urldecode(s));
 }
 
-var is_chrome_firefox_enable=false;
+var firefox_boost = is_chrome_firefox && !!localStorage.fxboost;
 
 // ArrayBuffer to binary string
-var ab_to_str = is_chrome_firefox_enable ? mozAB2S : function(ab)
+var ab_to_str = firefox_boost ? mozAB2S : function(ab)
 {
 	var b = '', i;
 	
@@ -295,7 +299,7 @@ function ab_to_base64(ab)
 }
 
 // ArrayBuffer to binary with depadding
-var ab_to_str_depad = is_chrome_firefox_enable ? mozAB2SDepad : function(ab)
+var ab_to_str_depad = firefox_boost ? mozAB2SDepad : function(ab)
 {
 	var b, i;
 
@@ -776,12 +780,12 @@ function dec_attr(attr,key)
 	}
 }
 
-var to8 = is_chrome_firefox_enable ? mozTo8 : function(unicode)
+var to8 = firefox_boost ? mozTo8 : function(unicode)
 {
 	return unescape(encodeURIComponent(unicode));
 }
 
-var from8 = is_chrome_firefox_enable ? mozFrom8 : function(utf8)
+var from8 = firefox_boost ? mozFrom8 : function(utf8)
 {
 	return decodeURIComponent(escape(utf8));
 }
@@ -1191,6 +1195,22 @@ function api_createuser(ctx,invitecode,invitename,uh)
 function api_checkconfirmcode(ctx,c)
 {
 	res = api_req({ a : 'uc', c : c },ctx);
+}
+
+function api_resetuser(ctx,c,email,pw)
+{
+    // start fresh account
+    api_create_u_k();
+    var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
+
+    var ssc = Array(4);
+	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
+    
+    api_req({ a : 'erx',
+              c : c,
+              x : a32_to_base64(encrypt_key(pw_aes,u_k)),
+              y : stringhash(email.toLowerCase(),pw_aes),
+              z : base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k),ssc))) },ctx);
 }
 
 function api_resetkeykey(ctx,c,key,email,pw)

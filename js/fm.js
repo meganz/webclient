@@ -688,23 +688,44 @@ function ephemeralDialog(msg)
 
 function fmremove()
 {
-	var filecnt=0,foldercnt=0,contactcnt=0;
+	var filecnt=0,foldercnt=0,contactcnt=0,removesharecnt=0;
 	for (var i in $.selected)
 	{
-		if ($.selected[i].length == 11) contactcnt++;
+		var n = M.d[$.selected[i]];
+		if (n && n.p.length == 11) removesharecnt++;
+		else if ($.selected[i].length == 11) contactcnt++;
 		else if (M.d[$.selected[i]].t) foldercnt++;
 		else filecnt++;		
 	}
 	
-	if (contactcnt)
+	if (removesharecnt)
+	{
+		for(var i in $.selected)
+		{
+			M.delNode($.selected[i]);
+			api_req({a:'d',n:$.selected[i],i:requesti});
+			delete u_sharekeys[$.selected[i]];
+		}
+	}
+	else if (contactcnt)
 	{
 		msgDialog('confirmation',l[1001],l[1002].replace('[X]',M.d[$.selected[0]].name),false,function(e)
 		{
 			if (e)
-			{
+			{				
 				for(var i in $.selected)
-				{					
-					M.delNode($.selected[i]);					
+				{
+					if (M.c[$.selected[i]])
+					{
+						for (var sharenode in M.c[$.selected[i]])
+						{
+							console.log(sharenode);
+							M.delNode(sharenode);
+							api_req({a:'d',n:sharenode,i:requesti});
+							delete u_sharekeys[sharenode];						
+						}					
+					}
+					M.delNode($.selected[i]);
 					api_req({a:'ur',u:$.selected[i],l:'0',i: requesti});
 				}
 			}
@@ -829,6 +850,12 @@ function initContextUI()
 	
 	$(c+'.remove-item').unbind('click');
 	$(c+'.remove-item').bind('click',function(event) 
+	{
+		fmremove();
+	});
+	
+	$(c+'.removeshare-item').unbind('click');
+	$(c+'.removeshare-item').bind('click',function(event) 
 	{
 		fmremove();
 	});
@@ -1762,7 +1789,7 @@ function accountUI()
 			document.location.hash = 'resellers';		
 		});
 		
-		if (ssl_needed() || (document.location.href.substr(0,19) == 'chrome-extension://') || is_chrome_firefox) $('#acc_use_ssl').hide();
+		if (is_extension || ssl_needed()) $('#acc_use_ssl').hide();
 		
 		$('.usessl').removeClass('radioOn').addClass('radioOff');		
 		var i = 7;
@@ -2108,7 +2135,8 @@ var FMShortcuts = function() {
 
     // bind
     $(window).bind('keydown.fmshortcuts', function(e) {
-				
+		
+		if (!is_fm()) return true;
 	
         e = e || window.event;
 
@@ -3335,18 +3363,10 @@ function menuItems()
 {
 	var items = [];
 	var sourceRoot = RootbyId($.selected[0]);			
-	if ($.selected.length == 1 && RightsbyID($.selected[0]) > 0)
-	{					
-		// $(t).filter('.rename-item').show();				
-		items['rename'] = 1;
-	}
+	if ($.selected.length == 1 && RightsbyID($.selected[0]) > 1) items['rename'] = 1;
 	if (RightsbyID($.selected[0]) > 0)
-	{
-		//$(t).filter('.remove-item,.add-star-item').show();	
-		
-		items['remove'] = 1;
-		items['add-star'] = 1;
-		
+	{	
+		items['add-star'] = 1;		
 		$.delfav=1;
 		for (var i in $.selected)
 		{
@@ -3356,31 +3376,18 @@ function menuItems()
 		if ($.delfav) $('.add-star-item').text(l[976]);				
 		else $('.add-star-item').text(l[975]);
 	}
-	if ($.selected.length == 1 && M.d[$.selected[0]].t)
-	{
-		//$(t).filter('.open-item').show();
-		items['open'] = 1;				
-	}
-	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name))
-	{					
-		items['preview'] = 1;
-	}
-	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink)
-	{
-		//$(t).filter('.sharing-item').show();			
-		items['sharing'] = 1;
-	}
+	var n = M.d[$.selected[0]];
+	if (n && n.p.length == 11) items['removeshare'] = 1;
+	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
+	if ($.selected.length == 1 && M.d[$.selected[0]].t) items['open'] = 1;					
+	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name)) items['preview'] = 1;	
+	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) items['sharing'] = 1;	
 	if (sourceRoot == M.RootID && !folderlink)
 	{
-		//$(t).filter('.move-item,.getlink-item').show();
 		items['move'] = 1;
 		items['getlink'] = 1;
 	}
-	else if (sourceRoot == M.RubbishID && !folderlink)
-	{
-		//$(t).filter('.move-item').show();
-		items['move'] = 1;
-	}
+	else if (sourceRoot == M.RubbishID && !folderlink) items['move'] = 1;
 	
 	items['download'] = 1;
 	items['zipdownload'] = 1;
@@ -3814,27 +3821,29 @@ function renameDialog()
 		$('.rename-dialog .fm-dialog-input-clear').unbind('click');
 		$('.rename-dialog .fm-dialog-input-clear').bind('click',function()  
 		{
-			$('.rename-dialog input').val('');			
+			var n = M.d[$.selected[0]];
+			var ext = fileext(n.name);			
+			if (ext.length > 0) ext = '.' + ext;			
+			if (n.t) ext = '';
+			$('.rename-dialog input').val(ext);
 			$('.rename-dialog').removeClass('active');
-		});		
-		$('.rename-dialog input').unbind('keyup');
-		$('.rename-dialog input').bind('keyup',function()  
-		{
-			if ($(this).val() == '') $('.rename-dialog').removeClass('active');
-			else $('.rename-dialog').addClass('active');
-		});		
+			$('.rename-dialog input')[0].selectionStart=0;
+			$('.rename-dialog input')[0].selectionEnd=0;
+			$('.rename-dialog input').focus();
+		});				
 		$('.fm-dialog-rename-button').unbind('click');
 		$('.fm-dialog-rename-button').bind('click',function()  
 		{
-			dorename();
+			var c = $('.rename-dialog').attr('class');
+			if (c && c.indexOf('active') > -1) dorename();
 		});
-		var n = M.d[$.selected[0]];		
+		var n = M.d[$.selected[0]];
 		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
 		else $('.rename-dialog .fm-dialog-title').text(l[426]);		
 		$('.rename-dialog input').val(n.name);		
-		if (!n.t)
-		{
-			var ext = fileext(n.name);
+		var ext = fileext(n.name);
+		if (!n.t && ext.length > 0)
+		{			
 			$('.rename-dialog input')[0].selectionStart=0;
 			$('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
 		}
@@ -3843,9 +3852,11 @@ function renameDialog()
 		$('.rename-dialog input').bind('click keydown keyup keypress',function(e)
 		{
 			var n = M.d[$.selected[0]];
-			if (!n.t)
-			{
-				var ext = fileext(n.name);
+			var ext = fileext(n.name);			
+			if ($(this).val() == '' || (!n.t && ext.length > 0 && $(this).val() == '.' + ext)) $('.rename-dialog').removeClass('active');
+			else $('.rename-dialog').addClass('active');			
+			if (!n.t && ext.length > 0)
+			{			
 				if (this.selectionStart > $('.rename-dialog input').val().length - ext.length-2)
 				{
 					this.selectionStart = $('.rename-dialog input').val().length - ext.length-1;
@@ -4460,7 +4471,7 @@ function linksDialog(close)
 	});	
 	
 
-	if (document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox)
+	if (is_extension)
 	{
 		if (!is_chrome_firefox) 
 		{			

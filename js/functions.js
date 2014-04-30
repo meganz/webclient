@@ -256,7 +256,15 @@ function populate_l()
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
+	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');	
+	l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
+	l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');	
+	l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+	l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+	l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');	
+	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');		
+	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
+	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');		
 	l['year'] = new Date().getFullYear();
 }
 

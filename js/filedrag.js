@@ -120,7 +120,7 @@ function start_upload()
 {
 	if (u_wasloggedin())
 	{
-		msgDialog('confirmation','Starting new account','Do you want to upload your files to a new session?','"No" will allow you to log in and start your upload.',function(e)
+		msgDialog('confirmation',l[1193],l[2001],l[2002],function(e)
 		{
 			if(e) start_anoupload();
 			else loginDialog();

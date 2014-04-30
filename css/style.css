@@ -81,6 +81,9 @@ body {
 .hidden {
 	display: none;
 }
+.italic {
+	font-style: italic;
+}
 a, a:link, a:visited, a:hover, a:active {
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	color: #333333;
@@ -337,11 +340,28 @@ input[type="checkbox"] {
 	margin: 9px 11px 0 0;
 }
 .new-registration-checkbox .checkboxOn, .new-registration-checkbox .checkboxOff {
-	margin: 0 7px 20px 0;
+	margin: 0 11px 20px 0;
 }
 .new-registration-checkbox .register-st2-button {
 	float: right;
 	margin-top: -8px;
+	background-image: none;
+	padding: 0;
+}
+.new-registration-checkbox .register-st2-button-arrow {
+	padding: 0 15px 0 15px;
+	background-image: none;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-radius: 5px;
+}
+.login-page-create-new {
+	float: right;
+	font-size: 13px;
+	padding: 35px 0 0 0;
+}
+.login-page-create-new span {
+	cursor: pointer;
 }
 .fm-dialog .radio-txt, .top-login-popup .radio-txt {
 	padding-top: 17px;
@@ -863,6 +883,11 @@ input.radioOn, input.radioOff {
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	padding-right: 25px;
 	padding-top: 7px;
+}
+.reset-pass .radio-txt {
+	display: block;
+	margin-left: 32px;
+	float: none;
 }
 .nt-settings .radio-txt {
 	padding-bottom: 7px;
@@ -1881,7 +1906,7 @@ form {
 	width: 720px;
 }
 .blog-new-item {
-	padding: 10px 35px 49px 3px;
+	padding: 10px 35px 41px 3px;
 }
 .blog-new.new-bottom-pages h2 {
 	margin: 0;
@@ -2019,7 +2044,7 @@ p a.blog-new-read-more:hover {
 	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
 	border-radius: 15px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-position: -7px -105px;
 	background-repeat: no-repeat;
 	padding: 0 20px 0 30px;
@@ -2047,6 +2072,72 @@ a.blog-new-archive-lnk {
 	color: #3F4646;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	margin-top: 10px;
+}
+.blog-search-header {
+	padding: 40px 0 0 0;
+}
+.blog-text-selection {
+	background:#f6d3cc;
+}
+.blog-pagination-button {
+	display: inline-block;
+	height: 30px;
+	min-width: 30px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0 5px;
+	padding: 0 5px;
+	font-size: 13px;
+	line-height: 30px;
+	text-align: center;
+	background-color: #cccccc;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	color: white;
+	cursor: pointer;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.blog-pagination-button:hover, .blog-pagination-button.active {
+	background-color: #D42400;
+}
+.blog-pagination-button.unavailable, .blog-pagination-button.unavailable:hover {
+	background-color: #f2f2f2;
+	cursor: default;
+}
+.blog-pagination-button.to-the-beggining, .blog-pagination-button.previous, .blog-pagination-button.to-the-end, .blog-pagination-button.next {
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
+	background-repeat: no-repeat;
+}
+.blog-pagination-button.to-the-beggining::before, .blog-pagination-button.previous::before, .blog-pagination-button.to-the-end::before, .blog-pagination-button.next::before {
+	content: '\00a0';
+}
+.blog-pagination-button.to-the-beggining {
+	background-position: 6px -42px;
+}
+.blog-pagination-button.previous {
+	background-position: 10px 8px;
+}
+.blog-pagination-button.to-the-end {
+	background-position: -36px -42px;
+}
+.blog-pagination-button.next {
+	background-position: -30px 8px;
+}
+.blog-pagination {
+	border-top: 2px solid #f2f2f2;
+	padding: 31px 0;
+	margin: 16px 50px 0 0;
+}
+.blog-pagination-pad {
+	margin-right: -15px;
+	text-align: center;
 }
 .facebook-lnk {
 	display: block;
@@ -2115,7 +2206,7 @@ a.blog-new-archive-lnk {
 	position: absolute;
 	left: 0;
 	top: 4px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .social {
@@ -2125,7 +2216,7 @@ a.blog-new-archive-lnk {
 	position: absolute;
 	z-index: 101;
 	display: block;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-position: 0px -269px;
 	background-repeat: no-repeat;
 	width: 18px;
@@ -2178,7 +2269,7 @@ a.blog-new-archive-lnk {
 .rss-view-all {
 	color: #E5391F !important;
 	display: block;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-position: -12px -46px;
 	background-repeat: no-repeat;
 	padding: 0 0 0 17px;
@@ -2213,7 +2304,7 @@ a.blog-new-archive-lnk {
 	display: block;
 	width: 30px;
 	height: 30px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-position: -30px 8px;
 	background-repeat: no-repeat;
 	margin: 26px -6px -6px 10px;
@@ -2227,7 +2318,7 @@ a.blog-new-archive-lnk {
 	display: block;
 	width: 30px;
 	height: 30px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-position: 10px 8px;
 	background-repeat: no-repeat;
 	margin: 26px 0 -6px 10px;
@@ -2349,9 +2440,8 @@ a.blog-new-archive-lnk {
 	font-size: 14px;
 	line-height: 20px;
 	color: #404646;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
 	color: #3F4646;
-	font-weight: bold;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -2368,7 +2458,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: 5px -248px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-minus-sign {
@@ -2380,7 +2470,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -41px -248px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-arrow {
@@ -2392,7 +2482,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -84px -248px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-positive {
@@ -2404,7 +2494,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -116px -248px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-negative {
@@ -2416,7 +2506,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -151px -248px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-strong-recomend {
@@ -2428,7 +2518,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -190px -246px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-recomend {
@@ -2440,7 +2530,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -150px -206px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-not-recomend {
@@ -2452,7 +2542,7 @@ a.blog-new-archive-lnk {
 	float: left;
 	display: block;
 	background-position: -190px -206px;
-	background-image: url(../images/mega/blog-new-sprite.png);
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
 	background-repeat: no-repeat;
 }
 .blog-new-num-txt, .blog-new-num-txtpositive-negative-txt {
@@ -4709,9 +4799,6 @@ th.grid-first-th {
 .backup-file-info span.tranfer-filetype-txt.backup {
 	padding: 0;
 }
-.backup-recover h3.main-italic-header .red, .backup-recover h5.main-italic-header .red {
-	font-family: 'Open Sans Semibold', Arial;
-}
 .fm-browsers-txt {
 	padding: 0 0 0 23px;
 }
@@ -4825,6 +4912,11 @@ th.grid-first-th {
 }
 .fm-breadcrumbs.search, .fm-share-breadcrumbs.search {
 	background-position: 8px -11210px;
+}
+.fm-breadcrumbs.calendar {
+	background-image: url(../images/mega/blog-new-sprite_v2.png);
+	background-repeat: no-repeat;
+	background-position: -194px -151px;
 }
 .fm-breadcrumbs.recycle-bin, .fm-share-breadcrumbs.recycle-bin {
 	background-position: -10px -2448px;
@@ -7099,10 +7191,10 @@ div .fm-tree-folder.dragover {
 .context-menu-item.move-item:hover {
 	background-position: left -8094px;
 }
-.context-menu-item.remove-item, .context-menu-item.clearbin-item, .context-menu-item.canceltransfer-item {
+.context-menu-item.remove-item, .context-menu-item.clearbin-item, .context-menu-item.canceltransfer-item, .context-menu-item.removeshare-item {
 	background-position: left -8144px;
 }
-.context-menu-item.remove-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.canceltransfer-item:hover {
+.context-menu-item.remove-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.canceltransfer-item:hover, .context-menu-item.removeshare-item:hover {
 	background-position: left -8194px;
 }
 .context-menu-item.addcontact-item {
@@ -9433,7 +9525,7 @@ body.new-startpage {
 	width: 20px;
 	height: 20px;
 	float: right;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 1px 4px;
 	background-repeat: no-repeat;
 	margin: 0 12px 5px 0;
@@ -9456,7 +9548,7 @@ body.new-startpage {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin-bottom: 10px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 5px -74px;
 	background-repeat: no-repeat;
 	padding: 0 10px 0 30px;
@@ -9503,7 +9595,7 @@ body.new-startpage {
 	margin-top: 14px;
 }
 .top-login-warning-arrow {
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -10px -506px;
 	background-repeat: no-repeat;
 	width: 30px;
@@ -9515,7 +9607,7 @@ body.new-startpage {
 	width: 13px;
 	height: 14px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -3px -237px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -9534,7 +9626,7 @@ body.new-startpage {
 	float: left;
 	width: 55px;
 	height: 57px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -2px -289px;
 	background-repeat: no-repeat;
 }
@@ -9549,7 +9641,7 @@ body.new-startpage {
 	padding-top: 5px;
 }
 .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff {
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -2px -392px;
 	background-repeat: no-repeat;
 	background-size: auto;
@@ -9579,7 +9671,7 @@ body.new-startpage {
 	width: 5px;
 	height: 26px;
 	position: relative;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -3px -554px;
 	background-repeat: no-repeat;
 	margin-left: -13px;
@@ -9587,7 +9679,7 @@ body.new-startpage {
 .login-notification-icon {
 	width: 16px;
 	height: 16px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 0 -1497px;
 	background-repeat: no-repeat;
 	position: absolute;
@@ -9607,7 +9699,7 @@ body.new-startpage {
 	font-size: 11px;
 	color: #999999;
 	line-height: 21px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 0 -1582px;
 	background-repeat: no-repeat;
 	float: right;
@@ -9623,7 +9715,7 @@ body.new-startpage {
 	width: 12px;
 	height: 5px;
 	position: absolute;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 0 -912px;
 	background-repeat: no-repeat;
 	margin: 0 0 -10px -6px;
@@ -9711,7 +9803,7 @@ body.new-startpage {
 	line-height: 28px;
 	padding-left: 50px;
 	color: white;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: -18px -622px;
 	background-repeat: no-repeat;
 	font-size: 13px;
@@ -9735,7 +9827,7 @@ body.new-startpage {
 h3.main-italic-header {
 	font-size: 20px;
 	line-height: 30px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'Open Sans Semibold', Arial;
 	margin: 0;
 	padding: 25px 0 25px 0;
 	font-weight: normal;
@@ -9744,7 +9836,7 @@ h3.main-italic-header {
 h5.main-italic-header {
 	font-size: 16px;
 	line-height: 28px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'Open Sans Semibold', Arial;
 	margin: 0;
 	padding: 0px 0 5px 0;
 	font-weight: normal;
@@ -9760,7 +9852,7 @@ h5.main-italic-header {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 	margin-bottom: 20px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 9px -69px;
 	background-repeat: no-repeat;
 	padding: 0 10px 0 35px;
@@ -9802,7 +9894,7 @@ h5.main-italic-header {
 	background-position: 9px -109px;
 }
 .login-register-input.green-tick {
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: 6px -585px;
 	background-repeat: no-repeat;
 }
@@ -9824,19 +9916,9 @@ h5.main-italic-header {
 .login-register-input.name.incorrect {
 	background-position: 9px -1099px;
 }
-.login-forgot-password {
-	font-size: 13px;
-	line-height: 21px;
-	cursor: pointer;
-	color: #999999;
-	padding: 0 0 0 37px;
-	margin: 11px 0 22px 0;
-	background-image: url(..//images/mega/top-login-sprite.png?v=4);
-	background-position: 9px -1670px;
-	background-repeat: no-repeat;
-}
-.new-registration-checkbox {
-	padding-left: 9px;
+.login-page-forgot-bl {
+	padding: 0 0 30px 0;
+	margin-top: -10px;
 }
 .register-st2-txt-block {
 	padding-top: 80px;
@@ -9855,7 +9937,7 @@ h5.main-italic-header {
 	float: left;
 	padding-right: 20px;
 	cursor: pointer;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: right -772px;
 	background-repeat: no-repeat;
 	margin-bottom: 20px;
@@ -9873,7 +9955,7 @@ h5.main-italic-header {
 	-webkit-border-top-left-radius: 5px;
 	-moz-border-radius-topleft: 5px;
 	border-top-left-radius: 5px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: right -662px;
 	background-repeat: no-repeat;
 }
@@ -9954,7 +10036,7 @@ h5.main-italic-header {
 .password-status-icon {
 	height: 36px;
 	width: 30px;
-	background-image: url(../images/mega/top-login-sprite.png?v=4);
+	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 2px -1000px;
 	background-repeat: no-repeat;
 	position: absolute;
@@ -13044,7 +13126,7 @@ h1.help-home-header {
 	padding-bottom: 20px;
 }
 .help-block {
-	height: 130px;
+	min-height: 130px;
 	margin: 40px 3px 0 3px;
 	border: 2px solid #d9d9d9;
 	-moz-border-radius: 5px;
@@ -13065,7 +13147,7 @@ h1.help-home-header {
 .help-block:hover {
 	border: 5px solid #D21F00;
 	margin: 37px 0 -3px 0;
-	height: 136px;
+	min-height: 136px;
 }
 .help-short-icon {
 	display: table-cell;
@@ -14578,7 +14660,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .backup-download-block, .recover-upload-block {
 	padding: 15px 0 0 76px;
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: 0 6px;
 	background-repeat: no-repeat;
 	height: 125px;
@@ -14680,7 +14762,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 20px 0 73px;
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: 15px -222px;
 	background-repeat: no-repeat;
 }
@@ -14758,7 +14840,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	position: absolute;
 	width: 24px;
 	height: 24px;
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: -4px -594px;
 	background-repeat: no-repeat;
 }
@@ -14791,7 +14873,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	margin-bottom: -15px;
 }
 .login-register-input.fail {
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: 4px -653px;
 	background-repeat: no-repeat;
 }
@@ -14813,7 +14895,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .reset-account-lock-image {
 	height: 375px;
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: center -860px;
 	background-repeat: no-repeat
 }
@@ -14821,7 +14903,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	font-size: 13px;
 	line-height: 21px;
 	padding-left: 90px;
-	background-image: url(../images/mega/encr-sprite.png?v=1);
+	background-image: url(../images/mega/encr-sprite_v1.png);
 	background-position: -10px -745px;
 	background-repeat: no-repeat;
 }
@@ -15092,11 +15174,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	min-width: 648px;
 	margin-left: -334px;
 }
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 728px;
+	margin-left: -384px;
+}
 }
 @media only screen and (max-width: 1362px) {
-.ads .download-mid-centered-block {
-	min-width: 648px;
-}
 .ads .downloading-progress {
 	width: 300px;
 }
@@ -15105,9 +15188,25 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads .download-mid-centered-block {
 	min-width: 635px;
 }
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 728px;
+	margin-left: -384px;
+}
 .ads.fr .new-download-button-txt2 {
 	font-size: 10px;
 	line-height: 18px;
+}
+}
+@media only screen and (max-width: 1296px) {
+.ads .download-mid-centered-block.not-available-some-reason {
+	min-width: 428px;
+	margin-left: -214px;
+}
+.ads .download-mid-centered-block.not-available-some-reason .new-download-icon {
+	display: none;
+}
+.ads .download-mid-centered-block.not-available-some-reason .new-download-right-block {
+	margin-left: 0;
 }
 }
 @media only screen and (max-width: 1157px) {
@@ -15116,6 +15215,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .ads .download-mid-centered-block {
 	margin-left: -190px;
+}
+.ads .download-mid-centered-block.not-available-some-reason {
+	margin-left: -64px;
 }
 }
 @media only screen and (max-height:  833px) {
@@ -15499,7 +15601,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 170px auto;
 }
  .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
- background-image: url(../images/mega/top-login-sprite@2x.png?v=4);
+ background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
  .reg-success-icon, .reg-st3-membership-icon, .reg-st3-storage, .reg-st3-bandwidth, .reg-st3-save-icon, .reg-st3-save-icon {
@@ -15571,8 +15673,8 @@ a.notification-icon, a.notification-icon:link, a.notification-icon:visited, a.no
 background-image: url(../images/mega/notification-sprite@2x.png);
 background-size: 1814px 30px;
 }
-.blog-new-search, .social-icon, .social-arrow, .rss-view-all, .blog-new-forward, .blog-new-back, .blog-plus-sign, .blog-minus-sign, .blog-new-arrow, .blog-new-positive, .blog-new-negative, .blog-new-strong-recomend, .blog-new-recomend, .blog-new-not-recomend {
-background-image: url(../images/mega/blog-new-sprite@2x.png);
+.blog-new-search, .social-icon, .social-arrow, .rss-view-all, .blog-new-forward, .blog-new-back, .blog-plus-sign, .blog-minus-sign, .blog-new-arrow, .blog-new-positive, .blog-new-negative, .blog-new-strong-recomend, .blog-new-recomend, .blog-new-not-recomend, .blog-pagination-button.to-the-beggining, .blog-pagination-button.previous, .blog-pagination-button.to-the-end, .blog-pagination-button.next, .fm-breadcrumbs.calendar {
+background-image: url(../images/mega/blog-new-sprite@2x_v2.png);
 background-size: 217px auto;
 }
 .new-left-menu-icon.help-icon, .help-nw .dev-new-button, .help-listing, .help-short-icon {
@@ -15653,7 +15755,7 @@ background-image: url(../images/mega/new-download@2x.png);
 background-size: 340px auto;
 }
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
-background-image: url(../images/mega/encr-sprite@2x.png?v=1);
+background-image: url(../images/mega/encr-sprite@2x_v1.png);
  background-size: 216px;
 }
 }
@@ -16755,10 +16857,10 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .top-icons-block .context-menu-item.move-item:hover {
 	background-position: right -8092px;
 }
-.rtl .top-icons-block .context-menu-item.remove-item, .rtl .top-icons-block .context-menu-item.clearbin-item, .rtl .top-icons-block .context-menu-item.canceltransfer-item {
+.rtl .top-icons-block .context-menu-item.remove-item, .rtl .top-icons-block .context-menu-item.clearbin-item, .rtl .top-icons-block .context-menu-item.canceltransfer-item, .rtl .top-icons-block .context-menu-item.removeshare-item {
 	background-position: right -8142px;
 }
-.rtl .top-icons-block .context-menu-item.remove-item:hover, .rtl .top-icons-block .context-menu-item.clearbin-item:hover, .rtl .top-icons-block .context-menu-item.canceltransfer-item:hover {
+.rtl .top-icons-block .context-menu-item.remove-item:hover, .rtl .top-icons-block .context-menu-item.clearbin-item:hover, .rtl .top-icons-block .context-menu-item.canceltransfer-item:hover, .rtl .top-icons-block .context-menu-item.removeshare-item:hover {
 	background-position: right -8192px;
 }
 .rtl .top-icons-block .context-menu-item.addcontact-item {

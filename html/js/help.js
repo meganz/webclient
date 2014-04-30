@@ -121,15 +121,17 @@ function init_help()
 }
 
 
-l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
-l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');		
+l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
+l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[A]','<a href="#mobile">').replace('[/A]','</a>');
 l[1863] = l[1863].replace('[B]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/B]','</a>');
-l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">').replace('[/C]','</a>');	
+l[1863] = l[1863].replace('[C]','<a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">').replace('[/C]','</a>');
 l[1862] = l[1862].replace('[A]','<a href="https://play.google.com/store/apps/details?id=com.flyingottersoftware.mega" target="_blank">').replace('[/A]','</a>');
-l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/A]','</a>');	
+l[1860] = l[1860].replace('[A]','<a href="https://itunes.apple.com/app/mega/id706857885" target="_blank">').replace('[/A]','</a>');
 l[1828] = l[1828].replace('[A]','<a href="#sync">').replace('[/A]','</a>');
-
+l[1996] = l[1996].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+l[1998]	= l[1998].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
+l[1838] = l[1838].replace('"Debris"','"Rubbish"');
 
 
 var helpdata = 
@@ -322,7 +324,21 @@ var helpdata =
 {
 	// q: 'I have forgotten my password. Can I reset it?',
 	q: l[340],
-	a: '<p>' + l[341] + '</p>',
+	a: '<p>' + l[1994] + '</p>',
+	c: [3],
+	i: 1
+},
+{
+	// q: I just remembered the password of my old account after performing a password reset. How do I get my data back?
+	q: l[1995],
+	a: '<p>' + l[1996] + '</p>',
+	c: [3],
+	i: 1
+},
+{
+	// q: 'MEGA is asking me to make a backup of my master encryption key, why?',
+	q: l[1997],
+	a: '<p>' + l[1998] + '</p>',
 	c: [3],
 	i: 1
 },
@@ -373,11 +389,6 @@ var helpdata =
 	c: [4]
 },
 {
-	q: l[1835],
-	a: '<p>' + l[1836] + '</p>',
-	c: [4]
-},
-{
 	q: l[1837],
 	a: '<p>' + l[1838] + '</p>',
 	c: [4]
@@ -393,22 +404,20 @@ var helpdata =
 	c: [4]
 },
 {
-	q: l[1843],
-	a: '<p>' + l[1844] + '</p>',
-	c: [4]
-},
-{
 	q: l[1845],
 	a: '<p>' + l[1846] + '</p><p>' + l[1847] + '</p><p>' + l[1848] + '</p> ',
 	c: [4]
 },
-
+{
+	q: l[1999],
+	a: '<p>' + l[2000] + '</p>',
+	c: [4]
+},
 {
 	q: l[1886],
 	a: '<p>' + l[1887] + '</p>',
 	c: [4]
 },
-
 {
 	q: l[1849],
 	a: '<p>' + l[1850] + '</p>',
@@ -438,6 +447,8 @@ var helpdata =
 	a: '<p>' + l[1858] + '</p>',
 	c: [4]
 },
+
+
 
 // iOS
 {

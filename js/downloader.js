@@ -293,6 +293,8 @@ ClassFile.prototype.run = function(task_done) {
 			}));
 		});
 
+		delete self.dl.urls;
+
 		self.emptyFile = false;
 		if (tasks.length == 0) {
 			self.emptyFile = true;
@@ -329,6 +331,7 @@ ClassFile.prototype.run = function(task_done) {
 			return false;
 		}
 		var info = dl_queue.splitFile(res.s);
+		self.dl.url  = res.g;
 		self.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
 		return self.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
 	});

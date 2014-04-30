@@ -111,11 +111,9 @@ function init_page()
 		document.location.hash = 'signup' + localStorage.signupcode;
 		return false;
 	}
-
 	$('.top-head').remove();
 	$('#loading').hide();
-	if (loadingDialog) loadingDialog.hide();	
-		
+	if (loadingDialog) loadingDialog.hide();
 	
 	page = page.replace('%21','!').replace('%21','!');
 	
@@ -211,7 +209,6 @@ function init_page()
 		}});
 		return false;
 	}	
-	
 	if (localStorage.voucher && u_type !== false)
 	{
 		api_req({a: 'uavr',v: localStorage.voucher},
@@ -222,8 +219,7 @@ function init_page()
 			}
 		});
 		delete localStorage.voucher;
-	}
-	
+	}	
 	if (page.substr(0,10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));	
@@ -240,13 +236,12 @@ function init_page()
 		blogmonth = page.substr(5,page.length-2);	
 		page = 'blog';			
 	}
-
 	if (page.substr(0,6) == 'signup')
 	{
 		var signupcode = page.substr(6,page.length-1);
 		loadingDialog.show();
 		api_req({ a: 'uv',c: signupcode},
-		{ 
+		{
 		  callback : function(res)
 		  {
 			loadingDialog.hide();
@@ -261,7 +256,7 @@ function init_page()
 				document.location.hash = 'start';
 			}
 			else if(u_type === false)			
-			{	
+			{
 				localStorage.signupcode = signupcode;
 				localStorage.registeremail = res;
 				document.location.hash = 'register';
@@ -278,10 +273,10 @@ function init_page()
 				});
 			}
 		  }
-		});			
-	}	
+		});
+	}
 	else if (page == 'newpw')
-	{		
+	{
 		setpwset(pwchangecode,{callback: function(res) 
 		{
 			loadingDialog.hide();
@@ -304,7 +299,7 @@ function init_page()
 		}});
 	}
 	else if (page == 'confirm')
-	{				
+	{
 		loadingDialog.show();
 		var ctx = 
 		{
@@ -334,7 +329,7 @@ function init_page()
 			}
 		}
 		verifysignupcode(confirmcode,ctx);		
-	}		
+	}	
 	else if (u_type == 2)
 	{
 		parsepage(pages['key']);
@@ -412,9 +407,9 @@ function init_page()
 	}
 	else if (page == 'backup' && !u_type)
 	{
-		login_next = page;
 		login_txt = l[1298];
-		document.location.hash = 'login';
+		parsepage(pages['login']);
+		init_login();
 	}
 	else if (page == 'backup')
 	{
@@ -740,6 +735,14 @@ function loginDialog(close)
 		if (c.indexOf('checkboxOff') > -1) $('.login-checkbox').attr('class','login-checkbox checkboxOn');
 		else $('.login-checkbox').attr('class','login-checkbox checkboxOff');
 	});	
+	
+	$('.top-login-forgot-pass').unbind('click');
+	$('.top-login-forgot-pass').bind('click',function(e)
+	{
+		document.location.hash = 'recovery';
+		loginDialog(1);
+	});
+	
 	$('.top-dialog-login-button').unbind('click');
 	$('.top-dialog-login-button').bind('click',function(e)
 	{
@@ -802,6 +805,13 @@ function loginDialog(close)
 		$('.top-login-warning').removeClass('hidden');
 		$(this).addClass('hidden');
 	});
+	
+	$('.top-login-input-block').unbind('click');
+	$('.top-login-input-block').bind('click',function(e)
+	{
+		$(this).find('input').focus();
+	});
+	
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').unbind('click');
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').bind('click',function(e)
 	{		
@@ -888,7 +898,6 @@ function mLogout()
 			document.location.reload();
 		}
 	}
-
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;			
 	if (u_type === 0 && cnt > 0)

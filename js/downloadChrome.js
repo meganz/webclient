@@ -12,7 +12,6 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_position = 0
 		, dl_buffer
 		, dl_paused = false
-		, dl_paused = false
 		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl

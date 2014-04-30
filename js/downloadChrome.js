@@ -62,6 +62,26 @@ function FileSystemAPI(dl_id, dl) {
 
 	// dl_createtmpfile  {{{
 	var that = this;
+
+	function free_space(error_message) {
+		/* error */
+		clearit(0,0,function(s) {
+			// clear persistent files:
+			clearit(1,0,function(s) {
+				if (chrome_write_error_msg == 21 && !$.msgDialog) {
+					chrome_write_error_msg=0;
+					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+				}
+				chrome_write_error_msg++;
+			});
+		});
+	
+		setTimeout(function() {
+			failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
+			dl_ack_write();
+		}, 2000);
+	}
+
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
@@ -88,29 +108,18 @@ function FileSystemAPI(dl_id, dl) {
 					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
-						failed = e;
-						//dl_ack_write();
+						/* try to release disk space and retry */
+						free_space(e);
 					}
 	
 					dl_fw.onwriteend = function() {
-						if (dl_fw.position == targetpos) return dl_ack_write();
+						if (dl_fw.position == targetpos) {
+							chrome_write_error_msg=0; /* reset error counter */
+							return dl_ack_write();
+						}
 	
-						/* error */
-						clearit(0,0,function(s) {
-							// clear persistent files:
-							clearit(1,0,function(s) {
-								if (chrome_write_error_msg == 21 && !$.msgDialog) {
-									chrome_write_error_msg=0;
-									msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
-								}
-								chrome_write_error_msg++;
-							});
-						});
-	
-						setTimeout(function() {
-							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
-							dl_ack_write();
-						}, 2000);
+						/* try to release disk space and retry */
+						free_space();
 					}
 	
 					zfileEntry = fileEntry;
@@ -192,6 +201,7 @@ function FileSystemAPI(dl_id, dl) {
 	function dl_ack_write() {
 		if (failed) {
 			failed = false; /* reset error flag */
+			/* retry */
 			dl_fw.seek(dl_position);
 			DEBUG('IO: error, retrying and pausing dlQueue');
 			dlQueue.pause(); /* pause all downloads */

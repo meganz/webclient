@@ -73,13 +73,14 @@ function FileSystemAPI(dl_id, dl) {
 					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
 				}
 				chrome_write_error_msg++;
+				
+				setTimeout(function() {
+					failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
+					dl_ack_write();
+				}, 2000);
 			});
 		});
 	
-		setTimeout(function() {
-			failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
-			dl_ack_write();
-		}, 2000);
 	}
 
 	function dl_createtmpfile(fs) {
@@ -108,8 +109,7 @@ function FileSystemAPI(dl_id, dl) {
 					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
-						/* try to release disk space and retry */
-						free_space(e);
+						/* onwriteend() will take care of it */
 					}
 	
 					dl_fw.onwriteend = function() {

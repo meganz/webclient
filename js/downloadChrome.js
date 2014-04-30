@@ -211,6 +211,9 @@ function FileSystemAPI(dl_id, dl) {
 		}
 
 		if (dl_paused) {
+			if ($.msgDialog) {
+				closeDialog();
+			}
 			dlQueue.resume();
 			DEBUG('IO: done, resuming dlQueue');
 			dl_paused = false;

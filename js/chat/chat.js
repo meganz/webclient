@@ -1155,7 +1155,7 @@ MegaChat.prototype.getJidFromNodeId = function(nodeId) {
 //    var hash = simpleStringHashCode(nodeId) + "";
 //    return "test-" + hash.substr(-1) + "@sandbox.developers.mega.co.nz";
 
-    return base32.encode(nodeId) + "@" + this.options.xmppDomain;
+    return baseenc.b32encode(nodeId) + "@" + this.options.xmppDomain;
 };
 
 /**

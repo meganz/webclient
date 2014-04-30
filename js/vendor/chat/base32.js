@@ -4,7 +4,7 @@ var baseenc = baseenc || {};
 
 baseenc.b32encode = function(s) {
     /* encodes a string s to base32 and returns the encoded string */
-    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".toLowerCase();
 
     var parts = [];
     var quanta= Math.floor((s.length / 5));

@@ -277,6 +277,7 @@ var MegaChat = function() {
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
+        'xmppDomain': "sandbox.developers.mega.co.nz",
         'rtcSession': {
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
@@ -1151,9 +1152,10 @@ MegaChat.prototype.reorderContactTree = function() {
 MegaChat.prototype.getJidFromNodeId = function(nodeId) {
     assert(nodeId, "Missing nodeId for getJidFromNodeId");
 
-    // TODO: fake function that should be replaced with a real node ID -> jabber id conversion
-    var hash = simpleStringHashCode(nodeId) + "";
-    return "test-" + hash.substr(-1) + "@sandbox.developers.mega.co.nz";
+//    var hash = simpleStringHashCode(nodeId) + "";
+//    return "test-" + hash.substr(-1) + "@sandbox.developers.mega.co.nz";
+
+    return nodeId + "@" + this.options.xmppDomain;
 };
 
 /**
@@ -1163,8 +1165,10 @@ MegaChat.prototype.getJidFromNodeId = function(nodeId) {
  */
 MegaChat.prototype.getMyXMPPPassword = function() {
     // TODO: Replace me w/ a real function that will give us the password for logging in the jabber server
-    var self = this;
-    return self.getJidFromNodeId(u_handle).split("@")[0];
+//    var self = this;
+//    return self.getJidFromNodeId(u_handle).split("@")[0];
+
+    return u_sid ? u_sid.substr(0, 16) : false;
 };
 
 

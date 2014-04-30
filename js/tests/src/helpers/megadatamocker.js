@@ -11,6 +11,7 @@ var MegaDataMocker = function() {
         window,
         {
             'u_handle': "A_123456789",
+            'u_sid': "c5N5zoeMFzja_tScIA3QQVo2aWpwS0NsT184ggY0ta9BlkYxFfmIDdkvig",
             'avatars': {},
             'M': {
                 'u': {

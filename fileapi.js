@@ -441,6 +441,8 @@ function mozFrom8(utf8) {
 						}
 					},
 					downloadDone: function(fn,f) {
+						if(!mozPrefs.getBoolPref('notifydl')) return;
+
 						if(f) {
 							mozAlert(fn,'Download Finished.',function(s,t) {
 								if(t == 'alertclickcallback') try {
@@ -845,6 +847,11 @@ function mozFrom8(utf8) {
 
 		return folder;
 	};
+
+	if (!mozPrefs.getPrefType('notifydl'))
+	{
+		mozPrefs.setBoolPref('notifydl', true);
+	}
 
 	if (!mozPrefs.getPrefType('dir'))
 	{

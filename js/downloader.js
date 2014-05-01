@@ -281,6 +281,7 @@ ClassFile.prototype.run = function(task_done) {
 
 	this.dl.io.begin = function() {
 		var tasks = [];
+		DEBUG('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
 		$.each(self.dl.urls||[], function(key, url) {
 			tasks.push(new ClassChunk({
 				url: url.url, 

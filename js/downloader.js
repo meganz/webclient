@@ -4,7 +4,7 @@ var fetchingFile = null
 	 *	XHR fetching, useful when we have internet
 	 *  faster than our IO (first world problem) 
 	 */
-	, IO_THROTTLE = 2
+	, IO_THROTTLE = 3
 
 // Chunk fetch {{{
 var GlobalProgress = {};
@@ -378,7 +378,7 @@ function dl_writer(dl, is_ready) {
 	}, 1);
 
 	dl.writer.on('queue', function() {
-		if (dl.writer._queue.length <= IO_THROTTLE && !dlQueue.isPaused()) {
+		if (dl.writer._queue.length >= IO_THROTTLE && !dlQueue.isPaused()) {
 			DEBUG("IO_THROTTLE: pause XHR");
 			dlQueue.pause();
 			paused = true;
@@ -386,7 +386,7 @@ function dl_writer(dl, is_ready) {
 	});
 
 	dl.writer.on('working', function() {
-		if (dl.writer._queue.length > IO_THROTTLE && paused) {
+		if (dl.writer._queue.length < IO_THROTTLE && paused) {
 			DEBUG("IO_THROTTLE: resume XHR");
 			dlQueue.resume();
 			paused = false;

@@ -1,4 +1,10 @@
 var fetchingFile = null
+	/**
+	 *  How many queue IO we want before pausing the 
+	 *	XHR fetching, useful when we have internet
+	 *  faster than our IO (first world problem) 
+	 */
+	, IO_THROTTLE = 2
 
 // Chunk fetch {{{
 var GlobalProgress = {};
@@ -341,6 +347,7 @@ ClassFile.prototype.run = function(task_done) {
 // }}}
 
 function dl_writer(dl, is_ready) {
+	var paused = false;
 	is_ready = is_ready || function() { return true; };
 
 	dl.decrypter = 0;
@@ -369,6 +376,22 @@ function dl_writer(dl, is_ready) {
 			task.null = null
 		});
 	}, 1);
+
+	dl.writer.on('queue', function() {
+		if (dl.writer._queue.length <= IO_THROTTLE && !dlQueue.isPaused()) {
+			DEBUG("IO_THROTTLE: pause XHR");
+			dlQueue.pause();
+			paused = true;
+		}
+	});
+
+	dl.writer.on('working', function() {
+		if (dl.writer._queue.length > IO_THROTTLE && paused) {
+			DEBUG("IO_THROTTLE: resume XHR");
+			dlQueue.resume();
+			paused = false;
+		}
+	});
 
 	dl.writer.pos = 0
 

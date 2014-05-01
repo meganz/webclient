@@ -135,5 +135,6 @@ MegaQueue.prototype._process = function() {
 
 MegaQueue.prototype.push = function(arg, next, self) {
     this._queue.push([arg, next || function() {}, self || null]);
+	this.trigger('queue');
     this._process();
 };

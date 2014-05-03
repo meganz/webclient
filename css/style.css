@@ -16967,6 +16967,7 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-file-upload, .rtl .search-messages-result {
 	padding: 0 41px 0 10px;
 }
+
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }

@@ -306,7 +306,7 @@ ClassFile.prototype.run = function(task_done) {
 		if (tasks.length == 0) {
 			self.emptyFile = true;
 			tasks.push({ 
-				task: {  zipid: sel.fdl.zipid, id: self.dl.id },
+				task: {  zipid: self.dl.zipid, id: self.dl.id },
 				run: function(done) {
 					self.dl.io.write("", 0, function() {
 						self.dl.ready(); /* tell the download scheduler we're done */

@@ -241,24 +241,24 @@ ClassFile.prototype.destroy = function() {
 
 	if (!this.dl.cancelled) {
 		if (this.dl.zipid) {
-			Zips[this.dl.zipid].done();
-		} else {
-			this.dl.onDownloadProgress(
-				this.dl.dl_id,
-				100,
-				this.dl.size,
-				this.dl.size,
-				0,
-				this.dl.pos
-			);
-			
-			this.dl.onBeforeDownloadComplete(this.dl.pos);
-			if (!this.dl.preview) {
-				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
-			}
-			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
-			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+			return Zips[this.dl.zipid].done();
 		}
+		
+		this.dl.onDownloadProgress(
+			this.dl.dl_id,
+			100,
+			this.dl.size,
+			this.dl.size,
+			0,
+			this.dl.pos
+		);
+		
+		this.dl.onBeforeDownloadComplete(this.dl.pos);
+		if (!this.dl.preview) {
+			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
+		}
+		this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+		if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
 	}
 
 	delete GlobalProgress[this.gid];

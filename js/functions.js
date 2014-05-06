@@ -574,11 +574,12 @@ function NOW() {
 function DEBUG2() {
 	if (d) {
 		console.log.apply(console, arguments)
-		if (!is_chrome_firefox) {
+		if (!is_chrome_firefox && localStorge.ddetailed2) {
 			console.warn.apply(console, arguments)
 		} else if (d > 1) console.trace();
 	}
 }
+
 function DEBUG() {
 	if (arguments.length == 2 && typeof arguments[0] == "object"
 		  && typeof arguments[0][arguments[1]] == "function") {
@@ -596,7 +597,7 @@ function DEBUG() {
 	}
 	if (d) {
 		console.log.apply(console, arguments)
-		if (!is_chrome_firefox) {
+		if (!is_chrome_firefox && localStorge.ddetailed) {
 			console.error.apply(console, arguments)
 		} else if (d > 1) console.trace();
 	}

@@ -364,6 +364,8 @@ function failureFunction(task, args) {
 		}		
 	}
 
+	DEBUG2(dl.name, "failed ", code);
+
 	/* update UI */
 	dl_reportstatus(dl, EAGAIN); 
 

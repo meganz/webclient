@@ -3625,7 +3625,7 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-left-tooltip {
 	height: 24px;
 	padding: 0 10px;
-	background-color: rgb(0,0,0);
+	background-color: rgba(0,0,0,0.8);
 	line-height: 23px;
 	color: #CCCCCC;
 	font-size: 12px;

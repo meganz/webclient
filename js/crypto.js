@@ -1776,6 +1776,13 @@ function api_fareq(res,ctx)
 				this.abort();
 				this.ctx.errfa(id,1);
 			};
+			
+			faxhrs[slot].onerror = function()
+			{
+				var ctx = this.ctx;
+				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+				this.ctx.errfa(id,1);				
+			}
 
 			faxhrs[slot].onreadystatechange = function()
 			{
@@ -2017,7 +2024,7 @@ function crypto_procsr(sr)
 		{
 			var pubkey;
 
-			if (typeof res == 'object' && typeof res[0] == 'object' && typeof res[0].pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(res[0].pubk);
+			if (typeof res == 'object' && typeof res.pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(res.pubk);
 
 			// collect all required pubkeys	
 			while (ctx.i < ctx.sr.length)
@@ -2053,10 +2060,11 @@ function crypto_procsr(sr)
 				}
 				else sh = ctx.sr[i];
 			}
+
 			if (rsr.length) api_req({ a : 'k', sr : rsr });			
 		}
 	}
-	
+
 	ctx.callback(false,ctx);
 }
 

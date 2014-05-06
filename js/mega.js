@@ -2107,58 +2107,63 @@ function execsc(ap)
 					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
 				}
 			}
-			else if (typeof a.o != 'undefined')
-			{
-				if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
-				{				
-					u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
-					tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
-					prockey=true;
-				}
-			
-				if (typeof a.r == "undefined")
-				{
-					console.log('delete a share');
-					// delete a share:
-					var n = M.d[a.n];
-					if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
-					else M.delNode(a.n);
-					if (!folderlink && a.u !== 'EXP' && fminitialized) addnotification({t: 'dshare',n: a.n,u:a.o});
-					delete u_sharekeys[a.n];
-				}
-				else
-				{
-					console.log('I receive a share, prepare for receiving tree a');
-					// I receive a share, prepare for receiving tree a
-					tparentid 	= a.o;
-					trights 	= a.r;
-					if (M.d[a.n])
-					{
-						// update rights:
-						M.nodeAttr({h:a.n,r:a.r,su:a.o});
-					}
-					else
-					{
-						console.log('look up other root-share-nodes from this user');
-						// look up other root-share-nodes from this user:
-						if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
+			else
+            {
+                if (typeof a.n != 'undefined' && typeof a.k != 'undefined' && typeof u_sharekeys[a.n] == 'undefined')
+                {
+                    u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
+                    tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
+                    prockey = true;
+                }
 
-						if (!folderlink && fminitialized) addnotification(
-						{
-							t: 'share',
-							n: a.n,
-							u: a.o
-						});
-					}
-				}
-			}
-			else if (prockey)
+                if (typeof a.o != 'undefined')
+                {
+                    if (typeof a.r == "undefined")
+                    {
+                        console.log('delete a share');
+                        // delete a share:
+                        var n = M.d[a.n];
+                        if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
+                        else M.delNode(a.n);
+                        if (!folderlink && a.u !== 'EXP' && fminitialized) addnotification({t: 'dshare',n: a.n,u:a.o});
+                        delete u_sharekeys[a.n];
+                    }
+                    else
+                    {
+                        console.log('I receive a share, prepare for receiving tree a');
+                        // I receive a share, prepare for receiving tree a
+                        tparentid 	= a.o;
+                        trights 	= a.r;
+                        if (M.d[a.n])
+                        {
+                            // update rights:
+                            M.nodeAttr({h:a.n,r:a.r,su:a.o});
+                        }
+                        else
+                        {
+                            console.log('look up other root-share-nodes from this user');
+                            // look up other root-share-nodes from this user:
+                            if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
+
+                            if (!folderlink && fminitialized) addnotification(
+                            {
+                                t: 'share',
+                                n: a.n,
+                                u: a.o
+                            });
+                        }
+                    }
+                }
+            }
+
+			if (prockey)
 			{
 				var nodes = fm_getnodes(a.n,1);
 				nodes.push(a.n);
 				for (var i in nodes)
 				{
 					var n = M.d[nodes[i]];
+
 					if (n)
 					{
 						var f = {a:n.a,h:n.h,k:n.k};
@@ -2168,6 +2173,7 @@ function execsc(ap)
 					}
 				}
 			}
+
 			crypto_share_rsa2aes();
 		}
 		else if (a.a == 'k' && !folderlink)

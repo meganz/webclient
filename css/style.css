@@ -131,7 +131,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	float: left;
 }
 .top-head {
-	height: 50px;
+	height: 48px;
 	background-color: #151412;
 	position: relative;
 }
@@ -1716,6 +1716,9 @@ a.nt-settings-button:hover span {
 	-khtml-opacity: 0.2;
 	opacity: 0.2;
 }
+.jspHorizontalBar .jspDrag {
+	height: 6px !important;
+}
 .jspDrag.jspHover, .jspDrag.jspScroll, .jspDrag.jspActive {
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
@@ -2077,7 +2080,7 @@ a.blog-new-archive-lnk {
 	padding: 40px 0 0 0;
 }
 .blog-text-selection {
-	background:#f6d3cc;
+	background: #f6d3cc;
 }
 .blog-pagination-button {
 	display: inline-block;
@@ -2923,481 +2926,293 @@ label.iPhoneCheckLabelOff span {
 
 .fm-tree-panel {
 	height: 100%;
-	height: -webkit-calc(100% - 50px);
-	height: -moz-calc(100% - 50px);
-	height: calc(100% - 50px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 10px 0 10px 0;
 }
-.fm-tree-pad {
-	margin-right: 10px;
+.content-panel {
+	overflow: hidden;
+	display: none;
+}
+.content-panel.cloud-drive, .content-panel.shared-with-me {
+	padding: 24px 0;
 }
 .fm-tree-panel ul, .fm-move-dialog-body ul {
 	padding: 0;
 	margin: 0;
 	list-style: none;
+	display: block;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+}
+.fm-tree-panel ul ul {
+	display: none;
+}
+.fm-tree-panel ul ul.opened {
+	display: block;
+}
+.fm-tree-panel ul ul .nw-fm-tree-item {
+	padding-left: 24px;
+}
+.fm-tree-panel ul ul ul .nw-fm-tree-item {
+	padding-left: 48px;
+}
+.fm-tree-panel ul ul ul ul .nw-fm-tree-item {
+	padding-left: 72px;
+}
+.fm-tree-panel ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 96px;
+}
+.fm-tree-panel ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 120px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 144px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 168px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 192px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 216px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 240px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 264px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 288px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 312px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 336px;
+}
+.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 360px;
+}
+.nw-fm-tree-item {
+	display: block;
+	background-color: rgba(215,16,0,0);
+	padding-right: 15px;
+}
+.nw-fm-tree-item:hover {
+	background-color: rgba(215,16,0,0.05);
+}
+.nw-fm-tree-item.selected {
+	background-color: rgba(215,16,0,0.5);
+}
+.shared-with-me .nw-fm-tree-item:hover {
+	background-color: rgba(254,174,0,0.1);
+}
+.shared-with-me .nw-fm-tree-item.selected {
+	background-color: rgba(254,174,0,0.5);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
+	list-style: none;
 	padding: 0;
 	margin: 0;
-	list-style: none;
-}
-.fm-connector, .fm-connector-first {
-	float: left;
-	display: block;
-	width: 10px;
-	height: 46px;
-	background-position: 4px -1810px;
-	background-repeat: no-repeat;
-}
-.fm-connector-first.active {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-connector.mid {
-	background-position: 4px -1947px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-connector.vertical-line {
-	background-position: 4px -2007px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-connector.last, .current .fm-connector {
-	background-position: 4px -2037px !important;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-tree-header {
-	display: block;
-	margin-left: 10px;
-	height: 40px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	color: black;
-	font-size: 13px;
-	line-height: 40px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	margin-bottom: 6px;
-	cursor: default;
-	overflow: hidden;
-}
-.fm-tree-header.cloud-drive-item, .fm-tree-header.cloud-drive-item.active.dragover, .fm-tree-header.cloud-drive-item.dragover {
-	background-position: 18px -2253px;
-	color: black
-}
-.fm-tree-header.cloud-drive-item.active.dragover, .fm-tree-header.cloud-drive-item.dragover {
-	background-color: #e8c5be;
-}
-.fm-tree-header.cloud-drive-item.active {
-	background-color: #d22000;
-	color: white;
-	background-position: 18px -1193px;
-}
-.fm-tree-header.recycle-item, .fm-tree-header.recycle-item.active.dragover, .fm-tree-header.recycle-item.dragover {
-	background-position: 16px -2302px;
-	color: black
-}
-.fm-tree-header.recycle-item.active.dragover, .fm-tree-header.recycle-item.dragover {
-	background-color: #d5e1c8;
-}
-.fm-tree-header.recycle-item.active {
-	background-color: #73AC3A;
-	color: white;
-	background-position: 16px -2443px;
-}
-.fm-tree-header.recycle-item.recycle-notification, .fm-tree-header.recycle-item.recycle-notification.active.dragover, .fm-tree-header.recycle-item.recycle-notification.dragover {
-	background-position: 16px -2698px;
-	color: black
-}
-.fm-tree-header.recycle-item.recycle-notification.active.dragover, .fm-tree-header.recycle-item.recycle-notification.dragover {
-	background-color: #d5e1c8;
-}
-.fm-tree-header.recycle-item.active.recycle-notification {
-	background-position: 16px -2493px;
-	color: white;
-}
-.fm-tree-header.contacts-item, .fm-tree-header.contacts-item.active.dragover, .fm-tree-header.contacts-item.dragover {
-	background-position: 16px -2392px;
-	color: black
-}
-.fm-tree-header.contacts-item.active.dragover, .fm-tree-header.contacts-item.dragover {
-	background-color: #c5e0ec;
-}
-.fm-tree-header.contacts-item.active {
-	background-color: #22A6E5;
-	color: white;
-	background-position: 16px -2543px;
-}
-.fm-tree-header.messages-item, .fm-tree-header.messages-item.active.dragover, .fm-tree-header.messages-item.dragover {
-	background-position: 16px -2347px;
-	color: black
-}
-.fm-tree-header.messages-item.active.dragover, .fm-tree-header.messages-item.dragover {
-	background-color: #bebebe;
-}
-.fm-tree-header.messages-item.active {
-	background-color: #777777;
-	color: white;
-	background-position: 16px -2599px;
-}
-.fm-tree-header span {
-	display: block;
-	background-repeat: no-repeat;
-	padding-left: 64px
-}
-.fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -5px -1339px;
-}
-.fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -5px -1380px;
-}
-.fm-tree-header.active.contains-subfolders span {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -5px -1419px;
-}
-.fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -5px -1300px;
-}
-.fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows {
-	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -23px -2655px;
-	padding-left: 0;
-	float: right;
-	width: 24px;
-	height: 20px;
-	margin: 10px 10px 0 0;
-	cursor: pointer;
-}
-.fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows.active, .fm-tree-header.active.expanded span.contacts-arrows.active {
-	background-position: 9px -2655px;
-}
-.fm-horizontal-connector {
-	float: left;
-	display: block;
-	width: 10px;
-	height: 30px;
-	background-position: -4px -2066px;
-	background-repeat: repeat-x;
-}
-.fm-horizontal-connector.active {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-ul .fm-horizontal-connector {
-	width: 10px;
-}
-ul ul .fm-horizontal-connector {
-	width: 20px;
-}
-ul ul ul .fm-horizontal-connector {
-	width: 30px;
-}
-ul ul ul ul .fm-horizontal-connector {
-	width: 40px;
-}
-ul ul ul ul ul .fm-horizontal-connector {
-	width: 50px;
-}
-ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 60px;
-}
-ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 70px;
-}
-ul ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 80px;
-}
-ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 90px;
-}
-ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 100px;
-}
-ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 100px;
-}
-ul ul ul ul ul ul ul ul ul ul ul ul .fm-horizontal-connector {
-	width: 120px;
-}
-.fm-tree-folder {
-	display: block;
-	margin: 0 0 5px 20px;
-	height: 25px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	color: #333333;
-	font-size: 13px;
-	line-height: 25px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: 32px -2114px;
-	background-repeat: no-repeat;
 	white-space: nowrap;
-	cursor: default;
-}
-.fm-tree-folder.tree-file {
-	background-image: none;
-}
-.fm-tree-folder.active.dragover, .fm-tree-folder.dragover {
-	color: #333333;
-	background-position: 32px -2114px;
-}
-.fm-tree-folder.shared-folder, .fm-tree-folder.shared-folder.active.dragover, .fm-tree-folder.shared-folder.dragover {
-	background-position: 32px -2174px;
-}
-.fm-tree-folder.opened, .fm-tree-folder.expanded, .fm-tree-folder.opened.active.dragover, .fm-tree-folder.expanded.active.dragover, .fm-tree-folder.opened.dragover, .fm-tree-folder.expanded.dragover {
-	background-position: 32px -4675px;
-}
-.fm-tree-folder.shared-folder.opened, .fm-tree-folder.shared-folder.expanded, .fm-tree-folder.shared-folder.opened.active.dragover, .fm-tree-folder.shared-folder.expanded.active.dragover, .fm-tree-folder.shared-folder.opened.dragover, .fm-tree-folder.shared-folder.expanded.dragover {
-	background-position: 32px -4730px;
-}
-.fm-tree-folder.active {
-	background-position: 32px -2144px;
-	background-color: #a6a6a6;
-	color: white;
-}
-.fm-tree-folder.shared-folder.active, .fm-tree-folder.shared-folder.active.expanded {
-	background-position: 32px -2205px;
-}
-.treesub_contacts .fm-tree-folder, .treesub_contacts .fm-tree-folder.active.dragover, .treesub_contacts .fm-tree-folder.dragover {
-	background-position: 32px -2989px;
-}
-.treesub_contacts .fm-tree-folder.expanded, .treesub_contacts .fm-tree-folder.opened, .treesub_contacts .fm-tree-folder.expanded.active.dragover, .treesub_contacts .fm-tree-folder.opened.active.dragover, .treesub_contacts .fm-tree-folder.expanded.dragover, .treesub_contacts .fm-tree-folder.opened.dragover {
-	background-position: 32px -3030px;
-}
-.treesub_contacts .fm-tree-folder.active, .fm-tree-folder.expanded.active, .treesub_contacts .fm-tree-folder.opened.active {
-	background-position: 32px -2144px;
-}
-.fm-tree-folder.contact, .fm-tree-folder.contact.active.dragover, .fm-tree-folder.contact.dragover {
-	background-position: 0 0;
-	height: 40px;
-	line-height: 40px;
-}
-.fm-tree-folder.contact.online-status, .fm-tree-folder.contact.online-status.active.dragover, .fm-tree-folder.contact.online-status.dragover, .fm-tree-folder.contact.online-status.active, .fm-tree-folder.contact.online-status.expanded.active, .fm-tree-folder.contact.online-status.opened.active {
-	background-position: 10px -2838px;
-}
-.fm-tree-folder.contact.away-status, .fm-tree-folder.contact.away-status.active.dragover, .fm-tree-folder.contact.away-status.dragover, .fm-tree-folder.contact.away-status.active, .fm-tree-folder.contact.away-status.expanded.active, .fm-tree-folder.contact.away-status.opened.active {
-	background-position: 10px -2878px;
-}
-.fm-tree-folder.contact.offline-status, .fm-tree-folder.contact.offline-status.active.dragover, .fm-tree-folder.contact.offline-status.dragover, .fm-tree-folder.contact.offline-status.active, .fm-tree-folder.contact.offline-status.expanded.active, .fm-tree-folder.contact.offline-status.opened.active {
-	background-position: 10px -2918px;
-}
-.fm-tree-folder.contact.black-status, .fm-tree-folder.contact.black-status.active.dragover, .fm-tree-folder.contact.black-status.dragover, .fm-tree-folder.contact.black-status.active, .fm-tree-folder.contact.black-status.expanded.active, .fm-tree-folder.contact.black-status.opened.active {
-	background-position: 10px -8763px;
-}
-.fm-tree-folder.contact.busy-status, .fm-tree-folder.contact.busy-status.active.dragover, .fm-tree-folder.contact.black-busy.dragover, .fm-tree-folder.contact.busy-status.active, .fm-tree-folder.contact.busy-status.expanded.active, .fm-tree-folder.contact.busy-status.opened.active {
-	background-position: 10px -10347px;
-}
-.fm-tree-folder span {
-	display: block;
-	background-position: -5px -1307px;
-	background-repeat: no-repeat;
-	padding: 0 10px 0 64px;
-}
-.fm-tree-folder span.transfer-filtype-icon {
-	padding: 0;
-	margin: 0 0 0 30px;
-}
-.fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span {
-	background-position: -5px -1346px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span {
-	background-position: -5px -1388px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-tree-folder.contains-folders.active span {
-	background-position: -5px -1426px;
-}
-.fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span {
-	background-position: -5px -1308px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-}
-.fm-tree-folder.contact span, .fm-tree-folder.contact.active.dragover span, .fm-tree-folder.contact.dragover span {
-	background-position: -5px -1300px;
-}
-.fm-tree-folder.contains-folders.contact span, .fm-tree-folder.contains-folders.contact.active.dragover span, .fm-tree-folder.contains-folders.contact.dragover span {
-	background-position: -5px -1338px;
-}
-.fm-tree-folder.contains-folders.opened.contact span, .fm-tree-folder.contains-folders.expanded.contact span, .fm-tree-folder.contains-folders.opened.contact.active.dragover span, .fm-tree-folder.contains-folders.opened.contact.dragover span, .fm-tree-folder.contains-folders.expanded.contact.active.dragover span, .fm-tree-folder.contains-folders.expanded.contact.dragover span {
-	background-position: -5px -1380px;
-}
-.fm-tree-folder.contains-folders.active.contact span {
-	background-position: -5px -1418px;
-}
-.fm-tree-folder.contains-folders.active.opened.contact span, .fm-tree-folder.contains-folders.active.expanded.contact span {
-	background-position: -5px -1300px;
-}
-.fm-tree-folder.contact span {
-	padding: 0;
-}
-.fm-tree-folder.contact span.contact-name, .fm-tree-folder.contact.contains-folders span.contact-name, .add-contact-item span.contact-name {
-	margin: 0 0 0 80px;
-	background-image: none !important;
-	word-break: break-all;
-	overflow: hidden;
-	white-space: normal;
-	padding-right: 10px;
-	height: 40px;
-}
-.fm-tree-folder.contact span.avatar, .fm-tree-folder.contact.contains-folders span.avatar, .add-contact-item .avatar, .contacts-avatar, .properties-dialog .avatar {
-	background-image: none !important;
-	float: left;
-	width: 30px;
-	height: 30px;
-	margin: 5px 0 0 45px;
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 2px;
-	background-color: rgba(0, 0, 0, .15);
-	display: block;
 	position: relative;
 }
-.contacts-avatar {
-	margin: 10px 0 0 10px;
-}
-.contacts-username {
+.nw-fm-arrow-icon {
 	display: block;
-	margin: 0 15px 0 50px;
-	overflow: hidden;
-	height: 49px;
-	word-break: break-all;
-	white-space: pre-wrap;
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	cursor: default;
 }
-.fm-tree-folder.contact span.avatar span, .fm-tree-folder.contact.contains-folders span .avatar span, .add-contact-item .avatar span, .contacts-avatar span, .properties-dialog .avatar span {
-	width: 26px;
-	height: 26px;
-	background-image: none;
-	background-color: white;
-	padding: 2px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	overflow: hidden;
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
-	display: block;
-}
-.fm-tree-folder.contact span.avatar span img, .add-contact-item span.avatar span img, .contacts-avatar span img, .properties-dialog .avatar span img {
-	width: 22px;
-	height: 22px;
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
-	line-height: 0;
-	border: 0;
-}
-.fm-tree-folder.contact span.messages-icon {
-	display: block;
-	float: right;
-	background-position: -15px -2801px !important;
-	min-width: 25px;
-	height: 30px;
-	margin-top: 5px;
-	padding: 0;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	margin-right: 5px;
-	display: none;
+.nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -845px;
 	cursor: pointer;
 }
-.fm-tree-folder.active.contact span span.messages-icon, .fm-tree-folder.active.contact.opened span span.messages-icon {
-	background-position: -15px -2751px !important;
+.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon {
+	background-position: center -875px;
 }
-.fm-tree-folder.contact span.messages-icon span {
-	background-image: none;
-	height: 14px;
-	line-height: 12px;
-	padding: 0 5px;
-	background-color: #1fa4e7;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	white-space: nowrap;
-	word-break: normal;
-	margin: 0 0 0 0;
-	color: white;
-	font-size: 11px;
-	margin: -1px 0 0 15px;
-	float: right;
-	display: none;
+.nw-fm-tree-item.contains-folders.expanded .nw-fm-arrow-icon {
+	background-position: center -784px;
 }
-.fm-tree-folder.contact span.messages-icon.active, .fm-tree-folder.contact span.messages-icon span.active {
+.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon {
+	background-position: center -814px;
+}
+.nw-fm-tree-folder {
 	display: block;
-}
-.fm-subfolders .fm-connector {
-	height: 30px;
-}
-.fm-subfolders .fm-connector.contact, .fm-connector.contact.mid, .fm-connector.contact.vertical-line, .fm-connector.contact.last, .current .fm-connector.contact {
-	height: 45px;
-}
-.fm-connector.mid.contact {
-	background-position: 4px -1938px;
-}
-.fm-connector.vertical-line.contact {
-	background-position: 4px -2000px;
-}
-.fm-connector.last.contact, .current .fm-connector.contact {
-	background-position: 4px -2028px !important;
-}
-.fm-horizontal-connector.contact {
-	height: 45px;
-	background-position: -4px -2057px;
-}
-ul.fm-subfolders, ul.fm-subfolders ul {
-	display: none;
+	margin-left: 24px;
+	padding-left: 23px;
+	white-space: nowrap;
+	cursor: default;
+	font-size: 11px;
+	line-height: 23px;
+	color: #666666;
+	height: 24px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -17px -911px;
 	overflow: hidden;
 }
-ul.fm-subfolders.opened, ul.fm-subfolders.opened ul.opened {
+.nw-fm-tree-item.selected .nw-fm-tree-folder {
+	color: white;
+	background-position: -17px -945px;
+}
+.nw-contact-item {
+	height: 48px;
+	padding-right: 15px;
+	overflow: hidden;
+	cursor: pointer;
+}
+.nw-contact-item:hover {
+	background-color: rgba(113,173,58,0.1);
+}
+.nw-contact-item.selected {
+	background-color: rgba(113,173,58,0.5);
+}
+.nw-contact-status {
+	width: 8px;
+	height: 8px;
+	float: left;
+	margin: 20px 2px 0 12px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.selected .nw-contact-status {
+	border: 2px solid rgba(255,255,255,1);
+	width: 12px;
+	height: 12px;
+	margin: 18px 0 0 10px;
+}
+.nw-conversations-item .nw-contact-status {
+	margin-top:8px;	
+}
+.nw-conversations-item.selected .nw-contact-status {
+	margin-top:6px;	
+}
+.online .nw-contact-status {
+	background-color: #71AE32;
+}
+.away .nw-contact-status {
+	background-color: #ffce00;
+}
+.busy .nw-contact-status {
+	background-color: #FFCB00;
+}
+.offline .nw-contact-status {
+	background-color: #D11E00;
+}
+.black .nw-contact-status {
+	background-color: black;
+}
+.nw-contact-avatar {
+	width: 32px;
+	height: 32px;
+	float: left;
+	margin: 8px 0 0 10px;
+	border: 2px solid white;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	overflow: hidden;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	background-color: rgba(0,0,0,0.06);
+}
+.nw-contact-avatar img {
+	width: 32px;
+	height: 32px;
 	display: block;
+	margin: -2px 0 0 -2px;
+	-webkit-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
+	box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
+	box-sizing: border-box;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
 }
-ul .fm-tree-folder {
-	margin-left: 20px;
+.nw-contact-name {
+	font-size: 11px;
+	line-height: 47px;
+	color: #666666;
+	margin: 0 0 0 76px;
 }
-ul ul .fm-tree-folder {
-	margin-left: 30px;
+.nw-contact-item.selected .nw-contact-name {
+	color: white;
 }
-ul ul ul .fm-tree-folder {
-	margin-left: 40px;
+.nw-conversations-header {
+	height: 24px;
+	font-family: 'Open Sans Semibold', Arial;
+	font-size: 12px;
+	line-height: 23px;
+	color: #666666;
+	padding: 0 0 0 10px;
+	text-transform: uppercase;
+	position: relative;
 }
-ul ul ul ul .fm-tree-folder {
-	margin-left: 50px;
+.nw-conversations-arrows {
+	height: 24px;
+	width: 24px;
+	position: absolute;
+	right: 10px;
+	top: 0;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -12px -752px;
+	cursor: pointer;
 }
-ul ul ul ul ul .fm-tree-folder {
-	margin-left: 60px;
+.nw-conversations-item {
+	height: 24px;
+	padding-right: 15px;
+	overflow: hidden;
+	cursor:pointer;
 }
-ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 70px;
+.nw-conversations-item:hover {
+	background-color:rgba(10,164,227,0.1);
 }
-ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 80px;
+.nw-conversations-item.selected {
+	background-color:rgba(10,164,227,0.5);
 }
-ul ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 90px;
+.nw-conversations-name {
+	margin-left: 32px;
+	font-size: 11px;
+	line-height: 23px;
+	color: #666666;
 }
-ul ul ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 100px;
+.nw-conversations-item.selected .nw-conversations-name {
+	color: white;
 }
-ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 110px;
+.file-transter-icon {
+	height: 48px;
+	width: 48px;
+	position: absolute;
+	bottom: 0;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -581px;
+	cursor:pointer;
 }
-ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 120px;
-}
-ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
-	margin-left: 130px;
+.file-transter-icon:hover {
+	background-position: center -651px;
 }
 .tree-item {
 	display: none;
@@ -3737,9 +3552,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 }
 .fm-main {
 	height: 100%;
-	height: -webkit-calc(100% - 77px);
-	height: -moz-calc(100% - 77px);
-	height: calc(100% - 77px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	overflow: hidden;
 }
 .transfer-panel-opened .fm-main {
@@ -3748,51 +3563,143 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	height: calc(100% - 243px);
 }
 .fm-left-panel {
-	width: 304px;
+	width: 256px;
 	height: 100%;
 	float: left;
-	background-color: #eeeeee;
+	background-color: #f2f2f2;
 }
 .fm-left-menu {
-	height: 50px;
-	background-color: #333333;
+	height: 48px;
+	background-color: rgba(242,242,242,100);
 }
-.fm-menu-item {
-	width: 25%;
-	height: inherit;
-	display: block;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
+.fm-left-menu.cloud-drive {
+	background-color: rgba(213,22,0,100);
+}
+.fm-left-menu.shared-with-me {
+	background-color: rgba(252,173,0,100);
+}
+.fm-left-menu.contacts {
+	background-color: rgba(113,173,58,100);
+}
+.fm-left-menu.conversations {
+	background-color: rgba(31,165,224,100);
+}
+.nw-fm-left-icons-panel {
+	background-color: #222222;
+	width: 48px;
 	float: left;
+	height: 100%;
+}
+.nw-fm-tree-header {
+	position: relative;
+	font-size: 12px;
+	line-height: 47px;
+	text-transform: uppercase;
+	font-family: 'Open Sans Semibold';
+	padding: 0 0 0 10px;
+	color: white;
+	display: none;
+}
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active {
+	display: block;
+}
+.nw-fm-settins-icon {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -721px;
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	z-index: 5;
+	right: 13px;
+	top: 13px;
 	cursor: pointer;
 }
-.fm-menu-item.cloud {
-	background-position: center -571px;
+.nw-fm-left-icon {
+	width: 48px;
+	height: 48px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	cursor: pointer;
 }
-.fm-menu-item.cloud:hover, .fm-menu-item.cloud.active {
-	background-position: center -631px;
-	background-color: #d11e00;
+.nw-fm-left-tooltip {
+	height: 24px;
+	padding: 0 10px;
+	background-color: rgb(0,0,0);
+	line-height: 23px;
+	color: #CCCCCC;
+	font-size: 12px;
+	position: absolute;
+	margin: 12px 0 0 -200px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	white-space: nowrap;
+	left:46px;
+	-webkit-transition: left 200ms ease-in-out, opacity 200ms ease-in-out;
+	-moz-transition: left 200ms ease-in-out, opacity 200ms ease-in-out;
+	-o-transition: left 200ms ease-in-out, opacity 200ms ease-in-out;
+	-ms-transition: left 200ms ease-in-out, opacity 200ms ease-in-out;
+	transition: left 200ms ease-in-out, opacity 200ms ease-in-out;
+	z-index:10;
+	
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	z-index:40px;
 }
-.fm-menu-item.recycle {
-	background-position: center -705px;
+.nw-fm-left-tooltip.hovered {
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+	left:56px;
+	margin: 12px 0 0 0;
 }
-.fm-menu-item.recycle:hover, .fm-menu-item.recycle.active {
-	background-position: center -775px;
-	background-color: #73AC3A;
+.nw-fm-left-icon.cloud-drive {
+	background-color: rgba(213,22,0,0);
+	background-position: center 13px;
 }
-.fm-menu-item.contacts {
-	background-position: center -844px;
+.nw-fm-left-icon.shared-with-me {
+	background-color: rgba(252,173,0,0);
+	background-position: center -35px;
 }
-.fm-menu-item.contacts:hover, .fm-menu-item.contacts.active {
-	background-position: center -914px;
-	background-color: #22A6E5;
+.nw-fm-left-icon.contacts {
+	background-color: rgba(113,173,58,0);
+	background-position: center -83px;
 }
-.fm-menu-item.messages {
-	background-position: center -988px;
+.nw-fm-left-icon.conversations {
+	background-color: rgba(31,165,224,0);
+	background-position: center -131px;
 }
-.fm-menu-item.messages:hover, .fm-menu-item.messages.active {
-	background-position: center -1058px;
-	background-color: #777777;
+.nw-fm-left-icon.cloud-drive:hover {
+	background-position: center -177px;
+}
+.nw-fm-left-icon.shared-with-me:hover {
+	background-position: center -225px;
+}
+.nw-fm-left-icon.contacts:hover {
+	background-position: center -273px;
+}
+.nw-fm-left-icon.conversations:hover {
+	background-position: center -321px;
+}
+.nw-fm-left-icon.cloud-drive.active {
+	background-color: rgba(213,22,0,100);
+	background-position: center -367px;
+}
+.nw-fm-left-icon.shared-with-me.active {
+	background-color: rgba(252,173,0,100);
+	background-position: center -415px;
+}
+.nw-fm-left-icon.contacts.active {
+	background-color: rgba(113,173,58,100);
+	background-position: center -463px;
+}
+.nw-fm-left-icon.conversations.active {
+	background-color: rgba(31,165,224,100);
+	background-position: center -511px;
 }
 .dark-overlay {
 	background: black;
@@ -3930,14 +3837,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul .fm-tree-folder {
 	line-height: 0;
 }
 .files-grid-view, .contacts-grid-view {
-	border-top: 1px solid white;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100%;
-	height: -webkit-calc(100% - 49px);
-	height: -moz-calc(100% - 49px);
-	height: calc(100% - 49px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 }
 .grid-header-star {
 	height: 25px;
@@ -4013,14 +3919,13 @@ th.grid-first-th {
 	background-position: 1px -3579px;
 }
 .fm-blocks-view, .fm-contacts-blocks-view {
-	border-top: 2px solid #EEEEEE;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100%;
-	height: -webkit-calc(100% - 49px);
-	height: -moz-calc(100% - 49px);
-	height: calc(100% - 49px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	position: relative;
 	min-height: 280px;
 	padding: 0;
@@ -4858,14 +4763,13 @@ th.grid-first-th {
 	margin-left: 304px;
 }
 .fm-right-header {
-	height: 40px;
+	height: 48px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 10px 0 0 10px;
 	white-space: nowrap;
-	margin-bottom: 9px;
 	position: relative;
+	background-color: #f2f2f2;
 }
 .fm-back-button {
 	display: block;
@@ -16967,7 +16871,6 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-file-upload, .rtl .search-messages-result {
 	padding: 0 41px 0 10px;
 }
-
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }

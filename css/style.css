@@ -3090,7 +3090,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: #ffce00;
 }
 .busy .nw-contact-status {
-	background-color: #FF7D00;
+	background-color: #FFCB00;
 }
 .offline .nw-contact-status {
 	background-color: #D11E00;
@@ -3138,6 +3138,7 @@ label.iPhoneCheckLabelOff span {
 .nw-contact-item.selected .nw-contact-name {
 	color: white;
 }
+
 .nw-conversations-header {
 	height: 24px;
 	font-family: 'Open Sans Semibold', Arial;
@@ -3662,6 +3663,7 @@ background-color:rgba(255,255,255,0.15);
 	background-color: rgba(213,22,0,0);
 	background-position: center 13px;
 }
+
 .nw-fm-left-icon.shared-with-me {
 	background-color: rgba(252,173,0,0);
 	background-position: center -35px;
@@ -3698,6 +3700,7 @@ background-color:rgba(255,255,255,0.15);
 	background-color: rgba(113,173,58,100);
 	background-position: center -463px;
 }
+
 .nw-fm-left-icon.conversations.active {
 	background-color: rgba(31,165,224,100);
 	background-position: center -511px;
@@ -16977,7 +16980,6 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-file-upload, .rtl .search-messages-result {
 	padding: 0 41px 0 10px;
 }
-
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }

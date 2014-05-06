@@ -2211,6 +2211,7 @@ a.blog-new-archive-lnk {
 }
 .social {
 	position: relative;
+	padding-bottom:40px;
 }
 .social-arrow {
 	position: absolute;

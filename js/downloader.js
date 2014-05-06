@@ -241,6 +241,7 @@ ClassFile.prototype.destroy = function() {
 
 	if (!this.dl.cancelled) {
 		if (this.dl.zipid) {
+			this.task = null;
 			return Zips[this.dl.zipid].done();
 		}
 		

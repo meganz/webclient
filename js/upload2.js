@@ -221,10 +221,11 @@ var UploadManager = new function() {
 		api_reportfailure(hostname(file.posturl), network_error_check);
 
 		// reschedule
+
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
-		DEBUG("retrying chunk because of", reason + "")
+		DEBUG2("retrying chunk because of", reason + "");
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -455,7 +456,8 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 	}
 
 	DEBUG("bad response from server", [
-		xhr.status == 200,
+		xhr.status,
+		this.file.name,
 		typeof xhr.response == 'string',
 		xhr.statusText
 	]);
@@ -531,8 +533,10 @@ FileUpload.prototype.run = function(done) {
 	file.retries		= 0;
 	file.xr				= getxr();
 	file.ul_lastreason	= file.ul_lastreason || 0
+
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 
+		DEBUG2("this shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
 
@@ -757,7 +761,7 @@ ulQueue.validateTask = function(pzTask) {
 		return true;
 	}
 
-	if (pzTask instanceof FileUpload && !start_uploading) {
+	if (pzTask instanceof FileUpload && !start_uploading && $('#ul_' + pzTask.file.id).length != 0) {
 		return true;
 	}
 

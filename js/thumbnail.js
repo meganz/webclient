@@ -175,3 +175,99 @@ function dataURLToAB(dataURL)
 
 	return uInt8Array;
 }
+
+
+var ba_images=[],ba_time=0,ba_id=0,ba_result=[];
+
+function benchmarki()
+{
+	var a=0;	
+	ba_images=[];	
+	for (var i in M.d)
+	{
+		if (M.d[i].name && is_image(M.d[i].name) && M.d[i].fa)
+		{	
+			ba_images.push(M.d[i]);
+		}
+		else a++;
+	}
+	console.log('found ' + ba_images.length + ' images with file attr ('+a+' don\'t have file attributes)');
+	
+	ba_images = shuffle(ba_images);
+	
+	ba_result['success']=0;
+	ba_result['error']=0;
+	
+	benchmarkireq();
+}
+
+function shuffle(array) {
+  var currentIndex = array.length
+    , temporaryValue
+    , randomIndex
+    ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+function benchmarkireq()
+{
+	ba_time = new Date().getTime();
+
+	function eot(id, err)
+	{
+		for (var i in ba_images)
+		{
+			if (ba_images[i].h == id)
+			{		
+				ba_result['error']++;				
+				console.log('error',new Date().getTime()-ba_time,err);
+				console.log(ba_images[i].fa);
+				ba_id++;
+				benchmarkireq();
+			}		
+		}
+	}
+	eot.timeout = 5100;
+
+	var n = ba_images[ba_id];	
+	if (n)
+	{
+		var treq = {};
+		treq[n.h] = {fa:n.fa,k:n.key};
+		api_getfileattr(treq,1,function(ctx,id,uint8arr)
+		{
+			for (var i in ba_images)
+			{
+				if (ba_images[i].h == id)
+				{
+					ba_result['success']++;					
+					console.log('success',uint8arr.length,new Date().getTime()-ba_time);
+					ba_id++;
+					benchmarkireq();
+					
+					previewsrc(myURL.createObjectURL(new Blob([uint8arr],{ type: 'image/jpeg' })));
+				}		
+			}
+		},eot);
+	}
+	else 
+	{
+		console.log('ready');
+	}
+
+}
+

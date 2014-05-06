@@ -241,24 +241,25 @@ ClassFile.prototype.destroy = function() {
 
 	if (!this.dl.cancelled) {
 		if (this.dl.zipid) {
-			Zips[this.dl.zipid].done();
-		} else {
-			this.dl.onDownloadProgress(
-				this.dl.dl_id,
-				100,
-				this.dl.size,
-				this.dl.size,
-				0,
-				this.dl.pos
-			);
-			
-			this.dl.onBeforeDownloadComplete(this.dl.pos);
-			if (!this.dl.preview) {
-				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
-			}
-			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
-			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+			this.task = null;
+			return Zips[this.dl.zipid].done();
 		}
+		
+		this.dl.onDownloadProgress(
+			this.dl.dl_id,
+			100,
+			this.dl.size,
+			this.dl.size,
+			0,
+			this.dl.pos
+		);
+		
+		this.dl.onBeforeDownloadComplete(this.dl.pos);
+		if (!this.dl.preview) {
+			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
+		}
+		this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+		if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
 	}
 
 	delete GlobalProgress[this.gid];
@@ -306,7 +307,7 @@ ClassFile.prototype.run = function(task_done) {
 		if (tasks.length == 0) {
 			self.emptyFile = true;
 			tasks.push({ 
-				task: {  zipid: sel.fdl.zipid, id: self.dl.id },
+				task: {  zipid: self.dl.zipid, id: self.dl.id },
 				run: function(done) {
 					self.dl.io.write("", 0, function() {
 						self.dl.ready(); /* tell the download scheduler we're done */

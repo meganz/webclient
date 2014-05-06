@@ -620,11 +620,11 @@ else
 			}
 		}
 
-		var xhr_timeout=5000;
+		var xhr_timeout=30000;
 
 		function xhr_error()
 		{
-			xhr_timeout+=1000;
+			xhr_timeout+=10000;
 			console.log(xhr_timeout);
 			if (bootstaticpath.indexOf('cdn') > -1)
 			{

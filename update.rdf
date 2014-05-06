@@ -14,9 +14,9 @@
                    NS1:minVersion="4.0"
                    NS1:maxVersion="30.*"
                    NS1:updateLink="http://eu.static.mega.co.nz/mega.xpi"
-                   NS1:updateHash="sha256:4f8c41518a467c806f25833892c393acf051dee0ff894ea727d1466365f2bcbb" />
+                   NS1:updateHash="sha256:789fcb75c0180afd3a8a6497eda2c6b1574262548c8ba0467b154dde162e003c" />
   <RDF:Description RDF:about="rdf:#$IIU611"
-                   NS1:version="2.0.142">
+                   NS1:version="2.0.146">
     <NS1:targetApplication RDF:resource="rdf:#$LIU611"/>
   </RDF:Description>
 </RDF:RDF>

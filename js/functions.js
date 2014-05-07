@@ -565,7 +565,7 @@ function checkMail(email)
 }
 
 function NOW() {
-	return (new Date()).getTime();
+	return Date.now();
 }
 
 /**
@@ -730,9 +730,8 @@ function percent_megatitle()
 		t = '';
 		$.transferprogress = {};
 	}
-	
-	if (!t || parseInt(t) >= 100) megatitle();
-	else megatitle(t);
+
+	megatitle(t);
 }
 
 function __percent_megatitle()

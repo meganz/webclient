@@ -1436,7 +1436,7 @@ function api_setshare1(ctx)
 {
 	var i, j, n, nk, sharekey, ssharekey;
 	var req, res;
-	var newkey = false;
+	var newkey = true;
 
 	req = { a : 's',
 			n : ctx.node,
@@ -1449,7 +1449,11 @@ function api_setshare1(ctx)
 		{
 			if (!req.ok)
 			{						
-				if (u_sharekeys[ctx.node]) sharekey = u_sharekeys[ctx.node];
+				if (u_sharekeys[ctx.node])
+                {
+                    sharekey = u_sharekeys[ctx.node];
+                    newkey = false;
+                }
 				else
 				{
 					// we only need to generate a key if one or more shares are being added to a previously unshared node
@@ -1457,8 +1461,8 @@ function api_setshare1(ctx)
 					for (j = 4; j--; ) sharekey.push(rand(0x100000000));					
 					
 					u_sharekeys[ctx.node] = sharekey;
-					newkey = true;
 				}
+
 				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
 				req.ha = crypto_handleauth(ctx.node);
 				ssharekey = a32_to_str(sharekey);				

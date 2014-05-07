@@ -58,58 +58,202 @@
  
   
   <div class="fm-main default">
+				<div class="nw-fm-left-icons-panel">
+                 <div class="nw-fm-left-icon cloud-drive active">
+                   <div class="nw-fm-left-tooltip">Cloud Drive</div>
+                 </div>
+                 <div class="nw-fm-left-icon shared-with-me">
+                   <div class="nw-fm-left-tooltip">Shared with me</div>
+                 </div>
+                 <div class="nw-fm-left-icon contacts">
+                   <div class="nw-fm-left-tooltip">Contacts</div>
+                 </div>
+                 <div class="nw-fm-left-icon conversations">
+                   <div class="nw-fm-left-tooltip">Conversations</div>
+                 </div>
+                 <div class="file-transter-icon"></div>
+              </div>
     
     <div class="fm-left-panel">
-      <div class="left-pane-drag-handle"></div>
-     
-      <div class="fm-left-menu">
-         <a class="fm-menu-item cloud active"></a> 
-         <a class="fm-menu-item recycle"></a>
-         <a class="fm-menu-item contacts"></a>
-         <a class="fm-menu-item messages"></a>
-		 <div class="new-notifications-txt folderlink hidden">[$808]</div>
-      </div>       
-       
-      <div class="fm-tree-panel">
-        <div class="fm-tree-pad">
-          <span class="fm-connector-first"></span>
-          <a class="fm-tree-header cloud-drive-item active">
-             <span>
-                [$164]
-             </span>    
-          </a>          
-          <ul class="fm-subfolders cloudsub"></ul>
-		  
-		            
-          <span class="fm-connector-first"></span>
-          <a class="fm-tree-header recycle-item">
-             <span>
-                [$167]
-             </span>    
-          </a>
-          <ul class="fm-subfolders rubbishsub"></ul>
-          
-          
-          <span class="fm-connector-first"></span>
-          <a class="fm-tree-header contacts-item">
-             <span class="contacts-arrows"></span> 
-             <span>
-                [$165]
-             </span>  
-          </a>          
-          <ul class="fm-subfolders contacts" id="treesub_contacts"></ul>
-		  
-          <span class="fm-connector-first"></span>
-          <a class="fm-tree-header messages-item">
-             <span>
-                [$166]
-             </span>    
-          </a>
-		  <ul class="fm-subfolders messaging"></ul>
-        </div>
-      </div>
-  
-  </div>
+                <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations" !-->
+                <div class="fm-left-menu cloud-drive">
+                   <div class="nw-fm-tree-header cloud-drive"> 
+                      Cloud Drive 
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header shared-with-me"> 
+                      Shared with me
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header contacts"> 
+                      Contacts
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header conversations"> 
+                      Conversations
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                </div>
+                <div class="fm-tree-panel">
+                  <!-- Please add "active" to necessary block to activate it !-->
+                  <div class="content-panel cloud-drive active">
+                  </div> 
+                  <div class="content-panel shared-with-me">
+                   <ul>
+                     <li>
+                       <!-- 
+                          Please add "selected" classname if item is selected. 
+                          Please add "contains-folders" classnanme if item has subfolders. 
+                          Please add "expanded" classname if item is expaned. 
+                       !-->
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div>
+                  <div class="content-panel contacts">
+                    <!-- Please set any status class "online"/"away"/"busy"/"offline" !-->
+                    <!-- Please set "selected" class to select contact !-->
+                    <div class="nw-contact-item offline">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Andrei.d
+                       </div>
+                    </div>
+                    <div class="nw-contact-item busy">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Bram van der Kolk
+                       </div>
+                    </div>
+                    <div class="nw-contact-item away">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Eduardo
+                       </div>
+                    </div>
+                    <div class="nw-contact-item online">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         César Rodas
+                       </div>
+                    </div>
+                  
+                  </div> 
+                  <div class="content-panel conversations">
+                     <div class="nw-conversations-header">
+                       Contacts
+                       <div class="nw-conversations-arrows"></div>
+                     </div>
+                     <div class="nw-conversations-item online">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Andrei.d
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item offline">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Bram van der Kolk
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item away">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Eduardo
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item busy">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          César Rodas
+                        </div>
+                     </div>
+                  </div>  
+                </div>
+              
+              </div>
 
   <div class="fm-right-files-block">
   

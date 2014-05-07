@@ -167,7 +167,7 @@ function MegaData ()
 	{
 		this.filterBy(function(node)
 		{
-		  if (node.name && node.p == id) return true;
+		  if ((node.name && node.p == id) || (node.name && node.p && node.p.length == 11 && id == 'shares')) return true;
 		});
 	};
 
@@ -433,14 +433,20 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
+		/*
 		$('.cloudsub').attr('id','treesub_' + M.RootID);
 		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
 		$('#treesub_' + M.RootID).html('');
-		this.buildtree(this.d[this.RootID]);
+		
 		$('#treesub_contacts').html('');
 		this.buildtree({h:'contacts'});
 		$('#treesub_' + M.RubbishID).html('');
 		this.buildtree({h:M.RubbishID});
+		*/
+		
+		this.buildtree({h:'shares'});
+		
+		this.buildtree(this.d[this.RootID]);
 		treeUI();
 	};
 	
@@ -469,6 +475,7 @@ function MegaData ()
 		else if (id == 'inbox') id = this.InboxID;
 		else if (id == 'cloudroot') id = this.RootID;
 		else if (id == 'contacts') id = 'contacts';
+		else if (id == 'shares') id = 'shares';
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
@@ -476,8 +483,8 @@ function MegaData ()
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
-		if (id == this.RootID) $('.fm-connector-first').removeClass('active');
 		
+
 		if (this.chat)
 		{
 			treeUIopen(M.currentdirid.replace('chat/',''),1);
@@ -489,6 +496,7 @@ function MegaData ()
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			$('.fm-right-account-block').addClass('hidden');
+			
 			var tt = new Date().getTime();
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
@@ -511,6 +519,7 @@ function MegaData ()
 				}
 			}
 			M.viewmode=viewmode;
+
 
 			if (fmconfig.uisorting && fmconfig.sorting) M.doSort(fmconfig.sorting.n,fmconfig.sorting.d);
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
@@ -562,24 +571,22 @@ function MegaData ()
 		}
 	};
 	
-	
-	
-	
 
 	this.buildtree = function(n)
 	{
+		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
+		{
+			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
+		}
+		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
+		{
+			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+		}
+		
 		if (this.c[n.h])
 		{
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
-			if (n.h == M.RubbishID) $('.fm-tree-header.recycle-item').addClass('recycle-notification');
-			if (folders.length > 0)
-			{
-				if (n.h == M.RootID) $('.fm-left-panel .fm-tree-header.cloud-drive-item').addClass('contains-subfolders');
-				else if (n.h == M.RubbishID) $('.fm-left-panel .fm-tree-header.recycle-item').addClass('contains-subfolders');
-				else if (n.h == 'contacts') $('.fm-left-panel .fm-tree-header.contacts-item').addClass('contains-subfolders');
-				else $('#treesub_'+n.h).siblings('a').addClass('contains-folders');
-			}
 			
 			// sort by name is default in the tree
 			folders.sort(function(a,b)
@@ -587,6 +594,7 @@ function MegaData ()
 				if (a.name) return a.name.localeCompare(b.name);
 			});
 			
+			/*
 			if (n.h == 'contacts')
 			{
 				// in case of contacts we have custom sort/grouping:
@@ -618,22 +626,10 @@ function MegaData ()
 				$('.contacts-sorting-type').removeClass('active');				
 				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
 			}
+			*/
 			
 			for (var i in folders)
 			{
-				var treenode = '<span>' + htmlentities(folders[i].name) + '</span>';
-				var contactc = '';
-				var statusc = '';
-				if (n.h == 'contacts')
-				{
-					contactc = 'contact';
-					statusc = 'no-status';
-					var avatar = staticpath + 'images/mega/default-avatar.png';
-					if (avatars[folders[i].h]) avatar = avatars[folders[i].h].url;
-					treenode = '<span><span class="avatar ' + folders[i].h + '"><span><img src="'+ avatar + '" alt=""/></span></span><span class="messages-icon"><span class="active">2</span></span><span class="contact-name">' + htmlentities(folders[i].name) +'</span></span>';
-				}
-				var s = '';
-				if (typeof folders[i].shares != 'undefined') s = 'shared-folder';
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
@@ -656,11 +652,12 @@ function MegaData ()
 				
 				var containsc='';
 				var cns = M.c[folders[i].h];						
-				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';				
+				
+				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				
 				if ($('#treeli_'+folders[i].h).length == 0)
-				{
+				{				
 					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
 					else $('#treesub_' + n.h).append(html);					
@@ -802,6 +799,7 @@ function MegaData ()
 
 	this.addNode = function(n,ignoreDB)
 	{
+		if (!this.c['shares']) this.c['shares'] = [];
 		if (!M.d[n.p] && n.p !== 'contacts')
 		{
 			if (n.sk) n.p = n.u;
@@ -825,7 +823,10 @@ function MegaData ()
 		{			
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
+			// maintain special incoming shares index:
+			if (n.p.length == 11) this.c['shares'][n.h]=1;			
 		}
+		
 		if (n.t == 2) this.RootID 		= n.h;
 		if (n.t == 3) this.InboxID 		= n.h;
 		if (n.t == 4) this.RubbishID 	= n.h;

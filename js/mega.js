@@ -435,9 +435,23 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
+
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		this.contacts();
+
+		/*
+		$('.cloudsub').attr('id','treesub_' + M.RootID);
+		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
+		$('#treesub_' + M.RootID).html('');
+		
+		$('#treesub_contacts').html('');
+		this.buildtree({h:'contacts'});
+		$('#treesub_' + M.RubbishID).html('');
+		this.buildtree({h:M.RubbishID});
+		*/
+		
+	
 		treeUI();
 	};
 	
@@ -479,7 +493,6 @@ function MegaData ()
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
-			
 
 		if (this.chat)
 		{
@@ -517,6 +530,7 @@ function MegaData ()
 				}
 			}
 			M.viewmode=viewmode;
+
 
 			if (fmconfig.uisorting && fmconfig.sorting) M.doSort(fmconfig.sorting.n,fmconfig.sorting.d);
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
@@ -567,6 +581,7 @@ function MegaData ()
 		}
 	};
 	
+
 	this.contacts = function()
 	{
 		var contacts = [];

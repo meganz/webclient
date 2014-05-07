@@ -299,7 +299,20 @@ else
 {
 	if (!b_u)
 	{
-		if (typeof console == "undefined") { this.console = {log: function() {}};}
+		window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
+		{
+			if (d)
+			{
+				console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
+			}
+			else
+			{
+				// TODO: XHR to log server?
+			}
+
+			return false;
+		};
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};

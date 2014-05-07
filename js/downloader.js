@@ -267,7 +267,6 @@ ClassFile.prototype.destroy = function() {
 	this.task = null;
 	this.dl.writer.destroy();
 	delete this.dl;
-	megatitle();
 }
 
 ClassFile.prototype.run = function(task_done) {

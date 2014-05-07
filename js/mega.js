@@ -1400,6 +1400,8 @@ function MegaData ()
 
 	this.makeDir = function(n)
 	{
+		if (is_chrome_firefox & 4) return;
+
 		var dirs = [];
 		function getfolders(d,o) 
 		{

@@ -352,9 +352,17 @@ else
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		if (is_chrome_firefox && OS && localStorage.fxio)
+		{
+			is_chrome_firefox |= 4;
+			jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+		}
+		else
+		{
+			jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
+			jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+			jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		}
 		jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});

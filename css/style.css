@@ -137,14 +137,14 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 }
 .logo {
 	display: block;
-	background-image: url(../images/mega/logo.png);
-	background-position: left top;
-	background-repeat: no-repeat;
-	width: 178px;
-	height: 39px;
+	width: 36px;
+	height: 36px;
 	float: left;
-	margin: 0 0 0 6px;
+	margin: 6px 0 0 6px;
 	cursor: pointer;
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position:left top;
+	background-repeat:no-repeat;
 }
 .nlanguage-popup {
 	position: absolute;
@@ -1105,68 +1105,78 @@ a.blog-button:hover {
 }
 .notification-num {
 	display: block;
-	position: absolute;
-	-moz-border-radius: 12px;
-	-webkit-border-radius: 12px;
-	border-radius: 12px;
-	background-color: #741b09;
-	color: #d6bbb6;
-	font-size: 10px;
-	line-height: 12px;
-	font-weight: bold;
-	padding: 1px 4px 1px 4px;
-	top: -6px;
-	left: 20px;
-	border: 2px solid black;
+position: absolute;
+-moz-border-radius: 12px;
+-webkit-border-radius: 12px;
+border-radius: 12px;
+background-color: #D41D00;
+color: white;
+font-size: 10px;
+line-height: 12px;
+height: 16px;
+font-weight: bold;
+padding: 1px 2px 2px 3px;
+margin: -6px 0 0 16px;
+	border: 2px solid #111111;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box
+	box-sizing: border-box;
 }
-.cloud-popup-icon:hover .notification-num, .cloud-popup-icon.active .notification-num {
-	background-color: #d11e00;
-	color: white;
-}
+
 .create-account-button {
 	cursor: pointer;
-	height: 26px;
-	line-height: 24px;
-	font-size: 13px;
+	height: 24px;
+	line-height: 22px;
+	font-size: 12px;
 	padding: 0 15px;
-	background-color: #741b09;
-	color: #d6bbb6;
+	background-color:rgba(211,34,0,0.5);
+	
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	color: #d5bbb5;
 	float: right;
 	margin: 12px 10px 0 0;
-	-webkit-border-bottom-right-radius: 4px;
-	-moz-border-radius-bottomright: 4px;
-	border-bottom-right-radius: 4px;
-	-webkit-border-top-right-radius: 4px;
-	-moz-border-radius-topright: 4px;
-	border-top-right-radius: 4px;
+	-webkit-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomright:8px;
+	border-bottom-right-radius: 8px;
+	-webkit-border-top-right-radius: 8px;
+	-moz-border-radius-topright: 8px;
+	border-top-right-radius: 8px;
 }
 .create-account-button:hover, .create-account-button.active {
-	background-color: #D12B00;
-	color: white;
+	background-color:rgba(213,31,0,0.7);
+	color: #e1bcb4;
+	
 }
 .top-login-button {
 	cursor: pointer;
-	height: 26px;
-	line-height: 24px;
-	font-size: 13px;
+	height: 24px;
+	line-height: 22px;
+	font-size: 12px;
 	padding: 0 15px;
-	background-color: #383736;
-	color: #c4c3c3;
+	background-color:rgba(255,255,255,0.15);
+	
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	color: #c2c2c2;
 	float: right;
 	margin: 12px 2px 0 0;
-	-webkit-border-bottom-left-radius: 4px;
-	-moz-border-radius-bottomleft: 4px;
-	border-bottom-left-radius: 4px;
-	-webkit-border-top-left-radius: 4px;
-	-moz-border-radius-topleft: 4px;
-	border-top-left-radius: 4px;
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
+	-webkit-border-top-left-radius: 8px;
+	-moz-border-radius-topleft: 8px;
+	border-top-left-radius: 8px;
 }
 .top-login-button:hover, .top-login-button.active {
-	background-color: #606060;
-	color: white;
+	background-color:rgba(255,255,255,0.3);
+	color:#bcbcbc;
 }
 .unread-num {
 	display: inline-block;
@@ -1186,34 +1196,6 @@ a.blog-button:hover {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: -1px -9px 0 6px;
-}
-.notification-popup, .warning-popup {
-	width: 402px;
-	position: absolute;
-	left: -185px;
-	top: 40px;
-	-webkit-border-bottom-left-radius: 6px;
-	-moz-border-radius-bottomleft: 6px;
-	border-bottom-left-radius: 6px;
-	-webkit-border-bottom-right-radius: 6px;
-	-moz-border-radius-bottomright: 6px;
-	border-bottom-right-radius: 6px;
-	background-color: white;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	border: 2px solid rgba(0, 0, 0, 0.2);
-	-moz-background-clip: border;
-	-webkit-background-clip: border;
-	background-clip: border-box;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding;
-	background-clip: padding-box;
-	border-top: none;
-	z-index: 1000;
-}
-.notification-popup {
-	margin: 10px 0 0 -185px;
 }
 .notification-settings {
 	display: block;
@@ -1303,13 +1285,8 @@ a.blog-button:hover {
 .notification-status-icon {
 	display: block;
 	background-color: inherit;
-	background-image: url(../images/mega/notification-sprite.png);
-	background-repeat: no-repeat;
-	background-position: -544px center;
-	padding-left: 21px;
-}
-.read .notification-status-icon {
-	background-position: -624px center;
+	padding-left: 26px;
+	position:relative;
 }
 .notification-type {
 	display: block;
@@ -1359,10 +1336,12 @@ a.blog-button:hover {
 }
 .notification-info {
 	font-size: 12px;
-	color: #575b5c;
+	color: #666666;
 	display: block;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	line-height: 20px;
+	padding-top:5px;
+	
 }
 .nt-popup .notification-info {
 	height: 40px;
@@ -1410,10 +1389,10 @@ a.blog-button:hover {
 }
 .notification-date {
 	font-size: 11px;
-	color: #898c8c;
+	color: #999999;
 	display: block;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	padding-top: 5px;
+	padding-bottom:5px;
 }
 .notification-seeAll {
 	display: block;
@@ -3226,14 +3205,14 @@ label.iPhoneCheckLabelOff span {
 	background-image: none;
 }
 .fm-avatar {
-	height: 40px;
-	width: 40px;
+	height: 36px;
+	width: 36px;
 	float: right;
 	display: block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 5px 10px 0 0;
+	margin: 7px 10px 0 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -3251,29 +3230,35 @@ label.iPhoneCheckLabelOff span {
 	border: 2px solid #d9d9d9;
 }
 .top-menu-icon {
-	background-position: left -9452px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
 	cursor: pointer;
-	height: 26px;
-	line-height: 24px;
-	font-size: 13px;
+	height: 24px;
+	line-height: 22px;
+	font-size: 12px;
 	padding: 0 10px 0 26px;
 	background-color: #383736;
-	color: #c4c3c3;
+	color: #c2c2c2;
 	float: right;
 	margin: 12px 10px 0 0;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	background-color:rgba(255,255,255,0.15);
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position: -4px -60px;
+	background-repeat:no-repeat;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 .top-menu-icon:hover, .top-menu-icon.active {
-	background-position: left -9517px;
-	background-color: #606060;
-	color: white;
+	background-color:rgba(255,255,255,0.3);
+	background-position: -4px -110px;
+	color:#bcbcbc;
 }
 .fm-avatar img {
-	width: 36px;
+	width: 32px;
 	border: 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
@@ -3287,7 +3272,7 @@ label.iPhoneCheckLabelOff span {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	margin: 17px 6px 0 0;
+	margin: 16px 6px 0 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -3295,12 +3280,6 @@ label.iPhoneCheckLabelOff span {
 }
 .activity-status-block:hover, .activity-status-block.active {
 	border: 2px solid #424140;
-}
-.download-page .activity-status-block {
-	border: 2px solid white;
-}
-.download-page .activity-status-block:hover, .download-page .activity-status-block.active {
-	border: 2px solid #b2b2b2;
 }
 .activity-status, .contact-status {
 	height: 8px;
@@ -3329,7 +3308,7 @@ label.iPhoneCheckLabelOff span {
 	margin-left: 20px;
 }
 .activity-status.online, .contact-status.online-status {
-	background-color: #71ae32;
+	background-color: #71AE32;
 }
 .activity-status.away, .contact-status.away-status {
 	background-color: #ffce00;
@@ -3345,26 +3324,16 @@ label.iPhoneCheckLabelOff span {
 }
 .membership-status-block {
 	float: right;
-	margin: 13px 16px 0 0;
+	margin: 14px 16px 0 0;
 	height: 24px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 2px;
-	border: 2px solid #151412;
 	cursor: pointer;
 	-moz-border-radius: 18px;
 	-webkit-border-radius: 18px;
 	border-radius: 18px;
-}
-.download-page .membership-status-block {
-	border: 2px solid white;
-}
-.membership-status-block:hover, .membership-status-block.active {
-	border: 2px solid #424140;
-}
-.download-page .membership-status-block:hover, .download-page .membership-status-block.active {
-	border: 2px solid #b2b2b2;
 }
 .membership-status {
 	height: 16px;
@@ -3381,39 +3350,36 @@ label.iPhoneCheckLabelOff span {
 	text-transform: uppercase;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	font-size: 11px;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 .membership-status.pro {
 	background-color: #741b09;
 	color: #d6bbb6;
 }
 .membership-status.free {
-	background-color: #609e1f;
-	color: #eaf3d1;
-}
-.download-page .membership-status.pro {
-	background-color: #D22000;
-	color: white;
-}
-.download-page .membership-status.free {
-	background-color: #6EB028;
-	color: white;
+	background-color: #528121;
+	color: #cbd9bd;
 }
 .membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
-	background-color: #d11e00;
-	color: white;
+	background-color: #bf1f02;
+	color: #f9e9e6;
 }
 .membership-status-block:hover .membership-status.free, .membership-status-block.active .membership-status.free {
-	background-color: #6EB028;
-	color: white;
+	background-color: #6eb028;
+	color: #f1f7ea;
 }
 .user-name, a.user-name {
 	float: right;
-	margin: 12px 20px 0 0;
+	margin: 11px 20px 0 0;
 	display: block;
 	line-height: 24px;
-	color: #8a8a89;
+	color: #888888;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	font-size: 13px;
+	font-size: 12px;
 	cursor: default;
 }
 .download-page .user-name, .download-page a.user-name {
@@ -3446,27 +3412,60 @@ label.iPhoneCheckLabelOff span {
 .notification-popup-icon:hover, .notification-popup-icon.active {
 	background-position: -9px -325px;
 }
-.cloud-popup-icon, .warning-popup-icon {
+.cloud-popup-icon, .warning-popup-icon, .top-chat-notification {
 	float: right;
-	height: 30px;
-	width: 32px;
-	margin: 10px 20px 0 0;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -9px -390px;
-	background-repeat: no-repeat;
-	cursor: pointer;
-	position: relative;
+height: 24px;
+width: 24px;
+margin: 13px 20px 0 0;
+background-image: url(../images/mega/top-sprite.svg);
+background-position: -9px -205px;
+background-repeat: no-repeat;
+cursor: pointer;
+background-color:rgba(255,255,255,0.15);
+-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.top-chat-notification {
+	background-position: -9px -155px;
+}
+.cloud-popup-icon:hover, .top-chat-notification:hover {
+	background-color:rgba(255,255,255,0.3);
+}
+.cloud-popup-icon.active, .top-chat-notification.active {
+	background-color:rgba(255,255,255,0.5);
+}
+
+.warning-popup-icon {
+	background-position: -9px -254px;
+	background-color:rgba(255,192,0,0.8);
+}
+.warning-popup-icon.active, .warning-popup-icon:hover {
+	background-color:rgba(255,192,0,1);
 }
 .warning-icon-area {
-	height: 30px;
-	width: 32px;
+	height: 24px;
+	width: 24px;
 	cursor: pointer;
 }
 .warning-popup-body {
-	padding: 0 20px 20px 20px;
-	font-size: 13px;
+	padding: 20px 20px 20px 20px;
+	font-size: 12px;
 	line-height: 21px;
 	color: #666666;
+}
+.warning-popup-body .green {
+	color:#409900;
+}
+.warning-header {
+	font-size:18px;
+	line-height:24px;
+	padding: 5px 0 20px 0;
 }
 .warning-gray-icon {
 	width: 37px;
@@ -3484,35 +3483,38 @@ label.iPhoneCheckLabelOff span {
 	background-position: center 1px;
 	background-repeat: no-repeat;
 }
-.warning-popup-icon, .warning-popup-icon:hover, .warning-popup-icon.active {
-	background-position: -9px -10829px;
-}
-.cloud-popup-icon:hover, .cloud-popup-icon.active {
-	background-position: -9px -460px;
-}
+
 .top-search-bl {
 	float: right;
-	height: 30px;
-	width: 220px;
-	border: 2px solid #444342;
+	height: 24px;
+	width: 160px;
 	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
 	border-radius: 15px;
-	margin: 10px 20px 0 0;
+	margin: 13px 20px 0 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: -10px top;
-	background-repeat: no-repeat;
 	position: relative;
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position: -3px -473px;
+	background-repeat:no-repeat;
+	background-color:rgba(255,255,255,0.15);
+	
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
-.active.top-search-bl {
-	border: 2px solid #737271;
-	background-position: -10px -55px;
+.top-search-bl:hover, .top-search-bl.active {
+	background-color:rgba(255,255,255,0.3);
 }
-.active .top-search-input {
-	color: #737271;
+.active.focused .top-search-input {
+	color: #434343;
+}
+.active.focused.typing .top-search-input {
+	color: black;
 }
 .contains-value .top-search-clear {
 	background-image: url(../images/mega/main-sprite.png?v=7);
@@ -3526,29 +3528,28 @@ label.iPhoneCheckLabelOff span {
 .contains-value .top-clear-button {
 	display: block;
 	width: 30px;
-	height: 26px;
+	height: 24px;
 	right: 0;
 	position: absolute;
 	z-index: 100;
 	cursor: pointer;
 }
 .top-search-clear {
-	height: 26px;
-	background-position: right -1707px;
+	height: 24px;
+	background-position: right -1708px;
 	background-repeat: no-repeat;
-	padding: 0 30px 0 25px;
+	padding: 0 30px 0 27px;
 }
 .top-search-input {
 	border: 0;
 	width: 100%;
-	line-height: 24px;
-	height: 26px;
-	background-color: #151412;
-	color: #444342;
-	font-size: 13px;
+	line-height: 22px;
+	color: black;
+	font-size: 12px;
 	margin: 0;
 	padding: 0;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	background-color:transparent;
 }
 .fm-main {
 	height: 100%;
@@ -5220,8 +5221,11 @@ span.search-number {
 }
 .context-menu-divider {
 	height: 2px;
-	background-color: #e7e8e8;
-	margin: 5px 0;
+	background-color: #3d3d3d;
+	margin: 3px 0;
+}
+.context-menu-divider.pro {
+	background-color:transparent;
 }
 .create-new-folder, .add-user-popup {
 	display: none;
@@ -6398,17 +6402,58 @@ div .fm-tree-folder.dragover {
 }
 .fm-dialog-header, .notification-header {
 	height: 32px;
-	border-bottom: 2px solid #eeeeee;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box
+	box-sizing: border-box;
+	text-align:center;
+	background-color:#F6F6F6;
+	text-align:center;
 }
 .fm-dialog-title, .notification-txt {
 	line-height: 30px;
-	font-size: 13px;
+	font-size: 12px;
 	float: left;
 	color: #D21F00;
 	padding-left: 10px;
+}
+.notification-txt {
+	color:#999999;
+	display:inline-block;
+	padding: 0 0 0 26px;
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position: -8px -511px;
+	background-repeat:no-repeat;
+	float:none;
+	
+}
+.notification-status {
+	width:8px;
+	height:8px;
+	position:absolute;
+	display:block;
+	-moz-border-radius: 100%;
+-webkit-border-radius: 100%;
+border-radius: 100%;
+margin: -4px 0 0 -16px;
+background-color:rgba(213,22,0,0.7);
+-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	top:50%;
+}
+.notification-status-icon:hover .notification-status {
+	background-color:rgba(213,22,0,1);
+}
+.read .notification-status {
+	background-color:rgba(0,0,0,0.2);
+	width:4px;
+	height:4px;
+	margin: -2px 0 0 -15px;
+}
+.read .notification-status-icon:hover .notification-status {
+	background-color:rgba(0,0,0,0.4);
 }
 .fm-dialog-chrome-clipboard {
 	position: absolute;
@@ -6604,101 +6649,88 @@ div .fm-tree-folder.dragover {
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
 	background-color: #F6F6F6;
 	height: 50px;
-	-webkit-border-bottom-left-radius: 6px;
-	-moz-border-radius-bottomleft: 6px;
-	border-bottom-left-radius: 6px;
-	-webkit-border-bottom-right-radius: 6px;
-	-moz-border-radius-bottomright: 6px;
-	border-bottom-right-radius: 6px;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-left-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomright: 7px;
+	border-bottom-right-radius: 7px;
 	position: relative;
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
 	float: right;
-	height: 30px;
+	height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
-	font-size: 13px;
-	line-height: 24px;
+	font-size: 12px;
+	line-height: 30px;
 	text-align: center;
-	padding: 0 10px;
-	background-color: white;
-	border: 2px solid #b2b2b2;
-	color: #b8baba;
+	padding: 0 15px;
+	background-color: rgba(0,0,0,0.3);
+	color: white;
 	cursor: default;
 	margin: 10px 10px 0 0;
-	min-width: 84px;
 	user-select: none;
 	-moz-user-select: none;
 	-khtml-user-select: none;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.fm-dialog-button.warning-button {
+	background-color: rgba(143,196,98,0.9);
+}
+.fm-dialog-button.warning-button:hover {
+	background-color: rgba(143,196,98,1);
+}
+.fm-dialog-button.red {
+	background-color: rgba(213,22,0,0.7);
+	color:white;
+}
+.fm-dialog-button.red:hover {
+	background-color: rgba(213,22,0,0.9);
 }
 .top-dialog-login-button {
 	margin: 5px 0px 10px 0;
 }
 .fm-dialog-button.move-button.active, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
 	cursor: pointer;
-	border: 2px solid #D32200;
-	color: #D32200;
 }
-.fm-dialog-button.move-button.active:hover, .top-dialog-login-button, .top-dialog-login-button:hover {
-	background-color: #D32200;
-	color: white;
-}
-.avatar-dialog .fm-account-change-avatar {
-	border: 2px solid #b2b2b2;
-}
-.avatar-dialog .fm-account-change-avatar:hover {
-	border: 2px solid #b2b2b2;
+.fm-dialog-button:hover, .top-dialog-login-button:hover, fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover {
+	background-color: rgba(0,0,0,0.5);
 }
 .fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active {
-	color: #363b3b;
 	cursor: pointer;
 	position: relative;
 }
 .fm-dialog-button.cancel-button.active:hover, .fm-dialog-button.save-button.active:hover, .fm-dialog-button.add-contact-button.active:hover, .fm-dialog-button.cancel-contact-button.active:hover, .fm-dialog-button.notification-button.active:hover, .fm-dialog-button.links-button.active:hover, .fm-dialog-button.browsers-button.active:hover, .fm-dialog-button.fm-terms-cancel.active:hover, .fm-dialog-button.quota-later-button.active:hover, .fm-dialog-button.close-button.active:hover, .fm-dialog-button.notifications-button.active:hover, .fm-dialog-button.fm-languages-save.active:hover, .fm-dialog-button.membership-button.active:hover, .avatar-dialog .fm-account-change-avatar:hover, .fm-dialog-button.warning-button:hover {
-	background-color: #b2b2b2;
 	color: white;
 	cursor: pointer;
 }
 .fm-account-button {
-	border: 2px solid #b2b2b2;
-	color: #363b3b;
 	cursor: pointer;
 	display: inline-block;
 	margin: 10px 5px 0 5px;
 	float: none;
 }
-.fm-account-button:hover, .fm-account-button.active {
-	background-color: #474747;
-	border: 2px solid #474747;
-	color: white;
-}
-.fm-dialog-button.notifications-button {
-	background-position: 8px -9834px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	text-align: left;
-	padding: 0 10px 0 38px;
-}
-.fm-dialog-button.notifications-button:hover {
-	background-position: 8px -9879px;
-}
+
 .fm-dialog-button.links-button {
 	position: relative;
 }
 .fm-dialog-button.links-button object {
-	height: 26px;
+	height: 32px;
 	width: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
 }
 .fm-dialog-button.quota-upgrade-button.active, .fm-dialog-button.quota-upgrade-button.active:hover, .fm-dialog-button.fm-terms-agree.active:hover {
-	background-color: #D21F00;
-	border: 2px solid #D21F00;
 	color: white;
 	cursor: pointer;
 }
@@ -7753,13 +7785,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	display: block;
 }
 .top-menu-popup, .top-submenu-popup, .top-user-status-popup, .membership-popup, .top-login-popup, .top-warning-popup {
-	min-width: 178px;
+	min-width: 170px;
 	position: absolute;
 	background-color: white;
-	-webkit-border-bottom-left-radius: 7px;
-	-moz-border-radius-bottomleft: 7px;
-	border-bottom-left-radius: 7px;
-	border: 2px solid rgba(0, 0, 0, .3);
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
 	border-top: 0;
 	border-right: 0;
 	-webkit-background-clip: padding-box;
@@ -7768,36 +7799,104 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	z-index: 500;
-	padding: 5px 0;
+	padding: 4px 0;
 	min-height: 40px;
-	top: 50px;
+	top: 48px;
 	right: 0;
-	display: none;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	margin-left:-10000px;
+	margin-right:-10000px;
+}
+.top-menu-popup.active, .top-submenu-popup.active, .top-user-status-popup.active, .membership-popup.active, .top-login-popup.active, .top-warning-popup.active, .notification-popup.active, .warning-popup.active {
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+	margin-left:0;
+	margin-right:0;
+}
+.top-warning-popup.active, .notification-popup.active, .warning-popup.active, .notification-popup.active.hidden, .warning-popup.active.hidden {
+	margin-left:-188px;
+	margin-right:0;
+}
+.notification-popup, .warning-popup  {
+	width: 402px;
+	position: absolute;
+	left: -185px;
+	top: 38px;
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
+	-webkit-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomright: 8px;
+	border-bottom-right-radius: 8px;
+	background-color: white;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 2px solid rgba(0, 0, 0, 0.15);
+	-moz-background-clip: padding-box;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border-top: none;
+	z-index: 1000;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	margin-left:-10000px;
+	display:block;
+}
+.notification-popup {
+	margin-top: 10px;
+}
+.membership-popup, .top-login-popup, .top-warning-popup {
+	border-left:2px solid rgba(0,0,0,0.15);
+	border-bottom:2px solid rgba(0,0,0,0.15);
+	-moz-background-clip: padding-box;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	
+}
+.top-menu-popup, .top-submenu-popup, .top-user-status-popup {
+	background-color:#333333;
+	font-size:12px;
+	color:#CCCCCC;
+	
 }
 .top-login-popup {
 	width: 332px;
 }
 .top-warning-popup {
-	border-right: 2px solid rgba(0, 0, 0, .3);
-	-webkit-border-bottom-right-radius: 7px;
-	-moz-border-radius-bottomright: 7px;
-	border-bottom-right-radius: 7px;
-	top: 40px;
+	border-right: 2px solid rgba(0, 0, 0, .15);
+	-webkit-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomright: 8px;
+	border-bottom-right-radius: 8px;
+	top: 48px;
 	width: 404px;
-	left: 50%;
 	right: auto;
-	margin-left: -202px;
+	margin-left: -190px;
 	padding: 0;
-}
-.top-warning-popup .membership-popup-arrow {
-	margin-right: 174px;
 }
 .top-warning-popup.active {
 	display: block;
 }
 .membership-popup {
-	min-width: 470px;
-	min-height: 263px;
+	min-width: 472px;
+	min-height: 265px;
 	padding: 0;
 }
 .membership-main-block, .membership-loading {
@@ -7887,7 +7986,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	display: inline-block;
 }
 .membershtip-medium-txt {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 20px;
 	color: #333333;
 }
@@ -8083,17 +8182,33 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	right: 34px;
 }
 }
-.top-menu-popup.active, .top-login-popup.active, .top-user-status-popup.active, .membership-popup.active {
-	display: block;
-}
+
 .top-submenu-popup {
 	top: 0;
-	right: 100%;
-	border: 2px solid rgba(0, 0, 0, .3);
-	-moz-border-radius: 7px;
-	-webkit-border-radius: 7px;
-	border-radius: 7px;
-	margin: -7px -7px 0 0;
+	right: 90%;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	margin: -8px 0 0 0;
+	-webkit-border-top-right-radius: 0px;
+	-moz-border-radius-topright: 0px;
+	border-top-right-radius: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+	-moz-border-radius-bottomright: 0px;
+	border-bottom-right-radius: 0px;
+	padding: 8px 0;
+	 filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	-webkit-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
+	display:block;
+	margin-right:-600px;
+	margin-left:0;
 }
 .top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
@@ -8103,41 +8218,53 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-moz-border-radius-topright: 0px;
 	border-top-right-radius: 0px;
 }
-.top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow {
-	height: 7px;
+.top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
+	height: 8px;
 	margin-top: -12px;
-	background-position: center -9616px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	width: 52px;
+	width: 44px;
 	float: right;
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position: 2px -420px;
+	background-repeat:no-repeat;
+}
+.top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
+	background-position: 2px -440px;
+}
+.notification-arrow {
+	background-position: 2px -450px;
+}
+.notification-arrow, .warning-popup-arrow {
+	position:absolute;
+	float:none;
+	left:50%;
+	margin-left:-21px;
+	top: 4px;
+}
+.membership-popup-arrow {
+	margin-top: -8px;
 }
 .top-login-arrow {
 	margin-right: 183px;
 }
-.membership-popup-arrow {
-	margin-top: -7px;
-}
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.membership-popup-arrow {
-	margin-right: 109px;
-}
-.notification-arrow {
-	width: 100%;
-	margin-top: -7px;
-}
 .top-menu-item, .top-user-status-item {
 	display: block;
-	height: 30px;
-	line-height: 28px;
+	height: 32px;
+	line-height: 30px;
 	padding: 0 15px 0 26px;
-	font-size: 13px;
+	font-size: 12px;
 	cursor: pointer;
 	position: relative;
-	color: rgb(51, 51, 51);
+	color: #cccccc;
 	white-space: nowrap;
+	background-color: rgba(255,255,255,0);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 .top-user-status-item {
 	padding-left: 5px;
@@ -8155,26 +8282,34 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	margin: 0 0 0 22px;
 }
 .top-menu-item.upgrade-your-account {
-	color: #D42600;
+	color: #cfdcbf;
+	background-color: rgba(109,177,15,0.7);
+}
+.top-menu-item.upgrade-your-account:hover {
+	color: white;
+	background-color: rgba(109,177,15,1);
 }
 .top-submenu-popup .top-menu-item {
 	padding: 0 15px;
 }
 .top-menu-item:hover, .top-menu-item.active {
-	background-color: #d11e00;
+	background-color: rgba(255,255,255,0.1);
 	color: white;
 }
 .top-menu-item.contains-submenu {
-	background-image: url(../images/mega/main-sprite.png?v=7);
 	font-family: 'Open Sans', Arial;
 	background-repeat: no-repeat;
-	background-position: 3px -9657px;
-}
-.top-menu-item.contains-submenu:hover, .top-menu-item.contains-submenu.active {
-	background-position: 3px -9687px;
+	background-image:url(../images/mega/top-sprite.svg);
+	background-position: left -348px;
+	background-repeat:no-repeat;
 }
 .top-menu-item.contains-submenu:hover .top-submenu-popup, .top-menu-item.contains-submenu.active .top-submenu-popup {
-	display: block;
+	 filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+	right:100%;
+	margin-right:0;
 }
 .green-circle, .blue-circle, .game-circle {
 	background-image: url(../images/mega/rounded-progressbars.png);
@@ -8549,7 +8684,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	position: absolute;
 	top: 0;
 	margin-top: 24px;
-	background-position: center -4991px;
 	display: none;
 	z-index: 401;
 }
@@ -8750,6 +8884,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	border: 2px solid rgba(0,0,0,0.3);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
 }
 .account-history-dropdown-button {
 	margin: -3px 0 0 0;
@@ -8757,29 +8893,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	min-width: 145px;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
 }
 .top-head.startpage, .top-head.download-page, .top-head.browsers-page {
 	background-color: white;
 	position: relative;
-}
-.startpage .logo {
-	display: none;
-}
-.download-page .logo, .browsers-page .logo {
-	background-image: url(../images/mega/logo-black.png);
-	background-position: 10px 13px;
-	background-repeat: no-repeat;
-}
-.startpage .top-menu-icon, .download-page .top-menu-icon {
-	background-position: 6px -10238px;
-}
-.startpage .create-account-button, .download-page .create-account-button {
-	background-color: #DB0605;
-	color: white;
-}
-.startpage .top-login-button, .download-page .top-login-button {
-	background-color: #4c4c4c;
-	color: white;
 }
 .st-get-started-block {
 	display: block;
@@ -14838,7 +14957,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	display: inline-block;
 	float: none;
 	margin: 0;
-	color: #333333;
 }
 .restore-success .fm-dialog-button.browsers-button:hover, .reset-success .fm-dialog-button.browsers-button:hover {
 	border-color: #D42400;
@@ -15521,12 +15639,9 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .top-menu-icon, .language-popup-icon, .notification-popup-icon, .cloud-popup-icon, .top-search-bl, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .grid-header-star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .grid-url-arrow, .transfer-type, .transfer-status, .fm-back-button, .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs, .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow, .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-new-folder, .fm-file-upload, .fm-folder-upload, .fm-add-user, .fm-clearbin-button, .fm-files-view-icon, .fm-contacts-view-icon, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-dialog-button.notifications-button, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .top-user-status-item.active, .top-menu-item.contains-submenu, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-popup-icon, .warning-gray-icon, .arrow.asc, .arrow.desc, .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .grid-header-star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .grid-url-arrow, .transfer-type, .transfer-status, .fm-back-button, .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs, .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow, .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-new-folder, .fm-file-upload, .fm-folder-upload, .fm-add-user, .fm-clearbin-button, .fm-files-view-icon, .fm-contacts-view-icon, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-login-arrow, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon, .arrow.asc, .arrow.desc, .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
-}
-.warning-popup-icon, .warning-popup-icon:hover, .warning-popup-icon.active {
-background-position: -9px -10828px;
 }
 top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/language-sprite@2x.png);
@@ -15543,10 +15658,6 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
 .green-circle, .blue-circle, .game-circle {
  background-image: url(../images/mega/rounded-progressbars@2x.png);
  background-size: 64px auto;
-}
-.download-page .logo, .browsers-page .logo {
- background-image: url(../images/mega/logo-black@2x.png);
- background-size: 128px auto;
 }
 .nw-bottom-copyrigths, .nw-start-nz, .nw-bottom-social {
  background-image: url(../images/mega/bottom-sprite@2x.png);
@@ -15600,11 +15711,6 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/avatar-zoom@2x.png);
  background-size: 367px auto;
 }
-.logo {
- display: block;
- background-image: url(../images/mega/logo_x2.png);
- background-size: 180px auto;
-}
  .new-affiliate-bg1, .new-affiliate-right-bg, .new-affialite-mid-bg, ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.cannt-ul li span, .new-affiliate-icon, .new-affiliate-star, .affiliate-input-block.select, .affiliate .radioOn, .affiliate .radioOff {
 background-image: url(../images/mega/new-affiliate-sprite@2x.png);
 background-size: 1500px auto;
@@ -15621,7 +15727,7 @@ background-size: 904px auto;
 background-image: url(../images/mega/notification-icons@2x.png);
 background-size: 414px auto;
 }
-a.notification-icon, a.notification-icon:link, a.notification-icon:visited, a.notification-icon:active, a.notification-icon:hover, a.notification-icon.active, a.notification-icon.active:link, a.notification-icon.active:visited, a.notification-icon.active:active, .notification-status-icon, .notification-type, .nt-popup-close, .nt-info-block .notification-type {
+a.notification-icon, a.notification-icon:link, a.notification-icon:visited, a.notification-icon:active, a.notification-icon:hover, a.notification-icon.active, a.notification-icon.active:link, a.notification-icon.active:visited, a.notification-icon.active:active, .notification-type, .nt-popup-close, .nt-info-block .notification-type {
 background-image: url(../images/mega/notification-sprite@2x.png);
 background-size: 1814px 30px;
 }

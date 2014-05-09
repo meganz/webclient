@@ -211,7 +211,7 @@ function donotify()
 	{
 		notifymarkcount(true);
 		notifycounter();
-		$('.notification-popup').addClass('hidden');
+		$('.notification-popup').removeClass('active');
 		$('.cloud-popup-icon').removeClass('active');
 		var id = $(this).attr('id');
 		if (id)
@@ -246,7 +246,7 @@ function hide_notiblock()
 {
 	notifymarkcount(true);
 	$(".notification-icon").removeClass('active');
-	$('.notification-popup').addClass('hidden');
+	$('.notification-popup').removeClass('active');
 }
 
 function popup(id,html)
@@ -342,6 +342,7 @@ function notificationhtml(id,type,title,time,read)
 	
 	rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
 	rhtml += '<span class="notification-status-icon">';
+	rhtml += '<span class="notification-status"></span>';
 	rhtml += '<span class="notification-type">';
 	rhtml += '<span class="notification-content">';
 	rhtml += '<span class="notification-info">' + title + '</span>';
@@ -413,7 +414,7 @@ function initNotifications()
 	  {
 		  $(this).addClass('active');
 		  $('.notification-popup').css('left', $(this).position().left);
-		  $('.notification-popup').removeClass('hidden');
+		  $('.notification-popup').addClass('active');
 		  notifyclock();		
 		  donotify();		  
 	  } 
@@ -422,7 +423,7 @@ function initNotifications()
 		  notifymarkcount(true);
 		  notifycounter();
 		  $(this).removeClass('active');
-		  $('.notification-popup').addClass('hidden');
+		  $('.notification-popup').removeClass('active');
 	  }
 	});
 	
@@ -430,7 +431,7 @@ function initNotifications()
 	$('.notifications-button').bind('click',function(e)
 	{
 		$('.cloud-popup-icon').removeClass('active');
-		$('.notification-popup').addClass('hidden');
+		$('.notification-popup').removeClass('active');
 		document.location.hash = 'fm/notifications';
 	});
 	

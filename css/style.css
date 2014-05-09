@@ -9814,9 +9814,9 @@ body.new-startpage {
 	overflow: hidden;
 }
 .main-top-info-block {
-	height: 70px;
+	height: 48px;
 	background-color: rgba(0,0,0,0.8);
-	padding-top: 20px;
+	padding-top: 9px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

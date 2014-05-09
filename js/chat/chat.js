@@ -279,6 +279,7 @@ var MegaChat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': "sandbox.developers.mega.co.nz",
         'rtcSession': {
+            dummyCryptoFunctions: true,
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
                 {

@@ -62,6 +62,7 @@ function WebrtcApi() {
             };
         }
     } else {
+        this.unsupported = true;
         console.log('Browser does not appear to be WebRTC-capable');
     }
     var mst = this.MediaStreamTrack;
@@ -85,7 +86,9 @@ function WebrtcApi() {
         this.getMediaInputTypesFromStream = function(cb) {
             this.getUserMedia({audio:true, video:true},
                 function(stream) {
-                    cb({audio: (stream.getAudioTracks().length > 0), video: (stream.getVideoTracks().length > 0)});
+                    var result = {audio: (stream.getAudioTracks().length > 0), video: (stream.getVideoTracks().length > 0)};
+                    stream = null;
+                    cb(result);
                 },
                 function() {
                     cb({error: true})
@@ -191,3 +194,6 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um, self, 
     }
 }		
 
+var RTC = new WebrtcApi;
+if (RTC.unsupported)
+    RTC = null;

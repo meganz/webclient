@@ -353,6 +353,7 @@ else
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
         jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
         jsl.push({f:'js/vendor/chat/strophe.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'mega_js', j:1,w:7});

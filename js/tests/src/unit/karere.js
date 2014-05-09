@@ -79,6 +79,7 @@ describe("Karere Unit Test", function() {
         // presence was send
         expect(m1.calls['send'][0][0].tagName).to.equal("presence");
 
+        promise.verify();
         expect(promise.state()).to.equal("resolved");
 
 

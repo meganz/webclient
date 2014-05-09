@@ -8,6 +8,7 @@
  * Note: requires sinon.js
  *
  * @param objectInstance
+ * @param methods
  * @constructor
  */
 var ObjectMocker = function(objectInstance, methods) {
@@ -31,7 +32,11 @@ var ObjectMocker = function(objectInstance, methods) {
             if(!obj[k]) {
                 obj[k] = function() {};
             }
-            sinon.stub(obj, k, v);
+            if(obj[k] && obj[k].name == "proxy") {
+                return;
+            } else {
+                sinon.stub(obj, k, v);
+            }
         }
     });
 
@@ -87,7 +92,9 @@ ObjectMocker.prototype.restore = function() {
                 console.error("Could not find .restore on", obj[k]);
             }
         } else {
-            obj[k] = obj[k].oldVal;
+            if(obj[k] && obj[k].oldVal) {
+                obj[k] = obj[k].oldVal;
+            }
         }
     });
 };
@@ -112,4 +119,38 @@ ObjectMocker.prototype.logFunctionCallWrapper = function(name, fn) {
             return fn.apply(this, toArray(arguments));
         }
     }
+};
+
+
+
+/**
+ * mock every fn in megaChatObj (recursively)
+ *
+ * @param obj
+ * @returns {{}} returns mock obj that can be used as `methods` arg of {{ObjectMocker}}
+ */
+
+ObjectMocker.generateMockArrayFor = function(obj) {
+    var reg = []; // private scope
+
+    var _recurs = function(obj) {
+        var mockedFns = {};
+
+        $.each(obj, function(k, v) {
+            // recursion protection
+            if(reg.indexOf(obj[k]) > -1) {
+                return; // continue;
+            }
+            reg.push(obj[k]);
+
+            if($.isFunction(obj[k])) {
+                mockedFns[k] = obj[k];
+            } else if($.isPlainObject(obj[k]) || (obj[k] instanceof Object && !$.isArray(obj[k]))) {
+                mockedFns[k] = _recurs(obj[k]);
+            }
+        });
+        return mockedFns;
+    };
+
+    return _recurs(obj);
 };

@@ -77,364 +77,18 @@ TBD.STATIC_PUB_KEY_DIR = {
 };
 
 
-var OpQueue = function(ctx, validateFn, recoverFailFn) {
-    this.ctx = ctx;
-    this._queue = [];
-
-    this.validateFn = validateFn;
-    this.recoverFailFn = recoverFailFn;
-    this.MAX_ERROR_RETRIES = 10; /* todo */
-
-    this._error_retries = 0;
-
-    // TODO: TODO: TODO: TODO: FIXME: XX: THIS IS REAALLYYY BAD!!!
-    this.tickTimer = this.retry();
-
-    return this;
-};
-
-OpQueue.prototype.queue = function(opName, arrArgs, secondArg, thirdArg) {
-    arrArgs = arrArgs || [];
-
-    this._queue.push(
-        [
-            opName,
-            arrArgs,
-            secondArg,
-            thirdArg
-        ]
-    );
-
-    this.pop(); // try to exec the op immediately
-};
-
-OpQueue.prototype.retry = function() {
-    if(this.tickTimer) {
-        clearTimeout(this.tickTimer);
-        this.tickTimer = null;
-    }
-    var self = this;
-
-    return this.tickTimer = setTimeout(function() {
-        this.tickTimer = null;
-        self.pop();
-    }, 1000);
-}
-
-OpQueue.prototype.pop = function() {
-    if(this._queue.length == 0) {
-        return true;
-    }
-
-    this._currentOp = this._queue[0];
-
-    if(this.validateFn(this, this._queue[0])) {
-        var op = this._queue.shift();
-
-        if($.isArray(op[1])) { // supports combining multiple ops
-            /**
-             * if the next X ops are the same, combine them (call the op, with args = args1 + args2 + args3)
-             */
-            var lastRemovedElementId = -1;
-            $.each(this._queue.slice(), function(k, v) {
-                if(v[0] == op[0]) {
-                    op[1].push(
-                        v[1]
-                    );
-                    lastRemovedElementId = k;
-                } else {
-                    return false;
-                }
-            });
-            if(lastRemovedElementId != -1) {
-                this._queue = this._queue.splice(lastRemovedElementId + 1);
-            }
-        }
-
-        var self = this;
-
-        // per OP optimisations and safe guards
-        if(op[0] == "exclude") {
-            // exclude only users who are CURRENTLY in the cliquesMember members list
-            var op1 = [];
-            $.each(op[1], function(k, v) {
-                if(self.ctx.cliquesMember.members.indexOf(v) !== -1) {
-                    op1.push(
-                        v
-                    );
-                }
-            });
-            op[1] = op1; // replace
-        } else if(op[0] == "join") {
-            // join only users who are NOT CURRENTLY in the cliquesMember members list
-            var op1 = [];
-            $.each(op[1], function(k, v) {
-                if(self.ctx.cliquesMember.members.indexOf(v) === -1) {
-                    op1.push(
-                        v
-                    );
-                }
-            });
-            op[1] = op1; // replace
-        }
-        if(op[1].length == 0) {
-            if(localStorage.d) {
-                console.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
-            }
-        } else {
-            this.ctx[op[0]](op[1], op[2], op[3]);
-        }
-
-        return this.pop();
-    } else {
-        if(this._error_retries > this.MAX_ERROR_RETRIES) {
-            this._error_retries = 0;
-            this.recoverFailFn(this);
-        } else {
-            if(localStorage.d) { console.error("OpQueue Will retry: ", this._currentOp, this._queue[0]); }
-            this._error_retries++;
-
-            this.tickTimer = this.retry();
-        }
-        return false;
-    }
-};
-
+/**
+ * Encryption filter that connects MegaChat + Karere and mpENC
+ *
+ * @param megaChat
+ * @returns {EncryptionFilter}
+ * @constructor
+ */
 var EncryptionFilter = function(megaChat) {
     var self = this;
 
     self.megaChat = megaChat;
     self.karere = megaChat.karere;
-
-    var syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
-        var xmppUsers = megaRoom.getOrderedUsers();
-        var encUsers = megaRoom.encryptionHandler.askeMember.members;
-
-        var excludeUsers = [];
-        var joinUsers = [];
-
-        $.each(encUsers, function(k, v) {
-            if(xmppUsers.indexOf(v) == -1) {
-                excludeUsers.push(v);
-            }
-        });
-
-        $.each(xmppUsers, function(k, v) {
-            if(encUsers.indexOf(v) == -1 && v != megaRoom.megaChat.karere.getJid()) {
-                joinUsers.push(v);
-            }
-        });
-
-        // now ping ALL of the users so that we are 100% sure that they ARE active (else, the mpENC algo will block)
-        // this will not solve all possible encryption-flow crashes, but may save some! because someone can quit
-        // (without notifying the owner, because of conn. error) at the next moment after the PingResponse...there is
-        // NO way to guarantee 100% that all of the joinUsers will be available and will notify when leaving (conn. errors)
-        // we should find a way to fix that in the crypto's flow, or introduce .restart() method that will be triggered
-        // if multiple messages were not SENT in a timely manner (and they will get retried)
-        var promises = [];
-        var allUsers = array_unique(xmppUsers.concat(encUsers));
-        $.each(allUsers, function(k, v) {
-            if(v == megaRoom.megaChat.karere.getJid()) {
-                return; // its me! no need for self-pinging :)
-            }
-
-            if(localStorage.d) { console.error("#PING pinging: ", v); }
-
-            promises.push(
-                megaRoom.megaChat.karere.sendPing(v)
-                    .fail(function() {
-                        if(localStorage.d) { console.error("#PING ping failed for: ", v); }
-
-                        if(excludeUsers.indexOf(v) == -1) { // not excluded
-                            if(localStorage.d) { console.error("#PING ping failed caused exclude for: ", v); }
-
-                            if(encUsers.indexOf(v) != -1) {
-                                excludeUsers.push(
-                                    v
-                                );
-                            } else if(joinUsers.indexOf(v) != -1) {
-                                if(localStorage.d) { console.error("#PING ping failed caused removal from JOIN users for: ", v); }
-
-                                joinUsers.splice(joinUsers.indexOf(v), 1);
-                            }
-                        }
-                    })
-                    .done(function() {
-                        if(localStorage.d) { console.error("#PING ping success for: ", v); }
-                    })
-            );
-        });
-
-        $.when.apply($.when, promises)
-            .always(function() {
-//                console.error("#PING got state // users to join:", joinUsers);
-//                console.error("#PING got state // users to exclude:", excludeUsers);
-
-                // filter .joinUsers who are NOT participants
-                var participants = megaRoom.getParticipants();
-
-                $.each(joinUsers, function(k, v) {
-                    if(participants.indexOf(Karere.getNormalizedBareJid(v)) === -1) {
-                        joinUsers.splice(k, 1);
-                    }
-                });
-
-                if(forceRecover) {
-                    megaRoom.encryptionOpQueue._queue = [];
-
-                    var currentUsers = [];
-                    var newlyJoinedUsers = [];
-
-                    joinUsers = joinUsers.concat(
-                        megaRoom.megaChat.karere.getJid()
-                    );
-
-                    // iterate on all newly joined users + current askeMembers and prepare a list of CURRENT users
-                    $.each(megaRoom.encryptionHandler.askeMember.members.concat(joinUsers), function(k, v) {
-                        if(excludeUsers.indexOf(v) !== -1) {
-                            return; // continue, this is a user who had timed out while waiting for a ping response
-                        } else if(megaRoom.encryptionHandler.askeMember.members.indexOf(v) !== -1) {
-                            currentUsers.push(v);
-                        } else if(excludeUsers.indexOf(v) === -1) {
-                            newlyJoinedUsers.push(v);
-                        } else {
-                            if(localStorage.d) {
-                                console.error("forceRecover: ignoring user: ", v);
-                            }
-                        }
-                    });
-
-                    megaRoom.encryptionOpQueue.queue(
-                        'recover',
-                        array_unique(currentUsers)
-                    );
-                    if(newlyJoinedUsers.length > 0) {
-                        megaRoom.encryptionOpQueue.queue(
-                            'join',
-                            array_unique(newlyJoinedUsers)
-                        );
-                    }
-                } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
-                    // first start, then exclude
-                    if(joinUsers.length > 0) {
-                        megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
-                    }
-                    if(excludeUsers.length > 0) {
-                        megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
-                    }
-
-                } else {
-                    // first exclude, then start
-                    if(excludeUsers.length > 0) {
-                        megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
-                    }
-                    if(joinUsers.length > 0) {
-                        megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
-                    }
-                }
-            })
-    };
-
-
-    var flushQueue = function(megaRoom, handler) {
-        if(localStorage.d) { console.error("Flushing: ", megaRoom, handler); }
-
-        while(handler.protocolOutQueue.length) {
-            var msg = handler.protocolOutQueue.shift();
-            if(msg.to) {
-                megaRoom.megaChat.karere.sendRawMessage(
-                    msg.to,
-                    (!msg.to || msg.to.indexOf("conference.") !== -1) ? "groupchat" : "chat",
-                    msg.message,
-                    (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
-                    msg.metadata ? msg.metadata.messageId : undefined,
-                    msg.metadata ? msg.metadata.delay : undefined
-                );
-            } else {
-                megaRoom.megaChat.karere.sendRawMessage(
-                    megaRoom.roomJid,
-                    "groupchat",
-                    msg.message,
-                    (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
-                    msg.metadata ? msg.metadata.messageId : undefined,
-                    msg.metadata ? msg.metadata.delay : undefined
-                );
-            }
-
-            if(localStorage.d) { console.error("protocolOut: ", msg); }
-        }
-        while(handler.messageOutQueue.length) {
-            var msg = handler.messageOutQueue.shift();
-
-            var toJid = msg.to ? msg.to : megaRoom.roomJid;
-
-            megaRoom.megaChat.karere.sendRawMessage(
-                toJid,
-                (!toJid || toJid.indexOf("conference.") !== -1) ? "groupchat" : "chat",
-                msg.message,
-                (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
-                msg.metadata ? msg.metadata.messageId : undefined,
-                msg.metadata ? msg.metadata.delay : undefined
-            );
-
-            if(localStorage.d) { console.error("messageOut: ", msg); }
-        }
-
-        while(handler.uiQueue.length) {
-            var wireMessage = handler.uiQueue.shift();
-            if(wireMessage.type == "message") {
-                var msgPayload = JSON.parse(wireMessage.message);
-
-                if(msgPayload[1].action) {
-                    var eventObject = new KarereEventObjects.ActionMessage(
-                        /* toJid */ wireMessage.toJid,
-                        /* fromJid */ Karere.getNormalizedFullJid(wireMessage.fromJid),
-                        /* messageId */ wireMessage.messageId,
-                        /* action */ msgPayload[1].action,
-                        /* meta */ msgPayload[1],
-                        /* delay */ wireMessage.delay
-                    );
-                    self.megaChat.karere.trigger("onActionMessage", [eventObject]);
-                } else {
-                    var eventObject = new KarereEventObjects.IncomingMessage(
-                        /* toJid */ wireMessage.toJid,
-                        /* fromJid */ wireMessage.fromJid,
-                        /* type */ "Message",
-                        /* rawType */ wireMessage.rawType,
-                        /* messageId */ wireMessage.messageId,
-                        /* rawMessage */ undefined,
-                        /* roomJid */ wireMessage.roomJid,
-                        /* meta */ msgPayload[1],
-                        /* contents */ msgPayload[0],
-                        /* elements */ undefined,
-                        /* delay */ wireMessage.delay
-                    );
-                    self.megaChat.karere.trigger("onChatMessage", [eventObject]);
-                }
-            } else {
-                var $dialog = megaRoom.generateInlineDialog(
-                    "mpEnc-ui-" + wireMessage.type,
-                    wireMessage.message,
-                    undefined,
-                    ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type], {
-                        'reject': {
-                            'type': 'secondary',
-                            'text': "Hide",
-                            'callback': function() {
-                                $dialog.remove();
-                            }
-                        }
-                    }
-                );
-
-                megaRoom.appendDomMessage(
-                    $dialog
-                );
-            }
-
-            if(localStorage.d) { console.error("uiQueue: ", wireMessage); }
-        }
-    };
 
     megaChat.bind("onRoomCreated", function(e, megaRoom) {
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
@@ -443,7 +97,7 @@ var EncryptionFilter = function(megaChat) {
             TBD.RSA_PUB_KEY,
             TBD.STATIC_PUB_KEY_DIR,
             function(handler) {
-                flushQueue(megaRoom, handler);
+                self.flushQueue(megaRoom, handler);
             },
             function(handler) {
                 if(localStorage.d) { console.error("Got state change: ", handler.state); }
@@ -456,7 +110,7 @@ var EncryptionFilter = function(megaChat) {
                     megaRoom.setState(
                         MegaChatRoom.STATE.PLUGINS_PAUSED
                     )
-                }else if(handler.state === mpenc.handler.STATE.INITIALISED && megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED) {
+                } else if(handler.state === mpenc.handler.STATE.INITIALISED && megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED) {
                     megaRoom.setState(
                         MegaChatRoom.STATE.READY
                     )
@@ -484,9 +138,10 @@ var EncryptionFilter = function(megaChat) {
                 }
             },
             function(opQueue) {
-                syncRoomUsersWithEncMembers(megaRoom, true);
+                self.syncRoomUsersWithEncMembers(megaRoom, true);
             }
         );
+
 
         logAllCallsOnObject(megaRoom.encryptionHandler, console.error, true, "mpenc");
         logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue");
@@ -524,6 +179,8 @@ var EncryptionFilter = function(megaChat) {
 
 
     /**
+     * TODO: Docs
+     *
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersUpdated}
      */
@@ -542,7 +199,7 @@ var EncryptionFilter = function(megaChat) {
             // i'm the new "owner"
 
             // sync users list w/ encryption (join/exclude);
-            syncRoomUsersWithEncMembers(megaRoom);
+            self.syncRoomUsersWithEncMembers(megaRoom);
         }
 
         // i'm the only user in the room, set state to ready.
@@ -554,6 +211,8 @@ var EncryptionFilter = function(megaChat) {
     });
 
     /**
+     * TODO: Docs
+     *
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersJoined}
      */
@@ -577,9 +236,16 @@ var EncryptionFilter = function(megaChat) {
             // i'm the "owner"
 
             // sync users list w/ encryption (join/exclude);
-            syncRoomUsersWithEncMembers(megaRoom);
+            self.syncRoomUsersWithEncMembers(megaRoom);
         }
     });
+
+    /**
+     * TODO: Docs
+     *
+     * @param e {jQuery.Event}
+     * @param eventObject {KarereEventObjects.UsersJoined}
+     */
     megaChat.karere.bind("onUsersLeft", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
@@ -594,18 +260,25 @@ var EncryptionFilter = function(megaChat) {
 //            console.error("I'm the new owner of the room!")
 
             // sync users list w/ encryption (join/exclude);
-            syncRoomUsersWithEncMembers(megaRoom);
+            self.syncRoomUsersWithEncMembers(megaRoom);
 
         } else if(users[0] == megaRoom.megaChat.karere.getJid()) {
             // i'm the owner
 
             // sync users list w/ encryption (join/exclude);
-            syncRoomUsersWithEncMembers(megaRoom);
+            self.syncRoomUsersWithEncMembers(megaRoom);
         }
 //        console.error("got state change2?: ", users[0], megaRoom.megaChat.karere.getJid());
     });
 
 
+    /**
+     * TODO: Docs
+     *
+     * @param e
+     * @param eventObject
+     * @param karere
+     */
     var processIncoming = function(e, eventObject, karere) {
         // ignore filtering any messages without text or meta... this is the case with "is typing" indicators
         if(self.messageShouldNotBeEncrypted(eventObject) === true) {
@@ -615,6 +288,13 @@ var EncryptionFilter = function(megaChat) {
         self.processIncomingMessage(e, eventObject, karere);
     };
 
+    /**
+     * TODO: Docs
+     *
+     * @param e
+     * @param eventObject
+     * @param karere
+     */
     var processOutgoing = function(e, eventObject, karere) {
         // ignore filtering any messages without text, meta or which are already encrypted
         // (empty msg/meta = this is the case with "is typing" indicators)
@@ -637,15 +317,269 @@ var EncryptionFilter = function(megaChat) {
     megaChat.karere.bind("onOutgoingMessage", processOutgoing);
 
 
+
     logAllCallsOnObject(this, console.error, true, "encFilter");
+
     return this;
 };
 
-
+/**
+ * The tag used in mpENC messages
+ *
+ * @type {string}
+ */
 EncryptionFilter.MPENC_MSG_TAG = "?mpENC:";
 
+
 /**
+ * Flush all queues in mpENC
  *
+ * @param megaRoom {MegaChatRoom}
+ * @param handler {mpenc.ProtocolHandler}
+ */
+EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
+    var self = this;
+
+    if(localStorage.d) { console.error("Flushing: ", megaRoom, handler); }
+
+    while(handler.protocolOutQueue.length) {
+        var msg = handler.protocolOutQueue.shift();
+        if(msg.to) {
+            megaRoom.megaChat.karere.sendRawMessage(
+                msg.to,
+                (!msg.to || msg.to.indexOf("conference.") !== -1) ? "groupchat" : "chat",
+                msg.message,
+                (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
+                msg.metadata ? msg.metadata.messageId : undefined,
+                msg.metadata ? msg.metadata.delay : undefined
+            );
+        } else {
+            megaRoom.megaChat.karere.sendRawMessage(
+                megaRoom.roomJid,
+                "groupchat",
+                msg.message,
+                (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
+                msg.metadata ? msg.metadata.messageId : undefined,
+                msg.metadata ? msg.metadata.delay : undefined
+            );
+        }
+
+        if(localStorage.d) { console.error("protocolOut: ", msg); }
+    }
+    while(handler.messageOutQueue.length) {
+        var msg = handler.messageOutQueue.shift();
+
+        var toJid = msg.to ? msg.to : megaRoom.roomJid;
+
+        megaRoom.megaChat.karere.sendRawMessage(
+            toJid,
+            (!toJid || toJid.indexOf("conference.") !== -1) ? "groupchat" : "chat",
+            msg.message,
+            (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
+            msg.metadata ? msg.metadata.messageId : undefined,
+            msg.metadata ? msg.metadata.delay : undefined
+        );
+
+        if(localStorage.d) { console.error("messageOut: ", msg); }
+    }
+
+    while(handler.uiQueue.length) {
+        var wireMessage = handler.uiQueue.shift();
+        if(wireMessage.type == "message") {
+            var msgPayload = JSON.parse(wireMessage.message);
+
+            if(msgPayload[1].action) {
+                var eventObject = new KarereEventObjects.ActionMessage(
+                    /* toJid */ wireMessage.toJid,
+                    /* fromJid */ Karere.getNormalizedFullJid(wireMessage.fromJid),
+                    /* messageId */ wireMessage.messageId,
+                    /* action */ msgPayload[1].action,
+                    /* meta */ msgPayload[1],
+                    /* delay */ wireMessage.delay
+                );
+                self.megaChat.karere.trigger("onActionMessage", [eventObject]);
+            } else {
+                var eventObject = new KarereEventObjects.IncomingMessage(
+                    /* toJid */ wireMessage.toJid,
+                    /* fromJid */ wireMessage.fromJid,
+                    /* type */ "Message",
+                    /* rawType */ wireMessage.rawType,
+                    /* messageId */ wireMessage.messageId,
+                    /* rawMessage */ undefined,
+                    /* roomJid */ wireMessage.roomJid,
+                    /* meta */ msgPayload[1],
+                    /* contents */ msgPayload[0],
+                    /* elements */ undefined,
+                    /* delay */ wireMessage.delay
+                );
+                self.megaChat.karere.trigger("onChatMessage", [eventObject]);
+            }
+        } else {
+            var $dialog = megaRoom.generateInlineDialog(
+                "mpEnc-ui-" + wireMessage.type,
+                wireMessage.message,
+                undefined,
+                ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type], {
+                    'reject': {
+                        'type': 'secondary',
+                        'text': "Hide",
+                        'callback': function() {
+                            $dialog.remove();
+                        }
+                    }
+                }
+            );
+
+            megaRoom.appendDomMessage(
+                $dialog
+            );
+        }
+
+        if(localStorage.d) { console.error("uiQueue: ", wireMessage); }
+    }
+};
+
+
+/**
+ * Goes thru the list of users in the specific `megaRoom` and tries to sync that with the `mpenc.ProtocolHandler`
+ *
+ * @param megaRoom {MegaChatRoom}
+ * @param forceRecover {boolean}
+ */
+EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
+    var xmppUsers = megaRoom.getOrderedUsers();
+    var encUsers = megaRoom.encryptionHandler.askeMember.members;
+
+    var excludeUsers = [];
+    var joinUsers = [];
+
+    $.each(encUsers, function(k, v) {
+        if(xmppUsers.indexOf(v) == -1) {
+            excludeUsers.push(v);
+        }
+    });
+
+    $.each(xmppUsers, function(k, v) {
+        if(encUsers.indexOf(v) == -1 && v != megaRoom.megaChat.karere.getJid()) {
+            joinUsers.push(v);
+        }
+    });
+
+    // now ping ALL of the users so that we are 100% sure that they ARE active (else, the mpENC algo will block)
+    // this will not solve all possible encryption-flow crashes, but may save some! because someone can quit
+    // (without notifying the owner, because of conn. error) at the next moment after the PingResponse...there is
+    // NO way to guarantee 100% that all of the joinUsers will be available and will notify when leaving (conn. errors)
+    // we should find a way to fix that in the crypto's flow, or introduce .restart() method that will be triggered
+    // if multiple messages were not SENT in a timely manner (and they will get retried)
+    var promises = [];
+    var allUsers = array_unique(xmppUsers.concat(encUsers));
+    $.each(allUsers, function(k, v) {
+        if(v == megaRoom.megaChat.karere.getJid()) {
+            return; // its me! no need for self-pinging :)
+        }
+        if(excludeUsers.indexOf(v) !== -1) {
+            return; // no need to ping users who are going to be excluded
+        }
+
+        if(localStorage.d) { console.error("#PING pinging: ", v); }
+
+        promises.push(
+            megaRoom.megaChat.karere.sendPing(v)
+                .fail(function() {
+                    if(localStorage.d) { console.error("#PING ping failed for: ", v); }
+
+                    if(excludeUsers.indexOf(v) == -1) { // not excluded
+                        if(localStorage.d) { console.error("#PING ping failed caused exclude for: ", v); }
+
+                        if(encUsers.indexOf(v) != -1) {
+                            excludeUsers.push(
+                                v
+                            );
+                        } else if(joinUsers.indexOf(v) != -1) {
+                            if(localStorage.d) { console.error("#PING ping failed caused removal from JOIN users for: ", v); }
+
+                            joinUsers.splice(joinUsers.indexOf(v), 1);
+                        }
+                    }
+                })
+                .done(function() {
+                    if(localStorage.d) { console.error("#PING ping success for: ", v); }
+                })
+        );
+    });
+
+    $.when.apply($.when, promises)
+        .always(function() {
+//                console.error("#PING got state // users to join:", joinUsers);
+//                console.error("#PING got state // users to exclude:", excludeUsers);
+
+            // filter .joinUsers who are NOT participants
+            var participants = megaRoom.getParticipants();
+
+            $.each(joinUsers, function(k, v) {
+                if(participants.indexOf(Karere.getNormalizedBareJid(v)) === -1) {
+                    joinUsers.splice(k, 1);
+                }
+            });
+
+            if(forceRecover) {
+                megaRoom.encryptionOpQueue._queue = [];
+
+                var currentUsers = [];
+                var newlyJoinedUsers = [];
+
+                joinUsers = joinUsers.concat(
+                    megaRoom.megaChat.karere.getJid()
+                );
+
+                // iterate on all newly joined users + current askeMembers and prepare a list of CURRENT users
+                $.each(megaRoom.encryptionHandler.askeMember.members.concat(joinUsers), function(k, v) {
+                    if(excludeUsers.indexOf(v) !== -1) {
+                        return; // continue, this is a user who had timed out while waiting for a ping response
+                    } else if(megaRoom.encryptionHandler.askeMember.members.indexOf(v) !== -1) {
+                        currentUsers.push(v);
+                    } else if(excludeUsers.indexOf(v) === -1) {
+                        newlyJoinedUsers.push(v);
+                    } else {
+                        if(localStorage.d) {
+                            console.error("forceRecover: ignoring user: ", v);
+                        }
+                    }
+                });
+
+                megaRoom.encryptionOpQueue.queue(
+                    'recover',
+                    array_unique(currentUsers)
+                );
+                if(newlyJoinedUsers.length > 0) {
+                    megaRoom.encryptionOpQueue.queue(
+                        'join',
+                        array_unique(newlyJoinedUsers)
+                    );
+                }
+            } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
+                // first start, then exclude
+                if(joinUsers.length > 0) {
+                    megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
+                }
+                if(excludeUsers.length > 0) {
+                    megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
+                }
+
+            } else {
+                // first exclude, then start
+                if(excludeUsers.length > 0) {
+                    megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
+                }
+                if(joinUsers.length > 0) {
+                    megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
+                }
+            }
+        })
+};
+
+/**
+ * TODO: Docs
  * @param e
  * @param eventObject {KarereEventObjects.OutgoingMessage}
  * @param karere {Karere}
@@ -714,7 +648,7 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
 };
 
 /**
- *
+ * TODO: Docs
  * @param e
  * @param eventObject {(KarereEventObjects.IncomingMessage|KarereEventObjects.IncomingPrivateMessage)}
  * @param karere {Karere}

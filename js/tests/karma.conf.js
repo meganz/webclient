@@ -18,6 +18,7 @@ module.exports = function(config) {
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
 
              "../chat/mpenc.js",
+             "../chat/opQueue.js",
 
              "../vendor/chat/strophe.js",
              "../vendor/chat/strophe.disco.js",
@@ -46,6 +47,7 @@ module.exports = function(config) {
              "../chat/karere.js",
              "../chat/chat.js",
 
+            "src/helpers/fromMega.js",
             "src/helpers/functionsmocker.js",
             "src/helpers/megadatamocker.js",
             "src/helpers/eventmocker.js",
@@ -67,7 +69,7 @@ module.exports = function(config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            '../chat/*.js': ['coverage'],
+            '../chat/!(*mpenc|rtcSession).js': ['coverage'],
             'src/helpers/*.js': ['coverage']
         },
 

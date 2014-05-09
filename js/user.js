@@ -182,7 +182,11 @@ function u_logout(logout)
 
         if(MegaChatEnabled) {
             if(megaChat.is_initialized) {
-                megaChat.destroy();
+                megaChat.destroy().always(function() {
+                    window.megaChat = new MegaChat();
+                    localStorage.removeItem("megaChatPresence");
+                    localStorage.removeItem("megaChatPresenceMtime");
+                })
             }
         }
 	}

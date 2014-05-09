@@ -123,7 +123,9 @@ var Karere = function(user_options) {
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
+
         if(eventObject.getShow() != "unavailable") {
+
             self._presenceCache[eventObject.getFromJid()] = eventObject.getShow() ? eventObject.getShow() : "available";
             self._presenceBareCache[bareJid] = eventObject.getShow() ? eventObject.getShow() : "available";
 
@@ -196,7 +198,10 @@ var Karere = function(user_options) {
             return;
         }
 
-        console.error("Sending pong: ", eventObject);
+        if(localStorage.d) {
+            console.error("Sending pong: ", eventObject);
+        }
+
         self.sendPong(eventObject.getFromJid(), eventObject.getMessageId());
     });
 
@@ -275,13 +280,13 @@ Karere.DEFAULTS = {
      * When a method which requires connection is called, Karere would try to connect and execute that method.
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
-    connectionRequiredTimeout: 21000,
+    connectionRequiredTimeout: 7000,
 
 
     /**
      * Timeout when connecting
      */
-    connectTimeout: 15000,
+    connectTimeout: 5000,
 
 
     /**
@@ -397,9 +402,7 @@ makeMetaAware(Karere);
             $promise.resolve(Karere.CONNECTION_STATE.CONNECTED);
             return $promise;
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
-            return createTimeoutPromise(function() {
-                return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
-            }, 100, self.options.connectTimeout);
+            return self._$connectingPromise;
         }
 
 
@@ -500,7 +503,27 @@ makeMetaAware(Karere);
             }
         );
 
-        return $promise;
+        self._$connectingPromise = createTimeoutPromise(function() {
+            return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
+        }, 100, self.options.connectTimeout)
+            .fail(function() {
+                delete self._$connectingPromise;
+                self.disconnect(); /* retry? */
+            });
+
+        // sync the _$connectionPromise in realtime with the original $promise
+        $promise
+            .done(function() {
+                if(self._$connectingPromise) {
+                    self._$connectingPromise.verify();
+                }
+            })
+            .fail(function() {
+                if(self._$connectingPromise) {
+                    self._$connectingPromise.reject();
+                }
+            });
+        return self._$connectingPromise;
     };
 
 
@@ -1375,6 +1398,7 @@ makeMetaAware(Karere);
             }
 
             self._presenceCache[self.getJid()] = presence;
+            self._presenceBareCache[self.getBareJid()] = presence;
 
             self.connection.send(
                 msg.tree()

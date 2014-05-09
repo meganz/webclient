@@ -533,12 +533,13 @@ describe("Chat.js - Karere UI integration", function() {
 
     it("Presence sync across devices and auto invite to private rooms (resume/created chat support)", function(done) {
 
-
         var user1jid2 = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u) + "/res2";
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u) + "/res";
 
 
-        localStorage.megaChatPresence = megaChat._myPresence = "away";
+        localStorage.megaChatPresence = megaChat._myPresence = megaChat.karere._presenceCache[megaChat.karere.getJid()] = "away";
+        megaChat.karere._presenceBareCache[megaChat.karere.getBareJid()] = megaChat._myPresence;
+
         var origPresenceMtime = localStorage.megaChatPresenceMtime = unixtime();
 
         // receive outdated presence
@@ -599,6 +600,7 @@ describe("Chat.js - Karere UI integration", function() {
             delay: newUnixtime,
             to: megaChat.karere.getJid()
         });
+
 
         expect(eventTriggerShouldNOTReturnFalse).to.be.ok;
         expect(localStorage.megaChatPresence).to.eql("chat");

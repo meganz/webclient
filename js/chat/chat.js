@@ -397,6 +397,7 @@ MegaChat.prototype.init = function() {
                         return false; // break;
                     }
                 });
+
                 // Sync presence across devices (will check the delayed val!)
                 if(bareJid == self.karere.getBareJid()) {
                     if(eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
@@ -427,6 +428,7 @@ MegaChat.prototype.init = function() {
                 }
             });
         }
+
         self.renderMyStatus();
         self.renderContactTree();
     });
@@ -559,7 +561,6 @@ MegaChat.prototype.init = function() {
         if(eventObject.isMyOwn(self.karere) === true || e.isPropagationStopped() === true) {
             return;
         }
-        console.error("GOT ACTION MESSAGE: ", eventObject);
 
         var room;
         var meta = eventObject.getMeta();
@@ -775,17 +776,8 @@ MegaChat.prototype.connect = function() {
                 self.getJidFromNodeId(u_handle),
                 self.getMyXMPPPassword()
             )
-            .done(function() {
-                $('.activity-status-block .activity-status')
-                    .removeClass('online')
-                    .removeClass('offline')
-                    .addClass('online')
-            })
-            .fail(function() {
-                $('.activity-status-block .activity-status')
-                    .removeClass('online')
-                    .removeClass('offline')
-                    .addClass('online')
+            .always(function() {
+                self.renderMyStatus();
             });
 };
 
@@ -1025,6 +1017,9 @@ MegaChat.prototype.renderMyStatus = function() {
     // reset
     var $status = $('.activity-status-block .activity-status');
 
+    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+
+
     $status
         .removeClass('online')
         .removeClass('away')
@@ -1032,9 +1027,17 @@ MegaChat.prototype.renderMyStatus = function() {
         .removeClass('offline')
         .removeClass('black');
 
+
+
     var presence = self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED ?
                 self.karere.getPresence(self.karere.getJid()) :
                 localStorage.megaChatPresence;
+
+    var cssClass = self.xmppPresenceToCssClass(
+        presence
+    );
+
+
     if(!presence && self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
         if(!localStorage.megaChatPresence) {
             presence = localStorage.megaChatPresence = "chat"; // default
@@ -1042,17 +1045,11 @@ MegaChat.prototype.renderMyStatus = function() {
             presence = localStorage.megaChatPresence;
         }
 
+    } else if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
+        cssClass = "offline";
     }
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
 
-    var cssClass = self.xmppPresenceToCssClass(
-        presence
-    );
-
-    $status.addClass(
-        cssClass
-    );
 
     if(cssClass == 'online') {
         $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
@@ -1065,6 +1062,19 @@ MegaChat.prototype.renderMyStatus = function() {
     } else {
         $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
     }
+
+    $status.addClass(
+        cssClass
+    );
+
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+        $status.parent()
+            .addClass("connecting");
+    } else {
+        $status.parent()
+            .removeClass("connecting");
+    }
+
 };
 
 
@@ -1152,10 +1162,7 @@ MegaChat.prototype.reorderContactTree = function() {
 MegaChat.prototype.getJidFromNodeId = function(nodeId) {
     assert(nodeId, "Missing nodeId for getJidFromNodeId");
 
-//    var hash = simpleStringHashCode(nodeId) + "";
-//    return "test-" + hash.substr(-1) + "@sandbox.developers.mega.co.nz";
-
-    return baseenc.b32encode(nodeId) + "@" + this.options.xmppDomain;
+    return megaUserIdEncodeForXmpp(nodeId) + "@" + this.options.xmppDomain;
 };
 
 /**
@@ -1164,10 +1171,6 @@ MegaChat.prototype.getJidFromNodeId = function(nodeId) {
  * @returns {String}
  */
 MegaChat.prototype.getMyXMPPPassword = function() {
-    // TODO: Replace me w/ a real function that will give us the password for logging in the jabber server
-//    var self = this;
-//    return self.getJidFromNodeId(u_handle).split("@")[0];
-
     return u_sid ? u_sid.substr(0, 16) : false;
 };
 
@@ -2721,8 +2724,6 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         self.setState(MegaChatRoom.STATE.SYNCING);
     }
 
-    console.error("!!! SENT REQ WITH ID: ", messageId);
-
     self._syncRequests[messageId] = {
         'messageId': messageId,
         'userJid': userJid,
@@ -3055,7 +3056,6 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
             users
         )
         .done(function(responses) {
-            console.error(responses);
 
             var attachments = {};
             $.each(ids, function(k, nodeId) {

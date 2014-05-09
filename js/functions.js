@@ -687,13 +687,17 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         resolveRejectArgs = [resolveRejectArgs]
     }
 
-    var tickInterval = setInterval(function() {
+    $promise.verify = function() {
         if(validateFunction()) {
             if(localStorage.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
+    };
+
+    var tickInterval = setInterval(function() {
+        $promise.verify();
     }, tick);
 
     var timeoutTimer = setTimeout(function() {
@@ -713,6 +717,8 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         clearInterval(tickInterval);
         clearTimeout(timeoutTimer)
     });
+
+    $promise.verify();
 
     return $promise;
 };
@@ -974,3 +980,14 @@ function array_unique(arr) {
         return $.inArray(v ,arr) === k;
     });
 }
+
+/**
+ * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
+ *
+ * @param handle {string} mega user id
+ * @returns {string} base32 formatted user id to be used when doing xmpp auth
+ */
+function megaUserIdEncodeForXmpp(handle) {
+    var s = base64urldecode(handle);
+    return baseenc.b32encode(s).replace(/=/g, "");
+};

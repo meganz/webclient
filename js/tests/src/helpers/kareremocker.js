@@ -25,6 +25,9 @@ var KarereMocker = function(objectInstance) {
 
                 this._connectionState = Karere.CONNECTION_STATE.CONNECTED;
 
+                this._presenceCache[this.getJid()] = localStorage.megaChatPresence ? localStorage.megaChatPresence : "chat";
+                this._presenceBareCache[this.getBareJid()] = localStorage.megaChatPresence ? localStorage.megaChatPresence : "chat";
+
                 return $promise;
             },
             'disconnect': function() {
@@ -120,6 +123,11 @@ var KarereMocker = function(objectInstance) {
                 return 123;
             },
             'setPresence': function(presence, status, delay) {
+                var self = this;
+
+                self._presenceCache[self.getJid()] = presence;
+                self._presenceBareCache[self.getBareJid()] = presence;
+                
                 return;
             },
             'options': {

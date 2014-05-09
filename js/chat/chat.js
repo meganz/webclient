@@ -715,7 +715,9 @@ MegaChat.prototype.init = function() {
 
         // bind rtc events
         var rtcEventProxyToRoom = function(e, eventData) {
-            console.debug("RTC: ", e, eventData);
+            if(localStorage.d) {
+                console.debug("RTC: ", e, eventData);
+            }
 
             var peer = eventData.peer;
 
@@ -1638,6 +1640,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
         $('.call-actions', self.$header).hide();
 
         var doAnswer = function() {
+            self.megaChat.incomingCallDialog.hide();
+
             eventData.answer(true, {
                 mediaOptions: self.getMediaOptions()
             });
@@ -1650,6 +1654,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
         };
 
         var doCancel = function() {
+            self.megaChat.incomingCallDialog.hide();
+
             eventData.answer(false, {reason:'busy'});
 
             self.trigger('call-declined', eventData);
@@ -1747,6 +1753,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
     var resetCallStateNoCall = function() {
         self.callIsActive = false;
+
+        self.megaChat.incomingCallDialog.hide();
+
         $('.call-actions', self.$header).hide();
         $('.btn-chat-call', self.$header).show();
 

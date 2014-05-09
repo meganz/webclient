@@ -227,7 +227,7 @@ RtcSession.prototype = {
         case Strophe.Status.DISCONNECTING:
         {
             this.terminateAll('disconnected', null, true);
-            this._freeLocalStreamIfUnused();                
+            this.rtcSession._freeLocalStream();
             break;
         }
         case Strophe.Status.CONNECTED:
@@ -885,16 +885,16 @@ RtcSession.prototype = {
         };
  },
  _refLocalStream: function(sendsVideo) {
-    this._usesLocalStream = true;
+//    this._usesLocalStream = true;
     RtcSession.gLocalStreamRefcount++;
     if (sendsVideo)
         RtcSession._enableLocalVid(this);
  },
  _unrefLocalStream: function() {
-    if (!this._usesLocalStream)
-        return;
+//    if (!this._usesLocalStream)
+//        return;
         
-    this._usesLocalStream = false;
+//    this._usesLocalStream = false;
     var cnt = --RtcSession.gLocalStreamRefcount;
     if (cnt > 0)
         return;
@@ -903,6 +903,12 @@ RtcSession.prototype = {
         console.warn('RtcSession.unrefLocalStream: gLocalStream is null. refcount = ', cnt);
         return;
     }
+    this._freeLocalStream();
+ },
+ _freeLocalStream: function() {
+    RtcSession.gLocalStreamRefcount = 0;
+    if (!RtcSession.gLocalStream)
+        return;
     RtcSession._disableLocalVid(this);
 /**
     Local stream is about to be closed and local video player to be destroyed
@@ -932,7 +938,7 @@ RtcSession.prototype = {
  */
  destroy: function() {
     this.hangup();
-    this._unrefLocalStream();
+    this._freeLocalStream();
  },
  _requiredLocalStream: function(channels) {
     if (channels.video)

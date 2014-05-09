@@ -196,9 +196,9 @@ var EncryptionFilter = function(megaChat) {
     megaChat.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
-        megaRoom.iHadJoined = true;
-
         assert(megaRoom, 'room not found');
+
+        megaRoom.iHadJoined = true;
 
         var users = megaRoom.getOrderedUsers();
 

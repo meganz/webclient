@@ -90,6 +90,9 @@ var EncryptionFilter = function(megaChat) {
     self.megaChat = megaChat;
     self.karere = megaChat.karere;
 
+    /**
+     * Initialize the mpenc.handler.ProtocolHandler and OpQueue when a room is created
+     */
     megaChat.bind("onRoomCreated", function(e, megaRoom) {
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
@@ -146,14 +149,20 @@ var EncryptionFilter = function(megaChat) {
         logAllCallsOnObject(megaRoom.encryptionHandler, console.error, true, "mpenc");
         logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue");
     });
+
+    /**
+     * Cleanup after room destroy
+     */
     megaChat.bind("onRoomDestroy", function(e, megaRoom) {
-        //XX: Wait for the destroy/quit flow to be fully finished (e.g. listen for state and somehow return a promise)
         megaRoom.encryptionOpQueue.queue('quit');
         delete megaRoom.encryptionHandler;
         delete megaRoom.encryptionOpQueue;
     });
 
 
+    /**
+     * Pause MegaChat's state machine if needed (so that the mpenc can set up the encryption)
+     */
     megaChat.bind("onPluginsWait", function(e, megaRoom) {
         /**
          * This event is triggered when i'd joined a new room (joined may also mean created and joined)
@@ -179,7 +188,7 @@ var EncryptionFilter = function(megaChat) {
 
 
     /**
-     * TODO: Docs
+     * Sync members list and encryption after i'd joined
      *
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersUpdated}
@@ -211,7 +220,7 @@ var EncryptionFilter = function(megaChat) {
     });
 
     /**
-     * TODO: Docs
+     * When someone joins a room, if i'm the owner, i should add him to the encryption member list
      *
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersJoined}
@@ -241,7 +250,7 @@ var EncryptionFilter = function(megaChat) {
     });
 
     /**
-     * TODO: Docs
+     * When someone leaves a room, if i'm the room owner, i should remove him from the enc members list
      *
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersJoined}
@@ -273,7 +282,7 @@ var EncryptionFilter = function(megaChat) {
 
 
     /**
-     * TODO: Docs
+     * Process any incoming message which is encrypted (or should have been encrypted)
      *
      * @param e
      * @param eventObject
@@ -289,7 +298,7 @@ var EncryptionFilter = function(megaChat) {
     };
 
     /**
-     * TODO: Docs
+     * Process any outgoing messages (e.g. plain text messages) that needs to be encrypted
      *
      * @param e
      * @param eventObject
@@ -579,7 +588,8 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
 };
 
 /**
- * TODO: Docs
+ * This method will process any outgoing group chat and direct chat (for now, the only support is for "action") messages
+ *
  * @param e
  * @param eventObject {KarereEventObjects.OutgoingMessage}
  * @param karere {Karere}
@@ -620,7 +630,7 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
         if(megaRoom) {
             // stop the actual sending of the message, in case you want to queue it and resend it later
 
-            //TODO: SEND only to a specific user... .send() ignores the .to property
+            // SEND only to a specific user... .send() ignores the .to property
             megaRoom.encryptionOpQueue.queue(
                 'sendTo',
                 JSON.stringify([
@@ -648,7 +658,13 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
 };
 
 /**
- * TODO: Docs
+ * This method will process any incoming message and try to decrypt it, but sending it to the mpenc.handler.ProtocolHandler
+ * Also, if the message is a direct message (type="chat", e.g. action message) it will go thru all currently opened rooms
+ * in which I (`self.karere.getJid()`) is currently having a chat with the user who had sent the message
+ * (`eventObject.getFromJid()`).
+ *
+ * Note: This is only going to work for 1on1 chats.. in the future we need to refactor this for group chats.
+ *
  * @param e
  * @param eventObject {(KarereEventObjects.IncomingMessage|KarereEventObjects.IncomingPrivateMessage)}
  * @param karere {Karere}

@@ -1,4 +1,10 @@
 var fetchingFile = null
+	/**
+	 *  How many queue IO we want before pausing the 
+	 *	XHR fetching, useful when we have internet
+	 *  faster than our IO (first world problem) 
+	 */
+	, IO_THROTTLE = 3
 
 // Chunk fetch {{{
 var GlobalProgress = {};
@@ -235,24 +241,25 @@ ClassFile.prototype.destroy = function() {
 
 	if (!this.dl.cancelled) {
 		if (this.dl.zipid) {
-			Zips[this.dl.zipid].done();
-		} else {
-			this.dl.onDownloadProgress(
-				this.dl.dl_id,
-				100,
-				this.dl.size,
-				this.dl.size,
-				0,
-				this.dl.pos
-			);
-			
-			this.dl.onBeforeDownloadComplete(this.dl.pos);
-			if (!this.dl.preview) {
-				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
-			}
-			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
-			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+			this.task = null;
+			return Zips[this.dl.zipid].done();
 		}
+		
+		this.dl.onDownloadProgress(
+			this.dl.dl_id,
+			100,
+			this.dl.size,
+			this.dl.size,
+			0,
+			this.dl.pos
+		);
+		
+		this.dl.onBeforeDownloadComplete(this.dl.pos);
+		if (!this.dl.preview) {
+			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
+		}
+		this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+		if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
 	}
 
 	delete GlobalProgress[this.gid];
@@ -260,7 +267,6 @@ ClassFile.prototype.destroy = function() {
 	this.task = null;
 	this.dl.writer.destroy();
 	delete this.dl;
-	megatitle();
 }
 
 ClassFile.prototype.run = function(task_done) {
@@ -281,6 +287,7 @@ ClassFile.prototype.run = function(task_done) {
 
 	this.dl.io.begin = function() {
 		var tasks = [];
+		DEBUG('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
 		$.each(self.dl.urls||[], function(key, url) {
 			tasks.push(new ClassChunk({
 				url: url.url, 
@@ -299,7 +306,7 @@ ClassFile.prototype.run = function(task_done) {
 		if (tasks.length == 0) {
 			self.emptyFile = true;
 			tasks.push({ 
-				task: {  zipid: sel.fdl.zipid, id: self.dl.id },
+				task: {  zipid: self.dl.zipid, id: self.dl.id },
 				run: function(done) {
 					self.dl.io.write("", 0, function() {
 						self.dl.ready(); /* tell the download scheduler we're done */
@@ -340,6 +347,7 @@ ClassFile.prototype.run = function(task_done) {
 // }}}
 
 function dl_writer(dl, is_ready) {
+	var paused = false;
 	is_ready = is_ready || function() { return true; };
 
 	dl.decrypter = 0;
@@ -368,6 +376,22 @@ function dl_writer(dl, is_ready) {
 			task.null = null
 		});
 	}, 1);
+
+	dl.writer.on('queue', function() {
+		if (dl.writer._queue.length >= IO_THROTTLE && !dlQueue.isPaused()) {
+			DEBUG("IO_THROTTLE: pause XHR");
+			dlQueue.pause();
+			paused = true;
+		}
+	});
+
+	dl.writer.on('working', function() {
+		if (dl.writer._queue.length < IO_THROTTLE && paused) {
+			DEBUG("IO_THROTTLE: resume XHR");
+			dlQueue.resume();
+			paused = false;
+		}
+	});
 
 	dl.writer.pos = 0
 

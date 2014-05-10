@@ -316,7 +316,20 @@ else
 {
 	if (!b_u)
 	{
-		if (typeof console == "undefined") { this.console = {log: function() {}};}
+		window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
+		{
+			if (d)
+			{
+				console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
+			}
+			else
+			{
+				// TODO: XHR to log server?
+			}
+
+			return false;
+		};
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
@@ -367,9 +380,17 @@ else
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-		jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
-		jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
-		jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		if (is_chrome_firefox && OS && localStorage.fxio)
+		{
+			is_chrome_firefox |= 4;
+			jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
+		}
+		else
+		{
+			jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
+			jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
+			jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
+		}
 		jsl.push({f:'js/downloader.js', n: 'dl_downloader', j:1,w:3});
 		jsl.push({f:'js/download2.js', n: 'dl_js', j:1,w:3});
 		jsl.push({f:'js/upload2.js', n: 'upload_js', j:1,w:2});
@@ -635,11 +656,11 @@ else
 			}
 		}
 
-		var xhr_timeout=5000;
+		var xhr_timeout=30000;
 
 		function xhr_error()
 		{
-			xhr_timeout+=1000;
+			xhr_timeout+=10000;
 			console.log(xhr_timeout);
 			if (bootstaticpath.indexOf('cdn') > -1)
 			{

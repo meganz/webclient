@@ -124,6 +124,7 @@ MegaQueue.prototype.destroy = function() {
 	clearTimeout(this._later);
 	this._limit = -1
 	this._queue = null;
+	this._queue = [];
 }
 
 MegaQueue.prototype._process = function() {
@@ -135,5 +136,6 @@ MegaQueue.prototype._process = function() {
 
 MegaQueue.prototype.push = function(arg, next, self) {
     this._queue.push([arg, next || function() {}, self || null]);
+	this.trigger('queue');
     this._process();
 };

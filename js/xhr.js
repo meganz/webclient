@@ -97,6 +97,12 @@ w.killallXhr = function() {
 	}
 }
 
+w.clearXhr = function() {
+	_xhr_queue = $.grep(_xhr_queue, function(val) {
+		return val.listener !== null;
+	});
+};
+
 w.getXhr = function(object) {
 	var zclass = (object.constructor||{}).name || "no-class";
 	for (var i = 0; i < _xhr_queue.length; i++) {

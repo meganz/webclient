@@ -11,6 +11,7 @@ function FileSystemAPI(dl_id, dl) {
 		, dl_writing
 		, dl_position = 0
 		, dl_buffer
+		, dl_paused = false
 		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl
@@ -21,6 +22,7 @@ function FileSystemAPI(dl_id, dl) {
 		, failed = false
 		, dl_storagetype = 0
 		, dl_done = function() {}
+		, IO = this
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -41,6 +43,7 @@ function FileSystemAPI(dl_id, dl) {
 			  dl.io.size  = IO.size;
 			  dl.io.progress  = IO.progress;
 			  dl.io.setCredentials(dl_geturl, dl_filesize, dl_filename, dl_chunks, dl_chunksizes);
+			  IO = null
 			  break;
 			case FileError.INVALID_MODIFICATION_ERR:
 			  alert('INVALID_MODIFICATION_ERR in ' + type);
@@ -60,6 +63,26 @@ function FileSystemAPI(dl_id, dl) {
 
 	// dl_createtmpfile  {{{
 	var that = this;
+
+	function free_space(error_message) {
+		/* error */
+		clearit(0,0,function(s) {
+			// clear persistent files:
+			clearit(1,0,function(s) {
+				if (++chrome_write_error_msg % 21 == 0 && !$.msgDialog) {
+					chrome_write_error_msg=0;
+					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+				}
+				
+				setTimeout(function() {
+					failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
+					dl_ack_write();
+				}, 2000);
+			});
+		});
+	
+	}
+
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
@@ -86,29 +109,17 @@ function FileSystemAPI(dl_id, dl) {
 					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
-						failed = e;
-						//dl_ack_write();
+						/* onwriteend() will take care of it */
 					}
 	
 					dl_fw.onwriteend = function() {
-						if (dl_fw.position == targetpos) return dl_ack_write();
+						if (dl_fw.position == targetpos) {
+							chrome_write_error_msg=0; /* reset error counter */
+							return dl_ack_write();
+						}
 	
-						/* error */
-						clearit(0,0,function(s) {
-							// clear persistent files:
-							clearit(1,0,function(s) {
-								if (chrome_write_error_msg == 21 && !$.msgDialog) {
-									chrome_write_error_msg=0;
-									msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
-								}
-								chrome_write_error_msg++;
-							});
-						});
-	
-						setTimeout(function() {
-							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
-							dl_ack_write();
-						}, 2000);
+						/* try to release disk space and retry */
+						free_space();
 					}
 	
 					zfileEntry = fileEntry;
@@ -190,11 +201,25 @@ function FileSystemAPI(dl_id, dl) {
 	function dl_ack_write() {
 		if (failed) {
 			failed = false; /* reset error flag */
+			/* retry */
 			dl_fw.seek(dl_position);
+			DEBUG('IO: error, retrying and pausing dlQueue');
+			dlQueue.pause(); /* pause all downloads */
+			dl_paused = true;
 			return setTimeout(function() {
-				dl_fw.write(new Blob([buffer]));
+				dl_fw.write(new Blob([dl_buffer]));
 			}, 2000);
 		}
+
+		if (dl_paused) {
+			if ($.msgDialog) {
+				closeDialog();
+			}
+			dlQueue.resume();
+			DEBUG('IO: done, resuming dlQueue');
+			dl_paused = false;
+		}
+
 		dl_writing = false;
 		dl_done(); /* notify writer */
 
@@ -225,6 +250,7 @@ function FileSystemAPI(dl_id, dl) {
 		if (!is_chrome_firefox)  {
 			document.getElementById('dllink').click();
 		}
+		IO = null;
 	}
 
 	this.setCredentials = function(url, size, filename, chunks, sizes) {

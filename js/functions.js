@@ -579,6 +579,13 @@ function DEBUG2() {
 		} else if (d > 1) console.trace();
 	}
 }
+
+function ERRDEBUG() {
+	if (d) {
+		console.error.apply(console, arguments)
+	}
+}
+
 function DEBUG() {
 	if (arguments.length == 2 && typeof arguments[0] == "object"
 		  && typeof arguments[0][arguments[1]] == "function") {

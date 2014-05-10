@@ -361,7 +361,7 @@ function failureFunction(task, args) {
 				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
-		}		
+		}
 	}
 
 	/* update UI */

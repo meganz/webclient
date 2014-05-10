@@ -147,6 +147,7 @@ function network_error_check() {
 				 *	We request a new upload URL to the server, and the upload
 				 *	starts from scratch
 				 */
+				ERRDEBUG("restarting because it failed", ul_queue[i].retries, , 'times',  ul);
 				UploadManager.restart( ul_queue[i] );
 				ul.error++;
 			}
@@ -164,6 +165,7 @@ function network_error_check() {
 		if (k.retries/k.error > 3) {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
+			ERRDEBUG('shrinking' + (k == ul ? 'ul' : 'dl'))
 			(k == ul ? ulQueue : dlQueue).shrink();
 		}
 	});
@@ -202,14 +204,14 @@ var UploadManager = new function() {
 		file.posturl  = "";
 		file.completion = [];
 
-		DEBUG("restart()", file.name)
+		ERRDEBUG("restart()", file.name)
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task[0].file != file;
 		});
 
 		file.abort = true;
 
-		DEBUG("fatal error restarting", file.name)
+		ERRDEBUG("fatal error restarting", file.name)
 		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
@@ -224,7 +226,7 @@ var UploadManager = new function() {
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
-		DEBUG("retrying chunk because of", reason + "")
+		ERRDEBUG("retrying chunk because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 

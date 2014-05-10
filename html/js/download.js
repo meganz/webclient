@@ -195,14 +195,14 @@ function dl_g(res)
 		$('.new-download-red-button').unbind('click');
 		$('.new-download-red-button').bind('click',function(e)
 		{
-			if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 104857600 && navigator.userAgent.indexOf('Firefox') > -1) 
+			if (dlMethod == MemoryIO && !localStorage.firefoxDialog && fdl_filesize > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) 
 			{
 				firefoxDialog();
 			}			
 			else if ((('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
 			|| (navigator.userAgent.indexOf('MSIE 10') > -1)
 			|| ((navigator.userAgent.indexOf('Safari') > -1) && (navigator.userAgent.indexOf('Chrome') == -1))) 
-			&& fdl_filesize > 104857600 && !localStorage.browserDialog)
+			&& fdl_filesize > 1048576000 && !localStorage.browserDialog)
 			{
 			  browserDialog();
 			}

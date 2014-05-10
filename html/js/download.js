@@ -135,7 +135,7 @@ function nextAd()
 
 function dlinfo(ph,key,next)
 {
-	if (!(u_attr && u_attr.p)) Mads();
+	if (!(u_attr && u_attr.p) && !is_extension) Mads();
 
 	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))

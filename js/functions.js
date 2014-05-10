@@ -597,7 +597,7 @@ function DEBUG() {
 	if (d) {
 		console.log.apply(console, arguments)
 		if (!is_chrome_firefox) {
-			console.error.apply(console, arguments)
+			console.debug.apply(console, arguments)
 		} else if (d > 1) console.trace();
 	}
 }

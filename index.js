@@ -639,7 +639,7 @@ function init_page()
 		if (page.substr(0,2) == 'fm')
 		{		
 			id = page.replace('fm/','');
-			if (id.length < 5) id =false;
+			if (id.length < 5 && id !== 'chat') id =false;
 		}
 		
 		if (!id && fminitialized) id = M.RootID;

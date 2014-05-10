@@ -3514,7 +3514,7 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	else if (id == M.RootID) sectionUIopen('cloud-drive');
 	else if (id == 'contacts') sectionUIopen('contacts');
 	else if (id == 'chat') sectionUIopen('conversations');
-	
+
 	if (!fminitialized) return false;
 	if (!event)
 	{

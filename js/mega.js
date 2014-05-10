@@ -435,7 +435,6 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
-
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		this.contacts();
@@ -450,7 +449,6 @@ function MegaData ()
 		$('#treesub_' + M.RubbishID).html('');
 		this.buildtree({h:M.RubbishID});
 		*/
-		
 	
 		treeUI();
 	};
@@ -493,7 +491,6 @@ function MegaData ()
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
-
 		if (this.chat)
 		{
 			treeUIopen(M.currentdirid.replace('chat/',''),1);
@@ -531,7 +528,6 @@ function MegaData ()
 			}
 			M.viewmode=viewmode;
 
-
 			if (fmconfig.uisorting && fmconfig.sorting) M.doSort(fmconfig.sorting.n,fmconfig.sorting.d);
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
 			else M.doSort('name',1);
@@ -545,14 +541,24 @@ function MegaData ()
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-			}		
+
+			}
+			
+			console.log(id);
+
+
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
 			setTimeout(function()
 			{
 				M.renderPath();
 			},1);
-		}	
+
+		}		
+		console.log(M.currentdirid);	
+		console.log(n_h);
+		
+
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
@@ -581,6 +587,42 @@ function MegaData ()
 		}
 	};
 	
+	this.contacts = function()
+	{
+		var contacts = [];
+		for (var i in M.u) if (M.u[i].c) contacts.push(M.u[i]);
+		if (localStorage.csort) this.csort = localStorage.csort;
+		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+		if (this.csort == 'shares')
+		{				
+			contacts.sort(function(a,b)
+			{
+				if (M.c[a.h] && M.c[b.h])
+				{
+					if (a.name) return a.name.localeCompare(b.name);
+				}
+				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+				return 0;
+			});
+		}
+		else if (this.csort == 'name')
+		{				
+			contacts.sort(function(a,b)
+			{						
+				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
+			});
+		}
+		var html = '',status='',img;
+		// status can be: "online"/"away"/"busy"/"offline"
+		for (var i in contacts)
+		{						
+			var img = staticpath + 'images/mega/default-small-avatar.png';
+			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';			
+		}		
+		$('.content-panel.contacts').html(html);
+	};
 
 	this.contacts = function()
 	{

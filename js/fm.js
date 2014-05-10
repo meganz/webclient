@@ -395,30 +395,6 @@ function initUI()
 	M.avatars();
 	if (typeof dl_import !== 'undefined' && dl_import) dl_fm_import();
 	
-	$('.fm-menu-item').unbind('mouseover');
-	$('.fm-menu-item').bind('mouseover',function(e)
-	{
-		$(this).addClass('active');	
-		if ($.gridDragging)
-		{			
-			var c = $(this).attr('class');			
-			if (!c) return false;
-			if (c.indexOf('cloud') > -1) treeUIopen(M.RootID,0,0,1);
-			else if (c.indexOf('recycle') > -1) treeUIopen(M.RubbishID,0,0,1);
-			else if (c.indexOf('contacts') > -1) treeUIopen('contacts',0,0,1);
-			else if (c.indexOf('messages') > -1) treeUIopen(M.InboxID,0,0,1);			
-		}	
-	});
-	
-	$('.fm-menu-item').unbind('mouseout');
-	$('.fm-menu-item').bind('mouseout',function(e)
-	{
-		if ($(this).attr('class').indexOf('contacts') > -1 && (RootbyId(M.currentdirid) == 'contacts' || $('.fm-tree-header.contacts-item').attr('class').indexOf('active') > -1)) return false;
-		else if ($(this).attr('class').indexOf('messages') > -1 && RootbyId(M.currentdirid) == M.InboxID) return false;
-		else if ($(this).attr('class').indexOf('recycle') > -1 && RootbyId(M.currentdirid) == M.RubbishID) return false;
-		else if ($(this).attr('class').indexOf('cloud') > -1 && RootbyId(M.currentdirid) == M.RootID) return false;
-		$(this).removeClass('active');
-	});
 	
 	$('.context-menu').unbind('contextmenu');
 	$('.context-menu').bind('contextmenu',function(e)
@@ -430,7 +406,7 @@ function initUI()
 	$('.fm-new-folder').bind('mouseover',function(e)
 	{
 		$('.fm-new-folder').addClass('hovered');	
-	});	
+	});
 	$('.fm-new-folder').unbind('mouseout');
 	$('.fm-new-folder').bind('mouseout',function(e)
 	{
@@ -443,6 +419,8 @@ function initUI()
 		var c = $(this).attr('class');
 		if (c && c.indexOf('cloud-drive') > -1) M.openFolder(M.RootID);
 		else if (c && c.indexOf('shared-with-me') > -1) M.openFolder('shares');
+		else if (c && c.indexOf('conversations') > -1) M.openFolder('chat');
+		else if (c && c.indexOf('contacts') > -1) M.openFolder('contacts');
 	});
 	
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
@@ -3541,6 +3519,8 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
 	if (id == 'shares') sectionUIopen('shared-with-me');
 	else if (id == M.RootID) sectionUIopen('cloud-drive');
+	else if (id == 'contacts') sectionUIopen('contacts');
+	else if (id == 'chat') sectionUIopen('conversations');
 	if (!fminitialized) return false;
 	if (!event)
 	{

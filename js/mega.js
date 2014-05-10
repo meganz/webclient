@@ -297,15 +297,13 @@ function MegaData ()
 						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';
+						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';						
 					}
 					else
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
-						
-
 					}
 				}
 				else
@@ -433,19 +431,7 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
-		/*
-		$('.cloudsub').attr('id','treesub_' + M.RootID);
-		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
-		$('#treesub_' + M.RootID).html('');
-		
-		$('#treesub_contacts').html('');
-		this.buildtree({h:'contacts'});
-		$('#treesub_' + M.RubbishID).html('');
-		this.buildtree({h:M.RubbishID});
-		*/
-		
-		this.buildtree({h:'shares'});
-		
+		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		treeUI();
 	};
@@ -476,6 +462,11 @@ function MegaData ()
 		else if (id == 'cloudroot') id = this.RootID;
 		else if (id == 'contacts') id = 'contacts';
 		else if (id == 'shares') id = 'shares';
+		else if (id == 'chat')
+		{
+			id = 'chat';
+			//n_h = id; FIXME
+		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
@@ -483,7 +474,7 @@ function MegaData ()
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
-		
+			
 
 		if (this.chat)
 		{
@@ -501,6 +492,8 @@ function MegaData ()
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
 			else M.filterByParent(M.currentdirid);
+			
+			
 
 			var viewmode=0;
 
@@ -520,7 +513,6 @@ function MegaData ()
 			}
 			M.viewmode=viewmode;
 
-
 			if (fmconfig.uisorting && fmconfig.sorting) M.doSort(fmconfig.sorting.n,fmconfig.sorting.d);
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
 			else M.doSort('name',1);
@@ -535,6 +527,8 @@ function MegaData ()
 				}
 				treeUIopen(M.currentdirid,1);
 			}
+			
+			console.log(id);
 
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
@@ -543,6 +537,11 @@ function MegaData ()
 				M.renderPath();
 			},1);
 		}
+		
+		console.log(M.currentdirid);
+		
+		console.log(n_h);
+		
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
@@ -571,6 +570,42 @@ function MegaData ()
 		}
 	};
 	
+	this.contacts = function()
+	{
+		var contacts = [];
+		for (var i in M.u) if (M.u[i].c) contacts.push(M.u[i]);
+		if (localStorage.csort) this.csort = localStorage.csort;
+		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+		if (this.csort == 'shares')
+		{				
+			contacts.sort(function(a,b)
+			{
+				if (M.c[a.h] && M.c[b.h])
+				{
+					if (a.name) return a.name.localeCompare(b.name);
+				}
+				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+				return 0;
+			});
+		}
+		else if (this.csort == 'name')
+		{				
+			contacts.sort(function(a,b)
+			{						
+				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
+			});
+		}
+		var html = '',status='',img;
+		// status can be: "online"/"away"/"busy"/"offline"
+		for (var i in contacts)
+		{						
+			var img = staticpath + 'images/mega/default-small-avatar.png';
+			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';			
+		}		
+		$('.content-panel.contacts').html(html);
+	};
 
 	this.buildtree = function(n)
 	{

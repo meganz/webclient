@@ -280,9 +280,9 @@
 	<path fill="#010101" d="M17,1183l-7.2-6.5v4.061c-5.71,0.629-8.8,6.14-8.8,8.939c1.14-2.95,5.37-4.061,8.8-4.061v4.061L17,1183z"/>
 </g>
 <g opacity="0.4">
-	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#010101" points="29,1240.5 25,1235.5 33,1235.5 	"/>
+	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#010101" points="39,1240.5 35,1235.5 43,1235.5 	"/>
 </g>
 <g opacity="0.4">
-	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#010101" points="29,1295.5 25,1300.5 33,1300.5 	"/>
+	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#010101" points="39,1295.5 35,1300.5 43,1300.5 	"/>
 </g>
 </svg>

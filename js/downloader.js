@@ -106,14 +106,15 @@ ClassChunk.prototype.isCancelled = function() {
 		this._cancelled = true;
 		DEBUG("Chunk aborting itself because download was cancelled ", this.localId);
 		this.xhr.abort();
-		this.finish_upload();
+		this.finish_download();
 		return true;
 	}
 }
 // }}}
 
-// finish_upload {{{
-ClassChunk.prototype.finish_upload = function() {
+// finish_download {{{
+ClassChunk.prototype.finish_download = function() {
+	ERRDEBUG("here");
 	if (this.is_finished) return;
 	this.is_finished  = true;
 	this.xhr = null;
@@ -174,7 +175,8 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		if (this.failed) DownloadManager.release(this);
 		r = null
 		this.failed = false
-		this.finish_upload();
+		this.finish_download();
+		this.dl.retries = 0;
 	} else if (!this.dl.cancelled) {
 		DEBUG(xhr.status, r.bytesLength, this.size);
 		DEBUG("HTTP FAILED", this.dl.n, xhr.status, "am i done?", this.done);
@@ -272,6 +274,8 @@ ClassFile.prototype.destroy = function() {
 
 ClassFile.prototype.run = function(task_done) {
 	fetchingFile = 1;
+	this.dl.retries = 0; /* set the retries flag */
+
 	DEBUG("dl_key " + this.dl.key);
 	this.dl.onDownloadStart(this.dl.dl_id, this.dl.n, this.dl.size, this.dl.pos);
 

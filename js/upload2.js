@@ -131,8 +131,8 @@ function network_error_check() {
 				 *	this is fine because we resume the download
 				 */
 				DownloadManager.newUrl( dl_queue[i] );
-				dl.error++
 			}
+			dl.error++
 		}
 	}
 
@@ -147,10 +147,10 @@ function network_error_check() {
 				 *	We request a new upload URL to the server, and the upload
 				 *	starts from scratch
 				 */
-				ERRDEBUG("restarting because it failed", ul_queue[i].retries, , 'times',  ul);
+				ERRDEBUG("restarting because it failed", ul_queue[i].retries, 'times',  ul);
 				UploadManager.restart( ul_queue[i] );
-				ul.error++;
 			}
+			ul.error++;
 		}
 	}
 
@@ -165,7 +165,7 @@ function network_error_check() {
 		if (k.retries/k.error > 3) {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
-			ERRDEBUG('shrinking' + (k == ul ? 'ul' : 'dl'))
+			ERRDEBUG('shrinking: ' + (k == ul ? 'ul' : 'dl'))
 			(k == ul ? ulQueue : dlQueue).shrink();
 		}
 	});
@@ -488,7 +488,7 @@ ChunkUpload.prototype.upload = function() {
 
 ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
-		DEBUG("IO error");
+		ERRDEBUG("IO error");
 		this.file.done_starting();
 		return UploadManager.retry(this.file, this, args[0])
 	}
@@ -504,6 +504,9 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 
 ChunkUpload.prototype.done = function() {
 	DEBUG("release", this.start);
+	
+	this.file.retries  = 0; /* reset error flag */
+
 	/* release worker */
 	this._done();
 

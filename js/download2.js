@@ -368,6 +368,7 @@ function failureFunction(task, args) {
 	dl_reportstatus(dl, EAGAIN); 
 
 	/* check for network error  */
+	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
 	dlQueue.pushFirst(task);
 }

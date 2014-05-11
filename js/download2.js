@@ -494,8 +494,9 @@ function IdToFile(id) {
 
 if(localStorage.dlMethod) {
 	dlMethod = window[localStorage.dlMethod];
-}
-else if (window.webkitRequestFileSystem) {
+} else if (is_chrome_firefox & 4) {
+	dlMethod = FirefoxIO;
+} else if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
 } else if (navigator.msSaveOrOpenBlob) {
 	dlMethod = BlobBuilderIO;

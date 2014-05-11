@@ -22,6 +22,7 @@ function FileSystemAPI(dl_id, dl) {
 		, failed = false
 		, dl_storagetype = 0
 		, dl_done = function() {}
+		, IO = this
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -42,6 +43,7 @@ function FileSystemAPI(dl_id, dl) {
 			  dl.io.size  = IO.size;
 			  dl.io.progress  = IO.progress;
 			  dl.io.setCredentials(dl_geturl, dl_filesize, dl_filename, dl_chunks, dl_chunksizes);
+			  IO = null
 			  break;
 			case FileError.INVALID_MODIFICATION_ERR:
 			  alert('INVALID_MODIFICATION_ERR in ' + type);
@@ -248,6 +250,7 @@ function FileSystemAPI(dl_id, dl) {
 		if (!is_chrome_firefox)  {
 			document.getElementById('dllink').click();
 		}
+		IO = null;
 	}
 
 	this.setCredentials = function(url, size, filename, chunks, sizes) {

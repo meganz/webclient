@@ -223,6 +223,7 @@ var UploadManager = new function() {
 		api_reportfailure(hostname(file.posturl), network_error_check);
 
 		// reschedule
+
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
@@ -457,7 +458,8 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 	}
 
 	DEBUG("bad response from server", [
-		xhr.status == 200,
+		xhr.status,
+		this.file.name,
 		typeof xhr.response == 'string',
 		xhr.statusText
 	]);
@@ -536,8 +538,10 @@ FileUpload.prototype.run = function(done) {
 	file.retries		= 0;
 	file.xr				= getxr();
 	file.ul_lastreason	= file.ul_lastreason || 0
+
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 
+		DEBUG2("this shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
 
@@ -725,14 +729,14 @@ function isQueueActive(q) {
 function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
 	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
-	
-	if (dl_queue.length == 0 && ul_queue == 0) {
+
+	if (dl_queue.length == 0 && ul_queue.length == 0) {
 		clearXhr(); /* destroy all xhr */
 	}	
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
 
-	Soon(percent_megatitle);
+	Later(percent_megatitle);
 }
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
@@ -762,7 +766,7 @@ ulQueue.validateTask = function(pzTask) {
 		return true;
 	}
 
-	if (pzTask instanceof FileUpload && !start_uploading) {
+	if (pzTask instanceof FileUpload && !start_uploading && $('#ul_' + pzTask.file.id).length != 0) {
 		return true;
 	}
 

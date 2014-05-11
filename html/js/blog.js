@@ -237,7 +237,11 @@ var blogposts = [
 
 
 
-var bloglimit = 100;
+var bloglimit = 5;
+var blogpage = 1;
+
+var blogpostnum;
+
 var blogmonth = false;
 var blogsearch = false;
 
@@ -263,18 +267,19 @@ function blog_load()
 	$('body').addClass('blog-new');	
 	var blogcontent = '';
 	var a=0;
+	var blogstart = blogpage*bloglimit-bloglimit;
 	for (var i in blogposts)
 	{		
-		var mm = blog_month(blogposts[i].t);		
+		var mm = blog_month(blogposts[i].t);
+		
 		if ((blogmonth && (mm == blogmonth)) || ((!blogmonth) && (!blogsearch))
 		|| (blogsearch && (blog_searchmath(blogposts[i],blogsearch))))
 		{		
 			var introtxt = blogposts[i].introtxt;		
 			introtxt += ' [...]';		
-			if (i < bloglimit)
+			if (a >= blogstart && a < bloglimit*blogpage)
 			{
-				var by = 'Admin';
-				
+				var by = 'Admin';				
 				if (blogposts[i].by) by = blogposts[i].by;		
 				blogcontent +='<div class="blog-new-item">';
 				blogcontent +='<h2>' + blogposts[i].h + '</h2>';
@@ -284,17 +289,34 @@ function blog_load()
 				blogcontent +='<div class="clear"></div><img alt="" src="' + staticpath + blogposts[i].simg + '" />';
 				blogcontent +='<p><span class="blog-new-description">' + introtxt + '</span>';
 				blogcontent +='<a href="#blog_' + blogposts[i].id + '" class="blog-new-read-more">Read more</a>';
-				blogcontent +='<span class="clear"></span></p> </div>';			
+				blogcontent +='<span class="clear"></span></p> </div>';				
 			}
 			a++;
 		}
 	}
+	blogpostnum=a;
 	if (m) $('.privacy-page').html(blogcontent);		
 	else
 	{
-		blog_archive();	
+		blog_archive();		
+		blogcontent += blog_pager();		
 		$('.blog-new-left').html(blogcontent);
-		
+		$('.blog-pagination-button').unbind('click');
+		$('.blog-pagination-button').bind('click',function()
+		{
+			var c = $(this).attr('class');
+			if (c && c.indexOf('next') > -1) blogpage+=1;
+			else if (c && c.indexOf('previous') > -1) blogpage-=1;
+			else if (c && c.indexOf('to-the-end') > -1) blogpage = Math.ceil(blogpostnum/bloglimit);			
+			else if (c && c.indexOf('to-the-beggining') > -1) blogpage=1;
+			else if (c) blogpage = parseInt(c.replace('blog-pagination-button ',''));
+			if (blogpage < 1) blogpage=1;
+			if (blogpage > Math.ceil(blogpostnum/bloglimit)) blogpage = Math.ceil(blogpostnum/bloglimit);
+			blog_load();
+		});
+		if (blogpage == Math.ceil(blogpostnum/bloglimit)) $('.blog-pagination-button.next,.blog-pagination-button.to-the-end').addClass('unavailable');
+		if (blogpage == 1) $('.blog-pagination-button.previous,.blog-pagination-button.to-the-beggining').addClass('unavailable');		
+		$('.blog-pagination-button.' + blogpage).addClass('active');		
 		if (blogsearch) 
 		{
 			$('#blog_searchinput').val(blogsearch);
@@ -306,8 +328,23 @@ function blog_load()
 		}
 		else $('.privacy-top-pad h1').text('Blog');
 	}
-	
 	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,mouseWheelSpeed:50});
+}
+
+function blog_pager()
+{
+	var pages = Math.ceil(blogpostnum/bloglimit);
+	if (pages == 1) return '';
+	var blogpages = '';
+	var i =0;
+	
+	while (i < pages)
+	{
+		blogpages += '<div class="blog-pagination-button ' + (i+1) + '">' + (i+1) + '</div>';
+		i++;	
+	}	
+	var blogpager = '<div class="blog-pagination"><div class="blog-pagination-pad"><div class="blog-pagination-button to-the-beggining"></div><div class="blog-pagination-button previous"></div>' + blogpages + '<div class="blog-pagination-button next"></div><div class="blog-pagination-button to-the-end"></div></div></div>';	
+	return blogpager;
 }
 
 

@@ -172,13 +172,6 @@ function reselect(n)
 }
 
 
-
-
-
-
-
-
-
 function initUI()
 {
 	if (!folderlink)

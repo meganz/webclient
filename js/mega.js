@@ -449,7 +449,6 @@ function MegaData ()
 		$('#treesub_' + M.RubbishID).html('');
 		this.buildtree({h:M.RubbishID});
 		*/
-	
 		treeUI();
 	};
 	
@@ -541,24 +540,14 @@ function MegaData ()
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-
-			}
-			
-			console.log(id);
-
-
+			}		
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
 			setTimeout(function()
 			{
 				M.renderPath();
 			},1);
-
-		}		
-		console.log(M.currentdirid);	
-		console.log(n_h);
-		
-
+		}	
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};

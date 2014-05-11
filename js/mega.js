@@ -187,7 +187,8 @@ function MegaData ()
 		
 		for (var u in M.c['contacts']) if (!avatars[u])
 		{
-			api_req({a:'uga',u:u,ua:'+a'},{
+			api_req({a:'uga',u:u,ua:'+a'},
+			{
 				u : u,
 				callback: function(res,ctx)
 				{
@@ -200,6 +201,9 @@ function MegaData ()
 							url: myURL.createObjectURL(blob)
 						}
 						var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
+						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
+						
+						var el = $('#contact_' + ctx.u);						
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
 
 						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
@@ -433,6 +437,7 @@ function MegaData ()
 	{
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
+		this.contacts();
 		treeUI();
 	};
 	
@@ -526,22 +531,14 @@ function MegaData ()
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-			}
-			
-			console.log(id);
-
+			}		
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
 			setTimeout(function()
 			{
 				M.renderPath();
 			},1);
-		}
-		
-		console.log(M.currentdirid);
-		
-		console.log(n_h);
-		
+		}	
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
@@ -2092,15 +2089,15 @@ function rendernew()
 	}
 	if (newcontact)
 	{
-		M.avatars();
-		M.buildtree({h:'contacts'});
-		treeUIopen('contacts');
+		M.avatars();	
+		M.contacts();
 		treeUI();
 	}
-
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 }
+
+
 
 function execsc(ap)
 {

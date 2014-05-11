@@ -160,7 +160,7 @@ function init_page()
 	{
 		resetpwcode = page.replace("pwreset","");
 		page = 'resetpassword';
-	}	
+	}
 	if (page.substr(0,5) == 'newpw')
 	{
 		pwchangecode = page.replace("newpw","");
@@ -168,7 +168,7 @@ function init_page()
 	}
 	
 	blogmonth=false;
-	blogsearch=false;	
+	blogsearch=false;
 	
 	if (page.substr(0,7) == 'voucher')
 	{

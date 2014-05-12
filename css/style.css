@@ -155,7 +155,8 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 }
 .arrow-block {
 	height: 13px;
-	margin-top: -1px;;
+	margin-top: -1px;
+	;
 }
 .nlanguage-txt-block {
 	width: 150px;
@@ -3002,7 +3003,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: rgba(254,174,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.dragover {
-	background-color: rgba(215,16,0,0.1);
+	background-color: rgba(254,174,0,0.2);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
@@ -3840,13 +3841,13 @@ label.iPhoneCheckLabelOff span {
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
-.files-grid-view th, .contacts-grid-view th, .grid-table-header th {
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
 }
-.files-grid-view th.grid-url-header, .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header {
-	background-image:none;
+.files-grid-view th.grid-url-header, .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7) {
+	background-image: none;
 }
 .grid-header-star {
 	height: 24px;
@@ -3877,12 +3878,10 @@ th.grid-first-th {
 .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td {
 	background-color: rgba(238,238,238,1);
 }
-.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td,
-.grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td {
+.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td {
 	background-color: rgba(225,225,225,1);
 }
-.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td,
-.grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td {
+.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td {
 	background-color: rgba(225,225,225,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
@@ -3972,7 +3971,7 @@ th.grid-first-th {
 	margin: 12px 0 0 12px;
 	position: relative;
 	cursor: default;
-	background-color:rgba(0,0,0,0.05);
+	background-color: rgba(0,0,0,0.05);
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -3980,37 +3979,36 @@ th.grid-first-th {
 	transition: background-color 200ms ease-in-out;
 }
 .file-icon-area {
-	width:120px;
-	height:120px;
-	display:block;
-	background-color:white;
-	margin:4px 0 0 4px;
-	overflow:hidden;
+	width: 120px;
+	height: 120px;
+	display: block;
+	background-color: white;
+	margin: 4px 0 0 4px;
+	overflow: hidden;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	position:relative;
-	overflow:hidden;
+	position: relative;
+	overflow: hidden;
 }
 .contact-block-view {
 	width: 140px;
 	height: 160px;
 }
 .file-block:hover, .contact-block-view:hover {
-	background-color:rgba(0,0,0,0.2);
+	background-color: rgba(0,0,0,0.2);
 }
 .file-block.ui-selected, .contact-block-view.ui-selected {
-	background-color:rgba(0,0,0,0.25);
+	background-color: rgba(0,0,0,0.25);
 }
 .file-block.ui-selecting, .contact-block-view.ui-selecting {
-	background-color:rgba(0,0,0,0.25);
+	background-color: rgba(0,0,0,0.25);
 }
 .file-block.dragover, .contact-block-view.dragover {
-	background-color:rgba(0,0,0,0.1);
+	background-color: rgba(0,0,0,0.1);
 }
 .file-block:hover .file-block-title, .contact-block-view:hover .file-block-title, .file-block.ui-selected .file-block-title, .contact-block-view.ui-selected .file-block-title, .file-block.ui-selecting .file-block-title, .contact-block-view.ui-selecting .file-block-title {
-	color:white;
-	
+	color: white;
 }
 .file-block img, .contact-block-view img {
 	border: 0;
@@ -4083,7 +4081,7 @@ th.grid-first-th {
 	font-size: 11px;
 	line-height: 28px;
 	text-align: center;
-	color:#666666;
+	color: #666666;
 }
 .grid-url-arrow {
 	height: 24px;
@@ -4093,51 +4091,56 @@ th.grid-first-th {
 	background-repeat: no-repeat;
 	background-position: -1px -1578px;
 	-webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
-cursor: pointer;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+	cursor: pointer;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
--moz-opacity: 0.7;
--khtml-opacity: 0.7;
-opacity: 0.7;
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
 }
 .grid-url-arrow:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
--moz-opacity: 1;
--khtml-opacity: 1;
-opacity: 1;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .file-settings-icon {
 	width: 38px;
-height: 18px;
-background-image: url(http://test/webclient/images/mega/nw-fm-sprite.svg);
-background-repeat: no-repeat;
-background-position: -1px -1581px;
-position: absolute;
-top: 5px;
-right: 5px;
-z-index: 10;
--webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
-cursor: pointer;
+	height: 18px;
+	background-image: url(http://test/webclient/images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -1px -1561px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	z-index: 10;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+	cursor: pointer;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
--moz-opacity: 0;
--khtml-opacity: 0;
-opacity: 0;
-cursor:pointer;
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	cursor: pointer;
 }
 .file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
--moz-opacity: 1;
--khtml-opacity: 1;
-opacity: 1;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
+	-moz-opacity: 0.75;
+	-khtml-opacity: 0.75;
+	opacity: 0.75;
 }
-
+.file-block:hover .file-settings-icon:hover, .file-block.ui-selected .file-settings-icon:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
 .clone-of-header, .clone-of-header span {
 	height: 0;
 	overflow: hidden;
@@ -4157,7 +4160,7 @@ opacity: 1;
 	font-size: 11px;
 }
 table {
-border-spacing:transparent;
+	border-spacing: transparent;
 }
 .grid-table td, .grid-share-table td, .contacts-grid-table td {
 	height: 24px;
@@ -4189,7 +4192,7 @@ border-spacing:transparent;
 	padding: 0;
 	width: 24px;
 	height: 24px;
-	margin:0 0 0 -4px;
+	margin: 0 0 0 -4px;
 	background-position: 0 0px;
 	background-image: url(../images/mega/small-icons-v1.png);
 	background-repeat: no-repeat;
@@ -4340,15 +4343,15 @@ border-spacing:transparent;
 	background-image: url(../images/mega/medium-icons-v1.png);
 	background-repeat: no-repeat;
 	margin: 8px auto 0 auto;
-	position:absolute;
-	margin:-32px 0 0 -32px;
-	left:50%;
-	top:50%;
+	position: absolute;
+	margin: -32px 0 0 -32px;
+	left: 50%;
+	top: 50%;
 }
 .block-view-file-type.thumb {
 	width: 120px;
 	height: 120px;
-	margin:-60px 0 0 -60px;
+	margin: -60px 0 0 -60px;
 }
 .block-view-file-type.word, .share-folder-icon div.word {
 	background-position: 0 0px;
@@ -13880,12 +13883,11 @@ h1.help-home-header {
 }
 .arrow {
 	cursor: pointer;
-	background-position:right top;
-	background-image:url(../images/mega/nw-fm-sprite.svg);
-	background-repeat:no-repeat
+	background-position: right top;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat
 }
 .arrow.asc {
-	
 	background-position: right -1227px;
 }
 .arrow.desc {

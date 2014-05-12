@@ -131,8 +131,8 @@ function network_error_check() {
 				 *	this is fine because we resume the download
 				 */
 				DownloadManager.newUrl( dl_queue[i] );
-				dl.error++
 			}
+			dl.error++
 		}
 	}
 
@@ -147,9 +147,10 @@ function network_error_check() {
 				 *	We request a new upload URL to the server, and the upload
 				 *	starts from scratch
 				 */
+				ERRDEBUG("restarting because it failed", ul_queue[i].retries, 'times',  ul);
 				UploadManager.restart( ul_queue[i] );
-				ul.error++;
 			}
+			ul.error++;
 		}
 	}
 
@@ -164,6 +165,7 @@ function network_error_check() {
 		if (k.retries/k.error > 3) {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
+			ERRDEBUG('shrinking: ' + (k == ul ? 'ul' : 'dl'))
 			(k == ul ? ulQueue : dlQueue).shrink();
 		}
 	});
@@ -202,14 +204,14 @@ var UploadManager = new function() {
 		file.posturl  = "";
 		file.completion = [];
 
-		DEBUG("restart()", file.name)
+		ERRDEBUG("restart()", file.name)
 		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
 			return task[0].file != file;
 		});
 
 		file.abort = true;
 
-		DEBUG("fatal error restarting", file.name)
+		ERRDEBUG("fatal error restarting", file.name)
 		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
@@ -225,7 +227,7 @@ var UploadManager = new function() {
 		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
 		ulQueue.pushFirst(newTask);
 
-		DEBUG2("retrying chunk because of", reason + "");
+		ERRDEBUG("retrying chunk because of", reason + "")
 		onUploadError(file.pos, "Upload failed - retrying");
 	};
 
@@ -445,6 +447,8 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			}
 
 			this.bytes = null;
+			
+			this.file.retries  = 0; /* reset error flag */
 
 			return this.done();
 
@@ -488,7 +492,7 @@ ChunkUpload.prototype.upload = function() {
 
 ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
-		DEBUG("IO error");
+		ERRDEBUG("IO error");
 		this.file.done_starting();
 		return UploadManager.retry(this.file, this, args[0])
 	}
@@ -504,6 +508,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 
 ChunkUpload.prototype.done = function() {
 	DEBUG("release", this.start);
+	
 	/* release worker */
 	this._done();
 

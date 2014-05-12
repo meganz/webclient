@@ -361,7 +361,7 @@ function failureFunction(task, args) {
 				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
-		}		
+		}
 	}
 
 	DEBUG2(dl.name, "failed ", code);
@@ -370,6 +370,7 @@ function failureFunction(task, args) {
 	dl_reportstatus(dl, EAGAIN); 
 
 	/* check for network error  */
+	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
 	dlQueue.pushFirst(task);
 }

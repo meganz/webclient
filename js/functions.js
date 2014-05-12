@@ -573,33 +573,19 @@ function NOW() {
  */
 function DEBUG2() {
 	if (d) {
-		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorge.ddetailed2) {
-			console.warn.apply(console, arguments)
-		} else if (d > 1) console.trace();
+		console.warn.apply(console, arguments)
+	}
+}
+
+function ERRDEBUG() {
+	if (d) {
+		console.error.apply(console, arguments)
 	}
 }
 
 function DEBUG() {
-	if (arguments.length == 2 && typeof arguments[0] == "object"
-		  && typeof arguments[0][arguments[1]] == "function") {
-		  
-		var self = arguments[0]
-			, method = arguments[1]
-			, fnc    = self[method]
-
-		self[method] = function() {
-			var args = Array.prototype.slice.call(arguments);
-			if (d) console.warn.apply(console, [method, args]);
-			return fnc.apply(self, arguments);
-		};
-		return;
-	}
 	if (d) {
-		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorge.ddetailed) {
-			console.error.apply(console, arguments)
-		} else if (d > 1) console.trace();
+		console.debug.apply(console, arguments)
 	}
 }
 

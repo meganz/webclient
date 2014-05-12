@@ -603,37 +603,6 @@ define('mpenc/messages',[
     return ns;
 });
 
-/*
- A JavaScript implementation of the SHA family of hashes, as
- defined in FIPS PUB 180-2 as well as the corresponding HMAC implementation
- as defined in FIPS PUB 198a
-
- Copyright Brian Turek 2008-2013
- Distributed under the BSD License
- See http://caligatio.github.com/jsSHA/ for more information
-
- Several functions taken from Paul Johnston
-*/
-(function(J){function u(a,c,b){var h=0,f=[0],k="",l=null,k=b||"UTF8";if("UTF8"!==k&&"UTF16"!==k)throw"encoding must be UTF8 or UTF16";if("HEX"===c){if(0!==a.length%2)throw"srcString of HEX type must be in byte increments";l=x(a);h=l.binLen;f=l.value}else if("ASCII"===c||"TEXT"===c)l=y(a,k),h=l.binLen,f=l.value;else if("B64"===c)l=z(a),h=l.binLen,f=l.value;else throw"inputFormat must be HEX, TEXT, ASCII, or B64";this.getHash=function(a,c,b,k){var l=null,e=f.slice(),m=h,q;3===arguments.length?"number"!==
-typeof b&&(k=b,b=1):2===arguments.length&&(b=1);if(b!==parseInt(b,10)||1>b)throw"numRounds must a integer >= 1";switch(c){case "HEX":l=A;break;case "B64":l=B;break;default:throw"format must be HEX or B64";}if("SHA-384"===a)for(q=0;q<b;q++)e=t(e,m,a),m=384;else if("SHA-512"===a)for(q=0;q<b;q++)e=t(e,m,a),m=512;else throw"Chosen SHA variant is not supported";return l(e,C(k))};this.getHMAC=function(a,b,c,l,n){var e,m,q,r,p=[],v=[];e=null;switch(l){case "HEX":l=A;break;case "B64":l=B;break;default:throw"outputFormat must be HEX or B64";
-}if("SHA-384"===c)m=128,r=384;else if("SHA-512"===c)m=128,r=512;else throw"Chosen SHA variant is not supported";if("HEX"===b)e=x(a),q=e.binLen,e=e.value;else if("ASCII"===b||"TEXT"===b)e=y(a,k),q=e.binLen,e=e.value;else if("B64"===b)e=z(a),q=e.binLen,e=e.value;else throw"inputFormat must be HEX, TEXT, ASCII, or B64";a=8*m;b=m/4-1;m<q/8?(e=t(e,q,c),e[b]&=4294967040):m>q/8&&(e[b]&=4294967040);for(m=0;m<=b;m+=1)p[m]=e[m]^909522486,v[m]=e[m]^1549556828;c=t(v.concat(t(p.concat(f),a+h,c)),a+r,c);return l(c,
-C(n))}}function n(a,c){this.a=a;this.b=c}function y(a,c){var b=[],h,f=[],k=0,l;if("UTF8"===c)for(l=0;l<a.length;l+=1)for(h=a.charCodeAt(l),f=[],2048<h?(f[0]=224|(h&61440)>>>12,f[1]=128|(h&4032)>>>6,f[2]=128|h&63):128<h?(f[0]=192|(h&1984)>>>6,f[1]=128|h&63):f[0]=h,h=0;h<f.length;h+=1)b[k>>>2]|=f[h]<<24-k%4*8,k+=1;else if("UTF16"===c)for(l=0;l<a.length;l+=1)b[k>>>2]|=a.charCodeAt(l)<<16-k%4*8,k+=2;return{value:b,binLen:8*k}}function x(a){var c=[],b=a.length,h,f;if(0!==b%2)throw"String of HEX type must be in byte increments";
-for(h=0;h<b;h+=2){f=parseInt(a.substr(h,2),16);if(isNaN(f))throw"String of HEX type contains invalid characters";c[h>>>3]|=f<<24-h%8*4}return{value:c,binLen:4*b}}function z(a){var c=[],b=0,h,f,k,l,n;if(-1===a.search(/^[a-zA-Z0-9=+\/]+$/))throw"Invalid character in base-64 string";h=a.indexOf("=");a=a.replace(/\=/g,"");if(-1!==h&&h<a.length)throw"Invalid '=' found in base-64 string";for(f=0;f<a.length;f+=4){n=a.substr(f,4);for(k=l=0;k<n.length;k+=1)h="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".indexOf(n[k]),
-l|=h<<18-6*k;for(k=0;k<n.length-1;k+=1)c[b>>2]|=(l>>>16-8*k&255)<<24-b%4*8,b+=1}return{value:c,binLen:8*b}}function A(a,c){var b="",h=4*a.length,f,k;for(f=0;f<h;f+=1)k=a[f>>>2]>>>8*(3-f%4),b+="0123456789abcdef".charAt(k>>>4&15)+"0123456789abcdef".charAt(k&15);return c.outputUpper?b.toUpperCase():b}function B(a,c){var b="",h=4*a.length,f,k,l;for(f=0;f<h;f+=3)for(l=(a[f>>>2]>>>8*(3-f%4)&255)<<16|(a[f+1>>>2]>>>8*(3-(f+1)%4)&255)<<8|a[f+2>>>2]>>>8*(3-(f+2)%4)&255,k=0;4>k;k+=1)b=8*f+6*k<=32*a.length?b+
-"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".charAt(l>>>6*(3-k)&63):b+c.b64Pad;return b}function C(a){var c={outputUpper:!1,b64Pad:"="};try{a.hasOwnProperty("outputUpper")&&(c.outputUpper=a.outputUpper),a.hasOwnProperty("b64Pad")&&(c.b64Pad=a.b64Pad)}catch(b){}if("boolean"!==typeof c.outputUpper)throw"Invalid outputUpper formatting option";if("string"!==typeof c.b64Pad)throw"Invalid b64Pad formatting option";return c}function p(a,c){var b=null,b=new n(a.a,a.b);return b=32>=c?
-new n(b.a>>>c|b.b<<32-c&4294967295,b.b>>>c|b.a<<32-c&4294967295):new n(b.b>>>c-32|b.a<<64-c&4294967295,b.a>>>c-32|b.b<<64-c&4294967295)}function D(a,c){var b=null;return b=32>=c?new n(a.a>>>c,a.b>>>c|a.a<<32-c&4294967295):new n(0,a.a>>>c-32)}function K(a,c,b){return new n(a.a&c.a^~a.a&b.a,a.b&c.b^~a.b&b.b)}function L(a,c,b){return new n(a.a&c.a^a.a&b.a^c.a&b.a,a.b&c.b^a.b&b.b^c.b&b.b)}function M(a){var c=p(a,28),b=p(a,34);a=p(a,39);return new n(c.a^b.a^a.a,c.b^b.b^a.b)}function N(a){var c=p(a,14),
-b=p(a,18);a=p(a,41);return new n(c.a^b.a^a.a,c.b^b.b^a.b)}function O(a){var c=p(a,1),b=p(a,8);a=D(a,7);return new n(c.a^b.a^a.a,c.b^b.b^a.b)}function P(a){var c=p(a,19),b=p(a,61);a=D(a,6);return new n(c.a^b.a^a.a,c.b^b.b^a.b)}function Q(a,c){var b,h,f;b=(a.b&65535)+(c.b&65535);h=(a.b>>>16)+(c.b>>>16)+(b>>>16);f=(h&65535)<<16|b&65535;b=(a.a&65535)+(c.a&65535)+(h>>>16);h=(a.a>>>16)+(c.a>>>16)+(b>>>16);return new n((h&65535)<<16|b&65535,f)}function R(a,c,b,h){var f,k,l;f=(a.b&65535)+(c.b&65535)+(b.b&
-65535)+(h.b&65535);k=(a.b>>>16)+(c.b>>>16)+(b.b>>>16)+(h.b>>>16)+(f>>>16);l=(k&65535)<<16|f&65535;f=(a.a&65535)+(c.a&65535)+(b.a&65535)+(h.a&65535)+(k>>>16);k=(a.a>>>16)+(c.a>>>16)+(b.a>>>16)+(h.a>>>16)+(f>>>16);return new n((k&65535)<<16|f&65535,l)}function S(a,c,b,h,f){var k,l,p;k=(a.b&65535)+(c.b&65535)+(b.b&65535)+(h.b&65535)+(f.b&65535);l=(a.b>>>16)+(c.b>>>16)+(b.b>>>16)+(h.b>>>16)+(f.b>>>16)+(k>>>16);p=(l&65535)<<16|k&65535;k=(a.a&65535)+(c.a&65535)+(b.a&65535)+(h.a&65535)+(f.a&65535)+(l>>>
-16);l=(a.a>>>16)+(c.a>>>16)+(b.a>>>16)+(h.a>>>16)+(f.a>>>16)+(k>>>16);return new n((l&65535)<<16|k&65535,p)}function t(a,c,b){var h,f,k,l,p,t,u,E,x,e,m,q,r,y,v,s,z,A,B,C,D,F,G,H,d,w=[],I,g=[1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,
-3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298];e=[3238371032,914150663,812702999,4144912697,4290775857,1750603025,1694076839,3204075428];f=[1779033703,3144134277,1013904242,
-2773480762,1359893119,2600822924,528734635,1541459225];if("SHA-384"===b||"SHA-512"===b)m=80,h=(c+128>>>10<<5)+31,y=32,v=2,d=n,s=Q,z=R,A=S,B=O,C=P,D=M,F=N,H=L,G=K,g=[new d(g[0],3609767458),new d(g[1],602891725),new d(g[2],3964484399),new d(g[3],2173295548),new d(g[4],4081628472),new d(g[5],3053834265),new d(g[6],2937671579),new d(g[7],3664609560),new d(g[8],2734883394),new d(g[9],1164996542),new d(g[10],1323610764),new d(g[11],3590304994),new d(g[12],4068182383),new d(g[13],991336113),new d(g[14],
-633803317),new d(g[15],3479774868),new d(g[16],2666613458),new d(g[17],944711139),new d(g[18],2341262773),new d(g[19],2007800933),new d(g[20],1495990901),new d(g[21],1856431235),new d(g[22],3175218132),new d(g[23],2198950837),new d(g[24],3999719339),new d(g[25],766784016),new d(g[26],2566594879),new d(g[27],3203337956),new d(g[28],1034457026),new d(g[29],2466948901),new d(g[30],3758326383),new d(g[31],168717936),new d(g[32],1188179964),new d(g[33],1546045734),new d(g[34],1522805485),new d(g[35],2643833823),
-new d(g[36],2343527390),new d(g[37],1014477480),new d(g[38],1206759142),new d(g[39],344077627),new d(g[40],1290863460),new d(g[41],3158454273),new d(g[42],3505952657),new d(g[43],106217008),new d(g[44],3606008344),new d(g[45],1432725776),new d(g[46],1467031594),new d(g[47],851169720),new d(g[48],3100823752),new d(g[49],1363258195),new d(g[50],3750685593),new d(g[51],3785050280),new d(g[52],3318307427),new d(g[53],3812723403),new d(g[54],2003034995),new d(g[55],3602036899),new d(g[56],1575990012),
-new d(g[57],1125592928),new d(g[58],2716904306),new d(g[59],442776044),new d(g[60],593698344),new d(g[61],3733110249),new d(g[62],2999351573),new d(g[63],3815920427),new d(3391569614,3928383900),new d(3515267271,566280711),new d(3940187606,3454069534),new d(4118630271,4000239992),new d(116418474,1914138554),new d(174292421,2731055270),new d(289380356,3203993006),new d(460393269,320620315),new d(685471733,587496836),new d(852142971,1086792851),new d(1017036298,365543100),new d(1126000580,2618297676),
-new d(1288033470,3409855158),new d(1501505948,4234509866),new d(1607167915,987167468),new d(1816402316,1246189591)],e="SHA-384"===b?[new d(3418070365,e[0]),new d(1654270250,e[1]),new d(2438529370,e[2]),new d(355462360,e[3]),new d(1731405415,e[4]),new d(41048885895,e[5]),new d(3675008525,e[6]),new d(1203062813,e[7])]:[new d(f[0],4089235720),new d(f[1],2227873595),new d(f[2],4271175723),new d(f[3],1595750129),new d(f[4],2917565137),new d(f[5],725511199),new d(f[6],4215389547),new d(f[7],327033209)];
-else throw"Unexpected error in SHA-2 implementation";a[c>>>5]|=128<<24-c%32;a[h]=c;I=a.length;for(q=0;q<I;q+=y){c=e[0];h=e[1];f=e[2];k=e[3];l=e[4];p=e[5];t=e[6];u=e[7];for(r=0;r<m;r+=1)w[r]=16>r?new d(a[r*v+q],a[r*v+q+1]):z(C(w[r-2]),w[r-7],B(w[r-15]),w[r-16]),E=A(u,F(l),G(l,p,t),g[r],w[r]),x=s(D(c),H(c,h,f)),u=t,t=p,p=l,l=s(k,E),k=f,f=h,h=c,c=s(E,x);e[0]=s(c,e[0]);e[1]=s(h,e[1]);e[2]=s(f,e[2]);e[3]=s(k,e[3]);e[4]=s(l,e[4]);e[5]=s(p,e[5]);e[6]=s(t,e[6]);e[7]=s(u,e[7])}if("SHA-384"===b)a=[e[0].a,e[0].b,
-e[1].a,e[1].b,e[2].a,e[2].b,e[3].a,e[3].b,e[4].a,e[4].b,e[5].a,e[5].b];else if("SHA-512"===b)a=[e[0].a,e[0].b,e[1].a,e[1].b,e[2].a,e[2].b,e[3].a,e[3].b,e[4].a,e[4].b,e[5].a,e[5].b,e[6].a,e[6].b,e[7].a,e[7].b];else throw"Unexpected error in SHA-2 implementation";return a}"function"===typeof define&&typeof define.amd?define('jsSHA',[],function(){return u}):"undefined"!==typeof exports?"undefined"!==typeof module&&module.exports?module.exports=exports=u:exports=u:J.jsSHA=u})(this);
-
 // Copyright (c) 2005  Tom Wu
 // All Rights Reserved.
 // See "LICENSE" for details.
@@ -1855,465 +1824,1147 @@ BigInteger.prototype.square = bnSquare;
 ;
 define("jsbn2", function(){});
 
-
-//  Ed25519 - digital signatures based on curve25519
-//  Adapted from http://ed25519.cr.yp.to/python/ed25519.py by Ron Garret
-//  December 2011
+// Copyright (c) 2007, 2013, 2014 Michele Bini
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is furnished
+// to do so, subject to the following conditions:
 //
-//  Requires jsbn and jsSHA
-//  http://www-cs-students.stanford.edu/~tjw/jsbn/
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 //
-//  Running under v8 highly recommended.  Anything else is pretty slow.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
-// Wrap into local namespace.
-var djbec = {};
-(function() {
-
-BigInteger.prototype.toSource = function(b) {
-  return bnToString.call(this, b) + "L";
-}
-
-function chr(n) { return String.fromCharCode(n); }
-function ord(c) { return c.charCodeAt(0); }
-
-function map(f, l) {
-  assert(!!l, 'passed argument l is invalid.');
-
-  result = new Array(l.length);
-  for (var i=0; i<l.length; i++) result[i]=f(l[i]);
-  return result;
-}
-
-function bytes2string(bytes) { return map(chr, bytes).join(''); }
-
-function string2bytes(s) { return map(ord, s); }
-
-function bi2bytes(n, cnt) {
-  if (cnt==undefined) cnt = (n.bitLength()>>3)+1;
-  var bytes = new Array(cnt);
-  for (var i = 0; i<cnt; i++) {
-    bytes[i] = n[0]&255;           // n.and(xff);
-    n = n.shiftRight(8);
+var c255lbase32chars = "abcdefghijklmnopqrstuvwxyz234567";
+var c255lbase32values = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7, "i":8, "j":9, "k":10, "l":11, "m":12, "n":13, "o":14, "p":15, "q":16, "r":17, "s":18, "t":19, "u":20, "v":21, "w":22, "x":23, "y":24, "z":25, "2":26, "3":27, "4":28, "5":29, "6":30, "7":31 };
+function c255lbase32encode(n) {
+  var c;
+  var r = "";
+  for (c = 0; c < 255; c+=5) {
+    r = c255lbase32chars.substr(c255lgetbit(n, c) + (c255lgetbit(n, c+1) << 1) + (c255lgetbit(n, c+2) << 2) + (c255lgetbit(n, c+3) << 3) + (c255lgetbit(n, c+4) << 4), 1) + r;
   }
-  return bytes;
+  return r;
 }
-
-function bytes2bi(bytes) {
-  var n = bi('0');
-  for (var i=bytes.length-1; i>-1; i--) {
-    n = n.shiftLeft(8).or(bi(''+bytes[i]));
+function c255lbase32decode(n) {
+  var c = 0;
+  var r = c255lzero();
+  var l = n.length;
+  for (c = 0; (l > 0) && (c < 255); c+=5) {
+    l--;
+    var v = c255lbase32values[n.substr(l, 1)];
+    c255lsetbit(r, c,    v&1); v = v >> 1;
+    c255lsetbit(r, c+1,  v&1); v = v >> 1;
+    c255lsetbit(r, c+2,  v&1); v = v >> 1;
+    c255lsetbit(r, c+3,  v&1); v = v >> 1;
+    c255lsetbit(r, c+4,  v&1);
   }
-  return n;
+  return r;
 }
-
-function hex2bi(s) { return new BigInteger(s, 16); }
-
-// BigInteger construction done right
-function bi(s, base) {
-  if (base != undefined) {
-    if (base == 256) return bytes2bi(string2bytes(s));
-    return new BigInteger(s, base);
-  } else if (typeof s == 'string') {
-    return new BigInteger(s, 10);
-  } else if (s instanceof Array) {
-    return bytes2bi(s);
-  } else if (typeof s == 'number') {
-    return new BigInteger(s.toString(), 10);
-  } else {
-    throw "Can't convert " + s + " to BigInteger";
+var c255lhexchars = "0123456789abcdef";
+var c255lhexvalues = {"0":0, "1":1, "2":2, "3":3, "4":4, "5":5, "6":6, "7":7,  "8":8, "9":9, "a":10, "b":11, "c":12, "d":13, "e":14, "f":15 };
+function c255lhexencode(n) {
+  var c;
+  var r = "";
+  for (c = 0; c < 255; c+=4) {
+    r = c255lhexchars.substr(c255lgetbit(n, c) + (c255lgetbit(n, c+1) << 1) + (c255lgetbit(n, c+2) << 2) + (c255lgetbit(n, c+3) << 3), 1) + r;
   }
+  return r;
 }
-
-function sha512(s) {                      // Requires jsSHA
-  var shaObj = new jsSHA(s, "ASCII");
-  return bi2bytes(hex2bi(shaObj.getHash("SHA-512", "HEX")), 64).reverse();
-}
-
-function inthash(s) {
-  return bytes2bi(sha512(s));
-}
-
-function stringhash(s) {
-  return bytes2string(sha512(s));
-}
-
-
-var zero = BigInteger.ZERO;
-var one = BigInteger.ONE;
-var two = bi('2');
-
-BigInteger.prototype.times = BigInteger.prototype.multiply;
-BigInteger.prototype.plus = BigInteger.prototype.add;
-BigInteger.prototype.minus = BigInteger.prototype.subtract;
-BigInteger.prototype.square = function () { return this.times(this); }
-
-
-var xff = bi('255');
-var b = bi('256');
-var q = two.pow(bi('255')).minus(bi('19'));
-var l = two.pow(252).add(bi('27742317777372353535851937790883648493'));
-
-var k1 = two.pow(b.minus(two));
-var k2 = two.pow(251).minus(one).shiftLeft(3);
-
-function inv(n) { return n.mod(q).modInverse(q); }
-
-var d = bi('-121665').times(inv(bi('121666'))).mod(q);
-var i = two.modPow(q.minus(one).divide(bi('4')), q);
-
-function xrecover(y) {
-  var ysquared = y.times(y);
-  var xx = ysquared.minus(one).times(inv(one.add(d.times(ysquared))));
-  var x = xx.modPow(q.add(bi('3')).divide(bi('8')), q);
-  if (!(x.times(x).minus(xx).mod(q).equals(zero))) {
-    x = x.times(i).mod(q);
+function c255lhexdecode(n) {
+  var c = 0;
+  var r = c255lzero();
+  var l = n.length;
+  for (c = 0; (l > 0) && (c < 255); c+=4) {
+    l--;
+    var v = c255lhexvalues[n.substr(l, 1)];
+    c255lsetbit(r, c,    v&1); v = v >> 1;
+    c255lsetbit(r, c+1,  v&1); v = v >> 1;
+    c255lsetbit(r, c+2,  v&1); v = v >> 1;
+    c255lsetbit(r, c+3,  v&1);
   }
-  if (!(x.mod(two).equals(zero))) {
-    x = q.minus(x);
+  return r;
+}
+var c255lprime = [0xffff-18, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0x7fff];
+function c255lsetbit(n, c, v) {
+  var i = c >> 4;
+  var a = n[i];
+  a = a + (1 << (c & 0xf)) * v;
+  n[i] = a;
+}
+function c255lgetbit(n, c) {
+  return (n[c >> 4] >> (c & 0xf)) & 1;
+}
+function c255lzero() {
+  return [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+}
+function c255lone() {
+  return [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+}
+function c255lbase() { // Basepoint
+  return [9,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+}
+// return -1, 0, +1 when a is less than, equal, or greater than b
+function c255lbigintcmp(a, b) {
+ // The following code is a bit tricky to avoid code branching
+  var c, abs_r, mask;
+  var r = 0;
+  for (c = 15; c >= 0; c--) {
+    var x = a[c];
+    var y = b[c];
+    r = r + (x - y)*(1 - r*r);
+    // http://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
+    // correct for [-294967295, 294967295]
+    mask = r >> 31;
+    abs_r = (r + mask) ^ mask;
+    // http://stackoverflow.com/questions/596467/how-do-i-convert-a-number-to-an-integer-in-javascript
+    // this rounds towards zero
+    r = ~~((r << 1) / (abs_r + 1));
   }
-  return x;
+  return r;
+}
+function c255lbigintadd(a, b) {
+  var r = [];
+  var v;
+  r[0] = (v = a[0] + b[0]) & 0xffff;
+  r[1] = (v = (v >>> 16) + a[1] + b[1]) & 0xffff;
+  r[2] = (v = (v >>> 16) + a[2] + b[2]) & 0xffff;
+  r[3] = (v = (v >>> 16) + a[3] + b[3]) & 0xffff;
+  r[4] = (v = (v >>> 16) + a[4] + b[4]) & 0xffff;
+  r[5] = (v = (v >>> 16) + a[5] + b[5]) & 0xffff;
+  r[6] = (v = (v >>> 16) + a[6] + b[6]) & 0xffff;
+  r[7] = (v = (v >>> 16) + a[7] + b[7]) & 0xffff;
+  r[8] = (v = (v >>> 16) + a[8] + b[8]) & 0xffff;
+  r[9] = (v = (v >>> 16) + a[9] + b[9]) & 0xffff;
+  r[10] = (v = (v >>> 16) + a[10] + b[10]) & 0xffff;
+  r[11] = (v = (v >>> 16) + a[11] + b[11]) & 0xffff;
+  r[12] = (v = (v >>> 16) + a[12] + b[12]) & 0xffff;
+  r[13] = (v = (v >>> 16) + a[13] + b[13]) & 0xffff;
+  r[14] = (v = (v >>> 16) + a[14] + b[14]) & 0xffff;
+  r[15] = (v >>> 16) + a[15] + b[15];
+  return r;
+}
+function c255lbigintsub(a, b) {
+  var r = [];
+  var v;
+  r[0] = (v = 0x80000 + a[0] - b[0]) & 0xffff;
+  r[1] = (v = (v >>> 16) + 0x7fff8 + a[1] - b[1]) & 0xffff;
+  r[2] = (v = (v >>> 16) + 0x7fff8 + a[2] - b[2]) & 0xffff;
+  r[3] = (v = (v >>> 16) + 0x7fff8 + a[3] - b[3]) & 0xffff;
+  r[4] = (v = (v >>> 16) + 0x7fff8 + a[4] - b[4]) & 0xffff;
+  r[5] = (v = (v >>> 16) + 0x7fff8 + a[5] - b[5]) & 0xffff;
+  r[6] = (v = (v >>> 16) + 0x7fff8 + a[6] - b[6]) & 0xffff;
+  r[7] = (v = (v >>> 16) + 0x7fff8 + a[7] - b[7]) & 0xffff;
+  r[8] = (v = (v >>> 16) + 0x7fff8 + a[8] - b[8]) & 0xffff;
+  r[9] = (v = (v >>> 16) + 0x7fff8 + a[9] - b[9]) & 0xffff;
+  r[10] = (v = (v >>> 16) + 0x7fff8 + a[10] - b[10]) & 0xffff;
+  r[11] = (v = (v >>> 16) + 0x7fff8 + a[11] - b[11]) & 0xffff;
+  r[12] = (v = (v >>> 16) + 0x7fff8 + a[12] - b[12]) & 0xffff;
+  r[13] = (v = (v >>> 16) + 0x7fff8 + a[13] - b[13]) & 0xffff;
+  r[14] = (v = (v >>> 16) + 0x7fff8 + a[14] - b[14]) & 0xffff;
+  r[15] = (v >>> 16) - 8 + a[15] - b[15];
+  return r;
 }
 
-var by = inv(bi('5')).times(bi('4')).mod(q);
-var bx = xrecover(by);
-var bp = [bx, by]
-
-// Simple but slow version
-
-function edwards(p1, p2) {
-  var x1 = p1[0]; var y1 = p1[1]; var x2 = p2[0]; var y2 = p2[1];
-  var k = d.times(x1).times(x2).times(y1).times(y2);
-  var x3 = x1.times(y2).add(x2.times(y1)).times(inv(one.plus(k)));
-  var y3 = y1.times(y2).add(x1.times(x2)).times(inv(one.minus(k)));
-  return [x3.mod(q), y3.mod(q)];
+function c255lsqr8h(a7, a6, a5, a4, a3, a2, a1, a0) {
+  // 'division by 0x10000' can not be replaced by '>> 16' because more than 32 bits of precision are needed
+  // similarly 'multiplication by 2' cannot be replaced by '<< 1'
+  var r = [];
+  var v;
+  r[0] = (v = a0*a0) & 0xffff;
+  r[1] = (v = (0|(v / 0x10000)) + 2*a0*a1) & 0xffff;
+  r[2] = (v = (0|(v / 0x10000)) + 2*a0*a2 + a1*a1) & 0xffff;
+  r[3] = (v = (0|(v / 0x10000)) + 2*a0*a3 + 2*a1*a2) & 0xffff;
+  r[4] = (v = (0|(v / 0x10000)) + 2*a0*a4 + 2*a1*a3 + a2*a2) & 0xffff;
+  r[5] = (v = (0|(v / 0x10000)) + 2*a0*a5 + 2*a1*a4 + 2*a2*a3) & 0xffff;
+  r[6] = (v = (0|(v / 0x10000)) + 2*a0*a6 + 2*a1*a5 + 2*a2*a4 + a3*a3) & 0xffff;
+  r[7] = (v = (0|(v / 0x10000)) + 2*a0*a7 + 2*a1*a6 + 2*a2*a5 + 2*a3*a4) & 0xffff;
+  r[8] = (v = (0|(v / 0x10000)) + 2*a1*a7 + 2*a2*a6 + 2*a3*a5 + a4*a4) & 0xffff;
+  r[9] = (v = (0|(v / 0x10000)) + 2*a2*a7 + 2*a3*a6 + 2*a4*a5) & 0xffff;
+  r[10] = (v = (0|(v / 0x10000)) + 2*a3*a7 + 2*a4*a6 + a5*a5) & 0xffff;
+  r[11] = (v = (0|(v / 0x10000)) + 2*a4*a7 + 2*a5*a6) & 0xffff;
+  r[12] = (v = (0|(v / 0x10000)) + 2*a5*a7 + a6*a6) & 0xffff;
+  r[13] = (v = (0|(v / 0x10000)) + 2*a6*a7) & 0xffff;
+  r[14] = (v = (0|(v / 0x10000)) + a7*a7) & 0xffff;
+  r[15] = 0|(v / 0x10000);
+  return r;
 }
 
-function slow_scalarmult(p, e) {
-  if (e.equals(zero)) return [zero, one];
-  var _ = scalarmult(p, e.divide(two));
-  _ = edwards(_,_)
-  if (e.testBit(0)) return edwards(_, p);
-  else return _;
+function c255lsqrmodp(a) {
+  var x = c255lsqr8h(a[15], a[14], a[13], a[12], a[11], a[10], a[9], a[8]);
+  var z = c255lsqr8h(a[7], a[6], a[5], a[4], a[3], a[2], a[1], a[0]);
+  var y = c255lsqr8h(a[15] + a[7], a[14] + a[6], a[13] + a[5], a[12] + a[4], a[11] + a[3], a[10] + a[2], a[9] + a[1], a[8] + a[0]);
+  var r = [];
+  var v;
+  r[0] = (v = 0x800000 + z[0] + (y[8] -x[8] -z[8] + x[0] -0x80) * 38) & 0xffff;
+  r[1] = (v = 0x7fff80 + (v >>> 16) + z[1] + (y[9] -x[9] -z[9] + x[1]) * 38) & 0xffff;
+  r[2] = (v = 0x7fff80 + (v >>> 16) + z[2] + (y[10] -x[10] -z[10] + x[2]) * 38) & 0xffff;
+  r[3] = (v = 0x7fff80 + (v >>> 16) + z[3] + (y[11] -x[11] -z[11] + x[3]) * 38) & 0xffff;
+  r[4] = (v = 0x7fff80 + (v >>> 16) + z[4] + (y[12] -x[12] -z[12] + x[4]) * 38) & 0xffff;
+  r[5] = (v = 0x7fff80 + (v >>> 16) + z[5] + (y[13] -x[13] -z[13] + x[5]) * 38) & 0xffff;
+  r[6] = (v = 0x7fff80 + (v >>> 16) + z[6] + (y[14] -x[14] -z[14] + x[6]) * 38) & 0xffff;
+  r[7] = (v = 0x7fff80 + (v >>> 16) + z[7] + (y[15] -x[15] -z[15] + x[7]) * 38) & 0xffff;
+  r[8] = (v = 0x7fff80 + (v >>> 16) + z[8] + y[0] -x[0] -z[0] + x[8] * 38) & 0xffff;
+  r[9] = (v = 0x7fff80 + (v >>> 16) + z[9] + y[1] -x[1] -z[1] + x[9] * 38) & 0xffff;
+  r[10] = (v = 0x7fff80 + (v >>> 16) + z[10] + y[2] -x[2] -z[2] + x[10] * 38) & 0xffff;
+  r[11] = (v = 0x7fff80 + (v >>> 16) + z[11] + y[3] -x[3] -z[3] + x[11] * 38) & 0xffff;
+  r[12] = (v = 0x7fff80 + (v >>> 16) + z[12] + y[4] -x[4] -z[4] + x[12] * 38) & 0xffff;
+  r[13] = (v = 0x7fff80 + (v >>> 16) + z[13] + y[5] -x[5] -z[5] + x[13] * 38) & 0xffff;
+  r[14] = (v = 0x7fff80 + (v >>> 16) + z[14] + y[6] -x[6] -z[6] + x[14] * 38) & 0xffff;
+  r[15] = 0x7fff80 + (v >>> 16) + z[15] + y[7] -x[7] -z[7] + x[15] * 38;
+  c255lreduce(r);
+  return r;
 }
 
-// Faster (!) version based on:
-// http://www.hyperelliptic.org/EFD/g1p/auto-twisted-extended-1.html
-
-function xpt_add(pt1, pt2) {
-  var x1 = pt1[0];
-  var y1 = pt1[1];
-  var z1 = pt1[2];
-  var t1 = pt1[3];
-  var x2 = pt2[0];
-  var y2 = pt2[1];
-  var z2 = pt2[2];
-  var t2 = pt2[3];
-  var A = y1.minus(x1).times(y2.plus(x2)).mod(q);
-  var B = y1.plus(x1).times(y2.minus(x2)).mod(q);
-  var C = z1.times(two).times(t2).mod(q);
-  var D = t1.times(two).times(z2).mod(q);
-  var E = D.plus(C);
-  var F = B.minus(A);
-  var G = B.plus(A);
-  var H = D.minus(C);
-  return [E.times(F).mod(q), G.times(H).mod(q),
-	  F.times(G).mod(q), E.times(H).mod(q)];
+function c255lmul8h(a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) {
+  // 'division by 0x10000' can not be replaced by '>> 16' because more than 32 bits of precision are needed
+  var r = [];
+  var v;
+  r[0] = (v = a0*b0) & 0xffff;
+  r[1] = (v = (0|(v / 0x10000)) + a0*b1 + a1*b0) & 0xffff;
+  r[2] = (v = (0|(v / 0x10000)) + a0*b2 + a1*b1 + a2*b0) & 0xffff;
+  r[3] = (v = (0|(v / 0x10000)) + a0*b3 + a1*b2 + a2*b1 + a3*b0) & 0xffff;
+  r[4] = (v = (0|(v / 0x10000)) + a0*b4 + a1*b3 + a2*b2 + a3*b1 + a4*b0) & 0xffff;
+  r[5] = (v = (0|(v / 0x10000)) + a0*b5 + a1*b4 + a2*b3 + a3*b2 + a4*b1 + a5*b0) & 0xffff;
+  r[6] = (v = (0|(v / 0x10000)) + a0*b6 + a1*b5 + a2*b4 + a3*b3 + a4*b2 + a5*b1 + a6*b0) & 0xffff;
+  r[7] = (v = (0|(v / 0x10000)) + a0*b7 + a1*b6 + a2*b5 + a3*b4 + a4*b3 + a5*b2 + a6*b1 + a7*b0) & 0xffff;
+  r[8] = (v = (0|(v / 0x10000)) + a1*b7 + a2*b6 + a3*b5 + a4*b4 + a5*b3 + a6*b2 + a7*b1) & 0xffff;
+  r[9] = (v = (0|(v / 0x10000)) + a2*b7 + a3*b6 + a4*b5 + a5*b4 + a6*b3 + a7*b2) & 0xffff;
+  r[10] = (v = (0|(v / 0x10000)) + a3*b7 + a4*b6 + a5*b5 + a6*b4 + a7*b3) & 0xffff;
+  r[11] = (v = (0|(v / 0x10000)) + a4*b7 + a5*b6 + a6*b5 + a7*b4) & 0xffff;
+  r[12] = (v = (0|(v / 0x10000)) + a5*b7 + a6*b6 + a7*b5) & 0xffff;
+  r[13] = (v = (0|(v / 0x10000)) + a6*b7 + a7*b6) & 0xffff;
+  r[14] = (v = (0|(v / 0x10000)) + a7*b7) & 0xffff;
+  r[15] = (0|(v / 0x10000));
+  return r;
 }
 
-function xpt_double(pt1) {
-  var x1 = pt1[0];
-  var y1 = pt1[1];
-  var z1 = pt1[2];
-  var A = x1.times(x1);
-  var B = y1.times(y1);
-  var C = two.times(z1).times(z1);
-  var D = zero.minus(A).mod(q);
-  var J = x1.plus(y1);
-  var E = J.times(J).minus(A).minus(B);
-  var G = D.plus(B);
-  var F = G.minus(C);
-  var H = D.minus(B);
-  return [E.times(F).mod(q), G.times(H).mod(q),
-	  F.times(G).mod(q), E.times(H).mod(q)];
+function
+c255lmulmodp(a, b) {
+  // Karatsuba multiplication scheme: x*y = (b^2+b)*x1*y1 - b*(x1-x0)*(y1-y0) + (b+1)*x0*y0
+  var x = c255lmul8h(a[15], a[14], a[13], a[12], a[11], a[10], a[9], a[8], b[15], b[14], b[13], b[12], b[11], b[10], b[9], b[8]);
+  var z = c255lmul8h(a[7], a[6], a[5], a[4], a[3], a[2], a[1], a[0], b[7], b[6], b[5], b[4], b[3], b[2], b[1], b[0]);
+  var y = c255lmul8h(a[15] + a[7], a[14] + a[6], a[13] + a[5], a[12] + a[4], a[11] + a[3], a[10] + a[2], a[9] + a[1], a[8] + a[0],
+  			b[15] + b[7], b[14] + b[6], b[13] + b[5], b[12] + b[4], b[11] + b[3], b[10] + b[2], b[9] + b[1], b[8] + b[0]);
+  var r = [];
+  var v;
+  r[0] = (v = 0x800000 + z[0] + (y[8] -x[8] -z[8] + x[0] -0x80) * 38) & 0xffff;
+  r[1] = (v = 0x7fff80 + (v >>> 16) + z[1] + (y[9] -x[9] -z[9] + x[1]) * 38) & 0xffff;
+  r[2] = (v = 0x7fff80 + (v >>> 16) + z[2] + (y[10] -x[10] -z[10] + x[2]) * 38) & 0xffff;
+  r[3] = (v = 0x7fff80 + (v >>> 16) + z[3] + (y[11] -x[11] -z[11] + x[3]) * 38) & 0xffff;
+  r[4] = (v = 0x7fff80 + (v >>> 16) + z[4] + (y[12] -x[12] -z[12] + x[4]) * 38) & 0xffff;
+  r[5] = (v = 0x7fff80 + (v >>> 16) + z[5] + (y[13] -x[13] -z[13] + x[5]) * 38) & 0xffff;
+  r[6] = (v = 0x7fff80 + (v >>> 16) + z[6] + (y[14] -x[14] -z[14] + x[6]) * 38) & 0xffff;
+  r[7] = (v = 0x7fff80 + (v >>> 16) + z[7] + (y[15] -x[15] -z[15] + x[7]) * 38) & 0xffff;
+  r[8] = (v = 0x7fff80 + (v >>> 16) + z[8] + y[0] -x[0] -z[0] + x[8] * 38) & 0xffff;
+  r[9] = (v = 0x7fff80 + (v >>> 16) + z[9] + y[1] -x[1] -z[1] + x[9] * 38) & 0xffff;
+  r[10] = (v = 0x7fff80 + (v >>> 16) + z[10] + y[2] -x[2] -z[2] + x[10] * 38) & 0xffff;
+  r[11] = (v = 0x7fff80 + (v >>> 16) + z[11] + y[3] -x[3] -z[3] + x[11] * 38) & 0xffff;
+  r[12] = (v = 0x7fff80 + (v >>> 16) + z[12] + y[4] -x[4] -z[4] + x[12] * 38) & 0xffff;
+  r[13] = (v = 0x7fff80 + (v >>> 16) + z[13] + y[5] -x[5] -z[5] + x[13] * 38) & 0xffff;
+  r[14] = (v = 0x7fff80 + (v >>> 16) + z[14] + y[6] -x[6] -z[6] + x[14] * 38) & 0xffff;
+  r[15] = 0x7fff80 + (v >>> 16) + z[15] + y[7] -x[7] -z[7] + x[15] * 38;
+  c255lreduce(r);
+  return r;
 }
 
-function xpt_mult(pt, n) {
-  if (n.equals(zero)) return [zero, one, one, zero];
-  var _ = xpt_mult(pt, n.shiftRight(1));
-  _ = xpt_double(_);
-  if (n.testBit(0)) return xpt_add(_, pt);
-  else return _;
+function c255lreduce(a) {
+  var v = a[15];
+  a[15] = v & 0x7fff;
+  v = (0|(v / 0x8000)) * 19; // >32-bits of precision are required here so '/ 0x8000' can not be replaced by the arithmetic equivalent '>>> 15'
+  a[0] = (v += a[0]) & 0xffff;
+  v = v >>> 16;
+  a[1] = (v += a[1]) & 0xffff;
+  v = v >>> 16;
+  a[2] = (v += a[2]) & 0xffff;
+  v = v >>> 16;
+  a[3] = (v += a[3]) & 0xffff;
+  v = v >>> 16;
+  a[4] = (v += a[4]) & 0xffff;
+  v = v >>> 16;
+  a[5] = (v += a[5]) & 0xffff;
+  v = v >>> 16;
+  a[6] = (v += a[6]) & 0xffff;
+  v = v >>> 16;
+  a[7] = (v += a[7]) & 0xffff;
+  v = v >>> 16;
+  a[8] = (v += a[8]) & 0xffff;
+  v = v >>> 16;
+  a[9] = (v += a[9]) & 0xffff;
+  v = v >>> 16;
+  a[10] = (v += a[10]) & 0xffff;
+  v = v >>> 16;
+  a[11] = (v += a[11]) & 0xffff;
+  v = v >>> 16;
+  a[12] = (v += a[12]) & 0xffff;
+  v = v >>> 16;
+  a[13] = (v += a[13]) & 0xffff;
+  v = v >>> 16;
+  a[14] = (v += a[14]) & 0xffff;
+  v = v >>> 16;
+  a[15] += v;
 }
 
-function pt_xform(pt) {
-  var x = pt[0];
-  var y = pt[1];
-  return [x, y, one, x.times(y).mod(q)]
+function c255laddmodp(a, b) {
+  var r = [];
+  var v;
+  r[0] = (v = ((0|(a[15] >>> 15)) + (0|(b[15] >>> 15))) * 19 + a[0] + b[0]) & 0xffff;
+  r[1] = (v = (v >>> 16) + a[1] + b[1]) & 0xffff;
+  r[2] = (v = (v >>> 16) + a[2] + b[2]) & 0xffff;
+  r[3] = (v = (v >>> 16) + a[3] + b[3]) & 0xffff;
+  r[4] = (v = (v >>> 16) + a[4] + b[4]) & 0xffff;
+  r[5] = (v = (v >>> 16) + a[5] + b[5]) & 0xffff;
+  r[6] = (v = (v >>> 16) + a[6] + b[6]) & 0xffff;
+  r[7] = (v = (v >>> 16) + a[7] + b[7]) & 0xffff;
+  r[8] = (v = (v >>> 16) + a[8] + b[8]) & 0xffff;
+  r[9] = (v = (v >>> 16) + a[9] + b[9]) & 0xffff;
+  r[10] = (v = (v >>> 16) + a[10] + b[10]) & 0xffff;
+  r[11] = (v = (v >>> 16) + a[11] + b[11]) & 0xffff;
+  r[12] = (v = (v >>> 16) + a[12] + b[12]) & 0xffff;
+  r[13] = (v = (v >>> 16) + a[13] + b[13]) & 0xffff;
+  r[14] = (v = (v >>> 16) + a[14] + b[14]) & 0xffff;
+  r[15] = (v >>> 16) + (a[15] & 0x7fff) + (b[15] & 0x7fff);
+  return r;
 }
 
-function pt_unxform (pt) {
-  var x = pt[0];
-  var y = pt[1];
-  var z = pt[2];
-  var invz = inv(z);
-  return [x.times(invz).mod(q), y.times(invz).mod(q)]
+function c255lsubmodp(a, b) {
+  var r = [];
+  var v;
+  r[0] = (v = 0x80000 + ((0|(a[15] >>> 15)) - (0|(b[15] >>> 15)) - 1) * 19 + a[0] - b[0]) & 0xffff;
+  r[1] = (v = (v >>> 16) + 0x7fff8 + a[1] - b[1]) & 0xffff;
+  r[2] = (v = (v >>> 16) + 0x7fff8 + a[2] - b[2]) & 0xffff;
+  r[3] = (v = (v >>> 16) + 0x7fff8 + a[3] - b[3]) & 0xffff;
+  r[4] = (v = (v >>> 16) + 0x7fff8 + a[4] - b[4]) & 0xffff;
+  r[5] = (v = (v >>> 16) + 0x7fff8 + a[5] - b[5]) & 0xffff;
+  r[6] = (v = (v >>> 16) + 0x7fff8 + a[6] - b[6]) & 0xffff;
+  r[7] = (v = (v >>> 16) + 0x7fff8 + a[7] - b[7]) & 0xffff;
+  r[8] = (v = (v >>> 16) + 0x7fff8 + a[8] - b[8]) & 0xffff;
+  r[9] = (v = (v >>> 16) + 0x7fff8 + a[9] - b[9]) & 0xffff;
+  r[10] = (v = (v >>> 16) + 0x7fff8 + a[10] - b[10]) & 0xffff;
+  r[11] = (v = (v >>> 16) + 0x7fff8 + a[11] - b[11]) & 0xffff;
+  r[12] = (v = (v >>> 16) + 0x7fff8 + a[12] - b[12]) & 0xffff;
+  r[13] = (v = (v >>> 16) + 0x7fff8 + a[13] - b[13]) & 0xffff;
+  r[14] = (v = (v >>> 16) + 0x7fff8 + a[14] - b[14]) & 0xffff;
+  r[15] = (v >>> 16) + 0x7ff8 + (a[15] & 0x7fff) - (b[15] & 0x7fff);
+  return r;
 }
 
-function scalarmult(pt, n) {
-  return pt_unxform(xpt_mult(pt_xform(pt), n));
-}
-
-function encodeint(n) {
-  return bi2bytes(n, 32);
-}
-
-function decodeint(a) {
-  return bytes2bi(a);
-}
-
-function encodepoint(p) {
-  var x = p[0];
-  var y = p[1];
-  return encodeint(y.add(x.and(one).shiftLeft(255)));
-}
-
-function publickey(sk) {
-  var h = inthash(sk);
-  var a = k1.add(k2.and(h));
-  return encodepoint(scalarmult(bp, a));
-}
-
-function signature(m, sk, pk) {
-  var hi = inthash(sk);
-  var hs = stringhash(sk);
-  var a = k1.add(k2.and(hi));
-  var r = inthash(hs.slice(32,64) + m);
-  var rp = scalarmult(bp, r);
-  var s0 = inthash(bytes2string(encodepoint(rp)) + bytes2string(pk) + m)
-  var s = r.add(a.times(s0)).mod(l);
-  return encodepoint(rp).concat(encodeint(s));
-}
-
-function isoncurve(p) {
-  var x = p[0];
-  var y = p[1];
-  var v = d.times(x).times(x).times(y).times(y).mod(q);
-  return y.times(y).minus(x.times(x)).minus(one).minus(v).mod(q).equals(zero);
-}
-
-function decodeint(v) { return bytes2bi(v,32); }
-
-function decodepoint(v) {
-  var y = bytes2bi(v, 32).and(two.pow(xff).minus(one));
-  x = xrecover(y);
-  if ((x.testBit(0) ? 1 : 0) != v[31]>>7) x = q.minus(x);
-  var p = [x,y];
-  if (!isoncurve(p)) throw('Point is not on curve');
-  return p;
-}
-
-function checksig(sig, msg, pk) {
-  var r = decodepoint(sig.slice(0, 32));
-  var a = decodepoint(pk);
-  var s = decodeint(sig.slice(32, 64));
-  var h = inthash(bytes2string(encodepoint(r).concat(pk)) + msg);
-  var v1 = scalarmult(bp, s);
-  var v2 = edwards(r, scalarmult(a, h));
-  return v1[0].equals(v2[0]) && v1[1].equals(v2[1]);
-}
-
-function sig_test(msg) {
-  var pk = publickey('foo');
-  var sig = signature(msg, 'foo', pk);
-  return checksig(sig, msg, pk);
-}
-
-///////////////////////////////////////////////////////
-//
-//  Curve25519 diffie-helman
-//
-
-function zpt_add(xz1, xz2, base) {
-  var x1 = xz1[0];
-  var x2 = xz2[0];
-  var z1 = xz1[1];
-  var z2 = xz2[1];
-  var x = x2.times(x1).minus(z2.times(z1)).square().shiftLeft(2).mod(q);
-  var z = x2.times(z1).minus(z2.times(x1)).square().shiftLeft(2).times(base).mod(q);
-  return [x,z];
-}
-
-function zpt_double(xz) {
-  var x = xz[0];
-  var z = xz[1];
-  var x1 = x.square().minus(z.square()).square().mod(q);
-  var z1 = x.times(z).times(x.square().plus(bi('486662').times(x).times(z).plus(z.square()))).shiftLeft(2).mod(q)
-  return [x1, z1]
-}
-
-function zpt_sm(n, base) {
-  var bp = [base, one]
-  var bp2 = zpt_double(bp);
-  function f(m) {
-    if (m.equals(one)) return [bp, bp2];
-    var pm_pm1 = f(m.shiftRight(1));
-    var pm = pm_pm1[0];
-    var pm1 = pm_pm1[1];
-    if (m.testBit(0)) return [zpt_add(pm, pm1, base), zpt_double(pm1)];
-    else return [zpt_double(pm), zpt_add(pm, pm1, base)];
+function
+c255linvmodp(a) {
+  var c = a;
+  var i = 250;
+  while (--i) {
+    a = c255lsqrmodp(a);
+    //if (i > 240) { tracev("invmodp a", a); }
+    a = c255lmulmodp(a, c);
+    //if (i > 240) { tracev("invmodp a 2", a); }
   }
-  return f(n);
+  a = c255lsqrmodp(a);
+  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
+  a = c255lsqrmodp(a);
+  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
+  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
+  return a;
 }
 
-function curve25519(n, base) {
-  base = base || bi('9');
-  var xz_ = zpt_sm(n, base);
-  var x = xz_[0][0];
-  var z = xz_[0][1];
-  return x.times(z.modInverse(q)).mod(q);
+function c255lmulasmall(a) {
+  // 'division by 0x10000' can not be replaced by '>> 16' because more than 32 bits of precision are needed
+  var m = 121665;
+  var r = [];
+  var v;
+  r[0] = (v = a[0] * m) & 0xffff;
+  r[1] = (v = (0|(v / 0x10000)) + a[1]*m) & 0xffff;
+  r[2] = (v = (0|(v / 0x10000)) + a[2]*m) & 0xffff;
+  r[3] = (v = (0|(v / 0x10000)) + a[3]*m) & 0xffff;
+  r[4] = (v = (0|(v / 0x10000)) + a[4]*m) & 0xffff;
+  r[5] = (v = (0|(v / 0x10000)) + a[5]*m) & 0xffff;
+  r[6] = (v = (0|(v / 0x10000)) + a[6]*m) & 0xffff;
+  r[7] = (v = (0|(v / 0x10000)) + a[7]*m) & 0xffff;
+  r[8] = (v = (0|(v / 0x10000)) + a[8]*m) & 0xffff;
+  r[9] = (v = (0|(v / 0x10000)) + a[9]*m) & 0xffff;
+  r[10] = (v = (0|(v / 0x10000)) + a[10]*m) & 0xffff;
+  r[11] = (v = (0|(v / 0x10000)) + a[11]*m) & 0xffff;
+  r[12] = (v = (0|(v / 0x10000)) + a[12]*m) & 0xffff;
+  r[13] = (v = (0|(v / 0x10000)) + a[13]*m) & 0xffff;
+  r[14] = (v = (0|(v / 0x10000)) + a[14]*m) & 0xffff;
+  r[15] = (0|(v / 0x10000)) + a[15]*m;
+  c255lreduce(r);
+  return r;
 }
 
-function dh_test(sk1, sk2) {
-  pk1 = curve25519(sk1);
-  pk2 = curve25519(sk2);
-  return curve25519(sk1, pk2).equals(curve25519(sk2, pk1));
+function c255ldbl(x, z) {
+  var x_2, z_2, m, n, o;
+  ///tracev("dbl x", x);
+  ///tracev("dbl z", z);
+  m = c255lsqrmodp(c255laddmodp(x, z));
+  //tracev("dbl m", c255laddmodp(x, z));
+  n = c255lsqrmodp(c255lsubmodp(x, z));
+  ///tracev("dbl n", n);
+  o = c255lsubmodp(m, n);
+  ///tracev("dbl o", o);
+  x_2 = c255lmulmodp(n, m);
+  //tracev("dbl x_2", x_2);
+  z_2 = c255lmulmodp(c255laddmodp(c255lmulasmall(o), m), o);
+  //tracev("dbl z_2", z_2);
+  return [x_2, z_2];
 }
 
-// Add only needed function to namespace and finish wrapping.
-djbec.bytes2string = bytes2string;
-djbec.string2bytes = string2bytes;
-djbec.publickey = publickey;
-djbec.signature = signature;
-djbec.checksig = checksig;
-})();
+function c255lsum(x, z, x_p, z_p, x_1) {
+  var x_3, z_3, k, l, p, q;
+  //tracev("sum x", x);
+  //tracev("sum z", z);
+  p = c255lmulmodp(c255lsubmodp(x, z), c255laddmodp(x_p, z_p));
+  q = c255lmulmodp(c255laddmodp(x, z), c255lsubmodp(x_p, z_p));
+  //tracev("sum p", p);
+  //tracev("sum q", q);
+  x_3 = c255lsqrmodp(c255laddmodp(p, q));
+  z_3 = c255lmulmodp(c255lsqrmodp(c255lsubmodp(p, q)), x_1);
+  return [x_3, z_3];
+}
 
-define("djbec", ["jsSHA","jsbn","jsbn2"], (function (global) {
-    return function () {
-        var ret, fn;
-       fn = function (jsSHA, jsbn, jsbn2) {
-                // djbec refers to a global "jsSHA" variable, so define it here
-                this.jsSHA = jsSHA;
-                this.djbec = djbec;
-            };
-        ret = fn.apply(global, arguments);
-        return ret || global.djbec;
-    };
-}(this)));
 
-function p(a){throw a;}var r=void 0,v=!0,C=!1;var sjcl={cipher:{},hash:{},keyexchange:{},mode:{},misc:{},codec:{},exception:{corrupt:function(a){this.toString=function(){return"CORRUPT: "+this.message};this.message=a},invalid:function(a){this.toString=function(){return"INVALID: "+this.message};this.message=a},bug:function(a){this.toString=function(){return"BUG: "+this.message};this.message=a},notReady:function(a){this.toString=function(){return"NOT READY: "+this.message};this.message=a}}};
-"undefined"!==typeof module&&module.exports&&(module.exports=sjcl);
-sjcl.cipher.aes=function(a){this.A[0][0][0]||this.F();var b,c,d,e,f=this.A[0][4],g=this.A[1];b=a.length;var h=1;4!==b&&(6!==b&&8!==b)&&p(new sjcl.exception.invalid("invalid aes key size"));this.d=[d=a.slice(0),e=[]];for(a=b;a<4*b+28;a++){c=d[a-1];if(0===a%b||8===b&&4===a%b)c=f[c>>>24]<<24^f[c>>16&255]<<16^f[c>>8&255]<<8^f[c&255],0===a%b&&(c=c<<8^c>>>24^h<<24,h=h<<1^283*(h>>7));d[a]=d[a-b]^c}for(b=0;a;b++,a--)c=d[b&3?a:a-4],e[b]=4>=a||4>b?c:g[0][f[c>>>24]]^g[1][f[c>>16&255]]^g[2][f[c>>8&255]]^g[3][f[c&
-255]]};
-sjcl.cipher.aes.prototype={encrypt:function(a){return ba(this,a,0)},decrypt:function(a){return ba(this,a,1)},A:[[[],[],[],[],[]],[[],[],[],[],[]]],F:function(){var a=this.A[0],b=this.A[1],c=a[4],d=b[4],e,f,g,h=[],k=[],l,n,m,q;for(e=0;0x100>e;e++)k[(h[e]=e<<1^283*(e>>7))^e]=e;for(f=g=0;!c[f];f^=l||1,g=k[g]||1){m=g^g<<1^g<<2^g<<3^g<<4;m=m>>8^m&255^99;c[f]=m;d[m]=f;n=h[e=h[l=h[f]]];q=0x1010101*n^0x10001*e^0x101*l^0x1010100*f;n=0x101*h[m]^0x1010100*m;for(e=0;4>e;e++)a[e][f]=n=n<<24^n>>>8,b[e][m]=q=q<<24^q>>>8}for(e=
-0;5>e;e++)a[e]=a[e].slice(0),b[e]=b[e].slice(0)}};
-function ba(a,b,c){4!==b.length&&p(new sjcl.exception.invalid("invalid aes block size"));var d=a.d[c],e=b[0]^d[0],f=b[c?3:1]^d[1],g=b[2]^d[2];b=b[c?1:3]^d[3];var h,k,l,n=d.length/4-2,m,q=4,t=[0,0,0,0];h=a.A[c];a=h[0];var s=h[1],E=h[2],G=h[3],F=h[4];for(m=0;m<n;m++)h=a[e>>>24]^s[f>>16&255]^E[g>>8&255]^G[b&255]^d[q],k=a[f>>>24]^s[g>>16&255]^E[b>>8&255]^G[e&255]^d[q+1],l=a[g>>>24]^s[b>>16&255]^E[e>>8&255]^G[f&255]^d[q+2],b=a[b>>>24]^s[e>>16&255]^E[f>>8&255]^G[g&255]^d[q+3],q+=4,e=h,f=k,g=l;for(m=0;4>
-m;m++)t[c?3&-m:m]=F[e>>>24]<<24^F[f>>16&255]<<16^F[g>>8&255]<<8^F[b&255]^d[q++],h=e,e=f,f=g,g=b,b=h;return t}
-sjcl.bitArray={bitSlice:function(a,b,c){a=sjcl.bitArray.ea(a.slice(b/32),32-(b&31)).slice(1);return c===r?a:sjcl.bitArray.clamp(a,c-b)},extract:function(a,b,c){var d=Math.floor(-b-c&31);return((b+c-1^b)&-32?a[b/32|0]<<32-d^a[b/32+1|0]>>>d:a[b/32|0]>>>d)&(1<<c)-1},concat:function(a,b){if(0===a.length||0===b.length)return a.concat(b);var c=a[a.length-1],d=sjcl.bitArray.getPartial(c);return 32===d?a.concat(b):sjcl.bitArray.ea(b,d,c|0,a.slice(0,a.length-1))},bitLength:function(a){var b=a.length;return 0===
-b?0:32*(b-1)+sjcl.bitArray.getPartial(a[b-1])},clamp:function(a,b){if(32*a.length<b)return a;a=a.slice(0,Math.ceil(b/32));var c=a.length;b&=31;0<c&&b&&(a[c-1]=sjcl.bitArray.partial(b,a[c-1]&2147483648>>b-1,1));return a},partial:function(a,b,c){return 32===a?b:(c?b|0:b<<32-a)+0x10000000000*a},getPartial:function(a){return Math.round(a/0x10000000000)||32},equal:function(a,b){if(sjcl.bitArray.bitLength(a)!==sjcl.bitArray.bitLength(b))return C;var c=0,d;for(d=0;d<a.length;d++)c|=a[d]^b[d];return 0===
-c},ea:function(a,b,c,d){var e;e=0;for(d===r&&(d=[]);32<=b;b-=32)d.push(c),c=0;if(0===b)return d.concat(a);for(e=0;e<a.length;e++)d.push(c|a[e]>>>b),c=a[e]<<32-b;e=a.length?a[a.length-1]:0;a=sjcl.bitArray.getPartial(e);d.push(sjcl.bitArray.partial(b+a&31,32<b+a?c:d.pop(),1));return d},o:function(a,b){return[a[0]^b[0],a[1]^b[1],a[2]^b[2],a[3]^b[3]]}};
-sjcl.codec.utf8String={fromBits:function(a){var b="",c=sjcl.bitArray.bitLength(a),d,e;for(d=0;d<c/8;d++)0===(d&3)&&(e=a[d/4]),b+=String.fromCharCode(e>>>24),e<<=8;return decodeURIComponent(escape(b))},toBits:function(a){a=unescape(encodeURIComponent(a));var b=[],c,d=0;for(c=0;c<a.length;c++)d=d<<8|a.charCodeAt(c),3===(c&3)&&(b.push(d),d=0);c&3&&b.push(sjcl.bitArray.partial(8*(c&3),d));return b}};
-sjcl.codec.hex={fromBits:function(a){var b="",c;for(c=0;c<a.length;c++)b+=((a[c]|0)+0xf00000000000).toString(16).substr(4);return b.substr(0,sjcl.bitArray.bitLength(a)/4)},toBits:function(a){var b,c=[],d;a=a.replace(/\s|0x/g,"");d=a.length;a+="00000000";for(b=0;b<a.length;b+=8)c.push(parseInt(a.substr(b,8),16)^0);return sjcl.bitArray.clamp(c,4*d)}};
-sjcl.codec.base64={W:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",fromBits:function(a,b,c){var d="",e=0,f=sjcl.codec.base64.W,g=0,h=sjcl.bitArray.bitLength(a);c&&(f=f.substr(0,62)+"-_");for(c=0;6*d.length<h;)d+=f.charAt((g^a[c]>>>e)>>>26),6>e?(g=a[c]<<6-e,e+=26,c++):(g<<=6,e-=6);for(;d.length&3&&!b;)d+="=";return d},toBits:function(a,b){a=a.replace(/\s|=/g,"");var c=[],d,e=0,f=sjcl.codec.base64.W,g=0,h;b&&(f=f.substr(0,62)+"-_");for(d=0;d<a.length;d++)h=f.indexOf(a.charAt(d)),
-0>h&&p(new sjcl.exception.invalid("this isn't base64!")),26<e?(e-=26,c.push(g^h>>>e),g=h<<32-e):(e+=6,g^=h<<32-e);e&56&&c.push(sjcl.bitArray.partial(e&56,g,1));return c}};sjcl.codec.base64url={fromBits:function(a){return sjcl.codec.base64.fromBits(a,1,1)},toBits:function(a){return sjcl.codec.base64.toBits(a,1)}};
-sjcl.codec.bytes={fromBits:function(a){var b=[],c=sjcl.bitArray.bitLength(a),d,e;for(d=0;d<c/8;d++)0===(d&3)&&(e=a[d/4]),b.push(e>>>24),e<<=8;return b},toBits:function(a){var b=[],c,d=0;for(c=0;c<a.length;c++)d=d<<8|a[c],3===(c&3)&&(b.push(d),d=0);c&3&&b.push(sjcl.bitArray.partial(8*(c&3),d));return b}};sjcl.hash.sha256=function(a){this.d[0]||this.F();a?(this.h=a.h.slice(0),this.e=a.e.slice(0),this.c=a.c):this.reset()};sjcl.hash.sha256.hash=function(a){return(new sjcl.hash.sha256).update(a).finalize()};
-sjcl.hash.sha256.prototype={blockSize:512,reset:function(){this.h=this.m.slice(0);this.e=[];this.c=0;return this},update:function(a){"string"===typeof a&&(a=sjcl.codec.utf8String.toBits(a));var b,c=this.e=sjcl.bitArray.concat(this.e,a);b=this.c;a=this.c=b+sjcl.bitArray.bitLength(a);for(b=512+b&-512;b<=a;b+=512)this.k(c.splice(0,16));return this},finalize:function(){var a,b=this.e,c=this.h,b=sjcl.bitArray.concat(b,[sjcl.bitArray.partial(1,1)]);for(a=b.length+2;a&15;a++)b.push(0);b.push(Math.floor(this.c/
-4294967296));for(b.push(this.c|0);b.length;)this.k(b.splice(0,16));this.reset();return c},m:[],d:[],F:function(){function a(a){return 0x100000000*(a-Math.floor(a))|0}var b=0,c=2,d;a:for(;64>b;c++){for(d=2;d*d<=c;d++)if(0===c%d)continue a;8>b&&(this.m[b]=a(Math.pow(c,0.5)));this.d[b]=a(Math.pow(c,1/3));b++}},k:function(a){var b,c,d=a.slice(0),e=this.h,f=this.d,g=e[0],h=e[1],k=e[2],l=e[3],n=e[4],m=e[5],q=e[6],t=e[7];for(a=0;64>a;a++)16>a?b=d[a]:(b=d[a+1&15],c=d[a+14&15],b=d[a&15]=(b>>>7^b>>>18^b>>>3^
-b<<25^b<<14)+(c>>>17^c>>>19^c>>>10^c<<15^c<<13)+d[a&15]+d[a+9&15]|0),b=b+t+(n>>>6^n>>>11^n>>>25^n<<26^n<<21^n<<7)+(q^n&(m^q))+f[a],t=q,q=m,m=n,n=l+b|0,l=k,k=h,h=g,g=b+(h&k^l&(h^k))+(h>>>2^h>>>13^h>>>22^h<<30^h<<19^h<<10)|0;e[0]=e[0]+g|0;e[1]=e[1]+h|0;e[2]=e[2]+k|0;e[3]=e[3]+l|0;e[4]=e[4]+n|0;e[5]=e[5]+m|0;e[6]=e[6]+q|0;e[7]=e[7]+t|0}};sjcl.hash.sha512=function(a){this.d[0]||this.F();a?(this.h=a.h.slice(0),this.e=a.e.slice(0),this.c=a.c):this.reset()};sjcl.hash.sha512.hash=function(a){return(new sjcl.hash.sha512).update(a).finalize()};
-sjcl.hash.sha512.prototype={blockSize:1024,reset:function(){this.h=this.m.slice(0);this.e=[];this.c=0;return this},update:function(a){"string"===typeof a&&(a=sjcl.codec.utf8String.toBits(a));var b,c=this.e=sjcl.bitArray.concat(this.e,a);b=this.c;a=this.c=b+sjcl.bitArray.bitLength(a);for(b=1024+b&-1024;b<=a;b+=1024)this.k(c.splice(0,32));return this},finalize:function(){var a,b=this.e,c=this.h,b=sjcl.bitArray.concat(b,[sjcl.bitArray.partial(1,1)]);for(a=b.length+4;a&31;a++)b.push(0);b.push(0);b.push(0);
-b.push(Math.floor(this.c/0x100000000));for(b.push(this.c|0);b.length;)this.k(b.splice(0,32));this.reset();return c},m:[],ra:[12372232,13281083,9762859,1914609,15106769,4090911,4308331,8266105],d:[],ta:[2666018,15689165,5061423,9034684,4764984,380953,1658779,7176472,197186,7368638,14987916,16757986,8096111,1480369,13046325,6891156,15813330,5187043,9229749,11312229,2818677,10937475,4324308,1135541,6741931,11809296,16458047,15666916,11046850,698149,229999,945776,13774844,2541862,12856045,9810911,11494366,
-7844520,15576806,8533307,15795044,4337665,16291729,5553712,15684120,6662416,7413802,12308920,13816008,4303699,9366425,10176680,13195875,4295371,6546291,11712675,15708924,1519456,15772530,6568428,6495784,8568297,13007125,7492395,2515356,12632583,14740254,7262584,1535930,13146278,16321966,1853211,294276,13051027,13221564,1051980,4080310,6651434,14088940,4675607],F:function(){function a(a){return 0x100000000*(a-Math.floor(a))|0}function b(a){return 0x10000000000*(a-Math.floor(a))&255}var c=0,d=2,e;a:for(;80>
-c;d++){for(e=2;e*e<=d;e++)if(0===d%e)continue a;8>c&&(this.m[2*c]=a(Math.pow(d,0.5)),this.m[2*c+1]=b(Math.pow(d,0.5))<<24|this.ra[c]);this.d[2*c]=a(Math.pow(d,1/3));this.d[2*c+1]=b(Math.pow(d,1/3))<<24|this.ta[c];c++}},k:function(a){var b,c,d=a.slice(0),e=this.h,f=this.d,g=e[0],h=e[1],k=e[2],l=e[3],n=e[4],m=e[5],q=e[6],t=e[7],s=e[8],E=e[9],G=e[10],F=e[11],ea=e[12],Q=e[13],fa=e[14],R=e[15],y=g,w=h,J=k,H=l,K=n,I=m,Y=q,L=t,z=s,x=E,S=G,M=F,T=ea,N=Q,Z=fa,O=R;for(a=0;80>a;a++){if(16>a)b=d[2*a],c=d[2*a+
-1];else{c=d[2*(a-15)];var u=d[2*(a-15)+1];b=(u<<31|c>>>1)^(u<<24|c>>>8)^c>>>7;var A=(c<<31|u>>>1)^(c<<24|u>>>8)^(c<<25|u>>>7);c=d[2*(a-2)];var B=d[2*(a-2)+1],u=(B<<13|c>>>19)^(c<<3|B>>>29)^c>>>6,B=(c<<13|B>>>19)^(B<<3|c>>>29)^(c<<26|B>>>6),$=d[2*(a-7)],aa=d[2*(a-16)],P=d[2*(a-16)+1];c=A+d[2*(a-7)+1];b=b+$+(c>>>0<A>>>0?1:0);c+=B;b+=u+(c>>>0<B>>>0?1:0);c+=P;b+=aa+(c>>>0<P>>>0?1:0)}d[2*a]=b|=0;d[2*a+1]=c|=0;var $=z&S^~z&T,ga=x&M^~x&N,B=y&J^y&K^J&K,ka=w&H^w&I^H&I,aa=(w<<4|y>>>28)^(y<<30|w>>>2)^(y<<25|
-w>>>7),P=(y<<4|w>>>28)^(w<<30|y>>>2)^(w<<25|y>>>7),la=f[2*a],ha=f[2*a+1],u=O+((z<<18|x>>>14)^(z<<14|x>>>18)^(x<<23|z>>>9)),A=Z+((x<<18|z>>>14)^(x<<14|z>>>18)^(z<<23|x>>>9))+(u>>>0<O>>>0?1:0),u=u+ga,A=A+($+(u>>>0<ga>>>0?1:0)),u=u+ha,A=A+(la+(u>>>0<ha>>>0?1:0)),u=u+c,A=A+(b+(u>>>0<c>>>0?1:0));c=P+ka;b=aa+B+(c>>>0<P>>>0?1:0);Z=T;O=N;T=S;N=M;S=z;M=x;x=L+u|0;z=Y+A+(x>>>0<L>>>0?1:0)|0;Y=K;L=I;K=J;I=H;J=y;H=w;w=u+c|0;y=A+b+(w>>>0<u>>>0?1:0)|0}h=e[1]=h+w|0;e[0]=g+y+(h>>>0<w>>>0?1:0)|0;l=e[3]=l+H|0;e[2]=k+
-J+(l>>>0<H>>>0?1:0)|0;m=e[5]=m+I|0;e[4]=n+K+(m>>>0<I>>>0?1:0)|0;t=e[7]=t+L|0;e[6]=q+Y+(t>>>0<L>>>0?1:0)|0;E=e[9]=E+x|0;e[8]=s+z+(E>>>0<x>>>0?1:0)|0;F=e[11]=F+M|0;e[10]=G+S+(F>>>0<M>>>0?1:0)|0;Q=e[13]=Q+N|0;e[12]=ea+T+(Q>>>0<N>>>0?1:0)|0;R=e[15]=R+O|0;e[14]=fa+Z+(R>>>0<O>>>0?1:0)|0}};sjcl.hash.sha1=function(a){a?(this.h=a.h.slice(0),this.e=a.e.slice(0),this.c=a.c):this.reset()};sjcl.hash.sha1.hash=function(a){return(new sjcl.hash.sha1).update(a).finalize()};
-sjcl.hash.sha1.prototype={blockSize:512,reset:function(){this.h=this.m.slice(0);this.e=[];this.c=0;return this},update:function(a){"string"===typeof a&&(a=sjcl.codec.utf8String.toBits(a));var b,c=this.e=sjcl.bitArray.concat(this.e,a);b=this.c;a=this.c=b+sjcl.bitArray.bitLength(a);for(b=this.blockSize+b&-this.blockSize;b<=a;b+=this.blockSize)this.k(c.splice(0,16));return this},finalize:function(){var a,b=this.e,c=this.h,b=sjcl.bitArray.concat(b,[sjcl.bitArray.partial(1,1)]);for(a=b.length+2;a&15;a++)b.push(0);
-b.push(Math.floor(this.c/0x100000000));for(b.push(this.c|0);b.length;)this.k(b.splice(0,16));this.reset();return c},m:[1732584193,4023233417,2562383102,271733878,3285377520],d:[1518500249,1859775393,2400959708,3395469782],k:function(a){var b,c,d,e,f,g,h=a.slice(0),k=this.h;c=k[0];d=k[1];e=k[2];f=k[3];g=k[4];for(a=0;79>=a;a++)16<=a&&(h[a]=(h[a-3]^h[a-8]^h[a-14]^h[a-16])<<1|(h[a-3]^h[a-8]^h[a-14]^h[a-16])>>>31),b=19>=a?d&e|~d&f:39>=a?d^e^f:59>=a?d&e|d&f|e&f:79>=a?d^e^f:r,b=(c<<5|c>>>27)+b+g+h[a]+this.d[Math.floor(a/
-20)]|0,g=f,f=e,e=d<<30|d>>>2,d=c,c=b;k[0]=k[0]+c|0;k[1]=k[1]+d|0;k[2]=k[2]+e|0;k[3]=k[3]+f|0;k[4]=k[4]+g|0}};
-sjcl.mode.ccm={name:"ccm",encrypt:function(a,b,c,d,e){var f,g=b.slice(0),h=sjcl.bitArray,k=h.bitLength(c)/8,l=h.bitLength(g)/8;e=e||64;d=d||[];7>k&&p(new sjcl.exception.invalid("ccm: iv must be at least 7 bytes"));for(f=2;4>f&&l>>>8*f;f++);f<15-k&&(f=15-k);c=h.clamp(c,8*(15-f));b=sjcl.mode.ccm.Y(a,b,c,d,e,f);g=sjcl.mode.ccm.D(a,g,c,b,e,f);return h.concat(g.data,g.tag)},decrypt:function(a,b,c,d,e){e=e||64;d=d||[];var f=sjcl.bitArray,g=f.bitLength(c)/8,h=f.bitLength(b),k=f.clamp(b,h-e),l=f.bitSlice(b,
-h-e),h=(h-e)/8;7>g&&p(new sjcl.exception.invalid("ccm: iv must be at least 7 bytes"));for(b=2;4>b&&h>>>8*b;b++);b<15-g&&(b=15-g);c=f.clamp(c,8*(15-b));k=sjcl.mode.ccm.D(a,k,c,l,e,b);a=sjcl.mode.ccm.Y(a,k.data,c,d,e,b);f.equal(k.tag,a)||p(new sjcl.exception.corrupt("ccm: tag doesn't match"));return k.data},Y:function(a,b,c,d,e,f){var g=[],h=sjcl.bitArray,k=h.o;e/=8;(e%2||4>e||16<e)&&p(new sjcl.exception.invalid("ccm: invalid tag length"));(0xffffffff<d.length||0xffffffff<b.length)&&p(new sjcl.exception.bug("ccm: can't deal with 4GiB or more data"));
-f=[h.partial(8,(d.length?64:0)|e-2<<2|f-1)];f=h.concat(f,c);f[3]|=h.bitLength(b)/8;f=a.encrypt(f);if(d.length){c=h.bitLength(d)/8;65279>=c?g=[h.partial(16,c)]:0xffffffff>=c&&(g=h.concat([h.partial(16,65534)],[c]));g=h.concat(g,d);for(d=0;d<g.length;d+=4)f=a.encrypt(k(f,g.slice(d,d+4).concat([0,0,0])))}for(d=0;d<b.length;d+=4)f=a.encrypt(k(f,b.slice(d,d+4).concat([0,0,0])));return h.clamp(f,8*e)},D:function(a,b,c,d,e,f){var g,h=sjcl.bitArray;g=h.o;var k=b.length,l=h.bitLength(b);c=h.concat([h.partial(8,
-f-1)],c).concat([0,0,0]).slice(0,4);d=h.bitSlice(g(d,a.encrypt(c)),0,e);if(!k)return{tag:d,data:[]};for(g=0;g<k;g+=4)c[3]++,e=a.encrypt(c),b[g]^=e[0],b[g+1]^=e[1],b[g+2]^=e[2],b[g+3]^=e[3];return{tag:d,data:h.clamp(b,l)}}};sjcl.beware===r&&(sjcl.beware={});
-sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]=function(){sjcl.mode.cbc={name:"cbc",encrypt:function(a,b,c,d){d&&d.length&&p(new sjcl.exception.invalid("cbc can't authenticate data"));128!==sjcl.bitArray.bitLength(c)&&p(new sjcl.exception.invalid("cbc iv must be 128 bits"));var e=sjcl.bitArray,f=e.o,g=e.bitLength(b),h=0,k=[];g&7&&p(new sjcl.exception.invalid("pkcs#5 padding only works for multiples of a byte"));for(d=0;h+128<=g;d+=4,h+=128)c=a.encrypt(f(c,b.slice(d,
-d+4))),k.splice(d,0,c[0],c[1],c[2],c[3]);g=0x1010101*(16-(g>>3&15));c=a.encrypt(f(c,e.concat(b,[g,g,g,g]).slice(d,d+4)));k.splice(d,0,c[0],c[1],c[2],c[3]);return k},decrypt:function(a,b,c,d){d&&d.length&&p(new sjcl.exception.invalid("cbc can't authenticate data"));128!==sjcl.bitArray.bitLength(c)&&p(new sjcl.exception.invalid("cbc iv must be 128 bits"));(sjcl.bitArray.bitLength(b)&127||!b.length)&&p(new sjcl.exception.corrupt("cbc ciphertext must be a positive multiple of the block size"));var e=sjcl.bitArray,
-f=e.o,g,h=[];for(d=0;d<b.length;d+=4)g=b.slice(d,d+4),c=f(c,a.decrypt(g)),h.splice(d,0,c[0],c[1],c[2],c[3]),c=g;g=h[d-1]&255;(0===g||16<g)&&p(new sjcl.exception.corrupt("pkcs#5 padding corrupt"));c=0x1010101*g;e.equal(e.bitSlice([c,c,c,c],0,8*g),e.bitSlice(h,32*h.length-8*g,32*h.length))||p(new sjcl.exception.corrupt("pkcs#5 padding corrupt"));return e.bitSlice(h,0,32*h.length-8*g)}}};
-sjcl.mode.ocb2={name:"ocb2",encrypt:function(a,b,c,d,e,f){128!==sjcl.bitArray.bitLength(c)&&p(new sjcl.exception.invalid("ocb iv must be 128 bits"));var g,h=sjcl.mode.ocb2.U,k=sjcl.bitArray,l=k.o,n=[0,0,0,0];c=h(a.encrypt(c));var m,q=[];d=d||[];e=e||64;for(g=0;g+4<b.length;g+=4)m=b.slice(g,g+4),n=l(n,m),q=q.concat(l(c,a.encrypt(l(c,m)))),c=h(c);m=b.slice(g);b=k.bitLength(m);g=a.encrypt(l(c,[0,0,0,b]));m=k.clamp(l(m.concat([0,0,0]),g),b);n=l(n,l(m.concat([0,0,0]),g));n=a.encrypt(l(n,l(c,h(c))));d.length&&
-(n=l(n,f?d:sjcl.mode.ocb2.pmac(a,d)));return q.concat(k.concat(m,k.clamp(n,e)))},decrypt:function(a,b,c,d,e,f){128!==sjcl.bitArray.bitLength(c)&&p(new sjcl.exception.invalid("ocb iv must be 128 bits"));e=e||64;var g=sjcl.mode.ocb2.U,h=sjcl.bitArray,k=h.o,l=[0,0,0,0],n=g(a.encrypt(c)),m,q,t=sjcl.bitArray.bitLength(b)-e,s=[];d=d||[];for(c=0;c+4<t/32;c+=4)m=k(n,a.decrypt(k(n,b.slice(c,c+4)))),l=k(l,m),s=s.concat(m),n=g(n);q=t-32*c;m=a.encrypt(k(n,[0,0,0,q]));m=k(m,h.clamp(b.slice(c),q).concat([0,0,0]));
-l=k(l,m);l=a.encrypt(k(l,k(n,g(n))));d.length&&(l=k(l,f?d:sjcl.mode.ocb2.pmac(a,d)));h.equal(h.clamp(l,e),h.bitSlice(b,t))||p(new sjcl.exception.corrupt("ocb: tag doesn't match"));return s.concat(h.clamp(m,q))},pmac:function(a,b){var c,d=sjcl.mode.ocb2.U,e=sjcl.bitArray,f=e.o,g=[0,0,0,0],h=a.encrypt([0,0,0,0]),h=f(h,d(d(h)));for(c=0;c+4<b.length;c+=4)h=d(h),g=f(g,a.encrypt(f(h,b.slice(c,c+4))));c=b.slice(c);128>e.bitLength(c)&&(h=f(h,d(h)),c=e.concat(c,[-2147483648,0,0,0]));g=f(g,c);return a.encrypt(f(d(f(h,
-d(h))),g))},U:function(a){return[a[0]<<1^a[1]>>>31,a[1]<<1^a[2]>>>31,a[2]<<1^a[3]>>>31,a[3]<<1^135*(a[0]>>>31)]}};
-sjcl.mode.gcm={name:"gcm",encrypt:function(a,b,c,d,e){var f=b.slice(0);b=sjcl.bitArray;d=d||[];a=sjcl.mode.gcm.D(v,a,f,d,c,e||128);return b.concat(a.data,a.tag)},decrypt:function(a,b,c,d,e){var f=b.slice(0),g=sjcl.bitArray,h=g.bitLength(f);e=e||128;d=d||[];e<=h?(b=g.bitSlice(f,h-e),f=g.bitSlice(f,0,h-e)):(b=f,f=[]);a=sjcl.mode.gcm.D(C,a,f,d,c,e);g.equal(a.tag,b)||p(new sjcl.exception.corrupt("gcm: tag doesn't match"));return a.data},pa:function(a,b){var c,d,e,f,g,h=sjcl.bitArray.o;e=[0,0,0,0];f=b.slice(0);
-for(c=0;128>c;c++){(d=0!==(a[Math.floor(c/32)]&1<<31-c%32))&&(e=h(e,f));g=0!==(f[3]&1);for(d=3;0<d;d--)f[d]=f[d]>>>1|(f[d-1]&1)<<31;f[0]>>>=1;g&&(f[0]^=-0x1f000000)}return e},t:function(a,b,c){var d,e=c.length;b=b.slice(0);for(d=0;d<e;d+=4)b[0]^=0xffffffff&c[d],b[1]^=0xffffffff&c[d+1],b[2]^=0xffffffff&c[d+2],b[3]^=0xffffffff&c[d+3],b=sjcl.mode.gcm.pa(b,a);return b},D:function(a,b,c,d,e,f){var g,h,k,l,n,m,q,t,s=sjcl.bitArray;m=c.length;q=s.bitLength(c);t=s.bitLength(d);h=s.bitLength(e);g=b.encrypt([0,
-0,0,0]);96===h?(e=e.slice(0),e=s.concat(e,[1])):(e=sjcl.mode.gcm.t(g,[0,0,0,0],e),e=sjcl.mode.gcm.t(g,e,[0,0,Math.floor(h/0x100000000),h&0xffffffff]));h=sjcl.mode.gcm.t(g,[0,0,0,0],d);n=e.slice(0);d=h.slice(0);a||(d=sjcl.mode.gcm.t(g,h,c));for(l=0;l<m;l+=4)n[3]++,k=b.encrypt(n),c[l]^=k[0],c[l+1]^=k[1],c[l+2]^=k[2],c[l+3]^=k[3];c=s.clamp(c,q);a&&(d=sjcl.mode.gcm.t(g,h,c));a=[Math.floor(t/0x100000000),t&0xffffffff,Math.floor(q/0x100000000),q&0xffffffff];d=sjcl.mode.gcm.t(g,d,a);k=b.encrypt(e);d[0]^=k[0];
-d[1]^=k[1];d[2]^=k[2];d[3]^=k[3];return{tag:s.bitSlice(d,0,f),data:c}}};sjcl.misc.hmac=function(a,b){this.$=b=b||sjcl.hash.sha256;var c=[[],[]],d,e=b.prototype.blockSize/32;this.C=[new b,new b];a.length>e&&(a=b.hash(a));for(d=0;d<e;d++)c[0][d]=a[d]^909522486,c[1][d]=a[d]^1549556828;this.C[0].update(c[0]);this.C[1].update(c[1]);this.T=new b(this.C[0])};
-sjcl.misc.hmac.prototype.encrypt=sjcl.misc.hmac.prototype.mac=function(a){this.ga&&p(new sjcl.exception.invalid("encrypt on already updated hmac called!"));this.update(a);return this.digest(a)};sjcl.misc.hmac.prototype.reset=function(){this.T=new this.$(this.C[0]);this.ga=C};sjcl.misc.hmac.prototype.update=function(a){this.ga=v;this.T.update(a)};sjcl.misc.hmac.prototype.digest=function(){var a=this.T.finalize(),a=(new this.$(this.C[1])).update(a).finalize();this.reset();return a};
-sjcl.misc.pbkdf2=function(a,b,c,d,e){c=c||1E3;(0>d||0>c)&&p(sjcl.exception.invalid("invalid params to pbkdf2"));"string"===typeof a&&(a=sjcl.codec.utf8String.toBits(a));"string"===typeof b&&(b=sjcl.codec.utf8String.toBits(b));e=e||sjcl.misc.hmac;a=new e(a);var f,g,h,k,l=[],n=sjcl.bitArray;for(k=1;32*l.length<(d||1);k++){e=f=a.encrypt(n.concat(b,[k]));for(g=1;g<c;g++){f=a.encrypt(f);for(h=0;h<f.length;h++)e[h]^=f[h]}l=l.concat(e)}d&&(l=n.clamp(l,d));return l};
-sjcl.prng=function(a){this.j=[new sjcl.hash.sha256];this.u=[0];this.S=0;this.K={};this.R=0;this.X={};this.da=this.n=this.w=this.ma=0;this.d=[0,0,0,0,0,0,0,0];this.q=[0,0,0,0];this.P=r;this.Q=a;this.H=C;this.O={progress:{},seeded:{}};this.B=this.la=0;this.L=1;this.M=2;this.ia=0x10000;this.V=[0,48,64,96,128,192,0x100,384,512,768,1024];this.ja=3E4;this.ha=80};
-sjcl.prng.prototype={randomWords:function(a,b){var c=[],d;d=this.isReady(b);var e;d===this.B&&p(new sjcl.exception.notReady("generator isn't seeded"));if(d&this.M){d=!(d&this.L);e=[];var f=0,g;this.da=e[0]=(new Date).valueOf()+this.ja;for(g=0;16>g;g++)e.push(0x100000000*Math.random()|0);for(g=0;g<this.j.length&&!(e=e.concat(this.j[g].finalize()),f+=this.u[g],this.u[g]=0,!d&&this.S&1<<g);g++);this.S>=1<<this.j.length&&(this.j.push(new sjcl.hash.sha256),this.u.push(0));this.n-=f;f>this.w&&(this.w=f);
-this.S++;this.d=sjcl.hash.sha256.hash(this.d.concat(e));this.P=new sjcl.cipher.aes(this.d);for(d=0;4>d&&!(this.q[d]=this.q[d]+1|0,this.q[d]);d++);}for(d=0;d<a;d+=4)0===(d+1)%this.ia&&ca(this),e=da(this),c.push(e[0],e[1],e[2],e[3]);ca(this);return c.slice(0,a)},setDefaultParanoia:function(a,b){0===a&&"Setting paranoia=0 will ruin your security; use it only for testing"!==b&&p("Setting paranoia=0 will ruin your security; use it only for testing");this.Q=a},addEntropy:function(a,b,c){c=c||"user";var d,
-e,f=(new Date).valueOf(),g=this.K[c],h=this.isReady(),k=0;d=this.X[c];d===r&&(d=this.X[c]=this.ma++);g===r&&(g=this.K[c]=0);this.K[c]=(this.K[c]+1)%this.j.length;switch(typeof a){case "number":b===r&&(b=1);this.j[g].update([d,this.R++,1,b,f,1,a|0]);break;case "object":c=Object.prototype.toString.call(a);if("[object Uint32Array]"===c){e=[];for(c=0;c<a.length;c++)e.push(a[c]);a=e}else{"[object Array]"!==c&&(k=1);for(c=0;c<a.length&&!k;c++)"number"!==typeof a[c]&&(k=1)}if(!k){if(b===r)for(c=b=0;c<a.length;c++)for(e=
-a[c];0<e;)b++,e>>>=1;this.j[g].update([d,this.R++,2,b,f,a.length].concat(a))}break;case "string":b===r&&(b=a.length);this.j[g].update([d,this.R++,3,b,f,a.length]);this.j[g].update(a);break;default:k=1}k&&p(new sjcl.exception.bug("random: addEntropy only supports number, array of numbers or string"));this.u[g]+=b;this.n+=b;h===this.B&&(this.isReady()!==this.B&&ia("seeded",Math.max(this.w,this.n)),ia("progress",this.getProgress()))},isReady:function(a){a=this.V[a!==r?a:this.Q];return this.w&&this.w>=
-a?this.u[0]>this.ha&&(new Date).valueOf()>this.da?this.M|this.L:this.L:this.n>=a?this.M|this.B:this.B},getProgress:function(a){a=this.V[a?a:this.Q];return this.w>=a?1:this.n>a?1:this.n/a},startCollectors:function(){this.H||(this.f={loadTimeCollector:D(this,this.ua),mouseCollector:D(this,this.va),keyboardCollector:D(this,this.sa),accelerometerCollector:D(this,this.ka)},window.addEventListener?(window.addEventListener("load",this.f.loadTimeCollector,C),window.addEventListener("mousemove",this.f.mouseCollector,
-C),window.addEventListener("keypress",this.f.keyboardCollector,C),window.addEventListener("devicemotion",this.f.accelerometerCollector,C)):document.attachEvent?(document.attachEvent("onload",this.f.loadTimeCollector),document.attachEvent("onmousemove",this.f.mouseCollector),document.attachEvent("keypress",this.f.keyboardCollector)):p(new sjcl.exception.bug("can't attach event")),this.H=v)},stopCollectors:function(){this.H&&(window.removeEventListener?(window.removeEventListener("load",this.f.loadTimeCollector,
-C),window.removeEventListener("mousemove",this.f.mouseCollector,C),window.removeEventListener("keypress",this.f.keyboardCollector,C),window.removeEventListener("devicemotion",this.f.accelerometerCollector,C)):document.detachEvent&&(document.detachEvent("onload",this.f.loadTimeCollector),document.detachEvent("onmousemove",this.f.mouseCollector),document.detachEvent("keypress",this.f.keyboardCollector)),this.H=C)},addEventListener:function(a,b){this.O[a][this.la++]=b},removeEventListener:function(a,
-b){var c,d,e=this.O[a],f=[];for(d in e)e.hasOwnProperty(d)&&e[d]===b&&f.push(d);for(c=0;c<f.length;c++)d=f[c],delete e[d]},sa:function(){U(1)},va:function(a){sjcl.random.addEntropy([a.x||a.clientX||a.offsetX||0,a.y||a.clientY||a.offsetY||0],2,"mouse");U(0)},ua:function(){U(2)},ka:function(a){a=a.accelerationIncludingGravity.x||a.accelerationIncludingGravity.y||a.accelerationIncludingGravity.z;if(window.orientation){var b=window.orientation;"number"===typeof b&&sjcl.random.addEntropy(b,1,"accelerometer")}a&&
-sjcl.random.addEntropy(a,2,"accelerometer");U(0)}};function ia(a,b){var c,d=sjcl.random.O[a],e=[];for(c in d)d.hasOwnProperty(c)&&e.push(d[c]);for(c=0;c<e.length;c++)e[c](b)}function U(a){window&&window.performance&&"function"===typeof window.performance.now?sjcl.random.addEntropy(window.performance.now(),a,"loadtime"):sjcl.random.addEntropy((new Date).valueOf(),a,"loadtime")}function ca(a){a.d=da(a).concat(da(a));a.P=new sjcl.cipher.aes(a.d)}
-function da(a){for(var b=0;4>b&&!(a.q[b]=a.q[b]+1|0,a.q[b]);b++);return a.P.encrypt(a.q)}function D(a,b){return function(){b.apply(a,arguments)}}sjcl.random=new sjcl.prng(6);
-a:try{var V,ja,W;if("undefined"!==typeof module&&module.exports&&(ja=require("crypto"))&&ja.randomBytes)V=ja.randomBytes(128),V=new Uint32Array((new Uint8Array(V)).buffer),sjcl.random.addEntropy(V,1024,"crypto['randomBytes']");else if(window&&Uint32Array){W=new Uint32Array(32);if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(W);else if(window.msCrypto&&window.msCrypto.getRandomValues)window.msCrypto.getRandomValues(W);else break a;sjcl.random.addEntropy(W,1024,"crypto['getRandomValues']")}}catch(ma){"undefined"!==
-typeof window&&window.console&&(console.log("There was an error collecting entropy from the browser:"),console.log(ma))}
-sjcl.json={defaults:{v:1,iter:1E3,ks:128,ts:64,mode:"ccm",adata:"",cipher:"aes"},oa:function(a,b,c,d){c=c||{};d=d||{};var e=sjcl.json,f=e.p({iv:sjcl.random.randomWords(4,0)},e.defaults),g;e.p(f,c);c=f.adata;"string"===typeof f.salt&&(f.salt=sjcl.codec.base64.toBits(f.salt));"string"===typeof f.iv&&(f.iv=sjcl.codec.base64.toBits(f.iv));(!sjcl.mode[f.mode]||!sjcl.cipher[f.cipher]||"string"===typeof a&&100>=f.iter||64!==f.ts&&96!==f.ts&&128!==f.ts||128!==f.ks&&192!==f.ks&&0x100!==f.ks||2>f.iv.length||
-4<f.iv.length)&&p(new sjcl.exception.invalid("json encrypt: invalid parameters"));"string"===typeof a?(g=sjcl.misc.cachedPbkdf2(a,f),a=g.key.slice(0,f.ks/32),f.salt=g.salt):sjcl.ecc&&a instanceof sjcl.ecc.elGamal.publicKey&&(g=a.kem(),f.kemtag=g.tag,a=g.key.slice(0,f.ks/32));"string"===typeof b&&(b=sjcl.codec.utf8String.toBits(b));"string"===typeof c&&(c=sjcl.codec.utf8String.toBits(c));g=new sjcl.cipher[f.cipher](a);e.p(d,f);d.key=a;f.ct=sjcl.mode[f.mode].encrypt(g,b,f.iv,c,f.ts);return f},encrypt:function(a,
-b,c,d){var e=sjcl.json,f=e.oa.apply(e,arguments);return e.encode(f)},na:function(a,b,c,d){c=c||{};d=d||{};var e=sjcl.json;b=e.p(e.p(e.p({},e.defaults),b),c,v);var f;c=b.adata;"string"===typeof b.salt&&(b.salt=sjcl.codec.base64.toBits(b.salt));"string"===typeof b.iv&&(b.iv=sjcl.codec.base64.toBits(b.iv));(!sjcl.mode[b.mode]||!sjcl.cipher[b.cipher]||"string"===typeof a&&100>=b.iter||64!==b.ts&&96!==b.ts&&128!==b.ts||128!==b.ks&&192!==b.ks&&0x100!==b.ks||!b.iv||2>b.iv.length||4<b.iv.length)&&p(new sjcl.exception.invalid("json decrypt: invalid parameters"));
-"string"===typeof a?(f=sjcl.misc.cachedPbkdf2(a,b),a=f.key.slice(0,b.ks/32),b.salt=f.salt):sjcl.ecc&&a instanceof sjcl.ecc.elGamal.secretKey&&(a=a.unkem(sjcl.codec.base64.toBits(b.kemtag)).slice(0,b.ks/32));"string"===typeof c&&(c=sjcl.codec.utf8String.toBits(c));f=new sjcl.cipher[b.cipher](a);c=sjcl.mode[b.mode].decrypt(f,b.ct,b.iv,c,b.ts);e.p(d,b);d.key=a;return sjcl.codec.utf8String.fromBits(c)},decrypt:function(a,b,c,d){var e=sjcl.json;return e.na(a,e.decode(b),c,d)},encode:function(a){var b,
-c="{",d="";for(b in a)if(a.hasOwnProperty(b))switch(b.match(/^[a-z0-9]+$/i)||p(new sjcl.exception.invalid("json encode: invalid property name")),c+=d+'"'+b+'":',d=",",typeof a[b]){case "number":case "boolean":c+=a[b];break;case "string":c+='"'+escape(a[b])+'"';break;case "object":c+='"'+sjcl.codec.base64.fromBits(a[b],0)+'"';break;default:p(new sjcl.exception.bug("json encode: unsupported type"))}return c+"}"},decode:function(a){a=a.replace(/\s/g,"");a.match(/^\{.*\}$/)||p(new sjcl.exception.invalid("json decode: this isn't json!"));
-a=a.replace(/^\{|\}$/g,"").split(/,/);var b={},c,d;for(c=0;c<a.length;c++)(d=a[c].match(/^(?:(["']?)([a-z][a-z0-9]*)\1):(?:(\d+)|"([a-z0-9+\/%*_.@=\-]*)")$/i))||p(new sjcl.exception.invalid("json decode: this isn't json!")),b[d[2]]=d[3]?parseInt(d[3],10):d[2].match(/^(ct|salt|iv)$/)?sjcl.codec.base64.toBits(d[4]):unescape(d[4]);return b},p:function(a,b,c){a===r&&(a={});if(b===r)return a;for(var d in b)b.hasOwnProperty(d)&&(c&&(a[d]!==r&&a[d]!==b[d])&&p(new sjcl.exception.invalid("required parameter overridden")),
-a[d]=b[d]);return a},ya:function(a,b){var c={},d;for(d in a)a.hasOwnProperty(d)&&a[d]!==b[d]&&(c[d]=a[d]);return c},xa:function(a,b){var c={},d;for(d=0;d<b.length;d++)a[b[d]]!==r&&(c[b[d]]=a[b[d]]);return c}};sjcl.encrypt=sjcl.json.encrypt;sjcl.decrypt=sjcl.json.decrypt;sjcl.misc.wa={};
-sjcl.misc.cachedPbkdf2=function(a,b){var c=sjcl.misc.wa,d;b=b||{};d=b.iter||1E3;c=c[a]=c[a]||{};d=c[d]=c[d]||{firstSalt:b.salt&&b.salt.length?b.salt.slice(0):sjcl.random.randomWords(2,0)};c=b.salt===r?d.firstSalt:b.salt;d[c]=d[c]||sjcl.misc.pbkdf2(a,c,b.iter);return{key:d[c].slice(0),salt:c.slice(0)}};sjcl.bn=function(a){this.initWith(a)};
-sjcl.bn.prototype={radix:24,maxMul:8,i:sjcl.bn,copy:function(){return new this.i(this)},initWith:function(a){var b=0,c;switch(typeof a){case "object":this.limbs=a.limbs.slice(0);break;case "number":this.limbs=[a];this.normalize();break;case "string":a=a.replace(/^0x/,"");this.limbs=[];c=this.radix/4;for(b=0;b<a.length;b+=c)this.limbs.push(parseInt(a.substring(Math.max(a.length-b-c,0),a.length-b),16));break;default:this.limbs=[0]}return this},equals:function(a){"number"===typeof a&&(a=new this.i(a));
-var b=0,c;this.fullReduce();a.fullReduce();for(c=0;c<this.limbs.length||c<a.limbs.length;c++)b|=this.getLimb(c)^a.getLimb(c);return 0===b},getLimb:function(a){return a>=this.limbs.length?0:this.limbs[a]},greaterEquals:function(a){"number"===typeof a&&(a=new this.i(a));var b=0,c=0,d,e,f;for(d=Math.max(this.limbs.length,a.limbs.length)-1;0<=d;d--)e=this.getLimb(d),f=a.getLimb(d),c|=f-e&~b,b|=e-f&~c;return(c|~b)>>>31},toString:function(){this.fullReduce();var a="",b,c,d=this.limbs;for(b=0;b<this.limbs.length;b++){for(c=
-d[b].toString(16);b<this.limbs.length-1&&6>c.length;)c="0"+c;a=c+a}return"0x"+a},addM:function(a){"object"!==typeof a&&(a=new this.i(a));var b=this.limbs,c=a.limbs;for(a=b.length;a<c.length;a++)b[a]=0;for(a=0;a<c.length;a++)b[a]+=c[a];return this},doubleM:function(){var a,b=0,c,d=this.radix,e=this.radixMask,f=this.limbs;for(a=0;a<f.length;a++)c=f[a],c=c+c+b,f[a]=c&e,b=c>>d;b&&f.push(b);return this},halveM:function(){var a,b=0,c,d=this.radix,e=this.limbs;for(a=e.length-1;0<=a;a--)c=e[a],e[a]=c+b>>
-1,b=(c&1)<<d;e[e.length-1]||e.pop();return this},subM:function(a){"object"!==typeof a&&(a=new this.i(a));var b=this.limbs,c=a.limbs;for(a=b.length;a<c.length;a++)b[a]=0;for(a=0;a<c.length;a++)b[a]-=c[a];return this},mod:function(a){var b=!this.greaterEquals(new sjcl.bn(0));a=(new sjcl.bn(a)).normalize();var c=(new sjcl.bn(this)).normalize(),d=0;for(b&&(c=(new sjcl.bn(0)).subM(c).normalize());c.greaterEquals(a);d++)a.doubleM();for(b&&(c=a.sub(c).normalize());0<d;d--)a.halveM(),c.greaterEquals(a)&&
-c.subM(a).normalize();return c.trim()},inverseMod:function(a){var b=new sjcl.bn(1),c=new sjcl.bn(0),d=new sjcl.bn(this),e=new sjcl.bn(a),f,g=1;a.limbs[0]&1||p(new sjcl.exception.invalid("inverseMod: p must be odd"));do{d.limbs[0]&1&&(d.greaterEquals(e)||(f=d,d=e,e=f,f=b,b=c,c=f),d.subM(e),d.normalize(),b.greaterEquals(c)||b.addM(a),b.subM(c));d.halveM();b.limbs[0]&1&&b.addM(a);b.normalize();b.halveM();for(f=g=0;f<d.limbs.length;f++)g|=d.limbs[f]}while(g);e.equals(1)||p(new sjcl.exception.invalid("inverseMod: p and x must be relatively prime"));
-return c},add:function(a){return this.copy().addM(a)},sub:function(a){return this.copy().subM(a)},mul:function(a){"number"===typeof a&&(a=new this.i(a));var b,c=this.limbs,d=a.limbs,e=c.length,f=d.length,g=new this.i,h=g.limbs,k,l=this.maxMul;for(b=0;b<this.limbs.length+a.limbs.length+1;b++)h[b]=0;for(b=0;b<e;b++){k=c[b];for(a=0;a<f;a++)h[b+a]+=k*d[a];--l||(l=this.maxMul,g.cnormalize())}return g.cnormalize().reduce()},square:function(){return this.mul(this)},power:function(a){"number"===typeof a?
-a=[a]:a.limbs!==r&&(a=a.normalize().limbs);var b,c,d=new this.i(1),e=this;for(b=0;b<a.length;b++)for(c=0;c<this.radix;c++)a[b]&1<<c&&(d=d.mul(e)),e=e.square();return d},mulmod:function(a,b){return this.mod(b).mul(a.mod(b)).mod(b)},powermod:function(a,b){for(var c=new sjcl.bn(1),d=new sjcl.bn(this),e=new sjcl.bn(a);;){e.limbs[0]&1&&(c=c.mulmod(d,b));e.halveM();if(e.equals(0))break;d=d.mulmod(d,b)}return c.normalize().reduce()},trim:function(){var a=this.limbs,b;do b=a.pop();while(a.length&&0===b);
-a.push(b);return this},reduce:function(){return this},fullReduce:function(){return this.normalize()},normalize:function(){var a=0,b,c=this.ipv,d,e=this.limbs,f=e.length,g=this.radixMask;for(b=0;b<f||0!==a&&-1!==a;b++)a=(e[b]||0)+a,d=e[b]=a&g,a=(a-d)*c;-1===a&&(e[b-1]-=this.placeVal);return this},cnormalize:function(){var a=0,b,c=this.ipv,d,e=this.limbs,f=e.length,g=this.radixMask;for(b=0;b<f-1;b++)a=e[b]+a,d=e[b]=a&g,a=(a-d)*c;e[b]+=a;return this},toBits:function(a){this.fullReduce();a=a||this.exponent||
-this.bitLength();var b=Math.floor((a-1)/24),c=sjcl.bitArray,d=[c.partial((a+7&-8)%this.radix||this.radix,this.getLimb(b))];for(b--;0<=b;b--)d=c.concat(d,[c.partial(Math.min(this.radix,a),this.getLimb(b))]),a-=this.radix;return d},bitLength:function(){this.fullReduce();for(var a=this.radix*(this.limbs.length-1),b=this.limbs[this.limbs.length-1];b;b>>>=1)a++;return a+7&-8}};
-sjcl.bn.fromBits=function(a){var b=new this,c=[],d=sjcl.bitArray,e=this.prototype,f=Math.min(this.bitLength||0x100000000,d.bitLength(a)),g=f%e.radix||e.radix;for(c[0]=d.extract(a,0,g);g<f;g+=e.radix)c.unshift(d.extract(a,g,e.radix));b.limbs=c;return b};sjcl.bn.prototype.ipv=1/(sjcl.bn.prototype.placeVal=Math.pow(2,sjcl.bn.prototype.radix));sjcl.bn.prototype.radixMask=(1<<sjcl.bn.prototype.radix)-1;
-sjcl.bn.pseudoMersennePrime=function(a,b){function c(a){this.initWith(a)}var d=c.prototype=new sjcl.bn,e,f;e=d.modOffset=Math.ceil(f=a/d.radix);d.exponent=a;d.offset=[];d.factor=[];d.minOffset=e;d.fullMask=0;d.fullOffset=[];d.fullFactor=[];d.modulus=c.modulus=new sjcl.bn(Math.pow(2,a));d.fullMask=0|-Math.pow(2,a%d.radix);for(e=0;e<b.length;e++)d.offset[e]=Math.floor(b[e][0]/d.radix-f),d.fullOffset[e]=Math.ceil(b[e][0]/d.radix-f),d.factor[e]=b[e][1]*Math.pow(0.5,a-b[e][0]+d.offset[e]*d.radix),d.fullFactor[e]=
-b[e][1]*Math.pow(0.5,a-b[e][0]+d.fullOffset[e]*d.radix),d.modulus.addM(new sjcl.bn(Math.pow(2,b[e][0])*b[e][1])),d.minOffset=Math.min(d.minOffset,-d.offset[e]);d.i=c;d.modulus.cnormalize();d.reduce=function(){var a,b,c,d=this.modOffset,e=this.limbs,f=this.offset,q=this.offset.length,t=this.factor,s;for(a=this.minOffset;e.length>d;){c=e.pop();s=e.length;for(b=0;b<q;b++)e[s+f[b]]-=t[b]*c;a--;a||(e.push(0),this.cnormalize(),a=this.minOffset)}this.cnormalize();return this};d.fa=-1===d.fullMask?d.reduce:
-function(){var a=this.limbs,b=a.length-1,c,d;this.reduce();if(b===this.modOffset-1){d=a[b]&this.fullMask;a[b]-=d;for(c=0;c<this.fullOffset.length;c++)a[b+this.fullOffset[c]]-=this.fullFactor[c]*d;this.normalize()}};d.fullReduce=function(){var a,b;this.fa();this.addM(this.modulus);this.addM(this.modulus);this.normalize();this.fa();for(b=this.limbs.length;b<this.modOffset;b++)this.limbs[b]=0;a=this.greaterEquals(this.modulus);for(b=0;b<this.limbs.length;b++)this.limbs[b]-=this.modulus.limbs[b]*a;this.cnormalize();
-return this};d.inverse=function(){return this.power(this.modulus.sub(2))};c.fromBits=sjcl.bn.fromBits;return c};var X=sjcl.bn.pseudoMersennePrime;
-sjcl.bn.prime={p127:X(127,[[0,-1]]),p25519:X(255,[[0,-19]]),p192k:X(192,[[32,-1],[12,-1],[8,-1],[7,-1],[6,-1],[3,-1],[0,-1]]),p224k:X(224,[[32,-1],[12,-1],[11,-1],[9,-1],[7,-1],[4,-1],[1,-1],[0,-1]]),p256k:X(0x100,[[32,-1],[9,-1],[8,-1],[7,-1],[6,-1],[4,-1],[0,-1]]),p192:X(192,[[0,-1],[64,-1]]),p224:X(224,[[0,1],[96,-1]]),p256:X(0x100,[[0,-1],[96,1],[192,1],[224,-1]]),p384:X(384,[[0,-1],[32,1],[96,-1],[128,-1]]),p521:X(521,[[0,-1]])};
-sjcl.bn.random=function(a,b){"object"!==typeof a&&(a=new sjcl.bn(a));for(var c,d,e=a.limbs.length,f=a.limbs[e-1]+1,g=new sjcl.bn;;){do c=sjcl.random.randomWords(e,b),0>c[e-1]&&(c[e-1]+=0x100000000);while(Math.floor(c[e-1]/f)===Math.floor(0x100000000/f));c[e-1]%=f;for(d=0;d<e-1;d++)c[d]&=a.radixMask;g.limbs=c;if(!g.greaterEquals(a))return g}};sjcl.ecc={};sjcl.ecc.point=function(a,b,c){b===r?this.isIdentity=v:(this.x=b,this.y=c,this.isIdentity=C);this.curve=a};
-sjcl.ecc.point.prototype={toJac:function(){return new sjcl.ecc.pointJac(this.curve,this.x,this.y,new this.curve.field(1))},mult:function(a){return this.toJac().mult(a,this).toAffine()},mult2:function(a,b,c){return this.toJac().mult2(a,this,b,c).toAffine()},multiples:function(){var a,b,c;if(this.ca===r){c=this.toJac().doubl();a=this.ca=[new sjcl.ecc.point(this.curve),this,c.toAffine()];for(b=3;16>b;b++)c=c.add(this),a.push(c.toAffine())}return this.ca},isValid:function(){return this.y.square().equals(this.curve.b.add(this.x.mul(this.curve.a.add(this.x.square()))))},
-toBits:function(){return sjcl.bitArray.concat(this.x.toBits(),this.y.toBits())}};sjcl.ecc.pointJac=function(a,b,c,d){b===r?this.isIdentity=v:(this.x=b,this.y=c,this.z=d,this.isIdentity=C);this.curve=a};
-sjcl.ecc.pointJac.prototype={add:function(a){var b,c,d,e;this.curve!==a.curve&&p("sjcl['ecc']['add'](): Points must be on the same curve to add them!");if(this.isIdentity)return a.toJac();if(a.isIdentity)return this;b=this.z.square();c=a.x.mul(b).subM(this.x);if(c.equals(0))return this.y.equals(a.y.mul(b.mul(this.z)))?this.doubl():new sjcl.ecc.pointJac(this.curve);b=a.y.mul(b.mul(this.z)).subM(this.y);d=c.square();a=b.square();e=c.square().mul(c).addM(this.x.add(this.x).mul(d));a=a.subM(e);b=this.x.mul(d).subM(a).mul(b);
-d=this.y.mul(c.square().mul(c));b=b.subM(d);c=this.z.mul(c);return new sjcl.ecc.pointJac(this.curve,a,b,c)},doubl:function(){if(this.isIdentity)return this;var a=this.y.square(),b=a.mul(this.x.mul(4)),c=a.square().mul(8),a=this.z.square(),d=this.curve.a.toString()==(new sjcl.bn(-3)).toString()?this.x.sub(a).mul(3).mul(this.x.add(a)):this.x.square().mul(3).add(a.square().mul(this.curve.a)),a=d.square().subM(b).subM(b),b=b.sub(a).mul(d).subM(c),c=this.y.add(this.y).mul(this.z);return new sjcl.ecc.pointJac(this.curve,
-a,b,c)},toAffine:function(){if(this.isIdentity||this.z.equals(0))return new sjcl.ecc.point(this.curve);var a=this.z.inverse(),b=a.square();return new sjcl.ecc.point(this.curve,this.x.mul(b).fullReduce(),this.y.mul(b.mul(a)).fullReduce())},mult:function(a,b){"number"===typeof a?a=[a]:a.limbs!==r&&(a=a.normalize().limbs);var c,d,e=(new sjcl.ecc.point(this.curve)).toJac(),f=b.multiples();for(c=a.length-1;0<=c;c--)for(d=sjcl.bn.prototype.radix-4;0<=d;d-=4)e=e.doubl().doubl().doubl().doubl().add(f[a[c]>>
-d&15]);return e},mult2:function(a,b,c,d){"number"===typeof a?a=[a]:a.limbs!==r&&(a=a.normalize().limbs);"number"===typeof c?c=[c]:c.limbs!==r&&(c=c.normalize().limbs);var e,f=(new sjcl.ecc.point(this.curve)).toJac();b=b.multiples();var g=d.multiples(),h,k;for(d=Math.max(a.length,c.length)-1;0<=d;d--){h=a[d]|0;k=c[d]|0;for(e=sjcl.bn.prototype.radix-4;0<=e;e-=4)f=f.doubl().doubl().doubl().doubl().add(b[h>>e&15]).add(g[k>>e&15])}return f},isValid:function(){var a=this.z.square(),b=a.square(),a=b.mul(a);
-return this.y.square().equals(this.curve.b.mul(a).add(this.x.mul(this.curve.a.mul(b).add(this.x.square()))))}};sjcl.ecc.curve=function(a,b,c,d,e,f){this.field=a;this.r=new sjcl.bn(b);this.a=new a(c);this.b=new a(d);this.G=new sjcl.ecc.point(this,new a(e),new a(f))};
-sjcl.ecc.curve.prototype.fromBits=function(a){var b=sjcl.bitArray,c=this.field.prototype.exponent+7&-8;a=new sjcl.ecc.point(this,this.field.fromBits(b.bitSlice(a,0,c)),this.field.fromBits(b.bitSlice(a,c,2*c)));a.isValid()||p(new sjcl.exception.corrupt("not on the curve!"));return a};
-sjcl.ecc.curves={c192:new sjcl.ecc.curve(sjcl.bn.prime.p192,"0xffffffffffffffffffffffff99def836146bc9b1b4d22831",-3,"0x64210519e59c80e70fa7e9ab72243049feb8deecc146b9b1","0x188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012","0x07192b95ffc8da78631011ed6b24cdd573f977a11e794811"),c224:new sjcl.ecc.curve(sjcl.bn.prime.p224,"0xffffffffffffffffffffffffffff16a2e0b8f03e13dd29455c5c2a3d",-3,"0xb4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4","0xb70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
-"0xbd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34"),c256:new sjcl.ecc.curve(sjcl.bn.prime.p256,"0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",-3,"0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b","0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296","0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5"),c384:new sjcl.ecc.curve(sjcl.bn.prime.p384,"0xffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973",
--3,"0xb3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef","0xaa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7","0x3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f"),k192:new sjcl.ecc.curve(sjcl.bn.prime.p192k,"0xfffffffffffffffffffffffe26f2fc170f69466a74defd8d",0,3,"0xdb4ff10ec057e9ae26b07d0280b7f4341da5d1b1eae06c7d","0x9b2f2f6d9c5628a7844163d015be86344082aa88d95e2f9d"),
-k224:new sjcl.ecc.curve(sjcl.bn.prime.p224k,"0x010000000000000000000000000001dce8d2ec6184caf0a971769fb1f7",0,5,"0xa1455b334df099df30fc28a169a467e9e47075a90f7e650eb6b7a45c","0x7e089fed7fba344282cafbd6f7e319f7c0b0bd59e2ca4bdb556d61a5"),k256:new sjcl.ecc.curve(sjcl.bn.prime.p256k,"0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",0,7,"0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798","0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8")};
-sjcl.ecc.basicKey={publicKey:function(a,b){this.l=a;this.s=a.r.bitLength();this.J=b instanceof Array?a.fromBits(b):b;this.get=function(){var a=this.J.toBits(),b=sjcl.bitArray.bitLength(a),e=sjcl.bitArray.bitSlice(a,0,b/2),a=sjcl.bitArray.bitSlice(a,b/2);return{x:e,y:a}}},secretKey:function(a,b){this.l=a;this.s=a.r.bitLength();this.I=b;this.get=function(){return this.I.toBits()}}};
-sjcl.ecc.basicKey.generateKeys=function(a){return function(b,c,d){b=b||0x100;c=c||0;"number"===typeof b&&(b=sjcl.ecc.curves["c"+b],b===r&&p(new sjcl.exception.invalid("no such curve")));d=d||sjcl.bn.random(b.r,c);c=b.G.mult(d);return{pub:new sjcl.ecc[a].publicKey(b,c),sec:new sjcl.ecc[a].secretKey(b,d)}}};
-sjcl.ecc.elGamal={generateKeys:sjcl.ecc.basicKey.generateKeys("elGamal"),publicKey:function(a,b){sjcl.ecc.basicKey.publicKey.apply(this,arguments)},secretKey:function(a,b){sjcl.ecc.basicKey.secretKey.apply(this,arguments)}};sjcl.ecc.elGamal.publicKey.prototype={kem:function(a){a=sjcl.bn.random(this.l.r,a);var b=this.l.G.mult(a).toBits();return{key:sjcl.hash.sha256.hash(this.J.mult(a).toBits()),tag:b}}};
-sjcl.ecc.elGamal.secretKey.prototype={unkem:function(a){return sjcl.hash.sha256.hash(this.l.fromBits(a).mult(this.I).toBits())},dh:function(a){return sjcl.hash.sha256.hash(a.J.mult(this.I).toBits())}};sjcl.ecc.ecdsa={generateKeys:sjcl.ecc.basicKey.generateKeys("ecdsa")};sjcl.ecc.ecdsa.publicKey=function(a,b){sjcl.ecc.basicKey.publicKey.apply(this,arguments)};
-sjcl.ecc.ecdsa.publicKey.prototype={verify:function(a,b,c){sjcl.bitArray.bitLength(a)>this.s&&(a=sjcl.bitArray.clamp(a,this.s));var d=sjcl.bitArray,e=this.l.r,f=this.s,g=sjcl.bn.fromBits(d.bitSlice(b,0,f)),d=sjcl.bn.fromBits(d.bitSlice(b,f,2*f)),h=c?d:d.inverseMod(e),f=sjcl.bn.fromBits(a).mul(h).mod(e),h=g.mul(h).mod(e),f=this.l.G.mult2(f,h,this.J).x;if(g.equals(0)||d.equals(0)||g.greaterEquals(e)||d.greaterEquals(e)||!f.equals(g)){if(c===r)return this.verify(a,b,v);p(new sjcl.exception.corrupt("signature didn't check out"))}return v}};
-sjcl.ecc.ecdsa.secretKey=function(a,b){sjcl.ecc.basicKey.secretKey.apply(this,arguments)};sjcl.ecc.ecdsa.secretKey.prototype={sign:function(a,b,c,d){sjcl.bitArray.bitLength(a)>this.s&&(a=sjcl.bitArray.clamp(a,this.s));var e=this.l.r,f=e.bitLength();d=d||sjcl.bn.random(e.sub(1),b).add(1);b=this.l.G.mult(d).x.mod(e);a=sjcl.bn.fromBits(a).add(b.mul(this.I));c=c?a.inverseMod(e).mul(d).mod(e):a.mul(d.inverseMod(e)).mod(e);return sjcl.bitArray.concat(b.toBits(f),c.toBits(f))}};
-sjcl.keyexchange.srp={makeVerifier:function(a,b,c,d){a=sjcl.keyexchange.srp.makeX(a,b,c);a=sjcl.bn.fromBits(a);return d.g.powermod(a,d.N)},makeX:function(a,b,c){a=sjcl.hash.sha1.hash(a+":"+b);return sjcl.hash.sha1.hash(sjcl.bitArray.concat(c,a))},knownGroup:function(a){"string"!==typeof a&&(a=a.toString());sjcl.keyexchange.srp.Z||sjcl.keyexchange.srp.qa();return sjcl.keyexchange.srp.ba[a]},Z:C,qa:function(){var a,b;for(a=0;a<sjcl.keyexchange.srp.aa.length;a++)b=sjcl.keyexchange.srp.aa[a].toString(),
-b=sjcl.keyexchange.srp.ba[b],b.N=new sjcl.bn(b.N),b.g=new sjcl.bn(b.g);sjcl.keyexchange.srp.Z=v},aa:[1024,1536,2048],ba:{1024:{N:"EEAF0AB9ADB38DD69C33F80AFA8FC5E86072618775FF3C0B9EA2314C9C256576D674DF7496EA81D3383B4813D692C6E0E0D5D8E250B98BE48E495C1D6089DAD15DC7D7B46154D6B6CE8EF4AD69B15D4982559B297BCF1885C529F566660E57EC68EDBC3C05726CC02FD4CBF4976EAA9AFD5138FE8376435B9FC61D2FC0EB06E3",g:2},1536:{N:"9DEF3CAFB939277AB1F12A8617A47BBBDBA51DF499AC4C80BEEEA9614B19CC4D5F4F5F556E27CBDE51C6A94BE4607A291558903BA0D0F84380B655BB9A22E8DCDF028A7CEC67F0D08134B1C8B97989149B609E0BE3BAB63D47548381DBC5B1FC764E3F4B53DD9DA1158BFD3E2B9C8CF56EDF019539349627DB2FD53D24B7C48665772E437D6C7F8CE442734AF7CCB7AE837C264AE3A9BEB87F8A2FE9B8B5292E5A021FFF5E91479E8CE7A28C2442C6F315180F93499A234DCF76E3FED135F9BB",
-g:2},2048:{N:"AC6BDB41324A9A9BF166DE5E1389582FAF72B6651987EE07FC3192943DB56050A37329CBB4A099ED8193E0757767A13DD52312AB4B03310DCD7F48A9DA04FD50E8083969EDB767B0CF6095179A163AB3661A05FBD5FAAAE82918A9962F0B93B855F97993EC975EEAA80D740ADBF4FF747359D041D5C33EA71D281E446B14773BCA97B43A23FB801676BD207A436C6481F1D2B9078717461A5B9D32E688F87748544523B524B0D57D5EA77A2775D2ECFA032CFBDBF52FB3786160279004E57AE6AF874E7303CE53299CCC041C7BC308D82A5698F3A8D0C38271AE35F8E9DBFBB694B5C803D89F7AE435DE236D525F54759B65E372FCD68EF20FA7111F9E4AFF73",
-g:2}}};
+function curve25519_raw(f, c) {
+  var a, x_1, q;
 
-define("sjcl", (function (global) {
+  x_1 = c;
+  //tracev("c", c);
+  //tracev("x_1", x_1);
+  a = c255ldbl(x_1, c255lone());
+  //tracev("x_a", a[0]);
+  //tracev("z_a", a[1]);
+  q = [ x_1, c255lone() ];
+
+  var n = 255;
+
+  while (c255lgetbit(f, n) == 0) {
+    n--;
+    // For correct constant-time operation, bit 255 should always be set to 1 so the following 'while' loop is never entered
+    if (n < 0) {
+      return c255lzero();
+    }
+  }
+  n--;
+
+  var aq = [ a, q ];
+    
+  while (n >= 0) {
+    var r, s;
+    var b = c255lgetbit(f, n);
+    r = c255lsum(aq[0][0], aq[0][1], aq[1][0], aq[1][1], x_1);
+    s = c255ldbl(aq[1-b][0], aq[1-b][1]);
+    aq[1-b]  = s;
+    aq[b]    = r;
+    n--;
+  }
+  q = aq[1];
+
+  //tracev("x", q[0]);
+  //tracev("z", q[1]);
+  q[1] = c255linvmodp(q[1]);
+  //tracev("1/z", q[1]);
+  q[0] = c255lmulmodp(q[0], q[1]);
+  c255lreduce(q[0]);
+  return q[0];
+}
+
+function curve25519b32(a, b) {
+  return c255lbase32encode(curve25519(c255lbase32decode(a), c255lbase32decode(b)));
+}
+
+function curve25519(f, c) {
+    if (!c) { c = c255lbase(); }
+    f[0]   &= 0xFFF8;
+    f[15]   = (f[15] & 0x7FFF) | 0x4000;
+    return curve25519_raw(f, c);
+}
+;
+define("curve255", (function (global) {
     return function () {
         var ret, fn;
        fn = function () {
-                this.sjcl = sjcl;
+                this.curve255 = {
+                    c255lhexchars: c255lhexchars,
+                    c255lhexvalues: c255lhexvalues,
+                    c255lhexdecode: c255lhexdecode,
+                    curve25519: curve25519,
+                    base32decode: c255lbase32decode,
+                    base32encode: c255lbase32encode,
+                };
             };
         ret = fn.apply(global, arguments);
-        return ret || global.sjcl;
+        return ret || global.curve255;
+    };
+}(this)));
+
+/**
+ * @fileOverview
+ * Public JavaScript API of the digital signature scheme based on Curve25519
+ * (EdDSA).
+ */
+
+/*
+ * Created: 6 May 2014 Guy K. Kloss <gk@mega.co.nz>
+ *
+ * (c) 2014 by Mega Limited, Wellsford, New Zealand
+ *     http://mega.co.nz/
+ *     Simplified (2-clause) BSD License.
+ *
+ * You should have received a copy of the license along with this
+ * program.
+ *
+ * This file is part of the multi-party chat encryption suite.
+ *
+ * This code is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+
+
+/**
+ * @exports ed25519
+ * Public JavaScript API of the digital signature scheme based on Curve25519
+ * (EdDSA).
+ *
+ * @description
+ * Public JavaScript API of the digital signature scheme based on Curve25519
+ * (EdDSA).
+ *
+ * <p>
+ * This code is a faster but more complicated version of the Ed25519 encryption
+ * scheme (as compared to djbec.js).  It uses two different representations for
+ * big integers: The jsbn BigInteger class, which can represent
+ * arbitrary-length numbers, and a special fixed-length representation
+ * optimised for 256-bit integers.  The reason both are needed is that the
+ * Ed25519 algorithm requires some 512-bit numbers.</p>
+ */
+var ed25519 = {};
+
+(function() {
+    /** Version of ed25519 API/implementation. */
+    ed25519.VERSION = '0.8.0';
+
+    function _bi255(value) {
+        if (!(this instanceof _bi255)) {
+            return new _bi255(value);
+        }
+        if (typeof value === 'undefined') {
+            return _bi255(0);
+        }
+        var c = value.constructor;
+        if ((c === Array) && (value.length === 16)) {
+            this.n = value;
+        } else if ((c === Array) && (value.length === 32)) {
+            this.n = _bytes2bi255(value).n;
+        } else if (c === String) {
+            this.n = c255lhexdecode(value);
+        } else if (c === Number) {
+            this.n = [value & 0xffff,
+                      value >> 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        } else if (value instanceof _bi255) {
+            this.n = value.n.slice(0); // Copy constructor
+        } else {
+            throw "Bad argument for bignum: " + value;
+        }
+    }
+
+   _bi255.prototype = {
+        'toString' : function() {
+            return c255lhexencode(this.n);
+        },
+        'toSource' : function() {
+            return '_' + c255lhexencode(this.n);
+        },
+        'plus' : function(n1) {
+            return _bi255(c255lbigintadd(this.n, n1.n));
+        },
+        'minus' : function(n1) {
+            return _bi255(c255lbigintsub(this.n, n1.n)).modq();
+        },
+        'times' : function(n1) {
+            return _bi255(c255lmulmodp(this.n, n1.n));
+        },
+        'divide' : function(n1) {
+            return this.times(n1.inv());
+        },
+        'sqr' : function() {
+            return _bi255(c255lsqrmodp(this.n));
+        },
+        'cmp' : function(n1) {
+            return c255lbigintcmp(this.n, n1.n);
+        },
+        'equals' : function(n1) {
+            return this.cmp(n1) === 0;
+        },
+        'isOdd' : function() {
+            return (this.n[0] & 1) === 1;
+        },
+        'shiftLeft' : function(cnt) {
+            _shiftL(this.n, cnt);
+            return this;
+        },
+        'shiftRight' : function(cnt) {
+            _shiftR(this.n, cnt);
+            return this;
+        },
+        'inv' : function() {
+            return _bi255(c255linvmodp(this.n));
+        },
+        'pow' : function(e) {
+            return _bi255(_pow(this.n, e.n));
+        },
+        'modq' : function() {
+            return _modq(this);
+        },
+        'bytes' : function() {
+            return _bi255_bytes(this);
+        }
+    };
+
+    function _shiftL(n, cnt) {
+        var lastcarry = 0;
+        for (var i = 0; i < 16; i++) {
+            var carry = n[i] >> (16 - cnt);
+            n[i] = (n[i] << cnt) & 0xffff | lastcarry;
+            lastcarry = carry;
+        }
+        return n;
+    }
+
+    function _shiftR(n, cnt) {
+        var lastcarry = 0;
+        for (var i = 15; i >= 0; i--) {
+            var carry = n[i] << (16 - cnt) & 0xffff;
+            n[i] = (n[i] >> cnt) | lastcarry;
+            lastcarry = carry;
+        }
+        return n;
+    }
+
+    function _bi255_bytes(n) {
+        n = _bi255(n); // Make a copy because shiftRight is destructive
+        var a = new Array(32);
+        for (var i = 31; i >= 0; i--) {
+            a[i] = n.n[0] & 0xff;
+            n.shiftRight(8);
+        }
+        return a;
+    }
+
+    function _bytes2bi255(a) {
+        var n = _bi255(0);
+        for (var i = 0; i < 32; i++) {
+            n.shiftLeft(8);
+            n = n.plus(_bi255(a[i]));
+        }
+        return n;
+    }
+
+    function _pow(n, e) {
+        var result = c255lone();
+        for (var i = 0; i < 256; i++) {
+            if (c255lgetbit(e, i) === 1) {
+                result = c255lmulmodp(result, n);
+            }
+            n = c255lsqrmodp(n);
+        }
+        return result;
+    }
+
+    var _ZERO = _bi255(0);
+    var _ONE = _bi255(1);
+    var _TWO = _bi255(2);
+    var _Q = _bi255(c255lprime);
+
+    function _modq(n) {
+        _myReduce(n.n);
+        if (n.cmp(_Q) >= 0) {
+            return _modq(n.minus(_Q));
+        }
+        if (n.cmp(_ZERO) === -1) {
+            return _modq(n.plus(_Q));
+        } else {
+            return n;
+        }
+    }
+
+    // _RECOVERY_EXPONENT = _Q.plus(_bi255(3)).divide(_bi255(8));
+    var _RECOVERY_EXPONENT = _bi255('0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe');
+    // _D = _Q.minus(_bi255(121665)).divide(_bi255(121666));
+    var _D = _bi255('52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3');
+    // _I = _TWO.pow(_Q.minus(_ONE).divide(_bi255(4)));
+    var _I = _bi255('2b8324804fc1df0b2b4d00993dfbd7a72f431806ad2fe478c4ee1b274a0ea0b0');
+    // _L = _TWO.pow(_bi255(252)).plus(_bi255('14def9dea2f79cd65812631a5cf5d3ed'));
+    var _L = _bi255('1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed');
+    var _L_BI = _bi('1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed', 16);
+
+
+    /**
+     * TODO: Check whether we can find a better way to make it constant time.
+     *
+     * This function has been modified up to be closer to constant time.
+     *
+     * It is copied from curve255.js c255lreduce(), but it failed if the
+     * conditional ``if (v < 0x8000)`` was omitted in this implementation.
+     */
+    function _myReduce(arr) {
+        var aCopy = arr.slice(0)
+        var v = arr[15];
+        // Use the dummy copy instead of just returning to be more constant time.
+        var a = (v < 0x8000) ? aCopy : arr;
+        a[15] = v & 0x7fff;
+        v = (v >>> 15) * 19;
+        a[0] = (v += a[0]) & 0xffff;
+        v = v >>> 16;
+        a[1] = (v += a[1]) & 0xffff;
+        v = v >>> 16;
+        a[2] = (v += a[2]) & 0xffff;
+        v = v >>> 16;
+        a[3] = (v += a[3]) & 0xffff;
+        v = v >>> 16;
+        a[4] = (v += a[4]) & 0xffff;
+        v = v >>> 16;
+        a[5] = (v += a[5]) & 0xffff;
+        v = v >>> 16;
+        a[6] = (v += a[6]) & 0xffff;
+        v = v >>> 16;
+        a[7] = (v += a[7]) & 0xffff;
+        v = v >>> 16;
+        a[8] = (v += a[8]) & 0xffff;
+        v = v >>> 16;
+        a[9] = (v += a[9]) & 0xffff;
+        v = v >>> 16;
+        a[10] = (v += a[10]) & 0xffff;
+        v = v >>> 16;
+        a[11] = (v += a[11]) & 0xffff;
+        v = v >>> 16;
+        a[12] = (v += a[12]) & 0xffff;
+        v = v >>> 16;
+        a[13] = (v += a[13]) & 0xffff;
+        v = v >>> 16;
+        a[14] = (v += a[14]) & 0xffff;
+        v = v >>> 16;
+        a[15] += v;
+    }
+
+    // ////////////////////////////////////////////////////////////
+
+    /**
+     * Checks whether a point is on the curve.
+     *
+     * @param p {string}
+     *     The point to check for in a byte string representation.
+     * @returns
+     *     true if the point is on the curve, false otherwise.
+     */
+    ed25519.isoncurve = function(p) {
+        try {
+            _isoncurve(_decodepoint(_string2bytes(p)));
+        } catch(e) {
+            if (e === 'Point is not on curve') {
+                return false;
+            } else {
+                throw e;
+            }
+        }
+        return true;
+    };
+
+    function _isoncurve(p) {
+        var x = p[0];
+        var y = p[1];
+        var xsqr = x.sqr();
+        var ysqr = y.sqr();
+        var v = _D.times(xsqr).times(ysqr);
+        return ysqr.minus(xsqr).minus(_ONE).minus(v).modq().equals(_ZERO);
+    }
+
+    function _xrecover(y) {
+        var ysquared = y.sqr();
+        var xx = ysquared.minus(_ONE).divide(_ONE.plus(_D.times(ysquared)));
+        var x = xx.pow(_RECOVERY_EXPONENT);
+        if (!(x.times(x).minus(xx).equals(_ZERO))) {
+            x = x.times(_I);
+        }
+        if (x.isOdd()) {
+            x = _Q.minus(x);
+        }
+        return x;
+    }
+
+    function _x_pt_add(pt1, pt2) {
+        var x1 = pt1[0];
+        var y1 = pt1[1];
+        var z1 = pt1[2];
+        var t1 = pt1[3];
+        var x2 = pt2[0];
+        var y2 = pt2[1];
+        var z2 = pt2[2];
+        var t2 = pt2[3];
+        var A = y1.minus(x1).times(y2.plus(x2));
+        var B = y1.plus(x1).times(y2.minus(x2));
+        var C = z1.times(_TWO).times(t2);
+        var D = t1.times(_TWO).times(z2);
+        var E = D.plus(C);
+        var F = B.minus(A);
+        var G = B.plus(A);
+        var H = D.minus(C);
+        return [E.times(F), G.times(H), F.times(G), E.times(H)];
+    }
+
+    function _xpt_double(pt1) {
+        var x1 = pt1[0];
+        var y1 = pt1[1];
+        var z1 = pt1[2];
+        var A = x1.times(x1);
+        var B = y1.times(y1);
+        var C = _TWO.times(z1).times(z1);
+        var D = _Q.minus(A);
+        var J = x1.plus(y1);
+        var E = J.times(J).minus(A).minus(B);
+        var G = D.plus(B);
+        var F = G.minus(C);
+        var H = D.minus(B);
+        return [E.times(F), G.times(H), F.times(G), E.times(H)];
+    }
+
+    function _xpt_mult(pt, n) {
+        if (n.equals(_ZERO)) {
+            return [_ZERO, _ONE, _ONE, _ZERO];
+        }
+        var odd = n.isOdd();
+        n.shiftRight(1);
+        var value = _xpt_double(_xpt_mult(pt, n));
+        return odd ? _x_pt_add(value, pt) : value;
+    }
+
+    function _pt_xform(pt) {
+        var x = pt[0];
+        var y = pt[1];
+        return [x, y, _ONE, x.times(y)];
+    }
+
+    function _pt_unxform(pt) {
+        var x = pt[0];
+        var y = pt[1];
+        var z = pt[2];
+        var invz = z.inv();
+        return [x.times(invz), y.times(invz)];
+    }
+
+    function _scalarmult(pt, n) {
+        return _pt_unxform(_xpt_mult(_pt_xform(pt), n));
+    }
+
+    function _bytesgetbit(bytes, n) {
+        return (bytes[bytes.length - (n >>> 3) - 1] >> (n & 7)) & 1;
+    }
+
+    function _xpt_mult_bytes(pt, bytes) {
+        var r = [_ZERO, _ONE, _ONE, _ZERO];
+        for (var i = (bytes.length << 3) - 1; i >= 0; i--) {
+            r = _xpt_double(r);
+            if (_bytesgetbit(bytes, i) === 1) {
+                r = _x_pt_add(r, pt);
+            }
+        }
+        return r;
+    }
+
+    function _scalarmultBytes(pt, bytes) {
+        return _pt_unxform(_xpt_mult_bytes(_pt_xform(pt), bytes));
+    }
+
+    var _by = _bi255(4).divide(_bi255(5));
+    var _bx = _xrecover(_by);
+    var _bp = [_bx, _by];
+
+    function _encodeint(n) {
+        return n.bytes(32).reverse();
+    }
+    function _decodeint(b) {
+        return _bi255(b.slice(0).reverse());
+    }
+
+    function _encodepoint(p) {
+        var v = _encodeint(p[1]);
+        if (p[0].isOdd()) {
+            v[31] |= 0x80;
+        }
+        return v;
+    }
+
+    function _decodepoint(v) {
+        v = v.slice(0);
+        var signbit = v[31] >> 7;
+        v[31] &= 127;
+        var y = _decodeint(v);
+        var x = _xrecover(y);
+        if ((x.n[0] & 1) !== signbit) {
+            x = _Q.minus(x);
+        }
+        var p = [x, y];
+        if (!_isoncurve(p)) {
+            throw ('Point is not on curve');
+        }
+        return p;
+    }
+
+    // //////////////////////////////////////////////////
+
+    /**
+     * Factory function to create a suitable BigInteger.
+     *
+     * @param value
+     *     The value for the big integer.
+     * @param base {integer}
+     *     Base of the conversion of elements in ``value``.
+     * @returns
+     *     A BigInteger object.
+     */
+    function _bi(value, base) {
+        if (base !== undefined) {
+            if (base === 256) {
+                return _bi(_string2bytes(value));
+            }
+            return new BigInteger(value, base);
+        } else if (typeof value === 'string') {
+            return new BigInteger(value, 10);
+        } else if ((value instanceof Array) || (value instanceof Uint8Array)) {
+            return new BigInteger(value);
+        } else if (typeof value === 'number') {
+            return new BigInteger(value.toString(), 10);
+        } else {
+            throw "Can't convert " + value + " to BigInteger";
+        }
+    }
+
+    function _bi2bytes(n, cnt) {
+        if (cnt === undefined) {
+            cnt = (n.bitLength() + 7) >>> 3;
+        }
+        var bytes = new Array(cnt);
+        for (var i = cnt - 1; i >= 0; i--) {
+            bytes[i] = n[0] & 255; // n.and(0xff);
+            n = n.shiftRight(8);
+        }
+        return bytes;
+    }
+
+    BigInteger.prototype.toSource = function() {
+        return this.toString(16);
+    };
+    BigInteger.prototype.bytes = function(n) {
+        return _bi2bytes(this, n);
+    };
+
+    // /////////////////////////////////////////////////////////
+
+    function _bytehash(s) {
+        return _bi2bytes(_bi(asmCrypto.SHA512.bytes(s)), 64).reverse();
+    }
+
+    function _stringhash(s) {
+        return _map(_chr, _bi2bytes(_bi(asmCrypto.SHA512.bytes(s)), 64)).join('');
+    }
+
+    function _inthash(s) {
+        // Need a leading 0 to prevent sign extension
+        return _bi([0].concat(_bytehash(s)));
+    }
+
+    function _inthash_lo(s) {
+        return _bi255(_bytehash(s).slice(32, 64));
+    }
+
+    function _inthash_mod_l(s) {
+        return _inthash(s).mod(_L_BI);
+    }
+
+    function _get_a(sk) {
+        var a = _inthash_lo(sk);
+        a.n[0] &= 0xfff8;
+        a.n[15] &= 0x3fff;
+        a.n[15] |= 0x4000;
+        return a;
+    }
+
+    function _publickey(sk) {
+        return _encodepoint(_scalarmult(_bp, _get_a(sk)));
+    }
+
+    /**
+     * Computes the EdDSA public key.
+     *
+     * <p>Note: Seeds should be a byte string, not a unicode string containing
+     * multi-byte characters.</p>
+     *
+     * @param sk {string}
+     *     Private key seed in the form of a byte string.
+     * @returns {string}
+     *     Public key as byte string computed from the private key seed
+     *     (32 bytes).
+     */
+    ed25519.publickey = function(sk) {
+        return _bytes2string(_publickey(sk));
+    };
+
+    function _map(f, l) {
+        var result = new Array(l.length);
+        for (var i = 0; i < l.length; i++) {
+            result[i] = f(l[i]);
+        }
+        return result;
+    }
+
+    function _chr(n) {
+        return String.fromCharCode(n);
+    }
+    function _ord(c) {
+        return c.charCodeAt(0);
+    }
+
+    function _bytes2string(bytes) {
+        return _map(_chr, bytes).join('');
+    }
+
+    /**
+     * Converts an 8-bit integer array representation to a byte string.
+     *
+     * @param bytes {array}
+     *     Array of 8-bit integers.
+     * @returns {string}
+     *     Byte string representation (8-bit characters only).
+     */
+    ed25519.bytes2string = function(bytes) {
+        return _bytes2string(bytes);
+    };
+
+    function _string2bytes(s) {
+        return _map(_ord, s);
+    }
+
+    /**
+     * Converts a byte string representation to an array of unsigned
+     * 8-bit integers.
+     *
+     * @param text {string}
+     *     Byte string representation (8-bit characters only).
+     * @returns {array}
+     *     Array of 8-bit integers.
+     */
+    ed25519.string2bytes = function(text) {
+        return _string2bytes(text);
+    };
+
+    /**
+     * Computes an EdDSA signature of a message.
+     *
+     * <p>Notes:</p>
+     *
+     * <ul>
+     *   <li>Unicode messages need to be converted to a byte representation
+     *   (e. g. UTF-8).</li>
+     *   <li>If `pk` is given, and it is *not* a point of the curve, the signature
+     *   will be faulty, but no error will be thrown.</li>
+     * </ul>
+     *
+     * @param message {string}
+     *     Message in the form of a byte string.
+     * @param sk {string}
+     *     Private key seed in the form of a byte string.
+     * @param pk {string}
+     *     Public key as byte string (if not present, it will be computed from
+     *     the private key seed).
+     * @returns {string}
+     *     Detached message signature in the form of a byte string (64 bytes).
+     */
+    ed25519.signature = function(message, sk, pk) {
+        if (pk === undefined) {
+            pk = _publickey(sk);
+        } else {
+            pk = _string2bytes(pk);
+        }
+        var a = _bi(_get_a(sk).toString(), 16);
+        var hs = _stringhash(sk);
+        var r = _bytehash(hs.slice(32, 64) + message);
+        var rp = _scalarmultBytes(_bp, r);
+        var erp = _encodepoint(rp);
+        r = _bi(r).mod(_bi(1, 10).shiftLeft(512));
+        var s = _map(_chr, erp).join('') + _map(_chr, pk).join('') + message;
+        s = _inthash_mod_l(s).multiply(a).add(r).mod(_L_BI);
+        return _bytes2string(erp.concat(_encodeint(s)));
+    };
+
+    function _pt_add(p1, p2) {
+        return _pt_unxform(_x_pt_add(_pt_xform(p1), _pt_xform(p2)));
+    }
+
+    /**
+     * Checks an EdDSA signature of a message with the public key.
+     *
+     * <p>Note: Unicode messages need to be converted to a byte representation
+     * (e. g. UTF-8).</p>
+     *
+     * @param sig {string}
+     *     Message signature in the form of a byte string. Can be detached
+     *     (64 bytes), or attached to be sliced off.
+     * @param message {string}
+     *     Message in the form of a byte string.
+     * @param pk {string}
+     *     Public key as byte string (if not present, it will be computed from
+     *     the private key seed).
+     * @returns {bool}
+     *     true, if the signature verifies.
+     */
+    ed25519.checksig = function(sig, message, pk) {
+        sig = _string2bytes(sig.slice(0, 64));
+        pk = _string2bytes(pk);
+        var rpe = sig.slice(0, 32);
+        var rp = _decodepoint(rpe);
+        var a = _decodepoint(pk);
+        var s = _decodeint(sig.slice(32, 64));
+        var h = _inthash(_bytes2string(rpe.concat(pk)) + message);
+        var v1 = _scalarmult(_bp, s);
+        var value = _scalarmultBytes(a, _bi2bytes(h));
+        var v2 = _pt_add(rp, value);
+        return v1[0].equals(v2[0]) && v1[1].equals(v2[1]);
+    };
+
+
+    /**
+     * Generates a new random private key seed of 32 bytes length (256 bit).
+     *
+     * @returns {string}
+     *     Byte string containing a new random private key seed.
+     */
+    ed25519.genkeyseed = function() {
+        var buffer = new Uint8Array(32);
+        asmCrypto.getRandomValues(buffer);
+        var result = '';
+        for (var i = 0; i < buffer.length; i++) {
+            result += String.fromCharCode(buffer[i]);
+        }
+        return result;
+    };
+})();
+
+define("ed25519", ["jsbn","jsbn2","curve255"], (function (global) {
+    return function () {
+        var ret, fn;
+       fn = function (asmCrypto, jsbn, jsbn2) {
+                this.ed25519 = ed25519;
+            };
+        ret = fn.apply(global, arguments);
+        return ret || global.ed25519;
     };
 }(this)));
 
@@ -2323,9 +2974,8 @@ define("sjcl", (function (global) {
  */
 
 define('mpenc/helper/utils',[
-    "djbec",
-    "sjcl"
-], function(djbec, sjcl) {
+    "ed25519",
+], function(ed25519) {
     
 
     /**
@@ -2366,10 +3016,17 @@ define('mpenc/helper/utils',[
      * @private
      */
     ns._newKey32 = function(bits) {
-        // TODO: Replace with Mega's implementation of rand(n)
-        // https://github.com/meganz/webclient/blob/master/js/keygen.js#L21
-        var paranoia = [0,48,64,96,128,192,256,384,512,768,1024].indexOf(bits);
-        return sjcl.random.randomWords(Math.floor(bits / 32), paranoia);
+        var buffer = ns._newKey08(bits);
+        var result = [];
+        var value = 0;
+        for (var i = 0; i < buffer.length; i += 4) {
+            value = buffer[i];
+            value += buffer[i + 1] << 8;
+            value += buffer[i + 2] << 16;
+            value += buffer[i + 3] << 24;
+            result.push(value);
+        }
+        return result;
     };
 
 
@@ -2384,7 +3041,15 @@ define('mpenc/helper/utils',[
      * @private
      */
     ns._newKey16 = function(bits) {
-        return ns._key32to16(ns._newKey32(bits));
+        var buffer = ns._newKey08(bits);
+        var result = [];
+        var value = 0;
+        for (var i = 0; i < buffer.length; i += 2) {
+            value = buffer[i];
+            value += buffer[i + 1] << 8;
+            result.push(value);
+        }
+        return result;
     };
 
 
@@ -2399,7 +3064,13 @@ define('mpenc/helper/utils',[
      * @private
      */
     ns._newKey08 = function(bits) {
-        return ns._key32to08(ns._newKey32(bits));
+        var buffer = new Uint8Array(Math.floor(bits / 8));
+        asmCrypto.getRandomValues(buffer);
+        var result = [];
+        for (var i = 0; i < buffer.length; i++) {
+            result.push(buffer[i]);
+        }
+        return result;
     };
 
 
@@ -2639,7 +3310,7 @@ define('mpenc/helper/utils',[
      *     Binary string.
      */
     ns.sha256 = function(data) {
-        return djbec.bytes2string(asmCrypto.SHA256.bytes(data));
+        return ed25519.bytes2string(asmCrypto.SHA256.bytes(data));
     };
 
 
@@ -2693,6 +3364,30 @@ define('mpenc/helper/utils',[
 
 
     /**
+     * Constant time string comparison of two strings.
+     *
+     * @param str1 {string}
+     *     The first string to be compared against the second.
+     * @param str2 {string}
+     *     The second string to be compared against the first.
+     * @returns
+     *     A true on equality.
+     */
+    ns.constTimeStringCmp = function(str1, str2) {
+        // Compare lengths - can save a lot of time.
+        if (str1.length !== str2.length) {
+            return false;
+        }
+
+        var diff = 0;
+        for (var i = 0, l = str1.length; i < l; i++) {
+            diff |= (str1[i] ^ str2[i]);
+        }
+        return !diff;
+    };
+
+
+    /**
      * (Deep) compares two JavaScript arrays.
      *
      * See: http://stackoverflow.com/questions/7837456/comparing-two-arrays-in-javascript
@@ -2730,6 +3425,7 @@ define('mpenc/helper/utils',[
         return true;
     };
 
+
     /**
      * Check an object's invariants.
      *
@@ -2749,6 +3445,7 @@ define('mpenc/helper/utils',[
             parent = Object.getPrototypeOf(parent);
         }
     };
+
 
     /**
      * (Deep) compares two JavaScript objects.
@@ -2867,8 +3564,8 @@ define('mpenc/codec',[
     "mpenc/messages",
     "mpenc/helper/utils",
     "mpenc/version",
-    "djbec",
-], function(assert, messages, utils, version, djbec) {
+    "ed25519",
+], function(assert, messages, utils, version, ed25519) {
     
 
     /**
@@ -3135,11 +3832,17 @@ define('mpenc/codec',[
                 var index = out.members.indexOf(out.source);
                 pubKey = out.pubKeys[index];
             }
-            out.signatureOk = ns.verifyDataMessage(out.rawMessage,
-                                                   out.signature,
-                                                   pubKey);
-            _assert(out.signatureOk,
-                    'Signature of message does not verify!');
+            try {
+                out.signatureOk = ns.verifyDataMessage(out.rawMessage,
+                                                       out.signature,
+                                                       pubKey);
+                _assert(out.signatureOk,
+                        'Signature of message does not verify!');
+            } catch (e) {
+                out.signatureOk = false;
+                _assert(out.signatureOk,
+                        'Signature of message does not verify: ' + e + '!');
+            }
         }
 
         _assert(out.protocol === version.PROTOCOL_VERSION,
@@ -3376,11 +4079,13 @@ define('mpenc/codec',[
         if (data === null || data === undefined) {
             return null;
         }
-        var keyBytes = new Uint8Array(djbec.string2bytes(key));
+        var keyBytes = new Uint8Array(ed25519.string2bytes(key));
         var ivBytes = new Uint8Array(utils._newKey08(128));
-        var cipherBytes = asmCrypto.AES_CBC.encrypt(data, keyBytes, true, ivBytes);
-        return { data: djbec.bytes2string(cipherBytes),
-                 iv: djbec.bytes2string(ivBytes) };
+        // Protect multi-byte characters.
+        var dataBytes = unescape(encodeURIComponent(data));
+        var cipherBytes = asmCrypto.AES_CBC.encrypt(dataBytes, keyBytes, true, ivBytes);
+        return { data: ed25519.bytes2string(cipherBytes),
+                 iv: ed25519.bytes2string(ivBytes) };
     };
 
 
@@ -3402,10 +4107,11 @@ define('mpenc/codec',[
         if (data === null || data === undefined) {
             return null;
         }
-        var keyBytes = new Uint8Array(djbec.string2bytes(key));
-        var ivBytes = new Uint8Array(djbec.string2bytes(iv));
+        var keyBytes = new Uint8Array(ed25519.string2bytes(key));
+        var ivBytes = new Uint8Array(ed25519.string2bytes(iv));
         var clearBytes = asmCrypto.AES_CBC.decrypt(data, keyBytes, true, ivBytes);
-        return djbec.bytes2string(clearBytes);
+        // Undo protection for multi-byte characters.
+        return decodeURIComponent(escape(ed25519.bytes2string(clearBytes)));
     };
 
 
@@ -3428,10 +4134,7 @@ define('mpenc/codec',[
         if (data === null || data === undefined) {
             return null;
         }
-
-        var pubKeyBytes = djbec.string2bytes(pubKey);
-        var signatureBytes = djbec.signature(data, privKey, pubKeyBytes);
-        return djbec.bytes2string(signatureBytes);
+        return ed25519.signature(data, privKey, pubKey);
     };
 
 
@@ -3454,10 +4157,7 @@ define('mpenc/codec',[
         if (data === null || data === undefined) {
             return null;
         }
-
-        var pubKeyBytes = djbec.string2bytes(pubKey);
-        var signatureBytes = djbec.string2bytes(signature);
-        return signatureBytes = djbec.checksig(signatureBytes, data, pubKeyBytes);
+        return ed25519.checksig(signature, data, pubKey);
     };
 
 
@@ -3474,486 +4174,8 @@ define('mpenc/codec',[
         return _PROTOCOL_PREFIX + 'v' + version.PROTOCOL_VERSION.charCodeAt(0) + '?' + text;
     };
 
-
-//    ns.test = function() {
-//        dump(djbec.sig_test('msg','key'));
-//        dump(djbec.sig_test('foo','baz'));
-//        dump(djbec.sig_test());
-//        dump(djbec.dh_test());
-//    };
-
-
-
     return ns;
 });
-
-// Copyright (c) 2007, 2013 Michele Bini
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is furnished
-// to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-var c255lbase32chars = "abcdefghijklmnopqrstuvwxyz234567";
-var c255lbase32values = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7, "i":8, "j":9, "k":10, "l":11, "m":12, "n":13, "o":14, "p":15, "q":16, "r":17, "s":18, "t":19, "u":20, "v":21, "w":22, "x":23, "y":24, "z":25, "2":26, "3":27, "4":28, "5":29, "6":30, "7":31 };
-function c255lbase32encode(n) {
-  var c;
-  var r = "";
-  for (c = 0; c < 255; c+=5) {
-    r = c255lbase32chars.substr(c255lgetbit(n, c) + c255lgetbit(n, c+1)*2 + c255lgetbit(n, c+2)*4 + c255lgetbit(n, c+3)*8 + c255lgetbit(n, c+4)*16, 1) + r;
-  }
-  return r;
-}
-function c255lbase32decode(n) {
-  var c = 0;
-  var r = c255lzero();
-  var l = n.length;
-  for (c = 0; (l > 0) && (c < 255); c+=5) {
-    l--;
-    var v = c255lbase32values[n.substr(l, 1)];
-    c255lsetbit(r, c,    v%2); v = v >> 1;
-    c255lsetbit(r, c+1,  v%2); v = v >> 1;
-    c255lsetbit(r, c+2,  v%2); v = v >> 1;
-    c255lsetbit(r, c+3,  v%2); v = v >> 1;
-    c255lsetbit(r, c+4,  v%2);
-  }
-  return r;
-}
-var c255lhexchars = "0123456789abcdef";
-var c255lhexvalues = {"0":0, "1":1, "2":2, "3":3, "4":4, "5":5, "6":6, "7":7,  "8":8, "9":9, "a":10, "b":11, "c":12, "d":13, "e":14, "f":15 };
-function c255lhexencode(n) {
-  var c;
-  var r = "";
-  for (c = 0; c < 255; c+=4) {
-    r = c255lhexchars.substr(c255lgetbit(n, c) + c255lgetbit(n, c+1)*2 + c255lgetbit(n, c+2)*4 + c255lgetbit(n, c+3)*8, 1) + r;
-  }
-  return r;
-}
-function c255lhexdecode(n) {
-  var c = 0;
-  var r = c255lzero();
-  var l = n.length;
-  for (c = 0; (l > 0) && (c < 255); c+=4) {
-    l--;
-    var v = c255lhexvalues[n.substr(l, 1)];
-    c255lsetbit(r, c,    v%2); v = v >> 1;
-    c255lsetbit(r, c+1,  v%2); v = v >> 1;
-    c255lsetbit(r, c+2,  v%2); v = v >> 1;
-    c255lsetbit(r, c+3,  v%2);
-  }
-  return r;
-}
-var c255lprime = [0xffff-18, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0xffff,  0xffff, 0xffff, 0xffff, 0x7fff];
-function c255lsetbit(n, c, v) {
-  var i = Math.floor(c / 16);
-  var a = n[i];
-  a = a + Math.pow(2, c % 16) * v;
-  n[i] = a;
-}
-function c255lgetbit(n, c) {
-  return Math.floor(n[Math.floor(c / 16)] / Math.pow(2, c % 16)) % 2;
-}
-function c255lzero() {
-  return [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-}
-function c255lone() {
-  return [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-}
-function c255lbase() { // Basepoint
-  return [9,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-}
-// return -1, 0, +1 when a is less than, equal, or greater than b
-function c255lbigintcmp(a, b) {
- // The following code is a bit tricky to avoid code branching
-  var c;
-  var r = 0;
-  for (c = 15; c >= 0; c--) {
-    var x = a[c];
-    var y = b[c];
-    r = r + (x - y)*(1 - r*r);
-    r = Math.round(2 * r / (Math.abs(r) + 1));
-  }
-  r = Math.round(2 * r / (Math.abs(r) + 1));
-  return r;
-}
-function c255lbigintadd(a, b) {
-  var r = [];
-  var v;
-  r[0] = (v = a[0] + b[0]) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + a[1] + b[1]) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + a[2] + b[2]) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + a[3] + b[3]) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + a[4] + b[4]) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + a[5] + b[5]) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + a[6] + b[6]) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + a[7] + b[7]) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + a[8] + b[8]) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + a[9] + b[9]) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + a[10] + b[10]) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + a[11] + b[11]) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + a[12] + b[12]) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + a[13] + b[13]) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + a[14] + b[14]) % 0x10000;
-  r[15] = Math.floor(v / 0x10000) + a[15] + b[15];
-  return r;
-}
-function c255lbigintsub(a, b) {
-  var r = [];
-  var v;
-  r[0] = (v = 0x80000 + a[0] - b[0]) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[1] - b[1]) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[2] - b[2]) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[3] - b[3]) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[4] - b[4]) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[5] - b[5]) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[6] - b[6]) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[7] - b[7]) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[8] - b[8]) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[9] - b[9]) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[10] - b[10]) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[11] - b[11]) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[12] - b[12]) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[13] - b[13]) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[14] - b[14]) % 0x10000;
-  r[15] = Math.floor(v / 0x10000) - 8 + a[15] - b[15];
-  return r;
-}
-
-function c255lsqr8h(a7, a6, a5, a4, a3, a2, a1, a0) {
-  var r = [];
-  var v;
-  r[0] = (v = a0*a0) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + 2*a0*a1) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + 2*a0*a2 + a1*a1) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + 2*a0*a3 + 2*a1*a2) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + 2*a0*a4 + 2*a1*a3 + a2*a2) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + 2*a0*a5 + 2*a1*a4 + 2*a2*a3) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + 2*a0*a6 + 2*a1*a5 + 2*a2*a4 + a3*a3) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + 2*a0*a7 + 2*a1*a6 + 2*a2*a5 + 2*a3*a4) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + 2*a1*a7 + 2*a2*a6 + 2*a3*a5 + a4*a4) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + 2*a2*a7 + 2*a3*a6 + 2*a4*a5) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + 2*a3*a7 + 2*a4*a6 + a5*a5) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + 2*a4*a7 + 2*a5*a6) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + 2*a5*a7 + a6*a6) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + 2*a6*a7) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + a7*a7) % 0x10000;
-  r[15] = Math.floor(v / 0x10000);
-  return r;
-}
-
-function c255lsqrmodp(a) {
-  var x = c255lsqr8h(a[15], a[14], a[13], a[12], a[11], a[10], a[9], a[8]);
-  var z = c255lsqr8h(a[7], a[6], a[5], a[4], a[3], a[2], a[1], a[0]);
-  var y = c255lsqr8h(a[15] + a[7], a[14] + a[6], a[13] + a[5], a[12] + a[4], a[11] + a[3], a[10] + a[2], a[9] + a[1], a[8] + a[0]);
-  var r = [];
-  var v;
-  r[0] = (v = 0x800000 + z[0] + (y[8] -x[8] -z[8] + x[0] -0x80) * 38) % 0x10000;
-  r[1] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[1] + (y[9] -x[9] -z[9] + x[1]) * 38) % 0x10000;
-  r[2] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[2] + (y[10] -x[10] -z[10] + x[2]) * 38) % 0x10000;
-  r[3] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[3] + (y[11] -x[11] -z[11] + x[3]) * 38) % 0x10000;
-  r[4] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[4] + (y[12] -x[12] -z[12] + x[4]) * 38) % 0x10000;
-  r[5] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[5] + (y[13] -x[13] -z[13] + x[5]) * 38) % 0x10000;
-  r[6] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[6] + (y[14] -x[14] -z[14] + x[6]) * 38) % 0x10000;
-  r[7] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[7] + (y[15] -x[15] -z[15] + x[7]) * 38) % 0x10000;
-  r[8] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[8] + y[0] -x[0] -z[0] + x[8] * 38) % 0x10000;
-  r[9] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[9] + y[1] -x[1] -z[1] + x[9] * 38) % 0x10000;
-  r[10] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[10] + y[2] -x[2] -z[2] + x[10] * 38) % 0x10000;
-  r[11] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[11] + y[3] -x[3] -z[3] + x[11] * 38) % 0x10000;
-  r[12] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[12] + y[4] -x[4] -z[4] + x[12] * 38) % 0x10000;
-  r[13] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[13] + y[5] -x[5] -z[5] + x[13] * 38) % 0x10000;
-  r[14] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[14] + y[6] -x[6] -z[6] + x[14] * 38) % 0x10000;
-  r[15] = 0x7fff80 + Math.floor(v / 0x10000) + z[15] + y[7] -x[7] -z[7] + x[15] * 38;
-  c255lreduce(r);
-  return r;
-}
-
-function c255lmul8h(a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) {
-  var r = [];
-  var v;
-  r[0] = (v = a0*b0) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + a0*b1 + a1*b0) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + a0*b2 + a1*b1 + a2*b0) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + a0*b3 + a1*b2 + a2*b1 + a3*b0) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + a0*b4 + a1*b3 + a2*b2 + a3*b1 + a4*b0) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + a0*b5 + a1*b4 + a2*b3 + a3*b2 + a4*b1 + a5*b0) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + a0*b6 + a1*b5 + a2*b4 + a3*b3 + a4*b2 + a5*b1 + a6*b0) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + a0*b7 + a1*b6 + a2*b5 + a3*b4 + a4*b3 + a5*b2 + a6*b1 + a7*b0) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + a1*b7 + a2*b6 + a3*b5 + a4*b4 + a5*b3 + a6*b2 + a7*b1) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + a2*b7 + a3*b6 + a4*b5 + a5*b4 + a6*b3 + a7*b2) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + a3*b7 + a4*b6 + a5*b5 + a6*b4 + a7*b3) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + a4*b7 + a5*b6 + a6*b5 + a7*b4) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + a5*b7 + a6*b6 + a7*b5) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + a6*b7 + a7*b6) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + a7*b7) % 0x10000;
-  r[15] = Math.floor(v / 0x10000);
-  return r;
-}
-
-function
-c255lmulmodp(a, b) {
-  // Karatsuba multiplication scheme: x*y = (b^2+b)*x1*y1 - b*(x1-x0)*(y1-y0) + (b+1)*x0*y0
-  var x = c255lmul8h(a[15], a[14], a[13], a[12], a[11], a[10], a[9], a[8], b[15], b[14], b[13], b[12], b[11], b[10], b[9], b[8]);
-  var z = c255lmul8h(a[7], a[6], a[5], a[4], a[3], a[2], a[1], a[0], b[7], b[6], b[5], b[4], b[3], b[2], b[1], b[0]);
-  var y = c255lmul8h(a[15] + a[7], a[14] + a[6], a[13] + a[5], a[12] + a[4], a[11] + a[3], a[10] + a[2], a[9] + a[1], a[8] + a[0],
-  			b[15] + b[7], b[14] + b[6], b[13] + b[5], b[12] + b[4], b[11] + b[3], b[10] + b[2], b[9] + b[1], b[8] + b[0]);
-  var r = [];
-  var v;
-  r[0] = (v = 0x800000 + z[0] + (y[8] -x[8] -z[8] + x[0] -0x80) * 38) % 0x10000;
-  r[1] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[1] + (y[9] -x[9] -z[9] + x[1]) * 38) % 0x10000;
-  r[2] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[2] + (y[10] -x[10] -z[10] + x[2]) * 38) % 0x10000;
-  r[3] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[3] + (y[11] -x[11] -z[11] + x[3]) * 38) % 0x10000;
-  r[4] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[4] + (y[12] -x[12] -z[12] + x[4]) * 38) % 0x10000;
-  r[5] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[5] + (y[13] -x[13] -z[13] + x[5]) * 38) % 0x10000;
-  r[6] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[6] + (y[14] -x[14] -z[14] + x[6]) * 38) % 0x10000;
-  r[7] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[7] + (y[15] -x[15] -z[15] + x[7]) * 38) % 0x10000;
-  r[8] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[8] + y[0] -x[0] -z[0] + x[8] * 38) % 0x10000;
-  r[9] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[9] + y[1] -x[1] -z[1] + x[9] * 38) % 0x10000;
-  r[10] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[10] + y[2] -x[2] -z[2] + x[10] * 38) % 0x10000;
-  r[11] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[11] + y[3] -x[3] -z[3] + x[11] * 38) % 0x10000;
-  r[12] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[12] + y[4] -x[4] -z[4] + x[12] * 38) % 0x10000;
-  r[13] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[13] + y[5] -x[5] -z[5] + x[13] * 38) % 0x10000;
-  r[14] = (v = 0x7fff80 + Math.floor(v / 0x10000) + z[14] + y[6] -x[6] -z[6] + x[14] * 38) % 0x10000;
-  r[15] = 0x7fff80 + Math.floor(v / 0x10000) + z[15] + y[7] -x[7] -z[7] + x[15] * 38;
-  c255lreduce(r);
-  return r;
-}
-
-function c255lreduce(a) {
-  var v = a[15];
-  a[15] = v % 0x8000;
-  v = Math.floor(v / 0x8000) * 19;
-  a[0] = (v += a[0]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[1] = (v += a[1]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[2] = (v += a[2]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[3] = (v += a[3]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[4] = (v += a[4]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[5] = (v += a[5]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[6] = (v += a[6]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[7] = (v += a[7]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[8] = (v += a[8]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[9] = (v += a[9]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[10] = (v += a[10]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[11] = (v += a[11]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[12] = (v += a[12]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[13] = (v += a[13]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[14] = (v += a[14]) % 0x10000;
-  v = Math.floor(v / 0x10000);
-  a[15] += v;
-}
-
-function c255laddmodp(a, b) {
-  var r = [];
-  var v;
-  r[0] = (v = (Math.floor(a[15] / 0x8000) + Math.floor(b[15] / 0x8000)) * 19 + a[0] + b[0]) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + a[1] + b[1]) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + a[2] + b[2]) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + a[3] + b[3]) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + a[4] + b[4]) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + a[5] + b[5]) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + a[6] + b[6]) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + a[7] + b[7]) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + a[8] + b[8]) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + a[9] + b[9]) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + a[10] + b[10]) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + a[11] + b[11]) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + a[12] + b[12]) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + a[13] + b[13]) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + a[14] + b[14]) % 0x10000;
-  r[15] = Math.floor(v / 0x10000) + a[15] % 0x8000 + b[15] % 0x8000;
-  return r;
-}
-
-function c255lsubmodp(a, b) {
-  var r = [];
-  var v;
-  r[0] = (v = 0x80000 + (Math.floor(a[15] / 0x8000) - Math.floor(b[15] / 0x8000) - 1) * 19 + a[0] - b[0]) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[1] - b[1]) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[2] - b[2]) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[3] - b[3]) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[4] - b[4]) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[5] - b[5]) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[6] - b[6]) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[7] - b[7]) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[8] - b[8]) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[9] - b[9]) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[10] - b[10]) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[11] - b[11]) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[12] - b[12]) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[13] - b[13]) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + 0x7fff8 + a[14] - b[14]) % 0x10000;
-  r[15] = Math.floor(v / 0x10000) + 0x7ff8 + a[15]%0x8000 - b[15]%0x8000;
-  return r;
-}
-
-function
-c255linvmodp(a) {
-  var c = a;
-  var i = 250;
-  while (--i) {
-    a = c255lsqrmodp(a);
-    //if (i > 240) { tracev("invmodp a", a); }
-    a = c255lmulmodp(a, c);
-    //if (i > 240) { tracev("invmodp a 2", a); }
-  }
-  a = c255lsqrmodp(a);
-  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
-  a = c255lsqrmodp(a);
-  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
-  a = c255lsqrmodp(a); a = c255lmulmodp(a, c);
-  return a;
-}
-
-function c255lmulasmall(a) {
-  var m = 121665;
-  var r = [];
-  var v;
-  r[0] = (v = a[0] * m) % 0x10000;
-  r[1] = (v = Math.floor(v / 0x10000) + a[1]*m) % 0x10000;
-  r[2] = (v = Math.floor(v / 0x10000) + a[2]*m) % 0x10000;
-  r[3] = (v = Math.floor(v / 0x10000) + a[3]*m) % 0x10000;
-  r[4] = (v = Math.floor(v / 0x10000) + a[4]*m) % 0x10000;
-  r[5] = (v = Math.floor(v / 0x10000) + a[5]*m) % 0x10000;
-  r[6] = (v = Math.floor(v / 0x10000) + a[6]*m) % 0x10000;
-  r[7] = (v = Math.floor(v / 0x10000) + a[7]*m) % 0x10000;
-  r[8] = (v = Math.floor(v / 0x10000) + a[8]*m) % 0x10000;
-  r[9] = (v = Math.floor(v / 0x10000) + a[9]*m) % 0x10000;
-  r[10] = (v = Math.floor(v / 0x10000) + a[10]*m) % 0x10000;
-  r[11] = (v = Math.floor(v / 0x10000) + a[11]*m) % 0x10000;
-  r[12] = (v = Math.floor(v / 0x10000) + a[12]*m) % 0x10000;
-  r[13] = (v = Math.floor(v / 0x10000) + a[13]*m) % 0x10000;
-  r[14] = (v = Math.floor(v / 0x10000) + a[14]*m) % 0x10000;
-  r[15] = Math.floor(v / 0x10000) + a[15]*m;
-  c255lreduce(r);
-  return r;
-}
-
-function c255ldbl(x, z) {
-  var x_2, z_2, m, n, o;
-  ///tracev("dbl x", x);
-  ///tracev("dbl z", z);
-  m = c255lsqrmodp(c255laddmodp(x, z));
-  //tracev("dbl m", c255laddmodp(x, z));
-  n = c255lsqrmodp(c255lsubmodp(x, z));
-  ///tracev("dbl n", n);
-  o = c255lsubmodp(m, n);
-  ///tracev("dbl o", o);
-  x_2 = c255lmulmodp(n, m);
-  //tracev("dbl x_2", x_2);
-  z_2 = c255lmulmodp(c255laddmodp(c255lmulasmall(o), m), o);
-  //tracev("dbl z_2", z_2);
-  return [x_2, z_2];
-}
-
-function c255lsum(x, z, x_p, z_p, x_1) {
-  var x_3, z_3, k, l, p, q;
-  //tracev("sum x", x);
-  //tracev("sum z", z);
-  p = c255lmulmodp(c255lsubmodp(x, z), c255laddmodp(x_p, z_p));
-  q = c255lmulmodp(c255laddmodp(x, z), c255lsubmodp(x_p, z_p));
-  //tracev("sum p", p);
-  //tracev("sum q", q);
-  x_3 = c255lsqrmodp(c255laddmodp(p, q));
-  z_3 = c255lmulmodp(c255lsqrmodp(c255lsubmodp(p, q)), x_1);
-  return [x_3, z_3];
-}
-
-
-function curve25519_raw(f, c) {
-  var a, x_1, q;
-
-  x_1 = c;
-  //tracev("c", c);
-  //tracev("x_1", x_1);
-  a = c255ldbl(x_1, c255lone());
-  //tracev("x_a", a[0]);
-  //tracev("z_a", a[1]);
-  q = [ x_1, c255lone() ];
-
-  var n = 255;
-
-  while (c255lgetbit(f, n) == 0) {
-    n--;
-    // For correct constant-time operation, bit 255 should always be set to 1 so the following 'while' loop is never entered
-    if (n < 0) {
-      return c255lzero();
-    }
-  }
-  n--;
-
-  var aq = [ a, q ];
-    
-  while (n >= 0) {
-    var r, s;
-    var b = c255lgetbit(f, n);
-    r = c255lsum(aq[0][0], aq[0][1], aq[1][0], aq[1][1], x_1);
-    s = c255ldbl(aq[1-b][0], aq[1-b][1]);
-    aq[1-b]  = s;
-    aq[b]    = r;
-    n--;
-  }
-  q = aq[1];
-
-  //tracev("x", q[0]);
-  //tracev("z", q[1]);
-  q[1] = c255linvmodp(q[1]);
-  //tracev("1/z", q[1]);
-  q[0] = c255lmulmodp(q[0], q[1]);
-  c255lreduce(q[0]);
-  return q[0];
-}
-
-function curve25519b32(a, b) {
-  return c255lbase32encode(curve25519(c255lbase32decode(a), c255lbase32decode(b)));
-}
-
-function curve25519(f, c) {
-    if (!c) { c = c255lbase(); }
-    f[0]   &= 0xFFF8;
-    f[15]   = (f[15] & 0x7FFF) | 0x4000;
-    return curve25519_raw(f, c);
-}
-;
-define("curve255", (function (global) {
-    return function () {
-        var ret, fn;
-       fn = function () {
-                this.curve255 = {
-                    curve25519: curve25519,
-                    base32decode: c255lbase32decode,
-                    base32encode: c255lbase32encode,
-                };
-            };
-        ret = fn.apply(global, arguments);
-        return ret || global.curve255;
-    };
-}(this)));
 
 /**
  * @fileOverview
@@ -4029,11 +4251,9 @@ define('mpenc/helper/patches',[
      */
     curve255.fromHex = function(key) {
         var out = [];
-        if (key.length % 4) {
-            var padding = 4 - key.length % 4;
-            for (var i = 0; i < padding; i++) {
-                key = '0' + key;
-            }
+        var padding = 4 - ((key.length % 4) || 4);
+        for (var i = 0; i < padding; i++) {
+            key = '0' + key;
         }
         var i = 0;
         while (i < key.length) {
@@ -5133,8 +5353,8 @@ define('mpenc/greet/ske',[
     "mpenc/helper/assert",
     "mpenc/helper/utils",
     "rsa",
-    "djbec",
-], function(assert, utils, rsa, djbec) {
+    "ed25519",
+], function(assert, utils, rsa, ed25519) {
     
 
     /**
@@ -5177,6 +5397,8 @@ define('mpenc/greet/ske',[
      * but WITHOUT ANY WARRANTY; without even the implied warranty of
      * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
      */
+
+    var MAGIC_NUMBER = 'acksig';
 
     /**
      * Carries message content for the authenticated signature key exchange.
@@ -5328,14 +5550,14 @@ define('mpenc/greet/ske',[
         this.ephemeralPubKeys = utils.clone(message.pubKeys);
 
         // Make new nonce and ephemeral signing key pair.
-        this.nonce = djbec.bytes2string(utils._newKey08(256));
+        this.nonce = ed25519.genkeyseed();
         this.nonces.push(this.nonce);
         if (!this.ephemeralPrivKey) {
             // Only generate a new key if we don't have one.
             // We might want to recover and just re-run the protocol.
-            this.ephemeralPrivKey = djbec.bytes2string(utils._newKey08(512));
+            this.ephemeralPrivKey = ed25519.genkeyseed();
         }
-        this.ephemeralPubKey = djbec.bytes2string(djbec.publickey(this.ephemeralPrivKey));
+        this.ephemeralPubKey = ed25519.publickey(this.ephemeralPrivKey);
         this.ephemeralPubKeys.push(this.ephemeralPubKey);
 
         // Clone message.
@@ -5375,7 +5597,8 @@ define('mpenc/greet/ske',[
     ns.SignatureKeyExchangeMember.prototype._computeSessionSig = function() {
         _assert(this.sessionId, 'Session ID not available.');
         _assert(this.ephemeralPubKey, 'No ephemeral key pair available.');
-        var sessionAck = this.id + this.ephemeralPubKey + this.nonce + this.sessionId;
+        var sessionAck = MAGIC_NUMBER + this.id + this.ephemeralPubKey
+                       + this.nonce + this.sessionId;
         var hashValue = utils.sha256(sessionAck);
         return ns._smallrsasign(hashValue, this.staticPrivKey);
     };
@@ -5403,10 +5626,10 @@ define('mpenc/greet/ske',[
                 "Member's static pub key missing.");
         var decrypted = ns._smallrsaverify(signature,
                                            this.staticPubKeyDir.get(memberId));
-        var sessionAck = memberId + this.ephemeralPubKeys[memberPos]
+        var sessionAck = MAGIC_NUMBER + memberId + this.ephemeralPubKeys[memberPos]
                        + this.nonces[memberPos] + this.sessionId;
         var hashValue = utils.sha256(sessionAck);
-        return (decrypted === hashValue);
+        return utils.constTimeStringCmp(decrypted, hashValue);
     };
 
 
@@ -5699,13 +5922,18 @@ define('mpenc/greet/ske',[
                 'message too long for encoding scheme');
 
         // Padding string.
-        // TODO: Replace this with cryptographically secure random numbers.
-        var padding = '';
-        for (var i = 0; i < length - message.length - 2; i++) {
-            padding += String.fromCharCode(1 + Math.floor(255 * Math.random()));
+        var paddingString = '';
+        var paddingLength = length - message.length - 2;
+        var paddingByte = new Uint8Array(1);
+        asmCrypto.getRandomValues(paddingByte);
+        for (var i = 0; i < paddingLength; i++) {
+            while (paddingByte[0] === 0) {
+                asmCrypto.getRandomValues(paddingByte);
+            }
+            paddingString += String.fromCharCode(paddingByte[0]);
         }
 
-        return String.fromCharCode(2) + padding + String.fromCharCode(0) + message;
+        return String.fromCharCode(2) + paddingString + String.fromCharCode(0) + message;
     };
 
 

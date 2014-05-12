@@ -2980,6 +2980,11 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 	background-color: rgba(215,16,0,0);
 	padding-right: 15px;
+	-webkit-transition: background-color 150ms ease-in-out;
+	-moz-transition: background-color 150ms ease-in-out;
+	-o-transition: background-color 150ms ease-in-out;
+	-ms-transition: background-color 150ms ease-in-out;
+	transition: background-color 150ms ease-in-out;
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(215,16,0,0.05);
@@ -2987,11 +2992,17 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-tree-item.selected {
 	background-color: rgba(215,16,0,0.5);
 }
+.nw-fm-tree-item.dragover {
+	background-color: rgba(215,16,0,0.2);
+}
 .shared-with-me .nw-fm-tree-item:hover {
 	background-color: rgba(254,174,0,0.1);
 }
 .shared-with-me .nw-fm-tree-item.selected {
 	background-color: rgba(254,174,0,0.5);
+}
+.shared-with-me .nw-fm-tree-item.dragover {
+	background-color: rgba(215,16,0,0.1);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
@@ -3014,13 +3025,13 @@ label.iPhoneCheckLabelOff span {
 	background-position: center -845px;
 	cursor: pointer;
 }
-.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon {
 	background-position: center -875px;
 }
 .nw-fm-tree-item.contains-folders.expanded .nw-fm-arrow-icon {
 	background-position: center -784px;
 }
-.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon {
 	background-position: center -814px;
 }
 .nw-fm-tree-folder {
@@ -3038,7 +3049,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -17px -911px;
 	overflow: hidden;
 }
-.nw-fm-tree-item.selected .nw-fm-tree-folder {
+.nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
 	background-position: -17px -945px;
 }
@@ -3832,6 +3843,14 @@ label.iPhoneCheckLabelOff span {
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -1528px;
+}
+.files-grid-view th.grid-url-header, .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header {
+	background-image:none;
+}
 .grid-header-star {
 	height: 24px;
 	width: 30px;
@@ -3943,55 +3962,68 @@ th.grid-first-th {
 	box-sizing: border-box;
 }
 .file-block, .contact-block-view {
-	height: 100px;
-	width: 100px;
+	height: 152px;
+	width: 128px;
 	display: block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
 	float: left;
-	margin: 7px 0 0 10px;
+	margin: 12px 0 0 12px;
 	position: relative;
 	cursor: default;
+	background-color:rgba(0,0,0,0.05);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.file-icon-area {
+	width:120px;
+	height:120px;
+	display:block;
+	background-color:white;
+	margin:4px 0 0 4px;
+	overflow:hidden;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	position:relative;
+	overflow:hidden;
 }
 .contact-block-view {
 	width: 140px;
 	height: 160px;
 }
 .file-block:hover, .contact-block-view:hover {
-	background-color: #f6f6f6;
-	border-color: #f6f6f6;
+	background-color:rgba(0,0,0,0.2);
 }
 .file-block.ui-selected, .contact-block-view.ui-selected {
-	background-color: #d9d9d9;
-	border-color: #d9d9d9;
+	background-color:rgba(0,0,0,0.25);
 }
 .file-block.ui-selecting, .contact-block-view.ui-selecting {
-	background-color: #e9e9e9;
-	border-color: #e9e9e9;
+	background-color:rgba(0,0,0,0.25);
 }
 .file-block.dragover, .contact-block-view.dragover {
-	background-color: #e6e6e6;
-	border-color: #e6e6e6;
+	background-color:rgba(0,0,0,0.1);
+}
+.file-block:hover .file-block-title, .contact-block-view:hover .file-block-title, .file-block.ui-selected .file-block-title, .contact-block-view.ui-selected .file-block-title, .file-block.ui-selecting .file-block-title, .contact-block-view.ui-selecting .file-block-title {
+	color:white;
+	
 }
 .file-block img, .contact-block-view img {
 	border: 0;
 	display: block;
-	width: 64px;
-	margin: 8px 0 0 16px;
+	width: 120px;
+	margin: 0;
 }
 .file-block .thumb img, .contact-block-view img.thumb {
-	border: 2px solid rgba(0,0,0,0.10);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
 	display: block;
-	width: 60px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
+	width: 120px;
 }
 .file-block img {
 	display: none;
@@ -4045,40 +4077,55 @@ th.grid-first-th {
 }
 .file-block-title, .contact-block-view-name {
 	display: block;
-	padding: 1px 0 0 0;
+	padding: 0 0 0 0;
 	white-space: pre-wrap;
 	word-break: break-all;
 	margin: 0 10px;
-	height: 18px;
+	height: 28px;
 	overflow: hidden;
-	font-size: 12px;
-	line-height: 18px;
+	font-size: 11px;
+	line-height: 28px;
 	text-align: center;
+	color:#666666;
 }
 .grid-url-arrow {
 	height: 24px;
-	width: 24px;
+	width: 36px;
 	display: block;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: 0 -1172px;
+	background-position: -1px -1558px;
 }
-.grid-url-arrow {
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
--moz-opacity: 0.2;
--khtml-opacity: 0.2;
-opacity: 0.2;
+.file-settings-icon {
+	width: 38px;
+height: 18px;
+background-image: url(http://test/webclient/images/mega/nw-fm-sprite.svg);
+background-repeat: no-repeat;
+background-position: -1px -1581px;
+position: absolute;
+top: 5px;
+right: 5px;
+z-index: 10;
+-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+cursor: pointer;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+-moz-opacity: 0;
+-khtml-opacity: 0;
+opacity: 0;
+cursor:pointer;
+}
+.file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+-moz-opacity: 1;
+-khtml-opacity: 1;
+opacity: 1;
 }
 .grid-url-arrow:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
--moz-opacity: 0.4;
--khtml-opacity: 0.4;
-opacity: 0.4;
+	background-position: -1px -1578px;
 }
 .clone-of-header, .clone-of-header span {
 	height: 0;
@@ -4282,6 +4329,15 @@ border-spacing:transparent;
 	background-image: url(../images/mega/medium-icons-v1.png);
 	background-repeat: no-repeat;
 	margin: 8px auto 0 auto;
+	position:absolute;
+	margin:-32px 0 0 -32px;
+	left:50%;
+	top:50%;
+}
+.block-view-file-type.thumb {
+	width: 120px;
+	height: 120px;
+	margin:-60px 0 0 -60px;
 }
 .block-view-file-type.word, .share-folder-icon div.word {
 	background-position: 0 0px;
@@ -5357,9 +5413,8 @@ span.search-number {
 div .fm-tree-folder.dragover {
 	background-color: #d6d6d6;
 }
-.grid-table tr.dragover, table.grid-table .dragover td, .grid-share-table tr.dragover, table.grid-share-table .dragover td, .contacts-grid-table tr.dragover, table.contacts-grid-table .dragover td {
-	background-color: #d6d6d6;
-	border-bottom: 2px solid #d6d6d6;
+table.grid-table .dragover td, table.grid-share-table .dragover td, table.contacts-grid-table .dragover td {
+	background-color: rgba(0,0,0,0.1);
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .grid-scrolling-table .jspContainer, .contacts-grid-scrolling-table .jspContainer, .grid-scrolling-table .jspPane, .contacts-grid-scrolling-table .jspPane {
 	width: 100% !important;

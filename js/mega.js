@@ -307,7 +307,7 @@ function MegaData ()
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 					}
 				}
 				else

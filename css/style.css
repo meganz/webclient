@@ -3844,7 +3844,7 @@ th.grid-first-th {
 .grid-sixth-th {
 	width: 45px;
 }
-.grid-table tr {
+.grid-table td {
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -3852,13 +3852,18 @@ th.grid-first-th {
 	transition: background-color 200ms ease-in-out;
 	background-color: rgba(238,238,238,0);
 }
-.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td {
+.grid-table tr:nth-child(odd) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td {
+	background-color: rgba(0,0,0,0.02);
+}
+.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td {
 	background-color: rgba(238,238,238,1);
 }
-.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td {
+.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td,
+.grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td {
 	background-color: rgba(225,225,225,1);
 }
-.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td {
+.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td,
+.grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td {
 	background-color: rgba(225,225,225,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
@@ -4055,7 +4060,7 @@ th.grid-first-th {
 	background-repeat: no-repeat;
 	background-position: 0 -1172px;
 }
-.grid-url-field {
+.grid-url-arrow {
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
@@ -4066,7 +4071,7 @@ th.grid-first-th {
 -khtml-opacity: 0.2;
 opacity: 0.2;
 }
-.grid-url-field:hover {
+.grid-url-arrow:hover {
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
 -moz-opacity: 0.4;
 -khtml-opacity: 0.4;
@@ -4087,14 +4092,14 @@ opacity: 0.4;
 	padding-left: 12px;
 	height: 24px;
 	position: relative;
-	line-height: 24px;
+	line-height: 22px;
 	font-size: 11px;
+}
+table {
+border-spacing:transparent;
 }
 .grid-table td, .grid-share-table td, .contacts-grid-table td {
 	height: 24px;
-}
-.grid-table tr:nth-child(odd), .grid-share-table tr:nth-child(odd), .contacts-grid-table tr:nth-child(odd) {
-	background-color: rgba(0,0,0,0.02);
 }
 .contacts-grid-table td {
 	height: 52px;

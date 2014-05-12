@@ -4133,7 +4133,7 @@ border-spacing:transparent;
 	height: 24px;
 	margin:0 0 0 -4px;
 	background-position: 0 0px;
-	background-image: url(../images/mega/small-icons.png);
+	background-image: url(../images/mega/small-icons-v1.png);
 	background-repeat: no-repeat;
 }
 .transfer-filtype-icon img {
@@ -4279,7 +4279,7 @@ border-spacing:transparent;
 	height: 64px;
 	display: block;
 	background-position: 0 0px;
-	background-image: url(../images/mega/medium-icons.png);
+	background-image: url(../images/mega/medium-icons-v1.png);
 	background-repeat: no-repeat;
 	margin: 8px auto 0 auto;
 }
@@ -5297,7 +5297,7 @@ span.search-number {
 	background-repeat: no-repeat;
 	position: absolute;
 	background-position: 0 top;
-	background-image: url(../images/mega/drag-icons.png)
+	background-image: url(../images/mega/drag-icons-v1.png)
 }
 .dragger-icon.first {
 	margin: 10px 0 0 6px;
@@ -7134,7 +7134,7 @@ div .fm-tree-folder.dragover {
 	float: left;
 	margin: 5px 0 0 6px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/drag-icons.png);
+	background-image: url(../images/mega/drag-icons-v1.png);
 	background-position: 0 0;
 }
 .export-link-text-pad {
@@ -7494,7 +7494,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	top: 0px;
 	left: 0px;
 	display: none;
-	background-image: url(../images/mega/large-icons.png);
+	background-image: url(../images/mega/large-icons-v1.png);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 }
@@ -10528,7 +10528,7 @@ h5.main-italic-header {
 	height: 48px;
 	float: left;
 	margin: 1px 0 0 -5px;
-	background-image: url(../images/mega/drag-icons.png);
+	background-image: url(../images/mega/drag-icons-v1.png);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 }
@@ -11658,7 +11658,7 @@ strong, b {
 	width: 64px;
 	height: 64px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/medium-icons.png);
+	background-image: url(../images/mega/medium-icons-v1.png);
 	background-position: 0 -1984px;
 }
 .share-folder-info {
@@ -13849,7 +13849,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon-span {
 	background-position: 0 0px;
-	background-image: url(../images/mega/small-icons.png);
+	background-image: url(../images/mega/small-icons-v1.png);
 	background-repeat: no-repeat;
 	width: 24px;
 	height: 24px;
@@ -15245,19 +15245,19 @@ background-size:27px auto;
  background-size:72px auto;
 }
  .dragger-icon, .export-icon, .new-download-file-icon {
- background-image:url(../images/mega/drag-icons@2x.png);
+ background-image:url(../images/mega/drag-icons@2x-v1.png);
  background-size:48px auto;
 }
 .share-folder-icon div, .block-view-file-type {
-background-image: url(../images/mega/medium-icons@2x.png);
+background-image: url(../images/mega/medium-icons@2x-v1.png);
 background-size:64px auto;
 }
 .properties-file-icon div {
- background-image: url(../images/mega/large-icons@2x.png);
+ background-image: url(../images/mega/large-icons@2x-v1.png);
 background-size:220px auto;
 }
 .transfer-filtype-icon, .search-path-icon-span {
- background-image: url(../images/mega/small-icons@2x.png);
+ background-image: url(../images/mega/small-icons@2x-v1.png);
  background-size:24px auto;
 }
 .ff-extension-icon, .ff-extension-button {

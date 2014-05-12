@@ -3006,6 +3006,8 @@ function iconUI()
 
 function topContextMenu(close)
 {
+	return;
+	
 	if (close)
 	{
 		fmtopUI();

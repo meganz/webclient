@@ -447,6 +447,8 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			}
 
 			this.bytes = null;
+			
+			this.file.retries  = 0; /* reset error flag */
 
 			return this.done();
 
@@ -507,8 +509,6 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 ChunkUpload.prototype.done = function() {
 	DEBUG("release", this.start);
 	
-	this.file.retries  = 0; /* reset error flag */
-
 	/* release worker */
 	this._done();
 

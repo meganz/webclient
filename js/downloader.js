@@ -114,7 +114,6 @@ ClassChunk.prototype.isCancelled = function() {
 
 // finish_download {{{
 ClassChunk.prototype.finish_download = function() {
-	ERRDEBUG("here");
 	if (this.is_finished) return;
 	this.is_finished  = true;
 	this.xhr = null;

@@ -4088,27 +4088,21 @@ th.grid-first-th {
 }
 .grid-url-arrow {
 	height: 24px;
-	width: 36px;
+	width: 38px;
 	display: block;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -1px -1578px;
+	background-position: -1px -1558px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
 	cursor: pointer;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
-	opacity: 0.7;
-}
-.grid-url-arrow:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 }
 .file-settings-icon {
 	width: 38px;
@@ -4132,13 +4126,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	opacity: 0;
 	cursor: pointer;
 }
-.file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon {
+.file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon, tr:hover .grid-url-arrow, tr.ui-selected .grid-url-arrow {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
 	-moz-opacity: 0.75;
 	-khtml-opacity: 0.75;
 	opacity: 0.75;
 }
-.file-block:hover .file-settings-icon:hover, .file-block.ui-selected .file-settings-icon:hover {
+.file-block:hover .file-settings-icon:hover, .file-block.ui-selected .file-settings-icon:hover, tr:hover .grid-url-arrow:hover, tr.ui-selected:hover .grid-url-arrow:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;

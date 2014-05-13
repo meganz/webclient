@@ -11,11 +11,12 @@
  * mouse motion event code originally from John Walker
  * key press timing code thanks to Nigel Johnstone */
 
-var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
 var lastactive = new Date().getTime();
 
-var randomSeed = new Array(256);
-var randomCounter = 0;
+var bioSeed = new Array(256);
+var bioCounter = 0;
+
+var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
 
 // ----------------------------------------
 
@@ -25,7 +26,7 @@ if (window.performance !== undefined && window.performance.now !== undefined) {
 	var timeByte = function() { return ((new Date().getTime())>>>2)&255 };
 }
 
-function keyPressEntropy(e) { randomSeed[randomCounter++ & 255] ^= timeByte(); }
+function keyPressEntropy(e) { bioSeed[bioCounter++ & 255] ^= timeByte(); }
 
 function mouseMoveEntropy(e)
 {
@@ -35,7 +36,7 @@ function mouseMoveEntropy(e)
  {
   var c = ((e.screenX << 4) | (e.screenY & 15));
   if (typeof arkanoid_entropy !== 'undefined') arkanoid_entropy();
-  randomSeed[randomCounter++ & 255] ^= ( timeByte() ^ c );
+  bioSeed[bioCounter++ & 255] ^= ( timeByte() ^ c );
   mouseMoveSkip = ( Math.random() * 8 ) | 0;
  }
 }

@@ -597,6 +597,10 @@ function crypto_rsagenkey ()
         u_setrsa(e.data);
     };
 
+    var randomSeed = new Uint32Array(256);
+    asmCrypto.ISAAC.seed(bioSeed);
+    asmCrypto.getRandomValues(randomSeed);
+
     w.postMessage([ 2048, 257, randomSeed ]);
 }
 

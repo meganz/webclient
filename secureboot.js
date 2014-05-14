@@ -299,19 +299,22 @@ else
 {
 	if (!b_u)
 	{
-		window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
-		{
-			if (d)
+		/*
+			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
-			}
-			else
-			{
-				// TODO: XHR to log server?
-			}
+				if (d)
+				{
+					console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
+				}
+				else
+				{
+					// TODO: XHR to log server?
+				}
 
-			return false;
-		};
+				return false;
+			};
+		*/
+		
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;

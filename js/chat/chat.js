@@ -2963,7 +2963,19 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
     var megaChat = this.megaChat;
     meta = meta || {};
 
-    if(self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0) {
+    // Uncaught AssertionFailed: Messages can only be sent in initialised state.
+    var pluginsForceQueue = false;
+
+
+    $.each(self.megaChat.plugins, function(k) {
+        if(self.megaChat.plugins[k].shouldQueueMessage) {
+            if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
+                pluginsForceQueue = true;
+            }
+        }
+    });
+
+    if(pluginsForceQueue || (self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
         var eventObject = new KarereEventObjects.OutgoingMessage(
             self.roomJid,

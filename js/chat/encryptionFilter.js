@@ -745,3 +745,10 @@ EncryptionFilter.prototype.messageShouldNotBeEncrypted = function(eventObject) {
     }
 };
 
+EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject) {
+    return (
+            megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ||
+            megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED
+        );
+};
+

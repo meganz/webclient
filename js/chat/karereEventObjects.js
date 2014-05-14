@@ -1375,14 +1375,16 @@ KarereEventObjects.PingResponse.prototype.toString = function() {
  * @param fromJid {string} sender's JID
  * @param [show] {string} status of the user (this should be used instead of `status`, for determinating the user's presence, e.g.: chat/away/etc)
  * @param [status] {string} status of the user
+ * @param [type] {string} type of the presence event
  * @param [delay] {number} unix time stamp saying when this presence was last updated
  * @constructor
  */
-KarereEventObjects.Presence = function(toJid, fromJid, show, status, delay) {
+KarereEventObjects.Presence = function(toJid, fromJid, show, status, type, delay) {
     this.setToJid(toJid);
     this.setFromJid(fromJid);
     this.setShow(show);
     this.setStatus(status);
+    this.setType(type);
     this.setDelay(delay);
 };
 /**
@@ -1457,6 +1459,24 @@ KarereEventObjects.Presence.prototype.getStatus = function() {
  */
 KarereEventObjects.Presence.prototype.setStatus = function(val) {
     this.status = val || "available";
+    return this;
+};
+/**
+ * Getter for property `type`
+ *
+ * @returns {(string|null)} type of the presence event
+ */
+KarereEventObjects.Presence.prototype.getType = function() {
+    return this.type;
+};
+/**
+ * Setter for property `type`
+ *
+ * @param [val] {string} type of the presence event
+ * @returns {KarereEventObjects.Presence}
+ */
+KarereEventObjects.Presence.prototype.setType = function(val) {
+    this.type = val || null;
     return this;
 };
 /**

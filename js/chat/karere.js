@@ -124,7 +124,7 @@ var Karere = function(user_options) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
 
-        if(eventObject.getShow() != "unavailable") {
+        if(eventObject.getShow() != "unavailable" && !eventObject.getType()) {
 
             self._presenceCache[eventObject.getFromJid()] = eventObject.getShow() ? eventObject.getShow() : "available";
             self._presenceBareCache[bareJid] = eventObject.getShow() ? eventObject.getShow() : "available";
@@ -307,7 +307,12 @@ Karere.DEFAULTS = {
         'video': false,
         'karere': false,
         'ping': false
-    }
+    },
+
+    /**
+     * Default name for roster group to be used when .subscribe is called
+     */
+    defaultRosterGroupName: 'Contacts'
 };
 
 
@@ -1265,6 +1270,7 @@ makeMetaAware(Karere);
                 eventData.from,
                 eventData.show,
                 eventData.status,
+                eventData.rawType,
                 eventData.delay
             );
         } else if(stanzaType == "ActiveMessage") {
@@ -2262,6 +2268,75 @@ makeMetaAware(Karere);
             self.connection.send(
                 msg.tree()
             );
+        }
+    };
+
+
+
+    Karere.prototype.subscribe = function(bareJid) {
+        var self = this;
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            var msg = $iq({
+                id: self.generateMessageId(),
+                type: "set"
+            })
+                .c("query", {
+                    'xmlns': 'jabber:iq:roster'
+                })
+                .c("item", {
+                    jid: bareJid,
+                    subscription: 'both',
+                    name: bareJid.split("@")[0]
+                })
+                .c("group")
+                    .t(self.options.defaultRosterGroupName);
+
+            self.connection.send(
+                msg.tree()
+            );
+
+//            var msg2 = $pres({id: self.generateMessageId(), to: bareJid, type: "subscribe"});
+//
+//            self.connection.send(
+//                msg2.tree()
+//            );
+
+        } else {
+            if(localStorage.d) { console.error("Not connected"); }
+        }
+    };
+
+    Karere.prototype.unsubscribe = function(bareJid) {
+        var self = this;
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+            var msg = $iq({
+                id: self.generateMessageId(),
+                type: "set"
+            })
+                .c("query", {
+                    'xmlns': 'jabber:iq:roster'
+                })
+                .c("item", {
+                    jid: bareJid,
+                    subscription: 'none',
+                    name: bareJid.split("@")[0]
+                })
+                .c("group")
+                    .t(self.options.defaultRosterGroupName);
+
+            self.connection.send(
+                msg.tree()
+            );
+
+//            var msg2 = $pres({id: self.generateMessageId(), to: bareJid, type: "unsubscribe"});
+//
+//            self.connection.send(
+//                msg2.tree()
+//            );
+        } else {
+            if(localStorage.d) { console.error("Not connected"); }
         }
     };
 }

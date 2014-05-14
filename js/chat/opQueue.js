@@ -136,7 +136,7 @@ OpQueue.prototype.pop = function() {
             });
             op[1] = op1; // replace
         }
-        if(op[1].length == 0) {
+        if(op[1].length == 0 && op[0] != "recover") {
             if(localStorage.d) {
                 console.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
             }

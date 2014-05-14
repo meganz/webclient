@@ -1397,6 +1397,43 @@ MegaChat.prototype.getPrivateRoomJidFor = function(jid) {
 };
 
 
+
+/**
+ * Called when a new user is added into MEGA
+ *
+ * @param u {Object} object containing user information (u.h is required)
+ */
+MegaChat.prototype.processNewUser = function(u) {
+    var self = this;
+
+    console.error("added: ", u);
+
+
+    this.karere.subscribe(megaChat.getJidFromNodeId(u));
+
+    self.renderContactTree();
+    self.renderMyStatus();
+};
+
+/**
+ * Called when a new contact is removed into MEGA
+ *
+ * @param u {Object} object containing user information (u.h is required)
+ */
+MegaChat.prototype.processRemovedUser = function(u) {
+    var self = this;
+
+    console.error("removed: ", u);
+
+
+    this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
+
+    self.renderContactTree();
+    self.renderMyStatus();
+};
+
+
+
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
@@ -3137,5 +3174,6 @@ MegaChatRoom.prototype.renderContactTree = function() {
 
     $navElement.data('chatroom', self);
 };
+
 
 window.megaChat = new MegaChat();

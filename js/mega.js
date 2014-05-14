@@ -961,7 +961,9 @@ function MegaData ()
 				if (res.u)
 				{
 					newnodes=[];
+
 					process_u([{ c: 1, m: res.m, h:res.u, u: res.u, ts: (new Date().getTime()/1000) }],false);
+
 					rendernew();
 				}
 			}
@@ -2112,6 +2114,16 @@ function execsc(ap)
 		if (a.i == requesti)
 		{
 			if (d) console.log('OWN ACTION PACKET');
+
+            if(a.a == 'c') {
+                if(megaChat && megaChat.is_initialized) {
+                    $.each(a.u, function(k, v) {
+                        megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](
+                            v.u
+                        );
+                    });
+                };
+            }
 		}
 		else if (a.a == 'fa')
 		{
@@ -2248,6 +2260,15 @@ function execsc(ap)
 		else if (a.a == 'c')
 		{
 			process_u(a.u);
+
+            if(megaChat && megaChat.is_initialized) {
+                $.each(a.u, function(k, v) {
+                    megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](
+                        v.u
+                    );
+                });
+            };
+
 		}
 		else if (a.a == 'd')
 		{

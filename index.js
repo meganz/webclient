@@ -725,7 +725,7 @@ function loginDialog(close)
 		return false;
 	}
 	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) {
-		$('.top-login-warning').addClass('hidden');	
+		$('.top-login-warning').removeClass('active');	
 		$('.login-notification-icon').removeClass('hidden');
 	}
 	$('.login-checkbox,.top-login-popup .radio-txt').unbind('click');
@@ -796,13 +796,13 @@ function loginDialog(close)
 	$('.top-login-warning-close').bind('click',function(e)
 	{
 		if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) localStorage.hideloginwarning=1;
-		$('.top-login-warning').addClass('hidden');
+		$('.top-login-warning').removeClass('active');
 		$('.login-notification-icon').removeClass('hidden');	
 	});	
 	$('.login-notification-icon').unbind('click');
 	$('.login-notification-icon').bind('click',function(e)
 	{
-		$('.top-login-warning').removeClass('hidden');
+		$('.top-login-warning').addClass('active');
 		$(this).addClass('hidden');
 	});
 	

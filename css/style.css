@@ -156,7 +156,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .arrow-block {
 	height: 13px;
 	margin-top: -1px;
-	;
 }
 .nlanguage-txt-block {
 	width: 150px;
@@ -375,6 +374,7 @@ input[type="checkbox"] {
 }
 .top-login-popup .radio-txt {
 	padding-top: 11px;
+	font-size: 12px;
 }
 .new-registration-checkbox .radio-txt {
 	padding-top: 3px;
@@ -3117,20 +3117,34 @@ label.iPhoneCheckLabelOff span {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	overflow: hidden;
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(0,0,0,0.06);
+	position: relative;
+}
+.nw-verified-icon {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	z-index: 10;
+	background-position: -11px -2244px;
+	background-repeat: no-repeat;
+	top: -2px;
+	right: -3px;
+	display: none;
+}
+.verified .nw-verified-icon {
+	display: block;
 }
 .nw-contact-avatar img {
-	width: 32px;
-	height: 32px;
+	width: 28px;
+	height: 28px;
 	display: block;
-	margin: -2px 0 0 -2px;
-	-webkit-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
-	-moz-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
-	box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.25);
+	-webkit-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.15);
+	-moz-box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.15);
+	box-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.15);
 	box-sizing: border-box;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
@@ -5015,30 +5029,62 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-notification-settings {
-	float: left;
-	height: 30px;
-	border: 2px solid #b2b2b2;
-	line-height: 25px;
-	color: #3f3f3f;
-	padding: 0 10px 0 41px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
+.fm-add-user, .fm-clearbin-button, .fm-notification-settings, .fm-send-files, .fm-start-call {
+	height: 24px;
+	float: right;
+	font-size: 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	line-height: 22px;
+	color: white;
+	padding: 0 0 0 33px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -6px -5571px;
+	background-position: -9px -1730px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	margin-left: 10px;
+	margin: 12px 8px 0 0;
 	cursor: pointer;
+	background-color: rgba(107,177,54,0.8);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	cursor: pointer;
+	position: relative;
+}
+.fm-add-user {
+	margin: 12px 12px 0 0;
+}
+.fm-send-files {
+	background-color: rgba(222,0,0,0.7);
+	background-position: -9px -1700px;
+}
+.fm-start-call {
+	background-color: rgba(6,160,236,0.7);
+	background-position: -9px -1670px;
+}
+.fm-send-files:hover, .fm-send-files.active {
+	background-color: rgba(222,0,0,1);
+}
+.fm-start-call:hover, .fm-start-call.active {
+	background-color: rgba(6,160,236,1);
 }
 .fm-add-user:hover, .fm-add-user.active {
-	background-color: #25A8E3;
-	border-color: #25A8E3;
-	color: white;
-	background-position: -6px -5646px;
+	background-color: rgba(107,177,54,1);
+}
+.fm-chatbutton-arrow {
+	display: block;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -1610px;
+	padding-right: 25px;
+}
+.fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
+	background-position: right -1640px;
 }
 .fm-notification-settings {
 	background-image: url(../images/mega/notification-icons.png);
@@ -5349,7 +5395,7 @@ span.search-number {
 .add-user-popup-button, a.add-user-popup-button {
 	background-color: #1B9EEB;
 }
-.fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button {
+.fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .nw-contact-avatar, .nw-contact-avatar img {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -5441,33 +5487,37 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	width: 100% !important;
 }
 .fm-chat-block {
-	border-top: 1px solid white;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100%;
-	height: -webkit-calc(100% - 49px);
-	height: -moz-calc(100% - 49px);
-	height: calc(100% - 49px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	position: relative;
 }
 .fm-chat-message-scroll {
 	height: 100%;
-	height: -webkit-calc(100% - 140px);
-	height: -moz-calc(100% - 140px);
-	height: calc(100% - 140px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	padding: 0 20px 0 8px;
+}
+.fm-chat-message-pad {
+	padding: 8px 21px 0 5px;
+	position: relative;
 }
 .fm-chat-message-scroll .jspPane {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-bottom: 30px !important;
+	padding-bottom: 5px !important;
 }
 .fm-chat-message a {
-	color: #D21F00;
+	color: #0A68CA;
 }
 .fm-chat-typing-txt {
 	height: 30px;
@@ -5503,50 +5553,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.fm-chat-header {
-	height: 80px;
-	background-color: #f6f6f6;
-}
-.fm-chat-avatar-block {
-	float: left;
-	width: 50px;
-	height: 50px;
-	margin: 15px 0 0 15px;
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 2px;
-	background-color: rgba(0, 0, 0, .15);
-	position: relative;
-}
-.fm-chat-top-verified {
-	background-image: url(../images/mega/chat-sprite.png?v=2);
-	background-position: -1px -447px;
-	background-repeat: no-repeat;
-	width: 22px;
-	height: 22px;
-	position: absolute;
-	right: -6px;
-	top: -4px;
-	-webkit-transition: all 300ms ease-in-out;
-	-moz-transition: all 300ms ease-in-out;
-	-o-transition: all 300ms ease-in-out;
-	-ms-transition: all 300ms ease-in-out;
-	transition: all 300ms ease-in-out;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
-	opacity: 0;
-}
-.verified .fm-chat-top-verified {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
 .fm-chat-avatar {
 	width: 46px;
 	height: 46px;
@@ -5572,41 +5578,38 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-chat-user-info {
 	float: left;
-	margin: 19px 0 0 15px;
+	margin: 8px 0 0 12px;
 }
 .fm-chat-messages-block {
-	border-top: 2px solid #eeeeee;
-	padding: 20px 0 16px 0;
-	display: inline-block;
+	padding: 8px 0;
 	width: 100%;
 }
-.fm-chat-messages-block:first-child {
-	border: 0;
-}
 .fm-chat-user {
-	font-size: 15px;
-	line-height: 22px;
-	color: #353a3a;
-	margin-right: 25px;
+	font-size: 12px;
+	line-height: 17px;
+	color: #333333;
+	margin-right: 20px;
 	font-family: 'Open Sans Semibold';
 }
 .fm-chat-user-star {
-	width: 25px;
-	height: 22px;
+	width: 18px;
+	height: 18px;
 	float: right;
 }
 .star .fm-chat-user-star {
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-position: 8px -3626px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -7px -2205px;
 	background-repeat: no-repeat;
 }
 .fm-chat-user-status {
-	font-size: 13px;
-	line-height: 21px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	padding: 0 0 0 20px;
-	color: #353a3a;
+	font-size: 11px;
+	line-height: 16px;
+	padding: 0 0 0 0;
+	color: #666666;
+	float: left;
+}
+.fm-chat-user-info .nw-contact-status {
+	margin: 4px 5px 0 0px;
 }
 .fm-chat-user-status.offline {
 	background-position: -17px -2928px;
@@ -5640,7 +5643,32 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	color: #1FA4E7;
 }
 .fm-chat-messages-pad {
-	margin-left: 203px;
+	margin: 0 203px 0 0;
+	display: inline-block;
+	background-color: rgba(29,161,233,0.1);
+	-moz-border-radius: 18px;
+	-webkit-border-radius: 18px;
+	border-radius: 18px;
+}
+.right-block {
+	text-align: right;
+}
+.right-block .fm-chat-messages-pad {
+	margin: 0 0 0 203px;
+	background-color: rgba(0,0,0,0.05);
+}
+.chat-sharing .fm-chat-messages-pad {
+	background-color: rgba(120,179,66,0.1);
+}
+.chat-username {
+	color: #1DA0E9;
+	font-family: "Open Sans Semibold", Arial;
+}
+.fm-chat-messages-block .nw-contact-avatar {
+	margin: 2px;
+}
+.right-block .nw-contact-avatar {
+	float: right;
 }
 .fm-chat-messages-block.grouped-message .fm-chat-username {
 	visibility: hidden;
@@ -5661,18 +5689,31 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	text-align: right;
 }
 .fm-chat-message {
-	margin-right: 90px;
-	font-size: 13px;
+	margin: 0 0 0 34px;
+	font-size: 12px;
 	line-height: 21px;
-	color: #666666;
-	padding-bottom: 6px;
+	color: #333333;
+	padding: 7px 15px 9px 15px;
+	text-align: left;
 }
-.fm-chat-messages-pad img {
-	width: 60px;
-	float: left;
-	display: block;
-	margin-top: 10px;
-	margin-bottom: 6px;
+.nw-chat-date {
+	height: 14px;
+	margin: -3px 0 -3px 0;
+	text-align: right;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: left -2290px;
+	background-repeat: repeat-x;
+}
+.nw-chat-date-txt {
+	font-size: 11px;
+	color: rgba(19,25,25,0.5);
+	display: inline-block;
+	background-color: white;
+	line-height: 13px;
+	padding: 0 0 0 10px;
+}
+.right-block .fm-chat-message {
+	margin: 0 34px 0 0;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;
@@ -5766,10 +5807,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	color: #333333;
 	cursor: default;
 }
-.fm-chat-messages-pad .block-view-file-type {
-	float: left;
-	margin: 8px -2px 6px -3px;
-}
 .fm-chat-shared-files {
 	background-color: #f3f3f3;
 	margin: 10px 15px 5px -10px;
@@ -5787,56 +5824,53 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	color: white;
 }
 .fm-chat-line-block {
-	background-color: #f6f6f6;
-	padding: 15px 0 14px 0;
+	background-color: rgba(0,0,0,0.05);
+	padding: 10px 0 11px 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-}
-.fm-chat-attach-file {
-	float: left;
-	width: 32px;
-	height: 32px;
-	margin: 0 10px 0 161px;
-	background-position: -9px -5231px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	cursor: pointer;
-	position: relative;
-}
-.fm-chat-attach-file:hover, .fm-chat-attach-file.active {
-	background-position: -9px -5316px;
+	margin-left: 2px;
 }
 .fm-chat-emotions-icon {
 	float: right;
-	width: 32px;
-	height: 32px;
-	margin: 0 41px 0 10px;
-	background-position: -9px -5401px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
+	width: 27px;
+	height: 27px;
+	margin: 0 15px 0 10px;
+	background-position: 1px -2417px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
 	position: relative;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .fm-chat-emotions-icon:hover, .fm-chat-emotions-icon.active {
-	background-position: -9px -5481px;
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 }
 .fm-chat-input-block {
-	border: 2px solid #dddddd;
-	margin: 0 83px 0 203px;
+	margin: 0 50px 0 0px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background-color: white;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	padding: 0 0 0 35px;
+	padding: 0 0 0 46px;
 	overflow: hidden;
 	position: relative;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: 10px -2460px;
+	background-repeat: no-repeat;
 }
 .fm-chat-messages-pad .fm-chat-shared-files .block-view-file-type {
 	margin: 8px auto 0 auto;
@@ -5866,8 +5900,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	margin: 0 0 0 0;
 	border: 0;
 	outline: none;
-	font-size: 13px;
-	line-height: 25px;
+	font-size: 12px;
+	line-height: 27px;
 	color: #666666;
 	resize: none;
 	max-height: 200px;
@@ -5875,6 +5909,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	background-color: transparent;
 }
 .grid-share-table tr td:nth-child(1) {
 	padding-left: 12px;
@@ -5887,11 +5922,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-chat-attach-popup {
 	position: absolute;
-	z-index: 900;
-	min-width: 500px;
-	height: 436px;
+	z-index: 1110;
+	min-width: 600px;
+	height: 486px;
 	background-color: #F6F6F6;
-	border: 2px solid rgba(0,0,0,0.3);
+	border: 2px solid rgba(0,0,0,0.1);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	-webkit-box-sizing: border-box;
@@ -5900,214 +5935,313 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	border-radius: 6px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
-	bottom: 54px;
-	left: 10px;
+	top: 50%;
+	left: 50%;
 	overflow: hidden;
+	margin: -243px 0 0 -300px;
 }
 .fm-chat-attach-top {
-	height: 40px;
+	height: 56px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 10px 0 0 0;
+	padding: 15px 0 0 9px;
 	overflow: hidden;
 	white-space: nowrap;
-	margin: 0 10px 10px 10px;
+	background-color: white;
+	border-bottom: 2px solid #f2f2f2;
 }
 .fm-chat-attach-scrolling {
 	height: 100%;
-	height: -webkit-calc(100% - 50px);
-	height: -moz-calc(100% - 50px);
-	height: calc(100% - 50px);
+	height: -webkit-calc(100% - 112px);
+	height: -moz-calc(100% - 112px);
+	height: calc(100% - 112px);
 	background-color: white;
 	overflow: hidden;
 }
 .fm-chat-attach-bottom {
-	height: 50px;
-	padding: 0 2px 0 0;
+	height: 56px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 3px 2px 0 0;
 }
-.fm-chat-attach-button, .fm-chat-contact-button {
+.fm-chat-attach-scrolling .grid-table tr td {
+	padding-left: 21px;
 	cursor: default;
-	border: 2px solid #e9e9e9;
-	height: 34px;
-	background-color: white;
-	color: #898c8c;
-	font-size: 13px;
-	line-height: 29px;
-	padding: 0 16px;
-	float: right;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	margin: 8px 6px 0 0;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
 }
-.fm-chat-attach-button.active, .fm-chat-contact-button.active {
-	border: 2px solid #acacac;
-	height: 34px;
-	background-color: white;
-	color: #363b3b;
+.nw-fm-close-button {
+	width: 26px;
+	height: 26px;
+	position: absolute;
+	right: 12px;
+	top: 14px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: 6px -2771px;
 	cursor: pointer;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 }
-.fm-chat-attach-button.active:hover, .fm-chat-contact-button.active:hover {
-	height: 34px;
-	background-color: #acacac;
-	color: white;
+.nw-fm-close-button:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
-.fm-chat-attach-arrow {
-	position: absolute;
-	z-index: 901;
-	width: 16px;
-	height: 12px;
-	background-position: center -5890px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
+.fm-chat-arrow {
+	width: 8px;
+	height: 20px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	top: -10px;
-	left: 8px;
-	display: none;
-}
-.active .fm-chat-attach-arrow, .active .fm-chat-emotion-arrow {
-	display: block;
-}
-.fm-chat-emotion-arrow {
+	background-position: left -2719px;
 	position: absolute;
-	z-index: 901;
-	width: 16px;
-	height: 12px;
-	background-position: center -5950px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	top: -10px;
-	left: 8px;
-	display: none;
-}
-.fm-chat-emotion-popup {
-	position: absolute;
-	z-index: 900;
-	width: 214px;
-	min-height: 120px;
-	background-color: white;
-	border: 2px solid rgba(0,0,0,0.1);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	bottom: 54px;
-	right: 10px;
-	padding: 10px 12px 16px 12px
+	bottom: 10px;
+	right: -8px;
 }
 .fm-chat-smile {
 	cursor: pointer;
-	width: 25px;
-	height: 25px;
+	width: 32px;
+	height: 32px;
 	float: left;
 	background-image: url(../images/mega/chat-smiles.png);
-	background-position: center 3px;
+	background-position: 6px 6px;
 	background-repeat: no-repeat;
-	background-size: 58px auto;
-	margin: 6px 6px 0 6px;
+	margin: 4px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background-color: rgba(255,255,255,0);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.fm-chat-smile.wink {
+	background-position: -34px 6px;
+}
+.fm-chat-smile.tongue {
+	background-position: -74px 6px;
+}
+.fm-chat-smile.grin {
+	background-position: -114px 6px;
+}
+.fm-chat-smile.confuse {
+	background-position: -154px 6px;
+}
+.fm-chat-smile.grasp {
+	background-position: 6px -34px;
+}
+.fm-chat-smile.sad {
+	background-position: -74px -34px;
+}
+.fm-chat-smile.cry {
+	background-position: -114px -34px;
+}
+.fm-chat-smile.angry {
+	background-position: -154px -34px;
 }
 .fm-chat-smile:hover {
-	background-position: center -47px;
+	background-color: rgba(255,255,255,0.1);
 }
-.fm-chat-download-popup {
-	width: 344px;
-	height: 124px;
-	border: 2px solid rgba(0,0,0,0.1);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
+.fm-chat-message .fm-chat-smile {
+	display: inline-block;
+	margin: 0;
+	width: 21px;
+	height: 21px;
+	float: none;
+	margin: 0 3px;
+}
+.fm-chat-message .fm-chat-smile::before {
+	content: '\00a0';
+}
+.fm-chat-message .fm-chat-smile.smile {
+	background-position: 0px 1px;
+}
+.fm-chat-message .fm-chat-smile.wink {
+	background-position: -28px 1px;
+}
+.fm-chat-message .fm-chat-smile.tongue {
+	background-position: -68px 1px;
+}
+.fm-chat-message .fm-chat-smile.grin {
+	background-position: -108px 1px;
+}
+.fm-chat-message .fm-chat-smile.confuse {
+	background-position: -148px 1px;
+}
+.fm-chat-message .fm-chat-smile.grasp {
+	background-position: 0 -27px;
+}
+.fm-chat-message .fm-chat-smile.sad {
+	background-position: -68px -27px;
+}
+.fm-chat-message .fm-chat-smile.cry {
+	background-position: -108px -27px;
+}
+.fm-chat-message .fm-chat-smile.angry {
+	background-position: -148px -27px;
+}
+.fm-chat-download-popup, .fm-add-contact-popup, .fm-send-files-popup, .fm-start-call-popup, .fm-chat-emotion-popup {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	border-radius: 8px;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
-	background-color: white;
+	background-color: #333333;
+	font-size: 12px;
+	color: #CCCCCC;
+	padding: 8px 0;
 	position: absolute;
-	padding: 10px 10px 10px 0;
 	z-index: 100;
-	margin-left: -172px;
+	left: -10000px;
+	-webkit-transition: opacity 100ms ease-in-out;
+	-moz-transition: opacity 100ms ease-in-out;
+	-o-transition: opacity 100ms ease-in-out;
+	-ms-transition: opacity 100ms ease-in-out;
+	transition: opacity 100ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 }
-.fm-chat-download-arrow {
-	width: 18px;
-	height: 12px;
-	position: absolute;
-	background-image: url(../images/mega/chat-sprite.png?v=2);
-	background-position: -12px -516px;
-	background-repeat: no-repeat;
-	margin: -22px 0 0 -9px;
-	left: 50%;
+.fm-add-contact-popup, .fm-send-files-popup, .fm-start-call-popup, .fm-chat-emotion-popup {
+	left: auto;
+	right: -10000px;
+	top: 48px;
+	margin-right: 12px;
 }
-.top .fm-chat-download-arrow {
-	background-position: -52px -516px;
-	bottom: -10px;
+.fm-send-files-popup, .fm-start-call-popup {
+	left: -10000px;
+	right: auto;
+	margin-right: 0;
 }
-.fm-chat-download-button {
-	border: 2px solid #d9d9d9;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
+.fm-add-contact-popup.active, .fm-chat-emotion-popup.active {
+	right: 0;
+}
+.fm-chat-emotion-popup {
+	margin: -134px 48px 0 0;
+	width: 210px;
+	height: 130px;
+	padding: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 100px;
-	height: 100px;
-	float: left;
-	overflow: hidden;
-	padding: 0px 13px 10px 13px;
-	margin-left: 10px;
-	cursor: pointer;
 }
-.fm-chat-download-icon {
-	background-image: url(../images/mega/chat-sprite.png?v=2);
-	background-position: center -619px;
+.fm-send-files-popup.active, .fm-start-call-popup.active {
+	left: 0;
+}
+.fm-chat-download-popup.active, .fm-add-contact-popup.active, .fm-send-files-popup.active, .fm-start-call-popup.active, .fm-chat-emotion-popup.active {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.fm-add-contact-arrow, .fm-chat-download-arrow, .fm-send-files-arrow, .fm-start-call-arrow {
+	width: 44px;
+	height: 8px;
+	position: absolute;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -2516px;
 	background-repeat: no-repeat;
-	height: 62px;
+	margin: 0 0 0 -22px;
+	left: 50%;
+	bottom: -8px;
 }
-.fm-chat-download-txt {
-	font-size: 11px;
-	color: #555959;
-	line-height: 14px;
-	text-align: center;
+.fm-add-contact-arrow, .fm-send-files-arrow, .fm-start-call-arrow {
+	top: -8px;
+	width: 17px;
+	bottom: auto;
+	margin: 0 -8px 0 0;
+	left: auto;
+	right: 34px;
+	background-position: -11px -420px;
+	background-image: url(../images/mega/top-sprite.svg);
 }
-.fm-chat-download-button:hover .fm-chat-download-txt {
+.fm-send-files-arrow {
+	left: 20px;
+	right: auto;
+	margin: 0 0 0 -8px;
+}
+.fm-chat-download-button, .fm-chat-popup-button {
+	height: 32px;
+	line-height: 30px;
+	padding: 0 15px 0 50px;
+	font-size: 12px;
+	cursor: pointer;
+	position: relative;
+	color: #cccccc;
+	white-space: nowrap;
+	background-color: rgba(255,255,255,0);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: 0 -2516px;
+	background-repeat: no-repeat;
+}
+.fm-chat-download-button:hover, .fm-chat-download-button.active, .fm-chat-popup-button:hover, .fm-chat-popup-button.active {
+	background-color: rgba(213,22,0,1);
 	color: white;
 }
-.to-cloud .fm-chat-download-icon {
-	background-position: center -619px;
+.fm-chat-download-button.to-cloud, .fm-chat-popup-button.from-cloud {
+	background-position: 0 -1833px;
 }
-.as-zip .fm-chat-download-icon {
-	background-position: center -699px;
+.fm-chat-download-button.as-zip {
+	background-position: 6px -2631px;
 }
-.to-computer .fm-chat-download-icon {
-	background-position: center -789px;
+.fm-chat-download-button.to-computer, .fm-chat-popup-button.from-computer {
+	background-position: 0 -1865px;
 }
-.to-cloud:hover {
-	background-color: #D42400;
-	border-color: #D42400;
+.fm-chat-download-button.to-cloud:hover, .fm-chat-download-button.to-cloud.active, .fm-chat-popup-button.from-cloud:hover, .fm-chat-popup-button.from-cloud.active {
+	background-position: 0 -2043px;
 }
-.as-zip:hover {
-	background-color: #b2b2b2;
-	border-color: #b2b2b2;
+.fm-chat-download-button.as-zip:hover, .fm-chat-download-button.as-zip.active {
+	background-position: 6px -2661px;
 }
-.to-computer:hover {
-	background-color: #6BB219;
-	border-color: #6BB219;
+.fm-chat-download-button.to-computer:hover, .fm-chat-download-button.to-computer.active, .fm-chat-popup-button.from-computer:hover, .fm-chat-popup-button.from-computer.active {
+	background-position: 0 -2075px;
 }
-.to-cloud:hover .fm-chat-download-icon {
-	background-position: center -889px;
+.fm-chat-popup-button.add-contact {
+	background-position: -4px -1903px;
+	padding: 0 15px 0 42px;
 }
-.as-zip:hover .fm-chat-download-icon {
-	background-position: center -699px;
+.fm-chat-popup-button.add-contact:hover, .fm-chat-popup-button.add-contact.active {
+	background-position: -4px -2113px;
+	background-color: rgba(107,177,54,1);
 }
-.to-computer:hover .fm-chat-download-icon {
-	background-position: center -999px;
+.fm-chat-popup-button.send-contact {
+	background-position: -4px -1935px;
+	padding: 0 15px 0 42px;
+}
+.fm-chat-popup-button.send-contact:hover, .fm-chat-popup-button.add-contact.active {
+	background-position: -4px -2145px;
+	background-color: rgba(6,160,236,1);
+}
+.fm-chat-popup-button.start-audio {
+	background-position: -1px -1762px;
+}
+.fm-chat-popup-button.start-audio:hover, .fm-chat-popup-button.start-audio.active {
+	background-position: -1px -1972px;
+	background-color: rgba(29,161,233,1);
+}
+.fm-chat-popup-button.start-video {
+	background-position: -1px -1794px;
+}
+.fm-chat-popup-button.start-video:hover, .fm-chat-popup-button.start-video.active {
+	background-position: -1px -2004px;
+	background-color: rgba(29,161,233,1);
 }
 /** debug chat audio/video **/
 .fm-chat-header .local-video-container, .fm-chat-header .remote-video-container {
@@ -6164,11 +6298,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 	border-radius: 0;
-	-webkit-transition: all 300ms ease-in-out;
-	-moz-transition: all 300ms ease-in-out;
-	-o-transition: all 300ms ease-in-out;
-	-ms-transition: all 300ms ease-in-out;
-	transition: all 300ms ease-in-out;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
@@ -6179,75 +6313,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
-}
-.fm-add-contact-popup {
-	position: absolute;
-	z-index: 900;
-	width: 400px;
-	height: 308px;
-	background-color: white;
-	border: 2px solid rgba(0,0,0,0.3);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	top: 98px;
-	left: 471px;
-}
-.fm-add-contact-arrow {
-	position: absolute;
-	background-position: center -6002px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	width: 16px;
-	height: 12px;
-	margin: -9px 0 0 9px;
-}
-.fm-add-contact-scrolling {
-	height: 100%;
-	height: -webkit-calc(100% - 50px);
-	height: -moz-calc(100% - 50px);
-	height: calc(100% - 50px);
-	overflow: hidden;
-}
-.fm-add-contact-bottom {
-	height: 50px;
-	background-color: #F6F6F6;
-	-webkit-border-bottom-left-radius: 6px;
-	-moz-border-radius-bottomleft: 6px;
-	border-bottom-left-radius: 6px;
-	-webkit-border-bottom-right-radius: 6px;
-	-moz-border-radius-bottomright: 6px;
-	border-bottom-right-radius: 6px;
-}
-.add-contact-item {
-	display: block;
-	height: 52px;
-	border-bottom: 2px solid #eeeeee;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	cursor: default;
-}
-.add-contact-pad {
-	display: block;
-	background-position: -7px -2913px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
-	background-repeat: no-repeat;
-	height: 52px;
-	position: relative;
-}
-.add-contact-item .avatar {
-	margin: 10px 0 0 30px;
-}
-.add-contact-username {
-	margin: 0 0 0 70px;
-	padding: 17px 0 0 0;
-	display: block;
 }
 .fm-dialog-overlay {
 	width: 100%;
@@ -6677,7 +6742,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	border-bottom-right-radius: 7px;
 	position: relative;
 }
-.fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
+.fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	float: right;
 	height: 32px;
 	-webkit-box-sizing: border-box;
@@ -6694,14 +6759,117 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	color: white;
 	cursor: default;
 	margin: 10px 10px 0 0;
-	user-select: none;
-	-moz-user-select: none;
+	webkit-touch-callout: none;
+	-webkit-user-select: none;
 	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
+	cursor: pointer;
+}
+.nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button {
+	float: left;
+	margin: 15px 0 0 10px;
+	cursor: pointer;
+	position: relative;
+}
+.multiple-sharing .main-body .nw-chat-button {
+	top: 7px;
+}
+.nw-chat-icons-area {
+	float: left;
+}
+.nw-chat-icons-area .block-view-file-type {
+	margin: 0;
+	left: 0;
+	top: 0;
+	margin: 0 4px 4px -7px;
+	display: none;
+	z-index: 10;
+	position: relative;
+}
+.nw-chat-icons-area .block-view-file-type:first-child {
+	display: block;
+}
+.multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type {
+	display: block;
+}
+.multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(2) {
+	margin: -62px 4px 4px -1px;
+	z-index: 9;
+}
+.multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(3) {
+	margin: -62px 4px 4px 5px;
+	z-index: 8;
+}
+.multiple-sharing.expanded .main-body .nw-chat-icons-area .block-view-file-type {
+	display: none;
+	margin: 0;
+	left: 0;
+	top: 0;
+	margin: 0 4px 4px -7px;
+}
+.multiple-sharing.expanded .main-body .nw-chat-icons-area .block-view-file-type:first-child {
+	display: block;
+}
+.nw-chat-sharing-body, .expanded .nw-chat-sharing-body.main-body {
+	padding-top: 7px;
+	display: none;
+}
+.nw-chat-sharing-body.main-body, .expanded .nw-chat-sharing-body {
+	display: block;
+	padding-top: 14px;
+}
+.expanded .nw-chat-sharing-body.main-body {
+	display: block;
+}
+.nw-chat-sharing-filename, .multiple-sharing.expanded .main-body .nw-chat-sharing-filename {
+	font-size: 12px;
+	line-height: 21px;
+	color: #333333;
+	padding-left: 32px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: 0 -2317px;
+	background-repeat: no-repeat;
+	float: left;
+	margin-top: 20px;
+}
+.nw-chat-sharing-filesize, .multiple-sharing.expanded .main-body .nw-chat-sharing-filesize {
+	ont-size: 11px;
+	line-height: 21px;
+	color: #999999;
+	padding-left: 20px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -5px -2368px;
+	background-repeat: no-repeat;
+	float: left;
+	margin: 20px 10px 0 0;
+}
+.multiple-sharing .main-body .nw-chat-sharing-filename, .multiple-sharing .main-body .nw-chat-sharing-filesize {
+	margin-top: 27px;
+}
+.nw-chat-expand-arrow {
+	display: none;
+	cursor: pointer;
+	width: 24px;
+	line-height: 21px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -22px -2586px;
+	background-repeat: no-repeat;
+}
+.multiple-sharing .nw-chat-expand-arrow {
+	display: inline-block;
+}
+.expanded .nw-chat-expand-arrow {
+	background-position: -22px -2546px;
+}
+.nw-chat-expand-arrow::before {
+	content: '\00a0';
 }
 .fm-dialog-button.warning-button {
 	background-color: rgba(143,196,98,0.9);
@@ -6709,11 +6877,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog-button.warning-button:hover {
 	background-color: rgba(143,196,98,1);
 }
-.fm-dialog-button.red {
+.fm-dialog-button.red, .nw-chat-button.red, .multiple-sharing.expanded .main-body .nw-chat-button.red, .fm-chat-attach-button.red, .fm-chat-contact-button.red {
 	background-color: rgba(213,22,0,0.7);
 	color: white;
 }
-.fm-dialog-button.red:hover {
+.fm-dialog-button.red:hover, .nw-chat-button.red:hover, .nw-chat-button.red.active, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.red:hover, .fm-chat-contact-button.red:hover, .fm-chat-attach-button.red.active, .fm-chat-contact-button.red.active {
 	background-color: rgba(213,22,0,0.9);
 }
 .top-dialog-login-button {
@@ -6722,10 +6890,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog-button.move-button.active, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
 	cursor: pointer;
 }
-.fm-dialog-button:hover, .top-dialog-login-button:hover, fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover {
+.fm-dialog-button:hover, .top-dialog-login-button:hover, fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .nw-chat-button:hover, .nw-chat-button.active, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover {
 	background-color: rgba(0,0,0,0.5);
 }
-.fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active {
+.fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active, .nw-chat-button.active {
 	cursor: pointer;
 	position: relative;
 }
@@ -8246,15 +8414,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
 	background-position: 2px -440px;
 }
-.notification-arrow {
+.notification-arrow, .top-login-arrow {
 	background-position: 2px -450px;
 }
-.notification-arrow, .warning-popup-arrow {
+.notification-arrow, .warning-popup-arrow, .top-login-arrow {
 	position: absolute;
 	float: none;
 	left: 50%;
 	margin-left: -21px;
 	top: 4px;
+}
+.top-login-arrow {
+	right: 3px;
+	left: auto;
 }
 .membership-popup-arrow {
 	margin-top: -8px;
@@ -9617,7 +9789,7 @@ body.new-startpage {
 	width: 100%;
 	padding: 0;
 	margin: 0;
-	font-size: 13px;
+	font-size: 12px;
 	color: #878787;
 	height: 24px;
 	line-height: 24px;
@@ -9626,21 +9798,38 @@ body.new-startpage {
 .top-login-warning {
 	position: absolute;
 	right: 2px;
-	background-color: rgba(0,0,0,0.9);
+	background-color: #333333;
 	width: 328px;
 	min-height: 60px;
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
 	margin-top: 14px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+	margin-left: 150%;
+}
+.top-login-warning.active {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+	margin-left: 0;
 }
 .top-login-warning-arrow {
-	background-image: url(../images/mega/top-login-sprite_v4.png);
-	background-position: -10px -506px;
+	background-image: url(http://test/webclient/images/mega/top-sprite.svg);
+	background-position: 2px -420px;
 	background-repeat: no-repeat;
 	width: 30px;
-	height: 5px;
-	margin: -5px auto 0 auto;
+	height: 8px;
+	margin: -7px auto 0 auto;
 }
 .top-login-warning-close {
 	float: right;
@@ -9731,13 +9920,20 @@ body.new-startpage {
 	background-position: 0 -1537px;
 }
 .top-login-forgot-pass-bl {
-	border-bottom: 2px solid #f2f2f2;
-	padding: 3px 15px 13px 0;
-	margin: 0 -15px 10px -15px;
+	padding: 3px 0 13px 0;
+	margin: 0 0 0 0;
+}
+.top-login-bott-gray-block {
+	background-color: #F6F6F6;
+	margin: 0 -15px -4px -15px;
+	padding: 5px 15px 0 15px;
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
 }
 .top-login-forgot-pass {
 	font-size: 11px;
-	color: #999999;
+	color: rgb(153,153,153);
 	line-height: 21px;
 	background-image: url(../images/mega/top-login-sprite_v4.png);
 	background-position: 0 -1582px;
@@ -9745,10 +9941,15 @@ body.new-startpage {
 	float: right;
 	padding: 0 0 0 23px;
 	cursor: pointer;
+	-webkit-transition: color 200ms ease-in-out;
+	-moz-transition: color 150ms ease-in-out;
+	-o-transition: color 150ms ease-in-out;
+	-ms-transition: color 150ms ease-in-out;
+	transition: color 150ms ease-in-out;
 }
 .top-login-forgot-pass:hover {
 	background-position: 0 -1582px;
-	color: #D72300;
+	color: rgb(217,32,0);
 	background-position: 0 -1622px;
 }
 .password-tooltip-arrow {
@@ -9900,6 +10101,10 @@ h5.main-italic-header {
 }
 .top-dialog-login-button {
 	position: relative;
+	background-color: rgba(213,22,0,0.7);
+}
+.top-dialog-login-button:hover {
+	background-color: rgba(213,22,0,1);
 }
 .top-dialog-login-button img {
 	display: none;
@@ -9908,12 +10113,11 @@ h5.main-italic-header {
 	padding-right: 25px;
 }
 .top-dialog-login-button.loading img {
-	margin-right: 20px;
 	display: block;
 	width: 16px;
 	position: absolute;
-	right: 11px;
-	top: 4px;
+	right: 12px;
+	top: 7px;
 	padding: 0 0 0 0;
 }
 .login-register-input input {
@@ -15284,6 +15488,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 }
  @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.fm-chat-smile {
+ background-image:url(../images/mega/chat-smiles@2x.png);
+ background-size:180px auto;
+}
 .icoming-call-button {
  background-image:url(../images/mega/chat-sprite@2x.png?v=2);
 background-size:72px auto;
@@ -15315,7 +15523,7 @@ background-size:27px auto;
 .transfer-status.error {
  background-position: 0 -10573px;
 }
-.fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head, .fm-chat-download-arrow, .fm-chat-download-icon {
+.fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head {
  background-image: url(../images/mega/chat-sprite@2x.png?v=2);
  background-size:72px auto;
 }
@@ -15609,7 +15817,7 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .contact-status-icon .transfer-type, .transfer-status, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-login-arrow, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .contact-status-icon .transfer-type, .transfer-status, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
@@ -15633,7 +15841,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-image: url(../images/mega/bottom-sprite@2x.png);
  background-size: 170px auto;
 }
- .top-login-full, .top-login-input-block, .top-login-warning-arrow, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
+ .top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .fm-chat-messages-pad .file-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password {
  background-image: url(../images/mega/top-login-sprite@2x_v4.png);
  background-size:48px auto;
 }
@@ -16993,4 +17201,106 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 }
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
+}
+#circleG {
+	width: 28px;
+	margin-top: 8px;
+}
+.circleG {
+	background-color: transparent;
+	float: left;
+	height: 6px;
+	margin-left: 3px;
+	width: 6px;
+	-moz-animation-name: bounce_circleG;
+	-moz-animation-duration: 1.35s;
+	-moz-animation-iteration-count: infinite;
+	-moz-animation-direction: linear;
+	-moz-border-radius: 4px;
+	-webkit-animation-name: bounce_circleG;
+	-webkit-animation-duration: 1.35s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: linear;
+	-webkit-border-radius: 4px;
+	-ms-animation-name: bounce_circleG;
+	-ms-animation-duration: 1.35s;
+	-ms-animation-iteration-count: infinite;
+	-ms-animation-direction: linear;
+	-ms-border-radius: 4px;
+	-o-animation-name: bounce_circleG;
+	-o-animation-duration: 1.35s;
+	-o-animation-iteration-count: infinite;
+	-o-animation-direction: linear;
+	-o-border-radius: 4px;
+	animation-name: bounce_circleG;
+	animation-duration: 1.35s;
+	animation-iteration-count: infinite;
+	animation-direction: linear;
+	border-radius: 4px;
+}
+#circleG_1 {
+	-moz-animation-delay: 0.27s;
+	-webkit-animation-delay: 0.27s;
+	-ms-animation-delay: 0.27s;
+	-o-animation-delay: 0.27s;
+	animation-delay: 0.27s;
+}
+#circleG_2 {
+	-moz-animation-delay: 0.63s;
+	-webkit-animation-delay: 0.63s;
+	-ms-animation-delay: 0.63s;
+	-o-animation-delay: 0.63s;
+	animation-delay: 0.63s;
+}
+#circleG_3 {
+	-moz-animation-delay: 0.8099999999999999s;
+	-webkit-animation-delay: 0.8099999999999999s;
+	-ms-animation-delay: 0.8099999999999999s;
+	-o-animation-delay: 0.8099999999999999s;
+	animation-delay: 0.8099999999999999s;
+}
+ @-moz-keyframes bounce_circleG {
+0% {
+}
+ 50% {
+background-color:#1DA2E9
+}
+ 100% {
+}
+}
+ @-webkit-keyframes bounce_circleG {
+0% {
+}
+ 50% {
+background-color:#1DA2E9
+}
+ 100% {
+}
+}
+ @-ms-keyframes bounce_circleG {
+0% {
+}
+ 50% {
+background-color:#1DA2E9
+}
+ 100% {
+}
+}
+ @-o-keyframes bounce_circleG {
+0% {
+}
+ 50% {
+background-color:#1DA2E9
+}
+ 100% {
+}
+}
+ @keyframes bounce_circleG {
+0% {
+}
+ 50% {
+background-color:#1DA2E9
+}
+ 100% {
+}
 }

@@ -248,9 +248,14 @@ $(document).ready(function() {
 		$('.fm-chat-attach-popup').removeClass('hidden');
 	});
 	
+	$('.fm-chat-popup-button.add-contact').bind('click', function() {
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-add-user-popup').removeClass('hidden');
+	});
+	
 	$('.nw-fm-close-button').bind('click', function() {
 		$('.fm-dialog-overlay').addClass('hidden');
-		$('.fm-chat-attach-popup').addClass('hidden');
+		$(this).closest('.fm-dialog-popup').addClass('hidden');
 	});
 	
 });
@@ -265,7 +270,7 @@ $(document).ready(function() {
 <div class="fm-dialog-overlay hidden"></div>
 
 <!-- New file attach dialog !-->
-<div class="fm-chat-attach-popup hidden">
+<div class="fm-chat-attach-popup fm-dialog-popup hidden">
    <div class="fm-chat-attach-top">
         <a class="fm-breadcrumbs cloud-drive contains-directories has-next-button">
           <span class="right-arrow-bg ui-draggable"><span>Cloud Drive</span></span>
@@ -316,6 +321,77 @@ $(document).ready(function() {
    </div>
 </div>
 <!-- End of New file attach dialog !-->
+
+<!-- New "Add user to conversation" dialog !-->
+<div class="fm-add-user-popup fm-dialog-popup hidden">
+   <div class="fm-dialog-top fm-add-user-top">
+        <div class="nw-fm-dialog-title">Add contact to conversation:</div>
+        <div class="fm-dialog-search">
+           <input type="text" value="Search" />
+        </div>
+        <div class="nw-fm-close-button"></div>
+   </div>
+   <!-- Please set scrolling init !-->
+   <div class="fm-add-user-scrolling">
+      <!-- Please add "verified" classname !-->
+      <div class="nw-contact-item offline verified">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Andrei.d
+         </div>
+      </div>
+      <div class="nw-contact-item online">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Bram van der Kolk
+         </div>
+      </div>
+      <div class="nw-contact-item away">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Eduardo
+         </div>
+      </div>
+      <div class="nw-contact-item busy verified">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Kim Dotcom
+         </div>
+      </div>
+      <div class="nw-contact-item online">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Bram van der Kolk
+         </div>
+      </div>    
+   </div>
+   <div class="fm-dialog-bottom">
+       <div class="fm-dialog-button red"> Add </div>
+       <div class="fm-dialog-button"> Cancel </div>
+       <div class="clear"></div>
+   </div>
+</div>
+<!-- End of New "Add user to conversation" dialog !-->
 
 <div class="fmholder" id="fmholder">
   <div class="top-head"> 
@@ -874,6 +950,9 @@ $(document).ready(function() {
             <div class="fm-chat-smile grasp"></div>
             <div class="clear"></div>
           </div>
+          
+          <div class="nw-chat-message-icon"></div>
+          
           <div class="fm-chat-input-block">
             <textarea class="message-textarea">Write a message...</textarea>
           </div>

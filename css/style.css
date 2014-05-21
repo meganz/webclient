@@ -3066,6 +3066,60 @@ label.iPhoneCheckLabelOff span {
 .nw-contact-item.selected {
 	background-color: rgba(113,173,58,0.5);
 }
+.fm-add-user-scrolling .nw-contact-item {
+	padding-right: 32px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: right -2907px;
+	background-repeat: no-repeat;
+}
+.fm-add-user-scrolling .nw-contact-item:nth-child(even) {
+	background-color: rgba(0,0,0,0.02);
+}
+.fm-add-user-scrolling .nw-contact-item:hover {
+	background-color: rgba(0,0,0,0.03);
+}
+.fm-add-user-scrolling .nw-contact-item.selected {
+	background-color: rgba(0,0,0,0.05);
+	background-position: right -2859px;
+}
+.fm-add-user-scrolling .nw-contact-item.selected .nw-contact-name {
+	color: #666666;
+}
+.fm-dialog-search {
+	height: 32px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 12px;
+	border: 2px solid #d9d9d9;
+	padding: 0 10px 0 32px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -10px -2969px;
+	background-repeat: no-repeat;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+.fm-dialog-search input {
+	line-height: 27px;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	font-size: 13px;
+	color: #868686;
+}
+.verified .nw-contact-verified-icon {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -19px -2827px;
+	background-repeat: no-repeat;
+	position: absolute;
+	z-index: 10;
+	right: -3px;
+	top: -2px;
+	width: 10px;
+	height: 10px;
+}
 .nw-contact-status {
 	width: 8px;
 	height: 8px;
@@ -5865,9 +5919,17 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	padding: 0 0 0 46px;
 	overflow: hidden;
 	position: relative;
+}
+.nw-chat-message-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: 10px -2460px;
+	background-position: 0 -2460px;
 	background-repeat: no-repeat;
+	width: 26px;
+	height: 24px;
+	position: absolute;
+	left: 12px;
+	top: 10px;
+	z-index: 10;
 }
 .fm-chat-messages-pad .fm-chat-shared-files .block-view-file-type {
 	margin: 8px auto 0 auto;
@@ -5917,7 +5979,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .grid-share-table tr:first-child td:nth-child(3) {
 	width: 45px;
 }
-.fm-chat-attach-popup {
+.fm-chat-attach-popup, .fm-add-user-popup {
 	position: absolute;
 	z-index: 1110;
 	min-width: 600px;
@@ -5937,18 +5999,35 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	overflow: hidden;
 	margin: -243px 0 0 -300px;
 }
-.fm-chat-attach-top {
-	height: 56px;
+.fm-add-user-popup {
+	min-width: 400px;
+	height: 396px;
+	margin: -198px 0 0 -200px;
+}
+.fm-chat-attach-top, .fm-dialog-top {
+	min-height: 56px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 15px 0 0 9px;
+	padding: 15px 32px 0 9px;
 	overflow: hidden;
 	white-space: nowrap;
 	background-color: white;
 	border-bottom: 2px solid #f2f2f2;
 }
-.fm-chat-attach-scrolling {
+.fm-dialog-top.fm-add-user-top {
+	padding: 0;
+	min-height: 96px;
+}
+.nw-fm-dialog-title {
+	font-family: 'Open Sans', Arail;
+	font-size: 16px;
+	line-height: 21px;
+	color: #999999;
+	padding: 15px 33px 2px 33px;
+	text-align: center;
+}
+.fm-chat-attach-scrolling, .fm-add-user-scrolling {
 	height: 100%;
 	height: -webkit-calc(100% - 112px);
 	height: -moz-calc(100% - 112px);
@@ -5956,7 +6035,13 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	background-color: white;
 	overflow: hidden;
 }
-.fm-chat-attach-bottom {
+.fm-add-user-scrolling {
+	height: 100%;
+	height: -webkit-calc(100% - 152px);
+	height: -moz-calc(100% - 152px);
+	height: calc(100% - 152px);
+}
+.fm-chat-attach-bottom, .fm-dialog-bottom {
 	height: 56px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;

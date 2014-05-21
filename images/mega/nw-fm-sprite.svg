@@ -505,4 +505,27 @@
 <path opacity="0.6" fill="#010101" d="M8.412,2784l3.3-3.29c0.39-0.39,0.39-1.03,0-1.42s-1.03-0.39-1.42,0l-3.29,3.3l-3.29-3.3
 	c-0.39-0.39-1.03-0.39-1.42,0s-0.39,1.03,0,1.42l3.3,3.29l-3.3,3.29c-0.39,0.39-0.39,1.03,0,1.42c0.2,0.19,0.45,0.29,0.71,0.29
 	s0.51-0.1,0.71-0.29l3.29-3.3l3.29,3.3c0.2,0.19,0.45,0.29,0.71,0.29s0.51-0.1,0.71-0.29c0.39-0.39,0.39-1.03,0-1.42L8.412,2784z"/>
+<g>
+	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" cx="24" cy="2832" r="5"/>
+	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#32A2DC" cx="24" cy="2832" r="4"/>
+	<g>
+		<rect x="22" y="2832" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+		<rect x="23" y="2833" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+		<rect x="24" y="2832" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+		<rect x="25" y="2831" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+		<rect x="26" y="2830" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	</g>
+</g>
+<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#7AB248" points="18,2883 20.609,2880.33 23.87,2883.67 30.391,2877 
+	33,2879.67 23.87,2889 "/>
+<polygon opacity="0.1" fill-rule="evenodd" clip-rule="evenodd" fill="#010101" points="18,2931 20.609,2928.33 23.87,2931.67 
+	30.391,2925 33,2927.67 23.87,2937 "/>
+<g opacity="0.3">
+	<path fill-rule="evenodd" clip-rule="evenodd" fill="#010101" d="M24,2984.5c-2.49,0-4.5-2.01-4.5-4.5s2.01-4.5,4.5-4.5
+		s4.5,2.01,4.5,4.5S26.49,2984.5,24,2984.5z M24,2974c-3.311,0-6,2.689-6,6s2.689,6,6,6s6-2.689,6-6S27.311,2974,24,2974z"/>
+	<path fill="#010101" d="M28.859,2985.891c-0.26,0.26-0.26,0.67,0,0.93l2.99,2.99c0.25,0.25,0.67,0.25,0.92,0l1.041-1.041
+		c0.25-0.25,0.25-0.67,0-0.92l-2.99-2.99c-0.26-0.26-0.67-0.26-0.93,0L28.859,2985.891z"/>
+	
+		<rect x="26.714" y="2984.361" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 -2061.3726 5115.8213)" fill="#010101" width="4.243" height="0.947"/>
+</g>
 </svg>

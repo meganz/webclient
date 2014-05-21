@@ -3206,7 +3206,8 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-contact-name {
 	font-size: 11px;
-	line-height: 47px;
+	line-height: 21px;
+	padding-top: 14px;
 	color: #666666;
 	margin: 0 0 0 76px;
 }
@@ -5465,7 +5466,7 @@ span.search-number {
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-user, .nw-contact-name, .nw-conversations-name {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;

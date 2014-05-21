@@ -5463,7 +5463,7 @@ span.search-number {
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-user, .nw-contact-name, .nw-conversations-name {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .nw-contact-name, .nw-conversations-name, .fm-chat-smile {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -5761,7 +5761,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
-	padding: 7px 15px 9px 15px;
+	padding: 7px 10px 9px 15px;
 	text-align: left;
 }
 .nw-chat-date {

@@ -132,7 +132,7 @@ describe("Chat.js - Karere UI integration", function() {
     });
 
 
-    it("1on1 chat, invitation accept for 1on1 chat rooms", function(done) {
+    it("1on1 chat, invitation accept for 1on1 chat rooms and leave room", function(done) {
         var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
 
@@ -246,6 +246,28 @@ describe("Chat.js - Karere UI integration", function() {
                 ).to.equal(roomJid);
 
                 expect(eventTriggerShouldReturnFalse2).to.not.be.ok;
+
+                // leave room
+                var leftUsers = {};
+                leftUsers[user2jid] = "none";
+
+                var currentUsers = {};
+                currentUsers[user1jid] = "moderator";
+
+                megaChat.karere._triggerEvent("UsersLeft", new KarereEventObjects.UsersLeft(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    leftUsers
+                ));
+
+                expect(Object.keys(megaChat.chats[roomJid].getUsers()))
+                    .to.deep.equal(
+                        [user1jid]
+                    );
+
+                expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
 
                 done();
             });
@@ -1218,5 +1240,210 @@ describe("Chat.js - Karere UI integration", function() {
 
         });
 
+    });
+
+    it("MegaChatRoom.recover on disconnect", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined",
+                    new KarereEventObjects.UsersJoined(
+                        roomJid + "/" + megaChat.karere.getNickname(),
+                        user1jid,
+                        roomJid,
+                        {},
+                        users
+                    )
+                );
+
+
+                expect(megaChat.chats[roomJid].getParticipants())
+                    .to.have.members(
+                        megaChat.chats[roomJid].users
+                    );
+
+                expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
+
+
+                // accept invitation
+                // first leave the room
+                delete megaChat.chats[roomJid];
+
+                var eventTriggerShouldReturnFalse2 = megaChat.karere._triggerEvent("InviteMessage", {
+                    elems: [],
+                    from: user2jid,
+                    id: "4",
+                    karere: null,
+                    meta: {
+                        ctime: unixtime() - 10000 /* date in the future */,
+                        invitationType: "resume",
+                        participants: [
+                            Strophe.getBareJidFromJid(user1jid),
+                            Strophe.getBareJidFromJid(user2jid)
+                        ],
+                        type: "private",
+                        users: users
+                    },
+                    myOwn: false,
+                    password: undefined,
+                    rawMessage: null,
+                    rawType: null,
+                    room: roomJid,
+                    to: user1jid,
+                    type: "Message"
+                });
+
+                expect(
+                    megaChat.karere.joinChat
+                ).to.have.been.calledOnce;
+
+
+
+                expect(
+                    megaChat.karere.joinChat.getCall(0).args[0]
+                ).to.equal(roomJid);
+
+                // participantExistsInRoom tests
+
+                expect(
+                    megaChat.chats[roomJid].participantExistsInRoom("random-jid-hoes-here")
+                ).to.eql(false);
+
+                expect(
+                    megaChat.chats[roomJid].participantExistsInRoom(user1jid)
+                ).to.eql(true);
+                expect(
+                    megaChat.chats[roomJid].participantExistsInRoom(user2jid)
+                ).to.eql(true);
+
+
+                expect(
+                    megaChat.chats[roomJid].participantExistsInRoom(user1jid, true)
+                ).to.eql(true);
+                expect(
+                    megaChat.chats[roomJid].participantExistsInRoom(user2jid, true)
+                ).to.eql(true);
+
+
+                // getRoomOwenr and .getOrderedUsersInChat test
+                expect(
+                    megaChat.chats[roomJid].getRoomOwner()
+                ).to.eql(user1jid);
+
+
+
+                // disconnect and chat rooms restore test
+
+                megaChat.karere.trigger("onDisconnected");
+
+                $.each(megaChat.chats, function(k, v) {
+                    sinon.stub(v, 'recover', v.recover);
+
+                    expect(v.state).to.eql(
+                        MegaChatRoom.STATE.INITIALIZED
+                    );
+                });
+
+                var onRoomCreatedTriggerCount = 0;
+                megaChat.bind("onRoomCreated.test", function() {
+                    onRoomCreatedTriggerCount++;
+                });
+
+
+                megaChat.karere.trigger("onConnected");
+                expect(megaChat.karere.startChat.callCount).to.eql(
+                    2
+                );
+
+                $.each(megaChat.chats, function(k, v) {
+                    expect(v.recover.callCount).to.eql(
+                        1
+                    );
+
+                    expect(v.state).to.eql(
+                        MegaChatRoom.STATE.JOINING
+                    );
+
+                    expect(onRoomCreatedTriggerCount).to.eql(
+                        1
+                    );
+                });
+                megaChat.unbind("onRoomCreated.test");
+
+
+                // test leave room
+                var room = megaChat.chats[roomJid];
+                megaChat.chats[roomJid].leave();
+                expect(
+                    room.state
+                ).to.eql(
+                        MegaChatRoom.STATE.LEFT
+                    );
+
+                expect(
+                    self.megaChat.karere.leaveChat.callCount
+                ).to.eql(1);
+
+                // restore room state so that the afterEach wont crash
+                megaChat.chats[roomJid].state = MegaChatRoom.STATE.READY;
+
+                done();
+            });
+    });
+
+    it("add/remove new user hooks (via Mega API)", function(done) {
+        sinon.stub(
+            megaChat.karere,
+            'subscribe',
+            megaChat.karere.subscribe
+        );
+
+        sinon.stub(
+            megaChat.karere,
+            'unsubscribe',
+            megaChat.karere.unsubscribe
+        );
+
+
+        megaChat.processNewUser("A_123456789");
+
+        expect(megaChat.karere.subscribe.callCount).to.eql(1);
+        expect(megaChat.karere.unsubscribe.callCount).to.eql(0);
+
+
+        megaChat.processRemovedUser("A_123456789");
+
+        expect(megaChat.karere.subscribe.callCount).to.eql(1);
+        expect(megaChat.karere.unsubscribe.callCount).to.eql(1);
+
+        done();
     });
 });

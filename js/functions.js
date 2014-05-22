@@ -574,7 +574,7 @@ function NOW() {
 function DEBUG2() {
 	if (d) {
 		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorge.ddetailed2) {
+		if (!is_chrome_firefox && localStorage.ddetailed2) {
 			console.warn.apply(console, arguments)
 		} else if (d > 1) console.trace();
 	}
@@ -597,7 +597,7 @@ function DEBUG() {
 	}
 	if (d) {
 		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorge.ddetailed) {
+		if (!is_chrome_firefox && localStorage.ddetailed) {
 			console.error.apply(console, arguments)
 		} else if (d > 1) console.trace();
 	}

@@ -298,6 +298,9 @@ describe("Chat.js - Karere UI integration", function() {
             megaChat.karere.joinChat
         ).to.have.been.called;
 
+        // cleanup
+        delete megaChat.chats[roomJid]._syncDone;
+        sinon.stub(megaChat.chats[roomJid], 'requestMessageSync', megaChat.chats[roomJid].requestMessageSync);
 
         expect(
             megaChat.karere.joinChat.getCall(0).args[0]
@@ -331,6 +334,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         users[user1jid] = "participant";
 
+
         megaChat.karere._triggerEvent("UsersJoined",
             new KarereEventObjects.UsersJoined(
                 roomJid + "/" + Karere.getNicknameFromJid(user1jid) + "resource",
@@ -352,9 +356,17 @@ describe("Chat.js - Karere UI integration", function() {
         );
 
         assert(
-            megaChat.chats[roomJid].state == MegaChatRoom.STATE.SYNCING,
-            "Invalid state found. Expected: SYNCING, got: " + megaChat.chats[roomJid].getStateAsText()
+            megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY,
+            "Invalid state found. Expected: READY, got: " + megaChat.chats[roomJid].getStateAsText()
         );
+
+        expect(
+            megaChat.chats[roomJid].requestMessageSync.callCount
+        ).to.eql(1);
+
+        expect(
+            megaChat.chats[roomJid]._syncDone
+        ).to.eql(true);
 
         expect(megaChat.chats[roomJid].getParticipants()).to.have.members(Object.keys(users));
         expect(megaChat.chats[roomJid].getParticipants().length).to.eql(2);

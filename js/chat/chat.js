@@ -7,7 +7,7 @@
  */
 var MegaChatEnabled = false;
 if (localStorage.megachat) {
-    MegaChatEnabled=true;
+    MegaChatEnabled = true;
 }
 
 
@@ -31,23 +31,25 @@ var chatui;
 
         var $promise;
 
+
         if(localStorage.megaChatPresence != "unavailable") {
             if(megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
                 megaChat.connect()
                     .done(function() {
-                        chatJids.push(megaChat.karere.getBareJid());
 
-                        $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
+
                     });
             } else {
-                chatJids.push(megaChat.karere.getBareJid());
-
-                $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
             }
+
+
         } else {
-            alert("You are currently offline. To chat, you need to change your state back to online, away or busy.");
-            // TODO: Better error message?
+            // XX: I'm offline, should we show some kind of notification saying: hey, you can't send messages while you
+            // are offline?
         }
+
+        chatJids.push(megaChat.karere.getBareJid());
+        $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
 
         if($promise) {
             $promise.done(function(roomJid, room) {
@@ -524,6 +526,20 @@ MegaChat.prototype.init = function() {
 
     var updateMyConnectionStatus = function() {
         self.renderMyStatus();
+        self.renderContactTree()
+    };
+
+
+    /**
+     * Go throught all megaChat.chats[] and run .startChat so that the user will resume any started conversations,
+     * in case of his connection was interuptted
+     */
+    var recoverChats = function() {
+        $.each(self.chats, function(k, v) {
+            if(v.state == MegaChatRoom.STATE.INITIALIZED) {
+                v.recover();
+            }
+        });
     };
 
     this.karere.bind("onConnected", function() {
@@ -531,12 +547,20 @@ MegaChat.prototype.init = function() {
             self.karere.setPresence(localStorage.megaChatPresence, undefined, localStorage.megaChatPresenceMtime);
         }
         updateMyConnectionStatus();
+
+        recoverChats();
     });
     this.karere.bind("onConnecting", updateMyConnectionStatus);
     this.karere.bind("onConnfail", updateMyConnectionStatus);
     this.karere.bind("onAuthfail", updateMyConnectionStatus);
     this.karere.bind("onDisconnecting", updateMyConnectionStatus);
-    this.karere.bind("onDisconnected", updateMyConnectionStatus);
+    this.karere.bind("onDisconnected", function() {
+        updateMyConnectionStatus();
+
+        $.each(self.chats, function(k, v) {
+            v.setState(MegaChatRoom.STATE.INITIALIZED, true);
+        })
+    });
 
     this.karere.bind("onUsersJoined", function(e, eventData) {
         return self._onUsersUpdate("joined", e, eventData);
@@ -614,6 +638,8 @@ MegaChat.prototype.init = function() {
 
         localStorage.megaChatPresence = presence;
         localStorage.megaChatPresenceMtime = unixtime();
+
+        $('.top-user-status-popup').removeClass("active");
 
         if(self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.connect().done(function() {
@@ -764,7 +790,12 @@ MegaChat.prototype.init = function() {
         // no RTC support.
     }
 
-
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED) {
+        self.karere.authSetup(
+            self.getJidFromNodeId(u_handle),
+            self.getMyXMPPPassword()
+        );
+    }
 };
 
 /**
@@ -1213,6 +1244,7 @@ MegaChat.prototype.openChat = function(jids, type) {
 
     if(self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
+        self.currentlyOpenedChat = null;
     }
 
 
@@ -1228,8 +1260,8 @@ MegaChat.prototype.openChat = function(jids, type) {
 
     var tmpJid = room.roomJid;
 
-    $promise.done(function(roomJid, room) {
-        assert(roomJid, "missing room jid");
+//    $promise.done(function(roomJid, room) {
+//        assert(roomJid, "missing room jid");
 
         if(self.currentlyOpenedChat === tmpJid) {
             self.currentlyOpenedChat = roomJid;
@@ -1241,9 +1273,13 @@ MegaChat.prototype.openChat = function(jids, type) {
                 room.refreshUI();
             }
         }
-    });
+//    });
 
 
+
+    if(self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+        return;
+    }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);
 
@@ -1479,6 +1515,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
          */
         'syncRequestCleanupTimeout': 15000,
 
+        /**
+         * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
+         */
+        'pluginsReadyTimeout': 3000,
 
         /**
          * Default media options
@@ -1528,34 +1568,20 @@ var MegaChatRoom = function(megaChat, roomJid) {
     var self = this;
     this.bind('onStateChange', function(e, oldState, newState) {
         if(localStorage.d) {
-            console.debug("Will change state from: ", MegaChatRoom.stateToText(oldState), " to ", MegaChatRoom.stateToText(newState));
+            console.error("Will change state from: ", MegaChatRoom.stateToText(oldState), " to ", MegaChatRoom.stateToText(newState));
         }
+
         var resetStateToReady = function() {
-            if(self.state != MegaChatRoom.STATE.LEFT && self.state != MegaChatRoom.STATE.READY && self.state != MegaChatRoom.STATE.SYNCED) {
+            if(self.state != MegaChatRoom.STATE.LEFT && self.state != MegaChatRoom.STATE.READY) {
                 if(localStorage.d) {
-                    console.warn("Sync failed, setting state to READY.");
+                    console.warn("setting state to READY.");
                 }
-                self.setState(MegaChatRoom.STATE.READY); // its ok, if the sync failed...change the state to DONE
+                self.setState(MegaChatRoom.STATE.READY);
             }
         };
 
         if(newState == MegaChatRoom.STATE.PLUGINS_READY) {
-            if(self.requestMessageSync()) {
-                createTimeoutPromise(
-                    function() {
-                        return self.state == MegaChatRoom.STATE.READY || self.state == MegaChatRoom.STATE.SYNCED
-                    },
-                    200,
-                    self.options.messageSyncFailAfterTimeout
-                )
-                    .fail(function() {
-                        resetStateToReady();
-                    })
-            } else {
-                resetStateToReady();
-            }
-
-
+            resetStateToReady();
         } else if(newState == MegaChatRoom.STATE.JOINED) {
             self.setState(MegaChatRoom.STATE.PLUGINS_WAIT);
 
@@ -1563,18 +1589,25 @@ var MegaChatRoom = function(megaChat, roomJid) {
             var $event = new $.Event("onPluginsWait");
             self.megaChat.trigger($event, [self]);
 
-            if($event.isPropagationStopped()) {
-                return;
+            if(!$event.isPropagationStopped()) {
+                self.setState(MegaChatRoom.STATE.PLUGINS_READY);
             }
-
-            self.setState(MegaChatRoom.STATE.PLUGINS_READY);
-        } else if(newState == MegaChatRoom.STATE.SYNCED) {
-            // XX: we should add the encryption stuff just after state == SYNCED and before state == READY
-            self.setState(MegaChatRoom.STATE.READY);
+        } else if(newState == MegaChatRoom.STATE.PLUGINS_PAUSED) {
+            // allow plugins to hold the PLUGINS_WAIT state for MAX 5s
+            createTimeoutPromise(function() {
+                return self.state !== MegaChatRoom.STATE.PLUGINS_WAIT
+            }, 100, self.options.pluginsReadyTimeout)
+                .fail(function() {
+                    if(self.state == MegaChatRoom.STATE.PLUGINS_WAIT || self.state == MegaChatRoom.STATE.PLUGINS_PAUSED) {
+                        self.setState(MegaChatRoom.STATE.PLUGINS_READY);
+                    }
+                });
         } else if(newState == MegaChatRoom.STATE.READY) {
             if(localStorage.dd) {
                 console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
             }
+            self.requestMessageSync();
+
             if(self._messagesQueue.length > 0) {
                 $.each(self._messagesQueue, function(k, v) {
                     if(!v) {
@@ -1993,7 +2026,7 @@ makeObservable(MegaChatRoom);
 /**
  * Room states
  *
- * @type {{INITIALIZED: number, JOINING: number, JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, SYNCING: number, SYNCED: number, READY: number, LEAVING: number, LEFT: number}}
+ * @type {{INITIALIZED: number, JOINING: number, JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, READY: number, LEAVING: number, LEFT: number}}
  */
 MegaChatRoom.STATE = {
     'INITIALIZED': 5,
@@ -2002,9 +2035,6 @@ MegaChatRoom.STATE = {
 
     'PLUGINS_WAIT': 30,
     'PLUGINS_READY': 40,
-
-    'SYNCING': 50,
-    'SYNCED': 60,
 
 
     'READY': 150,
@@ -2038,18 +2068,30 @@ MegaChatRoom.stateToText = function(state) {
 /**
  * Change the state of this room
  *
- * @param newState {MegaChatRoom.STATE.*}
+ * @param newState {MegaChatRoom.STATE.*} the new state
+ * @param [isRecover] {Boolean}
  */
-MegaChatRoom.prototype.setState = function(newState) {
+MegaChatRoom.prototype.setState = function(newState, isRecover) {
     var self = this;
 
     assert(newState, 'Missing state');
+
+    if(newState == self.state) {
+        if(localStorage.d) {
+            console.log("Ignoring .setState, newState == oldState, current state: ", self.getStateAsText());
+        }
+        return;
+    }
 
     if(self.state) { // if not == null, e.g. setting to INITIALIZED
         // only allow state changes to be increasing the .state value (5->10->....150...) with the exception when a
         // PLUGINS_PAUSED is the current or new state
         assert(
-            newState === MegaChatRoom.STATE.PLUGINS_PAUSED || self.state === MegaChatRoom.STATE.PLUGINS_PAUSED || newState > self.state,
+            newState === MegaChatRoom.STATE.PLUGINS_PAUSED ||
+                self.state === MegaChatRoom.STATE.PLUGINS_PAUSED ||
+                (newState === MegaChatRoom.STATE.JOINING && isRecover) ||
+                (newState === MegaChatRoom.STATE.INITIALIZED && isRecover) ||
+                newState > self.state,
             'Invalid state change. Current:' + MegaChatRoom.stateToText(self.state) +  "to" + MegaChatRoom.stateToText(newState)
         );
     }
@@ -2606,14 +2648,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         $message.insertAfter($after);
     }
 
-    // group messages by hidding the author's name
-    var $authorElement = $('.fm-chat-username', $message);
-    var $prevMessage = $message.prev();
-    if($authorElement.size() > 0 && $prevMessage.is(".fm-chat-messages-block")) {
-        if($('.fm-chat-username', $prevMessage).text() == $authorElement.text()) {
-            $message.addClass('grouped-message');
-        }
-    }
+    self._regroupMessages();
 
 
     $jsp.reinitialise();
@@ -2635,6 +2670,33 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     self.trigger('activity');
 };
+
+
+/**
+ * Should take care of messages grouping (UI)
+ *
+ * @private
+ */
+MegaChatRoom.prototype._regroupMessages = function() {
+    var self = this;
+    var $messages = self.$messages;
+    // group messages by hidding the author's name
+    $('.fm-chat-messages-block', $messages).each(function() {
+        var $message = $(this);
+
+        var $authorElement = $('.fm-chat-username', $message);
+        var $prevMessage = $message.prev();
+        if($authorElement.size() > 0 && $prevMessage.is(".fm-chat-messages-block")) {
+            if($('.fm-chat-username', $prevMessage).text() == $authorElement.text()) {
+                $message.addClass('grouped-message');
+            } else {
+                $message.removeClass('grouped-message');
+            }
+        }
+
+    });
+
+}
 
 /**
  * Generates a DOM Element containing the required UI elements for an inline dialog (buttons, text message, icon, etc)
@@ -2717,6 +2779,15 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
+    console.warn("will eventually sync:", self)
+    // sync only once
+    if(self._syncDone === true) {
+        return;
+    }
+    self._syncDone = true;
+
+    console.warn("sync started:", self)
+
     exceptFromUsers = exceptFromUsers || [];
 
     var users = karere.getUsersInChat(self.roomJid);
@@ -2755,6 +2826,7 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
         console.debug("Potential message sync users: ", ownUsers);
     }
 
+
     var messageId = karere.sendAction(
         userJid,
         'sync',
@@ -2765,10 +2837,6 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
 
     if(!self._syncRequests) {
         self._syncRequests = {};
-    }
-
-    if(self.state != MegaChatRoom.STATE.SYNCING && self.state != MegaChatRoom.STATE.READY) {
-        self.setState(MegaChatRoom.STATE.SYNCING);
     }
 
     self._syncRequests[messageId] = {
@@ -2790,7 +2858,9 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
             self._syncRequests[messageId].timeoutHandler();
         }, self.options.requestMessagesSyncTimeout)
     };
-    console.warn(new Date(), "Sent a sync request to user: ", userJid, " for room: ", self.roomJid);
+    if(localStorage.d) {
+        console.warn(new Date(), "Sent a sync request to user: ", userJid, " for room: ", self.roomJid);
+    }
 
     return true;
 };
@@ -2924,10 +2994,6 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
         if(localStorage.d) {
             console.warn(new Date(), "finished sync from: ", response.getFromJid(), self.roomJid, meta.total);
         }
-
-        if(self.state < MegaChatRoom.STATE.SYNCED) {
-            self.setState(MegaChatRoom.STATE.SYNCED);
-        }
     } else {
         if(localStorage.d) {
             console.debug("waiting for more messages from sync: ", meta.total - (meta.chunkSize + meta.offset));
@@ -2953,6 +3019,28 @@ MegaChatRoom.prototype.getNavElement = function() {
 
 
 /**
+ * Will check if any of the plugins requires a message to be 'queued' instead of sent.
+ *
+ * @param [message] {Object} optional message object (currently not used)
+ * @returns {boolean}
+ */
+MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
+    var self = this;
+    var pluginsForceQueue = false;
+
+    $.each(self.megaChat.plugins, function(k) {
+        if(self.megaChat.plugins[k].shouldQueueMessage) {
+            if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
+                pluginsForceQueue = true;
+                return false; // break
+            }
+        }
+    });
+
+    return pluginsForceQueue;
+}
+
+/**
  * Send message to this room
  *
  * @param message {String}
@@ -2963,19 +3051,12 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
     var megaChat = this.megaChat;
     meta = meta || {};
 
-    // Uncaught AssertionFailed: Messages can only be sent in initialised state.
-    var pluginsForceQueue = false;
 
-
-    $.each(self.megaChat.plugins, function(k) {
-        if(self.megaChat.plugins[k].shouldQueueMessage) {
-            if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
-                pluginsForceQueue = true;
-            }
-        }
-    });
-
-    if(pluginsForceQueue || (self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)) {
+    if(
+        megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
+            self.arePluginsForcingMessageQueue(message) ||
+            (self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)
+        ) {
         var messageId = megaChat.karere.generateMessageId(self.roomJid);
         var eventObject = new KarereEventObjects.OutgoingMessage(
             self.roomJid,
@@ -3091,7 +3172,7 @@ MegaChatRoom.prototype.attachNodes = function(ids, message) {
     var self = this;
     message = message || "";
 
-    if(ids.length == 0) {
+    if(ids.length === 0) {
         return;
     }
 
@@ -3185,6 +3266,25 @@ MegaChatRoom.prototype.renderContactTree = function() {
     }
 
     $navElement.data('chatroom', self);
+};
+
+/**
+ * Re-join - safely join a room after connection error/interruption
+ */
+MegaChatRoom.prototype.recover = function() {
+    var self = this;
+
+    console.error('recovering room: ', self.roomJid, self);
+
+    self._syncRequests = [];
+    self.callIsActive = false;
+    self.callRequest = null;
+    self.setState(MegaChatRoom.STATE.JOINING, true);
+    var $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], (self.type == "private" ? false : undefined));
+
+    self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins
+
+    return $startChatPromise;
 };
 
 

@@ -205,6 +205,17 @@ var Karere = function(user_options) {
         self.sendPong(eventObject.getFromJid(), eventObject.getMessageId());
     });
 
+    // cleanup after disconnecting
+    self.bind("onDisconnected", function() {
+        self._presenceCache = {};
+        self._presenceBareCache = {};
+
+        self._discoCache = {};
+        self._discoBareCache = {};
+
+        self._iqRequests = {};
+    });
+
     // helper functions for simple way of storing/caching some meta info
     return this;
 };
@@ -280,13 +291,13 @@ Karere.DEFAULTS = {
      * When a method which requires connection is called, Karere would try to connect and execute that method.
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
-    connectionRequiredTimeout: 7000,
+    connectionRequiredTimeout: 8000,
 
 
     /**
      * Timeout when connecting
      */
-    connectTimeout: 5000,
+    connectTimeout: 7000,
 
 
     /**
@@ -389,6 +400,37 @@ makeMetaAware(Karere);
     };
 
     /**
+     * Initialize JID and password... (will not automatically connect, to use those credentials for connecting you can
+     * always call .reconnect())
+     *
+     * @param jid string
+     * @param password string
+     */
+    Karere.prototype.authSetup = function(jid, password) {
+        var self = this;
+
+        var bareJid = Strophe.getBareJidFromJid(jid);
+        var fullJid = jid;
+
+        // if there is no /resource defined, generate one on the fly.
+        if(bareJid == fullJid) {
+            var resource = self.options.clientName + "-" + self._generateNewResourceIdx();
+            fullJid = fullJid + "/" + resource;
+        }
+
+        /// we may need this to reconnect in case of disconnect or connection issues.
+        // also, we should reuse the original generated resource, so we cache the full jid here.
+        self._jid = fullJid;
+        self._password = password;
+        self._fullJid = fullJid;
+
+
+        // parse and cache the mucDomain
+        self.options.mucDomain = "conference." + jid.split("@")[1].split("/")[0];
+    };
+
+
+    /**
      * Connect to a XMPP account
      *
      * @param jid
@@ -411,34 +453,18 @@ makeMetaAware(Karere);
         }
 
 
-        var bareJid = Strophe.getBareJidFromJid(jid);
-        var fullJid = jid;
-
-        // if there is no /resource defined, generate one on the fly.
-        if(bareJid == fullJid) {
-            var resource = self.options.clientName + "-" + self._generateNewResourceIdx();
-            fullJid = fullJid + "/" + resource;
-        }
-
-        /// we may need this to reconnect in case of disconnect or connection issues.
-        // also, we should reuse the original generated resource, so we cache the full jid here.
-        self._jid = fullJid;
-        self._password = password;
-
-
-        // parse and cache the mucDomain
-        self.options.mucDomain = "conference." + jid.split("@")[1].split("/")[0];
+        self.authSetup(jid, password);
 
 
 
         self.connection.reset(); // clear any old attached handlers
 
         self.connection.connect(
-            fullJid,
+            self._fullJid,
             self._password,
             function(status) {
                 if(localStorage.d) {
-		            console.warn("Got connection status: ", fullJid, self._password, status);
+		            console.warn("Got connection status: ", self._fullJid, self._password, status);
                 }
 
                 self._connectionState = status;
@@ -512,7 +538,6 @@ makeMetaAware(Karere);
             return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
         }, 100, self.options.connectTimeout)
             .fail(function() {
-                delete self._$connectingPromise;
                 self.disconnect(); /* retry? */
             });
 
@@ -528,7 +553,9 @@ makeMetaAware(Karere);
                     self._$connectingPromise.reject();
                 }
             });
-        return self._$connectingPromise;
+        return self._$connectingPromise.always(function() {
+            delete self._$connectingPromise;
+        });
     };
 
 
@@ -571,30 +598,35 @@ makeMetaAware(Karere);
                 );
             }
             else if(self.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-                if(localStorage.d) {
-		            console.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
-                }
+                if(!self._isReconnecting) {
+                    if(localStorage.d) {
+                        console.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
+                    }
+                    self._isReconnecting = true;
 
-                internalPromises.push(
-                    self.reconnect()
-                );
+                    internalPromises.push(
+                        self.reconnect()
+                    );
+                }
             }
 
             $.when.apply($, internalPromises)
                 .done(function() {
                     fn.apply(self, args)
                         .done(function() {
-                            $promise.resolve.apply($promise, toArray(arguments))
+                            $promise.resolve.apply($promise, toArray(arguments));
                         })
                         .fail(function() {
-                            $promise.reject.apply($promise, toArray(arguments))
+                            $promise.reject.apply($promise, toArray(arguments));
                         });
                 })
                 .fail(function() {
                     $promise.reject(toArray(arguments));
                 });
 
-            return $promise;
+            return $promise.always(function() {
+                self._isReconnecting = false;
+            });
         }
     };
 
@@ -834,7 +866,7 @@ makeMetaAware(Karere);
      * @returns {*}
      */
     Karere.getNormalizedBareJid = function(jid) {
-        if(jid.indexOf("conference.") != -1) {
+        if(jid.indexOf("conference.") != -1 && jid.indexOf("/") != -1) {
             jid = jid.split("/")[1].split("__")[0] + "@" + jid.split("@")[1].split("/")[0].replace("conference.", "");
         } else {
             jid = jid.split("/")[0];

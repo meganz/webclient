@@ -649,7 +649,6 @@ describe("EncryptionFilter", function() {
         });
     });
 
-    // TODO: onPluginsWait flow
     describe("Events plugin handler state/flow", function() {
         // syncRoomUsersWithEncMembers
         // onRoomCreated
@@ -1011,10 +1010,11 @@ describe("EncryptionFilter", function() {
 
             e = new $.Event("onPluginsWait");
             megaChatObj.trigger(e, {
-                getOrderedUsers: function() {
-                    return [
-                        megaChatObj.karere.getJid()
-                    ]
+                encryptionHandler: {
+                    state: mpenc.handler.STATE.INITIALISED
+                },
+                setState: function(newState) {
+                    e.stateChanged = newState;
                 }
             });
 
@@ -1022,14 +1022,16 @@ describe("EncryptionFilter", function() {
 
             e = new $.Event("onPluginsWait");
             megaChatObj.trigger(e, {
-                getOrderedUsers: function() {
-                    return [
-                        megaChatObj.karere.getJid(),
-                        megaChatObj.karere.getJid() + "/user2"
-                    ]
+                encryptionHandler: {
+                    state: mpenc.handler.STATE.NULL
+                },
+                setState: function(newState) {
+                    e.stateChanged = newState;
                 }
             });
             expect(e.isPropagationStopped()).to.be.ok;
+
+            expect(e.stateChanged).to.eql(MegaChatRoom.STATE.PLUGINS_PAUSED);
 
             done();
         });
@@ -1221,7 +1223,7 @@ describe("EncryptionFilter", function() {
             room.state = MegaChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.READY);
+            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY);
             expect(room.setState.callCount).to.eql(3);
             expect(opQueue.pop.callCount).to.eql(2);
 
@@ -1230,7 +1232,7 @@ describe("EncryptionFilter", function() {
             room.state = MegaChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.READY);
+            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY);
             expect(room.setState.callCount).to.eql(4);
             expect(opQueue.pop.callCount).to.eql(3);
 

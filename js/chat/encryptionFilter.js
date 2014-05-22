@@ -94,6 +94,8 @@ var EncryptionFilter = function(megaChat) {
      * Initialize the mpenc.handler.ProtocolHandler and OpQueue when a room is created
      */
     megaChat.bind("onRoomCreated", function(e, megaRoom) {
+        console.error("ROOM created.");
+
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
             TBD.RSA_PRIV_KEY,
@@ -103,9 +105,9 @@ var EncryptionFilter = function(megaChat) {
                 self.flushQueue(megaRoom, handler);
             },
             function(handler) {
-                if(localStorage.d) { console.error("Got state change: ", handler.state); }
+                if(localStorage.d) { console.error("Got state change: ", handler.state, MegaChatRoom.prototype.getStateAsText.apply(megaRoom)); }
 
-                if(handler.state === mpenc.handler.STATE.INITIALISED && megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT) {
+                if(handler.state === mpenc.handler.STATE.INITIALISED && (megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED)) {
                     megaRoom.setState(
                         MegaChatRoom.STATE.PLUGINS_READY
                     )
@@ -113,16 +115,14 @@ var EncryptionFilter = function(megaChat) {
                     megaRoom.setState(
                         MegaChatRoom.STATE.PLUGINS_PAUSED
                     )
-                } else if(handler.state === mpenc.handler.STATE.INITIALISED && megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED) {
-                    megaRoom.setState(
-                        MegaChatRoom.STATE.READY
-                    )
                 }
+
                 if(handler.state === mpenc.handler.STATE.INITIALISED) {
                     megaRoom.encryptionOpQueue.pop();
                 }
             }
         );
+
         megaRoom.encryptionIsInitialized = false;
 
         megaRoom.encryptionOpQueue = new OpQueue(
@@ -178,10 +178,11 @@ var EncryptionFilter = function(megaChat) {
          * Note: ANY plugin should be done in 10secs (see Karere's options for extending the syncDelay)
          */
 
-        if(megaRoom.getOrderedUsers().length > 1) { // only if i'm not the only user in the room
+        // stop and wait for the crypto to be ready
+        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED) {
             e.stopPropagation();
+            megaRoom.setState(MegaChatRoom.STATE.PLUGINS_PAUSED);
         }
-
     });
 
 
@@ -379,6 +380,8 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
         var msg = handler.messageOutQueue.shift();
 
         var toJid = msg.to ? msg.to : megaRoom.roomJid;
+
+        console.error("sending out message to: ", toJid)
 
         megaRoom.megaChat.karere.sendRawMessage(
             toJid,
@@ -747,8 +750,7 @@ EncryptionFilter.prototype.messageShouldNotBeEncrypted = function(eventObject) {
 
 EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject) {
     return (
-            megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ||
-            megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED
+            megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED
         );
 };
 

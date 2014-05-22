@@ -50,7 +50,14 @@ try
 
 		(function(global) {
 			global.loadSubScript = function(file,scope) {
-				Services.scriptloader.loadSubScript(file,scope||global);
+				if (global.d) {
+					Services.scriptloader.loadSubScriptWithOptions(file,{
+						target : scope||global, charset: "UTF-8",
+						ignoreCache : true
+					});
+				} else {
+					Services.scriptloader.loadSubScript(file,scope||global);
+				}
 			};
 		})(this);
 
@@ -68,6 +75,7 @@ try
 			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
 				throw new Error('Initialization failed.');
 			}
+			var d = !!localStorage.d;
 		} catch(e) {
 			alert('Error setting up DOM Storage instance:\n\n'
 				+ e + '\n\n' + mozBrowserID);
@@ -564,12 +572,6 @@ else
 		}
 
 		var xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
-
-		if(fx_startup_cache && d > 1)
-		{
-			console.log('*** Invalidating startup cache ***');
-			Services.obs.notifyObservers(null, "startupcache-invalidate", null);
-		}
 
 		function jsl_start()
 		{

@@ -256,7 +256,7 @@ ClassFile.prototype.destroy = function() {
 		
 		this.dl.onBeforeDownloadComplete(this.dl.pos);
 		if (!this.dl.preview) {
-			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p);
+			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
 		}
 		this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
 		if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);

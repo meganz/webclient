@@ -241,7 +241,7 @@ function mozFrom8(utf8) {
 }
 
 function mozNotifyDL(fn,f) {
-	if (!mozPrefs.getBoolPref('notifydl')) return;
+	if (!mozPrefs.getBoolPref('notifydl')) return false;
 	if (!f) return mozAlert('Download ' + fn + ' finished.');
 
 	mozAlert(fn,'Download Finished.',function(s,t)
@@ -267,6 +267,8 @@ function mozNotifyDL(fn,f) {
 			}
 		}
 	});
+
+	return true;
 }
 
 function mozAddToLibrary(file, name, size, st, type, url)
@@ -335,7 +337,7 @@ function mozSaneFileName(name) {
 }
 
 function mozSanePathTree(path, file) {
-	path = ('' + path).split(/[\\\/]+/).map(mozSaneFileName).filter(String);
+	path = (''+(path||'')).split(/[\\\/]+/).map(mozSaneFileName).filter(String);
 	if (file) path.push(mozSaneFileName(file));
 	return path;
 }
@@ -355,6 +357,11 @@ function mozGetMIMEType(file) {
 	catch(e) {}
 
 	return t || '';
+}
+
+function mozClearStartupCache() {
+	console.log('*** Invalidating startup cache ***');
+	Services.obs.notifyObservers(null, "startupcache-invalidate", null);
 }
 
 (function __FileSystemAPI(scope) {

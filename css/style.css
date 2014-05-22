@@ -5455,7 +5455,7 @@ span.search-number {
 	-ms-user-select: none;
 	user-select: none;
 }
-.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div {
+.nw-contact-avatar, .nw-contact-avatar img, div.nw-chat-sharing-body, div.fm-chat-messages-pad, .block-view-file-type, .nw-chat-expand-arrow, .fm-chat-message, .nw-chat-sharing-body, .nw-chat-sharing-body div, .nw-contact-avatar img {
 	-webkit-touch-callout: none !important;
 	-webkit-user-select: none !important;
 	-khtml-user-select: none !important;
@@ -5761,7 +5761,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
-	padding: 7px 10px 9px 15px;
+	padding: 7px 15px 9px 15px;
 	text-align: left;
 }
 .nw-chat-date {
@@ -5782,6 +5782,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .right-block .fm-chat-message {
 	margin: 0 34px 0 0;
+	padding: 7px 10px 9px 15px;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;

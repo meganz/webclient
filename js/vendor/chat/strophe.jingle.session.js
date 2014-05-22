@@ -319,9 +319,8 @@ createdOffer: function (sdp, cb) {
         self.addFingerprintHmac(init);
         self.sendIq(init, 'offer', null, function() {
             self.state = 'error';
-            if (self.peerconnection.state != 'ended')
-                self.peerconnection.close();
-        });
+            self.jingle.terminate(self, 'initiate-error', 'Error or timeout initiating jingle session');
+        }, self.jingle.jingleAutoAcceptTimeout);
         debugLog("created&sent OFFER to", self.peerjid);    
       }
       if (cb)
@@ -583,7 +582,7 @@ sendTerminate: function (reason, text) {
     debugLog("sent TERMINATE to", this.peerjid);
 },
 
-sendIq: function(iq, src, successCb, errorCb)
+sendIq: function(iq, src, successCb, errorCb, timeout)
 {
     var self = this;
     this.connection.sendIQ(iq,
@@ -607,7 +606,7 @@ sendIq: function(iq, src, successCb, errorCb)
             }
             self.jingle.onJingleError.call(self.eventHandler, self, error, stanza, iq);
         },
-        this.responseTimeout);
+        timeout||this.responseTimeout);
 },
 
 sendMute: function (muted, content) {

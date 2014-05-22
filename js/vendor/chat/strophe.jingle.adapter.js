@@ -1,14 +1,13 @@
-
 // mozilla chrome compat layer -- very similar to adapter.js
+//Based on code from ESTOS
+
 function WebrtcApi() {
     if (navigator.mozGetUserMedia) {
         console.log('This appears to be Firefox');
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks)
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
-
-        var version = parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1], 10);
-        if (version < 22)
-            throw new Error('Your version of Firefox is too old, at lest version 22 is required');
+        if (!mozRTCPeerConnection)
+            throw new Error('Your version of Firefox is too old, at lest version 22 for Desktop and version 24 for Andorid is required');
         
         this.peerconnection = mozRTCPeerConnection;
         this.browser = 'firefox';
@@ -29,17 +28,12 @@ function WebrtcApi() {
     } else if (navigator.webkitGetUserMedia) {
         console.log('This appears to be Chrome');
         this.peerconnection =  webkitRTCPeerConnection;
-        this.browser =  'chrome';
+        this.browser =  window.opr?'opera':'chrome';
         this.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
         this.attachMediaStream = function (element, stream) {
             element.attr('src', webkitURL.createObjectURL(stream));
         };
-//            pc_constraints: {} // FIVE-182
-        if (navigator.userAgent.indexOf('Android') < 0)
-            this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support in canary
-          else
-            this.pc_constraints = {}; // disable DTLS on Android
-            
+        this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox            
 		this.cloneMediaStream = function(src, what) {
             var stream = new webkitMediaStream;
 			if (what.audio)
@@ -62,8 +56,7 @@ function WebrtcApi() {
             };
         }
     } else {
-        this.unsupported = true;
-        console.log('Browser does not appear to be WebRTC-capable');
+        throw new Error('Browser does not appear to be WebRTC-capable');
     }
     var mst = this.MediaStreamTrack;
     if (mst && mst.getSources) {
@@ -194,6 +187,13 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um, self, 
     }
 }		
 
-var RTC = new WebrtcApi;
-if (RTC.unsupported)
+var RTC = null;
+
+try {
+    RTC = new WebrtcApi;
+}
+catch(e)
+{
     RTC = null;
+    console.warn("Error enabling webrtc support: "+e);
+}

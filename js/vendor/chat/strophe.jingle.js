@@ -85,8 +85,8 @@ var JinglePlugin = {
 
         if (RTC.getMediaInputTypesFromScan) {
             RTC.getMediaInputTypesFromScan(function(types) {
-                hasAudio = (types.audio && !(mediaFlags & o.DISABLE_MIC));
-                hasVideo = (types.video && !(mediaFlags & o.DISABLE_CAM));
+                var hasAudio = (types.audio && !(mediaFlags & o.DISABLE_MIC));
+                var hasVideo = (types.video && !(mediaFlags & o.DISABLE_CAM));
                 if (hasAudio)
                     addAudioCaps();
                 if (hasVideo)

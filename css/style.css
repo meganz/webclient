@@ -9923,7 +9923,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin-left: 0;
 }
 .top-login-warning-arrow {
-	background-image: url(http://test/webclient/images/mega/top-sprite.svg);
+	background-image: url(../images/mega/top-sprite.svg);
 	background-position: 2px -420px;
 	background-repeat: no-repeat;
 	width: 30px;

@@ -648,8 +648,10 @@ MegaChat.prototype.init = function() {
             return true;
         } else {
             if(presence == Karere.PRESENCE.OFFLINE) {
+                self.karere.resetConnectionRetries();
                 self.karere.disconnect();
             } else {
+                self.karere.resetConnectionRetries();
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
             }
         }
@@ -806,6 +808,8 @@ MegaChat.prototype.init = function() {
 MegaChat.prototype.connect = function() {
     var self = this;
 
+    self.karere.resetConnectionRetries();
+
     return self.karere.connect(
                 self.getJidFromNodeId(u_handle),
                 self.getMyXMPPPassword()
@@ -934,6 +938,8 @@ MegaChat.prototype.destroy = function() {
         room.destroy();
         delete self.chats[roomJid];
     });
+
+    self.karere.resetConnectionRetries();
 
     return self.karere.disconnect()
         .done(function() {

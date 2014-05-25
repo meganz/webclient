@@ -11,18 +11,18 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
     var self = this;
     var karere = this._conn.karere;
 
-    if(!karere._errors) {
-        karere._errors = 0;
+    if(!karere._connectionRetries) {
+        karere._connectionRetries = 0;
     }
-    karere._errors++;
+    karere._connectionRetries++;
 
 
     if(localStorage.d) {
-		console.warn("request error, status: " + reqStatus + ", number of errors: " + karere._errors);
+		console.warn("request error, status: " + reqStatus + ", number of errors: " + karere._connectionRetries);
     }
 
 
-    if (karere._errors > karere.options.maxConnectionRetries) {
+    if (karere._connectionRetries > karere.options.maxConnectionRetries) {
         this._onDisconnectTimeout();
     } else {
         setTimeout(function() {
@@ -30,7 +30,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
                 .done(function() {
                     karere.reconnect();
                 });
-        }, karere._errors * 1000)
+        }, karere._connectionRetries * 1000)
     }
 };
 
@@ -216,6 +216,19 @@ var Karere = function(user_options) {
         self._iqRequests = {};
     });
 
+
+    self._connectionRetries = 0;
+
+    self.bind("onConnected", function() {
+        self._connectionRetries = 0; // reset connection retries
+
+        // stop any timer which is running to try to reconnect (which should not happen, but since Karere is async...
+        // race condition may trigger a .reconnect() by a timer)
+        if(self._connectionRetryInProgress) {
+            clearTimeout(self._connectionRetryInProgress);
+        }
+    });
+
     // helper functions for simple way of storing/caching some meta info
     return this;
 };
@@ -283,11 +296,6 @@ Karere.DEFAULTS = {
     disconnectQueueTimeout: 2000,
 
     /**
-     * Maximum connection retry in case of error
-     */
-    maxConnectionRetries: 10,
-
-    /**
      * When a method which requires connection is called, Karere would try to connect and execute that method.
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
@@ -299,6 +307,18 @@ Karere.DEFAULTS = {
      */
     connectTimeout: 7000,
 
+
+    /**
+     * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
+     * self._connectionRetries * this value)
+     */
+    reconnectDelay: 550,
+
+
+    /**
+     * Maximum connection retry in case of error OR timeout
+     */
+    maxConnectionRetries: 3,
 
     /**
      * Timeout waiting for a ping response from user (note: using client-to-client xmpp ping)
@@ -480,7 +500,7 @@ makeMetaAware(Karere);
 		                console.warn(self.getNickname(), 'Karere failed to connect.');
                     }
 
-                    if(self._errors >= self.options.maxConnectionRetries) {
+                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onConnfail');
@@ -496,7 +516,7 @@ makeMetaAware(Karere);
 		                console.warn(self.getNickname(), 'Karere is disconnecting.');
                     }
 
-                    if(self._errors >= self.options.maxConnectionRetries) {
+                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
 
@@ -506,7 +526,7 @@ makeMetaAware(Karere);
                         console.info(self.getNickname(), 'Karere is disconnected.');
                     }
 
-                    if(self._errors >= self.options.maxConnectionRetries) {
+                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onDisconnected');
@@ -520,7 +540,7 @@ makeMetaAware(Karere);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingIq, self), null, 'iq', null, null,  null);
 
 
-                    self._errors = 0; // reset connection errors
+                    self._connectionRetries = 0; // reset connection errors
 
                     self.setPresence(); // really important...if we dont call this...the user will not be visible/online to the others in the roster
                                         // so no messages will get delivered.
@@ -538,7 +558,23 @@ makeMetaAware(Karere);
             return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
         }, 100, self.options.connectTimeout)
             .fail(function() {
-                self.disconnect(); /* retry? */
+                delete self._$connectingPromise;
+
+                if((self._connectionRetries + 1) < self.options.maxConnectionRetries) {
+                    self._connectionRetries++;
+
+                    self.disconnect()
+                        .always(function() {
+                            clearTimeout(self._connectionRetryInProgress);
+
+                            self._connectionRetryInProgress = setTimeout(function() {
+                                self.reconnect()
+                            }, (self._connectionRetries + 1) * self.options.reconnectDelay)
+
+                        });
+                } else {
+                    self.disconnect();
+                }
             });
 
         // sync the _$connectionPromise in realtime with the original $promise
@@ -673,7 +709,6 @@ makeMetaAware(Karere);
     Karere.prototype.disconnect = function() {
         var self = this;
 
-
         if(
             self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED ||
                 self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING ||
@@ -708,6 +743,8 @@ makeMetaAware(Karere);
             self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED
         }
 
+        clearTimeout(self._connectionRetryInProgress);
+
         return createTimeoutPromise(
             function() {
                 return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED;
@@ -718,6 +755,17 @@ makeMetaAware(Karere);
             self.clearMeta('rooms');
         });
     };
+
+    /**
+     * Use this method to force Karere to reset the connection retry count and stop any active/waiting attempts to
+     * re-connect
+     */
+    Karere.prototype.resetConnectionRetries = function() {
+        var self = this;
+
+        self._connectionRetries = 0;
+        clearTimeout(self._connectionRetryInProgress);
+    }
 }
 
 /**

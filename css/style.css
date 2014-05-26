@@ -4922,7 +4922,7 @@ table {
 .transfer-type, .transfer-status {
 	height: 24px;
 	line-height: 22px;
-	padding: 0 0 0 27px;
+	padding: 0 0 0 24px;
 	white-space: nowrap;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -4939,23 +4939,22 @@ table {
 	background-position: -7px -3538px;
 }
 .transfer-status.completed {
-	background-position: -10px -4093px;
-	padding: 0 0 0 24px;
+	background-position: -9px -4093px;
+	padding: 0 0 0 21px;
 }
 .transfer-status.queued {
-	background-position: -10px -3563px;
-	padding: 0 0 0 24px;
+	background-position: -9px -3563px;
+	padding: 0 0 0 21px;
 }
 .transfer-status.error {
-	background-position: -10px -4124px;
-	padding: 0 0 0 24px;
+	background-position: -7px -4124px;
 }
-.transfer-status.paused {
+.transfer-type.paused {
 	background-position: -7px -3490px;
-	padding: 0 0 0 24px;
 }
 .transfer-status.initiliazing {
-	background-position: -10px -4163px;
+	background-position: -9px -4163px;
+	padding: 0 0 0 21px;
 }
 .transfer-status.pending {
 	background-image: none;
@@ -15480,9 +15479,6 @@ background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
  background-image:url(../images/mega/context-top@2x.png);
 background-size:27px auto;
 }
-.transfer-status.error {
- background-position: 0 -10573px;
-}
 .fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head {
  background-image: url(../images/mega/chat-sprite@2x.png?v=2);
  background-size:72px auto;
@@ -15777,7 +15773,7 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contact-status-icon .transfer-type, .transfer-status, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }

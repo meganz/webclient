@@ -3251,7 +3251,7 @@ label.iPhoneCheckLabelOff span {
 .nw-conversations-item.selected .nw-conversations-name {
 	color: white;
 }
-.file-transter-icon {
+.file-transfer-icon {
 	height: 48px;
 	width: 48px;
 	position: absolute;
@@ -3261,8 +3261,141 @@ label.iPhoneCheckLabelOff span {
 	background-position: center -581px;
 	cursor: pointer;
 }
-.file-transter-icon:hover {
+.file-transfer-icon:hover {
 	background-position: center -651px;
+}
+.file-transfer-download, .file-transfer-upload {
+	height: 48px;
+	width: 48px;
+	background-image: url(../images/mega/transfer-progress.svg);
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+.download-percents-0 .file-transfer-download {
+	background-position: -1px -436px;
+}
+.download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download, .download-percents-3 .file-transfer-download {
+	background-position: -1px -476px;
+}
+.download-percents-4 .file-transfer-download, .download-percents-5 .file-transfer-download, .download-percents-6 .file-transfer-download {
+	background-position: -1px -516px;
+}
+.download-percents-7 .file-transfer-download, .download-percents-8 .file-transfer-download, .download-percents-9 .file-transfer-download {
+	background-position: -1px -556px;
+}
+.download-percents-10 .file-transfer-download, .download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
+	background-position: -1px -596px;
+}
+.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download, .download-percents-15 .file-transfer-download {
+	background-position: -1px -636px;
+}
+.download-percents-16 .file-transfer-download, .download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download {
+	background-position: -1px -676px;
+}
+.download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download, .download-percents-21 .file-transfer-download {
+	background-position: -1px -716px;
+}
+.download-percents-22 .file-transfer-download, .download-percents-23 .file-transfer-download, .download-percents-24 .file-transfer-download {
+	background-position: -1px -756px;
+}
+.download-percents-25 .file-transfer-download, .download-percents-26 .file-transfer-download, .download-percents-27 .file-transfer-download {
+	background-position: -1px -796px;
+}
+.download-percents-28 .file-transfer-download, .download-percents-29 .file-transfer-download, .download-percents-30 .file-transfer-download {
+	background-position: -1px -836px;
+}
+.download-percents-31 .file-transfer-download, .download-percents-32 .file-transfer-download, .download-percents-33 .file-transfer-download {
+	background-position: -1px -876px;
+}
+.download-percents-34 .file-transfer-download, .download-percents-35 .file-transfer-download, .download-percents-36 .file-transfer-download {
+	background-position: -1px -916px;
+}
+.download-percents-37 .file-transfer-download, .download-percents-38 .file-transfer-download, .download-percents-39 .file-transfer-download {
+	background-position: -1px -956px;
+}
+.download-percents-0 {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-3 .file-transfer-download, .download-percents-4 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-5 .file-transfer-download, .download-percents-6 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-7 .file-transfer-download, .download-percents-8 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-9 .file-transfer-download, .download-percents-10 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-15 .file-transfer-download, .download-percents-16 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-21 .file-transfer-download, .download-percents-22 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-23 .file-transfer-download, .download-percents-24 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-25 .file-transfer-download, .download-percents-26 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-27 .file-transfer-download, .download-percents-28 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-29 .file-transfer-download, .download-percents-30 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-31 .file-transfer-download, .download-percents-32 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-33 .file-transfer-download, .download-percents-34 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-35 .file-transfer-download, .download-percents-36 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-37 .file-transfer-download, .download-percents-38 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-38 .file-transfer-download, .download-percents-39 .file-transfer-download {
+	ackground-position: -1px -9`6px;
+}
+.download-percents-40 .file-transfer-download, .download-percents-41 .file-transfer-download {
+	ackground-position: -1px -956px;
+}
+.download-percents-42 .file-transfer-download, .download-percents-43 .file-transfer-download {
+	background-position: -1px -996px;
+}
+.download-percents-44 .file-transfer-download, .download-percents-45 .file-transfer-download {
+	background-position: -1px -1036px;
+}
+.download-percents-46 .file-transfer-download, .download-percents-47 .file-transfer-download {
+	background-position: -1px -1076px;
+}
+.download-percents-48 .file-transfer-download, .download-percents-49 .file-transfer-download {
+	background-position: -1px -1116px;
+}
+.download-percents-48 .file-transfer-download, .download-percents-49 .file-transfer-download {
+	background-position: -1px -1116px;
+}
+.download-percents-50 .file-transfer-download {
+	background-position: -1px -1156px;
 }
 .tree-item {
 	display: none;
@@ -3662,6 +3795,7 @@ label.iPhoneCheckLabelOff span {
 	float: left;
 	height: 100%;
 	position: relative;
+	min-height:250px;
 }
 .nw-fm-tree-header {
 	position: relative;

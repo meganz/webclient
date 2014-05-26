@@ -8,35 +8,37 @@
     <a class="contacts-sorting-type desc">Descending</a>
   </div>
   
+  <!-- Please add/remove "left-points-position/right-points-position/top-points-position/bottom-points-position" class to activate points and set its position !-->
   <div class="context-menu files-menu hidden">
-	<a class="context-menu-item open-item">[$865]</a>
-	<a class="context-menu-item preview-item">[$1899]</a>
-	<a class="context-menu-item download-item">[$58]</a>
-    <a class="context-menu-item download-standart-item">Standard download</a>
-	<a class="context-menu-item zipdownload-item">[$864]</a>
-	<a class="context-menu-item send-to-contact-item">Send to contact</a>
-    <a class="context-menu-item getlink-item">[$59]</a>
-	<a class="context-menu-item sharing-item">[$60]</a>
-	<a class="context-menu-item rename-item">[$61]</a>
-	<a class="context-menu-item move-item">[$62]</a>
-	<a class="context-menu-item copy-item">[$63]</a>
-	<a class="context-menu-item newfolder-item">[$68]</a>
-	<a class="context-menu-item fileupload-item"><label for="fileselect3" class=""><input type="file" id="fileselect3" name="fileselect3" class="hidden">[$99]</label></a>
-	<a class="context-menu-item folderupload-item"><label for="fileselect4" class=""><input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />[$98]</label></a>
-	<a class="context-menu-item remove-item">[$83]</a>
-	<a class="context-menu-item removeshare-item">[$144]</a>
-	<a class="context-menu-item properties-item">[$892]</a>
-	<a class="context-menu-item permissions-item">[$64]</a>
-	<a class="context-menu-item clearbin-item">[$70]</a>
-	<a class="context-menu-item addcontact-item">[$71]</a>
-	<a class="context-menu-item reply-item">Reply</a>
-    <a class="context-menu-item reply-to-all">Reply to all</a>
-    <a class="context-menu-item forward-item">Forward</a>
-    <a class="context-menu-item add-star-item">[$975]</a>
-    <a class="context-menu-item canceltransfer-item">[$103]</a>
+    <div class="context-menu-points"></div>
+	<a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
+	<a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
+	<a class="context-menu-item download-item"><span class="context-menu-icon"></span>[$58]</a>
+    <a class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</a>
+	<a class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</a>
+	<a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>Send to contact</a>
+    <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
+	<a class="context-menu-item sharing-item"><span class="context-menu-icon"></span>[$60]</a>
+	<a class="context-menu-item rename-item"><span class="context-menu-icon"></span>[$61]</a>
+	<a class="context-menu-item move-item"><span class="context-menu-icon"></span>[$62]</a>
+	<a class="context-menu-item copy-item"><span class="context-menu-icon"></span>[$63]</a>
+	<a class="context-menu-item newfolder-item"><span class="context-menu-icon"></span>[$68]</a>
+	<a class="context-menu-item fileupload-item"><span class="context-menu-icon"></span><label for="fileselect3" class=""><input type="file" id="fileselect3" name="fileselect3" class="hidden">[$99]</label></a>
+	<a class="context-menu-item folderupload-item"><span class="context-menu-icon"></span><label for="fileselect4" class=""><input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />[$98]</label></a>
+	<a class="context-menu-item remove-item"><span class="context-menu-icon"></span>[$83]</a>
+	<a class="context-menu-item removeshare-item"><span class="context-menu-icon"></span>[$144]</a>
+	<a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$892]</a>
+	<a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
+	<a class="context-menu-item clearbin-item"><span class="context-menu-icon"></span>[$70]</a>
+	<a class="context-menu-item addcontact-item"><span class="context-menu-icon"></span>[$71]</a>
+	<a class="context-menu-item reply-item"><span class="context-menu-icon"></span>Reply</a>
+    <a class="context-menu-item reply-to-all"><span class="context-menu-icon"></span>Reply to all</a>
+    <a class="context-menu-item forward-item"><span class="context-menu-icon"></span>Forward</a>
+    <a class="context-menu-item add-star-item"><span class="context-menu-icon"></span>[$975]</a>
+    <a class="context-menu-item canceltransfer-item"><span class="context-menu-icon"></span>[$103]</a>
     <div class="context-menu-divider"></div>
-    <a class="context-menu-item select-all">Select all</a>
-    <a class="context-menu-item refresh-item">[$85]</a>
+    <a class="context-menu-item select-all"><span class="context-menu-icon"></span>Select all</a>
+    <a class="context-menu-item refresh-item"><span class="context-menu-icon"></span>[$85]</a>
   </div>
   
   
@@ -71,7 +73,8 @@
                  <div class="nw-fm-left-icon conversations">
                    <div class="nw-fm-left-tooltip">Conversations</div>
                  </div>
-                 <div class="file-transter-icon"></div>
+                 <!-- Please add "filled" classname if user have deleted items !-->
+                 <div class="rubbish-bin-button"><div class="rubbish-bin-icon"></div></div>
               </div>
     
     <div class="fm-left-panel">
@@ -416,12 +419,12 @@
        <div class="files-grid-view hidden">
             <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                <tr>
-                  <th class="grid-first-th" width="30"><span class="grid-header-star"></span></th>
+                  <th class="grid-first-th" ><span class="grid-header-star"></span></th>
                   <th><div class="arrow name asc">[$86]</div></th>
-                  <th width="100"><div class="arrow size">[$87]</div></th>
-                  <th width="130"><div class="arrow type">[$93]</div></th>
-                  <th width="120"><div class="arrow date">[$896]</div></th>
-                  <th width="50" class="grid-url-header">URL</th>
+                  <th><div class="arrow size">[$87]</div></th>
+                  <th><div class="arrow type">[$93]</div></th>
+                  <th><div class="arrow date">[$896]</div></th>
+                  <th class="grid-url-header"></th>
                </tr>
             </table>
             <div class="grid-scrolling-table">
@@ -1398,24 +1401,32 @@ Please delete files or <a href="">upgrade your account.</a></span>
 
 <div class="transfer-panel">
       <div class="transfer-drag-handle"></div>
+      <div class="file-transter-icon"></div>
       <div class="transfer-panel-title">
          [$104]
       </div>
       <a class="tranfer-view-icon"></a>
       <a class="transfer-settings-icon"></a>
+      <!-- Please add/remove "active" class to sjow/hide upload and download indicators !-->
+      <div class="tranfer-upload-indicator active">
+        640 Kb/s
+      </div>
+      <div class="tranfer-download-indicator active">
+        1640 Kb/s
+      </div>
       <a class="transfer-pause-icon"></a>
-      <div class="transfer-points"></div>
       <div class="clear"></div>
       <div class="tranfer-table">
         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
             <tr>
               <th>[$86]</th>
-              <th width="120">[$87]</th>
-              <th width="180">[$88]</th>
-              <th width="250">[$89]</th>
-              <th width="100">[$90]</th>
-              <th width="100">[$91]</th>
-              <th width="110">[$92]</th>
+              <th>[$87]</th>
+              <th>[$88]</th>
+              <th>[$89]</th>
+              <th>[$90]</th>
+              <th>[$91]</th>
+              <th>[$92]</th>
+              <th class="grid-url-header"></th>
             </tr>
         </table>
         <div class="transfer-scrolling-table">
@@ -1428,6 +1439,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
               <th width="100"></th>
               <th width="100"></th>
 			  <th width="110"></th>
+              <th width="60" class="grid-url-field"></th>
             </tr>                       
         </table>
        </div>

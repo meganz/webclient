@@ -331,9 +331,13 @@ function mozError(e) {
 }
 
 function mozSaneFileName(name) {
+	// http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
 	name = ('' + name).replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.');
 	if (name.length > 250) name = name.substr(0,250) + name.split('.').pop();
-	return name.trim();
+	name = name.replace(/\s+/g,' ').trim();
+	var end = name.lastIndexOf('.'); end = ~end && end || name.length;
+	if(/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0,end))) name = '!' + name;
+	return name;
 }
 
 function mozSanePathTree(path, file) {

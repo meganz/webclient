@@ -74,11 +74,11 @@
                    <div class="nw-fm-left-tooltip">Conversations</div>
                  </div>
                  <!-- Please add "filled" classname if user have deleted items !-->
-                 <div class="rubbish-bin-button"><div class="rubbish-bin-icon"></div></div>
+                 <div class="nw-fm-left-icon rubbish-bin"><div class="rubbish-bin-icon"></div><div class="nw-fm-left-tooltip">Conversations</div></div>
               </div>
     
     <div class="fm-left-panel">
-                <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations" !-->
+                <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
                 <div class="fm-left-menu cloud-drive">
                    <div class="nw-fm-tree-header cloud-drive"> 
                       Cloud Drive 
@@ -94,6 +94,10 @@
                    </div>
                    <div class="nw-fm-tree-header conversations"> 
                       Conversations
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header rubbish-bin"> 
+                      Rubbish bin
                       <div class="nw-fm-settins-icon"></div>
                    </div>
                 </div>
@@ -254,6 +258,170 @@
                         </div>
                      </div>
                   </div>  
+                  <div class="content-panel rubbish-bin">
+                   <ul>
+                     <li>
+                       <!-- 
+                          Please add "selected" classname if item is selected. 
+                          Please add "contains-folders" classnanme if item has subfolders. 
+                          Please add "expanded" classname if item is expaned. 
+                       !-->
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div>
+                  <div class="content-panel rubbish-bin">
+                   <ul>
+                     <li>
+                       <!-- 
+                          Please add "selected" classname if item is selected. 
+                          Please add "contains-folders" classnanme if item has subfolders. 
+                          Please add "expanded" classname if item is expaned. 
+                       !-->
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div>
                 </div>
               
               </div>

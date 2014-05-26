@@ -2895,7 +2895,7 @@ label.iPhoneCheckLabelOff span {
 	overflow: hidden;
 	display: none;
 }
-.content-panel.cloud-drive, .content-panel.shared-with-me {
+.content-panel.cloud-drive, .content-panel.shared-with-me, .content-panel.rubbish-bin {
 	padding: 24px 0;
 }
 .fm-tree-panel ul, .fm-move-dialog-body ul {
@@ -2988,6 +2988,15 @@ label.iPhoneCheckLabelOff span {
 .shared-with-me .nw-fm-tree-item.dragover {
 	background-color: rgba(254,174,0,0.2);
 }
+.rubbish-bin .nw-fm-tree-item:hover {
+	background-color: rgba(113,173,58,0.1);
+}
+.rubbish-bin .nw-fm-tree-item.selected {
+	background-color: rgba(113,173,58,0.5);
+}
+.rubbish-bin .nw-fm-tree-item.dragover {
+	background-color: rgba(113,173,58,0.2);
+}
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
 	list-style: none;
@@ -3032,6 +3041,9 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: -17px -911px;
 	overflow: hidden;
+}
+.rubbish-bin .nw-fm-tree-folder {
+	background-position: -17px -5341px;
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
@@ -3631,16 +3643,19 @@ label.iPhoneCheckLabelOff span {
 	background-color: rgba(242,242,242,100);
 }
 .fm-left-menu.cloud-drive {
-	background-color: rgba(213,22,0,100);
+	background-color: rgba(213,22,0,1);
 }
 .fm-left-menu.shared-with-me {
-	background-color: rgba(252,173,0,100);
+	background-color: rgba(252,173,0,1);
 }
 .fm-left-menu.contacts {
-	background-color: rgba(113,173,58,100);
+	background-color: rgba(113,173,58,1);
 }
 .fm-left-menu.conversations {
-	background-color: rgba(31,165,224,100);
+	background-color: rgba(31,165,224,1);
+}
+.fm-left-menu.rubbish-bin {
+	background-color: rgba(115,172,58,1);
 }
 .nw-fm-left-icons-panel {
 	background-color: #222222;
@@ -3659,7 +3674,7 @@ label.iPhoneCheckLabelOff span {
 	color: white;
 	display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin {
 	display: block;
 }
 .nw-fm-settins-icon {
@@ -3779,7 +3794,7 @@ label.iPhoneCheckLabelOff span {
 	width: 100%;
 	height: 100%;
 }
-.rubbish-bin-button {
+.nw-fm-left-icon.rubbish-bin {
 	height: 48px;
 	width: 48px;
 	position: absolute;
@@ -3791,8 +3806,9 @@ label.iPhoneCheckLabelOff span {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
+	background-image:none;
 }
-.rubbish-bin-button:hover {
+.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active {
 	background-color: rgba(115,172,58,1);
 }
 .rubbish-bin-icon {
@@ -3812,19 +3828,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.3;
 	cursor: pointer;
 }
-.rubbish-bin-button:hover .rubbish-bin-icon {
+.nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.rubbish-bin-button.filled:hover .rubbish-bin-icon {
+.nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
 }
-.rubbish-bin-icon.filled {
+.filled .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
@@ -8864,7 +8880,7 @@ border-spacing: 0;
 	border: 0;
 }
 .fm-account-header {
-	font-size: 15px;
+	font-size: 14px;
 	line-height: 21px;
 	color: #666666;
 	padding: 0 0 10px 0;

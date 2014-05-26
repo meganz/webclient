@@ -1893,15 +1893,12 @@ function gridUI()
 	$('.fm-files-view-icon.block-view').removeClass('active');
 	$.gridHeader = function()  
 	{	
-		var el = $('.grid-table-header th');		
-		var i=0;
-		var w=0;		
-		while (i < el.length)
-		{
-			if (i !== 1) w+=$(el[i]).width();
-			i++;
-		}
-		$('.grid-table-header th:eq(1)').width($('.files-grid-view').width()-w-60);
+		
+		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+		
 		initTransferScroll();
 	}	
 	$.contactgridHeader = function()
@@ -1914,7 +1911,10 @@ function gridUI()
 			if (i !== 0) w+=$(el[i]).width();
 			i++;
 		}
-		$('.contacts-grid-header th:eq(0)').width($('.contacts-grid-view').width()-w-34);
+		$('.contacts-grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.contacts-grid-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
 		initTransferScroll();
 	}	
 	if (M.currentdirid == 'contacts') $.selectddUIgrid = '.contacts-grid-table';
@@ -1962,7 +1962,7 @@ function gridUI()
 	else
 	{
 		$('.grid-url-arrow').show();
-		$('.grid-url-header').text('URL');
+		$('.grid-url-header').text('');
 	}	
 	$('.files-grid-view,.fm-empty-cloud').unbind('contextmenu');
 	$('.files-grid-view,.fm-empty-cloud').bind('contextmenu',function(e)
@@ -2875,7 +2875,6 @@ function selectddUI()
     selectionManager = new SelectionManager(
         $('.file-block-scrolling')
     );
-	
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('contextmenu', function (e) 
@@ -3127,14 +3126,11 @@ function transferPanelUI()
 	{		
 		fm_resize_handler();
 		var el = $('.transfer-table-header th');
-		var i=1;
-		var w=0;		
-		while (i < el.length)
-		{
-			w+=$(el[i]).width();
-			i++;
-		}
-		$('.transfer-table-header th:eq(0)').width($('.transfer-panel').width()-w-82);	
+		$('.transfer-table tr:first-child th').each(function(i,e) {
+		  var headerColumn = $('.transfer-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+		
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
 		{
@@ -3293,8 +3289,8 @@ function menuItems()
 			var n = M.d[$.selected[i]];					
 			if (n && !n.fav) $.delfav=0;
 		}				
-		if ($.delfav) $('.add-star-item').text(l[976]);				
-		else $('.add-star-item').text(l[975]);
+		if ($.delfav) $('.add-star-item').html('<span class="context-menu-icon"></span>'+l[976]);				
+		else $('.add-star-item').html('<span class="context-menu-icon"/></span>'+l[975]);
 	}
 	var n = M.d[$.selected[0]];
 	if (n && n.p.length == 11) items['removeshare'] = 1;

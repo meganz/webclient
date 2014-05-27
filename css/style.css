@@ -3261,143 +3261,212 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: center -581px;
 	cursor: pointer;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding:4px 0 0 4px;
 }
 .file-transfer-icon:hover {
 	background-position: center -651px;
 }
 .file-transfer-download, .file-transfer-upload {
-	height: 48px;
-	width: 48px;
+	height: 40px;
+	width: 40px;
 	background-image: url(../images/mega/transfer-progress.svg);
 	background-repeat: no-repeat;
 	background-position: center top;
 }
-.download-percents-0 .file-transfer-download {
-	background-position: -1px -436px;
-}
-.download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download, .download-percents-3 .file-transfer-download {
-	background-position: -1px -476px;
-}
-.download-percents-4 .file-transfer-download, .download-percents-5 .file-transfer-download, .download-percents-6 .file-transfer-download {
-	background-position: -1px -516px;
-}
-.download-percents-7 .file-transfer-download, .download-percents-8 .file-transfer-download, .download-percents-9 .file-transfer-download {
-	background-position: -1px -556px;
-}
-.download-percents-10 .file-transfer-download, .download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
-	background-position: -1px -596px;
-}
-.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download, .download-percents-15 .file-transfer-download {
-	background-position: -1px -636px;
-}
-.download-percents-16 .file-transfer-download, .download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download {
-	background-position: -1px -676px;
-}
-.download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download, .download-percents-21 .file-transfer-download {
-	background-position: -1px -716px;
-}
-.download-percents-22 .file-transfer-download, .download-percents-23 .file-transfer-download, .download-percents-24 .file-transfer-download {
-	background-position: -1px -756px;
-}
-.download-percents-25 .file-transfer-download, .download-percents-26 .file-transfer-download, .download-percents-27 .file-transfer-download {
-	background-position: -1px -796px;
-}
-.download-percents-28 .file-transfer-download, .download-percents-29 .file-transfer-download, .download-percents-30 .file-transfer-download {
-	background-position: -1px -836px;
-}
-.download-percents-31 .file-transfer-download, .download-percents-32 .file-transfer-download, .download-percents-33 .file-transfer-download {
-	background-position: -1px -876px;
-}
-.download-percents-34 .file-transfer-download, .download-percents-35 .file-transfer-download, .download-percents-36 .file-transfer-download {
-	background-position: -1px -916px;
-}
-.download-percents-37 .file-transfer-download, .download-percents-38 .file-transfer-download, .download-percents-39 .file-transfer-download {
-	background-position: -1px -956px;
-}
+
 .download-percents-0 {
-	ackground-position: -1px -9`6px;
+	background-position: -5px 40px;
 }
-.download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download, .download-percents-3 .file-transfer-download, .download-percents-4 .file-transfer-download {
+	background-position: -5px -40px;
 }
-.download-percents-3 .file-transfer-download, .download-percents-4 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-5 .file-transfer-download, .download-percents-6 .file-transfer-download, .download-percents-7 .file-transfer-download, .download-percents-8 .file-transfer-download {
+	background-position: -5px -120px;
 }
-.download-percents-5 .file-transfer-download, .download-percents-6 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-9 .file-transfer-download, .download-percents-10 .file-transfer-download, .download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
+	background-position: -5px -200px;
 }
-.download-percents-7 .file-transfer-download, .download-percents-8 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download, .download-percents-15 .file-transfer-download, .download-percents-16.file-transfer-download {
+	background-position: -5px -280px;
 }
-.download-percents-9 .file-transfer-download, .download-percents-10 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download, .download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download {
+	background-position: -5px -360px;
 }
-.download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-21 .file-transfer-download, .download-percents-22 .file-transfer-download, .download-percents-23 .file-transfer-download, .download-percents-24 .file-transfer-download {
+	background-position: -5px -440px;
 }
-.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-25 .file-transfer-download, .download-percents-26 .file-transfer-download, .download-percents-27 .file-transfer-download, .download-percents-28 .file-transfer-download {
+	background-position: -5px -520px;
 }
-.download-percents-15 .file-transfer-download, .download-percents-16 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-29 .file-transfer-download, .download-percents-30 .file-transfer-download, .download-percents-31 .file-transfer-download {
+	background-position: -5px -600px;
 }
-.download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-32 .file-transfer-download, .download-percents-33 .file-transfer-download, .download-percents-34 .file-transfer-download {
+	background-position: -5px -680px;
 }
-.download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-35 .file-transfer-download, .download-percents-36 .file-transfer-download, .download-percents-37 .file-transfer-download {
+	background-position: -5px -760px;
 }
-.download-percents-21 .file-transfer-download, .download-percents-22 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-38 .file-transfer-download, .download-percents-39 .file-transfer-download, .download-percents-40 .file-transfer-download {
+	background-position: -5px -840px;
 }
-.download-percents-23 .file-transfer-download, .download-percents-24 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-41 .file-transfer-download, .download-percents-42 .file-transfer-download, .download-percents-43 .file-transfer-download {
+	background-position: -5px -920px;
 }
-.download-percents-25 .file-transfer-download, .download-percents-26 .file-transfer-download {
-	ackground-position: -1px -9`6px;
+.download-percents-44 .file-transfer-download, .download-percents-45 .file-transfer-download, .download-percents-46 .file-transfer-download {
+	background-position: -5px -1000px;
 }
-.download-percents-27 .file-transfer-download, .download-percents-28 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-29 .file-transfer-download, .download-percents-30 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-31 .file-transfer-download, .download-percents-32 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-33 .file-transfer-download, .download-percents-34 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-35 .file-transfer-download, .download-percents-36 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-37 .file-transfer-download, .download-percents-38 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-38 .file-transfer-download, .download-percents-39 .file-transfer-download {
-	ackground-position: -1px -9`6px;
-}
-.download-percents-40 .file-transfer-download, .download-percents-41 .file-transfer-download {
-	ackground-position: -1px -956px;
-}
-.download-percents-42 .file-transfer-download, .download-percents-43 .file-transfer-download {
-	background-position: -1px -996px;
-}
-.download-percents-44 .file-transfer-download, .download-percents-45 .file-transfer-download {
-	background-position: -1px -1036px;
-}
-.download-percents-46 .file-transfer-download, .download-percents-47 .file-transfer-download {
-	background-position: -1px -1076px;
-}
-.download-percents-48 .file-transfer-download, .download-percents-49 .file-transfer-download {
-	background-position: -1px -1116px;
-}
-.download-percents-48 .file-transfer-download, .download-percents-49 .file-transfer-download {
-	background-position: -1px -1116px;
+.download-percents-47 .file-transfer-download, .download-percents-48 .file-transfer-download, .download-percents-49 .file-transfer-download {
+	background-position: -5px -1080px;
 }
 .download-percents-50 .file-transfer-download {
-	background-position: -1px -1156px;
+	background-position: -5px -1160px;
 }
+
+.download-percents-51 .file-transfer-download, .download-percents-52 .file-transfer-download, .download-percents-53 .file-transfer-download, .download-percents-54 .file-transfer-download {
+	background-position: -5px -1240px;
+}
+.download-percents-55 .file-transfer-download, .download-percents-56 .file-transfer-download, .download-percents-57 .file-transfer-download, .download-percents-58 .file-transfer-download {
+	background-position: -5px -1320px;
+}
+.download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download, , .download-percents-62 .file-transfer-download {
+	background-position: -5px -1400px;
+}
+.download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66.file-transfer-download {
+	background-position: -5px -1480px;
+}
+.download-percents-67 .file-transfer-download, .download-percents-68 .file-transfer-download, .download-percents-69 .file-transfer-download, .download-percents-70 .file-transfer-download {
+	background-position: -5px -1560px;
+}
+.download-percents-71 .file-transfer-download, .download-percents-72 .file-transfer-download, .download-percents-73 .file-transfer-download, .download-percents-74 .file-transfer-download {
+	background-position: -5px -1640px;
+}
+.download-percents-75 .file-transfer-download, .download-percents-76 .file-transfer-download, .download-percents-77 .file-transfer-download, .download-percents-78 .file-transfer-download {
+	background-position: -5px -1720px;
+}
+.download-percents-79 .file-transfer-download, .download-percents-80 .file-transfer-download, .download-percents-81 .file-transfer-download {
+	background-position: -5px -1800px;
+}
+.download-percents-82 .file-transfer-download, .download-percents-83 .file-transfer-download, .download-percents-84 .file-transfer-download {
+	background-position: -5px -1880px;
+}
+.download-percents-85 .file-transfer-download, .download-percents-86 .file-transfer-download, .download-percents-87 .file-transfer-download {
+	background-position: -5px -1960px;
+}
+.download-percents-88 .file-transfer-download, .download-percents-89 .file-transfer-download, .download-percents-90 .file-transfer-download {
+	background-position: -5px -2040px;
+}
+.download-percents-91 .file-transfer-download, .download-percents-92 .file-transfer-download, .download-percents-93 .file-transfer-download {
+	background-position: -5px -2120px;
+}
+.download-percents-94 .file-transfer-download, .download-percents-95 .file-transfer-download, .download-percents-96 .file-transfer-download {
+	background-position: -5px -2200px;
+}
+.download-percents-97 .file-transfer-download, .download-percents-98 .file-transfer-download, .download-percents-99 .file-transfer-download {
+	background-position: -5px -2280px;
+}
+.download-percents-100 .file-transfer-download {
+	background-position: -5px -2360px;
+}
+
+.upload-percents-0 {
+	background-position: -5px 40px;
+}
+.upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload, , .upload-percents-4 .file-transfer-upload {
+	background-position: -5px -2440px;
+}
+.upload-percents-5 .file-transfer-upload, .upload-percents-6 .file-transfer-upload, .upload-percents-7 .file-transfer-upload, .upload-percents-8 .file-transfer-upload {
+	background-position: -5px -2520px;
+}
+.upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload, , .upload-percents-12 .file-transfer-upload {
+	background-position: -5px -2600px;
+}
+.upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16.file-transfer-upload {
+	background-position: -5px -2680px;
+}
+.upload-percents-17 .file-transfer-upload, .upload-percents-18 .file-transfer-upload, .upload-percents-19 .file-transfer-upload, .upload-percents-20 .file-transfer-upload {
+	background-position: -5px -2760px;
+}
+.upload-percents-21 .file-transfer-upload, .upload-percents-22 .file-transfer-upload, .upload-percents-23 .file-transfer-upload, .upload-percents-24 .file-transfer-upload {
+	background-position: -5px -2840px;
+}
+.upload-percents-25 .file-transfer-upload, .upload-percents-26 .file-transfer-upload, .upload-percents-27 .file-transfer-upload, .upload-percents-28 .file-transfer-upload {
+	background-position: -5px -2920px;
+}
+.upload-percents-29 .file-transfer-upload, .upload-percents-30 .file-transfer-upload, .upload-percents-31 .file-transfer-upload {
+	background-position: -5px -3000px;
+}
+.upload-percents-32 .file-transfer-upload, .upload-percents-33 .file-transfer-upload, .upload-percents-34 .file-transfer-upload {
+	background-position: -5px -3080px;
+}
+.upload-percents-35 .file-transfer-upload, .upload-percents-36 .file-transfer-upload, .upload-percents-37 .file-transfer-upload {
+	background-position: -5px -3160px;
+}
+.upload-percents-38 .file-transfer-upload, .upload-percents-39 .file-transfer-upload, .upload-percents-40 .file-transfer-upload {
+	background-position: -5px -3240px;
+}
+.upload-percents-41 .file-transfer-upload, .upload-percents-42 .file-transfer-upload, .upload-percents-43 .file-transfer-upload {
+	background-position: -5px -3320px;
+}
+.upload-percents-44 .file-transfer-upload, .upload-percents-45 .file-transfer-upload, .upload-percents-46 .file-transfer-upload {
+	background-position: -5px -3400px;
+}
+.upload-percents-47 .file-transfer-upload, .upload-percents-48 .file-transfer-upload, .upload-percents-49 .file-transfer-upload {
+	background-position: -5px -3480px;
+}
+.upload-percents-50 .file-transfer-upload {
+	background-position: -5px -3560px;
+}
+
+.upload-percents-51 .file-transfer-upload, .upload-percents-52 .file-transfer-upload, .upload-percents-53 .file-transfer-upload, .upload-percents-54 .file-transfer-upload {
+	background-position: -5px -3640px;
+}
+.upload-percents-55 .file-transfer-upload, .upload-percents-56 .file-transfer-upload, .upload-percents-57 .file-transfer-upload, .upload-percents-58 .file-transfer-upload {
+	background-position: -5px -3720px;
+}
+.upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload, , .upload-percents-62 .file-transfer-upload {
+	background-position: -5px -3800px;
+}
+.upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66.file-transfer-upload {
+	background-position: -5px -3880px;
+}
+.upload-percents-67 .file-transfer-upload, .upload-percents-68 .file-transfer-upload, .upload-percents-69 .file-transfer-upload, .upload-percents-70 .file-transfer-upload {
+	background-position: -5px -3960px;
+}
+.upload-percents-71 .file-transfer-upload, .upload-percents-72 .file-transfer-upload, .upload-percents-73 .file-transfer-upload, .upload-percents-74 .file-transfer-upload {
+	background-position: -5px -4040px;
+}
+.upload-percents-75 .file-transfer-upload, .upload-percents-76 .file-transfer-upload, .upload-percents-77 .file-transfer-upload, .upload-percents-78 .file-transfer-upload {
+	background-position: -5px -4120px;
+}
+.upload-percents-79 .file-transfer-upload, .upload-percents-80 .file-transfer-upload, .upload-percents-81 .file-transfer-upload {
+	background-position: -5px -4200px;
+}
+.upload-percents-82 .file-transfer-upload, .upload-percents-83 .file-transfer-upload, .upload-percents-84 .file-transfer-upload {
+	background-position: -5px -4280px;
+}
+.upload-percents-85 .file-transfer-upload, .upload-percents-86 .file-transfer-upload, .upload-percents-87 .file-transfer-upload {
+	background-position: -5px -4360px;
+}
+.upload-percents-88 .file-transfer-upload, .upload-percents-89 .file-transfer-upload, .upload-percents-90 .file-transfer-upload {
+	background-position: -5px -4440px;
+}
+.upload-percents-91 .file-transfer-upload, .upload-percents-92 .file-transfer-upload, .upload-percents-93 .file-transfer-upload {
+	background-position: -5px -4520px;
+}
+.upload-percents-94 .file-transfer-upload, .upload-percents-95 .file-transfer-upload, .upload-percents-96 .file-transfer-upload {
+	background-position: -5px -4600px;
+}
+.upload-percents-97 .file-transfer-upload, .upload-percents-98 .file-transfer-upload, .upload-percents-99 .file-transfer-upload {
+	background-position: -5px -4680px;
+}
+.upload-percents-100 .file-transfer-upload {
+	background-position: -5px -4760px;
+}
+
 .tree-item {
 	display: none;
 }

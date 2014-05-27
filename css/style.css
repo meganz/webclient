@@ -524,7 +524,7 @@ label span.black {
 	width: 973px;
 	height: 30px;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 16px;
 	color: #888787;
 	padding: 0;
@@ -763,7 +763,7 @@ a.account-manage-button:hover {
 }
 .account-italic-txt {
 	font-style: italic;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 18px;
 	color: #8A8A8A;
 	padding: 12px 0 0 0;
@@ -784,7 +784,7 @@ a.account-manage-button:hover {
 	float: left;
 	width: 42px;
 	color: #6b6c6f;
-	font-size: 14px;
+	font-size: 12px;
 	line-height: 18px;
 	text-align: center;
 	margin-right: 48px;
@@ -861,7 +861,7 @@ input.radioOn, input.radioOff {
 }
 .radio-txt {
 	float: left;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 16px;
 	color: #6c6d6f;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
@@ -3263,7 +3263,7 @@ label.iPhoneCheckLabelOff span {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding:4px 0 0 4px;
+	padding: 4px 0 0 4px;
 }
 .file-transfer-icon:hover {
 	background-position: center -651px;
@@ -3275,7 +3275,6 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: center top;
 }
-
 .download-percents-0 {
 	background-position: -5px 40px;
 }
@@ -3324,15 +3323,14 @@ label.iPhoneCheckLabelOff span {
 .download-percents-50 .file-transfer-download {
 	background-position: -5px -1160px;
 }
-
 .download-percents-51 .file-transfer-download, .download-percents-52 .file-transfer-download, .download-percents-53 .file-transfer-download, .download-percents-54 .file-transfer-download {
 	background-position: -5px -1240px;
 }
 .download-percents-55 .file-transfer-download, .download-percents-56 .file-transfer-download, .download-percents-57 .file-transfer-download, .download-percents-58 .file-transfer-download {
 	background-position: -5px -1320px;
 }
-.download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download, , .download-percents-62 .file-transfer-download {
-	background-position: -5px -1400px;
+.download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download,, .download-percents-62 .file-transfer-download {
+ background-position: -5px -1400px;
 }
 .download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66.file-transfer-download {
 	background-position: -5px -1480px;
@@ -3370,18 +3368,17 @@ label.iPhoneCheckLabelOff span {
 .download-percents-100 .file-transfer-download {
 	background-position: -5px -2360px;
 }
-
 .upload-percents-0 {
 	background-position: -5px 40px;
 }
-.upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload, , .upload-percents-4 .file-transfer-upload {
-	background-position: -5px -2440px;
+.upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload,, .upload-percents-4 .file-transfer-upload {
+ background-position: -5px -2440px;
 }
 .upload-percents-5 .file-transfer-upload, .upload-percents-6 .file-transfer-upload, .upload-percents-7 .file-transfer-upload, .upload-percents-8 .file-transfer-upload {
 	background-position: -5px -2520px;
 }
-.upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload, , .upload-percents-12 .file-transfer-upload {
-	background-position: -5px -2600px;
+.upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload,, .upload-percents-12 .file-transfer-upload {
+ background-position: -5px -2600px;
 }
 .upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16.file-transfer-upload {
 	background-position: -5px -2680px;
@@ -3419,15 +3416,14 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-50 .file-transfer-upload {
 	background-position: -5px -3560px;
 }
-
 .upload-percents-51 .file-transfer-upload, .upload-percents-52 .file-transfer-upload, .upload-percents-53 .file-transfer-upload, .upload-percents-54 .file-transfer-upload {
 	background-position: -5px -3640px;
 }
 .upload-percents-55 .file-transfer-upload, .upload-percents-56 .file-transfer-upload, .upload-percents-57 .file-transfer-upload, .upload-percents-58 .file-transfer-upload {
 	background-position: -5px -3720px;
 }
-.upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload, , .upload-percents-62 .file-transfer-upload {
-	background-position: -5px -3800px;
+.upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload,, .upload-percents-62 .file-transfer-upload {
+ background-position: -5px -3800px;
 }
 .upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66.file-transfer-upload {
 	background-position: -5px -3880px;
@@ -3465,7 +3461,6 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-100 .file-transfer-upload {
 	background-position: -5px -4760px;
 }
-
 .tree-item {
 	display: none;
 }
@@ -3864,7 +3859,7 @@ label.iPhoneCheckLabelOff span {
 	float: left;
 	height: 100%;
 	position: relative;
-	min-height:250px;
+	min-height: 250px;
 }
 .nw-fm-tree-header {
 	position: relative;
@@ -4006,7 +4001,7 @@ label.iPhoneCheckLabelOff span {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
-	background-image:none;
+	background-image: none;
 }
 .nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active {
 	background-color: rgba(115,172,58,1);
@@ -4425,8 +4420,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-khtml-opacity: 0;
 	opacity: 0;
 	position: absolute;
-top: 0;
-left: 12px;
+	top: 0;
+	left: 12px;
 }
 .file-settings-icon {
 	width: 38px;
@@ -5668,7 +5663,7 @@ span.search-number {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	line-height: 27px;
-	font-size: 13px;
+	font-size: 12px;
 	color: #383b3d;
 	padding: 0 10px;
 }
@@ -8701,19 +8696,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	left: 4px;
 	top: 4px;
 	background-position: -3px -3830px;
-	display:none;
+	display: none;
 }
 table {
-display: table;
-border-collapse: separate;
-border-spacing: 0;
+	display: table;
+	border-collapse: separate;
+	border-spacing: 0;
 }
 .transfer-table-header th, .transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
-	display:block;
-	float:left;
+	display: block;
+	float: left;
 }
-.left-points-position  .context-menu-points, .right-points-position  .context-menu-points, .top-points-position  .context-menu-points, .bottom-points-position  .context-menu-points {
-	display:block;
+.left-points-position .context-menu-points, .right-points-position .context-menu-points, .top-points-position .context-menu-points, .bottom-points-position .context-menu-points {
+	display: block;
 }
 .left-points-position.context-menu, .right-points-position.context-menu {
 	padding: 16px 0 8px 0;
@@ -9337,7 +9332,7 @@ border-spacing: 0;
 }
 .fm-account-labels label {
 	height: 50px;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 18px;
 	color: #333333;
 	display: table-cell;
@@ -9358,7 +9353,7 @@ border-spacing: 0;
 .account-select-txt {
 	display: block;
 	line-height: 25px;
-	font-size: 13px;
+	font-size: 12px;
 	color: #868686;
 	padding: 0 10px;
 }

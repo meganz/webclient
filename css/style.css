@@ -7264,8 +7264,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-account-button {
 	cursor: pointer;
 	display: inline-block;
-	margin: 10px 5px 0 5px;
+	margin: 9px 5px 0 5px;
 	float: none;
+	font-size: 12px;
+    line-height: 27px;
+	height: 29px;
 }
 .fm-dialog-button.links-button {
 	position: relative;

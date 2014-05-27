@@ -3276,7 +3276,7 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: center top;
 }
-.download-percents-0 {
+.download-percents-0 .file-transfer-download {
 	background-position: -5px 40px;
 }
 .download-percents-1 .file-transfer-download, .download-percents-2 .file-transfer-download, .download-percents-3 .file-transfer-download, .download-percents-4 .file-transfer-download {
@@ -3369,7 +3369,7 @@ label.iPhoneCheckLabelOff span {
 .download-percents-100 .file-transfer-download {
 	background-position: -5px -2360px;
 }
-.upload-percents-0 {
+.upload-percents-0 .file-transfer-upload {
 	background-position: -5px 40px;
 }
 .upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload,, .upload-percents-4 .file-transfer-upload {

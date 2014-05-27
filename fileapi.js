@@ -229,15 +229,19 @@ function mozAB2SDepad(ab) {
 	return mozAB2S(ab,++i);
 }
 
-const mozUConv = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-	.createInstance(Ci.nsIScriptableUnicodeConverter);
-mozUConv.charset = "UTF-8";
+function mozUConv(cs) {
+	var c = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+		.createInstance(Ci.nsIScriptableUnicodeConverter);
+	c.charset = cs || "UTF-8";
+	return c;
+}
 
 function mozTo8(unicode) {
-	return mozUConv.ConvertFromUnicode(unicode);
+	var c = mozUConv();
+	return c.ConvertFromUnicode(unicode) + c.Finish();
 }
 function mozFrom8(utf8) {
-	return mozUConv.ConvertToUnicode(utf8);
+	return mozUConv().ConvertToUnicode(utf8);
 }
 
 function mozNotifyDL(fn,f) {

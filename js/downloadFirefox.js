@@ -6,7 +6,7 @@ function FirefoxIO(dl_id, dl)
 
 	this.write = function (buffer, offset, done)
 	{
-		if (d) console.log('Writing...', offset, PATH);
+		if (d) console.log('Writing...', buffer.byteLength, offset, PATH);
 		FD.write(buffer).then(l => Soon(done), error);
 	};
 
@@ -24,6 +24,8 @@ function FirefoxIO(dl_id, dl)
 
 		mozIOSetup(name, dl.zipid ? '' : dl.p, size, error, p =>
 		{
+			if (!dl.st) dl.st = Date.now();
+
 			OS.File.open(PATH=p, { trunc: true }).then(fd =>
 			{
 				FD = fd;
@@ -106,7 +108,7 @@ function mozIOError(name)
 function mozIOCleanup(name, path, size, dl)
 {
 	if (d) console.log('mozIOCleanup', name, path);
-	OS.File.setDates(path, null, dl.t*1e3);
+	if (dl.t) OS.File.setDates(path, null, dl.t*1e3);
 	mozAddToLibrary(path, name, size, dl.st );
 }
 

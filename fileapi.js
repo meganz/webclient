@@ -229,19 +229,23 @@ function mozAB2SDepad(ab) {
 	return mozAB2S(ab,++i);
 }
 
-const mozUConv = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-	.createInstance(Ci.nsIScriptableUnicodeConverter);
-mozUConv.charset = "UTF-8";
+function mozUConv(cs) {
+	var c = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+		.createInstance(Ci.nsIScriptableUnicodeConverter);
+	c.charset = cs || "UTF-8";
+	return c;
+}
 
 function mozTo8(unicode) {
-	return mozUConv.ConvertFromUnicode(unicode);
+	var c = mozUConv();
+	return c.ConvertFromUnicode(unicode) + c.Finish();
 }
 function mozFrom8(utf8) {
-	return mozUConv.ConvertToUnicode(utf8);
+	return mozUConv().ConvertToUnicode(utf8);
 }
 
 function mozNotifyDL(fn,f) {
-	if (!mozPrefs.getBoolPref('notifydl')) return;
+	if (!mozPrefs.getBoolPref('notifydl')) return false;
 	if (!f) return mozAlert('Download ' + fn + ' finished.');
 
 	mozAlert(fn,'Download Finished.',function(s,t)
@@ -267,6 +271,8 @@ function mozNotifyDL(fn,f) {
 			}
 		}
 	});
+
+	return true;
 }
 
 function mozAddToLibrary(file, name, size, st, type, url)
@@ -329,13 +335,17 @@ function mozError(e) {
 }
 
 function mozSaneFileName(name) {
+	// http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
 	name = ('' + name).replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.');
 	if (name.length > 250) name = name.substr(0,250) + name.split('.').pop();
-	return name.trim();
+	name = name.replace(/\s+/g,' ').trim();
+	var end = name.lastIndexOf('.'); end = ~end && end || name.length;
+	if(/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0,end))) name = '!' + name;
+	return name;
 }
 
 function mozSanePathTree(path, file) {
-	path = ('' + path).split(/[\\\/]+/).map(mozSaneFileName).filter(String);
+	path = (''+(path||'')).split(/[\\\/]+/).map(mozSaneFileName).filter(String);
 	if (file) path.push(mozSaneFileName(file));
 	return path;
 }
@@ -355,6 +365,11 @@ function mozGetMIMEType(file) {
 	catch(e) {}
 
 	return t || '';
+}
+
+function mozClearStartupCache() {
+	console.log('*** Invalidating startup cache ***');
+	Services.obs.notifyObservers(null, "startupcache-invalidate", null);
 }
 
 (function __FileSystemAPI(scope) {

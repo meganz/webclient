@@ -704,7 +704,12 @@ function enc_attr(attr,key)
 {
 	var ab;
 
-	ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
+	try {
+		ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
+	} catch(e) {
+		msgDialog('warningb', l[135], e.message || e);
+		throw e;
+	}
 
 	// if no key supplied, generate a random one
 	if (!key.length) for (i = 4; i--; ) key[i] = rand(0x100000000);
@@ -732,6 +737,20 @@ function dec_attr(attr,key)
 	try {
 		return JSON.parse(from8(b.substr(4)));
 	} catch (e) {
+		if (d) console.error(b, e);
+		var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/), s = m && m[1], l = s && s.length || 0, j=',';
+		while (l--)
+		{
+			s = s.substr(0,l||1);
+			try {
+				from8(s+j);
+				break;
+			} catch(e) {}
+		}
+		if (~l) try {
+			var new_name = s+j+'trunc'+Math.random().toString(16).slice(-4)+(m[2]||'');
+			return JSON.parse(from8(b.substr(4).replace(m[0],'"n":"'+new_name+'"')));
+		} catch(e) {}
 		return { n : 'MALFORMED_ATTRIBUTES' };
 	}
 }
@@ -2533,3 +2552,103 @@ function crypto_share_rsa2aes()
 		}
 	};
 })(this);
+
+
+
+
+
+
+/*
+Ed25519 pubk/privk storage
+
+usage:
+
+Ed_putkeys('publickey','secretkey');
+
+Ed_getkeys(function(pubkey,privkey)
+{
+	console.log('public key: ',pubkey);
+	console.log('private key: ',privkey);
+});
+
+
+Ed_getpubkey('wN-NqeMUkGs',
+{
+	callback: function(pubkey,ctx)
+	{
+		if (pubkey) console.log('public key for user ' + ctx.u + ' is: ' + pubkey);
+		else console.log('no public key for user ' + ctx.u);
+	}
+});
+
+*/
+
+
+
+// Store my keypair:
+function Ed_putkeys(Eb_pubk,Eb_privk)
+{
+	// Encrypt private key with the user's secret key to a private user attribute
+	api_req({'a':'up','Ed25519privk':a32_to_base64(encrypt_key(u_k_aes,str_to_a32(Eb_privk)))});
+	// Store public key as a public user attribute (+ user attributes are public)
+	api_req({'a':'up','+Ed25519pubk':base64urlencode(Eb_pubk)});
+}
+
+// Retrieve my keypair:
+function Ed_getkeys(callback)
+{
+	if (!u_attr['Ed25519privk'])
+	{
+		// console.log('no private key found in user attributes (should not happen)');
+	}
+	else
+	{
+		Ed_getpubkey(u_handle,
+		{
+			callback2: callback,
+			callback: function(res,ctx)
+			{
+				var privatekey = a32_to_str(decrypt_key(u_k_aes,str_to_a32(u_attr['Ed25519privk'])));
+				if (ctx.callback2) ctx.callback2(res,privatekey);				
+				//console.log('privatekey',privatekey);
+				//console.log('publickey',res);
+			}
+		});	
+	}	
+}
+
+
+var Ed25519pubk = {};
+// Get public key for any user:
+function Ed_getpubkey(userhandle,ctx)
+{	
+	// If cached, make immediate callback:
+	if (Ed25519pubk[userhandle]) ctx.callback(Ed25519pubk[userhandle],ctx);	
+	else
+	{
+		ctx.u = userhandle;
+		api_req({a:'uga',u:userhandle,ua:'+Ed25519pubk'},
+		{
+			u : userhandle,
+			ctx2: ctx,
+			callback: function(res,ctx)
+			{
+				if (typeof res !== 'number')
+				{
+					// console.log('make callback with public key');
+					Ed25519pubk[ctx.u] = base64urldecode(res);
+					if (ctx.ctx2) ctx.ctx2.callback(Ed25519pubk[ctx.u],ctx.ctx2);					
+				}
+				else
+				{
+					// console.log('no public key found (should not happen)');
+					if (ctx.ctx2 && ctx.ctx2.callback) ctx.ctx2.callback(false,ctx.ctx2);
+					console.log('no +Ed25519pubk attribute for user ' + ctx.u);
+				}
+			}
+		});
+	}	
+}
+
+
+

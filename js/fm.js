@@ -3197,8 +3197,8 @@ function transferPanelUI()
 		if (slideshowid && previews[slideshowid]) previewsrc(previews[slideshowid].src);		
     });
 	
-	$('.tranfer-view-icon').unbind('click');
-	$('.tranfer-view-icon').bind('click', function (e) 
+	$('.tranfer-view-icon,.file-transfer-icon').unbind('click');
+	$('.tranfer-view-icon,.file-transfer-icon').bind('click', function (e) 
 	{
 		$.transferOpen();
     });

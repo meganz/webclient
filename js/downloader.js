@@ -83,6 +83,8 @@ ClassChunk.prototype.updateProgress = function(force) {
 		this.dl.pos // this download position
 	);
 
+	this.dl.speed = this.Progress.speed
+
 	this.Progress.dl_prevprogress = _progress
 	this.Progress.dl_lastprogress = NOW()
 }

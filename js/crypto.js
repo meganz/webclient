@@ -704,7 +704,12 @@ function enc_attr(attr,key)
 {
 	var ab;
 
-	ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
+	try {
+		ab = str_to_ab('MEGA'+to8(JSON.stringify(attr)));
+	} catch(e) {
+		msgDialog('warningb', l[135], e.message || e);
+		throw e;
+	}
 
 	// if no key supplied, generate a random one
 	if (!key.length) for (i = 4; i--; ) key[i] = rand(0x100000000);
@@ -732,6 +737,20 @@ function dec_attr(attr,key)
 	try {
 		return JSON.parse(from8(b.substr(4)));
 	} catch (e) {
+		if (d) console.error(b, e);
+		var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/), s = m && m[1], l = s && s.length || 0, j=',';
+		while (l--)
+		{
+			s = s.substr(0,l||1);
+			try {
+				from8(s+j);
+				break;
+			} catch(e) {}
+		}
+		if (~l) try {
+			var new_name = s+j+'trunc'+Math.random().toString(16).slice(-4)+(m[2]||'');
+			return JSON.parse(from8(b.substr(4).replace(m[0],'"n":"'+new_name+'"')));
+		} catch(e) {}
 		return { n : 'MALFORMED_ATTRIBUTES' };
 	}
 }

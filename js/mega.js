@@ -371,11 +371,18 @@ function MegaData ()
 			}
 		}
 		$('.grid-url-arrow').unbind('click');
-		$('.grid-url-arrow').bind('click',function()
+		$('.grid-url-arrow').bind('click',function(e)
 		{
-			$.selected = [$(this).closest('tr').attr('id')];
-			if (u_type === 0) ephemeralDialog(l[1005]);
-			else M.getlinks([$.selected]);
+			var target = $(this).closest('tr');
+			if (target.attr('class').indexOf('ui-selected') == -1) {
+				target.parent().find('tr').removeClass('ui-selected');
+			}
+			target.addClass('ui-selected');
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = target;
+			cacheselect();
+			searchPath();
+			contextmenuUI(e,1);
 		});
 
 		if (this.viewmode == 1)

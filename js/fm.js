@@ -330,7 +330,8 @@ function initUI()
 		}
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
-		$('.fm-tree-folder').removeClass('dragover');		
+		$('.fm-tree-folder').removeClass('dragover');
+		$('.context-menu.files-menu').addClass('hidden');
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');

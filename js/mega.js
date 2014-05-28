@@ -370,12 +370,24 @@ function MegaData ()
 				}				
 			}
 		}
-		$('.grid-url-arrow').unbind('click');
-		$('.grid-url-arrow').bind('click',function(e)
-		{
+		$('.grid-url-arrow,.file-block .file-settings-icon').unbind('click');
+		$('.grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
 			if (target.attr('class').indexOf('ui-selected') == -1) {
 				target.parent().find('tr').removeClass('ui-selected');
+			}
+			target.addClass('ui-selected');
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = target;
+			cacheselect();
+			searchPath();
+			contextmenuUI(e,1);
+		});
+
+		$('.file-block .file-settings-icon').bind('click',function(e) {
+			var target = $(this).parents('.file-block')
+			if (target.attr('class').indexOf('ui-selected') == -1) {
+				target.parent().find('a').removeClass('ui-selected');
 			}
 			target.addClass('ui-selected');
 			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file

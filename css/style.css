@@ -2766,7 +2766,7 @@ img.blog-new-logos {
 	display: block;
 }
 .propreties-dark-txt {
-	font-size: 15px;
+	font-size: 12px;
 	color: #50504E;
 	line-height: 24px;
 	display: block;
@@ -3037,18 +3037,29 @@ label.iPhoneCheckLabelOff span {
 	line-height: 23px;
 	color: #666666;
 	height: 24px;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-image: url(../images/mega/files-icons.svg);
+    background-position: -64px -1237px;
 	background-repeat: no-repeat;
-	background-position: -17px -911px;
 	overflow: hidden;
 }
 .rubbish-bin .nw-fm-tree-folder {
-	background-position: -17px -5341px;
+	background-position: -64px -1917px;
+}
+.rubbish-bin .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-shared-folder {
+	background-position: -64px -1957px;
+}
+.nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
+	background-position: -64px -1277px;
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -945px;
+	background-position: -64px -11657px;
 }
+.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder {
+	color: white;
+	background-position: -64px -1877px;
+}
+
 .nw-contact-item {
 	height: 48px;
 	padding-right: 15px;
@@ -4242,21 +4253,18 @@ th.grid-first-th {
 }
 .file-block .file-status-icon, .contact-status-icon {
 	position: absolute;
-	left: 0;
-	top: 0;
-	height: 17px;
-	width: 15px;
+left: 4px;
+top: 4px;
+height: 17px;
+z-index: 10;
+width: 15px;
 	background-position: 1px -3679px;
 }
-.file-block.ui-selected .file-status-icon, .file-block.dragover .file-status-icon, .ui-selected .contact-status-icon, .dragover .contact-status-icon {
-	background-position: -39px -3679px;
-}
+
 .file-block .file-status-icon.star, .contact-status-icon.star {
-	background-position: 1px -3629px;
+	background-position: -14px -1472px;
 }
-.file-block.ui-selected .file-status-icon.star, .file-block.dragover .file-status-icon.star, .ui-selected .contact-status-icon.star, .dragover .contact-status-icon.star {
-	background-position: 1px -3579px;
-}
+
 .fm-blocks-view, .fm-contacts-blocks-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -4510,157 +4518,165 @@ table {
 	height: 24px;
 	margin: 0 0 0 -2px;
 	background-position: 0 0px;
-	background-image: url(../images/mega/small-icons-v1.png);
+	background-image: url(../images/mega/files-icons.svg);
 	background-repeat: no-repeat;
 }
 .transfer-filtype-icon img {
 	display: none;
 }
 .transfer-filtype-icon.word, .search-path-icon-span.word {
-	background-position: 0 0px;
+	background-position: -62px 3px;
 }
 .transfer-filtype-icon.web-lang, .search-path-icon-span.web-lang {
-	background-position: 0 -24px;
+	background-position: -62px -37px;
 }
 .transfer-filtype-icon.web-data, .search-path-icon-span.web-data {
-	background-position: 0 -48px;
+	background-position: -62px -77px;
 }
 .transfer-filtype-icon.video, .search-path-icon-span.video {
-	background-position: 0 -72px;
+	background-position: -62px -117px;
 }
 .transfer-filtype-icon.video-vob, .search-path-icon-span.video-vob {
-	background-position: 0 -96px;
+	background-position: -62px -157px;
 }
 .transfer-filtype-icon.video-subtitles, .search-path-icon-span.video-subtitles {
-	background-position: 0 -120px;
+	background-position: -62px -197px;
 }
 .transfer-filtype-icon.vector, .search-path-icon-span.vector {
-	background-position: 0 -144px;
+	background-position: -62px -237px;
 }
 .transfer-filtype-icon.vcard, .search-path-icon-span.vcard {
-	background-position: 0 -168px;
+	background-position: -62px -277px;
 }
 .transfer-filtype-icon.torrent, .search-path-icon-span.torrent {
-	background-position: 0 -192px;
+	background-position: -62px -317px;
 }
 .transfer-filtype-icon.text, .search-path-icon-span.text {
-	background-position: 0 -216px;
+	background-position: -62px -357px;
 }
 .transfer-filtype-icon.swf, .search-path-icon-span.swf {
-	background-position: 0 -240px;
+	background-position: -62px -397px;
 }
 .transfer-filtype-icon.spreadsheet, .search-path-icon-span.spreadsheet {
-	background-position: 0 -264px;
+	background-position: -62px -437px;
 }
 .transfer-filtype-icon.sourcecode, .search-path-icon-span.sourcecode {
-	background-position: 0 -288px;
+	background-position: -62px -477px;
 }
 .transfer-filtype-icon.real-audio, .search-path-icon-span.real-audio {
-	background-position: 0 -312px;
+	background-position: -62px -517px;
 }
 .transfer-filtype-icon.raw, .search-path-icon-span.raw {
-	background-position: 0 -336px;
+	background-position: -62px -557px;
 }
 .transfer-filtype-icon.premiere, .search-path-icon-span.premiere {
-	background-position: 0 -360px;
+	background-position: -62px -597px;
 }
 .transfer-filtype-icon.powerpoint, .search-path-icon-span.powerpoint {
-	background-position: 0 -384px;
+	background-position: -62px -637px;
 }
 .transfer-filtype-icon.podcast, .search-path-icon-span.podcast {
-	background-position: 0 -408px;
+	background-position: -62px -677px;
 }
 .transfer-filtype-icon.playlist, .search-path-icon-span.playlist {
-	background-position: 0 -432px;
+	background-position: -62px -717px;
 }
 .transfer-filtype-icon.photoshop, .search-path-icon-span.photoshop {
-	background-position: 0 -456px;
+	background-position: -62px -757px;
 }
 .transfer-filtype-icon.pdf, .search-path-icon-span.pdf {
-	background-position: 0 -480px;
+	background-position: -62px -797px;
 }
 .transfer-filtype-icon.midi, .search-path-icon-span.midi {
-	background-position: 0 -504px;
+	background-position: -62px -837px;
 }
 .transfer-filtype-icon.java, .search-path-icon-span.java {
-	background-position: 0 -528px;
+	background-position: -62px -877px;
 }
 .transfer-filtype-icon.indesign, .search-path-icon-span.indesign {
-	background-position: 0 -552px;
+	background-position: -62px -917px;
 }
 .transfer-filtype-icon.image, .search-path-icon-span.image {
-	background-position: 0 -576px;
+	background-position: -62px -957px;
 }
 .transfer-filtype-icon.illustrator, .search-path-icon-span.illustrator {
-	background-position: 0 -600px;
+	background-position: -62px -997px;
 }
 .transfer-filtype-icon.html, .search-path-icon-span.html {
-	background-position: 0 -614px;
+	background-position: -62px -1037px;
 }
 .transfer-filtype-icon.graphic, .search-path-icon-span.graphic {
-	background-position: 0 -648px;
+	background-position: -62px -1077px;
 }
 .transfer-filtype-icon.gis, .search-path-icon-span.gis {
-	background-position: 0 -672px;
+	background-position: -62px -1117px;
 }
 .transfer-filtype-icon.generic, .search-path-icon-span.generic {
-	background-position: 0 -696px;
+	background-position: -62px -1157px;
 }
 .transfer-filtype-icon.font, .search-path-icon-span.font {
-	background-position: 0 -720px;
+	background-position: -62px -1197px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder {
-	background-position: 0 -744px;
+	background-position: -62px -1237px;
 }
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-	background-position: 0 -768px;
+	background-position: -62px -1277px;
 }
 .transfer-filtype-icon.flash, .search-path-icon-span.flash {
-	background-position: 0 -792px;
+	background-position: -62px -1317px;
 }
 .transfer-filtype-icon.flash-video, .search-path-icon-span.flash-video {
-	background-position: 0 -816px;
+	background-position: -62px -1357px;
 }
 .transfer-filtype-icon.fla-lang, .search-path-icon-span.fla-lang {
-	background-position: 0 -840px;
+	background-position: -62px -1397px;
 }
 .transfer-filtype-icon.executable, .search-path-icon-span.executable {
-	background-position: 0 -864px;
+	background-position: -62px -1437px;
 }
 .transfer-filtype-icon.excel, .search-path-icon-span.excel {
-	background-position: 0 -888px;
+	background-position: -62px -1477px;
 }
 .transfer-filtype-icon.dreamweaver, .search-path-icon-span.dreamweaver {
-	background-position: 0 -912px;
+	background-position: -62px -1517px;
 }
 .transfer-filtype-icon.database, .search-path-icon-span.database {
-	background-position: 0 -936px;
+	background-position: -62px -1557px;
 }
 .transfer-filtype-icon.compressed, .search-path-icon-span.compressed {
-	background-position: 0 -960px;
+	background-position: -62px -1597px;
 }
 .transfer-filtype-icon.cad, .search-path-icon-span.cad {
-	background-position: 0 -984px;
+	background-position: -62px -1637px;
 }
 .transfer-filtype-icon.audio, .search-path-icon-span.audio {
-	background-position: 0 -1008px;
+	background-position: -62px -1677px;
 }
 .transfer-filtype-icon.aftereffects, .search-path-icon-span.aftereffects {
-	background-position: 0 -1032px;
+	background-position: -62px -1717px;
 }
 .transfer-filtype-icon.threed, .search-path-icon-span.threed {
-	background-position: 0 -1056px;
+	background-position: -62px -1757px;
+}
+.transfer-filtype-icon.win-folder, .search-path-icon-span.win-folder {
+	background-position: -62px -1797px;
+}
+.transfer-filtype-icon.apple-folder, .search-path-icon-span.apple-folder {
+	background-position: -62px -1837px;
+}
+.transfer-filtype-icon.photo-folder, .search-path-icon-span.photo-folder {
+	background-position: -62px -1837px;
 }
 .block-view-file-type {
-	width: 64px;
-	height: 64px;
+	width: 74px;
+	height: 84px;
 	display: block;
 	background-position: 0 0px;
-	background-image: url(../images/mega/medium-icons-v1.png);
+	background-image: url(../images/mega/files-icons.svg);
 	background-repeat: no-repeat;
-	margin: 8px auto 0 auto;
 	position: absolute;
-	margin: -32px 0 0 -32px;
+	margin: -42px 0 0 -37px;
 	left: 50%;
 	top: 50%;
 }
@@ -4669,411 +4685,298 @@ table {
 	height: 120px;
 	margin: -60px 0 0 -60px;
 }
-.block-view-file-type.word, .share-folder-icon div.word {
-	background-position: 0 0px;
+.block-view-file-type.word, .share-folder-icon div.word, .properties-file-icon div.word {
+	background-position: center -5916px;
 }
-.block-view-file-type.web-lang, .share-folder-icon div.web-lang {
-	background-position: 0 -64px;
+.block-view-file-type.web-lang, .share-folder-icon div.web-lang, .properties-file-icon div.web-lang {
+	background-position: center -6026px;
 }
-.block-view-file-type.web-data, .share-folder-icon div.web-data {
-	background-position: 0 -128px;
+.block-view-file-type.web-data, .share-folder-icon div.web-data, .properties-file-icon div.web-data {
+	background-position: center -6146px;
 }
-.block-view-file-type.video, .share-folder-icon div.video {
-	background-position: 0 -192px;
+.block-view-file-type.video, .share-folder-icon div.video, .properties-file-icon div.video {
+	background-position: center -6266px;
 }
-.block-view-file-type.video-vob, .share-folder-icon div.video-vob {
-	background-position: 0 -256px;
+.block-view-file-type.video-vob, .share-folder-icon div.video-vob, .properties-file-icon div.video-vob {
+	background-position: center -6386px;
 }
-.block-view-file-type.video-subtitles, .share-folder-icon div.video-subtitles {
-	background-position: 0 -320px;
+.block-view-file-type.video-subtitles, .share-folder-icon div.video-subtitles, .properties-file-icon div.video-subtitles {
+	background-position: center -6506px;
 }
-.block-view-file-type.vector, .share-folder-icon div.vector {
-	background-position: 0 -384px;
+.block-view-file-type.vector, .share-folder-icon div.vector, .properties-file-icon div.vector {
+	background-position: center -6626px;
 }
-.block-view-file-type.vcard, .share-folder-icon div.vcard {
-	background-position: 0 -448px;
+.block-view-file-type.vcard, .share-folder-icon div.vcard, .properties-file-icon div.vcard {
+	background-position: center -6746px;
 }
-.block-view-file-type.torrent, .share-folder-icon div.torrent {
-	background-position: 0 -512px;
+.block-view-file-type.torrent, .share-folder-icon div.torrent, .properties-file-icon div.torrent {
+	background-position: center -6866px;
 }
-.block-view-file-type.text, .share-folder-icon div.text {
-	background-position: 0 -576px;
+.block-view-file-type.text, .share-folder-icon div.text, .properties-file-icon div.text {
+	background-position: center -6986px;
 }
-.block-view-file-type.swf, .share-folder-icon div.swf {
-	background-position: 0 -640px;
+.block-view-file-type.swf, .share-folder-icon div.swf, .properties-file-icon div.swf {
+	background-position: center -7106px;
 }
-.block-view-file-type.spreadsheet, .share-folder-icon div.spreadsheet {
-	background-position: 0 -704px;
+.block-view-file-type.spreadsheet, .share-folder-icon div.spreadsheet, .properties-file-icon div.spreadsheet {
+	background-position: center -7226px;
 }
-.block-view-file-type.sourcecode, .share-folder-icon div.sourcecode {
-	background-position: 0 -768px;
+.block-view-file-type.sourcecode, .share-folder-icon div.sourcecode, .properties-file-icon div.sourcecode {
+	background-position: center -7346px;
 }
-.block-view-file-type.real-audio, .share-folder-icon div.real-audio {
-	background-position: 0 -832px;
+.block-view-file-type.real-audio, .share-folder-icon div.real-audio, .properties-file-icon div.real-audio {
+	background-position: center -7466px;
 }
-.block-view-file-type.raw, .share-folder-icon div.raw {
-	background-position: 0 -896px;
+.block-view-file-type.raw, .share-folder-icon div.raw, .properties-file-icon div.raw {
+	background-position: center -7586px;
 }
-.block-view-file-type.premiere, .share-folder-icon div.premiere {
-	background-position: 0 -960px;
+.block-view-file-type.premiere, .share-folder-icon div.premiere, .properties-file-icon div.premiere {
+	background-position: center -7706px;
 }
-.block-view-file-type.powerpoint, .share-folder-icon div.powerpoint {
-	background-position: 0 -1024px;
+.block-view-file-type.powerpoint, .share-folder-icon div.powerpoint, .properties-file-icon div.powerpoint {
+	background-position: center -7826px;
 }
-.block-view-file-type.podcast, .share-folder-icon div.podcast {
-	background-position: 0 -1088px;
+.block-view-file-type.podcast, .share-folder-icon div.podcast, .properties-file-icon div.podcast {
+	background-position: center -7946px;
 }
-.block-view-file-type.playlist, .share-folder-icon div.playlist {
-	background-position: 0 -1152px;
+.block-view-file-type.playlist, .share-folder-icon div.playlist, .properties-file-icon div.playlist {
+	background-position: center -8066px;
 }
-.block-view-file-type.photoshop, .share-folder-icon div.photoshop {
-	background-position: 0 -1216px;
+.block-view-file-type.photoshop, .share-folder-icon div.photoshop, .properties-file-icon div.photoshop {
+	background-position: center -8186px;
 }
-.block-view-file-type.pdf, .share-folder-icon div.pdf {
-	background-position: 0 -1280px;
+.block-view-file-type.pdf, .share-folder-icon div.pdf, .properties-file-icon div.pdf {
+	background-position: center -8306px;
 }
-.block-view-file-type.midi, .share-folder-icon div.midi {
-	background-position: 0 -1344px;
+.block-view-file-type.midi, .share-folder-icon div.midi, .properties-file-icon div.midi {
+	background-position: center -8426px;
 }
-.block-view-file-type.java, .share-folder-icon div.java {
-	background-position: 0 -1408px;
+.block-view-file-type.java, .share-folder-icon div.java, .properties-file-icon div.java {
+	background-position: center -8546px;
 }
-.block-view-file-type.indesign, .share-folder-icon div.indesign {
-	background-position: 0 -1472px;
+.block-view-file-type.indesign, .share-folder-icon div.indesign, .properties-file-icon div.indesign {
+	background-position: center -8666px;
 }
-.block-view-file-type.image, .share-folder-icon div.image {
-	background-position: 0 -1536px;
+.block-view-file-type.image, .share-folder-icon div.image, .properties-file-icon div.image {
+	background-position: center -8786px;
 }
-.block-view-file-type.illustrator, .share-folder-icon div.illustrator {
-	background-position: 0 -1600px;
+.block-view-file-type.illustrator, .share-folder-icon div.illustrator, .properties-file-icon div.illustrator {
+	background-position: center -8906px;
 }
-.block-view-file-type.html, .share-folder-icon div.html {
-	background-position: 0 -1664px;
+.block-view-file-type.html, .share-folder-icon div.html, .properties-file-icon div.html {
+	background-position: center -9026px;
 }
-.block-view-file-type.graphic, .share-folder-icon div.graphic {
-	background-position: 0 -1728px;
+.block-view-file-type.graphic, .share-folder-icon div.graphic, .properties-file-icon div.graphic {
+	background-position: center -9146px;
 }
-.block-view-file-type.gis, .share-folder-icon div.gis {
-	background-position: 0 -1792px;
+.block-view-file-type.gis, .share-folder-icon div.gis, .properties-file-icon div.gis {
+	background-position: center -9266px;
 }
-.block-view-file-type.generic, .share-folder-icon div.generic {
-	background-position: 0 -1856px;
+.block-view-file-type.generic, .share-folder-icon div.generic, .properties-file-icon div.generic {
+	background-position: center -9386px;
 }
-.block-view-file-type.font, .share-folder-icon div.font {
-	background-position: 0 -1920px;
+.block-view-file-type.font, .share-folder-icon div.font, .properties-file-icon div.font {
+	background-position: center -9506px;
 }
-.block-view-file-type.folder, .share-folder-icon div.folder {
-	background-position: 0 -1984px;
+.block-view-file-type.folder, .share-folder-icon div.folder, .properties-file-icon div.folder {
+	background-position: center -9626px;
 }
-.block-view-file-type.folder-shared, .share-folder-icon div.folder-shared {
-	background-position: 0 -2048px;
+.block-view-file-type.folder-shared, .share-folder-icon div.folder-shared, .properties-file-icon div.folder-shared {
+	background-position: center -9746px;
 }
-.block-view-file-type.flash, .share-folder-icon div.flash {
-	background-position: 0 -2112px;
+.block-view-file-type.flash, .share-folder-icon div.flash, .properties-file-icon div.flash {
+	background-position: center -9866px;
 }
-.block-view-file-type.flash-video, .share-folder-icon div.flash-video {
-	background-position: 0 -2176px;
+.block-view-file-type.flash-video, .share-folder-icon div.flash-video, .properties-file-icon div.flash-video {
+	background-position: center -9986px;
 }
-.block-view-file-type.fla-lang, .share-folder-icon div.fla-lang {
-	background-position: 0 -2240px;
+.block-view-file-type.fla-lang, .share-folder-icon div.fla-lang, .properties-file-icon div.fla-lang {
+	background-position: center -10106px;
 }
-.block-view-file-type.executable, .share-folder-icon div.executable {
-	background-position: 0 -2304px;
+.block-view-file-type.executable, .share-folder-icon div.executable, .properties-file-icon div.executable {
+	background-position: center -10226px;
 }
-.block-view-file-type.excel, .share-folder-icon div.excel {
-	background-position: 0 -2368px;
+.block-view-file-type.excel, .share-folder-icon div.excel, .properties-file-icon div.exel {
+	background-position: center -10346px;
 }
-.block-view-file-type.dreamweaver, .share-folder-icon div.dreamweaver {
-	background-position: 0 -2432px;
+.block-view-file-type.dreamweaver, .share-folder-icon div.dreamweaver, .properties-file-icon div.dreamweaver {
+	background-position: center -10466px;
 }
-.block-view-file-type.database, .share-folder-icon div.database {
-	background-position: 0 -2496px;
+.block-view-file-type.database, .share-folder-icon div.database, .properties-file-icon divdatabase {
+	background-position: center -10586px;
 }
-.block-view-file-type.compressed, .share-folder-icon div.compressed {
-	background-position: 0 -2560px;
+.block-view-file-type.compressed, .share-folder-icon div.compressed, .properties-file-icon div.compressed {
+	background-position: center -10706px;
 }
-.block-view-file-type.cad, .share-folder-icon div.cad {
-	background-position: 0 -2624px;
+.block-view-file-type.cad, .share-folder-icon div.cad, .properties-file-icon div.cad {
+	background-position: center -10826px;
 }
-.block-view-file-type.audio, .share-folder-icon div.audio {
-	background-position: 0 -2688px;
+.block-view-file-type.audio, .share-folder-icon div.audio, .properties-file-icon div.audio {
+	background-position: center -10946px;
 }
-.block-view-file-type.aftereffects, .share-folder-icon div.aftereffects {
-	background-position: 0 -2752px;
+.block-view-file-type.aftereffects, .share-folder-icon div.aftereffects, .properties-file-icon div.aftereffects {
+	background-position: center -11066px;
 }
-.block-view-file-type.threed, .share-folder-icon div.threed {
-	background-position: 0 -2816px;
+.block-view-file-type.threed, .share-folder-icon div.threed, .properties-file-icon div.threed {
+	background-position: center -11186px;
 }
+.block-view-file-type.win-folder, .share-folder-icon div.win-folder, .properties-file-icon div.win-folder {
+	background-position: center -11306px;
+}
+.block-view-file-type.apple-folder, .share-folder-icon div.apple-folder, .properties-file-icon div.apple-folder {
+	background-position: center -11426px;
+}
+.block-view-file-type.photo-folder, .share-folder-icon div.photo-folder, .properties-file-icon div.photo-folder {
+	background-position: center -11546px;
+}
+
+
+
 .dragger-icon.word, .export-icon.word, .new-download-file-icon.word {
-	background-position: 0 0;
+	background-position: center -2054px;
 }
 .dragger-icon.web-lang, .export-icon.web-lang, .new-download-file-icon.web-lang {
-	background-position: 0 -48px;
+	background-position: center -2134px;
 }
 .dragger-icon.web-data, .export-icon.web-data, .new-download-file-icon.web-data {
-	background-position: 0 -96px;
+	background-position: center -2214px;
 }
 .dragger-icon.video, .export-icon.video, .new-download-file-icon.video {
-	background-position: 0 -144px;
+	background-position: center -2294px;
 }
 .dragger-icon.video-vob, .export-icon.video-vob, .new-download-file-icon.video-vob {
-	background-position: 0 -192px;
+	background-position: center -2374px;
 }
 .dragger-icon.video-subtitles, .export-icon.video-subtitles, .new-download-file-icon.video-subtitles {
-	background-position: 0 -240px;
+	background-position: center -2454px;
 }
 .dragger-icon.vector, .export-icon.vector, .new-download-file-icon.vector {
-	background-position: 0 -288px;
+	background-position: center -2534px;
 }
 .dragger-icon.vcard, .export-icon.vcard, .new-download-file-icon.vcard {
-	background-position: 0 -336px;
+	background-position: center -2614px;
 }
 .dragger-icon.torrent, .export-icon.torrent, .new-download-file-icon.torrent {
-	background-position: 0 -384px;
+	background-position: center -2694px;
 }
 .dragger-icon.text, .export-icon.text, .new-download-file-icon.text {
-	background-position: 0 -432px;
+	background-position: center -2774px;
 }
 .dragger-icon.swf, .export-icon.swf, .new-download-file-icon.swf {
-	background-position: 0 -480px;
+	background-position: center -2854px;
 }
 .dragger-icon.spreadsheet, .export-icon.spreadsheet, .new-download-file-icon.spreadsheet {
-	background-position: 0 -528px;
+	background-position: center -2934px;
 }
 .dragger-icon.sourcecode, .export-icon.sourcecode, .new-download-file-icon.sourcecode {
-	background-position: 0 -576px;
+	background-position: center -3014px;
 }
 .dragger-icon.real-audio, .export-icon.real-audio, .new-download-file-icon.real-audio {
-	background-position: 0 -624px;
+	background-position: center -3094px;
 }
 .dragger-icon.raw, .export-icon.raw, .new-download-file-icon.raw {
-	background-position: 0 -672px;
+	background-position: center -3174px;
 }
 .dragger-icon.premiere, .export-icon.premiere, .new-download-file-icon.premiere {
-	background-position: 0 -720px;
+	background-position: center -3254px;
 }
 .dragger-icon.powerpoint, .export-icon.powerpoint, .new-download-file-icon.powerpoint {
-	background-position: 0 -768px;
+	background-position: center -3334px;
 }
 .dragger-icon.podcast, .export-icon.podcast, .new-download-file-icon.podcast {
-	background-position: 0 -816px;
+	background-position: center -3414px;
 }
 .dragger-icon.playlist, .export-icon.playlist, .new-download-file-icon.playlist {
-	background-position: 0 -864px;
+	background-position: center -3494px;
 }
 .dragger-icon.photoshop, .export-icon.photoshop, .new-download-file-icon.photoshop {
-	background-position: 0 -912px;
+	background-position: center -3574px;
 }
 .dragger-icon.pdf, .export-icon.pdf, .new-download-file-icon.pdf {
-	background-position: 0 -960px;
+	background-position: center -3654px;
 }
 .dragger-icon.midi, .export-icon.midi, .new-download-file-icon.midi {
-	background-position: 0 -1008px;
+	background-position: center -3734px;
 }
 .dragger-icon.java, .export-icon.java, .new-download-file-icon.java {
-	background-position: 0 -1056px;
+	background-position: center -3814px;
 }
 .dragger-icon.indesign, .export-icon.indesign, .new-download-file-icon.indesign {
-	background-position: 0 -1104px;
+	background-position: center -3894px;
 }
 .dragger-icon.image, .export-icon.image, .new-download-file-icon.image {
-	background-position: 0 -1152px;
+	background-position: center -3974px;
 }
 .dragger-icon.illustrator, .export-icon.illustrator, .new-download-file-icon.illustrator {
-	background-position: 0 -1200px;
+	background-position: center -4054px;
 }
 .dragger-icon.html, .export-icon.html, .new-download-file-icon.html {
-	background-position: 0 -1248px;
+	background-position: center -4134px;
 }
 .dragger-icon.graphic, .export-icon.graphic, .new-download-file-icon.graphic {
-	background-position: 0 -1296px;
+	background-position: center -4214px;
 }
 .dragger-icon.gis, .export-icon.gis, .new-download-file-icon.gis {
-	background-position: 0 -1344px;
+	background-position: center -4294px;
 }
 .dragger-icon.generic, .export-icon.generic, .new-download-file-icon.generic {
-	background-position: 0 -1392px;
+	background-position: center -4374px;
 }
 .dragger-icon.font, .export-icon.font, .new-download-file-icon.font {
-	background-position: 0 -1440px;
+	background-position: center -4454px;
 }
 .dragger-icon.folder, .export-icon.folder, .new-download-file-icon.folder {
-	background-position: 0 -1488px;
+	background-position: center -4534px;
 }
 .dragger-icon.folder-shared, .export-icon.folder-shared, .new-download-file-icon.folder-shared {
-	background-position: 0 -1536px;
+	background-position: center -4614px;
 }
 .dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash {
-	background-position: 0 -1584px;
+	background-position: center -4694px;
 }
 .dragger-icon.flash-video, .export-icon.flash-video, .new-download-file-icon.flash-video {
-	background-position: 0 -1632px;
+	background-position: center -4774px;
 }
 .dragger-icon.fla-lang, .export-icon.fla-lang, .new-download-file-icon.fla-lang {
-	background-position: 0 -1680px;
+	background-position: center -4854px;
 }
 .dragger-icon.executable, .export-icon.executable, .new-download-file-icon.executable {
-	background-position: 0 -1728px;
+	background-position: center -4934px;
 }
 .dragger-icon.excel, .export-icon.excel, .new-download-file-icon.excel {
-	background-position: 0 -1776px;
+	background-position: center -5014px;
 }
 .dragger-icon.dreamweaver, .export-icon.dreamweaver, .new-download-file-icon.dreamweaver {
-	background-position: 0 -1824px;
+	background-position: center -5094px;
 }
 .dragger-icon.database, .export-icon.database, .new-download-file-icon.database {
-	background-position: 0 -1872px;
+	background-position: center -5174px;
 }
 .dragger-icon.compressed, .export-icon.compressed, .new-download-file-icon.compressed {
-	background-position: 0 -1920px;
+	background-position: center -5254px;
 }
 .dragger-icon.cad, .export-icon.cad, .new-download-file-icon.cad {
-	background-position: 0 -1968px;
+	background-position: center -5334px;
 }
 .dragger-icon.audio, .export-icon.audio, .new-download-file-icon.audio {
-	background-position: 0 -2016px;
+	background-position: center -5414px;
 }
 .dragger-icon.aftereffects, .export-icon.aftereffects, .new-download-file-icon.aftereffects {
-	background-position: 0 -2064px;
+	background-position: center -5494px;
 }
 .dragger-icon.threed, .export-icon.threed, .new-download-file-icon.threed {
-	background-position: 0 -2112px;
+	background-position: center -5574px;
 }
-.properties-file-icon div.word {
-	background-position: 0 0px;
+.dragger-icon.win-folder, .export-icon.win-folder, .new-download-file-icon.win-folder {
+	background-position: center -5654px;
 }
-.properties-file-icon div.web-lang {
-	background-position: 0 -220px;
+.dragger-icon.apple-folder, .export-icon.apple-folder, .new-download-file-icon.apple-folder {
+	background-position: center -5654px;
 }
-.properties-file-icon div.web-data {
-	background-position: 0 -440px;
+.dragger-icon.photo-folder, .export-icon.photo-folder, .new-download-file-icon.photo-folder {
+	background-position: center -5734px;
 }
-.properties-file-icon div.video {
-	background-position: 0 -660px;
-}
-.properties-file-icon div.video-vob {
-	background-position: 0 -880px;
-}
-.properties-file-icon div.video-subtitles {
-	background-position: 0 -1100px;
-}
-.properties-file-icon div.vector {
-	background-position: 0 -1320px;
-}
-.block-view-file-type.vcard {
-	background-position: 0 -1540px;
-}
-.properties-file-icon div.torrent {
-	background-position: 0 -1760px;
-}
-.properties-file-icon div.text {
-	background-position: 0 -1980px;
-}
-.properties-file-icon div.swf {
-	background-position: 0 -2200px;
-}
-.properties-file-icon div.spreadsheet {
-	background-position: 0 -2420px;
-}
-.properties-file-icon div.sourcecode {
-	background-position: 0 -2640px;
-}
-.properties-file-icon div.real-audio {
-	background-position: 0 -2860px;
-}
-.properties-file-icon div.raw {
-	background-position: 0 -3080px;
-}
-.properties-file-icon div.premiere {
-	background-position: 0 -3300px;
-}
-.properties-file-icon div.powerpoint {
-	background-position: 0 -3520px;
-}
-.properties-file-icon div.podcast {
-	background-position: 0 -3740px;
-}
-.properties-file-icon div.playlist {
-	background-position: 0 -3960px;
-}
-.properties-file-icon div.photoshop {
-	background-position: 0 -4180px;
-}
-.properties-file-icon div.pdf {
-	background-position: 0 -4400px;
-}
-.properties-file-icon div.midi {
-	background-position: 0 -4620px;
-}
-.properties-file-icon div.java {
-	background-position: 0 -4840px;
-}
-.properties-file-icon div.indesign {
-	background-position: 0 -5060px;
-}
-.properties-file-icon div.image {
-	background-position: 0 -5280px;
-}
-.properties-file-icon div.illustrator {
-	background-position: 0 -5500px;
-}
-.properties-file-icon div.html {
-	background-position: 0 -5720px;
-}
-.properties-file-icon div.graphic {
-	background-position: 0 -5940px;
-}
-.properties-file-icon div.gis {
-	background-position: 0 -6160px;
-}
-.properties-file-icon div.generic {
-	background-position: 0 -6380px;
-}
-.properties-file-icon div.font {
-	background-position: 0 -6600px;
-}
-.properties-file-icon div.folder {
-	background-position: 0 -6820px;
-}
-.properties-file-icon div.folder-shared {
-	background-position: 0 -7040px;
-}
-.properties-file-icon div.flash {
-	background-position: 0 -7260px;
-}
-.properties-file-icon div.flash-video {
-	background-position: 0 -7480px;
-}
-.properties-file-icon div.fla-lang {
-	background-position: 0 -7700px;
-}
-.properties-file-icon div.executable {
-	background-position: 0 -7920px;
-}
-.properties-file-icon div.excel {
-	background-position: 0 -8140px;
-}
-.properties-file-icon div.dreamweaver {
-	background-position: 0 -8360px;
-}
-.properties-file-icon div.database {
-	background-position: 0 -8580px;
-}
-.properties-file-icon div.compressed {
-	background-position: 0 -8800px;
-}
-.properties-file-icon div.cad {
-	background-position: 0 -9020px;
-}
-.properties-file-icon div.audio {
-	background-position: 0 -9240px;
-}
-.properties-file-icon div.aftereffects {
-	background-position: 0 -9460px;
-}
-.properties-file-icon div.threed {
-	background-position: 0 -9680px;
-}
+
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
 	width: 24px;
 	border: 0;
@@ -5090,7 +4993,7 @@ table {
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
 	height: 24px;
-	padding: 0 0 0 30px;
+	padding: 0 0 0 25px;
 	word-break: break-all;
 	white-space: pre-wrap;
 	display: block;
@@ -5743,12 +5646,12 @@ span.search-number {
 	top: 200px;
 }
 .dragger-icon {
-	width: 48px;
-	height: 48px;
+	width: 52px;
+    height: 60px;
 	background-repeat: no-repeat;
 	position: absolute;
 	background-position: 0 top;
-	background-image: url(../images/mega/drag-icons-v1.png)
+	background-image: url(../images/mega/files-icons.svg)
 }
 .dragger-icon.first {
 	margin: 10px 0 0 6px;
@@ -5770,7 +5673,7 @@ span.search-number {
 	position: absolute;
 	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
-	margin: 6px 0 0 -15px;
+	margin: 6px 0 0 -18px;
 }
 .drag .dragger-status {
 	background-position: 0 -5037px;
@@ -7933,23 +7836,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .properties-file-icon {
 	float: left;
 	padding: 0 0 0 30px;
-	height: 222px;
-	width: 196px;
+	height: 142px;
+
+	width: 142px;
 	position: relative;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 .properties-file-icon div {
-	width: 220px;
-	height: 220px;
+	width: 80px;
+height: 86px;
+
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	display: none;
-	background-image: url(../images/mega/large-icons-v1.png);
+	background-image: url(../images/mega/files-icons.svg);
 	background-position: 0 0;
 	background-repeat: no-repeat;
+	margin: 29px 0 0 29px;
 }
 .properties-file-icon div:nth-child(1) {
 	display: block;
@@ -7958,28 +7864,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	display: none;
 }
 .multiple .properties-file-icon div:nth-child(1) {
-	width: 220px;
+
 	position: absolute;
 	top: 10px;
 	left: 10px;
 	display: block;
 }
 .multiple .properties-file-icon div:nth-child(2) {
-	width: 220px;
+	
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	display: block;
 }
 .multiple .properties-file-icon div:nth-child(3) {
-	width: 220px;
+	
 	position: absolute;
 	top: -10px;
 	left: -10px;
 	display: block;
 }
 .properties-txt-pad {
-	margin: 0 0 0 226px;
+	margin: 0 0 0 142px;
 	padding: 28px 20px 0 0;
 }
 .properties-link-block {
@@ -9477,9 +9383,9 @@ table {
 	min-width: 0;
 }
 .st-mid-white-block, .download-mid-white-block {
-	height: -webkit-calc(100% - 50px);
-	height: -moz-calc(100% - 50px);
-	height: calc(100% - 50px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	min-height: 590px;
 	position: relative;
 }
@@ -11205,22 +11111,22 @@ h5.main-italic-header {
 	position: relative;
 }
 .new-download-file-icon {
-	width: 48px;
-	height: 48px;
-	float: left;
-	margin: 1px 0 0 -5px;
-	background-image: url(../images/mega/drag-icons-v1.png);
+	width: 54px;
+height: 60px;
+float: left;
+margin: 0 0 0 0;
+	background-image: url(../images/mega/files-icons.svg);
 	background-position: 0 0;
 	background-repeat: no-repeat;
 }
 .new-download-file-info {
-	margin-left: 60px;
+	margin-left: 70px;
 }
 .new-download-file-title {
 	font-size: 13px;
 	line-height: 18px;
 	color: #333333;
-	padding-top: 5px;
+	padding-top: 10px;
 }
 .new-download-file-size {
 	font-size: 11px;
@@ -12347,7 +12253,7 @@ strong, b {
 	padding: 23px 0 0 0;
 }
 .share-folder-info .propreties-dark-txt {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 20px;
 }
 .share-folder-link-bl {
@@ -15727,22 +15633,6 @@ background-size:27px auto;
 .fm-tree-folder.contact span.avatar span.fm-chat-verified, .fm-chat-top-verified, .fm-chat-verification-head, .fm-chat-verification-skipped, .fm-chat-verified-head {
  background-image: url(../images/mega/chat-sprite@2x.png?v=2);
  background-size:72px auto;
-}
- .dragger-icon, .export-icon, .new-download-file-icon {
- background-image:url(../images/mega/drag-icons@2x-v1.png);
- background-size:48px auto;
-}
-.share-folder-icon div, .block-view-file-type {
-background-image: url(../images/mega/medium-icons@2x-v1.png);
-background-size:64px auto;
-}
-.properties-file-icon div {
- background-image: url(../images/mega/large-icons@2x-v1.png);
-background-size:220px auto;
-}
-.transfer-filtype-icon, .search-path-icon-span {
- background-image: url(../images/mega/small-icons@2x-v1.png);
- background-size:24px auto;
 }
 .ff-extension-icon, .ff-extension-button {
  background-image: url(../images/mega/firefox-sprite@2x.png);

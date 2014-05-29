@@ -415,6 +415,7 @@ function initUI()
 		else if (c && c.indexOf('shared-with-me') > -1) M.openFolder('shares');
 		else if (c && c.indexOf('conversations') > -1) M.openFolder('chat');
 		else if (c && c.indexOf('contacts') > -1) M.openFolder('contacts');
+		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 	
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)

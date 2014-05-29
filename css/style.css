@@ -5619,7 +5619,7 @@ span.search-number {
 	width: 382px;
 	height: 74px;
 	background-color: white;
-	margin: 38px 0 0 -46px;
+	margin: 36px 0 0 -39px;
 	z-index: 900;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5693,7 +5693,7 @@ span.search-number {
 	background-color: #6EB028;
 	color: white;
 	text-align: center;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 29px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;

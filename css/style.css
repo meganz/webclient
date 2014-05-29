@@ -3038,7 +3038,7 @@ label.iPhoneCheckLabelOff span {
 	color: #666666;
 	height: 24px;
 	background-image: url(../images/mega/files-icons.svg);
-    background-position: -64px -1237px;
+	background-position: -64px -1237px;
 	background-repeat: no-repeat;
 	overflow: hidden;
 }
@@ -3059,7 +3059,6 @@ label.iPhoneCheckLabelOff span {
 	color: white;
 	background-position: -64px -1877px;
 }
-
 .nw-contact-item {
 	height: 48px;
 	padding-right: 15px;
@@ -4253,18 +4252,16 @@ th.grid-first-th {
 }
 .file-block .file-status-icon, .contact-status-icon {
 	position: absolute;
-left: 4px;
-top: 4px;
-height: 17px;
-z-index: 10;
-width: 15px;
+	left: 4px;
+	top: 4px;
+	height: 17px;
+	z-index: 10;
+	width: 15px;
 	background-position: 1px -3679px;
 }
-
 .file-block .file-status-icon.star, .contact-status-icon.star {
 	background-position: -14px -1472px;
 }
-
 .fm-blocks-view, .fm-contacts-blocks-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -4829,9 +4826,6 @@ table {
 .block-view-file-type.photo-folder, .share-folder-icon div.photo-folder, .properties-file-icon div.photo-folder {
 	background-position: center -11546px;
 }
-
-
-
 .dragger-icon.word, .export-icon.word, .new-download-file-icon.word {
 	background-position: center -2054px;
 }
@@ -4976,7 +4970,6 @@ table {
 .dragger-icon.photo-folder, .export-icon.photo-folder, .new-download-file-icon.photo-folder {
 	background-position: center -5734px;
 }
-
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
 	width: 24px;
 	border: 0;
@@ -5647,7 +5640,7 @@ span.search-number {
 }
 .dragger-icon {
 	width: 52px;
-    height: 60px;
+	height: 60px;
 	background-repeat: no-repeat;
 	position: absolute;
 	background-position: 0 top;
@@ -7170,7 +7163,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: 9px 5px 0 5px;
 	float: none;
 	font-size: 12px;
-    line-height: 27px;
+	line-height: 27px;
 	height: 29px;
 }
 .fm-dialog-button.links-button {
@@ -7837,7 +7830,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	float: left;
 	padding: 0 0 0 30px;
 	height: 142px;
-
 	width: 142px;
 	position: relative;
 	-moz-box-sizing: border-box;
@@ -7846,8 +7838,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .properties-file-icon div {
 	width: 80px;
-height: 86px;
-
+	height: 86px;
 	position: absolute;
 	top: 0px;
 	left: 0px;
@@ -7864,21 +7855,18 @@ height: 86px;
 	display: none;
 }
 .multiple .properties-file-icon div:nth-child(1) {
-
 	position: absolute;
 	top: 10px;
 	left: 10px;
 	display: block;
 }
 .multiple .properties-file-icon div:nth-child(2) {
-	
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	display: block;
 }
 .multiple .properties-file-icon div:nth-child(3) {
-	
 	position: absolute;
 	top: -10px;
 	left: -10px;
@@ -11112,9 +11100,9 @@ h5.main-italic-header {
 }
 .new-download-file-icon {
 	width: 54px;
-height: 60px;
-float: left;
-margin: 0 0 0 0;
+	height: 60px;
+	float: left;
+	margin: 0 0 0 0;
 	background-image: url(../images/mega/files-icons.svg);
 	background-position: 0 0;
 	background-repeat: no-repeat;

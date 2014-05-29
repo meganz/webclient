@@ -202,7 +202,7 @@ function initUI()
 		{
 			// tree dropped:
 			var c = $(e.target).attr('class');
-			if (c && c.indexOf('recycle') > -1) t = M.RubbishID;
+			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
 			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else
 			{
@@ -3416,7 +3416,7 @@ function treeUI()
 		}
 	});
 	
-	$('.fm-tree-panel .nw-fm-tree-item').droppable( 
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin').droppable( 
 	{
 		tolerance: 'pointer',		
 		drop: function(e, ui)

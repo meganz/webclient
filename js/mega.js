@@ -370,8 +370,8 @@ function MegaData ()
 				}				
 			}
 		}
-		$('.fm-blocks-view .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
-		$('.fm-blocks-view .grid-url-arrow').bind('click',function(e) {
+		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
+		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
 			if (target.attr('class').indexOf('ui-selected') == -1) {
 				target.parent().find('tr').removeClass('ui-selected');

@@ -478,6 +478,7 @@ function openTransferpanel()
 	if (!uldl_hold) ulQueue.resume();
 	initTreeScroll();
 	$(window).trigger('resize');
+
 	$('.tranfer-table .grid-url-arrow').unbind('click')
 	$('.tranfer-table .grid-url-arrow').bind('click', function(e) {
 		var target = $(this).closest('tr');
@@ -487,9 +488,9 @@ function openTransferpanel()
 		$('.context-menu.files-menu .context-menu-item').filter('.refresh-item,.canceltransfer-item').show();
 		target.parent().find('tr').removeClass('ui-selected');
 		target.addClass('ui-selected')
-		console.debug(target)
 		contextmenuUI(e);
 	});
+
 }
 
 function doAddContact(e,dialog)
@@ -897,6 +898,11 @@ function initContextUI()
 			$(window).trigger('resize');
 			resetUploadDownload();
 		});
+
+		if ($('.transfer-table tr').length == 1 && $('.tranfer-view-icon.active').length == 1) {
+			// if we have no other pending file, we should hide it
+			$.transferOpen();
+		}
 	});
 }
 
@@ -3144,7 +3150,7 @@ function transferPanelUI()
 		  var headerColumn = $('.transfer-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });
-		
+
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
 		{

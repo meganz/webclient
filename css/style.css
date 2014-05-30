@@ -4013,7 +4013,8 @@ label.iPhoneCheckLabelOff span {
 	transition: all 200ms ease-in-out;
 	background-image: none;
 }
-.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active {
+.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active,
+.nw-fm-left-icon.rubbish-bin.dragover {
 	background-color: rgba(115,172,58,1);
 }
 .rubbish-bin-icon {

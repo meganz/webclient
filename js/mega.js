@@ -1723,7 +1723,6 @@ function MegaData ()
 			setTimeout(fm_chromebar,500,$.dlheight);
 			setTimeout(fm_chromebar,1000,$.dlheight);
 		}
-		percent_megatitle();
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
@@ -1743,6 +1742,8 @@ function MegaData ()
 			$.transferprogress['dlc'] += $.transferprogress[id][1];
 			delete $.transferprogress[id];
 		}
+
+		percent_megatitle();
 	}
 
 	this.dlbeforecomplete = function()
@@ -1821,7 +1822,7 @@ function MegaData ()
 
 		panelDomQueue.splice(0, toClean);
 
-		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();
 			resetUploadDownload();
 		}

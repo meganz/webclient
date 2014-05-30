@@ -102,3 +102,7 @@ function base64urlencode(data)
     var r = data.length % 3;
     return (r ? enc.slice(0, r - 3) : enc);
 }
+
+
+is_chrome_firefox = true; /* to be used for phantomjs */
+mozRunAsync = false;

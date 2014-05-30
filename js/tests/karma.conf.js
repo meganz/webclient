@@ -11,6 +11,8 @@ module.exports = function(config) {
             "../jquery-min-1.8.1.js",
             "../jquery-ui.js",
 
+            "src/helpers/fromMega.js",
+
              "../functions.js",
 //             "../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
@@ -47,7 +49,6 @@ module.exports = function(config) {
              "../chat/karere.js",
              "../chat/chat.js",
 
-            "src/helpers/fromMega.js",
             "src/helpers/functionsmocker.js",
             "src/helpers/megadatamocker.js",
             "src/helpers/eventmocker.js",

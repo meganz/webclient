@@ -1241,105 +1241,108 @@ describe("EncryptionFilter", function() {
         });
     });
 
-//    it("weird use case", function(done) {
-//        // ph1 is the owner of the room
-//        var ph1 = new mpenc.handler.ProtocolHandler(
-//            "jid1",
-//            TBD.RSA_PRIV_KEY,
-//            TBD.RSA_PUB_KEY,
-//            TBD.STATIC_PUB_KEY_DIR,
-//            function(handler) {
-//
-//            },
-//            function(handler) {
-//            }
-//        );
-//
-//        var ph2 = new mpenc.handler.ProtocolHandler(
-//            "jid2",
-//            TBD.RSA_PRIV_KEY,
-//            TBD.RSA_PUB_KEY,
-//            TBD.STATIC_PUB_KEY_DIR,
-//            function(handler) {
-//
-//            },
-//            function(handler) {
-//            }
-//        );
-//
-//        // initial start & handshake
-//        ph1.start([
-//            "jid2"
-//        ]);
-//
-//
-//        ph2.processMessage(
-//            ph1.protocolOutQueue.pop()
-//        );
-//
-//        // *new* by patching the 'stateUpdatedCallback' we will add a expect() to be sure that the .state is set to
-//        // READY, after the protocolOutQueue is updated
-//        ph1.stateUpdatedCallback = function(h) {
-//            if(this.state == 3) {
-//                expect(ph1.protocolOutQueue.length).to.eql(1);
-//            }
-//        };
-//
-//        ph1.processMessage(
-//            ph2.protocolOutQueue.pop()
-//        );
-//
-//        expect(ph1.state).to.eql(3);
-//
-//        ph1.stateUpdatedCallback = function(h) {};
-//
-//        expect(ph2.state).to.eql(2);
-//        {
-//            // this is the problematic part..ph1 (room owner, who started the enc flow) sees he is at state == READY
-//            // so he tries to send a message to ph2, meanwhile ph2 is STILL not in ready state
-//
-//            // test message sending - jid1 -> jid2
-//            ph1.send("a", {});
-//
-//            ph2.processMessage(
-//                ph1.messageOutQueue.pop()
-//            );
-//
-//            expect(ph2.uiQueue[0].message).to.eql("a");
-//            expect(ph2.uiQueue[0].from).to.eql("jid1");
-//            expect(ph2.uiQueue[0].type).to.eql("message");
-//        }
-//
-//        ph2.processMessage(
-//            ph1.protocolOutQueue.pop()
-//        );
-//
-//        expect(ph2.state).to.eql(3);
-//
-//
-//
-//
-//
-//
-//        // test message sending from jid2 -> jid1
-//
-//        ph2.send("b", {meta: true});
-//
-//        ph1.processMessage(
-//            ph2.messageOutQueue.pop()
-//        );
-//
-//
-//
-//
-//
-//        expect(ph1.uiQueue[0].message).to.eql("b");
-//        expect(ph1.uiQueue[0].metadata.meta).to.eql(true);
-//        expect(ph1.uiQueue[0].from).to.eql("jid2");
-//        expect(ph1.uiQueue[0].type).to.eql("message");
-//
-//
-//
-//        done();
-//    })
+    it("issue 283 - ProtocolHandler changes his state to INITIALISED too early (BEFORE its actually initialised)", function(done) {
+        // ph1 is the owner of the room
+        var ph1 = new mpenc.handler.ProtocolHandler(
+            "jid1",
+            TBD.ED25519_PRIV_KEY,
+            TBD.ED25519_PUB_KEY,
+            TBD.STATIC_PUB_KEY_DIR,
+            function(handler) {
+
+            },
+            function(handler) {
+            }
+        );
+
+        var ph2 = new mpenc.handler.ProtocolHandler(
+            "jid2",
+            TBD.ED25519_PRIV_KEY,
+            TBD.ED25519_PUB_KEY,
+            TBD.STATIC_PUB_KEY_DIR,
+            function(handler) {
+
+            },
+            function(handler) {
+            }
+        );
+
+        // initial start & handshake
+        ph1.start([
+            "jid2"
+        ]);
+
+
+        ph2.processMessage(
+            ph1.protocolOutQueue.pop()
+        );
+
+        // *new* by patching the 'stateUpdatedCallback' we will add a expect() to be sure that the .state is set to
+        // READY, after the protocolOutQueue is updated
+        ph1.stateUpdatedCallback = function(h) {
+            if(this.state == 3) {
+                expect(ph1.protocolOutQueue.length).to.eql(1);
+            }
+        };
+
+        ph1.processMessage(
+            ph2.protocolOutQueue.pop()
+        );
+
+        expect(ph1.state).to.eql(3);
+
+
+        ph1.stateUpdatedCallback = function(h) {};
+
+        ph2.processMessage(
+            ph1.protocolOutQueue.pop()
+        );
+
+        expect(ph2.state).to.eql(3);
+        {
+            // this is the problematic part..ph1 (room owner, who started the enc flow) sees he is at state == READY
+            // so he tries to send a message to ph2, meanwhile ph2 is STILL not in ready state
+
+            // test message sending - jid1 -> jid2
+            ph1.send("a", {});
+
+            ph2.processMessage(
+                ph1.messageOutQueue.pop()
+            );
+
+            expect(ph2.uiQueue[0].message).to.eql("a");
+            expect(ph2.uiQueue[0].from).to.eql("jid1");
+            expect(ph2.uiQueue[0].type).to.eql("message");
+        }
+
+
+
+        expect(ph2.state).to.eql(3);
+
+
+
+
+
+
+        // test message sending from jid2 -> jid1
+
+        ph2.send("b", {meta: true});
+
+        ph1.processMessage(
+            ph2.messageOutQueue.pop()
+        );
+
+
+
+
+
+        expect(ph1.uiQueue[0].message).to.eql("b");
+        expect(ph1.uiQueue[0].metadata.meta).to.eql(true);
+        expect(ph1.uiQueue[0].from).to.eql("jid2");
+        expect(ph1.uiQueue[0].type).to.eql("message");
+
+
+
+        done();
+    })
 });

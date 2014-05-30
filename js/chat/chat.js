@@ -1625,7 +1625,6 @@ var MegaChatRoom = function(megaChat, roomJid) {
         } else if(newState == MegaChatRoom.STATE.READY) {
             if(localStorage.dd) {
                 console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
-                debugger;
             }
 
             if(self._messagesQueue.length > 0) {

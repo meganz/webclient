@@ -8,7 +8,6 @@ var n_h = false;
 var n_k_aes = false;
 var fmdirid=false;
 var u_type,cur_page,u_checked
-var page = '';
 var confirmcode = false;
 var confirmok = false;
 var hash = window.location.hash;
@@ -37,6 +36,7 @@ function startMega()
 	if (silent_loading)
 	{
 		silent_loading();
+		jsl=[];
 		silent_loading=false;
 		return false;
 	}
@@ -48,7 +48,6 @@ function startMega()
 		delete pages['dialogs'];
 	}
 	jsl=[];
-	page = document.location.hash.replace('#','');
 	init_page();
 }
 
@@ -56,7 +55,7 @@ function startMega()
 
 function mainScroll()
 {
-	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,mouseWheelSpeed:100,verticalDragMinHeight:150});	
+	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,verticalDragMinHeight:150,enableKeyboardNavigation:true});
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
 	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
@@ -79,7 +78,11 @@ function scrollMenu()
 
 
 function init_page()
-{		
+{
+	closeDialog();
+
+	if (typeof clearAds !== 'undefined') clearAds();	
+
 	if (window.stopBaboom) 
 	{
 		window.stopBaboom();
@@ -99,9 +102,7 @@ function init_page()
 		if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) page = 'firefox';
 		else page = 'chrome';
 	}	
-	else if (page == 'notifications') page = 'fm/notifications';
-		
-	
+	else if (page == 'notifications') page = 'fm/notifications';	
 	
 	if (localStorage.signupcode && u_type !== false) delete localStorage.signupcode;	
 	else if (localStorage.signupcode && page.substr(0,6) !== 'signup' && page !== 'register' && page !== 'terms' && page !== 'privacy' && page !== 'chrome' && page !== 'firefox')
@@ -110,11 +111,12 @@ function init_page()
 		document.location.hash = 'signup' + localStorage.signupcode;
 		return false;
 	}
-
 	$('.top-head').remove();
 	$('#loading').hide();
-	if (loadingDialog) loadingDialog.hide();	
-	page = page.replace('%21','!');		
+	if (loadingDialog) loadingDialog.hide();
+	
+	page = page.replace('%21','!').replace('%21','!');
+	
 	if (page.substr(0,1) == '!' && page.length > 1)
 	{							
 		dlkey=false;
@@ -207,7 +209,6 @@ function init_page()
 		}});
 		return false;
 	}	
-	
 	if (localStorage.voucher && u_type !== false)
 	{
 		api_req({a: 'uavr',v: localStorage.voucher},
@@ -218,8 +219,7 @@ function init_page()
 			}
 		});
 		delete localStorage.voucher;
-	}
-	
+	}	
 	if (page.substr(0,10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));	
@@ -236,13 +236,12 @@ function init_page()
 		blogmonth = page.substr(5,page.length-2);	
 		page = 'blog';			
 	}
-
 	if (page.substr(0,6) == 'signup')
 	{
 		var signupcode = page.substr(6,page.length-1);
 		loadingDialog.show();
 		api_req({ a: 'uv',c: signupcode},
-		{ 
+		{
 		  callback : function(res)
 		  {
 			loadingDialog.hide();
@@ -257,7 +256,7 @@ function init_page()
 				document.location.hash = 'start';
 			}
 			else if(u_type === false)			
-			{	
+			{
 				localStorage.signupcode = signupcode;
 				localStorage.registeremail = res;
 				document.location.hash = 'register';
@@ -274,10 +273,10 @@ function init_page()
 				});
 			}
 		  }
-		});			
-	}	
+		});
+	}
 	else if (page == 'newpw')
-	{		
+	{
 		setpwset(pwchangecode,{callback: function(res) 
 		{
 			loadingDialog.hide();
@@ -300,7 +299,7 @@ function init_page()
 		}});
 	}
 	else if (page == 'confirm')
-	{				
+	{
 		loadingDialog.show();
 		var ctx = 
 		{
@@ -330,7 +329,7 @@ function init_page()
 			}
 		}
 		verifysignupcode(confirmcode,ctx);		
-	}		
+	}	
 	else if (u_type == 2)
 	{
 		parsepage(pages['key']);
@@ -385,8 +384,8 @@ function init_page()
 	}
 	else if (page.substr(0,4) == 'help')
 	{		
-			parsepage(pages['help']);
-			init_help();
+		parsepage(pages['help']);
+		init_help();
 	}
 	else if (page == 'privacy')
 	{
@@ -406,6 +405,27 @@ function init_page()
 		parsepage(pages['dev']);
 		dev_init('doc');
 	}
+	else if (page == 'backup' && !u_type)
+	{
+		login_txt = l[1298];
+		parsepage(pages['login']);
+		init_login();
+	}
+	else if (page == 'backup')
+	{
+		parsepage(pages['backup']);
+		init_backup();
+	}
+	else if (page == 'recovery')
+	{
+		parsepage(pages['recovery']);		
+		init_recovery();
+	}
+	else if (page.substr(0,7) == 'recover' && page.length > 25)
+	{
+		parsepage(pages['reset']);		
+		init_reset();
+	}	
 	else if (page == 'sdkterms')
 	{
 		parsepage(pages['sdkterms']);		
@@ -523,6 +543,42 @@ function init_page()
 		{
 			document.location.hash = 'help/sync';
 		});
+		
+		
+		$('#syncanim').unbind('click');
+		$('#syncanim').bind('click',function(e)
+		{
+			$('.sync-button').click();
+		});
+		
+		
+		/*
+		$('#syncanim').css('height','');
+		$('#syncanim').css('width','');		
+		$('#syncanim').addClass('sync-main-img');
+		*/
+		
+		
+		if (typeof swiffy == 'undefined' && !silent_loading)
+		{
+			silent_loading=function()
+			{
+				startSync();			
+			};
+			jsl.push(jsl2['mads_js']);
+			jsl_start();
+		}
+		else startSync();		
+		
+		function startSync()
+		{
+			stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
+			stage.start();
+			setTimeout(function()
+			{
+				$('#syncanim svg').css('cursor','pointer');
+			},500);
+		}	
 	}
 	else if (page == 'mobile')
 	{
@@ -534,7 +590,7 @@ function init_page()
 		init_affiliatemember();
 	}
 	else if (page == 'affiliates')
-	{
+	{	
 		parsepage(pages['affiliates']);
 	}
 	else if (page == 'resellers')
@@ -676,7 +732,10 @@ function loginDialog(close)
 		$('.top-login-popup').removeClass('active');
 		return false;
 	}
-	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) $('.top-login-warning').addClass('hidden');	
+	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) {
+		$('.top-login-warning').addClass('hidden');	
+		$('.login-notification-icon').removeClass('hidden');
+	}
 	$('.login-checkbox,.top-login-popup .radio-txt').unbind('click');
 	$('.login-checkbox,.top-login-popup .radio-txt').bind('click',function(e)
 	{
@@ -684,6 +743,14 @@ function loginDialog(close)
 		if (c.indexOf('checkboxOff') > -1) $('.login-checkbox').attr('class','login-checkbox checkboxOn');
 		else $('.login-checkbox').attr('class','login-checkbox checkboxOff');
 	});	
+	
+	$('.top-login-forgot-pass').unbind('click');
+	$('.top-login-forgot-pass').bind('click',function(e)
+	{
+		document.location.hash = 'recovery';
+		loginDialog(1);
+	});
+	
 	$('.top-dialog-login-button').unbind('click');
 	$('.top-dialog-login-button').bind('click',function(e)
 	{
@@ -737,8 +804,22 @@ function loginDialog(close)
 	$('.top-login-warning-close').bind('click',function(e)
 	{
 		if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) localStorage.hideloginwarning=1;
-		$('.top-login-warning').addClass('hidden');	
+		$('.top-login-warning').addClass('hidden');
+		$('.login-notification-icon').removeClass('hidden');	
 	});	
+	$('.login-notification-icon').unbind('click');
+	$('.login-notification-icon').bind('click',function(e)
+	{
+		$('.top-login-warning').removeClass('hidden');
+		$(this).addClass('hidden');
+	});
+	
+	$('.top-login-input-block').unbind('click');
+	$('.top-login-input-block').bind('click',function(e)
+	{
+		$(this).find('input').focus();
+	});
+	
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').unbind('click');
 	$('.loginwarning-checkbox,.top-login-warning .radio-txt').bind('click',function(e)
 	{		
@@ -797,36 +878,34 @@ function tooltiplogin()
 
 function mLogout()
 {
-	$.dologout = function()
+	$.dologout = function(Quiet)
 	{
 		if ((fminitialized && downloading) || ul_uploading)
 		{
+			if(Quiet) return true;
 			msgDialog('confirmation',l[967],l[377] + ' ' + l[507]+'?',false,function(e)
 			{
 				if (e)
 				{
-					if (downloading) 
-					{
-						dl_cancel();
-						dl_queue= new DownloadQueue;
-					}
-					if (ul_uploading)
-					{
-						ul_cancel();
-						ul_queue=[];
-					}
-					$.dologout();
+					if (downloading) dl_cancel();				
+					if (ul_uploading) ul_cancel();
+					
+					resetUploadDownload();
+					loadingDialog.show();
+					var t = setInterval(function() {
+						if(!$.dologout(!0)) {
+							clearInterval(t);
+						}
+					}, 200);
 				}
 			});
 		}
 		else
 		{
-			u_logout(1);
-			if (is_chrome_firefox) document.location.href =  'chrome://mega/content/' + urlrootfile;
-			else init_page();
+			u_logout(1);			
+			document.location.reload();
 		}
 	}
-
 	var cnt=0;
 	if (M.c[M.RootID] && u_type === 0) for (var i in M.c[M.RootID]) cnt++;			
 	if (u_type === 0 && cnt > 0)
@@ -1265,6 +1344,7 @@ function is_fm()
 
 function parsepage(pagehtml,pp)
 {
+	$('body').removeClass('ads');
 	$('#fmholder').hide();
 	$('#pageholder').hide();
 	$('#startholder').hide();

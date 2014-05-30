@@ -34,7 +34,15 @@ Directories
 JavaScript files
 -----
 
+**secureboot.js** loads all the resources from static content servers and verifies its authenticity by checking the cryptographic hash
+
+**decrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
+
+**encrypter.js** the encrypter which is used as a web worker to encrypt data while uploading
+
 **js/arkanoid.js** has the arkanoid game which is used to collect entropy for public/private key creation
+
+**js/asmcrypto.js** general-purpose cryptographic library
 
 **js/avatar.js** is used for avatar selection, cropping & scaling (all on the client side in the canvas)
 
@@ -48,11 +56,7 @@ JavaScript files
 
 **js/crypto.js** contains all the cryptographic functions & API handlers
 
-**js/decrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
-
 **js/download.js** contains all the download logic
-
-**js/encrypter.js** the encrypter which is used as a web worker to encrypt data while uploading
 
 **js/exif.js** library that we use to read the EXIF flags from images prior to client side thumbnail creation
 
@@ -99,6 +103,4 @@ JavaScript files
 **js/zip.js** JavaScript implementation to create ZIP archives of multiple files on the client side
 
 **js/zxcvbn.js** password strength verification library (including dictionary table)
-
-
 

@@ -32,12 +32,12 @@ function init_start()
 {
 	megainfotxt();
 	
-	if (lang !== 'en')
+	if (lang !== 'en' && lang !== 'de')
 	{
 		l[225] = l[225].toLowerCase();
-		l[225] = l[225].substr(0,1).toUpperCase() + l[225].substr(1,l[225].length-1).toLowerCase();
-		$('.st-main-info.uploadtxt').text(l[225]);
-	}
+		l[225] = l[225].substr(0,1).toUpperCase() + l[225].substr(1,l[225].length-1).toLowerCase();		
+	}	
+	if (lang !== 'en') $('.st-main-info.uploadtxt').text(l[225]);
 	
 	if (page == 'start')
 	{
@@ -99,7 +99,7 @@ $.jScroll={};
 
 function jScrollStart()
 {
-	$('.st-main-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll:true,mouseWheelSpeed:100});
+	$('.st-main-block').jScrollPane({showArrows:true, arrowSize:5,animateScroll:true});
 	jScrollFade('.st-main-block');
 	$('.st-main-block').unbind('jsp-scroll-y.back');
 	$('.st-main-block').bind('jsp-scroll-y.back',function(event, scrollPositionY, isAtTop, isAtBottom)

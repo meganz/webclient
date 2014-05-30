@@ -2,23 +2,13 @@ var dlMethod
 	, dl_maxSlots = 4
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
-	, dlQueue = new QueueClass(downloader)
-
-dlQueue.push = function(x) {
-	if (!x.task) {
-		throw new Error("invalid error");
-	}
-	QueueClass.prototype.push.apply(dlQueue, arguments);
-};
+	, dlQueue = new MegaQueue(downloader)
+	, preparing_download
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
-	var L=0;
-	$.each(obj, function(i, elem) {
-		L++;
-	});
-	return L;
-}
+	return Object.keys(obj).length;
+};
 
 function dl_cancel() {
 	DownloadManager.abortAll();
@@ -54,6 +44,24 @@ var DownloadManager = new function() {
 		return _match;
 	}
 
+	self.newUrl = function(dl) {
+		dlQueue.pause(); /* pause *all* downloads */
+		DEBUG("ask for new URL for", dl.dl_id);
+		dlGetUrl(dl, function (error, res, o) {
+			if (error) return self.newUrl(dl);
+			var changed = 0
+			for (var i = 0; i < dlQueue._queue.length; i++) {
+				if (dlQueue._queue[i][0].dl === dl) {
+					dlQueue._queue[i][0].url = res.g + "/" +
+						dlQueue._queue[i][0].url.replace(/.+\//, '')
+					changed++
+				}
+			}
+			dlQueue.resume(); /* resume *all* downloads */
+			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
+		});
+	}
+
 	self.debug = function() {
 		DEBUG("blocked patterns", locks);
 	};
@@ -66,6 +74,7 @@ var DownloadManager = new function() {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
+			delete Zips[dl.zipid];
 			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
@@ -84,6 +93,10 @@ var DownloadManager = new function() {
 				$(this).remove();
 			});
 		}
+		if (dl.io instanceof MemoryIO) {
+			dl.io.abort();
+		}
+		dl = null;
 	}
 
 	self.abortAll = function() {
@@ -92,7 +105,7 @@ var DownloadManager = new function() {
 				self.abort(file);
 			}
 		});
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.abort = function(pattern, dontCleanUI) {
@@ -113,7 +126,7 @@ var DownloadManager = new function() {
 		}
 
 		self.remove(_pattern);
-		megatitle();
+		percent_megatitle();
 	}
 
 	self.remove = function(pattern, check) {
@@ -121,10 +134,10 @@ var DownloadManager = new function() {
 		pattern = s2o(pattern);
 		removed.push(task2id(pattern))
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-			var match = doesMatch(obj, pattern);
+			var match = doesMatch(obj[0], pattern);
 			if (match) {
-				check(obj);
-				DEBUG("remove task " + obj.__tid, pattern);
+				check(obj[0]);
+				DEBUG("remove task", pattern);
 			}
 			return !match;
 		});
@@ -200,64 +213,43 @@ dlQueue.on('working', function() {
 });
 
 dlQueue.on('resume', function() {
-	downloading = true;
+	downloading =!dlQueue.isEmpty();
 });
 
 dlQueue.on('pause', function() {
-	downloading = false;
+	downloading =!dlQueue.isEmpty();
 });
 
 dlQueue.on('drain', function() {
-	downloading = false;
+	downloading =!dlQueue.isEmpty();
 });
 // }}}
 
 // chunk scheduler {{{
-/**
- *	Override the downloader scheduler method.
- *	The idea is to select chunks from the same
- *	file_id, always
- */
-dlQueue.getNextTask = (function() {
-	/* private variable to keep in track
-	   the current file id */
-	var current = null
-		, DM = DownloadManager
-
-	return function() {
-		var queue = {}
-			, self = this
-			, candidate = null
-
-		$.each(self._queue, function(p, pzTask) {
-			if (!DM.enabled(pzTask)) return;
-			if (pzTask.download && pzTask.download.dl_id == current) {
-				candidate = p;
-				return false; /* break */
-			}
-			if (candidate === null || (pzTask instanceof ClassChunk && self._queue[candidate] instanceof ClassFile)) {
-				/* make it our candidate but don't break the loop */
-				candidate = p;
-			}
-		});
-
-		if (candidate !== null)  {
-			candidate = self._queue.splice(candidate, 1)[0]
-			current = (candidate.download||{}).dl_id;
+dlQueue.prepareNextTask = function() {
+	this.has_chunk = false;
+	for (var i = 0; i < this._queue.length; i++) {
+		if (this._queue[i][0] instanceof ClassChunk) {
+			this.has_chunk = true;
+			break;
 		}
+	}
+};
 
-		if (false && !candidate) {
-			DEBUG("next task is", candidate, fetchingFile, self._queue);
-			DM.debug();
+dlQueue.validateTask = function(pzTask, next) {
+	if (DownloadManager.enabled(pzTask)) {
+		if (pzTask instanceof ClassChunk) {
+			return true;
+		} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
+			return true;
 		}
-
-		return candidate;
-	};
-})();
+	}
+	return false;
+};
 // }}}
 
 if (localStorage.dl_maxSlots) {
-	dl_maxSlots = localStorage.dl_maxSlots;
+	dl_maxSlots = parseInt( localStorage.dl_maxSlots );
 }
 
 function checkLostChunks(file)
@@ -324,16 +316,22 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 		, dl_chunksizes = []
 	
 	var pp, p = pp = 0;
-	for (var i = 1; i <= 8 && p < dl_filesize-i*131072; i++) {
-		dl_chunksizes[p] = i*131072;
+	for (var i = 1; i <= 8 && p < dl_filesize-i*"128".KB(); i++) {
+		dl_chunksizes[p] = i*"128".KB()
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
 	}
 
+	var chunksize = dl_filesize / dlQueue._limit / 2
+
+	if (chunksize > "16".MB()) chunksize = "16".MB()
+	else if (chunksize <= "1".MB()) chunksize = "1".MB();
+	else chunksize = "1".MB() * Math.floor(chunksize / "1".MB())
+
+	var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
 	while (p < dl_filesize) {
-		dl_chunksizes[p] = Math.floor((dl_filesize-p)/1048576+1)*1048576;
-		if (dl_chunksizes[p] > dl_maxchunk) dl_chunksizes[p] = dl_maxchunk;
+		dl_chunksizes[p] = p > reserved ? "1".MB() : chunksize;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
@@ -350,17 +348,9 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
-function failureFunction(reschedule, task, args) {
+function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
-
-	DownloadManager.pause(task);
-
-	if (!task.dl.retry_time) {
-		task.dl.retry_time = 1000
-	} else {
-		task.dl.retry_time = Math.min(task.dl.retry_time*1.2, 3600*1000);
-	}
 
 	if (code == 509) {
 		var t = new Date().getTime();
@@ -368,23 +358,20 @@ function failureFunction(reschedule, task, args) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
-				reschedule(); 
+				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
 		}		
 	}
 
-	dl_reportstatus(dl, EAGAIN);
+	DEBUG2(dl.name, "failed ", code);
 
-	setTimeout(function() {
-		var range = (dl.url||"").replace(/.+\//, '');
-		dlGetUrl(dl, function (error, res, o) {
-			if (!error) {
-				task.url = res.g + '/' + range; /* new url */
-			}
-			reschedule(); 
-		});
-	}, task.dl.retry_time);
+	/* update UI */
+	dl_reportstatus(dl, EAGAIN); 
+
+	/* check for network error  */
+	api_reportfailure(hostname(dl.url), network_error_check);
+	dlQueue.pushFirst(task);
 }
 
 DownloadQueue.prototype.push = function() {
@@ -393,7 +380,6 @@ DownloadQueue.prototype.push = function() {
 		, dl  = this[id]
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
-		, dl_retryinterval = 1000
 		, dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
 
@@ -423,7 +409,6 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 
-	dl_decrypter(dl);
 	dl_writer(dl);
 
 	dl.macs  = {}
@@ -447,12 +432,40 @@ function dl_reportstatus(dl, code)
 	}
 }
 
+function dlGetUrlDone(res, ctx) {
+	if (typeof res == 'number') {
+		dl_reportstatus(ctx.object, res);
+	} else if (typeof res == 'object') {
+		if (res.d) {
+			dl_reportstatus(ctx.object, res.d ? 2 : 1)
+		} else if (res.g) {
+			var ab = base64_to_ab(res.at)
+				, o = dec_attr(ab ,[ctx.dl_key[0]^ctx.dl_key[4],ctx.dl_key[1]^ctx.dl_key[5],ctx.dl_key[2]^ctx.dl_key[6],ctx.dl_key[3]^ctx.dl_key[7]]);
+
+			if (typeof o == 'object' && typeof o.n == 'string') {
+				if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
+					ctx.object.data = new ArrayBuffer(res.s);				
+				}
+				return ctx.next(false, res, o, ctx.object);
+			}
+			dl_reportstatus(ctx.object, EGAIN);
+		} else {
+			dl_reportstatus(ctx.object, res.e);
+		}
+	} else {
+		dl_reportstatus(ctx.object, EAGAIN);
+	}
+	
+	dl_retryinterval *= 1.2;
+	ctx.next(new Error("failed"))
+}
+
 function dlGetUrl(object, callback) {
 	var req = { 
 		a : 'g', 
 		g : 1, 
 		ssl : use_ssl,
-	}, dl_key = object.key
+	} 
 
 	if (object.ph) {
 		req.p = object.ph;
@@ -461,35 +474,10 @@ function dlGetUrl(object, callback) {
 	}
 
 	api_req(req, {
-		callback: function(res, rex) {
-			if (typeof res == 'object') {
-				if (typeof res == 'number') {
-					dl_reportstatus(object, res);
-				} else {
-					if (res.d) {
-						dl_reportstatus(object, res.d ? 2 : 1)
-					} else if (res.g) {
-						var ab = base64_to_ab(res.at)
-							, o = dec_attr(ab ,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
-	
-						if (typeof o == 'object' && typeof o.n == 'string') {
-							if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || object.preview === -1)) {
-								object.data = new ArrayBuffer(res.s);				
-							}
-							return callback(false, res, o, object);
-						}
-						dl_reportstatus(object, EGAIN);
-					} else {
-						dl_reportstatus(object, res.e);
-					}
-				}
-			} else {
-				dl_reportstatus(object, EAGAIN);
-			}
-			
-			dl_retryinterval *= 1.2;
-			callback(new Error("failed"))
-		}
+		object: object,
+		next: callback,
+		dl_key: object.key,
+		callback: dlGetUrlDone
 	},n_h ? 1 : 0);
 }
 
@@ -507,8 +495,9 @@ function IdToFile(id) {
 
 if(localStorage.dlMethod) {
 	dlMethod = window[localStorage.dlMethod];
-}
-else if (window.webkitRequestFileSystem) {
+} else if (is_chrome_firefox & 4) {
+	dlMethod = FirefoxIO;
+} else if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
 } else if (navigator.msSaveOrOpenBlob) {
 	dlMethod = BlobBuilderIO;

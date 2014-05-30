@@ -99,7 +99,7 @@ function mozCloseStream(s) {
 			s.finish();
 			return;
 		} catch (e) {
-			Cu.reportError(e);
+			mozError(e);
 		}
 	}
 	s.close();
@@ -125,6 +125,8 @@ function mozPlaySound(n) {
 
 function mozDirtyGetAsEntry(aFile,aDataTransfer)
 {
+	aFile = aFile.clone();
+
 	this.__defineGetter__('isFile', function()
 	{
 		return aFile.isFile();
@@ -140,15 +142,12 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 	this.file = function(aCallback)
 	{
-		try {
-			var type = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService).getTypeFromFile(aFile);
-		} catch(e) {}
-
 		aCallback({
 			name : aFile.leafName,
 			size : aFile.fileSize,
-			type : type || '',
+			type : mozGetMIMEType(aFile),
 			lastModifiedDate : aFile.lastModifiedTime,
+			get mozFile() aFile,
 
 			u8: function(aStart,aBytes)
 			{
@@ -166,7 +165,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 					nsIFileInputStream.seek(0,aStart);
 					var data = nsIBinaryInputStream.readByteArray(aBytes);
 
-					if (d && (aBytes != 64 || d > 1)) { // 64 == fingerprint
+					if (d && (aBytes != 64 || d > 2)) { // 64 == fingerprint
 						console.log('mozDirtyGetAsEntry.u8', aStart,aBytes, this.name, this.type,
 							this.size, ''+data.slice(0,16).map(function(n) n.toString(16)));
 					}
@@ -213,6 +212,164 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 	};
 
 	if (d) console.log('mozDirtyGetAsEntry', aFile.path);
+}
+
+function mozAB2S(ab,len) {
+	var i = Cc['@mozilla.org/io/arraybuffer-input-stream;1']
+			.createInstance(Ci.nsIArrayBufferInputStream),
+		s = Cc["@mozilla.org/scriptableinputstream;1"]
+			.createInstance(Ci.nsIScriptableInputStream);
+	i.setData(ab.buffer || ab, 0, len || ab.byteLength);
+	s.init(i);
+	return s.readBytes(i.available());
+}
+function mozAB2SDepad(ab) {
+	var ab8 = new Uint8Array(ab), i = ab8.length;
+	while (i-- && !ab8[i]);
+	return mozAB2S(ab,++i);
+}
+
+function mozUConv(cs) {
+	var c = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+		.createInstance(Ci.nsIScriptableUnicodeConverter);
+	c.charset = cs || "UTF-8";
+	return c;
+}
+
+function mozTo8(unicode) {
+	var c = mozUConv();
+	return c.ConvertFromUnicode(unicode) + c.Finish();
+}
+function mozFrom8(utf8) {
+	return mozUConv().ConvertToUnicode(utf8);
+}
+
+function mozNotifyDL(fn,f) {
+	if (!mozPrefs.getBoolPref('notifydl')) return false;
+	if (!f) return mozAlert('Download ' + fn + ' finished.');
+
+	mozAlert(fn,'Download Finished.',function(s,t)
+	{
+		if(t == 'alertclickcallback') try {
+			if(parseInt(Services.appinfo.version) > 23) throw 2;
+			Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
+				.getService(Ci.nsIDownloadManagerUI).show();
+		} catch(e) {
+			var dllib = 'about:downloads';
+			try {
+				Services.io.newChannel(dllib,null,null);
+			} catch(e) {
+				dllib = 'chrome://communicator/content/downloads/downloadmanager.xul';
+			}
+			if(BrowserApp) {
+				// BrowserApp.addTab('about:downloads');
+				f.launch();
+			} else {
+				var fe = 'chrome,dialog=no,menubar=no,status=no,'
+					+ 'scrollbars=yes,toolbar=no,location=no,resizable=yes';
+				Services.ww.openWindow(null,dllib,'mega:downloads',fe,null);
+			}
+		}
+	});
+
+	return true;
+}
+
+function mozAddToLibrary(file, name, size, st, type, url)
+{
+	try {
+		if (typeof file === 'string') file = mozFile(file);
+		if (size < 1) size = file.fileSize;
+		url = url || location.href;
+
+		var { Downloads, DownloadsData } = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
+
+		Downloads.getList(Downloads.PUBLIC).then(function(aList) {
+
+			var mOptions = {
+				target : file,
+				source : {
+					url: url,
+					referrer: document.referrer || url,
+				},
+				startTime   : st,
+				totalBytes  : parseInt(size),
+				succeeded   : true,
+				contentType : type || mozGetMIMEType(file)
+			};
+			Downloads.createDownload(mOptions).then(function(aDownload) {
+				// LOG(aDownload.getSerializationHash());
+				try {
+					/**
+					 * This is a private function which might get replaced
+					 * so wrapping in a try/catch since we'll not rely on
+					 * its presence for the download being properly added
+					 * to the Library. Its only purpose here is that the
+					 * correct file size is reported there.
+					 */
+					aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
+				} catch(e) {
+					mozError(e);
+				}
+				aList.add(aDownload).then(function() {
+					// aDownload.refresh().then(null,mozError);
+					mozRunAsync(function() {
+						mozNotifyDL(name, file);
+						DownloadsData._notifyDownloadEvent("finish");
+						// DownloadsData.onDownloadChanged(aDownload);
+						// var dataItem = DownloadsData._downloadToDataItemMap.get(aDownload);
+						// console.log('dataItem', dataItem);
+					});
+				}, mozError);
+			}, mozError);
+		}, mozError);
+	} catch(e) {
+		mozError(e);
+		mozNotifyDL(name);
+	}
+}
+
+function mozError(e) {
+	Cu.reportError(e);
+	if (d) console.error(e);
+}
+
+function mozSaneFileName(name) {
+	// http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
+	name = ('' + name).replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.');
+	if (name.length > 250) name = name.substr(0,250) + name.split('.').pop();
+	name = name.replace(/\s+/g,' ').trim();
+	var end = name.lastIndexOf('.'); end = ~end && end || name.length;
+	if(/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0,end))) name = '!' + name;
+	return name;
+}
+
+function mozSanePathTree(path, file) {
+	path = (''+(path||'')).split(/[\\\/]+/).map(mozSaneFileName).filter(String);
+	if (file) path.push(mozSaneFileName(file));
+	return path;
+}
+
+const mozMIMEService = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService);
+function mozGetMIMEType(file) {
+	var t;
+
+	try
+	{
+		if(file instanceof Ci.nsIFile) {
+			t = mozMIMEService.getTypeFromFile(file);
+		} else {
+			t = mozMIMEService.getTypeFromExtension((''+file).replace(/.*\./,'.'));
+		}
+	}
+	catch(e) {}
+
+	return t || '';
+}
+
+function mozClearStartupCache() {
+	console.log('*** Invalidating startup cache ***');
+	Services.obs.notifyObservers(null, "startupcache-invalidate", null);
 }
 
 (function __FileSystemAPI(scope) {
@@ -327,7 +484,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							}
 							catch(e)
 							{
-								Cu.reportError(e);
+								mozError(e);
 							}
 						}
 						this.guid = this.startTime + this.name;
@@ -358,75 +515,14 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							} finally {
 								stm.finalize();
 							}
-							this.downloadDone(fn);
+							this.downloadDone(fn,f);
 						} catch(e) {
-							// Cu.reportError(e);
-
-							try {
-								var { Downloads, DownloadsData }
-									= Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
-
-								Downloads.getList(Downloads.PUBLIC).then(function(aList) {
-
-									var mOptions = {
-										target : f,
-										source : {
-											url: location.href,
-											referrer: location.href
-										},
-										startTime   : this.startTime,
-										totalBytes  : parseInt(this.filesize),
-										succeeded   : true,
-										contentType : this.type
-									};
-									Downloads.createDownload(mOptions).then(function(aDownload) {
-										// LOG(aDownload.getSerializationHash());
-										try {
-											/**
-											 * This is a private function which might get replaced
-											 * so wrapping in a try/catch since we'll not rely on
-											 * its presence for the download being properly added
-											 * to the Library. Its only purpose here is that the
-											 * correct file size is reported there.
-											 */
-											aDownload._setBytes(mOptions.totalBytes,mOptions.totalBytes);
-										} catch(e) {
-											Cu.reportError(e);
-										}
-										aList.add(aDownload).then(function() {
-											// aDownload.refresh().then(null,Cu.reportError);
-											mozRunAsync(function() {
-												this.downloadDone(fn);
-												DownloadsData._notifyDownloadEvent("finish");
-												// DownloadsData.onDownloadChanged(aDownload);
-												// var dataItem = DownloadsData._downloadToDataItemMap.get(aDownload);
-												// console.log('dataItem', dataItem);
-											}.bind(this));
-										}.bind(this), Cu.reportError);
-									}.bind(this), Cu.reportError);
-								}.bind(this), Cu.reportError);
-							} catch(e) {
-								Cu.reportError(e);
-								this.downloadDone(fn,1);
-							}
+							// mozError(e);
+							mozAddToLibrary(f, fn, this.filesize, this.startTime, this.type, location.href );
 						}
 					},
 					downloadDone: function(fn,f) {
-						if(!f) {
-							mozAlert(fn,'Download Finished.',function(s,t) {
-								if(t == 'alertclickcallback') try {
-									if(parseInt(Services.appinfo.version) > 23) throw 2;
-									Components.classesByID["{7dfdf0d1-aff6-4a34-bad1-d0fe74601642}"]
-										.getService(Ci.nsIDownloadManagerUI).show();
-								} catch(e) {
-									var fe = 'chrome,dialog=no,menubar=no,status=no,'
-									 + 'scrollbars=yes,toolbar=no,location=no,resizable=yes';
-									Services.ww.openWindow(null,'about:downloads','mega:downloads',fe,null);
-								}
-							});
-						} else {
-							mozAlert('Download ' + fn + ' finished.');
-						}
+						mozNotifyDL(fn, f);
 					},
 					handleCompletion : function(r) {
 						if(d) console.log('handleCompletion with reason ' + r);
@@ -439,16 +535,16 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 						var guid = this.guid;
 						Services.downloads.getDownloadByGUID(guid, function(s, r) {
 							if(!Components.isSuccessCode(s)) {
-								Cu.reportError(new Components.Exception("Huh, invalid GUID: " + guid));
-							} else {
+								mozError(new Components.Exception("Huh, invalid GUID: " + guid));
+							} else try {
 								var {DownloadsData} = Cu.import("resource://app/modules/DownloadsCommon.jsm", {});
 								DownloadsData._getOrAddDataItem(r, !1);
 								DownloadsData._notifyDownloadEvent("finish");
-							}
+							} catch(e) {}
 						});
 					},
 					handleError : function(e) {
-						Cu.reportError(e);
+						mozError(e);
 					},
 					createWriter : function(callback) {
 						this.Writer = {
@@ -467,7 +563,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 										File.Writer.position += c;
 									} catch(e) {
 									// Likely 0x80520010 (NS_ERROR_FILE_NO_DEVICE_SPACE)
-										Cu.reportError(e);
+										mozError(e);
 									}
 									File.Writer.readyState = File.Writer.DONE;
 									/**
@@ -618,13 +714,11 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				var q = opts.fxo;
 				if (d) LOG(q);
 				File.filesize = q.size;
-				File.filename = (q.zipname || q.n)
-					.replace(/[:\/\\<">|?*]+/g,'.')
-					.replace(/\s*\.+/g,'.').substr(0,256);
+				File.filename = mozSaneFileName(q.zipname || q.n);
 
 				try {
 					if(q.p && !q.zipid)
-						File.folder = ('' + q.p).split(/[\\\/]+/).filter(String);
+						File.folder = mozSanePathTree(q.p);
 					File.filetime = q.t || 0;
 				} catch(e) {}
 
@@ -643,7 +737,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 						fs.QueryInterface(Ci.nsISeekableStream);
 						fs.init(f, 0x02 | 0x08 | 0x20, parseInt("0755",8), 0);
 					} catch(ex) {
-						Cu.reportError(ex);
+						mozError(ex);
 						var ps = Services.prompt,
 							btn = ['Yes','Yes, saving as default'],
 							flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_IS_STRING +
@@ -672,10 +766,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 						File.sBufSize = Math.min(4*1024*1024,File.filesize * 1.3 / 100);
 						File.startTime = Date.now();
-
-						try {
-							File.type = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService).getTypeFromFile(f);
-						} catch(e) {}
+						File.type = mozGetMIMEType(f);
 
 						if(File.type && options.streaming && location.hash.substr(0,3) !== '#fm') {
 
@@ -741,7 +832,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 							document.getElementById('download_speed').textContent = '\u221E';
 							document.getElementById('download_filename').style.marginBottom = '20px';
 						} catch(e) {
-							Cu.reportError(e);
+							mozError(e);
 						}
 					}
 				}
@@ -792,7 +883,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 	scope.mozAskDownloadsFolder = function(m)
 	{
-		var folder = mozFilePicker(null,2,{title : m || 'Please choose downloads folder'});
+		var folder = mozFilePicker(null,2,{title : m || l[136] || 'Please choose downloads folder'});
 
 		if (folder)
 		{
@@ -806,12 +897,21 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 		return folder;
 	};
 
+	if (!mozPrefs.getPrefType('notifydl'))
+	{
+		mozPrefs.setBoolPref('notifydl', true);
+	}
+
 	if (!mozPrefs.getPrefType('dir'))
 	{
 		/**
 		 * Downloads will be saved on the Desktop by default
 		 */
-		mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		try {
+			mozSetDownloadsFolder(Services.dirsvc.get("Desk", Ci.nsIFile));
+		} catch(e) {
+			mozSetDownloadsFolder(Services.dirsvc.get("DfltDwnld", Ci.nsIFile));
+		}
 	}
 
 	try
@@ -826,7 +926,15 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 	}
 	catch(e)
 	{
-		Cu.reportError(e);
+		mozError(e);
 		alert(e);
 	}
 })(self);
+
+try {
+	const { OS } = 27 < parseInt(Services.appinfo.version)
+		&& Cu.import("resource://gre/modules/osfile.jsm", {});
+} catch(e) {}
+
+const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;
+if(!BrowserApp) is_chrome_firefox |= 2;

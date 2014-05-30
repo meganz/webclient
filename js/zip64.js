@@ -127,10 +127,13 @@ function dlZipIO(dl, dl_id) {
 			$.each(dirData, function(key, value) {
 				doWrite(value);
 			});
+			
+			delete GlobalProgress['zip_' + dl.zipid];
+
 			doWrite(end, function() {
 				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
-				realIO.download(dl.zipname);
+				realIO.download(dl.zipname, '');
 				if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 			});
 
@@ -162,7 +165,7 @@ function dlZipIO(dl, dl_id) {
 		return function (buffer, pos, next) {
 			if (!ZipObject) {
 				realIO.is_zip = true
-				realIO.setCredentials("", self.size + self.files*1024);
+				realIO.setCredentials("", self.size + self.files*1024, dl.zipname);
 				ZipObject = new ZIPClass(self.size + self.files*1024);
 			}
 

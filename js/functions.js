@@ -1,11 +1,62 @@
-function inherits(ctor, superCtor) {
-	ctor.super_ = superCtor
-	var TempCtor = function () {
-		ctor.super_.prototype.constructor.apply(this, arguments)
+var inherits = (function(){
+	var createObject = Object.create || function createObject(source) {
+		var Host = function () {};
+		Host.prototype = source;
+		return new Host();
+	};
+
+	return function (destination, source) {
+		var proto = destination.prototype = createObject(source.prototype);
+		proto.constructor = destination;
+		proto._super = source.prototype;
 	}
-	TempCtor.prototype = superCtor.prototype
-	ctor.prototype = new TempCtor()
-	ctor.prototype.constructor = ctor
+})();
+
+/**
+ *	Cascade:
+ *
+ *	Tiny helper to queue related tasks, in which the output of one function
+ *	is the input of the next task. It is asynchronous
+ *	
+ *		function([prevarg, arg], next)
+ *	
+ *	Author: @crodas
+ */
+function Cascade(tasks, fnc, done, value)
+{
+	function scheduler(value) {
+		if (tasks.length == 0) {
+			return done(value);
+		}
+
+		fnc([value, tasks.shift()], scheduler)
+	}
+
+	scheduler(value);
+}
+
+/**
+ *	Simple interface to run things in parallel (safely) once, and 
+ *	get a safe callback
+ *
+ *	Author: @crodas
+ */
+function Parallel(task) {
+	var callbacks = {};
+	return function(args, next) {
+		var id = JSON.stringify(args)
+		if (callbacks[id]) {
+			return callbacks[id].push(next);
+		}
+		callbacks[id] = [next];
+		task(args, function() {
+			var args = arguments;
+			$.each(callbacks[id], function(i, next) {
+				next.apply(null, args);
+			});
+			delete callbacks[id];
+		});
+	};
 }
 
 
@@ -17,10 +68,13 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(function() {
-		callback();
-	}, 1000);
+	setTimeout(callback, 1000);
 }
+
+var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
+{
+	setTimeout(callback, 0);
+};
 
 function jScrollFade(id)
 {
@@ -195,12 +249,22 @@ function populate_l()
 	l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
 	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');	
+	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
+	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
 	l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
 	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
+	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');	
+	l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
+	l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');	
+	l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+	l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
+	l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');	
+	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');		
+	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
+	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');		
 	l['year'] = new Date().getFullYear();
 }
 
@@ -381,7 +445,8 @@ function uplpad(number, length)
 
 function secondsToTime(secs)
 {
-	if (!(secs >= 0)) secs = 0;
+	if (secs < 0) return '';
+
 	var hours = uplpad(Math.floor(secs / (60 * 60)),2);	
 	var divisor_for_minutes = secs % (60 * 60);
 	var minutes = uplpad(Math.floor(divisor_for_minutes / 60),2);
@@ -850,12 +915,21 @@ function addZeroIfLenLessThen(val, len) {
 
 
 function NOW() {
-	return (new Date()).getTime();
+	return Date.now();
 }
 
 /**
  *	Global function to help debugging
  */
+function DEBUG2() {
+	if (d) {
+		console.log.apply(console, arguments)
+		if (!is_chrome_firefox && localStorge.ddetailed2) {
+			console.warn.apply(console, arguments)
+		} else if (d > 1) console.trace();
+	}
+}
+
 function DEBUG() {
 	if (arguments.length == 2 && typeof arguments[0] == "object"
 		  && typeof arguments[0][arguments[1]] == "function") {
@@ -873,9 +947,9 @@ function DEBUG() {
 	}
 	if (d) {
 		console.log.apply(console, arguments)
-		if (!is_chrome_firefox) {
+		if (!is_chrome_firefox && localStorge.ddetailed) {
 			console.error.apply(console, arguments)
-		}
+		} else if (d > 1) console.trace();
 	}
 }
 
@@ -991,3 +1065,205 @@ function megaUserIdEncodeForXmpp(handle) {
     var s = base64urldecode(handle);
     return baseenc.b32encode(s).replace(/=/g, "");
 };
+
+
+/**
+ *	Create a pool of workers, it returns a Queue object
+ *	so it can be called many times and it'd be throttled 
+ *	by the queue
+ */
+function CreateWorkers(url, message, size) {
+	size = size || 4
+	var worker = []
+		, instances = [];
+
+	function handler(id) {
+		return function(e) {
+			message(this.context, e, function(r) {
+				worker[id].busy = false; /* release worker */
+				instances[id](r);
+			});
+		}
+	}
+
+	function create(i) {
+		var w;		
+		
+		w  = new Worker(url);
+
+		w.id   = i;
+		w.busy = false;
+		w.postMessage = w.webkitPostMessage || w.postMessage;
+		w.onmessage   = handler(i);
+		return w;
+	}
+
+	for (var i = 0; i < size; i++) {
+		worker.push(null);
+	}
+
+	return new MegaQueue(function(task, done) {
+		for (var i = 0; i < size; i++) {
+			if (worker[i] === null) worker[i] = create(i);
+			if (!worker[i].busy) break;
+		}
+		worker[i].busy = true;
+		instances[i]   = done;
+		$.each(task, function(e, t) {
+			if (e == 0) {
+				worker[i].context = t;
+			} else if (t.constructor === Uint8Array && typeof MSBlobBuilder !== "function") {
+				worker[i].postMessage(t.buffer,[t.buffer]);
+			} else {
+				worker[i].postMessage(t);
+			}
+		});
+	}, size);
+}
+
+function percent_megatitle()
+{
+	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {};
+	
+	for (var i in dl_queue)
+	{
+		var q = dl_queue[i];
+		var t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+		
+		if (t)
+		{
+			dl_r += t[0];
+			dl_t += t[1];
+		}
+		else
+		{
+			dl_t += q.size || 0;
+		}
+	}
+	
+	for (var i in ul_queue)
+	{
+		var t = tp['ul_' + ul_queue[i].id];
+		
+		if (t)
+		{
+			ul_r += t[0];
+			ul_t += t[1];
+		}
+		else
+		{
+			ul_t += ul_queue[i].size || 0;
+		}
+	}
+	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
+	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
+	
+	if (dl_t && ul_t)
+	{
+		t = ' \u2191 ' + Math.floor(ul_r/ul_t*100) + '% \u2193 ' + Math.floor(dl_r/dl_t*100) + '%';
+	}
+	else if (dl_t)
+	{
+		t = ' ' + Math.floor(dl_r/dl_t*100) + '%';
+	}
+	else if (ul_t)
+	{
+		t = ' ' + Math.floor(ul_r/ul_t*100) + '%';
+	}
+	else
+	{
+		t = '';
+		$.transferprogress = {};
+	}
+
+	megatitle(t);
+}
+
+function __percent_megatitle()
+{
+	var percentage = 0
+		, total = 0
+
+	$('.transfer-table .progressbar-percents').each(function() {
+		var p = parseInt($(this).text());
+		if (isNaN(p)) return;
+		percentage += p;
+		total++;
+	});
+	
+	percentage = Math.floor(percentage / total)
+
+	if (total == 0 || percentage == 0 || percentage == 100) {
+		megatitle();
+	} else {
+		megatitle(" " + percentage + "%");
+	}
+}
+
+function hostname(url) {
+	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+}
+
+// Helper to manage time/sizes in a friendly way
+String.prototype.seconds = function() {
+	return parseInt(this) * 1000;
+}
+
+String.prototype.minutes = function() {
+	return parseInt(this) * 1000 * 60;
+}
+
+String.prototype.MB = function() {
+	return parseInt(this) * 1024 * 1024;
+}
+
+String.prototype.KB = function() {
+	return parseInt(this) * 1024;
+}
+
+// Quick hack for sane average speed readings
+function bucketspeedometer(initialp)
+{
+	return {
+		interval : 200,
+		num : 300,
+		prevp : initialp,
+
+		h : {},
+
+		progress : function(p)
+		{
+			var now, min, oldest;
+			var total;
+			var t;
+			
+			now = NOW();
+			now -= now % this.interval;
+
+			this.h[now] = (this.h[now] || 0)+p-this.prevp;
+			this.prevp = p;
+			
+			min = now-this.interval*this.num;
+			
+			oldest = now;
+			total = 0;
+
+			for (t in this.h)
+			{
+				if (t < min) delete this.h.bt;
+				else
+				{
+					if (t < oldest) oldest = t;
+					total += this.h[t];
+				}
+			}
+
+			if (now-oldest < 1000) return 0;
+			
+			p = 1000*total/(now-oldest);
+
+			// protect against negative returns due to repeated chunks etc.
+			return p > 0 ? p : 0;
+		}
+	}
+}

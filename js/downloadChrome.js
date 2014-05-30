@@ -3,15 +3,16 @@
 
 function FileSystemAPI(dl_id, dl) {
 	var dl_quotabytes = 0
-		, IO = this
 		, Fs
 		, dl_fw
 		, dirid = "mega"
 		, dl_chunks = []
 		, dl_chunksizes = []
 		, dl_writing
-		, dl_ack_write = function() {}
-		, chrome_write_error_msg = 20
+		, dl_position = 0
+		, dl_buffer
+		, dl_paused = false
+		, chrome_write_error_msg = 0
 		, targetpos = 0
 		, dl_geturl
 		, dl_filesize
@@ -20,6 +21,8 @@ function FileSystemAPI(dl_id, dl) {
 		, zfileEntry
 		, failed = false
 		, dl_storagetype = 0
+		, dl_done = function() {}
+		, IO = this
 		;
 
 	window.requestFileSystem = window.webkitRequestFileSystem;
@@ -35,7 +38,12 @@ function FileSystemAPI(dl_id, dl) {
 			  alert('NOT_FOUND_ERR in ' + type);
 			  break;
 			case FileError.SECURITY_ERR:
-			  alert('File transfers do not work with Chrome Incognito.<br>' + '(Security Error in ' + type + ')');
+			  dl.io = new MemoryIO(dl_id, dl);
+			  dl.io.begin = IO.begin;
+			  dl.io.size  = IO.size;
+			  dl.io.progress  = IO.progress;
+			  dl.io.setCredentials(dl_geturl, dl_filesize, dl_filename, dl_chunks, dl_chunksizes);
+			  IO = null
 			  break;
 			case FileError.INVALID_MODIFICATION_ERR:
 			  alert('INVALID_MODIFICATION_ERR in ' + type);
@@ -43,7 +51,7 @@ function FileSystemAPI(dl_id, dl) {
 			case FileError.INVALID_STATE_ERR:
 				console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
 				setTimeout(function() {
-					FileSystemAPI.check();
+					check();
 				}, 500);
 				break;
 			default:
@@ -54,6 +62,27 @@ function FileSystemAPI(dl_id, dl) {
 	// }}}
 
 	// dl_createtmpfile  {{{
+	var that = this;
+
+	function free_space(error_message) {
+		/* error */
+		clearit(0,0,function(s) {
+			// clear persistent files:
+			clearit(1,0,function(s) {
+				if (++chrome_write_error_msg % 21 == 0 && !$.msgDialog) {
+					chrome_write_error_msg=0;
+					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+				}
+				
+				setTimeout(function() {
+					failed = error_message || 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
+					dl_ack_write();
+				}, 2000);
+			});
+		});
+	
+	}
+
 	function dl_createtmpfile(fs) {
 		Fs = fs;
 		Fs.root.getDirectory('mega', {create: true}, function(dirEntry) {                
@@ -80,36 +109,25 @@ function FileSystemAPI(dl_id, dl) {
 					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
-						failed = e;
-						//dl_ack_write();
+						/* onwriteend() will take care of it */
 					}
 	
 					dl_fw.onwriteend = function() {
-						if (dl_fw.position == targetpos) return dl_ack_write();
+						if (dl_fw.position == targetpos) {
+							chrome_write_error_msg=0; /* reset error counter */
+							return dl_ack_write();
+						}
 	
-						/* error */
-						clearit(0,0,function(s) {
-							// clear persistent files:
-							clearit(1,0,function(s) {
-								if (chrome_write_error_msg == 21 && !$.msgDialog) {
-									chrome_write_error_msg=0;
-									msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
-								}
-								chrome_write_error_msg++;
-							});
-						});
-	
-						setTimeout(function() {
-							failed = 'Short write (' + dl_fw.position + ' / ' + targetpos + ')';
-							dl_ack_write();
-						}, 2000);
+						/* try to release disk space and retry */
+						free_space();
 					}
 	
 					zfileEntry = fileEntry;
-					setTimeout(function() {
+					Soon(function() {
 						// deferred execution
-						IO.begin();
-					}, 1);
+						that.begin();
+						that = null;
+					});
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -175,59 +193,80 @@ function FileSystemAPI(dl_id, dl) {
 	}
 
 	if(is_chrome_firefox) {
-		IO.abort = function(err) {
-			dl_fw.close(err);
+		this.abort = function(err) {
+			if (dl_fw) dl_fw.close(err);
 		};
 	}
 
-	IO.write = function(buffer, position, done) {
+	function dl_ack_write() {
+		if (failed) {
+			failed = false; /* reset error flag */
+			/* retry */
+			dl_fw.seek(dl_position);
+			DEBUG('IO: error, retrying and pausing dlQueue');
+			dlQueue.pause(); /* pause all downloads */
+			dl_paused = true;
+			return setTimeout(function() {
+				dl_fw.write(new Blob([dl_buffer]));
+			}, 2000);
+		}
+
+		if (dl_paused) {
+			if ($.msgDialog) {
+				closeDialog();
+			}
+			dlQueue.resume();
+			DEBUG('IO: done, resuming dlQueue');
+			dl_paused = false;
+		}
+
+		dl_writing = false;
+		dl_done(); /* notify writer */
+
+		/* release references to callback and buffer */
+		dl_buffer = null;
+		dl_done   = null;
+	}
+
+	this.write = function(buffer, position, done) {
 		if (position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
-		dl_writing = true;
-		failed     = false;
-		targetpos  = buffer.length + dl_fw.position;
+		dl_writing  = true;
+		failed      = false;
+		targetpos   = buffer.length + dl_fw.position;
+		dl_position = position
+		dl_buffer   = buffer
+		dl_done     = done
 
-		dl_ack_write = function() {
-			if (failed) {
-				failed = false; /* reset error flag */
-				dl_fw.seek(position);
-				return setTimeout(function() {
-					dl_fw.write(new Blob([buffer]));
-				}, 2000);
-			}
-
-			dl_writing = false;
-			done(); /* notify writer */
-		};
 
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
 		dl_fw.write(new Blob([buffer]));
 	};
 
-	IO.download = function(name, path) {
+	this.download = function(name, path) {
 		document.getElementById('dllink').download = name;
 		document.getElementById('dllink').href = zfileEntry.toURL();
 		if (!is_chrome_firefox)  {
 			document.getElementById('dllink').click();
 		}
+		IO = null;
 	}
 
-	IO.setCredentials = function(url, size, filename, chunks, sizes) {
+	this.setCredentials = function(url, size, filename, chunks, sizes) {
 		dl_geturl = url;
 		dl_filesize = size;
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		if (IO.is_zip || !dl.zipid) {
+		if (this.is_zip || !dl.zipid) {
 			check();
 		} else {
 			// tell the writter everything was fine
 			// only on zip, where the IO objects are not
 			// doing any write
-			IO.begin(); 
+			this.begin(); 
 		}
 	};
 }
-
 window.requestFileSystem = window.webkitRequestFileSystem;

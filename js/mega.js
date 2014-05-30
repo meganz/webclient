@@ -1,5 +1,7 @@
 var newnodes;
 var fminitialized=false;
+var panelDomQueue = []
+	, DOM_TRANSFER_LIMIT = 15
 
 if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
@@ -27,6 +29,8 @@ var fmconfig ={};
 if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
+
+
 
 function MegaData ()
 {
@@ -59,7 +63,6 @@ function MegaData ()
 		this.sortfn = false;
 		this.sortd = false;
 		this.rendered = false;
-		this.currentdirid = false;
 		this.RootID=undefined;
 		this.RubbishID=undefined;
 		this.InboxID=undefined;
@@ -617,7 +620,32 @@ function MegaData ()
 			
 			if (n.h == 'contacts')
 			{
-				folders = this.sortContacts(folders);
+				// in case of contacts we have custom sort/grouping:
+				if (localStorage.csort) this.csort = localStorage.csort;
+				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+				
+				
+				
+				if (this.csort == 'shares')
+				{				
+					folders.sort(function(a,b)
+					{
+						if (M.c[a.h] && M.c[b.h])
+						{
+							if (a.name) return a.name.localeCompare(b.name);
+						}
+						else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+						else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+						return 0;
+					});
+				}
+				else if (this.csort == 'name')
+				{				
+					folders.sort(function(a,b)
+					{						
+						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
+					});
+				}
 				
 				$('.contacts-sorting-by').removeClass('active');
 				$('.contacts-sorting-by.' + this.csort).addClass('active');				
@@ -643,27 +671,33 @@ function MegaData ()
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
+				
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
-					ulc = 'class="opened"';
-					expandedc = 'expanded';
-					buildnode = true;
+					for (var h in M.c[folders[i].h])
+					{
+						var n2 = M.d[h];						
+						if (n2 && n2.t) buildnode = true;
+					}
 				}
+				
+				if (buildnode)
+				{
+					ulc = 'class="opened"';
+					expandedc = 'expanded';				
+				}
+				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
+				
 				var containsc='';
 				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
-
-                var roomJid = megaChat.generatePrivateRoomName([
-                    megaChat.getJidFromNodeId(u_handle),
-                    megaChat.getJidFromNodeId(folders[i].h)
-                ]);
-
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" data-room-jid="' + roomJid + '" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				
 				if ($('#treeli_'+folders[i].h).length == 0)
 				{
-					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
-					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
-					else $('#treesub_' + n.h).append(html);
+					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
+					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
+					else $('#treesub_' + n.h).append(html);					
 				}
 				if (buildnode) this.buildtree(folders[i]);				
 			}
@@ -765,9 +799,16 @@ function MegaData ()
 		{
 			if (a[i] == this.RootID)
 			{
-				typeclass = 'folder';
-				if (folderlink && M.d[this.RootID]) name = htmlentities(M.d[this.RootID].name);
-				else name = l[164];
+				if (folderlink && M.d[this.RootID])
+				{
+					name = htmlentities(M.d[this.RootID].name);
+					typeclass = 'folder';
+				}
+				else
+				{
+					name = l[164];
+					typeclass = 'cloud-drive';
+				}
 			}
 			else if (a[i] == 'contacts')
 			{
@@ -818,7 +859,7 @@ function MegaData ()
 		$('.fm-folder-upload span').text(l[98]);
 
 		$('.fm-right-header').removeClass('long-path');
-		if (M.pathLength()+250 > $('.fm-right-header').width())
+		if (M.pathLength()+260 > $('.fm-right-header').width())
 		{
 			$('.fm-right-header').addClass('long-path');
 			$('.fm-new-folder span').text('');
@@ -829,7 +870,7 @@ function MegaData ()
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;
 
-		while (M.pathLength()+250 > $('.fm-right-header').width() && i < el.length)
+		while (M.pathLength()+260 > $('.fm-right-header').width() && i < el.length)
 		{
 			$(el[i]).text('');
 			i++;
@@ -848,8 +889,6 @@ function MegaData ()
 		if (this.d[id]) return this.d[id];
 		else return false;
 	};
-	
-	
 
 	this.addNode = function(n,ignoreDB)
 	{
@@ -916,6 +955,7 @@ function MegaData ()
 		var a =0;
 		function ds(h)
 		{
+			removeUInode(h);
 			if (M.c[h] && h.length < 11)
 			{
 				for(var h2 in M.c[h]) ds(h2);
@@ -928,8 +968,7 @@ function MegaData ()
 				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
-			if (M.v[h]) delete M.v[h];
-			removeUInode(h);
+			if (M.v[h]) delete M.v[h];			
 		}
 		ds(h);
 	};
@@ -1094,11 +1133,10 @@ function MegaData ()
 					var j =[];
 					for (var i in ctx.cn)
 					{
-						M.delNode(ctx.cn[i]);			
-						j.push({a:'d',n:cn[i],i:requesti});
+						M.delNode(ctx.cn[i]);									
+						api_req({a:'d',n:cn[i],i:requesti});
 					}					
-					api_req(j);
-				}			
+				}		
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
 				if (res.f) process_f(res.f);
@@ -1460,6 +1498,8 @@ function MegaData ()
 
 	this.makeDir = function(n)
 	{
+		if (is_chrome_firefox & 4) return;
+
 		var dirs = [];
 		function getfolders(d,o) 
 		{
@@ -1618,7 +1658,6 @@ function MegaData ()
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
 	{
-		if (kbps == 0) return;
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
 		{
@@ -1653,14 +1692,18 @@ function MegaData ()
 		}
 
 		if (!bl) return false;
-		if (!$.transferprogress) $.transferprogress=[];
-		if (kbps == 0) return false;
+		if (!$.transferprogress) $.transferprogress={};
+		if (kbps == 0) {
+			if (perc != 100 || $.transferprogress[id]) return false;
+			kbps = bl;
+		}
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = (bt-bl)/bps;
 		if (bl && bt)
 		{
-			$.transferprogress[id] = Math.floor(bl/bt*100);
+			// $.transferprogress[id] = Math.floor(bl/bt*100);
+			$.transferprogress[id] = [bl,bt];
 			if (!uldl_hold)
 			{
 				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
@@ -1675,8 +1718,7 @@ function MegaData ()
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
-				if ((!ul_uploading) && (perc == 100)) megatitle();
-				else if (!ul_uploading) megatitle(' ' + perc + '%');
+				percent_megatitle();
 
 				if (page.substr(0,2) !== 'fm')
 				{
@@ -1701,7 +1743,7 @@ function MegaData ()
 			$('.slideshow-error').addClass('hidden');
 			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
 		}		
-	
+		
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
@@ -1730,7 +1772,7 @@ function MegaData ()
 			setTimeout(fm_chromebar,500,$.dlheight);
 			setTimeout(fm_chromebar,1000,$.dlheight);
 		}
-		megatitle();
+		percent_megatitle();
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
@@ -1744,6 +1786,12 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
+		if ($.transferprogress && $.transferprogress[id])
+		{
+			if (!$.transferprogress['dlc']) $.transferprogress['dlc'] = 0;
+			$.transferprogress['dlc'] += $.transferprogress[id][1];
+			delete $.transferprogress[id];
+		}
 	}
 
 	this.dlbeforecomplete = function()
@@ -1809,6 +1857,32 @@ function MegaData ()
 		$.transferHeader();
 	}
 	this.mobileuploads = [];
+
+	$(document).on('remove', '.transfer-table tr', function() {
+		var toClean = 0
+		$.each(panelDomQueue, function(i, html) {
+			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
+				return false;
+			}
+			$(html).appendTo('.transfer-table')
+			toClean++
+		});
+
+		panelDomQueue.splice(0, toClean);
+
+		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+			$.transferClose();
+			resetUploadDownload();
+		}
+	});
+
+	this.addToTransferTable = function(elem) {
+		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
+			return panelDomQueue.push(elem);
+		}
+		$(elem).appendTo('.transfer-table')
+	}
+
 	this.addUpload = function(u)
 	{
 		for (var i in u)
@@ -1818,14 +1892,21 @@ function MegaData ()
 			if (!f.flashid) f.flashid = false;
 			f.target = M.currentdirid;
 			f.id = ul_id;
+
+			this.addToTransferTable(
+				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>'
+			);
 			ul_queue.push(f);			
 			
-			$('.transfer-table').append('<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
 		}
-		if (page !== 'start') openTransferpanel();
+		if (page == 'start') {
+			ulQueue.pause();
+			uldl_hold = false; /* this isn't a pause generated by the UI */
+		}
+		else openTransferpanel();
 	}
 
-	this.ulprogress = function(id,bl,bt)
+	this.ulprogress = function(id, perc, bl, bt, bps)
 	{
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
@@ -1834,22 +1915,20 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
-		if (!bl) return false;
+		if (!bl || !ul_queue[id]['starttime']) return false;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
-		var bps = Math.round(bl / eltime);
-		var retime = (bt-bl)/bps;
-		if (!$.transferprogress) $.transferprogress=[];
-		var perc = Math.floor(bl/bt*100);
+		var retime = bps > 1000 ? (bt-bl)/bps : -1;
+		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
 		{
-			$.transferprogress[id] = Math.floor(bl/bt*100);
-			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',Math.round(bl/bt*100)+'%');
-			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(Math.round(bl/bt*100)+'%');
-			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
+			// $.transferprogress[id] = Math.floor(bl/bt*100);
+			$.transferprogress['ul_' + id] = [bl,bt];
+			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
+			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
+			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bps ? bytesToSize(bps,1) +'/s' : '');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
-			if ((!ul_uploading) && (perc == 100)) megatitle();
-			else if (!ul_uploading) megatitle(' ' + perc + '%');
+			percent_megatitle();
 			$.transferHeader();
 
 			if (page.substr(0,2) !== 'fm')
@@ -1897,15 +1976,21 @@ function MegaData ()
 		}
 		else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
 		else $('.widget-circle').attr('class','widget-circle percents-0');
+		if ($.transferprogress && $.transferprogress['ul_'+ id])
+		{
+			if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
+			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
+			delete $.transferprogress['ul_'+ id];
+		}
 	}
 
 	this.ulstart = function(id)
 	{
 		if (d) console.log('ulstart',id);
-		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id);
+		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
 	};
 
@@ -1955,9 +2040,13 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid,error)
+function onUploadError(fileid, errorstr)
 {
-	if (d) console.log('OnUploadError ' + fileid + ' ' + error);
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+
+	$('.transfer-table #ul_' + fileid + ' td:eq(3)')
+		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
+		.parents('tr').data({'failed' : NOW()});
 }
 
 function addupload(u)
@@ -1968,9 +2057,9 @@ function onUploadStart(id)
 {
 	M.ulstart(id);
 }
-function onUploadProgress(id, bl, bt)
+function onUploadProgress(id, p, bl, bt, speed)
 {
-	M.ulprogress(id,bl,bt);
+	M.ulprogress(id, p, bl, bt, speed);
 }
 function onUploadSuccess(id, bl, bt)
 {
@@ -2148,58 +2237,63 @@ function execsc(ap)
 					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
 				}
 			}
-			else if (typeof a.o != 'undefined')
-			{
-				if (typeof u_sharekeys[a.n] == 'undefined' && typeof a.k != 'undefined')
-				{				
-					u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
-					tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
-					prockey=true;
-				}
-			
-				if (typeof a.r == "undefined")
-				{
-					console.log('delete a share');
-					// delete a share:
-					var n = M.d[a.n];
-					if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
-					else M.delNode(a.n);
-					if (!folderlink && a.u !== 'EXP' && fminitialized) addnotification({t: 'dshare',n: a.n,u:a.o});
-					delete u_sharekeys[a.n];
-				}
-				else
-				{
-					console.log('I receive a share, prepare for receiving tree a');
-					// I receive a share, prepare for receiving tree a
-					tparentid 	= a.o;
-					trights 	= a.r;
-					if (M.d[a.n])
-					{
-						// update rights:
-						M.nodeAttr({h:a.n,r:a.r,su:a.o});
-					}
-					else
-					{
-						console.log('look up other root-share-nodes from this user');
-						// look up other root-share-nodes from this user:
-						if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
+			else
+            {
+                if (typeof a.n != 'undefined' && typeof a.k != 'undefined' && typeof u_sharekeys[a.n] == 'undefined')
+                {
+                    u_sharekeys[a.n] = crypto_process_sharekey(a.n,a.k);
+                    tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[a.n]));
+                    prockey = true;
+                }
 
-						if (!folderlink && fminitialized) addnotification(
-						{
-							t: 'share',
-							n: a.n,
-							u: a.o
-						});
-					}
-				}
-			}
-			else if (prockey)
+                if (typeof a.o != 'undefined')
+                {
+                    if (typeof a.r == "undefined")
+                    {
+                        console.log('delete a share');
+                        // delete a share:
+                        var n = M.d[a.n];
+                        if (n && n.p.length != 11) M.nodeAttr({h:a.n,r:0,su:''});
+                        else M.delNode(a.n);
+                        if (!folderlink && a.u !== 'EXP' && fminitialized) addnotification({t: 'dshare',n: a.n,u:a.o});
+                        delete u_sharekeys[a.n];
+                    }
+                    else
+                    {
+                        console.log('I receive a share, prepare for receiving tree a');
+                        // I receive a share, prepare for receiving tree a
+                        tparentid 	= a.o;
+                        trights 	= a.r;
+                        if (M.d[a.n])
+                        {
+                            // update rights:
+                            M.nodeAttr({h:a.n,r:a.r,su:a.o});
+                        }
+                        else
+                        {
+                            console.log('look up other root-share-nodes from this user');
+                            // look up other root-share-nodes from this user:
+                            if (typeof M.c[a.o] != 'undefined') for(var i in M.c[a.o]) if (M.d[i] && M.d[i].t == 1) rootsharenodes[i]=1;
+
+                            if (!folderlink && fminitialized) addnotification(
+                            {
+                                t: 'share',
+                                n: a.n,
+                                u: a.o
+                            });
+                        }
+                    }
+                }
+            }
+
+			if (prockey)
 			{
 				var nodes = fm_getnodes(a.n,1);
 				nodes.push(a.n);
 				for (var i in nodes)
 				{
 					var n = M.d[nodes[i]];
+
 					if (n)
 					{
 						var f = {a:n.a,h:n.h,k:n.k};
@@ -2209,6 +2303,7 @@ function execsc(ap)
 					}
 				}
 			}
+
 			crypto_share_rsa2aes();
 		}
 		else if (a.a == 'k' && !folderlink)

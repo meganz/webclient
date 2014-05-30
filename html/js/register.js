@@ -295,8 +295,7 @@ function pageregister()
 
 
 function init_register()
-{
-	
+{	
 	if (register_txt)
 	{
 		$('.main-top-info-block').removeClass('hidden');
@@ -451,6 +450,18 @@ function init_register()
 		};
 		termsDialog();
 		return false;	
+	});	
+	$('.login-register-input.email,.login-register-input.password').unbind('click');
+	$('.login-register-input.email,.login-register-input.password').bind('click',function(e)
+	{
+		$(this).find('input').focus();
+	});
+	$('.login-register-input.name').unbind('click');
+	$('.login-register-input.name').bind('click',function(e)
+	{
+		var c = $(e.target).attr('class');	
+		if (c && c.indexOf('login-register-input name') > -1) $('#register-firstname').focus();
+		else if (c && c.indexOf('register-family-input-block') > -1) $('#register-lastname').focus();
 	});
 }
 

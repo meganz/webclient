@@ -3,7 +3,7 @@ var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedD
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-var mDBact,mDBv=3;
+var mDBact,mDBv=4;
 
 if (indexedDB)
 {
@@ -42,8 +42,8 @@ if (indexedDB)
 			loadfm();
 			return;
 		}
-		mDBact = Math.random();		
-		mDBactive(mDBact);	
+		mDBact = Math.random();	
+		mDBactive(mDBact);
 		loadingDialog.show();
 		if (d) console.log('mDBstart()');
 		request = indexedDB.open("MEGA_" + u_handle,2);
@@ -252,7 +252,7 @@ if (indexedDB)
 	function mDBreload()
 	{
 		mDB.close();
-		mDB=2;
+		mDB=2;		
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.onsuccess = function(event)
 		{
@@ -280,6 +280,8 @@ if (indexedDB)
 		{
 			delete localStorage[u_handle + '_mDBcount'];
 			delete localStorage[u_handle + '_maxaction'];
+			delete localStorage[u_handle + '_mDBactive'];
+			mDBact = Math.random();			
 			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 			Qt=undefined;
 			request=undefined;

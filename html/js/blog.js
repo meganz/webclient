@@ -5,6 +5,24 @@ if (!m) megalogo = '<img alt="Mega" src="' + staticpath + 'images/mega/blogs/job
 
 var blogposts = [
 {
+	"h" : "Lost passwords in the crypto age",
+	"t" :  1398502194,
+	"c" : "<p>The advent of end-to-end encryption has created a new type of human drama: The \"I can't remember the password of my cloud account, and their customer support insists that they cannot help me\" disaster. While we cannot assist with after-the-fact password recovery, we now provide a safety net for the <I>proactive</I> forgetful:</p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">1</span><span class=\"blog-new-num-txt\"><a href=\"#backup\">Export</a> your master crypto key</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">2</span><span class=\"blog-new-num-txt\">Store it in a safe place</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">3</span><span class=\"blog-new-num-txt\">Forget your password</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">4</span><span class=\"blog-new-num-txt\"><a href=\"#recovery\">Request</a> a password reset link by e-mail</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">5</span><span class=\"blog-new-num-txt\">Set a new password after providing the exported master key</span><span class=\"clear\"></span></p><p>If you are a not-so-proactive forgetful, there is now a workflow that permits the re-use of your primary e-mail address for a fresh and empty MEGA account with optional retroactive recovery:</p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">1</span><span class=\"blog-new-num-txt\">Forget your password</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">2</span><span class=\"blog-new-num-txt\"><a href=\"#recovery\">Request</a> a password reset link by e-mail</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">3</span><span class=\"blog-new-num-txt\">Park your existing account and create a new one</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">4</span><span class=\"blog-new-num-txt\">Remember your old password within 60 days</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">5</span><span class=\"blog-new-num-txt\">Contact the friendly MEGA support team at <a href=\"mailto:support@mega.co.nz\">support@mega.co.nz</a> and ask them to restore the parked account</span><span class=\"clear\"></span></p><p class=\"small-pad-paragraph\"><span class=\"blog-new-number\">6</span><span class=\"blog-new-num-txt\">Log into the restored account</span><span class=\"clear\"></span></p><p>In other news, we have upgraded our infrastructure (your data now fills 8,000 hard drives), our web file manager (with vastly improved file transfer efficiency), MEGAsync for Windows (with the MacOS X and Linux versions coming out shortly) and our mobile apps (major upgrades to the iOS and Android apps are on the way!).</p>",
+	"introtxt": "The advent of end-to-end encryption has created a new type of human drama: The \"I can't remember the password of my cloud account, and their customer support insists that they cannot help me\" disaster",
+	"simg": "images/mega/blogs/thumb_26@2x.png",
+	"by": "Admin",
+	"id": 26
+},
+{
+	"h" : "MEGA announces plans to be listed on the New Zealand Stock Exchange",
+	"t" :  1395686081,
+	"c" : "<p>Auckland, New Zealand - 25 March 2014: Shareholders of Mega Limited (\"Mega\") have entered into a conditional agreement to acquire NZSX listed company TRS Investments Limited (\"TRS\") in a reverse takeover transaction.</p><p class=\"strong-paragraph\">Principal terms of the transaction</p><p>TRS (<a href=\"https://www.nzx.com/markets/NZSX/securities/TRS\" target=\"_blank\">NZSX:TRS</a>) will undertake a 148 to 1 consolidation of its existing share capital and will then issue 700,000,000 new shares in TRS to the existing shareholders of Mega at an issue price of 30 cents per share. Following completion of the transaction, the existing shareholders of Mega will hold approximately 99% of the shares on issue in TRS.<br><br>TRS will change its name to Mega.<br><br>Further particulars about the proposed consolidation will be provided to the market in due course.<br><br>The acquisition is principally conditional upon TRS obtaining all shareholder approvals and such other consents and approvals that may be required to undertake the transaction, and the arrangements collateral to the transaction, including but not limited to those approvals required in accordance with the Companies Act, the Takeovers Code, NZSX Listing Rules and the Securities Act, on or before 30 May 2014.<br><br>TRS will circulate a Notice of Special Meeting and collateral documentation for a meeting of Shareholders to approve the transaction.<br><br>Stephen Hall, Chief Executive of Mega, said \"The rapid global growth of Mega has generated significant interest from potential investors. Listing on the New Zealand Stock Exchange will allow investors to participate in the ongoing growth of Mega\".</p><p class=\"strong-paragraph\">About Mega</p><p>Mega is a global technology business headquartered in Auckland that delivers encrypted, cloud based services that enable private, secure online communication and collaboration for businesses and individuals.<br><br>Mega's browser-based User Controlled Encryption (UCE) is unique in providing automatic encryption for all data transferred to and stored on Mega's cloud service. UCE means that only the user controls the encryption key. This provides a level of privacy and security that is unique, and allows Mega to position itself as \"<a href=\"#privacycompany\">The Privacy Company</a>\".<br><br>The Mega service was launched on 20th January 2013. Mega currently has around 7 million registered users, with new user registrations exceeding 20,000 per day. Users have stored nearly one billion encrypted files in the Mega cloud and are currently uploading up to 11 million files per day.<br><br>Mega expects to release encrypted instant messaging and encrypted chat and video conferencing in the second quarter of 2014. Development of an encrypted email service is planned.</p><p class=\"strong-paragraph\">Media enquiries:</p><p>Stephen Hall - Chief Executive<br><a href=\"mailto:stephenh@mega.co.nz\">stephenh@mega.co.nz</a><br>Mobile: +64 21 715725</p>",
+	"introtxt": "Shareholders of Mega Limited (\"Mega\") have entered into a conditional agreement to acquire NZSX listed company TRS Investments Limited (\"TRS\") in a reverse takeover transaction",
+	"simg": "images/mega/blogs/thumb_25@2x.png",
+	"by": "Stephen Hall",
+	"id": 25
+},
+{
 	"h" : "MEGA turns 1",
 	"t" :  1390135153,
 	"c" : "<p>When we launched MEGA a year ago, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that <i>security by policy</i> (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of <i>security by design</i> (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.</p><p>MEGA was architected around the simple fact that cryptography, for it to be accepted and used, must not interfere with usability. MEGA is fully accessible without prior software installs and remains the only cloud storage provider with browser-based high-performance end-to-end encryption. The only visible signs of the crypto layer operating under MEGA's hood are the entropy collection during signup, the lack of a password reset feature and the novel (and browser-specific) ways file transfers are conducted. Today, millions of business and personal users rely on MEGA to securely and reliably store and serve petabytes of data and we believe that this success is the result of MEGA's low barrier to entry to a more secure cloud.</p><p>Since we opened MEGA to the public, we have added many of the initially missing bits and pieces: we have launched mobile apps for <a href=\"#mobile\">Android and iOS</a> and a <a href=\"#sync\">Windows sync client</a>. Yet, our cloud storage product is still incomplete &mdash; tablet support, BlackBerry and Windows Phone apps and sync clients for MacOS and Linux are on their way, along with much more complete and accessible <a href=\"#sdk\">SDK</a>.</p><p>We would like to thank all users who put up with the teething issues during our beta phase, the critics who sparked healthy and often entertaining controversy around our design decisions and the security researchers who successfully participated in our bug bounty program.</p><p>This year, MEGA will evolve beyond mere cloud storage and become a feature-complete online collaboration and communication platform, all with no-compromise end-to-end encryption.</p><p>It has been an extremely busy year for us, and we're looking forward to the next twelve months of providing a feature-rich secure cloud!</p>",
@@ -219,7 +237,11 @@ var blogposts = [
 
 
 
-var bloglimit = 100;
+var bloglimit = 5;
+var blogpage = 1;
+
+var blogpostnum;
+
 var blogmonth = false;
 var blogsearch = false;
 
@@ -245,20 +267,20 @@ function blog_load()
 	$('body').addClass('blog-new');	
 	var blogcontent = '';
 	var a=0;
+	var blogstart = blogpage*bloglimit-bloglimit;
 	for (var i in blogposts)
 	{		
-		var mm = blog_month(blogposts[i].t);		
+		var mm = blog_month(blogposts[i].t);
+		
 		if ((blogmonth && (mm == blogmonth)) || ((!blogmonth) && (!blogsearch))
 		|| (blogsearch && (blog_searchmath(blogposts[i],blogsearch))))
 		{		
 			var introtxt = blogposts[i].introtxt;		
 			introtxt += ' [...]';		
-			if (i < bloglimit)
+			if (a >= blogstart && a < bloglimit*blogpage)
 			{
-				var by = 'Admin';
-				
-				if (blogposts[i].by) by = blogposts[i].by;				
-				if (parseInt(i) > 0) blogcontent += '<div class="blog-new-div"><div></div></div>';		
+				var by = 'Admin';				
+				if (blogposts[i].by) by = blogposts[i].by;		
 				blogcontent +='<div class="blog-new-item">';
 				blogcontent +='<h2>' + blogposts[i].h + '</h2>';
 				blogcontent +='<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
@@ -267,17 +289,34 @@ function blog_load()
 				blogcontent +='<div class="clear"></div><img alt="" src="' + staticpath + blogposts[i].simg + '" />';
 				blogcontent +='<p><span class="blog-new-description">' + introtxt + '</span>';
 				blogcontent +='<a href="#blog_' + blogposts[i].id + '" class="blog-new-read-more">Read more</a>';
-				blogcontent +='<span class="clear"></span></p> </div>';			
+				blogcontent +='<span class="clear"></span></p> </div>';				
 			}
 			a++;
 		}
 	}
+	blogpostnum=a;
 	if (m) $('.privacy-page').html(blogcontent);		
 	else
 	{
-		blog_archive();	
+		blog_archive();		
+		blogcontent += blog_pager();		
 		$('.blog-new-left').html(blogcontent);
-		
+		$('.blog-pagination-button').unbind('click');
+		$('.blog-pagination-button').bind('click',function()
+		{
+			var c = $(this).attr('class');
+			if (c && c.indexOf('next') > -1) blogpage+=1;
+			else if (c && c.indexOf('previous') > -1) blogpage-=1;
+			else if (c && c.indexOf('to-the-end') > -1) blogpage = Math.ceil(blogpostnum/bloglimit);			
+			else if (c && c.indexOf('to-the-beggining') > -1) blogpage=1;
+			else if (c) blogpage = parseInt(c.replace('blog-pagination-button ',''));
+			if (blogpage < 1) blogpage=1;
+			if (blogpage > Math.ceil(blogpostnum/bloglimit)) blogpage = Math.ceil(blogpostnum/bloglimit);
+			blog_load();
+		});
+		if (blogpage == Math.ceil(blogpostnum/bloglimit)) $('.blog-pagination-button.next,.blog-pagination-button.to-the-end').addClass('unavailable');
+		if (blogpage == 1) $('.blog-pagination-button.previous,.blog-pagination-button.to-the-beggining').addClass('unavailable');		
+		$('.blog-pagination-button.' + blogpage).addClass('active');		
 		if (blogsearch) 
 		{
 			$('#blog_searchinput').val(blogsearch);
@@ -289,8 +328,23 @@ function blog_load()
 		}
 		else $('.privacy-top-pad h1').text('Blog');
 	}
-	
 	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,mouseWheelSpeed:50});
+}
+
+function blog_pager()
+{
+	var pages = Math.ceil(blogpostnum/bloglimit);
+	if (pages == 1) return '';
+	var blogpages = '';
+	var i =0;
+	
+	while (i < pages)
+	{
+		blogpages += '<div class="blog-pagination-button ' + (i+1) + '">' + (i+1) + '</div>';
+		i++;	
+	}	
+	var blogpager = '<div class="blog-pagination"><div class="blog-pagination-pad"><div class="blog-pagination-button to-the-beggining"></div><div class="blog-pagination-button previous"></div>' + blogpages + '<div class="blog-pagination-button next"></div><div class="blog-pagination-button to-the-end"></div></div></div>';	
+	return blogpager;
 }
 
 
@@ -356,7 +410,7 @@ if (typeof mobileblog !== 'undefined')
 			content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
 			var date = new Date(blogposts[i].t*1000);			
 			var blogdate =  date.getDate() + '-' + (parseInt(date.getMonth())+1) + '-' + date.getFullYear();
-			var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">MEGA exits beta</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + blogposts[i].by + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="clear"></div></div></div></div>';
+			var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">' + blogposts[i].h + '</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + blogposts[i].by + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="clear"></div></div></div></div>';
 			document.body.innerHTML = html;			
 			if (android) document.body.className = 'android blog';
 			else if (ios) document.body.className = 'ios blog';

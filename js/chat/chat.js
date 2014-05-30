@@ -10,7 +10,6 @@ if (localStorage.megachat) {
     MegaChatEnabled = true;
 }
 
-
 var chatui;
 (function() {
     chatui = function() {
@@ -543,9 +542,13 @@ MegaChat.prototype.init = function() {
     };
 
     this.karere.bind("onConnected", function() {
+
         if(localStorage.megaChatPresence) {
             self.karere.setPresence(localStorage.megaChatPresence, undefined, localStorage.megaChatPresenceMtime);
+        } else {
+            self.karere.setPresence();
         }
+
         updateMyConnectionStatus();
 
         recoverChats();
@@ -790,6 +793,7 @@ MegaChat.prototype.init = function() {
 
     } catch(e) {
         // no RTC support.
+
     }
 
     if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED) {
@@ -807,6 +811,13 @@ MegaChat.prototype.init = function() {
  */
 MegaChat.prototype.connect = function() {
     var self = this;
+
+    // connection flow already started/in progress?
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+        return self.karere._$connectingPromise.always(function() {
+            self.renderMyStatus();
+        });
+    }
 
     self.karere.resetConnectionRetries();
 
@@ -1524,7 +1535,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
          */
-        'pluginsReadyTimeout': 3000,
+        'pluginsReadyTimeout': 30000,
 
         /**
          * Default media options
@@ -1576,7 +1587,6 @@ var MegaChatRoom = function(megaChat, roomJid) {
         if(localStorage.d) {
             console.error("Will change state from: ", MegaChatRoom.stateToText(oldState), " to ", MegaChatRoom.stateToText(newState));
         }
-
         var resetStateToReady = function() {
             if(self.state != MegaChatRoom.STATE.LEFT && self.state != MegaChatRoom.STATE.READY) {
                 if(localStorage.d) {
@@ -1601,18 +1611,22 @@ var MegaChatRoom = function(megaChat, roomJid) {
         } else if(newState == MegaChatRoom.STATE.PLUGINS_PAUSED) {
             // allow plugins to hold the PLUGINS_WAIT state for MAX 5s
             createTimeoutPromise(function() {
-                return self.state !== MegaChatRoom.STATE.PLUGINS_WAIT
+                return self.state !== MegaChatRoom.STATE.PLUGINS_PAUSED && self.state !== MegaChatRoom.STATE.PLUGINS_WAIT
             }, 100, self.options.pluginsReadyTimeout)
                 .fail(function() {
                     if(self.state == MegaChatRoom.STATE.PLUGINS_WAIT || self.state == MegaChatRoom.STATE.PLUGINS_PAUSED) {
+                        if(localStorage.d) {
+                            console.error("Plugins had timed out, setting state to PLUGINS_READY");
+                        }
+
                         self.setState(MegaChatRoom.STATE.PLUGINS_READY);
                     }
                 });
         } else if(newState == MegaChatRoom.STATE.READY) {
             if(localStorage.dd) {
                 console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+                debugger;
             }
-            self.requestMessageSync();
 
             if(self._messagesQueue.length > 0) {
                 $.each(self._messagesQueue, function(k, v) {
@@ -1624,6 +1638,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
                 });
                 self._messagesQueue = [];
             }
+
+            self.requestMessageSync();
         }
     });
 
@@ -2367,16 +2383,18 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
             $('.btn-chat-call', self.$header).hide();
         } else {
             var haveCallCapability = false;
-            $.each(participants, function(k, p) {
-               var capabilities = self.megaChat.karere.getCapabilities(p);
+            if(self.megaChat.rtc) { // only check if the CLIENT have the required capabilities (.rtc = initialised)
+                $.each(participants, function(k, p) {
+                   var capabilities = self.megaChat.karere.getCapabilities(p);
 
-               if(!capabilities) {
-                   return; // continue;
-               }
-               if(capabilities['audio'] || capabilities['video']) {
-                   haveCallCapability = true;
-               }
-            });
+                   if(!capabilities) {
+                       return; // continue;
+                   }
+                   if(capabilities['audio'] || capabilities['video']) {
+                       haveCallCapability = true;
+                   }
+                });
+            }
 
             if(haveCallCapability) {
                 $('.btn-chat-call', self.$header).show();
@@ -2785,7 +2803,10 @@ MegaChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     var megaChat = self.megaChat;
     var karere = megaChat.karere;
 
-    console.warn("will eventually sync:", self)
+    if(localStorage.d) {
+        console.warn("will eventually sync:", self)
+    }
+
     // sync only once
     if(self._syncDone === true) {
         return;

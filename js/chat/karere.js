@@ -29,6 +29,10 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
             karere.disconnect()
                 .done(function() {
                     karere.reconnect();
+                })
+                .fail(function() {
+                    karere.connection.disconnect(); // force disconnect
+                    karere.reconnect();
                 });
         }, karere._connectionRetries * 1000)
     }
@@ -123,6 +127,10 @@ var Karere = function(user_options) {
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
+        if(eventObject.getFromJid().indexOf("conference.") !== -1) {
+            // ignore user joined presences for conf rooms.
+            return;
+        }
 
         if(eventObject.getShow() != "unavailable" && !eventObject.getType()) {
 
@@ -299,20 +307,20 @@ Karere.DEFAULTS = {
      * When a method which requires connection is called, Karere would try to connect and execute that method.
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
-    connectionRequiredTimeout: 8000,
+    connectionRequiredTimeout: 9000,
 
 
     /**
      * Timeout when connecting
      */
-    connectTimeout: 7000,
+    connectTimeout: 10000,
 
 
     /**
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 550,
+    reconnectDelay: 2550,
 
 
     /**
@@ -542,9 +550,6 @@ makeMetaAware(Karere);
 
                     self._connectionRetries = 0; // reset connection errors
 
-                    self.setPresence(); // really important...if we dont call this...the user will not be visible/online to the others in the roster
-                                        // so no messages will get delivered.
-
                     self.trigger('onConnected');
 
                     $promise.resolve(status);
@@ -717,7 +722,7 @@ makeMetaAware(Karere);
             ) {
 
             if(localStorage.d) {
-		        console.debug("Will try to wait for the queue to get empty before disconnecting...");
+		        console.error("Will try to wait for the queue to get empty before disconnecting...");
             }
 
             self._connectionState = Karere.CONNECTION_STATE.DISCONNECTING;
@@ -765,6 +770,9 @@ makeMetaAware(Karere);
 
         self._connectionRetries = 0;
         clearTimeout(self._connectionRetryInProgress);
+        if(self._$connectingPromise) {
+            self._$connectingPromise.reject();
+        }
     }
 }
 
@@ -1398,14 +1406,20 @@ makeMetaAware(Karere);
                 eventData.fromJid,
                 eventData.messageId
             );
-            console.error(stanzaType, eventDataObject);
+
+            if(localStorage.d) {
+                console.error(stanzaType, eventDataObject);
+            }
         } else if(stanzaType == "PingResponse") {
             eventDataObject = new KarereEventObjects.PingResponse(
                 eventData.toJid,
                 eventData.fromJid,
                 eventData.messageId
             );
-            console.error(stanzaType, eventDataObject);
+
+            if(localStorage.d) {
+                console.error(stanzaType, eventDataObject);
+            }
         } else {
             eventDataObject = eventData;
             if($.isPlainObject(eventDataObject)) {
@@ -1458,6 +1472,7 @@ makeMetaAware(Karere);
      * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
+
         presence = presence || "chat";
         status = status || "";
         delay = delay ? parseFloat(delay) : undefined;

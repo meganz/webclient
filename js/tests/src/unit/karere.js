@@ -65,6 +65,10 @@ describe("Karere Unit Test", function() {
         done();
     });
     it("can connect, disconnect and reconnect", function(done) {
+        k1.bind("onConnected", function(e) {
+            k1.setPresence();
+        });
+
         var promise = k1.connect("user@jid.com", "password");
 
         expect(m1.calls['connect'][0][0]).to.contain("user@jid.com/");

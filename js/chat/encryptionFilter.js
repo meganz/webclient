@@ -352,8 +352,10 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
     if(localStorage.d) { console.error("Flushing: ", megaRoom, handler); }
 
+
     while(handler.protocolOutQueue.length) {
         var msg = handler.protocolOutQueue.shift();
+
         if(msg.to) {
             megaRoom.megaChat.karere.sendRawMessage(
                 msg.to,
@@ -376,6 +378,8 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
         if(localStorage.d) { console.error("protocolOut: ", msg); }
     }
+
+
     while(handler.messageOutQueue.length) {
         var msg = handler.messageOutQueue.shift();
 
@@ -394,6 +398,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
         if(localStorage.d) { console.error("messageOut: ", msg); }
     }
+
 
     while(handler.uiQueue.length) {
         var wireMessage = handler.uiQueue.shift();

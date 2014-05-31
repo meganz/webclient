@@ -3151,15 +3151,6 @@ function transferPanelUI()
 		  $(headerColumn).width($(e).width());
 	    });
 
-		$('.tranfer-table').unbind('click')
-		$('.tranfer-table').bind('click', function() {
-			// we don't have selection, unless the 
-			// the contextmenu sets it (when it shows the menu)
-			$('.transfer-table tr')
-				.removeClass('ui-selected');
-		});
-
-		
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
 		{
@@ -3196,8 +3187,9 @@ function transferPanelUI()
 				}
 				else if (e.metaKey == false) 
 				{
+					var had = $(this).hasClass('ui-selected');
 					$('.transfer-table tr').removeClass('ui-selected');
-					$(this).addClass('ui-selected');
+					if (!had) $(this).addClass('ui-selected');
 					$.TgridLastSelected = this;
 				}
 				else 

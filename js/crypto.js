@@ -597,7 +597,7 @@ function crypto_rsagenkey ()
         u_setrsa(e.data);
     };
 
-    var randomSeed = new Uint32Array(256);
+    var randomSeed = new Uint8Array(256);
     asmCrypto.ISAAC.seed(bioSeed);
     asmCrypto.getRandomValues(randomSeed);
 

@@ -26,7 +26,7 @@ if (window.performance !== undefined && window.performance.now !== undefined) {
 	var timeByte = function() { return ((new Date().getTime())>>>2)&255 };
 }
 
-function keyPressEntropy(e) { bioSeed[bioCounter++ & 255] ^= timeByte(); }
+function keyPressEntropy(e) { bioSeed[bioCounter++ & 255] ^= timeByte() | ( e.keyCode << 8 ); }
 
 function mouseMoveEntropy(e)
 {
@@ -36,7 +36,7 @@ function mouseMoveEntropy(e)
  {
   var c = ((e.screenX << 4) | (e.screenY & 15));
   if (typeof arkanoid_entropy !== 'undefined') arkanoid_entropy();
-  bioSeed[bioCounter++ & 255] ^= ( timeByte() ^ c );
+  bioSeed[bioCounter++ & 255] ^= timeByte() | ( c << 8 );
   mouseMoveSkip = ( Math.random() * 8 ) | 0;
  }
 }

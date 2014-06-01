@@ -280,7 +280,27 @@ var MegaChat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': "sandbox.developers.mega.co.nz",
         'rtcSession': {
-            dummyCryptoFunctions: true,
+            encryptMessageForJid: function(msg, bareJid) {
+                var contactName = megaChat.getContactNameFromJid(bareJid);
+                if (!u_pubkeys[contactName]) {
+                    throw new Error("pubkey not loaded: " + contactName);
+                }
+                return base64urlencode(crypto_rsaencrypt(u_pubkeys[contactName], msg));
+            },
+            decryptMessage: function(msg) {
+                // TODO: update this when we switch to asmCrypto, it should just be
+                // crypto_rsadecrypt(base64urldecode(msg), u_privk)
+                return crypto_rsadecrypt(mpi2b(base64urldecode(msg)), u_privk).substring(0, 44);
+            },
+            prepareToSendMessage: function(sendMsgFunc, bareJid) {
+                api_cachepubkeys({
+                    cachepubkeyscomplete : sendMsgFunc
+                }, [megaChat.getContactNameFromJid(bareJid)]);
+            },
+            generateMac: function(msg, key) {
+                var rawkey = atob(key);
+                return asmCrypto.HMAC_SHA256.base64( rawkey, msg );
+            },
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
                 {

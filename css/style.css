@@ -4161,6 +4161,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 	font-size: 0;
 	line-height: 0;
+	height: 24px;
+	overflow: hidden;
 }
 .files-grid-view, .contacts-grid-view {
 	-webkit-box-sizing: border-box;
@@ -5496,7 +5498,7 @@ span.search-number {
 	z-index: 500;
 	padding: 8px 0;
 }
-.context-menu-divider {
+.context-menu-divider, .pause-item-divider {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
@@ -8708,6 +8710,24 @@ table {
 }
 .select-all .context-menu-icon {
 	background-position: -1px -5290px;
+}
+.preview-item .context-menu-icon {
+	background-position: -4px -5380px;
+}
+.transfer-pause .context-menu-icon {
+	background-position: 5px -3612px;
+}
+.transfer-play .context-menu-icon {
+	background-position: 4px -5432px;
+}
+.move-up .context-menu-icon {
+	background-position: 5px -3652px;
+}
+.move-down .context-menu-icon {
+	background-position: 5px -3684px;
+}
+.tranfer-clear .context-menu-icon {
+	background-position: 5px -3716px;
 }
 .top-user-status-item {
 	padding-left: 5px;

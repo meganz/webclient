@@ -1,0 +1,969 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+
+      function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  initTreePanelScroll();
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+  });
+  $('.nw-fm-tree-folder').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
+		  $('.nw-fm-tree-item.selected').removeClass('selected');
+		  fmTreeItem.addClass('selected');
+	  }
+  });
+  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
+		  fmTreeItem.addClass('expanded');
+		  fmTreeItem.next('ul').addClass('opened');
+		  initTreePanelScroll();
+	  } else {
+		  fmTreeItem.removeClass('expanded');
+		  fmTreeItem.next('ul').removeClass('opened');
+		  initTreePanelScroll();
+	  }
+  });
+  $('.nw-fm-left-icon').bind('click', function() {
+	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
+	  if($(this).attr('class').indexOf('active') == -1) {
+		  $('.nw-fm-left-icon.active').removeClass('active');
+		  $(this).addClass('active');
+		  $('.content-panel.active').removeClass('active');
+		  $('.content-panel.'+currentPanelTitle).addClass('active');
+		  initTreePanelScroll();
+		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
+	  }
+  });
+  $('.nw-contact-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-contact-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  $('.nw-conversations-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-conversations-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  var initial;
+  $('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initial );
+	  initial = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+  });
+  $('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initial );
+  });
+   
+
+    //Demo of scripts. You can use optimized as always. jScrollPane is a bit buggy here. 
+
+    function initChatScrolling() {
+	   $('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+    }
+	initChatScrolling();
+	$(window).bind('resize', function () {
+		initChatScrolling();
+	});
+	
+	
+	
+	$('.message-textarea').keyup(function() {
+		  $(this).height('auto');
+		  var text = $(this).val();   
+          var lines = text.split("\n");
+          var count = lines.length;
+		   
+		  if ($(this).val().length != 0 && count>1) {
+		         $(this).height($(this).prop("scrollHeight"));
+				 var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight();
+				 if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight()) {
+				     $('.fm-chat-message-scroll').height(scrollBlockHeight);
+				     initChatScrolling();
+				 }
+		  }
+		  else  $(this).height('27px');
+	});
+	
+	$('.fm-chat-attach-file').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') > -1) {
+			 $('.fm-chat-attach-popup').addClass('hidden');
+			 $(this).removeClass('active');
+		} else {
+			 $('.fm-chat-attach-popup').removeClass('hidden');
+			 $(this).addClass('active');
+			 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-attach-arrow').position().top;
+			 $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
+		}
+	});
+	
+	$('.nw-chat-button.red').bind('click', function() {
+		var chatDownloadPopup = $('.fm-chat-download-popup');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			 $('.nw-chat-button.red.active').removeClass('active');
+			 var p = $(this);
+			 var positionY = $(this).closest('.fm-chat-message-pad').outerHeight() - $(this).position().top;
+			 var positionX = $(this).position().left;
+	        // if (positionY - 174 > 0) {
+			   $(chatDownloadPopup).css('bottom', positionY - 7  + 'px');
+			// } else {
+			//   $(chatDownloadPopup).css('bottom', positionY + 'px');
+			//   $(chatDownloadPopup).addClass('top');
+			// }
+			 chatDownloadPopup.addClass('active');
+			 chatDownloadPopup.css('margin-left', '-'+ chatDownloadPopup.outerWidth()/2 + 'px');
+			 chatDownloadPopup.css('left', positionX + $(this).outerWidth()/2 + 10  + 'px');
+		     $(this).addClass('active');
+		} 
+		else {
+			 $(this).removeClass('active');
+			 chatDownloadPopup.removeClass('active');
+			 chatDownloadPopup.css('left', '-' + 10000 + 'px');
+		}
+			 
+	});
+	$('.fm-chat-download-button').bind('click', function() {
+		var chatDownloadPopup = $('.fm-chat-download-popup.active');
+		chatDownloadPopup.removeClass('active');
+		chatDownloadPopup.css('left', '-' + 10000 + 'px');
+		$('.nw-chat-button.red.active').removeClass('active');
+	});
+	
+    function closeChatPopups() {
+		var activePopup = $('.chat-popup.active');
+		var activeButton = $('.chat-button.active');
+		activeButton.removeClass('active');
+		activePopup.removeClass('active');
+		if (activePopup.attr('class')) {
+		  activeButton.removeClass('active');
+		  activePopup.removeClass('active');
+		  if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1) activePopup.css('left', '-' + 10000 + 'px'); 
+		  else activePopup.css('right', '-' + 10000 + 'px'); 
+		}
+	}
+	
+	$('.fm-add-user').bind('click', function() {
+	    var positionX = $(this).position().left;
+		var addUserPopup = $('.fm-add-contact-popup');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			 closeChatPopups();
+			 addUserPopup.addClass('active');
+			 $(this).addClass('active');
+			 $('.fm-add-contact-arrow').css('right', $(this).outerWidth()/2  + 'px'); 
+			 addUserPopup.css('right', 0 + 'px'); 
+		} else {
+			 addUserPopup.removeClass('active');
+			 addUserPopup.css('right', '-' + '10000' + 'px'); 
+			 $(this).removeClass('active');
+			 
+		}
+	});
+	
+	$('.fm-send-files').bind('click', function() {
+	    var positionX = $(this).position().left;
+		var sendFilesPopup = $('.fm-send-files-popup');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			 closeChatPopups();
+			 sendFilesPopup.addClass('active');
+			 $(this).addClass('active');
+			 $('.fm-send-files-arrow').css('left', $(this).outerWidth()/2  + 'px'); 
+			 sendFilesPopup.css('left',  $(this).position().left + 'px'); 
+		} else {
+			 sendFilesPopup.removeClass('active');
+			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
+			 $(this).removeClass('active');
+			 
+		}
+	});
+	
+	
+	$('.fm-start-call').bind('click', function() {
+	    var positionX = $(this).position().left;
+		var sendFilesPopup = $('.fm-start-call-popup');
+		if ($(this).attr('class').indexOf('active') == -1) {
+			 closeChatPopups();
+			 sendFilesPopup.addClass('active');
+			 $(this).addClass('active');
+			 $('.fm-start-call-arrow').css('left', $(this).outerWidth()/2  + 'px'); 
+			 sendFilesPopup.css('left',  $(this).position().left + 'px'); 
+		} else {
+			 sendFilesPopup.removeClass('active');
+			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
+			 $(this).removeClass('active');
+			 
+		}
+	});
+	
+	$('.fm-chat-emotions-icon').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') == -1) {
+			$(this).addClass('active');
+			$('.fm-chat-emotion-popup').addClass('active');
+		} else {
+			$(this).removeClass('active');
+			$('.fm-chat-emotion-popup').removeClass('active');
+		}
+	});
+	
+	$('.fm-chat-smile').bind('click', function() {
+			$('.fm-chat-emotions-icon').removeClass('active');
+			$('.fm-chat-emotion-popup').removeClass('active');
+	});
+	
+	$('.multiple-sharing .nw-chat-expand-arrow').bind('click', function() {
+		var sharingBlock = $(this).closest('.fm-chat-messages-block');
+		if ($(sharingBlock).attr('class').indexOf('expanded') > -1) 
+			  sharingBlock.removeClass('expanded');
+		else sharingBlock.addClass('expanded');
+		var chatDownloadPopup = $('.fm-chat-download-popup.active');
+		chatDownloadPopup.removeClass('active');
+		chatDownloadPopup.css('left', '-' + 10000 + 'px');
+		$('.nw-chat-button.red.active').removeClass('active');
+	
+	    initChatScrolling();
+	});
+	
+	$('.fm-chat-popup-button.from-cloud').bind('click', function() {
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-chat-attach-popup').removeClass('hidden');
+	});
+	
+	$('.fm-chat-popup-button.add-contact').bind('click', function() {
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-add-user-popup').removeClass('hidden');
+	});
+	
+	$('.nw-fm-close-button').bind('click', function() {
+		$('.fm-dialog-overlay').addClass('hidden');
+		$(this).closest('.fm-dialog-popup').addClass('hidden');
+	});
+	
+});
+</script>
+</head>
+
+<body>
+
+<div class="loading-spinner" style="display:none;"></div>
+<div class="dark-overlay hidden"></div>
+<div class="loading-spinner hidden"></div>
+<div class="fm-dialog-overlay hidden"></div>
+
+<!-- New file attach dialog !-->
+<div class="fm-chat-attach-popup fm-dialog-popup hidden">
+   <div class="fm-chat-attach-top">
+        <a class="fm-breadcrumbs cloud-drive contains-directories has-next-button">
+          <span class="right-arrow-bg ui-draggable"><span>Cloud Drive</span></span>
+        </a>
+        <a class="fm-breadcrumbs folder contains-directories has-next-button">
+          <span class="right-arrow-bg ui-draggable"><span>szc</span></span>
+        </a>
+        <a class="fm-breadcrumbs folder contains-directories">
+          <span class="right-arrow-bg ui-draggable"><span>aewdawd</span></span>
+        </a>
+        <div class="clear"></div>
+        <div class="nw-fm-close-button"></div>
+   </div>
+   <div class="fm-chat-attach-scrolling">
+         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">
+           <tbody>       
+             <tr class="folder">
+               <td>
+                 <span class="transfer-filtype-icon folder-shared"> </span>
+                 <span class="tranfer-filetype-txt">2w4efwsef efsefs dfsd fsd fsdfsdfdfsdf</span>
+               </td>
+             </tr>
+             <tr>
+               <td>
+                 <span class="transfer-filtype-icon image"> </span>
+                 <span class="tranfer-filetype-txt">10.12.2009_15.12.16.jpg</span>
+               </td>
+             </tr>
+             <tr>
+               <td>
+                 <span class="transfer-filtype-icon image"> </span>
+                 <span class="tranfer-filetype-txt">10.12.2009_15.12.16.jpg</span>
+               </td>
+             </tr>
+             <tr>
+               <td>
+                 <span class="transfer-filtype-icon image"> </span>
+                 <span class="tranfer-filetype-txt">10.12.2009_15.12.16.jpg</span>
+               </td>
+             </tr>
+           </tbody>
+         </table>    
+   </div>
+   <div class="fm-chat-attach-bottom">
+       <div class="fm-chat-attach-button red"> Send </div>
+       <div class="fm-chat-attach-button"> Cancel </div>
+       <div class="clear"></div>
+   </div>
+</div>
+<!-- End of New file attach dialog !-->
+
+<!-- New "Add user to conversation" dialog !-->
+<div class="fm-add-user-popup fm-dialog-popup hidden">
+   <div class="fm-dialog-top fm-add-user-top">
+        <div class="nw-fm-dialog-title">Add contact to conversation:</div>
+        <div class="fm-dialog-search">
+           <input type="text" value="Search" />
+        </div>
+        <div class="nw-fm-close-button"></div>
+   </div>
+   <!-- Please set scrolling init !-->
+   <div class="fm-add-user-scrolling">
+      <!-- Please add "verified" classname !-->
+      <div class="nw-contact-item offline verified">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Andrei.d
+         </div>
+      </div>
+      <div class="nw-contact-item online">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Bram van der Kolk
+         </div>
+      </div>
+      <div class="nw-contact-item away">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Eduardo
+         </div>
+      </div>
+      <div class="nw-contact-item busy verified">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Kim Dotcom
+         </div>
+      </div>
+      <div class="nw-contact-item online">
+         <div class="nw-contact-status"></div>
+         <div class="nw-contact-avatar">
+              <div class="nw-contact-verified-icon"></div>
+              <img alt="" src="images/mega/default-small-avatar.png" />
+         </div>
+         <div class="nw-contact-name">
+              Bram van der Kolk
+         </div>
+      </div>    
+   </div>
+   <div class="fm-dialog-bottom">
+       <div class="fm-dialog-button red"> Add </div>
+       <div class="fm-dialog-button"> Cancel </div>
+       <div class="clear"></div>
+   </div>
+</div>
+<!-- End of New "Add user to conversation" dialog !-->
+
+<div class="fmholder" id="fmholder">
+  <div class="top-head"> 
+    <a class="logo"></a> 
+    <a class="top-menu-icon">Menu</a> 
+    <div class="membership-status-block">
+       <div class="membership-status free" style="display: block;">FREE</div>
+    </div>
+    <a class="user-name">Andrei.d</a>
+    <div class="activity-status-block">
+      <div class="activity-status online"></div>
+    </div>
+    <div class="cloud-popup-icon" style="display: block;"><span class="notification-num" style="display: none;">0</span></div>
+    <div class="top-chat-notification"></div>
+    <div class="top-search-bl">
+       <div class="top-search-clear">
+           <div class="top-clear-button"></div>
+           <input type="text" value="Search" class="top-search-input">
+       </div>
+    </div>   
+  </div>
+  
+  <div class="fm-main default">
+    <div class="nw-fm-left-icons-panel">
+          <div class="nw-fm-left-icon cloud-drive active">
+             <div class="nw-fm-left-tooltip">Cloud Drive</div>
+          </div>
+          <div class="nw-fm-left-icon shared-with-me">
+             <div class="nw-fm-left-tooltip">Shared with me</div>
+          </div>
+          <div class="nw-fm-left-icon contacts">
+             <div class="nw-fm-left-tooltip">Contacts</div>
+          </div>
+          <div class="nw-fm-left-icon conversations">
+             <div class="nw-fm-left-tooltip">Conversations</div>
+          </div>
+          <div class="file-transter-icon"></div>
+    </div>
+    <div class="fm-left-panel">
+                <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations" !-->
+                <div class="fm-left-menu cloud-drive">
+                   <div class="nw-fm-tree-header cloud-drive"> 
+                      Cloud Drive 
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header shared-with-me"> 
+                      Shared with me
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header contacts"> 
+                      Contacts
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header conversations"> 
+                      Conversations
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                </div>
+                <div class="fm-tree-panel">
+                  <!-- Please add "active" to necessary block to activate it !-->
+                  <div class="content-panel cloud-drive active">
+                   <ul>
+                     <li>
+                       <!-- 
+                          Please add "selected" classname if item is selected. 
+                          Please add "contains-folders" classnanme if item has subfolders. 
+                          Please add "expanded" classname if item is expaned. 
+                       !-->
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div> 
+                  <div class="content-panel shared-with-me">
+                   <ul>
+                     <li>
+                       <!-- 
+                          Please add "selected" classname if item is selected. 
+                          Please add "contains-folders" classnanme if item has subfolders. 
+                          Please add "expanded" classname if item is expaned. 
+                       !-->
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div>
+                  <div class="content-panel contacts">
+                    <!-- Please set any status class "online"/"away"/"busy"/"offline" !-->
+                    <!-- Please set "selected" class to select contact !-->
+                    <div class="nw-contact-item offline">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Andrei.d
+                       </div>
+                    </div>
+                    <div class="nw-contact-item busy">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Bram van der Kolk
+                       </div>
+                    </div>
+                    <div class="nw-contact-item away">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         Eduardo
+                       </div>
+                    </div>
+                    <div class="nw-contact-item online">
+                       <div class="nw-contact-status"></div>
+                       <div class="nw-contact-avatar">
+                           <img alt="" src="images/mega/default-small-avatar.png" />
+                       </div>
+                       <div class="nw-contact-name">
+                         César Rodas
+                       </div>
+                    </div>
+                  
+                  </div> 
+                  <div class="content-panel conversations">
+                     <div class="nw-conversations-header">
+                       Contacts
+                       <div class="nw-conversations-arrows"></div>
+                     </div>
+                     <div class="nw-conversations-item online">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Andrei.d
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item offline">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Bram van der Kolk
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item away">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          Eduardo
+                        </div>
+                     </div>
+                     <div class="nw-conversations-item busy">
+                        <div class="nw-contact-status"></div>
+                        <div class="nw-conversations-name">
+                          César Rodas
+                        </div>
+                     </div>
+                  </div>  
+                </div>
+              
+              </div>
+              
+    <div class="fm-right-files-block">
+      <!--Chat header !-->
+      <div class="fm-right-header"> 
+        <div class="nw-contact-avatar verified">
+          <div class="nw-verified-icon"></div>
+          <img alt="" src="images/mega/default-small-avatar.png">
+        </div>
+        <div class="fm-chat-user-info star online">
+            <div class="fm-chat-user-star"></div>
+            <div class="fm-chat-user">Bram Van Der Kolk</div>
+            <div class="nw-contact-status"></div>
+            <div class="fm-chat-user-status"> Online </div>
+            <div class="clear"></div>
+        </div>
+       
+        <div class="chat-button fm-add-user"> <span class="fm-chatbutton-arrow">Add ...</span> </div>
+        <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
+        <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+        
+        <div class="chat-popup fm-add-contact-popup">
+          <div class="fm-add-contact-arrow"></div>
+          <div class="fm-chat-popup-button add-contact">Add contact to Conversation</div>
+          <div class="fm-chat-popup-button send-contact">Send contact details</div>
+        </div>
+        
+        <div class="chat-popup fm-send-files-popup">
+          <div class="fm-send-files-arrow"></div>
+          <div class="fm-chat-popup-button from-cloud">From your Cloud Drive</div>
+          <div class="fm-chat-popup-button from-computer">From your computer</div>
+        </div>
+        
+        <div class="chat-popup fm-start-call-popup">
+          <div class="fm-send-files-arrow"></div>
+          <div class="fm-chat-popup-button start-audio">Start audio call</div>
+          <div class="fm-chat-popup-button start-video">Start video conference</div>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <!-- End of Chat header !-->
+      
+      <!--Chat block !-->
+      <div class="fm-chat-block">
+        
+        <div class="fm-chat-message-scroll"> 
+         <div class="fm-chat-message-pad"> 
+          <!-- Unhide on ".nw-chat-button.red" mouseover !-->
+          <div class="fm-chat-download-popup">
+            <div class="fm-chat-download-arrow"></div>
+            <div class="fm-chat-download-button to-cloud">
+              Download to your Cloud Drive
+            </div>
+            <div class="fm-chat-download-button as-zip">
+              Download as Zip
+            </div>
+            <div class="fm-chat-download-button to-computer">
+              Download to your computer
+            </div>
+          </div>
+          
+          <div class="nw-chat-date">
+            <div class="nw-chat-date-txt">Today, 2:00 PM</div>
+          </div>
+          
+          <!-- One Message block !-->
+          <div class="fm-chat-messages-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          <!-- End ofMessage block !-->
+          
+          <div class="fm-chat-messages-block right-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <div class="nw-chat-date">
+            <div class="nw-chat-date-txt">Today, 2:00 PM</div>
+          </div>
+          
+          <div class="fm-chat-messages-block right-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message"> <span>Awsome! <span class="fm-chat-smile smile"></span></span> </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <div class="fm-chat-messages-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <div class="fm-chat-messages-block right-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <div class="fm-chat-messages-block chat-sharing right-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message">
+                 You are sharing a file: <span class="nw-chat-expand-arrow"></span>
+                 <!-- Add "main-body" classname only for first main body !-->
+                 <div class="nw-chat-sharing-body main-body">
+                   <div class="nw-chat-icons-area">
+                     <span class="block-view-file-type text"></span>
+                   </div>
+                   <div class="nw-chat-sharing-filename">
+                     FileName.doc
+                   </div>
+                   <div class="nw-chat-sharing-filesize">
+                     750 kb
+                   </div>
+                   <div class="nw-chat-button">Cancel</div>
+                   <div class="clear"></div>
+                 </div>
+              </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <!-- Add "multiple-sharing" classname if we have several files !-->
+          <div class="fm-chat-messages-block chat-sharing multiple-sharing">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message">
+                 <span class="chat-username">Alex Brunskill</span> is sharing a file: <span class="nw-chat-expand-arrow"></span>
+                 <!-- Add "main-body" classname only for first main body !-->
+                 <div class="nw-chat-sharing-body main-body">
+                   <div class="nw-chat-icons-area">
+                     <span class="block-view-file-type text"></span>
+                     <span class="block-view-file-type mp3"></span>
+                     <span class="block-view-file-type mpeg"></span>
+                   </div>
+                   <div class="nw-chat-sharing-filename">
+                     FileName.doc
+                   </div>
+                   <div class="nw-chat-sharing-filesize">
+                     750 kb
+                   </div>
+                   <div class="nw-chat-button">Cancel</div>
+                   <div class="nw-chat-button red">Save...</div>
+                   <div class="clear"></div>
+                 </div>
+                 <div class="nw-chat-sharing-body">
+                   <div class="nw-chat-icons-area">
+                     <span class="block-view-file-type text"></span>
+                   </div>
+                   <div class="nw-chat-sharing-filename">
+                     FileName.doc
+                   </div>
+                   <div class="nw-chat-sharing-filesize">
+                     750 kb
+                   </div>
+                   <div class="nw-chat-button">Cancel</div>
+                   <div class="nw-chat-button red">Save...</div>
+                   <div class="clear"></div>
+                 </div>
+                 <div class="nw-chat-sharing-body">
+                   <div class="nw-chat-icons-area">
+                     <span class="block-view-file-type text"></span>
+                   </div>
+                   <div class="nw-chat-sharing-filename">
+                     FileName.doc
+                   </div>
+                   <div class="nw-chat-sharing-filesize">
+                     750 kb
+                   </div>
+                   <div class="nw-chat-button">Cancel</div>
+                   <div class="nw-chat-button red">Save...</div>
+                   <div class="clear"></div>
+                 </div>
+                 <div class="nw-chat-sharing-body">
+                   <div class="nw-chat-icons-area">
+                     <span class="block-view-file-type text"></span>
+                   </div>
+                   <div class="nw-chat-sharing-filename">
+                     FileName.doc
+                   </div>
+                   <div class="nw-chat-sharing-filesize">
+                     750 kb
+                   </div>
+                   <div class="nw-chat-button">Cancel</div>
+                   <div class="nw-chat-button red">Save...</div>
+                   <div class="clear"></div>
+                 </div>
+              </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+          
+          <div class="fm-chat-messages-block">
+            <div class="fm-chat-messages-pad">
+              <div class="nw-contact-avatar">
+                <img alt="" src="images/mega/default-small-avatar.png">
+              </div>
+              <div class="fm-chat-message">
+                <div class="circle" id="circleG">
+                  <div id="circleG_1" class="circleG"></div>
+                  <div id="circleG_2" class="circleG"></div>
+                  <div id="circleG_3" class="circleG"></div>
+                </div>
+              </div>
+              <div class="clear"></div>
+            </div>
+          </div>
+         
+          
+         </div> 
+        </div>
+        <div class="fm-chat-line-block">
+          
+          <div class="fm-chat-emotions-icon"></div>
+          
+          <div class="fm-chat-emotion-popup">
+            <div class="fm-chat-arrow"></div>
+            <div class="fm-chat-smile smile"></div>
+            <div class="fm-chat-smile wink"></div>
+            <div class="fm-chat-smile tongue"></div>
+            <div class="fm-chat-smile grin"></div>
+            <div class="fm-chat-smile confuse"></div>
+            <div class="fm-chat-smile grasp"></div>
+            <div class="fm-chat-smile sad"></div>
+            <div class="fm-chat-smile cry"></div>
+            <div class="fm-chat-smile angry"></div>
+            <div class="fm-chat-smile smile"></div>
+            <div class="fm-chat-smile wink"></div>
+            <div class="fm-chat-smile tongue"></div>
+            <div class="fm-chat-smile grin"></div>
+            <div class="fm-chat-smile confuse"></div>
+            <div class="fm-chat-smile grasp"></div>
+            <div class="clear"></div>
+          </div>
+          
+          <div class="nw-chat-message-icon"></div>
+          
+          <div class="fm-chat-input-block">
+            <textarea class="message-textarea">Write a message...</textarea>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+      
+      <!--end !--> 
+      
+    </div>
+  </div>
+</div>
+</body>
+</html>

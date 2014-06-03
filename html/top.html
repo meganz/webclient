@@ -102,13 +102,15 @@
              <div class="top-login-forgot-pass">[$1934]</div>
              <div class="clear"></div>
           </div>
-          <div class="checkboxOn login-checkbox"></div>
-          <label class="radio-txt">[$192]</label>
+          <div class="top-login-bott-gray-block">
+            <div class="checkboxOn login-checkbox"></div>
+            <label class="radio-txt">[$192]</label>
 		  
-          <div class="top-dialog-login-button">[$171] <img alt="" src="{staticpath}images/mega/ajax-loader.gif" /></div>
-          <div class="clear"></div>
+            <div class="top-dialog-login-button">[$171] <img alt="" src="{staticpath}images/mega/ajax-loader-nw.gif" /></div>
+            <div class="clear"></div>
+          </div>
        </div>
-       <div class="top-login-warning">
+       <div class="top-login-warning active">
             <div class="top-login-warning-arrow"></div>
             <div class="top-login-warning-close"></div>
             <div class="top-login-warning-pad">
@@ -341,7 +343,7 @@ Don't want to wait? <a href="">Upgrade your account.</a></span>
     
     
     <div class="cloud-popup-icon"><span class="notification-num" style="display:none" >0</span></div>
-    <div class="notification-popup empty hidden">
+    <div class="notification-popup empty">
       <div class="notification-arrow"></div>
       <div class="notification-header"> 
         <a href="#notificationsettings" class="notification-settings hidden"></a>
@@ -353,7 +355,8 @@ Don't want to wait? <a href="">Upgrade your account.</a></span>
         </div>
       </div>
       <div class="fm-notifications-bottom">
-          <div class="fm-dialog-button notifications-button active">[$863]</div>
+          <div class="fm-dialog-button notifications-button active red">[$863]</div>
+          <div class="fm-dialog-button notifications-button active">Clear</div>
       </div>
       <div class="notification-popup-empty"> 
         <div class="notification-popup-empty-txt"></div>
@@ -363,17 +366,19 @@ Don't want to wait? <a href="">Upgrade your account.</a></span>
 	<div class="warning-popup-icon">
 		<div class="warning-icon-area"></div>
 		<div class="top-warning-popup">
-		  <div class="membership-popup-arrow"></div> 
+		  <div class="warning-popup-arrow"></div> 
 		  <div class="warning-popup-body">
-			<div class="warning-gray-icon"></div>
-			[$881]
-			<div class="warning-green-icon"></div>
+            <div class="warning-header">You are using an ephemeral session.</div>
+			<!-- [$881] !-->
+            The data you are storing will be lost when it expires. To preserve your files, please upgrade to a real account at your earliest convenience and claim your <span class="green">free 50 GB of secure storage space in the cloud!</span>
 		  </div>
 		  <div class="fm-notifications-bottom"> 
 			<div class="fm-dialog-button active warning-button">[$779]</div> 
 		  </div>
 		</div>
 	</div>
+    
+    <div class="top-chat-notification hidden"></div>
     
     <div class="top-search-bl">
        <div class="top-search-clear">

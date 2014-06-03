@@ -1123,7 +1123,8 @@ function CreateWorkers(url, message, size) {
 
 function percent_megatitle()
 {
-	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {};
+	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}
+		, dl_s = 0, ul_s = 0
 	
 	for (var i in dl_queue)
 	{
@@ -1139,6 +1140,7 @@ function percent_megatitle()
 		{
 			dl_t += q.size || 0;
 		}
+		dl_s += ((q||{}).speed || 0) * 1000
 	}
 	
 	for (var i in ul_queue)
@@ -1154,27 +1156,53 @@ function percent_megatitle()
 		{
 			ul_t += ul_queue[i].size || 0;
 		}
+		ul_s += ((ul_queue[i]||{}).speed || 0)
 	}
 	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
 	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
+
+	var x_ul = Math.floor(ul_r/ul_t*100) || 0,
+		x_dl = Math.floor(dl_r/dl_t*100) || 0
 	
 	if (dl_t && ul_t)
 	{
-		t = ' \u2191 ' + Math.floor(ul_r/ul_t*100) + '% \u2193 ' + Math.floor(dl_r/dl_t*100) + '%';
+		t = ' \u2191 ' +  x_dl + '% \u2193 ' + x_ul + '%';
 	}
 	else if (dl_t)
 	{
-		t = ' ' + Math.floor(dl_r/dl_t*100) + '%';
+		t = ' ' + x_dl + '%';
 	}
 	else if (ul_t)
 	{
-		t = ' ' + Math.floor(ul_r/ul_t*100) + '%';
+		t = ' ' + x_ul + '%';
 	}
 	else
 	{
 		t = '';
 		$.transferprogress = {};
 	}
+
+	if (dl_s > 0) {
+		$('.tranfer-download-indicator')
+			.text(bytesToSize(dl_s, 1) + "/s")
+			.addClass('active')
+	} else {
+		$('.tranfer-download-indicator').removeClass('active')
+	}
+
+	if (ul_s > 0) {
+		$('.tranfer-upload-indicator')
+			.text(bytesToSize(ul_s, 1) + "/s")
+			.addClass('active')
+	} else {
+		$('.tranfer-upload-indicator').removeClass('active')
+	}
+
+	$('.file-transfer-icon')
+		.attr(
+			'class', 
+			'file-transfer-icon download-percents-' + x_dl + ' upload-percents-' + x_ul
+		);
 
 	megatitle(t);
 }

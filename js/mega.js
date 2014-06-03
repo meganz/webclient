@@ -184,7 +184,7 @@ function MegaData ()
 	{
 		this.filterBy(function(node)
 		{
-		  if (node.name && node.p == id) return true;
+		  if ((node.name && node.p == id) || (node.name && node.p && node.p.length == 11 && id == 'shares')) return true;
 		});
 	};
 
@@ -204,7 +204,8 @@ function MegaData ()
 		
 		for (var u in M.c['contacts']) if (!avatars[u])
 		{
-			api_req({a:'uga',u:u,ua:'+a'},{
+			api_req({a:'uga',u:u,ua:'+a'},
+			{
 				u : u,
 				callback: function(res,ctx)
 				{
@@ -217,6 +218,9 @@ function MegaData ()
 							url: myURL.createObjectURL(blob)
 						}
 						var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
+						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
+						
+						var el = $('#contact_' + ctx.u);						
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
 
 						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
@@ -317,15 +321,13 @@ function MegaData ()
 						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';
+						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';						
 					}
 					else
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
-						
-
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 					}
 				}
 				else
@@ -350,7 +352,7 @@ function MegaData ()
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="50" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="60" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
 						t = '.grid-table.fm';
 					}
 				}
@@ -388,16 +390,31 @@ function MegaData ()
 				}				
 			}
 		}
-		$('.grid-url-arrow').unbind('click');
-		$('.grid-url-arrow').bind('click',function()
-		{
-			$.selected = [$(this).closest('tr').attr('id')];
-			if (u_type === 0) ephemeralDialog(l[1005]);
-			else {
-                M.getlinks([$.selected]).done(function() {
-                    linksDialog();
-                });
-            }
+		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
+		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
+			var target = $(this).closest('tr');
+			if (target.attr('class').indexOf('ui-selected') == -1) {
+				target.parent().find('tr').removeClass('ui-selected');
+			}
+			target.addClass('ui-selected');
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = target;
+			cacheselect();
+			searchPath();
+			contextmenuUI(e,1);
+		});
+
+		$('.file-block .file-settings-icon').bind('click',function(e) {
+			var target = $(this).parents('.file-block')
+			if (target.attr('class').indexOf('ui-selected') == -1) {
+				target.parent().find('a').removeClass('ui-selected');
+			}
+			target.addClass('ui-selected');
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = target;
+			cacheselect();
+			searchPath();
+			contextmenuUI(e,1);
 		});
 
 		if (this.viewmode == 1)
@@ -457,14 +474,9 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
-		$('.cloudsub').attr('id','treesub_' + M.RootID);
-		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
-		$('#treesub_' + M.RootID).html('');
+		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
-		$('#treesub_contacts').html('');
-		this.buildtree({h:'contacts'});
-		$('#treesub_' + M.RubbishID).html('');
-		this.buildtree({h:M.RubbishID});
+		this.contacts();
 		treeUI();
 	};
 	
@@ -497,6 +509,12 @@ function MegaData ()
 		else if (id == 'inbox') id = this.InboxID;
 		else if (id == 'cloudroot') id = this.RootID;
 		else if (id == 'contacts') id = 'contacts';
+		else if (id == 'shares') id = 'shares';
+		else if (id == 'chat')
+		{
+			id = 'chat';
+			//n_h = id; FIXME
+		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
@@ -504,8 +522,8 @@ function MegaData ()
 		else if (!M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
-		if (id == this.RootID) $('.fm-connector-first').removeClass('active');
-		
+			
+
 		if (this.chat)
 		{
 			treeUIopen(M.currentdirid.replace('chat/',''),1);
@@ -517,10 +535,13 @@ function MegaData ()
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			$('.fm-right-account-block').addClass('hidden');
+			
 			var tt = new Date().getTime();
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
 			else M.filterByParent(M.currentdirid);
+			
+			
 
 			var viewmode=0;
 
@@ -553,15 +574,14 @@ function MegaData ()
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-			}
-
+			}		
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
 			setTimeout(function()
 			{
 				M.renderPath();
 			},1);
-		}
+		}	
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
@@ -590,6 +610,42 @@ function MegaData ()
 		}
 	};
 	
+	this.contacts = function()
+	{
+		var contacts = [];
+		for (var i in M.u) if (M.u[i].c) contacts.push(M.u[i]);
+		if (localStorage.csort) this.csort = localStorage.csort;
+		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+		if (this.csort == 'shares')
+		{				
+			contacts.sort(function(a,b)
+			{
+				if (M.c[a.h] && M.c[b.h])
+				{
+					if (a.name) return a.name.localeCompare(b.name);
+				}
+				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+				return 0;
+			});
+		}
+		else if (this.csort == 'name')
+		{				
+			contacts.sort(function(a,b)
+			{						
+				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
+			});
+		}
+		var html = '',status='',img;
+		// status can be: "online"/"away"/"busy"/"offline"
+		for (var i in contacts)
+		{						
+			var img = staticpath + 'images/mega/default-small-avatar.png';
+			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';			
+		}		
+		$('.content-panel.contacts').html(html);
+	};
 
     this.getContacts = function(n) {
         var folders = [];
@@ -600,17 +656,19 @@ function MegaData ()
 
 	this.buildtree = function(n)
 	{
+		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
+		{
+			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
+		}
+		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
+		{
+			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+		}
+		
 		if (this.c[n.h])
 		{
-			var folders = this.getContacts(n);
-			if (n.h == M.RubbishID) $('.fm-tree-header.recycle-item').addClass('recycle-notification');
-			if (folders.length > 0)
-			{
-				if (n.h == M.RootID) $('.fm-left-panel .fm-tree-header.cloud-drive-item').addClass('contains-subfolders');
-				else if (n.h == M.RubbishID) $('.fm-left-panel .fm-tree-header.recycle-item').addClass('contains-subfolders');
-				else if (n.h == 'contacts') $('.fm-left-panel .fm-tree-header.contacts-item').addClass('contains-subfolders');
-				else $('#treesub_'+n.h).siblings('a').addClass('contains-folders');
-			}
+			var folders = [];
+			for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 			
 			// sort by name is default in the tree
 			folders.sort(function(a,b)
@@ -618,6 +676,7 @@ function MegaData ()
 				if (a.name) return a.name.localeCompare(b.name);
 			});
 			
+			/*
 			if (n.h == 'contacts')
 			{
 				// in case of contacts we have custom sort/grouping:
@@ -652,22 +711,10 @@ function MegaData ()
 				$('.contacts-sorting-type').removeClass('active');				
 				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
 			}
+			*/
 			
 			for (var i in folders)
 			{
-				var treenode = '<span>' + htmlentities(folders[i].name) + '</span>';
-				var contactc = '';
-				var statusc = '';
-				if (n.h == 'contacts')
-				{
-					contactc = 'contact';
-					statusc = 'no-status';
-					var avatar = staticpath + 'images/mega/default-avatar.png';
-					if (avatars[folders[i].h]) avatar = avatars[folders[i].h].url;
-					treenode = '<span><span class="avatar ' + folders[i].h + '"><span><img src="'+ avatar + '" alt=""/></span></span><span class="messages-icon"><span class="active"></span></span><span class="contact-name">' + htmlentities(folders[i].name) +'</span></span>';
-				}
-				var s = '';
-				if (typeof folders[i].shares != 'undefined') s = 'shared-folder';
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
@@ -690,11 +737,12 @@ function MegaData ()
 				
 				var containsc='';
 				var cns = M.c[folders[i].h];						
-				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="fm-connector ' + contactc + '"></span><span class="fm-horizontal-connector ' + contactc + '"></span><a class="fm-tree-folder ' + contactc + ' ' + s + ' ' + statusc + ' ' + expandedc + ' ' + containsc +'" id="treea_' + folders[i].h + '">' + treenode + '</a><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';				
+				
+				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				
 				if ($('#treeli_'+folders[i].h).length == 0)
-				{
+				{				
 					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
 					else $('#treesub_' + n.h).append(html);					
@@ -892,6 +940,7 @@ function MegaData ()
 
 	this.addNode = function(n,ignoreDB)
 	{
+		if (!this.c['shares']) this.c['shares'] = [];
 		if (!M.d[n.p] && n.p !== 'contacts')
 		{
 			if (n.sk) n.p = n.u;
@@ -915,7 +964,10 @@ function MegaData ()
 		{			
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
+			// maintain special incoming shares index:
+			if (n.p.length == 11) this.c['shares'][n.h]=1;			
 		}
+		
 		if (n.t == 2) this.RootID 		= n.h;
 		if (n.t == 3) this.InboxID 		= n.h;
 		if (n.t == 4) this.RubbishID 	= n.h;
@@ -1628,7 +1680,7 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 			}
 		}
 
@@ -1638,7 +1690,7 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>');
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 //		$.transferHeader();
@@ -1687,7 +1739,7 @@ function MegaData ()
 		if (failed+30000 > NOW()) return;
 
 		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
-			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
 
@@ -1714,7 +1766,6 @@ function MegaData ()
 				}
 			
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' .progressbar-percents').text(perc+'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
@@ -1772,7 +1823,6 @@ function MegaData ()
 			setTimeout(fm_chromebar,500,$.dlheight);
 			setTimeout(fm_chromebar,1000,$.dlheight);
 		}
-		percent_megatitle();
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
@@ -1792,6 +1842,8 @@ function MegaData ()
 			$.transferprogress['dlc'] += $.transferprogress[id][1];
 			delete $.transferprogress[id];
 		}
+
+		percent_megatitle();
 	}
 
 	this.dlbeforecomplete = function()
@@ -1870,7 +1922,7 @@ function MegaData ()
 
 		panelDomQueue.splice(0, toClean);
 
-		if (panelDomQueue.length == 0 && $('.transfer-table tr:visible').length-1 == 0) {
+		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();
 			resetUploadDownload();
 		}
@@ -1894,7 +1946,7 @@ function MegaData ()
 			f.id = ul_id;
 
 			this.addToTransferTable(
-				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td></tr>'
+				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
 			ul_queue.push(f);			
 			
@@ -1912,7 +1964,7 @@ function MegaData ()
 		{
 			$('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
 			$('.transfer-table #ul_' + id + ' .transfer-status').addClass('download');
-			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
@@ -1924,7 +1976,6 @@ function MegaData ()
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
 			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
-			$('.transfer-table #ul_' + id + ' .progressbar-percents').text(perc+'%');
 			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bps ? bytesToSize(bps,1) +'/s' : '');
 			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
@@ -2169,9 +2220,8 @@ function rendernew()
 	}
 	if (newcontact)
 	{
-		M.avatars();
-		M.buildtree({h:'contacts'});
-		treeUIopen('contacts');
+		M.avatars();	
+		M.contacts();
 		treeUI();
 
         if(MegaChatEnabled) {
@@ -2179,10 +2229,11 @@ function rendernew()
             megaChat.renderMyStatus();
         }
 	}
-
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 }
+
+
 
 function execsc(ap)
 {

@@ -558,6 +558,54 @@ function chksum(buf)
 	return d;
 }
 
+/* moved from js/keygen.js {{{ */
+
+// random number between 0 .. n -- based on repeated calls to rc
+function rand(n)
+{
+    var r = new Uint32Array(1);
+    asmCrypto.getRandomValues(r);
+    return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
+}
+
+/*
+if(is_chrome_firefox) {
+	var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
+		.createInstance(Ci.nsIRandomGenerator);
+
+	var rand = function fx_rand(n) {
+		var r = nsIRandomGenerator.generateRandomBytes(4);
+		r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
+		if(r<0) r ^= 0x80000000;
+		return r % n; // oops, it's not uniformly distributed
+	};
+}
+*/
+
+function crypto_rsagenkey ()
+{
+    var w = new Worker('keygen.js');
+
+    var startTime = new Date();
+
+    w.onmessage = function (e) {
+        w.terminate();
+
+        var endTime = new Date();
+        if (d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
+
+        u_setrsa(e.data);
+    };
+
+    var randomSeed = new Uint8Array(256);
+    asmCrypto.ISAAC.seed(bioSeed);
+    asmCrypto.getRandomValues(randomSeed);
+
+    w.postMessage([ 2048, 257, randomSeed ]);
+}
+
+/* }}} */
+
 // decrypt ArrayBuffer in CTR mode, return MAC
 function decrypt_ab_ctr(aes,ab,nonce,pos)
 {
@@ -1209,7 +1257,7 @@ function api_resetkeykey2(res,ctx)
         for (var i = 0; i < 4; i++)
         {
             var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
-            if (typeof mpi2b(privk.substr(0,l)) == 'number') break;
+            if ( privk.substr(0,l).length < 2 ) break;
             privk = privk.substr(l);
         }
 
@@ -1269,27 +1317,14 @@ function api_getsid2(res,ctx)
 				}
 				else if (typeof res.csid == 'string')
 				{
-					var t = mpi2b(base64urldecode(res.csid));
+					var t = base64urldecode(res.csid);
 
-					var privk = a32_to_str(decrypt_key(aes,base64_to_a32(res.privk)));
+					var privk = crypto_decodeprivkey( a32_to_str(decrypt_key(aes,base64_to_a32(res.privk))) );
 
-					var rsa_privk = Array(4);
-					
-					// decompose private key
-					for (var i = 0; i < 4; i++)
-					{
-						var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
-
-						rsa_privk[i] = mpi2b(privk.substr(0,l));
-						if (typeof rsa_privk[i] == 'number') break;
-						privk = privk.substr(l);
-					}
-
-					// check format
-					if (i == 4 && privk.length < 16)
+					if (privk)
 					{
 						// TODO: check remaining padding for added early wrong password detection likelihood
-						r = [k,base64urlencode(crypto_rsadecrypt(t,rsa_privk).substr(0,43)),rsa_privk];
+						r = [k,base64urlencode(crypto_rsadecrypt(t,privk).substr(0,43)),privk];
 					}
 				}
 			}
@@ -1400,7 +1435,7 @@ function api_cachepubkeys2(res,ctx)
 	{
 		var spubkey, keylen, pubkey;
 		
-		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(res.pubk);
+		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
 	}
 
 	if (!--ctx.ctx.remaining) ctx.ctx.cachepubkeyscomplete(ctx.ctx);
@@ -1413,13 +1448,7 @@ function encryptto(user,data)
 
 	if (pubkey = u_pubkeys[user])
 	{
-		// random padding
-		for (i = (pubkey[2]>>3)-1-data.length; i-- > 0; ) data = data+String.fromCharCode(rand(256));
-
-		i = data.length*8;
-		data = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + data;
-
-		return b2mpi(RSAencrypt(mpi2b(data),pubkey[1],pubkey[0]));
+		return crypto_rsaencrypt(data,pubkey);
 	}
 
 	return false;
@@ -1495,7 +1524,7 @@ function api_setshare1(ctx)
 	ctx.ssharekey = ssharekey;
 
 	// encrypt ssharekey to known users
-	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[req.s[i].u],ssharekey));
+	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
 	
 	ctx.req = req;
 
@@ -1518,7 +1547,7 @@ function api_setshare1(ctx)
 				
 				var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
 
-				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(u_pubkeys[ctx.req.s[i].u],ssharekey));
+				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[ctx.req.s[i].u]));
 
 				return api_req(ctx.req,ctx);
 			}
@@ -1531,84 +1560,125 @@ function api_setshare1(ctx)
 	api_req(ctx.req,ctx);
 }
 
-function api_setrsa(privk,pubk)
-{
-	var t, i;
-	
-	for (t = '', i = 0; i < privk.length; i++) t = t+b2mpi(privk[i]);
-	
-	for (i = (-t.length)&15; i--; ) t = t + String.fromCharCode(rand(256));
-
-	ctx = { callback : function(res,ctx) {
-			if (d) console.log("RSA key put result=" + res);
-			
-			u_privk = ctx.privk;
-			u_storage.privk = JSON.stringify(u_privk);
-			u_type = 3;
-			
-			ui_keycomplete();
-		},
-		privk : privk
-	};
-		
-	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(t))), pubk : base64urlencode(b2mpi(pubk[0])+b2mpi(pubk[1])) },ctx);
-}
-
 function crypto_handleauth(h)
 {
 	return a32_to_base64(encrypt_key(u_k_aes,str_to_a32(h+h)));
 }
 
+function crypto_encodepubkey(pubkey)
+{
+    var mlen = pubkey[0].length * 8,
+        elen = pubkey[1].length * 8;
+
+    return String.fromCharCode(mlen/256)+String.fromCharCode(mlen%256) + pubkey[0]
+         + String.fromCharCode(elen/256)+String.fromCharCode(elen%256) + pubkey[1];
+}
+
 function crypto_decodepubkey(pubk)
 {
-	var i;
-	
-	var spubkey = base64urldecode(pubk);
+	var pubkey = [];
 
-	var keylen = spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1);
-
-	var pubkey = Array(3);
+	var keylen = pubk.charCodeAt(0)*256+pubk.charCodeAt(1);
 
 	// decompose public key
-	for (i = 0; i < 2; i++)
+	for (var i = 0; i < 2; i++)
 	{
-		var l = ((spubkey.charCodeAt(0)*256+spubkey.charCodeAt(1)+7)>>3)+2;
+		if (pubk.length < 2) break;
 
-		pubkey[i] = mpi2b(spubkey.substr(0,l));
-		if (typeof pubkey[i] == 'number') break;
-		spubkey = spubkey.substr(l);
+		var l = (pubk.charCodeAt(0)*256+pubk.charCodeAt(1)+7)>>3;
+		if (l > pubk.length-2) break;
+
+		pubkey[i] = pubk.substr(2,l);
+		pubk = pubk.substr(l+2);
 	}
 
 	// check format
-	if (i == 2 && spubkey.length < 16)
-	{
-		pubkey[2] = keylen;
-		return pubkey;
-	}
-	return false;
+	if (i !== 2 || pubk.length >= 16) return false;
+
+	pubkey[2] = keylen;
+
+	return pubkey;
 }
 
-function crypto_rsaencrypt(pubkey,data)
+function crypto_encodeprivkey(privk)
 {
-	var i;
-	
+    var plen = privk[3].length * 8,
+        qlen = privk[4].length * 8,
+        dlen = privk[2].length * 8,
+        ulen = privk[7].length * 8;
+
+    var t = String.fromCharCode(qlen/256)+String.fromCharCode(qlen%256) + privk[4]
+          + String.fromCharCode(plen/256)+String.fromCharCode(plen%256) + privk[3]
+          + String.fromCharCode(dlen/256)+String.fromCharCode(dlen%256) + privk[2]
+          + String.fromCharCode(ulen/256)+String.fromCharCode(ulen%256) + privk[7];
+
+	while ( t.length & 15 ) t += String.fromCharCode(rand(256));
+
+    return t;
+}
+
+function crypto_decodeprivkey(privk)
+{
+    var privkey = [];
+
+    // decompose private key
+    for (var i = 0; i < 4; i++)
+    {
+		if (privk.length < 2) break;
+
+		var l = (privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3;
+		if (l > privk.length-2) break;
+
+	    privkey[i] = new asmCrypto.BigNumber( privk.substr(2,l) );
+	    privk = privk.substr(l+2);
+    }
+
+    // check format
+    if (i !== 4 || privk.length >= 16) return false;
+
+    // TODO: check remaining padding for added early wrong password detection likelihood
+
+    // restore privkey components via the known ones
+    var q = privkey[0], p = privkey[1], d = privkey[2], u = privkey[3],
+        q1 = q.subtract(1), p1 = p.subtract(1),
+        m = new asmCrypto.Modulus( p.multiply(q) ),
+        e = new asmCrypto.Modulus( p1.multiply(q1) ).inverse(d),
+        dp = d.divide(p1).remainder,
+        dq = d.divide(q1).remainder;
+
+    privkey = [ m, e, d, p, q, dp, dq, u ];
+    for (i = 0; i < privkey.length; i++) {
+        privkey[i] = asmCrypto.bytes_to_string( privkey[i].toBytes() );
+    }
+
+    return privkey;
+}
+
+// encrypts cleartext string to the supplied pubkey
+// returns string representing an MPI-formatted big number
+function crypto_rsaencrypt(cleartext,pubkey)
+{
 	// random padding
-	for (i = (pubkey[2]>>3)-1-data.length; i-- > 0; ) data = data+String.fromCharCode(rand(256));
+	for (var i = (pubkey[0].length)-1-cleartext.length; i-- > 0; ) cleartext += String.fromCharCode(rand(256));
 
-	i = data.length*8;
-	data = String.fromCharCode(i >> 8) + String.fromCharCode(i & 255) + data;
+    var ciphertext = asmCrypto.bytes_to_string( asmCrypto.RSA.encrypt(cleartext,pubkey) );
 
-	return b2mpi(RSAencrypt(mpi2b(data),pubkey[1],pubkey[0]));
+    var clen = ciphertext.length * 8;
+    ciphertext = String.fromCharCode(clen/256)+String.fromCharCode(clen%256) + ciphertext;
+
+    return ciphertext;
 }
 
-function crypto_rsadecrypt(ciphertext,privk)
+// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
+// returns cleartext string
+function crypto_rsadecrypt(ciphertext,privkey)
 {
-	var l = ((privk[2].length*28-1)>>5<<2)-2;
-	var c = b2s(RSAdecrypt(ciphertext,privk[2],privk[0],privk[1],privk[3]));
+    var l = (ciphertext.charCodeAt(0)*256+ciphertext.charCodeAt(1)+7)>>3;
+    ciphertext = ciphertext.substr(2,l);
 
-	if (c.length < l) c = new Array(l-c.length+1).join(String.fromCharCode(0))+c;
-	
-	return c;
+    var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA.decrypt(ciphertext,privkey) );
+
+	return cleartext.substr(1);
 }
 
 // Complete upload
@@ -2047,7 +2117,7 @@ function crypto_procsr(sr)
 		{
 			var pubkey;
 
-			if (typeof res == 'object' && typeof res.pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(res.pubk);
+			if (typeof res == 'object' && typeof res.pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res.pubk));
 
 			// collect all required pubkeys	
 			while (ctx.i < ctx.sr.length)
@@ -2077,7 +2147,7 @@ function crypto_procsr(sr)
 						if (pubkey = u_pubkeys[ctx.sr[i]])
 						{
 							// pubkey found: encrypt share key to it
-							if (n = crypto_rsaencrypt(pubkey,a32_to_str(u_sharekeys[sh]))) rsr.push(sh,ctx.sr[i],base64urlencode(n));
+							if (n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey)) rsr.push(sh,ctx.sr[i],base64urlencode(n));
 						}
 					}
 				}
@@ -2168,7 +2238,7 @@ function crypto_processkey(me,master_aes,file)
 			// long keys: RSA
 			if (u_privk)
 			{
-				var t = mpi2b(base64urldecode(key));
+				var t = base64urldecode(key);
 				
 				if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
 				else
@@ -2361,7 +2431,7 @@ function crypto_process_sharekey(handle,key)
 {
 	if (key.length > 22)
 	{
-		key = mpi2b(base64urldecode(key));
+		key = base64urldecode(key);
 		var k = str_to_a32(crypto_rsadecrypt(key,u_privk).substr(0,16));
 		rsasharekeys[handle] = true;
 		return k;
@@ -2649,6 +2719,3 @@ function Ed_getpubkey(userhandle,ctx)
 		});
 	}	
 }
-
-
-

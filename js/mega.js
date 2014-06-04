@@ -458,6 +458,7 @@ function MegaData ()
 		this.buildtree(this.d[this.RootID]);
 		this.contacts();
 
+
 		/*
 		$('.cloudsub').attr('id','treesub_' + M.RootID);
 		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
@@ -632,6 +633,7 @@ function MegaData ()
 		$('.content-panel.contacts').html(html);
 	};
 
+
 	this.contacts = function()
 	{
 		var contacts = [];
@@ -668,6 +670,7 @@ function MegaData ()
 		}		
 		$('.content-panel.contacts').html(html);
 	};
+
 
 	this.buildtree = function(n)
 	{

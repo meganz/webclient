@@ -26,10 +26,10 @@ function u_login2(ctx,ks)
 	{
 		localStorage.wasloggedin = true;
 		u_logout();
-		u_storage = ctx.permanent ? localStorage : sessionStorage;
+		u_storage = init_storage( ctx.permanent ? localStorage : sessionStorage );
 		u_storage.k = JSON.stringify(ks[0]);
 		u_storage.sid = ks[1];
-		if (ks[2]) u_storage.privk = JSON.stringify(ks[2]);
+		if (ks[2]) u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
 		u_checklogin(ctx,false);
 	}
 	else ctx.checkloginresult(ctx,false);
@@ -54,7 +54,7 @@ function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 			api_create_u_k();
 
 			ctx.createanonuserresult = u_checklogin2;
-			
+
 			createanonuser(ctx,passwordkey,invitecode,invitename,uh);
 		}
 	}
@@ -118,10 +118,10 @@ function u_checklogin3a(res,ctx)
 		
 		u_storage.attr = JSON.stringify(u_attr);
 		u_storage.handle = u_handle = u_attr.u;
-	
+
 		try {
 			u_k = JSON.parse(u_storage.k);
-			if (u_attr.privk) u_privk = JSON.parse(u_storage.privk);
+			if (u_attr.privk) u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));
 		} catch(e) {
 		}
 
@@ -148,7 +148,7 @@ function u_logout(logout)
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
 	}
-	
+
 	if (logout)
 	{
 		delete localStorage.signupcode;
@@ -179,6 +179,25 @@ function u_wasloggedin()
 {
 	return localStorage.wasloggedin;
 }
+
+// set user's RSA key
+function u_setrsa(rsakey)
+{
+	ctx = {
+	    callback : function(res,ctx) {
+	        if (d) console.log("RSA key put result=" + res);
+
+	        u_privk = rsakey;
+	        u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
+	        u_type = 3;
+
+	        ui_keycomplete();
+	    }
+	};
+
+	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(crypto_encodeprivkey(rsakey)))), pubk : base64urlencode(crypto_encodepubkey(rsakey)) },ctx);
+}
+
 
 // ensures that a user identity exists, also sets sid
 function createanonuser(ctx,passwordkey,invitecode,invitename,uh)

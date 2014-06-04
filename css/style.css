@@ -10469,23 +10469,42 @@ h5.main-italic-header {
 	height: 140px;
 	margin: 50px auto 0 auto;
 }
-.reg-st5-key-gen {
-	width: 140px;
-	height: 140px;
-	background-image: url(../images/mega/reg-st5-rounded.png);
-	background-position: left top;
-	background-repeat: no-repeat;
-	display: table-cell;
-	vertical-align: middle;
-	text-align: center;
-	font-size: 12px;
-	line-height: 18px;
-	color: #666666;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 0 25px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+.reg-st5-spin {
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    padding: 1em;
+    vertical-align: middle;
+    text-align: center;
+    background-color: transparent;
+    border: 5px solid transparent;
+    border-top-color: #c22;
+    border-bottom-color: #c22;
+    border-radius: 50%;
+}
+.outer {
+  -webkit-animation: spin 1s infinite;
+  animation: spin 1s infinite;
+}
+.inner {
+  -webkit-animation: spin 1s infinite;
+  animation: spin 1s infinite;
+}
+@-webkit-keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .reg-st5-info-icon {
 	width: 32px;
@@ -10520,72 +10539,6 @@ h5.main-italic-header {
 .reg-st5-complete-button.active {
 	background-color: #D82C00;
 	cursor: pointer;
-}
-.reg-st5-key-gen.percents-0 {
-	background-position: 0 0;
-}
-.reg-st5-key-gen.percents-1, .reg-st5-key-gen.percents-2, .reg-st5-key-gen.percents-3, .reg-st5-key-gen.percents-4, .reg-st5-key-gen.percents-5, .reg-st5-key-gen.percents-6 {
-	background-position: 0 -175px;
-}
-.reg-st5-key-gen.percents-7, .reg-st5-key-gen.percents-8, .reg-st5-key-gen.percents-9, .reg-st5-key-gen.percents-10, .reg-st5-key-gen.percents-11, .reg-st5-key-gen.percents-12 {
-	background-position: 0 -350px;
-}
-.reg-st5-key-gen.percents-13, .reg-st5-key-gen.percents-14, .reg-st5-key-gen.percents-15, .reg-st5-key-gen.percents-16, .reg-st5-key-gen.percents-17, .reg-st5-key-gen.percents-18 {
-	background-position: 0 -525px;
-}
-.reg-st5-key-gen.percents-19, .reg-st5-key-gen.percents-20, .reg-st5-key-gen.percents-21, .reg-st5-key-gen.percents-22, .reg-st5-key-gen.percents-23, .reg-st5-key-gen.percents-24 {
-	background-position: 0 -700px;
-}
-.reg-st5-key-gen.percents-25, .reg-st5-key-gen.percents-26, .reg-st5-key-gen.percents-27, .reg-st5-key-gen.percents-28, .reg-st5-key-gen.percents-29, .reg-st5-key-gen.percents-30 {
-	background-position: 0 -875px;
-}
-.reg-st5-key-gen.percents-31, .reg-st5-key-gen.percents-32, .reg-st5-key-gen.percents-33, .reg-st5-key-gen.percents-34, .reg-st5-key-gen.percents-35, .reg-st5-key-gen.percents-36 {
-	background-position: 0 -1050px;
-}
-.reg-st5-key-gen.percents-37, .reg-st5-key-gen.percents-38, .reg-st5-key-gen.percents-39, .reg-st5-key-gen.percents-40, .reg-st5-key-gen.percents-41, .reg-st5-key-gen.percents-42 {
-	background-position: 0 -1225px;
-}
-.reg-st5-key-gen.percents-43, .reg-st5-key-gen.percents-44, .reg-st5-key-gen.percents-45 {
-	background-position: 0 -1400px;
-}
-.reg-st5-key-gen.percents-46, .reg-st5-key-gen.percents-47, .reg-st5-key-gen.percents-48, .reg-st5-key-gen.percents-49 {
-	background-position: 0 -1575px;
-}
-.reg-st5-key-gen.percents-50 {
-	background-position: 0 -1750px;
-}
-.reg-st5-key-gen.percents-51, .reg-st5-key-gen.percents-52, .reg-st5-key-gen.percents-53, .reg-st5-key-gen.percents-54, .reg-st5-key-gen.percents-55, .reg-st5-key-gen.percents-56 {
-	background-position: 0 -1925px;
-}
-.reg-st5-key-gen.percents-57, .reg-st5-key-gen.percents-58, .reg-st5-key-gen.percents-59, .reg-st5-key-gen.percents-60, .reg-st5-key-gen.percents-61, .reg-st5-key-gen.percents-62 {
-	background-position: 0 -2100px;
-}
-.reg-st5-key-gen.percents-63, .reg-st5-key-gen.percents-64, .reg-st5-key-gen.percents-65, .reg-st5-key-gen.percents-66, .reg-st5-key-gen.percents-67 {
-	background-position: 0 -2275px;
-}
-.reg-st5-key-gen.percents-68, .reg-st5-key-gen.percents-69, .reg-st5-key-gen.percents-70, .reg-st5-key-gen.percents-71, .reg-st5-key-gen.percents-72 {
-	background-position: 0 -2450px;
-}
-.reg-st5-key-gen.percents-73, .reg-st5-key-gen.percents-74, .reg-st5-key-gen.percents-75, .reg-st5-key-gen.percents-76, .reg-st5-key-gen.percents-77 {
-	background-position: 0 -2625px;
-}
-.reg-st5-key-gen.percents-78, .reg-st5-key-gen.percents-79, .reg-st5-key-gen.percents-80, .reg-st5-key-gen.percents-81, .reg-st5-key-gen.percents-82 {
-	background-position: 0 -2800px;
-}
-.reg-st5-key-gen.percents-83, .reg-st5-key-gen.percents-84, .reg-st5-key-gen.percents-85, .reg-st5-key-gen.percents-86, .reg-st5-key-gen.percents-87 {
-	background-position: 0 -2975px;
-}
-.reg-st5-key-gen.percents-88, .reg-st5-key-gen.percents-89, .reg-st5-key-gen.percents-90, .reg-st5-key-gen.percents-91, .reg-st5-key-gen.percents-92 {
-	background-position: 0 -3150px;
-}
-.reg-st5-key-gen.percents-93, .reg-st5-key-gen.percents-94, .reg-st5-key-gen.percents-95, .reg-st5-key-gen.percents-96, .reg-st5-key-gen.percents-97, .reg-st5-key-gen.percents-98, .reg-st5-key-gen.percents-99 {
-	background-position: 0 -3325px;
-}
-.reg-st5-key-gen.percents-100 {
-	background-position: 0 -3500px;
-}
-.percents-100.reg-st5-key-gen span {
-	display: none;
 }
 .new-download-icon {
 	width: 299px;

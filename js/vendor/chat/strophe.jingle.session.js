@@ -26,7 +26,7 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.ice_config = {},
     this.drip_container = [];
     this.responseTimeout = this.jingle.jingleTimeout;
-    
+
     this.usetrickle = true;
     this.usepranswer = false; // early transport warmup -- mind you, this might fail. depends on webrtc issue 1718
     this.usedrip = false; // dripping is sending trickle candidates not one-by-one
@@ -34,7 +34,7 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.hadstuncandidate = false;
     this.hadturncandidate = false;
     this.lasticecandidate = false;
-    
+
     this.statsinterval = null;
     this.syncMutedState();
 }
@@ -52,7 +52,7 @@ initiate: function(isInitiator) {
     this.state = 'pending';
     this.initiator = isInitiator ? this.me : this.peerjid;
     this.responder = !isInitiator ? this.me : this.peerjid;
-    
+
     //console.log('create PeerConnection ' + JSON.stringify(this.ice_config));
     try {
         this.peerconnection = new RTC.peerconnection(this.ice_config, this.pc_constraints);
@@ -133,8 +133,8 @@ accept: function (cb) {
            sid: this.sid
           });
     prsdp.toJingle(accept, this.initiator == this.me ? 'initiator' : 'responder');
-    ob.addFingerprintHmac(accept);
-    
+    ob.addFingerprintMac(accept);
+
     var sdp = this.peerconnection.localDescription.sdp;
     while (SDPUtil.find_line(sdp, 'a=inactive')) {
         // FIXME: change any inactive to sendrecv or whatever they were originally
@@ -273,7 +273,7 @@ sendIceCandidate: function (candidate) {
 
             this.localSDP = new SDP(this.peerconnection.localDescription.sdp);
             this.localSDP.toJingle(init, this.initiator == this.me ? 'initiator' : 'responder');
-            this.addFingerprintHmac(init);
+            this.addFingerprintMac(init);
             this.sendIq(init, 'offer', null, function() {
                 self.state = 'error';
                 self.peerconnection.close();
@@ -282,7 +282,7 @@ sendIceCandidate: function (candidate) {
         } //end if (!usetrickle)
         this.lasticecandidate = true;
         debugLog('Candidates generated -> srflx:', this.hadstuncandidate+ ', relay:', this.hadturncandidate);
-        
+
         if (!(this.hadstuncandidate || this.hadturncandidate) && this.peerconnection.signalingState != 'closed') {
             self.jingle.onNoStunCandidates.call(self.eventHandler, self);
         }
@@ -316,12 +316,12 @@ createdOffer: function (sdp, cb) {
             sid: self.sid
            });
         self.localSDP.toJingle(init, self.initiator == self.me ? 'initiator' : 'responder');
-        self.addFingerprintHmac(init);
+        self.addFingerprintMac(init);
         self.sendIq(init, 'offer', null, function() {
             self.state = 'error';
             self.jingle.terminate(self, 'initiate-error', 'Error or timeout initiating jingle session');
         }, self.jingle.jingleAutoAcceptTimeout);
-        debugLog("created&sent OFFER to", self.peerjid);    
+        debugLog("created&sent OFFER to", self.peerjid);
       }
       if (cb)
         cb();
@@ -329,7 +329,7 @@ createdOffer: function (sdp, cb) {
     function (e) {
         self.reportError({type:'webrtc', op:'setLocalDescription'}, e);
     });
-     
+
     var cands = SDPUtil.find_lines(this.localSDP.raw, 'a=candidate:');
     for (var i = 0; i < cands.length; i++) {
         var cand = SDPUtil.parse_icecandidate(cands[i]);
@@ -374,7 +374,7 @@ setRemoteDescription: function (elem, desctype, successCb, failCb)
         }
     }
     var remotedesc = new RTC.RTCSessionDescription({type: desctype, sdp: this.remoteSDP.raw});
-     
+
     //console.log('setRemoteDescription for session', this.sid);
 //setRemoteDescription() takes some time on Firefox, and meanwhile ICE candidated start
 //being processed - the code thinks that ICE candidates start arriving before the answer,
@@ -384,7 +384,7 @@ setRemoteDescription: function (elem, desctype, successCb, failCb)
         {
             successCb();
         },
-        function (e) 
+        function (e)
         {
             this.reportError({type:'webrtc', op:'setRemoteDescription'}, e);
             if (failCb)
@@ -397,7 +397,7 @@ addIceCandidate: function (elem) {
     var obj = this;
     if (this.peerconnection.signalingState == 'closed')
         return;
-    
+
     if (!this.peerconnection.remoteDescription && this.peerconnection.signalingState == 'have-local-offer') {
         console.log('trickle ice candidate arriving before session accept...');
         // create a PRANSWER for setRemoteDescription
@@ -514,7 +514,7 @@ createdAnswer: function (sdp, cb, provisional) {
     {
         console.warn('Session ', this.sid, 'to', this.peerjid, ':createdAnswer: Session already closed, aborting');
 //        return;
-    }    
+    }
     var self = this;
     self.localSDP = new SDP(sdp.sdp);
     //this.localSDP.mangle();
@@ -530,7 +530,7 @@ createdAnswer: function (sdp, cb, provisional) {
                    sid: this.sid
                 });
             this.localSDP.toJingle(accept, this.initiator == this.me ? 'initiator' : 'responder');
-            self.addFingerprintHmac(accept);
+            self.addFingerprintMac(accept);
             this.sendIq(accept, 'answer');
         } else {
             sdp.type = 'pranswer';
@@ -572,13 +572,13 @@ sendTerminate: function (reason, text) {
            sid: this.sid})
         .c('reason')
         .c(reason || 'success');
-        
+
     if (text) {
         term.up().c('text').t(text);
     }
 
     this.sendIq(term, 'terminate', function() {});
-    obj.terminate();    
+    obj.terminate();
     debugLog("sent TERMINATE to", this.peerjid);
 },
 
@@ -678,12 +678,12 @@ reportError: function(info, e) {
     this.jingle.onInternalError.call(this.jingle.eventHandler, info, e);
 },
 
-addFingerprintHmac: function(jiq) {
-    if (!this.peerNonce)
-        throw new Error("addFingerprintHmac: No peer nonce has been received");
+addFingerprintMac: function(jiq) {
+    if (!this.peerFprMacKey)
+        throw new Error("addFingerprintMac: No peer mac-key has been received");
     var j = $(jiq.tree()).find('>jingle');
     if (!j)
-        throw new Error("addFingerprintHmac: No jingle node present in packet");
+        throw new Error("addFingerprintMac: No jingle node present in packet");
     var fpnodes = j.find('content>transport>fingerprint');
     if (fpnodes.length < 1)
         throw new Error("Could not find any fingerprint nodes in generated jingle packet");
@@ -692,9 +692,9 @@ addFingerprintHmac: function(jiq) {
         fps.push(this.getAttribute('hash')+' '+this.textContent);
     });
     fps.sort();
-    var fprmac = this.jingle.generateHmac(fps.join(';'), this.peerNonce);
+    var fprmac = this.jingle.generateMac(fps.join(';'), this.peerFprMacKey);
     j.attr('fprmac', fprmac);
-//    console.log('local fingerprint is: "'+fpt+'", HMAC:"'+this.fingerprintMac+'"');
+//    console.log('local fingerprint is: "'+fpt+'", MAC:"'+this.fingerprintMac+'"');
 }
 } //end JingleSession class
 

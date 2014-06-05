@@ -46,8 +46,9 @@ try
 	{
 		var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 
+		Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
 		Cu['import']("resource://gre/modules/Services.jsm");
-		Cu['import']("resource://gre/modules/NetUtil.jsm");
+		XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
 		(function(global) {
 			global.loadSubScript = function(file,scope) {
@@ -440,7 +441,7 @@ else
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-		if (is_chrome_firefox && OS && localStorage.fxio)
+		if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27 && localStorage.fxio)
 		{
 			is_chrome_firefox |= 4;
 			jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});

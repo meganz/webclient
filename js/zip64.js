@@ -510,11 +510,6 @@ var ZIPClass = function(totalSize) {
 
 		return header.getBytes();
 	}
-
-
-	DEBUG(self, 'writeHeader');
-	DEBUG(self, 'writeCentralDir')
-	DEBUG(self, 'writeSuffix')
 }
 
 // crc32 {{{

@@ -58,7 +58,7 @@ function _queue_checker(queue, tasks, next, error) {
 MegaQueue.prototype.pushAll = function(tasks, next, error) {
 	var i = 0
 		, len = tasks.length
-		, callback = _queue_checker(this,tasks, next, error)
+		, callback = _queue_checker(this, tasks, next, error)
 
 	for (i=0; i < len; i++) {
 		this.push(tasks[i], callback);

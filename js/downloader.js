@@ -225,6 +225,21 @@ ClassChunk.prototype.run = function(task_done) {
 // }}}
 
 // ClassFile {{{
+function ClassEmptyChunk(dl) {
+	this.task = { zipid: dl.zipid, id: dl.id};
+	this.dl	  = dl;
+}
+
+ClassEmptyChunk.prototype.run = function(task_done) {
+	var self = this;
+	this.dl.io.write("", 0, function() {
+		task_done();
+		self.dl.ready();
+		self.dl = null;
+		self = null;
+	});
+}
+
 function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
@@ -241,6 +256,7 @@ ClassFile.prototype.destroy = function() {
 	}
 
 	if (!this.dl.cancelled) {
+		DEBUG("done donwload", this.dl.zipid, this.dl.cancelled)
 		if (this.dl.zipid) {
 			this.task = null;
 			return Zips[this.dl.zipid].done();
@@ -308,14 +324,7 @@ ClassFile.prototype.run = function(task_done) {
 		self.emptyFile = false;
 		if (tasks.length == 0) {
 			self.emptyFile = true;
-			tasks.push({ 
-				task: {  zipid: self.dl.zipid, id: self.dl.id },
-				run: function(done) {
-					self.dl.io.write("", 0, function() {
-						self.dl.ready(); /* tell the download scheduler we're done */
-					});
-				}
-			});
+			tasks.push(new ClassEmptyChunk(self.dl));
 		}
 		self.dl.io.begin = null;
 		
@@ -334,7 +343,7 @@ ClassFile.prototype.run = function(task_done) {
 			task_done(); /* release worker */
 			setTimeout(function() {
 				/* retry !*/
-				DEBUG('retrying');
+				ERRDEBUG('retrying ', self.dl.n);
 				dlQueue.pushFirst(self);
 			}, dl_retryinterval);
 			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
@@ -380,21 +389,7 @@ function dl_writer(dl, is_ready) {
 		});
 	}, 1);
 
-	dl.writer.on('queue', function() {
-		if (dl.writer._queue.length >= IO_THROTTLE && !dlQueue.isPaused()) {
-			DEBUG("IO_THROTTLE: pause XHR");
-			dlQueue.pause();
-			paused = true;
-		}
-	});
-
-	dl.writer.on('working', function() {
-		if (dl.writer._queue.length < IO_THROTTLE && paused) {
-			DEBUG("IO_THROTTLE: resume XHR");
-			dlQueue.resume();
-			paused = false;
-		}
-	});
+	throttleByIO(dl.writer);
 
 	dl.writer.pos = 0
 

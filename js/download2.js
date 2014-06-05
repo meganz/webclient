@@ -207,6 +207,26 @@ var DownloadManager = new function() {
 
 }
 
+function throttleByIO(writer) {
+	var paused = false;
+
+	writer.on('queue', function() {
+		if (writer._queue.length >= IO_THROTTLE && !dlQueue.isPaused()) {
+			DEBUG("IO_THROTTLE: pause XHR");
+			dlQueue.pause();
+			paused = true;
+		}
+	});
+
+	writer.on('working', function() {
+		if (writer._queue.length < IO_THROTTLE && paused) {
+			DEBUG("IO_THROTTLE: resume XHR");
+			dlQueue.resume();
+			paused = false;
+		}
+	});
+}
+
 // downloading variable {{{
 dlQueue.on('working', function() {
 	downloading = true;
@@ -238,7 +258,7 @@ dlQueue.prepareNextTask = function() {
 
 dlQueue.validateTask = function(pzTask, next) {
 	if (DownloadManager.enabled(pzTask)) {
-		if (pzTask instanceof ClassChunk) {
+		if (pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk) {
 			return true;
 		} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
 			return true;
@@ -361,7 +381,7 @@ function failureFunction(task, args) {
 				dlQueue.pushFirst(task);
 			}, 60000);
 			return;
-		}		
+		}
 	}
 
 	DEBUG2(dl.name, "failed ", code);
@@ -370,6 +390,7 @@ function failureFunction(task, args) {
 	dl_reportstatus(dl, EAGAIN); 
 
 	/* check for network error  */
+	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
 	dlQueue.pushFirst(task);
 }

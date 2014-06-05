@@ -597,11 +597,10 @@ function crypto_rsagenkey ()
         u_setrsa(e.data);
     };
 
-    var randomSeed = new Uint8Array(256);
-    asmCrypto.ISAAC.seed(bioSeed);
-    asmCrypto.getRandomValues(randomSeed);
+    var workerSeed = new Uint8Array(256);
+    asmCrypto.getRandomValues(workerSeed);
 
-    w.postMessage([ 2048, 257, randomSeed ]);
+    w.postMessage([ 2048, 257, workerSeed ]);
 }
 
 /* }}} */

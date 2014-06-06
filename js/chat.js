@@ -51,9 +51,8 @@ function chatui()
 	{
 		if (e.keyCode == 13 && e.shiftKey == false)
 		{
-			console.log('send chat message');
+			console.log('send chat message', $(this).val());
 			$(this).val('');
-			return;		
 		}
 		$(this).height('auto');
 		var text = $(this).val();   

@@ -456,6 +456,7 @@ function MegaData ()
 	{
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
+		this.buildtree({h:M.RubbishID});
 		this.contacts();
 
 
@@ -681,6 +682,10 @@ function MegaData ()
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
 			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+		}
+		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
+		{
+			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
 		}
 		
 		if (this.c[n.h])

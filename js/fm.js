@@ -3524,7 +3524,7 @@ function sectionUIopen(id)
 	$('.content-panel').removeClass('active');
 	$('.nw-fm-left-icon.' + id).addClass('active');	
 	$('.content-panel.' + id).addClass('active');	
-	$('.fm-left-menu').removeClass('cloud-drive shared-with-me contacts conversations').addClass(id);
+	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);
 }
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
@@ -3533,6 +3533,7 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	else if (id == M.RootID) sectionUIopen('cloud-drive');
 	else if (id == 'contacts') sectionUIopen('contacts');
 	else if (id == 'chat') sectionUIopen('conversations');
+	else if (id == M.RubbishID) sectionUIopen('rubbish-bin');
 	if (!fminitialized) return false;
 	if (!event)
 	{

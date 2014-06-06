@@ -4,7 +4,7 @@ var fetchingFile = null
 	 *	XHR fetching, useful when we have internet
 	 *  faster than our IO (first world problem) 
 	 */
-	, IO_THROTTLE = 3
+	, IO_THROTTLE = 15
 
 // Chunk fetch {{{
 var GlobalProgress = {};

@@ -115,7 +115,7 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				{
 					if(is_chrome_firefox && "blob" in file)
 					{
-						if (OS && file.size > 2e6) try
+						if (file.size > 2e6) try
 						{
 							return OS.File.read(file.mozFile.path).then(function(u8)
 							{

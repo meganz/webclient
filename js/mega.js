@@ -1549,7 +1549,7 @@ function MegaData ()
 
 	this.addDownload = function(n,z,preview)
 	{
-		// todo cesar: preview parameter indicates that this is a image preview download
+		// todo cesar: preview parameter indicates that this is a image fpreview download
 		delete $.dlhash;
 		var zipname,path;
 		var nodes = [];

@@ -597,11 +597,10 @@ function crypto_rsagenkey ()
         u_setrsa(e.data);
     };
 
-    var randomSeed = new Uint8Array(256);
-    asmCrypto.ISAAC.seed(bioSeed);
-    asmCrypto.getRandomValues(randomSeed);
+    var workerSeed = new Uint8Array(256);
+    asmCrypto.getRandomValues(workerSeed);
 
-    w.postMessage([ 2048, 257, randomSeed ]);
+    w.postMessage([ 2048, 257, workerSeed ]);
 }
 
 /* }}} */
@@ -1257,7 +1256,7 @@ function api_resetkeykey2(res,ctx)
         for (var i = 0; i < 4; i++)
         {
             var l = ((privk.charCodeAt(0)*256+privk.charCodeAt(1)+7)>>3)+2;
-            if (typeof mpi2b(privk.substr(0,l)) == 'number') break;
+            if ( privk.substr(0,l).length < 2 ) break;
             privk = privk.substr(l);
         }
 
@@ -2719,6 +2718,3 @@ function Ed_getpubkey(userhandle,ctx)
 		});
 	}	
 }
-
-
-

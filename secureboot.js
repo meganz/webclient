@@ -46,8 +46,9 @@ try
 	{
 		var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 
+		Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
 		Cu['import']("resource://gre/modules/Services.jsm");
-		Cu['import']("resource://gre/modules/NetUtil.jsm");
+		XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
 		(function(global) {
 			global.loadSubScript = function(file,scope) {
@@ -187,17 +188,66 @@ function cmparrays(a,b)
 }
 
 function init_storage ( storage ) {
-    var v = storage.v,
+    var v = storage.v || 0,
         d = storage.d,
         dd = storage.dd,
         sp = storage.staticpath;
 
-    if ( v !== storage_version ) storage.clear();
-    storage.v = storage_version;
+    // Graceful storage version upgrade
+    if ( v == 0 ) {
+        // array of limbs -> mpi-encoded number
+        function b2mpi (b) {
+            var bs = 28, bm = (1 << bs) - 1, bn = 1, bc = 0, r = [0], rb = 1, rn = 0;
+            var bits = b.length * bs;
+            var n, rr='';
 
-    if ( d ) storage.d = d;
-    if ( dd ) storage.dd = dd;
-    if ( sp ) storage.staticpath = sp;
+            for ( n = 0; n < bits; n++ ) {
+                if ( b[bc] & bn ) r[rn] |= rb;
+                if ( (rb <<= 1) > 255 ) rb = 1, r[++rn] = 0;
+                if ( (bn <<= 1) > bm ) bn = 1, bc++;
+            }
+
+            while ( rn && r[rn] == 0 ) rn--;
+
+            bn = 256;
+            for ( bits = 8; bits > 0; bits-- ) if ( r[rn] & (bn >>= 1) ) break;
+            bits += rn * 8;
+
+            rr += String.fromCharCode(bits/256)+String.fromCharCode(bits%256);
+            if ( bits ) for ( n = rn; n >= 0; n-- ) rr += String.fromCharCode(r[n]);
+            return rr;
+        }
+
+        if ( storage.privk ) {
+            // Upgrade key format
+            try {
+                var privk = JSON.parse(storage.privk), str = '';
+                for ( var i = 0; i < privk.length; i++ ) str += b2mpi( privk[i] );
+                storage.privk = btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+                v++;
+            }
+            catch ( e ) {
+                console.error( e );
+            }
+        }
+        else {
+            v++;
+        }
+
+        storage.v = v;
+    }
+    // if ( v == 1 ) { ... }
+    // if ( v == 2 ) { ... }
+    // ... and so on
+
+    // Or upgrade hard when graceful method isn't provided
+    if ( v != storage_version ) {
+        storage.clear();
+        storage.v = storage_version;
+        if ( d ) storage.d = d;
+        if ( dd ) storage.dd = dd;
+        if ( sp ) storage.staticpath = sp;
+    }
 
     return storage;
 }
@@ -391,7 +441,7 @@ else
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
 		jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
 		jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-		if (is_chrome_firefox && OS && localStorage.fxio)
+		if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27 && localStorage.fxio)
 		{
 			is_chrome_firefox |= 4;
 			jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});

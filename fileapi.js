@@ -74,8 +74,7 @@ function mozAlert(m,x,cb) {
 	if(d) console.log('mozAlert: '+m);
 	var i = 'resource://mega/icon.png', t = 'MEGA '+(x || mozPrefs.getCharPref('version'));
 	try {
-		Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService)
-			.showAlertNotification(i,t,m,!!cb,"",cb, 'MEGA');
+		mozAlertsService.showAlertNotification(i,t,m,!!cb,"",cb, 'MEGA');
 	} catch(e) {
 		var aw = Services.ww.openWindow(null,"chrome://global/content/alerts/alert.xul",
 			"_blank", "chrome,titlebar=no,popup=yes", null);
@@ -85,8 +84,7 @@ function mozAlert(m,x,cb) {
 }
 
 function mozSetClipboard(str) {
-	Cc["@mozilla.org/widget/clipboardhelper;1"]
-		.getService(Ci.nsIClipboardHelper).copyString(str);
+	mozClipboardHelper.copyString(str);
 }
 
 function mozRunAsync(f) {
@@ -350,7 +348,6 @@ function mozSanePathTree(path, file) {
 	return path;
 }
 
-const mozMIMEService = Cc["@mozilla.org/mime;1"].getService(Ci.nsIMIMEService);
 function mozGetMIMEType(file) {
 	var t;
 
@@ -931,10 +928,12 @@ function mozClearStartupCache() {
 	}
 })(self);
 
-try {
-	const { OS } = 27 < parseInt(Services.appinfo.version)
-		&& Cu.import("resource://gre/modules/osfile.jsm", {});
-} catch(e) {}
+const mozLazyGetService = XPCOMUtils.defineLazyServiceGetter.bind(XPCOMUtils, this);
 
+mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                   "nsIMIMEService"     );
+mozLazyGetService( "mozAlertsService",   "@mozilla.org/alerts-service;1",         "nsIAlertsService"   );
+mozLazyGetService( "mozClipboardHelper", "@mozilla.org/widget/clipboardhelper;1", "nsIClipboardHelper" );
+
+XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;
 if(!BrowserApp) is_chrome_firefox |= 2;

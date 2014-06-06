@@ -7,7 +7,7 @@ self.onmessage = function ( e ) {
         pexp = ( e.data && e.data[1] ) || 257,
         seed = ( e.data && e.data[2] ) || 0;
 
-    if ( seed ) asmCrypto.ISAAC.seed(seed);
+    if ( seed ) asmCrypto.random.seed(seed);
 
     var rsakey = asmCrypto.RSA.generateKey(bits,pexp);
     if ( typeof rsakey[1] === 'number' ) rsakey[1] = asmCrypto.hex_to_bytes( rsakey[1].toString(16) ); // fix exponent

@@ -6,14 +6,14 @@
  * Instead, we use some bits from random() to determine how many
  * subsequent mouse movements we ignore before capturing the next one.
  *
- * Collected entropy is used to salt ISAAC PRNG.
+ * Collected entropy is used to salt asmCrypto's PRNG.
  *
  * mouse motion event code originally from John Walker
  * key press timing code thanks to Nigel Johnstone */
 
-var lastactive = new Date().getTime();
+var lastactive = Date.now();
 
-var bioSeed = new Array(256);
+var bioSeed = new Uint32Array(256);
 var bioCounter = 0;
 
 var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
@@ -30,7 +30,7 @@ function keyPressEntropy(e) { bioSeed[bioCounter++ & 255] ^= timeByte() | ( e.ke
 
 function mouseMoveEntropy(e)
 {
- lastactive = new Date().getTime();
+ lastactive = Date.now();
 
  if(mouseMoveSkip-- <= 0)
  {
@@ -38,6 +38,11 @@ function mouseMoveEntropy(e)
   if (typeof arkanoid_entropy !== 'undefined') arkanoid_entropy();
   bioSeed[bioCounter++ & 255] ^= timeByte() | ( c << 8 );
   mouseMoveSkip = ( Math.random() * 8 ) | 0;
+
+  if ( (bioCounter & 255) == 0 ) {
+    if (d) console.log("Reseeding PRNG");
+    asmCrypto.random.seed(bioSeed);
+  }
  }
 }
 

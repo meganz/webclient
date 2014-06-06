@@ -4,6 +4,7 @@ var dlMethod
 	, dl_maxchunk = 16*1048576
 	, dlQueue = new MegaQueue(downloader)
 	, preparing_download
+	, ui_paused = false
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {

@@ -3330,12 +3330,14 @@ function transferPanelUI()
 			$(this).removeClass('active');
 			dlQueue.resume();
 			ulQueue.resume();
+			ui_paused = false;
 		}
 		else
 		{
 			$(this).addClass('active');
 			dlQueue.pause();
 			ulQueue.pause();
+			ui_paused = true;
 
 			$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
 			{

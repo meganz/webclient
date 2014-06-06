@@ -360,7 +360,7 @@ ChunkUpload.prototype.updateprogress = function() {
 	if (this.file.complete) return;
 
 	var tp = this.file.sent || 0;
-	if (ulQueue.isPaused()) return;
+	if (ui_paused) return;
 
 	$.each(this.file.progress, function(i, p) {
 		tp += p;

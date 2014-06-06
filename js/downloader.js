@@ -62,7 +62,7 @@ ClassChunk.prototype.updateProgress = function(force) {
 	}
 
 	this.shouldIReportDone();
-	if (this.Progress.dl_lastprogress+500 > NOW() && !force) {
+	if (this.Progress.dl_lastprogress+200 > NOW() && !force) {
 		// too soon
 		return false;
 	}

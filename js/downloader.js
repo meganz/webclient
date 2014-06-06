@@ -124,7 +124,7 @@ ClassChunk.prototype.finish_download = function() {
 
 // XHR::on_progress {{{
 ClassChunk.prototype.on_progress = function(args) {
-	if (this.isCancelled()) return;
+	if (this.isCancelled() || !this.Progress.data[this.xid]) return;
 	this.Progress.data[this.xid][0] = args[0].loaded;
 	this.updateProgress();
 };

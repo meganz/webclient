@@ -6299,10 +6299,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-smile.grasp {
 	background-position: 6px -34px;
 }
-.fm-chat-smile.sad {
+.fm-chat-smile.cry {
 	background-position: -74px -34px;
 }
-.fm-chat-smile.cry {
+.fm-chat-smile.sad {
 	background-position: -114px -34px;
 }
 .fm-chat-smile.angry {

@@ -4,12 +4,33 @@ if (localStorage.megachat) MegaChat=true;
 // current active chatid
 var chatid = false;
 
+
+var chat_smileys = {};
+chat_smileys['smile'] = [':-)',':)'];
+chat_smileys['wink'] = [';-)',';)'];
+chat_smileys['tongue'] = [':p',':P',':-P',':-p'];
+chat_smileys['grin'] = [':D',':d'];
+chat_smileys['confuse'] = [':|',':-|'];
+chat_smileys['grasp'] = [':o',':O'];
+chat_smileys['sad'] = [':-(',':('];
+chat_smileys['cry'] = [';(',':\'(',';-('];
+chat_smileys['angry'] = ['(angry)'];
+
 function hideChat()
 {
 	$('.fm-chat-block').addClass('hidden');
 }
 
-
+function renderChatText(text)
+{
+	if (!text) text ='';
+	for (var i in chat_smileys)
+	{
+		for (var j in chat_smileys[i]) text = text.replaceAll(chat_smileys[i][j],'<div class="fm-chat-smile ' + i + '"></div>');		
+	}	
+	text = text.replace(/(?:\r\n|\r|\n)/g, '<br />');	
+	return text;	
+}
 
 
 function openChat(id)
@@ -33,11 +54,16 @@ function openChat(id)
 	
 	chatUI.header();
 	
+	chatUI.msgArea();
+	
 	chatUI.init(chatid);
 	
 	$('#contact2_' + chatid).addClass('selected');
 	window.location.hash = '#fm/chat/' + chatid;
 }
+
+
+
 
 
 var chatUI = {};
@@ -69,8 +95,36 @@ chatUI.init = function(cid)
 	}
 }
 
+chatUI.msgArea = function()
+{
+	$('.message-textarea').focus();
+};
 
-chatUI.renderMsg = function (userid,cid,message,typing)
+chatUI.msgHeight = function()
+{
+	var el = '.message-textarea';
+	$(el).height('auto');
+	var text = $(el).val();   
+	var lines = text.split("\n");
+	var count = lines.length;		   
+	if ($(el).val().length != 0 && count>1) 
+	{
+		$(el).height($(el).prop("scrollHeight"));
+		var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight();
+		if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight()) 
+		{
+			$('.fm-chat-message-scroll').height(scrollBlockHeight);
+			chatUI.scroll();
+		}
+	}
+	else if ($(el).height() > 27)	
+	{
+		$(el).height('27px');
+		chatUI.scroll();
+	}
+}
+
+chatUI.renderMsg = function(userid,cid,message,typing)
 {
 	this.init(cid);	
 	var class_rightbl ='',avatar = staticpath + 'images/mega/default-small-avatar.png';
@@ -96,11 +150,11 @@ chatUI.renderMsg = function (userid,cid,message,typing)
 	else
 	{
 		// real message:
-		$('.fm-chat-message-pad.' + cid).append('<div class="fm-chat-messages-block' + class_rightbl + '"><div class="fm-chat-messages-pad"><div class="nw-contact-avatar"><img alt="" src="' + avatar + '"></div><div class="fm-chat-message"> <span>' + htmlentities(message) + '</span> </div><div class="clear"></div></div></div>');
+		$('.fm-chat-message-pad.' + cid).append('<div class="fm-chat-messages-block' + class_rightbl + '"><div class="fm-chat-messages-pad"><div class="nw-contact-avatar"><img alt="" src="' + avatar + '"></div><div class="fm-chat-message"> <span>' + renderChatText(htmlentities(message)) + '</span> </div><div class="clear"></div></div></div>');		
+		$('.fm-chat-message-pad.' + cid).linkify();		
 	}
 	this.scroll(cid);
 }
-
 
 chatUI.renderDate = function(cid,date)
 {
@@ -129,6 +183,9 @@ chatUI.scroll = function(cid)
 	
 	// TODO: remember scroll state for each chat and scroll down automatically
 	$('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	
+	var jsp = $('.fm-chat-message-scroll').data('jsp');
+	jsp.scrollToBottom();	
 }
 
 
@@ -138,8 +195,14 @@ chatUI.header = function()
 	
 	$('.fm-right-header.chat').removeClass('hidden');
 	
-	$('.fm-right-header .nw-contact-avatar').removeClass('verified');	
+	$('.fm-right-header .nw-contact-avatar').removeClass('verified');
+	
+	// TODO: implement verification logic
 	if (M.u[chatid].verified) $('.fm-right-header .nw-contact-avatar').addClass('verified');
+	
+	var avatar = staticpath + 'images/mega/default-small-avatar.png';
+	if (avatars[chatid]) avatar = avatars[chatid].url;
+	$('.fm-right-header.chat .nw-contact-avatar img').attr('src',avatar);
 	
 	// set name:
 	$('.fm-chat-user').text(M.u[chatid].m);
@@ -154,6 +217,8 @@ chatUI.header = function()
 }
 
 
+
+
 chatUI.events = function()
 {
 	// add onclick events for contact list:
@@ -162,7 +227,7 @@ chatUI.events = function()
 	{
 		var id = $(this).attr('id');
 		if (id) chatid = id.replace('contact2_','');
-		openChat();
+		openChat();		
 	});
 	
 	// general chat UI logic (needs further refining):
@@ -184,28 +249,14 @@ chatUI.events = function()
 	{
 		if (e.keyCode == 13 && e.shiftKey == false)
 		{
-			console.log('send chat message', $(this).val());		
+			chatUI.renderMsg(u_handle,chatid,$(this).val());			
 			$(this).val('');
 		}
-		$(this).height('auto');
-		var text = $(this).val();   
-        var lines = text.split("\n");
-        var count = lines.length;		   
-		if ($(this).val().length != 0 && count>1) 
+		else
 		{
-			$(this).height($(this).prop("scrollHeight"));
-			var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight();
-			if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight()) 
-			{
-				$('.fm-chat-message-scroll').height(scrollBlockHeight);
-				chatUI.scroll();
-			}
+		
 		}
-		else if ($(this).height() > 27)	
-		{
-			$(this).height('27px');
-			chatUI.scroll();
-		}
+		chatUI.msgHeight();
 	});
 	
 	$('.fm-chat-attach-file').unbind('click');
@@ -363,7 +414,18 @@ chatUI.events = function()
 	$('.fm-chat-smile').bind('click', function() 
 	{
 			$('.fm-chat-emotions-icon').removeClass('active');
-			$('.fm-chat-emotion-popup').removeClass('active');
+			$('.fm-chat-emotion-popup').removeClass('active');			
+			var c = $(this).attr('class');
+			if (c)
+			{
+				c = c.replace('fm-chat-smile ','');				
+				if ($('.message-textarea').val() == 'Write a message...') $('.message-textarea').val('');				
+				$('.message-textarea').val($('.message-textarea').val() + chat_smileys[c][0]);
+				setTimeout(function()
+				{
+					moveCursortoToEnd($('.message-textarea')[0]);
+				},1);
+			}
 	});
 	
 	$('.multiple-sharing .nw-chat-expand-arrow').unbind('click');
@@ -393,6 +455,8 @@ chatUI.events = function()
 		$('.fm-add-user-popup').removeClass('hidden');
 	});
 	
+	//$('.fm-chat-line-block')
+	
 	$('.nw-fm-close-button').unbind('click');
 	$('.nw-fm-close-button').bind('click', function() 
 	{
@@ -400,12 +464,3 @@ chatUI.events = function()
 		$(this).closest('.fm-dialog-popup').addClass('hidden');
 	});	
 }
-
-
-
-
-
-	
-	
-	
-

@@ -422,6 +422,7 @@ else
 		jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
 		jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
 		jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
+		jsl.push({f:'js/jquery.linkify.min.js', n: 'jquery_linkify_js', j:1,w:1});
 		jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
 		jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
 		jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});

@@ -495,7 +495,9 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-			chatui();
+			chatUI.boot();
+			chatUI.events();
+			treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
@@ -507,6 +509,7 @@ function MegaData ()
 			{
 				// new chatid detected, open now:
 				openChat(id.replace('chat/',''));
+				treeUI();
 			}
 		}
 		else if (!M.d[id]) id = this.RootID;

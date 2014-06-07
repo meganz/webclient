@@ -345,6 +345,7 @@ ClassFile.prototype.run = function(task_done) {
 				/* retry !*/
 				ERRDEBUG('retrying ', self.dl.n);
 				dlQueue.pushFirst(self);
+				if (ioThrottlePaused) dlQueue.resume();
 			}, dl_retryinterval);
 			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
 			return false;

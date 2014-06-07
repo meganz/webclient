@@ -5542,6 +5542,11 @@ span.search-number {
 .create-folder-input-bl, .add-user-popup-input-bl {
 	float: left;
 	width: 235px;
+	background-color: rgba(0,0,0,0.05);
+	height:32px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
 }
 .create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .fm-account-select {
 	width: 100%;
@@ -5549,10 +5554,8 @@ span.search-number {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
-	line-height: 32px;
+	
+	line-height: 30px;
 	margin-top: 0;
 	font-size: 12px;
 	color: #868686;
@@ -5560,7 +5563,8 @@ span.search-number {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: -5px -5657px;
 	background-repeat: no-repeat;
-	background-color: rgba(0,0,0,0.05);
+	background-color:transparent;
+	
 	border: 0;
 }
 .fm-account-select {

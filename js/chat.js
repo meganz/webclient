@@ -9,8 +9,42 @@ function hideChat()
 	$('.fm-chat-block').addClass('hidden');
 }
 
-function chatui()
-{	
+
+
+
+function openChat(id)
+{
+	chatUI.boot();
+	chatUI.events();
+	
+	if (id) chatid = id;
+		
+	chatUI.init(chatid);
+	
+	$('.fm-chat-block').removeClass('hidden');
+	
+	// remove all chat div's:
+	$('.fm-chat-message-pad').addClass('hidden');
+	
+	// show relevant chat div:
+	$('.fm-chat-message-pad.' + chatid).removeClass('hidden');
+	
+	chatUI.scroll();
+	
+	chatUI.header();
+	
+	chatUI.init(chatid);
+	
+	$('#contact2_' + chatid).addClass('selected');
+	window.location.hash = '#fm/chat/' + chatid;
+}
+
+
+var chatUI = {};
+
+
+chatUI.boot = function()
+{
 	// hide other panels:
 	hideEmptyMsg();
 	$('.files-grid-view').addClass('hidden');
@@ -22,7 +56,106 @@ function chatui()
 	$('.nw-conversations-item').removeClass('selected');
 	
 	sectionUIopen('conversations');
+};
+
+chatUI.init = function(cid)
+{
+	if ($('.fm-chat-message-pad.' + cid).length == 0)
+	{
+		// add chat div to DOM:
+		$('<div class="fm-chat-message-pad ' + htmlentities(cid) + ' hidden"></div>').insertBefore('.fm-chat-message-pad.example');
+		
+		// TODO: prerender history (partly)?
+	}
+}
+
+
+chatUI.renderMsg = function (userid,cid,message,typing)
+{
+	this.init(cid);	
+	var class_rightbl ='',avatar = staticpath + 'images/mega/default-small-avatar.png';
 	
+	// check if the message is from myself
+	if (userid == u_handle) class_rightbl = ' right-block';
+	// set user avatar (if available):
+	if (avatars[userid]) avatar = avatars[userid].url;
+	
+	if (typing)
+	{
+		if (!message) 
+		{
+			// hide typing:
+			$('.fm-chat-message-pad.' + cid + ' .fm-chat-messages-block.typing').remove();
+		}
+		else
+		{
+			// show typing:
+			if ($('.fm-chat-message-pad.' + cid + ' .typing').length == 0) $('.fm-chat-message-pad.' + cid).append('<div class="fm-chat-messages-block typing"><div class="fm-chat-messages-pad"><div class="nw-contact-avatar"><img alt="" src="' + avatar + '"></div><div class="fm-chat-message"><div class="circle" id="circleG"><div id="circleG_1" class="circleG"></div><div id="circleG_2" class="circleG"></div><div id="circleG_3" class="circleG"></div></div></div><div class="clear"></div></div></div>');
+		}
+	}
+	else
+	{
+		// real message:
+		$('.fm-chat-message-pad.' + cid).append('<div class="fm-chat-messages-block' + class_rightbl + '"><div class="fm-chat-messages-pad"><div class="nw-contact-avatar"><img alt="" src="' + avatar + '"></div><div class="fm-chat-message"> <span>' + htmlentities(message) + '</span> </div><div class="clear"></div></div></div>');
+	}
+	this.scroll(cid);
+}
+
+
+chatUI.renderDate = function(cid,date)
+{
+	this.init(cid);
+	$('.fm-chat-message-pad.' + cid).append('<div class="nw-chat-date"><div class="nw-chat-date-txt">' + date + '</div></div>');
+	this.scroll(cid);
+}
+
+chatUI.typing = function(userid,cid)
+{
+	this.renderMsg(userid,cid,true,true);
+}
+
+chatUI.typingStop = function(userid,cid)
+{
+	this.renderMsg(userid,cid,false,true);
+}
+
+chatUI.scroll = function(cid)
+{
+	// Always put the typing element to the bottom
+	if (cid) $('.fm-chat-message-pad.' + cid + ' .typing').appendTo('.fm-chat-message-pad.' + cid);
+	
+	// If chat is currently not visible, no need to initialize the scroll
+	if (cid && chatid !== cid) return false;
+	
+	// TODO: remember scroll state for each chat and scroll down automatically
+	$('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+}
+
+
+chatUI.header = function()
+{
+	if (!chatid) $('.fm-right-header.chat').addClass('hidden');
+	
+	$('.fm-right-header.chat').removeClass('hidden');
+	
+	$('.fm-right-header .nw-contact-avatar').removeClass('verified');	
+	if (M.u[chatid].verified) $('.fm-right-header .nw-contact-avatar').addClass('verified');
+	
+	// set name:
+	$('.fm-chat-user').text(M.u[chatid].m);
+	$('.fm-chat-user-info').removeClass('online offline away busy');
+	
+	// online status:
+	$('.fm-chat-user-info').addClass('offline');	
+	$('.fm-chat-user-status').text('offline');
+
+	// hide add user button (group chat will come later)
+	$('.chat-button.fm-add-user').addClass('hidden');
+}
+
+
+chatUI.events = function()
+{
 	// add onclick events for contact list:
 	$('.nw-conversations-item').unbind('click');
 	$('.nw-conversations-item').bind('click',function(e)
@@ -51,7 +184,7 @@ function chatui()
 	{
 		if (e.keyCode == 13 && e.shiftKey == false)
 		{
-			console.log('send chat message', $(this).val());
+			console.log('send chat message', $(this).val());		
 			$(this).val('');
 		}
 		$(this).height('auto');
@@ -65,10 +198,14 @@ function chatui()
 			if (scrollBlockHeight != $('.fm-chat-message-scroll').outerHeight()) 
 			{
 				$('.fm-chat-message-scroll').height(scrollBlockHeight);
-				initChatScrolling();
+				chatUI.scroll();
 			}
 		}
-		else $(this).height('27px');
+		else if ($(this).height() > 27)	
+		{
+			$(this).height('27px');
+			chatUI.scroll();
+		}
 	});
 	
 	$('.fm-chat-attach-file').unbind('click');
@@ -238,8 +375,8 @@ function chatui()
 		var chatDownloadPopup = $('.fm-chat-download-popup.active');
 		chatDownloadPopup.removeClass('active');
 		chatDownloadPopup.css('left', '-' + 10000 + 'px');
-		$('.nw-chat-button.red.active').removeClass('active');	
-	    initChatScrolling();
+		$('.nw-chat-button.red.active').removeClass('active');
+		chatUI.scroll();
 	});
 	
 	$('.fm-chat-popup-button.from-cloud').unbind('click');
@@ -264,46 +401,6 @@ function chatui()
 	});	
 }
 
-
-function openChat(id)
-{
-	chatui();
-	if (id) chatid = id;
-	$('.fm-chat-block').removeClass('hidden');
-	initChatScrolling();	
-	chatHeader();	
-	$('#contact2_' + chatid).addClass('selected');
-	window.location.hash = '#fm/chat/' + chatid;
-}
-
-
-function chatHeader()
-{	
-	if (!chatid) $('.fm-right-header.chat').addClass('hidden');
-	
-	$('.fm-right-header.chat').removeClass('hidden');
-	
-	$('.fm-right-header .nw-contact-avatar').removeClass('verified');	
-	if (M.u[chatid].verified) $('.fm-right-header .nw-contact-avatar').addClass('verified');
-	
-	// set name:
-	$('.fm-chat-user').text(M.u[chatid].m);
-	$('.fm-chat-user-info').removeClass('online offline away busy');
-	
-	// online status:
-	$('.fm-chat-user-info').addClass('offline');	
-	$('.fm-chat-user-status').text('offline');
-
-	// hide add user button (group chat will come later)
-	$('.chat-button.fm-add-user').addClass('hidden');
-}
-
-
-
-function initChatScrolling() 
-{
-	$('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
-}	
 
 
 

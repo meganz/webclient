@@ -5095,10 +5095,7 @@ function fm_resize_handler() {
 	{
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
-	}
-	
-	
-	if (M.chat) initChatScrolling();	
+	}	
 
     var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({

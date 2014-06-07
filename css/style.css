@@ -5714,10 +5714,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	height: 100%;
-	height: -webkit-calc(100% - 48px);
-	height: -moz-calc(100% - 48px);
-	height: calc(100% - 48px);
+	height: 100% !important;
+	height: -webkit-calc(100% - 48px) !important;
+	height: -moz-calc(100% - 48px) !important;
+	height: calc(100% - 48px) !important;
+	min-height:200px !important;
 	position: relative;
 }
 .fm-chat-message-scroll {
@@ -5743,7 +5744,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-bottom: 5px !important;
 }
 .fm-chat-message a {
 	color: #0A68CA;

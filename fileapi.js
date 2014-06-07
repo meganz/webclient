@@ -930,9 +930,10 @@ function mozClearStartupCache() {
 
 const mozLazyGetService = XPCOMUtils.defineLazyServiceGetter.bind(XPCOMUtils, this);
 
-mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                   "nsIMIMEService"     );
-mozLazyGetService( "mozAlertsService",   "@mozilla.org/alerts-service;1",         "nsIAlertsService"   );
-mozLazyGetService( "mozClipboardHelper", "@mozilla.org/widget/clipboardhelper;1", "nsIClipboardHelper" );
+mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                      "nsIMIMEService"     );
+mozLazyGetService( "mozAlertsService",   "@mozilla.org/alerts-service;1",            "nsIAlertsService"   );
+mozLazyGetService( "mozClipboardHelper", "@mozilla.org/widget/clipboardhelper;1",    "nsIClipboardHelper" );
+mozLazyGetService( "mozRandomGenerator", "@mozilla.org/security/random-generator;1", "nsIRandomGenerator" );
 
 XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm");
 const BrowserApp = Services.wm.getMostRecentWindow('navigator:browser').BrowserApp;

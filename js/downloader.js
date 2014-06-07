@@ -56,7 +56,7 @@ ClassChunk.prototype.shouldIReportDone = function() {
 
 // updateProgress {{{
 ClassChunk.prototype.updateProgress = function(force) {
-	if (dlQueue.isPaused()) {
+	if (ui_paused) {
 		// do not update the UI
 		return false;
 	}

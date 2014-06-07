@@ -23,7 +23,7 @@ var mouseMoveSkip = 0; // Delay counter for mouse entropy collection
 if (window.performance !== undefined && window.performance.now !== undefined) {
 	var timeByte = function() { return ((window.performance.now()%512)>>>1)&255 };
 } else {
-	var timeByte = function() { return ((new Date().getTime())>>>2)&255 };
+	var timeByte = function() { return (Date.now()>>>2)&255 };
 }
 
 function keyPressEntropy(e) { bioSeed[bioCounter++ & 255] ^= timeByte() | ( e.keyCode << 8 ); }
@@ -66,6 +66,8 @@ function eventsEnd()
 	
 function eventsCollect()
 {
+ for(var i = 0xff ; i-- ; keyPressEntropy({keyCode:Date.now() & i}));
+
  if((document.implementation.hasFeature("Events", "2.0"))
   && document.addEventListener) // Document Object Model (DOM) 2 events
  {

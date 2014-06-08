@@ -3211,10 +3211,11 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-contact-name {
 	font-size: 11px;
-	line-height: 21px;
-	padding-top: 14px;
-	color: #666666;
-	margin: 0 0 0 76px;
+line-height: 21px;
+color: #666666;
+white-space: nowrap;
+margin: 14px 0 0 76px;
+overflow: hidden;
 }
 .nw-contact-item.selected .nw-contact-name {
 	color: white;

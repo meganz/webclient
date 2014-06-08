@@ -975,7 +975,6 @@ function createfolderUI()
 			if (c.indexOf('active') == -1) 
 			{
 				$('.fm-new-folder').addClass('active');
-				$('.create-new-folder input').focus();
 			}
 			else $('.fm-new-folder').removeClass('active');
 		}		
@@ -986,10 +985,17 @@ function createfolderUI()
 	{
 		docreatefolderUI(e);
 		return false;
-	});	
+	});
+	$('.create-folder-button-cancel').unbind('click');
+	$('.create-folder-button-cancel').bind('click',function(e) 
+	{
+		 $('.fm-new-folder').removeClass('active');
+		 $('.create-new-folder').removeClass('filled-input');
+	});
 	$('.create-folder-input-bl input').unbind('keypress');
 	$('.create-folder-input-bl input').bind('keypress',function(e) 
 	{
+	    $(this).closest('.fm-new-folder').addClass('filled-input');
 		if (e.which == 13) docreatefolderUI(e);
 	});
 }

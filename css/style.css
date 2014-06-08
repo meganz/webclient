@@ -5512,7 +5512,6 @@ span.search-number {
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	min-width: 334px;
-	height: 74px;
 	background-color: white;
 	margin: 36px 0 0 -39px;
 	z-index: 900;
@@ -5523,6 +5522,7 @@ span.search-number {
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 	display: block;
+	overflow: hidden;
 }
 .active .add-user-popup {
 	margin: 38px 0 0 -43px;
@@ -5537,13 +5537,41 @@ span.search-number {
 	margin: -12px 0 0 -6px;
 }
 .create-folder-pad, .add-user-popup-pad {
-	margin: 20px 18px 0 18px
+	margin: 12px 12px 12px 12px
+}
+.create-folder-pad {
+	margin: 34px 12px 12px 12px;
+}
+.create-folder-bottom {
+	height: 56px;
+	background-color: #F6F6F6;
+	margin: 12px -12px -12px -12px;
+	display: none;
+}
+.filled-input .create-folder-bottom {
+	display: block;
+}
+.filled-input .create-folder-button {
+	display: none;
+}
+.filled-input .create-folder-input-bl {
+	width: 100%;
+}
+.create-folder-size-icon {
+	background-image: url(http://test/webclient/images/mega/nw-fm-sprite.svg);
+	background-position: center -5509px;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 6px;
+	right: 10px;
 }
 .create-folder-input-bl, .add-user-popup-input-bl {
 	float: left;
 	width: 235px;
 	background-color: rgba(0,0,0,0.05);
-	height:32px;
+	height: 32px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
@@ -5554,7 +5582,6 @@ span.search-number {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	
 	line-height: 30px;
 	margin-top: 0;
 	font-size: 12px;
@@ -5563,8 +5590,7 @@ span.search-number {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: -5px -5657px;
 	background-repeat: no-repeat;
-	background-color:transparent;
-	
+	background-color: transparent;
 	border: 0;
 }
 .fm-account-select {
@@ -5584,7 +5610,7 @@ span.search-number {
 	top: 0;
 	cursor: pointer;
 }
-.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button {
+.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel {
 	margin-left: 245px;
 	height: 32px;
 	background-color: rgba(109,176,63,0.7);
@@ -5606,8 +5632,20 @@ span.search-number {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 }
-.add-user-popup-button, a.add-user-popup-button {
+.create-folder-button:hover, a.create-folder-button:hover, .add-user-popup-button:hover, a.add-user-popup-button:hover {
 	background-color: rgba(109,176,63,1);
+}
+.create-folder-bottom .create-folder-button, .create-folder-bottom a.create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .filled-input .create-folder-bottom a.create-folder-button, .create-folder-button-cancel {
+	float: right;
+	margin: 12px 12px 0 0;
+	display: block;
+}
+.create-folder-button-cancel, a.create-folder-button-cancel, .add-user-popup-button-cancel, a.add-user-popup-button-cancel {
+	background-color: rgba(0,0,0,0.3);
+}
+.create-folder-button-cancel:hover, a.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, a.add-user-popup-button-cancel:hover {
+	background-color: rgba(0,0,0,0.6);
+	color: white;
 }
 .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button {
 	-webkit-touch-callout: none;

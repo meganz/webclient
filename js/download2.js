@@ -221,7 +221,7 @@ function throttleByIO(writer) {
 		if (writer._queue.length < IO_THROTTLE && ioThrottlePaused) {
 			DEBUG("IO_THROTTLE: resume XHR");
 			dlQueue.resume();
-			ioThrottlePaused = true;
+			ioThrottlePaused = false;
 		}
 	});
 }

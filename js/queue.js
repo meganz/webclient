@@ -32,6 +32,8 @@ MegaQueue.prototype.shrink = function() {
 
 MegaQueue.prototype.pause = function() {
 	this.trigger('pause')
+	DEBUG("pausing queue");
+	console.trace();
 	this._paused = true;
 };
 

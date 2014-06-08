@@ -5744,33 +5744,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-chat-message a {
 	color: #0A68CA;
 }
-.fm-chat-typing-txt {
-	height: 30px;
-	color: #898c8c;
-	font-size: 13px;
-	text-align: center;
-	padding-top: 6px;
-	position: absolute;
-	width: 100%;
-	bottom: 0;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
-	opacity: 0;
-	-webkit-transition: all 250ms ease-in-out;
-	-moz-transition: all 250ms ease-in-out;
-	-o-transition: all 250ms ease-in-out;
-	-ms-transition: all 250ms ease-in-out;
-	transition: all 250ms ease-in-out;
+.fm-chat-messages-block.typing-template {
+	display: none;
 }
-.fm-chat-typing-txt.typing {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
+.fm-chat-messages-block.typing-template.typing {
+    display: block;
 }
 .fm-chat-message-scroll .jspPane {
 	min-height: 100%;
@@ -5895,12 +5873,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .right-block .nw-contact-avatar {
 	float: right;
 }
-.fm-chat-messages-block.grouped-message .fm-chat-username {
-	visibility: hidden;
+
+.fm-chat-message-container.grouped-message .nw-chat-date {
+	display: none;
 }
-.fm-chat-messages-block.grouped-message {
-	border-top: 0;
-}
+
+
 .fm-chat-message-time {
 	width: 90px;
 	float: right;
@@ -6429,6 +6407,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	right: auto;
 	margin: 0 0 0 -8px;
 }
+
 .fm-chat-download-button, .fm-chat-popup-button {
 	height: 32px;
 	line-height: 30px;

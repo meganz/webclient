@@ -976,7 +976,10 @@ function createfolderUI()
 			{
 				$('.fm-new-folder').addClass('active');
 			}
-			else $('.fm-new-folder').removeClass('active');
+			else {
+				$('.fm-new-folder').removeClass('active');
+				$('.fm-new-folder').removeClass('filled-input');
+			}
 		}		
 		$.hideContextMenu();
 	});
@@ -990,12 +993,12 @@ function createfolderUI()
 	$('.create-folder-button-cancel').bind('click',function(e) 
 	{
 		 $('.fm-new-folder').removeClass('active');
-		 $('.create-new-folder').removeClass('filled-input');
+		 $('.fm-new-folder').removeClass('filled-input');
 	});
 	$('.create-folder-input-bl input').unbind('keypress');
 	$('.create-folder-input-bl input').bind('keypress',function(e) 
 	{
-	    $(this).closest('.fm-new-folder').addClass('filled-input');
+	    $('.fm-new-folder').addClass('filled-input');
 		if (e.which == 13) docreatefolderUI(e);
 	});
 }
@@ -1008,7 +1011,8 @@ function docreatefolderUI(e)
 
 function fmtopUI()
 {
-	$('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');	
+	$('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
+	$('.fm-new-folder').removeClass('filled-input');
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{	
 		$('.fm-clearbin-button').removeClass('hidden');	

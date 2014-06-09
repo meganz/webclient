@@ -118,6 +118,7 @@ MegaQueue.prototype.process = function() {
 				 * a stalled % Status... [dc]
 				 */
 				if (d) console.error('*** CHECK THIS ***', this);
+				this._noTaskCount = -1;
 				return false;
 			}
 			this._process();
@@ -143,7 +144,7 @@ MegaQueue.prototype.destroy = function() {
 
 MegaQueue.prototype._process = function() {
 	if (this._later) clearTimeout(this._later);
-	this._later = setTimeout(this.process.bind(this));
+	this._later = setTimeout(this.process.bind(this), 90);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

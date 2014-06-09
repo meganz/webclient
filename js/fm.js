@@ -1012,8 +1012,8 @@ function createfolderUI()
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
 	});
-	$('.create-folder-button-cancel').unbind('click');
-	$('.create-folder-button-cancel').bind('click',function(e) 
+	$('.create-folder-button-cancel popup').unbind('click');
+	$('.create-folder-button-cancel popup').bind('click',function(e) 
 	{
 		 $('.fm-new-folder').removeClass('active');
 		 $('.fm-new-folder').removeClass('filled-input');
@@ -4250,11 +4250,12 @@ function createfolderDialog(close)
 			createfolderDialog(1);		
 		}
 	});
-	$('.create-folder-dialog .fm-dialog-close').unbind('click');
-	$('.create-folder-dialog .fm-dialog-close').bind('click',function()  
+	$('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').unbind('click');
+	$('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click',function()  
 	{
 		createfolderDialog(1);
-	});	
+		$('.create-folder-dialog input').val(l[157]);
+	});
 	$('.fm-dialog-input-clear').unbind('click');
 	$('.fm-dialog-input-clear').bind('click',function()  
 	{

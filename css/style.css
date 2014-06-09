@@ -6278,7 +6278,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	padding: 0;
 	min-height: 96px;
 }
-.nw-fm-dialog-title {
+.nw-fm-dialog-title, .fm-dialog-title {
 	font-family: 'Open Sans', Arail;
 	font-size: 16px;
 	line-height: 21px;
@@ -6827,7 +6827,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: -222px 0 0 -352px;
 	overflow: visible;
 }
-.fm-dialog-header, .notification-header {
+.notification-header {
 	height: 32px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -6836,7 +6836,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: #F6F6F6;
 	text-align: center;
 }
-.fm-dialog-title, .notification-txt {
+.notification-txt {
 	line-height: 30px;
 	font-size: 12px;
 	float: left;

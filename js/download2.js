@@ -46,7 +46,6 @@ var DownloadManager = new function() {
 	}
 
 	self.newUrl = function(dl) {
-		dlQueue.pause(); /* pause *all* downloads */
 		DEBUG("ask for new URL for", dl.dl_id);
 		dlGetUrl(dl, function (error, res, o) {
 			if (error) return self.newUrl(dl);
@@ -58,7 +57,6 @@ var DownloadManager = new function() {
 					changed++
 				}
 			}
-			dlQueue.resume(); /* resume *all* downloads */
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
 		});
 	}
@@ -223,7 +221,7 @@ function throttleByIO(writer) {
 		if (writer._queue.length < IO_THROTTLE && ioThrottlePaused) {
 			DEBUG("IO_THROTTLE: resume XHR");
 			dlQueue.resume();
-			ioThrottlePaused = true;
+			ioThrottlePaused = false;
 		}
 	});
 }

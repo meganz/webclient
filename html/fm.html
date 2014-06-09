@@ -2,7 +2,6 @@
     <a class="contacts-sorting-by name">[$86]</a>
     <!--<a class="contacts-sorting-by active">Status</a>-->
     <a class="contacts-sorting-by shares">[$1348]</a>
-    <a class="contacts-sorting-by chat-activity">Recent Chat Activity</a>
     <!--<a class="contacts-sorting-by">Recent</a>-->
     <div class="context-menu-divider"></div>
     <a class="contacts-sorting-type asc">Ascending</a>
@@ -37,6 +36,12 @@
     <a class="context-menu-item forward-item"><span class="context-menu-icon"></span>Forward</a>
     <a class="context-menu-item add-star-item"><span class="context-menu-icon"></span>[$975]</a>
     <a class="context-menu-item canceltransfer-item"><span class="context-menu-icon"></span>[$103]</a>
+    <a class="context-menu-item transfer-pause"><span class="context-menu-icon"></span>[$103]</a>
+    <a class="context-menu-item transfer-play"><span class="context-menu-icon"></span>Pause</a>
+    <div class="pause-item-divider hidden"></div>
+    <a class="context-menu-item move-up"><span class="context-menu-icon"></span>Move up queue</a>
+    <a class="context-menu-item move-down"><span class="context-menu-icon"></span>Move down queue</a>
+    <a class="context-menu-item tranfer-clear"><span class="context-menu-icon"></span>Clear</a>
     <div class="context-menu-divider"></div>
     <a class="context-menu-item select-all"><span class="context-menu-icon"></span>Select all</a>
     <a class="context-menu-item refresh-item"><span class="context-menu-icon"></span>[$85]</a>
@@ -103,22 +108,15 @@
     </div>
 </div>
 <div class="fm-tree-panel">
-<!-- Please add "active" to necessary block to activate it !-->
 <div class="content-panel cloud-drive active">
 </div>
 <div class="content-panel shared-with-me">
     <ul>
         <li>
-            <!--
-               Please add "selected" classname if item is selected.
-               Please add "contains-folders" classnanme if item has subfolders.
-               Please add "expanded" classname if item is expaned.
-            !-->
                        <span class="nw-fm-tree-item contains-folders">
                           <span class="nw-fm-arrow-icon"></span>
                           <span class="nw-fm-tree-folder">Folder1</span>
                        </span>
-            <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
             <ul>
                 <li>
                            <span class="nw-fm-tree-item">
@@ -262,98 +260,10 @@
 <div class="content-panel rubbish-bin">
     <ul>
         <li>
-            <!--
-               Please add "selected" classname if item is selected.
-               Please add "contains-folders" classnanme if item has subfolders.
-               Please add "expanded" classname if item is expaned.
-            !-->
                        <span class="nw-fm-tree-item contains-folders">
                           <span class="nw-fm-arrow-icon"></span>
                           <span class="nw-fm-tree-folder">Folder1</span>
                        </span>
-            <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
-            <ul>
-                <li>
-                           <span class="nw-fm-tree-item">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
-                           </span>
-                </li>
-            </ul>
-        </li>
-        <li>
-                       <span class="nw-fm-tree-item">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder2</span>
-                       </span>
-        </li>
-        <li>
-                       <span class="nw-fm-tree-item contains-folders">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder3</span>
-                       </span>
-            <ul>
-                <li>
-                           <span class="nw-fm-tree-item">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
-                           </span>
-                </li>
-                <li>
-                           <span class="nw-fm-tree-item contains-folders">
-                              <span class="nw-fm-arrow-icon"></span>
-                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
-                           </span>
-                    <ul>
-                        <li>
-                               <span class="nw-fm-tree-item">
-                                 <span class="nw-fm-arrow-icon"></span>
-                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
-                               </span>
-                        </li>
-                        <li>
-                               <span class="nw-fm-tree-item">
-                                 <span class="nw-fm-arrow-icon"></span>
-                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
-                               </span>
-                        </li>
-                        <li>
-                               <span class="nw-fm-tree-item">
-                                 <span class="nw-fm-arrow-icon"></span>
-                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
-                               </span>
-                        </li>
-                        <li>
-                               <span class="nw-fm-tree-item">
-                                 <span class="nw-fm-arrow-icon"></span>
-                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
-                               </span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </li>
-        <li>
-                       <span class="nw-fm-tree-item">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Backups</span>
-                       </span>
-        </li>
-    </ul>
-</div>
-<div class="content-panel rubbish-bin">
-    <ul>
-        <li>
-            <!--
-               Please add "selected" classname if item is selected.
-               Please add "contains-folders" classnanme if item has subfolders.
-               Please add "expanded" classname if item is expaned.
-            !-->
-                       <span class="nw-fm-tree-item contains-folders">
-                          <span class="nw-fm-arrow-icon"></span>
-                          <span class="nw-fm-tree-folder">Folder1</span>
-                       </span>
-            <!-- Please add "opened" classname to open subfolder. You can also set necessary height in JS function to create animated effect. !-->
             <ul>
                 <li>
                            <span class="nw-fm-tree-item">
@@ -428,7 +338,212 @@
 </div>
 
 <div class="fm-right-files-block">
-<div class="fm-right-header hidden">
+
+<div class="fm-right-header chat hidden">
+    <div class="nw-contact-avatar verified">
+        <div class="nw-verified-icon"></div>
+        <img alt="" src="images/mega/default-small-avatar.png">
+    </div>
+    <div class="fm-chat-user-info star online">
+        <div class="fm-chat-user-star"></div>
+        <div class="fm-chat-user">Bram Van Der Kolk</div>
+        <div class="nw-contact-status"></div>
+        <div class="fm-chat-user-status"> Online </div>
+        <div class="clear"></div>
+    </div>
+
+    <!--<div class="chat-button fm-add-user"> <span class="fm-chatbutton-arrow">Add ...</span> </div>-->
+    <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
+    <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+
+    <div class="chat-popup fm-add-contact-popup">
+        <div class="fm-add-contact-arrow"></div>
+        <div class="fm-chat-popup-button add-contact">Add contact to Conversation</div>
+        <div class="fm-chat-popup-button send-contact">Send contact details</div>
+    </div>
+
+    <div class="chat-popup fm-send-files-popup">
+        <div class="fm-send-files-arrow"></div>
+        <div class="fm-chat-popup-button from-cloud">From your Cloud Drive</div>
+        <div class="fm-chat-popup-button from-computer">From your computer</div>
+    </div>
+
+    <div class="chat-popup fm-start-call-popup">
+        <div class="fm-send-files-arrow"></div>
+        <div class="fm-chat-popup-button start-audio">Start audio call</div>
+        <div class="fm-chat-popup-button start-video">Start video conference</div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+
+
+<!-- begin chat block -->
+
+<div class="fm-chat-block hidden">
+    <div class="fm-chat-messages-block inline-dialog template hidden">
+        <div class="fm-chat-messages-pad">
+            <div class="fm-chat-verification-head fm-chat-inline-dialog-header">
+                Header
+            </div>
+            <div class="fm-chat-message">
+                Message
+            </div>
+            <div class="fm-chat-file-button verify-button">Primary button</div>
+            <div class="fm-chat-file-button skip-button">Secondary button</div>
+        </div>
+    </div>
+
+
+    <div class="message template hidden">
+        <div class="nw-chat-date">
+            <div class="nw-chat-date-txt">Today, 2:00 PM</div>
+        </div>
+
+        <!-- One Message block !-->
+        <div class="fm-chat-messages-block">
+            <div class="fm-chat-messages-pad">
+                <div class="nw-contact-avatar">
+                    <img alt="" src="images/mega/default-small-avatar.png">
+                </div>
+                <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <!-- End ofMessage block !-->
+    </div>
+
+
+    <div class="fm-right-header template">
+        <div class="nw-contact-avatar todo-verified">
+            <div class="todo-nw-verified-icon"></div>
+            <img alt="" src="images/mega/default-small-avatar.png">
+        </div>
+        <div class="fm-chat-user-info todo-star online">
+            <div class="todo-fm-chat-user-star"></div>
+
+            <div class="fm-chat-user">Bram Van Der Kolk</div>
+            <div class="nw-contact-status"></div>
+            <div class="fm-chat-user-status"> Online </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="chat-button fm-add-user"> <span class="fm-chatbutton-arrow">Add ...</span> </div>
+        <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
+        <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+
+        <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
+            <div class="fm-add-contact-arrow" style="right: 46px;"></div>
+            <div class="fm-chat-popup-button add-contact">Add contact to Conversation</div>
+            <div class="fm-chat-popup-button send-contact">Send contact details</div>
+        </div>
+
+        <div class="chat-popup fm-send-files-popup" style="left: -10000px;">
+            <div class="fm-send-files-arrow" style="left: 62px;"></div>
+            <div class="fm-chat-popup-button from-cloud">From your Cloud Drive</div>
+            <div class="fm-chat-popup-button from-computer">From your computer</div>
+        </div>
+
+        <div class="chat-popup fm-start-call-popup" style="left: -10000px;">
+            <div class="fm-send-files-arrow" style="left: 62px;"></div>
+            <div class="fm-chat-popup-button start-audio">Start audio call</div>
+            <div class="fm-chat-popup-button start-video">Start video conference</div>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+
+
+    <div class="fm-chat-message-scroll template">
+        <!-- Unhide on "save-button" mouseover !-->
+        <div class="fm-chat-download-popup hidden">
+            <div class="fm-chat-download-arrow"></div>
+            <div class="fm-chat-download-button to-cloud">
+                <div class="fm-chat-download-icon"></div>
+                <div class="fm-chat-download-txt">
+                    To your Cloud Drive
+                </div>
+            </div>
+            <div class="fm-chat-download-button as-zip">
+                <div class="fm-chat-download-icon"></div>
+                <div class="fm-chat-download-txt">
+                    As ZIP file
+                </div>
+            </div>
+            <div class="fm-chat-download-button to-computer">
+                <div class="fm-chat-download-icon"></div>
+                <div class="fm-chat-download-txt">
+                    To your computer
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="fm-chat-messages-block typing-template right-block">
+            <div class="fm-chat-messages-pad">
+                <div class="nw-contact-avatar">
+                    <img alt="" src="images/mega/default-small-avatar.png">
+                </div>
+                <div class="fm-chat-message">
+                    <div class="circle" id="circleG">
+                        <div id="circleG_1" class="circleG"></div>
+                        <div id="circleG_2" class="circleG"></div>
+                        <div id="circleG_3" class="circleG"></div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="fm-chat-line-block">
+
+        <div class="fm-chat-attach-file">
+            <div class="fm-chat-attach-arrow"></div>
+        </div>
+
+        <div class="fm-chat-emotions-icon">
+            <div class="fm-chat-emotion-arrow"></div>
+        </div>
+        <div class="fm-chat-emotion-popup hidden">
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="fm-chat-smile"></div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="fm-chat-input-block">
+            <div class="fm-chat-input-icon"></div>
+            <textarea class="message-textarea"></textarea>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+</div>
+
+<!-- end chat block -->
+
+
+
+
+
+
+<div class="fm-right-header fm hidden">
+
     <a class="fm-back-button"></a>
     <div class="fm-breadcrumbs-block">
     </div>
@@ -453,7 +568,6 @@
             <div class="create-folder-pad">
                 <div class="create-folder-size-icon full-size"></div>
                 <div class="create-folder-input-bl">
-                    <input type="text" />
                     <input type="text" value="[$157]" />
                 </div>
                 <a class="create-folder-button">[$455]</a>
@@ -644,199 +758,6 @@
         <div class="clear"></div>
     </div>
 </div>
-
-
-
-
-<div class="fm-chat-block hidden">
-    <div class="fm-chat-messages-block inline-dialog template hidden">
-        <div class="fm-chat-messages-pad">
-            <div class="fm-chat-verification-head fm-chat-inline-dialog-header">
-                Header
-            </div>
-            <div class="fm-chat-message">
-                Message
-            </div>
-            <div class="fm-chat-file-button verify-button">Primary button</div>
-            <div class="fm-chat-file-button skip-button">Secondary button</div>
-        </div>
-    </div>
-
-
-    <div class="message template hidden">
-        <div class="nw-chat-date">
-            <div class="nw-chat-date-txt">Today, 2:00 PM</div>
-        </div>
-
-        <!-- One Message block !-->
-        <div class="fm-chat-messages-block">
-            <div class="fm-chat-messages-pad">
-                <div class="nw-contact-avatar">
-                    <img alt="" src="images/mega/default-small-avatar.png">
-                </div>
-                <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
-                <div class="clear"></div>
-            </div>
-        </div>
-        <!-- End ofMessage block !-->
-    </div>
-
-
-    <div class="fm-right-header template">
-        <div class="nw-contact-avatar todo-verified">
-            <div class="todo-nw-verified-icon"></div>
-            <img alt="" src="images/mega/default-small-avatar.png">
-        </div>
-        <div class="fm-chat-user-info todo-star online">
-            <div class="todo-fm-chat-user-star"></div>
-
-            <div class="fm-chat-user">Bram Van Der Kolk</div>
-            <div class="nw-contact-status"></div>
-            <div class="fm-chat-user-status"> Online </div>
-            <div class="clear"></div>
-        </div>
-
-        <div class="chat-button fm-add-user"> <span class="fm-chatbutton-arrow">Add ...</span> </div>
-        <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
-        <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
-
-        <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
-            <div class="fm-add-contact-arrow" style="right: 46px;"></div>
-            <div class="fm-chat-popup-button add-contact">Add contact to Conversation</div>
-            <div class="fm-chat-popup-button send-contact">Send contact details</div>
-        </div>
-
-        <div class="chat-popup fm-send-files-popup" style="left: -10000px;">
-            <div class="fm-send-files-arrow" style="left: 62px;"></div>
-            <div class="fm-chat-popup-button from-cloud">From your Cloud Drive</div>
-            <div class="fm-chat-popup-button from-computer">From your computer</div>
-        </div>
-
-        <div class="chat-popup fm-start-call-popup" style="left: -10000px;">
-            <div class="fm-send-files-arrow" style="left: 62px;"></div>
-            <div class="fm-chat-popup-button start-audio">Start audio call</div>
-            <div class="fm-chat-popup-button start-video">Start video conference</div>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-    <!--<div class="fm-right-header template">-->
-    <!--&lt;!&ndash; Add/remove "verfified" class !&ndash;&gt;-->
-    <!--<div class="fm-chat-avatar-block"> -->
-    <!--<div class="fm-chat-top-verified"></div>-->
-    <!--<div class="fm-chat-avatar">-->
-    <!--<img alt="" src="images/mega/default-avatar.png" />-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--<div class="fm-chat-user-info">-->
-    <!--<div class="fm-chat-user-star"></div>-->
-    <!--<div class="fm-chat-user">Bram Van Der Kolk</div>-->
-    <!--<div class="nw-contact-status"></div>-->
-    <!--<div class="fm-chat-user-status online">-->
-    <!--Online-->
-    <!--</div>-->
-
-    <!--<div class="temp-controls">-->
-    <!--&lt;!&ndash; TODO: Move those somewhere else &ndash;&gt;-->
-    <!--<a href="javascript:;" class="btn-chat-call call-actions">Call</a>-->
-    <!--<a href="javascript:;" class="btn-chat-answer-incoming-call call-actions">Answer</a>-->
-    <!--<a href="javascript:;" class="btn-chat-reject-incoming-call call-actions">Reject</a>-->
-    <!--<a href="javascript:;" class="btn-chat-cancel-active-call call-actions">Cancel</a>-->
-    <!--<a href="javascript:;" class="btn-chat-mute call-actions">Audio Mute</a>-->
-    <!--<a href="javascript:;" class="btn-chat-unmute call-actions">Audio Unmute</a>-->
-    <!--<a href="javascript:;" class="btn-chat-video-mute call-actions">Video Mute</a>-->
-    <!--<a href="javascript:;" class="btn-chat-video-unmute call-actions">Video Unmute</a>-->
-    <!--</div>-->
-    <!--</div>-->
-
-
-    <!--<div class="remote-video-container"></div>-->
-    <!--<div class="local-video-container"></div>-->
-
-    <!--<div class="clear"></div>-->
-    <!--</div>-->
-
-    <div class="fm-chat-message-scroll template">
-        <!-- Unhide on "save-button" mouseover !-->
-        <div class="fm-chat-download-popup hidden">
-            <div class="fm-chat-download-arrow"></div>
-            <div class="fm-chat-download-button to-cloud">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    To your Cloud Drive
-                </div>
-            </div>
-            <div class="fm-chat-download-button as-zip">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    As ZIP file
-                </div>
-            </div>
-            <div class="fm-chat-download-button to-computer">
-                <div class="fm-chat-download-icon"></div>
-                <div class="fm-chat-download-txt">
-                    To your computer
-                </div>
-            </div>
-            <div class="clear"></div>
-        </div>
-
-        <div class="fm-chat-messages-block typing-template right-block">
-            <div class="fm-chat-messages-pad">
-                <div class="nw-contact-avatar">
-                    <img alt="" src="images/mega/default-small-avatar.png">
-                </div>
-                <div class="fm-chat-message">
-                    <div class="circle" id="circleG">
-                        <div id="circleG_1" class="circleG"></div>
-                        <div id="circleG_2" class="circleG"></div>
-                        <div id="circleG_3" class="circleG"></div>
-                    </div>
-                </div>
-                <div class="clear"></div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <div class="fm-chat-line-block">
-
-        <div class="fm-chat-attach-file">
-            <div class="fm-chat-attach-arrow"></div>
-        </div>
-
-        <div class="fm-chat-emotions-icon">
-            <div class="fm-chat-emotion-arrow"></div>
-        </div>
-        <div class="fm-chat-emotion-popup hidden">
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="fm-chat-smile"></div>
-            <div class="clear"></div>
-        </div>
-
-        <div class="fm-chat-input-block">
-            <div class="fm-chat-input-icon"></div>
-            <textarea class="message-textarea"></textarea>
-        </div>
-        <div class="clear"></div>
-    </div>
-
-</div>
-
 </div>
 
 <div class="fm-right-account-block">
@@ -989,7 +910,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
 
             <div class="fm-account-info-block">
                 <div class="membership-big-txt balance">
-                    &euro; 99.99
+                    &euro; 0.00
                 </div>
                 <div class="membershtip-medium-txt red-bg topup">[$450]</div>
 

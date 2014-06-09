@@ -689,7 +689,7 @@ function MegaData ()
 		if (this.c[n.h])
 		{
 			var folders = [];
-			for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
+			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 			
 			// sort by name is default in the tree
 			folders.sort(function(a,b)

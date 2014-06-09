@@ -6,6 +6,7 @@ function MegaQueue(worker, limit) {
 	this._queue = [];
     this._running = 0
 	this._worker  = worker
+	this._noTaskCount = 0;
 }
 inherits(MegaQueue, MegaEvents)
 
@@ -32,8 +33,7 @@ MegaQueue.prototype.shrink = function() {
 
 MegaQueue.prototype.pause = function() {
 	this.trigger('pause')
-	DEBUG("pausing queue");
-	console.trace();
+	if (d) { console.log("pausing queue"); console.trace(); }
 	this._paused = true;
 };
 
@@ -106,12 +106,24 @@ MegaQueue.prototype.process = function() {
 	var args;
 	if (this._paused) return;
 	clearTimeout(this._later);
+	delete this._later;
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
+			if ( ++this._noTaskCount > 666 )
+			{
+				/**
+				 * XXX: Prevent an infinite loop when there's a connection hang,
+				 * with the UI reporting either "Temporary error; retrying" or
+				 * a stalled % Status... [dc]
+				 */
+				if (d) console.error('*** CHECK THIS ***', this);
+				return false;
+			}
 			this._process();
 			return false;
 		}
+		this._noTaskCount = 0;
 		this.run_in_context(args);
 		this.trigger('working', args);
 	}
@@ -130,10 +142,8 @@ MegaQueue.prototype.destroy = function() {
 }
 
 MegaQueue.prototype._process = function() {
-	clearTimeout(this._later);
-	this._later = setTimeout(function(q) {
-		q.process();
-	}, 0, this);
+	if (this._later) clearTimeout(this._later);
+	this._later = setTimeout(this.process.bind(this));
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

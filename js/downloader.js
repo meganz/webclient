@@ -1,4 +1,4 @@
-var fetchingFile = null
+var fetchingFile = null, __ccXID = 0
 	/**
 	 *  How many queue IO we want before pausing the 
 	 *	XHR fetching, useful when we have internet
@@ -18,7 +18,7 @@ function ClassChunk(task) {
 	this.done = false
 	this.avg  = [0, 0]
 	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'file_' + this.dl.dl_id
-	this.xid  = this.gid + "_" + parseInt(Math.random() * 0xfffffffffff)
+	this.xid  = this.gid + "_" + (++__ccXID)
 	this.failed   = false
 	this.backoff  = 1000
 	this.lastPing = NOW()
@@ -92,7 +92,7 @@ ClassChunk.prototype.updateProgress = function(force) {
 ClassChunk.prototype.isCancelled = function() {
 	if (this._cancelled) {
 		/* aborted already */
-		console.warn('CHECK THIS', 'It shouldnt be reached since we xhr.abort()ed it.');
+		DEBUG('Already xhr.abort()ed it...');
 		return true;
 	}
 	var is_cancelled = !!this.dl.cancelled;
@@ -100,7 +100,7 @@ ClassChunk.prototype.isCancelled = function() {
 		if(typeof(this.dl.pos) !== 'number') {
 			this.dl.pos = IdToFile(this.dl).pos
 		}
-		is_canceled = !dl_queue[this.dl.pos].n;
+		is_cancelled = !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		this._cancelled = true;
@@ -296,17 +296,17 @@ ClassFile.prototype.run = function(task_done) {
 	var self = this;
 
 	this.dl.ready = function() {
-		DEBUG('is cancelled?', self.chunkFinished, self.dl.writer.isEmpty(), self.dl.decrypter == 0) 
-		if (self.chunkFinished && self.dl.writer.isEmpty() && self.dl.decrypter == 0) {
+		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0) 
+		if (this.chunkFinished && this.dl.writer.isEmpty() && this.dl.decrypter == 0) {
 			DEBUG('destroy');
-			self.destroy();
+			this.destroy();
 			self = null;
 		}
-	}
+	}.bind(this);
 
 	this.dl.io.begin = function() {
 		var tasks = [];
-		DEBUG('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
+		if(d) console.log('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
 		$.each(self.dl.urls||[], function(key, url) {
 			tasks.push(new ClassChunk({
 				url: url.url, 

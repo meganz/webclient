@@ -46,7 +46,6 @@ var DownloadManager = new function() {
 	}
 
 	self.newUrl = function(dl) {
-		dlQueue.pause(); /* pause *all* downloads */
 		DEBUG("ask for new URL for", dl.dl_id);
 		dlGetUrl(dl, function (error, res, o) {
 			if (error) return self.newUrl(dl);
@@ -58,7 +57,6 @@ var DownloadManager = new function() {
 					changed++
 				}
 			}
-			dlQueue.resume(); /* resume *all* downloads */
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
 		});
 	}
@@ -208,22 +206,22 @@ var DownloadManager = new function() {
 
 }
 
-function throttleByIO(writer) {
-	var paused = false;
+var ioThrottlePaused = false;
 
+function throttleByIO(writer) {
 	writer.on('queue', function() {
 		if (writer._queue.length >= IO_THROTTLE && !dlQueue.isPaused()) {
 			DEBUG("IO_THROTTLE: pause XHR");
 			dlQueue.pause();
-			paused = true;
+			ioThrottlePaused = true;
 		}
 	});
 
 	writer.on('working', function() {
-		if (writer._queue.length < IO_THROTTLE && paused) {
+		if (writer._queue.length < IO_THROTTLE && ioThrottlePaused) {
 			DEBUG("IO_THROTTLE: resume XHR");
 			dlQueue.resume();
-			paused = false;
+			ioThrottlePaused = false;
 		}
 	});
 }
@@ -380,6 +378,7 @@ function failureFunction(task, args) {
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
 			setTimeout(function() {
 				dlQueue.pushFirst(task);
+				if (ioThrottlePaused) dlQueue.resume();
 			}, 60000);
 			return;
 		}
@@ -394,6 +393,7 @@ function failureFunction(task, args) {
 	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
 	dlQueue.pushFirst(task);
+	if (ioThrottlePaused) dlQueue.resume();
 }
 
 DownloadQueue.prototype.push = function() {

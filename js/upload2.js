@@ -131,6 +131,7 @@ function network_error_check() {
 				 *	this is fine because we resume the download
 				 */
 				DownloadManager.newUrl( dl_queue[i] );
+				dl.retries = 0;
 			}
 			dl.error++
 		}
@@ -149,6 +150,7 @@ function network_error_check() {
 				 */
 				ERRDEBUG("restarting because it failed", ul_queue[i].retries, 'times',  ul);
 				UploadManager.restart( ul_queue[i] );
+				ul_queue[i].retries = 0;
 			}
 			ul.error++;
 		}

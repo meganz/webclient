@@ -1107,6 +1107,30 @@ function CreateWorkers(url, message, size) {
 	}, size);
 }
 
+
+function dcTracer(ctr) {
+	var name = ctr.name, proto = ctr.prototype;
+	for(var fn in proto) {
+		if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
+			console.log('Tracing ' + name + '.' + fn);
+			proto[fn] = (function(fn, fc) {
+				fc.dbg = function() {
+					try {
+						console.log('Entering ' + name + '.' + fn,
+							this, '~####~', Array.prototype.slice.call(arguments));
+						var r = fc.apply(this, arguments);
+						console.log('Leaving ' + name + '.' + fn, r);
+						return r;
+					} catch(e) {
+						console.error(e);
+					}
+				};
+				return fc.dbg;
+			})(fn, proto[fn]);
+		}
+	}
+}
+
 function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}

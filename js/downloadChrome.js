@@ -8,6 +8,7 @@ function FileSystemAPI(dl_id, dl) {
 		, dirid = "mega"
 		, dl_chunks = []
 		, dl_chunksizes = []
+		, dialog = false
 		, dl_writing
 		, dl_position = 0
 		, dl_buffer
@@ -73,6 +74,7 @@ function FileSystemAPI(dl_id, dl) {
 				if (++chrome_write_error_msg % 21 == 0 && !$.msgDialog) {
 					chrome_write_error_msg=0;
 					msgDialog('warningb','Out of disk space','Your system volume is running out of disk space. Your download will continue automatically after you free up some space.');
+					dialog = true;
 				}
 				
 				setTimeout(function() {
@@ -204,22 +206,17 @@ function FileSystemAPI(dl_id, dl) {
 			failed = false; /* reset error flag */
 			/* retry */
 			dl_fw.seek(dl_position);
-			DEBUG('IO: error, retrying and pausing dlQueue');
-			dlQueue.pause(); /* pause all downloads */
-			dl_paused = true;
+			DEBUG('IO: error, retrying');
 			return setTimeout(function() {
 				dl_fw.write(new Blob([dl_buffer]));
 			}, 2000);
 		}
 
-		if (dl_paused) {
-			if ($.msgDialog) {
-				closeDialog();
-			}
-			dlQueue.resume();
-			DEBUG('IO: done, resuming dlQueue');
-			dl_paused = false;
+		if (dialog && $.msgDialog) {
+			closeDialog();
+			dialog = false;
 		}
+		DEBUG('IO: error seems fixed');
 
 		dl_writing = false;
 		dl_done(); /* notify writer */

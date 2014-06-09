@@ -5,6 +5,7 @@ var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
+var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
 
 function isMobile()
@@ -45,8 +46,9 @@ try
     {
         var Cc = Components.classes, Ci = Components.interfaces, Cu = Components.utils;
 
-        Cu['import']("resource://gre/modules/Services.jsm");
-        Cu['import']("resource://gre/modules/NetUtil.jsm");
+		Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
+		Cu['import']("resource://gre/modules/Services.jsm");
+		XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
         (function(global) {
             global.loadSubScript = function(file,scope) {
@@ -192,6 +194,71 @@ function cmparrays(a,b)
     if (a.length != b.length) return false;
     for (var i = a.length; i--; ) if (a[i] != b[i]) return false;
     return true;
+}
+
+function init_storage ( storage ) {
+    var v = storage.v || 0,
+        d = storage.d,
+        dd = storage.dd,
+        sp = storage.staticpath;
+
+    // Graceful storage version upgrade
+    if ( v == 0 ) {
+        // array of limbs -> mpi-encoded number
+        function b2mpi (b) {
+            var bs = 28, bm = (1 << bs) - 1, bn = 1, bc = 0, r = [0], rb = 1, rn = 0;
+            var bits = b.length * bs;
+            var n, rr='';
+
+            for ( n = 0; n < bits; n++ ) {
+                if ( b[bc] & bn ) r[rn] |= rb;
+                if ( (rb <<= 1) > 255 ) rb = 1, r[++rn] = 0;
+                if ( (bn <<= 1) > bm ) bn = 1, bc++;
+            }
+
+            while ( rn && r[rn] == 0 ) rn--;
+
+            bn = 256;
+            for ( bits = 8; bits > 0; bits-- ) if ( r[rn] & (bn >>= 1) ) break;
+            bits += rn * 8;
+
+            rr += String.fromCharCode(bits/256)+String.fromCharCode(bits%256);
+            if ( bits ) for ( n = rn; n >= 0; n-- ) rr += String.fromCharCode(r[n]);
+            return rr;
+        }
+
+        if ( storage.privk ) {
+            // Upgrade key format
+            try {
+                var privk = JSON.parse(storage.privk), str = '';
+                for ( var i = 0; i < privk.length; i++ ) str += b2mpi( privk[i] );
+                storage.privk = btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+                v++;
+            }
+            catch ( e ) {
+                console.error( e );
+            }
+        }
+        else {
+            v++;
+        }
+
+        storage.v = v;
+    }
+    // if ( v == 1 ) { ... }
+    // if ( v == 2 ) { ... }
+    // ... and so on
+
+    // Or upgrade hard when graceful method isn't provided
+    if ( v != storage_version ) {
+        storage.clear();
+        storage.v = storage_version;
+        if ( d ) storage.d = d;
+        if ( dd ) storage.dd = dd;
+        if ( sp ) storage.staticpath = sp;
+    }
+
+    return storage;
 }
 
 var androidsplash = false;
@@ -356,13 +423,11 @@ else
 
         jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-        jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
+        jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
-        jsl.push({f:'js/rsa.js', n: 'rsa_js', j:1});
-        jsl.push({f:'js/keygen.js', n: 'keygen_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
         jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});

@@ -852,6 +852,7 @@ makeMetaAware(Karere);
      */
     Karere.prototype.generateMessageId = function(toJid) {
         var self = this;
+        //TODO: THIS IS STUPID! the message ID should be unique, primary key
         return fastHashFunction(self.getJid() + toJid) + "_" + unixtime()
     };
 

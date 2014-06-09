@@ -4013,8 +4013,7 @@ label.iPhoneCheckLabelOff span {
 	transition: all 200ms ease-in-out;
 	background-image: none;
 }
-.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active,
-.nw-fm-left-icon.rubbish-bin.dragover {
+.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active, .nw-fm-left-icon.rubbish-bin.dragover {
 	background-color: rgba(115,172,58,1);
 }
 .rubbish-bin-icon {
@@ -4161,6 +4160,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 	font-size: 0;
 	line-height: 0;
+	height: 24px;
+	overflow: hidden;
 }
 .files-grid-view, .contacts-grid-view {
 	-webkit-box-sizing: border-box;
@@ -5248,7 +5249,7 @@ span.search-number {
 	border-radius: 8px;
 	line-height: 22px;
 	color: white;
-	padding: 0 0 0 33px;
+	padding: 0 10px 0 33px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -9px -1730px;
@@ -5319,14 +5320,13 @@ span.search-number {
 	background-position: 9px -66px;
 }
 .fm-clearbin-button {
-	background-position: -3px -8941px;
-	padding: 0 10px 0 35px;
+	background-position: -3px -5820px;
+	padding: 0 10px 0 32px;
+	background-color: rgba(211,26,0,0.7);
 }
 .fm-clearbin-button:hover, .fm-clearbin-button.active {
-	background-color: #d31a00;
-	border-color: #d31a00;
+	background-color: rgba(211,26,0,1);
 	color: white;
-	background-position: -3px -9006px;
 }
 .fm-files-view-icon, .fm-contacts-view-icon {
 	width: 18px;
@@ -5367,14 +5367,13 @@ span.search-number {
 	opacity: 0.7;
 }
 .fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder {
-	border-top: 2px solid #EEEEEE;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100%;
-	height: -webkit-calc(100% - 49px);
-	height: -moz-calc(100% - 49px);
-	height: calc(100% - 49px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	position: relative;
 	min-height: 280px;
 }
@@ -5496,7 +5495,7 @@ span.search-number {
 	z-index: 500;
 	padding: 8px 0;
 }
-.context-menu-divider {
+.context-menu-divider, .pause-item-divider {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
@@ -5509,25 +5508,21 @@ span.search-number {
 }
 .active .create-new-folder, .active .add-user-popup {
 	position: absolute;
-	border-radius: 7px;
-	border: 2px solid rgba(0, 0, 0, .3);
+	border: 2px solid rgba(0, 0, 0, 0.15);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
-	width: 382px;
-	height: 74px;
+	min-width: 334px;
 	background-color: white;
 	margin: 36px 0 0 -39px;
 	z-index: 900;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	-webkit-border-top-right-radius: 0px;
-	-moz-top-radius-topright: 0px;
-	border-top-right-radius: 0px;
-	-webkit-border-top-left-radius: 0px;
-	-moz-top-radius-topleft: 0px;
-	border-top-left-radius: 0px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 	display: block;
+	overflow: hidden;
 }
 .active .add-user-popup {
 	margin: 38px 0 0 -43px;
@@ -5536,36 +5531,67 @@ span.search-number {
 	width: 125px;
 	height: 13px;
 	position: absolute;
-	background-image: url(../images/mega/main-sprite.png?v=7);
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -5891px;
 	background-repeat: no-repeat;
-	background-position: 4px -4987px;
-	margin: -12px 0 0 -2px;
+	margin: -12px 0 0 -6px;
 }
 .create-folder-pad, .add-user-popup-pad {
-	margin: 20px 18px 0 18px
+	margin: 12px 12px 12px 12px
+}
+.create-folder-pad {
+	margin: 34px 12px 12px 12px;
+}
+.create-folder-bottom {
+	height: 56px;
+	background-color: #F6F6F6;
+	margin: 12px -12px -12px -12px;
+	display: none;
+}
+.filled-input .create-folder-bottom {
+	display: block;
+}
+.filled-input .create-folder-button {
+	display: none;
+}
+.filled-input .create-folder-input-bl {
+	width: 100%;
+}
+.create-folder-size-icon {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -5509px;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 6px;
+	right: 10px;
 }
 .create-folder-input-bl, .add-user-popup-input-bl {
 	float: left;
-	width: 70%;
+	width: 235px;
+	background-color: rgba(0,0,0,0.05);
+	height: 32px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
 }
 .create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .fm-account-select {
-	height: 30px;
-	border: 2px solid #d9d9d9;
 	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	line-height: 27px;
+	line-height: 30px;
+	margin-top: 0;
 	font-size: 12px;
-	color: #383b3d;
-	padding: 0 10px;
-}
-.fm-account-input input {
 	color: #868686;
+	padding: 0 10px 0 35px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -5px -5657px;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	border: 0;
 }
 .fm-account-select {
 	background-position: right -6596px;
@@ -5584,14 +5610,14 @@ span.search-number {
 	top: 0;
 	cursor: pointer;
 }
-.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button {
-	margin-left: 73%;
-	height: 30px;
-	background-color: #6EB028;
+.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel {
+	margin-left: 245px;
+	height: 32px;
+	background-color: rgba(109,176,63,0.7);
 	color: white;
 	text-align: center;
 	font-size: 12px;
-	line-height: 29px;
+	line-height: 30px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
@@ -5600,9 +5626,26 @@ span.search-number {
 	box-sizing: border-box;
 	padding: 0 10px;
 	display: block;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
-.add-user-popup-button, a.add-user-popup-button {
-	background-color: #1B9EEB;
+.create-folder-button:hover, a.create-folder-button:hover, .add-user-popup-button:hover, a.add-user-popup-button:hover {
+	background-color: rgba(109,176,63,1);
+}
+.create-folder-bottom .create-folder-button, .create-folder-bottom a.create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .filled-input .create-folder-bottom a.create-folder-button, .create-folder-button-cancel {
+	float: right;
+	margin: 12px 12px 0 0;
+	display: block;
+}
+.create-folder-button-cancel, a.create-folder-button-cancel, .add-user-popup-button-cancel, a.add-user-popup-button-cancel {
+	background-color: rgba(0,0,0,0.3);
+}
+.create-folder-button-cancel:hover, a.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, a.add-user-popup-button-cancel:hover {
+	background-color: rgba(0,0,0,0.6);
+	color: white;
 }
 .fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button {
 	-webkit-touch-callout: none;
@@ -5715,10 +5758,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	height: 100%;
-	height: -webkit-calc(100% - 48px);
-	height: -moz-calc(100% - 48px);
-	height: calc(100% - 48px);
+	height: 100% !important;
+	height: -webkit-calc(100% - 48px) !important;
+	height: -moz-calc(100% - 48px) !important;
+	height: calc(100% - 48px) !important;
+	min-height: 200px !important;
 	position: relative;
 }
 .fm-chat-message-scroll {
@@ -5734,6 +5778,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-chat-message-pad {
 	padding: 8px 21px 0 5px;
 	position: relative;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	max-width: 1024px;
+	margin: 0 auto;
 }
 .fm-chat-message-scroll .jspPane {
 	-webkit-box-sizing: border-box;
@@ -6275,10 +6324,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-smile.grasp {
 	background-position: 6px -34px;
 }
-.fm-chat-smile.sad {
+.fm-chat-smile.cry {
 	background-position: -74px -34px;
 }
-.fm-chat-smile.cry {
+.fm-chat-smile.sad {
 	background-position: -114px -34px;
 }
 .fm-chat-smile.angry {
@@ -6302,28 +6351,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	background-position: 0px 1px;
 }
 .fm-chat-message .fm-chat-smile.wink {
-	background-position: -28px 1px;
+	background-position: -40px 1px;
 }
 .fm-chat-message .fm-chat-smile.tongue {
-	background-position: -68px 1px;
+	background-position: -80px 1px;
 }
 .fm-chat-message .fm-chat-smile.grin {
-	background-position: -108px 1px;
+	background-position: -120px 1px;
 }
 .fm-chat-message .fm-chat-smile.confuse {
-	background-position: -148px 1px;
+	background-position: -160px 1px;
 }
 .fm-chat-message .fm-chat-smile.grasp {
-	background-position: 0 -27px;
+	background-position: 0 -40px;
 }
 .fm-chat-message .fm-chat-smile.sad {
-	background-position: -68px -27px;
+	background-position: -80px -40px;
 }
 .fm-chat-message .fm-chat-smile.cry {
-	background-position: -108px -27px;
+	background-position: -120px -40px;
 }
 .fm-chat-message .fm-chat-smile.angry {
-	background-position: -148px -27px;
+	background-position: -160px -40px;
 }
 .fm-chat-download-popup, .fm-add-contact-popup, .fm-send-files-popup, .fm-start-call-popup, .fm-chat-emotion-popup {
 	-webkit-box-sizing: border-box;
@@ -8687,6 +8736,24 @@ table {
 }
 .select-all .context-menu-icon {
 	background-position: -1px -5290px;
+}
+.preview-item .context-menu-icon {
+	background-position: -4px -5380px;
+}
+.transfer-pause .context-menu-icon {
+	background-position: 5px -3612px;
+}
+.transfer-play .context-menu-icon {
+	background-position: 4px -5432px;
+}
+.move-up .context-menu-icon {
+	background-position: 5px -3652px;
+}
+.move-down .context-menu-icon {
+	background-position: 5px -3684px;
+}
+.tranfer-clear .context-menu-icon {
+	background-position: 5px -3716px;
 }
 .top-user-status-item {
 	padding-left: 5px;
@@ -15876,7 +15943,7 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .add-user-popup-arrow, .fm-account-select, .dragger-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .top-user-status-item.active, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }

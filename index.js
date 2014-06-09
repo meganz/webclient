@@ -1057,7 +1057,10 @@ function topmenuUI()
 		{			
 			var c3;
 			if (e && e.target) c3 = $(e.target).parent().attr('class');
-			if (!c3 || c3.indexOf('fm-new-folder') == -1) $('.fm-new-folder').removeClass('active');
+			if (!c3 || c3.indexOf('fm-new-folder') == -1) {
+				$('.fm-new-folder').removeClass('active');
+				$('.fm-new-folder').removeClass('filled-input');
+			}
 		}		
 		if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0) && (!c || c.indexOf('fm-add-user') == -1))
 		{
@@ -1396,7 +1399,7 @@ function parsetopmenu()
 
 
 window.onhashchange = function()
-{	
+{
 	var tpage = document.location.hash;	
 	if (silent_loading)
 	{

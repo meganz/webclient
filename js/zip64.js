@@ -97,7 +97,7 @@ function dlZipIO(dl, dl_id) {
 		, queue = []
 		, current = null
 		, gOffset = 0
-		, realIO = new dlMethod(dl_id, dl) 
+		, realIO = new dlMethod(dl_id, dl, this) 
 		, ready = false
 
 	// fake set credentials
@@ -121,7 +121,6 @@ function dlZipIO(dl, dl_id) {
 
 	this.done = function() {
 		current = null
-		DEBUG("done write", queue.length, "missing");
 		if (queue.length === 0) {
 			var end = ZipObject.writeSuffix(gOffset, dirData);
 			$.each(dirData, function(key, value) {
@@ -174,15 +173,20 @@ function dlZipIO(dl, dl_id) {
 				removeValue(queue,file.id);
 			}
 
+
 			if (current != file.id || expected != pos) {
 				var my = arguments.callee
 					, args = Array.prototype.slice.call(arguments)
 					, zself = this
 
+				//DownloadManager.pause('zipid:' + dl.zipid);
+
 				return setTimeout(function() {
 					my.apply(zself, args);
 				}, 100);
 			}
+
+			//DownloadManager.release('zipid:' + dl.zipid);
 
 			expected = pos + buffer.length
 			if (pos === 0) {
@@ -510,11 +514,6 @@ var ZIPClass = function(totalSize) {
 
 		return header.getBytes();
 	}
-
-
-	DEBUG(self, 'writeHeader');
-	DEBUG(self, 'writeCentralDir')
-	DEBUG(self, 'writeSuffix')
 }
 
 // crc32 {{{

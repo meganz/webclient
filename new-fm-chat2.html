@@ -86,15 +86,15 @@ $(document).ready(function() {
 	$(window).bind('resize', function () {
 		initChatScrolling();
 	});
-	
-	
-	
+
+
+
 	$('.message-textarea').keyup(function() {
 		  $(this).height('auto');
 		  var text = $(this).val();   
           var lines = text.split("\n");
           var count = lines.length;
-		   
+
 		  if ($(this).val().length != 0 && count>1) {
 		         $(this).height($(this).prop("scrollHeight"));
 				 var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight();
@@ -105,7 +105,7 @@ $(document).ready(function() {
 		  }
 		  else  $(this).height('27px');
 	});
-	
+
 	$('.fm-chat-attach-file').bind('click', function() {
 		if ($(this).attr('class').indexOf('active') > -1) {
 			 $('.fm-chat-attach-popup').addClass('hidden');
@@ -117,7 +117,7 @@ $(document).ready(function() {
 			 $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
 		}
 	});
-	
+
 	$('.nw-chat-button.red').bind('click', function() {
 		var chatDownloadPopup = $('.fm-chat-download-popup');
 		if ($(this).attr('class').indexOf('active') == -1) {
@@ -141,7 +141,7 @@ $(document).ready(function() {
 			 chatDownloadPopup.removeClass('active');
 			 chatDownloadPopup.css('left', '-' + 10000 + 'px');
 		}
-			 
+
 	});
 	$('.fm-chat-download-button').bind('click', function() {
 		var chatDownloadPopup = $('.fm-chat-download-popup.active');
@@ -149,7 +149,7 @@ $(document).ready(function() {
 		chatDownloadPopup.css('left', '-' + 10000 + 'px');
 		$('.nw-chat-button.red.active').removeClass('active');
 	});
-	
+
     function closeChatPopups() {
 		var activePopup = $('.chat-popup.active');
 		var activeButton = $('.chat-button.active');
@@ -162,7 +162,7 @@ $(document).ready(function() {
 		  else activePopup.css('right', '-' + 10000 + 'px'); 
 		}
 	}
-	
+
 	$('.fm-add-user').bind('click', function() {
 	    var positionX = $(this).position().left;
 		var addUserPopup = $('.fm-add-contact-popup');
@@ -176,10 +176,10 @@ $(document).ready(function() {
 			 addUserPopup.removeClass('active');
 			 addUserPopup.css('right', '-' + '10000' + 'px'); 
 			 $(this).removeClass('active');
-			 
+
 		}
 	});
-	
+
 	$('.fm-send-files').bind('click', function() {
 	    var positionX = $(this).position().left;
 		var sendFilesPopup = $('.fm-send-files-popup');
@@ -193,11 +193,11 @@ $(document).ready(function() {
 			 sendFilesPopup.removeClass('active');
 			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
 			 $(this).removeClass('active');
-			 
+
 		}
 	});
-	
-	
+
+
 	$('.fm-start-call').bind('click', function() {
 	    var positionX = $(this).position().left;
 		var sendFilesPopup = $('.fm-start-call-popup');
@@ -211,10 +211,10 @@ $(document).ready(function() {
 			 sendFilesPopup.removeClass('active');
 			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
 			 $(this).removeClass('active');
-			 
+
 		}
 	});
-	
+
 	$('.fm-chat-emotions-icon').bind('click', function() {
 		if ($(this).attr('class').indexOf('active') == -1) {
 			$(this).addClass('active');
@@ -224,12 +224,12 @@ $(document).ready(function() {
 			$('.fm-chat-emotion-popup').removeClass('active');
 		}
 	});
-	
+
 	$('.fm-chat-smile').bind('click', function() {
 			$('.fm-chat-emotions-icon').removeClass('active');
 			$('.fm-chat-emotion-popup').removeClass('active');
 	});
-	
+
 	$('.multiple-sharing .nw-chat-expand-arrow').bind('click', function() {
 		var sharingBlock = $(this).closest('.fm-chat-messages-block');
 		if ($(sharingBlock).attr('class').indexOf('expanded') > -1) 
@@ -239,25 +239,25 @@ $(document).ready(function() {
 		chatDownloadPopup.removeClass('active');
 		chatDownloadPopup.css('left', '-' + 10000 + 'px');
 		$('.nw-chat-button.red.active').removeClass('active');
-	
+
 	    initChatScrolling();
 	});
-	
+
 	$('.fm-chat-popup-button.from-cloud').bind('click', function() {
 		$('.fm-dialog-overlay').removeClass('hidden');
 		$('.fm-chat-attach-popup').removeClass('hidden');
 	});
-	
+
 	$('.fm-chat-popup-button.add-contact').bind('click', function() {
 		$('.fm-dialog-overlay').removeClass('hidden');
 		$('.fm-add-user-popup').removeClass('hidden');
 	});
-	
+
 	$('.nw-fm-close-button').bind('click', function() {
 		$('.fm-dialog-overlay').addClass('hidden');
 		$(this).closest('.fm-dialog-popup').addClass('hidden');
 	});
-	
+
 });
 </script>
 </head>
@@ -785,7 +785,7 @@ $(document).ready(function() {
               <div class="nw-contact-avatar">
                 <img alt="" src="images/mega/default-small-avatar.png">
               </div>
-              <div class="fm-chat-message"> <span>Awsome! <span class="fm-chat-smile smile"></span></span> </div>
+              <div class="fm-chat-message"> <span>Awsome! <span class="fm-chat-smile grasp"></span></span> </div>
               <div class="clear"></div>
             </div>
           </div>

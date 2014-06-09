@@ -38,6 +38,7 @@ function FileSystemAPI(dl_id, dl) {
 			  alert('NOT_FOUND_ERR in ' + type);
 			  break;
 			case FileError.SECURITY_ERR:
+			  dlMethod = MemoryIO; /* change it globaly */
 			  dl.io = new MemoryIO(dl_id, dl);
 			  dl.io.begin = IO.begin;
 			  dl.io.size  = IO.size;
@@ -229,6 +230,8 @@ function FileSystemAPI(dl_id, dl) {
 	}
 
 	this.write = function(buffer, position, done) {
+		if (dl.io instanceof MemoryIO) return dl.io.write(buffer, position, done);
+
 		if (position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
@@ -245,6 +248,8 @@ function FileSystemAPI(dl_id, dl) {
 	};
 
 	this.download = function(name, path) {
+		if (dl.io instanceof MemoryIO) return dl.io.download(name, path);
+
 		document.getElementById('dllink').download = name;
 		document.getElementById('dllink').href = zfileEntry.toURL();
 		if (!is_chrome_firefox)  {

@@ -49,7 +49,7 @@ function doregister()
 		
 		if (localStorage.signupcode)
 		{	
-			u_storage = localStorage;
+			u_storage = init_storage(localStorage);
 			var ctx = 
 			{				
 				checkloginresult: function(u_ctx,r)
@@ -73,7 +73,7 @@ function doregister()
 		}
 		else if (u_type === false) 
 		{
-			u_storage = localStorage;
+			u_storage = init_storage(localStorage);
 			var u_ctx = 
 			{
 				checkloginresult: function(u_ctx,r)
@@ -256,7 +256,7 @@ function pageregister()
 			if (localStorage.signupcode)
 			{
 				loadingDialog.show();
-				u_storage = localStorage;
+				u_storage = init_storage(localStorage);
 				var ctx = 
 				{
 					checkloginresult: function(u_ctx,r)
@@ -278,7 +278,7 @@ function pageregister()
 			else if (u_type === false)
 			{
 				loadingDialog.show();
-				u_storage = localStorage;
+				u_storage = init_storage(localStorage);
 				u_checklogin(
 				{
 					checkloginresult: function(u_ctx,r)

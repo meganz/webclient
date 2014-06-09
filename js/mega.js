@@ -476,14 +476,18 @@ function MegaData ()
 	{
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
+		this.buildtree({h:M.RubbishID});
 		this.contacts();
-		treeUI();
-	};
-	
-	this.renderContacts = function()
-	{
+		/*
+		$('.cloudsub').attr('id','treesub_' + M.RootID);
+		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
+		$('#treesub_' + M.RootID).html('');
+		
 		$('#treesub_contacts').html('');
 		this.buildtree({h:'contacts'});
+		$('#treesub_' + M.RubbishID).html('');
+		this.buildtree({h:M.RubbishID});
+		*/
 		treeUI();
 
         if(MegaChatEnabled) {
@@ -492,9 +496,10 @@ function MegaData ()
 	};
 
 	this.openFolder = function(id,force,chat)
-	{		
-		topContextMenu(1);
-		$('.fm-files-view-icon').removeClass('hidden');
+	{
+		$('.fm-right-account-block').addClass('hidden');		
+		$('.fm-files-view-icon').removeClass('hidden');		
+		
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) notificationsUI(1);
 		this.search=false;
@@ -512,29 +517,38 @@ function MegaData ()
 		else if (id == 'shares') id = 'shares';
 		else if (id == 'chat')
 		{
+			this.chat=true;
 			id = 'chat';
-			//n_h = id; FIXME
+			chatUI.boot();
+			chatUI.events();
+			treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
-		else if (id && id.substr(0,5) == 'chat/') this.chat=true;
+		else if (id && id.substr(0,5) == 'chat/')
+		{
+			this.chat=true;
+			if (chatid != id.replace('chat/',''))
+			{
+				// new chatid detected, open now:
+				openChat(id.replace('chat/',''));
+				treeUI();
+			}
+		}
 		else if (!M.d[id]) id = this.RootID;
+		
+		if (!this.chat) hideChat();
+		
 		this.currentdirid = id;
-
-			
 
 		if (this.chat)
 		{
-			treeUIopen(M.currentdirid.replace('chat/',''),1);
-			chatui();
-			fmtopUI();
-			M.renderPath();
+			// do nothing here		
 		}
 		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
-			$('.fm-right-account-block').addClass('hidden');
 			
 			var tt = new Date().getTime();
 
@@ -636,15 +650,18 @@ function MegaData ()
 				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
 			});
 		}
-		var html = '',status='',img;
+		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
 		for (var i in contacts)
 		{						
 			var img = staticpath + 'images/mega/default-small-avatar.png';
 			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';			
-		}		
-		$('.content-panel.contacts').html(html);
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
+			
+			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
+		}
+		$('.content-panel.contacts').html(html);	
+		$('.content-panel.conversations').html(html2);
 	};
 
     this.getContacts = function(n) {
@@ -663,6 +680,10 @@ function MegaData ()
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
 			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+		}
+		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
+		{
+			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
 		}
 		
 		if (this.c[n.h])
@@ -906,10 +927,10 @@ function MegaData ()
 		$('.fm-file-upload span').text(l[99]);
 		$('.fm-folder-upload span').text(l[98]);
 
-		$('.fm-right-header').removeClass('long-path');
-		if (M.pathLength()+260 > $('.fm-right-header').width())
+		$('.fm-right-header.fm').removeClass('long-path');
+		if (M.pathLength()+260 > $('.fm-right-header.fm').width())
 		{
-			$('.fm-right-header').addClass('long-path');
+			$('.fm-right-header.fm').addClass('long-path');
 			$('.fm-new-folder span').text('');
 			$('.fm-file-upload span').text('');
 			$('.fm-folder-upload span').text('');
@@ -918,7 +939,7 @@ function MegaData ()
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;
 
-		while (M.pathLength()+260 > $('.fm-right-header').width() && i < el.length)
+		while (M.pathLength()+260 > $('.fm-right-header.fm').width() && i < el.length)
 		{
 			$(el[i]).text('');
 			i++;
@@ -1598,7 +1619,7 @@ function MegaData ()
 
 	this.addDownload = function(n,z,preview)
 	{
-		// todo cesar: preview parameter indicates that this is a image preview download
+		// todo cesar: preview parameter indicates that this is a image fpreview download
 		delete $.dlhash;
 		var zipname,path;
 		var nodes = [];

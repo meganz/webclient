@@ -34,6 +34,8 @@ Directories
 JavaScript files
 -----
 
+**asmcrypto.js** general-purpose cryptographic library
+
 **secureboot.js** loads all the resources from static content servers and verifies its authenticity by checking the cryptographic hash
 
 **decrypter.js** the decrypter which is used as a web worker to decrypt data while downloading
@@ -41,8 +43,6 @@ JavaScript files
 **encrypter.js** the encrypter which is used as a web worker to encrypt data while uploading
 
 **js/arkanoid.js** has the arkanoid game which is used to collect entropy for public/private key creation
-
-**js/asmcrypto.js** general-purpose cryptographic library
 
 **js/avatar.js** is used for avatar selection, cropping & scaling (all on the client side in the canvas)
 

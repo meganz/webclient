@@ -224,10 +224,9 @@ function initUI()
 			var c = $(e.target).attr('class');			
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');			
 		}
-
-
+		
 		if (ids.length && t) dd = ddtype(ids,t);
-
+		
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
 		{			
@@ -262,8 +261,7 @@ function initUI()
 				}			
 			},1000);
 			
-
-
+			
 			if (t == M.RubbishID) $('.dragger-block').addClass('warning');
 			else if (dd == 'move') $('.dragger-block').addClass('move');
 			else if (dd == 'copy') $('.dragger-block').addClass('copy');
@@ -365,7 +363,8 @@ function initUI()
 		$.hideContextMenu(e);
 		if ($.hideTopMenu) $.hideTopMenu(e);		
 		var c = $(e.target).attr('class');		
-		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1)) return false;
+		if ($(e.target).attr('type') !== 'file' && (c && c.indexOf('upgradelink') == -1) && (c && c.indexOf('campaign-logo') == -1) && (c && c.indexOf('resellerbuy') == -1) && (c && c.indexOf('linkified') == -1)) return false;
+		
     });
 	
 	$('.fm-back-button').unbind('click');
@@ -379,7 +378,7 @@ function initUI()
 		}
 	});	
 
-	$('.fm-right-header').removeClass('hidden');
+	$('.fm-right-header.fm').removeClass('hidden');
 	if (folderlink) 
 	{
 		// todo: enable folder link in header
@@ -5290,7 +5289,7 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    var right_blocks_height =  right_pane_height - $('.fm-right-header').outerHeight() - 10 /* padding */;
+    var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({
         'height': right_blocks_height + "px",
         'min-height': right_blocks_height + "px"

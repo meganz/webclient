@@ -183,7 +183,7 @@ function translate(html)
 				l[items[i]] = l[items[i]].replace('"','&quot;');
 			}		
 		}
-		html = html.replace(new RegExp( "\\[\\$" +items[i] + "\\]", "g"),l[items[i]]);		
+		html = html.replace(new RegExp( "\\[\\$" +items[i] + "\\]", "g"),l[items[i]]);
 	}
 	return html;
 }
@@ -433,7 +433,7 @@ function unixtime() {
 }
 
 
-function uplpad(number, length) 
+function uplpad(number, length)
 {   
     var str = '' + number;
     while (str.length < length) 
@@ -923,33 +923,19 @@ function NOW() {
  */
 function DEBUG2() {
 	if (d) {
-		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorage.ddetailed2) {
-			console.warn.apply(console, arguments)
-		} else if (d > 1) console.trace();
+		console.warn.apply(console, arguments)
+	}
+}
+
+function ERRDEBUG() {
+	if (d) {
+		console.error.apply(console, arguments)
 	}
 }
 
 function DEBUG() {
-	if (arguments.length == 2 && typeof arguments[0] == "object"
-		  && typeof arguments[0][arguments[1]] == "function") {
-		  
-		var self = arguments[0]
-			, method = arguments[1]
-			, fnc    = self[method]
-
-		self[method] = function() {
-			var args = Array.prototype.slice.call(arguments);
-			if (d) console.warn.apply(console, [method, args]);
-			return fnc.apply(self, arguments);
-		};
-		return;
-	}
 	if (d) {
-		console.log.apply(console, arguments)
-		if (!is_chrome_firefox && localStorage.ddetailed) {
-			console.error.apply(console, arguments)
-		} else if (d > 1) console.trace();
+		console.debug.apply(console, arguments)
 	}
 }
 
@@ -1295,3 +1281,42 @@ function bucketspeedometer(initialp)
 		}
 	}
 }
+
+
+function moveCursortoToEnd(el) 
+{
+    if (typeof el.selectionStart == "number") 
+	{
+        el.selectionStart = el.selectionEnd = el.value.length;
+    } 
+	else if (typeof el.createTextRange != "undefined") 
+	{
+        el.focus();
+        var range = el.createTextRange();
+        range.collapse(false);
+        range.select();
+    }
+}
+
+String.prototype.replaceAll = function(_f, _r, _c)
+{ 
+  var o = this.toString();
+  var r = '';
+  var s = o;
+  var b = 0;
+  var e = -1;
+  if(_c){ _f = _f.toLowerCase(); s = o.toLowerCase(); }
+
+  while((e=s.indexOf(_f)) > -1)
+  {
+    r += o.substring(b, b+e) + _r;
+    s = s.substring(e+_f.length, s.length);
+    b += e+_f.length;
+  }
+
+  // Add Leftover
+  if(s.length>0){ r+=o.substring(o.length-s.length, o.length); }
+
+  // Return New String
+  return r;
+};

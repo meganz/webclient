@@ -990,6 +990,28 @@ function createfolderUI()
 		docreatefolderUI(e);
 		return false;
 	});
+	$('.create-folder-size-icon.full-size').unbind('click');
+	$('.create-folder-size-icon.full-size').bind('click',function(e) 
+	{
+		var v = $('.fm-new-folder input').val();
+		if(v != l[157] && v != '') $('.create-folder-dialog input').val(v);
+		$('.fm-new-folder').removeClass('active');
+		$('.fm-new-folder').removeClass('filled-input');
+		createfolderDialog(0);
+		$('.fm-new-folder input').val(l[157]);
+	});
+	$('.create-folder-size-icon.short-size').unbind('click');
+	$('.create-folder-size-icon.short-size').bind('click',function(e) 
+	{
+		var v = $('.create-folder-dialog input').val();
+		if(v != l[157] && v != '') {
+			$('.fm-new-folder input').val(v);
+			$('.fm-new-folder').removeClass('filled-input');
+		}
+		$('.fm-new-folder').addClass('active');
+		createfolderDialog(1);
+		$('.create-folder-dialog input').val(l[157]);
+	});
 	$('.create-folder-button-cancel').unbind('click');
 	$('.create-folder-button-cancel').bind('click',function(e) 
 	{

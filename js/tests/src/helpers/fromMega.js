@@ -103,6 +103,8 @@ function base64urlencode(data)
     return (r ? enc.slice(0, r - 3) : enc);
 }
 
+function parsetopmenu() {};
+function sectionUIopen() {};
 
 is_chrome_firefox = true; /* to be used for phantomjs */
 mozRunAsync = false;

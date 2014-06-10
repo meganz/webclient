@@ -14,7 +14,7 @@ module.exports = function(config) {
             "src/helpers/fromMega.js",
 
              "../functions.js",
-//             "../asmcrypto.js",
+//             "../../asmcrypto.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",

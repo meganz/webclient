@@ -13,7 +13,8 @@ function expectToBeResolved($promise, msg) {
             if(localStorage.dxmpp) {
                 debugger;
             }
-            expect(true).to.equal(false, msg + ", fail arguments: " + toArray(arguments).join(", "));
+
+            expect(true).to.eql(false, msg + ", fail arguments: " + toArray(arguments).join(", "));
         });
 
     return $promise;

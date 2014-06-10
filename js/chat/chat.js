@@ -1266,6 +1266,7 @@ MegaChat.prototype.reorderContactTree = function() {
 
     folders = M.sortContacts(folders);
 
+    //TODO: this should use the new HTML code, not #treesub_contacts
     var $container = $('#treesub_contacts');
 
     var $prevNode = null;
@@ -1571,30 +1572,32 @@ MegaChat.prototype.refreshConversations = function() {
 
     // remove any dom elements for rooms which were destroyed
     $('.content-panel .conversations .nw-conversations-item').each(function() {
-        if(!self.chats[$(this).data('chatRoomId')]) {
+        if($(this).data('chatRoomId') && !self.chats[$(this).data('chatRoomId')]) {
             $(this).remove();
         }
     });
-    $.each(self.chats, function(k, v) {
-        if($('.content-panel .conversations .nw-conversations-item[data-chatRoomId="' + k + '"]').size() == 0) {
-            // does not exists, create new dom element
-            var $elem = $('<div class="nw-conversations-item"><div class="nw-contact-status"></div><div class="nw-conversations-name"></div></div>');
 
-            var participants = v.getParticipantsExceptMe();
+    //XX: move the current code from mega.js to here?
 
-            $elem.data('chatRoomJid', k);
-
-            if(v.type == "private") {
-                $elem.addClass("private_" + self.getContactFromJid(participants[0]).u);
-            }
-
-            var contactName = self.getContactNameFromJid(participants[0]);
-            $('.nw-conversations-name', $elem).text(contactName);
-
-            //TODO: work in progress
-            $('.content-panel .conversations').append($elem);
-        }
-    });
+//    $.each(self.chats, function(k, v) {
+//        if($('.content-panel .conversations .nw-conversations-item[data-chatRoomId="' + k + '"]').size() == 0) {
+//            // does not exists, create new dom element
+//            var $elem = $('<div class="nw-conversations-item"><div class="nw-contact-status"></div><div class="nw-conversations-name"></div></div>');
+//
+//            var participants = v.getParticipantsExceptMe();
+//
+//            $elem.data('chatRoomJid', k);
+//
+//            if(v.type == "private") {
+//                $elem.addClass("private_" + self.getContactFromJid(participants[0]).u);
+//            }
+//
+//            var contactName = self.getContactNameFromJid(participants[0]);
+//            $('.nw-conversations-name', $elem).text(contactName);
+//
+//            $('.content-panel.conversations').append($elem);
+//        }
+//    });
 
     self.renderContactTree();
 };
@@ -2883,7 +2886,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     $message.attr('data-timestamp', timestamp);
 
-    $('.jspContainer > .jspPane .fm-chat-messages-block', self.$messages).each(function() {
+    $('.jspContainer > .jspPane .fm-chat-message-container', self.$messages).each(function() {
         if(timestamp >= $(this).attr('data-timestamp')) {
             $after = $(this);
         } else if($before === null && timestamp < $(this).attr('data-timestamp')) {
@@ -2913,7 +2916,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         var $navElement = self.getNavElement();
         var $count = $('.messages-icon span', $navElement);
 
-        var count = $('.fm-chat-messages-block.unread', self.$messages).size();
+        var count = $('.fm-chat-message-container.unread', self.$messages).size();
         if(count > 0) {
             self.unreadCount = count;
         } else if(count == 0) {

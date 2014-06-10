@@ -509,11 +509,18 @@ describe("Chat.js - Karere UI integration", function() {
 
         var messagesInOrderedList = [];
         $('.fm-chat-messages-block').each(function() {
+            if($(this).is(".typing-template") || $(this).parent().is(".template")) {
+                return; // continue;
+            }
+
             messagesInOrderedList.push({
-                'ts': $(this).attr('data-timestamp'),
-                'time': $('.fm-chat-message-time', $(this)).text(),
-                'msg': $('.fm-chat-message', $(this)).text(),
-                'name': $('.fm-chat-username', $(this)).text()
+                'ts': $(this).parent().attr('data-timestamp'),
+                'time': $('.nw-chat-date-txt', $(this).parent()).text(),
+                'msg': $('.fm-chat-message span', $(this)).text(),
+                'fromId': $(this).parent().attr('data-from'),
+                'isMyOwn': $(this).is(".my-own-message"),
+                'isGrouped': $(this).parent().is(".grouped-message"),
+                'isRightBlock': $(this).is(".right-block")
             });
         });
 
@@ -522,44 +529,53 @@ describe("Chat.js - Karere UI integration", function() {
                 "ts": "50",
                 "time": unixtimeToTimeString(testMessages[2].getDelay()),
                 "msg": "hopala1",
-                "name": "lp@mega.co.nz"
+                "fromId": testMessages[2].getFromJid().split("@")[0],
+                "isMyOwn": false,
+                "isGrouped": false,
+                "isRightBlock": true
             },
             {
                 "ts": "100",
                 "time": unixtimeToTimeString(testMessages[0].getDelay()),
                 "msg": "hopala2",
-                "name": "lpetrov@me.com"
+                "fromId": testMessages[0].getFromJid().split("@")[0],
+                "isMyOwn": true,
+                "isGrouped": false,
+                "isRightBlock": false
             },
             {
                 "ts": "200",
                 "time": unixtimeToTimeString(testMessages[1].getDelay()),
                 "msg": "hopala3",
-                "name": "lpetrov@me.com"
+                "fromId": testMessages[1].getFromJid().split("@")[0],
+                "isMyOwn": true,
+                "isGrouped": true,
+                "isRightBlock": false
             },
             {
                 "ts": "300",
                 "time": unixtimeToTimeString(testMessages[3].getDelay()),
                 "msg": "hopala4",
-                "name": "lpetrov@me.com"
+                "fromId": testMessages[3].getFromJid().split("@")[0],
+                "isMyOwn": true,
+                "isGrouped": true,
+                "isRightBlock": false
             }
         ];
 
         expect(messagesInOrderedList).to.eql(expectedMessagesList);
 
         expect(
-            $('.fm-chat-header').data("roomJid")
+            $('.fm-right-header').data("roomJid")
         ).to.eql(roomJid.split("@")[0]);
 
-        expect(
-            $('.fm-chat-header').data("roomJid")
-        ).to.eql(roomJid.split("@")[0]);
+        // not implemented in the HTML yet.
+//        expect(
+//            $('.messages-icon').is(":hidden")
+//        ).to.be.ok;
 
         expect(
-            $('.messages-icon').is(":hidden")
-        ).to.be.ok;
-
-        expect(
-            $('#treea_' + Object.keys(M.u)[1]).data("roomJid")
+            $('#contact2_' + Object.keys(M.u)[1]).data("roomJid")
         ).to.eql(roomJid.split("@")[0]);
 
         done();
@@ -682,7 +698,6 @@ describe("Chat.js - Karere UI integration", function() {
 
         expectToBeResolved($promise, 'cant open chat')
             .done(function() {
-
                 var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
                 expect(
                     megaChat.karere.addUserToChat
@@ -758,13 +773,12 @@ describe("Chat.js - Karere UI integration", function() {
                 expect(args4).to.have.property('users').to.be.empty;
 
 
-
                 // verify DOM update when presence is received from a 3rd party
                 var presenceCssClassMap = [
-                    [Karere.PRESENCE.AVAILABLE, '.online-status'],
-                    [Karere.PRESENCE.AWAY, '.away-status'],
-                    [Karere.PRESENCE.BUSY, '.busy-status'],
-                    [Karere.PRESENCE.OFFLINE, '.offline-status']
+                    [Karere.PRESENCE.AVAILABLE, '.online'],
+                    [Karere.PRESENCE.AWAY, '.away'],
+                    [Karere.PRESENCE.BUSY, '.busy'],
+                    [Karere.PRESENCE.OFFLINE, '.offline']
                 ];
                 $.each(presenceCssClassMap, function(k, v) {
                     // prepare mocked disco response
@@ -799,24 +813,27 @@ describe("Chat.js - Karere UI integration", function() {
                         to: megaChat.karere.getJid()
                     });
 
+                    expect(
+                        $('#contact_' + Object.keys(M.u)[1]).is(v[1])
+                    ).to.be.ok;
 
                     expect(
-                        $('#treea_' + Object.keys(M.u)[1]).is(v[1])
+                        $('#contact2_' + Object.keys(M.u)[1]).is(v[1])
                     ).to.be.ok;
 
                     if(v[0] != Karere.PRESENCE.OFFLINE) {
                         // confirm that the chat-capability-* classes are added in the UI if the presence
                         // was not offline
                         expect(
-                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-audio")
+                            $('#contact2_' + Object.keys(M.u)[1]).is(".chat-capability-audio")
                         ).to.be.ok;
 
                         expect(
-                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-video")
+                            $('#contact2_' + Object.keys(M.u)[1]).is(".chat-capability-video")
                         ).to.be.ok;
 
                         expect(
-                            $('#treea_' + Object.keys(M.u)[1]).is(".chat-capability-karere")
+                            $('#contact2_' + Object.keys(M.u)[1]).is(".chat-capability-karere")
                         ).to.be.ok;
                     }
                 });

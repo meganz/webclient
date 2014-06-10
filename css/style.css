@@ -5803,9 +5803,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100% !important;
-	height: -webkit-calc(100% - 48px) !important;
-	height: -moz-calc(100% - 48px) !important;
-	height: calc(100% - 48px) !important;
+	height: -webkit-calc(100% - 0px) !important;
+	height: -moz-calc(100% - 0px) !important;
+	height: calc(100% - 0px) !important;
 	min-height: 200px !important;
 	position: relative;
 }
@@ -5879,6 +5879,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-chat-messages-block {
 	padding: 8px 0;
 	width: 100%;
+}
+.fm-chat-message-container {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .fm-chat-user {
 	font-size: 12px;
@@ -6352,6 +6358,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
+    text-indent: -9999px; /* accessability, allow smiley elements to be copied as text, by hidding the text from the
+                             user */
 }
 .fm-chat-smile.wink {
 	background-position: -34px 6px;
@@ -6377,6 +6385,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-smile.angry {
 	background-position: -154px -34px;
 }
+
+.fm-chat-smile.mega {
+    background-image: url(../images/mega/top-sprite.svg);
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);
 }

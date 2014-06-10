@@ -9,12 +9,37 @@ var EmoticonsFilter = function(megaChat) {
     var self = this;
 
     self.emoticonsMap = {
-        ':)': 'smile',
-        ':(': 'sad',
-        '(rofl)': 'rofl',
-        ':d': 'bigsmile',
-        ':p': 'tongueout'
 
+        ':-)': 'smile',
+        ':)': 'smile',
+
+        ';-)': 'wink',
+        ';)': 'wink',
+
+        ':p': 'tongue',
+        ':P': 'tongue',
+        ':-P': 'tongue',
+        ':-p': 'tongue',
+
+        ':D': 'grin',
+        ':d': 'grin',
+
+        ':|': 'confuse',
+        ':-|': 'confuse',
+
+        ':o': 'grasp',
+        ':O': 'grasp',
+
+        ':-(': 'sad',
+        ':(': 'sad',
+
+        ';(': 'cry',
+        ':\'(': 'cry',
+        ';-(': 'cry',
+
+        '(angry)': 'angry',
+
+        '(mega)': 'mega'
     };
 
     //RegExpEscape
@@ -52,7 +77,7 @@ EmoticonsFilter.prototype.processMessage = function(e, eventData) {
         var cssClassName = self.emoticonsMap[$.trim(match.toLowerCase())];
 
         if(cssClassName) {
-            return '<span class="fm-chat-emoticon fm-chat-emoticon-' + cssClassName + '" title="' + match + '">' + match + '</span>'
+            return '<span class="fm-chat-smile ' + cssClassName + '" title="' + match + '">' + match + '</span>'
         } else {
             return match;
         }

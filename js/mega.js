@@ -519,8 +519,9 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-			chatUI.boot();
-			chatUI.events();
+            //TODO: show something? some kind of list of conversations summary/overview screen or something?
+            sectionUIopen('conversations');
+
 			treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
@@ -529,16 +530,17 @@ function MegaData ()
 		else if (id && id.substr(0,5) == 'chat/')
 		{
 			this.chat=true;
-			if (chatid != id.replace('chat/',''))
-			{
-				// new chatid detected, open now:
-				openChat(id.replace('chat/',''));
-				treeUI();
-			}
+            treeUI();
+
+            chatui(id); // XX: using the old code...for now
 		}
 		else if (!M.d[id]) id = this.RootID;
 		
-		if (!this.chat) hideChat();
+		if (!this.chat) {
+            if(megaChat.getCurrentRoom()) {
+                megaChat.getCurrentRoom().hide();
+            }
+        }
 		
 		this.currentdirid = id;
 

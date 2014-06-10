@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+        var devhost = window.location.host;
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
+
+        localStorage.clear();
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+
+        localStorage.dd=1;
+
+//        localStorage.contextmenu=1;
+
+        localStorage.megachat=1;
+        localStorage.jj=true;
+        localStorage.dxmpp = 1;
+        localStorage.stopOnAssertFail = true;
+        localStorage.d = 1;
+        window.location = '../index.html';
+    </script>
+</head>
+<body>
+
+</body>
+</html>

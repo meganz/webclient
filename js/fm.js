@@ -66,6 +66,13 @@ function initTransferScroll()
 
 function initTreeScroll() 
 {    
+    /**
+    if(localStorage.leftPaneWidth && $('.fm-left-panel').css('width').replace("px", "") != localStorage.leftPaneWidth) 
+	{
+        $('.fm-left-panel').css({'width': localStorage.leftPaneWidth + "px"});
+    }
+    **/	
+
 	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
 	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
 	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
@@ -258,9 +265,16 @@ function initUI()
 			if (t == M.RubbishID) $('.dragger-block').addClass('warning');
 			else if (dd == 'move') $('.dragger-block').addClass('move');
 			else if (dd == 'copy') $('.dragger-block').addClass('copy');
+            else if($(e.target).parents('.fm-chat-block').size() > 0) {
+                // drag over a chat window
+                //TODO: Missing css for drag-share
+                $('.dragger-block').addClass('share');
+            }
 			else $('.dragger-block').addClass('drag');
+
 			$(e.target).addClass('dragover');
 		}
+
 		if (a == 'drop' && dd) 
 		{
 			if (dd == 'move')
@@ -285,6 +299,15 @@ function initUI()
 				},50);
 			}
 			$('.dragger-block').hide();	
+		} else if(a == 'drop' && !dd && $(e.target).parents('.fm-chat-block').size() > 0) {
+            $(ui.draggable).draggable( "option", "revert", false );
+
+            // drop over a chat window
+            var currentRoom = megaChat.getCurrentRoom();
+            assert(currentRoom, 'Current room missing - this drop action should be impossible.');
+            currentRoom.attachNodes(ids);
+
+            $('.dragger-block').hide();
 		}
 	};
 	InitFileDrag();
@@ -388,6 +411,7 @@ function initUI()
 		termsDialog();
 	}
 	M.avatars();
+
 	if (typeof dl_import !== 'undefined' && dl_import) dl_fm_import();
 	
 	
@@ -741,7 +765,11 @@ function initContextUI()
 	$(c+'.getlink-item').bind('click',function(event) 
 	{
 		if (u_type === 0) ephemeralDialog(l[1005]);
-		else M.getlinks($.selected);
+		else {
+            M.getlinks($.selected).done(function() {
+                linksDialog();
+            });
+        }
 	});
 	
 	$(c+'.sharing-item').unbind('click');
@@ -944,6 +972,10 @@ function cSortMenuUI()
 		{
 			localStorage.csort = 'shares';
 			localStorage.csortd = -1;
+		} else if (c && c.indexOf('chat-activity') > -1)
+        {
+			localStorage.csort = 'chat-activity';
+			localStorage.csortd = -1;
 		}
 		M.renderContacts();
 	});
@@ -1035,7 +1067,7 @@ function createfolderUI()
 	{
 		if($('.create-new-folder input').val() == '')  
 		$('.create-new-folder input').val(l[157]);
-	});	
+	});
 }
 
 function docreatefolderUI(e)
@@ -1049,7 +1081,7 @@ function docreatefolderUI(e)
 function fmtopUI()
 {
 	$('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
-	$('.fm-new-folder').removeClass('filled-input');
+	$('.fm-new-folder').removeClass('filled-input')
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{	
 		$('.fm-clearbin-button').removeClass('hidden');	
@@ -2004,6 +2036,7 @@ function gridUI()
 		}
     });	
 	$('.fm-blocks-view').addClass('hidden');
+	$('.fm-chat-block').addClass('hidden');
 	$('.fm-contacts-blocks-view').addClass('hidden');	
 	if (M.currentdirid == 'contacts')
 	{
@@ -2221,7 +2254,8 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).bind('hashchange', function() {
+    $(window).unbind('hashchange.quickfinder');
+    $(window).bind('hashchange.quickfinder', function() {
         if(self.is_active()) {
             self.deactivate();
         }
@@ -4255,7 +4289,7 @@ function createfolderDialog(close)
 	{
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
-	});
+	});	
 	$('.fm-dialog-input-clear').unbind('click');
 	$('.fm-dialog-input-clear').bind('click',function()  
 	{
@@ -4873,7 +4907,11 @@ function slideshow(id,close)
 	$('.slideshow-getlink').bind('click',function(e)
 	{
 		if (u_type === 0) ephemeralDialog(l[1005]);
-		else M.getlinks([slideshowid]);
+		else {
+            M.getlinks([slideshowid]).done(function() {
+                linksDialog();
+            });
+        }
 	});
 	
 	if (previews[id])
@@ -5154,6 +5192,11 @@ function fm_resize_handler() {
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
 	}	
+
+	
+	if (M.chat) {
+        megaChat.resized();
+    }
 
     var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() - 10 /* padding */;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({

@@ -171,6 +171,24 @@ function u_logout(logout)
 		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
 		$.hideContextMenu = function () {};
 		api_reset();	
+		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};	
+		$.hideContextMenu= function () {};
+		if (waitxhr)
+		{
+			waitxhr.abort();
+			waitxhr=undefined;	
+		}
+
+
+        if(MegaChatEnabled) {
+            if(megaChat.is_initialized) {
+                megaChat.destroy().always(function() {
+                    window.megaChat = new MegaChat();
+                    localStorage.removeItem("megaChatPresence");
+                    localStorage.removeItem("megaChatPresenceMtime");
+                })
+            }
+        }
 	}
 }
 

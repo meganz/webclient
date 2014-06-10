@@ -163,6 +163,23 @@ function MegaData ()
 		}
 	};
 
+
+    /**
+     * The same as filterBy, but instead of pushing the stuff in M.v, will return a new array.
+     *
+     * @param f function, with 1 arguments (node) that returns true when a specific node should be returned in the list
+     * of filtered results
+     */
+    this.getFilterBy = function (f)
+    {
+        var v= [];
+        for (var i in this.d) {
+            if (f(this.d[i])) v.push(this.d[i]);
+        }
+
+        return v;
+    };
+
 	this.filterByParent = function(id)
 	{
 		this.filterBy(function(node)
@@ -249,6 +266,9 @@ function MegaData ()
 		}
 		return {files:files,folders:folders,ts:ts};
 	};
+
+
+
 
 	this.renderMain = function(u)
 	{
@@ -469,6 +489,10 @@ function MegaData ()
 		this.buildtree({h:M.RubbishID});
 		*/
 		treeUI();
+
+        if(MegaChatEnabled) {
+            megaChat.renderContactTree();
+        }
 	};
 
 	this.openFolder = function(id,force,chat)
@@ -495,8 +519,9 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-			chatUI.boot();
-			chatUI.events();
+            //TODO: show something? some kind of list of conversations summary/overview screen or something?
+            sectionUIopen('conversations');
+
 			treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
@@ -505,16 +530,17 @@ function MegaData ()
 		else if (id && id.substr(0,5) == 'chat/')
 		{
 			this.chat=true;
-			if (chatid != id.replace('chat/',''))
-			{
-				// new chatid detected, open now:
-				openChat(id.replace('chat/',''));
-				treeUI();
-			}
+            treeUI();
+
+            chatui(id); // XX: using the old code...for now
 		}
 		else if (!M.d[id]) id = this.RootID;
 		
-		if (!this.chat) hideChat();
+		if (!this.chat) {
+            if(megaChat.getCurrentRoom()) {
+                megaChat.getCurrentRoom().hide();
+            }
+        }
 		
 		this.currentdirid = id;
 
@@ -640,6 +666,13 @@ function MegaData ()
 		$('.content-panel.conversations').html(html2);
 	};
 
+    this.getContacts = function(n) {
+        var folders = [];
+        for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
+
+        return folders;
+    };
+
 	this.buildtree = function(n)
 	{
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
@@ -672,6 +705,9 @@ function MegaData ()
 				// in case of contacts we have custom sort/grouping:
 				if (localStorage.csort) this.csort = localStorage.csort;
 				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+				
+				
+				
 				if (this.csort == 'shares')
 				{				
 					folders.sort(function(a,b)
@@ -738,6 +774,60 @@ function MegaData ()
 			}
 		}
 	};
+
+    this.sortContacts = function(folders) {
+        // in case of contacts we have custom sort/grouping:
+        if (localStorage.csort) this.csort = localStorage.csort;
+        if (localStorage.csortd) this.csortd = parseInt(localStorage.csortd);
+
+
+
+        if (this.csort == 'shares')
+        {
+            folders.sort(function(a,b)
+            {
+                if (M.c[a.h] && M.c[b.h])
+                {
+                    if (a.name) return a.name.localeCompare(b.name);
+                }
+                else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
+                else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
+                return 0;
+            });
+        }
+        else if (this.csort == 'name')
+        {
+            folders.sort(function(a,b)
+            {
+                if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
+            });
+        }
+        else if (this.csort == 'chat-activity')
+        {
+            folders.sort(function(a,b)
+            {
+                var aTime = M.u[a.h].lastChatActivity;
+                var bTime = M.u[b.h].lastChatActivity;
+
+                if (aTime && bTime)
+                {
+                    if (aTime > bTime) {
+                        return 1 * M.csortd;
+                    } else if(aTime < bTime) {
+                        return -1 * M.csortd;
+                    } else {
+                        return 0;
+                    }
+                }
+                else if (aTime && !bTime) return 1*M.csortd;
+                else if (!aTime && bTime) return -1*M.csortd;
+
+                return 0;
+            });
+        }
+
+        return folders;
+    }
 
 	this.getPath = function(id)
 	{
@@ -816,8 +906,10 @@ function MegaData ()
 		}
 
 		if (this.currentdirid && this.currentdirid.substr(0,5) == 'chat/')
-		{			
-			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="chatcrumb"><span class="right-arrow-bg"><span>Andrei.d</span></span></a>');
+		{
+
+            var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
+			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="path_'+htmlentities(M.currentdirid.replace("chat/", ""))+'"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
 			
 			$('.search-files-result').addClass('hidden');						
 		}
@@ -983,7 +1075,9 @@ function MegaData ()
 				if (res.u)
 				{
 					newnodes=[];
+
 					process_u([{ c: 1, m: res.m, h:res.u, u: res.u, ts: (new Date().getTime()/1000) }],false);
+
 					rendernew();
 				}
 			}
@@ -1405,6 +1499,8 @@ function MegaData ()
 
 	this.getlinks = function(h)
 	{
+        this.$getLinkPromise = new $.Deferred();
+
 		loadingDialog.show();
 		this.links = [];
 		this.folderlinks = [];
@@ -1420,10 +1516,14 @@ function MegaData ()
 		if (d) console.log('getlinks',this.links);
 		if (this.folderlinks.length > 0) this.getFolderlinks();
 		else this.getlinksDone();
+
+        return this.$getLinkPromise;
 	}
 
 	this.getlinksDone = function()
 	{
+        var self = this;
+
 		for (var i in this.links) api_req({a:'l',n:this.links[i]},{
 			node : this.links[i],
 			last : i == this.links.length-1,
@@ -1433,7 +1533,7 @@ function MegaData ()
 
 				if (ctx.last)
 				{
-					linksDialog();
+                    self.$getLinkPromise.resolve();
 					loadingDialog.hide();
 				}
 			}
@@ -1627,7 +1727,9 @@ function MegaData ()
 		}
 
 		delete $.dlhash;
-	}
+	};
+
+
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
 	{
@@ -1964,7 +2066,16 @@ function MegaData ()
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
 		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
-	}
+	};
+
+
+    this.cloneChatNode = function(n,keepParent) {
+        var n2 = clone(n);
+        n2.k = a32_to_base64(n2.key);
+        delete n2.key,n2.ph,n2.ar;
+        if (!keepParent) delete n2.p;
+        return n2;
+    };
 }
 
 
@@ -2083,6 +2194,10 @@ function renderfm()
 		$('#treesub_' + M.RootID).addClass('opened');
 	}
 	M.openFolder(M.currentdirid);
+    if(MegaChatEnabled) {
+        megaChat.renderContactTree();
+        megaChat.renderMyStatus();
+    }
 	if (d) console.log('renderfm() time:',t-new Date().getTime());
 }
 
@@ -2131,6 +2246,11 @@ function rendernew()
 		M.avatars();	
 		M.contacts();
 		treeUI();
+
+        if(MegaChatEnabled) {
+            megaChat.renderContactTree();
+            megaChat.renderMyStatus();
+        }
 	}
 	if (newpath) M.renderPath();
 	newnodes=undefined;
@@ -2157,6 +2277,16 @@ function execsc(ap)
 		if (a.i == requesti)
 		{
 			if (d) console.log('OWN ACTION PACKET');
+
+            if(a.a == 'c') {
+                if(megaChat && megaChat.is_initialized) {
+                    $.each(a.u, function(k, v) {
+                        megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](
+                            v.u
+                        );
+                    });
+                };
+            }
 		}
 		else if (a.a == 'fa')
 		{
@@ -2299,6 +2429,15 @@ function execsc(ap)
 		else if (a.a == 'c')
 		{
 			process_u(a.u);
+
+            if(megaChat && megaChat.is_initialized) {
+                $.each(a.u, function(k, v) {
+                    megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](
+                        v.u
+                    );
+                });
+            };
+
 		}
 		else if (a.a == 'd')
 		{
@@ -2550,8 +2689,10 @@ function getuid(email)
 	return false;
 }
 
-function doshare(h,t)
+function doshare(h,t, dontShowShareDialog)
 {
+    var $promise = new $.Deferred();
+
 	nodeids = fm_getnodes(h);
 	nodeids.push(h);
 
@@ -2575,22 +2716,31 @@ function doshare(h,t)
 						var rights = ctx.t[i].r;
 						var user = ctx.t[i].u;
 						if (user.indexOf('@') >= 0) user = getuid(ctx.t[i].u);
-						M.nodeShare(ctx.h,{h:$.selected[0],r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
+						M.nodeShare(ctx.h,{h:h,r:rights,u:user,ts:Math.floor(new Date().getTime()/1000)});
 					}
 				}
-				$('.fm-dialog.share-dialog').removeClass('hidden');
+                if(dontShowShareDialog != true) {
+				    $('.fm-dialog.share-dialog').removeClass('hidden');
+                }
 				loadingDialog.hide();
-				M.renderShare($.selected[0]);
-				shareDialog();
+				M.renderShare(h);
+
+                if(dontShowShareDialog != true) {
+                    shareDialog();
+                }
+
 				renderfm();
+                $promise.resolve();
 			}
 			else
 			{
 				$('.fm-dialog.share-dialog').removeClass('hidden');
 				loadingDialog.hide();
+                $promise.reject(res);
 			}
 		}
 	});
+    return $promise;
 }
 
 function processmove(jsonmove)
@@ -2742,6 +2892,7 @@ function fm_requestfolderid(h,name,ulparams)
 
 function clone(obj)
 {
+
     if (null == obj || "object" != typeof obj) return obj;
     if (obj instanceof Date)
 	{
@@ -2751,6 +2902,7 @@ function clone(obj)
     }
     if (obj instanceof Array)
 	{
+
         var copy = [];
         for (var i = 0, len = obj.length; i < len; i++) {
             copy[i] = clone(obj[i]);

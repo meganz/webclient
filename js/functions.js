@@ -399,6 +399,9 @@ function time2date(unixtime,ignoretime)
     return MyDateString;
 }	
 
+// in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
+if(typeof(l) == 'undefined') { l = []; };
+
 var date_months = [l[408],l[409],l[410],l[411],l[412],l[413],l[414],l[415],l[416],l[417],l[418],l[419]];
 
 function acc_time2date(unixtime)
@@ -425,8 +428,12 @@ function time2last(timestamp)
 	else return l[879].replace('[X]',Math.ceil(sec/86400));
 }
 
+function unixtime() {
+    return (new Date().getTime()/1000);
+}
 
-function uplpad(number, length) 
+
+function uplpad(number, length)
 {   
     var str = '' + number;
     while (str.length < length) 
@@ -563,6 +570,349 @@ function checkMail(email)
 	if (filter.test(email)) return false;	
 	else return true;	
 }
+/**
+ * Helper function for creating alias of a method w/ specific context
+ *
+ * @param context
+ * @param fn
+ * @returns {aliasClosure}
+ */
+function funcAlias(context, fn) {
+    return function aliasClosure() {
+        return fn.apply(context, arguments);
+    };
+}
+
+/**
+ * Adds on, bind, unbind, one and trigger methods to a specific class's prototype.
+ *
+ * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
+ */
+function makeObservable(kls) {
+    var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
+
+    $.each(aliases, function(k, v) {
+        kls.prototype[v] = function() {
+            return $(this)[v].apply($(this), toArray(arguments));
+        }
+    });
+};
+
+/**
+ * Adds simple .setMeta and .getMeta functions, which can be used to store some meta information on the fly.
+ * Also triggers `onMetaChange` events (only if the `kls` have a `trigger` method !)
+ *
+ * @param kls {Class} on which prototype's this method should add the setMeta and getMeta
+ */
+function makeMetaAware(kls) {
+    /**
+     * Store meta data
+     *
+     * @param prefix string
+     * @param namespace string
+     * @param k string
+     * @param val {*}
+     */
+    kls.prototype.setMeta = function(prefix, namespace, k, val) {
+        var self = this;
+
+        if(self["_" + prefix] == undefined) {
+            self["_" + prefix] = {};
+        } if(self["_" + prefix][namespace] == undefined) {
+            self["_" + prefix][namespace] = {};
+        }
+        self["_" + prefix][namespace][k] = val;
+
+        if(self.trigger) {
+            self.trigger("onMetaChange", prefix, namespace, k, val);
+        }
+    };
+
+    /**
+     * Clear/delete meta data
+     *
+     * @param prefix string  optional
+     * @param namespace string  optional
+     * @param k string optional
+     */
+    kls.prototype.clearMeta = function(prefix, namespace, k) {
+        var self = this;
+
+        if(prefix && !namespace && !k) {
+            delete self["_" + prefix];
+        } else if(prefix && namespace && !k) {
+            delete self["_" + prefix][namespace];
+        } else if(prefix && namespace && k) {
+            delete self["_" + prefix][namespace][k];
+        }
+
+        if(self.trigger) {
+            self.trigger("onMetaChange", prefix, namespace, k);
+        }
+    };
+
+    /**
+     * Retrieve meta data
+     *
+     * @param prefix {string}
+     * @param namespace {string} optional
+     * @param k {string} optional
+     * @param default_value {*} optional
+     * @returns {*}
+     */
+    kls.prototype.getMeta = function(prefix, namespace, k, default_value) {
+        var self = this;
+
+        namespace = namespace || undefined; /* optional */
+        k = k || undefined; /* optional */
+        default_value = default_value || undefined; /* optional */
+
+        // support for calling only with 2 args.
+        if(k == undefined) {
+            if(self["_" + prefix] == undefined) {
+                return default_value;
+            } else {
+                return self["_" + prefix][namespace] || default_value;
+            }
+        } else {
+            // all args
+
+            if(self["_" + prefix] == undefined) {
+                return default_value;
+            } else if(self["_" + prefix][namespace] == undefined) {
+                return default_value;
+            } else {
+                return self["_" + prefix][namespace][k] || default_value;
+            }
+        }
+    };
+};
+
+/**
+ * Simple method for generating unique event name with a .suffix that is a hash of the passed 3-n arguments
+ * Main purpose is to be used with jQuery.bind and jQuery.unbind.
+ *
+ * @param eventName {string} event name
+ * @param name {string} name of the handler (e.g. .suffix)
+ * @returns {string} e.g. $eventName.$name_$ShortHashOfTheAdditionalArguments
+ */
+function generateEventSuffixFromArguments(eventName, name) {
+    var args = Array.prototype.splice.call(arguments, 2);
+    var result = "";
+    $.each(args, function(k, v) {
+        result += v;
+    });
+
+    return eventName + "." + name + "_" + ("" + fastHashFunction(result)).replace("-", "_");
+};
+
+/**
+ * This is a placeholder, which will be used anywhere in our code where we need a simple and FAST hash function.
+ * Later on, we can change the implementation (to use md5 or murmur) by just changing the function body of this
+ * function.
+ * @param {String}
+ */
+function fastHashFunction(val) {
+    return asmCrypto.SHA256.hex(val).substr(0, 16);
+}
+
+/**
+ * @see http://stackoverflow.com/q/7616461/940217
+ * @return {number}
+ */
+function simpleStringHashCode(str){
+    assert(str, "Missing str passed to simpleStringHashCode");
+
+    if (Array.prototype.reduce){
+        return str.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+    }
+    var hash = 0;
+    if (str.length === 0) return hash;
+    for (var i = 0; i < str.length; i++) {
+        var character  = str.charCodeAt(i);
+        hash  = ((hash<<5)-hash)+character;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+};
+
+/**
+ * Creates a promise, which will fail if the validateFunction() don't return true in a timely manner (e.g. < timeout).
+ *
+ * @param validateFunction {Function}
+ * @param tick {int}
+ * @param timeout {int}
+ * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
+ * @returns {Deferred}
+ */
+function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs) {
+    var $promise = new $.Deferred();
+    resolveRejectArgs = resolveRejectArgs || [];
+    if(!$.isArray(resolveRejectArgs)) {
+        resolveRejectArgs = [resolveRejectArgs]
+    }
+
+    $promise.verify = function() {
+        if(validateFunction()) {
+            if(localStorage.d) {
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+            }
+            $promise.resolve.apply($promise, resolveRejectArgs);
+        }
+    };
+
+    var tickInterval = setInterval(function() {
+        $promise.verify();
+    }, tick);
+
+    var timeoutTimer = setTimeout(function() {
+        if(validateFunction()) {
+            if(localStorage.d) {
+                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+            }
+            $promise.resolve.apply($promise, resolveRejectArgs);
+        } else {
+            console.error("Timed out after waiting", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+            $promise.reject.apply($promise, resolveRejectArgs);
+        }
+    }, timeout);
+
+    // stop any running timers and timeouts
+    $promise.always(function() {
+        clearInterval(tickInterval);
+        clearTimeout(timeoutTimer)
+    });
+
+    $promise.verify();
+
+    return $promise;
+};
+
+/**
+ * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
+ *
+ * @param val {Arguments}
+ * @returns {Array}
+ */
+function toArray(val) {
+    return Array.prototype.slice.call(val, val);
+};
+
+
+
+/**
+ * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
+ * © 2011 Colin Snover <http://zetafleet.com>
+ * Released under MIT license.
+ */
+(function (Date, undefined) {
+    var origParse = Date.parse, numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];
+    Date.parse = function (date) {
+        var timestamp, struct, minutesOffset = 0;
+
+        // ES5 §15.9.4.2 states that the string should attempt to be parsed as a Date Time String Format string
+        // before falling back to any implementation-specific date parsing, so that’s what we do, even if native
+        // implementations could be faster
+        //              1 YYYY                2 MM       3 DD           4 HH    5 mm       6 ss        7 msec        8 Z 9 ±    10 tzHH    11 tzmm
+        if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(date))) {
+            // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
+            for (var i = 0, k; (k = numericKeys[i]); ++i) {
+                struct[k] = +struct[k] || 0;
+            }
+
+            // allow undefined days and months
+            struct[2] = (+struct[2] || 1) - 1;
+            struct[3] = +struct[3] || 1;
+
+            if (struct[8] !== 'Z' && struct[9] !== undefined) {
+                minutesOffset = struct[10] * 60 + struct[11];
+
+                if (struct[9] === '+') {
+                    minutesOffset = 0 - minutesOffset;
+                }
+            }
+
+            timestamp = Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
+        }
+        else {
+            timestamp = origParse ? origParse(date) : NaN;
+        }
+
+        return timestamp;
+    };
+}(Date));
+
+
+/**
+ * @module assert
+ *
+ * Assertion helper module.
+ *
+ * Example usage:
+ *
+ * <pre>
+ * function lastElement(array) {
+ *     assert(array.length > 0, "empty array in lastElement");
+ *     return array[array.length - 1];
+ * }
+ * </pre>
+ */
+
+"use strict";
+
+/**
+ * Assertion exception.
+ * @param message
+ *     Message for exception on failure.
+ * @constructor
+ */
+function AssertionFailed(message) {
+    this.message = message;
+}
+AssertionFailed.prototype = Object.create(Error.prototype);
+AssertionFailed.prototype.name = 'AssertionFailed';
+
+
+/**
+ * Assert a given test condition.
+ *
+ * Throws an AssertionFailed exception with the given `message` on failure.
+ *
+ * @param test
+ *     Test statement.
+ * @param message
+ *     Message for exception on failure.
+ */
+function assert(test, message) {
+    if (!test) {
+        if(localStorage.d) {
+            console.error(message);
+        }
+        if(localStorage.stopOnAssertFail) {
+            debugger;
+        }
+
+        throw new AssertionFailed(message);
+    }
+}
+
+/**
+ * Pad/prepend `val` with "0" (zeros) until the length is == `length`
+ *
+ * @param val {String} value to add "0" to
+ * @param len {Number} expected length
+ * @returns {String}
+ */
+function addZeroIfLenLessThen(val, len) {
+    if(val.toString().length < len) {
+        for(var i = val.toString().length; i<len; i++) {
+            val = "0" + val;
+        }
+    }
+    return val;
+};
+
+
 
 function NOW() {
 	return Date.now();
@@ -606,6 +956,101 @@ function removeValue(array, value) {
 	array.splice($.inArray(value, array), 1);
 };
 
+
+/**
+ * Original: http://stackoverflow.com/questions/7317299/regex-matching-list-of-emoticons-of-various-type
+ *
+ * @param text
+ * @returns {XML|string|void}
+ * @constructor
+ */
+function RegExpEscape(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
+
+function unixtimeToTimeString(timestamp) {
+    var date = new Date(timestamp * 1000);
+    return addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
+};
+
+/**
+ * Simple wrapper function that will log all calls of `fnName`.
+ * This function is intended to be used for dev/debugging/testing purposes only.
+ *
+ * @param ctx
+ * @param fnName
+ * @param loggerFn
+ */
+function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
+    if(!localStorage.d) {
+        return;
+    }
+
+    var origFn = ctx[fnName];
+    var textPrefix = textPrefix || "noname";
+    textPrefix = "[call logger: " + textPrefix + "]";
+
+    if(ctx[fnName].haveCallLogger) { // recursion
+        return;
+    }
+    ctx[fnName] = function() {
+        loggerFn.apply(console, [textPrefix, "Called: ", fnName, toArray(arguments)]);
+        var res = origFn.apply(this, toArray(arguments));
+        loggerFn.apply(console, [textPrefix, "Got result: ", fnName, res]);
+
+        return res;
+    };
+    ctx[fnName].haveCallLogger = true; // recursion
+};
+
+/**
+ * Simple Object instance call log helper
+ * This function is intended to be used for dev/debugging/testing purposes only.
+ *
+ *
+ * WARNING: This function will create tons of references in the window.callLoggerObjects & also may flood your console.
+ *
+ * @param ctx
+ * @param [loggerFn] {Function}
+ * @param [recursive] {boolean}
+ */
+function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix) {
+    if(!localStorage.d) {
+        return;
+    }
+    loggerFn = loggerFn || console.debug;
+
+    if(!window.callLoggerObjects) {
+        window.callLoggerObjects = [];
+    }
+    $.each(ctx, function(k, v) {
+        if(typeof(v) == "function") {
+            callLoggerWrapper(ctx, k, loggerFn, textPrefix);
+        } else if(typeof(v) == "object" && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
+            window.callLoggerObjects.push(v);
+            logAllCallsOnObject(v, loggerFn, recursive, textPrefix + "." + k);
+        }
+    });
+};
+
+
+function array_unique(arr) {
+    return $.grep(arr, function(v, k){
+        return $.inArray(v ,arr) === k;
+    });
+}
+
+/**
+ * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
+ *
+ * @param handle {string} mega user id
+ * @returns {string} base32 formatted user id to be used when doing xmpp auth
+ */
+function megaUserIdEncodeForXmpp(handle) {
+    var s = base64urldecode(handle);
+    return baseenc.b32encode(s).replace(/=/g, "");
+};
 
 
 /**
@@ -660,6 +1105,30 @@ function CreateWorkers(url, message, size) {
 			}
 		});
 	}, size);
+}
+
+
+function dcTracer(ctr) {
+	var name = ctr.name, proto = ctr.prototype;
+	for(var fn in proto) {
+		if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
+			console.log('Tracing ' + name + '.' + fn);
+			proto[fn] = (function(fn, fc) {
+				fc.dbg = function() {
+					try {
+						console.log('Entering ' + name + '.' + fn,
+							this, '~####~', Array.prototype.slice.call(arguments));
+						var r = fc.apply(this, arguments);
+						console.log('Leaving ' + name + '.' + fn, r);
+						return r;
+					} catch(e) {
+						console.error(e);
+					}
+				};
+				return fc.dbg;
+			})(fn, proto[fn]);
+		}
+	}
 }
 
 function percent_megatitle()

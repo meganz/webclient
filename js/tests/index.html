@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="vendor/mocha/mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="vendor/mocha/mocha.js"></script>
+    <script src="vendor/mocha/chai.js"></script>
+    <script src="vendor/mocha/sinon-chai.js"></script>
+    <script src="vendor/sinon-1.7.3.js"></script>
+
+    <script>
+        // Disabled because of Strophejs
+//        mocha.checkLeaks();
+        mocha.setup({
+            ui: 'bdd'
+        });
+    </script>
+
+
+    <!-- test - required libs -->
+    <!-- language patch -->
+    <script type="text/javascript">
+        l = [];
+    </script>
+
+    <script type="text/javascript" src="../jquery-min-1.8.1.js"></script>
+    <script type="text/javascript" src="../jquery-ui.js"></script>
+    <script type="text/javascript" src="../jquery.jscrollpane.min.js"></script>
+
+    <script type="text/javascript" src="src/helpers/fromMega.js"></script>
+
+
+
+    <script type="text/javascript" src="../functions.js"></script>
+    <script type="text/javascript" src="../../asmcrypto.js"></script>
+    <script type="text/javascript" src="../mega.js"></script>
+
+
+    <script type="text/javascript" src="../chat/megaIncomingCallDialog.js"></script>
+    <script type="text/javascript" src="../chat/mpenc.js"></script>
+    <script type="text/javascript" src="../chat/opQueue.js"></script>
+
+    <script type="text/javascript" src="../vendor/chat/strophe.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.disco.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.jingle.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.jingle.session.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.jingle.sdp.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.jingle.adapter.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.muc.js"></script>
+    <script type="text/javascript" src="../vendor/chat/strophe.roster.js"></script>
+    <script type="text/javascript" src="../vendor/chat/wildemitter.patched.js"></script>
+    <script type="text/javascript" src="../vendor/chat/hark.patched.js"></script>
+    <script type="text/javascript" src="../vendor/chat/base32.js"></script>
+
+    <script type="text/javascript" src="../vendor/Autolinker.js"></script>
+
+    <script type="text/javascript" src="../megafilepicker.js"></script>
+
+    <script type="text/javascript" src="../chat/rtcSession.js"></script>
+
+    <script type="text/javascript" src="../chat/urlFilter.js"></script>
+    <script type="text/javascript" src="../chat/attachmentsFilter.js"></script>
+    <script type="text/javascript" src="../chat/emoticonsFilter.js"></script>
+    <script type="text/javascript" src="../chat/capslockFilterDemo.js"></script>
+    <script type="text/javascript" src="../chat/encryptionFilter.js"></script>
+
+    <script type="text/javascript" src="../chat/karereEventObjects.js"></script>
+    <script type="text/javascript" src="../chat/karere.js"></script>
+    <script type="text/javascript" src="../chat/chat.js"></script>
+
+
+
+    <!-- some helper funcs -->
+    <script type="text/javascript" src="src/helpers/functionsmocker.js"></script>
+    <script type="text/javascript" src="src/helpers/megadatamocker.js"></script>
+    <script type="text/javascript" src="src/helpers/eventmocker.js"></script>
+    <script type="text/javascript" src="src/helpers/objectmocker.js"></script>
+    <script type="text/javascript" src="src/helpers/strophemocker.js"></script>
+    <script type="text/javascript" src="src/helpers/fixtures.js"></script>
+    <script type="text/javascript" src="src/helpers/kareremocker.js"></script>
+    <script type="text/javascript" src="src/helpers/utils.js"></script>
+
+    <!-- include spec files here... -->
+    <!--<script type="text/javascript" src="spec/SpecHelper.js"></script>-->
+
+    <script>
+        // Patch Mocha to make it more `console.log` friendly
+        var mochaHelper = ConsoleMochaHelper();
+    </script>
+
+    <!-- include source files here... -->
+    <script type="text/javascript" src="src/unit/eventmocker.js"></script>
+    <script type="text/javascript" src="src/unit/karere.js"></script>
+    <script type="text/javascript" src="src/unit/chat.js"></script>
+    <script type="text/javascript" src="src/unit/chat_filters.js"></script>
+    <script type="text/javascript" src="src/unit/opqueue.js"></script>
+    <script type="text/javascript" src="src/unit/encryptionfilter.js"></script>
+
+    <!--<script type="text/javascript" src="src/integration/chat_integration.js"></script>-->
+
+
+    <script>
+        mocha.run();
+    </script>
+  </body>
+</html>

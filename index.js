@@ -711,6 +711,14 @@ function init_page()
 	}
 	topmenuUI();
 	loggedout=false;
+
+    // chat
+
+    if(MegaChatEnabled) {
+        if(u_type && !megaChat.is_initialized) {
+            megaChat.init();
+        }
+    }
 }
 
 var avatars = {};
@@ -952,6 +960,11 @@ function topmenuUI()
 			$('.membership-status').html(l[435]);	
 		}		
 		$('.membership-status').show();
+
+        if(MegaChatEnabled) {
+            $('.activity-status-block, .activity-status').show();
+            megaChat.renderMyStatus();
+        }
 	}
 	else
 	{
@@ -1094,8 +1107,8 @@ function topmenuUI()
 			$('.top-user-status-popup').removeClass('active');
 		}
 	});	
-	$('.top-user-status-item').unbind('click');
-	$('.top-user-status-item').bind('click',function(e) 
+	$('.top-user-status-item').unbind('click.topui');
+	$('.top-user-status-item').bind('click.topui',function(e)
 	{   
 		if ($(this).attr('class').indexOf('active') == -1)
 	    {
@@ -1435,7 +1448,9 @@ window.onhashchange = function()
 		loadingDialog.show();
 		jsl_start();
 	}
-	else init_page();
+	else {
+        init_page();
+    }
 }
 
 

@@ -1,0 +1,227 @@
+<!-- current and change presence fixture -->
+<div class="activity-status-block">
+    <div class="activity-status online"></div>
+</div>
+<div class="top-user-status-popup">
+    <div class="top-user-status-arrow"></div>
+    <div class="top-user-status-item active"  data-presence="chat">
+        <div class="activity-status online"></div>
+        <div class="top-user-status-txt">Online</div>
+    </div>
+    <div class="top-user-status-item" data-presence="away">
+        <div class="activity-status away"></div>
+        <div class="top-user-status-txt">Away</div>
+    </div>
+    <div class="top-user-status-item"  data-presence="dnd">
+        <div class="activity-status busy"></div>
+        <div class="top-user-status-txt">Busy</div>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="top-user-status-item"  data-presence="unavailable">
+        <div class="activity-status offline"></div>
+        <div class="top-user-status-txt">Offline</div>
+    </div>
+</div>
+
+
+<!-- tree fixture -->
+<div class="content-panel contacts">
+    <!-- Please set any status class "online"/"away"/"busy"/"offline" !-->
+    <!-- Please set "selected" class to select contact !-->
+    <div class="nw-contact-item offline" id="contact_A_123456789">
+        <div class="nw-contact-status"></div>
+        <div class="nw-contact-avatar">
+            <img alt="" src="images/mega/default-small-avatar.png" />
+        </div>
+        <div class="nw-contact-name">
+            Andrei.d
+        </div>
+    </div>
+    <div class="nw-contact-item busy" id="contact_B_123456789">
+        <div class="nw-contact-status"></div>
+        <div class="nw-contact-avatar">
+            <img alt="" src="images/mega/default-small-avatar.png" />
+        </div>
+        <div class="nw-contact-name">
+            Bram van der Kolk
+        </div>
+    </div>
+
+</div>
+<div class="content-panel conversations">
+    <div class="nw-conversations-header">
+        Contacts
+        <div class="nw-conversations-arrows"></div>
+    </div>
+    <div class="nw-conversations-item online" id="contact2_A_123456789">
+        <div class="nw-contact-status"></div>
+        <div class="nw-conversations-name">
+            Andrei.d
+        </div>
+    </div>
+    <div class="nw-conversations-item offline" id="contact2_B_123456789">
+        <div class="nw-contact-status"></div>
+        <div class="nw-conversations-name">
+            Bram van der Kolk
+        </div>
+    </div>
+</div>
+
+
+
+<!-- chat block fixture -->
+
+<div class="fm-right-files-block">
+
+    <!-- begin chat block -->
+
+    <div class="fm-chat-block hidden">
+        <div class="fm-chat-messages-block inline-dialog template hidden">
+            <div class="fm-chat-messages-pad">
+                <div class="fm-chat-verification-head fm-chat-inline-dialog-header">
+                    Header
+                </div>
+                <div class="fm-chat-message">
+                    Message
+                </div>
+                <div class="fm-chat-file-button verify-button">Primary button</div>
+                <div class="fm-chat-file-button skip-button">Secondary button</div>
+            </div>
+        </div>
+
+
+        <div class="message template hidden">
+            <div class="nw-chat-date">
+                <div class="nw-chat-date-txt">Today, 2:00 PM</div>
+            </div>
+
+            <!-- One Message block !-->
+            <div class="fm-chat-messages-block">
+                <div class="fm-chat-messages-pad">
+                    <div class="nw-contact-avatar">
+                        <img alt="" src="images/mega/default-small-avatar.png">
+                    </div>
+                    <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <!-- End ofMessage block !-->
+        </div>
+
+
+        <div class="fm-right-header template">
+            <div class="nw-contact-avatar todo-verified">
+                <div class="todo-nw-verified-icon"></div>
+                <img alt="" src="images/mega/default-small-avatar.png">
+            </div>
+            <div class="fm-chat-user-info todo-star online">
+                <div class="todo-fm-chat-user-star"></div>
+
+                <div class="fm-chat-user">Bram Van Der Kolk</div>
+                <div class="nw-contact-status"></div>
+                <div class="fm-chat-user-status"> Online </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
+            <div class="chat-button fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+
+            <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
+                <div class="fm-add-contact-arrow" style="right: 46px;"></div>
+                <div class="fm-chat-popup-button add-contact">Add contact to Conversation</div>
+                <div class="fm-chat-popup-button send-contact">Send contact details</div>
+            </div>
+
+            <div class="chat-popup fm-send-files-popup" style="left: -10000px;">
+                <div class="fm-send-files-arrow" style="left: 62px;"></div>
+                <div class="fm-chat-popup-button from-cloud">From your Cloud Drive</div>
+                <div class="fm-chat-popup-button from-computer">From your computer</div>
+            </div>
+
+            <div class="chat-popup fm-start-call-popup" style="left: -10000px;">
+                <div class="fm-send-files-arrow" style="left: 62px;"></div>
+                <div class="fm-chat-popup-button start-audio">Start audio call</div>
+                <div class="fm-chat-popup-button start-video">Start video conference</div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+
+
+        <div class="fm-chat-message-scroll template">
+            <!-- Unhide on "save-button" mouseover !-->
+            <div class="fm-chat-download-popup hidden">
+                <div class="fm-chat-download-arrow"></div>
+                <div class="fm-chat-download-button to-cloud">
+                    <div class="fm-chat-download-icon"></div>
+                    <div class="fm-chat-download-txt">
+                        To your Cloud Drive
+                    </div>
+                </div>
+                <div class="fm-chat-download-button as-zip">
+                    <div class="fm-chat-download-icon"></div>
+                    <div class="fm-chat-download-txt">
+                        As ZIP file
+                    </div>
+                </div>
+                <div class="fm-chat-download-button to-computer">
+                    <div class="fm-chat-download-icon"></div>
+                    <div class="fm-chat-download-txt">
+                        To your computer
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="fm-chat-messages-block typing-template right-block">
+                <div class="fm-chat-messages-pad">
+                    <div class="nw-contact-avatar">
+                        <img alt="" src="images/mega/default-small-avatar.png">
+                    </div>
+                    <div class="fm-chat-message">
+                        <div class="circle" id="circleG">
+                            <div id="circleG_1" class="circleG"></div>
+                            <div id="circleG_2" class="circleG"></div>
+                            <div id="circleG_3" class="circleG"></div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="fm-chat-line-block">
+
+            <div class="fm-chat-attach-file">
+                <div class="fm-chat-attach-arrow"></div>
+            </div>
+
+            <div class="fm-chat-emotions-icon">
+                <div class="fm-chat-emotion-arrow"></div>
+            </div>
+            <div class="fm-chat-emotion-popup hidden">
+                <div class="fm-chat-smile smile" data-text=":)"></div>
+                <div class="fm-chat-smile wink" data-text=";)"></div>
+                <div class="fm-chat-smile tongue" data-text=":P"></div>
+                <div class="fm-chat-smile grin" data-text=":D"></div>
+                <div class="fm-chat-smile confuse" data-text=":|"></div>
+                <div class="fm-chat-smile grasp" data-text=":O"></div>
+                <div class="fm-chat-smile sad" data-text=":("></div>
+                <div class="fm-chat-smile cry" data-text=";("></div>
+                <div class="fm-chat-smile angry" data-text="(angry)"></div>
+                <div class="fm-chat-smile mega" data-text="(mega)"></div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="fm-chat-input-block">
+                <div class="fm-chat-input-icon"></div>
+                <textarea class="message-textarea"></textarea>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+    </div>
+
+    <!-- end chat block -->

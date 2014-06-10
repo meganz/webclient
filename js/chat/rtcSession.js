@@ -38,7 +38,7 @@
     @param {function} options.generateMac
         A function that takes a message and a key and returns a MAC. Can be any
         standard MAC function such as hmac-sha1 or similar
-        Signature: <i> generateMac(msg:string):string
+        Signature: <i> generateMac(msg:string, key:string):string
         If there is an error, the function must throw an exception
     @param {function} [options.generateMacKey]
         A function that generates a new, unpredictably random, never-used-before
@@ -100,7 +100,15 @@ function RtcSession(stropheConn, options) {
         jingle.prepareToSendMessage = function(f) { f(); };
     }
     jingle.verifyMac = function(msg, key, actualMac) {
-        var expectedMac = jingle.generateMac(msg, key);
+        if (!actualMac)
+            return false;
+        var expectedMac;
+        try {
+            expectedMac = jingle.generateMac(msg, key);
+        } catch(e) {
+            return false;
+        }
+
         // constant-time compare
         var aLen = actualMac.length;
         var eLen = expectedMac.length;
@@ -230,7 +238,19 @@ RtcSession.prototype = {
         successCallback.call(self, sessStream);
       },
       function(error, e) {
-        var msg = error?error.name:e;
+        var msg;
+        if (!error)
+            msg = e;
+        else {
+            if (typeof error === 'string')
+                msg = error;
+             else if (error.name)
+                msg = error.name;
+             else if (error.code)
+                msg = error.code;
+             else
+                msg = error;
+        }
         if (errCallback)
             errCallback(msg);
 /**
@@ -313,12 +333,14 @@ RtcSession.prototype = {
         ansHandler = null;
 // The crypto exceptions thrown here will simply discard the call request and remove the handler
         var peerFprMacKey = $(stanza).attr('fprmackey');
-        if (!peerFprMacKey)
-            throw new Error("Call answer missing encrypted mac-key");
-        peerFprMacKey = self.jingle.decryptMessage(peerFprMacKey);
-        if (!peerFprMacKey)
-            throw new Error("Error decrypting peer mac-key");
-
+        try {
+            peerFprMacKey = self.jingle.decryptMessage(peerFprMacKey);
+            if (!peerFprMacKey)
+                peerFprMacKey = self.jingle.generateMacKey();
+        } catch(e) {
+            peerFprMacKey = self.jingle.generateMacKey();
+        }
+        
         var fullPeerJid = $(stanza).attr('from');
         if (isBroadcast)
             self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', by: fullPeerJid, accepted:'1'}));
@@ -1028,8 +1050,9 @@ RtcSession._disableLocalVid = function(rtc) {
     @type {object}
     @property {DOM} player - the local camera video HTML element
 */
-    rtc.trigger('local-video-disabled', {player: this.gLocalVid});
     this._localVidEnabled = false;
+    rtc.trigger('local-video-disabled', {player: this.gLocalVid});
+
 }
 
 RtcSession._enableLocalVid = function(rtc) {

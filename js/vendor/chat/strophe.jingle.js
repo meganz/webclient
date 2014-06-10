@@ -183,19 +183,28 @@ var JinglePlugin = {
             if (!ans.ownFprMacKey)
                 throw new Error("No ans.ownFprMacKey present, there is a bug");
             var j = $(iq).find('>jingle');
+            var sid = $(iq).find('jingle').attr('sid');
+  
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), ans.ownFprMacKey, j.attr('fprmac'))) {
-                console.warn('Fingerprint verification failed, possible forge attempt, dropping call!');
+                console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
+                try {
+                  self.sendTerminateNoSession(sid, $(iq).attr('to'), "security", "Fingerprint verification failed");
+                } catch(e) {
+                    console.error(e);
+                }
                 try {
                   self.onCallTerminated.call(self.eventHandler, {
                     fake: true, peerjid: peerjid, isInitiator: false,
-                    sid: $(iq).find('jingle').attr('sid')
-                  }, "security", "fingerprint verification failed");
-                } catch(e){}
+                    sid: sid, 
+                  }, "security", "Fingerprint verification failed");
+                } catch(e){
+                    console.error(e);
+                }
                 return true;
             }
 //===
             var sess = self.createSession($(iq).attr('to'), peerjid,
-                    $(iq).find('jingle').attr('sid'), ans.options.localStream,
+                    sid, ans.options.localStream,
                     ans.options.muted, {peerFprMacKey: ans.peerFprMacKey});
 
             sess.media_constraints = self.media_constraints;
@@ -240,8 +249,8 @@ var JinglePlugin = {
                 throw new Error("No session.ownFprMacKey present, there is a bug");
             var j = $(iq).find('>jingle');
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), sess.ownFprMacKey, j.attr('fprmac'))) {
-                console.warn('Fingerprint verification failed, possible forge attempt, dropping call!');
-                self.terminateBySid(sess.sid, 'security', 'fingerprint verification failed');
+                console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
+                self.terminateBySid(sess.sid, 'security', "Fingerprint verification failed");
                 return true;
             }
 // We are likely to start receiving ice candidates before setRemoteDescription()
@@ -370,9 +379,17 @@ var JinglePlugin = {
                 return false;//the callback returning false signals to the calling user code that the call request is not valid anymore
             if (accept) {
                 var ownFprMacKey = self.generateMacKey();
-                var peerFprMacKey = self.decryptMessage($(callmsg).attr('fprmackey'));
-                if (!peerFprMacKey)
-                    throw new Error("Encrypted mac-key missing from call request");
+                var peerFprMacKey;
+                try
+                {
+                    peerFprMacKey = self.decryptMessage($(callmsg).attr('fprmackey'));
+                    if (!peerFprMacKey)
+                        peerFprMacKey = self.generateMacKey();
+                }
+                catch(e) {
+                    peerFprMacKey = self.generateMacKey();
+                }
+
 // tsTillJingle measures the time since we sent megaCallAnswer till we receive jingle-initiate
                 var tsTillJingle = Date.now()+self.jingleAutoAcceptTimeout;
                 self.acceptCallsFrom[from] = {
@@ -416,9 +433,12 @@ var JinglePlugin = {
       return true;
     },
     cancelAutoAnswerEntry: function(from, reason, text) {
+        if (!this.acceptCallsFrom[from])
+            return false;
         delete this.acceptCallsFrom[from];
         this.onCallTerminated.call(this.eventHandler, {fake: true, peerjid: from, isInitiator: false},
             reason, text);
+        return true;
     },
     cancelAllAutoAnswerEntries: function(reason, text) {
         var save = this.acceptCallsFrom;
@@ -507,6 +527,18 @@ var JinglePlugin = {
         if (!sess)
             return false;
         return this.terminate(sess, null, null);
+    },
+    sendTerminateNoSession: function(sid, to, reason, text) {
+        var term = $iq({to: this.peerjid, type: 'set'});
+        term
+          .c('jingle', {xmlns: 'urn:xmpp:jingle:1',
+            action: 'session-terminate',
+            sid: sid})
+          .c('reason')
+          .c(reason);
+        if (text)
+            term.up().c('text').t(text);
+        this.connection.sendIQ(term);
     },
     sessionIsValid: function(sess)
     {

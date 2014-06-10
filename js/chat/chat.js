@@ -2169,14 +2169,28 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
     self.bind('call-ended', function(e, eventData) {
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "ended-call-" + unixtime(),
-                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.",
-                undefined,
-                ['fm-chat-call-ended']
+        var msg = "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.";
+
+        if(eventData.reason == "security") {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "error-" + unixtime(),
+                    msg + " " + eventData.text,
+                    undefined,
+                    ['fm-chat-call-ended']
+                )
             )
-        );
+        } else {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "ended-call-" + unixtime(),
+                    msg,
+                    undefined,
+                    ['fm-chat-call-ended']
+                )
+            );
+        }
+
 
         resetCallStateNoCall();
     });

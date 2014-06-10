@@ -22,8 +22,8 @@ MegaQueue.prototype.pushFirst = function(arg, next, self) {
 
 MegaQueue.prototype.resume = function() {
 	this._paused = false;
-	this.trigger('resume')
 	this._process();
+	this.trigger('resume')
 };
 
 MegaQueue.prototype.shrink = function() {
@@ -32,9 +32,9 @@ MegaQueue.prototype.shrink = function() {
 }
 
 MegaQueue.prototype.pause = function() {
-	this.trigger('pause')
 	if (d) { console.log("pausing queue"); console.trace(); }
 	this._paused = true;
+	this.trigger('pause')
 };
 
 MegaQueue.prototype.isPaused = function() {

@@ -189,22 +189,6 @@ var DownloadManager = new function() {
 		removeValue(removed, pattern);
 	}
 
-	self.enabled = function(task) {
-		var enabled = true;
-		if (task.__canretry) {
-			DEBUG("RETRYING TASK");
-			return true;
-		}
-		$.each(locks, function(i, pattern) {
-			if (doesMatch(task, pattern)) {
-				enabled = false;
-				return false; /* break */
-			}
-		});
-		if (!enabled) ERRDEBUG("this shouldn't happen");
-		return enabled;
-	}
-
 }
 
 var ioThrottlePaused = false;
@@ -257,12 +241,10 @@ dlQueue.prepareNextTask = function() {
 };
 
 dlQueue.validateTask = function(pzTask, next) {
-	if (DownloadManager.enabled(pzTask)) {
-		if (pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk) {
-			return true;
-		} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
-			return true;
-		}
+	if (pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk) {
+		return true;
+	} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
+		return true;
 	}
 	return false;
 };

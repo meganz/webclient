@@ -7609,8 +7609,8 @@ margin: 0 0 0 20px;
 	display: none;
 }
 .export-link-item:first-child {
-	border: 0;
-	height: 100px;
+	height: 102px;
+	margin-top:12px;
 }
 .file-key {
 	display: none;

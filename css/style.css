@@ -6696,8 +6696,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
 	min-width: 500px;
-	height: 126px;
-	margin: -63px 0 0 -250px;
+	margin: -49px 0 0 -250px;
 }
 .fm-dialog.download-dialog {
 	width: 504px;
@@ -6921,7 +6920,7 @@ opacity: 0.3;
 opacity: 0.6;
 }
 .fm-dialog-body {
-	padding: 30px;
+	padding: 12px;
 }
 .download-dialog .fm-dialog-body {
 	padding: 30px 20px 32px 20px;
@@ -6959,18 +6958,18 @@ opacity: 0.6;
 	cursor: pointer;
 }
 .fm-dialog-new-folder-input, .fm-dialog-add-contact-input {
-	height: 30px;
-	border: 2px solid #dcdcdc;
+	height: 32px;
 	float: left;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
 	width: 330px;
 	color: #9a9a9a;
+	background-color: rgba(0,0,0,0.05);
 }
 .filled-input .fm-dialog-new-folder-input, .filled-input .fm-dialog-add-contact-input {
 	
@@ -6982,6 +6981,7 @@ opacity: 0.6;
 	background-position: -11px -6171px;
 	cursor: default;
 	display: block;
+	margin: 2px 2px 0 0;
 }
 .active .fm-dialog-input-clear {
 	background-image: url(../images/mega/main-sprite.png?v=7);
@@ -6991,16 +6991,18 @@ opacity: 0.6;
 	margin: 0 30px 0 0;
 }
 .fm-dialog-new-folder-input input, .fm-dialog-add-contact-input input {
-	line-height: 24px;
-	padding: 0 0 0 10px;
-	color: #c3c3c3;
-	border: 0;
-	height: 24px;
-	font-size: 13px;
+	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	width: 100%;
+	background-color: white;
+	line-height: 30px;
+	margin-top: 0;
+	font-size: 12px;
+	color: #868686;
+	padding: 0 10px 0 10px;
+	background-color: transparent;
+	border: 0;
 }
 .active .fm-dialog-new-folder-input input {
 	color: #9a9a9a;
@@ -7009,22 +7011,31 @@ opacity: 0.6;
 	color: #9a9a9a;
 }
 .fm-dialog-add-contact-button, .fm-dialog-rename-button, .fm-voucher-button, .new-start-arrow-button {
-	height: 30px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	margin-left: 340px;
-	font-size: 13px;
-	line-height: 24px;
-	text-align: center;
-	padding: 0 10px;
-	background-color: white;
-	border: 2px solid #b2b2b2;
+	height: 32px;
+	background-color: rgba(0,0,0,0.3);
 	color: #b8baba;
-	cursor: default;
+	margin: 0 0 0 342px;
+	color: white;
+text-align: center;
+font-size: 12px;
+line-height: 30px;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+padding: 0 10px;
+display: block;
+-webkit-transition: background-color 200ms ease-in-out;
+-moz-transition: background-color 200ms ease-in-out;
+-o-transition: background-color 200ms ease-in-out;
+-ms-transition: background-color 200ms ease-in-out;
+transition: background-color 200ms ease-in-out;
+cursor: pointer;
+}
+.fm-dialog-add-contact-button:hover, .fm-dialog-rename-button:hover, .fm-voucher-button:hover, .new-start-arrow-button:hover {
+	background-color: rgba(0,0,0,0.6);
 }
 .active.new-start-arrow-button {
 	color: #333333;
@@ -7592,7 +7603,7 @@ margin: 0 0 0 20px;
 	padding-top: 8px;
 }
 .export-link-txt {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
 	white-space: nowrap;
@@ -7611,7 +7622,9 @@ margin: 0 0 0 20px;
 	display: none;
 }
 .export-link-item:first-child {
-	height: 102px;
+	height: 76px;
+	border:0;
+	padding:0;
 }
 .file-key {
 	display: none;

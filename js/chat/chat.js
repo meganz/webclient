@@ -292,11 +292,11 @@ var MegaChat = function() {
         'xmppDomain': "sandbox.developers.mega.co.nz",
         'rtcSession': {
             encryptMessageForJid: function(msg, bareJid) {
-                var contactName = megaChat.getContactNameFromJid(bareJid);
-                if (!u_pubkeys[contactName]) {
-                    throw new Error("pubkey not loaded: " + contactName);
+                var contact = megaChat.getContactFromJid(bareJid);
+                if (!u_pubkeys[contact.h]) {
+                    throw new Error("pubkey not loaded: " + contact);
                 }
-                return base64urlencode(crypto_rsaencrypt(u_pubkeys[contactName], msg));
+                return base64urlencode(crypto_rsaencrypt(msg, u_pubkeys[contact.h]));
             },
             decryptMessage: function(msg) {
                 // TODO: update this when we switch to asmCrypto, it should just be
@@ -308,10 +308,17 @@ var MegaChat = function() {
             prepareToSendMessage: function(sendMsgFunc, bareJid) {
                 api_cachepubkeys({
                     cachepubkeyscomplete : sendMsgFunc
-                }, [megaChat.getContactNameFromJid(bareJid)]);
+                }, [megaChat.getContactFromJid(bareJid).h]);
             },
             generateMac: function(msg, key) {
-                var rawkey = atob(key);
+                var rawkey = key;
+                try {
+                    rawkey = atob(key);
+                } catch(e) {
+//                    if(e instanceof InvalidCharacterError) {
+//                        rawkey = key
+//                    }
+                }
                 return asmCrypto.HMAC_SHA256.base64( rawkey, msg );
             },
             iceServers:[
@@ -852,7 +859,7 @@ MegaChat.prototype.init = function() {
 
     } catch(e) {
         // no RTC support.
-
+        console.error("No rtc support: ", e);
     }
 
     if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED) {
@@ -1616,6 +1623,13 @@ MegaChat.prototype.closeChatPopups = function() {
 };
 
 
+/**
+ * Debug helper
+ */
+
+MegaChat.prototype.getChatNum = function(idx) {
+    return this.chats[Object.keys(this.chats)[idx]];
+};
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -1797,9 +1811,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
             $('.fm-start-call-arrow', self.$header).css('left', $(this).outerWidth()/2  + 'px');
             sendFilesPopup.css('left',  $(this).position().left + 'px');
         } else {
-            sendFilesPopup.removeClass('active');
-            sendFilesPopup.css('left', '-' + '10000' + 'px');
-            $(this).removeClass('active');
+            self.megaChat.closeChatPopups();
 
         }
     });
@@ -1821,9 +1833,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         }
         else
         {
-            sendFilesPopup.removeClass('active');
-            sendFilesPopup.css('left', '-' + '10000' + 'px');
-            $(this).removeClass('active');
+            self.megaChat.closeChatPopups();
 
         }
     });
@@ -1834,10 +1844,10 @@ var MegaChatRoom = function(megaChat, roomJid) {
     $('.call-actions', self.$header).unbind('click.megaChat');
 
     var startCall = function() {
+        self.megaChat.closeChatPopups();
+
         var participants = self.getParticipantsExceptMe();
         assert(participants.length > 0, "No participants.");
-
-        self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
 
         var doCancel = function() {
             if(self.callRequest && self.callRequest.cancel) {
@@ -1847,6 +1857,11 @@ var MegaChatRoom = function(megaChat, roomJid) {
             }
             self.megaChat.karere.connection.rtc.hangup();
         };
+
+        if(self.callRequest) {
+            doCancel();
+        }
+        self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
 
         $('.btn-chat-cancel-active-call', self.$header).bind('click.megaChat', function() {
             doCancel();

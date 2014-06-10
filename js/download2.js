@@ -201,6 +201,7 @@ var DownloadManager = new function() {
 				return false; /* break */
 			}
 		});
+		if (!enabled) ERRDEBUG("this shouldn't happen");
 		return enabled;
 	}
 

@@ -384,7 +384,8 @@ function failureFunction(task, args) {
 		}
 	}
 
-	DEBUG2(dl.name, "failed ", code);
+	// DEBUG2(dl.name, "failed ", code);
+	if (d) console.error('Fai1ure', dl.zipname || dl.n, code );
 
 	/* update UI */
 	dl_reportstatus(dl, EAGAIN); 

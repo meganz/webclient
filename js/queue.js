@@ -41,7 +41,7 @@ MegaQueue.prototype.isPaused = function() {
 	return this._paused;
 }
 
-function _queue_checker(queue, tasks, next, error) {
+function _queue_checker(tasks, next, error) {
 	return function(task, response) {
 		tasks.splice($.inArray(task, tasks), 1);
 		if (response.length && response[0] === false) {
@@ -49,7 +49,7 @@ function _queue_checker(queue, tasks, next, error) {
 			 *	The first argument of .done(false) is false, which 
 			 *	means that something went wrong
 			 */
-			return error(task, arguments);
+			return error(task, response);
 		}
 		if (tasks.length == 0) {
 			next();
@@ -60,7 +60,7 @@ function _queue_checker(queue, tasks, next, error) {
 MegaQueue.prototype.pushAll = function(tasks, next, error) {
 	var i = 0
 		, len = tasks.length
-		, callback = _queue_checker(this, tasks, next, error)
+		, callback = _queue_checker(tasks, next, error)
 
 	for (i=0; i < len; i++) {
 		this.push(tasks[i], callback);
@@ -68,18 +68,16 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 };
 
 MegaQueue.prototype.run_in_context = function(task) {
-	var self = this;
-	self._running++
+	this._running++;
 	this._worker(task[0], function() {
-		if (!self) return; /* already called */
+		if (!task[1]) return; /* already called */
 		task[1].apply(task[2], [task[0], arguments]);
 		task[0] = null;
 		task[1] = null;
 		task[2] = null;
-		self._running--;
-        self._process();
-		self = null;
-    });
+		this._running--;
+		this._process();
+	}.bind(this));
 }
 
 MegaQueue.prototype.validateTask = function() {
@@ -110,7 +108,7 @@ MegaQueue.prototype.process = function() {
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
-			if ( ++this._noTaskCount > 666 )
+			if ( ++this._noTaskCount == 666 )
 			{
 				/**
 				 * XXX: Prevent an infinite loop when there's a connection hang,
@@ -121,7 +119,7 @@ MegaQueue.prototype.process = function() {
 				this._noTaskCount = -1;
 				return false;
 			}
-			this._process();
+			this._process(1200);
 			return false;
 		}
 		this._noTaskCount = 0;
@@ -142,9 +140,9 @@ MegaQueue.prototype.destroy = function() {
 	this._queue = [];
 }
 
-MegaQueue.prototype._process = function() {
+MegaQueue.prototype._process = function(ms) {
 	if (this._later) clearTimeout(this._later);
-	this._later = setTimeout(this.process.bind(this), 90);
+	this._later = setTimeout(this.process.bind(this), ms || 190);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

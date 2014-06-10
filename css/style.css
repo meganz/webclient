@@ -5558,7 +5558,7 @@ span.search-number {
 .create-folder-pad {
 	margin: 34px 12px 12px 12px;
 }
-.create-folder-bottom {
+.create-folder-bottom, .default-dialog-bottom {
 	height: 56px;
 	background-color: #F6F6F6;
 	margin: 12px -12px -12px -12px;
@@ -5570,7 +5570,7 @@ border-bottom-left-radius: 8px;
 -moz-border-radius-bottomright: 8px;
 border-bottom-right-radius: 8px;
 }
-.filled-input .create-folder-bottom {
+.filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
 }
 .filled-input .create-folder-button {
@@ -6683,9 +6683,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	z-index: 1200;
 	border: 2px solid rgba(0,0,0,0.15);
 	background-color: white;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 	left: 50%;
 	top: 50%;
 	-webkit-background-clip: padding-box;
@@ -6695,8 +6695,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 }
 .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
-	min-width: 500px;
-	margin: -49px 0 0 -250px;
+	min-width:440px;
+	margin: -77px 0 0 -220px;
 }
 .fm-dialog.download-dialog {
 	width: 504px;
@@ -6971,7 +6971,9 @@ opacity: 0.6;
 	color: #9a9a9a;
 	background-color: rgba(0,0,0,0.05);
 }
-.filled-input .fm-dialog-new-folder-input, .filled-input .fm-dialog-add-contact-input {
+.fm-dialog-new-folder-input {
+	float:none;
+	width:100%;
 	
 }
 .fm-dialog-input-clear {
@@ -7014,7 +7016,7 @@ opacity: 0.6;
 	height: 32px;
 	background-color: rgba(0,0,0,0.3);
 	color: #b8baba;
-	margin: 0 0 0 342px;
+	margin: 12px 12px 0 0;
 	color: white;
 text-align: center;
 font-size: 12px;
@@ -7033,6 +7035,7 @@ display: block;
 -ms-transition: background-color 200ms ease-in-out;
 transition: background-color 200ms ease-in-out;
 cursor: pointer;
+float:right;
 }
 .fm-dialog-add-contact-button:hover, .fm-dialog-rename-button:hover, .fm-voucher-button:hover, .new-start-arrow-button:hover {
 	background-color: rgba(0,0,0,0.6);

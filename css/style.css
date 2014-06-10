@@ -6792,8 +6792,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	overflow: hidden;
 }
 .fm-dialog.export-links-dialog {
-	width: 604px;
-	margin: -253px 0 0 -302px;
+	width: 634px;
+	margin: -96px 0 0 -317px;
 	overflow: hidden;
 }
 .fm-dialog.browsers-dialog {
@@ -7565,7 +7565,6 @@ opacity: 0.6;
 	overflow: hidden;
 }
 .export-link-item {
-	height: 60px;
 	border-top: 2px solid #eeeeee;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -7574,18 +7573,20 @@ opacity: 0.6;
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
+	padding:20px 0 0 0;
+	height: 100px;
 }
 .export-icon {
-	height: 48px;
-	width: 48px;
-	float: left;
-	margin: 5px 0 0 6px;
+	height: 62px;
+width: 54px;
+float: left;
+margin: 0 0 0 20px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/drag-icons-v1.png);
+	background-image: url(../images/mega/files-icons.svg);
 	background-position: 0 0;
 }
 .export-link-text-pad {
-	margin: 0 0 0 63px;
+	margin: 0 0 0 83px;
 	padding-top: 8px;
 }
 .export-link-txt {
@@ -7609,7 +7610,7 @@ opacity: 0.6;
 }
 .export-link-item:first-child {
 	border: 0;
-	height: 58px;
+	height: 100px;
 }
 .file-key {
 	display: none;

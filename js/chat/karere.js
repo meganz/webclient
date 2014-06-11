@@ -1327,8 +1327,6 @@ makeMetaAware(Karere);
             }
         }
 
-        console.error(stanzaType, eventData);
-
         var targetedTypeEvent = new $.Event("on" + stanzaType);
 
         if(localStorage.d) {

@@ -1548,7 +1548,7 @@ MegaChat.prototype.getPrivateRoomJidFor = function(jid) {
 MegaChat.prototype.processNewUser = function(u) {
     var self = this;
 
-    console.error("added: ", u);
+    if(localStorage.d) { console.error("added: ", u); }
 
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u));
@@ -1565,7 +1565,7 @@ MegaChat.prototype.processNewUser = function(u) {
 MegaChat.prototype.processRemovedUser = function(u) {
     var self = this;
 
-    console.error("removed: ", u);
+    if(localStorage.d) { console.error("removed: ", u); }
 
 
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
@@ -3558,7 +3558,9 @@ MegaChatRoom.prototype.renderContactTree = function() {
 MegaChatRoom.prototype.recover = function() {
     var self = this;
 
-    console.error('recovering room: ', self.roomJid, self);
+    if(localStorage.d) {
+        console.error('recovering room: ', self.roomJid, self);
+    }
 
     self._syncRequests = [];
     self.callIsActive = false;

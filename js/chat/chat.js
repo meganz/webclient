@@ -301,10 +301,12 @@ var MegaChat = function() {
                 return base64urlencode(crypto_rsaencrypt(msg, u_pubkeys[contact.h]));
             },
             decryptMessage: function(msg) {
-                // TODO: update this when we switch to asmCrypto, it should just be
-                // crypto_rsadecrypt(base64urldecode(msg), u_privk)
-                // crypto_rsadecrypt(mpi2b(base64urldecode(msg)), u_privk).substring(0, 44);
-                return crypto_rsadecrypt(base64urldecode(msg), u_privk);
+                var decryptedVal = crypto_rsadecrypt(base64urldecode(msg), u_privk);
+                if(decryptedVal && decryptedVal.length > 0) {
+                    return decryptedVal.substring(0, 44)
+                } else {
+                    return decryptedVal; // some null/falsy value
+                }
 
             },
             prepareToSendMessage: function(sendMsgFunc, bareJid) {

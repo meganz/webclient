@@ -7148,9 +7148,10 @@ float:right;
 	margin: 15px 0 0 10px;
 	cursor: pointer;
 	position: relative;
+	top:10px;
 }
 .multiple-sharing .main-body .nw-chat-button {
-	top: 7px;
+	top: 17px;
 }
 .nw-chat-icons-area {
 	float: left;
@@ -7171,11 +7172,11 @@ float:right;
 	display: block;
 }
 .multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(2) {
-	margin: -62px 4px 4px -1px;
+	margin: -82px 4px 4px -1px;
 	z-index: 9;
 }
 .multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(3) {
-	margin: -62px 4px 4px 5px;
+	margin: -82px 4px 4px 5px;
 	z-index: 8;
 }
 .multiple-sharing.expanded .main-body .nw-chat-icons-area .block-view-file-type {
@@ -7208,7 +7209,7 @@ float:right;
 	background-position: 0 -2317px;
 	background-repeat: no-repeat;
 	float: left;
-	margin-top: 20px;
+	margin-top: 30px;
 }
 .nw-chat-sharing-filesize, .multiple-sharing.expanded .main-body .nw-chat-sharing-filesize {
 	ont-size: 11px;
@@ -7219,10 +7220,10 @@ float:right;
 	background-position: -5px -2368px;
 	background-repeat: no-repeat;
 	float: left;
-	margin: 20px 10px 0 0;
+	margin: 30px 10px 0 0;
 }
 .multiple-sharing .main-body .nw-chat-sharing-filename, .multiple-sharing .main-body .nw-chat-sharing-filesize {
-	margin-top: 27px;
+	margin-top: 37px;
 }
 .nw-chat-expand-arrow {
 	display: none;

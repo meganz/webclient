@@ -1766,22 +1766,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
                     }
                 });
         } else if(newState == MegaChatRoom.STATE.READY) {
-            if(localStorage.dd) {
-                console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+            if(self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+                self._flushMessagesQueue();
             }
-
-            if(self._messagesQueue.length > 0) {
-                $.each(self._messagesQueue, function(k, v) {
-                    if(!v) {
-                        return; //continue;
-                    }
-
-                    self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", v.getContents(), v.getMeta(), v.getMessageId(), v.getDelay());
-                });
-                self._messagesQueue = [];
-            }
-
-            self.requestMessageSync();
         }
     });
 
@@ -2917,7 +2904,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     $message.attr('data-timestamp', timestamp);
 
-    $('.jspContainer > .jspPane > .fm-chat-message-pad > .fm-chat-message-container', self.$messages).each(function() {
+    $('.jspContainer > .jspPane > .fm-chat-message-container', self.$messages).each(function() {
         if(timestamp >= $(this).attr('data-timestamp')) {
             $after = $(this);
         } else if($before === null && timestamp < $(this).attr('data-timestamp')) {
@@ -2927,7 +2914,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     if(!$after && !$before) {
 //        console.log("append: ", message.message);
-        $('.jspContainer > .jspPane > .fm-chat-message-pad', self.$messages)
+        $('.jspContainer > .jspPane', self.$messages)
             .append($message);
     } else if($before) {
 //        console.log("before: ", message.message, $before.text());
@@ -3062,6 +3049,8 @@ MegaChatRoom.prototype.getInlineDialogInstance = function(type) {
  *
  * Note: This is a recursion-like function, which uses the `exceptFromUsers` argument to mark which users had failed to
  * respond with a message sync response.
+ *
+ * Second note: this function will halt if a request was already executed successfuly. (see this._syncDone)
  *
  * @param exceptFromUsers {Array} Array of FULL JIDs which should be skipped when asking for messages sync (e.g. they
  * had timed out in the past)
@@ -3610,8 +3599,32 @@ MegaChatRoom.prototype.resized = function(scrollToBottom) {
 
         self.refreshUI(scrollToBottom);
     }
-
-
 };
 
+
+/**
+ * This method will be called on room state change, only when the mpenc's state is === INITIALISED
+ *
+ * @private
+ */
+MegaChatRoom.prototype._flushMessagesQueue = function() {
+    var self = this;
+
+    if(localStorage.dd) {
+        console.log("Chat room state set to ready, will flush queue: ", self._messagesQueue);
+    }
+
+    if(self._messagesQueue.length > 0) {
+        $.each(self._messagesQueue, function(k, v) {
+            if(!v) {
+                return; //continue;
+            }
+
+            self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", v.getContents(), v.getMeta(), v.getMessageId(), v.getDelay());
+        });
+        self._messagesQueue = [];
+    }
+
+    self.requestMessageSync();
+}
 window.megaChat = new MegaChat();

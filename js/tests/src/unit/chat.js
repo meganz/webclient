@@ -356,6 +356,9 @@ describe("Chat.js - Karere UI integration", function() {
 
         users[user1jid] = "participant";
 
+        megaChat.chats[roomJid].encryptionHandler = {
+            'state': 3
+        };
 
         megaChat.karere._triggerEvent("UsersJoined",
             new KarereEventObjects.UsersJoined(
@@ -518,7 +521,6 @@ describe("Chat.js - Karere UI integration", function() {
                 'time': $('.nw-chat-date-txt', $(this).parent()).text(),
                 'msg': $('.fm-chat-message span', $(this)).text(),
                 'fromId': $(this).parent().attr('data-from'),
-                'isMyOwn': $(this).is(".my-own-message"),
                 'isGrouped': $(this).parent().is(".grouped-message"),
                 'isRightBlock': $(this).is(".right-block")
             });
@@ -530,36 +532,32 @@ describe("Chat.js - Karere UI integration", function() {
                 "time": unixtimeToTimeString(testMessages[2].getDelay()),
                 "msg": "hopala1",
                 "fromId": testMessages[2].getFromJid().split("@")[0],
-                "isMyOwn": false,
                 "isGrouped": false,
-                "isRightBlock": true
+                "isRightBlock": false
             },
             {
                 "ts": "100",
                 "time": unixtimeToTimeString(testMessages[0].getDelay()),
                 "msg": "hopala2",
                 "fromId": testMessages[0].getFromJid().split("@")[0],
-                "isMyOwn": true,
                 "isGrouped": false,
-                "isRightBlock": false
+                "isRightBlock": true
             },
             {
                 "ts": "200",
                 "time": unixtimeToTimeString(testMessages[1].getDelay()),
                 "msg": "hopala3",
                 "fromId": testMessages[1].getFromJid().split("@")[0],
-                "isMyOwn": true,
                 "isGrouped": true,
-                "isRightBlock": false
+                "isRightBlock": true
             },
             {
                 "ts": "300",
                 "time": unixtimeToTimeString(testMessages[3].getDelay()),
                 "msg": "hopala4",
                 "fromId": testMessages[3].getFromJid().split("@")[0],
-                "isMyOwn": true,
                 "isGrouped": true,
-                "isRightBlock": false
+                "isRightBlock": true
             }
         ];
 
@@ -1075,7 +1073,9 @@ describe("Chat.js - Karere UI integration", function() {
             this.toggleReady = function(roomJid) {
                 if(!self.ready[roomJid]) {
                     self.ready[roomJid] = true;
+                    self.megaChat.chats[roomJid].encryptionHandler = {'state': 3};
                     self.megaChat.chats[roomJid].setState(MegaChatRoom.STATE.PLUGINS_READY);
+
                 } else {
                     self.ready[roomJid] = false;
                 }

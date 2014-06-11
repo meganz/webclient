@@ -1135,7 +1135,8 @@ makeMetaAware(Karere);
                     $('forwarded', message).each(function(k, v) {
                         self._onIncomingStanza($('message', v)[0], {
                             'isForwarded': true,
-                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined
+                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined,
+                            'sent-stamp': $('delay', v).attr('sent-stmap') ? Date.parse($('delay', v).attr('sent-stamp'))/1000 : undefined
                         });
                     });
 
@@ -1153,9 +1154,10 @@ makeMetaAware(Karere);
                     $('forwarded', message).each(function(k, v) {
                         self._onIncomingStanza($('message', v)[0], {
                             'isForwarded': true,
-                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined
+                            'delay': $('delay', v).attr('stamp') ? Date.parse($('delay', v).attr('stamp'))/1000 : undefined,
+                            'sent-stamp': $('delay', v).attr('sent-stmap') ? Date.parse($('delay', v).attr('sent-stamp'))/1000 : undefined
                         });
-                    })
+                    });
 
 
                     // stop
@@ -1225,6 +1227,8 @@ makeMetaAware(Karere);
                 var stamp = delay[0].getAttribute('stamp');
                 var d = Date.parse(stamp);
                 eventData.delay = d/1000;
+
+                eventData['sent-stamp'] = $('delay', message).attr('sent-stamp') ? Date.parse($('delay', message).attr('sent-stamp'))/1000 : undefined;
             }
         } else {
             if(localStorage.d) {
@@ -1308,11 +1312,22 @@ makeMetaAware(Karere);
         if(eventData['rawMessage'] && eventData['rawMessage'].getElementsByTagName("delay").length > 0) {
             var delay = eventData['rawMessage'].getElementsByTagName("delay");
             if(delay.length > 0) {
+                // relative stamp
                 var stamp = delay[0].getAttribute('stamp');
                 var d = Date.parse(stamp);
-                eventData.delay = d/1000;
+
+                if(delay[0].getAttribute('sent-stamp')) {
+                    var sentStamp = delay[0].getAttribute('sent-stamp');
+                    var d2 = Date.parse(sentStamp);
+
+                    eventData.delay = (unixtime() - (d2/1000 - d/1000));
+                } else {
+                    eventData.delay = d/1000;
+                }
             }
         }
+
+        console.error(stanzaType, eventData);
 
         var targetedTypeEvent = new $.Event("on" + stanzaType);
 
@@ -1494,6 +1509,7 @@ makeMetaAware(Karere);
                     .c("delay", {
                         'xmlns': 'urn:xmpp:delay',
                         'stamp': (new Date(delay * 1000).toISOString()),
+                        'sent-stamp': (new Date(unixtime() * 1000).toISOString()),
                         'from': self.getJid()
                     })
                 .up();
@@ -1674,6 +1690,9 @@ makeMetaAware(Karere);
             $delay.attr('xmlns', 'urn:xmpp:delay');
             $delay.attr('from', self.getJid());
             $delay.attr('stamp', (new Date(outgoingMessage.getDelay() * 1000).toISOString()));
+
+            //XX: use different place to store the sent-stamp? this is totally not following the XMPP protocol.
+            $delay.attr('sent-stamp', (new Date(unixtime() * 1000).toISOString()));
 
             message.nodeTree.appendChild(
                 $delay[0]

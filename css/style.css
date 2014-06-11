@@ -5821,7 +5821,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .fm-chat-message-pad {
 	padding: 8px 21px 0 5px;
-	position: relative;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -6002,9 +6001,15 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	height: 14px;
 	margin: -3px 0 -3px 0;
 	text-align: right;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
+}
+.chat-date-line {
+	position:absolute; height:14px; margin:0 8px 0 8px; left:0; background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: left -2290px;
 	background-repeat: repeat-x;
+	width: 100%;
+width: -webkit-calc(100% - 29px);
+width: -moz-calc(100% - 29px);
+width: calc(100% - 29px);
 }
 .nw-chat-date-txt {
 	font-size: 11px;
@@ -6012,7 +6017,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: inline-block;
 	background-color: white;
 	line-height: 13px;
-	padding: 0 0 0 10px;
+	padding: 0 10px 0 10px;
+	position:relative;
+	margin-right:-10px;
+	z-index:10;
 }
 .right-block .fm-chat-message {
 	margin: 0 34px 0 0;

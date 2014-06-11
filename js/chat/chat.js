@@ -2824,10 +2824,8 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     // add .current-name if this is my own message
     if(jid == self.megaChat.karere.getBareJid()) {
-        $('.fm-chat-messages-block', $message).addClass("my-own-message");
-    } else {
         $('.fm-chat-messages-block', $message).addClass("right-block");
-    }
+    } 
 
 
 
@@ -2919,7 +2917,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     $message.attr('data-timestamp', timestamp);
 
-    $('.jspContainer > .jspPane .fm-chat-message-container', self.$messages).each(function() {
+    $('.jspContainer > .jspPane > .fm-chat-message-pad > .fm-chat-message-container', self.$messages).each(function() {
         if(timestamp >= $(this).attr('data-timestamp')) {
             $after = $(this);
         } else if($before === null && timestamp < $(this).attr('data-timestamp')) {
@@ -2929,7 +2927,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     if(!$after && !$before) {
 //        console.log("append: ", message.message);
-        $('.jspContainer > .jspPane', self.$messages)
+        $('.jspContainer > .jspPane > .fm-chat-message-pad', self.$messages)
             .append($message);
     } else if($before) {
 //        console.log("before: ", message.message, $before.text());

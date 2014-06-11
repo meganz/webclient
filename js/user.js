@@ -119,6 +119,8 @@ function u_checklogin3a(res,ctx)
 		u_storage.attr = JSON.stringify(u_attr);
 		u_storage.handle = u_handle = u_attr.u;
 
+        init_storage(u_storage);
+
 		try {
 			u_k = JSON.parse(u_storage.k);
 			if (u_attr.privk) u_privk = crypto_decodeprivkey(base64urldecode(u_storage.privk));

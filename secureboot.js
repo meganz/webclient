@@ -227,7 +227,7 @@ function init_storage ( storage ) {
             return rr;
         }
 
-        if ( storage.privk ) {
+        if ( storage.privk && storage.privk.substr(0, 1) == "[") { /* is json serialized array which need to be migrated */
             // Upgrade key format
             try {
                 var privk = JSON.parse(storage.privk), str = '';
@@ -236,7 +236,7 @@ function init_storage ( storage ) {
                 v++;
             }
             catch ( e ) {
-                console.error( e );
+                console.error("Could not migrate storage - priv key could not be converted to the new format: ", e);
             }
         }
         else {

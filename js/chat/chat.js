@@ -5,10 +5,12 @@
  * localStorage.dxmpp = 1; localStorage.stopOnAssertFail = true; localStorage.d = 1;
  * @type {boolean}
  */
-var MegaChatEnabled = false;
-if (localStorage.megachat) {
-    MegaChatEnabled = true;
-}
+var MegaChatEnabled = true;
+// Mega Chat is now ALWAYS ENABLED
+
+//if (localStorage.megachat) {
+//    MegaChatEnabled = true;
+//}
 
 var chatui;
 (function() {

@@ -673,7 +673,7 @@ MegaChat.prototype.init = function() {
                 .removeClass("hidden")
                 .removeClass("right-block");
 
-            if(contactHashFromJid.u != u_handle) {
+            if(contactHashFromJid.u == u_handle) {
                 $element.addClass("right-block");
             }
 

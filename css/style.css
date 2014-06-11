@@ -6007,9 +6007,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	background-position: left -2290px;
 	background-repeat: repeat-x;
 	width: 100%;
-width: -webkit-calc(100% - 29px);
-width: -moz-calc(100% - 29px);
-width: calc(100% - 29px);
+width: -webkit-calc(100% - 16px);
+width: -moz-calc(100% - 16px);
+width: calc(100% - 16px);
 }
 .nw-chat-date-txt {
 	font-size: 11px;

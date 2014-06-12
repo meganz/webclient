@@ -533,7 +533,7 @@ describe("Chat.js - Karere UI integration", function() {
                 "msg": "hopala1",
                 "fromId": testMessages[2].getFromJid().split("@")[0],
                 "isGrouped": false,
-                "isRightBlock": false
+                "isRightBlock": true
             },
             {
                 "ts": "100",
@@ -541,7 +541,7 @@ describe("Chat.js - Karere UI integration", function() {
                 "msg": "hopala2",
                 "fromId": testMessages[0].getFromJid().split("@")[0],
                 "isGrouped": false,
-                "isRightBlock": true
+                "isRightBlock": false
             },
             {
                 "ts": "200",
@@ -549,7 +549,7 @@ describe("Chat.js - Karere UI integration", function() {
                 "msg": "hopala3",
                 "fromId": testMessages[1].getFromJid().split("@")[0],
                 "isGrouped": true,
-                "isRightBlock": true
+                "isRightBlock": false
             },
             {
                 "ts": "300",
@@ -557,7 +557,7 @@ describe("Chat.js - Karere UI integration", function() {
                 "msg": "hopala4",
                 "fromId": testMessages[3].getFromJid().split("@")[0],
                 "isGrouped": true,
-                "isRightBlock": true
+                "isRightBlock": false
             }
         ];
 

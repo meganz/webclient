@@ -673,7 +673,7 @@ MegaChat.prototype.init = function() {
                 .removeClass("hidden")
                 .removeClass("right-block");
 
-            if(contactHashFromJid.u == u_handle) {
+            if(contactHashFromJid.u != u_handle) {
                 $element.addClass("right-block");
             }
 
@@ -2530,8 +2530,13 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
 
     if(self.type == "private") {
         $.each(self.users, function(k, v) {
+            if(v == self.megaChat.karere.getBareJid()) {
+                // ignore me
+                return; // continue;
+            }
             var $element = $('.nw-conversations-item[data-jid="' + v + '"]');
             $element.attr("data-room-jid", self.roomJid.split("@")[0]);
+            console.warn(self.roomJid, v, $element);
         });
     }
 
@@ -2810,7 +2815,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     }
 
     // add .current-name if this is my own message
-    if(jid == self.megaChat.karere.getBareJid()) {
+    if(jid != self.megaChat.karere.getBareJid()) {
         $('.fm-chat-messages-block', $message).addClass("right-block");
     } 
 
@@ -2932,12 +2937,13 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     // update unread messages count
     if(self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
         var $navElement = self.getNavElement();
-        var $count = $('.messages-icon span', $navElement);
+        var $count = $('.nw-conversations-unread', $navElement);
 
         var count = $('.fm-chat-message-container.unread', self.$messages).size();
         if(count > 0) {
             self.unreadCount = count;
-        } else if(count == 0) {
+            $navElement.addClass("unread");
+        } else if(count === 0) {
             self.unreadCount = 0;
         }
         self.renderContactTree();
@@ -3538,15 +3544,15 @@ MegaChatRoom.prototype.renderContactTree = function() {
 
     var $navElement = self.getNavElement();
 
-    var $count = $('.messages-icon span', $navElement);
+    var $count = $('.nw-conversations-unread', $navElement);
 
     var count = self.unreadCount;
     if(count > 0) {
         $count.text(count);
-        $count.parent().show();
-    } else if(count == 0) {
-        $count.text('');
-        $count.parent().hide();
+        $navElement.addClass("unread");
+    } else if(count === 0) {
+        $count.text("");
+        $navElement.removeClass("unread");
     }
 
     $navElement.data('chatroom', self);

@@ -3279,7 +3279,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: rgba(10,164,227,0.5);
 }
 .nw-conversations-name {
-	margin-left: 32px;
+	margin: 0 25px 0 32px;
 	font-size: 11px;
 	line-height: 23px;
 	color: #666666;

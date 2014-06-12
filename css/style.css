@@ -3211,11 +3211,11 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-contact-name {
 	font-size: 11px;
-line-height: 21px;
-color: #666666;
-white-space: nowrap;
-margin: 14px 0 0 76px;
-overflow: hidden;
+	line-height: 21px;
+	color: #666666;
+	white-space: nowrap;
+	margin: 14px 0 0 76px;
+	overflow: hidden;
 }
 .nw-contact-item.selected .nw-contact-name {
 	color: white;
@@ -3246,6 +3246,31 @@ overflow: hidden;
 	padding-right: 15px;
 	overflow: hidden;
 	cursor: pointer;
+	position: relative;
+}
+.nw-conversations-unread {
+	position: absolute;
+	z-index: 10;
+	right: 17px;
+	top: 5px;
+	color: white;
+	background-color: #1FA4E7;
+	height: 14px;
+	min-width: 14px;
+	text-align: center;
+	line-height: 13px;
+	font-size: 11px;
+	padding: 0 3px;
+	-moz-border-radius: 14px;
+	-webkit-border-radius: 14px;
+	border-radius: 14px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	display: none;
+}
+.unread .nw-conversations-unread {
+	display: block;
 }
 .nw-conversations-item:hover {
 	background-color: rgba(10,164,227,0.1);
@@ -5525,17 +5550,17 @@ span.search-number {
 	display: block;
 }
 .long-path .active .create-new-folder, .long-path .active .add-user-popup {
-    margin: 36px 0 0 -141px;	
+	margin: 36px 0 0 -141px;
 }
 .long-path .create-folder-arrow, .long-path .add-user-popup-arrow {
-    margin: -12px 0 0 64px;	
+	margin: -12px 0 0 64px;
 }
 .create-folder-dialog {
-	min-width:334px;
-	min-height:154px;
-	left:50%;
-	top:50%;
-	margin:-77px 0 0 -167px; 	
+	min-width: 334px;
+	min-height: 154px;
+	left: 50%;
+	top: 50%;
+	margin: -77px 0 0 -167px;
 }
 .active .add-user-popup {
 	margin: 38px 0 0 -173px;
@@ -5564,11 +5589,11 @@ span.search-number {
 	margin: 12px -12px -12px -12px;
 	display: none;
 	-webkit-border-bottom-left-radius: 8px;
--moz-border-radius-bottomleft: 8px;
-border-bottom-left-radius: 8px;
--webkit-border-bottom-right-radius: 8px;
--moz-border-radius-bottomright: 8px;
-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
+	-webkit-border-bottom-right-radius: 8px;
+	-moz-border-radius-bottomright: 8px;
+	border-bottom-right-radius: 8px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -5578,7 +5603,7 @@ border-bottom-right-radius: 8px;
 }
 .filled-input .create-folder-input-bl {
 	width: 100%;
-	float:none;
+	float: none;
 }
 .create-folder-size-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -5590,25 +5615,25 @@ border-bottom-right-radius: 8px;
 	top: 6px;
 	right: 10px;
 	-webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
--moz-opacity: 0.3;
--khtml-opacity: 0.3;
-opacity: 0.3;
-cursor:pointer;
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: pointer;
 }
 .create-folder-size-icon:hover {
--moz-opacity: 0.6;
--khtml-opacity: 0.6;
-opacity: 0.6;
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
 }
 .create-folder-size-icon.short-size {
 	background-position: center -5559px;
-top: 16px;
-right: 40px;
+	top: 16px;
+	right: 40px;
 }
 .create-folder-input-bl, .add-user-popup-input-bl {
 	float: left;
@@ -5674,7 +5699,7 @@ right: 40px;
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-	cursor:pointer;
+	cursor: pointer;
 }
 .create-folder-button:hover, a.create-folder-button:hover, .add-user-popup-button:hover, a.add-user-popup-button:hover, .fm-dialog-new-folder-button:hover, .active .fm-dialog-new-folder-button {
 	background-color: rgba(109,176,63,1);
@@ -5840,7 +5865,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: none;
 }
 .fm-chat-messages-block.typing-template.typing {
-    display: block;
+	display: block;
 }
 .fm-chat-message-scroll .jspPane {
 	min-height: 100%;
@@ -5880,10 +5905,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	width: 100%;
 }
 .fm-chat-message-container {
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .fm-chat-user {
 	font-size: 12px;
@@ -5971,12 +5996,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .right-block .nw-contact-avatar {
 	float: right;
 }
-
 .fm-chat-message-container.grouped-message .nw-chat-date {
 	display: none;
 }
-
-
 .fm-chat-message-time {
 	width: 90px;
 	float: right;
@@ -6003,13 +6025,17 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	text-align: right;
 }
 .chat-date-line {
-	position:absolute; height:14px; margin:0 8px 0 8px; left:0; background-image: url(../images/mega/nw-fm-sprite.svg);
+	position: absolute;
+	height: 14px;
+	margin: 0 8px 0 8px;
+	left: 0;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: left -2290px;
 	background-repeat: repeat-x;
 	width: 100%;
-width: -webkit-calc(100% - 16px);
-width: -moz-calc(100% - 16px);
-width: calc(100% - 16px);
+	width: -webkit-calc(100% - 16px);
+	width: -moz-calc(100% - 16px);
+	width: calc(100% - 16px);
 }
 .nw-chat-date-txt {
 	font-size: 11px;
@@ -6018,9 +6044,9 @@ width: calc(100% - 16px);
 	background-color: white;
 	line-height: 13px;
 	padding: 0 10px 0 10px;
-	position:relative;
-	margin-right:-10px;
-	z-index:10;
+	position: relative;
+	margin-right: -10px;
+	z-index: 10;
 }
 .right-block .fm-chat-message {
 	margin: 0 34px 0 0;
@@ -6366,7 +6392,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-    text-indent: -9999px; /* accessability, allow smiley elements to be copied as text, by hidding the text from the
+	text-indent: -9999px; /* accessability, allow smiley elements to be copied as text, by hidding the text from the
                              user */
 }
 .fm-chat-smile.wink {
@@ -6393,14 +6419,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 .fm-chat-smile.angry {
 	background-position: -154px -34px;
 }
-
 .fm-chat-smile.mega {
-    background-image: url(../images/mega/top-sprite.svg);
-    background-position: left top;
-    background-repeat: no-repeat;
-    background-size: cover;
+	background-image: url(../images/mega/top-sprite.svg);
+	background-position: left top;
+	background-repeat: no-repeat;
+	background-size: cover;
 }
-
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);
 }
@@ -6524,7 +6548,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	right: auto;
 	margin: 0 0 0 -8px;
 }
-
 .fm-chat-download-button, .fm-chat-popup-button {
 	height: 32px;
 	line-height: 30px;
@@ -6698,7 +6721,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 }
 .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
-	min-width:440px;
+	min-width: 440px;
 	margin: -77px 0 0 -220px;
 }
 .fm-dialog.download-dialog {
@@ -6899,28 +6922,28 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .fm-dialog-close {
 	cursor: pointer;
-height: 30px;
-width: 30px;
-background-position: 9px -5961px;
-background-image: url(../images/mega/nw-fm-sprite.svg);
-background-repeat: no-repeat;
-position: absolute;
-right: 10px;
-tOp: 12px;
--webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
+	height: 30px;
+	width: 30px;
+	background-position: 9px -5961px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	position: absolute;
+	right: 10px;
+	tOp: 12px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
--moz-opacity: 0.3;
--khtml-opacity: 0.3;
-opacity: 0.3;
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .fm-dialog-close:hover {
 	-moz-opacity: 0.6;
--khtml-opacity: 0.6;
-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
 }
 .fm-dialog-body {
 	padding: 12px;
@@ -6975,9 +6998,8 @@ opacity: 0.6;
 	background-color: rgba(0,0,0,0.05);
 }
 .fm-dialog-new-folder-input {
-	float:none;
-	width:100%;
-	
+	float: none;
+	width: 100%;
 }
 .fm-dialog-input-clear {
 	width: 26px;
@@ -7021,24 +7043,24 @@ opacity: 0.6;
 	color: #b8baba;
 	margin: 12px 12px 0 0;
 	color: white;
-text-align: center;
-font-size: 12px;
-line-height: 30px;
--moz-border-radius: 4px;
--webkit-border-radius: 4px;
-border-radius: 4px;
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
-padding: 0 10px;
-display: block;
--webkit-transition: background-color 200ms ease-in-out;
--moz-transition: background-color 200ms ease-in-out;
--o-transition: background-color 200ms ease-in-out;
--ms-transition: background-color 200ms ease-in-out;
-transition: background-color 200ms ease-in-out;
-cursor: pointer;
-float:right;
+	text-align: center;
+	font-size: 12px;
+	line-height: 30px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 0 10px;
+	display: block;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	cursor: pointer;
+	float: right;
 }
 .fm-dialog-add-contact-button:hover, .fm-dialog-rename-button:hover, .fm-voucher-button:hover, .new-start-arrow-button:hover {
 	background-color: rgba(0,0,0,0.6);
@@ -7148,7 +7170,7 @@ float:right;
 	margin: 15px 0 0 10px;
 	cursor: pointer;
 	position: relative;
-	top:10px;
+	top: 10px;
 }
 .multiple-sharing .main-body .nw-chat-button {
 	top: 17px;
@@ -7581,8 +7603,7 @@ float:right;
 .export-link-body {
 	max-height: 420px;
 	overflow: hidden;
-	margin-top:12px;
-	
+	margin-top: 12px;
 }
 .export-link-item {
 	border-top: 2px solid #eeeeee;
@@ -7593,14 +7614,14 @@ float:right;
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	padding:20px 0 0 0;
+	padding: 20px 0 0 0;
 	height: 100px;
 }
 .export-icon {
 	height: 62px;
-width: 54px;
-float: left;
-margin: 0 0 0 20px;
+	width: 54px;
+	float: left;
+	margin: 0 0 0 20px;
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/files-icons.svg);
 	background-position: 0 0;
@@ -7630,8 +7651,8 @@ margin: 0 0 0 20px;
 }
 .export-link-item:first-child {
 	height: 76px;
-	border:0;
-	padding:0;
+	border: 0;
+	padding: 0;
 }
 .file-key {
 	display: none;

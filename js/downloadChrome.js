@@ -216,7 +216,6 @@ function FileSystemAPI(dl_id, dl) {
 			closeDialog();
 			dialog = false;
 		}
-		DEBUG('IO: error seems fixed');
 
 		dl_writing = false;
 		dl_done(); /* notify writer */

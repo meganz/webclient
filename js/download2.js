@@ -354,6 +354,8 @@ function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
+	ERRDEBUG("here", code, dlQueue._running);
+
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {

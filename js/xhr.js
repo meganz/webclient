@@ -30,10 +30,10 @@ function newXhr() {
 	}
 
 	xhr.onreadystatechange = function() {
-		ERRDEBUG('onready', xhr, this.__id);
 		xhr.setup_timeout();
 		if (!this.listener) return this.nolistener();
 		if (this.readyState == this.DONE && this.listener.on_ready) {
+			ERRDEBUG('onready', xhr, this.__id);
 			clearTimeout(xhr.__timeout);
 			if (xhr.status == 0) {
 				// no network error

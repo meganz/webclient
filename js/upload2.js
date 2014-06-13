@@ -121,8 +121,9 @@ function network_error_check() {
 		, ul = { error: 0, retries: 0}
 		, dl = { error: 0, retries: 0}
 
-	for (i = 0; i < ul_queue.length; i++) {
+	for (i = 0; i < dl_queue.length; i++) {
 		if (dl_queue[i] && dl_queue[i].dl_failed) {
+			if (d) console.log('Failed download:', dl_queue[i].zipname||dl_queue[i].n, 'Retries: ' + dl_queue[i].retries, dl_queue[i].zipid);
 			dl.retries += dl_queue[i].retries
 			if (dl_queue[i].retries++ == 5) {
 				/**

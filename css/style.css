@@ -5844,13 +5844,16 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	box-sizing: border-box;
 	padding: 0 20px 0 8px;
 }
-.fm-chat-message-pad {
+.fm-chat-message-pad, .fm-chat-message-container {
 	padding: 8px 21px 0 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	max-width: 1024px;
-	margin: 0 auto;
+	margin: 0;
+}
+.fm-chat-message-container {
+	padding-top:0;
 }
 .fm-chat-message-scroll .jspPane {
 	-webkit-box-sizing: border-box;

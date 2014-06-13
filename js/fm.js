@@ -3427,7 +3427,7 @@ function treeUI()
 	if (d) console.log('treeUI()',new Date().getTime()-tt);
 }
 
-function treeUIexpand(id,force)
+function treeUIexpand(id,force,moveDialog)
 {	
 	M.buildtree(M.d[id]);
 	
@@ -3950,41 +3950,66 @@ function mcDialog(close)
 			$('.move-dialog #bottomheader span').text(l[164]);
 		}		
 		var html;
-		if ($.mctype == 'move' || $.mctype == 'copy-cloud') html = $('.fm-tree-pad .fm-subfolders').first().html();	
-		else html = $('#treesub_contacts').html();
+		if ($.mctype == 'move' || $.mctype == 'copy-cloud') html = $('.content-panel.cloud-drive').html();
+		else html = $('.content-panel.contacts').html();
 		html = html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_');
-		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);		
+		
+		html = '<div class="fm-tree-panel">' + html + '</div>';
+		
+		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);
 		$('.move-dialog #mainsub').html(html);		
-		$('.move-dialog #mainsub ul').removeClass('opened');
-		$('.move-dialog #mainsub a').removeClass('expanded active lightactive');				
-		$('.move-dialog .messages-icon').hide();		
+		
+		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');		
+		$('.move-dialog ul').removeClass('opened');
+		
+		
+		
 		$.mctreeUI = function()
 		{
-			$('.move-dialog #mainsub a').unbind('click');		
-			$('.move-dialog #mainsub a').bind('click',function(e,ui)
+			$('.move-dialog .nw-fm-tree-item').unbind('click');
+			$('.move-dialog .nw-fm-tree-item').bind('click',function(e) 
 			{
-				$.mcselected = $(this).attr('id').replace('mctreea_','');				
-				M.buildtree(M.d[$.mcselected]);			
+				$.mcselected = $(this).attr('id').replace('mctreea_','');
+				M.buildtree(M.d[$.mcselected]);
 				var html = $('#treesub_'+$.mcselected).html();
 				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
 				$.mctreeUI();
-				var c = $(this).attr('class');
-				if (c.indexOf('contains-folders') > -1)
+				
+				var c = $(e.target).attr('class');
+				if (c && c.indexOf('nw-fm-arrow-icon') > -1)
 				{
-					c2 = $(this).next().attr('class');				
-					if ((c.indexOf('active') > -1 || e.offsetX < 25 || e.layerX < 25) && ((c2 && c2.indexOf('opened') > -1)))
-					{
-						$(this).next().removeClass('opened');					
-						$(this).removeClass('expanded');
+					var c = $(this).attr('class');					
+					if (c && c.indexOf('opened') > -1)
+					{							
+						$(this).removeClass('opened expanded');
+						$('#mctreesub_' + $.mcselected).removeClass('opened');						
 					}
-					else if ((c.indexOf('active') > -1 || e.offsetX < 25 || e.layerY < 25) && ((c2 && c2.indexOf('opened') == -1) || !c2))
+					else
 					{
-						$(this).next().addClass('opened');
-						$(this).addClass('expanded');				
-					}
+						$(this).addClass('opened expanded');
+						$('#mctreesub_' + $.mcselected).addClass('opened');
+					}				
 				}
-				$('.move-dialog .fm-move-dialog-body .fm-subfolders a').removeClass('active');
-				$(this).addClass('active');			
+				else
+				{					
+					var c = $(this).attr('class');
+					if (c && c.indexOf('selected') > -1)
+					{
+						if (c && c.indexOf('opened') > -1)
+						{
+							$(this).removeClass('opened expanded');
+							$('#mctreesub_' + $.mcselected).removeClass('opened');
+						}
+						else
+						{
+							$(this).addClass('opened expanded');
+							$('#mctreesub_' + $.mcselected).addClass('opened');
+						}
+					}
+					$('.move-dialog .nw-fm-tree-item').removeClass('selected');
+					$(this).addClass('selected');
+				}
+				
 				$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 				jScrollFade('.fm-move-dialog-body');
 				$('.move-dialog .move-button').addClass('active');

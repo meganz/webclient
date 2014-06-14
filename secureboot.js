@@ -415,7 +415,16 @@ else
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 		jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
-		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
+		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});		
+		
+		
+		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
+		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
+		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+		
+		
+		
+		
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
 		jsl.push({f:'js/functions.js', n: 'functions_js', j:1});

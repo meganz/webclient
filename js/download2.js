@@ -378,10 +378,8 @@ function failureFunction(task, args) {
 	/* check for network error  */
 	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
-	Later(function() {
-		dlQueue.pushFirst(task);
-		if (ioThrottlePaused) dlQueue.resume();
-	});
+	dlQueue.pushFirst(task);
+	if (ioThrottlePaused) dlQueue.resume();
 }
 
 DownloadQueue.prototype.push = function() {

@@ -1660,7 +1660,7 @@ function crypto_rsaencrypt(cleartext,pubkey)
 	// random padding
 	for (var i = (pubkey[0].length)-1-cleartext.length; i-- > 0; ) cleartext += String.fromCharCode(rand(256));
 
-    var ciphertext = asmCrypto.bytes_to_string( asmCrypto.RSA.encrypt(cleartext,pubkey) );
+    var ciphertext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.encrypt(cleartext,pubkey) );
 
     var clen = ciphertext.length * 8;
     ciphertext = String.fromCharCode(clen/256)+String.fromCharCode(clen%256) + ciphertext;
@@ -1675,7 +1675,7 @@ function crypto_rsadecrypt(ciphertext,privkey)
     var l = (ciphertext.charCodeAt(0)*256+ciphertext.charCodeAt(1)+7)>>3;
     ciphertext = ciphertext.substr(2,l);
 
-    var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA.decrypt(ciphertext,privkey) );
+    var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.decrypt(ciphertext,privkey) );
 
 	return cleartext.substr(1);
 }

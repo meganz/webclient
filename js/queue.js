@@ -16,7 +16,7 @@ MegaQueue.prototype.isEmpty = function() {
 }
 
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
-    this._queue.unshift([arg, next || function() {}, self]);
+	this._queue.unshift([arg, next || function _MQPushFirstVOID() {}, self || null]);
 	this._process();
 };
 
@@ -42,8 +42,10 @@ MegaQueue.prototype.isPaused = function() {
 }
 
 function _queue_checker(tasks, next, error) {
-	return function(task, response) {
-		tasks.splice($.inArray(task, tasks), 1);
+	return function CCQueueChecker(task, response) {
+		ASSERT(task, 'Invalid Task.');
+		if (d > 1) console.error('** QC:', task, next, error);
+		if (task) tasks.splice($.inArray(task, tasks), 1);
 		if (response.length && response[0] === false) {
 			/**
 			 *	The first argument of .done(false) is false, which 
@@ -63,19 +65,20 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 		, callback = _queue_checker(tasks, next, error)
 
 	for (i=0; i < len; i++) {
-		this.push(tasks[i], callback);
+		this.push(tasks[i], tasks[i].ric_cb = callback);
 	}
 };
 
 MegaQueue.prototype.run_in_context = function(task) {
 	this._running++;
-	this._worker(task[0], function() {
+	this._worker(task[0], function MQRicStub() {
+		ASSERT(task[1], 'This should not be reached twice.');
 		if (!task[1]) return; /* already called */
-		this._running--;
 		task[1].apply(task[2], [task[0], arguments]);
 		task[0] = null;
 		task[1] = null;
 		task[2] = null;
+		this._running--;
 		this._process();
 	}.bind(this));
 }
@@ -146,7 +149,7 @@ MegaQueue.prototype._process = function(ms) {
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {
-    this._queue.push([arg, next || function() {}, self || null]);
+    this._queue.push([arg, next || function _MQPushVOID() {}, self || null]);
 	this.trigger('queue');
     this._process();
 };

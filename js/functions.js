@@ -589,6 +589,11 @@ function DEBUG() {
 	}
 }
 
+function ASSERT(what, msg) {
+	if (console.assert) console.assert(what, msg);
+	else if (!what) console.error('FAILED ASSERTION', msg);
+}
+
 /**
  *	Return a default callback for error handlign
  */

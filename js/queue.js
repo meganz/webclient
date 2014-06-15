@@ -71,11 +71,11 @@ MegaQueue.prototype.run_in_context = function(task) {
 	this._running++;
 	this._worker(task[0], function() {
 		if (!task[1]) return; /* already called */
+		this._running--;
 		task[1].apply(task[2], [task[0], arguments]);
 		task[0] = null;
 		task[1] = null;
 		task[2] = null;
-		this._running--;
 		this._process();
 	}.bind(this));
 }

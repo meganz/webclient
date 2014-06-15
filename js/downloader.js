@@ -188,8 +188,8 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 // }}}
 
 ClassChunk.prototype.request = function() {
+	this.has_failed = false; /* reset error flag */
 	this.xhr = getXhr(this);
-	
 	if (dlMethod == FileSystemAPI) {
 		var t = this.url.lastIndexOf('/dl/')
 			, r = this.url.lastIndexOf('/dl/')

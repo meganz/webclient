@@ -23,7 +23,9 @@ function newXhr() {
 	}
 
 	xhr.nolistener = function() {
-		DEBUG('Socket: no listener for socket', this.__id);
+		if (!this.__errored) {
+			ERRDEBUG('Socket: no listener for socket', this.__id);
+		}
 		this._abort();
 	}
 
@@ -31,7 +33,12 @@ function newXhr() {
 		xhr.setup_timeout();
 		if (!this.listener) return this.nolistener();
 		if (this.readyState == this.DONE && this.listener.on_ready) {
+			ERRDEBUG('onready', xhr, this.__id);
 			clearTimeout(xhr.__timeout);
+			if (xhr.status == 0) {
+				// no network error
+				return xhr.onerror(new Error("No network"));
+			}
 			this.listener.on_ready(arguments, this);
 			this.listener = null; /* we're done here, release this slot */
 		}
@@ -46,7 +53,7 @@ function newXhr() {
 		}
 	}
 
-	xhr.onerror = function() {
+	xhr.onerror = function(e) {
 		clearTimeout(xhr.__timeout);
 		if (!this.listener) return this.nolistener();
 		if (this.listener.on_error && !this.__errored) {
@@ -54,7 +61,7 @@ function newXhr() {
 			this.listener  = null; /* release */
 			this.__errored = true
 			this.abort();
-			DEBUG('Socket: onerror', this.__id);
+			ERRDEBUG('Socket: onerror', this.__id, e);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -71,7 +78,7 @@ function newXhr() {
 			this.listener  = null; /* release */
 			this.__errored = true
 			this.abort();
-			DEBUG('Socket: ontimeout', this.__id);
+			ERRDEBUG('Socket: ontimeout', this.__id);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);

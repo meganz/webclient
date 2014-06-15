@@ -381,7 +381,6 @@ else if (page == '#android')
 }
 else
 {
-<<<<<<< HEAD
     if (!b_u)
     {
         /*

@@ -133,7 +133,7 @@ function u_checklogin3a(res,ctx)
 		else if (!u_attr.privk) r = 2;
 		else r = 3;
 		
-		u_curve25519();
+		if (r == 3) u_curve25519();
 	}
 
 	ctx.checkloginresult(ctx,r);

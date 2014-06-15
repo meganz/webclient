@@ -1731,7 +1731,7 @@ function MegaData ()
 
 
 
-	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num)
+	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num, force)
 	{
 		var st;
 		if (dl_queue[dl_queue_num].zipid)
@@ -1769,8 +1769,8 @@ function MegaData ()
 		if (!bl) return false;
 		if (!$.transferprogress) $.transferprogress={};
 		if (kbps == 0) {
-			if (perc != 100 || $.transferprogress[id]) return false;
-			kbps = bl;
+			if (!force && (perc != 100 || $.transferprogress[id])) return false;
+			kbps = bl / 1024;
 		}
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;

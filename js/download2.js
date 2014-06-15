@@ -23,7 +23,7 @@ var DownloadManager = new function() {
 	var self = this
 		, locks = []
 		, removed = []
-	
+
 	function s2o(s) {
 		if (typeof s == "string") {
 			var parts = s.split(":");
@@ -32,7 +32,7 @@ var DownloadManager = new function() {
 		}
 		return s;
 	}
-	
+
 	function doesMatch(task, pattern) {
 		var _match = true;
 
@@ -173,7 +173,7 @@ var DownloadManager = new function() {
 
 	function task2id(pattern) {
 		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) {
-			if (typeof pattern.task.zipid == "number") { 
+			if (typeof pattern.task.zipid == "number") {
 				pattern = 'zipid:' + pattern.task.zipid;
 			} else {
 				pattern = 'id:' + pattern.task.id;
@@ -241,12 +241,10 @@ dlQueue.prepareNextTask = function() {
 };
 
 dlQueue.validateTask = function(pzTask, next) {
-	if (pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk) {
-		return true;
-	} else if (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk) {
-		return true;
-	}
-	return false;
+	var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk
+		|| (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk);
+	// if (d) console.log('dlQueue.validateTask', r, next, pzTask);
+	return r;
 };
 // }}}
 
@@ -291,7 +289,7 @@ function checkLostChunks(file)
 
 /**
  *	DownloadQueue
- *	
+ *
  *	Array extension to override push, so we can easily
  *	kick up the download (or queue it) without modifying the
  *	caller codes
@@ -316,7 +314,7 @@ DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
 DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	var dl_chunks = []
 		, dl_chunksizes = []
-	
+
 	var pp, p = pp = 0;
 	for (var i = 1; i <= 8 && p < dl_filesize-i*"128".KB(); i++) {
 		dl_chunksizes[p] = i*"128".KB()
@@ -354,32 +352,34 @@ function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
-	ERRDEBUG("here", code, dlQueue._running);
-
 	if (code == 509) {
 		var t = new Date().getTime();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
 			dl_lastquotawarning = t;
-			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS);
+			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
 			setTimeout(function() {
 				dlQueue.pushFirst(task);
 				if (ioThrottlePaused) dlQueue.resume();
 			}, 60000);
-			return;
+			return 1;
 		}
 	}
 
+	ASSERT(code != 403, 'Got a 403 response, fixme.');
+
 	// DEBUG2(dl.name, "failed ", code);
-	if (d) console.error('Fai1ure', dl.zipname || dl.n, code );
+	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.ric_cb );
 
 	/* update UI */
-	dl_reportstatus(dl, EAGAIN); 
+	dl_reportstatus(dl, EAGAIN);
 
 	/* check for network error  */
 	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
-	dlQueue.pushFirst(task);
+	dlQueue.pushFirst(task, task.ric_cb);
 	if (ioThrottlePaused) dlQueue.resume();
+
+	return 2;
 }
 
 DownloadQueue.prototype.push = function() {
@@ -393,7 +393,7 @@ DownloadQueue.prototype.push = function() {
 
 	if (dl.zipid) {
 		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = new dlZipIO(dl, dl_id); 
+			Zips[dl.zipid] = new dlZipIO(dl, dl_id);
 		}
 		var tZip = Zips[dl.zipid];
 		dlIO.write = tZip.getWriter(dl);
@@ -402,7 +402,7 @@ DownloadQueue.prototype.push = function() {
 	}
 
 	if (!use_workers) {
-		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);	
+		dl.aes = new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 	}
 
 	/* In case it failed and it was manually cancelled and retried */
@@ -433,7 +433,7 @@ function dl_reportstatus(dl, code)
 		dl.lasterror = code;
 		dl.onDownloadError(dl.dl_id, code, dl.pos);
 	}
-	
+
 	if(code === EKEY) {
 		// TODO: Check if other codes should raise abort()
 		DownloadManager.abort(dl, true);
@@ -452,7 +452,7 @@ function dlGetUrlDone(res, ctx) {
 
 			if (typeof o == 'object' && typeof o.n == 'string') {
 				if (have_ab && res.s <= 48*1048576 && is_image(o.n) && (!res.fa || res.fa.indexOf(':0*') < 0 || res.fa.indexOf(':1*') < 0 || ctx.object.preview === -1)) {
-					ctx.object.data = new ArrayBuffer(res.s);				
+					ctx.object.data = new ArrayBuffer(res.s);
 				}
 				return ctx.next(false, res, o, ctx.object);
 			}
@@ -463,17 +463,17 @@ function dlGetUrlDone(res, ctx) {
 	} else {
 		dl_reportstatus(ctx.object, EAGAIN);
 	}
-	
+
 	dl_retryinterval *= 1.2;
 	ctx.next(new Error("failed"))
 }
 
 function dlGetUrl(object, callback) {
-	var req = { 
-		a : 'g', 
-		g : 1, 
+	var req = {
+		a : 'g',
+		g : 1,
 		ssl : use_ssl,
-	} 
+	}
 
 	if (object.ph) {
 		req.p = object.ph;
@@ -490,14 +490,23 @@ function dlGetUrl(object, callback) {
 }
 
 function IdToFile(id) {
-	var dl = {}
-	$.each(dl_queue, function(i, _dl) {
-		if (id == _dl.id) {
-			dl = _dl
-			dl.pos = i
-			return false;
+	var dl = {};
+	for (var i in dl_queue)
+	{
+		if (id == dl_queue[i].id)
+		{
+			dl = dl_queue[i];
+			ASSERT(dl.pos == i, 'dl.pos !== i');
+			break;
 		}
-	});
+	}
+	// $.each(dl_queue, function(i, _dl) {
+		// if (id == _dl.id) {
+			// dl = _dl
+			// dl.pos = i
+			// return false;
+		// }
+	// });
 	return dl;
 }
 

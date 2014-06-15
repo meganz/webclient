@@ -8775,7 +8775,7 @@ table {
 	background-position: -2px -4633px;
 }
 .download-item .context-menu-icon {
-	background-position: -3px -4312px;
+	background-position: -3px -5212px;
 }
 .folder-item .context-menu-icon {
 	background-position: -3px -4556px;
@@ -8807,8 +8807,8 @@ table {
 .newfolder-item .context-menu-icon {
 	background-position: -1px -5160px;
 }
-.fileupload-item .context-menu-icon {
-	background-position: -3px -5212px;
+.fileupload-item .context-menu-icon {	
+	background-position: -3px -4312px;
 }
 .folderupload-item .context-menu-icon {
 	background-position: -1px -5250px;

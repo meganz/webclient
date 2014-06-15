@@ -2630,7 +2630,6 @@ var u_pubk25519;
 
 function u_curve25519()
 {
-	console.log('u_curve25519');
 	var keySeed,newKey=false;
 	if (!u_attr['keySeed'] && !u_keySeed)
 	{

@@ -32,6 +32,10 @@ function newXhr() {
 		xhr.setup_timeout();
 		switch(this.readyState) {
 			case 4:
+				var s = (this.status+"")[0]
+				if (s != '2' && s != '3') {
+					return this.onerror();
+				}
 				if (this.listener.on_ready) {
 					clearTimeout(xhr.__timeout);
 					if(0xDEAD === this.listener.on_ready(arguments, this)) {

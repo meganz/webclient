@@ -141,25 +141,15 @@ ClassChunk.prototype.on_progress = function(args) {
 
 // XHR::on_error {{{
 ClassChunk.prototype.on_error = function(args, xhr) {
-	if (d) console.error('ClassChunk.on_error', this.task.chunk_id, args, xhr, this);
+	ERRDEBUG('ClassChunk.on_error', this.task.chunk_id, args, xhr, this);
 
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-/*	if (this.done) {
-		// We already told the scheduler we were done
-		// with no error and this happened. Should I reschedule this
-		// task?
-		this.failed = true;
-		return setTimeout(function(q) {
-			q.request();
-		}, this.backoff *= 1.2, this);
-	}*/
-
-	// this.xhr = null;
-	// return this.task_done(false, xhr.status);
-	// return this.finish_download(false, xhr.status);
 	this.failed = this.done;
+	// If there was an socket error, keep retrying
+	// Good idea @diegocr, much better than. I'm setting the backoff
+	// max value of 15 minutes. Better approach?
 	return setTimeout(function()
 	{
 		if (this.backoff > 40000)
@@ -167,7 +157,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 			this.backoff = 950+Math.floor(Math.random()*9e3);
 		}
 		this.finish_download(false, xhr.status);
-	}.bind(this), this.backoff *= 1.2 );
+	}.bind(this), Math.min(this.backoff *= 1.2, 15*60*1000));
 }
 // }}}
 

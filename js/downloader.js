@@ -1,8 +1,8 @@
 var fetchingFile = null, __ccXID = 0
 	/**
-	 *  How many queue IO we want before pausing the 
+	 *  How many queue IO we want before pausing the
 	 *	XHR fetching, useful when we have internet
-	 *  faster than our IO (first world problem) 
+	 *  faster than our IO (first world problem)
 	 */
 	, IO_THROTTLE = 15
 
@@ -20,7 +20,7 @@ function ClassChunk(task) {
 	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'file_' + this.dl.dl_id
 	this.xid  = this.gid + "_" + (++__ccXID)
 	this.failed   = false
-	this.backoff  = 1000
+	this.backoff  = 1936+Math.floor(Math.random()*2e3);
 	this.lastPing = NOW()
 	this.lastUpdate = NOW()
 	this.Progress   = GlobalProgress[this.gid]
@@ -41,16 +41,20 @@ ClassChunk.destroy = function() {
 // }}}
 
 // shouldIReportDone {{{
-ClassChunk.prototype.shouldIReportDone = function() {
-	if (!this.Progress.data[this.xid]) return;
-	var remain = this.Progress.data[this.xid][1]-this.Progress.data[this.xid][0]
-		, report_done = !this.done && iRealDownloads <= dlQueue._limit * 1.2 && remain/this.Progress.speed <= dlDoneThreshold
+ClassChunk.prototype.shouldIReportDone = function(report_done) {
+	var pbx = this.Progress.data[this.xid];
+	if (!pbx) return;
+
+	if (!report_done) report_done = !this.done && iRealDownloads <= dlQueue._limit * 1.2
+		&& (pbx[1]-pbx[0])/this.Progress.speed <= dlDoneThreshold;
 
 	if (report_done) {
 		DEBUG('reporting done() earlier to start another download');
 		this.done = true;
 		this.task_done();
 	}
+
+	return report_done;
 };
 // }}}
 
@@ -61,30 +65,31 @@ ClassChunk.prototype.updateProgress = function(force) {
 		return false;
 	}
 
-	this.shouldIReportDone();
+	// var r = this.shouldIReportDone(force === 2);
+	var r = force !== 2 ? this.shouldIReportDone() : 0x7f;
 	if (this.Progress.dl_lastprogress+200 > NOW() && !force) {
 		// too soon
 		return false;
 	}
 	var _progress = this.Progress.done
-	$.each(this.Progress.data, function(i, val) {
-		_progress += val[0];
-	});
-			
-	var percentage = Math.floor(_progress/this.Progress.size*100);
-	percentage = (percentage == 100) ? 99 : percentage;
+	for (var i in this.Progress.data) {
+		_progress += this.Progress.data[i][0];
+	}
 
 	this.dl.onDownloadProgress(
-		this.dl.dl_id, 
-		percentage, 
+		this.dl.dl_id,
+		Math.min(99,Math.floor(_progress/this.Progress.size*100)),
 		_progress, // global progress
 		this.Progress.size, // total download size
 		this.Progress.speed = this.Progress.dl_xr.update(_progress - this.Progress.dl_prevprogress),  // speed
-		this.dl.pos // this download position
+		this.dl.pos, // this download position
+		force
 	);
 
 	this.Progress.dl_prevprogress = _progress
 	this.Progress.dl_lastprogress = NOW()
+
+	return r;
 }
 // }}}
 
@@ -105,7 +110,6 @@ ClassChunk.prototype.isCancelled = function() {
 	if (is_cancelled) {
 		this._cancelled = true;
 		DEBUG("Chunk aborting itself because download was cancelled ", this.localId);
-		this.xhr.abort();
 		this.finish_download();
 		return true;
 	}
@@ -113,43 +117,57 @@ ClassChunk.prototype.isCancelled = function() {
 // }}}
 
 // finish_download {{{
-ClassChunk.prototype.finish_download = function() {
-	if (this.is_finished) return;
-	this.is_finished  = true;
-	this.xhr = null;
-	if (!this.done) this.task_done();
-	iRealDownloads--;
+ClassChunk.prototype.finish_download = function(NoError) {
+	ASSERT(!!this.xhr, "Don't call me twice!");
+	if (this.xhr) {
+		ASSERT(iRealDownloads > 0, 'Inconsistent iRealDownloads');
+		this.xhr.abort();
+		delete this.xhr;
+		iRealDownloads--;
+		if (!this.done || NoError === false) {
+			this.task_done.apply(this, arguments);
+		}
+	}
 }
 // }}}
 
 // XHR::on_progress {{{
 ClassChunk.prototype.on_progress = function(args) {
-	if (this.isCancelled() || !this.Progress.data[this.xid]) return;
-	this.Progress.data[this.xid][0] = args[0].loaded;
-	this.updateProgress();
+	if (!this.Progress.data[this.xid] || this.isCancelled()) return;
+	if (args[0].loaded) this.Progress.data[this.xid][0] = args[0].loaded;
+	this.updateProgress(!!args[0].zSaaDc ? 0x9a : 0);
 };
 // }}}
 
 // XHR::on_error {{{
 ClassChunk.prototype.on_error = function(args, xhr) {
-	if (this.has_failed) return;
-	this.has_failed = true;
+	if (d) console.error('ClassChunk.on_error', this.task.chunk_id, args, xhr, this);
 
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
-	this.updateProgress(true);
+	this.updateProgress(2);
 
-	if (this.done) {
+/*	if (this.done) {
 		// We already told the scheduler we were done
-		// with no error and this happened. Should I reschedule this 
+		// with no error and this happened. Should I reschedule this
 		// task?
 		this.failed = true;
 		return setTimeout(function(q) {
 			q.request();
 		}, this.backoff *= 1.2, this);
-	}
+	}*/
 
-	this.xhr = null;
-	return this.task_done(false, xhr.status);
+	// this.xhr = null;
+	// return this.task_done(false, xhr.status);
+	// return this.finish_download(false, xhr.status);
+	this.failed = this.done;
+	return setTimeout(function()
+	{
+		if (this.backoff > 40000)
+		{
+			this.backoff = 950+Math.floor(Math.random()*9e3);
+		}
+		this.finish_download(false, xhr.status);
+	}.bind(this), this.backoff *= 1.2 );
 }
 // }}}
 
@@ -166,9 +184,9 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		}
 		this.dl.decrypter++;
 		Decrypter.push([
-			[this.dl, this.task.offset], 
-			this.dl.nonce, 
-			this.task.offset/16, 
+			[this.dl, this.task.offset],
+			this.dl.nonce,
+			this.task.offset/16,
 			new Uint8Array(r)
 		])
 		if (this.failed) DownloadManager.release(this);
@@ -177,17 +195,15 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		this.finish_download();
 		this.dl.retries = 0;
 	} else if (!this.dl.cancelled) {
-		DEBUG(xhr.status, r.bytesLength, this.size);
-		DEBUG("HTTP FAILED", this.dl.n, xhr.status, "am i done?", this.done);
-		r = null;
-		return this.on_error(null, xhr);
+		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r.bytesLength, this.size);
+		return 0xDEAD;
 	}
 };
 // }}}
 
 ClassChunk.prototype.request = function() {
-	this.has_failed = false; /* reset error flag */
 	this.xhr = getXhr(this);
+
 	if (dlMethod == FileSystemAPI) {
 		var t = this.url.lastIndexOf('/dl/')
 			, r = this.url.lastIndexOf('/dl/')
@@ -196,7 +212,7 @@ ClassChunk.prototype.request = function() {
 	} else {
 		this.xhr.open('POST', this.url, true);
 	}
-	
+
 	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 	this.xhr.send();
 	DEBUG("Fetch " + this.url);
@@ -206,7 +222,7 @@ ClassChunk.prototype.run = function(task_done) {
 	iRealDownloads++;
 	this.localId = iRealDownloads;
 	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
-		/** 
+		/**
 		 *	It is an small chunk and we *should* finish soon if everything goes
 		 *	fine. We release our slot so another chunk can start now. It is useful
 		 *	to speed up tiny downloads on a ZIP file
@@ -214,7 +230,7 @@ ClassChunk.prototype.run = function(task_done) {
 		this.done = true;
 		task_done();
 	}
-	
+
 	this.task_done = task_done;
 	if (!this.io.dl_bytesreceived) {
 		this.io.dl_bytesreceived = 0;
@@ -250,18 +266,18 @@ function ClassFile(dl) {
 }
 
 ClassFile.prototype.destroy = function() {
-	if (!this.emptyFile && !checkLostChunks(this.dl) &&  
+	if (!this.emptyFile && !checkLostChunks(this.dl) &&
 		(typeof skipcheck == 'undefined' || !skipcheck)) {
 		dl_reportstatus(this.dl, EKEY);
 	}
 
 	if (!this.dl.cancelled) {
-		DEBUG("done donwload", this.dl.zipid, this.dl.cancelled)
+		DEBUG("done download", this.dl.zipid, this.dl.cancelled)
 		if (this.dl.zipid) {
 			this.task = null;
 			return Zips[this.dl.zipid].done();
 		}
-		
+
 		this.dl.onDownloadProgress(
 			this.dl.dl_id,
 			100,
@@ -270,7 +286,7 @@ ClassFile.prototype.destroy = function() {
 			0,
 			this.dl.pos
 		);
-		
+
 		this.dl.onBeforeDownloadComplete(this.dl.pos);
 		if (!this.dl.preview) {
 			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
@@ -296,8 +312,8 @@ ClassFile.prototype.run = function(task_done) {
 	var self = this;
 
 	this.dl.ready = function() {
-		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0) 
-		if (this.chunkFinished && this.dl.writer.isEmpty() && this.dl.decrypter == 0) {
+		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0)
+		if (this.chunkFinished && this.dl.decrypter == 0 && this.dl.writer.isEmpty()) {
 			DEBUG('destroy');
 			this.destroy();
 			self = null;
@@ -309,31 +325,30 @@ ClassFile.prototype.run = function(task_done) {
 		if(d) console.log('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
 		$.each(self.dl.urls||[], function(key, url) {
 			tasks.push(new ClassChunk({
-				url: url.url, 
-				offset: url.offset, 
-				size: url.size, 
-				download: self.dl, 
+				url: url.url,
+				offset: url.offset,
+				size: url.size,
+				download: self.dl,
 				chunk_id: key,
 				zipid: self.dl.zipid,
 				id: self.dl.id
 			}));
 		});
 
-		delete self.dl.urls;
-
 		self.emptyFile = false;
 		if (tasks.length == 0) {
 			self.emptyFile = true;
 			tasks.push(new ClassEmptyChunk(self.dl));
 		}
-		self.dl.io.begin = null;
-		
-		dlQueue.pushAll(tasks, function() {
-			self.chunkFinished = true
-		}, failureFunction);
-		
+
+		dlQueue.pushAll(tasks, function onChunkFinished() { self.chunkFinished = true }, failureFunction);
+
 		fetchingFile = 0;
-		task_done();	
+		task_done();
+
+		delete self.dl.urls;
+		delete self.dl.io.begin;
+		task_done = null;
 	};
 
 	dlGetUrl(this.dl, function(error, res, o) {
@@ -360,13 +375,10 @@ ClassFile.prototype.run = function(task_done) {
 // }}}
 
 function dl_writer(dl, is_ready) {
-	var paused = false;
-	is_ready = is_ready || function() { return true; };
 
 	dl.decrypter = 0;
 
-	dl.writer = new MegaQueue(function (task, done) {
-		var Scheduler = this;
+	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
 			if (dl.data) {
@@ -395,8 +407,9 @@ function dl_writer(dl, is_ready) {
 	dl.writer.pos = 0
 
 	dl.writer.validateTask = function(t) {
-		if (!is_ready()) return null;
-		return t.offset == dl.writer.pos;
+		var r = (!is_ready || is_ready()) && t.offset == dl.writer.pos;
+		// if (d) console.log('validateTask', r, t.offset, dl.writer.pos, t, dl, dl.writer);
+		return r;
 	};
 };
 
@@ -424,9 +437,9 @@ var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
 	}
 }, 4);
 
-/** 
+/**
  *	Keep in track real active downloads.
- *	
+ *
  *	Despite the fact that the DownloadQueue has a limitted size,
  *	to speed up things for tiny downloads each download is able to
  *	report to the scheduler that they are done when it may not be necessarily
@@ -435,7 +448,6 @@ var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
 var iRealDownloads = 0
 	// ETA (in seconds) to consider a download finished, used to speed up chunks
 	, dlDoneThreshold = 3
-
 
 function downloader(task, done) {
 	if (DownloadManager.isRemoved(task)) {
@@ -458,13 +470,13 @@ function getxr()
 				return 0;
 			}
 			if (b) this.tb[ts] = this.tb[ts] ? this.tb[ts]+b : b;
-			b = 0;			
+			b = 0;
 			for (t in this.tb)
 			{
 				t = parseInt(t);
 				if (t < ts-this.window) delete this.tb[t];
 				else b += this.tb[t];
-			}			
+			}
 			if (!b)
 			{
 				this.st = 0;
@@ -473,9 +485,9 @@ function getxr()
 			else if (!this.st) this.st = ts;
 
 			if (!(ts -= this.st)) return 0;
-			
+
 			if (ts > this.window) ts = this.window;
-			
+
 			return b/ts;
 		},
 
@@ -484,4 +496,3 @@ function getxr()
 		window : 60000
 	}
 }
-

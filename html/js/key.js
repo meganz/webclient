@@ -50,7 +50,11 @@ function key_step2()
 	$.killarkanoid=true;
 	$('.key1').addClass('hidden');
 	$('.key2').removeClass('hidden');
-	if (typeof u_privk == 'undefined') crypto_rsagenkey();
+	if (typeof u_privk == 'undefined')
+	{
+		crypto_rsagenkey();
+		u_curve25519();
+	}
 	else ui_keycomplete();
 }
 

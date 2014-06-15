@@ -2630,27 +2630,28 @@ var u_pubk25519;
 
 function u_curve25519()
 {
+	var keySeed,newKey=false;
 	if (!u_attr['keySeed'] && !u_keySeed)
 	{
-		var keySeed = jodid25519.eddsa.generateKeySeed();
-		var pubKey  = jodid25519.eddsa.publicKey(keySeed);
-		api_req({'a':'up','keySeed':a32_to_base64(encrypt_key(u_k_aes,str_to_a32(keySeed)))});
-		api_req({'a':'up','+pubk25519':base64urlencode(pubKey)});
+		keySeed = jodid25519.eddsa.generateKeySeed();
+		newKey=true;
 	}
-	else 
-	{		
-		var keySeed = a32_to_str(decrypt_key(u_k_aes,str_to_a32(u_attr['keySeed'])));
-		var pubKey  = jodid25519.eddsa.publicKey(keySeed);
-	}	
-	u_keySeed 	= keySeed;
-	u_pubk25519 = pubKey;
+	else keySeed = a32_to_str(decrypt_key(u_k_aes,str_to_a32(u_attr['keySeed'])));
+	
+	u_keySeed	= keySeed;
+	u_pubk25519	= jodid25519.eddsa.publicKey(u_keySeed);
+	
+	if (newKey)
+	{
+		api_req({'a':'up','keySeed':a32_to_base64(encrypt_key(u_k_aes,str_to_a32(keySeed)))});
+		api_req({'a':'up','+pubk25519':base64urlencode(u_pubk25519)});
+	}
 }
 
 var pubk25519 = {};
 
 function getpubk25519(userhandle,callback)
-{	
-	// if cached, make immediate callback:
+{
 	if (pubk25519[userhandle]) callback(pubk25519[userhandle],userhandle);	
 	else
 	{

@@ -4198,7 +4198,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
-.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th {
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
@@ -4229,10 +4229,14 @@ th.grid-first-th {
 	transition: background-color 200ms ease-in-out;
 	background-color: rgba(238,238,238,0);
 }
-.grid-table tr:nth-child(odd) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
+.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
 	background-color: rgba(0,0,0,0.02);
 }
-.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
+.fm-account-main .grid-table tr:nth-child(odd) td {
+	background-color:white;
+	
+}
+.grid-table tr:hover td, .fm-account-main .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
 	background-color: rgba(238,238,238,1);
 }
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td {
@@ -4535,7 +4539,6 @@ table {
 .transfer-filtype-icon, .fm-browsers-icon, .fm-flags-icon, .fm-member-icon {
 	display: block;
 	position: absolute;
-	padding-top: 1px;
 }
 .transfer-filtype-icon {
 	padding: 0;

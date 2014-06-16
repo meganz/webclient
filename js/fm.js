@@ -3901,6 +3901,7 @@ function shareDialog(close)
 		$('.fm-share-permissions-block').addClass('hidden');
 	});
 	$('.share-dialog').removeClass('hidden');
+	$('.share-dialog').css('margin-top','-'+$('.share-dialog').height()/2+'px');
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-share-body').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
 	jScrollFade('.fm-share-body');

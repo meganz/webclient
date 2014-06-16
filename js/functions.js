@@ -944,6 +944,12 @@ function ASSERT(what, msg) {
 	else if (!what) console.error('FAILED ASSERTION', msg);
 }
 
+function oDestroy(obj) {
+	Object.keys(obj).forEach(function(memb) {
+		if (obj.hasOwnProperty(memb)) delete obj[memb];
+	});
+}
+
 /**
  *	Return a default callback for error handlign
  */

@@ -17,8 +17,8 @@ function newXhr() {
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
 		clearTimeout(this.__timeout);
-		xhr._abort();
 		this.listener = null; /* we're done here, release this slot */
+		xhr._abort();
 	}
 
 	xhr.nolistener = function() {

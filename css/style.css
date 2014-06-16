@@ -8022,16 +8022,15 @@ span.orange {
 }
 .properties-dialog label.iPhoneCheckLabelOn span, .properties-dialog label.iPhoneCheckLabelOff span, .fm-account-blocks label.iPhoneCheckLabelOn span, .fm-account-blocks label.iPhoneCheckLabelOff span, .share-dialog label.iPhoneCheckLabelOn span, .share-dialog label.iPhoneCheckLabelOff span {
 	display: block;
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: bold;
-	line-height: 19px;
-	padding-top: 1px;
+	line-height: 18px;
 }
 .properties-dialog label.iPhoneCheckLabelOn span, .fm-account-blocks label.iPhoneCheckLabelOn span, .reg-checkbox label.iPhoneCheckLabelOn, .share-dialog label.iPhoneCheckLabelOn span {
-	padding-left: 4px;
+	padding-left: 5px;
 }
 .properties-dialog label.iPhoneCheckLabelOff span, .fm-account-blocks label.iPhoneCheckLabelOff span, .reg-checkbox label.iPhoneCheckLabelOff span, .share-dialog label.iPhoneCheckLabelOff span {
-	padding-right: 5px;
+	padding-right: 7px;
 }
 .properties-dialog .iPhoneCheckContainer input, .fm-account-blocks .iPhoneCheckContainer input, .reg-checkbox .iPhoneCheckContainer input, .share-dialog .iPhoneCheckContainer input {
 	position: absolute;

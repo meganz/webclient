@@ -5891,7 +5891,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	margin: 0;
 }
 .fm-chat-message-container {
-	padding-top:0;
+	padding-top: 0;
 }
 .fm-chat-message-scroll .jspPane {
 	-webkit-box-sizing: border-box;
@@ -7162,10 +7162,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	padding: 0 0px 0 0;
 }
 .fm-move-top-block {
-	height:48px; background-color: #f2f2f2; margin-top:15px;
+	height: 48px;
+	background-color: #f2f2f2;
+	margin-top: 15px;
 }
 .fm-move-dialog-list {
-	padding:15px 0
+	padding: 15px 0
 }
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
 	background-color: #F6F6F6;
@@ -7414,14 +7416,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-empty {
 	background-image: url(../images/mega/share-folder.png?v=1);
-	background-position: center 60px;
-background-repeat: no-repeat;
-font-size: 18px;
-text-align: center;
-line-height: 30px;
-text-align: center;
-color: #999999;
-padding: 240px 10px 10px 10px;
+	background-position: center 40px;
+	background-repeat: no-repeat;
+	font-size: 18px;
+	text-align: center;
+	line-height: 30px;
+	text-align: center;
+	color: #999999;
+	padding: 240px 10px 10px 10px;
 }
 .fm-share-pointer {
 	width: 60px;
@@ -7485,7 +7487,7 @@ padding: 240px 10px 10px 10px;
 .fm-share-contacts-body {
 	height: 208px;
 	background-color: white;
-	width:100%;
+	width: 100%;
 }
 .fm-shared-to {
 	position: relative;
@@ -8848,7 +8850,7 @@ table {
 .newfolder-item .context-menu-icon {
 	background-position: -1px -5160px;
 }
-.fileupload-item .context-menu-icon {	
+.fileupload-item .context-menu-icon {
 	background-position: -3px -4312px;
 }
 .folderupload-item .context-menu-icon {
@@ -16881,7 +16883,6 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div {
 	direction: ltr;
 }
-
 .rtl .tranfer-filetype-txt, .rtl .fm-browsers-txt, .rtl .fm-flags-txt, .rtl.fm-member-icon-txt {
 	padding: 0 28px 0 0;
 	text-align: right;

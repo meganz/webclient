@@ -7437,6 +7437,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-body {
 	height: 318px;
+	margin-top: 12px;
 }
 .terms-body {
 	height: 100%;
@@ -8140,7 +8141,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	float: left;
 }
 .properties-file-link {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
 }
@@ -12480,7 +12481,8 @@ strong, b {
 }
 .share-folder-block {
 	min-height: 90px;
-	background-color: #eeeeee;
+	background-color: #F6F6F6;
+	margin:12px 0 -12px 0;
 }
 .share-folder-icon {
 	float: left;

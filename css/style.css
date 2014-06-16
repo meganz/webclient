@@ -8703,8 +8703,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-position: 2px -420px;
 	background-repeat: no-repeat;
 }
-.top-user-status-arrow, .membership-popup-arrow, .warning-popup-arrow {
+.top-user-status-arrow {
 	background-position: 2px -420px;
+}
+.membership-popup-arrow, .warning-popup-arrow {
+	background-position: 2px -440px;
 }
 .top-user-status-arrow {
 	float: none;

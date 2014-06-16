@@ -5213,6 +5213,9 @@ table {
 	cursor: pointer;
 	position: relative;
 }
+.long-path .fm-new-folder, .long-path .search-files-result, .long-path .fm-file-upload, .long-path .search-messages-result, .long-path .fm-folder-upload {
+	padding: 0 10px 0 24px;
+}
 .fm-new-folder.active, .fm-new-folder.hovered, .fm-new-folder:hover {
 	background-color: rgba(142,197,92,1);
 }

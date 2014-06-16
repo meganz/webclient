@@ -5915,7 +5915,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	padding: 0 20px 0 8px;
 }
 .fm-chat-message-pad, .fm-chat-message-container {
-	padding: 8px 21px 0 5px;
+	padding: 8px 21px 0 8px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

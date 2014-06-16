@@ -3085,7 +3085,7 @@ function transferPanelUI()
 	{		
 		fm_resize_handler();
 		var el = $('.transfer-table-header th');
-		$('.transfer-table th').each(function(i,e) {
+		$('.transfer-table tr:first-child td').each(function(i,e) {
 		  var headerColumn = $('.transfer-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });

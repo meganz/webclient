@@ -3164,7 +3164,7 @@ label.iPhoneCheckLabelOff span {
 .black .nw-contact-status {
 	background-color: black;
 }
-.nw-contact-avatar {
+.nw-contact-avatar, .contacts-avatar {
 	width: 32px;
 	height: 32px;
 	float: left;
@@ -3181,6 +3181,10 @@ label.iPhoneCheckLabelOff span {
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(0,0,0,0.06);
 	position: relative;
+	display:block;
+}
+.contacts-avatar {
+	margin: 0 0 0 12px;
 }
 .nw-verified-icon {
 	position: absolute;
@@ -3197,7 +3201,7 @@ label.iPhoneCheckLabelOff span {
 .verified .nw-verified-icon {
 	display: block;
 }
-.nw-contact-avatar img {
+.nw-contact-avatar img, .contacts-avatar img {
 	width: 28px;
 	height: 28px;
 	display: block;
@@ -3209,15 +3213,19 @@ label.iPhoneCheckLabelOff span {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.nw-contact-name {
+.nw-contact-name, .contacts-username {
 	font-size: 11px;
 	line-height: 21px;
 	color: #666666;
 	white-space: nowrap;
 	margin: 14px 0 0 76px;
 	overflow: hidden;
+	display:block;
 }
-.nw-contact-item.selected .nw-contact-name {
+.contacts-username {
+	margin: 6px 0 0 56px;
+}
+.nw-contact-item.selected .nw-contact-name, .contacts-avatar .contacts-username {
 	color: white;
 }
 .nw-conversations-header {
@@ -4241,19 +4249,19 @@ th.grid-first-th {
 	transition: background-color 200ms ease-in-out;
 	background-color: rgba(238,238,238,0);
 }
-.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
+.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(even) td, .transfer-table tr:nth-child(odd) td {
 	background-color: rgba(0,0,0,0.02);
 }
 .fm-account-main .grid-table tr:nth-child(odd) td {
 	background-color: white;
 }
-.grid-table tr:hover td, .fm-account-main .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
+.grid-table tr:hover td, .fm-account-main .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(even):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
 	background-color: rgba(238,238,238,1);
 }
-.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td {
+.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(even) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td {
 	background-color: rgba(225,225,225,1);
 }
-.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
+.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(even) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(225,225,225,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
@@ -5116,7 +5124,6 @@ table {
 	white-space: nowrap;
 	position: relative;
 	background-color: #f2f2f2;
-	padding-right:2px;
 }
 .fm-back-button {
 	display: none;
@@ -7187,6 +7194,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
 	position: relative;
+}
+.free-popup .fm-notifications-bottom, .pro-popup .fm-notifications-bottom {
+	-webkit-border-bottom-right-radius: 0;
+	-moz-border-radius-bottomright: 0;
+	border-bottom-right-radius: 0;
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	float: right;
@@ -12087,7 +12099,6 @@ span.browsers-update {
 }
 .pro-bottom-button {
 	height: 40px;
-	min-width: 128px;
 	float: right;
 	color: white;
 	padding: 0 15px 0 15px;

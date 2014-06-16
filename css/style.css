@@ -8474,7 +8474,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .membershtip-medium-txt {
 	font-size: 12px;
-	line-height: 20px;
+	line-height: 19px;
+	min-height:20px;
 	color: #333333;
 }
 .membershtip-small-txt {

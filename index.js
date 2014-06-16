@@ -1334,7 +1334,7 @@ function topmenuUI()
 		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));	
 	}
 	
-	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+107+'px');
+	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+108+'px');
 	initNotifications();
 
 	clearit(0);

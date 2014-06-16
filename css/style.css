@@ -5321,7 +5321,7 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-notification-settings, .fm-send-files, .fm-start-call {
+.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call {
 	height: 24px;
 	float: right;
 	font-size: 12px;

@@ -7664,9 +7664,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-notification-info {
 	margin-left: 90px;
+	display:table-cell;
+	vertical-align:middle;
+	height:80px;
 }
 .fm-notification-info p {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 21px;
 	padding: 0 0 0 0;
 	margin: 0;

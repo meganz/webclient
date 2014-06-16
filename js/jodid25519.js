@@ -1485,8 +1485,9 @@ define("jsbn", (function (global) {
     return function () {
         var ret, fn;
        fn = function (jsbn) {
+                // first case is for plain jsbn, second case is for jsbn node module
                 return {
-                    BigInteger: BigInteger,
+                    BigInteger: (typeof BigInteger !== "undefined") ? BigInteger : module.exports,
                 };
             };
         ret = fn.apply(global, arguments);

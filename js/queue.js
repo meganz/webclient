@@ -43,9 +43,13 @@ MegaQueue.prototype.isPaused = function() {
 
 function _queue_checker(tasks, next, error) {
 	return function CCQueueChecker(task, response) {
-		ASSERT(task, 'Invalid Task.');
 		if (d > 1) console.error('** QC:', task, next, error);
-		if (task) tasks.splice($.inArray(task, tasks), 1);
+		ASSERT(task, 'Invalid Task.');
+		if (task) {
+			var pos = $.inArray(task, tasks);
+			ASSERT(pos != -1, 'Unknown task!?');
+			if (pos != -1) tasks.splice(pos, 1);
+		}
 		if (response.length && response[0] === false) {
 			/**
 			 *	The first argument of .done(false) is false, which 
@@ -53,9 +57,8 @@ function _queue_checker(tasks, next, error) {
 			 */
 			return error(task, response);
 		}
-		if (tasks.length == 0) {
-			next();
-		}
+		// if (!task.tiny) task.destroy();
+		if (tasks.length == 0) next();
 	};
 };
 
@@ -138,9 +141,10 @@ MegaQueue.prototype.process = function() {
 
 MegaQueue.prototype.destroy = function() {
 	clearTimeout(this._later);
-	this._limit = -1
-	this._queue = null;
-	this._queue = [];
+	// this._limit = -1
+	// this._queue = null;
+	// this._queue = [];
+	oDestroy(this);
 }
 
 MegaQueue.prototype._process = function(ms) {

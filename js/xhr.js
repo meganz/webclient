@@ -17,8 +17,8 @@ function newXhr() {
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
 		clearTimeout(this.__timeout);
-		xhr._abort();
 		this.listener = null; /* we're done here, release this slot */
+		xhr._abort();
 	}
 
 	xhr.nolistener = function() {
@@ -32,10 +32,6 @@ function newXhr() {
 		xhr.setup_timeout();
 		switch(this.readyState) {
 			case 4:
-				var s = (this.status+"")[0]
-				if (s != '2' && s != '3') {
-					return this.onerror();
-				}
 				if (this.listener.on_ready) {
 					clearTimeout(xhr.__timeout);
 					if(0xDEAD === this.listener.on_ready(arguments, this)) {

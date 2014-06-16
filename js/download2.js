@@ -348,27 +348,28 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
+function dlQueuePushBack(aTask) {
+	ASSERT(aTask && aTask.ric_cb, 'Invalid aTask.');
+	dlQueue.pushFirst(aTask, aTask.ric_cb);
+	if (ioThrottlePaused) dlQueue.resume();
+}
+
 function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
+	ASSERT(code != 403, 'Got a 403 response, fixme.');
+	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.ric_cb );
+
 	if (code == 509) {
-		var t = new Date().getTime();
+		var t = NOW();
 		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
-			setTimeout(function() {
-				dlQueue.pushFirst(task);
-				if (ioThrottlePaused) dlQueue.resume();
-			}, 60000);
+			setTimeout(function() { dlQueuePushBack(task); }, 60000);
 			return 1;
 		}
 	}
-
-	ASSERT(code != 403, 'Got a 403 response, fixme.');
-
-	// DEBUG2(dl.name, "failed ", code);
-	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.ric_cb );
 
 	/* update UI */
 	dl_reportstatus(dl, EAGAIN);
@@ -376,8 +377,7 @@ function failureFunction(task, args) {
 	/* check for network error  */
 	dl.dl_failed = true;
 	api_reportfailure(hostname(dl.url), network_error_check);
-	dlQueue.pushFirst(task, task.ric_cb);
-	if (ioThrottlePaused) dlQueue.resume();
+	dlQueuePushBack(task);
 
 	return 2;
 }

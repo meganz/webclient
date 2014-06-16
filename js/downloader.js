@@ -33,10 +33,11 @@ function ClassChunk(task) {
 }
 
 // destroy {{{
-ClassChunk.destroy = function() {
-	this.dl   = null;
-	this.task = null;
-	this.io   = null;
+ClassChunk.prototype.destroy = function() {
+	ASSERT(!this.xhr, 'ClassChunk.xhr should not exists...');
+	if (this.xhr) this.xhr.abort();
+
+	oDestroy(this);
 };
 // }}}
 
@@ -190,10 +191,9 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			new Uint8Array(r)
 		])
 		if (this.failed) DownloadManager.release(this);
-		r = null
-		this.failed = false
-		this.finish_download();
+		this.failed = false;
 		this.dl.retries = 0;
+		this.finish_download();
 	} else if (!this.dl.cancelled) {
 		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r.bytesLength, this.size);
 		return 0xDEAD;
@@ -227,6 +227,7 @@ ClassChunk.prototype.run = function(task_done) {
 		 *	fine. We release our slot so another chunk can start now. It is useful
 		 *	to speed up tiny downloads on a ZIP file
 		 */
+		this.tiny = true;
 		this.done = true;
 		task_done();
 	}
@@ -297,9 +298,8 @@ ClassFile.prototype.destroy = function() {
 
 	delete GlobalProgress[this.gid];
 
-	this.task = null;
 	this.dl.writer.destroy();
-	delete this.dl;
+	oDestroy(this);
 }
 
 ClassFile.prototype.run = function(task_done) {
@@ -309,47 +309,43 @@ ClassFile.prototype.run = function(task_done) {
 	DEBUG("dl_key " + this.dl.key);
 	this.dl.onDownloadStart(this.dl.dl_id, this.dl.n, this.dl.size, this.dl.pos);
 
-	var self = this;
-
 	this.dl.ready = function() {
 		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0)
 		if (this.chunkFinished && this.dl.decrypter == 0 && this.dl.writer.isEmpty()) {
 			DEBUG('destroy');
 			this.destroy();
-			self = null;
 		}
 	}.bind(this);
 
 	this.dl.io.begin = function() {
 		var tasks = [];
-		if(d) console.log('Adding', (self.dl.urls||[]).length, 'tasks for', self.dl.dl_id);
-		$.each(self.dl.urls||[], function(key, url) {
-			tasks.push(new ClassChunk({
-				url: url.url,
-				offset: url.offset,
-				size: url.size,
-				download: self.dl,
-				chunk_id: key,
-				zipid: self.dl.zipid,
-				id: self.dl.id
-			}));
-		});
+		if (d) console.log('Adding', (this.dl.urls||[]).length, 'tasks for', this.dl.dl_id);
+		if (this.dl.urls) for (var key in this.dl.urls)
+		{
+			var url = this.dl.urls[key];
 
-		self.emptyFile = false;
-		if (tasks.length == 0) {
-			self.emptyFile = true;
-			tasks.push(new ClassEmptyChunk(self.dl));
+			tasks.push(new ClassChunk({
+				url      : url.url,
+				size     : url.size,
+				offset   : url.offset,
+				download : this.dl,
+				chunk_id : key,
+				zipid    : this.dl.zipid,
+				id       : this.dl.id
+			}));
 		}
 
-		dlQueue.pushAll(tasks, function onChunkFinished() { self.chunkFinished = true }, failureFunction);
+		if ((this.emptyFile = (tasks.length == 0))) tasks.push(new ClassEmptyChunk(this.dl));
+
+		dlQueue.pushAll(tasks, function onChunkFinished() { this.chunkFinished = true }.bind(this), failureFunction);
 
 		fetchingFile = 0;
 		task_done();
 
-		delete self.dl.urls;
-		delete self.dl.io.begin;
+		delete this.dl.urls;
+		delete this.dl.io.begin;
 		task_done = null;
-	};
+	}.bind(this);
 
 	dlGetUrl(this.dl, function(error, res, o) {
 		if (error) {
@@ -358,19 +354,18 @@ ClassFile.prototype.run = function(task_done) {
 			task_done(); /* release worker */
 			setTimeout(function() {
 				/* retry !*/
-				ERRDEBUG('retrying ', self.dl.n);
-				dlQueue.pushFirst(self);
+				ERRDEBUG('retrying ', this.dl.n);
+				dlQueue.pushFirst(this);
 				if (ioThrottlePaused) dlQueue.resume();
 			}, dl_retryinterval);
 			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
 			return false;
 		}
 		var info = dl_queue.splitFile(res.s);
-		self.dl.url  = res.g;
-		self.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-		return self.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-	});
-
+		this.dl.url  = res.g;
+		this.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+		return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+	}.bind(this));
 };
 // }}}
 
@@ -397,8 +392,7 @@ function dl_writer(dl, is_ready) {
 
 			dl.ready(); /* tell the download scheduler we're done */
 
-			task.data = null
-			task.null = null
+			delete task.data;
 		});
 	}, 1);
 

@@ -1595,7 +1595,7 @@ function MegaData ()
 		if (!$.transferprogress) $.transferprogress={};
 		if (kbps == 0) {
 			if (!force && (perc != 100 || $.transferprogress[id])) return false;
-			kbps = bl / 1024;
+			kbps = 1; // hm,
 		}
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;

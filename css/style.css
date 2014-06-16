@@ -5113,6 +5113,7 @@ table {
 	white-space: nowrap;
 	position: relative;
 	background-color: #f2f2f2;
+	padding-right:2px;
 }
 .fm-back-button {
 	display: none;
@@ -5410,7 +5411,7 @@ span.search-number {
 }
 .fm-files-view-icon.block-view, .fm-contacts-view-icon.block-view {
 	background-position: -24px -1335px;
-	margin: 15px 24px 0 0;
+	margin: 15px 22px 0 0;
 }
 .fm-files-view-icon.listing-view:hover, .fm-contacts-view-icon.listing-view:hover, .fm-files-view-icon.block-view:hover, .fm-contacts-view-icon.block-view:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);

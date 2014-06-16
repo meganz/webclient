@@ -6821,8 +6821,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .fm-dialog.avatar-dialog {
 	min-width: 404px;
-	height: 534px;
-	margin: -267px 0 0 -202px;
+	height: 539px;
+	margin: -269px 0 0 -202px;
 	overflow: hidden;
 }
 .fm-dialog.terms-dialog {
@@ -9431,6 +9431,10 @@ table {
 	padding: 0 15px;
 	margin: 14px 0;
 	cursor: pointer;
+}
+.fm-account-change-avatar {
+	padding: 0 10px;
+margin: 37px 0 15px 0;
 }
 .fm-account-save, .fm-account-cancel {
 	float: right;
@@ -12789,9 +12793,6 @@ strong, b {
 .image-upload-and-crop-container .image-upload-field[disabled] + .image-upload-field-replacement:active {
 	-webkit-box-shadow: none;
 	box-shadow: none;
-}
-.image-upload-and-crop-container .image-upload-field-replacement {
-	color: #333;
 }
 .image-upload-and-crop-container .image-explorer-container {
 	margin: 0 auto;

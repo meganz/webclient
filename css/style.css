@@ -3889,6 +3889,9 @@ label.iPhoneCheckLabelOff span {
 .fm-left-menu.rubbish-bin {
 	background-color: rgba(115,172,58,1);
 }
+.fm-left-menu.notifications {
+	background-color: rgba(213,22,0,1);
+}
 .nw-fm-left-icons-panel {
 	background-color: #222222;
 	width: 48px;
@@ -3907,8 +3910,14 @@ label.iPhoneCheckLabelOff span {
 	color: white;
 	display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
+}
+.notifications .nw-fm-tree-header {
+	padding: 0 0 0 58px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -6143px;
 }
 .nw-fm-settins-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -4233,8 +4242,7 @@ th.grid-first-th {
 	background-color: rgba(0,0,0,0.02);
 }
 .fm-account-main .grid-table tr:nth-child(odd) td {
-	background-color:white;
-	
+	background-color: white;
 }
 .grid-table tr:hover td, .fm-account-main .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
 	background-color: rgba(238,238,238,1);
@@ -5097,7 +5105,7 @@ table {
 	height: 100%;
 	margin-left: 304px;
 }
-.fm-right-header {
+.fm-right-header, .new-notification-top {
 	height: 48px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5189,7 +5197,7 @@ table {
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
-.fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload {
+.fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	float: right;
 	height: 24px;
 	font-size: 12px;
@@ -5219,8 +5227,13 @@ table {
 .long-path .fm-new-folder, .long-path .search-files-result, .long-path .fm-file-upload, .long-path .search-messages-result, .long-path .fm-folder-upload {
 	padding: 0 10px 0 24px;
 }
-.fm-new-folder.active, .fm-new-folder.hovered, .fm-new-folder:hover {
+.fm-new-folder.active, .fm-new-folder.hovered, .fm-new-folder:hover, .fm-notification-settings:hover {
 	background-color: rgba(142,197,92,1);
+}
+.fm-notification-settings, a.fm-notification-settings {
+	background-position: -18px -6106px;
+	color: white;
+	padding: 0 10px 0 28px;
 }
 .fm-file-upload, .search-messages-result, .fm-folder-upload {
 	-moz-border-radius: 8px;
@@ -5363,28 +5376,6 @@ span.search-number {
 }
 .fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
 	background-position: right -1640px;
-}
-.fm-notification-settings {
-	background-image: url(../images/mega/notification-icons.png);
-	background-position: 9px 4px;
-	background-repeat: no-repeat;
-	padding: 0 10px 0 37px;
-	margin: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-	-webkit-border-bottom-right-radius: 4px;
-	-moz-border-radius-bottomright: 4px;
-	border-bottom-right-radius: 4px;
-	-webkit-border-top-right-radius: 4px;
-	-moz-border-radius-topright: 4px;
-	border-top-right-radius: 4px;
-}
-.fm-notification-settings:hover {
-	background-color: #D22000;
-	border-color: #D22000;
-	color: white;
-	background-position: 9px -66px;
 }
 .fm-clearbin-button {
 	background-position: -3px -5820px;
@@ -5685,7 +5676,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
-.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input  {
+.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input {
 	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5703,14 +5694,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border: 0;
 }
 .fm-account-input {
-	margin:20px 0 0 0;
+	margin: 20px 0 0 0;
 }
 .fm-account-input:first-child {
-	margin:10px 0 0 0;
+	margin: 10px 0 0 0;
 }
 .fm-account-input input {
 	padding: 0 10px 0 10px;
-	background-image:none;
+	background-image: none;
 }
 .fm-account-select {
 	background-position: right -6593px;
@@ -8478,7 +8469,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .membershtip-medium-txt {
 	font-size: 12px;
 	line-height: 19px;
-	min-height:20px;
+	min-height: 20px;
 	color: #333333;
 }
 .membershtip-small-txt {
@@ -9434,7 +9425,7 @@ table {
 }
 .fm-account-change-avatar {
 	padding: 0 10px;
-margin: 37px 0 15px 0;
+	margin: 37px 0 15px 0;
 }
 .fm-account-save, .fm-account-cancel {
 	float: right;
@@ -9477,7 +9468,7 @@ margin: 37px 0 15px 0;
 	width: 250px;
 }
 .fm-account-input {
-	float:none;
+	float: none;
 }
 .fm-account-input, .fm-account-select-block {
 	margin: 18px 0;
@@ -9491,10 +9482,9 @@ margin: 37px 0 15px 0;
 	padding: 0 10px;
 }
 .fm-account-select.country {
-	float:none;
-	width:250px;
+	float: none;
+	width: 250px;
 }
-
 .fm-account-select.year {
 	float: left;
 	width: 90px;
@@ -13698,20 +13688,11 @@ code, c {
 	background-repeat: no-repeat;
 	background-position: 9px -631px;
 }
-.new-notification-top {
-	height: 51px;
-	margin-left: 304px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 10px 0 0 10px;
-	border-bottom: 2px solid #EEEEEE;
-}
 .new-notifications-scroll {
 	height: 100%;
-	height: -webkit-calc(100% - 51px);
-	height: -moz-calc(100% - 51px);
-	height: calc(100% - 51px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
 	background-image: url(../images/mega/notification-icons.png);
 	background-position: -109px top;
 	background-repeat: repeat-y;
@@ -16218,7 +16199,7 @@ background-size: 541px auto;
 background-image: url(../images/mega/sdk-sprite@2x.png);
 background-size: 904px auto;
 }
-.nt-info-connector, .fm-notification-settings, .new-notifications-scroll {
+.nt-info-connector, .new-notifications-scroll {
 background-image: url(../images/mega/notification-icons@2x.png);
 background-size: 414px auto;
 }

@@ -3059,17 +3059,23 @@ label.iPhoneCheckLabelOff span {
 	color: white;
 	background-position: -64px -1877px;
 }
-.nw-contact-item {
+.nw-contact-item, .add-contact-item {
 	height: 48px;
-	padding-right: 15px;
 	overflow: hidden;
 	cursor: pointer;
+	display: block;
 }
 .nw-contact-item:hover {
 	background-color: rgba(113,173,58,0.1);
 }
 .nw-contact-item.selected {
 	background-color: rgba(113,173,58,0.5);
+}
+.add-contact-item:hover {
+	background-color: rgba(246,246,246,1);
+}
+.add-contact-item.selected, .add-contact-item.ui-selected {
+	background-color: rgba(238,238,238,1);
 }
 .fm-add-user-scrolling .nw-contact-item {
 	padding-right: 32px;
@@ -3164,7 +3170,7 @@ label.iPhoneCheckLabelOff span {
 .black .nw-contact-status {
 	background-color: black;
 }
-.nw-contact-avatar, .contacts-avatar {
+.nw-contact-avatar, .contacts-avatar, .avatar {
 	width: 32px;
 	height: 32px;
 	float: left;
@@ -3181,7 +3187,10 @@ label.iPhoneCheckLabelOff span {
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(0,0,0,0.06);
 	position: relative;
-	display:block;
+	display: block;
+}
+.add-contact-item, .add-contact-pad {
+	display: block;
 }
 .contacts-avatar {
 	margin: 0 0 0 12px;
@@ -3201,7 +3210,7 @@ label.iPhoneCheckLabelOff span {
 .verified .nw-verified-icon {
 	display: block;
 }
-.nw-contact-avatar img, .contacts-avatar img {
+.nw-contact-avatar img, .contacts-avatar img, .avatar img {
 	width: 28px;
 	height: 28px;
 	display: block;
@@ -3213,19 +3222,24 @@ label.iPhoneCheckLabelOff span {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.nw-contact-name, .contacts-username {
+.nw-contact-name, .contacts-username, .add-contact-username {
 	font-size: 11px;
 	line-height: 21px;
 	color: #666666;
 	white-space: nowrap;
-	margin: 13px 0 0 76px;
+	margin: 0 0 0 76px;
 	overflow: hidden;
-	display:block;
+	display: block;
+	padding: 13px 0 0 0;
 }
-.contacts-username {
-	margin: 5px 0 0 56px;
+.contacts-username, .add-contact-username {
+	margin: 0 0 0 56px;
+	padding: 5px 0 0 0;
 }
-.nw-contact-item.selected .nw-contact-name, .contacts-avatar .contacts-username {
+.add-contact-username {
+	padding: 13px 0 0 0;
+}
+.nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
 	color: white;
 }
 .nw-conversations-header {
@@ -3879,7 +3893,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: #f2f2f2;
 }
 .notifications .fm-left-panel {
-	width:304px;
+	width: 304px;
 }
 .fm-left-menu {
 	height: 48px;
@@ -4224,7 +4238,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: right -1528px;
 }
 .contacts-grid-view th:nth-child(4) {
-	background-image:none;
+	background-image: none;
 }
 .files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8) {
 	background-image: none;
@@ -7518,14 +7532,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-share-contacts-body .add-contact-pad, .fm-shared-to .add-contact-pad {
 	background-image: none;
 }
-.fm-share-contacts-body .avatar, .fm-shared-to .avatar {
-	margin: 10px 0 0 10px;
-}
 .properties-dialog .avatar {
 	margin: 5px 0 0 5px;
-}
-.fm-share-contacts-body .add-contact-username {
-	margin: 0 0 0 50px;
 }
 .properties-dialog .add-contact-username {
 	margin: 0 32px 0 45px;
@@ -7538,10 +7546,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin: 0 0 0 10px;
 	float: left;
 }
+.add-contact-pad {
+	padding-right: 15px;
+}
 .fm-share-contacts-body .ui-selected .add-contact-pad {
-	background-color: #EEEEEE;
-	background-position: right -4838px;
-	background-image: url(../images/mega/main-sprite.png?v=7);
+	background-position: right -2860px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
 }
 .fm-share-dropdown, .account-history-dropdown-button {
 	height: 30px;

@@ -3870,6 +3870,9 @@ label.iPhoneCheckLabelOff span {
 	float: left;
 	background-color: #f2f2f2;
 }
+.notifications .fm-left-panel {
+	width:304px;
+}
 .fm-left-menu {
 	height: 48px;
 	background-color: rgba(242,242,242,100);
@@ -3917,7 +3920,7 @@ label.iPhoneCheckLabelOff span {
 	padding: 0 0 0 58px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: left -6143px;
+	background-position: left -6142px;
 }
 .nw-fm-settins-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -5216,7 +5219,7 @@ table {
 	box-sizing: border-box;
 	margin: 12px 8px 0 0;
 	cursor: pointer;
-	background-color: rgba(142,197,92,0.8);
+	background-color: rgba(109,176,63,0.8);
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -5229,7 +5232,7 @@ table {
 	padding: 0 10px 0 24px;
 }
 .fm-new-folder.active, .fm-new-folder.hovered, .fm-new-folder:hover, .fm-notification-settings:hover {
-	background-color: rgba(142,197,92,1);
+	background-color: rgba(109,176,63,1);
 }
 .fm-notification-settings, a.fm-notification-settings {
 	background-position: -18px -6106px;

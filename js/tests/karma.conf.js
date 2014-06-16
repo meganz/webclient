@@ -15,6 +15,9 @@ module.exports = function(config) {
 
              "../functions.js",
              "../../asmcrypto.js",
+             "../jsbn.js",
+             "../jsbn2.js",
+             "../jodid25519.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",

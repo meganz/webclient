@@ -1,7 +1,7 @@
 /**
     @module rtcSession
 */
-"use strict";
+"use strict"
 
 /**
 
@@ -205,7 +205,7 @@ function RtcSession(stropheConn, options) {
 
     if (RTC.browser == 'firefox')
         this.jingle.media_constraints.mandatory.MozDontOfferDataChannel = true;
-};
+}
 //global variables
 //RtcSession.gLocalAudioOnlyStream = {stream: null, refcount:0};
 //RtcSession.gLocalAudioVideoStream = {stream: null, refcount:0};
@@ -996,7 +996,7 @@ RtcSession.prototype = {
       else
         return RtcSession.gLocalAudioOnlyStream;
   }
-};
+}
 
 
 RtcSession._maybeCreateVolMon = function() {
@@ -1020,7 +1020,7 @@ RtcSession._maybeCreateVolMon = function() {
             RtcSession.gVolMonCallback(level);
         });
     return true;
-};
+}
 
 RtcSession.mediaOptionsToMutedState =  function(options, stream) {
     var mutedState = new MutedState;
@@ -1028,7 +1028,7 @@ RtcSession.mediaOptionsToMutedState =  function(options, stream) {
     var muteVideo = (!options.video && (stream.getVideoTracks().length > 0));
     mutedState.set(muteAudio, muteVideo);
     return mutedState;
-};
+}
 
 RtcSession.xmlUnescape = function(text) {
     return text.replace(/\&amp;/g, '&')
@@ -1036,7 +1036,7 @@ RtcSession.xmlUnescape = function(text) {
                .replace(/\&gt;/g, '>')
                .replace(/\&apos;/g, "'")
                .replace(/\&quot;/g, '"');
-};
+}
 
 RtcSession._disableLocalVid = function(rtc) {
     if (!this._localVidEnabled)
@@ -1053,7 +1053,7 @@ RtcSession._disableLocalVid = function(rtc) {
     this._localVidEnabled = false;
     rtc.trigger('local-video-disabled', {player: this.gLocalVid});
 
-};
+}
 
 RtcSession._enableLocalVid = function(rtc) {
     if(this._localVidEnabled)
@@ -1068,7 +1068,7 @@ RtcSession._enableLocalVid = function(rtc) {
     rtc.trigger('local-video-enabled', {player: this.gLocalVid});
     this.gLocalVid.play();
     this._localVidEnabled = true;
-};
+}
 
 /**
  Creates a unique string identifying the call,
@@ -1080,7 +1080,7 @@ RtcSession._makeCallId = function(sess) {
         return sess.me+':'+sess.peerjid+':'+sess.sid;
       else
         return sess.peerjid+':'+sess.me+':'+sess.sid;
-};
+}
 
 /**
     Session object
@@ -1146,7 +1146,7 @@ isCaller: function() {
 isFake: function() {
     return (this._sess.isFake === true);
 }
-};
+}
 
 
 RtcSession.xorEnc = function(str, key) {
@@ -1164,7 +1164,7 @@ RtcSession.xorEnc = function(str, key) {
       result+=int2hex[code&0x0f];
   }
   return result;
-};
+}
 
 RtcSession.xorDec = function(str, key) {
     var result = "";
@@ -1182,7 +1182,7 @@ RtcSession.xorDec = function(str, key) {
         result+=String.fromCharCode(code);
     }
     return result;
-};
+}
 
 RtcSession.hexDigitToInt = function(digit) {
     var code = digit.charCodeAt(0);
@@ -1195,3 +1195,4 @@ RtcSession.hexDigitToInt = function(digit) {
     else
         throw new Error("Non-hex char");
 };
+

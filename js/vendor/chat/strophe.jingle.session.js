@@ -56,7 +56,8 @@ initiate: function(isInitiator) {
     //console.log('create PeerConnection ' + JSON.stringify(this.ice_config));
     try {
         this.peerconnection = new RTC.peerconnection(this.ice_config, this.pc_constraints);
-        //console.log('Created RTCPeerConnnection');
+        if ((RTC.Stats === undefined) && (typeof statsGlobalInit === 'function'))
+            statsGlobalInit(this.peerconnection);
     } catch (e) {
         console.error('Failed to create PeerConnection, exception: ', e.stack);
         return;
@@ -157,10 +158,6 @@ terminate: function (reason) {
     {
         this.peerconnection.close();
         this.peerconnection = null;
-    }
-    if (this.statsinterval !== null) {
-        window.clearInterval(this.statsinterval);
-        this.statsinterval = null;
     }
 },
 

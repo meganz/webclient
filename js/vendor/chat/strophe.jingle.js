@@ -188,7 +188,7 @@ var JinglePlugin = {
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), ans.ownFprMacKey, j.attr('fprmac'))) {
                 console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
                 try {
-                  self.sendTerminateNoSession(sid, $(iq).attr('to'), "security", "Fingerprint verification failed");
+                  self.sendTerminateNoSession(sid, $(iq).attr('from'), "security", "Fingerprint verification failed");
                 } catch(e) {
                     console.error(e);
                 }
@@ -529,7 +529,7 @@ var JinglePlugin = {
         return this.terminate(sess, null, null);
     },
     sendTerminateNoSession: function(sid, to, reason, text) {
-        var term = $iq({to: this.peerjid, type: 'set'});
+        var term = $iq({to: to, type: 'set'});
         term
           .c('jingle', {xmlns: 'urn:xmpp:jingle:1',
             action: 'session-terminate',

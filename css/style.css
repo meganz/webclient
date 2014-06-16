@@ -3065,6 +3065,9 @@ label.iPhoneCheckLabelOff span {
 	cursor: pointer;
 	display: block;
 }
+.add-contact-item:nth-child(even) {
+	background-color: rgba(0,0,0,0.02);
+}
 .nw-contact-item:hover {
 	background-color: rgba(113,173,58,0.1);
 }
@@ -4749,292 +4752,292 @@ table {
 	height: 120px;
 	margin: -60px 0 0 -60px;
 }
-.block-view-file-type.word, .share-folder-icon div.word, .properties-file-icon div.word {
+.block-view-file-type.word, .properties-file-icon div.word {
 	background-position: center -5916px;
 }
-.block-view-file-type.web-lang, .share-folder-icon div.web-lang, .properties-file-icon div.web-lang {
+.block-view-file-type.web-lang, .properties-file-icon div.web-lang {
 	background-position: center -6026px;
 }
-.block-view-file-type.web-data, .share-folder-icon div.web-data, .properties-file-icon div.web-data {
+.block-view-file-type.web-data, .properties-file-icon div.web-data {
 	background-position: center -6146px;
 }
-.block-view-file-type.video, .share-folder-icon div.video, .properties-file-icon div.video {
+.block-view-file-type.video, .properties-file-icon div.video {
 	background-position: center -6266px;
 }
-.block-view-file-type.video-vob, .share-folder-icon div.video-vob, .properties-file-icon div.video-vob {
+.block-view-file-type.video-vob, .properties-file-icon div.video-vob {
 	background-position: center -6386px;
 }
-.block-view-file-type.video-subtitles, .share-folder-icon div.video-subtitles, .properties-file-icon div.video-subtitles {
+.block-view-file-type.video-subtitles, .properties-file-icon div.video-subtitles {
 	background-position: center -6506px;
 }
-.block-view-file-type.vector, .share-folder-icon div.vector, .properties-file-icon div.vector {
+.block-view-file-type.vector, .properties-file-icon div.vector {
 	background-position: center -6626px;
 }
-.block-view-file-type.vcard, .share-folder-icon div.vcard, .properties-file-icon div.vcard {
+.block-view-file-type.vcard, .properties-file-icon div.vcard {
 	background-position: center -6746px;
 }
-.block-view-file-type.torrent, .share-folder-icon div.torrent, .properties-file-icon div.torrent {
+.block-view-file-type.torrent, .properties-file-icon div.torrent {
 	background-position: center -6866px;
 }
-.block-view-file-type.text, .share-folder-icon div.text, .properties-file-icon div.text {
+.block-view-file-type.text, .properties-file-icon div.text {
 	background-position: center -6986px;
 }
-.block-view-file-type.swf, .share-folder-icon div.swf, .properties-file-icon div.swf {
+.block-view-file-type.swf, .properties-file-icon div.swf {
 	background-position: center -7106px;
 }
-.block-view-file-type.spreadsheet, .share-folder-icon div.spreadsheet, .properties-file-icon div.spreadsheet {
+.block-view-file-type.spreadsheet, .properties-file-icon div.spreadsheet {
 	background-position: center -7226px;
 }
-.block-view-file-type.sourcecode, .share-folder-icon div.sourcecode, .properties-file-icon div.sourcecode {
+.block-view-file-type.sourcecode, .properties-file-icon div.sourcecode {
 	background-position: center -7346px;
 }
-.block-view-file-type.real-audio, .share-folder-icon div.real-audio, .properties-file-icon div.real-audio {
+.block-view-file-type.real-audio, .properties-file-icon div.real-audio {
 	background-position: center -7466px;
 }
-.block-view-file-type.raw, .share-folder-icon div.raw, .properties-file-icon div.raw {
+.block-view-file-type.raw, .properties-file-icon div.raw {
 	background-position: center -7586px;
 }
-.block-view-file-type.premiere, .share-folder-icon div.premiere, .properties-file-icon div.premiere {
+.block-view-file-type.premiere, .properties-file-icon div.premiere {
 	background-position: center -7706px;
 }
-.block-view-file-type.powerpoint, .share-folder-icon div.powerpoint, .properties-file-icon div.powerpoint {
+.block-view-file-type.powerpoint, .properties-file-icon div.powerpoint {
 	background-position: center -7826px;
 }
-.block-view-file-type.podcast, .share-folder-icon div.podcast, .properties-file-icon div.podcast {
+.block-view-file-type.podcast, .properties-file-icon div.podcast {
 	background-position: center -7946px;
 }
-.block-view-file-type.playlist, .share-folder-icon div.playlist, .properties-file-icon div.playlist {
+.block-view-file-type.playlist, .properties-file-icon div.playlist {
 	background-position: center -8066px;
 }
-.block-view-file-type.photoshop, .share-folder-icon div.photoshop, .properties-file-icon div.photoshop {
+.block-view-file-type.photoshop, .properties-file-icon div.photoshop {
 	background-position: center -8186px;
 }
-.block-view-file-type.pdf, .share-folder-icon div.pdf, .properties-file-icon div.pdf {
+.block-view-file-type.pdf, .properties-file-icon div.pdf {
 	background-position: center -8306px;
 }
-.block-view-file-type.midi, .share-folder-icon div.midi, .properties-file-icon div.midi {
+.block-view-file-type.midi, .properties-file-icon div.midi {
 	background-position: center -8426px;
 }
-.block-view-file-type.java, .share-folder-icon div.java, .properties-file-icon div.java {
+.block-view-file-type.java, .properties-file-icon div.java {
 	background-position: center -8546px;
 }
-.block-view-file-type.indesign, .share-folder-icon div.indesign, .properties-file-icon div.indesign {
+.block-view-file-type.indesign, .properties-file-icon div.indesign {
 	background-position: center -8666px;
 }
-.block-view-file-type.image, .share-folder-icon div.image, .properties-file-icon div.image {
+.block-view-file-type.image, .properties-file-icon div.image {
 	background-position: center -8786px;
 }
-.block-view-file-type.illustrator, .share-folder-icon div.illustrator, .properties-file-icon div.illustrator {
+.block-view-file-type.illustrator, .properties-file-icon div.illustrator {
 	background-position: center -8906px;
 }
-.block-view-file-type.html, .share-folder-icon div.html, .properties-file-icon div.html {
+.block-view-file-type.html, .properties-file-icon div.html {
 	background-position: center -9026px;
 }
-.block-view-file-type.graphic, .share-folder-icon div.graphic, .properties-file-icon div.graphic {
+.block-view-file-type.graphic, .properties-file-icon div.graphic {
 	background-position: center -9146px;
 }
-.block-view-file-type.gis, .share-folder-icon div.gis, .properties-file-icon div.gis {
+.block-view-file-type.gis, .properties-file-icon div.gis {
 	background-position: center -9266px;
 }
-.block-view-file-type.generic, .share-folder-icon div.generic, .properties-file-icon div.generic {
+.block-view-file-type.generic, .properties-file-icon div.generic {
 	background-position: center -9386px;
 }
-.block-view-file-type.font, .share-folder-icon div.font, .properties-file-icon div.font {
+.block-view-file-type.font, .properties-file-icon div.font {
 	background-position: center -9506px;
 }
-.block-view-file-type.folder, .share-folder-icon div.folder, .properties-file-icon div.folder {
+.block-view-file-type.folder, .properties-file-icon div.folder {
 	background-position: center -9626px;
 }
-.block-view-file-type.folder-shared, .share-folder-icon div.folder-shared, .properties-file-icon div.folder-shared {
+.block-view-file-type.folder-shared, .properties-file-icon div.folder-shared {
 	background-position: center -9746px;
 }
-.block-view-file-type.flash, .share-folder-icon div.flash, .properties-file-icon div.flash {
+.block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
 }
-.block-view-file-type.flash-video, .share-folder-icon div.flash-video, .properties-file-icon div.flash-video {
+.block-view-file-type.flash-video,  .properties-file-icon div.flash-video {
 	background-position: center -9986px;
 }
-.block-view-file-type.fla-lang, .share-folder-icon div.fla-lang, .properties-file-icon div.fla-lang {
+.block-view-file-type.fla-lang, .properties-file-icon div.fla-lang {
 	background-position: center -10106px;
 }
-.block-view-file-type.executable, .share-folder-icon div.executable, .properties-file-icon div.executable {
+.block-view-file-type.executable, .properties-file-icon div.executable {
 	background-position: center -10226px;
 }
-.block-view-file-type.excel, .share-folder-icon div.excel, .properties-file-icon div.exel {
+.block-view-file-type.excel, .properties-file-icon div.exel {
 	background-position: center -10346px;
 }
-.block-view-file-type.dreamweaver, .share-folder-icon div.dreamweaver, .properties-file-icon div.dreamweaver {
+.block-view-file-type.dreamweaver, .properties-file-icon div.dreamweaver {
 	background-position: center -10466px;
 }
-.block-view-file-type.database, .share-folder-icon div.database, .properties-file-icon divdatabase {
+.block-view-file-type.database, .properties-file-icon divdatabase {
 	background-position: center -10586px;
 }
-.block-view-file-type.compressed, .share-folder-icon div.compressed, .properties-file-icon div.compressed {
+.block-view-file-type.compressed, .properties-file-icon div.compressed {
 	background-position: center -10706px;
 }
-.block-view-file-type.cad, .share-folder-icon div.cad, .properties-file-icon div.cad {
+.block-view-file-type.cad, .properties-file-icon div.cad {
 	background-position: center -10826px;
 }
-.block-view-file-type.audio, .share-folder-icon div.audio, .properties-file-icon div.audio {
+.block-view-file-type.audio, .properties-file-icon div.audio {
 	background-position: center -10946px;
 }
-.block-view-file-type.aftereffects, .share-folder-icon div.aftereffects, .properties-file-icon div.aftereffects {
+.block-view-file-type.aftereffects, .properties-file-icon div.aftereffects {
 	background-position: center -11066px;
 }
-.block-view-file-type.threed, .share-folder-icon div.threed, .properties-file-icon div.threed {
+.block-view-file-type.threed, .properties-file-icon div.threed {
 	background-position: center -11186px;
 }
-.block-view-file-type.win-folder, .share-folder-icon div.win-folder, .properties-file-icon div.win-folder {
+.block-view-file-type.win-folder, .properties-file-icon div.win-folder {
 	background-position: center -11306px;
 }
-.block-view-file-type.apple-folder, .share-folder-icon div.apple-folder, .properties-file-icon div.apple-folder {
+.block-view-file-type.apple-folder, .properties-file-icon div.apple-folder {
 	background-position: center -11426px;
 }
-.block-view-file-type.photo-folder, .share-folder-icon div.photo-folder, .properties-file-icon div.photo-folder {
+.block-view-file-type.photo-folder, .properties-file-icon div.photo-folder {
 	background-position: center -11546px;
 }
-.dragger-icon.word, .export-icon.word, .new-download-file-icon.word {
+.dragger-icon.word, .export-icon.word, .new-download-file-icon.word, .share-folder-icon div.word {
 	background-position: center -2054px;
 }
-.dragger-icon.web-lang, .export-icon.web-lang, .new-download-file-icon.web-lang {
+.dragger-icon.web-lang, .export-icon.web-lang, .new-download-file-icon.web-lang, .share-folder-icon div.web-lang {
 	background-position: center -2134px;
 }
-.dragger-icon.web-data, .export-icon.web-data, .new-download-file-icon.web-data {
+.dragger-icon.web-data, .export-icon.web-data, .new-download-file-icon.web-data, .share-folder-icon div.web-data {
 	background-position: center -2214px;
 }
-.dragger-icon.video, .export-icon.video, .new-download-file-icon.video {
+.dragger-icon.video, .export-icon.video, .new-download-file-icon.video, .share-folder-icon div.video {
 	background-position: center -2294px;
 }
-.dragger-icon.video-vob, .export-icon.video-vob, .new-download-file-icon.video-vob {
+.dragger-icon.video-vob, .export-icon.video-vob, .new-download-file-icon.video-vob, .share-folder-icon div.video-vob {
 	background-position: center -2374px;
 }
-.dragger-icon.video-subtitles, .export-icon.video-subtitles, .new-download-file-icon.video-subtitles {
+.dragger-icon.video-subtitles, .export-icon.video-subtitles, .new-download-file-icon.video-subtitles, .share-folder-icon div.video-subtitles {
 	background-position: center -2454px;
 }
-.dragger-icon.vector, .export-icon.vector, .new-download-file-icon.vector {
+.dragger-icon.vector, .export-icon.vector, .new-download-file-icon.vector, .share-folder-icon div.vector {
 	background-position: center -2534px;
 }
-.dragger-icon.vcard, .export-icon.vcard, .new-download-file-icon.vcard {
+.dragger-icon.vcard, .export-icon.vcard, .new-download-file-icon.vcard, .share-folder-icon div.vcard {
 	background-position: center -2614px;
 }
-.dragger-icon.torrent, .export-icon.torrent, .new-download-file-icon.torrent {
+.dragger-icon.torrent, .export-icon.torrent, .new-download-file-icon.torrent, .share-folder-icon div.torrent {
 	background-position: center -2694px;
 }
-.dragger-icon.text, .export-icon.text, .new-download-file-icon.text {
+.dragger-icon.text, .export-icon.text, .new-download-file-icon.text, .share-folder-icon div.text {
 	background-position: center -2774px;
 }
-.dragger-icon.swf, .export-icon.swf, .new-download-file-icon.swf {
+.dragger-icon.swf, .export-icon.swf, .new-download-file-icon.swf, .share-folder-icon div.swf {
 	background-position: center -2854px;
 }
-.dragger-icon.spreadsheet, .export-icon.spreadsheet, .new-download-file-icon.spreadsheet {
+.dragger-icon.spreadsheet, .export-icon.spreadsheet, .new-download-file-icon.spreadsheet, .share-folder-icon div.spreadsheet {
 	background-position: center -2934px;
 }
-.dragger-icon.sourcecode, .export-icon.sourcecode, .new-download-file-icon.sourcecode {
+.dragger-icon.sourcecode, .export-icon.sourcecode, .new-download-file-icon.sourcecode, .share-folder-icon div.sourcecode {
 	background-position: center -3014px;
 }
-.dragger-icon.real-audio, .export-icon.real-audio, .new-download-file-icon.real-audio {
+.dragger-icon.real-audio, .export-icon.real-audio, .new-download-file-icon.real-audio, .share-folder-icon div.real-audio {
 	background-position: center -3094px;
 }
-.dragger-icon.raw, .export-icon.raw, .new-download-file-icon.raw {
+.dragger-icon.raw, .export-icon.raw, .new-download-file-icon.raw, .share-folder-icon div.raw {
 	background-position: center -3174px;
 }
-.dragger-icon.premiere, .export-icon.premiere, .new-download-file-icon.premiere {
+.dragger-icon.premiere, .export-icon.premiere, .new-download-file-icon.premiere, .share-folder-icon div.premiere {
 	background-position: center -3254px;
 }
-.dragger-icon.powerpoint, .export-icon.powerpoint, .new-download-file-icon.powerpoint {
+.dragger-icon.powerpoint, .export-icon.powerpoint, .new-download-file-icon.powerpoint, .share-folder-icon div.powerpoint {
 	background-position: center -3334px;
 }
-.dragger-icon.podcast, .export-icon.podcast, .new-download-file-icon.podcast {
+.dragger-icon.podcast, .export-icon.podcast, .new-download-file-icon.podcast, .share-folder-icon div.podcast {
 	background-position: center -3414px;
 }
-.dragger-icon.playlist, .export-icon.playlist, .new-download-file-icon.playlist {
+.dragger-icon.playlist, .export-icon.playlist, .new-download-file-icon.playlist, .share-folder-icon div.playlist {
 	background-position: center -3494px;
 }
-.dragger-icon.photoshop, .export-icon.photoshop, .new-download-file-icon.photoshop {
+.dragger-icon.photoshop, .export-icon.photoshop, .new-download-file-icon.photoshop, .share-folder-icon div.photoshop {
 	background-position: center -3574px;
 }
-.dragger-icon.pdf, .export-icon.pdf, .new-download-file-icon.pdf {
+.dragger-icon.pdf, .export-icon.pdf, .new-download-file-icon.pdf, .share-folder-icon div.pdf {
 	background-position: center -3654px;
 }
-.dragger-icon.midi, .export-icon.midi, .new-download-file-icon.midi {
+.dragger-icon.midi, .export-icon.midi, .new-download-file-icon.midi, .share-folder-icon div.midi {
 	background-position: center -3734px;
 }
-.dragger-icon.java, .export-icon.java, .new-download-file-icon.java {
+.dragger-icon.java, .export-icon.java, .new-download-file-icon.java, .share-folder-icon div.java {
 	background-position: center -3814px;
 }
-.dragger-icon.indesign, .export-icon.indesign, .new-download-file-icon.indesign {
+.dragger-icon.indesign, .export-icon.indesign, .new-download-file-icon.indesign, .share-folder-icon div.indesign {
 	background-position: center -3894px;
 }
-.dragger-icon.image, .export-icon.image, .new-download-file-icon.image {
+.dragger-icon.image, .export-icon.image, .new-download-file-icon.image, .share-folder-icon div.image {
 	background-position: center -3974px;
 }
-.dragger-icon.illustrator, .export-icon.illustrator, .new-download-file-icon.illustrator {
+.dragger-icon.illustrator, .export-icon.illustrator, .new-download-file-icon.illustrator, .share-folder-icon div.illustrator {
 	background-position: center -4054px;
 }
-.dragger-icon.html, .export-icon.html, .new-download-file-icon.html {
+.dragger-icon.html, .export-icon.html, .new-download-file-icon.html, .share-folder-icon div.html {
 	background-position: center -4134px;
 }
-.dragger-icon.graphic, .export-icon.graphic, .new-download-file-icon.graphic {
+.dragger-icon.graphic, .export-icon.graphic, .new-download-file-icon.graphic, .share-folder-icon div.graphic {
 	background-position: center -4214px;
 }
-.dragger-icon.gis, .export-icon.gis, .new-download-file-icon.gis {
+.dragger-icon.gis, .export-icon.gis, .new-download-file-icon.gis, .share-folder-icon div.gis {
 	background-position: center -4294px;
 }
-.dragger-icon.generic, .export-icon.generic, .new-download-file-icon.generic {
+.dragger-icon.generic, .export-icon.generic, .new-download-file-icon.generic, .share-folder-icon div.generic {
 	background-position: center -4374px;
 }
-.dragger-icon.font, .export-icon.font, .new-download-file-icon.font {
+.dragger-icon.font, .export-icon.font, .new-download-file-icon.font, .share-folder-icon div.font {
 	background-position: center -4454px;
 }
-.dragger-icon.folder, .export-icon.folder, .new-download-file-icon.folder {
+.dragger-icon.folder, .export-icon.folder, .new-download-file-icon.folder, .share-folder-icon div.folder {
 	background-position: center -4534px;
 }
-.dragger-icon.folder-shared, .export-icon.folder-shared, .new-download-file-icon.folder-shared {
+.dragger-icon.folder-shared, .export-icon.folder-shared, .new-download-file-icon.folder-shared, .share-folder-icon div.folder-shared {
 	background-position: center -4614px;
 }
-.dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash {
+.dragger-icon.flash, .export-icon.flash, .new-download-file-icon.flash, .share-folder-icon div.flash {
 	background-position: center -4694px;
 }
-.dragger-icon.flash-video, .export-icon.flash-video, .new-download-file-icon.flash-video {
+.dragger-icon.flash-video, .export-icon.flash-video, .new-download-file-icon.flash-video, .share-folder-icon div.flash-video {
 	background-position: center -4774px;
 }
-.dragger-icon.fla-lang, .export-icon.fla-lang, .new-download-file-icon.fla-lang {
+.dragger-icon.fla-lang, .export-icon.fla-lang, .new-download-file-icon.fla-lang, .share-folder-icon div.fla-lang {
 	background-position: center -4854px;
 }
-.dragger-icon.executable, .export-icon.executable, .new-download-file-icon.executable {
+.dragger-icon.executable, .export-icon.executable, .new-download-file-icon.executable, .share-folder-icon div.executable {
 	background-position: center -4934px;
 }
-.dragger-icon.excel, .export-icon.excel, .new-download-file-icon.excel {
+.dragger-icon.excel, .export-icon.excel, .new-download-file-icon.excel, .share-folder-icon div.excel {
 	background-position: center -5014px;
 }
-.dragger-icon.dreamweaver, .export-icon.dreamweaver, .new-download-file-icon.dreamweaver {
+.dragger-icon.dreamweaver, .export-icon.dreamweaver, .new-download-file-icon.dreamweaver, .share-folder-icon div.dreamweaver {
 	background-position: center -5094px;
 }
-.dragger-icon.database, .export-icon.database, .new-download-file-icon.database {
+.dragger-icon.database, .export-icon.database, .new-download-file-icon.database, .share-folder-icon div.database {
 	background-position: center -5174px;
 }
-.dragger-icon.compressed, .export-icon.compressed, .new-download-file-icon.compressed {
+.dragger-icon.compressed, .export-icon.compressed, .new-download-file-icon.compressed, .share-folder-icon div.compressed {
 	background-position: center -5254px;
 }
-.dragger-icon.cad, .export-icon.cad, .new-download-file-icon.cad {
+.dragger-icon.cad, .export-icon.cad, .new-download-file-icon.cad, .share-folder-icon div.cad {
 	background-position: center -5334px;
 }
-.dragger-icon.audio, .export-icon.audio, .new-download-file-icon.audio {
+.dragger-icon.audio, .export-icon.audio, .new-download-file-icon.audio, .share-folder-icon div.audio {
 	background-position: center -5414px;
 }
-.dragger-icon.aftereffects, .export-icon.aftereffects, .new-download-file-icon.aftereffects {
+.dragger-icon.aftereffects, .export-icon.aftereffects, .new-download-file-icon.aftereffects, .share-folder-icon div.aftereffects {
 	background-position: center -5494px;
 }
-.dragger-icon.threed, .export-icon.threed, .new-download-file-icon.threed {
+.dragger-icon.threed, .export-icon.threed, .new-download-file-icon.threed, .share-folder-icon div.threed {
 	background-position: center -5574px;
 }
-.dragger-icon.win-folder, .export-icon.win-folder, .new-download-file-icon.win-folder {
+.dragger-icon.win-folder, .export-icon.win-folder, .new-download-file-icon.win-folder, .share-folder-icon div.win-folder {
 	background-position: center -5654px;
 }
-.dragger-icon.apple-folder, .export-icon.apple-folder, .new-download-file-icon.apple-folder {
+.dragger-icon.apple-folder, .export-icon.apple-folder, .new-download-file-icon.apple-folder, .share-folder-icon div.apple-folder {
 	background-position: center -5654px;
 }
-.dragger-icon.photo-folder, .export-icon.photo-folder, .new-download-file-icon.photo-folder {
+.dragger-icon.photo-folder, .export-icon.photo-folder, .new-download-file-icon.photo-folder, .share-folder-icon div.photo-folder {
 	background-position: center -5734px;
 }
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
@@ -12490,14 +12493,14 @@ strong, b {
 	box-sizing: border-box;
 }
 .share-folder-icon div {
-	width: 64px;
+	width: 56px;
 	height: 64px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/medium-icons-v1.png);
-	background-position: 0 -1984px;
+	background-image: url(../images/mega/files-icons.svg);
+	margin-top:3px;
 }
 .share-folder-info {
-	margin-left: 98px;
+	margin-left: 87px;
 	padding: 23px 0 0 0;
 }
 .share-folder-info .propreties-dark-txt {

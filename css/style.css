@@ -5727,6 +5727,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: transparent;
 	border: 0;
 }
+.add-user-popup-input-bl input {
+	background-position: -2px -6197px;
+}
 .fm-account-input {
 	margin: 20px 0 0 0;
 }

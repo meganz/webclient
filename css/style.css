@@ -3043,10 +3043,10 @@ label.iPhoneCheckLabelOff span {
 	overflow: hidden;
 }
 .rubbish-bin .nw-fm-tree-folder {
-	background-position: -64px -1917px;
+	background-position: -64px -1957px;
 }
 .rubbish-bin .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-shared-folder {
-	background-position: -64px -1957px;
+	background-position: -64px -1997px;
 }
 .nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
 	background-position: -64px -1277px;
@@ -3055,7 +3055,7 @@ label.iPhoneCheckLabelOff span {
 	color: white;
 	background-position: -64px -11657px;
 }
-.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder {
+.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin.nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin.nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
 	background-position: -64px -1877px;
 }
@@ -3065,7 +3065,7 @@ label.iPhoneCheckLabelOff span {
 	cursor: pointer;
 	display: block;
 	margin-right: 15px;
-overflow: hidden;
+	overflow: hidden;
 }
 .add-contact-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -4856,7 +4856,7 @@ table {
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
 }
-.block-view-file-type.flash-video,  .properties-file-icon div.flash-video {
+.block-view-file-type.flash-video, .properties-file-icon div.flash-video {
 	background-position: center -9986px;
 }
 .block-view-file-type.fla-lang, .properties-file-icon div.fla-lang {
@@ -5318,20 +5318,20 @@ table {
 }
 span.search-number {
 	color: rgba(109,176,63,0.8);
-height: 14px;
-line-height: 13px;
-font-size: 11px;
-background-color:white;
-margin: 5px 0 0 9px;
-padding: 0 4px;
--moz-border-radius: 8px;
--webkit-border-radius: 8px;
-border-radius: 8px;
--webkit-transition: all 200ms ease-in-out;
--moz-transition: all 200ms ease-in-out;
--o-transition: all 200ms ease-in-out;
--ms-transition: all 200ms ease-in-out;
-transition: all 200ms ease-in-out;
+	height: 14px;
+	line-height: 13px;
+	font-size: 11px;
+	background-color: white;
+	margin: 5px 0 0 9px;
+	padding: 0 4px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .search-files-result:hover span.search-number, .search-messages-result:hover span.search-number, .fm-breadcrumbs span.search-number {
 	color: rgba(109,176,63,1);
@@ -7667,9 +7667,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-notification-info {
 	margin-left: 90px;
-	display:table-cell;
-	vertical-align:middle;
-	height:78px;
+	display: table-cell;
+	vertical-align: middle;
+	height: 78px;
 }
 .fm-notification-info p {
 	font-size: 12px;
@@ -12488,7 +12488,7 @@ strong, b {
 .share-folder-block {
 	min-height: 90px;
 	background-color: #F6F6F6;
-	margin:12px 0 -12px 0;
+	margin: 12px 0 -12px 0;
 }
 .share-folder-icon {
 	float: left;
@@ -12504,7 +12504,7 @@ strong, b {
 	height: 64px;
 	background-repeat: no-repeat;
 	background-image: url(../images/mega/files-icons.svg);
-	margin-top:3px;
+	margin-top: 3px;
 }
 .share-folder-info {
 	margin-left: 87px;

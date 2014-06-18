@@ -7,8 +7,14 @@ function newXhr() {
 	var xhr = new XMLHttpRequest;
 	xhr.__id = ++total
 	xhr.__timeout = null;
+	xhr.clear_timeout = function() {
+		if (this.__timeout) {
+			clearTimeout(this.__timeout);
+			delete this.__timeout;
+		}
+	};
 	xhr.setup_timeout = function() {
-		clearTimeout(this.__timeout);
+		this.clear_timeout();
 		this.__timeout = setTimeout(this.ontimeout.bind(this), 2*60*1000);
 	};
 
@@ -16,24 +22,24 @@ function newXhr() {
 
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
-		clearTimeout(this.__timeout);
+		this.clear_timeout();
 		this.listener = null; /* we're done here, release this slot */
-		xhr._abort();
+		this._abort();
 	}
 
 	xhr.nolistener = function() {
 		if (d) console.error('Socket: no listener for socket', this.__id);
-		clearTimeout(this.__timeout);
+		this.clear_timeout();
 		this._abort();
 	}
 
 	xhr.onreadystatechange = function() {
 		if (!this.listener) return this.nolistener();
-		xhr.setup_timeout();
+		this.setup_timeout();
 		switch(this.readyState) {
 			case 4:
 				if (this.listener.on_ready) {
-					clearTimeout(xhr.__timeout);
+					this.clear_timeout();
 					if(0xDEAD === this.listener.on_ready(arguments, this)) {
 						this.onerror();
 					} else {
@@ -58,7 +64,7 @@ function newXhr() {
 
 	xhr.xhr_cleanup = function(e) {
 		if (!this.listener) return this.nolistener();
-		clearTimeout(xhr.__timeout);
+		this.clear_timeout();
 		if (this.listener.on_error && !this.__errored) {
 			var l = this.listener;
 			this.listener  = null; /* release */
@@ -82,7 +88,7 @@ function newXhr() {
 
 	xhr.onprogress = function() {
 		if (!this.listener) return this.nolistener();
-		xhr.setup_timeout();
+		this.setup_timeout();
 		if (this.listener.on_progress) {
 			this.listener.on_progress(arguments, this)
 		}

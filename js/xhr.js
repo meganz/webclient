@@ -60,12 +60,15 @@ function newXhr() {
 		if (!this.listener) return this.nolistener();
 		clearTimeout(xhr.__timeout);
 		if (this.listener.on_error && !this.__errored) {
-			var l = this.listener,r=e&&e.type||'error';
+			var l = this.listener;
 			this.listener  = null; /* release */
 			this.__errored = true;
-			l.on_error(arguments, this, r);
+			if (e !== 0x9ffe) {
+				var r = e && e.type || 'error';
+				if (d) console.error('Socket: on' + r, this.__id, this);
+				l.on_error(arguments, this, r);
+			}
 			this._abort();
-			if (d) console.error('Socket: on' + r, this.__id, this);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);

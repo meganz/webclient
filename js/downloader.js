@@ -34,8 +34,7 @@ function ClassChunk(task) {
 
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
-	ASSERT(!this.xhr, 'ClassChunk.xhr should not exists...');
-	if (this.xhr) this.xhr.abort();
+	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
 
 	oDestroy(this);
 };
@@ -122,7 +121,7 @@ ClassChunk.prototype.finish_download = function(NoError) {
 	ASSERT(!!this.xhr, "Don't call me twice!");
 	if (this.xhr) {
 		ASSERT(iRealDownloads > 0, 'Inconsistent iRealDownloads');
-		this.xhr.abort();
+		this.xhr.xhr_cleanup(0x9ffe);
 		delete this.xhr;
 		iRealDownloads--;
 		if (!this.done || NoError === false) {
@@ -194,6 +193,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		this.failed = false;
 		this.dl.retries = 0;
 		this.finish_download();
+		this.destroy();
 	} else if (!this.dl.cancelled) {
 		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r.bytesLength, this.size);
 		return 0xDEAD;

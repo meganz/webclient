@@ -7,6 +7,7 @@ function newXhr() {
 	var xhr = new XMLHttpRequest;
 	xhr.__id = ++total
 	xhr.__timeout = null;
+	xhr.__timeout_ms = localStorage.xhrtimeout || 2*60*1000;
 	xhr.clear_timeout = function() {
 		if (this.__timeout) {
 			clearTimeout(this.__timeout);
@@ -15,7 +16,7 @@ function newXhr() {
 	};
 	xhr.setup_timeout = function() {
 		this.clear_timeout();
-		this.__timeout = setTimeout(this.ontimeout.bind(this), 2*60*1000);
+		this.__timeout = setTimeout(this.ontimeout.bind(this), this.__timeout_ms);
 	};
 
 	xhr._abort = xhr.abort;

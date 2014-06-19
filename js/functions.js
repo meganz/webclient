@@ -598,7 +598,7 @@ function ASSERT(what, msg) {
 }
 
 function oDestroy(obj) {
-	if (d) ASSERT(Object.isFrozen(obj) === false);
+	if (d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
 	Object.keys(obj).forEach(function(memb) {
 		if (obj.hasOwnProperty(memb)) delete obj[memb];

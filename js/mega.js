@@ -1707,8 +1707,8 @@ function MegaData ()
 			case ESID:                 errorstr = l[19];  break;
 			case EBLOCKED:
 			case ETOOMANY:
-			case ENOENT:               errorstr = l[22];  break;
 			case EACCESS:              errorstr = l[23];  break;
+			case ENOENT:               errorstr = l[22];  break;
 			case EKEY:                 errorstr = l[24];  break;
 			case EOVERQUOTA:
 				if (d) console.log('Quota error');

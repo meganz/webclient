@@ -47,9 +47,9 @@ function newXhr() {
 					}
 				}
 				break;
-			case 2:
+			// case 2:
 				// force progress update in case of a previous error with the chunk
-				this.onprogress({zSaaDc:1});
+				// this.onprogress({zSaaDc:1});
 		}
 	}
 

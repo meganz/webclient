@@ -438,6 +438,7 @@ function uplpad(number, length)
 
 function secondsToTime(secs)
 {
+	if (isNaN(secs)) return '--:--:--';
 	if (secs < 0) return '';
 
 	var hours = uplpad(Math.floor(secs / (60 * 60)),2);	
@@ -457,7 +458,9 @@ function htmlentities(value)
 }
 
 function bytesToSize(bytes, precision)
-{	
+{
+	if(!bytes) return '0';
+
 	var s_b = 'B';
 	var s_kb = 'KB';
 	var s_mb = 'MB';
@@ -595,9 +598,13 @@ function ASSERT(what, msg) {
 }
 
 function oDestroy(obj) {
+	if (d) ASSERT(Object.isFrozen(obj) === false);
+
 	Object.keys(obj).forEach(function(memb) {
 		if (obj.hasOwnProperty(memb)) delete obj[memb];
 	});
+
+	if (d) Object.freeze(obj);
 }
 
 /**

@@ -431,7 +431,7 @@ function dl_reportstatus(dl, code)
 {
 	if (dl) {
 		dl.lasterror = code;
-		dl.onDownloadError(dl.dl_id, code, dl.pos);
+		dl.onDownloadError(dl, code);
 	}
 
 	if(code === EKEY) {

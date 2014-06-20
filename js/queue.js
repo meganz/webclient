@@ -26,7 +26,7 @@ MegaQueue.prototype.pushFirst = function(arg, next, self) {
 		}
 		ASSERT(!found, 'Huh, that task already exists');
 	}
-	this._queue.unshift([arg, next || function _MQPushFirstVOID() {}, self || null]);
+	this._queue.unshift([arg, next, self]);
 	this._process();
 };
 
@@ -51,15 +51,9 @@ MegaQueue.prototype.isPaused = function() {
 	return this._paused;
 }
 
-function _queue_checker(queue, tasks, next, error) {
-	return function CCQueueChecker(task, response) {
+MegaQueue.prototype.pushAll = function(tasks, next, error) {
+	function CCQueueChecker(task, response) {
 		if (d > 1) console.error('** QC:', task, next, error);
-		ASSERT(task, 'Invalid Task.');
-		if (task) {
-			var pos = $.inArray(task, tasks);
-			ASSERT(pos != -1, 'Unknown task!?');
-			if (pos != -1) tasks.splice(pos, 1);
-		}
 		if (response.length && response[0] === false) {
 			/**
 			 *	The first argument of .done(false) is false, which 
@@ -67,33 +61,29 @@ function _queue_checker(queue, tasks, next, error) {
 			 */
 			return error(task, response);
 		}
-		if (tasks.length == 0) {
-			if (d) ASSERT(queue.isEmpty(), 'The queue isnt empty');
-			if (queue.isEmpty()) next();
-		}
-	};
-};
-
-MegaQueue.prototype.pushAll = function(tasks, next, error) {
+		var pos = $.inArray(task, tasks);
+		ASSERT(pos != -1, 'Unknown task!?');
+		if (pos != -1) tasks.splice(pos, 1);
+		if (tasks.length == 0) next();
+	}
 	var i = 0
 		, len = tasks.length
-		, callback = _queue_checker(this, tasks, next, error)
 
 	for (i=0; i < len; i++) {
-		this.push(tasks[i], tasks[i].ric_cb = callback);
+		tasks[i].onQueueDone = CCQueueChecker;
+		this.push(tasks[i]);
 	}
 };
 
 MegaQueue.prototype.run_in_context = function(task) {
 	this._running++;
 	this._worker(task[0], function MQRicStub() {
-		ASSERT(task[1], 'This should not be reached twice.');
-		if (!task[1]) return; /* already called */
+		ASSERT(task[0], 'This should not be reached twice.');
+		if (!task[0]) return; /* already called */
 		this._running--;
-		task[1].apply(task[2], [task[0], arguments]);
-		task[0] = null;
-		task[1] = null;
-		task[2] = null;
+		var done = task[1] || task[0].onQueueDone;
+		if (done) done.apply(task[2] || this, [task[0], arguments]);
+		task[0] = task[1] = task[2] = undefined;
 		this._process();
 	}.bind(this));
 }
@@ -165,7 +155,7 @@ MegaQueue.prototype._process = function(ms) {
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {
-    this._queue.push([arg, next || function _MQPushVOID() {}, self || null]);
+	this._queue.push([arg, next, self]);
 	this.trigger('queue');
-    this._process();
+	this._process();
 };

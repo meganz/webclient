@@ -349,8 +349,8 @@ var dl_lastquotawarning = 0
 	, dl_retryinterval  = 1000
 
 function dlQueuePushBack(aTask) {
-	ASSERT(aTask && aTask.ric_cb, 'Invalid aTask.');
-	dlQueue.pushFirst(aTask, aTask.ric_cb);
+	ASSERT(aTask && aTask.onQueueDone, 'Invalid aTask.');
+	dlQueue.pushFirst(aTask);
 	if (ioThrottlePaused) dlQueue.resume();
 }
 
@@ -359,7 +359,7 @@ function failureFunction(task, args) {
 		, dl = task.task.download
 
 	ASSERT(code != 403, 'Got a 403 response, fixme.');
-	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.ric_cb );
+	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.onQueueDone.name );
 
 	if (code == 509) {
 		var t = NOW();
@@ -431,7 +431,7 @@ function dl_reportstatus(dl, code)
 {
 	if (dl) {
 		dl.lasterror = code;
-		dl.onDownloadError(dl.dl_id, code, dl.pos);
+		dl.onDownloadError(dl, code);
 	}
 
 	if(code === EKEY) {

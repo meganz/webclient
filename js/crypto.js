@@ -584,23 +584,38 @@ if(is_chrome_firefox) {
 
 function crypto_rsagenkey ()
 {
-    var w = new Worker('keygen.js');
-
     var startTime = new Date();
 
-    w.onmessage = function (e) {
-        w.terminate();
+    if ( msCrypto && msCrypto.subtle ) {
+        var ko = msCrypto.subtle.generateKey( { name: 'RSAES-PKCS1-v1_5', modulusLength: 2048 }, true );
+        ko.oncomplete = function () {
+            ko = msCrypto.subtle.exportKey( 'jwk', ko.result.privateKey );
+            ko.oncomplete = function () {
+                var jwk = JSON.parse( asmCrypto.bytes_to_string( new Uint8Array(ko.result) ) );
+                _done( ['n','e','d','p','q','dp','dq','qi'].map( function ( x ) { return base64urldecode( jwk[x] ) } ) );
+            };
+        };
+    }
+    else {
+        var w = new Worker('keygen.js');
 
+        w.onmessage = function (e) {
+            w.terminate();
+            _done(e.data);
+        };
+
+        var workerSeed = new Uint8Array(256);
+        asmCrypto.getRandomValues(workerSeed);
+
+        w.postMessage([ 2048, 257, workerSeed ]);
+    }
+
+    function _done( k ) {
         var endTime = new Date();
         if (d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
 
-        u_setrsa(e.data);
-    };
-
-    var workerSeed = new Uint8Array(256);
-    asmCrypto.getRandomValues(workerSeed);
-
-    w.postMessage([ 2048, 257, workerSeed ]);
+        u_setrsa(k);
+    }
 }
 
 /* }}} */

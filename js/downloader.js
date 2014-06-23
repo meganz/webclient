@@ -223,18 +223,16 @@ ClassChunk.prototype.request = function() {
 }
 
 ClassChunk.prototype.run = function(task_done) {
-	iRealDownloads++;
-	this.localId = iRealDownloads;
-	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
-		/**
-		 *	It is an small chunk and we *should* finish soon if everything goes
-		 *	fine. We release our slot so another chunk can start now. It is useful
-		 *	to speed up tiny downloads on a ZIP file
-		 */
-		this.tiny = true;
-		this.done = true;
-		task_done();
-	}
+	this.localId = ++iRealDownloads;
+	// if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
+		// /**
+		 // *	It is an small chunk and we *should* finish soon if everything goes
+		 // *	fine. We release our slot so another chunk can start now. It is useful
+		 // *	to speed up tiny downloads on a ZIP file
+		 // */
+		// this.done = true;
+		// task_done();
+	// }
 
 	this.task_done = task_done;
 	if (!this.io.dl_bytesreceived) {
@@ -279,8 +277,9 @@ ClassFile.prototype.destroy = function() {
 	if (!this.dl.cancelled) {
 		DEBUG("done download", this.dl.zipid, this.dl.cancelled)
 		if (this.dl.zipid) {
-			this.task = null;
-			return Zips[this.dl.zipid].done();
+			Zips[this.dl.zipid].done();
+			oDestroy(this);
+			return;
 		}
 
 		this.dl.onDownloadProgress(
@@ -361,7 +360,7 @@ ClassFile.prototype.run = function(task_done) {
 				ERRDEBUG('retrying ', this.dl.n);
 				dlQueue.pushFirst(this);
 				if (ioThrottlePaused) dlQueue.resume();
-			}, dl_retryinterval);
+			}.bind(this), dl_retryinterval);
 			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
 			return false;
 		}

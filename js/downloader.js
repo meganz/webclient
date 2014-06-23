@@ -310,7 +310,7 @@ ClassFile.prototype.run = function(task_done) {
 	this.dl.retries = 0; /* set the retries flag */
 
 	DEBUG("dl_key " + this.dl.key);
-	this.dl.onDownloadStart(this.dl.dl_id, this.dl.n, this.dl.size, this.dl.pos);
+	this.dl.onDownloadStart(this.dl);
 
 	this.dl.ready = function() {
 		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0)
@@ -355,7 +355,7 @@ ClassFile.prototype.run = function(task_done) {
 			/* failed */
 			fetchingFile = 0;
 			task_done(); /* release worker */
-			setTimeout(function() {
+			setTimeout(function onGetUrlError() {
 				/* retry !*/
 				ERRDEBUG('retrying ', this.dl.n);
 				dlQueue.pushFirst(this);

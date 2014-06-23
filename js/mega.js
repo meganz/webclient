@@ -1921,14 +1921,15 @@ function MegaData ()
 		}
 	}
 
-	this.dlstart = function(id,name,size, dl_queue_num)
+	this.dlstart = function(dl)
 	{
-		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
-		if (dl_queue[dl_queue_num].zipid) id = 'zip_' + dl_queue[dl_queue_num].zipid;
-		else id = 'dl_' + id;
+		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
+		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #' + id));
-		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id, 0, 0, 0, 0, dl_queue_num);
+		dl.st = NOW();
+		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
+		ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
+		if (typeof dl_queue[dl.pos] === 'object') M.dlprogress(id, 0, 0, 0, 0, dl.pos);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];

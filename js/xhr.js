@@ -7,33 +7,40 @@ function newXhr() {
 	var xhr = new XMLHttpRequest;
 	xhr.__id = ++total
 	xhr.__timeout = null;
+	xhr.__timeout_ms = localStorage.xhrtimeout || 2*60*1000;
+	xhr.clear_timeout = function() {
+		if (this.__timeout) {
+			clearTimeout(this.__timeout);
+			delete this.__timeout;
+		}
+	};
 	xhr.setup_timeout = function() {
-		clearTimeout(this.__timeout);
-		this.__timeout = setTimeout(this.ontimeout.bind(this), 2*60*1000);
+		this.clear_timeout();
+		this.__timeout = setTimeout(this.ontimeout.bind(this), this.__timeout_ms);
 	};
 
 	xhr._abort = xhr.abort;
 
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
-		clearTimeout(this.__timeout);
+		this.clear_timeout();
 		this.listener = null; /* we're done here, release this slot */
-		xhr._abort();
+		this._abort();
 	}
 
 	xhr.nolistener = function() {
 		if (d) console.error('Socket: no listener for socket', this.__id);
-		clearTimeout(this.__timeout);
+		this.clear_timeout();
 		this._abort();
 	}
 
 	xhr.onreadystatechange = function() {
 		if (!this.listener) return this.nolistener();
-		xhr.setup_timeout();
+		this.setup_timeout();
 		switch(this.readyState) {
 			case 4:
 				if (this.listener.on_ready) {
-					clearTimeout(xhr.__timeout);
+					this.clear_timeout();
 					if(0xDEAD === this.listener.on_ready(arguments, this)) {
 						this.onerror();
 					} else {
@@ -41,9 +48,9 @@ function newXhr() {
 					}
 				}
 				break;
-			case 2:
+			// case 2:
 				// force progress update in case of a previous error with the chunk
-				this.onprogress({zSaaDc:1});
+				// this.onprogress({zSaaDc:1});
 		}
 	}
 
@@ -58,14 +65,17 @@ function newXhr() {
 
 	xhr.xhr_cleanup = function(e) {
 		if (!this.listener) return this.nolistener();
-		clearTimeout(xhr.__timeout);
+		this.clear_timeout();
 		if (this.listener.on_error && !this.__errored) {
-			var l = this.listener,r=e&&e.type||'error';
+			var l = this.listener;
 			this.listener  = null; /* release */
 			this.__errored = true;
-			l.on_error(arguments, this, r);
+			if (e !== 0x9ffe) {
+				var r = e && e.type || 'error';
+				if (d) console.error('Socket: on' + r, this.__id, this);
+				l.on_error(arguments, this, r);
+			}
 			this._abort();
-			if (d) console.error('Socket: on' + r, this.__id, this);
 			for(var i = 0; i < _xhr_queue.length; i++) {
 				if (_xhr_queue[i].__id == this.__id) {
 					_xhr_queue.splice(i, 1);
@@ -79,7 +89,7 @@ function newXhr() {
 
 	xhr.onprogress = function() {
 		if (!this.listener) return this.nolistener();
-		xhr.setup_timeout();
+		this.setup_timeout();
 		if (this.listener.on_progress) {
 			this.listener.on_progress(arguments, this)
 		}

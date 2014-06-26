@@ -1757,37 +1757,38 @@ function MegaData ()
 			st = dl_queue[dl_queue_num].st;
 		}
 
-		var failed = parseInt($('#' + id).data('failed') || "0");
+		// var failed = parseInt($('#' + id).data('failed') || "0");
 		// failed not long ago
-		if (failed+30000 > NOW()) return;
 
-		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
-			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
-			$.transferHeader();
-		}
+		// if (failed+30000 > NOW()) return;
 
 		if (!bl) return false;
 		if (!$.transferprogress) $.transferprogress={};
 		if (kbps == 0) {
 			if (!force && (perc != 100 || $.transferprogress[id])) return false;
-			kbps = 1; // hm,
 		}
+
+		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
+			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$.transferHeader();
+		}
+
 		var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
-		var retime = (bt-bl)/bps;
-		if (bl && bt)
+		var retime = bps && (bt-bl)/bps;
+		if (bt)
 		{
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
 			$.transferprogress[id] = [bl,bt];
 			if (!uldl_hold)
 			{
 				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
-				{					
+				{
 					$('.slideshow-error').addClass('hidden');
 					$('.slideshow-pending').addClass('hidden');
 					$('.slideshow-progress').attr('class','slideshow-progress percents-'+perc);
 				}
-			
+
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
 				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
@@ -1803,8 +1804,6 @@ function MegaData ()
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
 				}
-				
-				
 			}
 		}
 	}
@@ -1874,25 +1873,29 @@ function MegaData ()
 		$.dlheight = $('body').height();
 	}
 
-	this.dlerror = function(fileid, error, dl_queue_num)
+	this.dlerror = function(dl, error)
 	{
-		var errorstr=false;
+		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		if (error == EOVERQUOTA)
-		{
-			if (d) console.log('Quota error');
-			errorstr = l[233];
+
+		switch (error) {
+			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
+			case ESID:                 errorstr = l[19];  break;
+			case EBLOCKED:
+			case ETOOMANY:
+			case EACCESS:              errorstr = l[23];  break;
+			case ENOENT:               errorstr = l[22];  break;
+			case EKEY:                 errorstr = l[24];  break;
+			case EOVERQUOTA:
+				if (d) console.log('Quota error');
+				// errorstr = l[233];
+				// break;
+			// case EAGAIN:               errorstr = l[233]; break;
+			// case ETEMPUNAVAIL:         errorstr = l[233]; break;
+			default:                   errorstr = l[x=233]; break;
 		}
-		else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
-		else if (error == ESID) errorstr = l[19];
-		else if (error == ETEMPUNAVAIL) errorstr = l[233];
-		else if (error == EBLOCKED || error == ETOOMANY || error == EACCESS) errorstr=l[23];
-		else if (error == ENOENT) errorstr=l[22];
-		else if (error == EKEY) errorstr = l[24];
-		else if (error == EAGAIN) errorstr = l[233];
-		else errorstr = l[233];		
-				
-		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+
+		if (slideshowid == dl.id && !previews[slideshowid]) 
 		{
 			$('.slideshow-image-bl').addClass('hidden');
 			$('.slideshow-pending').addClass('hidden');
@@ -1901,34 +1904,32 @@ function MegaData ()
 			$('.slideshow-error-txt').text(errorstr);
 		}
 
-		var file = null;
-		$.each(dl_queue, function(id, f) {
-			if (f.id == fileid) {
-				file = f;
-				return false;
-			}
-		});
-
 		if (errorstr)  {
-			if (file) file.failed = new Date;
-			var dom = null;
-			if (file && file.zipid) {
-				dom = $('.transfer-table #zip_' + file.zipid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
-			} else {
-				dom = $('.transfer-table #dl_' + fileid + ' td:eq(3)').html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>');
+			dl.failed = new Date;
+			var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + fileid);
+			if (x != 233 || !(GlobalProgress[id] || {}).speed) {
+				/**
+				 * a chunk may fail at any time, don't report a temporary error while
+				 * there is network activity associated with the download, though.
+				 */
+				$('.transfer-table #' + id + ' td:eq(3)')
+					.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
+					// .parents('tr').data({'failed' : NOW()});
+				$('.transfer-table #' + id + ' td:eq(4)').text('');
+				$('.transfer-table #' + id + ' td:eq(6)').text('--:--:--');
 			}
-			dom.parents('tr').data({'failed' : NOW()});
 		}
 	}
 
-	this.dlstart = function(id,name,size, dl_queue_num)
+	this.dlstart = function(dl)
 	{
-		$('.transfer-table #dl_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
-		if (dl_queue[dl_queue_num].zipid) id = 'zip_' + dl_queue[dl_queue_num].zipid;
-		else id = 'dl_' + id;
+		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
+		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #' + id));
-		dl_queue[dl_queue_num].st = new Date().getTime();
-		M.dlprogress(id, 0, 0, 0, 0, dl_queue_num);
+		dl.st = NOW();
+		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
+		ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
+		if (typeof dl_queue[dl.pos] === 'object') M.dlprogress(id, 0, 0, 0, 0, dl.pos);
 		$.transferHeader();
 	}
 	this.mobileuploads = [];

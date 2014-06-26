@@ -2978,7 +2978,8 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('click', function (e) 
 	{
 		if ($.gridDragging) return false;
-		if (e.shiftKey && s.length > 0)
+		var s = e.shiftKey && $($.selectddUIgrid + ' .ui-selected');
+		if (s && s.length > 0)
 		{
 			var start = s[0];
 			var end = this;

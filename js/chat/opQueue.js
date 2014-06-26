@@ -33,8 +33,8 @@ var OpQueue = function(ctx, validateFn, recoverFailFn) {
  *
  * @param opName
  * @param arrArgs
- * @param secondArg
- * @param thirdArg
+ * @param [secondArg]
+ * @param [thirdArg]
  */
 OpQueue.prototype.queue = function(opName, arrArgs, secondArg, thirdArg) {
     arrArgs = arrArgs || [];

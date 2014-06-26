@@ -1,27 +1,4 @@
 /**
- * EncryptionFilterDemo
- *
- * Demo of how to use MegaChat and Karere's events to integrate the mpENC.
- *
- * Warning: Requires the full version of the sjcl, because of the encrypt/decrypt methods
- *
- * @param megaChat
- * @returns {EncryptionFilter}
- * @constructor
- */
-
-//TODO: Fix me.
-var TBD = {};
-TBD.ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
-TBD.ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-
-
-TBD.STATIC_PUB_KEY_DIR = {
-    'get': function(key) { return TBD.ED25519_PUB_KEY; }
-};
-
-
-/**
  * Encryption filter that connects MegaChat + Karere and mpENC
  *
  * @param megaChat
@@ -42,9 +19,19 @@ var EncryptionFilter = function(megaChat) {
 
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
-            TBD.ED25519_PRIV_KEY,
-            TBD.ED25519_PUB_KEY,
-            TBD.STATIC_PUB_KEY_DIR,
+            u_keySeed,
+            u_pubk25519,
+            {
+                'get': function(jid) {
+                    var contact = megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(jid));
+                    assert(!!contact, 'contact not found: ' + jid);
+
+                    var h = contact.u;
+                    assert(!!pubk25519[h], 'pubk25519 key not found for user: ' + h);
+
+                    return pubk25519[h];
+                }
+            },
             function(handler) {
                 self.flushQueue(megaRoom, handler);
             },
@@ -149,7 +136,7 @@ var EncryptionFilter = function(megaChat) {
 
 //        console.error("I'd Joined: ", users, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
 
-        if(users[0] == megaChat.karere.getJid()) {
+        if(megaRoom.iAmRoomOwner()) {
             // i'm the new "owner"
 
             // sync users list w/ encryption (join/exclude);
@@ -180,13 +167,7 @@ var EncryptionFilter = function(megaChat) {
             return;
         }
 
-        var users = megaRoom.getOrderedUsers();
-
-//        console.error("Joined: ", users, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
-
-
-//        console.error("got state change1?: ", users[0], megaRoom.megaChat.karere.getJid());
-        if(users[0] == megaChat.karere.getJid()) {
+        if(megaRoom.iAmRoomOwner()) {
             // i'm the "owner"
 
             // sync users list w/ encryption (join/exclude);
@@ -216,7 +197,7 @@ var EncryptionFilter = function(megaChat) {
             // sync users list w/ encryption (join/exclude);
             self.syncRoomUsersWithEncMembers(megaRoom);
 
-        } else if(users[0] == megaRoom.megaChat.karere.getJid()) {
+        } else if(megaRoom.iAmRoomOwner()) {
             // i'm the owner
 
             // sync users list w/ encryption (join/exclude);
@@ -261,6 +242,10 @@ var EncryptionFilter = function(megaChat) {
 
 
 
+    // fill my key
+    if(u_pubk25519) {
+        pubk25519[u_handle] = u_pubk25519;
+    }
 
     // incoming
     megaChat.karere.bind("onChatMessage", processIncoming);
@@ -269,7 +254,6 @@ var EncryptionFilter = function(megaChat) {
 
     // outgoing
     megaChat.karere.bind("onOutgoingMessage", processOutgoing);
-
 
 
     logAllCallsOnObject(this, console.error, true, "encFilter");
@@ -282,7 +266,7 @@ var EncryptionFilter = function(megaChat) {
  *
  * @type {string}
  */
-EncryptionFilter.MPENC_MSG_TAG = "?mpENC:";
+EncryptionFilter.MPENC_MSG_TAG = "?mpENC";
 
 
 /**
@@ -376,16 +360,31 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                 self.megaChat.karere.trigger("onChatMessage", [eventObject]);
             }
         } else {
+            var message = wireMessage.message;
+
+            var removeThisTypeOfDialogs = function() {
+                $('.fm-chat-inline-dialog-' + 'mpEnc-ui-' + wireMessage.type).remove();
+                megaRoom.refreshScrollUI();
+            };
+
+            if(wireMessage.type === "error" && wireMessage.message.indexOf("req-recover") !== -1) {
+                if(megaRoom.iAmRoomOwner()) {
+                    self.syncRoomUsersWithEncMembers(megaRoom, true);
+                }
+
+                message = "Something went wrong. mpENC received recover request, will start the process now.";
+            }
+
             var $dialog = megaRoom.generateInlineDialog(
                 "mpEnc-ui-" + wireMessage.type,
-                wireMessage.message,
+                message,
                 undefined,
-                ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type], {
+                ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type, 'mpEnc-message-' + wireMessage.messageId], {
                     'reject': {
                         'type': 'secondary',
                         'text': "Hide",
                         'callback': function() {
-                            $dialog.remove();
+                            removeThisTypeOfDialogs();
                         }
                     }
                 }
@@ -394,6 +393,44 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
             megaRoom.appendDomMessage(
                 $dialog
             );
+
+            createTimeoutPromise(function() {
+                return megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED
+            }, 500, 10000)
+                .done(function() {
+                    removeThisTypeOfDialogs();
+                })
+                .fail(function() {
+                    removeThisTypeOfDialogs();
+
+                    var $dialog2 = megaRoom.generateInlineDialog(
+                        "mpEnc-ui-" + wireMessage.type,
+                        "Could not recover mpENC from the problem. Do you want to retry manually?",
+                        undefined,
+                        ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type, 'mpEnc-message-' + wireMessage.messageId], {
+                            'retry': {
+                                'type': 'primary',
+                                'text': "Retry Manually",
+                                'callback': function() {
+                                    removeThisTypeOfDialogs();
+
+                                    megaRoom.encryptionHandler.sendError("req-recover");
+                                }
+                            },
+                            'reject': {
+                                'type': 'secondary',
+                                'text': "Hide",
+                                'callback': function() {
+                                    removeThisTypeOfDialogs();
+                                }
+                            }
+                        }
+                    );
+
+                    megaRoom.appendDomMessage(
+                        $dialog2
+                    );
+                });
         }
 
         if(localStorage.d) { console.error("uiQueue: ", wireMessage); }
@@ -637,12 +674,11 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
         });
         if(localStorage.d) { console.error("Found enc in message: ", wireMessage); }
 
-
         if(eventObject.getRawType() == "groupchat") {
             var roomJid = eventObject.getRoomJid();
             var megaRoom = self.megaChat.chats[roomJid];
             if(megaRoom) {
-                var resp = megaRoom.encryptionHandler.processMessage(wireMessage);
+                var resp = self.processMessage(e, megaRoom, wireMessage);
 
                 e.stopPropagation();
             } else {
@@ -651,7 +687,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
         } else if(eventObject.getRawType() == "chat") {
             // send to all chat rooms in which i'm currently having a chat w/ this user
             if(eventObject.getMeta().roomJid) {
-                self.megaChat.chats[eventObject.getMeta().roomJid].encryptionHandler.processMessage(wireMessage);
+                self.processMessage(e, self.megaChat.chats[eventObject.getMeta().roomJid], wireMessage);
                 if(!e.isPropagationStopped()) {
                     e.stopPropagation();
                 }
@@ -661,7 +697,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
                     if(v.getUsers()[fromJid]) {
                         if(localStorage.d) { console.error("Found matching room for priv msg: ", v.roomJid, v, wireMessage); }
 
-                        var resp = v.encryptionHandler.processMessage(wireMessage);
+                        var resp = self.processMessage(e, v, wireMessage);
 
                         if(!e.isPropagationStopped()) {
                             e.stopPropagation();
@@ -669,7 +705,6 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
                     }
                 });
             }
-
         } else {
             console.error("No idea how to handle enc message: ", wireMessage);
         }
@@ -677,6 +712,75 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
         // should not do anything...or call e.stopPropagation() to disable ANY plain text messages.
         if(localStorage.d) { console.debug("Got plaintext message: ", eventObject); }
     }
+};
+
+/**
+ * Recursive function that will retry to get the user's ed25519 key and call .processMessage within a try/catch
+ * up to 3 times and then will send a .recover request to the room owner
+ *
+ * @private
+ */
+EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wireMessage, contact, retriesCount) {
+
+    var self = this;
+    retriesCount = retriesCount || 0;
+
+
+    if(retriesCount >= 3) {
+        if(megaRoom.iAmRoomOwner()) {
+            if(localStorage.d) { console.error("could not process message, will try to .recover, since I'm the room owner."); }
+
+            self.syncRoomUsersWithEncMembers(megaRoom, true);
+        } else {
+            if(localStorage.d) { console.error("could not process message, will try to request .recover from the room owner."); }
+            megaRoom.encryptionHandler.sendError("req-recover");
+        }
+
+        return;
+    } else {
+        retriesCount++;
+    }
+
+    getpubk25519(contact.u, function(r) {
+        var failed = function() {
+            if(localStorage.d) {
+                console.error("Could not process message: ", wireMessage, e);
+            }
+
+            setTimeout(function() {
+                self._processMessageRecursive(e, megaRoom, wireMessage, contact, retriesCount);
+            }, retriesCount * 1234);
+        };
+
+        if(r) {
+            try {
+                megaRoom.encryptionHandler.processMessage(wireMessage);
+            } catch(e) {
+                if(localStorage.d) {
+                    console.error("Failed to process message", wireMessage, "with error:", e);
+                }
+//                failed();
+            }
+        } else {
+            failed();
+        }
+    });
+};
+
+EncryptionFilter.prototype.processMessage = function(e, megaRoom, wireMessage) {
+    var self = this;
+    var fromBareJid = Karere.getNormalizedBareJid(wireMessage.from);
+    var contact = megaRoom.megaChat.getContactFromJid(fromBareJid);
+    assert(!!contact, 'contact not found.');
+
+    if(localStorage.d) {
+        console.error("Processing: ", wireMessage)
+    }
+
+    var retriesCount = 0;
+
+
+    self._processMessageRecursive(e, megaRoom, wireMessage, contact, retriesCount);
 };
 
 /**

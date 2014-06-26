@@ -1163,6 +1163,10 @@ describe("Chat.js - Karere UI integration", function() {
 //            megaChat.karere.getJid()
 //        ]);
 
+        megaChat.chats[roomJid].encryptionHandler = {
+            'state': mpenc.handler.STATE.NULL
+        };
+
         megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
             roomJid + "/" + megaChat.karere.getNickname(),
             megaChat.karere.getJid(),

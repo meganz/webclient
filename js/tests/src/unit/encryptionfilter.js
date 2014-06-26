@@ -1,3 +1,13 @@
+var TESTING_KEYS = {};
+TESTING_KEYS.ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
+TESTING_KEYS.ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
+
+
+TESTING_KEYS.STATIC_PUB_KEY_DIR = {
+    'get': function(key) { return TESTING_KEYS.ED25519_PUB_KEY; }
+};
+
+
 describe("EncryptionFilter", function() {
 
 
@@ -26,6 +36,14 @@ describe("EncryptionFilter", function() {
         var self = this;
 
         self.chats = {};
+
+
+        self.getJidFromNodeId = function(nodeId) {
+            return megaUserIdEncodeForXmpp(nodeId) + "@jid.com";
+        };
+        self.getContactFromJid = function() {
+            return MegaChat.prototype.getContactFromJid.apply(this, toArray(arguments))
+        };
 
         $.each([
             'room1',
@@ -80,6 +98,11 @@ describe("EncryptionFilter", function() {
     var encryptionFilterMocker;
     var megaChatMocker;
 
+    var megaDataMocker;
+    
+    var myJid;
+    var otherUserJid;
+
     beforeEach(function(done) {
         // create dummy megaChat obj
 
@@ -91,6 +114,7 @@ describe("EncryptionFilter", function() {
         megaChatMocker = new ObjectMocker(megaChatObj, mockedFns);
 
 
+        megaDataMocker = new MegaDataMocker();
 
 
 
@@ -99,6 +123,10 @@ describe("EncryptionFilter", function() {
         var encryptionFilterMockedFns = ObjectMocker.generateMockArrayFor(encryptionFilter);
         encryptionFilterMocker = new ObjectMocker(encryptionFilter, encryptionFilterMockedFns);
 
+
+        myJid = megaChatObj.getJidFromNodeId(Object.keys(M.u)[0]);
+        otherUserJid = megaChatObj.getJidFromNodeId(Object.keys(M.u)[1]);
+        
         done();
     });
 
@@ -107,6 +135,9 @@ describe("EncryptionFilter", function() {
         megaChatMocker.restore();
         megaChatObj = null;
         encryptionFilter = null;
+
+        megaDataMocker.restore();
+        megaDataMocker = null;
 
         done();
     });
@@ -119,8 +150,8 @@ describe("EncryptionFilter", function() {
         expect(
             encryptionFilter.messageShouldNotBeEncrypted(
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "type",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgid",
@@ -141,8 +172,8 @@ describe("EncryptionFilter", function() {
         expect(
             encryptionFilter.messageShouldNotBeEncrypted(
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "type",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgid",
@@ -162,8 +193,8 @@ describe("EncryptionFilter", function() {
         expect(
             encryptionFilter.messageShouldNotBeEncrypted(
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "type",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgid",
@@ -184,8 +215,8 @@ describe("EncryptionFilter", function() {
         expect(
             encryptionFilter.messageShouldNotBeEncrypted(
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "type",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgid",
@@ -343,8 +374,8 @@ describe("EncryptionFilter", function() {
                 {
                     'type': 'message',
                     'messageId': 'msgId',
-                    'fromJid': 'from@jid.com',
-                    'toJid': 'toJid@jid.com',
+                    'fromJid': otherUserJid,
+                    'toJid': myJid,
                     'delay': 123,
                     'message': JSON.stringify([
                         {
@@ -366,8 +397,8 @@ describe("EncryptionFilter", function() {
             expect(JSON.stringify(megaChatObj.karere.trigger.getCall(0).args[1][0])).to.eql(
                 JSON.stringify(
                     {
-                        "toJid": "toJid@jid.com",
-                        "fromJid": "from@jid.com",
+                        "toJid": myJid,
+                        "fromJid": otherUserJid,
                         "messageId": "msgId",
                         "action": "action",
                         "meta":{
@@ -388,8 +419,8 @@ describe("EncryptionFilter", function() {
                 {
                     'type': 'message',
                     'messageId': 'msgId',
-                    'fromJid': 'from@jid.com',
-                    'toJid': 'toJid@jid.com',
+                    'fromJid': otherUserJid,
+                    'toJid': myJid,
                     'roomJid': 'room1@conference.jid.com',
                     'rawType': 'groupchat',
                     'delay': 123,
@@ -410,8 +441,8 @@ describe("EncryptionFilter", function() {
             expect(JSON.stringify(megaChatObj.karere.trigger.getCall(0).args[1][0])).to.eql(
                 JSON.stringify(
                     {
-                        "toJid": "toJid@jid.com",
-                        "fromJid": "from@jid.com",
+                        "toJid": myJid,
+                        "fromJid": otherUserJid,
                         "type": "Message",
                         "rawType": "groupchat",
                         "messageId": "msgId",
@@ -454,35 +485,36 @@ describe("EncryptionFilter", function() {
         it("direct message - valid room", function(done) {
             var room = megaChatObj.chats["room1@conference.jid.com"];
             room.getUsers = function() {
-                return {
-                    'from@jid.com': "owner"
-                };
+                var u = {};
+                u[otherUserJid] = "owner";
+
+                return u;
             };
 
 
             encryptionFilter.processIncomingMessage(
                 genDummyEvent(),
                 new KarereEventObjects.IncomingPrivateMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "Message",
                     /* rawType */ "chat",
                     /* messageId */ "msgId",
                     /* rawMessage */ null,
                     /* meta */ {},
-                    /* message */ EncryptionFilter.MPENC_MSG_TAG + "[encrypted contents]",
+                    /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
                     /* elements */ null,
                     /* delay */ 123
                 ),
                 megaChatObj.karere
             );
 
-            expect(room.encryptionHandler.processMessage.callCount).to.eql(1);
+            expect(encryptionFilter.processMessage.callCount).to.eql(1);
 
             expect(
-                JSON.stringify(room.encryptionHandler.processMessage.getCall(0).args[0])
+                JSON.stringify(encryptionFilter.processMessage.getCall(0).args[2])
             ).to.eql(
-                    '{"toJid":"to@jid.com","fromJid":"from@jid.com","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"from@jid.com"}'
+                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"' + otherUserJid + '"}'
                 );
 
             done();
@@ -491,30 +523,31 @@ describe("EncryptionFilter", function() {
         it("direct message - invalid room", function(done) {
             var room = megaChatObj.chats["room1@conference.jid.com"];
             room.getUsers = function() {
-                return {
-                    'from@jid.com': "owner"
-                };
+                var u = {};
+                u[otherUserJid] = "owner";
+
+                return u;
             };
 
 
             encryptionFilter.processIncomingMessage(
                 genDummyEvent(),
                 new KarereEventObjects.IncomingPrivateMessage(
-                    /* toJid */ "to@jid.com",
+                    /* toJid */ myJid,
                     /* fromJid */ "fromINVALID@jid.com",
                     /* type */ "Message",
                     /* rawType */ "chat",
                     /* messageId */ "msgId",
                     /* rawMessage */ null,
                     /* meta */ {},
-                    /* message */ EncryptionFilter.MPENC_MSG_TAG + "[encrypted contents]",
+                    /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
                     /* elements */ null,
                     /* delay */ 123
                 ),
                 megaChatObj.karere
             );
 
-            expect(room.encryptionHandler.processMessage.callCount).to.eql(0);
+            expect(encryptionFilter.processMessage.callCount).to.eql(0);
 
 
             done();
@@ -528,8 +561,8 @@ describe("EncryptionFilter", function() {
             encryptionFilter.processIncomingMessage(
                 genDummyEvent(),
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "Message",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgId",
@@ -538,19 +571,19 @@ describe("EncryptionFilter", function() {
                     /* meta */ {
                         'additionalMeta': true
                     },
-                    /* message */ EncryptionFilter.MPENC_MSG_TAG + "[encrypted contents]",
+                    /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
                     /* elements */ null,
                     /* delay */ 123
                 ),
                 megaChatObj.karere
             );
 
-            expect(room.encryptionHandler.processMessage.callCount).to.eql(1);
+            expect(encryptionFilter.processMessage.callCount).to.eql(1);
 
             expect(
-                JSON.stringify(room.encryptionHandler.processMessage.getCall(0).args[0])
+                JSON.stringify(encryptionFilter.processMessage.getCall(0).args[2])
             ).to.eql(
-                    '{"toJid":"to@jid.com","fromJid":"from@jid.com","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"message":"?mpENC:[encrypted contents]","from":"from@jid.com"}'
+                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"message":"?mpENC:[encrypted contents]","from":"' + otherUserJid + '"}'
                 );
 
             done();
@@ -564,8 +597,8 @@ describe("EncryptionFilter", function() {
             encryptionFilter.processIncomingMessage(
                 genDummyEvent(),
                 new KarereEventObjects.IncomingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "Message",
                     /* rawType */ "groupchat",
                     /* messageId */ "msgId",
@@ -596,8 +629,8 @@ describe("EncryptionFilter", function() {
             encryptionFilter.processOutgoingMessage(
                 genDummyEvent(),
                 new KarereEventObjects.OutgoingMessage(
-                    /* toJid */ "to@jid.com",
-                    /* fromJid */ "from@jid.com",
+                    /* toJid */ myJid,
+                    /* fromJid */ otherUserJid,
                     /* type */ "action",
                     /* messageId */ "msgId",
                     /* contents */ "[plain text message contents]",
@@ -611,7 +644,7 @@ describe("EncryptionFilter", function() {
             expect(room.encryptionOpQueue.queue.callCount).to.eql(1);
 
             expect(JSON.stringify(room.encryptionOpQueue.queue.getCall(0).args)).to.eql(
-                '["sendTo","[\\"[plain text message contents]\\",{\\"roomJid\\":\\"room1@conference.jid.com\\"}]","to@jid.com",{"messageId":"msgId","roomJid":"room1@conference.jid.com","delay":123}]'
+                '["sendTo","[\\"[plain text message contents]\\",{\\"roomJid\\":\\"room1@conference.jid.com\\"}]","' + myJid + '",{"messageId":"msgId","roomJid":"room1@conference.jid.com","delay":123}]'
             );
 
 
@@ -626,7 +659,7 @@ describe("EncryptionFilter", function() {
                 genDummyEvent(),
                 new KarereEventObjects.OutgoingMessage(
                     /* toJid */ room.roomJid,
-                    /* fromJid */ "from@jid.com",
+                    /* fromJid */ otherUserJid,
                     /* type */ "groupchat",
                     /* messageId */ "msgId",
                     /* contents */ "[plain text message contents]",
@@ -710,6 +743,7 @@ describe("EncryptionFilter", function() {
                     Object.keys(newUsers)[0]
                 ];
             };
+            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
 
 
                 megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
@@ -840,6 +874,8 @@ describe("EncryptionFilter", function() {
                 ];
             };
 
+            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
+
 
                 megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
                 /* fromJid */ room.roomJid,
@@ -963,6 +999,8 @@ describe("EncryptionFilter", function() {
                     megaChatObj.karere.getJid()
                 ];
             };
+
+            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
 
             room.state =  MegaChatRoom.STATE.PLUGINS_WAIT;
             megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
@@ -1241,108 +1279,266 @@ describe("EncryptionFilter", function() {
         });
     });
 
-    it("issue 283 - ProtocolHandler changes his state to INITIALISED too early (BEFORE its actually initialised)", function(done) {
-        // ph1 is the owner of the room
-        var ph1 = new mpenc.handler.ProtocolHandler(
-            "jid1",
-            TBD.ED25519_PRIV_KEY,
-            TBD.ED25519_PUB_KEY,
-            TBD.STATIC_PUB_KEY_DIR,
-            function(handler) {
+    describe("Regression tests", function() {
+        it("issue 283 - ProtocolHandler changes his state to INITIALISED too early (BEFORE its actually initialised)", function(done) {
+            // ph1 is the owner of the room
+            var ph1 = new mpenc.handler.ProtocolHandler(
+                "jid1",
+                TESTING_KEYS.ED25519_PRIV_KEY,
+                TESTING_KEYS.ED25519_PUB_KEY,
+                TESTING_KEYS.STATIC_PUB_KEY_DIR,
+                function(handler) {
 
-            },
-            function(handler) {
-            }
-        );
-
-        var ph2 = new mpenc.handler.ProtocolHandler(
-            "jid2",
-            TBD.ED25519_PRIV_KEY,
-            TBD.ED25519_PUB_KEY,
-            TBD.STATIC_PUB_KEY_DIR,
-            function(handler) {
-
-            },
-            function(handler) {
-            }
-        );
-
-        // initial start & handshake
-        ph1.start([
-            "jid2"
-        ]);
-
-
-        ph2.processMessage(
-            ph1.protocolOutQueue.pop()
-        );
-
-        // *new* by patching the 'stateUpdatedCallback' we will add a expect() to be sure that the .state is set to
-        // READY, after the protocolOutQueue is updated
-        ph1.stateUpdatedCallback = function(h) {
-            if(this.state == 3) {
-                expect(ph1.protocolOutQueue.length).to.eql(1);
-            }
-        };
-
-        ph1.processMessage(
-            ph2.protocolOutQueue.pop()
-        );
-
-        expect(ph1.state).to.eql(3);
-
-
-        ph1.stateUpdatedCallback = function(h) {};
-
-        ph2.processMessage(
-            ph1.protocolOutQueue.pop()
-        );
-
-        expect(ph2.state).to.eql(3);
-        {
-            // this is the problematic part..ph1 (room owner, who started the enc flow) sees he is at state == READY
-            // so he tries to send a message to ph2, meanwhile ph2 is STILL not in ready state
-
-            // test message sending - jid1 -> jid2
-            ph1.send("a", {});
-
-            ph2.processMessage(
-                ph1.messageOutQueue.pop()
+                },
+                function(handler) {
+                }
             );
 
-            expect(ph2.uiQueue[0].message).to.eql("a");
-            expect(ph2.uiQueue[0].from).to.eql("jid1");
-            expect(ph2.uiQueue[0].type).to.eql("message");
-        }
+            var ph2 = new mpenc.handler.ProtocolHandler(
+                "jid2",
+                TESTING_KEYS.ED25519_PRIV_KEY,
+                TESTING_KEYS.ED25519_PUB_KEY,
+                TESTING_KEYS.STATIC_PUB_KEY_DIR,
+                function(handler) {
+
+                },
+                function(handler) {
+                }
+            );
+
+            // initial start & handshake
+            ph1.start([
+                "jid2"
+            ]);
+
+
+            ph2.processMessage(
+                ph1.protocolOutQueue.pop()
+            );
+
+            // *new* by patching the 'stateUpdatedCallback' we will add a expect() to be sure that the .state is set to
+            // READY, after the protocolOutQueue is updated
+            ph1.stateUpdatedCallback = function(h) {
+                if(this.state == 3) {
+                    expect(ph1.protocolOutQueue.length).to.eql(1);
+                }
+            };
+
+            ph1.processMessage(
+                ph2.protocolOutQueue.pop()
+            );
+
+            expect(ph1.state).to.eql(3);
+
+
+            ph1.stateUpdatedCallback = function(h) {};
+
+            ph2.processMessage(
+                ph1.protocolOutQueue.pop()
+            );
+
+            expect(ph2.state).to.eql(3);
+            {
+                // this is the problematic part..ph1 (room owner, who started the enc flow) sees he is at state == READY
+                // so he tries to send a message to ph2, meanwhile ph2 is STILL not in ready state
+
+                // test message sending - jid1 -> jid2
+                ph1.send("a", {});
+
+                ph2.processMessage(
+                    ph1.messageOutQueue.pop()
+                );
+
+                expect(ph2.uiQueue[0].message).to.eql("a");
+                expect(ph2.uiQueue[0].from).to.eql("jid1");
+                expect(ph2.uiQueue[0].type).to.eql("message");
+            }
 
 
 
-        expect(ph2.state).to.eql(3);
+            expect(ph2.state).to.eql(3);
 
 
 
 
 
 
-        // test message sending from jid2 -> jid1
+            // test message sending from jid2 -> jid1
 
-        ph2.send("b", {meta: true});
+            ph2.send("b", {meta: true});
 
-        ph1.processMessage(
-            ph2.messageOutQueue.pop()
-        );
-
-
+            ph1.processMessage(
+                ph2.messageOutQueue.pop()
+            );
 
 
 
-        expect(ph1.uiQueue[0].message).to.eql("b");
-        expect(ph1.uiQueue[0].metadata.meta).to.eql(true);
-        expect(ph1.uiQueue[0].from).to.eql("jid2");
-        expect(ph1.uiQueue[0].type).to.eql("message");
+
+
+            expect(ph1.uiQueue[0].message).to.eql("b");
+            expect(ph1.uiQueue[0].metadata.meta).to.eql(true);
+            expect(ph1.uiQueue[0].from).to.eql("jid2");
+            expect(ph1.uiQueue[0].type).to.eql("message");
 
 
 
-        done();
-    })
+            done();
+        });
+    });
+
+    describe("25519 keys", function() {
+        it("feature 306 - async loading of 25519 pub keys + .recover signaling/calling when .processMessage fails", function(done) {
+
+            // mock setTimeout
+            sinon.stub(window, 'setTimeout', function(cb, timer) {
+                console.debug("setTimeout was called with timer: ", timer, "and cb: ", cb);
+                cb();
+            });
+
+            // initialize encryptionOpQueue
+            var room = megaChatObj.chats["room1@conference.jid.com"];
+            room.getOrderedUsers = function() {
+                return [
+                    myJid,
+                    otherUserJid
+                ];
+            };
+
+            megaChatObj.trigger("onRoomCreated", room);
+
+            expect(room.encryptionHandler instanceof mpenc.handler.ProtocolHandler).to.be.ok;
+            expect(room.encryptionOpQueue instanceof OpQueue).to.be.ok;
+
+            encryptionFilter.syncRoomUsersWithEncMembers.restore();
+            sinon.stub(encryptionFilter, 'syncRoomUsersWithEncMembers', function(){});
+
+            room.encryptionHandler.askeMember.members = room.getOrderedUsers();
+            room.encryptionHandler.cliquesMember.members = room.getOrderedUsers();
+
+
+            // test the case when the 25519 keys are loaded successfully and the message is processed
+            {
+                room.iAmRoomOwner = function() { return true; };
+
+                sinon.stub(room.encryptionHandler, 'processMessage', function() {});
+
+                encryptionFilter.processIncomingMessage(
+                    genDummyEvent(),
+                    new KarereEventObjects.IncomingPrivateMessage(
+                        /* toJid */ myJid,
+                        /* fromJid */ otherUserJid,
+                        /* type */ "Message",
+                        /* rawType */ "chat",
+                        /* messageId */ "msgId",
+                        /* rawMessage */ null,
+                        /* meta */ {
+                            roomJid: "room1@conference.jid.com"
+                        },
+                        /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
+                        /* elements */ null,
+                        /* delay */ 123
+                    ),
+                    megaChatObj.karere
+                );
+
+                expect(encryptionFilter.processMessage.callCount).to.eql(1);
+
+                expect(
+                    JSON.stringify(encryptionFilter.processMessage.getCall(0).args[2])
+                ).to.eql(
+                        '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{"roomJid":"room1@conference.jid.com"},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"' + otherUserJid + '"}'
+                    );
+
+                expect(getpubk25519.callCount).to.eql(1);
+                expect(getpubk25519.getCall(0).args[0]).to.eql("B_123456789");
+
+                room.encryptionHandler.processMessage.restore();
+            }
+
+            sinon.spy(room.encryptionHandler, 'sendError');
+            sinon.spy(room.encryptionHandler, 'recover');
+
+            // test the case when the 25519 keys are NOT loaded successfully OR processMessage had failed
+            {
+                var _tmp = getpubk25519;
+
+                // force the getpubk25519 to fail
+                getpubk25519 = function(h, cb) {
+                    cb(false);
+                };
+
+                // -> when i'm NOT a room owner
+                room.iAmRoomOwner = function() { return false; };
+
+                encryptionFilter.processIncomingMessage(
+                    genDummyEvent(),
+                    new KarereEventObjects.IncomingPrivateMessage(
+                        /* toJid */ myJid,
+                        /* fromJid */ otherUserJid,
+                        /* type */ "Message",
+                        /* rawType */ "chat",
+                        /* messageId */ "msgId",
+                        /* rawMessage */ null,
+                        /* meta */ {
+                            roomJid: "room1@conference.jid.com"
+                        },
+                        /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
+                        /* elements */ null,
+                        /* delay */ 123
+                    ),
+                    megaChatObj.karere
+                );
+
+                expect(encryptionFilter.processMessage.callCount).to.eql(2);
+
+                expect(encryptionFilter._processMessageRecursive.callCount).to.eql(5);
+
+                expect(room.encryptionHandler.sendError.callCount).to.eql(1);
+                expect(room.encryptionHandler.sendError.getCall(0).args[0]).to.eql("req-recover");
+
+                expect(room.encryptionHandler.recover.callCount).to.eql(0);
+                expect(encryptionFilter.syncRoomUsersWithEncMembers.callCount).to.eql(0);
+
+                // -> when i am the room owner
+                room.iAmRoomOwner = function() { return true; };
+
+                encryptionFilter.processIncomingMessage(
+                    genDummyEvent(),
+                    new KarereEventObjects.IncomingPrivateMessage(
+                        /* toJid */ myJid,
+                        /* fromJid */ otherUserJid,
+                        /* type */ "Message",
+                        /* rawType */ "chat",
+                        /* messageId */ "msgId",
+                        /* rawMessage */ null,
+                        /* meta */ {
+                            roomJid: "room1@conference.jid.com"
+                        },
+                        /* message */ EncryptionFilter.MPENC_MSG_TAG + ":[encrypted contents]",
+                        /* elements */ null,
+                        /* delay */ 123
+                    ),
+                    megaChatObj.karere
+                );
+
+                expect(encryptionFilter.processMessage.callCount).to.eql(3);
+
+                expect(encryptionFilter._processMessageRecursive.callCount).to.eql(9);
+
+                expect(room.encryptionHandler.sendError.callCount).to.eql(1);
+
+
+                expect(room.encryptionHandler.recover.callCount).to.eql(0);
+                expect(encryptionFilter.syncRoomUsersWithEncMembers.callCount).to.eql(1);
+
+                window.setTimeout.restore(); // restore the stub method
+
+                getpubk25519 = _tmp; // restore getpubk25519 method
+
+                encryptionFilter.syncRoomUsersWithEncMembers.restore();
+
+                done();
+            }
+        });
+    });
 });

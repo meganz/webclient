@@ -12,6 +12,17 @@ var MegaDataMocker = function() {
         {
             'u_handle': "A_123456789",
             'u_sid': "c5N5zoeMFzja_tScIA3QQVo2aWpwS0NsT184ggY0ta9BlkYxFfmIDdkvig",
+            // 25519 keys mocker
+            'u_pubk25519': atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo='),
+            'pubk25519': {
+                'A_123456789': atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=')
+            },
+            'getpubk25519': function(h, cb) {
+                pubk25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
+
+                cb(pubk25519[h]);
+            },
+            'u_keySeed': atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='),
             'avatars': {},
             'M': {
                 'u': {

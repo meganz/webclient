@@ -986,8 +986,8 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
                     }
                 })
             }
-        } else { // they had joined
-
+        } else {
+            // they had joined
         }
         var room = self.chats[eventObject.getRoomJid()];
         assert(room, "Room not found!");
@@ -1834,20 +1834,20 @@ var MegaChatRoom = function(megaChat, roomJid) {
      */
     $('.call-actions', self.$header).unbind('click.megaChat');
 
+    var doCancel = function() {
+        if(self.callRequest && self.callRequest.cancel) {
+            self.callRequest.cancel();
+
+            resetCallStateNoCall();
+        }
+        self.megaChat.karere.connection.rtc.hangup();
+    };
+
     var startCall = function() {
         self.megaChat.closeChatPopups();
 
         var participants = self.getParticipantsExceptMe();
         assert(participants.length > 0, "No participants.");
-
-        var doCancel = function() {
-            if(self.callRequest && self.callRequest.cancel) {
-                self.callRequest.cancel();
-
-                resetCallStateNoCall();
-            }
-            self.megaChat.karere.connection.rtc.hangup();
-        };
 
         if(self.callRequest) {
             doCancel();
@@ -2091,6 +2091,28 @@ var MegaChatRoom = function(megaChat, roomJid) {
         );
         callStartedState(e, eventData);
     });
+
+    self.bind('local-media-fail', function(e, eventData) {
+        if(self.callRequest) {
+            doCancel();
+        }
+
+        var msg = "Could not start call.";
+
+        if(eventData.error == "PermissionDeniedError" || eventData == "PermissionDeniedError") {
+            msg = "Call to failed, because access to the mic/camera was denied.";
+        }
+
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "canceled-call-" + unixtime(),
+                msg,
+                undefined,
+                ['fm-chat-different-device-call']
+            )
+        );
+    });
+
     self.bind('call-answered', function(e, eventData) {
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -2172,12 +2194,14 @@ var MegaChatRoom = function(megaChat, roomJid) {
                 )
             )
         } else {
+            //TODO: should we add special UI notification for .reason === busy? do we have icon for this?
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "ended-call-" + unixtime(),
                     msg,
                     undefined,
-                    ['fm-chat-call-ended']
+                    ['fm-chat-call-ended', 'fm-chat-call-reason-' + eventData.reason]
                 )
             );
         }
@@ -2490,6 +2514,19 @@ MegaChatRoom.prototype.getRoomOwner = function() {
     var users = self.megaChat.karere.getOrderedUsersInChat(self.roomJid);
 
     return users[0];
+};
+
+/**
+ * Check if i'm the owner of the room
+ *
+ * @returns {boolean}
+ */
+MegaChatRoom.prototype.iAmRoomOwner = function() {
+    var self = this;
+
+    var users = self.getOrderedUsers();
+
+    return users[0] === self.megaChat.karere.getJid();
 };
 
 MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
@@ -3018,6 +3055,8 @@ MegaChatRoom.prototype.generateInlineDialog = function(type, title, messageConte
     $('.fm-chat-message', $inlineDialog).text(messageContents ? messageContents : "");
 
     var $pad = $('.fm-chat-messages-pad', $inlineDialog);
+
+    $pad.parent().attr('data-timestamp', unixtime());
 
     var $primaryButton = $('.verify-button', $inlineDialog).detach();
     var $secondaryButton = $('.skip-button', $inlineDialog).detach();

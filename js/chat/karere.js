@@ -89,21 +89,20 @@ var Karere = function(user_options) {
     self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
 
     // Implement a straight forward, naive cleanup logic to be executed before the page is reloaded
-    // ideas and references:
-    // - https://github.com/metajack/strophejs/issues/16
-    // -
-    $(window).on("beforeunload", function() {
+    $(window).on("unload", function() {
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
             var msg = $pres({
                 type: 'unavailable'
             });
 
-            self.connection.sync = true;
+
 
             self.connection.send(msg);
 
             self.connection.flush();
+
+            self.connection.sync = true;
 
             self.connection.disconnect();
 

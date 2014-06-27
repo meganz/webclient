@@ -2832,7 +2832,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     var timestamp = message.getDelay() ? message.getDelay() : unixtime();
 
-    $('.nw-chat-date-txt', $message).text(
+    $('.chat-message-date', $message).text(
         unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
     );
 
@@ -2879,11 +2879,11 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
 
     if(message.messageHtml) {
-        $('.fm-chat-message span', $message).html(
+        $('.fm-chat-message .chat-message-txt span', $message).html(
             message.messageHtml.replace(/\s{2}/gi, "&nbsp;")
         );
     } else {
-        $('.fm-chat-message span', $message).html(
+        $('.fm-chat-message .chat-message-txt span', $message).html(
             htmlentities(message.getContents()).replace(/\n/gi, "<br/>").replace(/\s/gi, "&nbsp;")
         );
     }
@@ -2956,7 +2956,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     if(!$after && !$before) {
 //        console.log("append: ", message.message);
-        $('.jspContainer > .jspPane', self.$messages)
+        $('.jspContainer > .jspPane > .fm-chat-message-pad', self.$messages)
             .append($message);
     } else if($before) {
 //        console.log("before: ", message.message, $before.text());

@@ -49,7 +49,7 @@
         }
 
 
-        $('.incoming-call-username', self.$dialog).text(username);
+        $('.incoming-call-name', self.$dialog).text(username);
 
         $('.icoming-call-header', self.$dialog).text(
             self.options.textMessage.replace("$username", username)
@@ -170,11 +170,16 @@
         '       <div class="incoming-call-shadow-bl"></div>\n' +
         '       <img src="images/mega/default-avatar.png" alt="" />\n' +
         '   </div>\n' +
-        '<div class="incoming-call-username">Andrei D.</div>\n' +
+        '<div class="incoming-call-username">\n' +
+		  '<span class="incoming-contact-info">\n' +
+            '<span class="incoming-call-name">Andrei D.</span>\n' +
+            '<span class="incoming-call-txt">Incoming call...</span>\n' +
+          '</span>\n'
+        '</div>\n' +
         '   <div class="incoming-call-buttons">\n' +
         '       <div class="icoming-call-button cancel-call"></div>\n' +
+		'       <div class="icoming-call-button video-call"></div>\n' +
         '       <div class="icoming-call-button audio-call"></div>\n' +
-        '       <div class="icoming-call-button video-call"></div>\n' +
         '   </div>\n' +
         '</div>';
 

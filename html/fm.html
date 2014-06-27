@@ -358,22 +358,25 @@
             <div class="fm-chat-file-button skip-button">Secondary button</div>
         </div>
     </div>
-
+    
 
     <div class="message template hidden">
-        <div class="nw-chat-date">
-            <div class="chat-date-line"></div>
-            <div class="nw-chat-date-txt">Today, 2:00 PM</div>
-        </div>
-
+        
         <!-- One Message block !-->
         <div class="fm-chat-messages-block">
             <div class="fm-chat-messages-pad">
                 <div class="nw-contact-avatar">
                     <img alt="" src="images/mega/default-small-avatar.png">
                 </div>
-                <div class="fm-chat-message"> <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> </div>
-                <div class="clear"></div>
+                <div class="fm-chat-message"> 
+                  <span class="chat-username">Name</span>
+                  <span class="clear"></span>
+                  <div class="chat-message-date">2:02 pm</div>
+                  <div class="chat-message-txt"><span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span> 
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                
             </div>
         </div>
         <!-- End ofMessage block !-->
@@ -428,6 +431,10 @@
 
     <div class="fm-chat-message-scroll template">
       <div class="fm-chat-message-pad">
+        <div class="chat-date-divider">
+              <div class="chat-date-top-arrow"></div>
+              <div class="chat-date-bottom-arrow"></div>
+        </div>
         <!-- Unhide on "save-button" mouseover !-->
         <div class="fm-chat-download-popup hidden">
             <div class="fm-chat-download-arrow"></div>

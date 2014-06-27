@@ -3198,35 +3198,35 @@ label.iPhoneCheckLabelOff span {
 	text-align: center;
 	font-family: 'Open Sans Semibold';
 }
-.nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2 {
+.fm-avatar.color1 {
+	background-color: #FF6A19;
+}
+.nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2, .fm-avatar.color2 {
 	background-color: #5856d6;
 }
-.nw-contact-avatar.color3, .contacts-avatar.color3, .avatar.color3 {
+.nw-contact-avatar.color3, .contacts-avatar.color3, .avatar.color3, .fm-avatar.color3 {
 	background-color: #007aff;
 }
-.nw-contact-avatar.color4, .contacts-avatar.color4, .avatar.color4 {
+.nw-contact-avatar.color4, .contacts-avatar.color4, .avatar.color4, .fm-avatar.color4 {
 	background-color: #34aadc;
 }
-.nw-contact-avatar.color5, .contacts-avatar.color5, .avatar.color5 {
+.nw-contact-avatar.color5, .contacts-avatar.color5, .avatar.color5, .fm-avatar.color5 {
 	background-color: #5ac8fa;
 }
-.nw-contact-avatar.color6, .contacts-avatar.color6, .avatar.color6 {
+.nw-contact-avatar.color6, .contacts-avatar.color6, .avatar.color6, .fm-avatar.color6 {
 	background-color: #4cd964;
 }
-.nw-contact-avatar.color7, .contacts-avatar.color7, .avatar.color7 {
+.nw-contact-avatar.color7, .contacts-avatar.color7, .avatar.color7, .fm-avatar.color7 {
 	background-color: #ff1a53;
 }
-.nw-contact-avatar.color8, .contacts-avatar.color8, .avatar.color8 {
+.nw-contact-avatar.color8, .contacts-avatar.color8, .avatar.color8, .fm-avatar.color8 {
 	background-color: #d90007;
 }
-.nw-contact-avatar.color9, .contacts-avatar.color9, .avatar.color9 {
+.nw-contact-avatar.color9, .contacts-avatar.color9, .avatar.color9, .fm-avatar.color9 {
 	background-color: #ff9500;
 }
-.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10 {
+.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10, .fm-avatar.color10 {
 	background-color: #ffcc00;
-}
-.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10 {
-	background-color: 8e8e93;
 }
 .add-contact-item, .add-contact-pad {
 	display: block;
@@ -3567,29 +3567,30 @@ label.iPhoneCheckLabelOff span {
 	background-image: none;
 }
 .fm-avatar {
-	height: 36px;
-	width: 36px;
+	height: 24px;
+	width: 24px;
 	float: right;
 	display: block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 7px 10px 0 0;
+	margin:12px 10px 0 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	line-height: 0;
 	overflow: hidden;
-	padding: 2px;
-	background-color: white;
 	cursor: pointer;
+	line-height:22px;
+	color: white;
+text-align: center;
+font-family: 'Open Sans Semibold';
+font-size:16px;
 }
 .download-page .fm-avatar {
 	height: 44px;
 	width: 44px;
 	margin: 3px 8px 0 -2px;
-	padding: 2px;
-	border: 2px solid #d9d9d9;
 }
 .top-menu-icon {
 	cursor: pointer;
@@ -3620,7 +3621,7 @@ label.iPhoneCheckLabelOff span {
 	color: #bcbcbc;
 }
 .fm-avatar img {
-	width: 32px;
+	width: 24px;
 	border: 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;

@@ -586,7 +586,7 @@ function crypto_rsagenkey ()
 {
     var startTime = new Date();
 
-    if ( msCrypto && msCrypto.subtle ) {
+    if ( typeof msCrypto !== 'undefined' && msCrypto.subtle ) {
         var ko = msCrypto.subtle.generateKey( { name: 'RSAES-PKCS1-v1_5', modulusLength: 2048 }, true );
         ko.oncomplete = function () {
             ko = msCrypto.subtle.exportKey( 'jwk', ko.result.privateKey );

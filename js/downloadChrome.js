@@ -147,7 +147,7 @@ function FileSystemAPI(dl_id, dl) {
 		}
 
 		navigator.webkitPersistentStorage.queryUsageAndQuota(function(used, remaining)  {
-			navigator.webkitTemporaryStorage.queryUsageAndQuota(function(tused,tremaining) {				
+			navigator.webkitTemporaryStorage.queryUsageAndQuota(function(tused,tremaining) {
 				if (used > 0 || remaining > 0) {
 					dl_storagetype = 1
 					if (remaining < reqsize) {
@@ -158,16 +158,16 @@ function FileSystemAPI(dl_id, dl) {
 						next(true);
 					}
 				} else {
-					// check if standard temporary quota is sufficient to proceed:
+					// check if our temporary storage quota is sufficient to proceed (require 60% margin because quota the quota can change during the download) :
 					dl_storagetype = 0
-					if (tremaining > reqsize) {
+					if (tremaining > reqsize*1.5+1024*1024*100) {
 						next(true);
-					} else if (tused+tremaining > reqsize) {
+					} else if (tused+tremaining > reqsize*1.5+1024*1024*100) {
 						clearit(0,300,function() {
 							retry();
 						});
 					} else {
-						// ran out of 20% of 50% of free diskspace -> request persistent storage to be able to use all remaining disk space:
+						// highly likely that we will run out of 20% of 50% of free our diskspace -> request persistent storage to be able to use all remaining disk space:
 						navigator.webkitPersistentStorage.requestQuota(1024*1024*1024*100, function(grantedBytes) {
 							if (grantedBytes == 0) return retry();
 

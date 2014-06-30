@@ -36,6 +36,27 @@ MegaQueue.prototype.resume = function() {
 	this.trigger('resume')
 };
 
+MegaQueue.prototype.canExpand = function() {
+	return this._limit <= this._running && this._limit*1.5 >= this._running;
+}
+
+/**
+ *	Expand temporarily the queue size, it should be called
+ *	when a task is about to end (for sure) so a new 
+ *  task can start. 
+ *
+ *	It is useful when download many tiny files
+ */
+MegaQueue.prototype.expand = function() {
+	if (this.canExpand()) {
+		this._expanded = true;
+		this._process();
+		if (d) console.error("expand queue " + this._running);
+		return true;
+	}
+	return false;
+};
+
 MegaQueue.prototype.shrink = function() {
 	this._limit = Math.max(this._limit-1, 1);
 	return this._limit;

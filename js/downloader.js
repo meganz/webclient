@@ -45,7 +45,7 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 	var pbx = this.Progress.data[this.xid];
 	if (!pbx) return;
 
-	if (!report_done) report_done = !this.done && iRealDownloads <= dlQueue._limit * 1.2
+	if (!report_done) report_done = !this.done && dlQueue.canExpand()
 		&& (pbx[1]-pbx[0])/this.Progress.speed <= dlDoneThreshold;
 
 	if (report_done) {
@@ -120,10 +120,8 @@ ClassChunk.prototype.isCancelled = function() {
 ClassChunk.prototype.finish_download = function() {
 	ASSERT(!!this.xhr, "Don't call me twice!");
 	if (this.xhr) {
-		ASSERT(iRealDownloads > 0, 'Inconsistent iRealDownloads');
 		this.xhr.xhr_cleanup(0x9ffe);
 		delete this.xhr;
-		iRealDownloads--;
 		this.task_done.apply(this, arguments);
 	}
 }
@@ -195,16 +193,17 @@ ClassChunk.prototype.request = function() {
 	DEBUG("Fetch " + this.url);
 }
 
+var iRealDownloads;
 ClassChunk.prototype.run = function(task_done) {
+	this.has_failed = false;
 	this.localId = ++iRealDownloads;
-	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
+	if (this.size < 100 * 1024 && dlQueue.expand()) {
 		/**
 		 *	It is an small chunk and we *should* finish soon if everything goes
 		 *	fine. We release our slot so another chunk can start now. It is useful
 		 *	to speed up tiny downloads on a ZIP file
 		 */
 		this.done = true;
-		dlQueue.expand();
 	}
 
 	this.task_done = task_done;
@@ -418,9 +417,8 @@ var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
  *	report to the scheduler that they are done when it may not be necessarily
  *	true (but they are for instance close to their finish)
  */
-var iRealDownloads = 0
-	// ETA (in seconds) to consider a download finished, used to speed up chunks
-	, dlDoneThreshold = 3
+// ETA (in seconds) to consider a download finished, used to speed up chunks
+var  dlDoneThreshold = 3
 
 function downloader(task, done) {
 	if (DownloadManager.isRemoved(task)) {

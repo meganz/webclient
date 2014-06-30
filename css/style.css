@@ -6218,6 +6218,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
+	height:100%;
 }
 .video-resizer {
 	height: 16px;
@@ -6322,6 +6323,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 159px;
 	min-height: 120px;
 	max-height: 180px;
+}
+.current-user-video-block video, .current-user-video-block img {
+	height:100%;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
 }
 .current-user-resizer {
 	cursor: move;

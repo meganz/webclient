@@ -41,11 +41,11 @@ MegaQueue.prototype.canExpand = function() {
 }
 
 /**
- *	Expand temporarily the queue size, it should be called
- *	when a task is about to end (for sure) so a new 
- *  task can start. 
+ * Expand temporarily the queue size, it should be called
+ * when a task is about to end (for sure) so a new
+ * task can start.
  *
- *	It is useful when download many tiny files
+ * It is useful when download many tiny files
  */
 MegaQueue.prototype.expand = function() {
 	if (this.canExpand()) {
@@ -188,19 +188,4 @@ MegaQueue.prototype.push = function(arg, next, self) {
 	this._queue.push([arg, next, self]);
 	this.trigger('queue');
 	this._process();
-};
-
-/**
- * Expand temporarily the queue size, it should be called
- * when a task is about to end (for sure) so a new
- * task can start.
- *
- *	It is useful when download many tiny files
- */
-MegaQueue.prototype.expand = function() {
-
-	if (this._limit*1.5 >= this._running) {
-		this._expanded = true;
-		this._process();
-	}
 };

@@ -349,7 +349,22 @@ function dl_writer(dl, is_ready) {
 
 	dl.decrypter = 0;
 
+	function finish_write(task, done) {
+		done();
+
+		if (typeof task.callback == "function") {
+			task.callback();
+		}
+		dl.ready(); /* tell the download scheduler we're done */
+		delete task.data;
+	}
+
 	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
+		if (task.data.length == 0) {
+			if (d) console.error("writing empty chunk");
+			return finish_write(task, done);
+		}
+
 		dl.io.write(task.data, task.offset, function() {
 			dl.writer.pos += task.data.length;
 			if (dl.data) {
@@ -360,15 +375,7 @@ function dl_writer(dl, is_ready) {
 				).set(task.data);
 			}
 
-			done();
-
-			if (typeof task.callback == "function") {
-				task.callback();
-			}
-
-			dl.ready(); /* tell the download scheduler we're done */
-
-			delete task.data;
+			return finish_write(task, done);
 		});
 	}, 1);
 

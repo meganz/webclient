@@ -747,8 +747,8 @@ $(document).ready(function() {
         </div>
         
         <!-- Chat audio/video indicators !-->
-        <div class="chat-header-indicator muted-audio hidden"></div>
-        <div class="chat-header-indicator muted-video hidden"></div>
+        <div class="chat-header-indicator muted-audio"></div>
+        <div class="chat-header-indicator muted-video"></div>
         <!-- end of Chat audio/video indicators !-->
        
         <div class="chat-button fm-add-user"> <span class="fm-chatbutton-arrow">Add ...</span> </div>
@@ -779,7 +779,7 @@ $(document).ready(function() {
         <div class="chat-call-block">
         
           <!-- Video container !-->
-          <div class="video-call-container">
+          <div class="video-call-container hidden">
              <!-- Please add "active" class if video block is fullsized. Please add "full-sized" class to .fm-chat-block also !-->
              <div class="video-call-button size-icon"></div>
              <img style=" height:100%;" src="images/temp/video-img.jpg" />
@@ -787,25 +787,25 @@ $(document).ready(function() {
           
           <!-- Current user video container !-->
           <!-- Please set height to this block while resizing !-->
-          <div class="current-user-video-container">
+          <div class="current-user-video-container hidden">
             <div class="current-user-resizer"><div></div></div>
-            <div class="video-call-button audio-icon"></div>
+            <div class="video-call-button audio-icon active"></div>
             <div class="video-call-button video-icon"></div>
             <div class="video-call-button hang-up-icon"></div>
             <img style=" height:100%;" src="images/temp/video-img.jpg" />
           </div>
         
           <!-- Audio container !-->
-          <div class="audio-call-container hidden">
+          <div class="audio-call-container">
              <!-- Please add "active" class if video block is fullsized. Please add "full-sized" class to .fm-chat-block also !-->
              <div class="video-call-button size-icon"></div>
              <img alt="" src="images/temp/avatar-img.jpg" />
           </div>
           
           <!-- Current user audio container !-->
-          <div class="current-user-audio-container hidden">
-           <div class="video-call-button audio-icon"></div>
-           <div class="video-call-button video-icon"></div>
+          <div class="current-user-audio-container">
+           <div class="video-call-button audio-icon active"></div>
+           <div class="video-call-button video-icon active"></div>
            <div class="video-call-button hang-up-icon"></div>
            <img style=" height:100%;" src="images/temp/avatar-img.jpg" />
           </div>

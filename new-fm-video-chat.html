@@ -257,6 +257,19 @@ $(document).ready(function() {
 		$('.fm-dialog-overlay').addClass('hidden');
 		$(this).closest('.fm-dialog-popup').addClass('hidden');
 	});
+	
+	$('.video-call-button.size-icon').bind('click', function() {
+		
+		if ($(this).attr('class').indexOf('active') == -1) {
+			  $(this).addClass('active');
+			  $('.fm-chat-block').addClass('full-sized');
+		}
+		else {
+			$(this).removeClass('active');
+			$('.fm-chat-block').removeClass('full-sized');
+			initChatScrolling();
+		}
+	});
 
 });
 </script>

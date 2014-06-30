@@ -414,7 +414,7 @@ else
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-		jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});		
 		
 		

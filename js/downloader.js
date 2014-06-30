@@ -20,7 +20,7 @@ function ClassChunk(task) {
 	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'dl_' + this.dl.dl_id
 	this.xid  = this.gid + "_" + (++__ccXID)
 	this.failed   = false
-	this.backoff  = 1936+Math.floor(Math.random()*2e3);
+	// this.backoff  = 1936+Math.floor(Math.random()*2e3);
 	this.lastPing = NOW()
 	this.lastUpdate = NOW()
 	this.Progress   = GlobalProgress[this.gid]
@@ -51,7 +51,7 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 	if (report_done) {
 		DEBUG('reporting done() earlier to start another download');
 		this.done = true;
-		this.task_done();
+		dlQueue.expand();
 	}
 
 	return report_done;
@@ -117,16 +117,14 @@ ClassChunk.prototype.isCancelled = function() {
 // }}}
 
 // finish_download {{{
-ClassChunk.prototype.finish_download = function(NoError) {
+ClassChunk.prototype.finish_download = function() {
 	ASSERT(!!this.xhr, "Don't call me twice!");
 	if (this.xhr) {
 		ASSERT(iRealDownloads > 0, 'Inconsistent iRealDownloads');
 		this.xhr.xhr_cleanup(0x9ffe);
 		delete this.xhr;
 		iRealDownloads--;
-		if (!this.done || NoError === false) {
-			this.task_done.apply(this, arguments);
-		}
+		this.task_done.apply(this, arguments);
 	}
 }
 // }}}
@@ -148,28 +146,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-/*	if (this.done) {
-		// We already told the scheduler we were done
-		// with no error and this happened. Should I reschedule this
-		// task?
-		this.failed = true;
-		return setTimeout(function(q) {
-			q.request();
-		}, this.backoff *= 1.2, this);
-	}*/
-
-	// this.xhr = null;
-	// return this.task_done(false, xhr.status);
-	// return this.finish_download(false, xhr.status);
-	this.failed = this.done;
-	return setTimeout(function()
-	{
-		if (this.backoff > 40000)
-		{
-			this.backoff = 950+Math.floor(Math.random()*9e3);
-		}
-		this.finish_download(false, xhr.status);
-	}.bind(this), this.backoff *= 1.2 );
+	setTimeout(this.finish_download.bind(this, false, xhr.status), 950+Math.floor(Math.random()*2e3));
 }
 // }}}
 
@@ -191,8 +168,6 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			this.task.offset/16,
 			new Uint8Array(r)
 		])
-		if (this.failed) DownloadManager.release(this);
-		this.failed = false;
 		this.dl.retries = 0;
 		this.finish_download();
 		this.destroy();
@@ -222,15 +197,15 @@ ClassChunk.prototype.request = function() {
 
 ClassChunk.prototype.run = function(task_done) {
 	this.localId = ++iRealDownloads;
-	// if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
-		// /**
-		 // *	It is an small chunk and we *should* finish soon if everything goes
-		 // *	fine. We release our slot so another chunk can start now. It is useful
-		 // *	to speed up tiny downloads on a ZIP file
-		 // */
-		// this.done = true;
-		// task_done();
-	// }
+	if (this.size < 100 * 1024 && iRealDownloads <= dlQueue._limit * 0.5) {
+		/**
+		 *	It is an small chunk and we *should* finish soon if everything goes
+		 *	fine. We release our slot so another chunk can start now. It is useful
+		 *	to speed up tiny downloads on a ZIP file
+		 */
+		this.done = true;
+		dlQueue.expand();
+	}
 
 	this.task_done = task_done;
 	if (!this.io.dl_bytesreceived) {

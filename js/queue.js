@@ -135,6 +135,15 @@ MegaQueue.prototype.process = function() {
 		this.trigger('working', args);
 	}
 
+	if (this._expanded) {
+		args = this.getNextTask();
+		if (args) {
+			this.run_in_context(args);
+			this.trigger('working', args);
+		}
+		delete this._expanded;
+	}
+
 	if (this.isEmpty()) {
 		this.trigger('drain');
 	}
@@ -158,4 +167,19 @@ MegaQueue.prototype.push = function(arg, next, self) {
 	this._queue.push([arg, next, self]);
 	this.trigger('queue');
 	this._process();
+};
+
+/**
+ * Expand temporarily the queue size, it should be called
+ * when a task is about to end (for sure) so a new
+ * task can start.
+ *
+ *	It is useful when download many tiny files
+ */
+MegaQueue.prototype.expand = function() {
+
+	if (this._limit*1.5 >= this._running) {
+		this._expanded = true;
+		this._process();
+	}
 };

@@ -621,7 +621,9 @@ function dlError(text) {
  *	Remove an element from an *array*
  */
 function removeValue(array, value) {
-	array.splice($.inArray(value, array), 1);
+	var idx = array.indexOf(value);
+	ASSERT(idx != -1, 'Unable to Remove Value ' + value);
+	if (idx != -1) array.splice(idx, 1);
 };
 
 

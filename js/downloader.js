@@ -32,10 +32,14 @@ function ClassChunk(task) {
 	this.Progress.data[this.xid] = [0, task.size];
 }
 
+ClassChunk.prototype.toString = function() {
+	return "[ClassChunk " + this.xid + "]";
+};
+
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-
 	oDestroy(this);
 };
 // }}}
@@ -236,6 +240,10 @@ function ClassFile(dl) {
 	}
 }
 
+ClassFile.prototype.toString = function() {
+	return "[ClassFile " + this.gid + "]";
+};
+
 ClassFile.prototype.destroy = function() {
 	if (!this.emptyFile && !checkLostChunks(this.dl) &&
 		(typeof skipcheck == 'undefined' || !skipcheck)) {
@@ -358,7 +366,7 @@ function dl_writer(dl, is_ready) {
 	}
 
 	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
-		if (task.data.length == 0 || task.data.byteLength == 0) {
+		if (!task.data.byteLength) {
 			if (d) console.error("writing empty chunk");
 			return finish_write(task, done);
 		}

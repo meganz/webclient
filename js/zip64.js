@@ -123,10 +123,20 @@ function dlZipIO(dl, dl_id) {
 		current = null
 		if (queue.length === 0) {
 			var end = ZipObject.writeSuffix(gOffset, dirData);
-			$.each(dirData, function(key, value) {
-				doWrite(value);
-			});
-			
+			// $.each(dirData, function(key, value) {
+				// doWrite(value);
+			// });
+			var size = 0, offset = 0, buf;
+			for (var i in dirData) {
+				size += dirData[i].byteLength;
+			}
+			buf = new Uint8Array(size);
+			for (var i in dirData) {
+				buf.set(dirData[i], offset);
+				offset += dirData[i].byteLength;
+			}
+			doWrite(buf);
+
 			delete GlobalProgress['zip_' + dl.zipid];
 
 			doWrite(end, function() {

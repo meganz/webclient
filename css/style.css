@@ -1655,7 +1655,7 @@ a.nt-settings-button:hover span {
 	position: relative;
 }
 .jspPane {
-	width: inherit !important;
+	width: 100% !important;
 }
 .jspDrag {
 	background-color: rgb(102, 102, 102);
@@ -3198,6 +3198,9 @@ label.iPhoneCheckLabelOff span {
 	text-align: center;
 	font-family: 'Open Sans Semibold';
 }
+.nw-contact-avatar {
+	margin-bottom: 8px;
+}
 .fm-avatar.color1 {
 	background-color: #FF6A19;
 }
@@ -3574,18 +3577,18 @@ label.iPhoneCheckLabelOff span {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin:12px 10px 0 0;
+	margin: 12px 10px 0 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	line-height: 0;
 	overflow: hidden;
 	cursor: pointer;
-	line-height:22px;
+	line-height: 22px;
 	color: white;
-text-align: center;
-font-family: 'Open Sans Semibold';
-font-size:16px;
+	text-align: center;
+	font-family: 'Open Sans Semibold';
+	font-size: 16px;
 }
 .download-page .fm-avatar {
 	height: 44px;
@@ -6082,11 +6085,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	height: 100% !important;
-	height: -webkit-calc(100% - 0px) !important;
-	height: -moz-calc(100% - 0px) !important;
-	height: calc(100% - 0px) !important;
-	min-height: 200px !important;
 	position: relative;
+	min-height: 145px;
 }
 .fm-chat-message-scroll {
 	height: 100%;
@@ -6104,7 +6104,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
-	position: relative;
+	width: inherit !important;
 }
 .chat-message-date {
 	font-size: 12px;
@@ -6117,6 +6117,311 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	box-sizing: border-box;
 	padding-left: 22px;
 	line-height: 21px;
+}
+.nw-conversations-item.current-calling {
+	height: 48px;
+	background-color: rgba(29,161,233,0.5);
+	cursor: default;
+}
+.current-calling .nw-contact-status {
+	border: 2px solid rgba(255,255,255,1);
+	width: 12px;
+	height: 12px;
+	margin: 18px 0 0 10px;
+}
+.current-calling .nw-conversations-name {
+	line-height: 47px;
+	margin: 0 80px 0 32px;
+	color: white;
+}
+.chat-cancel-icon {
+	width: 16px;
+	height: 16px;
+	float: right;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -14px -6439px;
+	margin: 16px 1px 0 0;
+	cursor: pointer;
+}
+.chat-time-txt {
+	float: right;
+	background-color: white;
+	margin: 16px 10px 0 0;
+	padding: 0 5px;
+	height: 16px;
+	color: #2BA6DE;
+	line-height: 14px;
+	font-size: 11px;
+	box-sizing: border-box;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	border-radius: 16px;
+}
+.video-call .fm-right-header {
+	height: 75%;
+	border-left: 2px solid white;
+	max-height: -webkit-calc(100% - 97px);
+	max-height: -moz-calc(100% - 97px);
+	max-height: calc(100% - 97px);
+	min-height: 50%;
+	overflow: hidden;
+}
+.full-sized .fm-right-header {
+	max-height: -webkit-calc(100% - 48px);
+	max-height: -moz-calc(100% - 48px);
+	max-height: calc(100% - 48px);
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
+}
+.video-call .nw-contact-avatar {
+	margin-left: 6px;
+}
+.video-call .fm-chat-message-scroll {
+	height: 25%;
+	height: -webkit-calc(25% - 48px);
+	height: -moz-calc(25% - 48px);
+	height: calc(25% - 48px);
+	min-height: 49px;
+	max-height: -webkit-calc(50% - 48px);
+	max-height: -moz-calc(50% - 48px);
+	max-height: calc(50% - 48px);
+}
+.full-sized  .fm-chat-message-scroll {
+	height:0;
+	min-height:0;
+}
+.chat-call-block, .audio-call-block {
+	height: 100%;
+	height: -webkit-calc(100% - 64px);
+	height: -moz-calc(100% - 64px);
+	height: calc(100% - 64px);
+	margin: 0 auto;
+	text-align: center;
+	position:relative;
+	overflow:hidden;
+}
+.video-call-container, .audio-call-container {
+	display: inline-block;
+	height: 100%;
+	background-color: white;
+	padding: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+}
+.audio-call-container {
+	display:block;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	position:absolute;
+	left:50%;
+	top:50%;
+	width:256px;
+	height:256px;
+	margin:-128px 0 0 -128px;
+	overflow:visible;
+}
+.audio-call-container img {
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	height:100%;
+}
+.audio-call-container .video-call-button.size-icon {
+	top: -2px;
+    right: -2px;
+}
+.video-call-container img, .video-call-container video {
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	height:100%;
+}
+.video-resizer {
+	height: 16px;
+	width: 16px;
+	margin: 0 auto;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -6763px;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: move;
+}
+.video-resizer:hover {
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+.video-call-button {
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	z-index: 10;
+	border: 4px solid rgba(255,255,255,0.7);
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background-color: rgba(0,0,0,0.3);
+	cursor: pointer;
+	-webkit-transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
+	-moz-transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
+	-o-transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
+	-ms-transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
+	transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -8px -6807px;
+	top: 8px;
+	right: 8px;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.video-call-button.size-icon.active {
+	background-position: -8px -6867px;
+}
+.video-call-button:hover {
+	border: 4px solid rgba(255,255,255,1);
+	background-color: rgba(0,0,0,0.7);
+}
+.video-call-button.audio-icon {
+	bottom: 8px;
+	left: 8px;
+	background-position: -8px -6928px;
+	top: auto;
+}
+.video-call-button.audio-icon.active {
+	background-position: -7px -7137px;
+}
+.video-call-button.video-icon {
+	bottom: 8px;
+	left: 52px;
+	background-position: -8px -6988px;
+	top: auto;
+}
+.video-call-button.video-icon.active {
+	background-position: -8px -7088px;
+}
+.video-call-button.hang-up-icon {
+	bottom: 8px;
+	right: 8px;
+	background-position: -8px -7048px;
+	top: auto;
+	background-color: rgba(219,6,5,0.7);
+}
+.video-call-button.hang-up-icon:hover {
+	background-color: rgba(219,6,5,1);
+}
+.current-user-video-container, .current-user-audio-container {
+	bottom: 0;
+	right: 16px;
+	position: absolute;
+	z-index: 10;
+	background-color: white;
+	padding: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	height: 159px;
+	min-height: 120px;
+	max-height: 180px;
+}
+.current-user-audio-container {
+	height:168px;
+	width:168px;
+	min-height:0;
+	min-width:0;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.current-user-audio-container .video-call-button.video-icon {
+	left:64px;
+}
+.current-user-audio-container img {
+	height:100%;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.current-user-video-container video, .current-user-video-container img {
+	height:100%;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+}
+.current-user-resizer {
+	cursor: move;
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	z-index: 10;
+	left: 4px;
+	top: 4px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -14px -6716px;
+}
+.current-user-resizer div {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -14px -6737px;
+	width: 16px;
+	height: 16px;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+}
+.current-user-resizer:hover div {
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.video-call-container.hidden, .audio-call-container.hidden {
+	display:none;
+}
+.chat-header-indicator {
+	width:25px;
+	height:25px;
+	float:left;
+	margin: 12px 0 0 9px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -13px -6484px;
+	
+}
+.chat-header-indicator.muted-video {
+	background-position: -13px -6534px;
 }
 .chat-date-divider {
 	position: absolute;
@@ -6142,11 +6447,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-chat-message-container {
 	padding-top: 0;
 }
-.fm-chat-message-scroll .jspPane {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
 .fm-chat-message a {
 	color: #0A68CA;
 }
@@ -6157,7 +6457,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: block;
 }
 .fm-chat-message-scroll .jspPane {
-	min-height: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -6261,11 +6560,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	margin: 0 0 0 0;
 	display: block;
 	background-color: rgba(43,166,222,0.05);
+	padding-bottom: 1px;
 }
 .right-block .fm-chat-messages-pad {
 	background-color: rgba(0,0,0,0.02);
 }
-.chat-sharing .fm-chat-messages-pad {
+.chat-sharing .fm-chat-messages-pad, .chat-notification .fm-chat-messages-pad {
 	background-color: rgba(109,176,63,0.05);
 }
 .chat-username {
@@ -6274,14 +6574,17 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	display: block;
 	display: inline-block;
 }
-.fm-chat-message span.clear {
-	display: inline-block;
+.fm-chat-message .clear {
+	display: table-cell;
+}
+.nw-chat-sharing-body .clear {
+	display: block;
 }
 .right-block .chat-username {
 	color: #666666;
 }
 .fm-chat-messages-block .nw-contact-avatar {
-	margin: 6px 0 0 6px;
+	margin: 6px 0 6px 6px;
 }
 .fm-chat-message-container.grouped-message .nw-chat-date {
 	display: none;
@@ -6303,7 +6606,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
-	padding: 11px 0 9px 0px;
+	padding: 11px 0 11px 0px;
 	text-align: left;
 }
 .chat-message-txt {
@@ -6433,7 +6736,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	float: right;
 	width: 27px;
 	height: 27px;
-	margin: 0 15px 0 10px;
+	margin: 0 12px 0 10px;
 	background-position: 1px -2417px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -6460,7 +6763,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 0 0 46px;
+	padding: 0 0 0 50px;
 	overflow: hidden;
 	position: relative;
 }
@@ -6493,7 +6796,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	position: absolute;
 	height: 25px;
 	width: 28px;
-	left: 0;
+	left: 10px;
 }
 .fm-chat-input-block textarea {
 	width: 100%;
@@ -7456,11 +7759,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-chat-icons-area {
 	float: left;
 }
+.nw-chat-notification-icon {
+	width: 40px;
+	height: 32px;
+	float: left;
+	background-position: -3px -6570px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	display: none;
+}
+.chat-notification .nw-chat-notification-icon {
+	display: block;
+}
+.chat-notification .fm-chat-message {
+	margin-left: 90px;
+}
 .nw-chat-icons-area .block-view-file-type {
 	margin: 0;
 	left: 0;
 	top: 0;
-	margin: 0 4px 4px 0;
+	margin: 0 4px 0 0;
 	display: none;
 	z-index: 10;
 	position: relative;
@@ -7474,11 +7792,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(2) {
-	margin: -42px 4px 4px 6px;
+	margin: -38px 4px 0 6px;
 	z-index: 9;
 }
 .multiple-sharing .main-body .nw-chat-icons-area .block-view-file-type:nth-child(3) {
-	margin: -42px 4px 4px 12px;
+	margin: -38px 4px 0 12px;
 	z-index: 8;
 }
 .multiple-sharing.expanded .main-body .nw-chat-icons-area .block-view-file-type {
@@ -7486,7 +7804,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin: 0;
 	left: 0;
 	top: 0;
-	margin: 0 4px 4px 0;
+	margin: 0 4px 0 0;
 }
 .multiple-sharing.expanded .main-body .nw-chat-icons-area .block-view-file-type:first-child {
 	display: block;
@@ -15891,6 +16209,7 @@ span.incoming-call-name {
 	font-size: 11px;
 	color: #999999;
 	display: block;
+	font-family: 'Open Sans', Arial;
 }
 .icoming-call-header {
 	text-align: center;
@@ -16019,6 +16338,11 @@ span.incoming-call-name {
 @media only screen and (max-width: 1362px) {
 .ads .downloading-progress {
 	width: 300px;
+}
+}
+@media only screen and (max-height: 292px) {
+.video-call .fm-right-header {
+	min-height: 48px;
 }
 }
 @media only screen and (max-width: 1323px) {

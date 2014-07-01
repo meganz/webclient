@@ -3423,7 +3423,7 @@ label.iPhoneCheckLabelOff span {
 .download-percents-55 .file-transfer-download, .download-percents-56 .file-transfer-download, .download-percents-57 .file-transfer-download, .download-percents-58 .file-transfer-download {
 	background-position: -5px -1320px;
 }
-.download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download,, .download-percents-62 .file-transfer-download {
+.download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download, .download-percents-62 .file-transfer-download {
  background-position: -5px -1400px;
 }
 .download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66.file-transfer-download {
@@ -3465,13 +3465,13 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-0 .file-transfer-upload {
 	background-position: -5px 40px;
 }
-.upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload,, .upload-percents-4 .file-transfer-upload {
+.upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload, .upload-percents-4 .file-transfer-upload {
  background-position: -5px -2440px;
 }
 .upload-percents-5 .file-transfer-upload, .upload-percents-6 .file-transfer-upload, .upload-percents-7 .file-transfer-upload, .upload-percents-8 .file-transfer-upload {
 	background-position: -5px -2520px;
 }
-.upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload,, .upload-percents-12 .file-transfer-upload {
+.upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload, .upload-percents-12 .file-transfer-upload {
  background-position: -5px -2600px;
 }
 .upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16.file-transfer-upload {
@@ -3516,7 +3516,7 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-55 .file-transfer-upload, .upload-percents-56 .file-transfer-upload, .upload-percents-57 .file-transfer-upload, .upload-percents-58 .file-transfer-upload {
 	background-position: -5px -3720px;
 }
-.upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload,, .upload-percents-62 .file-transfer-upload {
+.upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload, .upload-percents-62 .file-transfer-upload {
  background-position: -5px -3800px;
 }
 .upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66.file-transfer-upload {
@@ -8602,6 +8602,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	right: auto;
 	margin-left: -190px;
 	padding: 0;
+        display: none;
 }
 .top-warning-popup.active {
 	display: block;
@@ -9746,7 +9747,7 @@ table {
 .fm-account-checkbox-label {
 	font-size: 13px;
 	line-height: 18px;
-	color: ##333333;
+	color: #333333;
 	padding: 0 0 0 10px;
 	float: left;
 }

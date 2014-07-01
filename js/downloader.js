@@ -222,9 +222,11 @@ function ClassEmptyChunk(dl) {
 }
 
 ClassEmptyChunk.prototype.run = function(task_done) {
-	task_done();
-	this.dl.ready();
-	oDestroy(this);
+	this.dl.io.write(new Uint8Array(0), 0, function() {
+		task_done();
+		this.dl.ready();
+		oDestroy(this);
+	}.bind(this));
 }
 
 function ClassFile(dl) {
@@ -358,7 +360,7 @@ function dl_writer(dl, is_ready) {
 	}
 
 	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
-		if (task.data.length == 0 || task.data.byteLength == 0) {
+		if (!task.data.byteLength) {
 			if (d) console.error("writing empty chunk");
 			return finish_write(task, done);
 		}

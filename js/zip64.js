@@ -153,14 +153,16 @@ function dlZipIO(dl, dl_id) {
 	/**
 	 *	Peform real write 
 	 */
-	function doWrite(buffer, next) {
-		self.writer.push({
-			data: buffer,
-			offset: gOffset,
-			callback: next
-		});
+	var doWrite = function(buffer, next) {
+		if (buffer.byteLength) {
+			this.writer.push({
+				data: buffer,
+				offset: gOffset,
+				callback: next
+			});
+		}
 		gOffset += buffer.length;
-	}
+	}.bind(this)
 
 	this.getWriter = function(file) {
 		var entryPos = 0

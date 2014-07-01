@@ -360,7 +360,7 @@ function dl_writer(dl, is_ready) {
 	}
 
 	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
-		if (task.data.length == 0) {
+		if (task.data.length == 0 || task.data.byteLength == 0) {
 			if (d) console.error("writing empty chunk");
 			return finish_write(task, done);
 		}

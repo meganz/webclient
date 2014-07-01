@@ -185,8 +185,8 @@ var DownloadManager = new function() {
 	self.release = function(pattern) {
 		var pattern = task2id(pattern)
 		DEBUG("RELEASE LOCK TO ", pattern);
-		removeValue(locks, pattern);
-		removeValue(removed, pattern);
+		removeValue(locks, pattern, true);
+		removeValue(removed, pattern, true);
 	}
 
 }

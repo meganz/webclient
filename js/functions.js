@@ -620,9 +620,9 @@ function dlError(text) {
 /**
  *	Remove an element from an *array*
  */
-function removeValue(array, value) {
+function removeValue(array, value, can_fail) {
 	var idx = array.indexOf(value);
-	ASSERT(idx != -1, 'Unable to Remove Value ' + value);
+	ASSERT(can_fail || idx != -1, 'Unable to Remove Value ' + value);
 	if (idx != -1) array.splice(idx, 1);
 };
 

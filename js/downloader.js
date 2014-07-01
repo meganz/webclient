@@ -319,9 +319,15 @@ ClassFile.prototype.run = function(task_done) {
 			}));
 		}
 
-		if ((this.emptyFile = (tasks.length == 0))) tasks.push(new ClassEmptyChunk(this.dl));
+		if (this.dl.zipid && (this.emptyFile = (tasks.length == 0))) {
+			tasks.push(new ClassEmptyChunk(this.dl));
+		}
 
-		dlQueue.pushAll(tasks, function onChunkFinished() { this.chunkFinished = true }.bind(this), failureFunction);
+		if (tasks.length > 0) {
+			dlQueue.pushAll(tasks, function onChunkFinished() { 
+					this.chunkFinished = true 
+			}.bind(this), failureFunction);
+		}
 
 		fetchingFile = 0;
 		task_done();
@@ -329,6 +335,11 @@ ClassFile.prototype.run = function(task_done) {
 		delete this.dl.urls;
 		delete this.dl.io.begin;
 		task_done = null;
+
+		if (tasks.length == 0) {
+			// force file download
+			this.destroy();
+		}
 	}.bind(this);
 
 	dlGetUrl(this.dl, function(error, res, o) {

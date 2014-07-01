@@ -7,8 +7,7 @@ function FirefoxIO(dl_id, dl)
 	this.write = function (buffer, offset, done)
 	{
 		if (d) console.log('Writing...', buffer.byteLength, offset, PATH);
-		if (buffer.byteLength) FD.write(buffer).then(l => Soon(done), error);
-		else Soon(done);
+		FD.write(buffer).then(l => Soon(done), error);
 	};
 
 	this.download = function(name)

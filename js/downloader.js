@@ -32,10 +32,14 @@ function ClassChunk(task) {
 	this.Progress.data[this.xid] = [0, task.size];
 }
 
+ClassChunk.prototype.toString = function() {
+	return "[ClassChunk " + this.xid + "]";
+};
+
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-
 	oDestroy(this);
 };
 // }}}
@@ -237,6 +241,10 @@ function ClassFile(dl) {
 		GlobalProgress[this.gid] = {data: {}, done: 0};
 	}
 }
+
+ClassFile.prototype.toString = function() {
+	return "[ClassFile " + this.gid + "]";
+};
 
 ClassFile.prototype.destroy = function() {
 	if (!this.emptyFile && !checkLostChunks(this.dl) &&

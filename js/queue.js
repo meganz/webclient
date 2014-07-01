@@ -74,7 +74,6 @@ MegaQueue.prototype.isPaused = function() {
 
 MegaQueue.prototype.pushAll = function(tasks, next, error) {
 	function CCQueueChecker(task, response) {
-		if (d > 1) console.error('** QC:', task, next, error);
 		if (response.length && response[0] === false) {
 			/**
 			 *	The first argument of .done(false) is false, which 
@@ -82,9 +81,7 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 			 */
 			return error(task, response);
 		}
-		var pos = $.inArray(task, tasks);
-		ASSERT(pos != -1, 'Unknown task!?');
-		if (pos != -1) tasks.splice(pos, 1);
+		removeValue(tasks, task);
 		if (tasks.length == 0) next();
 	}
 	var i = 0

@@ -222,11 +222,9 @@ function ClassEmptyChunk(dl) {
 }
 
 ClassEmptyChunk.prototype.run = function(task_done) {
-	this.dl.io.write(new Uint8Array(0), 0, function() {
-		task_done();
-		this.dl.ready();
-		oDestroy(this);
-	}.bind(this));
+	task_done();
+	this.dl.ready();
+	oDestroy(this);
 }
 
 function ClassFile(dl) {

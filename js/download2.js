@@ -34,15 +34,20 @@ var DownloadManager = new function() {
 	}
 
 	function doesMatch(task, pattern) {
-		var _match = true;
-
-		$.each(s2o(pattern), function(key, value) {
-			if (typeof task.task[key] == "undefined" || task.task[key] != value) {
-				_match = false;
+		pattern = s2o(pattern);
+		for (var key in pattern) {
+			if (typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
 				return false;
-			}
-		});
-		return _match;
+		}
+		return true;
+		// var _match = true;
+		// $.each(s2o(pattern), function(key, value) {
+			// if (typeof task.task[key] == "undefined" || task.task[key] != value) {
+				// _match = false;
+				// return false;
+			// }
+		// });
+		// return _match;
 	}
 
 	self.newUrl = function(dl) {
@@ -112,10 +117,12 @@ var DownloadManager = new function() {
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
 				if (!dl.cancelled && typeof dl.io.abort == "function") try {
+					if (d) console.log('IO.abort', dl.zipid || dl.id, dl);
 					dl.io.abort("User cancelled");
 				} catch(e) {
 					DEBUG(e.message, e);
 				}
+				if (dl.zipid) Zips[dl.zipid].cancelled = true;
 				dl.cancelled = true;
 				/* do not break the loop, it may be a multi-files zip */
 			}
@@ -125,32 +132,29 @@ var DownloadManager = new function() {
 		}
 
 		self.remove(_pattern);
-		percent_megatitle();
+		Soon(percent_megatitle);
 	}
 
 	self.remove = function(pattern, check) {
-		check = check || function() {};
 		pattern = s2o(pattern);
 		removed.push(task2id(pattern))
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj[0], pattern);
 			if (match) {
-				check(obj[0]);
-				DEBUG("remove task", pattern);
+				if (check) check(obj[0]);
+				if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
+				if (obj[0].destroy) obj[0].destroy();
 			}
 			return !match;
 		});
 	};
 
 	self.isRemoved = function(task) {
-		var enabled = true;
-		$.each(removed, function(i, pattern) {
-			if (doesMatch(task, pattern)) {
-				enabled = false;
-				return false; /* break */
-			}
-		});
-		return !enabled;
+		for (var i in removed) {
+			if (doesMatch(task, removed[i]))
+				return true;
+		}
+		return false;
 	}
 
 	self.pause = function(work) {
@@ -186,9 +190,25 @@ var DownloadManager = new function() {
 		var pattern = task2id(pattern)
 		DEBUG("RELEASE LOCK TO ", pattern);
 		removeValue(locks, pattern, true);
-		removeValue(removed, pattern, true);
+		if (!removeValue(removed, pattern, true))
+		{
+			pattern = s2o(pattern);
+			for (var i in removed)
+			{
+				if (typeof removed[i] === 'object')
+				{
+					for (var k in pattern)
+					{
+						if (pattern[k] === removed[i][k])
+						{
+							removed.splice(i, 1);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
-
 }
 
 var ioThrottlePaused = false;
@@ -363,10 +383,10 @@ function failureFunction(task, args) {
 
 	if (code == 509) {
 		var t = NOW();
-		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
+		if (t-dl_lastquotawarning > 60000) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
-			setTimeout(function() { dlQueuePushBack(task); }, 60000);
+			dl.quota_t = setTimeout(function() { dlQueuePushBack(task); }, 60000);
 			return 1;
 		}
 	}

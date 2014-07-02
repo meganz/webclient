@@ -40,6 +40,7 @@ ClassChunk.prototype.toString = function() {
 ClassChunk.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
+	if (this.oet) clearTimeout(this.oet);
 	oDestroy(this);
 };
 // }}}
@@ -53,7 +54,7 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 		&& (pbx[1]-pbx[0])/this.Progress.speed <= dlDoneThreshold;
 
 	if (report_done) {
-		DEBUG('reporting done() earlier to start another download');
+		if (d) console.log(this + ' reporting done() earlier to start another download.');
 		this.done = true;
 		dlQueue.expand();
 	}
@@ -99,11 +100,6 @@ ClassChunk.prototype.updateProgress = function(force) {
 
 // isCancelled {{{
 ClassChunk.prototype.isCancelled = function() {
-	if (this._cancelled) {
-		/* aborted already */
-		DEBUG('Already xhr.abort()ed it...');
-		return true;
-	}
 	var is_cancelled = !!this.dl.cancelled;
 	if (!is_cancelled) {
 		if(typeof(this.dl.pos) !== 'number') {
@@ -112,11 +108,12 @@ ClassChunk.prototype.isCancelled = function() {
 		is_cancelled = !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
-		this._cancelled = true;
-		DEBUG("Chunk aborting itself because download was cancelled ", this.localId);
+		if (d) console.log(this + " aborting itself because download was canceled.", this.task.chunk_id);
 		this.finish_download();
-		return true;
+		this.task.file.destroy();
+		this.destroy();
 	}
+	return is_cancelled;
 }
 // }}}
 
@@ -148,7 +145,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-	setTimeout(this.finish_download.bind(this, false, xhr.status), 950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.status), 950+Math.floor(Math.random()*2e3));
 }
 // }}}
 
@@ -184,8 +181,7 @@ ClassChunk.prototype.request = function() {
 	this.xhr = getXhr(this);
 
 	if (dlMethod == FileSystemAPI) {
-		var t = this.url.lastIndexOf('/dl/')
-			, r = this.url.lastIndexOf('/dl/')
+		var t = this.url.lastIndexOf('/dl/');
 		this.xhr.open('POST', this.url.substr(0, t+1));
 		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t));
 	} else {
@@ -194,13 +190,10 @@ ClassChunk.prototype.request = function() {
 
 	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
 	this.xhr.send();
-	DEBUG("Fetch " + this.url);
+	if (d) console.log(this + " Fetching " + this.url);
 }
 
-var iRealDownloads;
 ClassChunk.prototype.run = function(task_done) {
-	this.has_failed = false;
-	this.localId = ++iRealDownloads;
 	if (this.size < 100 * 1024 && dlQueue.expand()) {
 		/**
 		 *	It is an small chunk and we *should* finish soon if everything goes
@@ -247,37 +240,53 @@ ClassFile.prototype.toString = function() {
 };
 
 ClassFile.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this, this.dl? (this.dl.cancelled? 'cancelled':'finished'):'expunged');
+	if (!this.dl) return;
+
 	if (!this.emptyFile && !checkLostChunks(this.dl) &&
 		(typeof skipcheck == 'undefined' || !skipcheck)) {
 		dl_reportstatus(this.dl, EKEY);
 	}
 
-	if (!this.dl.cancelled) {
-		DEBUG("done download", this.dl.zipid, this.dl.cancelled)
-		if (this.dl.zipid) {
-			Zips[this.dl.zipid].done();
-			oDestroy(this);
-			return;
-		}
-
-		this.dl.onDownloadProgress(
-			this.dl.dl_id,
-			100,
-			this.dl.size,
-			this.dl.size,
-			0,
-			this.dl.pos
-		);
-
-		this.dl.onBeforeDownloadComplete(this.dl.pos);
-		if (!this.dl.preview) {
-			this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
-		}
-		this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
-		if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+	if (this.dl.quota_t) {
+		clearTimeout(dl.quota_t);
+		delete this.dl.quota_t;
 	}
 
-	delete GlobalProgress[this.gid];
+	if (this.dl.cancelled)
+	{
+		if (this.dl.zipid && Zips[this.dl.zipid])
+			Zips[this.dl.zipid].destroy();
+	}
+	else
+	{
+		if (this.dl.zipid)
+		{
+			Zips[this.dl.zipid].done();
+		}
+		else
+		{
+			this.dl.onDownloadProgress(
+				this.dl.dl_id,
+				100,
+				this.dl.size,
+				this.dl.size,
+				0,
+				this.dl.pos
+			);
+
+			this.dl.onBeforeDownloadComplete(this.dl.pos);
+			if (!this.dl.preview) {
+				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
+			}
+			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+		}
+	}
+
+	if (!this.dl.zipid) delete GlobalProgress[this.gid];
+
+	this.dl.ready = function onDeadEnd() { if (d) console.error('We reached a dead end..') };
 
 	this.dl.writer.destroy();
 	oDestroy(this);
@@ -294,9 +303,8 @@ ClassFile.prototype.run = function(task_done) {
 	}
 
 	this.dl.ready = function() {
-		if(d) console.log('is cancelled?', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter == 0)
+		if(d) console.log('@dl.ready', this.chunkFinished, this.dl.writer.isEmpty(), this.dl.decrypter);
 		if (this.chunkFinished && this.dl.decrypter == 0 && this.dl.writer.isEmpty()) {
-			DEBUG('destroy');
 			this.destroy();
 		}
 	}.bind(this);
@@ -315,7 +323,8 @@ ClassFile.prototype.run = function(task_done) {
 				download : this.dl,
 				chunk_id : key,
 				zipid    : this.dl.zipid,
-				id       : this.dl.id
+				id       : this.dl.id,
+				file     : this
 			}));
 		}
 
@@ -374,13 +383,13 @@ function dl_writer(dl, is_ready) {
 		if (typeof task.callback == "function") {
 			task.callback();
 		}
-		dl.ready(); /* tell the download scheduler we're done */
+		if (dl.ready) dl.ready(); /* tell the download scheduler we're done */
 		delete task.data;
 	}
 
 	dl.writer = new MegaQueue(function dlIOWriterStub(task, done) {
-		if (!task.data.byteLength) {
-			if (d) console.error("writing empty chunk");
+		if (!task.data.byteLength || dl.cancelled) {
+			if (d) console.error(dl.cancelled ? "download cancelled":"writing empty chunk");
 			return finish_write(task, done);
 		}
 

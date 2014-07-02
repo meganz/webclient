@@ -624,6 +624,7 @@ function removeValue(array, value, can_fail) {
 	var idx = array.indexOf(value);
 	ASSERT(can_fail || idx != -1, 'Unable to Remove Value ' + value);
 	if (idx != -1) array.splice(idx, 1);
+	return idx != -1;
 };
 
 

@@ -119,6 +119,13 @@ function dlZipIO(dl, dl_id) {
 	this.ready = function() {
 	};
 
+	this.destroy = function() {
+		delete Zips[dl.zipid];
+		delete GlobalProgress['zip_' + dl.zipid];
+		this.writer.destroy();
+		oDestroy(this);
+	};
+
 	this.done = function() {
 		current = null
 		if (queue.length === 0) {
@@ -137,15 +144,13 @@ function dlZipIO(dl, dl_id) {
 			}
 			doWrite(buf);
 
-			delete GlobalProgress['zip_' + dl.zipid];
-
 			doWrite(end, function() {
 				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
 				dl.onBeforeDownloadComplete(dl.pos);
 				realIO.download(dl.zipname, '');
 				if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
-			});
-
+				this.destroy();
+			}.bind(this));
 		}
 	}
 

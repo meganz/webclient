@@ -2640,49 +2640,57 @@ function crypto_share_rsa2aes()
 
 
 
-var u_keySeed;
-var u_pubk25519;
+var u_privEd25519;
+var u_pubEd25519;
 
-function u_curve25519()
+function u_ed25519()
 {
-	var keySeed,newKey=false;
-	if (!u_attr['keySeed'] && !u_keySeed)
+	var keySeed, newKey = false;
+	if (!u_attr['prEd255'] && !u_privEd25519)
 	{
-		keySeed = jodid25519.eddsa.generateKeySeed();
-		newKey=true;
+	    keySeed = jodid25519.eddsa.generateKeySeed();
+		newKey = true;
 	}
-	else keySeed = a32_to_str(decrypt_key(u_k_aes,str_to_a32(u_attr['keySeed'])));
+	else
+	{
+	    keySeed = a32_to_str(decrypt_key(u_k_aes, str_to_a32(u_attr['prEd255'])));
+	}
 	
-	u_keySeed	= keySeed;
-	u_pubk25519	= jodid25519.eddsa.publicKey(u_keySeed);
+	u_privEd25519 = keySeed;
+	u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
 	
 	if (newKey)
 	{
-		api_req({'a':'up','keySeed':a32_to_base64(encrypt_key(u_k_aes,str_to_a32(keySeed)))});
-		api_req({'a':'up','+pubk25519':base64urlencode(u_pubk25519)});
+		api_req({'a': 'up', 'prEd255': a32_to_base64(encrypt_key(u_k_aes, str_to_a32(keySeed)))});
+		api_req({'a': 'up', '+puEd255': base64urlencode(u_pubEd25519)});
 	}
 }
 
-var pubk25519 = {};
+var pubEd25519 = {};
 
-function getpubk25519(userhandle,callback)
+function getPubEd25519(userhandle, callback)
 {
-	if (pubk25519[userhandle]) callback(pubk25519[userhandle],userhandle);	
+	if (pubEd25519[userhandle])
+	{
+	    callback(pubEd25519[userhandle], userhandle);
+	}
 	else
 	{
-		api_req({a:'uga',u:userhandle,ua:'+pubk25519'},
+		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
 		{
 			u: userhandle,
 			callback2: callback,
-			callback: function(res,ctx)
+			callback: function(res, ctx)
 			{
 				if (typeof res !== 'number' && ctx.callback2)
 				{
-					pubk25519[ctx.u] = base64urldecode(res);
-					ctx.callback2(pubk25519[ctx.u],ctx.u);
+				    pubEd25519[ctx.u] = base64urldecode(res);
+					ctx.callback2(pubEd25519[ctx.u], ctx.u);
 				}
-				else if (ctx.callback2) ctx.callback2(false,ctx.u);
-				
+				else if (ctx.callback2)
+				{
+				    ctx.callback2(false, ctx.u);
+				}
 			}
 		});
 	}	

@@ -53,7 +53,7 @@ function key_step2()
 	if (typeof u_privk == 'undefined')
 	{
 		crypto_rsagenkey();
-		u_curve25519();
+		u_ed25519();
 	}
 	else ui_keycomplete();
 }

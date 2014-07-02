@@ -19,17 +19,17 @@ var EncryptionFilter = function(megaChat) {
 
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
-            u_keySeed,
-            u_pubk25519,
+            u_privEd25519,
+            u_pubEd25519,
             {
                 'get': function(jid) {
                     var contact = megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(jid));
                     assert(!!contact, 'contact not found: ' + jid);
 
                     var h = contact.u;
-                    assert(!!pubk25519[h], 'pubk25519 key not found for user: ' + h);
+                    assert(!!pubEd25519[h], 'pubEd25519 key not found for user: ' + h);
 
-                    return pubk25519[h];
+                    return pubEd25519[h];
                 }
             },
             function(handler) {
@@ -243,8 +243,8 @@ var EncryptionFilter = function(megaChat) {
 
 
     // fill my key
-    if(u_pubk25519) {
-        pubk25519[u_handle] = u_pubk25519;
+    if(u_pubEd25519) {
+        pubEd25519[u_handle] = u_pubEd25519;
     }
 
     // incoming
@@ -741,7 +741,7 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
         retriesCount++;
     }
 
-    getpubk25519(contact.u, function(r) {
+    getPubEd25519(contact.u, function(r) {
         var failed = function() {
             if(localStorage.d) {
                 console.error("Could not process message: ", wireMessage, e);

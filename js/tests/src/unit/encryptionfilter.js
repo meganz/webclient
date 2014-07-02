@@ -1449,8 +1449,8 @@ describe("EncryptionFilter", function() {
                         '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{"roomJid":"room1@conference.jid.com"},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"' + otherUserJid + '"}'
                     );
 
-                expect(getpubk25519.callCount).to.eql(1);
-                expect(getpubk25519.getCall(0).args[0]).to.eql("B_123456789");
+                expect(getPubEd25519.callCount).to.eql(1);
+                expect(getPubEd25519.getCall(0).args[0]).to.eql("B_123456789");
 
                 room.encryptionHandler.processMessage.restore();
             }
@@ -1460,10 +1460,10 @@ describe("EncryptionFilter", function() {
 
             // test the case when the 25519 keys are NOT loaded successfully OR processMessage had failed
             {
-                var _tmp = getpubk25519;
+                var _tmp = getPubEd25519;
 
-                // force the getpubk25519 to fail
-                getpubk25519 = function(h, cb) {
+                // force the getPubEd25519 to fail
+                getPubEd25519 = function(h, cb) {
                     cb(false);
                 };
 
@@ -1533,7 +1533,7 @@ describe("EncryptionFilter", function() {
 
                 window.setTimeout.restore(); // restore the stub method
 
-                getpubk25519 = _tmp; // restore getpubk25519 method
+                getPubEd25519 = _tmp; // restore getPubEd25519 method
 
                 encryptionFilter.syncRoomUsersWithEncMembers.restore();
 

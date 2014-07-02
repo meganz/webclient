@@ -2646,14 +2646,14 @@ var u_pubEd25519;
 function u_ed25519()
 {
 	var keySeed, newKey = false;
-	if (!u_attr['privEd25519'] && !u_privEd25519)
+	if (!u_attr['prEd255'] && !u_privEd25519)
 	{
 	    keySeed = jodid25519.eddsa.generateKeySeed();
 		newKey = true;
 	}
 	else
 	{
-	    keySeed = a32_to_str(decrypt_key(u_k_aes, str_to_a32(u_attr['privEd25519'])));
+	    keySeed = a32_to_str(decrypt_key(u_k_aes, str_to_a32(u_attr['prEd255'])));
 	}
 	
 	u_privEd25519 = keySeed;
@@ -2661,8 +2661,8 @@ function u_ed25519()
 	
 	if (newKey)
 	{
-		api_req({'a': 'up', 'privEd25519': a32_to_base64(encrypt_key(u_k_aes, str_to_a32(keySeed)))});
-		api_req({'a': 'up', '+pubEd25519': base64urlencode(u_pubEd25519)});
+		api_req({'a': 'up', 'prEd255': a32_to_base64(encrypt_key(u_k_aes, str_to_a32(keySeed)))});
+		api_req({'a': 'up', '+puEd255': base64urlencode(u_pubEd25519)});
 	}
 }
 
@@ -2676,7 +2676,7 @@ function getpubk25519(userhandle, callback)
 	}
 	else
 	{
-		api_req({'a': 'uga', 'u': userhandle, 'ua': '+pubEd25519'},
+		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
 		{
 			u: userhandle,
 			callback2: callback,

@@ -149,7 +149,7 @@ function u_logout(logout)
 		a[i].removeItem('handle');
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
-        a[i].removeItem('privEd25519');
+        a[i].removeItem('prEd255');
 	}
 
 	if (logout)

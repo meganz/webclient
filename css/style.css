@@ -6188,9 +6188,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	max-height: -moz-calc(50% - 48px);
 	max-height: calc(50% - 48px);
 }
-.full-sized  .fm-chat-message-scroll {
-	height:0;
-	min-height:0;
+.full-sized .fm-chat-message-scroll {
+	height: 0;
+	min-height: 0;
 }
 .chat-call-block, .audio-call-block {
 	height: 100%;
@@ -6199,8 +6199,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	height: calc(100% - 64px);
 	margin: 0 auto;
 	text-align: center;
-	position:relative;
-	overflow:hidden;
+	position: relative;
+	overflow: hidden;
 }
 .video-call-container, .audio-call-container {
 	display: inline-block;
@@ -6217,33 +6217,33 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	position: relative;
 }
 .audio-call-container {
-	display:block;
+	display: block;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	position:absolute;
-	left:50%;
-	top:50%;
-	width:256px;
-	height:256px;
-	margin:-128px 0 0 -128px;
-	overflow:visible;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 256px;
+	height: 256px;
+	margin: -128px 0 0 -128px;
+	overflow: visible;
 }
 .audio-call-container img {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	height:100%;
+	height: 100%;
 }
 .audio-call-container .video-call-button.size-icon {
 	top: -2px;
-    right: -2px;
+	right: -2px;
 }
 .video-call-container img, .video-call-container video {
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
-	height:100%;
+	height: 100%;
 }
 .video-resizer {
 	height: 16px;
@@ -6350,25 +6350,25 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	max-height: 180px;
 }
 .current-user-audio-container {
-	height:168px;
-	width:168px;
-	min-height:0;
-	min-width:0;
+	height: 168px;
+	width: 168px;
+	min-height: 0;
+	min-width: 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
 .current-user-audio-container .video-call-button.video-icon {
-	left:64px;
+	left: 64px;
 }
 .current-user-audio-container img {
-	height:100%;
+	height: 100%;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
 .current-user-video-container video, .current-user-video-container img {
-	height:100%;
+	height: 100%;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
@@ -6396,29 +6396,28 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	-moz-opacity: 0.2;
 	-khtml-opacity: 0.2;
 	opacity: 0.2;
 }
 .current-user-resizer:hover div {
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
 .video-call-container.hidden, .audio-call-container.hidden {
-	display:none;
+	display: none;
 }
 .chat-header-indicator {
-	width:25px;
-	height:25px;
-	float:left;
+	width: 25px;
+	height: 25px;
+	float: left;
 	margin: 12px 0 0 9px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -13px -6484px;
-	
 }
 .chat-header-indicator.muted-video {
 	background-position: -13px -6534px;
@@ -6559,11 +6558,11 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-messages-pad {
 	margin: 0 0 0 0;
 	display: block;
-	background-color: rgba(43,166,222,0.05);
+	background-color: rgba(0,0,0,0.02);
 	padding-bottom: 1px;
 }
 .right-block .fm-chat-messages-pad {
-	background-color: rgba(0,0,0,0.02);
+	background-color: rgba(43,166,222,0.05);
 }
 .chat-sharing .fm-chat-messages-pad, .chat-notification .fm-chat-messages-pad {
 	background-color: rgba(109,176,63,0.05);
@@ -6573,6 +6572,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-family: "Open Sans Semibold", Arial;
 	display: block;
 	display: inline-block;
+	color: #666666;
 }
 .fm-chat-message .clear {
 	display: table-cell;
@@ -6581,7 +6581,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .right-block .chat-username {
-	color: #666666;
+	color: #1DA0E9;
 }
 .fm-chat-messages-block .nw-contact-avatar {
 	margin: 6px 0 6px 6px;
@@ -8920,7 +8920,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	right: auto;
 	margin-left: -190px;
 	padding: 0;
-        display: none;
+	display:none;
 }
 .top-warning-popup.active {
 	display: block;

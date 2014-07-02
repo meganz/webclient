@@ -570,6 +570,35 @@ function removeUInode(h)
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
+        var hasItems=false;
+	for (var h in M.c[M.currentdirid]) { hasItems=true; break; }
+        // Show empty picture if there's no more items available in tab
+	if (!hasItems)
+        {
+                switch (M.currentdirid)
+                {
+                        case M.RootID:
+                            $('.grid-table.fm tr').remove();
+                            $('.fm-empty-cloud').removeClass('hidden');
+                            break;
+                        case "shares":
+                            $('.files-grid-view .grid-table-header tr').remove();
+                            // ToDo: Missing empty picture for shares
+                            $('.fm-empty-cloud').removeClass('hidden');
+                            break;
+                        case "contacts":
+                            $('.contacts-grid-view .contacts-grid-header tr').remove();
+                            $('.fm-empty-contacts').removeClass('hidden');
+                            break;
+                        case "chat":
+                            // ToDo: Missing grid header for conversation
+                            $('.contacts-grid-view .contacts-grid-header tr').remove();
+                            $('.fm-empty-messages').removeClass('hidden');
+                            break;
+                        default:
+                            break;
+                }
+        }        
 }
 
 function sharedUInode(h,s)

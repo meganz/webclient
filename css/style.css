@@ -3427,7 +3427,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -5px -1320px;
 }
 .download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download, .download-percents-62 .file-transfer-download {
- background-position: -5px -1400px;
+	background-position: -5px -1400px;
 }
 .download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66.file-transfer-download {
 	background-position: -5px -1480px;
@@ -3469,13 +3469,13 @@ label.iPhoneCheckLabelOff span {
 	background-position: -5px 40px;
 }
 .upload-percents-1 .file-transfer-upload, .upload-percents-2 .file-transfer-upload, .upload-percents-3 .file-transfer-upload, .upload-percents-4 .file-transfer-upload {
- background-position: -5px -2440px;
+	background-position: -5px -2440px;
 }
 .upload-percents-5 .file-transfer-upload, .upload-percents-6 .file-transfer-upload, .upload-percents-7 .file-transfer-upload, .upload-percents-8 .file-transfer-upload {
 	background-position: -5px -2520px;
 }
 .upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload, .upload-percents-12 .file-transfer-upload {
- background-position: -5px -2600px;
+	background-position: -5px -2600px;
 }
 .upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16.file-transfer-upload {
 	background-position: -5px -2680px;
@@ -3520,7 +3520,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -5px -3720px;
 }
 .upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload, .upload-percents-62 .file-transfer-upload {
- background-position: -5px -3800px;
+	background-position: -5px -3800px;
 }
 .upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66.file-transfer-upload {
 	background-position: -5px -3880px;
@@ -3570,14 +3570,14 @@ label.iPhoneCheckLabelOff span {
 	background-image: none;
 }
 .fm-avatar {
-	height: 24px;
-	width: 24px;
+	height: 28px;
+	width: 28px;
 	float: right;
 	display: block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 12px 10px 0 0;
+	margin: 10px 10px 0 0;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -3589,6 +3589,18 @@ label.iPhoneCheckLabelOff span {
 	text-align: center;
 	font-family: 'Open Sans Semibold';
 	font-size: 16px;
+	border: 2px solid rgba(255,255,255,0);
+	-webkit-transition: border-color 200ms ease-in-out;
+	-moz-transition: border-color 200ms ease-in-out;
+	-o-transition: border-color 200ms ease-in-out;
+	-ms-transition: border-color 200ms ease-in-out;
+	transition: border-color 200ms ease-in-out;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
+}
+.fm-avatar:hover {
+	border: 2px solid rgba(255,255,255,1);
 }
 .download-page .fm-avatar {
 	height: 44px;
@@ -3634,7 +3646,10 @@ label.iPhoneCheckLabelOff span {
 	float: right;
 	width: 16px;
 	height: 16px;
-	border: 2px solid #151412;
+	border: 2px solid rgba(255,255,255,0);
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -3643,9 +3658,14 @@ label.iPhoneCheckLabelOff span {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	cursor: pointer;
+	-webkit-transition: border-color 200ms ease-in-out;
+	-moz-transition: border-color 200ms ease-in-out;
+	-o-transition: border-color 200ms ease-in-out;
+	-ms-transition: border-color 200ms ease-in-out;
+	transition: border-color 200ms ease-in-out;
 }
 .activity-status-block:hover, .activity-status-block.active {
-	border: 2px solid #424140;
+	border: 2px solid rgba(255,255,255,0.19);
 }
 .activity-status, .contact-status {
 	height: 8px;
@@ -8920,7 +8940,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	right: auto;
 	margin-left: -190px;
 	padding: 0;
-	display:none;
+	display: none;
 }
 .top-warning-popup.active {
 	display: block;
@@ -9258,6 +9278,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-position: 2px -420px;
 	background-repeat: no-repeat;
 }
+.top-menu-arrow {
+	width: 50px;
+}
+.membership-popup-arrow {
+	width: 36px;
+}
 .top-user-status-arrow {
 	background-position: 2px -420px;
 }
@@ -9266,7 +9292,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .top-user-status-arrow {
 	float: none;
-	margin-left: 11px;
+	margin-left: 20px;
 }
 .notification-arrow, .top-login-arrow {
 	background-position: 2px -450px;

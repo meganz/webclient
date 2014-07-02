@@ -1112,9 +1112,9 @@ function MegaData ()
 				}
 			}
 		}
-		var hasFolders=false;
-		if (sel) for (var h in M.c[M.RubbishID]) if (M.d[h].t) hasFolders=true;
-		if (!hasFolders)
+		var hasItems=false;
+		if (sel) for (var h in M.c[M.RubbishID]) { hasItems=true; break; }
+		if (!hasItems)
 		{
 			$('#treesub_' + M.RubbishID).remove();
 			$('.fm-tree-header.recycle-item').removeClass('contains-subfolders expanded recycle-notification');

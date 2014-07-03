@@ -131,7 +131,7 @@ function u_checklogin3a(res,ctx)
 		else if (!u_attr.privk) r = 2;
 		else r = 3;
 		
-		if (r == 3) u_curve25519();
+		if (r == 3) u_ed25519();
 	}
 
 	ctx.checkloginresult(ctx,r);
@@ -149,6 +149,7 @@ function u_logout(logout)
 		a[i].removeItem('handle');
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
+        a[i].removeItem('prEd255');
 	}
 
 	if (logout)

@@ -20,9 +20,7 @@ function dl_cancel() {
  *	a given file (and their chunks/files)
  */
 var DownloadManager = new function() {
-	var self = this
-		, locks = []
-		, removed = []
+	var locks = [], removed = [];
 
 	function s2o(s) {
 		if (typeof s == "string") {
@@ -50,10 +48,10 @@ var DownloadManager = new function() {
 		// return _match;
 	}
 
-	self.newUrl = function(dl) {
+	this.newUrl = function(dl) {
 		DEBUG("ask for new URL for", dl.dl_id);
 		dlGetUrl(dl, function (error, res, o) {
-			if (error) return self.newUrl(dl);
+			if (error) return this.newUrl(dl);
 			var changed = 0
 			for (var i = 0; i < dlQueue._queue.length; i++) {
 				if (dlQueue._queue[i][0].dl === dl) {
@@ -63,14 +61,14 @@ var DownloadManager = new function() {
 				}
 			}
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
-		});
+		}.bind(this));
 	}
 
-	self.debug = function() {
-		DEBUG("blocked patterns", locks);
+	this.debug = function() {
+		DEBUG("blocked patterns", locks, removed);
 	};
 
-	self.cleanupUI = function(dl, force) {
+	this.cleanupUI = function(dl, force) {
 		var selector = null
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
@@ -103,16 +101,17 @@ var DownloadManager = new function() {
 		dl = null;
 	}
 
-	self.abortAll = function() {
-		$.each(dl_queue, function(i, file) {
+	this.abortAll = function() {
+		for(var i in dl_queue) {
+			var file = dl_queue[i];
 			if (file.id || file.zipid) {
-				self.abort(file);
+				this.abort(file);
 			}
-		});
-		percent_megatitle();
+		}
+		Soon(percent_megatitle);
 	}
 
-	self.abort = function(pattern, dontCleanUI) {
+	this.abort = function(pattern, dontCleanUI) {
 		var _pattern = s2o(pattern);
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
@@ -128,16 +127,18 @@ var DownloadManager = new function() {
 			}
 		});
 		if (typeof pattern == "object" && !dontCleanUI) {
-			self.cleanupUI(pattern);
+			this.cleanupUI(pattern);
 		}
 
-		self.remove(_pattern);
+		this.remove(_pattern);
 		Soon(percent_megatitle);
 	}
 
-	self.remove = function(pattern, check) {
+	this.remove = function(pattern, check) {
 		pattern = s2o(pattern);
-		removed.push(task2id(pattern))
+		var tid = task2id(pattern);
+		this.release(tid);
+		removed.push(tid);
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj[0], pattern);
 			if (match) {
@@ -149,7 +150,7 @@ var DownloadManager = new function() {
 		});
 	};
 
-	self.isRemoved = function(task) {
+	this.isRemoved = function(task) {
 		for (var i in removed) {
 			if (doesMatch(task, removed[i]))
 				return true;
@@ -157,7 +158,7 @@ var DownloadManager = new function() {
 		return false;
 	}
 
-	self.pause = function(work) {
+	this.pause = function(work) {
 		var pattern = task2id(work)
 		DEBUG("PAUSED ", pattern);
 
@@ -170,23 +171,32 @@ var DownloadManager = new function() {
 		work.__ondone   = function() {
 			work.__ondone = function() {
 				DEBUG("here __ondone()->->");
-				self.release(pattern);
+				DownloadManager.release(pattern);
 			};
 		};
 	}
 
+	function isDLObject(obj) {
+		return typeof obj === 'object' && typeof obj.onDownloadStart === 'function';
+	}
+
 	function task2id(pattern) {
-		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) {
-			if (typeof pattern.task.zipid == "number") {
-				pattern = 'zipid:' + pattern.task.zipid;
+		var obj;
+
+		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) obj = pattern.task;
+		else if (isDLObject(pattern)) obj = pattern;
+
+		if (obj) {
+			if (typeof obj.zipid == "number") {
+				pattern = 'zipid:' + obj.zipid;
 			} else {
-				pattern = 'id:' + pattern.task.id;
+				pattern = 'id:' + obj.id;
 			}
 		}
 		return pattern;
 	}
 
-	self.release = function(pattern) {
+	this.release = function(pattern) {
 		var pattern = task2id(pattern)
 		DEBUG("RELEASE LOCK TO ", pattern);
 		removeValue(locks, pattern, true);

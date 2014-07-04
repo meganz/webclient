@@ -1716,7 +1716,7 @@ function MegaData ()
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
-//		$.transferHeader();
+		$.transferHeader(false);
 
         if (!preview) 
 		{
@@ -1837,8 +1837,6 @@ function MegaData ()
 				$(this).remove();
 			});
 		}
-		$.transferHeader();
-
 		if (dlMethod == FileSystemAPI)
 		{
 			setTimeout(fm_chromebar,250,$.dlheight);
@@ -1866,6 +1864,7 @@ function MegaData ()
 		}
 
 		percent_megatitle();
+		$.transferHeader(dl_queue.length === (dl_queue_num + 1));
 	}
 
 	this.dlbeforecomplete = function()
@@ -1956,7 +1955,9 @@ function MegaData ()
 		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
 			return panelDomQueue.push(elem);
 		}
-		$(elem).appendTo('.transfer-table')
+		$(elem).appendTo('.transfer-table');
+                // In some cases UI is not yet initialized, nor transferHeader()
+                $('.transfer-table-header').show(0);
 	}
 
 	this.addUpload = function(u)
@@ -1972,7 +1973,7 @@ function MegaData ()
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
-			ul_queue.push(f);			
+			ul_queue.push(f);
 			
 		}
 		if (page == 'start') {
@@ -2038,7 +2039,6 @@ function MegaData ()
 		{
 			$(this).remove();
 		});
-		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
 		if (a < 2 && !downloading)
@@ -2057,6 +2057,7 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
+		$.transferHeader(ul_queue.length === (id + 1));
 	}
 
 	this.ulstart = function(id)

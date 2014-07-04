@@ -3122,14 +3122,22 @@ function iconUI()
 
 function transferPanelUI()
 {
-    $.transferHeader = function()
+    $.transferHeader = function(end)
 	{		
 		fm_resize_handler();
-		var el = $('.transfer-table-header th');
-		$('.transfer-table tr:first-child td').each(function(i,e) {
-		  var headerColumn = $('.transfer-table-header th').get(i);
-		  $(headerColumn).width($(e).width());
-	    });
+                var el = $('.transfer-table-header th');
+                // Get first item in transfer queue, and loop through each column
+                $('.transfer-table tr:nth-child(2) td').each(function(i,e)
+                {
+                        var headerColumn = $(el).get(i);
+                        $(headerColumn).width($(e).width());
+                });
+                
+                var tth = $('.transfer-table-header');
+                if (typeof end != 'undefined')
+                        // Show/Hide header if there is no items in transfer list
+                        if (!end) tth.show(0);
+                        else if (end) tth.hide(1000);// 1000 match slow on complete
 
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 

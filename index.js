@@ -525,60 +525,7 @@ function init_page()
 	else if (page == 'sync')
 	{
 		parsepage(pages['sync']);
-		
-		$('.st-apps-icon.mobile').unbind('click');
-		$('.st-apps-icon.mobile').bind('click', function ()
-		{
-			document.location.hash = 'mobile';
-		});
-		
-		$('.st-apps-icon.browser').unbind('click');
-		$('.st-apps-icon.browser').bind('click', function ()
-		{
-			document.location.hash = 'plugin';
-		});
-		
-		$('.sync-help-center').unbind('click');
-		$('.sync-help-center').bind('click',function(e)
-		{
-			document.location.hash = 'help/sync';
-		});
-		
-		
-		$('#syncanim').unbind('click');
-		$('#syncanim').bind('click',function(e)
-		{
-			$('.sync-button').click();
-		});
-		
-		
-		/*
-		$('#syncanim').css('height','');
-		$('#syncanim').css('width','');		
-		$('#syncanim').addClass('sync-main-img');
-		*/
-		
-		
-		if (typeof swiffy == 'undefined' && !silent_loading)
-		{
-			silent_loading=function()
-			{
-				startSync();			
-			};
-			jsl.push(jsl2['mads_js']);
-			jsl_start();
-		}
-		else startSync();		
-		
-		function startSync()
-		{
-			stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
-			stage.start();
-			setTimeout(function()
-			{
-				$('#syncanim svg').css('cursor','pointer');
-			},500);
-		}	
+		init_sync();
 	}
 	else if (page == 'mobile')
 	{

@@ -11464,6 +11464,10 @@ span.browsers-update {
 	text-align: left;
 	white-space: nowrap;
 }
+.ios-button .sync-button-txt:after {
+	content: '\00a0';
+	
+}
 .google-play-button {
 	background-position: -343px -1447px;
 }

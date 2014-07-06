@@ -12714,7 +12714,7 @@ span.browsers-update {
 	line-height: 21px;
 	color: #666666;
 	padding: 15px 0 0px 22px;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -813px -1536px;
 }
@@ -12727,7 +12727,7 @@ span.browsers-update {
 	float: left;
 	width: 448px;
 	height: 200px;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -488px -433px;
 	margin-bottom: 28px;
@@ -12796,7 +12796,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -12807,9 +12807,6 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
-}
-.sync-button.mac {
-	background-position: 15px -327px;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -12903,7 +12900,7 @@ span.browsers-update {
 	width: 80px;
 	height: 78px;
 	float: left;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -465px -1122px;
 	margin: 15px 0 17px 0;
@@ -12965,7 +12962,7 @@ span.browsers-update {
 }
 .chrome-bott-icons {
 	height: 140px;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: 0 -768px;
 }
@@ -13010,7 +13007,7 @@ span.browsers-update {
 .chrome-download-button:hover, a.chrome-download-button:hover {
 	background-color: #DB0605;
 	border: 2px solid #DB0605;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -4px -919px;
 	color: white;
@@ -16131,7 +16128,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	height: 9px;
 	left: 145px;
 	top: 2px;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=1);
+	background-image: url(../images/mega/mobile-sprite.png?v=1);
 	background-position: right -1449px;
 	background-repeat: no-repeat;
 }
@@ -16801,7 +16798,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 853px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow {
- background-image: url(../images/mega/mobile-sprite-v2@2x.png?v=4);
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
  background-size: 836px auto;
 }
  .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
@@ -16907,7 +16904,7 @@ background-image: url(../images/mega/chrome-app@2x.png);
 background-size: 700px auto;
 }
 .chrome-download-button:hover, a.chrome-download-button:hover {
- background-image: url(../images/mega/mobile-sprite-v2@2x.png?v=4);
+ background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
 background-size: 836px auto;
 }
 .campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {

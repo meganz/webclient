@@ -861,7 +861,7 @@ function initContextUI()
 		if (d) console.log('permissions');
 	});	
 	
-	$(c+'.add-star-item').unbind('onkeyup');
+	$(c+'.add-star-item').unbind('click');
 	$(c+'.add-star-item').bind('click',function(event) 
 	{
 		M.favourite($.selected,$.delfav);		

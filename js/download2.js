@@ -546,9 +546,7 @@ if(localStorage.dlMethod) {
 	dlMethod = FirefoxIO;
 } else if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
-} else if (navigator.msSaveOrOpenBlob) {
-	dlMethod = BlobBuilderIO;
-} else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
+} else if (navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
 	dlMethod = MemoryIO;
 } else {
 	dlMethod = FlashIO;

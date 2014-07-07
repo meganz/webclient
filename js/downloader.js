@@ -172,12 +172,21 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 		this.destroy();
 	} else if (!this.dl.cancelled) {
 		if (d) console.error("HTTP FAILED", this.dl.n, xhr.status, "am i done? "+this.done, r.bytesLength, this.size);
+		if (dlMethod === MemoryIO) try {
+			new Uint8Array(0x1000000);
+		} catch(e) {
+			// We're running out of memory..
+			console.error('Uh, oh...', e);
+			dlFatalError(this.dl, e);
+		}
 		return 0xDEAD;
 	}
 };
 // }}}
 
 ClassChunk.prototype.request = function() {
+	if (this.isCancelled()) return;
+
 	this.xhr = getXhr(this);
 
 	if (dlMethod == FileSystemAPI) {
@@ -368,7 +377,11 @@ ClassFile.prototype.run = function(task_done) {
 		var info = dl_queue.splitFile(res.s);
 		this.dl.url  = res.g;
 		this.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-		return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+		try {
+			return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+		} catch(e) {
+			setTransferStatus( this.dl, e, true );
+		}
 	}.bind(this));
 };
 // }}}

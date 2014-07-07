@@ -625,8 +625,39 @@ function removeValue(array, value, can_fail) {
 	ASSERT(can_fail || idx != -1, 'Unable to Remove Value ' + value);
 	if (idx != -1) array.splice(idx, 1);
 	return idx != -1;
-};
+}
 
+function setTransferStatus( dl, status, ethrow, lock) {
+	var id = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+	var text = '' + status;
+	if (text.length > 44) text = text.substr(0,42) + '...';
+	$('.transfer-table #' + id + ' td:eq(3)').text(text);
+	if (lock) $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
+	if (d) console.error(status);
+	if (ethrow) throw status;
+}
+
+function dlFatalError(dl, error, ethrow) {
+	var m = 'This issue should be resolved ';
+	if (ua.indexOf('safari') == -1 && ua.indexOf('chrome') != -1)
+	{
+		m += 'exiting from Incognito mode.';
+	}
+	else if (navigator.msSaveOrOpenBlob)
+	{
+		Later(browserDialog);
+		m = l[1933];
+	}
+	else
+	{
+		Later(firefoxDialog);
+		// m += 'installing our extension.'
+		m = l[1932];
+	}
+	msgDialog('warninga', l[1676], m, error );
+	setTransferStatus( dl, error, ethrow, true );
+	DownloadManager.abort(dl);
+}
 
 
 /**

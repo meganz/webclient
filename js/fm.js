@@ -861,7 +861,7 @@ function initContextUI()
 		if (d) console.log('permissions');
 	});	
 	
-	$(c+'.add-star-item').unbind('click');
+	$(c+'.add-star-item').unbind('onkeyup');
 	$(c+'.add-star-item').bind('click',function(event) 
 	{
 		M.favourite($.selected,$.delfav);		
@@ -2110,6 +2110,13 @@ function gridUI()
 		if (contextmenuUI(e,2)) return true;
 		else return false;	
 		$.hideTopMenu();
+	});
+        // enable add star on first column click (make favorite)
+	$('.grid-table.fm tr td:first-child').unbind('click');
+	$('.grid-table.fm tr td:first-child').bind('click',function(e)
+	{		
+		var id = [$(this).parent().attr('id')];
+		M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));		
 	});	
 	if (d) console.log('gridUI() time:',new Date().getTime() - t);
 	$('.grid-table-header .arrow').unbind('click');

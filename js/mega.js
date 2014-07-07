@@ -1415,7 +1415,7 @@ function MegaData ()
 				api_req({a:'a',n:h,attr:attr,key:key,i:requesti});
 				$('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
 				$('.file-block#' + h + ' .file-block-title').text(name);
-				$('#treea_' + h + ' span').text(name);
+				$('#treea_' + h + ' span:nth-child(2)').text(name);
 				if ($('#path_' + h).length > 0) M.renderPath();
 			}
 		}

@@ -588,7 +588,7 @@ function ERRDEBUG() {
 
 function DEBUG() {
 	if (d) {
-		console.debug.apply(console, arguments)
+		(console.debug||console.log).apply(console, arguments)
 	}
 }
 

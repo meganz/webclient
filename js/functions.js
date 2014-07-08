@@ -639,7 +639,7 @@ function setTransferStatus( dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
 	var m = 'This issue should be resolved ';
-	if (ua.indexOf('safari') == -1 && ua.indexOf('chrome') != -1)
+	if ($.browser.chrome)
 	{
 		m += 'exiting from Incognito mode.';
 	}

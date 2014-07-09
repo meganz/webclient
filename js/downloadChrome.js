@@ -260,14 +260,7 @@ function FileSystemAPI(dl_id, dl) {
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		if (this.is_zip || !dl.zipid) {
-			check();
-		} else {
-			// tell the writter everything was fine
-			// only on zip, where the IO objects are not
-			// doing any write
-			this.begin(); 
-		}
+		check();
 	};
 }
 window.requestFileSystem = window.webkitRequestFileSystem;

@@ -85,208 +85,6 @@ function ezBuffer(size) {
 
 var Zips = {};
 
-/**
- *	Pseudo-IO method to simplify zip writings
- */
-function dlZipIO(dl, dl_id) {
-	var self = this
-		, qZips = []
-		, ZipObject
-		, hashes = {}
-		, dirData = []
-		, queue = []
-		, current = null
-		, gOffset = 0
-		, realIO = new dlMethod(dl_id, dl, this) 
-		, ready = false
-
-	// fake set credentials
-	realIO.begin = function() {
-		ready = true;
-	}
-
-	dl_writer(this, function() {
-		return ready;
-	});
-
-
-	this.IO   = this.io = realIO;
-	this.size = 0
-	this.files = 0
-	this.progress	= 0
-	this.dl_xr	= getxr()
-
-	this.ready = function() {
-	};
-
-	this.destroy = function() {
-		delete Zips[dl.zipid];
-		delete GlobalProgress['zip_' + dl.zipid];
-		this.writer.destroy();
-		oDestroy(this);
-	};
-
-	this.done = function() {
-		current = null
-		if (queue.length === 0) {
-			var end = ZipObject.writeSuffix(gOffset, dirData);
-			// $.each(dirData, function(key, value) {
-				// doWrite(value);
-			// });
-			var size = 0, offset = 0, buf;
-			for (var i in dirData) {
-				size += dirData[i].byteLength;
-			}
-			buf = new Uint8Array(size);
-			for (var i in dirData) {
-				buf.set(dirData[i], offset);
-				offset += dirData[i].byteLength;
-			}
-			doWrite(buf);
-
-			doWrite(end, function() {
-				dl.onDownloadComplete(dl.dl_id, dl.zipid, dl.pos);
-				dl.onBeforeDownloadComplete(dl.pos);
-				realIO.download(dl.zipname, '');
-				if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
-				this.destroy();
-			}.bind(this));
-		}
-	}
-
-
-	/**
-	 *	Peform real write 
-	 */
-	var doWrite = function(buffer, next) {
-		if (buffer.byteLength) {
-			this.writer.push({
-				data: buffer,
-				offset: gOffset,
-				callback: next
-			});
-		}
-		gOffset += buffer.length;
-	}.bind(this)
-
-	this.getWriter = function(file) {
-		var entryPos = 0
-			, expected = 0 /* next chunk */
-
-		this.size += file.size
-		this.files++;
-
-		queue.push(file.id);
-
-		return function (buffer, pos, next) {
-			if (!ZipObject) {
-				realIO.is_zip = true
-				realIO.setCredentials("", self.size + self.files*1024, dl.zipname);
-				ZipObject = new ZIPClass(self.size + self.files*1024);
-			}
-
-			if (current === null) {
-				current = file.id;
-				removeValue(queue,file.id);
-			}
-
-
-			if (current != file.id || expected != pos) {
-				var my = arguments.callee
-					, args = Array.prototype.slice.call(arguments)
-					, zself = this
-
-				//DownloadManager.pause('zipid:' + dl.zipid);
-
-				return setTimeout(function() {
-					my.apply(zself, args);
-				}, 100);
-			}
-
-			//DownloadManager.release('zipid:' + dl.zipid);
-
-			expected = pos + buffer.length
-			if (pos === 0) {
-				var header = ZipObject.writeHeader(
-					file.p + file.n,
-					file.size,
-					file.t
-				);
-				entryPos = gOffset;
-				doWrite(header);
-				hashes[file.id] = 0;
-			}
-
-			hashes[file.id] = crc32(buffer, hashes[file.id], buffer.length);
-
-
-			if (pos + buffer.length == file.size ) {
-				var centralDir = ZipObject.writeCentralDir(
-					file.p + file.n,
-					file.size,
-					file.t,
-					hashes[file.id],
-					false,
-					entryPos 
-				);
-				dirData.push(centralDir.dirRecord)
-				doWrite(buffer);
-				doWrite(centralDir.dataDescriptor, next);
-			} else {
-				doWrite(buffer, next);
-			}
-		};
-	}
-
-	this.write = function(buffer, position, next, task) {
-		if ($.inArray(task.download.id, qZips)==-1) {
-			qZips.push(task.download.id)
-		}
-
-		if (qZips[0] !== task.download.id || task.pos != pos) {
-			DEBUG("retry ", pos, task.pos, qZips[0], task.download.id);
-			throw new Error;
-		}
-
-		if (task.first) {
-			var header = ZipObject.writeHeader(
-				task.path,
-				task.fsize,
-				task.download.t
-			);
-			entryPos = offset;
-			realIO.write(header, offset, function() {});
-			offset += header.length;
-			hashes[task.download.id] = 0;
-		}
-		hashes[task.download.id] = crc32(buffer, hashes[task.download.id], buffer.length);
-
-		realIO.write(buffer, offset, function() {
-			offset += buffer.length;
-			if (task.last) {
-				var centralDir = ZipObject.writeCentralDir(
-					task.path,
-					task.fsize,
-					task.download.t,
-					hashes[task.download.id],
-					false,
-					entryPos 
-				);
-				dirData.push(centralDir.dirRecord)
-				realIO.write(centralDir.dataDescriptor, offset, next);
-				offset += centralDir.dataDescriptor.length;
-				pos     = 0;
-				qZips.shift();
-				return;
-			}
-			next();
-			pos++;
-		}, task);
-	};
-
-}
-
-
 var ZIPClass = function(totalSize) {
 	var self = this
 		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
@@ -625,3 +423,175 @@ function crc32(data, crc, len)
 	return crc ^ -1;
 }
 // }}}
+
+/**
+ *	ZipEntryIO
+ *
+ *	It implements a FileIO object but underneath it writes using
+ *	`ZipWriter.write()` method. This object adds a few bytes before and after
+ *	the buffer itself, some zip structures.
+ */
+function ZipEntryIO(zipWriter) {
+	this.zipWriter = zipWriter;
+	this.queued  = 0
+};
+
+ZipEntryIO.prototype.destroy = function() {
+	oDestroy(this);
+};
+
+ZipEntryIO.prototype.isEmpty = function() {
+	return this.queued == 0;
+}
+
+ZipEntryIO.prototype.setCredentials = function() {
+	this.begin();
+};
+
+ZipEntryIO.prototype.push = function(obj) {
+	this.queued++
+	obj.zfile = this;
+	this.zipWriter.zwriter.push(obj, function() {
+		this.queued--
+		if (this.file.ready) this.file.ready();
+	}.bind(this));
+};
+
+function ZipWriter(dl_id, dl) {
+	this.dl     = dl;
+	this.io		= new dlMethod(dl_id, dl)
+	this.size	= 0
+	this.is_ready  = false
+	this.queues = [];
+	this.hashes = {};
+	this.dirData = [];
+	this.offset = 0;
+	this.file_offset = 0;
+
+	this.io.begin  = function() {
+		this.is_ready = true;
+		this.writer.process();
+	}.bind(this);
+	this.io.is_zip = true;
+	dl_writer(this);
+	dl_zip_writer(this);
+}
+
+ZipWriter.prototype.createZipObject = function() {
+	if (!this.ZipObject) {
+		this.ZipObject = new ZIPClass(this.size);
+		this.io.setCredentials("", this.size, this.dl.zipname);
+	}
+	return this.ZipObject;
+};
+
+ZipWriter.prototype.destroy = function() {
+	if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
+	oDestroy(this);
+}
+
+function dlZipWriterIOWorker(task, done) {
+	var file = task.zfile.file;
+	if (task.offset === 0) {
+		var header = this.ZipObject.writeHeader(
+			file.p + file.n,
+			file.size,
+			file.t
+		);
+		task.zfile.file.io.entryPos = this.offset;
+		this.hashes[file.id] = 0;
+		this._write(header);
+	}
+
+	this.hashes[file.id] = crc32(task.data, this.hashes[file.id], task.data.length)
+	this.file_offset += task.data.length;
+	this._write(task.data, done);
+}
+
+function dlZipWriterValidate(t) {
+	if (!this.ZipObject) {
+		this.createZipObject(); /* create the zipobject if it doesnt exists */
+	}
+
+	return this.is_ready && t.zfile == this.queues[0] && t.offset == this.file_offset;
+};
+
+/**
+ *	Create `zwriter` queue
+ *
+ *	It creates a queue to write in order and we expose it to
+ *	to the ZipEntryIO, so they can write in any order.
+ */
+function dl_zip_writer(zipWriter) {
+	zipWriter.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(zipWriter), 1);
+	zipWriter.zwriter.validateTask = dlZipWriterValidate.bind(zipWriter);
+}
+
+ZipWriter.prototype.done = function(zfile) {
+	var file = zfile.dl;
+	var centralDir = this.ZipObject.writeCentralDir(
+		file.p + file.n,
+		file.size,
+		file.t,
+		this.hashes[file.id],
+		false,
+		file.io.entryPos
+	);
+	this.dirData.push(centralDir.dirRecord)
+	this._write(centralDir.dataDescriptor);
+
+	this.queues.shift();
+	this.file_offset = 0;
+
+	if (this.queues.length == 0){
+		var end = this.ZipObject.writeSuffix(this.offset, this.dirData)
+			, size = 0
+			, offset = 0
+			, buf
+
+		for (var i in this.dirData) {
+			size += this.dirData[i].byteLength;
+		}
+
+		buf = new Uint8Array(size);
+		for (var i in this.dirData) {
+			buf.set(this.dirData[i], offset);
+			offset += this.dirData[i].byteLength;
+		}
+
+		/* write zip suffix */
+		this._write(buf);
+
+		/* Write directory data */
+		this._write(end, function() {
+			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+			this.dl.onBeforeDownloadComplete(this.dl.pos);
+			this.io.download(this.dl.zipname, '');
+			this.writer.destroy();
+			this.zwriter.destroy();
+			this.destroy();
+		}.bind(this));
+	}
+};
+
+/**
+ *	Private Write function
+ */
+ZipWriter.prototype._write = function(buffer, next) {
+	if (buffer.byteLength) {
+		this.writer.push({
+			data: buffer,
+			offset: this.offset, 
+			callback: next
+		});
+	}
+	this.offset += buffer.length;
+};
+
+ZipWriter.prototype.addEntryStream = function(file) {
+	var io =  new ZipEntryIO(this);
+	io.file = file
+	this.queues.push(io);
+	this.size += file.size
+	return io;
+};

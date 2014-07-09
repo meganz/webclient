@@ -271,7 +271,7 @@ ClassFile.prototype.destroy = function() {
 	{
 		if (this.dl.zipid)
 		{
-			Zips[this.dl.zipid].done();
+			Zips[this.dl.zipid].done(this);
 		}
 		else
 		{
@@ -387,8 +387,6 @@ ClassFile.prototype.run = function(task_done) {
 // }}}
 
 function dl_writer(dl, is_ready) {
-
-	dl.decrypter = 0;
 
 	function finish_write(task, done) {
 		done();

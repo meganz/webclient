@@ -5,8 +5,12 @@
   <RDF:Seq RDF:about="rdf:#$HIU611">
     <RDF:li RDF:resource="rdf:#$IIU611"/>
   </RDF:Seq>
+  <RDF:Description RDF:about="rdf:#$IIU611"
+                   NS1:version="2.0.152">
+    <NS1:targetApplication RDF:resource="rdf:#$LIU611"/>
+  </RDF:Description>
   <RDF:Description RDF:about="urn:mozilla:extension:firefox@mega.co.nz"
-                   NS1:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAALjJgXjZ6t0F4qH4th2Coa3wJHXUH9R77pexfEUTfo8qeY9TnYHpqW01ytoTNz7b5zE4fisWhpWjmryGdvkdCj4gAgLqdPSGRH7aAXYKxAVlZ4bxFbmQIMirqDphn3+Q2CKMG6h3HLrJOp9c0WumDaVXcCDMb3WezW0XzARtMNk">
+                   NS1:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAK/wd16ihrRu9e21jQG1XG64b8warviyNliEig0B8qJbrzK3vj1UKHBCv17uXtSNPtBVnCU1CZAKkIrLA9lRsurn3PUI1wFWKJEbUK6Owzfq9RvtK04jiz7MDM9Yvqn/qNzL51QOsm4VLIxk5x5LwGEuHvxAgP0yQv+tgBCKiY1G">
     <NS1:updates RDF:resource="rdf:#$HIU611"/>
   </RDF:Description>
   <RDF:Description RDF:about="rdf:#$LIU611"
@@ -14,9 +18,5 @@
                    NS1:minVersion="4.0"
                    NS1:maxVersion="30.*"
                    NS1:updateLink="http://eu.static.mega.co.nz/mega.xpi"
-                   NS1:updateHash="sha256:ebcfa5e97236eef5d185ab9f2dca7bc4b8932cda83e818f8a967c59bfe0f77c7" />
-  <RDF:Description RDF:about="rdf:#$IIU611"
-                   NS1:version="2.0.150">
-    <NS1:targetApplication RDF:resource="rdf:#$LIU611"/>
-  </RDF:Description>
+                   NS1:updateHash="sha256:14152f0fb4efd8a580e5fa63484a3d4af17f28a5532aacdd179d89c8ed644cfc" />
 </RDF:RDF>

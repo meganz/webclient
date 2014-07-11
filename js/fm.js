@@ -836,7 +836,19 @@ function initContextUI()
 	{
 		createfolderDialog();
 	});
-	
+
+	$(c+'.fileupload-item').unbind('click');
+	$(c+'.fileupload-item').bind('click',function(event) 
+	{
+		$('#fileselect3').click();
+	});
+        
+	$(c+'.folderupload-item').unbind('click');
+	$(c+'.folderupload-item').bind('click',function(event) 
+	{
+		$('#fileselect4').click();
+	});
+    
 	$(c+'.remove-item').unbind('click');
 	$(c+'.remove-item').bind('click',function(event) 
 	{

@@ -3289,10 +3289,18 @@ function transferPanelUI()
 	{
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
-			$(this).removeClass('active');
-			dlQueue.resume();
-			ulQueue.resume();
-			ui_paused = false;
+                        // terms of service 
+                        if (u_attr.terms)
+                        {
+                                $(this).removeClass('active');
+                                dlQueue.resume();
+                                ulQueue.resume();
+                                ui_paused = false;
+                        } else
+                        {
+                            alert(l[214]);
+                            DEBUG(l[214]);
+                        }
 		}
 		else
 		{

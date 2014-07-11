@@ -395,13 +395,17 @@ function initUI()
 	{
 		if (e.which == 13) doAddContact(e);
 	});
-	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
 		$.termsAgree = function()
 		{
 			u_attr.terms=1;
 			api_req({a:'up',terms:'Mq'});
+                        // queued work is continued when user accept terms of service
+			$('.transfer-pause-icon').removeClass('active');
+			dlQueue.resume();
+			ulQueue.resume();
+			ui_paused = false;
 		};
 		$.termsDeny = function()
 		{
@@ -410,6 +414,7 @@ function initUI()
 		};
 		termsDialog();
 	}
+	if (ul_queue.length > 0) openTransferpanel();
 	M.avatars();
 
 	if (typeof dl_import !== 'undefined' && dl_import) dl_fm_import();
@@ -500,7 +505,20 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();	
-	if (!uldl_hold) ulQueue.resume();
+	if (!uldl_hold && u_attr.terms)
+                ulQueue.resume();
+        else// make sure that terms of service are accepted before any action
+        {
+		$('.transfer-pause-icon').addClass('active');
+		dlQueue.pause();
+		ulQueue.pause();
+		ui_paused = true;
+
+//		$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+//		{
+//			$(this).text('');
+//		});            
+        }
 	initTreeScroll();
 	$(window).trigger('resize');
 

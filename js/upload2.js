@@ -735,7 +735,8 @@ function resetUploadDownload() {
 
 	if (dl_queue.length == 0 && ul_queue.length == 0) {
 		clearXhr(); /* destroy all xhr */
-	}	
+		$.transferClose(); /* in case it isn't closed already.. */
+	}
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
 

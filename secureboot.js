@@ -381,55 +381,55 @@ else if (page == '#android')
 }
 else
 {
-    if (!b_u)
-    {
-        /*
-         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
-         {
-         if (d)
-         {
-         console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
-         }
-         else
-         {
-         // TODO: XHR to log server?
-         }
+	if (!b_u)
+	{
+		/*
+			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
+			{
+				if (d)
+				{
+					console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
+				}
+				else
+				{
+					// TODO: XHR to log server?
+				}
 
-         return false;
-         };
-         */
-
-        if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
-        var d = localStorage.d || 0;
-        var jj = localStorage.jj || 0;
-        var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
-
-        function detectlang()
-        {
-            return 'en';
-            if (!navigator.language) return 'en';
-            var bl = navigator.language.toLowerCase();
-            var l2 = languages;
-            for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-            for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
-            return 'en';
-        }
-        var init_f = [];
-        var lang = detectlang();
-        if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
-        var langv = '';
-        if (typeof lv != 'undefined') langv = '_' + lv[lang];
-        var jsl = []
-
-        jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
-        jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-        jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
-        jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});		
+				return false;
+			};
+		*/
 		
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
+		var d = localStorage.d || 0;
+		var jj = localStorage.jj || 0;
+		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
+
+		function detectlang()
+		{
+			return 'en';
+			if (!navigator.language) return 'en';
+			var bl = navigator.language.toLowerCase();
+			var l2 = languages;
+			for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
+			for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+			return 'en';
+		}
+		var init_f = [];
+		var lang = detectlang();
+		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
+		var langv = '';
+		if (typeof lv != 'undefined') langv = '_' + lv[lang];
+		var jsl = []
+
+		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
+		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});		
 		
+
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});

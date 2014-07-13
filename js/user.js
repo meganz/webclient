@@ -152,6 +152,7 @@ function u_logout(logout)
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
         a[i].removeItem('prEd255');
+        a[i].removeItem('randseed');
 	}
 
 	if (logout)

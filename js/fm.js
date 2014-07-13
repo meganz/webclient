@@ -4544,7 +4544,7 @@ function browserDialog(close)
 	var bc,bh,bt;
 	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
 	{
-		if (page !== 'download')
+		if (page !== 'download' && (''+page).split('/').shift() !== 'fm')
 		{
 			browserDialog(1);
 			return false;
@@ -4552,8 +4552,9 @@ function browserDialog(close)
 		// IE11
 		bc = 'ie10';		
 		bh = l[884].replace('[X]','IE 11');
-		if (page == 'download') bt = l[1933];		
-		else bt = l[886];
+		// if (page == 'download') bt = l[1933];
+		// else bt = l[886];
+		bt = l[1933];
 	}
 	else if (navigator.userAgent.indexOf('MSIE 10') > -1)
 	{	

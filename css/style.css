@@ -17410,9 +17410,9 @@ transform: rotate(900deg);
 }
 .ui-resizable-n {
 	cursor: n-resize;
-	height: 7px;
+	height: 15px;
 	width: 100%;
-	top: -5px;
+	top: -1px;
 	left: 0;
 }
 .ui-resizable-s {

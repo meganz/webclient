@@ -499,7 +499,6 @@ else
         }
         else
         {
-            jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
             jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
             jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
         }

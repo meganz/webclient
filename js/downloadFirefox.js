@@ -76,17 +76,7 @@ function MemoryIO(dl_id, dl)
 	{
 		if (d) console.log('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
 
-		if (this.is_zip || !dl.zipid) try
-		{
-			u8buf = new Uint8Array(size);
-		}
-		catch(ex)
-		{
-			var id = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
-			$('.transfer-table #' + id + ' td:eq(3)').text(ex);
-			console.error(ex);
-			throw ex;
-		}
+		if (this.is_zip || !dl.zipid) u8buf = new Uint8Array(size);
 		this.begin();
 	};
 

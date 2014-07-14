@@ -36,6 +36,27 @@ MegaQueue.prototype.resume = function() {
 	this.trigger('resume')
 };
 
+MegaQueue.prototype.canExpand = function() {
+	return this._limit <= this._running && this._limit*1.5 >= this._running;
+}
+
+/**
+ * Expand temporarily the queue size, it should be called
+ * when a task is about to end (for sure) so a new
+ * task can start.
+ *
+ * It is useful when download many tiny files
+ */
+MegaQueue.prototype.expand = function() {
+	if (this.canExpand()) {
+		this._expanded = true;
+		this._process();
+		if (d) console.error("expand queue " + this._running);
+		return true;
+	}
+	return false;
+};
+
 MegaQueue.prototype.shrink = function() {
 	this._limit = Math.max(this._limit-1, 1);
 	return this._limit;
@@ -53,7 +74,6 @@ MegaQueue.prototype.isPaused = function() {
 
 MegaQueue.prototype.pushAll = function(tasks, next, error) {
 	function CCQueueChecker(task, response) {
-		if (d > 1) console.error('** QC:', task, next, error);
 		if (response.length && response[0] === false) {
 			/**
 			 *	The first argument of .done(false) is false, which 
@@ -61,9 +81,7 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 			 */
 			return error(task, response);
 		}
-		var pos = $.inArray(task, tasks);
-		ASSERT(pos != -1, 'Unknown task!?');
-		if (pos != -1) tasks.splice(pos, 1);
+		removeValue(tasks, task);
 		if (tasks.length == 0) next();
 	}
 	var i = 0
@@ -133,6 +151,15 @@ MegaQueue.prototype.process = function() {
 		this._noTaskCount = 0;
 		this.run_in_context(args);
 		this.trigger('working', args);
+	}
+
+	if (this._expanded) {
+		args = this.getNextTask();
+		if (args) {
+			this.run_in_context(args);
+			this.trigger('working', args);
+		}
+		delete this._expanded;
 	}
 
 	if (this.isEmpty()) {

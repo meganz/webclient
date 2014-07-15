@@ -272,6 +272,25 @@ function MegaData ()
 
 	this.renderMain = function(u)
 	{
+		function flush_cached_nodes(n)
+		{
+			var e = cache.splice(0, n || cache.length);
+			
+			if (e.length)
+			{
+				var n = cache_e === '.grid-table.fm' ? $(cache_e) : $(ev.target).data('jsp').getContentPane();
+				
+				for (var i in e)
+				{
+					n.append(e[i]);
+				}
+				$(window).trigger('resize');
+			}
+			else
+			{
+				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+			}
+		}
 		hideEmptyMsg();
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
@@ -294,6 +313,7 @@ function MegaData ()
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 		}
 
+		var files = 0, cache = [], cache_e, n_cache = this.viewmode == 1 ? 80 : 40;
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
@@ -311,7 +331,7 @@ function MegaData ()
 					t = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
-				var html,t,el,star='';
+				var html,t,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
 				if (this.viewmode == 1)
 				{
@@ -328,6 +348,7 @@ function MegaData ()
 						t = '.file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						cc=1;
 					}
 				}
 				else
@@ -354,12 +375,15 @@ function MegaData ()
 					{
 						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="60" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
 						t = '.grid-table.fm';
+						cc=1;
 					}
 				}
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
-					$(t).append(html);
+					if (cc && ++files > n_cache) cache.push(html);
+					else $(t).append(html);
+					cache_e = t;
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
@@ -389,6 +413,25 @@ function MegaData ()
 					}
 				}				
 			}
+		}
+		$(window).unbind('dynlist.flush');
+		$(window).bind('dynlist.flush', function()
+		{
+			if (cache.length)
+			{
+				loadingDialog.show();
+				flush_cached_nodes();
+				loadingDialog.hide();
+			}
+		});
+		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+		if (d) console.log('cache', files, cache_e, cache.length);
+		if (cache.length)
+		{
+			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
+			{
+				if (bot) flush_cached_nodes(n_cache / 2);
+			});
 		}
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {

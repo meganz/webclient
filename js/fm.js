@@ -2550,6 +2550,7 @@ var SelectionManager = function($selectable) {
      * Simple helper func, for selecting all elements in the current view.
      */
     this.select_all = function() {
+		$(window).trigger('dynlist.flush');
         var $selectable_containers = $(
             [
                 ".fm-blocks-view",

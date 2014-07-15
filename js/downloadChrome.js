@@ -109,31 +109,32 @@ function FileSystemAPI(dl_id, dl) {
 				fileEntry.createWriter(function(fileWriter) {     
 					DEBUG('File "mega/' + dl_id + '" created');
 					dl_fw = fileWriter
-					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
 						/* onwriteend() will take care of it */
-					}
-	
+					};
+
 					dl_fw.onwriteend = function() {
+						if (that) {
+							ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
+							if (dl_fw.readyState === dl_fw.DONE) {
+								that.begin();
+								that = null;
+							}
+							return;
+						}
+						
 						if (dl_fw.position == targetpos) {
 							chrome_write_error_msg=0; /* reset error counter */
 							return dl_ack_write();
 						}
-	
+
 						/* try to release disk space and retry */
 						free_space();
-					}
-	
+					};
 					zfileEntry = fileEntry;
-					var finalize = setInterval(function() {
-						if (dl_fw.readyState === dl_fw.DONE) {
-							// deferred execution
-							that.begin();
-							that = null;
-							clearInterval(finalize);
-						}
-					}, 10);
+					dl_fw.truncate(0);
+					
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;

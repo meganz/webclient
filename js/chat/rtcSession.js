@@ -354,6 +354,9 @@ RtcSession.prototype = {
             @type {object}
             @property {string} peer
                 The full JID of the remote peer, to whom the call is being made
+            @property {object} peerMedia
+                @property {bool} audio Present and true of peer has enabled audio
+                @property {bool} video Present and true of peer has enabled video
         */
             self.trigger('call-init', {peer:fullPeerJid});
       } catch(e) {
@@ -404,6 +407,7 @@ RtcSession.prototype = {
         self.connection.send($msg({
             to:targetJid,
             type:'megaCall',
+            media: (options.audio?"a":"")+(options.video?"v":""),
             fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid)
         }));
     }, targetJid);
@@ -578,24 +582,30 @@ RtcSession.prototype = {
     RtcSession._maybeCreateVolMon();
  },
 
- onIncomingCallRequest: function(from, reqStillValid, ansFunc)
+ onIncomingCallRequest: function(params, ansFunc)
  {
     var self = this;
     /**
     Incoming call request received
     @event "call-incoming-request"
     @type {object}
-    @property {string} from
-        The full JID of the caller
-    @property {ReqValidFunc} reqStillValid
-        A function returning boolean that can be used at any time to check if the call request is still
-        valid (i.e. not timed out)
-    @property {AnswerFunc} answer
-        A function to answer or decline the call
+    @property {object} params
+        @property {string} peer
+            The full JID of the caller
+        @property {ReqValidFunc} reqStillValid
+            A function returning boolean that can be used at any time to check if the call
+            request is still valid (i.e. not timed out)
+        @property {object} peerMedia
+            @property {bool} audio
+                Present and equal to true if peer enabled audio in his mediaOptions to startMediaCall()
+            @property {bool} video
+                Present and equal to true if peer enabled video
+        @property {AnswerFunc} answer
+            A function to answer or decline the call
     */
-    this.trigger('call-incoming-request', {peer: from, reqStillValid: reqStillValid, answer:
-     function(accept, obj) {
-        if (!reqStillValid()) //expired
+    params.answer = 
+    function(accept, obj) {
+        if (!params.reqStillValid()) //expired
             return false;
 
         if (!accept)
@@ -615,7 +625,8 @@ RtcSession.prototype = {
           });
 
           return true;
-    }});
+    }
+    this.trigger('call-incoming-request', params);
     /**
     Function parameter to <i>call-incoming-request</i> to check if the call request is still valid
     @callback ReqValidFunc

@@ -377,8 +377,9 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
             var $dialog = megaRoom.generateInlineDialog(
                 "mpEnc-ui-" + wireMessage.type,
+                false,
+                "mpenc-error",
                 message,
-                undefined,
                 ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type, 'mpEnc-message-' + wireMessage.messageId], {
                     'reject': {
                         'type': 'secondary',
@@ -405,8 +406,9 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
                     var $dialog2 = megaRoom.generateInlineDialog(
                         "mpEnc-ui-" + wireMessage.type,
+                        false,
+                        "mpenc-error",
                         "Could not recover mpENC from the problem. Do you want to retry manually?",
-                        undefined,
                         ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type, 'mpEnc-message-' + wireMessage.messageId], {
                             'retry': {
                                 'type': 'primary',
@@ -726,7 +728,13 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
     retriesCount = retriesCount || 0;
 
 
-    if(retriesCount >= 3) {
+    if(retriesCount >= 3 && (megaRoom._processMessageFails === undefined || megaRoom._processMessageFails < 3)) {
+        if(megaRoom._processMessageFails === undefined) {
+            megaRoom._processMessageFails = 0;
+        } else {
+            megaRoom._processMessageFails++;
+        }
+
         if(megaRoom.iAmRoomOwner()) {
             if(localStorage.d) { console.error("could not process message, will try to .recover, since I'm the room owner."); }
 
@@ -739,6 +747,30 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
         return;
     } else {
         retriesCount++;
+    }
+    if(megaRoom._processMessageFails >= 3) {
+        alert(1);
+        var $dialog = megaRoom.generateInlineDialog(
+            "mpEnc-ui-error",
+            false,
+            "mpenc-error",
+            "Something went wrong with mpENC. Could not initialise encryption, chat is now in stale state.",
+            ['mpEnc-message', 'mpEnc-message-type-error'], {
+                'reject': {
+                    'type': 'secondary',
+                    'text': "Hide",
+                    'callback': function() {
+                        $('.fm-chat-inline-dialog-' + 'mpEnc-ui-error').remove();
+                        megaRoom.refreshScrollUI();
+                    }
+                }
+            }
+        );
+
+        megaRoom.appendDomMessage(
+            $dialog
+        );
+        return;
     }
 
     getPubEd25519(contact.u, function(r) {

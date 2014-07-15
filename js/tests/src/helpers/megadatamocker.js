@@ -27,10 +27,10 @@ var MegaDataMocker = function() {
             'M': {
                 'u': {
                     "A_123456789": {
-                        "u": "A_123456789", "c": 2, "m": "lpetrov@me.com", "presence": "chat", "presenceMtime": 1391783363.743, "h": "A_123456789"
+                        "u": "A_123456789", "c": 2, "m": "lpetrov@me.com", "presence": "chat", "name": "lyubomir.Zetrov@mega.co.nz", "presenceMtime": 1391783363.743, "h": "A_123456789"
                     },
                     "B_123456789": {
-                        "u": "B_123456789", "c": 1, "m": "lp@mega.co.nz", "ts": 1390835777, "name": "lp@mega.co.nz", "h": "B_123456789", "t": 1, "p": "B_123456789", "presence": "chat", "presenceMtime": 1392042647
+                        "u": "B_123456789", "c": 1, "m": "lp@mega.co.nz", "ts": 1390835777, "name": "lyubomir.Xetrov@mega.co.nz", "h": "B_123456789", "t": 1, "p": "B_123456789", "presence": "chat", "presenceMtime": 1392042647
                     }
                 },
                 'd': {

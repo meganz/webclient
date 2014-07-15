@@ -228,36 +228,41 @@
 
 </div>
 <div class="content-panel conversations">
-    <div class="nw-conversations-header">
-        Contacts
-        <div class="nw-conversations-arrows"></div>
-    </div>
-    <div class="nw-conversations-item online">
-        <div class="nw-contact-status"></div>
-        <div class="nw-conversations-unread">0</div>
-        <div class="nw-conversations-name">
-            Andrei.d
+    <div class="nw-conversations-header call-started hidden">CURRENT CALLING</div>
+    <div class="nw-conversations-item current-calling hidden"><div class="nw-contact-status"></div><div class="chat-cancel-icon"></div><div class="chat-time-txt"></div><div class="nw-conversations-name"></div></div>
+
+    <div class="conversations-container">
+        <div class="nw-conversations-header">
+            Contacts
+            <div class="nw-conversations-arrows"></div>
         </div>
-    </div>
-    <div class="nw-conversations-item offline">
-        <div class="nw-contact-status"></div>
-        <div class="nw-conversations-unread">0</div>
-        <div class="nw-conversations-name">
-            Bram van der Kolk
+        <div class="nw-conversations-item online">
+            <div class="nw-contact-status"></div>
+            <div class="nw-conversations-unread">0</div>
+            <div class="nw-conversations-name">
+                Andrei.d
+            </div>
         </div>
-    </div>
-    <div class="nw-conversations-item away">
-        <div class="nw-contact-status"></div>
-        <div class="nw-conversations-unread">0</div>
-        <div class="nw-conversations-name">
-            Eduardo
+        <div class="nw-conversations-item offline">
+            <div class="nw-contact-status"></div>
+            <div class="nw-conversations-unread">0</div>
+            <div class="nw-conversations-name">
+                Bram van der Kolk
+            </div>
         </div>
-    </div>
-    <div class="nw-conversations-item busy">
-        <div class="nw-contact-status"></div>
-        <div class="nw-conversations-unread">0</div>
-        <div class="nw-conversations-name">
-            Cesar Rodas
+        <div class="nw-conversations-item away">
+            <div class="nw-contact-status"></div>
+            <div class="nw-conversations-unread">0</div>
+            <div class="nw-conversations-name">
+                Eduardo
+            </div>
+        </div>
+        <div class="nw-conversations-item busy">
+            <div class="nw-contact-status"></div>
+            <div class="nw-conversations-unread">0</div>
+            <div class="nw-conversations-name">
+                Cesar Rodas
+            </div>
         </div>
     </div>
 </div>
@@ -346,17 +351,24 @@
 <!-- begin chat block -->
 
 <div class="fm-chat-block hidden">
-    <div class="fm-chat-messages-block inline-dialog template hidden">
+    <div class="fm-chat-messages-block inline-dialog chat-notification template hidden">
         <div class="fm-chat-messages-pad">
-            <div class="fm-chat-verification-head fm-chat-inline-dialog-header">
-                Header
+            <div class="nw-chat-notification-icon"></div>
+
+            <div class="nw-contact-avatar color1">
+                A
             </div>
+
+
             <div class="fm-chat-message">
-                Message
+                <div class="chat-message-date">2:02 pm</div>
+                <div class="chat-message-txt"></div>
+
+                <div class="fm-chat-file-button primary-button">Primary button</div>
+                <div class="fm-chat-file-button secondary-button">Secondary button</div>
+
+                <div class="clear"></div>
             </div>
-            <div class="clear"></div>
-            <div class="fm-chat-file-button verify-button">Primary button</div>
-            <div class="fm-chat-file-button skip-button">Secondary button</div>
         </div>
     </div>
     
@@ -398,15 +410,14 @@
             <div class="clear"></div>
         </div>
 
-        <div class="temp-video-container">
-            <div class="local-video-container"></div>
-            <div class="remote-video-container"></div>
 
-        </div>
+        <!-- Chat audio/video indicators !-->
+        <div class="chat-header-indicator muted-audio hidden"></div> <!-- todo -->
+        <div class="chat-header-indicator muted-video hidden"></div> <!-- todo -->
+        <!-- end of Chat audio/video indicators !-->
+
         <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
         <div class="chat-button btn-chat-call fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
-
-        <div class="chat-button btn-chat-cancel-active-call call-actions"> <span class="fm-chatbutton-arrow">End Call</span> </div>
 
         <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
             <div class="fm-add-contact-arrow" style="right: 46px;"></div>
@@ -426,6 +437,36 @@
             <div class="fm-chat-popup-button start-video">Start video conference</div>
         </div>
         <div class="clear"></div>
+
+
+        <!-- audio/video elements -->
+        <!-- Please set height to this block while main block resizing !-->
+        <div class="chat-call-block">
+
+            <!-- Audio & Video container !-->
+            <div class="others-av-screen video-call-container audio-call-container hidden">
+
+                <!-- Please add "active" class if video block is fullsized. Please add "full-sized" class to .fm-chat-block also !-->
+                <div class="video-call-button size-icon"></div>
+                <img alt="" src="" class="other-avatar"/>
+            </div>
+
+            <!-- Current user audio container !-->
+            <div class="my-av-screen current-user-audio-container current-user-video-container hidden">
+                <div class="current-user-resizer video-only"><div></div></div>
+                <div class="video-call-button audio-icon"></div>
+                <div class="video-call-button video-icon"></div>
+                <div class="video-call-button hang-up-icon"></div>
+
+                <img style="height:100%;" src="" class="my-avatar"/>
+            </div>
+
+        </div>
+
+        <div class="video-resizer"></div>
+        <div class="drag-handle"></div>
+        <!-- end of audio/video elements -->
+
     </div>
 
 

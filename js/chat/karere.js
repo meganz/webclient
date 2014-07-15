@@ -51,7 +51,7 @@ var Karere = function(user_options) {
 
     self.options = $.extend(true, {}, Karere.DEFAULTS, user_options);
 
-    self.connection = new Strophe.Connection(self.options.boshServiceUrl, self.options.stropheOptions);
+    self.connection = new Strophe.Connection("", self.options.stropheOptions);
     self.connection.karere = self;
 
     self.connection.disco.addNode('urn:xmpp:ping', {}); // supports pings
@@ -486,6 +486,11 @@ makeMetaAware(Karere);
 
         self.connection.reset(); // clear any old attached handlers
 
+        if($.isFunction(self.options.boshServiceUrl)) {
+            self.connection.service = self.options.boshServiceUrl();
+        } else {
+            self.connection.service = self.options.boshServiceUrl;
+        }
         self.connection.connect(
             self._fullJid,
             self._password,

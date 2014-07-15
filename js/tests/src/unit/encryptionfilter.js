@@ -475,7 +475,7 @@ describe("EncryptionFilter", function() {
             expect(handler.uiQueue.length).to.eql(0);
 
             expect(megaChatObj.chats["room1@conference.jid.com"].generateInlineDialog.getCall(0).args[0]).to.eql("mpEnc-ui-" + "warning");
-            expect(megaChatObj.chats["room1@conference.jid.com"].generateInlineDialog.getCall(0).args[1]).to.eql("hello world");
+            expect(megaChatObj.chats["room1@conference.jid.com"].generateInlineDialog.getCall(0).args[3]).to.eql("hello world");
 
             done();
         });
@@ -1470,6 +1470,7 @@ describe("EncryptionFilter", function() {
                 // -> when i'm NOT a room owner
                 room.iAmRoomOwner = function() { return false; };
 
+
                 encryptionFilter.processIncomingMessage(
                     genDummyEvent(),
                     new KarereEventObjects.IncomingPrivateMessage(
@@ -1488,6 +1489,7 @@ describe("EncryptionFilter", function() {
                     ),
                     megaChatObj.karere
                 );
+
 
                 expect(encryptionFilter.processMessage.callCount).to.eql(2);
 

@@ -11,12 +11,6 @@
         var self = this;
 
         var defaultOptions = {
-            /**
-             * Text message shown in the incoming call dialog
-             *
-             * {String}
-             */
-            'textMessage': "Incoming call from $username" /* TODO: use l[] */
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
@@ -34,7 +28,7 @@
     /**
      * Show the dialog
      */
-    MegaIncomingCallDialog.prototype.show = function(username, avatarImg, answerAudioFn, answerVideoFn, cancelFn) {
+    MegaIncomingCallDialog.prototype.show = function(username, avatarImg, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
         var self = this;
 
         if(!self.$dialog) {
@@ -50,10 +44,6 @@
 
 
         $('.incoming-call-name', self.$dialog).text(username);
-
-        $('.icoming-call-header', self.$dialog).text(
-            self.options.textMessage.replace("$username", username)
-        );
 
         if(avatarImg) {
             $('.incoming-call-avatar img', self.$dialog).attr(
@@ -79,6 +69,11 @@
         });
 
 
+        if(isVideoCall) {
+            $('.incoming-call-buttons', self.$dialog).addClass("video-enabled");
+        } else {
+            $('.incoming-call-buttons', self.$dialog).removeClass("video-enabled");
+        }
         self.visible = true;
 
         self.$dialog.removeClass('hidden');
@@ -169,19 +164,19 @@
         '<div class="incoming-call-avatar">\n' +
         '       <div class="incoming-call-shadow-bl"></div>\n' +
         '       <img src="images/mega/default-avatar.png" alt="" />\n' +
-        '   </div>\n' +
+        '</div>\n' +
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +
             '<span class="incoming-call-name">Andrei D.</span>\n' +
             '<span class="incoming-call-txt">Incoming call...</span>\n' +
-          '</span>\n'
+          '</span>\n' +
         '</div>\n' +
-        '   <div class="incoming-call-buttons">\n' +
-        '       <div class="icoming-call-button cancel-call"></div>\n' +
-		'       <div class="icoming-call-button video-call"></div>\n' +
-        '       <div class="icoming-call-button audio-call"></div>\n' +
-        '   </div>\n' +
-        '</div>';
+        '<div class="incoming-call-buttons">\n' +
+        '  <div class="icoming-call-button cancel-call"></div>\n' +
+		'  <div class="icoming-call-button video-call"></div>\n' +
+        '  <div class="icoming-call-button audio-call"></div>\n' +
+        '</div>\n' +
+    '</div>';
 
     // export
     window.MegaIncomingCallDialog = MegaIncomingCallDialog;

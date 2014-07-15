@@ -663,7 +663,7 @@ function MegaData ()
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}
 		$('.content-panel.contacts').html(html);	
-		$('.content-panel.conversations').html(html2);
+		$('.content-panel.conversations .conversations-container').html(html2);
 	};
 
     this.getContacts = function(n) {

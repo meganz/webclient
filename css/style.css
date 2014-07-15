@@ -6250,9 +6250,9 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	overflow: visible;
 }
 .audio-call-container img {
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
+	-moz-border-radius: 100% !important;
+	-webkit-border-radius: 100% !important;
+	border-radius: 100% !important;
 	height: 100%;
 }
 .audio-call-container .video-call-button.size-icon {
@@ -6288,6 +6288,11 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+}
+.drag-handle {
+    /* position the drag handle ontop of the video resizer UI element */
+    bottom: 0px !important;
+    height: 16px !important;
 }
 .video-call-button {
 	width: 40px;
@@ -6355,7 +6360,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .current-user-video-container, .current-user-audio-container {
 	bottom: 0;
 	right: 16px;
-	position: absolute;
+	position: absolute !important /* overwriting the ui-resize-* classes */;
 	z-index: 10;
 	background-color: white;
 	padding: 4px;
@@ -6383,9 +6388,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .current-user-audio-container img {
 	height: 100%;
-	-moz-border-radius: 100%;
-	-webkit-border-radius: 100%;
-	border-radius: 100%;
+	-moz-border-radius: 100% !important;
+	-webkit-border-radius: 100% !important;
+	border-radius: 100% !important;
 }
 .current-user-video-container video, .current-user-video-container img {
 	height: 100%;
@@ -6393,6 +6398,13 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
+
+.current-user-video-container {
+    width: 212px;
+    min-height: 0;
+    min-width: 0;
+}
+
 .current-user-resizer {
 	cursor: move;
 	width: 16px;
@@ -6606,7 +6618,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-messages-block .nw-contact-avatar {
 	margin: 6px 0 6px 6px;
 }
-.fm-chat-message-container.grouped-message .nw-chat-date {
+.fm-chat-message-container.grouped-message .nw-contact-avatar,
+    .fm-chat-message-container.grouped-message .chat-username {
+
 	display: none;
 }
 .fm-chat-message-time {
@@ -6670,7 +6684,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: -30px -5821px;
 }
 .fm-chat-file-button {
-	float: left;
+	float: none;
 	height: 30px;
 	background-color: white;
 	font-size: 13px;
@@ -6686,6 +6700,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+    display: inline-block;
 }
 .fm-chat-file-button.verify-button, .fm-chat-file-button.skip-button {
 	margin: 9px 10px 0 0;
@@ -7200,30 +7215,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: -1px -2004px;
 	background-color: rgba(29,161,233,1);
 }
-/** debug chat audio/video **/
-.fm-chat-header .local-video-container, .fm-chat-header .remote-video-container {
-	width: 70px;
-	height: 70px;
-	float: right;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	margin-right: 8px;
-}
-.fm-chat-header .local-video-container {
-	border: 1px solid red;
-}
-.fm-chat-header .remote-video-container {
-	border: 1px solid blue;
-}
-.fm-chat-header .local-video-container video, .fm-chat-header .remote-video-container video {
-	width: 70px;
-	height: 70px;
-}
-/** debug chat audio/video **/
 
 /** debug emoticons **/
 .fm-chat-emoticon {

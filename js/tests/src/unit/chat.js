@@ -346,11 +346,13 @@ describe("Chat.js - Karere UI integration", function() {
             )
         );
 
+
         expect(
             megaChat.chats[roomJid].getOrderedUsers()
         ).to.eql([
                 user2jid
             ]);
+
 
 //        megaChat.karere.setMeta('rooms', roomJid, 'users', users);
 
@@ -518,8 +520,8 @@ describe("Chat.js - Karere UI integration", function() {
 
             messagesInOrderedList.push({
                 'ts': $(this).parent().attr('data-timestamp'),
-                'time': $('.nw-chat-date-txt', $(this).parent()).text(),
-                'msg': $('.fm-chat-message span', $(this)).text(),
+                'time': $('.chat-message-date', $(this).parent()).text(),
+                'msg': $('.chat-message-txt span', $(this)).text(),
                 'fromId': $(this).parent().attr('data-from'),
                 'isGrouped': $(this).parent().is(".grouped-message"),
                 'isRightBlock': $(this).is(".right-block")
@@ -566,11 +568,6 @@ describe("Chat.js - Karere UI integration", function() {
         expect(
             $('.fm-right-header').data("roomJid")
         ).to.eql(roomJid.split("@")[0]);
-
-        // not implemented in the HTML yet.
-//        expect(
-//            $('.messages-icon').is(":hidden")
-//        ).to.be.ok;
 
         expect(
             $('#contact2_' + Object.keys(M.u)[1]).data("roomJid")
@@ -1466,5 +1463,120 @@ describe("Chat.js - Karere UI integration", function() {
         expect(megaChat.karere.unsubscribe.callCount).to.eql(1);
 
         done();
+    });
+
+    it("_generateContactAvatarElement (name, duplicate first letter short names generator and avatar generator)", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+
+                expect(
+                    megaChat.karere.addUserToChat
+                ).to.have.been.calledOnce;
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[0]
+                ).to.equal(roomJid);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[1]
+                ).to.equal(user2jid);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[2]
+                ).to.equal(undefined);
+
+                expect(
+                    megaChat.karere.addUserToChat.getCall(0).args[3]
+                ).to.equal("private");
+
+                var args4 = megaChat.karere.addUserToChat.getCall(0).args[4];
+                expect(args4).to.have.property('ctime');
+                expect(args4).to.have.property('invitationType', 'created');
+                expect(args4).to.have.property('participants').to.eql([user1jid, user2jid]);
+                expect(args4).to.have.property('users').to.be.empty;
+
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
+
+                var megaRoom = megaChat.chats[roomJid];
+
+                var $elem1, $elem2;
+
+                $elem1 = megaRoom._generateContactAvatarElement(user1jid);
+                $elem2 = megaRoom._generateContactAvatarElement(user2jid);
+
+                expect($elem1.is(".color1")).to.be.ok;
+                expect($elem2.is(".color2")).to.be.ok;
+
+                expect($elem1.text()).to.eql("LX");
+                expect($elem2.text()).to.eql("LZ");
+
+                expect($('img', $elem1).size()).to.eql(0);
+                expect($('img', $elem2).size()).to.eql(0);
+
+                M.u["A_123456789"].name="lyubomir.petrov@example.com";
+                M.u["B_123456789"].name="bram.van.der.kolk@example.com";
+
+                $elem1 = megaRoom._generateContactAvatarElement(user1jid);
+                $elem2 = megaRoom._generateContactAvatarElement(user2jid);
+
+                expect($elem1.is(".color1")).to.be.ok;
+                expect($elem2.is(".color2")).to.be.ok;
+
+                expect($elem1.text()).to.eql("L");
+                expect($elem2.text()).to.eql("B");
+
+
+                avatars["A_123456789"] = {'url': "#yup"};
+                avatars["B_123456789"] = {'url': "#yup"};
+
+
+                $elem1 = megaRoom._generateContactAvatarElement(user1jid);
+                $elem2 = megaRoom._generateContactAvatarElement(user2jid);
+
+                expect($('img', $elem1).size()).to.eql(1);
+                expect($('img', $elem2).size()).to.eql(1);
+
+                expect($elem1.text()).to.eql("");
+                expect($elem2.text()).to.eql("");
+
+
+                done();
+            });
     });
 });

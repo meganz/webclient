@@ -225,7 +225,7 @@ function initUI()
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');			
 		}
 		
-		if (ids.length && t) dd = ddtype(ids,t);
+		if (ids && ids.length && t) dd = ddtype(ids,t);
 		
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
@@ -5318,6 +5318,8 @@ function FMResizablePane(element, opts) {
         size_attr = 'height';
     } else if(opts.direction == 'e' || opts.direction == 'w') {
         size_attr = 'width';
+    } else if(opts.direction.length == 2) {
+        size_attr = 'both';
     }
 
     /**
@@ -5356,9 +5358,18 @@ function FMResizablePane(element, opts) {
                     'top': 0
                 };
 
-                css_attrs[size_attr] = ui.size[size_attr];
-                $element.css(css_attrs);
-                localStorage[opts.persistanceKey] = ui.size[size_attr];
+                if(size_attr == 'both') {
+                    css_attrs['width'] = ui.size['width'];
+                    css_attrs['height'] = ui.size['height'];
+
+                    $element.css(css_attrs);
+
+                    localStorage[opts.persistanceKey] = JSON.stringify(css_attrs);
+                } else {
+                    css_attrs[size_attr] = ui.size[size_attr];
+                    $element.css(css_attrs);
+                    localStorage[opts.persistanceKey] = JSON.stringify(ui.size[size_attr]);
+                }
 
                 $self.trigger('resize', [e, ui]);
             },
@@ -5367,6 +5378,10 @@ function FMResizablePane(element, opts) {
                 $(window).trigger('resize');
             }
         };
+
+        if(opts['aspectRatio']) {
+            resizable_opts['aspectRatio'] = opts['aspectRatio'];
+        }
 
         resizable_opts['handles'][opts.direction] = $handle;
 

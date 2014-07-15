@@ -212,7 +212,7 @@ var JinglePlugin = {
             sess.ice_config = self.ice_config;
 
             sess.inputQueue = [];
-            var ret = self.onCallIncoming.call(self.eventHandler, sess);
+            var ret = self.onCallIncoming.call(self.eventHandler, {sess: sess, peerMedia: ans.peerMedia});
             if (ret != true) {
                 self.terminate(sess, ret.reason, ret.text);
                 delete sess.inputQueue;
@@ -368,8 +368,11 @@ var JinglePlugin = {
         var reqStillValid = function() {
             return ((tsTillUser > Date.now()) && (cancelHandler != null));
         };
+        var peerMedia = self.peerMediaToObj($(callmsg).attr('media'));
 // Notify about incoming call
-        self.onIncomingCallRequest.call(self.eventHandler, from, reqStillValid,
+        self.onIncomingCallRequest.call(self.eventHandler, 
+             {peer:from, reqStillValid:reqStillValid,
+              peerMedia: peerMedia},
           function(accept, obj) {
 // If dialog was displayed for too long, the peer timed out waiting for response,
 // or user was at another client and that other client answred.
@@ -396,6 +399,7 @@ var JinglePlugin = {
                     tsReceived: tsReceived,
                     tsTill: tsTillJingle,
                     options: obj.options,
+                    peerMedia: peerMedia,
                     peerFprMacKey: peerFprMacKey,
                     ownFprMacKey: ownFprMacKey
                 };
@@ -555,6 +559,19 @@ var JinglePlugin = {
         }
         fps.sort();
         return fps.join(';');
+    },
+    peerMediaToObj: function(peerMediaStr) {
+        var res = {};
+        if (!peerMediaStr) {
+            console.error("media attribute missing from megaCall request or is empty");
+            return res;
+        }
+        
+        if (peerMediaStr.indexOf('a') > -1)
+            res.audio = true;
+        if (peerMediaStr.indexOf('v') > -1)
+            res.video = true;
+        return res;
     },
     getStunAndTurnCredentials: function () {
         // get stun and turn configuration from server via xep-0215

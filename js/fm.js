@@ -4903,37 +4903,37 @@ var slideshowid;
 
 function slideshowsteps()
 {
-	var forward = [], backward=[], len;
-        len = M.v.length;
+	var forward = [], backward = [], ii = [], ci;
+        // Loop through available items and extract images
+        for (var i in M.v) {
+                if (M.v[i].name && is_image(M.v[i].name))
+                {
+                        // is currently previewed item
+                        if (M.v[i].h == slideshowid) ci = i;
+                        ii.push(i);
+                }
+        }
+        
+        var len = ii.length;
+        // If there is at least 2 images
         if (len > 1)
         {
-                for (var i in M.v)
+                var n = ii.indexOf(ci);
+                switch (n)
                 {
-                        if (M.v[i].name && is_image(M.v[i].name))
-                        {	
-                                // current item
-                                if (M.v[i].h == slideshowid)
-                                {
-                                        var n = parseInt(i);
-                                        switch (n)
-                                        {
-                                            // last
-                                            case len-1:
-                                                forward.push(M.v[0].h);
-                                                backward.push(M.v[n-1].h);
-                                                break;
-                                            // first
-                                            case 0:
-                                                forward.push(M.v[n+1].h);
-                                                backward.push(M.v[len-1].h);
-                                                break;
-                                            default:
-                                                forward.push(M.v[n+1].h);
-                                                backward.push(M.v[n-1].h);
-                                        }
-                                        break;// break for loop
-                                } 
-                        }
+                        // last
+                        case len-1:
+                            forward.push(M.v[ii[0]].h);
+                            backward.push(M.v[ii[n-1]].h);
+                            break;
+                        // first
+                        case 0:
+                            forward.push(M.v[ii[n+1]].h);
+                            backward.push(M.v[ii[len-1]].h);
+                            break;
+                        default:
+                            forward.push(M.v[ii[n+1]].h);
+                            backward.push(M.v[ii[n-1]].h);
                 }
         }
 	return {backward:backward,forward:forward};

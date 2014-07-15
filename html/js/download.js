@@ -51,6 +51,9 @@ function Mads()
 		jsl_start();
 	}
 	else startMads();
+	
+	if (navigator.platform.toUpperCase().indexOf('MAC')>=0) sync_switchOS('mac');
+	else sync_switchOS('windows');
 }
 
 function startMads()
@@ -466,4 +469,36 @@ function dlkeyDialog()
 		$('.fm-dialog-overlay').addClass('hidden');	
 	});
 }
+
+function sync_switchOS(os)
+{	
+	if (os == 'windows')
+	{
+		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
+		$('.sync-button-txt.small').text(l[1158]);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a>');
+		$('.sync-button').removeClass('mac');
+		$('.sync-button').attr('href',syncurl);
+	}
+	else if (os == 'mac')
+	{
+		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
+		var ostxt = 'For Mac';
+		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');			
+		$('.sync-button-txt.small').text(ostxt);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a>');
+		$('.sync-button').addClass('mac');
+		$('.sync-button').attr('href',syncurl);
+	}	
+	$('.sync-bottom-txt a').unbind('click');
+	$('.sync-bottom-txt a').bind('click',function(e)
+	{
+		var c = $(this).attr('class');
+		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
+		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
+		return false;
+	});
+}
+
+
 

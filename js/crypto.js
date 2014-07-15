@@ -2668,7 +2668,7 @@ function u_ed25519()
 
 var pubEd25519 = {};
 
-function getpubk25519(userhandle, callback)
+function getPubEd25519(userhandle, callback)
 {
 	if (pubEd25519[userhandle])
 	{

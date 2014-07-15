@@ -3400,8 +3400,14 @@ MegaChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasse
 
     var $pad = $('.fm-chat-messages-pad', $inlineDialog);
 
-    $pad.parent().attr('data-timestamp', unixtime());
+    var timestamp = unixtime();
 
+    $pad.parent().attr('data-timestamp', timestamp);
+    $pad.parent().addClass("fm-chat-message-container");
+
+    $('.chat-message-date', $inlineDialog).text(
+        unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
+    );
 
 
     var $primaryButton = $('.primary-button', $inlineDialog).detach();

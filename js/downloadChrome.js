@@ -127,7 +127,6 @@ function FileSystemAPI(dl_id, dl) {
 	
 					zfileEntry = fileEntry;
 					var finalize = setInterval(function() {
-						ERRDEBUG(dl_fw.readyState === dl_fw.DONE) 
 						if (dl_fw.readyState === dl_fw.DONE) {
 							// deferred execution
 							that.begin();
@@ -244,7 +243,6 @@ function FileSystemAPI(dl_id, dl) {
 
 
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
-		ERRDEBUG(dl_fw);
 		dl_fw.write(new Blob([buffer]));
 	};
 

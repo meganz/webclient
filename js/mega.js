@@ -278,12 +278,14 @@ function MegaData ()
 			
 			if (e.length)
 			{
-				var n = cache_e === '.grid-table.fm' ? $(cache_e) : $(ev.target).data('jsp').getContentPane();
+				var n = M.viewmode == 0 ? $('.grid-table.fm') : $('.file-block-scrolling').data('jsp').getContentPane();
 				
 				for (var i in e)
 				{
 					n.append(e[i]);
 				}
+				if (folderlink || RootbyId(M.currentdirid) == M.RubbishID) $('.grid-url-arrow').hide();
+				if (M.viewmode == 1) fm_thumbnails();
 				$(window).trigger('resize');
 			}
 			else
@@ -313,7 +315,7 @@ function MegaData ()
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 		}
 
-		var files = 0, cache = [], cache_e, n_cache = this.viewmode == 1 ? 80 : 40;
+		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
@@ -383,7 +385,6 @@ function MegaData ()
 					// if the current view does not have any nodes, just append it
 					if (cc && ++files > n_cache) cache.push(html);
 					else $(t).append(html);
-					cache_e = t;
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
@@ -425,7 +426,7 @@ function MegaData ()
 			}
 		});
 		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
-		if (d) console.log('cache', files, cache_e, cache.length);
+		if (d) console.log('cache %d/%d', cache.length, files);
 		if (cache.length)
 		{
 			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)

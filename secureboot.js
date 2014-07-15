@@ -131,7 +131,8 @@ if (is_chrome_firefox)
     bootstaticpath = 'chrome://mega/content/';
     urlrootfile = 'secure.html';
     nocontentcheck=true;
-    staticpath = 'https://eu.static.mega.co.nz/';
+    if (localStorage.d) staticpath = bootstaticpath;
+    else staticpath = 'https://eu.static.mega.co.nz/';
     if(!b_u) try
     {
         loadSubScript(bootstaticpath + 'fileapi.js');
@@ -400,7 +401,7 @@ else
 		*/
 		
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
-		var d = localStorage.d || 0;
+		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 
@@ -492,7 +493,7 @@ else
         jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
         jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
         jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-        if (is_chrome_firefox && OS && localStorage.fxio)
+        if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
         {
             is_chrome_firefox |= 4;
             jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
@@ -895,7 +896,7 @@ else
                 else if ((jsl[i].j == 2) && (!jj))
                 {
                     if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
-                    if (window.URL)
+                    if (!is_chrome_firefox && window.URL)
                     {
                         cssar.push(jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/'));
                     }
@@ -905,18 +906,19 @@ else
                         css.type = "text/css";
                         css.rel = 'stylesheet';
                         document.getElementsByTagName('head')[0].appendChild(css);
-                        css.innerHTML = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                        css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                     }
                 }
-                else if (jsl[i].j == 3) l = JSON.parse(jsl[i].text);
+                else if (jsl[i].j == 3) l = l || JSON.parse(jsl[i].text);
                 else if (jsl[i].j == 4) scripts[jsl[i].f] = jsl[i].text;
                 else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
             }
             if (window.URL)
             {
-                try
+                var blob;
+                if (cssar.length) try
                 {
-                    var blob = new Blob(cssar, { type: "text/css" });
+                    blob = new Blob(cssar, { type: "text/css" });
                     for ( var f in scripts ) {
                         if (!scripts[f].match(/^blob:/)) {
                             scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
@@ -928,7 +930,7 @@ else
                     window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
                     var bb = new BlobBuilder();
                     for (var i in cssar) bb.append(cssar[i]);
-                    var blob = bb.getBlob('text/css');
+                    blob = bb.getBlob('text/css');
                     for ( var f in scripts ) {
                         if (!scripts[f].match(/^blob:/)) {
                             bb = new BlobBuilder();
@@ -937,11 +939,14 @@ else
                         }
                     }
                 }
-                var link = document.createElement('link');
-                link.setAttribute('rel', 'stylesheet');
-                link.type = 'text/css';
-                link.href = window.URL.createObjectURL(blob);
-                document.head.appendChild(link);
+                if (blob)
+                {
+                    var link = document.createElement('link');
+                    link.setAttribute('rel', 'stylesheet');
+                    link.type = 'text/css';
+                    link.href = window.URL.createObjectURL(blob);
+                    document.head.appendChild(link);
+                }
                 cssar=undefined;
                 jsar.push('jsl_done=true; boot_done();');
                 evalscript_url(jsar);

@@ -1716,7 +1716,7 @@ function MegaData ()
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
-		$.transferHeader(false);
+		$.transferHeader();
 
         if (!preview) 
 		{
@@ -1864,7 +1864,7 @@ function MegaData ()
 		}
 
 		percent_megatitle();
-		$.transferHeader(dl_queue.length === (dl_queue_num + 1));
+		$.transferHeader();
 	}
 
 	this.dlbeforecomplete = function()
@@ -2057,7 +2057,7 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
-		$.transferHeader(ul_queue.length === (id + 1));
+		$.transferHeader();
 	}
 
 	this.ulstart = function(id)

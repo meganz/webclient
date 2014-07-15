@@ -29,7 +29,7 @@ function newXhr() {
 	}
 
 	xhr.nolistener = function() {
-		if (d) console.error('Socket: no listener for socket', this.__id);
+		if (d && !this.__failed) console.error('Socket: no listener for socket', this.__id);
 		this.clear_timeout();
 		this._abort();
 	}
@@ -66,10 +66,10 @@ function newXhr() {
 	xhr.xhr_cleanup = function(e) {
 		if (!this.listener) return this.nolistener();
 		this.clear_timeout();
-		if (this.listener.on_error && !this.__errored) {
+		if (this.listener.on_error && !this.__failed) {
 			var l = this.listener;
 			this.listener  = null; /* release */
-			this.__errored = true;
+			this.__failed = true;
 			if (e !== 0x9ffe) {
 				var r = e && e.type || 'error';
 				if (d) console.error('Socket: on' + r, this.__id, this);
@@ -115,7 +115,7 @@ w.getXhr = function(object) {
 	for (var i = 0; i < _xhr_queue.length; i++) {
 		if (!_xhr_queue[i].listener && _xhr_queue[i].type == zclass) {
 			_xhr_queue[i].listener  = object;
-			_xhr_queue[i].__errored = false;
+			_xhr_queue[i].__failed = false;
 			return _xhr_queue[i];
 		}
 	}

@@ -3,13 +3,14 @@ function MemoryIO(dl_id, dl) {
 		, offset = 0
 		, msie = typeof MSBlobBuilder === 'function'
 
-	if (d) DEBUG('Creating new MemoryIO instance', dl_id, new Error().stack, dl);
+	if (d) console.log('Creating new MemoryIO instance', dl_id, dl);
 
 	this.write = function (buffer, position, done) {
-		if(msie) {
-			dblob.append(have_ab ? buffer : buffer.buffer);
-		} else {
-			dblob.push(new Blob([buffer]));
+		try {
+			if(msie) dblob.append(have_ab ? buffer : buffer.buffer);
+			    else dblob.push(new Blob([buffer]));
+		} catch(e) {
+			dlFatalError(dl, e);
 		}
 		offset += (have_ab ? buffer : buffer.buffer).length;
 		buffer  = null;
@@ -49,6 +50,9 @@ function MemoryIO(dl_id, dl) {
 
 	this.setCredentials = function (url, size, filename, chunks, sizes) {
 		if (d) DEBUG('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
+		if (size > 950*0x100000) {
+			dlFatalError(dl, Error('File too big to be reliably handled in memory.'));
+		}
 		dblob = msie ? new MSBlobBuilder() : [];
 		this.begin();
 	};

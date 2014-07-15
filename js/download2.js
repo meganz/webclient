@@ -20,9 +20,7 @@ function dl_cancel() {
  *	a given file (and their chunks/files)
  */
 var DownloadManager = new function() {
-	var self = this
-		, locks = []
-		, removed = []
+	var locks = [], removed = [];
 
 	function s2o(s) {
 		if (typeof s == "string") {
@@ -34,21 +32,26 @@ var DownloadManager = new function() {
 	}
 
 	function doesMatch(task, pattern) {
-		var _match = true;
-
-		$.each(s2o(pattern), function(key, value) {
-			if (typeof task.task[key] == "undefined" || task.task[key] != value) {
-				_match = false;
+		pattern = s2o(pattern);
+		for (var key in pattern) {
+			if (typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
 				return false;
-			}
-		});
-		return _match;
+		}
+		return true;
+		// var _match = true;
+		// $.each(s2o(pattern), function(key, value) {
+			// if (typeof task.task[key] == "undefined" || task.task[key] != value) {
+				// _match = false;
+				// return false;
+			// }
+		// });
+		// return _match;
 	}
 
-	self.newUrl = function(dl) {
+	this.newUrl = function(dl) {
 		DEBUG("ask for new URL for", dl.dl_id);
 		dlGetUrl(dl, function (error, res, o) {
-			if (error) return self.newUrl(dl);
+			if (error) return this.newUrl(dl);
 			var changed = 0
 			for (var i = 0; i < dlQueue._queue.length; i++) {
 				if (dlQueue._queue[i][0].dl === dl) {
@@ -58,14 +61,14 @@ var DownloadManager = new function() {
 				}
 			}
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
-		});
+		}.bind(this));
 	}
 
-	self.debug = function() {
-		DEBUG("blocked patterns", locks);
+	this.debug = function() {
+		DEBUG("blocked patterns", locks, removed);
 	};
 
-	self.cleanupUI = function(dl, force) {
+	this.cleanupUI = function(dl, force) {
 		var selector = null
 		if (dl.zipid) {
 			$.each(dl_queue, function(i, file) {
@@ -98,62 +101,64 @@ var DownloadManager = new function() {
 		dl = null;
 	}
 
-	self.abortAll = function() {
-		$.each(dl_queue, function(i, file) {
+	this.abortAll = function() {
+		for(var i in dl_queue) {
+			var file = dl_queue[i];
 			if (file.id || file.zipid) {
-				self.abort(file);
+				this.abort(file);
 			}
-		});
-		percent_megatitle();
+		}
+		Soon(percent_megatitle);
 	}
 
-	self.abort = function(pattern, dontCleanUI) {
+	this.abort = function(pattern, dontCleanUI) {
 		var _pattern = s2o(pattern);
 		$.each(dl_queue, function(i, dl) {
 			if (doesMatch({task:dl}, _pattern)) {
 				if (!dl.cancelled && typeof dl.io.abort == "function") try {
+					if (d) console.log('IO.abort', dl.zipid || dl.id, dl);
 					dl.io.abort("User cancelled");
 				} catch(e) {
 					DEBUG(e.message, e);
 				}
+				if (dl.zipid) Zips[dl.zipid].cancelled = true;
 				dl.cancelled = true;
 				/* do not break the loop, it may be a multi-files zip */
 			}
 		});
 		if (typeof pattern == "object" && !dontCleanUI) {
-			self.cleanupUI(pattern);
+			this.cleanupUI(pattern);
 		}
 
-		self.remove(_pattern);
-		percent_megatitle();
+		this.remove(_pattern);
+		Soon(percent_megatitle);
 	}
 
-	self.remove = function(pattern, check) {
-		check = check || function() {};
+	this.remove = function(pattern, check) {
 		pattern = s2o(pattern);
-		removed.push(task2id(pattern))
+		var tid = task2id(pattern);
+		this.release(tid);
+		removed.push(tid);
 		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
 			var match = doesMatch(obj[0], pattern);
 			if (match) {
-				check(obj[0]);
-				DEBUG("remove task", pattern);
+				if (check) check(obj[0]);
+				if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
+				if (obj[0].destroy) obj[0].destroy();
 			}
 			return !match;
 		});
 	};
 
-	self.isRemoved = function(task) {
-		var enabled = true;
-		$.each(removed, function(i, pattern) {
-			if (doesMatch(task, pattern)) {
-				enabled = false;
-				return false; /* break */
-			}
-		});
-		return !enabled;
+	this.isRemoved = function(task) {
+		for (var i in removed) {
+			if (doesMatch(task, removed[i]))
+				return true;
+		}
+		return false;
 	}
 
-	self.pause = function(work) {
+	this.pause = function(work) {
 		var pattern = task2id(work)
 		DEBUG("PAUSED ", pattern);
 
@@ -166,29 +171,54 @@ var DownloadManager = new function() {
 		work.__ondone   = function() {
 			work.__ondone = function() {
 				DEBUG("here __ondone()->->");
-				self.release(pattern);
+				DownloadManager.release(pattern);
 			};
 		};
 	}
 
+	function isDLObject(obj) {
+		return typeof obj === 'object' && typeof obj.onDownloadStart === 'function';
+	}
+
 	function task2id(pattern) {
-		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) {
-			if (typeof pattern.task.zipid == "number") {
-				pattern = 'zipid:' + pattern.task.zipid;
+		var obj;
+
+		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) obj = pattern.task;
+		else if (isDLObject(pattern)) obj = pattern;
+
+		if (obj) {
+			if (typeof obj.zipid == "number") {
+				pattern = 'zipid:' + obj.zipid;
 			} else {
-				pattern = 'id:' + pattern.task.id;
+				pattern = 'id:' + obj.id;
 			}
 		}
 		return pattern;
 	}
 
-	self.release = function(pattern) {
+	this.release = function(pattern) {
 		var pattern = task2id(pattern)
 		DEBUG("RELEASE LOCK TO ", pattern);
-		removeValue(locks, pattern);
-		removeValue(removed, pattern);
+		removeValue(locks, pattern, true);
+		if (!removeValue(removed, pattern, true))
+		{
+			pattern = s2o(pattern);
+			for (var i in removed)
+			{
+				if (typeof removed[i] === 'object')
+				{
+					for (var k in pattern)
+					{
+						if (pattern[k] === removed[i][k])
+						{
+							removed.splice(i, 1);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
-
 }
 
 var ioThrottlePaused = false;
@@ -363,10 +393,10 @@ function failureFunction(task, args) {
 
 	if (code == 509) {
 		var t = NOW();
-		if (!dl_lastquotawarning || t-dl_lastquotawarning > 55000) {
+		if (t-dl_lastquotawarning > 60000) {
 			dl_lastquotawarning = t;
 			dl_reportstatus(dl, code == 509 ? EOVERQUOTA : ETOOMANYCONNECTIONS); // XXX
-			setTimeout(function() { dlQueuePushBack(task); }, 60000);
+			dl.quota_t = setTimeout(function() { dlQueuePushBack(task); }, 60000);
 			return 1;
 		}
 	}
@@ -516,9 +546,7 @@ if(localStorage.dlMethod) {
 	dlMethod = FirefoxIO;
 } else if (window.webkitRequestFileSystem) {
 	dlMethod = FileSystemAPI;
-} else if (navigator.msSaveOrOpenBlob) {
-	dlMethod = BlobBuilderIO;
-} else if ("download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
+} else if (navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
 	dlMethod = MemoryIO;
 } else {
 	dlMethod = FlashIO;

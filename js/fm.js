@@ -395,13 +395,17 @@ function initUI()
 	{
 		if (e.which == 13) doAddContact(e);
 	});
-	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
 		$.termsAgree = function()
 		{
 			u_attr.terms=1;
 			api_req({a:'up',terms:'Mq'});
+                        // queued work is continued when user accept terms of service
+			$('.transfer-pause-icon').removeClass('active');
+			dlQueue.resume();
+			ulQueue.resume();
+			ui_paused = false;
 		};
 		$.termsDeny = function()
 		{
@@ -410,6 +414,7 @@ function initUI()
 		};
 		termsDialog();
 	}
+	if (ul_queue.length > 0) openTransferpanel();
 	M.avatars();
 
 	if (typeof dl_import !== 'undefined' && dl_import) dl_fm_import();
@@ -499,8 +504,20 @@ function openTransferpanel()
 	$.transferOpen(1);
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
-	else initGridScrolling();	
-	if (!uldl_hold) ulQueue.resume();
+	else initGridScrolling();
+	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	else// make sure that terms of service are accepted before any action
+	{
+		$('.transfer-pause-icon').addClass('active');
+		dlQueue.pause();
+		ulQueue.pause();
+		ui_paused = true;
+
+//		$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+//		{
+//			$(this).text('');
+//		});            
+	}
 	initTreeScroll();
 	$(window).trigger('resize');
 
@@ -570,6 +587,35 @@ function removeUInode(h)
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
+        var hasItems=false;
+	for (var h in M.c[M.currentdirid]) { hasItems=true; break; }
+        // Show empty picture if there's no more items available in tab
+	if (!hasItems)
+        {
+                switch (M.currentdirid)
+                {
+                        case M.RootID:
+                            $('.grid-table.fm tr').remove();
+                            $('.fm-empty-cloud').removeClass('hidden');
+                            break;
+                        case "shares":
+                            $('.files-grid-view .grid-table-header tr').remove();
+                            // ToDo: Missing empty picture for shares
+                            $('.fm-empty-cloud').removeClass('hidden');
+                            break;
+                        case "contacts":
+                            $('.contacts-grid-view .contacts-grid-header tr').remove();
+                            $('.fm-empty-contacts').removeClass('hidden');
+                            break;
+                        case "chat":
+                            // ToDo: Missing grid header for conversation
+                            $('.contacts-grid-view .contacts-grid-header tr').remove();
+                            $('.fm-empty-messages').removeClass('hidden');
+                            break;
+                        default:
+                            break;
+                }
+        }        
 }
 
 function sharedUInode(h,s)
@@ -807,7 +853,19 @@ function initContextUI()
 	{
 		createfolderDialog();
 	});
-	
+
+	$(c+'.fileupload-item').unbind('click');
+	$(c+'.fileupload-item').bind('click',function(event) 
+	{
+		$('#fileselect3').click();
+	});
+        
+	$(c+'.folderupload-item').unbind('click');
+	$(c+'.folderupload-item').bind('click',function(event) 
+	{
+		$('#fileselect4').click();
+	});
+    
 	$(c+'.remove-item').unbind('click');
 	$(c+'.remove-item').bind('click',function(event) 
 	{
@@ -2081,6 +2139,13 @@ function gridUI()
 		if (contextmenuUI(e,2)) return true;
 		else return false;	
 		$.hideTopMenu();
+	});
+        // enable add star on first column click (make favorite)
+	$('.grid-table.fm tr td:first-child').unbind('click');
+	$('.grid-table.fm tr td:first-child').bind('click',function(e)
+	{		
+		var id = [$(this).parent().attr('id')];
+		M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));		
 	});	
 	if (d) console.log('gridUI() time:',new Date().getTime() - t);
 	$('.grid-table-header .arrow').unbind('click');
@@ -2485,6 +2550,7 @@ var SelectionManager = function($selectable) {
      * Simple helper func, for selecting all elements in the current view.
      */
     this.select_all = function() {
+		$(window).trigger('dynlist.flush');
         var $selectable_containers = $(
             [
                 ".fm-blocks-view",
@@ -3096,11 +3162,18 @@ function transferPanelUI()
     $.transferHeader = function()
 	{		
 		fm_resize_handler();
-		var el = $('.transfer-table-header th');
-		$('.transfer-table tr:first-child td').each(function(i,e) {
-		  var headerColumn = $('.transfer-table-header th').get(i);
-		  $(headerColumn).width($(e).width());
-	    });
+                var el = $('.transfer-table-header th');
+                // Get first item in transfer queue, and loop through each column
+                $('.transfer-table tr:nth-child(2) td').each(function(i,e)
+                {
+                        var headerColumn = $(el).get(i);
+                        $(headerColumn).width($(e).width());
+                });
+                
+                var tth = $('.transfer-table-header');
+                var toHide = (dl_queue.length || ul_queue.length);
+                // Show/Hide header if there is no items in transfer list
+                if (!toHide) tth.hide(1000); else tth.show(0);
 
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
@@ -3215,10 +3288,18 @@ function transferPanelUI()
 	{
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
-			$(this).removeClass('active');
-			dlQueue.resume();
-			ulQueue.resume();
-			ui_paused = false;
+                        // terms of service 
+                        if (u_attr.terms)
+                        {
+                                $(this).removeClass('active');
+                                dlQueue.resume();
+                                ulQueue.resume();
+                                ui_paused = false;
+                        } else
+                        {
+                            alert(l[214]);
+                            DEBUG(l[214]);
+                        }
 		}
 		else
 		{
@@ -4544,7 +4625,7 @@ function browserDialog(close)
 	var bc,bh,bt;
 	if ('-ms-scroll-limit' in document.documentElement.style && '-ms-ime-align' in document.documentElement.style)
 	{
-		if (page !== 'download')
+		if (page !== 'download' && (''+page).split('/').shift() !== 'fm')
 		{
 			browserDialog(1);
 			return false;
@@ -4552,8 +4633,9 @@ function browserDialog(close)
 		// IE11
 		bc = 'ie10';		
 		bh = l[884].replace('[X]','IE 11');
-		if (page == 'download') bt = l[1933];		
-		else bt = l[886];
+		// if (page == 'download') bt = l[1933];
+		// else bt = l[886];
+		bt = l[1933];
 	}
 	else if (navigator.userAgent.indexOf('MSIE 10') > -1)
 	{	
@@ -4820,16 +4902,39 @@ var slideshowid;
 
 function slideshowsteps()
 {
-	var check=false, forward = [], backward=[];
-	for (var i in M.v)
-	{
-		if (M.v[i].name && is_image(M.v[i].name))
-		{	
-			if (M.v[i].h == slideshowid) check=true;
-			else if (check) forward.push(M.v[i].h);
-			else backward.push(M.v[i].h);			
-		}
-	}
+	var forward = [], backward = [], ii = [], ci;
+        // Loop through available items and extract images
+        for (var i in M.v) {
+                if (M.v[i].name && is_image(M.v[i].name))
+                {
+                        // is currently previewed item
+                        if (M.v[i].h == slideshowid) ci = i;
+                        ii.push(i);
+                }
+        }
+        
+        var len = ii.length;
+        // If there is at least 2 images
+        if (len > 1)
+        {
+                var n = ii.indexOf(ci);
+                switch (n)
+                {
+                        // last
+                        case len-1:
+                            forward.push(M.v[ii[0]].h);
+                            backward.push(M.v[ii[n-1]].h);
+                            break;
+                        // first
+                        case 0:
+                            forward.push(M.v[ii[n+1]].h);
+                            backward.push(M.v[ii[len-1]].h);
+                            break;
+                        default:
+                            forward.push(M.v[ii[n+1]].h);
+                            backward.push(M.v[ii[n-1]].h);
+                }
+        }
 	return {backward:backward,forward:forward};
 }
 

@@ -272,6 +272,27 @@ function MegaData ()
 
 	this.renderMain = function(u)
 	{
+		function flush_cached_nodes(n)
+		{
+			var e = cache.splice(0, n || cache.length);
+			
+			if (e.length)
+			{
+				var n = M.viewmode == 0 ? $('.grid-table.fm') : $('.file-block-scrolling').data('jsp').getContentPane();
+				
+				for (var i in e)
+				{
+					n.append(e[i]);
+				}
+				if (folderlink || RootbyId(M.currentdirid) == M.RubbishID) $('.grid-url-arrow').hide();
+				if (M.viewmode == 1) fm_thumbnails();
+				$(window).trigger('resize');
+			}
+			else
+			{
+				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+			}
+		}
 		hideEmptyMsg();
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
@@ -294,6 +315,7 @@ function MegaData ()
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 		}
 
+		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
@@ -311,7 +333,7 @@ function MegaData ()
 					t = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
-				var html,t,el,star='';
+				var html,t,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
 				if (this.viewmode == 1)
 				{
@@ -328,6 +350,7 @@ function MegaData ()
 						t = '.file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						cc=1;
 					}
 				}
 				else
@@ -354,12 +377,14 @@ function MegaData ()
 					{
 						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="60" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
 						t = '.grid-table.fm';
+						cc=1;
 					}
 				}
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
-					$(t).append(html);
+					if (cc && ++files > n_cache) cache.push(html);
+					else $(t).append(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
@@ -389,6 +414,25 @@ function MegaData ()
 					}
 				}				
 			}
+		}
+		$(window).unbind('dynlist.flush');
+		$(window).bind('dynlist.flush', function()
+		{
+			if (cache.length)
+			{
+				loadingDialog.show();
+				flush_cached_nodes();
+				loadingDialog.hide();
+			}
+		});
+		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+		if (d) console.log('cache %d/%d', cache.length, files);
+		if (cache.length)
+		{
+			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
+			{
+				if (bot) flush_cached_nodes(n_cache / 2);
+			});
 		}
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
@@ -1112,9 +1156,9 @@ function MegaData ()
 				}
 			}
 		}
-		var hasFolders=false;
-		if (sel) for (var h in M.c[M.RubbishID]) if (M.d[h].t) hasFolders=true;
-		if (!hasFolders)
+		var hasItems=false;
+		if (sel) for (var h in M.c[M.RubbishID]) { hasItems=true; break; }
+		if (!hasItems)
 		{
 			$('#treesub_' + M.RubbishID).remove();
 			$('.fm-tree-header.recycle-item').removeClass('contains-subfolders expanded recycle-notification');
@@ -1415,7 +1459,7 @@ function MegaData ()
 				api_req({a:'a',n:h,attr:attr,key:key,i:requesti});
 				$('.grid-table.fm #' + h + ' .tranfer-filetype-txt').text(name);
 				$('.file-block#' + h + ' .file-block-title').text(name);
-				$('#treea_' + h + ' span').text(name);
+				$('#treea_' + h + ' span:nth-child(2)').text(name);
 				if ($('#path_' + h).length > 0) M.renderPath();
 			}
 		}
@@ -1707,7 +1751,7 @@ function MegaData ()
 			}
 		}
 
-		if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 104857600) setTimeout(firefoxDialog,1000);		
+		if (dlMethod == MemoryIO && ~ua.indexOf(') gecko') && !localStorage.firefoxDialog && $.totalDL > 104857600) Later(firefoxDialog);
 
 		var flashhtml='';
 		if (dlMethod == FlashIO) {
@@ -1716,7 +1760,7 @@ function MegaData ()
 		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
-//		$.transferHeader();
+		$.transferHeader();
 
         if (!preview) 
 		{
@@ -1837,8 +1881,6 @@ function MegaData ()
 				$(this).remove();
 			});
 		}
-		$.transferHeader();
-
 		if (dlMethod == FileSystemAPI)
 		{
 			setTimeout(fm_chromebar,250,$.dlheight);
@@ -1866,6 +1908,7 @@ function MegaData ()
 		}
 
 		percent_megatitle();
+		$.transferHeader();
 	}
 
 	this.dlbeforecomplete = function()
@@ -1956,7 +1999,9 @@ function MegaData ()
 		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
 			return panelDomQueue.push(elem);
 		}
-		$(elem).appendTo('.transfer-table')
+		$(elem).appendTo('.transfer-table');
+                // In some cases UI is not yet initialized, nor transferHeader()
+                $('.transfer-table-header').show(0);
 	}
 
 	this.addUpload = function(u)
@@ -1972,7 +2017,7 @@ function MegaData ()
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
-			ul_queue.push(f);			
+			ul_queue.push(f);
 			
 		}
 		if (page == 'start') {
@@ -2038,7 +2083,6 @@ function MegaData ()
 		{
 			$(this).remove();
 		});
-		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
 		if (a < 2 && !downloading)
@@ -2057,6 +2101,7 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
+		$.transferHeader();
 	}
 
 	this.ulstart = function(id)

@@ -4726,7 +4726,7 @@ table {
 	background-position: -62px -997px;
 }
 .transfer-filtype-icon.html, .search-path-icon-span.html {
-	background-position: -62px -1037px;
+	background-position: 0 -624px;
 }
 .transfer-filtype-icon.graphic, .search-path-icon-span.graphic {
 	background-position: -62px -1077px;
@@ -12705,7 +12705,7 @@ span.browsers-update {
 	line-height: 21px;
 	color: #666666;
 	padding: 15px 0 0px 22px;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -813px -1536px;
 }
@@ -12718,7 +12718,7 @@ span.browsers-update {
 	float: left;
 	width: 448px;
 	height: 200px;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -488px -433px;
 	margin-bottom: 28px;
@@ -12787,7 +12787,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -12798,6 +12798,9 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
+}
+.sync-button.mac {
+	background-position: 15px -327px;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -12891,7 +12894,7 @@ span.browsers-update {
 	width: 80px;
 	height: 78px;
 	float: left;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -465px -1122px;
 	margin: 15px 0 17px 0;
@@ -12953,7 +12956,7 @@ span.browsers-update {
 }
 .chrome-bott-icons {
 	height: 140px;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: 0 -768px;
 }
@@ -12998,7 +13001,7 @@ span.browsers-update {
 .chrome-download-button:hover, a.chrome-download-button:hover {
 	background-color: #DB0605;
 	border: 2px solid #DB0605;
-	background-image: url(../images/mega/mobile-sprite.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -4px -919px;
 	color: white;
@@ -16119,7 +16122,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	height: 9px;
 	left: 145px;
 	top: 2px;
-	background-image: url(../images/mega/mobile-sprite.png?v=1);
+	background-image: url(../images/mega/mobile-sprite-v2.png?v=1);
 	background-position: right -1449px;
 	background-repeat: no-repeat;
 }
@@ -16789,7 +16792,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 853px auto;
 }
 .sync-list-txt, .sync-icon, .mobile-icon, .ios-button, .ff-icon, .blackberry-button, .chrome-icon, .sync-button, .google-play-button, .ff-bott-button, .mobile-small-icon, .chrome-bott-icons, .chrome-download-button, a.chrome-download-button, .ads-top-arrow {
- background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
+ background-image: url(../images/mega/mobile-sprite-v2@2x.png?v=4);
  background-size: 836px auto;
 }
  .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
@@ -16895,7 +16898,7 @@ background-image: url(../images/mega/chrome-app@2x.png);
 background-size: 700px auto;
 }
 .chrome-download-button:hover, a.chrome-download-button:hover {
- background-image: url(../images/mega/mobile-sprite@2x.png?v=4);
+ background-image: url(../images/mega/mobile-sprite-v2@2x.png?v=4);
 background-size: 836px auto;
 }
 .campaign-logo, .campaign-arrow, .campaign-mega-logo, .campaign-take-action span, .campaign .new-download-icon, .campaign-icon, .campaign-close-button {
@@ -17398,9 +17401,9 @@ transform: rotate(900deg);
 }
 .ui-resizable-n {
 	cursor: n-resize;
-	height: 7px;
+	height: 15px;
 	width: 100%;
-	top: -5px;
+	top: -1px;
 	left: 0;
 }
 .ui-resizable-s {
@@ -17681,108 +17684,54 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }
-.circle {
-	margin-bottom: 9px;
+
+
+
+.keyspinner {
+  margin: 50px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  text-align: center;  
+  -webkit-animation: rotate 2.0s infinite linear;
+  animation: rotate 2.0s infinite linear;
 }
-#circleG {
-	width: 28px;
-	margin-top: 8px;
+
+.keydot1, .keydot2 {
+  width: 60%;
+  height: 60%;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  background-color: #d90007;
+  border-radius: 100%;
+  
+  -webkit-animation: bounce 2.0s infinite ease-in-out;
+  animation: bounce 2.0s infinite ease-in-out;
 }
-.circleG {
-	background-color: transparent;
-	float: left;
-	height: 6px;
-	margin-left: 3px;
-	width: 6px;
-	-moz-animation-name: bounce_circleG;
-	-moz-animation-duration: 1.35s;
-	-moz-animation-iteration-count: infinite;
-	-moz-animation-direction: linear;
-	-moz-border-radius: 4px;
-	-webkit-animation-name: bounce_circleG;
-	-webkit-animation-duration: 1.35s;
-	-webkit-animation-iteration-count: infinite;
-	-webkit-animation-direction: linear;
-	-webkit-border-radius: 4px;
-	-ms-animation-name: bounce_circleG;
-	-ms-animation-duration: 1.35s;
-	-ms-animation-iteration-count: infinite;
-	-ms-animation-direction: linear;
-	-ms-border-radius: 4px;
-	-o-animation-name: bounce_circleG;
-	-o-animation-duration: 1.35s;
-	-o-animation-iteration-count: infinite;
-	-o-animation-direction: linear;
-	-o-border-radius: 4px;
-	animation-name: bounce_circleG;
-	animation-duration: 1.35s;
-	animation-iteration-count: infinite;
-	animation-direction: linear;
-	border-radius: 4px;
+
+.keydot2 {
+  top: auto;
+  bottom: 0px;
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
 }
-#circleG_1 {
-	-moz-animation-delay: 0.27s;
-	-webkit-animation-delay: 0.27s;
-	-ms-animation-delay: 0.27s;
-	-o-animation-delay: 0.27s;
-	animation-delay: 0.27s;
+
+@-webkit-keyframes rotate { 100% { -webkit-transform: rotate(360deg) }}
+@keyframes rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }}
+
+@-webkit-keyframes bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
 }
-#circleG_2 {
-	-moz-animation-delay: 0.63s;
-	-webkit-animation-delay: 0.63s;
-	-ms-animation-delay: 0.63s;
-	-o-animation-delay: 0.63s;
-	animation-delay: 0.63s;
+
+@keyframes bounce {
+  0%, 100% { 
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
 }
-#circleG_3 {
-	-moz-animation-delay: 0.8099999999999999s;
-	-webkit-animation-delay: 0.8099999999999999s;
-	-ms-animation-delay: 0.8099999999999999s;
-	-o-animation-delay: 0.8099999999999999s;
-	animation-delay: 0.8099999999999999s;
-}
- @-moz-keyframes bounce_circleG {
-0% {
-}
- 50% {
-background-color:#1DA2E9
-}
- 100% {
-}
-}
- @-webkit-keyframes bounce_circleG {
-0% {
-}
- 50% {
-background-color:#1DA2E9
-}
- 100% {
-}
-}
- @-ms-keyframes bounce_circleG {
-0% {
-}
- 50% {
-background-color:#1DA2E9
-}
- 100% {
-}
-}
- @-o-keyframes bounce_circleG {
-0% {
-}
- 50% {
-background-color:#1DA2E9
-}
- 100% {
-}
-}
- @keyframes bounce_circleG {
-0% {
-}
- 50% {
-background-color:#1DA2E9
-}
- 100% {
-}
-}
+

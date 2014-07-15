@@ -131,7 +131,8 @@ if (is_chrome_firefox)
     bootstaticpath = 'chrome://mega/content/';
     urlrootfile = 'secure.html';
     nocontentcheck=true;
-    staticpath = 'https://eu.static.mega.co.nz/';
+    if (localStorage.d) staticpath = bootstaticpath;
+    else staticpath = 'https://eu.static.mega.co.nz/';
     if(!b_u) try
     {
         loadSubScript(bootstaticpath + 'fileapi.js');
@@ -381,55 +382,55 @@ else if (page == '#android')
 }
 else
 {
-    if (!b_u)
-    {
-        /*
-         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
-         {
-         if (d)
-         {
-         console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
-         }
-         else
-         {
-         // TODO: XHR to log server?
-         }
+	if (!b_u)
+	{
+		/*
+			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
+			{
+				if (d)
+				{
+					console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
+				}
+				else
+				{
+					// TODO: XHR to log server?
+				}
 
-         return false;
-         };
-         */
-
-        if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
-        var d = localStorage.d || 0;
-        var jj = localStorage.jj || 0;
-        var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
-
-        function detectlang()
-        {
-            return 'en';
-            if (!navigator.language) return 'en';
-            var bl = navigator.language.toLowerCase();
-            var l2 = languages;
-            for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
-            for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
-            return 'en';
-        }
-        var init_f = [];
-        var lang = detectlang();
-        if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
-        var langv = '';
-        if (typeof lv != 'undefined') langv = '_' + lv[lang];
-        var jsl = []
-
-        jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
-        jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
-        jsl.push({f:'asmcrypto.js',n:'asmcrypto_js',j:1});
-        jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});		
+				return false;
+			};
+		*/
 		
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
+		var d = localStorage.d || 0;
+		var jj = localStorage.jj || 0;
+		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
+
+		function detectlang()
+		{
+			return 'en';
+			if (!navigator.language) return 'en';
+			var bl = navigator.language.toLowerCase();
+			var l2 = languages;
+			for (var l in l2) for (b in l2[l]) if (l2[l][b] == bl) return l;
+			for (var l in l2) for (b in l2[l]) if (l2[l][b].substring(0,3)==bl.substring(0,3)) return l;
+			return 'en';
+		}
+		var init_f = [];
+		var lang = detectlang();
+		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
+		var langv = '';
+		if (typeof lv != 'undefined') langv = '_' + lv[lang];
+		var jsl = []
+
+		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
+		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
+		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});		
 		
+
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -493,14 +494,13 @@ else
         jsl.push({f:'js/events.js', n: 'events', j:1,w:4});
         jsl.push({f:'js/queue.js', n: 'queue', j:1,w:4});
         jsl.push({f:'js/downloadChrome.js', n: 'dl_chrome', j:1,w:3});
-        if (is_chrome_firefox && OS && localStorage.fxio)
+        if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
         {
             is_chrome_firefox |= 4;
             jsl.push({f:'js/downloadFirefox.js', n: 'dl_firefox', j:1,w:3});
         }
         else
         {
-            jsl.push({f:'js/downloadBlobBuilder.js', n: 'dl_blobbuilder', j:1,w:3});
             jsl.push({f:'js/downloadMemory.js', n: 'dl_memory', j:1,w:3});
             jsl.push({f:'js/downloadFlash.js', n: 'dl_flash', j:1,w:3});
         }
@@ -897,7 +897,7 @@ else
                 else if ((jsl[i].j == 2) && (!jj))
                 {
                     if (document.getElementById('bootbottom')) document.getElementById('bootbottom').style.display='none';
-                    if (window.URL)
+                    if (!is_chrome_firefox && window.URL)
                     {
                         cssar.push(jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/'));
                     }
@@ -907,7 +907,7 @@ else
                         css.type = "text/css";
                         css.rel = 'stylesheet';
                         document.getElementsByTagName('head')[0].appendChild(css);
-                        css.innerHTML = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
+                        css.textContent = jsl[i].text.replace(/\.\.\//g,staticpath).replace(new RegExp( "\\/en\\/", "g"),'/' + lang + '/');
                     }
                 }
                 else if (jsl[i].j == 3) l = JSON.parse(jsl[i].text);
@@ -916,9 +916,10 @@ else
             }
             if (window.URL)
             {
-                try
+                var blob;
+                if (cssar.length) try
                 {
-                    var blob = new Blob(cssar, { type: "text/css" });
+                    blob = new Blob(cssar, { type: "text/css" });
                     for ( var f in scripts ) {
                         if (!scripts[f].match(/^blob:/)) {
                             scripts[f] = window.URL.createObjectURL( new Blob( [ scripts[f] ], { type: 'text/javascript' } ) );
@@ -930,7 +931,7 @@ else
                     window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
                     var bb = new BlobBuilder();
                     for (var i in cssar) bb.append(cssar[i]);
-                    var blob = bb.getBlob('text/css');
+                    blob = bb.getBlob('text/css');
                     for ( var f in scripts ) {
                         if (!scripts[f].match(/^blob:/)) {
                             bb = new BlobBuilder();
@@ -939,11 +940,14 @@ else
                         }
                     }
                 }
-                var link = document.createElement('link');
-                link.setAttribute('rel', 'stylesheet');
-                link.type = 'text/css';
-                link.href = window.URL.createObjectURL(blob);
-                document.head.appendChild(link);
+                if (blob)
+                {
+                    var link = document.createElement('link');
+                    link.setAttribute('rel', 'stylesheet');
+                    link.type = 'text/css';
+                    link.href = window.URL.createObjectURL(blob);
+                    document.head.appendChild(link);
+                }
                 cssar=undefined;
                 jsar.push('jsl_done=true; boot_done();');
                 evalscript_url(jsar);

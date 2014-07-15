@@ -475,20 +475,20 @@ function sync_switchOS(os)
 	if (os == 'windows')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
-		$('.sync-button-txt.small').text(l[1158]);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a>');
-		$('.sync-button').removeClass('mac');
-		$('.sync-button').attr('href',syncurl);
+		$('.ads-left-block .sync-button-txt.small').text(l[1158]);			
+		$('.ads-left-block .sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a>');
+		$('.ads-left-block .sync-button').removeClass('mac');
+		$('.ads-left-block .sync-button').attr('href',syncurl);
 	}
 	else if (os == 'mac')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
 		var ostxt = 'For Mac';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');			
-		$('.sync-button-txt.small').text(ostxt);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a>');
-		$('.sync-button').addClass('mac');
-		$('.sync-button').attr('href',syncurl);
+		$('.ads-left-block .sync-button-txt.small').text(ostxt);			
+		$('.ads-left-block .sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a>');
+		$('.ads-left-block .sync-button').addClass('mac');
+		$('.ads-left-block .sync-button').attr('href',syncurl);
 	}	
 	$('.sync-bottom-txt a').unbind('click');
 	$('.sync-bottom-txt a').bind('click',function(e)

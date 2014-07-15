@@ -126,11 +126,14 @@ function FileSystemAPI(dl_id, dl) {
 					}
 	
 					zfileEntry = fileEntry;
-					Soon(function() {
-						// deferred execution
-						that.begin();
-						that = null;
-					});
+					var finalize = setInterval(function() {
+						if (dl_fw.readyState === dl_fw.DONE) {
+							// deferred execution
+							that.begin();
+							that = null;
+							clearInterval(finalize);
+						}
+					}, 10);
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -218,17 +221,16 @@ function FileSystemAPI(dl_id, dl) {
 		}
 
 		dl_writing = false;
-		dl_done(); /* notify writer */
-
 		/* release references to callback and buffer */
 		dl_buffer = null;
-		dl_done   = null;
+		dl_done(); /* notify writer */
+
 	}
 
 	this.write = function(buffer, position, done) {
 		if (dl.io instanceof MemoryIO) return dl.io.write(buffer, position, done);
 
-		if (position != dl_fw.position) {
+		if (dl_writing || position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
 		dl_writing  = true;

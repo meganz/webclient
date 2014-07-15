@@ -126,11 +126,15 @@ function FileSystemAPI(dl_id, dl) {
 					}
 	
 					zfileEntry = fileEntry;
-					Soon(function() {
-						// deferred execution
-						that.begin();
-						that = null;
-					});
+					var finalize = setInterval(function() {
+						ERRDEBUG(dl_fw.readyState === dl_fw.DONE) 
+						if (dl_fw.readyState === dl_fw.DONE) {
+							// deferred execution
+							that.begin();
+							that = null;
+							clearInterval(finalize);
+						}
+					}, 10);
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -228,7 +232,7 @@ function FileSystemAPI(dl_id, dl) {
 	this.write = function(buffer, position, done) {
 		if (dl.io instanceof MemoryIO) return dl.io.write(buffer, position, done);
 
-		if (position != dl_fw.position) {
+		if (dl_writing || position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
 		dl_writing  = true;
@@ -240,6 +244,7 @@ function FileSystemAPI(dl_id, dl) {
 
 
 		DEBUG("Write " + buffer.length + " bytes at " + position  + "/"  + dl_fw.position);
+		ERRDEBUG(dl_fw);
 		dl_fw.write(new Blob([buffer]));
 	};
 

@@ -504,11 +504,10 @@ function openTransferpanel()
 	$.transferOpen(1);
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
-	else initGridScrolling();	
-	if (!uldl_hold && u_attr.terms)
-                ulQueue.resume();
-        else// make sure that terms of service are accepted before any action
-        {
+	else initGridScrolling();
+	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	else// make sure that terms of service are accepted before any action
+	{
 		$('.transfer-pause-icon').addClass('active');
 		dlQueue.pause();
 		ulQueue.pause();
@@ -518,7 +517,7 @@ function openTransferpanel()
 //		{
 //			$(this).text('');
 //		});            
-        }
+	}
 	initTreeScroll();
 	$(window).trigger('resize');
 

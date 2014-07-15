@@ -3159,7 +3159,7 @@ function iconUI()
 
 function transferPanelUI()
 {
-    $.transferHeader = function(end)
+    $.transferHeader = function()
 	{		
 		fm_resize_handler();
                 var el = $('.transfer-table-header th');
@@ -3171,10 +3171,9 @@ function transferPanelUI()
                 });
                 
                 var tth = $('.transfer-table-header');
-                if (typeof end != 'undefined')
-                        // Show/Hide header if there is no items in transfer list
-                        if (!end) tth.show(0);
-                        else if (end) tth.hide(1000);// 1000 match slow on complete
+                var toHide = (dl_queue.length || ul_queue.length);
+                // Show/Hide header if there is no items in transfer list
+                if (!toHide) tth.hide(1000); else tth.show(0);
 
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 

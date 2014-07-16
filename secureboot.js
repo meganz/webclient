@@ -425,6 +425,9 @@ else
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
+
+        jsl.push({f:'js/megakvstorage.js', n: 'megakvstorage_js', j:1,w:5});
+
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});

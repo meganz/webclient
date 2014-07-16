@@ -311,9 +311,7 @@ var MegaChat = function() {
 
             },
             prepareToSendMessage: function(sendMsgFunc, bareJid) {
-                api_cachepubkeys({
-                    cachepubkeyscomplete : sendMsgFunc
-                }, [megaChat.getContactFromJid(bareJid).h]);
+                getPubk(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
             },
             generateMac: function(msg, key) {
                 var rawkey = key;
@@ -1694,9 +1692,9 @@ MegaChat.prototype.getBoshServiceUrl = function() {
     var hash = asmCrypto.SHA1.hex(u_handle).substr(0, 1);
     if("abcde".indexOf(hash) !== -1) {
         num = 1;
-    } else if ("f012".indexOf(hash) !== -1) {
+    } else if ("f0123".indexOf(hash) !== -1) {
         num = 2;
-    } else if ("3456".indexOf(hash) !== -1) {
+    } else if ("456789".indexOf(hash) !== -1) {
         num = 3;
     } else { // should not happen
         assert(false, 'this should never happen (generated SHA1 hex hash contained unexpected character)');

@@ -155,8 +155,28 @@ function u_logout(logout)
         a[i].removeItem('randseed');
 	}
 
+
+    if(pubkeysCache) { pubkeysCache.clear(); }
+    if(pubEd25519Cache) { pubEd25519Cache.clear(); }
+
 	if (logout)
 	{
+        if(MegaChatEnabled) {
+            localStorage.removeItem("audioVideoScreenSize");
+
+
+            if(megaChat.is_initialized) {
+                megaChat.destroy().always(function() {
+                    window.megaChat = new MegaChat();
+                    localStorage.removeItem("megaChatPresence");
+                    localStorage.removeItem("megaChatPresenceMtime");
+                });
+
+                localStorage.removeItem("megaChatPresence");
+                localStorage.removeItem("megaChatPresenceMtime");
+            }
+        }
+
 		delete localStorage.signupcode;
 		delete localStorage.registeremail;
 		if (mDBact)
@@ -184,17 +204,6 @@ function u_logout(logout)
 			waitxhr.abort();
 			waitxhr=undefined;	
 		}
-
-
-        if(MegaChatEnabled) {
-            if(megaChat.is_initialized) {
-                megaChat.destroy().always(function() {
-                    window.megaChat = new MegaChat();
-                    localStorage.removeItem("megaChatPresence");
-                    localStorage.removeItem("megaChatPresenceMtime");
-                })
-            }
-        }
 	}
 }
 

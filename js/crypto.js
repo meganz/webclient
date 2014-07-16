@@ -2668,12 +2668,22 @@ function u_ed25519()
 
 var pubEd25519 = {};
 
+var pubEd25519Cache = null;
 function getPubEd25519(userhandle, callback)
 {
+    if(!pubEd25519Cache) {
+        pubEd25519Cache = new MegaKVStorage("pk25519", localStorage);
+    }
+
 	if (pubEd25519[userhandle])
 	{
 	    callback(pubEd25519[userhandle], userhandle);
 	}
+    else if(pubEd25519Cache.hasItem(userhandle))
+    {
+        pubEd25519[userhandle] = pubEd25519Cache.getItem(userhandle);
+        callback(pubEd25519[userhandle], userhandle);
+    }
 	else
 	{
 		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
@@ -2684,7 +2694,9 @@ function getPubEd25519(userhandle, callback)
 			{
 				if (typeof res !== 'number' && ctx.callback2)
 				{
+
 				    pubEd25519[ctx.u] = base64urldecode(res);
+                    pubEd25519Cache.setItem(ctx.u, pubEd25519[ctx.u]);
 					ctx.callback2(pubEd25519[ctx.u], ctx.u);
 				}
 				else if (ctx.callback2)
@@ -2694,4 +2706,39 @@ function getPubEd25519(userhandle, callback)
 			}
 		});
 	}	
+}
+
+var pubkeysCache = null;
+/**
+ * Cached/persistent way of accessing user public keys
+ *
+ * @param userhandle {string}
+ * @param callback {Function} with one argument - the actual pubkey
+ */
+function getPubk(userhandle, callback) {
+    if(!pubkeysCache) {
+        pubkeysCache = new MegaKVStorage("pubk", localStorage);
+    }
+
+    if (u_pubkeys[userhandle])
+    {
+        callback(u_pubkeys[userhandle], userhandle);
+    }
+    else if(pubkeysCache.hasItem(userhandle))
+    {
+        u_pubkeys[userhandle] = JSON.parse(pubkeysCache.getItem(userhandle));
+        callback(u_pubkeys[userhandle], userhandle);
+    }
+    else
+    {
+        api_cachepubkeys({
+            cachepubkeyscomplete : function() {
+                pubkeysCache.setItem(userhandle, JSON.stringify(u_pubkeys[userhandle]));
+
+                console.error("pbk cache set: ", userhandle, u_pubkeys[userhandle]);
+
+                callback(u_pubkeys[userhandle]);
+            }
+        }, [userhandle]);
+    }
 }

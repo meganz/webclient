@@ -20,6 +20,7 @@ module.exports = function(config) {
              "../jodid25519.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
+             "../megakvstorage.js",
              "../fm.js",
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
 

@@ -749,7 +749,6 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
         retriesCount++;
     }
     if(megaRoom._processMessageFails >= 3) {
-        alert(1);
         var $dialog = megaRoom.generateInlineDialog(
             "mpEnc-ui-error",
             false,

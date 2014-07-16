@@ -2006,12 +2006,15 @@ function MegaData ()
 
 	this.addUpload = function(u)
 	{
+		var target = $.onDroppedTreeFolder || M.currentdirid;
+		delete $.onDroppedTreeFolder;
+
 		for (var i in u)
 		{
 			var f = u[i];
 			var ul_id = ul_queue.length;
 			if (!f.flashid) f.flashid = false;
-			f.target = M.currentdirid;
+			f.target = target;
 			f.id = ul_id;
 
 			this.addToTransferTable(

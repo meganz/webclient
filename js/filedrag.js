@@ -4,7 +4,7 @@ function FileDragHover(e)
 {
 	if (d) console.log('hover',$.dragging);
 	if (folderlink) return false;
-	$.dragging=new Date().getTime();
+	$.dragging=Date.now();
 	e.stopPropagation();
 	e.preventDefault();
 	if (document.getElementById('start_uploadbutton')) document.getElementById('start_uploadbutton').style.display = 'none';
@@ -49,6 +49,17 @@ function FileDragHover(e)
 		$('.st-main-cursor,.st-main-info').fadeOut(30);
 		start_over();
 	}
+	else
+	{
+		var t = $(e.target);
+		$('span.nw-fm-tree-folder').css('background-color','');
+		
+		if (t.attr('class') == "nw-fm-tree-folder")
+		{
+			t.css('background-color','rgba(222,222,10,0.3)');
+			$.onDroppedTreeFolder = t.parent().attr('id').split('_').pop();
+		}
+	}
 }
 
 function FileDragLeave(e)
@@ -59,7 +70,7 @@ function FileDragLeave(e)
 	e.preventDefault();
 	setTimeout(function()
 	{
-		if (e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging+50 < new Date().getTime())
+		if (e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging+50 < Date.now())
 		{
 			$($.ddhelper).remove();
 			$.ddhelper=undefined;
@@ -67,7 +78,7 @@ function FileDragLeave(e)
 	},100);
 	setTimeout(function()
 	{
-		if (page == 'start' && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging+500 < new Date().getTime())
+		if (page == 'start' && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging+500 < Date.now())
 		{
 			$.dragging=false;
 			start_out();
@@ -164,6 +175,10 @@ function FileSelectHandler(e)
 		{
 			$('.st-main-cursor,.st-main-info').show();
 		},500);
+	}
+	else
+	{
+		$('span.nw-fm-tree-folder').css('background-color','');
 	}
 
 	var files = e.target.files || e.dataTransfer.files;

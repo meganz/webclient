@@ -3289,7 +3289,7 @@ function transferPanelUI()
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
                         // terms of service 
-                        if (u_attr.terms)
+                        if (u_type || u_attr.terms)
                         {
                                 $(this).removeClass('active');
                                 dlQueue.resume();

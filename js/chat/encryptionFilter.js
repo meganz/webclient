@@ -65,6 +65,8 @@ var EncryptionFilter = function(megaChat) {
                     return true;
                 } else if(nextOp[0] == "start" && opQueue.ctx.state == mpenc.handler.STATE.NULL) {
                     return true;
+                } else if(nextOp[0] == "join" && opQueue.ctx.state == mpenc.handler.STATE.INITIALISED) {
+                    return true;
                 }/* if(nextOp[0] == "processMessage") {  // greet/init enc messages
                     return true;
                 } */else {
@@ -560,19 +562,19 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
             } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
                 // first start, then exclude
                 if(joinUsers.length > 0) {
-                    megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
+                    megaRoom.encryptionOpQueue.queue('start', joinUsers);
                 }
                 if(excludeUsers.length > 0) {
                     megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
                 }
 
             } else {
-                // first exclude, then start
+                // first exclude, then join
                 if(excludeUsers.length > 0) {
                     megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
                 }
                 if(joinUsers.length > 0) {
-                    megaRoom.encryptionOpQueue.queue(megaRoom.encryptionHandler.state == mpenc.handler.STATE.NULL ? 'start' : 'join', joinUsers);
+                    megaRoom.encryptionOpQueue.queue('join', joinUsers);
                 }
             }
         })

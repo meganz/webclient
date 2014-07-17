@@ -123,6 +123,8 @@ var Karere = function(user_options) {
     self._iqRequests = {};
 
 
+    self._waitForPresenceCache = {};
+
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
 
@@ -1868,6 +1870,12 @@ makeMetaAware(Karere);
         var $promise = new $.Deferred();
         var generatedEventName = generateEventSuffixFromArguments("onUsers" + eventName, "inv", roomJid, userJid, self._generateNewIdx());
 
+        var waitCacheKey = eventName + "_" + roomJid + "_" + userJid;
+
+        if(self._waitForPresenceCache[waitCacheKey]) {
+            return self._waitForPresenceCache[waitCacheKey];
+        }
+
         if(localStorage.d) {
             console.warn(
                 self.getNickname(),
@@ -1938,6 +1946,13 @@ makeMetaAware(Karere);
         });
 
 
+
+        self._waitForPresenceCache[waitCacheKey] = $promise;
+
+        $promise.always(function() {
+            // cleanup
+            delete self._waitForPresenceCache[waitCacheKey];
+        })
         return $promise;
     };
 

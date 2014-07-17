@@ -699,10 +699,13 @@ function MegaData ()
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
 		for (var i in contacts)
-		{						
+		{
+            if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
+                continue;
+            }
 			var img = staticpath + 'images/mega/default-small-avatar.png';
 			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
 			
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}

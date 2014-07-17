@@ -4438,6 +4438,7 @@ function createfolderDialog(close)
 	});
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.create-folder-dialog').removeClass('hidden');
+        $('.create-folder-input-bl input').focus();
 	$('.create-folder-dialog').removeClass('active');
 }
 

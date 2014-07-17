@@ -59,6 +59,7 @@ MegaQueue.prototype.expand = function() {
 
 MegaQueue.prototype.shrink = function() {
 	this._limit = Math.max(this._limit-1, 1);
+	if (d) console.error("shrking queue to ", this._limit);
 	return this._limit;
 }
 

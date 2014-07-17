@@ -173,7 +173,8 @@ function network_error_check() {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
 			ERRDEBUG('shrinking: ' + (k == ul ? 'ul' : 'dl'))
-			(k == ul ? ulQueue : dlQueue).shrink();
+			var queue = (k == ul ? ulQueue : dlQueue)
+			queue.shrink();
 		}
 	});
 }

@@ -9,20 +9,22 @@ var ul_completing;
 function ul_completepending(target)
 {
 	if (ul_completion.length) {
+	console.error("I'm weak, debug me.")
 		var ul = ul_completion.shift();
-		var ctx = {
-			target : target,
-			ul_queue_num : ul[3],
-			size: ul_queue[ul[3]].size,
-			callback : ul_completepending2,
-			faid : ul[1].faid,
-			file : ul[1]
-		};
+		// var ctx = {
+			// target : target,
+			// ul_queue_num : ul[3],
+			// size: ul_queue[ul[3]].size,
+			// callback : ul_completepending2,
+			// faid : ul[1].faid,
+			// file : ul[1]
+		// };
+		//api_completeupload(ul[0],ul[1],ul[2],ctx);
 
+		var file = ul[1];
 		file.response = ul[0]
 		file.filekey  = ul[2]
 		ul_finalize(file)
-		//api_completeupload(ul[0],ul[1],ul[2],ctx);
 	}
 	else ul_completing = false;
 }
@@ -45,6 +47,8 @@ function ul_completepending2(res,ctx)
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
+	oDestroy(ctx.file);
+	oDestroy(ctx);
 }
 
 function ul_deduplicate(File, identical) {
@@ -257,7 +261,7 @@ function ul_upload(File) {
 	var i, file = File.file
 
 	if (file.repair) {
-		file.ul_key = file.repair;
+		var ul_key = file.repair;
 		file.ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]	
 	} else {
 		file.ul_key = Array(6);
@@ -360,14 +364,10 @@ function ChunkUpload(file, start, end)
 }
 
 ChunkUpload.prototype.updateprogress = function() {
-	if (this.file.complete) return;
+	if (this.file.complete || ui_paused) return;
 
-	var tp = this.file.sent || 0;
-	if (ui_paused) return;
-
-	$.each(this.file.progress, function(i, p) {
-		tp += p;
-	});
+	var tp = this.file.sent || 0, p=this.file.progress;
+	for (var i in p) tp += p[i];
 
 	// only start measuring progress once the TCP buffers are filled
 	// (assumes a modern TCP stack with a large intial window)
@@ -516,9 +516,7 @@ ChunkUpload.prototype.done = function() {
 	this._done();
 
 	/* clean up references */
-	this.bytes = null;
-	this.file  = null;
-	this.ul    = null;
+	oDestroy(this);
 };
 
 ChunkUpload.prototype.run = function(done) {

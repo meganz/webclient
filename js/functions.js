@@ -1281,7 +1281,7 @@ function __percent_megatitle()
 		total++;
 	});
 	
-	percentage = Math.floor(percentage / total)
+	percentage = Math.floor(percentage / total);
 
 	if (total == 0 || percentage == 0 || percentage == 100) {
 		megatitle();

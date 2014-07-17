@@ -5738,6 +5738,15 @@ span.search-number {
 	text-align: center;
 	margin-top: 20px;
 }
+.transfer-panel-empty-txt {
+	position: absolute;
+	text-align: center;
+	width: 100%;
+	top: 35%;
+	color: #7A7E7F;
+	font-size: 22px;
+	line-height: 38px;
+}
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;

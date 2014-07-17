@@ -533,6 +533,8 @@ else
         jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'html/register.html', n: 'register', j:0});
+        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
         var jsl2 =
         {
             'about': {f:'html/about.html', n: 'about', j:0},
@@ -540,8 +542,8 @@ else
             'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
             'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
             'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-            'register': {f:'html/register.html', n: 'register', j:0},
-            'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+//            'register': {f:'html/register.html', n: 'register', j:0},
+//            'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
             'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
             'download': {f:'html/download.html', n: 'download', j:0},
             'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
@@ -590,7 +592,7 @@ else
             'recovery': ['recovery','recovery_js'],
             'reset': ['reset','reset_js'],
             'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-            'register': ['register','register_js'],
+//            'register': ['register','register_js'],
             'android': ['android'],
             'resellers': ['resellers'],
             '!': ['download','download_js'],

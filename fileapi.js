@@ -140,7 +140,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 
 	this.file = function(aCallback)
 	{
-		aCallback({
+		var file = {
 			name : aFile.leafName,
 			size : aFile.fileSize,
 			type : mozGetMIMEType(aFile),
@@ -188,6 +188,10 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			{
 				return this.blob(aStart,aEnd-aStart);
 			}
+		};
+		mozRunAsync(function() {
+			aCallback(file);
+			file = undefined;
 		});
 	};
 
@@ -201,7 +205,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 			entries.push(new mozDirtyGetAsEntry(file,aDataTransfer));
 		}
 
-		aCallback(entries);
+		mozRunAsync(aCallback.bind(this, entries));
 	};
 
 	this.createReader = function()

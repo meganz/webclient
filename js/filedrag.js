@@ -102,10 +102,10 @@ function traverseFileTree(item, path)
 			if (d) console.log(file);
 			file.path = path;
 			filedrag_u.push(file);
-			dir_inflight--;
-			if (dir_inflight == 0 && $.dostart)
+			if (--dir_inflight == 0 && $.dostart)
 			{
 				addupload(filedrag_u);
+				filedrag_u = [];
 				if (page == 'start') start_upload();
 			}
 		});
@@ -120,8 +120,11 @@ function traverseFileTree(item, path)
 			{
 				traverseFileTree(entries[i], path + item.name + "/");
 			}
-			dir_inflight--;
-			if (dir_inflight == 0) addupload(filedrag_u);
+			if (--dir_inflight == 0)
+			{
+				addupload(filedrag_u);
+				filedrag_u = [];
+			}
 		});
 	}
 	if (d && dir_inflight == 0) console.log('end');
@@ -207,11 +210,11 @@ function FileSelectHandler(e)
 			for (var i=0, m=e.dataTransfer.mozItemCount ; i<m ; ++i)
 			{
 				var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
-			    if (file instanceof Ci.nsIFile)
+				if (file instanceof Ci.nsIFile)
 				{
 					filedrag_u=[];
 					if (i == m-1) $.dostart=true;
-					traverseFileTree(new mozDirtyGetAsEntry(file,e.dataTransfer));
+					traverseFileTree(new mozDirtyGetAsEntry(file/*,e.dataTransfer*/));
 				}
 				else
 				{

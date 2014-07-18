@@ -4033,67 +4033,11 @@ MegaChatRoom.prototype._flushMessagesQueue = function() {
     self.requestMessageSync();
 };
 
-MegaChatRoom.prototype._getReadableContactNameFromStr = function(s, shortFormat) {
-    if(!s) {
-        return "NA";
-    }
-
-    if(shortFormat) {
-        return s.substr(0,1).toUpperCase();
-    } else {
-        s = s.split(/[^a-z]/ig);
-        s = s[0].substr(0, 1) + (s.length > 1 ? "" + s[1].substr(0, 1) : "");
-        return s.toUpperCase();
-    }
-};
 MegaChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
     var self = this;
 
-    var $element = $('<div class="nw-contact-avatar"></div>');
-
     var contact = self.megaChat.getContactFromJid(fullJid);
-    assert(contact, 'contact not found');
-
-    var name = self.megaChat.getContactNameFromJid(fullJid);
-    assert(name, 'contact/contact name not found');
-
-    var displayName = name.substr(0,1).toUpperCase();
-    var avatar = avatars[contact.u];
-
-    var color = 1;
-
-    $.each(self.getParticipants(), function(k, v) {
-        var c = self.megaChat.getContactFromJid(v);
-        var n = self.megaChat.getContactNameFromJid(v);
-        if(!n || !c) {
-            return; // skip, contact not found
-        }
-
-        var dn;
-        if(displayName.length == 1) {
-            dn = self._getReadableContactNameFromStr(n, true);
-        } else {
-            dn = self._getReadableContactNameFromStr(n, false);
-        }
-
-        if(c.u == contact.u) {
-            color = Math.min(k+1, 10 /* we have max 10 colors */);
-        } else if(dn == displayName) { // duplicate name, if name != my current name
-            displayName = self._getReadableContactNameFromStr(n, false);
-        }
-    });
-
-
-    $element.addClass("color" + color);
-    if(avatar) {
-        $element.append(
-            '<img src="' + avatar.url + '"/>'
-        );
-    } else {
-        $element.text(
-            displayName
-        );
-    }
+    var $element = generateAvatarElement(contact.u);
 
     // TODO: implement verification logic
     if (contact.verified) {

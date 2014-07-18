@@ -358,3 +358,100 @@ function processquota1(res,ctx)
 		else ctx.processquotaresult(ctx,false);
 	}
 }
+
+
+
+function _generateReadableContactNameFromStr(s, shortFormat) {
+    if(!s) {
+        return "NA";
+    }
+
+    if(shortFormat) {
+        return s.substr(0,1).toUpperCase();
+    } else {
+        s = s.split(/[^a-z]/ig);
+        s = s[0].substr(0, 1) + (s.length > 1 ? "" + s[1].substr(0, 1) : "");
+        return s.toUpperCase();
+    }
+}
+
+function generateContactName(user_hash) {
+    var contact = M.u[user_hash];
+    if(!contact) {
+        console.error('contact not found');
+    }
+
+    var name;
+
+    if(contact && contact.name) {
+        name = contact.name;
+    } else if(contact && contact.m) {
+        name = contact.m;
+    } else {
+        name = user_hash;
+    }
+
+    return name;
+}
+
+function generateAvatarElement(user_hash) {
+    var $element = $('<div class="nw-contact-avatar"></div>');
+
+    var contact = M.u[user_hash];
+    if(!contact) {
+        console.error('contact not found');
+    }
+
+    var name = generateContactName(user_hash);
+
+
+    var displayName = name.substr(0,1).toUpperCase();
+    var avatar = avatars[contact.u];
+
+    var color = 1;
+
+
+    if(contact.displayName && contact.displayColor) { // really simple in-memory cache
+        displayName = contact.displayName;
+        color = contact.displayColor;
+    } else {
+        $.each(Object.keys(M.u), function(k, v) {
+            var c = M.u[v];
+            var n = generateContactName(v);
+
+            if(!n || !c) {
+                return; // skip, contact not found
+            }
+
+            var dn;
+            if(displayName.length == 1) {
+                dn = _generateReadableContactNameFromStr(n, true);
+            } else {
+                dn = _generateReadableContactNameFromStr(n, false);
+            }
+
+            if(c.u == contact.u) {
+                color = Math.min(k+1, 10 /* we have max 10 colors */);
+            } else if(dn == displayName) { // duplicate name, if name != my current name
+                displayName = _generateReadableContactNameFromStr(n, false);
+            }
+        });
+
+        contact.displayName = displayName;
+        contact.displayColor = color;
+    }
+
+    $element.addClass("color" + color);
+    if(avatar) {
+        $element.append(
+            '<img src="' + avatar.url + '"/>'
+        );
+        $element.data("shortName", displayName); // expose the generated name, so that other components can use it
+        $element.data("fullName", name); // expose the generated name, so that other components can use it
+    } else {
+        $element.text(
+            displayName
+        );
+    }
+    return $element;
+}

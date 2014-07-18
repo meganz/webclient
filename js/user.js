@@ -360,7 +360,14 @@ function processquota1(res,ctx)
 }
 
 
-
+/**
+ * Helper method that will generate a 1 or 2 letter short contact name
+ *
+ * @param s
+ * @param shortFormat
+ * @returns {string}
+ * @private
+ */
 function _generateReadableContactNameFromStr(s, shortFormat) {
     if(!s) {
         return "NA";
@@ -375,6 +382,14 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
     }
 }
 
+/**
+ * Use this when rendering contact's name. Will try to find the contact and render his name (or email, if name is not
+ * available) and as a last fallback option, if the contact is not found will render the user_hash (which is not
+ * really helpful, but a way to debug)
+ *
+ * @param user_hash
+ * @returns {String}
+ */
 function generateContactName(user_hash) {
     var contact = M.u[user_hash];
     if(!contact) {
@@ -394,6 +409,12 @@ function generateContactName(user_hash) {
     return name;
 }
 
+/**
+ * Generates a div.nw-contact-avatar for a specific user_hash
+ *
+ * @param user_hash
+ * @returns {*|jQuery|HTMLElement}
+ */
 function generateAvatarElement(user_hash) {
     var $element = $('<div class="nw-contact-avatar"></div>');
 

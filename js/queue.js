@@ -66,7 +66,7 @@ MegaQueue.prototype.shrink = function() {
 MegaQueue.prototype.pause = function() {
 	if (d) { 
 		console.log("pausing queue"); 
-		if (console.trace) console.trace(); 
+		if (d > 1 && console.trace) console.trace(); 
 	}
 	this._paused = true;
 	this.trigger('pause')

@@ -95,14 +95,7 @@ function FileSystemAPI(dl_id, dl) {
 			var options = {create: true};
 
 			if(is_chrome_firefox) {
-				var q = {};
-				for(var o in dl_queue) {
-					if(dl_queue[o].dl_id == dl_id) {
-						q = dl_queue[o];
-						break;
-					}
-				}
-				options.fxo = Object.create( q, { size : { value : dl_filesize }});
+				options.fxo = Object.create( dl, { size : { value : dl_filesize }});
 			}
 
 			fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {

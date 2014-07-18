@@ -265,7 +265,7 @@ ClassFile.prototype.destroy = function() {
 	if (this.dl.cancelled)
 	{
 		if (this.dl.zipid && Zips[this.dl.zipid])
-			Zips[this.dl.zipid].destroy();
+			Zips[this.dl.zipid].destroy(0xbadf);
 	}
 	else
 	{

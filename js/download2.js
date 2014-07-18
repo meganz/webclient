@@ -76,7 +76,6 @@ var DownloadManager = new function() {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			delete Zips[dl.zipid];
 			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
@@ -418,15 +417,14 @@ DownloadQueue.prototype.push = function() {
 		, dl  = this[id]
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
-		, dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
+		, dlIO
 
 	if (dl.zipid) {
-		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
-		}
-		var tZip = Zips[dl.zipid];
-		dlIO = tZip.addEntryStream(dl);
+		if (!Zips[dl.zipid]) Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
+		dlIO = Zips[dl.zipid].addEntryFile(dl);
+	} else {
+		dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl);
 	}
 
 	if (!use_workers) {

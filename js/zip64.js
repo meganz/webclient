@@ -378,7 +378,6 @@ ZipEntryIO.prototype.push = function(obj) {
 
 function ZipWriter(dl_id, dl) {
 	this.dl     = dl;
-	this.io		= new dlMethod(dl_id, dl)
 	this.size	= 0
 	this.is_ready  = false
 	this.queues = [];
@@ -386,8 +385,14 @@ function ZipWriter(dl_id, dl) {
 	this.dirData = [];
 	this.offset = 0;
 	this.file_offset = 0;
-	this.io.is_zip = true;
 
+	if ((dlMethod === FileSystemAPI) || ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO))
+	{
+		this.io = new CacheIO(dl_id, dl);
+	}
+	else this.io = new dlMethod(dl_id, dl)
+
+	this.io.is_zip = true;
 	this.io.begin  = function() {
 		this.is_ready = true;
 		this.zwriter.process();
@@ -532,6 +537,114 @@ ZipWriter.prototype.addEntryFile = function(file) {
 
 
 
+
+
+/**
+ * CacheIO, intended to minimize real disk I/O when
+ *          creating ZIPs with several small files.
+ */
+function CacheIO(dl_id, dl)
+{
+	var IO, u8buf, offsetI = 0, offsetO = 0, __max_chunk_size = 32*0x100000;
+
+	if (d) console.log('Creating new CacheIO instance', dl_id, dl );
+
+	function PUSH(done, buffer)
+	{
+		if (!buffer) buffer = u8buf.subarray(0,offsetI);
+		IO.write(buffer, offsetO, done);
+		offsetO += buffer.byteLength;
+	}
+	function FILL(buffer)
+	{
+		u8buf.set(buffer, offsetI);
+		offsetI += buffer.byteLength;
+	}
+
+	this.write = function (buffer, offset, done)
+	{
+		if (d) console.log('CacheIOing...', buffer.byteLength, offset, offsetI, offsetO);
+
+		if (offsetI + buffer.byteLength > __max_chunk_size)
+		{
+			function next()
+			{
+				if (next.write)
+				{
+					next.write();
+					next.write=0;
+				}
+				else
+				{
+					if (buffer) FILL(buffer);
+					next.done();
+				}
+			}
+			next.done = done;
+
+			if (offsetI) PUSH(next);
+
+			if (buffer.byteLength > __max_chunk_size)
+			{
+				next.write = function()
+				{
+					PUSH(next, buffer);
+					buffer = undefined;
+				};
+
+				if (!offsetI) Soon(next);
+			}
+			offsetI = 0;
+		}
+		else
+		{
+			FILL(buffer);
+			Soon(done);
+		}
+	};
+
+	this.download = function(name, path)
+	{
+		function finish()
+		{
+			IO.download.apply(IO, args);
+			u8buf = undefined;
+		}
+		var args = arguments;
+
+		if (offsetI)
+		{
+			PUSH(finish);
+		}
+		else
+		{
+			finish();
+		}
+	};
+
+	this.setCredentials = function (url, size)
+	{
+		if (d) console.log('CacheIO Begin', dl_id, arguments);
+
+		if (this.is_zip || !dl.zipid)
+		{
+			__max_chunk_size = Math.min(size+4194304,__max_chunk_size);
+			u8buf = new Uint8Array(__max_chunk_size);
+
+			IO = new dlMethod(dl_id, dl);
+			IO.begin = this.begin;
+			IO.is_zip = this.is_zip;
+			IO.setCredentials.apply(IO, arguments);
+		}
+		else this.begin();
+	};
+
+	this.abort = function()
+	{
+		u8buf = undefined;
+		if (IO.abort) IO.abort.apply(IO, arguments);
+	};
+}
 
 
 

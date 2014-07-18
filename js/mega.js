@@ -1090,7 +1090,14 @@ function MegaData ()
 				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
-			if (M.v[h]) delete M.v[h];			
+                        for (var k in M.v)
+                        {
+                                if (M.v[k].h === h)
+                                {
+                                        delete M.v[k];
+                                        break;
+                                }
+                        }
 		}
 		ds(h);
 	};
@@ -1284,7 +1291,16 @@ function MegaData ()
 			});
 			if (M.d[h] && M.d[h].p)
 			{
-				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];				
+				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
+                                // Update M.v it's used for slideshot preview at least
+                                for (var k in M.v)
+                                {
+                                        if (M.v[k].h === h)
+                                        {
+                                                delete M.v[k];
+                                                break;
+                                        }
+                                }
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
 				removeUInode(h);

@@ -895,12 +895,14 @@ function topmenuUI()
 			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
 			
 			$('.membership-status').addClass('pro');
+			$('.context-menu-divider.upgrade-your-account').addClass('pro');
 			$('.membership-status').html('PRO');			
 			$('.membership-popup.pro-popup');		
 		}
 		else
 		{
 			$('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
+			$('.context-menu-divider.upgrade-your-account').removeClass('pro');
 			$('.membership-status').addClass('free');
 			$('.membership-status').html(l[435]);	
 		}		

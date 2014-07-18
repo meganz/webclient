@@ -810,7 +810,7 @@ function dec_attr(attr,key)
 			} catch(e) {}
 		}
 		if (~l) try {
-			var new_name = s+j+'trunc'+Math.random().toString(16).slice(-4)+(m[2]||'');
+			var new_name = s+j+'trunc'+simpleStringHashCode(s).toString(16)+(m[2]||'');
 			return JSON.parse(from8(b.substr(4).replace(m[0],'"n":"'+new_name+'"')));
 		} catch(e) {}
 		return { n : 'MALFORMED_ATTRIBUTES' };

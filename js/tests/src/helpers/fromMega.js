@@ -108,3 +108,5 @@ function sectionUIopen() {};
 
 is_chrome_firefox = true; /* to be used for phantomjs */
 mozRunAsync = false;
+
+function is_fm() { return false; }

@@ -137,14 +137,27 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 }
 .logo {
 	display: block;
-	width: 36px;
-	height: 36px;
+	width: 30px;
+	height: 30px;
 	float: left;
-	margin: 6px 0 0 6px;
+	margin: 9px 0 0 9px;
 	cursor: pointer;
 	background-image: url(../images/mega/top-sprite.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
+	background-color: rgba(255,255,255,0.5);
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	-webkit-transition: background-color 20ms ease-in-out;
+	-moz-transition: background-color 20ms ease-in-out;
+	-o-transition: background-color 20ms ease-in-out;
+	-ms-transition: background-color 20ms ease-in-out;
+	transition: background-color 20ms ease-in-out;
+}
+.logo:hover {
+	background-color: rgba(208,39,47,1);
+	background-position: left -30px;
 }
 .nlanguage-popup {
 	position: absolute;
@@ -1116,12 +1129,12 @@ a.blog-button:hover {
 	font-size: 12px;
 	padding: 0 15px;
 	background-color: rgba(211,34,0,0.5);
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
-	color: #d5bbb5;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	color: rgba(255,255,255,0.5);
 	float: right;
 	margin: 12px 10px 0 0;
 	-webkit-border-bottom-right-radius: 8px;
@@ -1132,8 +1145,8 @@ a.blog-button:hover {
 	border-top-right-radius: 8px;
 }
 .create-account-button:hover, .create-account-button.active {
-	background-color: rgba(213,31,0,0.7);
-	color: #e1bcb4;
+	background-color: rgba(211,34,0,0.7);
+	color: rgba(255,255,255,0.7);
 }
 .top-login-button {
 	cursor: pointer;
@@ -1141,13 +1154,13 @@ a.blog-button:hover {
 	line-height: 22px;
 	font-size: 12px;
 	padding: 0 15px;
-	background-color: rgba(255,255,255,0.15);
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
-	color: #c2c2c2;
+	background-color: rgba(255,255,255,0.3);
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+	color: rgba(255,255,255,0.5);
 	float: right;
 	margin: 12px 2px 0 0;
 	-webkit-border-bottom-left-radius: 8px;
@@ -1158,8 +1171,8 @@ a.blog-button:hover {
 	border-top-left-radius: 8px;
 }
 .top-login-button:hover, .top-login-button.active {
-	background-color: rgba(255,255,255,0.3);
-	color: #bcbcbc;
+	background-color: rgba(255,255,255,0.5);
+	color: rgba(255,255,255,0.7);
 }
 .unread-num {
 	display: inline-block;
@@ -2899,7 +2912,7 @@ label.iPhoneCheckLabelOff span {
 	display: none;
 }
 .content-panel.cloud-drive, .content-panel.shared-with-me, .content-panel.rubbish-bin {
-	padding: 24px 0;
+	padding: 0 0 24px 0;
 }
 .fm-tree-panel ul, .fm-move-dialog-body ul {
 	padding: 0;
@@ -2965,7 +2978,7 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-item {
 	display: block;
-	background-color: rgba(215,16,0,0);
+	background-color: rgba(217,0,7,0);
 	padding-right: 15px;
 	-webkit-transition: background-color 150ms ease-in-out;
 	-moz-transition: background-color 150ms ease-in-out;
@@ -2974,31 +2987,33 @@ label.iPhoneCheckLabelOff span {
 	transition: background-color 150ms ease-in-out;
 }
 .nw-fm-tree-item:hover {
-	background-color: rgba(215,16,0,0.05);
+	background-color: rgba(217,0,7,0.2);
+	color:white;
 }
 .nw-fm-tree-item.selected {
-	background-color: rgba(215,16,0,0.5);
+	background-color: rgba(217,0,7,0.5);
+	color:white;
 }
 .nw-fm-tree-item.dragover {
-	background-color: rgba(215,16,0,0.2);
+	background-color: rgba(217,0,7,0.3);
 }
 .shared-with-me .nw-fm-tree-item:hover {
-	background-color: rgba(254,174,0,0.1);
+	background-color: rgba(255,179,0,0.3);
 }
 .shared-with-me .nw-fm-tree-item.selected {
-	background-color: rgba(254,174,0,0.5);
+	background-color: rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.dragover {
-	background-color: rgba(254,174,0,0.2);
+	background-color: rgba(255,179,0,0.4);
 }
 .rubbish-bin .nw-fm-tree-item:hover {
-	background-color: rgba(113,173,58,0.1);
+	background-color: rgba(39,183,0,0.3);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
-	background-color: rgba(113,173,58,0.5);
+	background-color: rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.dragover {
-	background-color: rgba(113,173,58,0.2);
+	background-color: rgba(39,183,0,0.4);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
@@ -3040,27 +3055,41 @@ label.iPhoneCheckLabelOff span {
 	line-height: 23px;
 	color: #666666;
 	height: 24px;
-	background-image: url(../images/mega/files-icons.svg);
-	background-position: -64px -1237px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -17px -7465px;
 	background-repeat: no-repeat;
 	overflow: hidden;
 }
-.rubbish-bin .nw-fm-tree-folder {
-	background-position: -64px -1957px;
-}
-.rubbish-bin .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-shared-folder {
-	background-position: -64px -1997px;
-}
+
+
 .nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
-	background-position: -64px -1277px;
+	background-position: -17px -7535px;
 }
-.nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
+.nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
-	background-position: -64px -11657px;
+	background-position: -17px -7465px;
 }
-.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin.nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin.nw-fm-tree-item.dragover .nw-fm-tree-folder {
+.nw-fm-tree-item.opened .nw-fm-tree-folder {
+	background-position: -17px -7345px;
+}
+.nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder
+ {
 	color: white;
-	background-position: -64px -1877px;
+	background-position: -17px -7505px;
+}
+.nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder
+ {
+	color: white;
+	background-position: -17px -7375px;
+}
+
+.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder,
+.nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
+	background-position: -16px -7565px;
+}
+.nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder,
+.nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
+	background-position: -17px -7435px;
 }
 .nw-contact-item, .add-contact-item {
 	height: 48px;
@@ -3140,16 +3169,17 @@ label.iPhoneCheckLabelOff span {
 	height: 10px;
 }
 .nw-contact-status {
-	width: 8px;
-	height: 8px;
+	width: 12px;
+	height: 12px;
 	float: left;
-	margin: 20px 2px 0 12px;
+	margin: 18px 0px 0 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
+	border:2px solid white;
 }
 .selected .nw-contact-status {
 	border: 2px solid rgba(255,255,255,1);
@@ -3158,9 +3188,6 @@ label.iPhoneCheckLabelOff span {
 	margin: 18px 0 0 10px;
 }
 .nw-conversations-item .nw-contact-status {
-	margin-top: 8px;
-}
-.nw-conversations-item.selected .nw-contact-status {
 	margin-top: 6px;
 }
 .online .nw-contact-status {
@@ -3286,12 +3313,12 @@ label.iPhoneCheckLabelOff span {
 	font-family: 'Open Sans Semibold', Arial;
 	font-size: 12px;
 	line-height: 23px;
-	color: #666666;
+	color: #999999;
 	padding: 0 0 0 10px;
-	text-transform: uppercase;
 	position: relative;
+	background-color:white;
 }
-.nw-conversations-arrows {
+.nw-tree-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
@@ -3334,10 +3361,12 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 }
 .nw-conversations-item:hover {
-	background-color: rgba(10,164,227,0.1);
+	background-color: rgba(0,163,230,0.3);
+	color:white;
 }
 .nw-conversations-item.selected {
 	background-color: rgba(10,164,227,0.5);
+	color:white;
 }
 .nw-conversations-name {
 	margin: 0 25px 0 32px;
@@ -3345,7 +3374,7 @@ label.iPhoneCheckLabelOff span {
 	line-height: 23px;
 	color: #666666;
 }
-.nw-conversations-item.selected .nw-conversations-name {
+.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name {
 	color: white;
 }
 .file-transfer-icon {
@@ -3613,27 +3642,25 @@ label.iPhoneCheckLabelOff span {
 	line-height: 22px;
 	font-size: 12px;
 	padding: 0 10px 0 26px;
-	background-color: #383736;
-	color: #c2c2c2;
+	color: rgba(255,255,255,0.5);
 	float: right;
 	margin: 12px 10px 0 0;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
-	background-color: rgba(255,255,255,0.15);
+	background-color: rgba(255,255,255,0.3);
 	background-image: url(../images/mega/top-sprite.svg);
 	background-position: -4px -60px;
 	background-repeat: no-repeat;
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .top-menu-icon:hover, .top-menu-icon.active {
-	background-color: rgba(255,255,255,0.3);
-	background-position: -4px -110px;
-	color: #bcbcbc;
+	background-color: rgba(255,255,255,0.5);
+	color: rgba(255,255,255,0.7);
 }
 .fm-avatar img {
 	width: 24px;
@@ -3694,16 +3721,16 @@ label.iPhoneCheckLabelOff span {
 	margin-left: 20px;
 }
 .activity-status.online, .contact-status.online-status {
-	background-color: #71AE32;
+	background-color: #13E03C;
 }
 .activity-status.away, .contact-status.away-status {
-	background-color: #ffce00;
+	background-color: #FFD200;
 }
 .activity-status.busy, .contact-status.busy-status {
-	background-color: #FF7D00;
+	background-color: #FFA500;
 }
 .activity-status.offline, .contact-status.offline-status {
-	background-color: #d22000;
+	background-color: #FF1A53;
 }
 .activity-status.black, .contact-status.black-status {
 	background-color: black;
@@ -3732,31 +3759,29 @@ label.iPhoneCheckLabelOff span {
 	background-color: #9a1c06;
 	line-height: 16px;
 	padding: 0 8px;
-	color: #e1bbb5;
+	color: rgba(255,255,255,0.7);
 	text-transform: uppercase;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	font-size: 11px;
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .membership-status.pro {
-	background-color: #741b09;
-	color: #d6bbb6;
+	background-color: #721908;
 }
 .membership-status.free {
-	background-color: #528121;
-	color: #cbd9bd;
+	background-color: #12a22f;
 }
 .membership-status-block:hover .membership-status.pro, .membership-status-block.active .membership-status.pro {
 	background-color: #bf1f02;
-	color: #f9e9e6;
+	color: rgba(255,255,255,0.9);
 }
 .membership-status-block:hover .membership-status.free, .membership-status-block.active .membership-status.free {
-	background-color: #6eb028;
-	color: #f1f7ea;
+	background-color: #13E03C;
+	color: rgba(255,255,255,0.9);
 }
 .user-name, a.user-name {
 	float: right;
@@ -3807,7 +3832,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -9px -205px;
 	background-repeat: no-repeat;
 	cursor: pointer;
-	background-color: rgba(255,255,255,0.15);
+	background-color: rgba(255,255,255,0.3);
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -3821,7 +3846,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -9px -155px;
 }
 .cloud-popup-icon:hover, .top-chat-notification:hover {
-	background-color: rgba(255,255,255,0.3);
+	background-color: rgba(255,255,255,0.5);
 }
 .cloud-popup-icon.active, .top-chat-notification.active {
 	background-color: rgba(255,255,255,0.5);
@@ -3883,7 +3908,7 @@ label.iPhoneCheckLabelOff span {
 	background-image: url(../images/mega/top-sprite.svg);
 	background-position: -3px -473px;
 	background-repeat: no-repeat;
-	background-color: rgba(255,255,255,0.15);
+	background-color: rgba(255,255,255,0.3);
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -3891,7 +3916,10 @@ label.iPhoneCheckLabelOff span {
 	transition: background-color 200ms ease-in-out;
 }
 .top-search-bl:hover, .top-search-bl.active {
-	background-color: rgba(255,255,255,0.3);
+	background-color: rgba(255,255,255,0.5);
+}
+.top-search-bl.active {
+	width: 240px;
 }
 .active.focused .top-search-input {
 	color: #434343;
@@ -3959,23 +3987,55 @@ label.iPhoneCheckLabelOff span {
 	height: 48px;
 	background-color: rgba(242,242,242,100);
 }
-.fm-left-menu.cloud-drive {
-	background-color: rgba(213,22,0,1);
+.fm-left-menu.cloud-drive, .fm-left-menu.notifications {
+	background: #d90007;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q5MDAwNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZjFhNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #d90007), color-stop(100%, #ff1a53));
+	background: -webkit-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -o-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -ms-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: linear-gradient(to right, #d90007 0%, #ff1a53 100%);
 }
 .fm-left-menu.shared-with-me {
-	background-color: rgba(252,173,0,1);
+	background: #ffa500;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmYTUwMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQzMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #ffa500 0%, #ffd300 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #ffa500), color-stop(100%, #ffd300));
+	background: -webkit-linear-gradient(left, #ffa500 0%, #ffd300 100%);
+	background: -o-linear-gradient(left, #ffa500 0%, #ffd300 100%);
+	background: -ms-linear-gradient(left, #ffa500 0%, #ffd300 100%);
+	background: linear-gradient(to right, #ffa500 0%, #ffd300 100%);
 }
 .fm-left-menu.contacts {
-	background-color: rgba(113,173,58,1);
+	background: #777777;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzc3Nzc3NyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTk5OTkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #777777 0%, #999999 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #777777), color-stop(100%, #999999));
+	background: -webkit-linear-gradient(left, #777777 0%, #999999 100%);
+	background: -o-linear-gradient(left, #777777 0%, #999999 100%);
+	background: -ms-linear-gradient(left, #777777 0%, #999999 100%);
+	background: linear-gradient(to right, #777777 0%, #999999 100%);
 }
 .fm-left-menu.conversations {
-	background-color: rgba(31,165,224,1);
+	background: #2ba6de;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJiYTZkZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM2MWQyZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #2ba6de 0%, #61d2ff 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #2ba6de), color-stop(100%, #61d2ff));
+	background: -webkit-linear-gradient(left, #2ba6de 0%, #61d2ff 100%);
+	background: -o-linear-gradient(left, #2ba6de 0%, #61d2ff 100%);
+	background: -ms-linear-gradient(left, #2ba6de 0%, #61d2ff 100%);
+	background: linear-gradient(to right, #2ba6de 0%, #61d2ff 100%);
 }
 .fm-left-menu.rubbish-bin {
-	background-color: rgba(115,172,58,1);
-}
-.fm-left-menu.notifications {
-	background-color: rgba(213,22,0,1);
+	background: #31b500;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzMxYjUwMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxM2UwM2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #31b500 0%, #13e03c 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #31b500), color-stop(100%, #13e03c));
+	background: -webkit-linear-gradient(left, #31b500 0%, #13e03c 100%);
+	background: -o-linear-gradient(left, #31b500 0%, #13e03c 100%);
+	background: -ms-linear-gradient(left, #31b500 0%, #13e03c 100%);
+	background: linear-gradient(to right, #31b500 0%, #13e03c 100%);
 }
 .nw-fm-left-icons-panel {
 	background-color: #222222;
@@ -4073,31 +4133,35 @@ label.iPhoneCheckLabelOff span {
 	background-position: center -131px;
 }
 .nw-fm-left-icon.cloud-drive:hover {
-	background-position: center -177px;
+	background-position: center -367px;
+	background-color: rgba(217,0,7,0.7);
 }
 .nw-fm-left-icon.shared-with-me:hover {
-	background-position: center -225px;
+	background-position: center -415px;
+	background-color: rgba(250,165,0,0.8);
 }
 .nw-fm-left-icon.contacts:hover {
-	background-position: center -273px;
+	background-position: center -463px;
+	background-color: rgba(119,119,119,0.8);
 }
 .nw-fm-left-icon.conversations:hover {
-	background-position: center -321px;
+	background-position: center -511px;
+	background-color: rgba(43,166,222,0.8);
 }
 .nw-fm-left-icon.cloud-drive.active {
-	background-color: rgba(213,22,0,100);
+	background-color: rgba(217,0,7,1);
 	background-position: center -367px;
 }
 .nw-fm-left-icon.shared-with-me.active {
-	background-color: rgba(252,173,0,100);
+	background-color: rgba(250,165,0,1);
 	background-position: center -415px;
 }
 .nw-fm-left-icon.contacts.active {
-	background-color: rgba(113,173,58,100);
+	background-color: rgba(119,119,119,1);
 	background-position: center -463px;
 }
 .nw-fm-left-icon.conversations.active {
-	background-color: rgba(31,165,224,100);
+	background-color: rgba(43,166,222,1);
 	background-position: center -511px;
 }
 .dark-overlay {
@@ -4124,16 +4188,13 @@ label.iPhoneCheckLabelOff span {
 	position: absolute;
 	bottom: 0;
 	cursor: pointer;
-	background-color: rgba(115,172,58,0);
-	-webkit-transition: all 200ms ease-in-out;
-	-moz-transition: all 200ms ease-in-out;
-	-o-transition: all 200ms ease-in-out;
-	-ms-transition: all 200ms ease-in-out;
-	transition: all 200ms ease-in-out;
 	background-image: none;
 }
-.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.active, .nw-fm-left-icon.rubbish-bin.dragover {
-	background-color: rgba(115,172,58,1);
+.nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.dragover {
+	background-color: rgba(49,183,0,0.7);
+}
+.nw-fm-left-icon.rubbish-bin.active {
+	background-color: rgba(49,183,0,1);
 }
 .rubbish-bin-icon {
 	height: 48px;
@@ -4141,25 +4202,14 @@ label.iPhoneCheckLabelOff span {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: 4px -3087px;
-	-webkit-transition: all 200ms ease-in-out;
-	-moz-transition: all 200ms ease-in-out;
-	-o-transition: all 200ms ease-in-out;
-	-ms-transition: all 200ms ease-in-out;
-	transition: all 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-	cursor: pointer;
-}
-.nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+	cursor: pointer;
 }
-.nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+.nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
 	opacity: 1;
@@ -4362,8 +4412,11 @@ th.grid-first-th {
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
 }
-.grid-status-icon.star, .file-status-icon.star, .contact-status-icon.star {
+.file-status-icon.star, .contact-status-icon.star {
 	background-position: -7px -1469px;
+}
+.grid-status-icon.star {
+	background-position: -9px -7736px;
 }
 .grid-status-icon.new, .file-status-icon.new, .contact-status-icon.new {
 	background-position: -34px -1624px;
@@ -6299,9 +6352,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.5;
 }
 .drag-handle {
-    /* position the drag handle ontop of the video resizer UI element */
-    bottom: 0px !important;
-    height: 16px !important;
+	/* position the drag handle ontop of the video resizer UI element */
+	bottom: 0px !important;
+	height: 16px !important;
 }
 .video-call-button {
 	width: 40px;
@@ -6407,13 +6460,11 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
-
 .current-user-video-container {
-    width: 212px;
-    min-height: 0;
-    min-width: 0;
+	width: 212px;
+	min-height: 0;
+	min-width: 0;
 }
-
 .current-user-resizer {
 	cursor: move;
 	width: 16px;
@@ -6627,9 +6678,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-messages-block .nw-contact-avatar {
 	margin: 6px 0 6px 6px;
 }
-.fm-chat-message-container.grouped-message .nw-contact-avatar,
-    .fm-chat-message-container.grouped-message .chat-username {
-
+.fm-chat-message-container.grouped-message .nw-contact-avatar,  .fm-chat-message-container.grouped-message .chat-username {
 	display: none;
 }
 .fm-chat-message-time {
@@ -6709,7 +6758,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-    display: inline-block;
+	display: inline-block;
 }
 .fm-chat-file-button.verify-button, .fm-chat-file-button.skip-button {
 	margin: 9px 10px 0 0;
@@ -7224,7 +7273,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: -1px -2004px;
 	background-color: rgba(29,161,233,1);
 }
-
 /** debug emoticons **/
 .fm-chat-emoticon {
 	width: 25px;
@@ -8927,6 +8975,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	font-size: 12px;
 	color: #CCCCCC;
 }
+.top-submenu-popup {
+	border-right: 2px solid transparent;
+}
 .top-login-popup {
 	width: 332px;
 }
@@ -9241,12 +9292,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 	margin: -8px 0 0 0;
-	-webkit-border-top-right-radius: 0px;
-	-moz-border-radius-topright: 0px;
-	border-top-right-radius: 0px;
-	-webkit-border-bottom-right-radius: 0px;
-	-moz-border-radius-bottomright: 0px;
-	border-bottom-right-radius: 0px;
 	padding: 8px 0;
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
@@ -9342,7 +9387,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	color: rgba(204,204,204,1);
 }
 .context-menu-item:hover, .context-menu-item.active {
-	background-color: rgba(153,153,153,1);
+	background-color: rgba(255,255,255,0.1);
 	color: rgba(255,255,255,1);
 }
 .context-menu-item .context-menu-icon, .context-menu-points {
@@ -9508,25 +9553,33 @@ table {
 }
 .top-user-status-item .activity-status {
 	float: left;
-	margin: 12px 0 0 5px;
+	margin: 12px 0 0 7px;
+}
+.top-user-status-item:hover .activity-status {
+	border: 4px solid rgba(51,51,51,1);
+	margin: 8px 0 0 3px;
+	width: 16px;
+	height: 16px;
+}
+.top-user-status-item.active {
+	background-image: url(../images/mega/top-sprite.svg);
+	background-position: right -663px;
+	background-repeat: no-repeat;
 }
 .top-user-status-txt {
-	margin: 0 0 0 22px;
+	margin: 0 0 0 26px;
 }
 .top-menu-item.upgrade-your-account {
-	color: #cfdcbf;
-	background-color: rgba(109,177,15,0.7);
+	color: rgba(255,255,255,0.7);
+	background-color: rgba(29,172,57,1);
 }
 .top-menu-item.upgrade-your-account:hover {
-	color: white;
-	background-color: rgba(109,177,15,1);
+	color: rgba(255,255,255,1);
+	background-color: rgba(19,224,60,1);
 }
-.top-submenu-popup .top-menu-item {
-	padding: 0 15px;
-}
-.top-menu-item:hover, .top-menu-item.active, .context-menu-item:hover, .context-menu-item.active, .top-user-status-item:hover, .top-user-status-item.active {
+.top-menu-item:hover, .top-menu-item.active, .context-menu-item:hover, .context-menu-item.active, .top-user-status-item:hover {
 	background-color: rgba(255,255,255,0.1);
-	color: white;
+	color: #CCCCCC;
 }
 .top-menu-item.contains-submenu {
 	font-family: 'Open Sans', Arial;
@@ -17693,54 +17746,58 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }
-
-
-
 .keyspinner {
-  margin: 50px auto;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  text-align: center;  
-  -webkit-animation: rotate 2.0s infinite linear;
-  animation: rotate 2.0s infinite linear;
+	margin: 50px auto;
+	width: 40px;
+	height: 40px;
+	position: relative;
+	text-align: center;
+	-webkit-animation: rotate 2.0s infinite linear;
+	animation: rotate 2.0s infinite linear;
 }
-
 .keydot1, .keydot2 {
-  width: 60%;
-  height: 60%;
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  background-color: #d90007;
-  border-radius: 100%;
-  
-  -webkit-animation: bounce 2.0s infinite ease-in-out;
-  animation: bounce 2.0s infinite ease-in-out;
+	width: 60%;
+	height: 60%;
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	background-color: #d90007;
+	border-radius: 100%;
+	-webkit-animation: bounce 2.0s infinite ease-in-out;
+	animation: bounce 2.0s infinite ease-in-out;
 }
-
 .keydot2 {
-  top: auto;
-  bottom: 0px;
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
+	top: auto;
+	bottom: 0px;
+	-webkit-animation-delay: -1.0s;
+	animation-delay: -1.0s;
 }
-
-@-webkit-keyframes rotate { 100% { -webkit-transform: rotate(360deg) }}
-@keyframes rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }}
-
-@-webkit-keyframes bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
+ @-webkit-keyframes rotate {
+100% {
+-webkit-transform: rotate(360deg)
 }
-
-@keyframes bounce {
-  0%, 100% { 
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% { 
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
 }
-
+@keyframes rotate {
+100% {
+transform: rotate(360deg);
+-webkit-transform: rotate(360deg)
+}
+}
+ @-webkit-keyframes bounce {
+ 0%, 100% {
+-webkit-transform: scale(0.0)
+}
+ 50% {
+-webkit-transform: scale(1.0)
+}
+}
+ @keyframes bounce {
+ 0%, 100% {
+ transform: scale(0.0);
+ -webkit-transform: scale(0.0);
+}
+50% {
+ transform: scale(1.0);
+ -webkit-transform: scale(1.0);
+}
+}

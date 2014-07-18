@@ -215,6 +215,7 @@ function initUI()
 			{
 				var t = $(e.target).attr('id');			
 				if (t && t.indexOf('treea_') > -1) t = t.replace('treea_','');
+				else if (t && t.indexOf('path_') > -1) t = t.replace('path_','');
 				else t=undefined;
 			}
 		}
@@ -3477,7 +3478,7 @@ function treeUI()
 		}
 	});
 	
-	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin').droppable( 
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs').droppable(
 	{
 		tolerance: 'pointer',		
 		drop: function(e, ui)

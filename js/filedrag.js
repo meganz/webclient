@@ -49,7 +49,7 @@ function FileDragHover(e)
 		$('.st-main-cursor,.st-main-info').fadeOut(30);
 		start_over();
 	}
-	else
+	else if (e)
 	{
 		var t = $(e.target);
 		$('span.nw-fm-tree-folder').css('background-color','');

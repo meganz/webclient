@@ -1552,6 +1552,11 @@ describe("Chat.js - Karere UI integration", function() {
                 M.u["A_123456789"].name="lyubomir.petrov@example.com";
                 M.u["B_123456789"].name="bram.van.der.kolk@example.com";
 
+                delete M.u["A_123456789"].displayName;
+                delete M.u["A_123456789"].displayColor;
+                delete M.u["B_123456789"].displayName;
+                delete M.u["B_123456789"].displayColor;
+
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
@@ -1565,12 +1570,19 @@ describe("Chat.js - Karere UI integration", function() {
                 avatars["A_123456789"] = {'url': "#yup"};
                 avatars["B_123456789"] = {'url': "#yup"};
 
+                delete M.u["A_123456789"].displayName;
+                delete M.u["A_123456789"].displayColor;
+                delete M.u["B_123456789"].displayName;
+                delete M.u["B_123456789"].displayColor;
+
 
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
                 expect($('img', $elem1).size()).to.eql(1);
                 expect($('img', $elem2).size()).to.eql(1);
+                expect($elem1.is(".color1")).to.be.ok;
+                expect($elem2.is(".color2")).to.be.ok;
 
                 expect($elem1.text()).to.eql("");
                 expect($elem2.text()).to.eql("");

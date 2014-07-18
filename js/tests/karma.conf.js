@@ -22,6 +22,7 @@ module.exports = function(config) {
              "../mega.js",
              "../megakvstorage.js",
              "../fm.js",
+             "../user.js",
              "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
 
              "../chat/mpenc.js",

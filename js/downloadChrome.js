@@ -222,11 +222,10 @@ function FileSystemAPI(dl_id, dl) {
 		}
 
 		dl_writing = false;
-		dl_done(); /* notify writer */
-
 		/* release references to callback and buffer */
 		dl_buffer = null;
-		dl_done   = null;
+		dl_done(); /* notify writer */
+
 	}
 
 	this.write = function(buffer, position, done) {
@@ -264,14 +263,7 @@ function FileSystemAPI(dl_id, dl) {
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		if (this.is_zip || !dl.zipid) {
-			check();
-		} else {
-			// tell the writter everything was fine
-			// only on zip, where the IO objects are not
-			// doing any write
-			this.begin(); 
-		}
+		check();
 	};
 }
 window.requestFileSystem = window.webkitRequestFileSystem;

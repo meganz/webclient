@@ -423,12 +423,10 @@ DownloadQueue.prototype.push = function() {
 
 	if (dl.zipid) {
 		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = new dlZipIO(dl, dl_id);
+			Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
 		}
 		var tZip = Zips[dl.zipid];
-		dlIO.write = tZip.getWriter(dl);
-		dlIO.abort = tZip.IO.abort;
-		dlIO.dl_xr = tZip.dl_xr
+		dlIO = tZip.addEntryStream(dl);
 	}
 
 	if (!use_workers) {
@@ -446,8 +444,14 @@ DownloadQueue.prototype.push = function() {
 	// and speed
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
+	dl.decrypter	= 0;
 
-	dl_writer(dl);
+
+	if (!dl.zipid) {
+		dl_writer(dl);
+	} else {
+		dl.writer = dlIO;
+	}
 
 	dl.macs  = {}
 	dl.urls	 = []

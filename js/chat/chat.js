@@ -2245,6 +2245,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         'persistanceKey': 'audioVideoScreenSize',
         'direction': 's'
     });
+    $('.drag-handle', self.$header).hide();
 
 
 
@@ -2414,6 +2415,7 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
 
         self.megaChat.renderContactTree();
 
+        $('.drag-handle', self.$header).show();
         self.$header.parent().addClass("video-call"); // adds video-call or audio-call class name
 
         // hide all elements
@@ -2493,6 +2495,8 @@ MegaChatRoom.prototype._resetCallStateNoCall = function() {
     self.$header.parent()
         .removeClass("video-call")
         .removeClass("audio-call");
+
+    $('.drag-handle', self.$header).hide();
 
     self.$header.css('height', '');
 

@@ -289,10 +289,14 @@ var MegaChat = function() {
     this.currentlyOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
 
+    var xmppDomain = "sandbox.developers.mega.co.nz";
+    if(localStorage.megaChatCluster) {
+        xmppDomain = "developers.mega.co.nz";
+    }
+
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
-//        'xmppDomain': "developers.mega.co.nz",
-        'xmppDomain': "sandbox.developers.mega.co.nz",
+        'xmppDomain': xmppDomain,
         'rtcSession': {
             encryptMessageForJid: function(msg, bareJid) {
                 var contact = megaChat.getContactFromJid(bareJid);
@@ -1705,8 +1709,11 @@ MegaChat.prototype.getBoshServiceUrl = function() {
         num = "0" + num;
     }
 
-//    return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
-    return "https://sandbox.developers.mega.co.nz:5281/http-bind";
+    if(localStorage.megaChatCluster) {
+        return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
+    } else {
+        return "https://sandbox.developers.mega.co.nz:5281/http-bind";
+    }
 };
 
 /**

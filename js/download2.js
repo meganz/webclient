@@ -138,15 +138,16 @@ var DownloadManager = new function() {
 		var tid = task2id(pattern);
 		this.release(tid);
 		removed.push(tid);
-		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-			var match = doesMatch(obj[0], pattern);
-			if (match) {
-				if (check) check(obj[0]);
-				if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
-				if (obj[0].destroy) obj[0].destroy();
-			}
-			return !match;
-		});
+		dlQueue.filter(pattern);
+		// dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
+			// var match = doesMatch(obj[0], pattern);
+			// if (match) {
+				// if (check) check(obj[0]);
+				// if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
+				// if (obj[0].destroy) obj[0].destroy();
+			// }
+			// return !match;
+		// });
 	};
 
 	this.isRemoved = function(task) {

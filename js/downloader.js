@@ -367,29 +367,7 @@ ClassFile.prototype.run = function(task_done) {
 				/* Remove leaked items from dlQueue & dl_queue */
 				// DownloadManager.abort(this.dl.zipid ? "zipid:"+this.dl.zipid:"id:"+this.dl.dl_id);
 				// XXX: Hmm, DownloadManager.abort seems unreliably at this stage...
-				var what = this.dl.zipid ? 'zipid':'dl_id',
-					id = this.dl.zipid ? this.dl.zipid:this.dl.dl_id,
-					len = dlQueue._queue.length;
-				dlQueue._queue = dlQueue._queue.filter(function(item)
-				{
-					var obj = item[0];
-
-					if (typeof obj === 'object')
-					{
-						var dl = obj.dl;
-
-						if (dl && dl[what] === id)
-						{
-							if (d) console.error('Expunging ' + obj);
-							if (obj.destroy) obj.destroy();
-							return false;
-						}
-						return !dl || isQueueActive(dl);
-					}
-					return true;
-				});
-				if (d) console.log('dlQueue filtered, %d/%d items remaining', dlQueue._queue.length, len);
-				Soon(resetUploadDownload);
+				dlQueue.filter(this.dl);
 				this.destroy();
 			}
 			task_done();

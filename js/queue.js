@@ -63,6 +63,53 @@ MegaQueue.prototype.shrink = function() {
 	return this._limit;
 }
 
+MegaQueue.prototype.filter = function(key, value, memb)
+{
+	var len = this._queue.length;
+
+	if (!len)
+	{
+		if (d) console.error('Nothing to filter');
+	}
+	else
+	{
+		if (typeof key === 'object')
+		{
+			if ("zipid" in key || "id" in key)
+			{
+				memb  = 'dl';
+				value = key.zipid ? key.zipid:key.id;
+				key   = key.zipid ? 'zipid':'id';
+			}
+			else
+			{
+				throw new Error('Unknown object.');
+			}
+		}
+
+		this._queue = this._queue.filter(function(item)
+		{
+			var obj = item[0];
+
+			if (typeof obj === 'object')
+			{
+				if ((memb && obj[memb] && obj[memb][key] == value)
+				|| (!memb && obj[key] === value))
+				{
+					if (d && !obj.destroy) console.log('Removing Task ' + obj);
+					if (obj.destroy) obj.destroy();
+					return false;
+				}
+				if (memb === 'dl') return !obj[memb] || isQueueActive(obj[memb]);
+			}
+			return true;
+		});
+
+		if (d) console.log('Queue filtered, %d/%d tasks remaining', this._queue.length, len, key, value);
+		Later(resetUploadDownload);
+	}
+};
+
 MegaQueue.prototype.pause = function() {
 	if (d) { 
 		console.log("pausing queue"); 

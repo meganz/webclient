@@ -644,7 +644,7 @@ function CacheIO(dl_id, dl)
 	this.abort = function()
 	{
 		u8buf = undefined;
-		if (IO.abort) IO.abort.apply(IO, arguments);
+		if (IO && IO.abort) IO.abort.apply(IO, arguments);
 	};
 }
 

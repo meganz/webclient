@@ -3036,13 +3036,13 @@ label.iPhoneCheckLabelOff span {
 	background-position: center -845px;
 	cursor: pointer;
 }
-.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders:hover .nw-fm-arrow-icon {
 	background-position: center -875px;
 }
 .nw-fm-tree-item.contains-folders.expanded .nw-fm-arrow-icon {
 	background-position: center -784px;
 }
-.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.expanded:hover .nw-fm-arrow-icon {
 	background-position: center -814px;
 }
 .nw-fm-tree-folder {

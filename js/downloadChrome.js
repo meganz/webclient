@@ -95,42 +95,39 @@ function FileSystemAPI(dl_id, dl) {
 			var options = {create: true};
 
 			if(is_chrome_firefox) {
-				var q = {};
-				for(var o in dl_queue) {
-					if(dl_queue[o].dl_id == dl_id) {
-						q = dl_queue[o];
-						break;
-					}
-				}
-				options.fxo = Object.create( q, { size : { value : dl_filesize }});
+				options.fxo = Object.create( dl, { size : { value : dl_filesize }});
 			}
 
 			fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
 				fileEntry.createWriter(function(fileWriter) {     
 					DEBUG('File "mega/' + dl_id + '" created');
 					dl_fw = fileWriter
-					dl_fw.truncate(0);
 	
 					dl_fw.onerror = function(e) {
 						/* onwriteend() will take care of it */
-					}
-	
+					};
+
 					dl_fw.onwriteend = function() {
+						if (that) {
+							ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
+							if (dl_fw.readyState === dl_fw.DONE) {
+								that.begin();
+								that = null;
+							}
+							return;
+						}
+						
 						if (dl_fw.position == targetpos) {
 							chrome_write_error_msg=0; /* reset error counter */
 							return dl_ack_write();
 						}
-	
+
 						/* try to release disk space and retry */
 						free_space();
-					}
-	
+					};
 					zfileEntry = fileEntry;
-					Soon(function() {
-						// deferred execution
-						that.begin();
-						that = null;
-					});
+					dl_fw.truncate(0);
+					
 				}, errorHandler('createWriter'));
 			}, errorHandler('getFile'));
 			options = undefined;
@@ -218,17 +215,16 @@ function FileSystemAPI(dl_id, dl) {
 		}
 
 		dl_writing = false;
-		dl_done(); /* notify writer */
-
 		/* release references to callback and buffer */
 		dl_buffer = null;
-		dl_done   = null;
+		dl_done(); /* notify writer */
+
 	}
 
 	this.write = function(buffer, position, done) {
 		if (dl.io instanceof MemoryIO) return dl.io.write(buffer, position, done);
 
-		if (position != dl_fw.position) {
+		if (dl_writing || position != dl_fw.position) {
 			throw new Error([position, buffer.length, position+buffer.length, dl_fw.position]);
 		}
 		dl_writing  = true;
@@ -260,14 +256,7 @@ function FileSystemAPI(dl_id, dl) {
 		dl_filename = filename;
 		dl_chunks   = chunks;
 		dl_chunksizes = sizes;
-		if (this.is_zip || !dl.zipid) {
-			check();
-		} else {
-			// tell the writter everything was fine
-			// only on zip, where the IO objects are not
-			// doing any write
-			this.begin(); 
-		}
+		check();
 	};
 }
 window.requestFileSystem = window.webkitRequestFileSystem;

@@ -595,6 +595,10 @@ function mozClearStartupCache() {
 									alert('Unexpected truncate offset ' + p);
 									throw new Error('Unexpected truncate offset ' + p);
 								}
+								mozRunAsync(function() {
+									File.Writer.readyState = File.Writer.DONE;
+									File.Writer.onwriteend();
+								});
 							},
 							seek : function(p) {
 								File.fs.seek(0,p);

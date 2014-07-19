@@ -14,7 +14,7 @@ function MemoryIO(dl_id, dl) {
 		}
 		offset += (have_ab ? buffer : buffer.buffer).length;
 		buffer  = null;
-		done();
+		Later(done); 
 	};
 
 	this.download = function(name, path) {

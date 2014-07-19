@@ -34,7 +34,7 @@ var DownloadManager = new function() {
 	function doesMatch(task, pattern) {
 		pattern = s2o(pattern);
 		for (var key in pattern) {
-			if (typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
+			if (typeof task.task !== 'object' || typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
 				return false;
 		}
 		return true;
@@ -76,7 +76,6 @@ var DownloadManager = new function() {
 					dl_queue[i] = {}; /* remove it */
 				}
 			});
-			delete Zips[dl.zipid];
 			selector = '#zip_' + dl.zipid;
 		} else {
 			if(typeof dl.pos !== 'undefined') {
@@ -139,15 +138,16 @@ var DownloadManager = new function() {
 		var tid = task2id(pattern);
 		this.release(tid);
 		removed.push(tid);
-		dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-			var match = doesMatch(obj[0], pattern);
-			if (match) {
-				if (check) check(obj[0]);
-				if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
-				if (obj[0].destroy) obj[0].destroy();
-			}
-			return !match;
-		});
+		dlQueue.filter(pattern);
+		// dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
+			// var match = doesMatch(obj[0], pattern);
+			// if (match) {
+				// if (check) check(obj[0]);
+				// if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
+				// if (obj[0].destroy) obj[0].destroy();
+			// }
+			// return !match;
+		// });
 	};
 
 	this.isRemoved = function(task) {
@@ -418,17 +418,14 @@ DownloadQueue.prototype.push = function() {
 		, dl  = this[id]
 		, dl_id  = dl.ph || dl.id
 		, dl_key = dl.key
-		, dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl)
 		, dl_keyNonce = JSON.stringify([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7],dl_key[4],dl_key[5]])
+		, dlIO
 
 	if (dl.zipid) {
-		if (!Zips[dl.zipid]) {
-			Zips[dl.zipid] = new dlZipIO(dl, dl_id);
-		}
-		var tZip = Zips[dl.zipid];
-		dlIO.write = tZip.getWriter(dl);
-		dlIO.abort = tZip.IO.abort;
-		dlIO.dl_xr = tZip.dl_xr
+		if (!Zips[dl.zipid]) Zips[dl.zipid] = new ZipWriter(dl.zipid, dl);
+		dlIO = Zips[dl.zipid].addEntryFile(dl);
+	} else {
+		dlIO = dl.preview ? new MemoryIO(dl_id, dl) : new dlMethod(dl_id, dl);
 	}
 
 	if (!use_workers) {
@@ -446,8 +443,14 @@ DownloadQueue.prototype.push = function() {
 	// and speed
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
+	dl.decrypter	= 0;
 
-	dl_writer(dl);
+
+	if (!dl.zipid) {
+		dl_writer(dl);
+	} else {
+		dl.writer = dlIO;
+	}
 
 	dl.macs  = {}
 	dl.urls	 = []
@@ -486,7 +489,7 @@ function dlGetUrlDone(res, ctx) {
 				}
 				return ctx.next(false, res, o, ctx.object);
 			}
-			dl_reportstatus(ctx.object, EGAIN);
+			dl_reportstatus(ctx.object, EAGAIN);
 		} else {
 			dl_reportstatus(ctx.object, res.e);
 		}

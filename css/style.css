@@ -10388,6 +10388,9 @@ table {
 	height: 43px;
 	text-align: center;
 }
+.bottom-pages .st-social-block {
+	display:none;
+}
 .st-bottom-button {
 	height: 29px;
 	width: 29px;

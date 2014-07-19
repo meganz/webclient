@@ -267,13 +267,13 @@ ClassFile.prototype.destroy = function() {
 	if (this.dl.cancelled)
 	{
 		if (this.dl.zipid && Zips[this.dl.zipid])
-			Zips[this.dl.zipid].destroy();
+			Zips[this.dl.zipid].destroy(0xbadf);
 	}
 	else
 	{
 		if (this.dl.zipid)
 		{
-			Zips[this.dl.zipid].done();
+			Zips[this.dl.zipid].done(this);
 		}
 		else
 		{
@@ -363,6 +363,18 @@ ClassFile.prototype.run = function(task_done) {
 	}.bind(this);
 
 	dlGetUrl(this.dl, function(error, res, o) {
+		if (!this.dl || this.dl.cancelled) {
+			if (d) console.error('Knock, knock..', this.dl);
+			if (this.dl) {
+				/* Remove leaked items from dlQueue & dl_queue */
+				// DownloadManager.abort(this.dl.zipid ? "zipid:"+this.dl.zipid:"id:"+this.dl.dl_id);
+				// XXX: Hmm, DownloadManager.abort seems unreliably at this stage...
+				dlQueue.filter(this.dl);
+				this.destroy();
+			}
+			task_done();
+			return;
+		}
 		if (error) {
 			/* failed */
 			fetchingFile = 0;
@@ -389,8 +401,6 @@ ClassFile.prototype.run = function(task_done) {
 // }}}
 
 function dl_writer(dl, is_ready) {
-
-	dl.decrypter = 0;
 
 	function finish_write(task, done) {
 		done();

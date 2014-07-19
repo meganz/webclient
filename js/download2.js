@@ -34,7 +34,7 @@ var DownloadManager = new function() {
 	function doesMatch(task, pattern) {
 		pattern = s2o(pattern);
 		for (var key in pattern) {
-			if (typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
+			if (typeof task.task !== 'object' || typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
 				return false;
 		}
 		return true;
@@ -488,7 +488,7 @@ function dlGetUrlDone(res, ctx) {
 				}
 				return ctx.next(false, res, o, ctx.object);
 			}
-			dl_reportstatus(ctx.object, EGAIN);
+			dl_reportstatus(ctx.object, EAGAIN);
 		} else {
 			dl_reportstatus(ctx.object, res.e);
 		}

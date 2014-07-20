@@ -1691,6 +1691,7 @@ function crypto_rsadecrypt(ciphertext,privkey)
     ciphertext = ciphertext.substr(2,l);
 
     var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.decrypt(ciphertext,privkey) );
+    if (cleartext.length < privkey[0].length) cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
     if ( cleartext.charCodeAt(1) != 0 ) cleartext = String.fromCharCode(0) + cleartext; // Old bogus padding workaround
 
     return cleartext.substr(2);

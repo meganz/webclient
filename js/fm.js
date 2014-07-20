@@ -3559,6 +3559,24 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');	
 	if (id !== 'conversations') $('.fm-right-header.fm').removeClass('hidden');
+	
+	var headertxt = '';
+	switch(id)
+	{ 
+		case 'contacts':
+		headertxt = 'My contacts';
+		break;
+		case 'conversations':
+		headertxt = 'My conversations';
+		break;
+		case 'shared-with-me':
+		headertxt = 'My incoming shares';
+		break;
+		case 'cloud-drive':
+		headertxt = 'My folders';
+		break;
+	}
+	$('.nw-tree-panel-header span').text(headertxt);
 }
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)

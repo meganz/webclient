@@ -3174,7 +3174,16 @@ function transferPanelUI()
                 var tth = $('.transfer-table-header');
                 var toHide = (dl_queue.length || ul_queue.length);
                 // Show/Hide header if there is no items in transfer list
-                if (!toHide) tth.hide(1000); else tth.show(0);
+                if (!toHide)
+                {
+                        $('.transfer-panel-empty-txt').removeClass('hidden');
+                        tth.hide(0);
+                } 
+                else
+                {
+                        $('.transfer-panel-empty-txt').addClass('hidden');
+                        tth.show(0);
+                }
 
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
@@ -4445,6 +4454,7 @@ function createfolderDialog(close)
 	});
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.create-folder-dialog').removeClass('hidden');
+        $('.create-folder-input-bl input').focus();
 	$('.create-folder-dialog').removeClass('active');
 }
 

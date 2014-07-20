@@ -576,6 +576,8 @@ function MegaData ()
         }
 		
 		this.currentdirid = id;
+		
+		$('.nw-fm-tree-item').removeClass('opened');
 
 		if (this.chat)
 		{
@@ -588,9 +590,7 @@ function MegaData ()
 			var tt = new Date().getTime();
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
-			else M.filterByParent(M.currentdirid);
-			
-			
+			else M.filterByParent(M.currentdirid);						
 
 			var viewmode=0;
 
@@ -614,15 +614,16 @@ function MegaData ()
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
 			else M.doSort('name',1);
 			M.renderMain();
-			M.renderPath();
 			if (fminitialized && (id.substr(0,6) !== 'search'))
 			{
 				if ($('treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
-					if (n && n.p) treeUIopen(n.p,false,true);
+					if (n && n.p) treeUIopen(n.p,false,true);					
 				}
 				treeUIopen(M.currentdirid,1);
+				
+				$('#treea_'+M.currentdirid).addClass('opened');
 			}		
 			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
@@ -801,7 +802,10 @@ function MegaData ()
 				var sharedfolder = '';				
 				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
 				
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				var openedc = '';
+				if (M.currentdirid == folders[i].h) openedc = 'opened';
+				
+				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				
 				if ($('#treeli_'+folders[i].h).length == 0)
 				{				

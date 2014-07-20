@@ -620,12 +620,7 @@ function removeUInode(h)
 }
 
 function sharedUInode(h,s)
-{	
-	console.log('sharedUInode',h,s);
-	
-	if (s) console.log('do it');
-	else console.log('dont do it');
-	
+{
 	if (s) $('#treea_' + h + ' .nw-fm-tree-folder').addClass('shared-folder');				
 	else
 	{
@@ -3496,7 +3491,6 @@ function treeUI()
 		var id = $(this).attr('id').replace('treea_','');	
 		if (e.type == 'contextmenu')
 		{
-			$('.nw-fm-tree-item').removeClass('dragover');
 			$('.nw-fm-tree-item').removeClass('dragover');
 			$(this).addClass('dragover');
 			$.selected=[id];

@@ -230,7 +230,7 @@ function initUI()
 		
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
-		{			
+		{
 			$(e.target).removeClass('dragover');
 			$('.dragger-block').addClass('drag');	
 		}
@@ -354,7 +354,7 @@ function initUI()
 		}
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
-		$('.fm-tree-folder').removeClass('dragover');
+		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu').addClass('hidden');
 	};
 	

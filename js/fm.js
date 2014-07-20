@@ -621,15 +621,20 @@ function removeUInode(h)
 
 function sharedUInode(h,s)
 {	
-	if (s) $('#treea_' + h).addClass('shared-folder');	
+	console.log('sharedUInode',h,s);
+	
+	if (s) console.log('do it');
+	else console.log('dont do it');
+	
+	if (s) $('#treea_' + h + ' .nw-fm-tree-folder').addClass('shared-folder');				
 	else
 	{
-		$('#treea_' + h).removeClass('shared-folder');		
-		$('.grid-table.fm #'+h + ' .transfer-filtype-icon').removeClass('folder-shared');
-		$('.file-block#'+h + ' .block-view-file-type').removeClass('folder-shared');		
+		$('#treea_' + h + ' .nw-fm-tree-folder').removeClass('shared-folder');		
+		$('.grid-table.fm #'+ h + ' .transfer-filtype-icon').removeClass('folder-shared');
+		$('.file-block#'+ h + ' .block-view-file-type').removeClass('folder-shared');		
 	}
-	$('.grid-table.fm #'+h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
-	$('.file-block#'+h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
+	$('.grid-table.fm #'+ h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
+	$('.file-block#'+ h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
 }
 
 
@@ -3545,7 +3550,6 @@ function treeUIexpand(id,force,moveDialog)
 	{
 		fmtreenode(id,true);
 		$('#treesub_' + id).addClass('opened');
-		b.addClass('opened')
 		b.addClass('expanded');		
 	}
 
@@ -4053,8 +4057,7 @@ function mcDialog(close)
 		
 		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);
 		$('.move-dialog #mainsub').html(html);		
-		
-		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');		
+		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');	
 		$('.move-dialog ul').removeClass('opened');
 		
 		
@@ -4076,12 +4079,12 @@ function mcDialog(close)
 					var c = $(this).attr('class');					
 					if (c && c.indexOf('opened') > -1)
 					{							
-						$(this).removeClass('opened expanded');
+						$(this).removeClass('expanded');
 						$('#mctreesub_' + $.mcselected).removeClass('opened');						
 					}
 					else
 					{
-						$(this).addClass('opened expanded');
+						$(this).addClass('expanded');
 						$('#mctreesub_' + $.mcselected).addClass('opened');
 					}				
 				}
@@ -4090,14 +4093,14 @@ function mcDialog(close)
 					var c = $(this).attr('class');
 					if (c && c.indexOf('selected') > -1)
 					{
-						if (c && c.indexOf('opened') > -1)
+						if (c && c.indexOf('expanded') > -1)
 						{
-							$(this).removeClass('opened expanded');
+							$(this).removeClass('expanded');
 							$('#mctreesub_' + $.mcselected).removeClass('opened');
 						}
 						else
 						{
-							$(this).addClass('opened expanded');
+							$(this).addClass('expanded');
 							$('#mctreesub_' + $.mcselected).addClass('opened');
 						}
 					}

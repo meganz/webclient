@@ -521,19 +521,8 @@ function MegaData ()
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		this.buildtree({h:M.RubbishID});
-		this.contacts();
-		/*
-		$('.cloudsub').attr('id','treesub_' + M.RootID);
-		if (!folderlink) $('.rubbishsub').attr('id','treesub_' + M.RubbishID);
-		$('#treesub_' + M.RootID).html('');
-		
-		$('#treesub_contacts').html('');
-		this.buildtree({h:'contacts'});
-		$('#treesub_' + M.RubbishID).html('');
-		this.buildtree({h:M.RubbishID});
-		*/
+		this.contacts();		
 		treeUI();
-
         if(MegaChatEnabled) {
             megaChat.renderContactTree();
         }
@@ -809,7 +798,10 @@ function MegaData ()
 				var cns = M.c[folders[i].h];						
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';				
 				
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+				var sharedfolder = '';				
+				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
+				
+				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 				
 				if ($('#treeli_'+folders[i].h).length == 0)
 				{				
@@ -826,7 +818,6 @@ function MegaData ()
         // in case of contacts we have custom sort/grouping:
         if (localStorage.csort) this.csort = localStorage.csort;
         if (localStorage.csortd) this.csortd = parseInt(localStorage.csortd);
-
 
 
         if (this.csort == 'shares')
@@ -1523,9 +1514,6 @@ function MegaData ()
 
 	this.delnodeShare = function(h,u)
 	{
-		console.log('delnodeShare');
-
-		
 		if (this.d[h] && typeof this.d[h].shares !== 'undefined')
 		{
 			delete this.d[h].shares[u];
@@ -2780,8 +2768,6 @@ function doshare(h,t, dontShowShareDialog)
                 if(dontShowShareDialog != true) {
                     shareDialog();
                 }
-
-				renderfm();
                 $promise.resolve();
 			}
 			else

@@ -151,6 +151,9 @@ var DownloadManager = new function() {
 	};
 
 	this.isRemoved = function(task) {
+		if (!task.dl) {
+			return true;
+		}
 		for (var i in removed) {
 			if (doesMatch(task, removed[i]))
 				return true;

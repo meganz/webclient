@@ -3036,13 +3036,13 @@ label.iPhoneCheckLabelOff span {
 	background-position: center -845px;
 	cursor: pointer;
 }
-.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders:hover .nw-fm-arrow-icon {
 	background-position: center -875px;
 }
 .nw-fm-tree-item.contains-folders.expanded .nw-fm-arrow-icon {
 	background-position: center -784px;
 }
-.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon {
+.nw-fm-tree-item.contains-folders.selected.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.dragover.expanded .nw-fm-arrow-icon, .nw-fm-tree-item.contains-folders.expanded:hover .nw-fm-arrow-icon {
 	background-position: center -814px;
 }
 .nw-fm-tree-folder {
@@ -3308,7 +3308,7 @@ label.iPhoneCheckLabelOff span {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
 	color: white;
 }
-.nw-conversations-header {
+.nw-conversations-header, .nw-tree-panel-header {
 	height: 24px;
 	font-family: 'Open Sans Semibold', Arial;
 	font-size: 12px;

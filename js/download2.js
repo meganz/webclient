@@ -112,7 +112,11 @@ var DownloadManager = new function() {
 
 	this.abort = function(pattern, dontCleanUI) {
 		var _pattern = s2o(pattern);
-		$.each(dl_queue, function(i, dl) {
+		var i, dl;
+		this.remove(_pattern);
+
+		for (i=0; i < dl_queue.length; i++) {
+			dl = dl_queue[i];
 			if (doesMatch({task:dl}, _pattern)) {
 				if (!dl.cancelled && typeof dl.io.abort == "function") try {
 					if (d) console.log('IO.abort', dl.zipid || dl.id, dl);
@@ -124,12 +128,11 @@ var DownloadManager = new function() {
 				dl.cancelled = true;
 				/* do not break the loop, it may be a multi-files zip */
 			}
-		});
+		}
 		if (typeof pattern == "object" && !dontCleanUI) {
 			this.cleanupUI(pattern);
 		}
 
-		this.remove(_pattern);
 		Soon(percent_megatitle);
 	}
 
@@ -151,6 +154,9 @@ var DownloadManager = new function() {
 	};
 
 	this.isRemoved = function(task) {
+		if (!task.dl) {
+			return true;
+		}
 		for (var i in removed) {
 			if (doesMatch(task, removed[i]))
 				return true;

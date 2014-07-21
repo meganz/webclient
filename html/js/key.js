@@ -14,6 +14,7 @@ function load_start_arkanoid()
 
 function init_key()
 {
+	/*
 	if (m)
 	{
 		crypto_rsagenkey();
@@ -41,7 +42,16 @@ function init_key()
 	{
 		key_step2();
 	});
+	*/
 	
+	$('.key1').addClass('hidden');
+	$('.key2').removeClass('hidden');
+	if (typeof u_privk == 'undefined')
+	{
+		crypto_rsagenkey();
+		u_ed25519();
+	}
+	else ui_keycomplete();	
 }
 
 
@@ -83,32 +93,10 @@ function start_arkanoid()
 
 function ui_keycomplete()
 {
-    $('.reg-st5-spin').hide();
-    $('.reg-st5-progressbar span').hide();
-	if (m)
-	{
-		mobilekeygen=false;
-		init_page();
-	}
-	else
-	{	
-		setTimeout(function()
-		{
-			if (!u_attr.p) key_step3();
-			else
-			{
-				page = 'key';
-				document.location.hash = 'fm';
-			}
-		},500);
-	}
-}
-
-function key_step3()
-{
-	$('.key1').addClass('hidden');
+    $('.key1').addClass('hidden');
 	$('.key2').addClass('hidden');
 	$('.key3').removeClass('hidden');	
 	init_pro();	
 	mainScroll();
 }
+

@@ -81,16 +81,6 @@ function init_page()
 {
 	closeDialog();
 
-	if (typeof clearAds !== 'undefined') clearAds();	
-
-	if (window.stopBaboom) 
-	{
-		window.stopBaboom();
-		window.stopBaboom=undefined;	
-	}
-	
-	$('body').removeClass('adv');
-
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;

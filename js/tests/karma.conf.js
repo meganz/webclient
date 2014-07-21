@@ -76,8 +76,7 @@ module.exports = function(config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            '../chat/!(*mpenc|rtcSession).js': ['coverage'],
-            'src/helpers/*.js': ['coverage']
+            '../chat/!(*mpenc|rtcSession).js': ['coverage']
         },
 
 //        browsers: ['PhantomJS_custom'],

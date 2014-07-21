@@ -2331,7 +2331,7 @@ MegaChatRoom.prototype._cancelCallRequest = function() {
 
         self._resetCallStateNoCall();
     }
-    self.megaChat.karere.connection.rtc.hangup();
+    self.megaChat.rtc.hangup();
 };
 
 MegaChatRoom.prototype._startCall = function() {
@@ -3723,6 +3723,8 @@ MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     var pluginsForceQueue = false;
 
     $.each(self.megaChat.plugins, function(k) {
+        console.log(k);
+
         if(self.megaChat.plugins[k].shouldQueueMessage) {
             if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
                 pluginsForceQueue = true;
@@ -3732,7 +3734,7 @@ MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     });
 
     return pluginsForceQueue;
-}
+};
 
 /**
  * Send message to this room

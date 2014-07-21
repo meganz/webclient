@@ -40,11 +40,17 @@ function mouseMoveEntropy (e) {
 
     var v = ( ( (e.screenX << 8) | (e.screenY & 255) ) << 16 ) | timeValue();
 
-    if ( !localStorage.randseed && bioCounter < 45 ) {
-        // `bioCounter` is incremented once per 4 move events in avegare
-        // 45 * 4 = 180 first move events should provide at about 270 bits of entropy
-        // (conservative estimation is 1.5 bits of entropy per move event)
-        asmCrypto.random.seed( new Uint32Array( [ v ] ) );
+    if ( !localStorage.randseed ) {
+        if ( bioCounter < 45 ) {
+            // `bioCounter` is incremented once per 4 move events in average
+            // 45 * 4 = 180 first move events should provide at about 270 bits of entropy
+            // (conservative estimation is 1.5 bits of entropy per move event)
+            asmCrypto.random.seed( new Uint32Array( [ v ] ) );
+        }
+        else {
+            if (d) console.log("Got the first seed for future PRNG reseeding");
+            saveRandSeed();
+        }
     }
 
     if ( mouseMoveSkip-- <= 0 ) {
@@ -54,17 +60,19 @@ function mouseMoveEntropy (e) {
 
         if ( (bioCounter & 255) === 0 ) {
             if (d) console.log("Reseeding PRNG with collected entropy");
-
             asmCrypto.random.seed(bioSeed);
-
-            // Store some random bits for reseeding RNG in the future
-            var randseed = new Uint8Array(32);
-            asmCrypto.getRandomValues(randseed);
-            localStorage.randseed = base64urlencode( asmCrypto.bytes_to_string(randseed) );
+            saveRandSeed();
         }
 
         if ( typeof arkanoid_entropy !== 'undefined' ) arkanoid_entropy();
     }
+}
+
+// Store some random bits for reseeding RNG in the future
+function saveRandSeed () {
+    var randseed = new Uint8Array(32);
+    asmCrypto.getRandomValues(randseed);
+    localStorage.randseed = base64urlencode( asmCrypto.bytes_to_string(randseed) );
 }
 
 // ----------------------------------------

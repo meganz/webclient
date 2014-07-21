@@ -372,14 +372,9 @@ ClassFile.prototype.run = function(task_done) {
 				dlQueue.filter(this.dl);
 				this.destroy();
 			}
-			fetchingFile = 0;
-			task_done();
-			return;
-		}
-		if (error) {
+			error = true;
+		} else if (error) {
 			/* failed */
-			fetchingFile = 0;
-			task_done(); /* release worker */
 			setTimeout(function onGetUrlError() {
 				/* retry !*/
 				ERRDEBUG('retrying ', this.dl.n);
@@ -387,15 +382,20 @@ ClassFile.prototype.run = function(task_done) {
 				if (ioThrottlePaused) dlQueue.resume();
 			}.bind(this), dl_retryinterval);
 			DEBUG('retry to fetch url in ', dl_retryinterval, ' ms');
-			return false;
+		} else {
+			var info = dl_queue.splitFile(res.s);
+			this.dl.url  = res.g;
+			this.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
+			try {
+				return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
+			} catch(e) {
+				setTransferStatus( this.dl, e, true );
+			}
 		}
-		var info = dl_queue.splitFile(res.s);
-		this.dl.url  = res.g;
-		this.dl.urls = dl_queue.getUrls(info.chunks, info.offsets, res.g)
-		try {
-			return this.dl.io.setCredentials(res.g, res.s, o.n, info.chunks, info.offsets);
-		} catch(e) {
-			setTransferStatus( this.dl, e, true );
+		if (error) {
+			fetchingFile = 0;
+			Soon(task_done); /* release worker */
+			task_done = null;
 		}
 	}.bind(this));
 };

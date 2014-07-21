@@ -567,13 +567,13 @@ function searchFM()
 
 }
 
-
 function removeUInode(h)
 {
 	var n = M.d[h];
 	var i=0;
+	// check subfolders
 	if (n && n.t)
-	{
+    {
 		var cns = M.c[n.p];			
 		if (cns) 
 		{
@@ -582,41 +582,63 @@ function removeUInode(h)
 				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
 			}
 		}
-		if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 	}
-	$('#' + h).remove();
-	$('#treea_' + h).remove();
-	$('#treesub_' + h).remove();
-	$('#treeli_' + h).remove();
-        var hasItems=false;
-	for (var h in M.c[M.currentdirid]) { hasItems=true; break; }
-        // Show empty picture if there's no more items available in tab
-	if (!hasItems)
-        {
-                switch (M.currentdirid)
-                {
-                        case M.RootID:
-                            $('.grid-table.fm tr').remove();
-                            $('.fm-empty-cloud').removeClass('hidden');
-                            break;
-                        case "shares":
-                            $('.files-grid-view .grid-table-header tr').remove();
-                            // ToDo: Missing empty picture for shares
-                            $('.fm-empty-cloud').removeClass('hidden');
-                            break;
-                        case "contacts":
-                            $('.contacts-grid-view .contacts-grid-header tr').remove();
-                            $('.fm-empty-contacts').removeClass('hidden');
-                            break;
-                        case "chat":
-                            // ToDo: Missing grid header for conversation
-                            $('.contacts-grid-view .contacts-grid-header tr').remove();
-                            $('.fm-empty-messages').removeClass('hidden');
-                            break;
-                        default:
-                            break;
-                }
-        }        
+    var hasItems=false;
+	if (M.v.length) hasItems = true;
+    switch (M.currentdirid)
+    {
+		case M.RootID:
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+//			$('#treea_' + h).remove();
+//			$('#treesub_' + h).remove();
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.grid-table.fm tr').remove();
+				$('.fm-empty-cloud').removeClass('hidden');
+			}
+            break;
+		case "shares":
+			if (!hasItems)
+            {
+				$('.files-grid-view .grid-table-header tr').remove();
+				// ToDo: Missing empty picture for shares
+				$('.fm-empty-cloud').removeClass('hidden');
+			}
+			break;
+		case "contacts":
+			//Clear left panel
+			$('#contact_' + h).remove();
+			if (!hasItems)
+			{
+				$('.contacts-grid-view .contacts-grid-header tr').remove();
+				$('.fm-empty-contacts').removeClass('hidden');
+			}
+			break;
+		case "chat":
+			if (!hasItems)
+			{
+				// ToDo: Missing grid header for conversation
+				$('.contacts-grid-view .contacts-grid-header tr').remove();
+				$('.fm-empty-chat').removeClass('hidden');
+			}
+			break;
+		case M.RubbishID:
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+//			$('#treea_' + h).remove();
+//			$('#treesub_' + h).remove();
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.contacts-grid-view .contacts-grid-header tr').remove();
+				$('.fm-empty-trashbin').removeClass('hidden');
+			}
+			break;
+		default:
+			break;
+	}
 }
 
 function sharedUInode(h,s)

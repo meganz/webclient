@@ -38,8 +38,6 @@ ClassChunk.prototype.toString = function() {
 
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
-	if (this.destroying) return;
-	this.destroying = true;
 	if (d) console.log('Destroying ' + this);
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
 	if (this.oet) clearTimeout(this.oet);
@@ -251,12 +249,10 @@ ClassFile.prototype.toString = function() {
 };
 
 ClassFile.prototype.destroy = function() {
-	if (this.destroying) return;
-	this.destroying = true;
 	if (d) console.log('Destroying ' + this, this.dl? (this.dl.cancelled? 'cancelled':'finished'):'expunged');
 	if (!this.dl) return;
 
-	if (!this.emptyFile && !checkLostChunks(this.dl) &&
+	if (!this.dl.cancelled && !this.emptyFile && !checkLostChunks(this.dl) &&
 		(typeof skipcheck == 'undefined' || !skipcheck)) {
 		dl_reportstatus(this.dl, EKEY);
 	}

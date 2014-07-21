@@ -588,6 +588,7 @@ function removeUInode(h)
 	$('#treea_' + h).remove();
 	$('#treesub_' + h).remove();
 	$('#treeli_' + h).remove();
+        $('#contact_' + h).remove();
         var hasItems=false;
 	for (var h in M.c[M.currentdirid]) { hasItems=true; break; }
         // Show empty picture if there's no more items available in tab

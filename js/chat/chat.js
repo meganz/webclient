@@ -1045,11 +1045,10 @@ MegaChat.prototype.destroy = function() {
  */
 MegaChat.prototype.getContacts = function() {
     var results = [];
-    $.each(M.u, function(k, v) {
-        if(v.c == 1 || v.c == 2) {
-            results.push(v);
-        }
-    });
+    for (v in M.u)
+    {
+        if(v.c == 1 || v.c == 2) results.push(v);
+    }
     return results;
 };
 

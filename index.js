@@ -677,8 +677,9 @@ function loginDialog(close)
 		$('.top-login-popup').removeClass('active');
 		return false;
 	}
-	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) {
-		$('.top-login-warning').removeClass('active');	
+	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) 
+	{
+		$('.top-login-warning').hide();
 		$('.login-notification-icon').removeClass('hidden');
 	}
 	$('.login-checkbox,.top-login-popup .radio-txt').unbind('click');
@@ -755,6 +756,7 @@ function loginDialog(close)
 	$('.login-notification-icon').unbind('click');
 	$('.login-notification-icon').bind('click',function(e)
 	{
+		$('.top-login-warning').show();
 		$('.top-login-warning').addClass('active');
 		$(this).addClass('hidden');
 	});

@@ -250,7 +250,7 @@ ClassFile.prototype.toString = function() {
 
 ClassFile.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this, this.dl? (this.dl.cancelled? 'cancelled':'finished'):'expunged');
-	if (!this.dl || Zips[this.dl.zipid].cancelled) return;
+	if (!this.dl) return;
 
 	if (!this.dl.cancelled && !this.emptyFile && !checkLostChunks(this.dl) &&
 		(typeof skipcheck == 'undefined' || !skipcheck)) {

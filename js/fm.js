@@ -571,29 +571,28 @@ function removeUInode(h)
 {
 	var n = M.d[h];
 	var i=0;
+	// check subfolders
+	if (n && n.t)
+    {
+		var cns = M.c[n.p];			
+		if (cns) 
+		{
+			for (var cn in cns) 
+			{
+				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
+			}
+		}
+	}
     var hasItems=false;
-	// Note: Be careful when removing nodes from M.v use splice instead of delete, to auto sync length
 	if (M.v.length) hasItems = true;
     switch (M.currentdirid)
     {
 		case M.RootID:
-			if (n && n.t)
-            {
-				var cns = M.c[n.p];			
-                if (cns) 
-                {
-					for (var cn in cns) 
-                    {
-						if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
-                    }
-				}
-				if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
-			}
-			// ToDo: is this really necessary? remove all nodes, not just common parent?
-			$('#' + h).remove();
-			$('#treea_' + h).remove();
-			$('#treesub_' + h).remove();
-			$('#treeli_' + h).remove();
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+//			$('#treea_' + h).remove();
+//			$('#treesub_' + h).remove();
+			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{
 				$('.grid-table.fm tr').remove();
@@ -622,7 +621,19 @@ function removeUInode(h)
 			{
 				// ToDo: Missing grid header for conversation
 				$('.contacts-grid-view .contacts-grid-header tr').remove();
-				$('.fm-empty-messages').removeClass('hidden');
+				$('.fm-empty-chat').removeClass('hidden');
+			}
+			break;
+		case M.RubbishID:
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+//			$('#treea_' + h).remove();
+//			$('#treesub_' + h).remove();
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.contacts-grid-view .contacts-grid-header tr').remove();
+				$('.fm-empty-trashbin').removeClass('hidden');
 			}
 			break;
 		default:

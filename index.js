@@ -81,16 +81,6 @@ function init_page()
 {
 	closeDialog();
 
-	if (typeof clearAds !== 'undefined') clearAds();	
-
-	if (window.stopBaboom) 
-	{
-		window.stopBaboom();
-		window.stopBaboom=undefined;	
-	}
-	
-	$('body').removeClass('adv');
-
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -677,8 +667,9 @@ function loginDialog(close)
 		$('.top-login-popup').removeClass('active');
 		return false;
 	}
-	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) {
-		$('.top-login-warning').removeClass('active');	
+	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) 
+	{
+		$('.top-login-warning').hide();
 		$('.login-notification-icon').removeClass('hidden');
 	}
 	$('.login-checkbox,.top-login-popup .radio-txt').unbind('click');
@@ -755,6 +746,7 @@ function loginDialog(close)
 	$('.login-notification-icon').unbind('click');
 	$('.login-notification-icon').bind('click',function(e)
 	{
+		$('.top-login-warning').show();
 		$('.top-login-warning').addClass('active');
 		$(this).addClass('hidden');
 	});
@@ -876,7 +868,7 @@ function topmenuUI()
 	$('.top-menu-item.logout,.context-menu-divider.logout').hide();
 	$('.top-menu-item.clouddrive,.top-menu-item.account').hide();
 	$('.activity-status,.activity-status-block').hide();
-	$('.membership-status').removeClass('free');
+	$('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
 	$('.membership-status').hide();	
 	$('.top-head .user-name').hide();	
 	if (fminitialized) $('.top-search-bl').show();
@@ -892,15 +884,15 @@ function topmenuUI()
 			$('.membership-icon-pad .membership-icon').attr('class','membership-icon pro' + u_attr.p);			
 			if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
 			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
-			
-			$('.membership-status').addClass('pro');
-			$('.membership-status').html('PRO');			
+			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');			
+			$('.membership-status-block').html('<div class="membership-status pro">PRO</div>');			
+			$('.context-menu-divider.upgrade-your-account').addClass('pro');			
 			$('.membership-popup.pro-popup');		
 		}
 		else
 		{
 			$('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
+			$('.context-menu-divider.upgrade-your-account').removeClass('pro');
 			$('.membership-status').addClass('free');
 			$('.membership-status').html(l[435]);	
 		}		
@@ -913,7 +905,7 @@ function topmenuUI()
 	}
 	else
 	{
-		if (u_type === 0)
+		if (u_type === 0 && !confirmok && page !== 'key')
 		{
 			$('.top-menu-item.register').text(l[968]);
 			$('.top-menu-item.clouddrive').show();

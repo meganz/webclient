@@ -24,7 +24,7 @@ function FlashIO(dl_id, dl) {
 
 		document.getElementById(swfid).flashdata(dl_id, subdata);
 		offset += len
-		done();
+		Later(done);
 	};
 
 	this.download = function (name, path) {

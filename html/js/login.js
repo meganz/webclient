@@ -230,6 +230,9 @@ function init_login()
 
 	if (confirmok)
 	{
+		$('.register-st2-txt-block').addClass('hidden');
+		$('.login-page-create-new').addClass('hidden');
+		$('.top-login-forgot-pass').addClass('hidden');
 		$('.main-top-info-block').removeClass('hidden');
 		$('.register-st2-button-arrow').text(l[1131]);
 		$('.main-italic-header.login').text(l[1131]);

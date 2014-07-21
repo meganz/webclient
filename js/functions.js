@@ -1269,27 +1269,6 @@ function percent_megatitle()
 	megatitle(t);
 }
 
-function __percent_megatitle()
-{
-	var percentage = 0
-		, total = 0
-
-	$('.transfer-table .progressbar-percents').each(function() {
-		var p = parseInt($(this).text());
-		if (isNaN(p)) return;
-		percentage += p;
-		total++;
-	});
-	
-	percentage = Math.floor(percentage / total)
-
-	if (total == 0 || percentage == 0 || percentage == 100) {
-		megatitle();
-	} else {
-		megatitle(" " + percentage + "%");
-	}
-}
-
 function hostname(url) {
 	return (url || "").match(/https?:\/\/([^.]+)/)[1];
 }

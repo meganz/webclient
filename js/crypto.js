@@ -1672,8 +1672,8 @@ function crypto_decodeprivkey(privk)
 // returns string representing an MPI-formatted big number
 function crypto_rsaencrypt(cleartext,pubkey)
 {
-	// random padding
-	for (var i = (pubkey[0].length)-1-cleartext.length; i-- > 0; ) cleartext += String.fromCharCode(rand(256));
+    // random padding up to pubkey's byte length minus 2
+    for (var i = (pubkey[0].length)-2-cleartext.length; i-- > 0; ) cleartext += String.fromCharCode(rand(256));
 
     var ciphertext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.encrypt(cleartext,pubkey) );
 
@@ -1691,8 +1691,10 @@ function crypto_rsadecrypt(ciphertext,privkey)
     ciphertext = ciphertext.substr(2,l);
 
     var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.decrypt(ciphertext,privkey) );
+    if (cleartext.length < privkey[0].length) cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
+    if ( cleartext.charCodeAt(1) != 0 ) cleartext = String.fromCharCode(0) + cleartext; // Old bogus padding workaround
 
-	return cleartext.substr(1);
+    return cleartext.substr(2);
 }
 
 // Complete upload

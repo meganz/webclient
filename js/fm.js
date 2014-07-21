@@ -230,7 +230,7 @@ function initUI()
 		
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
-		{			
+		{
 			$(e.target).removeClass('dragover');
 			$('.dragger-block').addClass('drag');	
 		}
@@ -354,7 +354,7 @@ function initUI()
 		}
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
-		$('.fm-tree-folder').removeClass('dragover');
+		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu').addClass('hidden');
 	};
 	
@@ -620,16 +620,16 @@ function removeUInode(h)
 }
 
 function sharedUInode(h,s)
-{	
-	if (s) $('#treea_' + h).addClass('shared-folder');	
+{
+	if (s) $('#treea_' + h + ' .nw-fm-tree-folder').addClass('shared-folder');				
 	else
 	{
-		$('#treea_' + h).removeClass('shared-folder');		
-		$('.grid-table.fm #'+h + ' .transfer-filtype-icon').removeClass('folder-shared');
-		$('.file-block#'+h + ' .block-view-file-type').removeClass('folder-shared');		
+		$('#treea_' + h + ' .nw-fm-tree-folder').removeClass('shared-folder');		
+		$('.grid-table.fm #'+ h + ' .transfer-filtype-icon').removeClass('folder-shared');
+		$('.file-block#'+ h + ' .block-view-file-type').removeClass('folder-shared');		
 	}
-	$('.grid-table.fm #'+h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
-	$('.file-block#'+h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
+	$('.grid-table.fm #'+ h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
+	$('.file-block#'+ h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
 }
 
 
@@ -3174,7 +3174,16 @@ function transferPanelUI()
                 var tth = $('.transfer-table-header');
                 var toHide = (dl_queue.length || ul_queue.length);
                 // Show/Hide header if there is no items in transfer list
-                if (!toHide) tth.hide(1000); else tth.show(0);
+                if (!toHide)
+                {
+                        $('.transfer-panel-empty-txt').removeClass('hidden');
+                        tth.hide(0);
+                } 
+                else
+                {
+                        $('.transfer-panel-empty-txt').addClass('hidden');
+                        tth.show(0);
+                }
 
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e) 
@@ -3492,7 +3501,6 @@ function treeUI()
 		if (e.type == 'contextmenu')
 		{
 			$('.nw-fm-tree-item').removeClass('dragover');
-			$('.nw-fm-tree-item').removeClass('dragover');
 			$(this).addClass('dragover');
 			$.selected=[id];
 			if (contextmenuUI(e,1)) return true;
@@ -3545,7 +3553,6 @@ function treeUIexpand(id,force,moveDialog)
 	{
 		fmtreenode(id,true);
 		$('#treesub_' + id).addClass('opened');
-		b.addClass('opened')
 		b.addClass('expanded');		
 	}
 
@@ -3561,6 +3568,24 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');	
 	if (id !== 'conversations') $('.fm-right-header.fm').removeClass('hidden');
+	
+	var headertxt = '';
+	switch(id)
+	{ 
+		case 'contacts':
+		headertxt = 'My contacts';
+		break;
+		case 'conversations':
+		headertxt = 'My conversations';
+		break;
+		case 'shared-with-me':
+		headertxt = 'My incoming shares';
+		break;
+		case 'cloud-drive':
+		headertxt = 'My folders';
+		break;
+	}
+	$('.nw-tree-panel-header span').text(headertxt);
 }
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
@@ -4053,8 +4078,7 @@ function mcDialog(close)
 		
 		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);
 		$('.move-dialog #mainsub').html(html);		
-		
-		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');		
+		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');	
 		$('.move-dialog ul').removeClass('opened');
 		
 		
@@ -4076,12 +4100,12 @@ function mcDialog(close)
 					var c = $(this).attr('class');					
 					if (c && c.indexOf('opened') > -1)
 					{							
-						$(this).removeClass('opened expanded');
+						$(this).removeClass('expanded');
 						$('#mctreesub_' + $.mcselected).removeClass('opened');						
 					}
 					else
 					{
-						$(this).addClass('opened expanded');
+						$(this).addClass('expanded');
 						$('#mctreesub_' + $.mcselected).addClass('opened');
 					}				
 				}
@@ -4090,14 +4114,14 @@ function mcDialog(close)
 					var c = $(this).attr('class');
 					if (c && c.indexOf('selected') > -1)
 					{
-						if (c && c.indexOf('opened') > -1)
+						if (c && c.indexOf('expanded') > -1)
 						{
-							$(this).removeClass('opened expanded');
+							$(this).removeClass('expanded');
 							$('#mctreesub_' + $.mcselected).removeClass('opened');
 						}
 						else
 						{
-							$(this).addClass('opened expanded');
+							$(this).addClass('expanded');
 							$('#mctreesub_' + $.mcselected).addClass('opened');
 						}
 					}
@@ -4430,6 +4454,7 @@ function createfolderDialog(close)
 	});
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.create-folder-dialog').removeClass('hidden');
+        $('.create-folder-input-bl input').focus();
 	$('.create-folder-dialog').removeClass('active');
 }
 

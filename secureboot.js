@@ -533,6 +533,8 @@ else
         jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'html/register.html', n: 'register', j:0});
+        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
         var jsl2 =
         {
             'about': {f:'html/about.html', n: 'about', j:0},
@@ -540,8 +542,8 @@ else
             'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
             'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
             'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
-            'register': {f:'html/register.html', n: 'register', j:0},
-            'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
+//            'register': {f:'html/register.html', n: 'register', j:0},
+//            'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
             'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
             'download': {f:'html/download.html', n: 'download', j:0},
             'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
@@ -567,6 +569,7 @@ else
             'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
             'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
             'sync': {f:'html/sync.html', n: 'sync', j:0},
+			'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
             'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
             'affiliates': {f:'html/affiliates.html', n: 'affiliates', j:0},
             'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:0},
@@ -590,7 +593,7 @@ else
             'recovery': ['recovery','recovery_js'],
             'reset': ['reset','reset_js'],
             'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-            'register': ['register','register_js'],
+//            'register': ['register','register_js'],
             'android': ['android'],
             'resellers': ['resellers'],
             '!': ['download','download_js'],
@@ -601,7 +604,7 @@ else
             'takedown': ['takedown'],
             'firefox': ['firefox'],
             'mobile': ['mobile'],
-            'sync': ['sync'],
+            'sync': ['sync','sync_js'],
             'contact': ['contact'],
             'dev': ['dev','dev_js','sdkterms'],
             'sdk': ['dev','dev_js','sdkterms'],
@@ -853,8 +856,8 @@ else
                 xhr_stack[xhri].url = url;
                 xhr_stack[xhri].jsi = jsi;
                 xhr_stack[xhri].xhri = xhri;
-                if (localStorage.dd) url += '?t=' + Date.now();
-                xhr_stack[xhri].open("GET", bootstaticpath + url, true);
+                if (localStorage.dd) url += '?t=' + Date.now();                
+				xhr_stack[xhri].open("GET", !localStorage.dd && url.indexOf('mads.js') > -1 ? 'https://eu.static.mega.co.nz/' : bootstaticpath + url, true);				
                 xhr_stack[xhri].timeout = xhr_timeout;
                 if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
                 xhr_stack[xhri].send(null);

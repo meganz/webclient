@@ -868,7 +868,7 @@ function topmenuUI()
 	$('.top-menu-item.logout,.context-menu-divider.logout').hide();
 	$('.top-menu-item.clouddrive,.top-menu-item.account').hide();
 	$('.activity-status,.activity-status-block').hide();
-	$('.membership-status').removeClass('free');
+	$('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
 	$('.membership-status').hide();	
 	$('.top-head .user-name').hide();	
 	if (fminitialized) $('.top-search-bl').show();
@@ -884,11 +884,9 @@ function topmenuUI()
 			$('.membership-icon-pad .membership-icon').attr('class','membership-icon pro' + u_attr.p);			
 			if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
 			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
-			
-			$('.membership-status').addClass('pro');
-			$('.context-menu-divider.upgrade-your-account').addClass('pro');
-			$('.membership-status').html('PRO');			
+			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');			
+			$('.membership-status-block').html('<div class="membership-status pro">PRO</div>');			
+			$('.context-menu-divider.upgrade-your-account').addClass('pro');			
 			$('.membership-popup.pro-popup');		
 		}
 		else

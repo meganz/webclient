@@ -1090,7 +1090,7 @@ function MegaData ()
                         {
                                 if (M.v[k].h === h)
                                 {
-                                        delete M.v[k];
+                                        M.v.splice(k, 1);
                                         break;
                                 }
                         }
@@ -1289,14 +1289,14 @@ function MegaData ()
 			if (M.d[h] && M.d[h].p)
 			{
 				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
-                                // Update M.v it's used for slideshot preview at least
-                                for (var k in M.v)
-                                {
-                                        if (M.v[k].h === h)
-                                        {
-                                                delete M.v[k];
-                                                break;
-                                        }
+				// Update M.v it's used for slideshot preview at least
+				for (var k in M.v)
+				{
+					if (M.v[k].h === h)
+					{
+						M.v.splice(k, 1);
+						break;
+					}
                                 }
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;

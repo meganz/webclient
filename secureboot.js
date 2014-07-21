@@ -856,8 +856,8 @@ else
                 xhr_stack[xhri].url = url;
                 xhr_stack[xhri].jsi = jsi;
                 xhr_stack[xhri].xhri = xhri;
-                if (localStorage.dd) url += '?t=' + Date.now();
-                xhr_stack[xhri].open("GET", bootstaticpath + url, true);
+                if (localStorage.dd) url += '?t=' + Date.now();                
+				xhr_stack[xhri].open("GET", !localStorage.dd && url.indexOf('mads.js') > -1 ? 'https://eu.static.mega.co.nz/' : bootstaticpath + url, true);				
                 xhr_stack[xhri].timeout = xhr_timeout;
                 if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
                 xhr_stack[xhri].send(null);

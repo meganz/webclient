@@ -372,6 +372,7 @@ ClassFile.prototype.run = function(task_done) {
 				dlQueue.filter(this.dl);
 				this.destroy();
 			}
+			fetchingFile = 0;
 			task_done();
 			return;
 		}

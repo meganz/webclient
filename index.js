@@ -901,7 +901,7 @@ function topmenuUI()
 	}
 	else
 	{
-		if (u_type === 0)
+		if (u_type === 0 && !confirmok && page !== 'key')
 		{
 			$('.top-menu-item.register').text(l[968]);
 			$('.top-menu-item.clouddrive').show();

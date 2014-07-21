@@ -113,7 +113,6 @@ var DownloadManager = new function() {
 	this.abort = function(pattern, dontCleanUI) {
 		var _pattern = s2o(pattern);
 		var i, dl;
-		this.remove(_pattern);
 
 		for (i=0; i < dl_queue.length; i++) {
 			dl = dl_queue[i];
@@ -133,6 +132,7 @@ var DownloadManager = new function() {
 			this.cleanupUI(pattern);
 		}
 
+		this.remove(_pattern);
 		Soon(percent_megatitle);
 	}
 
@@ -475,7 +475,9 @@ function dl_reportstatus(dl, code)
 
 	if(code === EKEY) {
 		// TODO: Check if other codes should raise abort()
-		DownloadManager.abort(dl, true);
+		Later(function() {
+			DownloadManager.abort(dl, true);
+		});
 	}
 }
 

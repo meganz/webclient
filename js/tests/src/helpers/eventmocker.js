@@ -71,7 +71,6 @@ EventMocker.prototype.mock = function(eventName, timeout) {
 
         mock.timeout_timer = setTimeout(function() {
             console.error("EventMock timed out waiting on: ", eventName, (new Date()));
-
             mock.timeout_timer = false;
             mock.timeouts+=1;
 

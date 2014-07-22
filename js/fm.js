@@ -596,7 +596,8 @@ function removeUInode(h)
 		{
 			for (var cn in cns) 
 			{
-				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
+				if (M.d[cn] && M.d[cn].t && cn !== h) i++;
+				break;// Break on i > 0
 			}
 		}
 	}

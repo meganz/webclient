@@ -4620,6 +4620,9 @@ th.grid-first-th {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
 }
 .file-settings-icon {
 	left: auto;
@@ -9490,7 +9493,7 @@ table {
 	opacity: 1;
 }
 .open-item .context-menu-icon {
-	background-position: -2px -4633px;
+	background-position: -3px -4633px;
 }
 .download-item .context-menu-icon {
 	background-position: -3px -5212px;
@@ -9508,12 +9511,15 @@ table {
 	background-position: -3px -4694px;
 }
 .send-to-contact-item .context-menu-icon {
-	background-position: -1px -4987px;
+	background-position: -3px -4987px;
 }
 .getlink-item .context-menu-icon {
 	background-position: -3px -4344px;
 }
 .sharing-item .context-menu-icon {
+	background-position: -3px -4800px;
+}
+.image-like-item .context-menu-icon {
 	background-position: -3px -4800px;
 }
 .move-item .context-menu-icon {
@@ -9523,43 +9529,43 @@ table {
 	background-position: -3px -4448px;
 }
 .newfolder-item .context-menu-icon {
-	background-position: -1px -5160px;
+	background-position: -3px -5160px;
 }
 .fileupload-item .context-menu-icon {
 	background-position: -3px -4312px;
 }
 .folderupload-item .context-menu-icon {
-	background-position: -1px -5250px;
+	background-position: -3px -5250px;
 }
 .removeshare-item .context-menu-icon, .remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
-	background-position: -4px -4480px;
+	background-position: -3px -4519px;
 }
 .properties-item .context-menu-icon {
-	background-position: -4px -4240px;
+	background-position: -3px -4240px;
 }
 .permissions-item .context-menu-icon {
 	background-position: -2px -4935px;
 }
 .permissions-item .context-menu-icon {
-	background-position: -2px -4935px;
+	background-position: -3px -4935px;
 }
 .rename-item .context-menu-icon {
 	background-position: -3px -4383px;
 }
 .addcontact-item .context-menu-icon {
-	background-position: -1px -5020px;
+	background-position: -3px -5020px;
 }
 .reply-item .context-menu-icon {
-	background-position: -1px -5057px;
+	background-position: -3px -5057px;
 }
 .reply-to-all .context-menu-icon {
-	background-position: -1px -5090px;
+	background-position: -3px -5090px;
 }
 .forward-item .context-menu-icon {
-	background-position: -1px -5123px;
+	background-position: -3px -5123px;
 }
 .add-star-item .context-menu-icon {
-	background-position: -4px -4271px;
+	background-position: -3px -4271px;
 }
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
@@ -9568,10 +9574,10 @@ table {
 	background-position: 4px -3756px;
 }
 .select-all .context-menu-icon {
-	background-position: -1px -5290px;
+	background-position: -3px -5290px;
 }
 .preview-item .context-menu-icon {
-	background-position: -4px -5380px;
+	background-position: -3px -5380px;
 }
 .transfer-pause .context-menu-icon {
 	background-position: 5px -3612px;

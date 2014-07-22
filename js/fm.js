@@ -3472,7 +3472,12 @@ function contextmenuUI(e,ll,topmenu)
 	}
 	
 	var m = $('.context-menu.files-menu');
+	var v = m.children($('.context-menu-section'));
+	v.removeClass('hidden');
 	m.removeClass('hidden');
+	v.each(function() {
+		if($(this).height()<24) $(this).addClass('hidden');
+	});
 	var r = $('body').outerWidth()-$(m).outerWidth();
 	var b = $('body').outerHeight()-$(m).outerHeight();
 	var mX = e.pageX;

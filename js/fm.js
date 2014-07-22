@@ -449,6 +449,23 @@ function initUI()
 		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 	
+	var initialTooltipTime;
+	$('.nw-fm-left-icon').unbind('mouseover');
+	$('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initialTooltipTime );
+	  initialTooltipTime = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+    });
+	
+	$('.nw-fm-left-icon').unbind('mouseout');
+	$('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initialTooltipTime );
+    });
+	
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
 		setTimeout(function()

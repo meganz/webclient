@@ -599,7 +599,7 @@ function removeUInode(h)
 				if (M.d[cn] && M.d[cn].t && cn !== h)
 				{
 					i++;
-					break;// Stop counting
+					break;
 				}
 			}
 		}

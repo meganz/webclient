@@ -290,19 +290,22 @@ if (localStorage.dl_maxSlots) {
 
 function checkLostChunks(file)
 {
-	var t = []
-		, dl_key = file.key
+	var dl_key = file.key
+		// , t = []
 
-	$.each(file.macs, function(i, mac) {
-		t.push(i);
-	});
-	t.sort(function(a, b) {
-		return parseInt(a) - parseInt(b);
-	});
+	// $.each(file.macs, function(i, mac) {
+		// t.push(i);
+	// });
+	// t.sort(function(a, b) {
+		// return parseInt(a) - parseInt(b);
+	// });
+	// $.each(t, function(i, v) {
+		// t[i] = file.macs[v];
+	// });
 
-	$.each(t, function(i, v) {
-		t[i] = file.macs[v];
-	});
+	var t = Object.keys(file.macs).map(Number)
+		.sort(function(a, b) { return a - b })
+		.map(function(v) { return file.macs[v]});
 
 	var mac = condenseMacs(t,[dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]);
 

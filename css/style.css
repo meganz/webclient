@@ -2988,11 +2988,11 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
-	color:white;
+	color: white;
 }
 .nw-fm-tree-item.selected {
 	background-color: rgba(217,0,7,0.5);
-	color:white;
+	color: white;
 }
 .nw-fm-tree-item.dragover {
 	background-color: rgba(217,0,7,0.3);
@@ -3047,8 +3047,8 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-folder {
 	display: block;
-	margin-left: 24px;
-	padding-left: 23px;
+	margin-left: 22px;
+	padding-left: 24px;
 	white-space: nowrap;
 	cursor: default;
 	font-size: 11px;
@@ -3060,36 +3060,38 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	overflow: hidden;
 }
-
-
-.nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
-	background-position: -17px -7535px;
+.rubbish-bin .nw-fm-tree-folder {
+	background-position: -15px -7595px;
 }
-.nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
+.rubbish-bin .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-shared-folder {
+	background-position: -15px -7625px;
+}
+.nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
+	background-position: -15px -7535px;
+}
+.nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -7465px;
+	background-position: -15px -7465px;
 }
 .nw-fm-tree-item.opened .nw-fm-tree-folder {
-	background-position: -17px -7345px;
+	background-position: -15px -7345px;
 }
-.nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder
- {
+.rubbish-bin .nw-fm-tree-item.opened .nw-fm-tree-folder {
+	background-position: -15px -7655px;
+}
+.nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -7505px;
+	background-position: -15px -7505px;
 }
-.nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder
- {
+.nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -7375px;
+	background-position: -15px -7375px;
 }
-
-.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder,
-.nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
-	background-position: -16px -7565px;
+.nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
+	background-position: -15px -7565px;
 }
-.nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder,
-.nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
-	background-position: -17px -7435px;
+.nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
+	background-position: -15px -7435px;
 }
 .nw-contact-item, .add-contact-item {
 	height: 48px;
@@ -3179,7 +3181,7 @@ label.iPhoneCheckLabelOff span {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-	border:2px solid white;
+	border: 2px solid white;
 }
 .selected .nw-contact-status {
 	border: 2px solid rgba(255,255,255,1);
@@ -3187,7 +3189,7 @@ label.iPhoneCheckLabelOff span {
 	height: 12px;
 	margin: 18px 0 0 10px;
 }
-.nw-conversations-item .nw-contact-status {
+.nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
 	margin-top: 6px;
 }
 .online .nw-contact-status {
@@ -3227,6 +3229,9 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-contact-avatar {
 	margin-bottom: 8px;
+}
+.fm-tree-panel .nw-contact-avatar {
+	display: none;
 }
 .fm-avatar.color1 {
 	background-color: #FF6A19;
@@ -3316,7 +3321,7 @@ label.iPhoneCheckLabelOff span {
 	color: #999999;
 	padding: 0 0 0 10px;
 	position: relative;
-	background-color:white;
+	background-color: white;
 }
 .nw-tree-panel-arrows {
 	height: 24px;
@@ -3329,7 +3334,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -12px -752px;
 	cursor: pointer;
 }
-.nw-conversations-item {
+.nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
 	padding-right: 15px;
 	overflow: hidden;
@@ -3347,7 +3352,7 @@ label.iPhoneCheckLabelOff span {
 	min-width: 14px;
 	text-align: center;
 	line-height: 13px;
-	font-size: 11px;
+	font-size: 10px;
 	padding: 0 3px;
 	-moz-border-radius: 14px;
 	-webkit-border-radius: 14px;
@@ -3360,21 +3365,38 @@ label.iPhoneCheckLabelOff span {
 .unread .nw-conversations-unread {
 	display: block;
 }
+.nw-contact-item .nw-conversations-unread {
+	color: white;
+	background-color: rgba(119,119,119,0.3);
+}
+.nw-contact-item:hover .nw-conversations-unread, .nw-contact-item.selected .nw-conversations-unread {
+	color: #666666;
+	background-color: white;
+}
 .nw-conversations-item:hover {
 	background-color: rgba(0,163,230,0.3);
-	color:white;
+	color: white;
+}
+.fm-tree-panel .nw-contact-item:hover {
+	background-color: rgba(119,119,119,0.3);
+	color: white;
+}
+.fm-tree-panel .nw-contact-item.selected {
+	background-color: rgba(119,119,119,0.5);
+	color: white;
 }
 .nw-conversations-item.selected {
 	background-color: rgba(10,164,227,0.5);
-	color:white;
+	color: white;
 }
-.nw-conversations-name {
+.nw-conversations-name, .fm-tree-panel .nw-contact-name {
 	margin: 0 25px 0 32px;
 	font-size: 11px;
 	line-height: 23px;
 	color: #666666;
+	padding: 0;
 }
-.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name {
+.nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
 	color: white;
 }
 .file-transfer-icon {
@@ -4203,12 +4225,17 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: 4px -3087px;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: pointer;
+}
+.filled .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
-	cursor: pointer;
 }
-.nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
+.nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active.filled .rubbish-bin-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
@@ -4381,14 +4408,8 @@ th.grid-first-th {
 .fm-account-main .grid-table tr:nth-child(odd) td {
 	background-color: white;
 }
-.grid-table tr:hover td, .fm-account-main .grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .transfer-table tr:hover td, .grid-table tr:nth-child(odd):hover td, .grid-share-table tr:nth-child(odd):hover td, .contacts-grid-table tr:nth-child(odd):hover td, .transfer-table tr:nth-child(odd):hover td, .transfer-table tr:hover td {
+.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(238,238,238,1);
-}
-.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td {
-	background-color: rgba(225,225,225,1);
-}
-.grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
-	background-color: rgba(225,225,225,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
@@ -4407,7 +4428,7 @@ th.grid-first-th {
 .file-status-icon {
 	background-image: none;
 }
-.file-status-icon.star {
+.file-status-icon.star, .contact-status-icon.star {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
@@ -4425,22 +4446,22 @@ th.grid-first-th {
 	background-position: -29px -1574px;
 }
 .file-block .file-status-icon.new, .contact-status-icon.new, .file-block.ui-selected .file-status-icon.new, .file-block.dragover .file-status-icon.new, .ui-selected .contact-status-icon.new, .dragover .contact-status-icon.new {
-	background-position: -39px -1629px;
+	background-position: -7px -1469px;
 }
 .file-block .file-status-icon.star.new, .contact-status-icon.star.new, .file-block.ui-selected .file-status-icon.star.new, .file-block.dragover .file-status-icon.star.new, .ui-selected .contact-status-icon.star.new, .dragover .contact-status-icon.star.new {
-	background-position: -34px -1579px;
+	background-position: -7px -1469px;
 }
 .file-block .file-status-icon, .contact-status-icon {
 	position: absolute;
 	left: 4px;
 	top: 4px;
-	height: 17px;
+	height: 20px;
 	z-index: 10;
-	width: 15px;
+	width: 20px;
 	background-position: 1px -3679px;
 }
 .file-block .file-status-icon.star, .contact-status-icon.star {
-	background-position: -14px -1472px;
+	background-position: -14px -7738px;
 }
 .fm-blocks-view, .fm-contacts-blocks-view {
 	-webkit-box-sizing: border-box;
@@ -4499,20 +4520,11 @@ th.grid-first-th {
 	width: 140px;
 	height: 160px;
 }
-.file-block:hover, .contact-block-view:hover {
-	background-color: rgba(0,0,0,0.2);
-}
-.file-block.ui-selected, .contact-block-view.ui-selected {
-	background-color: rgba(0,0,0,0.25);
-}
-.file-block.ui-selecting, .contact-block-view.ui-selecting {
-	background-color: rgba(0,0,0,0.25);
-}
-.file-block.dragover, .contact-block-view.dragover {
+.file-block.ui-selected, .contact-block-view.ui-selected, .file-block.ui-selecting, .contact-block-view.ui-selecting {
 	background-color: rgba(0,0,0,0.1);
 }
-.file-block:hover .file-block-title, .contact-block-view:hover .file-block-title, .file-block.ui-selected .file-block-title, .contact-block-view.ui-selected .file-block-title, .file-block.ui-selecting .file-block-title, .contact-block-view.ui-selecting .file-block-title {
-	color: white;
+.file-block.dragover, .contact-block-view.dragover {
+	background-color: rgba(0,0,0,0.07);
 }
 .file-block img, .contact-block-view img {
 	border: 0;
@@ -4585,62 +4597,75 @@ th.grid-first-th {
 	font-size: 11px;
 	line-height: 28px;
 	text-align: center;
-	color: #666666;
+	color: #333333;
 }
-.grid-url-arrow {
-	height: 24px;
-	width: 38px;
+.grid-url-arrow, .file-settings-icon {
+	height: 18px;
+	width: 18px;
 	display: block;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-repeat: no-repeat;
-	background-position: -1px -1558px;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
 	cursor: pointer;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-	-moz-opacity: 0;
-	-khtml-opacity: 0;
-	opacity: 0;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 	position: absolute;
-	top: 0;
+	background-color: rbga(255, 255, 255, 0);
+	top: 3px;
 	left: 12px;
+	border: 2px solid rgba(0,0,0,0);
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
 }
 .file-settings-icon {
-	width: 38px;
-	height: 18px;
+	left: auto;
+	right: 6px;
+	top: auto;
+	bottom: 30px;
+	z-index: 10;
+}
+.grid-url-arrow span, .file-settings-icon span {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -1px -1561px;
-	position: absolute;
-	top: 5px;
-	right: 5px;
-	z-index: 10;
+	background-position: -18px -7788px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-	cursor: pointer;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
-	cursor: pointer;
+	display: block;
+	width: 14px;
+	height: 14px;
 }
 .file-block:hover .file-settings-icon, .file-block.ui-selected .file-settings-icon, tr:hover .grid-url-arrow, tr.ui-selected .grid-url-arrow {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
-	-moz-opacity: 0.75;
-	-khtml-opacity: 0.75;
-	opacity: 0.75;
+	border: 2px solid rgba(0,0,0,0.1);
+	background-color: rgba(255,255,255,1);
+}
+.file-block:hover .file-settings-icon span, .file-block.ui-selected .file-settings-icon span, tr:hover .grid-url-arrow span, tr.ui-selected .grid-url-arrow span {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
 }
 .file-block:hover .file-settings-icon:hover, .file-block.ui-selected .file-settings-icon:hover, tr:hover .grid-url-arrow:hover, tr.ui-selected:hover .grid-url-arrow:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
+	border: 2px solid rgba(0,0,0,0.2);
+}
+.file-block:hover .file-settings-icon:hover span, .file-block.ui-selected .file-settings-icon:hover span, tr:hover .grid-url-arrow:hover span, tr.ui-selected:hover .grid-url-arrow:hover span {
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .clone-of-header, .clone-of-header span, .clone-of-header, .clone-of-header th {
 	height: 0;
@@ -4701,148 +4726,156 @@ table {
 	display: none;
 }
 .transfer-filtype-icon.word, .search-path-icon-span.word {
-	background-position: -62px 3px;
+	background-position: -62px 4px;
 }
 .transfer-filtype-icon.web-lang, .search-path-icon-span.web-lang {
-	background-position: -62px -37px;
+	background-position: -62px -36px;
 }
 .transfer-filtype-icon.web-data, .search-path-icon-span.web-data {
-	background-position: -62px -77px;
+	background-position: -62px -76px;
 }
 .transfer-filtype-icon.video, .search-path-icon-span.video {
-	background-position: -62px -117px;
+	background-position: -62px -116px;
 }
 .transfer-filtype-icon.video-vob, .search-path-icon-span.video-vob {
-	background-position: -62px -157px;
+	background-position: -62px -156px;
 }
 .transfer-filtype-icon.video-subtitles, .search-path-icon-span.video-subtitles {
-	background-position: -62px -197px;
+	background-position: -62px -196px;
 }
 .transfer-filtype-icon.vector, .search-path-icon-span.vector {
-	background-position: -62px -237px;
+	background-position: -62px -236px;
 }
 .transfer-filtype-icon.vcard, .search-path-icon-span.vcard {
-	background-position: -62px -277px;
+	background-position: -62px -276px;
 }
 .transfer-filtype-icon.torrent, .search-path-icon-span.torrent {
-	background-position: -62px -317px;
+	background-position: -62px -316px;
 }
 .transfer-filtype-icon.text, .search-path-icon-span.text {
-	background-position: -62px -357px;
+	background-position: -62px -356px;
 }
 .transfer-filtype-icon.swf, .search-path-icon-span.swf {
-	background-position: -62px -397px;
+	background-position: -62px -396px;
 }
 .transfer-filtype-icon.spreadsheet, .search-path-icon-span.spreadsheet {
-	background-position: -62px -437px;
+	background-position: -62px -436px;
 }
 .transfer-filtype-icon.sourcecode, .search-path-icon-span.sourcecode {
-	background-position: -62px -477px;
+	background-position: -62px -476px;
 }
 .transfer-filtype-icon.real-audio, .search-path-icon-span.real-audio {
-	background-position: -62px -517px;
+	background-position: -62px -516px;
 }
 .transfer-filtype-icon.raw, .search-path-icon-span.raw {
-	background-position: -62px -557px;
+	background-position: -62px -556px;
 }
 .transfer-filtype-icon.premiere, .search-path-icon-span.premiere {
-	background-position: -62px -597px;
+	background-position: -62px -596px;
 }
 .transfer-filtype-icon.powerpoint, .search-path-icon-span.powerpoint {
-	background-position: -62px -637px;
+	background-position: -62px -636px;
 }
 .transfer-filtype-icon.podcast, .search-path-icon-span.podcast {
-	background-position: -62px -677px;
+	background-position: -62px -676px;
 }
 .transfer-filtype-icon.playlist, .search-path-icon-span.playlist {
-	background-position: -62px -717px;
+	background-position: -62px -716px;
 }
 .transfer-filtype-icon.photoshop, .search-path-icon-span.photoshop {
-	background-position: -62px -757px;
+	background-position: -62px -756px;
 }
 .transfer-filtype-icon.pdf, .search-path-icon-span.pdf {
-	background-position: -62px -797px;
+	background-position: -62px -796px;
 }
 .transfer-filtype-icon.midi, .search-path-icon-span.midi {
-	background-position: -62px -837px;
+	background-position: -62px -836px;
 }
 .transfer-filtype-icon.java, .search-path-icon-span.java {
-	background-position: -62px -877px;
+	background-position: -62px -876px;
 }
 .transfer-filtype-icon.indesign, .search-path-icon-span.indesign {
-	background-position: -62px -917px;
+	background-position: -62px -916px;
 }
 .transfer-filtype-icon.image, .search-path-icon-span.image {
-	background-position: -62px -957px;
+	background-position: -62px -956px;
 }
 .transfer-filtype-icon.illustrator, .search-path-icon-span.illustrator {
-	background-position: -62px -997px;
+	background-position: -62px -996px;
 }
 .transfer-filtype-icon.html, .search-path-icon-span.html {
-	background-position: 0 -624px;
+	background-position: -62px -1036px;
 }
 .transfer-filtype-icon.graphic, .search-path-icon-span.graphic {
-	background-position: -62px -1077px;
+	background-position: -62px -1076px;
 }
 .transfer-filtype-icon.gis, .search-path-icon-span.gis {
-	background-position: -62px -1117px;
+	background-position: -62px -1116px;
 }
 .transfer-filtype-icon.generic, .search-path-icon-span.generic {
-	background-position: -62px -1157px;
+	background-position: -62px -1156px;
 }
 .transfer-filtype-icon.font, .search-path-icon-span.font {
-	background-position: -62px -1197px;
+	background-position: -62px -1196px;
 }
-.transfer-filtype-icon.folder, .search-path-icon-span.folder {
-	background-position: -62px -1237px;
+.transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: -14px -7465px;
+	background-repeat: no-repeat;
 }
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-	background-position: -62px -1277px;
+	background-position: -14px -7535px;
+}
+.rubbish-bin .transfer-filtype-icon.folder, .rubbish-bin .search-path-icon-span.folder {
+	background-position: -14px -7595px;
+}
+.rubbish-bin .transfer-filtype-icon.folder-shared, .rubbish-bin .search-path-icon-span.folder-shared {
+	background-position: -14px -7625px;
 }
 .transfer-filtype-icon.flash, .search-path-icon-span.flash {
-	background-position: -62px -1317px;
+	background-position: -62px -1316px;
 }
 .transfer-filtype-icon.flash-video, .search-path-icon-span.flash-video {
-	background-position: -62px -1357px;
+	background-position: -62px -1356px;
 }
 .transfer-filtype-icon.fla-lang, .search-path-icon-span.fla-lang {
-	background-position: -62px -1397px;
+	background-position: -62px -1396px;
 }
 .transfer-filtype-icon.executable, .search-path-icon-span.executable {
-	background-position: -62px -1437px;
+	background-position: -62px -1436px;
 }
 .transfer-filtype-icon.excel, .search-path-icon-span.excel {
-	background-position: -62px -1477px;
+	background-position: -62px -1476px;
 }
 .transfer-filtype-icon.dreamweaver, .search-path-icon-span.dreamweaver {
-	background-position: -62px -1517px;
+	background-position: -62px -1516px;
 }
 .transfer-filtype-icon.database, .search-path-icon-span.database {
-	background-position: -62px -1557px;
+	background-position: -62px -1556px;
 }
 .transfer-filtype-icon.compressed, .search-path-icon-span.compressed {
-	background-position: -62px -1597px;
+	background-position: -62px -1596px;
 }
 .transfer-filtype-icon.cad, .search-path-icon-span.cad {
-	background-position: -62px -1637px;
+	background-position: -62px -1636px;
 }
 .transfer-filtype-icon.audio, .search-path-icon-span.audio {
-	background-position: -62px -1677px;
+	background-position: -62px -1676px;
 }
 .transfer-filtype-icon.aftereffects, .search-path-icon-span.aftereffects {
-	background-position: -62px -1717px;
+	background-position: -62px -1716px;
 }
 .transfer-filtype-icon.threed, .search-path-icon-span.threed {
-	background-position: -62px -1757px;
+	background-position: -62px -1756px;
 }
 .transfer-filtype-icon.win-folder, .search-path-icon-span.win-folder {
-	background-position: -62px -1797px;
+	background-position: -62px -1796px;
 }
 .transfer-filtype-icon.apple-folder, .search-path-icon-span.apple-folder {
-	background-position: -62px -1837px;
+	background-position: -62px -1836px;
 }
 .transfer-filtype-icon.photo-folder, .search-path-icon-span.photo-folder {
-	background-position: -62px -1837px;
+	background-position: -62px -1836px;
 }
 .block-view-file-type {
 	width: 74px;
@@ -5309,7 +5342,7 @@ table {
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
 	height: 24px;
-	padding: 0 0 0 25px;
+	padding: 0 0 0 23px;
 	word-break: break-all;
 	white-space: pre-wrap;
 	display: block;
@@ -5708,6 +5741,13 @@ span.search-number {
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
+}
+.fm-files-view-icon.listing-view.inactive, .fm-contacts-view-icon.listing-view.inactive, .fm-files-view-icon.block-view.inactive, .fm-contacts-view-icon.block-view.inactive {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.05;
+	-khtml-opacity: 0.05;
+	opacity: 0.05;
+	cursor: default;
 }
 .fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder {
 	-webkit-box-sizing: border-box;
@@ -6157,7 +6197,7 @@ div .fm-tree-folder.dragover {
 	background-color: #d6d6d6;
 }
 table.grid-table .dragover td, table.grid-share-table .dragover td, table.contacts-grid-table .dragover td {
-	background-color: rgba(0,0,0,0.1);
+	background-color: rgba(238,238,238,0.7);
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .grid-scrolling-table .jspContainer, .contacts-grid-scrolling-table .jspContainer, .grid-scrolling-table .jspPane, .contacts-grid-scrolling-table .jspPane {
 	width: 100% !important;
@@ -6614,7 +6654,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 }
 .fm-chat-user-info .nw-contact-status {
-	margin: 4px 5px 0 0px;
+	margin: 2px 5px 0 0px;
 }
 .fm-chat-user-status.offline {
 	background-position: -17px -2928px;
@@ -6678,7 +6718,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-messages-block .nw-contact-avatar {
 	margin: 6px 0 6px 6px;
 }
-.fm-chat-message-container.grouped-message .nw-contact-avatar,  .fm-chat-message-container.grouped-message .chat-username {
+.fm-chat-message-container.grouped-message .nw-contact-avatar, .fm-chat-message-container.grouped-message .chat-username {
 	display: none;
 }
 .fm-chat-message-time {
@@ -8167,6 +8207,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 }
+.fm-share-dropdown {
+	margin: 10px -20px 0 0;
+}
 .account-history-dropdown-button.active {
 	border: 2px solid white;
 }
@@ -9450,7 +9493,7 @@ table {
 	opacity: 1;
 }
 .open-item .context-menu-icon {
-	background-position: -2px -4633px;
+	background-position: -3px -4633px;
 }
 .download-item .context-menu-icon {
 	background-position: -3px -5212px;
@@ -9468,12 +9511,15 @@ table {
 	background-position: -3px -4694px;
 }
 .send-to-contact-item .context-menu-icon {
-	background-position: -1px -4987px;
+	background-position: -3px -4987px;
 }
 .getlink-item .context-menu-icon {
 	background-position: -3px -4344px;
 }
 .sharing-item .context-menu-icon {
+	background-position: -3px -4800px;
+}
+.image-like-item .context-menu-icon {
 	background-position: -3px -4800px;
 }
 .move-item .context-menu-icon {
@@ -9483,43 +9529,43 @@ table {
 	background-position: -3px -4448px;
 }
 .newfolder-item .context-menu-icon {
-	background-position: -1px -5160px;
+	background-position: -3px -5160px;
 }
 .fileupload-item .context-menu-icon {
 	background-position: -3px -4312px;
 }
 .folderupload-item .context-menu-icon {
-	background-position: -1px -5250px;
+	background-position: -3px -5250px;
 }
 .removeshare-item .context-menu-icon, .remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
-	background-position: -4px -4480px;
+	background-position: -3px -4519px;
 }
 .properties-item .context-menu-icon {
-	background-position: -4px -4240px;
+	background-position: -3px -4240px;
 }
 .permissions-item .context-menu-icon {
 	background-position: -2px -4935px;
 }
 .permissions-item .context-menu-icon {
-	background-position: -2px -4935px;
+	background-position: -3px -4935px;
 }
 .rename-item .context-menu-icon {
 	background-position: -3px -4383px;
 }
 .addcontact-item .context-menu-icon {
-	background-position: -1px -5020px;
+	background-position: -3px -5020px;
 }
 .reply-item .context-menu-icon {
-	background-position: -1px -5057px;
+	background-position: -3px -5057px;
 }
 .reply-to-all .context-menu-icon {
-	background-position: -1px -5090px;
+	background-position: -3px -5090px;
 }
 .forward-item .context-menu-icon {
-	background-position: -1px -5123px;
+	background-position: -3px -5123px;
 }
 .add-star-item .context-menu-icon {
-	background-position: -4px -4271px;
+	background-position: -3px -4271px;
 }
 .canceltransfer-item .context-menu-icon {
 	background-position: 4px -3716px;
@@ -9528,10 +9574,10 @@ table {
 	background-position: 4px -3756px;
 }
 .select-all .context-menu-icon {
-	background-position: -1px -5290px;
+	background-position: -3px -5290px;
 }
 .preview-item .context-menu-icon {
-	background-position: -4px -5380px;
+	background-position: -3px -5380px;
 }
 .transfer-pause .context-menu-icon {
 	background-position: 5px -3612px;
@@ -10398,7 +10444,7 @@ table {
 	text-align: center;
 }
 .bottom-pages .st-social-block {
-	display:none;
+	display: none;
 }
 .st-bottom-button {
 	height: 29px;

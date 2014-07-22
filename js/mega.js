@@ -349,7 +349,7 @@ function MegaData ()
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 						cc=1;
 					}
 				}
@@ -375,7 +375,7 @@ function MegaData ()
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="60" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
 						cc=1;
 					}
@@ -693,9 +693,7 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			var img = staticpath + 'images/mega/default-small-avatar.png';
-			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
 			
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}
@@ -1085,14 +1083,16 @@ function MegaData ()
 				M.delHash(M.d[h]);				
 				delete M.d[h];
 			}
+                        // Update M.v it's used for at least preview slideshow
                         for (var k in M.v)
                         {
                                 if (M.v[k].h === h)
                                 {
-                                        delete M.v[k];
+                                        M.v.splice(k, 1);
                                         break;
                                 }
                         }
+                        if (typeof M.u.h === 'object') M.u.h.c = 0;
 		}
 		ds(h);
 	};
@@ -1287,14 +1287,14 @@ function MegaData ()
 			if (M.d[h] && M.d[h].p)
 			{
 				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
-                                // Update M.v it's used for slideshot preview at least
-                                for (var k in M.v)
-                                {
-                                        if (M.v[k].h === h)
-                                        {
-                                                delete M.v[k];
-                                                break;
-                                        }
+				// Update M.v it's used for slideshot preview at least
+				for (var k in M.v)
+				{
+					if (M.v[k].h === h)
+					{
+						M.v.splice(k, 1);
+						break;
+					}
                                 }
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
@@ -1758,7 +1758,7 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>');
 			}
 		}
 
@@ -1768,7 +1768,7 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 		$.transferHeader();
@@ -2029,7 +2029,7 @@ function MegaData ()
 			f.id = ul_id;
 
 			this.addToTransferTable(
-				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
+				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>'
 			);
 			ul_queue.push(f);
 			

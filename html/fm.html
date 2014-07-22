@@ -10,17 +10,27 @@
 
 <!-- Please add/remove "left-points-position/right-points-position/top-points-position/bottom-points-position" class to activate points and set its position !-->
 <div class="context-menu files-menu hidden">
-    <div class="context-menu-points"></div>
-    <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
+  <div class="context-menu-section">
     <a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
-    <a class="context-menu-item download-item"><span class="context-menu-icon"></span>[$58]</a>
+    <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
+    <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>Info</a>
+    <a class="context-menu-item add-star-item"><span class="context-menu-icon"></span>Favourite</a>
+    <a class="context-menu-item image-like-item"><span class="context-menu-icon"></span>Favourite</a>
+    <div class="context-menu-divider"></div>
+  </div>
+  <div class="context-menu-section">
+    <a class="context-menu-item download-item"><span class="context-menu-icon"></span>[$58]...</a>
     <a class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</a>
     <a class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</a>
     <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>Send to contact</a>
     <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
     <a class="context-menu-item sharing-item"><span class="context-menu-icon"></span>[$60]</a>
+     <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
+    <div class="context-menu-divider"></div>
+  </div>
+  <div class="context-menu-section">
     <a class="context-menu-item rename-item"><span class="context-menu-icon"></span>[$61]</a>
-    <a class="context-menu-item move-item"><span class="context-menu-icon"></span>[$62]</a>
+    <a class="context-menu-item move-item"><span class="context-menu-icon"></span>[$62]...</a>
     <a class="context-menu-item copy-item"><span class="context-menu-icon"></span>[$63]</a>
     <a class="context-menu-item newfolder-item"><span class="context-menu-icon"></span>[$68]</a>
     <a class="context-menu-item fileupload-item"><span class="context-menu-icon"></span>[$99]</a>
@@ -29,14 +39,12 @@
     <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
     <a class="context-menu-item remove-item"><span class="context-menu-icon"></span>[$83]</a>
     <a class="context-menu-item removeshare-item"><span class="context-menu-icon"></span>[$144]</a>
-    <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$892]</a>
-    <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
     <a class="context-menu-item clearbin-item"><span class="context-menu-icon"></span>[$70]</a>
     <a class="context-menu-item addcontact-item"><span class="context-menu-icon"></span>[$71]</a>
     <a class="context-menu-item reply-item"><span class="context-menu-icon"></span>Reply</a>
     <a class="context-menu-item reply-to-all"><span class="context-menu-icon"></span>Reply to all</a>
     <a class="context-menu-item forward-item"><span class="context-menu-icon"></span>Forward</a>
-    <a class="context-menu-item add-star-item"><span class="context-menu-icon"></span>[$975]</a>
+    
     <a class="context-menu-item canceltransfer-item"><span class="context-menu-icon"></span>[$103]</a>
     <a class="context-menu-item transfer-pause"><span class="context-menu-icon"></span>[$103]</a>
     <a class="context-menu-item transfer-play"><span class="context-menu-icon"></span>Pause</a>
@@ -45,8 +53,9 @@
     <a class="context-menu-item move-down"><span class="context-menu-icon"></span>Move down queue</a>
     <a class="context-menu-item tranfer-clear"><span class="context-menu-icon"></span>Clear</a>
     <div class="context-menu-divider"></div>
-    <a class="context-menu-item select-all"><span class="context-menu-icon"></span>Select all</a>
-    <a class="context-menu-item refresh-item"><span class="context-menu-icon"></span>[$85]</a>
+  </div>
+  <a class="context-menu-item select-all"><span class="context-menu-icon"></span>Select all</a>
+  <a class="context-menu-item refresh-item"><span class="context-menu-icon"></span>[$85]</a>
 </div>
 
 
@@ -572,7 +581,7 @@
     <div class="fm-breadcrumbs-block">
     </div>
 
-
+    <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldn't be clicked !-->
     <a class="fm-files-view-icon block-view"></a>
     <a class="fm-files-view-icon listing-view active"></a>
 
@@ -1337,7 +1346,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
                     <th width="100"></th>
                     <th width="100"></th>
                     <th width="110"></th>
-                    <th width="60" class="grid-url-field"></th>
+                    <th width="42" class="grid-url-field"></th>
                 </tr>
             </table>
         </div>

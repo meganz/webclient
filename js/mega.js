@@ -1760,7 +1760,16 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'">'
+					+ '<td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td>'
+					+ '<td><span class="row-number">1</span></td>'
+					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+					+ '<td></td>'
+					+ '<td>' + bytesToSize(n.s) + '</td>'
+					+ '<td>File</td>'
+					+ '<td><span class="transfer-status queued">Queued</span></td>'
+					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
+					+ '</tr>');
 			}
 		}
 
@@ -1770,7 +1779,16 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+		if (z) 
+		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
+			+ '<td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td>'
+			+ '<td><span class="row-number">1</span></td>'
+			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
+			+ '<td></td>'
+			+ '<td>' + bytesToSize(zipsize) + '</td>'
+			+ '<td>Zip</td>'
+			+ '<td><span class="transfer-status queued">Queued</span></td>'
+			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 		$.transferHeader();
@@ -1826,7 +1844,7 @@ function MegaData ()
 		}
 
 		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
-			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$('.transfer-table #' + id + ' td:eq(6)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
 
@@ -1847,9 +1865,9 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
-				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
-				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
+				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
+				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
+				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
 				percent_megatitle();
 
 				if (page.substr(0,2) !== 'fm')
@@ -1876,7 +1894,7 @@ function MegaData ()
 		
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
-		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #' + id + ' td:eq(6)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
@@ -1968,11 +1986,11 @@ function MegaData ()
 				 * a chunk may fail at any time, don't report a temporary error while
 				 * there is network activity associated with the download, though.
 				 */
-				$('.transfer-table #' + id + ' td:eq(3)')
+				$('.transfer-table #' + id + ' td:eq(6)')
 					.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 					// .parents('tr').data({'failed' : NOW()});
-				$('.transfer-table #' + id + ' td:eq(4)').text('');
-				$('.transfer-table #' + id + ' td:eq(6)').text('--:--:--');
+				//$('.transfer-table #' + id + ' td:eq(4)').text('');
+				$('.transfer-table #' + id + ' td:eq(3)').text('--:--:--');
 			}
 		}
 	}
@@ -1980,7 +1998,7 @@ function MegaData ()
 	this.dlstart = function(dl)
 	{
 		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
-		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #' + id + ' td:eq(6)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #' + id));
 		dl.st = NOW();
 		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');

@@ -1177,22 +1177,25 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{	
 		$('.fm-clearbin-button').removeClass('hidden');	
+		$('.files-grid-view').addClass('rubbish-bin');	
+	} else {
+		$('.files-grid-view').removeClass('rubbish-bin');	
+	    if (RootbyId(M.currentdirid) == M.InboxID)
+	    {	
+		   if (d) console.log('Inbox');
+	    }
+	    else if (M.currentdirid == 'contacts')
+	    {
+		   $('.fm-add-user').removeClass('hidden');	
+	    }
+	    else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
+	    {
+		    $('.fm-new-folder').removeClass('hidden');
+		    $('.fm-file-upload').removeClass('hidden');
+		    if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		    else $('.fm-file-upload').addClass('last-button');		
+	    }
 	}
-	else if (RootbyId(M.currentdirid) == M.InboxID)
-	{	
-		if (d) console.log('Inbox');
-	}
-	else if (M.currentdirid == 'contacts')
-	{
-		$('.fm-add-user').removeClass('hidden');	
-	}
-	else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
-	{
-		$('.fm-new-folder').removeClass('hidden');
-		$('.fm-file-upload').removeClass('hidden');
-		if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
-		else $('.fm-file-upload').addClass('last-button');		
-	}	
 	$('.fm-clearbin-button').unbind('click');
 	$('.fm-clearbin-button').bind('click',function()
 	{

@@ -231,8 +231,11 @@ if (indexedDB)
 						return false;
 					}
 				}
-				maxaction = localStorage[u_handle + '_maxaction'];
-				getsc(1);
+				maxaction = localStorage[u_handle + '_maxaction'];				
+				var a=0;
+				for (var i in M.d) a++;				
+				if (!maxaction || a == 0) mDBreload();
+				else getsc(1);
 			}
 		};
 	}

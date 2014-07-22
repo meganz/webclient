@@ -3048,7 +3048,7 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-tree-folder {
 	display: block;
 	margin-left: 22px;
-	padding-left: 25px;
+	padding-left: 24px;
 	white-space: nowrap;
 	cursor: default;
 	font-size: 11px;
@@ -4726,97 +4726,97 @@ table {
 	display: none;
 }
 .transfer-filtype-icon.word, .search-path-icon-span.word {
-	background-position: -62px 3px;
+	background-position: -62px 4px;
 }
 .transfer-filtype-icon.web-lang, .search-path-icon-span.web-lang {
-	background-position: -62px -37px;
+	background-position: -62px -36px;
 }
 .transfer-filtype-icon.web-data, .search-path-icon-span.web-data {
-	background-position: -62px -77px;
+	background-position: -62px -76px;
 }
 .transfer-filtype-icon.video, .search-path-icon-span.video {
-	background-position: -62px -117px;
+	background-position: -62px -116px;
 }
 .transfer-filtype-icon.video-vob, .search-path-icon-span.video-vob {
-	background-position: -62px -157px;
+	background-position: -62px -156px;
 }
 .transfer-filtype-icon.video-subtitles, .search-path-icon-span.video-subtitles {
-	background-position: -62px -197px;
+	background-position: -62px -196px;
 }
 .transfer-filtype-icon.vector, .search-path-icon-span.vector {
-	background-position: -62px -237px;
+	background-position: -62px -236px;
 }
 .transfer-filtype-icon.vcard, .search-path-icon-span.vcard {
-	background-position: -62px -277px;
+	background-position: -62px -276px;
 }
 .transfer-filtype-icon.torrent, .search-path-icon-span.torrent {
-	background-position: -62px -317px;
+	background-position: -62px -316px;
 }
 .transfer-filtype-icon.text, .search-path-icon-span.text {
-	background-position: -62px -357px;
+	background-position: -62px -356px;
 }
 .transfer-filtype-icon.swf, .search-path-icon-span.swf {
-	background-position: -62px -397px;
+	background-position: -62px -396px;
 }
 .transfer-filtype-icon.spreadsheet, .search-path-icon-span.spreadsheet {
-	background-position: -62px -437px;
+	background-position: -62px -436px;
 }
 .transfer-filtype-icon.sourcecode, .search-path-icon-span.sourcecode {
-	background-position: -62px -477px;
+	background-position: -62px -476px;
 }
 .transfer-filtype-icon.real-audio, .search-path-icon-span.real-audio {
-	background-position: -62px -517px;
+	background-position: -62px -516px;
 }
 .transfer-filtype-icon.raw, .search-path-icon-span.raw {
-	background-position: -62px -557px;
+	background-position: -62px -556px;
 }
 .transfer-filtype-icon.premiere, .search-path-icon-span.premiere {
-	background-position: -62px -597px;
+	background-position: -62px -596px;
 }
 .transfer-filtype-icon.powerpoint, .search-path-icon-span.powerpoint {
-	background-position: -62px -637px;
+	background-position: -62px -636px;
 }
 .transfer-filtype-icon.podcast, .search-path-icon-span.podcast {
-	background-position: -62px -677px;
+	background-position: -62px -676px;
 }
 .transfer-filtype-icon.playlist, .search-path-icon-span.playlist {
-	background-position: -62px -717px;
+	background-position: -62px -716px;
 }
 .transfer-filtype-icon.photoshop, .search-path-icon-span.photoshop {
-	background-position: -62px -757px;
+	background-position: -62px -756px;
 }
 .transfer-filtype-icon.pdf, .search-path-icon-span.pdf {
-	background-position: -62px -797px;
+	background-position: -62px -796px;
 }
 .transfer-filtype-icon.midi, .search-path-icon-span.midi {
-	background-position: -62px -837px;
+	background-position: -62px -836px;
 }
 .transfer-filtype-icon.java, .search-path-icon-span.java {
-	background-position: -62px -877px;
+	background-position: -62px -876px;
 }
 .transfer-filtype-icon.indesign, .search-path-icon-span.indesign {
-	background-position: -62px -917px;
+	background-position: -62px -916px;
 }
 .transfer-filtype-icon.image, .search-path-icon-span.image {
-	background-position: -62px -957px;
+	background-position: -62px -956px;
 }
 .transfer-filtype-icon.illustrator, .search-path-icon-span.illustrator {
-	background-position: -62px -997px;
+	background-position: -62px -996px;
 }
 .transfer-filtype-icon.html, .search-path-icon-span.html {
-	background-position: 0 -624px;
+	background-position: -62px -1036px;
 }
 .transfer-filtype-icon.graphic, .search-path-icon-span.graphic {
-	background-position: -62px -1077px;
+	background-position: -62px -1076px;
 }
 .transfer-filtype-icon.gis, .search-path-icon-span.gis {
-	background-position: -62px -1117px;
+	background-position: -62px -1116px;
 }
 .transfer-filtype-icon.generic, .search-path-icon-span.generic {
-	background-position: -62px -1157px;
+	background-position: -62px -1156px;
 }
 .transfer-filtype-icon.font, .search-path-icon-span.font {
-	background-position: -62px -1197px;
+	background-position: -62px -1196px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -4833,49 +4833,49 @@ table {
 	background-position: -14px -7625px;
 }
 .transfer-filtype-icon.flash, .search-path-icon-span.flash {
-	background-position: -62px -1317px;
+	background-position: -62px -1316px;
 }
 .transfer-filtype-icon.flash-video, .search-path-icon-span.flash-video {
-	background-position: -62px -1357px;
+	background-position: -62px -1356px;
 }
 .transfer-filtype-icon.fla-lang, .search-path-icon-span.fla-lang {
-	background-position: -62px -1397px;
+	background-position: -62px -1396px;
 }
 .transfer-filtype-icon.executable, .search-path-icon-span.executable {
-	background-position: -62px -1437px;
+	background-position: -62px -1436px;
 }
 .transfer-filtype-icon.excel, .search-path-icon-span.excel {
-	background-position: -62px -1477px;
+	background-position: -62px -1476px;
 }
 .transfer-filtype-icon.dreamweaver, .search-path-icon-span.dreamweaver {
-	background-position: -62px -1517px;
+	background-position: -62px -1516px;
 }
 .transfer-filtype-icon.database, .search-path-icon-span.database {
-	background-position: -62px -1557px;
+	background-position: -62px -1556px;
 }
 .transfer-filtype-icon.compressed, .search-path-icon-span.compressed {
-	background-position: -62px -1597px;
+	background-position: -62px -1596px;
 }
 .transfer-filtype-icon.cad, .search-path-icon-span.cad {
-	background-position: -62px -1637px;
+	background-position: -62px -1636px;
 }
 .transfer-filtype-icon.audio, .search-path-icon-span.audio {
-	background-position: -62px -1677px;
+	background-position: -62px -1676px;
 }
 .transfer-filtype-icon.aftereffects, .search-path-icon-span.aftereffects {
-	background-position: -62px -1717px;
+	background-position: -62px -1716px;
 }
 .transfer-filtype-icon.threed, .search-path-icon-span.threed {
-	background-position: -62px -1757px;
+	background-position: -62px -1756px;
 }
 .transfer-filtype-icon.win-folder, .search-path-icon-span.win-folder {
-	background-position: -62px -1797px;
+	background-position: -62px -1796px;
 }
 .transfer-filtype-icon.apple-folder, .search-path-icon-span.apple-folder {
-	background-position: -62px -1837px;
+	background-position: -62px -1836px;
 }
 .transfer-filtype-icon.photo-folder, .search-path-icon-span.photo-folder {
-	background-position: -62px -1837px;
+	background-position: -62px -1836px;
 }
 .block-view-file-type {
 	width: 74px;
@@ -5342,7 +5342,7 @@ table {
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
 	height: 24px;
-	padding: 0 0 0 25px;
+	padding: 0 0 0 23px;
 	word-break: break-all;
 	white-space: pre-wrap;
 	display: block;

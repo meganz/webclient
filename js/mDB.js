@@ -232,9 +232,12 @@ if (indexedDB)
 					}
 				}
 				maxaction = localStorage[u_handle + '_maxaction'];				
-				var a=0;
-				for (var i in M.d) a++;				
-				if (!maxaction || a == 0) mDBreload();
+				for (var i in M.d) 
+				{
+					var entries=true;
+					break;
+				}
+				if (!maxaction || typeof entries == 'undefined') mDBreload();
 				else getsc(1);
 			}
 		};

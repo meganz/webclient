@@ -31,7 +31,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
                     karere.reconnect();
                 })
                 .fail(function() {
-                    karere.connection.disconnect(); // force disconnect
+                    karere.connection._doDisconnect(); // force disconnect
                     karere.reconnect();
                 });
         }, karere._connectionRetries * 1000)

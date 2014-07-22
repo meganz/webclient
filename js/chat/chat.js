@@ -289,9 +289,9 @@ var MegaChat = function() {
     this.currentlyOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
 
-    var xmppDomain = "sandbox.developers.mega.co.nz";
-    if(localStorage.megaChatCluster) {
-        xmppDomain = "developers.mega.co.nz";
+    var xmppDomain = "developers.mega.co.nz";
+    if(localStorage.megaChatUseSandbox) {
+        xmppDomain = "sandbox.developers.mega.co.nz";
     }
 
     this.options = {
@@ -331,14 +331,14 @@ var MegaChat = function() {
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
                 {
-                    url: 'turn:j100.server.lu:3478?transport=udp',
-                    username: "alex",
-                    credential: 'alexsecret'
+                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:j100.server.lu:3478?transport=tcp',
-                    username: "alex",
-                    credential: 'alexsecret'
+                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
                 }
             ]
         },
@@ -1709,10 +1709,10 @@ MegaChat.prototype.getBoshServiceUrl = function() {
         num = "0" + num;
     }
 
-    if(localStorage.megaChatCluster) {
-        return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
-    } else {
+    if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
+    } else {
+        return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
     }
 };
 
@@ -2331,7 +2331,7 @@ MegaChatRoom.prototype._cancelCallRequest = function() {
 
         self._resetCallStateNoCall();
     }
-    self.megaChat.karere.connection.rtc.hangup();
+    self.megaChat.rtc.hangup();
 };
 
 MegaChatRoom.prototype._startCall = function() {
@@ -3723,6 +3723,8 @@ MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     var pluginsForceQueue = false;
 
     $.each(self.megaChat.plugins, function(k) {
+        console.log(k);
+
         if(self.megaChat.plugins[k].shouldQueueMessage) {
             if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
                 pluginsForceQueue = true;
@@ -3732,7 +3734,7 @@ MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     });
 
     return pluginsForceQueue;
-}
+};
 
 /**
  * Send message to this room

@@ -817,6 +817,24 @@ function fmremove()
 function initContextUI()
 {
 	var c = '.context-menu-item';
+	
+	//TODO: Create logic for submenues positions in context menu
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover',function()
+	{   
+	    var s = $(this).children('.context-submenu').eq(0);
+		$(this).find('.context-submenu').removeClass('left-position');
+		s.addClass('active');
+		var rpos = $(window).width() - $(vv).offset().left - $(vv).width();
+		if (rpos < 20) $(this).find('.context-submenu').addClass('left-position');
+	});
+	$(c+'.contains-submenu').unbind('mouseout');
+	$(c+'.contains-submenu').bind('mouseout',function()
+	{
+		$(this).find('.context-submenu').removeClass('active');
+	});
+	
+	
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
 	{

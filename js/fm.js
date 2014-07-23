@@ -143,6 +143,9 @@ function hideEmptyMsg()
 	$('.fm-empty-search').addClass('hidden');
 	$('.fm-empty-cloud').addClass('hidden');
 	$('.fm-empty-messages').addClass('hidden');
+	
+	$('.fm-empty-conversations').addClass('hidden');
+	$('.fm-empty-incoming').addClass('hidden');
 }
 
 
@@ -586,6 +589,8 @@ function searchFM()
 
 function removeUInode(h)
 {
+	console.log('removeUInode',h);
+
 	var n = M.d[h];
 	var i=0;
 	// check subfolders
@@ -625,8 +630,11 @@ function removeUInode(h)
 			}
 			break;
 		case "contacts":
-			//Clear left panel
+			//Clear left panel:
 			$('#contact_' + h).remove();
+			// clear the contacts grid:
+			$('.contacts-grid-view #' + h).remove();			
+			// TODO: remove from conversations?
 			if (!hasItems)
 			{
 				$('.contacts-grid-view .contacts-grid-header tr').remove();
@@ -809,6 +817,24 @@ function fmremove()
 function initContextUI()
 {
 	var c = '.context-menu-item';
+	
+	//TODO: Create logic for submenues positions in context menu
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover',function()
+	{   
+	    var s = $(this).children('.context-submenu').eq(0);
+		$(this).find('.context-submenu').removeClass('left-position');
+		s.addClass('active');
+		var rpos = $(window).width() - $(s).offset().left - $(s).width();
+		if (rpos < 20) $(this).find('.context-submenu').addClass('left-position');
+	});
+	$(c+'.contains-submenu').unbind('mouseout');
+	$(c+'.contains-submenu').bind('mouseout',function()
+	{
+		$(this).find('.context-submenu').removeClass('active');
+	});
+	
+	
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
 	{

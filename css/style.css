@@ -4395,11 +4395,6 @@ th.grid-first-th {
 	width: 45px;
 }
 .grid-table td {
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
 	background-color: rgba(238,238,238,0);
 }
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
@@ -4407,6 +4402,14 @@ th.grid-first-th {
 }
 .fm-account-main .grid-table tr:nth-child(odd) td {
 	background-color: white;
+}
+.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .grid-table tr:hover:nth-child(odd) td, .grid-share-table tr:hover:nth-child(odd) td, .contacts-grid-table tr:hover:nth-child(odd) td, .transfer-table tr:hover:nth-child(odd) td, .transfer-table tr:hover td {
+	background-color: rgba(0,0,0,0.035);
+	-webkit-transition: background-color 100ms ease-in-out;
+	-moz-transition: background-color 100ms ease-in-out;
+	-o-transition: background-color 100ms ease-in-out;
+	-ms-transition: background-color 100ms ease-in-out;
+	transition: background-color 100ms ease-in-out;
 }
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(238,238,238,1);
@@ -4497,11 +4500,6 @@ th.grid-first-th {
 	position: relative;
 	cursor: default;
 	background-color: rgba(0,0,0,0.05);
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
 }
 .file-icon-area {
 	width: 120px;
@@ -4520,11 +4518,19 @@ th.grid-first-th {
 	width: 140px;
 	height: 160px;
 }
+.file-block:hover, .contact-block-view:hover {
+	background-color: rgba(0,0,0,0.07);
+	-webkit-transition: background-color 100ms ease-in-out;
+	-moz-transition: background-color 100ms ease-in-out;
+	-o-transition: background-color 100ms ease-in-out;
+	-ms-transition: background-color 100ms ease-in-out;
+	transition: background-color 100ms ease-in-out;
+}
 .file-block.ui-selected, .contact-block-view.ui-selected, .file-block.ui-selecting, .contact-block-view.ui-selecting {
 	background-color: rgba(0,0,0,0.1);
 }
 .file-block.dragover, .contact-block-view.dragover {
-	background-color: rgba(0,0,0,0.07);
+	background-color: rgba(0,0,0,0.075);
 }
 .file-block img, .contact-block-view img {
 	border: 0;
@@ -5856,13 +5862,22 @@ span.search-number {
 	background-position: 10px -4847px;
 	cursor: pointer;
 }
+.context-menu-item.contains-submenu {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: right -4593px;
+	background-repeat: no-repeat;
+}
+.context-menu-item.contains-submenu:hover {
+	background-position: right -4763px;
+	color: white;
+}
 .context-menu-item.hidden {
 	display: none;
 }
 .contacts-sorting-by, .contacts-sorting-type {
 	background-position: 0 -4847px;
 }
-.contacts-sorting-by:hover, .contacts-sorting-type:hover, .context-menu-item:hover {
+.contacts-sorting-by:hover, .contacts-sorting-type:hover {
 	background-color: #d11e00;
 	color: white;
 }
@@ -8927,7 +8942,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .active .properties-contacts-popup {
 	display: block;
 }
-.top-menu-popup, .top-submenu-popup, .top-user-status-popup, .membership-popup, .top-login-popup, .top-warning-popup {
+.top-menu-popup, .top-submenu-popup, .top-user-status-popup, .membership-popup, .top-login-popup, .top-warning-popup, .context-submenu {
 	min-width: 170px;
 	position: absolute;
 	background-color: white;
@@ -8958,7 +8973,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	margin-left: -10000px;
 	margin-right: -10000px;
 }
-.top-menu-popup.active, .top-submenu-popup.active, .top-user-status-popup.active, .membership-popup.active, .top-login-popup.active, .top-warning-popup.active, .notification-popup.active, .warning-popup.active {
+.top-menu-popup.active, .top-submenu-popup.active, .top-user-status-popup.active, .membership-popup.active, .top-login-popup.active, .top-warning-popup.active, .notification-popup.active, .warning-popup.active, .context-submenu.active {
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
@@ -9013,7 +9028,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 }
-.top-menu-popup, .top-submenu-popup, .top-user-status-popup {
+.top-menu-popup, .top-submenu-popup, .top-user-status-popup, .context-submenu {
 	background-color: #333333;
 	font-size: 12px;
 	color: #CCCCCC;
@@ -9328,7 +9343,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	right: 34px;
 }
 }
-.top-submenu-popup {
+.top-submenu-popup, .context-submenu {
 	top: 0;
 	right: 90%;
 	-moz-border-radius: 8px;
@@ -9346,8 +9361,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-ms-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
 	display: block;
-	margin-right: -600px;
+	margin-right: -10600px;
 	margin-left: 0;
+}
+.context-submenu {
+	border-left: 2px solid transparent;
+	left: 100%;
+	right: auto;
+}
+.context-submenu.left-position {
+	border-right: 2px solid transparent;
+	left: auto;
+	right: 100%;
+}
+.context-submenu .context-menu-item {
+	display: block !important;
 }
 .top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
@@ -9416,22 +9444,32 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	color: #cccccc;
 	white-space: nowrap;
 	background-color: rgba(255,255,255,0);
-	-webkit-transition: all 200ms ease-in-out;
-	-moz-transition: all 200ms ease-in-out;
-	-o-transition: all 200ms ease-in-out;
-	-ms-transition: all 200ms ease-in-out;
-	transition: all 200ms ease-in-out;
+	-webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+	cursor: pointer;
 }
 .context-menu-item {
 	padding: 0 15px 0 42px;
 	color: rgba(204,204,204,1);
 }
 .context-menu-item:hover, .context-menu-item.active {
-	background-color: rgba(255,255,255,0.1);
+	background-color: rgba(153,153,153,1);
 	color: rgba(255,255,255,1);
+}
+.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover {
+	background-color: rgba(220,0,0,1);
+}
+.context-menu-item.getlink-item:hover, .context-menu-item.sharing-item:hover {
+	background-color: rgba(255,179,0,1);
+}
+.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover {
+	background-color: rgba(49,181,0,1);
 }
 .context-menu-item .context-menu-icon, .context-menu-points {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -9451,6 +9489,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
+}
+.context-menu-item.contains-submenu {
+	padding-right: 25px;
+}
+.context-menu-item:hover > .context-menu-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .context-menu-points {
 	width: 28px;
@@ -9486,20 +9533,11 @@ table {
 	top: auto;
 	bottom: 4px;
 }
-.context-menu-item:hover .context-menu-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
 .open-item .context-menu-icon {
 	background-position: -3px -4633px;
 }
 .download-item .context-menu-icon {
 	background-position: -3px -5212px;
-}
-.folder-item .context-menu-icon {
-	background-position: -3px -4556px;
 }
 .download-standart-item .context-menu-icon {
 	background-position: -3px -4694px;
@@ -9526,7 +9564,10 @@ table {
 	background-position: -3px -4416px;
 }
 .copy-item .context-menu-icon {
-	background-position: -3px -4448px;
+	background-position: -2px -4448px;
+}
+.folder-item .context-menu-icon {
+	background-position: -3px -4556px;
 }
 .newfolder-item .context-menu-icon {
 	background-position: -3px -5160px;
@@ -9538,7 +9579,7 @@ table {
 	background-position: -3px -5250px;
 }
 .removeshare-item .context-menu-icon, .remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
-	background-position: -3px -4519px;
+	background-position: -3px -4479px;
 }
 .properties-item .context-menu-icon {
 	background-position: -3px -4240px;
@@ -9571,7 +9612,7 @@ table {
 	background-position: 4px -3716px;
 }
 .refresh-item .context-menu-icon {
-	background-position: 4px -3756px;
+	background-position: -3px -4519px;
 }
 .select-all .context-menu-icon {
 	background-position: -3px -5290px;
@@ -9623,7 +9664,7 @@ table {
 	color: rgba(255,255,255,1);
 	background-color: rgba(19,224,60,1);
 }
-.top-menu-item:hover, .top-menu-item.active, .context-menu-item:hover, .context-menu-item.active, .top-user-status-item:hover {
+.top-menu-item:hover, .top-menu-item.active, .top-user-status-item:hover {
 	background-color: rgba(255,255,255,0.1);
 	color: #CCCCCC;
 }

@@ -586,6 +586,8 @@ function searchFM()
 
 function removeUInode(h)
 {
+	console.log('removeUInode',h);
+
 	var n = M.d[h];
 	var i=0;
 	// check subfolders
@@ -625,8 +627,11 @@ function removeUInode(h)
 			}
 			break;
 		case "contacts":
-			//Clear left panel
+			//Clear left panel:
 			$('#contact_' + h).remove();
+			// clear the contacts grid:
+			$('.contacts-grid-view #' + h).remove();			
+			// TODO: remove from conversations?
 			if (!hasItems)
 			{
 				$('.contacts-grid-view .contacts-grid-header tr').remove();

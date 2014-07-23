@@ -4395,11 +4395,6 @@ th.grid-first-th {
 	width: 45px;
 }
 .grid-table td {
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
 	background-color: rgba(238,238,238,0);
 }
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
@@ -4407,6 +4402,14 @@ th.grid-first-th {
 }
 .fm-account-main .grid-table tr:nth-child(odd) td {
 	background-color: white;
+}
+.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .grid-table tr:hover:nth-child(odd) td, .grid-share-table tr:hover:nth-child(odd) td, .contacts-grid-table tr:hover:nth-child(odd) td, .transfer-table tr:hover:nth-child(odd) td, .transfer-table tr:hover td {
+	background-color: rgba(0,0,0,0.035);
+	-webkit-transition: background-color 100ms ease-in-out;
+	-moz-transition: background-color 100ms ease-in-out;
+	-o-transition: background-color 100ms ease-in-out;
+	-ms-transition: background-color 100ms ease-in-out;
+	transition: background-color 100ms ease-in-out;
 }
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(238,238,238,1);
@@ -4497,11 +4500,6 @@ th.grid-first-th {
 	position: relative;
 	cursor: default;
 	background-color: rgba(0,0,0,0.05);
-	-webkit-transition: background-color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out;
 }
 .file-icon-area {
 	width: 120px;
@@ -4520,11 +4518,19 @@ th.grid-first-th {
 	width: 140px;
 	height: 160px;
 }
+.file-block:hover, .contact-block-view:hover {
+	background-color: rgba(0,0,0,0.07);
+	-webkit-transition: background-color 100ms ease-in-out;
+	-moz-transition: background-color 100ms ease-in-out;
+	-o-transition: background-color 100ms ease-in-out;
+	-ms-transition: background-color 100ms ease-in-out;
+	transition: background-color 100ms ease-in-out;
+}
 .file-block.ui-selected, .contact-block-view.ui-selected, .file-block.ui-selecting, .contact-block-view.ui-selecting {
 	background-color: rgba(0,0,0,0.1);
 }
 .file-block.dragover, .contact-block-view.dragover {
-	background-color: rgba(0,0,0,0.07);
+	background-color: rgba(0,0,0,0.075);
 }
 .file-block img, .contact-block-view img {
 	border: 0;

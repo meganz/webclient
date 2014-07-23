@@ -708,6 +708,16 @@ else
                         document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
                 }
             }
+
+            for (var k in jsl2)
+            {
+                if (jsl2[k].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl2[k].f + '?r=' + Math.random() + '"></sc' + 'ript>');
+                else if (jsl2[k].j === 2)
+                {
+                    if ((m && (jsl2[k].m)) || ((!m) && (jsl2[k].d)))
+                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl2[k].f + '" />');
+                }
+            }
         }
 
         var pages = [], scripts = {};

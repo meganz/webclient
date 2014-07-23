@@ -2932,9 +2932,6 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
             }
             var $element = $('.nw-conversations-item[data-jid="' + v + '"]');
             $element.attr("data-room-jid", self.roomJid.split("@")[0]);
-
-            var $element2 = $('.nw-contact-item#contact_' + self.megaChat.getContactFromJid(v).u);
-            $element2.attr("data-room-jid", self.roomJid.split("@")[0]);
         });
     }
 
@@ -3705,7 +3702,7 @@ MegaChatRoom.prototype.getNavElement = function() {
     var self = this;
 
     if(self.type == "private") {
-        return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"], .nw-contact-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
+        return $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
     } else {
         throw new Error("Not implemented.");
     }

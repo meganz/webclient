@@ -616,11 +616,10 @@ function removeUInode(h)
 		case M.RootID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
-//			$('#treea_' + h).remove();
-//			$('#treesub_' + h).remove();
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{
+				$('.files-grid-view').addClass('hidden');
 				$('.grid-table.fm tr').remove();
 				$('.fm-empty-cloud').removeClass('hidden');
 			}
@@ -656,8 +655,6 @@ function removeUInode(h)
 		case M.RubbishID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
-//			$('#treea_' + h).remove();
-//			$('#treesub_' + h).remove();
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{
@@ -3645,6 +3642,7 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');	
 	if (id !== 'conversations') $('.fm-right-header.fm').removeClass('hidden');
+	if (id !== 'cloud-drive') $('.files-grid-view').addClass('hidden');
 	
 	var headertxt = '';
 	switch(id)

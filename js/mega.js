@@ -521,7 +521,7 @@ function MegaData ()
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		this.buildtree({h:M.RubbishID});
-		this.contacts();		
+		this.contacts();	
 		treeUI();
         if(MegaChatEnabled) {
             megaChat.renderContactTree();
@@ -663,7 +663,8 @@ function MegaData ()
 	this.contacts = function()
 	{
 		var contacts = [];
-		for (var i in M.u) if (M.u[i].c) contacts.push(M.u[i]);
+		for (var i in M.c['contacts']) contacts.push(M.d[i]);
+		
 		if (localStorage.csort) this.csort = localStorage.csort;
 		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
 		if (this.csort == 'shares')
@@ -693,6 +694,7 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
+			
 			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
 			
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';

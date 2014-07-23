@@ -825,7 +825,7 @@ function initContextUI()
 	    var s = $(this).children('.context-submenu').eq(0);
 		$(this).find('.context-submenu').removeClass('left-position');
 		s.addClass('active');
-		var rpos = $(window).width() - $(vv).offset().left - $(vv).width();
+		var rpos = $(window).width() - $(s).offset().left - $(s).width();
 		if (rpos < 20) $(this).find('.context-submenu').addClass('left-position');
 	});
 	$(c+'.contains-submenu').unbind('mouseout');

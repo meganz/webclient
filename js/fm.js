@@ -143,6 +143,9 @@ function hideEmptyMsg()
 	$('.fm-empty-search').addClass('hidden');
 	$('.fm-empty-cloud').addClass('hidden');
 	$('.fm-empty-messages').addClass('hidden');
+	
+	$('.fm-empty-conversations').addClass('hidden');
+	$('.fm-empty-incoming').addClass('hidden');
 }
 
 

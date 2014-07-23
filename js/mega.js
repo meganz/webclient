@@ -313,6 +313,7 @@ function MegaData ()
 			else if (M.currentdirid.substr(0,7) == 'search/') $('.fm-empty-search').removeClass('hidden');
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
+			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 		}
 
 		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;

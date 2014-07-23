@@ -4426,6 +4426,12 @@ Strophe.Bosh.prototype = {
                         }
                     }
                 }
+                if(req.abort === true) {
+                    Strophe.error("_processRequest - sendFunc: req send was aborted " +
+                        " request has readyState of " +
+                        req.xhr.readyState + ", request content: " + req.data);
+                    return; // this request was aborted while the setTimeout was retrying to send the request
+                }
                 req.xhr.send(req.data);
             };
 

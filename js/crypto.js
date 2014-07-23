@@ -2698,7 +2698,7 @@ function getPubEd25519(userhandle, callback)
 				{
 
 				    pubEd25519[ctx.u] = base64urldecode(res);
-                    pubEd25519Cache.setItem(ctx.u, pubEd25519[ctx.u]);
+                    pubEd25519Cache.setItem(ctx.u, pubEd25519[ctx.u], 24*60*60);
 					ctx.callback2(pubEd25519[ctx.u], ctx.u);
 				}
 				else if (ctx.callback2)
@@ -2735,9 +2735,7 @@ function getPubk(userhandle, callback) {
     {
         api_cachepubkeys({
             cachepubkeyscomplete : function() {
-                pubkeysCache.setItem(userhandle, JSON.stringify(u_pubkeys[userhandle]));
-
-                console.error("pbk cache set: ", userhandle, u_pubkeys[userhandle]);
+                pubkeysCache.setItem(userhandle, JSON.stringify(u_pubkeys[userhandle]), 24*60*60);
 
                 callback(u_pubkeys[userhandle]);
             }

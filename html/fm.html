@@ -19,9 +19,13 @@
     <div class="context-menu-divider"></div>
   </div>
   <div class="context-menu-section">
-    <a class="context-menu-item download-item"><span class="context-menu-icon"></span>[$58]...</a>
-    <a class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</a>
-    <a class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</a>
+    <a class="context-menu-item download-item contains-submenu">
+      <span class="context-menu-icon"></span>[$58]...
+      <span class="context-submenu">
+            <span class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</span>
+            <span class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</span>
+      </span>
+    </a>
     <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>Send to contact</a>
     <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
     <a class="context-menu-item sharing-item"><span class="context-menu-icon"></span>[$60]</a>
@@ -30,7 +34,20 @@
   </div>
   <div class="context-menu-section">
     <a class="context-menu-item rename-item"><span class="context-menu-icon"></span>[$61]</a>
-    <a class="context-menu-item move-item"><span class="context-menu-icon"></span>[$62]...</a>
+    <a class="context-menu-item move-item contains-submenu">
+      <span class="context-menu-icon"></span>[$62]...
+      <span class="context-submenu">
+            <span class="context-menu-item folder-item contains-submenu">
+              <span class="context-menu-icon"></span>Folder1
+              <span class="context-submenu">
+                 <span class="context-menu-item folder-item">
+                    <span class="context-menu-icon"></span>Folder3
+                 </span>
+              </span>
+            </span>
+            <span class="context-menu-item folder-item"><span class="context-menu-icon"></span>Folder2</span>
+      </span>
+    </a>
     <a class="context-menu-item copy-item"><span class="context-menu-icon"></span>[$63]</a>
     <a class="context-menu-item newfolder-item"><span class="context-menu-icon"></span>[$68]</a>
     <a class="context-menu-item fileupload-item"><span class="context-menu-icon"></span>[$99]</a>
@@ -698,6 +715,21 @@
         <div class="fm-empty-cloud-txt">[$981]</div>
     </div>
 </div>
+
+
+<div class="fm-empty-incoming hidden">
+    <div class="fm-empty-pad">
+        <div class="fm-empty-cloud-bg"></div>
+        <div class="fm-empty-cloud-txt">You have no incoming shares</div>
+    </div>
+</div>
+<div class="fm-empty-conversations hidden">
+    <div class="fm-empty-pad">
+        <div class="fm-empty-cloud-bg"></div>
+        <div class="fm-empty-cloud-txt">You have no conversations</div>
+    </div>
+</div>
+
 <div class="files-grid-view hidden">
     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
         <tr>

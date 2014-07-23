@@ -242,8 +242,14 @@ if (indexedDB)
 						return false;
 					}
 				}
-				maxaction = localStorage[u_handle + '_maxaction'];
-				getsc(1);
+				maxaction = localStorage[u_handle + '_maxaction'];				
+				for (var i in M.d) 
+				{
+					var entries=true;
+					break;
+				}
+				if (!maxaction || typeof entries == 'undefined') mDBreload();
+				else getsc(1);
 			}
 		};
 	}

@@ -7860,6 +7860,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
+	min-width:80px;
 }
 .multiple-sharing.expanded .main-body .nw-chat-button, .nw-chat-button {
 	height: 24px;
@@ -8038,6 +8039,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-dialog-button.quota-upgrade-button.active, .fm-dialog-button.quota-upgrade-button.active:hover, .fm-dialog-button.fm-terms-agree.active:hover {
 	color: white;
 	cursor: pointer;
+}
+.confirmation-checkbox {
+	margin: -5px 0 0-16px;
 }
 .fm-dialog-button.add-contact-button, .fm-dialog-button.cancel-contact-button {
 	height: 32px;

@@ -547,6 +547,8 @@ FileUpload.prototype.run = function(done) {
 		return ulQueue.pushFirst(this);
 	}
 
+	file.started = true;
+
 	DEBUG(file.name, "starting upload", file.id)
 
 	start_uploading = true;

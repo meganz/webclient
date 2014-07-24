@@ -3361,6 +3361,9 @@ function transferPanelUI()
 			ulQueue.pause();
 			ui_paused = true;
 
+			$('.tranfer-download-indicator,.tranfer-upload-indicator')
+				.text('PAUSED');
+
 			/* Set all files, in both ul_queue
 			   and dl_queue as paused */
 			var q = [dl_queue, ul_queue];
@@ -3372,7 +3375,7 @@ function transferPanelUI()
 				}
 			}
 
-			$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+			$('.transfer-table tr td:eq(3)').each(function()
 			{
 				$(this).text('');
 			});

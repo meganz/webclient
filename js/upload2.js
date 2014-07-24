@@ -365,7 +365,7 @@ function ChunkUpload(file, start, end)
 }
 
 ChunkUpload.prototype.updateprogress = function() {
-	if (this.file.complete || ui_paused) return;
+	if (this.file.paused || this.file.complete || ui_paused) return;
 
 	var tp = this.file.sent || 0, p=this.file.progress;
 	for (var i in p) tp += p[i];

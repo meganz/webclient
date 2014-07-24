@@ -967,6 +967,33 @@ function initContextUI()
 		addContactDialog();
 		if (d) console.log('addcontact');	
 	});
+
+	$(c+'.transfer-play').unbind('click');
+	$(c+'.transfer-play').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			fileIdToObject($(this).attr('id'))
+				.paused = false;
+		});
+	});
+
+	$(c+'.transfer-pause').unbind('click');
+	$(c+'.transfer-pause').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			fileIdToObject($(this).attr('id'))
+				.paused = true;
+		});
+	});
+
+	$(c+'.tranfer-clear').unbind('click');
+	$(c+'.tranfer-clear').bind('click',function(event) 
+	{
+		$('.transfer-table span.completed')
+			.each(function() {
+				$(this).parents('tr').fadeOut();
+			});
+	});
 	
 	$(c+'.refresh-item').unbind('click');
 	$(c+'.refresh-item').bind('click',function(event) 

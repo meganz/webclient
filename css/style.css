@@ -5755,7 +5755,7 @@ span.search-number {
 	opacity: 0.05;
 	cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -5790,49 +5790,61 @@ span.search-number {
 	height: 264px;
 	margin-top: -132px;
 }
-.fm-empty-folder .fm-empty-pad {
+.fm-empty-folder .fm-empty-pad, .fm-empty-incoming .fm-empty-pad {
 	height: 266px;
 	margin-top: -133px;
 }
-.fm-empty-cloud-bg {
-	height: 206px;
+.fm-empty-conversations .fm-empty-pad {
+	height: 286px;
+	margin-top: -142px;
+}
+.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-contacts-bg, .fm-empty-messages-bg {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 	background-image: url(../images/mega/empty.png);
-	background-position: center top;
 	background-repeat: no-repeat;
 }
-.fm-empty-folder-bg {
-	height: 209px;
-	background-image: url(../images/mega/empty.png);
-	background-position: center -1720px;
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg {
+	background-image: url(../images/mega/empty-sprite.svg);
 	background-repeat: no-repeat;
+}
+.fm-empty-cloud-bg {
+	height: 206px;
+	background-position: center -300px;
 }
 .fm-empty-search-bg {
 	height: 249px;
-	background-image: url(../images/mega/empty.png);
 	background-position: center -290px;
-	background-repeat: no-repeat;
 }
 .fm-empty-trashbin-bg {
 	height: 233px;
-	background-image: url(../images/mega/empty.png);
 	background-position: center -640px;
-	background-repeat: no-repeat;
 }
 .fm-empty-contacts-bg {
 	height: 186px;
-	background-image: url(../images/mega/empty.png);
 	background-position: center -990px;
-	background-repeat: no-repeat;
 }
 .fm-empty-messages-bg {
 	height: 207px;
-	background-image: url(../images/mega/empty.png);
 	background-position: center -1352px;
-	background-repeat: no-repeat;
+}
+.fm-empty-folder-bg {
+	height: 210px;
+	background-position: center -589px;
+}
+.fm-empty-conversations-bg {
+	height: 229px;
+	background-position: center top;
+}
+.fm-empty-incoming-bg {
+	height: 210px;
+	background-position: center -879px;
 }
 .fm-empty-cloud-txt {
-	color: #7A7E7F;
-	font-size: 22px;
+	color: #CCCCCC;
+	font-size: 30px;
 	line-height: 38px;
 	text-align: center;
 	margin-top: 20px;
@@ -7860,7 +7872,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
-	min-width:80px;
+	min-width: 80px;
 }
 .multiple-sharing.expanded .main-body .nw-chat-button, .nw-chat-button {
 	height: 24px;
@@ -17013,7 +17025,7 @@ background-size: 36px auto;
  background-position:center -50px;
  background-size:60px auto;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-contacts-bg, .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-contacts-bg, .fm-empty-messages-bg {
 background-image: url(../images/mega/empty@2x.png);
  background-size: 300px auto;
 }

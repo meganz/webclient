@@ -431,7 +431,7 @@ ZipWriter.prototype.destroy = function(error) {
 		delete GlobalProgress['zip_' + dl.zipid];
 		if (error || this.cancelled) {
 			if (this.io.abort) this.io.abort(error || this);
-		 - (2* (file.p + file.n).length)}
+		} 
 		else if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 		oDestroy(this);
 	}

@@ -5441,7 +5441,7 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() - 10 /* padding */;
+    var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() ;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({
         'height': right_blocks_height + "px",
         'min-height': right_blocks_height + "px"

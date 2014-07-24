@@ -307,6 +307,8 @@ ClassFile.prototype.run = function(task_done) {
 	fetchingFile = 1;
 	this.dl.retries = 0; /* set the retries flag */
 
+	this.dl.started = true;
+
 	DEBUG("dl_key " + this.dl.key);
 	if (!GlobalProgress[this.gid].started) {
 		GlobalProgress[this.gid].started = true;

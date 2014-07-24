@@ -1904,6 +1904,7 @@ function MegaData ()
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(6)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #' + id + ' td:eq(3)').text('');
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
@@ -2123,6 +2124,7 @@ function MegaData ()
 			$('#mobileupload_header').text(l[554]);
 		}
 		$('.transfer-table #ul_' + id + ' td:eq(6)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
 		if (a < 2 && !downloading)

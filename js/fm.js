@@ -528,7 +528,28 @@ function openTransferpanel()
 		e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
 		e.currentTarget = target;
 		$('.context-menu.files-menu .context-menu-item').hide();
-		$('.context-menu.files-menu .context-menu-item').filter('.refresh-item,.canceltransfer-item').show();
+		var menuitems = $('.context-menu.files-menu .context-menu-item')
+		
+		menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear,.refresh-item,.canceltransfer-item').show();
+
+		var file = fileIdToObject($(target).attr('id'));
+		if (!file) {
+			/* no file, it is a finished operation */
+			menuitems.hide()
+				.filter('.tranfer-clear,.refresh-item')
+				.show()
+			
+		} else {
+			if (file.started) {
+				menuitems.filter('.move-up,.move-down').hide();
+			}
+			if (file.paused) {
+				menuitems.filter('.transfer-pause').hide();
+			} else {
+				menuitems.filter('.transfer-play').hide();
+			}
+		}
+
 		target.parent().find('tr').removeClass('ui-selected');
 		target.addClass('ui-selected')
 		contextmenuUI(e);
@@ -3340,6 +3361,17 @@ function transferPanelUI()
 			ulQueue.pause();
 			ui_paused = true;
 
+			/* Set all files, in both ul_queue
+			   and dl_queue as paused */
+			var q = [dl_queue, ul_queue];
+			for (var i in q) {
+				for(var e = 0; e < q[i].length; e++) {
+					if (q[i][e]) {
+						q[i][e].paused = true;
+					}
+				}
+			}
+
 			$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
 			{
 				$(this).text('');
@@ -3407,7 +3439,6 @@ function menuItems()
 
 	return items;
 }
-
 
 function contextmenuUI(e,ll,topmenu)
 {

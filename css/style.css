@@ -5918,6 +5918,7 @@ span.search-number {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
+	display:block;
 }
 .context-menu-divider.pro {
 	background-color: transparent;
@@ -9599,6 +9600,9 @@ table {
 }
 .properties-item .context-menu-icon {
 	background-position: -3px -4240px;
+}
+.advanced-item .context-menu-icon {
+	background-position: -1px -4903px;
 }
 .permissions-item .context-menu-icon {
 	background-position: -2px -4935px;

@@ -88,13 +88,14 @@ var Zips = {};
 var ZIPClass = function(totalSize) {
 	var self = this
 		, maxZipSize = Math.pow(2,31) * .9
-		
-	this.isZip64 = totalSize > maxZipSize || localStorage.zip64 == 1
+		, isZip64 = totalSize > maxZipSize || localStorage.zip64 == 1
+
+	this.isZip64 = isZip64 /* make it public */
 	
 	// Constants
 	var fileHeaderLen				= 30
 		, noCompression				= 0
-		, zipVersion				= this.isZip64 ? 45 : 20
+		, zipVersion				= isZip64 ? 45 : 20
 		, defaultFlags				= 0x808 /* UTF-8 */
 		, i32max					= 0xffffffff
 		, i16max					= 0xffff
@@ -165,7 +166,7 @@ var ZIPClass = function(totalSize) {
 			var extra = []
 				, ebuf
 
-			if (this.isZip64) {
+			if (isZip64) {
 				ebuf = ezBuffer(28); // 2xi16 + 3xi64
 				ebuf.i16(zip64ExtraId);
 				ebuf.i16(24);
@@ -183,14 +184,14 @@ var ZIPClass = function(totalSize) {
 			buf.i16(this.Method)
 			DosDateTime(this.date, buf)
 			buf.i32(this.crc32);
-			buf.i32(this.isZip64 ? i32max : this.size);
-			buf.i32(this.isZip64 ? i32max : this.unsize);
+			buf.i32(isZip64 ? i32max : this.size);
+			buf.i32(isZip64 ? i32max : this.unsize);
 			buf.i16(this.file.length);
 			buf.i16(extra.length);
 			buf.i16(0); // no comments
 			buf.i32(0); // disk number
 			buf.i32(this.externalAttr);
-			buf.i32(this.isZip64 ? i32max : this.offset);
+			buf.i32(isZip64 ? i32max : this.offset);
 			buf.appendBytes(this.file);
 			buf.appendBytes(extra);
 
@@ -206,10 +207,10 @@ var ZIPClass = function(totalSize) {
 		this.unsize	= 0;
 
 		this.getBytes = function() {
-			var buf = ezBuffer(this.isZip64 ? dataDescriptor64Len : dataDescriptorLen);
+			var buf = ezBuffer(isZip64 ? dataDescriptor64Len : dataDescriptorLen);
 			buf.i32(dataDescriptorSignature);
 			buf.i32(this.crc32);
-			if (this.isZip64) {
+			if (isZip64) {
 				buf.i64(this.size);
 				buf.i64(this.unsize);
 			} else {
@@ -267,7 +268,7 @@ var ZIPClass = function(totalSize) {
 		var dataDescriptor = new ZipDataDescriptor();
 		dataDescriptor.crc32	= crc32;
 		dataDescriptor.size		= size;
-		dataDescriptor.unsize   = size;
+		dataDescriptor.unsize	= size;
 
 		return {
 			dirRecord: dirRecord.getBytes(),
@@ -280,7 +281,7 @@ var ZIPClass = function(totalSize) {
 		for (var i in dirData) dirDatalength += dirData[i].length;
 
 		var buf = ezBuffer(22);
-		if (this.isZip64) {
+		if (isZip64) {
 			var xbuf = new ezBuffer(directory64EndLen + directory64LocLen)
 			xbuf.i32(directory64EndSignature)
 			// directory64EndLen - 4 bytes - 8 bytes
@@ -304,10 +305,10 @@ var ZIPClass = function(totalSize) {
 		
 		buf.i32(directoryEndSignature)
 		buf.i32(0); // skip
-		buf.i16(this.isZip64 ? i16max : dirData.length)
-		buf.i16(this.isZip64 ? i16max : dirData.length)
-		buf.i32(this.isZip64 ? i32max : dirDatalength);
-		buf.i32(this.isZip64 ? i32max : pos);
+		buf.i16(isZip64 ? i16max : dirData.length)
+		buf.i16(isZip64 ? i16max : dirData.length)
+		buf.i32(isZip64 ? i32max : dirDatalength);
+		buf.i32(isZip64 ? i32max : pos);
 		buf.i16(0); // no comments
 		
 		return buf.getBytes();
@@ -378,13 +379,14 @@ ZipEntryIO.prototype.push = function(obj) {
 };
 
 function ZipWriter(dl_id, dl) {
-	this.dl     = dl;
+	this.dl		= dl;
 	this.size	= 0
-	this.is_ready  = false
-	this.queues = [];
-	this.hashes = {};
-	this.dirData = [];
-	this.offset = 0;
+	this.nfiles	= 0
+	this.is_ready	= false
+	this.queues		= [];
+	this.hashes		= {};
+	this.dirData	= [];
+	this.offset		= 0;
 	this.file_offset = 0;
 
 	if ((dlMethod === FileSystemAPI) || ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO))
@@ -413,9 +415,17 @@ ZipWriter.prototype.createZipObject = function() {
 		this.ZipObject = new ZIPClass(
 			this.size
 		);
-		this.size += (this.ZipObject.isZip64 ? 98 : 22)
+
+		if (this.ZipObject.isZip64) {
+			this.size += this.nfiles * 28 // extra bytes for each ZipCentralDirectory 
+			this.size += this.nfiles * 24 // extra bytes for each dataDescriptor
+			this.size += 98 // final bytes
+		} else {
+			this.size += this.nfiles * 16 // extra bytes for each dataDescriptor
+			this.size += 22 // final bytes
+		}
+
 		this.io.setCredentials("", this.size, this.dl.zipname);
-		// TODO: pass accurate size to setCredentials
 		ERRDEBUG("isZip64", this.ZipObject.isZip64, this.size);
 
 	}
@@ -538,10 +548,10 @@ ZipWriter.prototype._eof = function() {
 ZipWriter.prototype.addEntryFile = function(file) {
 	var io =  new ZipEntryIO(this, file);
 	this.queues.push(io);
+	this.nfiles++
 	this.size += file.size 
 		+ 30 + 9 + 2 * (file.p.length + file.n.length) /* header */
 		+ 46 + file.p.length + file.n.length  /* dirRecord */
-		+ 16 /* dataDescriptor */
 	return io;
 };
 

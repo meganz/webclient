@@ -3354,6 +3354,17 @@ function transferPanelUI()
 				DEBUG(l[214]);
 			}
 
+			/* Remove from all files, in both ul_queue
+			   and dl_queue the paused value */
+			var q = [dl_queue, ul_queue];
+			for (var i in q) {
+				for(var e = 0; e < q[i].length; e++) {
+					if (q[i][e]) {
+						q[i][e].paused = false;
+					}
+				}
+			}
+
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.removeClass('active');
 		}

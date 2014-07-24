@@ -226,4 +226,4 @@ js/docs/
 ## Node modules
 #############
 
-tests/node_modules/
+js/tests/node_modules/

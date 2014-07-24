@@ -4278,7 +4278,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	line-height: 19px;
 	color: white;
 	padding: 0 10px 0 20px;
-	margin: 14px 2px 0 12px;
+	margin: 14px 12px 0 0px;
 	background-color: rgba(29,161,233,0.7);
 	-moz-border-radius: 20px;
 	-webkit-border-radius: 20px;
@@ -4296,15 +4296,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .tranfer-download-indicator.active, .tranfer-upload-indicator.active {
 	display: block;
 }
-.tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon {
+.tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-clear-all-icon {
 	display: block;
 	float: right;
 	height: 25px;
-	width: 25px;
+	width: 22px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -6px -4002px;
-	margin: 11px 12px 0 10px;
+	background-position: -8px -4002px;
+	margin: 11px 12px 0 0;
 	cursor: pointer;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -4316,26 +4316,27 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
-.tranfer-view-icon:hover, .transfer-pause-icon:hover, .transfer-settings-icon:hover {
+.tranfer-view-icon:hover, .transfer-pause-icon:hover, .transfer-settings-icon:hover, .transfer-clear-all-icon:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
 .tranfer-view-icon.active {
-	background-position: -6px -3383px;
+	background-position: -8px -3383px;
 }
 .transfer-settings-icon {
-	background-position: -6px -3333px;
-	margin: 11px 0 0 10px;
+	background-position: -8px -3333px;
 	cursor: pointer;
 }
 .transfer-pause-icon {
-	background-position: -6px -3243px;
-	margin: 11px 0 0 10px;
+	background-position: -8px -3243px;
 }
 .transfer-pause-icon.active {
-	background-position: -6px -3273px;
+	background-position: -8px -3273px;
+}
+.transfer-clear-all-icon {
+	background-position: -8px -3433px;
 }
 .transfer-table th, .transfer-table td, .transfer-table-header th, .grid-table th, .grid-table td, .grid-share-table th, .grid-share-table td, .grid-table-header th, .contacts-grid-header th, .contacts-grid-table th, .contacts-grid-table td {
 	-webkit-box-sizing: border-box;

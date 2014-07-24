@@ -17,7 +17,7 @@ function ClassChunk(task) {
 	this.io	  = task.download.io
 	this.done = false
 	this.avg  = [0, 0]
-	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'dl_' + this.dl.dl_id
+	this.gid  = task.file.gid;
 	this.xid  = this.gid + "_" + (++__ccXID)
 	this.failed   = false
 	// this.backoff  = 1936+Math.floor(Math.random()*2e3);
@@ -30,17 +30,24 @@ function ClassChunk(task) {
 	this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
 	this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
 	this.Progress.data[this.xid] = [0, task.size];
+	this[this.gid] = !0;
 }
 
 ClassChunk.prototype.toString = function() {
 	return "[ClassChunk " + this.xid + "]";
 };
 
+ClassChunk.prototype.abort = function() {
+	if (this.oet) clearTimeout(this.oet);
+	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
+	if (this.Progress) removeValue(this.Progress.working, this, 1);
+	delete this.xhr;
+};
+
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
-	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-	if (this.oet) clearTimeout(this.oet);
+	this.abort();
 	oDestroy(this);
 };
 // }}}
@@ -220,6 +227,7 @@ ClassChunk.prototype.run = function(task_done) {
 	}
 
 	this.request(); /* let the fun begin! */
+	this.Progress.working.push(this);
 };
 // }}}
 
@@ -241,9 +249,11 @@ function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
 	this.gid  = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id
-	if (!dl.zipid || !GlobalProgress[this.gid]) {
-		GlobalProgress[this.gid] = {data: {}, done: 0};
+	if (!dl.zipid || !GlobalProgress[this.gid])
+	{
+		GlobalProgress[this.gid] = {data: {}, done: 0, working:[]};
 	}
+	this[this.gid] = !0;
 }
 
 ClassFile.prototype.toString = function() {

@@ -47,7 +47,8 @@ function ul_completepending2(res,ctx)
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
-	oDestroy(ctx.file);
+	if (ctx.file.mFiU) ctx.file.mFiU.destroy();
+	else oDestroy(ctx.file);
 	oDestroy(ctx);
 }
 
@@ -281,6 +282,7 @@ function ul_upload(File) {
 	file.ul_aes = new sjcl.cipher.aes([
 		file.ul_key[0],file.ul_key[1],file.ul_key[2],file.ul_key[3]
 	]);
+	file.mFiU = File;
 
 	if (file.size) {
 		var pp, p = 0, tasks = {}
@@ -323,23 +325,6 @@ function ul_start(File) {
 		, len   = ul_queue.length
 		, max   = File.file.pos+8
 
-	/* CPU INTENSIVE
-	$.each(ul_queue, function(i, cfile) {
-		if (i < File.file.pos || cfile.posturl) return; // continue 
-		if (i >= File.file.pos+8 || maxpf <= 0) return false; // break 
-		api_req({ 
-			a : 'u', 
-			ssl : use_ssl, 
-			ms : ul_maxSpeed, 
-			s : cfile.size, 
-			r : cfile.retries, 
-			e : cfile.ul_lastreason 
-		}, { reqindex : i, callback : next });
-		maxpf -= cfile.size
-		total++;
-	});
-	*/
-
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
 		api_req({ 
@@ -358,11 +343,24 @@ function ul_start(File) {
 
 function ChunkUpload(file, start, end)
 {
-	this.file = file;
-	this.ul   = file;
+	this.file  = file;
+	this.ul    = file;
 	this.start = start;
-	this.end	= end;
+	this.end   = end;
+	this.gid   = file.mFiU.gid;
+	this.xid   = this.gid + '_' + start + '-' + end;
+	this[this.gid] = !0;
 }
+
+ChunkUpload.prototype.toString = function() {
+	return "[ChunkUpload " + this.xid + "]";
+};
+
+ChunkUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	removeValue(GlobalProgress[this.gid].working, this, 1);
+	oDestroy(this);
+};
 
 ChunkUpload.prototype.updateprogress = function() {
 	if (this.file.complete || ui_paused) return;
@@ -517,19 +515,35 @@ ChunkUpload.prototype.done = function() {
 	this._done();
 
 	/* clean up references */
-	oDestroy(this);
+	this.destroy();
 };
 
 ChunkUpload.prototype.run = function(done) {
 	this._done = done;
 	this.file.ul_reader.push(this, this.io_ready, this);
+	GlobalProgress[this.gid].working.push(this);
 };
 
 
 function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
+	this.gid  = 'ul_'+this.ul.id;
+	this[this.gid] = !0;
+	GlobalProgress[this.gid] = {working:[]};
 }
+
+FileUpload.prototype.toString = function() {
+	return "[FileUpload " + this.gid + "]";
+};
+
+FileUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+	delete GlobalProgress[this.gid];
+	oDestroy(this.file);
+	oDestroy(this);
+};
 
 FileUpload.prototype.run = function(done) {
 	var file = this.file

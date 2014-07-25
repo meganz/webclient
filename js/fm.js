@@ -522,6 +522,47 @@ function initUI()
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 }
 
+function isIdDownload(id) {
+	return id[0] == 'd' || id[0] == 'z';
+}
+
+function transferPanelContextMenu(target)
+{
+	$('.context-menu.files-menu .context-menu-item').hide();
+	var menuitems = $('.context-menu.files-menu .context-menu-item')
+	
+	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
+		.show();
+
+	var file = fileIdToObject($(target).attr('id'));
+	if (!file) {
+		/* no file, it is a finished operation */
+		menuitems.hide()
+			.filter('.tranfer-clear,.refresh-item')
+			.show()
+		
+	} else {
+		if (file.started) {
+			menuitems.filter('.move-up,.move-down').hide();
+		}
+		if (file.paused) {
+			menuitems.filter('.transfer-pause').hide();
+		} else {
+			menuitems.filter('.transfer-play').hide();
+		}
+
+		if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
+			menuitems.filter('.move-up').hide();
+		}
+		if (target.next().length == 0) {
+			menuitems.filter('.move-down').hide();
+		}
+	}
+
+	menuitems.parent()
+		.children('.context-menu-divider').hide().end()
+		.children('.pause-item-divider').show().end()
+}
 
 function openTransferpanel()
 {
@@ -545,34 +586,13 @@ function openTransferpanel()
 	initTreeScroll();
 	$(window).trigger('resize');
 
+
 	$('.tranfer-table .grid-url-arrow').unbind('click')
 	$('.tranfer-table .grid-url-arrow').bind('click', function(e) {
 		var target = $(this).closest('tr');
 		e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
 		e.currentTarget = target;
-		$('.context-menu.files-menu .context-menu-item').hide();
-		var menuitems = $('.context-menu.files-menu .context-menu-item')
-		
-		menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear,.refresh-item,.canceltransfer-item').show();
-
-		var file = fileIdToObject($(target).attr('id'));
-		if (!file) {
-			/* no file, it is a finished operation */
-			menuitems.hide()
-				.filter('.tranfer-clear,.refresh-item')
-				.show()
-			
-		} else {
-			if (file.started) {
-				menuitems.filter('.move-up,.move-down').hide();
-			}
-			if (file.paused) {
-				menuitems.filter('.transfer-pause').hide();
-			} else {
-				menuitems.filter('.transfer-play').hide();
-			}
-		}
-
+		transferPanelContextMenu(target);
 		target.parent().find('tr').removeClass('ui-selected');
 		target.addClass('ui-selected')
 		contextmenuUI(e);
@@ -996,12 +1016,30 @@ function initContextUI()
 		if (d) console.log('addcontact');	
 	});
 
+	$(c+'.move-up').unbind('click');
+	$(c+'.move-up').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			fm_tfsmove($(this).attr('id'), -1);
+		});
+	});
+
+	$(c+'.move-down').unbind('click');
+	$(c+'.move-down').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			fm_tfsmove($(this).attr('id'), +1);
+		});
+	});
+
 	$(c+'.transfer-play').unbind('click');
 	$(c+'.transfer-play').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			fileIdToObject($(this).attr('id'))
+			var id = $(this).attr('id')
+			fileIdToObject(id)
 				.paused = false;
+			if (id[0] == 'd') fm_tfsresume(id)
 		});
 	});
 
@@ -1009,20 +1047,13 @@ function initContextUI()
 	$(c+'.transfer-pause').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			fileIdToObject($(this).attr('id'))
+			var id = $(this).attr('id')
+			fileIdToObject(id)
 				.paused = true;
+			if (id[0] == 'd') fm_tfspause(id);
 		});
 	});
 
-	$(c+'.tranfer-clear').unbind('click');
-	$(c+'.tranfer-clear').bind('click',function(event) 
-	{
-		$('.transfer-table span.completed')
-			.each(function() {
-				$(this).parents('tr').fadeOut();
-			});
-	});
-	
 	$(c+'.refresh-item').unbind('click');
 	$(c+'.refresh-item').bind('click',function(event) 
 	{
@@ -1038,8 +1069,8 @@ function initContextUI()
         selectionManager.select_all();
 	});
 	
-	$(c+'.canceltransfer-item').unbind('click');
-	$(c+'.canceltransfer-item').bind('click',function(event) 
+	$(c+'.canceltransfer-item,' + c + '.tranfer-clear').unbind('click');
+	$(c+'.canceltransfer-item,' + c + '.tranfer-clear').bind('click',function(event) 
 	{			
 		$.zipkill={};
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
@@ -3291,8 +3322,7 @@ function transferPanelUI()
 		{
 			if (e.type == 'contextmenu')
 			{
-				$('.context-menu.files-menu .context-menu-item').hide();
-				$('.context-menu.files-menu .context-menu-item').filter('.refresh-item,.canceltransfer-item').show();
+				transferPanelContextMenu($(this));
 				var c = $(this).attr('class');				
 				if (!c || (c && c.indexOf('ui-selected') == -1)) $('.transfer-table tr').removeClass('ui-selected');
 				$(this).addClass('ui-selected');

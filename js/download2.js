@@ -310,6 +310,9 @@ function fm_tfsmove(gid, dir) // -1:up, 1:down
 	
 	var id = to && to.attr('id') || 'x';
 
+	ASSERT(GlobalProgress[id] && GlobalProgress[id].working.length == 0,'Invalid [to] transfer state: ' + gid);
+	if (!GlobalProgress[id] || GlobalProgress[id].working.length) return;
+	
 	if (id[0] == gid[0] || "zdz".indexOf(id[0]+gid[0]) != -1)
 	{
 		to[act](tfs);
@@ -418,7 +421,7 @@ dlQueue.pause = function(gid)
 			this._running--;
 		}
 		this._qpaused[gid] = this.slurp(gid);
-		$('.transfer-table #' + gid + ' td:eq(2) span').text('Download (paused)');
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (paused)');
 		// TODO: move that $() somewhere else and set other columns
 	}
 };
@@ -434,7 +437,7 @@ dlQueue.resume = function(gid)
 	{
 		delete GlobalProgress[gid].paused;
 		if (this.isEmpty()) this.dispatch(gid);
-		$('.transfer-table #' + gid + ' td:eq(2) span').text('Download');
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text('');
 		// TODO: $() stuff
 	}
 };

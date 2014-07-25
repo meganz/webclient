@@ -52,7 +52,7 @@ MegaQueue.prototype.expand = function() {
 	if (this.canExpand()) {
 		this._expanded = true;
 		this._process();
-		if (d) console.error("expand queue " + this._running);
+		if (d) console.log("expand queue " + this._running);
 		return true;
 	}
 	return false;

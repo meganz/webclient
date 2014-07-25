@@ -1038,20 +1038,7 @@ function initContextUI()
 	$(c+'.move-up').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			var $this = $(this)
-				, prev = $(this).prev()
-				, id   = $this.attr('id')
-
-			if (isIdDownload(id) == isIdDownload(prev.attr('id'))) {
-				if (isIdDownload(id)) {
-					fm_tfsmove(id, -1);
-				} else {
-					// missing upload move
-				}
-			}
-
-			// update UI
-			$this.insertBefore( prev );
+			fm_tfsmove($(this).attr('id'), -1);
 		});
 	});
 
@@ -1059,20 +1046,7 @@ function initContextUI()
 	$(c+'.move-down').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			var $this = $(this)
-				, next = $(this).next()
-				, id   = $this.attr('id')
-
-			if (isIdDownload(id) == isIdDownload(next.attr('id'))) {
-				if (isIdDownload(id)) {
-					fm_tfsmove(id, 1);
-				} else {
-					// missing upload move
-				}
-			}
-
-			// update UI
-			$this.insertAfter( next )
+			fm_tfsmove($(this).attr('id'), +1);
 		});
 	});
 

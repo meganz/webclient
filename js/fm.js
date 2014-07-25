@@ -3390,8 +3390,6 @@ function transferPanelUI()
 
 	$.transferClose = function() {
 		var panel = $('.transfer-panel')
-			, fm  = $('#fmholder')
-			, menu = $('#topmenu')
 
         panel.animate({'height': $('.transfer-panel-title').height()}, {
 			complete: function() {
@@ -3399,12 +3397,7 @@ function transferPanelUI()
 				$('#fmholder').removeClass('transfer-panel-opened');
 				$(window).trigger('resize');
 			},
-			progress: function() {
-				var height =  fm.outerHeight() - (menu.outerHeight() + panel.outerHeight())
-				$('.fm-main.default').css({
-					'height': height + "px"
-				});
-			}
+			progress: fm_resize_handler
 		})
 	}
 	
@@ -3422,20 +3415,13 @@ function transferPanelUI()
 			}
 
 			var panel = $('.transfer-panel')
-				, fm  = $('#fmholder')
-				, menu = $('#topmenu')
 
 				panel.animate({'height': height + $('.transfer-panel-title').height()}, {
 					complete: function() {
 						$.transferHeader();
 						$(window).trigger('resize');
 					},
-					step: function() {
-						var height =  fm.outerHeight() - (menu.outerHeight() + panel.outerHeight())
-						$('.fm-main.default').css({
-							'height': height + "px"
-						});
-					}
+					progress: fm_resize_handler
 				})
 
 		}

@@ -1244,12 +1244,12 @@ function percent_megatitle()
 		}
 		ul_s += ((ul_queue[i]||{}).speed || 0)
 	}
-	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
-	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
+	//if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
+	//if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
 
 	var x_ul = Math.floor(ul_r/ul_t*100) || 0,
 		x_dl = Math.floor(dl_r/dl_t*100) || 0
-	
+
 	if (dl_t && ul_t)
 	{
 		t = ' \u2191 ' +  x_dl + '% \u2193 ' + x_ul + '%';

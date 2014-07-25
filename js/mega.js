@@ -2064,6 +2064,7 @@ function MegaData ()
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();
+			$('.transfer-clear-all-icon').addClass('hidden');
 			resetUploadDownload();
 		}
 	});

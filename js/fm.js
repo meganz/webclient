@@ -3389,10 +3389,23 @@ function transferPanelUI()
     });
 
 	$.transferClose = function() {
-		$('.tranfer-view-icon').removeClass('active');
-		$('#fmholder').removeClass('transfer-panel-opened');
-        $('.transfer-panel').css({'height': ''});
-        $(window).trigger('resize');
+		var panel = $('.transfer-panel')
+			, fm  = $('#fmholder')
+			, menu = $('#topmenu')
+
+        panel.animate({'height': $('.transfer-panel-title').height()}, {
+			complete: function() {
+				$('.tranfer-view-icon').removeClass('active');
+				$('#fmholder').removeClass('transfer-panel-opened');
+				$(window).trigger('resize');
+			},
+			progress: function() {
+				var height =  fm.outerHeight() - (menu.outerHeight() + panel.outerHeight())
+				$('.fm-main.default').css({
+					'height': height + "px"
+				});
+			}
+		})
 	}
 	
 	$.transferOpen = function(force)
@@ -3401,9 +3414,30 @@ function transferPanelUI()
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-            if(localStorage.transferPaneHeight && $.transferPaneResizable) $('.transfer-panel').css({'height': Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight) + "px"});            
-			else  $('.transfer-panel').css({'height': '193px'});            
 			$.transferHeader();
+
+			var height = 193
+            if(localStorage.transferPaneHeight && $.transferPaneResizable) {
+				height = Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight)
+			}
+
+			var panel = $('.transfer-panel')
+				, fm  = $('#fmholder')
+				, menu = $('#topmenu')
+
+				panel.animate({'height': height + $('.transfer-panel-title').height()}, {
+					complete: function() {
+						$.transferHeader();
+						$(window).trigger('resize');
+					},
+					step: function() {
+						var height =  fm.outerHeight() - (menu.outerHeight() + panel.outerHeight())
+						$('.fm-main.default').css({
+							'height': height + "px"
+						});
+					}
+				})
+
 		}
 		else 
 		{

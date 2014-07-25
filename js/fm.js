@@ -359,6 +359,9 @@ function initUI()
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu').addClass('hidden');
+		
+		console.log('test');
+		
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');
@@ -860,29 +863,8 @@ function initContextUI()
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
 	{
-		/*
-		var c = $(this).attr('class');
-		
-		if (c && c.indexOf('dropdown') > -1)
-		{
-			$('.context-menu-item.more-item.dropdown').removeClass('active');
-			if (c.indexOf('active') > -1) 
-			{
-				$('.context-menu.files-menu').addClass('hidden');
-				$(this).removeClass('active');
-				return false;			
-			}
-			$(this).addClass('active');
-			$('.context-menu.files-menu .context-menu-divider').hide();
-			$('.context-menu.files-menu .context-menu-item').hide();			
-			$('.context-menu.files-menu .download-standart-item').show();
-			$('.context-menu.files-menu .zipdownload-item').show();
-			$('.context-menu.files-menu').removeClass('hidden');
-            var offset = $(this).offset();
-            $('.context-menu.files-menu').css({top: offset.top+35, left: offset.left});
-		}
-		else M.addDownload($.selected);
-		*/
+		var c = $(event.target).attr('class');		
+		if (c && c.indexOf('contains-submenu') > -1) M.addDownload($.selected);
 	});
 	
 	$(c+'.download-standart-item').unbind('click');

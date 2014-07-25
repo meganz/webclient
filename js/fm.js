@@ -3604,6 +3604,22 @@ function contextmenuUI(e,ll,topmenu)
 	e.preventDefault();
 }
 
+function scrollContextMenu(e, cont)
+{
+	var k = document.getElementById(cont);
+	var pNode = k.parentNode;
+
+	var ex = e.pageX;
+	var ey = e.pageY;
+	var dy = h * 0.1;
+	var h = pNode.offsetHeight;
+	var pos = getHtmlElemPos(pNode);
+	var py = (ey - pos.y - dy) / (h - dy * 2);
+	if (py > 1) py = 1;
+	if (py < 0) py = 0;
+	pNode.scrollTop = py * (pNode.scrollHeight - h);
+}
+
 var tt;
 
 function treeUI()

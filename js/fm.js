@@ -860,6 +860,7 @@ function initContextUI()
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
 	{
+		/*
 		var c = $(this).attr('class');
 		
 		if (c && c.indexOf('dropdown') > -1)
@@ -881,6 +882,7 @@ function initContextUI()
             $('.context-menu.files-menu').css({top: offset.top+35, left: offset.left});
 		}
 		else M.addDownload($.selected);
+		*/
 	});
 	
 	$(c+'.download-standart-item').unbind('click');

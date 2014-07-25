@@ -543,6 +543,13 @@ function transferPanelContextMenu(target)
 		} else {
 			menuitems.filter('.transfer-play').hide();
 		}
+
+		if (target.prev().length == 0 || target.prev().find('.queued').length == 0) {
+			menuitems.filter('.move-up').hide();
+		}
+		if (target.next().length == 0) {
+			menuitems.filter('.move-down').hide();
+		}
 	}
 
 	menuitems.parent()
@@ -1027,8 +1034,7 @@ function initContextUI()
 	$(c+'.move-up').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			$(this).attr('id')
-				.paused = false;
+			$(this)
 		});
 	});
 

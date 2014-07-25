@@ -1023,12 +1023,23 @@ function initContextUI()
 		if (d) console.log('addcontact');	
 	});
 
+	$(c+'.move-up').unbind('click');
+	$(c+'.move-up').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			$(this).attr('id')
+				.paused = false;
+		});
+	});
+
 	$(c+'.transfer-play').unbind('click');
 	$(c+'.transfer-play').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			fileIdToObject($(this).attr('id'))
+			var id = $(this).attr('id')
+			fileIdToObject(id)
 				.paused = false;
+			if (id[0] == 'd') fm_tfsresume(id)
 		});
 	});
 
@@ -1036,8 +1047,10 @@ function initContextUI()
 	$(c+'.transfer-pause').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			fileIdToObject($(this).attr('id'))
+			var id = $(this).attr('id')
+			fileIdToObject(id)
 				.paused = true;
+			if (id[0] == 'd') fm_tfspause(id);
 		});
 	});
 

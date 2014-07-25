@@ -418,7 +418,7 @@ dlQueue.pause = function(gid)
 			this._running--;
 		}
 		this._qpaused[gid] = this.slurp(gid);
-		$('.transfer-table #' + gid + ' td:eq(2) span').text('Download (paused)');
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (paused)');
 		// TODO: move that $() somewhere else and set other columns
 	}
 };
@@ -434,7 +434,7 @@ dlQueue.resume = function(gid)
 	{
 		delete GlobalProgress[gid].paused;
 		if (this.isEmpty()) this.dispatch(gid);
-		$('.transfer-table #' + gid + ' td:eq(2) span').text('Download');
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text('');
 		// TODO: $() stuff
 	}
 };

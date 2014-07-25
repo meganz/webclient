@@ -1974,6 +1974,8 @@ function MegaData ()
 			delete $.transferprogress[id];
 		}
 
+		GlobalProgress[id].finished = true;
+
 		percent_megatitle();
 		$.transferHeader();
 	}
@@ -2177,6 +2179,7 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
+		GlobalProgress['ul_' + id].finished = true;
 		$.transferHeader();
 	}
 

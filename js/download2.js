@@ -310,6 +310,9 @@ function fm_tfsmove(gid, dir) // -1:up, 1:down
 	
 	var id = to && to.attr('id') || 'x';
 
+	ASSERT(GlobalProgress[id] && GlobalProgress[id].working.length == 0,'Invalid [to] transfer state: ' + gid);
+	if (!GlobalProgress[id] || GlobalProgress[id].working.length) return;
+	
 	if (id[0] == gid[0] || "zdz".indexOf(id[0]+gid[0]) != -1)
 	{
 		to[act](tfs);

@@ -7,6 +7,7 @@ function MegaQueue(worker, limit) {
     this._running = 0
 	this._worker  = worker
 	this._noTaskCount = 0;
+	this._qpaused = {};
 }
 inherits(MegaQueue, MegaEvents)
 
@@ -51,7 +52,7 @@ MegaQueue.prototype.expand = function() {
 	if (this.canExpand()) {
 		this._expanded = true;
 		this._process();
-		if (d) console.error("expand queue " + this._running);
+		if (d) console.log("expand queue " + this._running);
 		return true;
 	}
 	return false;
@@ -110,6 +111,16 @@ MegaQueue.prototype.filter = function(key, value, memb)
 	}
 };
 
+MegaQueue.prototype.slurp = function(gid)
+{
+	var res = [];
+	this._queue = this._queue.filter(function(item)
+	{
+		return item[0][gid] ? (res.push(item), false) : true;
+	});
+	return res;
+};
+
 MegaQueue.prototype.pause = function() {
 	if (d) { 
 		console.log("pausing queue"); 
@@ -161,14 +172,11 @@ MegaQueue.prototype.validateTask = function() {
 	return true;
 }
 
-MegaQueue.prototype.prepareNextTask = function() {
-};
-
 MegaQueue.prototype.getNextTask = function() {
-	var i, len = this._queue.length
-	this.prepareNextTask();
+	var i, r, len = this._queue.length
 	for (i = 0; i < len; i++) {
-		if (this.validateTask(this._queue[i][0])) {
+		if ((r = this.validateTask(this._queue[i][0]))) {
+			if (r < 0) return null;
 			var data = this._queue[i]
 			this._queue.splice(i, 1);
 			return data
@@ -185,7 +193,7 @@ MegaQueue.prototype.process = function() {
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
-			if ( ++this._noTaskCount == 666 )
+			if ( ++this._noTaskCount == 666 && !$.len(this._qpaused))
 			{
 				/**
 				 * XXX: Prevent an infinite loop when there's a connection hang,

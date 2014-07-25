@@ -1947,6 +1947,11 @@ function MegaData ()
 				.removeClass('download')
 				.addClass('safari-downloaded')
 				.text('Save File');
+		} else {
+			$('.transfer-table #' + id).fadeOut('slow', function(e)
+			{
+				$(this).remove();
+			});
 		}
 		if (dlMethod == FileSystemAPI)
 		{
@@ -2161,6 +2166,11 @@ function MegaData ()
 		}
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
+		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
+		{
+			$(this).remove();
+		});
+		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
 		if (a < 2 && !downloading)

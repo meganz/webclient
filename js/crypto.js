@@ -1535,10 +1535,6 @@ function api_setshare1(ctx)
 					// we only need to generate a key if one or more shares are being added to a previously unshared node
 					sharekey = [];
 					for (j = 4; j--; ) sharekey.push(rand(0x100000000));					
-sharekey[0] = 0;
-sharekey[1] = 0;
-
-					
 					u_sharekeys[ctx.node] = sharekey;
 				}
 

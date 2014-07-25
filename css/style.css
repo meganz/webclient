@@ -3058,6 +3058,8 @@ label.iPhoneCheckLabelOff span {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: -17px -7465px;
 	background-repeat: no-repeat;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
 	overflow: hidden;
 }
 .rubbish-bin .nw-fm-tree-folder {
@@ -3297,11 +3299,14 @@ label.iPhoneCheckLabelOff span {
 	font-size: 11px;
 	line-height: 21px;
 	color: #666666;
-	white-space: nowrap;
+	
 	margin: 0 0 0 76px;
 	overflow: hidden;
 	display: block;
 	padding: 13px 0 0 0;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
 }
 .contacts-username, .add-contact-username {
 	margin: 0 0 0 56px;
@@ -3340,6 +3345,9 @@ label.iPhoneCheckLabelOff span {
 	overflow: hidden;
 	cursor: pointer;
 	position: relative;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
 }
 .nw-conversations-unread {
 	position: absolute;
@@ -3395,6 +3403,10 @@ label.iPhoneCheckLabelOff span {
 	line-height: 23px;
 	color: #666666;
 	padding: 0;
+	overflow:hidden;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
 }
 .nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
 	color: white;
@@ -4252,8 +4264,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background-color: #333333;
+	
 	overflow: hidden;
+}
+.transfer-icons-block {
+	background-color: #333333;
 }
 .transfer-panel-opened .transfer-panel {
 	height: 193px;
@@ -4360,7 +4375,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	overflow: hidden;
 }
-.files-grid-view, .contacts-grid-view {
+.files-grid-view, .shared-grid-view, .contacts-grid-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4369,7 +4384,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
-.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th {
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .shared-grid-view th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
@@ -4377,7 +4392,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .contacts-grid-view th:nth-child(4) {
 	background-image: none;
 }
-.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8) {
+.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5) {
 	background-image: none;
 }
 .grid-header-star {
@@ -4398,6 +4413,11 @@ th.grid-first-th {
 .grid-table td {
 	background-color: rgba(238,238,238,0);
 }
+.grid-table.shared-with-me td {
+	height:48px;
+	
+}
+
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
 	background-color: rgba(0,0,0,0.02);
 }
@@ -4467,7 +4487,7 @@ th.grid-first-th {
 .file-block .file-status-icon.star, .contact-status-icon.star {
 	background-position: -14px -7738px;
 }
-.fm-blocks-view, .fm-contacts-blocks-view {
+.fm-blocks-view, .fm-contacts-blocks-view, .shared-blocks-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4479,7 +4499,7 @@ th.grid-first-th {
 	min-height: 280px;
 	padding: 0;
 }
-.file-block-scrolling, .contacts-blocks-scrolling {
+.file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
 	height: 100%;
 	padding: 0 0 10px 0;
 	-webkit-box-sizing: border-box;
@@ -4501,6 +4521,22 @@ th.grid-first-th {
 	position: relative;
 	cursor: default;
 	background-color: rgba(0,0,0,0.05);
+}
+.shared-blocks-view .file-block {
+	height:216px; width:168px;
+	
+}
+.shared-blocks-view .file-icon-area {
+	width:160px;
+	height:160px;
+}
+.shared-blocks-view  .block-view-file-type.folder, .properties-file-icon div.folder {
+	width:94px;
+	height:77px;
+	background-image: url(../images/mega/shared-sprite.svg);
+background-repeat: no-repeat;
+background-position: center top;
+margin: -38px 0 0 -47px;
 }
 .file-icon-area {
 	width: 120px;
@@ -4595,16 +4631,24 @@ th.grid-first-th {
 }
 .file-block-title, .contact-block-view-name {
 	display: block;
-	padding: 0 0 0 0;
-	white-space: pre-wrap;
-	word-break: break-all;
-	margin: 0 10px;
-	height: 28px;
-	overflow: hidden;
-	font-size: 11px;
-	line-height: 28px;
-	text-align: center;
-	color: #333333;
+padding: 0 0 0 0;
+white-space: pre-wrap;
+word-break: break-all;
+padding: 0 10px;
+height: 28px;
+overflow: hidden;
+font-size: 11px;
+line-height: 28px;
+margin: 0;
+text-align: center;
+color: #333333;
+-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
 }
 .grid-url-arrow, .file-settings-icon {
 	height: 18px;
@@ -4682,7 +4726,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .clone-of-header th {
 	height: 0;
 	line-height: 0;
-	overflow: hidden;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
 	color: #666666;
@@ -5475,11 +5522,15 @@ table {
 .fm-dialog-breadcrumbs {
 	background-position: 5px -1000px;
 }
-.fm-breadcrumbs.shared-with-me .right-arrow-bg {
-	background-position: 5px -6014px;
+.fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg {
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: 2px -504px;
+	padding: 0 2px 0 38px;
 }
-.fm-dialog-breadcrumbs.shared-with-me {
-	background-position: 5px -6011px;
+.fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg {
+	background-position: 2px -501px;
+	
 }
 .fm-dialog-breadcrumbs:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5512,8 +5563,16 @@ table {
 	padding: 0 10px 0 38px;
 	color: black;
 }
-.fm-breadcrumbs.folder .right-arrow-bg, .fm-share-breadcrumbs.folder .right-arrow-bg {
-	background-position: -4px -1386px;
+.fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg {
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: 2px -624px;
+}
+.fm-breadcrumbs.shared-folder .right-arrow-bg {
+	background-position: 2px -544px;
+}
+.fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me  .right-arrow-bg span {
+	display:none;
 }
 .fm-breadcrumbs .right-arrow-bg:hover, .fm-share-breadcrumbs .right-arrow-bg:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -16518,6 +16577,82 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
 	background-color: rgba(6,160,236,1);
 }
+.shared-with-me .nw-contact-avatar {
+	position:absolute;
+	margin: 1px 0 0 0;
+}
+.shared-grid-view .td, .shared-grid-view .th  {
+	padding:0 12px;
+}
+.shared-with-me .fm-chat-user-info {
+  float: none;
+  margin: 1px 0 0 44px;
+}
+.shared-folder-icon {
+	background-image: url(../images/mega/shared-sprite.svg);
+background-position: -27px -132px;
+background-repeat: no-repeat;
+width: 40px;
+height: 32px;
+position: absolute;
+margin: 1px 0 0 0;
+}
+.shared-folder-info-block {
+	padding:0 0 0 51px; font-size:11px; line-height:17px;
+	display:block;
+}
+.shared-folder-name {
+	color:#111111;
+	display:block;
+	white-space:nowrap;
+	-o-text-overflow: ellipsis;
+text-overflow: ellipsis;
+overflow: hidden;
+}
+.shared-folder-info {
+	 color:#666666; line-height:16px;
+	 display:block;
+	 white-space:nowrap;
+	 -o-text-overflow: ellipsis;
+text-overflow: ellipsis;
+overflow: hidden;
+}
+.shared-folder-access {
+	font-size: 11px;
+line-height: 16px;
+padding-left: 29px;
+color: #666666;
+display:block;
+background-image: url(../images/mega/shared-sprite.svg);
+background-position: -37px -245px;
+background-repeat: no-repeat;
+}
+.shared-folder-access.read-and-write {
+	background-position: -36px -293px;
+}
+.shared-folder-access.full-access {
+	background-position: -37px -197px;
+}
+.file-block .nw-contact-avatar, .file-block.contacts-avatar, .file-block.avatar {
+	margin: 10px 0 0 10px;
+}
+.file-block .shared-folder-info-block {
+padding: 9px 6px 0 50px;
+}
+.file-block .shared-folder-access {
+	position: absolute;
+width: 22px;
+height: 20px;
+z-index: 10;
+top: 6px;
+right: 7px;
+padding:0;
+}
+.file-block .shared-folder-access.full-access, .file-block .shared-folder-access.read-and-write {
+	top: 7px;
+right: 5px;
+}
+
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
 	min-width: 648px;

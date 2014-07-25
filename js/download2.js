@@ -89,6 +89,11 @@ var DownloadManager = new function() {
 			}
 			selector = '#dl_' + dl.id;
 		}
+		if (dlMethod != FlashIO || force) {
+			$(selector).fadeOut('slow', function() {
+				$(this).remove();
+			});
+		}
 		if (dl.io instanceof MemoryIO) {
 			dl.io.abort();
 		}

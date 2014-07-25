@@ -1211,18 +1211,20 @@ function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}
 		, dl_s = 0, ul_s = 0
+		, fid
 	
 	for (var i in dl_queue)
 	{
 		var q = dl_queue[i];
-		var t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+		fid = q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id;
+		var t = tp[fid]
 		
 		if (t)
 		{
 			dl_r += t[0];
 			dl_t += t[1];
 		}
-		else
+		else if (q.id && !GlobalProgress[fid].finished) 
 		{
 			dl_t += q.size || 0;
 		}
@@ -1231,14 +1233,15 @@ function percent_megatitle()
 	
 	for (var i in ul_queue)
 	{
-		var t = tp['ul_' + ul_queue[i].id];
+		fid = 'ul_' + ul_queue[i].id;
+		var t = tp[fid]
 		
 		if (t)
 		{
 			ul_r += t[0];
 			ul_t += t[1];
 		}
-		else
+		else if (ul_queue[i].id && !GlobalProgress[fid].finished) 
 		{
 			ul_t += ul_queue[i].size || 0;
 		}

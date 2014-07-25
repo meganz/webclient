@@ -3601,36 +3601,31 @@ function contextmenuUI(e,ll,topmenu)
 		else $(this).find('.context-menu-divider').show();
 	});
 	
-	adjustContextMenuPosition(e, m, (id && id.length === 11));
+	adjustContextMenuPosition(e, m);
 	
 	m.removeClass('hidden');
 	e.preventDefault();
 }
 
-// @menuType can be transfer panel or context menu
-function adjustContextMenuPosition(e, m, menuType)
+function adjustContextMenuPosition(e, m)
 {
 	var mPos;// menu position
 	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
-	if (menuType)// transfer panel menu
+	
+	if (e.type === 'click')// clicked on file-settings-icon
 	{
+		var ico = {'x':e.currentTarget.context.offsetWidth, 'y':e.currentTarget.context.offsetHeight};
+		var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
+		mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y, ico);
 	}
-	else// all other menus
+	else// right click
 	{
-		if (e.type === 'click')// clicked on file-settings-icon
-		{
-			var ico = {'x':e.currentTarget.context.offsetWidth, 'y':e.currentTarget.context.offsetHeight};
-			var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
-			mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y, ico);
-		}
-		else// right click
-		{
-			mPos = reCalcMenuPosition(e, m, mX, mY);
-		}
+		mPos = reCalcMenuPosition(e, m, mX, mY);
 	}
+	
 	m.css({'top':mPos.y,'left':mPos.x});// set menu position
 	
-	return;
+	return true;
 }
 
 // re-calculates element position if there's a need for that, eg. less then 12px left on right side

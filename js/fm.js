@@ -3547,14 +3547,14 @@ function menuItems()
 
 function contextmenuUI(e,ll,topmenu)
 {
-	// iscontextmenu disabled
+	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
 	// filter selector
 	var t = '.context-menu.files-menu .context-menu-item';
-	// it seems that ll == 2 is used when right click is occures outside of item, on empty canvas
+	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)
 	{
-		// Enable upload item menu for clould-drive, disable it for rubbish and rest of crew
+		// Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
 			$(t).filter('.context-menu-item').hide();
@@ -3567,9 +3567,9 @@ function contextmenuUI(e,ll,topmenu)
 	{
 		$(t).hide();// Hide all menu-items
 		var c = $(e.currentTarget).attr('class');
-		var id = $(e.currentTarget).attr('id');// get id of clicked element
-		if (id) id = id.replace('treea_','');// if clicked on left panel
-		if (id && !M.d[id]) id = undefined;// exist in node list?
+		var id = $(e.currentTarget).attr('id');
+		if (id) id = id.replace('treea_','');// if right clicked on left panel
+		if (id && !M.d[id]) id = undefined;// exist in node list
 
 		// detect and show right menu
 		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
@@ -3600,36 +3600,69 @@ function contextmenuUI(e,ll,topmenu)
 		if($(this).height()<24) $(this).addClass('hidden');
 	});
 	
-	adjustMenuPosition(e, m, (id && id.length === 11));
+	adjustContextMenuPosition(e, m, (id && id.length === 11));
 	// show menu
 	v.removeClass('hidden');
 	m.removeClass('hidden');
 	e.preventDefault();
 }
 
-function adjustMenuPosition(e, m, menuType)
+function adjustContextMenuPosition(e, m, menuType)
 {
-	var T_M = 12;// top margin in pixels
-	var S_M = 12;// side margin in pixels
-	// Returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
-	var mX = e.clientX;
-	var mY = e.clientY;
+	var mPos;// menu position
 	if (menuType)// transfer panel menu
 	{
 	}
 	else// all other menus
 	{
-		var r = $('body').outerWidth()-$(m).outerWidth();
-		var b = $('body').outerHeight()-$(m).outerHeight();
-		if (b - $(m).position().top < 50) m.css('top', b-50);
-		if (r - $(m).position().left < 1) m.css('left', mX - 10 - $(m).outerWidth());
+		if (e.type === 'click')// clicked on file-settings-icon
+		{
+			var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
+			mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y);
+		}
+		else// right click
+		{
+			
+		}
+//		1. Find height and width context menu
+//		2. Compare top, bot, left, right dimensions
+//		3. move menu if there is a need for it
 	}
-	m.css({'top':mY,'left':mX});// set menu position
+	m.css({'top':mPos.y,'left':mPos.x});// set menu position
 	
 	return;
 }
 
-function scrollContextMenu(e, cont)
+// re-calculates element position if there's a need for that, eg. less then 12px left on right side
+// @x, @y current coordinates where element should be shown
+// @cmW, @cmH width and height of element
+function reCalcMenuPosition(e, m, x, y)
+{
+	var TOP_MARGIN = 12;
+	var SIDE_MARGIN = 12;
+	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
+	var cmW = m.width(), cmH = m.height();// context menu dimensions
+	var wH = window.innerHeight, wW = window.innerWidth;
+	var icoW = e.currentTarget.context.offsetWidth;
+	var icoH = e.currentTarget.context.offsetHeight;
+	var dPos = {'x':x, 'y':y + icoH};// draw possition
+	var maxX = wW - SIDE_MARGIN;// max horizontal position
+	var maxY = wH - TOP_MARGIN;// max vertical position
+	var minX = SIDE_MARGIN;// min horizontal position
+	var minY = TOP_MARGIN;// min vertical position
+	var wMax = x + cmW;// current coordinate of right edge
+	var hMax = y + cmH;// current coordinate of bottom edge
+
+	if (wMax > maxX) dPos.x = x - cmW + icoW;// draw to the left
+//	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
+//	else if (hMax > maxY) dPos.x = x - cmW;
+	if (hMax > maxY) dPos.y = maxY - cmH;
+	 
+	 return {'x':dPos.x, 'y':dPos.y}
+}
+
+// Can scroll menus which height is bigger then window.height
+function scrollMenu(e, cont)
 {
 	var k = document.getElementById(cont);
 	var pNode = k.parentNode;

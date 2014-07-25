@@ -1034,7 +1034,15 @@ function initContextUI()
 	$(c+'.move-up').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			$(this)
+			$(this).insertBefore( $(this).prev() )
+		});
+	});
+
+	$(c+'.move-down').unbind('click');
+	$(c+'.move-down').bind('click',function(event) 
+	{
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
+			$(this).insertAfter( $(this).next() )
 		});
 	});
 

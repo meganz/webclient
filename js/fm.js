@@ -1034,7 +1034,24 @@ function initContextUI()
 	$(c+'.move-up').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			$(this).insertBefore( $(this).prev() )
+			var $this = $(this)
+				, prev = $(this).prev()
+				, id   = $this.attr('id')
+
+			if (id.substr(0,2) == prev.attr('id').substr(0,2)) {
+				var queue = id[0] == 'd' ? dlQueue._queue : ulQueue._queue
+				for (var i = 0 ; i < queue.length; i++) {
+					if (queue[i][0].gid == id) {
+						var tmp = queue[i-1][0]
+						queue[i-1][0]	= queue[i][0]
+						queue[i][0]		= tmp
+						break;
+					}
+				}
+			}
+
+			// update UI
+			$this.insertBefore( prev );
 		});
 	});
 
@@ -1042,7 +1059,24 @@ function initContextUI()
 	$(c+'.move-down').bind('click',function(event) 
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
-			$(this).insertAfter( $(this).next() )
+			var $this = $(this)
+				, next = $(this).next()
+				, id   = $this.attr('id')
+
+			if (id.substr(0,2) == next.attr('id').substr(0,2)) {
+				var queue = id[0] == 'd' ? dlQueue._queue : ulQueue._queue
+				for (var i = 0 ; i < queue.length; i++) {
+					if (queue[i][0].gid == id) {
+						var tmp = queue[i+1][0]
+						queue[i+1][0]	= queue[i][0]
+						queue[i][0]		= tmp
+						break;
+					}
+				}
+			}
+
+			// update UI
+			$this.insertAfter( next )
 		});
 	});
 

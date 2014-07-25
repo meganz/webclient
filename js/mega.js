@@ -499,7 +499,7 @@ function MegaData ()
 		});
 
 		$('.file-block .file-settings-icon').bind('click',function(e) {
-			var target = $(this).parents('.file-block')
+			var target = $(this).parents('.file-block');
 			if (target.attr('class').indexOf('ui-selected') == -1) {
 				target.parent().find('a').removeClass('ui-selected');
 			}

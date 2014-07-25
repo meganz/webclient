@@ -3547,10 +3547,14 @@ function menuItems()
 
 function contextmenuUI(e,ll,topmenu)
 {
+	// iscontextmenu disabled
 	if (localStorage.contextmenu) return true;
-	var t = '.context-menu.files-menu .context-menu-item';	
+	// filter selector
+	var t = '.context-menu.files-menu .context-menu-item';
+	// it seems that ll == 2 is used when right click is occures outside of item, on empty canvas
 	if (ll == 2)
 	{
+		// Enable upload item menu for clould-drive, disable it for rubbish and rest of crew
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
 			$(t).filter('.context-menu-item').hide();
@@ -3559,21 +3563,23 @@ function contextmenuUI(e,ll,topmenu)
 		}
 		else return false;
 	}
-	else if (ll)
+	else if (ll)// click on item
 	{
-		$(t).hide();
+		$(t).hide();// Hide all menu-items
 		var c = $(e.currentTarget).attr('class');
-		var id = $(e.currentTarget).attr('id');
-		if (id) id = id.replace('treea_','');
-		if (id && !M.d[id]) id = undefined;
-		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
+		var id = $(e.currentTarget).attr('id');// get id of clicked element
+		if (id) id = id.replace('treea_','');// if clicked on left panel
+		if (id && !M.d[id]) id = undefined;// exist in node list?
+
+		// detect and show right menu
+		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			$.selected = [M.RootID];
 			$(t).filter('.refresh-item,.properties-item').show();
 		}
-		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
-		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
+		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();
+		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();
 		else if (c && c.indexOf('messages-item') > -1)
 		{
 			e.preventDefault();
@@ -3586,22 +3592,41 @@ function contextmenuUI(e,ll,topmenu)
 		}
 		else return false;		
 	}
-	
-	var m = $('.context-menu.files-menu');
+	// This part of code is also executed when ll == 'undefined'
+	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var v = m.children($('.context-menu-section'));
-	v.removeClass('hidden');
-	m.removeClass('hidden');
+	
 	v.each(function() {
 		if($(this).height()<24) $(this).addClass('hidden');
 	});
-	var r = $('body').outerWidth()-$(m).outerWidth();
-	var b = $('body').outerHeight()-$(m).outerHeight();
-	var mX = e.pageX;
-	var mY = e.pageY;
-	m.css({'top':mY,'left':mX})
-	if (b - $(m).position().top < 50) m.css('top', b-50);		
-	if (r - $(m).position().left < 1) m.css('left', mX - 10 - $(m).outerWidth());	
+	
+	adjustMenuPosition(e, m, (id && id.length === 11));
+	// show menu
+	v.removeClass('hidden');
+	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function adjustMenuPosition(e, m, menuType)
+{
+	var T_M = 12;// top margin in pixels
+	var S_M = 12;// side margin in pixels
+	// Returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
+	var mX = e.clientX;
+	var mY = e.clientY;
+	if (menuType)// transfer panel menu
+	{
+	}
+	else// all other menus
+	{
+		var r = $('body').outerWidth()-$(m).outerWidth();
+		var b = $('body').outerHeight()-$(m).outerHeight();
+		if (b - $(m).position().top < 50) m.css('top', b-50);
+		if (r - $(m).position().left < 1) m.css('left', mX - 10 - $(m).outerWidth());
+	}
+	m.css({'top':mY,'left':mX});// set menu position
+	
+	return;
 }
 
 function scrollContextMenu(e, cont)
@@ -3609,7 +3634,6 @@ function scrollContextMenu(e, cont)
 	var k = document.getElementById(cont);
 	var pNode = k.parentNode;
 
-	var ex = e.pageX;
 	var ey = e.pageY;
 	var dy = h * 0.1;
 	var h = pNode.offsetHeight;

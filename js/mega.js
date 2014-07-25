@@ -1873,7 +1873,7 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' td:eq(0) .speed').text("(" + bytesToSize(bps,1) +'/s)');
+				$('.transfer-table #' + id + ' td:eq(0) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
 				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
@@ -2090,7 +2090,7 @@ function MegaData ()
 			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
 			$('.transfer-table #ul_' + id + ' td:eq(0) .speed').text(
-				'(' + (bps ? bytesToSize(bps,1) +'/s' : '') + ')'
+				bps ? (' (' + bytesToSize(bps,1) +'/s' + ')' ) : ''
 			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(3)').text(secondsToTime(retime));

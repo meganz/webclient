@@ -143,6 +143,9 @@ function hideEmptyMsg()
 	$('.fm-empty-search').addClass('hidden');
 	$('.fm-empty-cloud').addClass('hidden');
 	$('.fm-empty-messages').addClass('hidden');
+	
+	$('.fm-empty-conversations').addClass('hidden');
+	$('.fm-empty-incoming').addClass('hidden');
 }
 
 
@@ -449,6 +452,23 @@ function initUI()
 		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 	
+	var initialTooltipTime;
+	$('.nw-fm-left-icon').unbind('mouseover');
+	$('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initialTooltipTime );
+	  initialTooltipTime = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+    });
+	
+	$('.nw-fm-left-icon').unbind('mouseout');
+	$('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initialTooltipTime );
+    });
+	
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
 		setTimeout(function()
@@ -590,6 +610,8 @@ function searchFM()
 
 function removeUInode(h)
 {
+	console.log('removeUInode',h);
+
 	var n = M.d[h];
 	var i=0;
 	// check subfolders
@@ -600,7 +622,11 @@ function removeUInode(h)
 		{
 			for (var cn in cns) 
 			{
-				if (M.d[cn] && M.d[cn].t && cn !== h) i++;	
+				if (M.d[cn] && M.d[cn].t && cn !== h)
+				{
+					i++;
+					break;
+				}
 			}
 		}
 	}
@@ -611,11 +637,10 @@ function removeUInode(h)
 		case M.RootID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
-//			$('#treea_' + h).remove();
-//			$('#treesub_' + h).remove();
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{
+				$('.files-grid-view').addClass('hidden');
 				$('.grid-table.fm tr').remove();
 				$('.fm-empty-cloud').removeClass('hidden');
 			}
@@ -629,8 +654,11 @@ function removeUInode(h)
 			}
 			break;
 		case "contacts":
-			//Clear left panel
+			//Clear left panel:
 			$('#contact_' + h).remove();
+			// clear the contacts grid:
+			$('.contacts-grid-view #' + h).remove();			
+			// TODO: remove from conversations?
 			if (!hasItems)
 			{
 				$('.contacts-grid-view .contacts-grid-header tr').remove();
@@ -648,8 +676,6 @@ function removeUInode(h)
 		case M.RubbishID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
-//			$('#treea_' + h).remove();
-//			$('#treesub_' + h).remove();
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{
@@ -813,6 +839,24 @@ function fmremove()
 function initContextUI()
 {
 	var c = '.context-menu-item';
+	
+	//TODO: Create logic for submenues positions in context menu
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover',function()
+	{   
+	    var s = $(this).children('.context-submenu').eq(0);
+		$(this).find('.context-submenu').removeClass('left-position');
+		s.addClass('active');
+		var rpos = $(window).width() - $(s).offset().left - $(s).width();
+		if (rpos < 20) $(this).find('.context-submenu').addClass('left-position');
+	});
+	$(c+'.contains-submenu').unbind('mouseout');
+	$(c+'.contains-submenu').bind('mouseout',function()
+	{
+		$(this).find('.context-submenu').removeClass('active');
+	});
+	
+	
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event) 
 	{
@@ -1225,22 +1269,25 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{	
 		$('.fm-clearbin-button').removeClass('hidden');	
+		$('.files-grid-view').addClass('rubbish-bin');	
+	} else {
+		$('.files-grid-view').removeClass('rubbish-bin');	
+	    if (RootbyId(M.currentdirid) == M.InboxID)
+	    {	
+		   if (d) console.log('Inbox');
+	    }
+	    else if (M.currentdirid == 'contacts')
+	    {
+		   $('.fm-add-user').removeClass('hidden');	
+	    }
+	    else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
+	    {
+		    $('.fm-new-folder').removeClass('hidden');
+		    $('.fm-file-upload').removeClass('hidden');
+		    if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
+		    else $('.fm-file-upload').addClass('last-button');		
+	    }
 	}
-	else if (RootbyId(M.currentdirid) == M.InboxID)
-	{	
-		if (d) console.log('Inbox');
-	}
-	else if (M.currentdirid == 'contacts')
-	{
-		$('.fm-add-user').removeClass('hidden');	
-	}
-	else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
-	{
-		$('.fm-new-folder').removeClass('hidden');
-		$('.fm-file-upload').removeClass('hidden');
-		if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) $('.fm-folder-upload').removeClass('hidden');
-		else $('.fm-file-upload').addClass('last-button');		
-	}	
 	$('.fm-clearbin-button').unbind('click');
 	$('.fm-clearbin-button').bind('click',function()
 	{
@@ -3527,7 +3574,12 @@ function contextmenuUI(e,ll,topmenu)
 	}
 	
 	var m = $('.context-menu.files-menu');
+	var v = m.children($('.context-menu-section'));
+	v.removeClass('hidden');
 	m.removeClass('hidden');
+	v.each(function() {
+		if($(this).height()<24) $(this).addClass('hidden');
+	});
 	var r = $('body').outerWidth()-$(m).outerWidth();
 	var b = $('body').outerHeight()-$(m).outerHeight();
 	var mX = e.pageX;
@@ -3665,6 +3717,7 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');	
 	if (id !== 'conversations') $('.fm-right-header.fm').removeClass('hidden');
+	if (id !== 'cloud-drive') $('.files-grid-view').addClass('hidden');
 	
 	var headertxt = '';
 	switch(id)
@@ -5463,7 +5516,7 @@ function fm_resize_handler() {
         megaChat.resized();
     }
 
-    var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() - 10 /* padding */;
+    var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() ;
     $('.fm-right-files-block > *:not(.fm-right-header)').css({
         'height': right_blocks_height + "px",
         'min-height': right_blocks_height + "px"

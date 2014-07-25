@@ -220,3 +220,10 @@ js/tests/coverage
 
 # JS Docs
 js/docs/
+
+
+#############
+## Node modules
+#############
+
+js/tests/node_modules/

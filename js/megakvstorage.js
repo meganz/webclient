@@ -44,9 +44,14 @@ MegaKVStorage.prototype._genBucketName = function(k) {
  *
  * @param k
  * @param v
+ * @param [expiration] {Number} optional number of seconds to expire this item after
  */
-MegaKVStorage.prototype.setItem = function(k, v) {
-    return this.adapter.setItem(this._genBucketName(k), v);
+MegaKVStorage.prototype.setItem = function(k, v, expiration) {
+    var r = this.adapter.setItem(this._genBucketName(k), v);
+    if(expiration) {
+        this.adapter.setItem(this._genBucketName(k) + ".exp", unixtime() + expiration);
+    }
+    return r;
 };
 
 /**
@@ -55,9 +60,28 @@ MegaKVStorage.prototype.setItem = function(k, v) {
  * @param k
  */
 MegaKVStorage.prototype.removeItem = function(k) {
+    this.adapter.removeItem(this._genBucketName(k) + ".exp");
     return this.adapter.removeItem(this._genBucketName(k));
 };
 
+/**
+ * Utility func, used to check if a key had expired (and remove it from the storage)
+ *
+ * @param k
+ * @returns {boolean}
+ * @private
+ */
+MegaKVStorage.prototype._checkAndRemoveIfExpired = function(k) {
+    // check if expired first
+    var expiredVal = this.adapter.getItem(this._genBucketName(k) + ".exp");
+    if(expiredVal && expiredVal < unixtime()) {
+        this.removeItem(k);
+
+        return true;
+    } else {
+        return false;
+    }
+};
 
 /**
  * `Storage.getItem` implementation + default_val, what to return in case that this value is not available
@@ -67,6 +91,9 @@ MegaKVStorage.prototype.removeItem = function(k) {
  * @returns {*}
  */
 MegaKVStorage.prototype.getItem = function(k, default_val) {
+    if(this._checkAndRemoveIfExpired(k) === true) {
+        return default_val;
+    }
     var val = this.adapter.getItem(this._genBucketName(k));
     return val !== null ? val : default_val;
 };
@@ -78,6 +105,9 @@ MegaKVStorage.prototype.getItem = function(k, default_val) {
  * @returns {boolean}
  */
 MegaKVStorage.prototype.hasItem = function(k) {
+    if(this._checkAndRemoveIfExpired(k) === true) {
+        return false;
+    }
     return this.adapter.getItem(this._genBucketName(k)) !== null;
 };
 

@@ -319,6 +319,7 @@ function MegaData ()
 			else if (M.currentdirid.substr(0,7) == 'search/') $('.fm-empty-search').removeClass('hidden');
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
+			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 		}
 
 		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;
@@ -355,7 +356,7 @@ function MegaData ()
 					{
 						t = '.file-block-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 						cc=1;
 					}
 				}
@@ -381,7 +382,7 @@ function MegaData ()
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="60" class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
 						cc=1;
 					}
@@ -527,7 +528,7 @@ function MegaData ()
 		this.buildtree({h:'shares'});		
 		this.buildtree(this.d[this.RootID]);
 		this.buildtree({h:M.RubbishID});
-		this.contacts();		
+		this.contacts();	
 		treeUI();
         if(MegaChatEnabled) {
             megaChat.renderContactTree();
@@ -669,7 +670,8 @@ function MegaData ()
 	this.contacts = function()
 	{
 		var contacts = [];
-		for (var i in M.u) if (M.u[i].c) contacts.push(M.u[i]);
+		for (var i in M.c['contacts']) contacts.push(M.d[i]);
+		
 		if (localStorage.csort) this.csort = localStorage.csort;
 		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
 		if (this.csort == 'shares')
@@ -699,9 +701,8 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			var img = staticpath + 'images/mega/default-small-avatar.png';
-			if (avatars[contacts[i].u]) img = avatars[contacts[i].u].url;
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-contact-avatar"><img alt="" src="' + img + '"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
+			
+			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
 			
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}
@@ -1767,12 +1768,11 @@ function MegaData ()
 				}
 
 				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'">'
-					+ '<td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td>'
+					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
-					+ '<td>File</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
 					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
 					+ '</tr>');
@@ -1788,12 +1788,11 @@ function MegaData ()
 		}
 		if (z) 
 		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
-			+ '<td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td>'
+			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td><span class="row-number">1</span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
-			+ '<td>Zip</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
 			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
 		fmUpdateCount();
@@ -1853,7 +1852,7 @@ function MegaData ()
 		}
 
 		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
-			$('.transfer-table #' + id + ' td:eq(6)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$('.transfer-table #' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
 
@@ -1874,6 +1873,7 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
+				$('.transfer-table #' + id + ' td:eq(0) .speed').text("(" + bytesToSize(bps,1) +'/s)');
 				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
@@ -1903,7 +1903,7 @@ function MegaData ()
 		
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
-		$('.transfer-table #' + id + ' td:eq(6)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #' + id + ' td:eq(3)').text('');
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
@@ -1989,7 +1989,7 @@ function MegaData ()
 				 * a chunk may fail at any time, don't report a temporary error while
 				 * there is network activity associated with the download, though.
 				 */
-				$('.transfer-table #' + id + ' td:eq(6)')
+				$('.transfer-table #' + id + ' td:eq(5)')
 					.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 					// .parents('tr').data({'failed' : NOW()});
 				//$('.transfer-table #' + id + ' td:eq(4)').text('');
@@ -2001,7 +2001,7 @@ function MegaData ()
 	this.dlstart = function(dl)
 	{
 		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
-		$('.transfer-table #' + id + ' td:eq(6)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		dl.st = NOW();
 		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
 		ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
@@ -2052,12 +2052,11 @@ function MegaData ()
 
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'">'
-					+ '<td><span class="transfer-type upload">' + l[372] + '</span></td>'
+					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
-					+ '<td>File</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
 					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
@@ -2078,7 +2077,7 @@ function MegaData ()
 		{
 			$('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
 			$('.transfer-table #ul_' + id + ' .transfer-status').addClass('download');
-			$('.transfer-table #ul_' + id + ' td:eq(6)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
+			$('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
@@ -2090,7 +2089,9 @@ function MegaData ()
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
 			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
-			//$('.transfer-table #ul_' + id + ' td:eq(4)').text(bps ? bytesToSize(bps,1) +'/s' : '');
+			$('.transfer-table #ul_' + id + ' td:eq(0) .speed').text(
+				'(' + (bps ? bytesToSize(bps,1) +'/s' : '') + ')'
+			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(3)').text(secondsToTime(retime));
 			percent_megatitle();
@@ -2123,7 +2124,7 @@ function MegaData ()
 			$('#uploadpopbtn').text(l[726]);
 			$('#mobileupload_header').text(l[554]);
 		}
-		$('.transfer-table #ul_' + id + ' td:eq(6)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
@@ -2149,7 +2150,7 @@ function MegaData ()
 	this.ulstart = function(id)
 	{
 		if (d) console.log('ulstart',id);
-		$('.transfer-table #ul_' + id + ' td:eq(6)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		ul_queue[id].starttime = new Date().getTime();
 		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
@@ -2205,7 +2206,7 @@ function onUploadError(fileid, errorstr)
 {
 	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
 
-	$('.transfer-table #ul_' + fileid + ' td:eq(6)')
+	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 		.parents('tr').data({'failed' : NOW()});
 }

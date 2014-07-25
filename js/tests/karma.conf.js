@@ -14,16 +14,16 @@ module.exports = function(config) {
             "src/helpers/fromMega.js",
 
              "../functions.js",
-             "../../asmcrypto.js",
+             "../asmcrypto.js",
              "../jsbn.js",
              "../jsbn2.js",
              "../jodid25519.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
-             "../megakvstorage.js",
              "../fm.js",
              "../user.js",
-             "http://rawgithub.com/bitwiseshiftleft/sjcl/master/sjcl.js",
+             "../megakvstorage.js",
+             "../tlvstore.js",
 
              "../chat/mpenc.js",
              "../chat/opQueue.js",
@@ -77,7 +77,8 @@ module.exports = function(config) {
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
             '../chat/!(*mpenc|rtcSession).js': ['coverage'],
-            'src/helpers/*.js': ['coverage']
+            '../megakvstorage.js': ['coverage'],
+             '../tlvstore.js': ['coverage']
         },
 
 //        browsers: ['PhantomJS_custom'],

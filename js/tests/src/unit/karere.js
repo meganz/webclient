@@ -631,4 +631,131 @@ describe("Karere Unit Test", function() {
     });
 
     //TODO: write a simple test for _requiresConnectionWrapper
+
+    it("sent-stamp - absolute and relative time stamps", function(done) {
+        k1.fakeConnect("user@jid.com", "password");
+
+        em1.mock("onPrivateMessage");
+
+        var d1 = 123;
+
+        // absolute timestamp
+        k1._onIncomingStanza(
+            stringToXml(
+                "<message xmlns='jabber:client' from='from@jid.com' to='" + k1.getJid() + "' type='chat' id='idx'>" +
+                    "<active xmlns='http://jabber.org/protocol/chatstates'/>" +
+                    "<delay stamp='" + (new Date(d1 * 1000).toISOString()) + "'/>" +
+                    "<body>yo</body>" +
+                    "</message>"
+            )
+        );
+
+        expect(
+            em1.mocks['onPrivateMessage'].triggeredCount
+        ).to.eql(1);
+
+        expect(
+            em1.mocks['onPrivateMessage'].triggeredArgs[0][1].delay
+        ).to.eql(d1);
+
+        // relative timestamp
+        d1 = 123; // message created time
+        var d2 = 153; // and sent 30sec later
+
+        var receivedTimestamp = 153; // received at the same time
+
+        sinon.stub(window, 'unixtime', function() {
+            return receivedTimestamp;
+        });
+
+        k1._onIncomingStanza(
+            stringToXml(
+                "<message xmlns='jabber:client' from='from@jid.com' to='" + k1.getJid() + "' type='chat' id='idx'>" +
+                    "<active xmlns='http://jabber.org/protocol/chatstates'/>" +
+                    "<delay stamp='" + (new Date(d1 * 1000).toISOString()) + "' sent-stamp='" + (new Date(d2 * 1000).toISOString()) + "'/>" +
+                    "<body>yo</body>" +
+                    "</message>"
+            )
+        );
+
+        expect(
+            em1.mocks['onPrivateMessage'].triggeredCount
+        ).to.eql(2);
+
+        expect(
+            em1.mocks['onPrivateMessage'].triggeredArgs[1][1].delay
+        ).to.eql(receivedTimestamp - (d2 - d1));
+
+        window.unixtime.restore();
+
+        done();
+    });
+    it("pingRequest, pingResponse, _onIncomingIq", function(done) {
+        k1.fakeConnect("user@jid.com", "password");
+
+        em1.mock("onPingResponse");
+        em1.mock("onPingRequest");
+
+
+        var $p1 = k1.sendPing("targetUserJid");
+
+        expectToBeResolved($p1, "ping failed to get any pong/ping response from the other user");
+
+        var msgId = Object.keys(k1._iqRequests)[0];
+
+
+        // fake pong
+        k1._onIncomingIq(
+            $(
+                '<iq type="result" id="' + msgId + '" from="targetUserJid" to="toJid"/>'
+            )[0]
+        );
+
+        expect(em1.mocks.onPingResponse.triggeredCount).to.eql(1);
+        expect(em1.mocks.onPingResponse.triggeredArgs[0][1].toJid).to.eql("toJid");
+        expect(em1.mocks.onPingResponse.triggeredArgs[0][1].fromJid).to.eql("targetUserJid");
+        expect(em1.mocks.onPingResponse.triggeredArgs[0][1].messageId).to.eql(msgId);
+        expect(em1.mocks.onPingResponse.triggeredArgs[0][1] instanceof KarereEventObjects.PingResponse).to.eql(true);
+
+
+        $p1.done(function() {
+            sinon.stub(k1, 'sendPong', k1.sendPong);
+
+            // fake incoming ping
+            k1._onIncomingIq(
+                $(
+                    '<iq type="get" id="msgId" from="fromJid" to="' + k1.getJid() + '"><ping/></iq>'
+                )[0]
+            );
+
+
+
+
+            expect(k1.sendPong.callCount).to.eql(1);
+
+            expect(em1.mocks.onPingRequest.triggeredCount).to.eql(1);
+            expect(em1.mocks.onPingRequest.triggeredArgs[0][1].toJid).to.eql(k1.getJid());
+            expect(em1.mocks.onPingRequest.triggeredArgs[0][1].fromJid).to.eql("fromJid");
+            expect(em1.mocks.onPingRequest.triggeredArgs[0][1].messageId).to.eql("msgId");
+            expect(em1.mocks.onPingRequest.triggeredArgs[0][1] instanceof KarereEventObjects.PingRequest).to.eql(true);
+
+            k1.sendPong.restore();
+
+            done();
+        });
+    });
+    it("_waitForPresenceCache", function(done) {
+        k1.fakeConnect("user@jid.com", "password");
+
+        em1.mock("onInviteMessage");
+        em1.mock("onUsersJoined");
+        em1.mock("onUsersLeft");
+
+        var promiseJoined = k1.waitForUserToJoin("room@jid.com", "user2@jid.com");
+        var promiseJoined2 = k1.waitForUserToJoin("room@jid.com", "user2@jid.com");
+
+        expect(promiseJoined).to.eql(promiseJoined2);
+
+        done();
+    });
 });

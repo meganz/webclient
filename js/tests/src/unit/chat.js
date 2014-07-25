@@ -1591,4 +1591,438 @@ describe("Chat.js - Karere UI integration", function() {
                 done();
             });
     });
+
+    it("onComposing and onPaused events", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
+
+                var megaRoom = megaChat.chats[roomJid];
+
+                megaChat.karere.trigger("onComposingMessage", new KarereEventObjects.StateComposingMessage(
+                    user1jid,
+                    user2jid,
+                    roomJid
+                ));
+
+                expect($('.typing').size()).to.eql(1);
+                expect($('.typing:visible').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color2').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color2').size()).to.eql(1);
+
+
+
+                megaChat.karere.trigger("onComposingMessage", new KarereEventObjects.StateComposingMessage(
+                    user2jid,
+                    user1jid,
+                    roomJid
+                ));
+
+                expect($('.typing').size()).to.eql(1);
+                expect($('.typing:visible').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
+
+                megaChat.karere.trigger("onPausedMessage", new KarereEventObjects.StatePausedMessage(
+                    user2jid,
+                    user1jid,
+                    roomJid
+                ));
+
+                expect($('.typing').size()).to.eql(0);
+                expect($('.typing:visible').size()).to.eql(0);
+
+
+                done();
+            });
+    });
+
+
+
+    it("._*call* methods (audio/video logic and UI)", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        var rtcMocker;
+
+        megaChat.rtc = megaChat.rtc ? megaChat.rtc : {};
+        rtcMocker = new ObjectMocker(
+            megaChat.rtc,
+            {
+                'startMediaCall': function() {
+                    var s = this;
+
+                    s.canceled = false;
+                    return {
+                        'cancel': function() {
+                            s.canceled = true;
+                        }
+                    };
+                },
+                'hangup': function() {},
+                'getReceivedMediaTypes': function() {
+                    return {
+                        'audio': true,
+                        'video': true
+                    };
+                },
+                'getSentMediaTypes': function() {
+                    return;
+                }
+            }
+        );
+
+
+        afterEach(function(done) {
+            if(rtcMocker) {
+                rtcMocker.restore();
+            }
+
+            done();
+        });
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
+
+                var megaRoom = megaChat.chats[roomJid];
+
+
+                // start call (audio + video)
+
+                megaRoom.options.mediaOptions['audio'] = true;
+                megaRoom.options.mediaOptions['video'] = true;
+                megaRoom._startCall();
+
+                expect(megaChat.rtc.startMediaCall.callCount).to.eql(1);
+                expect(megaChat.rtc.startMediaCall.getCall(0).args[0]).to.eql(user2jid);
+                expect(megaChat.rtc.startMediaCall.getCall(0).args[1]).to.eql({
+                    'video': true,
+                    'audio': true
+                });
+                expect(Object.keys(megaRoom.callRequest)).to.eql(['cancel']);
+                expect(megaChat.rtc.canceled).to.eql(false);
+                expect($('.outgoing-call').size()).to.eql(1);
+
+                // _cancelCallRequest, _resetCallStateNoCall
+                megaRoom._cancelCallRequest();
+                expect(megaChat.rtc.canceled).to.eql(true);
+                expect(megaChat.rtc.hangup.callCount).to.eql(1);
+
+                // start new call (audio only)
+                megaRoom.options.mediaOptions['audio'] = true;
+                megaRoom.options.mediaOptions['video'] = false;
+                megaRoom._startCall();
+                expect(megaChat.rtc.startMediaCall.callCount).to.eql(2);
+                expect(megaChat.rtc.startMediaCall.getCall(0).args[0]).to.eql(user2jid);
+                expect(megaChat.rtc.startMediaCall.getCall(0).args[1]).to.eql({
+                    'video': false,
+                    'audio': true
+                });
+                expect(megaChat.rtc.canceled).to.eql(false);
+                expect(Object.keys(megaRoom.callRequest)).to.eql(['cancel']);
+                expect($('.outgoing-call').size()).to.eql(1);
+
+
+                // media recv (local + remote)
+                megaRoom.trigger("local-stream-obtained", {
+                    'player': $("<video class='fake-player-local-media-received'/>")
+                });
+
+                expect($('.fake-player-local-media-received', megaRoom.$header).size()).eql(1);
+
+
+                megaRoom.trigger("media-recv", {
+                    'peer': user2jid,
+                    'player': $("<video class='fake-player-media-received'/>")
+                });
+
+                expect($('.others-av-screen', megaRoom.$header).data("jid")).to.eql(
+                    user2jid
+                );
+                expect($('.fake-player-media-received', megaRoom.$header).size()).eql(1);
+
+
+                // _callStartedState
+                megaRoom.trigger('call-answered',
+                    {
+                        type: 'call-init',
+                        peer: user2jid
+                    }
+                );
+
+                expect(
+                    $('.nw-conversations-header.call-started:visible, .nw-conversations-item.current-calling:visible').size()
+                ).to.eql(2)
+
+                expect(megaRoom.$header.parent().is(".video-call")).to.eql(true);
+
+                // _renderAudioVideoScreens, _renderSingleAudioVideoScreen
+
+                expect($('.my-av-screen', megaRoom.$header).is(":visible")).to.eql(true);
+                expect($('.my-av-screen .my-avatar', megaRoom.$header).css("display")).to.eql("inline");
+                expect($('.my-av-screen video', megaRoom.$header).css("display")).to.eql("none");
+
+                expect($('.others-av-screen', megaRoom.$header).is(":visible")).to.eql(true);
+                expect($('.others-av-screen .other-avatar', megaRoom.$header).css("display")).to.eql("none");
+                expect($('.others-av-screen video', megaRoom.$header).css("display")).to.eql("inline");
+
+
+                done();
+            });
+    });
+
+    it(".generateInlineDialog", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
+
+                var megaRoom = megaChat.chats[roomJid];
+
+                var $dialog = megaRoom.generateInlineDialog(
+                    "type",
+                    user1jid,
+                    ["cssClass1"],
+                    "message contents",
+                    ["cssClass2"],
+                    {
+                        'answer': {
+                            'type': 'primary',
+                            'text': "Answer",
+                            'callback': function(){}
+                        },
+                        'reject': {
+                            'type': 'secondary',
+                            'text': "Cancel",
+                            'callback': function(){}
+                        }
+                    },
+                    false
+                );
+
+
+                expect(!!$dialog.data("timestamp")).to.eql(true);
+                expect($dialog.is(".cssClass2")).to.eql(true);
+                expect($('.cssClass1', $dialog).size()).to.eql(1);
+                expect($('.fm-chat-inline-dialog-button-answer', $dialog).size()).to.eql(1);
+                expect($('.fm-chat-inline-dialog-button-reject', $dialog).size()).to.eql(1);
+
+                done();
+            });
+    });
+
+
+    it(".arePluginsForcingMessageQueue, .getMessageById, ._flushMessagesQueue", function(done) {
+        var user1jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u);
+        var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u);
+
+        var jids = [
+            user1jid,
+            user2jid
+        ];
+
+        var $promise = megaChat.openChat(
+            jids,
+            "private"
+        );
+
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledWith([]);
+
+        expect(
+            megaChat.karere.startChat
+        ).to.have.been.calledOnce;
+
+        expectToBeResolved($promise, 'cant open chat')
+            .done(function() {
+                var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
+
+                // fake user join
+                var users = {};
+                users[user1jid] = "moderator";
+                users[user2jid] = "participant";
+
+                megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+                    roomJid + "/" + megaChat.karere.getNickname(),
+                    user1jid,
+                    roomJid,
+                    {},
+                    users
+                ));
+
+                var megaRoom = megaChat.chats[roomJid];
+
+                // arePluginsForcingMessageQueue
+                var origPlugins = megaChat.plugins;
+
+                megaChat.plugins = {
+                    'forceQueue': {'shouldQueueMessage': function() { return true; } }
+                };
+
+                expect(megaRoom.arePluginsForcingMessageQueue({})).to.eql(true);
+
+                megaChat.plugins = {
+                    'forceQueue': {'shouldQueueMessage': function() { return false; } }
+                };
+
+                expect(megaRoom.arePluginsForcingMessageQueue({})).to.eql(false);
+
+                megaChat.plugins = {
+                    'forceQueue': {'shouldQueueMessage': function() { return false; } },
+                    'forceQueue2': {'shouldQueueMessage': function() { return true; } }
+                };
+
+                expect(megaRoom.arePluginsForcingMessageQueue({})).to.eql(true);
+
+
+                megaChat.plugins = origPlugins;
+
+
+                // getMessageById
+
+
+                var msg = {
+                    messageId: "1234"
+                };
+                megaRoom.messages = [msg];
+
+                expect(megaRoom.getMessageById("1234")).to.eql(msg);
+                expect(megaRoom.getMessageById("12345")).to.eql(false);
+
+
+                // _flushMessagesQueue
+                megaRoom._messagesQueue = [
+                    new KarereEventObjects.OutgoingMessage(
+                        /* toJid */ user1jid,
+                        /* fromJid */ user2jid,
+                        /* type */ "groupchat",
+                        /* messageId */ "msgId",
+                        /* contents */ "message contents",
+                        /* meta */ {
+                            'roomJid': megaRoom.roomJid
+                        },
+                        /* delay */ 123
+                    )
+                ];
+
+                megaRoom._flushMessagesQueue();
+
+                expect(megaRoom._messagesQueue.length).to.eql(0);
+                expect(megaRoom._messagesQueue.length).to.eql(0);
+                expect(megaChat.karere.sendRawMessage.callCount).to.eql(2);
+
+                expect(megaChat.karere.sendRawMessage.getCall(0).args[2]).to.eql("message contents");
+                // sync request, sent by the _flushMessageQueue
+                expect(megaChat.karere.sendRawMessage.getCall(1).args[1]).to.eql("action");
+                expect(megaChat.karere.sendRawMessage.getCall(1).args[3].action).to.eql("sync");
+
+
+                done();
+            });
+    });
 });

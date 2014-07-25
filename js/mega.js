@@ -290,8 +290,12 @@ function MegaData ()
 				{
 					n.append(e[i]);
 				}
-				if (folderlink || RootbyId(M.currentdirid) == M.RubbishID) $('.grid-url-arrow').hide();
-				if (M.viewmode == 1) fm_thumbnails();
+				if (M.dynlistRt) clearTimeout(M.dynlistRt);
+				M.dynlistRt = setTimeout(function()
+				{
+					delete M.dynlistRt;
+					M.rmSetupUI();
+				}, 400);
 				$(window).trigger('resize');
 			}
 			else
@@ -322,7 +326,26 @@ function MegaData ()
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 		}
 
-		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;
+		var files = 0, cache = [], n_cache;
+		if (this.viewmode == 1)
+		{
+			var r = Math.floor($('.fm-blocks-view').width() / 140);
+			n_cache = r*Math.ceil($('.fm-blocks-view').height()/164);
+		}
+		else
+		{
+			n_cache = Math.ceil($('.files-grid-view').height() / 24);
+		}
+		this.cRenderMainN = this.cRenderMainN || 1;
+		if (!n_cache)
+		{
+			if (++this.cRenderMainN < 4) return Soon(function()
+			{
+				M.renderMain(u);
+			});
+			n_cache = 9e9;
+		}
+		delete this.cRenderMainN;
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
@@ -433,7 +456,7 @@ function MegaData ()
 			}
 		});
 		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
-		if (d) console.log('cache %d/%d', cache.length, files);
+		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
 			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
@@ -441,6 +464,26 @@ function MegaData ()
 				if (bot) flush_cached_nodes(n_cache / 2);
 			});
 		}
+
+		if (this.viewmode == 1)
+		{
+			$('.file-block-scrolling').append('<div class="clear"></div>');
+			fa_duplicates = {};
+		}
+
+		this.rmSetupUI();
+	};
+	
+	this.rmSetupUI = function()
+	{
+		if (this.viewmode == 1)
+		{
+			iconUI();
+			fm_thumbnails();
+		}
+		else Soon(gridUI);
+		Soon(fmtopUI);
+		
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
@@ -467,16 +510,6 @@ function MegaData ()
 			searchPath();
 			contextmenuUI(e,1);
 		});
-
-		if (this.viewmode == 1)
-		{
-			$('.file-block-scrolling').append('<div class="clear"></div>');
-			iconUI();
-			fa_duplicates = {};
-			fm_thumbnails();
-		}
-		else gridUI();
-		fmtopUI();
 	};
 
 	this.renderShare = function(h)

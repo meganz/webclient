@@ -3595,21 +3595,23 @@ function contextmenuUI(e,ll,topmenu)
 	// This part of code is also executed when ll == 'undefined'
 	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var v = m.children($('.context-menu-section'));
-	
-	v.each(function() {
-		if($(this).height()<24) $(this).addClass('hidden');
+	v.each(function() {// hide dividers in hidden sections
+		var a = $(this).find('.context-menu-item');
+		if ($(a).filter(':hidden').length === $(a).length) $(this).find('.context-menu-divider').hide();
+		else $(this).find('.context-menu-divider').show();
 	});
 	
 	adjustContextMenuPosition(e, m, (id && id.length === 11));
-	// show menu
-	v.removeClass('hidden');
+	
 	m.removeClass('hidden');
 	e.preventDefault();
 }
 
+// @menuType can be transfer panel or context menu
 function adjustContextMenuPosition(e, m, menuType)
 {
 	var mPos;// menu position
+	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
 	if (menuType)// transfer panel menu
 	{
 	}
@@ -3617,16 +3619,14 @@ function adjustContextMenuPosition(e, m, menuType)
 	{
 		if (e.type === 'click')// clicked on file-settings-icon
 		{
+			var ico = {'x':e.currentTarget.context.offsetWidth, 'y':e.currentTarget.context.offsetHeight};
 			var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
-			mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y);
+			mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y, ico);
 		}
 		else// right click
 		{
-			
+			mPos = reCalcMenuPosition(e, m, mX, mY);
 		}
-//		1. Find height and width context menu
-//		2. Compare top, bot, left, right dimensions
-//		3. move menu if there is a need for it
 	}
 	m.css({'top':mPos.y,'left':mPos.x});// set menu position
 	
@@ -3636,24 +3636,34 @@ function adjustContextMenuPosition(e, m, menuType)
 // re-calculates element position if there's a need for that, eg. less then 12px left on right side
 // @x, @y current coordinates where element should be shown
 // @cmW, @cmH width and height of element
-function reCalcMenuPosition(e, m, x, y)
+// @ico, file-settings-icon dimensions, can be undefined, when right click menu is called
+function reCalcMenuPosition(e, m, x, y, ico)
 {
 	var TOP_MARGIN = 12;
 	var SIDE_MARGIN = 12;
-	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
-	var cmW = m.width(), cmH = m.height();// context menu dimensions
+	var cmW = m.outerWidth(), cmH = m.outerHeight();// context menu dimensions
 	var wH = window.innerHeight, wW = window.innerWidth;
-	var icoW = e.currentTarget.context.offsetWidth;
-	var icoH = e.currentTarget.context.offsetHeight;
-	var dPos = {'x':x, 'y':y + icoH};// draw possition
 	var maxX = wW - SIDE_MARGIN;// max horizontal position
 	var maxY = wH - TOP_MARGIN;// max vertical position
 	var minX = SIDE_MARGIN;// min horizontal position
 	var minY = TOP_MARGIN;// min vertical position
 	var wMax = x + cmW;// current coordinate of right edge
 	var hMax = y + cmH;// current coordinate of bottom edge
-
-	if (wMax > maxX) dPos.x = x - cmW + icoW;// draw to the left
+	
+	var dPos;
+	if (typeof ico !== 'undefined')// file-settings-icon click
+	{
+		dPos = {'x':x, 'y':y + ico.y};
+		if (wMax > maxX) dPos.x = x - cmW + ico.x;// draw to the left
+	}
+	else// right click
+	{
+		dPos = {'x':x, 'y':y};
+		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
+	}
+		
+// ToDo: decide how to handle "huge" context menu
+// ToDo: decide how to handle overlapping menus, eg. submenu can't be drawn to the right any more, so only options is to the left over existin one
 //	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
 //	else if (hMax > maxY) dPos.x = x - cmW;
 	if (hMax > maxY) dPos.y = maxY - cmH;

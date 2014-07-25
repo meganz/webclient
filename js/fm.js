@@ -519,6 +519,10 @@ function initUI()
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 }
 
+function isIdDownload(id) {
+	return id[0] == 'd' || id[0] == 'z';
+}
+
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();
@@ -1038,15 +1042,11 @@ function initContextUI()
 				, prev = $(this).prev()
 				, id   = $this.attr('id')
 
-			if (id.substr(0,2) == prev.attr('id').substr(0,2)) {
-				var queue = id[0] == 'd' ? dlQueue._queue : ulQueue._queue
-				for (var i = 0 ; i < queue.length; i++) {
-					if (queue[i][0].gid == id) {
-						var tmp = queue[i-1][0]
-						queue[i-1][0]	= queue[i][0]
-						queue[i][0]		= tmp
-						break;
-					}
+			if (isIdDownload(id) == isIdDownload(prev.attr('id'))) {
+				if (isIdDownload(id)) {
+					fm_tfsmove(id, -1);
+				} else {
+					// missing upload move
 				}
 			}
 
@@ -1063,15 +1063,11 @@ function initContextUI()
 				, next = $(this).next()
 				, id   = $this.attr('id')
 
-			if (id.substr(0,2) == next.attr('id').substr(0,2)) {
-				var queue = id[0] == 'd' ? dlQueue._queue : ulQueue._queue
-				for (var i = 0 ; i < queue.length; i++) {
-					if (queue[i][0].gid == id) {
-						var tmp = queue[i+1][0]
-						queue[i+1][0]	= queue[i][0]
-						queue[i][0]		= tmp
-						break;
-					}
+			if (isIdDownload(id) == isIdDownload(next.attr('id'))) {
+				if (isIdDownload(id)) {
+					fm_tfsmove(id, 1);
+				} else {
+					// missing upload move
 				}
 			}
 

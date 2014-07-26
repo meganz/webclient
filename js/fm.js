@@ -50,12 +50,23 @@ function initContactsGridScrolling()
 	$('.contacts-grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-grid-scrolling-table');
 }
+
+
 function initContactsBlocksScrolling() 
 {
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-blocks-scrolling');
+}
+
+
+function initShareBlocksScrolling() 
+{
+	var jsp = $('.shared-blocks-scrolling').data('jsp');
+	if (jsp) jsp.destroy();
+	$('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
+	jScrollFade('.shared-blocks-scrolling');
 }
 
 function initTransferScroll()
@@ -359,9 +370,6 @@ function initUI()
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu').addClass('hidden');
-		
-		console.log('test');
-		
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');
@@ -2193,13 +2201,12 @@ function gridUI()
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
 	$.gridHeader = function()  
-	{	
-		
-		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+	{		
+		$('.grid-table tbody tr:first-child td').each(function(i,e) 
+		{
 		  var headerColumn = $('.grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
-	    });
-		
+	    });		
 		initTransferScroll();
 	}	
 	$.contactgridHeader = function()
@@ -2217,7 +2224,28 @@ function gridUI()
 		  $(headerColumn).width($(e).width());
 	    });
 		initTransferScroll();
-	}	
+	}
+	
+	
+	$.sharedgridHeader = function()
+	{
+		var el = $('.shared-grid-view .grid-table-header th');		
+		var i=0;
+		var w=0;		
+		while (i < el.length)
+		{
+			if (i !== 0) w+=$(el[i]).width();
+			i++;
+		}
+		$('.shared-grid-view .grid-scrolling-table tbody tr:first-child td').each(function(i,e) 
+		{
+		  var headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+		initTransferScroll();
+	}
+	
+	
 	if (M.currentdirid == 'contacts') $.selectddUIgrid = '.contacts-grid-table';
 	else $.selectddUIgrid = '.grid-scrolling-table';	
 	$.selectddUIitem = 'tr';
@@ -2241,13 +2269,24 @@ function gridUI()
     });	
 	$('.fm-blocks-view').addClass('hidden');
 	$('.fm-chat-block').addClass('hidden');
-	$('.fm-contacts-blocks-view').addClass('hidden');	
+	$('.fm-contacts-blocks-view').addClass('hidden');
+	$('.shared-blocks-view').addClass('hidden');
+	
+	
 	if (M.currentdirid == 'contacts')
 	{
 		$('.files-grid-view').addClass('hidden');
 		$('.contacts-grid-view').removeClass('hidden');
 		$.contactgridHeader();
 		initContactsGridScrolling();
+	}
+	else if (M.currentdirid == 'shares')
+	{
+		$('.files-grid-view').addClass('hidden');
+		$('.contacts-grid-view').addClass('hidden');
+		$('.shared-grid-view').removeClass('hidden');		
+		$.sharedgridHeader();		
+		initGridScrolling();
 	}
 	else
 	{	
@@ -3247,23 +3286,36 @@ function iconUI()
 		$.selectddUIgrid = '.contacts-blocks-scrolling';
 		$.selectddUIitem = '.contact-block-view';
 	}
+	else if (M.currentdirid == 'shares')
+	{
+		$.selectddUIgrid = '.shared-blocks-scrolling';
+		$.selectddUIitem = 'a';
+	}
 	else
 	{
 		$.selectddUIgrid = '.file-block-scrolling';
 		$.selectddUIitem = 'a';
 	}
 	selectddUI();	
-	$('.files-grid-view').addClass('hidden');	
+	
+	$('.files-grid-view').addClass('hidden');
 	$('.contacts-grid-view').addClass('hidden');
+	$('.shared-grid-view').addClass('hidden');	
+	$('.fm-blocks-view').addClass('hidden');
+	$('.fm-contacts-blocks-view').addClass('hidden');
+	
 	if (M.currentdirid == 'contacts')
 	{
-		$('.fm-blocks-view').addClass('hidden');
 		$('.fm-contacts-blocks-view').removeClass('hidden');
 		initContactsBlocksScrolling();
 	}
+	else if (M.currentdirid == 'shares')
+	{		
+		$('.shared-blocks-view').removeClass('hidden');
+		initShareBlocksScrolling();
+	}
 	else
 	{
-		$('.fm-contacts-blocks-view').addClass('hidden');
 		$('.fm-blocks-view').removeClass('hidden');
 		initFileblocksScrolling();
 	}	
@@ -3271,11 +3323,12 @@ function iconUI()
 	$(window).bind('resize.icon', function () 
 	{
 		if (M.viewmode == 1 && M.currentdirid == 'contacts') initContactsBlocksScrolling();
+		else if (M.viewmode == 1 && M.currentdirid == 'shares') initShareBlocksScrolling();
         else if (M.viewmode == 1) initFileblocksScrolling();
     });
 	
-	$('.fm-blocks-view').unbind('contextmenu');
-	$('.fm-blocks-view').bind('contextmenu',function(e)
+	$('.fm-blocks-view,.shared-blocks-view').unbind('contextmenu');
+	$('.fm-blocks-view,.shared-blocks-view').bind('contextmenu',function(e)
 	{		
 		$('.file-block').removeClass('ui-selected');
 		selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
@@ -5577,7 +5630,7 @@ function fm_resize_handler() {
 	{
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
-	}	
+	}
 
 	
 	if (M.chat) {

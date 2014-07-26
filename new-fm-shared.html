@@ -111,12 +111,12 @@ $(document).ready(function() {
   $('.fm-files-view-icon').bind('click', function () {
 	  if ($(this).attr('class').indexOf('active') == -1) {
 		  if ($(this).attr('class').indexOf('block-view') > -1) {
-			  $('.shared-grid-view').addClass('hidden');
-			  $('.shared-blocks-view').removeClass('hidden'); 
+			  $('.files-grid-view ').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden'); 
               initSharedBlocksScroll();
 		  } else {
-			  $('.shared-grid-view').removeClass('hidden');
-			  $('.shared-blocks-view').addClass('hidden');
+			  $('.files-grid-view ').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
 			  initSharedGridScroll();
 		  }
 		  $('.fm-files-view-icon').removeClass('active');
@@ -284,7 +284,7 @@ $(document).ready(function() {
                 </div>
                 
                 <!-- New block for shared folders grid !-->
-                <div class="shared-grid-view">
+                <div class="files-grid-view shared-view">
                 
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                       <tr>
@@ -399,7 +399,7 @@ $(document).ready(function() {
                 </div>
                 
                 <!-- New block for shared folders blocks view !-->
-                <div class="shared-blocks-view hidden">
+                <div class="fm-blocks-view shared-view hidden">
                   <div class="shared-blocks-scrolling">
                     
                     <a class="file-block folder">

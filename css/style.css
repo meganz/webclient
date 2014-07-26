@@ -3059,7 +3059,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -17px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 	overflow: hidden;
 }
 .rubbish-bin .nw-fm-tree-folder {
@@ -3299,14 +3299,13 @@ text-overflow: ellipsis;
 	font-size: 11px;
 	line-height: 21px;
 	color: #666666;
-	
 	margin: 0 0 0 76px;
 	overflow: hidden;
 	display: block;
 	padding: 13px 0 0 0;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .contacts-username, .add-contact-username {
 	margin: 0 0 0 56px;
@@ -3347,7 +3346,7 @@ text-overflow: ellipsis;
 	position: relative;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .nw-conversations-unread {
 	position: absolute;
@@ -3403,10 +3402,10 @@ text-overflow: ellipsis;
 	line-height: 23px;
 	color: #666666;
 	padding: 0;
-	overflow:hidden;
+	overflow: hidden;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .nw-conversations-item.selected .nw-conversations-name, .nw-conversations-item:hover .nw-conversations-name, .fm-tree-panel .nw-contact-item:hover .nw-contact-name, .fm-tree-panel .nw-contact-item.selected .nw-contact-name {
 	color: white;
@@ -4264,7 +4263,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	
 	overflow: hidden;
 }
 .transfer-icons-block {
@@ -4414,10 +4412,8 @@ th.grid-first-th {
 	background-color: rgba(238,238,238,0);
 }
 .grid-table.shared-with-me td {
-	height:48px;
-	
+	height: 48px;
 }
-
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
 	background-color: rgba(0,0,0,0.02);
 }
@@ -4523,20 +4519,20 @@ th.grid-first-th {
 	background-color: rgba(0,0,0,0.05);
 }
 .shared-blocks-view .file-block {
-	height:216px; width:168px;
-	
+	height: 216px;
+	width: 168px;
 }
 .shared-blocks-view .file-icon-area {
-	width:160px;
-	height:160px;
+	width: 160px;
+	height: 160px;
 }
-.shared-blocks-view  .block-view-file-type.folder, .properties-file-icon div.folder {
-	width:94px;
-	height:77px;
+.shared-blocks-view .block-view-file-type.folder, .properties-file-icon div.folder {
+	width: 94px;
+	height: 77px;
 	background-image: url(../images/mega/shared-sprite.svg);
-background-repeat: no-repeat;
-background-position: center top;
-margin: -38px 0 0 -47px;
+	background-repeat: no-repeat;
+	background-position: center top;
+	margin: -38px 0 0 -47px;
 }
 .file-icon-area {
 	width: 120px;
@@ -4631,24 +4627,24 @@ margin: -38px 0 0 -47px;
 }
 .file-block-title, .contact-block-view-name {
 	display: block;
-padding: 0 0 0 0;
-white-space: pre-wrap;
-word-break: break-all;
-padding: 0 10px;
-height: 28px;
-overflow: hidden;
-font-size: 11px;
-line-height: 28px;
-margin: 0;
-text-align: center;
-color: #333333;
--o-text-overflow: ellipsis;
-text-overflow: ellipsis;
-overflow: hidden;
-white-space: nowrap;
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
+	padding: 0 0 0 0;
+	white-space: pre-wrap;
+	word-break: break-all;
+	padding: 0 10px;
+	height: 28px;
+	overflow: hidden;
+	font-size: 11px;
+	line-height: 28px;
+	margin: 0;
+	text-align: center;
+	color: #333333;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .grid-url-arrow, .file-settings-icon {
 	height: 18px;
@@ -4727,9 +4723,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 0;
 	line-height: 0;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
-overflow: hidden;
-white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
 	color: #666666;
@@ -5530,7 +5526,6 @@ table {
 }
 .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg {
 	background-position: 2px -501px;
-	
 }
 .fm-dialog-breadcrumbs:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5571,8 +5566,8 @@ table {
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
 	background-position: 2px -544px;
 }
-.fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me  .right-arrow-bg span {
-	display:none;
+.fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg span {
+	display: none;
 }
 .fm-breadcrumbs .right-arrow-bg:hover, .fm-share-breadcrumbs .right-arrow-bg:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5775,7 +5770,6 @@ span.search-number {
 }
 .fm-leave-share {
 	background-position: -31px -458px;
-	
 	background-color: rgba(102,102,102,0.7);
 }
 .fm-share-copy {
@@ -5786,7 +5780,6 @@ span.search-number {
 	background-color: rgba(102,102,102,1);
 }
 .fm-share-copy:hover, .fm-share-copy.active {
-	
 	background-color: rgba(109,176,63,1);
 }
 .fm-share-download {
@@ -6004,7 +5997,7 @@ span.search-number {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
-	display:block;
+	display: block;
 }
 .context-menu-divider.pro {
 	background-color: transparent;
@@ -16604,54 +16597,57 @@ span.incoming-call-name {
 	background-color: rgba(6,160,236,1);
 }
 .shared-with-me .nw-contact-avatar {
-	position:absolute;
+	position: absolute;
 	margin: 1px 0 0 0;
 }
-.shared-grid-view .td, .shared-grid-view .th  {
-	padding:0 12px;
+.shared-grid-view .td, .shared-grid-view .th {
+	padding: 0 12px;
 }
 .shared-with-me .fm-chat-user-info {
-  float: none;
-  margin: 1px 0 0 44px;
+	float: none;
+	margin: 1px 0 0 44px;
 }
 .shared-folder-icon {
 	background-image: url(../images/mega/shared-sprite.svg);
-background-position: -27px -132px;
-background-repeat: no-repeat;
-width: 40px;
-height: 32px;
-position: absolute;
-margin: 1px 0 0 0;
+	background-position: -27px -132px;
+	background-repeat: no-repeat;
+	width: 40px;
+	height: 32px;
+	position: absolute;
+	margin: 1px 0 0 0;
 }
 .shared-folder-info-block {
-	padding:0 0 0 51px; font-size:11px; line-height:17px;
-	display:block;
+	padding: 0 0 0 51px;
+	font-size: 11px;
+	line-height: 17px;
+	display: block;
 }
 .shared-folder-name {
-	color:#111111;
-	display:block;
-	white-space:nowrap;
+	color: #111111;
+	display: block;
+	white-space: nowrap;
 	-o-text-overflow: ellipsis;
-text-overflow: ellipsis;
-overflow: hidden;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .shared-folder-info {
-	 color:#666666; line-height:16px;
-	 display:block;
-	 white-space:nowrap;
-	 -o-text-overflow: ellipsis;
-text-overflow: ellipsis;
-overflow: hidden;
+	color: #666666;
+	line-height: 16px;
+	display: block;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 .shared-folder-access {
 	font-size: 11px;
-line-height: 16px;
-padding-left: 29px;
-color: #666666;
-display:block;
-background-image: url(../images/mega/shared-sprite.svg);
-background-position: -37px -245px;
-background-repeat: no-repeat;
+	line-height: 16px;
+	padding-left: 29px;
+	color: #666666;
+	display: block;
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-position: -37px -245px;
+	background-repeat: no-repeat;
 }
 .shared-folder-access.read-and-write {
 	background-position: -36px -293px;
@@ -16663,82 +16659,94 @@ background-repeat: no-repeat;
 	margin: 10px 0 0 10px;
 }
 .file-block .shared-folder-info-block {
-padding: 9px 6px 0 50px;
+	padding: 9px 6px 0 50px;
 }
 .file-block .shared-folder-access {
 	position: absolute;
-width: 22px;
-height: 20px;
-z-index: 10;
-top: 6px;
-right: 7px;
-padding:0;
+	width: 22px;
+	height: 20px;
+	z-index: 10;
+	top: 6px;
+	right: 7px;
+	padding: 0;
 }
 .file-block .shared-folder-access.full-access, .file-block .shared-folder-access.read-and-write {
 	top: 7px;
-right: 5px;
+	right: 5px;
 }
 .shared-top-details {
-	height:123px;
+	height: 123px;
 }
 .shared-details-icon {
 	width: 100px;
-height: 100px;
-float: left;
-background-image: url(../images/mega/shared-sprite.svg);
-background-repeat: no-repeat;
-background-position: center top;
-margin: 23px 0 0 20px;
+	height: 100px;
+	float: left;
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center top;
+	margin: 23px 0 0 20px;
 }
 .shared-details-info-block {
-	margin-left:138px;
+	margin-left: 138px;
 }
 .shared-details-pad {
-	float:left; padding-top: 28px;
+	float: left;
+	padding-top: 28px;
 }
 .shared-details-folder-name {
-	font-size:24px; line-height:28px; float:left; color:#333333;
+	font-size: 24px;
+	line-height: 28px;
+	float: left;
+	color: #333333;
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
-background-color: rgba(255,255,255,1); position:static; float:left; left:auto; top:auto; margin: 6px 0 0 11px;
+	background-color: rgba(255,255,255,1);
+	position: static;
+	float: left;
+	left: auto;
+	top: auto;
+	margin: 6px 0 0 11px;
 }
 .shared-details-pad .grid-url-arrow span {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
--moz-opacity: 0.2;
--khtml-opacity: 0.2;
-opacity: 0.2;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
 }
 .shared-details-pad .grid-url-arrow:hover, .shared-details-pad .grid-url-arrow.active {
 	border: 2px solid rgba(0,0,0,0.2);
 }
 .shared-details-pad .grid-url-arrow:hover span, .shared-details-pad .grid-url-arrow.active span {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
--moz-opacity: 0.3;
--khtml-opacity: 0.3;
-opacity: 0.3;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .shared-details-pad .shared-folder-access {
-	float:left; margin: 8px 0 0 8px;
+	float: left;
+	margin: 8px 0 0 8px;
 }
 .shared-details-pad .nw-contact-avatar {
 	margin: 10px 0 0 0px;
 }
 .shared-details-pad .fm-chat-user {
-	color:#666666; font-size:11px; padding:9px 0 0 0; font-family:'Open Sans', Helvetica, Arial;
-	
+	color: #666666;
+	font-size: 11px;
+	padding: 9px 0 0 0;
+	font-family: 'Open Sans', Helvetica, Arial;
 }
 .shared-details-buttons {
-	float:right; padding:58px 18px 0 0;
+	float: right;
+	padding: 58px 18px 0 0;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
 	height: -webkit-calc(100% - 123px);
-height: -moz-calc(100% - 123px);
-height: calc(100% - 123px);
+	height: -moz-calc(100% - 123px);
+	height: calc(100% - 123px);
 }
 .fm-blocks-view.shared-folder-content {
-	padding:12px;
-	
+	padding: 12px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;

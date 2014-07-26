@@ -30,6 +30,16 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
+
+function fmUpdateCount() {
+	var i = 0;
+	$('.transfer-table span.row-number').each(function() {
+		$(this).text(++i);
+	});
+}
+
+
+
 function MegaData ()
 {
 	this.d = {};
@@ -48,14 +58,6 @@ function MegaData ()
 	
 	this.csortd = -1;
 	this.csort = 'name';
-
-	function fmUpdateCount() {
-		var i = 0;
-		$('.transfer-table span.row-number').each(function() {
-			$(this).text(++i);
-		});
-	}
-
 
 	this.reset = function()
 	{
@@ -2060,6 +2062,7 @@ function MegaData ()
 		});
 
 		panelDomQueue.splice(0, toClean);
+		fmUpdateCount();
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();

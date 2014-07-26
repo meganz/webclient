@@ -1938,6 +1938,8 @@ function MegaData ()
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #' + id + ' td:eq(3)').text('');
+		resetUploadDownload();
+
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
@@ -1950,7 +1952,6 @@ function MegaData ()
 		} else {
 			$('.transfer-table #' + id).fadeOut('slow', function(e)
 			{
-				resetUploadDownload();
 				$(this).remove();
 			});
 		}
@@ -2164,9 +2165,10 @@ function MegaData ()
 		}
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
+		resetUploadDownload();
+
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
-			resetUploadDownload();
 			$(this).remove();
 		});
 		$.transferHeader();

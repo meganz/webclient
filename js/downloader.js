@@ -98,7 +98,7 @@ ClassChunk.prototype.updateProgress = function(force) {
 		force && force !== 2
 	);
 
-	this.dl.speed = this.Progress.speed
+	GlobalProgress[this.dl.zipid ? 'zip_' + this.dl.zipid : 'ul_' + this.dl.id].speed = this.Progress.speed
 
 	this.Progress.dl_prevprogress = _progress
 	this.Progress.dl_lastprogress = NOW()
@@ -274,6 +274,7 @@ ClassFile.prototype.destroy = function() {
 		delete this.dl.quota_t;
 	}
 
+
 	if (this.dl.cancelled)
 	{
 		if (this.dl.zipid && Zips[this.dl.zipid])
@@ -357,7 +358,7 @@ ClassFile.prototype.run = function(task_done) {
 
 		if (tasks.length > 0) {
 			dlQueue.pushAll(tasks, function onChunkFinished() { 
-					this.chunkFinished = true 
+				this.chunkFinished = true 
 			}.bind(this), failureFunction);
 		}
 

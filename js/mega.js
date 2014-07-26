@@ -1979,9 +1979,6 @@ function MegaData ()
 			delete $.transferprogress[id];
 		}
 
-		GlobalProgress[id].finished = true;
-
-		percent_megatitle();
 		$.transferHeader();
 	}
 
@@ -2135,7 +2132,6 @@ function MegaData ()
 			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(3)').text(secondsToTime(retime));
-			percent_megatitle();
 			$.transferHeader();
 
 			if (page.substr(0,2) !== 'fm')
@@ -2190,7 +2186,6 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
-		GlobalProgress['ul_' + id].finished = true;
 		$.transferHeader();
 	}
 

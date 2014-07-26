@@ -1224,7 +1224,7 @@ function percent_megatitle()
 			dl_r += t[0];
 			dl_t += t[1];
 		}
-		else if (q.id && !GlobalProgress[fid].finished) 
+		else
 		{
 			dl_t += q.size || 0;
 		}
@@ -1241,7 +1241,7 @@ function percent_megatitle()
 			ul_r += t[0];
 			ul_t += t[1];
 		}
-		else if (ul_queue[i].id && !GlobalProgress[fid].finished) 
+		else
 		{
 			ul_t += ul_queue[i].size || 0;
 		}
@@ -1252,7 +1252,7 @@ function percent_megatitle()
 
 	var x_ul = Math.floor(ul_r/ul_t*100) || 0,
 		x_dl = Math.floor(dl_r/dl_t*100) || 0
-	
+
 	if (dl_t && ul_t)
 	{
 		t = ' \u2191 ' +  x_dl + '% \u2193 ' + x_ul + '%';

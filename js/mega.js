@@ -1950,6 +1950,7 @@ function MegaData ()
 		} else {
 			$('.transfer-table #' + id).fadeOut('slow', function(e)
 			{
+				resetUploadDownload();
 				$(this).remove();
 			});
 		}
@@ -2165,6 +2166,7 @@ function MegaData ()
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
+			resetUploadDownload();
 			$(this).remove();
 		});
 		$.transferHeader();

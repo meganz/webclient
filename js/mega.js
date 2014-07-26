@@ -309,6 +309,7 @@ function MegaData ()
 			}
 		}
 		hideEmptyMsg();
+		
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		var jsp = $('.contacts-blocks-scrolling').data('jsp');
@@ -493,9 +494,12 @@ function MegaData ()
 						a = $(t+' '+el);
 						$(a[a.length-1]).after(html);
 					}
-				}				
+				}
 			}
 		}
+				
+		sharedfolderUI();
+		
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
@@ -521,6 +525,8 @@ function MegaData ()
 			$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
+		
+		
 
 		this.rmSetupUI();
 	};
@@ -968,9 +974,11 @@ function MegaData ()
 		var g=1;
 		while(g)
 		{
-			if (M.d[id] || id == 'contacts' || id == 'messages' || id == M.InboxID) a.push(id);
-			else return [];
-			if (id == this.RootID || id == 'contacts' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
+			if (id == 'contacts') id = 'shares';
+		
+			if ((M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) && id.length !== 11) a.push(id);
+			else if (id.length !== 11) return [];
+			if (id == this.RootID || id == 'contacts' || id == 'shares' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
 			if (g) id = this.d[id].p;
 		}
 		return a;
@@ -1010,7 +1018,7 @@ function MegaData ()
 				}
 				else
 				{
-					name = l[164];
+					name = '';
 					typeclass = 'cloud-drive';
 				}
 			}
@@ -1018,6 +1026,11 @@ function MegaData ()
 			{
 				typeclass = 'contacts';
 				name = l[165];
+			}
+			else if (a[i] == 'shares')
+			{
+				typeclass = 'shared-with-me';
+				name = '';
 			}
 			else if (a[i] == this.RubbishID)
 			{

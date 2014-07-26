@@ -378,7 +378,7 @@ ChunkUpload.prototype.updateprogress = function() {
 		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size,
-		GlobalProgress[this.file.id].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
+		GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
 	);
 
 	if (tp == this.file.size) this.file.complete = true;

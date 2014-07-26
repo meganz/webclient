@@ -1249,7 +1249,7 @@ function percent_megatitle()
 		{
 			ul_t += ul_queue[i].size || 0;
 		}
-		ul_s += ((GlobalProgress[fid]||{}).speed || 0) * 1000
+		ul_s += ((GlobalProgress[fid]||{}).speed || 0)
 	}
 	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
 	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }

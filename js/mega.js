@@ -2146,6 +2146,7 @@ function MegaData ()
 				$('.widget-block').addClass('active');
 			}
 		}
+		percent_megatitle();
 	}
 
 	this.ulcomplete = function(id,h,k)

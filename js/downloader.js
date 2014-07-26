@@ -98,8 +98,6 @@ ClassChunk.prototype.updateProgress = function(force) {
 		force && force !== 2
 	);
 
-	GlobalProgress[this.dl.zipid ? 'zip_' + this.dl.zipid : 'ul_' + this.dl.id].speed = this.Progress.speed
-
 	this.Progress.dl_prevprogress = _progress
 	this.Progress.dl_lastprogress = NOW()
 

@@ -9,7 +9,7 @@ var ul_completing;
 function ul_completepending(target)
 {
 	if (ul_completion.length) {
-	console.error("I'm weak, debug me.")
+		console.error("I'm weak, debug me.")
 		var ul = ul_completion.shift();
 		// var ctx = {
 			// target : target,
@@ -41,8 +41,8 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		onUploadSuccess(ul_queue[ctx.ul_queue_num].id);
 		ul_queue[ctx.ul_queue_num] = {}
-		onUploadSuccess(ctx.ul_queue_num);
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
@@ -74,7 +74,7 @@ function ul_deduplicate(File, identical) {
 			} else if (typeof res == 'number' || res.e) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
-				onUploadSuccess(uq.pos);
+				onUploadSuccess(uq.id);
 				File.file.ul_failed = false;
 				File.file.retries   = 0;
 				File.file.done_starting();
@@ -221,7 +221,7 @@ var UploadManager = new function() {
 		file.abort = true;
 
 		ERRDEBUG("fatal error restarting", file.name)
-		onUploadError(file.pos, "Upload failed - restarting upload");
+		onUploadError(file.id, "Upload failed - restarting upload");
 
 		// reschedule
 		ulQueue.push(new FileUpload(file));
@@ -237,7 +237,7 @@ var UploadManager = new function() {
 		ulQueue.pushFirst(newTask);
 
 		ERRDEBUG("retrying chunk because of", reason + "")
-		onUploadError(file.pos, "Upload failed - retrying");
+		onUploadError(file.id, "Upload failed - retrying");
 	};
 
 	self.isReady = function(Task) {
@@ -313,7 +313,7 @@ function ul_upload(File) {
 		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
-	onUploadStart(file.pos);
+	onUploadStart(file.id);
 	file.done_starting();
 }
 
@@ -374,7 +374,7 @@ ChunkUpload.prototype.updateprogress = function() {
 	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
-		this.file.pos, 
+		this.file.id, 
 		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size,
@@ -440,10 +440,10 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 					this.file.filekey       = filekey
 					this.file.response      = base64urlencode(response)
 					ul_finalize(this.file);
-					//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+					//api_completeupload(response, ul_queue[file.id], filekey,ctx);
 				} else {
 					this.file.completion.push([
-						response.url, this.file, filekey, this.file.pos
+						response.url, this.file, filekey, this.file.id
 					]);
 				}
 			}
@@ -563,7 +563,7 @@ FileUpload.prototype.run = function(done) {
 
 	file.started = true;
 
-	DEBUG(file.name, "starting upload", file.id)
+	ERRDEBUG(file.name, "starting upload", file.id)
 
 	start_uploading = true;
 

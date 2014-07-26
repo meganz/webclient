@@ -563,7 +563,7 @@ FileUpload.prototype.run = function(done) {
 
 	file.started = true;
 
-	ERRDEBUG(file.name, "starting upload", file.id)
+	if (d) console.log(file.name, "starting upload", file.id)
 
 	start_uploading = true;
 

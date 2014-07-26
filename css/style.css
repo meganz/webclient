@@ -16751,6 +16751,12 @@ span.incoming-call-name {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.file-block .nw-contact-avatar img {
+	display:block;
+	height:32px;
+	width:32px;
+	
+}
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
 	min-width: 648px;

@@ -354,6 +354,7 @@ function fm_tfsmove(gid, dir) // -1:up, 1:down
 		}
 		dl_queue.length = p;
 		dlQueue._queue  = mQueue;
+		fmUpdateCount();
 		return;
 	}
 	
@@ -388,6 +389,7 @@ function fm_tfsmove(gid, dir) // -1:up, 1:down
 			break;
 		}
 	}
+	fmUpdateCount();
 };
 
 dlQueue.dispatch = function(gid)

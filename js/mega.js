@@ -30,6 +30,16 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
+
+function fmUpdateCount() {
+	var i = 0;
+	$('.transfer-table span.row-number').each(function() {
+		$(this).text(++i);
+	});
+}
+
+
+
 function MegaData ()
 {
 	this.d = {};
@@ -48,14 +58,6 @@ function MegaData ()
 	
 	this.csortd = -1;
 	this.csort = 'name';
-
-	function fmUpdateCount() {
-		var i = 0;
-		$('.transfer-table span.row-number').each(function() {
-			$(this).text(++i);
-		});
-	}
-
 
 	this.reset = function()
 	{
@@ -228,6 +230,9 @@ function MegaData ()
 						
 						var el = $('#contact_' + ctx.u);						
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
+						
+						var el = $('.nw-contact-avatar.' + ctx.u);
+						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
 
 						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
 					}
@@ -304,17 +309,19 @@ function MegaData ()
 			}
 		}
 		hideEmptyMsg();
+		
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		var jsp = $('.contacts-blocks-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		if (!u)
 		{
-			$('.grid-table.fm tr').remove();
+			$('.grid-table tr').remove();
 			$('.file-block-scrolling div').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling div').remove();
 			$('.contacts-grid-table tr').not('.clone-of-header').remove();
+			
 		}
 		if (this.v.length == 0)
 		{
@@ -373,7 +380,29 @@ function MegaData ()
 						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';						
+						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';				
+					}
+					else if (this.currentdirid == 'shares')
+					{					
+						var u_h = this.v[i].p;						
+						var user = M.d[u_h];						
+						var avatar = user.name.substr(0,2);						
+						if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+						var rights = 'Read only', rightsclass = ' read-only';						
+						if (M.v[i].r == 1)
+						{
+							rights = 'Read and write';
+							rightsclass = ' read-and-write';
+						}
+						else if (M.v[i].r == 2)
+						{
+							rights = 'Full access';
+							rightsclass = ' full-access';
+						}
+					
+						t = '.shared-blocks-scrolling';
+						el = 'a';
+						html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon '+star+'"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar +'</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
 					}
 					else
 					{
@@ -402,6 +431,29 @@ function MegaData ()
 
 						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td><span class="contacts-avatar ' + this.v[i].h + '"><span><img src="' + avatar + '" alt=""/></span></span><span class="contacts-username">' + htmlentities(this.v[i].name) + '</span></td><td width="130" class="hidden"><span class="contact-status online-status"></span><span class="contact-status-text">Online</span></td><td  width="200">' + htmlentities(contains) + '</td><td width="200">' + htmlentities(time) + '</td></tr>';
 						t = '.contacts-grid-table';
+					}
+					else if (this.currentdirid == 'shares')
+					{
+						var cs = this.contactstatus(this.v[i].h);
+						var contains = fm_contains(cs.files,cs.folders);
+						if (cs.files == 0 && cs.folders == 0) contains = l[1050];
+						var u_h = this.v[i].p;						
+						var user = M.d[u_h];						
+						var avatar = user.name.substr(0,2);						
+						if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+						var rights = 'Read only', rightsclass = ' read-only';						
+						if (M.v[i].r == 1)
+						{
+							rights = 'Read and write';
+							rightsclass = ' read-and-write';
+						}
+						else if (M.v[i].r == 2)
+						{
+							rights = 'Full access';
+							rightsclass = ' full-access';
+						}
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star online"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status">Offline</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
+						t = '.grid-table.shared-with-me';
 					}
 					else
 					{
@@ -442,9 +494,12 @@ function MegaData ()
 						a = $(t+' '+el);
 						$(a[a.length-1]).after(html);
 					}
-				}				
+				}
 			}
 		}
+				
+		sharedfolderUI();
+		
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
@@ -470,6 +525,8 @@ function MegaData ()
 			$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
+		
+		
 
 		this.rmSetupUI();
 	};
@@ -917,9 +974,11 @@ function MegaData ()
 		var g=1;
 		while(g)
 		{
-			if (M.d[id] || id == 'contacts' || id == 'messages' || id == M.InboxID) a.push(id);
-			else return [];
-			if (id == this.RootID || id == 'contacts' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
+			if (id == 'contacts') id = 'shares';
+		
+			if ((M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) && id.length !== 11) a.push(id);
+			else if (id.length !== 11) return [];
+			if (id == this.RootID || id == 'contacts' || id == 'shares' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
 			if (g) id = this.d[id].p;
 		}
 		return a;
@@ -959,7 +1018,7 @@ function MegaData ()
 				}
 				else
 				{
-					name = l[164];
+					name = '';
 					typeclass = 'cloud-drive';
 				}
 			}
@@ -967,6 +1026,11 @@ function MegaData ()
 			{
 				typeclass = 'contacts';
 				name = l[165];
+			}
+			else if (a[i] == 'shares')
+			{
+				typeclass = 'shared-with-me';
+				name = '';
 			}
 			else if (a[i] == this.RubbishID)
 			{
@@ -1938,6 +2002,8 @@ function MegaData ()
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #' + id + ' td:eq(3)').text('');
+		resetUploadDownload();
+
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
@@ -1979,9 +2045,6 @@ function MegaData ()
 			delete $.transferprogress[id];
 		}
 
-		GlobalProgress[id].finished = true;
-
-		percent_megatitle();
 		$.transferHeader();
 	}
 
@@ -2061,6 +2124,7 @@ function MegaData ()
 		});
 
 		panelDomQueue.splice(0, toClean);
+		fmUpdateCount();
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();
@@ -2135,7 +2199,6 @@ function MegaData ()
 			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
 			$('.transfer-table #ul_' + id + ' td:eq(3)').text(secondsToTime(retime));
-			percent_megatitle();
 			$.transferHeader();
 
 			if (page.substr(0,2) !== 'fm')
@@ -2148,6 +2211,7 @@ function MegaData ()
 				$('.widget-block').addClass('active');
 			}
 		}
+		percent_megatitle();
 	}
 
 	this.ulcomplete = function(id,h,k)
@@ -2167,6 +2231,8 @@ function MegaData ()
 		}
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
+		resetUploadDownload();
+
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
 			$(this).remove();
@@ -2190,7 +2256,6 @@ function MegaData ()
 			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
 			delete $.transferprogress['ul_'+ id];
 		}
-		GlobalProgress['ul_' + id].finished = true;
 		$.transferHeader();
 	}
 

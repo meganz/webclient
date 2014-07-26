@@ -4487,7 +4487,7 @@ th.grid-first-th {
 .file-block .file-status-icon.star, .contact-status-icon.star {
 	background-position: -14px -7738px;
 }
-.fm-blocks-view, .fm-contacts-blocks-view, .shared-blocks-view {
+.fm-blocks-view, .fm-contacts-blocks-view, .shared-blocks-view, .shared-details-block {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -5704,7 +5704,7 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call {
+.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download {
 	height: 24px;
 	float: right;
 	font-size: 12px;
@@ -5730,6 +5730,9 @@ span.search-number {
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 	position: relative;
+}
+.fm-add-user, .fm-send-files, .fm-start-call, .fm-share-download {
+	padding: 0 0 0 33px;
 }
 .fm-add-user {
 	margin: 12px 12px 0 0;
@@ -5761,12 +5764,35 @@ span.search-number {
 .fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
 	background-position: right -1640px;
 }
-.fm-clearbin-button {
+.fm-clearbin-button, .fm-share-download {
 	background-position: -3px -5820px;
-	padding: 0 10px 0 32px;
 	background-color: rgba(211,26,0,0.7);
 }
-.fm-clearbin-button:hover, .fm-clearbin-button.active {
+.fm-leave-share, .fm-share-copy, .fm-share-download {
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -32px -378px;
+}
+.fm-leave-share {
+	background-position: -31px -458px;
+	
+	background-color: rgba(102,102,102,0.7);
+}
+.fm-share-copy {
+	background-position: -32px -418px;
+	background-color: rgba(109,176,63,0.8);
+}
+.fm-leave-share:hover, .fm-leave-share.active {
+	background-color: rgba(102,102,102,1);
+}
+.fm-share-copy:hover, .fm-share-copy.active {
+	
+	background-color: rgba(109,176,63,1);
+}
+.fm-share-download {
+	background-position: -32px -378px;
+}
+.fm-clearbin-button:hover, .fm-clearbin-button.active, .fm-share-download:hover, .fm-share-download.active {
 	background-color: rgba(211,26,0,1);
 	color: white;
 }
@@ -16652,7 +16678,71 @@ padding:0;
 	top: 7px;
 right: 5px;
 }
-
+.shared-top-details {
+	height:123px;
+}
+.shared-details-icon {
+	width: 100px;
+height: 100px;
+float: left;
+background-image: url(../images/mega/shared-sprite.svg);
+background-repeat: no-repeat;
+background-position: center top;
+margin: 23px 0 0 20px;
+}
+.shared-details-info-block {
+	margin-left:138px;
+}
+.shared-details-pad {
+	float:left; padding-top: 28px;
+}
+.shared-details-folder-name {
+	font-size:24px; line-height:28px; float:left; color:#333333;
+}
+.shared-details-pad .grid-url-arrow {
+	border: 2px solid rgba(0,0,0,0.1);
+background-color: rgba(255,255,255,1); position:static; float:left; left:auto; top:auto; margin: 6px 0 0 11px;
+}
+.shared-details-pad .grid-url-arrow span {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+-moz-opacity: 0.2;
+-khtml-opacity: 0.2;
+opacity: 0.2;
+}
+.shared-details-pad .grid-url-arrow:hover, .shared-details-pad .grid-url-arrow.active {
+	border: 2px solid rgba(0,0,0,0.2);
+}
+.shared-details-pad .grid-url-arrow:hover span, .shared-details-pad .grid-url-arrow.active span {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+-moz-opacity: 0.3;
+-khtml-opacity: 0.3;
+opacity: 0.3;
+}
+.shared-details-pad .shared-folder-access {
+	float:left; margin: 8px 0 0 8px;
+}
+.shared-details-pad .nw-contact-avatar {
+	margin: 10px 0 0 0px;
+}
+.shared-details-pad .fm-chat-user {
+	color:#666666; font-size:11px; padding:9px 0 0 0; font-family:'Open Sans', Helvetica, Arial;
+	
+}
+.shared-details-buttons {
+	float:right; padding:58px 18px 0 0;
+}
+.files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
+	height: -webkit-calc(100% - 123px);
+height: -moz-calc(100% - 123px);
+height: calc(100% - 123px);
+}
+.fm-blocks-view.shared-folder-content {
+	padding:12px;
+	
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
 	min-width: 648px;

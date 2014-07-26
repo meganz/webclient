@@ -20,13 +20,13 @@ $(document).ready(function() {
   {
 	  $('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
   }
-  function initSharedGridScroll()
+  function initGridScroll()
   {
 	  $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
   }
-  function initSharedBlocksScroll()
+  function initBlocksScroll()
   {
-	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+	  $('.file-block-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
   }
   
   
@@ -40,16 +40,16 @@ $(document).ready(function() {
 	
   initTreePanelScroll();
   initTransferPanelScroll();
-  initSharedGridScroll();
-  initSharedBlocksScroll();
+  initGridScroll();
+  initBlocksScroll();
   $.gridHeader();
   
   $(window).bind('resize', function () 
   {
 	  initTreePanelScroll();
       initTransferPanelScroll();
-      initSharedGridScroll();
-	  initSharedBlocksScroll();
+      initGridScroll();
+      initBlocksScroll();
       $.gridHeader();
   });
   $('.nw-fm-tree-folder').bind('click', function() {
@@ -111,13 +111,13 @@ $(document).ready(function() {
   $('.fm-files-view-icon').bind('click', function () {
 	  if ($(this).attr('class').indexOf('active') == -1) {
 		  if ($(this).attr('class').indexOf('block-view') > -1) {
-			  $('.shared-grid-view').addClass('hidden');
-			  $('.shared-blocks-view').removeClass('hidden'); 
-              initSharedBlocksScroll();
+			  $('.files-grid-view').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden');
+              initBlocksScroll(); 
 		  } else {
-			  $('.shared-grid-view').removeClass('hidden');
-			  $('.shared-blocks-view').addClass('hidden');
-			  initSharedGridScroll();
+			  $('.files-grid-view').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
+			  initGridScroll();
 		  }
 		  $('.fm-files-view-icon').removeClass('active');
 		  $(this).addClass('active');
@@ -284,7 +284,7 @@ $(document).ready(function() {
                 </div>
                 
                 <!-- New block for shared folders grid !-->
-                <div class="shared-grid-view">
+                <div class="shared-grid-view hidden">
                 
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                       <tr>
@@ -458,6 +458,89 @@ $(document).ready(function() {
                   
                   </div>
                 </div>
+                
+                <!-- New shared details block !-->
+                <div class="shared-details-block">
+                  <div class="shared-top-details">
+                     <div class="shared-details-icon"></div>
+                     <div class="shared-details-info-block">
+                        <div class="shared-details-pad">
+                          <div class="shared-details-folder-name">Shared Folder name</div>
+                          <a href="" class="grid-url-arrow"><span></span></a>
+                          <div class="shared-folder-access full-access">Full access</div>
+                          <div class="clear"></div>
+                          <div class="nw-contact-avatar color3">L</div>
+                          <div class="fm-chat-user-info">
+                            <div class="fm-chat-user">lk@mega.co.nz</div>
+                          </div>
+                        </div>
+                        <div class="shared-details-buttons">
+                          <div class="fm-leave-share">
+                             <span>Leave share</span>
+                          </div>
+                          <div class="fm-share-copy">
+                             <span>Copy</span>
+                          </div>
+                          <div class="fm-share-download">
+                             <span class="fm-chatbutton-arrow">Download...</span>
+                          </div>
+                          <div class="clear"></div>
+                        </div>
+                        <div class="clear"></div>
+                     </div>
+                  </div>
+                  
+                  <div class="files-grid-view shared-folder-content">
+
+                       <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+                         <tr>
+                           <th class="grid-first-th" style="width: 30px;"><span class="grid-header-star"></span></th>
+                           <th style="width: 683px;"><div class="arrow name desc">Name</div></th>
+                           <th style="width: 100px;"><div class="arrow size">Size</div></th>
+                           <th style="width: 130px;"><div class="arrow type">Type</div></th>
+                           <th style="width: 120px;"><div class="arrow date">Created</div></th>
+                           <th class="grid-url-header" style="width: 42px;"></th>
+                         </tr>
+                       </table>
+                       
+                       <div class="grid-scrolling-table">
+        
+                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">
+                           <tr class="folder">
+                             <td width="30">
+                               <span class="grid-status-icon"></span>
+                             </td>
+                             <td>
+                               <span class="transfer-filtype-icon folder"> </span>
+                               <span class="tranfer-filetype-txt">asdasd</span>
+                             </td>
+                             <td width="100"></td>
+                             <td width="130">Folder</td>
+                             <td width="120">2014-07-24 11:33</td>
+                             <td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td>
+                           </tr>
+                         </table>
+                         
+                       </div>
+                  
+                  </div>
+                  
+                  <div class="fm-blocks-view shared-folder-content hidden">
+                    <div class="file-block-scrolling">
+                       <a class="file-block folder">
+                         <span class="file-status-icon"></span>
+                         <span class="file-settings-icon"><span></span></span>
+                         <span class="file-icon-area">
+                           <span class="block-view-file-type folder"><img alt=""></span>
+                         </span>
+                         <span class="file-block-title">asdasd</span>
+                       </a>
+                       <div class="clear"></div>
+                    </div>
+                  </div>
+                  
+                </div>
+                
               
               </div>
               <div class="clear"></div>

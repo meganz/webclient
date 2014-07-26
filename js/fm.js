@@ -718,7 +718,6 @@ function removeUInode(h)
 				$('.fm-empty-cloud').removeClass('hidden');
 			}
             break;
-			break;
 	}
 }
 

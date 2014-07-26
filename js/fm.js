@@ -50,12 +50,23 @@ function initContactsGridScrolling()
 	$('.contacts-grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-grid-scrolling-table');
 }
+
+
 function initContactsBlocksScrolling() 
 {
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
 	jScrollFade('.contacts-blocks-scrolling');
+}
+
+
+function initShareBlocksScrolling() 
+{
+	var jsp = $('.shared-blocks-scrolling').data('jsp');
+	if (jsp) jsp.destroy();
+	$('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
+	jScrollFade('.shared-blocks-scrolling');
 }
 
 function initTransferScroll()
@@ -359,9 +370,6 @@ function initUI()
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu').addClass('hidden');
-		
-		console.log('test');
-		
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');
@@ -2193,13 +2201,12 @@ function gridUI()
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
 	$.gridHeader = function()  
-	{	
-		
-		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+	{		
+		$('.grid-table tbody tr:first-child td').each(function(i,e) 
+		{
 		  var headerColumn = $('.grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
-	    });
-		
+	    });		
 		initTransferScroll();
 	}	
 	$.contactgridHeader = function()
@@ -2217,7 +2224,28 @@ function gridUI()
 		  $(headerColumn).width($(e).width());
 	    });
 		initTransferScroll();
-	}	
+	}
+	
+	
+	$.sharedgridHeader = function()
+	{
+		var el = $('.shared-grid-view .grid-table-header th');		
+		var i=0;
+		var w=0;		
+		while (i < el.length)
+		{
+			if (i !== 0) w+=$(el[i]).width();
+			i++;
+		}
+		$('.shared-grid-view .grid-scrolling-table tbody tr:first-child td').each(function(i,e) 
+		{
+		  var headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+		initTransferScroll();
+	}
+	
+	
 	if (M.currentdirid == 'contacts') $.selectddUIgrid = '.contacts-grid-table';
 	else $.selectddUIgrid = '.grid-scrolling-table';	
 	$.selectddUIitem = 'tr';
@@ -2241,13 +2269,24 @@ function gridUI()
     });	
 	$('.fm-blocks-view').addClass('hidden');
 	$('.fm-chat-block').addClass('hidden');
-	$('.fm-contacts-blocks-view').addClass('hidden');	
+	$('.fm-contacts-blocks-view').addClass('hidden');
+	$('.shared-blocks-view').addClass('hidden');
+	
+	
 	if (M.currentdirid == 'contacts')
 	{
 		$('.files-grid-view').addClass('hidden');
 		$('.contacts-grid-view').removeClass('hidden');
 		$.contactgridHeader();
 		initContactsGridScrolling();
+	}
+	else if (M.currentdirid == 'shares')
+	{
+		$('.files-grid-view').addClass('hidden');
+		$('.contacts-grid-view').addClass('hidden');
+		$('.shared-grid-view').removeClass('hidden');		
+		$.sharedgridHeader();		
+		initGridScrolling();
 	}
 	else
 	{	
@@ -3247,23 +3286,36 @@ function iconUI()
 		$.selectddUIgrid = '.contacts-blocks-scrolling';
 		$.selectddUIitem = '.contact-block-view';
 	}
+	else if (M.currentdirid == 'shares')
+	{
+		$.selectddUIgrid = '.shared-blocks-scrolling';
+		$.selectddUIitem = 'a';
+	}
 	else
 	{
 		$.selectddUIgrid = '.file-block-scrolling';
 		$.selectddUIitem = 'a';
 	}
 	selectddUI();	
-	$('.files-grid-view').addClass('hidden');	
+	
+	$('.files-grid-view').addClass('hidden');
 	$('.contacts-grid-view').addClass('hidden');
+	$('.shared-grid-view').addClass('hidden');	
+	$('.fm-blocks-view').addClass('hidden');
+	$('.fm-contacts-blocks-view').addClass('hidden');
+	
 	if (M.currentdirid == 'contacts')
 	{
-		$('.fm-blocks-view').addClass('hidden');
 		$('.fm-contacts-blocks-view').removeClass('hidden');
 		initContactsBlocksScrolling();
 	}
+	else if (M.currentdirid == 'shares')
+	{		
+		$('.shared-blocks-view').removeClass('hidden');
+		initShareBlocksScrolling();
+	}
 	else
 	{
-		$('.fm-contacts-blocks-view').addClass('hidden');
 		$('.fm-blocks-view').removeClass('hidden');
 		initFileblocksScrolling();
 	}	
@@ -3271,11 +3323,12 @@ function iconUI()
 	$(window).bind('resize.icon', function () 
 	{
 		if (M.viewmode == 1 && M.currentdirid == 'contacts') initContactsBlocksScrolling();
+		else if (M.viewmode == 1 && M.currentdirid == 'shares') initShareBlocksScrolling();
         else if (M.viewmode == 1) initFileblocksScrolling();
     });
 	
-	$('.fm-blocks-view').unbind('contextmenu');
-	$('.fm-blocks-view').bind('contextmenu',function(e)
+	$('.fm-blocks-view,.shared-blocks-view').unbind('contextmenu');
+	$('.fm-blocks-view,.shared-blocks-view').bind('contextmenu',function(e)
 	{		
 		$('.file-block').removeClass('ui-selected');
 		selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
@@ -5519,7 +5572,7 @@ function fm_resize_handler() {
     // transfer panel resize logic
     var right_pane_height = (
         $('#fmholder').outerHeight() - (
-            $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
+            $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight() 
         )
     );
 
@@ -5577,19 +5630,27 @@ function fm_resize_handler() {
 	{
 		if (M.viewmode) initContactsBlocksScrolling();
 		else initContactsGridScrolling();
-	}	
+	}
 
 	
 	if (M.chat) {
         megaChat.resized();
     }
 
+	
     var right_blocks_height =  right_pane_height - $('.fm-right-header.fm').outerHeight() ;
-    $('.fm-right-files-block > *:not(.fm-right-header)').css({
+    $('.fm-right-files-block > *:not(.fm-right-header)').css(
+	{
         'height': right_blocks_height + "px",
         'min-height': right_blocks_height + "px"
     });
-
+	
+	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();	
+	$('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css(
+	{
+        'height': shared_block_height + "px",
+        'min-height': shared_block_height + "px"
+    });	
 
     // account page tweak, required since the transfer panel resize logic was introduced
     var $account_save_block = $('.fm-account-save-block');
@@ -5602,6 +5663,51 @@ function fm_resize_handler() {
 		
 }
 
+
+
+
+function sharedfolderUI()
+{	
+	if ($('.shared-details-block').length > 0) 
+	{
+		$('.shared-details-block .shared-folder-content').unwrap();			
+		$('.shared-folder-content').removeClass('shared-folder-content');
+		$('.shared-top-details').remove();
+	}
+
+	var n = M.d[M.currentdirid];		
+	if (n && n.p.length == 11)
+	{
+		var u_h = n.p;
+		var user = M.d[u_h];			
+		var avatar = user.name.substr(0,2);						
+		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+		var rights = 'Read only', rightsclass = ' read-only';						
+		if (n.r == 1)
+		{
+			rights = 'Read and write';
+			rightsclass = ' read-and-write';
+		}
+		else if (n.r == 2)
+		{
+			rights = 'Full access';
+			rightsclass = ' full-access';
+		}
+	
+	
+		var e = '.files-grid-view';
+		if (M.viewmode == 1) e = '.fm-blocks-view';
+		
+		$(e).wrap('<div class="shared-details-block"></div>');	
+		$('.shared-details-block').prepend('<div class="shared-top-details"><div class="shared-details-icon"></div><div class="shared-details-info-block"><div class="shared-details-pad"><div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div><a href="" class="grid-url-arrow"><span></span></a><div class="shared-folder-access'+ rightsclass + '">Full access</div><div class="clear"></div><div class="nw-contact-avatar color10">' + avatar + '</div><div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(user.name) + '</div></div></div><div class="shared-details-buttons"><div class="fm-leave-share"><span>Leave share</span></div><div class="fm-share-copy"><span>Copy</span></div><div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div><div class="clear"></div></div><div class="clear"></div></div></div>');	
+		$(e).addClass('shared-folder-content');
+		
+		fm_resize_handler();
+		
+		if (M.viewmode == 1) initFileblocksScrolling();
+		else initGridScrolling();
+	}
+}
 
 
 

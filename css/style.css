@@ -4373,7 +4373,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	overflow: hidden;
 }
-.files-grid-view, .files-grid-view.shared-view, .contacts-grid-view {
+.files-grid-view, .files-grid-view.shared-view, .contacts-grid-view, .shared-grid-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4382,7 +4382,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
-.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th {
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .shared-grid-view th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
@@ -4390,7 +4390,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .contacts-grid-view th:nth-child(4) {
 	background-image: none;
 }
-.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5) {
+.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5) {
 	background-image: none;
 }
 .grid-header-star {
@@ -4483,7 +4483,7 @@ th.grid-first-th {
 .file-block .file-status-icon.star, .contact-status-icon.star {
 	background-position: -14px -7738px;
 }
-.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block {
+.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4518,15 +4518,15 @@ th.grid-first-th {
 	cursor: default;
 	background-color: rgba(0,0,0,0.05);
 }
-.fm-blocks-view.shared-view .file-block {
+.fm-blocks-view.shared-view .file-block, .shared-blocks-view .file-block {
 	height: 216px;
 	width: 168px;
 }
-.fm-blocks-view.shared-view .file-icon-area {
+.fm-blocks-view.shared-view .file-icon-area, .shared-blocks-view .file-icon-area {
 	width: 160px;
 	height: 160px;
 }
-.fm-blocks-view.shared-view .block-view-file-type.folder, .properties-file-icon div.folder {
+.fm-blocks-view.shared-view .block-view-file-type.folder, .properties-file-icon div.folder, .shared-blocks-view  .block-view-file-type.folder {
 	width: 94px;
 	height: 77px;
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -5862,7 +5862,7 @@ span.search-number {
 	margin-top: -151px;
 }
 .fm-empty-contacts .fm-empty-pad {
-	height: 238px;
+	height: 240px;
 	margin-top: -120px;
 }
 .fm-empty-messages .fm-empty-pad {
@@ -5877,7 +5877,7 @@ span.search-number {
 	height: 286px;
 	margin-top: -142px;
 }
-.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-contacts-bg, .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
@@ -5885,7 +5885,7 @@ span.search-number {
 	background-image: url(../images/mega/empty.png);
 	background-repeat: no-repeat;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg {
 	background-image: url(../images/mega/empty-sprite.svg);
 	background-repeat: no-repeat;
 }
@@ -5901,9 +5901,10 @@ span.search-number {
 	height: 233px;
 	background-position: center -640px;
 }
+
 .fm-empty-contacts-bg {
 	height: 186px;
-	background-position: center -990px;
+	background-position: center -1168px;
 }
 .fm-empty-messages-bg {
 	height: 207px;
@@ -16600,9 +16601,7 @@ span.incoming-call-name {
 	position: absolute;
 	margin: 1px 0 0 0;
 }
-.files-grid-view.shared-view .td, .files-grid-view.shared-view .th {
-	padding: 0 12px;
-}
+
 .shared-with-me .fm-chat-user-info {
 	float: none;
 	margin: 1px 0 0 44px;
@@ -17269,7 +17268,7 @@ background-size: 36px auto;
  background-position:center -50px;
  background-size:60px auto;
 }
-.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-contacts-bg, .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-trashbin-bg,  .fm-empty-messages-bg {
 background-image: url(../images/mega/empty@2x.png);
  background-size: 300px auto;
 }

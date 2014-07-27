@@ -3775,7 +3775,46 @@ function reCalcMenuPosition(e, m, x, y, ico)
 //	else if (hMax > maxY) dPos.x = x - cmW;
 	if (hMax > maxY) dPos.y = maxY - cmH;
 	 
-	 return {'x':dPos.x, 'y':dPos.y}
+	return {'x':dPos.x, 'y':dPos.y};
+}
+
+// corner position 0 means default, all 4 courners same round radius
+function setBordersRadius(m, c)
+{
+	var DEF = 8;// default corner radius
+	var SMALL = 4;// small carner radius
+	var TOP_LEFT = 1, TOP_RIGHT = 2, BOT_LEFT = 3, BOT_RIGHT = 4;
+	var tl = DEF, tr = DEF, bl = DEF, br = DEF;
+	
+	var pos = (typeof c === 'undefined') ? 0 : pos;
+	
+	switch (pos)
+	{
+		case TOP_LEFT:
+			tl = SMALL;
+			break;
+		case TOP_RIGHT:
+			tr = SMALL;
+			break
+		case BOT_LEFT:
+			bl = SMALL;
+			break
+		case BOT_RIGHT:
+			br = SMALL;
+			break;
+		default:// situation when c is undefined, all border radius are by DEFAULT
+			break;
+			
+	}
+	
+	// set context menu border radius
+	m.css({
+		'border-top-left-radius': tl,
+		'border-top-right-radius': tr,
+		'border-bottom-left-radius': bl,
+		'border-bottom-right-radius': br});
+	
+	return true;
 }
 
 // Can scroll menus which height is bigger then window.height

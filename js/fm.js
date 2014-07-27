@@ -3654,6 +3654,9 @@ function contextmenuUI(e,ll,topmenu)
 {
 	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
+	
+	var m = $('.context-menu.files-menu');// container/wrapper around menu
+	m.addClass('hidden');// hide menu before re-draw
 	// filter selector
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
@@ -3698,12 +3701,16 @@ function contextmenuUI(e,ll,topmenu)
 		else return false;		
 	}
 	// This part of code is also executed when ll == 'undefined'
-	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var v = m.children($('.context-menu-section'));
+	// count all items inside section, and hide dividers if necessary
 	v.each(function() {// hide dividers in hidden sections
-		var a = $(this).find('.context-menu-item');
-		if ($(a).filter(':hidden').length === $(a).length) $(this).find('.context-menu-divider').hide();
-		else $(this).find('.context-menu-divider').show();
+		var a = $(this).find('a.context-menu-item');
+		var b = $(this).find('.context-menu-divider');
+		var c = a.filter(function() {
+			return $(this).css('display') === 'none';
+		});
+		if (c.length === a.length || a.length === 0) b.hide();
+		else b.show();
 	});
 	
 	adjustContextMenuPosition(e, m);

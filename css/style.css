@@ -16843,7 +16843,8 @@ span.incoming-call-name {
 }
 .contacts-blocks-scrolling .shared-folder-info-block {
 	padding-left: 10px;
-	padding-right: 10px
+	padding-right: 10px;
+	padding-top:8px;
 }
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

@@ -3726,7 +3726,7 @@ function adjustContextMenuPosition(e, m)
 	
 	if (e.type === 'click')// clicked on file-settings-icon
 	{
-		var ico = {'x':e.currentTarget.context.offsetWidth, 'y':e.currentTarget.context.offsetHeight};
+		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
 		var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
 		mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y, ico);
 	}
@@ -3754,39 +3754,55 @@ function reCalcMenuPosition(e, m, x, y, ico)
 	var maxY = wH - TOP_MARGIN;// max vertical position
 	var minX = SIDE_MARGIN;// min horizontal position
 	var minY = TOP_MARGIN;// min vertical position
-	var wMax = x + cmW;// current coordinate of right edge
-	var hMax = y + cmH;// current coordinate of bottom edge
+	var wMax = x + cmW;// calculated coordinate of right edge
+	var hMax = y + cmH;// calculated coordinate of bottom edge
 	
 	var dPos;
+	var cor;// corner, check setBordersRadius for more infos about
 	if (typeof ico !== 'undefined')// file-settings-icon click
 	{
-		dPos = {'x':x, 'y':y + ico.y};
-		if (wMax > maxX) dPos.x = x - cmW + ico.x;// draw to the left
+		// Important: number values that are substracted from x, y coordinates depends on border of file-settings-icon element
+		cor = 1;
+		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		if (wMax > maxX)// draw to the left
+		{
+			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
+			cor = 3;
+		}
+		if (hMax > maxY)// draw to the top
+		{
+			dPos.y = y - cmH - 4;// additional pixels to align with
+			cor++;
+		}
 	}
 	else// right click
 	{
+		cor = 0;
 		dPos = {'x':x, 'y':y};
 		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
+		if (hMax > maxY) dPos.y = maxY - cmH;// align with bottom, 12px from it
 	}
-		
+
+	setBordersRadius(m, cor);
+
 // ToDo: decide how to handle "huge" context menu
 // ToDo: decide how to handle overlapping menus, eg. submenu can't be drawn to the right any more, so only options is to the left over existin one
 //	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
 //	else if (hMax > maxY) dPos.x = x - cmW;
-	if (hMax > maxY) dPos.y = maxY - cmH;
+//	if (hMax > maxY) dPos.y = maxY - cmH;
 	 
 	return {'x':dPos.x, 'y':dPos.y};
 }
 
-// corner position 0 means default, all 4 courners same round radius
+// corner position 0 means default
 function setBordersRadius(m, c)
 {
 	var DEF = 8;// default corner radius
 	var SMALL = 4;// small carner radius
-	var TOP_LEFT = 1, TOP_RIGHT = 2, BOT_LEFT = 3, BOT_RIGHT = 4;
+	var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
 	var tl = DEF, tr = DEF, bl = DEF, br = DEF;
 	
-	var pos = (typeof c === 'undefined') ? 0 : pos;
+	var pos = (typeof c === 'undefined') ? 0 : c;
 	
 	switch (pos)
 	{

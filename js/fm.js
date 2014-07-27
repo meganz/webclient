@@ -669,17 +669,6 @@ function removeUInode(h)
 	if (M.v.length) hasItems = true;
     switch (M.currentdirid)
     {
-		case M.RootID:
-			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
-			$('#' + h).remove();// remove item
-			$('#treeli_' + h).remove();// remove folder and subfolders
-			if (!hasItems)
-			{
-				$('.files-grid-view').addClass('hidden');
-				$('.grid-table.fm tr').remove();
-				$('.fm-empty-cloud').removeClass('hidden');
-			}
-            break;
 		case "shares":
 			if (!hasItems)
             {
@@ -719,7 +708,16 @@ function removeUInode(h)
 			}
 			break;
 		default:
-			break;
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.files-grid-view').addClass('hidden');
+				$('.grid-table.fm tr').remove();
+				$('.fm-empty-cloud').removeClass('hidden');
+			}
+            break;
 	}
 }
 

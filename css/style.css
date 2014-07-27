@@ -40,6 +40,13 @@
 	font-weight: normal;
 	font-style: normal;
 }
+@font-face {
+	font-family: 'Open Sans Bold';
+	src: url('../fonts/opensans-bold-webfont.eot');
+	src: url('../fonts/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensans-bold-webfont.woff') format('woff'),  url('../fonts/opensans-bold-webfont.ttf') format('truetype'),  url('../fonts/opensans-bold-webfont.svg#open_sansbold') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
 body, td, th {
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -106,7 +113,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	transform: rotate( .0001deg );
 }
 .bold {
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 }
 .clear {
 	clear: both;
@@ -1111,7 +1118,7 @@ a.blog-button:hover {
 	font-size: 10px;
 	line-height: 12px;
 	height: 16px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	padding: 1px 2px 2px 3px;
 	margin: -6px 0 0 16px;
 	border: 2px solid #111111;
@@ -1183,7 +1190,7 @@ a.blog-button:hover {
 	color: white;
 	font-size: 10px;
 	line-height: 14px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	min-width: 14px;
 	height: 14px;
 	text-align: center;
@@ -2600,7 +2607,7 @@ img.blog-new-logos {
 	background-image: url(../images/mega/blogs/jobs-sprite.png);
 	background-repeat: no-repeat;
 	background-size: 31px 438px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	color: #727376;
 	margin-bottom: 15px;
 }
@@ -3191,20 +3198,34 @@ label.iPhoneCheckLabelOff span {
 	height: 12px;
 	margin: 18px 0 0 10px;
 }
+.files-grid-view .nw-contact-status, .fm-blocks-view .nw-contact-status, .shared-grid-view .nw-contact-status, .shared-blocks-view .nw-contact-status {
+	border: 0;
+	width: 8px;
+	height: 8px;
+	margin: 20px 2px 0 12px;
+}
+.files-grid-view .fm-chat-user-info .nw-contact-status, .fm-blocks-view .fm-chat-user-info .nw-contact-status, .shared-grid-view .fm-chat-user-info .nw-contact-status, .shared-blocks-view .fm-chat-user-info .nw-contact-status, .files-grid-view.contacts-view .nw-contact-status {
+	margin: 4px 6px 0 0px;
+}
+.grid-table td, .grid-table-header {
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
 .nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
 	margin-top: 6px;
 }
 .online .nw-contact-status {
-	background-color: #71AE32;
+	background-color: #13E03C;
 }
 .away .nw-contact-status {
-	background-color: #ffce00;
+	background-color: #FFD200;
 }
 .busy .nw-contact-status {
-	background-color: #FF7D00;
+	background-color: #FFA500;
 }
 .offline .nw-contact-status {
-	background-color: #D11E00;
+	background-color: #FF1A53;
 }
 .black .nw-contact-status {
 	background-color: black;
@@ -3235,34 +3256,34 @@ label.iPhoneCheckLabelOff span {
 .fm-tree-panel .nw-contact-avatar {
 	display: none;
 }
-.fm-avatar.color1 {
+.fm-avatar.color1, .color1 {
 	background-color: #FF6A19;
 }
-.nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2, .fm-avatar.color2 {
+.nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2, .fm-avatar.color2, .color2 {
 	background-color: #5856d6;
 }
-.nw-contact-avatar.color3, .contacts-avatar.color3, .avatar.color3, .fm-avatar.color3 {
+.nw-contact-avatar.color3, .contacts-avatar.color3, .avatar.color3, .fm-avatar.color3, .color3 {
 	background-color: #007aff;
 }
-.nw-contact-avatar.color4, .contacts-avatar.color4, .avatar.color4, .fm-avatar.color4 {
+.nw-contact-avatar.color4, .contacts-avatar.color4, .avatar.color4, .fm-avatar.color4, .color4 {
 	background-color: #34aadc;
 }
-.nw-contact-avatar.color5, .contacts-avatar.color5, .avatar.color5, .fm-avatar.color5 {
+.nw-contact-avatar.color5, .contacts-avatar.color5, .avatar.color5, .fm-avatar.color5, .color5 {
 	background-color: #5ac8fa;
 }
-.nw-contact-avatar.color6, .contacts-avatar.color6, .avatar.color6, .fm-avatar.color6 {
+.nw-contact-avatar.color6, .contacts-avatar.color6, .avatar.color6, .fm-avatar.color6, .color6 {
 	background-color: #4cd964;
 }
-.nw-contact-avatar.color7, .contacts-avatar.color7, .avatar.color7, .fm-avatar.color7 {
+.nw-contact-avatar.color7, .contacts-avatar.color7, .avatar.color7, .fm-avatar.color7, .color7 {
 	background-color: #ff1a53;
 }
-.nw-contact-avatar.color8, .contacts-avatar.color8, .avatar.color8, .fm-avatar.color8 {
+.nw-contact-avatar.color8, .contacts-avatar.color8, .avatar.color8, .fm-avatar.color8, .color8 {
 	background-color: #d90007;
 }
-.nw-contact-avatar.color9, .contacts-avatar.color9, .avatar.color9, .fm-avatar.color9 {
+.nw-contact-avatar.color9, .contacts-avatar.color9, .avatar.color9, .fm-avatar.color9, .color9 {
 	background-color: #ff9500;
 }
-.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10, .fm-avatar.color10 {
+.nw-contact-avatar.color10, .contacts-avatar.color10, .avatar.color10, .fm-avatar.color10, .color10 {
 	background-color: #ffcc00;
 }
 .add-contact-item, .add-contact-pad {
@@ -4373,7 +4394,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	overflow: hidden;
 }
-.files-grid-view, .files-grid-view.shared-view, .contacts-grid-view, .shared-grid-view {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4382,7 +4403,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
-.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .shared-grid-view th {
+.files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
@@ -4390,7 +4411,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .contacts-grid-view th:nth-child(4) {
 	background-image: none;
 }
-.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5) {
+.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3) {
 	background-image: none;
 }
 .grid-header-star {
@@ -4411,7 +4432,7 @@ th.grid-first-th {
 .grid-table td {
 	background-color: rgba(238,238,238,0);
 }
-.grid-table.shared-with-me td {
+.grid-table.shared-with-me td, .grid-table.contacts td {
 	height: 48px;
 }
 .grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
@@ -4433,6 +4454,9 @@ th.grid-first-th {
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
+}
+.grid-table.contacts tr td:first-child {
+	padding-left: 12px;
 }
 .grid-status-icon, .file-status-icon, .contact-status-icon {
 	height: 24px;
@@ -4483,7 +4507,7 @@ th.grid-first-th {
 .file-block .file-status-icon.star, .contact-status-icon.star {
 	background-position: -14px -7738px;
 }
-.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view {
+.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -4518,15 +4542,15 @@ th.grid-first-th {
 	cursor: default;
 	background-color: rgba(0,0,0,0.05);
 }
-.fm-blocks-view.shared-view .file-block, .shared-blocks-view .file-block {
+.fm-blocks-view.shared-view .file-block, .shared-blocks-view .file-block, .fm-blocks-view.contacts-view .file-block, .contacts-blocks-view .file-block {
 	height: 216px;
 	width: 168px;
 }
-.fm-blocks-view.shared-view .file-icon-area, .shared-blocks-view .file-icon-area {
+.fm-blocks-view.shared-view .file-icon-area, .shared-blocks-view .file-icon-area, .fm-blocks-view.contacts-view .file-icon-area, .contacts-blocks-view .file-icon-area {
 	width: 160px;
 	height: 160px;
 }
-.fm-blocks-view.shared-view .block-view-file-type.folder, .properties-file-icon div.folder, .shared-blocks-view  .block-view-file-type.folder {
+.fm-blocks-view.shared-view .block-view-file-type.folder, .properties-file-icon div.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder {
 	width: 94px;
 	height: 77px;
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -5518,14 +5542,20 @@ table {
 .fm-dialog-breadcrumbs {
 	background-position: 5px -1000px;
 }
-.fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg {
+.fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg, .fm-breadcrumbs.contacts .right-arrow-bg, .fm-dialog-breadcrumbs.contacts .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: 2px -504px;
 	padding: 0 2px 0 38px;
 }
+.fm-breadcrumbs.contacts .right-arrow-bg {
+	background-position: 2px -938px;
+}
 .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg {
 	background-position: 2px -501px;
+}
+.fm-dialog-breadcrumbs.contacts .right-arrow-bg {
+	background-position: 2px -935px;
 }
 .fm-dialog-breadcrumbs:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5558,7 +5588,7 @@ table {
 	padding: 0 10px 0 38px;
 	color: black;
 }
-.fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg {
+.fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg, .fm-breadcrumbs.contact .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: 2px -624px;
@@ -5566,7 +5596,16 @@ table {
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
 	background-position: 2px -544px;
 }
-.fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg span {
+.fm-dialog-breadcrumbs.shared-folder .right-arrow-bg {
+	background-position: 2px -541px;
+}
+.fm-breadcrumbs.contact .right-arrow-bg {
+	background-position: 2px -978px;
+}
+.fm-dialog-breadcrumbs.contact .right-arrow-bg {
+	background-position: 2px -975px;
+}
+.fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-breadcrumbs.contacts .right-arrow-bg span, .fm-dialog-breadcrumbs.contacts .right-arrow-bg span {
 	display: none;
 }
 .fm-breadcrumbs .right-arrow-bg:hover, .fm-share-breadcrumbs .right-arrow-bg:hover {
@@ -5901,7 +5940,6 @@ span.search-number {
 	height: 233px;
 	background-position: center -640px;
 }
-
 .fm-empty-contacts-bg {
 	height: 186px;
 	background-position: center -1168px;
@@ -8763,7 +8801,7 @@ span.orange {
 .properties-dialog label.iPhoneCheckLabelOn span, .properties-dialog label.iPhoneCheckLabelOff span, .fm-account-blocks label.iPhoneCheckLabelOn span, .fm-account-blocks label.iPhoneCheckLabelOff span, .share-dialog label.iPhoneCheckLabelOn span, .share-dialog label.iPhoneCheckLabelOff span {
 	display: block;
 	font-size: 12px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	line-height: 18px;
 }
 .properties-dialog label.iPhoneCheckLabelOn span, .fm-account-blocks label.iPhoneCheckLabelOn span, .reg-checkbox label.iPhoneCheckLabelOn, .share-dialog label.iPhoneCheckLabelOn span {
@@ -12440,7 +12478,7 @@ h5.main-italic-header {
 	border: 2px solid #b2b2b2;
 	color: #999999;
 	text-align: center;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	font-size: 12px;
 	line-height: 20px;
 	-webkit-border-radius: 100%;
@@ -12448,7 +12486,6 @@ h5.main-italic-header {
 	border-radius: 100%;
 	float: left;
 	margin: 2px 0 0 0;
-	font-family: 'Open Sans Semibold', Arial;
 }
 .new-bottom-pages p.list span.number, .new-bottom-pages p.sub-list span.number, .new-bottom-pages h2.list span.number, .new-bottom-pages h2.sub-list span.number {
 	margin: 2px 0 0 30px;
@@ -13197,7 +13234,7 @@ span.browsers-update {
 	line-height: 29px;
 	color: white;
 	font-size: 15px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	-webkit-border-radius: 100%;
 	-moz-border-radius: 100%;
 	border-radius: 100%;
@@ -16171,14 +16208,13 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	text-align: center;
 	font-size: 16px;
 	line-height: 58px;
-	font-family: 'Open Sans';
 	text-transform: uppercase;
 	float: left;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	color: white;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	-moz-border-radius: 100%;
 	-ms-border-radius: 100%;
 	-o-border-radius: 100%;
@@ -16392,7 +16428,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .ads-top-white-txt1 {
 	font-size: 30px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	color: white;
 	text-align: center;
 	line-height: 46px;
@@ -16400,7 +16436,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .ads-top-white-txt2 {
 	font-size: 14px;
-	font-weight: bold;
+	font-family: 'Open Sans Bold', Arial;
 	color: white;
 	text-align: center;
 	line-height: 18px;
@@ -16597,12 +16633,11 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
 	background-color: rgba(6,160,236,1);
 }
-.shared-with-me .nw-contact-avatar {
+.shared-with-me .nw-contact-avatar, .contacts-view td .nw-contact-avatar {
 	position: absolute;
 	margin: 1px 0 0 0;
 }
-
-.shared-with-me .fm-chat-user-info {
+.shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info {
 	float: none;
 	margin: 1px 0 0 44px;
 }
@@ -16621,7 +16656,7 @@ span.incoming-call-name {
 	line-height: 17px;
 	display: block;
 }
-.shared-folder-name {
+.shared-folder-name, .contact-name {
 	color: #111111;
 	display: block;
 	white-space: nowrap;
@@ -16629,7 +16664,7 @@ span.incoming-call-name {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.shared-folder-info {
+.shared-folder-info, .contact-email {
 	color: #666666;
 	line-height: 16px;
 	display: block;
@@ -16638,7 +16673,7 @@ span.incoming-call-name {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.shared-folder-access {
+.shared-folder-access, .contacts-interation {
 	font-size: 11px;
 	line-height: 16px;
 	padding-left: 29px;
@@ -16653,6 +16688,18 @@ span.incoming-call-name {
 }
 .shared-folder-access.full-access {
 	background-position: -37px -197px;
+}
+.contacts-interation.never {
+	background-position: -8px -1180px;
+}
+.contacts-interation.cloud-drive {
+	background-position: -8px -1096px;
+}
+.contacts-interation.conversations {
+	background-position: -8px -1153px;
+}
+.contacts-interation.unread-conversations {
+	background-position: -8px -1068px
 }
 .file-block .nw-contact-avatar, .file-block.contacts-avatar, .file-block.avatar {
 	margin: 10px 0 0 10px;
@@ -16751,10 +16798,52 @@ span.incoming-call-name {
 	box-sizing: border-box;
 }
 .file-block .nw-contact-avatar img {
-	display:block;
-	height:32px;
-	width:32px;
-	
+	display: block;
+	height: 32px;
+	width: 32px;
+}
+.contacts-blocks-scrolling .nw-contact-status {
+	float: none;
+	position: absolute;
+	border: 2px solid white;
+	width: 12px;
+	height: 12px;
+	display: block;
+	margin: 0;
+	left: 8px;
+	top: 8px;
+	z-index: 10;
+}
+.nw-contact-block-avatar {
+	display: block;
+	width: 160px;
+	height: 160px;
+	border: 2px solid white;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	color: white;
+	overflow: hidden;
+	font-size: 100px;
+	line-height: 158px;
+	margin: 4px 0 0 4px;
+	text-align: center;
+	font-family: 'Open Sans Bold', Arial;
+	text-transform: uppercase;
+}
+.two-letters .nw-contact-block-avatar {
+	font-size: 58px;
+}
+.nw-contact-block-avatar img {
+	width: 156px;
+	height: 156px;
+}
+.contacts-blocks-scrolling .shared-folder-info-block {
+	padding-left: 10px;
+	padding-right: 10px
 }
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
@@ -17268,7 +17357,7 @@ background-size: 36px auto;
  background-position:center -50px;
  background-size:60px auto;
 }
-.fm-empty-search-bg, .fm-empty-trashbin-bg,  .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
 background-image: url(../images/mega/empty@2x.png);
  background-size: 300px auto;
 }

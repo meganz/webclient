@@ -43,7 +43,7 @@
 @font-face {
 	font-family: 'Open Sans Bold';
 	src: url('../fonts/opensans-bold-webfont.eot');
-	src: url('../fonts/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'),  url('../fonts/opensans-bold-webfont.woff') format('woff'),  url('../fonts/opensans-bold-webfont.ttf') format('truetype'),  url('../fonts/opensans-bold-webfont.svg#open_sansbold') format('svg');
+	src: url('../fonts/opensans-bold-webfont.eot?#iefix') format('embedded-opentype'), url('../fonts/opensans-bold-webfont.woff') format('woff'), url('../fonts/opensans-bold-webfont.ttf') format('truetype'), url('../fonts/opensans-bold-webfont.svg#open_sansbold') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -4403,6 +4403,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
 }
+.files-grid-view.contact-details-view {
+	height: 100%;
+	height: -webkit-calc(100% - 235px);
+	height: -moz-calc(100% - 235px);
+	height: calc(100% - 235px);
+}
+.fm-blocks-view.contact-details-view, .fm-empty-incoming.contact-details-view {
+	height: 100%;
+	height: -webkit-calc(100% - 223px);
+	height: -moz-calc(100% - 223px);
+	height: calc(100% - 223px);
+	margin: -12px 0 0 0;
+	padding: 0 12px;
+}
+.fm-empty-incoming.contact-details-view {
+	height: 100%;
+	height: -webkit-calc(100% - 303px);
+	height: -moz-calc(100% - 303px);
+	height: calc(100% - 303px);
+}
 .files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -5738,7 +5758,7 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download {
+.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question {
 	height: 24px;
 	float: right;
 	font-size: 12px;
@@ -5765,19 +5785,55 @@ span.search-number {
 	cursor: pointer;
 	position: relative;
 }
-.fm-add-user, .fm-send-files, .fm-start-call, .fm-share-download {
+.fm-add-user {
+	padding: 0 10px 0 31px;
+}
+.fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
 	padding: 0 0 0 33px;
 }
 .fm-add-user {
-	margin: 12px 12px 0 0;
+	margin: 12px 10px 0 0;
 }
 .fm-send-files {
 	background-color: rgba(222,0,0,0.7);
-	background-position: -9px -1700px;
+	background-position: -8px -1700px;
 }
 .fm-start-call {
 	background-color: rgba(6,160,236,0.7);
 	background-position: -9px -1670px;
+}
+.fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question {
+	background-image: url(../images/mega/shared-sprite.svg);
+}
+.fm-start-conversation {
+	background-color: rgba(6,160,236,0.7);
+	background-position: -4px -713px;
+}
+.fm-start-conversation:hover, .fm-start-conversation.active {
+	background-color: rgba(6,160,236,1);
+}
+.fm-share-folders {
+	background-color: rgba(255,179,0,0.8);
+	background-position: -2px -893px;
+}
+.fm-share-folders:hover, .fm-share-folders.active {
+	background-color: rgba(255,179,0,1);
+}
+.fm-verify {
+	background-color: rgba(153,153,153,0.8);
+	background-position: -4px -753px;
+	margin: 13px 8px 0 10px;
+	float: left;
+}
+.fm-verify:hover, .fm-verify.active, .fm-question:hover, .fm-question.active {
+	background-color: rgba(153,153,153,1);
+}
+.fm-question {
+	background-color: rgba(153,153,153,0.8);
+	background-position: -2px -792px;
+	padding: 0 10px 0 16px;
+	margin: 13px 8px 0 0;
+	float: left;
 }
 .fm-send-files:hover, .fm-send-files.active {
 	background-color: rgba(222,0,0,1);
@@ -13552,15 +13608,15 @@ strong, b {
 	background-position: 0 -1000px;
 }
 .context-submenu {
-	max-width:170px;
-	margin-top:-40px;
-	top:auto;
+	max-width: 170px;
+	margin-top: -40px;
+	top: auto;
 }
 .context-submenu .context-menu-item {
-	width:100%;
-	overflow:hidden;
+	width: 100%;
+	overflow: hidden;
 	-o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .resellers-main-block {
 	margin: 0 -3px
@@ -16750,11 +16806,12 @@ span.incoming-call-name {
 	float: left;
 	padding-top: 28px;
 }
-.shared-details-folder-name {
+.shared-details-folder-name, .contact-details-user-name {
 	font-size: 24px;
 	line-height: 28px;
 	float: left;
 	color: #333333;
+	font-family: 'Open Sans Semibold', Arial;
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -16765,16 +16822,82 @@ span.incoming-call-name {
 	top: auto;
 	margin: 6px 0 0 11px;
 }
-.shared-details-pad .grid-url-arrow span {
+.contact-top-details {
+	height: 235px;
+	overflow: hidden;
+}
+.contact-top-details .nw-contact-block-avatar {
+	float: left;
+	margin: 22px 22px 0 22px;
+}
+.contact-fingerprint-block {
+	float: right;
+	padding: 45px 45px 0 0;
+}
+.contact-fingerprint-title {
+	padding: 0 0 20px 10px;
+	font-size: 12px;
+	color: #333333;
+	white-space: nowrap;
+	font-family: 'Open Sans Semibold';
+}
+.contact-fingerprint-txt {
+	font-size: 12px;
+	white-space: nowrap;
+	color: #666666;
+	text-transform: uppercase;
+	padding-bottom: 5px;
+}
+.contact-fingerprint-txt span {
+	padding-left: 10px;
+}
+.contact-details-pad {
+	margin-left: 200px;
+	overflow: hidden;
+	padding-top: 44px;
+}
+.contact-details-email {
+	font-size: 12px;
+	color: #666666;
+	padding: 5px 0;
+}
+.contact-details-pad .nw-contact-status {
+	margin: 2px 6px 0 0;
+}
+.contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
+	float: left;
+	margin: 20px 8px 0 0;
+}
+.contact-share-notification {
+	font-size: 12px;
+	color: #666666;
+	padding-left: 28px;
+	background-image: url(../images/mega/shared-sprite.svg);
+	background-position: -9px -95px;
+	background-repeat: no-repeat;
+	margin: 17px 0 0 24px;
+}
+.contact-top-details .grid-url-arrow {
+	position: static;
+	float: left;
+	left: auto;
+	top: auto;
+	margin: 6px 0 0 11px;
+}
+.contact-top-details:hover .grid-url-arrow {
+	border: 2px solid rgba(0,0,0,0.1);
+	background-color: rgba(255,255,255,1);
+}
+.shared-details-pad .grid-url-arrow span, .contact-top-details:hover .grid-url-arrow span {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	-moz-opacity: 0.2;
 	-khtml-opacity: 0.2;
 	opacity: 0.2;
 }
-.shared-details-pad .grid-url-arrow:hover, .shared-details-pad .grid-url-arrow.active {
+.shared-details-pad .grid-url-arrow:hover, .shared-details-pad .grid-url-arrow.active, .contact-top-details .grid-url-arrow:hover, .contact-top-details .grid-url-arrow.active {
 	border: 2px solid rgba(0,0,0,0.2);
 }
-.shared-details-pad .grid-url-arrow:hover span, .shared-details-pad .grid-url-arrow.active span {
+.shared-details-pad .grid-url-arrow:hover span, .shared-details-pad .grid-url-arrow.active span, .contact-top-details .grid-url-arrow:hover span, .contact-top-details .grid-url-arrow.active span {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-opacity: 0.3;
 	-khtml-opacity: 0.3;
@@ -16794,7 +16917,8 @@ span.incoming-call-name {
 	font-family: 'Open Sans', Helvetica, Arial;
 }
 .shared-details-buttons {
-	float: right;
+	right: 0;
+	position: absolute;
 	padding: 58px 18px 0 0;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
@@ -16851,12 +16975,12 @@ span.incoming-call-name {
 .file-block .nw-contact-block-avatar img {
 	width: 156px;
 	height: 156px;
-	display:block;
+	display: block;
 }
 .contacts-blocks-scrolling .shared-folder-info-block {
 	padding-left: 10px;
 	padding-right: 10px;
-	padding-top:8px;
+	padding-top: 8px;
 }
 @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

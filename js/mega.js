@@ -1861,6 +1861,7 @@ function MegaData ()
 			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
 			if (li.length == 0)
 			{
+				downloading = true;
 				dl_queue.push(
 				{
 					id: n.h,
@@ -2001,7 +2002,7 @@ function MegaData ()
 				{
 					$('.widget-block').removeClass('hidden');
 					$('.widget-block').show();
-					if (ulQueue.isEmpty()) $('.widget-circle').attr('class','widget-circle percents-'+perc);
+					if (!ul_uploading) $('.widget-circle').attr('class','widget-circle percents-'+perc);
 					$('.widget-icon.downloading').removeClass('hidden');
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
@@ -2049,7 +2050,7 @@ function MegaData ()
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && ulQueue.isEmpty())
+		if (a < 2 && !ul_uploading)
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{
@@ -2186,6 +2187,7 @@ function MegaData ()
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
 					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
+			ul_uploading = true;
 			ul_queue.push(f);
 			fmUpdateCount();
 			
@@ -2261,7 +2263,7 @@ function MegaData ()
 		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && dlQueue.isEmpty())
+		if (a < 2 && !downloading)
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{

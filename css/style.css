@@ -3069,6 +3069,17 @@ label.iPhoneCheckLabelOff span {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
+.context-submenu {
+	max-width:170px;
+	top:0;
+	margin-top:-40px;
+}
+.context-submenu .context-menu-item {
+	width:100%;
+	overflow:hidden;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
 .rubbish-bin .nw-fm-tree-folder {
 	background-position: -15px -7595px;
 }

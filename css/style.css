@@ -16837,9 +16837,10 @@ span.incoming-call-name {
 .two-letters .nw-contact-block-avatar {
 	font-size: 58px;
 }
-.nw-contact-block-avatar img {
+.file-block .nw-contact-block-avatar img {
 	width: 156px;
 	height: 156px;
+	display:block;
 }
 .contacts-blocks-scrolling .shared-folder-info-block {
 	padding-left: 10px;

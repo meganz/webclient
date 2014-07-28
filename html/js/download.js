@@ -419,7 +419,7 @@ function dlcomplete(id)
 	megatitle();		
 	var a=0;
 	for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-	if (a < 2 && !ul_uploading)
+	if (a < 2 && ulQueue.isEmpty())
 	{			
 		$('.widget-block').fadeOut('slow',function(e)
 		{								

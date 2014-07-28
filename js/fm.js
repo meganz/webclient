@@ -528,6 +528,13 @@ function initUI()
     },50);
 	
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
+	
+	megaChat.karere.unbind("onPresence.maintainUI");
+	megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData) 
+	{
+		M.onlineStatusEvent(megaChat.getContactFromJid(presenceEventData.getFromJid()),presenceEventData.getShow());
+	});
+	
 }
 
 function isIdDownload(id) {
@@ -883,8 +890,8 @@ function initContextUI()
 		var rpos = $(window).width() - $(s).offset().left - $(s).width();
 		if (rpos < 20) $(s).addClass('left-position');
 	});
-	$(c+'.contains-submenu').unbind('mouseleave');
-	$(c+'.contains-submenu').bind('mouseleave',function()
+	$(c+'.contains-submenu').unbind('mouseout');
+	$(c+'.contains-submenu').bind('mouseout',function()
 	{
 	    $(this).children('.context-submenu');
 	});
@@ -3557,6 +3564,7 @@ function transferPanelUI()
 				dlQueue.resume();
 				ulQueue.resume();
 				ui_paused = false;
+				uldl_hold = false;
 			} else
 			{
 				alert(l[214]);
@@ -3584,6 +3592,7 @@ function transferPanelUI()
 			dlQueue.pause();
 			ulQueue.pause();
 			ui_paused = true;
+			uldl_hold = true;
 
 			$('.transfer-panel tr span.transfer-type').addClass('paused');
 
@@ -3998,10 +4007,10 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
-	if (id !== 'cloud-drive') 
+	if ((id !== 'cloud-drive') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
 		$('.files-grid-view.fm').addClass('hidden');
-		$('.fm-blocks-view.fm').addClass('hidden');	
+		$('.fm-blocks-view.fm').addClass('hidden');
 	}
 	if (id !== 'contacts') 
 	{

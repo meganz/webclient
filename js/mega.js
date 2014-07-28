@@ -281,7 +281,31 @@ function MegaData ()
 		return {files:files,folders:folders,ts:ts};
 	};
 
-
+	
+	this.onlineStatusClass = function(os)
+	{
+		if (os == 'dnd') return ['Busy','busy'];
+		else if (os == 'away') return ['Away','away'];
+		else if (os == 'chat' || os == 'available') return ['Online','online'];
+		else return ['Offline','offline'];
+	};
+	
+	this.onlineStatusEvent = function(u,status)
+	{
+		console.log('onlineStatusEvent',u,status);
+	
+		if (u)
+		{
+			var e = $('.ustatus.' + u.u);
+			if (e.length > 0)
+			{
+				$(e).removeClass('offline online busy away');
+				$(e).addClass(this.onlineStatusClass(status)[1]);
+			}
+			var e = $('.fm-chat-user-status.' + u.u);
+			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);			
+		}	
+	};
 
 
 	this.renderMain = function(u)
@@ -387,20 +411,22 @@ function MegaData ()
 						var interactionclass = 'never';
 					}						
 					var user = M.d[u_h];						
-					var avatar = user.name.substr(0,2);						
-					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;						
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';					
+					
+					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 					
 					if (this.viewmode == 1)
 					{						
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<a class="file-block" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color5">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
+						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
 					}
 					else
 					{
 						el = 'tr';
 						t = '.grid-table.contacts';
-						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="online"><div class="nw-contact-status"></div><div class="fm-chat-user-status">Online</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';												
+						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';												
 					}
 				}
 				else if (this.currentdirid == 'shares')
@@ -410,7 +436,7 @@ function MegaData ()
 					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
 					var u_h = this.v[i].p;						
 					var user = M.d[u_h];						
-					var avatar = user.name.substr(0,2);						
+					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
 					var rights = 'Read only', rightsclass = ' read-only';						
 					if (M.v[i].r == 1)
@@ -424,17 +450,19 @@ function MegaData ()
 						rightsclass = ' full-access';
 					}
 					
+					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+					
 					if (this.viewmode == 1)
 					{
 						t = '.shared-blocks-scrolling';
 						el = 'a';
-						html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon '+star+'"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar +'</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
+						html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon '+star+'"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar +'</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
 					}
 					else
 					{
 						t = '.grid-table.shared-with-me';
 						el='tr';						
-						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star online"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status">Offline</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus '+ htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
 					}
 				}
 				else
@@ -1022,7 +1050,6 @@ function MegaData ()
 			}
 			else if (a[i] == 'shares')
 			{
-				console.log('huh');
 				typeclass = 'shared-with-me';
 				name = '';
 			}
@@ -1974,7 +2001,7 @@ function MegaData ()
 				{
 					$('.widget-block').removeClass('hidden');
 					$('.widget-block').show();
-					if (!ul_uploading) $('.widget-circle').attr('class','widget-circle percents-'+perc);
+					if (ulQueue.isEmpty()) $('.widget-circle').attr('class','widget-circle percents-'+perc);
 					$('.widget-icon.downloading').removeClass('hidden');
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
@@ -2022,7 +2049,7 @@ function MegaData ()
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && !ul_uploading)
+		if (a < 2 && ulQueue.isEmpty())
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{
@@ -2234,7 +2261,7 @@ function MegaData ()
 		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && !downloading)
+		if (a < 2 && dlQueue.isEmpty())
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{

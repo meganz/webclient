@@ -369,7 +369,9 @@ function initUI()
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
-		$('.context-menu.files-menu').addClass('hidden');
+		$('.context-menu.files-menu')
+			.addClass('hidden')
+			.find('.context-submenu.active').removeClass('active');
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');
@@ -890,8 +892,8 @@ function initContextUI()
 		var rpos = $(window).width() - $(s).offset().left - $(s).width();
 		if (rpos < 20) $(s).addClass('left-position');
 	});
-	$(c+'.contains-submenu').unbind('mouseout');
-	$(c+'.contains-submenu').bind('mouseout',function()
+	$(c+'.contains-submenu').unbind('mouseleave');
+	$(c+'.contains-submenu').bind('mouseleave',function()
 	{
 	    $(this).children('.context-submenu');
 	});
@@ -3683,10 +3685,9 @@ function contextmenuUI(e,ll,topmenu)
 	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
 	
-	var m = $('.context-menu.files-menu');// container/wrapper around menu
-	m.addClass('hidden');// hide menu before re-draw
-	m.find('.context-submenu.active').removeClass('active');
+	$.hideContextMenu();
 	
+	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)

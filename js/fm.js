@@ -877,16 +877,16 @@ function initContextUI()
 	$(c+'.contains-submenu').unbind('mouseover');
 	$(c+'.contains-submenu').bind('mouseover',function()
 	{   
-	    var s = $(this).children('.context-submenu').eq(0);
-		$(this).find('.context-submenu').removeClass('left-position');
+	    var s = $(this).next('.context-submenu');
+		$(s).removeClass('left-position');
 		s.addClass('active');
 		var rpos = $(window).width() - $(s).offset().left - $(s).width();
-		if (rpos < 20) $(this).find('.context-submenu').addClass('left-position');
+		if (rpos < 20) $(s).addClass('left-position');
 	});
 	$(c+'.contains-submenu').unbind('mouseout');
 	$(c+'.contains-submenu').bind('mouseout',function()
 	{
-		$(this).find('.context-submenu').removeClass('active');
+		$(s).removeClass('active');
 	});
 	
 	

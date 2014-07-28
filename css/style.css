@@ -3069,17 +3069,6 @@ label.iPhoneCheckLabelOff span {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.context-submenu {
-	max-width:170px;
-	top:0;
-	margin-top:-40px;
-}
-.context-submenu .context-menu-item {
-	width:100%;
-	overflow:hidden;
-	-o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
 .rubbish-bin .nw-fm-tree-folder {
 	background-position: -15px -7595px;
 }
@@ -13561,6 +13550,17 @@ strong, b {
 }
 .widget-circle.percents-100 {
 	background-position: 0 -1000px;
+}
+.context-submenu {
+	max-width:170px;
+	margin-top:-40px;
+	top:auto;
+}
+.context-submenu .context-menu-item {
+	width:100%;
+	overflow:hidden;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .resellers-main-block {
 	margin: 0 -3px

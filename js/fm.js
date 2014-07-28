@@ -885,9 +885,14 @@ function initContextUI()
 	});
 	$(c+'.contains-submenu').unbind('mouseout');
 	$(c+'.contains-submenu').bind('mouseout',function()
-	{
-		$(s).removeClass('active');
+	{   
+	    
+	    var s = $(this).next('.context-submenu');
+		var isHovered = $(s).is(":hover");
+		if (!isHovered)
+		   $(s).removeClass('active');
 	});
+	
 	
 	
 	$(c+'.download-item').unbind('click');

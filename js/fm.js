@@ -3569,6 +3569,7 @@ function transferPanelUI()
 				dlQueue.resume();
 				ulQueue.resume();
 				ui_paused = false;
+				uldl_hold = false;
 			} else
 			{
 				alert(l[214]);
@@ -3596,6 +3597,7 @@ function transferPanelUI()
 			dlQueue.pause();
 			ulQueue.pause();
 			ui_paused = true;
+			uldl_hold = true;
 
 			$('.transfer-panel tr span.transfer-type').addClass('paused');
 

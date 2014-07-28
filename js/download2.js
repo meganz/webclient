@@ -247,24 +247,6 @@ function throttleByIO(writer) {
 	});
 }
 
-// downloading variable {{{
-dlQueue.on('working', function() {
-	downloading = true;
-});
-
-dlQueue.on('resume', function() {
-	downloading =!dlQueue.isEmpty();
-});
-
-dlQueue.on('pause', function() {
-	downloading =!dlQueue.isEmpty();
-});
-
-dlQueue.on('drain', function() {
-	downloading =!dlQueue.isEmpty();
-});
-// }}}
-
 // TODO: move the next functions to fm.js when no possible conflicts
 function fm_tfsorderupd()
 {

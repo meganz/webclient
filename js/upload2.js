@@ -760,26 +760,6 @@ function resetUploadDownload() {
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 
-// ul_uploading variable {{{
-ulQueue.on('working', function() {
-	ul_uploading = true;
-});
-
-ulQueue.on('resume', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = false;
-});
-
-ulQueue.on('pause', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = true;
-});
-
-ulQueue.on('drain', function() {
-	ul_uploading = !ulQueue.isEmpty();
-});
-// }}}
-
 ulQueue.validateTask = function(pzTask) {
 	if (pzTask instanceof ChunkUpload && (!pzTask.file.paused || pzTask.__retry)) {
 		return true;

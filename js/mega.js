@@ -1980,7 +1980,7 @@ function MegaData ()
 				{
 					$('.widget-block').removeClass('hidden');
 					$('.widget-block').show();
-					if (!ul_uploading) $('.widget-circle').attr('class','widget-circle percents-'+perc);
+					if (ulQueue.isEmpty()) $('.widget-circle').attr('class','widget-circle percents-'+perc);
 					$('.widget-icon.downloading').removeClass('hidden');
 					$('.widget-speed-block.dlspeed').text(bytesToSize(bps,1) +'/s');
 					$('.widget-block').addClass('active');
@@ -2028,7 +2028,7 @@ function MegaData ()
 
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && !ul_uploading)
+		if (a < 2 && ulQueue.isEmpty())
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{
@@ -2240,7 +2240,7 @@ function MegaData ()
 		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && !downloading)
+		if (a < 2 && dlQueue.isEmpty())
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{

@@ -628,8 +628,6 @@ else
                 for (i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
             }
         }
-        var downloading = false;
-        var ul_uploading = false;
         var lightweight=false;
         var njsl = [];
         var fx_startup_cache = is_chrome_firefox && nocontentcheck;

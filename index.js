@@ -817,15 +817,15 @@ function mLogout()
 {
 	$.dologout = function(Quiet)
 	{
-		if ((fminitialized && downloading) || ul_uploading)
+		if ((fminitialized && !dlQueue.isEmpty()) || !ulQueue.isEmpty())
 		{
 			if(Quiet) return true;
 			msgDialog('confirmation',l[967],l[377] + ' ' + l[507]+'?',false,function(e)
 			{
 				if (e)
 				{
-					if (downloading) dl_cancel();				
-					if (ul_uploading) ul_cancel();
+					if (!dlQueue.isEmpty()) dl_cancel();				
+					if (!ulQueue.isEmpty()) ul_cancel();
 					
 					resetUploadDownload();
 					loadingDialog.show();
@@ -1257,7 +1257,7 @@ function topmenuUI()
 	}
 	
 	if (page.substr(0,2) !== 'fm' && u_type == 3 && !avatars[u_handle]) M.avatars();	
-	if (ul_uploading || downloading) $('.widget-block').removeClass('hidden');	
+	if (!ulQueue.isEmpty() || !dlQueue.isEmpty()) $('.widget-block').removeClass('hidden');	
 	
 	$('.widget-block').unbind('click');
 	$('.widget-block').bind('click',function(e)
@@ -1464,7 +1464,7 @@ function languageDialog(close)
 
 window.onbeforeunload = function ()
 {
-	if (downloading || ul_uploading) return l[377];
+	if (!dlQueue.isEmpty() || !ulQueue.isEmpty()) return l[377];
 	
 	if (mDB && mDBact && localStorage[u_handle + '_mDBactive']) delete localStorage[u_handle + '_mDBactive'];
 }

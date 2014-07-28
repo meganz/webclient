@@ -13551,6 +13551,17 @@ strong, b {
 .widget-circle.percents-100 {
 	background-position: 0 -1000px;
 }
+.context-submenu {
+	max-width:170px;
+	margin-top:-40px;
+	top:auto;
+}
+.context-submenu .context-menu-item {
+	width:100%;
+	overflow:hidden;
+	-o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
 .resellers-main-block {
 	margin: 0 -3px
 }
@@ -16837,9 +16848,10 @@ span.incoming-call-name {
 .two-letters .nw-contact-block-avatar {
 	font-size: 58px;
 }
-.nw-contact-block-avatar img {
+.file-block .nw-contact-block-avatar img {
 	width: 156px;
 	height: 156px;
+	display:block;
 }
 .contacts-blocks-scrolling .shared-folder-info-block {
 	padding-left: 10px;

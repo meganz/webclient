@@ -15,15 +15,19 @@ var MegaChatEnabled = true;
 var chatui;
 (function() {
     chatui = function(id) {
-
+	
         //TODO: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyMsg();
+		
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
         $('.contacts-grid-view').addClass('hidden');
         $('.fm-contacts-blocks-view').addClass('hidden');
         $('.fm-right-account-block').addClass('hidden');
+		
+		$('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+		
 
         $('.fm-right-files-block').removeClass('hidden');
 

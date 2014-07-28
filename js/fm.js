@@ -874,8 +874,8 @@ function initContextUI()
 	var c = '.context-menu-item';
 	
 	//TODO: Create logic for submenues positions in context menu
-	$(c+'.contains-submenu').unbind('mouseover');
-	$(c+'.contains-submenu').bind('mouseover',function()
+	$(c+'.contains-submenu').unbind('mouseenter');
+	$(c+'.contains-submenu').bind('mouseenter',function()
 	{   
 	    var s = $(this).next('.context-submenu');
 		$(s).removeClass('left-position');
@@ -883,10 +883,10 @@ function initContextUI()
 		var rpos = $(window).width() - $(s).offset().left - $(s).width();
 		if (rpos < 20) $(s).addClass('left-position');
 	});
-	$(c+'.contains-submenu').unbind('mouseout');
-	$(c+'.contains-submenu').bind('mouseout',function()
+	$(c+'.contains-submenu').unbind('mouseleave');
+	$(c+'.contains-submenu').bind('mouseleave',function()
 	{
-		$(s).removeClass('active');
+	    $(this).children('.context-submenu');
 	});
 	
 	
@@ -3676,7 +3676,8 @@ function contextmenuUI(e,ll,topmenu)
 	
 	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	m.addClass('hidden');// hide menu before re-draw
-	// filter selector
+	m.find('.context-submenu.active').removeClass('active');
+	
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)

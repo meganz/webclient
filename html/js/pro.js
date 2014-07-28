@@ -194,7 +194,7 @@ function pro_pay()
 									j++;
 								}
 								if (d) console.log(ppurl);
-								if (!ulQueue.isEmpty() || !dlQueue.isEmpty())
+								if (ul_uploading || downloading)
 								{
 									loadingDialog.hide();
 									paypalDialog(ppurl);							

@@ -745,8 +745,14 @@ function isQueueActive(q) {
 	return typeof q.id !== 'undefined';
 }
 function resetUploadDownload() {
-	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
-	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
+	if (!ul_queue.some(isQueueActive)) {
+		ul_queue = new UploadQueue();
+		ul_uploading = false;
+	}
+	if (!dl_queue.some(isQueueActive)) {
+		dl_queue = new DownloadQueue();
+		downloading = false;
+	}
 
 	if (dl_queue.length == 0 && ul_queue.length == 0) {
 		clearXhr(); /* destroy all xhr */

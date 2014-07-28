@@ -333,31 +333,43 @@ ClassFile.prototype.run = function(task_done) {
 
 	this.dl.io.begin = function() {
 		var tasks = [];
-		if (d) console.log('Adding', (this.dl.urls||[]).length, 'tasks for', this.dl.dl_id);
-		if (this.dl.urls) for (var key in this.dl.urls)
+
+		if (this.dl.cancelled)
 		{
-			var url = this.dl.urls[key];
-
-			tasks.push(new ClassChunk({
-				url      : url.url,
-				size     : url.size,
-				offset   : url.offset,
-				download : this.dl,
-				chunk_id : key,
-				zipid    : this.dl.zipid,
-				id       : this.dl.id,
-				file     : this
-			}));
+			if (d) console.log(this + ' cancelled while initializing.');
 		}
+		else
+		{
+			if (d) console.log('Adding', (this.dl.urls||[]).length, 'tasks for', this.dl.dl_id);
 
-		if (this.dl.zipid && (this.emptyFile = (tasks.length == 0))) {
-			tasks.push(new ClassEmptyChunk(this.dl));
-		}
+			if (this.dl.urls) for (var key in this.dl.urls)
+			{
+				var url = this.dl.urls[key];
 
-		if (tasks.length > 0) {
-			dlQueue.pushAll(tasks, function onChunkFinished() { 
-				this.chunkFinished = true 
-			}.bind(this), failureFunction);
+				tasks.push(new ClassChunk({
+					url      : url.url,
+					size     : url.size,
+					offset   : url.offset,
+					download : this.dl,
+					chunk_id : key,
+					zipid    : this.dl.zipid,
+					id       : this.dl.id,
+					file     : this
+				}));
+			}
+
+			if (this.dl.zipid && (this.emptyFile = (tasks.length == 0)))
+			{
+				tasks.push(new ClassEmptyChunk(this.dl));
+			}
+
+			if (tasks.length > 0)
+			{
+				dlQueue.pushAll(tasks,
+					function onChunkFinished() {
+						this.chunkFinished = true;
+					}.bind(this), failureFunction);
+			}
 		}
 
 		fetchingFile = 0;

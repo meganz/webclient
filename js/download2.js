@@ -125,6 +125,14 @@ var DownloadManager = new function() {
 				}
 				if (dl.zipid) Zips[dl.zipid].cancelled = true;
 				dl.cancelled = true;
+				if (dl.io && typeof dl.io.begin === 'function')
+				{
+					/**
+					 * Canceled while Initializing? Let's free up stuff
+					 * and notify the scheduler for the running task
+					 */
+					dl.io.begin();
+				}
 				/* do not break the loop, it may be a multi-files zip */
 			}
 		}

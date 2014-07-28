@@ -1275,9 +1275,6 @@ function topmenuUI()
 	
 	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+108+'px');
 	initNotifications();
-
-	clearit(0);
-	clearit(1);	
 }
 
 

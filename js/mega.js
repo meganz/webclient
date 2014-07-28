@@ -233,6 +233,9 @@ function MegaData ()
 						
 						var el = $('.nw-contact-avatar.' + ctx.u);
 						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
+						
+						var el = $('.nw-contact-block-avatar.' + ctx.u);
+						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
 
 						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
 					}
@@ -317,11 +320,8 @@ function MegaData ()
 		if (!u)
 		{
 			$('.grid-table tr').remove();
-			$('.file-block-scrolling div').remove();
 			$('.file-block-scrolling a').remove();
-			$('.contacts-blocks-scrolling div').remove();
-			$('.contacts-grid-table tr').not('.clone-of-header').remove();
-			
+			$('.contacts-blocks-scrolling a').remove();			
 		}
 		if (this.v.length == 0)
 		{
@@ -341,7 +341,7 @@ function MegaData ()
 		}
 		else
 		{
-			n_cache = Math.ceil($('.files-grid-view').height() / 24);
+			n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
 		}
 		this.cRenderMainN = this.cRenderMainN || 1;
 		if (!n_cache)
@@ -372,96 +372,88 @@ function MegaData ()
 				}
 				var html,t,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
-				if (this.viewmode == 1)
+				
+				if (this.currentdirid == 'contacts')
 				{
-					if (this.currentdirid == 'contacts')
+					var u_h = this.v[i].h;
+					var cs = this.contactstatus(u_h);
+					var contains = fm_contains(cs.files,cs.folders);
+					var time = time2last(cs.ts);
+					var interactionclass = 'cloud-drive';						
+					if (cs.files == 0 && cs.folders == 0)
 					{
-						var avatar = staticpath + 'images/mega/default-avatar.png';
-						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
+						contains = l[1050];
+						time = l[1051];
+						var interactionclass = 'never';
+					}						
+					var user = M.d[u_h];						
+					var avatar = user.name.substr(0,2);						
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+					
+					if (this.viewmode == 1)
+					{						
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';				
+						html = '<a class="file-block" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color5">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
 					}
-					else if (this.currentdirid == 'shares')
-					{					
-						var u_h = this.v[i].p;						
-						var user = M.d[u_h];						
-						var avatar = user.name.substr(0,2);						
-						if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
-						var rights = 'Read only', rightsclass = ' read-only';						
-						if (M.v[i].r == 1)
-						{
-							rights = 'Read and write';
-							rightsclass = ' read-and-write';
-						}
-						else if (M.v[i].r == 2)
-						{
-							rights = 'Full access';
-							rightsclass = ' full-access';
-						}
+					else
+					{
+						el = 'tr';
+						t = '.grid-table.contacts';
+						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="online"><div class="nw-contact-status"></div><div class="fm-chat-user-status">Online</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';												
+					}
+				}
+				else if (this.currentdirid == 'shares')
+				{					
+					var cs = this.contactstatus(this.v[i].h);
+					var contains = fm_contains(cs.files,cs.folders);
+					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
+					var u_h = this.v[i].p;						
+					var user = M.d[u_h];						
+					var avatar = user.name.substr(0,2);						
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+					var rights = 'Read only', rightsclass = ' read-only';						
+					if (M.v[i].r == 1)
+					{
+						rights = 'Read and write';
+						rightsclass = ' read-and-write';
+					}
+					else if (M.v[i].r == 2)
+					{
+						rights = 'Full access';
+						rightsclass = ' full-access';
+					}
 					
+					if (this.viewmode == 1)
+					{
 						t = '.shared-blocks-scrolling';
 						el = 'a';
 						html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon '+star+'"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar +'</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
 					}
 					else
 					{
+						t = '.grid-table.shared-with-me';
+						el='tr';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star online"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status">Offline</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
+					}
+				}
+				else
+				{
+					if (this.viewmode == 1)
+					{
 						t = '.file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 						cc=1;
 					}
-				}
-				else
-				{
-					el='tr';
-					if (this.currentdirid == 'contacts')
-					{
-						var cs = this.contactstatus(this.v[i].h);
-						var contains = fm_contains(cs.files,cs.folders);
-						var time = time2last(cs.ts);
-						if (cs.files == 0 && cs.folders == 0)
-						{
-							contains = l[1050];
-							time = l[1051];
-						}
-
-						var avatar = staticpath + 'images/mega/default-avatar.png';
-						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
-
-						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td><span class="contacts-avatar ' + this.v[i].h + '"><span><img src="' + avatar + '" alt=""/></span></span><span class="contacts-username">' + htmlentities(this.v[i].name) + '</span></td><td width="130" class="hidden"><span class="contact-status online-status"></span><span class="contact-status-text">Online</span></td><td  width="200">' + htmlentities(contains) + '</td><td width="200">' + htmlentities(time) + '</td></tr>';
-						t = '.contacts-grid-table';
-					}
-					else if (this.currentdirid == 'shares')
-					{
-						var cs = this.contactstatus(this.v[i].h);
-						var contains = fm_contains(cs.files,cs.folders);
-						if (cs.files == 0 && cs.folders == 0) contains = l[1050];
-						var u_h = this.v[i].p;						
-						var user = M.d[u_h];						
-						var avatar = user.name.substr(0,2);						
-						if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
-						var rights = 'Read only', rightsclass = ' read-only';						
-						if (M.v[i].r == 1)
-						{
-							rights = 'Read and write';
-							rightsclass = ' read-and-write';
-						}
-						else if (M.v[i].r == 2)
-						{
-							rights = 'Full access';
-							rightsclass = ' full-access';
-						}
-						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color10">' + avatar + '</div><div class="fm-chat-user-info todo-star online"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status">Offline</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
-						t = '.grid-table.shared-with-me';
-					}
 					else
 					{
 						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
-						cc=1;
+						cc=1;						
 					}
 				}
+			
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
@@ -511,6 +503,7 @@ function MegaData ()
 			}
 		});
 		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+		
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
@@ -974,7 +967,7 @@ function MegaData ()
 		var g=1;
 		while(g)
 		{
-			if (id == 'contacts') id = 'shares';
+			if (id == 'contacts' && a.length > 0) id = 'shares';
 		
 			if ((M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) && id.length !== 11) a.push(id);
 			else if (id.length !== 11) return [];
@@ -1029,6 +1022,7 @@ function MegaData ()
 			}
 			else if (a[i] == 'shares')
 			{
+				console.log('huh');
 				typeclass = 'shared-with-me';
 				name = '';
 			}

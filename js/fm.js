@@ -45,10 +45,10 @@ function initFileblocksScrolling()
 
 function initContactsGridScrolling() 
 {
-	var jsp = $('.contacts-grid-scrolling-table').data('jsp');
+	var jsp = $('.grid-scrolling-table.contacts').data('jsp');
 	if (jsp) jsp.destroy();
-	$('.contacts-grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
-	jScrollFade('.contacts-grid-scrolling-table');
+	$('.grid-scrolling-table.contacts').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
+	jScrollFade('.grid-scrolling-table.contacts');
 }
 
 
@@ -1292,9 +1292,9 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{	
 		$('.fm-clearbin-button').removeClass('hidden');	
-		$('.files-grid-view').addClass('rubbish-bin');	
+		$('.files-grid-view.fm').addClass('rubbish-bin');	
 	} else {
-		$('.files-grid-view').removeClass('rubbish-bin');	
+		$('.files-grid-view.fm').removeClass('rubbish-bin');	
 	    if (RootbyId(M.currentdirid) == M.InboxID)
 	    {	
 		   if (d) console.log('Inbox');
@@ -2198,6 +2198,7 @@ function gridUI()
 	$.gridLastSelected=false;
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
+	
 	$.gridHeader = function()  
 	{		
 		$('.grid-table tbody tr:first-child td').each(function(i,e) 
@@ -2209,7 +2210,7 @@ function gridUI()
 	}	
 	$.contactgridHeader = function()
 	{
-		var el = $('.contacts-grid-table th');		
+		var el = $('.files-grid-view.contacts-view .grid-table-header th');		
 		var i=0;
 		var w=0;		
 		while (i < el.length)
@@ -2217,8 +2218,9 @@ function gridUI()
 			if (i !== 0) w+=$(el[i]).width();
 			i++;
 		}
-		$('.contacts-grid-table tbody tr:first-child td').each(function(i,e) {
-		  var headerColumn = $('.contacts-grid-header th').get(i);
+		$('.files-grid-view.contacts-view .grid-scrolling-table tbody tr:first-child td').each(function(i,e) 
+		{
+		  var headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });
 		initTransferScroll();
@@ -2244,10 +2246,6 @@ function gridUI()
 	}
 	
 	
-	if (M.currentdirid == 'contacts') $.selectddUIgrid = '.contacts-grid-table';
-	else $.selectddUIgrid = '.grid-scrolling-table';	
-	$.selectddUIitem = 'tr';
-	selectddUI();	
 	$(window).unbind('resize.grid');
 	$(window).bind('resize.grid', function () 
 	{
@@ -2258,37 +2256,41 @@ function gridUI()
 				$.contactgridHeader();
 				initContactsGridScrolling();
 			}
+			else if (M.currentid == 'shares')
+			{
+				initGridScrolling();
+				$.sharedgridHeader();
+			}
 			else
 			{
 				initGridScrolling();
 				$.gridHeader();
 			}
 		}
-    });	
-	$('.fm-blocks-view').addClass('hidden');
-	$('.fm-chat-block').addClass('hidden');
-	$('.fm-contacts-blocks-view').addClass('hidden');
-	$('.shared-blocks-view').addClass('hidden');
+    });
 	
+	$('.fm-blocks-view.fm').addClass('hidden');
+	$('.fm-chat-block').addClass('hidden');
+	$('.shared-blocks-view').addClass('hidden');
+	$('.shared-grid-view').addClass('hidden');
+	$('.files-grid-view.fm').addClass('hidden');	
+	$('.fm-blocks-view.contacts-view').addClass('hidden');	
+	$('.files-grid-view.contacts-view').addClass('hidden');	
 	
 	if (M.currentdirid == 'contacts')
-	{
-		$('.files-grid-view').addClass('hidden');
-		$('.contacts-grid-view').removeClass('hidden');
+	{		
+		$('.files-grid-view.contacts-view').removeClass('hidden');
 		$.contactgridHeader();
 		initContactsGridScrolling();
 	}
 	else if (M.currentdirid == 'shares')
 	{
-		$('.files-grid-view').addClass('hidden');
-		$('.contacts-grid-view').addClass('hidden');
 		$('.shared-grid-view').removeClass('hidden');		
 		$.sharedgridHeader();		
 		initGridScrolling();
 	}
 	else
 	{	
-		$('.contacts-grid-view').addClass('hidden');
 		$('.files-grid-view').removeClass('hidden');
 		initGridScrolling();
 		$.gridHeader();
@@ -2319,7 +2321,7 @@ function gridUI()
 		var id = [$(this).parent().attr('id')];
 		M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));		
 	});	
-	if (d) console.log('gridUI() time:',new Date().getTime() - t);
+	
 	$('.grid-table-header .arrow').unbind('click');
 	$('.grid-table-header .arrow').bind('click',function(e)
 	{
@@ -2332,6 +2334,15 @@ function gridUI()
 		else if (c && c.indexOf('date') > -1) M.doSort('date',d);	
 		if (c) M.renderMain();
 	});
+	
+	if (M.currentdirid == 'shares') $.selectddUIgrid = '.shared-grid-view .grid-scrolling-table';
+	else if (M.currentdirid == 'contacts') $.selectddUIgrid = '.grid-scrolling-table.contacts';
+	else $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
+	
+	$.selectddUIitem = 'tr';
+	setTimeout(selectddUI,10);
+	
+	if (d) console.log('gridUI() time:',new Date().getTime() - t);
 }
 
 /**
@@ -2622,7 +2633,7 @@ var QuickFinder = function(searchable_elements, containers) {
 
 var quickFinder = new QuickFinder(
     '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view, .contacts-grid-table'
+    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
 );
 
 
@@ -2725,8 +2736,10 @@ var SelectionManager = function($selectable) {
 		$(window).trigger('dynlist.flush');
         var $selectable_containers = $(
             [
-                ".fm-blocks-view",
-                ".files-grid-view",
+                ".fm-blocks-view.fm",
+				".fm-blocks-view.contacts-view",				
+                ".files-grid-view.fm",
+				".files-grid-view.contacts-view",
                 ".contacts-grid-view",
                 ".fm-contacts-blocks-view"
             ].join(",")
@@ -2751,8 +2764,10 @@ var SelectionManager = function($selectable) {
     this.get_selected = function() {
         var $selectable_containers = $(
             [
-                ".fm-blocks-view",
-                ".files-grid-view",
+                ".fm-blocks-view.fm",
+                ".fm-blocks-view.contacts-view",				
+                ".files-grid-view.fm",
+				".files-grid-view.contacts-view",
                 ".contacts-grid-view",
                 ".fm-contacts-blocks-view"
             ].join(",")
@@ -3278,33 +3293,15 @@ function iconUI()
 {
 	$('.fm-files-view-icon.block-view').addClass('active');
 	$('.fm-files-view-icon.listing-view').removeClass('active');
-	
-	if (M.currentdirid == 'contacts')
-	{
-		$.selectddUIgrid = '.contacts-blocks-scrolling';
-		$.selectddUIitem = '.contact-block-view';
-	}
-	else if (M.currentdirid == 'shares')
-	{
-		$.selectddUIgrid = '.shared-blocks-scrolling';
-		$.selectddUIitem = 'a';
-	}
-	else
-	{
-		$.selectddUIgrid = '.file-block-scrolling';
-		$.selectddUIitem = 'a';
-	}
-	selectddUI();	
-	
-	$('.files-grid-view').addClass('hidden');
-	$('.contacts-grid-view').addClass('hidden');
 	$('.shared-grid-view').addClass('hidden');	
-	$('.fm-blocks-view').addClass('hidden');
-	$('.fm-contacts-blocks-view').addClass('hidden');
+	$('.files-grid-view.fm').addClass('hidden');
+	$('.fm-blocks-view.fm').addClass('hidden');
+	$('.fm-blocks-view.contacts-view').addClass('hidden');	
+	$('.files-grid-view.contacts-view').addClass('hidden');
 	
 	if (M.currentdirid == 'contacts')
 	{
-		$('.fm-contacts-blocks-view').removeClass('hidden');
+		$('.fm-blocks-view.contacts-view').removeClass('hidden');
 		initContactsBlocksScrolling();
 	}
 	else if (M.currentdirid == 'shares')
@@ -3335,6 +3332,23 @@ function iconUI()
 		else return false;	
 		$.hideTopMenu();
 	});
+	
+	if (M.currentdirid == 'contacts')
+	{
+		$.selectddUIgrid = '.contacts-blocks-scrolling';
+		$.selectddUIitem = 'a';
+	}
+	else if (M.currentdirid == 'shares')
+	{
+		$.selectddUIgrid = '.shared-blocks-scrolling';
+		$.selectddUIitem = 'a';
+	}
+	else
+	{
+		$.selectddUIgrid = '.file-block-scrolling';
+		$.selectddUIitem = 'a';
+	}
+	setTimeout(selectddUI,10);
 }
 
 
@@ -3834,9 +3848,23 @@ function sectionUIopen(id)
 	$('.nw-fm-left-icon.' + id).addClass('active');	
 	$('.content-panel.' + id).addClass('active');	
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
-	$('.fm-right-header').addClass('hidden');	
-	if (id !== 'conversations') $('.fm-right-header.fm').removeClass('hidden');
-	if (id !== 'cloud-drive') $('.files-grid-view').addClass('hidden');
+	$('.fm-right-header').addClass('hidden');
+	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
+	if (id !== 'cloud-drive') 
+	{
+		$('.files-grid-view.fm').addClass('hidden');
+		$('.fm-blocks-view.fm').addClass('hidden');	
+	}
+	if (id !== 'contacts') 
+	{
+		$('.files-grid-view.contacts-view').addClass('hidden');
+		$('.fm-blocks-view.contacts-view').addClass('hidden');	
+	}
+	if (id !== 'shared-with-me') 
+	{
+		$('.shared-blocks-view').addClass('hidden');
+		$('.shared-grid-view').addClass('hidden');	
+	}
 	
 	var headertxt = '';
 	switch(id)
@@ -5615,7 +5643,7 @@ function fm_resize_handler() {
         });
     });
 
-    $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table'].join(", ")).css({
+    $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (
                 $(document.body).outerWidth() - (
                     $('.fm-left-panel').outerWidth()
@@ -5643,6 +5671,7 @@ function fm_resize_handler() {
         'min-height': right_blocks_height + "px"
     });
 	
+	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();	
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();	
 	$('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css(
 	{
@@ -5690,10 +5719,9 @@ function sharedfolderUI()
 		{
 			rights = 'Full access';
 			rightsclass = ' full-access';
-		}
+		}	
 	
-	
-		var e = '.files-grid-view';
+		var e = '.files-grid-view.fm';
 		if (M.viewmode == 1) e = '.fm-blocks-view';
 		
 		$(e).wrap('<div class="shared-details-block"></div>');	

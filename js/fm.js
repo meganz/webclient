@@ -528,6 +528,13 @@ function initUI()
     },50);
 	
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
+	
+	megaChat.karere.unbind("onPresence.maintainUI");
+	megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData) 
+	{
+		M.onlineStatusEvent(megaChat.getContactFromJid(presenceEventData.getFromJid()),presenceEventData.getShow());
+	});
+	
 }
 
 function isIdDownload(id) {

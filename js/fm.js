@@ -3855,10 +3855,10 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);	
 	$('.fm-right-header').addClass('hidden');
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
-	if (id !== 'cloud-drive') 
+	if ((id !== 'cloud-drive') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
 		$('.files-grid-view.fm').addClass('hidden');
-		$('.fm-blocks-view.fm').addClass('hidden');	
+		$('.fm-blocks-view.fm').addClass('hidden');
 	}
 	if (id !== 'contacts') 
 	{

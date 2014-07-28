@@ -1049,6 +1049,7 @@ function initContextUI()
 			var id = $(this).attr('id')
 			fileIdToObject(id)
 				.paused = false;
+			$('span.transfer-type', this).removeClass('paused');
 			if (id[0] == 'd') fm_tfsresume(id)
 		});
 	});
@@ -1060,6 +1061,7 @@ function initContextUI()
 			var id = $(this).attr('id')
 			fileIdToObject(id)
 				.paused = true;
+			$('span.transfer-type', this).addClass('paused');
 			if (id[0] == 'd') fm_tfspause(id);
 		});
 	});
@@ -3560,6 +3562,7 @@ function transferPanelUI()
 
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.removeClass('active');
+			$('.transfer-panel tr span.transfer-type').removeClass('paused');
 		}
 		else
 		{
@@ -3567,6 +3570,8 @@ function transferPanelUI()
 			dlQueue.pause();
 			ulQueue.pause();
 			ui_paused = true;
+
+			$('.transfer-panel tr span.transfer-type').addClass('paused');
 
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.text('PAUSED');

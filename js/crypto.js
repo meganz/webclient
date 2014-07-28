@@ -2190,6 +2190,7 @@ function crypto_procsr(sr)
 	ctx.callback(false,ctx);
 }
 
+
 var keycache = {};
 
 var rsa2aes = {};
@@ -2267,12 +2268,18 @@ function crypto_processkey(me,master_aes,file)
 			// long keys: RSA
 			if (u_privk)
 			{
-				var t = base64urldecode(key);
-				
-				if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
-				else
+				var t = base64urldecode(key);				
+				try
+				{				
+					if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
+					else
+					{
+						if (d) console.log("Corrupt key for node " + file.h);
+						return;
+					}	
+				}
+				catch(e)
 				{
-					if (d) console.log("Corrupt key for node " + file.h);
 					return;
 				}
 			}

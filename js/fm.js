@@ -3752,7 +3752,7 @@ function reCalcMenuPosition(e, m, x, y, ico)
 	var wH = window.innerHeight, wW = window.innerWidth;
 	var maxX = wW - SIDE_MARGIN;// max horizontal position
 	var maxY = wH - TOP_MARGIN;// max vertical position
-	var minX = SIDE_MARGIN;// min horizontal position
+	var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal position
 	var minY = TOP_MARGIN;// min vertical position
 	var wMax = x + cmW;// calculated coordinate of right edge
 	var hMax = y + cmH;// calculated coordinate of bottom edge
@@ -3779,6 +3779,8 @@ function reCalcMenuPosition(e, m, x, y, ico)
 	{
 		cor = 0;
 		dPos = {'x':x, 'y':y};
+		if (x < minX) dPos.x = minX;// left side alignment
+		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
 		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
 		if (hMax > maxY) dPos.y = maxY - cmH;// align with bottom, 12px from it
 	}

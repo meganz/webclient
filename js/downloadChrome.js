@@ -22,7 +22,7 @@
 			else if (i < entries.length)
 			{
 				var file = entries[i];
-				if (file.isFile)
+				if (file.isFile && !isTrasferActive(file.name))
 				{
 					file.getMetadata(function (metadata)
 					{

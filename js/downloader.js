@@ -6,9 +6,57 @@ var fetchingFile = null, __ccXID = 0
 	 */
 	, IO_THROTTLE = 15
 
-// Chunk fetch {{{
+// Keep a record of active transfers.
 var GlobalProgress = {};
 
+function dlSetActiveTransfer(dl_id)
+{
+	var data = JSON.parse(localStorage.aTransfers || '{}');
+
+	data[dl_id] = Date.now();
+
+	localStorage.aTransfers = JSON.stringify(data);
+}
+
+function isTrasferActive(dl_id)
+{
+	var date = null;
+
+	if (localStorage.aTransfers)
+	{
+		var data = JSON.parse(localStorage.aTransfers);
+
+		date = data[dl_id];
+	}
+
+	return date;
+}
+
+function dlClearActiveTransfer(dl_id)
+{
+	var data = JSON.parse(localStorage.aTransfers || '{}');
+	if (data[dl_id])
+	{
+		delete data[dl_id];
+		if (!$.len(data)) delete localStorage.aTransfers;
+		else localStorage.aTransfers = JSON.stringify(data);
+	}
+}
+
+if (localStorage.aTransfers)
+{
+	Soon(function() {
+		var data = JSON.parse(localStorage.aTransfers), now = NOW();
+		for (var r in data)
+		{
+			// Let's assume there was a system/browser crash...
+			if ((now - data[r]) > 86400000) delete data[r];
+		}
+		localStorage.aTransfers = JSON.stringify(data);
+	});
+}
+
+// Chunk fetch {{{
 function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
@@ -250,6 +298,7 @@ function ClassFile(dl) {
 	if (!dl.zipid || !GlobalProgress[this.gid])
 	{
 		GlobalProgress[this.gid] = {data: {}, done: 0, working:[]};
+		dlSetActiveTransfer(dl.zipid || dl.dl_id);
 	}
 	this[this.gid] = !0;
 }
@@ -271,7 +320,6 @@ ClassFile.prototype.destroy = function() {
 		clearTimeout(dl.quota_t);
 		delete this.dl.quota_t;
 	}
-
 
 	if (this.dl.cancelled)
 	{
@@ -305,6 +353,7 @@ ClassFile.prototype.destroy = function() {
 	}
 
 	if (!this.dl.zipid) delete GlobalProgress[this.gid];
+	dlClearActiveTransfer(this.dl.zipid || this.dl.dl_id);
 
 	this.dl.ready = function onDeadEnd() { if (d) console.error('We reached a dead end..') };
 

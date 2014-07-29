@@ -1005,6 +1005,7 @@ function MegaData ()
 		return a;
 	};
 
+
 	this.pathLength = function()
 	{
 		var length=0;
@@ -1025,12 +1026,13 @@ function MegaData ()
 
 	this.renderPath = function()
 	{
-		var hasnext='', typeclass;
+		var name, hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
-		var a = this.getPath(this.currentdirid);
-		for (var i in a)
-		{
-			if (a[i] == this.RootID)
+		var a2 = this.getPath(this.currentdirid);
+		
+		for (var i in a2)
+		{			
+			if (a2[i] == this.RootID)
 			{
 				if (folderlink && M.d[this.RootID])
 				{
@@ -1043,32 +1045,33 @@ function MegaData ()
 					typeclass = 'cloud-drive';
 				}
 			}
-			else if (a[i] == 'contacts')
+			else if (a2[i] == 'contacts')
 			{
 				typeclass = 'contacts';
 				name = l[165];
-			}
-			else if (a[i] == 'shares')
+			}			
+			else if (a2[i] == 'shares')
 			{
 				typeclass = 'shared-with-me';
 				name = '';
 			}
-			else if (a[i] == this.RubbishID)
+			else if (a2[i] == this.RubbishID)
 			{
 				typeclass = 'recycle-bin';
 				name = l[167];
 			}
-			else if (a[i] == 'messages' || a[i] == M.InboxID)
+			else if (a2[i] == 'messages' || a2[i] == M.InboxID)
 			{
 				typeclass = 'messages';
 				name = l[166];
 			}
 			else
 			{
-				name = htmlentities(this.d[a[i]].name);
+				
+				name = htmlentities(M.d[a2[i]].name);
 				typeclass = 'folder';
 			}
-			html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  name + '</span></span></a>' + html;
+			html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_'+htmlentities(a2[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  name + '</span></span></a>' + html;
 			hasnext = 'has-next-button';
 		}
 
@@ -1103,7 +1106,7 @@ function MegaData ()
 			$('.fm-new-folder span').text('');
 			$('.fm-file-upload span').text('');
 			$('.fm-folder-upload span').text('');
-		}
+		}	
 
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;

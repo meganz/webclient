@@ -13,30 +13,6 @@ var inherits = (function(){
 })();
 
 /**
- *	Map a file id dl_<fileid> or ul_<fileid> to their 
- *	objects in the dl_queue or ul_queue array
- */
-function fileIdToObject(fileId)
-{
-	var queue
-
-	if (fileId.match(/^dl_/)) {
-		queue = dl_queue;
-	} else {
-		queue = ul_queue;
-	}
-	
-	fileId = fileId.substr(3);
-	for (var i = 0; i < queue.length; i++) {
-		if (queue[i] && queue[i].id == fileId) {
-			return queue[i];	
-		}
-	}
-
-	return null;
-}
-
-/**
  *	Cascade:
  *
  *	Tiny helper to queue related tasks, in which the output of one function

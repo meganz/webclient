@@ -551,7 +551,7 @@ function transferPanelContextMenu(target)
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
 
-	var file = fileIdToObject($(target).attr('id'));
+	var file = GlobalProgress[$(target).attr('id')]
 	if (!file) {
 		/* no file, it is a finished operation */
 		menuitems.hide()
@@ -1056,10 +1056,8 @@ function initContextUI()
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
-			fileIdToObject(id)
-				.paused = false;
+			fm_tfsresume(id)
 			$('span.transfer-type', this).removeClass('paused');
-			if (id[0] == 'd') fm_tfsresume(id)
 		});
 	});
 
@@ -1068,10 +1066,8 @@ function initContextUI()
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
-			fileIdToObject(id)
-				.paused = true;
+			fm_tfspause(id);
 			$('span.transfer-type', this).addClass('paused');
-			if (id[0] == 'd') fm_tfspause(id);
 		});
 	});
 
@@ -1094,47 +1090,44 @@ function initContextUI()
 	$(c+'.canceltransfer-item,' + c + '.tranfer-clear').bind('click',function(event) 
 	{			
 		$.zipkill={};
-		msgDialog('confirmation','cancel this transfer','Are you sure you want to this transfer?','',function(e) { 
-			if (!e) return;
-			$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
+		{
+			var id = $(el).attr('id');
+			if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
 			{
-				var id = $(el).attr('id');
-				if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
+				id = id.replace('dl_','').replace('zip_','');
+
+				$.each(dl_queue, function(i, queue) {
+					if (queue.id == id || queue.zipid == id) {
+						if (queue.zipid) $.zipkill[queue.zipid] = 1;
+						else DownloadManager.abort({ id: queue.dl_id });
+					}
+				});
+			}
+			else if (id && id.indexOf('ul_') > -1)
+			{				
+				for (var i in ul_queue)
 				{
-					id = id.replace('dl_','').replace('zip_','');
-	
-					$.each(dl_queue, function(i, queue) {
-						if (queue.id == id || queue.zipid == id) {
-							if (queue.zipid) $.zipkill[queue.zipid] = 1;
-							else DownloadManager.abort({ id: queue.dl_id });
+					if (ul_queue[i])
+					{					
+						if (ul_queue[i].id == id.replace('ul_',''))
+						{
+							UploadManager.abort(ul_queue[i]);
 						}
-					});
-				}
-				else if (id && id.indexOf('ul_') > -1)
-				{				
-					for (var i in ul_queue)
-					{
-						if (ul_queue[i])
-						{					
-							if (ul_queue[i].id == id.replace('ul_',''))
-							{
-								UploadManager.abort(ul_queue[i]);
-							}
-						}
-					}	
-				}
-				$(this).remove();
-			});
-	
-			$.each($.zipkill, function(i) {
-				DownloadManager.abort({ zipid: i });
-			});
-			delete $.zipkill;
-			Soon(function() {
-				// XXX: better way to stretch the scrollbar?
-				$(window).trigger('resize');
-				resetUploadDownload();
-			});
+					}
+				}	
+			}
+			$(this).remove();
+		});
+
+		$.each($.zipkill, function(i) {
+			DownloadManager.abort({ zipid: i });
+		});
+		delete $.zipkill;
+		Soon(function() {
+			// XXX: better way to stretch the scrollbar?
+			$(window).trigger('resize');
+			resetUploadDownload();
 		});
 	});
 }
@@ -3573,17 +3566,6 @@ function transferPanelUI()
 				DEBUG(l[214]);
 			}
 
-			/* Remove from all files, in both ul_queue
-			   and dl_queue the paused value */
-			var q = [dl_queue, ul_queue];
-			for (var i in q) {
-				for(var e = 0; e < q[i].length; e++) {
-					if (q[i][e]) {
-						q[i][e].paused = false;
-					}
-				}
-			}
-
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.removeClass('active');
 			$('.transfer-panel tr span.transfer-type').removeClass('paused');
@@ -3600,17 +3582,6 @@ function transferPanelUI()
 
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.text('PAUSED');
-
-			/* Set all files, in both ul_queue
-			   and dl_queue as paused */
-			var q = [dl_queue, ul_queue];
-			for (var i in q) {
-				for(var e = 0; e < q[i].length; e++) {
-					if (q[i][e]) {
-						q[i][e].paused = true;
-					}
-				}
-			}
 
 			$('.transfer-table tr td:eq(3)').each(function()
 			{

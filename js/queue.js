@@ -14,7 +14,6 @@ inherits(MegaQueue, MegaEvents)
 MegaQueue.prototype.isEmpty = function() {
 	return this._running == 0 
 		&& this._queue.length == 0
-		&& $.len(this._qpaused) == 0
 }
 
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
@@ -222,9 +221,6 @@ MegaQueue.prototype.process = function() {
 		delete this._expanded;
 	}
 
-	if (this.isEmpty()) {
-		this.trigger('drain');
-	}
 	return true;
 };
 

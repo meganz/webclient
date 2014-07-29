@@ -1060,7 +1060,6 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
 			fm_tfsresume(id)
-			GlobalProgress[id].paused = false;
 			$('span.transfer-type', this).removeClass('paused');
 		});
 	});
@@ -1071,7 +1070,6 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
 			fm_tfspause(id);
-			GlobalProgress[id].paused = true;
 			$('span.transfer-type', this).addClass('paused');
 		});
 	});

@@ -549,7 +549,7 @@ function transferPanelContextMenu(target)
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
 
-	var file = fileIdToObject($(target).attr('id'));
+	var file = GlobalProgress[$(target).attr('id')]
 	if (!file) {
 		/* no file, it is a finished operation */
 		menuitems.hide()
@@ -1059,10 +1059,9 @@ function initContextUI()
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
-			fileIdToObject(id)
-				.paused = false;
+			fm_tfsresume(id)
+			GlobalProgress[id].paused = false;
 			$('span.transfer-type', this).removeClass('paused');
-			if (id[0] == 'd') fm_tfsresume(id)
 		});
 	});
 
@@ -1071,10 +1070,9 @@ function initContextUI()
 	{
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			var id = $(this).attr('id')
-			fileIdToObject(id)
-				.paused = true;
+			fm_tfspause(id);
+			GlobalProgress[id].paused = true;
 			$('span.transfer-type', this).addClass('paused');
-			if (id[0] == 'd') fm_tfspause(id);
 		});
 	});
 

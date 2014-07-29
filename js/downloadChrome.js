@@ -418,16 +418,20 @@
 
 	if ($.browser.chrome) Later(function()
 	{
-		dl_getspace(HUGE_QUOTA, function(st, e)
-		{
-			if (e && e.code === FileError.SECURITY_ERR)
+		window.webkitRequestFileSystem(0, 0x10000,
+			function (fs)
 			{
-				console.error('Switching to MemoryIO');
-				window.Incognito = true;
-				dlMethod = MemoryIO;
+				free_space();
+			},
+			function (e)
+			{
+				if (e && e.code === FileError.SECURITY_ERR)
+				{
+					console.error('Switching to MemoryIO');
+					window.Incognito = true;
+					dlMethod = MemoryIO;
+				}
 			}
-			else free_space();
-
-		}, 0);
+		);
 	});
 })(this);

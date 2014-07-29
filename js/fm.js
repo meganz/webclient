@@ -1095,47 +1095,44 @@ function initContextUI()
 	$(c+'.canceltransfer-item,' + c + '.tranfer-clear').bind('click',function(event) 
 	{			
 		$.zipkill={};
-		msgDialog('confirmation','cancel this transfer','Are you sure you want to this transfer?','',function(e) { 
-			if (!e) return;
-			$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
+		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
+		{
+			var id = $(el).attr('id');
+			if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
 			{
-				var id = $(el).attr('id');
-				if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
+				id = id.replace('dl_','').replace('zip_','');
+
+				$.each(dl_queue, function(i, queue) {
+					if (queue.id == id || queue.zipid == id) {
+						if (queue.zipid) $.zipkill[queue.zipid] = 1;
+						else DownloadManager.abort({ id: queue.dl_id });
+					}
+				});
+			}
+			else if (id && id.indexOf('ul_') > -1)
+			{				
+				for (var i in ul_queue)
 				{
-					id = id.replace('dl_','').replace('zip_','');
-	
-					$.each(dl_queue, function(i, queue) {
-						if (queue.id == id || queue.zipid == id) {
-							if (queue.zipid) $.zipkill[queue.zipid] = 1;
-							else DownloadManager.abort({ id: queue.dl_id });
+					if (ul_queue[i])
+					{					
+						if (ul_queue[i].id == id.replace('ul_',''))
+						{
+							UploadManager.abort(ul_queue[i]);
 						}
-					});
-				}
-				else if (id && id.indexOf('ul_') > -1)
-				{				
-					for (var i in ul_queue)
-					{
-						if (ul_queue[i])
-						{					
-							if (ul_queue[i].id == id.replace('ul_',''))
-							{
-								UploadManager.abort(ul_queue[i]);
-							}
-						}
-					}	
-				}
-				$(this).remove();
-			});
-	
-			$.each($.zipkill, function(i) {
-				DownloadManager.abort({ zipid: i });
-			});
-			delete $.zipkill;
-			Soon(function() {
-				// XXX: better way to stretch the scrollbar?
-				$(window).trigger('resize');
-				resetUploadDownload();
-			});
+					}
+				}	
+			}
+			$(this).remove();
+		});
+
+		$.each($.zipkill, function(i) {
+			DownloadManager.abort({ zipid: i });
+		});
+		delete $.zipkill;
+		Soon(function() {
+			// XXX: better way to stretch the scrollbar?
+			$(window).trigger('resize');
+			resetUploadDownload();
 		});
 	});
 }

@@ -2149,7 +2149,7 @@ function MegaData ()
 		});
 
 		panelDomQueue.splice(0, toClean);
-		fmUpdateCount();
+		Soon(fmUpdateCount);
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();

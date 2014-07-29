@@ -3576,17 +3576,6 @@ function transferPanelUI()
 				DEBUG(l[214]);
 			}
 
-			/* Remove from all files, in both ul_queue
-			   and dl_queue the paused value */
-			var q = [dl_queue, ul_queue];
-			for (var i in q) {
-				for(var e = 0; e < q[i].length; e++) {
-					if (q[i][e]) {
-						q[i][e].paused = false;
-					}
-				}
-			}
-
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.removeClass('active');
 			$('.transfer-panel tr span.transfer-type').removeClass('paused');
@@ -3603,17 +3592,6 @@ function transferPanelUI()
 
 			$('.tranfer-download-indicator,.tranfer-upload-indicator')
 				.text('PAUSED');
-
-			/* Set all files, in both ul_queue
-			   and dl_queue as paused */
-			var q = [dl_queue, ul_queue];
-			for (var i in q) {
-				for(var e = 0; e < q[i].length; e++) {
-					if (q[i][e]) {
-						q[i][e].paused = true;
-					}
-				}
-			}
 
 			$('.transfer-table tr td:eq(3)').each(function()
 			{

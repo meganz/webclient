@@ -7319,7 +7319,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	background-image: url(../images/mega/top-sprite.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-position: -5px -5px;
+	background-size:auto;
 }
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);
@@ -11501,14 +11502,13 @@ h5.main-italic-header {
 .top-dialog-login-button img {
 	display: none;
 }
-.top-dialog-login-button.loading {
-	padding-right: 25px;
-}
+
 .top-dialog-login-button.loading img {
 	display: block;
 	width: 16px;
 	position: absolute;
-	right: 12px;
+	left:50%;
+	margin-left:-8px;
 	top: 7px;
 	padding: 0 0 0 0;
 }
@@ -16972,7 +16972,7 @@ span.incoming-call-name {
 .two-letters .nw-contact-block-avatar {
 	font-size: 58px;
 }
-.file-block .nw-contact-block-avatar img {
+.file-block .nw-contact-block-avatar img, .nw-contact-block-avatar img {
 	width: 156px;
 	height: 156px;
 	display: block;

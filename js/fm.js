@@ -371,7 +371,7 @@ function initUI()
 		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu')
 			.addClass('hidden')
-			.find('.context-submenu.active').removeClass('active');
+			.find('.context-submenu').removeClass('active left-position');
 	};
 	
 	$('#fmholder').unbind('click.contextmenu');
@@ -882,20 +882,25 @@ function initContextUI()
 {
 	var c = '.context-menu-item';
 	
-	//TODO: Create logic for submenues positions in context menu
 	$(c+'.contains-submenu').unbind('mouseenter');
 	$(c+'.contains-submenu').bind('mouseenter',function()
-	{   
-	    var s = $(this).next('.context-submenu');
-		$(s).removeClass('left-position');
-		s.addClass('active');
-		var rpos = $(window).width() - $(s).offset().left - $(s).width();
-		if (rpos < 20) $(s).addClass('left-position');
+	{
+		var pos = getHtmlElemPos(this);
+		reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
+//	    var s = $(this).next('.context-submenu');
+//		$(s).removeClass('left-position');
+//		s.addClass('active');
+//		var rpos = $(window).width() - $(s).offset().left - $(s).width();
+//		if (rpos < 20) $(s).addClass('left-position');
+
+//		ToDo: Hold background-color for parent submenus
+		
+		$(this).next('.context-submenu').addClass('active');
 	});
 	$(c+'.contains-submenu').unbind('mouseleave');
 	$(c+'.contains-submenu').bind('mouseleave',function()
 	{
-	    $(this).children('.context-submenu');
+//	    ToDo: remove appropriate submenus, keep/remove background-color for parent/child submenus
 	});
 	
 	
@@ -3729,11 +3734,11 @@ function adjustContextMenuPosition(e, m)
 	{
 		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
 		var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
-		mPos = reCalcMenuPosition(e, m, icoPos.x, icoPos.y, ico);
+		mPos = reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
 	}
 	else// right click
 	{
-		mPos = reCalcMenuPosition(e, m, mX, mY);
+		mPos = reCalcMenuPosition(m, mX, mY);
 	}
 	
 	m.css({'top':mPos.y,'left':mPos.x});// set menu position
@@ -3741,11 +3746,7 @@ function adjustContextMenuPosition(e, m)
 	return true;
 }
 
-// re-calculates element position if there's a need for that, eg. less then 12px left on right side
-// @x, @y current coordinates where element should be shown
-// @cmW, @cmH width and height of element
-// @ico, file-settings-icon dimensions, can be undefined, when right click menu is called
-function reCalcMenuPosition(e, m, x, y, ico)
+function reCalcMenuPosition(m, x, y, ico)
 {
 	var TOP_MARGIN = 12;
 	var SIDE_MARGIN = 12;
@@ -3759,10 +3760,9 @@ function reCalcMenuPosition(e, m, x, y, ico)
 	var hMax = y + cmH;// calculated coordinate of bottom edge
 	
 	var dPos;
-	var cor;// corner, check setBordersRadius for more infos about
-	if (typeof ico !== 'undefined')// file-settings-icon click
+	var cor;// corner, check setBordersRadius for more info
+	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
 	{
-		// Important: number values that are substracted from x, y coordinates depends on border of file-settings-icon element
 		cor = 1;
 		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
 		if (wMax > maxX)// draw to the left
@@ -3772,9 +3772,36 @@ function reCalcMenuPosition(e, m, x, y, ico)
 		}
 		if (hMax > maxY)// draw to the top
 		{
-			dPos.y = y - cmH - 4;// additional pixels to align with
+			dPos.y = y - cmH - 4;// additional pixels to align with -icon
 			cor++;
 		}
+	}
+	else if ((typeof ico === 'string') && (ico === 'submenu'))// ToDo: !!! Improve condition
+	{
+		var n = m.next('.context-submenu');// next submenu
+		var nmW = n.outerWidth(), nmH = n.outerHeight();
+	
+		var top = 0, left = 'auto', right = '100%';
+		if (m.parent('.left-position').length === 0)
+		{
+			if (maxX >= (wMax + nmW)) top = 0, left = 'auto', right = '100%';
+			else if (minX <= (x - nmW)) n.addClass('left-position');
+			else// overlap parent menu
+			{
+				return DEBUG('overlap')
+			}
+		}
+		else
+		{
+			if (minX <= (x - nmW)) n.addClass('left-position');
+			else if (maxX >= (wMax + nmW)) top = 0, left = 'auto', right = '100%';
+			else// overlap parent menu
+			{
+				return DEBUG('overlap')
+			}
+		}
+		
+		return {'top': top, 'left': left, 'right':right};
 	}
 	else// right click
 	{
@@ -3782,14 +3809,12 @@ function reCalcMenuPosition(e, m, x, y, ico)
 		dPos = {'x':x, 'y':y};
 		if (x < minX) dPos.x = minX;// left side alignment
 		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
-		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
 		if (hMax > maxY) dPos.y = maxY - cmH;// align with bottom, 12px from it
 	}
 
 	setBordersRadius(m, cor);
 
 // ToDo: decide how to handle "huge" context menu
-// ToDo: decide how to handle overlapping menus, eg. submenu can't be drawn to the right any more, so only options is to the left over existin one
 //	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
 //	else if (hMax > maxY) dPos.x = x - cmW;
 //	if (hMax > maxY) dPos.y = maxY - cmH;

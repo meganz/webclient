@@ -79,7 +79,7 @@ function scrollMenu()
 
 function init_page()
 {
-	closeDialog();
+//	closeDialog();
 
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 

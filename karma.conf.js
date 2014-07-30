@@ -36,6 +36,7 @@ module.exports = function(config) {
         'js/fm.js',
         'js/user.js',
         'js/megafilepicker.js',
+        'js/tlvstore.js',
         
         // Tests.
         {pattern: 'test/fixtures/**/*.html', included: false, served: true},

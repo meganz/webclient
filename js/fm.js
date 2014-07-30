@@ -865,16 +865,11 @@ function initContextUI()
 {
 	var c = '.context-menu-item';
 	
-	$(c+'.contains-submenu').unbind('mouseenter');
-	$(c+'.contains-submenu').bind('mouseenter',function()
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover',function()
 	{
 		var pos = getHtmlElemPos(this);
 		reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
-//	    var s = $(this).next('.context-submenu');
-//		$(s).removeClass('left-position');
-//		s.addClass('active');
-//		var rpos = $(window).width() - $(s).offset().left - $(s).width();
-//		if (rpos < 20) $(s).addClass('left-position');
 
 //		ToDo: Hold background-color for parent submenus
 		
@@ -3740,22 +3735,33 @@ function reCalcMenuPosition(m, x, y, ico)
 		var nmW = n.outerWidth(), nmH = n.outerHeight();
 	
 		var top = 0, left = 'auto', right = '100%';
+		var o;
 		if (m.parent('.left-position').length === 0)
 		{
 			if (maxX >= (wMax + nmW)) top = 0, left = 'auto', right = '100%';
 			else if (minX <= (x - nmW)) n.addClass('left-position');
-			else// overlap parent menu
+			else
 			{
-				return DEBUG('overlap')
+				var tre = wW - wMax;// to right edge
+				var tle = x - minX - SIDE_MARGIN;// to left edge
+				if (tre >= tle) n.css({'top': 'auto', 'right': (wMax - nmW) + 'px', 'left': 'auto'});// align with left edge, set right
+				else n.css({'top': 'auto', 'left': (maxX - x - nmW) + 'px', 'right': 'auto'});
+				
+				return true;
 			}
 		}
 		else
 		{
 			if (minX <= (x - nmW)) n.addClass('left-position');
 			else if (maxX >= (wMax + nmW)) top = 0, left = 'auto', right = '100%';
-			else// overlap parent menu
+			else
 			{
-				return DEBUG('overlap')
+				var tre = wW - wMax;// to right edge
+				var tle = x - minX - SIDE_MARGIN;// to left edge
+				if (tre >= tle) n.css({'top': 'auto', 'right': (wMax - nmW) + 'px', 'left': 'auto'});// align with left edge, set right
+				else n.css({'top': 'auto', 'left': (maxX - x - nmW) + 'px', 'right': 'auto'});
+				
+				return true;
 			}
 		}
 		

@@ -16792,7 +16792,7 @@ span.incoming-call-name {
 }
 .shared-details-icon {
 	width: 100px;
-	height: 100px;
+	height: 90px;
 	float: left;
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
@@ -16801,6 +16801,7 @@ span.incoming-call-name {
 }
 .shared-details-info-block {
 	margin-left: 138px;
+	overflow:hidden;
 }
 .shared-details-pad {
 	float: left;

@@ -364,7 +364,9 @@ function initUI()
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
-		$('.context-menu.files-menu').addClass('hidden');
+		$('.context-menu.files-menu')
+			.addClass('hidden')
+			.find('.context-submenu').removeClass('active left-position');
 	};
 
 	$('#fmholder').unbind('click.contextmenu');

@@ -30,15 +30,12 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
-
 function fmUpdateCount() {
 	var i = 0;
 	$('.transfer-table span.row-number').each(function() {
 		$(this).text(++i);
 	});
 }
-
-
 
 function MegaData ()
 {
@@ -55,7 +52,7 @@ function MegaData ()
 	this.rendered = false;
 	this.currentdirid = false;
 	this.viewmode = 0;
-	
+
 	this.csortd = -1;
 	this.csort = 'name';
 
@@ -171,7 +168,6 @@ function MegaData ()
 		}
 	};
 
-
     /**
      * The same as filterBy, but instead of pushing the stuff in M.v, will return a new array.
      *
@@ -209,7 +205,7 @@ function MegaData ()
 	{
 		if (!M.c.contacts) M.c.contacts = { };
 		M.c.contacts[u_handle] = 1;
-		
+
 		for (var u in M.c['contacts']) if (!avatars[u])
 		{
 			api_req({a:'uga',u:u,ua:'+a'},
@@ -227,13 +223,13 @@ function MegaData ()
 						}
 						var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
-						
-						var el = $('#contact_' + ctx.u);						
+
+						var el = $('#contact_' + ctx.u);
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
-						
+
 						var el = $('.nw-contact-avatar.' + ctx.u);
 						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
-						
+
 						var el = $('.nw-contact-block-avatar.' + ctx.u);
 						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
 
@@ -242,7 +238,7 @@ function MegaData ()
 				}
 			});
 		}
-		
+
 		delete M.c.contacts[u_handle];
 	}
 
@@ -281,7 +277,6 @@ function MegaData ()
 		return {files:files,folders:folders,ts:ts};
 	};
 
-	
 	this.onlineStatusClass = function(os)
 	{
 		if (os == 'dnd') return ['Busy','busy'];
@@ -289,11 +284,11 @@ function MegaData ()
 		else if (os == 'chat' || os == 'available') return ['Online','online'];
 		else return ['Offline','offline'];
 	};
-	
+
 	this.onlineStatusEvent = function(u,status)
 	{
 		console.log('onlineStatusEvent',u,status);
-	
+
 		if (u)
 		{
 			var e = $('.ustatus.' + u.u);
@@ -303,31 +298,32 @@ function MegaData ()
 				$(e).addClass(this.onlineStatusClass(status)[1]);
 			}
 			var e = $('.fm-chat-user-status.' + u.u);
-			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);			
-		}	
+			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);
+		}
 	};
-
 
 	this.renderMain = function(u)
 	{
 		function flush_cached_nodes(n)
 		{
 			var e = cache.splice(0, n || cache.length);
-			
+
 			if (e.length)
 			{
 				var n = M.viewmode == 0 ? $('.grid-table.fm') : $('.file-block-scrolling').data('jsp').getContentPane();
-				
+
 				for (var i in e)
 				{
-					n.append(e[i]);
+					if (d) ASSERT(M.v[e[i][0]].name === e[i][2], 'Whoops... wrong idx..');
+					M.v[e[i][0]].seen = true;
+					n.append(e[i][1]);
 				}
 				if (M.dynlistRt) clearTimeout(M.dynlistRt);
 				M.dynlistRt = setTimeout(function()
 				{
 					delete M.dynlistRt;
 					M.rmSetupUI();
-				}, 400);
+				}, 750);
 				$(window).trigger('resize');
 			}
 			else
@@ -336,7 +332,7 @@ function MegaData ()
 			}
 		}
 		hideEmptyMsg();
-		
+
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		
@@ -351,7 +347,7 @@ function MegaData ()
 		{
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
-			$('.contacts-blocks-scrolling a').remove();			
+			$('.contacts-blocks-scrolling a').remove();
 		}
 		
 		
@@ -370,14 +366,15 @@ function MegaData ()
 		{
 			var r = Math.floor($('.fm-blocks-view').width() / 140);
 			n_cache = r*Math.ceil($('.fm-blocks-view').height()/164);
+			n_cache += n_cache%r;
 		}
 		else
 		{
 			n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
 		}
-		this.cRenderMainN = this.cRenderMainN || 1;
 		if (!n_cache)
 		{
+			this.cRenderMainN = this.cRenderMainN || 1;
 			if (++this.cRenderMainN < 4) return Soon(function()
 			{
 				M.renderMain(u);
@@ -404,28 +401,28 @@ function MegaData ()
 				}
 				var html,t,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
-				
+
 				if (this.currentdirid == 'contacts')
 				{
 					var u_h = this.v[i].h;
 					var cs = this.contactstatus(u_h);
 					var contains = fm_contains(cs.files,cs.folders);
 					var time = time2last(cs.ts);
-					var interactionclass = 'cloud-drive';						
+					var interactionclass = 'cloud-drive';
 					if (cs.files == 0 && cs.folders == 0)
 					{
 						contains = l[1050];
 						time = l[1051];
 						var interactionclass = 'never';
-					}						
-					var user = M.d[u_h];						
-					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;						
-					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';					
-					
+					}
+					var user = M.d[u_h];
+					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+
 					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-					
+
 					if (this.viewmode == 1)
-					{						
+					{
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
 						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
@@ -434,19 +431,19 @@ function MegaData ()
 					{
 						el = 'tr';
 						t = '.grid-table.contacts';
-						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';												
+						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';
 					}
 				}
 				else if (this.currentdirid == 'shares')
-				{					
+				{
 					var cs = this.contactstatus(this.v[i].h);
 					var contains = fm_contains(cs.files,cs.folders);
 					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
-					var u_h = this.v[i].p;						
-					var user = M.d[u_h];						
+					var u_h = this.v[i].p;
+					var user = M.d[u_h];
 					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
-					var rights = 'Read only', rightsclass = ' read-only';						
+					var rights = 'Read only', rightsclass = ' read-only';
 					if (M.v[i].r == 1)
 					{
 						rights = 'Read and write';
@@ -457,9 +454,9 @@ function MegaData ()
 						rights = 'Full access';
 						rightsclass = ' full-access';
 					}
-					
+
 					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-					
+
 					if (this.viewmode == 1)
 					{
 						t = '.shared-blocks-scrolling';
@@ -495,21 +492,29 @@ function MegaData ()
 						t = '.file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
-						cc=1;
+						cc=i;
 					}
 					else
 					{
 						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
-						cc=1;						
+						cc=i;
 					}
 				}
-			
+
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// if the current view does not have any nodes, just append it
-					if (cc && ++files > n_cache) cache.push(html);
-					else $(t).append(html);					
+					if (cc && ++files > n_cache)
+					{
+						this.v[i].seen = false;
+						cache.push([i,html,this.v[i].name]);
+					}
+					else
+					{
+						this.v[i].seen = true;
+						$(t).append(html);
+					}
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
@@ -540,9 +545,8 @@ function MegaData ()
 				}
 			}
 		}
-				
+
 		sharedfolderUI();
-		
 		contactUI();
 		
 		$(window).unbind('dynlist.flush');
@@ -556,7 +560,7 @@ function MegaData ()
 			}
 		});
 		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
-		
+
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
@@ -571,12 +575,10 @@ function MegaData ()
 			//$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
-		
-		
 
 		this.rmSetupUI();
 	};
-	
+
 	this.rmSetupUI = function()
 	{
 		if (this.viewmode == 1)
@@ -586,7 +588,7 @@ function MegaData ()
 		}
 		else Soon(gridUI);
 		Soon(fmtopUI);
-		
+
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
@@ -661,10 +663,10 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
-		this.buildtree({h:'shares'});		
+		this.buildtree({h:'shares'});
 		this.buildtree(this.d[this.RootID]);
 		this.buildtree({h:M.RubbishID});
-		this.contacts();	
+		this.contacts();
 		treeUI();
         if(MegaChatEnabled) {
             megaChat.renderContactTree();
@@ -673,9 +675,9 @@ function MegaData ()
 
 	this.openFolder = function(id,force,chat)
 	{
-		$('.fm-right-account-block').addClass('hidden');		
-		$('.fm-files-view-icon').removeClass('hidden');		
-		
+		$('.fm-right-account-block').addClass('hidden');
+		$('.fm-files-view-icon').removeClass('hidden');
+
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) notificationsUI(1);
 		this.search=false;
@@ -711,31 +713,31 @@ function MegaData ()
             chatui(id); // XX: using the old code...for now
 		}
 		else if (!M.d[id]) id = this.RootID;
-		
+
 		if (!this.chat) {
             if(megaChat.getCurrentRoom()) {
                 megaChat.getCurrentRoom().hide();
             }
         }
-		
+
 		this.currentdirid = id;
-		
+
 		$('.nw-fm-tree-item').removeClass('opened');
 
 		if (this.chat)
 		{
-			// do nothing here		
+			// do nothing here
 		}
 		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 		
 		
 			$('.fm-right-files-block').removeClass('hidden');
-			
-			var tt = new Date().getTime();
+
+			if (d) console.time('time for rendering');
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
-			else M.filterByParent(M.currentdirid);						
+			else M.filterByParent(M.currentdirid);
 
 			var viewmode=0;
 
@@ -764,24 +766,20 @@ function MegaData ()
 				if ($('treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
-					if (n && n.p) treeUIopen(n.p,false,true);					
+					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-				
-				$('#treea_'+M.currentdirid).addClass('opened');
-			}		
-			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
-			setTimeout(function()
-			{
-				M.renderPath();
-			},1);
-		}	
+				$('#treea_'+M.currentdirid).addClass('opened');
+			}
+			if (d) console.timeEnd('time for rendering');
+
+			Soon(function() { M.renderPath()});
+		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
-	
-	
+
 	this.runbugfix = function()
 	{
 		for (var i in M.d)
@@ -790,13 +788,13 @@ function MegaData ()
 			{
 				var nodes = fm_getnodes(M.d[i].h);
 				console.log(nodes);
-				
+
 				for (var j in nodes)
 				{
 					var n = M.d[nodes[j]];
 					if (n.name)
 					{
-						 
+
 						console.log(n.name);
 						console.log(n.key);
 					}
@@ -804,16 +802,16 @@ function MegaData ()
 			}
 		}
 	};
-	
+
 	this.contacts = function()
 	{
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
-		
+
 		if (localStorage.csort) this.csort = localStorage.csort;
 		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
 		if (this.csort == 'shares')
-		{				
+		{
 			contacts.sort(function(a,b)
 			{
 				if (M.c[a.h] && M.c[b.h])
@@ -826,9 +824,9 @@ function MegaData ()
 			});
 		}
 		else if (this.csort == 'name')
-		{				
+		{
 			contacts.sort(function(a,b)
-			{						
+			{
 				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
 			});
 		}
@@ -839,12 +837,12 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			
+
 			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
-			
+
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}
-		$('.content-panel.contacts').html(html);	
+		$('.content-panel.contacts').html(html);
 		$('.content-panel.conversations .conversations-container').html(html2);
 	};
 
@@ -863,35 +861,33 @@ function MegaData ()
 		}
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
-			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
 			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
 		}
-		
+
 		if (this.c[n.h])
 		{
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
-			
+
 			// sort by name is default in the tree
 			folders.sort(function(a,b)
 			{
 				if (a.name) return a.name.localeCompare(b.name);
 			});
-			
+
 			/*
 			if (n.h == 'contacts')
 			{
 				// in case of contacts we have custom sort/grouping:
 				if (localStorage.csort) this.csort = localStorage.csort;
 				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-				
-				
-				
+
 				if (this.csort == 'shares')
-				{				
+				{
 					folders.sort(function(a,b)
 					{
 						if (M.c[a.h] && M.c[b.h])
@@ -904,61 +900,61 @@ function MegaData ()
 					});
 				}
 				else if (this.csort == 'name')
-				{				
+				{
 					folders.sort(function(a,b)
-					{						
+					{
 						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
 					});
 				}
-				
+
 				$('.contacts-sorting-by').removeClass('active');
-				$('.contacts-sorting-by.' + this.csort).addClass('active');				
-				$('.contacts-sorting-type').removeClass('active');				
+				$('.contacts-sorting-by.' + this.csort).addClass('active');
+				$('.contacts-sorting-type').removeClass('active');
 				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
 			}
 			*/
-			
+
 			for (var i in folders)
 			{
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
-				
+
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
 					for (var h in M.c[folders[i].h])
 					{
-						var n2 = M.d[h];						
+						var n2 = M.d[h];
 						if (n2 && n2.t) buildnode = true;
 					}
 				}
-				
+
 				if (buildnode)
 				{
 					ulc = 'class="opened"';
-					expandedc = 'expanded';				
+					expandedc = 'expanded';
 				}
 				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
-				
+
 				var containsc='';
-				var cns = M.c[folders[i].h];						
-				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';				
-				
-				var sharedfolder = '';				
+				var cns = M.c[folders[i].h];
+				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
+
+				var sharedfolder = '';
 				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
-				
+
 				var openedc = '';
 				if (M.currentdirid == folders[i].h) openedc = 'opened';
-				
+
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
-				
+
 				if ($('#treeli_'+folders[i].h).length == 0)
-				{				
-					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
-					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
-					else $('#treesub_' + n.h).append(html);					
+				{
+					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
+					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
+					else $('#treesub_' + n.h).append(html);
 				}
-				if (buildnode) this.buildtree(folders[i]);				
+				if (buildnode) this.buildtree(folders[i]);
 			}
 		}
 	};
@@ -967,7 +963,6 @@ function MegaData ()
         // in case of contacts we have custom sort/grouping:
         if (localStorage.csort) this.csort = localStorage.csort;
         if (localStorage.csortd) this.csortd = parseInt(localStorage.csortd);
-
 
         if (this.csort == 'shares')
         {
@@ -1023,7 +1018,7 @@ function MegaData ()
 		while(g)
 		{
 			if (id == 'contacts' && a.length > 0) id = 'shares';
-		
+
 			if ((M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) && id.length !== 11) a.push(id);
 			else if (id.length !== 11) return [];
 			if (id == this.RootID || id == 'contacts' || id == 'shares' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
@@ -1031,7 +1026,6 @@ function MegaData ()
 		}
 		return a;
 	};
-
 
 	this.pathLength = function()
 	{
@@ -1056,9 +1050,9 @@ function MegaData ()
 		var name, hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
 		var a2 = this.getPath(this.currentdirid);
-		
+
 		for (var i in a2)
-		{			
+		{
 			if (a2[i] == this.RootID)
 			{
 				if (folderlink && M.d[this.RootID])
@@ -1076,7 +1070,7 @@ function MegaData ()
 			{
 				typeclass = 'contacts';
 				name = l[165];
-			}			
+			}
 			else if (a2[i] == 'shares')
 			{
 				typeclass = 'shared-with-me';
@@ -1094,7 +1088,7 @@ function MegaData ()
 			}
 			else
 			{
-				
+
 				name = htmlentities(M.d[a2[i]].name);
 				typeclass = 'folder';
 			}
@@ -1107,17 +1101,17 @@ function MegaData ()
 
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="path_'+htmlentities(M.currentdirid.replace("chat/", ""))+'"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
-			
-			$('.search-files-result').addClass('hidden');						
+
+			$('.search-files-result').addClass('hidden');
 		}
 		else if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
 		{
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
 			$('.search-files-result .search-number').text(M.v.length);
-			$('.search-files-result').removeClass('hidden');			
+			$('.search-files-result').removeClass('hidden');
 			$('.search-files-result').addClass('last-button');
 		}
-		else 
+		else
 		{
 			$('.search-files-result').addClass('hidden');
 			$('.fm-breadcrumbs-block').html(html);
@@ -1133,7 +1127,7 @@ function MegaData ()
 			$('.fm-new-folder span').text('');
 			$('.fm-file-upload span').text('');
 			$('.fm-folder-upload span').text('');
-		}	
+		}
 
 		var el = $('.fm-breadcrumbs-block .fm-breadcrumbs span span');
 		var i =0;
@@ -1181,20 +1175,20 @@ function MegaData ()
 		}
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
-		{			
+		{
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
 			// maintain special incoming shares index:
-			if (n.p.length == 11) this.c['shares'][n.h]=1;			
+			if (n.p.length == 11) this.c['shares'][n.h]=1;
 		}
-		
+
 		if (n.t == 2) this.RootID 		= n.h;
 		if (n.t == 3) this.InboxID 		= n.h;
 		if (n.t == 4) this.RubbishID 	= n.h;
 		if (!n.c)
 		{
 			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
-			
+
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
 				crypto_processkey(u_handle,u_k_aes,n);
@@ -1210,7 +1204,7 @@ function MegaData ()
 					newmissingkeys = true;
 				  }
 				}
-			}			
+			}
 			if (n.hash)
 			{
 				if (!this.h[n.hash]) this.h[n.hash]=[];
@@ -1236,8 +1230,8 @@ function MegaData ()
 			if (mDB && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
-				M.delIndex(M.d[h].p,h);				
-				M.delHash(M.d[h]);				
+				M.delIndex(M.d[h].p,h);
+				M.delHash(M.d[h]);
 				delete M.d[h];
 			}
                         // Update M.v it's used for at least preview slideshow
@@ -1253,19 +1247,19 @@ function MegaData ()
 		}
 		ds(h);
 	};
-	
+
 	this.delHash = function(n)
 	{
 		if (n.hash && M.h[n.hash])
 		{
 			for (var i in M.h[n.hash])
 			{
-				if (M.h[n.hash][i] == n.h) 
+				if (M.h[n.hash][i] == n.h)
 				{
 					M.h[n.hash].splice(i,1);
 					break;
 				}
-			}			
+			}
 			if (M.h[n.hash].length == 0) delete M.h[n.hash];
 		}
 	}
@@ -1414,10 +1408,10 @@ function MegaData ()
 					var j =[];
 					for (var i in ctx.cn)
 					{
-						M.delNode(ctx.cn[i]);									
+						M.delNode(ctx.cn[i]);
 						api_req({a:'d',n:cn[i],i:requesti});
-					}					
-				}		
+					}
+				}
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
 				if (res.f) process_f(res.f);
@@ -1471,7 +1465,7 @@ function MegaData ()
 		else
 		{
 			if (blockui) loadingDialog.show();
-			
+
 			account = { };
 
 			api_req({a:'uq',strg:1,xfer:1,pro:1},{
@@ -1496,8 +1490,8 @@ function MegaData ()
 						ctx.account.balance = res.balance;
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
-						
-						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];					
+
+						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];
 
 						if (!u_attr.p)
 						{
@@ -1530,7 +1524,7 @@ function MegaData ()
 				account : account,
 				callback: function(res,ctx)
 				{
-					if (typeof res != 'object') res = [];				
+					if (typeof res != 'object') res = [];
 					ctx.account.transactions = res;
 				}
 			});
@@ -1566,7 +1560,7 @@ function MegaData ()
 							if (u_attr.p) topmenuUI();
 						}
 					}
-					
+
 					ctx.account.lastupdate = new Date().getTime();
 
 					if (!ctx.account.bw) ctx.account.bw = 1024*1024*1024*10;
@@ -1574,7 +1568,7 @@ function MegaData ()
 					if (!ctx.account.downbw_used) ctx.account.downbw_used = 0;
 
 					M.account = ctx.account;
-					
+
 					if (ctx.cb) ctx.cb(ctx.account);
 				}
 			});
@@ -1673,7 +1667,7 @@ function MegaData ()
 	}
 
 	this.nodeShare = function(h,s,ignoreDB)
-	{		
+	{
 		if (this.d[h])
 		{
 			if (typeof this.d[h].shares == 'undefined') this.d[h].shares = [];
@@ -1788,12 +1782,12 @@ function MegaData ()
 		if (is_chrome_firefox & 4) return;
 
 		var dirs = [];
-		function getfolders(d,o) 
+		function getfolders(d,o)
 		{
 			var c = 0;
-			for (var e in M.d) 
+			for (var e in M.d)
 			{
-				if(M.d[e].t == 1 && M.d[e].p == d) 
+				if(M.d[e].t == 1 && M.d[e].p == d)
 				{
 					var p = o || [];
 					if (!o) p.push(fm_safename(M.d[d].name));
@@ -1808,24 +1802,24 @@ function MegaData ()
 
 		if (d) console.log('makedir',dirs);
 
-		if(is_chrome_firefox) 
+		if(is_chrome_firefox)
 		{
 			var root = mozGetDownloadsFolder();
-			if (root) dirs.forEach(function(p) 
+			if (root) dirs.forEach(function(p)
 			{
-				try 
+				try
 				{
 					p = mozFile(root,0,p);
 					if(!p.exists()) p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
-				} 
-				catch(e) 
+				}
+				catch(e)
 				{
 					Cu.reportError(e);
 					console.log('makedir', e.message);
 				}
 			});
-		} 
-		else 
+		}
+		else
 		{
 			if (d) console.log('MAKEDIR: TODO');
 		}
@@ -1845,22 +1839,22 @@ function MegaData ()
 				if (M.d[n[i]].t)
 				{
 					if(!z) this.makeDir(n[i]);
-					var subids = fm_getnodes(n[i]);					
+					var subids = fm_getnodes(n[i]);
 					for(var j in subids)
 					{
 						var p = this.getPath(subids[j]);
 						var path = '';
-						
+
 						for(var k in p)
 						{
 							if (p[k],M.d[p[k]].t) path = fm_safename(M.d[p[k]].name) + '/' + path;
 							if (p[k] == n[i]) break;
 						}
-						
+
 						if (!M.d[subids[j]].t)
 						{
 							nodes.push(subids[j]);
-							paths[subids[j]]=path;							
+							paths[subids[j]]=path;
 						}
 						else console.log('0 path',path);
 					}
@@ -1935,7 +1929,7 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z) 
+		if (z)
 		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
 			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td><span class="row-number">1</span></td>'
@@ -1950,7 +1944,7 @@ function MegaData ()
 //		$('.fmholder').addClass('transfer-panel-opened');
 		$.transferHeader();
 
-        if (!preview) 
+        if (!preview)
 		{
 			openTransferpanel();
 			initGridScrolling();
@@ -1960,8 +1954,6 @@ function MegaData ()
 
 		delete $.dlhash;
 	};
-
-
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num, force)
 	{
@@ -2005,7 +1997,7 @@ function MegaData ()
 			$.transferHeader();
 		}
 
-		var eltime = (new Date().getTime()-st)/1000;
+		// var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = bps && (bt-bl)/bps;
 		if (bt)
@@ -2043,13 +2035,13 @@ function MegaData ()
 
 	this.dlcomplete = function (id,z, dl_queue_num)
 	{
-		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
 		{
 			$('.slideshow-pending').addClass('hidden');
 			$('.slideshow-error').addClass('hidden');
 			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
-		}		
-		
+		}
+
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
@@ -2127,7 +2119,7 @@ function MegaData ()
 			default:                   errorstr = l[x=233]; break;
 		}
 
-		if (slideshowid == dl.id && !previews[slideshowid]) 
+		if (slideshowid == dl.id && !previews[slideshowid])
 		{
 			$('.slideshow-image-bl').addClass('hidden');
 			$('.slideshow-pending').addClass('hidden');
@@ -2176,7 +2168,7 @@ function MegaData ()
 		});
 
 		panelDomQueue.splice(0, toClean);
-		fmUpdateCount();
+		Soon(fmUpdateCount);
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
 			$.transferClose();
@@ -2220,7 +2212,7 @@ function MegaData ()
 			ul_uploading = true;
 			ul_queue.push(f);
 			fmUpdateCount();
-			
+
 		}
 		if (page == 'start') {
 			ulQueue.pause();
@@ -2239,7 +2231,7 @@ function MegaData ()
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
-		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
+		// var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -2321,7 +2313,6 @@ function MegaData ()
 		$.transferHeader();
 	};
 
-
     this.cloneChatNode = function(n,keepParent) {
         var n2 = clone(n);
         n2.k = a32_to_base64(n2.key);
@@ -2331,26 +2322,25 @@ function MegaData ()
     };
 }
 
-
 function voucherData(arr)
 {
 	var vouchers = [];
 	var varr = arr[0];
 	var tindex = {};
-	for (var i in arr[1]) tindex[arr[1][i][0]]=arr[1][i];			
-	for (var i in varr)				
-	{									
+	for (var i in arr[1]) tindex[arr[1][i][0]]=arr[1][i];
+	for (var i in varr)
+	{
 		var redeemed = 0;
 		var cancelled = 0;
 		var revoked = 0;
-		var redeem_email = '';					
+		var redeem_email = '';
 		if ((varr[i].rdm) && (tindex[varr[i].rdm]))
 		{
 			redeemed = tindex[varr[i].rdm][1];
-			redeemed_email = tindex[varr[i].rdm][2];					
-		}					
-		if (varr[i].xl) cancelled = tindex[varr[i].xl][1];					
-		if (varr[i].rvk) revoked = tindex[varr[i].rvk][1];		
+			redeemed_email = tindex[varr[i].rdm][2];
+		}
+		if (varr[i].xl) cancelled = tindex[varr[i].xl][1];
+		if (varr[i].rvk) revoked = tindex[varr[i].rvk][1];
 		vouchers.push({
 			id: varr[i].id,
 			amount: varr[i].g,
@@ -2361,7 +2351,7 @@ function voucherData(arr)
 			redeemed: redeemed,
 			redeem_email: redeem_email,
 			cancelled: cancelled,
-			revoked: revoked						
+			revoked: revoked
 		});
 	}
 	return vouchers;
@@ -2434,7 +2424,7 @@ var t;
 
 function renderfm()
 {
-	var t = new Date().getTime();
+	if (d) console.time('renderfm');
 	initUI();
 	loadingDialog.hide();
 	M.sortByName();
@@ -2451,12 +2441,12 @@ function renderfm()
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
-	if (d) console.log('renderfm() time:',t-new Date().getTime());
+	if (d) console.timeEnd('renderfm');
 }
 
 function rendernew()
 {
-	var t = new Date().getTime();
+	if (d) console.time('rendernew');
 	var treebuild=[];
 	var UImain=false;
 	var newcontact=false;
@@ -2496,7 +2486,7 @@ function rendernew()
 	}
 	if (newcontact)
 	{
-		M.avatars();	
+		M.avatars();
 		M.contacts();
 		treeUI();
 
@@ -2507,9 +2497,8 @@ function rendernew()
 	}
 	if (newpath) M.renderPath();
 	newnodes=undefined;
+	if (d) console.timeEnd('rendernew');
 }
-
-
 
 function execsc(ap)
 {
@@ -2548,20 +2537,20 @@ function execsc(ap)
 		else if (a.a == 's' && !folderlink)
 		{
 			var tsharekey = '';
-			var prockey = false;			
+			var prockey = false;
 
 			if (a.o == u_handle)
 			{
 				if (typeof a.r == "undefined")
 				{
-					// I deleted my share							
+					// I deleted my share
 					M.delnodeShare(a.n,a.u);
 				}
 				else if (typeof M.d[a.n].shares != 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
 				{
 					// I updated or created my share
 					u_sharekeys[a.n] = decrypt_key(u_k_aes,base64_to_a32(a.ok));
-					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
+					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});
 				}
 			}
 			else
@@ -2722,7 +2711,7 @@ function execsc(ap)
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' span').text(f.name);
-						if ($('#path_' + n.h).length > 0) newpath=1;						
+						if ($('#path_' + n.h).length > 0) newpath=1;
 						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
@@ -2756,8 +2745,8 @@ function execsc(ap)
 	}
 	if (newnodes.length > 0 && fminitialized) rendernew();
 	if (loadavatars) M.avatars();
-	fm_thumbnails();	
-	if ($.dialog == 'properties') propertiesDialog();	
+	fm_thumbnails();
+	if ($.dialog == 'properties') propertiesDialog();
 	getsc();
 }
 
@@ -3042,7 +3031,6 @@ function process_ok(ok)
 	}
 }
 
-
 function folderreqerr(c,e)
 {
     loadingDialog.hide();
@@ -3060,10 +3048,10 @@ function loadfm_callback(res)
 		M.RootID = res.f[0].h;
 		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
 		folderlink=pfid;
-	}	
+	}
 	if (res.u) process_u(res.u);
 	if (res.ok) process_ok(res.ok);
-	process_f(res.f);	
+	process_f(res.f);
 	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
 	maxaction = res.sn;
 	if (mDB) localStorage[u_handle + '_maxaction'] = maxaction;

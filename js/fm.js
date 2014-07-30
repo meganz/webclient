@@ -102,7 +102,7 @@ function initTreeScroll()
 var ddtreedisabled = {};
 function treeDroppable()
 {
-	var t=new Date().getTime();
+	// if (d) console.time('treeDroppable');
 	var tt = $('.fm-tree-panel .jspPane').position().top;
 	var toptop=false;	
 	$('.fm-tree-panel .ui-droppable').each(function(i,e)
@@ -128,6 +128,7 @@ function treeDroppable()
 			$(e).droppable("disable");
 		}	
 	});
+	// if (d) console.timeEnd('treeDroppable');
 }
 
 
@@ -2200,7 +2201,7 @@ function avatarDialog(close)
 
 function gridUI()
 {
-	var t = new Date().getTime();
+	if (d) console.time('gridUI');
 	$.gridDragging=false;
 	$.gridLastSelected=false;
 	$('.fm-files-view-icon.listing-view').addClass('active');
@@ -2347,9 +2348,9 @@ function gridUI()
 	else $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
 	
 	$.selectddUIitem = 'tr';
-	setTimeout(selectddUI,10);
+	Soon(selectddUI);
 	
-	if (d) console.log('gridUI() time:',new Date().getTime() - t);
+	if (d) console.timeEnd('gridUI');
 }
 
 /**
@@ -3123,6 +3124,7 @@ function searchPath()
 
 function selectddUI()
 {
+	if (d) console.time('selectddUI');
 	if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') return false;	
 	$($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable( 
 	{
@@ -3294,10 +3296,12 @@ function selectddUI()
 		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
 		else M.addDownload([h]);
 	});
+	if (d) console.timeEnd('selectddUI');
 }
 
 function iconUI()
 {
+	if (d) console.time('iconUI');
 	$('.fm-files-view-icon.block-view').addClass('active');
 	$('.fm-files-view-icon.listing-view').removeClass('active');
 	$('.shared-grid-view').addClass('hidden');	
@@ -3355,7 +3359,8 @@ function iconUI()
 		$.selectddUIgrid = '.file-block-scrolling';
 		$.selectddUIitem = 'a';
 	}
-	setTimeout(selectddUI,10);
+	Soon(selectddUI);
+	if (d) console.timeEnd('iconUI');
 }
 
 
@@ -3717,7 +3722,7 @@ var tt;
 
 function treeUI()
 {
-	tt = new Date().getTime();
+	if (d) console.time('treeUI');
 	$('.fm-tree-panel .nw-fm-tree-item').draggable( 
 	{
 		revert: true,
@@ -3798,7 +3803,7 @@ function treeUI()
 		initTreeScroll();	
 	});	
 	setTimeout(initTreeScroll,10);
-	if (d) console.log('treeUI()',new Date().getTime()-tt);
+	if (d) console.timeEnd('treeUI');
 }
 
 function treeUIexpand(id,force,moveDialog)
@@ -5477,17 +5482,18 @@ var fa_duplicates = {};
 
 function fm_thumbnails()
 {
-	var treq = {},a=0;	
+	var treq = {},a=0;
+	if (d) console.time('fm_thumbnails');
 	if (myURL)
 	{
 		for (var i in M.v)
 		{
-			var n = M.v[i];			
+			var n = M.v[i];
 			if (n.fa)
-			{				
+			{
 				if (typeof fa_duplicates[n.fa] == 'undefined') fa_duplicates[n.fa]=0;				
 				else fa_duplicates[n.fa]=1;
-				
+
 				if (!thumbnails[n.h] && !th_requested[n.h])
 				{
 					treq[n.h] = 
@@ -5495,11 +5501,14 @@ function fm_thumbnails()
 						fa: n.fa,
 						k: 	n.key
 					};
-					th_requested.push(n.h);					
+					th_requested[n.h] = 1;
+					a++;
 				}
-				else fm_thumbnail_render(n);
+				else if (n.seen && n.seen !== 2)
+				{
+					fm_thumbnail_render(n);
+				}
 			}
-			a++;
 		}				
 		if (a > 0)
 		{	
@@ -5507,9 +5516,9 @@ function fm_thumbnails()
 			{
 				try { var blob = new Blob([uint8arr],{ type: 'image/jpeg' });} catch(err) { }
 				if (blob.size < 25) blob = new Blob([uint8arr.buffer]);
-				thumbnailblobs[node] = blob;
+				// thumbnailblobs[node] = blob;
 				thumbnails[node] = myURL.createObjectURL(blob);				
-				fm_thumbnail_render(M.d[node]);
+				if (M.d[node].seen) fm_thumbnail_render(M.d[node]);
 				
 				// deduplicate in view when there is a duplicate fa:
 				if (M.d[node] && fa_duplicates[M.d[node].fa] > 0)
@@ -5519,13 +5528,14 @@ function fm_thumbnails()
 						if (M.v[i].h !== node && M.v[i].fa == M.d[node].fa && !thumbnails[M.v[i].h])
 						{
 							thumbnails[M.v[i].h] = thumbnails[node];
-							fm_thumbnail_render(M.v[i]);						
+							if (M.v[i].seen) fm_thumbnail_render(M.v[i]);						
 						}
 					}
 				}
 			});			
 		}
 	}
+	if (d) console.timeEnd('fm_thumbnails');
 }
 
 
@@ -5537,6 +5547,7 @@ function fm_thumbnail_render(n)
 	{
 		$('.file-block#' + n.h + ' img').attr('src',thumbnails[n.h]);
 		$('.file-block#' + n.h + ' img').parent().addClass('thumb');
+		n.seen = 2;
 	}
 }
 

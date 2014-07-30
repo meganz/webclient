@@ -431,7 +431,7 @@ function MegaData ()
 					{
 						el = 'tr';
 						t = '.grid-table.contacts';
-						html = '<tr><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';
 					}
 				}
 				else if (this.currentdirid == 'shares')

@@ -339,14 +339,22 @@ function MegaData ()
 		
 		var jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		
 		var jsp = $('.contacts-blocks-scrolling').data('jsp');
+		if (jsp) jsp.destroy();		
+
+		var jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		
+		
 		if (!u)
 		{
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();			
 		}
+		
+		
 		if (this.v.length == 0)
 		{
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
@@ -460,10 +468,25 @@ function MegaData ()
 					}
 					else
 					{
-						t = '.grid-table.shared-with-me';
+						t = '.shared-grid-view .grid-table.shared-with-me';
 						el='tr';						
 						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus '+ htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
 					}
+				}
+				else if (this.currentdirid.length == 11)
+				{
+					if (this.viewmode == 1)
+					{
+						t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
+						el = 'a';
+						html = '<a id="' + htmlentities(this.v[i].h) + '" class="file-block folder"><span class="file-status-icon"></span><span class="file-settings-icon"><span></span></span><span class="shared-folder-access  read-only"></span><span class="file-icon-area"><span class="block-view-file-type folder-shared"><img alt=""></span></span><span class="file-block-title">asdasd</span></a>';
+					}
+					else
+					{
+						t = '.contacts-details-block .grid-table.shared-with-me';
+						el='tr';					
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">Shared folder name 1</div><div class="shared-folder-info">4 files, 2 folders</div></div> </td><td width="270"><div class="shared-folder-access read-only">Read only</div></td></tr>';
+					}					
 				}
 				else
 				{
@@ -486,7 +509,7 @@ function MegaData ()
 				{
 					// if the current view does not have any nodes, just append it
 					if (cc && ++files > n_cache) cache.push(html);
-					else $(t).append(html);
+					else $(t).append(html);					
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
@@ -520,6 +543,8 @@ function MegaData ()
 				
 		sharedfolderUI();
 		
+		contactUI();
+		
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
@@ -543,7 +568,7 @@ function MegaData ()
 
 		if (this.viewmode == 1)
 		{
-			$('.file-block-scrolling').append('<div class="clear"></div>');
+			//$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
 		
@@ -703,6 +728,8 @@ function MegaData ()
 		}
 		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
+		
+		
 			$('.fm-right-files-block').removeClass('hidden');
 			
 			var tt = new Date().getTime();

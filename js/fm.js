@@ -40,8 +40,20 @@ function initFileblocksScrolling()
 {
 	$('.file-block-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
 	jScrollFade('.file-block-scrolling');
-	$('.file-block-scrolling.jspPane').height('');
 }
+
+
+function initFileblocksScrolling2() 
+{
+	$('.contact-details-view .file-block-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	jScrollFade('.contact-details-view .file-block-scrolling');
+}
+
+
+
+
+
+
 
 function initContactsGridScrolling() 
 {
@@ -2284,6 +2296,10 @@ function gridUI()
 	$('.fm-blocks-view.contacts-view').addClass('hidden');	
 	$('.files-grid-view.contacts-view').addClass('hidden');	
 	
+	$('.contacts-details-block').addClass('hidden');
+	$('.files-grid-view.contact-details-view').addClass('hidden');
+	$('.fm-blocks-view.contact-details-view').addClass('hidden');
+	
 	if (M.currentdirid == 'contacts')
 	{		
 		$('.files-grid-view.contacts-view').removeClass('hidden');
@@ -2295,6 +2311,13 @@ function gridUI()
 		$('.shared-grid-view').removeClass('hidden');		
 		$.sharedgridHeader();		
 		initGridScrolling();
+	}
+	else if (M.currentdirid.length == 11)
+	{
+		$('.contacts-details-block').removeClass('hidden');
+		$('.files-grid-view.contact-details-view').removeClass('hidden');			
+		initGridScrolling();
+		$.gridHeader();
 	}
 	else
 	{	
@@ -3306,6 +3329,11 @@ function iconUI()
 	$('.fm-blocks-view.contacts-view').addClass('hidden');	
 	$('.files-grid-view.contacts-view').addClass('hidden');
 	
+	
+	$('.contacts-details-block').addClass('hidden');
+	$('.files-grid-view.contact-details-view').addClass('hidden');
+	$('.fm-blocks-view.contact-details-view').addClass('hidden');		
+	
 	if (M.currentdirid == 'contacts')
 	{
 		$('.fm-blocks-view.contacts-view').removeClass('hidden');
@@ -3315,6 +3343,12 @@ function iconUI()
 	{		
 		$('.shared-blocks-view').removeClass('hidden');
 		initShareBlocksScrolling();
+	}
+	else if (M.currentdirid.length == 11)
+	{		
+		$('.contacts-details-block').removeClass('hidden');
+		$('.fm-blocks-view.contact-details-view').removeClass('hidden');
+		initFileblocksScrolling2();
 	}
 	else
 	{
@@ -3354,7 +3388,7 @@ function iconUI()
 	{
 		$.selectddUIgrid = '.file-block-scrolling';
 		$.selectddUIitem = 'a';
-	}
+	}	
 	setTimeout(selectddUI,10);
 }
 
@@ -3893,7 +3927,8 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 			if (M.d[ids[i]]) treeUIexpand(ids[i],1);
 			i++;
 		}
-		if (ids[0] == 'contacts') sectionUIopen('shared-with-me');
+		if (ids[0] == 'contacts' && M.currentdirid && M.currentdirid.length == 11) sectionUIopen('contacts');
+		else if (ids[0] == 'contacts') sectionUIopen('shared-with-me');
 		else if (ids[0] == M.RootID) sectionUIopen('cloud-drive');
 	}
 	if ($.hideContextMenu) $.hideContextMenu(event);		
@@ -5726,7 +5761,26 @@ function sharedfolderUI()
 }
 
 
-
+function contactUI()
+{
+	var n = M.u[M.currentdirid];
+	if (n && n.u)
+	{
+		var u_h = M.currentdirid;
+		var cs = M.contactstatus(u_h);
+		var user = M.d[u_h];		
+		var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;						
+		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';							
+		var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));		
+		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color);		
+		$('.contact-top-details .nw-contact-block-avatar').html(avatar);		
+		$('.contact-top-details .onlinestatus').removeClass('away offline online busy');		
+		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
+		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);		
+		$('.contact-top-details .contact-details-user-name').text(user.name);		
+		$('.contact-top-details .contact-details-email').text(user.m);
+	}
+}
 
 
 

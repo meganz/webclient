@@ -6,21 +6,40 @@ module.exports = function(config) {
     basePath: '',
 
     // Frameworks to use.
-    frameworks: ['requirejs', 'mocha', 'chai', 'sinon'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // List of files/patterns to load in the browser.
     // {included: false} files are loaded by requirejs
     files: [
-        // Dependency-based load order of library modules.
-        // (currently empty)
+        // Test utilities.
+        'node_modules/mocha/mocha.js',
+        'node_modules/chai/chai.js',
+        'node_modules/karma-chai-plugins/node_modules/sinon-chai/lib/sinon-chai.js',
+        'node_modules/sinon/pkg/sinon.js',
 
-        // Ours.
-        'js/config.js',
-        {pattern: 'src/**/*.js', included: false},
-        'test/test_data.js',
-        'test/test_utils.js',
-        {pattern: 'test/**/*_test.js', included: false},
-        'test/test_main.js',
+        // Basics.
+        'js/jquery-min-1.8.1.js',
+        'js/jquery-ui.js',
+        'js/jquery.jscrollpane.min.js',
+
+        // Libraries.
+        'js/asmcrypto.js',
+        'js/jsbn.js',
+        'js/jsbn2.js',
+        'js/jodid25519.js',
+        
+        // Our code.
+        'test/lang_dummy.js',
+        'secureboot.js',
+        'js/functions.js',
+        'js/mega.js',
+        'js/fm.js',
+        'js/user.js',
+        'js/megafilepicker.js',
+        
+        // Tests.
+        {pattern: 'test/fixtures/**/*.html', included: false, served: true},
+        {pattern: 'test/**/*_test.js', included: true},
     ],
 
     // List of files to exclude.

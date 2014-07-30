@@ -1,5 +1,5 @@
 {
-  "name": "Mega Web Client",
+  "name": "Mega_Webclient",
   "version": "2.0.0",
   "description": "Web Client to access the Mega Cloud Infrastructure",
   "main": "index.js",
@@ -29,8 +29,6 @@
   "author": "Mega Limited",
   "license": "proprietary",
   "readmeFilename": "README.md",
-  "dependencies": {
-  },
   "devDependencies": {
     "karma-script-launcher": "~0.1.0",
     "karma-chrome-launcher": "~0.1.2",
@@ -49,6 +47,6 @@
     "ibrik": "~1.1.1",
     "dateformat": "~1.0.7-1.2.3",
     "sinon": "~1.9.0",
-    "jsdoc": "~3.3.0",
+    "jsdoc": "~3.3.0"
   }
 }

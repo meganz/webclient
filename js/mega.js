@@ -837,13 +837,19 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-
 			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
-
 			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
 		}
 		$('.content-panel.contacts').html(html);
 		$('.content-panel.conversations .conversations-container').html(html2);
+		
+		$('.nw-contact-item').unbind('click');
+		$('.nw-contact-item').bind('click',function(e)
+		{
+			var id = $(this).attr('id');			
+			if (id) id = id.replace('contact_','');
+			M.openFolder(id);
+		});
 	};
 
     this.getContacts = function(n) {

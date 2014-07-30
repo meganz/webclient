@@ -5661,6 +5661,8 @@ function sharedfolderUI()
 
 function contactUI()
 {
+	$('.nw-contact-item').removeClass('selected');
+	
 	var n = M.u[M.currentdirid];
 	if (n && n.u)
 	{
@@ -5676,7 +5678,8 @@ function contactUI()
 		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
 		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);		
 		$('.contact-top-details .contact-details-user-name').text(user.name);		
-		$('.contact-top-details .contact-details-email').text(user.m);
+		$('.contact-top-details .contact-details-email').text(user.m);		
+		$('.nw-contact-item#contact_' + u_h).addClass('selected');
 	}
 }
 

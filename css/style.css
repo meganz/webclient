@@ -9665,13 +9665,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-color: rgba(153,153,153,1);
 	color: rgba(255,255,255,1);
 }
-.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover {
+.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
 	background-color: rgba(220,0,0,1);
 }
 .context-menu-item.getlink-item:hover, .context-menu-item.sharing-item:hover {
 	background-color: rgba(255,179,0,1);
 }
-.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover {
+.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened {
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-item .context-menu-icon, .context-menu-points {
@@ -9695,6 +9695,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .context-menu-item.contains-submenu {
 	padding-right: 25px;
+}
+.context-menu-item.move-item.opened {
+	background-color: rgba(49,181,0,1);
+}
+.context-menu-item.opened {
+	background-color: rgba(49,181,0,1);	
 }
 .context-menu-item:hover > .context-menu-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

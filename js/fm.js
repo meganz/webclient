@@ -370,6 +370,7 @@ function initUI()
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
 		b.removeClass('active left-position overlap-right overlap-left');
+		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
 	$('#fmholder').unbind('click.contextmenu');
@@ -876,6 +877,7 @@ function initContextUI()
 //		ToDo: Hold background-color for parent submenus
 		
 		$(this).next('.context-submenu').addClass('active');
+		$(this).addClass('opened');
 	});
 	$(c+'.contains-submenu').unbind('mouseleave');
 	$(c+'.contains-submenu').bind('mouseleave',function()

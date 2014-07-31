@@ -642,7 +642,6 @@ function searchFM()
 
 function removeUInode(h)
 {
-	console.log('removeUInode',h);
 
 	var n = M.d[h];
 	var i=0;
@@ -3160,13 +3159,6 @@ function selectddUI()
 	});
 
 	$('.ui-selectable-helper').remove();
-	
-	console.log($.selectddUIgrid);
-	
-	console.log($.selectddUIitem);
-	
-	
-	
 	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u)
 	{

@@ -1045,8 +1045,6 @@ function MegaData ()
 		while(g)
 		{
 			if (id == 'contacts' && a.length > 1) id = 'shares';
-			
-			console.log(id);
 
 			if (M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) a.push(id);
 			else if (id.length !== 11) return [];
@@ -1079,7 +1077,10 @@ function MegaData ()
 	{
 		var name, hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
-		var a2 = this.getPath(this.currentdirid);			
+		var a2 = this.getPath(this.currentdirid);
+		
+		if (a2.length > 2 && a2[a2.length-2].length == 11) delete a2[a2.length-2];		
+		
 		for (var i in a2)
 		{
 			if (a2[i] == this.RootID)
@@ -1123,7 +1124,6 @@ function MegaData ()
 			}
 			else
 			{
-
 				name = htmlentities(M.d[a2[i]].name);
 				typeclass = 'folder';
 			}

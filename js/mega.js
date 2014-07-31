@@ -472,17 +472,32 @@ function MegaData ()
 				}
 				else if (this.currentdirid.length == 11)
 				{
+					var cs = this.contactstatus(this.v[i].h);
+					var contains = fm_contains(cs.files,cs.folders);
+					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
+					var rights = 'Read only', rightsclass = ' read-only';
+					if (M.v[i].r == 1)
+					{
+						rights = 'Read and write';
+						rightsclass = ' read-and-write';
+					}
+					else if (M.v[i].r == 2)
+					{
+						rights = 'Full access';
+						rightsclass = ' full-access';
+					}
+				
 					if (this.viewmode == 1)
 					{
 						t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
 						el = 'a';
-						html = '<a id="' + htmlentities(this.v[i].h) + '" class="file-block folder"><span class="file-status-icon"></span><span class="file-settings-icon"><span></span></span><span class="shared-folder-access  read-only"></span><span class="file-icon-area"><span class="block-view-file-type folder-shared"><img alt=""></span></span><span class="file-block-title">asdasd</span></a>';
+						html = '<a id="' + htmlentities(this.v[i].h) + '" class="file-block folder"><span class="file-status-icon"></span><span class="file-settings-icon"><span></span></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder-shared"><img alt=""></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 					}
 					else
 					{
 						t = '.contacts-details-block .grid-table.shared-with-me';
 						el='tr';					
-						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">Shared folder name 1</div><div class="shared-folder-info">4 files, 2 folders</div></div> </td><td width="270"><div class="shared-folder-access read-only">Read only</div></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="270"><div class="shared-folder-access ' + rightsclass + '">' + rights + '</div></td></tr>';
 					}					
 				}
 				else
@@ -699,7 +714,7 @@ function MegaData ()
 			id = 'chat';
             //TODO: show something? some kind of list of conversations summary/overview screen or something?
             sectionUIopen('conversations');
-
+			sharedfolderUI();
 			treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
@@ -1023,10 +1038,13 @@ function MegaData ()
 		var g=1;
 		while(g)
 		{
-			if (id == 'contacts' && a.length > 0) id = 'shares';
+			if (id == 'contacts' && a.length > 1) id = 'shares';
+			
+			console.log(id);
 
-			if ((M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) && id.length !== 11) a.push(id);
+			if (M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) a.push(id);
 			else if (id.length !== 11) return [];
+			
 			if (id == this.RootID || id == 'contacts' || id == 'shares' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
 			if (g) id = this.d[id].p;
 		}
@@ -1055,8 +1073,7 @@ function MegaData ()
 	{
 		var name, hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
-		var a2 = this.getPath(this.currentdirid);
-
+		var a2 = this.getPath(this.currentdirid);			
 		for (var i in a2)
 		{
 			if (a2[i] == this.RootID)
@@ -1091,6 +1108,12 @@ function MegaData ()
 			{
 				typeclass = 'messages';
 				name = l[166];
+			}
+			else if (a2[i].length == 11)
+			{
+				var n = M.d[a2[i]];
+				if (n.name) name = n.name;
+				typeclass = 'contact';
 			}
 			else
 			{

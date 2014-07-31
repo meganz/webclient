@@ -448,7 +448,7 @@ function initUI()
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
-	{
+	{		
 		var c = $(this).attr('class');
 		if (c && c.indexOf('cloud-drive') > -1) M.openFolder(M.RootID);
 		else if (c && c.indexOf('shared-with-me') > -1) M.openFolder('shares');
@@ -2323,6 +2323,7 @@ function gridUI()
 
 	if (M.currentdirid == 'shares') $.selectddUIgrid = '.shared-grid-view .grid-scrolling-table';
 	else if (M.currentdirid == 'contacts') $.selectddUIgrid = '.grid-scrolling-table.contacts';
+	else if (M.currentdirid.length == 11) $.selectddUIgrid = '.files-grid-view.contact-details-view';
 	else $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
 
 	$.selectddUIitem = 'tr';
@@ -2704,7 +2705,8 @@ var SelectionManager = function($selectable) {
                 ".files-grid-view.fm",
 				".files-grid-view.contacts-view",
                 ".contacts-grid-view",
-                ".fm-contacts-blocks-view"
+                ".fm-contacts-blocks-view",
+				".files-grid-view.contact-details-view"
             ].join(",")
         ).filter(":visible");
 
@@ -2732,7 +2734,8 @@ var SelectionManager = function($selectable) {
                 ".files-grid-view.fm",
 				".files-grid-view.contacts-view",
                 ".contacts-grid-view",
-                ".fm-contacts-blocks-view"
+                ".fm-contacts-blocks-view",
+				".files-grid-view.contact-details-view"
             ].join(",")
         ).filter(":visible");
 
@@ -2891,7 +2894,7 @@ function UIkeyevents()
 
             }
         }
-        if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
+        if (e.keyCode == 38 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog)
 		{
 			// up in grid
 			if (e.shiftKey) $(e).addClass('ui-selected');
@@ -2904,7 +2907,7 @@ function UIkeyevents()
                 quickFinder.disable_if_active();
 			}
 		}
-		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
+		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog)
 		{
 			// down in grid
 			if (e.shiftKey) $(e).addClass('ui-selected');
@@ -2981,9 +2984,9 @@ function UIkeyevents()
 			$.hideTopMenu();
 		}
 
-		if (sl && $.selectddUIgrid == '.grid-scrolling-table')
+		if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1)
 		{
-			var jsp = $('.grid-scrolling-table').data('jsp');
+			var jsp = $($.selectddUIgrid).data('jsp');
 			jsp.scrollToElement(sl);
 		}
 
@@ -3157,10 +3160,20 @@ function selectddUI()
 	});
 
 	$('.ui-selectable-helper').remove();
+	
+	console.log($.selectddUIgrid);
+	
+	console.log($.selectddUIitem);
+	
+	
+	
+	
 	$($.selectddUIgrid).selectable({filter: $.selectddUIitem,start:function(e,u) { $.hideContextMenu(e); $.hideTopMenu(); }, stop: function(e,u)
 	{
 		searchPath();
 	}});
+	
+	
 
     /**
      * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
@@ -3168,6 +3181,8 @@ function selectddUI()
      *
      * @type {SelectionManager}
      */
+	 
+	 
     selectionManager = new SelectionManager(
         $('.file-block-scrolling')
     );
@@ -3233,6 +3248,7 @@ function selectddUI()
 		if ($.hideTopMenu) $.hideTopMenu();
 		return false;
 	});
+	
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('dblclick');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e)
@@ -3275,7 +3291,7 @@ function iconUI()
 		initShareBlocksScrolling();
 	}
 	else if (M.currentdirid.length == 11)
-	{		
+	{
 		$('.contacts-details-block').removeClass('hidden');
 		$('.fm-blocks-view.contact-details-view').removeClass('hidden');
 		initFileblocksScrolling2();
@@ -3796,6 +3812,7 @@ function sectionUIopen(id)
 	$('.content-panel.' + id).addClass('active');
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);
 	$('.fm-right-header').addClass('hidden');
+	
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
 	if ((id !== 'cloud-drive') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
@@ -3804,6 +3821,7 @@ function sectionUIopen(id)
 	}
 	if (id !== 'contacts')
 	{
+		$('.contacts-details-block').addClass('hidden');
 		$('.files-grid-view.contacts-view').addClass('hidden');
 		$('.fm-blocks-view.contacts-view').addClass('hidden');
 	}

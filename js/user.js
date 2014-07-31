@@ -401,22 +401,31 @@ function getUserAttribute(userhandle, attribute, pub, callback) {
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
  *     In case of an error, the `value` will be undefined.
+ * @param mode {integer}
+ *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
  */
-function setUserAttribute(attribute, value, pub, callback) {
+function setUserAttribute(attribute, value, pub, callback, mode) {
+    if (mode === undefined) {
+        mode = BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+    }
     if (pub === true || pub === undefined) {
         attribute = '+' + attribute;
     } else {
         attribute = '*' + attribute;
         // The value should be a key/value property container. Let's encode and
         // encrypt it.
-        value = blockEncrypt(containerToTlvRecords(value));
+        value = base64urlencode(blockEncrypt(containerToTlvRecords(value), u_k, mode));
     }
     
     // Assemble context for this async API request.
     var myCtx = {
         callback: function(res, ctx) {
             if (d) {
-                console.log('Wrote attribute "' + ctx.ua + '", result: ' + res);
+                if (typeof res !== 'number') {
+                    console.log('Setting user attribute "' + ctx.ua + '", result: ' + res);
+                } else {
+                    console.log('Error setting user attribute "' + ctx.ua + '", result: ' + res + '!');
+                }
             }
             if (ctx.callback2) {
                 ctx.callback2(res, ctx);
@@ -430,5 +439,7 @@ function setUserAttribute(attribute, value, pub, callback) {
     }
     
     // Fire it off.
-    api_req({'a': 'up', attribute: value}, myCtx);
+    var apiCall = {'a': 'up'};
+    apiCall[attribute] = value;
+    api_req(apiCall, myCtx);
 }

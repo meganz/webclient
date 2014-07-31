@@ -364,9 +364,12 @@ function initUI()
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
-		$('.context-menu.files-menu')
-			.addClass('hidden')
-			.find('.context-submenu').removeClass('active left-position overlap-rigth overlap-left');
+		// Set to default
+		var a = $('.context-menu.files-menu');
+		a.addClass('hidden');
+		var b = a.find('.context-submenu');
+		b.attr('style', '');
+		b.removeClass('active left-position overlap-right overlap-left');
 	};
 
 	$('#fmholder').unbind('click.contextmenu');
@@ -3759,7 +3762,7 @@ function reCalcMenuPosition(m, x, y, ico)
 			cor++;
 		}
 	}
-	else if ((typeof ico === 'string') && (ico === 'submenu'))// ToDo: !!! Improve condition
+	else if ((typeof ico === 'string') && (ico === 'submenu'))
 	{
 		var n = m.next('.context-submenu');// next submenu
 		var nmW = n.outerWidth(), nmH = n.outerHeight();

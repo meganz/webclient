@@ -22,9 +22,8 @@ var chatui;
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
-        $('.contacts-grid-view').addClass('hidden');
-        $('.fm-contacts-blocks-view').addClass('hidden');
         $('.fm-right-account-block').addClass('hidden');
+		$('.contacts-details-block').addClass('hidden');
 		
 		$('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 		

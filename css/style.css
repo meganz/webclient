@@ -18526,6 +18526,6 @@ transform: rotate(360deg);
 box-sizing: border-box;
 display:none;
 }
-.active-loading .loading {
+.connecting .loading {
 	display:block;
 }

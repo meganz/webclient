@@ -416,7 +416,7 @@
 
 	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-	if (window.webkitRequestFileSystem) Later(function()
+	if (navigator.webkitGetUserMedia) Later(function()
 	{
 		window.webkitRequestFileSystem(0, 0x10000,
 			function (fs)

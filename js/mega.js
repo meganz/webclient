@@ -559,6 +559,12 @@ function MegaData ()
 					}
 				}
 			}
+		}		
+		
+		if (this.viewmode == 1)
+		{
+			$(t).find('div.clear').remove();
+			$(t).append('<div class="clear"></div>');
 		}
 
 		sharedfolderUI();

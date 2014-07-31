@@ -7320,7 +7320,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	background-position: left top;
 	background-repeat: no-repeat;
 	background-position: -5px -5px;
-	background-size:auto;
+	background-size: auto;
 }
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);
@@ -11502,13 +11502,12 @@ h5.main-italic-header {
 .top-dialog-login-button img {
 	display: none;
 }
-
 .top-dialog-login-button.loading img {
 	display: block;
 	width: 16px;
 	position: absolute;
-	left:50%;
-	margin-left:-8px;
+	left: 50%;
+	margin-left: -8px;
 	top: 7px;
 	padding: 0 0 0 0;
 }
@@ -16801,7 +16800,7 @@ span.incoming-call-name {
 }
 .shared-details-info-block {
 	margin-left: 138px;
-	overflow:hidden;
+	overflow: hidden;
 }
 .shared-details-pad {
 	float: left;
@@ -18376,4 +18375,157 @@ transform: rotate(360deg);
  transform: scale(1.0);
  -webkit-transform: scale(1.0);
 }
+}
+ @keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-moz-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-webkit-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-o-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-moz-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-webkit-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+ @-o-keyframes rotate-loading {
+ 0% {
+transform: rotate(0deg);
+-ms-transform: rotate(0deg);
+-webkit-transform: rotate(0deg);
+-o-transform: rotate(0deg);
+-moz-transform: rotate(0deg);
+}
+ 100% {
+transform: rotate(360deg);
+-ms-transform: rotate(360deg);
+-webkit-transform: rotate(360deg);
+-o-transform: rotate(360deg);
+-moz-transform: rotate(360deg);
+}
+}
+.loading {
+	height: 16px;
+	position: relative;
+	width: 16px;
+	border-radius: 100%;
+	border: 2px solid transparent;
+	border-color: transparent gray transparent gray;
+	-moz-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-moz-transform-origin: 50% 50%;
+	-o-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-o-transform-origin: 50% 50%;
+	-webkit-animation: rotate-loading 1.5s linear 0s infinite normal;
+	-webkit-transform-origin: 50% 50%;
+	animation: rotate-loading 1.5s linear 0s infinite normal;
+	transform-origin: 50% 50%;
+	position: absolute;
+	margin: -2px 0 0 -2px;
+	-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+display:none;
+}
+.active-loading .loading {
+	display:block;
 }

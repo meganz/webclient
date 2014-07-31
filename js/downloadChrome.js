@@ -416,7 +416,7 @@
 
 	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-	if ($.browser.chrome) Later(function()
+	if (window.webkitRequestFileSystem) Later(function()
 	{
 		window.webkitRequestFileSystem(0, 0x10000,
 			function (fs)

@@ -2323,7 +2323,7 @@ function gridUI()
 
 	if (M.currentdirid == 'shares') $.selectddUIgrid = '.shared-grid-view .grid-scrolling-table';
 	else if (M.currentdirid == 'contacts') $.selectddUIgrid = '.grid-scrolling-table.contacts';
-	else if (M.currentdirid.length == 11) $.selectddUIgrid = '.files-grid-view.contact-details-view';
+	else if (M.currentdirid.length == 11) $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
 	else $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
 
 	$.selectddUIitem = 'tr';
@@ -2505,7 +2505,7 @@ var QuickFinder = function(searchable_elements, containers) {
     $(window).unbind('keypress.quickFinder');
 
     // bind
-    $(window).bind('keypress.quickFinder', function(e) {
+    $(window).bind('keypress.quickFinder', function(e) {	
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
@@ -2816,7 +2816,7 @@ function UIkeyevents()
 
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
-		else s = $('.grid-table.fm tr.ui-selected');
+		else s = $('.grid-table tr.ui-selected');
 
 		if (M.chat) return true;
 
@@ -2900,7 +2900,7 @@ function UIkeyevents()
 			if (e.shiftKey) $(e).addClass('ui-selected');
 			if ($(s[0]).prev().length > 0)
 			{
-				if (!e.shiftKey) $('.grid-table.fm tr').removeClass('ui-selected');
+				if (!e.shiftKey) $('.grid-table tr').removeClass('ui-selected');
 				$(s[0]).prev().addClass('ui-selected');
 				sl = $(s[0]).prev();
 
@@ -2913,7 +2913,7 @@ function UIkeyevents()
 			if (e.shiftKey) $(e).addClass('ui-selected');
 			if ($(s[s.length-1]).next().length > 0)
 			{
-				if (!e.shiftKey) $('.grid-table.fm tr').removeClass('ui-selected');
+				if (!e.shiftKey) $('.grid-table tr').removeClass('ui-selected');
 				$(s[s.length-1]).next().addClass('ui-selected');
 				sl = $(s[0]).next();
 
@@ -3184,7 +3184,7 @@ function selectddUI()
 	 
 	 
     selectionManager = new SelectionManager(
-        $('.file-block-scrolling')
+        $($.selectddUIgrid)
     );
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('contextmenu');
@@ -3328,6 +3328,11 @@ function iconUI()
 	else if (M.currentdirid == 'shares')
 	{
 		$.selectddUIgrid = '.shared-blocks-scrolling';
+		$.selectddUIitem = 'a';
+	}
+	else if (M.currentdirid.length == 11)
+	{
+		$.selectddUIgrid = '.contact-details-view .file-block-scrolling';
 		$.selectddUIitem = 'a';
 	}
 	else

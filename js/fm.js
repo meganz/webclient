@@ -366,7 +366,7 @@ function initUI()
 		$('.nw-fm-tree-item').removeClass('dragover');
 		$('.context-menu.files-menu')
 			.addClass('hidden')
-			.find('.context-submenu').removeClass('active left-position');
+			.find('.context-submenu').removeClass('active left-position overlap-rigth overlap-left');
 	};
 
 	$('#fmholder').unbind('click.contextmenu');
@@ -3711,7 +3711,24 @@ function reCalcMenuPosition(m, x, y, ico)
 	var minY = TOP_MARGIN;// min vertical position
 	var wMax = x + cmW;// calculated coordinate of right edge
 	var hMax = y + cmH;// calculated coordinate of bottom edge
-	
+
+	$.overlapParentMenu = function() {
+				var tre = wW - wMax;// to right edge
+				var tle = x - minX - SIDE_MARGIN;// to left edge
+				
+				if (tre >= tle)
+				{
+					n.addClass('overlap-right');
+					n.css({'left': (maxX - x - nmW) + 'px'});
+				}
+				else
+				{
+					n.addClass('overlap-left');
+					n.css({'right': (wMax - nmW - minX) + 'px'});
+				}
+
+				return;
+	};
 	var dPos;
 	var cor;// corner, check setBordersRadius for more info
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
@@ -3742,10 +3759,7 @@ function reCalcMenuPosition(m, x, y, ico)
 			else if (minX <= (x - nmW)) n.addClass('left-position');
 			else
 			{
-				var tre = wW - wMax;// to right edge
-				var tle = x - minX - SIDE_MARGIN;// to left edge
-				if (tre >= tle) n.css({'top': 'auto', 'right': (wMax - nmW) + 'px', 'left': 'auto'});// align with left edge, set right
-				else n.css({'top': 'auto', 'left': (maxX - x - nmW) + 'px', 'right': 'auto'});
+				$.overlapParentMenu();
 				
 				return true;
 			}
@@ -3756,11 +3770,8 @@ function reCalcMenuPosition(m, x, y, ico)
 			else if (maxX >= (wMax + nmW)) top = 0, left = 'auto', right = '100%';
 			else
 			{
-				var tre = wW - wMax;// to right edge
-				var tle = x - minX - SIDE_MARGIN;// to left edge
-				if (tre >= tle) n.css({'top': 'auto', 'right': (wMax - nmW) + 'px', 'left': 'auto'});// align with left edge, set right
-				else n.css({'top': 'auto', 'left': (maxX - x - nmW) + 'px', 'right': 'auto'});
-				
+				$.overlapParentMenu();
+
 				return true;
 			}
 		}

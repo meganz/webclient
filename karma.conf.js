@@ -28,12 +28,15 @@ module.exports = function(config) {
         'js/jsbn2.js',
         'js/jodid25519.js',
         
-        // Our code.
+        // Test helpers and test data.
         'test/lang_dummy.js',
+        
+        // Our code.
         'secureboot.js',
         'js/functions.js',
         'js/mega.js',
         'js/fm.js',
+        'js/crypto.js',
         'js/user.js',
         'js/megafilepicker.js',
         'js/tlvstore.js',

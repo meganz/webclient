@@ -78,7 +78,8 @@ describe("tlvstore unit test", function() {
                          [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
+                         'foo\u0000\u0000\u0003bar' + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY];
             var expected = [
                 'AAABAgMEBQYHCAkKC436kEyuBNzuW6p4fd5WoW0=',
                 'AAABAgMEBQYHCAkKCyi+Gse0PYhohpuaRdPeQ2zQzA==',
@@ -88,6 +89,7 @@ describe("tlvstore unit test", function() {
                 'AAABAgMEBQYHCAkKC0hIAMYpvQFROnlMxVaEuPiXMq/Y4m8BUAgw',
                 'AAABAgMEBQYHCAkKC1RPN8aeWU0aczwwzYjMOBC6E2laTFsBrGOaoCAFb928',
                 'AAABAgMEBQYHCAkKC8wtQxM9jPC6hJ6nBz0JjczE3x9BOdz47C+7ks4K2Wb9lPQIBLG4INdpu990',
+                'AAABAgMEBQYHCAkKC3rj/KjtP0NbJ2wC+omKaEkVX+4AfwLqxP/4wY53WGn8+OKBozgJryuRjTGxCo5iBp5XKqex2bwO2Dz7BTgZ+/w+iDFjLEWwz/gvCRBqTQDSvEs=',
                 'AQABAgMEBQYHCAl2SvO7NJsA/pCOM/+ZGRLO',
                 'AQABAgMEBQYHCAlsEidPV7tzJs/RkQ4e652Ipuc=',
                 'AQABAgMEBQYHCAkcT6pYBDGA0fD0WxB4YOqtkAhkd2VnxJpePwdJ',
@@ -96,6 +98,7 @@ describe("tlvstore unit test", function() {
                 'AQABAgMEBQYHCAkM5FcRtJDQ2/H4Efh3pgp0imG3oK+nxrA3SA==',
                 'AQABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrExuPcws6HdbPNrB+JfereuA==',
                 'AQABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrKNLfo7kJ4yRAJQ7lsIwegQ==',
+                'AQABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahH9Z65QV0iwi7YdUCAa/lYB',
                 'AgABAgMEBQYHCAmJNz0zRRXZCQ==',
                 'AgABAgMEBQYHCAlsEvCWxcq1JorR',
                 'AgABAgMEBQYHCAkcT6pYBDGA0fD0WxDEk30ne8m70A==',
@@ -104,6 +107,7 @@ describe("tlvstore unit test", function() {
                 'AgABAgMEBQYHCAkM5FcRtJDQ2/H445cZBM9C5Ws=',
                 'AgABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrE+a13ciKmM6k=',
                 'AgABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrw5l9HNUXDPk=',
+                'AgABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahGfgp845h0GDQ==',
             ];
             for (var i = 0; i < modes.length; i++) {
                 var mode = modes[i][0];
@@ -138,6 +142,7 @@ describe("tlvstore unit test", function() {
                 'AAABAgMEBQYHCAkKC0hIAMYpvQFROnlMxVaEuPiXMq/Y4m8BUAgw',
                 'AAABAgMEBQYHCAkKC1RPN8aeWU0aczwwzYjMOBC6E2laTFsBrGOaoCAFb928',
                 'AAABAgMEBQYHCAkKC8wtQxM9jPC6hJ6nBz0JjczE3x9BOdz47C+7ks4K2Wb9lPQIBLG4INdpu990',
+                'AAABAgMEBQYHCAkKC3rj/KjtP0NbJ2wC+omKaEkVX+4AfwLqxP/4wY53WGn8+OKBozgJryuRjTGxCo5iBp5XKqex2bwO2Dz7BTgZ+/w+iDFjLEWwz/gvCRBqTQDSvEs=',
                 'AQABAgMEBQYHCAl2SvO7NJsA/pCOM/+ZGRLO',
                 'AQABAgMEBQYHCAlsEidPV7tzJs/RkQ4e652Ipuc=',
                 'AQABAgMEBQYHCAkcT6pYBDGA0fD0WxB4YOqtkAhkd2VnxJpePwdJ',
@@ -146,6 +151,7 @@ describe("tlvstore unit test", function() {
                 'AQABAgMEBQYHCAkM5FcRtJDQ2/H4Efh3pgp0imG3oK+nxrA3SA==',
                 'AQABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrExuPcws6HdbPNrB+JfereuA==',
                 'AQABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrKNLfo7kJ4yRAJQ7lsIwegQ==',
+                'AQABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahH9Z65QV0iwi7YdUCAa/lYB',
                 'AgABAgMEBQYHCAmJNz0zRRXZCQ==',
                 'AgABAgMEBQYHCAlsEvCWxcq1JorR',
                 'AgABAgMEBQYHCAkcT6pYBDGA0fD0WxDEk30ne8m70A==',
@@ -154,10 +160,12 @@ describe("tlvstore unit test", function() {
                 'AgABAgMEBQYHCAkM5FcRtJDQ2/H445cZBM9C5Ws=',
                 'AgABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrE+a13ciKmM6k=',
                 'AgABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrw5l9HNUXDPk=',
+                'AgABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahGfgp845h0GDQ==',
             ];
             var expected = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                             "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                            'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+                            'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
+                            'foo\u0000\u0000\u0003bar' + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY];
             for (var i = 0; i < modes.length; i++) {
                 for (var j = 0; j < expected.length; j++) {
                     var cipher = atob(tests[i * expected.length + j]);
@@ -173,7 +181,8 @@ describe("tlvstore unit test", function() {
                          [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
+                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
+                         'foo\u0000\u0000\u0003bar' + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY];
             for (var i = 0; i < modes.length; i++) {
                 var mode = modes[i][0];
                 for (var j = 0; j < tests.length; j++) {

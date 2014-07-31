@@ -187,7 +187,7 @@ function u_wasloggedin()
 // set user's RSA key
 function u_setrsa(rsakey)
 {
-	ctx = {
+	var ctx = {
 	    callback : function(res,ctx) {
 	        if (d) console.log("RSA key put result=" + res);
 
@@ -328,4 +328,107 @@ function processquota1(res,ctx)
 		}
 		else ctx.processquotaresult(ctx,false);
 	}
+}
+
+
+/**
+ * Retrieves a user attribute.
+ *
+ * @param userhandle {string}
+ *     Mega's internal user handle.
+ * @param attribute {string}
+ *     Name of the attribute.
+ * @param pub {bool}
+ *     True for public attributes (default: true).
+ * @param callback {function}
+ *     Callback function to call upon completion (default: none).
+ */
+function getUserAttribute(userhandle, attribute, pub, callback) {
+    if (pub === true || pub === undefined) {
+        attribute = '+' + attribute;
+    } else {
+        attribute = '*' + attribute;
+    }
+    
+    // Assemble context for this async API request.
+    var myCtx = {
+        u: userhandle,
+        ua: attribute,
+        callback: function(res, ctx) {
+            if (typeof res !== 'number') {
+                var value = base64urldecode(res);
+                // Decrypt if it's a private attribute container.
+                if (ctx.ua.charAt(0) === '*') {
+                    var clearContainer = blockDecrypt(value, u_k);
+                    value = tlvRecordsToContainer(clearContainer);
+                }
+                if (d) {
+                    console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
+                                + '" is "' + value + '".');
+                }
+                if (ctx.callback2) {
+                    ctx.callback2(value, ctx);
+                }
+            } else {
+                if (d) {
+                    console.log('Error retrieving attribute "' + ctx.ua
+                                + '" for user "' + ctx.u + '": ' + res + '!');
+                }
+                if (ctx.callback2) {
+                    ctx.callback2(res, ctx);
+                }
+            }
+        },
+        callback2: callback
+    };
+    
+    // Fire it off.
+    api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
+}
+
+
+/**
+ * Stores a user attribute for oneself.
+ *
+ * @param attribute {string}
+ *     Name of the attribute.
+ * @param value {object}
+ *     Value of the user attribute. Public properties are of type {string},
+ *     private ones have to be an object with key/value pairs.
+ * @param pub {bool}
+ *     True for public attributes (default: true).
+ * @param callback {function}
+ *     Callback function to call upon completion (default: none). This callback
+ *     function expects two parameters: the attribute `name`, and its `value`.
+ *     In case of an error, the `value` will be undefined.
+ */
+function setUserAttribute(attribute, value, pub, callback) {
+    if (pub === true || pub === undefined) {
+        attribute = '+' + attribute;
+    } else {
+        attribute = '*' + attribute;
+        // The value should be a key/value property container. Let's encode and
+        // encrypt it.
+        value = blockEncrypt(containerToTlvRecords(value));
+    }
+    
+    // Assemble context for this async API request.
+    var myCtx = {
+        callback: function(res, ctx) {
+            if (d) {
+                console.log('Wrote attribute "' + ctx.ua + '", result: ' + res);
+            }
+            if (ctx.callback2) {
+                ctx.callback2(res, ctx);
+            }
+        },
+        ua: attribute,
+        callback2: callback,
+    };
+    if (callback) {
+        myCtx['callback2'] = callback;
+    }
+    
+    // Fire it off.
+    api_req({'a': 'up', attribute: value}, myCtx);
 }

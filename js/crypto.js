@@ -2698,7 +2698,7 @@ function getpubk25519(userhandle, callback)
 	}
 	else
 	{
-		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
+	    api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
 		{
 			u: userhandle,
 			callback2: callback,

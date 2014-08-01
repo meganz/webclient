@@ -390,7 +390,7 @@ else
 			};
 		*/
 		
-		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}; }
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
@@ -410,20 +410,17 @@ else
 		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
 		var langv = '';
 		if (typeof lv != 'undefined') langv = '_' + lv[lang];
-		var jsl = []
+		var jsl = [];
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
-		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-		
+		jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+        jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		
 		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
-		
-		
-		
 		
 		jsl.push({f:'js/user.js', n: 'user_js', j:1});
 		jsl.push({f:'js/hex.js', n: 'hex_js', j:1});

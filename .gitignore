@@ -211,8 +211,23 @@ pip-log.txt
 .coverage
 .tox
 
-#Translations
+
+#############
+## JavaScript machinery
+#############
+
+node_modules/
+coverage/
+doc/
+
+
+#############
+## Miscellaneous
+#############
+
+# Translations
 *.mo
 
-#Mr Developer
+# Mr Developer
 .mr.developer.cfg
+

@@ -2671,10 +2671,11 @@ function u_ed25519() {
 	    if (typeof res !== 'number') {
             u_keyring = res;
         } else {
-            u_keyring = {prEd255 : jodid25519.eddsa.generateKeySeed()};
+            u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+            u_keyring = {prEd255 : u_privEd25519};
             u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
             setUserAttribute('keyring', u_keyring, false);
-            setUserAttribute('puEd255', u_pubEd25519, true);
+            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
         }
         u_attr.keyring = u_keyring;
         u_privEd25519 = u_keyring.prEd255;
@@ -2686,13 +2687,13 @@ function u_ed25519() {
 
 var pubEd25519 = {};
 
-function getpubk25519(userhandle, callback) {
+function getPubEd25519(userhandle, callback) {
 	if (pubEd25519[userhandle]) {
 	    callback(pubEd25519[userhandle], userhandle);
 	} else {
 	    var myCallback = function(res, ctx) {
 	        if (typeof res !== 'number') {
-                pubEd25519[ctx.u] = res;
+                pubEd25519[ctx.u] = base64urldecode(res);
                 if (ctx.callback3) {
                     ctx.callback3(res, ctx.u);
                 }

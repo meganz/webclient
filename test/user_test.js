@@ -61,7 +61,7 @@ describe("user unit test", function() {
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
                 window.d = true;
-                callback('Zm9ydHl0d28=', theCtx);
+                callback('fortytwo', theCtx);
                 window.d = false;
                 assert.strictEqual(console.log.args[0][0],
                                    'Attribute "+puEd255" for user "me" is "fortytwo".');
@@ -74,7 +74,7 @@ describe("user unit test", function() {
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                callback('Zm9ydHl0d28=', theCtx);
+                callback('fortytwo', theCtx);
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
             });
     

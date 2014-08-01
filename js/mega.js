@@ -287,8 +287,6 @@ function MegaData ()
 
 	this.onlineStatusEvent = function(u,status)
 	{
-		console.log('onlineStatusEvent',u,status);
-
 		if (u)
 		{
 			var e = $('.ustatus.' + u.u);
@@ -359,6 +357,7 @@ function MegaData ()
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
 		}
 
 		var files = 0, cache = [], n_cache;
@@ -387,16 +386,16 @@ function MegaData ()
 			if (this.v[i].name)
 			{
 				var s='';
-				var t = '';
+				var ftype = '';
 				var c = '';
 				if (this.v[i].t)
 				{
-					t = l[1049];
+					ftype = l[1049];
 					c = ' folder';
 				}
 				else
 				{
-					t = filetype(this.v[i].name);
+					ftype = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
 				var html,t,el,cc,star='';
@@ -498,13 +497,13 @@ function MegaData ()
 						t = '.contacts-details-block .grid-table.shared-with-me';
 						el='tr';					
 						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="270"><div class="shared-folder-access ' + rightsclass + '">' + rights + '</div></td></tr>';
-					}					
+					}
 				}
 				else
 				{
 					if (this.viewmode == 1)
 					{
-						t = '.file-block-scrolling';
+						t = '.fm-blocks-view.fm .file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 						cc=i;
@@ -513,7 +512,7 @@ function MegaData ()
 					{
 						t = '.grid-table.fm';
 						el = 'tr';
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
 						cc=i;
 					}
 				}
@@ -568,9 +567,11 @@ function MegaData ()
 					}
 				}
 			}
-		}		
+		}
 		
-		if (this.viewmode == 1)
+		
+		
+		if (this.viewmode == 1 && this.v.length > 0)
 		{
 			$(t).find('div.clear').remove();
 			$(t).append('<div class="clear"></div>');
@@ -602,7 +603,6 @@ function MegaData ()
 
 		if (this.viewmode == 1)
 		{
-			//$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
 

@@ -149,14 +149,7 @@ function cacheselect()
 
 function hideEmptyMsg()
 {
-	$('.fm-empty-trashbin').addClass('hidden');
-	$('.fm-empty-contacts').addClass('hidden');
-	$('.fm-empty-search').addClass('hidden');
-	$('.fm-empty-cloud').addClass('hidden');
-	$('.fm-empty-messages').addClass('hidden');
-
-	$('.fm-empty-conversations').addClass('hidden');
-	$('.fm-empty-incoming').addClass('hidden');
+	$('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
 }
 
 function reselect(n)
@@ -703,7 +696,7 @@ function removeUInode(h)
 				$('.fm-empty-trashbin').removeClass('hidden');
 			}
 			break;
-		default:
+		case M.RootID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
 			$('#treeli_' + h).remove();// remove folder and subfolders
@@ -712,6 +705,34 @@ function removeUInode(h)
 				$('.files-grid-view').addClass('hidden');
 				$('.grid-table.fm tr').remove();
 				$('.fm-empty-cloud').removeClass('hidden');
+			}
+			break;
+		default:
+			console.log('default remove');
+			
+			console.log(h);
+		
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			
+			console.log($('#' + h));
+			
+			console.log($('#' + h).length);
+			
+			$('#' + h).remove();// remove item
+			
+			console.log($('#' + h).length);
+			
+			console.log($('#' + h));
+			
+			
+			
+			
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.files-grid-view').addClass('hidden');
+				$('.grid-table.fm tr').remove();
+				$('.fm-empty-folder').removeClass('hidden');
 			}
             break;
 	}

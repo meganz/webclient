@@ -2662,33 +2662,30 @@ function crypto_share_rsa2aes()
 
 
 
+var u_keyring;
 var u_privEd25519;
 var u_pubEd25519;
 
-function u_ed25519()
-{
-	var keySeed, newKey = false;
-	if (!u_attr['prEd255'] && !u_privEd25519)
-	{
-	    keySeed = jodid25519.eddsa.generateKeySeed();
-		newKey = true;
-	}
-	else
-	{
-	    keySeed = a32_to_str(decrypt_key(u_k_aes, str_to_a32(u_attr['prEd255'])));
-	}
-	
-	u_privEd25519 = keySeed;
-	u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-	
-	if (newKey)
-	{
-		api_req({'a': 'up', 'prEd255': a32_to_base64(encrypt_key(u_k_aes, str_to_a32(keySeed)))});
-		api_req({'a': 'up', '+puEd255': base64urlencode(u_pubEd25519)});
-	}
+function u_ed25519() {
+	var myCallback = function(res, ctx) {
+	    if (typeof res !== 'number') {
+            u_keyring = res;
+        } else {
+            u_keyring = {prEd255 : jodid25519.eddsa.generateKeySeed()};
+            u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+            setUserAttribute('keyring', u_keyring, false);
+            setUserAttribute('puEd255', u_pubEd25519, true);
+        }
+        u_attr.keyring = u_keyring;
+        u_privEd25519 = u_keyring.prEd255;
+        u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+        u_attr.puEd255 = u_pubEd25519;
+	};
+    getUserAttribute(u_handle, 'keyring', false, myCallback);
 }
 
 var pubEd25519 = {};
+
 
 var pubEd25519Cache = null;
 function getPubEd25519(userhandle, callback)

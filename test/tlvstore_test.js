@@ -193,5 +193,25 @@ describe("tlvstore unit test", function() {
                 }
             }
         });
+        
+        it("blockEncrypt/blockDecrypt round trip with array key", function() {
+            var key = [252579084, 185207048, 117835012, 50462976];
+            var modes = [[BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
+                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
+                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+            var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
+                         "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+                         'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
+                         'foo\u0000\u0000\u0003bar' + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY];
+            for (var i = 0; i < modes.length; i++) {
+                var mode = modes[i][0];
+                for (var j = 0; j < tests.length; j++) {
+                    var clear = tests[j];
+                    var cipher = blockEncrypt(clear, key, mode);
+                    var reClear = blockDecrypt(cipher, key);
+                    assert.strictEqual(reClear, clear);
+                }
+            }
+        });
     });
 });

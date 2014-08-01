@@ -149,7 +149,8 @@ function u_logout(logout)
 		a[i].removeItem('handle');
 		a[i].removeItem('attr');
 		a[i].removeItem('privk');
-        a[i].removeItem('prEd255');
+        a[i].removeItem('keyring');
+        a[i].removeItem('puEd255');
         a[i].removeItem('randseed');
 	}
 
@@ -342,8 +343,11 @@ function processquota1(res,ctx)
  *     True for public attributes (default: true).
  * @param callback {function}
  *     Callback function to call upon completion (default: none).
+ * @param ctx {object}
+ *     Context, in case higher hierarchies need to inject a context
+ *     (default: none).
  */
-function getUserAttribute(userhandle, attribute, pub, callback) {
+function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
     if (pub === true || pub === undefined) {
         attribute = '+' + attribute;
     } else {
@@ -351,36 +355,35 @@ function getUserAttribute(userhandle, attribute, pub, callback) {
     }
     
     // Assemble context for this async API request.
-    var myCtx = {
-        u: userhandle,
-        ua: attribute,
-        callback: function(res, ctx) {
-            if (typeof res !== 'number') {
-                var value = base64urldecode(res);
-                // Decrypt if it's a private attribute container.
-                if (ctx.ua.charAt(0) === '*') {
-                    var clearContainer = blockDecrypt(value, u_k);
-                    value = tlvRecordsToContainer(clearContainer);
-                }
-                if (d) {
-                    console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
-                                + '" is "' + value + '".');
-                }
-                if (ctx.callback2) {
-                    ctx.callback2(value, ctx);
-                }
-            } else {
-                if (d) {
-                    console.log('Error retrieving attribute "' + ctx.ua
-                                + '" for user "' + ctx.u + '": ' + res + '!');
-                }
-                if (ctx.callback2) {
-                    ctx.callback2(res, ctx);
-                }
+    var myCtx = ctx || {};
+    myCtx.u = userhandle;
+    myCtx.ua = attribute;
+    myCtx.callback = function(res, ctx) {
+        if (typeof res !== 'number') {
+            var value = base64urldecode(res);
+            // Decrypt if it's a private attribute container.
+            if (ctx.ua.charAt(0) === '*') {
+                var clearContainer = blockDecrypt(value, u_k);
+                value = tlvRecordsToContainer(clearContainer);
             }
-        },
-        callback2: callback
+            if (d) {
+                console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
+                            + '" is "' + value + '".');
+            }
+            if (ctx.callback2) {
+                ctx.callback2(value, ctx);
+            }
+        } else {
+            if (d) {
+                console.log('Error retrieving attribute "' + ctx.ua
+                            + '" for user "' + ctx.u + '": ' + res + '!');
+            }
+            if (ctx.callback2) {
+                ctx.callback2(res, ctx);
+            }
+        }
     };
+    myCtx.callback2 = callback;
     
     // Fire it off.
     api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);

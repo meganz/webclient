@@ -120,7 +120,7 @@ function tlvRecordsToContainer(tlvContainer) {
  * @property AES_GCM_10_08 {integer}
  *     AES in CCM mode, 10 byte IV/nonce and 8 byte MAC.
  */
-BLOCK_ENCRYPTION_SCHEME = {
+var BLOCK_ENCRYPTION_SCHEME = {
     AES_CCM_12_16: 0x00,
     AES_CCM_10_16: 0x01,
     AES_CCM_10_08: 0x02,
@@ -160,6 +160,10 @@ function blockEncrypt(clear, key, mode) {
     var tagSize = _TlvStore.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
     var nonceBytes = new Uint8Array(nonceSize);
     asmCrypto.getRandomValues(nonceBytes);
+    if (key instanceof Array || Object.prototype.toString.call(key) === '[object Array]') {
+        // Key is in the form of an array of four 32-bit words.
+        key = a32_to_str(key);
+    }
     var keyBytes = asmCrypto.string_to_bytes(key);
     var clearBytes = asmCrypto.string_to_bytes(unescape(encodeURIComponent(clear)));
     var cipherBytes = asmCrypto.AES_CCM.encrypt(clearBytes, keyBytes, nonceBytes,
@@ -186,6 +190,10 @@ function blockDecrypt(cipher, key) {
     var nonceBytes = asmCrypto.string_to_bytes(cipher.substring(1, nonceSize + 1));
     var cipherBytes = asmCrypto.string_to_bytes(cipher.substring(nonceSize + 1));
     var tagSize = _TlvStore.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
+    if (key instanceof Array || Object.prototype.toString.call(key) === '[object Array]') {
+        // Key is in the form of an array of four 32-bit words.
+        key = a32_to_str(key);
+    }
     var keyBytes = asmCrypto.string_to_bytes(key);
     var clearBytes = asmCrypto.AES_CCM.decrypt(cipherBytes, keyBytes, nonceBytes,
                                                undefined, tagSize);

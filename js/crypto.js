@@ -2671,10 +2671,11 @@ function u_ed25519() {
 	    if (typeof res !== 'number') {
             u_keyring = res;
         } else {
-            u_keyring = {prEd255 : jodid25519.eddsa.generateKeySeed()};
+            u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+            u_keyring = {prEd255 : u_privEd25519};
             u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
             setUserAttribute('keyring', u_keyring, false);
-            setUserAttribute('puEd255', u_pubEd25519, true);
+            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
         }
         u_attr.keyring = u_keyring;
         u_privEd25519 = u_keyring.prEd255;
@@ -2687,43 +2688,26 @@ function u_ed25519() {
 var pubEd25519 = {};
 
 
-var pubEd25519Cache = null;
-function getPubEd25519(userhandle, callback)
-{
-    if(!pubEd25519Cache) {
-        pubEd25519Cache = new MegaKVStorage("pk25519", localStorage);
-    }
-
-	if (pubEd25519[userhandle])
-	{
+function getPubEd25519(userhandle, callback) {
+	if (pubEd25519[userhandle]) {
 	    callback(pubEd25519[userhandle], userhandle);
-	}
-    else if(pubEd25519Cache.hasItem(userhandle))
-    {
-        pubEd25519[userhandle] = pubEd25519Cache.getItem(userhandle);
-        callback(pubEd25519[userhandle], userhandle);
-    }
-	else
-	{
-		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
-		{
-			u: userhandle,
-			callback2: callback,
-			callback: function(res, ctx)
-			{
-				if (typeof res !== 'number' && ctx.callback2)
-				{
+	} else {
+	    var myCallback = function(res, ctx) {
+	        if (typeof res !== 'number') {
+                pubEd25519[ctx.u] = base64urldecode(res);
+                if (ctx.callback3) {
+                    ctx.callback3(res, ctx.u);
+                }
+            } else if (ctx.callback3) {
+                ctx.callback3(false, ctx.u);
+            }
+	    };
+	    var myCtx = {
+	        u: userhandle,
+	        callback3: callback,
+	    };
+	    getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
 
-				    pubEd25519[ctx.u] = base64urldecode(res);
-                    pubEd25519Cache.setItem(ctx.u, pubEd25519[ctx.u], 24*60*60);
-					ctx.callback2(pubEd25519[ctx.u], ctx.u);
-				}
-				else if (ctx.callback2)
-				{
-				    ctx.callback2(false, ctx.u);
-				}
-			}
-		});
 	}	
 }
 

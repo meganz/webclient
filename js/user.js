@@ -506,10 +506,10 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
     myCtx.ua = attribute;
     myCtx.callback = function(res, ctx) {
         if (typeof res !== 'number') {
-            var value = base64urldecode(res);
             // Decrypt if it's a private attribute container.
+            var value = res;
             if (ctx.ua.charAt(0) === '*') {
-                var clearContainer = blockDecrypt(value, u_k);
+                var clearContainer = blockDecrypt(base64urldecode(res), u_k);
                 value = tlvRecordsToContainer(clearContainer);
             }
             if (d) {
@@ -571,9 +571,11 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         callback: function(res, ctx) {
             if (d) {
                 if (typeof res !== 'number') {
-                    console.log('Setting user attribute "' + ctx.ua + '", result: ' + res);
+                    console.log('Setting user attribute "'
+                                + ctx.ua + '", result: ' + res);
                 } else {
-                    console.log('Error setting user attribute "' + ctx.ua + '", result: ' + res + '!');
+                    console.log('Error setting user attribute "'
+                                + ctx.ua + '", result: ' + res + '!');
                 }
             }
             if (ctx.callback2) {

@@ -86,8 +86,19 @@
 		var totalsize = 0;
 		if (window.webkitRequestFileSystem)
 		{
-			if (d) console.log('Cleaning storage...', storagetype);
-			window.webkitRequestFileSystem(storagetype, 1024 * 1024, onInitFs, errorHandler2);
+			var st = storagetype ? 'Persistent':'Temporary';
+			navigator['webkit'+st+'Storage'].queryUsageAndQuota(function(used, remaining)
+			{
+				if (used+remaining)
+				{
+					if (d) console.log('Cleaning '+st+' Storage...', bytesToSize(used), bytesToSize(remaining));
+					window.webkitRequestFileSystem(storagetype, 1024, onInitFs, errorHandler2);
+				}
+				else
+				{
+					if (callback) callback(0);
+				}
+			}, errorHandler2);
 		}
 		else errorHandler2();
 	}

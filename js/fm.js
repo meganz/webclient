@@ -707,26 +707,9 @@ function removeUInode(h)
 				$('.fm-empty-cloud').removeClass('hidden');
 			}
 			break;
-		default:
-			console.log('default remove');
-			
-			console.log(h);
-		
+		default:			
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
-			
-			console.log($('#' + h));
-			
-			console.log($('#' + h).length);
-			
 			$('#' + h).remove();// remove item
-			
-			console.log($('#' + h).length);
-			
-			console.log($('#' + h));
-			
-			
-			
-			
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
 			{

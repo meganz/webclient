@@ -478,6 +478,7 @@ function generateAvatarElement(user_hash) {
     return $element;
 }
 
+/*
  * Retrieves a user attribute.
  *
  * @param userhandle {string}

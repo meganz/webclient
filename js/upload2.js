@@ -384,6 +384,10 @@ ChunkUpload.prototype.updateprogress = function() {
 	if (tp == this.file.size) this.file.complete = true;
 };
 
+ChunkUpload.prototype.abort = function() {
+	this.xhr.abort(); // abort socket
+};
+
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 	if (this.file.abort) {
 		xhr.abort()
@@ -490,6 +494,8 @@ ChunkUpload.prototype.upload = function() {
 		xhr.open('POST', this.file.posturl+this.suffix);
 		xhr.send(this.bytes.buffer);
 	}
+
+	this.xhr = xhr;
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
@@ -510,6 +516,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 
 ChunkUpload.prototype.done = function() {
 	DEBUG("release", this.start);
+	this.xhr = null;
 	
 	/* release worker */
 	this._done();
@@ -718,7 +725,7 @@ function worker_uploader(task, done) {
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = 4
 	, Encrypter
-	, ulQueue = new MegaQueue(worker_uploader, ul_maxSlots)
+	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0

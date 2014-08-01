@@ -511,49 +511,58 @@ function MegaData ()
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
+						el = 'tr';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
 						cc=i;
 					}
 				}
 
 				if (!u || $(t + ' '+el).length == 0)
 				{
-					// if the current view does not have any nodes, just append it
+					// 1. if the current view does not have any nodes, just append it
+					console.log('1. if the current view does not have any nodes, just append it');
 					if (cc && ++files > n_cache)
 					{
+						console.log('1a cache.push');
 						this.v[i].seen = false;
 						cache.push([i,html,this.v[i].name]);
 					}
 					else
 					{
+						console.log('1b append');
 						this.v[i].seen = true;
 						$(t).append(html);
 					}
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
 				{
-					// if there is a node before the new node in the current view, add it after that node:
+					// 2. if there is a node before the new node in the current view, add it after that node:
+					console.log('2. if there is a node before the new node in the current view, add it after that node:');
 					$(t+' #'+this.v[i-1].h).after(html);
 				}
 				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
 				{
-					// if there is a node after the new node in the current view, add it before that node:
+					// 3. if there is a node after the new node in the current view, add it before that node:
+					console.log('3. if there is a node after the new node in the current view, add it before that node:');
 					$(t+' #'+this.v[i+1].h).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
 				{
-					// new folder: insert new node before the first folder in the current view
+					// 4. new folder: insert new node before the first folder in the current view
+					console.log('4. new folder: insert new node before the first folder in the current view');
 					$($(t+' '+el)[0]).before(html);
 				}
 				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
 				{
-					// new file: insert new node before the first file in the current view
+					// 5. new file: insert new node before the first file in the current view
+					console.log('5. new file: insert new node before the first file in the current view');
 					var a = $(t+' '+el).not('.folder');
 					if (a.length > 0) $(a[0]).before(html);
 					else
 					{
-						// if this view does not have any files, insert after the last folder
+						// 6. if this view does not have any files, insert after the last folder
+						console.log('6. if this view does not have any files, insert after the last folder');
 						a = $(t+' '+el);
 						$(a[a.length-1]).after(html);
 					}

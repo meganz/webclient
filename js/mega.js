@@ -1955,9 +1955,9 @@ function MegaData ()
 				}
 
 				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'">'
-					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
@@ -1975,9 +1975,9 @@ function MegaData ()
 		}
 		if (z)
 		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
-			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td><span class="row-number">1</span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
+			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
@@ -2058,7 +2058,7 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' td:eq(0) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
+				$('.transfer-table #' + id + ' td:eq(2) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
 				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
@@ -2245,9 +2245,9 @@ function MegaData ()
 
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'">'
-					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
@@ -2283,7 +2283,7 @@ function MegaData ()
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
 			$.transferprogress['ul_' + id] = [bl,bt];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
-			$('.transfer-table #ul_' + id + ' td:eq(0) .speed').text(
+			$('.transfer-table #ul_' + id + ' td:eq(2) .speed').text(
 				bps ? (' (' + bytesToSize(bps,1) +'/s' + ')' ) : ''
 			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));

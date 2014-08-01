@@ -242,3 +242,69 @@ MegaQueue.prototype.push = function(arg, next, self) {
 	this.trigger('queue');
 	this._process();
 };
+
+function TransferQueue() {
+	MegaQueue.prototype.constructor.apply(this, arguments);
+}
+
+inherits(TransferQueue, MegaQueue);
+
+TransferQueue.prototype.dispatch = function(gid)
+{
+	// dispatch a paused transfer
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || this._qpaused[gid], 'This transfer is not in hold: ' + gid );
+	
+	if (this._qpaused[gid] && !GlobalProgress[gid].paused)
+	{
+		this._queue = this._qpaused[gid].concat(this._queue);
+		delete this._qpaused[gid];
+		this._process();
+		return true;
+	}
+	return false;
+};
+
+
+TransferQueue.prototype.pause = function(gid)
+{
+	if (!gid) return MegaQueue.prototype.pause.apply(this, arguments);
+
+	// pause single transfer
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || !GlobalProgress[gid].paused, 'This transfer is ALREADY paused: ' + gid );
+
+	if (GlobalProgress[gid])
+	{
+		var p = GlobalProgress[gid], chunk;
+		p.paused = true;
+		while ((chunk = p.working.pop()))
+		{
+			if (d) console.log('Aborting by pause: ' + chunk);
+			chunk.abort();
+			this.pushFirst(chunk);
+			this._running--;
+		}
+		this._qpaused[gid] = this.slurp(gid);
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text(' (paused)');
+		// TODO: move that $() somewhere else and set other columns
+	}
+};
+
+
+TransferQueue.prototype.resume = function(gid)
+{
+	if (!gid) return MegaQueue.prototype.resume.apply(this, arguments);
+
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || GlobalProgress[gid].paused, 'This transfer is not paused: ' + gid );
+
+	if (GlobalProgress[gid])
+	{
+		delete GlobalProgress[gid].paused;
+		if (this.isEmpty()) this.dispatch(gid);
+		$('.transfer-table #' + gid + ' td:eq(0) span.speed').text('');
+		// TODO: $() stuff
+	}
+};
+

@@ -143,16 +143,90 @@ function MegaData ()
 		this.sortd=d;
 		this.sort();
 	};
+	
+	this.sortByOwner = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var usera = M.d[a.p], userb = M.d[b.p];			
+			if (typeof usera.name == 'string' && typeof userb.name == 'string') return usera.name.localeCompare(userb.name)*d;
+			else return -1;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByAccess = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{			
+			if (typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && a.r < b.r) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.getSortStatus = function(u)
+	{
+		var status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+		if (status == 'chat') return 1;
+		else if (status == 'dnd') return 2;
+		else if (status == 'away') return 3;
+		else return 4;
+	};
+	
+	
+	this.sortByStatus = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var statusa = M.getSortStatus(a.u),statusb = M.getSortStatus(b.u);			
+			if (statusa < statusb) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByInteraction = function(d)
+	{
+		this.i_cache = {};		
+		this.sortfn = function(a,b,d)
+		{
+			if (!M.i_cache[a.u])
+			{				
+				var cs = M.contactstatus(a.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[a.u] = cs.ts;
+			}
+			if (!M.i_cache[b.u])
+			{	
+				var cs = M.contactstatus(b.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[b.u] = cs.ts;
+			}
+			if (M.i_cache[b.u] < M.i_cache[a.u]) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
 
 	this.doSort = function(n,d)
 	{
+		console.log('doSort',n,d);
 		$('.grid-table-header .arrow').removeClass('asc desc');
 		if (d > 0) $('.arrow.'+n).addClass('desc');
 		else $('.arrow.'+n).addClass('asc');
 		if (n == 'name') M.sortByName(d);
 		else if (n == 'size') M.sortBySize(d);
 		else if (n == 'type') M.sortByType(d);
-		else if (n == 'date') M.sortByDateTime(d);
+		else if (n == 'date') M.sortByDateTime(d);		
+		else if (n == 'owner') M.sortByOwner(d);
+		else if (n == 'access') M.sortByAccess(d);
+		else if (n == 'interaction') M.sortByInteraction(d);
+		else if (n == 'status') M.sortByStatus(d);
 		if (fmconfig.uisorting) storefmconfig('sorting',{n:n,d:d});
 		else fmsortmode(M.currentdirid,n,d);
 	};
@@ -453,9 +527,7 @@ function MegaData ()
 						rights = 'Full access';
 						rightsclass = ' full-access';
 					}
-
 					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-
 					if (this.viewmode == 1)
 					{
 						t = '.shared-blocks-scrolling';

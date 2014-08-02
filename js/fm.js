@@ -2321,6 +2321,10 @@ function gridUI()
 		else if (c && c.indexOf('size') > -1) M.doSort('size',d);
 		else if (c && c.indexOf('type') > -1) M.doSort('type',d);
 		else if (c && c.indexOf('date') > -1) M.doSort('date',d);
+		else if (c && c.indexOf('owner') > -1) M.doSort('owner',d);
+		else if (c && c.indexOf('access') > -1) M.doSort('access',d);
+		else if (c && c.indexOf('status') > -1) M.doSort('status',d);
+		else if (c && c.indexOf('interaction') > -1) M.doSort('interaction',d);
 		if (c) M.renderMain();
 	});
 

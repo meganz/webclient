@@ -156,10 +156,6 @@ function u_logout(logout)
         a[i].removeItem('randseed');
 	}
 
-
-    if(pubkeysCache) { pubkeysCache.clear(); }
-    if(pubEd25519Cache) { pubEd25519Cache.clear(); }
-
 	if (logout)
 	{
         if(MegaChatEnabled) {

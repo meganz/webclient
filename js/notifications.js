@@ -13,6 +13,9 @@ function pollnotifications()
 		{
 			callback: function (json,params)
 			{
+				console.log(json);
+				console.log('check',json.ltd || 0);
+			
 				if (typeof json == 'object' && json.fsn && u_type)
 				{
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
@@ -27,9 +30,9 @@ function pollnotifications()
 							user:		json.c[i].u,
 							folderid: 	json.c[i].n,
 							nodes:		json.c[i].f,
-							read:		json.c[i].td >= json.ltd,
+							read:		json.c[i].td >= (json.ltd || 0),
 							popup:		true,
-							count:		json.c[i].td >= json.ltd,
+							count:		json.c[i].td >= (json.ltd || 0),
 							rendered:	true
 						});
 					}
@@ -51,7 +54,7 @@ function notifycounter()
 	$.each(notifications, function(i,n) 
 	{
 		if (!n.count) a++;		
-	});	
+	});
 	
 	if (a == 0)
 	{	

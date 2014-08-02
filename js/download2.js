@@ -273,6 +273,7 @@ function fm_tfspause(gid)
 {
 	if (gid[0] === 'u') ulQueue.pause(gid);
 	else dlQueue.pause(gid);
+	$('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
 }
 
 function fm_tfsresume(gid)

@@ -3298,7 +3298,7 @@ function iconUI()
 	}
 	else
 	{
-		$('.fm-blocks-view').removeClass('hidden');
+		$('.fm-blocks-view.fm').removeClass('hidden');		
 		initFileblocksScrolling();
 	}
 	$(window).unbind('resize.icon');
@@ -3819,7 +3819,7 @@ function sectionUIopen(id)
 	$('.fm-right-header').addClass('hidden');
 	
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
-	if ((id !== 'cloud-drive') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
+	if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
 		$('.files-grid-view.fm').addClass('hidden');
 		$('.fm-blocks-view.fm').addClass('hidden');

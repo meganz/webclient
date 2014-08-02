@@ -1300,7 +1300,7 @@ function MegaData ()
 			}
 			else if (a2[i] == this.RubbishID)
 			{
-				typeclass = 'recycle-bin';
+				typeclass = 'rubbish-bin';
 				name = l[167];
 			}
 			else if (a2[i] == 'messages' || a2[i] == M.InboxID)

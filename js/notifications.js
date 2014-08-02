@@ -12,10 +12,7 @@ function pollnotifications()
 		api_req('c=100',
 		{
 			callback: function (json,params)
-			{
-				console.log(json);
-				console.log('check',json.ltd || 0);
-			
+			{			
 				if (typeof json == 'object' && json.fsn && u_type)
 				{
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
@@ -398,7 +395,6 @@ function donotifypopup(id,html)
 			}			
 			hide_notipop(id);			
 		}
-		console.log('click');		
 	});
 	setTimeout(hide_notipop,5000,id);
 }

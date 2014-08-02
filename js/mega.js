@@ -327,17 +327,21 @@ function MegaData ()
 			else
 			{
 				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+				delete M.rmCache;
 			}
 		}
+		var cache = /*u && M.rmCache ||*/ [], n_cache, n_cache_r = 1, files = cache.length, jsp;
+		M.rmCache = cache;
+
 		hideEmptyMsg();
 
-		var jsp = $('.file-block-scrolling').data('jsp');
+		jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		
-		var jsp = $('.contacts-blocks-scrolling').data('jsp');
+		jsp = $('.contacts-blocks-scrolling').data('jsp');
 		if (jsp) jsp.destroy();		
 
-		var jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
+		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		
 		
@@ -359,28 +363,28 @@ function MegaData ()
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
 		}
-
-		var files = 0, cache = [], n_cache;
-		if (this.viewmode == 1)
+		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
 		{
-			var r = Math.floor($('.fm-blocks-view').width() / 140);
-			n_cache = r*Math.ceil($('.fm-blocks-view').height()/164);
-			n_cache += n_cache%r;
-		}
-		else
-		{
-			n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
-		}
-		if (!n_cache)
-		{
-			this.cRenderMainN = this.cRenderMainN || 1;
-			if (++this.cRenderMainN < 4) return Soon(function()
+			if (this.viewmode == 1)
 			{
-				M.renderMain(u);
-			});
-			n_cache = 9e9;
+				var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+				n_cache = r*Math.ceil($('.fm-blocks-view.fm').height()/164);
+			}
+			else
+			{
+				n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
+			}
+			if (!n_cache)
+			{
+				this.cRenderMainN = this.cRenderMainN || 1;
+				if (++this.cRenderMainN < 4) return Soon(function()
+				{
+					M.renderMain(u);
+				});
+			}
 		}
 		delete this.cRenderMainN;
+
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
@@ -526,6 +530,7 @@ function MegaData ()
 						console.log('1a cache.push');
 						this.v[i].seen = false;
 						cache.push([i,html,this.v[i].name]);
+						cache[this.v[i].h] = [i,this.v[i].t];
 					}
 					else
 					{
@@ -534,47 +539,133 @@ function MegaData ()
 						$(t).append(html);
 					}
 				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
+				else
 				{
-					// 2. if there is a node before the new node in the current view, add it after that node:
-					console.log('2. if there is a node before the new node in the current view, add it after that node:');
-					$(t+' #'+this.v[i-1].h).after(html);
-				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
-				{
-					// 3. if there is a node after the new node in the current view, add it before that node:
-					console.log('3. if there is a node after the new node in the current view, add it before that node:');
-					$(t+' #'+this.v[i+1].h).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
-				{
-					// 4. new folder: insert new node before the first folder in the current view
-					console.log('4. new folder: insert new node before the first folder in the current view');
-					$($(t+' '+el)[0]).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
-				{
-					// 5. new file: insert new node before the first file in the current view
-					console.log('5. new file: insert new node before the first file in the current view');
-					var a = $(t+' '+el).not('.folder');
-					if (a.length > 0) $(a[0]).before(html);
-					else
+					var j;
+					files++;
+					if ($(t+' #'+this.v[i].h).length) continue;
+					if (cc && files > n_cache)
 					{
-						// 6. if this view does not have any files, insert after the last folder
-						console.log('6. if this view does not have any files, insert after the last folder');
-						a = $(t+' '+el);
-						$(a[a.length-1]).after(html);
+						// console.log('U. cache.push');
+						this.v[i].seen = false;
+						if (u && this.v[i-1] && cache[this.v[i-1]])
+						{
+							console.log('2b caching after');
+							j = cache[this.v[i-1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									cache.splice(x,0,[i,html,this.v[i].name]);
+									cache[this.v[i].h] = [i,this.v[i].t];
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..2b');
+						}
+						else if (u && this.v[i+1] && cache[this.v[i+1]])
+						{
+							console.log('3b caching before');
+							j = cache[this.v[i+1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									ASSERT(x>0,'3b');
+									cache.splice(x-1,0,[i,html,this.v[i].name]);
+									cache[this.v[i].h] = [i,this.v[i].t];
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..3b');
+						}
+						else if (this.v[i].t)
+						{
+							// 4. new folder: insert new node before the first folder in the current view
+							console.log('4u. new folder: insert new node before the first folder in the current view');
+							// $($(t+' '+el)[0]).before(html);
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								j = cache[x][0];
+								ASSERT(cache[this.v[j].h][0] === j, '4u. inconsistent..');
+								if (cache[this.v[j].h][1]) break;
+							}
+							
+							j = [i,html,this.v[i].name];
+							if (x != m)
+							{
+								cache.splice(x-1,0,j);
+							}
+							else
+							{
+								console.log('4u. no folders in cache');
+								cache.unshift(j);
+							}
+							
+							cache[this.v[i].h] = [i,this.v[i].t];
+						}
+						else
+						{
+							console.log('5u. new file: insert new node before the first file in the current view');
+							for (var p=0,x = 0, m = cache.length ; x < m ; ++x)
+							{
+								j = cache[x][0];
+								ASSERT(cache[this.v[j].h][0] === j, '5u. inconsistent..');
+								if (!cache[this.v[j].h][1]) p=x;
+							}
+							
+							j = [i,html,this.v[i].name];
+							if (p)
+							{
+								cache.splice(p,0,j);
+							}
+							else
+							{
+								console.log('6u. if this view does not have any files, insert after the last folder');
+								cache.push(j);
+							}
+							
+							cache[this.v[i].h] = [i,this.v[i].t];
+						}
+						continue;
+					}
+					
+					if (u && this.v[i-1] && $(t+' #'+this.v[i-1].h).length)
+					{
+						// 2. if there is a node before the new node in the current view, add it after that node:
+						console.log('2. if there is a node before the new node in the current view, add it after that node:');
+						$(t+' #'+this.v[i-1].h).after(html);
+					}
+					else if (u && this.v[i+1] && $(t+' #'+this.v[i+1].h).length)
+					{
+						// 3. if there is a node after the new node in the current view, add it before that node:
+						console.log('3. if there is a node after the new node in the current view, add it before that node:');
+						$(t+' #'+this.v[i+1].h).before(html);
+					}
+					else if (this.v[i].t)
+					{
+						// 4. new folder: insert new node before the first folder in the current view
+						console.log('4. new folder: insert new node before the first folder in the current view');
+						$($(t+' '+el)[0]).before(html);
+					}
+					else // !this.v[i].t)
+					{
+						// 5. new file: insert new node before the first file in the current view
+						console.log('5. new file: insert new node before the first file in the current view');
+						var a = $(t+' '+el).not('.folder');
+						if (a.length > 0) $(a[0]).before(html);
+						else
+						{
+							// 6. if this view does not have any files, insert after the last folder
+							console.log('6. if this view does not have any files, insert after the last folder');
+							a = $(t+' '+el);
+							$(a[a.length-1]).after(html);
+						}
 					}
 				}
 			}
-		}
-		
-		
-		
-		if (this.viewmode == 1 && this.v.length > 0)
-		{
-			$(t).find('div.clear').remove();
-			$(t).append('<div class="clear"></div>');
 		}
 
 		sharedfolderUI();
@@ -583,21 +674,46 @@ function MegaData ()
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
-			if (cache.length)
-			{
-				loadingDialog.show();
-				flush_cached_nodes();
-				loadingDialog.hide();
-			}
+			if (cache.length) flush_cached_nodes();
 		});
-		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+		
+		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y');
+		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
-			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
+			$(lSel).bind('jsp-scroll-y', function(ev, pos, top, bot)
 			{
-				if (bot) flush_cached_nodes(n_cache / 2);
+				if (bot) flush_cached_nodes(n_cache);
+			});
+			
+			$(window).bind("resize.dynlist", function()
+			{
+				if (cache.length)
+				{
+					if (!$(lSel).find('.jspDrag:visible').length)
+					{
+						var n;
+						
+						if (M.viewmode == 1)
+						{
+							var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+							n = r*Math.ceil($('.fm-blocks-view').height()/164) - $('.fm-blocks-view.fm a').length;
+						}
+						else
+						{
+							n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
+						}
+						
+						if (n > 0) flush_cached_nodes(n);
+					}
+				}
+				else
+				{
+					$(window).unbind("resize.dynlist");
+				}
 			});
 		}
 
@@ -613,6 +729,12 @@ function MegaData ()
 	{
 		if (this.viewmode == 1)
 		{
+			if (this.v.length > 0)
+			{
+				var o = $('.fm-blocks-view.fm .file-block-scrolling');
+				o.find('div.clear').remove();
+				o.append('<div class="clear"></div>');
+			}
 			iconUI();
 			fm_thumbnails();
 		}

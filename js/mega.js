@@ -761,7 +761,7 @@ function MegaData ()
 				if (bot) flush_cached_nodes(n_cache);
 			});
 			
-			$(window).bind("resize.dynlist", function()
+			function __dlOnResize()
 			{
 				if (cache.length)
 				{
@@ -786,6 +786,10 @@ function MegaData ()
 				{
 					$(window).unbind("resize.dynlist");
 				}
+			}
+			$(window).bind("resize.dynlist", function()
+			{
+				Soon(__dlOnResize);
 			});
 		}
 

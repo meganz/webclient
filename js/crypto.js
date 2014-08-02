@@ -2306,7 +2306,7 @@ function crypto_processkey(me,master_aes,file)
 				
 				if (file.hash)
 				{				
-					var h = base64urldecode('9HKWk0WYLhgOqQGbKD87pgTcoZ5S');
+					var h = base64urldecode(file.hash);
 					var t = 0;
 					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
 					file.mtime=t;

@@ -287,7 +287,7 @@ TransferQueue.prototype.pause = function(gid)
 		}
 		this._qpaused[gid] = this.slurp(gid);
 		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text(' (paused)');
-		// TODO: move that $() somewhere else and set other columns
+		GlobalProgress[gid].speed = 0; // reset speed
 	}
 };
 
@@ -304,7 +304,6 @@ TransferQueue.prototype.resume = function(gid)
 		delete GlobalProgress[gid].paused;
 		if (this.isEmpty()) this.dispatch(gid);
 		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text('');
-		// TODO: $() stuff
 	}
 };
 

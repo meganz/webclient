@@ -1229,9 +1229,13 @@ function topmenuUI()
 	$('.top-search-input').unbind('keyup');
 	$('.top-search-input').bind('keyup',function(e) 
 	{
-		if (e.keyCode == 13 && ($('.top-search-input').val().length > 2 || !asciionly($('.top-search-input').val())))
+		if (e.keyCode == 13)
 		{
-			document.location.hash = 'fm/search/' + $('.top-search-input').val();
+			if ($('.top-search-input').val().length > 2 || !asciionly($('.top-search-input').val())) document.location.hash = 'fm/search/' + $('.top-search-input').val();
+			else msgDialog('warninga','More characters required','Your search query has to contain at least 3 characters.',false,function()
+			{
+				$('.top-search-input').focus();
+			});
 		}
     });
 	

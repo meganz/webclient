@@ -215,7 +215,6 @@ function MegaData ()
 
 	this.doSort = function(n,d)
 	{
-		console.log('doSort',n,d);
 		$('.grid-table-header .arrow').removeClass('asc desc');
 		if (d > 0) $('.arrow.'+n).addClass('desc');
 		else $('.arrow.'+n).addClass('asc');
@@ -596,17 +595,14 @@ function MegaData ()
 				if (!u || $(t + ' '+el).length == 0)
 				{
 					// 1. if the current view does not have any nodes, just append it
-					console.log('1. if the current view does not have any nodes, just append it');
 					if (cc && ++files > n_cache)
 					{
-						console.log('1a cache.push');
 						this.v[i].seen = false;
 						cache.push([i,html,this.v[i].name]);
 						cache[this.v[i].h] = [i,this.v[i].t];
 					}
 					else
 					{
-						console.log('1b append');
 						this.v[i].seen = true;
 						$(t).append(html);
 					}
@@ -622,7 +618,6 @@ function MegaData ()
 						this.v[i].seen = false;
 						if (u && this.v[i-1] && cache[this.v[i-1]])
 						{
-							console.log('2b caching after');
 							j = cache[this.v[i-1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
 							{
@@ -638,7 +633,6 @@ function MegaData ()
 						}
 						else if (u && this.v[i+1] && cache[this.v[i+1]])
 						{
-							console.log('3b caching before');
 							j = cache[this.v[i+1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
 							{
@@ -656,7 +650,6 @@ function MegaData ()
 						else if (this.v[i].t)
 						{
 							// 4. new folder: insert new node before the first folder in the current view
-							console.log('4u. new folder: insert new node before the first folder in the current view');
 							// $($(t+' '+el)[0]).before(html);
 							for (var x = 0, m = cache.length ; x < m ; ++x)
 							{
@@ -672,7 +665,6 @@ function MegaData ()
 							}
 							else
 							{
-								console.log('4u. no folders in cache');
 								cache.unshift(j);
 							}
 							
@@ -680,7 +672,6 @@ function MegaData ()
 						}
 						else
 						{
-							console.log('5u. new file: insert new node before the first file in the current view');
 							for (var p=0,x = 0, m = cache.length ; x < m ; ++x)
 							{
 								j = cache[x][0];
@@ -695,7 +686,6 @@ function MegaData ()
 							}
 							else
 							{
-								console.log('6u. if this view does not have any files, insert after the last folder');
 								cache.push(j);
 							}
 							
@@ -707,31 +697,26 @@ function MegaData ()
 					if (u && this.v[i-1] && $(t+' #'+this.v[i-1].h).length)
 					{
 						// 2. if there is a node before the new node in the current view, add it after that node:
-						console.log('2. if there is a node before the new node in the current view, add it after that node:');
 						$(t+' #'+this.v[i-1].h).after(html);
 					}
 					else if (u && this.v[i+1] && $(t+' #'+this.v[i+1].h).length)
 					{
 						// 3. if there is a node after the new node in the current view, add it before that node:
-						console.log('3. if there is a node after the new node in the current view, add it before that node:');
 						$(t+' #'+this.v[i+1].h).before(html);
 					}
 					else if (this.v[i].t)
 					{
 						// 4. new folder: insert new node before the first folder in the current view
-						console.log('4. new folder: insert new node before the first folder in the current view');
 						$($(t+' '+el)[0]).before(html);
 					}
 					else // !this.v[i].t)
 					{
 						// 5. new file: insert new node before the first file in the current view
-						console.log('5. new file: insert new node before the first file in the current view');
 						var a = $(t+' '+el).not('.folder');
 						if (a.length > 0) $(a[0]).before(html);
 						else
 						{
 							// 6. if this view does not have any files, insert after the last folder
-							console.log('6. if this view does not have any files, insert after the last folder');
 							a = $(t+' '+el);
 							$(a[a.length-1]).after(html);
 						}

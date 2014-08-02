@@ -2215,6 +2215,8 @@ function MegaData ()
 		Soon(fmUpdateCount);
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
+			$('.transfer-panel-empty-txt').removeClass('hidden');
+			$('.transfer-table-header').hide(0);
 			$.transferClose();
 			$('.transfer-clear-all-icon').addClass('hidden');
 			resetUploadDownload();

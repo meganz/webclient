@@ -1473,7 +1473,7 @@ function MegaData ()
 			if (M.d[h] && M.d[h].p)
 			{
 				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
-				// Update M.v it's used for slideshot preview at least
+				// Update M.v it's used for slideshow preview at least
 				for (var k in M.v)
 				{
 					if (M.v[k].h === h)

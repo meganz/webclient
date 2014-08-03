@@ -323,6 +323,7 @@ function initUI()
 	InitFileDrag();
 	createfolderUI();
 	cSortMenuUI();
+	initContextSubmenus();
 	initContextUI();
 	transferPanelUI();
 	UIkeyevents();
@@ -864,6 +865,77 @@ function fmremove()
 	}
 }
 
+function initContextSubmenus()
+{
+	var icon = '<span class="context-menu-icon"></span>';
+	// divider & advanced submenu
+	var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+	
+	var cs = function(id)
+	{
+		var t = (typeof id  !== 'undefined') ? 'id="pfld_' + id + '"' : '';
+		return '<span class="context-submenu" ' + t + '>';
+	};
+	
+	var fi = function(id, name)
+		{
+			var a = $.isParent(id);
+			var t = a ? ' contains-submenu' : '' ;
+			return '<span class="context-menu-item folder-item ' + t + '" id="fld_' + id + '">' + icon + name;
+		};
+
+	$.isParent = function(id)
+	{
+		for (var i in M.d)
+		{
+			if (M.d.i.p === id) return true;
+		}
+		
+		return false;
+	};
+	
+	$.tmp = function(obj, prev)
+	{
+		var a = prev;
+		var r = {};
+		if (typeof a === 'undefined') a = M.RootID;
+		
+		r.a = {'o': false};
+		for (var i in obj)
+		{
+			r.a = {i: {'o': false}};
+		}
+	};
+			
+	$.createSubmenuStructure = function()
+	{
+		for (var i in M.c)
+		{
+			
+		}
+	};
+	
+	var html = cs('move');// context submenu move
+	
+	var sm = false;// submenu
+	
+	createSubmenuStructure();
+	sm = isParent(M.RootID);
+	
+	html += fi(M.RootID, 'Cloud Drive', sm);
+	html += fi(M.RubbishID, 'Rubbish Bin', false) + '</span>';
+	
+	html += adv;
+	html += '</span>';// end of context submenu move
+	
+//	var parser = new DOMParser();
+//	var embed = parser.parseFromString(html, "text/html");
+	
+	$('.context-menu-item.move-item').after(html);
+	
+	$('#' + M.RootId).after(fi(M.RubbishID, 'Rubbish Bin', false));
+
+}
 function initContextUI()
 {
 	var c = '.context-menu-item';
@@ -873,10 +945,9 @@ function initContextUI()
 	{
 		var pos = getHtmlElemPos(this);
 		var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
-		var n = $(this).next('.context-submenu');
-		n
-				.css({'top': c.top})
-				.addClass('active');
+		$(this).next('.context-submenu')
+			.css({'top': c.top})
+			.addClass('active');
 		
 		$(this).addClass('opened');
 	});

@@ -2688,6 +2688,17 @@ function u_ed25519() {
 var pubEd25519 = {};
 
 
+/**
+ * Cached Ed25519 public key retrieval utility.
+ * 
+ * @param userhandle {string}
+ *     Mega user handle.
+ * @param callback {function}
+ *     Callback function to call upon completion of operation. The callback
+ *     requires two parameters: `value` (the retrieved public key as a binary
+ *     string) and `user` (the user handle for the returned key). `value` will
+ *     be `false` upon a failed request.
+ */
 function getPubEd25519(userhandle, callback) {
 	if (pubEd25519[userhandle]) {
 	    callback(pubEd25519[userhandle], userhandle);
@@ -2709,6 +2720,58 @@ function getPubEd25519(userhandle, callback) {
 	    getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
 
 	}	
+}
+
+
+/**
+ * Computes a user's Ed25519 key finger print. This function uses the
+ * `pubEd25519` object for caching.
+ * 
+ * @param userhandle {string}
+ *     Mega user handle.
+ * @param callback {function}
+ *     Callback function to call upon completion of operation. The callback
+ *     requires two parameters: `value` (the computed fingerprint as a hex
+ *     string) and `user` (the user handle for the returned key). `value` will
+ *     be `false` upon a failed request.
+ * @param format {string}
+ *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
+ *     "string" and "base64" (default: "hex").
+ */
+function getFingerprint(userhandle, callback, format) {
+    format = format || "hex";
+    var _fingerprint = function(value) {
+        if (format === "bytes") {
+            return asmCrypto.SHA1.bytes(value);
+        } else if (format === "string") {
+            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
+        } else if (format === "hex") {
+            return asmCrypto.SHA1.hex(value);
+        } else if (format === "base64") {
+            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value)));
+        }
+    };
+    
+    if (pubEd25519[userhandle]) {
+        callback(_fingerprint(pubEd25519[userhandle]), userhandle);
+    } else {
+        var myCallback = function(res, ctx) {
+            if (typeof res !== 'number') {
+                res = base64urldecode(res);
+                pubEd25519[ctx.u] = res;
+                if (ctx.callback3) {
+                    ctx.callback3(_fingerprint(res), ctx.u);
+                }
+            } else if (ctx.callback3) {
+                ctx.callback3(false, ctx.u);
+            }
+        };
+        var myCtx = {
+            u: userhandle,
+            callback3: callback,
+        };
+        getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
+    }   
 }
 
 var pubkeysCache = null;

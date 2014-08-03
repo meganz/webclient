@@ -2822,6 +2822,7 @@ function UIkeyevents()
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
 	{
+		if (e.keyCode == 9) return false;
 
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');

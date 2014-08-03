@@ -74,6 +74,16 @@ describe("crypto unit test", function() {
                 callback(base64urlencode('foo'), theCtx);
                 assert.deepEqual(pubEd25519, {'me': 'foo'});
                 sinon.assert.calledOnce(myCallback);
+                assert.strictEqual(myCallback.args[0][0], 'foo');
+            });
+    
+            it("internal callback, custom callback, cached value", function() {
+                pubEd25519['me'] = 'foo';
+                var myCallback = sinon.spy();
+                getPubEd25519('me', myCallback);
+                assert.deepEqual(pubEd25519, {'me': 'foo'});
+                sinon.assert.calledOnce(myCallback);
+                assert.strictEqual(myCallback.args[0][0], 'foo');
             });
         });
     });

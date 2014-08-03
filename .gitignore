@@ -212,12 +212,27 @@ pip-log.txt
 .tox
 js/tests/coverage
 
-#Translations
+
+#############
+## JavaScript machinery
+#############
+
+node_modules/
+coverage/
+doc/
+
+
+#############
+## Miscellaneous
+#############
+
+# Translations
 *.mo
 
-#Mr Developer
+# Mr Developer
 .mr.developer.cfg
 
+<<<<<<< HEAD
 # JS Docs
 js/docs/
 
@@ -227,3 +242,5 @@ js/docs/
 #############
 
 js/tests/node_modules/
+=======
+>>>>>>> master

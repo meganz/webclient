@@ -143,6 +143,75 @@ function MegaData ()
 		this.sortd=d;
 		this.sort();
 	};
+	
+	this.sortByOwner = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var usera = M.d[a.p], userb = M.d[b.p];			
+			if (typeof usera.name == 'string' && typeof userb.name == 'string') return usera.name.localeCompare(userb.name)*d;
+			else return -1;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByAccess = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{			
+			if (typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && a.r < b.r) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.getSortStatus = function(u)
+	{
+		var status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+		if (status == 'chat') return 1;
+		else if (status == 'dnd') return 2;
+		else if (status == 'away') return 3;
+		else return 4;
+	};
+	
+	
+	this.sortByStatus = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var statusa = M.getSortStatus(a.u),statusb = M.getSortStatus(b.u);			
+			if (statusa < statusb) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByInteraction = function(d)
+	{
+		this.i_cache = {};		
+		this.sortfn = function(a,b,d)
+		{
+			if (!M.i_cache[a.u])
+			{				
+				var cs = M.contactstatus(a.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[a.u] = cs.ts;
+			}
+			if (!M.i_cache[b.u])
+			{	
+				var cs = M.contactstatus(b.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[b.u] = cs.ts;
+			}
+			if (M.i_cache[b.u] < M.i_cache[a.u]) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
 
 	this.doSort = function(n,d)
 	{
@@ -152,7 +221,11 @@ function MegaData ()
 		if (n == 'name') M.sortByName(d);
 		else if (n == 'size') M.sortBySize(d);
 		else if (n == 'type') M.sortByType(d);
-		else if (n == 'date') M.sortByDateTime(d);
+		else if (n == 'date') M.sortByDateTime(d);		
+		else if (n == 'owner') M.sortByOwner(d);
+		else if (n == 'access') M.sortByAccess(d);
+		else if (n == 'interaction') M.sortByInteraction(d);
+		else if (n == 'status') M.sortByStatus(d);
 		if (fmconfig.uisorting) storefmconfig('sorting',{n:n,d:d});
 		else fmsortmode(M.currentdirid,n,d);
 	};
@@ -287,8 +360,6 @@ function MegaData ()
 
 	this.onlineStatusEvent = function(u,status)
 	{
-		console.log('onlineStatusEvent',u,status);
-
 		if (u)
 		{
 			var e = $('.ustatus.' + u.u);
@@ -329,17 +400,21 @@ function MegaData ()
 			else
 			{
 				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+				delete M.rmCache;
 			}
 		}
+		var cache = /*u && M.rmCache ||*/ [], n_cache, n_cache_r = 1, files = cache.length, jsp;
+		M.rmCache = cache;
+
 		hideEmptyMsg();
 
-		var jsp = $('.file-block-scrolling').data('jsp');
+		jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		
-		var jsp = $('.contacts-blocks-scrolling').data('jsp');
+		jsp = $('.contacts-blocks-scrolling').data('jsp');
 		if (jsp) jsp.destroy();		
 
-		var jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
+		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
 		
 		
@@ -359,44 +434,45 @@ function MegaData ()
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
 		}
-
-		var files = 0, cache = [], n_cache;
-		if (this.viewmode == 1)
+		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
 		{
-			var r = Math.floor($('.fm-blocks-view').width() / 140);
-			n_cache = r*Math.ceil($('.fm-blocks-view').height()/164);
-			n_cache += n_cache%r;
-		}
-		else
-		{
-			n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
-		}
-		if (!n_cache)
-		{
-			this.cRenderMainN = this.cRenderMainN || 1;
-			if (++this.cRenderMainN < 4) return Soon(function()
+			if (this.viewmode == 1)
 			{
-				M.renderMain(u);
-			});
-			n_cache = 9e9;
+				var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+				n_cache = r*Math.ceil($('.fm-blocks-view.fm').height()/164)+r;
+			}
+			else
+			{
+				n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
+			}
+			if (!n_cache)
+			{
+				this.cRenderMainN = this.cRenderMainN || 1;
+				if (++this.cRenderMainN < 4) return Soon(function()
+				{
+					M.renderMain(u);
+				});
+			}
 		}
 		delete this.cRenderMainN;
+
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
 			{
 				var s='';
-				var t = '';
+				var ftype = '';
 				var c = '';
 				if (this.v[i].t)
 				{
-					t = l[1049];
+					ftype = l[1049];
 					c = ' folder';
 				}
 				else
 				{
-					t = filetype(this.v[i].name);
+					ftype = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
 				var html,t,el,cc,star='';
@@ -454,9 +530,7 @@ function MegaData ()
 						rights = 'Full access';
 						rightsclass = ' full-access';
 					}
-
 					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-
 					if (this.viewmode == 1)
 					{
 						t = '.shared-blocks-scrolling';
@@ -498,73 +572,124 @@ function MegaData ()
 						t = '.contacts-details-block .grid-table.shared-with-me';
 						el='tr';					
 						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="270"><div class="shared-folder-access ' + rightsclass + '">' + rights + '</div></td></tr>';
-					}					
+					}
 				}
 				else
 				{
 					if (this.viewmode == 1)
 					{
-						t = '.file-block-scrolling';
+						t = '.fm-blocks-view.fm .file-block-scrolling';
 						el = 'a';
 						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
-						cc=i;
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
-						cc=i;
+						el = 'tr';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
+					}
+					if (!(this.v[i].seen = n_cache > files++))
+					{
+						cache[this.v[i].h] = [i,this.v[i].t];
+						cc = [i,html,this.v[i].name,this.v[i].t];
 					}
 				}
 
 				if (!u || $(t + ' '+el).length == 0)
 				{
-					// if the current view does not have any nodes, just append it
-					if (cc && ++files > n_cache)
+					// 1. if the current view does not have any nodes, just append it
+					if (cc)
 					{
-						this.v[i].seen = false;
-						cache.push([i,html,this.v[i].name]);
+						cache.push(cc);
 					}
 					else
 					{
-						this.v[i].seen = true;
 						$(t).append(html);
 					}
 				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
+				else
 				{
-					// if there is a node before the new node in the current view, add it after that node:
-					$(t+' #'+this.v[i-1].h).after(html);
-				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
-				{
-					// if there is a node after the new node in the current view, add it before that node:
-					$(t+' #'+this.v[i+1].h).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
-				{
-					// new folder: insert new node before the first folder in the current view
-					$($(t+' '+el)[0]).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
-				{
-					// new file: insert new node before the first file in the current view
-					var a = $(t+' '+el).not('.folder');
-					if (a.length > 0) $(a[0]).before(html);
-					else
+					var j;
+					if ($(t+' #'+this.v[i].h).length)
 					{
-						// if this view does not have any files, insert after the last folder
-						a = $(t+' '+el);
-						$(a[a.length-1]).after(html);
+						this.v[i].seen = true;
+						continue;
+					}
+					
+					if (cc)
+					{
+						// console.log(this.v[i].name,cache.map(n=>n[2]));
+						
+						if (u && this.v[i-1] && cache[this.v[i-1]])
+						{
+							j = cache[this.v[i-1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									cache.splice(x,0,cc);
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..2b');
+						}
+						else if (u && this.v[i+1] && cache[this.v[i+1]]) // XXX?
+						{
+							j = cache[this.v[i+1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									ASSERT(x>0,'3b');
+									cache.splice(x-1,0,cc);
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..3b');
+						}
+						else if (this.v[i].t)
+						{
+							for (var x = 0, m = cache.length ; x < m && cache[x][3] ; ++x);
+							cache.splice(x,0,cc);
+						}
+						else
+						{
+							cache.push(cc);
+						}
+						continue;
+					}
+					
+					if (u && this.v[i-1] && $(t+' #'+this.v[i-1].h).length)
+					{
+						// 2. if there is a node before the new node in the current view, add it after that node:
+						$(t+' #'+this.v[i-1].h).after(html);
+					}
+					else if (u && this.v[i+1] && $(t+' #'+this.v[i+1].h).length)
+					{
+						// 3. if there is a node after the new node in the current view, add it before that node:
+						$(t+' #'+this.v[i+1].h).before(html);
+					}
+					else if (this.v[i].t)
+					{
+						// 4. new folder: insert new node before the first folder in the current view
+						$($(t+' '+el)[0]).before(html);
+					}
+					else // !this.v[i].t)
+					{
+						// 5. new file: insert new node before the first file in the current view
+						var a = $(t+' '+el).not('.folder');
+						if (a.length > 0) $(a[0]).before(html);
+						else
+						{
+							// 6. if this view does not have any files, insert after the last folder
+							a = $(t+' '+el);
+							$(a[a.length-1]).after(html);
+						}
 					}
 				}
 			}
-		}		
-		
-		if (this.viewmode == 1)
-		{
-			$(t).find('div.clear').remove();
-			$(t).append('<div class="clear"></div>');
 		}
 
 		sharedfolderUI();
@@ -573,27 +698,51 @@ function MegaData ()
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
-			if (cache.length)
-			{
-				loadingDialog.show();
-				flush_cached_nodes();
-				loadingDialog.hide();
-			}
+			if (cache.length) flush_cached_nodes();
 		});
-		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+		
+		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y');
+		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
-			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
+			$(lSel).bind('jsp-scroll-y', function(ev, pos, top, bot)
 			{
-				if (bot) flush_cached_nodes(n_cache / 2);
+				if (bot) flush_cached_nodes(n_cache);
 			});
+			
+			$(window).bind("resize.dynlist", SoonFc(function()
+			{
+				if (cache.length)
+				{
+					if (!$(lSel).find('.jspDrag:visible').length)
+					{
+						var n;
+						
+						if (M.viewmode == 1)
+						{
+							var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+							n = r*Math.ceil($('.fm-blocks-view').height()/164) - $('.fm-blocks-view.fm a').length;
+						}
+						else
+						{
+							n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
+						}
+						
+						if (n > 0) flush_cached_nodes(n);
+					}
+				}
+				else
+				{
+					$(window).unbind("resize.dynlist");
+				}
+			}));
 		}
 
 		if (this.viewmode == 1)
 		{
-			//$('.file-block-scrolling').append('<div class="clear"></div>');
 			fa_duplicates = {};
 		}
 
@@ -604,6 +753,12 @@ function MegaData ()
 	{
 		if (this.viewmode == 1)
 		{
+			if (this.v.length > 0)
+			{
+				var o = $('.fm-blocks-view.fm .file-block-scrolling');
+				o.find('div.clear').remove();
+				o.append('<div class="clear"></div>');
+			}
 			iconUI();
 			fm_thumbnails();
 		}
@@ -1108,7 +1263,7 @@ function MegaData ()
 			}
 			else if (a2[i] == this.RubbishID)
 			{
-				typeclass = 'recycle-bin';
+				typeclass = 'rubbish-bin';
 				name = l[167];
 			}
 			else if (a2[i] == 'messages' || a2[i] == M.InboxID)
@@ -1920,7 +2075,6 @@ function MegaData ()
 			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
 			if (li.length == 0)
 			{
-				downloading = true;
 				dl_queue.push(
 				{
 					id: n.h,
@@ -1946,15 +2100,14 @@ function MegaData ()
 				}
 
 				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'">'
-					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
 					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
 					+ '</tr>');
-					fmUpdateCount();
 			}
 		}
 
@@ -1966,14 +2119,13 @@ function MegaData ()
 		}
 		if (z)
 		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
-			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td><span class="row-number">1</span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
+			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
 			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
-		fmUpdateCount();
 
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
@@ -1985,6 +2137,8 @@ function MegaData ()
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
+			Soon(fmUpdateCount);
+			downloading = !!dl_queue.length;
 		}
 
 		delete $.dlhash;
@@ -2005,6 +2159,7 @@ function MegaData ()
 					if (!st) st = dl_queue[i].st;
 					ts+=dl_queue[i].size;
 					if (dl_queue[i].complete) tl+=dl_queue[i].size;
+					// TODO: check this for suitable GP use
 				}
 			}
 			bt = ts;
@@ -2038,7 +2193,7 @@ function MegaData ()
 		if (bt)
 		{
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
-			$.transferprogress[id] = [bl,bt];
+			$.transferprogress[id] = [bl,bt,bps];
 			if (!uldl_hold)
 			{
 				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
@@ -2049,7 +2204,7 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' td:eq(0) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
+				$('.transfer-table #' + id + ' td:eq(2) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
 				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
 				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
 				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
@@ -2081,7 +2236,6 @@ function MegaData ()
 		else id = 'dl_' + id;
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #' + id + ' td:eq(3)').text('');
-		resetUploadDownload();
 
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
@@ -2125,6 +2279,7 @@ function MegaData ()
 		}
 
 		$.transferHeader();
+		Soon(resetUploadDownload);
 	}
 
 	this.dlbeforecomplete = function()
@@ -2206,6 +2361,8 @@ function MegaData ()
 		Soon(fmUpdateCount);
 
 		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
+			$('.transfer-panel-empty-txt').removeClass('hidden');
+			$('.transfer-table-header').hide(0);
 			$.transferClose();
 			$('.transfer-clear-all-icon').addClass('hidden');
 			resetUploadDownload();
@@ -2236,24 +2393,24 @@ function MegaData ()
 
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'">'
-					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td><span class="row-number">1</span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
 					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
-			ul_uploading = true;
 			ul_queue.push(f);
-			fmUpdateCount();
-
 		}
 		if (page == 'start') {
 			ulQueue.pause();
 			uldl_hold = false; /* this isn't a pause generated by the UI */
 		}
 		else openTransferpanel();
+
+		ul_uploading = !!ul_queue.length;
+		Soon(fmUpdateCount);
 	}
 
 	this.ulprogress = function(id, perc, bl, bt, bps)
@@ -2272,9 +2429,9 @@ function MegaData ()
 		if (bl && bt && !uldl_hold)
 		{
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
-			$.transferprogress['ul_' + id] = [bl,bt];
+			$.transferprogress['ul_' + id] = [bl,bt,bps];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
-			$('.transfer-table #ul_' + id + ' td:eq(0) .speed').text(
+			$('.transfer-table #ul_' + id + ' td:eq(2) .speed').text(
 				bps ? (' (' + bytesToSize(bps,1) +'/s' + ')' ) : ''
 			);
 			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));

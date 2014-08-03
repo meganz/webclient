@@ -2306,7 +2306,7 @@ function crypto_processkey(me,master_aes,file)
 				
 				if (file.hash)
 				{				
-					var h = base64urldecode('9HKWk0WYLhgOqQGbKD87pgTcoZ5S');
+					var h = base64urldecode(file.hash);
 					var t = 0;
 					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
 					file.mtime=t;
@@ -2662,72 +2662,116 @@ function crypto_share_rsa2aes()
 
 
 
+var u_keyring;
 var u_privEd25519;
 var u_pubEd25519;
 
-function u_ed25519()
-{
-	var keySeed, newKey = false;
-	if (!u_attr['prEd255'] && !u_privEd25519)
-	{
-	    keySeed = jodid25519.eddsa.generateKeySeed();
-		newKey = true;
-	}
-	else
-	{
-	    keySeed = a32_to_str(decrypt_key(u_k_aes, str_to_a32(u_attr['prEd255'])));
-	}
-	
-	u_privEd25519 = keySeed;
-	u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-	
-	if (newKey)
-	{
-		api_req({'a': 'up', 'prEd255': a32_to_base64(encrypt_key(u_k_aes, str_to_a32(keySeed)))});
-		api_req({'a': 'up', '+puEd255': base64urlencode(u_pubEd25519)});
-	}
+function u_ed25519() {
+	var myCallback = function(res, ctx) {
+	    if (typeof res !== 'number') {
+            u_keyring = res;
+        } else {
+            u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+            u_keyring = {prEd255 : u_privEd25519};
+            u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+            setUserAttribute('keyring', u_keyring, false);
+            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+        }
+        u_attr.keyring = u_keyring;
+        u_privEd25519 = u_keyring.prEd255;
+        u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+        u_attr.puEd255 = u_pubEd25519;
+	};
+    getUserAttribute(u_handle, 'keyring', false, myCallback);
 }
 
 var pubEd25519 = {};
 
-var pubEd25519Cache = null;
-function getPubEd25519(userhandle, callback)
-{
-    if(!pubEd25519Cache) {
-        pubEd25519Cache = new MegaKVStorage("pk25519", localStorage);
-    }
 
-	if (pubEd25519[userhandle])
-	{
+/**
+ * Cached Ed25519 public key retrieval utility.
+ * 
+ * @param userhandle {string}
+ *     Mega user handle.
+ * @param callback {function}
+ *     Callback function to call upon completion of operation. The callback
+ *     requires two parameters: `value` (the retrieved public key as a binary
+ *     string) and `user` (the user handle for the returned key). `value` will
+ *     be `false` upon a failed request.
+ */
+function getPubEd25519(userhandle, callback) {
+	if (pubEd25519[userhandle]) {
 	    callback(pubEd25519[userhandle], userhandle);
-	}
-    else if(pubEd25519Cache.hasItem(userhandle))
-    {
-        pubEd25519[userhandle] = pubEd25519Cache.getItem(userhandle);
-        callback(pubEd25519[userhandle], userhandle);
-    }
-	else
-	{
-		api_req({'a': 'uga', 'u': userhandle, 'ua': '+puEd255'},
-		{
-			u: userhandle,
-			callback2: callback,
-			callback: function(res, ctx)
-			{
-				if (typeof res !== 'number' && ctx.callback2)
-				{
+	} else {
+	    var myCallback = function(res, ctx) {
+	        if (typeof res !== 'number') {
+                pubEd25519[ctx.u] = base64urldecode(res);
+                if (ctx.callback3) {
+                    ctx.callback3(res, ctx.u);
+                }
+            } else if (ctx.callback3) {
+                ctx.callback3(false, ctx.u);
+            }
+	    };
+	    var myCtx = {
+	        u: userhandle,
+	        callback3: callback,
+	    };
+	    getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
 
-				    pubEd25519[ctx.u] = base64urldecode(res);
-                    pubEd25519Cache.setItem(ctx.u, pubEd25519[ctx.u], 24*60*60);
-					ctx.callback2(pubEd25519[ctx.u], ctx.u);
-				}
-				else if (ctx.callback2)
-				{
-				    ctx.callback2(false, ctx.u);
-				}
-			}
-		});
 	}	
+}
+
+
+/**
+ * Computes a user's Ed25519 key finger print. This function uses the
+ * `pubEd25519` object for caching.
+ * 
+ * @param userhandle {string}
+ *     Mega user handle.
+ * @param callback {function}
+ *     Callback function to call upon completion of operation. The callback
+ *     requires two parameters: `value` (the computed fingerprint as a hex
+ *     string) and `user` (the user handle for the returned key). `value` will
+ *     be `false` upon a failed request.
+ * @param format {string}
+ *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
+ *     "string" and "base64" (default: "hex").
+ */
+function getFingerprint(userhandle, callback, format) {
+    format = format || "hex";
+    var _fingerprint = function(value) {
+        if (format === "bytes") {
+            return asmCrypto.SHA1.bytes(value);
+        } else if (format === "string") {
+            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
+        } else if (format === "hex") {
+            return asmCrypto.SHA1.hex(value);
+        } else if (format === "base64") {
+            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value)));
+        }
+    };
+    
+    if (pubEd25519[userhandle]) {
+        callback(_fingerprint(pubEd25519[userhandle]), userhandle);
+    } else {
+        var myCallback = function(res, ctx) {
+            if (typeof res !== 'number') {
+                res = base64urldecode(res);
+                pubEd25519[ctx.u] = res;
+                if (ctx.callback3) {
+                    ctx.callback3(_fingerprint(res), ctx.u);
+                }
+            } else if (ctx.callback3) {
+                ctx.callback3(false, ctx.u);
+            }
+        };
+        var myCtx = {
+            u: userhandle,
+            callback3: callback,
+        };
+        getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
+    }   
 }
 
 var pubkeysCache = null;

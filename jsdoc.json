@@ -1,0 +1,32 @@
+{
+    "source": {
+    	"include": ["."],
+    	"exclude": ["test/", "node_modules/", "js/json.js",
+    				"fileapi.js",
+    	            "js/jquery.jscrollpane.min.js",
+    	            "js/jquery.mousewheel.js",
+    	            "js/jquery-ui.js",
+					"js/jquery-min-1.8.1.js",
+					"js/jquery.remove.js",
+    	            "js/ads/", "js/mads.js"],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "templates": {
+        "applicationName": "Mega Webclient",
+        "disqus": "",
+        "googleAnalytics": "",
+        "openGraph": {
+            "title": "Mega Webclient",
+            "type": "website",
+            "image": "",
+            "site_name": "",
+            "url": ""
+        },
+        "meta": {
+            "title": "Mega Webclient",
+            "description": "",
+            "keyword": ""
+        }
+    }
+}

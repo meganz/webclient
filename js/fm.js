@@ -149,14 +149,7 @@ function cacheselect()
 
 function hideEmptyMsg()
 {
-	$('.fm-empty-trashbin').addClass('hidden');
-	$('.fm-empty-contacts').addClass('hidden');
-	$('.fm-empty-search').addClass('hidden');
-	$('.fm-empty-cloud').addClass('hidden');
-	$('.fm-empty-messages').addClass('hidden');
-
-	$('.fm-empty-conversations').addClass('hidden');
-	$('.fm-empty-incoming').addClass('hidden');
+	$('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
 }
 
 function reselect(n)
@@ -710,7 +703,7 @@ function removeUInode(h)
 				$('.fm-empty-trashbin').removeClass('hidden');
 			}
 			break;
-		default:
+		case M.RootID:
 			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
 			$('#treeli_' + h).remove();// remove folder and subfolders
@@ -719,6 +712,17 @@ function removeUInode(h)
 				$('.files-grid-view').addClass('hidden');
 				$('.grid-table.fm tr').remove();
 				$('.fm-empty-cloud').removeClass('hidden');
+			}
+			break;
+		default:			
+			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			$('#' + h).remove();// remove item
+			$('#treeli_' + h).remove();// remove folder and subfolders
+			if (!hasItems)
+			{
+				$('.files-grid-view').addClass('hidden');
+				$('.grid-table.fm tr').remove();
+				$('.fm-empty-folder').removeClass('hidden');
 			}
             break;
 	}
@@ -1081,6 +1085,7 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			fm_tfsmove($(this).attr('id'), -1);
 		});
+		Soon(fmUpdateCount);
 	});
 
 	$(c+'.move-down').unbind('click');
@@ -1089,6 +1094,7 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			fm_tfsmove($(this).attr('id'), +1);
 		});
+		Soon(fmUpdateCount);
 	});
 
 	$(c+'.transfer-play').unbind('click');
@@ -1109,6 +1115,7 @@ function initContextUI()
 			fm_tfspause(id);
 			$('span.transfer-type', this).addClass('paused');
 		});
+		$('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
 	});
 
 	$(c+'.refresh-item').unbind('click');
@@ -1333,9 +1340,11 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{
 		$('.fm-clearbin-button').removeClass('hidden');
-		$('.files-grid-view.fm').addClass('rubbish-bin');
-	} else {
-		$('.files-grid-view.fm').removeClass('rubbish-bin');
+		$('.files-grid-view.fm,fm-blocks-view.fm').addClass('rubbish-bin');
+	} 
+	else 
+	{
+		$('.files-grid-view.fm,fm-blocks-view.fm').removeClass('rubbish-bin');
 	    if (RootbyId(M.currentdirid) == M.InboxID)
 	    {
 		   if (d) console.log('Inbox');
@@ -2375,6 +2384,10 @@ function gridUI()
 		else if (c && c.indexOf('size') > -1) M.doSort('size',d);
 		else if (c && c.indexOf('type') > -1) M.doSort('type',d);
 		else if (c && c.indexOf('date') > -1) M.doSort('date',d);
+		else if (c && c.indexOf('owner') > -1) M.doSort('owner',d);
+		else if (c && c.indexOf('access') > -1) M.doSort('access',d);
+		else if (c && c.indexOf('status') > -1) M.doSort('status',d);
+		else if (c && c.indexOf('interaction') > -1) M.doSort('interaction',d);
 		if (c) M.renderMain();
 	});
 
@@ -2870,6 +2883,7 @@ function UIkeyevents()
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
 	{
+		if (e.keyCode == 9) return false;
 
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
@@ -3348,7 +3362,7 @@ function iconUI()
 	}
 	else
 	{
-		$('.fm-blocks-view').removeClass('hidden');
+		$('.fm-blocks-view.fm').removeClass('hidden');		
 		initFileblocksScrolling();
 	}
 	$(window).unbind('resize.icon');
@@ -4065,7 +4079,7 @@ function sectionUIopen(id)
 	$('.fm-right-header').addClass('hidden');
 	
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
-	if ((id !== 'cloud-drive') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
+	if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
 		$('.files-grid-view.fm').addClass('hidden');
 		$('.fm-blocks-view.fm').addClass('hidden');

@@ -462,7 +462,7 @@ ClassFile.prototype.run = function(task_done) {
 				setTransferStatus( this.dl, e, true );
 			}
 		}
-		if (error) {
+		if (error && task_done) {
 			fetchingFile = 0;
 			Soon(task_done); /* release worker */
 			task_done = null;

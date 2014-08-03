@@ -1,5 +1,6 @@
 ﻿
 
+
 var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
@@ -439,6 +440,7 @@ else
 
         jsl.push({f:'js/megakvstorage.js', n: 'megakvstorage_js', j:1,w:5});
 
+		jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
 		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});

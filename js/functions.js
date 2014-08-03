@@ -76,6 +76,11 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 	setTimeout(callback, 0);
 };
 
+function SoonFc(func)
+{
+	return function __soonfc() { Soon(func)};
+}
+
 function jScrollFade(id)
 {
 
@@ -989,7 +994,7 @@ function setTransferStatus( dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
 	var m = 'This issue should be resolved ';
-	if ($.browser.chrome)
+	if (navigator.webkitGetUserMedia)
 	{
 		m += 'exiting from Incognito mode.';
 	}
@@ -1186,46 +1191,41 @@ function dcTracer(ctr) {
 function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}
-		, dl_s = 0, ul_s = 0
-		, fid
-		, zips = {}
+		, dl_s = 0, ul_s = 0, zips = {}
 	
 	for (var i in dl_queue)
 	{
-		var q = dl_queue[i];
-		fid = q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id;
-		var t = tp[fid]
+		var q = dl_queue[i], t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 		
 		if (t)
 		{
 			dl_r += t[0];
 			dl_t += t[1];
+			if (!q.zipid || !zips[q.zipid]) {
+				if (q.zipid) zips[q.zipid] = 1;
+				dl_s += t[2];
+			}
 		}
 		else
 		{
 			dl_t += q.size || 0;
 		}
-		if (!q.zipid || !zips[q.zipid]) {
-			dl_s += ((GlobalProgress[fid]||{}).speed || 0) * 1000
-			if (q.zipid) zips[q.zipid] = 1;
-		}
 	}
 	
 	for (var i in ul_queue)
 	{
-		fid = 'ul_' + ul_queue[i].id;
-		var t = tp[fid]
+		var t = tp['ul_' + ul_queue[i].id]
 		
 		if (t)
 		{
 			ul_r += t[0];
 			ul_t += t[1];
+			ul_s += t[2];
 		}
 		else
 		{
 			ul_t += ul_queue[i].size || 0;
 		}
-		ul_s += ((GlobalProgress[fid]||{}).speed || 0)
 	}
 	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
 	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }

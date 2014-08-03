@@ -568,7 +568,9 @@ FileUpload.prototype.run = function(done) {
 		return ulQueue.pushFirst(this);
 	}
 
-	file.started = true;
+	if (!GlobalProgress[this.gid].started) {
+		GlobalProgress[this.gid].started = true;
+	}
 
 	if (d) console.log(file.name, "starting upload", file.id)
 

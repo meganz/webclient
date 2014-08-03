@@ -175,12 +175,8 @@ MegaQueue.prototype.validateTask = function() {
 MegaQueue.prototype.getNextTask = function() {
 	var i, r, len = this._queue.length
 	for (i = 0; i < len; i++) {
-		if ((r = this.validateTask(this._queue[i][0]))) {
-			if (r < 0) return null;
-			var data = this._queue[i]
-			this._queue.splice(i, 1);
-			return data
-		}
+		if ((r = this.validateTask(this._queue[i][0])))
+			return r < 0 ? null : this._queue.splice(i, 1)[0];
 	}
 	return null;
 };
@@ -188,8 +184,10 @@ MegaQueue.prototype.getNextTask = function() {
 MegaQueue.prototype.process = function() {
 	var args;
 	if (this._paused) return;
-	clearTimeout(this._later);
-	delete this._later;
+	if (this._later) {
+		clearTimeout(this._later);
+		delete this._later;
+	}
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
@@ -220,6 +218,7 @@ MegaQueue.prototype.process = function() {
 		}
 		delete this._expanded;
 	}
+	if (!args && this.mull) this.mull();
 
 	return true;
 };
@@ -234,7 +233,7 @@ MegaQueue.prototype.destroy = function() {
 
 MegaQueue.prototype._process = function(ms) {
 	if (this._later) clearTimeout(this._later);
-	this._later = setTimeout(this.process.bind(this), ms || 190);
+	this._later = setTimeout(this.process.bind(this), ms || 300);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {
@@ -248,6 +247,14 @@ function TransferQueue() {
 }
 
 inherits(TransferQueue, MegaQueue);
+
+TransferQueue.prototype.mull = function(gid)
+{
+	if (this.isEmpty() && $.len(this._qpaused))
+	{
+		this.dispatch(Object.keys(this._qpaused).shift());
+	}
+};
 
 TransferQueue.prototype.dispatch = function(gid)
 {
@@ -306,4 +313,3 @@ TransferQueue.prototype.resume = function(gid)
 		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text('');
 	}
 };
-

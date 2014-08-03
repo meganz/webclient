@@ -1027,6 +1027,7 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			fm_tfsmove($(this).attr('id'), -1);
 		});
+		Soon(fmUpdateCount);
 	});
 
 	$(c+'.move-down').unbind('click');
@@ -1035,6 +1036,7 @@ function initContextUI()
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el) {
 			fm_tfsmove($(this).attr('id'), +1);
 		});
+		Soon(fmUpdateCount);
 	});
 
 	$(c+'.transfer-play').unbind('click');
@@ -1055,6 +1057,7 @@ function initContextUI()
 			fm_tfspause(id);
 			$('span.transfer-type', this).addClass('paused');
 		});
+		$('.tranfer-download-indicator,.transfer-upload-indicator').removeClass('active');
 	});
 
 	$(c+'.refresh-item').unbind('click');

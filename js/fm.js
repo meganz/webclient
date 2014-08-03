@@ -877,9 +877,9 @@ function initContextSubmenus()
 		return '<span class="context-submenu" ' + t + '>';
 	};
 	
-	var fi = function(id, name)
+	var fi = function(id, name, a)
 		{
-			var a = $.isParent(id);
+//			var a = $.isParent(id);
 			var t = a ? ' contains-submenu' : '' ;
 			return '<span class="context-menu-item folder-item ' + t + '" id="fld_' + id + '">' + icon + name;
 		};
@@ -903,37 +903,21 @@ function initContextSubmenus()
 		r.a = {'o': false};
 		for (var i in obj)
 		{
-			r.a = {i: {'o': false}};
+			if ((M.d.i.p === prev) && (M.d.i.t === 1)) r.a = {i: {'o': false}};
 		}
+		
+		return r.a;
 	};
 			
-	$.createSubmenuStructure = function()
-	{
-		for (var i in M.c)
-		{
-			
-		}
-	};
-	
 	var html = cs('move');// context submenu move
-	
-	var sm = false;// submenu
-	
-	createSubmenuStructure();
-	sm = isParent(M.RootID);
-	
-	html += fi(M.RootID, 'Cloud Drive', sm);
+	html += fi(M.RootID, 'Cloud Drive', true) + '</span>';
 	html += fi(M.RubbishID, 'Rubbish Bin', false) + '</span>';
-	
 	html += adv;
 	html += '</span>';// end of context submenu move
 	
-//	var parser = new DOMParser();
-//	var embed = parser.parseFromString(html, "text/html");
-	
 	$('.context-menu-item.move-item').after(html);
 	
-	$('#' + M.RootId).after(fi(M.RubbishID, 'Rubbish Bin', false));
+//	$('#' + M.RootId).after(fi(M.RubbishID, 'Rubbish Bin', false));
 
 }
 function initContextUI()

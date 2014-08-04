@@ -2693,7 +2693,8 @@ function getPubEd25519(userhandle, callback) {
 	} else {
 	    var myCallback = function(res, ctx) {
 	        if (typeof res !== 'number') {
-                pubEd25519[ctx.u] = base64urldecode(res);
+                res = base64urldecode(res);
+                pubEd25519[ctx.u] = res;
                 if (ctx.callback3) {
                     ctx.callback3(res, ctx.u);
                 }

@@ -1,7 +1,6 @@
 var newnodes;
 var fminitialized=false;
-var panelDomQueue = []
-	, DOM_TRANSFER_LIMIT = 15
+var panelDomQueue = {};
 
 if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
@@ -394,17 +393,28 @@ function MegaData ()
 				{
 					delete M.dynlistRt;
 					M.rmSetupUI();
+					
+					// var max = e[0][0];
+					// for (var i = 0 ; i < max ; ++i)
+					// {
+						// var n = M.v[i];
+						// if (n.seen && !$(t+' #'+n.h).visible())
+						// {
+							// n.seen = false;
+							// $('.file-block#' + n.h + ' img').attr('src','about:blank');
+						// }
+					// }
 				}, 750);
 				$(window).trigger('resize');
 			}
 			else
 			{
-				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
-				delete M.rmCache;
+				$(lSel).unbind('jsp-scroll-y.dynlist');
+				// delete M.rmCache;
 			}
 		}
-		var cache = /*u && M.rmCache ||*/ [], n_cache, n_cache_r = 1, files = cache.length, jsp;
-		M.rmCache = cache;
+		var cache = /*u && M.rmCache ||*/ [], n_cache, files = cache.length, jsp, t;
+		// M.rmCache = cache;
 
 		hideEmptyMsg();
 
@@ -475,7 +485,7 @@ function MegaData ()
 					ftype = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
-				var html,t,el,cc,star='';
+				var html,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
 
 				if (this.currentdirid == 'contacts')
@@ -702,13 +712,13 @@ function MegaData ()
 		});
 		
 		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
-		$(lSel).unbind('jsp-scroll-y');
+		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
-			$(lSel).bind('jsp-scroll-y', function(ev, pos, top, bot)
+			$(lSel).bind('jsp-scroll-y.dynlist', function(ev, pos, top, bot)
 			{
 				if (bot) flush_cached_nodes(n_cache);
 			});
@@ -2099,8 +2109,8 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'">'
-					+ '<td><span class="row-number">1</span></td>'
+				if (!z) this.addToTransferTable('<tr id="dl_'+htmlentities(n.h)+'">'
+					+ '<td><span class="row-number"></span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
 					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td></td>'
@@ -2117,9 +2127,8 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z)
-		$('.transfer-table').append('<tr id="zip_'+zipid+'">'
-			+ '<td><span class="row-number">1</span></td>'
+		if (z) this.addToTransferTable('<tr id="zip_'+zipid+'">'
+			+ '<td><span class="row-number"></span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
 			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td></td>'
@@ -2137,7 +2146,6 @@ function MegaData ()
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
-			Soon(fmUpdateCount);
 			downloading = !!dl_queue.length;
 		}
 
@@ -2349,36 +2357,116 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
-	$(document).on('remove', '.transfer-table tr', function() {
-		var toClean = 0
-		$.each(panelDomQueue, function(i, html) {
-			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
-				return false;
+	$(window).bind('resize.tfsdynlist', SoonFc(function()
+	{
+		function flush_cached_nodes(n)
+		{
+			n = Object.keys(panelDomQueue).slice(0, n);
+			
+			if (n.length)
+			{
+				for (var i in n)
+				{
+					i = n[i];
+					addToTransferTable(i, panelDomQueue[i], 1);
+					delete panelDomQueue[i];
+				}
+				
+				if (M._tfsDynlistR) clearTimeout(M._tfsDynlistR);
+				M._tfsDynlistR = setTimeout(function()
+				{
+					delete M._tfsDynlistR;
+					Soon(transferPanelUI);
+					Soon(fmUpdateCount);
+				}, 350);
+				$(window).trigger('resize');
 			}
-			$(html).appendTo('.transfer-table')
-			toClean++
-		});
-
-		panelDomQueue.splice(0, toClean);
-		Soon(fmUpdateCount);
-
-		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
-			$('.transfer-panel-empty-txt').removeClass('hidden');
-			$('.transfer-table-header').hide(0);
-			$.transferClose();
-			$('.transfer-clear-all-icon').addClass('hidden');
-			resetUploadDownload();
 		}
-	});
+		var $tst = $('.transfer-scrolling-table');
+		$tst.unbind('jsp-scroll-y.tfsdynlist');
 
-	this.addToTransferTable = function(elem) {
-		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
-			return panelDomQueue.push(elem);
+		if ($('#fmholder').hasClass('transfer-panel-opened'))
+		{
+			var T = M.getTransferTableLengths();
+			
+			if (d) console.log('resize.tfsdynlist', JSON.stringify(T));
+			
+			if (T.left > 0) flush_cached_nodes(T.left+1);
+			
+			T = T.size;
+			$tst.bind('jsp-scroll-y.tfsdynlist', function(ev, pos, top, bot)
+			{
+				if (bot) flush_cached_nodes(T);
+			});
 		}
-		$(elem).appendTo('.transfer-table');
-                // In some cases UI is not yet initialized, nor transferHeader()
-                $('.transfer-table-header').show(0);
+		$tst = undefined;
+	}));
+
+	this.getTransferTableLengths = function()
+	{
+		var size = Math.ceil($('.transfer-scrolling-table').height() / 24),
+			used = $('.transfer-table tr[id]').length;
+
+		return { size : size, used : used, left : size - used };
+	};
+	
+	function addToTransferTable(gid, elem, q)
+	{
+		var target = gid[0] === 'u'
+			? $('.transfer-table tr[id^="ul"] .transfer-status.queued:last')
+			: $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
+
+		if (target.length) target.closest('tr').after(elem);
+		else
+		{
+			if (gid[0] != 'u')
+			{
+				target = $('.transfer-table tr[id^="ul"] .transfer-status.queued:first');
+			}
+			
+			if (target.length) target.closest('tr').before(elem);
+			else $(elem).appendTo('.transfer-table');
+		}
+		if (!q) Soon(fmUpdateCount);
 	}
+	this.addToTransferTable = function(elem)
+	{
+		var T = this.getTransferTableLengths(),
+			gid = elem.match(/id="([^"]+)"/).pop();
+
+		if (d) console.log('Adding Transfer', gid, JSON.stringify(T));
+
+		if (T.left > 0)
+		{
+			addToTransferTable(gid, elem);
+			// In some cases UI is not yet initialized, nor transferHeader()
+			$('.transfer-table-header').show(0);
+		}
+		else
+		{
+			var fit;
+
+			if (gid[0] !== 'u')
+			{
+				var dl = $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
+				
+				if (dl.length)
+				{
+					// keep inserting downloads as long there are uploads
+					// dl = +dl.closest('tr').children(':first').text();
+					dl = dl.closest('tr').prevAll().length;
+					
+					if (dl && dl + 1 < T.used)
+					{
+						addToTransferTable(gid, elem);
+						fit = true;
+					}
+				}
+			}
+			
+			if (!fit) panelDomQueue[gid] = elem;
+		}
+	};
 
 	this.addUpload = function(u)
 	{
@@ -2395,7 +2483,7 @@ function MegaData ()
 
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'">'
-					+ '<td><span class="row-number">1</span></td>'
+					+ '<td><span class="row-number"></span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
 					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td></td>'
@@ -2412,7 +2500,6 @@ function MegaData ()
 		else openTransferpanel();
 
 		ul_uploading = !!ul_queue.length;
-		Soon(fmUpdateCount);
 	}
 
 	this.ulprogress = function(id, perc, bl, bt, bps)

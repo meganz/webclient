@@ -78,7 +78,15 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 
 function SoonFc(func)
 {
-	return function __soonfc() { Soon(func)};
+	return function __soonfc()
+	{
+		var self = this, args = arguments;
+		if (func.__sfc) clearTimeout(func.__sfc);
+		func.__sfc = setTimeout(function() {
+			delete func.__sfc;
+			func.apply(self, args);
+		}, 122);
+	};
 }
 
 function jScrollFade(id)

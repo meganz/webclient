@@ -179,34 +179,51 @@ MANDATORY
         <div class="nw-fm-left-tooltip">Conversations</div>
     </div>
     <!-- Please add "filled" classname if user have deleted items !-->
-    <div class="nw-fm-left-icon rubbish-bin"><div class="rubbish-bin-icon"></div><div class="nw-fm-left-tooltip">Conversations</div></div>
+    <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
 </div>
 
 <div class="fm-left-panel">
+
+<!--Sorting menu for each section. !-->
+<div class="nw-sorting-menu hidden">
+  <div class="context-menu-section">
+   <div class="sorting-menu-arrow"></div>
+   <div class="sorting-menu-item active">Name</div>
+   <div class="sorting-menu-item">Status</div>
+   <div class="sorting-menu-item">Last Interaction</div>
+   <div class="sorting-item-divider"></div>
+  </div>
+  <div class="context-menu-section">
+   <div class="sorting-menu-item active">Ascending</div>
+   <div class="sorting-menu-item">Descending</div>
+  </div>
+</div>
+
 <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
 <div class="fm-left-menu cloud-drive">
     <div class="nw-fm-tree-header cloud-drive">
-        Cloud Drive
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Cloud Drive" placeholder="Cloud Drive" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header shared-with-me">
-        Shared with me
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Shared with me" placeholder="Shared with me" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header contacts">
-        Contacts
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Contacts" placeholder="Contacts" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header conversations">
-        Conversations
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Conversations" placeholder="Conversations" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header rubbish-bin">
-        Rubbish bin
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Rubbish bin" placeholder="Rubbish bin" />
+        <div class="nw-fm-search-icon"></div>
     </div>
 </div>
 <div class="fm-tree-panel">
+
 <div class="nw-tree-panel-header">
        <span>My folders</span>
        <div class="nw-tree-panel-arrows"></div>

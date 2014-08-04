@@ -568,7 +568,9 @@ FileUpload.prototype.run = function(done) {
 		return ulQueue.pushFirst(this);
 	}
 
-	file.started = true;
+	if (!GlobalProgress[this.gid].started) {
+		GlobalProgress[this.gid].started = true;
+	}
 
 	if (d) console.log(file.name, "starting upload", file.id)
 
@@ -761,10 +763,19 @@ function resetUploadDownload() {
 		downloading = false;
 	}
 
-	if (dl_queue.length == 0 && ul_queue.length == 0) {
+	if (dl_queue.length == 0 && ul_queue.length == 0)
+	{
 		clearXhr(); /* destroy all xhr */
-		$.transferClose(); /* in case it isn't closed already.. */
+		
+		$('.transfer-panel-empty-txt').removeClass('hidden');
+		$('.transfer-table-header').hide(0);
+		
+		$.transferClose();
+		
+		$('.transfer-clear-all-icon').addClass('hidden');
+		panelDomQueue = {};
 	}
+	else Soon(fmUpdateCount);
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
 

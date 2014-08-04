@@ -70,6 +70,9 @@ body {
 	height: 100%;
 	min-width: 987px;
 }
+body.dragging div, body.dragging a, body.dragging span {
+   cursor: url(../images/mega/cursor.png), auto !important;
+}
 ::selection {
 	background: #d22000;
 	color: white;
@@ -2986,41 +2989,51 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-tree-item {
 	display: block;
 	background-color: rgba(217,0,7,0);
-	padding-right: 15px;
-	-webkit-transition: background-color 150ms ease-in-out;
-	-moz-transition: background-color 150ms ease-in-out;
-	-o-transition: background-color 150ms ease-in-out;
-	-ms-transition: background-color 150ms ease-in-out;
-	transition: background-color 150ms ease-in-out;
+	padding-right: 13px;
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	border-right: 2px solid rgba(0,0,0,0);
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
+	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.selected {
 	background-color: rgba(217,0,7,0.5);
+	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.dragover {
 	background-color: rgba(217,0,7,0.3);
+	border-right: 2px solid rgba(217,0,7,0.5);
 }
 .shared-with-me .nw-fm-tree-item:hover {
 	background-color: rgba(255,179,0,0.3);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.selected {
 	background-color: rgba(255,179,0,0.5);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.dragover {
 	background-color: rgba(255,179,0,0.4);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .rubbish-bin .nw-fm-tree-item:hover {
 	background-color: rgba(39,183,0,0.3);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
 	background-color: rgba(39,183,0,0.6);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.dragover {
 	background-color: rgba(39,183,0,0.4);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
@@ -3076,7 +3089,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -15px -7625px;
 }
 .nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
-	background-position: -15px -7535px;
+	background-position: -17px -7535px;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
@@ -3090,17 +3103,17 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -15px -7505px;
+	background-position: -17px -7505px;
 }
 .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -15px -7375px;
+	background-position: -17px -7375px;
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
-	background-position: -15px -7565px;
+	background-position: -17px -7565px;
 }
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
-	background-position: -15px -7435px;
+	background-position: -17px -7435px;
 }
 .nw-contact-item, .add-contact-item {
 	height: 48px;
@@ -3109,6 +3122,13 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 	padding-right: 15px;
 	overflow: hidden;
+	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .add-contact-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -3347,27 +3367,53 @@ label.iPhoneCheckLabelOff span {
 	padding: 0 0 0 10px;
 	position: relative;
 	background-color: white;
+	border-right: 2px solid rgba(0,0,0,0.06);
 }
 .nw-tree-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
-	right: 10px;
+	right: 8px;
 	top: 0;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+}
+.nw-tree-panel-arrows:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.nw-tree-panel-arrows.active {
+	background-position: -12px -7916px;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
-	padding-right: 15px;
+	padding-right: 12px;
 	overflow: hidden;
 	cursor: pointer;
 	position: relative;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
+	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .nw-conversations-unread {
 	position: absolute;
@@ -3402,19 +3448,23 @@ label.iPhoneCheckLabelOff span {
 	background-color: white;
 }
 .nw-conversations-item:hover {
-	background-color: rgba(0,163,230,0.3);
+	background-color: rgba(43,166,222,0.3);
+	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item:hover {
 	background-color: rgba(119,119,119,0.3);
+	border-right: 2px solid rgba(119,119,119,0.3);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item.selected {
 	background-color: rgba(119,119,119,0.5);
+	border-right: 2px solid rgba(119,119,119,0.5);
 	color: white;
 }
 .nw-conversations-item.selected {
-	background-color: rgba(10,164,227,0.5);
+	background-color: rgba(43,166,222,0.5);
+	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .nw-conversations-name, .fm-tree-panel .nw-contact-name {
@@ -3467,7 +3517,7 @@ label.iPhoneCheckLabelOff span {
 .download-percents-9 .file-transfer-download, .download-percents-10 .file-transfer-download, .download-percents-11 .file-transfer-download, .download-percents-12 .file-transfer-download {
 	background-position: -5px -200px;
 }
-.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download, .download-percents-15 .file-transfer-download, .download-percents-16.file-transfer-download {
+.download-percents-13 .file-transfer-download, .download-percents-14 .file-transfer-download, .download-percents-15 .file-transfer-download, .download-percents-16 .file-transfer-download {
 	background-position: -5px -280px;
 }
 .download-percents-17 .file-transfer-download, .download-percents-18 .file-transfer-download, .download-percents-19 .file-transfer-download, .download-percents-20 .file-transfer-download {
@@ -3512,7 +3562,7 @@ label.iPhoneCheckLabelOff span {
 .download-percents-59 .file-transfer-download, .download-percents-60 .file-transfer-download, .download-percents-61 .file-transfer-download, .download-percents-62 .file-transfer-download {
 	background-position: -5px -1400px;
 }
-.download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66.file-transfer-download {
+.download-percents-63 .file-transfer-download, .download-percents-64 .file-transfer-download, .download-percents-65 .file-transfer-download, .download-percents-66 .file-transfer-download {
 	background-position: -5px -1480px;
 }
 .download-percents-67 .file-transfer-download, .download-percents-68 .file-transfer-download, .download-percents-69 .file-transfer-download, .download-percents-70 .file-transfer-download {
@@ -3560,7 +3610,7 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-9 .file-transfer-upload, .upload-percents-10 .file-transfer-upload, .upload-percents-11 .file-transfer-upload, .upload-percents-12 .file-transfer-upload {
 	background-position: -5px -2600px;
 }
-.upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16.file-transfer-upload {
+.upload-percents-13 .file-transfer-upload, .upload-percents-14 .file-transfer-upload, .upload-percents-15 .file-transfer-upload, .upload-percents-16 .file-transfer-upload {
 	background-position: -5px -2680px;
 }
 .upload-percents-17 .file-transfer-upload, .upload-percents-18 .file-transfer-upload, .upload-percents-19 .file-transfer-upload, .upload-percents-20 .file-transfer-upload {
@@ -3605,7 +3655,7 @@ label.iPhoneCheckLabelOff span {
 .upload-percents-59 .file-transfer-upload, .upload-percents-60 .file-transfer-upload, .upload-percents-61 .file-transfer-upload, .upload-percents-62 .file-transfer-upload {
 	background-position: -5px -3800px;
 }
-.upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66.file-transfer-upload {
+.upload-percents-63 .file-transfer-upload, .upload-percents-64 .file-transfer-upload, .upload-percents-65 .file-transfer-upload, .upload-percents-66 .file-transfer-upload {
 	background-position: -5px -3880px;
 }
 .upload-percents-67 .file-transfer-upload, .upload-percents-68 .file-transfer-upload, .upload-percents-69 .file-transfer-upload, .upload-percents-70 .file-transfer-upload {
@@ -4033,6 +4083,7 @@ label.iPhoneCheckLabelOff span {
 	height: 100%;
 	float: left;
 	background-color: #f2f2f2;
+	position: relative;
 }
 .notifications .fm-left-panel {
 	width: 304px;
@@ -4101,12 +4152,52 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-header {
 	position: relative;
-	font-size: 12px;
-	line-height: 47px;
-	font-family: 'Open Sans Semibold';
-	padding: 0 0 0 10px;
+	padding: 0 40px 0 10px;
 	color: white;
 	display: none;
+	height: 48px;
+}
+.nw-fm-tree-header input {
+	line-height: 24px;
+	color: white;
+	background-color: transparent;
+	width: 100%;
+	font-family: 'Open Sans Semibold';
+	font-size: 12px;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	cursor: default;
+	margin: 12px 0 0 0;
+}
+.nw-fm-tree-header.focused-input input, .nw-fm-tree-header.filled-input input {
+	cursor: text;
+}
+.nw-fm-tree-header.shared-with-me input::selection {
+	background: #FFA500;
+}
+.nw-fm-tree-header.contacts input::selection {
+	background: #777777;
+}
+.nw-fm-tree-header.conversations input::selection {
+	background: #2BA6DE;
+}
+.nw-fm-tree-header.rubbish-bin input::selection {
+	background: #31B500;
+}
+ .nw-fm-tree-header input::-webkit-input-placeholder {
+ color:rgba(255,255,255,0.3);
+}
+ .nw-fm-tree-header input:-moz-placeholder {
+ color:rgba(255,255,255,0.3);
+ opacity: 1;
+}
+ .nw-fm-tree-header input::-moz-placeholder {
+ color:rgba(255,255,255,0.3);
+ opacity: 1;
+}
+ .nw-fm-tree-header input:-ms-input-placeholder {
+ color:rgba(255,255,255,0.3);
 }
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
@@ -4117,17 +4208,38 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: left -6142px;
 }
-.nw-fm-settins-icon {
+.nw-fm-search-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: center -721px;
+	background-position: -11px -7881px;
 	position: absolute;
-	width: 20px;
-	height: 20px;
+	width: 22px;
+	height: 22px;
 	z-index: 5;
 	right: 13px;
 	top: 13px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 	cursor: pointer;
+}
+.filled-input .nw-fm-search-icon {
+	background-position: -10px -6436px;
+}
+.filled-input .nw-fm-search-icon:hover {
+	background-position: -11px -7821px;
+}
+.nw-fm-tree-header:hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .nw-fm-left-icon {
 	width: 48px;
@@ -5087,6 +5199,14 @@ table {
 .block-view-file-type.folder-shared, .properties-file-icon div.folder-shared {
 	background-position: center -9746px;
 }
+.rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
+	background-position: center -1223px;
+	background-image: url(../images/mega/shared-sprite.svg);
+}
+.rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
+	background-position: center -1323px;
+	background-image: url(../images/mega/shared-sprite.svg);
+}
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
 }
@@ -5622,6 +5742,9 @@ table {
 .fm-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -978px;
 }
+.fm-breadcrumbs.rubbish-bin .right-arrow-bg {
+	background-position: 8px -8038px;
+}
 .fm-dialog-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -975px;
 }
@@ -6073,7 +6196,7 @@ span.search-number {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu {
+.context-menu, .nw-sorting-menu {
 	min-width: 164px;
 	position: absolute;
 	background-color: #333333;
@@ -6088,7 +6211,11 @@ span.search-number {
 	z-index: 500;
 	padding: 8px 0;
 }
-.context-menu-divider, .pause-item-divider {
+.nw-sorting-menu {
+	right: -156px;
+	top: 40px;
+}
+.context-menu-divider, .pause-item-divider, .sorting-item-divider {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
@@ -6444,7 +6571,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .nw-conversations-item.current-calling {
 	height: 48px;
-	background-color: rgba(29,161,233,0.5);
+	background-color: rgba(31,165,224,0.5);
+	border-right: 2px solid rgba(31,165,224,0.5);
 	cursor: default;
 }
 .current-calling .nw-contact-status {
@@ -6471,10 +6599,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .chat-time-txt {
 	float: right;
 	background-color: white;
-	margin: 16px 10px 0 0;
+	margin: 17px 10px 0 0;
 	padding: 0 5px;
-	height: 16px;
-	color: #2BA6DE;
+	height: 14px;
+	color: #52B6E4;
 	line-height: 14px;
 	font-size: 11px;
 	box-sizing: border-box;
@@ -9560,6 +9688,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	border-left: 2px solid transparent;
 	left: 100%;
 	right: auto;
+	margin-left: -10600px;
 }
 .context-submenu.reset {
 	border-left: 2px solid transparent;
@@ -9636,7 +9765,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.top-menu-item, .top-user-status-item, .context-menu-item {
+.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item {
 	display: block;
 	height: 32px;
 	line-height: 30px;
@@ -9655,7 +9784,37 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	cursor: pointer;
+}
+.sorting-menu-item {
+	height: 24px;
+	line-height: 22px;
+	padding: 0 12px;
+	font-size: 12px;
+	color: rgba(153,153,153,1);
+	background-repeat: no-repeat;
+	background-position: right -7966px;
+	-webkit-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-moz-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-o-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-ms-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	transition: color 200ms ease-in-out, color 200ms ease-in-out;
+}
+.sorting-menu-item:hover {
+	background-color: rgba(255,255,255,0.1);
+}
+.sorting-menu-item.active, .sorting-menu-item.selected {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	color: rgba(255,255,255,1);
+}
+.sorting-menu-arrow {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -7998px;
+	position: absolute;
+	width: 10px;
+	height: 17px;
+	left: -7px;
+	top: 10px;
 }
 .context-menu-item {
 	padding: 0 15px 0 42px;
@@ -18521,7 +18680,7 @@ transform: rotate(360deg);
 -moz-transform: rotate(360deg);
 }
 }
-.loading {
+.loading-animation {
 	height: 16px;
 	position: relative;
 	width: 16px;
@@ -18550,10 +18709,12 @@ transform: rotate(360deg);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
+	display: none;
 }
-.connecting .loading {
+.connecting .loading-animation {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	-moz-opacity: 0.6;
 	-khtml-opacity: 0.6;
 	opacity: 0.6;
+	display: block;
 }

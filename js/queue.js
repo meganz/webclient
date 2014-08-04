@@ -225,9 +225,6 @@ MegaQueue.prototype.process = function() {
 
 MegaQueue.prototype.destroy = function() {
 	clearTimeout(this._later);
-	// this._limit = -1
-	// this._queue = null;
-	// this._queue = [];
 	oDestroy(this);
 }
 
@@ -248,7 +245,7 @@ function TransferQueue() {
 
 inherits(TransferQueue, MegaQueue);
 
-TransferQueue.prototype.mull = function(gid)
+TransferQueue.prototype.mull = function()
 {
 	if (this.isEmpty() && $.len(this._qpaused))
 	{
@@ -295,6 +292,10 @@ TransferQueue.prototype.pause = function(gid)
 		this._qpaused[gid] = this.slurp(gid);
 		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text(' (paused)');
 		GlobalProgress[gid].speed = 0; // reset speed
+		if (($.transferprogress||{})[gid]) {
+			$.transferprogress[gid][2] = 0; // reset speed
+		}
+		Soon(percent_megatitle);
 	}
 };
 

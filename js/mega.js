@@ -1143,6 +1143,34 @@ function MegaData ()
 
 	this.buildSubmenu = function(i, p)
 	{
+				
+		var icon = '<span class="context-menu-icon"></span>';
+		// divider & advanced
+		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+
+		this.buildRootSubmenu = function()
+		{
+			var cs = '';
+
+			for (var h in M.c[M.RootID])
+			{
+				if (M.d[h].t)
+				{
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					break;
+				}
+			}
+			
+			var html = '<span class="context-submenu" id="sm_move">';
+			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += adv;
+			html += '</span>';
+
+			$('.context-menu-item.move-item').after(html);
+		}
+		
 		var id, prev;
 		if (typeof i === 'undefined')
 		{
@@ -1156,9 +1184,6 @@ function MegaData ()
 			prev = p;
 		}
 		
-		var icon = '<span class="context-menu-icon"></span>';
-		// divider & advanced
-		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
 		var folders = [];
 		
 		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
@@ -1188,33 +1213,11 @@ function MegaData ()
 			}
 //				var sharedfolder = '';
 //				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
-			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + id + '">' + icon + this.d[fid].name + '</span>' + sm;
+			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
 			$('#sm_' + prev).append(html);
-			if (sub) this.buildSubmenu(folders[i], id);
+			if (sub) this.buildSubmenu(fid, id);
 		}
-		this.buildRootSubmenu = function()
-		{
-			var cs = '';
-
-			for (var h in M.c[M.RootID])
-			{
-				if (M.d[h].t)
-				{
-					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
-					break;
-				}
-			}
-			
-			var html = '<span class="context-submenu" id="sm_move">';
-			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
-			html += adv;
-			html += '</span>';
-
-			$('.context-menu-item.move-item').after(html);
-		};		
-};
+	}
 
     this.sortContacts = function(folders) {
         // in case of contacts we have custom sort/grouping:

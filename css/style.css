@@ -4139,6 +4139,18 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-tree-header.focused-input input, .nw-fm-tree-header.filled-input input {
 	cursor: text;
 }
+.nw-fm-tree-header.shared-with-me input::selection {
+	background: #FFA500;
+}
+.nw-fm-tree-header.contacts input::selection {
+	background: #777777;
+}
+.nw-fm-tree-header.conversations input::selection {
+	background: #2BA6DE;
+}
+.nw-fm-tree-header.rubbish-bin input::selection {
+	background: #31B500;
+}
  .nw-fm-tree-header input::-webkit-input-placeholder {
  color:rgba(255,255,255,0.3);
 }
@@ -5687,6 +5699,9 @@ table {
 }
 .fm-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -978px;
+}
+.fm-breadcrumbs.rubbish-bin .right-arrow-bg {
+	background-position: 8px -8038px;
 }
 .fm-dialog-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -975px;

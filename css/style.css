@@ -2987,12 +2987,12 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 	background-color: rgba(217,0,7,0);
 	padding-right: 13px;
-	-webkit-transition: background-color 150ms ease-in-out;
-	-moz-transition: background-color 150ms ease-in-out;
-	-o-transition: background-color 150ms ease-in-out;
-	-ms-transition: background-color 150ms ease-in-out;
-	transition: background-color 150ms ease-in-out;
-	border-right: 2px solid rgba(0,0,0,0.0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	border-right: 2px solid rgba(0,0,0,0);
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
@@ -3086,7 +3086,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -15px -7625px;
 }
 .nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
-	background-position: -15px -7535px;
+	background-position: -17px -7535px;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
@@ -3100,17 +3100,17 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -15px -7505px;
+	background-position: -17px -7505px;
 }
 .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -15px -7375px;
+	background-position: -17px -7375px;
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
-	background-position: -15px -7565px;
+	background-position: -17px -7565px;
 }
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
-	background-position: -15px -7435px;
+	background-position: -17px -7435px;
 }
 .nw-contact-item, .add-contact-item {
 	height: 48px;
@@ -3120,6 +3120,12 @@ label.iPhoneCheckLabelOff span {
 	padding-right: 15px;
 	overflow: hidden;
 	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .add-contact-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -3399,6 +3405,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .nw-conversations-unread {
 	position: absolute;

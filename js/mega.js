@@ -1141,6 +1141,81 @@ function MegaData ()
 		}
 	};
 
+	this.buildSubmenu = function(i, p)
+	{
+		var id, prev;
+		if (typeof i === 'undefined')
+		{
+			this.buildRootSubmenu();
+			id = this.RootID;
+			prev = 'move';
+		}
+		else
+		{
+			id = i;
+			prev = p;
+		}
+		
+		var icon = '<span class="context-menu-icon"></span>';
+		// divider & advanced
+		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+		var folders = [];
+		
+		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
+
+		// sort by name is default in the tree
+		folders.sort(function(a,b)
+		{
+			if (a.name) return a.name.localeCompare(b.name);
+		});
+
+		for (var i in folders)
+		{
+			var sub = false;
+			var cs = '';
+			var sm = '';
+			var fid = folders[i].h;
+
+			for (var h in M.c[fid])
+			{
+				if (M.d[h].t)
+				{
+					sub = true;
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					break;
+				}
+			}
+//				var sharedfolder = '';
+//				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
+			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + id + '">' + icon + this.d[fid].name + '</span>' + sm;
+			$('#sm_' + prev).append(html);
+			if (sub) this.buildSubmenu(folders[i], id);
+		}
+		this.buildRootSubmenu = function()
+		{
+			var cs = '';
+
+			for (var h in M.c[M.RootID])
+			{
+				if (M.d[h].t)
+				{
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					break;
+				}
+			}
+			
+			var html = '<span class="context-submenu" id="sm_move">';
+			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += adv;
+			html += '</span>';
+
+			$('.context-menu-item.move-item').after(html);
+		};		
+};
+
     this.sortContacts = function(folders) {
         // in case of contacts we have custom sort/grouping:
         if (localStorage.csort) this.csort = localStorage.csort;

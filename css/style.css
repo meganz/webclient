@@ -3371,20 +3371,23 @@ label.iPhoneCheckLabelOff span {
 	background-position: -12px -752px;
 	cursor: pointer;
 	-webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
--moz-opacity: 0.3;
--khtml-opacity: 0.3;
-opacity: 0.3;
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .nw-tree-panel-arrows:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
--moz-opacity: 0.7;
--khtml-opacity: 0.7;
-opacity: 0.7;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.nw-tree-panel-arrows.active {
+	background-position: -12px -7916px;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
@@ -4065,6 +4068,7 @@ opacity: 0.7;
 	height: 100%;
 	float: left;
 	background-color: #f2f2f2;
+	position: relative;
 }
 .notifications .fm-left-panel {
 	width: 304px;
@@ -5182,11 +5186,11 @@ table {
 }
 .rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
 	background-position: center -1223px;
-	background-image:url(../images/mega/shared-sprite.svg);
+	background-image: url(../images/mega/shared-sprite.svg);
 }
 .rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
 	background-position: center -1323px;
-	background-image:url(../images/mega/shared-sprite.svg);
+	background-image: url(../images/mega/shared-sprite.svg);
 }
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
@@ -6177,7 +6181,7 @@ span.search-number {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu {
+.context-menu, .nw-sorting-menu {
 	min-width: 164px;
 	position: absolute;
 	background-color: #333333;
@@ -6192,7 +6196,11 @@ span.search-number {
 	z-index: 500;
 	padding: 8px 0;
 }
-.context-menu-divider, .pause-item-divider {
+.nw-sorting-menu {
+	right: -156px;
+	top: 40px;
+}
+.context-menu-divider, .pause-item-divider, .sorting-item-divider {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
@@ -9730,7 +9738,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.top-menu-item, .top-user-status-item, .context-menu-item {
+.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item {
 	display: block;
 	height: 32px;
 	line-height: 30px;
@@ -9749,7 +9757,37 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	cursor: pointer;
+}
+.sorting-menu-item {
+	height: 24px;
+	line-height: 22px;
+	padding: 0 12px;
+	font-size: 12px;
+	color: rgba(153,153,153,1);
+	background-repeat: no-repeat;
+	background-position: right -7966px;
+	-webkit-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-moz-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-o-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-ms-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	transition: color 200ms ease-in-out, color 200ms ease-in-out;
+}
+.sorting-menu-item:hover {
+	color: rgba(255,255,255,1);
+}
+.sorting-menu-item.active, .sorting-menu-item.selected {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	color: rgba(255,255,255,1);
+}
+.sorting-menu-arrow {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -7998px;
+	position: absolute;
+	width: 10px;
+	height: 17px;
+	left: -7px;
+	top: 10px;
 }
 .context-menu-item {
 	padding: 0 15px 0 42px;

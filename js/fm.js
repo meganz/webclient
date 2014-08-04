@@ -220,6 +220,27 @@ function initUI()
 		} else 	$(this).parent('.nw-fm-tree-header').removeClass('focused-input');
 	});
 	
+	//Sorting demo script
+	$('.nw-tree-panel-arrows').unbind('click');
+	$('.nw-tree-panel-arrows').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') == -1) {
+			$(this).addClass('active');
+			$('.nw-sorting-menu').removeClass('hidden');
+		} else {
+			$(this).removeClass('active');
+			$('.nw-sorting-menu').addClass('hidden');
+		}
+	});
+	$('.sorting-menu-item').unbind('click');
+	$('.sorting-menu-item').bind('click', function() {
+		if ($(this).attr('class').indexOf('active') == -1) {
+			$(this).parent().find('.sorting-menu-item').removeClass('active');
+			$(this).addClass('active');
+			$('.nw-sorting-menu').addClass('hidden');
+			$('.nw-tree-panel-arrows').removeClass('active');
+		} 
+	});
+	
 	
 	$.doDD = function(e,ui,a,type)
 	{

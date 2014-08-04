@@ -2339,6 +2339,8 @@ function MegaData ()
 	{
 		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table').prepend($('.transfer-table #' + id));
+		Soon(fmUpdateCount);
 		dl.st = NOW();
 		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
 		ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
@@ -2500,6 +2502,8 @@ function MegaData ()
 	{
 		if (d) console.log('ulstart',id);
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
+		Soon(fmUpdateCount);
 		ul_queue[id].starttime = new Date().getTime();
 		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();

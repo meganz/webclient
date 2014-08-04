@@ -70,6 +70,9 @@ body {
 	height: 100%;
 	min-width: 987px;
 }
+body.dragging div, body.dragging a, body.dragging span {
+   cursor: url(../images/mega/cursor.png), auto !important;
+}
 ::selection {
 	background: #d22000;
 	color: white;

@@ -3163,6 +3163,7 @@ function selectddUI()
 		{
 			$.hideContextMenu(e);
 			$.gridDragging=true;
+			$('body').addClass('dragging');
 			if ($(this).attr('class').indexOf('ui-selected') == -1)
 			{
 				$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
@@ -3214,6 +3215,7 @@ function selectddUI()
 		stop: function(event)
 		{
 			$.gridDragging=false;
+			$('body').removeClass('dragging');
 			setTimeout(function()
 			{
 				treeUIopen(M.currentdirid);

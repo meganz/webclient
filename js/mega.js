@@ -1171,28 +1171,24 @@ function MegaData ()
 			$('.context-menu-item.move-item').after(html);
 		}
 		
-		var id, prev;
+		var id;
 		if (typeof i === 'undefined')
 		{
 			this.buildRootSubmenu();
 			id = this.RootID;
-			prev = 'move';
 		}
-		else
-		{
-			id = i;
-			prev = p;
-		}
+		else id = i;
 		
 		var folders = [];
 		
 		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
 
 		// sort by name is default in the tree
-		folders.sort(function(a,b)
-		{
-			if (a.name) return a.name.localeCompare(b.name);
-		});
+		// localeCompare is support in IE11 only
+//		folders.sort(function(a,b)
+//		{
+//			if (a.name) return a.name.localeCompare(b.name);
+//		});
 
 		for (var i in folders)
 		{
@@ -1214,8 +1210,8 @@ function MegaData ()
 //				var sharedfolder = '';
 //				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
 			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
-			$('#sm_' + prev).append(html);
-			if (sub) this.buildSubmenu(fid, id);
+			$('#sm_' + id).prepend(html);
+			if (sub) this.buildSubmenu(fid);
 		}
 	}
 

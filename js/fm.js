@@ -1310,11 +1310,11 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{
 		$('.fm-clearbin-button').removeClass('hidden');
-		$('.files-grid-view.fm,fm-blocks-view.fm').addClass('rubbish-bin');
+		$('.files-grid-view.fm,.fm-blocks-view.fm').addClass('rubbish-bin');
 	} 
 	else 
 	{
-		$('.files-grid-view.fm,fm-blocks-view.fm').removeClass('rubbish-bin');
+		$('.files-grid-view.fm,.fm-blocks-view.fm').removeClass('rubbish-bin');
 	    if (RootbyId(M.currentdirid) == M.InboxID)
 	    {
 		   if (d) console.log('Inbox');

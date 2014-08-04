@@ -3370,6 +3370,21 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
+	-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+-moz-opacity: 0.3;
+-khtml-opacity: 0.3;
+opacity: 0.3;
+}
+.nw-tree-panel-arrows:hover {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+-moz-opacity: 0.7;
+-khtml-opacity: 0.7;
+opacity: 0.7;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
@@ -5164,6 +5179,14 @@ table {
 }
 .block-view-file-type.folder-shared, .properties-file-icon div.folder-shared {
 	background-position: center -9746px;
+}
+.rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
+	background-position: center -1223px;
+	background-image:url(../images/mega/shared-sprite.svg);
+}
+.rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
+	background-position: center -1323px;
+	background-image:url(../images/mega/shared-sprite.svg);
 }
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;

@@ -9773,7 +9773,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	transition: color 200ms ease-in-out, color 200ms ease-in-out;
 }
 .sorting-menu-item:hover {
-	color: rgba(255,255,255,1);
+	background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
 	background-image: url(../images/mega/nw-fm-sprite.svg);

@@ -2986,41 +2986,51 @@ label.iPhoneCheckLabelOff span {
 .nw-fm-tree-item {
 	display: block;
 	background-color: rgba(217,0,7,0);
-	padding-right: 15px;
+	padding-right: 13px;
 	-webkit-transition: background-color 150ms ease-in-out;
 	-moz-transition: background-color 150ms ease-in-out;
 	-o-transition: background-color 150ms ease-in-out;
 	-ms-transition: background-color 150ms ease-in-out;
 	transition: background-color 150ms ease-in-out;
+	border-right: 2px solid rgba(0,0,0,0.0);
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
+	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.selected {
 	background-color: rgba(217,0,7,0.5);
+	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.dragover {
 	background-color: rgba(217,0,7,0.3);
+	border-right: 2px solid rgba(217,0,7,0.5);
 }
 .shared-with-me .nw-fm-tree-item:hover {
 	background-color: rgba(255,179,0,0.3);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.selected {
 	background-color: rgba(255,179,0,0.5);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.dragover {
 	background-color: rgba(255,179,0,0.4);
+	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .rubbish-bin .nw-fm-tree-item:hover {
 	background-color: rgba(39,183,0,0.3);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
 	background-color: rgba(39,183,0,0.6);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.dragover {
 	background-color: rgba(39,183,0,0.4);
+	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .fm-tree-panel li, .fm-move-dialog-body li {
 	display: block;
@@ -3109,6 +3119,7 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 	padding-right: 15px;
 	overflow: hidden;
+	border-right: 2px solid rgba(0,0,0,0);
 }
 .add-contact-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -3347,27 +3358,44 @@ label.iPhoneCheckLabelOff span {
 	padding: 0 0 0 10px;
 	position: relative;
 	background-color: white;
+	border-right: 2px solid rgba(0,0,0,0.06);
 }
 .nw-tree-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
-	right: 10px;
+	right: 8px;
 	top: 0;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -12px -752px;
 	cursor: pointer;
+	-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+-moz-opacity: 0.3;
+-khtml-opacity: 0.3;
+opacity: 0.3;
+}
+.nw-tree-panel-arrows:hover {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+-moz-opacity: 0.7;
+-khtml-opacity: 0.7;
+opacity: 0.7;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
-	padding-right: 15px;
+	padding-right: 12px;
 	overflow: hidden;
 	cursor: pointer;
 	position: relative;
 	white-space: nowrap;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
+	border-right: 2px solid rgba(0,0,0,0);
 }
 .nw-conversations-unread {
 	position: absolute;
@@ -3402,19 +3430,23 @@ label.iPhoneCheckLabelOff span {
 	background-color: white;
 }
 .nw-conversations-item:hover {
-	background-color: rgba(0,163,230,0.3);
+	background-color: rgba(43,166,222,0.3);
+	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item:hover {
 	background-color: rgba(119,119,119,0.3);
+	border-right: 2px solid rgba(119,119,119,0.3);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item.selected {
 	background-color: rgba(119,119,119,0.5);
+	border-right: 2px solid rgba(119,119,119,0.5);
 	color: white;
 }
 .nw-conversations-item.selected {
-	background-color: rgba(10,164,227,0.5);
+	background-color: rgba(43,166,222,0.5);
+	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .nw-conversations-name, .fm-tree-panel .nw-contact-name {
@@ -4101,12 +4133,52 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-header {
 	position: relative;
-	font-size: 12px;
-	line-height: 47px;
-	font-family: 'Open Sans Semibold';
-	padding: 0 0 0 10px;
+	padding: 0 40px 0 10px;
 	color: white;
 	display: none;
+	height: 48px;
+}
+.nw-fm-tree-header input {
+	line-height: 24px;
+	color: white;
+	background-color: transparent;
+	width: 100%;
+	font-family: 'Open Sans Semibold';
+	font-size: 12px;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	cursor: default;
+	margin: 12px 0 0 0;
+}
+.nw-fm-tree-header.focused-input input, .nw-fm-tree-header.filled-input input {
+	cursor: text;
+}
+.nw-fm-tree-header.shared-with-me input::selection {
+	background: #FFA500;
+}
+.nw-fm-tree-header.contacts input::selection {
+	background: #777777;
+}
+.nw-fm-tree-header.conversations input::selection {
+	background: #2BA6DE;
+}
+.nw-fm-tree-header.rubbish-bin input::selection {
+	background: #31B500;
+}
+ .nw-fm-tree-header input::-webkit-input-placeholder {
+ color:rgba(255,255,255,0.3);
+}
+ .nw-fm-tree-header input:-moz-placeholder {
+ color:rgba(255,255,255,0.3);
+ opacity: 1;
+}
+ .nw-fm-tree-header input::-moz-placeholder {
+ color:rgba(255,255,255,0.3);
+ opacity: 1;
+}
+ .nw-fm-tree-header input:-ms-input-placeholder {
+ color:rgba(255,255,255,0.3);
 }
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
@@ -4117,17 +4189,38 @@ label.iPhoneCheckLabelOff span {
 	background-repeat: no-repeat;
 	background-position: left -6142px;
 }
-.nw-fm-settins-icon {
+.nw-fm-search-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: center -721px;
+	background-position: -11px -7881px;
 	position: absolute;
-	width: 20px;
-	height: 20px;
+	width: 22px;
+	height: 22px;
 	z-index: 5;
 	right: 13px;
 	top: 13px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 	cursor: pointer;
+}
+.filled-input .nw-fm-search-icon {
+	background-position: -10px -6436px;
+}
+.filled-input .nw-fm-search-icon:hover {
+	background-position: -11px -7821px;
+}
+.nw-fm-tree-header:hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .nw-fm-left-icon {
 	width: 48px;
@@ -5087,6 +5180,14 @@ table {
 .block-view-file-type.folder-shared, .properties-file-icon div.folder-shared {
 	background-position: center -9746px;
 }
+.rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
+	background-position: center -1223px;
+	background-image:url(../images/mega/shared-sprite.svg);
+}
+.rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
+	background-position: center -1323px;
+	background-image:url(../images/mega/shared-sprite.svg);
+}
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
 }
@@ -5621,6 +5722,9 @@ table {
 }
 .fm-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -978px;
+}
+.fm-breadcrumbs.rubbish-bin .right-arrow-bg {
+	background-position: 8px -8038px;
 }
 .fm-dialog-breadcrumbs.contact .right-arrow-bg {
 	background-position: 2px -975px;
@@ -6444,7 +6548,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .nw-conversations-item.current-calling {
 	height: 48px;
-	background-color: rgba(29,161,233,0.5);
+	background-color: rgba(31,165,224,0.5);
+	border-right: 2px solid rgba(31,165,224,0.5);
 	cursor: default;
 }
 .current-calling .nw-contact-status {
@@ -6471,10 +6576,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .chat-time-txt {
 	float: right;
 	background-color: white;
-	margin: 16px 10px 0 0;
+	margin: 17px 10px 0 0;
 	padding: 0 5px;
-	height: 16px;
-	color: #2BA6DE;
+	height: 14px;
+	color: #52B6E4;
 	line-height: 14px;
 	font-size: 11px;
 	box-sizing: border-box;
@@ -18504,7 +18609,7 @@ transform: rotate(360deg);
 -moz-transform: rotate(360deg);
 }
 }
-.loading {
+.loading-animation {
 	height: 16px;
 	position: relative;
 	width: 16px;
@@ -18533,10 +18638,12 @@ transform: rotate(360deg);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
+	display: none;
 }
-.connecting .loading {
+.connecting .loading-animation {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	-moz-opacity: 0.6;
 	-khtml-opacity: 0.6;
 	opacity: 0.6;
+	display: block;
 }

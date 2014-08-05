@@ -366,7 +366,7 @@ function initUI()
 	createfolderUI();
 	cSortMenuUI();
 	M.buildSubmenu();
-	initContextUI();
+//	initContextUI();
 	transferPanelUI();
 	UIkeyevents();
 	addUserUI();
@@ -979,8 +979,6 @@ function initContextUI()
 	{
 		var a = $(this).next();
 		a.children().removeClass('active opened');
-//		a.find('.active').removeClass('active');
-//		a.find('.opened').removeClass('opened');
 		a.find('.context-submenu').addClass('hidden');
 		
 		if ($(this).is('.move-item'))

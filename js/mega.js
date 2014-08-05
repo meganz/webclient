@@ -1225,6 +1225,8 @@ function MegaData ()
 			$('#sm_' + id).prepend(html);
 			if (sub) this.buildSubmenu(fid);
 		}
+		
+		initContextUI();
 	};
 
     this.sortContacts = function(folders) {
@@ -2854,6 +2856,7 @@ function rendernew()
             megaChat.renderMyStatus();
         }
 	}
+	M.buildSubmenu();
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 	if (d) console.timeEnd('rendernew');

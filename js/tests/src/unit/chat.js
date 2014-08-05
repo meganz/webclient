@@ -1096,6 +1096,8 @@ describe("Chat.js - Karere UI integration", function() {
             "private"
         );
 
+        assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.JOINING, "Invalid room state, expected joining");
+
         // fake user join
         var users = {};
         users[megaChat.karere.getJid()] = "moderator";
@@ -1117,7 +1119,22 @@ describe("Chat.js - Karere UI integration", function() {
             users
         ));
 
+        assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS, "Invalid state of the room, should be WAITING_FOR_PARTICIPANTS");
+
         expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
+
+        // fake user join
+        var users = {};
+        users[megaChat.karere.getJid()] = "moderator";
+        users[user2jid] = "participant";
+
+        megaChat.karere._triggerEvent("UsersJoined", new KarereEventObjects.UsersJoined(
+            roomJid + "/" + megaChat.karere.getNickname(),
+            megaChat.karere.getJid(),
+            roomJid,
+            {},
+            users
+        ));
 
         $promise.done(function() {
             assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.PLUGINS_WAIT, "Plugin did not halted the room creation");

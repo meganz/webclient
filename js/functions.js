@@ -1412,3 +1412,28 @@ String.prototype.replaceAll = function(_f, _r, _c)
   // Return New String
   return r;
 };
+
+// Returns pixels position of element relative to document (top left corner)
+function getHtmlElemPos(elem)
+{
+    var xPos = 0;
+    var yPos = 0;
+    var sl;
+    var st;
+    var pNode;
+    while (elem)
+    {
+        pNode = elem.parentNode;
+        sl = 0;
+        st = 0;
+        if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName))
+        {
+            sl = elem.scrollLeft;
+            st = elem.scrollTop;
+        }
+        xPos += (elem.offsetLeft - sl + elem.clientLeft);
+        yPos += (elem.offsetTop - st + elem.clientTop);
+        elem = elem.offsetParent;
+    }
+    return {x: xPos, y: yPos};
+}

@@ -978,9 +978,25 @@ function initContextUI()
 	$(c+'.contains-submenu').bind('mouseover', function(e)
 	{
 		var a = $(this).next();
-		a.find('.active').removeClass('active');
-		a.find('.opened').removeClass('opened');
+		a.children().removeClass('active opened');
+//		a.find('.active').removeClass('active');
+//		a.find('.opened').removeClass('opened');
 		a.find('.context-submenu').addClass('hidden');
+		
+		if ($(this).is('.move-item'))
+		{
+			$('.context-menu .download-item')
+					.next().removeClass('active opened')
+					.removeClass('opened')
+					.next().find('.context-submenu').addClass('hidden');
+		}
+		if ($(this).is('.download-item'))
+		{
+			$('.context-menu .move-item')
+					.next().removeClass('active opened')
+					.removeClass('opened')
+					.next().find('.context-submenu').addClass('hidden');
+		}
 
 		if (!$(this).is('.opened'))
 		{

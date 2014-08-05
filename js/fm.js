@@ -183,6 +183,80 @@ function reselect(n)
 	}
 }
 
+
+var treesearch = false;
+
+function treesearchUI()
+{
+	// Search inputs demo logic for tree panel header
+	$('.nw-fm-tree-header').unbind('click');
+	$('.nw-fm-tree-header').bind('click', function() 
+	{
+		var i = $(this).find('input');
+		$(this).addClass('focused-input');
+		if (i.val() == i.attr('placeholder')) i.val('');
+		i.focus();
+	});
+	$('.nw-fm-search-icon').unbind('click');
+	$('.nw-fm-search-icon').bind('click', function() 
+	{
+		treesearch=false;
+		M.buildtree(M.d[M.RootID]);
+		treeUI();		
+		$(this).prev().val('');
+		$(this).parent().removeClass('filled-input');
+		$(this).parent().blur();
+	});
+	
+	$('.nw-fm-tree-header input').unbind('keyup');
+	$('.nw-fm-tree-header input').bind('keyup', function() 
+	{		
+		$(this).parent().addClass('filled-input');		
+		treesearch = $('.nw-fm-tree-header input').val();
+		M.buildtree(M.d[M.RootID]);
+		treeUI();
+	});
+	
+	$('.nw-fm-tree-header input').unbind('blur');
+	$('.nw-fm-tree-header input').bind('blur', function() 
+	{
+		console.log('blur');
+		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') 
+		{
+			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
+			$(this).val($(this).attr('placeholder'));
+		} 
+		else $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
+	});
+	
+	$('.nw-tree-panel-arrows').unbind('click');
+	$('.nw-tree-panel-arrows').bind('click', function() 
+	{
+		if ($(this).attr('class').indexOf('active') == -1) 
+		{
+			$(this).addClass('active');
+			$('.nw-sorting-menu').removeClass('hidden');
+		} 
+		else 
+		{
+			$(this).removeClass('active');
+			$('.nw-sorting-menu').addClass('hidden');
+		}
+	});
+	$('.sorting-menu-item').unbind('click');
+	$('.sorting-menu-item').bind('click', function() 
+	{
+		if ($(this).attr('class').indexOf('active') == -1) 
+		{
+			$(this).parent().find('.sorting-menu-item').removeClass('active');
+			$(this).addClass('active');
+			$('.nw-sorting-menu').addClass('hidden');
+			$('.nw-tree-panel-arrows').removeClass('active');
+		} 
+	});
+}
+
+
 function initUI()
 {
 	if (!folderlink)
@@ -193,53 +267,7 @@ function initUI()
 		$('.fm-left-menu .folderlink').addClass('hidden');
 	}
     
-	// Search inputs demo logic for tree panel header
-	$('.nw-fm-tree-header').unbind('click');
-	$('.nw-fm-tree-header').bind('click', function() {
-		var i = $(this).find('input');
-		$(this).addClass('focused-input');
-		if (i.val() == i.attr('placeholder'))
-			i.val('');
-		i.focus();
-	});
-	$('.nw-fm-search-icon').unbind('click');
-	$('.nw-fm-search-icon').bind('click', function() {
-		$(this).prev().val('');
-		$(this).parent().removeClass('filled-input')
-	});
-	
-	$('.nw-fm-tree-header input').unbind('keypress');
-	$('.nw-fm-tree-header input').bind('keypress', function() {
-		$(this).parent().addClass('filled-input');
-	});
-	$('.nw-fm-tree-header input').unbind('blur');
-	$('.nw-fm-tree-header input').bind('blur', function() {
-		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') {
-			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
-			$(this).val($(this).attr('placeholder'));
-		} else 	$(this).parent('.nw-fm-tree-header').removeClass('focused-input');
-	});
-	
-	//Sorting demo script
-	$('.nw-tree-panel-arrows').unbind('click');
-	$('.nw-tree-panel-arrows').bind('click', function() {
-		if ($(this).attr('class').indexOf('active') == -1) {
-			$(this).addClass('active');
-			$('.nw-sorting-menu').removeClass('hidden');
-		} else {
-			$(this).removeClass('active');
-			$('.nw-sorting-menu').addClass('hidden');
-		}
-	});
-	$('.sorting-menu-item').unbind('click');
-	$('.sorting-menu-item').bind('click', function() {
-		if ($(this).attr('class').indexOf('active') == -1) {
-			$(this).parent().find('.sorting-menu-item').removeClass('active');
-			$(this).addClass('active');
-			$('.nw-sorting-menu').addClass('hidden');
-			$('.nw-tree-panel-arrows').removeClass('active');
-		} 
-	});
+	treesearchUI();
 	
 	
 	$.doDD = function(e,ui,a,type)

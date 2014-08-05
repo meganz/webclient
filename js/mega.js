@@ -1107,7 +1107,7 @@ function MegaData ()
 			*/
 
 			for (var i in folders)
-			{
+			{			
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
@@ -1136,11 +1136,11 @@ function MegaData ()
 				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
 
 				var openedc = '';
-				if (M.currentdirid == folders[i].h) openedc = 'opened';
+				if (M.currentdirid == folders[i].h) openedc = 'opened';				
 
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 
-				if ($('#treeli_'+folders[i].h).length == 0)
+				if ((!treesearch || (treesearch && folders[i].name && folders[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) && $('#treeli_'+folders[i].h).length == 0)
 				{
 					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);

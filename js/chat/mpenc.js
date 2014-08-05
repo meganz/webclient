@@ -2713,6 +2713,9 @@ define('mpenc/greet/ske',[
         // Kick 'em.
         for (var i = 0; i < excludeMembers.length; i++) {
             var index = this.members.indexOf(excludeMembers[i]);
+            assert(
+                this.authenticatedMembers[index], 'oops! mpenc crashed.'
+            )
             this.oldEphemeralKeys[excludeMembers[i]] = {
                 pub: this.ephemeralPubKeys[index] || null,
                 authenticated: this.authenticatedMembers[index] || false,

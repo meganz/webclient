@@ -1040,6 +1040,24 @@ function unixtimeToTimeString(timestamp) {
 };
 
 /**
+ * Used in the callLoggerWrapper to generate dynamic colors depending on the textPrefix
+ *
+ * copyrights: http://stackoverflow.com/questions/9600295/automatically-change-text-color-to-assure-readability
+ *
+ * @param hexTripletColor
+ * @returns {*}
+ */
+function invertColor(hexTripletColor) {
+    var color = hexTripletColor;
+    color = color.substring(1);           // remove #
+    color = parseInt(color, 16);          // convert to integer
+    color = 0xFFFFFF ^ color;             // invert three bytes
+    color = color.toString(16);           // convert to hex
+    color = ("000000" + color).slice(-6); // pad with leading zeros
+    color = "#" + color;                  // prepend #
+    return color;
+}
+/**
  * Simple wrapper function that will log all calls of `fnName`.
  * This function is intended to be used for dev/debugging/testing purposes only.
  *
@@ -1055,14 +1073,18 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
     var origFn = ctx[fnName];
     var textPrefix = textPrefix || "noname";
     textPrefix = "[call logger: " + textPrefix + "]";
+    var clr = "#" + fastHashFunction(textPrefix).substr(0, 6);
+
+    var prefix1 = "%c" + textPrefix;
+    var prefix2 = "color: " + clr + "; background-color: " +invertColor(clr) + ";";
 
     if(ctx[fnName].haveCallLogger) { // recursion
         return;
     }
     ctx[fnName] = function() {
-        loggerFn.apply(console, [textPrefix, "Called: ", fnName, toArray(arguments)]);
+        loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
         var res = origFn.apply(this, toArray(arguments));
-        loggerFn.apply(console, [textPrefix, "Got result: ", fnName, res]);
+        loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, res]);
 
         return res;
     };

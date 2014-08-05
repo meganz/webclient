@@ -62,14 +62,14 @@ var Karere = function(user_options) {
         self.connection.rawInput = function (data) {
             if(localStorage.d) {
                 var d = new Date();
-		        console.debug(self.getNickname(), d, 'RECV: ' + data);
+                console.debug("%c" + self.getNickname() + " RECV: ", "background: #333333; color: #00ff00;", d, data);
             }
         };
 
         self.connection.rawOutput = function (data) {
 		    if(localStorage.d) {
                 var d = new Date();
-		        console.debug(self.getNickname(), d, 'SEND: ' + data);
+		        console.debug("%c" + self.getNickname() + " SEND: ", "background: #333333; color: #aaaaff;", d, data);
             }
         };
     }
@@ -124,6 +124,8 @@ var Karere = function(user_options) {
 
 
     self._waitForPresenceCache = {};
+
+    self._triggeredActions = {};
 
     self.bind("onPresence", function(e, eventObject) {
         var bareJid = Karere.getNormalizedBareJid(eventObject.getFromJid());
@@ -352,7 +354,12 @@ Karere.DEFAULTS = {
     /**
      * Default name for roster group to be used when .subscribe is called
      */
-    defaultRosterGroupName: 'Contacts'
+    defaultRosterGroupName: 'Contacts',
+
+    /**
+     * How much time we should keep the "Action" ids in memory (used to be checked if an Action was already triggered)
+     */
+    actionMessageTriggerRegistryExpiration: 2000
 };
 
 
@@ -1122,7 +1129,7 @@ makeMetaAware(Karere);
             eventData['elems'] = elems;
             eventData['rawMessage'] = message;
 
-            if(_type == "action") {
+            if(_type == "action" || (_type == "groupchat" && eventData.meta && eventData.meta.action)) {
                 self._triggerEvent("ActionMessage", eventData);
                 return true;
             } else if(_type == "chat" && elems.length > 0) {
@@ -1315,6 +1322,7 @@ makeMetaAware(Karere);
     Karere.prototype._triggerEvent = function (stanzaType, eventData) {
         var self = this;
 
+
         if(eventData['rawMessage'] && eventData['rawMessage'].getElementsByTagName("delay").length > 0) {
             var delay = eventData['rawMessage'].getElementsByTagName("delay");
             if(delay.length > 0) {
@@ -1333,6 +1341,12 @@ makeMetaAware(Karere);
             }
         }
 
+        if(stanzaType == "ActionMessage" && self._triggeredActions[eventData.id]) {
+            if(localStorage.d) {
+                console.debug(self.getNickname(), "Ignoring Event (action with this id was already triggered/processed) for: ", stanzaType, "with event data:", eventData);
+            }
+            return false;
+        }
         var targetedTypeEvent = new $.Event("on" + stanzaType);
 
         if(localStorage.d) {
@@ -1412,6 +1426,12 @@ makeMetaAware(Karere);
                 eventData.delay
             );
         } else if(stanzaType == "ActionMessage") {
+            self._triggeredActions[eventData.id] = true;
+
+            setTimeout(function() {
+                delete self._triggeredActions[eventData.id];
+            }, self.options.actionMessageTriggerRegistryExpiration);
+
             eventDataObject = new KarereEventObjects.ActionMessage(
                 eventData.to,
                 eventData.from,
@@ -1721,18 +1741,34 @@ makeMetaAware(Karere);
      * @param [meta]
      * @returns {*}
      */
-    Karere.prototype.sendAction = function(toJid, action, meta) {
-        return this.sendRawMessage(
-            toJid,
-            "action",
-            "",
-            $.extend(
-                true,
-                {},
-                meta,
-                {'action': action}
-            )
-        );
+    Karere.prototype.sendAction = function(toJid, action, meta, messageId) {
+        if(toJid.indexOf("conference.") !== -1) {
+            return this.sendRawMessage(
+                toJid,
+                "groupchat",
+                "",
+                $.extend(
+                    true,
+                    {},
+                    meta,
+                    {'action': action}
+                ),
+                messageId
+            );
+        } else {
+            return this.sendRawMessage(
+                toJid,
+                "action",
+                "",
+                $.extend(
+                    true,
+                    {},
+                    meta,
+                    {'action': action}
+                ),
+                messageId
+            );
+        }
     };
 
     /**

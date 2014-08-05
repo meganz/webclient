@@ -74,6 +74,10 @@ var EncryptionFilter = function(megaChat) {
                 }
             },
             function(opQueue) {
+                if(megaRoom._leaving) {
+                    return;
+                }
+
                 self.syncRoomUsersWithEncMembers(megaRoom, true);
             }
         );
@@ -87,7 +91,9 @@ var EncryptionFilter = function(megaChat) {
      * Cleanup after room destroy
      */
     megaChat.bind("onRoomDestroy", function(e, megaRoom) {
-        megaRoom.encryptionOpQueue.queue('quit');
+        if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED) {
+            megaRoom.encryptionOpQueue.queue('quit');
+        }
         delete megaRoom.encryptionHandler;
         delete megaRoom.encryptionOpQueue;
     });
@@ -130,7 +136,9 @@ var EncryptionFilter = function(megaChat) {
     megaChat.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
-        assert(megaRoom, 'room not found');
+        if(!megaRoom) {
+            return;
+        }
 
         megaRoom.iHadJoined = true;
 
@@ -186,7 +194,9 @@ var EncryptionFilter = function(megaChat) {
     megaChat.karere.bind("onUsersLeft", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
-        assert(megaRoom, 'room not found');
+        if(!megaRoom) {
+            return;
+        }
 
         var users = megaRoom.getOrderedUsers();
         var leftUsers = Object.keys(eventObject.getLeftUsers());
@@ -449,6 +459,10 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
  * @param forceRecover {boolean}
  */
 EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
+    if(megaRoom._leaving) {
+        return;
+    }
+
     var xmppUsers = megaRoom.getOrderedUsers();
     var encUsers = megaRoom.encryptionHandler.askeMember.members;
 
@@ -592,7 +606,36 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
 
     console.debug("Processing outgoing message: ", e, eventObject, eventObject.isEmptyMessage())
 
-    if(eventObject.getType() == "groupchat" && eventObject.getContents().indexOf(EncryptionFilter.MPENC_MSG_TAG) !== 0) {
+    if(eventObject.getMeta().action && eventObject.getMeta().roomJid) {
+        // get room jid
+        var roomJid = eventObject.getMeta().roomJid.split("/")[0];
+        var megaRoom = self.megaChat.chats[roomJid];
+        if(megaRoom) {
+            if(eventObject.getMeta().action && eventObject.getMeta().action.indexOf("conv-") !== -1) {
+                return; // send plain text
+            }
+            // stop the actual sending of the message, in case you want to queue it and resend it later
+
+            // SEND only to a specific user... .send() ignores the .to property
+            megaRoom.encryptionOpQueue.queue(
+                'sendTo',
+                JSON.stringify([
+                    eventObject.getContents(),
+                    eventObject.getMeta()
+                ]),
+                eventObject.getToJid(),
+                {
+                    'messageId': eventObject.getMessageId(),
+                    'roomJid': eventObject.getMeta().roomJid,
+                    'delay': eventObject.getDelay()
+                }
+            );
+
+            e.stopPropagation();
+        } else {
+            console.error("Room not found: ", roomJid, eventObject);
+        }
+    } else if(eventObject.getType() == "groupchat" && eventObject.getContents().indexOf(EncryptionFilter.MPENC_MSG_TAG) !== 0) {
 
         // get room jid
         var roomJid = eventObject.getToJid().split("/")[0];
@@ -608,32 +651,6 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
                 ]),
                 {
                     'messageId': eventObject.getMessageId(),
-                    'delay': eventObject.getDelay()
-                }
-            );
-
-            e.stopPropagation();
-        } else {
-            console.error("Room not found: ", roomJid, eventObject);
-        }
-    } else if(eventObject.getType() == "action" && eventObject.getMeta().roomJid) {
-        // get room jid
-        var roomJid = eventObject.getMeta().roomJid.split("/")[0];
-        var megaRoom = self.megaChat.chats[roomJid];
-        if(megaRoom) {
-            // stop the actual sending of the message, in case you want to queue it and resend it later
-
-            // SEND only to a specific user... .send() ignores the .to property
-            megaRoom.encryptionOpQueue.queue(
-                'sendTo',
-                JSON.stringify([
-                    eventObject.getContents(),
-                    eventObject.getMeta()
-                ]),
-                eventObject.getToJid(),
-                {
-                    'messageId': eventObject.getMessageId(),
-                    'roomJid': eventObject.getMeta().roomJid,
                     'delay': eventObject.getDelay()
                 }
             );
@@ -774,8 +791,15 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
         return;
     }
 
-    getPubEd25519(contact.u, function(r) {
-        var failed = function() {
+    var $promise1 = new $.Deferred();
+    var $promise2 = new $.Deferred();
+
+    var $combPromise = $.when($promise1, $promise2);
+
+    var contact2 = megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(wireMessage.toJid));
+
+    $combPromise
+        .fail(function() {
             if(localStorage.d) {
                 console.error("Could not process message: ", wireMessage, e);
             }
@@ -783,21 +807,45 @@ EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wire
             setTimeout(function() {
                 self._processMessageRecursive(e, megaRoom, wireMessage, contact, retriesCount);
             }, retriesCount * 1234);
-        };
+        })
+        .done(function() {
+            megaRoom.encryptionHandler.processMessage(wireMessage);
+        });
 
+    getPubEd25519(contact.u, function(r) {
         if(r) {
             try {
-                megaRoom.encryptionHandler.processMessage(wireMessage);
+                $promise1.resolve();
             } catch(e) {
                 if(localStorage.d) {
                     console.error("Failed to process message", wireMessage, "with error:", e);
+                    if(localStorage.stopOnAssertFail) {
+                        debugger;
+                    }
                 }
-//                failed();
             }
         } else {
-            failed();
+            $promise1.reject();
         }
     });
+    getPubEd25519(contact2.u, function(r) {
+        if(r) {
+            try {
+                $promise2.resolve();
+            } catch(e) {
+                if(localStorage.d) {
+                    console.error("Failed to process message", wireMessage, "with error:", e);
+                    if(localStorage.stopOnAssertFail) {
+                        debugger;
+                    }
+                }
+            }
+        } else {
+            $promise2.reject();
+        }
+    });
+
+    return $combPromise;
 };
 
 EncryptionFilter.prototype.processMessage = function(e, megaRoom, wireMessage) {

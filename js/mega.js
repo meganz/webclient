@@ -883,10 +883,11 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-            //TODO: show something? some kind of list of conversations summary/overview screen or something?
-            sectionUIopen('conversations');
-			sharedfolderUI();
-			treeUI();
+            
+            megaChat.renderListing();
+            
+            sharedfolderUI();
+            treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
@@ -1023,12 +1024,19 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
-			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
+            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";
+
+            html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
 		}
 		$('.content-panel.contacts').html(html);
-		$('.content-panel.conversations .conversations-container').html(html2);
-		
+
+        //TMP: temporary start chat button event handling
+        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
+            var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
+            window.location = "#fm/chat/" + user_handle;
+        });
+        
 		$('.nw-contact-item').unbind('click');
 		$('.nw-contact-item').bind('click',function(e)
 		{

@@ -536,7 +536,7 @@ function initUI()
 	{
         if($('#fmholder.transfer-panel-opened').size() == 0)
 		{
-            $.transferOpen();
+            $.transferOpen(undefined, true);
             $.transferHeader();
         }
 		var h = tp.height()
@@ -3522,7 +3522,7 @@ function transferPanelUI()
 		})
 	}
 
-	$.transferOpen = function(force)
+	$.transferOpen = function(force, dont_animate)
 	{
 		if($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
 		{
@@ -3537,13 +3537,18 @@ function transferPanelUI()
 
 			var panel = $('.transfer-panel')
 
-				panel.animate({'height': height}, {
-					complete: function() {
-						$.transferHeader();
-						$(window).trigger('resize');
-					},
-					progress: fm_resize_handler
-				})
+			if (dont_animate) {
+				panel.css({'height': height});
+				return fm_resize_handler();
+			}
+
+			panel.animate({'height': height}, {
+				complete: function() {
+					$.transferHeader();
+					$(window).trigger('resize');
+				},
+				progress: fm_resize_handler
+			})
 
 		}
 		else

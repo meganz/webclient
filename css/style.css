@@ -53,6 +53,9 @@ body, td, th {
 	color: #333333;
 	line-height: 15px;
 }
+body.dragging div, body.dragging a, body.dragging span {
+   cursor: url(../images/mega/cursor.png), auto !important;
+}
 html {
 	font-size: 100%;
 	-webkit-text-size-adjust: 100%;
@@ -69,9 +72,6 @@ body {
 	overflow: hidden;
 	height: 100%;
 	min-width: 987px;
-}
-body.dragging div, body.dragging a, body.dragging span {
-   cursor: url(../images/mega/cursor.png), auto !important;
 }
 ::selection {
 	background: #d22000;
@@ -3076,7 +3076,7 @@ label.iPhoneCheckLabelOff span {
 	color: #666666;
 	height: 24px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: -17px -7465px;
+	background-position: -15px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
@@ -3089,7 +3089,7 @@ label.iPhoneCheckLabelOff span {
 	background-position: -15px -7625px;
 }
 .nw-fm-tree-folder.shared-folder, .nw-fm-tree-shared-folder {
-	background-position: -17px -7535px;
+	background-position: -15px -7535px;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder {
 	color: white;
@@ -3103,17 +3103,17 @@ label.iPhoneCheckLabelOff span {
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -7505px;
+	background-position: -15px -7505px;
 }
 .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.selected.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder {
 	color: white;
-	background-position: -17px -7375px;
+	background-position: -15px -7375px;
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-shared-folder {
-	background-position: -17px -7565px;
+	background-position: -15px -7565px;
 }
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
-	background-position: -17px -7435px;
+	background-position: -15px -7435px;
 }
 .nw-contact-item, .add-contact-item {
 	height: 48px;

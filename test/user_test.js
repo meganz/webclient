@@ -7,12 +7,11 @@ describe("user unit test", function() {
     "use strict";
     
     var assert = chai.assert;
-    var sandbox = sinon.sandbox;
     
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
-    // Some test daata.
+    // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     
     var stdoutHook;

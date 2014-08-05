@@ -442,12 +442,12 @@ else
 
 		jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
+        jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});		
 		
-
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
+        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});

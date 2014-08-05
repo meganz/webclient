@@ -531,12 +531,11 @@ function initUI()
 		},2000);
 	}
 
-    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
+	var tPane = $('.transfer-panel')
+    $.transferPaneResizable = new FMResizablePane(tPane, {
         'direction': 'n',
-        'minHeight': 135,
-        'maxHeight': (
-            $(document.body).outerHeight() * 0.45 /* 45%? */
-        ),
+        'minHeight': 96,
+        'maxHeight': 312,
         'persistanceKey': 'transferPaneHeight',
         'handle': '.transfer-drag-handle'
     });
@@ -544,9 +543,17 @@ function initUI()
 	{
         if($('#fmholder.transfer-panel-opened').size() == 0)
 		{
-            $.transferOpen();
+            $.transferOpen(undefined, true);
             $.transferHeader();
         }
+		var h = tPane.height()
+		if (h >= $.transferPaneResizable.options.maxHeight) {
+			$('.transfer-drag-handle').css('cursor', 's-resize')
+		} else if (h <= $.transferPaneResizable.options.minHeight) {
+			$('.transfer-drag-handle').css('cursor', 'n-resize')
+		} else {
+			$('.transfer-drag-handle').css('cursor', 'ns-resize')
+		}
     });
 
     $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
@@ -556,8 +563,32 @@ function initUI()
         };
     });
 
+	var lPane = $('.fm-left-panel')
+    $.leftPaneResizable  = new FMResizablePane(lPane, {
+        'direction': 'e',
+        'minWidth': 200,
+        'maxWidth': 400,
+        'persistanceKey': 'leftPaneWidth',
+        'handle': '.left-pane-drag-handle'
+	});
+
+    if(localStorage.leftPaneWidth) {
+		lPane.width(Math.min(
+			$.leftPaneResizable.options.maxWidth,
+			Math.max($.leftPaneResizable.options.minWidth, localStorage.leftPaneWidth)
+		));
+	}
+
     $($.leftPaneResizable).on('resize', function() {
-        $(window).trigger('resize');
+		var w = lPane.width()
+		if (w >= $.leftPaneResizable.options.maxWidth) {
+			$('.left-pane-drag-handle').css('cursor', 'w-resize')
+		} else if (w <= $.leftPaneResizable.options.minWidth) {
+			$('.left-pane-drag-handle').css('cursor', 'e-resize')
+		} else {
+			$('.left-pane-drag-handle').css('cursor', 'we-resize')
+		}
+		$(window).trigger('resize');
     });
 
 	$(window).unbind('resize.fmrh hashchange.fmrh');
@@ -3531,6 +3562,8 @@ function transferPanelUI()
 
 	$.transferClose = function() {
 		var panel = $('.transfer-panel')
+		
+		$('.transfer-drag-handle').css('cursor', 'n-resize')
 
         panel.animate({'height': $('.transfer-panel-title').height()}, {
 			complete: function() {
@@ -3542,7 +3575,7 @@ function transferPanelUI()
 		})
 	}
 
-	$.transferOpen = function(force)
+	$.transferOpen = function(force, dont_animate)
 	{
 		if($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
 		{
@@ -3550,20 +3583,25 @@ function transferPanelUI()
 			$('#fmholder').addClass('transfer-panel-opened');
 			$.transferHeader();
 
-			var height = 193
+			var height = 192
             if(localStorage.transferPaneHeight && $.transferPaneResizable) {
 				height = Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight)
 			}
 
 			var panel = $('.transfer-panel')
 
-				panel.animate({'height': height + $('.transfer-panel-title').height()}, {
-					complete: function() {
-						$.transferHeader();
-						$(window).trigger('resize');
-					},
-					progress: fm_resize_handler
-				})
+			if (dont_animate) {
+				panel.css({'height': height});
+				return fm_resize_handler();
+			}
+
+			panel.animate({'height': height}, {
+				complete: function() {
+					$.transferHeader();
+					$(window).trigger('resize');
+				},
+				progress: fm_resize_handler
+			})
 
 		}
 		else
@@ -5900,6 +5938,10 @@ function fm_resize_handler() {
         'height': right_blocks_height + "px",
         'min-height': right_blocks_height + "px"
     });
+
+    $('.fm-right-files-block').css({
+		'margin-left' : ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+	});
 
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();

@@ -1160,6 +1160,7 @@ function MegaData ()
 
 		this.buildRootSubmenu = function()
 		{
+			$('#sm_move').remove();
 			var cs = '';
 
 			for (var h in M.c[M.RootID])
@@ -1179,7 +1180,7 @@ function MegaData ()
 			html += '</span>';
 
 			$('.context-menu-item.move-item').after(html);
-		}
+		};
 		
 		var id;
 		if (typeof i === 'undefined')
@@ -1193,8 +1194,8 @@ function MegaData ()
 		
 		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
 
-		// sort by name is default in the tree
-		// localeCompare is support in IE11 only
+// localeCompare is not supported in IE10, >=IE11 only
+// sort by name is default in the tree
 //		folders.sort(function(a,b)
 //		{
 //			if (a.name) return a.name.localeCompare(b.name);
@@ -1217,13 +1218,14 @@ function MegaData ()
 					break;
 				}
 			}
+// Should we have infors about shared folders in submenues?
 //				var sharedfolder = '';
 //				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
 			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
 			$('#sm_' + id).prepend(html);
 			if (sub) this.buildSubmenu(fid);
 		}
-	}
+	};
 
     this.sortContacts = function(folders) {
         // in case of contacts we have custom sort/grouping:

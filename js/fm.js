@@ -917,25 +917,51 @@ function fmremove()
 		});
 	}
 }
-
 function initContextUI()
 {
 	var c = '.context-menu-item';
 	
-	$(c+'.contains-submenu').unbind('mouseenter');
-	$(c+'.contains-submenu').bind('mouseenter', function(e)
+	$(c).unbind('mouseover');
+	$(c).bind('mouseover', function(e)
 	{
-		var pos = getHtmlElemPos(this);
-		var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
-		$(this).next('.context-submenu')
-			.css({'top': c.top})
-			.addClass('active');
-		
-		$(this).addClass('opened');
+		if ($(this).parent().is('.context-submenu'))
+		{
+			if (!$(this).is('.contains-submenu'))
+			{
+				$(this).parent().children().removeClass('active opened');
+				$(this).parent().find('.context-submenu').addClass('hidden');
+			}
+		}
+		else
+		{
+			if (!$(this).is('.contains-submenu'))
+			{
+				$('.context-menu .context-submenu.active ').removeClass('active');
+				$('.context-menu .contains-submenu.opened').removeClass('opened');
+				$('.context-menu .context-submenu').addClass('hidden');
+			}
+		}
 	});
-	$(c+'.contains-submenu').unbind('mouseleave');
-	$(c+'.contains-submenu').bind('mouseleave', function(e)
+	
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover', function(e)
 	{
+		var a = $(this).next();
+		a.find('.active').removeClass('active');
+		a.find('.opened').removeClass('opened');
+		a.find('.context-submenu').addClass('hidden');
+
+		if (!$(this).is('.opened'))
+		{
+			var pos = getHtmlElemPos(this);
+			var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
+			$(this).next('.context-submenu')
+				.css({'top': c.top})
+				.addClass('active')
+				.removeClass('hidden');
+
+			$(this).addClass('opened');
+		}
 	});
 
 	$(c+'.download-item').unbind('click');

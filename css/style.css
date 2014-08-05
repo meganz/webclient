@@ -18207,7 +18207,7 @@ transform: rotate(900deg);
  */
 .transfer-drag-handle {
 	width: 100%;
-	cursor: ns-resize;
+	cursor: n-resize;
 	z-index: 10;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;

@@ -503,12 +503,11 @@ function initUI()
 		},2000);
 	}
 
-    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
+	var tp = $('.transfer-panel')
+    $.transferPaneResizable = new FMResizablePane(tp, {
         'direction': 'n',
-        'minHeight': 135,
-        'maxHeight': (
-            $(document.body).outerHeight() * 0.45 /* 45%? */
-        ),
+        'minHeight': 96,
+        'maxHeight': 312,
         'persistanceKey': 'transferPaneHeight',
         'handle': '.transfer-drag-handle'
     });
@@ -519,6 +518,14 @@ function initUI()
             $.transferOpen();
             $.transferHeader();
         }
+		var h = tp.height()
+		if (h == 312) {
+			$('.transfer-drag-handle').css('cursor', 's-resize')
+		} else if (h <= 96) {
+			$('.transfer-drag-handle').css('cursor', 'n-resize')
+		} else {
+			$('.transfer-drag-handle').css('cursor', 'ns-resize')
+		}
     });
 
     $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
@@ -3479,6 +3486,8 @@ function transferPanelUI()
 
 	$.transferClose = function() {
 		var panel = $('.transfer-panel')
+		
+		$('.transfer-drag-handle').css('cursor', 'n-resize')
 
         panel.animate({'height': $('.transfer-panel-title').height()}, {
 			complete: function() {

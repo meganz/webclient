@@ -4025,6 +4025,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-search-bl.active {
 	width: 240px;
 }
+.top-search-input::-webkit-input-placeholder {
+ color:rgba(0,0,0,0.3);
+}
+ .top-search-input:-moz-placeholder {
+ color:rgba(0,0,0,0.3);
+ opacity: 1;
+}
+ .top-search-input::-moz-placeholder {
+ color:rgba(0,0,0,0.3);
+ opacity: 1;
+}
+ .top-search-input:-ms-input-placeholder {
+ color:rgba(0,0,0,0.3);
+}
 .active.focused .top-search-input {
 	color: #434343;
 }

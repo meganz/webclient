@@ -40,6 +40,7 @@ module.exports = function(config) {
         'js/user.js',
         'js/megafilepicker.js',
         'js/tlvstore.js',
+        'js/authring.js',
         
         // Tests.
         {pattern: 'test/fixtures/**/*.html', included: false, served: true},

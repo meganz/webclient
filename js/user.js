@@ -581,9 +581,6 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         ua: attribute,
         callback2: callback,
     };
-    if (callback) {
-        myCtx['callback2'] = callback;
-    }
     
     // Fire it off.
     var apiCall = {'a': 'up'};

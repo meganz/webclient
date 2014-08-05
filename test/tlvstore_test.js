@@ -11,7 +11,7 @@ describe("tlvstore unit test", function() {
     
     var ns = _TlvStore;
     
-    // Some test daata.
+    // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     
     // Create/restore Sinon stub/spy/mock sandboxes.
@@ -41,11 +41,15 @@ describe("tlvstore unit test", function() {
         });
         
         it("containerToTlvRecords", function() {
-            var tests = {'foo': 'bar',
-                         'puEd255': ED25519_PUB_KEY};
-            var expected = 'foo\u0000\u0000\u0003bar'
-                         + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY;
-            assert.strictEqual(containerToTlvRecords(tests), expected);
+            var tests = [{'foo': 'bar',
+                          'puEd255': ED25519_PUB_KEY},
+                         {'': 'fortytwo'}];
+            var expected = ['foo\u0000\u0000\u0003bar'
+                            + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY,
+                            '\u0000\u0000\u0008fortytwo'];
+            for (var i = 0; i < tests.length; i++) {
+                assert.strictEqual(containerToTlvRecords(tests[i]), expected[i]);
+            }
         });
         
         it('_splitSingleTlvRecord', function() {
@@ -58,13 +62,14 @@ describe("tlvstore unit test", function() {
         });
         
         it('tlvRecordsToContainer', function() {
-            var tests = 'foo\u0000\u0000\u0003bar'
-                      + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY;
-            var expected = {'foo': 'bar',
-                            'puEd255': ED25519_PUB_KEY};
-            var result = tlvRecordsToContainer(tests);
-            for (var key in expected) {
-                assert.strictEqual(result[key], expected[key]);
+            var tests = ['foo\u0000\u0000\u0003bar'
+                         + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY,
+                         '\u0000\u0000\u0008fortytwo'];
+            var expected = [{'foo': 'bar',
+                             'puEd255': ED25519_PUB_KEY},
+                            {'': 'fortytwo'}];
+            for (var i = 0; i < tests.length; i++) {
+                assert.deepEqual(tlvRecordsToContainer(tests[i]), expected[i]);
             }
         });
     });

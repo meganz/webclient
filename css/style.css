@@ -53,6 +53,9 @@ body, td, th {
 	color: #333333;
 	line-height: 15px;
 }
+body.dragging div, body.dragging a, body.dragging span {
+   cursor: url(../images/mega/cursor.png), auto !important;
+}
 html {
 	font-size: 100%;
 	-webkit-text-size-adjust: 100%;
@@ -2987,12 +2990,12 @@ label.iPhoneCheckLabelOff span {
 	display: block;
 	background-color: rgba(217,0,7,0);
 	padding-right: 13px;
-	-webkit-transition: background-color 150ms ease-in-out;
-	-moz-transition: background-color 150ms ease-in-out;
-	-o-transition: background-color 150ms ease-in-out;
-	-ms-transition: background-color 150ms ease-in-out;
-	transition: background-color 150ms ease-in-out;
-	border-right: 2px solid rgba(0,0,0,0.0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	border-right: 2px solid rgba(0,0,0,0);
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
@@ -3073,7 +3076,7 @@ label.iPhoneCheckLabelOff span {
 	color: #666666;
 	height: 24px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: -17px -7465px;
+	background-position: -15px -7465px;
 	background-repeat: no-repeat;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
@@ -3120,6 +3123,12 @@ label.iPhoneCheckLabelOff span {
 	padding-right: 15px;
 	overflow: hidden;
 	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .add-contact-item:nth-child(even) {
 	background-color: rgba(0,0,0,0.02);
@@ -3371,20 +3380,23 @@ label.iPhoneCheckLabelOff span {
 	background-position: -12px -752px;
 	cursor: pointer;
 	-webkit-transition: opacity 200ms ease-in-out;
--moz-transition: opacity 200ms ease-in-out;
--o-transition: opacity 200ms ease-in-out;
--ms-transition: opacity 200ms ease-in-out;
-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
--moz-opacity: 0.3;
--khtml-opacity: 0.3;
-opacity: 0.3;
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 }
 .nw-tree-panel-arrows:hover {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
--moz-opacity: 0.7;
--khtml-opacity: 0.7;
-opacity: 0.7;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.nw-tree-panel-arrows.active {
+	background-position: -12px -7916px;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
@@ -3396,6 +3408,12 @@ opacity: 0.7;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
 	border-right: 2px solid rgba(0,0,0,0);
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
+	background-color: rgba(0,0,0,0);
 }
 .nw-conversations-unread {
 	position: absolute;
@@ -4007,6 +4025,20 @@ opacity: 0.7;
 .top-search-bl.active {
 	width: 240px;
 }
+.top-search-input::-webkit-input-placeholder {
+ color:rgba(0,0,0,0.3);
+}
+ .top-search-input:-moz-placeholder {
+ color:rgba(0,0,0,0.3);
+ opacity: 1;
+}
+ .top-search-input::-moz-placeholder {
+ color:rgba(0,0,0,0.3);
+ opacity: 1;
+}
+ .top-search-input:-ms-input-placeholder {
+ color:rgba(0,0,0,0.3);
+}
 .active.focused .top-search-input {
 	color: #434343;
 }
@@ -4065,6 +4097,7 @@ opacity: 0.7;
 	height: 100%;
 	float: left;
 	background-color: #f2f2f2;
+	position: relative;
 }
 .notifications .fm-left-panel {
 	width: 304px;
@@ -5182,11 +5215,11 @@ table {
 }
 .rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
 	background-position: center -1223px;
-	background-image:url(../images/mega/shared-sprite.svg);
+	background-image: url(../images/mega/shared-sprite.svg);
 }
 .rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
 	background-position: center -1323px;
-	background-image:url(../images/mega/shared-sprite.svg);
+	background-image: url(../images/mega/shared-sprite.svg);
 }
 .block-view-file-type.flash, .properties-file-icon div.flash {
 	background-position: center -9866px;
@@ -6177,7 +6210,7 @@ span.search-number {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu {
+.context-menu, .nw-sorting-menu {
 	min-width: 164px;
 	position: absolute;
 	background-color: #333333;
@@ -6192,7 +6225,11 @@ span.search-number {
 	z-index: 500;
 	padding: 8px 0;
 }
-.context-menu-divider, .pause-item-divider {
+.nw-sorting-menu {
+	right: -156px;
+	top: 40px;
+}
+.context-menu-divider, .pause-item-divider, .sorting-item-divider {
 	height: 2px;
 	background-color: rgba(255,255,255,0.05);
 	margin: 3px 0;
@@ -9665,6 +9702,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	border-left: 2px solid transparent;
 	left: 100%;
 	right: auto;
+	margin-left: -10600px;
+	margin-right:0;
 }
 .context-submenu.left-position {
 	border-right: 2px solid transparent;
@@ -9730,7 +9769,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .top-user-status-arrow {
 	margin-right: 83px;
 }
-.top-menu-item, .top-user-status-item, .context-menu-item {
+.top-menu-item, .top-user-status-item, .context-menu-item, .sorting-menu-item {
 	display: block;
 	height: 32px;
 	line-height: 30px;
@@ -9749,7 +9788,37 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	cursor: pointer;
+}
+.sorting-menu-item {
+	height: 24px;
+	line-height: 22px;
+	padding: 0 12px;
+	font-size: 12px;
+	color: rgba(153,153,153,1);
+	background-repeat: no-repeat;
+	background-position: right -7966px;
+	-webkit-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-moz-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-o-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	-ms-transition: color 200ms ease-in-out, color 200ms ease-in-out;
+	transition: color 200ms ease-in-out, color 200ms ease-in-out;
+}
+.sorting-menu-item:hover {
+	background-color: rgba(255,255,255,0.1);
+}
+.sorting-menu-item.active, .sorting-menu-item.selected {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	color: rgba(255,255,255,1);
+}
+.sorting-menu-arrow {
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -7998px;
+	position: absolute;
+	width: 10px;
+	height: 17px;
+	left: -7px;
+	top: 10px;
 }
 .context-menu-item {
 	padding: 0 15px 0 42px;

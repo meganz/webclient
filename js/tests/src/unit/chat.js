@@ -62,6 +62,7 @@ describe("Chat.js - Karere UI integration", function() {
 
                 megaChat.init();
 
+
                 expect(
                     $('.activity-status-block').is(":visible")
                 ).to.be.ok;
@@ -313,6 +314,7 @@ describe("Chat.js - Karere UI integration", function() {
             to: user1jid,
             type: "Message"
         });
+
 
         expect(eventTriggerShouldReturnFalse).to.not.be.ok;
 
@@ -577,7 +579,6 @@ describe("Chat.js - Karere UI integration", function() {
     });
 
     it("Presence sync across devices and auto invite to private rooms (resume/created chat support)", function(done) {
-
         var user1jid2 = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[0]].u) + "/res2";
         var user2jid = megaChat.getJidFromNodeId(M.u[Object.keys(M.u)[1]].u) + "/res";
 
@@ -795,6 +796,8 @@ describe("Chat.js - Karere UI integration", function() {
                         "</iq>"
                     );
 
+
+
                     var eventTriggerShouldNOTReturnFalse = megaChat.karere._triggerEvent("Presence", {
                         from: user2jid,
                         id: null,
@@ -807,10 +810,6 @@ describe("Chat.js - Karere UI integration", function() {
                         delay: unixtime() - 1000,
                         to: megaChat.karere.getJid()
                     });
-
-                    expect(
-                        $('#contact_' + Object.keys(M.u)[1]).is(v[1])
-                    ).to.be.ok;
 
                     expect(
                         $('#contact2_' + Object.keys(M.u)[1]).is(v[1])

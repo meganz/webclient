@@ -981,19 +981,23 @@ function initContextUI()
 		a.children().removeClass('active opened');
 		a.find('.context-submenu').addClass('hidden');
 		
+		var b = $(this).parent('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
+		if (b.length)
+		{
+			b.removeClass('active opened')
+				.find('.context-submenu').addClass('hidden');
+		}
 		if ($(this).is('.move-item'))
 		{
-			$('.context-menu .download-item')
-					.next().removeClass('active opened')
-					.removeClass('opened')
-					.next().find('.context-submenu').addClass('hidden');
+			$('.context-menu .download-item').removeClass('opened')
+				.next().removeClass('active opened')
+				.next().find('.context-submenu').addClass('hidden');
 		}
 		if ($(this).is('.download-item'))
 		{
-			$('.context-menu .move-item')
-					.next().removeClass('active opened')
-					.removeClass('opened')
-					.next().find('.context-submenu').addClass('hidden');
+			$('.context-menu .move-item').removeClass('opened')
+				.next().removeClass('active opened')
+				.next().find('.context-submenu').addClass('hidden');
 		}
 
 		if (!$(this).is('.opened'))

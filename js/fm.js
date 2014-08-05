@@ -565,8 +565,23 @@ function initUI()
         'handle': '.left-pane-drag-handle'
 	});
 
+    if(localStorage.leftPaneWidth) {
+		lPane.width(Math.min(
+			$.leftPaneResizable.options.maxWidth,
+			Math.max($.leftPaneResizable.options.minWidth, localStorage.leftPaneWidth)
+		));
+	}
+
     $($.leftPaneResizable).on('resize', function() {
-        $(window).trigger('resize');
+		var w = lPane.width()
+		if (w >= $.leftPaneResizable.options.maxWidth) {
+			$('.left-pane-drag-handle').css('cursor', 'w-resize')
+		} else if (w <= $.leftPaneResizable.options.minWidth) {
+			$('.left-pane-drag-handle').css('cursor', 'e-resize')
+		} else {
+			$('.left-pane-drag-handle').css('cursor', 'we-resize')
+		}
+		$(window).trigger('resize');
     });
 
 	$(window).unbind('resize.fmrh hashchange.fmrh');

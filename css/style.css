@@ -8375,7 +8375,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 }
 .confirmation-checkbox {
-	margin: -5px 0 0-16px;
+	margin: -5px 0 0 -16px;
 }
 .fm-dialog-button.add-contact-button, .fm-dialog-button.cancel-contact-button {
 	height: 32px;
@@ -9709,10 +9709,21 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	margin-left: -10600px;
 	margin-right:0;
 }
+.context-submenu.reset {
+	border-left: 2px solid transparent;
+	left: 100%;
+	right: auto;
+}
 .context-submenu.left-position {
 	border-right: 2px solid transparent;
 	left: auto;
 	right: 100%;
+}
+.context-submenu.overlap-right {
+	right: auto;
+}
+.context-submenu.overlap-left {
+	left: auto;
 }
 .context-submenu .context-menu-item {
 	display: block !important;
@@ -9832,13 +9843,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	background-color: rgba(153,153,153,1);
 	color: rgba(255,255,255,1);
 }
-.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover {
+.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
 	background-color: rgba(220,0,0,1);
 }
 .context-menu-item.getlink-item:hover, .context-menu-item.sharing-item:hover {
 	background-color: rgba(255,179,0,1);
 }
-.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover {
+.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened {
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-item .context-menu-icon, .context-menu-points {
@@ -9862,6 +9873,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .context-menu-item.contains-submenu {
 	padding-right: 25px;
+}
+.context-menu-item.move-item.opened {
+	background-color: rgba(49,181,0,1);
+}
+.context-menu-item.opened {
+	background-color: rgba(49,181,0,1);	
 }
 .context-menu-item:hover > .context-menu-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

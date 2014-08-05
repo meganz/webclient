@@ -393,7 +393,8 @@ function initUI()
 	InitFileDrag();
 	createfolderUI();
 	cSortMenuUI();
-	initContextUI();
+	M.buildSubmenu();
+//	initContextUI();
 	transferPanelUI();
 	UIkeyevents();
 	addUserUI();
@@ -434,7 +435,13 @@ function initUI()
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
-		$('.context-menu.files-menu').addClass('hidden');
+		// Set to default
+		var a = $('.context-menu.files-menu');
+		a.addClass('hidden');
+		var b = a.find('.context-submenu');
+		b.attr('style', '');
+		b.removeClass('active left-position overlap-right overlap-left');
+		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
 	$('#fmholder').unbind('click.contextmenu');
@@ -969,29 +976,69 @@ function fmremove()
 		});
 	}
 }
-
 function initContextUI()
 {
 	var c = '.context-menu-item';
-
-	//TODO: Create logic for submenues positions in context menu
-	$(c+'.contains-submenu').unbind('mouseover');
-	$(c+'.contains-submenu').bind('mouseover',function()
+	
+	$(c).unbind('mouseover');
+	$(c).bind('mouseover', function(e)
 	{
-	    var s = $(this).next('.context-submenu');
-		$(s).removeClass('left-position');
-		s.addClass('active');
-		var rpos = $(window).width() - $(s).offset().left - $(s).width();
-		if (rpos < 20) $(s).addClass('left-position');
+		if ($(this).parent().is('.context-submenu'))
+		{
+			if (!$(this).is('.contains-submenu'))
+			{
+				$(this).parent().children().removeClass('active opened');
+				$(this).parent().find('.context-submenu').addClass('hidden');
+			}
+		}
+		else
+		{
+			if (!$(this).is('.contains-submenu'))
+			{
+				$('.context-menu .context-submenu.active ').removeClass('active');
+				$('.context-menu .contains-submenu.opened').removeClass('opened');
+				$('.context-menu .context-submenu').addClass('hidden');
+			}
+		}
 	});
-	$(c+'.contains-submenu').unbind('mouseout');
-	$(c+'.contains-submenu').bind('mouseout',function()
+	
+	$(c+'.contains-submenu').unbind('mouseover');
+	$(c+'.contains-submenu').bind('mouseover', function(e)
 	{
+		var a = $(this).next();
+		a.children().removeClass('active opened');
+		a.find('.context-submenu').addClass('hidden');
+		
+		var b = $(this).parent('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
+		if (b.length)
+		{
+			b.removeClass('active opened')
+				.find('.context-submenu').addClass('hidden');
+		}
+		if ($(this).is('.move-item'))
+		{
+			$('.context-menu .download-item').removeClass('opened')
+				.next().removeClass('active opened')
+				.next().find('.context-submenu').addClass('hidden');
+		}
+		if ($(this).is('.download-item'))
+		{
+			$('.context-menu .move-item').removeClass('opened')
+				.next().removeClass('active opened')
+				.next().find('.context-submenu').addClass('hidden');
+		}
 
-	    var s = $(this).next('.context-submenu');
-		var isHovered = $(s).is(":hover");
-		if (!isHovered)
-		   $(s).removeClass('active');
+		if (!$(this).is('.opened'))
+		{
+			var pos = getHtmlElemPos(this);
+			var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
+			$(this).next('.context-submenu')
+				.css({'top': c.top})
+				.addClass('active')
+				.removeClass('hidden');
+
+			$(this).addClass('opened');
+		}
 	});
 
 	$(c+'.download-item').unbind('click');
@@ -3757,10 +3804,17 @@ function menuItems()
 
 function contextmenuUI(e,ll,topmenu)
 {
+	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
+	
+	$.hideContextMenu();
+	
+	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var t = '.context-menu.files-menu .context-menu-item';
+	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)
 	{
+		// Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
 		if (RightsbyID(M.currentdirid) && RootbyId(M.currentdirid) !== M.RubbishID)
 		{
 			$(t).filter('.context-menu-item').hide();
@@ -3769,14 +3823,16 @@ function contextmenuUI(e,ll,topmenu)
 		}
 		else return false;
 	}
-	else if (ll)
+	else if (ll)// click on item
 	{
-		$(t).hide();
+		$(t).hide();// Hide all menu-items
 		var c = $(e.currentTarget).attr('class');
 		var id = $(e.currentTarget).attr('id');
-		if (id) id = id.replace('treea_','');
-		if (id && !M.d[id]) id = undefined;
-		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();
+		if (id) id = id.replace('treea_','');// if right clicked on left panel
+		if (id && !M.d[id]) id = undefined;// exist in node list
+
+		// detect and show right menu
+		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			$.selected = [M.RootID];
@@ -3796,22 +3852,209 @@ function contextmenuUI(e,ll,topmenu)
 		}
 		else return false;
 	}
-
-	var m = $('.context-menu.files-menu');
+	// This part of code is also executed when ll == 'undefined'
 	var v = m.children($('.context-menu-section'));
-	v.removeClass('hidden');
-	m.removeClass('hidden');
-	v.each(function() {
-		if($(this).height()<24) $(this).addClass('hidden');
+	// count all items inside section, and hide dividers if necessary
+	v.each(function() {// hide dividers in hidden sections
+		var a = $(this).find('a.context-menu-item');
+		var b = $(this).find('.context-menu-divider');
+		var c = a.filter(function() {
+			return $(this).css('display') === 'none';
+		});
+		if (c.length === a.length || a.length === 0) b.hide();
+		else b.show();
 	});
-	var r = $('body').outerWidth()-$(m).outerWidth();
-	var b = $('body').outerHeight()-$(m).outerHeight();
-	var mX = e.pageX;
-	var mY = e.pageY;
-	m.css({'top':mY,'left':mX})
-	if (b - $(m).position().top < 50) m.css('top', b-50);
-	if (r - $(m).position().left < 1) m.css('left', mX - 10 - $(m).outerWidth());
+	
+	adjustContextMenuPosition(e, m);
+	
+	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function adjustContextMenuPosition(e, m)
+{
+	var mPos;// menu position
+	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
+	
+	if (e.type === 'click')// clicked on file-settings-icon
+	{
+		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
+		var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
+		mPos = reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
+	}
+	else// right click
+	{
+		mPos = reCalcMenuPosition(m, mX, mY);
+	}
+	
+	m.css({'top':mPos.y,'left':mPos.x});// set menu position
+	
+	return true;
+}
+
+function reCalcMenuPosition(m, x, y, ico)
+{
+	var TOP_MARGIN = 12;
+	var SIDE_MARGIN = 12;
+	var cmW = m.outerWidth(), cmH = m.outerHeight();// context menu dimensions
+	var wH = window.innerHeight, wW = window.innerWidth;
+	var maxX = wW - SIDE_MARGIN;// max horizontal position
+	var maxY = wH - TOP_MARGIN;// max vertical position
+	var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal position
+	var minY = TOP_MARGIN;// min vertical position
+	var wMax = x + cmW;// calculated coordinate of right edge
+	var hMax = y + cmH;// calculated coordinate of bottom edge
+
+	$.overlapParentMenu = function()
+	{
+				var tre = wW - wMax;// to right edge
+				var tle = x - minX - SIDE_MARGIN;// to left edge
+				
+				if (tre >= tle)
+				{
+					n.addClass('overlap-right');
+					n.css({'top': top, 'left': (maxX - x - nmW) + 'px'});
+				}
+				else
+				{
+					n.addClass('overlap-left');
+					n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
+				}
+
+				return;
+	};
+	
+	$.horPos = function()
+	{
+		var t = 'auto';
+		var b = y + nmH - 8;
+		if (b > maxY) t = -(b - maxY - 40 - cmH) + 'px';// margin-top 40px
+		
+		return t;
+	};
+	
+	var dPos;
+	var cor;// corner, check setBordersRadius for more info
+	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
+	{
+		cor = 1;
+		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		if (wMax > maxX)// draw to the left
+		{
+			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
+			cor = 3;
+		}
+		if (hMax > maxY)// draw to the top
+		{
+			dPos.y = y - cmH - 4;// additional pixels to align with -icon
+			cor++;
+		}
+	}
+	else if ((typeof ico === 'string') && (ico === 'submenu'))
+	{
+		var n = m.next('.context-submenu');// next submenu
+		var nmW = n.outerWidth(), nmH = n.outerHeight();
+	
+		var top = 'auto', left = '100%', right = 'auto';
+		
+		top = $.horPos();
+		if (m.parent('.left-position').length === 0)
+		{
+			if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
+			else if (minX <= (x - nmW)) n.addClass('left-position');
+			else
+			{
+				$.overlapParentMenu();
+				
+				return true;
+			}
+		}
+		else
+		{
+			if (minX <= (x - nmW)) n.addClass('left-position');
+			else if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
+			else
+			{
+				$.overlapParentMenu();
+
+				return true;
+			}
+		}
+		
+		return {'top': top, 'left': left, 'right':right};
+	}
+	else// right click
+	{
+		cor = 0;
+		dPos = {'x':x, 'y':y};
+		if (x < minX) dPos.x = minX;// left side alignment
+		if (wMax > maxX) dPos.x = maxX - cmW;// align with right side, 12px from it
+		if (hMax > maxY) dPos.y = maxY - cmH;// align with bottom, 12px from it
+	}
+
+	setBordersRadius(m, cor);
+
+// ToDo: decide how to handle "huge" context menu
+//	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
+//	else if (hMax > maxY) dPos.x = x - cmW;
+//	if (hMax > maxY) dPos.y = maxY - cmH;
+	 
+	return {'x':dPos.x, 'y':dPos.y};
+}
+
+// corner position 0 means default
+function setBordersRadius(m, c)
+{
+	var DEF = 8;// default corner radius
+	var SMALL = 4;// small carner radius
+	var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
+	var tl = DEF, tr = DEF, bl = DEF, br = DEF;
+	
+	var pos = (typeof c === 'undefined') ? 0 : c;
+	
+	switch (pos)
+	{
+		case TOP_LEFT:
+			tl = SMALL;
+			break;
+		case TOP_RIGHT:
+			tr = SMALL;
+			break
+		case BOT_LEFT:
+			bl = SMALL;
+			break
+		case BOT_RIGHT:
+			br = SMALL;
+			break;
+		default:// situation when c is undefined, all border radius are by DEFAULT
+			break;
+			
+	}
+	
+	// set context menu border radius
+	m.css({
+		'border-top-left-radius': tl,
+		'border-top-right-radius': tr,
+		'border-bottom-left-radius': bl,
+		'border-bottom-right-radius': br});
+	
+	return true;
+}
+
+// Scroll menus which height is bigger then window.height
+function scrollHugeMenu(e, cont)
+{
+	var ey = e.pageY;
+	var k = document.getElementById(cont);
+	var pNode = k.parentNode;
+
+	var h = pNode.offsetHeight;
+	var dy = h * 0.1;
+	var pos = getHtmlElemPos(pNode);
+	var py = (ey - pos.y - dy) / (h - dy * 2);
+	if (py > 1) py = 1;
+	if (py < 0) py = 0;
+	pNode.scrollTop = py * (pNode.scrollHeight - h);
 }
 
 var tt;

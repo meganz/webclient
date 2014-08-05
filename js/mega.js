@@ -790,7 +790,7 @@ function MegaData ()
 		});
 
 		$('.file-block .file-settings-icon').bind('click',function(e) {
-			var target = $(this).parents('.file-block')
+			var target = $(this).parents('.file-block');
 			if (target.attr('class').indexOf('ui-selected') == -1) {
 				target.parent().find('a').removeClass('ui-selected');
 			}
@@ -1157,6 +1157,84 @@ function MegaData ()
 				if (buildnode) this.buildtree(folders[i]);
 			}
 		}
+	};
+
+	this.buildSubmenu = function(i, p)
+	{
+				
+		var icon = '<span class="context-menu-icon"></span>';
+		// divider & advanced
+		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+
+		this.buildRootSubmenu = function()
+		{
+			$('#sm_move').remove();
+			var cs = '';
+
+			for (var h in M.c[M.RootID])
+			{
+				if (M.d[h].t)
+				{
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					break;
+				}
+			}
+			
+			var html = '<span class="context-submenu" id="sm_move">';
+			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += adv;
+			html += '</span>';
+
+			$('.context-menu-item.move-item').after(html);
+		};
+		
+		var id;
+		if (typeof i === 'undefined')
+		{
+			this.buildRootSubmenu();
+			id = this.RootID;
+		}
+		else id = i;
+		
+		var folders = [];
+		
+		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
+
+// localeCompare is not supported in IE10, >=IE11 only
+// sort by name is default in the tree
+//		folders.sort(function(a,b)
+//		{
+//			if (a.name) return a.name.localeCompare(b.name);
+//		});
+
+		for (var i in folders)
+		{
+			var sub = false;
+			var cs = '';
+			var sm = '';
+			var fid = folders[i].h;
+
+			for (var h in M.c[fid])
+			{
+				if (M.d[h].t)
+				{
+					sub = true;
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					break;
+				}
+			}
+// Should we have infors about shared folders in submenues?
+//				var sharedfolder = '';
+//				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
+			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
+			$('#sm_' + id).prepend(html);
+			if (sub) this.buildSubmenu(fid);
+		}
+		
+		initContextUI();
 	};
 
     this.sortContacts = function(folders) {
@@ -1646,7 +1724,7 @@ function MegaData ()
 			if (M.d[h] && M.d[h].p)
 			{
 				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
-				// Update M.v it's used for slideshot preview at least
+				// Update M.v it's used for slideshow preview at least
 				for (var k in M.v)
 				{
 					if (M.v[k].h === h)
@@ -2786,6 +2864,7 @@ function rendernew()
             megaChat.renderMyStatus();
         }
 	}
+	M.buildSubmenu();
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 	if (d) console.timeEnd('rendernew');

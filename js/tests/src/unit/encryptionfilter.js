@@ -635,16 +635,18 @@ describe("EncryptionFilter", function() {
                     /* messageId */ "msgId",
                     /* contents */ "[plain text message contents]",
                     /* meta */ {
-                        'roomJid': room.roomJid
+                        'roomJid': room.roomJid,
+                        'action': 'test'
                     },
                     /* delay */ 123
                 ),
                 megaChatObj.karere
             );
+
             expect(room.encryptionOpQueue.queue.callCount).to.eql(1);
 
             expect(JSON.stringify(room.encryptionOpQueue.queue.getCall(0).args)).to.eql(
-                '["sendTo","[\\"[plain text message contents]\\",{\\"roomJid\\":\\"room1@conference.jid.com\\"}]","' + myJid + '",{"messageId":"msgId","roomJid":"room1@conference.jid.com","delay":123}]'
+                '["sendTo","[\\"[plain text message contents]\\",{\\"roomJid\\":\\"room1@conference.jid.com\\",\\"action\\":\\"test\\"}]","' + myJid + '",{"messageId":"msgId","roomJid":"room1@conference.jid.com","delay":123}]'
             );
 
 
@@ -953,10 +955,33 @@ describe("EncryptionFilter", function() {
             done();
         });
 
-        it("onRoomDestroy", function(done) {
+        it("onRoomDestroy - empty room", function(done) {
             var room = megaChatObj.chats["room1@conference.jid.com"];
 
             var origMockedOpQueue = room.encryptionOpQueue;
+            room.encryptionHandler = {};
+            room.encryptionHandler.state = 0;
+
+            megaChatObj.trigger("onRoomDestroy", room);
+
+            // no users, should not queue a .quit() op
+            expect(origMockedOpQueue.queue.callCount).to.eql(0);
+
+            done();
+        });
+        it("onRoomDestroy - room with users", function(done) {
+            var room = megaChatObj.chats["room1@conference.jid.com"];
+
+            var origMockedOpQueue = room.encryptionOpQueue;
+            // room containing users and the state == INITIALISED, should queue 'quit' op
+            room.getUsers = function() {
+                return [
+                '1',
+                '2'
+                ]
+            };
+            room.encryptionHandler = {};
+            room.encryptionHandler.state = mpenc.handler.STATE.INITIALISED;
 
             megaChatObj.trigger("onRoomDestroy", room);
 
@@ -1441,6 +1466,7 @@ describe("EncryptionFilter", function() {
                     megaChatObj.karere
                 );
 
+
                 expect(encryptionFilter.processMessage.callCount).to.eql(1);
 
                 expect(
@@ -1449,7 +1475,7 @@ describe("EncryptionFilter", function() {
                         '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{"roomJid":"room1@conference.jid.com"},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"' + otherUserJid + '"}'
                     );
 
-                expect(getPubEd25519.callCount).to.eql(1);
+                expect(getPubEd25519.callCount).to.eql(2);
                 expect(getPubEd25519.getCall(0).args[0]).to.eql("B_123456789");
 
                 room.encryptionHandler.processMessage.restore();

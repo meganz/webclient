@@ -390,7 +390,7 @@ MegaChat.prototype.init = function() {
 
 
     // since this plugin act as filter, it should be added first. (only if in the real app!)
-    if(typeof(mocha) == "undefined") {
+    if(typeof(mocha) == "undefined" && !localStorage.disableMpEnc) {
         self.plugins['encryptionFilter'] = new EncryptionFilter(self);
     }
 
@@ -435,6 +435,9 @@ MegaChat.prototype.init = function() {
                 }
 
                 $.each(self.chats, function(roomJid, room) {
+                    if(room._leaving || room._conv_ended) {
+                        return; // continue
+                    }
                     if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
                         if(localStorage.d) {
                             console.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
@@ -618,6 +621,23 @@ MegaChat.prototype.init = function() {
     });
 
     this.karere.bind("onUsersJoined", function(e, eventData) {
+        if(eventData.newUsers[self.karere.getJid()]) {
+            // i'm the first of my devices to join the room..notify all my other devices please
+            var iAmFirstToJoin = true;
+            Object.keys(eventData.currentUsers).forEach(function(k, v) {
+                if(k.indexOf(self.karere.getBareJid()) !== -1) {
+                    iAmFirstToJoin = false;
+                    return false;
+                }
+            });
+            if(iAmFirstToJoin) {
+                var room = self.chats[eventData.roomJid];
+
+                if(room) {
+                    self.sendBroadcastAction("conv-start", {roomJid: room.roomJid, type: room.type, participants: room.getParticipants()});
+                }
+            }
+        }
         return self._onUsersUpdate("joined", e, eventData);
     });
 
@@ -626,9 +646,15 @@ MegaChat.prototype.init = function() {
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
         if(self.chats[eventObject.getRoomJid()] && self.chats[eventObject.getRoomJid()].state == MegaChatRoom.STATE.JOINING) {
-            self.chats[eventObject.getRoomJid()].setState(
-                MegaChatRoom.STATE.JOINED
-            );
+            if(self.chats[eventObject.getRoomJid()]._waitingForOtherParticipants() === false) {
+                self.chats[eventObject.getRoomJid()].setState(
+                    MegaChatRoom.STATE.PARTICIPANTS_HAD_JOINED
+                );
+            } else {
+                self.chats[eventObject.getRoomJid()].setState(
+                    MegaChatRoom.STATE.JOINED
+                );
+            }
         }
     });
 
@@ -644,6 +670,7 @@ MegaChat.prototype.init = function() {
 
         var room;
         var meta = eventObject.getMeta();
+        var fromMyDevice = Karere.getNormalizedBareJid(eventObject.getFromJid()) == self.karere.getBareJid();
 
         if(eventObject.getAction() == "sync") {
             room = self.chats[meta.roomJid];
@@ -651,6 +678,41 @@ MegaChat.prototype.init = function() {
         } else if(eventObject.getAction() == "syncResponse") {
             room = self.chats[meta.roomJid];
             room.handleSyncResponse(eventObject);
+        } else if(eventObject.getAction() == "conv-end") {
+            if(fromMyDevice === true) {
+                room = self.chats[meta.roomJid];
+                if(room && room._leaving !== true) {
+                    room.destroy(false);
+                }
+            } else {
+                //TODO: if this is not a 'private' conversation, there should be no "Close chat" button
+                //TODO: add conversation ended class to to the room container
+                room = self.chats[meta.roomJid];
+                if(room) {
+                    room._conversationEnded(eventObject.getFromJid());
+                }
+            }
+        } else if(eventObject.getAction() == "conv-start" && fromMyDevice === true) {
+            if(fromMyDevice) {
+                room = self.chats[meta.roomJid];
+                if(!room) {
+                    self.openChat(meta.participants, meta.type);
+                }
+            } else {
+                room = self.chats[meta.roomJid];
+                if(!room) {
+                    [room.$header, room.$messages].forEach(function(k, v) {
+                        $(k).addClass("conv-start")
+                            .removeClass("conv-end");
+                    });
+
+                }
+
+            }
+        } else {
+            if(localStorage.d) {
+                console.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
+            }
         }
     });
 
@@ -880,6 +942,30 @@ MegaChat.prototype.init = function() {
             self.getMyXMPPPassword()
         );
     }
+
+
+    // contacts tab update
+
+    self.on('onRoomCreated', function(e, room) {
+        if(room.type == "private") {
+            var jid = room.getParticipantsExceptMe()[0];
+            var c = self.getContactFromJid(jid);
+
+            $('#contact_' + c.u + ' .start-chat-button')
+                .text('Show chat')
+                .addClass("active");
+        }
+    });
+    self.on('onRoomDestroy', function(e, room) {
+        if(room.type == "private") {
+            var jid = room.getParticipantsExceptMe()[0];
+            var c = self.getContactFromJid(jid);
+
+            $('#contact_' + c.u + ' .start-chat-button')
+                .text('Start chat')
+                .removeClass("active");
+        }
+    });
 };
 
 /**
@@ -973,10 +1059,18 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
         if(type != "joined") { // i'd left
             // i'd left, remove the room and the UI stuff
             if(self.chats[eventObject.getRoomJid()]) {
-                self.chats[eventObject.getRoomJid()].destroy();
+                self.chats[eventObject.getRoomJid()].destroy(true);
             }
         } else { // i'd joined
-
+            var room = self.chats[eventObject.getRoomJid()];
+            if(room) {
+                if(room._waitingForOtherParticipants() === false && (
+                        room.state == MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state == MegaChatRoom.STATE.JOINING
+                    )
+                ) {
+                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
+                }
+            }
         }
     } else { //some one else had joined/left the room
         if(type != "joined") { // they left the room
@@ -994,11 +1088,25 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
                     }
                 })
             }
+            var room = self.chats[eventObject.getRoomJid()];
+            if(room && room._waitingForOtherParticipants() === true) {
+                room._conversationEnded(eventObject.getFromJid());
+            }
         } else {
             // they had joined
+            var room = self.chats[eventObject.getRoomJid()];
+            if(room) {
+                if(room._waitingForOtherParticipants() === false && room.state == MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
+                    room._conversationStarted(eventObject.getFromJid());
+                }
+            }
         }
         var room = self.chats[eventObject.getRoomJid()];
-        assert(room, "Room not found!");
+
+        if(!room) {
+            return;
+        }
+
 
         room.syncUsers(clone(updatedJids));
         room.refreshUI();
@@ -1255,19 +1363,44 @@ MegaChat.prototype.renderContactTree = function() {
         $currentCallIndicator.addClass(targetClassName);
     }
 
-    // update conversation list presence
-    $.each(self.getContacts(), function(k, contact) {
-        var $element = $('.content-panel > #contact_' + contact.u + ', .content-panel.conversations #contact2_' + contact.u);
-        // skip if element does not exists
-        if($element.size() == 0) {
-            return;
+    // update conversation list
+    // -> add new convs to the ui
+    for(var k in self.chats) {
+        var megaRoom = self.chats[k];
+
+        if(megaRoom._leaving) {
+            continue;
         }
 
-        $element.removeClass("online");
-        $element.removeClass("offline");
-        $element.removeClass("busy");
-        $element.removeClass("away");
-        $element.removeClass("no");
+        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').size() != 0) {
+            continue;
+        }
+
+        if(megaRoom.type == "private") {
+            var chatWithJid = megaRoom.getParticipantsExceptMe()[0];
+            var contact = self.getContactFromJid(chatWithJid);
+            var name = self.getContactNameFromJid(chatWithJid);
+
+            var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
+            $('.content-panel.conversations .conversations-container').prepend(html2);
+
+        } else {
+            throw new Error("TBD");
+        }
+    }
+    // -> remove left chats from the ui
+    $('.nw-conversations-item[data-room-jid]').each(function() {
+        var megaRoom = self.chats[$(this).attr("data-room-jid") + "@" + self.karere.options.mucDomain];
+        if(!megaRoom || megaRoom._leaving === true) {
+            $(this).remove();
+        }
+    });
+
+
+
+    // update conversation list presence
+    $.each(self.getContacts(), function(k, contact) {
+        var $element = $('.content-panel.conversations #contact2_' + contact.u);
 
         var presence = self.karere.getPresence(self.getJidFromNodeId(contact.u));
 
@@ -1284,33 +1417,52 @@ MegaChat.prototype.renderContactTree = function() {
             targetClassName = "offline";
         }
 
-        $element.addClass(targetClassName);
 
-
-        assert(
-            $element.size() == 2,
-            'nav elements not found (expected 2, got: ' + $element.size() + ')'
-        );
-
-        var $conversationNavElement;
-        if($($element[1]).is('.nw-conversations-item')) {
-            $conversationNavElement = $($element[1]);
-        } else if($($element[0]).is('.nw-conversations-item')) {
-            $conversationNavElement = $($element[0]);
+        // update contacts nav tree
+        if(targetClassName !== "offline") {
+            $('#contact_' + contact.u + ' .start-chat-button', '.fm-tree-panel').show();
         } else {
-            assert(false, 'none of the elments is .nw-conversation-item');
+            $('#contact_' + contact.u + ' .start-chat-button', '.fm-tree-panel').hide();
+        }
+        $('#contact_' + contact.u, '.fm-tree-panel')
+            .removeClass("online")
+            .removeClass("offline")
+            .removeClass("busy")
+            .removeClass("away")
+            .removeClass("no")
+            .addClass(targetClassName);
+
+
+        // skip if element does not exists
+        if($element.size() == 0) {
+            return;
         }
 
-        $conversationNavElement.attr("data-jid", self.getJidFromNodeId(contact.u));
+        $element.removeClass("online");
+        $element.removeClass("offline");
+        $element.removeClass("busy");
+        $element.removeClass("away");
+        $element.removeClass("no");
+
+
+
+        $element.addClass(targetClassName);
+
+        assert(
+            $element.size() == 1,
+            'nav elements not found (expected 1, got: ' + $element.size() + ')'
+        );
+
+        $element.attr("data-jid", self.getJidFromNodeId(contact.u));
 
         if(contact.u != u_handle) {
-            $conversationNavElement.unbind("click.megaChat");
-            $conversationNavElement.bind("click.megaChat", function() {
+            $element.unbind("click.megaChat");
+            $element.bind("click.megaChat", function() {
                 window.location = "#fm/chat/" + contact.u;
             });
 
             var room = self.chats[
-                $conversationNavElement.attr('data-room-jid') + "@" + self.karere.options.mucDomain
+                $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain
                 ];
             if(room) {
                 room.renderContactTree();
@@ -1475,7 +1627,8 @@ MegaChat.prototype.openChat = function(jids, type) {
         .fail(function() {
             $promise.reject.apply($promise, toArray(arguments))
             if(self.chats[$startChatPromise.roomJid]) {
-                self.chats[$startChatPromise.roomJid].destroy();
+                self.chats[$startChatPromise.roomJid].destroy(false);
+                self.renderContactTree();
             }
         });
 
@@ -1623,6 +1776,10 @@ MegaChat.prototype.processRemovedUser = function(u) {
     if(localStorage.d) { console.error("removed: ", u); }
 
 
+    var room = self.getPrivateRoom(u);
+    if(room) {
+        room.destroy(true);
+    }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
 
     self.renderContactTree();
@@ -1642,28 +1799,6 @@ MegaChat.prototype.refreshConversations = function() {
             $(this).remove();
         }
     });
-
-    //XX: move the current code from mega.js to here?
-
-//    $.each(self.chats, function(k, v) {
-//        if($('.content-panel .conversations .nw-conversations-item[data-chatRoomId="' + k + '"]').size() == 0) {
-//            // does not exists, create new dom element
-//            var $elem = $('<div class="nw-conversations-item"><div class="nw-contact-status"></div><div class="nw-conversations-name"></div></div>');
-//
-//            var participants = v.getParticipantsExceptMe();
-//
-//            $elem.data('chatRoomJid', k);
-//
-//            if(v.type == "private") {
-//                $elem.addClass("private_" + self.getContactFromJid(participants[0]).u);
-//            }
-//
-//            var contactName = self.getContactNameFromJid(participants[0]);
-//            $('.nw-conversations-name', $elem).text(contactName);
-//
-//            $('.content-panel.conversations').append($elem);
-//        }
-//    });
 
     self.renderContactTree();
 };
@@ -1695,30 +1830,90 @@ MegaChat.prototype.getChatNum = function(idx) {
  * BOSH service that should be used for connecting the current user.
  */
 MegaChat.prototype.getBoshServiceUrl = function() {
-    var num = "";
-    var hash = asmCrypto.SHA1.hex(u_handle).substr(0, 1);
-    if("abcde".indexOf(hash) !== -1) {
-        num = 1;
-    } else if ("f0123".indexOf(hash) !== -1) {
-        num = 2;
-    } else if ("456789".indexOf(hash) !== -1) {
-        num = 3;
-    } else { // should not happen
-        assert(false, 'this should never happen (generated SHA1 hex hash contained unexpected character)');
-    }
-
-    num = "" + num; // conv to string
-    for(var i = num.length; i<3; i++) {
-        num = "0" + num;
-    }
-
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
     } else {
-        return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
+        return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
     }
 };
 
+
+/**
+ * Called when Conversations tab is opened
+ */
+MegaChat.prototype.renderListing = function() {
+    var self = this;
+
+    $('.files-grid-view').addClass('hidden');
+    $('.fm-blocks-view').addClass('hidden');
+    $('.contacts-grid-view').addClass('hidden');
+    $('.fm-chat-block').addClass('hidden');
+    $('.fm-contacts-blocks-view').addClass('hidden');
+
+    $('.fm-right-files-block').removeClass('hidden');
+
+    $('.nw-conversations-item').removeClass('selected');
+
+
+    sectionUIopen('conversations');
+
+    if(Object.keys(self.chats).length == 0) {
+        $('.fm-empty-conversations').removeClass('hidden');
+    } else {
+        $('.fm-empty-conversations').addClass('hidden');
+    }
+
+    //TODO: show something? some kind of list of conversations summary/overview screen or something?
+};
+
+/**
+ * Broadcast an action (to all of my devices) + optionally to a specific room.
+ *
+ * @param [toRoomJid] {String}
+ * @param action {String}
+ * @param [meta] {Object}
+ */
+MegaChat.prototype.sendBroadcastAction = function(toRoomJid, action, meta) {
+    var self = this;
+
+
+    if(arguments.length == 2) {
+        meta = action;
+        action = toRoomJid;
+        toRoomJid = undefined;
+    }
+
+    var messageId = self.karere.generateMessageId(self.karere.getJid() + (toRoomJid ? toRoomJid : ""));
+
+    self.karere.sendAction(self.karere.getBareJid(), action, meta, messageId);
+    if(toRoomJid) {
+        self.karere.sendAction(toRoomJid, action, meta, messageId);
+    }
+};
+
+/**
+ * Tries to find if there is a opened (private) chat room with user `h`
+ *
+ * @param h {string} hash of the user
+ * @returns {false|MegaChatRoom}
+ */
+MegaChat.prototype.getPrivateRoom = function(h) {
+    var self = this;
+
+    var jid = self.getJidFromNodeId(h);
+
+    var found = false;
+    Object.keys(self.chats).forEach(function(k) {
+        var v = self.chats[k];
+
+        if(v.getParticipantsExceptMe()[0] == jid) {
+            found = v;
+            return false; // break;
+        }
+    });
+
+    return found;
+};
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
@@ -1826,8 +2021,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
         if(newState == MegaChatRoom.STATE.PLUGINS_READY) {
             resetStateToReady();
         } else if(newState == MegaChatRoom.STATE.JOINED) {
+            self.setState(MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
+        } else if(newState == MegaChatRoom.STATE.PARTICIPANTS_HAD_JOINED) {
             self.setState(MegaChatRoom.STATE.PLUGINS_WAIT);
-
         } else if(newState == MegaChatRoom.STATE.PLUGINS_WAIT) {
             var $event = new $.Event("onPluginsWait");
             self.megaChat.trigger($event, [self]);
@@ -1850,13 +2046,15 @@ var MegaChatRoom = function(megaChat, roomJid) {
                     }
                 });
         } else if(newState == MegaChatRoom.STATE.READY) {
-            if(self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+            if(self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
                 self._flushMessagesQueue();
             }
         }
     });
 
     this.$header.hide();
+    this.$header.addClass('conv-ended');
+
     this.$messages.hide();
 
     this.$header.insertBefore(
@@ -1911,6 +2109,12 @@ var MegaChatRoom = function(megaChat, roomJid) {
             self.megaChat.closeChatPopups();
 
         }
+    });
+
+    // - end call
+    $('.chat-button.fm-chat-end', self.$header).unbind("click.megaChat");
+    $('.chat-button.fm-chat-end', self.$header).bind("click.megaChat", function() {
+        self.destroy(true);
     });
 
     /**
@@ -2293,6 +2497,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
     self.megaChat.trigger('onRoomCreated', [self]);
+
     return this;
 };
 
@@ -2304,12 +2509,15 @@ makeObservable(MegaChatRoom);
 /**
  * Room states
  *
- * @type {{INITIALIZED: number, JOINING: number, JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, READY: number, LEAVING: number, LEFT: number}}
+ * @type {{INITIALIZED: number, JOINING: number, JOINED: number, WAITING_FOR_PARTICIPANTS: number, PARTICIPANTS_HAD_JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, READY: number, PLUGINS_PAUSED: number, LEAVING: number, LEFT: number}}
  */
 MegaChatRoom.STATE = {
     'INITIALIZED': 5,
     'JOINING': 10,
     'JOINED': 20,
+
+    'WAITING_FOR_PARTICIPANTS': 24,
+    'PARTICIPANTS_HAD_JOINED': 27,
 
     'PLUGINS_WAIT': 30,
     'PLUGINS_READY': 40,
@@ -2681,6 +2889,7 @@ MegaChatRoom.prototype.setState = function(newState, isRecover) {
         assert(
             newState === MegaChatRoom.STATE.PLUGINS_PAUSED ||
                 self.state === MegaChatRoom.STATE.PLUGINS_PAUSED ||
+                newState === MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS ||
                 (newState === MegaChatRoom.STATE.JOINING && isRecover) ||
                 (newState === MegaChatRoom.STATE.INITIALIZED && isRecover) ||
                 newState > self.state,
@@ -2910,7 +3119,16 @@ MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
 MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
     var self = this;
 
+    if(self._leaving) {
+        return;
+    }
+
     this.$header.attr("data-room-jid", this.roomJid.split("@")[0]);
+
+    if(this.$header.is(":visible")) {
+        $('.nw-conversations-item').removeClass("selected");
+        $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
+    }
 
     var $jsp = self.$messages.data("jsp");
     assert($jsp, "JSP not available?!");
@@ -3026,10 +3244,18 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
 /**
  * Leave this chat room
  *
+ * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  * @returns {undefined|Deferred}
  */
-MegaChatRoom.prototype.leave = function() {
+MegaChatRoom.prototype.leave = function(notifyOtherDevices) {
     var self = this;
+
+    self._leaving = true;
+
+
+    if(notifyOtherDevices === true) {
+        self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", {roomJid: self.roomJid});
+    }
 
     if(self.roomJid.indexOf("@") != -1) {
         self.setState(MegaChatRoom.STATE.LEAVING);
@@ -3043,8 +3269,9 @@ MegaChatRoom.prototype.leave = function() {
 
 /**
  * Destroy a room (leave + UI destroy + js cleanup)
+ * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  */
-MegaChatRoom.prototype.destroy = function() {
+MegaChatRoom.prototype.destroy = function(notifyOtherDevices) {
     var self = this;
 
     self.megaChat.trigger('onRoomDestroy', [self]);
@@ -3058,15 +3285,27 @@ MegaChatRoom.prototype.destroy = function() {
         delete self._syncRequests;
     };
 
-    self.leave();
+    self.leave(notifyOtherDevices);
 
     self.$header.remove();
     self.$messages.remove();
 
     var $element = $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]');
-    $element.removeAttr("data-room-jid");
+    $element.remove();
 
-    delete self.megaChat[self.roomJid];
+    // dereference from self
+    var mc = self.megaChat;
+    var roomJid = self.roomJid;
+
+    if(roomJid == mc.getCurrentRoomJid()) {
+        window.location = "#fm/chat";
+        setTimeout(function() {
+            self.megaChat.renderListing();
+        }, 100);
+    }
+    setTimeout(function() {
+        delete mc.chats[roomJid];
+    }, 1);
 };
 
 
@@ -3082,13 +3321,16 @@ MegaChatRoom.prototype.show = function() {
     $('.contacts-grid-view').addClass('hidden');
     $('.fm-contacts-blocks-view').addClass('hidden');
 
-    $('.nw-conversations-item').removeClass('selected');
-
     $('.fm-right-files-block').removeClass('hidden');
 
+    $('.nw-conversations-item').removeClass('selected');
 
 
     sectionUIopen('conversations');
+
+
+    $('.nw-conversations-item').removeClass("selected");
+    $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
 
 
     self.$header.show();
@@ -3723,8 +3965,6 @@ MegaChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
     var pluginsForceQueue = false;
 
     $.each(self.megaChat.plugins, function(k) {
-        console.log(k);
-
         if(self.megaChat.plugins[k].shouldQueueMessage) {
             if(self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
                 pluginsForceQueue = true;
@@ -4055,4 +4295,73 @@ MegaChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
 
     return $element;
 };
+
+MegaChatRoom.prototype._waitingForOtherParticipants = function() {
+    var self = this;
+
+    var otherUsersInRoom = false;
+
+    Object.keys(self.getUsers()).forEach(function(v, k) {
+        if(v.indexOf(self.megaChat.karere.getBareJid()) === -1) {
+            otherUsersInRoom = true;
+            return false; // break
+        }
+   });
+    return !otherUsersInRoom;
+};
+
+MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
+    var self = this;
+
+    if(self && self._leaving !== true) {
+        self.setState(MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
+
+        [self.$header, self.$messages].forEach(function(k, v) {
+            $(k).addClass("conv-end")
+                .removeClass("conv-start");
+        });
+
+        self._conv_ended = true;
+
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "user-left",
+                userFullJid,
+                "user-left",
+                "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
+                [],
+                {
+                    'close': {
+                        'type': 'primary',
+                        'text': "Close chat",
+                        'callback': function() {
+                            self.destroy(true);
+                        }
+                    }
+                }
+            )
+        );
+    }
+};
+
+MegaChatRoom.prototype._conversationStarted = function(userFullJid) {
+    var self = this;
+
+    self._conv_ended = false;
+
+    self.appendDomMessage(
+        self.generateInlineDialog(
+            "user-joined",
+            userFullJid,
+            "user-joined",
+            "Conversation started, user joined: " + self.megaChat.getContactNameFromJid(userFullJid),
+            [],
+            {
+            }
+        )
+    );
+
+    self.setState(MegaChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
+};
+
 window.megaChat = new MegaChat();

@@ -3530,14 +3530,14 @@ function transferPanelUI()
 			$('#fmholder').addClass('transfer-panel-opened');
 			$.transferHeader();
 
-			var height = 193
+			var height = 192
             if(localStorage.transferPaneHeight && $.transferPaneResizable) {
 				height = Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight)
 			}
 
 			var panel = $('.transfer-panel')
 
-				panel.animate({'height': height + $('.transfer-panel-title').height()}, {
+				panel.animate({'height': height}, {
 					complete: function() {
 						$.transferHeader();
 						$(window).trigger('resize');

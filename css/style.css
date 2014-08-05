@@ -9703,6 +9703,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	left: 100%;
 	right: auto;
 	margin-left: -10600px;
+	margin-right:0;
 }
 .context-submenu.left-position {
 	border-right: 2px solid transparent;

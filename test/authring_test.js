@@ -114,7 +114,7 @@ describe("authring unit test", function() {
                 var theCtx = getUserAttribute.args[0][4];
                 callback(-3, theCtx);
                 sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], false);
+                assert.deepEqual(myCallback.args[0][0], {});
                 assert.deepEqual(u_authring, {});
             });
 

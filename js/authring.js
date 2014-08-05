@@ -66,7 +66,7 @@ var authring = (function () {
      *     Indicator used for authentication method. One of
      *     authring.AUTHENTICATION_METHOD (e. g. FINGERPRINT_COMPARISON).
      * @param confidence {byte}
-     *     Indicatgor used for confidence. One of authring.KEY_CONFIDENCE
+     *     Indicator used for confidence. One of authring.KEY_CONFIDENCE
      *     (e. g. UNSURE).
      * @returns {string}
      *     Single binary encoded authentication record.
@@ -170,14 +170,11 @@ var authring = (function () {
             if (typeof res !== 'number') {
                 // Authring is in the empty-name record.
                 u_authring = ns.deserialise(res['']);
-                if (ctx.callback3 !== undefined) {
-                    ctx.callback3(u_authring, ctx);
-                }
             } else {
                 u_authring = {};
-                if (ctx.callback3 !== undefined) {
-                    ctx.callback3(false, ctx);
-                }
+            }
+            if (ctx.callback3 !== undefined) {
+                ctx.callback3(u_authring, ctx);
             }
         };
         var myCtx = {
@@ -198,6 +195,52 @@ var authring = (function () {
     ns.setContacts = function(callback) {
         setUserAttribute('authring', {'': ns.serialise(u_authring)},
                          false, callback);
+    };
+    
+    
+    /**
+     * Loads the ring for all authenticated contacts into `u_authring`.
+     * 
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @return {object}
+     *     An object describing the authenticated `fingerprint`, the
+     *     authentication `method` and the key `confidence`. `false` in case
+     *     of an unauthorised contact. 
+     */
+    ns.getContactAuthenticated = function(userhandle) {
+        if (u_authring === undefined) {
+            throw new Error('First initialise u_authring by calling authring.getContacts()');
+        }
+        if (u_authring.hasOwnProperty(userhandle)) {
+            return u_authring[userhandle];
+        } else {
+            return false;
+        }
+    };
+    
+    
+    /**
+     * Serialises a single authentication record.
+     *
+     * @param userhandle {string}
+     *     Mega user handle.
+     * @param fingerprint {string}
+     *     Fingerprint to authenticate as a byte or hex string.
+     * @param method {byte}
+     *     Indicator used for authentication method. One of
+     *     authring.AUTHENTICATION_METHOD (e. g. FINGERPRINT_COMPARISON).
+     * @param confidence {byte}
+     *     Indicator used for confidence. One of authring.KEY_CONFIDENCE
+     *     (e. g. UNSURE).
+     */
+    ns.setContactAuthenticated = function(userhandle, fingerprint, method, confidence) {
+        if (u_authring === undefined) {
+            throw new Error('First initialise u_authring by calling authring.getContacts()');
+        }
+        u_authring[userhandle] = {fingerprint: fingerprint,
+                                  method: method,
+                                  confidence: confidence};
     };
     
     

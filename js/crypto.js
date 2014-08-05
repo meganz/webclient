@@ -2668,7 +2668,7 @@ var u_pubEd25519;
 
 function u_ed25519() {
 	var myCallback = function(res, ctx) {
-	    if (typeof res !== 'number') {
+        if (typeof res !== 'number') {
             u_keyring = res;
         } else {
             u_privEd25519 = jodid25519.eddsa.generateKeySeed();
@@ -2681,7 +2681,7 @@ function u_ed25519() {
         u_privEd25519 = u_keyring.prEd255;
         u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
         u_attr.puEd255 = u_pubEd25519;
-	};
+    };
     getUserAttribute(u_handle, 'keyring', false, myCallback);
 }
 
@@ -2700,11 +2700,11 @@ var pubEd25519 = {};
  *     be `false` upon a failed request.
  */
 function getPubEd25519(userhandle, callback) {
-	if (pubEd25519[userhandle]) {
-	    callback(pubEd25519[userhandle], userhandle);
-	} else {
-	    var myCallback = function(res, ctx) {
-	        if (typeof res !== 'number') {
+    if (pubEd25519[userhandle]) {
+        callback(pubEd25519[userhandle], userhandle);
+    } else {
+        var myCallback = function(res, ctx) {
+            if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
                 if (ctx.callback3) {
@@ -2713,14 +2713,13 @@ function getPubEd25519(userhandle, callback) {
             } else if (ctx.callback3) {
                 ctx.callback3(false, ctx.u);
             }
-	    };
-	    var myCtx = {
-	        u: userhandle,
-	        callback3: callback,
-	    };
-	    getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
-
-	}	
+        };
+        var myCtx = {
+            u: userhandle,
+            callback3: callback,
+        };
+        getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
+    }    
 }
 
 
@@ -2772,7 +2771,7 @@ function getFingerprint(userhandle, callback, format) {
             callback3: callback,
         };
         getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
-    }   
+    }
 }
 
 var pubkeysCache = null;

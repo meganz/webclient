@@ -79,7 +79,7 @@ _TlvStore._splitSingleTlvRecord = function(tlvContainer) {
     var valueLength = (tlvContainer.charCodeAt(keyLength + 1)) << 8
                     | tlvContainer.charCodeAt(keyLength + 2);
     var value = tlvContainer.substring(keyLength + 3, keyLength + valueLength + 3);
-    var rest = tlvContainer.substring(keyLength + valueLength + 3)
+    var rest = tlvContainer.substring(keyLength + valueLength + 3);
     return {'record': [key, value], 'rest': rest};
 };
 

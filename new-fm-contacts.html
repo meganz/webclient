@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initTransferPanelScroll()
+  {
+	  $('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedGridScroll()
+  {
+	  $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedBlocksScroll()
+  {
+	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  
+  
+  $.gridHeader = function()  
+  {	
+		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+   }	
+	
+  initTreePanelScroll();
+  initTransferPanelScroll();
+  initSharedGridScroll();
+  initSharedBlocksScroll();
+  $.gridHeader();
+  
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+      initTransferPanelScroll();
+      initSharedGridScroll();
+	  initSharedBlocksScroll();
+      $.gridHeader();
+  });
+  $('.nw-fm-tree-folder').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
+		  $('.nw-fm-tree-item.selected').removeClass('selected');
+		  fmTreeItem.addClass('selected');
+	  }
+  });
+  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
+		  fmTreeItem.addClass('expanded');
+		  fmTreeItem.next('ul').addClass('opened');
+		  initTreePanelScroll();
+	  } else {
+		  fmTreeItem.removeClass('expanded');
+		  fmTreeItem.next('ul').removeClass('opened');
+		  initTreePanelScroll();
+	  }
+  });
+  $('.nw-fm-left-icon').bind('click', function() {
+	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
+	  if($(this).attr('class').indexOf('active') == -1) {
+		  $('.nw-fm-left-icon.active').removeClass('active');
+		  $(this).addClass('active');
+		  $('.content-panel.active').removeClass('active');
+		  $('.content-panel.'+currentPanelTitle).addClass('active');
+		  initTreePanelScroll();
+		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
+	  }
+  });
+  $('.nw-contact-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-contact-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  $('.nw-conversations-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-conversations-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  var initial;
+  $('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initial );
+	  initial = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+  });
+  $('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initial );
+  });
+  
+  $('.fm-files-view-icon').bind('click', function () {
+	  if ($(this).attr('class').indexOf('active') == -1) {
+		  if ($(this).attr('class').indexOf('block-view') > -1) {
+			  $('.files-grid-view ').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden'); 
+              initSharedBlocksScroll();
+		  } else {
+			  $('.files-grid-view ').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
+			  initSharedGridScroll();
+		  }
+		  $('.fm-files-view-icon').removeClass('active');
+		  $(this).addClass('active');
+	  }
+  });
+	
+	
+  
+});
+
+</script>
+</head>
+
+<body id="bodyel">
+
+<!-- transfer-panel-opened class !-->
+<div id="fmholder" class="fmholder" style="display: block;">
+          <div class="top-head">
+           
+          </div>
+          <div class="fm-main default">
+              <div class="nw-fm-left-icons-panel">
+                 <div class="nw-fm-left-icon cloud-drive">
+                   <div class="nw-fm-left-tooltip">Cloud Drive</div>
+                 </div>
+                 <div class="nw-fm-left-icon shared-with-me">
+                   <div class="nw-fm-left-tooltip">Shared with me</div>
+                 </div>
+                 <div class="nw-fm-left-icon contacts active">
+                   <div class="nw-fm-left-tooltip">Contacts</div>
+                 </div>
+                 <div class="nw-fm-left-icon conversations">
+                   <div class="nw-fm-left-tooltip">Conversations</div>
+                 </div>
+                 <div class="nw-fm-left-icon rubbish-bin filled"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
+              </div>
+          
+              <div class="fm-left-panel">
+                <div class="fm-left-menu contacts">
+                   <div class="nw-fm-tree-header cloud-drive"> 
+                      Cloud Drive 
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header shared-with-me"> 
+                      Shared with me
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header contacts"> 
+                      Contacts
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header conversations"> 
+                      Conversations
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header rubbish-bin"> 
+                      Rubbish bin
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                </div>
+                <div class="fm-tree-panel">
+                  <div class="nw-tree-panel-header">
+                     <span>My contacts</span>
+                     <div class="nw-tree-panel-arrows"></div>
+                  </div>
+                  <div class="content-panel contacts active">
+                    <div class="nw-contact-item offline">
+                      <div class="nw-contact-status"></div>
+                      <div class="nw-contact-name">Andrei.Dymovich@conmio.com</div>
+                    </div>
+                    <div class="nw-contact-item busy">
+                      <div class="nw-contact-status"></div>
+                      <div class="nw-contact-name">Bram van der Kolk</div>
+                    </div>
+                    <div class="nw-contact-item away">
+                      <div class="nw-contact-status"></div>
+                      <div class="nw-contact-name">Eduardo</div>
+                    </div>
+                    <div class="nw-contact-item online">
+                      <div class="nw-contact-status"></div>
+                      <div class="nw-contact-name">Zeus</div>
+                    </div>
+                  </div>
+                </div>
+              
+              </div>
+              <div class="fm-right-files-block">
+              
+                <div class="fm-right-header">
+                
+                   <div class="fm-breadcrumbs-block">
+                     <!-- Please replace "cloud-drive" on "contacts" !-->
+                     <a class="fm-breadcrumbs contacts contains-directories has-next-button">
+                       <span class="right-arrow-bg"><span></span></span>
+                     </a>
+                     <!-- Please replace "folder" on "contact" !-->
+                     <a class="fm-breadcrumbs contact contains-directories">
+                         <span class="right-arrow-bg ui-draggable"><span>asdasd</span></span>
+                     </a>
+                     <div class="clear"></div>
+                   </div>
+                
+                   <a class="fm-files-view-icon block-view"></a>
+                   <a class="fm-files-view-icon listing-view active"></a>
+                   <div class="clear"></div>
+                </div>
+                
+                <!-- New block for contacts grid !-->
+                <div class="files-grid-view contacts-view">
+                
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+                      <tr>
+                        <th><div class="arrow name desc">Name</div></th>
+                        <th><div class="arrow size">Status</div></th>
+                        <th><div class="arrow type">Last interaction</div></th>
+                      </tr>
+                    </table>
+                    
+                    <div class="grid-scrolling-table">
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table contacts">
+                        <tr>
+                          <td>
+                            <div class="nw-contact-avatar color10">B</div>
+                            <div class="fm-chat-user-info todo-star">
+                              <div class="fm-chat-user">Andrei.d</div>
+                              <div class="contact-email">ad@mega.co.nz</div>                            
+                            </div>
+                          </td>
+                          <td width="240">
+                            <div class="online">
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Online</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: never/cloud-drive/conversations/unread-conversations !-->
+                            <div class="contacts-interation unread-conversations">A few seconds ago</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="nw-contact-avatar color4">L</div>
+                            <div class="fm-chat-user-info todo-star">
+                              <div class="fm-chat-user">Leo</div>
+                              <div class="contact-email">ad@mega.co.nz</div>                            
+                            </div>
+                          </td>
+                          <td width="240">
+                            <div class="away">
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Away</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: never/cloud-drive/conversations/unread-conversations !-->
+                            <div class="contacts-interation cloud-drive">20 minutes ago</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="nw-contact-avatar color2">B</div>
+                            <div class="fm-chat-user-info todo-star">
+                              <div class="fm-chat-user">Bram van der Kolk</div>
+                              <div class="contact-email">br@mega.co.nz</div>                            
+                            </div>
+                          </td>
+                          <td width="240">
+                            <div class="offline">
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Offline</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: never/cloud-drive/conversations/unread-conversations !-->
+                            <div class="contacts-interation conversations">1 hour ago</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="nw-contact-avatar color10">M</div>
+                            <div class="fm-chat-user-info todo-star">
+                              <div class="fm-chat-user">Mike</div>
+                              <div class="contact-email">mk@mega.co.nz</div>                            
+                            </div>
+                          </td>
+                          <td width="240">
+                            <div class="busy">
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Busy</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: never/cloud-drive/conversations/unread-conversations !-->
+                            <div class="contacts-interation never">Never</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                
+                </div>
+                
+                <!-- New block for contacts blocks view !-->
+                <div class="fm-blocks-view contacts-view hidden">
+                  <div class="contacts-blocks-scrolling">
+                    
+                    <!-- Please add online/offline/away/busy classname. Please add "two-letters" classname if we have two letters !-->
+                    <a class="file-block online">
+                      <span class="nw-contact-status"></span>
+                      <span class="nw-contact-block-avatar color10">
+                         A
+                      </span>
+                      
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Alex Brunskill</span>
+                         <span class="shared-folder-info">ab@mega.co.nz</span>
+                      </span> 
+                    </a>
+                    
+                    <!-- Please add online/offline/away/busy classname. Please add "two-letters" classname if we have two letters !-->
+                    <a class="file-block away two-letters">
+                      <span class="nw-contact-status"></span>
+                      <span class="nw-contact-block-avatar color3">
+                         <img src="images/mega/default-avatar.png" />
+                      </span>
+                      
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">World wide</span>
+                         <span class="shared-folder-info">ww@mega.co.nz</span>
+                      </span> 
+                    </a>
+                    
+                    <!-- Please add online/offline/away/busy classname. Please add "two-letters" classname if we have two letters !-->
+                    <a class="file-block offline">
+                      <span class="nw-contact-status"></span>
+                      <span class="nw-contact-block-avatar color5">
+                         b
+                      </span>
+                      
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Bram var der Kolk</span>
+                         <span class="shared-folder-info">bk@mega.co.nz</span>
+                      </span> 
+                    </a>
+                    
+                    <div class="clear"></div>
+                  
+                  </div>
+                </div>
+              
+              </div>
+              <div class="clear"></div>
+           
+          </div>
+          
+<div class="transfer-panel">
+  <div class="transfer-icons-block">
+   <div class="transfer-drag-handle ui-resizable-handle ui-resizable-n"></div>
+   <div class="file-transfer-icon download-percents-50  upload-percents-49">
+     <div class="file-transfer-download">
+        <div class="file-transfer-upload"></div> 
+     </div> 
+   </div>
+   <div class="transfer-panel-title">
+         File transfers
+   </div>
+   <a class="tranfer-view-icon active"></a>
+   <a class="transfer-settings-icon"></a>
+   <div class="tranfer-upload-indicator active">
+        640 Kb/s
+   </div>
+   <div class="tranfer-download-indicator active">
+        1640 Kb/s
+   </div>
+   <a class="transfer-pause-icon active"></a>
+   <div class="clear"></div>
+ </div>
+</div>
+
+
+</div>
+
+
+</body>
+</html>

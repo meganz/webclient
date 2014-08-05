@@ -9,7 +9,7 @@ var ul_completing;
 function ul_completepending(target)
 {
 	if (ul_completion.length) {
-	console.error("I'm weak, debug me.")
+		console.error("I'm weak, debug me.")
 		var ul = ul_completion.shift();
 		// var ctx = {
 			// target : target,
@@ -41,13 +41,14 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		onUploadSuccess(ul_queue[ctx.ul_queue_num].id);
 		ul_queue[ctx.ul_queue_num] = {}
-		onUploadSuccess(ctx.ul_queue_num);
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
-	oDestroy(ctx.file);
+	if (ctx.file.mFiU) ctx.file.mFiU.destroy();
+	else oDestroy(ctx.file);
 	oDestroy(ctx);
 }
 
@@ -73,7 +74,7 @@ function ul_deduplicate(File, identical) {
 			} else if (typeof res == 'number' || res.e) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
-				onUploadSuccess(uq.pos);
+				onUploadSuccess(uq.id);
 				File.file.ul_failed = false;
 				File.file.retries   = 0;
 				File.file.done_starting();
@@ -220,7 +221,7 @@ var UploadManager = new function() {
 		file.abort = true;
 
 		ERRDEBUG("fatal error restarting", file.name)
-		onUploadError(file.pos, "Upload failed - restarting upload");
+		onUploadError(file.id, "Upload failed - restarting upload");
 
 		// reschedule
 		ulQueue.push(new FileUpload(file));
@@ -236,7 +237,7 @@ var UploadManager = new function() {
 		ulQueue.pushFirst(newTask);
 
 		ERRDEBUG("retrying chunk because of", reason + "")
-		onUploadError(file.pos, "Upload failed - retrying");
+		onUploadError(file.id, "Upload failed - retrying");
 	};
 
 	self.isReady = function(Task) {
@@ -281,6 +282,7 @@ function ul_upload(File) {
 	file.ul_aes = new sjcl.cipher.aes([
 		file.ul_key[0],file.ul_key[1],file.ul_key[2],file.ul_key[3]
 	]);
+	file.mFiU = File;
 
 	if (file.size) {
 		var pp, p = 0, tasks = {}
@@ -311,7 +313,7 @@ function ul_upload(File) {
 		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
-	onUploadStart(file.pos);
+	onUploadStart(file.id);
 	file.done_starting();
 }
 
@@ -322,23 +324,6 @@ function ul_start(File) {
 		, total = 0
 		, len   = ul_queue.length
 		, max   = File.file.pos+8
-
-	/* CPU INTENSIVE
-	$.each(ul_queue, function(i, cfile) {
-		if (i < File.file.pos || cfile.posturl) return; // continue 
-		if (i >= File.file.pos+8 || maxpf <= 0) return false; // break 
-		api_req({ 
-			a : 'u', 
-			ssl : use_ssl, 
-			ms : ul_maxSpeed, 
-			s : cfile.size, 
-			r : cfile.retries, 
-			e : cfile.ul_lastreason 
-		}, { reqindex : i, callback : next });
-		maxpf -= cfile.size
-		total++;
-	});
-	*/
 
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
@@ -358,14 +343,27 @@ function ul_start(File) {
 
 function ChunkUpload(file, start, end)
 {
-	this.file = file;
-	this.ul   = file;
+	this.file  = file;
+	this.ul    = file;
 	this.start = start;
-	this.end	= end;
+	this.end   = end;
+	this.gid   = file.mFiU.gid;
+	this.xid   = this.gid + '_' + start + '-' + end;
+	this[this.gid] = !0;
 }
 
+ChunkUpload.prototype.toString = function() {
+	return "[ChunkUpload " + this.xid + "]";
+};
+
+ChunkUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	removeValue(GlobalProgress[this.gid].working, this, 1);
+	oDestroy(this);
+};
+
 ChunkUpload.prototype.updateprogress = function() {
-	if (this.file.complete || ui_paused) return;
+	if (this.file.paused || this.file.complete || ui_paused) return;
 
 	var tp = this.file.sent || 0, p=this.file.progress;
 	for (var i in p) tp += p[i];
@@ -376,14 +374,18 @@ ChunkUpload.prototype.updateprogress = function() {
 	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
-		this.file.pos, 
+		this.file.id, 
 		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size,
-		this.file.speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
+		GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
 	);
 
 	if (tp == this.file.size) this.file.complete = true;
+};
+
+ChunkUpload.prototype.abort = function() {
+	this.xhr.abort(); // abort socket
 };
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
@@ -442,10 +444,10 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 					this.file.filekey       = filekey
 					this.file.response      = base64urlencode(response)
 					ul_finalize(this.file);
-					//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+					//api_completeupload(response, ul_queue[file.id], filekey,ctx);
 				} else {
 					this.file.completion.push([
-						response.url, this.file, filekey, this.file.pos
+						response.url, this.file, filekey, this.file.id
 					]);
 				}
 			}
@@ -492,6 +494,8 @@ ChunkUpload.prototype.upload = function() {
 		xhr.open('POST', this.file.posturl+this.suffix);
 		xhr.send(this.bytes.buffer);
 	}
+
+	this.xhr = xhr;
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
@@ -512,24 +516,41 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 
 ChunkUpload.prototype.done = function() {
 	DEBUG("release", this.start);
+	this.xhr = null;
 	
 	/* release worker */
 	this._done();
 
 	/* clean up references */
-	oDestroy(this);
+	this.destroy();
 };
 
 ChunkUpload.prototype.run = function(done) {
 	this._done = done;
 	this.file.ul_reader.push(this, this.io_ready, this);
+	GlobalProgress[this.gid].working.push(this);
 };
 
 
 function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
+	this.gid  = 'ul_'+this.ul.id;
+	this[this.gid] = !0;
+	GlobalProgress[this.gid] = {working:[]};
 }
+
+FileUpload.prototype.toString = function() {
+	return "[FileUpload " + this.gid + "]";
+};
+
+FileUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+	delete GlobalProgress[this.gid];
+	oDestroy(this.file);
+	oDestroy(this);
+};
 
 FileUpload.prototype.run = function(done) {
 	var file = this.file
@@ -547,7 +568,11 @@ FileUpload.prototype.run = function(done) {
 		return ulQueue.pushFirst(this);
 	}
 
-	DEBUG(file.name, "starting upload", file.id)
+	if (!GlobalProgress[this.gid].started) {
+		GlobalProgress[this.gid].started = true;
+	}
+
+	if (d) console.log(file.name, "starting upload", file.id)
 
 	start_uploading = true;
 
@@ -702,7 +727,7 @@ function worker_uploader(task, done) {
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = 4
 	, Encrypter
-	, ulQueue = new MegaQueue(worker_uploader, ul_maxSlots)
+	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0
@@ -729,13 +754,28 @@ function isQueueActive(q) {
 	return typeof q.id !== 'undefined';
 }
 function resetUploadDownload() {
-	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
-	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
-
-	if (dl_queue.length == 0 && ul_queue.length == 0) {
-		clearXhr(); /* destroy all xhr */
-		$.transferClose(); /* in case it isn't closed already.. */
+	if (!ul_queue.some(isQueueActive)) {
+		ul_queue = new UploadQueue();
+		ul_uploading = false;
 	}
+	if (!dl_queue.some(isQueueActive)) {
+		dl_queue = new DownloadQueue();
+		downloading = false;
+	}
+
+	if (dl_queue.length == 0 && ul_queue.length == 0)
+	{
+		clearXhr(); /* destroy all xhr */
+		
+		$('.transfer-panel-empty-txt').removeClass('hidden');
+		$('.transfer-table-header').hide(0);
+		
+		$.transferClose();
+		
+		$('.transfer-clear-all-icon').addClass('hidden');
+		panelDomQueue = {};
+	}
+	else Soon(fmUpdateCount);
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
 
@@ -743,26 +783,6 @@ function resetUploadDownload() {
 }
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
-
-// ul_uploading variable {{{
-ulQueue.on('working', function() {
-	ul_uploading = true;
-});
-
-ulQueue.on('resume', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = false;
-});
-
-ulQueue.on('pause', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = true;
-});
-
-ulQueue.on('drain', function() {
-	ul_uploading = !ulQueue.isEmpty();
-});
-// }}}
 
 ulQueue.validateTask = function(pzTask) {
 	if (pzTask instanceof ChunkUpload && (!pzTask.file.paused || pzTask.__retry)) {

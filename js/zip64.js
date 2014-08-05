@@ -87,9 +87,11 @@ var Zips = {};
 
 var ZIPClass = function(totalSize) {
 	var self = this
-		, maxZipSize = Math.pow(2,32) - 4098 /* for headers */
-		, isZip64	= totalSize > maxZipSize || localStorage.zip64 == 1
+		, maxZipSize = Math.pow(2,31) * .9
+		, isZip64 = totalSize > maxZipSize || localStorage.zip64 == 1
 
+	this.isZip64 = isZip64 /* make it public */
+	
 	// Constants
 	var fileHeaderLen				= 30
 		, noCompression				= 0
@@ -266,7 +268,7 @@ var ZIPClass = function(totalSize) {
 		var dataDescriptor = new ZipDataDescriptor();
 		dataDescriptor.crc32	= crc32;
 		dataDescriptor.size		= size;
-		dataDescriptor.unsize   = size;
+		dataDescriptor.unsize	= size;
 
 		return {
 			dirRecord: dirRecord.getBytes(),
@@ -377,13 +379,14 @@ ZipEntryIO.prototype.push = function(obj) {
 };
 
 function ZipWriter(dl_id, dl) {
-	this.dl     = dl;
+	this.dl		= dl;
 	this.size	= 0
-	this.is_ready  = false
-	this.queues = [];
-	this.hashes = {};
-	this.dirData = [];
-	this.offset = 0;
+	this.nfiles	= 0
+	this.is_ready	= false
+	this.queues		= [];
+	this.hashes		= {};
+	this.dirData	= [];
+	this.offset		= 0;
 	this.file_offset = 0;
 
 	if ((dlMethod === FileSystemAPI) || ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO))
@@ -408,9 +411,23 @@ ZipWriter.prototype.toString = function() {
 
 ZipWriter.prototype.createZipObject = function() {
 	if (!this.ZipObject) {
-		this.ZipObject = new ZIPClass(this.size);
+		
+		this.ZipObject = new ZIPClass(
+			this.size
+		);
+
+		if (this.ZipObject.isZip64) {
+			this.size += this.nfiles * 28 // extra bytes for each ZipCentralDirectory 
+			this.size += this.nfiles * 24 // extra bytes for each dataDescriptor
+			this.size += 98 // final bytes
+		} else {
+			this.size += this.nfiles * 16 // extra bytes for each dataDescriptor
+			this.size += 22 // final bytes
+		}
+
 		this.io.setCredentials("", this.size, this.dl.zipname);
-		// TODO: pass accurate size to setCredentials
+		ERRDEBUG("isZip64", this.ZipObject.isZip64, this.size);
+
 	}
 	return this.ZipObject;
 };
@@ -424,7 +441,7 @@ ZipWriter.prototype.destroy = function(error) {
 		delete GlobalProgress['zip_' + dl.zipid];
 		if (error || this.cancelled) {
 			if (this.io.abort) this.io.abort(error || this);
-		}
+		} 
 		else if (dlMethod != FlashIO) DownloadManager.cleanupUI(dl, true);
 		oDestroy(this);
 	}
@@ -531,7 +548,10 @@ ZipWriter.prototype._eof = function() {
 ZipWriter.prototype.addEntryFile = function(file) {
 	var io =  new ZipEntryIO(this, file);
 	this.queues.push(io);
-	this.size += file.size
+	this.nfiles++
+	this.size += file.size 
+		+ 30 + 9 + 2 * (file.p.length + file.n.length) /* header */
+		+ 46 + file.p.length + file.n.length  /* dirRecord */
 	return io;
 };
 

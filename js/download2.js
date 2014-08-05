@@ -2,7 +2,7 @@ var dlMethod
 	, dl_maxSlots = 4
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
-	, dlQueue = new MegaQueue(downloader)
+	, dlQueue = new TransferQueue(downloader)
 	, preparing_download
 	, ui_paused = false
 
@@ -125,6 +125,14 @@ var DownloadManager = new function() {
 				}
 				if (dl.zipid) Zips[dl.zipid].cancelled = true;
 				dl.cancelled = true;
+				if (dl.io && typeof dl.io.begin === 'function')
+				{
+					/**
+					 * Canceled while Initializing? Let's free up stuff
+					 * and notify the scheduler for the running task
+					 */
+					dl.io.begin();
+				}
 				/* do not break the loop, it may be a multi-files zip */
 			}
 		}
@@ -247,39 +255,152 @@ function throttleByIO(writer) {
 	});
 }
 
-// downloading variable {{{
-dlQueue.on('working', function() {
-	downloading = true;
-});
+// TODO: move the next functions to fm.js when no possible conflicts
+function fm_tfsorderupd()
+{
+	M.t = {};
+	$('.transfer-table tr[id]').each(function(pos,node)
+	{
+		if (d) ASSERT(-1 != ['ul','dl','zip'].indexOf((''+node.id).split('_').shift()), 'Huh, unexpected node id: ' + node.id);
 
-dlQueue.on('resume', function() {
-	downloading =!dlQueue.isEmpty();
-});
+		M.t[pos] = node.id;
+		M.t[node.id] = pos;
+	});
+	if (d) console.log('M.t', M.t);
+}
 
-dlQueue.on('pause', function() {
-	downloading =!dlQueue.isEmpty();
-});
+function fm_tfspause(gid)
+{
+	if (gid[0] === 'u') ulQueue.pause(gid);
+	else dlQueue.pause(gid);
+}
 
-dlQueue.on('drain', function() {
-	downloading =!dlQueue.isEmpty();
-});
-// }}}
+function fm_tfsresume(gid)
+{
+	if (gid[0] === 'u') ulQueue.resume(gid);
+	else dlQueue.resume(gid);
+}
 
-// chunk scheduler {{{
-dlQueue.prepareNextTask = function() {
-	this.has_chunk = false;
-	for (var i = 0; i < this._queue.length; i++) {
-		if (this._queue[i][0] instanceof ClassChunk) {
-			this.has_chunk = true;
+function fm_tfsmove(gid, dir) // -1:up, 1:down
+{
+	var tfs = $('#' + gid), to, act, p1, p2;
+	ASSERT(tfs.length === 1,'Invalid transfer node: ' + gid);
+	if (tfs.length != 1) return;
+	
+	ASSERT(GlobalProgress[gid] && GlobalProgress[gid].working.length == 0,'Invalid transfer state: ' + gid);
+	if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) return;
+
+	if (~dir)
+	{
+		to  = tfs.next();
+		act = 'after';
+	}
+	else
+	{
+		to  = tfs.prev();
+		act = 'before';
+	}
+	
+	var id = to && to.attr('id') || 'x';
+
+	ASSERT(GlobalProgress[id] && GlobalProgress[id].working.length == 0,'Invalid [to] transfer state: ' + gid);
+	if (!GlobalProgress[id] || GlobalProgress[id].working.length) return;
+	
+	if (id[0] == gid[0] || "zdz".indexOf(id[0]+gid[0]) != -1)
+	{
+		to[act](tfs);
+	}
+	else
+	{
+		if (d) console.log('Unable to move ' + gid);
+		return;
+	}
+
+	fm_tfsorderupd();
+	
+	if (gid[0] === 'z' || id[0] === 'z')
+	{
+		var mQueue = [], trick = Object.keys(M.t).map(Number)
+			.filter(function(n) {
+				return !isNaN(n) && M.t[n][0] != 'u';
+			}), p = 0;
+		for (var i in trick)
+		{
+			ASSERT(i == trick[i] && M.t[i],'Oops..');
+			var mQ = dlQueue.slurp(M.t[i]);
+			for (var x in mQ)
+			{
+				(dl_queue[p]=mQ[x][0].dl).pos = p;
+				++p;
+			}
+			mQueue = mQueue.concat(mQ);
+		}
+		// we should probably fix our Array inheritance
+		for (var i = p, len = dl_queue.length ; i < len ; ++i )
+		{
+			delete dl_queue[i];
+		}
+		dl_queue.length = p;
+		dlQueue._queue  = mQueue;
+		return;
+	}
+	
+	if (gid[0] === 'u')
+	{
+		var m_prop  = 'ul';
+		var mQueue  = ulQueue._queue;
+		var m_queue = ul_queue;
+	}
+	else
+	{
+		var m_prop  = 'dl';
+		var mQueue  = dlQueue._queue;
+		var m_queue = dl_queue;
+	}
+	for (var i in mQueue)
+	{
+		if (mQueue[i][0][gid])
+		{
+			var tmp = mQueue[i], m_q = tmp[0][m_prop];
+			p1 = +i+ dir;
+			p2 = m_q.pos;
+			tmp[0][m_prop].pos = mQueue[p1][0][m_prop].pos;
+			mQueue[p1][0][m_prop].pos = p2;
+			mQueue[i]  = mQueue[p1];
+			mQueue[p1] = tmp;
+			p1 = m_queue.indexOf(m_q);
+			tmp = m_queue[p1];
+			m_queue[p1] = m_queue[p1+dir];
+			m_queue[p1+dir] = tmp;
+			ASSERT(m_queue[p1].pos === mQueue[i][0][m_prop].pos, 'Huh, move sync error..');
 			break;
 		}
 	}
 };
 
-dlQueue.validateTask = function(pzTask, next) {
-	var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk
-		|| (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk);
-	// if (d) console.log('dlQueue.validateTask', r, next, pzTask);
+// chunk scheduler {{{
+dlQueue.validateTask = function(pzTask)
+{
+	var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk;
+
+	if (!r && pzTask instanceof ClassFile && !fetchingFile)
+	{
+		var i = this._queue.length;
+		while (i-- && !(this._queue[i][0] instanceof ClassChunk));
+
+		if ((r = !~i) && $.len(this._qpaused))
+		{
+			fm_tfsorderupd();
+
+			// About to start a new download, check if a previously paused dl was resumed.
+			var p1 = M.t[pzTask.gid];
+			for (var i = 0 ; i < p1 ; ++i)
+			{
+				var gid = M.t[i];
+				if (this._qpaused[gid] && this.dispatch(gid)) return -0xBEEF;
+			}
+		}
+	}
 	return r;
 };
 // }}}

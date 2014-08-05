@@ -1,5 +1,6 @@
 ﻿
 
+
 var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
@@ -400,10 +401,21 @@ else
 			};
 		*/
 		
-		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
+		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
+		if (d && !console.time) (function(c)
+		{
+			var timers = {};
+			c.time = function(n) { timers[n] = new Date().getTime()};
+			c.timeEnd = function(n) {
+				if(timers[n]) {
+					c.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
+					delete timers[n];
+				}
+			};
+		})(console);
 
 		function detectlang()
 		{
@@ -428,25 +440,25 @@ else
 
         jsl.push({f:'js/megakvstorage.js', n: 'megakvstorage_js', j:1,w:5});
 
+		jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
-		jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
+        jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
 		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});		
 		
-
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
+        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-        jsl.push({f:'js/jquery-min-1.8.1.js', n: 'jquery', j:1,w:9});
-        jsl.push({f:'js/jquery-ui.js', n: 'jqueryui_js', j:1,w:12});
+        jsl.push({f:'js/jquery-2.1.1.min.js', n: 'jquery', j:1,w:10});
+        jsl.push({f:'js/jquery-ui.min.js', n: 'jqueryui_js', j:1,w:10});
         jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});
+        // jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});
         jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
         jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
         jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-        jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
         jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
         jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
         jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});

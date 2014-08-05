@@ -15,15 +15,18 @@ var MegaChatEnabled = true;
 var chatui;
 (function() {
     chatui = function(id) {
-
+	
         //TODO: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyMsg();
+		
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
-        $('.contacts-grid-view').addClass('hidden');
-        $('.fm-contacts-blocks-view').addClass('hidden');
         $('.fm-right-account-block').addClass('hidden');
+		$('.contacts-details-block').addClass('hidden');
+		
+		$('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+		
 
         $('.fm-right-files-block').removeClass('hidden');
 
@@ -432,6 +435,9 @@ MegaChat.prototype.init = function() {
                 }
 
                 $.each(self.chats, function(roomJid, room) {
+                    if(room._leaving || room._conv_ended) {
+                        return; // continue
+                    }
                     if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
                         if(localStorage.d) {
                             console.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
@@ -936,6 +942,30 @@ MegaChat.prototype.init = function() {
             self.getMyXMPPPassword()
         );
     }
+
+
+    // contacts tab update
+
+    self.on('onRoomCreated', function(e, room) {
+        if(room.type == "private") {
+            var jid = room.getParticipantsExceptMe()[0];
+            var c = self.getContactFromJid(jid);
+
+            $('#contact_' + c.u + ' .start-chat-button')
+                .text('Show chat')
+                .addClass("active");
+        }
+    });
+    self.on('onRoomDestroy', function(e, room) {
+        if(room.type == "private") {
+            var jid = room.getParticipantsExceptMe()[0];
+            var c = self.getContactFromJid(jid);
+
+            $('#contact_' + c.u + ' .start-chat-button')
+                .text('Start chat')
+                .removeClass("active");
+        }
+    });
 };
 
 /**
@@ -1746,6 +1776,10 @@ MegaChat.prototype.processRemovedUser = function(u) {
     if(localStorage.d) { console.error("removed: ", u); }
 
 
+    var room = self.getPrivateRoom(u);
+    if(room) {
+        room.destroy(true);
+    }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
 
     self.renderContactTree();
@@ -1765,28 +1799,6 @@ MegaChat.prototype.refreshConversations = function() {
             $(this).remove();
         }
     });
-
-    //XX: move the current code from mega.js to here?
-
-//    $.each(self.chats, function(k, v) {
-//        if($('.content-panel .conversations .nw-conversations-item[data-chatRoomId="' + k + '"]').size() == 0) {
-//            // does not exists, create new dom element
-//            var $elem = $('<div class="nw-conversations-item"><div class="nw-contact-status"></div><div class="nw-conversations-name"></div></div>');
-//
-//            var participants = v.getParticipantsExceptMe();
-//
-//            $elem.data('chatRoomJid', k);
-//
-//            if(v.type == "private") {
-//                $elem.addClass("private_" + self.getContactFromJid(participants[0]).u);
-//            }
-//
-//            var contactName = self.getContactNameFromJid(participants[0]);
-//            $('.nw-conversations-name', $elem).text(contactName);
-//
-//            $('.content-panel.conversations').append($elem);
-//        }
-//    });
 
     self.renderContactTree();
 };
@@ -1818,27 +1830,10 @@ MegaChat.prototype.getChatNum = function(idx) {
  * BOSH service that should be used for connecting the current user.
  */
 MegaChat.prototype.getBoshServiceUrl = function() {
-    var num = "";
-    var hash = asmCrypto.SHA1.hex(u_handle).substr(0, 1);
-    if("abcde".indexOf(hash) !== -1) {
-        num = 1;
-    } else if ("f0123".indexOf(hash) !== -1) {
-        num = 2;
-    } else if ("456789".indexOf(hash) !== -1) {
-        num = 3;
-    } else { // should not happen
-        assert(false, 'this should never happen (generated SHA1 hex hash contained unexpected character)');
-    }
-
-    num = "" + num; // conv to string
-    for(var i = num.length; i<3; i++) {
-        num = "0" + num;
-    }
-
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
     } else {
-        return "https://karere-" + num + ".developers.mega.co.nz:5281/http-bind";
+        return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
     }
 };
 
@@ -1847,9 +1842,12 @@ MegaChat.prototype.getBoshServiceUrl = function() {
  * Called when Conversations tab is opened
  */
 MegaChat.prototype.renderListing = function() {
+    var self = this;
+
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');
+    $('.fm-chat-block').addClass('hidden');
     $('.fm-contacts-blocks-view').addClass('hidden');
 
     $('.fm-right-files-block').removeClass('hidden');
@@ -1858,6 +1856,12 @@ MegaChat.prototype.renderListing = function() {
 
 
     sectionUIopen('conversations');
+
+    if(Object.keys(self.chats).length == 0) {
+        $('.fm-empty-conversations').removeClass('hidden');
+    } else {
+        $('.fm-empty-conversations').addClass('hidden');
+    }
 
     //TODO: show something? some kind of list of conversations summary/overview screen or something?
 };
@@ -1887,6 +1891,29 @@ MegaChat.prototype.sendBroadcastAction = function(toRoomJid, action, meta) {
     }
 };
 
+/**
+ * Tries to find if there is a opened (private) chat room with user `h`
+ *
+ * @param h {string} hash of the user
+ * @returns {false|MegaChatRoom}
+ */
+MegaChat.prototype.getPrivateRoom = function(h) {
+    var self = this;
+
+    var jid = self.getJidFromNodeId(h);
+
+    var found = false;
+    Object.keys(self.chats).forEach(function(k) {
+        var v = self.chats[k];
+
+        if(v.getParticipantsExceptMe()[0] == jid) {
+            found = v;
+            return false; // break;
+        }
+    });
+
+    return found;
+};
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
@@ -2088,7 +2115,6 @@ var MegaChatRoom = function(megaChat, roomJid) {
     $('.chat-button.fm-chat-end', self.$header).unbind("click.megaChat");
     $('.chat-button.fm-chat-end', self.$header).bind("click.megaChat", function() {
         self.destroy(true);
-        window.location = '#fm/chat';
     });
 
     /**
@@ -3099,6 +3125,11 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
 
     this.$header.attr("data-room-jid", this.roomJid.split("@")[0]);
 
+    if(this.$header.is(":visible")) {
+        $('.nw-conversations-item').removeClass("selected");
+        $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
+    }
+
     var $jsp = self.$messages.data("jsp");
     assert($jsp, "JSP not available?!");
 
@@ -3268,6 +3299,9 @@ MegaChatRoom.prototype.destroy = function(notifyOtherDevices) {
 
     if(roomJid == mc.getCurrentRoomJid()) {
         window.location = "#fm/chat";
+        setTimeout(function() {
+            self.megaChat.renderListing();
+        }, 100);
     }
     setTimeout(function() {
         delete mc.chats[roomJid];
@@ -3293,6 +3327,10 @@ MegaChatRoom.prototype.show = function() {
 
 
     sectionUIopen('conversations');
+
+
+    $('.nw-conversations-item').removeClass("selected");
+    $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
 
 
     self.$header.show();
@@ -4283,6 +4321,7 @@ MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
                 .removeClass("conv-start");
         });
 
+        self._conv_ended = true;
 
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -4308,6 +4347,7 @@ MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
 MegaChatRoom.prototype._conversationStarted = function(userFullJid) {
     var self = this;
 
+    self._conv_ended = false;
 
     self.appendDomMessage(
         self.generateInlineDialog(

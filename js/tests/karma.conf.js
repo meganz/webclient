@@ -20,10 +20,10 @@ module.exports = function(config) {
              "../jodid25519.js",
              "../jquery.jscrollpane.min.js",
              "../mega.js",
-             "../megakvstorage.js",
              "../fm.js",
              "../user.js",
              "../megakvstorage.js",
+             "../tlvstore.js",
 
              "../chat/mpenc.js",
              "../chat/opQueue.js",
@@ -77,7 +77,8 @@ module.exports = function(config) {
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
             '../chat/!(*mpenc|rtcSession).js': ['coverage'],
-            '../megakvstorage.js': ['coverage']
+            '../megakvstorage.js': ['coverage'],
+             '../tlvstore.js': ['coverage']
         },
 
 //        browsers: ['PhantomJS_custom'],

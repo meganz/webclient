@@ -426,15 +426,21 @@ function init_register()
 	$('.password-status-icon').unbind('mouseover');
 	$('.password-status-icon').bind('mouseover',function(e)
 	{
-		$('.password-status-warning').removeClass('hidden');
+		if ($(this).parents('.strong-password').length == 0)
+		{
+			$('.password-status-warning').removeClass('hidden');
+		}
 		
 	});	
 	$('.password-status-icon').unbind('mouseout');
 	$('.password-status-icon').bind('mouseout',function(e)
 	{
-		$('.password-status-warning').addClass('hidden');
-		
+		if ($(this).parents('.strong-password').length == 0)
+		{
+			$('.password-status-warning').addClass('hidden');
+		}
 	});		
+
 	$('.register-st2-button').unbind('click');
 	$('.register-st2-button').bind('click',function()
 	{

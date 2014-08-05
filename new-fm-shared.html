@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initTreePanelScroll()
+  {
+	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initTransferPanelScroll()
+  {
+	  $('.transfer-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedGridScroll()
+  {
+	  $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  function initSharedBlocksScroll()
+  {
+	  $('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  
+  
+  $.gridHeader = function()  
+  {	
+		$('.grid-table tbody tr:first-child td').each(function(i,e) {
+		  var headerColumn = $('.grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
+   }	
+	
+  initTreePanelScroll();
+  initTransferPanelScroll();
+  initSharedGridScroll();
+  initSharedBlocksScroll();
+  $.gridHeader();
+  
+  $(window).bind('resize', function () 
+  {
+	  initTreePanelScroll();
+      initTransferPanelScroll();
+      initSharedGridScroll();
+	  initSharedBlocksScroll();
+      $.gridHeader();
+  });
+  $('.nw-fm-tree-folder').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
+		  $('.nw-fm-tree-item.selected').removeClass('selected');
+		  fmTreeItem.addClass('selected');
+	  }
+  });
+  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
+	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
+	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
+		  fmTreeItem.addClass('expanded');
+		  fmTreeItem.next('ul').addClass('opened');
+		  initTreePanelScroll();
+	  } else {
+		  fmTreeItem.removeClass('expanded');
+		  fmTreeItem.next('ul').removeClass('opened');
+		  initTreePanelScroll();
+	  }
+  });
+  $('.nw-fm-left-icon').bind('click', function() {
+	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
+	  if($(this).attr('class').indexOf('active') == -1) {
+		  $('.nw-fm-left-icon.active').removeClass('active');
+		  $(this).addClass('active');
+		  $('.content-panel.active').removeClass('active');
+		  $('.content-panel.'+currentPanelTitle).addClass('active');
+		  initTreePanelScroll();
+		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
+	  }
+  });
+  $('.nw-contact-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-contact-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  $('.nw-conversations-item').bind('click', function() {
+	  if($(this).attr('class').indexOf('selected') == -1) {
+		  $('.nw-conversations-item.selected').removeClass('selected');
+		  $(this).addClass('selected');
+	  }
+  });
+  var initial;
+  $('.nw-fm-left-icon').bind('mouseover', function () {
+	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
+	  clearTimeout( initial );
+	  initial = window.setTimeout( 
+      function() {
+        $(tooltip).addClass('hovered');
+      }, 1000);
+  });
+  $('.nw-fm-left-icon').bind('mouseout', function () {
+	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+		clearTimeout( initial );
+  });
+  
+  $('.fm-files-view-icon').bind('click', function () {
+	  if ($(this).attr('class').indexOf('active') == -1) {
+		  if ($(this).attr('class').indexOf('block-view') > -1) {
+			  $('.files-grid-view ').addClass('hidden');
+			  $('.fm-blocks-view').removeClass('hidden'); 
+              initSharedBlocksScroll();
+		  } else {
+			  $('.files-grid-view ').removeClass('hidden');
+			  $('.fm-blocks-view').addClass('hidden');
+			  initSharedGridScroll();
+		  }
+		  $('.fm-files-view-icon').removeClass('active');
+		  $(this).addClass('active');
+	  }
+  });
+	
+	
+  
+});
+
+</script>
+</head>
+
+<body id="bodyel">
+
+<!-- transfer-panel-opened class !-->
+<div id="fmholder" class="fmholder" style="display: block;">
+          <div class="top-head">
+           
+          </div>
+          <div class="fm-main default">
+              <div class="nw-fm-left-icons-panel">
+                 <div class="nw-fm-left-icon cloud-drive">
+                   <div class="nw-fm-left-tooltip">Cloud Drive</div>
+                 </div>
+                 <div class="nw-fm-left-icon shared-with-me active">
+                   <div class="nw-fm-left-tooltip">Shared with me</div>
+                 </div>
+                 <div class="nw-fm-left-icon contacts">
+                   <div class="nw-fm-left-tooltip">Contacts</div>
+                 </div>
+                 <div class="nw-fm-left-icon conversations">
+                   <div class="nw-fm-left-tooltip">Conversations</div>
+                 </div>
+                 <div class="nw-fm-left-icon rubbish-bin filled"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
+              </div>
+          
+              <div class="fm-left-panel">
+                <div class="fm-left-menu shared-with-me">
+                   <div class="nw-fm-tree-header cloud-drive"> 
+                      Cloud Drive 
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header shared-with-me"> 
+                      Shared with me
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header contacts"> 
+                      Contacts
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header conversations"> 
+                      Conversations
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                   <div class="nw-fm-tree-header rubbish-bin"> 
+                      Rubbish bin
+                      <div class="nw-fm-settins-icon"></div>
+                   </div>
+                </div>
+                <div class="fm-tree-panel">
+                  <div class="nw-tree-panel-header">
+                     <span>My incoming shares</span>
+                     <div class="nw-tree-panel-arrows"></div>
+                  </div>
+                  <div class="content-panel shared-with-me active">
+                   <ul>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder1</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder1 Subfolder1</span>
+                           </span>
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder2</span>
+                       </span>
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item contains-folders">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Folder3</span>
+                       </span>
+                       <ul>
+                         <li>
+                           <span class="nw-fm-tree-item">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder1</span>
+                           </span>
+                         </li>
+                         <li>
+                           <span class="nw-fm-tree-item contains-folders">
+                              <span class="nw-fm-arrow-icon"></span>
+                              <span class="nw-fm-tree-folder">Folder3 Subfolder2</span>
+                           </span>
+                           <ul>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder1</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder2</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder3</span>
+                               </span>
+                             </li>
+                             <li>
+                               <span class="nw-fm-tree-item">
+                                 <span class="nw-fm-arrow-icon"></span>
+                                 <span class="nw-fm-tree-folder">Folder3 Subfolder2 SubSubfolder4</span>
+                               </span>
+                             </li>
+                           </ul> 
+                         </li>
+                       </ul> 
+                     </li>
+                     <li>
+                       <span class="nw-fm-tree-item">
+                          <span class="nw-fm-arrow-icon"></span>
+                          <span class="nw-fm-tree-folder">Backups</span>
+                       </span>
+                     </li>
+                   </ul> 
+                  </div>
+                </div>
+              
+              </div>
+              <div class="fm-right-files-block">
+              
+                <div class="fm-right-header">
+                
+                   <div class="fm-breadcrumbs-block">
+                     <!-- Please replace "cloud-drive" on "shared-with-me" !-->
+                     <a class="fm-breadcrumbs shared-with-me contains-directories has-next-button">
+                       <span class="right-arrow-bg"><span></span></span>
+                     </a>
+                     <!-- Please replace "folder" on "shared-folder" !-->
+                     <a class="fm-breadcrumbs shared-folder contains-directories">
+                         <span class="right-arrow-bg ui-draggable"><span>asdasd</span></span>
+                     </a>
+                     <div class="clear"></div>
+                   </div>
+                
+                   <a class="fm-files-view-icon block-view"></a>
+                   <a class="fm-files-view-icon listing-view active"></a>
+                   <div class="clear"></div>
+                </div>
+                
+                <!-- New block for shared folders grid !-->
+                <div class="files-grid-view shared-view">
+                
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+                      <tr>
+                        <th class="grid-first-th"><span class="grid-header-star"></span></th>
+                        <th><div class="arrow name desc">Name</div></th>
+                        <th><div class="arrow size">Owner</div></th>
+                        <th><div class="arrow type">Access</div></th>
+                      </tr>
+                    </table>
+                    
+                    <div class="grid-scrolling-table">
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me">
+                        <tr>
+                          <td width="30"><span class="grid-status-icon star"></span></td>
+                          <td>
+                              <div class="shared-folder-icon"></div>
+                              <div class="shared-folder-info-block">
+                                 <div class="shared-folder-name">Shared folder name 1</div>
+                                 <div class="shared-folder-info">4 files, 2 folders</div>
+                              </div> 
+                          </td>
+                          <td width="240">
+                            <div class="nw-contact-avatar color10">B</div>
+                            <div class="fm-chat-user-info todo-star online">
+                              <div class="todo-fm-chat-user-star"></div>
+                              <div class="fm-chat-user">bk@mega.co.nz</div>
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Offline</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
+                            <div class="shared-folder-access full-access">Full access</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="30"><span class="grid-status-icon star"></span></td>
+                          <td>
+                              <div class="shared-folder-icon"></div>
+                              <div class="shared-folder-info-block">
+                                 <div class="shared-folder-name">Shared folder name 1</div>
+                                 <div class="shared-folder-info">4 files, 2 folders</div>
+                              </div> 
+                          </td>
+                          <td width="240">
+                            <div class="nw-contact-avatar color1">A</div>
+                            <div class="fm-chat-user-info todo-star offline">
+                              <div class="todo-fm-chat-user-star"></div>
+                              <div class="fm-chat-user">ad@mega.co.nz</div>
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Offline</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
+                            <div class="shared-folder-access read-and-write">Read and write</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="30"><span class="grid-status-icon"></span></td>
+                          <td>
+                              <div class="shared-folder-icon"></div>
+                              <div class="shared-folder-info-block">
+                                 <div class="shared-folder-name">Shared folder name 1</div>
+                                 <div class="shared-folder-info">4 files, 2 folders</div>
+                              </div> 
+                          </td>
+                          <td width="240">
+                            <div class="nw-contact-avatar color3">L</div>
+                            <div class="fm-chat-user-info todo-star away">
+                              <div class="todo-fm-chat-user-star"></div>
+                              <div class="fm-chat-user">lk@mega.co.nz</div>
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Offline</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
+                            <div class="shared-folder-access read-only">Read only</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="30"><span class="grid-status-icon"></span></td>
+                          <td>
+                              <div class="shared-folder-icon"></div>
+                              <div class="shared-folder-info-block">
+                                 <div class="shared-folder-name">Shared folder name 1</div>
+                                 <div class="shared-folder-info">4 files, 2 folders</div>
+                              </div> 
+                          </td>
+                          <td width="240">
+                            <div class="nw-contact-avatar color10">B</div>
+                            <div class="fm-chat-user-info todo-star online">
+                              <div class="todo-fm-chat-user-star"></div>
+                              <div class="fm-chat-user">bk@mega.co.nz</div>
+                              <div class="nw-contact-status"></div>
+                              <div class="fm-chat-user-status">Offline</div>
+                              <div class="clear"></div>
+                            </div>
+                          </td>
+                          <td width="270">
+                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
+                            <div class="shared-folder-access full-access">Full access</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                
+                </div>
+                
+                <!-- New block for shared folders blocks view !-->
+                <div class="fm-blocks-view shared-view hidden">
+                  <div class="shared-blocks-scrolling">
+                    
+                    <a class="file-block folder">
+                      <span class="file-status-icon star"></span>
+                      <span class="shared-folder-access read-only"></span>
+                      <span class="file-icon-area">
+                        <span class="block-view-file-type folder"></span>
+                      </span>
+                      <span class="nw-contact-avatar color10">B</span>
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Shared folder name 1</span>
+                         <span class="shared-folder-info">by Hemi Anaru</span>
+                      </span> 
+                    </a>
+                    
+                    <a class="file-block folder">
+                      <span class="file-status-icon"></span>
+                      <span class="shared-folder-access read-and-write"></span>
+                      <span class="file-icon-area">
+                        <span class="block-view-file-type folder"></span>
+                      </span>
+                      <span class="nw-contact-avatar color1">A</span>
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Shared folder long name 1</span>
+                         <span class="shared-folder-info">by Bram van der Kolk</span>
+                      </span> 
+                    </a>
+                    
+                    <a class="file-block folder">
+                      <span class="file-status-icon"></span>
+                      <span class="shared-folder-access full-access"></span>
+                      <span class="file-icon-area">
+                        <span class="block-view-file-type folder"></span>
+                      </span>
+                      <span class="nw-contact-avatar color6"><img alt="" src="images/mega/default-avatar.png" /></span>
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Shared 1 folder long name 1</span>
+                         <span class="shared-folder-info">by Lexx</span>
+                      </span> 
+                    </a>
+                    
+                    <a class="file-block folder">
+                      <span class="file-status-icon"></span>
+                      <span class="shared-folder-access read-only"></span>
+                      <span class="file-icon-area">
+                        <span class="block-view-file-type folder"></span>
+                      </span>
+                      <span class="nw-contact-avatar color8">V</span>
+                      <span class="shared-folder-info-block">
+                         <span class="shared-folder-name">Shared 222 folder long name 1</span>
+                         <span class="shared-folder-info">by Miss V</span>
+                      </span> 
+                    </a>
+                    
+                    <div class="clear"></div>
+                  
+                  </div>
+                </div>
+              
+              </div>
+              <div class="clear"></div>
+           
+          </div>
+          
+<div class="transfer-panel">
+  <div class="transfer-icons-block">
+   <div class="transfer-drag-handle ui-resizable-handle ui-resizable-n"></div>
+   <div class="file-transfer-icon download-percents-50  upload-percents-49">
+     <div class="file-transfer-download">
+        <div class="file-transfer-upload"></div> 
+     </div> 
+   </div>
+   <div class="transfer-panel-title">
+         File transfers
+   </div>
+   <a class="tranfer-view-icon active"></a>
+   <a class="transfer-settings-icon"></a>
+   <div class="tranfer-upload-indicator active">
+        640 Kb/s
+   </div>
+   <div class="tranfer-download-indicator active">
+        1640 Kb/s
+   </div>
+   <a class="transfer-pause-icon active"></a>
+   <div class="clear"></div>
+ </div>
+</div>
+
+
+</div>
+
+
+</body>
+</html>

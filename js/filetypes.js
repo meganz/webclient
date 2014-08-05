@@ -42,7 +42,7 @@ var extensions =
 	'video-subtitle': [['srt'],'Subtitle'],
 	'web-data': [['html','xml','shtml','dhtml','js','css'],'Web Client Code'],
 	'web-lang': [['php','php3','php4','php5','phtml','inc','asp','pl','cgi','py'],'Web Server Code'],
-	'word.png': [['doc','docx','dotx','wps'],'MS Word']
+	'word': [['doc','docx','dotx','wps'],'MS Word']
 };
 
 var extdesc = 

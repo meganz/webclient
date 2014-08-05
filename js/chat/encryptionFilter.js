@@ -576,7 +576,6 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
             } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
                 // first start, then exclude
                 if(joinUsers.length > 0) {
-                    debugger;
                     megaRoom.encryptionOpQueue.queue('start', joinUsers);
                 }
                 if(excludeUsers.length > 0) {

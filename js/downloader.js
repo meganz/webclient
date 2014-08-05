@@ -6,9 +6,57 @@ var fetchingFile = null, __ccXID = 0
 	 */
 	, IO_THROTTLE = 15
 
-// Chunk fetch {{{
+// Keep a record of active transfers.
 var GlobalProgress = {};
 
+function dlSetActiveTransfer(dl_id)
+{
+	var data = JSON.parse(localStorage.aTransfers || '{}');
+
+	data[dl_id] = Date.now();
+
+	localStorage.aTransfers = JSON.stringify(data);
+}
+
+function isTrasferActive(dl_id)
+{
+	var date = null;
+
+	if (localStorage.aTransfers)
+	{
+		var data = JSON.parse(localStorage.aTransfers);
+
+		date = data[dl_id];
+	}
+
+	return date;
+}
+
+function dlClearActiveTransfer(dl_id)
+{
+	var data = JSON.parse(localStorage.aTransfers || '{}');
+	if (data[dl_id])
+	{
+		delete data[dl_id];
+		if (!$.len(data)) delete localStorage.aTransfers;
+		else localStorage.aTransfers = JSON.stringify(data);
+	}
+}
+
+if (localStorage.aTransfers)
+{
+	Soon(function() {
+		var data = JSON.parse(localStorage.aTransfers), now = NOW();
+		for (var r in data)
+		{
+			// Let's assume there was a system/browser crash...
+			if ((now - data[r]) > 86400000) delete data[r];
+		}
+		localStorage.aTransfers = JSON.stringify(data);
+	});
+}
+
+// Chunk fetch {{{
 function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;
@@ -17,7 +65,7 @@ function ClassChunk(task) {
 	this.io	  = task.download.io
 	this.done = false
 	this.avg  = [0, 0]
-	this.gid  = this.dl.zipid ? 'zip_' + this.dl.zipid : 'dl_' + this.dl.dl_id
+	this.gid  = task.file.gid;
 	this.xid  = this.gid + "_" + (++__ccXID)
 	this.failed   = false
 	// this.backoff  = 1936+Math.floor(Math.random()*2e3);
@@ -30,17 +78,24 @@ function ClassChunk(task) {
 	this.Progress.dl_lastprogress = this.Progress.dl_lastprogress || 0;
 	this.Progress.dl_prevprogress = this.Progress.dl_prevprogress || 0;
 	this.Progress.data[this.xid] = [0, task.size];
+	this[this.gid] = !0;
 }
 
 ClassChunk.prototype.toString = function() {
 	return "[ClassChunk " + this.xid + "]";
 };
 
+ClassChunk.prototype.abort = function() {
+	if (this.oet) clearTimeout(this.oet);
+	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
+	if (this.Progress) removeValue(this.Progress.working, this, 1);
+	delete this.xhr;
+};
+
 // destroy {{{
 ClassChunk.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
-	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-	if (this.oet) clearTimeout(this.oet);
+	this.abort();
 	oDestroy(this);
 };
 // }}}
@@ -90,8 +145,6 @@ ClassChunk.prototype.updateProgress = function(force) {
 		this.dl.pos, // this download position
 		force && force !== 2
 	);
-
-	this.dl.speed = this.Progress.speed
 
 	this.Progress.dl_prevprogress = _progress
 	this.Progress.dl_lastprogress = NOW()
@@ -220,6 +273,7 @@ ClassChunk.prototype.run = function(task_done) {
 	}
 
 	this.request(); /* let the fun begin! */
+	this.Progress.working.push(this);
 };
 // }}}
 
@@ -241,9 +295,12 @@ function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
 	this.gid  = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id
-	if (!dl.zipid || !GlobalProgress[this.gid]) {
-		GlobalProgress[this.gid] = {data: {}, done: 0};
+	if (!dl.zipid || !GlobalProgress[this.gid])
+	{
+		GlobalProgress[this.gid] = {data: {}, done: 0, working:[]};
+		dlSetActiveTransfer(dl.zipid || dl.dl_id);
 	}
+	this[this.gid] = !0;
 }
 
 ClassFile.prototype.toString = function() {
@@ -296,6 +353,7 @@ ClassFile.prototype.destroy = function() {
 	}
 
 	if (!this.dl.zipid) delete GlobalProgress[this.gid];
+	dlClearActiveTransfer(this.dl.zipid || this.dl.dl_id);
 
 	this.dl.ready = function onDeadEnd() { if (d) console.error('We reached a dead end..') };
 
@@ -322,31 +380,43 @@ ClassFile.prototype.run = function(task_done) {
 
 	this.dl.io.begin = function() {
 		var tasks = [];
-		if (d) console.log('Adding', (this.dl.urls||[]).length, 'tasks for', this.dl.dl_id);
-		if (this.dl.urls) for (var key in this.dl.urls)
+
+		if (this.dl.cancelled)
 		{
-			var url = this.dl.urls[key];
-
-			tasks.push(new ClassChunk({
-				url      : url.url,
-				size     : url.size,
-				offset   : url.offset,
-				download : this.dl,
-				chunk_id : key,
-				zipid    : this.dl.zipid,
-				id       : this.dl.id,
-				file     : this
-			}));
+			if (d) console.log(this + ' cancelled while initializing.');
 		}
+		else
+		{
+			if (d) console.log('Adding', (this.dl.urls||[]).length, 'tasks for', this.dl.dl_id);
 
-		if (this.dl.zipid && (this.emptyFile = (tasks.length == 0))) {
-			tasks.push(new ClassEmptyChunk(this.dl));
-		}
+			if (this.dl.urls) for (var key in this.dl.urls)
+			{
+				var url = this.dl.urls[key];
 
-		if (tasks.length > 0) {
-			dlQueue.pushAll(tasks, function onChunkFinished() { 
-					this.chunkFinished = true 
-			}.bind(this), failureFunction);
+				tasks.push(new ClassChunk({
+					url      : url.url,
+					size     : url.size,
+					offset   : url.offset,
+					download : this.dl,
+					chunk_id : key,
+					zipid    : this.dl.zipid,
+					id       : this.dl.id,
+					file     : this
+				}));
+			}
+
+			if (this.dl.zipid && (this.emptyFile = (tasks.length == 0)))
+			{
+				tasks.push(new ClassEmptyChunk(this.dl));
+			}
+
+			if (tasks.length > 0)
+			{
+				dlQueue.pushAll(tasks,
+					function onChunkFinished() {
+						this.chunkFinished = true;
+					}.bind(this), failureFunction);
+			}
 		}
 
 		fetchingFile = 0;
@@ -392,7 +462,7 @@ ClassFile.prototype.run = function(task_done) {
 				setTransferStatus( this.dl, e, true );
 			}
 		}
-		if (error) {
+		if (error && task_done) {
 			fetchingFile = 0;
 			Soon(task_done); /* release worker */
 			task_done = null;

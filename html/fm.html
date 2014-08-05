@@ -21,33 +21,35 @@
   <div class="context-menu-section">
     <a class="context-menu-item download-item contains-submenu">
       <span class="context-menu-icon"></span>[$58]...
-      <span class="context-submenu">
+    </a>
+    <span class="context-submenu">
             <span class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</span>
             <span class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</span>
-      </span>
-    </a>
+    </span>
     <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>Send to contact</a>
     <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
     <a class="context-menu-item sharing-item"><span class="context-menu-icon"></span>[$60]</a>
-     <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
+    <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
     <div class="context-menu-divider"></div>
   </div>
   <div class="context-menu-section">
     <a class="context-menu-item rename-item"><span class="context-menu-icon"></span>[$61]</a>
     <a class="context-menu-item move-item contains-submenu">
       <span class="context-menu-icon"></span>[$62]...
-      <span class="context-submenu">
+    </a>
+    <span class="context-submenu">
             <span class="context-menu-item folder-item contains-submenu">
               <span class="context-menu-icon"></span>Folder1
-              <span class="context-submenu">
+            </span>
+            <span class="context-submenu">
                  <span class="context-menu-item folder-item">
                     <span class="context-menu-icon"></span>Folder3
                  </span>
-              </span>
             </span>
             <span class="context-menu-item folder-item"><span class="context-menu-icon"></span>Folder2</span>
-      </span>
-    </a>
+            <span class="context-menu-divider"></span>
+            <span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>
+    </span>
     <a class="context-menu-item copy-item"><span class="context-menu-icon"></span>[$63]</a>
     <a class="context-menu-item newfolder-item"><span class="context-menu-icon"></span>[$68]</a>
     <a class="context-menu-item fileupload-item"><span class="context-menu-icon"></span>[$99]</a>
@@ -63,12 +65,12 @@
     <a class="context-menu-item forward-item"><span class="context-menu-icon"></span>Forward</a>
     
     <a class="context-menu-item canceltransfer-item"><span class="context-menu-icon"></span>[$103]</a>
-    <a class="context-menu-item transfer-pause"><span class="context-menu-icon"></span>[$103]</a>
-    <a class="context-menu-item transfer-play"><span class="context-menu-icon"></span>Pause</a>
+    <a class="context-menu-item transfer-pause"><span class="context-menu-icon"></span>Pause</a>
+    <a class="context-menu-item transfer-play"><span class="context-menu-icon"></span>Resume</a>
     <div class="pause-item-divider hidden"></div>
     <a class="context-menu-item move-up"><span class="context-menu-icon"></span>Move up queue</a>
     <a class="context-menu-item move-down"><span class="context-menu-icon"></span>Move down queue</a>
-    <a class="context-menu-item tranfer-clear"><span class="context-menu-icon"></span>Clear</a>
+    <a class="context-menu-item tranfer-clear"><span class="context-menu-icon"></span>[$103]</a>
     <div class="context-menu-divider"></div>
   </div>
   <a class="context-menu-item select-all"><span class="context-menu-icon"></span>Select all</a>
@@ -108,34 +110,52 @@
         <div class="nw-fm-left-tooltip">Conversations</div>
     </div>
     <!-- Please add "filled" classname if user have deleted items !-->
-    <div class="nw-fm-left-icon rubbish-bin"><div class="rubbish-bin-icon"></div><div class="nw-fm-left-tooltip">Conversations</div></div>
+    <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
 </div>
 
 <div class="fm-left-panel">
+	<div class="left-pane-drag-handle"></div>
+
+<!--Sorting menu for each section. !-->
+<div class="nw-sorting-menu hidden">
+  <div class="context-menu-section">
+   <div class="sorting-menu-arrow"></div>
+   <div class="sorting-menu-item active">Name</div>
+   <div class="sorting-menu-item">Status</div>
+   <div class="sorting-menu-item">Last Interaction</div>
+   <div class="sorting-item-divider"></div>
+  </div>
+  <div class="context-menu-section">
+   <div class="sorting-menu-item active">Ascending</div>
+   <div class="sorting-menu-item">Descending</div>
+  </div>
+</div>
+
 <!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
 <div class="fm-left-menu cloud-drive">
     <div class="nw-fm-tree-header cloud-drive">
-        Cloud Drive
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Cloud Drive" placeholder="Cloud Drive" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header shared-with-me">
-        Shared with me
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Shared with me" placeholder="Shared with me" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header contacts">
-        Contacts
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Contacts" placeholder="Contacts" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header conversations">
-        Conversations
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Conversations" placeholder="Conversations" />
+        <div class="nw-fm-search-icon"></div>
     </div>
     <div class="nw-fm-tree-header rubbish-bin">
-        Rubbish bin
-        <div class="nw-fm-settins-icon"></div>
+        <input type="text" value="Rubbish bin" placeholder="Rubbish bin" />
+        <div class="nw-fm-search-icon"></div>
     </div>
 </div>
 <div class="fm-tree-panel">
+
 <div class="nw-tree-panel-header">
        <span>My folders</span>
        <div class="nw-tree-panel-arrows"></div>
@@ -656,7 +676,7 @@
 <div class="fm-empty-folder hidden">
     <div class="fm-empty-pad">
         <div class="fm-empty-folder-bg"></div>
-        <div class="fm-empty-cloud-txt">[$977]</div>
+        <div class="fm-empty-cloud-txt">Empty Folder</div>
     </div>
 </div>
 <div class="fm-empty-search hidden">
@@ -687,21 +707,24 @@
     </div>
 </div>
 
-
 <div class="fm-empty-incoming hidden">
     <div class="fm-empty-pad">
-        <div class="fm-empty-cloud-bg"></div>
+        <div class="fm-empty-incoming-bg"></div>
         <div class="fm-empty-cloud-txt">You have no incoming shares</div>
     </div>
 </div>
 <div class="fm-empty-conversations hidden">
     <div class="fm-empty-pad">
-        <div class="fm-empty-cloud-bg"></div>
+        <div class="fm-empty-conversations-bg"></div>
         <div class="fm-empty-cloud-txt">You have no conversations</div>
     </div>
 </div>
 
-<div class="files-grid-view hidden">
+
+
+
+
+<div class="files-grid-view fm hidden">
     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
         <tr>
             <th class="grid-first-th" ><span class="grid-header-star"></span></th>
@@ -744,7 +767,8 @@
     </div>
 </div>
 
-<div class="fm-blocks-view hidden">
+
+<div class="fm-blocks-view fm hidden">
     <div class="file-block-scrolling">
         <div class="clear"></div>
     </div>
@@ -768,27 +792,136 @@
     </div>
 </div>
 
-<div class="contacts-grid-view hidden">
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="contacts-grid-header">
-        <tr>
-            <th><div class="arrow contact-name asc">[$86]</div></th>
-            <th class="hidden">[$89]</th>
-            <th><div class="arrow contact-content">[$982]</div></th>
-            <th><div class="arrow contact-last-modified">[$94]</div></th>
-        </tr>
-    </table>
-    <div class="contacts-grid-scrolling-table">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="contacts-grid-table">
-        </table>
-    </div>
+
+<div class="files-grid-view contacts-view">               
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+  <tr>
+	<th><div class="arrow name desc">Name</div></th>
+	<th><div class="arrow status">Status</div></th>
+	<th><div class="arrow interaction">Last interaction</div></th>
+  </tr>
+</table>
+<div class="grid-scrolling-table contacts">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table contacts">
+  </table>
+</div>
 </div>
 
-<div class="fm-contacts-blocks-view hidden">
-    <div class="contacts-blocks-scrolling">
-        <div class="clear"></div>
-    </div>
+
+<div class="fm-blocks-view contacts-view hidden">
+<div class="contacts-blocks-scrolling">
 </div>
 </div>
+
+
+
+
+
+<div class="shared-grid-view hidden">              
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+  <tr>
+	<th class="grid-first-th"><span class="grid-header-star"></span></th>
+	<th><div class="arrow name desc">Name</div></th>
+	<th><div class="arrow owner">Owner</div></th>
+	<th><div class="arrow access">Access</div></th>
+  </tr>
+</table>
+
+<div class="grid-scrolling-table">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me">
+  </table>
+</div>
+</div>
+
+
+
+ <div class="shared-blocks-view hidden">
+<div class="shared-blocks-scrolling">
+</div>
+</div>
+
+
+
+<div class="contacts-details-block hidden">
+<div class="contact-top-details">
+
+ <div class="nw-contact-block-avatar color10">
+	 A
+ </div>
+ <div class="contact-fingerprint-block">
+	   <div class="contact-fingerprint-title">Unique Crypto Fingerprint:</div>
+	   <div class="contact-fingerprint-txt">
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+	   </div>
+	   <div class="contact-fingerprint-txt">
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+		 <span>QH7XF</span>
+	   </div>
+	   <div class="fm-verify">
+		 <span">Verify...
+	   </span"></div>
+	   <div class="fm-question">
+	   </div>
+	   <div class="clear"></div>
+  </div>
+ 
+ <div class="contact-details-pad">
+	<div class="contact-details-user-name">Andrei.d</div>
+	<a href="" class="grid-url-arrow"><span></span></a>
+	<div class="clear"></div>
+	<div class="contact-details-email">ad@mega.co.nz</div>
+	<div class="onlinestatus away">
+		<div class="nw-contact-status"></div>
+		<div class="fm-chat-user-status">Away</div>
+		<div class="clear"></div>
+	</div>
+	<div class="fm-start-conversation">
+	   <span>Start Conversation</span>
+	</div>
+	<div class="fm-send-files">
+	   <span class="fm-chatbutton-arrow">Send files...</span>
+	</div>
+	<div class="fm-share-folders">
+	   <span>Share Folders</span>
+	</div>
+	
+	<div class="clear"></div>
+ </div>
+ <div class="clear"></div>
+ 
+ <!-- Please add "hidden" class if there is no shared folders !-->
+ <div class="contact-share-notification hidden"></div>
+ 
+</div>
+
+<div class="files-grid-view contact-details-view hidden">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+  <tbody><tr>
+	<th class="grid-first-th" style="width: 30px;"><span class="grid-header-star"></span></th>
+	<th style="width: 1306px;"><div class="arrow name desc">Name</div></th>
+	<th style="width: 270px;"><div class="arrow type">Access</div></th>
+  </tr>
+</tbody></table>
+
+<div class="grid-scrolling-table">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me">
+</table>
+</div>
+</div>
+
+<div class="fm-blocks-view contact-details-view hidden">
+<div class="file-block-scrolling">
+</div></div></div>
+</div>
+
+
+
 
 <div class="fm-right-account-block">
 <div class="fm-account-top">
@@ -1304,7 +1437,8 @@ Please delete files or <a href="">upgrade your account.</a></span>
 </div>
 
 <div class="transfer-panel">
-    <div class="transfer-drag-handle"></div>
+  <div class="transfer-drag-handle"></div>
+  <div class="transfer-icons-block">
     <!-- Please add "download-percents-0"-"download-percents-100" and "upload-percents-0"-"download-percents-100" !-->
     <div class="file-transfer-icon download-percents-0 upload-percents-0">
         <div class="file-transfer-download">
@@ -1314,6 +1448,7 @@ Please delete files or <a href="">upgrade your account.</a></span>
     <div class="transfer-panel-title">
         [$104]
     </div>
+    <a class="transfer-clear-all-icon hidden"></a>
     <a class="tranfer-view-icon"></a>
     <a class="transfer-settings-icon"></a>
     <!-- Please add/remove "active" class to sjow/hide upload and download indicators !-->
@@ -1325,30 +1460,29 @@ Please delete files or <a href="">upgrade your account.</a></span>
     </div>
     <a class="transfer-pause-icon"></a>
     <div class="clear"></div>
+  </div>
     <div class="tranfer-table">
         <div class="transfer-panel-empty-txt">No Active Transfers</div>
         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
             <tr>
+                <th>#</th>
                 <th>[$86]</th>
-                <th>[$87]</th>
                 <th>[$88]</th>
+                <th>ETA</th>
+                <th>[$87]</th>
                 <th>[$89]</th>
-                <th>[$90]</th>
-                <th>[$91]</th>
-                <th>[$92]</th>
                 <th class="grid-url-header"></th>
             </tr>
         </table>
         <div class="transfer-scrolling-table">
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table">
                 <tr class="clone-of-header">
+                    <th width="50"></th>
                     <th></th>
-                    <th width="120"></th>
-                    <th width="180"></th>
-                    <th width="250"></th>
-                    <th width="100"></th>
-                    <th width="100"></th>
+                    <th width="300"></th>
                     <th width="110"></th>
+                    <th width="100"></th>
+                    <th width="300"></th>
                     <th width="42" class="grid-url-field"></th>
                 </tr>
             </table>

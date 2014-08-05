@@ -211,6 +211,7 @@ function dl_g(res)
 			}
 			else
 			{			
+				downloading = true;
 				dl_queue.push(fdl_queue_var);					
 				$('.download-mid-centered-block').addClass('downloading');
 				$.dlhash = window.location.hash;

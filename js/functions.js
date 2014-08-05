@@ -76,6 +76,19 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 	setTimeout(callback, 0);
 };
 
+function SoonFc(func)
+{
+	return function __soonfc()
+	{
+		var self = this, args = arguments;
+		if (func.__sfc) clearTimeout(func.__sfc);
+		func.__sfc = setTimeout(function() {
+			delete func.__sfc;
+			func.apply(self, args);
+		}, 122);
+	};
+}
+
 function jScrollFade(id)
 {
 
@@ -989,7 +1002,7 @@ function setTransferStatus( dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
 	var m = 'This issue should be resolved ';
-	if ($.browser.chrome)
+	if (navigator.webkitGetUserMedia)
 	{
 		m += 'exiting from Incognito mode.';
 	}
@@ -1208,46 +1221,48 @@ function dcTracer(ctr) {
 function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {}
-		, dl_s = 0, ul_s = 0
+		, dl_s = 0, ul_s = 0, zips = {}
 	
 	for (var i in dl_queue)
 	{
-		var q = dl_queue[i];
-		var t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+		var q = dl_queue[i], t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 		
 		if (t)
 		{
 			dl_r += t[0];
 			dl_t += t[1];
+			if (!q.zipid || !zips[q.zipid]) {
+				if (q.zipid) zips[q.zipid] = 1;
+				dl_s += t[2];
+			}
 		}
 		else
 		{
 			dl_t += q.size || 0;
 		}
-		dl_s += ((q||{}).speed || 0) * 1000
 	}
 	
 	for (var i in ul_queue)
 	{
-		var t = tp['ul_' + ul_queue[i].id];
+		var t = tp['ul_' + ul_queue[i].id]
 		
 		if (t)
 		{
 			ul_r += t[0];
 			ul_t += t[1];
+			ul_s += t[2];
 		}
 		else
 		{
 			ul_t += ul_queue[i].size || 0;
 		}
-		ul_s += ((ul_queue[i]||{}).speed || 0)
 	}
 	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
 	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
 
 	var x_ul = Math.floor(ul_r/ul_t*100) || 0,
 		x_dl = Math.floor(dl_r/dl_t*100) || 0
-	
+
 	if (dl_t && ul_t)
 	{
 		t = ' \u2191 ' +  x_dl + '% \u2193 ' + x_ul + '%';

@@ -1,7 +1,6 @@
 var newnodes;
 var fminitialized=false;
-var panelDomQueue = []
-	, DOM_TRANSFER_LIMIT = 15
+var panelDomQueue = {};
 
 if (typeof seqno == 'undefined') var seqno = Math.floor(Math.random()*1000000000);
 if (typeof n_h == 'undefined') var n_h = false;
@@ -30,7 +29,12 @@ if (localStorage.fmconfig) fmconfig = JSON.parse(localStorage.fmconfig);
 var maxaction;
 var zipid=1;
 
-
+function fmUpdateCount() {
+	var i = 0;
+	$('.transfer-table span.row-number').each(function() {
+		$(this).text(++i);
+	});
+}
 
 function MegaData ()
 {
@@ -47,7 +51,7 @@ function MegaData ()
 	this.rendered = false;
 	this.currentdirid = false;
 	this.viewmode = 0;
-	
+
 	this.csortd = -1;
 	this.csort = 'name';
 
@@ -138,6 +142,75 @@ function MegaData ()
 		this.sortd=d;
 		this.sort();
 	};
+	
+	this.sortByOwner = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var usera = M.d[a.p], userb = M.d[b.p];			
+			if (typeof usera.name == 'string' && typeof userb.name == 'string') return usera.name.localeCompare(userb.name)*d;
+			else return -1;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByAccess = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{			
+			if (typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && a.r < b.r) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.getSortStatus = function(u)
+	{
+		var status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
+		if (status == 'chat') return 1;
+		else if (status == 'dnd') return 2;
+		else if (status == 'away') return 3;
+		else return 4;
+	};
+	
+	
+	this.sortByStatus = function(d)
+	{
+		this.sortfn = function(a,b,d)
+		{
+			var statusa = M.getSortStatus(a.u),statusb = M.getSortStatus(b.u);			
+			if (statusa < statusb) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
+	
+	this.sortByInteraction = function(d)
+	{
+		this.i_cache = {};		
+		this.sortfn = function(a,b,d)
+		{
+			if (!M.i_cache[a.u])
+			{				
+				var cs = M.contactstatus(a.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[a.u] = cs.ts;
+			}
+			if (!M.i_cache[b.u])
+			{	
+				var cs = M.contactstatus(b.u);
+				if (cs.ts == 0) cs.ts = -1;
+				M.i_cache[b.u] = cs.ts;
+			}
+			if (M.i_cache[b.u] < M.i_cache[a.u]) return -1*d;
+			else return 1*d;
+		}
+		this.sortd=d;
+		this.sort();
+	};
 
 	this.doSort = function(n,d)
 	{
@@ -147,7 +220,11 @@ function MegaData ()
 		if (n == 'name') M.sortByName(d);
 		else if (n == 'size') M.sortBySize(d);
 		else if (n == 'type') M.sortByType(d);
-		else if (n == 'date') M.sortByDateTime(d);
+		else if (n == 'date') M.sortByDateTime(d);		
+		else if (n == 'owner') M.sortByOwner(d);
+		else if (n == 'access') M.sortByAccess(d);
+		else if (n == 'interaction') M.sortByInteraction(d);
+		else if (n == 'status') M.sortByStatus(d);
 		if (fmconfig.uisorting) storefmconfig('sorting',{n:n,d:d});
 		else fmsortmode(M.currentdirid,n,d);
 	};
@@ -162,7 +239,6 @@ function MegaData ()
 			if (f(this.d[i])) this.v.push(this.d[i]);
 		}
 	};
-
 
     /**
      * The same as filterBy, but instead of pushing the stuff in M.v, will return a new array.
@@ -201,7 +277,7 @@ function MegaData ()
 	{
 		if (!M.c.contacts) M.c.contacts = { };
 		M.c.contacts[u_handle] = 1;
-		
+
 		for (var u in M.c['contacts']) if (!avatars[u])
 		{
 			api_req({a:'uga',u:u,ua:'+a'},
@@ -219,16 +295,22 @@ function MegaData ()
 						}
 						var el = $('.contact-block-view-avatar.' + ctx.u + ',.avatar.' + ctx.u + ',.contacts-avatar.' + ctx.u);
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
-						
-						var el = $('#contact_' + ctx.u);						
+
+						var el = $('#contact_' + ctx.u);
 						if (el.length > 0) el.find('img').attr('src',avatars[ctx.u].url);
+
+						var el = $('.nw-contact-avatar.' + ctx.u);
+						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
+
+						var el = $('.nw-contact-block-avatar.' + ctx.u);
+						if (el.length > 0) $(el).html('<img src="' + avatars[ctx.u].url + '">');
 
 						if (u_handle == ctx.u) $('.fm-avatar img,.fm-account-avatar img').attr('src',avatars[ctx.u].url);
 					}
 				}
 			});
 		}
-		
+
 		delete M.c.contacts[u_handle];
 	}
 
@@ -267,45 +349,93 @@ function MegaData ()
 		return {files:files,folders:folders,ts:ts};
 	};
 
+	this.onlineStatusClass = function(os)
+	{
+		if (os == 'dnd') return ['Busy','busy'];
+		else if (os == 'away') return ['Away','away'];
+		else if (os == 'chat' || os == 'available') return ['Online','online'];
+		else return ['Offline','offline'];
+	};
 
-
+	this.onlineStatusEvent = function(u,status)
+	{
+		if (u)
+		{
+			var e = $('.ustatus.' + u.u);
+			if (e.length > 0)
+			{
+				$(e).removeClass('offline online busy away');
+				$(e).addClass(this.onlineStatusClass(status)[1]);
+			}
+			var e = $('.fm-chat-user-status.' + u.u);
+			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);
+		}
+	};
 
 	this.renderMain = function(u)
 	{
 		function flush_cached_nodes(n)
 		{
 			var e = cache.splice(0, n || cache.length);
-			
+
 			if (e.length)
 			{
 				var n = M.viewmode == 0 ? $('.grid-table.fm') : $('.file-block-scrolling').data('jsp').getContentPane();
-				
+
 				for (var i in e)
 				{
-					n.append(e[i]);
+					if (d) ASSERT(M.v[e[i][0]].name === e[i][2], 'Whoops... wrong idx..');
+					M.v[e[i][0]].seen = true;
+					n.append(e[i][1]);
 				}
-				if (folderlink || RootbyId(M.currentdirid) == M.RubbishID) $('.grid-url-arrow').hide();
-				if (M.viewmode == 1) fm_thumbnails();
+				if (M.dynlistRt) clearTimeout(M.dynlistRt);
+				M.dynlistRt = setTimeout(function()
+				{
+					delete M.dynlistRt;
+					M.rmSetupUI();
+					
+					// var max = e[0][0];
+					// for (var i = 0 ; i < max ; ++i)
+					// {
+						// var n = M.v[i];
+						// if (n.seen && !$(t+' #'+n.h).visible())
+						// {
+							// n.seen = false;
+							// $('.file-block#' + n.h + ' img').attr('src','about:blank');
+						// }
+					// }
+				}, 750);
 				$(window).trigger('resize');
 			}
 			else
 			{
-				$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
+				$(lSel).unbind('jsp-scroll-y.dynlist');
+				// delete M.rmCache;
 			}
 		}
+		var cache = /*u && M.rmCache ||*/ [], n_cache, files = cache.length, jsp, t;
+		// M.rmCache = cache;
+
 		hideEmptyMsg();
-		var jsp = $('.file-block-scrolling').data('jsp');
+
+		jsp = $('.file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
-		var jsp = $('.contacts-blocks-scrolling').data('jsp');
+		
+		jsp = $('.contacts-blocks-scrolling').data('jsp');
+		if (jsp) jsp.destroy();		
+
+		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		
+		
 		if (!u)
 		{
-			$('.grid-table.fm tr').remove();
-			$('.file-block-scrolling div').remove();
+			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
-			$('.contacts-blocks-scrolling div').remove();
-			$('.contacts-grid-table tr').not('.clone-of-header').remove();
+			$('.contacts-blocks-scrolling a').remove();
 		}
+		
+		
 		if (this.v.length == 0)
 		{
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
@@ -314,127 +444,337 @@ function MegaData ()
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
 		}
+		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
+		{
+			if (this.viewmode == 1)
+			{
+				var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+				n_cache = r*Math.ceil($('.fm-blocks-view.fm').height()/164)+r;
+			}
+			else
+			{
+				n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
+			}
+			if (!n_cache)
+			{
+				this.cRenderMainN = this.cRenderMainN || 1;
+				if (++this.cRenderMainN < 4) return Soon(function()
+				{
+					M.renderMain(u);
+				});
+			}
+		}
+		delete this.cRenderMainN;
 
-		var files = 0, cache = [], n_cache = this.viewmode == 1 ? 80 : 40;
 		for (var i in this.v)
 		{
 			if (this.v[i].name)
 			{
 				var s='';
-				var t = '';
+				var ftype = '';
 				var c = '';
 				if (this.v[i].t)
 				{
-					t = l[1049];
+					ftype = l[1049];
 					c = ' folder';
 				}
 				else
 				{
-					t = filetype(this.v[i].name);
+					ftype = filetype(this.v[i].name);
 					s = htmlentities(bytesToSize(this.v[i].s));
 				}
-				var html,t,el,cc,star='';
+				var html,el,cc,star='';
 				if (this.v[i].fav) star = ' star';
-				if (this.viewmode == 1)
+
+				if (this.currentdirid == 'contacts')
 				{
-					if (this.currentdirid == 'contacts')
+					var u_h = this.v[i].h;
+					var cs = this.contactstatus(u_h);
+					var contains = fm_contains(cs.files,cs.folders);
+					var time = time2last(cs.ts);
+					var interactionclass = 'cloud-drive';
+					if (cs.files == 0 && cs.folders == 0)
 					{
-						var avatar = staticpath + 'images/mega/default-avatar.png';
-						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
+						contains = l[1050];
+						time = l[1051];
+						var interactionclass = 'never';
+					}
+					var user = M.d[u_h];
+					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+
+					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+
+					if (this.viewmode == 1)
+					{
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<div id="' + htmlentities(this.v[i].h) + '" class="contact-block-view"><span class="contact-status no-status"></span><div class="contact-block-view-avatar '+this.v[i].h+'"><span><img alt="" src="' + avatar + '" /></span></div><div class="contact-block-view-name">' + htmlentities(this.v[i].name) + '</div></div>';						
+						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
 					}
 					else
 					{
-						t = '.file-block-scrolling';
+						el = 'tr';
+						t = '.grid-table.contacts';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star"><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="contact-email">' + htmlentities(user.m) + '</div></div></td><td width="240"><div class="ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '"><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="contacts-interation ' + interactionclass + '">' + time + '</div></td></tr>';
+					}
+				}
+				else if (this.currentdirid == 'shares')
+				{
+					var cs = this.contactstatus(this.v[i].h);
+					var contains = fm_contains(cs.files,cs.folders);
+					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
+					var u_h = this.v[i].p;
+					var user = M.d[u_h];
+					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+					var rights = 'Read only', rightsclass = ' read-only';
+					if (M.v[i].r == 1)
+					{
+						rights = 'Read and write';
+						rightsclass = ' read-and-write';
+					}
+					else if (M.v[i].r == 2)
+					{
+						rights = 'Full access';
+						rightsclass = ' full-access';
+					}
+					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
+					if (this.viewmode == 1)
+					{
+						t = '.shared-blocks-scrolling';
 						el = 'a';
-						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
-						cc=1;
+						html = '<a class="file-block folder" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon '+star+'"></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder"></span></span><span class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar +'</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(this.v[i].name) + '</span><span class="shared-folder-info">by ' + htmlentities(user.name) + '</span></span></a>';
+					}
+					else
+					{
+						t = '.shared-grid-view .grid-table.shared-with-me';
+						el='tr';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon '+star+'"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus '+ htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';						
+					}
+				}
+				else if (this.currentdirid.length == 11)
+				{
+					var cs = this.contactstatus(this.v[i].h);
+					var contains = fm_contains(cs.files,cs.folders);
+					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
+					var rights = 'Read only', rightsclass = ' read-only';
+					if (M.v[i].r == 1)
+					{
+						rights = 'Read and write';
+						rightsclass = ' read-and-write';
+					}
+					else if (M.v[i].r == 2)
+					{
+						rights = 'Full access';
+						rightsclass = ' full-access';
+					}
+				
+					if (this.viewmode == 1)
+					{
+						t = '.fm-blocks-view.contact-details-view .file-block-scrolling';
+						el = 'a';
+						html = '<a id="' + htmlentities(this.v[i].h) + '" class="file-block folder"><span class="file-status-icon"></span><span class="file-settings-icon"><span></span></span><span class="shared-folder-access ' + rightsclass + '"></span><span class="file-icon-area"><span class="block-view-file-type folder-shared"><img alt=""></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
+					}
+					else
+					{
+						t = '.contacts-details-block .grid-table.shared-with-me';
+						el='tr';					
+						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="270"><div class="shared-folder-access ' + rightsclass + '">' + rights + '</div></td></tr>';
 					}
 				}
 				else
 				{
-					el='tr';
-					if (this.currentdirid == 'contacts')
+					if (this.viewmode == 1)
 					{
-						var cs = this.contactstatus(this.v[i].h);
-						var contains = fm_contains(cs.files,cs.folders);
-						var time = time2last(cs.ts);
-						if (cs.files == 0 && cs.folders == 0)
-						{
-							contains = l[1050];
-							time = l[1051];
-						}
-
-						var avatar = staticpath + 'images/mega/default-avatar.png';
-						if (avatars[this.v[i].h]) avatar = avatars[this.v[i].h].url;
-
-						html = '<tr id="' + htmlentities(this.v[i].h) + '"><td><span class="contacts-avatar ' + this.v[i].h + '"><span><img src="' + avatar + '" alt=""/></span></span><span class="contacts-username">' + htmlentities(this.v[i].name) + '</span></td><td width="130" class="hidden"><span class="contact-status online-status"></span><span class="contact-status-text">Online</span></td><td  width="200">' + htmlentities(contains) + '</td><td width="200">' + htmlentities(time) + '</td></tr>';
-						t = '.contacts-grid-table';
+						t = '.fm-blocks-view.fm .file-block-scrolling';
+						el = 'a';
+						html = '<a class="file-block' + c + '" id="' + htmlentities(this.v[i].h) + '"><span class="file-status-icon'+star+'"></span><span class="file-settings-icon"><span></span></span><span class="file-icon-area"><span class="block-view-file-type '+ fileicon(this.v[i]) + '"><img alt="" /></span></span><span class="file-block-title">' + htmlentities(this.v[i].name) + '</span></a>';
 					}
 					else
 					{
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + t + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';
 						t = '.grid-table.fm';
-						cc=1;
+						el = 'tr';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
+					}
+					if (!(this.v[i].seen = n_cache > files++))
+					{
+						cache[this.v[i].h] = [i,this.v[i].t];
+						cc = [i,html,this.v[i].name,this.v[i].t];
 					}
 				}
+
 				if (!u || $(t + ' '+el).length == 0)
 				{
-					// if the current view does not have any nodes, just append it
-					if (cc && ++files > n_cache) cache.push(html);
-					else $(t).append(html);
-				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i-1] && $(t+' #'+this.v[i-1].h).length > 0)
-				{
-					// if there is a node before the new node in the current view, add it after that node:
-					$(t+' #'+this.v[i-1].h).after(html);
-				}
-				else if (u && $(t+' #'+this.v[i].h).length == 0 && this.v[i+1] &&  $(t+' #'+this.v[i+1].h).length > 0)
-				{
-					// if there is a node after the new node in the current view, add it before that node:
-					$(t+' #'+this.v[i+1].h).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && this.v[i].t)
-				{
-					// new folder: insert new node before the first folder in the current view
-					$($(t+' '+el)[0]).before(html);
-				}
-				else if ($(t+' #'+this.v[i].h).length == 0 && !this.v[i].t)
-				{
-					// new file: insert new node before the first file in the current view
-					var a = $(t+' '+el).not('.folder');
-					if (a.length > 0) $(a[0]).before(html);
+					// 1. if the current view does not have any nodes, just append it
+					if (cc)
+					{
+						cache.push(cc);
+					}
 					else
 					{
-						// if this view does not have any files, insert after the last folder
-						a = $(t+' '+el);
-						$(a[a.length-1]).after(html);
+						$(t).append(html);
 					}
-				}				
+				}
+				else
+				{
+					var j;
+					if ($(t+' #'+this.v[i].h).length)
+					{
+						this.v[i].seen = true;
+						continue;
+					}
+					
+					if (cc)
+					{
+						// console.log(this.v[i].name,cache.map(n=>n[2]));
+						
+						if (u && this.v[i-1] && cache[this.v[i-1]])
+						{
+							j = cache[this.v[i-1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									cache.splice(x,0,cc);
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..2b');
+						}
+						else if (u && this.v[i+1] && cache[this.v[i+1]]) // XXX?
+						{
+							j = cache[this.v[i+1].h][0];
+							for (var x = 0, m = cache.length ; x < m ; ++x)
+							{
+								if (cache[x][0] === j)
+								{
+									ASSERT(x>0,'3b');
+									cache.splice(x-1,0,cc);
+									break;
+								}
+							}
+							// the cached node have to be found
+							ASSERT(x!=m,'Huh..3b');
+						}
+						else if (this.v[i].t)
+						{
+							for (var x = 0, m = cache.length ; x < m && cache[x][3] ; ++x);
+							cache.splice(x,0,cc);
+						}
+						else
+						{
+							cache.push(cc);
+						}
+						continue;
+					}
+					
+					if (u && this.v[i-1] && $(t+' #'+this.v[i-1].h).length)
+					{
+						// 2. if there is a node before the new node in the current view, add it after that node:
+						$(t+' #'+this.v[i-1].h).after(html);
+					}
+					else if (u && this.v[i+1] && $(t+' #'+this.v[i+1].h).length)
+					{
+						// 3. if there is a node after the new node in the current view, add it before that node:
+						$(t+' #'+this.v[i+1].h).before(html);
+					}
+					else if (this.v[i].t)
+					{
+						// 4. new folder: insert new node before the first folder in the current view
+						$($(t+' '+el)[0]).before(html);
+					}
+					else // !this.v[i].t)
+					{
+						// 5. new file: insert new node before the first file in the current view
+						var a = $(t+' '+el).not('.folder');
+						if (a.length > 0) $(a[0]).before(html);
+						else
+						{
+							// 6. if this view does not have any files, insert after the last folder
+							a = $(t+' '+el);
+							$(a[a.length-1]).after(html);
+						}
+					}
+				}
 			}
 		}
+
+		sharedfolderUI();
+		contactUI();
+		
 		$(window).unbind('dynlist.flush');
 		$(window).bind('dynlist.flush', function()
 		{
-			if (cache.length)
-			{
-				loadingDialog.show();
-				flush_cached_nodes();
-				loadingDialog.hide();
-			}
+			if (cache.length) flush_cached_nodes();
 		});
-		$('.grid-scrolling-table, .file-block-scrolling').unbind('jsp-scroll-y');
-		if (d) console.log('cache %d/%d', cache.length, files);
+		
+		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y.dynlist');
+		$(window).unbind("resize.dynlist");
+
+		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
 		{
-			$('.grid-scrolling-table, .file-block-scrolling').bind('jsp-scroll-y', function(ev, pos, top, bot)
+			$(lSel).bind('jsp-scroll-y.dynlist', function(ev, pos, top, bot)
 			{
-				if (bot) flush_cached_nodes(n_cache / 2);
+				if (bot) flush_cached_nodes(n_cache);
 			});
+			
+			$(window).bind("resize.dynlist", SoonFc(function()
+			{
+				if (cache.length)
+				{
+					if (!$(lSel).find('.jspDrag:visible').length)
+					{
+						var n;
+						
+						if (M.viewmode == 1)
+						{
+							var r = Math.floor($('.fm-blocks-view.fm').width() / 140);
+							n = r*Math.ceil($('.fm-blocks-view').height()/164) - $('.fm-blocks-view.fm a').length;
+						}
+						else
+						{
+							n = 2 + Math.ceil($('.files-grid-view.fm').height() / 24 - $('.files-grid-view.fm tr').length);
+						}
+						
+						if (n > 0) flush_cached_nodes(n);
+					}
+				}
+				else
+				{
+					$(window).unbind("resize.dynlist");
+				}
+			}));
 		}
+
+		if (this.viewmode == 1)
+		{
+			fa_duplicates = {};
+		}
+
+		this.rmSetupUI();
+	};
+
+	this.rmSetupUI = function()
+	{
+		if (this.viewmode == 1)
+		{
+			if (this.v.length > 0)
+			{
+				var o = $('.fm-blocks-view.fm .file-block-scrolling');
+				o.find('div.clear').remove();
+				o.append('<div class="clear"></div>');
+			}
+			iconUI();
+			fm_thumbnails();
+		}
+		else Soon(gridUI);
+		Soon(fmtopUI);
+
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
@@ -461,16 +801,6 @@ function MegaData ()
 			searchPath();
 			contextmenuUI(e,1);
 		});
-
-		if (this.viewmode == 1)
-		{
-			$('.file-block-scrolling').append('<div class="clear"></div>');
-			iconUI();
-			fa_duplicates = {};
-			fm_thumbnails();
-		}
-		else gridUI();
-		fmtopUI();
 	};
 
 	this.renderShare = function(h)
@@ -519,10 +849,10 @@ function MegaData ()
 
 	this.renderTree = function()
 	{
-		this.buildtree({h:'shares'});		
+		this.buildtree({h:'shares'});
 		this.buildtree(this.d[this.RootID]);
 		this.buildtree({h:M.RubbishID});
-		this.contacts();	
+		this.contacts();
 		treeUI();
         if(MegaChatEnabled) {
             megaChat.renderContactTree();
@@ -531,9 +861,9 @@ function MegaData ()
 
 	this.openFolder = function(id,force,chat)
 	{
-		$('.fm-right-account-block').addClass('hidden');		
-		$('.fm-files-view-icon').removeClass('hidden');		
-		
+		$('.fm-right-account-block').addClass('hidden');
+		$('.fm-files-view-icon').removeClass('hidden');
+
 		if (d) console.log('openFolder()',M.currentdirid,id);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) notificationsUI(1);
 		this.search=false;
@@ -553,11 +883,11 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-
-            // rendering is done in the MegaChat class
+            
             megaChat.renderListing();
-
-			treeUI();
+            
+            sharedfolderUI();
+            treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
@@ -570,29 +900,31 @@ function MegaData ()
             chatui(id); // XX: using the old code...for now
 		}
 		else if (!M.d[id]) id = this.RootID;
-		
+
 		if (!this.chat) {
             if(megaChat.getCurrentRoom()) {
                 megaChat.getCurrentRoom().hide();
             }
         }
-		
+
 		this.currentdirid = id;
-		
+
 		$('.nw-fm-tree-item').removeClass('opened');
 
 		if (this.chat)
 		{
-			// do nothing here		
+			// do nothing here
 		}
 		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
+		
+		
 			$('.fm-right-files-block').removeClass('hidden');
-			
-			var tt = new Date().getTime();
+
+			if (d) console.time('time for rendering');
 
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
-			else M.filterByParent(M.currentdirid);						
+			else M.filterByParent(M.currentdirid);
 
 			var viewmode=0;
 
@@ -621,24 +953,20 @@ function MegaData ()
 				if ($('treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
-					if (n && n.p) treeUIopen(n.p,false,true);					
+					if (n && n.p) treeUIopen(n.p,false,true);
 				}
 				treeUIopen(M.currentdirid,1);
-				
-				$('#treea_'+M.currentdirid).addClass('opened');
-			}		
-			if (d) console.log('time for rendering:',new Date().getTime()-tt);
 
-			setTimeout(function()
-			{
-				M.renderPath();
-			},1);
-		}	
+				$('#treea_'+M.currentdirid).addClass('opened');
+			}
+			if (d) console.timeEnd('time for rendering');
+
+			Soon(function() { M.renderPath()});
+		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
 	};
-	
-	
+
 	this.runbugfix = function()
 	{
 		for (var i in M.d)
@@ -647,13 +975,13 @@ function MegaData ()
 			{
 				var nodes = fm_getnodes(M.d[i].h);
 				console.log(nodes);
-				
+
 				for (var j in nodes)
 				{
 					var n = M.d[nodes[j]];
 					if (n.name)
 					{
-						 
+
 						console.log(n.name);
 						console.log(n.key);
 					}
@@ -661,16 +989,16 @@ function MegaData ()
 			}
 		}
 	};
-	
+
 	this.contacts = function()
 	{
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
-		
+
 		if (localStorage.csort) this.csort = localStorage.csort;
 		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
 		if (this.csort == 'shares')
-		{				
+		{
 			contacts.sort(function(a,b)
 			{
 				if (M.c[a.h] && M.c[b.h])
@@ -683,9 +1011,9 @@ function MegaData ()
 			});
 		}
 		else if (this.csort == 'name')
-		{				
+		{
 			contacts.sort(function(a,b)
-			{						
+			{
 				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
 			});
 		}
@@ -696,8 +1024,9 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + ' <a href="#" class="button start-chat-button">Start chat</a></div></div>';
+            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";
+
+            html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
 		}
 		$('.content-panel.contacts').html(html);
 
@@ -707,6 +1036,14 @@ function MegaData ()
             var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
             window.location = "#fm/chat/" + user_handle;
         });
+        
+		$('.nw-contact-item').unbind('click');
+		$('.nw-contact-item').bind('click',function(e)
+		{
+			var id = $(this).attr('id');			
+			if (id) id = id.replace('contact_','');
+			M.openFolder(id);
+		});
 	};
 
     this.getContacts = function(n) {
@@ -724,35 +1061,33 @@ function MegaData ()
 		}
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
-			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');			
+			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
 			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
 		}
-		
+
 		if (this.c[n.h])
 		{
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
-			
+
 			// sort by name is default in the tree
 			folders.sort(function(a,b)
 			{
 				if (a.name) return a.name.localeCompare(b.name);
 			});
-			
+
 			/*
 			if (n.h == 'contacts')
 			{
 				// in case of contacts we have custom sort/grouping:
 				if (localStorage.csort) this.csort = localStorage.csort;
 				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-				
-				
-				
+
 				if (this.csort == 'shares')
-				{				
+				{
 					folders.sort(function(a,b)
 					{
 						if (M.c[a.h] && M.c[b.h])
@@ -765,61 +1100,61 @@ function MegaData ()
 					});
 				}
 				else if (this.csort == 'name')
-				{				
+				{
 					folders.sort(function(a,b)
-					{						
+					{
 						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
 					});
 				}
-				
+
 				$('.contacts-sorting-by').removeClass('active');
-				$('.contacts-sorting-by.' + this.csort).addClass('active');				
-				$('.contacts-sorting-type').removeClass('active');				
+				$('.contacts-sorting-by.' + this.csort).addClass('active');
+				$('.contacts-sorting-type').removeClass('active');
 				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
 			}
 			*/
-			
+
 			for (var i in folders)
 			{
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
-				
+
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
 					for (var h in M.c[folders[i].h])
 					{
-						var n2 = M.d[h];						
+						var n2 = M.d[h];
 						if (n2 && n2.t) buildnode = true;
 					}
 				}
-				
+
 				if (buildnode)
 				{
 					ulc = 'class="opened"';
-					expandedc = 'expanded';				
+					expandedc = 'expanded';
 				}
 				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
-				
+
 				var containsc='';
-				var cns = M.c[folders[i].h];						
-				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';				
-				
-				var sharedfolder = '';				
+				var cns = M.c[folders[i].h];
+				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
+
+				var sharedfolder = '';
 				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
-				
+
 				var openedc = '';
 				if (M.currentdirid == folders[i].h) openedc = 'opened';
-				
+
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
-				
+
 				if ($('#treeli_'+folders[i].h).length == 0)
-				{				
-					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);					
-					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);				
-					else $('#treesub_' + n.h).append(html);					
+				{
+					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
+					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
+					else $('#treesub_' + n.h).append(html);
 				}
-				if (buildnode) this.buildtree(folders[i]);				
+				if (buildnode) this.buildtree(folders[i]);
 			}
 		}
 	};
@@ -828,7 +1163,6 @@ function MegaData ()
         // in case of contacts we have custom sort/grouping:
         if (localStorage.csort) this.csort = localStorage.csort;
         if (localStorage.csortd) this.csortd = parseInt(localStorage.csortd);
-
 
         if (this.csort == 'shares')
         {
@@ -883,9 +1217,12 @@ function MegaData ()
 		var g=1;
 		while(g)
 		{
-			if (M.d[id] || id == 'contacts' || id == 'messages' || id == M.InboxID) a.push(id);
-			else return [];
-			if (id == this.RootID || id == 'contacts' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
+			if (id == 'contacts' && a.length > 1) id = 'shares';
+
+			if (M.d[id] || id == 'contacts' || id == 'messages' || id == 'shares' || id == M.InboxID) a.push(id);
+			else if (id.length !== 11) return [];
+			
+			if (id == this.RootID || id == 'contacts' || id == 'shares' || id == 'messages' || id == this.RubbishID || id == this.InboxID) g=0;
 			if (g) id = this.d[id].p;
 		}
 		return a;
@@ -911,12 +1248,15 @@ function MegaData ()
 
 	this.renderPath = function()
 	{
-		var hasnext='', typeclass;
+		var name, hasnext='', typeclass;
 		var html = '<div class="clear"></div>';
-		var a = this.getPath(this.currentdirid);
-		for (var i in a)
+		var a2 = this.getPath(this.currentdirid);
+		
+		if (a2.length > 2 && a2[a2.length-2].length == 11) delete a2[a2.length-2];		
+		
+		for (var i in a2)
 		{
-			if (a[i] == this.RootID)
+			if (a2[i] == this.RootID)
 			{
 				if (folderlink && M.d[this.RootID])
 				{
@@ -925,31 +1265,42 @@ function MegaData ()
 				}
 				else
 				{
-					name = l[164];
+					name = '';
 					typeclass = 'cloud-drive';
 				}
 			}
-			else if (a[i] == 'contacts')
+			else if (a2[i] == 'contacts')
 			{
 				typeclass = 'contacts';
 				name = l[165];
 			}
-			else if (a[i] == this.RubbishID)
+			else if (a2[i] == 'shares')
 			{
-				typeclass = 'recycle-bin';
+				typeclass = 'shared-with-me';
+				name = '';
+			}
+			else if (a2[i] == this.RubbishID)
+			{
+				typeclass = 'rubbish-bin';
 				name = l[167];
 			}
-			else if (a[i] == 'messages' || a[i] == M.InboxID)
+			else if (a2[i] == 'messages' || a2[i] == M.InboxID)
 			{
 				typeclass = 'messages';
 				name = l[166];
 			}
+			else if (a2[i].length == 11)
+			{
+				var n = M.d[a2[i]];
+				if (n.name) name = n.name;
+				typeclass = 'contact';
+			}
 			else
 			{
-				name = htmlentities(this.d[a[i]].name);
+				name = htmlentities(M.d[a2[i]].name);
 				typeclass = 'folder';
 			}
-			html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  name + '</span></span></a>' + html;
+			html = '<a class="fm-breadcrumbs ' + typeclass + ' contains-directories ' + hasnext + ' ui-droppable" id="path_'+htmlentities(a2[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  name + '</span></span></a>' + html;
 			hasnext = 'has-next-button';
 		}
 
@@ -958,17 +1309,17 @@ function MegaData ()
 
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs contacts contains-directories has-next-button" id="path_contacts"><span class="right-arrow-bg"><span>Contacts</span></span></a><a class="fm-breadcrumbs chat" id="path_'+htmlentities(M.currentdirid.replace("chat/", ""))+'"><span class="right-arrow-bg"><span>' + htmlentities(contactName) + '</span></span></a>');
-			
-			$('.search-files-result').addClass('hidden');						
+
+			$('.search-files-result').addClass('hidden');
 		}
 		else if (this.currentdirid && this.currentdirid.substr(0,7) == 'search/')
 		{
 			$('.fm-breadcrumbs-block').html('<a class="fm-breadcrumbs search contains-directories ui-droppable" id="'+htmlentities(a[i])+'"><span class="right-arrow-bg ui-draggable"><span>' +  htmlentities(this.currentdirid.replace('search/',''))	+ '</span></span></a>');
 			$('.search-files-result .search-number').text(M.v.length);
-			$('.search-files-result').removeClass('hidden');			
+			$('.search-files-result').removeClass('hidden');
 			$('.search-files-result').addClass('last-button');
 		}
-		else 
+		else
 		{
 			$('.search-files-result').addClass('hidden');
 			$('.fm-breadcrumbs-block').html(html);
@@ -1032,20 +1383,20 @@ function MegaData ()
 		}
 		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
-		{			
+		{
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
 			this.c[n.p][n.h]=1;
 			// maintain special incoming shares index:
-			if (n.p.length == 11) this.c['shares'][n.h]=1;			
+			if (n.p.length == 11) this.c['shares'][n.h]=1;
 		}
-		
+
 		if (n.t == 2) this.RootID 		= n.h;
 		if (n.t == 3) this.InboxID 		= n.h;
 		if (n.t == 4) this.RubbishID 	= n.h;
 		if (!n.c)
 		{
 			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
-			
+
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
 				crypto_processkey(u_handle,u_k_aes,n);
@@ -1061,7 +1412,7 @@ function MegaData ()
 					newmissingkeys = true;
 				  }
 				}
-			}			
+			}
 			if (n.hash)
 			{
 				if (!this.h[n.hash]) this.h[n.hash]=[];
@@ -1087,8 +1438,8 @@ function MegaData ()
 			if (mDB && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
-				M.delIndex(M.d[h].p,h);				
-				M.delHash(M.d[h]);				
+				M.delIndex(M.d[h].p,h);
+				M.delHash(M.d[h]);
 				delete M.d[h];
 			}
                         // Update M.v it's used for at least preview slideshow
@@ -1104,19 +1455,19 @@ function MegaData ()
 		}
 		ds(h);
 	};
-	
+
 	this.delHash = function(n)
 	{
 		if (n.hash && M.h[n.hash])
 		{
 			for (var i in M.h[n.hash])
 			{
-				if (M.h[n.hash][i] == n.h) 
+				if (M.h[n.hash][i] == n.h)
 				{
 					M.h[n.hash].splice(i,1);
 					break;
 				}
-			}			
+			}
 			if (M.h[n.hash].length == 0) delete M.h[n.hash];
 		}
 	}
@@ -1265,10 +1616,10 @@ function MegaData ()
 					var j =[];
 					for (var i in ctx.cn)
 					{
-						M.delNode(ctx.cn[i]);									
+						M.delNode(ctx.cn[i]);
 						api_req({a:'d',n:cn[i],i:requesti});
-					}					
-				}		
+					}
+				}
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
 				if (res.f) process_f(res.f);
@@ -1322,7 +1673,7 @@ function MegaData ()
 		else
 		{
 			if (blockui) loadingDialog.show();
-			
+
 			account = { };
 
 			api_req({a:'uq',strg:1,xfer:1,pro:1},{
@@ -1347,8 +1698,8 @@ function MegaData ()
 						ctx.account.balance = res.balance;
 						ctx.account.reseller = res.reseller;
 						ctx.account.prices = res.prices;
-						
-						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];					
+
+						if (res.balance.length == 0) ctx.account.balance = [['0.00','EUR']];
 
 						if (!u_attr.p)
 						{
@@ -1381,7 +1732,7 @@ function MegaData ()
 				account : account,
 				callback: function(res,ctx)
 				{
-					if (typeof res != 'object') res = [];				
+					if (typeof res != 'object') res = [];
 					ctx.account.transactions = res;
 				}
 			});
@@ -1417,7 +1768,7 @@ function MegaData ()
 							if (u_attr.p) topmenuUI();
 						}
 					}
-					
+
 					ctx.account.lastupdate = new Date().getTime();
 
 					if (!ctx.account.bw) ctx.account.bw = 1024*1024*1024*10;
@@ -1425,7 +1776,7 @@ function MegaData ()
 					if (!ctx.account.downbw_used) ctx.account.downbw_used = 0;
 
 					M.account = ctx.account;
-					
+
 					if (ctx.cb) ctx.cb(ctx.account);
 				}
 			});
@@ -1524,7 +1875,7 @@ function MegaData ()
 	}
 
 	this.nodeShare = function(h,s,ignoreDB)
-	{		
+	{
 		if (this.d[h])
 		{
 			if (typeof this.d[h].shares == 'undefined') this.d[h].shares = [];
@@ -1639,12 +1990,12 @@ function MegaData ()
 		if (is_chrome_firefox & 4) return;
 
 		var dirs = [];
-		function getfolders(d,o) 
+		function getfolders(d,o)
 		{
 			var c = 0;
-			for (var e in M.d) 
+			for (var e in M.d)
 			{
-				if(M.d[e].t == 1 && M.d[e].p == d) 
+				if(M.d[e].t == 1 && M.d[e].p == d)
 				{
 					var p = o || [];
 					if (!o) p.push(fm_safename(M.d[d].name));
@@ -1659,24 +2010,24 @@ function MegaData ()
 
 		if (d) console.log('makedir',dirs);
 
-		if(is_chrome_firefox) 
+		if(is_chrome_firefox)
 		{
 			var root = mozGetDownloadsFolder();
-			if (root) dirs.forEach(function(p) 
+			if (root) dirs.forEach(function(p)
 			{
-				try 
+				try
 				{
 					p = mozFile(root,0,p);
 					if(!p.exists()) p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
-				} 
-				catch(e) 
+				}
+				catch(e)
 				{
 					Cu.reportError(e);
 					console.log('makedir', e.message);
 				}
 			});
-		} 
-		else 
+		}
+		else
 		{
 			if (d) console.log('MAKEDIR: TODO');
 		}
@@ -1696,22 +2047,22 @@ function MegaData ()
 				if (M.d[n[i]].t)
 				{
 					if(!z) this.makeDir(n[i]);
-					var subids = fm_getnodes(n[i]);					
+					var subids = fm_getnodes(n[i]);
 					for(var j in subids)
 					{
 						var p = this.getPath(subids[j]);
 						var path = '';
-						
+
 						for(var k in p)
 						{
 							if (p[k],M.d[p[k]].t) path = fm_safename(M.d[p[k]].name) + '/' + path;
 							if (p[k] == n[i]) break;
 						}
-						
+
 						if (!M.d[subids[j]].t)
 						{
 							nodes.push(subids[j]);
-							paths[subids[j]]=path;							
+							paths[subids[j]]=path;
 						}
 						else console.log('0 path',path);
 					}
@@ -1766,7 +2117,15 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
-				if (!z) $('.transfer-table').append('<tr id="dl_'+htmlentities(n.h)+'"><td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td><td>' + bytesToSize(n.s) + '</td><td><span class="transfer-type download">' + l[373] + '</span>' + flashhtml + '</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>');
+				if (!z) this.addToTransferTable('<tr id="dl_'+htmlentities(n.h)+'">'
+					+ '<td><span class="row-number"></span></td>'
+					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
+					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
+					+ '<td></td>'
+					+ '<td>' + bytesToSize(n.s) + '</td>'
+					+ '<td><span class="transfer-status queued">Queued</span></td>'
+					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
+					+ '</tr>');
 			}
 		}
 
@@ -1776,23 +2135,30 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
-		if (z) $('.transfer-table').append('<tr id="zip_'+zipid+'"><td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td><td>' + bytesToSize(zipsize) + '</td><td><span class="transfer-type download">' + l[373] + '</span>'+ flashhtml +'</td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>');
+		if (z) this.addToTransferTable('<tr id="zip_'+zipid+'">'
+			+ '<td><span class="row-number"></span></td>'
+			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
+			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
+			+ '<td></td>'
+			+ '<td>' + bytesToSize(zipsize) + '</td>'
+			+ '<td><span class="transfer-status queued">Queued</span></td>'
+			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
 		$.transferHeader();
 
-        if (!preview) 
+        if (!preview)
 		{
 			openTransferpanel();
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
+			downloading = !!dl_queue.length;
 		}
 
 		delete $.dlhash;
 	};
-
-
 
 	this.dlprogress = function (id, perc, bl, bt,kbps, dl_queue_num, force)
 	{
@@ -1809,6 +2175,7 @@ function MegaData ()
 					if (!st) st = dl_queue[i].st;
 					ts+=dl_queue[i].size;
 					if (dl_queue[i].complete) tl+=dl_queue[i].size;
+					// TODO: check this for suitable GP use
 				}
 			}
 			bt = ts;
@@ -1832,17 +2199,17 @@ function MegaData ()
 		}
 
 		if ($('.transfer-table #' + id + ' .progress-block').length == 0) {
-			$('.transfer-table #' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
+			$('.transfer-table #' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
 
-		var eltime = (new Date().getTime()-st)/1000;
+		// var eltime = (new Date().getTime()-st)/1000;
 		var bps = kbps*1000;
 		var retime = bps && (bt-bl)/bps;
 		if (bt)
 		{
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
-			$.transferprogress[id] = [bl,bt];
+			$.transferprogress[id] = [bl,bt,bps];
 			if (!uldl_hold)
 			{
 				if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
@@ -1853,9 +2220,10 @@ function MegaData ()
 				}
 
 				$('.transfer-table #' + id + ' .progressbarfill').css('width', perc +'%');
-				$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
-				$('.transfer-table #' + id + ' td:eq(5)').text(secondsToTime(eltime));
-				$('.transfer-table #' + id + ' td:eq(6)').text(secondsToTime(retime));
+				$('.transfer-table #' + id + ' td:eq(2) .speed').text(" (" + bytesToSize(bps,1) +'/s)');
+				//$('.transfer-table #' + id + ' td:eq(4)').text(bytesToSize(bps,1) +'/s');
+				//$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(eltime));
+				$('.transfer-table #' + id + ' td:eq(3)').text(secondsToTime(retime));
 				percent_megatitle();
 
 				if (page.substr(0,2) !== 'fm')
@@ -1873,16 +2241,18 @@ function MegaData ()
 
 	this.dlcomplete = function (id,z, dl_queue_num)
 	{
-		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) 
+		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
 		{
 			$('.slideshow-pending').addClass('hidden');
 			$('.slideshow-error').addClass('hidden');
 			$('.slideshow-progress').attr('class','slideshow-progress percents-100');
-		}		
-		
+		}
+
 		if (z) id = 'zip_' + z;
 		else id = 'dl_' + id;
-		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #' + id + ' td:eq(3)').text('');
+
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
@@ -1892,9 +2262,7 @@ function MegaData ()
 				.removeClass('download')
 				.addClass('safari-downloaded')
 				.text('Save File');
-		}
-		else
-		{
+		} else {
 			$('.transfer-table #' + id).fadeOut('slow', function(e)
 			{
 				$(this).remove();
@@ -1926,8 +2294,8 @@ function MegaData ()
 			delete $.transferprogress[id];
 		}
 
-		percent_megatitle();
 		$.transferHeader();
+		Soon(resetUploadDownload);
 	}
 
 	this.dlbeforecomplete = function()
@@ -1957,7 +2325,7 @@ function MegaData ()
 			default:                   errorstr = l[x=233]; break;
 		}
 
-		if (slideshowid == dl.id && !previews[slideshowid]) 
+		if (slideshowid == dl.id && !previews[slideshowid])
 		{
 			$('.slideshow-image-bl').addClass('hidden');
 			$('.slideshow-pending').addClass('hidden');
@@ -1974,11 +2342,11 @@ function MegaData ()
 				 * a chunk may fail at any time, don't report a temporary error while
 				 * there is network activity associated with the download, though.
 				 */
-				$('.transfer-table #' + id + ' td:eq(3)')
+				$('.transfer-table #' + id + ' td:eq(5)')
 					.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 					// .parents('tr').data({'failed' : NOW()});
-				$('.transfer-table #' + id + ' td:eq(4)').text('');
-				$('.transfer-table #' + id + ' td:eq(6)').text('--:--:--');
+				//$('.transfer-table #' + id + ' td:eq(4)').text('');
+				$('.transfer-table #' + id + ' td:eq(3)').text('--:--:--');
 			}
 		}
 	}
@@ -1986,8 +2354,9 @@ function MegaData ()
 	this.dlstart = function(dl)
 	{
 		var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
-		$('.transfer-table #' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
+		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #' + id));
+		Soon(fmUpdateCount);
 		dl.st = NOW();
 		ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
 		ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
@@ -1996,32 +2365,116 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
-	$(document).on('remove', '.transfer-table tr', function() {
-		var toClean = 0
-		$.each(panelDomQueue, function(i, html) {
-			if ($('.transfer-table tr:visible').length-1 > DOM_TRANSFER_LIMIT) {
-				return false;
+	$(window).bind('resize.tfsdynlist', SoonFc(function()
+	{
+		function flush_cached_nodes(n)
+		{
+			n = Object.keys(panelDomQueue).slice(0, n);
+			
+			if (n.length)
+			{
+				for (var i in n)
+				{
+					i = n[i];
+					addToTransferTable(i, panelDomQueue[i], 1);
+					delete panelDomQueue[i];
+				}
+				
+				if (M._tfsDynlistR) clearTimeout(M._tfsDynlistR);
+				M._tfsDynlistR = setTimeout(function()
+				{
+					delete M._tfsDynlistR;
+					Soon(transferPanelUI);
+					Soon(fmUpdateCount);
+				}, 350);
+				$(window).trigger('resize');
 			}
-			$(html).appendTo('.transfer-table')
-			toClean++
-		});
-
-		panelDomQueue.splice(0, toClean);
-
-		if (panelDomQueue.length == 0 && $('.transfer-table tr').length-1 == 1) {
-			$.transferClose();
-			resetUploadDownload();
 		}
-	});
+		var $tst = $('.transfer-scrolling-table');
+		$tst.unbind('jsp-scroll-y.tfsdynlist');
 
-	this.addToTransferTable = function(elem) {
-		if ($('.transfer-table tr').length > DOM_TRANSFER_LIMIT) {
-			return panelDomQueue.push(elem);
+		if ($('#fmholder').hasClass('transfer-panel-opened'))
+		{
+			var T = M.getTransferTableLengths();
+			
+			if (d) console.log('resize.tfsdynlist', JSON.stringify(T));
+			
+			if (T.left > 0) flush_cached_nodes(T.left+1);
+			
+			T = T.size;
+			$tst.bind('jsp-scroll-y.tfsdynlist', function(ev, pos, top, bot)
+			{
+				if (bot) flush_cached_nodes(T);
+			});
 		}
-		$(elem).appendTo('.transfer-table');
-                // In some cases UI is not yet initialized, nor transferHeader()
-                $('.transfer-table-header').show(0);
+		$tst = undefined;
+	}));
+
+	this.getTransferTableLengths = function()
+	{
+		var size = Math.ceil($('.transfer-scrolling-table').height() / 24),
+			used = $('.transfer-table tr[id]').length;
+
+		return { size : size, used : used, left : size - used };
+	};
+	
+	function addToTransferTable(gid, elem, q)
+	{
+		var target = gid[0] === 'u'
+			? $('.transfer-table tr[id^="ul"] .transfer-status.queued:last')
+			: $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
+
+		if (target.length) target.closest('tr').after(elem);
+		else
+		{
+			if (gid[0] != 'u')
+			{
+				target = $('.transfer-table tr[id^="ul"] .transfer-status.queued:first');
+			}
+			
+			if (target.length) target.closest('tr').before(elem);
+			else $(elem).appendTo('.transfer-table');
+		}
+		if (!q) Soon(fmUpdateCount);
 	}
+	this.addToTransferTable = function(elem)
+	{
+		var T = this.getTransferTableLengths(),
+			gid = elem.match(/id="([^"]+)"/).pop();
+
+		if (d) console.log('Adding Transfer', gid, JSON.stringify(T));
+
+		if (T.left > 0)
+		{
+			addToTransferTable(gid, elem);
+			// In some cases UI is not yet initialized, nor transferHeader()
+			$('.transfer-table-header').show(0);
+		}
+		else
+		{
+			var fit;
+
+			if (gid[0] !== 'u')
+			{
+				var dl = $('.transfer-table tr:not([id^="ul"]) .transfer-status.queued:last');
+				
+				if (dl.length)
+				{
+					// keep inserting downloads as long there are uploads
+					// dl = +dl.closest('tr').children(':first').text();
+					dl = dl.closest('tr').prevAll().length;
+					
+					if (dl && dl + 1 < T.used)
+					{
+						addToTransferTable(gid, elem);
+						fit = true;
+					}
+				}
+			}
+			
+			if (!fit) panelDomQueue[gid] = elem;
+		}
+	};
 
 	this.addUpload = function(u)
 	{
@@ -2037,16 +2490,24 @@ function MegaData ()
 			f.id = ul_id;
 
 			this.addToTransferTable(
-				'<tr id="ul_'+ul_id+'"><td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td><td>' + bytesToSize(f.size) + '</td><td><span class="transfer-type upload">' + l[372] + '</span></td><td><span class="transfer-status queued">Queued</span></td><td></td><td></td><td></td><td class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>'
+				'<tr id="ul_'+ul_id+'">'
+					+ '<td><span class="row-number"></span></td>'
+					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
+					+ '<td></td>'
+					+ '<td>' + bytesToSize(f.size) + '</td>'
+					+ '<td><span class="transfer-status queued">Queued</span></td>'
+					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
 			);
 			ul_queue.push(f);
-			
 		}
 		if (page == 'start') {
 			ulQueue.pause();
 			uldl_hold = false; /* this isn't a pause generated by the UI */
 		}
 		else openTransferpanel();
+
+		ul_uploading = !!ul_queue.length;
 	}
 
 	this.ulprogress = function(id, perc, bl, bt, bps)
@@ -2055,22 +2516,23 @@ function MegaData ()
 		{
 			$('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
 			$('.transfer-table #ul_' + id + ' .transfer-status').addClass('download');
-			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
+			$('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
 		if (!bl || !ul_queue[id]['starttime']) return false;
-		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
+		// var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
 		{
 			// $.transferprogress[id] = Math.floor(bl/bt*100);
-			$.transferprogress['ul_' + id] = [bl,bt];
+			$.transferprogress['ul_' + id] = [bl,bt,bps];
 			$('.transfer-table #ul_' + id + ' .progressbarfill').css('width',perc+'%');
-			$('.transfer-table #ul_' + id + ' td:eq(4)').text(bps ? bytesToSize(bps,1) +'/s' : '');
-			$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
-			$('.transfer-table #ul_' + id + ' td:eq(6)').text(secondsToTime(retime));
-			percent_megatitle();
+			$('.transfer-table #ul_' + id + ' td:eq(2) .speed').text(
+				bps ? (' (' + bytesToSize(bps,1) +'/s' + ')' ) : ''
+			);
+			//$('.transfer-table #ul_' + id + ' td:eq(5)').text(secondsToTime(eltime));
+			$('.transfer-table #ul_' + id + ' td:eq(3)').text(secondsToTime(retime));
 			$.transferHeader();
 
 			if (page.substr(0,2) !== 'fm')
@@ -2083,6 +2545,7 @@ function MegaData ()
 				$('.widget-block').addClass('active');
 			}
 		}
+		percent_megatitle();
 	}
 
 	this.ulcomplete = function(id,h,k)
@@ -2100,11 +2563,15 @@ function MegaData ()
 			$('#uploadpopbtn').text(l[726]);
 			$('#mobileupload_header').text(l[554]);
 		}
-		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
+		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
+		resetUploadDownload();
+
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
 			$(this).remove();
 		});
+		$.transferHeader();
 		var a=0;
 		for(var i in dl_queue) if (dl_queue[i]) a++;
 		if (a < 2 && !downloading)
@@ -2129,13 +2596,13 @@ function MegaData ()
 	this.ulstart = function(id)
 	{
 		if (d) console.log('ulstart',id);
-		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
-		ul_queue[id].starttime = new Date().getTime();
+		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
+		Soon(fmUpdateCount);
+		ul_queue[id].starttime = new Date().getTime();
 		M.ulprogress(id, 0, 0, 0);
 		$.transferHeader();
 	};
-
 
     this.cloneChatNode = function(n,keepParent) {
         var n2 = clone(n);
@@ -2146,26 +2613,25 @@ function MegaData ()
     };
 }
 
-
 function voucherData(arr)
 {
 	var vouchers = [];
 	var varr = arr[0];
 	var tindex = {};
-	for (var i in arr[1]) tindex[arr[1][i][0]]=arr[1][i];			
-	for (var i in varr)				
-	{									
+	for (var i in arr[1]) tindex[arr[1][i][0]]=arr[1][i];
+	for (var i in varr)
+	{
 		var redeemed = 0;
 		var cancelled = 0;
 		var revoked = 0;
-		var redeem_email = '';					
+		var redeem_email = '';
 		if ((varr[i].rdm) && (tindex[varr[i].rdm]))
 		{
 			redeemed = tindex[varr[i].rdm][1];
-			redeemed_email = tindex[varr[i].rdm][2];					
-		}					
-		if (varr[i].xl) cancelled = tindex[varr[i].xl][1];					
-		if (varr[i].rvk) revoked = tindex[varr[i].rvk][1];		
+			redeemed_email = tindex[varr[i].rdm][2];
+		}
+		if (varr[i].xl) cancelled = tindex[varr[i].xl][1];
+		if (varr[i].rvk) revoked = tindex[varr[i].rvk][1];
 		vouchers.push({
 			id: varr[i].id,
 			amount: varr[i].g,
@@ -2176,7 +2642,7 @@ function voucherData(arr)
 			redeemed: redeemed,
 			redeem_email: redeem_email,
 			cancelled: cancelled,
-			revoked: revoked						
+			revoked: revoked
 		});
 	}
 	return vouchers;
@@ -2186,7 +2652,7 @@ function onUploadError(fileid, errorstr)
 {
 	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
 
-	$('.transfer-table #ul_' + fileid + ' td:eq(3)')
+	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 		.parents('tr').data({'failed' : NOW()});
 }
@@ -2249,7 +2715,7 @@ var t;
 
 function renderfm()
 {
-	var t = new Date().getTime();
+	if (d) console.time('renderfm');
 	initUI();
 	loadingDialog.hide();
 	M.sortByName();
@@ -2266,12 +2732,12 @@ function renderfm()
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
-	if (d) console.log('renderfm() time:',t-new Date().getTime());
+	if (d) console.timeEnd('renderfm');
 }
 
 function rendernew()
 {
-	var t = new Date().getTime();
+	if (d) console.time('rendernew');
 	var treebuild=[];
 	var UImain=false;
 	var newcontact=false;
@@ -2311,7 +2777,7 @@ function rendernew()
 	}
 	if (newcontact)
 	{
-		M.avatars();	
+		M.avatars();
 		M.contacts();
 		treeUI();
 
@@ -2322,9 +2788,8 @@ function rendernew()
 	}
 	if (newpath) M.renderPath();
 	newnodes=undefined;
+	if (d) console.timeEnd('rendernew');
 }
-
-
 
 function execsc(ap)
 {
@@ -2363,20 +2828,20 @@ function execsc(ap)
 		else if (a.a == 's' && !folderlink)
 		{
 			var tsharekey = '';
-			var prockey = false;			
+			var prockey = false;
 
 			if (a.o == u_handle)
 			{
 				if (typeof a.r == "undefined")
 				{
-					// I deleted my share							
+					// I deleted my share
 					M.delnodeShare(a.n,a.u);
 				}
 				else if (typeof M.d[a.n].shares != 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
 				{
 					// I updated or created my share
 					u_sharekeys[a.n] = decrypt_key(u_k_aes,base64_to_a32(a.ok));
-					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});				
+					M.nodeShare(a.n,{h:a.n,r:a.r,u:a.u,ts:a.ts});
 				}
 			}
 			else
@@ -2537,7 +3002,7 @@ function execsc(ap)
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' span').text(f.name);
-						if ($('#path_' + n.h).length > 0) newpath=1;						
+						if ($('#path_' + n.h).length > 0) newpath=1;
 						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
@@ -2571,8 +3036,8 @@ function execsc(ap)
 	}
 	if (newnodes.length > 0 && fminitialized) rendernew();
 	if (loadavatars) M.avatars();
-	fm_thumbnails();	
-	if ($.dialog == 'properties') propertiesDialog();	
+	fm_thumbnails();
+	if ($.dialog == 'properties') propertiesDialog();
 	getsc();
 }
 
@@ -2857,7 +3322,6 @@ function process_ok(ok)
 	}
 }
 
-
 function folderreqerr(c,e)
 {
     loadingDialog.hide();
@@ -2875,10 +3339,10 @@ function loadfm_callback(res)
 		M.RootID = res.f[0].h;
 		u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
 		folderlink=pfid;
-	}	
+	}
 	if (res.u) process_u(res.u);
 	if (res.ok) process_ok(res.ok);
-	process_f(res.f);	
+	process_f(res.f);
 	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
 	maxaction = res.sn;
 	if (mDB) localStorage[u_handle + '_maxaction'] = maxaction;

@@ -7,12 +7,13 @@ function MegaQueue(worker, limit) {
     this._running = 0
 	this._worker  = worker
 	this._noTaskCount = 0;
+	this._qpaused = {};
 }
 inherits(MegaQueue, MegaEvents)
 
 MegaQueue.prototype.isEmpty = function() {
 	return this._running == 0 
-		&& this._queue.length == 0;
+		&& this._queue.length == 0
 }
 
 MegaQueue.prototype.pushFirst = function(arg, next, self) {
@@ -51,7 +52,7 @@ MegaQueue.prototype.expand = function() {
 	if (this.canExpand()) {
 		this._expanded = true;
 		this._process();
-		if (d) console.error("expand queue " + this._running);
+		if (d) console.log("expand queue " + this._running);
 		return true;
 	}
 	return false;
@@ -110,6 +111,16 @@ MegaQueue.prototype.filter = function(key, value, memb)
 	}
 };
 
+MegaQueue.prototype.slurp = function(gid)
+{
+	var res = [];
+	this._queue = this._queue.filter(function(item)
+	{
+		return item[0][gid] ? (res.push(item), false) : true;
+	});
+	return res;
+};
+
 MegaQueue.prototype.pause = function() {
 	if (d) { 
 		console.log("pausing queue"); 
@@ -161,18 +172,11 @@ MegaQueue.prototype.validateTask = function() {
 	return true;
 }
 
-MegaQueue.prototype.prepareNextTask = function() {
-};
-
 MegaQueue.prototype.getNextTask = function() {
-	var i, len = this._queue.length
-	this.prepareNextTask();
+	var i, r, len = this._queue.length
 	for (i = 0; i < len; i++) {
-		if (this.validateTask(this._queue[i][0])) {
-			var data = this._queue[i]
-			this._queue.splice(i, 1);
-			return data
-		}
+		if ((r = this.validateTask(this._queue[i][0])))
+			return r < 0 ? null : this._queue.splice(i, 1)[0];
 	}
 	return null;
 };
@@ -180,12 +184,14 @@ MegaQueue.prototype.getNextTask = function() {
 MegaQueue.prototype.process = function() {
 	var args;
 	if (this._paused) return;
-	clearTimeout(this._later);
-	delete this._later;
+	if (this._later) {
+		clearTimeout(this._later);
+		delete this._later;
+	}
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
-			if ( ++this._noTaskCount == 666 )
+			if ( ++this._noTaskCount == 666 && !$.len(this._qpaused))
 			{
 				/**
 				 * XXX: Prevent an infinite loop when there's a connection hang,
@@ -212,28 +218,99 @@ MegaQueue.prototype.process = function() {
 		}
 		delete this._expanded;
 	}
+	if (!args && this.mull) this.mull();
 
-	if (this.isEmpty()) {
-		this.trigger('drain');
-	}
 	return true;
 };
 
 MegaQueue.prototype.destroy = function() {
 	clearTimeout(this._later);
-	// this._limit = -1
-	// this._queue = null;
-	// this._queue = [];
 	oDestroy(this);
 }
 
 MegaQueue.prototype._process = function(ms) {
 	if (this._later) clearTimeout(this._later);
-	this._later = setTimeout(this.process.bind(this), ms || 190);
+	this._later = setTimeout(this.process.bind(this), ms || 300);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {
 	this._queue.push([arg, next, self]);
 	this.trigger('queue');
 	this._process();
+};
+
+function TransferQueue() {
+	MegaQueue.prototype.constructor.apply(this, arguments);
+}
+
+inherits(TransferQueue, MegaQueue);
+
+TransferQueue.prototype.mull = function()
+{
+	if (this.isEmpty() && $.len(this._qpaused))
+	{
+		this.dispatch(Object.keys(this._qpaused).shift());
+	}
+};
+
+TransferQueue.prototype.dispatch = function(gid)
+{
+	// dispatch a paused transfer
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || this._qpaused[gid], 'This transfer is not in hold: ' + gid );
+	
+	if (this._qpaused[gid] && !GlobalProgress[gid].paused)
+	{
+		this._queue = this._qpaused[gid].concat(this._queue);
+		delete this._qpaused[gid];
+		this._process();
+		return true;
+	}
+	return false;
+};
+
+
+TransferQueue.prototype.pause = function(gid)
+{
+	if (!gid) return MegaQueue.prototype.pause.apply(this, arguments);
+
+	// pause single transfer
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || !GlobalProgress[gid].paused, 'This transfer is ALREADY paused: ' + gid );
+
+	if (GlobalProgress[gid])
+	{
+		var p = GlobalProgress[gid], chunk;
+		p.paused = true;
+		while ((chunk = p.working.pop()))
+		{
+			if (d) console.log('Aborting by pause: ' + chunk);
+			chunk.abort();
+			this.pushFirst(chunk);
+			this._running--;
+		}
+		this._qpaused[gid] = this.slurp(gid);
+		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text(' (paused)');
+		GlobalProgress[gid].speed = 0; // reset speed
+		if (($.transferprogress||{})[gid]) {
+			$.transferprogress[gid][2] = 0; // reset speed
+		}
+		Soon(percent_megatitle);
+	}
+};
+
+
+TransferQueue.prototype.resume = function(gid)
+{
+	if (!gid) return MegaQueue.prototype.resume.apply(this, arguments);
+
+	ASSERT(GlobalProgress[gid], 'No transfer associated with ' + gid );
+	ASSERT(!GlobalProgress[gid] || GlobalProgress[gid].paused, 'This transfer is not paused: ' + gid );
+
+	if (GlobalProgress[gid])
+	{
+		delete GlobalProgress[gid].paused;
+		if (this.isEmpty()) this.dispatch(gid);
+		$('.transfer-table #' + gid + ' td:eq(2) span.speed').text('');
+	}
 };

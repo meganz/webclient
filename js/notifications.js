@@ -12,25 +12,24 @@ function pollnotifications()
 		api_req('c=100',
 		{
 			callback: function (json,params)
-			{
+			{			
 				if (typeof json == 'object' && json.fsn && u_type)
 				{
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
-					notifications = [];	
-					var nread=true;
+					notifications = [];
+					var currtime = Math.floor(new Date().getTime()/1000);
 					for (var i in json.c)
 					{
-						if (json.la == i) nread=false;
 						notifications.push({
 							id: 		makeid(10),
 							type: 		json.c[i].t,
-							timestamp:  (new Date().getTime()/1000)-json.c[i].td,
+							timestamp:  currtime-json.c[i].td,
 							user:		json.c[i].u,
 							folderid: 	json.c[i].n,
 							nodes:		json.c[i].f,
-							read:		nread,
+							read:		json.c[i].td >= (json.ltd || 0),
 							popup:		true,
-							count:		nread,
+							count:		json.c[i].td >= (json.ltd || 0),
 							rendered:	true
 						});
 					}
@@ -52,7 +51,7 @@ function notifycounter()
 	$.each(notifications, function(i,n) 
 	{
 		if (!n.count) a++;		
-	});	
+	});
 	
 	if (a == 0)
 	{	
@@ -397,7 +396,6 @@ function donotifypopup(id,html)
 			}			
 			hide_notipop(id);			
 		}
-		console.log('click');		
 	});
 	setTimeout(hide_notipop,5000,id);
 }

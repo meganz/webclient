@@ -3007,7 +3007,7 @@ function UIkeyevents()
 	$(window).unbind('keydown.uikeyevents');
 	$(window).bind('keydown.uikeyevents', function (e)
 	{
-		if (e.keyCode == 9) return false;
+		if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) return false;
 
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');

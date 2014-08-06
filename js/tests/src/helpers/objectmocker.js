@@ -89,7 +89,7 @@ ObjectMocker.prototype.restore = function() {
             if(typeof(obj[k].restore) == "function") {
                 obj[k].restore();
             } else {
-                console.error("Could not find .restore on", obj[k]);
+                console.error("Could not find .restore on function", k);
             }
         } else {
             if(obj[k] && obj[k].oldVal) {

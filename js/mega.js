@@ -790,7 +790,7 @@ function MegaData ()
 		});
 
 		$('.file-block .file-settings-icon').bind('click',function(e) {
-			var target = $(this).parents('.file-block')
+			var target = $(this).parents('.file-block');
 			if (target.attr('class').indexOf('ui-selected') == -1) {
 				target.parent().find('a').removeClass('ui-selected');
 			}
@@ -883,10 +883,11 @@ function MegaData ()
 		{
 			this.chat=true;
 			id = 'chat';
-            //TODO: show something? some kind of list of conversations summary/overview screen or something?
-            sectionUIopen('conversations');
-			sharedfolderUI();
-			treeUI();
+            
+            megaChat.renderListing();
+            
+            sharedfolderUI();
+            treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
@@ -1023,12 +1024,19 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-			html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + '</div></div>';
-			html2 += '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(contacts[i].m) + '</div></div>';
+            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";
+
+            html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
 		}
 		$('.content-panel.contacts').html(html);
-		$('.content-panel.conversations .conversations-container').html(html2);
-		
+
+        //TMP: temporary start chat button event handling
+        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
+            var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
+            window.location = "#fm/chat/" + user_handle;
+        });
+        
 		$('.nw-contact-item').unbind('click');
 		$('.nw-contact-item').bind('click',function(e)
 		{
@@ -1149,6 +1157,84 @@ function MegaData ()
 				if (buildnode) this.buildtree(folders[i]);
 			}
 		}
+	};
+
+	this.buildSubmenu = function(i, p)
+	{
+				
+		var icon = '<span class="context-menu-icon"></span>';
+		// divider & advanced
+		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+
+		this.buildRootSubmenu = function()
+		{
+			$('#sm_move').remove();
+			var cs = '';
+
+			for (var h in M.c[M.RootID])
+			{
+				if (M.d[h].t)
+				{
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					break;
+				}
+			}
+			
+			var html = '<span class="context-submenu" id="sm_move">';
+			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += adv;
+			html += '</span>';
+
+			$('.context-menu-item.move-item').after(html);
+		};
+		
+		var id;
+		if (typeof i === 'undefined')
+		{
+			this.buildRootSubmenu();
+			id = this.RootID;
+		}
+		else id = i;
+		
+		var folders = [];
+		
+		for(var i in this.c[id]) if (this.d[i] && this.d[i].t === 1 && this.d[i].name) folders.push(this.d[i]);
+
+// localeCompare is not supported in IE10, >=IE11 only
+// sort by name is default in the tree
+//		folders.sort(function(a,b)
+//		{
+//			if (a.name) return a.name.localeCompare(b.name);
+//		});
+
+		for (var i in folders)
+		{
+			var sub = false;
+			var cs = '';
+			var sm = '';
+			var fid = folders[i].h;
+
+			for (var h in M.c[fid])
+			{
+				if (M.d[h].t)
+				{
+					sub = true;
+					cs = ' contains-submenu';
+					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					break;
+				}
+			}
+// Should we have infors about shared folders in submenues?
+//				var sharedfolder = '';
+//				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
+			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
+			$('#sm_' + id).prepend(html);
+			if (sub) this.buildSubmenu(fid);
+		}
+		
+		initContextUI();
 	};
 
     this.sortContacts = function(folders) {
@@ -1638,7 +1724,7 @@ function MegaData ()
 			if (M.d[h] && M.d[h].p)
 			{
 				if (M.c[M.d[h].p] && M.c[M.d[h].p][h]) delete M.c[M.d[h].p][h];
-				// Update M.v it's used for slideshot preview at least
+				// Update M.v it's used for slideshow preview at least
 				for (var k in M.v)
 				{
 					if (M.v[k].h === h)
@@ -2778,6 +2864,7 @@ function rendernew()
             megaChat.renderMyStatus();
         }
 	}
+	M.buildSubmenu();
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 	if (d) console.timeEnd('rendernew');

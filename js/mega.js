@@ -384,8 +384,23 @@ function MegaData ()
 
 				for (var i in e)
 				{
-					if (d) ASSERT(M.v[e[i][0]].name === e[i][2], 'Whoops... wrong idx..');
-					M.v[e[i][0]].seen = true;
+					if (M.v[e[i][0]] && M.v[e[i][0]].h === e[i][2])
+					{
+						M.v[e[i][0]].seen = true;
+					}
+					else
+					{
+						if (d) console.log('desync cached node...', e[i][2]);
+
+						for (var k in M.v)
+						{
+							if (M.v[k].h === e[i][2])
+							{
+								M.v[k].seen = true;
+								break;
+							}
+						}
+					}
 					n.append(e[i][1]);
 				}
 				if (M.dynlistRt) clearTimeout(M.dynlistRt);
@@ -600,8 +615,8 @@ function MegaData ()
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
-						cache[this.v[i].h] = [i,this.v[i].t];
-						cc = [i,html,this.v[i].name,this.v[i].t];
+						// cache[this.v[i].h] = [i,this.v[i].t];
+						cc = [i,html,this.v[i].h,this.v[i].t];
 					}
 				}
 
@@ -622,15 +637,16 @@ function MegaData ()
 					var j;
 					if ($(t+' #'+this.v[i].h).length)
 					{
+						files--;
 						this.v[i].seen = true;
 						continue;
 					}
 					
 					if (cc)
 					{
-						// console.log(this.v[i].name,cache.map(n=>n[2]));
+						// console.log(i, this.v[i].name,cache.map(n=>n[2]));
 						
-						if (u && this.v[i-1] && cache[this.v[i-1]])
+					/*	if (u && this.v[i-1] && cache[this.v[i-1].h])
 						{
 							j = cache[this.v[i-1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
@@ -644,7 +660,7 @@ function MegaData ()
 							// the cached node have to be found
 							ASSERT(x!=m,'Huh..2b');
 						}
-						else if (u && this.v[i+1] && cache[this.v[i+1]]) // XXX?
+						else if (u && this.v[i+1] && cache[this.v[i+1].h]) // XXX?
 						{
 							j = cache[this.v[i+1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
@@ -659,7 +675,8 @@ function MegaData ()
 							// the cached node have to be found
 							ASSERT(x!=m,'Huh..3b');
 						}
-						else if (this.v[i].t)
+						else*/
+						if (this.v[i].t)
 						{
 							for (var x = 0, m = cache.length ; x < m && cache[x][3] ; ++x);
 							cache.splice(x,0,cc);
@@ -1024,10 +1041,14 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";
-
-            html += '<div class="nw-contact-item offline" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].m) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
-		}
+            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";			
+			var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));			
+			if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1))
+			{
+				html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
+			}
+		}		
+		
 		$('.content-panel.contacts').html(html);
 
         //TMP: temporary start chat button event handling
@@ -1072,54 +1093,16 @@ function MegaData ()
 		{
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
-
 			// sort by name is default in the tree
 			folders.sort(function(a,b)
 			{
 				if (a.name) return a.name.localeCompare(b.name);
 			});
-
-			/*
-			if (n.h == 'contacts')
-			{
-				// in case of contacts we have custom sort/grouping:
-				if (localStorage.csort) this.csort = localStorage.csort;
-				if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-
-				if (this.csort == 'shares')
-				{
-					folders.sort(function(a,b)
-					{
-						if (M.c[a.h] && M.c[b.h])
-						{
-							if (a.name) return a.name.localeCompare(b.name);
-						}
-						else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
-						else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
-						return 0;
-					});
-				}
-				else if (this.csort == 'name')
-				{
-					folders.sort(function(a,b)
-					{
-						if (a.name) return parseInt(a.name.localeCompare(b.name)*M.csortd);
-					});
-				}
-
-				$('.contacts-sorting-by').removeClass('active');
-				$('.contacts-sorting-by.' + this.csort).addClass('active');
-				$('.contacts-sorting-type').removeClass('active');
-				$('.contacts-sorting-type.' + (this.csortd > 0 ? 'asc' : 'desc')).addClass('active');
-			}
-			*/
-
 			for (var i in folders)
-			{
+			{			
 				var ulc = '';
 				var expandedc = '';
 				var buildnode=false;
-
 				if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h] && typeof M.c[folders[i].h] !== 'undefined')
 				{
 					for (var h in M.c[folders[i].h])
@@ -1128,27 +1111,23 @@ function MegaData ()
 						if (n2 && n2.t) buildnode = true;
 					}
 				}
-
 				if (buildnode)
 				{
 					ulc = 'class="opened"';
 					expandedc = 'expanded';
 				}
 				else if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[folders[i].h]) fmtreenode(folders[i].h,false);
-
 				var containsc='';
 				var cns = M.c[folders[i].h];
 				if (cns) for (var cn in cns) if (M.d[cn] && M.d[cn].t) containsc = 'contains-folders';
-
 				var sharedfolder = '';
 				if (typeof M.d[folders[i].h].shares !== 'undefined') sharedfolder = ' shared-folder';
 
 				var openedc = '';
-				if (M.currentdirid == folders[i].h) openedc = 'opened';
+				if (M.currentdirid == folders[i].h) openedc = 'opened';				
 
 				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
-
-				if ($('#treeli_'+folders[i].h).length == 0)
+				if ((!treesearch || (treesearch && folders[i].name && folders[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) && $('#treeli_'+folders[i].h).length == 0)
 				{
 					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
 					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
@@ -1732,7 +1711,7 @@ function MegaData ()
 						M.v.splice(k, 1);
 						break;
 					}
-                                }
+				}
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
 				removeUInode(h);
@@ -2443,7 +2422,7 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
-	$(window).bind('resize.tfsdynlist', SoonFc(function()
+	this.dynListR = SoonFc(function()
 	{
 		function flush_cached_nodes(n)
 		{
@@ -2486,7 +2465,7 @@ function MegaData ()
 			});
 		}
 		$tst = undefined;
-	}));
+	});
 
 	this.getTransferTableLengths = function()
 	{
@@ -2521,6 +2500,12 @@ function MegaData ()
 			gid = elem.match(/id="([^"]+)"/).pop();
 
 		if (d) console.log('Adding Transfer', gid, JSON.stringify(T));
+
+		if (this.dynListR)
+		{
+			$(window).bind('resize.tfsdynlist', this.dynListR);
+			delete this.dynListR;
+		}
 
 		if (T.left > 0)
 		{

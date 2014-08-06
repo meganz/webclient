@@ -2665,9 +2665,17 @@ function crypto_share_rsa2aes()
 var u_keyring;
 var u_privEd25519;
 var u_pubEd25519;
+var pubEd25519 = {};
 
-function u_ed25519() {
-	var myCallback = function(res, ctx) {
+/**
+ * Initialises the authentication system.
+ */
+function u_initAuthentication() {
+    // Load/initialise the authenticated contacts ring.
+    authring.getContacts();
+
+    // Load our key ring.
+    var myCallback = function(res, ctx) {
         if (typeof res !== 'number') {
             u_keyring = res;
         } else {
@@ -2681,11 +2689,10 @@ function u_ed25519() {
         u_privEd25519 = u_keyring.prEd255;
         u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
         u_attr.puEd255 = u_pubEd25519;
+        pubEd25519[u_handle] = u_pubEd25519;
     };
     getUserAttribute(u_handle, 'keyring', false, myCallback);
 }
-
-var pubEd25519 = {};
 
 
 /**
@@ -2695,20 +2702,43 @@ var pubEd25519 = {};
  *     Mega user handle.
  * @param callback {function}
  *     Callback function to call upon completion of operation. The callback
- *     requires two parameters: `value` (the retrieved public key as a binary
- *     string) and `user` (the user handle for the returned key). `value` will
+ *     requires two parameters: `value` (an object containing the public in
+ *     `pubkey` and its authencation state in `authenticated`). `value` will
  *     be `false` upon a failed request.
+ * @throws {Error}
+ *     In case the fingerprint of the public key differs from the one previously
+ *     authenticated by the user. This more severe condition warrants to throw
+ *     an exception.
  */
 function getPubEd25519(userhandle, callback) {
+    if (u_authring === undefined) {
+        throw new Error('First initialise u_authring by calling authring.getContacts()');
+    }
     if (pubEd25519[userhandle]) {
-        callback(pubEd25519[userhandle], userhandle);
+        var value = {pubkey: pubEd25519[userhandle],
+                     authenticated: authring.getContactAuthenticated(userhandle)};
+        if (value.authenticated
+                && !authring.equalFingerprints(value.authenticated.fingerprint,
+                                               authring.computeFingerprint(pubEd25519[userhandle]))) {
+            throw new Error('Fingerprint does not match previously authenticated one!');
+        }
+        if (callback) {
+            callback(value, userhandle);
+        }
     } else {
         var myCallback = function(res, ctx) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
+                var value = {pubkey: res,
+                             authenticated: authring.getContactAuthenticated(ctx.u)};
+                if (value.authenticated
+                        && !authring.equalFingerprints(value.authenticated.fingerprint,
+                                                       authring.computeFingerprint(pubEd25519[userhandle]))) {
+                    throw new Error('Fingerprint does not match previously authenticated one!');
+                }
                 if (ctx.callback3) {
-                    ctx.callback3(res, ctx.u);
+                    ctx.callback3(value, ctx.u);
                 }
             } else if (ctx.callback3) {
                 ctx.callback3(false, ctx.u);
@@ -2719,7 +2749,7 @@ function getPubEd25519(userhandle, callback) {
             callback3: callback,
         };
         getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
-    }    
+    }
 }
 
 
@@ -2739,28 +2769,18 @@ function getPubEd25519(userhandle, callback) {
  *     "string" and "base64" (default: "hex").
  */
 function getFingerprint(userhandle, callback, format) {
-    format = format || "hex";
-    var _fingerprint = function(value) {
-        if (format === "bytes") {
-            return asmCrypto.SHA1.bytes(value);
-        } else if (format === "string") {
-            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
-        } else if (format === "hex") {
-            return asmCrypto.SHA1.hex(value);
-        } else if (format === "base64") {
-            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value)));
-        }
-    };
-    
     if (pubEd25519[userhandle]) {
-        callback(_fingerprint(pubEd25519[userhandle]), userhandle);
+        if (callback) {
+            callback(authring.computeFingerprint(pubEd25519[userhandle], format),
+                     userhandle);
+        }
     } else {
         var myCallback = function(res, ctx) {
             if (typeof res !== 'number') {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
                 if (ctx.callback3) {
-                    ctx.callback3(_fingerprint(res), ctx.u);
+                    ctx.callback3(authring.computeFingerprint(res, format), ctx.u);
                 }
             } else if (ctx.callback3) {
                 ctx.callback3(false, ctx.u);

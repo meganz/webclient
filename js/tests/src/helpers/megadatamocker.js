@@ -20,7 +20,7 @@ var MegaDataMocker = function() {
             'getPubEd25519': function(h, cb) {
                 pubEd25519[h] = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
 
-                cb(pubEd25519[h]);
+                cb({pubkey: pubEd25519[h], authenticated: false}, h);
             },
             'u_privEd25519': atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A='),
             'avatars': {},

@@ -160,7 +160,7 @@ ClassChunk.prototype.isCancelled = function() {
 		if(typeof(this.dl.pos) !== 'number') {
 			this.dl.pos = IdToFile(this.dl).pos
 		}
-		is_cancelled = !dl_queue[this.dl.pos].n;
+		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		if (d) console.log(this + " aborting itself because download was canceled.", this.task.chunk_id);
@@ -174,7 +174,7 @@ ClassChunk.prototype.isCancelled = function() {
 
 // finish_download {{{
 ClassChunk.prototype.finish_download = function() {
-	ASSERT(!!this.xhr, "Don't call me twice!");
+	ASSERT(!!this.xhr || !this.dl || this.dl.cancelled, "Don't call me twice!");
 	if (this.xhr) {
 		this.xhr.xhr_cleanup(0x9ffe);
 		delete this.xhr;
@@ -317,8 +317,12 @@ ClassFile.prototype.destroy = function() {
 	}
 
 	if (this.dl.quota_t) {
-		clearTimeout(dl.quota_t);
+		clearTimeout(this.dl.quota_t);
 		delete this.dl.quota_t;
+	}
+	if (this.dl.retry_t) {
+		clearTimeout(this.dl.retry_t);
+		delete this.dl.retry_t;
 	}
 
 	if (this.dl.cancelled)
@@ -419,12 +423,14 @@ ClassFile.prototype.run = function(task_done) {
 			}
 		}
 
-		fetchingFile = 0;
-		task_done();
+		if (task_done) {
+			fetchingFile = 0;
+			task_done();
 
-		delete this.dl.urls;
-		delete this.dl.io.begin;
-		task_done = null;
+			delete this.dl.urls;
+			delete this.dl.io.begin;
+			task_done = null;
+		}
 
 		if (tasks.length == 0) {
 			// force file download
@@ -437,16 +443,14 @@ ClassFile.prototype.run = function(task_done) {
 			if (d) console.error('Knock, knock..', this.dl);
 			if (this.dl) {
 				/* Remove leaked items from dlQueue & dl_queue */
-				// DownloadManager.abort(this.dl.zipid ? "zipid:"+this.dl.zipid:"id:"+this.dl.dl_id);
-				// XXX: Hmm, DownloadManager.abort seems unreliably at this stage...
-				dlQueue.filter(this.dl);
-				this.destroy();
+				DownloadManager.abort(this.dl);
+				this.destroy(); // XXX: should be expunged already
 			}
 			error = true;
 		} else if (error) {
 			/* failed */
-			setTimeout(function onGetUrlError() {
-				/* retry !*/
+			this.dl.retry_t = setTimeout(function onGetUrlError()
+			{/* retry !*/
 				ERRDEBUG('retrying ', this.dl.n);
 				dlQueue.pushFirst(this);
 				if (ioThrottlePaused) dlQueue.resume();
@@ -550,8 +554,8 @@ var Decrypter = CreateWorkers('decrypter.js', function(context, e, done) {
 var  dlDoneThreshold = 3
 
 function downloader(task, done) {
-	if (DownloadManager.isRemoved(task)) {
-		DEBUG("removing old task");
+	if (!task.dl) {
+		if (d) console.log('Skipping frozen task ' + task);
 		return done();
 	}
 	return task.run(done);

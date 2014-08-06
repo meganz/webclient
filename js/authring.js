@@ -35,11 +35,14 @@ var authring = (function () {
      * "Enumeration" of authentication methods. The values in here must fit
      * into 4 bits of a byte.
      *
+     * @property SEEN {integer}
+     *     To record a "seen" fingerprint, to be able to check for future changes.
      * @property FINGERPRINT_COMPARISON {integer}
-     *     Direct fingerprint comparison.
+     *     Direct/full fingerprint comparison.
      */
     ns.AUTHENTICATION_METHOD = {
-        FINGERPRINT_COMPARISON: 0x00,
+        SEEN: 0x00,
+        FINGERPRINT_COMPARISON: 0x01,
     };
     
 
@@ -241,6 +244,52 @@ var authring = (function () {
         u_authring[userhandle] = {fingerprint: fingerprint,
                                   method: method,
                                   confidence: confidence};
+    };
+    
+    
+    /**
+     * Computes the given key's cryptographic fingerprint.
+     *
+     * @param key {string}
+     *     Byte string of key.
+     * @param format {string}
+     *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
+     *     "string" and "base64" (default: "hex").
+     * @return
+     *     Fingerprint value in the requested format.
+     */
+    ns.computeFingerprint = function(key, format) {
+        format = format || "hex";
+        if (format === "bytes") {
+            return asmCrypto.SHA1.bytes(key);
+        } else if (format === "string") {
+            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key));
+        } else if (format === "hex") {
+            return asmCrypto.SHA1.hex(key);
+        } else if (format === "base64") {
+            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key)));
+        }
+    };
+    
+    
+    /**
+     * Compare two fingerprints.
+     *
+     * @param fp1 {string}
+     *     First fingerprint in byte or hex string format.
+     * @param fp2 {string}
+     *     Second fingerprint. in byte or hex string format
+     * @return
+     *     True on equality, false otherwise.
+     */
+    ns.equalFingerprints = function(fp1, fp2) {
+        if (fp1.length !== 20) {
+            fp1 = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(fp1));
+        }
+        if (fp2.length !== 20) {
+            fp2 = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(fp2));
+        }
+        return fp1 === fp2;
     };
     
     

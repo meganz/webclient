@@ -80,8 +80,8 @@ describe("user unit test", function() {
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
                 window.api_req = sinon.spy();
                 var myCallback = sinon.spy();
-                sandbox.stub(window, 'blockDecrypt', _echo);
-                sandbox.stub(window, 'tlvRecordsToContainer', _echo);
+                sandbox.stub(tlvstore, 'blockDecrypt', _echo);
+                sandbox.stub(tlvstore, 'tlvRecordsToContainer', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
                 getUserAttribute('me', 'keyring', false, myCallback);
                 sinon.assert.calledOnce(api_req);
@@ -89,8 +89,8 @@ describe("user unit test", function() {
                 var theCtx = api_req.args[0][1];
                 callback('Zm9ydHl0d28=', theCtx);
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
-                assert.ok(tlvRecordsToContainer.calledWith('fortytwo'));
-                assert.ok(blockDecrypt.calledWith('fortytwo', 'foo'));
+                assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo'));
+                assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
             });
     
             it("private attribute, internal callback OK, custom callback", function() {
@@ -183,12 +183,12 @@ describe("user unit test", function() {
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
                 window.api_req = sinon.spy();
                 var myCallback = sinon.spy();
-                sandbox.stub(window, 'blockEncrypt', _echo);
-                sandbox.stub(window, 'containerToTlvRecords', _echo);
+                sandbox.stub(tlvstore, 'blockEncrypt', _echo);
+                sandbox.stub(tlvstore, 'containerToTlvRecords', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
                 setUserAttribute('keyring', 'fortytwo', false, myCallback);
-                assert.ok(blockEncrypt.calledWith('fortytwo', 'foo', BLOCK_ENCRYPTION_SCHEME. AES_CCM_12_16));
-                assert.ok(containerToTlvRecords.calledWith('fortytwo'));
+                assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo', tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_CCM_12_16));
+                assert.ok(tlvstore.containerToTlvRecords.calledWith('fortytwo'));
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -201,7 +201,7 @@ describe("user unit test", function() {
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
                 setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, undefined);
                 sinon.assert.calledOnce(api_req);
-                var decoded = tlvRecordsToContainer(blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
@@ -226,7 +226,7 @@ describe("user unit test", function() {
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
                 setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, undefined);
                 sinon.assert.calledOnce(api_req);
-                var decoded = tlvRecordsToContainer(blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');
@@ -237,9 +237,9 @@ describe("user unit test", function() {
                 window.api_req = sinon.spy();
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
                 setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY},
-                                 false, undefined, BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
+                                 false, undefined, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
                 sinon.assert.calledOnce(api_req);
-                var decoded = tlvRecordsToContainer(blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
+                var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
                 assert.strictEqual(decoded.puEd255, ED25519_PUB_KEY);
                 assert.strictEqual(decoded.foo, 'bar');

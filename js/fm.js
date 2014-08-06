@@ -186,41 +186,74 @@ function reselect(n)
 
 var treesearch = false;
 
+
+function treeredraw()
+{
+	if (RootbyId(M.currentdirid) == M.RootID) M.buildtree(M.d[M.RootID]);	
+	else if (RootbyId(M.currentdirid) == M.RubbishID) M.buildtree({h:M.RubbishID});
+	else if (RootbyId(M.currentdirid) == 'shares') M.buildtree({h:'shares'});
+	else if (RootbyId(M.currentdirid) == 'contacts') M.contacts();
+	else if (RootbyId(M.currentdirid) == 'chat')
+	{
+		console.log('render the entire contact list filtered by search query into the conversations list');
+	}
+	treeUI();
+}
+
+
 function treesearchUI()
 {
-	// Search inputs demo logic for tree panel header
 	$('.nw-fm-tree-header').unbind('click');
-	$('.nw-fm-tree-header').bind('click', function() 
+	$('.nw-fm-tree-header').bind('click', function(e)
 	{
+		var c = $(e.target).attr('class');		
+		if (c && c.indexOf('nw-fm-search-icon') > -1)
+		{
+			var c = $(this).attr('class');
+			if (c && c.indexOf('filled-input') > -1)
+			{
+				$(this).removeClass('filled-input');
+				return;
+			}
+		}
 		var i = $(this).find('input');
 		$(this).addClass('focused-input');
-		if (i.val() == i.attr('placeholder')) i.val('');
-		i.focus();
+		if (i.val() == i.attr('placeholder'))
+		{
+			i.val('');
+			i.focus();
+		}
 	});
 	$('.nw-fm-search-icon').unbind('click');
 	$('.nw-fm-search-icon').bind('click', function() 
 	{
-		treesearch=false;
-		M.buildtree(M.d[M.RootID]);
-		treeUI();		
-		$(this).prev().val('');
-		$(this).parent().removeClass('filled-input');
-		$(this).parent().blur();
+		treesearch=false;		
+		treeredraw();		
+		$(this).prev().val('');		
+		$(this).parent().find('input').blur();
 	});
 
 	$('.nw-fm-tree-header input').unbind('keyup');
-	$('.nw-fm-tree-header input').bind('keyup', function() 
-	{		
-		$(this).parent().addClass('filled-input');		
-		treesearch = $('.nw-fm-tree-header input').val();
-		M.buildtree(M.d[M.RootID]);
-		treeUI();
+	$('.nw-fm-tree-header input').bind('keyup', function(e) 
+	{
+		if (e.keyCode == 27)
+		{
+			$(this).parent().removeClass('filled-input');
+			$(this).parent().find('input').val('');
+			$(this).parent().find('input').blur();
+			treesearch=false;
+		}
+		else
+		{
+			$(this).parent().addClass('filled-input');
+			treesearch = $(this).parent().find('input').val();
+		}
+		treeredraw()
 	});
 	
 	$('.nw-fm-tree-header input').unbind('blur');
 	$('.nw-fm-tree-header input').bind('blur', function() 
 	{
-		console.log('blur');
 		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') 
 		{
 			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
@@ -526,6 +559,7 @@ function initUI()
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
 	{
+		treesearch=false;
 		var c = $(this).attr('class');
 		if (c && c.indexOf('cloud-drive') > -1) M.openFolder(M.RootID);
 		else if (c && c.indexOf('shared-with-me') > -1) M.openFolder('shares');

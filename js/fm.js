@@ -290,6 +290,21 @@ function treesearchUI()
 }
 
 
+/**
+ *	Set the right drag icon to the transfer panel
+ */
+function tpDragCursor() {
+	var h = $('.transfer-panel').height()
+	if (h >= $.transferPaneResizable.options.maxHeight) {
+		$('.transfer-drag-handle').css('cursor', 's-resize')
+	} else if (h <= $.transferPaneResizable.options.minHeight) {
+		$('.transfer-drag-handle').css('cursor', 'n-resize')
+	} else {
+		$('.transfer-drag-handle').css('cursor', 'ns-resize')
+	}
+}
+
+
 function initUI()
 {
 	if (!folderlink)
@@ -593,14 +608,14 @@ function initUI()
 		},2000);
 	}
 
-	var tPane = $('.transfer-panel')
-    $.transferPaneResizable = new FMResizablePane(tPane, {
+    $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
         'direction': 'n',
         'minHeight': 96,
         'maxHeight': 312,
         'persistanceKey': 'transferPaneHeight',
         'handle': '.transfer-drag-handle'
     });
+
     $($.transferPaneResizable).on('resize', function(e, resize_event, ui)
 	{
         if($('#fmholder.transfer-panel-opened').size() == 0)
@@ -608,14 +623,7 @@ function initUI()
             $.transferOpen(undefined, true);
             $.transferHeader();
         }
-		var h = tPane.height()
-		if (h >= $.transferPaneResizable.options.maxHeight) {
-			$('.transfer-drag-handle').css('cursor', 's-resize')
-		} else if (h <= $.transferPaneResizable.options.minHeight) {
-			$('.transfer-drag-handle').css('cursor', 'n-resize')
-		} else {
-			$('.transfer-drag-handle').css('cursor', 'ns-resize')
-		}
+		tpDragCursor();
     });
 
     $($.transferPaneResizable).on('resizestop', function(e, resize_event, ui) {
@@ -3657,6 +3665,7 @@ function transferPanelUI()
 
 			panel.animate({'height': height}, {
 				complete: function() {
+					tpDragCursor();
 					$.transferHeader();
 					$(window).trigger('resize');
 				},

@@ -7,9 +7,8 @@ describe("tlvstore unit test", function() {
     "use strict";
     
     var assert = chai.assert;
-    var sandbox = sinon.sandbox;
     
-    var ns = _TlvStore;
+    var ns = tlvstore;
     
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
@@ -48,7 +47,7 @@ describe("tlvstore unit test", function() {
                             + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY,
                             '\u0000\u0000\u0008fortytwo'];
             for (var i = 0; i < tests.length; i++) {
-                assert.strictEqual(containerToTlvRecords(tests[i]), expected[i]);
+                assert.strictEqual(ns.containerToTlvRecords(tests[i]), expected[i]);
             }
         });
         
@@ -69,7 +68,7 @@ describe("tlvstore unit test", function() {
                              'puEd255': ED25519_PUB_KEY},
                             {'': 'fortytwo'}];
             for (var i = 0; i < tests.length; i++) {
-                assert.deepEqual(tlvRecordsToContainer(tests[i]), expected[i]);
+                assert.deepEqual(ns.tlvRecordsToContainer(tests[i]), expected[i]);
             }
         });
     });
@@ -78,9 +77,9 @@ describe("tlvstore unit test", function() {
         it("blockEncrypt", function() {
             var iv = asmCrypto.hex_to_bytes('000102030405060708090a0b0c0d0e0f');
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
-            var modes = [[BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+            var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
@@ -126,7 +125,7 @@ describe("tlvstore unit test", function() {
                 sandbox.stub(asmCrypto, 'getRandomValues', _copy);
                 for (var j = 0; j < tests.length; j++) {
                     var clear = tests[j];
-                    assert.strictEqual(btoa(blockEncrypt(clear, key, mode)),
+                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode)),
                                        expected[i * tests.length + j]);
                 }
                 asmCrypto.getRandomValues.restore();
@@ -135,9 +134,9 @@ describe("tlvstore unit test", function() {
             
         it("blockDecrypt", function() {
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
-            var modes = [[BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+            var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = [
                 'AAABAgMEBQYHCAkKC436kEyuBNzuW6p4fd5WoW0=',
                 'AAABAgMEBQYHCAkKCyi+Gse0PYhohpuaRdPeQ2zQzA==',
@@ -174,16 +173,16 @@ describe("tlvstore unit test", function() {
             for (var i = 0; i < modes.length; i++) {
                 for (var j = 0; j < expected.length; j++) {
                     var cipher = atob(tests[i * expected.length + j]);
-                    assert.strictEqual(blockDecrypt(cipher, key), expected[j]);
+                    assert.strictEqual(ns.blockDecrypt(cipher, key), expected[j]);
                 }
             }
         });
         
         it("blockEncrypt/blockDecrypt round trip", function() {
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
-            var modes = [[BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+            var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
@@ -192,8 +191,8 @@ describe("tlvstore unit test", function() {
                 var mode = modes[i][0];
                 for (var j = 0; j < tests.length; j++) {
                     var clear = tests[j];
-                    var cipher = blockEncrypt(clear, key, mode);
-                    var reClear = blockDecrypt(cipher, key);
+                    var cipher = ns.blockEncrypt(clear, key, mode);
+                    var reClear = ns.blockDecrypt(cipher, key);
                     assert.strictEqual(reClear, clear);
                 }
             }
@@ -201,9 +200,9 @@ describe("tlvstore unit test", function() {
         
         it("blockEncrypt/blockDecrypt round trip with array key", function() {
             var key = [252579084, 185207048, 117835012, 50462976];
-            var modes = [[BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+            var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
@@ -212,8 +211,8 @@ describe("tlvstore unit test", function() {
                 var mode = modes[i][0];
                 for (var j = 0; j < tests.length; j++) {
                     var clear = tests[j];
-                    var cipher = blockEncrypt(clear, key, mode);
-                    var reClear = blockDecrypt(cipher, key);
+                    var cipher = ns.blockEncrypt(clear, key, mode);
+                    var reClear = ns.blockDecrypt(cipher, key);
                     assert.strictEqual(reClear, clear);
                 }
             }

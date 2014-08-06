@@ -1041,6 +1041,16 @@ function initContextUI()
 		}
 	});
 
+	$(c + '.folder-item').unbind('click');
+	$(c + '.folder-item').bind('click', function(e)
+	{
+		var t = $(this).attr('id').replace('fi_','');
+		var n=[];
+		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+		$.hideContextMenu();// ToDo: Dynamic refresh of submenues then no need for hiding
+		M.moveNodes(n,t);
+	});
+
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
 	{

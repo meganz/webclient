@@ -363,8 +363,9 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
             // Decrypt if it's a private attribute container.
             var value = res;
             if (ctx.ua.charAt(0) === '*') {
-                var clearContainer = blockDecrypt(base64urldecode(res), u_k);
-                value = tlvRecordsToContainer(clearContainer);
+                var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
+                                                           u_k);
+                value = tlvstore.tlvRecordsToContainer(clearContainer);
             }
             if (d) {
                 console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
@@ -409,7 +410,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
  */
 function setUserAttribute(attribute, value, pub, callback, mode) {
     if (mode === undefined) {
-        mode = BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+        mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
     }
     if (pub === true || pub === undefined) {
         attribute = '+' + attribute;
@@ -417,7 +418,8 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         attribute = '*' + attribute;
         // The value should be a key/value property container. Let's encode and
         // encrypt it.
-        value = base64urlencode(blockEncrypt(containerToTlvRecords(value), u_k, mode));
+        value = base64urlencode(tlvstore.blockEncrypt(
+            tlvstore.containerToTlvRecords(value), u_k, mode));
     }
     
     // Assemble context for this async API request.

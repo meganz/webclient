@@ -628,9 +628,9 @@ function MegaData ()
 					
 					if (cc)
 					{
-						// console.log(this.v[i].name,cache.map(n=>n[2]));
+						// console.log(i, this.v[i].name,cache.map(n=>n[2]));
 						
-						if (u && this.v[i-1] && cache[this.v[i-1]])
+					/*	if (u && this.v[i-1] && cache[this.v[i-1].h])
 						{
 							j = cache[this.v[i-1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
@@ -644,7 +644,7 @@ function MegaData ()
 							// the cached node have to be found
 							ASSERT(x!=m,'Huh..2b');
 						}
-						else if (u && this.v[i+1] && cache[this.v[i+1]]) // XXX?
+						else if (u && this.v[i+1] && cache[this.v[i+1].h]) // XXX?
 						{
 							j = cache[this.v[i+1].h][0];
 							for (var x = 0, m = cache.length ; x < m ; ++x)
@@ -659,7 +659,8 @@ function MegaData ()
 							// the cached node have to be found
 							ASSERT(x!=m,'Huh..3b');
 						}
-						else if (this.v[i].t)
+						else*/
+						if (this.v[i].t)
 						{
 							for (var x = 0, m = cache.length ; x < m && cache[x][3] ; ++x);
 							cache.splice(x,0,cc);
@@ -2443,7 +2444,7 @@ function MegaData ()
 	}
 	this.mobileuploads = [];
 
-	$(window).bind('resize.tfsdynlist', SoonFc(function()
+	this.dynListR = SoonFc(function()
 	{
 		function flush_cached_nodes(n)
 		{
@@ -2486,7 +2487,7 @@ function MegaData ()
 			});
 		}
 		$tst = undefined;
-	}));
+	});
 
 	this.getTransferTableLengths = function()
 	{
@@ -2521,6 +2522,12 @@ function MegaData ()
 			gid = elem.match(/id="([^"]+)"/).pop();
 
 		if (d) console.log('Adding Transfer', gid, JSON.stringify(T));
+
+		if (this.dynListR)
+		{
+			$(window).bind('resize.tfsdynlist', this.dynListR);
+			delete this.dynListR;
+		}
 
 		if (T.left > 0)
 		{

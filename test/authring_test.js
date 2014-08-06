@@ -14,6 +14,7 @@ describe("authring unit test", function() {
     var sandbox = null;
 
     // Some test data.
+    var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var ED25519_HEX_FINGERPRINT = '5b27aa5589179770e47575b162a1ded97b8bfc6d';
     var ED25519_STRING_FINGERPRINT = base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0');
     
@@ -172,6 +173,55 @@ describe("authring unit test", function() {
                 sinon.assert.calledOnce(myCallback);
                 assert.strictEqual(myCallback.args[0][0], 'me3456789xw');
             });
+        });
+    });
+    
+    describe('computeFingerprint', function() {
+        it("default format", function() {
+            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY),
+                               '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+        });
+
+        it("hex", function() {
+            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, "hex"),
+                               '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+        });
+
+        it("bytes", function() {
+            assert.deepEqual(ns.computeFingerprint(ED25519_PUB_KEY, "bytes"),
+                             asmCrypto.hex_to_bytes('5b27aa5589179770e47575b162a1ded97b8bfc6d'));
+        });
+
+        it("base64", function() {
+            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, "base64"),
+                               'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+        });
+
+        it("string", function() {
+            assert.strictEqual(base64urlencode(ns.computeFingerprint(ED25519_PUB_KEY, "string")),
+                               'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+        });
+    });
+    
+    describe('equalFingerprints', function() {
+        it("success", function() {
+            var tests = [['5b27aa5589179770e47575b162a1ded97b8bfc6d', '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
+                         [base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0'), '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
+                         ['5b27aa5589179770e47575b162a1ded97b8bfc6d', base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')],
+                         [base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0'), base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')]];
+            for (var i = 0; i < tests.length; i++) {
+                assert.ok(ns.equalFingerprints(tests[i][0], tests[i][1]));
+            }
+        });
+
+        it("failure", function() {
+            var tests = [['5b27aa5589179770e47575b162a1ded97b8bfc6e', '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
+                         [base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'), '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
+                         ['5b27aa5589179770e47575b162a1ded97b8bfc6e', base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')],
+                         [base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'), base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')]];
+            for (var i = 0; i < tests.length; i++) {
+                assert.notOk(ns.equalFingerprints(tests[i][0], tests[i][1]));
+            }
         });
     });
 });

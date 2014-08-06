@@ -384,8 +384,23 @@ function MegaData ()
 
 				for (var i in e)
 				{
-					if (d) ASSERT(M.v[e[i][0]].name === e[i][2], 'Whoops... wrong idx..');
-					M.v[e[i][0]].seen = true;
+					if (M.v[e[i][0]] && M.v[e[i][0]].h === e[i][2])
+					{
+						M.v[e[i][0]].seen = true;
+					}
+					else
+					{
+						if (d) console.log('desync cached node...', e[i][2]);
+
+						for (var k in M.v)
+						{
+							if (M.v[k].h === e[i][2])
+							{
+								M.v[k].seen = true;
+								break;
+							}
+						}
+					}
 					n.append(e[i][1]);
 				}
 				if (M.dynlistRt) clearTimeout(M.dynlistRt);
@@ -600,8 +615,8 @@ function MegaData ()
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
-						cache[this.v[i].h] = [i,this.v[i].t];
-						cc = [i,html,this.v[i].name,this.v[i].t];
+						// cache[this.v[i].h] = [i,this.v[i].t];
+						cc = [i,html,this.v[i].h,this.v[i].t];
 					}
 				}
 
@@ -622,6 +637,7 @@ function MegaData ()
 					var j;
 					if ($(t+' #'+this.v[i].h).length)
 					{
+						files--;
 						this.v[i].seen = true;
 						continue;
 					}
@@ -1695,7 +1711,7 @@ function MegaData ()
 						M.v.splice(k, 1);
 						break;
 					}
-                                }
+				}
 				if (typeof M.c[t] == 'undefined') M.c[t]=[];
 				M.c[t][h]=1;
 				removeUInode(h);

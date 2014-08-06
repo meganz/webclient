@@ -1490,7 +1490,7 @@ describe("EncryptionFilter", function() {
 
                 // force the getPubEd25519 to fail
                 getPubEd25519 = function(h, cb) {
-                    cb(false);
+                    cb(false, h);
                 };
 
                 // -> when i'm NOT a room owner

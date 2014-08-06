@@ -1019,7 +1019,7 @@ function initContextUI()
 		var t = $(this).attr('id').replace('fi_','');
 		var n=[];
 		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();// ToDo: Dynamic refresh of submenues then no need for hiding
+		$.hideContextMenu();
 		M.moveNodes(n,t);
 	});
 
@@ -3878,16 +3878,16 @@ function reCalcMenuPosition(m, x, y, ico)
 {
 	var TOP_MARGIN = 12;
 	var SIDE_MARGIN = 12;
-	var cmW = m.outerWidth(), cmH = m.outerHeight();// context menu dimensions
+	var cmW = m.outerWidth(), cmH = m.outerHeight();// dimensions without margins calculated
 	var wH = window.innerHeight, wW = window.innerWidth;
-	var maxX = wW - SIDE_MARGIN;// max horizontal position
-	var maxY = wH - TOP_MARGIN;// max vertical position
-	var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal position
-	var minY = TOP_MARGIN;// min vertical position
-	var wMax = x + cmW;// calculated coordinate of right edge
-	var hMax = y + cmH;// calculated coordinate of bottom edge
+	var maxX = wW - SIDE_MARGIN;// max horizontal
+	var maxY = wH - TOP_MARGIN;// max vertical
+	var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal
+	var minY = TOP_MARGIN;// min vertical
+	var wMax = x + cmW;// coordinate of right edge
+	var hMax = y + cmH;// coordinate of bottom edge
 
-	$.overlapParentMenu = function()
+	this.overlapParentMenu = function()
 	{
 				var tre = wW - wMax;// to right edge
 				var tle = x - minX - SIDE_MARGIN;// to left edge
@@ -3906,13 +3906,29 @@ function reCalcMenuPosition(m, x, y, ico)
 				return;
 	};
 	
-	$.horPos = function()
+	// submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
+	// first parent, which is NOT a .contains-submenu element (it's previous in same level) 
+	this.horPos = function()// used for submenues
 	{
-		var t = 'auto';
-		var b = y + nmH - 8;
-		if (b > maxY) t = -(b - maxY - 40 - cmH) + 'px';// margin-top 40px
+		var top;
+		var nTop = parseInt(n.css('padding-top'));
+		var a = m.parent();
+		var b = y + nmH - nTop;// bottom of submenu
+		var pPos;
 		
-		return t;
+//		if (nmH > (maxY - TOP_MARGIN))// handle "huge" menu
+//		{
+//		}
+//		else
+		{
+			if (a.is('.context-menu-section')) pPos = getHtmlElemPos(m.closest('.context-menu')[0]);
+			else pPos = getHtmlElemPos(a[0]);
+			
+			if (b > maxY) top = ((y - pPos.y) - (b - maxY)) + 'px';
+			else top = (y - pPos.y) + 'px';			
+		}
+		
+		return top;
 	};
 	
 	var dPos;
@@ -3932,21 +3948,27 @@ function reCalcMenuPosition(m, x, y, ico)
 			cor++;
 		}
 	}
-	else if ((typeof ico === 'string') && (ico === 'submenu'))
+	else if (ico === 'submenu')// submenues
 	{
-		var n = m.next('.context-submenu');// next submenu
-		var nmW = n.outerWidth(), nmH = n.outerHeight();
+		var n = m.next('.context-submenu');
+		var nmW = n.outerWidth();
+		var nmH = n.outerHeight();
+		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
+		{
+			nmH = maxY - TOP_MARGIN;
+			n.css({'height': nmH + 'px', 'overflow': 'hidden'});
+		}
 	
 		var top = 'auto', left = '100%', right = 'auto';
 		
-		top = $.horPos();
+		top = this.horPos();
 		if (m.parent('.left-position').length === 0)
 		{
 			if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
 			else if (minX <= (x - nmW)) n.addClass('left-position');
 			else
 			{
-				$.overlapParentMenu();
+				this.overlapParentMenu();
 				
 				return true;
 			}
@@ -3957,7 +3979,7 @@ function reCalcMenuPosition(m, x, y, ico)
 			else if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
 			else
 			{
-				$.overlapParentMenu();
+				this.overlapParentMenu();
 
 				return true;
 			}

@@ -680,10 +680,6 @@ function initUI()
 
 }
 
-function isIdDownload(id) {
-	return id[0] == 'd' || id[0] == 'z';
-}
-
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();

@@ -252,13 +252,6 @@ var EncryptionFilter = function(megaChat) {
         self.processOutgoingMessage(e, eventObject, karere);
     };
 
-
-
-    // fill my key
-    if(u_pubEd25519) {
-        pubEd25519[u_handle] = u_pubEd25519;
-    }
-
     // incoming
     megaChat.karere.bind("onChatMessage", processIncoming);
     megaChat.karere.bind("onPrivateMessage", processIncoming);

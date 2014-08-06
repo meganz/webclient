@@ -133,7 +133,10 @@ function u_checklogin3a(res,ctx)
 		else if (!u_attr.privk) r = 2;
 		else r = 3;
 		
-		if (r == 3) u_ed25519();
+		if (r == 3) {
+		    // Load/initialise the authentication system.
+		    u_initAuthentication();
+		}
 	}
 
 	ctx.checkloginresult(ctx,r);

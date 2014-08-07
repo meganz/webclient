@@ -526,7 +526,7 @@ function MegaData ()
 					{
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
+						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
 					}
 					else
 					{

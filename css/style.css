@@ -17180,8 +17180,8 @@ span.incoming-call-name {
 	font-family: 'Open Sans Bold', Arial;
 	text-transform: uppercase;
 }
-.two-letters .nw-contact-block-avatar {
-	font-size: 58px;
+.two-letters .nw-contact-block-avatar, .two-letters.nw-contact-block-avatar {
+	font-size: 75px;
 }
 .file-block .nw-contact-block-avatar img, .nw-contact-block-avatar img {
 	width: 156px;

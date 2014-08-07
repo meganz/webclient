@@ -6087,7 +6087,7 @@ function contactUI()
 		var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
 		var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color);
+		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color);
 		$('.contact-top-details .nw-contact-block-avatar').html(avatar);
 		$('.contact-top-details .onlinestatus').removeClass('away offline online busy');
 		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);

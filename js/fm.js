@@ -284,6 +284,7 @@ function treesearchUI()
 				.removeClass('active')
 				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
 				.addClass('active')
+			return false;
 		} 
 		else 
 		{
@@ -544,6 +545,8 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
+		$('.nw-sorting-menu').addClass('hidden')
+		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');

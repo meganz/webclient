@@ -6501,8 +6501,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: block;
 }
 .dragger-status {
-	width: 14px;
-	height: 14px;
+	width: 18px;
+	height: 18px;
 	position: absolute;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;

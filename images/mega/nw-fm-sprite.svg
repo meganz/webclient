@@ -1430,14 +1430,23 @@
 	c-0.09,0.149-0.13,0.3-0.14,0.45l0.73,0.811c0.55,0.609,1.31,0.709,1.72,0.709l0.16-0.01h0.87l1.16-1.899l1.07,0.58l-1.86-3.438
 	l-3.78,0.028l1.07,0.84L4.14,8047.04z M4.23,8048.74l2.3,4.25c0.46,0.59,1.33,0.699,2.24,0.68h2.56v-4H6.65
 	C5.94,8049.71,4.94,8049.54,4.23,8048.74z"/>
+	
+<filter id="dropshadow" x="-20%" y="-20%" width="150%" height="150%">
+    <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="1" />
+    <feOffset in="blur-out" result="the-shadow" dx="0" dy="1"/> 
+    <feColorMatrix in="the-shadow" result="color-out" type="matrix"
+      values="0 0 0 0   0
+              0 0 0 0   0 
+              0 0 0 0   0 
+              0 0 0 .1 0"/>
+    <feBlend in="SourceGraphic" in2="color-out" mode="normal"/>
+  </filter>
+
 <g>
 	<g>
-		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C69.png"  transform="matrix(1 0 0 1 -1.5 8287.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8296c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8302,2,8299.311,2,8296z"/>
+				C4.69,8302,2,8299.311,2,8296z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#777777" cx="8" cy="8296" r="5"/>
@@ -1447,11 +1456,9 @@
 <g>
 	<g>
 		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C78.png"  transform="matrix(1 0 0 1 -1.5 8137.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8146c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8152,2,8149.311,2,8146z"/>
+				C4.69,8152,2,8149.311,2,8146z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#73AC3A" cx="8" cy="8146" r="5"/>
@@ -1461,11 +1468,9 @@
 <g>
 	<g>
 		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C79.png"  transform="matrix(1 0 0 1 -1.5 8167.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8176c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8182,2,8179.311,2,8176z"/>
+				C4.69,8182,2,8179.311,2,8176z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#73AC3A" cx="8" cy="8176" r="5"/>
@@ -1475,11 +1480,9 @@
 <g>
 	<g>
 		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C7A.png"  transform="matrix(1 0 0 1 -1.5 8077.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8086c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8092,2,8089.311,2,8086z"/>
+				C4.69,8092,2,8089.311,2,8086z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#D51600" cx="8" cy="8086" r="5"/>
@@ -1487,12 +1490,9 @@
 </g>
 <g>
 	<g>
-		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C7B.png"  transform="matrix(1 0 0 1 -1.5 8107.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8116c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8122,2,8119.311,2,8116z"/>
+				C4.69,8122,2,8119.311,2,8116z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#73AC3A" cx="8" cy="8116" r="5"/>
@@ -1502,11 +1502,9 @@
 <g>
 	<g>
 		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C7C.png"  transform="matrix(1 0 0 1 -1.5 8197.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8206c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8212,2,8209.311,2,8206z"/>
+				C4.69,8212,2,8209.311,2,8206z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#FFA500" cx="8" cy="8206" r="5"/>
@@ -1515,12 +1513,9 @@
 </g>
 <g>
 	<g>
-		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C7F.png"  transform="matrix(1 0 0 1 -1.5 8257.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8266c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8272,2,8269.311,2,8266z"/>
+				C4.69,8272,2,8269.311,2,8266z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#2BA6DE" cx="8" cy="8266" r="5"/>
@@ -1529,12 +1524,9 @@
 </g>
 <g>
 	<g>
-		
-			<image overflow="visible" opacity="0.15" width="19" height="19" xlink:href="A934AD0CDF485C76.png"  transform="matrix(1 0 0 1 -1.5 8227.5)">
-		</image>
 		<g>
 			<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M2,8236c0-3.311,2.69-6,6-6c3.311,0,6,2.689,6,6s-2.689,6-6,6
-				C4.69,8242,2,8239.311,2,8236z"/>
+				C4.69,8242,2,8239.311,2,8236z" style="filter:url(#dropshadow)"/>
 		</g>
 	</g>
 	<circle fill-rule="evenodd" clip-rule="evenodd" fill="#777777" cx="8" cy="8236" r="5"/>

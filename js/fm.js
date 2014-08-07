@@ -279,14 +279,44 @@ function treesearchUI()
 	$('.sorting-menu-item').unbind('click');
 	$('.sorting-menu-item').bind('click', function() 
 	{
-		if ($(this).attr('class').indexOf('active') == -1) 
+		var $this = $(this)
+		if ($this.attr('class').indexOf('active') == -1) 
 		{
-			$(this).parent().find('.sorting-menu-item').removeClass('active');
-			$(this).addClass('active');
+			$this.parent().find('.sorting-menu-item').removeClass('active');
+			$this.addClass('active');
 			$('.nw-sorting-menu').addClass('hidden');
 			$('.nw-tree-panel-arrows').removeClass('active');
+			var data = $this.data()
+			if (data.dir) {
+				localStorage.sortTreePanelDirection = $.treePanel.direction = data.dir
+			} else {
+				localStorage.sortTreePanelBy = $.treePanel.by = data.by
+			}
 		}
 	});
+	initializeTreePanelSorting()
+}
+
+function treePanelSortingFunction() {
+	function desc(func) {
+		return function(a, b) {
+			return -1 * func(a, b);
+		};
+	}
+}
+
+function initializeTreePanelSorting()
+{
+	$.treePanel = {
+		by: anyOf(['name' , 'status', 'last-interaction'], localStorage.sortTreePanelBy) || "name",
+		direction: parseInt(anyOf(['-1', '1'], localStorage.sortTreePanelDirection) || '1'),
+	}
+	ERRDEBUG($.treePanel)
+
+	$('.sorting-menu-item')
+		.removeClass('active')
+		.filter('*[data-by=' + $.treePanel.by  + '],*[data-dir='+$.treePanel.direction+']')
+		.addClass('active')
 }
 
 

@@ -1014,6 +1014,7 @@ function MegaData ()
 
 		if (localStorage.csort) this.csort = localStorage.csort;
 		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
+		ERRDEBUG(this.csort, this.csortd, this)
 		if (this.csort == 'shares')
 		{
 			contacts.sort(function(a,b)

@@ -23,7 +23,6 @@ function pollnotifications()
 					
 					for (var i in json.c)
 					{
-						console.log(json.c[i].td);
 						notifications.push({
 							id: 		makeid(10),
 							type: 		json.c[i].t,

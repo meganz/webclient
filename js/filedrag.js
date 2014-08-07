@@ -41,7 +41,7 @@ function FileDragHover(e)
 		$('<div class="dragger-icon '+ fileicon({name:''}) +'"></div>').insertAfter('#draghelper .dragger-status');
 		$('.dragger-icon.fade').fadeTo(500, 0.1);
 		$($.ddhelper).css({left: (e.pageX+35 + "px"),top: (e.pageY-5 + "px")});
-		$('.dragger-block').removeClass('move copy warning drag');
+		$('.dragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
 		$('.dragger-block').addClass('copy');
 	}
 	if (page == 'start')

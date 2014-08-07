@@ -357,7 +357,7 @@ function initUI()
 
 		if (ids && ids.length && t) dd = ddtype(ids,t);
 
-		$('.dragger-block').removeClass('move copy warning drag');
+		$('.dragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
 		if (a == 'drop' || a == 'out')
 		{
 			$(e.target).removeClass('dragover');
@@ -396,7 +396,7 @@ function initUI()
             else if($(e.target).parents('.fm-chat-block').size() > 0) {
                 // drag over a chat window
                 //TODO: Missing css for drag-share
-                $('.dragger-block').addClass('share');
+                $('.dragger-block').addClass('to-share');
             }
 			else $('.dragger-block').addClass('drag');
 
@@ -4091,7 +4091,7 @@ function treeUI()
 		containment: 'document',
 		revertDuration:200,
 		distance: 10,
-		cursorAt:{right:100,bottom:70},
+		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
 			return getDDhelper();
@@ -4106,6 +4106,7 @@ function treeUI()
 			if (id && M.d[id]) html = '<div class="dragger-icon '+ fileicon(M.d[id]) +'"></div>'
 			$('#draghelper .dragger-icon').remove();
 			$(html).insertBefore('#draghelper .dragger-status');
+			$('body').addClass('dragging');
 		},
 		drag: function(e,u)
 		{
@@ -4114,6 +4115,7 @@ function treeUI()
 		stop: function(e,u)
 		{
 			$.treeDragging=false;
+			$('body').removeClass('dragging');
 		}
 	});
 

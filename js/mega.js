@@ -1083,6 +1083,7 @@ function MegaData ()
 
 	this.buildtree = function(n)
 	{
+		var stype = "cloud-drive";
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
 		{
 			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
@@ -1090,10 +1091,12 @@ function MegaData ()
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
 			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
+			stype = "shared-with-me";
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
 			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+			stype = "rubbish-bin";
 		}
 
 		if (this.c[n.h])
@@ -1101,9 +1104,10 @@ function MegaData ()
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 			// sort by name is default in the tree
-			folders.sort(function(a,b)
-			{
-				if (a.name) return a.name.localeCompare(b.name);
+			treePanelSortElements(stype, folders, {
+				name: function(a, b) {
+					if (a.name) return a.name.localeCompare(b.name);
+				}
 			});
 			for (var i in folders)
 			{			

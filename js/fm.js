@@ -308,7 +308,20 @@ function treesearchUI()
 			} else {
 				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by
 			}
-			M.contacts();
+			switch (type) {
+			case 'contacts':
+				M.contacts();
+				break;
+			case 'shared-with-me':
+				M.buildtree({h:'shares'});
+				break;
+			case 'cloud-drive':
+				M.buildtree(M.d[M.RootID]);
+				break;
+			case 'rubbish-bin':
+				M.buildtree({h:M.RubbishID});
+				break;
+			}
 		}
 	});
 	initializeTreePanelSorting()
@@ -317,7 +330,7 @@ function treesearchUI()
 function treePanelType()
 {
 	// is there an easy way of knowing it?
-	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon)/g, ''))
+	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
 }
 
 function treePanelSortElements(type, elements, handlers) {
@@ -332,7 +345,7 @@ function treePanelSortElements(type, elements, handlers) {
 function initializeTreePanelSorting()
 {
 	$.sortTreePanel = {}
-	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive'], function(key, type) {
+	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive','rubbish-bin'], function(key, type) {
 		$.sortTreePanel[type] = {
 			by: anyOf(['name' , 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
 			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1'),

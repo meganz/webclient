@@ -4065,15 +4065,15 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollHugeMenu(e, cont)
+function scrollHugeMenu(e)
 {
 	var ey = e.pageY;
-	var k = document.getElementById(cont);
-	var pNode = k.parentNode;
+//	var k = e.target;
+	var pNode = $(e.target).closest('.context-submenu')[0];
 
 	var h = pNode.offsetHeight;
-	var dy = h * 0.1;
-	var pos = getHtmlElemPos(pNode);
+	var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
+	var pos = getHtmlElemPos(pNode, true);
 	var py = (ey - pos.y - dy) / (h - dy * 2);
 	if (py > 1) py = 1;
 	if (py < 0) py = 0;

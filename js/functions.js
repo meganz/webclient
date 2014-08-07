@@ -1414,7 +1414,7 @@ String.prototype.replaceAll = function(_f, _r, _c)
 };
 
 // Returns pixels position of element relative to document (top left corner)
-function getHtmlElemPos(elem)
+function getHtmlElemPos(elem, n)
 {
     var xPos = 0;
     var yPos = 0;
@@ -1428,8 +1428,11 @@ function getHtmlElemPos(elem)
         st = 0;
         if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName))
         {
-            sl = elem.scrollLeft;
-            st = elem.scrollTop;
+			if (typeof n === 'undefined')// count this in, except for overflow huge menu
+			{
+				sl = elem.scrollLeft;
+				st = elem.scrollTop;
+			}
         }
         xPos += (elem.offsetLeft - sl + elem.clientLeft);
         yPos += (elem.offsetTop - st + elem.clientTop);

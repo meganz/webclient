@@ -1012,29 +1012,21 @@ function MegaData ()
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
 
-		if (localStorage.csort) this.csort = localStorage.csort;
-		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-		ERRDEBUG(this.csort, this.csortd, this)
-		if (this.csort == 'shares')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (M.c[a.h] && M.c[b.h])
-				{
-					if (a.name) return a.name.localeCompare(b.name);
-				}
-				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
-				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
-				return 0;
-			});
-		}
-		else if (this.csort == 'name')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
-			});
-		}
+		var statusValues = { online: 1, busy: 2, away: 3, offline: 4 }
+		treePanelSortElements('contacts', contacts, {
+			'last-interaction': function(a, b) {
+				
+			},
+			name: function(a, b) {
+				if (a.m) return parseInt(b.m.localeCompare(a.m));
+			},
+			status: function(a, b) {
+				var sa = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(a.u)))
+					, sb = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(b.u)))
+				return statusValues[sa[1]] - statusValues[sb[1]]
+			}
+		})
+
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
 		for (var i in contacts)

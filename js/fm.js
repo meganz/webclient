@@ -287,36 +287,44 @@ function treesearchUI()
 			$('.nw-sorting-menu').addClass('hidden');
 			$('.nw-tree-panel-arrows').removeClass('active');
 			var data = $this.data()
+				// is there an easy way of knowing it?
+				, type = $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon)/g, ''))
 			if (data.dir) {
-				localStorage.sortTreePanelDirection = $.treePanel.direction = data.dir
+				localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir
 			} else {
-				localStorage.sortTreePanelBy = $.treePanel.by = data.by
+				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by
 			}
+			M.contacts();
 		}
 	});
 	initializeTreePanelSorting()
 }
 
-function treePanelSortingFunction() {
-	function desc(func) {
-		return function(a, b) {
-			return -1 * func(a, b);
-		};
-	}
+function treePanelSortElements(type, elements, handlers) {
+	var settings = $.sortTreePanel[type]
+		, sort	 = handlers[settings.by]
+	if (!sort) return;
+	elements.sort(function(a, b) {
+		return sort(a, b) * settings.dir
+	});
 }
 
 function initializeTreePanelSorting()
 {
-	$.treePanel = {
-		by: anyOf(['name' , 'status', 'last-interaction'], localStorage.sortTreePanelBy) || "name",
-		direction: parseInt(anyOf(['-1', '1'], localStorage.sortTreePanelDirection) || '1'),
-	}
-	ERRDEBUG($.treePanel)
+	$.sortTreePanel = {}
+	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive'], function(key, type) {
+		$.sortTreePanel[type] = {
+			by: anyOf(['name' , 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
+			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1'),
+		};
+	});
 
+	/*
 	$('.sorting-menu-item')
 		.removeClass('active')
 		.filter('*[data-by=' + $.treePanel.by  + '],*[data-dir='+$.treePanel.direction+']')
 		.addClass('active')
+	*/
 }
 
 

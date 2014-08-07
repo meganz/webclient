@@ -369,6 +369,9 @@ function MegaData ()
 			}
 			var e = $('.fm-chat-user-status.' + u.u);
 			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);
+			if ($.sortTreePanel.contacts.by == 'status') {
+				M.contacts(); // we need to resort
+			}
 		}
 	};
 
@@ -1011,29 +1014,33 @@ function MegaData ()
 	{
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
+		
+		if (typeof this.i_cache != "object") this.i_cache = {}
 
-		if (localStorage.csort) this.csort = localStorage.csort;
-		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-		if (this.csort == 'shares')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (M.c[a.h] && M.c[b.h])
-				{
-					if (a.name) return a.name.localeCompare(b.name);
+		treePanelSortElements('contacts', contacts, {
+			'last-interaction': function(a, b) {
+				if (!M.i_cache[a.u])
+				{				
+					var cs = M.contactstatus(a.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[a.u] = cs.ts;
 				}
-				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
-				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
-				return 0;
-			});
-		}
-		else if (this.csort == 'name')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
-			});
-		}
+				if (!M.i_cache[b.u])
+				{	
+					var cs = M.contactstatus(b.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[b.u] = cs.ts;
+				}
+				return M.i_cache[a.u] - M.i_cache[b.u];
+			},
+			name: function(a, b) {
+				if (a.m) return parseInt(b.m.localeCompare(a.m));
+			},
+			status: function(a, b) {
+				return M.getSortStatus(a.u) - M.getSortStatus(b.u)
+			}
+		})
+
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
 		for (var i in contacts)
@@ -1076,6 +1083,7 @@ function MegaData ()
 
 	this.buildtree = function(n)
 	{
+		var stype = "cloud-drive";
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
 		{
 			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
@@ -1083,10 +1091,12 @@ function MegaData ()
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
 			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
+			stype = "shared-with-me";
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
 			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+			stype = "rubbish-bin";
 		}
 
 		if (this.c[n.h])
@@ -1094,9 +1104,10 @@ function MegaData ()
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 			// sort by name is default in the tree
-			folders.sort(function(a,b)
-			{
-				if (a.name) return a.name.localeCompare(b.name);
+			treePanelSortElements(stype, folders, {
+				name: function(a, b) {
+					if (a.name) return a.name.localeCompare(b.name);
+				}
 			});
 			for (var i in folders)
 			{			

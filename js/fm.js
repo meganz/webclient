@@ -268,7 +268,23 @@ function treesearchUI()
 		if ($(this).attr('class').indexOf('active') == -1) 
 		{
 			$(this).addClass('active');
-			$('.nw-sorting-menu').removeClass('hidden');
+			var menu = $('.nw-sorting-menu').removeClass('hidden')
+				, type = treePanelType()
+			switch (type) {
+			case 'contacts':
+				// show all the options
+				menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+				break;
+			default:
+				// hide everything
+				menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+			}
+
+			$('.sorting-menu-item')
+				.removeClass('active')
+				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
+				.addClass('active')
+			return false;
 		} 
 		else 
 		{
@@ -279,13 +295,62 @@ function treesearchUI()
 	$('.sorting-menu-item').unbind('click');
 	$('.sorting-menu-item').bind('click', function() 
 	{
-		if ($(this).attr('class').indexOf('active') == -1) 
+		var $this = $(this)
+		if ($this.attr('class').indexOf('active') == -1) 
 		{
-			$(this).parent().find('.sorting-menu-item').removeClass('active');
-			$(this).addClass('active');
+			$this.parent().find('.sorting-menu-item').removeClass('active');
+			$this.addClass('active');
 			$('.nw-sorting-menu').addClass('hidden');
 			$('.nw-tree-panel-arrows').removeClass('active');
+			var data = $this.data()
+				, type = treePanelType()
+			if (data.dir) {
+				localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir
+			} else {
+				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by
+			}
+			switch (type) {
+			case 'contacts':
+				M.contacts();
+				break;
+			case 'shared-with-me':
+				M.buildtree({h:'shares'});
+				break;
+			case 'cloud-drive':
+				M.buildtree(M.d[M.RootID]);
+				break;
+			case 'rubbish-bin':
+				M.buildtree({h:M.RubbishID});
+				break;
+			}
 		}
+	});
+	initializeTreePanelSorting()
+}
+
+function treePanelType()
+{
+	// is there an easy way of knowing it?
+	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
+}
+
+function treePanelSortElements(type, elements, handlers) {
+	var settings = $.sortTreePanel[type]
+		, sort	 = handlers[settings.by]
+	if (!sort) return;
+	elements.sort(function(a, b) {
+		return sort(a, b) * settings.dir
+	});
+}
+
+function initializeTreePanelSorting()
+{
+	$.sortTreePanel = {}
+	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive','rubbish-bin'], function(key, type) {
+		$.sortTreePanel[type] = {
+			by: anyOf(['name' , 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
+			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1'),
+		};
 	});
 }
 
@@ -480,6 +545,8 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
+		$('.nw-sorting-menu').addClass('hidden')
+		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');

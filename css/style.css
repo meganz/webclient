@@ -5570,7 +5570,7 @@ table {
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
 	height: 24px;
-	padding: 0 0 0 23px;
+	padding: 0 10px 0 23px;
 	word-break: break-all;
 	white-space: pre-wrap;
 	display: block;

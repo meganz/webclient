@@ -13,6 +13,14 @@ var inherits = (function(){
 })();
 
 /**
+ *	Check if value is contained in a array. If it is return value
+ *	otherwise false
+ */
+function anyOf(arr, value) {
+	return $.inArray(value, arr) == -1 ? false : value;
+}
+
+/**
  *	Cascade:
  *
  *	Tiny helper to queue related tasks, in which the output of one function

@@ -268,7 +268,22 @@ function treesearchUI()
 		if ($(this).attr('class').indexOf('active') == -1) 
 		{
 			$(this).addClass('active');
-			$('.nw-sorting-menu').removeClass('hidden');
+			var menu = $('.nw-sorting-menu').removeClass('hidden')
+				, type = treePanelType()
+			switch (type) {
+			case 'contacts':
+				// show all the options
+				menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+				break;
+			default:
+				// hide everything
+				menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+			}
+
+			$('.sorting-menu-item')
+				.removeClass('active')
+				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
+				.addClass('active')
 		} 
 		else 
 		{
@@ -287,8 +302,7 @@ function treesearchUI()
 			$('.nw-sorting-menu').addClass('hidden');
 			$('.nw-tree-panel-arrows').removeClass('active');
 			var data = $this.data()
-				// is there an easy way of knowing it?
-				, type = $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon)/g, ''))
+				, type = treePanelType()
 			if (data.dir) {
 				localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir
 			} else {
@@ -298,6 +312,12 @@ function treesearchUI()
 		}
 	});
 	initializeTreePanelSorting()
+}
+
+function treePanelType()
+{
+	// is there an easy way of knowing it?
+	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon)/g, ''))
 }
 
 function treePanelSortElements(type, elements, handlers) {
@@ -318,13 +338,6 @@ function initializeTreePanelSorting()
 			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1'),
 		};
 	});
-
-	/*
-	$('.sorting-menu-item')
-		.removeClass('active')
-		.filter('*[data-by=' + $.treePanel.by  + '],*[data-dir='+$.treePanel.direction+']')
-		.addClass('active')
-	*/
 }
 
 

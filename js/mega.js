@@ -369,6 +369,9 @@ function MegaData ()
 			}
 			var e = $('.fm-chat-user-status.' + u.u);
 			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);
+			if ($.sortTreePanel.contacts.by == 'status') {
+				M.contacts(); // we need to resort
+			}
 		}
 	};
 
@@ -1011,19 +1014,30 @@ function MegaData ()
 	{
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
+		
+		if (typeof this.i_cache != "object") this.i_cache = {}
 
-		var statusValues = { online: 1, busy: 2, away: 3, offline: 4 }
 		treePanelSortElements('contacts', contacts, {
 			'last-interaction': function(a, b) {
-				
+				if (!M.i_cache[a.u])
+				{				
+					var cs = M.contactstatus(a.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[a.u] = cs.ts;
+				}
+				if (!M.i_cache[b.u])
+				{	
+					var cs = M.contactstatus(b.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[b.u] = cs.ts;
+				}
+				return M.i_cache[a.u] - M.i_cache[b.u];
 			},
 			name: function(a, b) {
 				if (a.m) return parseInt(b.m.localeCompare(a.m));
 			},
 			status: function(a, b) {
-				var sa = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(a.u)))
-					, sb = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(b.u)))
-				return statusValues[sa[1]] - statusValues[sb[1]]
+				return M.getSortStatus(a.u) - M.getSortStatus(b.u)
 			}
 		})
 

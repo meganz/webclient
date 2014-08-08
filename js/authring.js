@@ -24,13 +24,13 @@ var authring = (function () {
      * byte string and a "trust indicator" byte containing the authentication and
      * confidence information. Therefore each authenticated user "consumes"
      * 29 bytes of storage.</p>
-     * 
+     *
      * <p>
      * Load contacts' authentication info  with `authring.getContacts()` and save
      * with `authring.setContacts()`.</p>
      */
     var ns = {};
-    
+
     /**
      * "Enumeration" of authentication methods. The values in here must fit
      * into 4 bits of a byte.
@@ -44,7 +44,7 @@ var authring = (function () {
         SEEN: 0x00,
         FINGERPRINT_COMPARISON: 0x01,
     };
-    
+
 
     /**
      * "Enumeration" of confidence in contact's key. The values in here must fit
@@ -56,8 +56,8 @@ var authring = (function () {
     ns.KEY_CONFIDENCE = {
         UNSURE: 0x00,
     };
-    
-    
+
+
     /**
      * Serialises a single authentication record.
      *
@@ -83,10 +83,10 @@ var authring = (function () {
         }
         return base64urldecode(userhandle)
                + fingerprintString
-               + String.fromCharCode((method << 4) | confidence);
+               + String.fromCharCode((confidence << 4) | method);
     };
-    
-    
+
+
     /**
      * Generates a binary encoded serialisation of an authentication ring
      * object.
@@ -108,8 +108,8 @@ var authring = (function () {
         }
         return result;
     };
-    
-    
+
+
     /**
      * Splits and decodes an authentication record off of a binary keyring
      * serialisation and returns the record and the rest.
@@ -128,16 +128,16 @@ var authring = (function () {
         var fingerprint =  serialisedRing.substring(8, 28);
         var authAttributes = serialisedRing.charCodeAt(28);
         var rest = serialisedRing.substring(29);
-        var method = (authAttributes >>> 4) & 0x0f;
-        var confidence = authAttributes & 0x0f;
+        var confidence = (authAttributes >>> 4) & 0x0f;
+        var method = authAttributes & 0x0f;
         return {userhandle: userhandle,
                 value: {fingerprint: fingerprint,
                         method: method,
                         confidence: confidence},
                 rest: rest};
     };
-    
-    
+
+
     /**
      * Decodes a binary encoded serialisation to an authentication ring object.
      *
@@ -158,11 +158,11 @@ var authring = (function () {
         }
         return container;
     };
-    
-    
+
+
     /**
      * Loads the ring for all authenticated contacts into `u_authring`.
-     * 
+     *
      * @param callback {function}
      *     Callback function to call upon completion of operation. The callback
      *     requires two parameters: `res` (the retrieved authentication ring)
@@ -185,11 +185,11 @@ var authring = (function () {
          };
         getUserAttribute(u_handle, 'authring', false, myCallback, myCtx);
     };
-    
-    
+
+
     /**
      * Saves the ring for all authenticated contacts from `u_authring`.
-     * 
+     *
      * @param callback {function}
      *     Callback function to call upon completion of operation. The callback
      *     requires two parameters: `res` (the retrieved authentication ring)
@@ -199,17 +199,17 @@ var authring = (function () {
         setUserAttribute('authring', {'': ns.serialise(u_authring)},
                          false, callback);
     };
-    
-    
+
+
     /**
      * Loads the ring for all authenticated contacts into `u_authring`.
-     * 
+     *
      * @param userhandle {string}
      *     Mega user handle.
      * @return {object}
      *     An object describing the authenticated `fingerprint`, the
      *     authentication `method` and the key `confidence`. `false` in case
-     *     of an unauthorised contact. 
+     *     of an unauthorised contact.
      */
     ns.getContactAuthenticated = function(userhandle) {
         if (u_authring === undefined) {
@@ -221,8 +221,8 @@ var authring = (function () {
             return false;
         }
     };
-    
-    
+
+
     /**
      * Serialises a single authentication record.
      *
@@ -244,9 +244,10 @@ var authring = (function () {
         u_authring[userhandle] = {fingerprint: fingerprint,
                                   method: method,
                                   confidence: confidence};
+        ns.serialise(u_authring);
     };
-    
-    
+
+
     /**
      * Computes the given key's cryptographic fingerprint.
      *
@@ -270,8 +271,8 @@ var authring = (function () {
             return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key)));
         }
     };
-    
-    
+
+
     /**
      * Compare two fingerprints.
      *
@@ -280,9 +281,13 @@ var authring = (function () {
      * @param fp2 {string}
      *     Second fingerprint. in byte or hex string format
      * @return
-     *     True on equality, false otherwise.
+     *     True on equality, `undefined` if one fingerprint is undefined,
+     *     false otherwise.
      */
     ns.equalFingerprints = function(fp1, fp2) {
+        if (fp1 === undefined || fp2 === undefined) {
+            return undefined;
+        }
         if (fp1.length !== 20) {
             fp1 = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(fp1));
         }
@@ -291,7 +296,7 @@ var authring = (function () {
         }
         return fp1 === fp2;
     };
-    
-    
+
+
     return ns;
 }());

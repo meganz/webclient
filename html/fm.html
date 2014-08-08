@@ -108,14 +108,14 @@
 <div class="nw-sorting-menu hidden">
   <div class="context-menu-section">
    <div class="sorting-menu-arrow"></div>
-   <div class="sorting-menu-item active">Name</div>
-   <div class="sorting-menu-item">Status</div>
-   <div class="sorting-menu-item">Last Interaction</div>
+   <div data-by="name" class="sorting-menu-item active">Name</div>
+   <div data-by="status" class="sorting-menu-item">Status</div>
+   <div data-by="last-interaction" class="sorting-menu-item">Last Interaction</div>
    <div class="sorting-item-divider"></div>
   </div>
   <div class="context-menu-section">
-   <div class="sorting-menu-item active">Ascending</div>
-   <div class="sorting-menu-item">Descending</div>
+   <div class="sorting-menu-item active" data-dir="1">Ascending</div>
+   <div class="sorting-menu-item" data-dir="-1">Descending</div>
   </div>
 </div>
 
@@ -802,9 +802,6 @@
 </div>
 
 
-
-
-
 <div class="shared-grid-view hidden">              
 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
   <tr>
@@ -822,10 +819,9 @@
 </div>
 
 
-
- <div class="shared-blocks-view hidden">
-<div class="shared-blocks-scrolling">
-</div>
+<div class="shared-blocks-view hidden">
+  <div class="shared-blocks-scrolling">
+  </div>
 </div>
 
 
@@ -851,8 +847,8 @@
 		 <span>QH7XF</span>
 	   </div>
 	   <div class="fm-verify">
-		 <span">Verify...
-	   </span"></div>
+		 <span>Verify...</span>
+	   </div>
 	   <div class="fm-question">
 	   </div>
 	   <div class="clear"></div>
@@ -885,6 +881,13 @@
  <!-- Please add "hidden" class if there is no shared folders !-->
  <div class="contact-share-notification hidden"></div>
  
+</div>
+
+<div class="fm-empty-incoming contact-details-view hidden">
+    <div class="fm-empty-pad">
+        <div class="fm-empty-incoming-bg"></div>
+        <div class="fm-empty-cloud-txt">You have no incoming shares</div>
+    </div>
 </div>
 
 <div class="files-grid-view contact-details-view hidden">

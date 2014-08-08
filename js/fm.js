@@ -268,7 +268,23 @@ function treesearchUI()
 		if ($(this).attr('class').indexOf('active') == -1) 
 		{
 			$(this).addClass('active');
-			$('.nw-sorting-menu').removeClass('hidden');
+			var menu = $('.nw-sorting-menu').removeClass('hidden')
+				, type = treePanelType()
+			switch (type) {
+			case 'contacts':
+				// show all the options
+				menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+				break;
+			default:
+				// hide everything
+				menu.find('.sorting-item-divider,*[data-by=name],*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+			}
+
+			$('.sorting-menu-item')
+				.removeClass('active')
+				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
+				.addClass('active')
+			return false;
 		} 
 		else 
 		{
@@ -279,13 +295,62 @@ function treesearchUI()
 	$('.sorting-menu-item').unbind('click');
 	$('.sorting-menu-item').bind('click', function() 
 	{
-		if ($(this).attr('class').indexOf('active') == -1) 
+		var $this = $(this)
+		if ($this.attr('class').indexOf('active') == -1) 
 		{
-			$(this).parent().find('.sorting-menu-item').removeClass('active');
-			$(this).addClass('active');
+			$this.parent().find('.sorting-menu-item').removeClass('active');
+			$this.addClass('active');
 			$('.nw-sorting-menu').addClass('hidden');
 			$('.nw-tree-panel-arrows').removeClass('active');
+			var data = $this.data()
+				, type = treePanelType()
+			if (data.dir) {
+				localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir
+			} else {
+				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by
+			}
+			switch (type) {
+			case 'contacts':
+				M.contacts();
+				break;
+			case 'shared-with-me':
+				M.buildtree({h:'shares'});
+				break;
+			case 'cloud-drive':
+				M.buildtree(M.d[M.RootID]);
+				break;
+			case 'rubbish-bin':
+				M.buildtree({h:M.RubbishID});
+				break;
+			}
 		}
+	});
+	initializeTreePanelSorting()
+}
+
+function treePanelType()
+{
+	// is there an easy way of knowing it?
+	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
+}
+
+function treePanelSortElements(type, elements, handlers) {
+	var settings = $.sortTreePanel[type]
+		, sort	 = handlers[settings.by]
+	if (!sort) return;
+	elements.sort(function(a, b) {
+		return sort(a, b) * settings.dir
+	});
+}
+
+function initializeTreePanelSorting()
+{
+	$.sortTreePanel = {}
+	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive','rubbish-bin'], function(key, type) {
+		$.sortTreePanel[type] = {
+			by: anyOf(['name' , 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
+			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1'),
+		};
 	});
 }
 
@@ -480,6 +545,8 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
+		$('.nw-sorting-menu').addClass('hidden')
+		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
@@ -3975,7 +4042,8 @@ function reCalcMenuPosition(m, x, y, ico)
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
-			n.css({'height': nmH + 'px', 'overflow': 'hidden'});
+			n.css({'height': nmH + 'px'});
+			n.addClass('ultra-height');
 		}
 	
 		var top = 'auto', left = '100%', right = 'auto';
@@ -6087,7 +6155,7 @@ function contactUI()
 		var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
 		var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color);
+		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color);
 		$('.contact-top-details .nw-contact-block-avatar').html(avatar);
 		$('.contact-top-details .onlinestatus').removeClass('away offline online busy');
 		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);

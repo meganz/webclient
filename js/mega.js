@@ -369,6 +369,9 @@ function MegaData ()
 			}
 			var e = $('.fm-chat-user-status.' + u.u);
 			if (e.length > 0) $(e).html(this.onlineStatusClass(status)[0]);
+			if ($.sortTreePanel.contacts.by == 'status') {
+				M.contacts(); // we need to resort
+			}
 		}
 	};
 
@@ -526,7 +529,7 @@ function MegaData ()
 					{
 						el = 'div';
 						t = '.contacts-blocks-scrolling';
-						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
+						html = '<a class="file-block ustatus '+ htmlentities(u_h) + ' '+ onlinestatus[1] + '" id="' + htmlentities(this.v[i].h) + '"><span class="nw-contact-status"></span><span class="nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</span><span class="shared-folder-info-block"><span class="shared-folder-name">' + htmlentities(user.name) + '</span><span class="shared-folder-info">' + htmlentities(user.m) + '</span></span> </a>';
 					}
 					else
 					{
@@ -1007,33 +1010,48 @@ function MegaData ()
 		}
 	};
 
+	/**
+	 *	If at sorting stage the two features
+	 *	that we're comparing are equals we 
+	 *	sort by username
+	 */
+	function sortByNameIfEq(diff, a, b) {
+		if (diff == 0 && a.m) return parseInt(a.m.localeCompare(b.m));
+		return diff;
+	}
+
 	this.contacts = function()
 	{
 		var contacts = [];
 		for (var i in M.c['contacts']) contacts.push(M.d[i]);
+		
+		if (typeof this.i_cache != "object") this.i_cache = {}
 
-		if (localStorage.csort) this.csort = localStorage.csort;
-		if (localStorage.csortd) this.csortd= parseInt(localStorage.csortd);
-		if (this.csort == 'shares')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (M.c[a.h] && M.c[b.h])
-				{
-					if (a.name) return a.name.localeCompare(b.name);
+		treePanelSortElements('contacts', contacts, {
+			'last-interaction': function(a, b) {
+				if (!M.i_cache[a.u])
+				{				
+					var cs = M.contactstatus(a.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[a.u] = cs.ts;
 				}
-				else if (M.c[a.h] && !M.c[b.h]) return 1*M.csortd;
-				else if (!M.c[a.h] && M.c[b.h]) return -1*M.csortd;
-				return 0;
-			});
-		}
-		else if (this.csort == 'name')
-		{
-			contacts.sort(function(a,b)
-			{
-				if (a.m) return parseInt(b.m.localeCompare(a.m)*M.csortd);
-			});
-		}
+				if (!M.i_cache[b.u])
+				{	
+					var cs = M.contactstatus(b.u);
+					if (cs.ts == 0) cs.ts = -1;
+					M.i_cache[b.u] = cs.ts;
+				}
+
+				return sortByNameIfEq(M.i_cache[a.u] - M.i_cache[b.u], a, b)
+			},
+			name: function(a, b) {
+				if (a.m) return parseInt(b.m.localeCompare(a.m));
+			},
+			status: function(a, b) {
+				return sortByNameIfEq(M.getSortStatus(a.u) - M.getSortStatus(b.u), a, b)
+			}
+		})
+
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
 		for (var i in contacts)
@@ -1076,6 +1094,7 @@ function MegaData ()
 
 	this.buildtree = function(n)
 	{
+		var stype = "cloud-drive";
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
 		{
 			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
@@ -1083,10 +1102,12 @@ function MegaData ()
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
 			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
+			stype = "shared-with-me";
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
 			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+			stype = "rubbish-bin";
 		}
 
 		if (this.c[n.h])
@@ -1094,9 +1115,10 @@ function MegaData ()
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i] && this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 			// sort by name is default in the tree
-			folders.sort(function(a,b)
-			{
-				if (a.name) return a.name.localeCompare(b.name);
+			treePanelSortElements(stype, folders, {
+				name: function(a, b) {
+					if (a.name) return a.name.localeCompare(b.name);
+				}
 			});
 			for (var i in folders)
 			{			
@@ -1155,14 +1177,14 @@ function MegaData ()
 				if (M.d[h].t)
 				{
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					sm = '<span class="context-submenu"><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + this.RootID + '"></span></span>';
 					break;
 				}
 			}
 			
 			var html = '<span class="context-submenu" id="sm_move">';
-			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
 			html += adv;
 			html += '</span>';
 
@@ -1201,7 +1223,7 @@ function MegaData ()
 				{
 					sub = true;
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					sm = '<span class="context-submenu" ><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + fid + '"></span></span>';
 					break;
 				}
 			}

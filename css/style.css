@@ -6169,10 +6169,12 @@ span.search-number {
 	position: absolute;
 	text-align: center;
 	width: 100%;
-	top: 35%;
+	top: 50%;
 	color: #7A7E7F;
-	font-size: 22px;
+	font-size: 18px;
 	line-height: 38px;
+	height: 40px;
+	margin-top: -8px;
 }
 .ui-selectable-helper {
 	position: absolute;
@@ -7484,8 +7486,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	background-position: 1px 2px;
 	background-size: auto;
 }
-.chat-message-txt .fm-chat-smile.mega { 
-    background-position: -5px -5px;
+.chat-message-txt .fm-chat-smile.mega {
+	background-position: -5px -5px;
 }
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);

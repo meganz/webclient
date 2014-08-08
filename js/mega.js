@@ -614,7 +614,7 @@ function MegaData ()
 					{
 						t = '.grid-table.fm';
 						el = 'tr';
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>';						
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
@@ -1169,14 +1169,14 @@ function MegaData ()
 				if (M.d[h].t)
 				{
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					sm = '<span class="context-submenu"><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + this.RootID + '"></span></span>';
 					break;
 				}
 			}
 			
 			var html = '<span class="context-submenu" id="sm_move">';
-			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
 			html += adv;
 			html += '</span>';
 
@@ -1215,7 +1215,7 @@ function MegaData ()
 				{
 					sub = true;
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					sm = '<span class="context-submenu" ><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + fid + '"></span></span>';
 					break;
 				}
 			}
@@ -2195,7 +2195,7 @@ function MegaData ()
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
-					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
+					+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td>'
 					+ '</tr>');
 			}
 		}
@@ -2213,7 +2213,7 @@ function MegaData ()
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
-			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+			+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>');
 
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
@@ -2574,7 +2574,7 @@ function MegaData ()
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
-					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
+					+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>'
 			);
 			ul_queue.push(f);
 		}

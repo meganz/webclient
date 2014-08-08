@@ -241,6 +241,10 @@ var authring = (function () {
         if (u_authring === undefined) {
             throw new Error('First initialise u_authring by calling authring.getContacts()');
         }
+        if (userhandle === u_handle) {
+            // We don't want to track ourself. Let's get out of here.
+            return;
+        }
         u_authring[userhandle] = {fingerprint: fingerprint,
                                   method: method,
                                   confidence: confidence};

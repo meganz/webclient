@@ -257,6 +257,16 @@ describe("authring unit test", function() {
             assert.deepEqual(u_authring, expected);
             sinon.assert.calledOnce(ns.setContacts);
         });
+
+        it("don't add self", function() {
+            sandbox.stub(window, 'u_authring', {});
+            sandbox.stub(window, 'u_handle', 'me3456789xw');
+            sandbox.stub(ns, 'setContacts');
+            ns.setContactAuthenticated('me3456789xw', ED25519_STRING_FINGERPRINT,
+                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+            assert.deepEqual(u_authring, {});
+            sinon.assert.notCalled(ns.setContacts);
+        });
     });
 
     describe('getContactAuthenticated()', function() {

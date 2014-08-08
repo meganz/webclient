@@ -1010,6 +1010,16 @@ function MegaData ()
 		}
 	};
 
+	/**
+	 *	If at sorting stage the two features
+	 *	that we're comparing are equals we 
+	 *	sort by username
+	 */
+	function sortByNameIfEq(diff, a, b) {
+		if (diff == 0 && a.m) return parseInt(a.m.localeCompare(b.m));
+		return diff;
+	}
+
 	this.contacts = function()
 	{
 		var contacts = [];
@@ -1031,13 +1041,14 @@ function MegaData ()
 					if (cs.ts == 0) cs.ts = -1;
 					M.i_cache[b.u] = cs.ts;
 				}
-				return M.i_cache[a.u] - M.i_cache[b.u];
+
+				return sortByNameIfEq(M.i_cache[a.u] - M.i_cache[b.u], a, b)
 			},
 			name: function(a, b) {
 				if (a.m) return parseInt(b.m.localeCompare(a.m));
 			},
 			status: function(a, b) {
-				return M.getSortStatus(a.u) - M.getSortStatus(b.u)
+				return sortByNameIfEq(M.getSortStatus(a.u) - M.getSortStatus(b.u), a, b)
 			}
 		})
 

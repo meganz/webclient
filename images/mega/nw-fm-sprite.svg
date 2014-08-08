@@ -178,10 +178,10 @@
 <g>
 	<path opacity="0.1" fill="#FFFFFF" enable-background="new    " d="M4,605c0-10.49,8.51-19,19-19s19,8.51,19,19s-8.51,19-19,19
 		S4,615.49,4,605z"/>
-	<circle fill="#222222" cx="23" cy="605" r="17"/>
+	<circle fill="#101010" cx="23" cy="605" r="17"/>
 	<path opacity="0.1" fill="#FFFFFF" enable-background="new    " d="M8,605c0-8.279,6.721-15,15-15c8.279,0,15,6.721,15,15
 		s-6.721,15-15,15C14.721,620,8,613.279,8,605z"/>
-	<circle fill="#222222" cx="23" cy="605" r="13"/>
+	<circle fill="#101010" cx="23" cy="605" r="13"/>
 	<g opacity="0.7">
 		<polygon fill="#FFFFFF" points="17,608 17,604 14,604 19,598 24,604 21,604 21,608 		"/>
 		<polygon fill="#FFFFFF" points="29,601 29,605 32,605 27,611 22,605 25,605 25,601 		"/>
@@ -190,10 +190,10 @@
 <g>
 	<path opacity="0.3" fill="#FFFFFF" enable-background="new    " d="M4,675c0-10.49,8.51-19,19-19s19,8.51,19,19s-8.51,19-19,19
 		S4,685.49,4,675z"/>
-	<circle fill="#222222" cx="23" cy="675" r="17"/>
+	<circle fill="#101010" cx="23" cy="675" r="17"/>
 	<path opacity="0.3" fill="#FFFFFF" enable-background="new    " d="M8,675c0-8.279,6.721-15,15-15c8.279,0,15,6.721,15,15
 		s-6.721,15-15,15C14.721,690,8,683.279,8,675z"/>
-	<circle fill="#222222" cx="23" cy="675" r="13"/>
+	<circle fill="#101010" cx="23" cy="675" r="13"/>
 	<g>
 		<polygon fill="#3FA4DC" points="17,678 17,674 14,674 19,668 24,674 21,674 21,678 		"/>
 		<polygon fill="#73AC43" points="29,671 29,675 32,675 27,681 22,675 25,675 25,671 		"/>

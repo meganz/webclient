@@ -4042,7 +4042,8 @@ function reCalcMenuPosition(m, x, y, ico)
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
-			n.css({'height': nmH + 'px', 'overflow': 'hidden'});
+			n.css({'height': nmH + 'px'});
+			n.addClass('ultra-height');
 		}
 	
 		var top = 'auto', left = '100%', right = 'auto';

@@ -1177,14 +1177,14 @@ function MegaData ()
 				if (M.d[h].t)
 				{
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + this.RootID + '">' + adv + '</span>';
+					sm = '<span class="context-submenu"><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + this.RootID + '"></span></span>';
 					break;
 				}
 			}
 			
 			var html = '<span class="context-submenu" id="sm_move">';
-			html += '<span class="context-menu-item folder-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-			html += '<span class="context-menu-item folder-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
+			html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
+			html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
 			html += adv;
 			html += '</span>';
 
@@ -1223,7 +1223,7 @@ function MegaData ()
 				{
 					sub = true;
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" id="sm_' + fid + '">' + adv + '</span>';
+					sm = '<span class="context-submenu" ><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + fid + '"></span></span>';
 					break;
 				}
 			}

@@ -6094,6 +6094,28 @@ function contactUI()
 		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
 		$('.contact-top-details .contact-details-user-name').text(user.name);
 		$('.contact-top-details .contact-details-email').text(user.m);
+
+        if(onlinestatus[1] != "offline" && u_h != u_handle) {
+            // user is online, lets display the "Start chat" button
+
+            var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
+            $('.fm-start-conversation')
+                .removeClass('hidden')
+                .text(startChatTxt);
+
+        } else {
+            // user is offline, hide the button
+            $('.fm-start-conversation').addClass('hidden');
+        }
+
+        // bind the "start chat" button
+        $('.fm-start-conversation').unbind("click.megaChat");
+        $('.fm-start-conversation').bind("click.megaChat", function(e) {
+            window.location = "#fm/chat/" + u_h;
+
+            return false;
+        });
+
 		$('.nw-contact-item#contact_' + u_h).addClass('selected');
 	}
 }

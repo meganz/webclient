@@ -951,6 +951,8 @@ MegaChat.prototype.init = function() {
             var jid = room.getParticipantsExceptMe()[0];
             var c = self.getContactFromJid(jid);
 
+            if(!c) { return; }
+
             $('#contact_' + c.u + ' .start-chat-button')
                 .text('Show chat')
                 .addClass("active");
@@ -960,6 +962,8 @@ MegaChat.prototype.init = function() {
         if(room.type == "private") {
             var jid = room.getParticipantsExceptMe()[0];
             var c = self.getContactFromJid(jid);
+
+            if(!c) { return; }
 
             $('#contact_' + c.u + ' .start-chat-button')
                 .text('Start chat')
@@ -4323,6 +4327,8 @@ MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
 
         self._conv_ended = true;
 
+        $('.fm-chat-file-button.fm-chat-inline-dialog-button-end-chat', self.$messages).remove();
+
         self.appendDomMessage(
             self.generateInlineDialog(
                 "user-left",
@@ -4331,7 +4337,7 @@ MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
                 "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
                 [],
                 {
-                    'close': {
+                    'end-chat': {
                         'type': 'primary',
                         'text': "Close chat",
                         'callback': function() {

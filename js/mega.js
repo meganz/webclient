@@ -1010,14 +1010,8 @@ function MegaData ()
 		}
 	};
 
-	/**
-	 *	If at sorting stage the two features
-	 *	that we're comparing are equals we 
-	 *	sort by username
-	 */
-	function sortByNameIfEq(diff, a, b) {
-		if (diff == 0 && a.m) return parseInt(a.m.localeCompare(b.m));
-		return diff;
+	function sortContactByName(a, b) {
+		return parseInt(a.m.localeCompare(b.m));
 	}
 
 	this.contacts = function()
@@ -1042,15 +1036,13 @@ function MegaData ()
 					M.i_cache[b.u] = cs.ts;
 				}
 
-				return sortByNameIfEq(M.i_cache[a.u] - M.i_cache[b.u], a, b)
+				return M.i_cache[a.u] - M.i_cache[b.u]
 			},
-			name: function(a, b) {
-				if (a.m) return parseInt(b.m.localeCompare(a.m));
-			},
+			name: sortContactByName,
 			status: function(a, b) {
-				return sortByNameIfEq(M.getSortStatus(a.u) - M.getSortStatus(b.u), a, b)
+				return M.getSortStatus(a.u) - M.getSortStatus(b.u)
 			}
-		})
+		}, sortContactByName)
 
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"

@@ -334,12 +334,14 @@ function treePanelType()
 	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
 }
 
-function treePanelSortElements(type, elements, handlers) {
+function treePanelSortElements(type, elements, handlers, ifEq) {
 	var settings = $.sortTreePanel[type]
 		, sort	 = handlers[settings.by]
 	if (!sort) return;
 	elements.sort(function(a, b) {
-		return sort(a, b) * settings.dir
+		var d = sort(a, b)
+		if (d == 0 && ifEq) return ifEq(a, b)
+		return d * settings.dir
 	});
 }
 

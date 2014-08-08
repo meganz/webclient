@@ -244,7 +244,7 @@ var authring = (function () {
         u_authring[userhandle] = {fingerprint: fingerprint,
                                   method: method,
                                   confidence: confidence};
-        ns.serialise(u_authring);
+        ns.setContacts();
     };
 
 

@@ -249,14 +249,13 @@ describe("authring unit test", function() {
 
         it("normal behaviour", function() {
             sandbox.stub(window, 'u_authring', {});
-            sandbox.stub(ns, 'serialise');
+            sandbox.stub(ns, 'setContacts');
             ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT,
                                        ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
             var expected = {'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                             method: 0, confidence: 0}};
             assert.deepEqual(u_authring, expected);
-            sinon.assert.calledOnce(ns.serialise);
-            assert.deepEqual(ns.serialise.args[0][0], expected);
+            sinon.assert.calledOnce(ns.setContacts);
         });
     });
 

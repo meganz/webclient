@@ -2706,7 +2706,7 @@ function _checkFingerprintEd25519(userhandle) {
     }
     if (value.authenticated === false) {
         authring.setContactAuthenticated(userhandle,
-                                         value.authenticated.fingerprint,
+                                         authring.computeFingerprint(pubEd25519[userhandle], 'string'),
                                          authring.AUTHENTICATION_METHOD.SEEN,
                                          authring.KEY_CONFIDENCE.UNSURE);
     }

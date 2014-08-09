@@ -14,9 +14,24 @@ describe("authring unit test", function() {
     var sandbox = null;
 
     // Some test data.
+    var ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
     var ED25519_HEX_FINGERPRINT = '5b27aa5589179770e47575b162a1ded97b8bfc6d';
     var ED25519_STRING_FINGERPRINT = base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+    var RSA_PUB_KEY = [atob('1XJHwX9WYEVk7KOack5nhOgzgnYWrVdt0UY2yn5Lw38mPzkVn'
+                            + 'kHCmguqWIfL5bzVpbHHhlG9yHumvyyu9r1gKUMz4Y/1cf69'
+                            + '1WIQmRGfg8dB2TeRUSvwb2A7EFGeFqQZHclgvpM2aq4PXrP'
+                            + 'PmQAciTxjguxcL1lem/fXGd1X6KKxPJ+UfQ5TZbV4O2aOwY'
+                            + 'uxys1YHh3mNHEp/xE1/fx292hdejPTJIX8IC5zjsss76e9P'
+                            + 'SVOgSrz+jQQYKbKpT5Yamml98bEZuLY9ncMGUmw5q4WHi/O'
+                            + 'dcvskHUydAL0qNOqbCwvt1Y7xIQfclR0SQE/AbwuJui0mt3'
+                            + 'PuGjM42T/DQ=='),
+                       atob('AQE='), 2048];
+    var RSA_HEX_FINGERPRINT = 'c8a7835ba37147f2f5bb60b059c9f003fa69a552';
+    var RSA_STRING_FINGERPRINT = base64urldecode('yKeDW6NxR_L1u2CwWcnwA_pppVI');
+    var RSA_SIGNED_PUB_KEY = atob('vGctqrIj0ks00jExcwcG5dhiqTqQi82tjOkBTmP5i'
+                                  + 'fz6E0/PGt7dlpF+Qjh6exOnASGQf8UGi+4DW/WQ'
+                                  + '90jGAw==');
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
@@ -176,54 +191,98 @@ describe("authring unit test", function() {
         });
     });
 
-    describe('computeFingerprint', function() {
-        it("default format", function() {
-            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY),
-                               '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+    describe('fingerprints and signing', function() {
+        describe('computeFingerprintEd25519()', function() {
+            it("default format", function() {
+                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY),
+                                   ED25519_HEX_FINGERPRINT);
+            });
+
+            it("hex", function() {
+                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY, "hex"),
+                                   ED25519_HEX_FINGERPRINT);
+            });
+
+            it("string", function() {
+                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY, "string"),
+                                   ED25519_STRING_FINGERPRINT);
+            });
         });
 
-        it("hex", function() {
-            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, "hex"),
-                               '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+        describe('computeFingerprintRSA()', function() {
+            it("default format", function() {
+                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY),
+                                   RSA_HEX_FINGERPRINT);
+            });
+
+            it("hex", function() {
+                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY, "hex"),
+                                   RSA_HEX_FINGERPRINT);
+            });
+
+            it("string", function() {
+                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY, "string"),
+                                   RSA_STRING_FINGERPRINT);
+            });
         });
 
-        it("string", function() {
-            assert.strictEqual(base64urlencode(ns.computeFingerprint(ED25519_PUB_KEY, "string")),
-                               'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
-        });
-    });
-
-    describe('equalFingerprints', function() {
-        it("equality", function() {
-            var tests = [['5b27aa5589179770e47575b162a1ded97b8bfc6d', '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         [base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0'), '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         ['5b27aa5589179770e47575b162a1ded97b8bfc6d', base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')],
-                         [base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0'), base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')]];
-            for (var i = 0; i < tests.length; i++) {
-                assert.ok(ns.equalFingerprints(tests[i][0], tests[i][1]));
-            }
+        describe('signRSAkey()', function() {
+            it("all normal", function() {
+                sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
+                sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
+                assert.strictEqual(btoa(ns.signRSAkey(RSA_PUB_KEY)),
+                                   btoa(RSA_SIGNED_PUB_KEY));
+            });
         });
 
-        it("inequality", function() {
-            var tests = [['5b27aa5589179770e47575b162a1ded97b8bfc6e', '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         [base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'), '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         ['5b27aa5589179770e47575b162a1ded97b8bfc6e', base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')],
-                         [base64urldecode('XyeqVYkXl3DkdXWxYqHe2XuL_G0'), base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0')],
-                         [undefined, '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         ['5b27aa5589179770e47575b162a1ded97b8bfc6e', undefined],
-                         [undefined, undefined]];
-            for (var i = 0; i < tests.length; i++) {
-                assert.notOk(ns.equalFingerprints(tests[i][0], tests[i][1]));
-            }
+        describe('verifyRSAkey()', function() {
+            it("good signature", function() {
+                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, ED25519_PUB_KEY), true);
+            });
+
+            it("bad signature", function() {
+                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 63) + String.fromCharCode(42),
+                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+            });
+
+            it("bad signature with bad point", function() {
+                assert.strictEqual(ns.verifyRSAkey(String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(1),
+                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+            });
         });
 
-        it("undefined", function() {
-            var tests = [[undefined, '5b27aa5589179770e47575b162a1ded97b8bfc6d'],
-                         ['5b27aa5589179770e47575b162a1ded97b8bfc6e', undefined],
-                         [undefined, undefined]];
-            for (var i = 0; i < tests.length; i++) {
-                assert.strictEqual(ns.equalFingerprints(tests[i][0], tests[i][1]), undefined);
-            }
+        describe('equalFingerprints()', function() {
+            it("equality", function() {
+                var tests = [[ED25519_HEX_FINGERPRINT, ED25519_HEX_FINGERPRINT],
+                             [ED25519_STRING_FINGERPRINT, ED25519_HEX_FINGERPRINT],
+                             [ED25519_HEX_FINGERPRINT, ED25519_STRING_FINGERPRINT],
+                             [ED25519_STRING_FINGERPRINT, ED25519_STRING_FINGERPRINT]];
+                for (var i = 0; i < tests.length; i++) {
+                    assert.ok(ns.equalFingerprints(tests[i][0], tests[i][1]));
+                }
+            });
+
+            it("inequality", function() {
+                var tests = [[RSA_HEX_FINGERPRINT, ED25519_HEX_FINGERPRINT],
+                             [RSA_STRING_FINGERPRINT, ED25519_HEX_FINGERPRINT],
+                             [RSA_HEX_FINGERPRINT, ED25519_STRING_FINGERPRINT],
+                             [RSA_STRING_FINGERPRINT, ED25519_STRING_FINGERPRINT],
+                             [undefined, ED25519_HEX_FINGERPRINT],
+                             [RSA_HEX_FINGERPRINT, undefined],
+                             [undefined, undefined]];
+                for (var i = 0; i < tests.length; i++) {
+                    assert.notOk(ns.equalFingerprints(tests[i][0], tests[i][1]));
+                }
+            });
+
+            it("undefined", function() {
+                var tests = [[undefined, ED25519_HEX_FINGERPRINT],
+                             [RSA_HEX_FINGERPRINT, undefined],
+                             [undefined, undefined]];
+                for (var i = 0; i < tests.length; i++) {
+                    assert.strictEqual(ns.equalFingerprints(tests[i][0], tests[i][1]), undefined);
+                }
+            });
         });
     });
 

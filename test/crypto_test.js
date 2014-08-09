@@ -156,7 +156,7 @@ describe("crypto unit test", function() {
             it("internal callback, custom callback, cached value", function() {
                 sandbox.stub(window, 'u_authring', {});
                 sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                sandbox.stub(authring, 'computeFingerprintEd25519').returns(ED25519_FINGERPRINT);
                 sandbox.stub(authring, 'setContacts');
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
@@ -172,7 +172,7 @@ describe("crypto unit test", function() {
                 var authenticated = {fingerprint: undefined, method: 0, confidence: 0};
                 sandbox.stub(window, 'u_authring', {'you456789xw': authenticated});
                 sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                sandbox.stub(authring, 'computeFingerprintEd25519').returns(ED25519_FINGERPRINT);
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});

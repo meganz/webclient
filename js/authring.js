@@ -253,22 +253,88 @@ var authring = (function () {
 
 
     /**
-     * Computes the given key's cryptographic fingerprint.
+     * Computes the given Ed25519 public key's cryptographic fingerprint.
      *
      * @param key {string}
      *     Byte string of key.
      * @param format {string}
      *     Format in which to return the fingerprint. Valid values: "string"
      *     and "hex" (default: "hex").
-     * @return
+     * @return {string}
      *     Fingerprint value in the requested format.
      */
-    ns.computeFingerprint = function(key, format) {
+    ns.computeFingerprintEd25519 = function(key, format) {
         format = format || "hex";
         if (format === "string") {
             return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key));
         } else if (format === "hex") {
             return asmCrypto.SHA1.hex(key);
+        }
+    };
+
+
+    /**
+     * Computes the given RSA public key's cryptographic fingerprint.
+     *
+     * @param key {array}
+     *     Array format of public key. Index 0 is the modulo, index 1 is the
+     *     exponent, both in byte string format.
+     * @param format {string}
+     *     Format in which to return the fingerprint. Valid values: "string"
+     *     and "hex" (default: "hex").
+     * @return {string}
+     *     Fingerprint value in the requested format.
+     */
+    ns.computeFingerprintRSA = function(key, format) {
+        format = format || "hex";
+        var value = key[0] + key[1];
+        if (format === "string") {
+            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
+        } else if (format === "hex") {
+            return asmCrypto.SHA1.hex(value);
+        }
+    };
+
+
+    /**
+     * Signs the given RSA public key using our own Ed25519 key.
+     *
+     * @param pubKey {array}
+     *     Array format of public key. Index 0 is the modulo, index 1 is the
+     *     exponent, both in byte string format.
+     * @return
+     *     EdDSA signature of the key as a byte string.
+     */
+    ns.signRSAkey = function(pubKey) {
+        var keyString = pubKey[0] + pubKey[1];
+        return jodid25519.eddsa.sign(keyString, u_privEd25519, u_pubEd25519);
+    };
+
+
+    /**
+     * Verifies the signature of the given RSA public key's against the
+     * contact's Ed25519 key.
+     *
+     * @param signature {string}
+     *     EdDSA signature in byte string format.
+     * @param pubKey {array}
+     *     Array format of public key. Index 0 is the modulo, index 1 is the
+     *     exponent, both in byte string format.
+     * @param signPubKey {string}
+     *     Contact's Ed25519 public key to verify the signature.
+     * @return
+     *     True on a good signature verification, false otherwise.
+     */
+    ns.verifyRSAkey = function(signature, pubKey, signPubKey) {
+        var keyString = pubKey[0] + pubKey[1];
+        try {
+            return jodid25519.eddsa.verify(signature, keyString, signPubKey);
+        } catch(e){
+            if (e === "Point is not on curve") {
+                return false;
+            } else {
+                throw e;
+            }
         }
     };
 

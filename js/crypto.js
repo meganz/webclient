@@ -2700,13 +2700,13 @@ function _checkFingerprintEd25519(userhandle) {
                  authenticated: authring.getContactAuthenticated(userhandle)};
     if (value.authenticated
             && authring.equalFingerprints(value.authenticated.fingerprint,
-                                          authring.computeFingerprint(pubEd25519[userhandle]))
+                                          authring.computeFingerprintEd25519(pubEd25519[userhandle]))
                === false) {
         throw new Error('Fingerprint does not match previously authenticated one!');
     }
     if (value.authenticated === false) {
         authring.setContactAuthenticated(userhandle,
-                                         authring.computeFingerprint(pubEd25519[userhandle], 'string'),
+                                         authring.computeFingerprintEd25519(pubEd25519[userhandle], 'string'),
                                          authring.AUTHENTICATION_METHOD.SEEN,
                                          authring.KEY_CONFIDENCE.UNSURE);
     }
@@ -2778,7 +2778,7 @@ function getPubEd25519(userhandle, callback) {
 function getFingerprintEd25519(userhandle, callback, format) {
     if (pubEd25519[userhandle]) {
         if (callback) {
-            callback(authring.computeFingerprint(pubEd25519[userhandle], format),
+            callback(authring.computeFingerprintEd25519(pubEd25519[userhandle], format),
                      userhandle);
         }
     } else {
@@ -2787,7 +2787,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
                 if (ctx.callback3) {
-                    ctx.callback3(authring.computeFingerprint(res, format), ctx.u);
+                    ctx.callback3(authring.computeFingerprintEd25519(res, format), ctx.u);
                 }
             } else if (ctx.callback3) {
                 ctx.callback3(false, ctx.u);

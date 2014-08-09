@@ -236,18 +236,20 @@ function treesearchUI()
 	$('.nw-fm-tree-header input').unbind('keyup');
 	$('.nw-fm-tree-header input').bind('keyup', function(e) 
 	{
+		var h = $(this).parent();
 		if (e.keyCode == 27)
 		{
-			$(this).parent().removeClass('filled-input');
-			$(this).parent().find('input').val('');
-			$(this).parent().find('input').blur();
+			h.removeClass('filled-input');
+			$(this).val('');
+			$(this).blur();
 			treesearch=false;
 		}
 		else
 		{
-			$(this).parent().addClass('filled-input');
-			treesearch = $(this).parent().find('input').val();
+			h.addClass('filled-input');
+			treesearch = $(this).val();
 		}
+		if ($(this).val()=='') h.removeClass('filled-input');
 		treeredraw()
 	});
 	
@@ -256,7 +258,7 @@ function treesearchUI()
 	{
 		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') 
 		{
-			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
+			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
 			$(this).val($(this).attr('placeholder'));
 		} 
 		else $(this).parent('.nw-fm-tree-header').removeClass('focused-input');

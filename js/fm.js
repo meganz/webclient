@@ -2540,9 +2540,12 @@ function gridUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.files-grid-view.contact-details-view').removeClass('hidden');
-		initGridScrolling();
-		$.gridHeader();
+		if (M.v.length > 0) 
+		{
+			$('.files-grid-view.contact-details-view').removeClass('hidden');
+			initGridScrolling();
+			$.gridHeader();
+		}
 	}
 	else
 	{
@@ -3557,8 +3560,11 @@ function iconUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.fm-blocks-view.contact-details-view').removeClass('hidden');
-		initFileblocksScrolling2();
+		if (M.v.length > 0) 
+		{		
+			$('.fm-blocks-view.contact-details-view').removeClass('hidden');
+			initFileblocksScrolling2();
+		}
 	}
 	else
 	{

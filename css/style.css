@@ -3418,15 +3418,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-conversations-unread {
 	position: absolute;
 	z-index: 10;
-	right: 17px;
+	right: 15px;
 	top: 5px;
 	color: white;
 	background-color: #1FA4E7;
 	height: 14px;
 	min-width: 14px;
 	text-align: center;
-	line-height: 13px;
-	font-size: 10px;
+	line-height: 14px;
+	font-size: 9px;
 	padding: 0 3px;
 	-moz-border-radius: 14px;
 	-webkit-border-radius: 14px;
@@ -8375,11 +8375,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-account-button {
 	cursor: pointer;
 	display: inline-block;
-	margin: 9px 5px 0 5px;
+	margin: 11px 5px 0 5px;
 	float: none;
 	font-size: 12px;
-	line-height: 27px;
-	height: 29px;
+	line-height: 25px;
+	height: 26px;
 }
 .fm-dialog-button.links-button {
 	position: relative;
@@ -10578,8 +10578,8 @@ table {
 	margin-left: 120px;
 }
 .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
-	height: 30px;
-	line-height: 28px;
+	height: 28px;
+	line-height: 26px;
 	background-color: #D52600;
 	color: white;
 	float: left;
@@ -10616,6 +10616,9 @@ table {
 .fm-account-labels {
 	float: left;
 	width: 120px;
+}
+.fm-account-labels .fm-account-pass-lines {
+	height: 20px;
 }
 .fm-account-labels .labels-block {
 	display: table-row;

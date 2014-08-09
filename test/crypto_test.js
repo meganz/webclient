@@ -156,7 +156,7 @@ describe("crypto unit test", function() {
             it("internal callback, custom callback, cached value", function() {
                 sandbox.stub(window, 'u_authring', {});
                 sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                sandbox.stub(authring, 'computeFingerprintEd25519').returns(ED25519_FINGERPRINT);
                 sandbox.stub(authring, 'setContacts');
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
@@ -172,7 +172,7 @@ describe("crypto unit test", function() {
                 var authenticated = {fingerprint: undefined, method: 0, confidence: 0};
                 sandbox.stub(window, 'u_authring', {'you456789xw': authenticated});
                 sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                sandbox.stub(authring, 'computeFingerprint').returns(ED25519_FINGERPRINT);
+                sandbox.stub(authring, 'computeFingerprintEd25519').returns(ED25519_FINGERPRINT);
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
@@ -260,25 +260,6 @@ describe("crypto unit test", function() {
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
                 assert.strictEqual(myCallback.args[0][0], '5b27aa5589179770e47575b162a1ded97b8bfc6d');
-            });
-
-            it("internal callback, custom callback, bytes", function() {
-                sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                var myCallback = sinon.spy();
-                getFingerprintEd25519('you456789xw', myCallback ,"bytes");
-                assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
-                sinon.assert.calledOnce(myCallback);
-                assert.deepEqual(myCallback.args[0][0],
-                                 asmCrypto.hex_to_bytes('5b27aa5589179770e47575b162a1ded97b8bfc6d'));
-            });
-
-            it("internal callback, custom callback, base64", function() {
-                sandbox.stub(window, 'pubEd25519', {'you456789xw': ED25519_PUB_KEY});
-                var myCallback = sinon.spy();
-                getFingerprintEd25519('you456789xw', myCallback ,"base64");
-                assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
-                sinon.assert.calledOnce(myCallback);
-                assert.deepEqual(myCallback.args[0][0], 'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
             });
 
             it("internal callback, custom callback, string", function() {

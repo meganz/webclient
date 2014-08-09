@@ -3418,15 +3418,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-conversations-unread {
 	position: absolute;
 	z-index: 10;
-	right: 17px;
+	right: 15px;
 	top: 5px;
 	color: white;
 	background-color: #1FA4E7;
 	height: 14px;
 	min-width: 14px;
 	text-align: center;
-	line-height: 13px;
-	font-size: 10px;
+	line-height: 14px;
+	font-size: 9px;
 	padding: 0 3px;
 	-moz-border-radius: 14px;
 	-webkit-border-radius: 14px;
@@ -6445,7 +6445,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.6);
 	color: white;
 }
-.fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div {
+.fmholder div, .fmholder a, .fmholder span, .fmholder td, div.new-bottom-pages div.new-left-menu-link, div.new-bottom-pages a.dev-new-button, .fm-subfolders, .add-contact-item, .share-folder-info, .fm-dialog-header, .fm-share-body, .share-dialog div, .fm-chat-file-button {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -7149,22 +7149,36 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-chat-file-button {
 	float: none;
-	height: 30px;
-	background-color: white;
-	font-size: 13px;
-	line-height: 25px;
+	height: 24px;
+	background-color: rgba(222,0,0,0.7);
+	font-size: 12px;
+	line-height: 22px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
-	padding: 0 15px;
+	padding: 0 10px;
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
 	border: 2px solid #b2b2b2;
-	color: #434343;
+	color: white;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	display: inline-block;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	border: 0;
+}
+.fm-chat-file-button:hover {
+	background-color: rgba(222,0,0,1);
+}
+.fm-chat-inline-dialog-button-end-chat {
+	margin-top: -1px;
+	float: right;
+	margin-right: -15px;
 }
 .fm-chat-file-button.verify-button, .fm-chat-file-button.skip-button {
 	margin: 9px 10px 0 0;
@@ -8375,11 +8389,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-account-button {
 	cursor: pointer;
 	display: inline-block;
-	margin: 9px 5px 0 5px;
+	margin: 11px 5px 0 5px;
 	float: none;
 	font-size: 12px;
-	line-height: 27px;
-	height: 29px;
+	line-height: 25px;
+	height: 26px;
 }
 .fm-dialog-button.links-button {
 	position: relative;
@@ -10578,8 +10592,8 @@ table {
 	margin-left: 120px;
 }
 .fm-account-change-avatar, .fm-account-save, .fm-account-cancel {
-	height: 30px;
-	line-height: 28px;
+	height: 28px;
+	line-height: 26px;
 	background-color: #D52600;
 	color: white;
 	float: left;
@@ -10616,6 +10630,9 @@ table {
 .fm-account-labels {
 	float: left;
 	width: 120px;
+}
+.fm-account-labels .fm-account-pass-lines {
+	height: 20px;
 }
 .fm-account-labels .labels-block {
 	display: table-row;

@@ -1156,6 +1156,7 @@ function MegaData ()
 	{
 				
 		var icon = '<span class="context-menu-icon"></span>';
+		var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 		// divider & advanced
 		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
 
@@ -1169,16 +1170,17 @@ function MegaData ()
 				if (M.d[h].t)
 				{
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu"><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + this.RootID + '"></span></span>';
+					sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
 					break;
 				}
 			}
 			
-			var html = '<span class="context-submenu" id="sm_move">';
+			var html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
 			html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
 			html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
 			html += adv;
-			html += '</span>';
+			html += arrow;
+			html += '</span></span>';
 
 			$('.context-menu-item.move-item').after(html);
 		};
@@ -1215,7 +1217,7 @@ function MegaData ()
 				{
 					sub = true;
 					cs = ' contains-submenu';
-					sm = '<span class="context-submenu" ><span class="context-top-arrow"></span><span class="context-bottom-arrow"></span><span class="context-scrolling-block" id="sm_' + fid + '"></span></span>';
+					sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
 					break;
 				}
 			}
@@ -1223,8 +1225,11 @@ function MegaData ()
 //				var sharedfolder = '';
 //				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
 			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
-			$('#sm_' + id).prepend(html);
-			if (sub) this.buildSubmenu(fid);
+			$('#csb_' + id).prepend(html);
+			if (sub)
+			{
+				this.buildSubmenu(fid);
+			}
 		}
 		
 		initContextUI();

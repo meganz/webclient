@@ -557,7 +557,7 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left');
+		b.removeClass('active left-position overlap-right overlap-left mega-height');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -1085,14 +1085,17 @@ function fmremove()
 }
 function initContextUI()
 {
-	var c = '.context-menu-item';
 	
+//	$('.context-scrolling-block').off('mousemove');
+//	$('.context-scrolling-block').on('mousemove', scrollMegaSubMenu(event));
+	
+	var c = '.context-menu-item';
 	$(c).unbind('mouseover');
-	$(c).bind('mouseover', function(e)
+	$(c).bind('mouseover', function()
 	{
-		if ($(this).parent().is('.context-submenu'))
+		if ($(this).parent().parent().is('.context-submenu'))// is move... or download...
 		{
-			if (!$(this).is('.contains-submenu'))
+			if (!$(this).is('.contains-submenu'))// if just item hide child context-submenu
 			{
 				$(this).parent().children().removeClass('active opened');
 				$(this).parent().find('.context-submenu').addClass('hidden');
@@ -1100,7 +1103,7 @@ function initContextUI()
 		}
 		else
 		{
-			if (!$(this).is('.contains-submenu'))
+			if (!$(this).is('.contains-submenu'))// Hide all submenues, for download and for move...
 			{
 				$('.context-menu .context-submenu.active ').removeClass('active');
 				$('.context-menu .contains-submenu.opened').removeClass('opened');
@@ -1112,11 +1115,12 @@ function initContextUI()
 	$(c+'.contains-submenu').unbind('mouseover');
 	$(c+'.contains-submenu').bind('mouseover', function(e)
 	{
-		var a = $(this).next();
+		var a = $(this).next();// context-submenu
 		a.children().removeClass('active opened');
 		a.find('.context-submenu').addClass('hidden');
-		
-		var b = $(this).parent('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
+		a.find('.opened').removeClass('opened');
+		// situation when we have 2 contains-submenus one below another
+		var b = $(this).closest('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
 		if (b.length)
 		{
 			b.removeClass('active opened')
@@ -4004,17 +4008,11 @@ function reCalcMenuPosition(m, x, y, ico)
 		var b = y + nmH - nTop;// bottom of submenu
 		var pPos;
 		
-//		if (nmH > (maxY - TOP_MARGIN))// handle "huge" menu
-//		{
-//		}
-//		else
-		{
-			if (a.is('.context-menu-section')) pPos = getHtmlElemPos(m.closest('.context-menu')[0]);
-			else pPos = getHtmlElemPos(a[0]);
-			
-			if (b > maxY) top = ((y - pPos.y) - (b - maxY)) + 'px';
-			else top = (y - pPos.y) + 'px';			
-		}
+		if (a.is('.context-menu-section')) pPos = getHtmlElemPos(m.closest('.context-menu')[0]);
+		else pPos = getHtmlElemPos(a[0], true);
+
+		if (b > maxY) top = ((y - pPos.y) - (b - maxY)) + 'px';
+		else top = (y - pPos.y) + 'px';			
 		
 		return top;
 	};
@@ -4044,14 +4042,18 @@ function reCalcMenuPosition(m, x, y, ico)
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
+			var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_',''));
+			$(tmp).addClass('context-scrolling-block');
+			tmp.addEventListener('mousemove', scrollMegaSubMenu);
+
+			n.addClass('mega-height');
 			n.css({'height': nmH + 'px'});
-			n.addClass('ultra-height');
 		}
 	
 		var top = 'auto', left = '100%', right = 'auto';
 		
 		top = this.horPos();
-		if (m.parent('.left-position').length === 0)
+		if (m.parent().parent('.left-position').length === 0)
 		{
 			if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
 			else if (minX <= (x - nmW)) n.addClass('left-position');
@@ -4135,19 +4137,24 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollHugeMenu(e, cont)
+function scrollMegaSubMenu(e)
 {
+//	e.stopPropagation();
+	
 	var ey = e.pageY;
-	var k = document.getElementById(cont);
-	var pNode = k.parentNode;
+//	var k = e.target;
+	var pNode = $(e.target).closest('.context-scrolling-block')[0];
 
-	var h = pNode.offsetHeight;
-	var dy = h * 0.1;
-	var pos = getHtmlElemPos(pNode);
-	var py = (ey - pos.y - dy) / (h - dy * 2);
-	if (py > 1) py = 1;
-	if (py < 0) py = 0;
-	pNode.scrollTop = py * (pNode.scrollHeight - h);
+	if (typeof pNode !== 'undefined')
+	{
+		var h = pNode.offsetHeight;
+		var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
+		var pos = getHtmlElemPos(pNode, true);
+		var py = (ey - pos.y - dy) / (h - dy * 2);
+		if (py > 1) py = 1;
+		if (py < 0) py = 0;
+		pNode.scrollTop = py * (pNode.scrollHeight - h);
+	}
 }
 
 var tt;

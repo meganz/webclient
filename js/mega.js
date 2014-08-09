@@ -463,6 +463,7 @@ function MegaData ()
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == 'contacts') $('.fm-empty-incoming.contact-details-view').removeClass('hidden');			
 		}
 		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
 		{
@@ -937,17 +938,11 @@ function MegaData ()
 		}
 		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
-		
-		
 			$('.fm-right-files-block').removeClass('hidden');
-
 			if (d) console.time('time for rendering');
-
 			if (id.substr(0,6) == 'search') M.filterBySearch(M.currentdirid);
 			else M.filterByParent(M.currentdirid);
-
 			var viewmode=0;
-
 			if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode)
 			{
 				if (fmconfig.viewmode) viewmode = fmconfig.viewmode;
@@ -963,7 +958,6 @@ function MegaData ()
 				}
 			}
 			M.viewmode=viewmode;
-
 			if (fmconfig.uisorting && fmconfig.sorting) M.doSort(fmconfig.sorting.n,fmconfig.sorting.d);
 			else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) M.doSort(fmconfig.sortmodes[id].n,fmconfig.sortmodes[id].d);
 			else M.doSort('name',1);
@@ -985,29 +979,6 @@ function MegaData ()
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
-	};
-
-	this.runbugfix = function()
-	{
-		for (var i in M.d)
-		{
-			if (M.d[i].t && M.d[i].shares)
-			{
-				var nodes = fm_getnodes(M.d[i].h);
-				console.log(nodes);
-
-				for (var j in nodes)
-				{
-					var n = M.d[nodes[j]];
-					if (n.name)
-					{
-
-						console.log(n.name);
-						console.log(n.key);
-					}
-				}
-			}
-		}
 	};
 
 	function sortContactByName(a, b) {

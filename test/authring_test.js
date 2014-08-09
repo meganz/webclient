@@ -187,16 +187,6 @@ describe("authring unit test", function() {
                                '5b27aa5589179770e47575b162a1ded97b8bfc6d');
         });
 
-        it("bytes", function() {
-            assert.deepEqual(ns.computeFingerprint(ED25519_PUB_KEY, "bytes"),
-                             asmCrypto.hex_to_bytes('5b27aa5589179770e47575b162a1ded97b8bfc6d'));
-        });
-
-        it("base64", function() {
-            assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, "base64"),
-                               'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
-        });
-
         it("string", function() {
             assert.strictEqual(base64urlencode(ns.computeFingerprint(ED25519_PUB_KEY, "string")),
                                'WyeqVYkXl3DkdXWxYqHe2XuL_G0');

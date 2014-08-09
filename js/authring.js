@@ -258,21 +258,17 @@ var authring = (function () {
      * @param key {string}
      *     Byte string of key.
      * @param format {string}
-     *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
-     *     "string" and "base64" (default: "hex").
+     *     Format in which to return the fingerprint. Valid values: "string"
+     *     and "hex" (default: "hex").
      * @return
      *     Fingerprint value in the requested format.
      */
     ns.computeFingerprint = function(key, format) {
         format = format || "hex";
-        if (format === "bytes") {
-            return asmCrypto.SHA1.bytes(key);
-        } else if (format === "string") {
+        if (format === "string") {
             return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key));
         } else if (format === "hex") {
             return asmCrypto.SHA1.hex(key);
-        } else if (format === "base64") {
-            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key)));
         }
     };
 

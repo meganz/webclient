@@ -334,12 +334,14 @@ function treePanelType()
 	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
 }
 
-function treePanelSortElements(type, elements, handlers) {
+function treePanelSortElements(type, elements, handlers, ifEq) {
 	var settings = $.sortTreePanel[type]
 		, sort	 = handlers[settings.by]
 	if (!sort) return;
 	elements.sort(function(a, b) {
-		return sort(a, b) * settings.dir
+		var d = sort(a, b)
+		if (d == 0 && ifEq) return ifEq(a, b)
+		return d * settings.dir
 	});
 }
 
@@ -6169,6 +6171,28 @@ function contactUI()
 		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
 		$('.contact-top-details .contact-details-user-name').text(user.name);
 		$('.contact-top-details .contact-details-email').text(user.m);
+
+        if(onlinestatus[1] != "offline" && u_h != u_handle) {
+            // user is online, lets display the "Start chat" button
+
+            var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
+            $('.fm-start-conversation')
+                .removeClass('hidden')
+                .text(startChatTxt);
+
+        } else {
+            // user is offline, hide the button
+            $('.fm-start-conversation').addClass('hidden');
+        }
+
+        // bind the "start chat" button
+        $('.fm-start-conversation').unbind("click.megaChat");
+        $('.fm-start-conversation').bind("click.megaChat", function(e) {
+            window.location = "#fm/chat/" + u_h;
+
+            return false;
+        });
+
 		$('.nw-contact-item#contact_' + u_h).addClass('selected');
 	}
 }

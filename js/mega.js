@@ -614,7 +614,7 @@ function MegaData ()
 					{
 						t = '.grid-table.fm';
 						el = 'tr';
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a href="" class="grid-url-arrow"><span></span></a></td></tr>';						
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>';						
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
@@ -1010,14 +1010,8 @@ function MegaData ()
 		}
 	};
 
-	/**
-	 *	If at sorting stage the two features
-	 *	that we're comparing are equals we 
-	 *	sort by username
-	 */
-	function sortByNameIfEq(diff, a, b) {
-		if (diff == 0 && a.m) return parseInt(a.m.localeCompare(b.m));
-		return diff;
+	function sortContactByName(a, b) {
+		return parseInt(a.m.localeCompare(b.m));
 	}
 
 	this.contacts = function()
@@ -1042,15 +1036,13 @@ function MegaData ()
 					M.i_cache[b.u] = cs.ts;
 				}
 
-				return sortByNameIfEq(M.i_cache[a.u] - M.i_cache[b.u], a, b)
+				return M.i_cache[a.u] - M.i_cache[b.u]
 			},
-			name: function(a, b) {
-				if (a.m) return parseInt(b.m.localeCompare(a.m));
-			},
+			name: sortContactByName,
 			status: function(a, b) {
-				return sortByNameIfEq(M.getSortStatus(a.u) - M.getSortStatus(b.u), a, b)
+				return M.getSortStatus(a.u) - M.getSortStatus(b.u)
 			}
-		})
+		}, sortContactByName)
 
 		var html = '',html2 = '',status='',img;
 		// status can be: "online"/"away"/"busy"/"offline"
@@ -2208,7 +2200,7 @@ function MegaData ()
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
-					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td>'
+					+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td>'
 					+ '</tr>');
 			}
 		}
@@ -2226,7 +2218,7 @@ function MegaData ()
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
-			+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>');
+			+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>');
 
 //		$('.tranfer-view-icon').addClass('active');
 //		$('.fmholder').addClass('transfer-panel-opened');
@@ -2587,7 +2579,7 @@ function MegaData ()
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
-					+ '<td class="grid-url-field"><a href="" class="grid-url-arrow"></a></td></tr>'
+					+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>'
 			);
 			ul_queue.push(f);
 		}

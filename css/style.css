@@ -644,7 +644,7 @@ a.account-manage-button:hover {
 	color: white;
 }
 .account-bandwidth-txt {
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 16px;
 	color: #6c6d6f;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
@@ -6169,10 +6169,12 @@ span.search-number {
 	position: absolute;
 	text-align: center;
 	width: 100%;
-	top: 35%;
+	top: 50%;
 	color: #7A7E7F;
-	font-size: 22px;
+	font-size: 18px;
 	line-height: 38px;
+	height: 40px;
+	margin-top: -8px;
 }
 .ui-selectable-helper {
 	position: absolute;
@@ -7481,8 +7483,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	background-image: url(../images/mega/top-sprite.svg);
 	background-position: left top;
 	background-repeat: no-repeat;
-	background-position: -5px -5px;
+	background-position: 1px 2px;
 	background-size: auto;
+}
+.chat-message-txt .fm-chat-smile.mega {
+	background-position: -5px -5px;
 }
 .fm-chat-smile:hover {
 	background-color: rgba(255,255,255,0.1);
@@ -8561,7 +8566,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: relative;
-	font-size: 13px;
+	font-size: 12px;
 	line-height: 24px;
 	padding: 0 25px 0 10px;
 	color: gray;
@@ -9486,7 +9491,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	vertical-align: middle;
 }
 .membership-big-txt {
-	font-size: 16px;
+	font-size: 14px;
 	line-height: 21px;
 	padding-bottom: 6px;
 }
@@ -10348,14 +10353,14 @@ table {
 	-moz-box-sizing: border-box;
 }
 .fm-account-blocks {
-	padding: 25px 20px 25px 20px;
+	padding: 14px 20px 15px 20px;
 	overflow: hidden;
 }
 .fm-account-blocks:first-child {
 	border: 0;
 }
 .fm-account-header {
-	font-size: 14px;
+	font-size: 13px;
 	line-height: 21px;
 	color: #666666;
 	padding: 0 0 10px 0;
@@ -13861,8 +13866,7 @@ strong, b {
 	background-position: 0 -1000px;
 }
 .context-submenu {
-	max-width: 170px;/*margin-top: -40px;*/
-	/*top: auto;*/
+	max-width: 170px;/*margin-top: -40px;*//*top: auto;*/
 }
 .context-submenu .context-menu-item {
 	width: 100%;
@@ -17065,6 +17069,12 @@ span.incoming-call-name {
 	float: left;
 	color: #333333;
 	font-family: 'Open Sans Semibold', Arial;
+	white-space: nowrap;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	padding-right: 10px;
+	max-width: 100%;
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -17207,9 +17217,9 @@ span.incoming-call-name {
 	width: 160px;
 	height: 160px;
 	border: 2px solid white;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

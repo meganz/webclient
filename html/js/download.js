@@ -292,18 +292,12 @@ function dlerror(id,error)
 	else if (error == ETOOMANYCONNECTIONS) errorstr = l[18];
 	else if (error == ESID) errorstr = l[19];
 	else if (error == ETEMPUNAVAIL) tempe = l[233];
-	else if (error == EBLOCKED)
-	{
-		msgDialog('warningb','Error',l[21]);
-		tempe=l[21];
-	}
+	else if (error == EBLOCKED) tempe = l[23];
 	else if (error == ENOENT) tempe=l[22];	
 	else if (error == EACCESS) tempe = l[23];	
 	else if (error == EKEY) tempe = l[24];	
 	else if (error == EAGAIN) tempe = l[233];	
 	else tempe = l[233];
-	
-	console.log('tempe',tempe);
 	
 	if (tempe)
 	{

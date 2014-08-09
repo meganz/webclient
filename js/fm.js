@@ -1152,18 +1152,8 @@ function initContextUI()
 		}
 	});
 
-	$(c + '.folder-item').unbind('click');
-	$(c + '.folder-item').bind('click', function(e)
-	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
-	});
-
-	$(c + '.cloud-item').unbind('click');
-	$(c + '.cloud-item').bind('click', function(e)
+	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
+	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
 		var t = $(this).attr('id').replace('fi_','');
 		var n=[];

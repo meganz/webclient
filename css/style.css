@@ -6585,7 +6585,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(255,255,255,0.9);
 	border: 2px solid rgba(0,0,0,0.05);
 	border-radius: 8px;
-	padding: 6px 6px 6px 12px;
+	padding: 7px 7px 7px 13px;
 	margin: -34px 0 0 -65px;
 	-webkit-background-clip: padding-box;
 	-moz-background-clip: padding-box;
@@ -6615,6 +6615,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: white;
 	font-size: 10px;
 	line-height: 13px;
+	display:none !important;
 }
 .u-dfn {
 	margin: -9px 0 0 39px;

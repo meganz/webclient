@@ -53,16 +53,33 @@ body, td, th {
 	color: #333333;
 	line-height: 15px;
 }
-body.dragging div, body.dragging a, body.dragging span { cursor: url(../images/mega/cursor1.png), auto !important }
-body.dndc-warning div,body.dndc-warning a, body.dndc-warning span { cursor: url(../images/mega/cursor1.png), auto !important }
-body.dndc-copy div,body.dndc-copy a, body.dndc-copy span { cursor: url(../images/mega/cursor2.png), auto !important }
-body.dndc-download div,body.dndc-download a, body.dndc-download span { cursor: url(../images/mega/cursor3.png), auto !important }
-body.dndc-move div,body.dndc-move a, body.dndc-move span { cursor: url(../images/mega/cursor4.png), auto !important }
-body.dndc-to-shared div,body.dndc-to-shared a, body.dndc-to-shared span { cursor: url(../images/mega/cursor5.png), auto !important }
-body.dndc-to-contacts div,body.dndc-to-contacts a, body.dndc-to-contacts span { cursor: url(../images/mega/cursor6.png), auto !important }
-body.dndc-to-conversations div,body.dndc-to-conversations a, body.dndc-to-conversations span { cursor: url(../images/mega/cursor7.png), auto !important }
-body.dndc-to-rubbish div,body.dndc-to-rubbish a, body.dndc-to-rubbish span { cursor: url(../images/mega/cursor8.png), auto !important }
-
+body.dragging div, body.dragging a, body.dragging span, body.dragging span {
+	cursor: url(../images/mega/cursor1.png), auto !important
+}
+body.dndc-warning div, body.dndc-warning a, body.dndc-warning span, body.dndc-warning input {
+	cursor: url(../images/mega/cursor1.png), auto !important
+}
+body.dndc-copy div, body.dndc-copy a, body.dndc-copy span, body.dndc-copy input {
+	cursor: url(../images/mega/cursor2.png), auto !important
+}
+body.dndc-download div, body.dndc-download a, body.dndc-download span, body.dndc-download input {
+	cursor: url(../images/mega/cursor3.png), auto !important
+}
+body.dndc-move div, body.dndc-move a, body.dndc-move span, body.dndc-move input {
+	cursor: url(../images/mega/cursor4.png), auto !important
+}
+body.dndc-to-shared div, body.dndc-to-shared a, body.dndc-to-shared span, body.dndc-to-shared input {
+	cursor: url(../images/mega/cursor5.png), auto !important
+}
+body.dndc-to-contacts div, body.dndc-to-contacts a, body.dndc-to-contacts span, body.dndc-to-contacts input {
+	cursor: url(../images/mega/cursor6.png), auto !important
+}
+body.dndc-to-conversations div, body.dndc-to-conversations a, body.dndc-to-conversations span, body.dndc-to-conversations input {
+	cursor: url(../images/mega/cursor7.png), auto !important
+}
+body.dndc-to-rubbish div, body.dndc-to-rubbish a, body.dndc-to-rubbish span, body.dndc-to-rubbish input {
+	cursor: url(../images/mega/cursor8.png), auto !important
+}
 html {
 	font-size: 100%;
 	-webkit-text-size-adjust: 100%;
@@ -4886,7 +4903,7 @@ th.grid-first-th {
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
-	border:none;
+	border: none;
 	background-color: transparent;
 }
 .file-block:hover .file-settings-icon:hover, .file-block.ui-selected .file-settings-icon:hover, tr:hover .grid-url-arrow:hover, tr.ui-selected:hover .grid-url-arrow:hover {
@@ -6554,7 +6571,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .to-rubbish .dragger-status {
 	background-position: 0 -8290px;
 }
-
 .dragger-block {
 	position: absolute;
 	z-index: 900;
@@ -6566,17 +6582,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: auto;
 	min-height: 20px;
 	position: absolute;
-	background-color: white;
-	border:2px solid rgba(96,96,96,0.8);
+	background-color: rgba(255,255,255,0.9);
+	border: 2px solid rgba(0,0,0,0.05);
 	border-radius: 8px;
-	padding: 4px 4px 4px 10px;
+	padding: 6px 6px 6px 12px;
 	margin: -34px 0 0 -65px;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	background-clip: padding-box;
 }
 .dragger-entry {
 	white-space: nowrap;
 	word-break: keep-all;
-	width:auto;
-    position: relative;
+	width: auto;
+	position: relative;
 	padding-top: 4px;
 }
 .dragger-files-number {
@@ -6600,7 +6619,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .u-dfn {
 	margin: -9px 0 0 39px;
 }
-
 .fm-tree-folder.lightactive {
 	background-color: #e0e0e0;
 }

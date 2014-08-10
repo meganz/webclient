@@ -455,9 +455,9 @@ else
         jsl.push({f:'js/jquery-ui.min.js', n: 'jqueryui_js', j:1,w:10});
         jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
-        // jsl.push({f:'js/jquery.remove.js', n: 'jqueryremove_js', j:1});
         jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
         jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
+        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
         jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
         jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
         jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});

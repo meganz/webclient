@@ -228,6 +228,11 @@ function ClassEmptyChunk(dl) {
 }
 
 ClassEmptyChunk.prototype.run = function(task_done) {
+	if (this.dl.zipid) {
+		this.dl.writer.push({ data: new Uint8Array(0), offset: 0});
+		Soon(task_done);
+	}
+	else
 	this.dl.io.write(new Uint8Array(0), 0, function() {
 		task_done();
 		this.dl.ready();

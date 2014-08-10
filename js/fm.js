@@ -3419,7 +3419,7 @@ function selectddUI()
 				var n = $(e).attr('id');
 				$.selected.push(n);
 				n = M.d[n];
-				if (--max > 0) html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+				if (max > i) html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
 			});
 			if (s.length > max)
 			{
@@ -4203,9 +4203,11 @@ function treeUI()
 		containment: 'document',
 		revertDuration:200,
 		distance: 10,
+		scroll: false,
 		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
+			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
 			return getDDhelper();
 		},
 		start: function (e, ui)
@@ -4215,14 +4217,18 @@ function treeUI()
 			var html = '';
 			var id = $(e.target).attr('id');
 			if (id) id = id.replace('treea_','');
-			if (id && M.d[id]) html = '<div class="dragger-icon '+ fileicon(M.d[id]) +'"></div>'
+			if (id && M.d[id]) html = ('<div class="transfer-filtype-icon ' + fileicon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
 			$('#draghelper .dragger-icon').remove();
-			$(html).insertBefore('#draghelper .dragger-status');
+			$('#draghelper .dragger-content').html(html);
 			$('body').addClass('dragging');
+			$.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+			$.draggerWidth = $('#draghelper .dragger-content').outerWidth();
 		},
-		drag: function(e,u)
+		drag: function(e,ui)
 		{
 			//console.log('tree dragging',e);
+			if (ui.position.top + $.draggerHeight - 28 > $(window).height()) ui.position.top = $(window).height() - $.draggerHeight + 26;
+			if (ui.position.left + $.draggerWidth - 58 > $(window).width()) ui.position.left = $(window).width() - $.draggerWidth + 56;
 		},
 		stop: function(e,u)
 		{

@@ -5756,6 +5756,9 @@ table {
 	padding: 0 10px 0 38px;
 	color: black;
 }
+.fm-breadcrumbs.cloud-drive .right-arrow-bg {
+	padding: 0 10px 0 30px;
+}
 .fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg, .fm-breadcrumbs.contact .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;

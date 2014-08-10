@@ -982,7 +982,7 @@ function setTransferStatus( dl, status, ethrow, lock) {
 	var id = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
 	var text = '' + status;
 	if (text.length > 44) text = text.substr(0,42) + '...';
-	$('.transfer-table #' + id + ' td:eq(3)').text(text);
+	$('.transfer-table #' + id + ' td:eq(6)').text(text);
 	if (lock) $('.transfer-table #' + id).attr('id', 'LOCKed_' + id);
 	if (d) console.error(status);
 	if (ethrow) throw status;

@@ -191,6 +191,109 @@ describe("authring unit test", function() {
         });
     });
 
+    describe('getting/setting u_authringRSA', function() {
+        var aSerialisedRing = atob('me3456789xzIp4Nbo3FH8vW7YLBZyfAD+mmlUgDKi7jnrvz3HMing1ujcUfy9btgsFnJ8AP6aaVSQg==');
+        var aRing = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                     method: ns.AUTHENTICATION_METHOD.SEEN,
+                                     confidence: ns.KEY_CONFIDENCE.UNSURE},
+                     'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                     method: 0x02,
+                                     confidence: 0x04}};
+
+        describe('getContactsRSA()', function() {
+            it("internal callback error, no custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', undefined);
+                sandbox.spy(window, 'getUserAttribute');
+                ns.getContactsRSA();
+                sinon.assert.calledOnce(getUserAttribute);
+                var callback = getUserAttribute.args[0][3];
+                var theCtx = getUserAttribute.args[0][4];
+                callback(-3, theCtx);
+                assert.deepEqual(u_authringRSA, {});
+            });
+
+            it("internal callback, no custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', undefined);
+                sandbox.spy(window, 'getUserAttribute');
+                ns.getContactsRSA();
+                sinon.assert.calledOnce(getUserAttribute);
+                var callback = getUserAttribute.args[0][3];
+                var theCtx = getUserAttribute.args[0][4];
+                callback({'': aSerialisedRing}, theCtx);
+                assert.deepEqual(u_authringRSA, aRing);
+            });
+
+            it("internal callback error, custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', undefined);
+                sandbox.spy(window, 'getUserAttribute');
+                var myCallback = sinon.spy();
+                ns.getContactsRSA(myCallback);
+                sinon.assert.calledOnce(getUserAttribute);
+                var callback = getUserAttribute.args[0][3];
+                var theCtx = getUserAttribute.args[0][4];
+                callback(-3, theCtx);
+                sinon.assert.calledOnce(myCallback);
+                assert.deepEqual(myCallback.args[0][0], {});
+                assert.deepEqual(u_authringRSA, {});
+            });
+
+            it("internal callback, custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', undefined);
+                sandbox.spy(window, 'getUserAttribute');
+                var myCallback = sinon.spy();
+                ns.getContactsRSA(myCallback);
+                sinon.assert.calledOnce(getUserAttribute);
+                var callback = getUserAttribute.args[0][3];
+                var theCtx = getUserAttribute.args[0][4];
+                callback({'': aSerialisedRing}, theCtx);
+                sinon.assert.calledOnce(myCallback);
+                assert.deepEqual(myCallback.args[0][0], aRing);
+                assert.deepEqual(u_authringRSA, aRing);
+            });
+        });
+
+        describe('setContactsRSA()', function() {
+            var aesKey = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+
+            it("no custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', aRing);
+                sandbox.stub(window, 'setUserAttribute');
+                ns.setContactsRSA();
+                sinon.assert.calledOnce(setUserAttribute);
+            });
+
+            it("custom callback with error", function() {
+                sandbox.stub(window, 'u_authringRSA', aRing);
+                sandbox.stub(window, 'u_k', aesKey);
+                sandbox.stub(window, 'api_req');
+                sandbox.spy(window, 'setUserAttribute');
+                var myCallback = sinon.spy();
+                ns.setContactsRSA(myCallback);
+                sinon.assert.calledOnce(setUserAttribute);
+                var ctx = api_req.args[0][1];
+                var callback = ctx.callback;
+                callback(-3, ctx);
+                sinon.assert.calledOnce(myCallback);
+                assert.strictEqual(myCallback.args[0][0], -3);
+            });
+
+            it("custom callback", function() {
+                sandbox.stub(window, 'u_authringRSA', aRing);
+                sandbox.stub(window, 'u_k', aesKey);
+                sandbox.stub(window, 'api_req');
+                sandbox.spy(window, 'setUserAttribute');
+                var myCallback = sinon.spy();
+                ns.setContactsRSA(myCallback);
+                sinon.assert.calledOnce(setUserAttribute);
+                var ctx = api_req.args[0][1];
+                var callback = ctx.callback;
+                callback('me3456789xw', ctx);
+                sinon.assert.calledOnce(myCallback);
+                assert.strictEqual(myCallback.args[0][0], 'me3456789xw');
+            });
+        });
+    });
+
     describe('fingerprints and signing', function() {
         describe('computeFingerprintEd25519()', function() {
             it("default format", function() {

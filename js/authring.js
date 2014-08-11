@@ -4,6 +4,7 @@
  */
 
 var u_authring = undefined;
+var u_authringRSA = undefined;
 
 var authring = (function () {
     /**
@@ -181,9 +182,37 @@ var authring = (function () {
             }
         };
         var myCtx = {
-             callback3: callback,
+            callback3: callback,
          };
         getUserAttribute(u_handle, 'authring', false, myCallback, myCtx);
+    };
+
+
+    /**
+     * Loads the ring for all authenticated RSA encryption keys into
+     * `u_authringRSA`.
+     *
+     * @param callback {function}
+     *     Callback function to call upon completion of operation. The callback
+     *     requires two parameters: `res` (the retrieved authentication ring)
+     *     and `ctx` (the context).
+     */
+    ns.getContactsRSA = function(callback) {
+        var myCallback = function(res, ctx) {
+            if (typeof res !== 'number') {
+                // Authring is in the empty-name record.
+                u_authringRSA = ns.deserialise(res['']);
+            } else {
+                u_authringRSA = {};
+            }
+            if (ctx.callback3 !== undefined) {
+                ctx.callback3(u_authringRSA, ctx);
+            }
+        };
+        var myCtx = {
+            callback3: callback,
+         };
+        getUserAttribute(u_handle, 'authRSA', false, myCallback, myCtx);
     };
 
 
@@ -197,6 +226,21 @@ var authring = (function () {
      */
     ns.setContacts = function(callback) {
         setUserAttribute('authring', {'': ns.serialise(u_authring)},
+                         false, callback);
+    };
+
+
+    /**
+     * Saves the ring for all authenticated RSA encryption keys from
+     * `u_authringRSA`.
+     *
+     * @param callback {function}
+     *     Callback function to call upon completion of operation. The callback
+     *     requires two parameters: `res` (the retrieved authentication ring)
+     *     and `ctx` (the context).
+     */
+    ns.setContactsRSA = function(callback) {
+        setUserAttribute('authRSA', {'': ns.serialise(u_authringRSA)},
                          false, callback);
     };
 

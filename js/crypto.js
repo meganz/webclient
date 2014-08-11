@@ -2671,27 +2671,47 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
-    // Load/initialise the authenticated contacts ring.
+    // Load contacts' tracked authentication and RSA fingerprints.
     authring.getContacts();
+    authring.getContactsRSA();
 
-    // Load our key ring.
-    var myCallback = function(res, ctx) {
-        if (typeof res !== 'number') {
-            u_keyring = res;
-        } else {
-            u_privEd25519 = jodid25519.eddsa.generateKeySeed();
-            u_keyring = {prEd255 : u_privEd25519};
-            u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-            setUserAttribute('keyring', u_keyring, false);
-            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+    // Load/initialise the authenticated contacts ring.
+    getUserAttribute(u_handle, 'keyring', false, u_initAuthentication2);
+}
+
+
+/**
+ * Provide Ed25519 key pair and a signed RSA pub key.
+ */
+function u_initAuthentication2(res, ctx) {
+    if (typeof res !== 'number') {
+        // Keyring is a private attribute, so it's been wrapped by a TLV store,
+        // no furthe processing here.
+        u_keyring = res;
+    } else {
+        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+        u_keyring = {prEd255 : u_privEd25519};
+        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        // Keyring is a private attribute here, so no preprocessing required
+        // (will be wrapped in a TLV store).
+        setUserAttribute('keyring', u_keyring, false);
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+    }
+    u_attr.keyring = u_keyring;
+    u_privEd25519 = u_keyring.prEd255;
+    u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+    u_attr.puEd255 = u_pubEd25519;
+    pubEd25519[u_handle] = u_pubEd25519;
+
+    // Ensure an RSA pub key signature.
+    var storeSigPubkCallback = function(res, ctx) {
+        if (typeof res === 'number') {
+            // No signed RSA pub key, store it.
+            var sigPubk = authring.signRSAkey(crypto_decodepubkey(base64urldecode(u_attr.pubk)));
+            setUserAttribute('sigPubk', base64urlencode(sigPubk), true);
         }
-        u_attr.keyring = u_keyring;
-        u_privEd25519 = u_keyring.prEd255;
-        u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
-        u_attr.puEd255 = u_pubEd25519;
-        pubEd25519[u_handle] = u_pubEd25519;
     };
-    getUserAttribute(u_handle, 'keyring', false, myCallback);
+    getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
 }
 
 

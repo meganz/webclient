@@ -410,7 +410,7 @@ function initUI()
 				var t = $(e.target).attr('id');
 				if (t && t.indexOf('treea_') > -1) t = t.replace('treea_','');
 				else if (t && t.indexOf('path_') > -1) t = t.replace('path_','');
-				else t=undefined;
+				else if (M.currentdirid !== 'shares' || !M.d[t] || RootbyId(t) !== 'shares') t=undefined;
 			}
 		}
 		else
@@ -483,6 +483,7 @@ function initUI()
 				if (c) $.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
 			}
 			// else $('.dragger-block').addClass('drag');
+			else $('body').addClass('dndc-warning');
 
 			$(e.target).addClass('dragover');
 			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
@@ -503,10 +504,17 @@ function initUI()
 		}
 		else if (a == 'drop' && dd)
 		{
+			function nRevert(r)
+			{
+				try {
+					$(ui.draggable).draggable( "option", "revert", false );
+					if (r) $(ui.draggable).remove();
+				} catch(e) {}
+			}
+
 			if (dd == 'move')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
-				$(ui.draggable).remove();
+				nRevert(1);
 				$.moveids=ids;
 				$.movet=t;
 				setTimeout(function()
@@ -516,17 +524,23 @@ function initUI()
 			}
 			else if (dd == 'copy')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
+				nRevert();
 				$.copyids=ids;
 				$.copyt=t;
 				setTimeout(function()
 				{
-					M.copyNodes($.copyids,$.copyt);
+					M.copyNodes($.copyids,$.copyt,0,function()
+					{
+						if (M.currentdirid === 'shares')
+						{
+							M.openFolder('shares',1);
+						}
+					});
 				},50);
 			}
 			else if (dd === 'download')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
+				nRevert();
 				var as_zip = e.altKey;
 				M.addDownload(ids, as_zip);
 			}
@@ -2468,7 +2482,7 @@ function avatarDialog(close)
 function gridUI()
 {
 	if (d) console.time('gridUI');
-	$.gridDragging=false;
+	// $.gridDragging=false;
 	$.gridLastSelected=false;
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
@@ -3400,6 +3414,7 @@ function selectddUI()
 			$.doDD(e,ui,'out',0);
 		}
 	});
+	if ($.gridDragging) $('body').addClass('dragging');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
 	{
 		start: function(e,u)
@@ -4237,7 +4252,7 @@ function treeUI()
 		}
 	});
 
-	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon').droppable(
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr').droppable(
 	{
 		tolerance: 'pointer',
 		drop: function(e, ui)

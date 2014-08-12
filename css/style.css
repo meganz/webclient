@@ -53,7 +53,7 @@ body, td, th {
 	color: #333333;
 	line-height: 15px;
 }
-body.dragging div, body.dragging a, body.dragging span, body.dragging span {
+body.dragging * {
 	cursor: url(../images/mega/cursor1.png), auto !important
 }
 body.dndc-warning div, body.dndc-warning a, body.dndc-warning span, body.dndc-warning input {

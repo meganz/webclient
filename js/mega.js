@@ -449,6 +449,7 @@ function MegaData ()
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
+			sharedfolderUI(true);
 		}
 
 		if (this.v.length == 0)

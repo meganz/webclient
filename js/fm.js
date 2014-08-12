@@ -6165,14 +6165,16 @@ function fm_resize_handler() {
 
 }
 
-function sharedfolderUI()
+function sharedfolderUI(aJustRemove)
 {
 	if ($('.shared-details-block').length > 0)
 	{
 		$('.shared-details-block .shared-folder-content').unwrap();
 		$('.shared-folder-content').removeClass('shared-folder-content');
 		$('.shared-top-details').remove();
+		$(window).trigger('resize');
 	}
+	if (aJustRemove) return;
 
 	var n = M.d[M.currentdirid];
 	if (n && n.p.length == 11)

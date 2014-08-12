@@ -449,6 +449,7 @@ function MegaData ()
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
+			sharedfolderUI(true);
 		}
 
 		if (this.v.length == 0)
@@ -1592,7 +1593,7 @@ function MegaData ()
 		if (mDB && !ignoreDB && !pfkey) mDBadd('u',clone(u));
 	};
 
-	this.copyNodes = function(cn,t,del)
+	this.copyNodes = function(cn,t,del,callback)
 	{
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
@@ -1668,6 +1669,7 @@ function MegaData ()
 				if (res.u) process_u(res.u,true);
 				if (res.f) process_f(res.f);
 				loadingDialog.hide();
+				if (callback) callback(res);
 				rendernew();
 			}
 		});
@@ -3174,7 +3176,7 @@ function ddtype(ids,toid,alt)
 		if (toid_r == 'contacts' && M.d[toid].p == 'contacts') r = 'copy';
 
 		// to a shared folder, only with write rights
-		if (toid_r == 'contacts' && RightsbyID(toid) > 0)
+		if ((toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0)
 		{
 			if (isCircular(fromid,toid)) return false;
 			else r = 'copy';

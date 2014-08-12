@@ -1221,15 +1221,12 @@ function MegaData ()
 					break;
 				}
 			}
-// Should we have infors about shared folders in submenues?
-//				var sharedfolder = '';
-//				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
-			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
+			var sharedfolder = 'folder-item';
+			// ToDo: update css to properly show shared-folders in submenus
+//			if (typeof M.d[fid].shares !== 'undefined') sharedfolder = 'shared-folder';
+			var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
 			$('#csb_' + id).prepend(html);
-			if (sub)
-			{
-				this.buildSubmenu(fid);
-			}
+			if (sub) this.buildSubmenu(fid);
 		}
 		
 		initContextUI();

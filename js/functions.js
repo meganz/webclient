@@ -1426,14 +1426,15 @@ function getHtmlElemPos(elem, n)
 {
     var xPos = 0;
     var yPos = 0;
-    var sl;
-    var st;
+    var sl,st, cl, ct;
     var pNode;
     while (elem)
     {
         pNode = elem.parentNode;
         sl = 0;
         st = 0;
+		cl = 0;
+		ct = 0;
         if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName))
         {
 			if (typeof n === 'undefined')// count this in, except for overflow huge menu
@@ -1441,9 +1442,11 @@ function getHtmlElemPos(elem, n)
 				sl = elem.scrollLeft;
 				st = elem.scrollTop;
 			}
+			cl = elem.clientLeft;
+			ct = elem.clientTop;
+			xPos += (elem.offsetLeft - sl + cl);
+			yPos += (elem.offsetTop - st - ct);
         }
-        xPos += (elem.offsetLeft - sl + elem.clientLeft);
-        yPos += (elem.offsetTop - st + elem.clientTop);
         elem = elem.offsetParent;
     }
     return {x: xPos, y: yPos};

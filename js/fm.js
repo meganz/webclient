@@ -531,7 +531,8 @@ function initUI()
 				{
 					M.copyNodes($.copyids,$.copyt,0,function()
 					{
-						if (M.currentdirid === 'shares')
+						// Update files count...
+						if (M.currentdirid === 'shares' && !M.viewmode)
 						{
 							M.openFolder('shares',1);
 						}
@@ -788,7 +789,6 @@ function initUI()
 	{
 		M.onlineStatusEvent(megaChat.getContactFromJid(presenceEventData.getFromJid()),presenceEventData.getShow());
 	});
-
 }
 
 function transferPanelContextMenu(target)
@@ -6165,16 +6165,14 @@ function fm_resize_handler() {
 
 }
 
-function sharedfolderUI(aJustRemove)
+function sharedfolderUI()
 {
 	if ($('.shared-details-block').length > 0)
 	{
 		$('.shared-details-block .shared-folder-content').unwrap();
 		$('.shared-folder-content').removeClass('shared-folder-content');
 		$('.shared-top-details').remove();
-		$(window).trigger('resize');
 	}
-	if (aJustRemove) return;
 
 	var n = M.d[M.currentdirid];
 	if (n && n.p.length == 11)
@@ -6196,16 +6194,43 @@ function sharedfolderUI(aJustRemove)
 		}
 
 		var e = '.files-grid-view.fm';
-		if (M.viewmode == 1) e = '.fm-blocks-view';
+		if (M.viewmode == 1) e = '.fm-blocks-view.fm';
 
 		$(e).wrap('<div class="shared-details-block"></div>');
-		$('.shared-details-block').prepend('<div class="shared-top-details"><div class="shared-details-icon"></div><div class="shared-details-info-block"><div class="shared-details-pad"><div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div><a href="" class="grid-url-arrow"><span></span></a><div class="shared-folder-access'+ rightsclass + '">Full access</div><div class="clear"></div><div class="nw-contact-avatar color10">' + avatar + '</div><div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(user.name) + '</div></div></div><div class="shared-details-buttons"><div class="fm-leave-share"><span>Leave share</span></div><div class="fm-share-copy"><span>Copy</span></div><div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div><div class="clear"></div></div><div class="clear"></div></div></div>');
+		$('.shared-details-block').prepend(
+			'<div class="shared-top-details">'
+				+'<div class="shared-details-icon"></div>'
+				+'<div class="shared-details-info-block">'
+					+'<div class="shared-details-pad">'
+						+'<div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div>'
+						+'<a href="" class="grid-url-arrow"><span></span></a>'
+						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
+						+'<div class="clear"></div>'
+						+'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+						+'<div class="fm-chat-user-info">'
+							+'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+						+'</div>'
+					+'</div>'
+					+'<div class="shared-details-buttons">'
+						+'<div class="fm-leave-share"><span>Leave share</span></div>'
+						+'<div class="fm-share-copy"><span>Copy</span></div>'
+						+'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
+						+'<div class="clear"></div>'
+					+'</div>'
+					+'<div class="clear"></div>'
+				+'</div>'
+			+'</div>');
 		$(e).addClass('shared-folder-content');
 
-		fm_resize_handler();
+		// fm_resize_handler();
 
-		if (M.viewmode == 1) initFileblocksScrolling();
-		else initGridScrolling();
+		// if (M.viewmode == 1) initFileblocksScrolling();
+		// else initGridScrolling();
+		
+		Soon(function() {
+			$(window).trigger('resize');
+			Soon(fm_resize_handler);
+		});
 	}
 }
 

@@ -427,11 +427,13 @@ function MegaData ()
 			else
 			{
 				$(lSel).unbind('jsp-scroll-y.dynlist');
-				// delete M.rmCache;
 			}
 		}
-		var cache = /*u && M.rmCache ||*/ [], n_cache, files = cache.length, jsp, t;
-		// M.rmCache = cache;
+		var cache = [], n_cache, files = 0, jsp, t, lSel;
+
+		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y.dynlist');
+		$(window).unbind("resize.dynlist");
 
 		hideEmptyMsg();
 
@@ -443,13 +445,14 @@ function MegaData ()
 
 		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		jsp = undefined;
 
 		if (!u)
 		{
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
-			sharedfolderUI(true);
+			sharedfolderUI();
 		}
 
 		if (this.v.length == 0)
@@ -721,7 +724,7 @@ function MegaData ()
 			}
 		}
 
-		sharedfolderUI();
+		// sharedfolderUI();
 		contactUI();
 
 		$(window).unbind('dynlist.flush');
@@ -729,10 +732,6 @@ function MegaData ()
 		{
 			if (cache.length) flush_cached_nodes();
 		});
-
-		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
-		$(lSel).unbind('jsp-scroll-y.dynlist');
-		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
@@ -776,6 +775,11 @@ function MegaData ()
 		}
 
 		this.rmSetupUI();
+		
+		if (!u) setTimeout(function() {
+			var jsp = $('.jspScrollable:visible').data('jsp');
+			if (jsp) jsp.reinitialise();
+		}, 170);
 	};
 
 	this.rmSetupUI = function()

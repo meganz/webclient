@@ -600,7 +600,7 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		b.removeClass('active left-position overlap-right overlap-left mega-height disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -788,7 +788,7 @@ function initUI()
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();
-	var menuitems = $('.context-menu.files-menu .context-menu-item')
+	var menuitems = $('.context-menu.files-menu .context-menu-item');
 
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
@@ -1188,12 +1188,17 @@ function initContextUI()
 	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
 	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
+		if (!$(this).is('disabled'))
+		{
+			var t = $(this).attr('id').replace('fi_','');
+			var n=[];
+			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+			$.hideContextMenu();
+			M.moveNodes(n,t);
+		}
 	});
+	// Not sure if this will work
+	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -3980,6 +3985,14 @@ function contextmenuUI(e,ll,topmenu)
 	});
 
 	adjustContextMenuPosition(e, m);
+
+	for (var md in M.d)
+	{
+		var t = md;
+		var n=[];
+		for (var i in $.selected) if (isCircular($.selected[i],t)) n.push($.selected[i]);
+		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
+	}
 
 	m.removeClass('hidden');
 	e.preventDefault();

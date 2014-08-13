@@ -4181,7 +4181,8 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
 	var ey = e.pageY;
-	var pNode = $(e.target).closest('.context-scrolling-block')[0];
+//	var pNode = $(e.target).closest('.context-scrolling-block')[0];
+	var pNode = $(e.target).closest('.context-submenu').children(':first');
 
 	if (typeof pNode !== 'undefined')
 	{

@@ -4181,8 +4181,8 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
 	var ey = e.pageY;
-//	var pNode = $(e.target).closest('.context-scrolling-block')[0];
-	var pNode = $(e.target).closest('.context-submenu').children(':first');
+	var c = $(e.target).closest('.context-submenu');
+	var pNode = c.children(':first')[0];
 
 	if (typeof pNode !== 'undefined')
 	{
@@ -4190,8 +4190,20 @@ function scrollMegaSubMenu(e)
 		var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
 		var pos = getHtmlElemPos(pNode, true);
 		var py = (ey - pos.y - dy) / (h - dy * 2);
-		if (py > 1) py = 1;
-		if (py < 0) py = 0;
+		if (py > 1)
+		{
+			py = 1;
+			c.children('.context-bottom-arrow').addClass('disabled');
+		}
+		else if (py < 0)
+		{
+			py = 0;
+			c.children('.context-top-arrow').addClass('disabled');
+		}
+		else
+		{
+			c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
+		}
 		pNode.scrollTop = py * (pNode.scrollHeight - h);
 	}
 }

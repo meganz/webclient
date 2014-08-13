@@ -33,8 +33,11 @@ var DEFAULT_SETTINGS = {
     idPrefix: "token-input-",
 
 	// Formatters
-    resultsFormatter: function(item){ return "<li class='share-search-result'><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
-    tokenFormatter: function(item) { return "<li><span class='search-avatar color3'>uu</span>" + item[this.propertyToSearch] + "</li>" },
+	
+	// Please add "email/gmail" classnames to "share-search-result" and "share-added-contact" blocks
+	// Please add "selected" classname to "share-search-result" block if user is already added
+    resultsFormatter: function(item){ return "<li class='share-search-result selected'><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
+    tokenFormatter: function(item) { return "<li class='share-added-contact'><span class='search-avatar color3'>UU</span>" + item[this.propertyToSearch] + "</li>" },
 
 	// Callbacks
     onResult: null,

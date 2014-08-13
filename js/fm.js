@@ -1121,11 +1121,8 @@ function fmremove()
 }
 function initContextUI()
 {
-
-//	$('.context-scrolling-block').off('mousemove');
-//	$('.context-scrolling-block').on('mousemove', scrollMegaSubMenu(event));
-
 	var c = '.context-menu-item';
+	
 	$(c).unbind('mouseover');
 	$(c).bind('mouseover', function()
 	{
@@ -1149,13 +1146,13 @@ function initContextUI()
 	});
 
 	$(c+'.contains-submenu').unbind('mouseover');
-	$(c+'.contains-submenu').bind('mouseover', function(e)
+	$(c+'.contains-submenu').bind('mouseover', function()
 	{
 		var a = $(this).next();// context-submenu
 		a.children().removeClass('active opened');
 		a.find('.context-submenu').addClass('hidden');
 		a.find('.opened').removeClass('opened');
-		// situation when we have 2 contains-submenus one below another
+		// situation when we have 2 contains-submenus in same context-submenu one neer another
 		var b = $(this).closest('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
 		if (b.length)
 		{
@@ -1177,8 +1174,8 @@ function initContextUI()
 
 		if (!$(this).is('.opened'))
 		{
-			var pos = getHtmlElemPos(this);
-			var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
+			var pos = $(this).offset();
+			var c = reCalcMenuPosition($(this), pos.left, pos.top, 'submenu');
 			$(this).next('.context-submenu')
 				.css({'top': c.top})
 				.addClass('active')
@@ -1188,18 +1185,8 @@ function initContextUI()
 		}
 	});
 
-	$(c + '.folder-item').unbind('click');
-	$(c + '.folder-item').bind('click', function(e)
-	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
-	});
-
-	$(c + '.cloud-item').unbind('click');
-	$(c + '.cloud-item').bind('click', function(e)
+	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
+	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
 		var t = $(this).attr('id').replace('fi_','');
 		var n=[];
@@ -4057,16 +4044,21 @@ function reCalcMenuPosition(m, x, y, ico)
 	{
 		var top;
 		var nTop = parseInt(n.css('padding-top'));
-		var a = m.parent();
-		var b = y + nmH - nTop;// bottom of submenu
-		var pPos;
-
-		if (a.is('.context-menu-section')) pPos = getHtmlElemPos(m.closest('.context-menu')[0]);
-		else pPos = getHtmlElemPos(a[0], true);
-
-		if (b > maxY) top = ((y - pPos.y) - (b - maxY)) + 'px';
-		else top = (y - pPos.y) + 'px';
-
+		var tB = parseInt(n.css('border-top-width'));
+		var pPos = m.position();
+		
+		var b = y + nmH - (nTop - tB);// bottom of submenu
+		var mP = m.closest('.context-submenu');
+		var pT = 0, bT = 0, pE = 0;
+		if (mP.length)
+		{
+			pE = mP.offset();
+			pT = parseInt(mP.css('padding-top'));
+			bT = parseInt(mP.css('border-top-width'));
+		}
+		if (b > maxY) top =  (maxY - nmH + nTop - tB) - pE.top + 'px';
+		else top = pPos.top - tB + 'px';
+		
 		return top;
 	};
 
@@ -4090,8 +4082,9 @@ function reCalcMenuPosition(m, x, y, ico)
 	else if (ico === 'submenu')// submenues
 	{
 		var n = m.next('.context-submenu');
-		var nmW = n.outerWidth();
-		var nmH = n.outerHeight();
+		var nmW = n.outerWidth();// margin not calculated
+		var nmH = n.outerHeight();// margins not calculated
+				
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
@@ -4142,11 +4135,6 @@ function reCalcMenuPosition(m, x, y, ico)
 
 	setBordersRadius(m, cor);
 
-// ToDo: decide how to handle "huge" context menu
-//	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
-//	else if (hMax > maxY) dPos.x = x - cmW;
-//	if (hMax > maxY) dPos.y = maxY - cmH;
-
 	return {'x':dPos.x, 'y':dPos.y};
 }
 
@@ -4192,11 +4180,9 @@ function setBordersRadius(m, c)
 // Scroll menus which height is bigger then window.height
 function scrollMegaSubMenu(e)
 {
-//	e.stopPropagation();
-
 	var ey = e.pageY;
-//	var k = e.target;
-	var pNode = $(e.target).closest('.context-scrolling-block')[0];
+//	var pNode = $(e.target).closest('.context-scrolling-block')[0];
+	var pNode = $(e.target).closest('.context-submenu').children(':first');
 
 	if (typeof pNode !== 'undefined')
 	{

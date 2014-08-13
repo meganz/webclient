@@ -2640,7 +2640,7 @@ function gridUI()
 
 	$.selectddUIitem = 'tr';
 	Soon(selectddUI);
-	
+
 	if (d) console.timeEnd('gridUI');
 }
 
@@ -3560,7 +3560,7 @@ function selectddUI()
 		else M.addDownload([h]);
 	});
 	if (d) console.timeEnd('selectddUI');
-	
+
 	if ($.rmInitJSP)
 	{
 		var jsp=$($.rmInitJSP).data('jsp');
@@ -4418,7 +4418,7 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 		scrollTo= $('.nw-tree-panel-header');
 	}
 	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
-	
+
 	if (scrollTo && !ignoreScroll)
 	{
 		var jsp = $('.fm-tree-panel').data('jsp');
@@ -6172,11 +6172,14 @@ function fm_resize_handler() {
 
 function sharedfolderUI()
 {
+	var r = false;
+
 	if ($('.shared-details-block').length > 0)
 	{
 		$('.shared-details-block .shared-folder-content').unwrap();
 		$('.shared-folder-content').removeClass('shared-folder-content');
 		$('.shared-top-details').remove();
+		r = true;
 	}
 
 	var n = M.d[M.currentdirid];
@@ -6231,12 +6234,14 @@ function sharedfolderUI()
 
 		// if (M.viewmode == 1) initFileblocksScrolling();
 		// else initGridScrolling();
-		
+
 		Soon(function() {
 			$(window).trigger('resize');
 			Soon(fm_resize_handler);
 		});
 	}
+
+	return r;
 }
 
 function contactUI()

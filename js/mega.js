@@ -434,7 +434,7 @@ function MegaData ()
 		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
 		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
-		sharedfolderUI();
+		if (sharedfolderUI()) $(lSel).parent().find('.fm-empty-pad.fm-empty-sharef').remove();
 		$(window).trigger('resize');
 
 		hideEmptyMsg();
@@ -464,7 +464,12 @@ function MegaData ()
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
-			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == M.RootID) $('.fm-empty-folder').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == 'shares')
+			{
+				$(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
+				$(window).trigger('resize');
+			}
 			else if (RootbyId(M.currentdirid) == 'contacts') $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
 		}
 		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
@@ -487,7 +492,7 @@ function MegaData ()
 				});
 			}
 		}
-		
+
 		delete this.cRenderMainN;
 
 		for (var i in this.v)
@@ -776,8 +781,8 @@ function MegaData ()
 			fa_duplicates = {};
 		}
 
-		this.rmSetupUI();		
-		
+		this.rmSetupUI();
+
 		if (!u && n_cache) $.rmInitJSP = lSel;
 	};
 

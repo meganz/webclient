@@ -2646,6 +2646,8 @@ function gridUI()
 
 	$.selectddUIitem = 'tr';
 	Soon(selectddUI);
+	
+	$(window).trigger('resize');
 
 	if (d) console.timeEnd('gridUI');
 }
@@ -3648,6 +3650,8 @@ function iconUI()
 	}
 	setTimeout(selectddUI,10);
 	if (d) console.timeEnd('iconUI');
+	
+	$(window).trigger('resize');
 }
 
 function transferPanelUI()

@@ -376,6 +376,9 @@ function MegaData ()
 
 	this.renderMain = function(u)
 	{
+		sharedfolderUI();
+		$(window).trigger('resize');
+	
 		function flush_cached_nodes(n)
 		{
 			var e = cache.splice(0, n || cache.length);
@@ -475,8 +478,6 @@ function MegaData ()
 			}
 			else
 			{
-				console.log('height',$('.files-grid-view.fm').height());
-				
 				n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
 			}
 			if (!n_cache)
@@ -489,7 +490,7 @@ function MegaData ()
 			}
 		}
 		
-		if ($.block) exit();
+		
 		
 		delete this.cRenderMainN;
 
@@ -779,7 +780,7 @@ function MegaData ()
 			fa_duplicates = {};
 		}
 
-		this.rmSetupUI();
+		this.rmSetupUI();		
 		
 		if (!u) setTimeout(function() {
 			var jsp = $('.jspScrollable:visible').data('jsp');

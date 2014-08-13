@@ -183,13 +183,11 @@ function reselect(n)
 	}
 }
 
-
 var treesearch = false;
-
 
 function treeredraw()
 {
-	if (RootbyId(M.currentdirid) == M.RootID) M.buildtree(M.d[M.RootID]);	
+	if (RootbyId(M.currentdirid) == M.RootID) M.buildtree(M.d[M.RootID]);
 	else if (RootbyId(M.currentdirid) == M.RubbishID) M.buildtree({h:M.RubbishID});
 	else if (RootbyId(M.currentdirid) == 'shares') M.buildtree({h:'shares'});
 	else if (RootbyId(M.currentdirid) == 'contacts') M.contacts();
@@ -200,13 +198,12 @@ function treeredraw()
 	treeUI();
 }
 
-
 function treesearchUI()
 {
 	$('.nw-fm-tree-header').unbind('click');
 	$('.nw-fm-tree-header').bind('click', function(e)
 	{
-		var c = $(e.target).attr('class');		
+		var c = $(e.target).attr('class');
 		if (c && c.indexOf('nw-fm-search-icon') > -1)
 		{
 			var c = $(this).attr('class');
@@ -225,47 +222,49 @@ function treesearchUI()
 		}
 	});
 	$('.nw-fm-search-icon').unbind('click');
-	$('.nw-fm-search-icon').bind('click', function() 
+	$('.nw-fm-search-icon').bind('click', function()
 	{
-		treesearch=false;		
-		treeredraw();		
-		$(this).prev().val('');		
+		treesearch=false;
+		treeredraw();
+		$(this).prev().val('');
 		$(this).parent().find('input').blur();
 	});
 
 	$('.nw-fm-tree-header input').unbind('keyup');
-	$('.nw-fm-tree-header input').bind('keyup', function(e) 
+	$('.nw-fm-tree-header input').bind('keyup', function(e)
 	{
+		var h = $(this).parent();
 		if (e.keyCode == 27)
 		{
-			$(this).parent().removeClass('filled-input');
-			$(this).parent().find('input').val('');
-			$(this).parent().find('input').blur();
+			h.removeClass('filled-input');
+			$(this).val('');
+			$(this).blur();
 			treesearch=false;
 		}
 		else
 		{
-			$(this).parent().addClass('filled-input');
-			treesearch = $(this).parent().find('input').val();
+			h.addClass('filled-input');
+			treesearch = $(this).val();
 		}
+		if ($(this).val()=='') h.removeClass('filled-input');
 		treeredraw()
 	});
-	
+
 	$('.nw-fm-tree-header input').unbind('blur');
-	$('.nw-fm-tree-header input').bind('blur', function() 
+	$('.nw-fm-tree-header input').bind('blur', function()
 	{
-		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') 
+		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='')
 		{
-			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
+			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
 			$(this).val($(this).attr('placeholder'));
-		} 
+		}
 		else $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
 	});
-	
+
 	$('.nw-tree-panel-arrows').unbind('click');
-	$('.nw-tree-panel-arrows').bind('click', function() 
+	$('.nw-tree-panel-arrows').bind('click', function()
 	{
-		if ($(this).attr('class').indexOf('active') == -1) 
+		if ($(this).attr('class').indexOf('active') == -1)
 		{
 			$(this).addClass('active');
 			var menu = $('.nw-sorting-menu').removeClass('hidden')
@@ -285,18 +284,18 @@ function treesearchUI()
 				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
 				.addClass('active')
 			return false;
-		} 
-		else 
+		}
+		else
 		{
 			$(this).removeClass('active');
 			$('.nw-sorting-menu').addClass('hidden');
 		}
 	});
 	$('.sorting-menu-item').unbind('click');
-	$('.sorting-menu-item').bind('click', function() 
+	$('.sorting-menu-item').bind('click', function()
 	{
 		var $this = $(this)
-		if ($this.attr('class').indexOf('active') == -1) 
+		if ($this.attr('class').indexOf('active') == -1)
 		{
 			$this.parent().find('.sorting-menu-item').removeClass('active');
 			$this.addClass('active');
@@ -356,7 +355,6 @@ function initializeTreePanelSorting()
 	});
 }
 
-
 /**
  *	Set the right drag icon to the transfer panel
  */
@@ -371,7 +369,6 @@ function tpDragCursor() {
 	}
 }
 
-
 function initUI()
 {
 	if (!folderlink)
@@ -381,10 +378,9 @@ function initUI()
 		$('.fm-menu-item').show();
 		$('.fm-left-menu .folderlink').addClass('hidden');
 	}
-    
+
 	treesearchUI();
-	
-	
+
 	$.doDD = function(e,ui,a,type)
 	{
 		var c = $(ui.draggable.context).attr('class');
@@ -407,12 +403,14 @@ function initUI()
 			var c = $(e.target).attr('class');
 			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
 			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
+			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
+			else if (c && c.indexOf('nw-fm-left-icon') > -1) dd = 'nw-fm-left-icon';
 			else
 			{
 				var t = $(e.target).attr('id');
 				if (t && t.indexOf('treea_') > -1) t = t.replace('treea_','');
 				else if (t && t.indexOf('path_') > -1) t = t.replace('path_','');
-				else t=undefined;
+				else if (M.currentdirid !== 'shares' || !M.d[t] || RootbyId(t) !== 'shares') t=undefined;
 			}
 		}
 		else
@@ -422,13 +420,25 @@ function initUI()
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');
 		}
 
-		if (ids && ids.length && t) dd = ddtype(ids,t);
+		if (ids && ids.length && t)
+		{
+			dd = ddtype(ids,t,e.altKey);
+			if (dd === 'move' && e.altKey) dd = 'copy';
+		}
 
-		$('.dragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
-		if (a == 'drop' || a == 'out')
+		// Workaround a problem where we get over[1] -> over[2] -> out[1]
+		if (a === 'out' && $.currentOver !== $(e.target).attr('id')) a = 'noop';
+
+		if (a !== 'noop')
+		{
+			if ($.liTimerK) clearTimeout($.liTimerK);
+			$('body').removeClassWith('dndc-');
+			$('.hide-settings-icon').removeClass('hide-settings-icon');
+		}
+		if (a == 'drop' || a == 'out' || a == 'noop')
 		{
 			$(e.target).removeClass('dragover');
-			$('.dragger-block').addClass('drag');
+			// if (a !== 'noop') $('.dragger-block').addClass('drag');
 		}
 		else if (a == 'over')
 		{
@@ -457,25 +467,54 @@ function initUI()
 				}
 			},1000);
 
-			if (t == M.RubbishID) $('.dragger-block').addClass('warning');
-			else if (dd == 'move') $('.dragger-block').addClass('move');
-			else if (dd == 'copy') $('.dragger-block').addClass('copy');
-            else if($(e.target).parents('.fm-chat-block').size() > 0) {
-                // drag over a chat window
-                //TODO: Missing css for drag-share
-                $('.dragger-block').addClass('to-share');
-            }
-			else $('.dragger-block').addClass('drag');
+			if (t == M.RubbishID) $('body').addClass('dndc-to-rubbish');
+			else if (dd == 'move') $('body').addClass('dndc-move');
+			else if (dd == 'copy') $('body').addClass('dndc-copy');
+			else if (dd == 'download') $('body').addClass('dndc-download');
+			else if (dd === 'nw-fm-left-icon')
+			{
+				var c = '' + $(e.target).attr('class');
+
+				if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
+				else if (~c.indexOf('contacts')) $('body').addClass('dndc-to-contacts');
+				else if (~c.indexOf('conversations')) $('body').addClass('dndc-to-conversations');
+				else c = null;
+
+				if (c) $.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
+			}
+			// else $('.dragger-block').addClass('drag');
+			else $('body').addClass('dndc-warning');
 
 			$(e.target).addClass('dragover');
+			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+			if ($(e.target).hasClass('folder')) $(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
 		}
 
-		if (a == 'drop' && dd)
+		if (a == 'drop' && dd === 'nw-fm-left-icon')
 		{
-			if (dd == 'move')
+			if ($(e.target).hasClass('conversations'))
 			{
 				$(ui.draggable).draggable( "option", "revert", false );
-				$(ui.draggable).remove();
+
+				// drop over a chat window
+				var currentRoom = megaChat.getCurrentRoom();
+				assert(currentRoom, 'Current room missing - this drop action should be impossible.');
+				currentRoom.attachNodes(ids);
+			}
+		}
+		else if (a == 'drop' && dd)
+		{
+			function nRevert(r)
+			{
+				try {
+					$(ui.draggable).draggable( "option", "revert", false );
+					if (r) $(ui.draggable).remove();
+				} catch(e) {}
+			}
+
+			if (dd == 'move')
+			{
+				nRevert(1);
 				$.moveids=ids;
 				$.movet=t;
 				setTimeout(function()
@@ -485,24 +524,27 @@ function initUI()
 			}
 			else if (dd == 'copy')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
+				nRevert();
 				$.copyids=ids;
 				$.copyt=t;
 				setTimeout(function()
 				{
-					M.copyNodes($.copyids,$.copyt);
+					M.copyNodes($.copyids,$.copyt,0,function()
+					{
+						if (M.currentdirid === 'shares')
+						{
+							M.openFolder('shares',1);
+						}
+					});
 				},50);
 			}
+			else if (dd === 'download')
+			{
+				nRevert();
+				var as_zip = e.altKey;
+				M.addDownload(ids, as_zip);
+			}
 			$('.dragger-block').hide();
-		} else if(a == 'drop' && !dd && $(e.target).parents('.fm-chat-block').size() > 0) {
-            $(ui.draggable).draggable( "option", "revert", false );
-
-            // drop over a chat window
-            var currentRoom = megaChat.getCurrentRoom();
-            assert(currentRoom, 'Current room missing - this drop action should be impossible.');
-            currentRoom.attachNodes(ids);
-
-            $('.dragger-block').hide();
 		}
 	};
 	InitFileDrag();
@@ -1085,10 +1127,10 @@ function fmremove()
 }
 function initContextUI()
 {
-	
+
 //	$('.context-scrolling-block').off('mousemove');
 //	$('.context-scrolling-block').on('mousemove', scrollMegaSubMenu(event));
-	
+
 	var c = '.context-menu-item';
 	$(c).unbind('mouseover');
 	$(c).bind('mouseover', function()
@@ -1111,7 +1153,7 @@ function initContextUI()
 			}
 		}
 	});
-	
+
 	$(c+'.contains-submenu').unbind('mouseover');
 	$(c+'.contains-submenu').bind('mouseover', function(e)
 	{
@@ -2432,7 +2474,7 @@ function avatarDialog(close)
 function gridUI()
 {
 	if (d) console.time('gridUI');
-	$.gridDragging=false;
+	// $.gridDragging=false;
 	$.gridLastSelected=false;
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
@@ -2532,9 +2574,12 @@ function gridUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.files-grid-view.contact-details-view').removeClass('hidden');
-		initGridScrolling();
-		$.gridHeader();
+		if (M.v.length > 0)
+		{
+			$('.files-grid-view.contact-details-view').removeClass('hidden');
+			initGridScrolling();
+			$.gridHeader();
+		}
 	}
 	else
 	{
@@ -3361,6 +3406,7 @@ function selectddUI()
 			$.doDD(e,ui,'out',0);
 		}
 	});
+	if ($.gridDragging) $('body').addClass('dragging');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
 	{
 		start: function(e,u)
@@ -3368,58 +3414,50 @@ function selectddUI()
 			$.hideContextMenu(e);
 			$.gridDragging=true;
 			$('body').addClass('dragging');
-			if ($(this).attr('class').indexOf('ui-selected') == -1)
+			if (!$(this).hasClass('ui-selected'))
 			{
 				$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
 				$(this).addClass('ui-selected');
 			}
-			var s = $($.selectddUIgrid + ' .ui-selected');
+			var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
 			$.selected=[];
 			s.each(function(i,e)
 			{
-				$.selected.push($(e).attr('id'));
+				var n = $(e).attr('id');
+				$.selected.push(n);
+				n = M.d[n];
+				if (max > i) html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
 			});
-			if (s.length > 1)
+			if (s.length > max)
 			{
-				$('.dragger-block').addClass('multiple');
 				$('.dragger-files-number').text(s.length);
 				$('.dragger-files-number').show();
 			}
-			var a = 0,html='',cl='',done={};
-			$('#draghelper .dragger-icon').remove();
-			for (var i in $.selected)
-			{
-				if (a == 0) cl = 'third';
-				else if (a == 1) cl = 'second';
-				else if (a == 2) cl = 'first';
-				var ico = fileicon(M.d[$.selected[i]]);
-				if (a < 3 && !done[ico])
-				{
-					done[ico]=1;
-					html = '<div class="dragger-icon '+cl+' '+ ico +'"></div>' + html;
-					a++;
-				}
-			}
-			$(html).insertBefore('#draghelper .dragger-status');
+			$('#draghelper .dragger-content').html(html.join(""));
+			$.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+			$.draggerWidth = $('#draghelper .dragger-content').outerWidth();
 		},
-		drag: function(e,u)
+		drag: function(e,ui)
 		{
-
+			if (ui.position.top + $.draggerHeight - 28 > $(window).height()) ui.position.top = $(window).height() - $.draggerHeight + 26;
+			if (ui.position.left + $.draggerWidth - 58 > $(window).width()) ui.position.left = $(window).width() - $.draggerWidth + 56;
 		},
 		refreshPositions: true,
 		containment: 'document',
+		scroll: false,
 		distance:10,
 		revertDuration:200,
 		revert: true,
-		cursorAt:{right:100,bottom:70},
+		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
+			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
 			return getDDhelper();
 		},
 		stop: function(event)
 		{
 			$.gridDragging=false;
-			$('body').removeClass('dragging');
+			$('body').removeClass('dragging').removeClassWith("dndc-");
 			setTimeout(function()
 			{
 				treeUIopen(M.currentdirid);
@@ -3549,8 +3587,11 @@ function iconUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.fm-blocks-view.contact-details-view').removeClass('hidden');
-		initFileblocksScrolling2();
+		if (M.v.length > 0)
+		{
+			$('.fm-blocks-view.contact-details-view').removeClass('hidden');
+			initFileblocksScrolling2();
+		}
 	}
 	else
 	{
@@ -3825,8 +3866,7 @@ function getDDhelper()
 	var id = '#fmholder';
 	if (page == 'start') id = '#startholder';
 	$('.dragger-block').remove();
-	$(id).append('<div class="dragger-block drag" id="draghelper"><div class="dragger-status"></div><div class="dragger-files-number">1</div></div>');
-	$('.dragger-block').removeClass('multiple');
+	$(id).append('<div class="dragger-block drag" id="draghelper"><div class="dragger-content"></div><div class="dragger-files-number">1</div></div>');
 	$('.dragger-block').show();
 	$('.dragger-files-number').hide();
 	return $('.dragger-block')[0];
@@ -3882,9 +3922,9 @@ function contextmenuUI(e,ll,topmenu)
 {
 	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
-	
+
 	$.hideContextMenu();
-	
+
 	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
@@ -3940,9 +3980,9 @@ function contextmenuUI(e,ll,topmenu)
 		if (c.length === a.length || a.length === 0) b.hide();
 		else b.show();
 	});
-	
+
 	adjustContextMenuPosition(e, m);
-	
+
 	m.removeClass('hidden');
 	e.preventDefault();
 }
@@ -3951,7 +3991,7 @@ function adjustContextMenuPosition(e, m)
 {
 	var mPos;// menu position
 	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
-	
+
 	if (e.type === 'click')// clicked on file-settings-icon
 	{
 		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
@@ -3962,9 +4002,9 @@ function adjustContextMenuPosition(e, m)
 	{
 		mPos = reCalcMenuPosition(m, mX, mY);
 	}
-	
+
 	m.css({'top':mPos.y,'left':mPos.x});// set menu position
-	
+
 	return true;
 }
 
@@ -3985,7 +4025,7 @@ function reCalcMenuPosition(m, x, y, ico)
 	{
 				var tre = wW - wMax;// to right edge
 				var tle = x - minX - SIDE_MARGIN;// to left edge
-				
+
 				if (tre >= tle)
 				{
 					n.addClass('overlap-right');
@@ -3999,9 +4039,9 @@ function reCalcMenuPosition(m, x, y, ico)
 
 				return;
 	};
-	
+
 	// submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-	// first parent, which is NOT a .contains-submenu element (it's previous in same level) 
+	// first parent, which is NOT a .contains-submenu element (it's previous in same level)
 	this.horPos = function()// used for submenues
 	{
 		var top;
@@ -4023,7 +4063,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		
 		return top;
 	};
-	
+
 	var dPos;
 	var cor;// corner, check setBordersRadius for more info
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
@@ -4057,9 +4097,9 @@ function reCalcMenuPosition(m, x, y, ico)
 			n.addClass('mega-height');
 			n.css({'height': nmH + 'px'});
 		}
-	
+
 		var top = 'auto', left = '100%', right = 'auto';
-		
+
 		top = this.horPos();
 		if (m.parent().parent('.left-position').length === 0)
 		{
@@ -4068,7 +4108,7 @@ function reCalcMenuPosition(m, x, y, ico)
 			else
 			{
 				this.overlapParentMenu();
-				
+
 				return true;
 			}
 		}
@@ -4083,7 +4123,7 @@ function reCalcMenuPosition(m, x, y, ico)
 				return true;
 			}
 		}
-		
+
 		return {'top': top, 'left': left, 'right':right};
 	}
 	else// right click
@@ -4107,9 +4147,9 @@ function setBordersRadius(m, c)
 	var SMALL = 4;// small carner radius
 	var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
 	var tl = DEF, tr = DEF, bl = DEF, br = DEF;
-	
+
 	var pos = (typeof c === 'undefined') ? 0 : c;
-	
+
 	switch (pos)
 	{
 		case TOP_LEFT:
@@ -4126,16 +4166,16 @@ function setBordersRadius(m, c)
 			break;
 		default:// situation when c is undefined, all border radius are by DEFAULT
 			break;
-			
+
 	}
-	
+
 	// set context menu border radius
 	m.css({
 		'border-top-left-radius': tl,
 		'border-top-right-radius': tr,
 		'border-bottom-left-radius': bl,
 		'border-bottom-right-radius': br});
-	
+
 	return true;
 }
 
@@ -4143,7 +4183,7 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
 //	e.stopPropagation();
-	
+
 	var ey = e.pageY;
 //	var k = e.target;
 	var pNode = $(e.target).closest('.context-scrolling-block')[0];
@@ -4171,9 +4211,11 @@ function treeUI()
 		containment: 'document',
 		revertDuration:200,
 		distance: 10,
+		scroll: false,
 		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
+			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
 			return getDDhelper();
 		},
 		start: function (e, ui)
@@ -4183,23 +4225,27 @@ function treeUI()
 			var html = '';
 			var id = $(e.target).attr('id');
 			if (id) id = id.replace('treea_','');
-			if (id && M.d[id]) html = '<div class="dragger-icon '+ fileicon(M.d[id]) +'"></div>'
+			if (id && M.d[id]) html = ('<div class="transfer-filtype-icon ' + fileicon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
 			$('#draghelper .dragger-icon').remove();
-			$(html).insertBefore('#draghelper .dragger-status');
+			$('#draghelper .dragger-content').html(html);
 			$('body').addClass('dragging');
+			$.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+			$.draggerWidth = $('#draghelper .dragger-content').outerWidth();
 		},
-		drag: function(e,u)
+		drag: function(e,ui)
 		{
 			//console.log('tree dragging',e);
+			if (ui.position.top + $.draggerHeight - 28 > $(window).height()) ui.position.top = $(window).height() - $.draggerHeight + 26;
+			if (ui.position.left + $.draggerWidth - 58 > $(window).width()) ui.position.left = $(window).width() - $.draggerWidth + 56;
 		},
 		stop: function(e,u)
 		{
 			$.treeDragging=false;
-			$('body').removeClass('dragging');
+			$('body').removeClass('dragging').removeClassWith("dndc-");
 		}
 	});
 
-	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs').droppable(
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr').droppable(
 	{
 		tolerance: 'pointer',
 		drop: function(e, ui)
@@ -6112,14 +6158,16 @@ function fm_resize_handler() {
 
 }
 
-function sharedfolderUI()
+function sharedfolderUI(aJustRemove)
 {
 	if ($('.shared-details-block').length > 0)
 	{
 		$('.shared-details-block .shared-folder-content').unwrap();
 		$('.shared-folder-content').removeClass('shared-folder-content');
 		$('.shared-top-details').remove();
+		$(window).trigger('resize');
 	}
+	if (aJustRemove) return;
 
 	var n = M.d[M.currentdirid];
 	if (n && n.p.length == 11)

@@ -280,7 +280,6 @@ TransferQueue.prototype.pause = function(gid)
 			$.transferprogress[gid][2] = 0; // reset speed
 		}
 		Soon(percent_megatitle);
-		ASSERT(this._running === 0, 'Invalid running counter ('+this._running+')');
 	}
 	else if (d)
 	{

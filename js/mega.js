@@ -427,11 +427,15 @@ function MegaData ()
 			else
 			{
 				$(lSel).unbind('jsp-scroll-y.dynlist');
-				// delete M.rmCache;
 			}
 		}
-		var cache = /*u && M.rmCache ||*/ [], n_cache, files = cache.length, jsp, t;
-		// M.rmCache = cache;
+		var cache = [], n_cache, files = 0, jsp, t, lSel;
+
+		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y.dynlist');
+		$(window).unbind("resize.dynlist");
+		sharedfolderUI();
+		$(window).trigger('resize');
 
 		hideEmptyMsg();
 
@@ -443,13 +447,13 @@ function MegaData ()
 
 		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		jsp = undefined;
 
 		if (!u)
 		{
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
-			sharedfolderUI(true);
 		}
 
 		if (this.v.length == 0)
@@ -483,6 +487,7 @@ function MegaData ()
 				});
 			}
 		}
+		
 		delete this.cRenderMainN;
 
 		for (var i in this.v)
@@ -721,7 +726,7 @@ function MegaData ()
 			}
 		}
 
-		sharedfolderUI();
+		// sharedfolderUI();
 		contactUI();
 
 		$(window).unbind('dynlist.flush');
@@ -729,10 +734,6 @@ function MegaData ()
 		{
 			if (cache.length) flush_cached_nodes();
 		});
-
-		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
-		$(lSel).unbind('jsp-scroll-y.dynlist');
-		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
@@ -775,7 +776,9 @@ function MegaData ()
 			fa_duplicates = {};
 		}
 
-		this.rmSetupUI();
+		this.rmSetupUI();		
+		
+		if (!u && n_cache) $.rmInitJSP = lSel;
 	};
 
 	this.rmSetupUI = function()
@@ -962,12 +965,12 @@ function MegaData ()
 			M.renderMain();
 			if (fminitialized && (id.substr(0,6) !== 'search'))
 			{
-				if ($('treea_'+M.currentdirid).length == 0)
+				if ($('#treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
-				treeUIopen(M.currentdirid,1);
+				treeUIopen(M.currentdirid,M.currentdirid === 'contacts');
 
 				$('#treea_'+M.currentdirid).addClass('opened');
 			}

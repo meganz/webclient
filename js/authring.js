@@ -369,10 +369,16 @@ var authring = (function () {
      *     Contact's Ed25519 public key to verify the signature.
      * @return {bool}
      *     True on a good signature verification, false otherwise.
+     * @throws
+     *     An error ithe signed key's time stamp is in the future.
      */
     ns.verifyRSAkey = function(signature, pubKey, signPubKey) {
-        var timeStamp = signature.substring(0, 8);
-        var keyString = 'keyauth' + timeStamp + pubKey[0] + pubKey[1];
+        var timestamp = signature.substring(0, 8);
+        var timestampValue = ns._byteStringToLong(timestamp);
+        if (timestampValue > Math.round(Date.now() / 1000)) {
+            throw new Error('Bad timestamp: In the future!');
+        }
+        var keyString = 'keyauth' + timestamp + pubKey[0] + pubKey[1];
         var signatureValue = signature.substring(8);
         try {
             return jodid25519.eddsa.verify(signatureValue, keyString, signPubKey);

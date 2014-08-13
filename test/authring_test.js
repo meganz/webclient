@@ -29,9 +29,9 @@ describe("authring unit test", function() {
                        atob('AQE='), 2048];
     var RSA_HEX_FINGERPRINT = 'c8a7835ba37147f2f5bb60b059c9f003fa69a552';
     var RSA_STRING_FINGERPRINT = base64urldecode('yKeDW6NxR_L1u2CwWcnwA_pppVI');
-    var RSA_SIGNED_PUB_KEY = atob('AAABR8zZvWLyNCRBSYBGpriOd/8XNxgPR7BAYZqdiZ'
-                                  + 'hckYEUmudQHNI1HRQIgn5aCXySwm6TciH0hqt9gK'
-                                  + 'Y25XVYnysZGLwI');
+    var RSA_SIGNED_PUB_KEY = atob('AAAAAFPqtrj3Qr4d83Oz/Ya6svzJfeoSBtWPC7KBU4'
+                                  + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
+                                  + 'aNLvSAFq5/5lQG');
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
@@ -331,7 +331,7 @@ describe("authring unit test", function() {
 
         describe('signRSAkey()', function() {
             it("all normal", function() {
-                sandbox.stub(Date, 'now', function() { return 1407891127650000; });
+                sandbox.stub(Date, 'now', function() { return 1407891127650; });
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
                 assert.strictEqual(btoa(ns.signRSAkey(RSA_PUB_KEY)),
@@ -350,8 +350,10 @@ describe("authring unit test", function() {
             });
 
             it("bad signature with bad timestamp", function() {
-                assert.strictEqual(ns.verifyRSAkey(String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(1),
-                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+                sandbox.stub(Date, 'now', function() { return 1407891027650; });
+                assert.throws(function() { return ns.verifyRSAkey(RSA_SIGNED_PUB_KEY,
+                                                                  RSA_PUB_KEY, ED25519_PUB_KEY); },
+                              'Bad timestamp: In the future!');
             });
 
             it("bad signature with bad point", function() {

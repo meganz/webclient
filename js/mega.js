@@ -427,11 +427,15 @@ function MegaData ()
 			else
 			{
 				$(lSel).unbind('jsp-scroll-y.dynlist');
-				// delete M.rmCache;
 			}
 		}
-		var cache = /*u && M.rmCache ||*/ [], n_cache, files = cache.length, jsp, t;
-		// M.rmCache = cache;
+		var cache = [], n_cache, files = 0, jsp, t, lSel;
+
+		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		$(lSel).unbind('jsp-scroll-y.dynlist');
+		$(window).unbind("resize.dynlist");
+		if (sharedfolderUI()) $(lSel).parent().find('.fm-empty-pad.fm-empty-sharef').remove();
+		$(window).trigger('resize');
 
 		hideEmptyMsg();
 
@@ -443,13 +447,13 @@ function MegaData ()
 
 		jsp = $('.contacts-details-block .file-block-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
+		jsp = undefined;
 
 		if (!u)
 		{
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
-			sharedfolderUI(true);
 		}
 
 		if (this.v.length == 0)
@@ -460,7 +464,12 @@ function MegaData ()
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
-			else if (RootbyId(M.currentdirid) == M.RootID || RootbyId(M.currentdirid) == 'shares') $('.fm-empty-folder').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == M.RootID) $('.fm-empty-folder').removeClass('hidden');
+			else if (RootbyId(M.currentdirid) == 'shares')
+			{
+				$(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
+				$(window).trigger('resize');
+			}
 			else if (RootbyId(M.currentdirid) == 'contacts') $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
 		}
 		else if (this.currentdirid.length != 11 && !~['contacts','shares'].indexOf(this.currentdirid))
@@ -483,6 +492,7 @@ function MegaData ()
 				});
 			}
 		}
+
 		delete this.cRenderMainN;
 
 		for (var i in this.v)
@@ -721,7 +731,7 @@ function MegaData ()
 			}
 		}
 
-		sharedfolderUI();
+		// sharedfolderUI();
 		contactUI();
 
 		$(window).unbind('dynlist.flush');
@@ -729,10 +739,6 @@ function MegaData ()
 		{
 			if (cache.length) flush_cached_nodes();
 		});
-
-		var lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
-		$(lSel).unbind('jsp-scroll-y.dynlist');
-		$(window).unbind("resize.dynlist");
 
 		if (d) console.log('cache %d/%d (%d)', cache.length, files, n_cache);
 		if (cache.length)
@@ -776,6 +782,8 @@ function MegaData ()
 		}
 
 		this.rmSetupUI();
+
+		if (!u && n_cache) $.rmInitJSP = lSel;
 	};
 
 	this.rmSetupUI = function()
@@ -962,12 +970,12 @@ function MegaData ()
 			M.renderMain();
 			if (fminitialized && (id.substr(0,6) !== 'search'))
 			{
-				if ($('treea_'+M.currentdirid).length == 0)
+				if ($('#treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
-				treeUIopen(M.currentdirid,1);
+				treeUIopen(M.currentdirid,M.currentdirid === 'contacts');
 
 				$('#treea_'+M.currentdirid).addClass('opened');
 			}

@@ -376,9 +376,6 @@ function MegaData ()
 
 	this.renderMain = function(u)
 	{
-		sharedfolderUI();
-		$(window).trigger('resize');
-	
 		function flush_cached_nodes(n)
 		{
 			var e = cache.splice(0, n || cache.length);
@@ -437,6 +434,8 @@ function MegaData ()
 		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
 		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
+		sharedfolderUI();
+		$(window).trigger('resize');
 
 		hideEmptyMsg();
 
@@ -489,8 +488,6 @@ function MegaData ()
 				});
 			}
 		}
-		
-		
 		
 		delete this.cRenderMainN;
 

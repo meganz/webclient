@@ -1198,7 +1198,7 @@ function initContextUI()
 		}
 	});
 	// Not sure if this will work
-	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
+//	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -3986,16 +3986,24 @@ function contextmenuUI(e,ll,topmenu)
 
 	adjustContextMenuPosition(e, m);
 
-	for (var md in M.d)
-	{
-		var t = md;
-		var n=[];
-		for (var i in $.selected) if (isCircular($.selected[i],t)) n.push($.selected[i]);
-		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
-	}
+	disableCirclarTargetsInSubMenus();
 
 	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function disableCirclarTargetsInSubMenus()
+{
+	$('#fi_' + M.currentdirid).addClass('disabled');
+	// not taking into account if selected items are files, but no damage, #fi_ is for folder-item only
+	for (var s in $.selected) $('#fi_' + $.selected[s]).addClass('disabled');		
+	for (var mc in M.c)
+	{
+		var n=[];
+		for (var i in $.selected) if (isCircular($.selected[i], mc)) n.push($.selected[i]);
+		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
+	}
+	return true;
 }
 
 function adjustContextMenuPosition(e, m)

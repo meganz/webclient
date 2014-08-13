@@ -1176,11 +1176,10 @@ function MegaData ()
 
 // localeCompare is not supported in IE10, >=IE11 only
 // sort by name is default in the tree
-//		folders.sort(function(a,b)
-//		{
-//			if (a.name) return a.name.localeCompare(b.name);
-//		});
-
+		folders.sort(function(a,b)
+		{
+			if (a.name) return a.name.localeCompare(b.name);
+		});
 		for (var i in folders)
 		{
 			var sub = false;
@@ -1199,10 +1198,9 @@ function MegaData ()
 				}
 			}
 			var sharedfolder = 'folder-item';
-			// ToDo: update css to properly show shared-folders in submenus
-//			if (typeof M.d[fid].shares !== 'undefined') sharedfolder = 'shared-folder';
+			if (typeof M.d[fid].shares !== 'undefined') sharedfolder = 'shared-folder-item';
 			var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
-			$('#csb_' + id).prepend(html);
+			$('#csb_' + id).append(html);
 			if (sub) this.buildSubmenu(fid);
 		}
 

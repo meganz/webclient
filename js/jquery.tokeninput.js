@@ -615,6 +615,7 @@ $.TokenList = function (input, url_or_data, settings) {
     function hide_dropdown () {
         dropdown.hide().empty();
         selected_dropdown_item = null;
+		$('.multiple-input').removeClass('active');
 	}
 
     function show_dropdown() {
@@ -626,6 +627,7 @@ $.TokenList = function (input, url_or_data, settings) {
                 zindex: 999
             })
             .show();
+			$('.multiple-input').addClass('active');
     }
 
     function show_dropdown_searching () {

@@ -7936,9 +7936,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	overflow: hidden;
 }
 .fm-dialog.share-dialog {
-	min-width: 604px;
-	min-height: 404px;
-	margin: -202px 0 0 -302px;
+	width: 480px;
+	height: auto;
+	min-height: 10px;
+	margin: -119px 0 0 -240px;
 	overflow: hidden;
 }
 .fm-dialog.export-links-dialog {
@@ -17448,10 +17449,7 @@ ul.token-input-list-mega {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 30px 6px 30px;
-	background-image:url(../images/mega/dialogs-sprite.svg);
-background-position:-80px -84px;
-background-repeat:no-repeat;
+	padding: 0 31px 6px 31px;
 }
 ul.token-input-list-mega li input {
 	border: 0;
@@ -17511,9 +17509,7 @@ li.token-input-token-mega .input-close:hover {
 	opacity: 0.5;
 }
 li.token-input-selected-token-mega {
-	background-color: #5670a6;
-	border: 1px solid #3b5998;
-	color: #fff;
+	background-color: rgba(255,255,255,0.5);
 }
 li.token-input-input-token-mega {
 	float: left;
@@ -17523,7 +17519,7 @@ li.token-input-input-token-mega {
 }
 div.token-input-dropdown-mega {
 	position: absolute;
-	width: 576px;
+	width: 456px;
 	background-color: #fff;
 	overflow: hidden;
 	border: 2px solid rgba(0,0,0,0.1);
@@ -17536,6 +17532,9 @@ div.token-input-dropdown-mega {
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 div.token-input-dropdown-mega p {
 	margin: 0;
@@ -17581,6 +17580,61 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	text-transform: uppercase;
+}
+.share-dialog-img {
+	height: 90px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center 8px;
+}
+.multiple-input {
+	position: relative;
+}
+.share-dialog-icon {
+	position: absolute;
+	width: 25px;
+	height: 25px;
+	z-index: 10;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -81px -84px;
+	background-repeat: no-repeat;
+}
+.share-dialog-icon.permissions-icon {
+	width: 30px;
+	background-position: -85px -275px;
+	right: 0;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: pointer;
+}
+.share-dialog-icon.permissions-icon:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+.active .share-dialog-icon {
+	background-position: -80px -314px;
+}
+.active .share-dialog-icon.permissions-icon {
+	background-position: -85px -239px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.active ul.token-input-list-mega {
+	background-color: rgba(0,0,0,0.2);
+}
+.active ul.token-input-list-mega li input {
+	color: white;
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

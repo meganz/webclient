@@ -73,10 +73,10 @@ function init_affiliatemember()
 	{
 		callback : function (res)
 		{	
-			if (res.r)
+			if (res)
 			{
 				var pid;
-				for (var p in res.r) pid = p;
+				for (var p in res) pid = p;
 				$('#aff_id').html('Partner ID: ' + htmlentities(pid));
 				$('#aff_url').html('https://mega.co.nz/#pro/' + htmlentities(pid));
 				$('#aff_url').attr('href','https://mega.co.nz/#pro/' + htmlentities(pid));				

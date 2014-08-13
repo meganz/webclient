@@ -18,9 +18,6 @@ function pollnotifications()
 					if (M.currentdirid == 'notifications') loadingDialog.hide();					
 					notifications = [];
 					var currtime = Math.floor(new Date().getTime()/1000);
-					
-					console.log(json.ltd);
-					
 					for (var i in json.c)
 					{
 						notifications.push({

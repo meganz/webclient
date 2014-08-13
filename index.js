@@ -521,13 +521,13 @@ function init_page()
 	{
 		parsepage(pages['mobile']);		
 	}
-	else if (page == 'affiliates'  && u_attr && u_attr.aff)
+	else if (page == 'affiliates'  && u_attr && u_attr.aff_payment)
 	{
 		parsepage(pages['affiliatemember']);
 		init_affiliatemember();
 	}
 	else if (page == 'affiliates')
-	{	
+	{
 		parsepage(pages['affiliates']);
 	}
 	else if (page == 'resellers')

@@ -153,18 +153,15 @@ function aff_signup()
 			callback : function (res)
 			{	
 				loadingDialog.hide();
-				if (res.r)
+				if (typeof res == 'number') alert(l[200]);				
+				else
 				{
 					u_attr.aff=1;
 					u_attr.aff_paypal = $('#aff_paypal').val();
 					u_attr.aff_bankaccount = $('#aff_bankaccount').val();
 					u_attr.aff_bankname = $('#aff_bankname').val();
 					u_attr.aff_benificiary = $('#aff_benificiary').val();
-					document.location.hash = 'affiliates';
-				}
-				else
-				{
-					alert(l[200]);				
+					document.location.hash = 'affiliates';					
 				}
 			}
 		});

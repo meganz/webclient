@@ -6,7 +6,7 @@
     <RDF:li RDF:resource="rdf:#$IIU611"/>
   </RDF:Seq>
   <RDF:Description RDF:about="rdf:#$IIU611"
-                   NS1:version="2.0.162">
+                   NS1:version="2.0.163">
     <NS1:targetApplication RDF:resource="rdf:#$LIU611"/>
   </RDF:Description>
   <RDF:Description RDF:about="urn:mozilla:extension:firefox@mega.co.nz"
@@ -18,5 +18,5 @@
                    NS1:minVersion="4.0"
                    NS1:maxVersion="30.*"
                    NS1:updateLink="http://eu.static.mega.co.nz/mega.xpi"
-                   NS1:updateHash="sha256:3ddd23ed572d01d0830762f4e57c609dd737327ee2740e821afcae8f71ebcf3c" />
+                   NS1:updateHash="sha256:176f05271d82604ab5024e3baef55b03eb1dbcbe9a5171e621598434773d362f" />
 </RDF:RDF>

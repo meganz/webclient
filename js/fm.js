@@ -1121,11 +1121,8 @@ function fmremove()
 }
 function initContextUI()
 {
-
-//	$('.context-scrolling-block').off('mousemove');
-//	$('.context-scrolling-block').on('mousemove', scrollMegaSubMenu(event));
-
 	var c = '.context-menu-item';
+	
 	$(c).unbind('mouseover');
 	$(c).bind('mouseover', function()
 	{
@@ -1149,13 +1146,13 @@ function initContextUI()
 	});
 
 	$(c+'.contains-submenu').unbind('mouseover');
-	$(c+'.contains-submenu').bind('mouseover', function(e)
+	$(c+'.contains-submenu').bind('mouseover', function()
 	{
 		var a = $(this).next();// context-submenu
 		a.children().removeClass('active opened');
 		a.find('.context-submenu').addClass('hidden');
 		a.find('.opened').removeClass('opened');
-		// situation when we have 2 contains-submenus one below another
+		// situation when we have 2 contains-submenus in same context-submenu one neer another
 		var b = $(this).closest('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
 		if (b.length)
 		{
@@ -1177,9 +1174,7 @@ function initContextUI()
 
 		if (!$(this).is('.opened'))
 		{
-//			var pos = getHtmlElemPos(this);
 			var pos = $(this).offset();
-//			var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
 			var c = reCalcMenuPosition($(this), pos.left, pos.top, 'submenu');
 			$(this).next('.context-submenu')
 				.css({'top': c.top})
@@ -4185,10 +4180,7 @@ function setBordersRadius(m, c)
 // Scroll menus which height is bigger then window.height
 function scrollMegaSubMenu(e)
 {
-//	e.stopPropagation();
-
 	var ey = e.pageY;
-//	var k = e.target;
 	var pNode = $(e.target).closest('.context-scrolling-block')[0];
 
 	if (typeof pNode !== 'undefined')

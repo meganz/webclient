@@ -4385,6 +4385,8 @@ function sectionUIopen(id)
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
+	console.error('treeUIopen',event,ignoreScroll);
+	
 	if (id == 'shares') sectionUIopen('shared-with-me');
 	else if (id == M.RootID) sectionUIopen('cloud-drive');
 	else if (id == 'contacts') sectionUIopen('contacts');
@@ -4416,14 +4418,16 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	if (id == M.RootID)
 	{
 		stickToTop = true;
-		scrollTo=$('#treesub_' + M.RootID);
+		scrollTo=false;
 	}
 	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
+	
 	if (scrollTo && !ignoreScroll)
 	{
 		var jsp = $('.fm-tree-panel').data('jsp');
 		if (jsp) setTimeout(function()
 		{
+			console.log('scroll to element?',scrollTo,stickToTop);
 			jsp.scrollToElement(scrollTo,stickToTop);
 		},50);
 	}

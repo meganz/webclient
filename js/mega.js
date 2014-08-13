@@ -969,12 +969,12 @@ function MegaData ()
 			M.renderMain();
 			if (fminitialized && (id.substr(0,6) !== 'search'))
 			{
-				if ($('treea_'+M.currentdirid).length == 0)
+				if ($('#treea_'+M.currentdirid).length == 0)
 				{
 					var n = M.d[M.currentdirid];
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
-				treeUIopen(M.currentdirid,1);
+				treeUIopen(M.currentdirid);
 
 				$('#treea_'+M.currentdirid).addClass('opened');
 			}

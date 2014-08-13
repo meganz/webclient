@@ -4385,8 +4385,6 @@ function sectionUIopen(id)
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	console.error('treeUIopen',event,ignoreScroll);
-	
 	if (id == 'shares') sectionUIopen('shared-with-me');
 	else if (id == M.RootID) sectionUIopen('cloud-drive');
 	else if (id == 'contacts') sectionUIopen('contacts');
@@ -4415,10 +4413,10 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	$('#treea_' + id).addClass('selected');
 	var scrollTo = false;
 	var stickToTop = false;
-	if (id == M.RootID)
+	if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
 	{
 		stickToTop = true;
-		scrollTo=false;
+		scrollTo= $('.nw-tree-panel-header');
 	}
 	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
 	

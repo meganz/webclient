@@ -33,7 +33,7 @@ var DEFAULT_SETTINGS = {
     idPrefix: "token-input-",
 
 	// Formatters
-    resultsFormatter: function(item){ return "<li><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
+    resultsFormatter: function(item){ return "<li class='share-search-result'><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
     tokenFormatter: function(item) { return "<li><span class='search-avatar color3'>uu</span>" + item[this.propertyToSearch] + "</li>" },
 
 	// Callbacks
@@ -617,6 +617,12 @@ $.TokenList = function (input, url_or_data, settings) {
         selected_dropdown_item = null;
 		$('.multiple-input').removeClass('active');
 	}
+	
+	function initShareInputScroll()
+    {
+	  $('.token-input-dropdown-mega').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+	  
+    }
 
     function show_dropdown() {
         dropdown
@@ -690,6 +696,7 @@ $.TokenList = function (input, url_or_data, settings) {
             });
 
             show_dropdown();
+			//initShareInputScroll();
 
             if(settings.animateDropdown) {
                 dropdown_ul.slideDown("fast");

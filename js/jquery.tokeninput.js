@@ -637,6 +637,9 @@ $.TokenList = function (input, url_or_data, settings) {
             })
             .show();
 			$('.multiple-input').addClass('active');
+			$('.permissions-menu').addClass('hidden');
+		    $('.permissions-icon.active').removeClass('active');
+		    $('.share-dialog-permissions.active').removeClass('active');
     }
 
     function show_dropdown_searching () {

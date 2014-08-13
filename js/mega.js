@@ -1176,11 +1176,10 @@ function MegaData ()
 
 // localeCompare is not supported in IE10, >=IE11 only
 // sort by name is default in the tree
-//		folders.sort(function(a,b)
-//		{
-//			if (a.name) return a.name.localeCompare(b.name);
-//		});
-
+		folders.sort(function(a,b)
+		{
+			if (a.name) return a.name.localeCompare(b.name);
+		});
 		for (var i in folders)
 		{
 			var sub = false;
@@ -1198,15 +1197,11 @@ function MegaData ()
 					break;
 				}
 			}
-// Should we have infors about shared folders in submenues?
-//				var sharedfolder = '';
-//				if (typeof M.d[fid].shares !== 'undefined') sharedfolder = ' shared-folder';
-			var html = '<span class="context-menu-item folder-item' + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
-			$('#csb_' + id).prepend(html);
-			if (sub)
-			{
-				this.buildSubmenu(fid);
-			}
+			var sharedfolder = 'folder-item';
+			if (typeof M.d[fid].shares !== 'undefined') sharedfolder = 'shared-folder-item';
+			var html = '<span class="context-menu-item ' + sharedfolder + cs + '" id="fi_' + fid + '">' + icon + this.d[fid].name + '</span>' + sm;
+			$('#csb_' + id).append(html);
+			if (sub) this.buildSubmenu(fid);
 		}
 
 		initContextUI();

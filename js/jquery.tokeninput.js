@@ -33,8 +33,11 @@ var DEFAULT_SETTINGS = {
     idPrefix: "token-input-",
 
 	// Formatters
-    resultsFormatter: function(item){ return "<li><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
-    tokenFormatter: function(item) { return "<li><span class='search-avatar color3'>uu</span>" + item[this.propertyToSearch] + "</li>" },
+	
+	// Please add "email/gmail" classnames to "share-search-result" and "share-added-contact" blocks
+	// Please add "selected" classname to "share-search-result" block if user is already added
+    resultsFormatter: function(item){ return "<li class='share-search-result selected'><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + item[this.propertyToSearch]+ "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>" },
+    tokenFormatter: function(item) { return "<li class='share-added-contact'><span class='search-avatar color3'>UU</span>" + item[this.propertyToSearch] + "</li>" },
 
 	// Callbacks
     onResult: null,
@@ -615,7 +618,14 @@ $.TokenList = function (input, url_or_data, settings) {
     function hide_dropdown () {
         dropdown.hide().empty();
         selected_dropdown_item = null;
+		$('.multiple-input').removeClass('active');
 	}
+	
+	function initShareInputScroll()
+    {
+	  $('.token-input-dropdown-mega').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+	  
+    }
 
     function show_dropdown() {
         dropdown
@@ -626,6 +636,10 @@ $.TokenList = function (input, url_or_data, settings) {
                 zindex: 999
             })
             .show();
+			$('.multiple-input').addClass('active');
+			$('.permissions-menu').addClass('hidden');
+		    $('.permissions-icon.active').removeClass('active');
+		    $('.share-dialog-permissions.active').removeClass('active');
     }
 
     function show_dropdown_searching () {
@@ -688,6 +702,7 @@ $.TokenList = function (input, url_or_data, settings) {
             });
 
             show_dropdown();
+			//initShareInputScroll();
 
             if(settings.animateDropdown) {
                 dropdown_ul.slideDown("fast");

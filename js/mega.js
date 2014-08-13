@@ -454,7 +454,6 @@ function MegaData ()
 			$('.grid-table tr').remove();
 			$('.file-block-scrolling a').remove();
 			$('.contacts-blocks-scrolling a').remove();
-			sharedfolderUI();
 		}
 
 		if (this.v.length == 0)
@@ -779,10 +778,7 @@ function MegaData ()
 
 		this.rmSetupUI();		
 		
-		if (!u) setTimeout(function() {
-			var jsp = $('.jspScrollable:visible').data('jsp');
-			if (jsp) jsp.reinitialise();
-		}, 170);
+		if (!u && n_cache) $.rmInitJSP = lSel;
 	};
 
 	this.rmSetupUI = function()
@@ -974,7 +970,7 @@ function MegaData ()
 					var n = M.d[M.currentdirid];
 					if (n && n.p) treeUIopen(n.p,false,true);
 				}
-				treeUIopen(M.currentdirid);
+				treeUIopen(M.currentdirid,M.currentdirid === 'contacts');
 
 				$('#treea_'+M.currentdirid).addClass('opened');
 			}

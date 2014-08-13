@@ -776,12 +776,6 @@ function initUI()
 	$(window).unbind('resize.fmrh hashchange.fmrh');
 	$(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    // because setTimeout was used in treeUI, we should trigger a `resize` evt
-    // we need to use setTimeout again :/
-    setTimeout(function() {
-        $(window).trigger('resize');
-    },50);
-
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 
 	megaChat.karere.unbind("onPresence.maintainUI");
@@ -2647,8 +2641,6 @@ function gridUI()
 	$.selectddUIitem = 'tr';
 	Soon(selectddUI);
 	
-	$(window).trigger('resize');
-
 	if (d) console.timeEnd('gridUI');
 }
 
@@ -3398,8 +3390,8 @@ function searchPath()
 
 function selectddUI()
 {
-	if (d) console.time('selectddUI');
 	if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') return false;
+	if (d) console.time('selectddUI');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable(
 	{
 		tolerance: 'pointer',
@@ -3568,6 +3560,15 @@ function selectddUI()
 		else M.addDownload([h]);
 	});
 	if (d) console.timeEnd('selectddUI');
+	
+	if ($.rmInitJSP)
+	{
+		var jsp=$($.rmInitJSP).data('jsp');
+		if (jsp) jsp.reinitialise();
+		if (d) console.log('jsp:!u', jsp);
+		delete $.rmInitJSP;
+	}
+	$(window).trigger('resize');
 }
 
 function iconUI()
@@ -3650,8 +3651,6 @@ function iconUI()
 	}
 	setTimeout(selectddUI,10);
 	if (d) console.timeEnd('iconUI');
-	
-	$(window).trigger('resize');
 }
 
 function transferPanelUI()

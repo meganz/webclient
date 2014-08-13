@@ -475,6 +475,8 @@ function MegaData ()
 			}
 			else
 			{
+				console.log('height',$('.files-grid-view.fm').height());
+				
 				n_cache = Math.ceil($('.files-grid-view.fm').height() / 24);
 			}
 			if (!n_cache)
@@ -486,6 +488,9 @@ function MegaData ()
 				});
 			}
 		}
+		
+		if ($.block) exit();
+		
 		delete this.cRenderMainN;
 
 		for (var i in this.v)

@@ -2591,7 +2591,7 @@ function gridUI()
 	}
 	else
 	{
-		$('.files-grid-view').removeClass('hidden');
+		$('.files-grid-view.fm').removeClass('hidden');
 		initGridScrolling();
 		$.gridHeader();
 	}

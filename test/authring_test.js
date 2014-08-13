@@ -29,9 +29,9 @@ describe("authring unit test", function() {
                        atob('AQE='), 2048];
     var RSA_HEX_FINGERPRINT = 'c8a7835ba37147f2f5bb60b059c9f003fa69a552';
     var RSA_STRING_FINGERPRINT = base64urldecode('yKeDW6NxR_L1u2CwWcnwA_pppVI');
-    var RSA_SIGNED_PUB_KEY = atob('vGctqrIj0ks00jExcwcG5dhiqTqQi82tjOkBTmP5i'
-                                  + 'fz6E0/PGt7dlpF+Qjh6exOnASGQf8UGi+4DW/WQ'
-                                  + '90jGAw==');
+    var RSA_SIGNED_PUB_KEY = atob('AAABR8zZvWLyNCRBSYBGpriOd/8XNxgPR7BAYZqdiZ'
+                                  + 'hckYEUmudQHNI1HRQIgn5aCXySwm6TciH0hqt9gK'
+                                  + 'Y25XVYnysZGLwI');
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
@@ -331,6 +331,7 @@ describe("authring unit test", function() {
 
         describe('signRSAkey()', function() {
             it("all normal", function() {
+                sandbox.stub(Date, 'now', function() { return 1407891127650000; });
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
                 assert.strictEqual(btoa(ns.signRSAkey(RSA_PUB_KEY)),
@@ -344,12 +345,17 @@ describe("authring unit test", function() {
             });
 
             it("bad signature", function() {
-                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 63) + String.fromCharCode(42),
+                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 71) + String.fromCharCode(42),
+                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+            });
+
+            it("bad signature with bad timestamp", function() {
+                assert.strictEqual(ns.verifyRSAkey(String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(1),
                                                    RSA_PUB_KEY, ED25519_PUB_KEY), false);
             });
 
             it("bad signature with bad point", function() {
-                assert.strictEqual(ns.verifyRSAkey(String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(1),
+                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
                                                    RSA_PUB_KEY, ED25519_PUB_KEY), false);
             });
         });
@@ -440,6 +446,55 @@ describe("authring unit test", function() {
             sandbox.stub(window, 'u_authring', {'you456789xw': authenticated});
             ns.getContactAuthenticated('you456789xw');
             assert.deepEqual(ns.getContactAuthenticated('you456789xw'), authenticated);
+        });
+    });
+
+    describe('integer conversion()', function() {
+        describe('_longToByteString()', function() {
+            it("simple tests", function() {
+                var tests = [1407891127650, 0,
+                             1, 3317330537000,
+                             9007199254740991];
+                var expected = ['00000147ccd9bd62', '0000000000000000',
+                                '0000000000000001', '00000304604eea28',
+                                '001fffffffffffff'];
+                for (var i = 0; i < tests.length; i++) {
+                    var expectedString = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(expected[i]));
+                    assert.strictEqual(ns._longToByteString(tests[i]), expectedString);
+                }
+            });
+
+            it("value too big", function() {
+                var tests = [9007199254740991 + 1];
+                for (var i = 0; i < tests.length; i++) {
+                    assert.throws(function() { ns._longToByteString(tests[i]); },
+                                  'Integer not suitable for lossless conversion in JavaScript.');
+                }
+            });
+        });
+
+        describe('_byteStringToLong()', function() {
+            it("simple tests", function() {
+                var tests = ['00000147ccd9bd62', '0000000000000000',
+                             '0000000000000001', '00000304604eea28',
+                             '001fffffffffffff'];
+                var expected = [1407891127650, 0,
+                                1, 3317330537000,
+                                9007199254740991];
+                for (var i = 0; i < tests.length; i++) {
+                    var testString = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(tests[i]));
+                    assert.strictEqual(ns._byteStringToLong(testString), expected[i]);
+                }
+            });
+
+            it("value too big", function() {
+                var tests = ['0020000000000000'];
+                for (var i = 0; i < tests.length; i++) {
+                    var testString = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(tests[i]));
+                    assert.throws(function() { ns._byteStringToLong(testString); },
+                                  'Integer not suitable for lossless conversion in JavaScript.');
+                }
+            });
         });
     });
 });

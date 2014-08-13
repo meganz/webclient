@@ -346,12 +346,13 @@ var authring = (function () {
      * @param pubKey {array}
      *     Array format of public key. Index 0 is the modulo, index 1 is the
      *     exponent, both in byte string format.
-     * @return
+     * @return {string}
      *     EdDSA signature of the key as a byte string.
      */
     ns.signRSAkey = function(pubKey) {
-        var keyString = pubKey[0] + pubKey[1];
-        return jodid25519.eddsa.sign(keyString, u_privEd25519, u_pubEd25519);
+        var timeStamp = ns._longToByteString(Math.round(Date.now() / 1000));
+        var keyString = 'keyauth' + timeStamp + pubKey[0] + pubKey[1];
+        return timeStamp + jodid25519.eddsa.sign(keyString, u_privEd25519, u_pubEd25519);
     };
 
 
@@ -366,13 +367,15 @@ var authring = (function () {
      *     exponent, both in byte string format.
      * @param signPubKey {string}
      *     Contact's Ed25519 public key to verify the signature.
-     * @return
+     * @return {bool}
      *     True on a good signature verification, false otherwise.
      */
     ns.verifyRSAkey = function(signature, pubKey, signPubKey) {
-        var keyString = pubKey[0] + pubKey[1];
+        var timeStamp = signature.substring(0, 8);
+        var keyString = 'keyauth' + timeStamp + pubKey[0] + pubKey[1];
+        var signatureValue = signature.substring(8);
         try {
-            return jodid25519.eddsa.verify(signature, keyString, signPubKey);
+            return jodid25519.eddsa.verify(signatureValue, keyString, signPubKey);
         } catch(e){
             if (e === "Point is not on curve") {
                 return false;
@@ -390,7 +393,7 @@ var authring = (function () {
      *     First fingerprint in byte or hex string format.
      * @param fp2 {string}
      *     Second fingerprint. in byte or hex string format
-     * @return
+     * @return {bool}
      *     True on equality, `undefined` if one fingerprint is undefined,
      *     false otherwise.
      */
@@ -405,6 +408,52 @@ var authring = (function () {
             fp2 = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(fp2));
         }
         return fp1 === fp2;
+    };
+
+
+    /**
+     * Convert a long integer (> 32-bit) to an 8-byte bit-endian string.
+     *
+     * @param value {integer}
+     *     Integer input.
+     * @return {string}
+     *     Big-endian byte string representation..
+     */
+    ns._longToByteString = function(value) {
+        if (value > 9007199254740991) {
+            // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
+            throw new Error('Integer not suitable for lossless conversion in JavaScript.');
+        }
+        var result = '';
+
+        for (var i = 0; i < 8; i++ ) {
+            result = String.fromCharCode(value & 0xff) + result;
+            value = Math.floor(value / 0x100);
+        }
+
+        return result;
+    };
+
+
+    /**
+     * Convert an 8-byte bit-endian string to a long integer (> 32-bit).
+     *
+     * @param sequence {string}
+     *     Big-endian byte string representation.
+     * @return {intenger}
+     *     Integer representation.
+     */
+    ns._byteStringToLong = function(sequence) {
+        var value = 0;
+        for (var i = 0; i < 8; i++) {
+            value = (value * 256) + sequence.charCodeAt(i);
+        }
+        if (value > 9007199254740991) {
+         // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
+            throw new Error('Integer not suitable for lossless conversion in JavaScript.');
+        }
+
+        return value;
     };
 
 

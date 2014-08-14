@@ -1122,7 +1122,7 @@ function fmremove()
 function initContextUI()
 {
 	var c = '.context-menu-item';
-	
+
 	$(c).unbind('mouseover');
 	$(c).bind('mouseover', function()
 	{
@@ -3552,7 +3552,7 @@ function selectddUI()
 	{
 		var jsp=$($.rmInitJSP).data('jsp');
 		if (jsp) jsp.reinitialise();
-		if (d) console.log('jsp:!u', jsp);
+		if (d) console.log('jsp:!u', !!jsp);
 		delete $.rmInitJSP;
 	}
 	$(window).trigger('resize');
@@ -4046,7 +4046,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		var nTop = parseInt(n.css('padding-top'));
 		var tB = parseInt(n.css('border-top-width'));
 		var pPos = m.position();
-		
+
 		var b = y + nmH - (nTop - tB);// bottom of submenu
 		var mP = m.closest('.context-submenu');
 		var pT = 0, bT = 0, pE = 0;
@@ -4058,7 +4058,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (b > maxY) top =  (maxY - nmH + nTop - tB) - pE.top + 'px';
 		else top = pPos.top - tB + 'px';
-		
+
 		return top;
 	};
 
@@ -4084,7 +4084,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		var n = m.next('.context-submenu');
 		var nmW = n.outerWidth();// margin not calculated
 		var nmH = n.outerHeight();// margins not calculated
-				
+
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
@@ -4368,15 +4368,18 @@ function sectionUIopen(id)
 	$('.nw-tree-panel-header span').text(headertxt);
 }
 
-	
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	if (RootbyId(id) == 'shares') sectionUIopen('shared-with-me');
-	else if (RootbyId(id) == M.RootID) sectionUIopen('cloud-drive');
-	else if (RootbyId(id) == 'contacts') sectionUIopen('contacts');
+	var id_r = RootbyId(id), e, scrollTo = false, stickToTop = false;
+
+	if (id_r == 'shares') sectionUIopen('shared-with-me');
+	else if (id_r == M.RootID) sectionUIopen('cloud-drive');
+	else if (id_r == 'contacts') sectionUIopen('contacts');
 	else if (id == 'chat') sectionUIopen('conversations');
-	else if (RootbyId(id) == M.RubbishID) sectionUIopen('rubbish-bin');	
+	else if (id_r == M.RubbishID) sectionUIopen('rubbish-bin');
+
 	if (!fminitialized) return false;
+
 	if (!event)
 	{
 		var ids = M.getPath(id);
@@ -4392,19 +4395,18 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 		else if (ids[0] == M.RootID) sectionUIopen('cloud-drive');
 	}
 	if ($.hideContextMenu) $.hideContextMenu(event);
-	var b = $('#treea_' + id);
-	var d = b.attr('class');
+
+	e = $('#treea_' + id);
 	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
-	var a = M.getPath(id);
-	$('#treea_' + id).addClass('selected');
-	var scrollTo = false;
-	var stickToTop = false;
+	e.addClass('selected');
+
 	if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
 	{
 		stickToTop = true;
-		scrollTo= $('.nw-tree-panel-header');
+		scrollTo = $('.nw-tree-panel-header');
 	}
-	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
+	else if (e.length && !e.visible()) scrollTo = e;
+	// if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
 
 	if (scrollTo && !ignoreScroll)
 	{

@@ -600,7 +600,8 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left mega-height disabled context-scrolling-block');
+		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -1188,7 +1189,7 @@ function initContextUI()
 	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
 	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		if (!$(this).is('disabled'))
+		if (!$(this).is('.disabled'))
 		{
 			var t = $(this).attr('id').replace('fi_','');
 			var n=[];
@@ -3994,14 +3995,12 @@ function contextmenuUI(e,ll,topmenu)
 
 function disableCirclarTargetsInSubMenus()
 {
-	$('#fi_' + M.currentdirid).addClass('disabled');
-	// not taking into account if selected items are files, but no damage, #fi_ is for folder-item only
-	for (var s in $.selected) $('#fi_' + $.selected[s]).addClass('disabled');		
-	for (var mc in M.c)
+	for (var s in $.selected)
 	{
-		var n=[];
-		for (var i in $.selected) if (isCircular($.selected[i], mc)) n.push($.selected[i]);
-		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
+		var x = $.selected[s];
+		$('#fi_' + x).addClass('disabled');
+		$('#fi_' + M.d[x].p).addClass('disabled');// Disable parent dir
+		disableDescendantFolders(x);// Disable all children folders
 	}
 	return true;
 }
@@ -4088,7 +4087,7 @@ function reCalcMenuPosition(m, x, y, ico)
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
 	{
 		cor = 1;
-		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		dPos = {'x':x - 2, 'y':y + ico.y + 8};// position for right-bot
 		if (wMax > maxX)// draw to the left
 		{
 			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
@@ -4096,7 +4095,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (hMax > maxY)// draw to the top
 		{
-			dPos.y = y - cmH - 4;// additional pixels to align with -icon
+			dPos.y = y - cmH;// additional pixels to align with -icon
 			cor++;
 		}
 	}

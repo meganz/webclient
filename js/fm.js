@@ -4087,7 +4087,7 @@ function reCalcMenuPosition(m, x, y, ico)
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
 	{
 		cor = 1;
-		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		dPos = {'x':x - 2, 'y':y + ico.y + 8};// position for right-bot
 		if (wMax > maxX)// draw to the left
 		{
 			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
@@ -4095,7 +4095,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (hMax > maxY)// draw to the top
 		{
-			dPos.y = y - cmH - 4;// additional pixels to align with -icon
+			dPos.y = y - cmH;// additional pixels to align with -icon
 			cor++;
 		}
 	}

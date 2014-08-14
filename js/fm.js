@@ -1188,7 +1188,7 @@ function initContextUI()
 	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
 	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		if (!$(this).is('disabled'))
+		if (!$(this).is('.disabled'))
 		{
 			var t = $(this).attr('id').replace('fi_','');
 			var n=[];

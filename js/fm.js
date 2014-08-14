@@ -4324,7 +4324,6 @@ function treeUIexpand(id,force,moveDialog)
 
 function sectionUIopen(id)
 {
-	console.error('sectionUIopen',id);
 	$('.nw-fm-left-icon').removeClass('active');
 	$('.content-panel').removeClass('active');
 	$('.nw-fm-left-icon.' + id).addClass('active');

@@ -1436,3 +1436,28 @@ function getHtmlElemPos(elem, n)
     }
     return {x: xPos, y: yPos};
 }
+
+function disableDescendantFolders(id)
+{
+	var folders = [];
+	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
+	
+	for (var i in folders)
+	{
+		var sub = false;
+		var fid = folders[i].h;
+
+		for (var h in M.c[fid])
+		{
+			if (M.d[h].t)
+			{
+				sub = true;
+				break;
+			}
+		}
+		$('#fi_' + fid).addClass('disabled');
+		if (sub) this.disableDescendantFolders(fid);
+	}
+
+	return true;
+}

@@ -600,7 +600,8 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left mega-height disabled context-scrolling-block');
+		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -3994,14 +3995,12 @@ function contextmenuUI(e,ll,topmenu)
 
 function disableCirclarTargetsInSubMenus()
 {
-	$('#fi_' + M.currentdirid).addClass('disabled');
-	// not taking into account if selected items are files, but no damage, #fi_ is for folder-item only
-	for (var s in $.selected) $('#fi_' + $.selected[s]).addClass('disabled');		
-	for (var mc in M.c)
+	for (var s in $.selected)
 	{
-		var n=[];
-		for (var i in $.selected) if (isCircular($.selected[i], mc)) n.push($.selected[i]);
-		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
+		var x = $.selected[s];
+		$('#fi_' + x).addClass('disabled');
+		$('#fi_' + M.d[x].p).addClass('disabled');// Disable parent dir
+		disableDescendantFolders(x);// Disable all children folders
 	}
 	return true;
 }

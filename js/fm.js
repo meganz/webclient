@@ -600,7 +600,7 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		b.removeClass('active left-position overlap-right overlap-left mega-height disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -788,7 +788,7 @@ function initUI()
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();
-	var menuitems = $('.context-menu.files-menu .context-menu-item')
+	var menuitems = $('.context-menu.files-menu .context-menu-item');
 
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
@@ -1188,12 +1188,17 @@ function initContextUI()
 	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
 	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
+		if (!$(this).is('disabled'))
+		{
+			var t = $(this).attr('id').replace('fi_','');
+			var n=[];
+			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+			$.hideContextMenu();
+			M.moveNodes(n,t);
+		}
 	});
+	// Not sure if this will work
+//	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -3981,8 +3986,24 @@ function contextmenuUI(e,ll,topmenu)
 
 	adjustContextMenuPosition(e, m);
 
+	disableCirclarTargetsInSubMenus();
+
 	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function disableCirclarTargetsInSubMenus()
+{
+	$('#fi_' + M.currentdirid).addClass('disabled');
+	// not taking into account if selected items are files, but no damage, #fi_ is for folder-item only
+	for (var s in $.selected) $('#fi_' + $.selected[s]).addClass('disabled');		
+	for (var mc in M.c)
+	{
+		var n=[];
+		for (var i in $.selected) if (isCircular($.selected[i], mc)) n.push($.selected[i]);
+		for (var k in n) $('#fi_' + n[k]).addClass('disabled');
+	}
+	return true;
 }
 
 function adjustContextMenuPosition(e, m)
@@ -4181,8 +4202,8 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
 	var ey = e.pageY;
-//	var pNode = $(e.target).closest('.context-scrolling-block')[0];
-	var pNode = $(e.target).closest('.context-submenu').children(':first');
+	var c = $(e.target).closest('.context-submenu');
+	var pNode = c.children(':first')[0];
 
 	if (typeof pNode !== 'undefined')
 	{
@@ -4190,8 +4211,20 @@ function scrollMegaSubMenu(e)
 		var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
 		var pos = getHtmlElemPos(pNode, true);
 		var py = (ey - pos.y - dy) / (h - dy * 2);
-		if (py > 1) py = 1;
-		if (py < 0) py = 0;
+		if (py > 1)
+		{
+			py = 1;
+			c.children('.context-bottom-arrow').addClass('disabled');
+		}
+		else if (py < 0)
+		{
+			py = 0;
+			c.children('.context-top-arrow').addClass('disabled');
+		}
+		else
+		{
+			c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
+		}
 		pNode.scrollTop = py * (pNode.scrollHeight - h);
 	}
 }

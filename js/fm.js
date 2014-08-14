@@ -4324,6 +4324,7 @@ function treeUIexpand(id,force,moveDialog)
 
 function sectionUIopen(id)
 {
+	console.error('sectionUIopen',id);
 	$('.nw-fm-left-icon').removeClass('active');
 	$('.content-panel').removeClass('active');
 	$('.nw-fm-left-icon.' + id).addClass('active');
@@ -4368,13 +4369,14 @@ function sectionUIopen(id)
 	$('.nw-tree-panel-header span').text(headertxt);
 }
 
+	
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	if (id == 'shares') sectionUIopen('shared-with-me');
-	else if (id == M.RootID) sectionUIopen('cloud-drive');
-	else if (id == 'contacts') sectionUIopen('contacts');
+	if (RootbyId(id) == 'shares') sectionUIopen('shared-with-me');
+	else if (RootbyId(id) == M.RootID) sectionUIopen('cloud-drive');
+	else if (RootbyId(id) == 'contacts') sectionUIopen('contacts');
 	else if (id == 'chat') sectionUIopen('conversations');
-	else if (id == M.RubbishID) sectionUIopen('rubbish-bin');
+	else if (RootbyId(id) == M.RubbishID) sectionUIopen('rubbish-bin');	
 	if (!fminitialized) return false;
 	if (!event)
 	{
@@ -4410,7 +4412,6 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 		var jsp = $('.fm-tree-panel').data('jsp');
 		if (jsp) setTimeout(function()
 		{
-			console.log('scroll to element?',scrollTo,stickToTop);
 			jsp.scrollToElement(scrollTo,stickToTop);
 		},50);
 	}

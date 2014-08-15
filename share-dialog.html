@@ -22,13 +22,27 @@ $(document).ready(function() {
 	dialogPositioning();
 	shareContactsScroll();
  
-	$('.share-multiple-input').tokenInput("http://shell.loopj.com/tokeninput/tvshows.php", {
+	$('.share-multiple-input').tokenInput([
+                {id: 7, name: "Ruby"},
+                {id: 11, name: "Python"},
+                {id: 13, name: "JavaScript"},
+                {id: 17, name: "ActionScript"},
+                {id: 19, name: "Scheme"},
+                {id: 23, name: "Lisp"},
+                {id: 29, name: "C#"},
+                {id: 31, name: "Fortran"},
+                {id: 37, name: "Visual Basic"},
+                {id: 41, name: "C"},
+                {id: 43, name: "C++"},
+                {id: 47, name: "Java"}
+            ], {
                 theme: "mega"
     });
 	
 	$('.share-dialog-permissions').unbind('click');
     $('.share-dialog-permissions').bind('click', function() {
 		var m = $('.permissions-menu');
+		m.removeClass('search-permissions');
 		if($(this).attr('class').indexOf('active') == -1) {
 		  var x = $(this).position().left +42;
 		  var y = $(this).position().top + 13;
@@ -52,9 +66,11 @@ $(document).ready(function() {
 		  m.css('top', y + 'px');
 		  m.removeClass('hidden');
 		  $(this).addClass('active');
+		  m.addClass('search-permissions');
 		} else {
 	      m.addClass('hidden');
 		  $(this).removeClass('active');
+		  m.removeClass('search-permissions');
 		}
 	});
 	
@@ -62,14 +78,19 @@ $(document).ready(function() {
     $('.permissions-menu-item').bind('click', function() {
 		if($(this).attr('class').indexOf('active') == -1) {
 			$(this).parent().find('.permissions-menu-item.active').removeClass('active');
+			var p = $(this).attr('class').replace('permissions-menu-item', '').split(" ").join("");
+		    if($(this).attr('class').indexOf('search-permissions') == -1) {
+			  $('.permissions-icon').removeClass('read-only read-and-write full-access');
+			  $('.permissions-icon').addClass(p);
+		    }
 			$(this).addClass('active');
 		} else $(this).removeClass('active');
 		$('.permissions-menu').addClass('hidden');
 		$('.permissions-icon.active').removeClass('active');
 		$('.share-dialog-permissions.active').removeClass('active');
+		
 	});
 });
-
 </script>
 </head>
 

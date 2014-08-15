@@ -485,7 +485,7 @@ function initUI()
 				if (c)
 				{
 					if ($.liTooltipTimer) clearTimeout($.liTooltipTimer);
-					$.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
+					$.liTimerK = Later(function() { $(e.target).click() });
 				}
 			}
 			// else $('.dragger-block').addClass('drag');
@@ -498,7 +498,7 @@ function initUI()
 				$(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
 			}
 		}
-		if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
+		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 		if (a == 'drop' && dd === 'nw-fm-left-icon')
 		{

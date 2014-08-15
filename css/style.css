@@ -2948,7 +2948,7 @@ label.iPhoneCheckLabelOff span {
 .content-panel.cloud-drive, .content-panel.shared-with-me, .content-panel.rubbish-bin {
 	padding: 0 0 24px 0;
 }
-.fm-tree-panel ul, .fm-move-dialog-body ul {
+.fm-tree-panel ul, .fm-move-dialog-body ul, .fm-dialog-body ul {
 	padding: 0;
 	margin: 0;
 	list-style: none;
@@ -2959,56 +2959,104 @@ label.iPhoneCheckLabelOff span {
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
 }
-.fm-tree-panel ul ul {
+.fm-tree-panel ul ul, .fm-dialog-body ul ul {
 	display: none;
 }
-.fm-tree-panel ul ul.opened {
+.fm-tree-panel ul ul.opened, .fm-dialog-body ul ul.opened {
 	display: block;
 }
-.fm-tree-panel ul ul .nw-fm-tree-item {
+ul ul .nw-fm-tree-item {
 	padding-left: 24px;
 }
-.fm-tree-panel ul ul ul .nw-fm-tree-item {
+ul ul ul .nw-fm-tree-item {
 	padding-left: 48px;
 }
-.fm-tree-panel ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul .nw-fm-tree-item {
 	padding-left: 72px;
 }
-.fm-tree-panel ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 96px;
 }
-.fm-tree-panel ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 120px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 144px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 168px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 192px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 216px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 240px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 264px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 288px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 312px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 336px;
 }
-.fm-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 360px;
+}
+.fm-dialog-body ul .nw-fm-tree-item {
+	padding-left: 27px;
+}
+.fm-dialog-body ul ul .nw-fm-tree-item {
+	padding-left: 51px;
+}
+.fm-dialog-body ul ul ul .nw-fm-tree-item {
+	padding-left: 75px;
+}
+.fm-dialog-body ul ul ul ul .nw-fm-tree-item {
+	padding-left: 99px;
+}
+.fm-dialog-body ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 123px;
+}
+.fm-dialog-body ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 147px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 171px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 195px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 219px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 243px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 267px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 291px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 315px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 339px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 363px;
+}
+.fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+	padding-left: 387px;
 }
 .nw-fm-tree-item {
 	display: block;
@@ -3059,7 +3107,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: rgba(39,183,0,0.4);
 	border-right: 2px solid rgba(39,183,0,0.6);
 }
-.fm-tree-panel li, .fm-move-dialog-body li {
+.fm-tree-panel li, .fm-move-dialog-body li, .fm-dialog-body li {
 	display: block;
 	list-style: none;
 	padding: 0;
@@ -3383,7 +3431,7 @@ label.iPhoneCheckLabelOff span {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
 	color: white;
 }
-.nw-conversations-header, .nw-tree-panel-header {
+.nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header {
 	height: 24px;
 	font-family: 'Open Sans Semibold', Arial;
 	font-size: 12px;
@@ -3394,7 +3442,7 @@ label.iPhoneCheckLabelOff span {
 	background-color: white;
 	border-right: 2px solid rgba(0,0,0,0.06);
 }
-.nw-tree-panel-arrows {
+.nw-tree-panel-arrows, .copy-dialog-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
@@ -3414,14 +3462,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
-.nw-tree-panel-arrows:hover {
+.nw-tree-panel-arrows:hover, .copy-dialog-panel-arrows:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
-.nw-tree-panel-arrows.active {
+.nw-tree-panel-arrows.active, .copy-dialog-panel-arrows.active {
 	background-position: -12px -7916px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
 }
 .nw-conversations-item, .fm-tree-panel .nw-contact-item {
 	height: 24px;
@@ -6252,7 +6304,7 @@ span.search-number {
 .contacts-sorting-by.active:hover, .contacts-sorting-type.active:hover {
 	background-position: 0 -4912px;
 }
-.context-menu, .nw-sorting-menu, .permissions-menu {
+.context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
 	min-width: 164px;
 	position: absolute;
 	background-color: #333333;
@@ -6270,6 +6322,10 @@ span.search-number {
 .nw-sorting-menu {
 	right: -156px;
 	top: 40px;
+}
+.dialog-sorting-menu {
+	left: 466px;
+	top: 103px;
 }
 .context-menu-divider, .pause-item-divider, .sorting-item-divider {
 	height: 2px;
@@ -7846,6 +7902,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	min-width: 440px;
 	margin: -77px 0 0 -220px;
 }
+.fm-dialog.copy-dialog {
+	width: 480px;
+	min-height: 400px;
+	margin: -200px 0 0 -240px;
+}
 .fm-dialog.download-dialog {
 	width: 504px;
 	min-height: 100px;
@@ -8456,6 +8517,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-dialog-button.dialog-share-button:hover {
 	background-color: rgba(255,179,0,1);
+}
+.fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-newfolder-button {
+	background-color: rgba(109,176,63,0.7);
+}
+.fm-dialog-button.dialog-newfolder-button {
+	float: left;
+	margin-left: 12px;
+}
+.fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-newfolder-button:hover {
+	background-color: rgba(109,176,63,1);
 }
 .fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active, .nw-chat-button.active {
 	cursor: pointer;
@@ -9868,6 +9939,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
+.context-top-arrow.disabled, .context-bottom-arrow.disabled {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+	cursor: default;
+}
 .context-submenu.mega-height {
 	padding: 22px 0;
 	margin-top: -14px;
@@ -9881,6 +9959,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .context-submenu .context-menu-item {
 	display: block !important;
+}
+.context-submenu .context-menu-item.disabled {
+	opacity: 0.6;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+}
+.context-submenu .context-menu-item.opened.disabled, .context-submenu .context-menu-item.disabled:hover {
+	background-color: transparent;
+	color: rgba(204,204,204,1);
+}
+.context-menu-item.disabled:hover > .context-menu-icon, .context-menu-item.opened.disabled > .context-menu-icon, .permissions-menu-item.active.disabled .context-menu-icon {
+	opacity: 0.5;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+}
+.context-menu-item.disabled.contains-submenu:hover, .context-menu-item.disabled.contains-submenu.opened {
+	color: rgba(204,204,204,1);
+	background-position: right -4593px;
 }
 .top-menu-popup .top-menu-item:nth-child(2) .top-submenu-popup {
 	-webkit-border-top-left-radius: 0px;
@@ -17628,7 +17726,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.email.search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar {
+.email .search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar {
 	background-color: transparent !important;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -17887,9 +17985,116 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.share-dialog-contacts .jspDrag, .token-input-dropdown-mega .jspDrag {
+.share-dialog-contacts .jspDrag, .token-input-dropdown-mega .jspDrag, .fm-dialog-body .jspDrag {
 	width: 4px;
 	background-color: black;
+}
+.copy-dialog .fm-dialog-body {
+	padding: 14px 0 0 0;
+}
+.copy-dialog-button {
+	height: 48px;
+	width: 159px;
+	float: left;
+	background-color: rgba(0,0,0,0.15);
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+.copy-dialog-button.cloud-drive {
+	background-position: center -367px;
+}
+.copy-dialog-button.shared-with-me {
+	width: 158px;
+	background-position: center -415px;
+}
+.copy-dialog-button.conversations {
+	background-position: center -510px;
+}
+.copy-dialog-button.cloud-drive.active {
+	background-color: rgba(220,0,0,1);
+}
+.copy-dialog-button.shared-with-me.active {
+	background-color: rgba(255,166,0,1);
+}
+.copy-dialog-button.conversations.active {
+	background-color: rgba(31,165,224,1);
+}
+.copy-dialog-empty.cloud-drive, .copy-dialog-empty.shared-with-me, .copy-dialog-empty.conversations {
+	height: 240px;
+	display: none;
+}
+.copy-dialog-empty-icon {
+	height: 166px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: center -867px;
+	background-repeat: no-repeat;
+}
+.shared-with-me .copy-dialog-empty-icon {
+	background-position: center -1037px;
+}
+.conversations .copy-dialog-empty-icon {
+	background-position: center -1177px;
+}
+.copy-dialog-empty-header {
+	font-size: 18px;
+	line-height: 24px;
+	color: #CCCCCC;
+	text-align: center;
+	padding: 0 12px;
+}
+.copy-dialog-empty-txt {
+	font-size: 11px;
+	padding-top: 3px;
+	line-height: 21px;
+	color: #999999;
+	padding: 0 12px;
+	text-align: center;
+}
+.fm-dialog-body .nw-fm-tree-item:hover {
+	border: 0;
+}
+.copy-dialog-tree-panel {
+	height: 240px;
+	overflow: hidden;
+	display: none;
+}
+.copy-dialog-panel-header {
+	height: 48px;
+	padding: 12px 2px 0 24px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 0;
+}
+.copy-dialog-panel-arrows {
+	right: 11px;
+	top: 11px;
+}
+.dialog-content-block {
+	padding-bottom: 20px;
+}
+.fm-dialog-body .nw-conversations-item {
+	padding-left: 13px;
+	border: 0;
+}
+.copy-dialog-txt {
+	display: none;
+}
+.copy-dialog-txt.cloud-drive {
+	color: #DF0000;
+}
+.copy-dialog-txt.shared-with-me {
+	color: #FFA600;
+}
+.copy-dialog-txt.conversations {
+	color: #1FA5DF;
+}
+.copy-dialog-txt.active {
+	display: inline;
+}
+.copy-dialog-empty.active, .copy-dialog-tree-panel.active {
+	display: block;
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

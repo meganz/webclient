@@ -75,15 +75,15 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(callback, 1000);
+	return setTimeout(callback, 1000);
 }
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 {
-	setTimeout(callback, 0);
+	setTimeout(callback, 17);
 };
 
-function SoonFc(func)
+function SoonFc(func, ms)
 {
 	return function __soonfc()
 	{
@@ -92,7 +92,7 @@ function SoonFc(func)
 		func.__sfc = setTimeout(function() {
 			delete func.__sfc;
 			func.apply(self, args);
-		}, 122);
+		}, ms || 122);
 	};
 }
 
@@ -1435,4 +1435,29 @@ function getHtmlElemPos(elem, n)
         elem = elem.offsetParent;
     }
     return {x: xPos, y: yPos};
+}
+
+function disableDescendantFolders(id)
+{
+	var folders = [];
+	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
+	
+	for (var i in folders)
+	{
+		var sub = false;
+		var fid = folders[i].h;
+
+		for (var h in M.c[fid])
+		{
+			if (M.d[h].t)
+			{
+				sub = true;
+				break;
+			}
+		}
+		$('#fi_' + fid).addClass('disabled');
+		if (sub) this.disableDescendantFolders(fid);
+	}
+
+	return true;
 }

@@ -87,16 +87,16 @@ function initTreeScroll()
     **/
 
 	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
-	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
-	{
-		var t =Math.random();
-		$.scroller=t;
-		setTimeout(function()
-		{
-			if (t == $.scroller) treeDroppable();
-		},100);
-	});
+	// $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
+	// $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
+	// {
+		// var t =Math.random();
+		// $.scroller=t;
+		// setTimeout(function()
+		// {
+			// if (t == $.scroller) treeDroppable();
+		// },100);
+	// });
 	jScrollFade('.fm-tree-panel');
 }
 
@@ -402,9 +402,10 @@ function initUI()
 			// tree dropped:
 			var c = $(e.target).attr('class');
 			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
-			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
+			else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) dd = 'download';
 			else if (c && c.indexOf('nw-fm-left-icon') > -1) dd = 'nw-fm-left-icon';
+			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else
 			{
 				var t = $(e.target).attr('id');
@@ -478,17 +479,26 @@ function initUI()
 				if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
 				else if (~c.indexOf('contacts')) $('body').addClass('dndc-to-contacts');
 				else if (~c.indexOf('conversations')) $('body').addClass('dndc-to-conversations');
+				else if (~c.indexOf('cloud-drive')) $('body').addClass('dndc-to-conversations'); // XXX: cursor, please?
 				else c = null;
 
-				if (c) $.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
+				if (c)
+				{
+					if ($.liTooltipTimer) clearTimeout($.liTooltipTimer);
+					$.liTimerK = Later(function() { $(e.target).click() });
+				}
 			}
 			// else $('.dragger-block').addClass('drag');
 			else $('body').addClass('dndc-warning');
 
 			$(e.target).addClass('dragover');
 			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-			if ($(e.target).hasClass('folder')) $(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+			if ($(e.target).hasClass('folder'))
+			{
+				$(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+			}
 		}
+		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 		if (a == 'drop' && dd === 'nw-fm-left-icon')
 		{
@@ -601,6 +611,7 @@ function initUI()
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
 		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -695,12 +706,11 @@ function initUI()
 		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 
-	var initialTooltipTime;
 	$('.nw-fm-left-icon').unbind('mouseover');
 	$('.nw-fm-left-icon').bind('mouseover', function () {
 	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
-	  clearTimeout( initialTooltipTime );
-	  initialTooltipTime = window.setTimeout(
+	  if ($.liTooltipTimer) clearTimeout( $.liTooltipTimer );
+	  $.liTooltipTimer = window.setTimeout(
       function() {
         $(tooltip).addClass('hovered');
       }, 1000);
@@ -709,7 +719,7 @@ function initUI()
 	$('.nw-fm-left-icon').unbind('mouseout');
 	$('.nw-fm-left-icon').bind('mouseout', function () {
 	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
-		clearTimeout( initialTooltipTime );
+		clearTimeout( $.liTooltipTimer );
     });
 
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
@@ -788,7 +798,7 @@ function initUI()
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();
-	var menuitems = $('.context-menu.files-menu .context-menu-item')
+	var menuitems = $('.context-menu.files-menu .context-menu-item');
 
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
@@ -1122,7 +1132,7 @@ function fmremove()
 function initContextUI()
 {
 	var c = '.context-menu-item';
-	
+
 	$(c).unbind('mouseover');
 	$(c).bind('mouseover', function()
 	{
@@ -1188,12 +1198,17 @@ function initContextUI()
 	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
 	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
+		if (!$(this).is('.disabled'))
+		{
+			var t = $(this).attr('id').replace('fi_','');
+			var n=[];
+			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+			$.hideContextMenu();
+			M.moveNodes(n,t);
+		}
 	});
+	// Not sure if this will work
+//	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -3449,7 +3464,7 @@ function selectddUI()
 			$('body').removeClass('dragging').removeClassWith("dndc-");
 			setTimeout(function()
 			{
-				treeUIopen(M.currentdirid);
+				treeUIopen(M.currentdirid, false, true);
 			},500);
 		}
 	});
@@ -3552,7 +3567,7 @@ function selectddUI()
 	{
 		var jsp=$($.rmInitJSP).data('jsp');
 		if (jsp) jsp.reinitialise();
-		if (d) console.log('jsp:!u', jsp);
+		if (d) console.log('jsp:!u', !!jsp);
 		delete $.rmInitJSP;
 	}
 	$(window).trigger('resize');
@@ -3981,8 +3996,22 @@ function contextmenuUI(e,ll,topmenu)
 
 	adjustContextMenuPosition(e, m);
 
+	disableCirclarTargetsInSubMenus();
+
 	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function disableCirclarTargetsInSubMenus()
+{
+	for (var s in $.selected)
+	{
+		var x = $.selected[s];
+		$('#fi_' + x).addClass('disabled');
+		$('#fi_' + M.d[x].p).addClass('disabled');// Disable parent dir
+		disableDescendantFolders(x);// Disable all children folders
+	}
+	return true;
 }
 
 function adjustContextMenuPosition(e, m)
@@ -4046,7 +4075,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		var nTop = parseInt(n.css('padding-top'));
 		var tB = parseInt(n.css('border-top-width'));
 		var pPos = m.position();
-		
+
 		var b = y + nmH - (nTop - tB);// bottom of submenu
 		var mP = m.closest('.context-submenu');
 		var pT = 0, bT = 0, pE = 0;
@@ -4058,7 +4087,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (b > maxY) top =  (maxY - nmH + nTop - tB) - pE.top + 'px';
 		else top = pPos.top - tB + 'px';
-		
+
 		return top;
 	};
 
@@ -4067,7 +4096,7 @@ function reCalcMenuPosition(m, x, y, ico)
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
 	{
 		cor = 1;
-		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		dPos = {'x':x - 2, 'y':y + ico.y + 8};// position for right-bot
 		if (wMax > maxX)// draw to the left
 		{
 			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
@@ -4075,7 +4104,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (hMax > maxY)// draw to the top
 		{
-			dPos.y = y - cmH - 4;// additional pixels to align with -icon
+			dPos.y = y - cmH;// additional pixels to align with -icon
 			cor++;
 		}
 	}
@@ -4084,7 +4113,7 @@ function reCalcMenuPosition(m, x, y, ico)
 		var n = m.next('.context-submenu');
 		var nmW = n.outerWidth();// margin not calculated
 		var nmH = n.outerHeight();// margins not calculated
-				
+
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
@@ -4181,8 +4210,8 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
 	var ey = e.pageY;
-//	var pNode = $(e.target).closest('.context-scrolling-block')[0];
-	var pNode = $(e.target).closest('.context-submenu').children(':first');
+	var c = $(e.target).closest('.context-submenu');
+	var pNode = c.children(':first')[0];
 
 	if (typeof pNode !== 'undefined')
 	{
@@ -4190,13 +4219,25 @@ function scrollMegaSubMenu(e)
 		var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
 		var pos = getHtmlElemPos(pNode, true);
 		var py = (ey - pos.y - dy) / (h - dy * 2);
-		if (py > 1) py = 1;
-		if (py < 0) py = 0;
+		if (py > 1)
+		{
+			py = 1;
+			c.children('.context-bottom-arrow').addClass('disabled');
+		}
+		else if (py < 0)
+		{
+			py = 0;
+			c.children('.context-top-arrow').addClass('disabled');
+		}
+		else
+		{
+			c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
+		}
 		pNode.scrollTop = py * (pNode.scrollHeight - h);
 	}
 }
 
-var tt;
+// var treeUI = SoonFc(__treeUI, 240);
 
 function treeUI()
 {
@@ -4277,7 +4318,7 @@ function treeUI()
 		else
 		{
 			var c = $(this).attr('class');
-			if (c && c.indexOf('selected') > -1) treeUIexpand(id);
+			if (c && c.indexOf('opened') > -1) treeUIexpand(id);
 			M.openFolder(id);
 		}
 		return false;
@@ -4288,7 +4329,14 @@ function treeUI()
 	{
 		initTreeScroll();
 	});
-	setTimeout(initTreeScroll,10);
+	// setTimeout(initTreeScroll,10);
+	Soon(function()
+	{	/**
+		 * Let's shoot two birds with a stone, when nodes are moved we need a resize
+		 * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+		 */
+		$(window).trigger('resize');
+	});
 	if (d) console.timeEnd('treeUI');
 }
 
@@ -4370,16 +4418,19 @@ function sectionUIopen(id)
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	if (id == 'shares') sectionUIopen('shared-with-me');
-	else if (id == M.RootID) sectionUIopen('cloud-drive');
-	else if (id == 'contacts') sectionUIopen('contacts');
+	var id_r = RootbyId(id), e, scrollTo = false, stickToTop = false;
+
+	if (id_r == 'shares') sectionUIopen('shared-with-me');
+	else if (id_r == M.RootID) sectionUIopen('cloud-drive');
+	else if (id_r == 'contacts') sectionUIopen('contacts');
 	else if (id == 'chat') sectionUIopen('conversations');
-	else if (id == M.RubbishID) sectionUIopen('rubbish-bin');
+	else if (id_r == M.RubbishID) sectionUIopen('rubbish-bin');
+
 	if (!fminitialized) return false;
+
 	if (!event)
 	{
 		var ids = M.getPath(id);
-		ids = ids.reverse();
 		var i=1;
 		while (i < ids.length)
 		{
@@ -4391,26 +4442,24 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 		else if (ids[0] == M.RootID) sectionUIopen('cloud-drive');
 	}
 	if ($.hideContextMenu) $.hideContextMenu(event);
-	var b = $('#treea_' + id);
-	var d = b.attr('class');
-	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
-	var a = M.getPath(id);
-	$('#treea_' + id).addClass('selected');
-	var scrollTo = false;
-	var stickToTop = false;
-	if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
-	{
-		stickToTop = true;
-		scrollTo= $('.nw-tree-panel-header');
-	}
-	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
 
-	if (scrollTo && !ignoreScroll)
+	e = $('#treea_' + id);
+	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
+	e.addClass('selected');
+
+	if (!ignoreScroll)
 	{
-		var jsp = $('.fm-tree-panel').data('jsp');
+		if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
+		{
+			stickToTop = true;
+			scrollTo = $('.nw-tree-panel-header');
+		}
+		else if (e.length && !e.visible()) scrollTo = e;
+		// if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
+
+		var jsp = scrollTo && $('.fm-tree-panel').data('jsp');
 		if (jsp) setTimeout(function()
 		{
-			console.log('scroll to element?',scrollTo,stickToTop);
 			jsp.scrollToElement(scrollTo,stickToTop);
 		},50);
 	}

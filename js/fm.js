@@ -719,7 +719,7 @@ function initUI()
 	$('.nw-fm-left-icon').unbind('mouseout');
 	$('.nw-fm-left-icon').bind('mouseout', function () {
 	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
-		clearTimeout( initialTooltipTime );
+		clearTimeout( $.liTooltipTimer );
     });
 
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)

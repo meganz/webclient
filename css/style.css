@@ -17647,10 +17647,14 @@ li.token-input-input-token-mega {
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
+	max-width:100%;
+}
+li.token-input-input-token-mega input {
+	max-width:100%;
 }
 div.token-input-dropdown-mega {
 	position: absolute;
-	width: 456px;
+	width: 456px !important;
 	background-color: #fff;
 	overflow: hidden;
 	border: 2px solid rgba(0,0,0,0.1);
@@ -17669,17 +17673,24 @@ div.token-input-dropdown-mega {
 }
 div.token-input-dropdown-mega p {
 	margin: 0;
-	padding: 10px;
+	padding: 9px 10px 11px 10px;
+	text-align:center;
+	line-height:24px;
 }
 div.token-input-dropdown-mega ul {
 	margin: 0;
 	padding: 0;
 }
 div.token-input-dropdown-mega ul li {
-	background-color: #fff;
+	background-color: rgb(255,255,255,1);
 	padding: 3px;
 	margin: 0;
 	list-style-type: none;
+	-webkit-transition: background-color 200ms ease-in-out;
+-moz-transition: background-color 200ms ease-in-out;
+-o-transition: background-color 200ms ease-in-out;
+-ms-transition: background-color 200ms ease-in-out;
+transition: background-color 200ms ease-in-out;
 }
 div.token-input-dropdown-mega ul li.token-input-dropdown-item-mega {
 	background-color: #fff;

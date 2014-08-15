@@ -88,7 +88,7 @@ describe("authring unit test", function() {
         });
     });
 
-    describe('getting/setting u_authring', function() {
+    describe('getting/setting u_authring.Ed25519', function() {
         var aSerialisedRing = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
         var aRing = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                      method: ns.AUTHENTICATION_METHOD.SEEN,
@@ -96,56 +96,84 @@ describe("authring unit test", function() {
                      'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                      method: 0x02,
                                      confidence: 0x04}};
+        var aSerialisedRingRSA = atob('me3456789xzIp4Nbo3FH8vW7YLBZyfAD+mmlUgDKi7jnrvz3HMing1ujcUfy9btgsFnJ8AP6aaVSQg==');
+        var aRingRSA = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                        method: ns.AUTHENTICATION_METHOD.SEEN,
+                                        confidence: ns.KEY_CONFIDENCE.UNSURE},
+                        'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                        method: 0x02,
+                                        confidence: 0x04}};
 
         describe('getContacts()', function() {
             it("internal callback error, no custom callback", function() {
-                sandbox.stub(window, 'u_authring', undefined);
+                sandbox.stub(u_authring, 'Ed25519', undefined);
                 sandbox.spy(window, 'getUserAttribute');
-                ns.getContacts();
+                ns.getContacts('Ed25519');
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
                 callback(-3, theCtx);
-                assert.deepEqual(u_authring, {});
+                assert.deepEqual(u_authring.Ed25519, {});
             });
 
             it("internal callback, no custom callback", function() {
-                sandbox.stub(window, 'u_authring', undefined);
+                sandbox.stub(u_authring, 'Ed25519', undefined);
                 sandbox.spy(window, 'getUserAttribute');
-                ns.getContacts();
+                ns.getContacts('Ed25519');
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
                 callback({'': aSerialisedRing}, theCtx);
-                assert.deepEqual(u_authring, aRing);
+                assert.deepEqual(u_authring.Ed25519, aRing);
             });
 
             it("internal callback error, custom callback", function() {
-                sandbox.stub(window, 'u_authring', undefined);
+                sandbox.stub(u_authring, 'Ed25519', undefined);
                 sandbox.spy(window, 'getUserAttribute');
                 var myCallback = sinon.spy();
-                ns.getContacts(myCallback);
+                ns.getContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
                 callback(-3, theCtx);
                 sinon.assert.calledOnce(myCallback);
                 assert.deepEqual(myCallback.args[0][0], {});
-                assert.deepEqual(u_authring, {});
+                assert.deepEqual(u_authring.Ed25519, {});
             });
 
             it("internal callback, custom callback", function() {
-                sandbox.stub(window, 'u_authring', undefined);
+                sandbox.stub(u_authring, 'Ed25519', undefined);
                 sandbox.spy(window, 'getUserAttribute');
                 var myCallback = sinon.spy();
-                ns.getContacts(myCallback);
+                ns.getContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
                 callback({'': aSerialisedRing}, theCtx);
                 sinon.assert.calledOnce(myCallback);
                 assert.deepEqual(myCallback.args[0][0], aRing);
-                assert.deepEqual(u_authring, aRing);
+                assert.deepEqual(u_authring.Ed25519, aRing);
+            });
+
+            it("unsupported key type", function() {
+                assert.throws(function() { ns.getContacts('DSA'); },
+                              'Unsupporte authentication key type: DSA');
+            });
+
+            it("authring for RSA", function() {
+                sandbox.stub(u_authring, 'RSA', undefined);
+                sandbox.spy(window, 'getUserAttribute');
+                ns.getContacts('RSA');
+                sinon.assert.calledOnce(getUserAttribute);
+                assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
+                var callback = getUserAttribute.args[0][3];
+                var theCtx = getUserAttribute.args[0][4];
+                callback({'': aSerialisedRingRSA}, theCtx);
+                assert.deepEqual(u_authring.RSA, aRingRSA);
             });
         });
 
@@ -153,20 +181,22 @@ describe("authring unit test", function() {
             var aesKey = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
 
             it("no custom callback", function() {
-                sandbox.stub(window, 'u_authring', aRing);
+                sandbox.stub(u_authring, 'Ed25519', aRing);
                 sandbox.stub(window, 'setUserAttribute');
-                ns.setContacts();
+                ns.setContacts('Ed25519');
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.strictEqual(setUserAttribute.args[0][0], 'authring');
             });
 
             it("custom callback with error", function() {
-                sandbox.stub(window, 'u_authring', aRing);
+                sandbox.stub(u_authring, 'Ed25519', aRing);
                 sandbox.stub(window, 'u_k', aesKey);
                 sandbox.stub(window, 'api_req');
                 sandbox.spy(window, 'setUserAttribute');
                 var myCallback = sinon.spy();
-                ns.setContacts(myCallback);
+                ns.setContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.strictEqual(setUserAttribute.args[0][0], 'authring');
                 var ctx = api_req.args[0][1];
                 var callback = ctx.callback;
                 callback(-3, ctx);
@@ -175,190 +205,114 @@ describe("authring unit test", function() {
             });
 
             it("custom callback", function() {
-                sandbox.stub(window, 'u_authring', aRing);
+                sandbox.stub(u_authring, 'Ed25519', aRing);
                 sandbox.stub(window, 'u_k', aesKey);
                 sandbox.stub(window, 'api_req');
                 sandbox.spy(window, 'setUserAttribute');
                 var myCallback = sinon.spy();
-                ns.setContacts(myCallback);
+                ns.setContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.strictEqual(setUserAttribute.args[0][0], 'authring');
                 var ctx = api_req.args[0][1];
                 var callback = ctx.callback;
                 callback('me3456789xw', ctx);
                 sinon.assert.calledOnce(myCallback);
                 assert.strictEqual(myCallback.args[0][0], 'me3456789xw');
             });
-        });
-    });
 
-    describe('getting/setting u_authringRSA', function() {
-        var aSerialisedRing = atob('me3456789xzIp4Nbo3FH8vW7YLBZyfAD+mmlUgDKi7jnrvz3HMing1ujcUfy9btgsFnJ8AP6aaVSQg==');
-        var aRing = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                     method: ns.AUTHENTICATION_METHOD.SEEN,
-                                     confidence: ns.KEY_CONFIDENCE.UNSURE},
-                     'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                     method: 0x02,
-                                     confidence: 0x04}};
-
-        describe('getContactsRSA()', function() {
-            it("internal callback error, no custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', undefined);
-                sandbox.spy(window, 'getUserAttribute');
-                ns.getContactsRSA();
-                sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
-                callback(-3, theCtx);
-                assert.deepEqual(u_authringRSA, {});
+            it("unsupported key type", function() {
+                assert.throws(function() { ns.setContacts('DSA'); },
+                              'Unsupporte authentication key type: DSA');
             });
 
-            it("internal callback, no custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', undefined);
-                sandbox.spy(window, 'getUserAttribute');
-                ns.getContactsRSA();
-                sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
-                callback({'': aSerialisedRing}, theCtx);
-                assert.deepEqual(u_authringRSA, aRing);
-            });
-
-            it("internal callback error, custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', undefined);
-                sandbox.spy(window, 'getUserAttribute');
-                var myCallback = sinon.spy();
-                ns.getContactsRSA(myCallback);
-                sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
-                callback(-3, theCtx);
-                sinon.assert.calledOnce(myCallback);
-                assert.deepEqual(myCallback.args[0][0], {});
-                assert.deepEqual(u_authringRSA, {});
-            });
-
-            it("internal callback, custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', undefined);
-                sandbox.spy(window, 'getUserAttribute');
-                var myCallback = sinon.spy();
-                ns.getContactsRSA(myCallback);
-                sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
-                callback({'': aSerialisedRing}, theCtx);
-                sinon.assert.calledOnce(myCallback);
-                assert.deepEqual(myCallback.args[0][0], aRing);
-                assert.deepEqual(u_authringRSA, aRing);
-            });
-        });
-
-        describe('setContactsRSA()', function() {
-            var aesKey = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
-
-            it("no custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', aRing);
+            it("authring for RSA", function() {
+                sandbox.stub(u_authring, 'RSA', aRingRSA);
                 sandbox.stub(window, 'setUserAttribute');
-                ns.setContactsRSA();
+                ns.setContacts('RSA');
                 sinon.assert.calledOnce(setUserAttribute);
-            });
-
-            it("custom callback with error", function() {
-                sandbox.stub(window, 'u_authringRSA', aRing);
-                sandbox.stub(window, 'u_k', aesKey);
-                sandbox.stub(window, 'api_req');
-                sandbox.spy(window, 'setUserAttribute');
-                var myCallback = sinon.spy();
-                ns.setContactsRSA(myCallback);
-                sinon.assert.calledOnce(setUserAttribute);
-                var ctx = api_req.args[0][1];
-                var callback = ctx.callback;
-                callback(-3, ctx);
-                sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], -3);
-            });
-
-            it("custom callback", function() {
-                sandbox.stub(window, 'u_authringRSA', aRing);
-                sandbox.stub(window, 'u_k', aesKey);
-                sandbox.stub(window, 'api_req');
-                sandbox.spy(window, 'setUserAttribute');
-                var myCallback = sinon.spy();
-                ns.setContactsRSA(myCallback);
-                sinon.assert.calledOnce(setUserAttribute);
-                var ctx = api_req.args[0][1];
-                var callback = ctx.callback;
-                callback('me3456789xw', ctx);
-                sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], 'me3456789xw');
+                assert.strictEqual(setUserAttribute.args[0][0], 'authRSA');
             });
         });
     });
 
     describe('fingerprints and signing', function() {
-        describe('computeFingerprintEd25519()', function() {
-            it("default format", function() {
-                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY),
+        describe('computeFingerprint()', function() {
+            it("default format Ed25519", function() {
+                assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, 'Ed25519'),
                                    ED25519_HEX_FINGERPRINT);
             });
 
-            it("hex", function() {
-                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY, "hex"),
+            it("hext Ed25519", function() {
+                assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, 'Ed25519', "hex"),
                                    ED25519_HEX_FINGERPRINT);
             });
 
-            it("string", function() {
-                assert.strictEqual(ns.computeFingerprintEd25519(ED25519_PUB_KEY, "string"),
+            it("stringt Ed25519", function() {
+                assert.strictEqual(ns.computeFingerprint(ED25519_PUB_KEY, 'Ed25519', "string"),
                                    ED25519_STRING_FINGERPRINT);
             });
-        });
 
-        describe('computeFingerprintRSA()', function() {
-            it("default format", function() {
-                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY),
+            it("default format RSA", function() {
+                assert.strictEqual(ns.computeFingerprint(RSA_PUB_KEY, 'RSA'),
                                    RSA_HEX_FINGERPRINT);
             });
 
-            it("hex", function() {
-                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY, "hex"),
+            it("hex RSA", function() {
+                assert.strictEqual(ns.computeFingerprint(RSA_PUB_KEY, 'RSA', "hex"),
                                    RSA_HEX_FINGERPRINT);
             });
 
-            it("string", function() {
-                assert.strictEqual(ns.computeFingerprintRSA(RSA_PUB_KEY, "string"),
+            it("stringRSA ", function() {
+                assert.strictEqual(ns.computeFingerprint(RSA_PUB_KEY, 'RSA', "string"),
                                    RSA_STRING_FINGERPRINT);
             });
+
+            it("unsupported key type", function() {
+                assert.throws(function() { ns.computeFingerprint(RSA_PUB_KEY, 'DSA'); },
+                              'Unsupporte key type: DSA');
+            });
         });
 
-        describe('signRSAkey()', function() {
+        describe('signKey()', function() {
             it("all normal", function() {
                 sandbox.stub(Date, 'now', function() { return 1407891127650; });
                 sandbox.stub(window, 'u_privEd25519', ED25519_PRIV_KEY);
                 sandbox.stub(window, 'u_pubEd25519', ED25519_PUB_KEY);
-                assert.strictEqual(btoa(ns.signRSAkey(RSA_PUB_KEY)),
+                assert.strictEqual(btoa(ns.signKey(RSA_PUB_KEY, 'RSA')),
                                    btoa(RSA_SIGNED_PUB_KEY));
+            });
+
+            it("unsupported key type", function() {
+                assert.throws(function() { ns.signKey(RSA_PUB_KEY, 'DSA'); },
+                              'Unsupporte key type: DSA');
             });
         });
 
-        describe('verifyRSAkey()', function() {
+        describe('verifyKey()', function() {
             it("good signature", function() {
-                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, ED25519_PUB_KEY), true);
+                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), true);
             });
 
             it("bad signature", function() {
-                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 71) + String.fromCharCode(42),
-                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 71) + String.fromCharCode(42),
+                                                RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), false);
             });
 
             it("bad signature with bad timestamp", function() {
                 sandbox.stub(Date, 'now', function() { return 1407891027650; });
-                assert.throws(function() { return ns.verifyRSAkey(RSA_SIGNED_PUB_KEY,
-                                                                  RSA_PUB_KEY, ED25519_PUB_KEY); },
+                assert.throws(function() { return ns.verifyKey(RSA_SIGNED_PUB_KEY,
+                                                               RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY); },
                               'Bad timestamp: In the future!');
             });
 
             it("bad signature with bad point", function() {
-                assert.strictEqual(ns.verifyRSAkey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
-                                                   RSA_PUB_KEY, ED25519_PUB_KEY), false);
+                assert.strictEqual(ns.verifyKey(RSA_SIGNED_PUB_KEY.substring(0, 8) + String.fromCharCode(42) + RSA_SIGNED_PUB_KEY.substring(9),
+                                                RSA_PUB_KEY, 'RSA', ED25519_PUB_KEY), false);
+            });
+
+            it("unsupported key type", function() {
+                assert.throws(function() { ns.verifyKey(RSA_SIGNED_PUB_KEY, RSA_PUB_KEY, 'DSA', ED25519_PUB_KEY); },
+                              'Unsupporte key type: DSA');
             });
         });
 
@@ -399,55 +353,88 @@ describe("authring unit test", function() {
 
     describe('setContactAuthenticated()', function() {
         it("uninitialised", function() {
-            sandbox.stub(window, 'u_authring', undefined);
+            sandbox.stub(u_authring, 'Ed25519', undefined);
             assert.throws(function() { ns.setContactAuthenticated('you456789xw',
                                                                   ED25519_STRING_FINGERPRINT,
+                                                                  'Ed25519',
                                                                   ns.AUTHENTICATION_METHOD.SEEN,
                                                                   ns.KEY_CONFIDENCE.UNSURE); },
                           'First initialise u_authring by calling authring.getContacts()');
         });
 
-        it("normal behaviour", function() {
-            sandbox.stub(window, 'u_authring', {});
+        it("unsupported key type", function() {
+            assert.throws(function() { ns.setContactAuthenticated('you456789xw',
+                                                                  ED25519_STRING_FINGERPRINT,
+                                                                  'DSA',
+                                                                  ns.AUTHENTICATION_METHOD.SEEN,
+                                                                  ns.KEY_CONFIDENCE.UNSURE); },
+                          'Unsupporte key type: DSA');
+        });
+
+        it("normal behaviour Ed25519", function() {
+            sandbox.stub(u_authring, 'Ed25519', {});
             sandbox.stub(ns, 'setContacts');
-            ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT,
+            ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT, 'Ed25519',
                                        ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
             var expected = {'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                             method: 0, confidence: 0}};
-            assert.deepEqual(u_authring, expected);
+            assert.deepEqual(u_authring.Ed25519, expected);
             sinon.assert.calledOnce(ns.setContacts);
+            assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
+        });
+
+        it("normal behaviou RSAr", function() {
+            sandbox.stub(u_authring, 'RSA', {});
+            sandbox.stub(ns, 'setContacts');
+            ns.setContactAuthenticated('you456789xw', RSA_STRING_FINGERPRINT, 'RSA',
+                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+            var expected = {'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                            method: 0, confidence: 0}};
+            assert.deepEqual(u_authring.RSA, expected);
+            sinon.assert.calledOnce(ns.setContacts);
+            assert.strictEqual(ns.setContacts.args[0][0], 'RSA');
         });
 
         it("don't add self", function() {
-            sandbox.stub(window, 'u_authring', {});
+            sandbox.stub(u_authring, 'Ed25519', {});
             sandbox.stub(window, 'u_handle', 'me3456789xw');
             sandbox.stub(ns, 'setContacts');
-            ns.setContactAuthenticated('me3456789xw', ED25519_STRING_FINGERPRINT,
+            ns.setContactAuthenticated('me3456789xw', ED25519_STRING_FINGERPRINT, 'Ed25519',
                                        ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
-            assert.deepEqual(u_authring, {});
+            assert.deepEqual(u_authring.Ed25519, {});
             sinon.assert.notCalled(ns.setContacts);
         });
     });
 
     describe('getContactAuthenticated()', function() {
         it("uninitialised", function() {
-            sandbox.stub(window, 'u_authring', undefined);
-            assert.throws(function() { ns.getContactAuthenticated('you456789xw'); },
+            sandbox.stub(u_authring, 'Ed25519', undefined);
+            assert.throws(function() { ns.getContactAuthenticated('you456789xw', 'Ed25519'); },
                           'First initialise u_authring by calling authring.getContacts()');
         });
 
-        it("unauthenticated contact", function() {
-            sandbox.stub(window, 'u_authring', {});
-            ns.getContactAuthenticated('you456789xw');
-            assert.deepEqual(ns.getContactAuthenticated('you456789xw'), false);
+        it("unsupported key type", function() {
+            assert.throws(function() { ns.getContactAuthenticated('you456789xw', 'DSA'); },
+                          'Unsupporte key type: DSA');
         });
 
-        it("authenticated contact", function() {
+        it("unauthenticated contact", function() {
+            sandbox.stub(u_authring, 'Ed25519', {});
+            assert.deepEqual(ns.getContactAuthenticated('you456789xw', 'Ed25519'), false);
+        });
+
+        it("authenticated contact Ed25519", function() {
             var authenticated = {fingerprint: ED25519_STRING_FINGERPRINT,
                                  method: 0, confidence: 0};
-            sandbox.stub(window, 'u_authring', {'you456789xw': authenticated});
-            ns.getContactAuthenticated('you456789xw');
-            assert.deepEqual(ns.getContactAuthenticated('you456789xw'), authenticated);
+            sandbox.stub(u_authring, 'Ed25519', {'you456789xw': authenticated});
+            assert.deepEqual(ns.getContactAuthenticated('you456789xw', 'Ed25519'), authenticated);
+        });
+
+        it("authenticated contact RSA", function() {
+            var authenticated = {fingerprint: RSA_STRING_FINGERPRINT,
+                                 method: 0, confidence: 0};
+            sandbox.stub(u_authring, 'RSA', {'you456789xw': authenticated});
+            assert.deepEqual(ns.getContactAuthenticated('you456789xw', 'RSA'), authenticated);
         });
     });
 

@@ -4314,7 +4314,7 @@ function treeUI()
 		else
 		{
 			var c = $(this).attr('class');
-			if (c && c.indexOf('selected') > -1) treeUIexpand(id);
+			if (c && c.indexOf('opened') > -1) treeUIexpand(id);
 			M.openFolder(id);
 		}
 		return false;
@@ -4338,6 +4338,8 @@ function treeUI()
 
 function treeUIexpand(id,force,moveDialog)
 {
+	console.error('treeUIexpand',id);
+
 	M.buildtree(M.d[id]);
 
 	var b = $('#treea_' + id);
@@ -4427,7 +4429,6 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	if (!event)
 	{
 		var ids = M.getPath(id);
-		ids = ids.reverse();
 		var i=1;
 		while (i < ids.length)
 		{

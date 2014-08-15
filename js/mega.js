@@ -3057,7 +3057,7 @@ function execsc(ap)
 					{
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
-						$('#treea_' + n.h + ' span').text(f.name);
+						$('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
 						if ($('#path_' + n.h).length > 0) newpath=1;
 						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}

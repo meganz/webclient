@@ -640,6 +640,7 @@ $.TokenList = function (input, url_or_data, settings) {
 			$('.permissions-menu').addClass('hidden');
 		    $('.permissions-icon.active').removeClass('active');
 		    $('.share-dialog-permissions.active').removeClass('active');
+			$('.permissions-menu').removeClass('search-permissions');
     }
 
     function show_dropdown_searching () {

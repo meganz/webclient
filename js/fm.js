@@ -402,10 +402,10 @@ function initUI()
 			// tree dropped:
 			var c = $(e.target).attr('class');
 			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
-			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
 			else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) dd = 'download';
 			else if (c && c.indexOf('nw-fm-left-icon') > -1) dd = 'nw-fm-left-icon';
+			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else
 			{
 				var t = $(e.target).attr('id');
@@ -479,9 +479,14 @@ function initUI()
 				if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
 				else if (~c.indexOf('contacts')) $('body').addClass('dndc-to-contacts');
 				else if (~c.indexOf('conversations')) $('body').addClass('dndc-to-conversations');
+				else if (~c.indexOf('cloud-drive')) $('body').addClass('dndc-to-conversations'); // XXX: cursor, please?
 				else c = null;
 
-				if (c) $.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
+				if (c)
+				{
+					if ($.liTooltipTimer) clearTimeout($.liTooltipTimer);
+					$.liTimerK = setTimeout(function() { $(e.target).click() }, 1789);
+				}
 			}
 			// else $('.dragger-block').addClass('drag');
 			else $('body').addClass('dndc-warning');
@@ -493,7 +498,7 @@ function initUI()
 				$(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
 			}
 		}
-		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
+		if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 		if (a == 'drop' && dd === 'nw-fm-left-icon')
 		{
@@ -701,12 +706,11 @@ function initUI()
 		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 
-	var initialTooltipTime;
 	$('.nw-fm-left-icon').unbind('mouseover');
 	$('.nw-fm-left-icon').bind('mouseover', function () {
 	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
-	  clearTimeout( initialTooltipTime );
-	  initialTooltipTime = window.setTimeout(
+	  if ($.liTooltipTimer) clearTimeout( $.liTooltipTimer );
+	  $.liTooltipTimer = window.setTimeout(
       function() {
         $(tooltip).addClass('hovered');
       }, 1000);
@@ -4233,7 +4237,7 @@ function scrollMegaSubMenu(e)
 	}
 }
 
-var tt;
+// var treeUI = SoonFc(__treeUI, 240);
 
 function treeUI()
 {

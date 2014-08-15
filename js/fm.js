@@ -3460,7 +3460,7 @@ function selectddUI()
 			$('body').removeClass('dragging').removeClassWith("dndc-");
 			setTimeout(function()
 			{
-				treeUIopen(M.currentdirid);
+				treeUIopen(M.currentdirid, false, true);
 			},500);
 		}
 	});
@@ -4325,7 +4325,14 @@ function treeUI()
 	{
 		initTreeScroll();
 	});
-	setTimeout(initTreeScroll,10);
+	// setTimeout(initTreeScroll,10);
+	Soon(function()
+	{	/**
+		 * Let's shoot two birds with a stone, when nodes are moved we need a resize
+		 * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+		 */
+		$(window).trigger('resize');
+	});
 	if (d) console.timeEnd('treeUI');
 }
 
@@ -4437,17 +4444,17 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
 	e.addClass('selected');
 
-	if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
+	if (!ignoreScroll)
 	{
-		stickToTop = true;
-		scrollTo = $('.nw-tree-panel-header');
-	}
-	else if (e.length && !e.visible()) scrollTo = e;
-	// if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
+		if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
+		{
+			stickToTop = true;
+			scrollTo = $('.nw-tree-panel-header');
+		}
+		else if (e.length && !e.visible()) scrollTo = e;
+		// if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
 
-	if (scrollTo && !ignoreScroll)
-	{
-		var jsp = $('.fm-tree-panel').data('jsp');
+		var jsp = scrollTo && $('.fm-tree-panel').data('jsp');
 		if (jsp) setTimeout(function()
 		{
 			jsp.scrollToElement(scrollTo,stickToTop);

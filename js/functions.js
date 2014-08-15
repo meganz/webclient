@@ -80,7 +80,7 @@ function Later(callback) {
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 {
-	setTimeout(callback, 0);
+	setTimeout(callback, 17);
 };
 
 function SoonFc(func)

@@ -392,7 +392,7 @@ function MegaData ()
 					}
 					else
 					{
-						if (d) console.log('desync cached node...', e[i][2]);
+						if (d > 1) console.log('desync cached node...', e[i][2]);
 
 						for (var k in M.v)
 						{

@@ -87,16 +87,16 @@ function initTreeScroll()
     **/
 
 	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
-	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
-	{
-		var t =Math.random();
-		$.scroller=t;
-		setTimeout(function()
-		{
-			if (t == $.scroller) treeDroppable();
-		},100);
-	});
+	// $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
+	// $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
+	// {
+		// var t =Math.random();
+		// $.scroller=t;
+		// setTimeout(function()
+		// {
+			// if (t == $.scroller) treeDroppable();
+		// },100);
+	// });
 	jScrollFade('.fm-tree-panel');
 }
 
@@ -404,6 +404,7 @@ function initUI()
 			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
 			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
+			else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) dd = 'download';
 			else if (c && c.indexOf('nw-fm-left-icon') > -1) dd = 'nw-fm-left-icon';
 			else
 			{
@@ -487,8 +488,12 @@ function initUI()
 
 			$(e.target).addClass('dragover');
 			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-			if ($(e.target).hasClass('folder')) $(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+			if ($(e.target).hasClass('folder'))
+			{
+				$(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+			}
 		}
+		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 		if (a == 'drop' && dd === 'nw-fm-left-icon')
 		{

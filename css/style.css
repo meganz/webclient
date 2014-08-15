@@ -3431,7 +3431,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
 	color: white;
 }
-.nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header {
+.nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header {
 	height: 24px;
 	font-family: 'Open Sans Semibold', Arial;
 	font-size: 12px;
@@ -3442,7 +3442,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	background-color: white;
 	border-right: 2px solid rgba(0,0,0,0.06);
 }
-.nw-tree-panel-arrows, .copy-dialog-panel-arrows {
+.nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
@@ -3462,13 +3462,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
-.nw-tree-panel-arrows:hover, .copy-dialog-panel-arrows:hover {
+.nw-tree-panel-arrows:hover, .copy-dialog-panel-arrows:hover, .move-dialog-panel-arrows:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
 }
-.nw-tree-panel-arrows.active, .copy-dialog-panel-arrows.active {
+.nw-tree-panel-arrows.active, .copy-dialog-panel-arrows.active, .move-dialog-panel-arrows.active {
 	background-position: -12px -7916px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
@@ -7902,9 +7902,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	min-width: 440px;
 	margin: -77px 0 0 -220px;
 }
-.fm-dialog.copy-dialog {
+.fm-dialog.copy-dialog, .fm-dialog.move-dialog {
 	width: 480px;
-	min-height: 400px;
 	margin: -200px 0 0 -240px;
 }
 .fm-dialog.download-dialog {
@@ -7989,12 +7988,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	min-width: 664px;
 	min-height: 416px;
 	margin: -229px 0 0 -332px;
-}
-.fm-dialog.move-dialog {
-	min-width: 404px;
-	height: 410px;
-	margin: -202px 0 0 -202px;
-	overflow: hidden;
 }
 .fm-dialog.share-dialog {
 	width: 480px;
@@ -18002,10 +17995,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 4px;
 	background-color: black;
 }
-.copy-dialog .fm-dialog-body {
+.copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
 	padding: 14px 0 0 0;
 }
-.copy-dialog-button {
+.copy-dialog-button, .move-dialog-button {
 	height: 48px;
 	width: 159px;
 	float: left;
@@ -18014,49 +18007,58 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
-.copy-dialog-button.cloud-drive {
+.copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
 	background-position: center -367px;
 }
-.copy-dialog-button.shared-with-me {
+.copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
 	width: 158px;
 	background-position: center -415px;
 }
-.copy-dialog-button.conversations {
+.copy-dialog-button.conversations, .move-dialog-button.conversations {
 	background-position: center -510px;
 }
-.copy-dialog-button.cloud-drive.active {
+.copy-dialog-button.rubbish-bin, .move-dialog-button.rubbish-bin {
+	background-position: 60px -3087px;
+}
+.copy-dialog-button.cloud-drive.active, .move-dialog-button.cloud-drive.active {
 	background-color: rgba(220,0,0,1);
 }
-.copy-dialog-button.shared-with-me.active {
+.copy-dialog-button.shared-with-me.active, .move-dialog-button.shared-with-me.active {
 	background-color: rgba(255,166,0,1);
 }
-.copy-dialog-button.conversations.active {
+.copy-dialog-button.conversations.active, .move-dialog-button.conversations.active {
 	background-color: rgba(31,165,224,1);
 }
-.copy-dialog-empty.cloud-drive, .copy-dialog-empty.shared-with-me, .copy-dialog-empty.conversations {
+.copy-dialog-button.rubbish-bin.active, .move-dialog-button.rubbish-bin.active {
+	background-color: rgba(49,181,0,1);
+}
+.copy-dialog-empty.cloud-drive, .copy-dialog-empty.shared-with-me, .copy-dialog-empty.conversations, .move-dialog-empty.cloud-drive, .move-dialog-empty.shared-with-me, .move-dialog-empty.conversations, .move-dialog-empty.rubbish-bin {
 	height: 240px;
 	display: none;
 }
-.copy-dialog-empty-icon {
+.copy-dialog-empty-icon, .move-dialog-empty-icon {
 	height: 166px;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-position: center -867px;
 	background-repeat: no-repeat;
 }
-.shared-with-me .copy-dialog-empty-icon {
+.shared-with-me .copy-dialog-empty-icon, .shared-with-me .move-dialog-empty-icon {
 	background-position: center -1037px;
 }
-.conversations .copy-dialog-empty-icon {
-	background-position: center -1177px;
+.conversations .copy-dialog-empty-icon, .conversations .move-dialog-empty-icon {
+	background-position: center -1187px;
 }
-.copy-dialog-empty-header {
+.rubbish-bin .copy-dialog-empty-icon, .rubbish-bin .move-dialog-empty-icon {
+	background-position: center -1352px;
+}
+.copy-dialog-empty-header, .move-dialog-empty-header {
 	font-size: 18px;
 	line-height: 24px;
 	color: #CCCCCC;
 	text-align: center;
 	padding: 0 12px;
 }
-.copy-dialog-empty-txt {
+.copy-dialog-empty-txt, .move-dialog-empty-txt {
 	font-size: 11px;
 	padding-top: 3px;
 	line-height: 21px;
@@ -18067,12 +18069,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-dialog-body .nw-fm-tree-item:hover {
 	border: 0;
 }
-.copy-dialog-tree-panel {
+.copy-dialog-tree-panel, .move-dialog-tree-panel {
 	height: 240px;
 	overflow: hidden;
 	display: none;
 }
-.copy-dialog-panel-header {
+.copy-dialog-panel-header, .move-dialog-panel-header {
 	height: 48px;
 	padding: 12px 2px 0 24px;
 	-moz-box-sizing: border-box;
@@ -18080,7 +18082,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 	border: 0;
 }
-.copy-dialog-panel-arrows {
+.copy-dialog-panel-arrows, .move-dialog-panel-arrows {
 	right: 11px;
 	top: 11px;
 }
@@ -18091,22 +18093,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	padding-left: 13px;
 	border: 0;
 }
-.copy-dialog-txt {
+.copy-dialog-txt, .move-dialog-txt {
 	display: none;
 }
-.copy-dialog-txt.cloud-drive {
+.copy-dialog-txt.cloud-drive, .move-dialog-txt.cloud-drive {
 	color: #DF0000;
 }
-.copy-dialog-txt.shared-with-me {
+.copy-dialog-txt.shared-with-me, .move-dialog-txt.shared-with-me {
 	color: #FFA600;
 }
-.copy-dialog-txt.conversations {
+.copy-dialog-txt.conversations, .move-dialog-txt.conversations {
 	color: #1FA5DF;
 }
-.copy-dialog-txt.active {
+.copy-dialog-txt.rubbish-bin, .move-dialog-txt.rubbish-bin {
+	color: #26B700;
+}
+.copy-dialog-txt.active, .move-dialog-txt.active {
 	display: inline;
 }
-.copy-dialog-empty.active, .copy-dialog-tree-panel.active {
+.copy-dialog-empty.active, .copy-dialog-tree-panel.active, .move-dialog-empty.active, .move-dialog-tree-panel.active {
 	display: block;
 }
  @media only screen and (max-width: 1593px) {

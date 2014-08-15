@@ -75,7 +75,7 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(callback, 1000);
+	return setTimeout(callback, 1000);
 }
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback)

@@ -4338,8 +4338,6 @@ function treeUI()
 
 function treeUIexpand(id,force,moveDialog)
 {
-	console.error('treeUIexpand',id);
-
 	M.buildtree(M.d[id]);
 
 	var b = $('#treea_' + id);

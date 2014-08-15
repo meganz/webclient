@@ -83,7 +83,7 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 	setTimeout(callback, 17);
 };
 
-function SoonFc(func)
+function SoonFc(func, ms)
 {
 	return function __soonfc()
 	{
@@ -92,7 +92,7 @@ function SoonFc(func)
 		func.__sfc = setTimeout(function() {
 			delete func.__sfc;
 			func.apply(self, args);
-		}, 122);
+		}, ms || 122);
 	};
 }
 

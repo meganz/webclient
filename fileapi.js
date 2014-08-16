@@ -173,7 +173,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				this._close = function()
 				{
 					mozCloseStream(nsIFileInputStream);
-					oDestroy(this);
+					delete this._close;
 					aFile = undefined;
 				};
 

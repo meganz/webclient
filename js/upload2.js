@@ -169,7 +169,8 @@ function network_error_check() {
 	 *	server to see if that fixes the problem
 	 */
 	$([ul, dl]).each(function(i, k) {
-		if (k.retries/k.error > 3) {
+		var ratio = k.retries/k.error
+		if (ratio > 0 && ratio%8 == 0) {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
 			ERRDEBUG('shrinking: ' + (k == ul ? 'ul' : 'dl'))
@@ -223,7 +224,7 @@ var UploadManager = new function() {
 		onUploadError(file.pos, "Upload failed - restarting upload");
 
 		// reschedule
-		ulQueue.push(new FileUpload(file));
+		ulQueue.pushFirst(new FileUpload(file));
 	};
 
 	self.retry = function(file, chunk, reason) {
@@ -406,7 +407,10 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 	} else {
 		UploadManager.retry(this.file, this, "xhr failed: " + reason);
 	}
-	this.done();
+	setTimeout(function() {
+		// wait a few seconds before we release out slot
+		this.done();
+	}.bind(this), 5000);
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
@@ -498,7 +502,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
 		ERRDEBUG("IO error");
 		this.file.done_starting();
-		return UploadManager.retry(this.file, this, args[0])
+		return UploadManager.retry(this.file, this, "IO failed: " + args[0])
 	}
 
 	Encrypter.push(

@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script>
+$(document).ready(function() {
+         if (('Notification' in window)) {
+            var notificationEvents = ['onclick', 'onshow', 'onerror', 'onclose'];
+
+            $('.notifications-button.confirm').bind('click', function(event) {
+			   var title;
+               var options;
+               event.preventDefault();
+               title = 'New messages';
+               options = {
+                     body: 'You have a total of 3 unread messages',
+                     tag: 'preset',
+                     icon: 'images/mega/icon64.ico'
+               };
+               Notification.requestPermission(function() {
+                  var notification = new Notification(title, options);
+               });
+			});
+         }
+});
+</script>
+</head>
+
+<body>
+
+<div class="fm-dialog-overlay"></div>
+
+<!-- Please add "notifications-premission" classname !-->
+<div class="fm-dialog confirmation-dialog notifications-premission">
+     <div class="fm-dialog-header">
+       <div class="fm-dialog-title">Confirmation</div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-notification-body">
+        <div class="fm-notification-icon"></div>
+        <div class="fm-notification-info">
+          <p>Notifications not allowed. Click to allow displaying desktop notifications.</p>
+        </div>
+        <div class="clear"></div>
+     </div>
+     <div class="fm-notifications-bottom">
+       <div class="fm-dialog-button notifications-button confirm">Allow</div>
+       <div class="fm-dialog-button notifications-button cancel">Cancel</div>
+       <div class="clear"></div>
+     </div>
+</div>
+
+</body>
+</html>

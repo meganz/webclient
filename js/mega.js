@@ -3054,12 +3054,13 @@ function execsc(ap)
 				{
 					u_nodekeys[a.n] = f.key;
 					if (f.name !== n.name)
-					{
+					{						
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
-						$('#treea_' + n.h + ' span').text(f.name);
+						$('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
+						
+						//@@@Todo: reposition elements according to sorting (if sorted by name)						
 						if ($('#path_' + n.h).length > 0) newpath=1;
-						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
 					{
@@ -3262,6 +3263,7 @@ function createfolder(toid,name,ulparams)
 		if (typeof res != 'number')
 		{
 			$('.fm-new-folder').removeClass('active');
+			$('.create-new-folder').addClass('hidden');
 			$('.create-folder-input-bl input').val('');
 			newnodes=[];
 			M.addNode(res.f[0]);

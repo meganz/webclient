@@ -1551,10 +1551,11 @@ function createfolderUI()
 		 $('.create-new-folder').addClass('hidden');
 		 $('.fm-new-folder input').val(l[157]);
 	});
-	$('.create-new-folder input').unbind('keypress');
-	$('.create-new-folder input').bind('keypress',function(e)
+	$('.create-new-folder input').unbind('keyup');
+	$('.create-new-folder input').bind('keyup',function(e)
 	{
 	    $('.create-new-folder').addClass('filled-input');
+		if ($(this).val()=='') $('.create-new-folder').removeClass('filled-input');
 		if (e.which == 13) docreatefolderUI(e);
 	});
 	$('.create-new-folder input').unbind('focus');

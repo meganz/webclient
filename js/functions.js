@@ -1461,3 +1461,33 @@ function disableDescendantFolders(id)
 
 	return true;
 }
+
+function ucfirst(str) {
+	//  discuss at: http://phpjs.org/functions/ucfirst/
+	// original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// bugfixed by: Onno Marsman
+	// improved by: Brett Zamir (http://brett-zamir.me)
+	//   example 1: ucfirst('kevin van zonneveld');
+	//   returns 1: 'Kevin van zonneveld'
+
+	str += '';
+	var f = str.charAt(0)
+		.toUpperCase();
+	return f + str.substr(1);
+}
+
+function readLocalStorage(name, type, val)
+{
+	if (!localStorage[name]) return false;
+	var f = 'parse' + ucfirst(type[0])
+		, v = localStorage[name];
+
+	if (typeof f == "callback") {
+		v =  window[f](v);
+	}
+
+	if (val && val.min && val.min > v)  return false;
+	if (val && val.max && val.max < v)  return false;
+
+	return v;
+}

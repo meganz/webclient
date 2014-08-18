@@ -746,7 +746,7 @@ function worker_uploader(task, done) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = 4
+	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'integer', { min: 1, max:6}) || 4
 	, Encrypter
 	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0

@@ -1,9 +1,9 @@
 var dlMethod
-	, dl_maxSlots = 4
+	, dl_maxSlots = readLocalStorage('dl_maxSlots', 'integer', {min:1, max:6}) || 5
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, ui_paused = false
-	, dlQueue = new TransferQueue(downloader)
+	, dlQueue = new TransferQueue(downloader, dl_maxSlots)
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {

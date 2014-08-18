@@ -1981,11 +1981,13 @@ function accountUI()
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
 				dl_maxSlots = M.account.dl_maxSlots;
+				dlQueue.setSize(dl_maxSlots);
 			}
 			if (M.account.ul_maxSlots)
 			{
 				localStorage.ul_maxSlots = M.account.ul_maxSlots;
 				ul_maxSlots = M.account.ul_maxSlots;
+				ulQueue.setSize(ul_maxSlots);
 			}
 			if (typeof M.account.ul_maxSpeed !== 'undefined')
 			{

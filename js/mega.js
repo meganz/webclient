@@ -3263,6 +3263,7 @@ function createfolder(toid,name,ulparams)
 		if (typeof res != 'number')
 		{
 			$('.fm-new-folder').removeClass('active');
+			$('.create-new-folder').addClass('hidden');
 			$('.create-folder-input-bl input').val('');
 			newnodes=[];
 			M.addNode(res.f[0]);

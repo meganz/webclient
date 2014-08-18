@@ -374,27 +374,50 @@ else
 {
 	if (!b_u)
 	{
-		/*
-			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
-			{
-				if (d)
-				{
-					console.error('Uncaught Exception', msg, url+':'+ln+','+cn, errobj);
-				}
-				else
-				{
-					// TODO: XHR to log server?
-				}
-
-				return false;
-			};
-		*/
-		
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}; }
 		var d = localStorage.d || 0;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 
+		if (!d)
+		{
+			var __cdumps = [], __cd_t;
+			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
+			{
+				var dump = {
+					message      : msg,
+					filename     : url,
+					linenumber   : ln
+				};
+				if (cn) dump.columnnumber = cn;
+				if (errobj)
+				{
+					if (errobj.stack) dump.stack = errobj.stack;
+				}
+				__cdumps.push(dump);
+				if (__cd_t) clearTimeout(__cd_t);
+				__cd_t = setTimeout(function()
+				{
+					// todo cesar: var source = $.get() ....
+
+					var report = { dump : __cdumps, date : new Date().toUTCString() };
+					__cdumps = [];
+
+					report.useragent = navigator.userAgent;
+					report.dlio = dlMethod.name;
+
+					if (is_chrome_firefox)
+					{
+						report.mozid = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
+					}
+
+					api_req({ a : 'cd', c : JSON.stringify(report) });
+
+				}, 3000);
+
+				return false;
+			};
+		}
 		function detectlang()
 		{
 			return 'en';

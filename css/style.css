@@ -1134,24 +1134,36 @@ a.blog-button:hover {
 .change-pass-block .notice-input-block.last {
 	margin: 4px 0 0 0;
 }
-.notification-num {
+.notification-num, .new-messages-indicator {
 	display: block;
-	position: absolute;
-	-moz-border-radius: 12px;
-	-webkit-border-radius: 12px;
-	border-radius: 12px;
-	background-color: #D41D00;
-	color: white;
-	font-size: 10px;
-	line-height: 12px;
-	height: 16px;
-	font-family: 'Open Sans Bold', Arial;
-	padding: 1px 2px 2px 3px;
-	margin: -6px 0 0 16px;
-	border: 2px solid #111111;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+position: absolute;
+-moz-border-radius: 12px;
+-webkit-border-radius: 12px;
+border-radius: 16px;
+background-color: #D41D00;
+color: white;
+font-size: 10px;
+line-height: 14px;
+height: 16px;
+min-width: 16px;
+text-align: center;
+font-family: 'Open Sans', Arial;
+padding: 0 2px 0 2px;
+margin: -6px 0 0 16px;
+border: 2px solid #111111;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+ .new-messages-indicator {
+margin: 1px 0 0 0px;
+right: 2px; 
+ }
+.nw-fm-left-icon.conversations:hover .new-messages-indicator {
+	border-color:#288ab7;
+}
+.nw-fm-left-icon.conversations.active .new-messages-indicator {
+	border-color:rgba(43,166,222,1);
 }
 .top-chat-notification .notification-num {
 	background-color: #2BA6DE;

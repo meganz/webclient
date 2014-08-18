@@ -384,27 +384,36 @@ else
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				var dump = {
-					message      : msg,
-					filename     : url,
-					linenumber   : ln
-				};
-				if (cn) dump.columnnumber = cn;
+				var dump = { m : msg, f : '' + url, l : ln };
+				if (cn) dump.c = cn;
 				if (errobj)
 				{
-					if (errobj.stack) dump.stack = errobj.stack;
+					if (errobj.stack) dump.s = '' + errobj.stack;
 				}
 				__cdumps.push(dump);
 				if (__cd_t) clearTimeout(__cd_t);
-				__cd_t = setTimeout(function()
+				__cd_t = setTimeout(safeCall(function()
 				{
-					// todo cesar: var source = $.get() ....
+					for (var i in __cdumps)
+					{
+						var dump = __cdumps[i];
+
+						// todo cesar: var source = $.get() ....
+
+						if (dump.f[0] === 'b')
+						{
+							dump.f = dump.f.replace(/^blob:[^:]+/, '..');
+							if (dump.s) dump.s = dump.s.replace(/blob:[^:\s]+/g, '..');
+						}
+					}
 
 					var report = { dump : __cdumps, date : new Date().toUTCString() };
 					__cdumps = [];
 
-					report.useragent = navigator.userAgent;
-					report.dlio = dlMethod.name;
+					report.ua = navigator.userAgent;
+					report.io = dlMethod.name;
+					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+					report.tp = $.transferprogress;
 
 					if (is_chrome_firefox)
 					{
@@ -413,7 +422,7 @@ else
 
 					api_req({ a : 'cd', c : JSON.stringify(report) });
 
-				}, 3000);
+				}), 3000);
 
 				return false;
 			};

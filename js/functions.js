@@ -59,6 +59,19 @@ function Parallel(task) {
 	};
 }
 
+function safeCall(fn)
+{
+	fn.foo = function __safeCallWrapper()
+	{
+		try {
+			return fn.apply(this, arguments);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+	fn.foo.bar = fn;
+	return fn.foo;
+}
 
 function asciionly(text)
 {

@@ -672,7 +672,7 @@ function ul_finalize(file) {
 		dirs.pop();
 	}
 
-	if (!file.filekey) throw new Error("filekey is missing")
+	ASSERT(file.filekey, "*** filekey is missing ***");
 
 	Cascade(dirs, Mkdir, function(dir) {
 		var body  = { n: file.name }
@@ -780,8 +780,6 @@ function resetUploadDownload() {
 		ul_uploading = false;
 	}
 	if (!dl_queue.some(isQueueActive)) {
-		dlQueue.destroy();
-		dlQueue = new TransferQueue(downloader)
 		dl_queue = new DownloadQueue();
 		downloading = false;
 	}

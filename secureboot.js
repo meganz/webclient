@@ -457,7 +457,6 @@ else
 		jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
 		jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
 		jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-		jsl.push({f:'js/cleartemp.js', n: 'cleartemp_js', j:1});
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});

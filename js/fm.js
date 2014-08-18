@@ -1487,6 +1487,7 @@ function createfolderUI()
 			var c2 = $(e.target).attr('class');
 			var c3 = $(e.target).parent().attr('class');
 			var b1 = $('.fm-new-folder');
+			$('.create-new-folder').removeClass('filled-input');
 			var d1 = $('.create-new-folder');
 			if ((!c2 || c2.indexOf('fm-new-folder') == -1) && (!c3 || c3.indexOf('fm-new-folder') == -1)) return false;
 			if (c.indexOf('active') == -1)

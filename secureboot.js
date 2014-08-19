@@ -72,7 +72,7 @@ try
 				Services.appinfo.OS,
 				Services.appinfo.XPCOMABI].join(" ");
 
-			loadSubScript('chrome://mega/content/strg.js');
+			loadSubScript('chrome://mega/content/strg2.js');
 
 			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
 				throw new Error('Initialization failed.');

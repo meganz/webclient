@@ -28,158 +28,126 @@ $(document).ready(function() {
 </head>
 
 <body id="bodyel">
+<div class="fm-dialog-overlay hidden"></div>
+<div class="add-user-popup">
+  <div class="add-user-popup-pad">
+    <div class="add-user-size-icon full-size"></div>
+    <div class="add-user-icon">
+      <div class="multiple-input-warning">
+        <div class="arrow"></div>
+        <span>Looks like there’s a malformed email there!</span></div>
+    </div>
+    <div class="multiple-input">
+      <input type="text" class="add-multiple-input"  name="" />
+      <div class="clear"></div>
+    </div>
+    <div class="default-dialog-bottom">
+      <div class="import-contacts-link"><span></span>Input contacts...</div>
+      <div class="add-user-popup-button add">Add</div>
+      <div class="add-user-popup-button cancel">Cancel</div>
+    </div>
+  </div>
+</div>
 
 <!-- transfer-panel-opened class !-->
 <div id="fmholder" class="fmholder" style="display: block;">
-          <div class="top-head">
-           
+  <div class="top-head"> </div>
+  <div class="fm-main default">
+    <div class="nw-fm-left-icons-panel">
+      <div class="nw-fm-left-icon cloud-drive">
+        <div class="nw-fm-left-tooltip">Cloud Drive</div>
+      </div>
+      <div class="nw-fm-left-icon shared-with-me">
+        <div class="nw-fm-left-tooltip">Shared with me</div>
+      </div>
+      <div class="nw-fm-left-icon contacts active">
+        <div class="nw-fm-left-tooltip">Contacts</div>
+      </div>
+      <div class="nw-fm-left-icon conversations">
+        <div class="nw-fm-left-tooltip">Conversations</div>
+      </div>
+      <div class="nw-fm-left-icon rubbish-bin filled">
+        <div class="nw-fm-left-tooltip">Rubbish bin</div>
+        <div class="rubbish-bin-icon"></div>
+      </div>
+    </div>
+    <div class="fm-left-panel">
+      <div class="fm-left-menu contacts">
+        <div class="nw-fm-tree-header cloud-drive"> Cloud Drive
+          <div class="nw-fm-settins-icon"></div>
+        </div>
+        <div class="nw-fm-tree-header shared-with-me"> Shared with me
+          <div class="nw-fm-settins-icon"></div>
+        </div>
+        <div class="nw-fm-tree-header contacts">
+          <input type="text" value="Contacts" placeholder="Contacts">
+          <div class="nw-fm-settins-icon"></div>
+        </div>
+        <div class="nw-fm-tree-header conversations"> Conversations
+          <div class="nw-fm-settins-icon"></div>
+        </div>
+        <div class="nw-fm-tree-header rubbish-bin"> Rubbish bin
+          <div class="nw-fm-settins-icon"></div>
+        </div>
+      </div>
+      <div class="fm-tree-panel">
+        <div class="nw-tree-panel-header"> <span>My contacts</span>
+          <div class="nw-tree-panel-arrows"></div>
+        </div>
+        <div class="content-panel contacts active">
+          <div class="nw-contact-item offline">
+            <div class="nw-contact-status"></div>
+            <div class="nw-contact-name">Andrei.Dymovich@conmio.com</div>
           </div>
-          <div class="fm-main default">
-              <div class="nw-fm-left-icons-panel">
-                 <div class="nw-fm-left-icon cloud-drive">
-                   <div class="nw-fm-left-tooltip">Cloud Drive</div>
-                 </div>
-                 <div class="nw-fm-left-icon shared-with-me">
-                   <div class="nw-fm-left-tooltip">Shared with me</div>
-                 </div>
-                 <div class="nw-fm-left-icon contacts active">
-                   <div class="nw-fm-left-tooltip">Contacts</div>
-                 </div>
-                 <div class="nw-fm-left-icon conversations">
-                   <div class="nw-fm-left-tooltip">Conversations</div>
-                 </div>
-                 <div class="nw-fm-left-icon rubbish-bin filled"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
-              </div>
-          
-              <div class="fm-left-panel">
-                <div class="fm-left-menu contacts">
-                   <div class="nw-fm-tree-header cloud-drive"> 
-                      Cloud Drive 
-                      <div class="nw-fm-settins-icon"></div>
-                   </div>
-                   <div class="nw-fm-tree-header shared-with-me"> 
-                      Shared with me
-                      <div class="nw-fm-settins-icon"></div>
-                   </div>
-                   <div class="nw-fm-tree-header contacts"> 
-                      Contacts
-                      <div class="nw-fm-settins-icon"></div>
-                   </div>
-                   <div class="nw-fm-tree-header conversations"> 
-                      Conversations
-                      <div class="nw-fm-settins-icon"></div>
-                   </div>
-                   <div class="nw-fm-tree-header rubbish-bin"> 
-                      Rubbish bin
-                      <div class="nw-fm-settins-icon"></div>
-                   </div>
-                </div>
-                <div class="fm-tree-panel">
-                  <div class="nw-tree-panel-header">
-                     <span>My contacts</span>
-                     <div class="nw-tree-panel-arrows"></div>
-                  </div>
-                  <div class="content-panel contacts active">
-                    <div class="nw-contact-item offline">
-                      <div class="nw-contact-status"></div>
-                      <div class="nw-contact-name">Andrei.Dymovich@conmio.com</div>
-                    </div>
-                    <div class="nw-contact-item busy">
-                      <div class="nw-contact-status"></div>
-                      <div class="nw-contact-name">Bram van der Kolk</div>
-                    </div>
-                    <div class="nw-contact-item away">
-                      <div class="nw-contact-status"></div>
-                      <div class="nw-contact-name">Eduardo</div>
-                    </div>
-                    <div class="nw-contact-item online">
-                      <div class="nw-contact-status"></div>
-                      <div class="nw-contact-name">Zeus</div>
-                    </div>
-                  </div>
-                </div>
-              
-              </div>
-              <div class="fm-right-files-block">
-              
-                <div class="fm-right-header">
-                
-                   <div class="fm-breadcrumbs-block">
-                     <!-- Please replace "cloud-drive" on "contacts" !-->
-                     <a class="fm-breadcrumbs contacts contains-directories has-next-button">
-                       <span class="right-arrow-bg"><span></span></span>
-                     </a>
-                     <!-- Please replace "folder" on "contact" !-->
-                     <a class="fm-breadcrumbs contact contains-directories">
-                         <span class="right-arrow-bg ui-draggable"><span>asdasd</span></span>
-                     </a>
-                     <div class="clear"></div>
-                   </div>
-                
-                   <a class="fm-files-view-icon block-view"></a>
-                   <a class="fm-files-view-icon listing-view active"></a>
-                   <div class="fm-add-user active">
-                     <div class="add-user-popup-arrow"></div>
-                     <span>Add contact</span>
-                   </div>
-                   
-                   <div class="add-user-popup">
-                       <div class="add-user-popup-pad">
-                         <div class="add-user-size-icon full-size"></div>
-                         <div class="multiple-input">
-                           <div class="add-user-icon"></div>
-                           <input type="text" class="add-multiple-input"  name="" />
-                           <div class="clear"></div>
-                         </div>
-                         <div class="default-dialog-bottom">
-                           <div class="import-contacts-link"><span></span>Input contacts...</div>
-                           <div class="add-user-popup-button add">Add</div>
-                           <div class="add-user-popup-button cancel">Cancel</div>
-                         </div>
-                       </div>
-                   </div>
-                   
-                   
-                   <div class="clear"></div>
-                </div>
-                
-                
-                
-                
-                
-              
-              </div>
-              <div class="clear"></div>
-           
+          <div class="nw-contact-item busy">
+            <div class="nw-contact-status"></div>
+            <div class="nw-contact-name">Bram van der Kolk</div>
           </div>
-          
-<div class="transfer-panel">
-  <div class="transfer-icons-block">
-   <div class="transfer-drag-handle ui-resizable-handle ui-resizable-n"></div>
-   <div class="file-transfer-icon download-percents-50  upload-percents-49">
-     <div class="file-transfer-download">
-        <div class="file-transfer-upload"></div> 
-     </div> 
-   </div>
-   <div class="transfer-panel-title">
-         File transfers
-   </div>
-   <a class="tranfer-view-icon active"></a>
-   <a class="transfer-settings-icon"></a>
-   <div class="tranfer-upload-indicator active">
-        640 Kb/s
-   </div>
-   <div class="tranfer-download-indicator active">
-        1640 Kb/s
-   </div>
-   <a class="transfer-pause-icon active"></a>
-   <div class="clear"></div>
- </div>
+          <div class="nw-contact-item away">
+            <div class="nw-contact-status"></div>
+            <div class="nw-contact-name">Eduardo</div>
+          </div>
+          <div class="nw-contact-item online">
+            <div class="nw-contact-status"></div>
+            <div class="nw-contact-name">Zeus</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fm-right-files-block">
+      <div class="fm-right-header">
+        <div class="fm-breadcrumbs-block"> 
+          <!-- Please replace "cloud-drive" on "contacts" !--> 
+          <a class="fm-breadcrumbs contacts contains-directories has-next-button"> <span class="right-arrow-bg"><span></span></span> </a> 
+          <!-- Please replace "folder" on "contact" !--> 
+          <a class="fm-breadcrumbs contact contains-directories"> <span class="right-arrow-bg ui-draggable"><span>asdasd</span></span> </a>
+          <div class="clear"></div>
+        </div>
+        <a class="fm-files-view-icon block-view"></a> <a class="fm-files-view-icon listing-view active"></a>
+        <div class="fm-add-user active">
+          <div class="add-user-popup-arrow"></div>
+          <span>Add contact</span> </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div class="transfer-panel">
+    <div class="transfer-icons-block">
+      <div class="transfer-drag-handle ui-resizable-handle ui-resizable-n"></div>
+      <div class="file-transfer-icon download-percents-50  upload-percents-49">
+        <div class="file-transfer-download">
+          <div class="file-transfer-upload"></div>
+        </div>
+      </div>
+      <div class="transfer-panel-title"> File transfers </div>
+      <a class="tranfer-view-icon active"></a> <a class="transfer-settings-icon"></a>
+      <div class="tranfer-upload-indicator active"> 640 Kb/s </div>
+      <div class="tranfer-download-indicator active"> 1640 Kb/s </div>
+      <a class="transfer-pause-icon active"></a>
+      <div class="clear"></div>
+    </div>
+  </div>
 </div>
-
-
-</div>
-
-
 </body>
 </html>

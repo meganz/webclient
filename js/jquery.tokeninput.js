@@ -258,7 +258,7 @@
                    show_dropdown_hint();
               }
               token_list.addClass($(input).data("settings").classes.focused);
-			  $('.multiple-input').addClass('active');
+			  $('.multiple-input').parent().addClass('active');
 			  $('.permissions-menu').addClass('hidden');
 		      $('.permissions-icon.active').removeClass('active');
 		      $('.share-dialog-permissions.active').removeClass('active');
@@ -272,7 +272,7 @@
               }
 
               $(this).val("");
-			  $('.multiple-input').removeClass('active');
+			  $('.multiple-input').parent().removeClass('active');
           })
           .bind("keyup keydown blur update", resize_input)
           .keydown(function (event) {

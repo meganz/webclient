@@ -1002,6 +1002,8 @@ function topmenuUI()
 		if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0) && (!c || c.indexOf('fm-add-user') == -1))
 		{
 			$('.fm-add-user').removeClass('active');
+		    $('.add-user-popup').addClass('dialog hidden');
+			$('.add-user-popup').removeAttr('style');
 		}
 	}	
 	$('#pageholder').unbind('click');

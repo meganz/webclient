@@ -1037,13 +1037,22 @@ function addUserUI()
 	{
 		var c = $(this).attr('class');
 		var c2 = $(e.target).attr('class');
+		var d1 = $('.add-user-popup');
+        
 		if ((!c2 || c2.indexOf('fm-add-user') == -1) && $(e.target).prop('tagName') !== 'SPAN') return false;
 		if (c.indexOf('active') == -1)
 		{
 			$(this).addClass('active');
-			$('.add-user-popup input').focus();
+			d1.removeClass('dialog hidden');
+			var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+	        if(w1 > 8 ) d1.css('right', w1 + 'px');
+	        else d1.css('right', 8 + 'px');
 		}
-		else $(this).removeClass('active');
+		else {
+			$(this).removeClass('active');
+			d1.addClass('dialog hidden');
+			d1.removeAttr('style');
+		}
 		$.hideContextMenu();
 	});
 }

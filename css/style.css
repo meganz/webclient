@@ -6353,7 +6353,7 @@ span.search-number {
 	border: 2px solid rgba(0, 0, 0, 0.1);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
-	min-width: 334px;
+	min-width: 360px;
 	background-color: white;
 	margin: 46px 0 0 0;
 	z-index: 900;
@@ -6387,13 +6387,10 @@ span.search-number {
 .active .create-folder-arrow, .active .add-user-popup-arrow {
 	display: block;
 }
-.add-user-popup-arrow {
-	margin: -12px 0 0 130px;
-}
-.create-folder-pad, .add-user-popup-pad, .create-folder-dialog .create-folder-pad {
+.create-folder-dialog .create-folder-pad {
 	margin: 12px 12px 12px 12px
 }
-.create-folder-pad {
+.create-folder-pad, .add-user-popup-pad {
 	margin: 34px 12px 12px 12px;
 }
 .create-folder-bottom, .default-dialog-bottom {
@@ -6401,12 +6398,13 @@ span.search-number {
 	background-color: #F6F6F6;
 	margin: 12px -12px -12px -12px;
 	display: none;
-	-webkit-border-bottom-left-radius: 8px;
-	-moz-border-radius-bottomleft: 8px;
-	border-bottom-left-radius: 8px;
-	-webkit-border-bottom-right-radius: 8px;
-	-moz-border-radius-bottomright: 8px;
-	border-bottom-right-radius: 8px;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-left-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomright: 7px;
+	border-bottom-right-radius: 7px;
+	padding-right: 4px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -6414,11 +6412,7 @@ span.search-number {
 .filled-input .create-folder-button {
 	display: none;
 }
-.filled-input .create-folder-input-bl {
-	width: 100%;
-	float: none;
-}
-.create-folder-size-icon {
+.create-folder-size-icon, .add-user-size-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
@@ -6438,12 +6432,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.3;
 	cursor: pointer;
 }
-.create-folder-size-icon:hover {
+.create-folder-size-icon:hover, .add-user-size-icon:hover {
 	-moz-opacity: 0.6;
 	-khtml-opacity: 0.6;
 	opacity: 0.6;
 }
-.create-folder-size-icon.short-size {
+.create-folder-size-icon.short-size, .add-user-size-icon.short-size {
 	background-position: center -5559px;
 	top: 16px;
 	right: 40px;
@@ -6457,6 +6451,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
+.filled-input .create-folder-input-bl, .add-user-popup-input-bl {
+	width: 100%;
+	float: none;
+}
 .create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input {
 	width: 100%;
 	-webkit-box-sizing: border-box;
@@ -6467,15 +6465,40 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin-top: 0;
 	font-size: 12px;
 	color: #868686;
-	padding: 0 10px 0 35px;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: -5px -5657px;
+	padding: 0 10px 0 34px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -1px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
 	border: 0;
 }
+.focused .create-folder-input-bl, .focused .add-user-popup-input-bl, .focused .fm-account-input, .focused .fm-account-select {
+	background-color: rgba(0,0,0,0.2);
+}
+.focused .create-folder-input-bl input {
+	color: white;
+	background-position: -1px -1930px;
+}
 .add-user-popup-input-bl input {
-	background-position: -2px -6197px;
+	background-position: -1px -1972px;
+}
+.focused .add-user-popup-input-bl input {
+	color: white;
+	background-position: -1px -2022px;
+}
+.create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
+ color:rgba(255,255,255,0.5);
+}
+.create-folder-input-bl input:-moz-placeholder, .add-user-popup-input-bl input:-moz-placeholder {
+ color:rgba(255,255,255,0.5);
+ opacity: 1;
+}
+.create-folder-input-bl input::-moz-placeholder, .add-user-popup-input-bl input::-moz-placeholder {
+ color:rgba(255,255,255,0.5);
+ opacity: 1;
+}
+.create-folder-input-bl input:-ms-input-placeholder, .add-user-popup-input-bl input:-ms-input-placeholder {
+ color:rgba(255,255,255,0.5);
 }
 .fm-account-input {
 	margin: 20px 0 0 0;
@@ -6504,7 +6527,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 0;
 	cursor: pointer;
 }
-.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
+.create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
 	margin-left: 245px;
 	height: 32px;
 	background-color: rgba(109,176,63,0.8);
@@ -6527,18 +6550,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 }
-.create-folder-button:hover, a.create-folder-button:hover, .add-user-popup-button:hover, a.add-user-popup-button:hover, .fm-dialog-new-folder-button:hover, .active .fm-dialog-new-folder-button {
+.create-folder-button:hover, .add-user-popup-button:hover, .fm-dialog-new-folder-button:hover {
 	background-color: rgba(109,176,63,1);
 }
-.create-folder-bottom .create-folder-button, .create-folder-bottom a.create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .filled-input .create-folder-bottom a.create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
+.create-folder-bottom .create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .add-user-popup-button {
 	float: right;
-	margin: 12px 12px 0 0;
+	margin: 12px 8px 0 0;
 	display: block;
 }
-.create-folder-button-cancel, a.create-folder-button-cancel, .add-user-popup-button-cancel, a.add-user-popup-button-cancel {
+.create-folder-button-cancel, .add-user-popup-button-cancel, .add-user-popup-button.cancel {
 	background-color: rgba(0,0,0,0.2);
 }
-.create-folder-button-cancel:hover, a.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, a.add-user-popup-button-cancel:hover {
+.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, .add-user-popup-button.cancel:hover {
 	background-color: rgba(0,0,0,0.5);
 	color: white;
 }

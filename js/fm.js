@@ -3148,6 +3148,8 @@ function UIkeyevents()
 		else s = $('.grid-table tr.ui-selected');
 
 		if (M.chat) return true;
+		
+		if (!is_fm()) return true;
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some

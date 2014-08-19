@@ -4835,6 +4835,14 @@ function shareDialog(close)
 			$(this).next().addClass('bottom');
 		}
 	});
+
+	$('.fm-dialog,.fm-dialog-overlay').unbind('click')
+	$('.fm-dialog,.fm-dialog-overlay').bind('click', function(e) {
+		if (!$(e.target).is('.fm-share-dropdown')) {
+			$('.fm-share-permissions-block').addClass('hidden');
+		}
+	});
+
 	$('.fm-share-permissions').unbind('click');
 	$('.fm-share-permissions').bind('click',function()
 	{

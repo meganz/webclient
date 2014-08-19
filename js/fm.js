@@ -1037,13 +1037,22 @@ function addUserUI()
 	{
 		var c = $(this).attr('class');
 		var c2 = $(e.target).attr('class');
+		var d1 = $('.add-user-popup');
+        
 		if ((!c2 || c2.indexOf('fm-add-user') == -1) && $(e.target).prop('tagName') !== 'SPAN') return false;
 		if (c.indexOf('active') == -1)
 		{
 			$(this).addClass('active');
-			$('.add-user-popup input').focus();
+			d1.removeClass('dialog hidden');
+			var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+	        if(w1 > 8 ) d1.css('right', w1 + 'px');
+	        else d1.css('right', 8 + 'px');
 		}
-		else $(this).removeClass('active');
+		else {
+			$(this).removeClass('active');
+			d1.addClass('dialog hidden');
+			d1.removeAttr('style');
+		}
 		$.hideContextMenu();
 	});
 }
@@ -1494,7 +1503,7 @@ function createfolderUI()
 			{
 				b1.addClass('active');
 				d1.removeClass('hidden');
-				w1 = w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+				var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
 				if(w1 > 8 ) d1.css('right', w1 + 'px');
 				else d1.css('right', 8 + 'px');
 				$('.fm-new-folder input').focus();
@@ -1514,43 +1523,38 @@ function createfolderUI()
 		return false;
 	});
 
-	$('.fm-new-folder .create-folder-button-cancel').unbind('click');
-	$('.fm-new-folder .create-folder-button-cancel').bind('click',function(e)
+	$('.create-folder-button-cancel').unbind('click');
+	$('.create-folder-button-cancel').bind('click',function(e)
 	{
-		$('.fm-new-folder').removeClass('active filled-input');
+		$('.fm-new-folder').removeClass('active');
 		$('.create-new-folder').addClass('hidden');
-		$('.fm-new-folder input').val(l[157]);
+		$('.create-new-folder').removeClass('filled-input');
+		$('.create-new-folder input').val(l[157]);
 	});
 
 	$('.create-folder-size-icon.full-size').unbind('click');
 	$('.create-folder-size-icon.full-size').bind('click',function(e)
 	{
-		var v = $('.fm-new-folder input').val();
+		var v = $('.create-new-folder input').val();
 		if(v != l[157] && v != '') $('.create-folder-dialog input').val(v);
-		$('.fm-new-folder').removeClass('active filled-input');
+		$('.fm-new-folder').removeClass('active');
+		$('.create-new-folder').removeClass('filled-input');
 		$('.create-new-folder').addClass('hidden');
 		createfolderDialog(0);
-		$('.fm-new-folder input').val(l[157]);
+		$('.create-new-folder input').val(l[157]);
 	});
 	$('.create-folder-size-icon.short-size').unbind('click');
 	$('.create-folder-size-icon.short-size').bind('click',function(e)
 	{
 		var v = $('.create-folder-dialog input').val();
 		if(v != l[157] && v != '') {
-			$('.fm-new-folder input').val(v);
-			$('.fm-new-folder').removeClass('filled-input');
+			$('.create-new-folder input').val(v);
+			$('.create-new-folder').addClass('filled-input');
 		}
 		$('.fm-new-folder').addClass('active');
 		$('.create-new-folder').removeClass('hidden');
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
-	});
-	$('.create-folder-button-cancel popup').unbind('click');
-	$('.create-folder-button-cancel popup').bind('click',function(e)
-	{
-		 $('.fm-new-folder').removeClass('active filled-input');
-		 $('.create-new-folder').addClass('hidden');
-		 $('.fm-new-folder input').val(l[157]);
 	});
 	$('.create-new-folder input').unbind('keyup');
 	$('.create-new-folder input').bind('keyup',function(e)
@@ -1563,12 +1567,14 @@ function createfolderUI()
 	$('.create-new-folder input').bind('focus',function()
 	{
 		if ($(this).val() == l[157]) $(this).val('');
+		$('.create-new-folder').addClass('focused');
 	});
 	$('.create-new-folder input').unbind('blur');
 	$('.create-new-folder input').bind('blur',function()
 	{
 		if($('.create-new-folder input').val() == '')
 		$('.create-new-folder input').val(l[157]);
+		$('.create-new-folder').removeClass('focused');
 	});
 }
 
@@ -5247,11 +5253,14 @@ function createfolderDialog(close)
 	$('.create-folder-dialog input').bind('focus',function()
 	{
 		if ($(this).val() == l[157]) $('.create-folder-dialog input').val('');
+		$('.create-folder-dialog').addClass('focused');
 	});
 	$('.create-folder-dialog input').unbind('blur');
 	$('.create-folder-dialog input').bind('blur',function()
 	{
-		if($('.create-folder-dialog input').val() == '') $('.create-folder-dialog input').val(l[157]);
+		if($('.create-folder-dialog input').val() == '') 
+			$('.create-folder-dialog input').val(l[157]);
+		$('.create-folder-dialog').removeClass('focused');
 	});
 	$('.create-folder-dialog input').unbind('keyup');
 	$('.create-folder-dialog input').bind('keyup',function()

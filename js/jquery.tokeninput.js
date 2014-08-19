@@ -27,9 +27,11 @@
     theme: null,
     zindex: 1200,
     resultsLimit: null,
+	searchDropdown: true,
 
     enableHTML: false,
 	addAvatar: true,
+	emailValidation: false,
 
     resultsFormatter: function(item) {
       var string = item[this.propertyToSearch]; 
@@ -61,7 +63,7 @@
     onResult: null,
     onCachedResult: null,
     onAdd: null,
-    onFreeTaggingAdd: null,
+    onFreeTaggingAdd: true,
     onDelete: null,
     onReady: null,
 
@@ -254,10 +256,10 @@
                   return false;
               } else
               if ($(input).data("settings").tokenLimit === null || $(input).data("settings").tokenLimit !== token_count) {
-                  show_dropdown_hint();
+                   show_dropdown_hint();
               }
               token_list.addClass($(input).data("settings").classes.focused);
-			  $('.multiple-input').addClass('active');
+			  $('.multiple-input').parent().addClass('active');
 			  $('.permissions-menu').addClass('hidden');
 		      $('.permissions-icon.active').removeClass('active');
 		      $('.share-dialog-permissions.active').removeClass('active');
@@ -271,13 +273,13 @@
               }
 
               $(this).val("");
-			  $('.multiple-input').removeClass('active');
+			  $('.multiple-input').parent().removeClass('active');
           })
           .bind("keyup keydown blur update", resize_input)
           .keydown(function (event) {
               var previous_token;
               var next_token;
-
+			  initShareInputScroll();
               switch(event.keyCode) {
                   case KEY.LEFT:
                   case KEY.RIGHT:
@@ -566,7 +568,6 @@
 
       function resize_input() {
           if(input_val === (input_val = input_box.val())) {return;}
-
           // Get width left on the current line
           var width_left = token_list.width() - input_box.offset().left - token_list.offset().left;
           // Enter new content into resizer and resize input accordingly
@@ -769,6 +770,13 @@
               callback.call(hidden_input,token_data);
           }
       }
+	  
+	    
+	  // Email validation
+	  function IsEmail(email) {
+         var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+         return regex.test(email);
+      }
 
       // Update the hidden input box value
       function update_hidden_input(saved_tokens, hidden_input) {
@@ -781,18 +789,26 @@
           hidden_input.val(token_values.join($(input).data("settings").tokenDelimiter));
 
       }
+	  
+	  function initShareInputScroll() {
+		  var h1 = $('.token-input-list-mega').outerHeight();
+		  var h2 = $('.multiple-input').outerHeight()
+		  if (h1  > 144 &&  h1 > h2) {
+	         var element = $('.multiple-input').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+		     focus_with_timeout(input_box);
+		  } //else if (element) element.destroy()
+      }
 
       // Hide and clear the results dropdown
       function hide_dropdown () {
-          dropdown.hide().empty();
+         if ($(input).data("settings").searchDropdown) {
+		  dropdown.hide().empty();
           selected_dropdown_item = null;
-      }
-	  
-	  function initShareInputScroll() {
-	     $('.token-input-dropdown-mega').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+		 }
       }
 
       function show_dropdown() {
+		 if ($(input).data("settings").searchDropdown) {
           dropdown
               .css({
                   position: "absolute",
@@ -802,17 +818,18 @@
                   'z-index': $(input).data("settings").zindex
               })
               .show();
+		 }
       }
 
       function show_dropdown_searching () {
-          if($(input).data("settings").searchingText) {
+          if($(input).data("settings").searchingText && $(input).data("settings").searchDropdown) {
               dropdown.html("<p>" + escapeHTML($(input).data("settings").searchingText) + "</p>");
               show_dropdown();
           }
       }
 
       function show_dropdown_hint () {
-          if($(input).data("settings").hintText) {
+          if($(input).data("settings").hintText && $(input).data("settings").searchDropdown) {
               dropdown.html("<p>" + escapeHTML($(input).data("settings").hintText) + "</p>");
               show_dropdown();
           }
@@ -1064,7 +1081,7 @@
       //
       // obj: a jQuery object to focus()
       function focus_with_timeout(obj) {
-          setTimeout(function() { obj.focus(); }, 50);
+          setTimeout(function() { obj.focus(); }, 0);
       }
 
   };

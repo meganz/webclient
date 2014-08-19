@@ -3349,7 +3349,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	display: block;
 	font-size: 16px;
-	line-height: 32px;
+	line-height: 30px;
 	color: white;
 	text-align: center;
 	font-family: 'Open Sans Semibold';
@@ -4685,7 +4685,7 @@ th.grid-first-th {
 	transition: background-color 100ms ease-in-out;
 }
 .grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
-	background-color: rgba(238,238,238,1);
+	background-color: rgba(233,233,233,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
@@ -6007,7 +6007,7 @@ span.search-number {
 	padding: 0 10px 0 33px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -9px -1730px;
+	background-position: -1px -8510px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -6023,7 +6023,7 @@ span.search-number {
 	position: relative;
 }
 .fm-add-user {
-	padding: 0 10px 0 31px;
+	padding: 0 10px 0 28px;
 }
 .fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
 	padding: 0 0 0 33px;
@@ -6353,7 +6353,7 @@ span.search-number {
 	border: 2px solid rgba(0, 0, 0, 0.1);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
-	min-width: 334px;
+	width: 360px;
 	background-color: white;
 	margin: 46px 0 0 0;
 	z-index: 900;
@@ -6364,6 +6364,17 @@ span.search-number {
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 	display: block;
+}
+.add-user-popup {
+	max-width: 90%;
+	z-index: 100;
+	margin: 94px 0 0 0;
+}
+.add-user-popup.dialog {
+	z-index: 1200;
+	left: 50%;
+	top: 50%;
+	margin: -69px 0 0 -180px;
 }
 .create-folder-dialog {
 	min-width: 334px;
@@ -6387,13 +6398,10 @@ span.search-number {
 .active .create-folder-arrow, .active .add-user-popup-arrow {
 	display: block;
 }
-.add-user-popup-arrow {
-	margin: -12px 0 0 130px;
-}
-.create-folder-pad, .add-user-popup-pad, .create-folder-dialog .create-folder-pad {
+.create-folder-dialog .create-folder-pad {
 	margin: 12px 12px 12px 12px
 }
-.create-folder-pad {
+.create-folder-pad, .add-user-popup-pad {
 	margin: 34px 12px 12px 12px;
 }
 .create-folder-bottom, .default-dialog-bottom {
@@ -6401,12 +6409,13 @@ span.search-number {
 	background-color: #F6F6F6;
 	margin: 12px -12px -12px -12px;
 	display: none;
-	-webkit-border-bottom-left-radius: 8px;
-	-moz-border-radius-bottomleft: 8px;
-	border-bottom-left-radius: 8px;
-	-webkit-border-bottom-right-radius: 8px;
-	-moz-border-radius-bottomright: 8px;
-	border-bottom-right-radius: 8px;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-left-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomright: 7px;
+	border-bottom-right-radius: 7px;
+	padding-right: 4px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -6414,11 +6423,7 @@ span.search-number {
 .filled-input .create-folder-button {
 	display: none;
 }
-.filled-input .create-folder-input-bl {
-	width: 100%;
-	float: none;
-}
-.create-folder-size-icon {
+.create-folder-size-icon, .add-user-size-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-position: center -5509px;
 	background-repeat: no-repeat;
@@ -6438,12 +6443,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.3;
 	cursor: pointer;
 }
-.create-folder-size-icon:hover {
+.create-folder-size-icon:hover, .add-user-size-icon:hover {
 	-moz-opacity: 0.6;
 	-khtml-opacity: 0.6;
 	opacity: 0.6;
 }
-.create-folder-size-icon.short-size {
+.create-folder-size-icon.short-size, .add-user-size-icon.short-size {
 	background-position: center -5559px;
 	top: 16px;
 	right: 40px;
@@ -6457,25 +6462,48 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 }
-.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input {
+.filled-input .create-folder-input-bl, .add-user-popup-input-bl {
+	width: 100%;
+	float: none;
+}
+.create-folder-input-bl input, .fm-account-input input {
 	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: white;
-	line-height: 30px;
+	line-height: 18px;
 	margin-top: 0;
-	font-size: 12px;
+	font-size: 11px;
 	color: #868686;
-	padding: 0 10px 0 35px;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: -5px -5657px;
+	padding: 6px 10px 2px 34px;
+	margin: 0;
+	background-image: url(http://test/webclient/images/mega/dialogs-sprite.svg);
+	background-position: -1px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
 	border: 0;
 }
-.add-user-popup-input-bl input {
-	background-position: -2px -6197px;
+.focused .create-folder-input-bl, .focused .fm-account-input, .focused .fm-account-select {
+	background-color: rgba(0,0,0,0.2);
+}
+.focused .create-folder-input-bl input {
+	color: white;
+	background-position: -1px -1930px;
+}
+ .create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
+ color:rgba(255,255,255,0.5);
+}
+.create-folder-input-bl input:-moz-placeholder, .add-user-popup-input-bl input:-moz-placeholder {
+ color:rgba(255,255,255,0.5);
+ opacity: 1;
+}
+.create-folder-input-bl input::-moz-placeholder, .add-user-popup-input-bl input::-moz-placeholder {
+ color:rgba(255,255,255,0.5);
+ opacity: 1;
+}
+.create-folder-input-bl input:-ms-input-placeholder, .add-user-popup-input-bl input:-ms-input-placeholder {
+ color:rgba(255,255,255,0.5);
 }
 .fm-account-input {
 	margin: 20px 0 0 0;
@@ -6504,7 +6532,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 0;
 	cursor: pointer;
 }
-.create-folder-button, a.create-folder-button, .add-user-popup-button, a.add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
+.create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
 	margin-left: 245px;
 	height: 32px;
 	background-color: rgba(109,176,63,0.8);
@@ -6527,18 +6555,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 }
-.create-folder-button:hover, a.create-folder-button:hover, .add-user-popup-button:hover, a.add-user-popup-button:hover, .fm-dialog-new-folder-button:hover, .active .fm-dialog-new-folder-button {
+.create-folder-button:hover, .add-user-popup-button:hover, .fm-dialog-new-folder-button:hover {
 	background-color: rgba(109,176,63,1);
 }
-.create-folder-bottom .create-folder-button, .create-folder-bottom a.create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .filled-input .create-folder-bottom a.create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
+.create-folder-bottom .create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .add-user-popup-button {
 	float: right;
-	margin: 12px 12px 0 0;
+	margin: 12px 8px 0 0;
 	display: block;
 }
-.create-folder-button-cancel, a.create-folder-button-cancel, .add-user-popup-button-cancel, a.add-user-popup-button-cancel {
+.create-folder-button-cancel, .add-user-popup-button-cancel, .add-user-popup-button.cancel {
 	background-color: rgba(0,0,0,0.2);
 }
-.create-folder-button-cancel:hover, a.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, a.add-user-popup-button-cancel:hover {
+.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, .add-user-popup-button.cancel:hover {
 	background-color: rgba(0,0,0,0.5);
 	color: white;
 }
@@ -17575,9 +17603,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 	background-color: #d0efa0;
 }
 ul.token-input-list-mega {
-	overflow: hidden;
 	height: auto !important;
-	height: 1%;
 	width: 100%;
 	border: 0;
 	cursor: text;
@@ -17585,33 +17611,65 @@ ul.token-input-list-mega {
 	min-height: 1px;
 	z-index: 999;
 	margin: 0;
-	padding: 0;
-	background-color: rgba(0,0,0,0.05);
 	list-style-type: none;
 	clear: left;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 31px 4px 31px;
+	padding: 0 10px 4px 31px;
+	overflow: hidden;
 }
-ul.token-input-list-mega li input {
+.multiple-input {
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-color: rgba(0,0,0,0.05);
+	max-height: 144px;
+	min-height:32px;
+}
+.multiple-input-warning {
+	height: 32px;
+	position: absolute;
+	right: 42px;
+	background-color: #444444;
+	padding: 0 2px 0 12px;
+	line-height: 30px;
+	color: #CCCCCC;
+	font-size: 11px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	white-space: nowrap;
+	display: none;
+}
+.error .multiple-input-warning {
+	display: block;
+}
+.multiple-input-warning .arrow {
+	height: 32px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -2009px;
+	position: absolute;
+	right: -14px;
+	width: 20px;
+}
+ul.token-input-list-mega li input, .multiple-input input  {
 	border: 0;
 	width: 100px;
 	padding: 0;
 	background-color: transparent;
-	line-height: 20px;
-	margin: 6px 3px 2px 3px;
+	line-height: 18px;
+	margin: 0;
+	padding: 6px 3px 4px 3px;
 	-webkit-appearance: caret;
 }
 li.token-input-token-mega {
 	overflow: hidden;
 	height: 20px;
-	line-height: 19px;
+	line-height: 18px;
 	margin: 6px 3px 2px 3px;
-	padding: 0 6px 0 24px;
+	padding: 0 20px 0 24px;
 	background-color: white;
 	cursor: default;
 	font-size: 11px;
@@ -17622,9 +17680,17 @@ li.token-input-token-mega {
 	float: left;
 	white-space: nowrap;
 	position: relative;
+	max-width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 li.token-input-token-mega.no-avatar {
-	padding: 0 6px 0 10px;
+	padding: 0 20px 0 10px;
 }
 li.token-input-token-mega p {
 	display: inline;
@@ -17643,12 +17709,14 @@ li.token-input-token-mega .input-close {
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
-	-moz-opacity: 0.2;
-	-khtml-opacity: 0.2;
-	opacity: 0.2;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
 	margin-left: 4px;
-	float: right;
+	position: absolute;
+	top: 0;
+	right: 6px;
 	cursor: pointer;
 }
 li.token-input-token-mega .input-close:hover {
@@ -17797,24 +17865,19 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	background-repeat: no-repeat;
 	background-position: center 8px;
 }
-.share-dialog-icon {
+.share-dialog-icon, .add-user-icon {
 	position: absolute;
 	width: 25px;
 	height: 25px;
 	z-index: 10;
 	background-image: url(../images/mega/dialogs-sprite.svg);
-	background-position: -82px -84px;
+	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
 .share-dialog-icon.permissions-icon {
 	width: 30px;
 	background-position: -85px -275px;
 	right: 13px;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-opacity: 0.3;
 	-khtml-opacity: 0.3;
@@ -17822,15 +17885,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 }
 .share-dialog-icon.permissions-icon:hover {
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.active .share-dialog-icon {
-	background-position: -80px -314px;
+.active .share-dialog-icon, .active .add-user-icon, .error .share-dialog-icon, .error .add-user-icon {
+	background-position: -81px -314px;
 }
-.active .share-dialog-icon.permissions-icon {
+.active .share-dialog-icon.permissions-icon, .error .share-dialog-icon.permissions-icon {
 	background-position: -85px -239px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
 	-moz-opacity: 1;
@@ -17849,10 +17917,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .share-dialog-icon.permissions-icon.read-and-write {
 	background-position: -85px -207px;
 }
-.active ul.token-input-list-mega {
+.active .multiple-input {
 	background-color: rgba(0,0,0,0.2);
 }
-.active ul.token-input-list-mega li input {
+.error .multiple-input {
+	background-color: rgba(217,0,7,0.5);
+}
+.active ul.token-input-list-mega li input, .multiple-input:hover ul.token-input-list-mega li input {
 	color: white;
 }
 .import-contacts-link {
@@ -18019,7 +18090,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.share-dialog-contacts .jspDrag, .token-input-dropdown-mega .jspDrag, .fm-dialog-body .jspDrag {
+.share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag {
 	width: 4px;
 	background-color: black;
 }

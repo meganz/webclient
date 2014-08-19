@@ -156,20 +156,20 @@
 					}
 					else
 					{
-						callback();
+						callback(PERSISTENT);
 					}
 				}
 				else
 				{
 					/**
 					 * Check if our temporary storage quota is sufficient to proceed.
-					 * (require 60% margin because the quota can change during the download)
+					 * (require 400% + 100MB margin because the quota can change during the download)
 					 */
-					if (tremaining > reqsize * 1.5 + 1024 * 1024 * 100)
+					if (tremaining > reqsize * 5 + 1024 * 1024 * 100)
 					{
 						callback();
 					}
-					else if (tused + tremaining > reqsize * 1.5 + 1024 * 1024 * 100)
+					else if (tused + tremaining > reqsize * 5 + 1024 * 1024 * 100)
 					{
 						clearit(0, 300, zRetry);
 					}
@@ -274,6 +274,7 @@
 						dl_fw.onerror = function (e)
 						{
 							/* onwriteend() will take care of it */
+							if (d) console.error(e);
 						};
 
 						dl_fw.onwriteend = function ()
@@ -343,6 +344,8 @@
 					return wTimer = setTimeout(this.fsInitOp.bind(this), 2801);
 				}
 				dl_storagetype = aStorageType !== 1 ? 0 : 1;
+
+				if (d) console.log('Using Storage: '+ ({0:'Temporary',1:'Persistent'})[dl_storagetype], aStorageType, aEvent, aFail);
 
 				window.requestFileSystem(
 					dl_storagetype,

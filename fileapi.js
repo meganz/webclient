@@ -938,6 +938,16 @@ function mozClearStartupCache() {
 	}
 })(self);
 
+var mozMEGAExtensionVersion;
+try {
+	var { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
+	AddonManager.getAddonByID('firefox@mega.co.nz',function(data)
+	{
+		mozMEGAExtensionVersion = data.version;
+		AddonManager = undefined;
+	});
+} catch(e) {}
+
 const mozLazyGetService = XPCOMUtils.defineLazyServiceGetter.bind(XPCOMUtils, this);
 
 mozLazyGetService( "mozMIMEService",     "@mozilla.org/mime;1",                      "nsIMIMEService"     );

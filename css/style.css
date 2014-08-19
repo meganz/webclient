@@ -3349,7 +3349,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	display: block;
 	font-size: 16px;
-	line-height: 32px;
+	line-height: 30px;
 	color: white;
 	text-align: center;
 	font-family: 'Open Sans Semibold';
@@ -6007,7 +6007,7 @@ span.search-number {
 	padding: 0 10px 0 33px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -9px -1730px;
+	background-position: -1px -8510px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -6023,7 +6023,7 @@ span.search-number {
 	position: relative;
 }
 .fm-add-user {
-	padding: 0 10px 0 31px;
+	padding: 0 10px 0 28px;
 }
 .fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
 	padding: 0 0 0 33px;
@@ -17625,6 +17625,7 @@ ul.token-input-list-mega {
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.05);
 	max-height: 144px;
+	min-height:32px;
 }
 .multiple-input-warning {
 	height: 32px;
@@ -17653,7 +17654,7 @@ ul.token-input-list-mega {
 	right: -14px;
 	width: 20px;
 }
-ul.token-input-list-mega li input {
+ul.token-input-list-mega li input, .multiple-input input  {
 	border: 0;
 	width: 100px;
 	padding: 0;

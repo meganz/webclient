@@ -31,6 +31,7 @@
 
     enableHTML: false,
 	addAvatar: true,
+	emailValidation: false,
 
     resultsFormatter: function(item) {
       var string = item[this.propertyToSearch]; 
@@ -62,7 +63,7 @@
     onResult: null,
     onCachedResult: null,
     onAdd: null,
-    onFreeTaggingAdd: null,
+    onFreeTaggingAdd: true,
     onDelete: null,
     onReady: null,
 
@@ -768,6 +769,13 @@
           if($.isFunction(callback)) {
               callback.call(hidden_input,token_data);
           }
+      }
+	  
+	    
+	  // Email validation
+	  function IsEmail(email) {
+         var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+         return regex.test(email);
       }
 
       // Update the hidden input box value

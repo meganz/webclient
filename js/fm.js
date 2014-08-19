@@ -1494,7 +1494,7 @@ function createfolderUI()
 			{
 				b1.addClass('active');
 				d1.removeClass('hidden');
-				w1 = w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+				var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
 				if(w1 > 8 ) d1.css('right', w1 + 'px');
 				else d1.css('right', 8 + 'px');
 				$('.fm-new-folder input').focus();

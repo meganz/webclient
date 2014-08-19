@@ -9,16 +9,21 @@
 <script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
 <script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
 <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
-<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.tokeninput.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {  
-  
-  
-  
-  
-  
+    var d1 = $('.add-user-popup');
+    var w1 = $(window).width() - $('.fm-add-user').offset().left - d1.outerWidth() + 2;
+	if(w1 > 8 ) d1.css('right', w1 + 'px');
+	else d1.css('right', 8 + 'px');
+	$('.add-multiple-input').tokenInput(null, {
+                theme: "mega",
+				addAvatar: false,
+				autocomplete: null,
+				searchDropdown:false
+    });
+	
 });
-
 </script>
 </head>
 
@@ -110,207 +115,37 @@ $(document).ready(function() {
                      </a>
                      <div class="clear"></div>
                    </div>
-                   
-                   
                 
                    <a class="fm-files-view-icon block-view"></a>
                    <a class="fm-files-view-icon listing-view active"></a>
                    <div class="fm-add-user active">
                      <div class="add-user-popup-arrow"></div>
-                     
                      <span>Add contact</span>
                    </div>
+                   
                    <div class="add-user-popup">
                        <div class="add-user-popup-pad">
                          <div class="add-user-size-icon full-size"></div>
-                         <div class="add-user-popup-input-bl">
-                           <input type="text">
+                         <div class="multiple-input">
+                           <div class="add-user-icon"></div>
+                           <input type="text" class="add-multiple-input"  name="" />
+                           <div class="clear"></div>
                          </div>
                          <div class="default-dialog-bottom">
+                           <div class="import-contacts-link"><span></span>Input contacts...</div>
                            <div class="add-user-popup-button add">Add</div>
                            <div class="add-user-popup-button cancel">Cancel</div>
                          </div>
                        </div>
                    </div>
+                   
+                   
                    <div class="clear"></div>
                 </div>
                 
                 
                 
                 
-                <div class="contacts-details-block hidden">
-                  <div class="contact-top-details">
-                  
-                     <div class="nw-contact-block-avatar color10">
-                        <img alt="" src="../../temp/images/blog-img3.png" />
-                     </div>
-                     <div class="contact-fingerprint-block">
-                           <div class="contact-fingerprint-title">Unique Crypto Fingerprint:</div>
-                           <div class="contact-fingerprint-txt">
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                           </div>
-                           <div class="contact-fingerprint-txt">
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                             <span>QH7XF</span>
-                           </div>
-                           <div class="fm-verify">
-                             <span">Verify...</span>
-                           </div>
-                           <div class="fm-question">
-                           </div>
-                           <div class="clear"></div>
-                      </div>
-                     
-                     <div class="contact-details-pad">
-                        <div class="contact-details-user-name">Andrei.d</div>
-                        <a href="" class="grid-url-arrow"><span></span></a>
-                        <div class="clear"></div>
-                        <div class="contact-details-email">ad@mega.co.nz</div>
-                        <div class="away">
-                            <div class="nw-contact-status"></div>
-                            <div class="fm-chat-user-status">Away</div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="fm-start-conversation">
-                           <span>Start Conversation</span>
-                        </div>
-                        <div class="fm-send-files">
-                           <span class="fm-chatbutton-arrow">Send files...</span>
-                        </div>
-                        <div class="fm-share-folders">
-                           <span>Share Folders</span>
-                        </div>
-                        
-                        <div class="clear"></div>
-                     </div>
-                     <div class="clear"></div>
-                     
-                     <!-- Please add "hidden" class if there is no shared folders !-->
-                     <div class="contact-share-notification">Andrei.d shared the following folders with you:</div>
-                     
-                  </div>
-                  
-                  <div class="files-grid-view contact-details-view">
-                
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                      <tr>
-                        <th class="grid-first-th"><span class="grid-header-star"></span></th>
-                        <th><div class="arrow name desc">Name</div></th>
-                        <th><div class="arrow type">Access</div></th>
-                      </tr>
-                    </table>
-                    
-                    <div class="grid-scrolling-table">
-                      <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me">
-                        <tr>
-                          <td width="30"><span class="grid-status-icon star"></span></td>
-                          <td>
-                              <div class="shared-folder-icon"></div>
-                              <div class="shared-folder-info-block">
-                                 <div class="shared-folder-name">Shared folder name 1</div>
-                                 <div class="shared-folder-info">4 files, 2 folders</div>
-                              </div> 
-                          </td>
-                          <td width="270">
-                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
-                            <div class="shared-folder-access full-access">Full access</div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td width="30"><span class="grid-status-icon star"></span></td>
-                          <td>
-                              <div class="shared-folder-icon"></div>
-                              <div class="shared-folder-info-block">
-                                 <div class="shared-folder-name">Shared folder name 1</div>
-                                 <div class="shared-folder-info">4 files, 2 folders</div>
-                              </div> 
-                          </td>
-                          <td width="270">
-                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
-                            <div class="shared-folder-access read-and-write">Read and write</div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td width="30"><span class="grid-status-icon"></span></td>
-                          <td>
-                              <div class="shared-folder-icon"></div>
-                              <div class="shared-folder-info-block">
-                                 <div class="shared-folder-name">Shared folder name 1</div>
-                                 <div class="shared-folder-info">4 files, 2 folders</div>
-                              </div> 
-                          </td>
-                          <td width="270">
-                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
-                            <div class="shared-folder-access read-only">Read only</div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td width="30"><span class="grid-status-icon"></span></td>
-                          <td>
-                              <div class="shared-folder-icon"></div>
-                              <div class="shared-folder-info-block">
-                                 <div class="shared-folder-name">Shared folder name 1</div>
-                                 <div class="shared-folder-info">4 files, 2 folders</div>
-                              </div> 
-                          </td>
-                          <td width="270">
-                            <!-- Please add any of classname: read-only/read-and-write/full-access !-->
-                            <div class="shared-folder-access full-access">Full access</div>
-                          </td>
-                        </tr>
-                      </table>
-                    </div>
-                
-                </div>
-                  
-                  <div class="fm-blocks-view contact-details-view hidden">
-                    <div class="file-block-scrolling">
-                       <a class="file-block folder">
-                         <span class="file-status-icon"></span>
-                         <span class="file-settings-icon"><span></span></span>
-                         <span class="shared-folder-access  read-only"></span>
-                         <span class="file-icon-area">
-                           <span class="block-view-file-type folder-shared"><img alt="" src="../asdawvf.png"></span>
-                         </span>
-                         <span class="file-block-title">asdasd</span>
-                       </a>
-                       <a class="file-block folder">
-                         <span class="file-status-icon"></span>
-                         <span class="file-settings-icon"><span></span></span>
-                         <span class="shared-folder-access  read-and-write"></span>
-                         <span class="file-icon-area">
-                           <span class="block-view-file-type folder-shared"><img alt=""></span>
-                         </span>
-                         <span class="file-block-title">asdasd</span>
-                       </a>
-                       <a class="file-block folder">
-                         <span class="file-status-icon"></span>
-                         <span class="file-settings-icon"><span></span></span>
-                         <span class="shared-folder-access  full-access"></span>
-                         <span class="file-icon-area">
-                           <span class="block-view-file-type folder-shared"><img alt=""></span>
-                         </span>
-                         <span class="file-block-title">asdasd</span>
-                       </a>
-                       <a class="file-block folder">
-                         <span class="file-status-icon"></span>
-                         <span class="file-settings-icon"><span></span></span>
-                         <span class="shared-folder-access  read-only"></span>
-                         <span class="file-icon-area">
-                           <span class="block-view-file-type folder-shared"><img alt=""></span>
-                         </span>
-                         <span class="file-block-title">asdasd</span>
-                       </a>
-                       <div class="clear"></div>
-                    </div>
-                  </div>
-                  
-                </div>
                 
               
               </div>

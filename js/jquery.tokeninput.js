@@ -29,16 +29,20 @@
     resultsLimit: null,
 
     enableHTML: false,
+	addAvatar: true,
 
     resultsFormatter: function(item) {
-      var string = item[this.propertyToSearch];
-      return "<li class='share-search-result'><span class='nw-contact-avatar color10'>UU</span><span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
+      var string = item[this.propertyToSearch]; 
+	  var avatar = "<span class='nw-contact-avatar color10'>UU</span>";
+      return "<li class='share-search-result'>"+ (this.addAvatar ? avatar:'') +"<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
+	  
     },
 
     tokenFormatter: function(item) {
 	  if (item)
       var string = item[this.propertyToSearch];
-      return "<li class='share-added-contact'><span class='search-avatar color3'>UU</span>" + (this.enableHTML ? string : _escapeHTML(string)) + "</li>";
+      var avatar = "<span class='search-avatar color3'>UU</span>";
+      return "<li class='share-added-contact " + (this.addAvatar ? '':'no-avatar') + "'>"+ (this.addAvatar ? avatar:'') + (this.enableHTML ? string : _escapeHTML(string)) + "</li>";
     },
 	
 

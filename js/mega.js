@@ -3054,12 +3054,13 @@ function execsc(ap)
 				{
 					u_nodekeys[a.n] = f.key;
 					if (f.name !== n.name)
-					{
+					{						
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
-						$('#treea_' + n.h + ' span').text(f.name);
+						$('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
+						
+						//@@@Todo: reposition elements according to sorting (if sorted by name)						
 						if ($('#path_' + n.h).length > 0) newpath=1;
-						if (n.h == M.RootID) $('.fm-tree-header.cloud-drive-item span').text(f.name);
 					}
 					if (f.fav !== n.fav)
 					{
@@ -3200,13 +3201,13 @@ function ddtype(ids,toid,alt)
 		if (fromid_r == M.InboxID && toid_r == M.RubbishID) r = 'move';
 
 		// from trashbin or inbox to a shared folder with write permission, always copy
-		if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && toid_r == 'contacts' && RightsbyID(toid) > 0) r = 'copy';
+		if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && (toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0) r = 'copy';
 
 		// copy from a share to cloud
-		if (fromid_r == 'contacts' && (toid == M.RootID  || toid_r == M.RootID)) r = 'copy';
+		if ((fromid_r == 'contacts' || fromid_r == 'shares') && (toid == M.RootID  || toid_r == M.RootID)) r = 'copy';
 
 		// move from a share to trashbin only with full control rights (do a copy + del for proper handling)
-		if (fromid_r == 'contacts' && toid == M.RubbishID && RightsbyID(fromid) > 1) r = 'copydel';
+		if ((fromid_r == 'contacts' || fromid_r == 'shares') && toid == M.RubbishID && RightsbyID(fromid) > 1) r = 'copydel';
 	}
 	return r;
 }
@@ -3262,6 +3263,7 @@ function createfolder(toid,name,ulparams)
 		if (typeof res != 'number')
 		{
 			$('.fm-new-folder').removeClass('active');
+			$('.create-new-folder').addClass('hidden');
 			$('.create-folder-input-bl input').val('');
 			newnodes=[];
 			M.addNode(res.f[0]);

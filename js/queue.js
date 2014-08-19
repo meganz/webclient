@@ -11,6 +11,11 @@ function MegaQueue(worker, limit) {
 }
 inherits(MegaQueue, MegaEvents)
 
+MegaQueue.prototype.setSize = function(size) {
+	this._limit = size;
+	this._process();
+}
+
 MegaQueue.prototype.isEmpty = function() {
 	return this._running == 0
 		&& this._queue.length == 0

@@ -383,6 +383,13 @@ function initUI()
 
 	$.doDD = function(e,ui,a,type)
 	{
+		function nRevert(r)
+		{
+			try {
+				$(ui.draggable).draggable( "option", "revert", false );
+				if (r) $(ui.draggable).remove();
+			} catch(e) {}
+		}
 		var c = $(ui.draggable.context).attr('class');
 		var t, ids, dd;
 
@@ -397,20 +404,31 @@ function initUI()
 			// grid dragged:
 			if ($.selected && $.selected.length > 0) ids = $.selected;
 		}
+
+		// Workaround a problem where we get over[1] -> over[2] -> out[1]
+		if (a === 'out' && $.currentOver !== $(e.target).attr('id')) a = 'noop';
+
 		if (type == 1)
 		{
 			// tree dropped:
 			var c = $(e.target).attr('class');
-			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
+			if (c && c.indexOf('nw-fm-left-icon') > -1)
+			{
+				dd = 'nw-fm-left-icon';
+				if (a == 'drop')
+				{
+					if (c.indexOf('cloud') > -1) t = M.RootID;
+					else if (c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
+				}
+			}
 			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
 			else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) dd = 'download';
-			else if (c && c.indexOf('nw-fm-left-icon') > -1) dd = 'nw-fm-left-icon';
-			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
 			else
 			{
 				var t = $(e.target).attr('id');
 				if (t && t.indexOf('treea_') > -1) t = t.replace('treea_','');
 				else if (t && t.indexOf('path_') > -1) t = t.replace('path_','');
+				else if (t && t.indexOf('contact2_') > -1) t = t.replace('contact2_','');
 				else if (M.currentdirid !== 'shares' || !M.d[t] || RootbyId(t) !== 'shares') t=undefined;
 			}
 		}
@@ -426,9 +444,6 @@ function initUI()
 			dd = ddtype(ids,t,e.altKey);
 			if (dd === 'move' && e.altKey) dd = 'copy';
 		}
-
-		// Workaround a problem where we get over[1] -> over[2] -> out[1]
-		if (a === 'out' && $.currentOver !== $(e.target).attr('id')) a = 'noop';
 
 		if (a !== 'noop')
 		{
@@ -465,18 +480,19 @@ function initUI()
 						else if (c && c.indexOf('contacts-item') > -1) h = 'contacts';
 					}
 					if (h) treeUIexpand(h,1);
+					else if ($(e.target).hasClass('nw-conversations-item')) $(e.target).click();
 				}
-			},1000);
+			},890);
 
-			if (t == M.RubbishID) $('body').addClass('dndc-to-rubbish');
-			else if (dd == 'move') $('body').addClass('dndc-move');
+			if (dd == 'move') $('body').addClass('dndc-move');
 			else if (dd == 'copy') $('body').addClass('dndc-copy');
 			else if (dd == 'download') $('body').addClass('dndc-download');
 			else if (dd === 'nw-fm-left-icon')
 			{
 				var c = '' + $(e.target).attr('class');
 
-				if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
+				if (~c.indexOf('rubbish-bin')) $('body').addClass('dndc-to-rubbish');
+				else if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
 				else if (~c.indexOf('contacts')) $('body').addClass('dndc-to-contacts');
 				else if (~c.indexOf('conversations')) $('body').addClass('dndc-to-conversations');
 				else if (~c.indexOf('cloud-drive')) $('body').addClass('dndc-to-conversations'); // XXX: cursor, please?
@@ -485,7 +501,7 @@ function initUI()
 				if (c)
 				{
 					if ($.liTooltipTimer) clearTimeout($.liTooltipTimer);
-					$.liTimerK = Later(function() { $(e.target).click() });
+					$.liTimerK = setTimeout(function() { $(e.target).click() }, 920);
 				}
 			}
 			// else $('.dragger-block').addClass('drag');
@@ -500,29 +516,24 @@ function initUI()
 		}
 		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
-		if (a == 'drop' && dd === 'nw-fm-left-icon')
+		if (a == 'drop' && dd)
 		{
-			if ($(e.target).hasClass('conversations'))
+			if (dd === 'nw-fm-left-icon')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
+				// do nothing
+			}
+			else if ($(e.target).hasClass('nw-conversations-item'))
+			{
+				nRevert();
 
 				// drop over a chat window
 				var currentRoom = megaChat.getCurrentRoom();
 				assert(currentRoom, 'Current room missing - this drop action should be impossible.');
 				currentRoom.attachNodes(ids);
-			}
-		}
-		else if (a == 'drop' && dd)
-		{
-			function nRevert(r)
-			{
-				try {
-					$(ui.draggable).draggable( "option", "revert", false );
-					if (r) $(ui.draggable).remove();
-				} catch(e) {}
-			}
 
-			if (dd == 'move')
+				if (d) console.error('TODO: dragging to the chat', currentRoom);
+			}
+			else if (dd == 'move')
 			{
 				nRevert(1);
 				$.moveids=ids;
@@ -683,16 +694,6 @@ function initUI()
 		if (!localStorage.contextmenu) e.preventDefault();
 	});
 
-	$('.fm-new-folder').unbind('mouseover');
-	$('.fm-new-folder').bind('mouseover',function(e)
-	{
-		$('.fm-new-folder').addClass('hovered');
-	});
-	$('.fm-new-folder').unbind('mouseout');
-	$('.fm-new-folder').bind('mouseout',function(e)
-	{
-		$('.fm-new-folder').removeClass('hovered');
-	});
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
@@ -1482,25 +1483,28 @@ function createfolderUI()
 	$('.fm-new-folder').unbind('click');
 	$('.fm-new-folder').bind('click',function(e)
 	{
-		if (($('.fm-new-folder').position().left+400) > $('body').width()) createfolderDialog();
-		else
-		{
 			var c = $('.fm-new-folder').attr('class');
 			var c2 = $(e.target).attr('class');
 			var c3 = $(e.target).parent().attr('class');
+			var b1 = $('.fm-new-folder');
+			$('.create-new-folder').removeClass('filled-input');
+			var d1 = $('.create-new-folder');
 			if ((!c2 || c2.indexOf('fm-new-folder') == -1) && (!c3 || c3.indexOf('fm-new-folder') == -1)) return false;
 			if (c.indexOf('active') == -1)
 			{
-				$('.fm-new-folder').addClass('active');
+				b1.addClass('active');
+				d1.removeClass('hidden');
+				w1 = w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+				if(w1 > 8 ) d1.css('right', w1 + 'px');
+				else d1.css('right', 8 + 'px');
 				$('.fm-new-folder input').focus();
 			}
 			else
 			{
-				$('.fm-new-folder').removeClass('active');
-				$('.fm-new-folder').removeClass('filled-input');
+				b1.removeClass('active filled-input');
+				d1.addClass('hidden');
 				$('.fm-new-folder input').val(l[157]);
 			}
-		}
 		$.hideContextMenu();
 	});
 	$('.create-folder-button').unbind('click');
@@ -1513,8 +1517,8 @@ function createfolderUI()
 	$('.fm-new-folder .create-folder-button-cancel').unbind('click');
 	$('.fm-new-folder .create-folder-button-cancel').bind('click',function(e)
 	{
-		$('.fm-new-folder').removeClass('active');
-		$('.fm-new-folder').removeClass('filled-input');
+		$('.fm-new-folder').removeClass('active filled-input');
+		$('.create-new-folder').addClass('hidden');
 		$('.fm-new-folder input').val(l[157]);
 	});
 
@@ -1523,8 +1527,8 @@ function createfolderUI()
 	{
 		var v = $('.fm-new-folder input').val();
 		if(v != l[157] && v != '') $('.create-folder-dialog input').val(v);
-		$('.fm-new-folder').removeClass('active');
-		$('.fm-new-folder').removeClass('filled-input');
+		$('.fm-new-folder').removeClass('active filled-input');
+		$('.create-new-folder').addClass('hidden');
 		createfolderDialog(0);
 		$('.fm-new-folder input').val(l[157]);
 	});
@@ -1537,20 +1541,22 @@ function createfolderUI()
 			$('.fm-new-folder').removeClass('filled-input');
 		}
 		$('.fm-new-folder').addClass('active');
+		$('.create-new-folder').removeClass('hidden');
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
 	});
 	$('.create-folder-button-cancel popup').unbind('click');
 	$('.create-folder-button-cancel popup').bind('click',function(e)
 	{
-		 $('.fm-new-folder').removeClass('active');
-		 $('.fm-new-folder').removeClass('filled-input');
+		 $('.fm-new-folder').removeClass('active filled-input');
+		 $('.create-new-folder').addClass('hidden');
 		 $('.fm-new-folder input').val(l[157]);
 	});
-	$('.create-new-folder input').unbind('keypress');
-	$('.create-new-folder input').bind('keypress',function(e)
+	$('.create-new-folder input').unbind('keyup');
+	$('.create-new-folder input').bind('keyup',function(e)
 	{
-	    $('.fm-new-folder').addClass('filled-input');
+	    $('.create-new-folder').addClass('filled-input');
+		if ($(this).val()=='') $('.create-new-folder').removeClass('filled-input');
 		if (e.which == 13) docreatefolderUI(e);
 	});
 	$('.create-new-folder input').unbind('focus');
@@ -1970,11 +1976,13 @@ function accountUI()
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
 				dl_maxSlots = M.account.dl_maxSlots;
+				dlQueue.setSize(dl_maxSlots);
 			}
 			if (M.account.ul_maxSlots)
 			{
 				localStorage.ul_maxSlots = M.account.ul_maxSlots;
 				ul_maxSlots = M.account.ul_maxSlots;
+				ulQueue.setSize(ul_maxSlots);
 			}
 			if (typeof M.account.ul_maxSpeed !== 'undefined')
 			{
@@ -4282,7 +4290,7 @@ function treeUI()
 		}
 	});
 
-	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr').droppable(
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr, .nw-conversations-item').droppable(
 	{
 		tolerance: 'pointer',
 		drop: function(e, ui)
@@ -4418,12 +4426,13 @@ function sectionUIopen(id)
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	var id_r = RootbyId(id), e, scrollTo = false, stickToTop = false;
+	var id_s = id.split('/')[0], id_r = RootbyId(id);
+	var e, scrollTo = false, stickToTop = false;
 
 	if (id_r == 'shares') sectionUIopen('shared-with-me');
 	else if (id_r == M.RootID) sectionUIopen('cloud-drive');
+	else if (id_s == 'chat') sectionUIopen('conversations');
 	else if (id_r == 'contacts') sectionUIopen('contacts');
-	else if (id == 'chat') sectionUIopen('conversations');
 	else if (id_r == M.RubbishID) sectionUIopen('rubbish-bin');
 
 	if (!fminitialized) return false;
@@ -4443,7 +4452,7 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 	}
 	if ($.hideContextMenu) $.hideContextMenu(event);
 
-	e = $('#treea_' + id);
+	e = $('#treea_' + id_s);
 	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
 	e.addClass('selected');
 

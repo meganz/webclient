@@ -56,7 +56,6 @@ if (localStorage.aTransfers)
 	});
 }
 
-// Chunk fetch {{{
 function ClassChunk(task) {
 	this.task = task;
 	this.dl   = task.download;

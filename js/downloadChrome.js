@@ -163,13 +163,13 @@
 				{
 					/**
 					 * Check if our temporary storage quota is sufficient to proceed.
-					 * (require 60% margin because the quota can change during the download)
+					 * (require 500% + 100MB margin because the quota can change during the download)
 					 */
-					if (tremaining > reqsize * 1.5 + 1024 * 1024 * 100)
+					if (tremaining > reqsize * 5 + 1024 * 1024 * 100)
 					{
 						callback();
 					}
-					else if (tused + tremaining > reqsize * 1.5 + 1024 * 1024 * 100)
+					else if (tused + tremaining > reqsize * 5 + 1024 * 1024 * 100)
 					{
 						clearit(0, 300, zRetry);
 					}

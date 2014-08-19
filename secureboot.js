@@ -431,8 +431,7 @@ else
 						}
 					}
 
-					var report = { dump : __cdumps, date : new Date().toUTCString() };
-					__cdumps = [];
+					var report = { date : new Date().toUTCString() };
 
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
@@ -445,8 +444,13 @@ else
 					{
 						report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
 					}
+					report = JSON.stringify(report);
 
-					api_req({ a : 'cd', c : JSON.stringify(report) });
+					for (var i in __cdumps)
+					{
+						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report });
+					}
+					__cdumps = [];
 
 				}), 3000);
 

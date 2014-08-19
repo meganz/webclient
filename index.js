@@ -873,7 +873,15 @@ function topmenuUI()
 	$('.top-head .user-name').hide();	
 	if (fminitialized) $('.top-search-bl').show();
 	else $('.top-search-bl').hide();
-	$('.fm-avatar').hide();	
+	$('.fm-avatar').hide();
+	
+	if (u_type == 3 && u_attr.firstname)
+	{
+		$('#topmenu .user-name').text(u_attr.firstname);
+		$('#topmenu .user-name').show();
+	}
+	else $('#topmenu .user-name').hide();
+	
 	if (u_type)
 	{		
 		$('.top-menu-item.logout,.context-menu-divider.logout').show();		

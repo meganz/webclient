@@ -163,7 +163,7 @@
 				{
 					/**
 					 * Check if our temporary storage quota is sufficient to proceed.
-					 * (require 500% + 100MB margin because the quota can change during the download)
+					 * (require 400% + 100MB margin because the quota can change during the download)
 					 */
 					if (tremaining > reqsize * 5 + 1024 * 1024 * 100)
 					{

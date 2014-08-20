@@ -2109,7 +2109,7 @@ define('jodid25519',[
     var ns = {};
     
     /** Module version indicator as string (format: [major.minor.patch]). */
-    ns.VERSION = '0.7.0';
+    ns.VERSION = '0.7.1';
 
     ns.dh = dh;
     ns.eddsa = eddsa;

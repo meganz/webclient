@@ -1135,7 +1135,7 @@ function MegaData ()
 		var icon = '<span class="context-menu-icon"></span>';
 		var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 		// divider & advanced
-		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Advanced</span>';
+		var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
 		this.buildRootSubmenu = function()
 		{

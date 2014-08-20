@@ -5,7 +5,8 @@ function FlashIO(dl_id, dl) {
 		, swfid  = 'dlswf_' + (dl.zipid ? 'zip_' + dl.zipid : dl_id)
 
 	this.write = function (buffer, position, done) {
-		if (!document.getElementById(swfid)) {
+		var node = document.getElementById(swfid);
+		if (!node) {
 			return setTimeout(function () {
 				if (!dl.cancelled) IO.write(buffer, position, done);
 			}, 300);
@@ -22,7 +23,14 @@ function FlashIO(dl_id, dl) {
 		else
 			subdata = base64urlencode(buffer.buffer);
 
-		document.getElementById(swfid).flashdata(dl_id, subdata);
+		if (typeof node.flashdata === 'function')
+		{
+			node.flashdata(dl_id, subdata);
+		}
+		else
+		{
+			dlFatalError(dl, 'FlashIO Object unavailable');
+		}
 		offset += len
 		Later(done);
 	};

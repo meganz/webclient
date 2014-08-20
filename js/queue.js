@@ -11,6 +11,11 @@ function MegaQueue(worker, limit) {
 }
 inherits(MegaQueue, MegaEvents)
 
+MegaQueue.prototype.setSize = function(size) {
+	this._limit = size;
+	this._process();
+}
+
 MegaQueue.prototype.isEmpty = function() {
 	return this._running == 0
 		&& this._queue.length == 0
@@ -280,7 +285,6 @@ TransferQueue.prototype.pause = function(gid)
 			$.transferprogress[gid][2] = 0; // reset speed
 		}
 		Soon(percent_megatitle);
-		ASSERT(this._running === 0, 'Invalid running counter ('+this._running+')');
 	}
 	else if (d)
 	{

@@ -3,7 +3,8 @@
  * Storage of authenticated contacts.
  */
 
-var u_authring = undefined;
+var u_authring = {'Ed25519': undefined,
+                  'RSA': undefined};
 
 var authring = (function () {
     /**
@@ -57,6 +58,9 @@ var authring = (function () {
         UNSURE: 0x00,
     };
 
+    // User property names used for different key types.
+    ns._properties = {'Ed25519': 'authring',
+                      'RSA': 'authRSA'};
 
     /**
      * Serialises a single authentication record.
@@ -163,60 +167,83 @@ var authring = (function () {
     /**
      * Loads the ring for all authenticated contacts into `u_authring`.
      *
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
      * @param callback {function}
      *     Callback function to call upon completion of operation. The callback
      *     requires two parameters: `res` (the retrieved authentication ring)
      *     and `ctx` (the context).
+     * @throws
+     *     An error if an unsupported key type is requested.
      */
-    ns.getContacts = function(callback) {
+    ns.getContacts = function(keyType, callback) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte authentication key type: ' + keyType);
+        }
         var myCallback = function(res, ctx) {
             if (typeof res !== 'number') {
                 // Authring is in the empty-name record.
-                u_authring = ns.deserialise(res['']);
+                u_authring[keyType] = ns.deserialise(res['']);
             } else {
-                u_authring = {};
+                u_authring[keyType] = {};
             }
             if (ctx.callback3 !== undefined) {
-                ctx.callback3(u_authring, ctx);
+                ctx.callback3(u_authring[keyType], ctx);
             }
         };
         var myCtx = {
-             callback3: callback,
-         };
-        getUserAttribute(u_handle, 'authring', false, myCallback, myCtx);
+            callback3: callback,
+        };
+        getUserAttribute(u_handle, ns._properties[keyType], false,
+                         myCallback, myCtx);
     };
 
 
     /**
      * Saves the ring for all authenticated contacts from `u_authring`.
      *
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
      * @param callback {function}
      *     Callback function to call upon completion of operation. The callback
      *     requires two parameters: `res` (the retrieved authentication ring)
      *     and `ctx` (the context).
+     * @throws
+     *     An error if an unsupported key type is requested.
      */
-    ns.setContacts = function(callback) {
-        setUserAttribute('authring', {'': ns.serialise(u_authring)},
+    ns.setContacts = function(keyType, callback) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte authentication key type: ' + keyType);
+        }
+        setUserAttribute(ns._properties[keyType],
+                         {'': ns.serialise(u_authring[keyType])},
                          false, callback);
     };
 
 
     /**
-     * Loads the ring for all authenticated contacts into `u_authring`.
+     * Gets the authentication state of a certain contact for a particular key type.
      *
      * @param userhandle {string}
      *     Mega user handle.
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
      * @return {object}
      *     An object describing the authenticated `fingerprint`, the
      *     authentication `method` and the key `confidence`. `false` in case
      *     of an unauthorised contact.
+     * @throws
+     *     An error if an unsupported key type is requested.
      */
-    ns.getContactAuthenticated = function(userhandle) {
-        if (u_authring === undefined) {
+    ns.getContactAuthenticated = function(userhandle, keyType) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte key type: ' + keyType);
+        }
+        if (u_authring[keyType] === undefined) {
             throw new Error('First initialise u_authring by calling authring.getContacts()');
         }
-        if (u_authring.hasOwnProperty(userhandle)) {
-            return u_authring[userhandle];
+        if (u_authring[keyType].hasOwnProperty(userhandle)) {
+            return u_authring[keyType][userhandle];
         } else {
             return false;
         }
@@ -224,55 +251,143 @@ var authring = (function () {
 
 
     /**
-     * Serialises a single authentication record.
+     * Stores a contact authentication for a particular key type.
      *
      * @param userhandle {string}
      *     Mega user handle.
      * @param fingerprint {string}
      *     Fingerprint to authenticate as a byte or hex string.
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
      * @param method {byte}
      *     Indicator used for authentication method. One of
      *     authring.AUTHENTICATION_METHOD (e. g. FINGERPRINT_COMPARISON).
      * @param confidence {byte}
      *     Indicator used for confidence. One of authring.KEY_CONFIDENCE
      *     (e. g. UNSURE).
+     * @throws
+     *     An error if an unsupported key type is requested.
      */
-    ns.setContactAuthenticated = function(userhandle, fingerprint, method, confidence) {
-        if (u_authring === undefined) {
+    ns.setContactAuthenticated = function(userhandle, fingerprint, keyType,
+                                          method, confidence) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte key type: ' + keyType);
+        }
+        if (u_authring[keyType] === undefined) {
             throw new Error('First initialise u_authring by calling authring.getContacts()');
         }
         if (userhandle === u_handle) {
             // We don't want to track ourself. Let's get out of here.
             return;
         }
-        u_authring[userhandle] = {fingerprint: fingerprint,
-                                  method: method,
-                                  confidence: confidence};
-        ns.setContacts();
+        u_authring[keyType][userhandle] = {fingerprint: fingerprint,
+                                           method: method,
+                                           confidence: confidence};
+        ns.setContacts(keyType);
     };
 
 
     /**
-     * Computes the given key's cryptographic fingerprint.
+     * Computes the given public key's cryptographic fingerprint.
      *
      * @param key {string}
      *     Byte string of key.
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
      * @param format {string}
-     *     Format in which to return the fingerprint. Valid values: "bytes", "hex",
-     *     "string" and "base64" (default: "hex").
-     * @return
+     *     Format in which to return the fingerprint. Valid values: "string"
+     *     and "hex" (default: "hex").
+     * @return {string}
      *     Fingerprint value in the requested format.
+     * @throws
+     *     An error if an unsupported key type is requested.
      */
-    ns.computeFingerprint = function(key, format) {
+    ns.computeFingerprint = function(key, keyType, format) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte key type: ' + keyType);
+        }
         format = format || "hex";
-        if (format === "bytes") {
-            return asmCrypto.SHA1.bytes(key);
-        } else if (format === "string") {
-            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key));
+        var value = key;
+        if (keyType === 'RSA') {
+            value = key[0] + key[1];
+        }
+        if (format === "string") {
+            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
         } else if (format === "hex") {
-            return asmCrypto.SHA1.hex(key);
-        } else if (format === "base64") {
-            return base64urlencode(asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(key)));
+            return asmCrypto.SHA1.hex(value);
+        }
+    };
+
+
+    /**
+     * Signs the given public key using our own Ed25519 key.
+     *
+     * @param pubKey {array}
+     *     Array format of public key. Index 0 is the modulo, index 1 is the
+     *     exponent, both in byte string format.
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     * @return {string}
+     *     EdDSA signature of the key as a byte string.
+     * @throws
+     *     An error if an unsupported key type is requested.
+     */
+    ns.signKey = function(pubKey, keyType) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte key type: ' + keyType);
+        }
+        var timeStamp = ns._longToByteString(Math.round(Date.now() / 1000));
+        var value = pubKey;
+        if (keyType === 'RSA') {
+            value = pubKey[0] + pubKey[1];
+        }
+        var keyString = 'keyauth' + timeStamp + value;
+        return timeStamp + jodid25519.eddsa.sign(keyString, u_privEd25519, u_pubEd25519);
+    };
+
+
+    /**
+     * Verifies the signature of the given public key's against the
+     * contact's Ed25519 key.
+     *
+     * @param signature {string}
+     *     EdDSA signature in byte string format.
+     * @param pubKey {array}
+     *     Array format of public key. Index 0 is the modulo, index 1 is the
+     *     exponent, both in byte string format.
+     * @param keyType {string}
+     *     Type of key for authentication records. Values are 'Ed25519' or 'RSA'.
+     * @param signPubKey {string}
+     *     Contact's Ed25519 public key to verify the signature.
+     * @return {bool}
+     *     True on a good signature verification, false otherwise.
+     * @throws
+     *     An error if the signed key's time stamp is in the future, or if an
+     *     unsupported key type is requested.
+     */
+    ns.verifyKey = function(signature, pubKey, keyType, signPubKey) {
+        if (ns._properties[keyType] === undefined) {
+            throw new Error('Unsupporte key type: ' + keyType);
+        }
+        var timestamp = signature.substring(0, 8);
+        var timestampValue = ns._byteStringToLong(timestamp);
+        if (timestampValue > Math.round(Date.now() / 1000)) {
+            throw new Error('Bad timestamp: In the future!');
+        }
+        var value = pubKey;
+        if (keyType === 'RSA') {
+            value = pubKey[0] + pubKey[1];
+        }
+        var keyString = 'keyauth' + timestamp + value;
+        var signatureValue = signature.substring(8);
+        try {
+            return jodid25519.eddsa.verify(signatureValue, keyString, signPubKey);
+        } catch(e){
+            if (e === "Point is not on curve") {
+                return false;
+            } else {
+                throw e;
+            }
         }
     };
 
@@ -284,7 +399,7 @@ var authring = (function () {
      *     First fingerprint in byte or hex string format.
      * @param fp2 {string}
      *     Second fingerprint. in byte or hex string format
-     * @return
+     * @return {bool}
      *     True on equality, `undefined` if one fingerprint is undefined,
      *     false otherwise.
      */
@@ -299,6 +414,56 @@ var authring = (function () {
             fp2 = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(fp2));
         }
         return fp1 === fp2;
+    };
+
+
+    /**
+     * Convert a long integer (> 32-bit) to an 8-byte bit-endian string.
+     *
+     * @param value {integer}
+     *     Integer input.
+     * @return {string}
+     *     Big-endian byte string representation.
+     * @throws
+     *     An error if the value is too large for JavaScript to encode it.
+     */
+    ns._longToByteString = function(value) {
+        if (value > 9007199254740991) {
+            // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
+            throw new Error('Integer not suitable for lossless conversion in JavaScript.');
+        }
+        var result = '';
+
+        for (var i = 0; i < 8; i++ ) {
+            result = String.fromCharCode(value & 0xff) + result;
+            value = Math.floor(value / 0x100);
+        }
+
+        return result;
+    };
+
+
+    /**
+     * Convert an 8-byte bit-endian string to a long integer (> 32-bit).
+     *
+     * @param sequence {string}
+     *     Big-endian byte string representation.
+     * @return {intenger}
+     *     Integer representation.
+     * @throws
+     *     An error if the value is too large for JavaScript to encode it.
+     */
+    ns._byteStringToLong = function(sequence) {
+        var value = 0;
+        for (var i = 0; i < 8; i++) {
+            value = (value * 256) + sequence.charCodeAt(i);
+        }
+        if (value > 9007199254740991) {
+         // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
+            throw new Error('Integer not suitable for lossless conversion in JavaScript.');
+        }
+
+        return value;
     };
 
 

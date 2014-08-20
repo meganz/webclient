@@ -23,8 +23,10 @@
       <span class="context-menu-icon"></span>[$58]...
     </a>
     <span class="context-submenu">
+        <span>
             <span class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>Standard download</span>
             <span class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</span>
+        </span>
     </span>
     <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>Send to contact</a>
     <a class="context-menu-item getlink-item"><span class="context-menu-icon"></span>[$59]</a>
@@ -95,6 +97,7 @@
         <div class="nw-fm-left-tooltip">Contacts</div>
     </div>
     <div class="nw-fm-left-icon conversations">
+        <div class="new-messages-indicator hidden">2</div>
         <div class="nw-fm-left-tooltip">Conversations</div>
     </div>
     <!-- Please add "filled" classname if user have deleted items !-->
@@ -592,8 +595,10 @@
     </div>
 
     <div class="fm-new-folder">
-        <div class="create-new-folder">
-            <div class="create-folder-arrow"></div>
+        <div class="create-folder-arrow"></div>
+        <span>[$68]</span>
+    </div>
+    <div class="create-new-folder hidden">
             <div class="create-folder-pad">
                 <div class="create-folder-size-icon full-size"></div>
                 <div class="create-folder-input-bl">
@@ -602,8 +607,8 @@
                 <a class="create-folder-button">[$455]</a>
                 <div class="clear"></div>
                 <div class="create-folder-bottom">
-                    <a class="create-folder-button">[$455]</a>
-                    <a class="create-folder-button-cancel popup">[$82]</a>
+                    <div class="create-folder-button">[$455]</div>
+                    <div class="create-folder-button-cancel popup">[$82]</div>
                 </div>
             </div>
             <div class="create-folder-loader hidden">
@@ -618,21 +623,10 @@
                     <div class="fountaing-circle cr-fountaing_8"></div>
                 </div>
             </div>
-        </div>
-        <span>[$68]</span>
     </div>
 
     <div class="fm-add-user hidden">
-        <div class="add-user-popup">
-            <div class="add-user-popup-arrow"></div>
-            <div class="add-user-popup-pad">
-                <div class="add-user-popup-input-bl">
-                    <input type="text" />
-                </div>
-                <a class="add-user-popup-button">[$155]</a>
-                <div class="clear"></div>
-            </div>
-        </div>
+        <div class="add-user-popup-arrow"></div>
         <span>[$101]</span>
     </div>
 
@@ -886,7 +880,7 @@
 <div class="fm-empty-incoming contact-details-view hidden">
     <div class="fm-empty-pad">
         <div class="fm-empty-incoming-bg"></div>
-        <div class="fm-empty-cloud-txt">You have no incoming shares</div>
+        <div class="fm-empty-cloud-txt">User has no shared folders with you</div>
     </div>
 </div>
 

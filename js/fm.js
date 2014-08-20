@@ -87,16 +87,16 @@ function initTreeScroll()
     **/
 
 	$('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-	$('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
-	$('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
-	{
-		var t =Math.random();
-		$.scroller=t;
-		setTimeout(function()
-		{
-			if (t == $.scroller) treeDroppable();
-		},100);
-	});
+	// $('.fm-tree-panel').unbind('jsp-scroll-y.droppable');
+	// $('.fm-tree-panel').bind('jsp-scroll-y.droppable',function(event, scrollPositionY, isAtTop, isAtBottom)
+	// {
+		// var t =Math.random();
+		// $.scroller=t;
+		// setTimeout(function()
+		// {
+			// if (t == $.scroller) treeDroppable();
+		// },100);
+	// });
 	jScrollFade('.fm-tree-panel');
 }
 
@@ -183,13 +183,11 @@ function reselect(n)
 	}
 }
 
-
 var treesearch = false;
-
 
 function treeredraw()
 {
-	if (RootbyId(M.currentdirid) == M.RootID) M.buildtree(M.d[M.RootID]);	
+	if (RootbyId(M.currentdirid) == M.RootID) M.buildtree(M.d[M.RootID]);
 	else if (RootbyId(M.currentdirid) == M.RubbishID) M.buildtree({h:M.RubbishID});
 	else if (RootbyId(M.currentdirid) == 'shares') M.buildtree({h:'shares'});
 	else if (RootbyId(M.currentdirid) == 'contacts') M.contacts();
@@ -200,13 +198,12 @@ function treeredraw()
 	treeUI();
 }
 
-
 function treesearchUI()
 {
 	$('.nw-fm-tree-header').unbind('click');
 	$('.nw-fm-tree-header').bind('click', function(e)
 	{
-		var c = $(e.target).attr('class');		
+		var c = $(e.target).attr('class');
 		if (c && c.indexOf('nw-fm-search-icon') > -1)
 		{
 			var c = $(this).attr('class');
@@ -225,47 +222,49 @@ function treesearchUI()
 		}
 	});
 	$('.nw-fm-search-icon').unbind('click');
-	$('.nw-fm-search-icon').bind('click', function() 
+	$('.nw-fm-search-icon').bind('click', function()
 	{
-		treesearch=false;		
-		treeredraw();		
-		$(this).prev().val('');		
+		treesearch=false;
+		treeredraw();
+		$(this).prev().val('');
 		$(this).parent().find('input').blur();
 	});
 
 	$('.nw-fm-tree-header input').unbind('keyup');
-	$('.nw-fm-tree-header input').bind('keyup', function(e) 
+	$('.nw-fm-tree-header input').bind('keyup', function(e)
 	{
+		var h = $(this).parent();
 		if (e.keyCode == 27)
 		{
-			$(this).parent().removeClass('filled-input');
-			$(this).parent().find('input').val('');
-			$(this).parent().find('input').blur();
+			h.removeClass('filled-input');
+			$(this).val('');
+			$(this).blur();
 			treesearch=false;
 		}
 		else
 		{
-			$(this).parent().addClass('filled-input');
-			treesearch = $(this).parent().find('input').val();
+			h.addClass('filled-input');
+			treesearch = $(this).val();
 		}
+		if ($(this).val()=='') h.removeClass('filled-input');
 		treeredraw()
 	});
-	
+
 	$('.nw-fm-tree-header input').unbind('blur');
-	$('.nw-fm-tree-header input').bind('blur', function() 
+	$('.nw-fm-tree-header input').bind('blur', function()
 	{
-		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='') 
+		if ($(this).val() == $(this).attr('placeholder') || $(this).val()=='')
 		{
-			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filed-input');
+			$(this).parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
 			$(this).val($(this).attr('placeholder'));
-		} 
+		}
 		else $(this).parent('.nw-fm-tree-header').removeClass('focused-input');
 	});
-	
+
 	$('.nw-tree-panel-arrows').unbind('click');
-	$('.nw-tree-panel-arrows').bind('click', function() 
+	$('.nw-tree-panel-arrows').bind('click', function()
 	{
-		if ($(this).attr('class').indexOf('active') == -1) 
+		if ($(this).attr('class').indexOf('active') == -1)
 		{
 			$(this).addClass('active');
 			var menu = $('.nw-sorting-menu').removeClass('hidden')
@@ -285,18 +284,18 @@ function treesearchUI()
 				.filter('*[data-by=' + $.sortTreePanel[type].by  + '],*[data-dir='+$.sortTreePanel[type].dir+']')
 				.addClass('active')
 			return false;
-		} 
-		else 
+		}
+		else
 		{
 			$(this).removeClass('active');
 			$('.nw-sorting-menu').addClass('hidden');
 		}
 	});
 	$('.sorting-menu-item').unbind('click');
-	$('.sorting-menu-item').bind('click', function() 
+	$('.sorting-menu-item').bind('click', function()
 	{
 		var $this = $(this)
-		if ($this.attr('class').indexOf('active') == -1) 
+		if ($this.attr('class').indexOf('active') == -1)
 		{
 			$this.parent().find('.sorting-menu-item').removeClass('active');
 			$this.addClass('active');
@@ -334,12 +333,14 @@ function treePanelType()
 	return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''))
 }
 
-function treePanelSortElements(type, elements, handlers) {
+function treePanelSortElements(type, elements, handlers, ifEq) {
 	var settings = $.sortTreePanel[type]
 		, sort	 = handlers[settings.by]
 	if (!sort) return;
 	elements.sort(function(a, b) {
-		return sort(a, b) * settings.dir
+		var d = sort(a, b)
+		if (d == 0 && ifEq) return ifEq(a, b)
+		return d * settings.dir
 	});
 }
 
@@ -353,7 +354,6 @@ function initializeTreePanelSorting()
 		};
 	});
 }
-
 
 /**
  *	Set the right drag icon to the transfer panel
@@ -369,7 +369,6 @@ function tpDragCursor() {
 	}
 }
 
-
 function initUI()
 {
 	if (!folderlink)
@@ -379,12 +378,18 @@ function initUI()
 		$('.fm-menu-item').show();
 		$('.fm-left-menu .folderlink').addClass('hidden');
 	}
-    
+
 	treesearchUI();
-	
-	
+
 	$.doDD = function(e,ui,a,type)
 	{
+		function nRevert(r)
+		{
+			try {
+				$(ui.draggable).draggable( "option", "revert", false );
+				if (r) $(ui.draggable).remove();
+			} catch(e) {}
+		}
 		var c = $(ui.draggable.context).attr('class');
 		var t, ids, dd;
 
@@ -399,18 +404,32 @@ function initUI()
 			// grid dragged:
 			if ($.selected && $.selected.length > 0) ids = $.selected;
 		}
+
+		// Workaround a problem where we get over[1] -> over[2] -> out[1]
+		if (a === 'out' && $.currentOver !== $(e.target).attr('id')) a = 'noop';
+
 		if (type == 1)
 		{
 			// tree dropped:
 			var c = $(e.target).attr('class');
-			if (c && c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
-			else if (c && c.indexOf('cloud') > -1) t = M.RootID;
+			if (c && c.indexOf('nw-fm-left-icon') > -1)
+			{
+				dd = 'nw-fm-left-icon';
+				if (a == 'drop')
+				{
+					if (c.indexOf('cloud') > -1) t = M.RootID;
+					else if (c.indexOf('rubbish-bin') > -1) t = M.RubbishID;
+				}
+			}
+			else if (c && c.indexOf('transfer-panel') > -1) dd = 'download';
+			else if (c && c.indexOf('nw-fm-tree-item') > -1 && !$(e.target).visible(!0)) dd = 'download';
 			else
 			{
 				var t = $(e.target).attr('id');
 				if (t && t.indexOf('treea_') > -1) t = t.replace('treea_','');
 				else if (t && t.indexOf('path_') > -1) t = t.replace('path_','');
-				else t=undefined;
+				else if (t && t.indexOf('contact2_') > -1) t = t.replace('contact2_','');
+				else if (M.currentdirid !== 'shares' || !M.d[t] || RootbyId(t) !== 'shares') t=undefined;
 			}
 		}
 		else
@@ -420,13 +439,22 @@ function initUI()
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');
 		}
 
-		if (ids && ids.length && t) dd = ddtype(ids,t);
+		if (ids && ids.length && t)
+		{
+			dd = ddtype(ids,t,e.altKey);
+			if (dd === 'move' && e.altKey) dd = 'copy';
+		}
 
-		$('.dragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
-		if (a == 'drop' || a == 'out')
+		if (a !== 'noop')
+		{
+			if ($.liTimerK) clearTimeout($.liTimerK);
+			$('body').removeClassWith('dndc-');
+			$('.hide-settings-icon').removeClass('hide-settings-icon');
+		}
+		if (a == 'drop' || a == 'out' || a == 'noop')
 		{
 			$(e.target).removeClass('dragover');
-			$('.dragger-block').addClass('drag');
+			// if (a !== 'noop') $('.dragger-block').addClass('drag');
 		}
 		else if (a == 'over')
 		{
@@ -452,28 +480,62 @@ function initUI()
 						else if (c && c.indexOf('contacts-item') > -1) h = 'contacts';
 					}
 					if (h) treeUIexpand(h,1);
+					else if ($(e.target).hasClass('nw-conversations-item')) $(e.target).click();
 				}
-			},1000);
+			},890);
 
-			if (t == M.RubbishID) $('.dragger-block').addClass('warning');
-			else if (dd == 'move') $('.dragger-block').addClass('move');
-			else if (dd == 'copy') $('.dragger-block').addClass('copy');
-            else if($(e.target).parents('.fm-chat-block').size() > 0) {
-                // drag over a chat window
-                //TODO: Missing css for drag-share
-                $('.dragger-block').addClass('to-share');
-            }
-			else $('.dragger-block').addClass('drag');
+			if (dd == 'move') $('body').addClass('dndc-move');
+			else if (dd == 'copy') $('body').addClass('dndc-copy');
+			else if (dd == 'download') $('body').addClass('dndc-download');
+			else if (dd === 'nw-fm-left-icon')
+			{
+				var c = '' + $(e.target).attr('class');
+
+				if (~c.indexOf('rubbish-bin')) $('body').addClass('dndc-to-rubbish');
+				else if (~c.indexOf('shared-with-me')) $('body').addClass('dndc-to-shared');
+				else if (~c.indexOf('contacts')) $('body').addClass('dndc-to-contacts');
+				else if (~c.indexOf('conversations')) $('body').addClass('dndc-to-conversations');
+				else if (~c.indexOf('cloud-drive')) $('body').addClass('dndc-to-conversations'); // XXX: cursor, please?
+				else c = null;
+
+				if (c)
+				{
+					if ($.liTooltipTimer) clearTimeout($.liTooltipTimer);
+					$.liTimerK = setTimeout(function() { $(e.target).click() }, 920);
+				}
+			}
+			// else $('.dragger-block').addClass('drag');
+			else $('body').addClass('dndc-warning');
 
 			$(e.target).addClass('dragover');
+			$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+			if ($(e.target).hasClass('folder'))
+			{
+				$(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
+			}
 		}
+		// if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
 		if (a == 'drop' && dd)
 		{
-			if (dd == 'move')
+			if (dd === 'nw-fm-left-icon')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
-				$(ui.draggable).remove();
+				// do nothing
+			}
+			else if ($(e.target).hasClass('nw-conversations-item'))
+			{
+				nRevert();
+
+				// drop over a chat window
+				var currentRoom = megaChat.getCurrentRoom();
+				assert(currentRoom, 'Current room missing - this drop action should be impossible.');
+				currentRoom.attachNodes(ids);
+
+				if (d) console.error('TODO: dragging to the chat', currentRoom);
+			}
+			else if (dd == 'move')
+			{
+				nRevert(1);
 				$.moveids=ids;
 				$.movet=t;
 				setTimeout(function()
@@ -483,24 +545,28 @@ function initUI()
 			}
 			else if (dd == 'copy')
 			{
-				$(ui.draggable).draggable( "option", "revert", false );
+				nRevert();
 				$.copyids=ids;
 				$.copyt=t;
 				setTimeout(function()
 				{
-					M.copyNodes($.copyids,$.copyt);
+					M.copyNodes($.copyids,$.copyt,0,function()
+					{
+						// Update files count...
+						if (M.currentdirid === 'shares' && !M.viewmode)
+						{
+							M.openFolder('shares',1);
+						}
+					});
 				},50);
 			}
+			else if (dd === 'download')
+			{
+				nRevert();
+				var as_zip = e.altKey;
+				M.addDownload(ids, as_zip);
+			}
 			$('.dragger-block').hide();
-		} else if(a == 'drop' && !dd && $(e.target).parents('.fm-chat-block').size() > 0) {
-            $(ui.draggable).draggable( "option", "revert", false );
-
-            // drop over a chat window
-            var currentRoom = megaChat.getCurrentRoom();
-            assert(currentRoom, 'Current room missing - this drop action should be impossible.');
-            currentRoom.attachNodes(ids);
-
-            $('.dragger-block').hide();
 		}
 	};
 	InitFileDrag();
@@ -555,7 +621,8 @@ function initUI()
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
-		b.removeClass('active left-position overlap-right overlap-left');
+		b.removeClass('active left-position overlap-right overlap-left mega-height');
+		a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
 		a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
 	};
 
@@ -627,16 +694,6 @@ function initUI()
 		if (!localStorage.contextmenu) e.preventDefault();
 	});
 
-	$('.fm-new-folder').unbind('mouseover');
-	$('.fm-new-folder').bind('mouseover',function(e)
-	{
-		$('.fm-new-folder').addClass('hovered');
-	});
-	$('.fm-new-folder').unbind('mouseout');
-	$('.fm-new-folder').bind('mouseout',function(e)
-	{
-		$('.fm-new-folder').removeClass('hovered');
-	});
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
@@ -650,12 +707,11 @@ function initUI()
 		else if (c && c.indexOf('rubbish-bin') > -1) M.openFolder(M.RubbishID);
 	});
 
-	var initialTooltipTime;
 	$('.nw-fm-left-icon').unbind('mouseover');
 	$('.nw-fm-left-icon').bind('mouseover', function () {
 	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
-	  clearTimeout( initialTooltipTime );
-	  initialTooltipTime = window.setTimeout(
+	  if ($.liTooltipTimer) clearTimeout( $.liTooltipTimer );
+	  $.liTooltipTimer = window.setTimeout(
       function() {
         $(tooltip).addClass('hovered');
       }, 1000);
@@ -664,7 +720,7 @@ function initUI()
 	$('.nw-fm-left-icon').unbind('mouseout');
 	$('.nw-fm-left-icon').bind('mouseout', function () {
 	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
-		clearTimeout( initialTooltipTime );
+		clearTimeout( $.liTooltipTimer );
     });
 
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
@@ -731,12 +787,6 @@ function initUI()
 	$(window).unbind('resize.fmrh hashchange.fmrh');
 	$(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    // because setTimeout was used in treeUI, we should trigger a `resize` evt
-    // we need to use setTimeout again :/
-    setTimeout(function() {
-        $(window).trigger('resize');
-    },50);
-
 	if (lang != 'en') $('.download-standart-item').text(l[58]);
 
 	megaChat.karere.unbind("onPresence.maintainUI");
@@ -744,13 +794,12 @@ function initUI()
 	{
 		M.onlineStatusEvent(megaChat.getContactFromJid(presenceEventData.getFromJid()),presenceEventData.getShow());
 	});
-
 }
 
 function transferPanelContextMenu(target)
 {
 	$('.context-menu.files-menu .context-menu-item').hide();
-	var menuitems = $('.context-menu.files-menu .context-menu-item')
+	var menuitems = $('.context-menu.files-menu .context-menu-item');
 
 	menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.tranfer-clear')
 		.show();
@@ -988,13 +1037,22 @@ function addUserUI()
 	{
 		var c = $(this).attr('class');
 		var c2 = $(e.target).attr('class');
+		var d1 = $('.add-user-popup');
+        
 		if ((!c2 || c2.indexOf('fm-add-user') == -1) && $(e.target).prop('tagName') !== 'SPAN') return false;
 		if (c.indexOf('active') == -1)
 		{
 			$(this).addClass('active');
-			$('.add-user-popup input').focus();
+			d1.removeClass('dialog hidden');
+			var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+	        if(w1 > 8 ) d1.css('right', w1 + 'px');
+	        else d1.css('right', 8 + 'px');
 		}
-		else $(this).removeClass('active');
+		else {
+			$(this).removeClass('active');
+			d1.addClass('dialog hidden');
+			d1.removeAttr('style');
+		}
 		$.hideContextMenu();
 	});
 }
@@ -1062,35 +1120,43 @@ function fmremove()
 	}
 	else if (RootbyId($.selected[0]) == 'contacts')
 	{
-		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+		if (localStorage.skipDelWarning) M.copyNodes($.selected,M.RubbishID,1);
+		else
 		{
-			if (e)
-			{
-				M.copyNodes($.selected,M.RubbishID,1);
-			}
-		});
+			msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+			{				
+				if (e)
+				{
+					M.copyNodes($.selected,M.RubbishID,1);
+				}
+			},true);
+		}
 	}
 	else
 	{
-		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+		if (localStorage.skipDelWarning) M.moveNodes($.selected,M.RubbishID);
+		else
 		{
-			if (e)
+			msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
 			{
-				M.moveNodes($.selected,M.RubbishID);
-			}
-		});
+				if (e)
+				{
+					M.moveNodes($.selected,M.RubbishID);
+				}
+			},true);
+		}
 	}
 }
 function initContextUI()
 {
 	var c = '.context-menu-item';
-	
+
 	$(c).unbind('mouseover');
-	$(c).bind('mouseover', function(e)
+	$(c).bind('mouseover', function()
 	{
-		if ($(this).parent().is('.context-submenu'))
+		if ($(this).parent().parent().is('.context-submenu'))// is move... or download...
 		{
-			if (!$(this).is('.contains-submenu'))
+			if (!$(this).is('.contains-submenu'))// if just item hide child context-submenu
 			{
 				$(this).parent().children().removeClass('active opened');
 				$(this).parent().find('.context-submenu').addClass('hidden');
@@ -1098,7 +1164,7 @@ function initContextUI()
 		}
 		else
 		{
-			if (!$(this).is('.contains-submenu'))
+			if (!$(this).is('.contains-submenu'))// Hide all submenues, for download and for move...
 			{
 				$('.context-menu .context-submenu.active ').removeClass('active');
 				$('.context-menu .contains-submenu.opened').removeClass('opened');
@@ -1106,15 +1172,16 @@ function initContextUI()
 			}
 		}
 	});
-	
+
 	$(c+'.contains-submenu').unbind('mouseover');
-	$(c+'.contains-submenu').bind('mouseover', function(e)
+	$(c+'.contains-submenu').bind('mouseover', function()
 	{
-		var a = $(this).next();
+		var a = $(this).next();// context-submenu
 		a.children().removeClass('active opened');
 		a.find('.context-submenu').addClass('hidden');
-		
-		var b = $(this).parent('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
+		a.find('.opened').removeClass('opened');
+		// situation when we have 2 contains-submenus in same context-submenu one neer another
+		var b = $(this).closest('.context-submenu').find('.context-submenu,.contains-submenu').not($(this).next());
 		if (b.length)
 		{
 			b.removeClass('active opened')
@@ -1135,8 +1202,8 @@ function initContextUI()
 
 		if (!$(this).is('.opened'))
 		{
-			var pos = getHtmlElemPos(this);
-			var c = reCalcMenuPosition($(this), pos.x, pos.y, 'submenu');
+			var pos = $(this).offset();
+			var c = reCalcMenuPosition($(this), pos.left, pos.top, 'submenu');
 			$(this).next('.context-submenu')
 				.css({'top': c.top})
 				.addClass('active')
@@ -1146,15 +1213,20 @@ function initContextUI()
 		}
 	});
 
-	$(c + '.folder-item').unbind('click');
-	$(c + '.folder-item').bind('click', function(e)
+	$(c + '.folder-item, ' + c + '.cloud-item').unbind('click');
+	$(c + '.folder-item, ' + c + '.cloud-item').bind('click', function(e)
 	{
-		var t = $(this).attr('id').replace('fi_','');
-		var n=[];
-		for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-		$.hideContextMenu();
-		M.moveNodes(n,t);
+		if (!$(this).is('.disabled'))
+		{
+			var t = $(this).attr('id').replace('fi_','');
+			var n=[];
+			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+			$.hideContextMenu();
+			M.moveNodes(n,t);
+		}
 	});
+	// Not sure if this will work
+//	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -1428,25 +1500,28 @@ function createfolderUI()
 	$('.fm-new-folder').unbind('click');
 	$('.fm-new-folder').bind('click',function(e)
 	{
-		if (($('.fm-new-folder').position().left+400) > $('body').width()) createfolderDialog();
-		else
-		{
 			var c = $('.fm-new-folder').attr('class');
 			var c2 = $(e.target).attr('class');
 			var c3 = $(e.target).parent().attr('class');
+			var b1 = $('.fm-new-folder');
+			$('.create-new-folder').removeClass('filled-input');
+			var d1 = $('.create-new-folder');
 			if ((!c2 || c2.indexOf('fm-new-folder') == -1) && (!c3 || c3.indexOf('fm-new-folder') == -1)) return false;
 			if (c.indexOf('active') == -1)
 			{
-				$('.fm-new-folder').addClass('active');
+				b1.addClass('active');
+				d1.removeClass('hidden');
+				var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
+				if(w1 > 8 ) d1.css('right', w1 + 'px');
+				else d1.css('right', 8 + 'px');
 				$('.fm-new-folder input').focus();
 			}
 			else
 			{
-				$('.fm-new-folder').removeClass('active');
-				$('.fm-new-folder').removeClass('filled-input');
+				b1.removeClass('active filled-input');
+				d1.addClass('hidden');
 				$('.fm-new-folder input').val(l[157]);
 			}
-		}
 		$.hideContextMenu();
 	});
 	$('.create-folder-button').unbind('click');
@@ -1456,59 +1531,58 @@ function createfolderUI()
 		return false;
 	});
 
-	$('.fm-new-folder .create-folder-button-cancel').unbind('click');
-	$('.fm-new-folder .create-folder-button-cancel').bind('click',function(e)
+	$('.create-folder-button-cancel').unbind('click');
+	$('.create-folder-button-cancel').bind('click',function(e)
 	{
 		$('.fm-new-folder').removeClass('active');
-		$('.fm-new-folder').removeClass('filled-input');
-		$('.fm-new-folder input').val(l[157]);
+		$('.create-new-folder').addClass('hidden');
+		$('.create-new-folder').removeClass('filled-input');
+		$('.create-new-folder input').val(l[157]);
 	});
 
 	$('.create-folder-size-icon.full-size').unbind('click');
 	$('.create-folder-size-icon.full-size').bind('click',function(e)
 	{
-		var v = $('.fm-new-folder input').val();
+		var v = $('.create-new-folder input').val();
 		if(v != l[157] && v != '') $('.create-folder-dialog input').val(v);
 		$('.fm-new-folder').removeClass('active');
-		$('.fm-new-folder').removeClass('filled-input');
+		$('.create-new-folder').removeClass('filled-input');
+		$('.create-new-folder').addClass('hidden');
 		createfolderDialog(0);
-		$('.fm-new-folder input').val(l[157]);
+		$('.create-new-folder input').val(l[157]);
 	});
 	$('.create-folder-size-icon.short-size').unbind('click');
 	$('.create-folder-size-icon.short-size').bind('click',function(e)
 	{
 		var v = $('.create-folder-dialog input').val();
 		if(v != l[157] && v != '') {
-			$('.fm-new-folder input').val(v);
-			$('.fm-new-folder').removeClass('filled-input');
+			$('.create-new-folder input').val(v);
+			$('.create-new-folder').addClass('filled-input');
 		}
 		$('.fm-new-folder').addClass('active');
+		$('.create-new-folder').removeClass('hidden');
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
 	});
-	$('.create-folder-button-cancel popup').unbind('click');
-	$('.create-folder-button-cancel popup').bind('click',function(e)
+	$('.create-new-folder input').unbind('keyup');
+	$('.create-new-folder input').bind('keyup',function(e)
 	{
-		 $('.fm-new-folder').removeClass('active');
-		 $('.fm-new-folder').removeClass('filled-input');
-		 $('.fm-new-folder input').val(l[157]);
-	});
-	$('.create-new-folder input').unbind('keypress');
-	$('.create-new-folder input').bind('keypress',function(e)
-	{
-	    $('.fm-new-folder').addClass('filled-input');
+	    $('.create-new-folder').addClass('filled-input');
+		if ($(this).val()=='') $('.create-new-folder').removeClass('filled-input');
 		if (e.which == 13) docreatefolderUI(e);
 	});
 	$('.create-new-folder input').unbind('focus');
 	$('.create-new-folder input').bind('focus',function()
 	{
 		if ($(this).val() == l[157]) $(this).val('');
+		$('.create-new-folder').addClass('focused');
 	});
 	$('.create-new-folder input').unbind('blur');
 	$('.create-new-folder input').bind('blur',function()
 	{
 		if($('.create-new-folder input').val() == '')
 		$('.create-new-folder input').val(l[157]);
+		$('.create-new-folder').removeClass('focused');
 	});
 }
 
@@ -1916,11 +1990,13 @@ function accountUI()
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
 				dl_maxSlots = M.account.dl_maxSlots;
+				dlQueue.setSize(dl_maxSlots);
 			}
 			if (M.account.ul_maxSlots)
 			{
 				localStorage.ul_maxSlots = M.account.ul_maxSlots;
 				ul_maxSlots = M.account.ul_maxSlots;
+				ulQueue.setSize(ul_maxSlots);
 			}
 			if (typeof M.account.ul_maxSpeed !== 'undefined')
 			{
@@ -2424,7 +2500,7 @@ function avatarDialog(close)
 function gridUI()
 {
 	if (d) console.time('gridUI');
-	$.gridDragging=false;
+	// $.gridDragging=false;
 	$.gridLastSelected=false;
 	$('.fm-files-view-icon.listing-view').addClass('active');
 	$('.fm-files-view-icon.block-view').removeClass('active');
@@ -2524,13 +2600,16 @@ function gridUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.files-grid-view.contact-details-view').removeClass('hidden');
-		initGridScrolling();
-		$.gridHeader();
+		if (M.v.length > 0)
+		{
+			$('.files-grid-view.contact-details-view').removeClass('hidden');
+			initGridScrolling();
+			$.gridHeader();
+		}
 	}
 	else
 	{
-		$('.files-grid-view').removeClass('hidden');
+		$('.files-grid-view.fm').removeClass('hidden');
 		initGridScrolling();
 		$.gridHeader();
 	}
@@ -3077,6 +3156,8 @@ function UIkeyevents()
 		else s = $('.grid-table tr.ui-selected');
 
 		if (M.chat) return true;
+		
+		if (!is_fm()) return true;
 
         /**
          * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
@@ -3335,8 +3416,8 @@ function searchPath()
 
 function selectddUI()
 {
-	if (d) console.time('selectddUI');
 	if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') return false;
+	if (d) console.time('selectddUI');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem + '.folder').droppable(
 	{
 		tolerance: 'pointer',
@@ -3353,6 +3434,7 @@ function selectddUI()
 			$.doDD(e,ui,'out',0);
 		}
 	});
+	if ($.gridDragging) $('body').addClass('dragging');
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
 	{
 		start: function(e,u)
@@ -3360,61 +3442,53 @@ function selectddUI()
 			$.hideContextMenu(e);
 			$.gridDragging=true;
 			$('body').addClass('dragging');
-			if ($(this).attr('class').indexOf('ui-selected') == -1)
+			if (!$(this).hasClass('ui-selected'))
 			{
 				$($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
 				$(this).addClass('ui-selected');
 			}
-			var s = $($.selectddUIgrid + ' .ui-selected');
+			var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
 			$.selected=[];
 			s.each(function(i,e)
 			{
-				$.selected.push($(e).attr('id'));
+				var n = $(e).attr('id');
+				$.selected.push(n);
+				n = M.d[n];
+				if (max > i) html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
 			});
-			if (s.length > 1)
+			if (s.length > max)
 			{
-				$('.dragger-block').addClass('multiple');
 				$('.dragger-files-number').text(s.length);
 				$('.dragger-files-number').show();
 			}
-			var a = 0,html='',cl='',done={};
-			$('#draghelper .dragger-icon').remove();
-			for (var i in $.selected)
-			{
-				if (a == 0) cl = 'third';
-				else if (a == 1) cl = 'second';
-				else if (a == 2) cl = 'first';
-				var ico = fileicon(M.d[$.selected[i]]);
-				if (a < 3 && !done[ico])
-				{
-					done[ico]=1;
-					html = '<div class="dragger-icon '+cl+' '+ ico +'"></div>' + html;
-					a++;
-				}
-			}
-			$(html).insertBefore('#draghelper .dragger-status');
+			$('#draghelper .dragger-content').html(html.join(""));
+			$.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+			$.draggerWidth = $('#draghelper .dragger-content').outerWidth();
 		},
-		drag: function(e,u)
+		drag: function(e,ui)
 		{
-
+			if (ui.position.top + $.draggerHeight - 28 > $(window).height()) ui.position.top = $(window).height() - $.draggerHeight + 26;
+			if (ui.position.left + $.draggerWidth - 58 > $(window).width()) ui.position.left = $(window).width() - $.draggerWidth + 56;
 		},
 		refreshPositions: true,
 		containment: 'document',
+		scroll: false,
 		distance:10,
 		revertDuration:200,
 		revert: true,
-		cursorAt:{right:100,bottom:70},
+		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
+			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
 			return getDDhelper();
 		},
 		stop: function(event)
 		{
 			$.gridDragging=false;
-			$('body').removeClass('dragging');
+			$('body').removeClass('dragging').removeClassWith("dndc-");
 			setTimeout(function()
 			{
-				treeUIopen(M.currentdirid);
+				treeUIopen(M.currentdirid, false, true);
 			},500);
 		}
 	});
@@ -3512,6 +3586,15 @@ function selectddUI()
 		else M.addDownload([h]);
 	});
 	if (d) console.timeEnd('selectddUI');
+
+	if ($.rmInitJSP)
+	{
+		var jsp=$($.rmInitJSP).data('jsp');
+		if (jsp) jsp.reinitialise();
+		if (d) console.log('jsp:!u', !!jsp);
+		delete $.rmInitJSP;
+	}
+	$(window).trigger('resize');
 }
 
 function iconUI()
@@ -3541,8 +3624,11 @@ function iconUI()
 	else if (M.currentdirid.length == 11)
 	{
 		$('.contacts-details-block').removeClass('hidden');
-		$('.fm-blocks-view.contact-details-view').removeClass('hidden');
-		initFileblocksScrolling2();
+		if (M.v.length > 0)
+		{
+			$('.fm-blocks-view.contact-details-view').removeClass('hidden');
+			initFileblocksScrolling2();
+		}
 	}
 	else
 	{
@@ -3817,8 +3903,7 @@ function getDDhelper()
 	var id = '#fmholder';
 	if (page == 'start') id = '#startholder';
 	$('.dragger-block').remove();
-	$(id).append('<div class="dragger-block drag" id="draghelper"><div class="dragger-status"></div><div class="dragger-files-number">1</div></div>');
-	$('.dragger-block').removeClass('multiple');
+	$(id).append('<div class="dragger-block drag" id="draghelper"><div class="dragger-content"></div><div class="dragger-files-number">1</div></div>');
 	$('.dragger-block').show();
 	$('.dragger-files-number').hide();
 	return $('.dragger-block')[0];
@@ -3874,9 +3959,9 @@ function contextmenuUI(e,ll,topmenu)
 {
 	// is contextmenu disabled
 	if (localStorage.contextmenu) return true;
-	
+
 	$.hideContextMenu();
-	
+
 	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
@@ -3932,18 +4017,32 @@ function contextmenuUI(e,ll,topmenu)
 		if (c.length === a.length || a.length === 0) b.hide();
 		else b.show();
 	});
-	
+
 	adjustContextMenuPosition(e, m);
-	
+
+	disableCirclarTargetsInSubMenus();
+
 	m.removeClass('hidden');
 	e.preventDefault();
+}
+
+function disableCirclarTargetsInSubMenus()
+{
+	for (var s in $.selected)
+	{
+		var x = $.selected[s];
+		$('#fi_' + x).addClass('disabled');
+		$('#fi_' + M.d[x].p).addClass('disabled');// Disable parent dir
+		disableDescendantFolders(x);// Disable all children folders
+	}
+	return true;
 }
 
 function adjustContextMenuPosition(e, m)
 {
 	var mPos;// menu position
 	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
-	
+
 	if (e.type === 'click')// clicked on file-settings-icon
 	{
 		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
@@ -3954,9 +4053,9 @@ function adjustContextMenuPosition(e, m)
 	{
 		mPos = reCalcMenuPosition(m, mX, mY);
 	}
-	
+
 	m.css({'top':mPos.y,'left':mPos.x});// set menu position
-	
+
 	return true;
 }
 
@@ -3977,7 +4076,7 @@ function reCalcMenuPosition(m, x, y, ico)
 	{
 				var tre = wW - wMax;// to right edge
 				var tle = x - minX - SIDE_MARGIN;// to left edge
-				
+
 				if (tre >= tle)
 				{
 					n.addClass('overlap-right');
@@ -3991,38 +4090,37 @@ function reCalcMenuPosition(m, x, y, ico)
 
 				return;
 	};
-	
+
 	// submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-	// first parent, which is NOT a .contains-submenu element (it's previous in same level) 
+	// first parent, which is NOT a .contains-submenu element (it's previous in same level)
 	this.horPos = function()// used for submenues
 	{
 		var top;
 		var nTop = parseInt(n.css('padding-top'));
-		var a = m.parent();
-		var b = y + nmH - nTop;// bottom of submenu
-		var pPos;
-		
-//		if (nmH > (maxY - TOP_MARGIN))// handle "huge" menu
-//		{
-//		}
-//		else
+		var tB = parseInt(n.css('border-top-width'));
+		var pPos = m.position();
+
+		var b = y + nmH - (nTop - tB);// bottom of submenu
+		var mP = m.closest('.context-submenu');
+		var pT = 0, bT = 0, pE = 0;
+		if (mP.length)
 		{
-			if (a.is('.context-menu-section')) pPos = getHtmlElemPos(m.closest('.context-menu')[0]);
-			else pPos = getHtmlElemPos(a[0]);
-			
-			if (b > maxY) top = ((y - pPos.y) - (b - maxY)) + 'px';
-			else top = (y - pPos.y) + 'px';			
+			pE = mP.offset();
+			pT = parseInt(mP.css('padding-top'));
+			bT = parseInt(mP.css('border-top-width'));
 		}
-		
+		if (b > maxY) top =  (maxY - nmH + nTop - tB) - pE.top + 'px';
+		else top = pPos.top - tB + 'px';
+
 		return top;
 	};
-	
+
 	var dPos;
 	var cor;// corner, check setBordersRadius for more info
 	if (typeof ico === 'object')// draw context menu relative to file-settings-icon
 	{
 		cor = 1;
-		dPos = {'x':x - 2, 'y':y + ico.y + 4};// position for right-bot
+		dPos = {'x':x - 2, 'y':y + ico.y + 8};// position for right-bot
 		if (wMax > maxX)// draw to the left
 		{
 			dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
@@ -4030,33 +4128,38 @@ function reCalcMenuPosition(m, x, y, ico)
 		}
 		if (hMax > maxY)// draw to the top
 		{
-			dPos.y = y - cmH - 4;// additional pixels to align with -icon
+			dPos.y = y - cmH;// additional pixels to align with -icon
 			cor++;
 		}
 	}
 	else if (ico === 'submenu')// submenues
 	{
 		var n = m.next('.context-submenu');
-		var nmW = n.outerWidth();
-		var nmH = n.outerHeight();
+		var nmW = n.outerWidth();// margin not calculated
+		var nmH = n.outerHeight();// margins not calculated
+
 		if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
 		{
 			nmH = maxY - TOP_MARGIN;
+			var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_',''));
+			$(tmp).addClass('context-scrolling-block');
+			tmp.addEventListener('mousemove', scrollMegaSubMenu);
+
+			n.addClass('mega-height');
 			n.css({'height': nmH + 'px'});
-			n.addClass('ultra-height');
 		}
-	
+
 		var top = 'auto', left = '100%', right = 'auto';
-		
+
 		top = this.horPos();
-		if (m.parent('.left-position').length === 0)
+		if (m.parent().parent('.left-position').length === 0)
 		{
 			if (maxX >= (wMax + nmW)) left = 'auto', right = '100%';
 			else if (minX <= (x - nmW)) n.addClass('left-position');
 			else
 			{
 				this.overlapParentMenu();
-				
+
 				return true;
 			}
 		}
@@ -4071,7 +4174,7 @@ function reCalcMenuPosition(m, x, y, ico)
 				return true;
 			}
 		}
-		
+
 		return {'top': top, 'left': left, 'right':right};
 	}
 	else// right click
@@ -4085,11 +4188,6 @@ function reCalcMenuPosition(m, x, y, ico)
 
 	setBordersRadius(m, cor);
 
-// ToDo: decide how to handle "huge" context menu
-//	if (cmH > wH - 2 * TOP_MARGIN) // ovarlay menu with scroll
-//	else if (hMax > maxY) dPos.x = x - cmW;
-//	if (hMax > maxY) dPos.y = maxY - cmH;
-	 
 	return {'x':dPos.x, 'y':dPos.y};
 }
 
@@ -4100,9 +4198,9 @@ function setBordersRadius(m, c)
 	var SMALL = 4;// small carner radius
 	var TOP_LEFT = 1, TOP_RIGHT = 3, BOT_LEFT = 2, BOT_RIGHT = 4;
 	var tl = DEF, tr = DEF, bl = DEF, br = DEF;
-	
+
 	var pos = (typeof c === 'undefined') ? 0 : c;
-	
+
 	switch (pos)
 	{
 		case TOP_LEFT:
@@ -4119,36 +4217,51 @@ function setBordersRadius(m, c)
 			break;
 		default:// situation when c is undefined, all border radius are by DEFAULT
 			break;
-			
+
 	}
-	
+
 	// set context menu border radius
 	m.css({
 		'border-top-left-radius': tl,
 		'border-top-right-radius': tr,
 		'border-bottom-left-radius': bl,
 		'border-bottom-right-radius': br});
-	
+
 	return true;
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollHugeMenu(e, cont)
+function scrollMegaSubMenu(e)
 {
 	var ey = e.pageY;
-	var k = document.getElementById(cont);
-	var pNode = k.parentNode;
+	var c = $(e.target).closest('.context-submenu');
+	var pNode = c.children(':first')[0];
 
-	var h = pNode.offsetHeight;
-	var dy = h * 0.1;
-	var pos = getHtmlElemPos(pNode);
-	var py = (ey - pos.y - dy) / (h - dy * 2);
-	if (py > 1) py = 1;
-	if (py < 0) py = 0;
-	pNode.scrollTop = py * (pNode.scrollHeight - h);
+	if (typeof pNode !== 'undefined')
+	{
+		var h = pNode.offsetHeight;
+		var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
+		var pos = getHtmlElemPos(pNode, true);
+		var py = (ey - pos.y - dy) / (h - dy * 2);
+		if (py > 1)
+		{
+			py = 1;
+			c.children('.context-bottom-arrow').addClass('disabled');
+		}
+		else if (py < 0)
+		{
+			py = 0;
+			c.children('.context-top-arrow').addClass('disabled');
+		}
+		else
+		{
+			c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
+		}
+		pNode.scrollTop = py * (pNode.scrollHeight - h);
+	}
 }
 
-var tt;
+// var treeUI = SoonFc(__treeUI, 240);
 
 function treeUI()
 {
@@ -4159,9 +4272,11 @@ function treeUI()
 		containment: 'document',
 		revertDuration:200,
 		distance: 10,
+		scroll: false,
 		cursorAt:{right:88,bottom:58},
 		helper: function(e,ui)
 		{
+			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
 			return getDDhelper();
 		},
 		start: function (e, ui)
@@ -4171,23 +4286,27 @@ function treeUI()
 			var html = '';
 			var id = $(e.target).attr('id');
 			if (id) id = id.replace('treea_','');
-			if (id && M.d[id]) html = '<div class="dragger-icon '+ fileicon(M.d[id]) +'"></div>'
+			if (id && M.d[id]) html = ('<div class="transfer-filtype-icon ' + fileicon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
 			$('#draghelper .dragger-icon').remove();
-			$(html).insertBefore('#draghelper .dragger-status');
+			$('#draghelper .dragger-content').html(html);
 			$('body').addClass('dragging');
+			$.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+			$.draggerWidth = $('#draghelper .dragger-content').outerWidth();
 		},
-		drag: function(e,u)
+		drag: function(e,ui)
 		{
 			//console.log('tree dragging',e);
+			if (ui.position.top + $.draggerHeight - 28 > $(window).height()) ui.position.top = $(window).height() - $.draggerHeight + 26;
+			if (ui.position.left + $.draggerWidth - 58 > $(window).width()) ui.position.left = $(window).width() - $.draggerWidth + 56;
 		},
 		stop: function(e,u)
 		{
 			$.treeDragging=false;
-			$('body').removeClass('dragging');
+			$('body').removeClass('dragging').removeClassWith("dndc-");
 		}
 	});
 
-	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs').droppable(
+	$('.fm-tree-panel .nw-fm-tree-item, .rubbish-bin, .fm-breadcrumbs, .transfer-panel, .nw-fm-left-icons-panel .nw-fm-left-icon, .shared-with-me tr, .nw-conversations-item').droppable(
 	{
 		tolerance: 'pointer',
 		drop: function(e, ui)
@@ -4223,7 +4342,7 @@ function treeUI()
 		else
 		{
 			var c = $(this).attr('class');
-			if (c && c.indexOf('selected') > -1) treeUIexpand(id);
+			if (c && c.indexOf('opened') > -1) treeUIexpand(id);
 			M.openFolder(id);
 		}
 		return false;
@@ -4234,7 +4353,14 @@ function treeUI()
 	{
 		initTreeScroll();
 	});
-	setTimeout(initTreeScroll,10);
+	// setTimeout(initTreeScroll,10);
+	Soon(function()
+	{	/**
+		 * Let's shoot two birds with a stone, when nodes are moved we need a resize
+		 * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+		 */
+		$(window).trigger('resize');
+	});
 	if (d) console.timeEnd('treeUI');
 }
 
@@ -4316,16 +4442,20 @@ function sectionUIopen(id)
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 {
-	if (id == 'shares') sectionUIopen('shared-with-me');
-	else if (id == M.RootID) sectionUIopen('cloud-drive');
-	else if (id == 'contacts') sectionUIopen('contacts');
-	else if (id == 'chat') sectionUIopen('conversations');
-	else if (id == M.RubbishID) sectionUIopen('rubbish-bin');
+	var id_s = id.split('/')[0], id_r = RootbyId(id);
+	var e, scrollTo = false, stickToTop = false;
+
+	if (id_r == 'shares') sectionUIopen('shared-with-me');
+	else if (id_r == M.RootID) sectionUIopen('cloud-drive');
+	else if (id_s == 'chat') sectionUIopen('conversations');
+	else if (id_r == 'contacts') sectionUIopen('contacts');
+	else if (id_r == M.RubbishID) sectionUIopen('rubbish-bin');
+
 	if (!fminitialized) return false;
+
 	if (!event)
 	{
 		var ids = M.getPath(id);
-		ids = ids.reverse();
 		var i=1;
 		while (i < ids.length)
 		{
@@ -4337,22 +4467,22 @@ function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
 		else if (ids[0] == M.RootID) sectionUIopen('cloud-drive');
 	}
 	if ($.hideContextMenu) $.hideContextMenu(event);
-	var b = $('#treea_' + id);
-	var d = b.attr('class');
+
+	e = $('#treea_' + id_s);
 	$('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
-	var a = M.getPath(id);
-	$('#treea_' + id).addClass('selected');
-	var scrollTo = false;
-	var stickToTop = false;
-	if (id == M.RootID)
+	e.addClass('selected');
+
+	if (!ignoreScroll)
 	{
-		stickToTop = true;
-		scrollTo=$('#treesub_' + M.RootID);
-	}
-	else if ($('#treea_' + id).length > 0 && !$('#treea_' + id).visible()) scrollTo = $('#treea_' + id);
-	if (scrollTo && !ignoreScroll)
-	{
-		var jsp = $('.fm-tree-panel').data('jsp');
+		if (id == M.RootID || id == 'shares' || id == 'contacts' || id == 'chat')
+		{
+			stickToTop = true;
+			scrollTo = $('.nw-tree-panel-header');
+		}
+		else if (e.length && !e.visible()) scrollTo = e;
+		// if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
+
+		var jsp = scrollTo && $('.fm-tree-panel').data('jsp');
 		if (jsp) setTimeout(function()
 		{
 			jsp.scrollToElement(scrollTo,stickToTop);
@@ -4445,11 +4575,12 @@ function dorename()
 	}
 }
 
-function msgDialog(type,title,msg,submsg,callback)
+function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
 	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
+	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
 	if (type == 'clear-bin')
 	{
@@ -4496,6 +4627,28 @@ function msgDialog(type,title,msg,submsg,callback)
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');
+		
+		if (checkbox)
+		{
+			$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');			
+			$.warningCheckbox=false;
+			$('#msgDialog .confirmation-checkbox').removeClass('hidden');
+			$('#msgDialog .confirmation-checkbox').unbind('click');
+			$('#msgDialog .confirmation-checkbox').bind('click',function(e)
+			{
+				var c = $('#msgDialog .confirmation-checkbox input').attr('class');
+				if (c && c.indexOf('checkboxOff') > -1)
+				{
+					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOff').addClass('checkboxOn');
+					localStorage.skipDelWarning=1;
+				}
+				else
+				{
+					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');
+					delete localStorage.skipDelWarning;
+				}			
+			});			
+		}
 	}
 
 	$('#msgDialog .fm-dialog-title').text(title);
@@ -4721,6 +4874,14 @@ function shareDialog(close)
 			$(this).next().addClass('bottom');
 		}
 	});
+
+	$('.fm-dialog,.fm-dialog-overlay').unbind('click')
+	$('.fm-dialog,.fm-dialog-overlay').bind('click', function(e) {
+		if (!$(e.target).is('.fm-share-dropdown')) {
+			$('.fm-share-permissions-block').addClass('hidden');
+		}
+	});
+
 	$('.fm-share-permissions').unbind('click');
 	$('.fm-share-permissions').bind('click',function()
 	{
@@ -5125,11 +5286,14 @@ function createfolderDialog(close)
 	$('.create-folder-dialog input').bind('focus',function()
 	{
 		if ($(this).val() == l[157]) $('.create-folder-dialog input').val('');
+		$('.create-folder-dialog').addClass('focused');
 	});
 	$('.create-folder-dialog input').unbind('blur');
 	$('.create-folder-dialog input').bind('blur',function()
 	{
-		if($('.create-folder-dialog input').val() == '') $('.create-folder-dialog input').val(l[157]);
+		if($('.create-folder-dialog input').val() == '') 
+			$('.create-folder-dialog input').val(l[157]);
+		$('.create-folder-dialog').removeClass('focused');
 	});
 	$('.create-folder-dialog input').unbind('keyup');
 	$('.create-folder-dialog input').bind('keyup',function()
@@ -6102,11 +6266,14 @@ function fm_resize_handler() {
 
 function sharedfolderUI()
 {
+	var r = false;
+
 	if ($('.shared-details-block').length > 0)
 	{
 		$('.shared-details-block .shared-folder-content').unwrap();
 		$('.shared-folder-content').removeClass('shared-folder-content');
 		$('.shared-top-details').remove();
+		r = true;
 	}
 
 	var n = M.d[M.currentdirid];
@@ -6129,17 +6296,46 @@ function sharedfolderUI()
 		}
 
 		var e = '.files-grid-view.fm';
-		if (M.viewmode == 1) e = '.fm-blocks-view';
+		if (M.viewmode == 1) e = '.fm-blocks-view.fm';
 
 		$(e).wrap('<div class="shared-details-block"></div>');
-		$('.shared-details-block').prepend('<div class="shared-top-details"><div class="shared-details-icon"></div><div class="shared-details-info-block"><div class="shared-details-pad"><div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div><a href="" class="grid-url-arrow"><span></span></a><div class="shared-folder-access'+ rightsclass + '">Full access</div><div class="clear"></div><div class="nw-contact-avatar color10">' + avatar + '</div><div class="fm-chat-user-info"><div class="fm-chat-user">' + htmlentities(user.name) + '</div></div></div><div class="shared-details-buttons"><div class="fm-leave-share"><span>Leave share</span></div><div class="fm-share-copy"><span>Copy</span></div><div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div><div class="clear"></div></div><div class="clear"></div></div></div>');
+		$('.shared-details-block').prepend(
+			'<div class="shared-top-details">'
+				+'<div class="shared-details-icon"></div>'
+				+'<div class="shared-details-info-block">'
+					+'<div class="shared-details-pad">'
+						+'<div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div>'
+						+'<a href="" class="grid-url-arrow"><span></span></a>'
+						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
+						+'<div class="clear"></div>'
+						+'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+						+'<div class="fm-chat-user-info">'
+							+'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+						+'</div>'
+					+'</div>'
+					+'<div class="shared-details-buttons">'
+						+'<div class="fm-leave-share"><span>Leave share</span></div>'
+						+'<div class="fm-share-copy"><span>Copy</span></div>'
+						+'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
+						+'<div class="clear"></div>'
+					+'</div>'
+					+'<div class="clear"></div>'
+				+'</div>'
+			+'</div>');
 		$(e).addClass('shared-folder-content');
 
-		fm_resize_handler();
+		// fm_resize_handler();
 
-		if (M.viewmode == 1) initFileblocksScrolling();
-		else initGridScrolling();
+		// if (M.viewmode == 1) initFileblocksScrolling();
+		// else initGridScrolling();
+
+		Soon(function() {
+			$(window).trigger('resize');
+			Soon(fm_resize_handler);
+		});
 	}
+
+	return r;
 }
 
 function contactUI()

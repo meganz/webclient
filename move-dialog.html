@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/Tr</xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.tokeninput.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+    
+	function dialogPositioning () {
+		$('.fm-dialog').css('margin-top', '-'+$('.fm-dialog').outerHeight()/2+'px');
+	}
+	function copyDialogScroll() {
+	  $('.move-dialog-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:8,animateScroll: true}); 
+    }
+	dialogPositioning();
+	copyDialogScroll();
+ 
+	$('.move-dialog-button').unbind('click');
+	$('.move-dialog-button').bind('click', function() {
+		if($(this).attr('class').indexOf('active') == -1) {
+			$('.move-dialog-button.active').removeClass('active');
+			$('.move-dialog-txt.active').removeClass('active');
+			$('.move-dialog-empty.active').removeClass('active');
+			$('.move-dialog-tree-panel.active').removeClass('active');
+			var section = $(this).attr('class').replace('move-dialog-button', '').split(" ").join("");
+	        switch(section)
+	        {
+		       case 'rubbish-bin':
+			   $('.move-dialog-txt.rubbish-bin').addClass('active');
+			   //$('.move-dialog-empty.rubbish-bin').addClass('active');
+			   $('.move-dialog-tree-panel.rubbish-bin').addClass('active');
+			   $('.dialog-newfolder-button').addClass('hidden');
+		       break;
+		       case 'shared-with-me':
+			   $('.move-dialog-txt.shared-with-me').addClass('active');
+			   //$('.move-dialog-empty.shared-with-me').addClass('active');
+			   $('.move-dialog-tree-panel.shared-with-me').addClass('active');
+			   $('.dialog-newfolder-button').addClass('hidden');
+		       break;
+		       case 'cloud-drive':
+			   $('.move-dialog-txt.cloud-drive').addClass('active');
+			   //$('.move-dialog-empty.cloud-drive').addClass('active');
+			   $('.move-dialog-tree-panel.cloud-drive').addClass('active');
+			   $('.dialog-newfolder-button').removeClass('hidden');
+		       break;
+			}
+			$(this).addClass('active');
+			copyDialogScroll();
+		}
+	});
+	
+	$('.move-dialog-panel-arrows').unbind('click');
+	$('.move-dialog-panel-arrows').bind('click', function() {
+		if($(this).attr('class').indexOf('active') == -1) {
+			$(this).addClass('active');
+			$('.dialog-sorting-menu').removeClass('hidden');
+		} else {
+			$(this).removeClass('active');
+			$('.dialog-sorting-menu').addClass('hidden');
+		}
+	});
+	
+	$('.dialog-sorting-menu .sorting-menu-item').unbind('click');
+	$('.dialog-sorting-menu .sorting-menu-item').bind('click', function() {
+		if($(this).attr('class').indexOf('active') == -1) {
+			$(this).parent().find('.sorting-menu-item').removeClass('active');
+			$(this).addClass('active');
+			$('.dialog-sorting-menu').addClass('hidden');
+		} 
+			
+	    $('.dialog-sorting-menu').addClass('hidden');
+		$('.move-dialog-panel-arrows.active').removeClass('active')
+	});
+	
+});
+
+</script>
+</head>
+
+<body id="bodyel" class="bottom-pages">
+
+
+<div class="fm-dialog-overlay"></div>
+
+
+<div class="fm-dialog move-dialog">
+     <div class="fm-dialog-header">
+       <!-- Please add "active" classname to necessary "move-dialog-txt" block !-->
+       <div class="fm-dialog-title">Move <span class="move-dialog-txt cloud-drive active">(Cloud Drive)</span><span class="move-dialog-txt shared-with-me">(Shared with me)</span><span class="copy-dialog-txt rubbish-bin">(Rubbish Bin)</span></div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+       <div class="move-dialog-button cloud-drive active"></div>
+       <div class="move-dialog-button shared-with-me"></div>
+       <div class="move-dialog-button rubbish-bin"></div>
+       <div class="clear"></div>
+       <div class="dialog-sorting-menu hidden">
+         <div class="context-menu-section">
+           <div class="sorting-menu-arrow"></div>
+           <div class="sorting-menu-item active">Name</div>
+           <div class="sorting-menu-item">Status</div>
+           <div class="sorting-menu-item">Last Interaction</div>
+           <div class="sorting-item-divider"></div>
+         </div>
+           <div class="context-menu-section">
+           <div class="sorting-menu-item active">Ascending</div>
+           <div class="sorting-menu-item">Descending</div>
+         </div>
+       </div>
+       
+       <!-- Please add "active" classname to necessary "move-dialog-empty" block !-->
+       <div class="move-dialog-empty cloud-drive">
+          <div class="move-dialog-empty-icon"></div>
+          <div class="move-dialog-empty-header">
+            No folders in your cloud drive
+          </div>
+          <div class="move-dialog-empty-txt">
+            Worry not! You can easily create a new folder  below. Right there, on the left hand side.
+          </div>
+       </div>
+       
+       <div class="move-dialog-empty shared-with-me">
+          <div class="move-dialog-empty-icon"></div>
+          <div class="move-dialog-empty-header">
+            No shared folders
+          </div>
+          <div class="move-dialog-empty-txt">
+            Lorem ipsum dolor sit amet
+          </div>
+       </div>
+       
+       <div class="move-dialog-empty rubbish-bin">
+          <div class="move-dialog-empty-icon"></div>
+          <div class="move-dialog-empty-header">
+            Empty Rubbish Bin
+          </div>
+          <div class="move-dialog-empty-txt">
+            Lorem ipsum dolor sit amet
+          </div>
+       </div>
+       
+       <!-- Please add "active" classname to necessary "move-dialog-tree-panel" block !-->
+       <div class="move-dialog-tree-panel cloud-drive active">
+           <div class="move-dialog-panel-header">
+              <span>My folders</span>
+              <div class="move-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+             <ul>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+               </li>
+               <li>
+                 <span class="nw-fm-tree-item contains-folders">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+                 <ul class="opened">
+                   <li>
+                   <span class="nw-fm-tree-item">
+                     <span class="nw-fm-arrow-icon"></span>
+                     <span class="nw-fm-tree-folder shared-folder">Subfolder</span>
+                   </span>
+                   </li>
+                 </ul>
+               </li>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+               </li>
+             </ul>
+           </div>
+       </div>
+       
+       <div class="move-dialog-tree-panel shared-with-me">
+           <div class="move-dialog-panel-header">
+              <span>Incoming shared folders</span>
+              <div class="move-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+             <ul>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+               </li>
+             </ul>
+           </div>
+       </div>
+       
+       
+       <div class="move-dialog-tree-panel rubbish-bin">
+           <div class="move-dialog-panel-header">
+              <span>Deleted folders</span>
+              <div class="move-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+             <ul>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+               </li>
+             </ul>
+           </div>
+       </div>
+        
+       
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button dialog-newfolder-button">
+          New folder
+        </div>
+        <div class="fm-dialog-button dialog-copy-button">
+          Paste
+        </div>
+        <div class="fm-dialog-button">
+          Cancel
+        </div>
+        <div class="clear"></div>
+     </div>
+</div>
+
+</body>
+</html>

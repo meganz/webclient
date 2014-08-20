@@ -35,7 +35,12 @@ function keyPressEntropy (e) {
     bioSeed[bioCounter++ & 255] ^= (e.keyCode << 16) | timeValue();
 }
 
+var mouseApiRetryT=false;
+
 function mouseMoveEntropy (e) {
+
+	
+
     lastactive = Date.now();
 
     var v = ( ( (e.screenX << 8) | (e.screenY & 255) ) << 16 ) | timeValue();
@@ -66,6 +71,12 @@ function mouseMoveEntropy (e) {
 
         if ( typeof arkanoid_entropy !== 'undefined' ) arkanoid_entropy();
     }
+	
+	if (!mouseApiRetryT || mouseApiRetryT < new Date().getTime())
+	{
+		mouseApiRetryT=new Date().getTime()+2000;
+		api_retry();		
+	}
 }
 
 // Store some random bits for reseeding RNG in the future

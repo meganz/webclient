@@ -521,13 +521,13 @@ function init_page()
 	{
 		parsepage(pages['mobile']);		
 	}
-	else if (page == 'affiliates'  && u_attr && u_attr.aff)
+	else if (page == 'affiliates'  && u_attr && u_attr.aff_payment)
 	{
 		parsepage(pages['affiliatemember']);
 		init_affiliatemember();
 	}
 	else if (page == 'affiliates')
-	{	
+	{
 		parsepage(pages['affiliates']);
 	}
 	else if (page == 'resellers')
@@ -873,7 +873,15 @@ function topmenuUI()
 	$('.top-head .user-name').hide();	
 	if (fminitialized) $('.top-search-bl').show();
 	else $('.top-search-bl').hide();
-	$('.fm-avatar').hide();	
+	$('.fm-avatar').hide();
+	
+	if (u_type == 3 && u_attr.firstname)
+	{
+		$('#topmenu .user-name').text(u_attr.firstname);
+		$('#topmenu .user-name').show();
+	}
+	else $('#topmenu .user-name').hide();
+	
 	if (u_type)
 	{		
 		$('.top-menu-item.logout,.context-menu-divider.logout').show();		
@@ -995,13 +1003,15 @@ function topmenuUI()
 			var c3;
 			if (e && e.target) c3 = $(e.target).parent().attr('class');
 			if (!c3 || c3.indexOf('fm-new-folder') == -1) {
-				$('.fm-new-folder').removeClass('active');
-				$('.fm-new-folder').removeClass('filled-input');
+				$('.fm-new-folder').removeClass('active filled-input');
+				$('.create-new-folder').addClass('hidden');
 			}
 		}		
 		if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0) && (!c || c.indexOf('fm-add-user') == -1))
 		{
 			$('.fm-add-user').removeClass('active');
+		    $('.add-user-popup').addClass('dialog hidden');
+			$('.add-user-popup').removeAttr('style');
 		}
 	}	
 	$('#pageholder').unbind('click');

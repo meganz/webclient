@@ -173,7 +173,7 @@ function mozDirtyGetAsEntry(aFile,aDataTransfer)
 				this._close = function()
 				{
 					mozCloseStream(nsIFileInputStream);
-					oDestroy(this);
+					delete this._close;
 					aFile = undefined;
 				};
 
@@ -937,6 +937,16 @@ function mozClearStartupCache() {
 		alert(e);
 	}
 })(self);
+
+var mozMEGAExtensionVersion;
+try {
+	var { AddonManager } = Cu.import("resource://gre/modules/AddonManager.jsm", {});
+	AddonManager.getAddonByID('firefox@mega.co.nz',function(data)
+	{
+		mozMEGAExtensionVersion = data.version;
+		AddonManager = undefined;
+	});
+} catch(e) {}
 
 const mozLazyGetService = XPCOMUtils.defineLazyServiceGetter.bind(XPCOMUtils, this);
 

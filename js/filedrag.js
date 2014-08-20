@@ -1,5 +1,17 @@
 (function(scope) {
 
+function getDDhelper()
+{
+	var id = '#fmholder';
+	if (page == 'start') id = '#startholder';
+	$('.udragger-block').remove();
+	$(id).append('<div class="udragger-block drag" id="draghelper"><div class="dragger-status"></div><div class="dragger-files-number u-dfn">1</div></div>');
+	$('.udragger-block').removeClass('multiple');
+	$('.udragger-block').show();
+	$('.dragger-files-number.u-dfn').hide();
+	return $('.udragger-block')[0];
+}
+
 function FileDragHover(e)
 {
 	if (d) console.log('hover',$.dragging);
@@ -31,8 +43,8 @@ function FileDragHover(e)
 		if (filecnt > 0) $.ddhelper = getDDhelper();
 		if (filecnt > 1)
 		{
-			$('.dragger-files-number').text(filecnt);
-			$('.dragger-files-number').show();
+			$('.dragger-files-number.u-dfn').text(filecnt);
+			$('.dragger-files-number.u-dfn').show();
 		}
 	}
 	if ($.ddhelper)
@@ -41,8 +53,8 @@ function FileDragHover(e)
 		$('<div class="dragger-icon '+ fileicon({name:''}) +'"></div>').insertAfter('#draghelper .dragger-status');
 		$('.dragger-icon.fade').fadeTo(500, 0.1);
 		$($.ddhelper).css({left: (e.pageX+35 + "px"),top: (e.pageY-5 + "px")});
-		$('.dragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
-		$('.dragger-block').addClass('copy');
+		$('.udragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
+		$('.udragger-block').addClass('copy');
 	}
 	if (page == 'start')
 	{
@@ -53,7 +65,7 @@ function FileDragHover(e)
 	{
 		var t = $(e.target);
 		$('span.nw-fm-tree-folder').css('background-color','');
-		
+
 		if (t.attr('class') == "nw-fm-tree-folder")
 		{
 			t.css('background-color','rgba(222,222,10,0.3)');

@@ -473,9 +473,9 @@ define("asmcrypto", (function (global) {
  * Copyright (c) 2007, 2013, 2014 Michele Bini
  * Copyright (c) 2014 Mega Limited
  * under the MIT License.
- * 
+ *
  * Authors: Guy K. Kloss, Michele Bini
- * 
+ *
  * You should have received a copy of the license along with this program.
  */
 
@@ -521,7 +521,7 @@ define('jodid25519/core',[
     function _BASE() {
         return [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
- 
+
     // return -1, 0, +1 when a is less than, equal, or greater than b
     function _bigintcmp(a, b) {
         // The following code is a bit tricky to avoid code branching
@@ -541,7 +541,7 @@ define('jodid25519/core',[
         }
         return r;
     }
- 
+
     function _bigintadd(a, b) {
         var r = [];
         var v;
@@ -563,7 +563,7 @@ define('jodid25519/core',[
         r[15] = (v >>> 16) + a[15] + b[15];
         return r;
     }
- 
+
     function _bigintsub(a, b) {
         var r = [];
         var v;
@@ -585,7 +585,7 @@ define('jodid25519/core',[
         r[15] = (v >>> 16) - 8 + a[15] - b[15];
         return r;
     }
- 
+
     function _sqr8h(a7, a6, a5, a4, a3, a2, a1, a0) {
         // 'division by 0x10000' can not be replaced by '>> 16' because
         // more than 32 bits of precision are needed similarly
@@ -617,7 +617,7 @@ define('jodid25519/core',[
         r[15] = 0 | (v / 0x10000);
         return r;
     }
- 
+
     function _sqrmodp(a) {
         var x = _sqr8h(a[15], a[14], a[13], a[12], a[11], a[10], a[9],
                        a[8]);
@@ -663,7 +663,7 @@ define('jodid25519/core',[
         _reduce(r);
         return r;
     }
- 
+
     function _mul8h(a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3,
                     b2, b1, b0) {
         // 'division by 0x10000' can not be replaced by '>> 16' because
@@ -697,7 +697,7 @@ define('jodid25519/core',[
         r[15] = (0 | (v / 0x10000));
         return r;
     }
- 
+
     function _mulmodp(a, b) {
         // Karatsuba multiplication scheme: x*y = (b^2+b)*x1*y1 -
         // b*(x1-x0)*(y1-y0) + (b+1)*x0*y0
@@ -751,7 +751,7 @@ define('jodid25519/core',[
         _reduce(r);
         return r;
     }
-    
+
     function _reduce(arr) {
         var aCopy = arr.slice(0);
         var choice = [arr, aCopy];
@@ -794,7 +794,7 @@ define('jodid25519/core',[
         v = v >>> 16;
         a[15] += v;
     }
- 
+
     function _addmodp(a, b) {
         var r = [];
         var v;
@@ -817,7 +817,7 @@ define('jodid25519/core',[
         r[15] = (v >>> 16) + (a[15] & 0x7fff) + (b[15] & 0x7fff);
         return r;
     }
- 
+
     function _submodp(a, b) {
         var r = [];
         var v;
@@ -842,7 +842,7 @@ define('jodid25519/core',[
                 - (b[15] & 0x7fff);
         return r;
     }
- 
+
     function _invmodp(a) {
         var c = a;
         var i = 250;
@@ -860,7 +860,7 @@ define('jodid25519/core',[
         a = _mulmodp(a, c);
         return a;
     }
- 
+
     function _mulasmall(a) {
         // 'division by 0x10000' can not be replaced by '>> 16' because
         // more than 32 bits of precision are needed
@@ -886,7 +886,7 @@ define('jodid25519/core',[
         _reduce(r);
         return r;
     }
- 
+
     function _dbl(x, z) {
         var x_2, z_2, m, n, o;
         m = _sqrmodp(_addmodp(x, z));
@@ -896,7 +896,7 @@ define('jodid25519/core',[
         z_2 = _mulmodp(_addmodp(_mulasmall(o), m), o);
         return [x_2, z_2];
     }
- 
+
     function _sum(x, z, x_p, z_p, x_1) {
         var x_3, z_3, p, q;
         p = _mulmodp(_submodp(x, z), _addmodp(x_p, z_p));
@@ -905,17 +905,26 @@ define('jodid25519/core',[
         z_3 = _mulmodp(_sqrmodp(_submodp(p, q)), x_1);
         return [x_3, z_3];
     }
-    
-    function _generateKey() {
+
+    function _generateKey(curve25519) {
         var buffer = new Uint8Array(32);
         asmCrypto.getRandomValues(buffer);
+        // For Curve25519 DH keys, we need to apply some bit mask on generated
+        // keys:
+        // * clear bit 0, 1, 2 of first byte
+        // * clear bit 7 of last byte
+        // * set bit 6 of last byte
+        if (curve25519 === true) {
+            buffer[0] &= 0xf8;
+            buffer[31] = (buffer[31] & 0x7f) | 0x40;
+        }
         var result = [];
         for (var i = 0; i < buffer.length; i++) {
             result.push(String.fromCharCode(buffer[i]));
         }
         return result.join('');
     }
-    
+
     // Expose some functions to the outside through this name space.
     // Note: This is not part of the public API.
     ns.getbit = _getbit;
@@ -934,8 +943,8 @@ define('jodid25519/core',[
     ns.mulmodp = _mulmodp;
     ns.sqrmodp = _sqrmodp;
     ns.generateKey = _generateKey;
-    
-    
+
+
     return ns;
 });
 
@@ -1376,9 +1385,9 @@ define('jodid25519/curve255',[
 /*
  * Copyright (c) 2014 Mega Limited
  * under the MIT License.
- * 
+ *
  * Authors: Guy K. Kloss
- * 
+ *
  * You should have received a copy of the license along with this program.
  */
 
@@ -1398,7 +1407,7 @@ define('jodid25519/dh',[
      */
     var ns = {};
 
-    
+
     function _toString(vector) {
         var result = [];
         for (var i = 0; i < vector.length; i++) {
@@ -1407,7 +1416,7 @@ define('jodid25519/dh',[
         }
         return result.join('');
     }
-    
+
     function _fromString(vector) {
         var result = new Array(16);
         for (var i = 0, l = 0; i < vector.length; i += 2) {
@@ -1417,7 +1426,7 @@ define('jodid25519/dh',[
         return result;
     }
 
-    
+
     /**
      * Computes a key through scalar multiplication of a point on the curve 25519.
      *
@@ -1474,8 +1483,10 @@ define('jodid25519/dh',[
      * @returns {string}
      *     Byte string containing a new random private key seed.
      */
-    ns.generateKey = core.generateKey;
-    
+    ns.generateKey = function() {
+        return core.generateKey(true);
+    };
+
 
     return ns;
 });
@@ -1504,9 +1515,9 @@ define("jsbn", (function (global) {
  * Copyright (c) 2011, 2012, 2014 Ron Garret
  * Copyright (c) 2014 Mega Limited
  * under the MIT License.
- * 
+ *
  * Authors: Guy K. Kloss, Ron Garret
- * 
+ *
  * You should have received a copy of the license along with this program.
  */
 
@@ -1525,7 +1536,7 @@ define('jodid25519/eddsa',[
      *
      * @description
      * Digital signature scheme based on Curve25519 (Ed25519 or EdDSA).
-     * 
+     *
      * <p>
      * This code is adapted from fast-djbec.js, a faster but more complicated
      * version of the Ed25519 encryption scheme (as compared to djbec.js).
@@ -1928,7 +1939,7 @@ define('jodid25519/eddsa',[
     function _chr(n) {
         return String.fromCharCode(n);
     }
-    
+
     function _ord(c) {
         return c.charCodeAt(0);
     }
@@ -1937,7 +1948,7 @@ define('jodid25519/eddsa',[
         return _pt_unxform(_x_pt_add(_pt_xform(p1), _pt_xform(p2)));
     }
 
-    
+
     // Exports for the API.
 
     /**
@@ -1962,7 +1973,7 @@ define('jodid25519/eddsa',[
         return true;
     };
 
-    
+
     /**
      * Computes the EdDSA public key.
      *
@@ -1980,7 +1991,7 @@ define('jodid25519/eddsa',[
         return utils.bytes2string(_publickey(keySeed));
     };
 
-    
+
     /**
      * Computes an EdDSA signature of a message.
      *
@@ -2021,7 +2032,7 @@ define('jodid25519/eddsa',[
         return utils.bytes2string(erp.concat(_encodeint(s)));
     };
 
-        
+
     /**
      * Verifies an EdDSA signature of a message with the public key.
      *
@@ -2062,9 +2073,11 @@ define('jodid25519/eddsa',[
      * @returns {string}
      *     Byte string containing a new random private key seed.
      */
-    ns.generateKeySeed = core.generateKey;
-    
-    
+    ns.generateKeySeed = function() {
+        return core.generateKey(false);
+    };
+
+
     return ns;
 });
 
@@ -2096,7 +2109,7 @@ define('jodid25519',[
     var ns = {};
     
     /** Module version indicator as string (format: [major.minor.patch]). */
-    ns.VERSION = '0.7.0';
+    ns.VERSION = '0.7.1';
 
     ns.dh = dh;
     ns.eddsa = eddsa;

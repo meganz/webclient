@@ -170,7 +170,8 @@ function network_error_check() {
 	 *	server to see if that fixes the problem
 	 */
 	$([ul, dl]).each(function(i, k) {
-		if (k.retries/k.error > 3) {
+		var ratio = k.retries/k.error
+		if (ratio > 0 && ratio%8 == 0) {
 			// if we're failing in average for the 3rd time,
 			// lets shrink our upload queue size
 			ERRDEBUG('shrinking: ' + (k == ul ? 'ul' : 'dl'))
@@ -246,7 +247,7 @@ var UploadManager =
 		onUploadError(file.id, "Upload failed - restarting upload");
 
 		// reschedule
-		ulQueue.push(new FileUpload(file));
+		ulQueue.pushFirst(new FileUpload(file));
 	},
 
 	retry : function UM_retry(file, chunk, reason)
@@ -429,7 +430,10 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 	} else {
 		UploadManager.retry(this.file, this, "xhr failed: " + reason);
 	}
-	this.done();
+	setTimeout(function() {
+		// wait a few seconds before we release out slot
+		this.done();
+	}.bind(this), 5000);
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
@@ -672,7 +676,7 @@ function ul_finalize(file) {
 		dirs.pop();
 	}
 
-	if (!file.filekey) throw new Error("filekey is missing")
+	ASSERT(file.filekey, "*** filekey is missing ***");
 
 	Cascade(dirs, Mkdir, function(dir) {
 		var body  = { n: file.name }
@@ -746,7 +750,7 @@ function worker_uploader(task, done) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = 4
+	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'integer', { min: 1, max:6}) || 4
 	, Encrypter
 	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
@@ -780,8 +784,6 @@ function resetUploadDownload() {
 		ul_uploading = false;
 	}
 	if (!dl_queue.some(isQueueActive)) {
-		dlQueue.destroy();
-		dlQueue = new TransferQueue(downloader)
 		dl_queue = new DownloadQueue();
 		downloading = false;
 	}

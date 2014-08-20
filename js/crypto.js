@@ -1436,37 +1436,54 @@ function api_updateuser(ctx,newuser)
 var u_pubkeys = {};
 
 // query missing keys for the given users
-function api_cachepubkeys(ctx,users)
-{
-	var u = [];
-	var i;
+function api_cachepubkeys(ctx, users) {
+    var u = [];
+    var i;
 
-	for (i = users.length; i--; ) if (users[i] != 'EXP' && !u_pubkeys[users[i]]) u.push(users[i]);
+    for (i = users.length; i--;) {
+        if (users[i] != 'EXP' && !u_pubkeys[users[i]]) {
+            u.push(users[i]);
+        }
+    }
 
-	if (ctx.remaining = u.length)
-	{
-		for (i = u.length; i--; )
-		{
-			api_req({ a : 'uk', u : u[i] },{
-				ctx : ctx,
-				u : u[i],
-				callback : api_cachepubkeys2
-			});
-		}
-	}
-	else ctx.cachepubkeyscomplete(ctx);
+    if (ctx.remaining = u.length) {
+        for (i = u.length; i--;) {
+            api_req({
+                a : 'uk',
+                u : u[i]
+            }, {
+                ctx : ctx,
+                u : u[i],
+                callback : api_cachepubkeys2
+            });
+        }
+    } else {
+        ctx.cachepubkeyscomplete(ctx);
+    }
 }
 
-function api_cachepubkeys2(res,ctx)
-{
-	if (typeof res == 'object')
-	{
-		var spubkey, keylen, pubkey;
+function api_cachepubkeys2(res, ctx) {
+    if (typeof res == 'object') {
+        var spubkey, keylen, pubkey;
 
-		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
-	}
+        if (res.pubk) {
+            u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
+            var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
+            var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
+            if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
+                throw new Error('Fingerprint does not match previously seen one!');
+            }
+            if (observed === false) {
+                authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
+                                                 authring.AUTHENTICATION_METHOD.SEEN,
+                                                 authring.KEY_CONFIDENCE.UNSURE);
+            }
+        }
+    }
 
-	if (!--ctx.ctx.remaining) ctx.ctx.cachepubkeyscomplete(ctx.ctx);
+    if (!--ctx.ctx.remaining) {
+        ctx.ctx.cachepubkeyscomplete(ctx.ctx);
+    }
 }
 
 function encryptto(user,data)
@@ -2671,42 +2688,61 @@ var pubEd25519 = {};
  * Initialises the authentication system.
  */
 function u_initAuthentication() {
-    // Load/initialise the authenticated contacts ring.
-    authring.getContacts();
+    // Load contacts' tracked authentication fingerprints.
+    authring.getContacts('Ed25519');
+    authring.getContacts('RSA');
 
-    // Load our key ring.
-    var myCallback = function(res, ctx) {
-        if (typeof res !== 'number') {
-            u_keyring = res;
-        } else {
-            u_privEd25519 = jodid25519.eddsa.generateKeySeed();
-            u_keyring = {prEd255 : u_privEd25519};
-            u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-            setUserAttribute('keyring', u_keyring, false);
-            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+    // Load/initialise the authenticated contacts ring.
+    getUserAttribute(u_handle, 'keyring', false, u_initAuthentication2);
+}
+
+
+/**
+ * Provide Ed25519 key pair and a signed RSA pub key.
+ */
+function u_initAuthentication2(res, ctx) {
+    if (typeof res !== 'number') {
+        // Keyring is a private attribute, so it's been wrapped by a TLV store,
+        // no furthe processing here.
+        u_keyring = res;
+    } else {
+        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+        u_keyring = {prEd255 : u_privEd25519};
+        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        // Keyring is a private attribute here, so no preprocessing required
+        // (will be wrapped in a TLV store).
+        setUserAttribute('keyring', u_keyring, false);
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+    }
+    u_attr.keyring = u_keyring;
+    u_privEd25519 = u_keyring.prEd255;
+    u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
+    u_attr.puEd255 = u_pubEd25519;
+    pubEd25519[u_handle] = u_pubEd25519;
+
+    // Ensure an RSA pub key signature.
+    var storeSigPubkCallback = function(res, ctx) {
+        if (typeof res === 'number') {
+            // No signed RSA pub key, store it.
+            var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),
+                                           'RSA');
+            setUserAttribute('sigPubk', base64urlencode(sigPubk), true);
         }
-        u_attr.keyring = u_keyring;
-        u_privEd25519 = u_keyring.prEd255;
-        u_pubEd25519 = u_pubEd25519 || jodid25519.eddsa.publicKey(u_privEd25519);
-        u_attr.puEd255 = u_pubEd25519;
-        pubEd25519[u_handle] = u_pubEd25519;
     };
-    getUserAttribute(u_handle, 'keyring', false, myCallback);
+    getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
 }
 
 
 function _checkFingerprintEd25519(userhandle) {
+    var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
+    var fingerprint = authring.computeFingerprint(pubEd25519[userhandle], 'Ed25519', 'string');
     var value = {pubkey: pubEd25519[userhandle],
-                 authenticated: authring.getContactAuthenticated(userhandle)};
-    if (value.authenticated
-            && authring.equalFingerprints(value.authenticated.fingerprint,
-                                          authring.computeFingerprint(pubEd25519[userhandle]))
-               === false) {
+                 authenticated: recorded};
+    if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
         throw new Error('Fingerprint does not match previously authenticated one!');
     }
-    if (value.authenticated === false) {
-        authring.setContactAuthenticated(userhandle,
-                                         authring.computeFingerprint(pubEd25519[userhandle], 'string'),
+    if (recorded === false) {
+        authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
                                          authring.AUTHENTICATION_METHOD.SEEN,
                                          authring.KEY_CONFIDENCE.UNSURE);
     }
@@ -2730,7 +2766,7 @@ function _checkFingerprintEd25519(userhandle) {
  *     an exception.
  */
 function getPubEd25519(userhandle, callback) {
-    if (u_authring === undefined) {
+    if (u_authring.Ed25519 === undefined) {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
     if (pubEd25519[userhandle]) {
@@ -2778,7 +2814,8 @@ function getPubEd25519(userhandle, callback) {
 function getFingerprintEd25519(userhandle, callback, format) {
     if (pubEd25519[userhandle]) {
         if (callback) {
-            callback(authring.computeFingerprint(pubEd25519[userhandle], format),
+            callback(authring.computeFingerprint(pubEd25519[userhandle],
+                                                 'Ed25519', format),
                      userhandle);
         }
     } else {
@@ -2787,7 +2824,8 @@ function getFingerprintEd25519(userhandle, callback, format) {
                 res = base64urldecode(res);
                 pubEd25519[ctx.u] = res;
                 if (ctx.callback3) {
-                    ctx.callback3(authring.computeFingerprint(res, format), ctx.u);
+                    ctx.callback3(authring.computeFingerprint(res, 'Ed25519', format),
+                                  ctx.u);
                 }
             } else if (ctx.callback3) {
                 ctx.callback3(false, ctx.u);

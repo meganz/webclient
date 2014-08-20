@@ -72,7 +72,7 @@ try
 				Services.appinfo.OS,
 				Services.appinfo.XPCOMABI].join(" ");
 
-			loadSubScript('chrome://mega/content/strg.js');
+			loadSubScript('chrome://mega/content/strg2.js');
 
 			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
 				throw new Error('Initialization failed.');
@@ -384,43 +384,72 @@ else
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				var dump = { m : msg, f : '' + url, l : ln };
-				if (cn) dump.c = cn;
+				if (__cdumps.length > 8) return false;
+
+				var dump = { m : msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
+
 				if (errobj)
 				{
-					if (errobj.stack) dump.s = '' + errobj.stack;
+					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
 				}
+				if (cn) dump.c = cn;
+
+				try
+				{
+					var crashes = JSON.parse(localStorage.crashes || '{}');
+					var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
+
+					if (crashes[checksum])
+					{
+						// Reported less than 10 days ago?
+						if (Date.now() - crashes[checksum] < 864000000) return false;
+					}
+					dump.x = checksum;
+					crashes[checksum] = Date.now();
+					localStorage.crashes = JSON.stringify(crashes);
+					cc = $.len(crashes);
+				}
+				catch(e) {
+					delete localStorage.crashes;
+				}
+
 				__cdumps.push(dump);
 				if (__cd_t) clearTimeout(__cd_t);
 				__cd_t = setTimeout(safeCall(function()
 				{
+					var ids = [];
 					for (var i in __cdumps)
 					{
 						var dump = __cdumps[i];
 
 						// todo cesar: var source = $.get() ....
 
-						if (dump.f[0] === 'b')
+						if (dump.x)
 						{
-							dump.f = dump.f.replace(/^blob:[^:]+/, '..');
-							if (dump.s) dump.s = dump.s.replace(/blob:[^:\s]+/g, '..');
+							ids.push(dump.x);
+							delete dump.x;
 						}
 					}
 
-					var report = { dump : __cdumps, date : new Date().toUTCString() };
-					__cdumps = [];
-
+					var report = {};
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
 					report.tp = $.transferprogress;
+					report.id = ids.join(",");
+					report.cc = cc;
 
 					if (is_chrome_firefox)
 					{
-						report.mozid = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
+						report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
 					}
+					report = JSON.stringify(report);
 
-					api_req({ a : 'cd', c : JSON.stringify(report) });
+					for (var i in __cdumps)
+					{
+						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report });
+					}
+					__cdumps = [];
 
 				}), 3000);
 

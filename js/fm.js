@@ -4516,12 +4516,14 @@ function linksDialog(close)
 		$('#clipboardbtn1').unbind('mouseover');
 		$('#clipboardbtn1').bind('mouseover',function()
 		{
-			$('#clipboardswf1')[0].setclipboardtext(getclipboardlinks());
+			var e = $('#clipboardswf1')[0];
+			if (e && e.setclipboardtext) e.setclipboardtext(getclipboardlinks());
 		});
 		$('#clipboardbtn2').unbind('mouseover');
 		$('#clipboardbtn2').bind('mouseover',function()
-		{			
-			$('#clipboardswf2')[0].setclipboardtext(getclipboardkeys());
+		{
+			var e = $('#clipboardswf2')[0];
+			if (e && e.setclipboardtext) e.setclipboardtext(getclipboardkeys());
 		});
 	}
 	
@@ -5397,7 +5399,7 @@ function savecomplete(id)
 	if (!$.dialog) 
 	$('#dlswf_'+id).remove();
 	var dl = IdToFile(id);
-	M.dlcomplete(dl.id, dl.zipid, dl.pos);
+	M.dlcomplete(dl);
 	DownloadManager.cleanupUI(dl, true);
 }
 

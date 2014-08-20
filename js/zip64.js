@@ -539,9 +539,9 @@ ZipWriter.prototype.finalize_file = function() {
 };
 
 ZipWriter.prototype._eof = function() {
-	this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
 	this.dl.onBeforeDownloadComplete(this.dl.pos);
 	this.io.download(this.dl.zipname, '');
+	this.dl.onDownloadComplete(this.dl);
 	this.destroy();
 };
 
@@ -744,10 +744,8 @@ var crc32table = [
 
 function crc32(data, crc, len) 
 {
-	if (typeof(crc) == "undefined")
-	{
-		crc = 0;
-	}
+	if (typeof(crc) == "undefined") crc = 0;
+	if (typeof(len) == "undefined") len = data.length;
 
 	var x = 0;
 	var y = 0;
@@ -756,7 +754,7 @@ function crc32(data, crc, len)
 
 	crc = crc ^ -1;
 	
-	for (var i = 0, len; i < len; i++)
+	for (var i = 0; i < len; i++)
 	{
 		y = (crc ^ data[i+off]) & 0xFF;
 		x = crc32table[y];

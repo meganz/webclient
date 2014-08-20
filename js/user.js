@@ -174,6 +174,11 @@ function u_logout(logout)
 
                 localStorage.removeItem("megaChatPresence");
                 localStorage.removeItem("megaChatPresenceMtime");
+
+            }
+
+            if(pubkeysCache && pubkeysCache.clear()) {
+                pubkeysCache.clear();
             }
         }
 

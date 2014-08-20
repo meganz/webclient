@@ -372,6 +372,11 @@ function MegaData ()
 			if ($.sortTreePanel.contacts.by == 'status') {
 				M.contacts(); // we need to resort
 			}
+
+            if(window.location.hash == "#fm/" + u.u) {
+                // re-render the contact view page if the presence had changed
+                contactUI();
+            }
 		}
 	};
 
@@ -1059,15 +1064,18 @@ function MegaData ()
             if(contacts[i].u == u_handle) { // don't show my own contact in the contact & conv. lists
                 continue;
             }
-            var startChatTxt = megaChat.getPrivateRoom(contacts[i].u) !== false ? "Start chat" : "Show chat";			
+
 			var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));			
 			if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1))
 			{
-				html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button">' + startChatTxt + '</a></div></div>';
+				html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"></a></div></div>';
 			}
 		}		
 		
 		$('.content-panel.contacts').html(html);
+
+
+        megaChat.renderContactTree();
 
         //TMP: temporary start chat button event handling
         $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');

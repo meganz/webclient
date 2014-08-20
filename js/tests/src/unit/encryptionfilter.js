@@ -126,7 +126,9 @@ describe("EncryptionFilter", function() {
 
         myJid = megaChatObj.getJidFromNodeId(Object.keys(M.u)[0]);
         otherUserJid = megaChatObj.getJidFromNodeId(Object.keys(M.u)[1]);
-        
+
+        localStorage.d = localStorage.dd = localStorage.stopOnAssertFail = 1;
+
         done();
     });
 
@@ -1338,7 +1340,7 @@ describe("EncryptionFilter", function() {
 
 
             ph2.processMessage(
-                ph1.protocolOutQueue.pop()
+                ph1.protocolOutQueue.shift()
             );
 
             // *new* by patching the 'stateUpdatedCallback' we will add a expect() to be sure that the .state is set to
@@ -1350,7 +1352,7 @@ describe("EncryptionFilter", function() {
             };
 
             ph1.processMessage(
-                ph2.protocolOutQueue.pop()
+                ph2.protocolOutQueue.shift()
             );
 
             expect(ph1.state).to.eql(3);
@@ -1359,7 +1361,7 @@ describe("EncryptionFilter", function() {
             ph1.stateUpdatedCallback = function(h) {};
 
             ph2.processMessage(
-                ph1.protocolOutQueue.pop()
+                ph1.protocolOutQueue.shift()
             );
 
             expect(ph2.state).to.eql(3);
@@ -1371,7 +1373,7 @@ describe("EncryptionFilter", function() {
                 ph1.send("a", {});
 
                 ph2.processMessage(
-                    ph1.messageOutQueue.pop()
+                    ph1.messageOutQueue.shift()
                 );
 
                 expect(ph2.uiQueue[0].message).to.eql("a");
@@ -1393,7 +1395,7 @@ describe("EncryptionFilter", function() {
             ph2.send("b", {meta: true});
 
             ph1.processMessage(
-                ph2.messageOutQueue.pop()
+                ph2.messageOutQueue.shift()
             );
 
 
@@ -1409,11 +1411,106 @@ describe("EncryptionFilter", function() {
 
             done();
         });
+
+        it("issue 545 - Not in members list, must be excluded SHOULD be thrown in case that messages were not processed in the correct order.",
+            function(done) {
+            // ph1 is the owner of the room
+            var ph1 = new mpenc.handler.ProtocolHandler(
+                "jid1",
+                TESTING_KEYS.ED25519_PRIV_KEY,
+                TESTING_KEYS.ED25519_PUB_KEY,
+                TESTING_KEYS.STATIC_PUB_KEY_DIR,
+                function(handler) {
+
+                },
+                function(handler) {
+                }
+            );
+
+            EncryptionFilter.debugEncryptionHandler(ph1, "ph1");
+
+            var ph2 = new mpenc.handler.ProtocolHandler(
+                "jid2",
+                TESTING_KEYS.ED25519_PRIV_KEY,
+                TESTING_KEYS.ED25519_PUB_KEY,
+                TESTING_KEYS.STATIC_PUB_KEY_DIR,
+                function(handler) {
+
+                },
+                function(handler) {
+                }
+            );
+            EncryptionFilter.debugEncryptionHandler(ph2, "ph2");
+
+            // initial start & handshake
+            ph1.start([
+                "jid2"
+            ]);
+
+
+            ph2.processMessage(
+                ph1.protocolOutQueue.shift()
+            );
+
+
+            ph1.processMessage(
+                ph2.protocolOutQueue.shift()
+            );
+
+            expect(ph1.state).to.eql(3);
+
+            ph2.processMessage(
+                ph1.protocolOutQueue.shift()
+            );
+
+            expect(ph2.state).to.eql(3);
+
+            // so now ph21 reloads the window and joins the groupchat (not the mpenc group)
+            var ph21 = new mpenc.handler.ProtocolHandler(
+                "jid21",
+                TESTING_KEYS.ED25519_PRIV_KEY,
+                TESTING_KEYS.ED25519_PUB_KEY,
+                TESTING_KEYS.STATIC_PUB_KEY_DIR,
+                function(handler) {
+
+                },
+                function(handler) {
+                }
+            );
+            EncryptionFilter.debugEncryptionHandler(ph21, "ph21");
+
+            // since ph21 had joined the groupchat, he will start processing ANY of the mpenc encrypted messages
+            // but since ph2 is now offline (detected via ping request), to start the key agreement, ph2 MUST be FIRST
+            // removed/excluded by ph1
+            ph1.exclude(["jid2"]);
+
+
+
+            ph1.join(["jid21"]);
+
+            // since the protocol message is sent to the group chat, it will be processed ONLY by ph21
+            ph21.processMessage(
+                ph1.protocolOutQueue.pop()
+            );
+
+            var old = localStorage.stopOnAssertFail;
+            localStorage.removeItem("stopOnAssertFail");
+            expect(
+                function() {
+                    ph21.processMessage(
+                        ph1.protocolOutQueue.shift()
+                    );
+                }
+            ).to.throw("Not in members list, must be excluded.");
+
+            localStorage.stopOnAssertFail = old;
+
+            done();
+        });
     });
 
     describe("25519 keys", function() {
-        it("feature 306 - async loading of 25519 pub keys + .recover signaling/calling when .processMessage fails", function(done) {
-
+        it("async loading of 25519 pub keys req. for the .processMessage", function(done) {
             // mock setTimeout
             sinon.stub(window, 'setTimeout', function(cb, timer) {
                 console.debug("setTimeout was called with timer: ", timer, "and cb: ", cb);
@@ -1435,7 +1532,13 @@ describe("EncryptionFilter", function() {
             expect(room.encryptionOpQueue instanceof OpQueue).to.be.ok;
 
             encryptionFilter.syncRoomUsersWithEncMembers.restore();
+
+            room.encryptionHandler.processMessage = function(){};
+
             sinon.stub(encryptionFilter, 'syncRoomUsersWithEncMembers', function(){});
+            if(!getPubEd25519.restore) {
+                sinon.spy(window, 'getPubEd25519');
+            }
 
             room.encryptionHandler.askeMember.members = room.getOrderedUsers();
             room.encryptionHandler.cliquesMember.members = room.getOrderedUsers();
@@ -1475,14 +1578,12 @@ describe("EncryptionFilter", function() {
                         '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"chat","messageId":"msgId","rawMessage":null,"meta":{"roomJid":"room1@conference.jid.com"},"message":"?mpENC:[encrypted contents]","elements":"","delay":123,"from":"' + otherUserJid + '"}'
                     );
 
+
                 expect(getPubEd25519.callCount).to.eql(2);
                 expect(getPubEd25519.getCall(0).args[0]).to.eql("B_123456789");
 
                 room.encryptionHandler.processMessage.restore();
             }
-
-            sinon.spy(room.encryptionHandler, 'sendError');
-            sinon.spy(room.encryptionHandler, 'recover');
 
             // test the case when the 25519 keys are NOT loaded successfully OR processMessage had failed
             {
@@ -1518,13 +1619,6 @@ describe("EncryptionFilter", function() {
 
 
                 expect(encryptionFilter.processMessage.callCount).to.eql(2);
-
-                expect(encryptionFilter._processMessageRecursive.callCount).to.eql(5);
-
-                expect(room.encryptionHandler.sendError.callCount).to.eql(1);
-                expect(room.encryptionHandler.sendError.getCall(0).args[0]).to.eql("req-recover");
-
-                expect(room.encryptionHandler.recover.callCount).to.eql(0);
                 expect(encryptionFilter.syncRoomUsersWithEncMembers.callCount).to.eql(0);
 
                 // -> when i am the room owner
@@ -1551,13 +1645,7 @@ describe("EncryptionFilter", function() {
 
                 expect(encryptionFilter.processMessage.callCount).to.eql(3);
 
-                expect(encryptionFilter._processMessageRecursive.callCount).to.eql(9);
-
-                expect(room.encryptionHandler.sendError.callCount).to.eql(1);
-
-
-                expect(room.encryptionHandler.recover.callCount).to.eql(0);
-                expect(encryptionFilter.syncRoomUsersWithEncMembers.callCount).to.eql(1);
+                expect(encryptionFilter.syncRoomUsersWithEncMembers.callCount).to.eql(0);
 
                 window.setTimeout.restore(); // restore the stub method
 

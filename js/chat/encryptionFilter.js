@@ -36,8 +36,6 @@ var EncryptionFilter = function(megaChat) {
                 self.flushQueue(megaRoom, handler);
             },
             function(handler) {
-                if(localStorage.d) { console.error("Got state change: ", handler.state, MegaChatRoom.prototype.getStateAsText.apply(megaRoom)); }
-
                 if(handler.state === mpenc.handler.STATE.INITIALISED && (megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED)) {
                     megaRoom.setState(
                         MegaChatRoom.STATE.PLUGINS_READY
@@ -58,6 +56,7 @@ var EncryptionFilter = function(megaChat) {
 
         megaRoom.encryptionOpQueue = new OpQueue(
             megaRoom.encryptionHandler,
+            megaRoom,
             function(opQueue, nextOp) {
                 if(nextOp[0] == "quit" && opQueue.ctx.state !== mpenc.handler.STATE.INITIALISED) {
                     return false;
@@ -67,9 +66,9 @@ var EncryptionFilter = function(megaChat) {
                     return true;
                 } else if(nextOp[0] == "join" && opQueue.ctx.state == mpenc.handler.STATE.INITIALISED) {
                     return true;
-                }/* if(nextOp[0] == "processMessage") {  // greet/init enc messages
+                } if(nextOp[0] == "processMessage") {  // greet/init enc messages
                     return true;
-                } */else {
+                } else {
                     return opQueue.ctx.state == mpenc.handler.STATE.INITIALISED || opQueue.ctx.state == mpenc.handler.STATE.NULL;
                 }
             },
@@ -83,7 +82,8 @@ var EncryptionFilter = function(megaChat) {
         );
 
 
-        logAllCallsOnObject(megaRoom.encryptionHandler, console.error, true, "mpenc");
+        EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0]);
+
         logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue");
     });
 
@@ -262,6 +262,7 @@ var EncryptionFilter = function(megaChat) {
 
 
     logAllCallsOnObject(this, console.error, true, "encFilter");
+    callLoggerWrapper(window, "getPubEd25519", console.error, "getPubEd25519");
 
     return this;
 };
@@ -729,132 +730,17 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
 };
 
 /**
- * Recursive function that will retry to get the user's ed25519 key and call .processMessage within a try/catch
- * up to 3 times and then will send a .recover request to the room owner
+ * This method will be called when a new message is received.
  *
- * @private
+ * @param e
+ * @param megaRoom
+ * @param wireMessage
  */
-EncryptionFilter.prototype._processMessageRecursive = function(e, megaRoom, wireMessage, contact, retriesCount) {
-
-    var self = this;
-    retriesCount = retriesCount || 0;
-
-
-    if(retriesCount >= 3 && (megaRoom._processMessageFails === undefined || megaRoom._processMessageFails < 3)) {
-        if(megaRoom._processMessageFails === undefined) {
-            megaRoom._processMessageFails = 0;
-        } else {
-            megaRoom._processMessageFails++;
-        }
-
-        if(megaRoom.iAmRoomOwner()) {
-            if(localStorage.d) { console.error("could not process message, will try to .recover, since I'm the room owner."); }
-
-            self.syncRoomUsersWithEncMembers(megaRoom, true);
-        } else {
-            if(localStorage.d) { console.error("could not process message, will try to request .recover from the room owner."); }
-            megaRoom.encryptionHandler.sendError("req-recover");
-        }
-
-        return;
-    } else {
-        retriesCount++;
-    }
-    if(megaRoom._processMessageFails >= 3) {
-        var $dialog = megaRoom.generateInlineDialog(
-            "mpEnc-ui-error",
-            false,
-            "mpenc-error",
-            "Something went wrong with mpENC. Could not initialise encryption, chat is now in stale state.",
-            ['mpEnc-message', 'mpEnc-message-type-error'], {
-                'reject': {
-                    'type': 'secondary',
-                    'text': "Hide",
-                    'callback': function() {
-                        $('.fm-chat-inline-dialog-' + 'mpEnc-ui-error').remove();
-                        megaRoom.refreshScrollUI();
-                    }
-                }
-            }
-        );
-
-        megaRoom.appendDomMessage(
-            $dialog
-        );
-        return;
-    }
-
-    var $promise1 = new $.Deferred();
-    var $promise2 = new $.Deferred();
-
-    var $combPromise = $.when($promise1, $promise2);
-
-    var contact2 = megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(wireMessage.toJid));
-
-    $combPromise
-        .fail(function() {
-            if(localStorage.d) {
-                console.error("Could not process message: ", wireMessage, e);
-            }
-
-            setTimeout(function() {
-                self._processMessageRecursive(e, megaRoom, wireMessage, contact, retriesCount);
-            }, retriesCount * 1234);
-        })
-        .done(function() {
-            megaRoom.encryptionHandler.processMessage(wireMessage);
-        });
-
-    getPubEd25519(contact.u, function(r) {
-        if(r) {
-            try {
-                $promise1.resolve();
-            } catch(e) {
-                if(localStorage.d) {
-                    console.error("Failed to process message", wireMessage, "with error:", e);
-                    if(localStorage.stopOnAssertFail) {
-                        debugger;
-                    }
-                }
-            }
-        } else {
-            $promise1.reject();
-        }
-    });
-    getPubEd25519(contact2.u, function(r) {
-        if(r) {
-            try {
-                $promise2.resolve();
-            } catch(e) {
-                if(localStorage.d) {
-                    console.error("Failed to process message", wireMessage, "with error:", e);
-                    if(localStorage.stopOnAssertFail) {
-                        debugger;
-                    }
-                }
-            }
-        } else {
-            $promise2.reject();
-        }
-    });
-
-    return $combPromise;
-};
-
 EncryptionFilter.prototype.processMessage = function(e, megaRoom, wireMessage) {
     var self = this;
-    var fromBareJid = Karere.getNormalizedBareJid(wireMessage.from);
-    var contact = megaRoom.megaChat.getContactFromJid(fromBareJid);
-    assert(!!contact, 'contact not found.');
-
-    if(localStorage.d) {
-        console.error("Processing: ", wireMessage)
-    }
-
-    var retriesCount = 0;
 
 
-    self._processMessageRecursive(e, megaRoom, wireMessage, contact, retriesCount);
+    megaRoom.encryptionOpQueue.queue("processMessage", wireMessage);
 };
 
 /**
@@ -875,9 +761,40 @@ EncryptionFilter.prototype.messageShouldNotBeEncrypted = function(eventObject) {
     }
 };
 
+/**
+ * Returns true if this message should be queued (currently only depends on the megaRoom's state)
+ *
+ * @param megaRoom
+ * @param messageObject
+ * @returns {boolean}
+ */
 EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject) {
     return (
             megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED
         );
 };
 
+/**
+ * Helper method that will attach debug loggers to a encryption/ProtocolHandler
+ *
+ * @param eh
+ * @param prefix
+ */
+EncryptionFilter.debugEncryptionHandler = function(eh, prefix) {
+    var old = eh.stateUpdatedCallback;
+    eh.stateUpdatedCallback = function(handler) {
+        if(localStorage.d) { console.error("Got mpenc state change: ", handler.state); }
+        return old(handler);
+    };
+
+    logAllCallsOnObject(eh, console.error, true, (prefix ? prefix + ":" : "") + "mpenc");
+    logAllCallsOnObject(eh.askeMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am");
+    logAllCallsOnObject(eh.askeMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:m");
+    logAllCallsOnObject(eh.askeMember.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:spkd");
+    logAllCallsOnObject(eh.cliquesMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm");
+    logAllCallsOnObject(eh.cliquesMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm:m");
+    logAllCallsOnObject(eh.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:spkd");
+    logAllCallsOnObject(eh.uiQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:uiQ");
+    logAllCallsOnObject(eh.protocolOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:poQ");
+    logAllCallsOnObject(eh.messageOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:moQ");
+};

@@ -1012,13 +1012,17 @@ MegaChat.prototype._onChatMessage = function(e, eventObject) {
     if(e.isPropagationStopped()) {
         return;
     }
-    if(localStorage.d) {
-        console.error("MegaChat is now processing incoming message: ", eventObject);
-    }
 
     // ignore empty messages (except attachments)
     if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
+        if(localStorage.d) {
+            console.error("Empty message, MegaChat will not process it: ", eventObject);
+        }
         return;
+    } else {
+        if(localStorage.d) {
+            console.error("MegaChat is now processing incoming message: ", eventObject);
+        }
     }
 
     var room = self.chats[eventObject.getRoomJid()];
@@ -1473,6 +1477,30 @@ MegaChat.prototype.renderContactTree = function() {
             }
         }
     });
+    // update contacts tree
+    $('.content-panel.contacts .nw-contact-item').each(function() {
+        var $node = $(this);
+        var node_id = $node.attr("id");
+        if(!node_id) {
+            return; // continue;
+        }
+
+        var u_h = node_id.replace("contact_", "");
+
+
+        var pres = M.onlineStatusClass(self.karere.getPresence(self.getJidFromNodeId(u_h)))[1];
+        if(pres == 'offline') {
+            $('.start-chat-button', $node).hide();
+        } else {
+            var startChatTxt = megaChat.getPrivateRoom(u_h) === false ? "Start chat" : "Show chat";
+            $('.start-chat-button', $node)
+                .show()
+                .text(
+                    startChatTxt
+                );
+
+        }
+    })
 };
 
 /**
@@ -2912,10 +2940,11 @@ MegaChatRoom.prototype.setState = function(newState, isRecover) {
  *
  * @returns {String}
  */
-MegaChatRoom.prototype.getStateAsText = function() {
+MegaChatRoom.prototype.getStateAsText = function(state) {
     var self = this;
     return MegaChatRoom.stateToText(self.state);
 };
+
 
 /**
  * Return current type of call (if there is active call, if not == false)

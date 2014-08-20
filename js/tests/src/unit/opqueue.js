@@ -52,7 +52,9 @@ describe("OpQueue Unit Test", function() {
         var recoverFailFn = function(ctx) {
             return ctx.shouldValidate;
         };
-        var opQueue = new OpQueue(ctx, validateFn, recoverFailFn);
+
+        var megaRoom = {};
+        var opQueue = new OpQueue(ctx, megaRoom, validateFn, recoverFailFn);
         mockOpQueue(opQueue);
 
         ctx.shouldValidate = true;
@@ -126,6 +128,85 @@ describe("OpQueue Unit Test", function() {
         opQueue.pop();
 
         expect(opQueue.ctx.sampleOp1.callCount).to.eql(3); // called
+
+        done();
+    });
+    it("545 - preparation before processing ops (processMessage)", function(done) {
+        var validateFn = function(opQueue, op) {
+            return opQueue.ctx.shouldValidate;
+        };
+
+        var recoverFailFn = function(ctx) {
+            // do nothing
+        };
+
+        ctx.processMessage = function() {};
+        sinon.spy(ctx, 'processMessage');
+
+
+
+        var megaRoom = {};
+        var opQueue = new OpQueue(ctx, megaRoom, validateFn, recoverFailFn);
+        mockOpQueue(opQueue);
+
+        ctx.shouldValidate = true;
+
+        var mdMocker = new MegaDataMocker();
+
+        megaRoom.megaChat = {
+            'getContactFromJid': MegaChat.prototype.getContactFromJid,
+            'getJidFromNodeId': MegaChat.prototype.getJidFromNodeId,
+            'options': {
+                'xmppDomain': "developers.mega.co.nz"
+            }
+        };
+
+
+        expect(opQueue.ctx.processMessage.callCount).to.eql(0);
+
+        opQueue.queue('processMessage', {
+            'from': megaChat.getJidFromNodeId(Object.keys(M.u)[0]),
+            'toJid': megaChat.getJidFromNodeId(Object.keys(M.u)[1])
+        });
+
+        expect(opQueue.$waitPreprocessing.state()).to.eql("resolved");
+
+        expect(opQueue.ctx.processMessage.callCount).to.eql(1);
+        expect(getPubEd25519.callCount).to.eql(2);
+
+        // -> lets try failing, this should remove the 'processMessage' from the queue.
+
+        getPubEd25519.restore();
+        // lets make getPubEd return error
+        sinon.stub(window, 'getPubEd25519', function(u_h, cb) {
+            cb(false)
+        });
+
+        opQueue.queue('processMessage', {
+            'from': megaChat.getJidFromNodeId(Object.keys(M.u)[0]),
+            'toJid': megaChat.getJidFromNodeId(Object.keys(M.u)[1])
+        });
+
+        expect(opQueue.$waitPreprocessing.state()).to.eql("rejected");
+
+        opQueue.queue('sampleOp1', 'args1');
+        // 'sampleOp1' should NOT be executed, because 'processMessage' had blocked the queue from processing next ops
+        expect(opQueue.ctx.sampleOp1.callCount).to.eql(0);
+        expect(getPubEd25519.callCount).to.eql(4);
+
+        getPubEd25519.restore();
+        // make getPubEd work again
+        sinon.stub(window, 'getPubEd25519', function(u_h, cb) {
+            cb('key')
+        });
+        opQueue.pop();
+
+        expect(opQueue.$waitPreprocessing).to.eql(true);
+
+        expect(getPubEd25519.callCount).to.eql(2);
+        expect(opQueue.ctx.sampleOp1.callCount).to.eql(1);
+
+        mdMocker.restore();
 
         done();
     });

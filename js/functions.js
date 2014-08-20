@@ -1092,7 +1092,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
     ctx[fnName] = function() {
         loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
         var res = origFn.apply(this, toArray(arguments));
-        loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, res]);
+        loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
 
         return res;
     };

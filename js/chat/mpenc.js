@@ -498,6 +498,10 @@ define('mpenc/helper/assert',[], function() {
      */
     ns.assert = function(test, message) {
         if (!test) {
+            if(localStorage.stopOnAssertFail) {
+                console.error(message);
+                debugger;
+            }
             throw new ns.AssertionFailed(message);
         }
     };
@@ -2713,9 +2717,10 @@ define('mpenc/greet/ske',[
         // Kick 'em.
         for (var i = 0; i < excludeMembers.length; i++) {
             var index = this.members.indexOf(excludeMembers[i]);
-            assert(
-                this.authenticatedMembers[index], 'oops! mpenc crashed.'
-            )
+            if(!this.authenticatedMembers[index] && localStorage.d) {
+                console.error("OOops! mpEnc crashed.");
+                debugger;
+            }
             this.oldEphemeralKeys[excludeMembers[i]] = {
                 pub: this.ephemeralPubKeys[index] || null,
                 authenticated: this.authenticatedMembers[index] || false,

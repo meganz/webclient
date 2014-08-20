@@ -831,7 +831,7 @@ function __percent_megatitle()
 }
 
 function hostname(url) {
-	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+	return (url || "http://mega.co.nz").match(/https?:\/\/([^.]+)/)[1];
 }
 
 // Helper to manage time/sizes in a friendly way

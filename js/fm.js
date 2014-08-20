@@ -1120,23 +1120,31 @@ function fmremove()
 	}
 	else if (RootbyId($.selected[0]) == 'contacts')
 	{
-		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+		if (localStorage.skipDelWarning) M.copyNodes($.selected,M.RubbishID,1);
+		else
 		{
-			if (e)
-			{
-				M.copyNodes($.selected,M.RubbishID,1);
-			}
-		});
+			msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+			{				
+				if (e)
+				{
+					M.copyNodes($.selected,M.RubbishID,1);
+				}
+			},true);
+		}
 	}
 	else
 	{
-		msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+		if (localStorage.skipDelWarning) M.moveNodes($.selected,M.RubbishID);
+		else
 		{
-			if (e)
+			msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
 			{
-				M.moveNodes($.selected,M.RubbishID);
-			}
-		});
+				if (e)
+				{
+					M.moveNodes($.selected,M.RubbishID);
+				}
+			},true);
+		}
 	}
 }
 function initContextUI()
@@ -4567,11 +4575,12 @@ function dorename()
 	}
 }
 
-function msgDialog(type,title,msg,submsg,callback)
+function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
 	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
+	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
 	if (type == 'clear-bin')
 	{
@@ -4618,6 +4627,28 @@ function msgDialog(type,title,msg,submsg,callback)
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');
+		
+		if (checkbox)
+		{
+			$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');			
+			$.warningCheckbox=false;
+			$('#msgDialog .confirmation-checkbox').removeClass('hidden');
+			$('#msgDialog .confirmation-checkbox').unbind('click');
+			$('#msgDialog .confirmation-checkbox').bind('click',function(e)
+			{
+				var c = $('#msgDialog .confirmation-checkbox input').attr('class');
+				if (c && c.indexOf('checkboxOff') > -1)
+				{
+					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOff').addClass('checkboxOn');
+					localStorage.skipDelWarning=1;
+				}
+				else
+				{
+					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');
+					delete localStorage.skipDelWarning;
+				}			
+			});			
+		}
 	}
 
 	$('#msgDialog .fm-dialog-title').text(title);

@@ -3148,9 +3148,12 @@ var selectionManager;
 
 function closeDialog()
 {
-	$('.fm-dialog').addClass('hidden');
 	$('.fm-dialog-overlay').addClass('hidden');
+	$('.fm-dialog')
+		.addClass('hidden')
+		.removeClass('arrange-to-back');
 	$('.export-links-warning').addClass('hidden');
+	arrange-to-back
 	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
 	delete $.dialog;
 }
@@ -5010,6 +5013,7 @@ function copyDialog()
 	
 	$('.copy-dialog .dialog-newfolder-button').unbind('click');
 	$('.copy-dialog .dialog-newfolder-button').bind('click', function() {
+		$('.copy-dialog').addClass('arrange-to-back');
 		createfolderDialog();
 	});
 
@@ -5420,6 +5424,7 @@ function createfolderDialog(close)
 	$('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').bind('click',function()
 	{
 		createfolderDialog(1);
+		$('.fm-dialog').removeClass('arrange-to-back');
 		$('.create-folder-dialog input').val(l[157]);
 	});
 	$('.fm-dialog-input-clear').unbind('click');

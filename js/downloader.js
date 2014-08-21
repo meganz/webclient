@@ -150,9 +150,9 @@ ClassChunk.prototype.isCancelled = function() {
 	var is_cancelled = !!this.dl.cancelled;
 	if (!is_cancelled) {
 		if(typeof(this.dl.pos) !== 'number') {
-			this.dl.pos = IdToFile(this.dl).pos
+			this.dl.pos = IdToFile(this.dl.id).pos
 		}
-		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos].n;
+		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos] || !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		if (d) console.log(this + " aborting itself because download was canceled.", this.task.chunk_id);

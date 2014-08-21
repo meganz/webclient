@@ -606,8 +606,14 @@ function DEBUG() {
 }
 
 function ASSERT(what, msg) {
-	if (console.assert) console.assert(what, msg);
-	else if (!what) console.error('FAILED ASSERTION', msg);
+	if (!what)
+	{
+		if (console.assert) console.assert(what, msg);
+		else console.error('FAILED ASSERTION', msg);
+		Soon(function() {
+			throw new Error('FAILED ASSERTION: ' + msg);
+		});
+	}
 }
 
 function oDestroy(obj) {

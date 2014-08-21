@@ -5142,6 +5142,13 @@ table {
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
 	background-position: -14px -7535px;
 }
+.rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.shared-folder {
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -7px -1974px;
+}
+.focused .rename-input-bl .transfer-filtype-icon.folder, .focused .rename-input-bl .transfer-filtype-icon.shared-folder {
+	background-position: -7px -2014px;
+}
 .rubbish-bin .transfer-filtype-icon.folder, .rubbish-bin .search-path-icon-span.folder {
 	background-position: -14px -7595px;
 }
@@ -6238,8 +6245,11 @@ span.search-number {
 	background-position: center -640px;
 }
 .fm-empty-contacts-bg {
-	height: 186px;
-	background-position: center -1168px;
+	height: 207px;
+    background-position: center -1512px;
+}
+.fm-empty-contacts-bg.hovered {
+	background-position: center -1852px;
 }
 .fm-empty-messages-bg {
 	height: 207px;
@@ -6453,7 +6463,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 16px;
 	right: 40px;
 }
-.create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select {
+.create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select, .rename-input-bl {
 	float: left;
 	width: 235px;
 	background-color: rgba(0,0,0,0.05);
@@ -6461,12 +6471,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
+	position:relative;
 }
-.filled-input .create-folder-input-bl, .add-user-popup-input-bl {
+.filled-input .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
 	float: none;
 }
-.create-folder-input-bl input, .fm-account-input input {
+.create-folder-input-bl input, .fm-account-input input, .rename-input-bl input {
 	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -6478,20 +6489,39 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #868686;
 	padding: 6px 10px 2px 34px;
 	margin: 0;
-	background-image: url(http://test/webclient/images/mega/dialogs-sprite.svg);
-	background-position: -1px -1890px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: 0 -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
 	border: 0;
 }
-.focused .create-folder-input-bl, .focused .fm-account-input, .focused .fm-account-select {
+.rename-input-bl input {
+	background-image:none;
+}
+.create-folder-input-bl input::selection, .fm-account-input input::selection, .rename-input-bl input::selection {
+background: rgba(0,0,0,0.3);
+color: white;
+}
+.create-folder-input-bl input::-moz-selection, .fm-account-input input::-moz-selection, .rename-input-bl input::-moz-selection {
+background: rgba(0,0,0,0.3);
+color: white;
+}
+.focused .create-folder-input-bl, .focused .fm-account-input, .focused .fm-account-select, .focused .rename-input-bl {
 	background-color: rgba(0,0,0,0.2);
 }
-.focused .create-folder-input-bl input {
+.focused .create-folder-input-bl input, .focused .rename-input-bl input {
 	color: white;
-	background-position: -1px -1930px;
+	background-position: 0 -1930px;
 }
- .create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
+.rename-input-bl .transfer-filtype-icon {
+	width:24px;
+	position:absolute;
+	left:9px;
+	height:24px;
+	top:4px;
+	background-repeat: no-repeat;
+}
+.create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
  color:rgba(255,255,255,0.5);
 }
 .create-folder-input-bl input:-moz-placeholder, .add-user-popup-input-bl input:-moz-placeholder {
@@ -6532,7 +6562,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 0;
 	cursor: pointer;
 }
-.create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button {
+.create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button {
 	margin-left: 245px;
 	height: 32px;
 	background-color: rgba(109,176,63,0.8);
@@ -6555,18 +6585,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 }
-.create-folder-button:hover, .add-user-popup-button:hover, .fm-dialog-new-folder-button:hover {
+.create-folder-button:hover, .add-user-popup-button:hover, .fm-dialog-new-folder-button:hover, .rename-dialog-button:hover {
 	background-color: rgba(109,176,63,1);
 }
-.create-folder-bottom .create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .add-user-popup-button {
+.create-folder-bottom .create-folder-button, .filled-input.create-folder-bottom .create-folder-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .add-user-popup-button, .rename-dialog-button {
 	float: right;
 	margin: 12px 8px 0 0;
 	display: block;
 }
-.create-folder-button-cancel, .add-user-popup-button-cancel, .add-user-popup-button.cancel {
+.create-folder-button-cancel, .add-user-popup-button-cancel, .add-user-popup-button.cancel, .rename-dialog-button.cancel {
 	background-color: rgba(0,0,0,0.2);
 }
-.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, .add-user-popup-button.cancel:hover {
+.create-folder-button-cancel:hover, .add-user-popup-button-cancel:hover, .add-user-popup-button.cancel:hover, .rename-dialog-button.cancel:hover {
 	background-color: rgba(0,0,0,0.5);
 	color: white;
 }
@@ -7935,6 +7965,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-dialog.rename-dialog, .fm-dialog.add-contact-dialog, .fm-dialog.dlkey-dialog {
 	min-width: 440px;
 	margin: -77px 0 0 -220px;
+}
+.fm-dialog.rename-dialog {
+	min-width: 360px;
+	margin: -77px 0 0 -180px;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
 	width: 480px;

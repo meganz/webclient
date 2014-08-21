@@ -6246,7 +6246,7 @@ span.search-number {
 }
 .fm-empty-contacts-bg {
 	height: 207px;
-    background-position: center -1512px;
+	background-position: center -1512px;
 }
 .fm-empty-contacts-bg.hovered {
 	background-position: center -1852px;
@@ -6471,7 +6471,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
-	position:relative;
+	position: relative;
 }
 .filled-input .create-folder-input-bl, .add-user-popup-input-bl, .rename-input-bl {
 	width: 100%;
@@ -6496,11 +6496,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border: 0;
 }
 .rename-input-bl input {
-	background-image:none;
+	background-image: none;
 }
 .create-folder-input-bl input::selection, .fm-account-input input::selection, .rename-input-bl input::selection {
-background: rgba(0,0,0,0.3);
-color: white;
+	background: rgba(0,0,0,0.3);
+	color: white;
 }
 .create-folder-input-bl input::-moz-selection, .fm-account-input input::-moz-selection, .rename-input-bl input::-moz-selection {
 background: rgba(0,0,0,0.3);
@@ -6514,11 +6514,11 @@ color: white;
 	background-position: 0 -1930px;
 }
 .rename-input-bl .transfer-filtype-icon {
-	width:24px;
-	position:absolute;
-	left:9px;
-	height:24px;
-	top:4px;
+	width: 24px;
+	position: absolute;
+	left: 9px;
+	height: 24px;
+	top: 4px;
 	background-repeat: no-repeat;
 }
 .create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
@@ -7575,6 +7575,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #999999;
 	padding: 15px 33px 2px 33px;
 	text-align: center;
+	min-height: 38px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
 .fm-chat-attach-scrolling, .fm-add-user-scrolling {
 	height: 100%;
@@ -7973,6 +7981,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
 	width: 480px;
 	margin: -200px 0 0 -240px;
+}
+.fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
+	z-index: 900;
 }
 .fm-dialog.download-dialog {
 	width: 504px;
@@ -17659,7 +17670,7 @@ ul.token-input-list-mega {
 	border-radius: 5px;
 	background-color: rgba(0,0,0,0.05);
 	max-height: 144px;
-	min-height:32px;
+	min-height: 32px;
 }
 .multiple-input-warning {
 	height: 32px;
@@ -17688,7 +17699,7 @@ ul.token-input-list-mega {
 	right: -14px;
 	width: 20px;
 }
-ul.token-input-list-mega li input, .multiple-input input  {
+ul.token-input-list-mega li input, .multiple-input input {
 	border: 0;
 	width: 100px;
 	padding: 0;

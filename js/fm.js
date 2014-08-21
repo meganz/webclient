@@ -3153,7 +3153,6 @@ function closeDialog()
 		.addClass('hidden')
 		.removeClass('arrange-to-back');
 	$('.export-links-warning').addClass('hidden');
-	arrange-to-back
 	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
 	delete $.dialog;
 }
@@ -4937,7 +4936,7 @@ function shareDialog(close)
 function copyDialog()
 {
 	$.dialogPositioning = function() {
-		$('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
+		$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
 	}
     $.copyDialogScroll = function() {
 		$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
@@ -4945,7 +4944,7 @@ function copyDialog()
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
-		delete $.dialog;// taken from keypressed, code 27
+		delete $.dialog;
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').addClass('hidden');

@@ -1816,7 +1816,7 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
-		if (!bl || !ul_queue[id]['starttime']) return false;
+		if (!bl || !ul_queue[id] || !ul_queue[id]['starttime']) return false;
 		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};

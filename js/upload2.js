@@ -97,18 +97,18 @@ function ul_Identical(target, path, hash,size)
 	var p = path.split('/');	
 	var n = M.d[target];
 	for (var i in p)
-	{		
+	{
+		if (!n) return false;
 		var foldername = p[i];
-		var h = n.h;		
-		if (!n) return false;		
-		var n = false;		
+		var h = n.h;
+		n = false;
 		for (var j in M.c[h])
 		{
 			if (M.d[j] && M.d[j].name == foldername)
 			{
 				if (M.d[j].t) n = M.d[j];
 				else if (p.length == parseInt(i)+1 && (hash == M.d[j].hash || size == M.d[j].s)) return M.d[j];
-			}			
+			}
 		}
 	}
 	return false;
@@ -750,15 +750,20 @@ function ul_filereader(fs, file) {
 		var end = task.start+task.end
 			, blob
 		if (file.slice || file.mozSlice) {
-			if (file.mozSlice) blob = file.mozSlice(task.start, end);
-			else blob = file.slice(task.start, end);
+			if (file.slice) blob = file.slice(task.start, end);
+			else blob = file.mozSlice(task.start, end);
 			xhr_supports_typed_arrays = true;
 		} else {
 			blob = file.webkitSlice(task.start, end);
 		}
 
 		fs.pos = task.start;
-		fs.readAsArrayBuffer(blob);
+		try {
+			fs.readAsArrayBuffer(blob);
+		} catch(e) {
+			console.error(e);
+			done(e);
+		}
 		fs.onerror = function(evt) {
 			done(new Error(evt))
 		}
@@ -777,7 +782,7 @@ function worker_uploader(task, done) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'integer', { min: 1, max:6}) || 4
+	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 })
 	, Encrypter
 	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0

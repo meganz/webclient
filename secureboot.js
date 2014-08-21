@@ -386,13 +386,19 @@ else
 			{
 				if (__cdumps.length > 8) return false;
 
-				var dump = { m : msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
+				var dump = { m : '' + msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
 
 				if (errobj)
 				{
 					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
 				}
 				if (cn) dump.c = cn;
+
+				if (ln == 0 && !dump.s)
+				{
+					if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
+					else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
+				}
 
 				try
 				{

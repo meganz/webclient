@@ -414,7 +414,7 @@ function initUI()
 		}
 	});	
 	$('.fm-right-header').removeClass('hidden');
-	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text(M.d[M.RootID].name);
+	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text((M.d[M.RootID]||{}).name||"\u30C4");
 	else folderlink=0;	
 	$('.add-user-popup-button').unbind('click');
 	$('.add-user-popup-button').bind('click',function(e)

@@ -81,13 +81,26 @@ function asciionly(text)
 }
 
 function Later(callback) {
-	setTimeout(callback, 1000);
+	return setTimeout(callback, 1000);
 }
 
 var Soon = is_chrome_firefox ? mozRunAsync : function(callback)
 {
-	setTimeout(callback, 0);
+	setTimeout(callback, 17);
 };
+
+function SoonFc(func, ms)
+{
+	return function __soonfc()
+	{
+		var self = this, args = arguments;
+		if (func.__sfc) clearTimeout(func.__sfc);
+		func.__sfc = setTimeout(function() {
+			delete func.__sfc;
+			func.apply(self, args);
+		}, ms || 122);
+	};
+}
 
 function jScrollFade(id)
 {
@@ -658,7 +671,7 @@ function setTransferStatus( dl, status, ethrow, lock) {
 
 function dlFatalError(dl, error, ethrow) {
 	var m = 'This issue should be resolved ';
-	if ($.browser.chrome)
+	if (navigator.webkitGetUserMedia)
 	{
 		m += 'exiting from Incognito mode.';
 	}
@@ -968,4 +981,128 @@ function bucketspeedometer(initialp)
 			return p > 0 ? p : 0;
 		}
 	}
+}
+
+function moveCursortoToEnd(el)
+{
+    if (typeof el.selectionStart == "number")
+	{
+        el.selectionStart = el.selectionEnd = el.value.length;
+    }
+	else if (typeof el.createTextRange != "undefined")
+	{
+        el.focus();
+        var range = el.createTextRange();
+        range.collapse(false);
+        range.select();
+    }
+}
+
+String.prototype.replaceAll = function(_f, _r, _c)
+{
+  var o = this.toString();
+  var r = '';
+  var s = o;
+  var b = 0;
+  var e = -1;
+  if(_c){ _f = _f.toLowerCase(); s = o.toLowerCase(); }
+
+  while((e=s.indexOf(_f)) > -1)
+  {
+    r += o.substring(b, b+e) + _r;
+    s = s.substring(e+_f.length, s.length);
+    b += e+_f.length;
+  }
+
+  // Add Leftover
+  if(s.length>0){ r+=o.substring(o.length-s.length, o.length); }
+
+  // Return New String
+  return r;
+};
+
+// Returns pixels position of element relative to document (top left corner)
+function getHtmlElemPos(elem, n)
+{
+    var xPos = 0;
+    var yPos = 0;
+    var sl,st, cl, ct;
+    var pNode;
+    while (elem)
+    {
+        pNode = elem.parentNode;
+        sl = 0;
+        st = 0;
+		cl = 0;
+		ct = 0;
+        if (pNode && pNode.tagName && !/html|body/i.test(pNode.tagName))
+        {
+			if (typeof n === 'undefined')// count this in, except for overflow huge menu
+			{
+				sl = elem.scrollLeft;
+				st = elem.scrollTop;
+			}
+			cl = elem.clientLeft;
+			ct = elem.clientTop;
+			xPos += (elem.offsetLeft - sl + cl);
+			yPos += (elem.offsetTop - st - ct);
+        }
+        elem = elem.offsetParent;
+    }
+    return {x: xPos, y: yPos};
+}
+
+function disableDescendantFolders(id)
+{
+	var folders = [];
+	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
+	
+	for (var i in folders)
+	{
+		var sub = false;
+		var fid = folders[i].h;
+
+		for (var h in M.c[fid])
+		{
+			if (M.d[h].t)
+			{
+				sub = true;
+				break;
+			}
+		}
+		$('#fi_' + fid).addClass('disabled');
+		if (sub) this.disableDescendantFolders(fid);
+	}
+
+	return true;
+}
+
+function ucfirst(str) {
+	//  discuss at: http://phpjs.org/functions/ucfirst/
+	// original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// bugfixed by: Onno Marsman
+	// improved by: Brett Zamir (http://brett-zamir.me)
+	//   example 1: ucfirst('kevin van zonneveld');
+	//   returns 1: 'Kevin van zonneveld'
+
+	str += '';
+	var f = str.charAt(0)
+		.toUpperCase();
+	return f + str.substr(1);
+}
+
+function readLocalStorage(name, type, val)
+{
+	if (!localStorage[name]) return false;
+	var f = 'parse' + ucfirst(type[0])
+		, v = localStorage[name];
+
+	if (typeof f == "callback") {
+		v =  window[f](v);
+	}
+
+	if (val && val.min && val.min > v)  return false;
+	if (val && val.max && val.max < v)  return false;
+
+	return v;
 }

@@ -1,5 +1,4 @@
-function UploadQueue() {
-}
+function UploadQueue() {}
 inherits(UploadQueue, Array);
 
 /* Helper functions {{{ */
@@ -41,14 +40,16 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		onUploadSuccess(ul_queue[ctx.ul_queue_num].id);
 		ul_queue[ctx.ul_queue_num] = {}
-		onUploadSuccess(ctx.ul_queue_num);
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
-	oDestroy(ctx.file);
+	if (ctx.file.mFiU) ctx.file.mFiU.destroy();
+	else oDestroy(ctx.file);
 	oDestroy(ctx);
+	Later(resetUploadDownload);
 }
 
 function ul_deduplicate(File, identical) {
@@ -73,7 +74,7 @@ function ul_deduplicate(File, identical) {
 			} else if (typeof res == 'number' || res.e) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
-				onUploadSuccess(uq.pos);
+				onUploadSuccess(uq.id);
 				File.file.ul_failed = false;
 				File.file.retries   = 0;
 				File.file.done_starting();
@@ -180,33 +181,55 @@ function network_error_check() {
 	});
 }
 
-var UploadManager = new function() {
-	var self = this;
+var UploadManager =
+{
+	GetGID : function UM_GetGID(ul)
+	{
+		return 'ul_' + ul.id;
+	},
 
-	self.abort = function(file) {
-		DEBUG("abort()", file.name, file.id);
-		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task[0].file != file;
-		});
+	abort : function UM_abort(gid)
+	{
+		if (gid === null || Array.isArray(gid)) // all || grp
+		{
+			this._multiAbort = 1;
 
-		file.abort = true;
+			if (gid) gid.forEach(this.abort.bind(this));
+			else ul_queue.filter(isQueueActive).forEach(this.abort.bind(this));
 
-		$('#ul_' + file.id).remove();
-		ul_queue[file.pos] = {};
-	}
+			delete this._multiAbort;
+			Soon(resetUploadDownload);
+		}
+		else
+		{
+			if (typeof gid === 'object') gid = this.GetGID(gid);
+			else if (gid[0] !== 'u') return;
 
-	self.abortAll = function() {
-		DEBUG("abortAll()");
-		panelDomQueue = [];
-		ulQueue._queue = [];
-		$.each(ul_queue, function(i, file) {
-			$('#ul_' + file.id).remove();
-			file.abort = true;
-			ul_queue[file.pos] = {};
-		});
-	}
+			var l = ul_queue.length, FUs = [];
+			while (l--)
+			{
+				var ul = ul_queue[l];
 
-	self.restart = function(file) {
+				if (gid === this.GetGID(ul))
+				{
+					if (d) console.log('Aborting ' + gid, ul.name);
+
+					ul.abort = true;
+					FUs.push(ul.mFiU);
+					ul_queue[l] = Object.freeze({});
+				}
+			}
+
+			ulQueue.pause(gid);
+			ulQueue.filter(gid);
+			if (!this._multiAbort) Soon(resetUploadDownload);
+			$('#' + gid).fadeOut('slow', function() { $(this).remove() });
+			FUs.map(function(o) { if (o) o.destroy() });
+		}
+	},
+
+	restart : function UM_restart(file)
+	{
 		file.retries  = 0;
 		file.sent     = 0;
 		file.progress = {};
@@ -221,13 +244,14 @@ var UploadManager = new function() {
 		file.abort = true;
 
 		ERRDEBUG("fatal error restarting", file.name)
-		onUploadError(file.pos, "Upload failed - restarting upload");
+		onUploadError(file.id, "Upload failed - restarting upload");
 
 		// reschedule
 		ulQueue.pushFirst(new FileUpload(file));
-	};
+	},
 
-	self.retry = function(file, chunk, reason) {
+	retry : function UM_retry(file, chunk, reason)
+	{
 		file.ul_failed = true;
 		api_reportfailure(hostname(file.posturl), network_error_check);
 
@@ -237,10 +261,11 @@ var UploadManager = new function() {
 		ulQueue.pushFirst(newTask);
 
 		ERRDEBUG("retrying chunk because of", reason + "")
-		onUploadError(file.pos, "Upload failed - retrying");
-	};
+		onUploadError(file.id, "Upload failed - retrying");
+	},
 
-	self.isReady = function(Task) {
+	isReady : function UM_isReady(Task)
+	{
 		return !Task.file.paused || Task.__retry;
 	}
 
@@ -288,6 +313,7 @@ function ul_upload(File) {
 	file.ul_aes = new sjcl.cipher.aes([
 		file.ul_key[0],file.ul_key[1],file.ul_key[2],file.ul_key[3]
 	]);
+	file.mFiU = File;
 
 	if (file.size) {
 		var pp, p = 0, tasks = {}
@@ -318,7 +344,7 @@ function ul_upload(File) {
 		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
-	onUploadStart(file.pos);
+	onUploadStart(file.id);
 	file.done_starting();
 }
 
@@ -369,11 +395,25 @@ function ChunkUpload(file, start, end)
 	this.file = file;
 	this.ul   = file;
 	this.start = start;
-	this.end	= end;
+	this.end   = end;
+	this.gid   = file.mFiU.gid;
+	this.xid   = this.gid + '_' + start + '-' + end;
+	this[this.gid] = !0;
+	if (d) console.log('Creating ' + this);
 }
 
+ChunkUpload.prototype.toString = function() {
+	return "[ChunkUpload " + this.xid + "]";
+};
+
+ChunkUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	this.abort();
+	oDestroy(this);
+};
+
 ChunkUpload.prototype.updateprogress = function() {
-	if (this.file.complete || ui_paused) return;
+	if (this.file.paused || this.file.complete || ui_paused) return;
 
 	var tp = this.file.sent || 0, p=this.file.progress;
 	for (var i in p) tp += p[i];
@@ -384,29 +424,30 @@ ChunkUpload.prototype.updateprogress = function() {
 	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
-		this.file.pos, 
+		this.file.id,
 		Math.floor(tp/this.file.size*100),
 		tp, 
 		this.file.size,
-		this.file.speedometer ? this.file.speedometer.progress(tp) : 0  // speed
+		GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
 	);
 	
 	if (tp == this.file.size) this.file.complete = true;
 };
 
+ChunkUpload.prototype.abort = function() {
+	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
+	removeValue(GlobalProgress[this.gid].working, this, 1);
+	delete this.xhr;
+};
+
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
-	if (this.file.abort) {
-		xhr.abort()
-		return this.done();
-	}
+	if (!this.file || this.file.abort) return this.done();
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
 };
 
 ChunkUpload.prototype.on_error = function(args, xhr, reason) {
-	if (this.file.abort) {
-		return this.done();
-	}
+	if (!this.file || this.file.abort) return this.done();
 	this.file.progress[this.start] = 0;
 	this.updateprogress();
 	if (args == EKEY) {
@@ -453,10 +494,10 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 					this.file.filekey       = filekey
 					this.file.response      = base64urlencode(response)
 					ul_finalize(this.file);
-					//api_completeupload(response, ul_queue[file.pos], filekey,ctx);
+					//api_completeupload(response, ul_queue[file.id], filekey,ctx);
 				} else {
 					this.file.completion.push([
-						response.url, this.file, filekey, this.file.pos
+						response.url, this.file, filekey, this.file.id
 					]);
 				}
 			}
@@ -503,11 +544,13 @@ ChunkUpload.prototype.upload = function() {
 		xhr.open('POST', this.file.posturl+this.suffix);
 		xhr.send(this.bytes.buffer);
 	}
+
+	this.xhr = xhr;
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0]) {
-		ERRDEBUG("IO error");
+		if (d) console.error('UL IO Error');
 		this.file.done_starting();
 		return UploadManager.retry(this.file, this, "IO failed: " + args[0])
 	}
@@ -521,26 +564,46 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	this.bytes = null;
 };
 
-ChunkUpload.prototype.done = function() {
-	DEBUG("release", this.start);
-	
+ChunkUpload.prototype.done = function(ee) {
+	if (d) console.log(this + '.done');
+
 	/* release worker */
 	this._done();
 
 	/* clean up references */
-	oDestroy(this);
+	this.destroy();
 };
 
 ChunkUpload.prototype.run = function(done) {
 	this._done = done;
 	this.file.ul_reader.push(this, this.io_ready, this);
+	GlobalProgress[this.gid].working.push(this);
 };
 
 
 function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
+	this.gid  = 'ul_'+this.ul.id;
+	this[this.gid] = !0;
+	GlobalProgress[this.gid] = {working:[]};
 }
+
+FileUpload.prototype.toString = function() {
+	return "[FileUpload " + this.gid + "]";
+};
+
+FileUpload.prototype.destroy = function() {
+	if (d) console.log('Destroying ' + this);
+	ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+	delete GlobalProgress[this.gid];
+	if (is_chrome_firefox && this.file._close)
+	{
+		this.file._close();
+	}
+	oDestroy(this.file);
+	oDestroy(this);
+};
 
 FileUpload.prototype.run = function(done) {
 	var file = this.file
@@ -558,7 +621,11 @@ FileUpload.prototype.run = function(done) {
 		return ulQueue.pushFirst(this);
 	}
 
-	DEBUG(file.name, "starting upload", file.id)
+	if (!GlobalProgress[this.gid].started) {
+		GlobalProgress[this.gid].started = true;
+	}
+
+	if (d) console.log(file.name, "starting upload", file.id)
 
 	start_uploading = true;
 
@@ -617,7 +684,7 @@ var Mkdir = Parallel(function(args, next) {
 });
 
 function ul_cancel() {
-	UploadManager.abortAll();
+	UploadManager.abort(null);
 }
 
 function ul_finalize(file) {
@@ -636,8 +703,7 @@ function ul_finalize(file) {
 		dirs.pop();
 	}
 
-	if (!file.filekey) throw new Error("filekey is missing")
-
+	ASSERT(file.filekey, "*** filekey is missing ***");
 
 	Cascade(dirs, Mkdir, function(dir) {
 		var body  = { n: file.name }
@@ -711,9 +777,9 @@ function worker_uploader(task, done) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = 4
+	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'integer', { min: 1, max:6}) || 4
 	, Encrypter
-	, ulQueue = new MegaQueue(worker_uploader, ul_maxSlots)
+	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0
@@ -740,11 +806,21 @@ function isQueueActive(q) {
 	return typeof q.id !== 'undefined';
 }
 function resetUploadDownload() {
-	if (!ul_queue.some(isQueueActive)) ul_queue = new UploadQueue();
-	if (!dl_queue.some(isQueueActive)) dl_queue = new DownloadQueue();
+	if (!ul_queue.some(isQueueActive)) {
+		ul_queue = new UploadQueue();
+		ul_uploading = false;
+	}
+	if (!dl_queue.some(isQueueActive)) {
+		dl_queue = new DownloadQueue();
+		downloading = false;
+	}
 
-	if (dl_queue.length == 0 && ul_queue.length == 0) {
+	if (!downloading && !ul_uploading)
+	{
 		clearXhr(); /* destroy all xhr */
+		panelDomQueue = [];
+		GlobalProgress = {};
+		delete $.transferprogress;
 		$.transferClose(); /* in case it isn't closed already.. */
 	}
 
@@ -755,25 +831,6 @@ function resetUploadDownload() {
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
 
-// ul_uploading variable {{{
-ulQueue.on('working', function() {
-	ul_uploading = true;
-});
-
-ulQueue.on('resume', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = false;
-});
-
-ulQueue.on('pause', function() {
-	ul_uploading = !ulQueue.isEmpty();
-	uldl_hold = true;
-});
-
-ulQueue.on('drain', function() {
-	ul_uploading = !ulQueue.isEmpty();
-});
-// }}}
 
 ulQueue.validateTask = function(pzTask) {
 	if (pzTask instanceof ChunkUpload && (!pzTask.file.paused || pzTask.__retry)) {

@@ -925,41 +925,17 @@ function initContextUI()
 	$(c+'.canceltransfer-item').unbind('click');
 	$(c+'.canceltransfer-item').bind('click',function(event) 
 	{			
-		$.zipkill={};
+		var toabort = {};
 		$('.transfer-table tr.ui-selected').not('.clone-of-header').each(function(j,el)
 		{
-			var id = $(el).attr('id');
-			if (id && (id.indexOf('dl_') > -1 || id.indexOf('zip_') > -1))
-			{
-				id = id.replace('dl_','').replace('zip_','');
-
-				$.each(dl_queue, function(i, queue) {
-					if (queue.id == id || queue.zipid == id) {
-						if (queue.zipid) $.zipkill[queue.zipid] = 1;
-						else DownloadManager.abort({ id: queue.dl_id });
-					}
-				});
-			}
-			else if (id && id.indexOf('ul_') > -1)
-			{				
-				for (var i in ul_queue)
-				{
-					if (ul_queue[i])
-					{					
-						if (ul_queue[i].id == id.replace('ul_',''))
-						{
-							UploadManager.abort(ul_queue[i]);
-						}
-					}
-				}	
-			}
+			toabort[$(el).attr('id')] = 1;
 			$(this).remove();
 		});
 
-		$.each($.zipkill, function(i) {
-			DownloadManager.abort({ zipid: i });
-		});
-		delete $.zipkill;
+		toabort = Object.keys(toabort);
+		DownloadManager.abort(toabort);
+		  UploadManager.abort(toabort);
+
 		Soon(function() {
 			// XXX: better way to stretch the scrollbar?
 			$(window).trigger('resize');
@@ -1455,12 +1431,14 @@ function accountUI()
 			if (M.account.dl_maxSlots) 
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
-				dl_maxSlots = M.account.dl_maxSlots;			
-			}			
-			if (M.account.ul_maxSlots) 
+				dl_maxSlots = M.account.dl_maxSlots;
+				dlQueue.setSize(dl_maxSlots);
+			}
+			if (M.account.ul_maxSlots)
 			{
 				localStorage.ul_maxSlots = M.account.ul_maxSlots;
-				ul_maxSlots = M.account.ul_maxSlots;			
+				ul_maxSlots = M.account.ul_maxSlots;
+				ulQueue.setSize(ul_maxSlots);
 			}
 			if (typeof M.account.ul_maxSpeed !== 'undefined') 
 			{
@@ -2238,7 +2216,8 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).bind('hashchange', function() {
+    $(window).unbind('hashchange.quickfinder');
+    $(window).bind('hashchange.quickfinder', function() {
         if(self.is_active()) {
             self.deactivate();
         }
@@ -5123,7 +5102,7 @@ function slideshow(id,close)
 			{
 				if (dl_queue[i].preview)
 				{
-					DownloadManager.abort({id: id});
+					DownloadManager.abort(dl_queue[i]);
 				}
 				break;
 			}

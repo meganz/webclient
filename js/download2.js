@@ -1,10 +1,9 @@
 var dlMethod
-	, dl_maxSlots = 4
+	, dl_maxSlots = readLocalStorage('dl_maxSlots', 'integer', {min:1, max:6}) || 5
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
-	, dlQueue = new MegaQueue(downloader)
-	, preparing_download
 	, ui_paused = false
+	, dlQueue = new TransferQueue(downloader, dl_maxSlots)
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
@@ -12,45 +11,21 @@ $.len = function(obj) {
 };
 
 function dl_cancel() {
-	DownloadManager.abortAll();
+	DownloadManager.abort(null);
 }
 
 /**
- *	Global object which can be used to pause/resume
+ *	Global object which can be used to abort
  *	a given file (and their chunks/files)
  */
-var DownloadManager = new function() {
-	var locks = [], removed = [];
+var DownloadManager =
+{
+	newUrl : function DM_newUrl(dl)
+	{
+		if (d) console.log("ask for new URL for", dl.dl_id);
 
-	function s2o(s) {
-		if (typeof s == "string") {
-			var parts = s.split(":");
-			s = {};
-			s[parts[0]] = parts[1];
-		}
-		return s;
-	}
-
-	function doesMatch(task, pattern) {
-		pattern = s2o(pattern);
-		for (var key in pattern) {
-			if (typeof task.task !== 'object' || typeof task.task[key] == "undefined" || task.task[key] != pattern[key])
-				return false;
-		}
-		return true;
-		// var _match = true;
-		// $.each(s2o(pattern), function(key, value) {
-			// if (typeof task.task[key] == "undefined" || task.task[key] != value) {
-				// _match = false;
-				// return false;
-			// }
-		// });
-		// return _match;
-	}
-
-	this.newUrl = function(dl) {
-		DEBUG("ask for new URL for", dl.dl_id);
-		dlGetUrl(dl, function (error, res, o) {
+		dlGetUrl(dl, function (error, res, o)
+		{
 			if (error) return this.newUrl(dl);
 			var changed = 0
 			for (var i = 0; i < dlQueue._queue.length; i++) {
@@ -62,170 +37,106 @@ var DownloadManager = new function() {
 			}
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
 		}.bind(this));
-	}
+	},
 
-	this.debug = function() {
-		DEBUG("blocked patterns", locks, removed);
-	};
+	cleanupUI : function DM_cleanupUI(gid)
+	{
+		if (typeof gid === 'object') gid = this.GetGID(gid);
 
-	this.cleanupUI = function(dl, force) {
-		var selector = null
-		if (dl.zipid) {
-			$.each(dl_queue, function(i, file) {
-				if (file.zipid == dl.zipid) {
-					dl_queue[i] = {}; /* remove it */
-				}
-			});
-			selector = '#zip_' + dl.zipid;
-		} else {
-			if(typeof dl.pos !== 'undefined') {
-				dl_queue[dl.pos] = {}; /* remove it */
-			} else {
-				$.each(dl_queue, function(i, file) {
-					if (file.id == dl.id) {
-						dl_queue[i] = {}; /* remove it */
-					}
-				});
-			}
-			selector = '#dl_' + dl.id;
-		}
-		if (dlMethod != FlashIO || force) {
-			$(selector).fadeOut('slow', function() {
-				$(this).remove();
-			});
-		}
-		if (dl.io instanceof MemoryIO) {
-			dl.io.abort();
-		}
-		dl = null;
-	}
-
-	this.abortAll = function() {
-		for(var i in dl_queue) {
-			var file = dl_queue[i];
-			if (file.id || file.zipid) {
-				this.abort(file);
-			}
-		}
-		Soon(percent_megatitle);
-	}
-
-	this.abort = function(pattern, dontCleanUI) {
-		var _pattern = s2o(pattern);
-		var i, dl;
-
-		for (i=0; i < dl_queue.length; i++) {
-			dl = dl_queue[i];
-			if (doesMatch({task:dl}, _pattern)) {
-				if (!dl.cancelled && typeof dl.io.abort == "function") try {
-					if (d) console.log('IO.abort', dl.zipid || dl.id, dl);
-					dl.io.abort("User cancelled");
-				} catch(e) {
-					DEBUG(e.message, e);
-				}
-				if (dl.zipid) Zips[dl.zipid].cancelled = true;
-				dl.cancelled = true;
-				/* do not break the loop, it may be a multi-files zip */
-			}
-		}
-		if (typeof pattern == "object" && !dontCleanUI) {
-			this.cleanupUI(pattern);
-		}
-
-		this.remove(_pattern);
-		Soon(percent_megatitle);
-	}
-
-	this.remove = function(pattern, check) {
-		pattern = s2o(pattern);
-		var tid = task2id(pattern);
-		this.release(tid);
-		removed.push(tid);
-		dlQueue.filter(pattern);
-		// dlQueue._queue = $.grep(dlQueue._queue, function(obj) {
-			// var match = doesMatch(obj[0], pattern);
-			// if (match) {
-				// if (check) check(obj[0]);
-				// if (d) console.log("remove task", pattern, obj[0].xid || obj[0].gid);
-				// if (obj[0].destroy) obj[0].destroy();
-			// }
-			// return !match;
-		// });
-	};
-
-	this.isRemoved = function(task) {
-		if (!task.dl) {
-			return true;
-		}
-		for (var i in removed) {
-			if (doesMatch(task, removed[i]))
-				return true;
-		}
-		return false;
-	}
-
-	this.pause = function(work) {
-		var pattern = task2id(work)
-		DEBUG("PAUSED ", pattern);
-
-		if ($.inArray(pattern, locks) == -1) {
-			// we want to save locks once
-			locks.push(pattern);
-		}
-
-		work.__canretry = true;
-		work.__ondone   = function() {
-			work.__ondone = function() {
-				DEBUG("here __ondone()->->");
-				DownloadManager.release(pattern);
-			};
-		};
-	}
-
-	function isDLObject(obj) {
-		return typeof obj === 'object' && typeof obj.onDownloadStart === 'function';
-	}
-
-	function task2id(pattern) {
-		var obj;
-
-		if (pattern instanceof ClassFile || pattern instanceof ClassChunk) obj = pattern.task;
-		else if (isDLObject(pattern)) obj = pattern;
-
-		if (obj) {
-			if (typeof obj.zipid == "number") {
-				pattern = 'zipid:' + obj.zipid;
-			} else {
-				pattern = 'id:' + obj.id;
-			}
-		}
-		return pattern;
-	}
-
-	this.release = function(pattern) {
-		var pattern = task2id(pattern)
-		DEBUG("RELEASE LOCK TO ", pattern);
-		removeValue(locks, pattern, true);
-		if (!removeValue(removed, pattern, true))
+		var l = dl_queue.length;
+		while (l--)
 		{
-			pattern = s2o(pattern);
-			for (var i in removed)
+			var dl = dl_queue[l];
+
+			if (gid === this.GetGID(dl))
 			{
-				if (typeof removed[i] === 'object')
+				if (d) console.log('cleanupUI', gid, dl.n, dl.zipname);
+
+				if (dl.io instanceof MemoryIO)
 				{
-					for (var k in pattern)
+					dl.io.abort();
+				}
+				// oDestroy(dl.io);
+				dl_queue[l] = Object.freeze({});
+			}
+		}
+
+		if (dlMethod !== FlashIO) $('#' + gid).fadeOut('slow', function() { $(this).remove() });
+	},
+
+	GetGID : function DM_GetGID(dl)
+	{
+		return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+	},
+
+	abort : function DM_abort(gid, keepUI)
+	{
+		if (gid === null || Array.isArray(gid)) // all || grp
+		{
+			this._multiAbort = 1;
+
+			if (gid) gid.forEach(this.abort.bind(this));
+			else dl_queue.filter(isQueueActive).forEach(this.abort.bind(this));
+
+			delete this._multiAbort;
+			Soon(resetUploadDownload);
+		}
+		else
+		{
+			if (typeof gid === 'object') gid = this.GetGID(gid);
+			else if (gid[0] === 'u') return;
+
+			var l = dl_queue.length;
+			while (l--)
+			{
+				var dl = dl_queue[l];
+
+				if (gid === this.GetGID(dl))
+				{
+					if (!dl.cancelled) try
 					{
-						if (pattern[k] === removed[i][k])
+						if (typeof dl.io.abort === "function")
 						{
-							removed.splice(i, 1);
-							break;
+							if (d) console.log('IO.abort', gid, dl);
+							dl.io.abort("User cancelled");
 						}
+					} catch(e) {
+						console.error(e);
+					}
+					dl.cancelled = true;
+					if (dl.zipid) Zips[dl.zipid].cancelled = true;
+					if (dl.io && typeof dl.io.begin === 'function')
+					{
+						/**
+						 * Canceled while Initializing? Let's free up stuff
+						 * and notify the scheduler for the running task
+						 */
+						dl.io.begin();
 					}
 				}
 			}
+			if (!keepUI) this.cleanupUI(gid);
+
+			/**
+			 * We rely on `dl.cancelled` to let chunks destroy himself.
+			 * However, if the dl is paused we might end up with the
+			 + ClassFile.destroy uncalled, which will be leaking.
+			 */
+			var foreach;
+			if (dlQueue._qpaused[gid])
+			{
+				foreach = function(task)
+				{
+					task = task[0];
+					return task instanceof ClassChunk && task.isCancelled() || task.destroy();
+				};
+			}
+
+			dlQueue.filter(gid, foreach);
+			if (!this._multiAbort) Soon(resetUploadDownload);
 		}
 	}
-}
+};
 
 var ioThrottlePaused = false;
 
@@ -247,39 +158,167 @@ function throttleByIO(writer) {
 	});
 }
 
-// downloading variable {{{
-dlQueue.on('working', function() {
-	downloading = true;
-});
+// TODO: move the next functions to fm.js when no possible conflicts
+function fm_tfsorderupd()
+{
+	M.t = {};
+	$('.transfer-table tr[id]').each(function(pos,node)
+	{
+		if (d) ASSERT(-1 != ['ul','dl','zip'].indexOf((''+node.id).split('_').shift()), 'Huh, unexpected node id: ' + node.id);
 
-dlQueue.on('resume', function() {
-	downloading =!dlQueue.isEmpty();
-});
+		M.t[pos] = node.id;
+		M.t[node.id] = pos;
+	});
+	if (d) console.log('M.t', M.t);
+}
 
-dlQueue.on('pause', function() {
-	downloading =!dlQueue.isEmpty();
-});
+function fm_tfspause(gid)
+{
+	if (gid[0] === 'u') ulQueue.pause(gid);
+	else dlQueue.pause(gid);
+}
 
-dlQueue.on('drain', function() {
-	downloading =!dlQueue.isEmpty();
-});
-// }}}
+function fm_tfsresume(gid)
+{
+	if (gid[0] === 'u') ulQueue.resume(gid);
+	else dlQueue.resume(gid);
+}
 
-// chunk scheduler {{{
-dlQueue.prepareNextTask = function() {
-	this.has_chunk = false;
-	for (var i = 0; i < this._queue.length; i++) {
-		if (this._queue[i][0] instanceof ClassChunk) {
-			this.has_chunk = true;
+function fm_tfsmove(gid, dir) // -1:up, 1:down
+{
+	var tfs = $('#' + gid), to, act, p1, p2;
+	ASSERT(tfs.length === 1,'Invalid transfer node: ' + gid);
+	if (tfs.length != 1) return;
+
+	ASSERT(GlobalProgress[gid] && GlobalProgress[gid].working.length == 0,'Invalid transfer state: ' + gid);
+	if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) return;
+
+	if (~dir)
+	{
+		to  = tfs.next();
+		act = 'after';
+	}
+	else
+	{
+		to  = tfs.prev();
+		act = 'before';
+	}
+
+	var id = to && to.attr('id') || 'x';
+
+	ASSERT(GlobalProgress[id] && GlobalProgress[id].working.length == 0,'Invalid [to] transfer state: ' + gid);
+	if (!GlobalProgress[id] || GlobalProgress[id].working.length) return;
+
+	if (id[0] == gid[0] || "zdz".indexOf(id[0]+gid[0]) != -1)
+	{
+		to[act](tfs);
+	}
+	else
+	{
+		if (d) console.log('Unable to move ' + gid);
+		return;
+	}
+
+	fm_tfsorderupd();
+
+	if (gid[0] === 'z' || id[0] === 'z')
+	{
+		var mQueue = [], trick = Object.keys(M.t).map(Number)
+			.filter(function(n) {
+				return !isNaN(n) && M.t[n][0] != 'u';
+			}), p = 0;
+		for (var i in trick)
+		{
+			ASSERT(i == trick[i] && M.t[i],'Oops..');
+			var mQ = dlQueue.slurp(M.t[i]);
+			for (var x in mQ)
+			{
+				(dl_queue[p]=mQ[x][0].dl).pos = p;
+				++p;
+			}
+			mQueue = mQueue.concat(mQ);
+		}
+		// we should probably fix our Array inheritance
+		for (var i = p, len = dl_queue.length ; i < len ; ++i )
+		{
+			delete dl_queue[i];
+		}
+		dl_queue.length = p;
+		dlQueue._queue  = mQueue;
+		return;
+	}
+
+	if (gid[0] === 'u')
+	{
+		var m_prop  = 'ul';
+		var mQueue  = ulQueue._queue;
+		var m_queue = ul_queue;
+	}
+	else
+	{
+		var m_prop  = 'dl';
+		var mQueue  = dlQueue._queue;
+		var m_queue = dl_queue;
+	}
+	var t_queue = m_queue.filter(isQueueActive);
+	if (t_queue.length != m_queue.length)
+	{
+		var i = 0, m = t_queue.length;
+		while (i < m)
+		{
+			(m_queue[i] = t_queue[i]).pos = i;
+			++i;
+		}
+		m_queue.length = i;
+		while (m_queue[i])
+		{
+			delete m_queue[i++];
+		}
+	}
+	for (var i in mQueue)
+	{
+		if (mQueue[i][0][gid])
+		{
+			var tmp = mQueue[i], m_q = tmp[0][m_prop];
+			p1 = +i+ dir;
+			p2 = m_q.pos;
+			tmp[0][m_prop].pos = mQueue[p1][0][m_prop].pos;
+			mQueue[p1][0][m_prop].pos = p2;
+			mQueue[i]  = mQueue[p1];
+			mQueue[p1] = tmp;
+			p1 = m_queue.indexOf(m_q);
+			tmp = m_queue[p1];
+			m_queue[p1] = m_queue[p1+dir];
+			m_queue[p1+dir] = tmp;
+			ASSERT(m_queue[p1].pos === mQueue[i][0][m_prop].pos, 'Huh, move sync error..');
 			break;
 		}
 	}
 };
 
-dlQueue.validateTask = function(pzTask, next) {
-	var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk
-		|| (pzTask instanceof ClassFile && !fetchingFile && !this.has_chunk);
-	// if (d) console.log('dlQueue.validateTask', r, next, pzTask);
+// chunk scheduler {{{
+dlQueue.validateTask = function(pzTask)
+{
+	var r = pzTask instanceof ClassChunk || pzTask instanceof ClassEmptyChunk;
+
+	if (!r && pzTask instanceof ClassFile && !fetchingFile)
+	{
+		var i = this._queue.length;
+		while (i-- && !(this._queue[i][0] instanceof ClassChunk));
+
+		if ((r = !~i) && $.len(this._qpaused))
+		{
+			fm_tfsorderupd();
+
+			// About to start a new download, check if a previously paused dl was resumed.
+			var p1 = M.t[pzTask.gid];
+			for (var i = 0 ; i < p1 ; ++i)
+			{
+				var gid = M.t[i];
+				if (this._qpaused[gid] && this.dispatch(gid)) return -0xBEEF;
+			}
+		}
+	}
 	return r;
 };
 // }}}
@@ -333,8 +372,7 @@ function checkLostChunks(file)
  *	kick up the download (or queue it) without modifying the
  *	caller codes
  */
-function DownloadQueue() {
-}
+function DownloadQueue() {}
 inherits(DownloadQueue, Array);
 
 DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
@@ -442,7 +480,7 @@ DownloadQueue.prototype.push = function() {
 	}
 
 	/* In case it failed and it was manually cancelled and retried */
-	DownloadManager.release("id:" + dl_id);
+	// DownloadManager.release("id:" + dl_id);
 
 	dl.pos		= id // download position in the queue
 	dl.dl_id	= dl_id;  // download id

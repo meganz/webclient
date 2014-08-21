@@ -1292,7 +1292,7 @@ function initContextUI()
 	$(c+'.copy-item').unbind('click');
 	$(c+'.copy-item').bind('click',function(event)
 	{
-		$.dialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+		$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
 		$('.fm-dialog-overlay').removeClass('hidden');
@@ -3148,10 +3148,19 @@ var selectionManager;
 
 function closeDialog()
 {
-	$('.fm-dialog-overlay').addClass('hidden');
-	$('.fm-dialog')
-		.addClass('hidden')
-		.removeClass('arrange-to-back');
+	if ($.dialog === 'createfolder' && $.copyDialog)
+	{
+		$('.fm-dialog.create-folder-dialog').addClass('hidden')
+		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
+	}
+	else
+	{
+		$('.fm-dialog').addClass('hidden')
+		$('.fm-dialog-overlay').addClass('hidden');
+		delete $.copyDialog;
+	}
+	$('.fm-dialog').removeClass('arrange-to-back');
+	
 	$('.export-links-warning').addClass('hidden');
 	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
 	delete $.dialog;
@@ -3299,6 +3308,10 @@ function UIkeyevents()
 		else if (e.keyCode == 13 && $.dialog == 'rename')
 		{
 			dorename();
+		}
+		else if (e.keyCode == 27 && $.copyDialog)
+		{
+			closeDialog();
 		}
 		else if (e.keyCode == 27 && $.dialog)
 		{
@@ -4944,7 +4957,7 @@ function copyDialog()
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
-		delete $.dialog;
+		delete $.copyDialog;
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').addClass('hidden');
@@ -4983,7 +4996,7 @@ function copyDialog()
                     break;
             }
             $(this).addClass('active');
-            copyDialogScroll();
+            $.copyDialogScroll();
         }
     });
 
@@ -5014,6 +5027,7 @@ function copyDialog()
 	$('.copy-dialog .dialog-newfolder-button').bind('click', function() {
 		$('.copy-dialog').addClass('arrange-to-back');
 		createfolderDialog();
+		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 	});
 
 }

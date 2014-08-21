@@ -2582,8 +2582,8 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
-		if (!bl || !ul_queue[id]['starttime']) return false;
-		// var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
+		if (!bl || !ul_queue[id] || !ul_queue[id]['starttime']) return false;
+		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -2634,10 +2634,8 @@ function MegaData ()
 		{
 			$(this).remove();
 		});
-		$.transferHeader();
-		var a=0;
-		for(var i in dl_queue) if (dl_queue[i]) a++;
-		if (a < 2 && !downloading)
+		var a=ul_queue.filter(isQueueActive).length;
+		if (a < 2 && !ul_uploading)
 		{
 			$('.widget-block').fadeOut('slow',function(e)
 			{
@@ -2654,6 +2652,7 @@ function MegaData ()
 			delete $.transferprogress['ul_'+ id];
 		}
 		$.transferHeader();
+		Soon(resetUploadDownload);
 	}
 
 	this.ulstart = function(id)

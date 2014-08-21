@@ -272,13 +272,19 @@ var UploadManager =
 
 function ul_get_posturl(File) {
 	return function(res, ctx) {
+		delete ul_queue[ctx.reqindex].posturl; /* reset in case of a retry */
 		if (typeof res == 'object') {
-			ul_queue[ctx.reqindex].posturl = res.p;
-			if (ctx.reqindex == File.ul.pos) {
-				ul_upload(File);
+			if (typeof res.p == "string" && res.p.length > 0) {
+				ul_queue[ctx.reqindex].posturl = res.p;
 			}
-		} else {
-			//DEBUG('request failed');
+		}
+		if (ctx.reqindex == File.ul.pos) {
+			if (ul_queue[ctx.reqindex].posturl) {
+				ul_upload(File);
+			} else {
+				/* retry */
+				ul_start(File);
+			}
 		}
 	};
 }
@@ -351,13 +357,14 @@ function ul_start(File) {
 
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
-		api_req({
-			a : 'u',
-			ssl : use_ssl,
-			ms : ul_maxSpeed,
-			s : cfile.size,
-			r : cfile.retries,
-			e : cfile.ul_lastreason
+		if (!cfile.id) continue;
+		api_req({ 
+			a : 'u', 
+			ssl : use_ssl, 
+			ms : ul_maxSpeed, 
+			s : cfile.size, 
+			r : cfile.retries, 
+			e : cfile.ul_lastreason 
 		}, { reqindex : i, callback : next });
 		maxpf -= cfile.size
 		total++;

@@ -29,9 +29,12 @@ function newXhr() {
 	}
 
 	xhr.nolistener = function() {
-		if (d && !this.__failed) console.error('Socket: no listener for socket', this.__id);
 		this.clear_timeout();
-		this._abort();
+		if (!this.__failed) {
+			if (d) console.error('Socket: no listener for socket', this.__id);
+			this.__failed = true;
+			this._abort();
+		}
 	}
 
 	xhr.onreadystatechange = function() {

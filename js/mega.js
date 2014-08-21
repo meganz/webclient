@@ -2070,9 +2070,9 @@ function MegaData ()
 		if(is_chrome_firefox)
 		{
 			var root = mozGetDownloadsFolder();
-			if (root) dirs.forEach(function(p)
+			if (root) dirs.filter(String).forEach(function(p) 
 			{
-				try
+				try 
 				{
 					p = mozFile(root,0,p);
 					if(!p.exists()) p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
@@ -2296,9 +2296,11 @@ function MegaData ()
 		}
 	}
 
-	this.dlcomplete = function (id,z, dl_queue_num)
+	this.dlcomplete = function (dl)
 	{
-		if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid])
+		var id = dl.id, z = dl.zipid;
+
+		if (slideshowid == id && !previews[slideshowid]) 
 		{
 			$('.slideshow-pending').addClass('hidden');
 			$('.slideshow-error').addClass('hidden');
@@ -2331,9 +2333,7 @@ function MegaData ()
 			setTimeout(fm_chromebar,500,$.dlheight);
 			setTimeout(fm_chromebar,1000,$.dlheight);
 		}
-
-		var a=0;
-		for(var i in dl_queue) if (dl_queue[i]) a++;
+		var a=dl_queue.filter(isQueueActive).length;
 		if (a < 2 && !ul_uploading)
 		{
 			$('.widget-block').fadeOut('slow',function(e)
@@ -2758,9 +2758,22 @@ function fm_chromebarcatchclick(height)
 	setTimeout(fm_chromebarcatchclick,200,height);
 }
 
-function fm_safename(n)
+function fm_safename(name)
 {
-	return n.replace(/[/\\:*?<>|]/g,'_');
+	// http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
+	name = ('' + name).replace(/[:\/\\<">|?*]+/g,'.').replace(/\s*\.+/g,'.');
+	if (name.length > 250) name = name.substr(0,250) +'.'+ name.split('.').pop();
+	name = name.replace(/\s+/g,' ').trim();
+	var end = name.lastIndexOf('.'); end = ~end && end || name.length;
+	if(/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0,end))) name = '!' + name;
+	return name;
+}
+
+function fm_safepath(path, file)
+{
+	path = (''+(path||'')).split(/[\\\/]+/).map(fm_safename).filter(String);
+	if (file) path.push(fm_safename(file));
+	return path;
 }
 
 function fm_matchname(p,name)

@@ -157,9 +157,9 @@ ClassChunk.prototype.isCancelled = function() {
 	var is_cancelled = !!this.dl.cancelled;
 	if (!is_cancelled) {
 		if(typeof(this.dl.pos) !== 'number') {
-			this.dl.pos = IdToFile(this.dl).pos
+			this.dl.pos = IdToFile(this.dl.id).pos
 		}
-		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos].n;
+		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos] || !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		if (d) console.log(this + " aborting itself because download was canceled.", this.task.chunk_id);
@@ -199,7 +199,7 @@ ClassChunk.prototype.on_error = function(args, xhr) {
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
 
-	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.status), 950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.finish_download.bind(this, false, xhr.readyState > 1 && xhr.status), 950+Math.floor(Math.random()*2e3));
 }
 // }}}
 
@@ -355,7 +355,7 @@ ClassFile.prototype.destroy = function() {
 			if (!this.dl.preview) {
 				this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
 			}
-			this.dl.onDownloadComplete(this.dl.dl_id, this.dl.zipid, this.dl.pos);
+			this.dl.onDownloadComplete(this.dl);
 			if (dlMethod != FlashIO) DownloadManager.cleanupUI(this.dl, true);
 		}
 	}

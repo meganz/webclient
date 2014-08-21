@@ -1068,6 +1068,8 @@ var failtime = 0;
 
 function api_reportfailure(hostname,callback)
 {
+	if (!hostname) return Soon(callback);
+
 	var t = new Date().getTime();
 
 	if (t-failtime < 60000) return;

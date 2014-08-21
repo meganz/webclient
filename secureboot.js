@@ -453,8 +453,7 @@ else
 						}
 					}
 
-					var report = { date : new Date().toUTCString() };
-
+					var report = {};
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();

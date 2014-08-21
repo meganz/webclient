@@ -116,13 +116,18 @@
 </div>
 
 <!--ToDo: Change stringes with appropriated lang.json-->
-<div class="fm-dialog copy-dialog">
+<div class="fm-dialog copy-dialog hidden">
+    <!--Header-->
      <div class="fm-dialog-header">
        <!-- Please add "active" classname to necessary "copy-dialog-txt" block !-->
-       <div class="fm-dialog-title">Copy <span class="copy-dialog-txt cloud-drive active">(Cloud Drive)</span><span class="copy-dialog-txt shared-with-me">(Shared with me)</span><span class="copy-dialog-txt conversations">(Send to Conversations)</span></div>
+       <div class="fm-dialog-title">Copy 
+           <span class="copy-dialog-txt cloud-drive active">(Cloud Drive)</span>
+           <span class="copy-dialog-txt shared-with-me">(Shared with me)</span>
+           <span class="copy-dialog-txt conversations">(Send to Conversations)</span>
+       </div>
        <div class="fm-dialog-close"></div>
        <div class="clear"></div>
-     </div>
+     </div><!--END Header-->
      <div class="fm-dialog-body">
        <div class="copy-dialog-button cloud-drive active"></div>
        <div class="copy-dialog-button shared-with-me"></div>
@@ -152,7 +157,6 @@
             Worry not! You can easily create a new folder  below. Right there, on the left hand side.
           </div>
        </div>
-       
        <div class="copy-dialog-empty shared-with-me">
           <div class="copy-dialog-empty-icon"></div>
           <div class="copy-dialog-empty-header">
@@ -162,7 +166,6 @@
             Lorem ipsum dolor sit amet
           </div>
        </div>
-       
        <div class="copy-dialog-empty conversations">
           <div class="copy-dialog-empty-icon"></div>
           <div class="copy-dialog-empty-header">
@@ -227,24 +230,24 @@
              </ul>-->
            </div>
        </div>
-       
+       <!--Shared with me-->
        <div class="copy-dialog-tree-panel shared-with-me">
            <div class="copy-dialog-panel-header">
               <span>Incoming shared folders</span>
               <div class="copy-dialog-panel-arrows"></div>
            </div>
            <div class="dialog-content-block">
-             <ul>
+<!--             <ul>
                <li>
                  <span class="nw-fm-tree-item">
                    <span class="nw-fm-arrow-icon"></span>
                    <span class="nw-fm-tree-folder shared-folder">Folder</span>
                  </span>
                </li>
-             </ul>
+             </ul>-->
            </div>
        </div>
-        
+       <!--Conversations--> 
        <div class="copy-dialog-tree-panel conversations">  
            <div class="copy-dialog-panel-header">
               <span>MEGA Contacts</span>
@@ -263,23 +266,22 @@
              </div>
            </div>
        </div>
-       
      </div>
+    <!--Buttons-->
      <div class="fm-notifications-bottom">
         <div class="fm-dialog-button dialog-newfolder-button">
-          New folder
+          [$68]
         </div>
         <div class="fm-dialog-button dialog-copy-button">
           Paste
         </div>
-        <div class="fm-dialog-button">
-          Cancel
+        <div class="fm-dialog-button dialog-cancel-button">
+          [$82]
         </div>
         <div class="clear"></div>
      </div>
 </div><!--END copy-dialog-->
 
-<!--Outdated, should be removed when copy-dialog is fully functional-->
 <div class="fm-dialog move-dialog hidden">
      <div class="fm-dialog-header">
        <div class="fm-dialog-title">[$62]</div>

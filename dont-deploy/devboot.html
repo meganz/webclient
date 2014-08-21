@@ -32,7 +32,7 @@
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
 
-//        localStorage.clear();
+        localStorage.clear();
         localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
         localStorage.dd = 1;

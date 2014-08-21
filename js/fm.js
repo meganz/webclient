@@ -573,6 +573,7 @@ function initUI()
 	createfolderUI();
 	cSortMenuUI();
 	M.buildSubmenu();
+	copyDialog();
 //	initContextUI();
 	transferPanelUI();
 	UIkeyevents();
@@ -1291,8 +1292,11 @@ function initContextUI()
 	$(c+'.copy-item').unbind('click');
 	$(c+'.copy-item').bind('click',function(event)
 	{
-//		$.mctype='copy-cloud';
-//		mcDialog();
+		$.dialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.copy-dialog').removeClass('hidden');
+		$('.fm-dialog-overlay').removeClass('hidden');
+//		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});
 
 	$(c+'.newfolder-item').unbind('click');
@@ -4917,6 +4921,90 @@ function shareDialog(close)
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-share-body').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
 	jScrollFade('.fm-share-body');
+}
+
+function copyDialog()
+{
+	$.dialogPositioning = function() {
+		$('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
+	}
+    $.copyDialogScroll = function() {
+		$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+    }
+	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
+	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
+	{
+		delete $.dialog;// taken from keypressed, code 27
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.copy-dialog').addClass('hidden');
+	});
+	
+    $.dialogPositioning();
+    $.copyDialogScroll();
+
+    $('.copy-dialog-button').unbind('click');
+    $('.copy-dialog-button').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            $('.copy-dialog-button.active').removeClass('active');
+            $('.copy-dialog-txt.active').removeClass('active');
+            $('.copy-dialog-empty.active').removeClass('active');
+            $('.copy-dialog-tree-panel.active').removeClass('active');
+            var section = $(this).attr('class').replace('copy-dialog-button', '').split(" ").join("");
+            switch (section)
+            {
+                case 'cloud-drive':
+                    $('.copy-dialog-txt.cloud-drive').addClass('active');
+                    //$('.copy-dialog-empty.cloud-drive').addClass('active');
+                    $('.copy-dialog-tree-panel.cloud-drive').addClass('active');
+                    $('.dialog-newfolder-button').removeClass('hidden');
+                    break;
+                case 'shared-with-me':
+                    $('.copy-dialog-txt.shared-with-me').addClass('active');
+                    //$('.copy-dialog-empty.shared-with-me').addClass('active');
+                    $('.copy-dialog-tree-panel.shared-with-me').addClass('active');
+                    $('.dialog-newfolder-button').addClass('hidden');
+                    break;
+                case 'conversations':
+                    $('.copy-dialog-txt.conversations').addClass('active');
+                    //$('.copy-dialog-empty.conversations').addClass('active');
+                    $('.copy-dialog-tree-panel.conversations').addClass('active');
+                    $('.dialog-newfolder-button').addClass('hidden');
+                    break;
+            }
+            $(this).addClass('active');
+            copyDialogScroll();
+        }
+    });
+
+    $('.copy-dialog-panel-arrows').unbind('click');
+    $('.copy-dialog-panel-arrows').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            $(this).addClass('active');
+            $('.dialog-sorting-menu').removeClass('hidden');
+        } else {
+            $(this).removeClass('active');
+            $('.dialog-sorting-menu').addClass('hidden');
+        }
+    });
+
+    $('.dialog-sorting-menu .sorting-menu-item').unbind('click');
+    $('.dialog-sorting-menu .sorting-menu-item').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            $(this).parent().find('.sorting-menu-item').removeClass('active');
+            $(this).addClass('active');
+            $('.dialog-sorting-menu').addClass('hidden');
+        }
+
+        $('.dialog-sorting-menu').addClass('hidden');
+        $('.copy-dialog-panel-arrows.active').removeClass('active')
+    });
+	
+	$('.copy-dialog .dialog-newfolder-button').unbind('click');
+	$('.copy-dialog .dialog-newfolder-button').bind('click', function() {
+		createfolderDialog();
+	});
+
 }
 
 function mcDialog(close)

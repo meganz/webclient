@@ -4517,24 +4517,17 @@ function renameDialog()
 			$('.rename-dialog').addClass('hidden');
 			$('.fm-dialog-overlay').addClass('hidden');
 		});
-		$('.rename-dialog .fm-dialog-input-clear').unbind('click');
-		$('.rename-dialog .fm-dialog-input-clear').bind('click',function()
-		{
-			var n = M.d[$.selected[0]];
-			var ext = fileext(n.name);
-			if (ext.length > 0) ext = '.' + ext;
-			if (n.t) ext = '';
-			$('.rename-dialog input').val(ext);
-			$('.rename-dialog').removeClass('active');
-			$('.rename-dialog input')[0].selectionStart=0;
-			$('.rename-dialog input')[0].selectionEnd=0;
-			$('.rename-dialog input').focus();
-		});
-		$('.fm-dialog-rename-button').unbind('click');
-		$('.fm-dialog-rename-button').bind('click',function()
+		$('.rename-dialog-button.rename').unbind('click');
+		$('.rename-dialog-button.rename').bind('click',function()
 		{
 			var c = $('.rename-dialog').attr('class');
 			if (c && c.indexOf('active') > -1) dorename();
+		});
+		$('.rename-dialog-button.cancel').unbind('click');
+		$('.rename-dialog-button.cancel').bind('click',function()
+		{
+			$('.rename-dialog').addClass('hidden');
+		    $('.fm-dialog-overlay').addClass('hidden');
 		});
 		var n = M.d[$.selected[0]];
 		if (n.t) $('.rename-dialog .fm-dialog-title').text(l[425]);
@@ -4546,6 +4539,21 @@ function renameDialog()
 			$('.rename-dialog input')[0].selectionStart=0;
 			$('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length-1;
 		}
+		$('.rename-dialog input').unbind('focus');
+		$('.rename-dialog input').bind('focus',function() {
+			var selEnd;
+			$(this).closest('.rename-dialog').addClass('focused');
+			var d = $(this).val().indexOf('.');
+			if (d > -1) selEnd = d;
+		    else selEnd = $(this).val().length;
+			$(this)[0].selectionStart=0;
+			$(this)[0].selectionEnd = selEnd;
+           
+		});
+		$('.rename-dialog input').unbind('blur');
+		$('.rename-dialog input').bind('blur',function() {
+			$(this).closest('.rename-dialog').removeClass('focused');
+		});
 		$('.rename-dialog input').unbind('click keydown keyup keypress');
 		$('.rename-dialog input').focus();
 		$('.rename-dialog input').bind('click keydown keyup keypress',function(e)

@@ -1291,8 +1291,8 @@ function initContextUI()
 	$(c+'.copy-item').unbind('click');
 	$(c+'.copy-item').bind('click',function(event)
 	{
-		$.mctype='copy-cloud';
-		mcDialog();
+//		$.mctype='copy-cloud';
+//		mcDialog();
 	});
 
 	$(c+'.newfolder-item').unbind('click');

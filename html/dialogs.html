@@ -115,6 +115,171 @@
     </div>
 </div>
 
+<!--ToDo: Change stringes with appropriated lang.json-->
+<div class="fm-dialog copy-dialog">
+     <div class="fm-dialog-header">
+       <!-- Please add "active" classname to necessary "copy-dialog-txt" block !-->
+       <div class="fm-dialog-title">Copy <span class="copy-dialog-txt cloud-drive active">(Cloud Drive)</span><span class="copy-dialog-txt shared-with-me">(Shared with me)</span><span class="copy-dialog-txt conversations">(Send to Conversations)</span></div>
+       <div class="fm-dialog-close"></div>
+       <div class="clear"></div>
+     </div>
+     <div class="fm-dialog-body">
+       <div class="copy-dialog-button cloud-drive active"></div>
+       <div class="copy-dialog-button shared-with-me"></div>
+       <div class="copy-dialog-button conversations"></div>
+       <div class="clear"></div>
+       <div class="dialog-sorting-menu hidden">
+         <div class="context-menu-section">
+           <div class="sorting-menu-arrow"></div>
+           <div class="sorting-menu-item active">Name</div>
+           <div class="sorting-menu-item">Status</div>
+           <div class="sorting-menu-item">Last Interaction</div>
+           <div class="sorting-item-divider"></div>
+         </div>
+           <div class="context-menu-section">
+           <div class="sorting-menu-item active">Ascending</div>
+           <div class="sorting-menu-item">Descending</div>
+         </div>
+       </div>
+       
+       <!-- Please add "active" classname to necessary "copy-dialog-empty" block !-->
+       <div class="copy-dialog-empty cloud-drive">
+          <div class="copy-dialog-empty-icon"></div>
+          <div class="copy-dialog-empty-header">
+            No folders in your cloud drive
+          </div>
+          <div class="copy-dialog-empty-txt">
+            Worry not! You can easily create a new folder  below. Right there, on the left hand side.
+          </div>
+       </div>
+       
+       <div class="copy-dialog-empty shared-with-me">
+          <div class="copy-dialog-empty-icon"></div>
+          <div class="copy-dialog-empty-header">
+            No shared folders
+          </div>
+          <div class="copy-dialog-empty-txt">
+            Lorem ipsum dolor sit amet
+          </div>
+       </div>
+       
+       <div class="copy-dialog-empty conversations">
+          <div class="copy-dialog-empty-icon"></div>
+          <div class="copy-dialog-empty-header">
+            No contacts
+          </div>
+          <div class="copy-dialog-empty-txt">
+            Lorem ipsum dolor sit amet
+          </div>
+       </div>
+       
+       <!-- Please add "active" classname to necessary "copy-dialog-tree-panel" block !-->
+       <div class="copy-dialog-tree-panel cloud-drive active">
+           <div class="copy-dialog-panel-header">
+              <span>My folders</span>
+              <div class="copy-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+               <!--ToDo: add items here-->
+<!--             <ul>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+               </li>
+               <li>
+                 <span class="nw-fm-tree-item contains-folders">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+                 <ul class="opened">
+                   <li>
+                   <span class="nw-fm-tree-item">
+                     <span class="nw-fm-arrow-icon"></span>
+                     <span class="nw-fm-tree-folder shared-folder">Subfolder</span>
+                   </span>
+                   </li>
+                 </ul>
+               </li>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder folder">Folder</span>
+                 </span>
+               </li>
+             </ul>-->
+           </div>
+       </div>
+       
+       <div class="copy-dialog-tree-panel shared-with-me">
+           <div class="copy-dialog-panel-header">
+              <span>Incoming shared folders</span>
+              <div class="copy-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+             <ul>
+               <li>
+                 <span class="nw-fm-tree-item">
+                   <span class="nw-fm-arrow-icon"></span>
+                   <span class="nw-fm-tree-folder shared-folder">Folder</span>
+                 </span>
+               </li>
+             </ul>
+           </div>
+       </div>
+        
+       <div class="copy-dialog-tree-panel conversations">  
+           <div class="copy-dialog-panel-header">
+              <span>MEGA Contacts</span>
+              <div class="copy-dialog-panel-arrows"></div>
+           </div>
+           <div class="dialog-content-block">
+             <div class="nw-conversations-item online">
+               <div class="nw-contact-status"></div>
+               <div class="nw-conversations-unread"></div>
+               <div class="nw-conversations-name">ad@mega.co.nz</div>
+             </div>
+             <div class="nw-conversations-item offline">
+               <div class="nw-contact-status"></div>
+               <div class="nw-conversations-unread"></div>
+               <div class="nw-conversations-name">eb@mega.co.nz</div>
+             </div>
+           </div>
+       </div>
+       
+     </div>
+     <div class="fm-notifications-bottom">
+        <div class="fm-dialog-button dialog-newfolder-button">
+          New folder
+        </div>
+        <div class="fm-dialog-button dialog-copy-button">
+          Paste
+        </div>
+        <div class="fm-dialog-button">
+          Cancel
+        </div>
+        <div class="clear"></div>
+     </div>
+</div><!--END copy-dialog-->
+
+<!--Outdated, should be removed when copy-dialog is fully functional-->
 <div class="fm-dialog move-dialog hidden">
      <div class="fm-dialog-header">
        <div class="fm-dialog-title">[$62]</div>

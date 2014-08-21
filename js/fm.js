@@ -1281,6 +1281,13 @@ function initContextUI()
 		mcDialog();
 	});
 
+	$(c+'.advanced-item').unbind('click');
+	$(c+'.advanced-item').bind('click',function(event)
+	{
+		$.mctype='move';
+		mcDialog();
+	});
+	
 	$(c+'.copy-item').unbind('click');
 	$(c+'.copy-item').bind('click',function(event)
 	{

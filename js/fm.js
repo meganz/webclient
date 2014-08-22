@@ -4348,6 +4348,16 @@ function treeUI()
 			$.doDD(e,ui,'out',1);
 		}
 	});
+
+	$(document).unbind('contextmenu');
+	$(document).bind('contextmenu', function(e) {
+		if (!localStorage.contextmenu) {
+			$.hideContextMenu();
+			return false;
+		}
+	});
+
+
 	$('.fm-tree-panel .nw-fm-tree-item').unbind('click contextmenu');
 	$('.fm-tree-panel .nw-fm-tree-item').bind('click contextmenu',function(e)
 	{

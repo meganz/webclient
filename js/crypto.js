@@ -1905,7 +1905,8 @@ function api_fareq(res,ctx)
 			{
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				this.ctx.errfa(id,1);				
+				if (this.ctx.errfa) this.ctx.errfa(id,1);
+				else console.error('errfa', id);
 			}
 
 			faxhrs[slot].onreadystatechange = function()

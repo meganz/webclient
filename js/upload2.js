@@ -375,7 +375,7 @@ function ul_start(File) {
 
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
-		if (!cfile.id) continue;
+		if (!isQueueActive(cfile)) continue;
 		api_req({ 
 			a : 'u', 
 			ssl : use_ssl, 
@@ -601,6 +601,7 @@ FileUpload.prototype.destroy = function() {
 	{
 		this.file._close();
 	}
+	this.file.ul_reader.destroy();
 	oDestroy(this.file);
 	oDestroy(this);
 };
@@ -758,21 +759,25 @@ function ul_filereader(fs, file) {
 		}
 
 		fs.pos = task.start;
+		fs.onerror = function(evt) {
+			done(new Error(evt))
+		};
+		fs.onloadend = function(evt) {
+			if (evt.target.readyState == FileReader.DONE) try {
+				task.bytes = new Uint8Array(evt.target.result);
+				done(null)
+			} catch(e) {
+				console.error(e);
+				done(e);
+			}
+			blob = undefined;
+		};
 		try {
 			fs.readAsArrayBuffer(blob);
 		} catch(e) {
 			console.error(e);
 			done(e);
 		}
-		fs.onerror = function(evt) {
-			done(new Error(evt))
-		}
-		fs.onloadend = function(evt) {
-			if (evt.target.readyState == FileReader.DONE) {
-				task.bytes = new Uint8Array(evt.target.result);
-				done(null)
-			}
-		}	
 	}, 1);
 }
 

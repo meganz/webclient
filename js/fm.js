@@ -553,8 +553,20 @@ function openTransferpanel()
 	$.transferOpen(1);
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
-	else initGridScrolling();	
-	if (!uldl_hold) ulQueue.resume();
+	else initGridScrolling();
+	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	else// make sure that terms of service are accepted before any action
+	{
+		$('.transfer-pause-icon').addClass('active');
+		dlQueue.pause();
+		ulQueue.pause();
+		ui_paused = true;
+
+//		$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
+//		{
+//			$(this).text('');
+//		});
+	}
 	initTreeScroll();
 	$(window).trigger('resize');
 }
@@ -3307,10 +3319,19 @@ function transferPanelUI()
 	{
 		if ($(this).attr('class').indexOf('active') > -1)
 		{
-			$(this).removeClass('active');
-			dlQueue.resume();
-			ulQueue.resume();
-			ui_paused = false;
+			// terms of service
+			if (u_type || u_attr.terms)
+			{
+				$(this).removeClass('active');
+				dlQueue.resume();
+				ulQueue.resume();
+				ui_paused = false;
+				uldl_hold = false;
+			} else
+			{
+				alert(l[214]);
+				DEBUG(l[214]);
+			}
 		}
 		else
 		{
@@ -3318,6 +3339,7 @@ function transferPanelUI()
 			dlQueue.pause();
 			ulQueue.pause();
 			ui_paused = true;
+			uldl_hold = true;
 
 			$('.transfer-table tr td:eq(4), .transfer-table tr td:eq(6)').each(function()
 			{

@@ -381,7 +381,7 @@ else
 
 		if (!d)
 		{
-			var __cdumps = [], __cd_t;
+			var __cdumps = [], __cd_t, __cd_v = /*!CDV*/1;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
 				if (__cdumps.length > 8) return false;
@@ -453,7 +453,7 @@ else
 
 					for (var i in __cdumps)
 					{
-						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report });
+						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v });
 					}
 					__cdumps = [];
 

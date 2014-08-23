@@ -4958,18 +4958,22 @@ function shareDialog(close)
 
 function copyDialog()
 {
-	$.dialogPositioning = function() {
+	$.dialogPositioning = function()
+	{
 		$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
 	}
-    $.copyDialogScroll = function() {
+    $.copyDialogScroll = function()
+	{
 		$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
     }
-	$.initCopyDialog = function () {
+	$.initCopyDialog = function ()
+	{
+		// Determine from whta panel copy dialog is called and show that tab and fill ti
 //		$('.copy-dialog-button.active').removeClass('active');
-		$('.copy-dialog-txt.active').removeClass('active');
+//		$('.copy-dialog-txt.active').removeClass('active');
 		$('.copy-dialog-empty.active').removeClass('active');
         $('.copy-dialog-tree-panel.active').removeClass('active');
-		if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block li').length)
+		if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block ul').length)
 		{
 			$('.copy-dialog-empty.cloud-drive').addClass('active');
 			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
@@ -4980,6 +4984,12 @@ function copyDialog()
 			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').removeClass('hidden');						
 		}
         $('.dialog-newfolder-button').removeClass('hidden');
+	}
+	$.fillCopyDialog = function()
+	{
+		$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').append($('.content-panel.cloud-drive ul:first'));
+		$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').append($('.content-panel.shared-with-me ul:first'));
+//		$('.copy-dialog-tree-panel.conversations .dialog-content-block').append($(i + '.conversations ul'));		
 	}
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
@@ -4992,10 +5002,11 @@ function copyDialog()
 	
     $.dialogPositioning();
     $.copyDialogScroll();
+	$.fillCopyDialog();
 	$.initCopyDialog();
 
     $('.copy-dialog-button').unbind('click');
-    $('.copy-dialog-button').bind('click', function() {
+    $('.copy-dialog-button').bind('click', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
             $('.copy-dialog-button.active').removeClass('active');
             $('.copy-dialog-txt.active').removeClass('active');
@@ -5005,8 +5016,10 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
+					$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').html('');
+					$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').append($('.content-panel.cloud-drive ul:first'));
                     $('.copy-dialog-txt.cloud-drive').addClass('active');
-					if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block li').length)
+					if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block ul').length)
 					{
 						$('.copy-dialog-empty.cloud-drive').addClass('active');
 						$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
@@ -5019,8 +5032,10 @@ function copyDialog()
                     $('.dialog-newfolder-button').removeClass('hidden');
                     break;
                 case 'shared-with-me':
+					$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').html('');
+					$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').append($('.content-panel.shared-with-me ul:first'));
                     $('.copy-dialog-txt.shared-with-me').addClass('active');
-					if (!$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block li').length)
+					if (!$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block ul').length)
 					{
 						$('.copy-dialog-empty.shared-with-me').addClass('active');
 						$('.copy-dialog-tree-panel.shared-with-me .copy-dialog-panel-header').addClass('hidden');
@@ -5034,7 +5049,7 @@ function copyDialog()
                     break;
                 case 'conversations':
                     $('.copy-dialog-txt.conversations').addClass('active');
-					if (!$('.copy-dialog-tree-panel.conversations .dialog-content-block li').length)
+					if (!$('.copy-dialog-tree-panel.conversations .dialog-content-block div').length)
 					{
 						$('.copy-dialog-empty.conversations').addClass('active');
 						$('.copy-dialog-tree-panel.conversations .copy-dialog-panel-header').addClass('hidden');

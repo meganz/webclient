@@ -436,7 +436,8 @@ ChunkUpload.prototype.updateprogress = function() {
 
 ChunkUpload.prototype.abort = function() {
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-	removeValue(GlobalProgress[this.gid].working, this, 1);
+	if (GlobalProgress[this.gid]) removeValue(GlobalProgress[this.gid].working, this, 1);
+	else if (d) console.error('This should not be reached twice or after FileUpload destroy...');
 	delete this.xhr;
 };
 
@@ -527,9 +528,15 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 
 ChunkUpload.prototype.upload = function() {
+	
+	if (!this.file) {
+		ASSERT(this.file, 'Was this upload destroyed? ' + !this.gid);
+		return;
+	}
+	
 	var xhr = getXhr(this);
 
-	DEBUG("pushing", this.file.posturl + this.suffix)
+	if (d) console.log("pushing", this.file.posturl + this.suffix)
 
 	if (chromehack) {
 		var data8 = new Uint8Array(this.bytes.buffer);
@@ -567,11 +574,14 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 ChunkUpload.prototype.done = function(ee) {
 	if (d) console.log(this + '.done');
 
-	/* release worker */
-	this._done();
+	if (this._done)
+	{
+		/* release worker */
+		this._done();
 
-	/* clean up references */
-	this.destroy();
+		/* clean up references */
+		this.destroy();
+	}
 };
 
 ChunkUpload.prototype.run = function(done) {
@@ -595,7 +605,8 @@ FileUpload.prototype.toString = function() {
 
 FileUpload.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
-	ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+	// Hmm, looks like there are more ChunkUploads than what we really upload (!?)
+	if (d) ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
 	delete GlobalProgress[this.gid];
 	if (is_chrome_firefox && this.file._close)
 	{
@@ -618,7 +629,7 @@ FileUpload.prototype.run = function(done) {
 
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
 		done(); 
-		DEBUG2("this shouldn't happen");
+		ASSERT(0, "This shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
 

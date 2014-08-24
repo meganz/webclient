@@ -6542,7 +6542,7 @@ color: white;
 	margin: 10px 0 0 0;
 }
 .fm-account-input input {
-	padding: 0 10px 0 10px;
+	padding: 7px 10px 0 10px;
 	background-image: none;
 }
 .fm-account-select {
@@ -8882,12 +8882,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-notification-icon {
 	float: left;
-	width: 105px;
+	width: 109px;
 	height: 75px;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-repeat: no-repeat;
 }
-
 .notification-dialog .fm-notification-icon {
 	background-position: 10px -2333px;
 }

@@ -403,18 +403,24 @@ else
 
 		if (!d)
 		{
-			var __cdumps = [], __cd_t;
+			var __cdumps = [], __cd_t, __cd_v = /*!CDV*/1;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
 				if (__cdumps.length > 8) return false;
 
-				var dump = { m : msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
+				var dump = { m : '' + msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
 
 				if (errobj)
 				{
 					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
 				}
 				if (cn) dump.c = cn;
+
+				if (ln == 0 && !dump.s)
+				{
+					if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
+					else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
+				}
 
 				try
 				{
@@ -453,8 +459,7 @@ else
 						}
 					}
 
-					var report = { date : new Date().toUTCString() };
-
+					var report = {};
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
@@ -470,7 +475,7 @@ else
 
 					for (var i in __cdumps)
 					{
-						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report });
+						api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v });
 					}
 					__cdumps = [];
 

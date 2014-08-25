@@ -3,11 +3,19 @@ function FlashIO(dl_id, dl) {
 		, offset = 0
 		, dl_id  = dl.zip_dl_id || dl_id
 		, swfid  = 'dlswf_' + (dl.zipid ? 'zip_' + dl.zipid : dl_id)
+		, retries = 0
 
 	this.write = function (buffer, position, done) {
-		if (!document.getElementById(swfid)) {
-			return setTimeout(function () {
-				if (!dl.cancelled) IO.write(buffer, position, done);
+		var node = document.getElementById(swfid);
+		if (typeof node.flashdata !== 'function')
+		{
+			return setTimeout(function ()
+			{
+				if (!dl.cancelled)
+				{
+					if (++retries < 400) IO.write(buffer, position, done);
+					else dlFatalError(dl, 'FlashIO Object unavailable');
+				}
 			}, 300);
 		}
 		var j,k,len,subdata;
@@ -22,7 +30,7 @@ function FlashIO(dl_id, dl) {
 		else
 			subdata = base64urlencode(buffer.buffer);
 
-		document.getElementById(swfid).flashdata(dl_id, subdata);
+		node.flashdata(dl_id, subdata);
 		offset += len
 		Later(done);
 	};

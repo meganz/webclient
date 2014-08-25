@@ -958,8 +958,14 @@ function DEBUG() {
 }
 
 function ASSERT(what, msg) {
-	if (console.assert) console.assert(what, msg);
-	else if (!what) console.error('FAILED ASSERTION', msg);
+	if (!what)
+	{
+		if (console.assert) console.assert(what, msg);
+		else console.error('FAILED ASSERTION', msg);
+		Soon(function() {
+			throw new Error('FAILED ASSERTION: ' + msg);
+		});
+	}
 }
 
 function oDestroy(obj) {
@@ -1379,7 +1385,9 @@ function percent_megatitle()
 }
 
 function hostname(url) {
-	return (url || "").match(/https?:\/\/([^.]+)/)[1];
+	if (d) ASSERT(url && /^http/.test(url), 'Invalid URL passed to hostname() -> ' + url);
+	url = (''+url).match(/https?:\/\/([^.]+)/);
+	return url && url[1];
 }
 
 // Helper to manage time/sizes in a friendly way
@@ -1556,16 +1564,15 @@ function ucfirst(str) {
 
 function readLocalStorage(name, type, val)
 {
-	if (!localStorage[name]) return false;
-	var f = 'parse' + ucfirst(type[0])
-		, v = localStorage[name];
+	var v;
+	if (localStorage[name])
+	{
+		var f = 'parse' + ucfirst(type);
+		v = localStorage[name];
 
-	if (typeof f == "callback") {
-		v =  window[f](v);
+		if (typeof window[f] === "function") v =  window[f](v);
+
+		if (val && ((val.min && val.min > v) || (val.max && val.max < v))) v = null;
 	}
-
-	if (val && val.min && val.min > v)  return false;
-	if (val && val.max && val.max < v)  return false;
-
-	return v;
+	return v || (val && val.def);
 }

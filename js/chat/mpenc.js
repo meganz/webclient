@@ -2043,7 +2043,7 @@ define('mpenc/greet/cliques',[
         var retValue = this._renewPrivKey();
 
         // Discard old and make new group key.
-        this.groupKey = retValue.cardinal;
+        this.groupKey = utils.sha256(retValue.cardinalKey);
         this._debugGroupKey = retValue.cardinalDebugKey;
 
         // Pass broadcast message on to all members.
@@ -2091,7 +2091,7 @@ define('mpenc/greet/cliques',[
 
         // Discard old and make new group key.
         this.groupKey = null;
-        this.groupKey = retValue.cardinalKey;
+        this.groupKey = utils.sha256(retValue.cardinalKey);
         this._debugGroupKey = retValue.cardinalDebugKey;
 
         // Pass broadcast message on to all members.
@@ -2144,7 +2144,7 @@ define('mpenc/greet/cliques',[
         if (myPos === this.members.length - 1) {
             // I'm the last in the chain:
             // Cardinal is secret key.
-            this.groupKey = result.cardinalKey;
+            this.groupKey = utils.sha256(result.cardinalKey);
             this._debugGroupKey = result.cardinalDebugKey;
             this._setKeys(this.intKeys, this._debugIntKeys);
             // Broadcast all intermediate keys.
@@ -2256,8 +2256,8 @@ define('mpenc/greet/cliques',[
         var myPos = this.members.indexOf(this.id);
         this.intKeys = intKeys;
         this._debugIntKeys = debugKeys;
-        this.groupKey = jodid25519.dh.computeKey(this.privKey,
-                                                 this.intKeys[myPos]);
+        this.groupKey = utils.sha256(jodid25519.dh.computeKey(this.privKey,
+                                                              this.intKeys[myPos]));
         this._debugGroupKey = ns._computeKeyDebug(this._debugPrivKey,
                                                   this._debugIntKeys[myPos]);
     };

@@ -1068,6 +1068,8 @@ var failtime = 0;
 
 function api_reportfailure(hostname,callback)
 {
+	if (!hostname) return Soon(callback);
+
 	var t = new Date().getTime();
 
 	if (t-failtime < 60000) return;
@@ -1920,7 +1922,8 @@ function api_fareq(res,ctx)
 			{
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				this.ctx.errfa(id,1);
+				if (this.ctx.errfa) this.ctx.errfa(id,1);
+				else console.error('errfa', id);
 			}
 
 			faxhrs[slot].onreadystatechange = function()

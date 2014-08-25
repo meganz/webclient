@@ -2576,7 +2576,7 @@ function UIkeyevents()
 	{		
 	
 		var sl=false,s;
-		if (M.viewmode) s = $('.file-block.ui-selected');
+		if (M.viewmode) s = $('.fm-blocks-view .file-block.ui-selected');
 		else s = $('.grid-table.fm tr.ui-selected');
 		
 		if (M.chat) return true;
@@ -2675,7 +2675,7 @@ function UIkeyevents()
 			},50,r);
 		}
 		else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid == '.grid-scrolling-table' && !$.dialog)
-		{		
+		{
 			// down in grid
 			if (e.shiftKey) $(e).addClass('ui-selected');
 			if ($(s[s.length-1]).next().length > 0)
@@ -2695,6 +2695,7 @@ function UIkeyevents()
 		}
 		else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
 		{
+			console.log(s);
 			$.selected=[];
 			s.each(function(i,e)
 			{

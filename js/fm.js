@@ -646,14 +646,10 @@ function initUI()
 			var n = M.d[M.currentdirid];
 			if ((n && n.p && M.d[n.p]) || (n && n.p == 'contacts')) M.openFolder(n.p);
 		}
-	});
-
+	});	
 	$('.fm-right-header.fm').removeClass('hidden');
-	if (folderlink)
-	{
-		// todo: enable folder link in header
-	}
-	else folderlink=0;
+	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text((M.d[M.RootID]||{}).name||"\u30C4");
+	else folderlink=0;	
 	$('.add-user-popup-button').unbind('click');
 	$('.add-user-popup-button').bind('click',function(e)
 	{
@@ -3174,8 +3170,8 @@ function UIkeyevents()
 		if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) return false;
 
 		var sl=false,s;
-		if (M.viewmode) s = $('.file-block.ui-selected');
-		else s = $('.grid-table tr.ui-selected');
+		if (M.viewmode) s = $('.fm-blocks-view.fm .file-block.ui-selected');
+		else s = $('.grid-table.fm tr.ui-selected');
 
 		if (M.chat) return true;
 		

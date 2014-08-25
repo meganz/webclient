@@ -2695,7 +2695,6 @@ function UIkeyevents()
 		}
 		else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
 		{
-			console.log(s);
 			$.selected=[];
 			s.each(function(i,e)
 			{

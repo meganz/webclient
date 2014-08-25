@@ -574,7 +574,6 @@ function initUI()
 	cSortMenuUI();
 	M.buildSubmenu();
 	copyDialog();
-//	initContextUI();
 	transferPanelUI();
 	UIkeyevents();
 	addUserUI();
@@ -1226,8 +1225,6 @@ function initContextUI()
 			M.moveNodes(n,t);
 		}
 	});
-	// Not sure if this will work
-//	$(c + '.folder-item.disabled, ' + c + '.cloud-item.disabled').off('click');
 
 	$(c+'.download-item').unbind('click');
 	$(c+'.download-item').bind('click',function(event)
@@ -1293,10 +1290,10 @@ function initContextUI()
 	$(c+'.copy-item').bind('click',function(event)
 	{
 		$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-		$('.copy-dialog .dialog-copy-button').addClass('active');
+//		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
+		handleDialogTabContent('.cloud-drive', 'ul', true);
 		$('.fm-dialog-overlay').removeClass('hidden');
-//		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});
 
 	$(c+'.newfolder-item').unbind('click');
@@ -4956,41 +4953,54 @@ function shareDialog(close)
 	jScrollFade('.fm-share-body');
 }
 
-function copyDialog()
-{
-	$.dialogPositioning = function()
+	function handleDialogTabContent(s, m, c, i)
 	{
-		$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
-	}
-    $.copyDialogScroll = function()
-	{
-		$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-    }
-	$.initCopyDialog = function ()
-	{
-		// Determine from whta panel copy dialog is called and show that tab and fill ti
-//		$('.copy-dialog-button.active').removeClass('active');
-//		$('.copy-dialog-txt.active').removeClass('active');
-		$('.copy-dialog-empty.active').removeClass('active');
-        $('.copy-dialog-tree-panel.active').removeClass('active');
-		if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block ul').length)
+		$('.copy-dialog-txt').removeClass('active');
+		$('.copy-dialog-empty').removeClass('active');
+		$('.copy-dialog-button').removeClass('active');
+		$('.copy-dialog-tree-panel').removeClass('active');
+		
+		$('.copy-dialog-txt' + s).addClass('active');
+		var b;
+		// Added cause of conversations-container
+		if (typeof i === 'undefined') b = $('.content-panel' + s).html();
+		else b = $('.content-panel ' + i).html()
+		
+		$('.copy-dialog-tree-panel' + s + ' .dialog-content-block')
+			.empty()
+			.html(b);
+		if (!$('.copy-dialog-tree-panel' + s + ' .dialog-content-block ' + m).length)
 		{
-			$('.copy-dialog-empty.cloud-drive').addClass('active');
-			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
+			$('.copy-dialog-empty' + s).addClass('active');
+			$('.copy-dialog-tree-panel' + s + ' .copy-dialog-panel-header').addClass('hidden');
 		}
 		else
 		{
-			$('.copy-dialog-tree-panel.cloud-drive').addClass('active');
-			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').removeClass('hidden');						
+			$('.copy-dialog-tree-panel' + s).addClass('active');
+			$('.copy-dialog-tree-panel' + s + ' .copy-dialog-panel-header').removeClass('hidden');						
 		}
-        $('.dialog-newfolder-button').removeClass('hidden');
+		// Create New Folder button
+		if (c) $('.dialog-newfolder-button').removeClass('hidden');
+		else $('.dialog-newfolder-button').addClass('hidden');
+
+	    copyDialogPositioning();
+		copyDialogScroll();
+
+		$('.copy-dialog-button' + s).addClass('active');//Activate tab
 	}
-	$.fillCopyDialog = function()
-	{
-		$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').append($('.content-panel.cloud-drive ul:first'));
-		$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').append($('.content-panel.shared-with-me ul:first'));
-//		$('.copy-dialog-tree-panel.conversations .dialog-content-block').append($(i + '.conversations ul'));		
-	}
+	
+function copyDialogScroll()
+{
+	$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+};
+
+function copyDialogPositioning()
+{
+	$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
+};
+
+function copyDialog()
+{
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
@@ -5000,70 +5010,22 @@ function copyDialog()
 		$('.copy-dialog').addClass('hidden');
 	});
 	
-    $.dialogPositioning();
-    $.copyDialogScroll();
-	$.fillCopyDialog();
-	$.initCopyDialog();
-
     $('.copy-dialog-button').unbind('click');
     $('.copy-dialog-button').bind('click', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
-            $('.copy-dialog-button.active').removeClass('active');
-            $('.copy-dialog-txt.active').removeClass('active');
-            $('.copy-dialog-empty.active').removeClass('active');
-            $('.copy-dialog-tree-panel.active').removeClass('active');
             var section = $(this).attr('class').replace('copy-dialog-button', '').split(" ").join("");
             switch (section)
             {
                 case 'cloud-drive':
-					$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').html('');
-					$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block').append($('.content-panel.cloud-drive ul:first'));
-                    $('.copy-dialog-txt.cloud-drive').addClass('active');
-					if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block ul').length)
-					{
-						$('.copy-dialog-empty.cloud-drive').addClass('active');
-						$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.cloud-drive').addClass('active');
-						$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').removeClass('hidden');						
-					}
-                    $('.dialog-newfolder-button').removeClass('hidden');
+					handleDialogTabContent('.cloud-drive', 'ul', true)
                     break;
                 case 'shared-with-me':
-					$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').html('');
-					$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block').append($('.content-panel.shared-with-me ul:first'));
-                    $('.copy-dialog-txt.shared-with-me').addClass('active');
-					if (!$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block ul').length)
-					{
-						$('.copy-dialog-empty.shared-with-me').addClass('active');
-						$('.copy-dialog-tree-panel.shared-with-me .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.shared-with-me').addClass('active');
-						$('.copy-dialog-tree-panel.shared-with-me .copy-dialog-panel-header').removeClass('hidden');						
-					}
-                    $('.dialog-newfolder-button').addClass('hidden');
+					handleDialogTabContent('.shared-with-me', 'ul', false);
                     break;
                 case 'conversations':
-                    $('.copy-dialog-txt.conversations').addClass('active');
-					if (!$('.copy-dialog-tree-panel.conversations .dialog-content-block div').length)
-					{
-						$('.copy-dialog-empty.conversations').addClass('active');
-						$('.copy-dialog-tree-panel.conversations .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.conversations').addClass('active');
-						$('.copy-dialog-tree-panel.conversations .copy-dialog-panel-header').removeClass('hidden');
-					}
-                    $('.dialog-newfolder-button').addClass('hidden');
+					handleDialogTabContent('.conversations', 'div', false, '.conversations-container');
                     break;
             }
-            $(this).addClass('active');
-            $.copyDialogScroll();
         }
     });
 
@@ -5085,9 +5047,8 @@ function copyDialog()
             $(this).addClass('active');
             $('.dialog-sorting-menu').addClass('hidden');
         }
-
         $('.dialog-sorting-menu').addClass('hidden');
-        $('.copy-dialog-panel-arrows.active').removeClass('active')
+        $('.copy-dialog-panel-arrows.active').removeClass('active');
     });
 	
 	$('.copy-dialog .dialog-newfolder-button').unbind('click');
@@ -5096,7 +5057,6 @@ function copyDialog()
 		createfolderDialog();
 		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 	});
-
 }
 
 function mcDialog(close)

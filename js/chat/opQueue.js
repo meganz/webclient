@@ -240,6 +240,11 @@ OpQueue.prototype.pop = function() {
                 try {
                     self.ctx[op[0]](op[1], op[2], op[3]);
                 } catch(e) {
+                    if(op[0] == "processMessage" || e.name == "TypeError") {
+                        if(localStorage.stopOnAssertFail) {
+                            debugger;
+                        }
+                    }
                     console.error("OpQueue caught mpenc exception: ", e, op);
                 }
             }

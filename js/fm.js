@@ -1137,7 +1137,7 @@ function fmremove()
 		if (localStorage.skipDelWarning) M.moveNodes($.selected,M.RubbishID);
 		else
 		{
-			msgDialog('confirmation',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
+			msgDialog('remove',l[1003],l[1004].replace('[X]',fm_contains(filecnt,foldercnt)),false,function(e)
 			{
 				if (e)
 				{
@@ -3319,7 +3319,7 @@ function UIkeyevents()
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(false);
 		}
-		else if (e.keyCode == 13 && $.msgDialog == 'confirmation')
+		else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove'))
 		{
 			closeMsg();
 			if ($.warningCallback) $.warningCallback(true);
@@ -4619,7 +4619,7 @@ function dorename()
 function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
-	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog');
+	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
 	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
@@ -4627,7 +4627,7 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 	{
 		$('#msgDialog').addClass('clear-bin-dialog');
 		$('#msgDialog .icon').addClass('fm-bin-clear-icon');
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();
@@ -4652,9 +4652,9 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 		else if (type == 'warningb') $('#msgDialog').addClass('warning-dialog-b');
 		else if (type == 'info') $('#msgDialog').addClass('notification-dialog');
 	}
-	else if (type == 'confirmation')
-	{
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="clear"></div>');
+	else if (type == 'confirmation' || type == 'remove')
+	{ 
+		$('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' +l[229]+'</label></div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
 
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
@@ -4668,31 +4668,32 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');
+		if (type == 'remove') $('#msgDialog').addClass('remove-dialog');
 		
 		if (checkbox)
 		{
-			$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');			
+			$('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');			
 			$.warningCheckbox=false;
-			$('#msgDialog .confirmation-checkbox').removeClass('hidden');
-			$('#msgDialog .confirmation-checkbox').unbind('click');
-			$('#msgDialog .confirmation-checkbox').bind('click',function(e)
+			$('#msgDialog .left.checkbox-block').removeClass('hidden');
+			$('#msgDialog .left.checkbox-block').unbind('click');
+			$('#msgDialog .left.checkbox-block').bind('click',function(e)
 			{
-				var c = $('#msgDialog .confirmation-checkbox input').attr('class');
+				var c = $('#msgDialog .left.checkbox-block input').attr('class');
 				if (c && c.indexOf('checkboxOff') > -1)
 				{
-					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOff').addClass('checkboxOn');
+					$('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOff').addClass('checkboxOn');
 					localStorage.skipDelWarning=1;
 				}
 				else
 				{
-					$('#msgDialog .confirmation-checkbox .checkdiv, #msgDialog .confirmation-checkbox input').removeClass('checkboxOn').addClass('checkboxOff');
+					$('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');
 					delete localStorage.skipDelWarning;
 				}			
 			});			
 		}
 	}
 
-	$('#msgDialog .fm-dialog-title').text(title);
+	$('#msgDialog .fm-dialog-title span').text(title);
 	$('#msgDialog .fm-notification-info p').html(msg);
 	if (submsg)
 	{

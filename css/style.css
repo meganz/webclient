@@ -8992,7 +8992,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .export-link-text-pad {
 	margin: 0 0 0 82px;
-	padding-top: 12px;
+	padding-top: 11px;
+}
+.file .export-link-text-pad {
+	padding-top: 1px;
 }
 .export-link-txt {
 	font-size: 11px;
@@ -9010,6 +9013,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .export-link-gray-txt {
 	color: #999999;
+	display: block;
+	font-size: 11px;
+	line-height: 16px;
 }
 .copy-keys-button {
 	display: block;

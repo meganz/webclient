@@ -410,13 +410,23 @@
 	   <div class="fm-dialog-chrome-clipboard hidden"><textarea id="chromeclipboard" style="width:10px; height:20px;"></textarea></div>
        <div class="fm-dialog-close"></div>
        <div class="clear"></div>
-     </div>   
-     <div class="export-link-body">      
+     </div> 
+     <div class="export-content-block"> 
+       <div class="export-gradient top"></div>
+       <div class="export-gradient bottom"></div>  
+       <div class="export-link-body">      
+       </div>
      </div>
      <div class="fm-notifications-bottom">
-        <div class="checkboxOff"> <input type="checkbox" name="export-checkbox" id="export-checkbox" class="checkboxOff"> </div>
-        <label for="export-checkbox" class="radio-txt">[$1032]</label> 
-		<div class="fm-dialog-button links-button active" id="clipboardbtn1">
+        <!--<div class="checkboxOff"> <input type="checkbox" name="export-checkbox" id="export-checkbox" class="checkboxOff"> </div>
+        <label for="export-checkbox" class="radio-txt">[$1032]</label> !-->
+        <div class="on_off export-checkbox">
+                <input type="checkbox" name="export-checkbox" id="export-checkbox" checked="checked"  />
+        </div>
+        <div class="export-checkbox-label">
+           Include key
+        </div>
+		<div class="fm-dialog-button links-button copy-to-clipboard active" id="clipboardbtn1">
           
         </div>
 		
@@ -431,12 +441,14 @@
 
 <div class="export-links-warning hidden">
    <div class="export-links-warning-close"></div>
-   <p>
-     <span class="orange">[$368]</span> [$369]
-   </p>
-   <p>
-     <span class="red">[$366]</span> [$367]
-   </p>
+   <div class="export-warning-content">
+     <p>
+       <span class="orange">[$368]</span> [$369]
+     </p>
+     <p>
+       <span class="red">[$366]</span> [$367]
+     </p>
+   </div>
 </div>
 
 

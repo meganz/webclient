@@ -5356,24 +5356,6 @@ function linksDialog(close)
 	{
 		$('.export-links-warning').addClass('hidden');
 	});
-	$('#export-checkbox').unbind('click');
-    $('#export-checkbox').bind('click',function()
-	{
-		if ($(this).attr('class').indexOf('checkboxOn') == -1)
-		{
-			$(this).closest('.fm-dialog').addClass('file-keys-view');
-			$(this).attr('class', 'checkboxOn');
-			$(this).parent().attr('class', 'checkboxOn');
-			$(this).attr('checked', true);
-		}
-		else
-		{
-			$(this).closest('.fm-dialog').removeClass('file-keys-view');
-			$(this).attr('class', 'checkboxOff');
-			$(this).parent().attr('class', 'checkboxOff');
-			$(this).attr('checked', false);
-		}
-	});
 	$('.export-links-dialog .fm-dialog-close').unbind('click');
     $('.export-links-dialog .fm-dialog-close').bind('click',function()
 	{
@@ -5432,18 +5414,29 @@ function linksDialog(close)
 			if (e && e.setclipboardtext) e.setclipboardtext(getclipboardkeys());
 		});
 	}
-
-	$('#export-checkbox').attr('checked', true);
-	$('#export-checkbox').addClass('checkboxOn').removeClass('checkboxOff');
-	$('#export-checkbox').parent().addClass('checkboxOn').removeClass('checkboxOff');
+    $('.export-checkbox :checkbox').iphoneStyle({resizeContainer:false,resizeHandle:false,onChange:function(elem, data)
+	{
+	   if(data) {
+		   $(elem).closest('.on_off').addClass('on');
+		   $('.export-links-dialog').addClass('file-keys-view');
+	   }
+	   else {
+		   $(elem).closest('.on_off').removeClass('on').addClass('off');
+		   $('.export-links-dialog').removeClass('file-keys-view');
+	   }
+	}});
+	$('.export-checkbox').addClass('on');
 	$('.export-links-dialog').addClass('file-keys-view');
 	$('.export-links-dialog .export-link-body').html(html);
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.export-links-warning').removeClass('hidden');
 	$('.fm-dialog.export-links-dialog').removeClass('hidden');
-	$('.export-link-body').jScrollPane({showArrows:true, arrowSize:5});
-	jScrollFade('.export-link-body');
-	$('.fm-dialog.export-links-dialog').css('margin-top',$('.fm-dialog.export-links-dialog').height()/2*-1);
+	$('.export-link-body').removeAttr('style');
+	if ($('.export-link-body').outerHeight() == 384) {
+	   $('.export-link-body').jScrollPane({showArrows:true, arrowSize:5});
+	   jScrollFade('.export-link-body');
+	}
+	$('.fm-dialog.export-links-dialog').css('margin-top',$('.fm-dialog.export-links-dialog').outerHeight()/2*-1);
 }
 
 function createfolderDialog(close)

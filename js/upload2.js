@@ -98,10 +98,10 @@ function ul_Identical(target, path, hash,size)
 	var n = M.d[target];
 	for (var i in p)
 	{
+		if (!n) return false;
 		var foldername = p[i];
 		var h = n.h;
-		if (!n) return false;
-		var n = false;
+		n = false;
 		for (var j in M.c[h])
 		{
 			if (M.d[j] && M.d[j].name == foldername)
@@ -357,7 +357,7 @@ function ul_start(File) {
 
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
-		if (!cfile.id) continue;
+		if (!isQueueActive(cfile)) continue;
 		api_req({ 
 			a : 'u', 
 			ssl : use_ssl, 
@@ -418,7 +418,8 @@ ChunkUpload.prototype.updateprogress = function() {
 
 ChunkUpload.prototype.abort = function() {
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
-	removeValue(GlobalProgress[this.gid].working, this, 1);
+	if (GlobalProgress[this.gid]) removeValue(GlobalProgress[this.gid].working, this, 1);
+	else if (d) console.error('This should not be reached twice or after FileUpload destroy...');
 	delete this.xhr;
 };
 
@@ -508,9 +509,15 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 }
 
 ChunkUpload.prototype.upload = function() {
+	
+	if (!this.file) {
+		ASSERT(this.file, 'Was this upload destroyed? ' + !this.gid);
+		return;
+	}
+	
 	var xhr = getXhr(this);
 
-	DEBUG("pushing", this.file.posturl + this.suffix)
+	if (d) console.log("pushing", this.file.posturl + this.suffix)
 
 	if (chromehack) {
 		var data8 = new Uint8Array(this.bytes.buffer);
@@ -548,11 +555,14 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 ChunkUpload.prototype.done = function(ee) {
 	if (d) console.log(this + '.done');
 
-	/* release worker */
-	this._done();
+	if (this._done)
+	{
+		/* release worker */
+		this._done();
 
-	/* clean up references */
-	this.destroy();
+		/* clean up references */
+		this.destroy();
+	}
 };
 
 ChunkUpload.prototype.run = function(done) {
@@ -575,12 +585,14 @@ FileUpload.prototype.toString = function() {
 
 FileUpload.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
-	ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
+	// Hmm, looks like there are more ChunkUploads than what we really upload (!?)
+	if (d) ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
 	delete GlobalProgress[this.gid];
 	if (is_chrome_firefox && this.file._close)
 	{
 		this.file._close();
 	}
+	this.file.ul_reader.destroy();
 	oDestroy(this.file);
 	oDestroy(this);
 };
@@ -596,8 +608,8 @@ FileUpload.prototype.run = function(done) {
 	file.ul_lastreason	= file.ul_lastreason || 0
 
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
-		done();
-		DEBUG2("this shouldn't happen");
+		done(); 
+		ASSERT(0, "This shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
 
@@ -730,23 +742,32 @@ function ul_filereader(fs, file) {
 		var end = task.start+task.end
 			, blob
 		if (file.slice || file.mozSlice) {
-			if (file.mozSlice) blob = file.mozSlice(task.start, end);
-			else blob = file.slice(task.start, end);
+			if (file.slice) blob = file.slice(task.start, end);
+			else blob = file.mozSlice(task.start, end);
 			xhr_supports_typed_arrays = true;
 		} else {
 			blob = file.webkitSlice(task.start, end);
 		}
 
 		fs.pos = task.start;
-		fs.readAsArrayBuffer(blob);
 		fs.onerror = function(evt) {
 			done(new Error(evt))
-		}
+		};
 		fs.onloadend = function(evt) {
-			if (evt.target.readyState == FileReader.DONE) {
+			if (evt.target.readyState == FileReader.DONE) try {
 				task.bytes = new Uint8Array(evt.target.result);
 				done(null)
+			} catch(e) {
+				console.error(e);
+				done(e);
 			}
+			blob = undefined;
+		};
+		try {
+			fs.readAsArrayBuffer(blob);
+		} catch(e) {
+			console.error(e);
+			done(e);
 		}
 	}, 1);
 }
@@ -757,7 +778,7 @@ function worker_uploader(task, done) {
 }
 
 var ul_queue  = new UploadQueue
-	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'integer', { min: 1, max:6}) || 4
+	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 })
 	, Encrypter
 	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
 	, ul_skipIdentical = 0

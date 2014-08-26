@@ -282,7 +282,7 @@ function dl_fm_import()
 	dl_import=false;
 }
 
-function dlerror(id,error)
+function dlerror(dl,error)
 {	
 	var errorstr='';
 	var tempe=false;
@@ -387,6 +387,7 @@ function start_anoimport()
 function dlcomplete(id)
 {
 	if (d) console.log('dlcomplete',id);
+	if (typeof id === 'object') id = id.dl_id;
 	$('.download-pause').hide();
 	$('.download-mid-centered-block').addClass('download-complete');	
 	$('.download-icon-pause').hide();

@@ -16,7 +16,7 @@ var chatui;
 (function() {
     chatui = function(id) {
 	
-        //TODO: move this code to MegaChat.constructor() and .show(jid)
+        //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyMsg();
 		
         $('.fm-files-view-icon').addClass('hidden');
@@ -109,10 +109,8 @@ var chatui;
             }
         });
 
-
-        //TODO: does not work... fixme
-        $('.fm-chat-block').off('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button');
-        $('.fm-chat-block').on('mouseover.megachat click.megachat', '.fm-chat-file-button.save-button', function() {
+        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.red.active');
+        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.red.active', function() {
             var currentRoom = megaChat.getCurrentRoom();
 
             var $chatDownloadPopup = $('.fm-chat-download-popup',currentRoom.$messages);
@@ -159,33 +157,67 @@ var chatui;
 
 
             var p = $(this);
-            var positionY = $(this).closest('.jspPane').outerHeight() - $(this).position().top;
+            var positionY = $(this).closest('.fm-chat-message-pad').outerHeight() - $(this).position().top;
             var positionX = $(this).position().left;
-            if (positionY - 174 > 0)
-            {
-                $($chatDownloadPopup).css('bottom', positionY - 174 + 'px');
-                $($chatDownloadPopup).removeClass('top');
-            }
-            else
-            {
-                $($chatDownloadPopup).css('bottom', positionY + 'px');
-                $($chatDownloadPopup).addClass('top');
-            }
-            $($chatDownloadPopup).css('left', positionX + $(this).outerWidth()/2 + 10 + 'px');
+            // if (positionY - 174 > 0) {
+            $($chatDownloadPopup).css('bottom', positionY + 10  + 'px');
+            // } else {
+            //   $(chatDownloadPopup).css('bottom', positionY + 'px');
+            //   $(chatDownloadPopup).addClass('top');
+            // }
+            $chatDownloadPopup.addClass('active');
+            $chatDownloadPopup.css('margin-left', '-'+ $chatDownloadPopup.outerWidth()/2 + 'px');
+            $chatDownloadPopup.css('left', positionX + $(this).outerWidth()/2 + 10  + 'px');
             $(this).addClass('active');
-            $($chatDownloadPopup).removeClass('hidden');
+            $($chatDownloadPopup).addClass('active');
 
 
         });
 
+        // cancel func.
+        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.cancel-button');
+        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.cancel-button', function() {
+            var nodeId = $(this).parent().attr("data-node-id");
+            var messageId = $(this).parent().parent().attr("data-message-id");
 
 
-        //TODO: does not work... fixme
+            var megaRoom = megaChat.getCurrentRoom();
+            megaRoom.sendAction(
+                "cancel-attachment",
+                "",
+                {
+                    'roomJid': megaRoom.roomJid,
+                    'nodeId': nodeId,
+                    'messageId': messageId
+                }
+            );
+
+            megaRoom.cancelAttachment(messageId, nodeId);
+        });
+
+
+
         $('.fm-chat-message-scroll').unbind('click');
         $('.fm-chat-message-scroll').bind('click', function()
         {
-            $('.fm-chat-download-popup').addClass('hidden');
+            megaChat.closeChatPopups();
         });
+
+
+        $('.fm-chat-popup-button.from-computer')
+            .unbind('click.megaChat')
+            .bind('click.megaChat', function() {
+                megaChat.closeChatPopups();
+                $('#fileselect1').trigger('click');
+            });
+
+        $('.fm-chat-popup-button.from-cloud')
+            .unbind('click.megaChat')
+            .bind('click.megaChat', function() {
+                megaChat.closeChatPopups();
+                megaChat.filePicker.show();
+            });
+
 
 
         //XX: does not work... fix this when we go into v2
@@ -678,6 +710,14 @@ MegaChat.prototype.init = function() {
         } else if(eventObject.getAction() == "syncResponse") {
             room = self.chats[meta.roomJid];
             room.handleSyncResponse(eventObject);
+        } else if(eventObject.getAction() == "cancel-attachment" && fromMyDevice === true) {
+            if(fromMyDevice === true) {
+                room = self.chats[meta.roomJid];
+                room.cancelAttachment(
+                    meta.messageId,
+                    meta.nodeId
+                );
+            }
         } else if(eventObject.getAction() == "conv-end") {
             if(fromMyDevice === true) {
                 room = self.chats[meta.roomJid];
@@ -1426,12 +1466,7 @@ MegaChat.prototype.renderContactTree = function() {
         }
 
 
-        // update contacts nav tree
-        if(targetClassName !== "offline") {
-            $('#contact_' + contact.u + ' .start-chat-button', '.fm-tree-panel').show();
-        } else {
-            $('#contact_' + contact.u + ' .start-chat-button', '.fm-tree-panel').hide();
-        }
+
         $('#contact_' + contact.u, '.fm-tree-panel')
             .removeClass("online")
             .removeClass("offline")
@@ -1488,19 +1523,32 @@ MegaChat.prototype.renderContactTree = function() {
         var u_h = node_id.replace("contact_", "");
 
 
-        var pres = M.onlineStatusClass(self.karere.getPresence(self.getJidFromNodeId(u_h)))[1];
-        if(pres == 'offline') {
-            $('.start-chat-button', $node).hide();
-        } else {
-            var startChatTxt = megaChat.getPrivateRoom(u_h) === false ? "Start chat" : "Show chat";
-            $('.start-chat-button', $node)
-                .show()
-                .text(
-                    startChatTxt
-                );
+        var startChatTxt = "Start chat";
+        $('.start-chat-button', $node)
+            .show()
+            .text(
+                startChatTxt
+            );
+    });
 
-        }
-    })
+
+    // update the "global" conversation tab unread counter
+    var unreadCount = 0;
+    for(var k in self.chats) {
+        var megaRoom = self.chats[k];
+        unreadCount += megaRoom.unreadCount;
+    }
+
+    if(unreadCount > 0) {
+        $('.new-messages-indicator')
+            .text(
+                unreadCount
+            )
+            .removeClass('hidden');
+    } else {
+        $('.new-messages-indicator')
+            .addClass('hidden');
+    }
 };
 
 /**
@@ -1840,6 +1888,7 @@ MegaChat.prototype.closeChatPopups = function() {
     var activeButton = $('.chat-button.active');
     activeButton.removeClass('active');
     activePopup.removeClass('active');
+
     if (activePopup.attr('class')) {
         activeButton.removeClass('active');
         activePopup.removeClass('active');
@@ -4062,6 +4111,19 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
 };
 
 /**
+ * Alias for sendAction, which will queue the action in case the room/enc is not ready.
+ *
+ * @param message
+ * @param meta
+ */
+MegaChatRoom.prototype.sendAction = function(action, message, meta) {
+    var self = this;
+    meta.action = action;
+
+    self.sendMessage(message, meta);
+};
+
+/**
  * Helper for accessing options.mediaOptions;
  *
  * @returns {*}
@@ -4397,6 +4459,23 @@ MegaChatRoom.prototype._conversationStarted = function(userFullJid) {
     );
 
     self.setState(MegaChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
+};
+MegaChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
+    var self = this;
+
+    var msg = self.getMessageById(messageId);
+
+    if(msg && msg.meta && msg.meta.attachments && msg.meta.attachments[nodeId]) {
+        msg.meta.attachments[nodeId].canceled = true;
+    }
+
+
+    var $container = $('.attachments-container[data-message-id="' + messageId + '"] .nw-chat-sharing-body[data-node-id="' + nodeId + '"]', self.$messages);
+    if($container.size() > 0) {
+        $('.nw-chat-button:first', $container).after($('<em>Canceled</em>'));
+
+        $('.nw-chat-button', $container).remove();
+    }
 };
 
 window.megaChat = new MegaChat();

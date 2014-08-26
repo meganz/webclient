@@ -1,5 +1,5 @@
 var dlMethod
-	, dl_maxSlots = readLocalStorage('dl_maxSlots', 'integer', {min:1, max:6}) || 5
+	, dl_maxSlots = readLocalStorage('dl_maxSlots', 'int', { min:1, max:6, def:5 })
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, ui_paused = false
@@ -322,10 +322,6 @@ dlQueue.validateTask = function(pzTask)
 	return r;
 };
 // }}}
-
-if (localStorage.dl_maxSlots) {
-	dl_maxSlots = parseInt( localStorage.dl_maxSlots );
-}
 
 function checkLostChunks(file)
 {

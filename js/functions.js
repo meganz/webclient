@@ -1564,16 +1564,15 @@ function ucfirst(str) {
 
 function readLocalStorage(name, type, val)
 {
-	if (!localStorage[name]) return false;
-	var f = 'parse' + ucfirst(type[0])
-		, v = localStorage[name];
+	var v;
+	if (localStorage[name])
+	{
+		var f = 'parse' + ucfirst(type);
+		v = localStorage[name];
 
-	if (typeof f == "callback") {
-		v =  window[f](v);
+		if (typeof window[f] === "function") v =  window[f](v);
+
+		if (val && ((val.min && val.min > v) || (val.max && val.max < v))) v = null;
 	}
-
-	if (val && val.min && val.min > v)  return false;
-	if (val && val.max && val.max < v)  return false;
-
-	return v;
+	return v || (val && val.def);
 }

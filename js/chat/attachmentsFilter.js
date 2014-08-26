@@ -1,5 +1,3 @@
-//TODO: does not work... fixme
-
 /**
  * AttachmentsFilter
  *
@@ -48,64 +46,85 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
     var m = eventData.message;
 
     // depending on the type and count of the attachments, we have different ways to render them:
-    // 1. one file
-    // 2. one folder
-    // 3. multiple files/folders
+    // 1. one file/folder
+    // 2. more then 1 file/folder
 
     var nodeIds = Object.keys(meta.attachments);
     var attachments = meta.attachments; // alias
 
-    // case 1 & 2
+    var i = 0;
 
-    if(nodeIds.length == 1) {
-        var attachment = attachments[nodeIds[0]]; //alias
+    var $container = $('<div class="attachments-container"></div>');
+
+
+    $.each(attachments, function(k, attachment) {
+        if(attachment.canceled) {
+            return; // continue;
+        }
 
         var $element = $(
-            '<div class="attachments-container">'+
-                '<div class="block-view-file-type"></div>' +
-                '<div class="fm-chat-filename">' +
+            '<div class="nw-chat-sharing-body">' +
+                '<div class="nw-chat-icons-area">' +
+                    '<span class="block-view-file-type text"></span>' +
+                '</div>' +
+                '<div class="nw-chat-sharing-filename">' +
                     'FileName.doc' +
                 '</div>' +
-                '<div class="fm-chat-filesize">' +
+                '<div class="nw-chat-sharing-filesize">' +
                     '750 kb' +
                 '</div>' +
-                '<div class="fm-chat-button-pad">' +
-                    '<div class="fm-chat-file-button save-button">Save...</div>' +
-                '</div>' +
+                '<div class="nw-chat-button red active save-button">Save...</div>' +
+                '<div class="nw-chat-button cancel-button">Cancel</div>' +
+                '<div class="clear"></div>' +
             '</div>'
         );
-        $element.attr('data-message-id', m.getMessageId())
-        $('.fm-chat-filename', $element).text(attachment.name);
+
+        if(i == 0) {
+            $element.addClass("main-body");
+        }
+
+        $('.nw-chat-sharing-filename', $element).text(attachment.name);
 
         if(attachment.t == 0) {
-            // case 1 - one file
-            $('.fm-chat-size', $element).text(bytesToSize(attachment.s));
+            // is file
             $('.block-view-file-type', $element).addClass(
                 fileicon({'name': attachment.name})
             );
-            // TBD
 
+            $('.nw-chat-sharing-filesize', $element).text(bytesToSize(attachment.s));
         } else if(attachment.t == 1) {
-            // case 2 - one folder
+            // is folder
             $('.block-view-file-type', $element).addClass('folder');
-            $('.fm-chat-filesize', $element).remove();
+            $('.nw-chat-sharing-filesize', $element).remove();
         } else { // unknown type?
             assert(false, "unknown attachment type");
         }
-        $element.attr('data-node-id', nodeIds[0]);
+        $element.attr('data-node-id', k);
 
-        var $saveButton = $('.save-button', $element);
-        $saveButton.text('Save...'); //todo: use ll[]
-
-        $('.fm-chat-message', $m).append(
+        $container.append(
             $element
         );
-    } else {
-        // case 3 - multiple files/folders
-        // TODO: TBD
+
+        i++;
+    });
+
+    $container.attr('data-message-id', m.getMessageId());
+
+    $('.fm-chat-message', $m)
+        .addClass('chat-sharing')
+        .append($container);
+
+    if(Object.keys(attachments).length > 1) {
+        $('.fm-chat-message', $m)
+            .addClass('multiple-sharing');
+
+        var $more = $('<span class="nw-chat-expand-arrow"></span>');
+        $('.chat-message-txt', $m).append($more);
+        $more.on('click', function() {
+            $('.fm-chat-message', $m).toggleClass('expanded');
+
+            // trigger refresh of the UI, because height was changed.
+            eventData.room.refreshScrollUI();
+        });
     }
-
-
-
-
 };

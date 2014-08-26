@@ -574,7 +574,7 @@ function initUI()
 	cSortMenuUI();
 	M.buildSubmenu();
 	copyDialog();
-//	initContextUI();
+	moveDialog();
 	transferPanelUI();
 	UIkeyevents();
 	addUserUI();
@@ -1285,8 +1285,11 @@ function initContextUI()
 	$(c+'.advanced-item').unbind('click');
 	$(c+'.advanced-item').bind('click',function(event)
 	{
-		$.mctype='move';
-		mcDialog();
+		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
+//		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.move-dialog').removeClass('hidden');
+		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
+		$('.fm-dialog-overlay').removeClass('hidden');
 	});
 	
 	$(c+'.copy-item').unbind('click');
@@ -1295,10 +1298,21 @@ function initContextUI()
 		$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
+		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
 		$('.fm-dialog-overlay').removeClass('hidden');
 //		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});
 
+	$(c+'.move-item').unbind('click');
+	$(c+'.move-item').bind('click',function(event)
+	{
+		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
+//		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.move-dialog').removeClass('hidden');
+		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
+		$('.fm-dialog-overlay').removeClass('hidden');
+	});
+	
 	$(c+'.newfolder-item').unbind('click');
 	$(c+'.newfolder-item').bind('click',function(event)
 	{
@@ -3148,7 +3162,7 @@ var selectionManager;
 
 function closeDialog()
 {
-	if ($.dialog === 'createfolder' && $.copyDialog)
+	if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog))
 	{
 		$('.fm-dialog.create-folder-dialog').addClass('hidden')
 		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
@@ -3158,6 +3172,7 @@ function closeDialog()
 		$('.fm-dialog').addClass('hidden')
 		$('.fm-dialog-overlay').addClass('hidden');
 		delete $.copyDialog;
+		delete $.moveDialog;
 	}
 	$('.fm-dialog').removeClass('arrange-to-back');
 	
@@ -3309,7 +3324,7 @@ function UIkeyevents()
 		{
 			dorename();
 		}
-		else if (e.keyCode == 27 && $.copyDialog)
+		else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog))
 		{
 			closeDialog();
 		}
@@ -4957,31 +4972,54 @@ function shareDialog(close)
 	jScrollFade('.fm-share-body');
 }
 
+function dialogScroll(s)
+{
+	$(s + '-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+};
+
+function dialogPositioning(s)
+{
+	$('.fm-dialog' + s + '-dialog').css('margin-top', '-' + $('.fm-dialog' + s + '-dialog').height()/2 + 'px');
+};
+
+function handleDialogTabContent(s, m, c, n, i)
+{
+	$(n + '-dialog-txt').removeClass('active');
+	$(n + '-dialog-empty').removeClass('active');
+	$(n + '-dialog-button').removeClass('active');
+	$(n + '-dialog-tree-panel').removeClass('active');
+	
+	$(n + '-dialog-txt' + s).addClass('active');
+	var b;
+	// Added cause of conversations-container
+	if (typeof i === 'undefined') b = $('.content-panel' + s).html();
+	else b = $('.content-panel ' + i).html()
+		
+	$(n + '-dialog-tree-panel' + s + ' .dialog-content-block')
+		.empty()
+		.html(b);
+	if (!$(n + '-dialog-tree-panel' + s + ' .dialog-content-block ' + m).length)
+	{
+		$(n + '-dialog-empty' + s).addClass('active');
+		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').addClass('hidden');
+	}
+	else
+	{
+		$(n + '-dialog-tree-panel' + s).addClass('active');
+		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').removeClass('hidden');						
+	}
+	// Create New Folder button
+	if (c) $('.dialog-newfolder-button').removeClass('hidden');
+	else $('.dialog-newfolder-button').addClass('hidden');
+
+    dialogPositioning(n);
+	dialogScroll(n);
+
+	$(n + '-dialog-button' + s).addClass('active');//Activate tab
+}
+	
 function copyDialog()
 {
-	$.dialogPositioning = function() {
-		$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
-	}
-    $.copyDialogScroll = function() {
-		$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-    }
-	$.initCopyDialog = function () {
-//		$('.copy-dialog-button.active').removeClass('active');
-		$('.copy-dialog-txt.active').removeClass('active');
-		$('.copy-dialog-empty.active').removeClass('active');
-        $('.copy-dialog-tree-panel.active').removeClass('active');
-		if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block li').length)
-		{
-			$('.copy-dialog-empty.cloud-drive').addClass('active');
-			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
-		}
-		else
-		{
-			$('.copy-dialog-tree-panel.cloud-drive').addClass('active');
-			$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').removeClass('hidden');						
-		}
-        $('.dialog-newfolder-button').removeClass('hidden');
-	}
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
@@ -4991,65 +5029,22 @@ function copyDialog()
 		$('.copy-dialog').addClass('hidden');
 	});
 	
-    $.dialogPositioning();
-    $.copyDialogScroll();
-	$.initCopyDialog();
-
     $('.copy-dialog-button').unbind('click');
     $('.copy-dialog-button').bind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
-            $('.copy-dialog-button.active').removeClass('active');
-            $('.copy-dialog-txt.active').removeClass('active');
-            $('.copy-dialog-empty.active').removeClass('active');
-            $('.copy-dialog-tree-panel.active').removeClass('active');
-            var section = $(this).attr('class').replace('copy-dialog-button', '').split(" ").join("");
+            var section = $(this).attr('class').split(" ")[1];
             switch (section)
             {
                 case 'cloud-drive':
-                    $('.copy-dialog-txt.cloud-drive').addClass('active');
-					if (!$('.copy-dialog-tree-panel.cloud-drive .dialog-content-block li').length)
-					{
-						$('.copy-dialog-empty.cloud-drive').addClass('active');
-						$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.cloud-drive').addClass('active');
-						$('.copy-dialog-tree-panel.cloud-drive .copy-dialog-panel-header').removeClass('hidden');						
-					}
-                    $('.dialog-newfolder-button').removeClass('hidden');
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy')
                     break;
                 case 'shared-with-me':
-                    $('.copy-dialog-txt.shared-with-me').addClass('active');
-					if (!$('.copy-dialog-tree-panel.shared-with-me .dialog-content-block li').length)
-					{
-						$('.copy-dialog-empty.shared-with-me').addClass('active');
-						$('.copy-dialog-tree-panel.shared-with-me .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.shared-with-me').addClass('active');
-						$('.copy-dialog-tree-panel.shared-with-me .copy-dialog-panel-header').removeClass('hidden');						
-					}
-                    $('.dialog-newfolder-button').addClass('hidden');
+					handleDialogTabContent('.shared-with-me', 'ul', false, '.copy');
                     break;
                 case 'conversations':
-                    $('.copy-dialog-txt.conversations').addClass('active');
-					if (!$('.copy-dialog-tree-panel.conversations .dialog-content-block li').length)
-					{
-						$('.copy-dialog-empty.conversations').addClass('active');
-						$('.copy-dialog-tree-panel.conversations .copy-dialog-panel-header').addClass('hidden');
-					}
-					else
-					{
-	                    $('.copy-dialog-tree-panel.conversations').addClass('active');
-						$('.copy-dialog-tree-panel.conversations .copy-dialog-panel-header').removeClass('hidden');
-					}
-                    $('.dialog-newfolder-button').addClass('hidden');
+					handleDialogTabContent('.conversations', 'div', false, '.copy', '.conversations-container');
                     break;
             }
-            $(this).addClass('active');
-            $.copyDialogScroll();
         }
     });
 
@@ -5082,194 +5077,254 @@ function copyDialog()
 		createfolderDialog();
 		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 	});
-
 }
 
-function mcDialog(close)
+function moveDialog()
 {
-	if (close)
+	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
+	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click',function()
 	{
-		$.dialog=false;
-		$('.move-dialog').addClass('hidden');
+		delete $.moveDialog;
 		$('.fm-dialog-overlay').addClass('hidden');
-		$('.move-dialog #mainsub').html('');
-		return true;
-	}
-	$.mcselected = M.RootID;
-	var jsp = $('.fm-move-dialog-body').data('jsp');
-	if (jsp) jsp.scrollTo(0,0,false);
-	if ($.selected.length > 0)
-	{
-		$.dialog = 'mc';
-		$('.move-dialog #topheader').removeClass('contacts-item cloud-drive-item active');
-		$('.move-dialog #bottomheader').removeClass('recycle-item recyle-notification contacts-item cloud-drive-item active');
-		$('.move-dialog .fm-dialog-title').text(l[63] + ' (' + l[118] + ')');
-		$('.move-dialog .move-button').text(l[63]);
-		if ($.mctype == 'move')
-		{
-			$('.move-dialog .fm-dialog-title').text(l[62] + ' (' + l[118] + ')');
-			$('.move-dialog .move-button').text(l[62]);
-			$('.move-dialog #topheader').addClass('cloud-drive-item active');
-			$('.move-dialog #topheader span').text(l[164]);
-			$('.move-dialog #bottomheader').addClass('recycle-item');
-			$('.move-dialog #bottomheader span').text(l[167]);
-		}
-		else if ($.mctype == 'copy-cloud')
-		{
-			$('.move-dialog #topheader').addClass('cloud-drive-item active');
-			$('.move-dialog #topheader span').text(l[164]);
-			$('.move-dialog #bottomheader').addClass('contacts-item');
-			$('.move-dialog #bottomheader span').text(l[165]);
-		}
-		else if ($.mctype == 'copy-contacts')
-		{
-			$('.move-dialog #topheader').addClass('contacts-item active');
-			$('.move-dialog #topheader span').text(l[165]);
-			$('.move-dialog #bottomheader').addClass('cloud-drive-item');
-			$('.move-dialog #bottomheader span').text(l[164]);
-		}
-		var html;
-		if ($.mctype == 'move' || $.mctype == 'copy-cloud') html = $('.content-panel.cloud-drive').html();
-		else html = $('.content-panel.contacts').html();
-		html = html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_');
+		$('.move-dialog .dialog-move-button').addClass('active');
+		$('.move-dialog').addClass('hidden');
+	});
+	
+    $('.move-dialog-button').unbind('click');
+    $('.move-dialog-button').bind('click', function(e) {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            var section = $(this).attr('class').split(" ")[1];
+            switch (section)
+            {
+                case 'cloud-drive':
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.move')
+                    break;
+                case 'shared-with-me':
+					handleDialogTabContent('.shared-with-me', 'ul', false, '.move');
+                    break;
+                case 'rubbish-bin':
+					handleDialogTabContent('.rubbish-bin', 'ul', true, '.move');
+                    break;
+            }
+        }
+    });
 
-		html = '<div class="fm-tree-panel">' + html + '</div>';
+    $('.move-dialog-panel-arrows').unbind('click');
+    $('.move-dialog-panel-arrows').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            $(this).addClass('active');
+            $('.dialog-sorting-menu').removeClass('hidden');
+        } else {
+            $(this).removeClass('active');
+            $('.dialog-sorting-menu').addClass('hidden');
+        }
+    });
 
-		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);
-		$('.move-dialog #mainsub').html(html);
-		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');
-		$('.move-dialog ul').removeClass('opened');
+    $('.dialog-sorting-menu .sorting-menu-item').unbind('click');
+    $('.dialog-sorting-menu .sorting-menu-item').bind('click', function() {
+        if ($(this).attr('class').indexOf('active') == -1) {
+            $(this).parent().find('.sorting-menu-item').removeClass('active');
+            $(this).addClass('active');
+            $('.dialog-sorting-menu').addClass('hidden');
+        }
 
-		$.mctreeUI = function()
-		{
-			$('.move-dialog .nw-fm-tree-item').unbind('click');
-			$('.move-dialog .nw-fm-tree-item').bind('click',function(e)
-			{
-				$.mcselected = $(this).attr('id').replace('mctreea_','');
-				M.buildtree(M.d[$.mcselected]);
-				var html = $('#treesub_'+$.mcselected).html();
-				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
-				$.mctreeUI();
-
-				var c = $(e.target).attr('class');
-				if (c && c.indexOf('nw-fm-arrow-icon') > -1)
-				{
-					var c = $(this).attr('class');
-					if (c && c.indexOf('opened') > -1)
-					{
-						$(this).removeClass('expanded');
-						$('#mctreesub_' + $.mcselected).removeClass('opened');
-					}
-					else
-					{
-						$(this).addClass('expanded');
-						$('#mctreesub_' + $.mcselected).addClass('opened');
-					}
-				}
-				else
-				{
-					var c = $(this).attr('class');
-					if (c && c.indexOf('selected') > -1)
-					{
-						if (c && c.indexOf('expanded') > -1)
-						{
-							$(this).removeClass('expanded');
-							$('#mctreesub_' + $.mcselected).removeClass('opened');
-						}
-						else
-						{
-							$(this).addClass('expanded');
-							$('#mctreesub_' + $.mcselected).addClass('opened');
-						}
-					}
-					$('.move-dialog .nw-fm-tree-item').removeClass('selected');
-					$(this).addClass('selected');
-				}
-
-				$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
-				jScrollFade('.fm-move-dialog-body');
-				$('.move-dialog .move-button').addClass('active');
-				$('.move-dialog .fm-tree-header').removeClass('active');
-				$('.move-dialog #topheader').addClass('active');
-			});
-
-			$('.move-dialog .fm-tree-header').unbind('click');
-			$('.move-dialog .fm-tree-header').bind('click',function(e,ui)
-			{
-				var c = $(this).attr('class');
-				var doScroll=false;
-				if (c && c.indexOf('contacts') > -1 && $.mctype == 'copy-cloud')
-				{
-					$.mctype = 'copy-contacts';
-					mcDialog();
-					doScroll=true;
-				}
-				else if (c && c.indexOf('cloud-drive') > -1 && $.mctype == 'copy-contacts')
-				{
-					$.mctype = 'copy-cloud';
-					mcDialog();
-					doScroll=true;
-				}
-				if (doScroll)
-				{
-					var jsp = $('.fm-move-dialog-body').data('jsp');
-					if (jsp) jsp.scrollTo(0,0);
-					return false;
-				}
-				if (c && c.indexOf('cloud-drive') > -1) $.mcselected = M.RootID;
-				else if (c && c.indexOf('recycle-item') > -1) $.mcselected = M.RubbishID;
-				$('.move-dialog .fm-move-dialog-body .fm-subfolders a').removeClass('active');
-				$('.move-dialog .fm-tree-header').removeClass('active');
-				$(this).addClass('active');
-				if (!c || (c && c.indexOf('contacts') == -1)) $('.move-dialog .move-button').addClass('active');
-			});
-			$('.fm-move-dialog-body .fm-connector').removeClass('vertical-line last mid');
-			$('.fm-move-dialog-body .fm-horizontal-connector').removeClass('active');
-		};
-		$.mctreeUI();
-		$('.move-dialog .move-button').addClass('active');
-		$('.move-dialog').removeClass('hidden');
-		$('.fm-dialog-overlay').removeClass('hidden');
-		$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
-		jScrollFade('.fm-move-dialog-body');
-		$('.move-dialog .fm-dialog-close').unbind('click');
-		$('.move-dialog .fm-dialog-close').bind('click',function()
-		{
-			mcDialog(1);
-		});
-		$('.move-dialog .cancel-button').unbind('click');
-		$('.move-dialog .cancel-button').bind('click',function()
-		{
-			mcDialog(1);
-		});
-		$('.move-dialog .move-button').unbind('click');
-		$('.move-dialog .move-button').bind('click',function()
-		{
-			var t = $.mcselected;
-			if ($.mctype == 'move')
-			{
-				var n=[];
-				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-				M.moveNodes(n,t);
-			}
-			else if ($.mctype.substr(0,4) == 'copy')
-			{
-				if ($.mctype == 'copy-contacts' && t.length == 8)
-				{
-					if (RightsbyID(t) == 0)
-					{
-						alert(l[1023]);
-						return false;
-					}
-				}
-				var n=[];
-				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-				M.copyNodes(n,t);
-			}
-			mcDialog(1);
-		});
-	}
+        $('.dialog-sorting-menu').addClass('hidden');
+        $('.move-dialog-panel-arrows.active').removeClass('active')
+    });
+	
+	$('.move-dialog .dialog-newfolder-button').unbind('click');
+	$('.move-dialog .dialog-newfolder-button').bind('click', function() {
+		$('.move-dialog').addClass('arrange-to-back');
+		createfolderDialog();
+		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
+	});
 }
+
+//function mcDialog(close)
+//{
+//	if (close)
+//	{
+//		$.dialog=false;
+//		$('.move-dialog').addClass('hidden');
+//		$('.fm-dialog-overlay').addClass('hidden');
+//		$('.move-dialog #mainsub').html('');
+//		return true;
+//	}
+//	$.mcselected = M.RootID;
+//	var jsp = $('.fm-move-dialog-body').data('jsp');
+//	if (jsp) jsp.scrollTo(0,0,false);
+//	if ($.selected.length > 0)
+//	{
+//		$.dialog = 'mc';
+//		$('.move-dialog #topheader').removeClass('contacts-item cloud-drive-item active');
+//		$('.move-dialog #bottomheader').removeClass('recycle-item recyle-notification contacts-item cloud-drive-item active');
+//		$('.move-dialog .fm-dialog-title').text(l[63] + ' (' + l[118] + ')');
+//		$('.move-dialog .move-button').text(l[63]);
+//		if ($.mctype == 'move')
+//		{
+//			$('.move-dialog .fm-dialog-title').text(l[62] + ' (' + l[118] + ')');
+//			$('.move-dialog .move-button').text(l[62]);
+//			$('.move-dialog #topheader').addClass('cloud-drive-item active');
+//			$('.move-dialog #topheader span').text(l[164]);
+//			$('.move-dialog #bottomheader').addClass('recycle-item');
+//			$('.move-dialog #bottomheader span').text(l[167]);
+//		}
+//		else if ($.mctype == 'copy-cloud')
+//		{
+//			$('.move-dialog #topheader').addClass('cloud-drive-item active');
+//			$('.move-dialog #topheader span').text(l[164]);
+//			$('.move-dialog #bottomheader').addClass('contacts-item');
+//			$('.move-dialog #bottomheader span').text(l[165]);
+//		}
+//		else if ($.mctype == 'copy-contacts')
+//		{
+//			$('.move-dialog #topheader').addClass('contacts-item active');
+//			$('.move-dialog #topheader span').text(l[165]);
+//			$('.move-dialog #bottomheader').addClass('cloud-drive-item');
+//			$('.move-dialog #bottomheader span').text(l[164]);
+//		}
+//		var html;
+//		if ($.mctype == 'move' || $.mctype == 'copy-cloud') html = $('.content-panel.cloud-drive').html();
+//		else html = $('.content-panel.contacts').html();
+//		html = html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_');
+//
+//		html = '<div class="fm-tree-panel">' + html + '</div>';
+//
+//		$('.move-dialog .fm-move-dialog-body .fm-subfolders').first().html(html);
+//		$('.move-dialog #mainsub').html(html);
+//		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');
+//		$('.move-dialog ul').removeClass('opened');
+//
+//		$.mctreeUI = function()
+//		{
+//			$('.move-dialog .nw-fm-tree-item').unbind('click');
+//			$('.move-dialog .nw-fm-tree-item').bind('click',function(e)
+//			{
+//				$.mcselected = $(this).attr('id').replace('mctreea_','');
+//				M.buildtree(M.d[$.mcselected]);
+//				var html = $('#treesub_'+$.mcselected).html();
+//				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
+//				$.mctreeUI();
+//
+//				var c = $(e.target).attr('class');
+//				if (c && c.indexOf('nw-fm-arrow-icon') > -1)
+//				{
+//					var c = $(this).attr('class');
+//					if (c && c.indexOf('opened') > -1)
+//					{
+//						$(this).removeClass('expanded');
+//						$('#mctreesub_' + $.mcselected).removeClass('opened');
+//					}
+//					else
+//					{
+//						$(this).addClass('expanded');
+//						$('#mctreesub_' + $.mcselected).addClass('opened');
+//					}
+//				}
+//				else
+//				{
+//					var c = $(this).attr('class');
+//					if (c && c.indexOf('selected') > -1)
+//					{
+//						if (c && c.indexOf('expanded') > -1)
+//						{
+//							$(this).removeClass('expanded');
+//							$('#mctreesub_' + $.mcselected).removeClass('opened');
+//						}
+//						else
+//						{
+//							$(this).addClass('expanded');
+//							$('#mctreesub_' + $.mcselected).addClass('opened');
+//						}
+//					}
+//					$('.move-dialog .nw-fm-tree-item').removeClass('selected');
+//					$(this).addClass('selected');
+//				}
+//
+//				$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
+//				jScrollFade('.fm-move-dialog-body');
+//				$('.move-dialog .move-button').addClass('active');
+//				$('.move-dialog .fm-tree-header').removeClass('active');
+//				$('.move-dialog #topheader').addClass('active');
+//			});
+//
+//			$('.move-dialog .fm-tree-header').unbind('click');
+//			$('.move-dialog .fm-tree-header').bind('click',function(e,ui)
+//			{
+//				var c = $(this).attr('class');
+//				var doScroll=false;
+//				if (c && c.indexOf('contacts') > -1 && $.mctype == 'copy-cloud')
+//				{
+//					$.mctype = 'copy-contacts';
+//					mcDialog();
+//					doScroll=true;
+//				}
+//				else if (c && c.indexOf('cloud-drive') > -1 && $.mctype == 'copy-contacts')
+//				{
+//					$.mctype = 'copy-cloud';
+//					mcDialog();
+//					doScroll=true;
+//				}
+//				if (doScroll)
+//				{
+//					var jsp = $('.fm-move-dialog-body').data('jsp');
+//					if (jsp) jsp.scrollTo(0,0);
+//					return false;
+//				}
+//				if (c && c.indexOf('cloud-drive') > -1) $.mcselected = M.RootID;
+//				else if (c && c.indexOf('recycle-item') > -1) $.mcselected = M.RubbishID;
+//				$('.move-dialog .fm-move-dialog-body .fm-subfolders a').removeClass('active');
+//				$('.move-dialog .fm-tree-header').removeClass('active');
+//				$(this).addClass('active');
+//				if (!c || (c && c.indexOf('contacts') == -1)) $('.move-dialog .move-button').addClass('active');
+//			});
+//			$('.fm-move-dialog-body .fm-connector').removeClass('vertical-line last mid');
+//			$('.fm-move-dialog-body .fm-horizontal-connector').removeClass('active');
+//		};
+//		$.mctreeUI();
+//		$('.move-dialog .move-button').addClass('active');
+//		$('.move-dialog').removeClass('hidden');
+//		$('.fm-dialog-overlay').removeClass('hidden');
+//		$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
+//		jScrollFade('.fm-move-dialog-body');
+//		$('.move-dialog .fm-dialog-close').unbind('click');
+//		$('.move-dialog .fm-dialog-close').bind('click',function()
+//		{
+//			mcDialog(1);
+//		});
+//		$('.move-dialog .cancel-button').unbind('click');
+//		$('.move-dialog .cancel-button').bind('click',function()
+//		{
+//			mcDialog(1);
+//		});
+//		$('.move-dialog .move-button').unbind('click');
+//		$('.move-dialog .move-button').bind('click',function()
+//		{
+//			var t = $.mcselected;
+//			if ($.mctype == 'move')
+//			{
+//				var n=[];
+//				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+//				M.moveNodes(n,t);
+//			}
+//			else if ($.mctype.substr(0,4) == 'copy')
+//			{
+//				if ($.mctype == 'copy-contacts' && t.length == 8)
+//				{
+//					if (RightsbyID(t) == 0)
+//					{
+//						alert(l[1023]);
+//						return false;
+//					}
+//				}
+//				var n=[];
+//				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+//				M.copyNodes(n,t);
+//			}
+//			mcDialog(1);
+//		});
+//	}
+//}
 
 function getclipboardlinks()
 {

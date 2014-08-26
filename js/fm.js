@@ -1289,7 +1289,7 @@ function initContextUI()
 		$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
 //		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
-		handleCopyDialogTabContent('.cloud-drive', 'ul', true);
+		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
 
@@ -1299,7 +1299,7 @@ function initContextUI()
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
 //		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
-		handleMoveDialogTabContent('.cloud-drive', 'ul', true);
+		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
 	
@@ -4962,52 +4962,52 @@ function shareDialog(close)
 	jScrollFade('.fm-share-body');
 }
 
-function handleCopyDialogTabContent(s, m, c, i)
+function dialogScroll(s)
 {
-	$('.copy-dialog-txt').removeClass('active');
-	$('.copy-dialog-empty').removeClass('active');
-	$('.copy-dialog-button').removeClass('active');
-	$('.copy-dialog-tree-panel').removeClass('active');
+	$(s + '-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+};
+
+function dialogPositioning(s)
+{
+	$('.fm-dialog' + s + '-dialog').css('margin-top', '-' + $('.fm-dialog' + s + '-dialog').height()/2 + 'px');
+};
+
+function handleDialogTabContent(s, m, c, n, i)
+{
+	$(n + '-dialog-txt').removeClass('active');
+	$(n + '-dialog-empty').removeClass('active');
+	$(n + '-dialog-button').removeClass('active');
+	$(n + '-dialog-tree-panel').removeClass('active');
 	
-	$('.copy-dialog-txt' + s).addClass('active');
+	$(n + '-dialog-txt' + s).addClass('active');
 	var b;
 	// Added cause of conversations-container
 	if (typeof i === 'undefined') b = $('.content-panel' + s).html();
 	else b = $('.content-panel ' + i).html()
 		
-	$('.copy-dialog-tree-panel' + s + ' .dialog-content-block')
+	$(n + '-dialog-tree-panel' + s + ' .dialog-content-block')
 		.empty()
 		.html(b);
-	if (!$('.copy-dialog-tree-panel' + s + ' .dialog-content-block ' + m).length)
+	if (!$(n + '-dialog-tree-panel' + s + ' .dialog-content-block ' + m).length)
 	{
-		$('.copy-dialog-empty' + s).addClass('active');
-		$('.copy-dialog-tree-panel' + s + ' .copy-dialog-panel-header').addClass('hidden');
+		$(n + '-dialog-empty' + s).addClass('active');
+		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').addClass('hidden');
 	}
 	else
 	{
-		$('.copy-dialog-tree-panel' + s).addClass('active');
-		$('.copy-dialog-tree-panel' + s + ' .copy-dialog-panel-header').removeClass('hidden');						
+		$(n + '-dialog-tree-panel' + s).addClass('active');
+		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').removeClass('hidden');						
 	}
 	// Create New Folder button
 	if (c) $('.dialog-newfolder-button').removeClass('hidden');
 	else $('.dialog-newfolder-button').addClass('hidden');
 
-    copyDialogPositioning();
-	copyDialogScroll();
+    dialogPositioning(n);
+	dialogScroll(n);
 
-	$('.copy-dialog-button' + s).addClass('active');//Activate tab
+	$(n + '-dialog-button' + s).addClass('active');//Activate tab
 }
 	
-function copyDialogScroll()
-{
-	$('.copy-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-};
-
-function copyDialogPositioning()
-{
-	$('.fm-dialog.copy-dialog').css('margin-top', '-' + $('.fm-dialog.copy-dialog').height()/2 + 'px');
-};
-
 function copyDialog()
 {
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
@@ -5026,13 +5026,13 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleCopyDialogTabContent('.cloud-drive', 'ul', true)
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy')
                     break;
                 case 'shared-with-me':
-					handleCopyDialogTabContent('.shared-with-me', 'ul', false);
+					handleDialogTabContent('.shared-with-me', 'ul', false, '.copy');
                     break;
                 case 'conversations':
-					handleCopyDialogTabContent('.conversations', 'div', false, '.conversations-container');
+					handleDialogTabContent('.conversations', 'div', false, '.copy', '.conversations-container');
                     break;
             }
         }
@@ -5068,52 +5068,6 @@ function copyDialog()
 	});
 }
 
-function moveDialogScroll()
-{
-	$('.move-dialog-tree-panel').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-};
-
-function moveDialogPositioning()
-{
-	$('.fm-dialog.move-dialog').css('margin-top', '-' + $('.fm-dialog.move-dialog').height()/2 + 'px');
-};
-
-function handleMoveDialogTabContent(s, m, c, i)
-{
-	$('.move-dialog-txt').removeClass('active');
-	$('.move-dialog-empty').removeClass('active');
-	$('.move-dialog-button').removeClass('active');
-	$('.move-dialog-tree-panel').removeClass('active');
-	
-	$('.move-dialog-txt' + s).addClass('active');
-	var b;
-	// Added cause of conversations-container
-	if (typeof i === 'undefined') b = $('.content-panel' + s).html();
-	else b = $('.content-panel ' + i).html()
-		
-	$('.move-dialog-tree-panel' + s + ' .dialog-content-block')
-		.empty()
-		.html(b);
-	if (!$('.move-dialog-tree-panel' + s + ' .dialog-content-block ' + m).length)
-	{
-		$('.move-dialog-empty' + s).addClass('active');
-		$('.move-dialog-tree-panel' + s + ' .move-dialog-panel-header').addClass('hidden');
-	}
-	else
-	{
-		$('.move-dialog-tree-panel' + s).addClass('active');
-		$('.move-dialog-tree-panel' + s + ' .move-dialog-panel-header').removeClass('hidden');						
-	}
-	// Create New Folder button
-	if (c) $('.dialog-newfolder-button').removeClass('hidden');
-	else $('.dialog-newfolder-button').addClass('hidden');
-
-    moveDialogPositioning();
-	moveDialogScroll();
-
-	$('.move-dialog-button' + s).addClass('active');//Activate tab
-}
-
 function moveDialog()
 {
 	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
@@ -5132,13 +5086,13 @@ function moveDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleMoveDialogTabContent('.cloud-drive', 'ul', true)
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.move')
                     break;
                 case 'shared-with-me':
-					handleMoveDialogTabContent('.shared-with-me', 'ul', false);
+					handleDialogTabContent('.shared-with-me', 'ul', false, '.move');
                     break;
                 case 'rubbish-bin':
-					handleMoveDialogTabContent('.rubbish-bin', 'ul', true);
+					handleDialogTabContent('.rubbish-bin', 'ul', true, '.move');
                     break;
             }
         }

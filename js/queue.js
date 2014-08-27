@@ -222,6 +222,7 @@ MegaQueue.prototype.destroy = function() {
 	// this._limit = -1
 	// this._queue = null;
 	// this._queue = [];
+	if (d) ASSERT(this._queue.length == 0, 'This queue was not properly cleaned...');
 	oDestroy(this);
 }
 

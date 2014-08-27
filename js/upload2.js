@@ -94,7 +94,7 @@ function ul_deduplicate(File, identical) {
 function ul_Identical(target, path, hash,size)
 {
 	if (!target || !path) return false;
-	var p = path.split('/');	
+	var p = path.split('/');
 	var n = M.d[target];
 	for (var i in p)
 	{
@@ -113,7 +113,7 @@ function ul_Identical(target, path, hash,size)
 	}
 	return false;
 }
-/* }}} */ 
+/* }}} */
 
 /**
  *	Check if the network is up!
@@ -165,7 +165,7 @@ function network_error_check() {
 	/**
 	 *	Check for error on upload and downloads
 	 *
-	 *	If we have many errors (average of 3 errors) 
+	 *	If we have many errors (average of 3 errors)
 	 *	we try to shrink the number of connections to the
 	 *	server to see if that fixes the problem
 	 */
@@ -295,7 +295,7 @@ function ul_upload(File) {
 
 	if (file.repair) {
 		var ul_key = file.repair;
-		file.ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]	
+		file.ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]
 	} else {
 		file.ul_key = Array(6);
 		// generate ul_key and nonce
@@ -358,15 +358,15 @@ function ul_start(File) {
 
 	/* CPU INTENSIVE
 	$.each(ul_queue, function(i, cfile) {
-		if (i < File.file.pos || cfile.posturl) return; // continue 
-		if (i >= File.file.pos+8 || maxpf <= 0) return false; // break 
-		api_req({ 
-			a : 'u', 
-			ssl : use_ssl, 
-			ms : ul_maxSpeed, 
-			s : cfile.size, 
-			r : cfile.retries, 
-			e : cfile.ul_lastreason 
+		if (i < File.file.pos || cfile.posturl) return; // continue
+		if (i >= File.file.pos+8 || maxpf <= 0) return false; // break
+		api_req({
+			a : 'u',
+			ssl : use_ssl,
+			ms : ul_maxSpeed,
+			s : cfile.size,
+			r : cfile.retries,
+			e : cfile.ul_lastreason
 		}, { reqindex : i, callback : next });
 		maxpf -= cfile.size
 		total++;
@@ -376,13 +376,13 @@ function ul_start(File) {
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
 		if (!isQueueActive(cfile)) continue;
-		api_req({ 
-			a : 'u', 
-			ssl : use_ssl, 
-			ms : ul_maxSpeed, 
-			s : cfile.size, 
-			r : cfile.retries, 
-			e : cfile.ul_lastreason 
+		api_req({
+			a : 'u',
+			ssl : use_ssl,
+			ms : ul_maxSpeed,
+			s : cfile.size,
+			r : cfile.retries,
+			e : cfile.ul_lastreason
 		}, { reqindex : i, callback : next });
 		maxpf -= cfile.size
 		total++;
@@ -426,11 +426,11 @@ ChunkUpload.prototype.updateprogress = function() {
 	onUploadProgress(
 		this.file.id,
 		Math.floor(tp/this.file.size*100),
-		tp, 
+		tp,
 		this.file.size,
 		GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0)  // speed
 	);
-	
+
 	if (tp == this.file.size) this.file.complete = true;
 };
 
@@ -442,7 +442,8 @@ ChunkUpload.prototype.abort = function() {
 };
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
-	if (!this.file || this.file.abort) return this.done();
+	if (!this.file || !this.file.progress || this.file.abort)
+		return this.done && this.done();
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
 };
@@ -482,9 +483,9 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 				var mac = condenseMacs(t, this.file.ul_key);
 
 				var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
-				
+
 				if (u_k_aes && !this.file.ul_completing) {
-					var ctx = { 
+					var ctx = {
 						file: this.file,
 						size: this.file.size,
 						ul_queue_num : this.file.pos,
@@ -504,12 +505,12 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			}
 
 			this.bytes = null;
-			
+
 			this.file.retries  = 0; /* reset error flag */
 
 			return this.done();
 
-		} else { 
+		} else {
 			DEBUG("Invalid upload response: " + response);
 			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
@@ -526,14 +527,13 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 	return this.on_error(null, null, "bad response from server");
 }
 
-
 ChunkUpload.prototype.upload = function() {
-	
+
 	if (!this.file) {
-		ASSERT(this.file, 'Was this upload destroyed? ' + !this.gid);
+		if (d) console.error('This upload was cancelled while the Encrypter was working, prevent this aborting it beforehand');
 		return;
 	}
-	
+
 	var xhr = getXhr(this);
 
 	if (d) console.log("pushing", this.file.posturl + this.suffix)
@@ -556,18 +556,27 @@ ChunkUpload.prototype.upload = function() {
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
-	if (args[0]) {
-		if (d) console.error('UL IO Error');
-		this.file.done_starting();
-		return UploadManager.retry(this.file, this, "IO failed: " + args[0])
+	if (args[0] || !this.file)
+	{
+		if (this.file && this.file.done_starting)
+		{
+			if (d) console.error('UL IO Error');
+
+			this.file.done_starting();
+			return UploadManager.retry(this.file, this, "IO failed: " + args[0]);
+		}
+		else
+		{
+			if (d) console.error('The FileReader finished, but this upload was cancelled...');
+		}
 	}
-
-	Encrypter.push(
-		[this, this.file.ul_keyNonce, this.start/16, this.bytes], 
-		this.upload, 
-		this
-	);
-
+	else
+	{
+		var task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
+		// TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
+		task[this.gid] = 1;
+		Encrypter.push( task, this.upload, this );
+	}
 	this.bytes = null;
 };
 
@@ -590,7 +599,6 @@ ChunkUpload.prototype.run = function(done) {
 	GlobalProgress[this.gid].working.push(this);
 };
 
-
 function FileUpload(file) {
 	this.file = file;
 	this.ul   = file;
@@ -607,12 +615,14 @@ FileUpload.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
 	// Hmm, looks like there are more ChunkUploads than what we really upload (!?)
 	if (d) ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
-	delete GlobalProgress[this.gid];
 	if (is_chrome_firefox && this.file._close)
 	{
 		this.file._close();
 	}
+	if (this.file.done_starting) Soon(this.file.done_starting);
+	this.file.ul_reader.filter(this.gid);
 	this.file.ul_reader.destroy();
+	delete GlobalProgress[this.gid];
 	oDestroy(this.file);
 	oDestroy(this);
 };
@@ -628,7 +638,7 @@ FileUpload.prototype.run = function(done) {
 	file.ul_lastreason	= file.ul_lastreason || 0
 
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
-		done(); 
+		done();
 		ASSERT(0, "This shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
@@ -646,6 +656,8 @@ FileUpload.prototype.run = function(done) {
 		if (started) return;
 		started = true;
 		start_uploading = false;
+		delete file.done_starting;
+		file = self = undefined;
 		done();
 	};
 
@@ -657,14 +669,10 @@ FileUpload.prototype.run = function(done) {
 			DEBUG(file.name, "fingerprint", M.h[hash] || identical)
 			if (M.h[hash] || identical) ul_deduplicate(self, identical);
 			else ul_start(self);
-			self = null;
-			file = null;
 		});
 	} catch (e) {
 		DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
 		ul_start(this);
-		file = null;
-		self = null;
 	}
 };
 
@@ -707,7 +715,7 @@ function ul_finalize(file) {
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
 
-	var dirs = (file.path||"").split(/\//g).filter(function(a) { 
+	var dirs = (file.path||"").split(/\//g).filter(function(a) {
 		return a.length > 0;
 	})
 
@@ -724,10 +732,10 @@ function ul_finalize(file) {
 		var faid = file.faid ? api_getfa(file.faid) : false
 		var req = { a : 'p',
 			t : dir,
-			n : [{ 
-				h : file.response, 
-				t : 0, 
-				a : ab_to_base64(ea[0]), 
+			n : [{
+				h : file.response,
+				t : 0,
+				a : ab_to_base64(ea[0]),
 				k : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
 			}],
 			i : requesti
@@ -740,9 +748,9 @@ function ul_finalize(file) {
 				req.cr[1][0] = file.response;
 			}
 		}
-		
+
 		DEBUG(file.name, "save to dir", dir, req)
-		
+
 		api_req(req, {
 			target: dir,
 			ul_queue_num: file.pos,
@@ -751,13 +759,13 @@ function ul_finalize(file) {
 			file: file,
 			callback: ul_completepending2
 		});
-	}, file.target || M.RootID);	
+	}, file.target || M.RootID);
 }
 
 function ul_filereader(fs, file) {
 	return new MegaQueue(function(task, done) {
 		if (fs.readyState == fs.LOADING) {
-			return this.reschedule();
+			return this.reschedule(); // --------- XXX: ???
 		}
 		var end = task.start+task.end
 			, blob
@@ -812,9 +820,14 @@ var ul_queue  = new UploadQueue
 
 Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	var file = context.file
+	if (!file) {
+		// TODO: This upload was cancelled, we should terminate the worker rather than waiting
+		if (d) console.error('This upload was cancelled, we should terminate the worker rather than waiting');
+		return e.data[0] == '[' || done();
+	}
 
 	if (typeof e.data == 'string') {
-		if (e.data[0] == '[') context.file.ul_macs[context.start] = JSON.parse(e.data);
+		if (e.data[0] == '[') file.ul_macs[context.start] = JSON.parse(e.data);
 		else DEBUG('WORKER:', e.data);
 	} else {
 		context.bytes = new Uint8Array(e.data.buffer || e.data);
@@ -842,7 +855,7 @@ function resetUploadDownload() {
 		panelDomQueue = [];
 		GlobalProgress = {};
 		delete $.transferprogress;
-		$.transferClose(); /* in case it isn't closed already.. */
+		if ($.transferClose) $.transferClose(); /* in case it isn't closed already.. */
 	}
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);
@@ -851,7 +864,6 @@ function resetUploadDownload() {
 }
 
 if (localStorage.ul_skipIdentical) ul_skipIdentical= parseInt(localStorage.ul_skipIdentical);
-
 
 ulQueue.validateTask = function(pzTask) {
 	if (pzTask instanceof ChunkUpload && (!pzTask.file.paused || pzTask.__retry)) {

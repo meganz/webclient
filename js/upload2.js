@@ -40,7 +40,7 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
-		onUploadSuccess(ul_queue[ctx.ul_queue_num].id);
+		onUploadSuccess(ul_queue[ctx.ul_queue_num],res.f[0].h,ctx.faid);
 		ul_queue[ctx.ul_queue_num] = {}
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
@@ -343,7 +343,7 @@ function ul_upload(File) {
 		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
-	onUploadStart(file.id);
+	onUploadStart(file);
 	file.done_starting();
 }
 
@@ -406,7 +406,7 @@ ChunkUpload.prototype.updateprogress = function() {
 	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
-		this.file.id,
+		this.file,
 		Math.floor(tp/this.file.size*100),
 		tp,
 		this.file.size,
@@ -689,13 +689,21 @@ function ul_cancel() {
 	UploadManager.abort(null);
 }
 
-function ul_finalize(file) {
+function ul_finalize(file, target) {
 	var p
 
-	DEBUG(file.name, "ul_finalize")
+	DEBUG(file.name, "ul_finalize", file.target, target)
 
 	if (is_chrome_firefox && file._close) file._close();
 	if (file.repair) file.target = M.RubbishID;
+	else if (!target && (''+file.target).substr(0,4) === 'chat')
+	{
+		return fm_requestfolderid(null,'My chat files', {
+			callback : SoonFc(function(meh, h) {
+				ul_finalize(file, h);
+			})
+		});
+	}
 
 	var dirs = (file.path||"").split(/\//g).filter(function(a) {
 		return a.length > 0;
@@ -741,7 +749,7 @@ function ul_finalize(file) {
 			file: file,
 			callback: ul_completepending2
 		});
-	}, file.target || M.RootID);
+	}, target || file.target || M.RootID);
 }
 
 function ul_filereader(fs, file) {

@@ -358,13 +358,13 @@ function ul_start(File) {
 	for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
 		var cfile = ul_queue[i];
 		if (!isQueueActive(cfile)) continue;
-		api_req({ 
-			a : 'u', 
-			ssl : use_ssl, 
-			ms : ul_maxSpeed, 
-			s : cfile.size, 
-			r : cfile.retries, 
-			e : cfile.ul_lastreason 
+		api_req({
+			a : 'u',
+			ssl : use_ssl,
+			ms : ul_maxSpeed,
+			s : cfile.size,
+			r : cfile.retries,
+			e : cfile.ul_lastreason
 		}, { reqindex : i, callback : next });
 		maxpf -= cfile.size
 		total++;
@@ -424,7 +424,8 @@ ChunkUpload.prototype.abort = function() {
 };
 
 ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
-	if (!this.file || this.file.abort) return this.done();
+	if (!this.file || !this.file.progress || this.file.abort)
+		return this.done && this.done();
 	this.file.progress[this.start] = args[0].loaded
 	this.updateprogress();
 };
@@ -509,12 +510,12 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 }
 
 ChunkUpload.prototype.upload = function() {
-	
+
 	if (!this.file) {
-		ASSERT(this.file, 'Was this upload destroyed? ' + !this.gid);
+		if (d) console.error('This upload was cancelled while the Encrypter was working, prevent this aborting it beforehand');
 		return;
 	}
-	
+
 	var xhr = getXhr(this);
 
 	if (d) console.log("pushing", this.file.posturl + this.suffix)
@@ -537,18 +538,27 @@ ChunkUpload.prototype.upload = function() {
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
-	if (args[0]) {
-		if (d) console.error('UL IO Error');
-		this.file.done_starting();
-		return UploadManager.retry(this.file, this, args[0])
+	if (args[0] || !this.file)
+	{
+		if (this.file && this.file.done_starting)
+		{
+			if (d) console.error('UL IO Error');
+
+			this.file.done_starting();
+			return UploadManager.retry(this.file, this, "IO failed: " + args[0]);
+		}
+		else
+		{
+			if (d) console.error('The FileReader finished, but this upload was cancelled...');
+		}
 	}
-
-	Encrypter.push(
-		[this, this.file.ul_keyNonce, this.start/16, this.bytes],
-		this.upload,
-		this
-	);
-
+	else
+	{
+		var task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
+		// TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
+		task[this.gid] = 1;
+		Encrypter.push( task, this.upload, this );
+	}
 	this.bytes = null;
 };
 
@@ -587,12 +597,14 @@ FileUpload.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
 	// Hmm, looks like there are more ChunkUploads than what we really upload (!?)
 	if (d) ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
-	delete GlobalProgress[this.gid];
 	if (is_chrome_firefox && this.file._close)
 	{
 		this.file._close();
 	}
+	if (this.file.done_starting) Soon(this.file.done_starting);
+	this.file.ul_reader.filter(this.gid);
 	this.file.ul_reader.destroy();
+	delete GlobalProgress[this.gid];
 	oDestroy(this.file);
 	oDestroy(this);
 };
@@ -608,7 +620,7 @@ FileUpload.prototype.run = function(done) {
 	file.ul_lastreason	= file.ul_lastreason || 0
 
 	if (start_uploading || $('#ul_' + file.id).length == 0) {
-		done(); 
+		done();
 		ASSERT(0, "This shouldn't happen");
 		return ulQueue.pushFirst(this);
 	}
@@ -626,6 +638,8 @@ FileUpload.prototype.run = function(done) {
 		if (started) return;
 		started = true;
 		start_uploading = false;
+		delete file.done_starting;
+		file = self = undefined;
 		done();
 	};
 
@@ -637,14 +651,10 @@ FileUpload.prototype.run = function(done) {
 			DEBUG(file.name, "fingerprint", M.h[hash] || identical)
 			if (M.h[hash] || identical) ul_deduplicate(self, identical);
 			else ul_start(self);
-			self = null;
-			file = null;
 		});
 	} catch (e) {
 		DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
 		ul_start(this);
-		file = null;
-		self = null;
 	}
 };
 
@@ -737,7 +747,7 @@ function ul_finalize(file) {
 function ul_filereader(fs, file) {
 	return new MegaQueue(function(task, done) {
 		if (fs.readyState == fs.LOADING) {
-			return this.reschedule();
+			return this.reschedule(); // --------- XXX: ???
 		}
 		var end = task.start+task.end
 			, blob
@@ -792,9 +802,14 @@ var ul_queue  = new UploadQueue
 
 Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	var file = context.file
+	if (!file) {
+		// TODO: This upload was cancelled, we should terminate the worker rather than waiting
+		if (d) console.error('This upload was cancelled, we should terminate the worker rather than waiting');
+		return e.data[0] == '[' || done();
+	}
 
 	if (typeof e.data == 'string') {
-		if (e.data[0] == '[') context.file.ul_macs[context.start] = JSON.parse(e.data);
+		if (e.data[0] == '[') file.ul_macs[context.start] = JSON.parse(e.data);
 		else DEBUG('WORKER:', e.data);
 	} else {
 		context.bytes = new Uint8Array(e.data.buffer || e.data);
@@ -823,7 +838,7 @@ function resetUploadDownload() {
 		$('.transfer-panel-empty-txt').removeClass('hidden');
 		$('.transfer-table-header').hide(0);
 
-		$.transferClose();
+		if ($.transferClose) $.transferClose();
 
 		$('.transfer-clear-all-icon').addClass('hidden');
 		panelDomQueue = {};

@@ -31,6 +31,9 @@ module.exports = function(config) {
         // Test helpers and test data.
         'test/lang_dummy.js',
         
+        // Config
+        'test/config.js',
+
         // Our code.
         'secureboot.js',
         'js/functions.js',

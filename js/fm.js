@@ -4988,6 +4988,9 @@ function handleDialogTabContent(s, m, c, n, i)
 	$(n + '-dialog-empty').removeClass('active');
 	$(n + '-dialog-button').removeClass('active');
 	$(n + '-dialog-tree-panel').removeClass('active');
+	$(n + '-dialog-panel-arrows').removeClass('active');
+	$('.dialog-sorting-menu').addClass('hidden');
+	
 	
 	$(n + '-dialog-txt' + s).addClass('active');
 	var b;

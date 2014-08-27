@@ -698,7 +698,7 @@ function ul_finalize(file, target) {
 	if (file.repair) file.target = M.RubbishID;
 	else if (!target && (''+file.target).substr(0,4) === 'chat')
 	{
-		return fm_requestfolderid(null,'My chat files', {
+		return fm_requestfolderid(null,'chat_files', {
 			callback : SoonFc(function(meh, h) {
 				ul_finalize(file, h);
 			})

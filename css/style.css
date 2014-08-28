@@ -8595,14 +8595,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-dialog-button.dialog-share-button:hover {
 	background-color: rgba(255,179,0,1);
 }
-.fm-dialog-button.move-button, .fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-newfolder-button, .confirmation-dialog .fm-dialog-button.notification-button.confirm {
+.fm-dialog-button.move-button, .fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-move-button,.fm-dialog-button.dialog-newfolder-button, .confirmation-dialog .fm-dialog-button.notification-button.confirm {
 	background-color: rgba(109,176,63,0.7);
 }
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
 	margin-left: 12px;
 }
-.fm-dialog-button.move-button:hover, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-newfolder-button:hover, .confirmation-dialog .fm-dialog-button.notification-button.confirm:hover {
+.fm-dialog-button.move-button:hover, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-move-button:hover,.fm-dialog-button.dialog-newfolder-button:hover, .confirmation-dialog .fm-dialog-button.notification-button.confirm:hover {
 	background-color: rgba(109,176,63,1);
 }
 .clear-bin-dialog .fm-dialog-button.notification-button.confirm, .confirmation-dialog.remove-dialog .fm-dialog-button.notification-button.confirm {

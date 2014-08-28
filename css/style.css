@@ -6782,6 +6782,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	box-sizing: border-box;
 	padding: 0 20px 0 8px;
 }
+.fm-chat-message-scroll > .jspContainer > .jspPane {
+    min-height: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 .fm-chat-message-pad {
 	padding: 0 2px 2px 2px;
 	-webkit-box-sizing: border-box;
@@ -7818,6 +7824,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: 0 0 0 -22px;
 	left: 50%;
 	bottom: -8px;
+}
+.flipped > .fm-add-contact-arrow, .flipped > .fm-chat-download-arrow, .flipped .fm-send-files-arrow, .flipped > .fm-start-call-arrow {
+    bottom: auto;
+    top: -8px;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 .fm-add-contact-arrow, .fm-send-files-arrow, .fm-start-call-arrow {
 	top: -8px;

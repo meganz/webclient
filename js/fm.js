@@ -1287,7 +1287,7 @@ function initContextUI()
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
 		$('.copy-dialog .dialog-move-button').addClass('active');
-		$('.move-dialog').removeClass('hidden');
+		$('.move-dialog').removeClass('hidden');		
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
@@ -5036,6 +5036,27 @@ function copyDialog()
 		$('.copy-dialog').addClass('hidden');		
 	};
 	
+	// Clears already selected sub-folders, and set selection to root
+	function selectCopyDialogTabRoot(section)
+	{
+		$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
+            switch (section)
+            {
+                case 'cloud-drive':
+					$.mcselected = M.RootID;
+                    break;
+                case 'shared-with-me':
+					$.mcselected = 'shares';
+                    break;
+                case 'conversations':
+					$.mcselected = 'chat';
+                    break;
+				default:
+					$.mcseleced = M.RootID;
+					break;
+            }		
+	};
+	
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
@@ -5044,8 +5065,9 @@ function copyDialog()
 	
     $('.copy-dialog-button').unbind('click');
     $('.copy-dialog-button').bind('click', function() {
+		var section = $(this).attr('class').split(" ")[1];
+		selectCopyDialogTabRoot(section);
         if ($(this).attr('class').indexOf('active') == -1) {
-            var section = $(this).attr('class').split(" ")[1];
             switch (section)
             {
                 case 'cloud-drive':
@@ -5143,10 +5165,9 @@ function copyDialog()
 	{
 		var n = [];
 		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+		closeDialog();
 		M.copyNodes(n, $.mcselected);
 		
-		closeDialog();
-		// Close dialog
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
 //				if (RightsbyID(t) == 0)
@@ -5155,9 +5176,6 @@ function copyDialog()
 //					return false;
 //				}
 //			}
-//			var n=[];
-//			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-//			M.copyNodes(n,t);
 	});
 }
 
@@ -5170,6 +5188,27 @@ function moveDialog()
 		$('.move-dialog').addClass('hidden');			
 	}
 	
+	// Clears already selected sub-folders, and set selection to root
+	function selectMoveDialogTabRoot(section)
+	{
+		$('.move-dialog .nw-fm-tree-item').removeClass('selected');
+            switch (section)
+            {
+                case 'cloud-drive':
+					$.mcselected = M.RootID;
+                    break;
+                case 'shared-with-me':
+					$.mcselected = 'shares';
+                    break;
+                case 'rubbish-bin':
+					$.mcselected = M.RubbishID;
+                    break;
+				default:
+					$.mcseleced = M.RootID;
+					break;
+            }
+	};
+	
 	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
 	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click',function()
 	{
@@ -5178,8 +5217,9 @@ function moveDialog()
 	
     $('.move-dialog-button').unbind('click');
     $('.move-dialog-button').bind('click', function(e) {
+        var section = $(this).attr('class').split(" ")[1];
+		selectMoveDialogTabRoot(section);
         if ($(this).attr('class').indexOf('active') == -1) {
-            var section = $(this).attr('class').split(" ")[1];
             switch (section)
             {
                 case 'cloud-drive':
@@ -5277,10 +5317,9 @@ function moveDialog()
 	{
 		var n = [];
 		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+		closeDialog();
 		M.moveNodes(n, $.mcselected);
 		
-		closeDialog();
-		// Close dialog
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
 //				if (RightsbyID(t) == 0)
@@ -5289,9 +5328,6 @@ function moveDialog()
 //					return false;
 //				}
 //			}
-//			var n=[];
-//			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-//			M.copyNodes(n,t);
 	});
 }
 

@@ -18476,7 +18476,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	vertical-align: middle;
 	perspective: 1000;
 }
-.video-full-canvas, .front, .back, .video-fliper {
+.video-full-canvas, .video-full-canvas .front, .video-full-canvas .back, .video-fliper {
 	height: 100%;
 }
 .video-full-canvas {
@@ -18514,7 +18514,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	transform-style: preserve-3d;
 	position: relative;
 }
-.front, .back {
+.video-full-canvas .front, .video-full-canvas .back {
 	-webkit-backface-visibility: hidden;
 	-moz-backface-visibility: hidden;
 	-ms-backface-visibility: hidden;
@@ -18533,14 +18533,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	top: 0;
 	left: 0;
 }
-.front {
+.video-full-canvas .front {
 	-webkit-transform: rotateY(0deg);
 	-ms-transform: rotateY(0deg);
 	background: lightgreen;
 	z-index: 2;
 }
-.back {
-	background: lightblue;
+.video-full-canvas .back {
 	-webkit-transform: rotateY(-180deg);
 	-moz-transform: rotateY(-180deg);
 	-o-transform: rotateY(-180deg);

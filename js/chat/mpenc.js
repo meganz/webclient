@@ -629,19 +629,26 @@ define('mpenc/messages',[
      *     recipient ("???").
      * @property greet {object}
      *     Introspective information for data carried by the greet protocol:
-     *
-     *     * `agreement` - "initial" or "auxiliary" key agreement.
-     *     * `flow` - "upflow" (directed message) or "downflow" (broadcast).
-     *     * `fromInitiator` {bool} - `true` if the flow initiator has sent the
-     *       message, `false` if not, `null` if it can't be determined.
-     *     * `negotiation` - A clear text expression of the type of negotiation
-     *       message sent. One of "I quit", "somebody quits", "refresh",
-     *       "exclude <subject>", "start <subject>" or "join <subject>" (with
-     *       <subject> being one of "me", "other" or "(not involved)").
-     *     * `members` - List of group members enclosed.
-     *     * `numNonces` - Number of nonces enclosed.
-     *     * `numPubKeys` - Number of public signing keys enclosed.
-     *     * `numIntKeys` - Number of intermediate GDH keys enclosed.
+     * @property greet.agreement {string}
+     *     "initial" or "auxiliary" key agreement.
+     * @property greet.flow {string}
+     *     "upflow" (directed message) or "downflow" (broadcast).
+     * @property greet.fromInitiator {bool}
+     *     `true` if the flow initiator has sent the message, `false` if not,
+     *     `null` if it can't be determined.
+     * @property greet.negotiation {string}
+     *     A clear text expression of the type of negotiation message sent.
+     *     One of "I quit", "somebody quits", "refresh", "exclude [subject]",
+     *     "start [subject]" or "join [subject]" (with [subject] being one of
+     *     "me", "other" or "(not involved)").
+     * @property greet.members {Array}
+     *     List of group members' IDs enclosed.
+     * @property greet.numNonces {integer}
+     *     Number of nonces enclosed.
+     * @property greet.numPubKeys {integer}
+     *     Number of public signing keys enclosed.
+     * @property greet.numIntKeys {integer}
+     *     Number of intermediate GDH keys enclosed.
      */
     ns.ProtocolMessageInfo = function() {
         this.type = null;
@@ -1465,7 +1472,7 @@ define('mpenc/codec',[
 
         // Debugging output.
         if (debug.decoder === true) {
-            console.log("mpenc debug: ", debugOutput);
+            console.log('mpEnc decoded message debug: ', debugOutput);
         }
 
         // Check signature, if present.
@@ -4066,10 +4073,9 @@ define('mpenc/handler',[
 define('mpenc',[
     "mpenc/codec",
     "mpenc/handler",
-    "mpenc/messages",
     "mpenc/version",
     "mpenc/debug"
-], function(codec, handler, messages, version, debug) {
+], function(codec, handler, version, debug) {
     
 
     /**
@@ -4090,7 +4096,6 @@ define('mpenc',[
     mpenc.codec = codec;
     mpenc.handler = handler;
     mpenc.version = version;
-    mpenc.messages = messages;
     mpenc.debug = debug;
 
     return mpenc;

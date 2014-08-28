@@ -18536,7 +18536,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .video-full-canvas .front {
 	-webkit-transform: rotateY(0deg);
 	-ms-transform: rotateY(0deg);
-	background: lightgreen;
 	z-index: 2;
 }
 .video-full-canvas .back {

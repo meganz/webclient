@@ -1465,7 +1465,7 @@ define('mpenc/codec',[
 
         // Debugging output.
         if (debug.decoder === true) {
-            console.log(debugOutput);
+            console.log("mpenc debug: ", debugOutput);
         }
 
         // Check signature, if present.
@@ -4066,6 +4066,7 @@ define('mpenc/handler',[
 define('mpenc',[
     "mpenc/codec",
     "mpenc/handler",
+    "mpenc/messages",
     "mpenc/version",
     "mpenc/debug"
 ], function(codec, handler, messages, version, debug) {
@@ -4089,6 +4090,7 @@ define('mpenc',[
     mpenc.codec = codec;
     mpenc.handler = handler;
     mpenc.version = version;
+    mpenc.messages = messages;
     mpenc.debug = debug;
 
     return mpenc;

@@ -1286,7 +1286,7 @@ function initContextUI()
 	$(c+'.advanced-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-//		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.copy-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		$('.fm-dialog-overlay').removeClass('hidden');
@@ -1307,7 +1307,7 @@ function initContextUI()
 	$(c+'.move-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-//		$('.copy-dialog .dialog-copy-button').addClass('active');
+		$('.copy-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		$('.fm-dialog-overlay').removeClass('hidden');
@@ -5028,13 +5028,18 @@ function handleDialogTabContent(s, m, c, n, i)
 	
 function copyDialog()
 {
-	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
-	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
+	
+	function closeDialog()
 	{
 		delete $.copyDialog;
 		$('.fm-dialog-overlay').addClass('hidden');
-		$('.copy-dialog .dialog-copy-button').addClass('active');
-		$('.copy-dialog').addClass('hidden');
+		$('.copy-dialog').addClass('hidden');		
+	};
+	
+	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
+	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
+	{
+		closeDialog();
 	});
 	
     $('.copy-dialog-button').unbind('click');
@@ -5132,17 +5137,43 @@ function copyDialog()
 			$(this).addClass('selected');
 		}
 	});
+	
+	$('.copy-dialog .dialog-copy-button').unbind('click');
+	$('.copy-dialog .dialog-copy-button').bind('click', function()
+	{
+		var n = [];
+		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+		M.copyNodes(n, $.mcselected);
+		
+		closeDialog();
+		// Close dialog
+//			if ($.mctype == 'copy-contacts' && t.length == 8)
+//			{
+//				if (RightsbyID(t) == 0)
+//				{
+//					alert(l[1023]);
+//					return false;
+//				}
+//			}
+//			var n=[];
+//			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+//			M.copyNodes(n,t);
+	});
 }
 
 function moveDialog()
 {
-	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
-	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click',function()
+	function closeDialog()
 	{
 		delete $.moveDialog;
 		$('.fm-dialog-overlay').addClass('hidden');
-		$('.move-dialog .dialog-move-button').addClass('active');
-		$('.move-dialog').addClass('hidden');
+		$('.move-dialog').addClass('hidden');			
+	}
+	
+	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
+	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').bind('click',function()
+	{
+		closeDialog();
 	});
 	
     $('.move-dialog-button').unbind('click');
@@ -5239,151 +5270,30 @@ function moveDialog()
 			$('.move-dialog .nw-fm-tree-item').removeClass('selected');
 			$(this).addClass('selected');
 		}
-	});	
-}
-
-//function mcDialog(close)
-//{
-//	$.mcselected = M.RootID;
-//	if ($.selected.length > 0)
-//	{
-//		if ($.mctype == 'move' || $.mctype == 'copy-cloud') html = $('.content-panel.cloud-drive').html();
-//		else html = $('.content-panel.contacts').html();
-//		html = html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_');
-//
-//		$('.move-dialog .nw-fm-tree-item').removeClass('expanded active opened');
-//		$('.move-dialog ul').removeClass('opened');
-//
-//		$.mctreeUI = function()
-//		{
-			$('.move-dialog .nw-fm-tree-item').unbind('click');
-			$('.move-dialog .nw-fm-tree-item').bind('click',function(e)// Comm: tree-item on click action
-			{
-				$.mcselected = $(this).attr('id').replace('mctreea_','');
-				M.buildtree(M.d[$.mcselected]);
-				var html = $('#treesub_'+$.mcselected).html();
-				if (html) $('#mctreesub_'+$.mcselected).html(html.replace(/treea_/g,'mctreea_').replace(/treesub_/g,'mctreesub_'));
-				$.mctreeUI();
-
-				var c = $(e.target).attr('class');
-				if (c && c.indexOf('nw-fm-arrow-icon') > -1)
-				{
-					var c = $(this).attr('class');
-					if (c && c.indexOf('opened') > -1)
-					{
-						$(this).removeClass('expanded');
-						$('#mctreesub_' + $.mcselected).removeClass('opened');
-					}
-					else
-					{
-						$(this).addClass('expanded');
-						$('#mctreesub_' + $.mcselected).addClass('opened');
-					}
-				}
-				else
-				{
-					var c = $(this).attr('class');
-					if (c && c.indexOf('selected') > -1)
-					{
-						if (c && c.indexOf('expanded') > -1)
-						{
-							$(this).removeClass('expanded');
-							$('#mctreesub_' + $.mcselected).removeClass('opened');
-						}
-						else
-						{
-							$(this).addClass('expanded');
-							$('#mctreesub_' + $.mcselected).addClass('opened');
-						}
-					}
-					$('.move-dialog .nw-fm-tree-item').removeClass('selected');
-					$(this).addClass('selected');
-				}
-
-				$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
-				jScrollFade('.fm-move-dialog-body');
-				$('.move-dialog .move-button').addClass('active');
-				$('.move-dialog .fm-tree-header').removeClass('active');
-				$('.move-dialog #topheader').addClass('active');
-			});
-//
-//			$('.move-dialog .fm-tree-header').unbind('click');
-//			$('.move-dialog .fm-tree-header').bind('click',function(e,ui)
+	});
+	
+	$('.move-dialog .dialog-move-button').unbind('click');
+	$('.move-dialog .dialog-move-button').bind('click', function()
+	{
+		var n = [];
+		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+		M.moveNodes(n, $.mcselected);
+		
+		closeDialog();
+		// Close dialog
+//			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
-//				var c = $(this).attr('class');
-//				var doScroll=false;
-//				if (c && c.indexOf('contacts') > -1 && $.mctype == 'copy-cloud')
+//				if (RightsbyID(t) == 0)
 //				{
-//					$.mctype = 'copy-contacts';
-//					mcDialog();
-//					doScroll=true;
-//				}
-//				else if (c && c.indexOf('cloud-drive') > -1 && $.mctype == 'copy-contacts')
-//				{
-//					$.mctype = 'copy-cloud';
-//					mcDialog();
-//					doScroll=true;
-//				}
-//				if (doScroll)
-//				{
-//					var jsp = $('.fm-move-dialog-body').data('jsp');
-//					if (jsp) jsp.scrollTo(0,0);
+//					alert(l[1023]);
 //					return false;
 //				}
-//				if (c && c.indexOf('cloud-drive') > -1) $.mcselected = M.RootID;
-//				else if (c && c.indexOf('recycle-item') > -1) $.mcselected = M.RubbishID;
-//				$('.move-dialog .fm-move-dialog-body .fm-subfolders a').removeClass('active');
-//				$('.move-dialog .fm-tree-header').removeClass('active');
-//				$(this).addClass('active');
-//				if (!c || (c && c.indexOf('contacts') == -1)) $('.move-dialog .move-button').addClass('active');
-//			});
-//			$('.fm-move-dialog-body .fm-connector').removeClass('vertical-line last mid');
-//			$('.fm-move-dialog-body .fm-horizontal-connector').removeClass('active');
-//		};
-//		$.mctreeUI();
-//		$('.move-dialog .move-button').addClass('active');
-//		$('.move-dialog').removeClass('hidden');
-//		$('.fm-dialog-overlay').removeClass('hidden');
-//		$('.fm-move-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
-//		jScrollFade('.fm-move-dialog-body');
-//		$('.move-dialog .fm-dialog-close').unbind('click');
-//		$('.move-dialog .fm-dialog-close').bind('click',function()
-//		{
-//			mcDialog(1);
-//		});
-//		$('.move-dialog .cancel-button').unbind('click');
-//		$('.move-dialog .cancel-button').bind('click',function()
-//		{
-//			mcDialog(1);
-//		});
-//		$('.move-dialog .move-button').unbind('click');
-//		$('.move-dialog .move-button').bind('click',function()
-//		{
-//			var t = $.mcselected;
-//			if ($.mctype == 'move')
-//			{
-//				var n=[];
-//				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-//				M.moveNodes(n,t);
 //			}
-//			else if ($.mctype.substr(0,4) == 'copy')
-//			{
-//				if ($.mctype == 'copy-contacts' && t.length == 8)
-//				{
-//					if (RightsbyID(t) == 0)
-//					{
-//						alert(l[1023]);
-//						return false;
-//					}
-//				}
-//				var n=[];
-//				for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
-//				M.copyNodes(n,t);
-//			}
-//			mcDialog(1);
-//		});
-//	}
-//}
+//			var n=[];
+//			for (var i in $.selected) if (!isCircular($.selected[i],t)) n.push($.selected[i]);
+//			M.copyNodes(n,t);
+	});
+}
 
 function getclipboardlinks()
 {

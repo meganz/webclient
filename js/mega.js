@@ -1034,7 +1034,7 @@ function MegaData ()
                 continue;
             }
 
-			var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));			
+			var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
 			if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1))
 			{
 				html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"></a></div></div>';
@@ -1042,7 +1042,6 @@ function MegaData ()
 		}
 
 		$('.content-panel.contacts').html(html);
-
 
         megaChat.renderContactTree();
 
@@ -2070,9 +2069,9 @@ function MegaData ()
 		if(is_chrome_firefox)
 		{
 			var root = mozGetDownloadsFolder();
-			if (root) dirs.filter(String).forEach(function(p) 
+			if (root) dirs.filter(String).forEach(function(p)
 			{
-				try 
+				try
 				{
 					p = mozFile(root,0,p);
 					if(!p.exists()) p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755",8));
@@ -2300,7 +2299,7 @@ function MegaData ()
 	{
 		var id = dl.id, z = dl.zipid;
 
-		if (slideshowid == id && !previews[slideshowid]) 
+		if (slideshowid == id && !previews[slideshowid])
 		{
 			$('.slideshow-pending').addClass('hidden');
 			$('.slideshow-error').addClass('hidden');
@@ -2539,15 +2538,22 @@ function MegaData ()
 		}
 	};
 
+	var __ul_id = 8000;
 	this.addUpload = function(u)
 	{
-		var target = $.onDroppedTreeFolder || M.currentdirid;
+		var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
 		delete $.onDroppedTreeFolder;
+
+		if ((onChat = (M.currentdirid.substr(0,4) === 'chat')))
+		{
+			if (!$.ulBunch) $.ulBunch = {};
+			if (!$.ulBunch[M.currentdirid]) $.ulBunch[M.currentdirid] = {};
+		}
 
 		for (var i in u)
 		{
 			var f = u[i];
-			var ul_id = ul_queue.length;
+			var ul_id = ++__ul_id;
 			if (!f.flashid) f.flashid = false;
 			f.target = target;
 			f.id = ul_id;
@@ -2563,6 +2569,8 @@ function MegaData ()
 					+ '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>'
 			);
 			ul_queue.push(f);
+
+			if (onChat) $.ulBunch[M.currentdirid][ul_id] = 1;
 		}
 		if (page == 'start') {
 			ulQueue.pause();
@@ -2573,8 +2581,10 @@ function MegaData ()
 		ul_uploading = !!ul_queue.length;
 	}
 
-	this.ulprogress = function(id, perc, bl, bt, bps)
+	this.ulprogress = function(ul, perc, bl, bt, bps)
 	{
+		var id = ul.id;
+
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
 			$('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
@@ -2582,8 +2592,8 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(5)').html('<div class="progress-block" style=""><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div></div>');
 			$.transferHeader();
 		}
-		if (!bl || !ul_queue[id] || !ul_queue[id]['starttime']) return false;
-		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
+		if (!bl || !ul.starttime) return false;
+		var eltime = (new Date().getTime()-ul.starttime)/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -2611,8 +2621,33 @@ function MegaData ()
 		percent_megatitle();
 	}
 
-	this.ulcomplete = function(id,h,k)
+	this.ulcomplete = function(ul,h,k)
 	{
+		var id = ul.id;
+
+		if ($.ulBunch && $.ulBunch[ul.target])
+		{
+			var ub = $.ulBunch[ul.target], p;
+			ub[id] = h;
+
+			for (var i in ub)
+			{
+				if (ub[i] == 1)
+				{
+					p = true;
+					break;
+				}
+			}
+
+			if (!p)
+			{
+				ub = Object.keys(ub).map(function(m) { return ub[m]});
+				$(document).trigger('mega.ulcomplete', [ul.target, ub]);
+				delete $.ulBunch[ul.target];
+				if (!$.len($.ulBunch)) delete $.ulBunch;
+			}
+		}
+
 		this.mobile_ul_completed=true;
 		for(var i in this.mobileuploads)
 		{
@@ -2628,7 +2663,6 @@ function MegaData ()
 		}
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #ul_' + id + ' td:eq(3)').text('');
-		resetUploadDownload();
 
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
@@ -2655,14 +2689,16 @@ function MegaData ()
 		Soon(resetUploadDownload);
 	}
 
-	this.ulstart = function(id)
+	this.ulstart = function(ul)
 	{
+		var id = ul.id;
+
 		if (d) console.log('ulstart',id);
 		$('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
 		Soon(fmUpdateCount);
-		ul_queue[id].starttime = new Date().getTime();
-		M.ulprogress(id, 0, 0, 0);
+		ul.starttime = new Date().getTime();
+		M.ulprogress(ul, 0, 0, 0);
 		$.transferHeader();
 	};
 
@@ -3074,12 +3110,12 @@ function execsc(ap)
 				{
 					u_nodekeys[a.n] = f.key;
 					if (f.name !== n.name)
-					{						
+					{
 						$('.grid-table.fm #' + n.h + ' .tranfer-filetype-txt').text(f.name);
 						$('.file-block#' + n.h + ' .file-block-title').text(f.name);
 						$('#treea_' + n.h + ' .nw-fm-tree-folder').text(f.name);
-						
-						//@@@Todo: reposition elements according to sorting (if sorted by name)						
+
+						//@@@Todo: reposition elements according to sorting (if sorted by name)
 						if ($('#path_' + n.h).length > 0) newpath=1;
 					}
 					if (f.fav !== n.fav)

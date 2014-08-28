@@ -960,11 +960,10 @@ function DEBUG() {
 function ASSERT(what, msg) {
 	if (!what)
 	{
+		var af = new Error('failed assertion; ' + msg);
+		Soon(function() { throw af; });
 		if (console.assert) console.assert(what, msg);
 		else console.error('FAILED ASSERTION', msg);
-		Soon(function() {
-			throw new Error('FAILED ASSERTION: ' + msg);
-		});
 	}
 }
 

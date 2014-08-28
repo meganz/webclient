@@ -547,7 +547,7 @@ define('mpenc/messages',[
      * @constructor
      * @param source {string}
      *     Message originator (from).
-     * @returns {ProtocolMessage}
+     * @returns {mpenc.messages.ProtocolMessage}
      *
      * @property source {string}
      *     Message originator (from).
@@ -603,6 +603,61 @@ define('mpenc/messages',[
         this.rawMessage = null;
         this.protocol = null;
         this.data = null;
+
+        return this;
+    };
+
+    /**
+     * Carries information extracted from a received mpENC protocol message for
+     * the greet protocol (key exchange and agreement).
+     *
+     * @constructor
+     * @returns {mpenc.messages.ProtocolMessageInfo}
+     *
+     * @property type {string}
+     *     String "mpEnc greet message".
+     * @property protocol {integer}
+     *     mpEnc protocol version number.
+     * @property from {string}
+     *     Message originator's participant ID.
+     * @property to {string}
+     *     Message destination's participant ID.
+     * @property origin {string}
+     *     Indicates whether the message originated from a group chat
+     *     participant ("participant"), from somebody not participating
+     *     ("outsider") or whether it cannot be determined/inferred by the
+     *     recipient ("???").
+     * @property greet {object}
+     *     Introspective information for data carried by the greet protocol:
+     *
+     *     * `agreement` - "initial" or "auxiliary" key agreement.
+     *     * `flow` - "upflow" (directed message) or "downflow" (broadcast).
+     *     * `fromInitiator` {bool} - `true` if the flow initiator has sent the
+     *       message, `false` if not, `null` if it can't be determined.
+     *     * `negotiation` - A clear text expression of the type of negotiation
+     *       message sent. One of "I quit", "somebody quits", "refresh",
+     *       "exclude <subject>", "start <subject>" or "join <subject>" (with
+     *       <subject> being one of "me", "other" or "(not involved)").
+     *     * `members` - List of group members enclosed.
+     *     * `numNonces` - Number of nonces enclosed.
+     *     * `numPubKeys` - Number of public signing keys enclosed.
+     *     * `numIntKeys` - Number of intermediate GDH keys enclosed.
+     */
+    ns.ProtocolMessageInfo = function() {
+        this.type = null;
+        this.protocol = null;
+        this.from = null;
+        this.to = null;
+        this.origin = null;
+        this.greet = {agreement: null,
+                      flow: null,
+                      fromInitiator: null,
+                      negotiation: null,
+                      members: [],
+                      numNonces: 0,
+                      numPubKeys: 0,
+                      numIntKeys: 0,
+        };
 
         return this;
     };
@@ -1108,7 +1163,10 @@ define('mpenc/debug',[], function() {
      * @description
      * Debugging configuration.
      */
-    var ns = {decoder: false};
+    var ns = {};
+
+    /** Debugging output from message decoder. */
+    ns.decoder = false;
 
     return ns;
 });
@@ -1431,6 +1489,69 @@ define('mpenc/codec',[
 
         _assert(out.protocol === version.PROTOCOL_VERSION,
                 'Received wrong protocol version: ' + out.protocol.charCodeAt(0) + '.');
+
+        return out;
+    };
+
+
+    /**
+     * Inspects a given TLV encoded protocol message to extract information
+     * on the message type.
+     *
+     * @param message {string}
+     *     A binary message representation.
+     * @returns {object}
+     *     Message meta-data.
+     */
+    ns.inspectMessageContent = function(message) {
+        if (!message) {
+            return null;
+        }
+        var out = new messages.ProtocolMessageInfo();
+
+        while (message.length > 0) {
+            var tlv = ns.decodeTLV(message);
+            switch (tlv.type) {
+                case ns.TLV_TYPE.PROTOCOL_VERSION:
+                    out.protocol = tlv.value.charCodeAt(0);
+                    break;
+                case ns.TLV_TYPE.SOURCE:
+                    out.from = tlv.value;
+                    break;
+                case ns.TLV_TYPE.DEST:
+                    out.to = tlv.value || '';
+                    if (out.to === '') {
+                        out.greet.flow = 'downflow';
+                    } else {
+                        out.greet.flow = 'upflow';
+                    }
+                    break;
+                case ns.TLV_TYPE.AUX_AGREEMENT:
+                    if (tlv.value === _ZERO_BYTE) {
+                        out.greet.agreement = 'initial';
+                    } else if (tlv.value === _ONE_BYTE) {
+                        out.greet.agreement = 'auxiliary';
+                    }
+                    break;
+                case ns.TLV_TYPE.MEMBER:
+                    out.greet.members.push(tlv.value);
+                    break;
+                case ns.TLV_TYPE.NONCE:
+                    out.greet.numNonces++;
+                    break;
+                case ns.TLV_TYPE.INT_KEY:
+                    out.greet.numIntKeys++;
+                    break;
+                case ns.TLV_TYPE.PUB_KEY:
+                    out.greet.numPubKeys++;
+                    break;
+                default:
+                    // Ignoring all others.
+                    break;
+            }
+
+            message = tlv.rest;
+        }
 
         return out;
     };
@@ -1850,6 +1971,2078 @@ define('mpenc/codec',[
 });
 
 /**
+ * @fileOverview
+ * Implementation of group key agreement based on CLIQUES.
+ */
+
+define('mpenc/greet/cliques',[
+    "mpenc/helper/assert",
+    "mpenc/helper/utils",
+    "jodid25519"
+], function(assert, utils, jodid25519) {
+    
+
+    /**
+     * @exports mpenc/greet/cliques
+     * Implementation of group key agreement based on CLIQUES.
+     *
+     * @description
+     * <p>Implementation of group key agreement based on CLIQUES.</p>
+     *
+     * <p>
+     * Michael Steiner, Gene Tsudik, and Michael Waidner. 2000.<br/>
+     * "Key Agreement in Dynamic Peer Groups."<br/>
+     * IEEE Trans. Parallel Distrib. Syst. 11, 8 (August 2000), 769-780.<br/>
+     * DOI=10.1109/71.877936</p>
+     *
+     * <p>This implementation is using the Curve25519 for ECDH mechanisms as a base
+     * extended for group key agreement.</p>
+     */
+    var ns = {};
+
+    var _assert = assert.assert;
+
+    /*
+     * Created: 20 Jan 2014 Guy K. Kloss <gk@mega.co.nz>
+     *
+     * (c) 2014 by Mega Limited, Wellsford, New Zealand
+     *     http://mega.co.nz/
+     *     Simplified (2-clause) BSD License.
+     *
+     * You should have received a copy of the license along with this
+     * program.
+     *
+     * This file is part of the multi-party chat encryption suite.
+     *
+     * This code is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     */
+
+    /**
+     * Carries message content for the CLIQUES protocol.
+     *
+     * @param source
+     *     Message originator (from).
+     * @param dest
+     *     Message destination (to).
+     * @param agreement
+     *     Type of key agreement. "ika" or "aka".
+     * @param flow
+     *     Direction of message flow. "upflow" or "downflow".
+     * @param members
+     *     List (array) of all participating members.
+     * @param intKeys
+     *     List (array) of intermediate keys to transmit.
+     * @param debugKeys
+     *     List (array) of keying debugging strings.
+     * @returns {CliquesMessage}
+     * @constructor
+     *
+     * @property source
+     *     Message originator (from).
+     * @property dest
+     *     Message destination (to).
+     * @property agreement
+     *     Type of key agreement. "ika" or "aka".
+     * @property flow
+     *     Direction of message flow. "upflow" or "downflow".
+     * @property members
+     *     List (array) of all participating members.
+     * @property intKeys
+     *     List (array) of intermediate keys to transmit.
+     * @property debugKeys
+     *     List (array) of keying debugging strings.
+     */
+    ns.CliquesMessage = function(source, dest, agreement, flow, members,
+                                 intKeys, debugKeys) {
+        this.source = source || '';
+        this.dest = dest || '';
+        this.agreement = agreement || '';
+        this.flow = flow || '';
+        this.members = members || [];
+        this.intKeys = intKeys || [];
+        this.debugKeys = debugKeys || [];
+        return this;
+    };
+
+
+    /**
+     * Implementation of group key agreement based on CLIQUES.
+     *
+     * This implementation is using the Curve25519 for ECDH mechanisms as a base
+     * extended for group key agreement.
+     *
+     * @constructor
+     * @param id {string}
+     *     Member's identifier string.
+     * @returns {CliquesMember}
+     *
+     * @property id {string}
+     *     Member's identifier string.
+     * @property members
+     *     List of all participants.
+     * @property intKeys
+     *     List (array) of intermediate keys for all participants. The key for
+     *     each participant contains all others' contributions but the
+     *     participant's one.
+     * @property privKey
+     *     This participant's private key.
+     * @property privKeyId
+     *     The ID of the private key (incrementing integer, starting from 0).
+     * @property keyTimestamp
+     *     Time stamp indicator when `privKey` was created/refreshed.
+     *     Some monotonously increasing counter.
+     * @property groupKey
+     *     Shared secret, the group key.
+     */
+    ns.CliquesMember = function(id) {
+        this.id = id;
+        this.members = [];
+        this.intKeys = null;
+        this.privKey = null;
+        this.privKeyId = 0;
+        this.keyTimestamp = null;
+        this.groupKey = null;
+        // For debugging: Chain of all scalar multiplication keys.
+        this._debugIntKeys = null;
+        this._debugGroupKey = null;
+
+        return this;
+    };
+
+
+    /**
+     * Start the IKA (Initial Key Agreement) procedure for the given members.
+     *
+     * @method
+     * @param otherMembers
+     *     Iterable of other members for the group (excluding self).
+     * @returns {CliquesMessage}
+     */
+    ns.CliquesMember.prototype.ika = function(otherMembers) {
+        _assert(otherMembers && otherMembers.length !== 0, 'No members to add.');
+        this.intKeys = null;
+        this._debugIntKeys = null;
+        this.privKey = null;
+        this._debugPrivKey = null;
+        var startMessage = new ns.CliquesMessage(this.id);
+        startMessage.members = [this.id].concat(otherMembers);
+        startMessage.agreement = 'ika';
+        startMessage.flow = 'upflow';
+        return this.upflow(startMessage);
+    };
+
+
+    /**
+     * Start the IKA (Initial Key Agreement) for a full/complete refresh of
+     * all keys.
+     *
+     * @returns {CliquesMessage}
+     * @method
+     */
+    ns.CliquesMember.prototype.ikaFullRefresh = function() {
+        // Start with the other members.
+        var otherMembers = utils.clone(this.members);
+        var myPos = otherMembers.indexOf(this.id);
+        otherMembers.splice(myPos, 1);
+        return this.ika(otherMembers);
+    };
+
+
+    /**
+     * Start the AKA (Auxiliary Key Agreement) for joining new members.
+     *
+     * @method
+     * @param newMembers
+     *     Iterable of new members to join the group.
+     * @returns {CliquesMessage}
+     */
+    ns.CliquesMember.prototype.akaJoin = function(newMembers) {
+        _assert(newMembers && newMembers.length !== 0, 'No members to add.');
+        var allMembers = this.members.concat(newMembers);
+        _assert(utils._noDuplicatesInList(allMembers),
+                'Duplicates in member list detected!');
+
+        // Replace members list.
+        this.members = allMembers;
+
+        // Renew all keys.
+        var retValue = this._renewPrivKey();
+
+        // Start of AKA upflow, so we can't be the last member in the chain.
+        // Add the new cardinal key.
+        this.intKeys.push(retValue.cardinalKey);
+        this._debugIntKeys.push(retValue.cardinalDebugKey);
+
+        // Pass a message on to the first new member to join.
+        var startMessage = new ns.CliquesMessage(this.id);
+        startMessage.members = allMembers;
+        startMessage.dest = newMembers[0];
+        startMessage.agreement = 'aka';
+        startMessage.flow = 'upflow';
+        startMessage.intKeys = this.intKeys;
+        startMessage.debugKeys = this._debugIntKeys;
+
+        return startMessage;
+    };
+
+
+    /**
+     * Start the AKA (Auxiliary Key Agreement) for excluding members.
+     *
+     * @method
+     * @param excludeMembers
+     *     Iterable of members to exclude from the group.
+     * @returns {CliquesMessage}
+     */
+    ns.CliquesMember.prototype.akaExclude = function(excludeMembers) {
+        _assert(excludeMembers && excludeMembers.length !== 0, 'No members to exclude.');
+        _assert(utils._arrayIsSubSet(excludeMembers, this.members),
+                'Members list to exclude is not a sub-set of previous members!');
+        _assert(excludeMembers.indexOf(this.id) < 0,
+                'Cannot exclude mysefl.');
+
+        // Kick 'em.
+        for (var i = 0; i < excludeMembers.length; i++) {
+            var index = this.members.indexOf(excludeMembers[i]);
+            this.members.splice(index, 1);
+            this.intKeys.splice(index, 1);
+            this._debugIntKeys.splice(index, 1);
+        }
+
+        // Renew all keys.
+        var retValue = this._renewPrivKey();
+
+        // Discard old and make new group key.
+        this.groupKey = utils.sha256(retValue.cardinalKey);
+        this._debugGroupKey = retValue.cardinalDebugKey;
+
+        // Pass broadcast message on to all members.
+        var broadcastMessage = new ns.CliquesMessage(this.id);
+        broadcastMessage.members = this.members;
+        broadcastMessage.agreement = 'aka';
+        broadcastMessage.flow = 'downflow';
+        broadcastMessage.intKeys = this.intKeys;
+        broadcastMessage.debugKeys = this._debugIntKeys;
+
+        return broadcastMessage;
+    };
+
+
+    /**
+     * AKA (Auxiliary Key Agreement) for excluding members.
+     *
+     * For CLIQUES, there is no message flow involved.
+     *
+     * @method
+     */
+    ns.CliquesMember.prototype.akaQuit = function() {
+        _assert(this.privKey !== null, 'Not participating.');
+
+        // Kick myself out.
+        var myPos = this.members.indexOf(this.id);
+        if (myPos >= 0) {
+            this.members.splice(myPos, 1);
+            this.intKeys = [];
+            this._debugIntKeys = [];
+            this.privKey = null;
+        }
+    };
+
+
+    /**
+     * Start the AKA (Auxiliary Key Agreement) for refreshing the own private key.
+     *
+     * @returns {CliquesMessage}
+     * @method
+     */
+    ns.CliquesMember.prototype.akaRefresh = function() {
+        // Renew all keys.
+        var retValue = this._renewPrivKey();
+
+        // Discard old and make new group key.
+        this.groupKey = null;
+        this.groupKey = utils.sha256(retValue.cardinalKey);
+        this._debugGroupKey = retValue.cardinalDebugKey;
+
+        // Pass broadcast message on to all members.
+        var broadcastMessage = new ns.CliquesMessage(this.id);
+        broadcastMessage.members = this.members;
+        broadcastMessage.agreement = 'aka';
+        broadcastMessage.flow = 'downflow';
+        broadcastMessage.intKeys = this.intKeys;
+        broadcastMessage.debugKeys = this._debugIntKeys;
+
+        return broadcastMessage;
+    };
+
+
+    /**
+     * IKA/AKA upflow phase message processing.
+     *
+     * @method
+     * @param message
+     *     Received upflow message. See {@link CliquesMessage}.
+     * @returns {CliquesMessage}
+     */
+    ns.CliquesMember.prototype.upflow = function(message) {
+        _assert(utils._noDuplicatesInList(message.members),
+                'Duplicates in member list detected!');
+        _assert(message.intKeys.length <= message.members.length,
+                'Too many intermediate keys on CLIQUES upflow!');
+
+        this.members = message.members;
+        this.intKeys = message.intKeys;
+        this._debugIntKeys = message.debugKeys;
+        if (this.intKeys.length === 0) {
+            // We're the first, so let's initialise it.
+            this.intKeys = [null];
+            this._debugIntKeys = [null];
+        }
+
+        // To not confuse _renewPrivKey() in full refresh situation.
+        if (message.agreement === 'ika') {
+            this.privKey = null;
+            this._debugPrivKey = null;
+        }
+
+        // Renew all keys.
+        var result = this._renewPrivKey();
+        var myPos = this.members.indexOf(this.id);
+
+        // Clone message.
+        message = utils.clone(message);
+        if (myPos === this.members.length - 1) {
+            // I'm the last in the chain:
+            // Cardinal is secret key.
+            this.groupKey = utils.sha256(result.cardinalKey);
+            this._debugGroupKey = result.cardinalDebugKey;
+            this._setKeys(this.intKeys, this._debugIntKeys);
+            // Broadcast all intermediate keys.
+            message.source = this.id;
+            message.dest = '';
+            message.flow = 'downflow';
+        } else {
+            // Add the new cardinal key.
+            this.intKeys.push(result.cardinalKey);
+            this._debugIntKeys.push(result.cardinalDebugKey);
+            // Pass a message on to the next in line.
+            message.source = this.id;
+            message.dest = this.members[myPos + 1];
+        }
+        message.intKeys = this.intKeys;
+        message.debugKeys = this._debugIntKeys;
+        return message;
+    };
+
+
+    /**
+     * Renew the private key, update the set of intermediate keys and return
+     * the new cardinal key.
+     *
+     * @returns
+     *     Cardinal key and cardinal debug key in an object.
+     * @method
+     * @private
+     */
+    ns.CliquesMember.prototype._renewPrivKey = function() {
+        var myPos = this.members.indexOf(this.id);
+        if (this.privKey) {
+            // Patch our old private key into intermediate keys.
+            this.intKeys[myPos] = jodid25519.dh.computeKey(this.privKey,
+                                                           this.intKeys[myPos]);
+            this._debugIntKeys[myPos] = ns._computeKeyDebug(this._debugPrivKey,
+                                                            this._debugIntKeys[myPos]);
+            this.privKey = null;
+        }
+
+        // Make a new private key.
+        this.privKey = jodid25519.dh.generateKey();
+        this.privKeyId++;
+        this.keyTimestamp = Math.round(Date.now() / 1000);
+        if (this._debugPrivKey) {
+            this._debugPrivKey = this._debugPrivKey + "'";
+        } else {
+            this._debugPrivKey = this.id;
+        }
+
+        // Update intermediate keys.
+        for (var i = 0; i < this.intKeys.length; i++) {
+            if (i !== myPos) {
+                this.intKeys[i] = jodid25519.dh.computeKey(this.privKey,
+                                                           this.intKeys[i]);
+                this._debugIntKeys[i] = ns._computeKeyDebug(this._debugPrivKey,
+                                                            this._debugIntKeys[i]);
+            }
+        }
+
+        // New cardinal is "own" intermediate scalar multiplied with our private.
+        var cardinalKey = jodid25519.dh.computeKey(this.privKey,
+                                                   this.intKeys[myPos]);
+        return {
+            cardinalKey: '' + cardinalKey,
+            cardinalDebugKey: ns._computeKeyDebug(this._debugPrivKey,
+                                                  this._debugIntKeys[myPos])
+        };
+    };
+
+    /**
+     * IKA downflow phase broadcast message receive.
+     *
+     * @method
+     * @param message
+     *     Received downflow broadcast message.
+     */
+    ns.CliquesMember.prototype.downflow = function(message) {
+        _assert(utils._noDuplicatesInList(message.members),
+                'Duplicates in member list detected!');
+        if (message.agreement === 'ika') {
+            _assert(utils.arrayEqual(this.members, message.members),
+                    'Member list mis-match in CLIQUES protocol');
+        }
+        _assert(message.members.indexOf(this.id) >= 0,
+                'Not in members list, must be excluded.');
+        _assert(message.members.length === message.intKeys.length,
+                'Mis-match intermediate key number for CLIQUES downflow.');
+        this.members = message.members;
+        this._setKeys(message.intKeys, message.debugKeys);
+    };
+
+
+    /**
+     * Updates local state for group and intermediate keys.
+     *
+     * @method
+     * @param intKeys
+     *     Intermediate keys.
+     * @param debugKeys
+     *     Debug "key" sequences.
+     * @private
+     */
+    ns.CliquesMember.prototype._setKeys = function(intKeys, debugKeys) {
+        this.groupKey = null;
+        this._debugGroupKey = null;
+
+        // New objects for intermediate keys.
+        var myPos = this.members.indexOf(this.id);
+        this.intKeys = intKeys;
+        this._debugIntKeys = debugKeys;
+        this.groupKey = utils.sha256(jodid25519.dh.computeKey(this.privKey,
+                                                              this.intKeys[myPos]));
+        this._debugGroupKey = ns._computeKeyDebug(this._debugPrivKey,
+                                                  this._debugIntKeys[myPos]);
+    };
+
+
+    /**
+     * Debug version of `jodid25519.dh.computeKey()`.
+     *
+     * In case intKey is undefined, privKey will be multiplied with the curve's
+     * base point.
+     *
+     * @param privKey
+     *     Private key.
+     * @param intKey
+     *     Intermediate key.
+     * @returns
+     *     Scalar product of keys.
+     * @private
+     */
+    ns._computeKeyDebug = function(privKey, intKey) {
+        if (intKey) {
+            return privKey + '*' + intKey;
+        } else {
+            return privKey + '*G';
+        }
+    };
+
+    return ns;
+});
+
+/**
+ * @fileOverview
+ * Implementation of an authenticated Signature Key Exchange scheme.
+ */
+
+define('mpenc/greet/ske',[
+    "mpenc/helper/assert",
+    "mpenc/helper/utils",
+    "jodid25519",
+], function(assert, utils, jodid25519) {
+    
+
+    /**
+     * @exports mpenc/greet/ske
+     * Implementation of an authenticated Signature Key Exchange scheme.
+     *
+     * @description
+     * <p>Implementation of an authenticated Signature Key Exchange scheme.</p>
+     *
+     * <p>
+     * This scheme is trying to prevent replay attacks by the use of a nonce-based
+     * session ID as described in </p>
+     *
+     * <p>
+     * Jens-Matthias Bohli and Rainer Steinwandt. 2006.<br/>
+     * "Deniable Group Key Agreement."<br/>
+     * VIETCRYPT 2006, LNCS 4341, pp. 298-311.</p>
+     *
+     * <p>
+     * This implementation is using the Edwards25519 for an ECDSA signature
+     * mechanism to complement the Curve25519-based group key agreement.</p>
+     */
+    var ns = {};
+
+    var _assert = assert.assert;
+
+    /*
+     * Created: 5 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+     *
+     * (c) 2014 by Mega Limited, Wellsford, New Zealand
+     *     http://mega.co.nz/
+     *     Simplified (2-clause) BSD License.
+     *
+     * You should have received a copy of the license along with this
+     * program.
+     *
+     * This file is part of the multi-party chat encryption suite.
+     *
+     * This code is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     */
+
+    var MAGIC_NUMBER = 'acksig';
+
+    /**
+     * Carries message content for the authenticated signature key exchange.
+     *
+     * @constructor
+     * @param source
+     *     Message originator (from).
+     * @param dest
+     *     Message destination (to).
+     * @param flow
+     *     Message type.
+     * @param members
+     *     List (array) of all participating members.
+     * @param nonces
+     *     List (array) of all participants' nonces.
+     * @param pubKeys
+     *     List (array) of all participants' ephemeral public keys.
+     * @param sessionSignature
+     *     Signature to acknowledge the session.
+     * @returns {SignatureKeyExchangeMessage}
+     *
+     * @property source {string}
+     *     Sender participant ID of message.
+     * @property dest {string}
+     *     Destination participatn ID of message (empty for broadcast).
+     * @property flow {string}
+     *     Flow direction of message ('upflow' or 'downflow').
+     * @property members {Array}
+     *     Participant IDs of members.
+     * @property nonces {Array}
+     *     Nonces of members.
+     * @property pubKeys {Array}
+     *     Ephemeral public signing key of members.
+     * @property sessionSignature {string}
+     *     Session acknowledgement signature using sender's static key.
+     * @property signingKey {string}
+     *     Ephemeral private signing key for session (upon quitting participation).
+     */
+    ns.SignatureKeyExchangeMessage = function(source, dest, flow, members,
+                                              nonces, pubKeys, sessionSignature) {
+        this.source = source || '';
+        this.dest = dest || '';
+        this.flow = flow || '';
+        this.members = members || [];
+        this.nonces = nonces || [];
+        this.pubKeys = pubKeys || [];
+        this.sessionSignature = sessionSignature || null;
+        this.signingKey = null;
+
+        return this;
+    };
+
+
+    /**
+     * Implementation of the authenticated signature key exchange.
+     *
+     * This implementation is using Edwards25519 ECDSA signatures.
+     *
+     * @constructor
+     * @param id {string}
+     *     Member's identifier string.
+     * @returns {SignatureKeyExchangeMember}
+     *
+     * @property id {string}
+     *     Member's identifier string.
+     * @property members
+     *     List of all participants.
+     * @property authenticatedMembers
+     *     List of boolean authentication values for members.
+     * @property ephemeralPrivKey
+     *     Own ephemeral private signing key.
+     * @property ephemeralPubKey
+     *     Own ephemeral public signing key.
+     * @property nonce
+     *     Own nonce value for this session.
+     * @property nonces
+     *     Nonce values of members for this session.
+     * @property ephemeralPubKeys
+     *     Ephemeral signing keys for members.
+     * @property sessionId
+     *     Session ID of this session.
+     * @property staticPrivKey
+     *     Own static (long term) signing key.
+     * @property staticPubKeyDir
+     *     "Directory" of static public keys, using the participant ID as key.
+     * @property oldEphemeralKeys
+     *     "Directory" of previous participants' ephemeral keys, using the
+     *     participant ID as key. The entries contain an object with one or more of
+     *     the members `priv`, `pub` and `authenticated` (if the key was
+     *     successfully authenticated).
+     */
+    ns.SignatureKeyExchangeMember = function(id) {
+        this.id = id;
+        this.members = [];
+        this.authenticatedMembers = null;
+        this.ephemeralPrivKey = null;
+        this.ephemeralPubKey = null;
+        this.nonce = null;
+        this.nonces = null;
+        this.ephemeralPubKeys = null;
+        this.sessionId = null;
+        this.staticPrivKey = null;
+        this.staticPubKeyDir = null;
+        this.oldEphemeralKeys = {};
+        return this;
+    };
+
+
+    /**
+     * Start the upflow for the the commit (nonce values and ephemeral public keys).
+     *
+     * @param otherMembers
+     *     Iterable of other members for the group (excluding self).
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.commit = function(otherMembers) {
+        _assert(otherMembers && otherMembers.length !== 0, 'No members to add.');
+        this.ephemeralPubKeys = null;
+        var startMessage = new ns.SignatureKeyExchangeMessage(this.id, '', 'upflow');
+        startMessage.members = [this.id].concat(otherMembers);
+        this.nonce = null;
+        this.nonces = [];
+        this.ephemeralPubKeys = [];
+        return this.upflow(startMessage);
+    };
+
+
+    /**
+     * SKE upflow phase message processing.
+     *
+     * @param message
+     *     Received upflow message. See {@link SignatureKeyExchangeMessage}.
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.upflow = function(message) {
+        _assert(utils._noDuplicatesInList(message.members),
+                'Duplicates in member list detected!');
+        _assert(message.nonces.length <= message.members.length,
+                'Too many nonces on ASKE upflow!');
+        _assert(message.pubKeys.length <= message.members.length,
+                'Too many pub keys on ASKE upflow!');
+        var myPos = message.members.indexOf(this.id);
+        _assert(myPos >= 0, 'Not member of this key exchange!');
+
+        this.members = utils.clone(message.members);
+        this.nonces = utils.clone(message.nonces);
+        this.ephemeralPubKeys = utils.clone(message.pubKeys);
+
+        // Make new nonce and ephemeral signing key pair.
+        this.nonce = jodid25519.eddsa.generateKeySeed();
+        this.nonces.push(this.nonce);
+        if (!this.ephemeralPrivKey) {
+            // Only generate a new key if we don't have one.
+            // We might want to recover and just re-run the protocol.
+            this.ephemeralPrivKey = jodid25519.eddsa.generateKeySeed();
+        }
+        this.ephemeralPubKey = jodid25519.eddsa.publicKey(this.ephemeralPrivKey);
+        this.ephemeralPubKeys.push(this.ephemeralPubKey);
+
+        // Clone message.
+        message = utils.clone(message);
+
+        // Pass on a message.
+        if (myPos === this.members.length - 1) {
+            // Compute my session ID.
+            this.sessionId = ns._computeSid(this.members, this.nonces);
+            // I'm the last in the chain:
+            // Broadcast own session authentication.
+            message.source = this.id;
+            message.dest = '';
+            message.flow = 'downflow';
+            this.authenticatedMembers = utils._arrayMaker(this.members.length, false);
+            this.authenticatedMembers[myPos] = true;
+            message.sessionSignature = this._computeSessionSig();
+        } else {
+            // Pass a message on to the next in line.
+            message.source = this.id;
+            message.dest = this.members[myPos + 1];
+        }
+        message.nonces = utils.clone(this.nonces);
+        message.pubKeys = utils.clone(this.ephemeralPubKeys);
+        return message;
+    };
+
+
+    /**
+     * Computes a session acknowledgement signature sigma(m) of a message
+     * m = (pid_i, E_i, k_i, sid) using the static private key.
+     *
+     * @returns
+     *     Session signature.
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype._computeSessionSig = function() {
+        _assert(this.sessionId, 'Session ID not available.');
+        _assert(this.ephemeralPubKey, 'No ephemeral key pair available.');
+        var sessionAck = MAGIC_NUMBER + this.id + this.ephemeralPubKey
+                       + this.nonce + this.sessionId;
+        var hashValue = utils.sha256(sessionAck);
+        return jodid25519.eddsa.sign(hashValue, this.staticPrivKey,
+                                     this.staticPubKeyDir.get(this.id));
+    };
+
+
+    /**
+     * Verifies a session acknowledgement signature sigma(m) of a message
+     * m = (pid_i, E_i, k_i, sid) using the static public key.
+     *
+     * @param memberId
+     *     Participant ID of the member to verify the signature against.
+     * @param signature
+     *     Session acknowledgement signature.
+     * @returns
+     *     Whether the signature verifies against the member's static public key.
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype._verifySessionSig = function(memberId, signature) {
+        _assert(this.sessionId, 'Session ID not available.');
+        var memberPos = this.members.indexOf(memberId);
+        _assert(memberPos >= 0, 'Member not in participants list.');
+        _assert(this.ephemeralPubKeys[memberPos],
+                "Member's ephemeral pub key missing.");
+        _assert(this.staticPubKeyDir.get(memberId),
+                "Member's static pub key missing.");
+        var sessionAck = MAGIC_NUMBER + memberId + this.ephemeralPubKeys[memberPos]
+                       + this.nonces[memberPos] + this.sessionId;
+        var hashValue = utils.sha256(sessionAck);
+        return jodid25519.eddsa.verify(signature, hashValue,
+                                       this.staticPubKeyDir.get(memberId));
+    };
+
+
+    /**
+     * SKE downflow phase message processing.
+     *
+     * Returns null for the case that it has sent a downflow message already.
+     *
+     * @param message
+     *     Received downflow message. See {@link SignatureKeyExchangeMessage}.
+     * @returns {SignatureKeyExchangeMessage} or null.
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.downflow = function(message) {
+        _assert(utils._noDuplicatesInList(message.members),
+                'Duplicates in member list detected!');
+        var myPos = message.members.indexOf(this.id);
+
+        // Generate session ID for received information.
+        var sid = ns._computeSid(message.members, message.nonces);
+
+        // Is this a broadcast for a new session?
+        var existingSession = (this.sessionId === sid);
+        if (!existingSession) {
+            this.members = utils.clone(message.members);
+            this.nonces = utils.clone(message.nonces);
+            this.ephemeralPubKeys = utils.clone(message.pubKeys);
+            this.sessionId = sid;
+
+            // New authentication list, and authenticate myself.
+            this.authenticatedMembers = utils._arrayMaker(this.members.length, false);
+            this.authenticatedMembers[myPos] = true;
+        }
+
+        // Verify the session authentication from sender.
+        var isValid = this._verifySessionSig(message.source,
+                                             message.sessionSignature);
+        _assert(isValid, 'Authentication of member failed: ' + message.source);
+        var senderPos = message.members.indexOf(message.source);
+        this.authenticatedMembers[senderPos] = true;
+
+        if (existingSession) {
+            // We've acknowledged already, so no more broadcasts from us.
+            return null;
+        }
+
+        // Clone message.
+        message = utils.clone(message);
+        // We haven't acknowledged, yet, so pass on the message.
+        message.source = this.id;
+        message.sessionSignature = this._computeSessionSig();
+
+        return message;
+    };
+
+
+    /**
+     * Returns true if the authenticated signature key exchange is fully
+     * acknowledged.
+     *
+     * @returns {bool}
+     *     True on a valid session.
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.isSessionAcknowledged = function() {
+        if (this.authenticatedMembers && (this.authenticatedMembers.length > 0)) {
+            return this.authenticatedMembers.every(function(item) { return item; });
+        } else {
+            return false;
+        }
+    };
+
+
+    /**
+     * Returns the ephemeral public signing key of a participant.
+     *
+     * @param participantId
+     *     Participant ID of the member to query for.
+     * @returns {string}
+     *     The binary string of the key or `undefined` if unknown.
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.getMemberEphemeralPubKey = function(participantId) {
+        var index = this.members.indexOf(participantId);
+        if (index >= 0) {
+            return this.ephemeralPubKeys[index];
+        } else {
+            var record = this.oldEphemeralKeys[participantId];
+            if (record) {
+                return record.pub;
+            }
+        }
+    };
+
+
+    /**
+     * Start a new upflow for joining new members.
+     *
+     * @param newMembers
+     *     Iterable of new members to join the group.
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.join = function(newMembers) {
+        _assert(newMembers && newMembers.length !== 0, 'No members to add.');
+        var allMembers = this.members.concat(newMembers);
+        _assert(utils._noDuplicatesInList(allMembers),
+                'Duplicates in member list detected!');
+        this.members = allMembers;
+
+        // Discard authentications.
+        var myPos = this.members.indexOf(this.id);
+        this.authenticatedMembers = utils._arrayMaker(this.members.length, false);
+        this.authenticatedMembers[myPos] = true;
+
+        // Pass a message on to the first new member to join.
+        var startMessage = new ns.SignatureKeyExchangeMessage(this.id, '', 'upflow');
+        startMessage.dest = newMembers[0];
+        startMessage.members = utils.clone(allMembers);
+        startMessage.nonces = utils.clone(this.nonces);
+        startMessage.pubKeys = utils.clone(this.ephemeralPubKeys);
+
+        return startMessage;
+    };
+
+
+    /**
+     * Start a new downflow for excluding members.
+     *
+     * @param excludeMembers
+     *     Iterable of members to exclude from the group.
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.exclude = function(excludeMembers) {
+        _assert(excludeMembers && excludeMembers.length !== 0, 'No members to exclude.');
+        _assert(utils._arrayIsSubSet(excludeMembers, this.members),
+                'Members list to exclude is not a sub-set of previous members!');
+        _assert(excludeMembers.indexOf(this.id) < 0,
+                'Cannot exclude mysefl.');
+
+        // Kick 'em.
+        for (var i = 0; i < excludeMembers.length; i++) {
+            var index = this.members.indexOf(excludeMembers[i]);
+            this.oldEphemeralKeys[excludeMembers[i]] = {
+                pub: this.ephemeralPubKeys[index] || null,
+                authenticated: this.authenticatedMembers[index] || false,
+            };
+            this.members.splice(index, 1);
+            this.nonces.splice(index, 1);
+            this.ephemeralPubKeys.splice(index, 1);
+        }
+
+        // Compute my session ID.
+        this.sessionId = ns._computeSid(this.members, this.nonces);
+
+        // Discard authentications.
+        var myPos = this.members.indexOf(this.id);
+        this.authenticatedMembers = utils._arrayMaker(this.members.length, false);
+        this.authenticatedMembers[myPos] = true;
+
+        // Pass broadcast message on to all members.
+        var broadcastMessage = new ns.SignatureKeyExchangeMessage(this.id, '', 'downflow');
+        broadcastMessage.members = utils.clone(this.members);
+        broadcastMessage.nonces = utils.clone(this.nonces);
+        broadcastMessage.pubKeys = utils.clone(this.ephemeralPubKeys);
+        broadcastMessage.sessionSignature = this._computeSessionSig();
+
+        return broadcastMessage;
+    };
+
+
+    /**
+     * Quit own participation and publish the ephemeral signing key.
+     *
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.quit = function() {
+        _assert(this.ephemeralPrivKey !== null, 'Not participating.');
+
+        // Kick myself out.
+        var myPos = this.members.indexOf(this.id);
+        this.oldEphemeralKeys[this.id] = {
+            pub: this.ephemeralPubKey,
+            priv: this.ephemeralPrivKey,
+            authenticated: false
+        };
+        if (this.authenticatedMembers) {
+            this.oldEphemeralKeys[this.id].authenticated = this.authenticatedMembers[myPos];
+            this.authenticatedMembers.splice(myPos, 1);
+        }
+        this.ephemeralPubKey = null;
+        this.ephemeralPrivKey = null;
+        if (this.members) {
+            this.members.splice(myPos, 1);
+        }
+        if (this.nonces) {
+            this.nonces.splice(myPos, 1);
+        }
+        if (this.ephemeralPubKeys) {
+            this.ephemeralPubKeys.splice(myPos, 1);
+        }
+
+        // Pass broadcast message on to all members.
+        var broadcastMessage = new ns.SignatureKeyExchangeMessage(this.id, '', 'downflow');
+        broadcastMessage.signingKey = this.oldEphemeralKeys[this.id].priv;
+
+        return broadcastMessage;
+    };
+
+
+    /**
+     * Fully re-run whole key agreements, but retain the ephemeral signing key.
+     *
+     * @returns {SignatureKeyExchangeMessage}
+     * @method
+     */
+    ns.SignatureKeyExchangeMember.prototype.fullRefresh = function() {
+        // Store away old ephemeral keys of members.
+        for (var i = 0; i < this.members.length; i++) {
+            if (this.ephemeralPubKeys && (i < this.ephemeralPubKeys.length)) {
+                this.oldEphemeralKeys[this.members[i]] = {
+                    pub: this.ephemeralPubKeys[i],
+                    priv: null,
+                };
+                if (this.ephemeralPubKeys && (i < this.authenticatedMembers.length)) {
+                    this.oldEphemeralKeys[this.members[i]].authenticated = this.authenticatedMembers[i];
+                } else {
+                    this.oldEphemeralKeys[this.members[i]].authenticated = false;
+                }
+            }
+        }
+        this.oldEphemeralKeys[this.id].priv = this.ephemeralPrivKey;
+
+        // Force complete new exchange of session info.
+        this.sessionId = null;
+
+        // Start with the other members.
+        var otherMembers = utils.clone(this.members);
+        var myPos = otherMembers.indexOf(this.id);
+        otherMembers.splice(myPos, 1);
+        return this.commit(otherMembers);
+    };
+
+
+    /**
+     * Computes the session ID.
+     *
+     * @param members
+     *     Members participating in protocol.
+     * @param nonces
+     *     Nonces of the members in matching order.
+     * @returns
+     *     Session ID as binary string.
+     */
+    ns._computeSid = function(members, nonces) {
+        // Create a mapping to access sorted/paired items later.
+        var mapping = {};
+        for (var i = 0; i < members.length; i++) {
+            mapping[members[i]] = nonces[i];
+        }
+        var sortedMembers = members.concat();
+        sortedMembers.sort();
+
+        // Compose the item chain.
+        var pidItems = '';
+        var nonceItems = '';
+        for (var i = 0; i < sortedMembers.length; i++) {
+            var pid = sortedMembers[i];
+            if (pid) {
+                pidItems += pid;
+                nonceItems += mapping[pid];
+            }
+        }
+        return utils.sha256(pidItems + nonceItems);
+    };
+
+    return ns;
+});
+
+/**
+ * @fileOverview
+ * Implementation of a protocol handler with its state machine.
+ */
+
+define('mpenc/handler',[
+    "mpenc/helper/assert",
+    "mpenc/helper/utils",
+    "mpenc/greet/cliques",
+    "mpenc/greet/ske",
+    "mpenc/codec",
+    "mpenc/messages",
+], function(assert, utils, cliques, ske, codec, messages) {
+    
+
+    /**
+     * @exports mpenc/handler
+     * Implementation of a protocol handler with its state machine.
+     *
+     * @description
+     * <p>Implementation of a protocol handler with its state machine.</p>
+     *
+     * <p>
+     * This protocol handler manages the message flow for user authentication,
+     * authenticated signature key exchange, and group key agreement.</p>
+     *
+     * <p>
+     * This implementation is using the an authenticated signature key exchange that
+     * also provides participant authentication as well as a CLIQUES-based group
+     * key agreement.</p>
+     */
+    var ns = {};
+
+    var _assert = assert.assert;
+
+    /*
+     * Created: 27 Feb 2014 Guy K. Kloss <gk@mega.co.nz>
+     *
+     * (c) 2014 by Mega Limited, Wellsford, New Zealand
+     *     http://mega.co.nz/
+     *     Simplified (2-clause) BSD License.
+     *
+     * You should have received a copy of the license along with this
+     * program.
+     *
+     * This file is part of the multi-party chat encryption suite.
+     *
+     * This code is distributed in the hope that it will be useful,
+     * but WITHOUT ANY WARRANTY; without even the implied warranty of
+     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+     */
+
+
+    /**
+     * "Enumeration" defining the different stable and intermediate states of
+     * the mpENC module.
+     *
+     * @property NULL {integer}
+     *     Uninitialised (default) state.
+     * @property INIT_UPFLOW {integer}
+     *     During process of initial protocol upflow.
+     * @property INIT_DOWNFLOW {integer}
+     *     During process of initial protocol downflow.
+     * @property INITIALISED {integer}
+     *     Default state during general usage of mpENC. No protocol/key
+     *     negotiation going on, and a valid group key is available.
+     * @property AUX_UPFLOW {integer}
+     *     During process of auxiliary protocol upflow.
+     * @property AUX_DOWNFLOW {integer}
+     *     During process of auxiliary protocol downflow.
+     */
+    ns.STATE = {
+        NULL:          0x00,
+        INIT_UPFLOW:   0x01,
+        INIT_DOWNFLOW: 0x02,
+        INITIALISED:   0x03,
+        AUX_UPFLOW:    0x04,
+        AUX_DOWNFLOW:  0x05,
+    };
+
+
+    /** Default size in bytes for the exponential padding to pad to. */
+    ns.DEFAULT_EXPONENTIAL_PADDING = 128;
+
+    /**
+     * Implementation of a protocol handler with its state machine.
+     *
+     * @constructor
+     * @param id {string}
+     *     Member's identifier string.
+     * @param privKey {string}
+     *     This participant's static/long term private key.
+     * @param pubKey {string}
+     *     This participant's static/long term public key.
+     * @param staticPubKeyDir {object}
+     *     An object with a `get(key)` method, returning the static public key of
+     *     indicated by member ID `ky`.
+     * @param queueUpdatedCallback {Function}
+     *      A callback function, that will be called every time something was
+     *      added to `protocolOutQueue`, `messageOutQueue` or `uiQueue`.
+     * @param stateUpdatedCallback {Function}
+     *      A callback function, that will be called every time the `state` is
+     *      changed.
+     * @param exponentialPadding {integer}
+     *     Number of bytes to pad the cipher text to come out as (0 to turn off
+     *     padding). If the clear text will result in a larger cipher text than
+     *     exponentialPadding, power of two exponential padding sizes will be
+     *     used.
+     * @returns {ProtocolHandler}
+     *
+     * @property id {string}
+     *     Member's identifier string.
+     * @property privKey {string}
+     *     This participant's static/long term private key.
+     * @property pubKey {string}
+     *     This participant's static/long term public key.
+     * @property staticPubKeyDir {object}
+     *     An object with a `get(key)` method, returning the static public key of
+     *     indicated by member ID `ky`.
+     * @property protocolOutQueue {Array}
+     *     Queue for outgoing protocol related (non-user) messages, prioritised
+     *     in processing over user messages.
+     * @property messageOutQueue {Array}
+     *     Queue for outgoing user content messages.
+     * @property uiQueue {Array}
+     *     Queue for messages to display in the UI. Contains objects with
+     *     attributes `type` (can be strings 'message', 'info', 'warn' and
+     *     'error') and `message`.
+     * @property askeMember {SignatureKeyExchangeMember}
+     *      Reference to signature key exchange protocol handler with the same
+     *      participant ID.
+     * @property cliquesMember {CliquesMember}
+     *     Reference to CLIQUES protocol handler with the same participant ID.
+     * @property state {integer}
+     *     Current state of the mpENC protocol handler according to {STATE}.
+     * @property exponentialPadding {integer}
+     *     Number of bytes to pad the cipher text to come out as (0 to turn off
+     *     padding). If the clear text will result in a larger cipher text than
+     *     exponentialPadding, power of two exponential padding sizes will be
+     *     used.
+     */
+    ns.ProtocolHandler = function(id, privKey, pubKey, staticPubKeyDir,
+                                  queueUpdatedCallback, stateUpdatedCallback,
+                                  exponentialPadding) {
+        this.id = id;
+        this.privKey = privKey;
+        this.pubKey = pubKey;
+        this.staticPubKeyDir = staticPubKeyDir;
+        this.protocolOutQueue = [];
+        this.messageOutQueue = [];
+        this.uiQueue = [];
+        this.queueUpdatedCallback = queueUpdatedCallback || function() {};
+        this.stateUpdatedCallback = stateUpdatedCallback || function() {};
+        this.state = ns.STATE.NULL;
+        this.exponentialPadding = exponentialPadding || ns.DEFAULT_EXPONENTIAL_PADDING;
+
+        // Sanity check.
+        _assert(this.id && this.privKey && this.pubKey && this.staticPubKeyDir,
+                'Constructor call missing required parameters.');
+
+        // Make protocol handlers for sub tasks.
+        this.cliquesMember = new cliques.CliquesMember(this.id);
+        this.askeMember = new ske.SignatureKeyExchangeMember(this.id);
+        this.askeMember.staticPrivKey = privKey;
+        this.askeMember.staticPubKeyDir = staticPubKeyDir;
+
+        return this;
+    };
+
+
+    /**
+     * Mechanism to start the protocol negotiation with the group participants.
+     *
+     * @method
+     * @param otherMembers {Array}
+     *     Iterable of other members for the group (excluding self).
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Un-encoded message content.
+     */
+    ns.ProtocolHandler.prototype._start = function(otherMembers) {
+        _assert(otherMembers && otherMembers.length !== 0, 'No members to add.');
+
+        var cliquesMessage = this.cliquesMember.ika(otherMembers);
+        var askeMessage = this.askeMember.commit(otherMembers);
+
+        return this._mergeMessages(cliquesMessage, askeMessage);
+    };
+
+
+    /**
+     * Start the protocol negotiation with the group participants.
+     *
+     * @method
+     * @param otherMembers {Array}
+     *     Iterable of other members for the group (excluding self).
+     */
+    ns.ProtocolHandler.prototype.start = function(otherMembers) {
+        _assert(this.state === ns.STATE.NULL,
+                'start() can only be called from an uninitialised state.');
+        this.state = ns.STATE.INIT_UPFLOW;
+        this.stateUpdatedCallback(this);
+
+        var outContent = this._start(otherMembers);
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Mechanism to start a new upflow for joining new members.
+     *
+     * @method
+     * @param newMembers {Array}
+     *     Iterable of new members to join the group.
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Un-encoded message content.
+     */
+    ns.ProtocolHandler.prototype._join = function(newMembers) {
+        _assert(newMembers && newMembers.length !== 0, 'No members to add.');
+
+        var cliquesMessage = this.cliquesMember.akaJoin(newMembers);
+        var askeMessage = this.askeMember.join(newMembers);
+
+        return this._mergeMessages(cliquesMessage, askeMessage);
+    };
+
+
+    /**
+     * Start a new upflow for joining new members.
+     *
+     * @method
+     * @param newMembers {Array}
+     *     Iterable of new members to join the group.
+     */
+    ns.ProtocolHandler.prototype.join = function(newMembers) {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'join() can only be called from an initialised state.');
+        this.state = ns.STATE.AUX_UPFLOW;
+        this.stateUpdatedCallback(this);
+
+        var outContent = this._join(newMembers);
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Mechanism to start a new downflow for excluding members.
+     *
+     * @method
+     * @param excludeMembers {Array}
+     *     Iterable of members to exclude from the group.
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Un-encoded message content.
+     */
+    ns.ProtocolHandler.prototype._exclude = function(excludeMembers) {
+        _assert(excludeMembers && excludeMembers.length !== 0, 'No members to exclude.');
+        _assert(excludeMembers.indexOf(this.id) < 0,
+                'Cannot exclude mysefl.');
+
+        var cliquesMessage = this.cliquesMember.akaExclude(excludeMembers);
+        var askeMessage = this.askeMember.exclude(excludeMembers);
+
+        return this._mergeMessages(cliquesMessage, askeMessage);
+    };
+
+
+    /**
+     * Start a new downflow for excluding members.
+     *
+     * @method
+     * @param excludeMembers {Array}
+     *     Iterable of members to exclude from the group.
+     */
+    ns.ProtocolHandler.prototype.exclude = function(excludeMembers) {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'exclude() can only be called from an initialised state.');
+        this.state = ns.STATE.AUX_DOWNFLOW;
+        this.stateUpdatedCallback(this);
+
+        var outContent = this._exclude(excludeMembers);
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+
+        if (this.askeMember.isSessionAcknowledged()) {
+            this.state = ns.STATE.INITIALISED;
+            this.stateUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Mechanism to start the downflow for quitting participation.
+     *
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Un-encoded message content.
+     * @method
+     */
+    ns.ProtocolHandler.prototype._quit = function() {
+        _assert(this.askeMember.ephemeralPrivKey !== null,
+                'Not participating.');
+        this.cliquesMember.akaQuit();
+        var askeMessage = this.askeMember.quit();
+        return this._mergeMessages(null, askeMessage);
+    };
+
+
+    /**
+     * Start the downflow for quitting participation.
+     *
+     * @method
+     */
+    ns.ProtocolHandler.prototype.quit = function() {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'quit() can only be called from an initialised state.');
+        this.state = ns.STATE.NULL;
+        this.stateUpdatedCallback(this);
+
+        var outContent = this._quit();
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Mechanism to refresh group key.
+     *
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Un-encoded message content.
+     * @method
+     */
+    ns.ProtocolHandler.prototype._refresh = function() {
+        var cliquesMessage = this.cliquesMember.akaRefresh();
+        return this._mergeMessages(cliquesMessage, null);
+    };
+
+
+    /**
+     * Refresh group key.
+     *
+     * @method
+     */
+    ns.ProtocolHandler.prototype.refresh = function() {
+        _assert((this.state === ns.STATE.INITIALISED)
+                || (this.state === ns.STATE.INIT_DOWNFLOW)
+                || (this.state === ns.STATE.AUX_DOWNFLOW),
+                'refresh() can only be called from an initialised or downflow states.');
+        this.state = ns.STATE.INITIALISED;
+        this.stateUpdatedCallback(this);
+
+        var outContent = this._refresh();
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Fully re-run whole key agreements, but retain the ephemeral signing key.
+     *
+     * @param keepMembers {Array}
+     *     Iterable of members to keep in the group (exclude others). This list
+     *     should include the one self. (Optional parameter.)
+     * @method
+     */
+    ns.ProtocolHandler.prototype.fullRefresh = function(keepMembers) {
+        this.state = ns.STATE.INIT_UPFLOW;
+        this.stateUpdatedCallback(this);
+
+        // Remove ourselves from members list to keep (if we're in there).
+        var otherMembers = utils.clone(this.cliquesMember.members);
+        if (keepMembers) {
+            otherMembers = utils.clone(keepMembers);
+        }
+        var myPos = otherMembers.indexOf(this.id);
+        if (myPos >= 0) {
+            otherMembers.splice(myPos, 1);
+        }
+
+        // Now start a normal upflow for an initial agreement.
+        var outContent = this._start(otherMembers);
+        if (outContent) {
+            var outMessage = {
+                from: this.id,
+                to: outContent.dest,
+                message: codec.encodeMessage(outContent, null,
+                                             this.askeMember.ephemeralPrivKey,
+                                             this.askeMember.ephemeralPubKey),
+            };
+            this.protocolOutQueue.push(outMessage);
+            this.queueUpdatedCallback(this);
+        }
+    };
+
+
+    /**
+     * Recover from protocol failure.
+     *
+     * An attempt is made to do so with as little protocol overhead as possible.
+     *
+     * @param keepMembers {Array}
+     *     Iterable of members to keep in the group (exclude others). This list
+     *     should include the one self. (Optional parameter.)
+     * @method
+     */
+    ns.ProtocolHandler.prototype.recover = function(keepMembers) {
+        var toKeep = [];
+        var toExclude = [];
+
+        if (keepMembers && (keepMembers.length > 0)) {
+            // Sort through keepMembers (they may be in "odd" order).
+            for (var i = 0; i < this.askeMember.members.length; i++) {
+                var index = keepMembers.indexOf(this.askeMember.members[i]);
+                if (index < 0) {
+                    toExclude.push(this.askeMember.members[i]);
+                } else {
+                    toKeep.push(this.askeMember.members[i]);
+                }
+            }
+            _assert(toKeep.length === keepMembers.length,
+                    'Mismatch between members to keep and current members.');
+        }
+
+        if (toExclude.length > 0) {
+            this.state = ns.STATE.AUX_DOWNFLOW;
+            this.stateUpdatedCallback(this);
+
+            var outContent = this._exclude(toExclude);
+            if (outContent) {
+                var outMessage = {
+                    from: this.id,
+                    to: outContent.dest,
+                    message: codec.encodeMessage(outContent, null,
+                                                 this.askeMember.ephemeralPrivKey,
+                                                 this.askeMember.ephemeralPubKey),
+                };
+                this.protocolOutQueue.push(outMessage);
+                this.queueUpdatedCallback(this);
+            }
+        } else {
+            if (this.askeMember.isSessionAcknowledged() &&
+                    ((this.state === ns.STATE.INITIALISED)
+                            || (this.state === ns.STATE.INIT_DOWNFLOW)
+                            || (this.state === ns.STATE.AUX_DOWNFLOW))) {
+                this.refresh();
+            } else {
+                this.fullRefresh((toKeep.length > 0) ? toKeep : undefined);
+            }
+        }
+    };
+
+
+    /**
+     * Handles mpENC protocol message processing.
+     *
+     * @method
+     * @param wireMessage {object}
+     *     Received message (wire encoded). The message contains an attribute
+     *     `message` carrying either an {@link mpenc.messages.ProtocolMessage}
+     *     or {@link mpenc.messages.DataMessage} payload.
+     */
+    ns.ProtocolHandler.prototype.processMessage = function(wireMessage) {
+        var classify = codec.categoriseMessage(wireMessage.message);
+
+        if (!classify) {
+            return;
+        }
+
+        switch (classify.category) {
+            case codec.MESSAGE_CATEGORY.MPENC_ERROR:
+                this.uiQueue.push({
+                    type: 'error',
+                    message: 'Error in mpENC protocol: ' + classify.content
+                });
+                this.queueUpdatedCallback(this);
+                break;
+            case codec.MESSAGE_CATEGORY.PLAIN:
+                var outMessage = {
+                    from: this.id,
+                    to: wireMessage.from,
+                    message: codec.getQueryMessage(
+                        "We're not dealing with plaintext messages. Let's negotiate mpENC communication."),
+                };
+                this.protocolOutQueue.push(outMessage);;
+                wireMessage.type = 'info';
+                wireMessage.message = 'Received unencrypted message, requesting encryption.';
+                this.uiQueue.push(wireMessage);
+                this.queueUpdatedCallback(this);
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_QUERY:
+                // Initiate keying protocol flow.
+                this.start(wireMessage.from);
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_GREET_MESSAGE:
+                var decodedMessage = null;
+                if (this.cliquesMember.groupKey) {
+                    // In case of a key refresh (groupKey existent),
+                    // the signing pubKeys won't be part of the message.
+                    var signingPubKey = this.askeMember.getMemberEphemeralPubKey(wireMessage.from);
+                    decodedMessage = codec.decodeMessageContent(classify.content,
+                                                                this.cliquesMember.groupKey.substring(0, 16),
+                                                                signingPubKey);
+                } else {
+                    decodedMessage = codec.decodeMessageContent(classify.content);
+                }
+
+                // This is an mpenc.greet message.
+                var keyingMessageResult = this._processKeyingMessage(decodedMessage);
+                var outContent = keyingMessageResult.decodedMessage;
+
+                if (outContent) {
+                    var outMessage = {
+                        from: this.id,
+                        to: outContent.dest,
+                        message: codec.encodeMessage(outContent, null,
+                                                     this.askeMember.ephemeralPrivKey,
+                                                     this.askeMember.ephemeralPubKey),
+                    };
+                    this.protocolOutQueue.push(outMessage);
+                    this.queueUpdatedCallback(this);
+                } else {
+                    // Nothing to do, we're done here.
+                }
+                if(keyingMessageResult.newState) {
+                    // Update the state if required.
+                    this.state = keyingMessageResult.newState;
+                    this.stateUpdatedCallback(this);
+                }
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_DATA_MESSAGE:
+                var decodedMessage = null;
+                _assert(this.state === ns.STATE.INITIALISED,
+                        'Data messages can only be decrypted from an initialised state.');
+
+                // Let's crack this baby open.
+                var signingPubKey = this.askeMember.getMemberEphemeralPubKey(wireMessage.from);
+                decodedMessage = codec.decodeMessageContent(classify.content,
+                                                            this.cliquesMember.groupKey.substring(0, 16),
+                                                            signingPubKey);
+
+                if (decodedMessage.signatureOk === false) {
+                    // Signature failed, abort!
+                    wireMessage.type = 'error';
+                    wireMessage.message = 'Signature of received message invalid.';
+                    this.uiQueue.push(wireMessage);
+                } else {
+                    wireMessage.type = 'message';
+                    wireMessage.message = decodedMessage.data;
+                    this.uiQueue.push(wireMessage);
+                }
+                this.queueUpdatedCallback(this);
+                break;
+            default:
+                _assert(false, 'Received unknown message category: ' + classify.category);
+                break;
+        }
+    };
+
+
+    /**
+     * Inspects a message for its type and some meta-data.
+     *
+     * This is a "cheap" operation, that is not performing any cryptographic
+     * operations, but only looks at the components of the message payload.
+     *
+     * @method
+     * @param wireMessage {object}
+     *     Received message (wire encoded). The message contains an attribute
+     *     `message` carrying either an {@link mpenc.messages.ProtocolMessage}
+     *     or {@link mpenc.messages.DataMessage} payload.
+     * @returns {object}
+     *     Message meta-data.
+     */
+    ns.ProtocolHandler.prototype.inspectMessage = function(wireMessage) {
+        var classify = codec.categoriseMessage(wireMessage.message);
+        var result = {};
+
+        switch (classify.category) {
+            case codec.MESSAGE_CATEGORY.PLAIN:
+                result.type = 'plain';
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_QUERY:
+                result.type = 'mpEnc query';
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_GREET_MESSAGE:
+                result = codec.inspectMessageContent(classify.content);
+                result.type = 'mpEnc greet message';
+                if (this.askeMember.members.indexOf(result.from) < 0) {
+                    result.origin = 'outsider';
+                } else {
+                    result.origin = 'participant';
+                }
+
+                // Now, let's deduce what type of greet protocol was invoked.
+                if (result.greet.members.length === 0) {
+                    // Quit of a member.
+                    if (result.from === this.id) {
+                        result.greet.negotiation = 'I quit';
+                    } else {
+                        result.greet.negotiation = 'somebody quits';
+                    }
+                } else if (utils.arrayEqual(result.greet.members,
+                                            this.askeMember.members)) {
+                    // Group key refresh.
+                    result.greet.negotiation = 'refresh';
+                } else if (result.greet.members.length < this.askeMember.members.length) {
+                    // Exclusion of a member.
+                    if (result.greet.members.indexOf(this.id) < 0) {
+                        result.greet.negotiation = 'exclude me';
+                    } else {
+                        result.greet.negotiation = 'exclude other';
+                    }
+                } else if (result.greet.members.length > this.askeMember.members.length) {
+                    // Starting or joining of a member.
+                    if (result.greet.agreement === 'initial') {
+                        result.greet.negotiation = 'start';
+                    } else {
+                        result.greet.negotiation = 'join';
+                    }
+                    if (this.askeMember.members.indexOf(this.id) < 0) {
+                        result.origin = '???';
+                        if (result.greet.members.indexOf(this.id) >= 0) {
+                            if (result.to === this.id) {
+                                result.greet.negotiation += ' me';
+                            } else {
+                                result.greet.negotiation += ' other';
+                            }
+                        } else {
+                            result.greet.negotiation += ' (not involved)';
+                        }
+                    } else {
+                        result.greet.negotiation += ' other';
+                    }
+                }
+
+                // Was the message sent by the initiator?
+                if (result.greet.agreement === 'initial'
+                        && result.greet.flow === 'upflow'
+                        && result.greet.numNonces === 1
+                        && result.greet.numIntKeys === 2
+                        && result.greet.numPubKeys === 1) {
+                    // Start of room negotiation.
+                    result.greet.fromInitiator = true;
+                } else if (result.greet.agreement === 'auxiliary') {
+                    if (result.greet.negotiation === 'join other') {
+                        if (result.greet.numNonces === this.askeMember.members.length
+                                && result.greet.numIntKeys === this.askeMember.members.length + 1
+                                && result.greet.numPubKeys === this.askeMember.members.length) {
+                            // Join somebody initial.
+                            result.greet.fromInitiator = true;
+                        } else {
+                            // Chained join message.
+                            result.greet.fromInitiator = false;
+                        }
+                    } else if ((result.greet.negotiation === 'exclude me' || result.greet.negotiation === 'exclude other')
+                            && result.greet.numNonces < this.askeMember.members.length
+                            && result.greet.numIntKeys < this.askeMember.members.length
+                            && result.greet.numPubKeys < this.askeMember.members.length) {
+                        // Exclude somebody.
+                        result.greet.fromInitiator = true;
+                    } else if (result.greet.negotiation === 'I quit'
+                            || result.greet.negotiation === 'somebody quits') {
+                        // Quit.
+                        result.greet.fromInitiator = true;
+                    } else if (result.greet.negotiation === 'refresh') {
+                        // Refresh.
+                        result.greet.fromInitiator = true;
+                    }
+                }
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_DATA_MESSAGE:
+                result.type = 'mpEnc data message';
+                break;
+            case codec.MESSAGE_CATEGORY.MPENC_ERROR:
+                result.type = 'mpEnc error';
+                break;
+            default:
+                // Ignoring all others.
+                break;
+        }
+
+        return result;
+    };
+
+
+    /**
+     * Sends a message confidentially to the current group.
+     *
+     * @method
+     * @param messageContent {string}
+     *     Unencrypted message content to be sent (plain text or HTML).
+     * @param metadata {*}
+     *     Use this argument to pass additional meta-data to be used later in
+     *     plain text (unencrypted) in the implementation.
+     */
+    ns.ProtocolHandler.prototype.send = function(messageContent, metadata) {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'Messages can only be sent in initialised state.');
+        var outMessage = {
+            from: this.id,
+            to: '',
+            metadata: metadata,
+            message: codec.encodeMessage(messageContent,
+                                         this.cliquesMember.groupKey.substring(0, 16),
+                                         this.askeMember.ephemeralPrivKey,
+                                         this.askeMember.ephemeralPubKey,
+                                         this.exponentialPadding),
+        };
+        this.messageOutQueue.push(outMessage);
+        this.queueUpdatedCallback(this);
+    };
+
+
+    /**
+     * Sends a message confidentially to an individual participant.
+     *
+     * *Warning:*
+     *
+     * A directed message is sent to one recipient only *to avoid network
+     * traffic.* For the current implementation, from a protection point of
+     * view the message has to be considered public in a group communication
+     * context. This means, that this mechanism is unsuitable for exchanging
+     * conversation transcripts with group participants in the presence of
+     * participants who are not entitled to *all* messages within the
+     * transcript!
+     *
+     * @method
+     * @param messageContent {string}
+     *     Unencrypted message content to be sent (plain text or HTML).
+     * @param to {string}
+     *     Recipient of a directed message (optional, default is to send to
+     *     entire group). *Note:* See warning on confidentiality above!
+     * @param metadata {*}
+     *     Use this argument to pass additional meta-data to be used later in
+     *     plain text (unencrypted) in the implementation.
+     */
+    ns.ProtocolHandler.prototype.sendTo = function(messageContent, to, metadata) {
+        _assert(this.state === ns.STATE.INITIALISED,
+                'Messages can only be sent in initialised state.');
+        _assert(to && (to.length > 0),
+                'A recipient has to be given.');
+        var outMessage = {
+            from: this.id,
+            to: to,
+            metadata: metadata,
+            message: codec.encodeMessage(messageContent,
+                                         this.cliquesMember.groupKey.substring(0, 16),
+                                         this.askeMember.ephemeralPrivKey,
+                                         this.askeMember.ephemeralPubKey,
+                                         this.exponentialPadding),
+        };
+        this.messageOutQueue.push(outMessage);
+        this.queueUpdatedCallback(this);
+    };
+
+
+    /**
+     * Sends an mpENC protocol error message to the current group.
+     *
+     * @method
+     * @param messageContent {string}
+     *     Error message content to be sent.
+     */
+    ns.ProtocolHandler.prototype.sendError = function(messageContent) {
+        var outMessage = {
+            from: this.id,
+            to: '',
+            message: codec.getErrorMessage(messageContent),
+        };
+        this.protocolOutQueue.push(outMessage);
+        this.queueUpdatedCallback(this);
+    };
+
+
+    /**
+     * Handles keying protocol execution with all participants.
+     *
+     * @method
+     * @param message {mpenc.messages.ProtocolMessage}
+     *     Received message (decoded). See {@link mpenc.messages.ProtocolMessage}.
+     * @returns {object}
+     *     Object containing the decoded message content as
+     *     {mpenc.messages.ProtocolMessage} in attribute `decodedMessage` and
+     *     optional (null if not used) the new the ProtocolHandler state in
+     *     attribute `newState`.
+     */
+    ns.ProtocolHandler.prototype._processKeyingMessage = function(message) {
+        var inCliquesMessage = this._getCliquesMessage(utils.clone(message));
+        var inAskeMessage = this._getAskeMessage(utils.clone(message));
+        var outCliquesMessage = null;
+        var outAskeMessage = null;
+        var outMessage = null;
+        var newState = null;
+
+        if (message.dest === null || message.dest === '') {
+            // Dealing with a broadcast downflow message.
+            // Check for legal state transitions.
+            if (message.agreement === 'initial') {
+                _assert((this.state === ns.STATE.INIT_UPFLOW)
+                        || (this.state === ns.STATE.INIT_DOWNFLOW)
+                        || (this.state === ns.STATE.INITIALISED),
+                        'Initial downflow can only follow an initial upflow (or own downflow).');
+            } else {
+                _assert((this.state === ns.STATE.INITIALISED)
+                        || (this.state === ns.STATE.AUX_UPFLOW)
+                        || (this.state === ns.STATE.AUX_DOWNFLOW),
+                        'Auxiliary downflow can only follow an initialised state or auxiliary upflow (or own downflow).');
+            }
+            if (message.signingKey) {
+                // Sender is quitting participation.
+                // TODO: quit() stuff here: CLIQUES will need to refresh keys, but avoid a race condition if all do it.
+                _assert(false, 'Key refresh for quitting is not implemented, yet!');
+            } else {
+                // Content for the CLIQUES protocol.
+                if (message.intKeys && (message.intKeys.length === message.members.length)) {
+                    this.cliquesMember.downflow(inCliquesMessage);
+                }
+                // Content for the signature key exchange protocol.
+                if (message.nonces && (message.nonces.length === message.members.length)) {
+                    outAskeMessage = this.askeMember.downflow(inAskeMessage);
+                }
+            }
+            outMessage = this._mergeMessages(null, outAskeMessage);
+            if (outMessage && message.agreement === 'initial') {
+                // Can't be inferred from ASKE message alone.
+                outMessage.agreement = 'initial';
+            }
+            // Handle state transitions.
+            if (outMessage) {
+                if (outMessage.agreement === 'initial') {
+                    newState = ns.STATE.INIT_DOWNFLOW;
+                } else {
+                    newState = ns.STATE.AUX_DOWNFLOW;
+                }
+            }
+            if (this.askeMember.isSessionAcknowledged()) {
+                // We have seen and verified all broadcasts from others.
+                newState = ns.STATE.INITIALISED;
+            }
+        } else {
+            // Dealing with a directed upflow message.
+            // Check for legal state transitions.
+            _assert((this.state === ns.STATE.INITIALISED)
+                    || (this.state === ns.STATE.NULL),
+                    'Auxiliary upflow can only follow an uninitialised or initialised state.');
+            outCliquesMessage = this.cliquesMember.upflow(inCliquesMessage);
+            outAskeMessage = this.askeMember.upflow(inAskeMessage);
+            outMessage = this._mergeMessages(outCliquesMessage, outAskeMessage);
+            // Handle state transitions.
+            if (message.agreement === 'initial') {
+                if (outMessage.dest === '') {
+                    newState = ns.STATE.INIT_DOWNFLOW;
+                } else {
+                    newState = ns.STATE.INIT_UPFLOW;
+                }
+            } else {
+                if (outMessage.dest === '') {
+                    newState = ns.STATE.AUX_DOWNFLOW;
+                } else {
+                    newState = ns.STATE.AUX_UPFLOW;
+                }
+            }
+        }
+        return { decodedMessage: outMessage,
+                 newState: newState };
+    };
+
+
+    /**
+     * Merges the contents of the messages for ASKE and CLIQUES into one message.
+     *
+     * @method
+     * @param cliquesMessage {mpenc.greet.cliques.CliquesMessage}
+     *     Message from CLIQUES protocol workflow.
+     * @param askeMessage {mpenc.greet.ske.SignatureKeyExchangeMessage}
+     *     Message from ASKE protocol workflow.
+     * @returns {mpenc.messages.ProtocolMessage}
+     *     Joined message (not wire encoded).
+     */
+    ns.ProtocolHandler.prototype._mergeMessages = function(cliquesMessage,
+                                                           askeMessage) {
+        // Are we done already?
+        if (!cliquesMessage && !askeMessage) {
+            return null;
+        }
+
+        var newMessage = new messages.ProtocolMessage(this.id);
+
+        if (cliquesMessage && askeMessage) {
+            _assert(cliquesMessage.source === askeMessage.source,
+                    "Message source mismatch, this shouldn't happen.");
+            _assert(cliquesMessage.dest === askeMessage.dest,
+                    "Message destination mismatch, this shouldn't happen.");
+        }
+
+        // Empty objects to simplify further logic.
+        cliquesMessage = cliquesMessage || {};
+        askeMessage = askeMessage || {};
+
+        newMessage.dest = cliquesMessage.dest || askeMessage.dest || '';
+        newMessage.flow = cliquesMessage.flow || askeMessage.flow;
+        newMessage.members = cliquesMessage.members || askeMessage.members;
+        newMessage.intKeys = cliquesMessage.intKeys || null;
+        newMessage.debugKeys = cliquesMessage.debugKeys || null;
+        newMessage.nonces = askeMessage.nonces || null;
+        newMessage.pubKeys = askeMessage.pubKeys || null;
+        newMessage.sessionSignature = askeMessage.sessionSignature || null;
+        newMessage.signingKey = askeMessage.signingKey || null;
+        if (cliquesMessage.agreement === 'ika') {
+            newMessage.agreement = 'initial';
+        } else {
+            newMessage.agreement = 'auxiliary';
+        }
+
+        return newMessage;
+    };
+
+
+    /**
+     * Extracts a CLIQUES message out of the received protocol handler message.
+     *
+     * @method
+     * @param message {mpenc.messages.ProtocolMessage}
+     *     Message from protocol handler.
+     * @returns {mpenc.greet.cliques.CliquesMessage}
+     *     Extracted message.
+     */
+    ns.ProtocolHandler.prototype._getCliquesMessage = function(message) {
+        var newMessage = cliques.CliquesMessage(this.id);
+        newMessage.source = message.source;
+        newMessage.dest = message.dest;
+        newMessage.flow = message.flow;
+        newMessage.members = message.members;
+        newMessage.intKeys = message.intKeys;
+        newMessage.debugKeys = message.debugKeys;
+        if (message.agreement === 'initial') {
+            newMessage.agreement = 'ika';
+        } else {
+            newMessage.agreement = 'aka';
+        }
+
+        return newMessage;
+    };
+
+
+    /**
+     * Extracts a ASKE message out of the received protocol handler message.
+     *
+     * @method
+     * @param message {mpenc.greet.messages.ProtocolMessage}
+     *     Message from protocol handler.
+     * @returns {mpenc.greet.ske.SignatureKeyExchangeMessage}
+     *     Extracted message.
+     */
+    ns.ProtocolHandler.prototype._getAskeMessage = function(message) {
+        var newMessage = ske.SignatureKeyExchangeMessage(this.id);
+        newMessage.source = message.source;
+        newMessage.dest = message.dest;
+        newMessage.flow = message.flow;
+        newMessage.members = message.members;
+        newMessage.nonces = message.nonces;
+        newMessage.pubKeys = message.pubKeys;
+        newMessage.sessionSignature = message.sessionSignature;
+        newMessage.signingKey = message.signingKey;
+
+        return newMessage;
+    };
+
+
+    return ns;
+});
+
+/**
  * @fileOverview JavaScript mpENC implementation.
  */
 
@@ -1872,10 +4065,10 @@ define('mpenc/codec',[
 
 define('mpenc',[
     "mpenc/codec",
-    "mpenc/messages",
+    "mpenc/handler",
     "mpenc/version",
-    "mpenc/debug",
-], function(codec, messages, version, debug) {
+    "mpenc/debug"
+], function(codec, handler, messages, version, debug) {
     
 
     /**
@@ -1893,8 +4086,9 @@ define('mpenc',[
      */
     var mpenc = {};
 
+    mpenc.codec = codec;
+    mpenc.handler = handler;
     mpenc.version = version;
-
     mpenc.debug = debug;
 
     return mpenc;

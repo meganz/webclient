@@ -1522,7 +1522,7 @@ function getHtmlElemPos(elem, n)
     return {x: xPos, y: yPos};
 }
 
-function disableDescendantFolders(id)
+function disableDescendantFolders(id, pref)
 {
 	var folders = [];
 	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
@@ -1540,8 +1540,8 @@ function disableDescendantFolders(id)
 				break;
 			}
 		}
-		$('#fi_' + fid).addClass('disabled');
-		if (sub) this.disableDescendantFolders(fid);
+		$(pref + fid).addClass('disabled');
+		if (sub) this.disableDescendantFolders(fid, pref);
 	}
 
 	return true;

@@ -20,9 +20,21 @@ function dl_cancel() {
  */
 var DownloadManager =
 {
-	newUrl : function DM_newUrl(dl)
+	newUrl : function DM_newUrl(dl, callback)
 	{
 		if (d) console.log("ask for new URL for", dl.dl_id);
+
+		if (callback)
+		{
+			if (!this.nup) this.nup = {};
+
+			if (this.nup[dl.dl_id])
+			{
+				this.nup[dl.dl_id].push(callback);
+				return;
+			}
+			this.nup[dl.dl_id] = [callback];
+		}
 
 		dlGetUrl(dl, function (error, res, o)
 		{
@@ -34,6 +46,14 @@ var DownloadManager =
 						dlQueue._queue[i][0].url.replace(/.+\//, '')
 					changed++
 				}
+			}
+			if (this.nup[dl.dl_id])
+			{
+				this.nup[dl.dl_id].forEach(function(callback)
+				{
+					callback(res.g, res);
+				});
+				delete this.nup[dl.dl_id];
 			}
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
 		}.bind(this));
@@ -431,7 +451,6 @@ function failureFunction(task, args) {
 	var code = args[1] || 0
 		, dl = task.task.download
 
-	ASSERT(code != 403, 'Got a 403 response, fixme.');
 	if (d) console.error('Fai1ure', dl.zipname || dl.n, code, task.task.chunk_id, task.task.offset, task.onQueueDone.name );
 
 	if (code == 509) {
@@ -447,10 +466,21 @@ function failureFunction(task, args) {
 	/* update UI */
 	dl_reportstatus(dl, EAGAIN);
 
-	/* check for network error  */
-	dl.dl_failed = true;
-	api_reportfailure(hostname(dl.url), network_error_check);
-	dlQueuePushBack(task);
+	if (code == 403 || code == 404)
+	{
+		DownloadManager.newUrl(dl, function(rg)
+		{
+			task.url = rg + "/" + task.url.replace(/.+\//, '');
+			dlQueuePushBack(task);
+		});
+	}
+	else
+	{
+		/* check for network error  */
+		dl.dl_failed = true;
+		api_reportfailure(hostname(dl.url), network_error_check);
+		dlQueuePushBack(task);
+	}
 
 	return 2;
 }

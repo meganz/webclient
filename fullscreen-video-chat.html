@@ -11,7 +11,8 @@
 $(document).ready(function() { 
 
    function fullscreenVideoResizing() {
-	   var h = $('.video-full-canvas img').width()*0.75; // Cansvas height  (4:3)
+	   // Cansvas height  (4:3)
+	   var h = ($(window).width()/2 - 12) * 0.75; 
 	   $('.video-row').css('height', ($(window).height() - h)/2);
 	   $('.video-main-container').css('height', h);
 	   $('.video-size-button').css('right', $('.video-size-button').offset().top);
@@ -53,17 +54,21 @@ $(document).ready(function() {
      </div>
      <div class="video-main-container">
            <div class="video-full-canvas">
+             <div class="video-fliper">
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
-               <img src="images/temp/video-temp-img.png" />
-               <div class="video-full-disabled-block hidden">
+               <div class="video-canvas-flip-side front">
+                 <img src="images/temp/video-temp-img.png" />
+               </div>
+               <div class="video-full-disabled-block back">
                     <div class="video-full-disabled-icon"></div>
                     <div class="video-full-disabled-txt">Camera disabled</div>
                </div>
+             </div>
            </div>
            <div class="video-full-canvas current-user">
              <div class="video-fliper">
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
-               <div class="front">
+               <div class="video-canvas-flip-side front">
                  <img src="images/temp/video-temp-img.png" />
                </div>
                <div class="video-full-disabled-block back">

@@ -6783,10 +6783,10 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	padding: 0 20px 0 8px;
 }
 .fm-chat-message-scroll > .jspContainer > .jspPane {
-    min-height: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	min-height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .fm-chat-message-pad {
 	padding: 0 2px 2px 2px;
@@ -7826,13 +7826,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	bottom: -8px;
 }
 .flipped > .fm-add-contact-arrow, .flipped > .fm-chat-download-arrow, .flipped .fm-send-files-arrow, .flipped > .fm-start-call-arrow {
-    bottom: auto;
-    top: -8px;
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    transform: rotate(180deg);
+	bottom: auto;
+	top: -8px;
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);
+	-o-transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 .fm-add-contact-arrow, .fm-send-files-arrow, .fm-start-call-arrow {
 	top: -8px;
@@ -18377,14 +18377,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	display: table;
 }
 .video-row {
-	position:relative;
-	min-height:80px;
+	position: relative;
+	min-height: 80px;
 }
 .video-main-container {
-	padding:0 8px;
-	max-height:-webkit-calc(100% - 160px);
-    max-height: -moz-calc(100% - 160px);
-    max-height: calc(100% - 160px);
+	padding: 0 8px;
+	max-height: -webkit-calc(100% - 160px);
+	max-height: -moz-calc(100% - 160px);
+	max-height: calc(100% - 160px);
 }
 .video-full-demo-ticket {
 	position: absolute;
@@ -18410,7 +18410,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .video-size-button {
 	position: absolute;
 	top: 50%;
-	right:20px;
+	right: 20px;
 	height: 48px;
 	width: 48px;
 	margin: -24px 0 0 0;
@@ -18466,14 +18466,86 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .video-full-canvas {
 	width: 50%;
 	display: block;
-	float:left;
-	height:100%;
+	float: left;
+	height: 100%;
 	padding: 0 2px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	text-align:center;
-	vertical-align:middle;
+	text-align: center;
+	vertical-align: middle;
+	perspective: 1000;
+}
+.video-full-canvas, .front, .back, .video-fliper {
+	height: 100%;
+}
+.video-full-canvas {
+	-webkit-perspective: 1000;
+	-moz-perspective: 1000;
+	-ms-perspective: 1000;
+	perspective: 1000;
+	-ms-transform: perspective(1000px);
+	-moz-transform: perspective(1000px);
+	-moz-transform-style: preserve-3d;
+	-ms-transform-style: preserve-3d;
+}
+.video-full-canvas.video-off .back {
+	-webkit-transform: rotateY(0deg);
+	-moz-transform: rotateY(0deg);
+	-o-transform: rotateY(0deg);
+	-ms-transform: rotateY(0deg);
+	transform: rotateY(0deg);
+}
+.video-full-canvas.video-off .front {
+	-webkit-transform: rotateY(180deg);
+	-moz-transform: rotateY(180deg);
+	-o-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
+.video-fliper {
+	-webkit-transition: 0.6s;
+	-webkit-transform-style: preserve-3d;
+	-ms-transition: 0.6s;
+	-moz-transition: 0.6s;
+	-moz-transform: perspective(1000px);
+	-moz-transform-style: preserve-3d;
+	-ms-transform-style: preserve-3d;
+	transition: 0.6s;
+	transform-style: preserve-3d;
+	position: relative;
+}
+.front, .back {
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-transition: 0.6s;
+	-webkit-transform-style: preserve-3d;
+	-moz-transition: 0.6s;
+	-moz-transform-style: preserve-3d;
+	-o-transition: 0.6s;
+	-o-transform-style: preserve-3d;
+	-ms-transition: 0.6s;
+	-ms-transform-style: preserve-3d;
+	transition: 0.6s;
+	transform-style: preserve-3d;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.front {
+	-webkit-transform: rotateY(0deg);
+	-ms-transform: rotateY(0deg);
+	background: lightgreen;
+	z-index: 2;
+}
+.back {
+	background: lightblue;
+	-webkit-transform: rotateY(-180deg);
+	-moz-transform: rotateY(-180deg);
+	-o-transform: rotateY(-180deg);
+	-ms-transform: rotateY(-180deg);
+	transform: rotateY(-180deg);
 }
 .video-full-canvas img, .video-full-canvas canvas {
 	width: 100%;

@@ -1539,7 +1539,7 @@ function createfolderUI()
 				var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
 				if(w1 > 8 ) d1.css('right', w1 + 'px');
 				else d1.css('right', 8 + 'px');
-				$('.fm-new-folder input').focus();
+				$('.create-new-folder input').focus();
 			}
 			else
 			{
@@ -1570,9 +1570,10 @@ function createfolderUI()
 	{
 		var v = $('.create-new-folder input').val();
 		if(v != l[157] && v != '') $('.create-folder-dialog input').val(v);
-		$('.fm-new-folder').removeClass('active');
+		$('.create-new-folder input').focus();
 		$('.create-new-folder').removeClass('filled-input');
 		$('.create-new-folder').addClass('hidden');
+		$('.fm-new-folder').removeClass('active');
 		createfolderDialog(0);
 		$('.create-new-folder input').val(l[157]);
 	});
@@ -1588,6 +1589,7 @@ function createfolderUI()
 		$('.create-new-folder').removeClass('hidden');
 		createfolderDialog(1);
 		$('.create-folder-dialog input').val(l[157]);
+		$('.create-new-folder input').focus();
 	});
 	$('.create-new-folder input').unbind('keyup');
 	$('.create-new-folder input').bind('keyup',function(e)

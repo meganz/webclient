@@ -547,7 +547,7 @@ define('mpenc/messages',[
      * @constructor
      * @param source {string}
      *     Message originator (from).
-     * @returns {ProtocolMessage}
+     * @returns {mpenc.messages.ProtocolMessage}
      *
      * @property source {string}
      *     Message originator (from).
@@ -603,6 +603,61 @@ define('mpenc/messages',[
         this.rawMessage = null;
         this.protocol = null;
         this.data = null;
+
+        return this;
+    };
+
+    /**
+     * Carries information extracted from a received mpENC protocol message for
+     * the greet protocol (key exchange and agreement).
+     *
+     * @constructor
+     * @returns {mpenc.messages.ProtocolMessageInfo}
+     *
+     * @property type {string}
+     *     String "mpEnc greet message".
+     * @property protocol {integer}
+     *     mpEnc protocol version number.
+     * @property from {string}
+     *     Message originator's participant ID.
+     * @property to {string}
+     *     Message destination's participant ID.
+     * @property origin {string}
+     *     Indicates whether the message originated from a group chat
+     *     participant ("participant"), from somebody not participating
+     *     ("outsider") or whether it cannot be determined/inferred by the
+     *     recipient ("???").
+     * @property greet {object}
+     *     Introspective information for data carried by the greet protocol:
+     *
+     *     * `agreement` - "initial" or "auxiliary" key agreement.
+     *     * `flow` - "upflow" (directed message) or "downflow" (broadcast).
+     *     * `fromInitiator` {bool} - `true` if the flow initiator has sent the
+     *       message, `false` if not, `null` if it can't be determined.
+     *     * `negotiation` - A clear text expression of the type of negotiation
+     *       message sent. One of "I quit", "somebody quits", "refresh",
+     *       "exclude <subject>", "start <subject>" or "join <subject>" (with
+     *       <subject> being one of "me", "other" or "(not involved)").
+     *     * `members` - List of group members enclosed.
+     *     * `numNonces` - Number of nonces enclosed.
+     *     * `numPubKeys` - Number of public signing keys enclosed.
+     *     * `numIntKeys` - Number of intermediate GDH keys enclosed.
+     */
+    ns.ProtocolMessageInfo = function() {
+        this.type = null;
+        this.protocol = null;
+        this.from = null;
+        this.to = null;
+        this.origin = null;
+        this.greet = {agreement: null,
+                      flow: null,
+                      fromInitiator: null,
+                      negotiation: null,
+                      members: [],
+                      numNonces: 0,
+                      numPubKeys: 0,
+                      numIntKeys: 0,
+        };
 
         return this;
     };
@@ -1452,22 +1507,7 @@ define('mpenc/codec',[
         if (!message) {
             return null;
         }
-        var out = {
-            type: null,
-            protocol: null,
-            from: null,
-            to: null,
-            origin: null,
-            greet: {agreement: null,
-                    flow: null,
-                    fromInitiator: null,
-                    negotiation: null,
-                    members: [],
-                    numNonces: 0,
-                    numIntKeys: 0,
-                    numPubKeys: 0,
-            },
-        };
+        var out = new messages.ProtocolMessageInfo();
 
         while (message.length > 0) {
             var tlv = ns.decodeTLV(message);
@@ -3629,7 +3669,7 @@ define('mpenc/handler',[
                     if (result.from === this.id) {
                         result.greet.negotiation = 'I quit';
                     } else {
-                        result.greet.negotiation = 'somebody else quits';
+                        result.greet.negotiation = 'somebody quits';
                     }
                 } else if (utils.arrayEqual(result.greet.members,
                                             this.askeMember.members)) {
@@ -3640,23 +3680,64 @@ define('mpenc/handler',[
                     if (result.greet.members.indexOf(this.id) < 0) {
                         result.greet.negotiation = 'exclude me';
                     } else {
-                        result.greet.negotiation = 'exclude others';
+                        result.greet.negotiation = 'exclude other';
                     }
                 } else if (result.greet.members.length > this.askeMember.members.length) {
-                    // Joining of a member.
-                    if (this.askeMember.members.indexOf(this.id) < 0) {
-                        result.greet.negotiation = 'join me';
-                        result.origin = '???';
+                    // Starting or joining of a member.
+                    if (result.greet.agreement === 'initial') {
+                        result.greet.negotiation = 'start';
                     } else {
-                        result.greet.negotiation = 'join others';
+                        result.greet.negotiation = 'join';
+                    }
+                    if (this.askeMember.members.indexOf(this.id) < 0) {
+                        result.origin = '???';
+                        if (result.greet.members.indexOf(this.id) >= 0) {
+                            if (result.to === this.id) {
+                                result.greet.negotiation += ' me';
+                            } else {
+                                result.greet.negotiation += ' other';
+                            }
+                        } else {
+                            result.greet.negotiation += ' (not involved)';
+                        }
+                    } else {
+                        result.greet.negotiation += ' other';
                     }
                 }
 
                 // Was the message sent by the initiator?
                 if (result.greet.agreement === 'initial'
                         && result.greet.flow === 'upflow'
-                        && false) { // xxx
+                        && result.greet.numNonces === 1
+                        && result.greet.numIntKeys === 2
+                        && result.greet.numPubKeys === 1) {
+                    // Start of room negotiation.
                     result.greet.fromInitiator = true;
+                } else if (result.greet.agreement === 'auxiliary') {
+                    if (result.greet.negotiation === 'join other') {
+                        if (result.greet.numNonces === this.askeMember.members.length
+                                && result.greet.numIntKeys === this.askeMember.members.length + 1
+                                && result.greet.numPubKeys === this.askeMember.members.length) {
+                            // Join somebody initial.
+                            result.greet.fromInitiator = true;
+                        } else {
+                            // Chained join message.
+                            result.greet.fromInitiator = false;
+                        }
+                    } else if ((result.greet.negotiation === 'exclude me' || result.greet.negotiation === 'exclude other')
+                            && result.greet.numNonces < this.askeMember.members.length
+                            && result.greet.numIntKeys < this.askeMember.members.length
+                            && result.greet.numPubKeys < this.askeMember.members.length) {
+                        // Exclude somebody.
+                        result.greet.fromInitiator = true;
+                    } else if (result.greet.negotiation === 'I quit'
+                            || result.greet.negotiation === 'somebody quits') {
+                        // Quit.
+                        result.greet.fromInitiator = true;
+                    } else if (result.greet.negotiation === 'refresh') {
+                        // Refresh.
+                        result.greet.fromInitiator = true;
+                    }
                 }
                 break;
             case codec.MESSAGE_CATEGORY.MPENC_DATA_MESSAGE:

@@ -3092,10 +3092,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	color: white;
 }
 .nw-fm-tree-item.disabled, .nw-conversations-item.disabled {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
--moz-opacity: 0.5;
--khtml-opacity: 0.5;
-opacity: 0.5;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
 }
 .nw-fm-tree-item.dragover {
 	background-color: rgba(217,0,7,0.3);
@@ -8999,7 +8999,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
-	padding: 10px 0 0 0;
+	padding: 8px 0 0 0;
 	height: 74px;
 }
 .export-icon {
@@ -9013,8 +9013,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .export-link-text-pad {
 	height: 56px;
-    vertical-align: middle;
-    display: table-cell;
+	vertical-align: middle;
+	display: table-cell;
 }
 .export-link-txt {
 	font-size: 11px;
@@ -9208,6 +9208,7 @@ label.radio-txt {
 	background-position: left -2880px;
 	background-repeat: no-repeat;
 	margin: 0 auto;
+	min-height:138px;
 }
 span.orange {
 	color: #FFD300;

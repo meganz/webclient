@@ -8,6 +8,9 @@
 var EncryptionFilter = function(megaChat) {
     var self = this;
 
+    if(localStorage.d && mpenc) {
+        mpenc.debug.decoder = true;
+    }
     self.megaChat = megaChat;
     self.karere = megaChat.karere;
 

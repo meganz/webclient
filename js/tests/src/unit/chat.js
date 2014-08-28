@@ -880,7 +880,6 @@ describe("Chat.js - Karere UI integration", function() {
                     )
                 );
 
-
                 expect(megaChat.chats[roomJid].getParticipants())
                     .to.have.members(
                         megaChat.chats[roomJid].users
@@ -931,99 +930,100 @@ describe("Chat.js - Karere UI integration", function() {
 
 
                 // File attachment test
-                $('.fm-chat-attach-file').trigger('click');
-
+                megaChat.filePicker.show();
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li').size()
+                    $('.fm-chat-attach-popup tr').size()
                 ).to.equal(
                     Object.keys(M.d).length - 1 /* -1, because there is 1 file which is not in the RootID node */
                 );
+
                 expect(
-                    $('.fm-chat-attach-popup .root > li#n_d1123456 > a').is(".contains-folders")
+                    $('.fm-chat-attach-popup tr#n_d1123456').is(".folder")
                 ).to.be.ok;
 
 
-                var expandedEvent = new jQuery.Event("mouseup");
-                expandedEvent.offsetX = expandedEvent.layerX = 20;
-
-                $('.fm-chat-attach-popup .root > li#n_d1123456 > a').trigger(expandedEvent);
+                $('.fm-chat-attach-popup tr#n_d1123456').trigger("dblclick");
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li#n_d1123456 > ul > li').size()
+                    $('.fm-chat-attach-popup tr').size()
+                ).to.equal(
+                    1
+                );
+                expect(
+                    $('.fm-chat-attach-popup .fm-chat-attach-top > span > a').size()
                 ).to.equal(
                     1
                 );
 
-                expect(
-                    $('.fm-chat-attach-popup .root > li#n_d1123456 > a').is(".opened.expanded")
-                ).to.be.ok;
-
+                // reset
+                megaChat.filePicker.hide();
+                megaChat.filePicker.show();
 
                 var selectSingleEvent = function() {
-                    return new jQuery.Event("mouseup");
+                    return new jQuery.Event("click");
                 };
 
                 var selectShiftEvent = function() {
-                    var e = new jQuery.Event("mouseup");
+                    var e = new jQuery.Event("click");
                     e.shiftKey = true;
                     return e;
                 };
 
 
                 var selectCtrlEvent = function() {
-                    var e = new jQuery.Event("mouseup");
+                    var e = new jQuery.Event("click");
                     e.ctrlKey = true;
                     return e;
                 };
 
 
                 // select multiple using shift
-                $('.fm-chat-attach-popup .root > li:last').prev().find('> a').trigger(selectSingleEvent());
-                $('.fm-chat-attach-popup .root > li:first').next().find('> a').trigger(selectShiftEvent());
+                $('.fm-chat-attach-popup tr:last').prev().trigger(selectSingleEvent());
+                $('.fm-chat-attach-popup tr:first').next().trigger(selectShiftEvent());
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                    $('.fm-chat-attach-popup tr.ui-selected').size()
                 ).to.equal(
                         2
                 );
 
                 // select single item and reset of the old selection
-                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectSingleEvent());
+                $('.fm-chat-attach-popup tr:first').trigger(selectSingleEvent());
 
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                    $('.fm-chat-attach-popup tr.ui-selected').size()
                 ).to.equal(
                         1
                     );
 
                 // unselect single item
-                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectCtrlEvent());
+                $('.fm-chat-attach-popup tr:first').trigger(selectCtrlEvent());
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                    $('.fm-chat-attach-popup tr.ui-selected').size()
                 ).to.equal(
                         0
                     );
 
 
                 // pick diff items using ctrl
-                $('.fm-chat-attach-popup .root > li:first').find('> a').trigger(selectCtrlEvent());
-                $('.fm-chat-attach-popup .root > li:last').find('> a').trigger(selectCtrlEvent());
+                $('.fm-chat-attach-popup tr:first').trigger(selectCtrlEvent());
+                $('.fm-chat-attach-popup tr:last').trigger(selectCtrlEvent());
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li > a.active').size()
+                    $('.fm-chat-attach-popup tr.ui-selected').size()
                 ).to.equal(
                         2
                     );
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li:first').find('> a').is('.active')
+                    $('.fm-chat-attach-popup tr:first').is('.ui-selected')
                 ).to.be.ok;
 
                 expect(
-                    $('.fm-chat-attach-popup .root > li:last').find('> a').is('.active')
+                    $('.fm-chat-attach-popup tr:last').is('.ui-selected')
                 ).to.be.ok;
 
                 // click send

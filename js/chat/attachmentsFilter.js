@@ -121,10 +121,11 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
         var $more = $('<span class="nw-chat-expand-arrow"></span>');
         $('.chat-message-txt', $m).append($more);
         $more.on('click', function() {
+            var $m = $(this).parents('.fm-chat-messages-pad');
             $('.fm-chat-message', $m).toggleClass('expanded');
 
             // trigger refresh of the UI, because height was changed.
-            eventData.room.refreshScrollUI();
+            eventData.room.refreshUI(false);
         });
     }
 };

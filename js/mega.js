@@ -2642,7 +2642,7 @@ function MegaData ()
 			if (!p)
 			{
 				ub = Object.keys(ub).map(function(m) { return ub[m]});
-				$(document).trigger('mega.ulcomplete', [ul.target, ub]);
+				$(document).trigger('megaulcomplete', [ul.target, ub]);
 				delete $.ulBunch[ul.target];
 				if (!$.len($.ulBunch)) delete $.ulBunch;
 			}

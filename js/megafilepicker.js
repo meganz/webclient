@@ -5,8 +5,7 @@
      *  - Allowing multi selection
      *
      *
-     * @param opts {Object} You should provide a `buttonElement` containing a DOM Element which should look like this::
-     *                      <div class="fm-chat-attach-file"><div class="fm-chat-attach-arrow"></div></div>
+     * @param opts {Object}
      * @constructor
      */
     var MegaFilePicker = function(opts) {
@@ -14,7 +13,7 @@
 
         var defaultOptions = {
             /**
-             * Required
+             * Optional
              *
              * {HTMLElement}
              */
@@ -25,7 +24,11 @@
         };
 
         self.options = $.extend(true, {}, defaultOptions, opts);
-        self.options.buttonElement = $(self.options.buttonElement);
+        if(self.options.buttonElement) {
+            self.options.buttonElement = $(self.options.buttonElement);
+        } else {
+            delete self.options.buttonElement;
+        }
 
 
         self.$picker = null;
@@ -47,11 +50,13 @@
     MegaFilePicker.prototype.initGenericEvents = function() {
         var self = this;
 
-        self.options.buttonElement.unbind('click.megafilepicker');
+        if(self.options.buttonElement) {
+            self.options.buttonElement.unbind('click.megafilepicker');
 
-        self.options.buttonElement.bind('click.megafilepicker', function() {
-            self.toggle();
-        });
+            self.options.buttonElement.bind('click.megafilepicker', function() {
+                self.toggle();
+            });
+        }
 
         self.on('selectionUpdate', function() {
             if(self.selection.length > 0) {
@@ -77,28 +82,32 @@
 
         self.visible = true;
 
-        self.options.buttonElement.addClass('active'); /* required to be visible, before the posY calc for the correct
-                                                          re-positioning of the dialog */
+        if(self.options.buttonElement) {
+            debugger;
+            self.options.buttonElement.addClass('active'); /* required to be visible, before the posY calc for the correct
+                                                              re-positioning of the dialog */
 
-        var $container = self.options.buttonElement.parent(); // in this attach files to chat use case> $('.fm-chat-line-block')
-        var positionY = $container.outerHeight() - $('.fm-chat-attach-arrow', self.options.buttonElement).position().top;
+            var $container = self.options.buttonElement.parent(); // in this attach files to chat use case> $('.fm-chat-line-block')
+            var positionY = $container.outerHeight() - $('.fm-chat-attach-arrow', self.options.buttonElement).position().top;
 
-        self.$picker.css('bottom', positionY - 17 + 'px');
+            self.$picker.css('bottom', positionY - 17 + 'px');
+        }
 
         self.$picker.removeClass('hidden');
+        self.$picker.addClass('active');
 
         // auto hide on click out of the dialog
         $(document).unbind('mouseup.megafilepicker');
         $(document).bind('mouseup.megafilepicker', function(e) {
-            if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
+            if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && (!self.options.buttonElement || !$(e.target).is(self.options.buttonElement))) {
                 self.hide();
             }
         });
 
         if(!self.$jsp) {
-            $('.fm-move-dialog-body', self.$picker).jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+            $('.fm-chat-attach-scrolling', self.$picker).jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
 
-            self.$jsp = $('.fm-move-dialog-body', self.$picker).data('jsp');
+            self.$jsp = $('.fm-chat-attach-scrolling', self.$picker).data('jsp');
         }
 
         // reset state
@@ -120,13 +129,17 @@
 
         self.visible = false;
         self.$picker.addClass('hidden');
-        self.options.buttonElement.removeClass('active');
+        self.$picker.removeClass('active');
+
+        if(self.options.buttonElement) {
+            self.options.buttonElement.removeClass('active');
+        }
 
         // cleaup & reset state
         if(self.$jsp) {
             self.$jsp.destroy();
         }
-        $('.root', self.$picker).empty();
+        self.$picker.remove();
         self.$picker = null;
         self.selection = [];
         $('.attach-send', self.$picker).removeClass('active');
@@ -179,9 +192,16 @@
             M.RootID
         );
 
+
+        if(self.options.buttonElement) {
+            self.$picker.insertAfter(self.options.buttonElement);
+        } else {
+            $(document.body).append(self.$picker);
+        }
+
         self._initPickerEvents();
 
-        self.$picker.insertAfter(self.options.buttonElement);
+        $('tbody', self.$picker).disableSelection();
     };
 
     /**
@@ -199,7 +219,7 @@
             }
         });
 
-        $('.attach-cancel', $d).bind('click', function() {
+        $('.attach-cancel, .nw-fm-close-button', $d).bind('click', function() {
             self.selection = [];
 
             self.trigger('cancel');
@@ -213,56 +233,52 @@
             self.hide();
         });
 
-        self.$picker.undelegate('mouseup.megafilepicker');
-        self.$picker.delegate('.fm-tree-folder', 'mouseup.megafilepicker', function(e) {
-            var $this = $(this);
-            var $nodeContainer = $this.parent();
-            var nodeHash = $this.data('k');
+        self.$picker
+            .undelegate('dblclick.megafilepicker') // folder open
+            .delegate('tr', 'dblclick.megafilepicker', function(e) {
+                var $this = $(this);
+                var $nodeContainer = $this.parent();
+                var nodeHash = $this.data('k');
 
-
-            var $ulContainer = $('ul', $nodeContainer);
-
-            // detect SELECT vs Folder expand call
-            // firefox fix
-            if(!e.offsetX) {
-                e.offsetX = e.pageX - $(this).offset().left;
-            }
-
-            if ($this.is('.contains-folders') && (e.offsetX < 25 || e.layerX < 25)) {
-                // create UL and expand
-                if($ulContainer.is('.opened')) {
-                    $ulContainer.removeClass('opened');
-                    $this.removeClass('opened expanded');
+                if ($this.is('.folder')) {
+                    self._loadNodes(nodeHash);
                 } else {
-                    $ulContainer.addClass('opened');
-                    $this.addClass('opened expanded');
-                }
+                    $this.addClass('ui-selected');
 
-                if($('li', $ulContainer).size() > 0) {
-                    $('li', $ulContainer).remove();
-                }
 
-                self._loadNodes(nodeHash, $ulContainer);
-            } else {
+                    self.selection = [$this.data('k')];
+                    self.trigger('selectionUpdate', [$this.data('k')]);
+
+                    $('.attach-send', $d).trigger('click');
+                }
+            })
+            .undelegate('click.megafilepicker')
+            .delegate('tr', 'click.megafilepicker', function(e) {
+                var $this = $(this);
+                var $nodeContainer = $this.parent();
+                var nodeHash = $this.data('k');
+
+
+
                 // this is a select call
                 // lets distinguish the multi select VS single select actions:
                 // 1. multi select
                 if(e.ctrlKey || e.metaKey) {
-                    if(!$this.is(".active")) {
-                        $this.addClass('active');
+                    if(!$this.is(".ui-selected")) {
+                        $this.addClass('ui-selected');
 
 
-                            self.selection.push(
-                                $this.data('k')
-                            );
+                        self.selection.push(
+                            $this.data('k')
+                        );
                         self.trigger('selectionUpdate', [$this.data('k')]);
                     } else {
-                        $this.removeClass('active');
+                        $this.removeClass('ui-selected');
                         self.selection = $.grep(self.selection, function(v) {
                             return v != $this.data('k');
                         });
 
-                        $('#n_' + $this.data('k'), self.$picker).removeClass('active');
+                        $('#n_' + $this.data('k'), self.$picker).removeClass('ui-selected');
 
                         self.trigger('selectionUpdate', [$this.data('k')]);
                     }
@@ -271,7 +287,7 @@
                     var selectionStarted = self.selection.length == 0 ? true : false;
 
                     // select from first node from the current list
-                    var $ul = $this.parents('ul');
+                    var $tbody = $this.parents('tbody');
                     var $firstSelectedNode = null;
                     var firstSelectedNodeIdx = null;
                     var $lastSelectedNode = $(this);
@@ -281,7 +297,7 @@
                     // convert all visible items to numeric inc. indexes, so that we can decide if the SHIFT selection
                     // should be applied from top to bottom or from bottom to top
                     var availableNodes = [];
-                    $.each($('> li > a.fm-tree-folder', $ul), function(k, item) {
+                    $.each($('> tr', $tbody), function(k, item) {
                         availableNodes.push(
                             $(item).data('k')
                         );
@@ -289,9 +305,9 @@
 
                     // set firstSelectedNode depending on the current selection
                     if(self.selection.length == 0) {
-                        $firstSelectedNode = $('> li > a.fm-tree-folder:first', $ul);
+                        $firstSelectedNode = $('> tr:first', $tbody);
                     } else {
-                        $firstSelectedNode = $('> li > a.fm-tree-folder.active:first', $ul);
+                        $firstSelectedNode = $('> tr.ui-selected:first', $tbody);
                     }
 
                     // set lastSelectedNode depending on the currently clicked item
@@ -301,7 +317,7 @@
                     // convert all visible items to numeric inc. indexes, so that we can decide if the SHIFT selection
                     // should be applied from top to bottom or from bottom to top
                     var availableNodes = [];
-                    $.each($('> li > a.fm-tree-folder', $ul), function(k, item) {
+                    $.each($('> tr', $tbody), function(k, item) {
                         availableNodes.push(
                             $(item).data('k')
                         );
@@ -321,14 +337,14 @@
 
                     self.selection = [];
 
-                    $.each($('> li > a.fm-tree-folder', $ul), function(k, item) {
+                    $.each($('> tr', $tbody), function(k, item) {
                         var $item = $(item);
 
                         if(k >= firstSelectedNodeIdx && k <= lastSelectedNodeIdx) {
                             self.selection.push(
                                 $item.data('k')
                             );
-                            $item.addClass('active');
+                            $item.addClass('ui-selected');
                         }
                         if(k > lastSelectedNodeIdx) {
                             return false; //break; if out of range, will save some loops
@@ -337,17 +353,16 @@
                     self.trigger('selectionUpdate', [self.selection]);
                 } else {
                     // 2. single select (removes previously selected items from the current selection)
-                    $('.fm-tree-folder.active', self.$picker).removeClass('active');
+                    $('tr.ui-selected', self.$picker).removeClass('ui-selected');
 
                     self.selection = [
                         $this.data('k')
                     ];
-                    $this.addClass('active');
+                    $this.addClass('ui-selected');
 
                     self.trigger('selectionUpdate', [$this.data('k')]);
                 }
-            }
-        });
+            })
     };
 
     /**
@@ -364,13 +379,9 @@
             return n.name && n.p == parentNodeId;
         };
 
-        if(!$nodeContainer) {
-            if(parentNodeId == M.RootID) {
-                $nodeContainer = $('.root', self.$picker);
-            } else {
-                throw new Error("No way to easily traverse the correct parent container, so .. please specify the $nodeContainer");
-            }
-        }
+
+        $nodeContainer = $('tbody', self.$picker);
+        $nodeContainer.empty();
 
         var nodes = M.getFilterBy(filterFunc);
 
@@ -408,32 +419,31 @@
 
         $.each(nodes, function(arrIdx, n) {
             var $newNode = $(MegaFilePicker.NODE_TEMPLATE);
-            var $currentNode = $('.fm-tree-folder', $newNode);
-            $('span', $currentNode).text(
+            $('.tranfer-filetype-txt', $newNode).text(
                 n.name
             );
 
 
             if(n.t == 0) {
                 // is file
-                var $icon = $('<span class="transfer-filtype-icon ' + fileicon(n) + '"></span>');
-                $currentNode.prepend(
-                    $icon
+                $('.transfer-filtype-icon', $newNode).addClass(
+                    fileicon(n)
                 );
-                $currentNode.addClass('tree-file');
             } else {
-                // contains folders OR files?
-                if(M.getFilterBy(function(n2) {
-                    return n2.name && n2.p == n.h;
-                }).length > 0) {
-                    $currentNode.addClass('contains-folders');
-                    $currentNode.parent().append(
-                        $('<ul></ul>')
+                $newNode.addClass("folder");
+
+                if(typeof n.shares !== "undefined") {
+                    $('.transfer-filtype-icon', $newNode).addClass(
+                        "folder-shared"
+                    );
+                } else {
+                    $('.transfer-filtype-icon', $newNode).addClass(
+                        "folder"
                     );
                 }
             }
 
-            $currentNode.data('k', n.h);
+            $newNode.data('k', n.h);
             $newNode.attr('id', 'n_' + n.h);
 
             $nodeContainer.append(
@@ -441,6 +451,38 @@
             );
         });
 
+        // render breadcrump
+        var $bcContainer = $('.fm-chat-attach-top > span', self.$picker);
+        $bcContainer.empty();
+        var parentNode = M.d[parentNodeId];
+        var first = true;
+
+        while(parentNode != undefined) {
+//
+            var $item = $('<a class="fm-breadcrumbs"><span class="right-arrow-bg ui-draggable"><span></span></span></a>');
+
+            if(parentNode.h != M.RootID) {
+                $('span', $item).text(parentNode.name);
+                $item.addClass("folder");
+            } else {
+                $('span', $item).text("Cloud Drive"); // TODO: use l[]!
+                $item.addClass("cloud-drive");
+            }
+
+            $item.data('h', parentNode.h);
+
+            $item.bind('click', function() {
+                self._loadNodes($(this).data('h'));
+            });
+            $item.addClass("contains-directories");
+            if(!first) {
+                $item.addClass("has-next-button");
+            }
+            $bcContainer.prepend($item);
+
+            first = false;
+            parentNode = M.d[parentNode.p];
+        }
         self.trigger('repaint');
     };
 
@@ -465,24 +507,23 @@
      *
      * @type {string}
      */
-    MegaFilePicker.PICKER_TEMPLATE = '<div class="fm-chat-attach-popup">\n' +
+    MegaFilePicker.PICKER_TEMPLATE = '<div class="fm-chat-attach-popup fm-dialog-popup">\n' +
+'           <div class="fm-chat-attach-top">\n' +
+'               <span></span>\n' +
+'                <div class="clear"></div>\n' +
+'                <div class="nw-fm-close-button"></div>\n' +
+'            </div>\n' +
 '            <div class="fm-chat-attach-scrolling">\n' +
-'                <div class="fm-move-dialog-body">\n' +
-'                    <div class="fm-move-dialog-pad">\n' +
-'                        <span class="fm-connector-first"></span>\n' +
-'                        <a class="fm-tree-header opened cloud-drive-item active ui-droppable contains-subfolders expanded">\n' +
-'                            <span>Cloud Drive</span>\n' +
-'                        </a>\n' +
-'                        <ul class="fm-subfolders opened root">\n' +
-'                        </ul>\n' +
-'                    </div>\n' +
-'                </div>\n' +
+'                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">\n' +
+'                    <tbody>\n' +
+'                    </tbody>\n' +
+'                </table>\n' +
 '            </div>\n' +
 '            <div class="fm-chat-attach-bottom">\n' +
-'                <div class="fm-chat-attach-button attach-send">\n' +
+'                <div class="fm-chat-attach-button attach-send red">\n' +
 '                Send\n' +
 '                </div>\n' +
-'                <div class="fm-chat-attach-button attach-cancel active">\n' +
+'                <div class="fm-chat-attach-button attach-cancel">\n' +
 '                Cancel\n' +
 '                </div>\n' +
 '                <div class="clear"></div>\n' +
@@ -494,12 +535,12 @@
      *
      * @type {string}
      */
-    MegaFilePicker.NODE_TEMPLATE = '<li>\n' +
-    '                                <span class="fm-connector"></span>\n' +
-    '                                <span class="fm-horizontal-connector"></span>\n' +
-    '                                <!-- Add "active" class to select file or folder !-->\n' +
-    '                                <a class="fm-tree-folder"><span>name</span></a>\n' +
-    '                            </li>\n';
+    MegaFilePicker.NODE_TEMPLATE = '<tr>\n' +
+'        <td>\n' +
+'            <span class="transfer-filtype-icon"> </span>\n' +
+'            <span class="tranfer-filetype-txt"></span>\n' +
+        '</td>\n' +
+    '</tr>';
 
     // export
     window.MegaFilePicker = MegaFilePicker;

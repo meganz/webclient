@@ -123,53 +123,80 @@ var chatui;
             assert(attachments, "no attachments found..something went wrong.")
             var nodeIds = Object.keys(attachments);
 
-            var accessibleNodeIds = [];
-            $.each(nodeIds, function(k, v) {
-                if(M.d[v]) {
-                    accessibleNodeIds.push(v);
-                }
-            });
+
 
             $('.to-cloud', $chatDownloadPopup).unbind('click.megachat');
             $('.as-zip', $chatDownloadPopup).unbind('click.megachat');
             $('.to-computer', $chatDownloadPopup).unbind('click.megachat');
 
-            if(accessibleNodeIds.length > 0) {
-                $('.save-button', $attachmentContainer).removeClass('disabled');
 
-                $('.to-cloud', $chatDownloadPopup).bind('click.megachat', function() {
-                    $.selected = clone(nodeIds);
-                    $.mctype = 'copy-cloud';
-                    mcDialog();
+            var _getNodeIdsForThisButton = function($button) {
+
+                var accessibleNodeIds = [];
+                $.each([
+                    $button.parents('.nw-chat-sharing-body').attr("data-node-id")
+                ], function(k, v) {
+                    if(M.d[v]) {
+                        accessibleNodeIds.push(v);
+                    }
                 });
 
-                $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
-                    M.addDownload(nodeIds, true);
-                });
-
-                $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
-                    M.addDownload(nodeIds, false);
-                });
-            } else {
-                $('.save-button', $attachmentContainer).addClass('disabled');
-                return;
-            }
+                return accessibleNodeIds;
+            };
 
 
-            var p = $(this);
-            var positionY = $(this).closest('.fm-chat-message-pad').outerHeight() - $(this).position().top;
-            var positionX = $(this).position().left;
-            // if (positionY - 174 > 0) {
-            $($chatDownloadPopup).css('bottom', positionY + 10  + 'px');
-            // } else {
-            //   $(chatDownloadPopup).css('bottom', positionY + 'px');
-            //   $(chatDownloadPopup).addClass('top');
-            // }
+            $('.to-cloud', $chatDownloadPopup).bind('click.megachat', function() {
+                var accessibleNodeIds = _getNodeIdsForThisButton($button);
+                assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
+                $.selected = clone(accessibleNodeIds);
+
+                $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+                $('.copy-dialog .dialog-copy-button').addClass('active');
+                $('.copy-dialog').removeClass('hidden');
+                handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
+                $('.fm-dialog-overlay').removeClass('hidden');
+
+                //TODO: fix this after #602 is ready.
+
+            });
+
+            $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
+                var accessibleNodeIds = _getNodeIdsForThisButton($button);
+                assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
+                M.addDownload(accessibleNodeIds, true);
+            });
+
+            $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
+                var accessibleNodeIds = _getNodeIdsForThisButton($button);
+                assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
+                M.addDownload(accessibleNodeIds, false);
+            });
+
             $chatDownloadPopup.addClass('active');
-            $chatDownloadPopup.css('margin-left', '-'+ $chatDownloadPopup.outerWidth()/2 + 'px');
-            $chatDownloadPopup.css('left', positionX + $(this).outerWidth()/2 + 10  + 'px');
+
             $(this).addClass('active');
-            $($chatDownloadPopup).addClass('active');
+
+
+
+            $chatDownloadPopup.position({
+                'my': 'center bottom',
+                'at': 'center top-10', /* the only hardcoded value, the arrow height */
+                'of': $(this),
+                'collision': 'flipfit flipfit',
+                'within': $('.fm-chat-message-scroll:visible > .jspContainer'),
+                'using': function (obj,info) {
+                    if (info.vertical == "top") {
+                        $(this).addClass("flipped"); // the arrow is re-positioned if this .flipped css class name is added to the popup container, to be on top, instead of bottom
+                    } else {
+                        $(this).removeClass("flipped");
+                    }
+
+                    $(this).css({
+                        left: obj.left + 'px',
+                        top: obj.top + 'px'
+                    });
+                }
+            });
 
 
         });
@@ -204,16 +231,16 @@ var chatui;
         });
 
 
-        $('.fm-chat-popup-button.from-computer')
-            .unbind('click.megaChat')
-            .bind('click.megaChat', function() {
+        $('.fm-chat-block')
+            .off('click.megaChatAttach', '.fm-chat-popup-button.from-computer')
+            .on('click.megaChatAttach', '.fm-chat-popup-button.from-computer', function() {
                 megaChat.closeChatPopups();
                 $('#fileselect1').trigger('click');
             });
 
-        $('.fm-chat-popup-button.from-cloud')
-            .unbind('click.megaChat')
-            .bind('click.megaChat', function() {
+        $('.fm-chat-block')
+            .off('click.megaChatAttach', '.fm-chat-popup-button.from-cloud')
+            .on('click.megaChatAttach', '.fm-chat-popup-button.from-cloud', function() {
                 megaChat.closeChatPopups();
                 megaChat.filePicker.show();
             });
@@ -378,8 +405,6 @@ var MegaChat = function() {
             ]
         },
         filePickerOptions: {
-            //TODO: does not work... fixme
-            'buttonElement': '.fm-chat-attach-file'
         },
         /**
          * Really simple plugin architecture
@@ -1010,6 +1035,27 @@ MegaChat.prototype.init = function() {
                 .removeClass("active");
         }
     });
+    $(document)
+        .unbind('megaulcomplete.megaChat')
+        .bind('megaulcomplete.megaChat', function(e, target, ulBunch) {
+            // attach to conversation
+            var megaRoomId = self.getPrivateRoomJidFor(
+                self.getJidFromNodeId(target.replace("chat/", ""))
+            )  + "@conference." + self.options.xmppDomain;
+
+            var megaRoom = self.chats[megaRoomId];
+            if(!megaRoom) {
+                console.error("Room not found for file attachment:", target);
+            } else {
+                assert(ulBunch && ulBunch.length > 0, 'empty ulBunch');
+
+                megaRoom.attachNodes(ulBunch);
+
+                setTimeout(function() { // because of the transfer panel close
+                    self.refreshScrollUI();
+                }, 1000);
+            }
+        });
 };
 
 /**
@@ -3196,7 +3242,8 @@ MegaChatRoom.prototype.getParticipantsExceptMe = function(jids) {
 /**
  * Refreshes the UI of the chat room.
  *
- * @param [scrollToBottom] boolean set to true if you want to automatically scroll the messages pane to the bottom
+ * @param [scrollToBottom] {boolean|jQuery} set to true if you want to automatically scroll the messages pane to the
+ * bottom OR to a specific element
  */
 MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
     var self = this;
@@ -3217,9 +3264,13 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
 
     $jsp.reinitialise();
 
-    if(scrollToBottom) {
+    if(scrollToBottom === true) {
         self.$messages.one('jsp-initialised', function() {
             $jsp.scrollToBottom();
+        });
+    } else if(scrollToBottom) {
+        self.$messages.one('jsp-initialised', function() {
+            $jsp.scrollToElement(scrollToBottom);
         });
     }
 
@@ -3565,6 +3616,12 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         room: self
     });
 
+    if($('.fm-chat-message .chat-message-txt span', $message).text().length == 0) {
+        if(localStorage.d) {
+            console.debug("Message was empty: ", message, $message);
+        }
+        return false;
+    }
     if(event.isPropagationStopped()) {
         if(localStorage.d) {
             console.warn("Event propagation stopped receiving (rendering) of message: ", message)
@@ -3654,7 +3711,7 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         self.renderContactTree();
     }
 
-    $jsp.reinitialise();
+    self.refreshScrollUI();
     $jsp.scrollToBottom();
 
     self.trigger('activity');

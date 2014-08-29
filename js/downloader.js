@@ -119,7 +119,8 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
 
 // updateProgress {{{
 ClassChunk.prototype.updateProgress = function(force) {
-	if (ui_paused) {
+	var is_cancelled = !!this.dl.cancelled;
+	if (is_cancelled || ui_paused) {
 		// do not update the UI
 		return false;
 	}

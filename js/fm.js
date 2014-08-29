@@ -5124,7 +5124,6 @@ function copyDialog()
 		M.buildtree(M.d[$.mcselected]);
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
-		disableCircularTargets('#mctreea_');
 		
 		var c = $(e.target).attr('class');
 		// Sub-folder exist?

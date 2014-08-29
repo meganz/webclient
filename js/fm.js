@@ -1300,7 +1300,6 @@ function initContextUI()
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
-		disableCircularTargets('#mctreea_');
 		$('.fm-dialog-overlay').removeClass('hidden');
 //		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});

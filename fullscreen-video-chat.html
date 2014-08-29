@@ -7,6 +7,7 @@
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.fullscreen-min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() { 
 
@@ -27,13 +28,21 @@ $(document).ready(function() {
    $('.video-call-button').bind('click', function() {
 	   if($(this).attr('class').indexOf('active') == -1) {
 		   $(this).addClass('active');
+		   // Video mute flipping
 		   if($(this).attr('class').indexOf('video-icon') > -1) 
 			   $('.video-full-canvas.current-user').addClass('video-off');
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(true)
 	   }
 	   else {
 	       $(this).removeClass('active');
+		   // Video mute flipping
 		   if($(this).attr('class').indexOf('video-icon') > -1) 
 			   $('.video-full-canvas.current-user').removeClass('video-off');
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(false);
 	   }
    });
   
@@ -49,15 +58,16 @@ $(document).ready(function() {
          <div class="video-full-demo-ticket"></div>
          <div class="video-full-logo"></div>
          <div class="video-size-button">
-             <div class="video-call-button size-icon active"></div>
+             <div class="video-call-button size-icon"></div>
          </div>
      </div>
      <div class="video-main-container">
+           <!-- Please add "video-off" classname if user disabled camera !-->
            <div class="video-full-canvas">
              <div class="video-fliper">
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
                <div class="video-canvas-flip-side front">
-                 <img src="images/temp/video-temp-img.png" />
+                 <img src="images/temp/video-temp-img.jpg" />
                </div>
                <div class="video-full-disabled-block back">
                     <div class="video-full-disabled-icon"></div>
@@ -65,11 +75,12 @@ $(document).ready(function() {
                </div>
              </div>
            </div>
+           <!-- Please add "video-off" classname if user disabled camera !-->
            <div class="video-full-canvas current-user">
              <div class="video-fliper">
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
                <div class="video-canvas-flip-side front">
-                 <img src="images/temp/video-temp-img.png" />
+                 <img src="images/temp/video-temp-img.jpg" />
                </div>
                <div class="video-full-disabled-block back">
                     <div class="video-full-disabled-icon"></div>

@@ -5,15 +5,58 @@
 <title></title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <link rel="stylesheet" type="text/css" href="css/style.css" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
 <script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
-<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
-<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/jquery.fullscreen-min.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {  
- 
-	
-	
+$(document).ready(function() { 
+
+function fullscreenVideoResizing() {
+	   // Cansvas height  (4:3)
+	   var h = ($(window).width()/2 - 12) * 0.75; 
+	   $('.video-row').css('height', ($(window).height() - h)/2);
+	   $('.video-main-container').css('height', h);
+	   $('.video-size-button').css('right', $('.video-size-button').offset().top);
+}
+
+function videoFullActionsBinding() {
+   $('.video-call-button').unbind('click');
+   $('.video-call-button').bind('click', function() {
+	   if($(this).attr('class').indexOf('active') == -1) {
+		   $(this).addClass('active');
+		   // Video mute flipping
+		   if($(this).attr('class').indexOf('video-icon') > -1) 
+			   $('.video-full-canvas.current-user').addClass('video-off');
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(true)
+	   }
+	   else {
+	       $(this).removeClass('active');
+		   // Video mute flipping
+		   if($(this).attr('class').indexOf('video-icon') > -1) 
+			   $('.video-full-canvas.current-user').removeClass('video-off');
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(false);
+	   }
+   });
+}
+
+$('.icoming-call-button.audio-call').unbind('click');
+$('.icoming-call-button.audio-call').bind('click', function() {
+	$('.fm-dialog-overlay').addClass('hidden');
+	$('.incoming-call-dialog').addClass('hidden');
+    $('.video-full-container').removeClass('hidden');
+    $('.video-call-button.size-icon').addClass('active');
+    $(document).fullScreen(true);
+    fullscreenVideoResizing();
+    $(window).bind('resize');
+    $(window).bind('resize', function () 
+    {
+	  fullscreenVideoResizing();
+    });
+    videoFullActionsBinding();
+});
   
 });
 
@@ -22,6 +65,52 @@ $(document).ready(function() {
 
 <body id="bodyel" class="bottom-pages">
 
+<div class="video-full-container hidden">
+     <div class="video-row">              
+         <div class="video-full-demo-ticket"></div>
+         <div class="video-full-logo"></div>
+         <div class="video-size-button">
+             <div class="video-call-button size-icon"></div>
+         </div>
+     </div>
+     <div class="video-main-container">
+           <!-- Please add "video-off" classname if user disabled camera !-->
+           <div class="video-full-canvas">
+             <div class="video-fliper">
+               <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
+               <div class="video-canvas-flip-side front">
+                 <img src="images/temp/video-temp-img.jpg" />
+               </div>
+               <div class="video-full-disabled-block back">
+                    <div class="video-full-disabled-icon"></div>
+                    <div class="video-full-disabled-txt">Camera disabled</div>
+               </div>
+             </div>
+           </div>
+           <!-- Please add "video-off" classname if user disabled camera !-->
+           <div class="video-full-canvas current-user">
+             <div class="video-fliper">
+               <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
+               <div class="video-canvas-flip-side front">
+                 <img src="images/temp/video-temp-img.jpg" />
+               </div>
+               <div class="video-full-disabled-block back">
+                    <div class="video-full-disabled-icon"></div>
+                    <div class="video-full-disabled-txt">Camera disabled</div>
+               </div>
+             </div>
+           </div>
+           <div class="clear"></div>
+     </div>
+     <div class="video-row">
+              <div class="video-full-buttons">
+                 <div class="video-call-button audio-icon"></div>
+                 <div class="video-call-button video-icon"></div>
+                 <div class="video-call-button hang-up-icon"></div>
+              </div>
+     </div>
+  
+  </div>
 
 <div class="fm-dialog-overlay"></div>
 
@@ -39,7 +128,7 @@ $(document).ready(function() {
      <!-- Please add "star" classname" !-->
      <div class="incoming-call-username star">
        <span class="incoming-contact-info">
-         <span class="incoming-call-name">Andrei D.</span>
+         <span class="incoming-call-name">Guy Kloss</span>
          <span class="incoming-call-txt">Incoming call...</span>
        </span>
      </div>

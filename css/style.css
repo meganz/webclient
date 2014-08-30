@@ -2077,7 +2077,7 @@ a.blog-new-archive-lnk {
 	padding: 40px 0 0 0;
 }
 .blog-text-selection {
-	background:#f6d3cc;
+	background: #f6d3cc;
 }
 .blog-pagination-button {
 	display: inline-block;
@@ -2211,7 +2211,7 @@ a.blog-new-archive-lnk {
 }
 .social {
 	position: relative;
-	padding-bottom:40px;
+	padding-bottom: 40px;
 }
 .social-arrow {
 	position: absolute;
@@ -9079,7 +9079,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 	text-align: center;
 }
 .bottom-pages .st-social-block {
-	display:none;
+	display: none;
 }
 .st-bottom-button {
 	height: 29px;
@@ -10473,41 +10473,41 @@ h5.main-italic-header {
 	margin: 50px auto 0 auto;
 }
 .reg-st5-spin {
-    box-sizing: border-box;
-    position: relative;
-    display: inline-block;
-    padding: 1em;
-    vertical-align: middle;
-    text-align: center;
-    background-color: transparent;
-    border: 5px solid transparent;
-    border-top-color: #c22;
-    border-bottom-color: #c22;
-    border-radius: 50%;
+	box-sizing: border-box;
+	position: relative;
+	display: inline-block;
+	padding: 1em;
+	vertical-align: middle;
+	text-align: center;
+	background-color: transparent;
+	border: 5px solid transparent;
+	border-top-color: #c22;
+	border-bottom-color: #c22;
+	border-radius: 50%;
 }
 .outer {
-  -webkit-animation: spin 1s infinite;
-  animation: spin 1s infinite;
+	-webkit-animation: spin 1s infinite;
+	animation: spin 1s infinite;
 }
 .inner {
-  -webkit-animation: spin 1s infinite;
-  animation: spin 1s infinite;
+	-webkit-animation: spin 1s infinite;
+	animation: spin 1s infinite;
 }
 @-webkit-keyframes spin {
-  from {
-    -webkit-transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(360deg);
-  }
+ from {
+ -webkit-transform: rotate(0deg);
+}
+to {
+	-webkit-transform: rotate(360deg);
+}
 }
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+ from {
+ transform: rotate(0deg);
+}
+to {
+	transform: rotate(360deg);
+}
 }
 .reg-st5-info-icon {
 	width: 32px;
@@ -11466,44 +11466,43 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
-	position:relative;
+	position: relative;
 }
 .sync-button.mac {
 	background-position: 15px -327px;
 }
 .sync-button.linux {
 	background-position: -462px -322px;
-	min-width:245px;
+	min-width: 245px;
 	padding: 6px 40px 0 0;
 }
 .sync-button.linux:hover, .sync-button.linux.active {
-	min-width:251px;
+	min-width: 251px;
 }
 .linux .sync-dropdown-arrow {
 	display: block;
-width: 15px;
-height: 15px;
-position: absolute;
-right: 16px;
-top: 22px;
-background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
-background-repeat: no-repeat;
-background-position: -817px -388px;
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	right: 16px;
+	top: 22px;
+	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
+	background-repeat: no-repeat;
+	background-position: -817px -388px;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
--moz-opacity: 0.5;
--khtml-opacity: 0.5;
-opacity: 0.6;
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.6;
 }
 .linux.active .sync-dropdown-arrow {
 	background-position: -737px -388px;
 }
-.sync-button.linux:hover .sync-dropdown-arrow,.sync-button.linux.active .sync-dropdown-arrow {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
--moz-opacity: 1;
--khtml-opacity: 1;
-opacity: 1;
+.sync-button.linux:hover .sync-dropdown-arrow, .sync-button.linux.active .sync-dropdown-arrow {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
-	
 .google-play-button {
 	background-position: -343px -1447px;
 }
@@ -11534,7 +11533,7 @@ opacity: 1;
 	background-position: -230px -612px;
 }
 .sync-button-txt {
-	display:block;
+	display: block;
 }
 .sync-context-menu {
 	min-width: 164px;
@@ -11551,7 +11550,6 @@ opacity: 1;
 	z-index: 500;
 	padding: 8px 0;
 }
-
 .sync-menu-item, a.sync-menu-item {
 	display: block;
 	height: 32px;
@@ -11572,10 +11570,9 @@ opacity: 1;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-
 .sync-menu-item:hover, a.sync-menu-item:hover {
 	background-color: rgba(153,153,153,1);
-	color:white;
+	color: white;
 }
 .new-app .sync-button-txt {
 	font-size: 16px;
@@ -15056,7 +15053,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: #c5c3c3;
-	text-align:center;
+	text-align: center;
 }
 .ads-bottom-block .sync-bottom-txt {
 	font-size: 11px;
@@ -15147,7 +15144,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
 	display: inline-block;
 	min-width: 240px;
-	width:auto;
+	width: auto;
 	border-color: #8d8c8c;
 }
 .ads-bottom-block .sync-button:hover, .ads-bottom-block .sync-button.active, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
@@ -17061,53 +17058,58 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .fm-new-folder, .rtl .search-files-result {
 	padding: 0 44px 0 10px;
 }
-
-
-
 .keyspinner {
-  margin: 50px auto;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  text-align: center;  
-  -webkit-animation: rotate 2.0s infinite linear;
-  animation: rotate 2.0s infinite linear;
+	margin: 50px auto;
+	width: 40px;
+	height: 40px;
+	position: relative;
+	text-align: center;
+	-webkit-animation: rotate 2.0s infinite linear;
+	animation: rotate 2.0s infinite linear;
 }
-
 .keydot1, .keydot2 {
-  width: 60%;
-  height: 60%;
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  background-color: #d90007;
-  border-radius: 100%;
-  
-  -webkit-animation: bounce 2.0s infinite ease-in-out;
-  animation: bounce 2.0s infinite ease-in-out;
+	width: 60%;
+	height: 60%;
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	background-color: #d90007;
+	border-radius: 100%;
+	-webkit-animation: bounce 2.0s infinite ease-in-out;
+	animation: bounce 2.0s infinite ease-in-out;
 }
-
 .keydot2 {
-  top: auto;
-  bottom: 0px;
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
+	top: auto;
+	bottom: 0px;
+	-webkit-animation-delay: -1.0s;
+	animation-delay: -1.0s;
 }
-
-@-webkit-keyframes rotate { 100% { -webkit-transform: rotate(360deg) }}
-@keyframes rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }}
-
-@-webkit-keyframes bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
+ @-webkit-keyframes rotate {
+100% {
+-webkit-transform: rotate(360deg)
 }
-
-@keyframes bounce {
-  0%, 100% { 
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% { 
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
+}
+@keyframes rotate {
+100% {
+transform: rotate(360deg);
+-webkit-transform: rotate(360deg)
+}
+}
+ @-webkit-keyframes bounce {
+ 0%, 100% {
+-webkit-transform: scale(0.0)
+}
+ 50% {
+-webkit-transform: scale(1.0)
+}
+}
+ @keyframes bounce {
+ 0%, 100% {
+ transform: scale(0.0);
+ -webkit-transform: scale(0.0);
+}
+50% {
+ transform: scale(1.0);
+ -webkit-transform: scale(1.0);
+}
 }

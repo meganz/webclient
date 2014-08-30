@@ -26,10 +26,16 @@ function init_sync()
 			document.location.href = syncurl;
 		});
 	},1000);
+	
+	
+	
+	var pf = navigator.platform.toUpperCase();
+	
+	pf = 'LINUX';
 
-	if (navigator.platform.toUpperCase().indexOf('MAC')>=0) sync_switchOS('mac');
-	else if (os == 'windows') sync_switchOS('windows');
-	else if (os == 'linux') sync_switchOS('linux');
+	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
+	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
+	else sync_switchOS('windows');
 
 	if (typeof swiffy == 'undefined' && !silent_loading)
 	{

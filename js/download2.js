@@ -47,7 +47,7 @@ var DownloadManager =
 					changed++
 				}
 			}
-			if (this.nup[dl.dl_id])
+			if (this.nup && this.nup[dl.dl_id])
 			{
 				this.nup[dl.dl_id].forEach(function(callback)
 				{

@@ -197,7 +197,10 @@ ClassChunk.prototype.on_progress = function(args) {
 // XHR::on_error {{{
 ClassChunk.prototype.on_error = function(args, xhr) {
 	if (d) console.error('ClassChunk.on_error', this.task&&this.task.chunk_id, args, xhr, this);
-	if (!this.dl) return;
+	if (this.isCancelled()) {
+		ASSERT(0, 'This chunk should have been destroyed before reaching XHR.onerror..');
+		return;
+	}
 
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
@@ -299,7 +302,7 @@ ClassEmptyChunk.prototype.run = function(task_done) {
 function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
-	this.gid  = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id
+	this.gid  = DownloadManager.GetGID(dl);
 	if (!dl.zipid || !GlobalProgress[this.gid])
 	{
 		GlobalProgress[this.gid] = {data: {}, done: 0, working:[]};

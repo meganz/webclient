@@ -118,6 +118,7 @@ w.getXhr = function(object) {
 	for (var i = 0; i < _xhr_queue.length; i++) {
 		if (!_xhr_queue[i].listener && _xhr_queue[i].type == zclass) {
 			_xhr_queue[i].listener  = object;
+			_xhr_queue[i].lname = '' + object;
 			_xhr_queue[i].__failed = false;
 			return _xhr_queue[i];
 		}
@@ -126,6 +127,7 @@ w.getXhr = function(object) {
 	/* create a new xhr object */
 	var xhr = newXhr();
 	xhr.listener = object;
+	xhr.lname = ''+object;
 	xhr.type     = zclass;
 
 	/* add it to the queue so we can recicle it */

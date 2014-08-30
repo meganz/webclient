@@ -151,8 +151,21 @@ var DownloadManager =
 					return task instanceof ClassChunk && task.isCancelled() || task.destroy();
 				};
 			}
-
 			dlQueue.filter(gid, foreach);
+
+			/**
+			 * Active chunks might are stuck waiting reply,
+			 * which won't get destroyed itself right away.
+			 */
+			if (GlobalProgress[gid])
+			{
+				var chunk, w = GlobalProgress[gid].working;
+				while ((chunk = w.pop()))
+				{
+					chunk.isCancelled();
+				}
+			}
+
 			if (!this._multiAbort) Soon(resetUploadDownload);
 		}
 	}
@@ -517,7 +530,6 @@ DownloadQueue.prototype.push = function() {
 	dl.io.progress 	= 0;
 	dl.io.size		= dl.size;
 	dl.decrypter	= 0;
-
 
 	if (!dl.zipid) {
 		dl_writer(dl);

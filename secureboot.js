@@ -403,7 +403,7 @@ else
 
 		if (!d)
 		{
-			var __cdumps = [], __cd_t, __cd_v = /*!CDV*/1;
+			var __cdumps = [], __cd_t, __cd_v = 2;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
 				if (__cdumps.length > 8) return false;

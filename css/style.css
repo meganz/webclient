@@ -13806,7 +13806,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -13817,9 +13817,42 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
+	position: relative;
 }
 .sync-button.mac {
 	background-position: 15px -327px;
+}
+.sync-button.linux {
+	background-position: -462px -322px;
+	min-width: 245px;
+	padding: 6px 40px 0 0;
+}
+.sync-button.linux:hover, .sync-button.linux.active {
+	min-width: 251px;
+}
+.linux .sync-dropdown-arrow {
+	display: block;
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	right: 16px;
+	top: 22px;
+	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
+	background-repeat: no-repeat;
+	background-position: -817px -388px;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.6;
+}
+.linux.active .sync-dropdown-arrow {
+	background-position: -737px -388px;
+}
+.sync-button.linux:hover .sync-dropdown-arrow, .sync-button.linux.active .sync-dropdown-arrow {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -13849,6 +13882,48 @@ span.browsers-update {
 	background-image: url(../images/mega/chrome-app.png);
 	background-repeat: no-repeat;
 	background-position: -230px -612px;
+}
+.sync-button-txt {
+	display: block;
+}
+.sync-context-menu {
+	min-width: 164px;
+	position: absolute;
+	background-color: #333333;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 500;
+	padding: 8px 0;
+}
+.sync-menu-item, a.sync-menu-item {
+	display: block;
+	height: 32px;
+	line-height: 30px;
+	padding: 0 15px 0 20px;
+	font-size: 12px;
+	cursor: pointer;
+	position: relative;
+	color: rgba(204,204,204,1);
+	white-space: nowrap;
+	background-color: rgba(255,255,255,0);
+	-webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.sync-menu-item:hover, a.sync-menu-item:hover {
+	background-color: rgba(153,153,153,1);
+	color: white;
 }
 .new-app .sync-button-txt {
 	font-size: 16px;

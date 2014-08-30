@@ -26,8 +26,15 @@ function init_sync()
 			document.location.href = syncurl;
 		});
 	},1000);
+	
+	
+	
+	var pf = navigator.platform.toUpperCase();
+	
+	pf = 'LINUX';
 
-	if (navigator.platform.toUpperCase().indexOf('MAC')>=0) sync_switchOS('mac');
+	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
+	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
 	else sync_switchOS('windows');
 
 	if (typeof swiffy == 'undefined' && !silent_loading)
@@ -50,20 +57,49 @@ function sync_switchOS(os)
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
 		$('.sync-button-txt.small').text(l[1158]);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a>');
-		$('.sync-button').removeClass('mac');
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-button').removeClass('mac linux');
 		$('.sync-button').attr('href',syncurl);
+		$('.sync-button').unbind('click');
 	}
 	else if (os == 'mac')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
 		var ostxt = 'For Mac';
-		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');			
+		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');	
+		if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');			
 		$('.sync-button-txt.small').text(ostxt);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a>');
-		$('.sync-button').addClass('mac');
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-button').removeClass('windows linux').addClass('mac');
 		$('.sync-button').attr('href',syncurl);
-	}	
+		$('.sync-button').unbind('click');
+	}
+	else if (os == 'linux')
+	{
+		var ostxt = 'For Linux';
+		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
+		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
+		$('.sync-button-txt.small').text(ostxt);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+		$('.sync-button').removeClass('mac linux').addClass('linux');
+		$('.sync-button').removeAttr('href');
+		$('.sync-button').bind('click', function() {
+			if ($(this).attr('class').indexOf('active') == -1) {
+			  $(this).addClass('active');
+			  $('.sync-context-menu').removeClass('hidden');
+			  $('.sync-context-menu').css('left', $(this).position().left + $(this).outerWidth() + 4);
+			  $('.sync-context-menu').css('top', $(this).position().top);
+			} else {
+			  $(this).removeClass('active');
+			  $('.sync-context-menu').addClass('hidden');
+			}
+		});
+		$('.sync-menu-item').unbind('click');
+		$('.sync-menu-item').bind('click', function() {
+			$('.sync-button').removeClass('active');
+			$('.sync-context-menu').addClass('hidden');
+		});
+	}		
 	$('.sync-bottom-txt a').unbind('click');
 	$('.sync-bottom-txt a').bind('click',function(e)
 	{

@@ -154,15 +154,17 @@ ClassChunk.prototype.updateProgress = function(force) {
 
 // isCancelled {{{
 ClassChunk.prototype.isCancelled = function() {
+	if (!this.dl) return true;
 	var is_cancelled = !!this.dl.cancelled;
 	if (!is_cancelled) {
 		if(typeof(this.dl.pos) !== 'number') {
 			this.dl.pos = IdToFile(this.dl.id).pos
 		}
-		this.dl.cancelled = is_cancelled = !dl_queue[this.dl.pos] || !dl_queue[this.dl.pos].n;
+		is_cancelled = !dl_queue[this.dl.pos] || !dl_queue[this.dl.pos].n;
 	}
 	if (is_cancelled) {
 		if (d) console.log(this + " aborting itself because download was canceled.", this.task.chunk_id);
+		this.dl.cancelled = true;
 		this.finish_download();
 		this.task.file.destroy();
 		this.destroy();
@@ -194,7 +196,8 @@ ClassChunk.prototype.on_progress = function(args) {
 
 // XHR::on_error {{{
 ClassChunk.prototype.on_error = function(args, xhr) {
-	if (d) console.error('ClassChunk.on_error', this.task.chunk_id, args, xhr, this);
+	if (d) console.error('ClassChunk.on_error', this.task&&this.task.chunk_id, args, xhr, this);
+	if (!this.dl) return;
 
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
@@ -238,25 +241,9 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 };
 // }}}
 
-ClassChunk.prototype.request = function() {
+ClassChunk.prototype.run = function(task_done) {
 	if (this.isCancelled()) return;
 
-	this.xhr = getXhr(this);
-
-	if (dlMethod == FileSystemAPI) {
-		var t = this.url.lastIndexOf('/dl/');
-		this.xhr.open('POST', this.url.substr(0, t+1));
-		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t));
-	} else {
-		this.xhr.open('POST', this.url, true);
-	}
-
-	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
-	this.xhr.send();
-	if (d) console.log(this + " Fetching " + this.url);
-}
-
-ClassChunk.prototype.run = function(task_done) {
 	if (this.size < 100 * 1024 && dlQueue.expand()) {
 		/**
 		 *	It is an small chunk and we *should* finish soon if everything goes
@@ -271,8 +258,22 @@ ClassChunk.prototype.run = function(task_done) {
 		this.io.dl_bytesreceived = 0;
 	}
 
-	this.request(); /* let the fun begin! */
 	this.Progress.working.push(this);
+
+	/* let the fun begin! */
+	if (d) console.log(this + " Fetching " + this.url);
+	this.xhr = getXhr(this);
+
+	if (chromehack) {
+		var t = this.url.lastIndexOf('/dl/');
+		this.xhr.open('POST', this.url.substr(0, t+1));
+		this.xhr.setRequestHeader("MEGA-Chrome-Antileak", this.url.substr(t));
+	} else {
+		this.xhr.open('POST', this.url, true);
+	}
+
+	this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+	this.xhr.send();
 };
 // }}}
 
@@ -370,6 +371,12 @@ ClassFile.prototype.destroy = function() {
 }
 
 ClassFile.prototype.run = function(task_done) {
+
+	ASSERT(this.gid && GlobalProgress[this.gid], 'Invalid ClassFile state (' + (!!this.gid) + ', ' + (this.dl&&!!this.dl.cancelled) + ')');
+	if (!this.gid || !GlobalProgress[this.gid]) {
+		return task_done(); // Hmm..
+	}
+
 	fetchingFile = 1;
 	this.dl.retries = 0; /* set the retries flag */
 

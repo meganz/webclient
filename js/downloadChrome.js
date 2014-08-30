@@ -449,3 +449,59 @@
 		);
 	});
 })(this);
+
+function FileIO(dl_id, dl)
+{
+	var file;
+
+	this.write = function (buffer, offset, done)
+	{
+		file = new File([file, buffer], file.name, {
+			type : file.type,
+			lastModified : Date.now()
+		});
+		Soon(done);
+	};
+
+	this.download = function(name, path)
+	{
+		var file_url = myURL.createObjectURL(file);
+		var dlLinkNode = document.getElementById('dllink');
+		dlLinkNode.download = name;
+		dlLinkNode.href = file_url;
+		dlLinkNode.click();
+		Later(function () {
+			myURL.revokeObjectURL(file_url);
+			file_url = undefined;
+		});
+	};
+
+	this.setCredentials = function (url, size, name)
+	{
+		if (this.is_zip || !dl.zipid)
+		{
+			file = new File([""], name, {
+				type : "application/octet-stream",
+				lastModified : Date.now()
+			});
+		}
+		this.begin();
+	};
+}
+
+FileIO.usable = function ()
+{
+	var r = false;
+
+	if (typeof File !== 'undefined')
+	{
+		try
+		{
+			var f = new File(["M"], "M.txt", {type:"text/plain"});
+			r = f.size === 1 && f.name === 'M.txt';
+		}
+		catch(e) {}
+	}
+
+	return r;
+}

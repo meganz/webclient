@@ -11520,45 +11520,6 @@ span.browsers-update {
 .sync-button-txt {
 	display: block;
 }
-.sync-context-menu {
-	min-width: 164px;
-	position: absolute;
-	background-color: #333333;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	z-index: 500;
-	padding: 8px 0;
-}
-.sync-menu-item, a.sync-menu-item {
-	display: block;
-	height: 32px;
-	line-height: 30px;
-	padding: 0 15px 0 20px;
-	font-size: 12px;
-	cursor: pointer;
-	position: relative;
-	color: rgba(204,204,204,1);
-	white-space: nowrap;
-	background-color: rgba(255,255,255,0);
-	-webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-.sync-menu-item:hover, a.sync-menu-item:hover {
-	background-color: rgba(153,153,153,1);
-	color: white;
-}
 .new-app .sync-button-txt {
 	font-size: 16px;
 	color: #999999;

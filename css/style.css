@@ -13820,7 +13820,6 @@ span.browsers-update {
 }
 .sync-button.linux {
 	background-position: -462px -322px;
-<<<<<<< HEAD
 }
 .sync-button-block {
 	display: inline-block
@@ -13838,37 +13837,6 @@ span.browsers-update {
 	text-align: left;
 	margin: 0 3px 10px 3px;
 	border-color: #d0d0d0;
-=======
-	min-width: 245px;
-	padding: 6px 40px 0 0;
-}
-.sync-button.linux:hover, .sync-button.linux.active {
-	min-width: 251px;
-}
-.linux .sync-dropdown-arrow {
-	display: block;
-	width: 15px;
-	height: 15px;
-	position: absolute;
-	right: 16px;
-	top: 22px;
-	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
-	background-repeat: no-repeat;
-	background-position: -817px -388px;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-	-moz-opacity: 0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.6;
-}
-.linux.active .sync-dropdown-arrow {
-	background-position: -737px -388px;
-}
-.sync-button.linux:hover .sync-dropdown-arrow, .sync-button.linux.active .sync-dropdown-arrow {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
->>>>>>> FETCH_HEAD
 }
 .google-play-button {
 	background-position: -343px -1447px;

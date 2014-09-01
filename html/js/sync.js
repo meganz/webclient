@@ -83,8 +83,14 @@ function sync_switchOS(os)
 		$('.sync-bottom-txt').html('Download MEGA <a href="" class="red">Nautilus extension package</a> (optionally).<br/>Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
 		$('.sync-button').removeClass('mac linux').addClass('linux');
 		$('.fm-version-select').removeClass('hidden');
+		$('.architecture-checkbox input').bind('click',function() {
+			$('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
+			$(this).parent().removeClass('radioOff').addClass('radioOn');
+			$(this).attr('checked', true)
+		});
 		$('.fm-version-select select').bind('change',function() {
            $('.version-select-txt').text($('.fm-version-select select option:selected').text());
+		   // TODO: change link according $('input:radio[name="architecture"]') value
 		   $('.sync-button').attr('href',$(this).val());
         });
 		

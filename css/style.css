@@ -11477,6 +11477,10 @@ span.browsers-update {
 .sync-button-block {
 	display:inline-block
 }
+.sync-radio-buttons {
+	margin:-10px 0 10px 0;
+	display:inline-block;
+}
 .fm-version-select {
 	width:auto; text-align:left; margin:0 3px 10px 3px; border-color: #d0d0d0;
 }

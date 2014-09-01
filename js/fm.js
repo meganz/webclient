@@ -554,7 +554,7 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();
-	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	if (!uldl_hold) ulQueue.resume();
 	else// make sure that terms of service are accepted before any action
 	{
 		$('.transfer-pause-icon').addClass('active');

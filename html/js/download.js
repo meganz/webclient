@@ -471,21 +471,49 @@ function sync_switchOS(os)
 	if (os == 'windows')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
-		$('.ads-left-block .sync-button-txt.small').text(l[1158]);			
-		$('.ads-left-block .sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a>');
-		$('.ads-left-block .sync-button').removeClass('mac');
-		$('.ads-left-block .sync-button').attr('href',syncurl);
+		$('.sync-button-txt.small').text(l[1158]);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-button').removeClass('mac linux');
+		$('.sync-button').attr('href',syncurl);
+		$('.sync-button').unbind('click');
 	}
 	else if (os == 'mac')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
 		var ostxt = 'For Mac';
-		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');			
-		$('.ads-left-block .sync-button-txt.small').text(ostxt);			
-		$('.ads-left-block .sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a>');
-		$('.ads-left-block .sync-button').addClass('mac');
-		$('.ads-left-block .sync-button').attr('href',syncurl);
-	}	
+		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');	
+		if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');			
+		$('.sync-button-txt.small').text(ostxt);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-button').removeClass('windows linux').addClass('mac');
+		$('.sync-button').attr('href',syncurl);
+		$('.sync-button').unbind('click');
+	}
+	else if (os == 'linux')
+	{
+		var ostxt = 'For Linux';
+		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
+		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
+		$('.sync-button-txt.small').text(ostxt);			
+		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+		$('.sync-button').removeClass('mac linux').addClass('linux');
+		$('.sync-button').removeAttr('href');
+		$('.sync-button').bind('click', function() {
+			if ($(this).attr('class').indexOf('active') == -1) {
+			  $(this).addClass('active');
+			  $('.sync-context-menu').removeClass('hidden');
+			  $('.sync-context-menu').css('left', $(this).position().left + $(this).outerWidth() + 8);
+			} else {
+			  $(this).removeClass('active');
+			  $('.sync-context-menu').addClass('hidden');
+			}
+		});
+		$('.sync-menu-item').unbind('click');
+		$('.sync-menu-item').bind('click', function() {
+			$('.sync-button').removeClass('active');
+			$('.sync-context-menu').addClass('hidden');
+		});
+	}		
 	$('.sync-bottom-txt a').unbind('click');
 	$('.sync-bottom-txt a').bind('click',function(e)
 	{

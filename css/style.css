@@ -15128,13 +15128,13 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 }
 .ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
 	display: inline-block;
-	min-width: 240px;
+	min-width: 234px;
 	width: auto;
 	border-color: #8d8c8c;
 }
 .ads-bottom-block .sync-button:hover, .ads-bottom-block .sync-button.active, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
 	border-color: #DB3200;
-	min-width: 246px;
+	min-width: 240px;
 }
 .ads-left-block .sync-context-menu {
 	bottom: 58px;

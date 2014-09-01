@@ -5076,7 +5076,8 @@ function copyDialog()
     $('.copy-dialog-button').bind('click', function() {
 		var section = $(this).attr('class').split(" ")[1];
 		selectCopyDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1) {
+        if ($(this).attr('class').indexOf('active') == -1)
+		{
             switch (section)
             {
                 case 'cloud-drive':
@@ -5179,17 +5180,52 @@ function copyDialog()
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 	
+	// Handle conversations tab item selection
+	$('.copy-dialog').off('click', '.nw-conversations-item');
+	$('.copy-dialog').on('click', '.nw-conversations-item', function()
+	{
+		if (!$(this).is('.selected'))
+		{
+			$.mcselected = $(this).attr('id').replace('contact2_','');
+			var $btn = $('.dialog-copy-button');
+
+			// unselect previously selected item
+			$('.copy-dialog .nw-conversations-item').removeClass('selected');
+			$(this).addClass('selected');
+			$btn.removeClass('disabled');
+
+			// Disable action button if there is no selected items
+			if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
+		}
+	});
+
 	$('.copy-dialog .dialog-copy-button').unbind('click');
 	$('.copy-dialog .dialog-copy-button').bind('click', function()
 	{
-		if ($.mcselected != 'undefined')
+		if (typeof $.mcselected != 'undefined')
 		{
-			// ToDo. switch for all possible situations
-			var n = [];
-			for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
-			closeDialog();// This is important to be here because we are doing cleaning for dialog during close
-			M.copyNodes(n, $.mcselected);
-		}
+			var section = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];// Get active tab
+			selectCopyDialogTabRoot(section);
+			switch (section)
+			{
+				case 'cloud-drive':
+					var n = [];
+					for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+					closeDialog();
+					M.copyNodes(n, $.mcselected);
+					break;
+				case 'shared-with-me':
+					// ToDo: Not clear for what this is used
+					break;
+				case 'conversations':
+					var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
+					if($selectedConv.size() > 0)
+						megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+					break;
+				default:
+					break;
+			}
+	}
 		
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
@@ -5247,7 +5283,8 @@ function moveDialog()
     $('.move-dialog-button').bind('click', function(e) {
         var section = $(this).attr('class').split(" ")[1];
 		selectMoveDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1) {
+        if ($(this).attr('class').indexOf('active') == -1)
+		{
             switch (section)
             {
                 case 'cloud-drive':
@@ -5354,7 +5391,7 @@ function moveDialog()
 	$('.move-dialog .dialog-move-button').unbind('click');
 	$('.move-dialog .dialog-move-button').bind('click', function()
 	{
-		if ($.mcselected != 'undefined')
+		if (typeof $.mcselected != 'undefined')
 		{
 			var n = [];
 			for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);

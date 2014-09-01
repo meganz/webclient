@@ -5041,24 +5041,27 @@ function copyDialog()
 	function selectCopyDialogTabRoot(section)
 	{
 		$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
-		var lbl = '.dialog-copy-button';
+		var $lbl = $('.dialog-copy-button');
 		switch (section)
 		{
 			case 'cloud-drive':
 				$.mcselected = M.RootID;
-				$(lbl).text('Paste');
+				$lbl.text('Paste');
                 break;
 			case 'shared-with-me':
 				$.mcselected = undefined;
-				$(lbl).text(l[1344]);					
+				$lbl.text(l[1344]);
+				$lbl.addClass('disabled');
 				break;
 			case 'conversations':
 				$.mcselected = undefined;
-				$(lbl).text(l[1940]);					
+				$lbl.text(l[1940]);					
+				$lbl.addClass('disabled');
 				break;
 			default:
 				$.mcseleced = undefined;
-				$(lbl).text('Paste');
+				$lbl.text('Paste');
+				$lbl.addClass('disabled');
 				break;
 		}		
 	};
@@ -5127,7 +5130,8 @@ function copyDialog()
 		M.buildtree(M.d[$.mcselected]);
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
-		
+		var $btn = $('.dialog-copy-button');
+
 		var c = $(e.target).attr('class');
 		// Sub-folder exist?
 		if (c && c.indexOf('nw-fm-arrow-icon') > -1)
@@ -5167,8 +5171,12 @@ function copyDialog()
 			// unselect previously selected item
 			$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
 			$(this).addClass('selected');
+			$btn.removeClass('disabled');
 		}
 		else $.mcselected = old;
+		
+		// Disable action button if there is no selected items
+		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 	
 	$('.copy-dialog .dialog-copy-button').unbind('click');
@@ -5207,24 +5215,24 @@ function moveDialog()
 	function selectMoveDialogTabRoot(section)
 	{
 		$('.move-dialog .nw-fm-tree-item').removeClass('selected');
-		var lbl = '.dialog-move-button';
+		var $lbl = $('.dialog-move-button');
 		switch (section)
 		{
 			case 'cloud-drive':
 				$.mcselected = M.RootID;
-				$(lbl).text(l[62]);
+				$lbl.text(l[62]);
 				break;
 			case 'shared-with-me':
 				$.mcselected = undefined;
-				$(lbl).text(l[1344]);
+				$lbl.text(l[1344]);
 				break;
 			case 'rubbish-bin':
 				$.mcselected = M.RubbishID;
-				$(lbl).text(l[62]);
+				$lbl.text(l[62]);
 				break;
 			default:
 				$.mcseleced = undefined;
-				$(lbl).text(l[62]);
+				$lbl.text(l[62]);
 				break;
             }
 	};
@@ -5294,6 +5302,7 @@ function moveDialog()
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
 		disableCircularTargets('#mctreea_');
+		var $btn = $('.dialog-move-button');
 
 		var c = $(e.target).attr('class');
 		// Sub-folder exist?
@@ -5334,8 +5343,12 @@ function moveDialog()
 			// unselect previously selected item
 			$('.move-dialog .nw-fm-tree-item').removeClass('selected');
 			$(this).addClass('selected');
+			$btn.removeClass('disabled');
 		}
 		else $.mcselected = old;
+		
+		// Disable action button if there is no selected items
+		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 	
 	$('.move-dialog .dialog-move-button').unbind('click');

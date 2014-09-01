@@ -31,7 +31,7 @@ function init_sync()
 	
 	var pf = navigator.platform.toUpperCase();
 	
-	pf = 'LINUX';
+	//pf = 'LINUX';
 
 	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
@@ -80,32 +80,23 @@ function sync_switchOS(os)
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
 		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
 		$('.sync-button-txt.small').text(ostxt);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+		$('.sync-bottom-txt').html('Download MEGA <a href="" class="red">Nautilus extension package</a> (optionally).<br/>Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
 		$('.sync-button').removeClass('mac linux').addClass('linux');
-		$('.sync-button').removeAttr('href');
-		$('.sync-button').bind('click', function() {
-			if ($(this).attr('class').indexOf('active') == -1) {
-			  $(this).addClass('active');
-			  $('.sync-context-menu').removeClass('hidden');
-			  $('.sync-context-menu').css('left', $(this).position().left + $(this).outerWidth() + 4);
-			  $('.sync-context-menu').css('top', $(this).position().top);
-			} else {
-			  $(this).removeClass('active');
-			  $('.sync-context-menu').addClass('hidden');
-			}
-		});
-		$('.sync-menu-item').unbind('click');
-		$('.sync-menu-item').bind('click', function() {
-			$('.sync-button').removeClass('active');
-			$('.sync-context-menu').addClass('hidden');
-		});
+		$('.fm-version-select').removeClass('hidden');
+		$('.fm-version-select select').bind('change',function() {
+           $('.version-select-txt').text($('.fm-version-select select option:selected').text());
+		   $('.sync-button').attr('href',$(this).val());
+        });
+		
 	}		
 	$('.sync-bottom-txt a').unbind('click');
 	$('.sync-bottom-txt a').bind('click',function(e)
 	{
 		var c = $(this).attr('class');
+		$('.fm-version-select').addClass('hidden');	
 		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
 		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
+		else if (c && c.indexOf('linux') > -1) sync_switchOS('linux');
 		return false;
 	});
 }

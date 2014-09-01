@@ -531,7 +531,7 @@ label span.black {
 	right: -27px;
 	top: 0;
 }
-.select_box select, .fm-account-select select {
+.select_box select, .fm-account-select select, .fm-version-select select {
 	border: 0;
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
@@ -5363,7 +5363,7 @@ span.search-number {
 	float: left;
 	width: 70%;
 }
-.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .fm-account-select {
+.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .fm-account-select, .fm-version-select {
 	height: 30px;
 	border: 2px solid #d9d9d9;
 	width: 100%;
@@ -5382,14 +5382,14 @@ span.search-number {
 .fm-account-input input {
 	color: #868686;
 }
-.fm-account-select {
+.fm-account-select, .fm-version-select {
 	background-position: right -6596px;
 	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0;
 	position: relative;
 }
-.fm-account-select select {
+.fm-account-select select, .fm-version-select select {
 	height: 26px;
 	width: 100%;
 	padding: 0;
@@ -8773,7 +8773,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .fm-account-input {
 	padding: 10px 0;
 }
-.account-select-txt {
+.account-select-txt, .version-select-txt {
 	display: block;
 	line-height: 25px;
 	font-size: 13px;
@@ -11473,35 +11473,12 @@ span.browsers-update {
 }
 .sync-button.linux {
 	background-position: -462px -322px;
-	min-width: 245px;
-	padding: 6px 40px 0 0;
 }
-.sync-button.linux:hover, .sync-button.linux.active {
-	min-width: 251px;
+.sync-button-block {
+	display:inline-block
 }
-.linux .sync-dropdown-arrow {
-	display: block;
-	width: 15px;
-	height: 15px;
-	position: absolute;
-	right: 16px;
-	top: 22px;
-	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
-	background-repeat: no-repeat;
-	background-position: -817px -388px;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-	-moz-opacity: 0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.6;
-}
-.linux.active .sync-dropdown-arrow {
-	background-position: -737px -388px;
-}
-.sync-button.linux:hover .sync-dropdown-arrow, .sync-button.linux.active .sync-dropdown-arrow {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
+.fm-version-select {
+	width:auto; text-align:left; margin:0 3px 10px 3px; border-color: #d0d0d0;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -15658,7 +15635,7 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .top-menu-icon, .language-popup-icon, .notification-popup-icon, .cloud-popup-icon, .top-search-bl, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .grid-header-star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .grid-url-arrow, .transfer-type, .transfer-status, .fm-back-button, .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs, .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow, .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-new-folder, .fm-file-upload, .fm-folder-upload, .fm-add-user, .fm-clearbin-button, .fm-files-view-icon, .fm-contacts-view-icon, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-dialog-button.notifications-button, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .top-user-status-item.active, .top-menu-item.contains-submenu, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-popup-icon, .warning-gray-icon, .arrow.asc, .arrow.desc, .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-tree-header, .fm-tree-header.contains-subfolders span, .fm-tree-header.contains-subfolders.active.dragover span, .fm-tree-header.contains-subfolders.dragover span, .fm-tree-header.contains-subfolders.expanded span, .fm-tree-header.expanded span, .fm-tree-header.contains-subfolders.expanded.active.dragover span, .fm-tree-header.expanded.active.dragover span, .fm-tree-header.contains-subfolders.expanded.dragover span, .fm-tree-header.expanded.dragover span, .fm-tree-header.active.contains-subfolders span, .fm-tree-header.active.contains-subfolders.expanded span, .fm-tree-header.active.expanded span, .fm-tree-header.contacts-item span.contacts-arrows, .fm-tree-header.active.contains-subfolders.expanded span.contacts-arrows, .fm-tree-header.active.expanded span.contacts-arrows, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .top-menu-icon, .language-popup-icon, .notification-popup-icon, .cloud-popup-icon, .top-search-bl, .contains-value .top-search-clear, .fm-menu-item, .transfer-panel-title, .tranfer-view-icon, .transfer-settings-icon, .transfer-pause-icon, .transfer-points, .grid-header-star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .grid-url-arrow, .transfer-type, .transfer-status, .fm-back-button, .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs, .fm-breadcrumbs.contains-directories span.dropdown-arrow, .fm-share-breadcrumbs.contains-directories span.dropdown-arrow, .fm-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.contains-directories.has-next-button .right-arrow-bg, .fm-new-folder, .fm-file-upload, .fm-folder-upload, .fm-add-user, .fm-clearbin-button, .fm-files-view-icon, .fm-contacts-view-icon, .contacts-sorting-by.active, .contacts-sorting-type.active, .create-folder-arrow, .add-user-popup-arrow, .fm-account-select, .fm-version-select, .dragger-status, .star .fm-chat-user-star, .fm-chat-user-status, .fm-chat-view-icon, .fm-chat-attach-file, .fm-chat-emotions-icon, .fm-chat-input-icon, .fm-chat-attach-arrow, .fm-chat-emotion-arrow, .fm-add-contact-arrow, .add-contact-pad, .fm-dialog-close, .active .fm-dialog-input-clear, .fm-dialog-button.notifications-button, .fm-share-add-contacts, .active .fm-share-contacts-arrow, .fm-share-pointer, .fm-share-contacts-search, .fm-share-contacts-body .ui-selected .add-contact-pad, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .context-menu-item, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .membership-arrow, .top-menu-arrow, .top-login-arrow, .notification-arrow, .top-user-status-arrow, .membership-popup-arrow, .top-user-status-item.active, .top-menu-item.contains-submenu, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-popup-icon, .warning-gray-icon, .arrow.asc, .arrow.desc, .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
@@ -16423,7 +16400,7 @@ transform: rotate(900deg);
 	box-sizing: border-box;
 	right: -2px;
 }
-body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
+body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .progressbar-percents, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .fm-version-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .context-menu-item, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
 	direction: rtl;
 }
 .rtl .nlanguage-bottom {

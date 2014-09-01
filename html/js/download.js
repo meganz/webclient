@@ -474,7 +474,6 @@ function sync_switchOS(os)
 		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
 		$('.sync-button').removeClass('mac linux');
 		$('.sync-button').attr('href',syncurl);
-		$('.sync-button').unbind('click');
 	}
 	else if (os == 'mac')
 	{
@@ -486,32 +485,18 @@ function sync_switchOS(os)
 		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
 		$('.sync-button').removeClass('windows linux').addClass('mac');
 		$('.sync-button').attr('href',syncurl);
-		$('.sync-button').unbind('click');
 	}
 	else if (os == 'linux')
 	{
+		syncurl = '/#sync';
 		var ostxt = 'For Linux';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
 		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
 		$('.sync-button-txt.small').text(ostxt);			
 		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
 		$('.sync-button').removeClass('mac linux').addClass('linux');
-		$('.sync-button').removeAttr('href');
-		$('.sync-button').bind('click', function() {
-			if ($(this).attr('class').indexOf('active') == -1) {
-			  $(this).addClass('active');
-			  $('.sync-context-menu').removeClass('hidden');
-			  $('.sync-context-menu').css('left', $(this).position().left + $(this).outerWidth() + 8);
-			} else {
-			  $(this).removeClass('active');
-			  $('.sync-context-menu').addClass('hidden');
-			}
-		});
-		$('.sync-menu-item').unbind('click');
-		$('.sync-menu-item').bind('click', function() {
-			$('.sync-button').removeClass('active');
-			$('.sync-context-menu').addClass('hidden');
-		});
+		$('.sync-button').attr('href',syncurl);
+		
 	}		
 	$('.sync-bottom-txt a').unbind('click');
 	$('.sync-bottom-txt a').bind('click',function(e)
@@ -519,6 +504,7 @@ function sync_switchOS(os)
 		var c = $(this).attr('class');
 		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
 		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
+		else if (c && c.indexOf('linux') > -1) sync_switchOS('linux');
 		return false;
 	});
 }

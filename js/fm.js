@@ -5048,13 +5048,13 @@ function copyDialog()
 					$.mcselected = M.RootID;
                     break;
                 case 'shared-with-me':
-					$.mcselected = 'shares';
+					$.mcselected = null;
                     break;
                 case 'conversations':
-					$.mcselected = 'chat';
+					$.mcselected = null;
                     break;
 				default:
-					$.mcseleced = M.RootID;
+					$.mcseleced = null;
 					break;
             }		
 	};

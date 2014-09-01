@@ -13,9 +13,10 @@ $(document).ready(function() {
 
    function fullscreenVideoResizing() {
 	   // Cansvas height  (4:3)
-	   var h = ($(window).width()/2 - 12) * 0.75; 
-	   $('.video-row').css('height', ($(window).height() - h)/2);
+	   var h = Math.round(($(window).width()/2 - 12) * 0.75); 
+	   $('.video-row').css('height', Math.round(($(window).height() - h)/2));
 	   $('.video-main-container').css('height', h);
+	   $('.video-main-container img').css('height', h);
 	   $('.video-size-button').css('right', $('.video-size-button').offset().top);
    }
    fullscreenVideoResizing();
@@ -29,8 +30,9 @@ $(document).ready(function() {
 	   if($(this).attr('class').indexOf('active') == -1) {
 		   $(this).addClass('active');
 		   // Video mute flipping
-		   if($(this).attr('class').indexOf('video-icon') > -1) 
+		   if($(this).attr('class').indexOf('video-icon') > -1) {
 			   $('.video-full-canvas.current-user').addClass('video-off');
+		   }
 		   // Fullscreen mode
 		   if($(this).attr('class').indexOf('size-icon') > -1) 
 			   $(document).fullScreen(true)
@@ -38,8 +40,9 @@ $(document).ready(function() {
 	   else {
 	       $(this).removeClass('active');
 		   // Video mute flipping
-		   if($(this).attr('class').indexOf('video-icon') > -1) 
+		   if($(this).attr('class').indexOf('video-icon') > -1)  {
 			   $('.video-full-canvas.current-user').removeClass('video-off');
+		   }
 		   // Fullscreen mode
 		   if($(this).attr('class').indexOf('size-icon') > -1) 
 			   $(document).fullScreen(false);
@@ -64,7 +67,8 @@ $(document).ready(function() {
      <div class="video-main-container">
            <!-- Please add "video-off" classname if user disabled camera !-->
            <div class="video-full-canvas">
-             <div class="video-fliper">
+             <div class="video-relative-block">
+               <div class="video-transparent-border"></div>
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
                <div class="video-canvas-flip-side front">
                  <img src="images/temp/video-temp-img.jpg" />
@@ -77,7 +81,8 @@ $(document).ready(function() {
            </div>
            <!-- Please add "video-off" classname if user disabled camera !-->
            <div class="video-full-canvas current-user">
-             <div class="video-fliper">
+             <div class="video-relative-block">
+               <div class="video-transparent-border"></div>
                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
                <div class="video-canvas-flip-side front">
                  <img src="images/temp/video-temp-img.jpg" />

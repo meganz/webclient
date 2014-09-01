@@ -18486,6 +18486,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: transparent;
 	border-color: rgba(255,255,255,0.2);
 	margin: 4px;
+
 }
 .video-row .video-call-button:hover {
 	border-color: rgba(255,255,255,0.5);
@@ -18536,79 +18537,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 	text-align: center;
 	vertical-align: middle;
-	perspective: 1000;
-}
-.video-full-canvas, .video-full-canvas .front, .video-full-canvas .back, .video-fliper {
-	height: 100%;
-}
-.video-full-canvas {
-	-webkit-perspective: 1000;
-	-moz-perspective: 1000;
-	-ms-perspective: 1000;
-	perspective: 1000;
-	-ms-transform: perspective(1000px);
-	-moz-transform: perspective(1000px);
-	-moz-transform-style: preserve-3d;
-	-ms-transform-style: preserve-3d;
-}
-.video-full-canvas.video-off .back {
-	-webkit-transform: rotateY(0deg);
-	-moz-transform: rotateY(0deg);
-	-o-transform: rotateY(0deg);
-	-ms-transform: rotateY(0deg);
-	transform: rotateY(0deg);
-}
-.video-full-canvas.video-off .front {
-	-webkit-transform: rotateY(180deg);
-	-moz-transform: rotateY(180deg);
-	-o-transform: rotateY(180deg);
-	transform: rotateY(180deg);
-}
-.video-fliper {
-	-webkit-transition: 0.6s;
-	-webkit-transform-style: preserve-3d;
-	-ms-transition: 0.6s;
-	-moz-transition: 0.6s;
-	-moz-transform: perspective(1000px);
-	-moz-transform-style: preserve-3d;
-	-ms-transform-style: preserve-3d;
-	transition: 0.6s;
-	transform-style: preserve-3d;
-	position: relative;
-}
-.video-full-canvas .front, .video-full-canvas .back {
-	-webkit-backface-visibility: hidden;
-	-moz-backface-visibility: hidden;
-	-ms-backface-visibility: hidden;
-	backface-visibility: hidden;
-	-webkit-transition: 0.6s;
-	-webkit-transform-style: preserve-3d;
-	-moz-transition: 0.6s;
-	-moz-transform-style: preserve-3d;
-	-o-transition: 0.6s;
-	-o-transform-style: preserve-3d;
-	-ms-transition: 0.6s;
-	-ms-transform-style: preserve-3d;
-	transition: 0.6s;
-	transform-style: preserve-3d;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-.video-full-canvas .front {
-	-webkit-transform: rotateY(0deg);
-	-ms-transform: rotateY(0deg);
-	z-index: 2;
-}
-.video-full-canvas .back {
-	-webkit-transform: rotateY(-180deg);
-	-moz-transform: rotateY(-180deg);
-	-o-transform: rotateY(-180deg);
-	-ms-transform: rotateY(-180deg);
-	transform: rotateY(-180deg);
+	position:relative;
 }
 .video-full-canvas img, .video-full-canvas canvas {
 	width: 100%;
+}
+.video-off .video-canvas-flip-side {
+	position:absolute;
+}
+.video-transparent-border {
+	position:absolute;
+	width:100%;
+	height:100%;
+	border:1px solid rgba(255,255,255,0.1);
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-background-clip: border-box;
+    background-clip: border-box;
+	z-index:10;
 }
 .video-full-buttons {
 	position: absolute;
@@ -18620,16 +18567,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	top: 50%;
 	margin: -24px 0 0 -84px;
 }
+.video-relative-block {
+	position:relative;
+	width:100%;
+	height:100%;
+}
 .video-full-disabled-block {
 	height: 100%;
 	width: 100%;
 	background: #4c4c4c;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRjNGM0YyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYjJiMmIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	border: 1px solid #5e5e5e;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	position: relative;
+	position: absolute;
+	-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+-moz-opacity: 0;
+-khtml-opacity: 0;
+opacity: 0;
+top:0;
+}
+
+.video-off .video-full-disabled-block {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+-moz-opacity: 1;
+-khtml-opacity: 1;
+opacity: 1;
+z-index:5;
 }
 .video-full-disabled-icon {
 	background-image: url(../images/mega/chat-sprite.svg);

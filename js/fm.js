@@ -1286,7 +1286,7 @@ function initContextUI()
 	$(c+'.advanced-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-		$('.copy-dialog .dialog-move-button').addClass('active');
+		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');		
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
@@ -1301,14 +1301,13 @@ function initContextUI()
 		$('.copy-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
 		$('.fm-dialog-overlay').removeClass('hidden');
-//		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});
 
 	$(c+'.move-item').unbind('click');
 	$(c+'.move-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-		$('.copy-dialog .dialog-move-button').addClass('active');
+		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
@@ -5015,7 +5014,7 @@ function handleDialogTabContent(s, m, c, n, i)
 		$(n + '-dialog-tree-panel' + s).addClass('active');
 		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').removeClass('hidden');						
 	}
-	// Create New Folder button
+	//  'New Folder' button
 	if (c) $('.dialog-newfolder-button').removeClass('hidden');
 	else $('.dialog-newfolder-button').addClass('hidden');
 
@@ -5042,21 +5041,26 @@ function copyDialog()
 	function selectCopyDialogTabRoot(section)
 	{
 		$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
-            switch (section)
-            {
-                case 'cloud-drive':
-					$.mcselected = M.RootID;
-                    break;
-                case 'shared-with-me':
-					$.mcselected = null;
-                    break;
-                case 'conversations':
-					$.mcselected = null;
-                    break;
-				default:
-					$.mcseleced = null;
-					break;
-            }		
+		var lbl = '.dialog-copy-button';
+		switch (section)
+		{
+			case 'cloud-drive':
+				$.mcselected = M.RootID;
+				$(lbl).text('Paste');
+                break;
+			case 'shared-with-me':
+				$.mcselected = undefined;
+				$(lbl).text(l[1344]);					
+				break;
+			case 'conversations':
+				$.mcselected = undefined;
+				$(lbl).text(l[1940]);					
+				break;
+			default:
+				$.mcseleced = undefined;
+				$(lbl).text('Paste');
+				break;
+		}		
 	};
 	
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
@@ -5073,7 +5077,7 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy')
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
                     break;
                 case 'shared-with-me':
 					handleDialogTabContent('.shared-with-me', 'ul', false, '.copy');
@@ -5170,10 +5174,14 @@ function copyDialog()
 	$('.copy-dialog .dialog-copy-button').unbind('click');
 	$('.copy-dialog .dialog-copy-button').bind('click', function()
 	{
-		var n = [];
-		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
-		closeDialog();
-		M.copyNodes(n, $.mcselected);
+		if ($.mcselected != 'undefined')
+		{
+			// ToDo. switch for all possible situations
+			var n = [];
+			for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+			closeDialog();// This is important to be here because we are doing cleaning for dialog during close
+			M.copyNodes(n, $.mcselected);
+		}
 		
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
@@ -5199,20 +5207,25 @@ function moveDialog()
 	function selectMoveDialogTabRoot(section)
 	{
 		$('.move-dialog .nw-fm-tree-item').removeClass('selected');
-            switch (section)
-            {
-                case 'cloud-drive':
-					$.mcselected = M.RootID;
-                    break;
-                case 'shared-with-me':
-					$.mcselected = 'shares';
-                    break;
-                case 'rubbish-bin':
-					$.mcselected = M.RubbishID;
-                    break;
-				default:
-					$.mcseleced = M.RootID;
-					break;
+		var lbl = '.dialog-move-button';
+		switch (section)
+		{
+			case 'cloud-drive':
+				$.mcselected = M.RootID;
+				$(lbl).text(l[62]);
+				break;
+			case 'shared-with-me':
+				$.mcselected = undefined;
+				$(lbl).text(l[1344]);
+				break;
+			case 'rubbish-bin':
+				$.mcselected = M.RubbishID;
+				$(lbl).text(l[62]);
+				break;
+			default:
+				$.mcseleced = undefined;
+				$(lbl).text(l[62]);
+				break;
             }
 	};
 	
@@ -5328,11 +5341,13 @@ function moveDialog()
 	$('.move-dialog .dialog-move-button').unbind('click');
 	$('.move-dialog .dialog-move-button').bind('click', function()
 	{
-		var n = [];
-		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
-		closeDialog();
-		M.moveNodes(n, $.mcselected);
-		
+		if ($.mcselected != 'undefined')
+		{
+			var n = [];
+			for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+			closeDialog();
+			M.moveNodes(n, $.mcselected);
+		}
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
 //				if (RightsbyID(t) == 0)

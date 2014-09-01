@@ -80,7 +80,7 @@ function sync_switchOS(os)
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
 		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
 		$('.sync-button-txt.small').text(ostxt);			
-		$('.sync-bottom-txt').html('Download MEGA <a href="" class="red">Nautilus extension package</a> (optionally).<br/>Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+		$('.sync-bottom-txt').html('<span class="nautilus-lnk">Download MEGA <a href="" class="red">Nautilus extension package</a> (optionally).</span>Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
 		$('.sync-button').removeClass('mac linux').addClass('linux');
 		$('.fm-version-select').removeClass('hidden');
 		$('.sync-radio-buttons').removeClass('hidden');

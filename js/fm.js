@@ -5190,19 +5190,16 @@ function copyDialog()
 	$('.copy-dialog').off('click', '.nw-conversations-item');
 	$('.copy-dialog').on('click', '.nw-conversations-item', function()
 	{
-		if (!$(this).is('.selected'))
-		{
-			$.mcselected = $(this).attr('id').replace('contact2_','');
-			var $btn = $('.dialog-copy-button');
+		$.mcselected = $(this).attr('id').replace('contact2_','');
+		var $btn = $('.dialog-copy-button');
 
-			// unselect previously selected item
-			$('.copy-dialog .nw-conversations-item').removeClass('selected');
-			$(this).addClass('selected');
-			$btn.removeClass('disabled');
-
-			// Disable action button if there is no selected items
-			if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
-		}
+		// unselect previously selected item
+		$('.copy-dialog .nw-conversations-item').removeClass('selected');
+		$(this).addClass('selected');
+		$btn.removeClass('disabled');
+			
+		// Disable action button if there is no selected items
+		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 
 	$('.copy-dialog .dialog-copy-button').unbind('click');
@@ -5211,7 +5208,6 @@ function copyDialog()
 		if (typeof $.mcselected != 'undefined')
 		{
 			var section = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];// Get active tab
-			selectCopyDialogTabRoot(section);
 			switch (section)
 			{
 				case 'cloud-drive':
@@ -5227,6 +5223,7 @@ function copyDialog()
 					var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
 					if($selectedConv.size() > 0)
 						megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+					closeDialog();
 					break;
 				default:
 					break;

@@ -31,7 +31,7 @@ function init_sync()
 	
 	var pf = navigator.platform.toUpperCase();
 	
-	pf = 'LINUX';
+	//pf = 'LINUX';
 
 	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');

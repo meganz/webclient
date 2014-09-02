@@ -60,6 +60,7 @@ describe("EncryptionFilter", function() {
                             'members': []
                         }
                     },
+                    bind: function(eventName, cb) {},
                     'encryptionOpQueue': {
                         'queue': function() {
                             console.warn("queue:", toArray(arguments));
@@ -1014,6 +1015,7 @@ describe("EncryptionFilter", function() {
 
 
 
+
             room.encryptionHandler.state = mpenc.handler.STATE.NULL;
 
             var newUsers = {};
@@ -1083,7 +1085,7 @@ describe("EncryptionFilter", function() {
                 }
             });
 
-            expect(e.isPropagationStopped()).not.to.be.ok;
+            expect(e.isPropagationStopped()).to.be.ok;
 
             e = new $.Event("onPluginsWait");
             megaChatObj.trigger(e, {

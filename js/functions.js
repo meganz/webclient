@@ -737,7 +737,7 @@ function generateEventSuffixFromArguments(eventName, name) {
  * @param {String}
  */
 function fastHashFunction(val) {
-    return asmCrypto.SHA256.hex(val).substr(0, 16);
+    return MurmurHash3(val, 0x4ef5391a).toString();
 }
 
 /**

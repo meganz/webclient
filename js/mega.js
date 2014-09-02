@@ -2173,10 +2173,11 @@ function MegaData ()
 					flashhtml = '<object width="1" height="1" id="dlswf_'+ htmlentities(n.h) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 				}
 
+				var p = ui_paused ? 'paused' : ''
 				if (!z) this.addToTransferTable('<tr id="dl_'+htmlentities(n.h)+'">'
 					+ '<td><span class="row-number"></span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon(n) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(n.name) + '</span></td>'
-					+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
+					+ '<td><span class="transfer-type download '+p+'">' + l[373] + '<span class="speed"></span></span>' + flashhtml + '</td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(n.s) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'
@@ -2191,10 +2192,12 @@ function MegaData ()
 		if (dlMethod == FlashIO) {
 			flashhtml = '<object width="1" height="1" id="dlswf_zip_'+ htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
 		}
+
+		var p = ui_paused ? 'paused' : ''
 		if (z) this.addToTransferTable('<tr id="zip_'+zipid+'">'
 			+ '<td><span class="row-number"></span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
-			+ '<td><span class="transfer-type download">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
+			+ '<td><span class="transfer-type download'+p+'">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
 			+ '<td></td>'
 			+ '<td>' + bytesToSize(zipsize) + '</td>'
 			+ '<td><span class="transfer-status queued">Queued</span></td>'
@@ -2311,12 +2314,13 @@ function MegaData ()
 		$('.transfer-table #' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
 		$('.transfer-table #' + id + ' td:eq(3)').text('');
 
+		var p = ui_paused ? 'paused' : ''
 		if ($('#dlswf_'+id.replace('dl_','')).length > 0)
 		{
 			var flashid = id.replace('dl_','');
 			$('#dlswf_'+flashid).width(170);
 			$('#dlswf_'+flashid).height(22);
-			$('#' + id + ' .transfer-type')
+			$('#' + id + ' .transfer-type ' + p)
 				.removeClass('download')
 				.addClass('safari-downloaded')
 				.text('Save File');
@@ -2558,11 +2562,12 @@ function MegaData ()
 			f.target = target;
 			f.id = ul_id;
 
+			var p = ui_paused ? 'paused' : ''
 			this.addToTransferTable(
 				'<tr id="ul_'+ul_id+'">'
 					+ '<td><span class="row-number"></span></td>'
 					+ '<td><span class="transfer-filtype-icon ' + fileicon({name:f.name}) +'"></span><span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
-					+ '<td><span class="transfer-type upload">' + l[372] + '<span class="speed"></span></span></td>'
+					+ '<td><span class="transfer-type upload '+p+'">' + l[372] + '<span class="speed"></span></span></td>'
 					+ '<td></td>'
 					+ '<td>' + bytesToSize(f.size) + '</td>'
 					+ '<td><span class="transfer-status queued">Queued</span></td>'

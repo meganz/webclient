@@ -129,7 +129,7 @@ function sync_switchOS(os)
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
 		$('.sync-button-txt.small').text(l[1158]);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-bottom-txt.button-txt').html('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
 		$('.sync-button').removeClass('mac linux');
 		$('.sync-button').attr('href',syncurl);
 		$('.sync-button').unbind('click');
@@ -141,7 +141,7 @@ function sync_switchOS(os)
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');	
 		if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');			
 		$('.sync-button-txt.small').text(ostxt);			
-		$('.sync-bottom-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
+		$('.sync-bottom-txt.button-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
 		$('.sync-button').removeClass('windows linux').addClass('mac');
 		$('.sync-button').attr('href',syncurl);
 		$('.sync-button').unbind('click');
@@ -151,6 +151,7 @@ function sync_switchOS(os)
 		var ostxt = 'For Linux';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
 		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
+
 		$('.sync-button-txt.small').text(ostxt);
 		
 		var ua = navigator.userAgent.toLowerCase();
@@ -184,12 +185,11 @@ function sync_switchOS(os)
 		$('.fm-version-select.sync select').html(options);
 		
 		
-		$('.sync-bottom-txt').html('<span class="nautilus-lnk">MEGA <a href="" class="red">Nautilus extension</a> (optional)</span>Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');	
-		
+		$('.sync-bottom-txt.button-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
+		$('.sync-bottom-txt.linux-txt').html('<span class="nautilus-lnk">MEGA <a href="" class="red">Nautilus extension</a> (optional).</span>');
 		
 		$('.sync-button').removeClass('mac linux').addClass('linux');
-		$('.fm-version-select').removeClass('hidden');
-		$('.sync-radio-buttons').removeClass('hidden');
+		$('.sync-button-block.linux').removeClass('hidden');
 		$('.architecture-checkbox input').bind('click',function() {
 			$('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
 			$(this).parent().removeClass('radioOff').addClass('radioOn');
@@ -206,8 +206,7 @@ function sync_switchOS(os)
 	$('.sync-bottom-txt a').bind('click',function(e)
 	{
 		var c = $(this).attr('class');
-		$('.fm-version-select').addClass('hidden');	
-		$('.sync-radio-buttons').addClass('hidden');
+		$('.sync-button-block.linux').addClass('hidden');
 		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
 		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
 		else if (c && c.indexOf('linux') > -1) sync_switchOS('linux');

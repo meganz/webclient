@@ -493,7 +493,7 @@ function sync_switchOS(os)
 	}
 	else if (os == 'linux')
 	{
-		syncurl = '/#sync';
+		syncurl = '#sync';
 		var ostxt = 'For Linux';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
 		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			

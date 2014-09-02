@@ -4680,12 +4680,12 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();
-			if ($.warningCallback) $.warningCallback(false);
+			if ($.warningCallback) $.warningCallback(true);
 		});
 		$('#msgDialog .fm-dialog-button').eq(1).bind('click',function()
 		{
 			closeMsg();
-			if ($.warningCallback) $.warningCallback(true);
+			if ($.warningCallback) $.warningCallback(false);
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');

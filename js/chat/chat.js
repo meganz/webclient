@@ -153,7 +153,7 @@ var chatui;
                 $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
                 $('.copy-dialog .dialog-copy-button').addClass('active');
                 $('.copy-dialog').removeClass('hidden');
-                handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
+                handleDialogContent('.cloud-drive', 'ul', true, '.copy');
                 $('.fm-dialog-overlay').removeClass('hidden');
 
                 //TODO: fix this after #602 is ready.

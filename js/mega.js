@@ -3324,6 +3324,7 @@ function createfolder(toid,name,ulparams)
 			newnodes=[];
 			M.addNode(res.f[0]);
 			rendernew();
+			refreshDialogContent();
 			loadingDialog.hide();
 			if (ctx.ulparams) ulparams.callback(ctx.ulparams,res.f[0].h);
 		}

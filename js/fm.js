@@ -1288,7 +1288,7 @@ function initContextUI()
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
 		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');		
-		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
+		handleDialogContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
@@ -1299,7 +1299,7 @@ function initContextUI()
 		$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
-		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
+		handleDialogContent('.cloud-drive', 'ul', true, '.copy');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
 
@@ -1309,7 +1309,7 @@ function initContextUI()
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
 		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
-		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
+		handleDialogContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
 		$('.fm-dialog-overlay').removeClass('hidden');
 	});
@@ -4985,22 +4985,9 @@ function dialogPositioning(s)
 	$('.fm-dialog' + s + '-dialog').css('margin-top', '-' + $('.fm-dialog' + s + '-dialog').height()/2 + 'px');
 };
 
-function handleDialogTabContent(s, m, c, n, i)
+function handleDialogTabContent(s, m, n, c)
 {
-	$(n + '-dialog-txt').removeClass('active');
-	$(n + '-dialog-empty').removeClass('active');
-	$(n + '-dialog-button').removeClass('active');
-	$(n + '-dialog-tree-panel').removeClass('active');
-	$(n + '-dialog-panel-arrows').removeClass('active');
-	$('.dialog-sorting-menu').addClass('hidden');
-	
-	$(n + '-dialog-txt' + s).addClass('active');
-	var b;
-	// Added cause of conversations-container
-	if (typeof i === 'undefined') b = $('.content-panel' + s).html();
-	else b = $('.content-panel ' + i).html()
-	
-	b = b.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_');;
+	var b = c.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_');;
 	$(n + '-dialog-tree-panel' + s + ' .dialog-content-block')
 		.empty()
 		.html(b);
@@ -5013,7 +5000,25 @@ function handleDialogTabContent(s, m, c, n, i)
 	{
 		$(n + '-dialog-tree-panel' + s).addClass('active');
 		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').removeClass('hidden');						
-	}
+	}	
+}
+
+function handleDialogContent(s, m, c, n, i)
+{
+	$(n + '-dialog-txt').removeClass('active');
+	$(n + '-dialog-empty').removeClass('active');
+	$(n + '-dialog-button').removeClass('active');
+	$(n + '-dialog-tree-panel').removeClass('active');
+	$(n + '-dialog-panel-arrows').removeClass('active');
+	$('.dialog-sorting-menu').addClass('hidden');
+	
+	$(n + '-dialog-txt' + s).addClass('active');
+	var b;
+	// Added cause of conversations-container
+	if (typeof i === 'undefined') b = $('.content-panel' + s).html();
+	else b = $('.content-panel ' + i).html();
+
+	handleDialogTabContent(s, m, n, b);
 	//  'New Folder' button
 	if (c) $('.dialog-newfolder-button').removeClass('hidden');
 	else $('.dialog-newfolder-button').addClass('hidden');
@@ -5081,13 +5086,13 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
+					handleDialogContent('.cloud-drive', 'ul', true, '.copy');
                     break;
                 case 'shared-with-me':
-					handleDialogTabContent('.shared-with-me', 'ul', false, '.copy');
+					handleDialogContent('.shared-with-me', 'ul', false, '.copy');
                     break;
                 case 'conversations':
-					handleDialogTabContent('.conversations', 'div', false, '.copy', '.conversations-container');
+					handleDialogContent('.conversations', 'div', false, '.copy', '.conversations-container');
                     break;
             }
         }
@@ -5120,6 +5125,7 @@ function copyDialog()
 	$('.copy-dialog .dialog-newfolder-button').bind('click', function() {
 		$('.copy-dialog').addClass('arrange-to-back');
 		createfolderDialog();
+
 		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 	});
 	
@@ -5288,13 +5294,13 @@ function moveDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogTabContent('.cloud-drive', 'ul', true, '.move')
+					handleDialogContent('.cloud-drive', 'ul', true, '.move');
                     break;
                 case 'shared-with-me':
-					handleDialogTabContent('.shared-with-me', 'ul', false, '.move');
+					handleDialogContent('.shared-with-me', 'ul', false, '.move');
                     break;
                 case 'rubbish-bin':
-					handleDialogTabContent('.rubbish-bin', 'ul', true, '.move');
+					handleDialogContent('.rubbish-bin', 'ul', false, '.move');
                     break;
             }
         }
@@ -5327,6 +5333,7 @@ function moveDialog()
 	$('.move-dialog .dialog-newfolder-button').bind('click', function() {
 		$('.move-dialog').addClass('arrange-to-back');
 		createfolderDialog();
+		
 		$('.fm-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
 	});
 	
@@ -5577,6 +5584,20 @@ function linksDialog(close)
 	$('.fm-dialog.export-links-dialog').css('margin-top',$('.fm-dialog.export-links-dialog').outerHeight()/2*-1);
 }
 
+function refreshDialogContent()
+{
+	// Refresh dialog content with newly created directory
+	var b = $('.content-panel.cloud-drive').html();
+	if($.copyDialog)
+	{
+		handleDialogTabContent('.cloud-drive', 'ul', '.copy', b);
+	}
+	else if ($.moveDialog)
+	{
+		handleDialogTabContent('.cloud-drive', 'ul', '.move', b);
+	}	
+}
+
 function createfolderDialog(close)
 {
 	$.dialog = 'createfolder';
@@ -5614,6 +5635,7 @@ function createfolderDialog(close)
 		{
 			if (!$.cftarget) $.cftarget = M.currentdirid;
 			createfolder($.cftarget,$(this).val());
+//			refreshDialogContent();
 			createfolderDialog(1);
 		}
 	});
@@ -5640,6 +5662,7 @@ function createfolderDialog(close)
 		{
 			if (!$.cftarget) $.cftarget = M.currentdirid;
 			createfolder($.cftarget,v);
+//			refreshDialogContent();
 			createfolderDialog(1);
 		}
 	});

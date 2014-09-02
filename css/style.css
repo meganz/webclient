@@ -13815,6 +13815,12 @@ span.browsers-update {
 	white-space: nowrap;
 	position: relative;
 }
+.sync-button-block .sync-button {
+	min-width:224px;
+}
+.sync-button-block .sync-button:hover {
+	min-width:230px;
+}
 .sync-button.mac {
 	background-position: 15px -327px;
 }
@@ -13822,21 +13828,32 @@ span.browsers-update {
 	background-position: -462px -322px;
 }
 .sync-button-block {
-	display: inline-block
+	display:inline-block;
+	margin:0 48px;
+	height: 101px;
 }
 .sync-radio-buttons {
-	margin: -10px 0 10px 0;
-	display: inline-block;
+	padding:5px 0 0px 0;
 }
 .nautilus-lnk {
-	display: block;
-	padding: 5px 0 8px 0;
+	display:block;
+	padding:5px 0 8px 0;
 }
+.sync-button-block.linux {
+	padding-top:0;
+	
+}	
 .fm-version-select {
-	width: auto;
-	text-align: left;
-	margin: 0 3px 10px 3px;
+	min-width: 220px;
+	display:inline-block;
+	text-align:left; margin: 0; 
 	border-color: #d0d0d0;
+	height:34px;
+	line-height:30px;
+	background-position: right -6594px;
+}
+.version-select-txt {
+	line-height: 28px;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -13869,45 +13886,6 @@ span.browsers-update {
 }
 .sync-button-txt {
 	display: block;
-}
-.sync-context-menu {
-	min-width: 164px;
-	position: absolute;
-	background-color: #333333;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	z-index: 500;
-	padding: 8px 0;
-}
-.sync-menu-item, a.sync-menu-item {
-	display: block;
-	height: 32px;
-	line-height: 30px;
-	padding: 0 15px 0 20px;
-	font-size: 12px;
-	cursor: pointer;
-	position: relative;
-	color: rgba(204,204,204,1);
-	white-space: nowrap;
-	background-color: rgba(255,255,255,0);
-	-webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-}
-.sync-menu-item:hover, a.sync-menu-item:hover {
-	background-color: rgba(153,153,153,1);
-	color: white;
 }
 .new-app .sync-button-txt {
 	font-size: 16px;

@@ -11468,6 +11468,12 @@ span.browsers-update {
 	white-space: nowrap;
 	position: relative;
 }
+.sync-button-block .sync-button {
+	min-width: 224px;
+}
+.sync-button-block .sync-button:hover {
+	min-width: 230px;
+}
 .sync-button.mac {
 	background-position: 15px -327px;
 }
@@ -11475,18 +11481,32 @@ span.browsers-update {
 	background-position: -462px -322px;
 }
 .sync-button-block {
-	display:inline-block
+	display: inline-block;
+	margin: 0 48px;
+	height: 101px;
 }
 .sync-radio-buttons {
-	margin:-10px 0 10px 0;
-	display:inline-block;
+	padding: 5px 0 0px 0;
 }
 .nautilus-lnk {
-	display:block;
-	padding:5px 0 8px 0;
+	display: block;
+	padding: 5px 0 8px 0;
+}
+.sync-button-block.linux {
+	padding-top: 0;
 }
 .fm-version-select {
-	width:auto; text-align:left; margin:0 3px 10px 3px; border-color: #d0d0d0;
+	min-width: 220px;
+	display: inline-block;
+	text-align: left;
+	margin: 0;
+	border-color: #d0d0d0;
+	height: 34px;
+	line-height: 30px;
+	background-position: right -6594px;
+}
+.version-select-txt {
+	line-height: 28px;
 }
 .google-play-button {
 	background-position: -343px -1447px;

@@ -908,7 +908,8 @@ function topmenuUI()
 			{
 				$('.top-warning-popup').removeClass('active');
 				document.location.hash = 'register';
-			});			
+			});
+			if (page !== 'register') $('.top-warning-popup').addClass('active');
 		}
 		$('.top-menu-item.upgrade-your-account').show();
 		$('.top-menu-item.upgrade-your-account').text(l[129]);

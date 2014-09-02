@@ -1956,6 +1956,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         expectToBeResolved($promise, 'cant open chat')
             .done(function() {
+
                 var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
                 // fake user join
@@ -2022,23 +2023,33 @@ describe("Chat.js - Karere UI integration", function() {
                         /* meta */ {
                             'roomJid': megaRoom.roomJid
                         },
-                        /* delay */ 123
+                        /* delay */ 123,
+                        KarereEventObjects.OutgoingMessage.STATE.NOT_SENT
                     )
                 ];
 
+                megaRoom.setState(MegaChatRoom.STATE.READY);
                 megaRoom._flushMessagesQueue();
 
                 expect(megaRoom._messagesQueue.length).to.eql(0);
-                expect(megaRoom._messagesQueue.length).to.eql(0);
+
+
+
+
                 expect(megaChat.karere.sendRawMessage.callCount).to.eql(2);
 
                 expect(megaChat.karere.sendRawMessage.getCall(0).args[2]).to.eql("message contents");
+
                 // sync request, sent by the _flushMessageQueue
                 expect(megaChat.karere.sendRawMessage.getCall(1).args[1]).to.eql("action");
                 expect(megaChat.karere.sendRawMessage.getCall(1).args[3].action).to.eql("sync");
 
 
+
+
                 done();
             });
     });
+
+
 });

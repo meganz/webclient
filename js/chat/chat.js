@@ -774,6 +774,24 @@ MegaChat.prototype.init = function() {
                 }
 
             }
+        } else if(eventObject.getAction() == "delete-message") {
+            room = self.chats[meta.roomJid];
+            if(!room) { return; };
+
+            var msgId = meta.messageId;
+            if(!msgId) { return; };
+
+            var msgObject = room.getMessageById(msgId);
+            if(!msgObject) { return; };
+
+
+
+            // is this user the owner/creator of the message?
+            if(Karere.getNormalizedBareJid(eventObject.getFromJid()) == Karere.getNormalizedBareJid(msgObject.getFromJid())) {
+                msgObject.meta['isDeleted'] = true;
+                $('.fm-chat-message-container[data-id="' + msgId + '"]', room.$messages).remove();
+                room.refreshUI();
+            }
         } else {
             if(localStorage.d) {
                 console.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
@@ -1089,7 +1107,7 @@ MegaChat.prototype.connect = function() {
  * Incoming chat message handler
  *
  * @param e
- * @param eventObject {KarereEventObjects.IncomingMessage}
+ * @param eventObject {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage}
  * @private
  */
 MegaChat.prototype._onChatMessage = function(e, eventObject) {
@@ -1110,6 +1128,7 @@ MegaChat.prototype._onChatMessage = function(e, eventObject) {
             console.error("MegaChat is now processing incoming message: ", eventObject);
         }
     }
+    // detect outgoing VS incoming messages here + sync their state
 
     var room = self.chats[eventObject.getRoomJid()];
     if(room) {
@@ -1175,17 +1194,23 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
             if(self._syncRequests) {
                 $.each(self._syncRequests, function(k, v) {
                     if(v.userJid == diffUsers[0]) {
-                        console.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
+                        if(localStorage.d) {
+                            console.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
+                        }
+
                         v.timeoutHandler();
                         clearTimeout(v.timer);
                         return false; // break;
                     }
                 })
             }
-            var room = self.chats[eventObject.getRoomJid()];
-            if(room && room._waitingForOtherParticipants() === true) {
-                room._conversationEnded(eventObject.getFromJid());
+
+            var room = room = self.chats[eventObject.getRoomJid()];
+            if(room && room.state == MegaChatRoom.STATE.READY && room._waitingForOtherParticipants()) {
+                // other party/ies had left the room
+                room.setState(MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
             }
+
         } else {
             // they had joined
             var room = self.chats[eventObject.getRoomJid()];
@@ -2010,7 +2035,7 @@ MegaChat.prototype.sendBroadcastAction = function(toRoomJid, action, meta) {
         toRoomJid = undefined;
     }
 
-    var messageId = self.karere.generateMessageId(self.karere.getJid() + (toRoomJid ? toRoomJid : ""));
+    var messageId = self.karere.generateMessageId(self.karere.getJid() + (toRoomJid ? toRoomJid : ""), JSON.stringify([action, meta]));
 
     self.karere.sendAction(self.karere.getBareJid(), action, meta, messageId);
     if(toRoomJid) {
@@ -2077,14 +2102,14 @@ var MegaChatRoom = function(megaChat, roomJid) {
          * Change the state of the room to READY in case there was no response in timely manner. (e.g. there were no
          * users who responded for a sync call).
          */
-        'messageSyncFailAfterTimeout': 10000, // XX: why is this so slow? optimise please.
+        'messageSyncFailAfterTimeout': 20000, // XX: why is this so slow? optimise please.
 
         /**
          * Used to cleanup the memory from sent sync requests.
          * This should be high enough, so that it will be enough for a response to be generated (message log to be
          * encrypted), send and received.
          */
-        'syncRequestCleanupTimeout': 15000,
+        'syncRequestCleanupTimeout': 40000,
 
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
@@ -2622,6 +2647,32 @@ var MegaChatRoom = function(megaChat, roomJid) {
 //            M.renderContacts();
 //        };
     });
+
+
+    self.$messages
+        .undelegate('.delete-message', 'mousedown.megaChatDeleteMessage')
+        .delegate('.delete-message', 'mousedown.megaChatDeleteMessage', function(e) {
+            var $message = $(this).parents('.fm-chat-message-container');
+            if(!$message) { return; };
+
+            var messageId = $message.attr('data-id');
+            var msgObject = self.getMessageById(messageId);
+            if(!msgObject) {
+                return;
+            }
+
+            if(Karere.getNormalizedBareJid(msgObject.getFromJid()) == self.megaChat.karere.getBareJid()) {
+                msgObject.meta['isDeleted'] = true;
+                $('.fm-chat-message-container[data-id="' + messageId + '"]', self.$messages).remove();
+                self.refreshUI();
+
+                self.megaChat.sendBroadcastAction(self.roomJid, 'delete-message', {
+                    'messageId': messageId,
+                    'plaintext': true,
+                    'roomJid': self.roomJid
+                });
+            }
+        });
 
     self.megaChat.trigger('onRoomCreated', [self]);
 
@@ -3390,6 +3441,7 @@ MegaChatRoom.prototype.leave = function(notifyOtherDevices) {
         self.megaChat.sendBroadcastAction(self.roomJid, "conv-end", {roomJid: self.roomJid});
     }
 
+
     if(self.roomJid.indexOf("@") != -1) {
         self.setState(MegaChatRoom.STATE.LEAVING);
         return self.megaChat.karere.leaveChat(self.roomJid).done(function() {
@@ -3545,7 +3597,6 @@ MegaChatRoom.prototype.appendMessage = function(message) {
     self.messagesIndex[message.getMessageId()] = self.messages.push(
         message
     );
-
 
     var $message = self.megaChat.$message_tpl.clone().removeClass("template").addClass("fm-chat-message-container");
 
@@ -3711,12 +3762,72 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         self.renderContactTree();
     }
 
+    $(messageObject).bind("onStateChange", function(e, msgObj, oldVal, newVal) {
+        self._renderMessageState($message, msgObj)
+    });
+
+
+    if(messageObject instanceof KarereEventObjects.IncomingMessage || messageObject instanceof KarereEventObjects.OutgoingMessage) {
+        if(Karere.getNormalizedBareJid(messageObject.getFromJid()) == self.megaChat.karere.getBareJid()) {
+            // its my own message
+            var $controls = $('<a href="javascript:;" class="chat-button message-options delete-message">[delete]</a>');
+            $('.chat-message-txt', $message).after($controls);
+        }
+    }
+
+    self._renderMessageState($message, messageObject);
+
     self.refreshScrollUI();
     $jsp.scrollToBottom();
 
     self.trigger('activity');
+
 };
 
+
+MegaChatRoom.prototype._renderMessageState = function($message, messageObject) {
+    var self = this;
+
+
+    $message.removeClass("msg-state-sent msg-state-not-sent msg-state-delivered");
+    $('.resend', $message).fadeOut(function() {
+        $(this).remove();
+    });
+
+    if(!(messageObject instanceof KarereEventObjects.OutgoingMessage)) {
+        return;
+    }
+
+    if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.SENT) {
+        $message.addClass("msg-state-sent");
+    } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
+        $message.addClass("msg-state-not-sent");
+
+        if(self._waitingForOtherParticipants() === false) {
+            var $resendButton = $('<div class="fm-chat-file-button primary-button resend">re-send</div>');
+            $('.chat-message-txt', $message).append($resendButton);
+            $resendButton.hide();
+            $resendButton.on('click', function() {
+                self._sendMessageToXmpp(messageObject);
+            });
+            setTimeout(function() {
+                if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT && self._waitingForOtherParticipants() === false) {
+                    $resendButton.fadeIn();
+                }
+            }, 3000);
+        }
+    } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
+        $message.addClass("msg-state-delivered");
+    } else {
+        $message.addClass("msg-state-unknown");
+    }
+
+
+
+
+
+    self.refreshUI();
+};
 
 /**
  * Should take care of messages grouping (UI)
@@ -4049,20 +4160,47 @@ MegaChatRoom.prototype.handleSyncResponse = function(response) {
 
     $.each(meta.messages, function(k, msg) {
         // msg is a plain javascript object, since it passed JSON serialization, so now we will convert it to propper
-        // {KarereEventObjects.IncomingMessage}
-        self.appendMessage(new KarereEventObjects.IncomingMessage(
-            self.roomJid,
-            msg.fromJid,
-            "Message",
-            "Message",
-            msg.messageId,
-            undefined,
-            self.roomJid,
-            msg.meta,
-            msg.contents,
-            undefined,
-            msg.delay
-        ));
+        // {KarereEventObjects.IncomingMessage|KarereEventObjects.OutgoingMessage}
+        var msgObject = null;
+
+
+        // skip deleted messages
+        if(msg.meta && msg.meta.isDeleted) {
+            return;
+        }
+
+        if(Karere.getNormalizedBareJid(msg.fromJid) == self.megaChat.karere.getBareJid()) {
+            // Outgoing
+            //toJid, fromJid, type, messageId, contents, meta, delay, state
+            msgObject = new KarereEventObjects.OutgoingMessage(
+                msg.toJid,
+                msg.fromJid,
+                msg.type,
+                msg.messageId,
+                msg.contents,
+                msg.meta,
+                msg.delay,
+                msg.state
+            )
+        } else {
+            // Incoming
+            // toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay
+            msgObject = new KarereEventObjects.IncomingMessage(
+                msg.toJid,
+                msg.fromJid,
+                msg.type,
+                msg.rawType,
+                msg.messageId,
+                undefined,
+                self.roomJid,
+                msg.meta,
+                msg.contents,
+                undefined,
+                msg.delay
+            )
+        }
+
+        self.appendMessage(msgObject);
     });
 
     if((meta.chunkSize + meta.offset) >= meta.total) {
@@ -4127,22 +4265,23 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
     meta = meta || {};
 
 
+    var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
+    var eventObject = new KarereEventObjects.OutgoingMessage(
+        self.roomJid,
+        megaChat.karere.getJid(),
+        "groupchat",
+        messageId,
+        message,
+        meta,
+        unixtime()
+    );
+
+
     if(
         megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
             self.arePluginsForcingMessageQueue(message) ||
             (self.state != MegaChatRoom.STATE.READY && message.indexOf("?mpENC:") !== 0)
         ) {
-        var messageId = megaChat.karere.generateMessageId(self.roomJid);
-        var eventObject = new KarereEventObjects.OutgoingMessage(
-            self.roomJid,
-            megaChat.karere.getJid(),
-            "groupchat",
-            messageId,
-            message,
-            meta,
-            unixtime()
-        );
-
 
         var event = new $.Event("onQueueMessage");
 
@@ -4159,13 +4298,44 @@ MegaChatRoom.prototype.sendMessage = function(message, meta) {
             console.debug("Queueing: ", eventObject);
         }
 
+
         self._messagesQueue.push(eventObject);
 
         self.appendMessage(eventObject);
     } else {
-        megaChat.karere.sendRawMessage(self.roomJid, "groupchat", message, meta);
+        self._sendMessageToXmpp(eventObject);
     }
 };
+
+/**
+ * This method will:
+ * - eventually (if the user is connected) try to send this message to the xmpp server
+ * - mark the message as sent or unsent (if the user is not connected)
+ *
+ * @param messageObject {KarereEventObjects.OutgoingMessage}
+ */
+MegaChatRoom.prototype._sendMessageToXmpp = function(messageObject) {
+    var self = this;
+    var megaChat = this.megaChat;
+
+    var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
+
+    if(
+        megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
+            self.arePluginsForcingMessageQueue(messageObject) ||
+            (self.state != MegaChatRoom.STATE.READY && messageContents.indexOf("?mpENC:") !== 0)
+        ) {
+        messageObject.setState(KarereEventObjects.OutgoingMessage.STATE.NOT_SENT);
+
+        return false;
+    } else {
+        messageObject.setState(KarereEventObjects.OutgoingMessage.STATE.SENT);
+
+        return megaChat.karere.sendRawMessage(self.roomJid, "groupchat", messageObject.getContents(), messageObject.getMeta(), messageObject.getMessageId(), messageObject.getDelay());
+    }
+};
+
+/**
 
 /**
  * Alias for sendAction, which will queue the action in case the room/enc is not ready.
@@ -4404,6 +4574,8 @@ MegaChatRoom.prototype.resized = function(scrollToBottom) {
         self.$messages.height(scrollBlockHeight);
 
         self.refreshUI(scrollToBottom);
+    } else {
+        self.refreshUI();
     }
 };
 
@@ -4426,7 +4598,7 @@ MegaChatRoom.prototype._flushMessagesQueue = function() {
                 return; //continue;
             }
 
-            self.megaChat.karere.sendRawMessage(self.roomJid, "groupchat", v.getContents(), v.getMeta(), v.getMessageId(), v.getDelay());
+            self._sendMessageToXmpp(v);
         });
         self._messagesQueue = [];
     }

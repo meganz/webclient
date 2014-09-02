@@ -84,6 +84,14 @@ var EncryptionFilter = function(megaChat) {
             }
         );
 
+        megaRoom.bind("onStateChange", function(e, oldState, newState) {
+            if(newState == MegaChatRoom.STATE.LEAVING) {
+                if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+                    megaRoom.encryptionOpQueue.queue('quit');
+                }
+            }
+        });
+
 
         EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0]);
 
@@ -121,10 +129,12 @@ var EncryptionFilter = function(megaChat) {
          */
 
         // stop and wait for the crypto to be ready
-        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED) {
-            e.stopPropagation();
-            megaRoom.setState(MegaChatRoom.STATE.PLUGINS_PAUSED);
-        }
+//        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED) {
+
+        e.stopPropagation();
+        megaRoom.setState(MegaChatRoom.STATE.PLUGINS_PAUSED);
+
+//        }
     });
 
 
@@ -157,7 +167,7 @@ var EncryptionFilter = function(megaChat) {
         }
 
         // i'm the only user in the room, set state to ready.
-        if(megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT && users.length == 1) {
+        if((megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED) && users.length == 1) {
             megaRoom.setState(
                 MegaChatRoom.STATE.PLUGINS_READY
             );
@@ -207,13 +217,14 @@ var EncryptionFilter = function(megaChat) {
         // owner had left and i'm the new owner
 //        console.error("Left: ", users, leftUsers, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
         if($.inArray(users[0], leftUsers) !== -1 && users[1] == megaRoom.megaChat.karere.getJid()) {
-//            console.error("I'm the new owner of the room!")
+            if(localStorage.d) { console.error("I'm the new owner of the room [1]!"); }
 
             // sync users list w/ encryption (join/exclude);
             self.syncRoomUsersWithEncMembers(megaRoom);
 
         } else if(megaRoom.iAmRoomOwner()) {
             // i'm the owner
+            if(localStorage.d) { console.error("I'm the new owner of the room [2]!"); }
 
             // sync users list w/ encryption (join/exclude);
             self.syncRoomUsersWithEncMembers(megaRoom);
@@ -262,6 +273,7 @@ var EncryptionFilter = function(megaChat) {
 
     // outgoing
     megaChat.karere.bind("onOutgoingMessage", processOutgoing);
+
 
 
     logAllCallsOnObject(this, console.error, true, "encFilter");
@@ -521,7 +533,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
         );
     });
 
-    $.when.apply($.when, promises)
+    return $.when.apply($.when, promises)
         .always(function() {
 //                console.error("#PING got state // users to join:", joinUsers);
 //                console.error("#PING got state // users to exclude:", excludeUsers);
@@ -578,7 +590,6 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                 if(excludeUsers.length > 0) {
                     megaRoom.encryptionOpQueue.queue('exclude', excludeUsers);
                 }
-
             } else {
                 // first exclude, then join
                 if(excludeUsers.length > 0) {
@@ -588,7 +599,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                     megaRoom.encryptionOpQueue.queue('join', joinUsers);
                 }
             }
-        })
+        });
 };
 
 /**
@@ -757,7 +768,7 @@ EncryptionFilter.prototype.processMessage = function(e, megaRoom, wireMessage) {
 EncryptionFilter.prototype.messageShouldNotBeEncrypted = function(eventObject) {
     if(eventObject.getMeta().action) {
         return false;
-    } else if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
+    } else if(eventObject.getMeta().plaintext || (eventObject.isEmptyMessage() && !eventObject.getMeta().attachments)) {
         return true;
     } else {
         return false;

@@ -621,11 +621,10 @@ describe("Karere Unit Test", function() {
         expect(promiseLeave.state()).to.equal('resolved');
 
 
+        // should be empty, since i'd left the room
         expect(
             k1.getOrderedUsersInChat(roomJid)
-        ).to.eql([
-                k1.getJid()
-            ]);
+        ).to.eql([]);
 
         done();
     });

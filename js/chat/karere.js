@@ -861,12 +861,16 @@ makeMetaAware(Karere);
     /**
      * Helper method to generate a message ID, based on the target JID
      * @param toJid {String} jid of the recipient
+     * @param [messageContents] {String} optional, message content
      * @returns {String}
      */
-    Karere.prototype.generateMessageId = function(toJid) {
+    Karere.prototype.generateMessageId = function(toJid, messageContents) {
         var self = this;
-        //TODO: THIS IS STUPID! the message ID should be unique, primary key
-        return fastHashFunction(self.getJid() + toJid) + "_" + unixtime()
+        var messageIdHash = self.getJid() + toJid;
+        if(messageContents) {
+            messageIdHash += messageContents;
+        }
+        return "m" + fastHashFunction(messageIdHash) + "_" + unixtime()
     };
 
 
@@ -1520,7 +1524,7 @@ makeMetaAware(Karere);
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
-            var msg = $pres({id: self.generateMessageId()})
+            var msg = $pres({id: self.generateMessageId("presence", status)})
                 .c("show")
                 .t(presence)
                 .up()
@@ -1649,7 +1653,10 @@ makeMetaAware(Karere);
 
         meta = meta || {};
         type = type || "chat";
-        messageId = messageId || self.generateMessageId(toJid);
+
+        var strContents = contents instanceof Strophe.Builder ? contents.toString() : contents;
+
+        messageId = messageId || self.generateMessageId(toJid, JSON.stringify([type, strContents, meta]));
 
         var outgoingMessage = new KarereEventObjects.OutgoingMessage(
             toJid,
@@ -2030,6 +2037,8 @@ makeMetaAware(Karere);
             roomJid,
             undefined,
             Karere._exceptionSafeProxy(function() {
+                self.clearMeta('rooms', roomJid);
+
                 $promise.resolve();
             }),
             exitMessage
@@ -2386,7 +2395,7 @@ makeMetaAware(Karere);
                 }
             });
 
-            var messageId = self.generateMessageId(targetFullUserJid);
+            var messageId = self.generateMessageId(targetFullUserJid, "ping");
 
             var msg = $iq({
                 from: self.getJid(),
@@ -2446,7 +2455,7 @@ makeMetaAware(Karere);
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
             var msg = $iq({
-                id: self.generateMessageId(),
+                id: self.generateMessageId(bareJid, "subscribe"),
                 type: "set"
             })
                 .c("query", {
@@ -2480,7 +2489,7 @@ makeMetaAware(Karere);
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
             var msg = $iq({
-                id: self.generateMessageId(),
+                id: self.generateMessageId(bareJid, "unsubscribe"),
                 type: "set"
             })
                 .c("query", {

@@ -232,12 +232,21 @@ OpQueue.prototype.pop = function() {
                 op[1] = op1; // replace
             }
 
-            if(op[1].length == 0 && op[0] != "recover") {
+            if(localStorage.d) {
+                if(op[0] == "processMessage") {
+                    console.error("Will process message with contents: ", mpenc.codec.inspectMessageContent(op[1]));
+                }
+            }
+
+
+            if(op[1].length == 0 && op[0] != "recover" && op[0] != "quit") {
                 if(localStorage.d) {
                     console.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
                 }
             } else {
                 try {
+                    if(op[0] == "quit") { debugger; }
+
                     self.ctx[op[0]](op[1], op[2], op[3]);
                 } catch(e) {
                     if(op[0] == "processMessage" || e.name == "TypeError") {
@@ -245,6 +254,7 @@ OpQueue.prototype.pop = function() {
                             debugger;
                         }
                     }
+
                     console.error("OpQueue caught mpenc exception: ", e, op);
                 }
             }

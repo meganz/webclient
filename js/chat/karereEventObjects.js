@@ -950,9 +950,10 @@ KarereEventObjects.InviteMessage.prototype.isEmptyMessage = function() {
  * @param [contents] {string} Message text contents
  * @param [meta] {Object} Attached META for this message (can be any JavaScript plain object)
  * @param [delay] {number} Unix time stamp saying when this message was sent
+ * @param [state] {number} State of this message (see {KarereEventObjects.OutgoingMessage.STATE.*})
  * @constructor
  */
-KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, contents, meta, delay) {
+KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, contents, meta, delay, state) {
     this.setToJid(toJid);
     this.setFromJid(fromJid);
     this.setType(type);
@@ -960,6 +961,12 @@ KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, c
     this.setContents(contents);
     this.setMeta(meta);
     this.setDelay(delay);
+    this.setState(state);
+};
+KarereEventObjects.OutgoingMessage.STATE = {
+    'SENT': 10,
+    'NOT_SENT': 20,
+    'DELIVERED': 30
 };
 /**
  * Getter for property `toJid`
@@ -1089,6 +1096,30 @@ KarereEventObjects.OutgoingMessage.prototype.getDelay = function() {
  */
 KarereEventObjects.OutgoingMessage.prototype.setDelay = function(val) {
     this.delay = val || unixtime();
+    return this;
+};
+/**
+ * Getter for property `state`
+ *
+ * @returns {(number|KarereEventObjects.OutgoingMessage.STATE.NOT_SENT)} State of this message (see {KarereEventObjects.OutgoingMessage.STATE.*})
+ */
+KarereEventObjects.OutgoingMessage.prototype.getState = function() {
+    return this.state;
+};
+/**
+ * Setter for property `state`
+ *
+ * @note: triggers onStateChange event (using jQuery), with arguments [this, oldValue, newValue]
+ *
+ * @param [val] {number} State of this message (see {KarereEventObjects.OutgoingMessage.STATE.*})
+ * @returns {KarereEventObjects.OutgoingMessage}
+ */
+KarereEventObjects.OutgoingMessage.prototype.setState = function(val) {
+    var oldVal = this.state;
+    this.state = val || KarereEventObjects.OutgoingMessage.STATE.NOT_SENT;
+    if (oldVal != this.state) {
+        jQuery(this).trigger("onStateChange", [this, oldVal, this.state]);
+    }
     return this;
 };
 /**

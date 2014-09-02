@@ -11599,6 +11599,9 @@ span.browsers-update {
 	color: #3F4646;
 	padding: 10px 0 0 0;
 }
+.sync-bottom-txt.linux {
+	text-align:left;
+}
 .mobile-small-icon {
 	width: 80px;
 	height: 78px;

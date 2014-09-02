@@ -562,7 +562,7 @@ label span.black {
 	right: -27px;
 	top: 0;
 }
-.select_box select, .fm-account-select select {
+.select_box select, .fm-account-select select, .fm-version-select select {
 	border: 0;
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
@@ -6473,7 +6473,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 16px;
 	right: 40px;
 }
-.create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select, .rename-input-bl {
+.create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select, .rename-input-bl, .fm-version-select {
 	float: left;
 	width: 235px;
 	background-color: rgba(0,0,0,0.05);
@@ -6516,7 +6516,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 background: rgba(0,0,0,0.3);
 color: white;
 }
-.focused .create-folder-input-bl, .focused .fm-account-input, .focused .fm-account-select, .focused .rename-input-bl {
+.focused .create-folder-input-bl, .focused .fm-account-input, .focused .fm-account-select, .focused .rename-input-bl, .focused .fm-version-select {
 	background-color: rgba(0,0,0,0.2);
 }
 .focused .create-folder-input-bl input, .focused .rename-input-bl input {
@@ -6555,14 +6555,14 @@ color: white;
 	padding: 7px 10px 0 10px;
 	background-image: none;
 }
-.fm-account-select {
+.fm-account-select, .fm-version-select {
 	background-position: right -6593px;
 	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0;
 	position: relative;
 }
-.fm-account-select select {
+.fm-account-select select, .fm-version-select select {
 	height: 32px;
 	width: 100%;
 	padding: 0;
@@ -8367,26 +8367,23 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.6);
 }
 .active.new-start-arrow-button {
-	color: #333333;
+	color: white;
 	float: left;
 	margin: 0;
 	cursor: pointer;
 	height: 34px;
-	line-height: 28px;
-	border: 2px solid #d9d9d9;
+	line-height: 32px;
 	padding: 0 37px 0 15px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 	background-image: url(../images/mega/new-start-full.png);
-	background-position: right -540px;
+	background-position: right -578px;
 	background-repeat: no-repeat;
 }
 .active.new-start-arrow-button.how-it-works {
-	background-color: #333333;
 	color: white;
-	background-position: -275px -514px;
-	border: 2px solid #6d6d6d;
+	background-position: right -578px;
 	padding: 0 15px 0 37px;
 }
 .active.new-start-arrow-button.download-now {
@@ -8398,8 +8395,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .active.new-start-arrow-button:hover {
 	background-color: #b2b2b2;
-	border: 2px solid #b2b2b2;
-	background-position: right -580px;
+	background-position: right -578px;
 	color: white;
 }
 .active.new-start-arrow-button.how-it-works:hover {
@@ -8630,14 +8626,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-dialog-button.dialog-share-button:hover {
 	background-color: rgba(255,179,0,1);
 }
-.fm-dialog-button.move-button, .fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-move-button,.fm-dialog-button.dialog-newfolder-button, .confirmation-dialog .fm-dialog-button.notification-button.confirm {
+.fm-dialog-button.move-button, .fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-move-button, .fm-dialog-button.dialog-newfolder-button, .confirmation-dialog .fm-dialog-button.notification-button.confirm {
 	background-color: rgba(109,176,63,0.7);
 }
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
 	margin-left: 12px;
 }
-.fm-dialog-button.move-button:hover, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-move-button:hover,.fm-dialog-button.dialog-newfolder-button:hover, .confirmation-dialog .fm-dialog-button.notification-button.confirm:hover {
+.fm-dialog-button.move-button:hover, .fm-dialog-button.dialog-copy-button:hover, .fm-dialog-button.dialog-move-button:hover, .fm-dialog-button.dialog-newfolder-button:hover, .confirmation-dialog .fm-dialog-button.notification-button.confirm:hover {
 	background-color: rgba(109,176,63,1);
 }
 .clear-bin-dialog .fm-dialog-button.notification-button.confirm, .confirmation-dialog.remove-dialog .fm-dialog-button.notification-button.confirm {
@@ -13820,7 +13816,7 @@ span.browsers-update {
 	margin: 3px;
 	cursor: pointer;
 	padding: 6px 15px 0 0;
-	background-image: url(../images/mega/mobile-sprite-v2.png?v=4);
+	background-image: url(../images/mega/mobile-sprite-v5.png?v=4);
 	background-repeat: no-repeat;
 	background-position: -462px -248px;
 	-moz-box-sizing: border-box;
@@ -13831,9 +13827,47 @@ span.browsers-update {
 	border-radius: 5px;
 	text-align: left;
 	white-space: nowrap;
+	position: relative;
+}
+.sync-button-block .sync-button {
+	min-width:224px;
+}
+.sync-button-block .sync-button:hover {
+	min-width:230px;
 }
 .sync-button.mac {
 	background-position: 15px -327px;
+}
+.sync-button.linux {
+	background-position: -462px -322px;
+}
+.sync-button-block {
+	display:inline-block;
+	margin:0 48px;
+	height: 101px;
+}
+.sync-radio-buttons {
+	padding:5px 0 0px 0;
+}
+.nautilus-lnk {
+	display:block;
+	padding:5px 0 8px 0;
+}
+.sync-button-block.linux {
+	padding-top:0;
+	
+}	
+.fm-version-select {
+	min-width: 220px;
+	display:inline-block;
+	text-align:left; margin: 0; 
+	border-color: #d0d0d0;
+	height:34px;
+	line-height:30px;
+	background-position: right -6594px;
+}
+.version-select-txt {
+	line-height: 28px;
 }
 .google-play-button {
 	background-position: -343px -1447px;
@@ -13863,6 +13897,9 @@ span.browsers-update {
 	background-image: url(../images/mega/chrome-app.png);
 	background-repeat: no-repeat;
 	background-position: -230px -612px;
+}
+.sync-button-txt {
+	display: block;
 }
 .new-app .sync-button-txt {
 	font-size: 16px;
@@ -17231,11 +17268,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-color: white;
 }
 .ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
-	display: block;
+	display: inline-block;
+	min-width: 234px;
+	width: auto;
 	border-color: #8d8c8c;
 }
 .ads-bottom-block .sync-button:hover, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
 	border-color: #DB3200;
+	min-width: 240px;
 }
 .ads-left-block rect, .ads-right-block rect {
 	fill: rgba(255,55,255,0);
@@ -18388,7 +18428,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background: #222222;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIyMjIyMiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMTExMTEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
 	background: -moz-linear-gradient(top, #222222 0%, #111111 100%);
-	z-index:3000;
+	z-index: 3000;
 }
 .video-row {
 	position: relative;
@@ -18438,6 +18478,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: transparent;
 	border-color: rgba(255,255,255,0.2);
 	margin: 4px;
+
 }
 .video-row .video-call-button:hover {
 	border-color: rgba(255,255,255,0.5);
@@ -18488,79 +18529,25 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	box-sizing: border-box;
 	text-align: center;
 	vertical-align: middle;
-	perspective: 1000;
-}
-.video-full-canvas, .video-full-canvas .front, .video-full-canvas .back, .video-fliper {
-	height: 100%;
-}
-.video-full-canvas {
-	-webkit-perspective: 1000;
-	-moz-perspective: 1000;
-	-ms-perspective: 1000;
-	perspective: 1000;
-	-ms-transform: perspective(1000px);
-	-moz-transform: perspective(1000px);
-	-moz-transform-style: preserve-3d;
-	-ms-transform-style: preserve-3d;
-}
-.video-full-canvas.video-off .back {
-	-webkit-transform: rotateY(0deg);
-	-moz-transform: rotateY(0deg);
-	-o-transform: rotateY(0deg);
-	-ms-transform: rotateY(0deg);
-	transform: rotateY(0deg);
-}
-.video-full-canvas.video-off .front {
-	-webkit-transform: rotateY(180deg);
-	-moz-transform: rotateY(180deg);
-	-o-transform: rotateY(180deg);
-	transform: rotateY(180deg);
-}
-.video-fliper {
-	-webkit-transition: 0.6s;
-	-webkit-transform-style: preserve-3d;
-	-ms-transition: 0.6s;
-	-moz-transition: 0.6s;
-	-moz-transform: perspective(1000px);
-	-moz-transform-style: preserve-3d;
-	-ms-transform-style: preserve-3d;
-	transition: 0.6s;
-	transform-style: preserve-3d;
-	position: relative;
-}
-.video-full-canvas .front, .video-full-canvas .back {
-	-webkit-backface-visibility: hidden;
-	-moz-backface-visibility: hidden;
-	-ms-backface-visibility: hidden;
-	backface-visibility: hidden;
-	-webkit-transition: 0.6s;
-	-webkit-transform-style: preserve-3d;
-	-moz-transition: 0.6s;
-	-moz-transform-style: preserve-3d;
-	-o-transition: 0.6s;
-	-o-transform-style: preserve-3d;
-	-ms-transition: 0.6s;
-	-ms-transform-style: preserve-3d;
-	transition: 0.6s;
-	transform-style: preserve-3d;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-.video-full-canvas .front {
-	-webkit-transform: rotateY(0deg);
-	-ms-transform: rotateY(0deg);
-	z-index: 2;
-}
-.video-full-canvas .back {
-	-webkit-transform: rotateY(-180deg);
-	-moz-transform: rotateY(-180deg);
-	-o-transform: rotateY(-180deg);
-	-ms-transform: rotateY(-180deg);
-	transform: rotateY(-180deg);
+	position:relative;
 }
 .video-full-canvas img, .video-full-canvas canvas {
 	width: 100%;
+}
+.video-off .video-canvas-flip-side {
+	position:absolute;
+}
+.video-transparent-border {
+	position:absolute;
+	width:100%;
+	height:100%;
+	border:1px solid rgba(255,255,255,0.1);
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-background-clip: border-box;
+    background-clip: border-box;
+	z-index:10;
 }
 .video-full-buttons {
 	position: absolute;
@@ -18572,16 +18559,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	top: 50%;
 	margin: -24px 0 0 -84px;
 }
+.video-relative-block {
+	position:relative;
+	width:100%;
+	height:100%;
+}
 .video-full-disabled-block {
 	height: 100%;
 	width: 100%;
 	background: #4c4c4c;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRjNGM0YyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYjJiMmIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	border: 1px solid #5e5e5e;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	position: relative;
+	position: absolute;
+	-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+-moz-opacity: 0;
+-khtml-opacity: 0;
+opacity: 0;
+top:0;
+}
+
+.video-off .video-full-disabled-block {
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+-moz-opacity: 1;
+-khtml-opacity: 1;
+opacity: 1;
+z-index:5;
 }
 .video-full-disabled-icon {
 	background-image: url(../images/mega/chat-sprite.svg);
@@ -18992,7 +18998,7 @@ background-size: 90px auto;
  background-image:url(../images/mega/register-info@2x.png);
 background-size:120px auto;
 }
-.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .fm-account-select, .fm-chat-view-icon, .fm-chat-attach-file, .active .fm-dialog-input-clear, .fm-share-add-contacts, .fm-share-pointer, .fm-share-contacts-search, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
+.orange-dropdown, a.orange-dropdown:link, a.orange-dropdown:visited, a.orange-dropdown:active, .download-checkbox .checkboxOff, .tips .checkboxOff, .browsers .checkboxOff, .affiliate-block.a-form .checkboxOff, .fm-dialog .checkboxOff, .fm-account-blocks .checkboxOff, .top-login-popup .checkboxOff, .new-registration-checkbox .checkboxOff, .download-checkbox .checkboxOn, .tips .checkboxOn, .browsers .checkboxOn, .affiliate-block.a-form .checkboxOn, .fm-dialog .checkboxOn, .fm-account-blocks .checkboxOn, .top-login-popup .checkboxOn, .new-registration-checkbox .checkboxOn, .notification-settings, .fm-connector-first.active, .fm-connector.mid, .fm-connector.vertical-line, .fm-connector.last, .current .fm-connector, .fm-horizontal-connector.active, .fm-tree-folder, .fm-tree-folder.contains-folders span, .fm-tree-folder.contains-folders.active.dragover span, .fm-tree-folder.contains-folders.dragover span, .fm-tree-folder.contains-folders.expanded span, .fm-tree-folder.expanded span, .fm-tree-folder.contains-folders.expanded.active.dragover span, .fm-tree-folder.expanded.active.dragover span, .fm-tree-folder.contains-folders.expanded.dragover span, .fm-tree-folder.expanded.dragover span, .fm-tree-folder.contains-folders.active.expanded span, .fm-tree-folder.active.expanded span, .language-popup-icon, .notification-popup-icon, .contains-value .top-search-clear, .fm-menu-item, .contacts-sorting-by.active, .contacts-sorting-type.active, .fm-account-select, .fm-version-select, .fm-chat-view-icon, .fm-chat-attach-file, .active .fm-dialog-input-clear, .fm-share-add-contacts, .fm-share-pointer, .fm-share-contacts-search, .fm-share-dropdown, .account-history-dropdown-button, .fm-share-permissions-block, .account-history-dropdown, .fm-share-permissions.active, .account-history-drop-items.active, .export-links-warning-close, .properties-caution-arrow, .properties-contact-close, .properties-arrow, .properties-contact-delete, .st-get-started-block, .account-warning-ico, .new-notifications-txt, .warning-gray-icon .search-files-result, .search-messages-result, .search-path-icon.cloud-drive, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon.recycle-item, .search-path-icon.contacts-item, .search-path-icon.inbox-item, .search-path-arrow {
 background-image: url(../images/mega/main-sprite@2x.png?v=7);
 background-size: 50px auto;
 }
@@ -19738,7 +19744,7 @@ transform: rotate(900deg);
 	right: -2px;
 	left: auto !important;
 }
-body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
+body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .rtl a:active, .rtl div, .rtl .nlanguage-lnk, .rtl a.nlanguage-lnk, .rtl a.nlanguage-lnk:link, .rtl a.nlanguage-lnk:visited, .rtl a.nlanguage-lnk:hover, .rtl a.nlanguage-lnk:active, .rtl .nlanguage-tooltip-main, .rtl .nlanguage-bottom, .rtl .password-stutus-txt, .rtl .select_box option, .rtl .select_box span.select-txt, .rtl .select_box select, .rtl .fm-account-select select, .rtl .fm-version-select select, .rtl .account-manage-button, .rtl a.account-manage-button, .rtl a.account-manage-button:link, .rtl a.account-manage-button:visited, .rtl a.account-manage-button:active, .rtl .account-bandwidth-txt, .rtl .account-tooltip-txt1, .rtl .account-tooltip-txt2, .rtl .account-set-txt, .rtl .account-counter-percents, .rtl .nt-settings-txt, .rtl .radio-txt, .rtl .terms-main, .rtl .slingshot-main, .rtl .blog-article li, .rtl .blog-article h2, .rtl .blog-date, .rtl .blog-short-content, .rtl .blog-button, .rtl a.blog-button, .rtl a.blog-button:link, .rtl a.blog-button:visited, .rtl a.blog-button:active, .rtl a.blog-button:hover, .rtl .blog-article p, .rtl .notification-info, .rtl .notification-date, .rtl .nt-info-txt, .rtl .nt-red-bar, .rtl .nt-back-button span, .rtl .blog-new.new-bottom-pages h2, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .blog-new-right h1, .rtl .new-bottom-pages .blog-new-item p, .rtl p .blog-new-read-more, .rtl p a.blog-new-read-more, .rtl a.blog-new-archive-lnk, .rtl .blog-new-full ul li, .rtl .sync li, .rtl .affiliate li, .rtl .pro li, .rtl .blog-new-number, .rtl .membership-status, .rtl .user-name, .rtl a.user-name, .rtl .contacts-sorting-by, .rtl .contacts-sorting-type, .rtl .membership-notification, .rtl .top-menu-item.contains-submenu, .rtl .st-main-info, .rtl .st-red-header, .rtl .st-blocks-header, .rtl strong, .rtl .nt-circle-date, .rtl .nt-circle-month, .rtl .blog-new-small, .rtl .blog-browser-title, .rtl .blog-dev-titles, .rtl .new-bottom-pages .blog-new-full p.strong-paragraph, .rtl .blog-new-full .blog-dark, .rtl .blog-new-num-txt.strong-header, .rtl .browsers-info-header, .rtl .fm-chat-user, .rtl .fm-chat-verification-head, .rtl .fm-chat-verification-skipped, .rtl .fm-chat-verified-head, .rtl .nw-bottom-header, .rtl .new-reg-status-pad strong, .rtl .reg-st3-big-txt, .rtl .reg-st3-checkbox-label, .rtl .reg-st3-percents, .rtl .new-bottom-pages p span.number, .rtl .new-bottom-pages h2 span.number, .rtl .diagonal, .rtl .sync-subheader, .rtl .sync-button-txt, .rtl strong, .rtl b, .rtl .dev-new-button, .rtl .new-bottom-pages .help-info-pages p strong, .rtl .new-bottom-pages .help-info-pages p b, .rtl .st-member-ship-right-bl, .rtl a.ff-extension-button, .rtl .st-blocks-header a, .rtl .st-blocks-header a:link, .rtl .st-blocks-header a:visited, .rtl .st-blocks-header a:hover, .rtl .st-blocks-header a:active, .rtl .st-dark-gray-txt, .rtl .st-mid-header, .rtl h3.main-italic-header, .rtl h5.main-italic-header, .rtl .reg-success-header, .rtl .reg-st3-save-txt, .rtl .reg-st5-key-gen, .rtl .download-error-title, .rtl .new-bottom-pages h1, .rtl .terms-main h1, .rtl .new-bottom-pages h2, .rtl .terms-main h2, .rtl .team-person-name, .rtl .browsers-header, .rtl .credits-title, .rtl .credits-info, .rtl .pro-icons-block, .rtl .pro-mid-header, .rtl .pro-star-button, .rtl .pro-bottom-header, .rtl .mobile-text-header, .rtl .privacy-company-header, .rtl .new-affiliate-mid-header, .rtl .new-affiliate-bot-header, .rtl .new-affiliate-icon-title, .rtl .contact-new-title, .rtl .dev-new-app-header, .rtl span.roman-number, .rtl .help-short-icon, .rtl .new-bottom-pages .help-info-pages p strong.italic, .rtl .new-bottom-pages .help-info-pages p i, .rtl .st-top-italic-txt {
 	direction: rtl;
 }
 .rtl .nlanguage-bottom {

@@ -1286,7 +1286,7 @@ function initContextUI()
 	$(c+'.advanced-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-		$('.copy-dialog .dialog-move-button').addClass('active');
+		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');		
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
@@ -1301,14 +1301,13 @@ function initContextUI()
 		$('.copy-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
 		$('.fm-dialog-overlay').removeClass('hidden');
-//		$('.fm-copy-dialog-body').jScrollPane({showArrows:true, arrowSize:5,animateScroll: true});
 	});
 
 	$(c+'.move-item').unbind('click');
 	$(c+'.move-item').bind('click',function(event)
 	{
 		$.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-		$('.copy-dialog .dialog-move-button').addClass('active');
+		$('.move-dialog .dialog-move-button').addClass('active');
 		$('.move-dialog').removeClass('hidden');
 		handleDialogTabContent('.cloud-drive', 'ul', true, '.move');
 		disableCircularTargets('#mctreea_');
@@ -5015,7 +5014,7 @@ function handleDialogTabContent(s, m, c, n, i)
 		$(n + '-dialog-tree-panel' + s).addClass('active');
 		$(n + '-dialog-tree-panel' + s + ' ' + n + '-dialog-panel-header').removeClass('hidden');						
 	}
-	// Create New Folder button
+	//  'New Folder' button
 	if (c) $('.dialog-newfolder-button').removeClass('hidden');
 	else $('.dialog-newfolder-button').addClass('hidden');
 
@@ -5042,21 +5041,29 @@ function copyDialog()
 	function selectCopyDialogTabRoot(section)
 	{
 		$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
-            switch (section)
-            {
-                case 'cloud-drive':
-					$.mcselected = M.RootID;
-                    break;
-                case 'shared-with-me':
-					$.mcselected = 'shares';
-                    break;
-                case 'conversations':
-					$.mcselected = 'chat';
-                    break;
-				default:
-					$.mcseleced = M.RootID;
-					break;
-            }		
+		var $lbl = $('.dialog-copy-button');
+		switch (section)
+		{
+			case 'cloud-drive':
+				$.mcselected = M.RootID;
+				$lbl.text('Paste');
+                break;
+			case 'shared-with-me':
+				$.mcselected = undefined;
+				$lbl.text(l[1344]);
+				$lbl.addClass('disabled');
+				break;
+			case 'conversations':
+				$.mcselected = undefined;
+				$lbl.text(l[1940]);					
+				$lbl.addClass('disabled');
+				break;
+			default:
+				$.mcseleced = undefined;
+				$lbl.text('Paste');
+				$lbl.addClass('disabled');
+				break;
+		}		
 	};
 	
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
@@ -5069,11 +5076,12 @@ function copyDialog()
     $('.copy-dialog-button').bind('click', function() {
 		var section = $(this).attr('class').split(" ")[1];
 		selectCopyDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1) {
+        if ($(this).attr('class').indexOf('active') == -1)
+		{
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy')
+					handleDialogTabContent('.cloud-drive', 'ul', true, '.copy');
                     break;
                 case 'shared-with-me':
 					handleDialogTabContent('.shared-with-me', 'ul', false, '.copy');
@@ -5123,7 +5131,8 @@ function copyDialog()
 		M.buildtree(M.d[$.mcselected]);
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
-		
+		var $btn = $('.dialog-copy-button');
+
 		var c = $(e.target).attr('class');
 		// Sub-folder exist?
 		if (c && c.indexOf('nw-fm-arrow-icon') > -1)
@@ -5163,17 +5172,60 @@ function copyDialog()
 			// unselect previously selected item
 			$('.copy-dialog .nw-fm-tree-item').removeClass('selected');
 			$(this).addClass('selected');
+			$btn.removeClass('disabled');
 		}
 		else $.mcselected = old;
+		
+		// Disable action button if there is no selected items
+		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 	
+	// Handle conversations tab item selection
+	$('.copy-dialog').off('click', '.nw-conversations-item');
+	$('.copy-dialog').on('click', '.nw-conversations-item', function()
+	{
+		if (!$(this).is('.selected'))
+		{
+			$.mcselected = $(this).attr('id').replace('contact2_','');
+			var $btn = $('.dialog-copy-button');
+
+			// unselect previously selected item
+			$('.copy-dialog .nw-conversations-item').removeClass('selected');
+			$(this).addClass('selected');
+			$btn.removeClass('disabled');
+
+			// Disable action button if there is no selected items
+			if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
+		}
+	});
+
 	$('.copy-dialog .dialog-copy-button').unbind('click');
 	$('.copy-dialog .dialog-copy-button').bind('click', function()
 	{
-		var n = [];
-		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
-		closeDialog();
-		M.copyNodes(n, $.mcselected);
+		if (typeof $.mcselected != 'undefined')
+		{
+			var section = $('.fm-dialog-title .copy-dialog-txt.active').attr('class').split(" ")[1];// Get active tab
+			selectCopyDialogTabRoot(section);
+			switch (section)
+			{
+				case 'cloud-drive':
+					var n = [];
+					for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+					closeDialog();
+					M.copyNodes(n, $.mcselected);
+					break;
+				case 'shared-with-me':
+					// ToDo: Not clear for what this is used
+					break;
+				case 'conversations':
+					var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
+					if($selectedConv.size() > 0)
+						megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+					break;
+				default:
+					break;
+			}
+	}
 		
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
@@ -5199,20 +5251,25 @@ function moveDialog()
 	function selectMoveDialogTabRoot(section)
 	{
 		$('.move-dialog .nw-fm-tree-item').removeClass('selected');
-            switch (section)
-            {
-                case 'cloud-drive':
-					$.mcselected = M.RootID;
-                    break;
-                case 'shared-with-me':
-					$.mcselected = 'shares';
-                    break;
-                case 'rubbish-bin':
-					$.mcselected = M.RubbishID;
-                    break;
-				default:
-					$.mcseleced = M.RootID;
-					break;
+		var $lbl = $('.dialog-move-button');
+		switch (section)
+		{
+			case 'cloud-drive':
+				$.mcselected = M.RootID;
+				$lbl.text(l[62]);
+				break;
+			case 'shared-with-me':
+				$.mcselected = undefined;
+				$lbl.text(l[1344]);
+				break;
+			case 'rubbish-bin':
+				$.mcselected = M.RubbishID;
+				$lbl.text(l[62]);
+				break;
+			default:
+				$.mcseleced = undefined;
+				$lbl.text(l[62]);
+				break;
             }
 	};
 	
@@ -5226,7 +5283,8 @@ function moveDialog()
     $('.move-dialog-button').bind('click', function(e) {
         var section = $(this).attr('class').split(" ")[1];
 		selectMoveDialogTabRoot(section);
-        if ($(this).attr('class').indexOf('active') == -1) {
+        if ($(this).attr('class').indexOf('active') == -1)
+		{
             switch (section)
             {
                 case 'cloud-drive':
@@ -5281,6 +5339,7 @@ function moveDialog()
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
 		disableCircularTargets('#mctreea_');
+		var $btn = $('.dialog-move-button');
 
 		var c = $(e.target).attr('class');
 		// Sub-folder exist?
@@ -5321,18 +5380,24 @@ function moveDialog()
 			// unselect previously selected item
 			$('.move-dialog .nw-fm-tree-item').removeClass('selected');
 			$(this).addClass('selected');
+			$btn.removeClass('disabled');
 		}
 		else $.mcselected = old;
+		
+		// Disable action button if there is no selected items
+		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
 	
 	$('.move-dialog .dialog-move-button').unbind('click');
 	$('.move-dialog .dialog-move-button').bind('click', function()
 	{
-		var n = [];
-		for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
-		closeDialog();
-		M.moveNodes(n, $.mcselected);
-		
+		if (typeof $.mcselected != 'undefined')
+		{
+			var n = [];
+			for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+			closeDialog();
+			M.moveNodes(n, $.mcselected);
+		}
 //			if ($.mctype == 'copy-contacts' && t.length == 8)
 //			{
 //				if (RightsbyID(t) == 0)

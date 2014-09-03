@@ -18560,8 +18560,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	vertical-align: middle;
 	position: relative;
 }
-.video-full-canvas img, .video-full-canvas canvas {
+.video-full-canvas img, .video-full-canvas video {
 	width: 100%;
+}
+.video-off video {
+    display: none;
 }
 .video-off .video-canvas-flip-side {
 	position: absolute;

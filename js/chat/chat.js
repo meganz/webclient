@@ -323,6 +323,23 @@ var chatui;
         });
 
 
+        // full screen stuff
+        function fullscreenVideoResizing() {
+            // Cansvas height  (4:3)
+            var h = Math.round(($(window).width()/2 - 12) * 0.75);
+            $('.video-row').css('height', Math.round(($(window).height() - h)/2));
+            $('.video-main-container').css('height', h);
+            $('.video-main-container img, .video-main-container video').css('height', h);
+            $('.video-size-button').css('right', $('.video-size-button').offset().top);
+        }
+        fullscreenVideoResizing();
+
+        $(window).bind('resize', function ()
+        {
+            if($('.video-full-container').is(":visible")) {
+                fullscreenVideoResizing();
+            }
+        });
 
     }
 })();
@@ -2571,8 +2588,20 @@ var MegaChatRoom = function(megaChat, roomJid) {
     self.bind('media-recv', function(event, obj) {
         $('.others-av-screen video', self.$header).remove();
 
-        $('.others-av-screen', self.$header).append(obj.player);
+        if(!$('.video-full-container').is(":visible")) {
+            $('.others-av-screen', self.$header).append(obj.player);
+        } else {
+            $('.video-full-container .other-user .front').append(obj.player);
+        }
         $('.others-av-screen', self.$header).attr('data-jid', obj.peer);
+
+        if(obj.player.length && obj.player.length === 1) {
+            // api incompatibility ?
+            self._othersAvElement = obj.player[0];
+        } else {
+            self._othersAvElement = obj.player;
+        }
+
 
         if(self.options.mediaOptions.video === false) {
             $('.others-av-screen .video-only', self.$header).hide();
@@ -2587,6 +2616,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         $('.my-av-screen video', self.$header).remove();
 
         $('.my-av-screen', self.$header).append(obj.player);
+        self._myAvElement = obj.player;
     });
 
     self.bind('local-player-remove', function(event, obj) {
@@ -2841,33 +2871,147 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
 
 
         // expand/size icon
-        var $expandButtons = $('.video-call-button.size-icon', self.$header);
+//        var $expandButtons = $('.video-call-button.size-icon', self.$header);
+//        $expandButtons.unbind('click.megaChat');
+//        $expandButtons.bind('click.megaChat', function() {
+//            if ($(this).attr('class').indexOf('active') == -1) {
+//                self.$header.css('height', '');
+//                $(this).addClass('active');
+//                self.$header.parent().addClass('full-sized');
+//                $('.video-resizer', self.$header).hide();
+//            }
+//            else {
+//                $(this).removeClass('active');
+//                self.$header.parent().removeClass('full-sized');
+//                $('.video-resizer', self.$header).show();
+//                // set header size if persisted
+//                if(localStorage.audioVideoScreenSize) {
+//                    self.$header.css(
+//                        'height',
+//                        JSON.parse(localStorage.audioVideoScreenSize)
+//                    );
+//                }
+//
+//                self.refreshScrollUI();
+//
+//                $(window).trigger('resize');
+//            }
+//        });
+        // new fullscreen logic
+        var $expandButtons = $('.video-call-button.size-icon');
+        var $fullscreenContainer = $('.video-full-container');
         $expandButtons.unbind('click.megaChat');
         $expandButtons.bind('click.megaChat', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
-                self.$header.css('height', '');
-                $(this).addClass('active');
-                self.$header.parent().addClass('full-sized');
-                $('.video-resizer', self.$header).hide();
-            }
-            else {
-                $(this).removeClass('active');
-                self.$header.parent().removeClass('full-sized');
-                $('.video-resizer', self.$header).show();
-                // set header size if persisted
-                if(localStorage.audioVideoScreenSize) {
-                    self.$header.css(
-                        'height',
-                        JSON.parse(localStorage.audioVideoScreenSize)
-                    );
+                $expandButtons.addClass('active');
+                $('.video-call-button.size-icon', $fullscreenContainer).addClass('active');
+
+                // move the <video/> elements
+                if(self._myAvElement) {
+                    $('.video-full-canvas.current-user .video-canvas-flip-side', $fullscreenContainer).append(self._myAvElement);
+                    self._myAvElement.play();
+                }
+                if(self._othersAvElement) {
+                    $('.video-full-canvas.other-user .video-canvas-flip-side', $fullscreenContainer).append(self._othersAvElement);
+                    self._othersAvElement.play();
                 }
 
-                self.refreshScrollUI();
+                // handle the hidden state of video tags in cases where the video was muted.
+                $fullscreenContainer.removeClass("hidden");
+                if(!$(self._myAvElement).is(":visible")) {
+                    $('.video-full-canvas.current-user').addClass('video-off');
+                } else {
+                    $('.video-full-canvas.current-user video').css('display', '');
+                    $('.video-full-canvas.current-user').removeClass('video-off');
+                }
 
-                $(window).trigger('resize');
+                if(!$(self._othersAvElement).is(":visible")) {
+                    $('.video-full-canvas.other-user').addClass('video-off');
+                } else {
+                    $('.video-full-canvas.other-user video').css('display', '');
+                    $('.video-full-canvas.other-user').removeClass('video-off');
+                }
+
+                $('.video-full-container .video-call-button.video-icon')[self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
+                $('.video-full-container .video-call-button.audio-icon')[self.options.mediaOptions.audio ? "removeClass" : "addClass"]("active");
+
+                $(document).fullScreen(true);
+            }
+            else {
+                $expandButtons.removeClass('active');
+                $('.video-call-button.size-icon', $fullscreenContainer).removeClass('active');
+                // move back the <video/> elements
+                if(self._myAvElement) {
+                    $(self._myAvElement).css('height', '');
+                    $('.my-av-screen', self.$header).append(self._myAvElement);
+                    self._myAvElement.play();
+                }
+                if(self._othersAvElement) {
+                    $(self._othersAvElement).css('height', '');
+                    $('.others-av-screen', self.$header).append(self._othersAvElement);
+                    self._othersAvElement.play();
+                }
+
+
+                $('.video-call-button.video-icon', self.$header)[self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
+                $('.video-call-button.audio-icon', self.$header)[self.options.mediaOptions.audio ? "removeClass" : "addClass"]("active");
+                self._renderAudioVideoScreens();
+                $fullscreenContainer.addClass("hidden");
+
+                $(document).fullScreen(false);
             }
         });
 
+        // collapse on ESC pressed (exited fullscreen)
+        $(document)
+            .unbind("fullscreenchange.megaChat")
+            .bind("fullscreenchange.megaChat", function() {
+                if(!$(document).fullScreen() && $fullscreenContainer.is(":visible")) {
+                    $('.video-full-container .video-call-button.size-icon.active').trigger('click');
+                }
+            });
+
+        $('.video-call-button.hang-up-icon', $fullscreenContainer)
+            .unbind('click.megaChat')
+            .bind('click.megaChat', function() {
+                $fullscreenContainer.addClass("hidden");
+                self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
+            });
+
+
+        $('.video-call-button.audio-icon', $fullscreenContainer)
+            .unbind('click.megaChat')
+            .bind('click.megaChat', function() {
+                if(self.options.mediaOptions.audio === false) { // un mute
+                    self.options.mediaOptions.audio = true;
+                    self.megaChat.karere.connection.rtc.muteUnmute(false, {audio:true});
+                    $(this).removeClass("active");
+                } else { // mute
+                    self.options.mediaOptions.audio = false;
+                    self.megaChat.karere.connection.rtc.muteUnmute(true, {audio:true});
+                    $(this).addClass("active");
+                }
+            })
+            [self.options.mediaOptions.audio ? "removeClass" : "addClass"]("active");
+
+
+        $('.video-call-button.video-icon', $fullscreenContainer)
+            .unbind('click.megaChat')
+            .bind('click.megaChat', function() {
+                if(self.options.mediaOptions.video === false) { // un mute
+                    self.options.mediaOptions.video = true;
+                    self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
+                    $(this).removeClass("active");
+                    $('.video-full-canvas.current-user').removeClass('video-off');
+                    $('.video-full-canvas.current-user video').css('display', '');
+                } else { // mute
+                    self.options.mediaOptions.video = false;
+                    self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
+                    $(this).addClass("active");
+                    $('.video-full-canvas.current-user').addClass('video-off');
+                }
+            })
+            [self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
 
     }
 
@@ -2878,7 +3022,14 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
     $cancel.bind('click.megaChat', function() {
         self.megaChat.karere.connection.rtc.hangup(); /** pass eventData.peer? **/
     });
+
+
     $cancel.show();
+
+    // auto trigger fullscreen if answered with video?
+    if(self.getMediaOptions().video === true) {
+        $('.video-call-button.size-icon', self.$header).trigger('click');
+    }
 
     self._resetCallStateInCall();
 };
@@ -2912,8 +3063,13 @@ MegaChatRoom.prototype._resetCallStateNoCall = function() {
     self.getInlineDialogInstance("incoming-call").remove();
     self.getInlineDialogInstance("outgoing-call").remove();
 
+    $('.video-full-container').addClass("hidden");
 
     $('.others-av-screen', self.$header).attr('data-jid', ''); // cleanup
+
+    $(document).fullScreen(false);
+
+    self._myAvElement = self._othersAvElement = null;
 
     self.refreshScrollUI();
 
@@ -2984,6 +3140,15 @@ MegaChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, 
         $('.my-avatar, .other-avatar', $screenElement).show();
         $('.video-only', $screenElement).hide();
         $('video', $screenElement).hide();
+
+        if($('.video-full-container').is(":visible")) {
+            if(videoCssClass == 'current-user-video-container') {
+                // my video screen
+                $('.video-full-canvas.current-user').addClass("video-off");
+            } else {
+                $('.video-full-canvas.other-user').addClass("video-off");
+            }
+        }
     } else {
         $screenElement
             .removeClass(audioCssClass)
@@ -2992,6 +3157,17 @@ MegaChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, 
         $('.my-avatar, .other-avatar', $screenElement).hide();
         $('.video-only', $screenElement).show();
         $('video', $screenElement).show();
+
+        if($('.video-full-container').is(":visible")) {
+            if(videoCssClass == 'current-user-video-container') {
+                // my video screen
+                $('.video-full-canvas.current-user video').css('display', '');
+                $('.video-full-canvas.current-user').removeClass("video-off");
+            } else {
+                $('.video-full-canvas.other-user video').css('display', '');
+                $('.video-full-canvas.other-user').removeClass("video-off");
+            }
+        }
     }
 }
 MegaChatRoom.prototype._resetCallStateInCall = function() {
@@ -4320,6 +4496,10 @@ MegaChatRoom.prototype._sendMessageToXmpp = function(messageObject) {
 
     var messageContents = messageObject.getContents() ? messageObject.getContents() : "";
 
+    var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
+    if(messageMeta.isDeleted && messageMeta.isDeleted === true) {
+        return false;
+    }
     if(
         megaChat.karere.getConnectionState() !== Karere.CONNECTION_STATE.CONNECTED ||
             self.arePluginsForcingMessageQueue(messageObject) ||
@@ -4674,18 +4854,6 @@ MegaChatRoom.prototype._conversationStarted = function(userFullJid) {
     var self = this;
 
     self._conv_ended = false;
-
-    self.appendDomMessage(
-        self.generateInlineDialog(
-            "user-joined",
-            userFullJid,
-            "user-joined",
-            "Conversation started, user joined: " + self.megaChat.getContactNameFromJid(userFullJid),
-            [],
-            {
-            }
-        )
-    );
 
     self.setState(MegaChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
 };

@@ -23,7 +23,12 @@ var FunctionsMocker = function() {
             }
         });
 
+    var origFullscreenPlug = $.fn.fullScreen;
+
+    $.fn.fullScreen = function() { return false; };
+
     self.restore = function() {
+        $.fn.fullScreen = origFullscreenPlug;
         self.objectMocker.restore();
     }
 };

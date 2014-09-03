@@ -8628,6 +8628,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-dialog-button.move-button, .fm-dialog-button.dialog-copy-button, .fm-dialog-button.dialog-move-button, .fm-dialog-button.dialog-newfolder-button, .confirmation-dialog .fm-dialog-button.notification-button.confirm {
 	background-color: rgba(109,176,63,0.7);
 }
+.fm-dialog-button.move-button.disabled, .fm-dialog-button.dialog-copy-button.disabled, .fm-dialog-button.dialog-move-button.disabled, .fm-dialog-button.dialog-newfolder-button.disabled, .confirmation-dialog .fm-dialog-button.notification-button.confirm.disabled, .fm-dialog-button.move-button.disabled:hover, .fm-dialog-button.dialog-copy-button.disabled:hover, .fm-dialog-button.dialog-move-button.disabled:hover, .fm-dialog-button.dialog-newfolder-button.disabled:hover, .confirmation-dialog .fm-dialog-button.notification-button.confirm.disabled:hover {
+	background-color: rgba(109,176,63,0.3);
+	cursor:default;
+}
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
 	margin-left: 12px;

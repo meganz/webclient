@@ -1138,37 +1138,29 @@
 <rect x="20" y="6770" fill="#030303" width="10" height="1"/>
 <rect x="20" y="6772" fill="#030303" width="10" height="1"/>
 <g>
-	<path fill="#FFFFFF" d="M26.5,7152v-0.43l-3.89,3.89c0.13,0.011,0.26,0.04,0.39,0.04C24.92,7155.5,26.5,7153.92,26.5,7152z
-		 M18.7,7153.24c-0.12-0.4-0.2-0.811-0.2-1.24v-1.5h-1v1.5c0,0.721,0.14,1.41,0.4,2.04L18.7,7153.24z M23.5,7157.5H23h-0.5v2h-3v1h7
-		v-1h-3V7157.5z M20.96,7157.1c0.64,0.26,1.32,0.4,2.04,0.4c3.029,0,5.5-2.471,5.5-5.5v-1.5h-0.93l-0.07,0.07v1.43
-		c0,2.48-2.02,4.5-4.5,4.5c-0.43,0-0.84-0.08-1.24-0.189L20.96,7157.1z M21.5,7147.5h1v-1h-1V7147.5z M21.5,7148.5v1h0.94
-		l0.06-0.061v-0.939H21.5z M22.5,7146.5h1v-1h1v1h0.939l0.801-0.8c-0.52-1.28-1.78-2.2-3.24-2.2c-1.92,0-3.5,1.58-3.5,3.5v5
-		c0,0.13,0.02,0.26,0.04,0.4l0.96-0.961v-0.939h0.94l0.06-0.061v-0.939h-1v-1h1v-1h-1v-1h1v-1h1V7146.5z M23.5,7148.43v-0.93h-1v1
-		h0.94L23.5,7148.43z M23.5,7146.5v1h0.939l0.061-0.07v-0.93H23.5z"/>
-	<path fill="#EE2A55" d="M32.16,7144.49c0.449-0.45,0.449-1.2,0-1.65c-0.45-0.449-1.2-0.449-1.65,0l-16.67,16.67
-		c-0.45,0.451-0.45,1.201,0,1.65c0.23,0.221,0.52,0.34,0.83,0.34c0.3,0,0.59-0.12,0.82-0.34L32.16,7144.49z"/>
+	<g>
+		<rect x="22" y="7146.998" fill="#FFFFFF" width="1" height="1"/>
+		<polygon fill="#FFFFFF" points="23,7159.998 20,7159.998 20,7160.998 27,7160.998 27,7159.998 24,7159.998 24,7157.998 
+			23.5,7157.998 23,7157.998 		"/>
+		<path fill="#FFFFFF" d="M28.07,7150.998l-0.07,0.07v1.43c0,2.48-2.02,4.5-4.5,4.5c-0.43,0-0.84-0.08-1.24-0.189l-0.8,0.789
+			c0.641,0.26,1.32,0.4,2.04,0.4c3.029,0,5.5-2.471,5.5-5.5v-1.5H28.07z"/>
+		<polygon fill="#FFFFFF" points="22,7149.998 22.94,7149.998 23,7149.938 23,7148.998 22,7148.998 		"/>
+		<polygon fill="#FFFFFF" points="24,7147.998 24.939,7147.998 25,7147.928 25,7146.998 24,7146.998 		"/>
+		<path fill="#FFFFFF" d="M19,7150.998h-1v1.5c0,0.721,0.141,1.41,0.4,2.041l0.8-0.801c-0.12-0.4-0.2-0.811-0.2-1.24V7150.998z"/>
+		<path fill="#FFFFFF" d="M23.5,7155.998c1.92,0,3.5-1.58,3.5-3.5v-0.43l-3.89,3.891C23.24,7155.969,23.37,7155.998,23.5,7155.998z"
+			/>
+		<path fill="#FFFFFF" d="M21,7151.938v-0.939h0.94l0.06-0.061v-0.939h-1v-1h1v-1h-1v-1h1v-1h1v1h1v-1h1v1h0.939l0.801-0.799
+			c-0.52-1.281-1.78-2.201-3.24-2.201c-1.92,0-3.5,1.58-3.5,3.5v5c0,0.131,0.021,0.26,0.04,0.4L21,7151.938z"/>
+		<polygon fill="#FFFFFF" points="23,7148.998 23.94,7148.998 24,7148.928 24,7147.998 23,7147.998 		"/>
+	</g>
+	<path fill="#EE2A55" d="M32.66,7144.988c0.449-0.449,0.449-1.199,0-1.65c-0.45-0.449-1.2-0.449-1.65,0l-16.67,16.67
+		c-0.449,0.451-0.449,1.201,0,1.65c0.23,0.221,0.521,0.34,0.83,0.34c0.301,0,0.59-0.119,0.82-0.34L32.66,7144.988z"/>
 </g>
 <g>
-	<g>
-		<polygon fill="#FFFFFF" points="33,6821 33,6814 26,6814 		"/>
-		
-			<rect x="27.591" y="6815.852" transform="matrix(-0.7076 -0.7066 0.7066 -0.7076 -4768.4731 11664.2432)" fill="#FFFFFF" width="2.828" height="5.66"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="15,6825 15,6832 22,6832 		"/>
-		
-			<rect x="17.681" y="6825.265" transform="matrix(0.707 0.7072 -0.7072 0.707 4834.3755 1986.9883)" fill="#FFFFFF" width="2.828" height="5.657"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="22,6814 15,6814 15,6821 		"/>
-		
-			<rect x="17.584" y="6815.169" transform="matrix(-0.707 0.7072 -0.7072 -0.707 4854.0713 11625.0293)" fill="#FFFFFF" width="2.828" height="5.66"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="26,6832 33,6832 33,6825 		"/>
-		
-			<rect x="27.953" y="6824.793" transform="matrix(0.7069 -0.7073 0.7073 0.7069 -4820.4316 2021.7148)" fill="#FFFFFF" width="2.828" height="5.662"/>
-	</g>
+	<polygon fill="#FFFFFF" points="26,6814 28.843,6816.843 26.004,6819.687 28.006,6821.684 30.842,6818.842 33,6821 33,6814 	"/>
+	<polygon fill="#FFFFFF" points="20.095,6825.094 17.594,6827.594 15,6825 15,6832 22,6832 19.594,6829.594 22.095,6827.094 	"/>
+	<polygon fill="#FFFFFF" points="20,6821 21.999,6819 19.499,6816.501 22,6814 15,6814 15,6821 17.5,6818.5 	"/>
+	<polygon fill="#FFFFFF" points="28.365,6824.622 26.365,6826.623 28.872,6829.128 26,6832 33,6832 33,6825 30.872,6827.128 	"/>
 </g>
 <g>
 	<g>
@@ -1198,26 +1190,10 @@
 <polygon fill="#FFFFFF" points="17,7241 33,7241 25,7249 "/>
 <polygon fill="#FFFFFF" points="33,7319 17,7319 25,7311 "/>
 <g>
-	<g>
-		<polygon fill="#FFFFFF" points="26.001,6874.251 26.001,6881.251 33.001,6881.251 		"/>
-		
-			<rect x="28.398" y="6874.235" transform="matrix(0.7075 0.7068 -0.7068 0.7075 4869.1655 1990.8013)" fill="#FFFFFF" width="2.827" height="5.662"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="22.001,6892.251 22.001,6885.251 15.001,6885.251 		"/>
-		
-			<rect x="16.586" y="6886.422" transform="matrix(-0.7073 -0.7069 0.7069 -0.7073 -4839.5166 11774.6006)" fill="#FFFFFF" width="2.828" height="5.658"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="15.001,6881.251 22.001,6881.251 22.001,6874.251 		"/>
-		
-			<rect x="17.085" y="6873.921" transform="matrix(0.7075 -0.7068 0.7068 0.7075 -4854.8096 2024.853)" fill="#FFFFFF" width="2.827" height="5.658"/>
-	</g>
-	<g>
-		<polygon fill="#FFFFFF" points="33.001,6885.251 26.001,6885.251 26.001,6892.251 		"/>
-		
-			<rect x="28.587" y="6886.422" transform="matrix(-0.7069 0.7073 -0.7073 -0.7069 4923.835 11738.2793)" fill="#FFFFFF" width="2.828" height="5.658"/>
-	</g>
+	<polygon fill="#FFFFFF" points="30.313,6878.563 32.812,6876.062 30.812,6874.064 28.314,6876.564 26.001,6874.251 
+		26.001,6881.251 33.001,6881.251 	"/>
+	<polygon fill="#FFFFFF" points="26.001,6885.251 26.001,6892.251 28.501,6889.751 31.002,6892.251 33.001,6890.252 30.5,6887.752 
+		33.001,6885.251 	"/>
 </g>
 <g>
 	<path opacity="0.5" fill="#FFFFFF" enable-background="new    " d="M38.68,302.68c-0.43-0.459-4.32-2.27-5.05-2.52
@@ -1615,22 +1591,26 @@
 	c-0.44-3.1-2.92-5.551-6.04-5.939V8587h-2v1.1c-3.01,0.48-5.37,2.881-5.8,5.9H7v2h1.2c0.43,3.02,2.79,5.42,5.8,5.9v1.1h2v-1.061
 	c3.12-0.389,5.6-2.84,6.04-5.939H23V8594z"/>
 <g>
-	<g>
-		<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M29,6942v1.5c0,2.48-2.02,4.5-4.5,4.5s-4.5-2.02-4.5-4.5v-1.5h-1
-			v1.5c0,3.029,2.471,5.5,5.5,5.5s5.5-2.471,5.5-5.5v-1.5H29z"/>
-		<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" points="24,6951 21,6951 21,6952 28,6952 28,6951 25,6951 
-			25,6949 24.5,6949 24,6949 		"/>
-		<rect x="23" y="6940" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="24" y="6941" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M22,6942h1v-1h-1v-1h1v-1h-1v-1h1v-1h1v1h1v-1h1v1h1v1h-1v1h1v1
-			h-1v1h1v1h-1v1h-1v-1h-1v1h-1v-1h-1V6942z M24.5,6947c1.92,0,3.5-1.58,3.5-3.5v-5c0-1.92-1.58-3.5-3.5-3.5s-3.5,1.58-3.5,3.5v5
-			C21,6945.42,22.58,6947,24.5,6947z"/>
-		<rect x="24" y="6939" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="25" y="6942" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="23" y="6938" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="23" y="6942" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="25" y="6938" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-		<rect x="25" y="6940" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
-	</g>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M29,6942v1.5c0,2.48-2.02,4.5-4.5,4.5s-4.5-2.02-4.5-4.5v-1.5h-1
+		v1.5c0,3.029,2.471,5.5,5.5,5.5s5.5-2.471,5.5-5.5v-1.5H29z"/>
+	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" points="24,6951 21,6951 21,6952 28,6952 28,6951 25,6951 
+		25,6949 24.5,6949 24,6949 	"/>
+	<rect x="23" y="6940" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="24" y="6941" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M24.5,6947c1.92,0,3.5-1.58,3.5-3.5v-5c0-1.92-1.58-3.5-3.5-3.5
+		s-3.5,1.58-3.5,3.5v5C21,6945.42,22.58,6947,24.5,6947z M22,6942h1v-1h-1v-1h1v-1h-1v-1h1v-1h1v1h1v-1h1v1h1v1h-1v1h1v1h-1v1h1v1
+		h-1v1h-1v-1h-1v1h-1v-1h-1V6942z"/>
+	<rect x="24" y="6939" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="25" y="6942" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="23" y="6938" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="23" y="6942" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="25" y="6938" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+	<rect x="25" y="6940" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" width="1" height="1"/>
+</g>
+<g>
+	<polygon fill="#FFFFFF" points="17.688,6878.563 15.188,6876.062 17.188,6874.064 19.687,6876.564 22,6874.251 22,6881.251 
+		15,6881.251 	"/>
+	<polygon fill="#FFFFFF" points="22,6885.251 22,6892.251 19.5,6889.751 16.999,6892.251 15,6890.252 17.501,6887.752 15,6885.251 	
+		"/>
 </g>
 </svg>

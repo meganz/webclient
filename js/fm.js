@@ -5221,9 +5221,8 @@ function copyDialog()
 					break;
 				case 'conversations':
 					var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
-					if($selectedConv.size() > 0)
-						megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
 					closeDialog();
+					megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
 					break;
 				default:
 					break;

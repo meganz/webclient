@@ -54,23 +54,23 @@ var linuxsync =
 {
 	'name':'Ubuntu 12.10',
 	'32':'xUbuntu_12.10/i386/megasync_i386.deb',
-	'32n':'xUbuntu_12.10/amd64/nautilus-megasync_amd64.deb',
+	'32n':'xUbuntu_12.10/i386/nautilus-megasync_i386.deb',
 	'64':'xUbuntu_12.10/amd64/megasync_amd64.deb',
-	'64n':'xUbuntu_12.10/i386/nautilus-megasync_i386.deb'
+	'64n':'xUbuntu_12.10/amd64/nautilus-megasync_amd64.deb'
 },
 {
 	'name':'Ubuntu 13.10',
 	'32':'xUbuntu_13.10/i386/megasync_i386.deb',
-	'32n':'xUbuntu_13.10/amd64/nautilus-megasync_amd64.deb',
+	'32n':'xUbuntu_13.10/i386/nautilus-megasync_i386.deb',
 	'64':'xUbuntu_13.10/amd64/megasync_amd64.deb',
-	'64n':'xUbuntu_13.10/i386/nautilus-megasync_i386.deb'
+	'64n':'xUbuntu_13.10/amd64/nautilus-megasync_amd64.deb'
 },
 {
 	'name':'Ubuntu 14.04',
 	'32':'xUbuntu_14.04/i386/megasync_i386.deb',
-	'32n':'xUbuntu_14.04/amd64/nautilus-megasync_amd64.deb',
+	'32n':'xUbuntu_14.04/i386/nautilus-megasync_i386.deb',
 	'64':'xUbuntu_14.04/amd64/megasync_amd64.deb',
-	'64n':'xUbuntu_14.04/i386/nautilus-megasync_i386.deb'
+	'64n':'xUbuntu_14.04/amd64/nautilus-megasync_amd64.deb'
 }];
 
 

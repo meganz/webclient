@@ -7012,11 +7012,11 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .video-call-button.video-icon {
 	bottom: 8px;
 	left: 52px;
-	background-position: -8px -6988px;
+	background-position: -8px -6987px;
 	top: auto;
 }
 .video-call-button.video-icon.active {
-	background-position: -8px -7088px;
+	background-position: -8px -7087px;
 }
 .video-call-button.hang-up-icon {
 	bottom: 8px;
@@ -18516,10 +18516,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: -3px -7133px;
 }
 .video-row .video-call-button.video-icon:hover {
-	background-position: -4px -6984px;
+	background-position: -4px -6983px;
 }
 .video-row .video-call-button.video-icon.active:hover {
-	background-position: -4px -7084px;
+	background-position: -4px -7083px;
 }
 .video-row .video-call-button.hang-up-icon:hover {
 	background-position: -4px -7184px;

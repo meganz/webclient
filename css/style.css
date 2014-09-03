@@ -13830,10 +13830,21 @@ span.browsers-update {
 	position: relative;
 }
 .sync-button-block .sync-button {
-	min-width:224px;
+	min-width: 224px;
 }
 .sync-button-block .sync-button:hover {
-	min-width:230px;
+	min-width: 230px;
+}
+.sync-button-block .sync-button.disabled, .sync-button-block .sync-button.disabled:hover {
+	margin: 3px;
+	min-width: 224px;
+	height: 64px;
+	border: 2px solid #d0d0d0;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+	cursor:default;
 }
 .sync-button.mac {
 	background-position: 15px -327px;
@@ -13842,28 +13853,28 @@ span.browsers-update {
 	background-position: -462px -322px;
 }
 .sync-button-block {
-	display:inline-block;
-	margin:0 48px;
+	display: inline-block;
+	margin: 0 48px;
 	height: 101px;
 }
 .sync-radio-buttons {
-	padding:5px 0 0px 0;
+	padding: 5px 0 0px 0;
 }
 .nautilus-lnk {
-	display:block;
-	padding:5px 0 8px 0;
+	display: block;
+	padding: 5px 0 8px 0;
 }
 .sync-button-block.linux {
-	padding-top:0;
-	
-}	
+	padding-top: 0;
+}
 .fm-version-select {
 	min-width: 220px;
-	display:inline-block;
-	text-align:left; margin: 0; 
+	display: inline-block;
+	text-align: left;
+	margin: 0;
 	border-color: #d0d0d0;
-	height:34px;
-	line-height:30px;
+	height: 34px;
+	line-height: 30px;
 	background-position: right -6594px;
 }
 .version-select-txt {
@@ -13959,6 +13970,9 @@ span.browsers-update {
 	line-height: 21px;
 	color: #3F4646;
 	padding: 10px 0 0 0;
+}
+.sync-bottom-txt.linux {
+	text-align:left;
 }
 .mobile-small-icon {
 	width: 80px;

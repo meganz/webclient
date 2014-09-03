@@ -99,7 +99,7 @@ function init_sync()
 		$('#syncanim').unbind('click');
 		$('#syncanim').bind('click',function(e)
 		{
-			document.location.href = syncurl;
+			if (syncurl) document.location.href = syncurl;
 		});
 	},1000);
 	var pf = navigator.platform.toUpperCase();	
@@ -121,10 +121,13 @@ function init_sync()
 
 
 
-var syncurl;
+var syncurl,nautilusurl;
+var syncsel=false;
 
 function sync_switchOS(os)
-{	
+{
+	$('.sync-button').attr('href','');
+	$('.sync-button-block.linux').addClass('hidden');
 	if (os == 'windows')
 	{
 		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
@@ -148,46 +151,14 @@ function sync_switchOS(os)
 	}
 	else if (os == 'linux')
 	{
+		syncurl=undefined;
+		syncsel=false;
 		var ostxt = 'For Linux';
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
-		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');			
-
-		$('.sync-button-txt.small').text(ostxt);
-		
-		var ua = navigator.userAgent.toLowerCase();
-		if (ua.indexOf('i686') > -1 || ua.indexOf('i386') > -1)
-		{
-			
-		}
-		
-		if (ua.indexOf('debian') > -1 || ua.indexOf('wheezy') > -1)
-		{
-			// debian
-		}
-		
-		if (ua.indexOf('debian') > -1 || ua.indexOf('wheezy') > -1)
-		{
-			// debian
-		}
-		
-		var parser = new UAParser();
-		var uastring = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.10) Gecko/20050925 Firefox/1.0.4 (Debian package 1.0.4-2sarge5)";
-		parser.setUA(uastring);
-		var result = parser.getResult();
-		console.log(result);
-		
-		
-		var options = '';		
-		for (var i in linuxsync)
-		{		
-			options += '<option value="'+i+'">' + linuxsync[i].name + '</option>';
-		}		
-		$('.fm-version-select.sync select').html(options);
-		
-		
+		if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
+		$('.sync-button-txt.small').text(ostxt);		
 		$('.sync-bottom-txt.button-txt').html('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
-		$('.sync-bottom-txt.linux-txt').html('<span class="nautilus-lnk">MEGA <a href="" class="red">Nautilus extension</a> (optional).</span>');
-		
+		$('.sync-bottom-txt.linux-txt').html('<span class="nautilus-lnk">MEGA <a href="" class="red">Nautilus extension</a> (optional).</span>');		
 		$('.sync-button').removeClass('mac linux').addClass('linux');
 		$('.sync-button-block.linux').removeClass('hidden');
 		$('.architecture-checkbox input').bind('click',function() {
@@ -200,18 +171,86 @@ function sync_switchOS(os)
 		   // TODO: change link according $('input:radio[name="architecture"]') value
 		   $('.sync-button').attr('href',$(this).val());
         });
+		$('.sync-button.linux').addClass('disabled');
+		$('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
+		$('.version-select-txt').html('Select Linux Distro');
+		var ua = navigator.userAgent.toLowerCase();
 		
+		//ua = 'debian 7.0';
+		if (ua.indexOf('i686') > -1 || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) $('.sync-radio-buttons #rad1').click();		
+		var options = '<option id="-1">Select Linux Distro</option>';
+		for (var i in linuxsync)
+		{
+			var selected = '';
+			var version = linuxsync[i].name.split(' ');
+			version = version[version.length-1];		
+			var name = linuxsync[i].name.replace(' ' + version,'');			
+			if (ua.indexOf(name.toLowerCase()) > -1 && ua.indexOf(version) > -1)
+			{
+				selected = 'selected';
+				changeLinux(i);
+			}
+			options += '<option value="'+i+'" ' + selected + '>' + linuxsync[i].name + '</option>';
+		}
+		$('.fm-version-select.sync select').html(options);
+		
+		$('.fm-version-select.sync select').unbind('change');
+		$('.fm-version-select.sync select').bind('change',function(e)
+		{			
+			changeLinux($(this).val());
+		});
+
+		$('.sync-bottom-txt.linux-txt a').unbind('click');
+		$('.sync-bottom-txt.linux-txt a').bind('click',function(e)
+		{
+			if (!nautilusurl) return false;		
+		});
+		
+		$('.sync-button').unbind('click');
+		$('.sync-button').bind('click',function(e)
+		{
+			if (!syncurl)
+			{
+				msgDialog('info','Select Linux Distro','Please select your linux distro and then click on the download button.');
+				return false;		
+			}
+		});
 	}		
-	$('.sync-bottom-txt a').unbind('click');
-	$('.sync-bottom-txt a').bind('click',function(e)
+	$('.sync-bottom-txt.button-txt a').unbind('click');
+	$('.sync-bottom-txt.button-txt a').bind('click',function(e)
 	{
-		var c = $(this).attr('class');
-		$('.sync-button-block.linux').addClass('hidden');
+		var c = $(this).attr('class');		
 		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
 		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
 		else if (c && c.indexOf('linux') > -1) sync_switchOS('linux');
 		return false;
 	});
+}
+
+function changeLinux(i)
+{
+	if (linuxsync[i])
+	{
+		$('.version-select-txt').text(linuxsync[i].name);
+		$('.sync-button.linux').removeClass('disabled');
+		$('.sync-bottom-txt.linux-txt').css('opacity', '1');	
+		var platform = '64';
+		var c = $('.linux32').parent().attr('class');
+		if (c && c.indexOf('radioOn') > -1) platform = '32';
+		syncurl = 'https://mega.co.nz/linux/MEGAsync/' + linuxsync[i][platform];
+		nautilusurl = 'https://mega.co.nz/linux/MEGAsync/' + linuxsync[i][platform + 'n'];
+		$('.sync-button').attr('href',syncurl);
+		$('.sync-bottom-txt.linux-txt a').attr('href',nautilusurl);
+		syncsel=i;
+	}
+	else
+	{
+		syncurl = false;
+		nautilusurl = false;
+		$('.sync-button.linux').addClass('disabled');
+		$('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
+		$('.version-select-txt').html('Select Linux Distro');	
+	}
 }
 
 function startSync()

@@ -900,10 +900,7 @@ input.radioOn, input.radioOff {
 	width: 18px;
 	height: 18px;
 }
-option[selected], option selected, option[selected=selected] {
-	background-color: #D9290B !important;
-	color: #FFFFFF !important;
-}
+
 .terms-main {
 	color: #595959;
 	font-size: 14px;

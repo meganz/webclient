@@ -833,6 +833,40 @@ function dcTracer(ctr) {
 	}
 }
 
+function setupTransferAnalysis()
+{
+	if ($.mTransferAnalysis) return;
+	
+	var prev = {};
+	$.mTransferAnalysis = setInterval(function()
+	{
+		if (uldl_hold) prev = {};
+		else if ($.transferprogress)
+		{
+			var tp = $.transferprogress;
+
+			for (var i in tp)
+			{
+				if (GlobalProgress[i] && GlobalProgress[i].paused)
+				{
+					delete prev[i];
+				}
+				else if (!prev[i]) prev[i] = tp[i][0];
+				else if (prev[i] == tp[i][0])
+				{
+					(function(p, t)
+					{
+						Soon(function()
+						{
+							throw new Error(t + ' stuck.');
+						});
+					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
+				}
+			}
+		}
+	}, 35000);
+}
+
 function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {};

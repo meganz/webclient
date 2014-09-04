@@ -1551,6 +1551,7 @@ function MegaData ()
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
+			setupTransferAnalysis();
 			downloading = !!dl_queue.length;
 		}
 
@@ -1808,6 +1809,7 @@ function MegaData ()
 		}
 		else openTransferpanel();
 
+		setupTransferAnalysis();
 		ul_uploading = !!ul_queue.length;
 	}
 

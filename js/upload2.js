@@ -856,6 +856,7 @@ function resetUploadDownload() {
 		GlobalProgress = {};
 		delete $.transferprogress;
 		if ($.transferClose) $.transferClose(); /* in case it isn't closed already.. */
+		if ($.mTransferAnalysis) clearInterval($.mTransferAnalysis);
 	}
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);

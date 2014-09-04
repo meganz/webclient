@@ -888,7 +888,7 @@ function mozClearStartupCache() {
 
 	scope.mozAskDownloadsFolder = function(m)
 	{
-		var folder = mozFilePicker(null,2,{title : m || l[136] || 'Please choose downloads folder'});
+		var folder = mozFilePicker(null,2,{title : m || (typeof l !== 'undefined'&&l[136]) || 'Please choose downloads folder'});
 
 		if (folder)
 		{

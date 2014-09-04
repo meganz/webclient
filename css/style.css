@@ -8499,13 +8499,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: none;
 }
 .nw-chat-notification-icon.waiting-verification {
-	background-position: 2px -9003px;
+	background-position: 3px -9003px;
 }
 .nw-chat-notification-icon.verified  {
-	background-position: 2px -9040px;
+	background-position: 3px -9040px;
 }
 .nw-chat-notification-icon.verification-skipped  {
-	background-position: 2px -9076px;
+	background-position: 3px -9076px;
 }
 .nw-chat-notification-icon.missed-call  {
 	background-position: 2px -9111px;

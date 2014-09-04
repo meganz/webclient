@@ -111,7 +111,8 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
 
     if (um.resolution && !constraints.video) 
         constraints.video = {mandatory: {}};// same behaviour as true
-    
+
+
     // see https://code.google.com/p/chromium/issues/detail?id=143631#c9 for list of supported resolutions
     switch (um.resolution) 
 	{

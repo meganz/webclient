@@ -36,13 +36,14 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.lasticecandidate = false;
 
     this.statsinterval = null;
-    this.syncMutedState();
+    if (this.localStream)
+        this.syncMutedState();
 }
 
 JingleSession.prototype = {
 
 initiate: function(isInitiator) {
-    var obj = this;
+    var self = this;
     if (this.state !== null) {
         console.error('attempt to initiate on session ' + this.sid +
                   'in state ' + this.state);
@@ -62,31 +63,42 @@ initiate: function(isInitiator) {
         console.error('Failed to create PeerConnection, exception: ', e.stack);
         return;
     }
-    this.peerconnection.addStream(this.localStream);
+    if (self.localStream)
+        self.peerconnection.addStream(this.localStream);
+    if (self.fileTransferHandler) {
+        if (isInitiator)
+            self.fileTransferHandler.bindToDataChannel(
+            self.peerconnection.createDataChannel(null, {ordered:true, reliable:true}));
+         else
+            self.peerconnection.ondatachannel = function(event) {
+                self.fileTransferHandler.bindToDataChannel(event.channel);
+        }
+    }
+
     this.hadstuncandidate = false;
     this.hadturncandidate = false;
     this.lasticecandidate = false;
     this.peerconnection.onicecandidate = function (event) {
-        obj.sendIceCandidate(event.candidate);
+        self.sendIceCandidate(event.candidate);
     };
     this.peerconnection.onaddstream = function (event) {
-        obj.remoteStream = event.stream;
-        obj.remoteStreams.push(event.stream);
-        obj.jingle.onRemoteStreamAdded.call(obj.eventHandler, obj, event);
+        self.remoteStream = event.stream;
+        self.remoteStreams.push(event.stream);
+        self.jingle.onRemoteStreamAdded.call(self.eventHandler, self, event);
     };
     this.peerconnection.onremovestream = function (event) {
-        obj.remoteStream = null;
+        self.remoteStream = null;
         // FIXME: remove from this.remoteStreams
-        obj.jingle.onRemoteStreamRemoved.call(obj.eventHandler, obj, event);
+        self.jingle.onRemoteStreamRemoved.call(self.eventHandler, self, event);
     };
     this.peerconnection.onsignalingstatechange = function (event) {
-        if (!(obj && obj.peerconnection)) return;
-//        console.log('signallingstate ', obj.peerconnection.signalingState, event);
+        if (!(self && self.peerconnection)) return;
+//        console.log('signallingstate ', self.peerconnection.signalingState, event);
     };
     this.peerconnection.oniceconnectionstatechange = function (event) {
-        if (!(obj && obj.peerconnection)) return;
-        console.log('iceconnectionstatechange', obj.peerconnection.iceConnectionState, event);
-        switch (obj.peerconnection.iceConnectionState) {
+        if (!(self && self.peerconnection)) return;
+        console.log('iceconnectionstatechange', self.peerconnection.iceConnectionState, event);
+        switch (self.peerconnection.iceConnectionState) {
         case 'connected':
             this.startTime = new Date();
             break;
@@ -94,7 +106,7 @@ initiate: function(isInitiator) {
             this.stopTime = new Date();
             break;
         }
-        obj.jingle.onIceConnStateChange.call(obj.eventHandler, obj, event);
+        self.jingle.onIceConnStateChange.call(self.eventHandler, self, event);
     };
 },
 

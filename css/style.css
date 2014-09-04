@@ -8579,6 +8579,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .multiple-sharing .main-body .nw-chat-sharing-filename, .multiple-sharing .main-body .nw-chat-sharing-filesize {
 	margin-top: 17px;
 }
+
+.direct-progressbar {
+    min-height: 21px;
+    padding-top: 5px;
+    width: 120px;
+}
 .nw-chat-expand-arrow {
 	display: none;
 	cursor: pointer;

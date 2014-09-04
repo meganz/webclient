@@ -230,6 +230,113 @@ var chatui;
             megaChat.closeChatPopups();
         });
 
+        $('.fm-chat-block')
+            .off('click.megaChatAttach', '.fm-chat-popup-button.direct-transfer')
+            .on('click.megaChatAttach', '.fm-chat-popup-button.direct-transfer', function() {
+                megaChat.closeChatPopups();
+
+                var room = megaChat.getCurrentRoom();
+                var participants = room.getParticipantsExceptMe();
+                var contact = megaChat.getContactFromJid(participants[0]);
+
+
+//                if(!megaChat.karere.getPresence(participants[0])) {
+//                    var $dialog = room.generateInlineDialog(
+//                        "error",
+//                        megaChat.karere.getJid(),
+//                        ["error"],
+//                        "User " + megaChat.getContactNameFromJid(participants[0]) + " is offline. You can only do a direct transfer with online users.",
+//                        ["error"],
+//                        {
+//                            'ok': {
+//                                'type': 'primary',
+//                                'text': "Close",
+//                                'callback': function() {
+//                                    $dialog.remove();
+//                                    room.refreshUI();
+//                                }
+//                            }
+//                        },
+//                        true
+//                    );
+//                    room.appendDomMessage($dialog);
+//
+//                    return;
+//                }
+                if(room) {
+                    var $fileUploadField = $('<input type="file" multiple />');
+                    $fileUploadField.addClass("hidden");
+                    $(document.body).append($fileUploadField);
+
+                    $fileUploadField.bind("change", function(e) {
+
+                        var filesList = e.target.files;
+
+                        ERRDEBUG("Direct transfer: ", filesList);
+
+
+                        assert(filesList.length > 0, 'no files selected.');
+
+                        getPubk(contact.h, function() {
+                            var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
+
+
+                            var $message = megaChat.$message_tpl.clone().removeClass("template").addClass("fm-chat-message-container");
+                            var jid = megaChat.karere.getBareJid();
+
+                            var timestamp = unixtime();
+
+                            $('.chat-message-date', $message).text(
+                                unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
+                            );
+                            var name = megaChat.getContactNameFromJid(jid);
+                            $('.nw-contact-avatar', $message).replaceWith(room._generateContactAvatarElement(jid));
+                            $('.chat-username', $message).text(name);
+
+                            $.each(filesList, function(k, v) {
+                                var $file = $('<div class="nw-chat-sharing-body main-body">' +
+                                    '<div class="nw-chat-icons-area">' +
+                                        '<span class="block-view-file-type ' + fileicon({name: v.name})+ '"></span>' +
+                                    '</div>' +
+                                    '<div class="nw-chat-sharing-filename">' +
+                                    v.name +
+                                    '</div>' +
+                                    '<div class="nw-chat-sharing-filesize">' +
+                                    bytesToSize(v.size) +
+                                    '</div>' +
+                                    '<div class="nw-chat-sharing-filesize direct-progressbar hidden"><div class="progressbar"><div class="progressbarfill" style="width: 24%;"></div></div></div>' +
+                                    '<div class="clear"></div>' +
+                                '</div>');
+                                $('.fm-chat-message', $message).append($file);
+                            });
+
+                            $('.chat-message-txt', $message).empty();
+                            // todo: add progress bar (global?)
+
+                            var $cancelButton = $('<div class="fm-chat-file-button primary-button">Cancel</div>');
+                            $('.chat-message-txt', $message).append($cancelButton);
+                            $cancelButton.on('click', function() {
+                                $(this).replaceWith("<em>Canceled</em>");
+                                room.refreshUI();
+                                resp.cancel();
+                            });
+
+                            room.appendDomMessage($message);
+                        });
+
+                        Soon(function() { $fileUploadField.remove(); });
+
+                    });
+
+                    $fileUploadField.trigger("click");
+
+                    setTimeout(function() { // really bad way to cleanup things.... but it should be enough for the prototype demo
+                        $fileUploadField.remove();
+                    }, 60000);
+                }
+            });
+
+
 
         $('.fm-chat-block')
             .off('click.megaChatAttach', '.fm-chat-popup-button.from-computer')
@@ -2339,123 +2446,137 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
     self.bind('call-incoming-request', function(e, eventData) {
-        $('.btn-chat-call', self.$header).hide();
+        if(eventData.peerMedia) {
+            $('.btn-chat-call', self.$header).hide();
 
-        var doAnswer = function() {
-            self.megaChat.incomingCallDialog.hide();
+            var doAnswer = function() {
+                self.megaChat.incomingCallDialog.hide();
 
-            eventData.answer(true, {
-                mediaOptions: self.getMediaOptions()
-            });
+                eventData.answer(true, {
+                    mediaOptions: self.getMediaOptions()
+                });
 
-            if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
-                self.activateWindow();
-            }
+                if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
+                    self.activateWindow();
+                }
 
-            self._resetCallStateInCall();
-        };
+                self._resetCallStateInCall();
+            };
 
-        var doCancel = function() {
-            self.megaChat.incomingCallDialog.hide();
+            var doCancel = function() {
+                self.megaChat.incomingCallDialog.hide();
 
-            eventData.answer(false, {reason:'busy'});
+                eventData.answer(false, {reason:'busy'});
 
-            self.trigger('call-declined', eventData);
-        };
+                self.trigger('call-declined', eventData);
+            };
 
-        var participants = self.getParticipantsExceptMe();
+            var participants = self.getParticipantsExceptMe();
 
-        if(self.type == "private") {
+            if(self.type == "private") {
 
-            assert(participants[0], "No participants found.");
+                assert(participants[0], "No participants found.");
 
 
-            var contact = self.megaChat.getContactFromJid(participants[0]);
+                var contact = self.megaChat.getContactFromJid(participants[0]);
 
-            if(!contact) {
-                console.warn("Contact not found: ", participants[0]);
+                if(!contact) {
+                    console.warn("Contact not found: ", participants[0]);
+                } else {
+
+                    var avatar = undefined;
+                    if(avatars[contact.u]) {
+                        avatar = avatars[contact.u].url;
+                    }
+
+                    self.megaChat.incomingCallDialog.show(
+                        self.megaChat.getContactNameFromJid(participants[0]),
+                        avatar,
+                        eventData.peerMedia.video ? true : false,
+                        function() {
+                            self.options.mediaOptions.audio = true;
+                            self.options.mediaOptions.video = false;
+
+                            doAnswer();
+                        },
+                        function() {
+                            self.options.mediaOptions.audio = true;
+                            self.options.mediaOptions.video = true;
+
+                            doAnswer();
+                        },
+                        function() {
+                            doCancel();
+                        }
+                    );
+                }
+
             } else {
-
-                var avatar = undefined;
-                if(avatars[contact.u]) {
-                    avatar = avatars[contact.u].url;
-                }
-
-                self.megaChat.incomingCallDialog.show(
-                    self.megaChat.getContactNameFromJid(participants[0]),
-                    avatar,
-                    eventData.peerMedia.video ? true : false,
-                    function() {
-                        self.options.mediaOptions.audio = true;
-                        self.options.mediaOptions.video = false;
-
-                        doAnswer();
-                    },
-                    function() {
-                        self.options.mediaOptions.audio = true;
-                        self.options.mediaOptions.video = true;
-
-                        doAnswer();
-                    },
-                    function() {
-                        doCancel();
-                    }
-                );
+                throw new Error("Not implemented"); //TODO: Groups, TBD
             }
 
-        } else {
-            throw new Error("Not implemented"); //TODO: Groups, TBD
-        }
 
 
+            var $answer = $('.btn-chat-answer-incoming-call', self.$header);
+            $answer.unbind('click.megaChat');
+            $answer.bind('click.megaChat', doAnswer);
+            $answer.show();
 
-        var $answer = $('.btn-chat-answer-incoming-call', self.$header);
-        $answer.unbind('click.megaChat');
-        $answer.bind('click.megaChat', doAnswer);
-        $answer.show();
+            var $cancel = $('.btn-chat-reject-incoming-call', self.$header);
+            $cancel.unbind('click.megaChat');
+            $cancel.bind('click.megaChat', doCancel);
+            $cancel.show();
 
-        var $cancel = $('.btn-chat-reject-incoming-call', self.$header);
-        $cancel.unbind('click.megaChat');
-        $cancel.bind('click.megaChat', doCancel);
-        $cancel.show();
-
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "incoming-call",
-                participants[0],
-                "incoming-call",
-                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
-                [],
-                {
-                    'answer': {
-                        'type': 'primary',
-                        'text': "Answer",
-                        'callback': doAnswer
-                    },
-                    'reject': {
-                        'type': 'secondary',
-                        'text': "Cancel",
-                        'callback': doCancel
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "incoming-call",
+                    participants[0],
+                    "incoming-call",
+                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
+                    [],
+                    {
+                        'answer': {
+                            'type': 'primary',
+                            'text': "Answer",
+                            'callback': doAnswer
+                        },
+                        'reject': {
+                            'type': 'secondary',
+                            'text': "Cancel",
+                            'callback': doCancel
+                        }
                     }
-                }
-            )
-        );
+                )
+            );
+        } else if(eventData.files) {
+            // file transfer
+            eventData.answer(true, {
+                audio: false,
+                video: false
+            }); // tmp
+        } else {
+            console.error("Not sure how to handle incoming call request: ", e, eventData);
+        }
     });
 
 
 
     self.bind('call-init', function(e, eventData) {
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "started-call-" + unixtime(),
-                eventData.peer,
-                "call-started",
-                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
-                []
-            )
-        );
+        if(eventData.isDataCall) {
+            return;
+        } else {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "started-call-" + unixtime(),
+                    eventData.peer,
+                    "call-started",
+                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    []
+                )
+            );
 
-        self._callStartedState(e, eventData);
+            self._callStartedState(e, eventData);
+        }
     });
 
     self.bind('local-media-fail', function(e, eventData) {
@@ -2481,16 +2602,20 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
     self.bind('call-answered', function(e, eventData) {
-        self.appendDomMessage(
-            self.generateInlineDialog(
-                "started-call-" + unixtime(),
-                eventData.peer,
-                "call-started",
-                "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
-                [])
-        );
+        if(eventData.isDataCall) {
+            return;
+        } else {
+            self.appendDomMessage(
+                self.generateInlineDialog(
+                    "started-call-" + unixtime(),
+                    eventData.peer,
+                    "call-started",
+                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    [])
+            );
 
-        self._callStartedState(e, eventData);
+            self._callStartedState(e, eventData);
+        }
     });
 
     self.bind('call-answer-timeout', function(e, eventData) {

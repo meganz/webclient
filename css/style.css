@@ -8498,6 +8498,36 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-repeat: no-repeat;
 	display: none;
 }
+.nw-chat-notification-icon.waiting-verification {
+	background-position: 2px -9003px;
+}
+.nw-chat-notification-icon.verified  {
+	background-position: 2px -9040px;
+}
+.nw-chat-notification-icon.verification-skipped  {
+	background-position: 2px -9076px;
+}
+.nw-chat-notification-icon.missed-call  {
+	background-position: 2px -9111px;
+}
+.nw-chat-notification-icon.rejected-call  {
+	background-position: 2px -9149px;
+}
+.nw-chat-notification-icon.call-started  {
+	background-position: 2px -9183px;
+}
+.nw-chat-notification-icon.call-ended  {
+	background-position: 2px -9219px;
+}
+.nw-chat-notification-icon.call-from-different-device  {
+	background-position: 2px -9256px;
+}
+.nw-chat-notification-icon.conversation-started  {
+	background-position: 1px -9296px;
+}
+.nw-chat-notification-icon.user-left  {
+	background-position: 1px -9336px;
+}
 .chat-notification .nw-chat-notification-icon {
 	display: block;
 }

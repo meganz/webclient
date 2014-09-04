@@ -3,7 +3,7 @@
 var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
-var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
+var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
@@ -65,13 +65,16 @@ try
 
 		try {
 			var mozBrowserID =
-			[	Services.appinfo.vendor,
-				Services.appinfo.name,
+			[	Services.appinfo.name,
 				Services.appinfo.platformVersion,
 				Services.appinfo.platformBuildID,
 				Services.appinfo.OS,
 				Services.appinfo.XPCOMABI].join(" ");
+		} catch(e) {
+			var mozBrowserID = ua;
+		}
 
+		try {
 			loadSubScript('chrome://mega/content/strg2.js');
 
 			if(!(localStorage instanceof Ci.nsIDOMStorage)) {

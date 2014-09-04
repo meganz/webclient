@@ -2676,7 +2676,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
             self.generateInlineDialog(
                 "rejected-call-" + unixtime(),
                 userJid,
-                "call-rejected",
+                "rejected-call",
                 msg,
                 []
             )
@@ -2691,7 +2691,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
                 self.generateInlineDialog(
                     "canceled-call-" + unixtime(),
                     eventData.from,
-                    "call-handled-elsewhere",
+                    "call-from-different-device",
                     "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was handled on some other device.",
                     []
                 )
@@ -4025,7 +4025,7 @@ MegaChatRoom.prototype.appendMessage = function(message) {
         room: self
     });
 
-    if($('.fm-chat-message .chat-message-txt span', $message).text().length == 0) {
+    if($('.fm-chat-message .chat-message-txt span', $message).text().length == 0 && (!message.meta || !message.meta.attachments)) {
         if(localStorage.d) {
             console.debug("Message was empty: ", message, $message);
         }

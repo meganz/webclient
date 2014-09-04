@@ -7329,6 +7329,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-message-container.grouped-message .nw-contact-avatar, .fm-chat-message-container.grouped-message .chat-username {
 	display: none;
 }
+.fm-chat-message-container.grouped-message.is-attachment .nw-contact-avatar {
+    display: block;
+}
+.fm-chat-message-container.grouped-message.is-attachment .chat-username {
+    display: inline-block;
+}
 .fm-chat-message-time {
 	width: 90px;
 	float: right;

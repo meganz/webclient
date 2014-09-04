@@ -2944,8 +2944,8 @@ define('mpenc/greet/ske',[
             this.oldEphemeralKeys[this.id].authenticated = this.authenticatedMembers[myPos];
             this.authenticatedMembers.splice(myPos, 1);
         }
-        this.ephemeralPubKey = null;
-        this.ephemeralPrivKey = null;
+//        this.ephemeralPubKey = null;
+//        this.ephemeralPrivKey = null;
         if (this.members) {
             this.members.splice(myPos, 1);
         }
@@ -3103,6 +3103,8 @@ define('mpenc/handler',[
      *     During process of auxiliary protocol upflow.
      * @property AUX_DOWNFLOW {integer}
      *     During process of auxiliary protocol downflow.
+     * @property QUIT {integer}
+     *     After quitting participation.
      */
     ns.STATE = {
         NULL:          0x00,
@@ -3111,7 +3113,8 @@ define('mpenc/handler',[
         INITIALISED:   0x03,
         AUX_UPFLOW:    0x04,
         AUX_DOWNFLOW:  0x05,
-    };
+        QUIT:          0x06,
+        };
 
 
     /** Default size in bytes for the exponential padding to pad to. */
@@ -3375,7 +3378,7 @@ define('mpenc/handler',[
     ns.ProtocolHandler.prototype.quit = function() {
         _assert(this.state === ns.STATE.INITIALISED,
                 'quit() can only be called from an initialised state.');
-        this.state = ns.STATE.NULL;
+        this.state = ns.STATE.QUIT;
         this.stateUpdatedCallback(this);
 
         var outContent = this._quit();
@@ -3585,6 +3588,9 @@ define('mpenc/handler',[
 
                 // This is an mpenc.greet message.
                 var keyingMessageResult = this._processKeyingMessage(decodedMessage);
+                if (keyingMessageResult === null) {
+                    return;
+                }
                 var outContent = keyingMessageResult.decodedMessage;
 
                 if (outContent) {
@@ -3871,6 +3877,11 @@ define('mpenc/handler',[
         var outMessage = null;
         var newState = null;
 
+        if (this.state === ns.STATE.QUIT) {
+            // We're with this session, get out of here.
+            return null;
+        }
+
         if (message.dest === null || message.dest === '') {
             // Dealing with a broadcast downflow message.
             // Check for legal state transitions.
@@ -3887,8 +3898,10 @@ define('mpenc/handler',[
             }
             if (message.signingKey) {
                 // Sender is quitting participation.
-                // TODO: quit() stuff here: CLIQUES will need to refresh keys, but avoid a race condition if all do it.
-                _assert(false, 'Key refresh for quitting is not implemented, yet!');
+                this.askeMember.oldEphemeralKeys[message.source] = {
+                    priv: message.signingKey,
+                    pub:  this.askeMember.ephemeralPubKeys[message.source]
+                };
             } else {
                 // Content for the CLIQUES protocol.
                 if (message.intKeys && (message.intKeys.length === message.members.length)) {

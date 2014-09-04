@@ -6054,7 +6054,7 @@ span.search-number {
 }
 .fm-chat-end {
 	background-color: rgba(222,0,0,0.7);
-	background-position: -8px -1700px;
+	background-position: 6px -8979px;
 }
 .fm-start-call {
 	background-color: rgba(6,160,236,0.7);
@@ -6794,6 +6794,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
+	position: relative;
 	width: inherit !important;
 }
 .chat-message-date {
@@ -7472,11 +7473,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-shared-files .fm-chat-file-button.save-button {
 	margin: 10px 10px 10px 10px;
 }
-.fm-chat-file-button:hover {
-	background-color: #d11e00;
-	border: 2px solid #d11e00;
-	color: white;
-}
 .fm-chat-line-block {
 	background-color: rgba(0,0,0,0.05);
 	padding: 10px 0 11px 0;
@@ -7834,9 +7830,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	right: 0;
 }
 .fm-chat-emotion-popup {
-	margin: -134px 48px 0 0;
+	margin: -94px 48px 0 0;
 	width: 210px;
-	height: 130px;
+	height: 90px;
 	padding: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -8521,10 +8517,40 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 40px;
 	height: 32px;
 	float: left;
-	background-position: -3px -6570px;
+	background-position: 1px -9296px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	display: none;
+}
+.nw-chat-notification-icon.waiting-verification {
+	background-position: 2px -9003px;
+}
+.nw-chat-notification-icon.verified {
+	background-position: 2px -9040px;
+}
+.nw-chat-notification-icon.verification-skipped {
+	background-position: 2px -9076px;
+}
+.nw-chat-notification-icon.missed-call {
+	background-position: 2px -9111px;
+}
+.nw-chat-notification-icon.rejected-call {
+	background-position: 2px -9149px;
+}
+.nw-chat-notification-icon.call-started {
+	background-position: 2px -9183px;
+}
+.nw-chat-notification-icon.call-ended {
+	background-position: 2px -9219px;
+}
+.nw-chat-notification-icon.call-from-different-device {
+	background-position: 2px -9256px;
+}
+.nw-chat-notification-icon.conversation-started {
+	background-position: 1px -9296px;
+}
+.nw-chat-notification-icon.user-left {
+	background-position: 1px -9336px;
 }
 .chat-notification .nw-chat-notification-icon {
 	display: block;
@@ -18533,37 +18559,40 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: -24px 0 0 0;
 }
 .video-full-container .video-call-button.audio-icon {
-	background-position: 0 -8750px;
+	background-position: -8px -8758px;
 }
 .video-full-container .video-call-button.audio-icon.active {
-	background-position: 0 -8920px;
+	background-position: -8px -8928px;
 }
 .video-full-container .video-call-button.video-icon {
-	background-position: 0 -8809px;
+	background-position: -8px -8817px;
 }
 .video-full-container .video-call-button.video-icon.active {
-	background-position: 0 -8868px;
+	background-position: -8px -8876px;
 }
 .video-full-container .video-call-button.size-icon {
-	background-position: 0 -8629px;
+	background-position: -8px -8637px;
 }
 .video-full-container .video-call-button.size-icon.active {
-	background-position: 0 -8689px;
+	background-position: -8px -8697px;
 }
 .video-full-container .video-call-button.hang-up-icon {
-	background-position: 0 -7180px;
-	background-color: transparent;
+	background-position: -8px -7188px;
+	background-color: black;
 }
 .video-full-container .video-call-button {
 	position: relative;
 	background-color: transparent;
 	border-color: transparent;
 	margin: 4px;
-	width: 48px;
-	height: 48px;
-	border: 0;
+	width: 40px;
+	height: 40px;
 	left: 0;
 	top: 0;
+	background-color: black;
+}
+.video-full-container .video-call-button:hover {
+	border-color: black;
 }
 .video-full-container.full-mode {
 	overflow: hidden;
@@ -18580,7 +18609,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	margin: 0 0 0 0;
+	margin: 0;
 }
 .video-full-canvas-block.another-user img, .video-full-canvas-block.another-user video {
 	width: 100%;
@@ -18665,7 +18694,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 100%;
 }
 .video-off video {
-    display: none;
+	display: none;
 }
 .video-off .video-canvas-flip-side {
 	position: absolute;
@@ -18724,11 +18753,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: 0;
 }
 .video-controls .video-size-button .video-call-button {
-	margin: 6px;
+	margin: 10px;
 }
 .video-controls .video-full-buttons .video-call-button {
 	float: left;
-	margin: 6px 2px 0 6px;
+	margin: 10px 6px 0 10px;
 }
 .video-relative-block {
 	position: relative;

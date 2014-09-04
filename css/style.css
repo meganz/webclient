@@ -7147,12 +7147,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-message-container {
 	padding-top: 0;
 }
-.fm-chat-message-container.msg-state-not-sent {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-	-moz-opacity: 0.7;
-	-khtml-opacity: 0.7;
-	opacity: 0.7;
-}
+
 .fm-chat-message a {
 	color: #0A68CA;
 }
@@ -7272,6 +7267,33 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-username.current-name {
 	color: #1FA4E7;
 }
+.fm-chat-message .label {
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+    color: rgba(0,0,0,0.3);
+    padding: 0px 2px 0px 2px;
+    line-height: 15px;
+    height: 18px;
+    position: absolute;
+    right: 102px;
+    top: 14px;
+    font-family: "Open Sans Semibold", Arial;
+    font-variant: small-caps;
+}
+.fm-chat-message .label.delete-button {
+    color: rgba(222,0,0,0.7);
+    border-color: rgba(222,0,0,0.6);
+}
+.fm-chat-message .label.delete-button:hover {
+    color: white;
+    border-color: rgba(222,0,0,0.6);
+    background-color: rgba(222,0,0,0.7);
+}
+
+.fm-chat-message .label.text-message {
+    right: 144px;
+}
+
 .fm-chat-messages-pad {
 	margin: 0 0 0 0;
 	display: block;
@@ -7325,6 +7347,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #333333;
 	padding: 10px 0 12px 0px;
 	text-align: left;
+
+    position: relative; /* required for the "relative -> absolute" hack for positioning label.not-sent */
 }
 .chat-message-txt {
 	margin-right: 89px;
@@ -18446,6 +18470,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	display: block;
 }
 .video-full-container {
+    position: absolute;
 	width: 100%;
 	height: 100%;
 	background: #222222;
@@ -18557,9 +18582,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	top: 50%;
 	margin: 0 0 0 0;
 }
-.video-full-canvas-block.another-user img, .video-full-canvas-block.another-user canvas {
+.video-full-canvas-block.another-user img, .video-full-canvas-block.another-user video {
 	width: 100%;
 }
+
 .video-full-canvas-block.current-user {
 	border: 4px solid rgba(255,255,255,0.7);
 	z-index: 10;
@@ -18569,7 +18595,23 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 	overflow: hidden;
+    min-width: 15%; /* auto resize/fit, 15% of the screen width */
+    max-width: 15%; /* auto resize/fit, 15% of the screen width */
 }
+.video-full-canvas-block.current-user img,.video-full-canvas-block.current-user video {
+    min-width: 100%; /* auto resize/fit, 15% of the screen width */
+    max-width: 100%; /* auto resize/fit, 15% of the screen width */
+}
+.video-full-canvas-block.video-off img,.video-full-canvas-block.video-off video {
+    display: none;
+}
+.video-full-canvas-block.current-user.video-off {
+    min-width: 252px;
+    max-width: 100%;
+    height: 166px;
+
+}
+
 .video-call-border {
 	width: 40px;
 	height: 40px;

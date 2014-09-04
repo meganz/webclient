@@ -60,14 +60,15 @@ OpQueue.prototype.queue = function(opName, arrArgs, secondArg, thirdArg) {
  * @returns {number} setTimeout id
  */
 OpQueue.prototype.retry = function() {
-    if(this.tickTimer) {
-        clearTimeout(this.tickTimer);
-        this.tickTimer = null;
-    }
     var self = this;
 
-    return this.tickTimer = setTimeout(function() {
-        this.tickTimer = null;
+    if(self.tickTimer) {
+        clearTimeout(self.tickTimer);
+        self.tickTimer = null;
+    }
+
+    return self.tickTimer = setTimeout(function() {
+        self.tickTimer = null;
         self.pop();
     }, self.retryTimeout);
 };
@@ -169,20 +170,20 @@ OpQueue.prototype.preprocess = function(op) {
 OpQueue.prototype.pop = function() {
     var self = this;
 
-    if(this._queue.length == 0) {
+    if(self._queue.length == 0) {
         return true;
     }
 
-    if(this.$waitPreprocessing && this.$waitPreprocessing.state && this.$waitPreprocessing.state() == "pending") {
+    if(self.$waitPreprocessing && self.$waitPreprocessing.state && self.$waitPreprocessing.state() == "pending") {
         // pause if we are waiting for op preprocessing.
         return true;
     }
 
-    this.$waitPreprocessing = this.preprocess(this._queue[0]);
+    self.$waitPreprocessing = self.preprocess(self._queue[0]);
 
 
 
-    $.when(this.$waitPreprocessing).done(function() {
+    $.when(self.$waitPreprocessing).done(function() {
         self._currentOp = self._queue[0];
 
         if(self.validateFn(self, self._queue[0])) {
@@ -261,7 +262,7 @@ OpQueue.prototype.pop = function() {
         } else {
             if(self._error_retries > self.MAX_ERROR_RETRIES) {
                 self._error_retries = 0;
-                self.recoverFailFn(this);
+                self.recoverFailFn(self);
             } else {
                 if(localStorage.d) { console.error("OpQueue Will retry: ", self._currentOp, self._queue[0]); }
                 self._error_retries++;

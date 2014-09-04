@@ -432,12 +432,23 @@ var chatui;
 
         // full screen stuff
         function fullscreenVideoResizing() {
-            // Cansvas height  (4:3)
-            var h = Math.round(($(window).width()/2 - 12) * 0.75);
-            $('.video-row').css('height', Math.round(($(window).height() - h)/2));
-            $('.video-main-container').css('height', h);
-            $('.video-main-container img, .video-main-container video').css('height', h);
-            $('.video-size-button').css('right', $('.video-size-button').offset().top);
+            var c = $('.video-full-canvas-block.another-user img,.video-full-canvas-block.another-user video');
+            var w = $(window).width();
+            var h = $(window).height();
+            c.removeAttr('style');
+            if (h/w == 0.5625) c.height(c.width()*0.5625);
+            else c.height(c.width()*0.75);
+            if(h > c.height()) {
+                var nw = (h*4)/3;
+                c.css({
+                    width : Math.round(nw),
+                    height : h
+                });
+            }
+            c.css({
+                'margin-left' : '-' + c.width()/2 + 'px',
+                'margin-top' : '-' + c.height()/2 + 'px'
+            });
         }
         fullscreenVideoResizing();
 
@@ -603,6 +614,19 @@ MegaChat.prototype.init = function() {
 
         var bareJid = eventObject.getFromJid().split("/")[0];
 
+        // should we trigger refreshUI ?
+        if(eventObject.isMyOwn(self.karere) === false) {
+            $.each(self.chats, function(roomJid, room) {
+
+                if(room.participantExistsInRoom(bareJid)) {
+                    // if this user is part of the currently visible room, then refresh the UI
+                    if(self.getCurrentRoomJid() == room.roomJid) {
+                        room.refreshUI();
+                    }
+                }
+            });
+        }
+
         if(eventObject.getShow() != "unavailable") {
             if(eventObject.isMyOwn(self.karere) === false) {
 
@@ -619,6 +643,7 @@ MegaChat.prototype.init = function() {
                     if(room._leaving || room._conv_ended) {
                         return; // continue
                     }
+
                     if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
                         if(localStorage.d) {
                             console.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
@@ -653,19 +678,6 @@ MegaChat.prototype.init = function() {
             }
         }
 
-        // should we trigger refreshUI ?
-        if(eventObject.isMyOwn(self.karere) === false) {
-            $.each(self.chats, function(roomJid, room) {
-
-                if(room.participantExistsInRoom(bareJid)) {
-                    // if this user is part of the currently visible room, then refresh the UI
-                    if(self.getCurrentRoomJid() == room.roomJid) {
-                        room.refreshUI();
-                    }
-                }
-            });
-        }
-
         self.renderMyStatus();
         self.renderContactTree();
     });
@@ -680,7 +692,15 @@ MegaChat.prototype.init = function() {
             } else {
                 $treeElement.removeClass('chat-capability-' + capability);
             }
-        })
+        });
+
+        var roomJid = $treeElement.attr('data-room-jid');
+
+        var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
+        if(room) { // refresh UI if new capabilities were received.
+            room.refreshUI();
+        }
+
     });
 
     // Invite messages
@@ -898,7 +918,7 @@ MegaChat.prototype.init = function() {
                 }
 
             }
-        } else if(eventObject.getAction() == "delete-message") {
+        } else if(eventObject.getAction() == "delete-message" && fromMyDevice === true) {
             room = self.chats[meta.roomJid];
             if(!room) { return; };
 
@@ -909,12 +929,23 @@ MegaChat.prototype.init = function() {
             if(!msgObject) { return; };
 
 
-
-            // is this user the owner/creator of the message?
-            if(Karere.getNormalizedBareJid(eventObject.getFromJid()) == Karere.getNormalizedBareJid(msgObject.getFromJid())) {
+            // policy required for deleting messages:
+            // 1. the delete-message action can only be allowed if the sender of both the action message and target message to be the same
+            // 2. the sender == me (applied by using the helper flag: fromMyDevice === true, in the previous if)
+            // 3. the message state is NOT_SENT
+            if(
+                Karere.getNormalizedBareJid(eventObject.getFromJid()) == Karere.getNormalizedBareJid(msgObject.getFromJid()) &&
+                msgObject.getState && msgObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT
+            ) {
                 msgObject.meta['isDeleted'] = true;
                 $('.fm-chat-message-container[data-id="' + msgId + '"]', room.$messages).remove();
                 room.refreshUI();
+
+                var msgIdx = room.messagesIndex[msgId];
+
+                removeValue(room.messagesIndex, msgIdx);
+                removeValue(room.messages, msgObject);
+                delete msgObject;
             }
         } else {
             if(localStorage.d) {
@@ -2805,8 +2836,8 @@ var MegaChatRoom = function(megaChat, roomJid) {
 
 
     self.$messages
-        .undelegate('.delete-message', 'mousedown.megaChatDeleteMessage')
-        .delegate('.delete-message', 'mousedown.megaChatDeleteMessage', function(e) {
+        .undelegate('.delete-button', 'mousedown.megaChatDeleteMessage')
+        .delegate('.delete-button', 'mousedown.megaChatDeleteMessage', function(e) {
             var $message = $(this).parents('.fm-chat-message-container');
             if(!$message) { return; };
 
@@ -2936,6 +2967,7 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
                 'height',
                 JSON.parse(localStorage.audioVideoScreenSize)
             );
+
             $(window).trigger('resize');
         }
 
@@ -3033,34 +3065,35 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
 
                 // move the <video/> elements
                 if(self._myAvElement) {
-                    $('.video-full-canvas.current-user .video-canvas-flip-side', $fullscreenContainer).append(self._myAvElement);
+                    $('.video-full-canvas-block.current-user .front', $fullscreenContainer).append(self._myAvElement);
                     self._myAvElement.play();
                 }
                 if(self._othersAvElement) {
-                    $('.video-full-canvas.other-user .video-canvas-flip-side', $fullscreenContainer).append(self._othersAvElement);
+                    $('.video-full-canvas-block.other-user .front', $fullscreenContainer).append(self._othersAvElement);
                     self._othersAvElement.play();
                 }
 
                 // handle the hidden state of video tags in cases where the video was muted.
                 $fullscreenContainer.removeClass("hidden");
                 if(!$(self._myAvElement).is(":visible")) {
-                    $('.video-full-canvas.current-user').addClass('video-off');
+                    $('.video-full-canvas-block.current-user').addClass('video-off');
                 } else {
-                    $('.video-full-canvas.current-user video').css('display', '');
-                    $('.video-full-canvas.current-user').removeClass('video-off');
+                    $('.video-full-canvas-block.current-user video').css('display', '');
+                    $('.video-full-canvas-block.current-user').removeClass('video-off');
                 }
 
                 if(!$(self._othersAvElement).is(":visible")) {
-                    $('.video-full-canvas.other-user').addClass('video-off');
+                    $('.video-full-canvas-block.other-user').addClass('video-off');
                 } else {
-                    $('.video-full-canvas.other-user video').css('display', '');
-                    $('.video-full-canvas.other-user').removeClass('video-off');
+                    $('.video-full-canvas-block.other-user video').css('display', '');
+                    $('.video-full-canvas-block.other-user').removeClass('video-off');
                 }
 
                 $('.video-full-container .video-call-button.video-icon')[self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
                 $('.video-full-container .video-call-button.audio-icon')[self.options.mediaOptions.audio ? "removeClass" : "addClass"]("active");
 
                 $(document).fullScreen(true);
+                $(window).trigger('resize');
             }
             else {
                 $expandButtons.removeClass('active');
@@ -3072,7 +3105,12 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
                     self._myAvElement.play();
                 }
                 if(self._othersAvElement) {
-                    $(self._othersAvElement).css('height', '');
+                    $(self._othersAvElement).css({
+                        'height': '',
+                        'margin-top': '',
+                        'margin-left': ''
+                    });
+
                     $('.others-av-screen', self.$header).append(self._othersAvElement);
                     self._othersAvElement.play();
                 }
@@ -3084,6 +3122,13 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
                 $fullscreenContainer.addClass("hidden");
 
                 $(document).fullScreen(false);
+                $(window).trigger('resize');
+
+                // object-fit hack
+                $('.others-av-screen.video-call-container video').css('height', 'auto');
+                setTimeout(function() { // TODO: remove this after the demo and find a proper solution.
+                    $('.others-av-screen.video-call-container video').css('height', '');
+                }, 800);
             }
         });
 
@@ -3127,13 +3172,13 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
                     self.options.mediaOptions.video = true;
                     self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
                     $(this).removeClass("active");
-                    $('.video-full-canvas.current-user').removeClass('video-off');
-                    $('.video-full-canvas.current-user video').css('display', '');
+                    $('.video-full-canvas-block.current-user').removeClass('video-off');
+                    $('.video-full-canvas-block.current-user video').css('display', '');
                 } else { // mute
                     self.options.mediaOptions.video = false;
                     self.megaChat.karere.connection.rtc.muteUnmute(true, {video:true});
                     $(this).addClass("active");
-                    $('.video-full-canvas.current-user').addClass('video-off');
+                    $('.video-full-canvas-block.current-user').addClass('video-off');
                 }
             })
             [self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
@@ -3150,11 +3195,6 @@ MegaChatRoom.prototype._callStartedState = function(e, eventData) {
 
 
     $cancel.show();
-
-    // auto trigger fullscreen if answered with video?
-    if(self.getMediaOptions().video === true) {
-        $('.video-call-button.size-icon', self.$header).trigger('click');
-    }
 
     self._resetCallStateInCall();
 };
@@ -3269,9 +3309,9 @@ MegaChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, 
         if($('.video-full-container').is(":visible")) {
             if(videoCssClass == 'current-user-video-container') {
                 // my video screen
-                $('.video-full-canvas.current-user').addClass("video-off");
+                $('.video-full-canvas-block.current-user').addClass("video-off");
             } else {
-                $('.video-full-canvas.other-user').addClass("video-off");
+                $('.video-full-canvas-block.other-user').addClass("video-off");
             }
         }
     } else {
@@ -3286,11 +3326,11 @@ MegaChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, 
         if($('.video-full-container').is(":visible")) {
             if(videoCssClass == 'current-user-video-container') {
                 // my video screen
-                $('.video-full-canvas.current-user video').css('display', '');
-                $('.video-full-canvas.current-user').removeClass("video-off");
+                $('.video-full-canvas-block.current-user video').css('display', '');
+                $('.video-full-canvas-block.current-user').removeClass("video-off");
             } else {
-                $('.video-full-canvas.other-user video').css('display', '');
-                $('.video-full-canvas.other-user').removeClass("video-off");
+                $('.video-full-canvas-block.other-user video').css('display', '');
+                $('.video-full-canvas-block.other-user').removeClass("video-off");
             }
         }
     }
@@ -3706,6 +3746,7 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
                    var capabilities = self.megaChat.karere.getCapabilities(p);
 
                    if(!capabilities) {
+                       ERRDEBUG("No audio/video capabilities for user: ", p);
                        return; // continue;
                    }
                    if(capabilities['audio'] || capabilities['video']) {
@@ -3716,6 +3757,8 @@ MegaChatRoom.prototype.refreshUI = function(scrollToBottom) {
 
             if(haveCallCapability) {
                 $('.btn-chat-call', self.$header).show();
+            } else {
+                ERRDEBUG("No audio/video capabilities.");
             }
         }
     }
@@ -3887,6 +3930,20 @@ MegaChatRoom.prototype.appendMessage = function(message) {
 
     if(message.getFromJid() == self.roomJid) {
         return; // dont show any system messages (from the conf room)
+    }
+
+    if(message instanceof KarereEventObjects.IncomingMessage && Karere.getNormalizedBareJid(message.getFromJid()) == self.megaChat.karere.getJid()) {
+        // my own IncomingMessage message, should be converted to Outgoing
+        message = new KarereEventObjects.OutgoingMessage(
+            message.toJid,
+            message.fromJid,
+            message.type,
+            message.messageId,
+            message.contents,
+            message.meta,
+            message.delay,
+            message.meta && message.meta.state ? message.meta.state : message.state
+        );
     }
     if(self.messagesIndex[message.getMessageId()] !== undefined) {
         if(localStorage.d) {
@@ -4067,15 +4124,6 @@ MegaChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         self._renderMessageState($message, msgObj)
     });
 
-
-    if(messageObject instanceof KarereEventObjects.IncomingMessage || messageObject instanceof KarereEventObjects.OutgoingMessage) {
-        if(Karere.getNormalizedBareJid(messageObject.getFromJid()) == self.megaChat.karere.getBareJid()) {
-            // its my own message
-            var $controls = $('<a href="javascript:;" class="chat-button message-options delete-message">[delete]</a>');
-            $('.chat-message-txt', $message).after($controls);
-        }
-    }
-
     self._renderMessageState($message, messageObject);
 
     self.refreshScrollUI();
@@ -4091,9 +4139,6 @@ MegaChatRoom.prototype._renderMessageState = function($message, messageObject) {
 
 
     $message.removeClass("msg-state-sent msg-state-not-sent msg-state-delivered");
-    $('.resend', $message).fadeOut(function() {
-        $(this).remove();
-    });
 
     if(!(messageObject instanceof KarereEventObjects.OutgoingMessage)) {
         return;
@@ -4101,26 +4146,37 @@ MegaChatRoom.prototype._renderMessageState = function($message, messageObject) {
 
     if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.SENT) {
         $message.addClass("msg-state-sent");
+
+        if($('.label.not-sent', $message).size() > 0) {
+            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
+        }
     } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
         $message.addClass("msg-state-not-sent");
 
-        if(self._waitingForOtherParticipants() === false) {
-            var $resendButton = $('<div class="fm-chat-file-button primary-button resend">re-send</div>');
-            $('.chat-message-txt', $message).append($resendButton);
-            $resendButton.hide();
-            $resendButton.on('click', function() {
-                self._sendMessageToXmpp(messageObject);
-            });
-            setTimeout(function() {
-                if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT && self._waitingForOtherParticipants() === false) {
-                    $resendButton.fadeIn();
-                }
-            }, 3000);
+        if($('.label.not-sent.text-message', $message).size() == 0) {
+            var $elem = $('<span class="label not-sent text-message">not sent</span>');
+            $elem.hide();
+            $('.chat-username', $message).after($elem);
+            $elem.fadeIn();
+        }
+        if($('.label.not-sent.delete-button', $message).size() == 0) {
+            var $elem = $('<a href="javascript:;" class="label not-sent delete-button">delete</a>');
+            $elem.hide();
+            $('.chat-username', $message).after($elem);
+            $elem.fadeIn();
         }
     } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
         $message.addClass("msg-state-delivered");
+
+        if($('.label.not-sent', $message).size() > 0) {
+            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
+        }
     } else {
         $message.addClass("msg-state-unknown");
+
+        if($('.label.not-sent', $message).size() > 0) {
+            $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
+        }
     }
 
 

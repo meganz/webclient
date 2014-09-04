@@ -60,6 +60,9 @@ function RtcSession(stropheConn, options) {
     if (!RTC)
         throw new Error('This browser does not support webRTC');
 
+
+    var self = this;
+
     this.connection = stropheConn;
     var jingle = this.jingle = stropheConn.jingle;
     if (jingle.rtcSession)
@@ -68,12 +71,18 @@ function RtcSession(stropheConn, options) {
 // Init crypto functions
     if (!options.encryptMessageForJid || !options.decryptMessage || !options.generateMac) {
         if (options.dummyCryptoFunctions) {
-            jingle.encryptMessageForJid = function(msg, bareJid)
-                {return RtcSession.xorEnc(msg, bareJid)};
-            jingle.decryptMessage = function(msg)
-                {return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid))};
-            jingle.generateMac = function(msg, key)
-                {return RtcSession.xorEnc(msg, key)};
+            jingle.encryptMessageForJid = function(msg, bareJid) {
+                if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
+                    throw new Error("pubkey not loaded: " + bareJid);
+                }
+                return RtcSession.xorEnc(msg, bareJid)
+            };
+            jingle.decryptMessage = function(msg) {
+                return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
+            };
+            jingle.generateMac = function(msg, key) {
+                return RtcSession.xorEnc(msg, key);
+            };
         } else
             throw new Error("At least one crypto function is not provided in 'options'");
     } else {
@@ -97,7 +106,16 @@ function RtcSession(stropheConn, options) {
     if (options.prepareToSendMessage) {
         jingle.prepareToSendMessage = options.prepareToSendMessage;
     } else {
-        jingle.prepareToSendMessage = function(f) { f(); };
+        if(options.dummyCryptoFunctions) {
+            jingle.prepareToSendMessage = function(f, bareJid) {
+                self._dummyKeys = self._dummyKeys || {};
+                self._dummyKeys[bareJid] = true;
+
+                f();
+            };
+        } else {
+            jingle.prepareToSendMessage = function(f) { f(); };
+        }
     }
     jingle.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
@@ -352,7 +370,7 @@ RtcSession.prototype = {
            ownFprMacKey: ownFprMacKey,
            peerFprMacKey: peerFprMacKey,
            fileTransferHandler: options.files?
-                self.jingle.ftManager.createUploadHandler(sid, fileArr):undefined
+                self.jingle.ftManager.createUploadHandler(sid, fullPeerJid, fileArr):undefined
         });
         /**
             An outgoing call is being initiated by us
@@ -411,31 +429,33 @@ RtcSession.prototype = {
     },
     null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
-    var msgattrs = {
-         to: targetJid,
-         type: 'megaCall',
-         sid: sid,
-         fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid)
-    };
-    if (options.files) {
-        var infos = {};
-        fileArr = [];
-        for (var i=0; i<options.files.length; i++) {
-            var file = options.files[i];
-            fileArr.push(Object.freeze(file));
-            var info = {size: file.size, mime: file.type};
-            infos[file.name] = info;
-        }
-        msgattrs.files = JSON.stringify(infos);
-    }
-     else
-        msgattrs.media = (options.audio?'a':'')+(options.video?'v':'');
-
     self.jingle.prepareToSendMessage(function() {
+        var msgattrs = {
+            to: targetJid,
+            type: 'megaCall',
+            sid: sid,
+            fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid)
+        };
+        if (options.files) {
+            var infos = {};
+            fileArr = [];
+            for (var i=0; i<options.files.length; i++) {
+                var file = options.files[i];
+                fileArr.push(Object.freeze(file));
+                var info = {size: file.size, mime: file.type};
+                infos[file.name] = info;
+            }
+            msgattrs.files = JSON.stringify(infos);
+        }
+        else
+            msgattrs.media = (options.audio?'a':'')+(options.video?'v':'');
+
+
         self.connection.send($msg(msgattrs));
     }, targetJid);
 
-    setTimeout(function() {
+    if (!options.files)
+     setTimeout(function() {
         if (state !== 1)
             return;
 
@@ -456,7 +476,7 @@ RtcSession.prototype = {
         @property {string} peer The JID of the callee
        */
         self.trigger('call-answer-timeout', {peer: targetJid});
-    }, self.jingle.callAnswerTimeout);
+     }, self.jingle.callAnswerTimeout);
   } //end initiateCallback()
   if (options.audio || options.video)
       self._myGetUserMedia(options, initiateCallback);

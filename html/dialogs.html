@@ -893,50 +893,75 @@
 </div>
 
 
-<div class="video-full-container hidden" style="position: absolute;">
-    <div class="video-row">
-        <div class="video-full-demo-ticket"></div>
-        <div class="video-full-logo"></div>
-        <div class="video-size-button">
-            <div class="video-call-button size-icon"><div class="video-call-border"></div></div>
+<div class="video-full-container full-mode hidden">
+    <!--<div class="video-row">-->
+        <!--<div class="video-full-demo-ticket"></div>-->
+        <!--<div class="video-full-logo"></div>-->
+        <!--<div class="video-size-button">-->
+            <!--<div class="video-call-button size-icon"><div class="video-call-border"></div></div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="video-main-container">-->
+        <!--&lt;!&ndash; Please add "video-off" classname if user disabled camera !&ndash;&gt;-->
+        <!--<div class="video-full-canvas other-user">-->
+            <!--<div class="video-relative-block">-->
+                <!--<div class="video-transparent-border"></div>-->
+                <!--&lt;!&ndash; Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !&ndash;&gt;-->
+                <!--<div class="video-canvas-flip-side front">-->
+                    <!--&lt;!&ndash;<img src="images/temp/video-temp-img.jpg" />&ndash;&gt;-->
+                <!--</div>-->
+                <!--<div class="video-full-disabled-block back">-->
+                    <!--<div class="video-full-disabled-icon"></div>-->
+                    <!--<div class="video-full-disabled-txt">Camera disabled</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--&lt;!&ndash; Please add "video-off" classname if user disabled camera !&ndash;&gt;-->
+        <!--<div class="video-full-canvas current-user">-->
+            <!--<div class="video-relative-block">-->
+                <!--<div class="video-transparent-border"></div>-->
+                <!--&lt;!&ndash; Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !&ndash;&gt;-->
+                <!--<div class="video-canvas-flip-side front">-->
+                    <!--&lt;!&ndash;<img src="images/temp/video-temp-img.jpg" />&ndash;&gt;-->
+                <!--</div>-->
+                <!--<div class="video-full-disabled-block back">-->
+                    <!--<div class="video-full-disabled-icon"></div>-->
+                    <!--<div class="video-full-disabled-txt">Camera disabled</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="clear"></div>-->
+    <!--</div>-->
+    <!--<div class="video-row">-->
+        <!--<div class="video-full-buttons">-->
+            <!--<div class="video-call-button audio-icon"><div class="video-call-border"></div></div>-->
+            <!--<div class="video-call-button video-icon"><div class="video-call-border"></div></div>-->
+            <!--<div class="video-call-button hang-up-icon"><div class="video-call-border"></div></div>-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <div class="video-full-demo-ticket"></div>
+    <div class="video-full-logo"></div>
+    <div class="video-full-canvas-block another-user other-user">
+        <!--<img alt="" src="images/temp/video-temp-img2.jpg" />-->
+        <div class="front"></div>
+    </div>
+    <div class="video-full-canvas-block current-user">
+        <!--<img alt="" src="images/temp/video-temp-img3.jpg" />-->
+        <div class="front"></div>
+        <div class="video-full-disabled-block">
+            <div class="video-full-disabled-icon"></div>
         </div>
     </div>
-    <div class="video-main-container">
-        <!-- Please add "video-off" classname if user disabled camera !-->
-        <div class="video-full-canvas other-user">
-            <div class="video-relative-block">
-                <div class="video-transparent-border"></div>
-                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
-                <div class="video-canvas-flip-side front">
-                    <!--<img src="images/temp/video-temp-img.jpg" />-->
-                </div>
-                <div class="video-full-disabled-block back">
-                    <div class="video-full-disabled-icon"></div>
-                    <div class="video-full-disabled-txt">Camera disabled</div>
-                </div>
-            </div>
-        </div>
-        <!-- Please add "video-off" classname if user disabled camera !-->
-        <div class="video-full-canvas current-user">
-            <div class="video-relative-block">
-                <div class="video-transparent-border"></div>
-                <!-- Please use canvas instead of demo img. width should be 100%, Width : Height = 4:3 !-->
-                <div class="video-canvas-flip-side front">
-                    <!--<img src="images/temp/video-temp-img.jpg" />-->
-                </div>
-                <div class="video-full-disabled-block back">
-                    <div class="video-full-disabled-icon"></div>
-                    <div class="video-full-disabled-txt">Camera disabled</div>
-                </div>
-            </div>
-        </div>
-        <div class="clear"></div>
-    </div>
-    <div class="video-row">
+    <div class="video-controls">
         <div class="video-full-buttons">
             <div class="video-call-button audio-icon"><div class="video-call-border"></div></div>
             <div class="video-call-button video-icon"><div class="video-call-border"></div></div>
             <div class="video-call-button hang-up-icon"><div class="video-call-border"></div></div>
+        </div>
+        <div class="video-size-button">
+            <div class="video-call-button size-icon"><div class="video-call-border"></div>
+            </div>
         </div>
     </div>
 </div>

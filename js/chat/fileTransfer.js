@@ -21,19 +21,19 @@ function FileTransferManager(jingle) {
     this.updateGui = function(){};
 }
 
-FileTransferManager.prototype.createDownloadHandler = function(sid, files) {
+FileTransferManager.prototype.createDownloadHandler = function(sid, peerJid, files) {
     if (this.downloads[sid])
         throw new Error("Assertion failed: download with the specified sid already exists");
-    var result = this.downloads[sid] = new DownloadHandler(this, sid, files);
+    var result = this.downloads[sid] = new DownloadHandler(this, sid, peerJid, files);
     if (!this._timer)
         this._timer = setInterval(this._onTimer.bind(this), 1000);
     return result;
 }
 
-FileTransferManager.prototype.createUploadHandler = function(sid, files) {
+FileTransferManager.prototype.createUploadHandler = function(sid, peerJid, files) {
     if (this.uploads[sid])
         throw new Error("Assertion failed: upload with the specified sid already exists");
-    var result = this.uploads[sid] = new UploadHandler(this, sid, files);
+    var result = this.uploads[sid] = new UploadHandler(this, sid, peerJid, files);
     if (!this._timer)
         this._timer = setInterval(this._onTimer.bind(this), 1000);
     return result;
@@ -72,31 +72,32 @@ FileTransferManager.prototype._onTimer = function() {
     }
 }
 
-FileTransferManager.sendQueue = function() {
+FileTransferManager.prototype.sendQueue = function() {
     var result = [];
     for (var sid in this.uploads) {
         var upload = this.uploads[sid];
         for (var i = 0; i<upload._files.length; i++) {
             var file = upload._files[i];
-            result.push({name: file.name, size: file.size, mime:file.type});
+            result.push({ftSess: upload, name: file.name, size: file.size, mime:file.type});
         }
     }
     return result;
 }
 
-FileTransferManager.recvQueue = function() {
+FileTransferManager.prototype.recvQueue = function() {
     var result = [];
     for (var sid in this.downloads) {
-        var download = this.uploads[sid];
-        for (var i = 0; i<download._files.length; i++) {
-            var file = download._files[i];
-            result.push({name: file.name, size: file.size, mime:file.type});
+        var download = this.downloads[sid];
+        for (var f in download._files) {
+            var file = download._files[f];
+            result.push({ftSess: download, name: f, size: file.size, mime:file.type});
         }
     }
     return result;
 }
 
-FileTransferManager.prototype.createHasher = function() {
+if (window.CryptoJS && CryptoJS.algo.SHA1)
+    FileTransferManager.prototype.createHasher = function() {
         var inst = CryptoJS.algo.SHA1.create();
         var WordArray = CryptoJS.lib.WordArray;
         var updateSave = inst.update;
@@ -104,14 +105,17 @@ FileTransferManager.prototype.createHasher = function() {
                 updateSave.call(inst, WordArray.create(arrBuf));
             }
         return inst;
-}
+    }
+    else
+        console.warn("webrtcft: CryptoJS SHA1 not found, hash checks will be disabled");
 
 function TransferHandlerBase() {
 }
 
-TransferHandlerBase.prototype.init = function(ftManager, sid) {
+TransferHandlerBase.prototype.init = function(ftManager, sid, peerJid) {
     this._ftManager = ftManager;
     this._sid = sid;
+    this._peerJid = peerJid;
 }
 
 TransferHandlerBase.prototype.bindToDataChannel = function(dataChan) {
@@ -136,6 +140,9 @@ TransferHandlerBase.prototype.isDownload = function() {
 TransferHandlerBase.prototype.sid = function() {
     return this._sid;
 }
+TransferHandlerBase.prototype.peerJid = function() {
+    return this._peerJid;
+}
 
 TransferHandlerBase.prototype.error = function(e, dontThrow, params) {
     var event = {ftSess:this, error:e};
@@ -146,8 +153,8 @@ TransferHandlerBase.prototype.error = function(e, dontThrow, params) {
     if (!dontThrow)
         throw new Error(e);
 }
-function DownloadHandler(ftManager, sid, files) {
-    this.init.call(this, ftManager, sid);
+function DownloadHandler(ftManager, sid, peerJid, files) {
+    this.init.call(this, ftManager, sid, peerJid);
     this._isDownload = true;
     this._files = files;
     this._currentFile = null;
@@ -193,7 +200,7 @@ DownloadHandler.prototype.onmessage = function(event) {
         if (this._ftManager.createHasher)
             this._hasher = this._ftManager.createHasher();
         this._state = FTSTATE_RECEIVE_FILE;
-        $(this._ftManager).trigger('recv-queue-updated');
+        $(this._ftManager).trigger('recv-queue-updated', {ftSess:this});
         $(this._ftManager).trigger('recv-new', {ftSess: this, file:info});
     }
     else if (ptype === FTPTYPE_FILE_DATA) {
@@ -238,7 +245,7 @@ DownloadHandler.prototype.onmessage = function(event) {
             if (Object.keys(this._files).length > 0)
                 console.warn("New file list received but not all files from previous list received");
             this._files = JSON.parse(readStringFromArrBuf(data, 4));
-            $(this._ftManager).trigger('recv-queue-updated')
+            $(this._ftManager).trigger('recv-queue-updated', {ftSess: this})
         }
     }
 }
@@ -259,13 +266,18 @@ DownloadHandler.prototype.sendFileNack = function(errMsg) {
     this._dataChan.send(buf);
 }
 DownloadHandler.prototype.remove = function(reason, text) {
-    if ((reason != 'user') && (Object.keys(this._files).length > 0))
+    if ((reason === 'user') || (this._files.length === 0))
+        $(this._ftManager).trigger('ftsess-remove', {ftSess:this});
+     else if (reason === 'peer-user')
+        $(this._ftManager).trigger('ftsess-canceled', {ftSess: this});
+     else
         this.error("Download session terminated: "+reason, true);
-    else {
-        $(this._ftManager).trigger('recv-sess-remove', {ftSess:this, isDownload: true});
-        delete this._ftManager.downloads[this._sid];
-        this._ftManager.checkDisableTimer();
-    }
+     delete this._ftManager.downloads[this._sid];
+     if (this._ftManager.checkDisableTimer())
+         this._ftManager.updateGui();
+     if (this._files.length > 0)
+         $(this._ftManager).trigger('recv-queue-updated', {ftSess: this});
+
 }
 
 DownloadHandler.prototype.progress = function() {
@@ -304,9 +316,8 @@ BlobChunksFileSaver.prototype.completeFile = function() {
     link.click();
 }
 
-function UploadHandler(ftManager, sid, files) {
-    this._ftManager = ftManager;
-    this._sid = sid;
+function UploadHandler(ftManager, sid, peerJid, files) {
+    this.init.call(this, ftManager, sid, peerJid);
     this._state = FTSTATE_WAIT_CONNECT;
     this._timer = null;
     this._files = files; //array of File objects
@@ -360,7 +371,7 @@ UploadHandler.prototype.onmessage = function(event) {
         var errMsg = readStringFromArrBuf(packet, 4);
         this.error("Remote error sending file: "+errMsg, {file:this._currentSentFile.name, size:this._currentSentFile.size});
         this._currentSentFile = null;
-        $(this._ftManager).trigger("send-queue-updated");
+        $(this._ftManager).trigger("send-queue-updated", {ftSess:this});
     }
 }
 
@@ -382,8 +393,8 @@ UploadHandler.prototype.nextFile = function() {
     this._sendBurst = false;
     if (this._ftManager.createHasher)
         this._hasher = this._ftManager.createHasher();
-    $(this._ftManager).trigger("send-queue-updated");
-    $(this._ftManager).trigger("send-new", {ftSession: this, file:{name:file.name, size:file.size}});
+    $(this._ftManager).trigger("send-queue-updated", {ftSess:this});
+    $(this._ftManager).trigger("send-new", {ftSess: this, file:{name:file.name, size:file.size}});
     var info = JSON.stringify({name: file.name, size: file.size});
     var nfbuf = new ArrayBuffer(4+info.length*2);
     writeStringToArrBuf(info, nfbuf, 4);
@@ -460,17 +471,19 @@ UploadHandler.prototype.endFile = function() {
 }
 
 UploadHandler.prototype.remove = function(reason, text) {
-    if ((reason != 'user') && (this._files.length > 0))
+    if ((reason === 'user') || (this._files.length === 0))
+        $(this._ftManager).trigger('ftsess-remove', {ftSess: this});
+    else if (reason === 'peer-user')
+        $(this._ftManager).trigger('ftsess-canceled', {ftSess: this});
+    else
         this.error("Upload session terminated: "+reason, true);
-      else {
-        $(this._ftManager).trigger('send-sess-remove', {sid:this._sid, isDownload: false});
-        delete this._ftManager.uploads[this._sid];
-        if (this._files)
-            $(this._ftManager).trigger('send-queue-updated');
 
-        if (this._ftManager.checkDisableTimer())
-            this._ftManager.updateGui();
-    }
+    delete this._ftManager.uploads[this._sid];
+    if (this._files)
+        $(this._ftManager).trigger('send-queue-updated', {ftSess: this});
+
+    if (this._ftManager.checkDisableTimer())
+        this._ftManager.updateGui();
 }
 
 UploadHandler.prototype.progress = function() {

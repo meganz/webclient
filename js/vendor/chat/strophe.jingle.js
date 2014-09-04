@@ -422,7 +422,7 @@ var JinglePlugin = {
                 };
                 if (files) {
                     call.files = files;
-                    call.fileTransferHandler = self.ftManager.createDownloadHandler(sid, files);
+                    call.fileTransferHandler = self.ftManager.createDownloadHandler(sid, from, files);
                 }
 // This timer is for the period from the megaCallAnswer to the jingle-initiate stanza
                 setTimeout(function() { //invalidate auto-answer after a timeout

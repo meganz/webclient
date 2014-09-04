@@ -6794,6 +6794,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
+	position:relative;
 	width: inherit !important;
 }
 .chat-message-date {
@@ -7448,11 +7449,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-shared-files .fm-chat-file-button.save-button {
 	margin: 10px 10px 10px 10px;
 }
-.fm-chat-file-button:hover {
-	background-color: #d11e00;
-	border: 2px solid #d11e00;
-	color: white;
-}
 .fm-chat-line-block {
 	background-color: rgba(0,0,0,0.05);
 	padding: 10px 0 11px 0;
@@ -7810,9 +7806,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	right: 0;
 }
 .fm-chat-emotion-popup {
-	margin: -134px 48px 0 0;
-	width: 210px;
-	height: 130px;
+	margin: -94px 48px 0 0;
+    width: 210px;
+    height: 90px;
 	padding: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;

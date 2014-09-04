@@ -28,9 +28,6 @@ AttachmentsFilter.prototype.processMessage = function(e, eventObject) {
     if(!eventObject.getMeta() || !eventObject.getMeta().attachments) {
         return; // ignore, this is not an attachments message
     }
-
-    eventObject.setContents("Is sharing a document with you:"); // XX: use ll[]
-
 };
 
 AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) {
@@ -114,12 +111,20 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
         .addClass('chat-sharing')
         .append($container);
 
+    $('.chat-username', $m).after(
+        $('<span class="attachment-label"> had shared ' + (
+            Object.keys(attachments).length == 1 ? " a file" : "files"
+            ) + ':</span>')
+    );
+
+    $m.addClass("is-attachment");
+
     if(Object.keys(attachments).length > 1) {
         $('.fm-chat-message', $m)
             .addClass('multiple-sharing');
 
         var $more = $('<span class="nw-chat-expand-arrow"></span>');
-        $('.chat-message-txt', $m).append($more);
+        $('.attachment-label', $m).after($more);
         $more.on('click', function() {
             var $m = $(this).parents('.fm-chat-messages-pad');
             $('.fm-chat-message', $m).toggleClass('expanded');

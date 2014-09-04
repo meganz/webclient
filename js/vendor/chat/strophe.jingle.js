@@ -9,7 +9,6 @@ var JinglePlugin = {
     RtcOptions: {},
     init: function (conn) {
         this.sessions = {};
-        this.jid2session = {};
         this.ice_config = {iceServers: []};
         this.pc_constraints = {};
         this.media_constraints = {
@@ -24,6 +23,7 @@ var JinglePlugin = {
         this.jingleTimeout = 50000;
         this.jingleAutoAcceptTimeout = 15000;
         this.eventHandler = this;
+        this.ftManager = new FileTransferManager(this);
 // Callbacks called by the connection.jingle object
         this.onIncomingCallRequest = function(from, reqStillValid, ansFunc){};
         this.onCallCanceled = function(from, info) {};
@@ -44,7 +44,7 @@ var JinglePlugin = {
         this.onJingleTimeout = function(sess, err, orig){};
         this.onRemoteStreamAdded = function(sess, event){};
         this.onRemoteStreamRemoved = function(sess, event){};
-        this.onIceConnStateChange = function(sess, event){};
+        this.onIceConnStateChange = function(sess, event){console.log("CONNSTATE->", event);};
         this.onNoStunCandidates = function(sess, event){};
         this.onPacketLoss = function(sess, loss){};
 
@@ -139,6 +139,8 @@ var JinglePlugin = {
 
         if ('session-initiate' != action) {
             if (!sess) {
+                if ('session-terminate' === action)
+                    return true;
                 ack.type = 'error';
                 ack.c('error', {type: 'cancel'})
                    .c('item-not-found', {xmlns: 'urn:ietf:params:xml:ns:xmpp-stanzas'}).up()
@@ -171,24 +173,26 @@ var JinglePlugin = {
         switch (action) {
         case 'session-initiate': {
             var self = this;
+            var j = $(iq).find('>jingle');
+            var sid = j.attr('sid');
             var peerjid = $(iq).attr('from');
             var barePeerJid = Strophe.getBareJidFromJid(peerjid);
             debugLog("received INITIATE from", peerjid);
             self.purgeOldAcceptCalls(); //they are purged by timers, but just in case
-            var ans = self.acceptCallsFrom[peerjid];
+            var ans = self.acceptCallsFrom[sid];
             if (!ans)
                 return true; //ignore silently - maybe there is no user on this client and some other client(resource) already accepted the call
-            delete self.acceptCallsFrom[peerjid];
+            if (ans.from != peerjid)
+                throw new Error('Sid and jid mismatch in session-initiate');
+            delete self.acceptCallsFrom[sid];
 // Verify SRTP fingerprint
             if (!ans.ownFprMacKey)
                 throw new Error("No ans.ownFprMacKey present, there is a bug");
-            var j = $(iq).find('>jingle');
-            var sid = $(iq).find('jingle').attr('sid');
-  
+
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), ans.ownFprMacKey, j.attr('fprmac'))) {
                 console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
                 try {
-                  self.sendTerminateNoSession(sid, $(iq).attr('from'), "security", "Fingerprint verification failed");
+                  self.sendTerminateNoSession(sid, peerjid, "security", "Fingerprint verification failed");
                 } catch(e) {
                     console.error(e);
                 }
@@ -203,16 +207,20 @@ var JinglePlugin = {
                 return true;
             }
 //===
-            var sess = self.createSession($(iq).attr('to'), peerjid,
+            if (!ans.fileTransferHandler)
+                sess = self.createSession($(iq).attr('to'), peerjid,
                     sid, ans.options.localStream,
                     ans.options.muted, {peerFprMacKey: ans.peerFprMacKey});
-
+             else
+                sess = self.createSession($(iq).attr('to'), peerjid,
+                    sid, null, null, {peerFprMacKey: ans.peerFprMacKey,
+                                      fileTransferHandler: ans.fileTransferHandler});
             sess.media_constraints = self.media_constraints;
             sess.pc_constraints = self.pc_constraints;
             sess.ice_config = self.ice_config;
 
             sess.inputQueue = [];
-            var ret = self.onCallIncoming.call(self.eventHandler, {sess: sess, peerMedia: ans.peerMedia});
+            var ret = self.onCallIncoming.call(self.eventHandler, {sess: sess, peerMedia: ans.peerMedia, files: ans.files});
             if (ret != true) {
                 self.terminate(sess, ret.reason, ret.text);
                 delete sess.inputQueue;
@@ -222,12 +230,13 @@ var JinglePlugin = {
             sess.initiate(false);
 
             // configure session
-            sess.setRemoteDescription($(iq).find('>jingle'), 'offer',
+            sess.setRemoteDescription(j, 'offer',
              function() {
                 sess.sendAnswer(function() {
                     sess.accept(function() {
-                        sess.sendMutedState();
-                        self.onCallAnswered.call(self.eventHandler, {peer: peerjid});
+                        if (!sess.fileTransferHandler)
+                            sess.sendMutedState();
+                        self.onCallAnswered.call(self.eventHandler, {peer: peerjid, isDataCall: !!sess.fileTransferHandler});
 //now handle all packets queued up while we were waiting for user's accept of the call
                         self.processAndDeleteInputQueue(sess);
                     });
@@ -250,14 +259,14 @@ var JinglePlugin = {
             var j = $(iq).find('>jingle');
             if (!self.verifyMac(self.getFingerprintsFromJingle(j), sess.ownFprMacKey, j.attr('fprmac'))) {
                 console.warn("Fingerprint verification failed. Possible forge attempt, dropping call!");
-                self.terminateBySid(sess.sid, 'security', "Fingerprint verification failed");
+                self.terminate(sess, 'security', "Fingerprint verification failed");
                 return true;
             }
 // We are likely to start receiving ice candidates before setRemoteDescription()
 // has completed, esp on Firefox, so we want to queue these and feed them only
 // after setRemoteDescription() completes
             sess.inputQueue = [];
-            sess.setRemoteDescription($(iq).find('>jingle'), 'answer',
+            sess.setRemoteDescription(j, 'answer',
               function(){sess.accept(
                 function() {
                     if (sess.inputQueue)
@@ -272,12 +281,10 @@ var JinglePlugin = {
             var reason = null, text = null;
             if ($(iq).find('>jingle>reason').length)
             {
-                reason = $(iq).find('>jingle>reason>:first')[0].tagName;
-                if (reason === 'hangup')
-                    reason = 'peer-hangup';
+                reason = 'peer-'+$(iq).find('>jingle>reason>:first')[0].tagName;
                 text = $(iq).find('>jingle>reason>text').text();
             }
-            this.terminate(sess, reason||'peer-hangup', text);
+            this.terminate(sess, reason||'peer-hangup', text, true);
             break;
         case 'transport-info':
             debugLog("received ICE candidate from", sess.peerjid);
@@ -285,16 +292,15 @@ var JinglePlugin = {
             break;
         case 'session-info':
             debugLog("received INFO from", sess.peerjid);
-            var affected;
             if ($(iq).find('>jingle>ringing[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').length) {
                 this.onRinging.call(this.eventHandler, sess);
             } else if ($(iq).find('>jingle>mute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').length) {
-                affected = $(iq).find('>jingle>mute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').attr('name');
+                var affected = $(iq).find('>jingle>mute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').attr('name');
                 var flags = new MuteInfo(affected);
                 sess.remoteMutedState.set(flags.audio, flags.video);
                 this.onMuted.call(this.eventHandler, sess, flags);
             } else if ($(iq).find('>jingle>unmute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').length) {
-                affected = $(iq).find('>jingle>unmute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').attr('name');
+                var affected = $(iq).find('>jingle>unmute[xmlns="urn:xmpp:jingle:apps:rtp:info:1"]').attr('name');
                 var flags = new MuteInfo(affected);
                 sess.remoteMutedState.set(flags.audio?false:null, flags.video?false:null);
                 this.onUnmuted.call(this.eventHandler, sess, flags);
@@ -319,12 +325,17 @@ var JinglePlugin = {
 
       try {
         var from = $(callmsg).attr('from');
+        var sid = $(callmsg).attr('sid'); //this will become the sid of the Jingle call once it is established
+        if (!sid)
+            throw new Error("Incoming call message does not have a 'sid' attribute");
         var bareJid = Strophe.getBareJidFromJid(from);
         var tsReceived = Date.now();
 
     // Add a 'handled-elsewhere' handler that will invalidate the call request if a notification
     // is received that another resource answered/declined the call
         elsewhereHandler = self.connection.addHandler(function(msg) {
+            if ($(msg).attr('sid') != sid)
+                return true;
             if (!cancelHandler)
                 return;
             elsewhereHandler = null;
@@ -333,19 +344,21 @@ var JinglePlugin = {
 
             var by = $(msg).attr('by');
             if (by != self.connection.jid)
-                self.onCallCanceled.call(self.eventHandler, $(msg).attr('from'),
+                self.onCallCanceled.call(self.eventHandler, from,
                  {event: 'handled-elsewhere', by: by, accepted:($(msg).attr('accepted')==='1')});
         }, null, 'message', 'megaNotifyCallHandled', null, from, {matchBare:true});
 
     // Add a 'cancel' handler that will ivalidate the call request if the caller sends a cancel message
         cancelHandler = self.connection.addHandler(function(msg) {
+            if ($(msg).attr('sid') != sid)
+                return true;
             if (!elsewhereHandler)
                 return;
             cancelHandler = null;
             self.connection.deleteHandler(elsewhereHandler);
             elsewhereHandler = null;
 
-            self.onCallCanceled.call(self.eventHandler, $(msg).attr('from'), {event: 'canceled'});
+            self.onCallCanceled.call(self.eventHandler, from, {event: 'canceled'});
         }, null, 'message', 'megaCallCancel', null, from, {matchBare:true});
 
         setTimeout(function() {
@@ -368,11 +381,14 @@ var JinglePlugin = {
         var reqStillValid = function() {
             return ((tsTillUser > Date.now()) && (cancelHandler != null));
         };
-        var peerMedia = self.peerMediaToObj($(callmsg).attr('media'));
+        var strPeerMedia = $(callmsg).attr('media');
+        var peerMedia = strPeerMedia?self.peerMediaToObj(strPeerMedia):undefined;
+        var strFiles = $(callmsg).attr('files');
+        var files = strFiles?JSON.parse(strFiles):undefined;
 // Notify about incoming call
         self.onIncomingCallRequest.call(self.eventHandler, 
              {peer:from, reqStillValid:reqStillValid,
-              peerMedia: peerMedia},
+              peerMedia: peerMedia, files: files},
           function(accept, obj) {
 // If dialog was displayed for too long, the peer timed out waiting for response,
 // or user was at another client and that other client answred.
@@ -395,35 +411,37 @@ var JinglePlugin = {
 
 // tsTillJingle measures the time since we sent megaCallAnswer till we receive jingle-initiate
                 var tsTillJingle = Date.now()+self.jingleAutoAcceptTimeout;
-                self.acceptCallsFrom[from] = {
+                var call = self.acceptCallsFrom[sid] = {
+                    from: from,
                     tsReceived: tsReceived,
                     tsTill: tsTillJingle,
                     options: obj.options,
-                    peerMedia: peerMedia,
                     peerFprMacKey: peerFprMacKey,
-                    ownFprMacKey: ownFprMacKey
+                    ownFprMacKey: ownFprMacKey,
+                    peerMedia: files?undefined:peerMedia
                 };
+                if (files) {
+                    call.files = files;
+                    call.fileTransferHandler = self.ftManager.createDownloadHandler(sid, from, files);
+                }
 // This timer is for the period from the megaCallAnswer to the jingle-initiate stanza
                 setTimeout(function() { //invalidate auto-answer after a timeout
-                    var call = self.acceptCallsFrom[from];
+                    var call = self.acceptCallsFrom[sid];
                     if (!call || (call.tsTill != tsTillJingle))
                         return; //entry was removed or updated by a new call request
-                    self.cancelAutoAnswerEntry(from, 'initiate-timeout', 'timed out waiting for caller to start call');
+                    self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'timed out waiting for caller to start call');
                 }, self.jingleAutoAcceptTimeout);
 
                 self.prepareToSendMessage(function() {
                     self.connection.send($msg({
+                        sid: sid,
                         to: from,
                         type: 'megaCallAnswer',
                         fprmackey: self.encryptMessageForJid(ownFprMacKey, bareJid)
                     }));
                 }, bareJid);
-            }
-            else {
-// We don't want to answer calls from that user, and this includes a potential previous
-// request - we want to cancel that too
-                delete self.acceptCallsFrom[bareJid];
-                var msg = $msg({to: from, type: 'megaCallDecline', reason: obj.reason?obj.reason:'unknown'});
+            } else {
+                var msg = $msg({sid: sid, to: from, type: 'megaCallDecline', reason: obj.reason?obj.reason:'unknown'});
                 if (obj.text)
                     msg.c('body').t(obj.text);
                 self.connection.send(msg);
@@ -436,28 +454,34 @@ var JinglePlugin = {
       }
       return true;
     },
-    cancelAutoAnswerEntry: function(from, reason, text) {
-        if (!this.acceptCallsFrom[from])
+    cancelAutoAnswerEntry: function(aid, reason, text, type) {
+        var item = this.acceptCallsFrom[aid];
+        if (!item)
             return false;
-        delete this.acceptCallsFrom[from];
-        this.onCallTerminated.call(this.eventHandler, {fake: true, peerjid: from, isInitiator: false},
-            reason, text);
+        if (item.fileTransferHandler) {
+            if (type && (type !== 'f'))
+                return false;
+            item.fileTransferHandler.remove(reason, text);
+            delete this.acceptCallsFrom[aid];
+        } else {
+            delete this.acceptCallsFrom[aid];
+            this.onCallTerminated.call(this.eventHandler, {fake: true, peerjid: item.from, isInitiator: false},
+                reason, text);
+        }
         return true;
     },
     cancelAllAutoAnswerEntries: function(reason, text) {
-        var save = this.acceptCallsFrom;
+        for (var aid in this.acceptCallsFrom)
+            this.cancelAutoAnswerEntry(aid, reason, text);
         this.acceptCallsFrom = {};
-        for (var k in save)
-            this.onCallTerminated.call(this.eventHandler, {fake: true, peerjid: k, isInitiator: false},
-                reason, text);
     },
     purgeOldAcceptCalls: function() {
         var self = this;
         var now = Date.now();
-        for (var k in self.acceptCallsFrom) {
-            var call = self.acceptCallsFrom[k];
+        for (var aid in self.acceptCallsFrom) {
+            var call = self.acceptCallsFrom[aid];
             if (call.tsTill < now)
-                this.cancelAutoAnswerEntry(k, 'initiate-timeout', 'timed out waiting for caller to start call');
+                this.cancelAutoAnswerEntry(aid, 'initiate-timeout', 'timed out waiting for caller to start call');
         }
     },
     processAndDeleteInputQueue: function(sess) {
@@ -466,10 +490,8 @@ var JinglePlugin = {
         for (var i=0; i<queue.length; i++)
             this.onJingle(queue[i]);
     },
-    initiate: function (peerjid, myjid, sessStream, mutedState, sessProps) { // initiate a new jinglesession to peerjid
-        var sess = this.createSession(myjid, peerjid,
-            Math.random().toString(36).substr(2, 12), // random string
-            sessStream, mutedState, sessProps);
+    initiate: function (sid, peerjid, myjid, sessStream, mutedState, sessProps) { // initiate a new jinglesession to peerjid
+        var sess = this.createSession(myjid, peerjid, sid, sessStream, mutedState, sessProps);
         // configure session
         sess.media_constraints = this.media_constraints;
         sess.pc_constraints = this.pc_constraints;
@@ -482,7 +504,6 @@ var JinglePlugin = {
     createSession: function(me, peerjid, sid, sessStream, mutedState, sessProps) {
         var sess = new JingleSession(me, peerjid, sid, this.connection, sessStream, mutedState);
         this.sessions[sess.sid] = sess;
-        this.jid2session[sess.peerjid] = sess;
         if (sessProps) {
             for (var k in sessProps)
                 if (sessProps.hasOwnProperty(k)) {
@@ -507,30 +528,27 @@ var JinglePlugin = {
     },
     terminate: function(sess, reason, text, nosend)
     {
-        if ((!sess) || (!this.sessions[sess.sid]))
-            return false; //throw new Error("Unknown session: " + sid);
+        if ((!sess) || (!this.sessions[sess.sid])) {
+            console.warn("Unknown session:", sid)
+            return false;
+        }
         if (sess.state != 'ended')
         {
             if (!nosend)
                 sess.sendTerminate(reason||'term', text);
             sess.terminate();
         }
-        delete this.jid2session[sess.peerjid];
         delete this.sessions[sess.sid];
-        try {
-            this.onCallTerminated.call(this.eventHandler, sess, reason||'term', text);
-        } catch(e) {
-            console.error('Jingle.onCallTerminated() threw an exception:', e.stack);
-        }
+        if (sess.fileTransferHandler)
+            sess.fileTransferHandler.remove(reason, text);
+         else
+            try {
+                this.onCallTerminated.call(this.eventHandler, sess, reason||'term', text);
+            } catch(e) {
+                console.error('Jingle.onCallTerminated() threw an exception:', e.stack);
+            }
 
         return true;
-    },
-    terminateByJid: function (jid)
-    {
-        var sess = this.jid2session[jid];
-        if (!sess)
-            return false;
-        return this.terminate(sess, null, null);
     },
     sendTerminateNoSession: function(sid, to, reason, text) {
         var term = $iq({to: to, type: 'set'});

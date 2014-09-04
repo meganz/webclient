@@ -531,6 +531,8 @@ else
         jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
+        jsl.push({f:'js/jquery.fullscreen-min.js', n: 'jquery_fullscreen', j:1,w:10});
+
         jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 
@@ -547,6 +549,10 @@ else
 
         jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
 
+        // direct transfer deps.
+        jsl.push({f:'js/vendor/chat/hmac-sha1.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/lib-typedarrays-min.js', n: 'mega_js', j:1,w:7});
+
         // Other
         jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
 
@@ -554,6 +560,7 @@ else
         // MEGA CHAT
         jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
         jsl.push({f:'js/megafilepicker.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/megaIncomingCallDialog.js', n: 'mega_js', j:1,w:7});

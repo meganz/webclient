@@ -1,0 +1,97 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.fullscreen-min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() { 
+
+   function fullscreenVideoResizing() {
+	   var c = $('.video-full-canvas-block.another-user img'); 
+	   var w = $(window).width(); 
+	   var h = $(window).height();
+	   c.removeAttr('style');
+	   if (h/w == 0.5625) c.height(c.width()*0.5625);
+	   else c.height(c.width()*0.75);
+	   if(h > c.height()) { 
+	       var nw = (h*4)/3;
+		   c.css({
+              width : Math.round(nw),
+              height : h
+           });
+	   }
+	   c.css({
+              'margin-left' : '-' + c.width()/2 + 'px',
+              'margin-top' : '-' + c.height()/2 + 'px'
+       });
+   }
+   fullscreenVideoResizing();
+   
+   $(window).bind('resize', function () 
+   {
+	  fullscreenVideoResizing();
+   });
+   
+   $('.video-call-button').bind('click', function() {
+	   if($(this).attr('class').indexOf('active') == -1) {
+		   $(this).addClass('active');
+		   // Video mute flipping
+		   if($(this).attr('class').indexOf('video-icon') > -1) {
+			   $('.video-full-canvas-block.current-user').addClass('video-off');
+		   }
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(true)
+	   }
+	   else {
+	       $(this).removeClass('active');
+		   // Video mute flipping
+		   if($(this).attr('class').indexOf('video-icon') > -1)  {
+			   $('.video-full-canvas-block.current-user').removeClass('video-off');
+		   }
+		   // Fullscreen mode
+		   if($(this).attr('class').indexOf('size-icon') > -1) 
+			   $(document).fullScreen(false);
+	   }
+   });
+  
+});
+
+</script>
+</head>
+
+<body id="bodyel">
+
+  <div class="video-full-container full-mode">
+     <div class="video-full-demo-ticket"></div>
+     <div class="video-full-logo"></div>
+     <div class="video-full-canvas-block another-user">
+       <img alt="" src="images/temp/video-temp-img2.jpg" />
+     </div>
+     <div class="video-full-canvas-block current-user">
+       <img alt="" src="images/temp/video-temp-img3.jpg" />
+       <div class="video-full-disabled-block">
+          <div class="video-full-disabled-icon"></div>
+       </div>
+     </div>
+     <div class="video-controls">
+              <div class="video-full-buttons">
+                 <div class="video-call-button audio-icon"><div class="video-call-border"></div></div>
+                 <div class="video-call-button video-icon"><div class="video-call-border"></div></div>
+                 <div class="video-call-button hang-up-icon"><div class="video-call-border"></div></div>
+              </div>
+              <div class="video-size-button">
+                <div class="video-call-button size-icon"><div class="video-call-border"></div>
+              </div>
+         </div>
+     </div>
+  
+  </div>
+</body>
+</html>

@@ -940,19 +940,19 @@ function NOW() {
  *	Global function to help debugging
  */
 function DEBUG2() {
-	if (d) {
+    if (typeof(d) !== "undefined" && d) {
 		console.warn.apply(console, arguments)
 	}
 }
 
 function ERRDEBUG() {
-	if (d) {
+	if (typeof(d) !== "undefined" && d) {
 		console.error.apply(console, arguments)
 	}
 }
 
 function DEBUG() {
-	if (d) {
+    if (typeof(d) !== "undefined" && d) {
 		(console.debug||console.log).apply(console, arguments)
 	}
 }
@@ -968,13 +968,13 @@ function ASSERT(what, msg) {
 }
 
 function oDestroy(obj) {
-	if (d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
+	if (typeof(d) !== "undefined" && d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
 	Object.keys(obj).forEach(function(memb) {
 		if (obj.hasOwnProperty(memb)) delete obj[memb];
 	});
 
-	if (d) Object.freeze(obj);
+	if (typeof(d) !== "undefined" && d) Object.freeze(obj);
 }
 
 /**

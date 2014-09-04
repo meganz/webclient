@@ -60,20 +60,29 @@ function RtcSession(stropheConn, options) {
     if (!RTC)
         throw new Error('This browser does not support webRTC');
 
+
+    var self = this;
+
     this.connection = stropheConn;
-    this.jingle = stropheConn.jingle;
-    var jingle = this.jingle;
+    var jingle = this.jingle = stropheConn.jingle;
     if (jingle.rtcSession)
         throw new Error("This Strophe connection already has an associated RtcSession instance");
+    this.ftManager = jingle.ftManager;
 // Init crypto functions
     if (!options.encryptMessageForJid || !options.decryptMessage || !options.generateMac) {
         if (options.dummyCryptoFunctions) {
-            jingle.encryptMessageForJid = function(msg, bareJid)
-                {return RtcSession.xorEnc(msg, bareJid)};
-            jingle.decryptMessage = function(msg)
-                {return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid))};
-            jingle.generateMac = function(msg, key)
-                {return RtcSession.xorEnc(msg, key)};
+            jingle.encryptMessageForJid = function(msg, bareJid) {
+                if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
+                    throw new Error("pubkey not loaded: " + bareJid);
+                }
+                return RtcSession.xorEnc(msg, bareJid)
+            };
+            jingle.decryptMessage = function(msg) {
+                return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
+            };
+            jingle.generateMac = function(msg, key) {
+                return RtcSession.xorEnc(msg, key);
+            };
         } else
             throw new Error("At least one crypto function is not provided in 'options'");
     } else {
@@ -97,7 +106,16 @@ function RtcSession(stropheConn, options) {
     if (options.prepareToSendMessage) {
         jingle.prepareToSendMessage = options.prepareToSendMessage;
     } else {
-        jingle.prepareToSendMessage = function(f) { f(); };
+        if(options.dummyCryptoFunctions) {
+            jingle.prepareToSendMessage = function(f, bareJid) {
+                self._dummyKeys = self._dummyKeys || {};
+                self._dummyKeys[bareJid] = true;
+
+                f();
+            };
+        } else {
+            jingle.prepareToSendMessage = function(f) { f(); };
+        }
     }
     jingle.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
@@ -300,7 +318,7 @@ RtcSession.prototype = {
         Necessary only if doing MUC, because the user's JID in the
         room is different than her normal JID. If not specified,
         the user's 'normal' JID will be used
-    @returns {{cancel: function()}}
+    @returns {{sessionId: string, cancel: function()}}
         Returns an object with a cancel() method, that, when called, cancels the call request.
         This method returns <i>true</i> if the call was successfully canceled, and <i>false</i>
         in case the call was already answered by someone.
@@ -313,17 +331,19 @@ RtcSession.prototype = {
   var state = 0; //state 0 means not yet got usermedia, 1 means got user media and waiting for peer, state 2 means pear answered or timed out, 4 means call was canceled by us via the cancel() method of the returned object
   var self = this;
   var isBroadcast = (!Strophe.getResourceFromJid(targetJid));
-  var ownFprMacKey = this.jingle.generateMacKey();
-
-  self._myGetUserMedia(options,
-   function(sessStream) {
-    if (state === 4) {//call was canceled before we got user media
+  var ownFprMacKey = self.jingle.generateMacKey();
+  var sid = Math.random().toString(36).substr(2, 12); // random string
+  var fileArr;
+  var initiateCallback = function(sessStream) {
+     if (state === 4) {//call was canceled before we got user media
         self._freeLocalStreamIfUnused();
         return;
-    }
-    state = 1;
+     }
+     state = 1;
 // Call accepted handler
-    ansHandler = this.connection.addHandler(function(stanza) {
+     ansHandler = self.connection.addHandler(function(stanza) {
+         if ($(stanza).attr('sid') != sid)
+             return true;
      try {
         if (state !== 1)
             return;
@@ -343,11 +363,15 @@ RtcSession.prototype = {
         
         var fullPeerJid = $(stanza).attr('from');
         if (isBroadcast)
-            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', by: fullPeerJid, accepted:'1'}));
+            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', sid: sid, by: fullPeerJid, accepted:'1'}));
 
-        self.jingle.initiate(fullPeerJid, myJid ? myJid:self.connection.jid,
-          sessStream, RtcSession.mediaOptionsToMutedState(options, sessStream),
-          {ownFprMacKey: ownFprMacKey, peerFprMacKey: peerFprMacKey});
+        self.jingle.initiate(sid, fullPeerJid, myJid ? myJid:self.connection.jid, sessStream,
+          sessStream?RtcSession.mediaOptionsToMutedState(options, sessStream):undefined, {
+           ownFprMacKey: ownFprMacKey,
+           peerFprMacKey: peerFprMacKey,
+           fileTransferHandler: options.files?
+                self.jingle.ftManager.createUploadHandler(sid, fullPeerJid, fileArr):undefined
+        });
         /**
             An outgoing call is being initiated by us
             @event "call-init"
@@ -358,7 +382,7 @@ RtcSession.prototype = {
                 @property {bool} audio Present and true of peer has enabled audio
                 @property {bool} video Present and true of peer has enabled video
         */
-            self.trigger('call-init', {peer:fullPeerJid});
+            self.trigger('call-init', {peer:fullPeerJid, isDataCall:!!options.files});
       } catch(e) {
         self._freeLocalStreamIfUnused();
         console.error("Exception in call answer handler:\n"+e.stack+'\nIgnoring call');
@@ -366,7 +390,9 @@ RtcSession.prototype = {
     }, null, 'message', 'megaCallAnswer', null, targetJid, {matchBare: true});
 
 //Call declined handler
-    declineHandler = this.connection.addHandler(function(stanza) {
+    declineHandler = self.connection.addHandler(function(stanza) {
+        if ($(stanza).attr('sid') != sid) //this message was not for us
+            return true;
         if (state !== 1)
             return;
 
@@ -381,7 +407,7 @@ RtcSession.prototype = {
         var fullPeerJid = $(stanza).attr('from');
 
         if (isBroadcast)
-            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', by: fullPeerJid, accepted:'0'}));
+            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', sid: sid, by: fullPeerJid, accepted:'0'}));
         /**
          A call that we have initiated has been declined by the remote peer
          @event "call-declined"
@@ -404,15 +430,32 @@ RtcSession.prototype = {
     null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
     self.jingle.prepareToSendMessage(function() {
-        self.connection.send($msg({
-            to:targetJid,
-            type:'megaCall',
-            media: (options.audio?"a":"")+(options.video?"v":""),
+        var msgattrs = {
+            to: targetJid,
+            type: 'megaCall',
+            sid: sid,
             fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid)
-        }));
+        };
+        if (options.files) {
+            var infos = {};
+            fileArr = [];
+            for (var i=0; i<options.files.length; i++) {
+                var file = options.files[i];
+                fileArr.push(Object.freeze(file));
+                var info = {size: file.size, mime: file.type};
+                infos[file.name] = info;
+            }
+            msgattrs.files = JSON.stringify(infos);
+        }
+        else
+            msgattrs.media = (options.audio?'a':'')+(options.video?'v':'');
+
+
+        self.connection.send($msg(msgattrs));
     }, targetJid);
 
-    setTimeout(function() {
+    if (!options.files)
+     setTimeout(function() {
         if (state !== 1)
             return;
 
@@ -433,11 +476,17 @@ RtcSession.prototype = {
         @property {string} peer The JID of the callee
        */
         self.trigger('call-answer-timeout', {peer: targetJid});
-    }, self.jingle.callAnswerTimeout);
-  }); //end myGetUserMedia()
+     }, self.jingle.callAnswerTimeout);
+  } //end initiateCallback()
+  if (options.audio || options.video)
+      self._myGetUserMedia(options, initiateCallback);
+  else
+      initiateCallback(null);
 
   //return an object with a cancel() method
-  return {cancel: function() {
+  return {
+      sessionId: sid,
+      cancel: function() {
         if (state === 2)
             return false;
         if (state === 1) { //same as if (ansHandler)
@@ -448,7 +497,7 @@ RtcSession.prototype = {
             declineHandler = null;
 
             self._freeLocalStreamIfUnused();
-            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaCallCancel'}));
+            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), sid: sid, type: 'megaCallCancel'}));
             return true;
         } else if (state === 0) {
             state = 4;
@@ -460,19 +509,45 @@ RtcSession.prototype = {
  },
 
  /**
-    Terminates an ongoing call
-    @param {string} [fullJid]
-        The full JID of the peer, serves to identify the call. If no jid is specified,
-        all current calls are terminated
+    Terminates an ongoing media call
+    @param {string} [jid]
+        The JID of the peer, serves to identify the call. If no jid is specified,
+        all current calls are terminated. If JID is a bare JID, all calls to this bare JID
+        will be terminated. If it is a full JID, only the call to that full JID is terminated
+        Note that this function does not terminate file transfer calls
  */
  hangup: function(jid)
  {
-    if (jid) {
-        this.jingle.terminateByJid(jid, 'hangup');
-        this.jingle.cancelAutoAnswerEntry(jid, 'hangup', '');
-    } else {
-        this.jingle.terminateAll('hangup');
-        this.jingle.cancelAllAutoAnswerEntries('hangup', '');
+    var isBareJid = jid && (jid.indexOf('/') < 0);
+    var sessions = this.jingle.sessions;
+    for (var sid in sessions) {
+        var sess = sessions[sid];
+        if (sess.fileTransferHandler)
+            continue;
+        if (jid) {
+            if (isBareJid) {
+                 if (Strophe.getBareJidFromJid(sess.peerjid) != jid)
+                    continue;
+            } else {
+                if (sess.peerjid != jid)
+                    continue;
+            }
+        }
+        this.jingle.terminateBySid(sid, 'hangup');
+    }
+    var autoAnswers = this.jingle.acceptCallsFrom;
+    for (var aid in autoAnswers) {
+        var item = autoAnswers[aid];
+        if (jid) {
+            if (isBareJid) {
+                if (Strophe.getBareJidFromJid(item.from) != jid)
+                    continue;
+            } else {
+                if (item.from != jid)
+                    continue;
+            }
+        }
+        this.jingle.cancelAutoAnswerEntry(aid, 'hangup', '', 'm');
     }
  },
 
@@ -518,19 +593,27 @@ RtcSession.prototype = {
         if (sessions.length < 1)
             return null;
     } else {
-        jid = Strophe.getBareJidFromJid(jid);
-        for(var j in this.jingle.jid2session)
-            if (Strophe.getBareJidFromJid(j) == jid)
-                sessions.push(this.jingle.jid2session[j]);
+        var isFullJid = (jid.indexOf('/') >= 0);
+        for(var sid in this.jingle.sessions) {
+            var sess = this.jingle.sessions[sid];
+            if (isFullJid) {
+                if (sess.peerjid === jid)
+                    sessions.push(sess);
+            } else {
+            if (Strophe.getBareJidFromJid(sess.peerjid) === jid)
+                sessions.push(sess);
+            }
+        }
     }
     return sessions;
  },
  _onPresenceUnavailable: function(pres)
  {
-    try {
-        this.jingle.terminateByJid($(pres).attr('from'), 'peer-disconnected');
-    } catch(e) {
-        console.error("_onPresenceUnavailable: Exception in handler:", e.stack);
+    var sessions = this.jingle.sessions;
+    for (var sid in sessions) {
+        var sess = sessions[sid];
+        if (sess.peerjid === from)
+            this.jingle.terminate(sess, 'peer-disconnected');
     }
     return true; //We dont want this handler to be deleted
  },
@@ -610,10 +693,10 @@ RtcSession.prototype = {
 
         if (!accept)
             return ansFunc(false, {reason: obj.reason?obj.reason:'busy', text: obj.text});
-
-        self._myGetUserMedia(obj.mediaOptions, //{audio:true, video:true},
-          function(sessStream) {
-            ansFunc(true, {
+        if (!params.files)
+          self._myGetUserMedia(obj.mediaOptions, //{audio:true, video:true},
+            function(sessStream) {
+              ansFunc(true, {
                 options:{
                     localStream: sessStream,
                     muted: RtcSession.mediaOptionsToMutedState(obj.mediaOptions, sessStream)
@@ -623,6 +706,8 @@ RtcSession.prototype = {
           function(err) {
             ansFunc(false, {reason: 'error', text: "There was a problem accessing user's camera or microphone. Error: "+err});
           });
+        else //file transfer
+            ansFunc(true, {});
 
           return true;
     }
@@ -696,15 +781,22 @@ RtcSession.prototype = {
  */
     var obj = {peer: sess.peerjid, sess:new SessWrapper(sess), stream: stream, player: playerElem};
     this.trigger('media-recv', obj);
-    if (obj.stats && RTC.Stats) {
-        var s = obj.stats;
-        if (!s.scanPeriod || !s.maxSamplePeriod)
-            return;
-        sess.statsRecorder = new RTC.Stats.Recorder(sess, s.scanPeriod, s.maxSamplePeriod, s.onSample);
-        sess.statsRecorder.start();
+    if (obj.stats || this.statsUrl) {
+        if (typeof obj.stats !== 'object')
+            obj.stats = {scanPeriod: 1, maxSamplePeriod: 5};
+
+        if (RTC.Stats) {
+            var s = obj.stats;
+            if (!s.scanPeriod || !s.maxSamplePeriod)
+                return;
+            sess.statsRecorder = new RTC.Stats.Recorder(sess, s.scanPeriod, s.maxSamplePeriod, s.onSample);
+            sess.statsRecorder.start();
+        }
+        else
+            console.warn("RTC stats requested, but stats API not available on this browser");
     }
-    else
-        sess.tsMediaStart = Date.now();
+    
+    sess.tsMediaStart = Date.now();
  },
 
  onCallTerminated: function(sess, reason, text) {
@@ -764,6 +856,11 @@ RtcSession.prototype = {
             bstats.dur = Math.ceil((Date.now()-sess.tsMediaStart)/1000);
         }
     }
+    if (this.statsUrl)
+       jQuery.ajax(this.statsUrl, {
+            type: 'POST',
+            data: JSON.stringify(obj.stats||obj.basicStats)
+    });
     this.trigger('call-ended', obj);
     if (!sess.fake) { //non-fake session
         if (sess.localStream)
@@ -777,8 +874,11 @@ RtcSession.prototype = {
  },
 
  _freeLocalStreamIfUnused: function() {
-    if (Object.keys(this.jingle.sessions).length > 0)
-        return;
+     var sessions = this.jingle.sessions;
+    for (var sess in sessions)
+        if (sessions[sess].localStream) //in use
+            return;
+
 //last call ended
     this._unrefLocalStream();
  },
@@ -879,8 +979,8 @@ RtcSession.prototype = {
  */
  getSentMediaTypes: function(fullJid)
  {
-    var sess = this.jingle.jid2session[fullJid];
-    if (!sess)
+     var sess = this.getMediaSessionToJid(fullJid);
+     if (!sess)
         return null;
 //we don't use sess.mutedState because in Forefox we don't have a separate
 //local streams for each session, so (un)muting one session's local stream applies to all
@@ -899,7 +999,7 @@ RtcSession.prototype = {
     @returns {{audio: Boolean, video: Boolean}} If there is no call to the specified JID, null is returned
  */
  getReceivedMediaTypes: function(fullJid) {
-    var sess = this.jingle.jid2session[fullJid];
+    var sess = this.getMediaSessionToJid(fullJid);
     if (!sess)
         return null;
     var m = sess.remoteMutedState;
@@ -907,6 +1007,20 @@ RtcSession.prototype = {
         audio: (sess.remoteStream.getAudioTracks().length > 0) && !m.audioMuted,
         video: (sess.remoteStream.getVideoTracks().length > 0) && !m.videoMuted
     }
+ },
+
+ getMediaSessionToJid: function(fullJid) {
+ //TODO: We get only the first media session to fullJid, but there may be more
+    var sessions = this.jingle.sessions;
+    var sess = null;
+    for (var sid in sessions) {
+        var s = sessions[sid];
+        if (s.localStream && (s.peerjid === fullJid)) {
+            sess = s;
+            break;
+        }
+    }
+    return sess;
  },
 
  /**
@@ -946,16 +1060,11 @@ RtcSession.prototype = {
         };
  },
  _refLocalStream: function(sendsVideo) {
-//    this._usesLocalStream = true;
     RtcSession.gLocalStreamRefcount++;
     if (sendsVideo)
         RtcSession._enableLocalVid(this);
  },
  _unrefLocalStream: function() {
-//    if (!this._usesLocalStream)
-//        return;
-
-//    this._usesLocalStream = false;
     var cnt = --RtcSession.gLocalStreamRefcount;
     if (cnt > 0)
         return;

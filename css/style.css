@@ -6093,7 +6093,7 @@ span.search-number {
 	margin: 13px 8px 0 0;
 	float: left;
 }
-.fm-send-files:hover, .fm-send-files.active {
+.fm-send-files:hover, .fm-send-files.active, .fm-chat-end:hover, .fm-chat-end.active {
 	background-color: rgba(222,0,0,1);
 }
 .fm-start-call:hover, .fm-start-call.active {

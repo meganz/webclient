@@ -18502,37 +18502,40 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: -24px 0 0 0;
 }
 .video-full-container .video-call-button.audio-icon {
-	background-position: 0 -8750px;
+	background-position: -8px -8758px;
 }
 .video-full-container .video-call-button.audio-icon.active {
-	background-position: 0 -8920px;
+	background-position: -8px -8928px;
 }
 .video-full-container .video-call-button.video-icon {
-	background-position: 0 -8809px;
+	background-position: -8px -8817px;
 }
 .video-full-container .video-call-button.video-icon.active {
-	background-position: 0 -8868px;
+	background-position: -8px -8876px;
 }
 .video-full-container .video-call-button.size-icon {
-	background-position: 0 -8629px;
+	background-position: -8px -8637px;
 }
 .video-full-container .video-call-button.size-icon.active {
-	background-position: 0 -8689px;
+	background-position: -8px -8697px;
 }
 .video-full-container .video-call-button.hang-up-icon {
-	background-position: 0 -7180px;
-	background-color: transparent;
+	background-position: -8px -7188px;
+	background-color: black;
 }
 .video-full-container .video-call-button {
 	position: relative;
 	background-color: transparent;
 	border-color: transparent;
 	margin: 4px;
-	width: 48px;
-	height: 48px;
-	border: 0;
+	width: 40px;
+	height: 40px;
 	left: 0;
 	top: 0;
+	background-color: black;
+}
+.video-full-container .video-call-button:hover {
+	border-color: black;
 }
 .video-full-container.full-mode {
 	overflow: hidden;
@@ -18549,7 +18552,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	margin: 0 0 0 0;
+	margin: 0;
 }
 .video-full-canvas-block.another-user img, .video-full-canvas-block.another-user canvas {
 	width: 100%;
@@ -18617,7 +18620,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 100%;
 }
 .video-off video {
-    display: none;
+	display: none;
 }
 .video-off .video-canvas-flip-side {
 	position: absolute;
@@ -18676,11 +18679,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: 0;
 }
 .video-controls .video-size-button .video-call-button {
-	margin: 6px;
+	margin: 10px;
 }
 .video-controls .video-full-buttons .video-call-button {
 	float: left;
-	margin: 6px 2px 0 6px;
+	margin: 10px 6px 0 10px;
 }
 .video-relative-block {
 	position: relative;

@@ -900,7 +900,6 @@ input.radioOn, input.radioOff {
 	width: 18px;
 	height: 18px;
 }
-
 .terms-main {
 	color: #595959;
 	font-size: 14px;
@@ -11476,17 +11475,27 @@ span.browsers-update {
 	min-width: 224px;
 	height: 64px;
 	border: 2px solid #d0d0d0;
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
 	-moz-opacity: 0.7;
 	-khtml-opacity: 0.7;
 	opacity: 0.7;
-	cursor:default;
+	cursor: default;
 }
 .sync-button.mac {
 	background-position: 15px -327px;
 }
 .sync-button.linux {
 	background-position: -462px -322px;
+}
+.linux-install-txt {
+	text-align: center;
+	padding: 0;
+	display: inline-block;
+	margin-top: 15px;
+	color: rgba(0,0,0,0.6);
+	font-size: 12px;
+	margin-bottom: -10px;
+	line-height: 24px;
 }
 .sync-button-block {
 	display: inline-block;
@@ -11608,7 +11617,7 @@ span.browsers-update {
 	padding: 10px 0 0 0;
 }
 .sync-bottom-txt.linux {
-	text-align:left;
+	text-align: left;
 }
 .mobile-small-icon {
 	width: 80px;

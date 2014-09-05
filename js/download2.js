@@ -22,8 +22,6 @@ var DownloadManager =
 {
 	newUrl : function DM_newUrl(dl, callback)
 	{
-		if (d) console.log("ask for new URL for", dl.dl_id);
-
 		if (callback)
 		{
 			if (!this.nup) this.nup = {};
@@ -35,10 +33,13 @@ var DownloadManager =
 			}
 			this.nup[dl.dl_id] = [callback];
 		}
+		if (d) console.log("Retrieving New URLs for", dl.dl_id);
 
+		dlQueue.pause();
 		dlGetUrl(dl, function (error, res, o)
 		{
-			if (error) return this.newUrl(dl);
+			if (error) return Later(this.newUrl.bind(this, dl));
+
 			var changed = 0
 			for (var i = 0; i < dlQueue._queue.length; i++) {
 				if (dlQueue._queue[i][0].dl === dl) {
@@ -56,6 +57,7 @@ var DownloadManager =
 				delete this.nup[dl.dl_id];
 			}
 			DEBUG("got", changed, "new URL for", dl.dl_id, "resume everything");
+			dlQueue.resume();
 		}.bind(this));
 	},
 

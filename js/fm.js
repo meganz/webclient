@@ -3435,8 +3435,10 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length == 11) $(t).filter('.refresh-item,.remove-item').show();        
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
+			var flt = '.refresh-item,.properties-item';
+			if (folderlink) flt += ',.zipdownload-item';
 			$.selected = [M.RootID];
-			$(t).filter('.refresh-item,.properties-item').show();
+			$(t).filter(flt).show();
 		}
 		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
 		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		

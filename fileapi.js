@@ -864,6 +864,57 @@ function mozClearStartupCache() {
 
 })(self);
 
+(function __mozSecurityTraps(scope) {
+
+	const __cE = document.createElement;
+	const __cE_NS = document.createElementNS;
+	const __XHR_Open = XMLHttpRequest.prototype.open;
+
+	Object.defineProperty(document, 'createElementNS',
+	{
+		value : function(ns, e)
+		{
+			if (ns !== 'http://www.w3.org/1999/xhtml')
+			{
+				ASSERT(0, 'Blocked namespace: ' + ns);
+				return null;
+			}
+
+			var eL = e.toLowerCase();
+			if (eL === 'script' || eL === 'iframe')
+			{
+				var caller = Components.stack.caller.caller;
+
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secureboot.js' !== caller.filename.split('?')[0])
+				{
+					ASSERT(0, 'Blocked '+e+' element creation');
+					return null;
+				}
+			}
+
+			return __cE_NS.call(document, ns, e);
+		}
+	});
+	Object.defineProperty(document, 'createElement',
+	{
+		value : function(e)
+		{
+			return document.createElementNS('http://www.w3.org/1999/xhtml', e);
+		}
+	});
+
+	XMLHttpRequest.prototype.open = function(meth, url)
+	{
+		var uri = Services.io.newURI(url, null, null);
+
+		if (/\.mega.co.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+
+		ASSERT(0, 'Blocked XHR to ' + url);
+	};
+	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
+
+})(self);
+
 (function __mozPreferences(scope) {
 	scope.mozPrefs = Services.prefs.getBranch('extensions.mega.');
 

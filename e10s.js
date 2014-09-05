@@ -5,6 +5,8 @@
 	const _hosts = {
 		"mega.co.nz" : 1,
 		"mega.is"    : 1,
+		"mega.io"    : 1,
+		"mega.nz"    : 1,
 		"me.ga"      : 1
 	};
 

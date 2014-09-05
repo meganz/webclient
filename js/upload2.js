@@ -556,7 +556,7 @@ ChunkUpload.prototype.upload = function() {
 };
 
 ChunkUpload.prototype.io_ready = function(task, args) {
-	if (args[0] || !this.file)
+	if (args[0] || !this.file || !this.file.ul_keyNonce)
 	{
 		if (this.file && this.file.done_starting)
 		{
@@ -782,13 +782,14 @@ function ul_filereader(fs, file) {
 			done(new Error(evt))
 		};
 		fs.onloadend = function(evt) {
+			var r = null;
 			if (evt.target.readyState == FileReader.DONE) try {
 				task.bytes = new Uint8Array(evt.target.result);
-				done(null)
 			} catch(e) {
 				console.error(e);
-				done(e);
+				r = e;
 			}
+			done(r);
 			blob = undefined;
 		};
 		try {

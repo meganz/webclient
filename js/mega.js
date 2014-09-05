@@ -485,7 +485,7 @@ function MegaData ()
 			fmtopUI();
 			M.renderPath();
 		}
-		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
+		else if (id && id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			$('.fm-right-account-block').addClass('hidden');
@@ -568,7 +568,7 @@ function MegaData ()
 
 	this.buildtree = function(n)
 	{
-		if (this.c[n.h])
+		if (n && this.c[n.h])
 		{
 			var folders = [];
 			for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);

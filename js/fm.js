@@ -274,7 +274,7 @@ function initUI()
 			if (c && c.indexOf('folder') > -1) t = $(e.target).attr('id');			
 		}
 		
-		if (ids.length && t) dd = ddtype(ids,t);
+		if (ids && ids.length && t) dd = ddtype(ids,t);
 		
 		$('.dragger-block').removeClass('move copy warning drag');
 		if (a == 'drop' || a == 'out')
@@ -406,6 +406,7 @@ function initUI()
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e) 
 	{
+		if (!M.currentdirid) return;
 		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/' || M.currentdirid.substr(0,5) == 'chat/') window.history.back();
 		else
 		{
@@ -3383,9 +3384,9 @@ function menuItems()
 	var n = M.d[$.selected[0]];
 	if (n && n.p.length == 11) items['removeshare'] = 1;
 	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
-	if ($.selected.length == 1 && M.d[$.selected[0]].t) items['open'] = 1;					
-	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name)) items['preview'] = 1;	
-	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) items['sharing'] = 1;	
+	if (n && $.selected.length == 1 && n.t) items['open'] = 1;					
+	if (n && $.selected.length == 1 && is_image(n.name)) items['preview'] = 1;	
+	if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink) items['sharing'] = 1;	
 	if (sourceRoot == M.RootID && !folderlink)
 	{
 		items['move'] = 1;

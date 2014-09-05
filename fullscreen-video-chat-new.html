@@ -60,6 +60,25 @@ $(document).ready(function() {
 			   $(document).fullScreen(false);
 	   }
    });
+   
+   //Hidding Control panel if cursor is idle
+   var idleMouseTimer;
+   var forceMouseHide = false;
+   $('.video-full-container.full-mode').mousemove(function(ev) {
+        if(!forceMouseHide) {
+          $('.video-full-container.full-mode').css('cursor', '');
+		  $('.video-controls').removeClass('hidden-controls');
+          clearTimeout(idleMouseTimer);
+          idleMouseTimer = setTimeout(function() {
+            $(".video-full-container.full-mode").css('cursor', 'none');
+			$('.video-controls').addClass('hidden-controls');
+            forceMouseHide = true;
+            setTimeout(function() {
+                forceMouseHide = false;
+            }, 400);
+          }, 2000);
+       }
+    });
   
 });
 

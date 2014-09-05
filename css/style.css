@@ -18781,6 +18781,48 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	float: left;
 	margin: 10px 6px 0 10px;
 }
+.video-minimize-button {
+	width:16px;
+	height:16px;
+	position:absolute;
+	top:4px;
+	right:4px;
+	background-color:rgba(255,255,255,0.9);
+	z-index:10;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat:no-repeat;
+	background-position: -1px -9474px;
+	cursor:pointer;
+	-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+border-radius: 3px;
+}
+.video-minimize-button.active {
+	background-position: -1px -9502px;
+}
+.video-full-canvas-block.current-user {
+	min-height:32px;
+}
+.video-full-canvas-block.current-user img, .video-full-canvas-block.current-user video {
+	-webkit-transition: opacity 200ms ease-in-out;
+-moz-transition: opacity 200ms ease-in-out;
+-o-transition: opacity 200ms ease-in-out;
+-ms-transition: opacity 200ms ease-in-out;
+transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+-moz-opacity: 1;
+-khtml-opacity: 1;
+opacity: 1;
+}
+.video-full-canvas-block.current-user.minimized, .video-full-canvas-block.current-user.minimized {
+	background-color:transparent;
+}
+.video-full-canvas-block.current-user.minimized img, .video-full-canvas-block.current-user.minimized video, .video-full-canvas-block.current-user.minimized .video-full-disabled-block{
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+-moz-opacity: 0;
+-khtml-opacity: 0;
+opacity: 0;
+}
 .video-relative-block {
 	position: relative;
 	width: 100%;

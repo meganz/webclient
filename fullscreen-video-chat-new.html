@@ -64,7 +64,8 @@ $(document).ready(function() {
    //Hidding Control panel if cursor is idle
    var idleMouseTimer;
    var forceMouseHide = false;
-   $('.video-full-container.full-mode').mousemove(function(ev) {
+   $('.video-full-container.full-mode').unbind('mousemove');
+   $('.video-full-container.full-mode').bind('mousemove',function(ev) {
         if(!forceMouseHide) {
           $('.video-full-container.full-mode').css('cursor', '');
 		  $('.video-controls').removeClass('hidden-controls');
@@ -79,6 +80,27 @@ $(document).ready(function() {
           }, 2000);
        }
     });
+	
+	//Video miminizing
+	$('.video-minimize-button').bind('click',function() {
+		 if($(this).attr('class').indexOf('active') == -1) {
+			  $(this).parent().addClass('minimized');
+			  $(this).parent().animate({
+			   'min-width': '32px',
+			    width: 32
+              }, 200, function() {
+                  $('.video-minimize-button').addClass('active');
+              });
+		 } else {
+			 $(this).parent().removeClass('minimized');
+			 $(this).parent().animate({
+                width: $(window).width()*0.15
+              }, 200, function() {
+                  $('.video-minimize-button').removeClass('active');
+				  $(this).parent().css('min-width','15%');
+              });
+		 }
+	});
   
 });
 
@@ -94,6 +116,7 @@ $(document).ready(function() {
        <img alt="" src="images/temp/video-temp-img2.jpg" />
      </div>
      <div class="video-full-canvas-block current-user">
+       <div class="video-minimize-button"></div>
        <img alt="" src="images/temp/video-temp-img3.jpg" />
        <div class="video-full-disabled-block">
           <div class="video-full-disabled-icon"></div>

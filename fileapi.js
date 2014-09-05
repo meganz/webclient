@@ -892,7 +892,9 @@ function mozClearStartupCache() {
 				}
 			}
 
-			return __cE_NS.call(document, ns, e);
+			// __cE_NS seems to cause some issue with the actions toolbar created on file selection..
+			// return __cE_NS.call(document, ns, e);
+			return __cE.call(document, e);
 		}
 	});
 	Object.defineProperty(document, 'createElement',

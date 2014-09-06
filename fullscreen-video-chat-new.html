@@ -38,11 +38,16 @@ $(document).ready(function() {
 	  fullscreenVideoResizing();
    });
    
+   
    $('.video-call-button').bind('click', function() {
 	   if($(this).attr('class').indexOf('active') == -1) {
 		   $(this).addClass('active');
 		   // Video mute flipping
 		   if($(this).attr('class').indexOf('video-icon') > -1) {
+			   $('.current-user .video-full-disabled-block').css({
+				  height:$('.video-full-canvas-block.current-user').height(),
+				  width:$('.video-full-canvas-block.current-user').width()
+			   })
 			   $('.video-full-canvas-block.current-user').addClass('video-off');
 		   }
 		   // Fullscreen mode
@@ -81,20 +86,26 @@ $(document).ready(function() {
        }
     });
 	
+	
 	//Video miminizing
 	$('.video-minimize-button').bind('click',function() {
 		 if($(this).attr('class').indexOf('active') == -1) {
 			  $(this).parent().addClass('minimized');
 			  $(this).parent().animate({
 			   'min-width': '32px',
-			    width: 32
+			    width: 32,
+				height: 32
               }, 200, function() {
                   $('.video-minimize-button').addClass('active');
               });
 		 } else {
+			
 			 $(this).parent().removeClass('minimized');
+			 var ch = $(window).width()*0.15;
 			 $(this).parent().animate({
-                width: $(window).width()*0.15
+                width: $(window).width()*0.15,
+				height:ch*0.75
+				
               }, 200, function() {
                   $('.video-minimize-button').removeClass('active');
 				  $(this).parent().css('min-width','15%');

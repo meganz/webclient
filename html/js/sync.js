@@ -110,7 +110,9 @@ function init_sync()
 		});
 	},1000);
 	var pf = navigator.platform.toUpperCase();
-	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
+	
+	if (page.substr(-5) == 'linux') sync_switchOS('linux');	
+	else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
 	else sync_switchOS('windows');
 	if (typeof swiffy == 'undefined' && !silent_loading)

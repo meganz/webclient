@@ -507,7 +507,7 @@ function init_page()
 			$('.ff-icon').removeClass('hovered');
 		});
 	}
-	else if (page == 'sync')
+	else if (page.substr(0,4) == 'sync')
 	{
 		parsepage(pages['sync']);
 		init_sync();

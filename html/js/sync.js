@@ -110,7 +110,6 @@ function init_sync()
 		});
 	},1000);
 	var pf = navigator.platform.toUpperCase();
-	pf = 'LINUX';
 	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
 	else sync_switchOS('windows');

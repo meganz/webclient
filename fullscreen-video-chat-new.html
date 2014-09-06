@@ -30,6 +30,11 @@ $(document).ready(function() {
               'margin-left' : '-' + c.width()/2 + 'px',
               'margin-top' : '-' + c.height()/2 + 'px'
        });
+	   $('.current-user .video-full-disabled-block').css({
+				  height:($(window).width()*0.15)*0.75,
+				  width:$(window).width()*0.15
+	   });
+	   $('.video-full-canvas-block.current-user').removeAttr('style');
    }
    fullscreenVideoResizing();
    
@@ -47,7 +52,7 @@ $(document).ready(function() {
 			   $('.current-user .video-full-disabled-block').css({
 				  height:$('.video-full-canvas-block.current-user').height(),
 				  width:$('.video-full-canvas-block.current-user').width()
-			   })
+			   });
 			   $('.video-full-canvas-block.current-user').addClass('video-off');
 		   }
 		   // Fullscreen mode
@@ -105,7 +110,6 @@ $(document).ready(function() {
 			 $(this).parent().animate({
                 width: $(window).width()*0.15,
 				height:ch*0.75
-				
               }, 200, function() {
                   $('.video-minimize-button').removeClass('active');
 				  $(this).parent().css('min-width','15%');

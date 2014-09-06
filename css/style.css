@@ -18618,6 +18618,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .video-off .video-full-disabled-block {
 	position: relative;
 	top: 0;
+	max-width:100%;
+	max-height:100%;
 }
 .video-full-canvas-block.current-user {
 	border: 4px solid rgba(255,255,255,0.7);

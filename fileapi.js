@@ -880,7 +880,7 @@ function mozClearStartupCache() {
 				return null;
 			}
 
-			var eL = e.toLowerCase();
+			var eL = e.split(':').pop().toLowerCase();
 			if (eL === 'script' || eL === 'iframe')
 			{
 				var caller = Components.stack.caller;
@@ -899,7 +899,7 @@ function mozClearStartupCache() {
 	{
 		value : function(e)
 		{
-			var eL = e.toLowerCase();
+			var eL = e.split(':').pop().toLowerCase();
 			if (eL === 'script' || eL === 'iframe')
 			{
 				var caller = Components.stack.caller;
@@ -918,7 +918,7 @@ function mozClearStartupCache() {
 	{
 		var uri = Services.io.newURI(url, null, null);
 
-		if (/\.mega.co.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+		if (/\.mega\.co\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
 
 		ASSERT(0, 'Blocked XHR to ' + url);
 	};

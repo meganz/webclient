@@ -1524,6 +1524,7 @@ MegaChat.prototype._onUsersUpdate = function(type, e, eventObject) {
             return;
         }
 
+        assert(anyOf(updatedJids, "null") === false, "updatedJids should not contain \"null\".");
 
         room.syncUsers(clone(updatedJids));
         room.refreshUI();

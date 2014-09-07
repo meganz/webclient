@@ -184,6 +184,7 @@ var Karere = function(user_options) {
                 orderedUsers.push(
                     jid
                 );
+                assert(jid !== null && jid != "null", "invalid JID passed");
                 users[jid] = role;
             }
         });
@@ -195,6 +196,9 @@ var Karere = function(user_options) {
             }
             delete users[jid];
         });
+
+        assert(anyOf(Object.keys(users), "null") === false, "users should not contain \"null\".");
+        assert(anyOf(orderedUsers, "null") === false, "users should not contain \"null\".");
 
         self.setMeta('rooms', eventObject.getRoomJid(), 'orderedUsers', orderedUsers);
 
@@ -1058,7 +1062,9 @@ makeMetaAware(Karere);
             $.each(x, function(ii, _x) {
                 $.each(_x.getElementsByTagName("item"), function(i, item) {
                     var role = item.getAttribute('role');
-                    var jid = item.getAttribute('jid');
+                    var jid = item.getAttribute('jid') ? item.getAttribute('jid') : Karere.getNormalizedFullJid(item.parentNode.parentNode.getAttribute("from"));
+
+                    assert(jid, "invalid jid found in <presence><x/></presence> stanza.");
 
                     if(role != "unavailable" && role != "none") {
                         if(users[jid] != role) {

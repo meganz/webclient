@@ -47,8 +47,9 @@
         crypto.getRandomValues() to generate a 256-bit (32-byte, 8-int) key,
         encoding in base64 format.
         The function takes no parameters and returns the generated string.
-    @param {function} [options.prepareToSendMessage]
-        A function that prepares to send the first message when initiating
+    @param {function} [options.preloadCryptoKeyForJid]
+        A function that preloads the public key of the peer jid and then calls the
+        callback given. Used to send the first message when initiating
         a session. It takes two parameters (sendmsg, jid), where sendmsg is a
         0-argument function "sendmsg", and jid is the targetJid.
         If this is not provided, function(sendmsg, jid) { sendmsg(); } is used,
@@ -60,36 +61,41 @@ function RtcSession(stropheConn, options) {
     if (!RTC)
         throw new Error('This browser does not support webRTC');
 
-
     var self = this;
-
     this.connection = stropheConn;
     var jingle = this.jingle = stropheConn.jingle;
     if (jingle.rtcSession)
         throw new Error("This Strophe connection already has an associated RtcSession instance");
     this.ftManager = jingle.ftManager;
 // Init crypto functions
-    if (!options.encryptMessageForJid || !options.decryptMessage || !options.generateMac) {
-        if (options.dummyCryptoFunctions) {
-            jingle.encryptMessageForJid = function(msg, bareJid) {
-                if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
-                    throw new Error("pubkey not loaded: " + bareJid);
-                }
-                return RtcSession.xorEnc(msg, bareJid)
-            };
-            jingle.decryptMessage = function(msg) {
-                return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
-            };
-            jingle.generateMac = function(msg, key) {
-                return RtcSession.xorEnc(msg, key);
-            };
-        } else
-            throw new Error("At least one crypto function is not provided in 'options'");
+    if (options.dummyCryptoFunctions) {
+        jingle.encryptMessageForJid = function(msg, bareJid) {
+            if (!self._dummyKeys || !self._dummyKeys[bareJid]) {
+                throw new Error("pubkey not loaded: " + bareJid);
+            }
+            return RtcSession.xorEnc(msg, bareJid)
+        };
+        jingle.decryptMessage = function(msg) {
+            return RtcSession.xorDec(msg, Strophe.getBareJidFromJid(this.connection.jid));
+        };
+        jingle.generateMac = function(msg, key) {
+            return RtcSession.xorEnc(msg, key);
+        };
+        jingle.preloadCryptoKeyForJid = function(f, bareJid) {
+            self._dummyKeys = self._dummyKeys || {};
+            self._dummyKeys[bareJid] = true;
+            f();
+        };
     } else {
+        if (!options.encryptMessageForJid || !options.decryptMessage || !options.generateMac ||
+            !options.preloadCryptoKeyForJid) {
+                throw new Error("At least one crypto function is not provided in 'options'");
+        }
         jingle.encryptMessageForJid = options.encryptMessageForJid;
         jingle.decryptMessage = options.decryptMessage;
         jingle.generateMac = options.generateMac;
         jingle.generateMacKey = options.generateMacKey;
+        jingle.preloadCryptoKeyForJid = options.preloadCryptoKeyForJid;
     }
     if (options.generateMacKey) {
         jingle.generateMacKey = options.generateMacKey;
@@ -101,21 +107,7 @@ function RtcSession(stropheConn, options) {
             for (var i=0; i<32; i++)
                 result+=String.fromCharCode(array[i]);
             return btoa(result);
-        }
-    }
-    if (options.prepareToSendMessage) {
-        jingle.prepareToSendMessage = options.prepareToSendMessage;
-    } else {
-        if(options.dummyCryptoFunctions) {
-            jingle.prepareToSendMessage = function(f, bareJid) {
-                self._dummyKeys = self._dummyKeys || {};
-                self._dummyKeys[bareJid] = true;
-
-                f();
-            };
-        } else {
-            jingle.prepareToSendMessage = function(f) { f(); };
-        }
+        };
     }
     jingle.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
@@ -186,7 +178,14 @@ function RtcSession(stropheConn, options) {
     @property {string} [info.by]
         Only if event='handled-elsewhere'. The full JID that handled the call
   */
-    j.onCallCanceled = function(from, info) {self.trigger('call-canceled', {from:from, info:info});};
+    j.onCallCanceled = function(from, info, isDataCall) {
+
+        self.trigger('call-canceled', {
+            from:from,
+            info:info,
+            isDataCall: isDataCall
+        });
+    };
     j.onCallAnswered = this.onCallAnswered;
     j.onCallTerminated = this.onCallTerminated;
     j.onRemoteStreamAdded = this.onRemoteStreamAdded;
@@ -424,12 +423,13 @@ RtcSession.prototype = {
         self.trigger('call-declined', {
             peer: fullPeerJid,
             reason: $(stanza).attr('reason'),
+            sessionId: $(stanza).attr('sid'),
             text : body.length ? RtcSession.xmlUnescape(body[0].textContent) : undefined
         });
     },
     null, 'message', 'megaCallDecline', null, targetJid, {matchBare: true});
 
-    self.jingle.prepareToSendMessage(function() {
+    self.jingle.preloadCryptoKeyForJid(function() {
         var msgattrs = {
             to: targetJid,
             type: 'megaCall',
@@ -441,8 +441,12 @@ RtcSession.prototype = {
             fileArr = [];
             for (var i=0; i<options.files.length; i++) {
                 var file = options.files[i];
+
+                file.uniqueId = fastHashFunction(file.size + file.name + targetJid + sid + unixtime() + rand(100000));
+
                 fileArr.push(Object.freeze(file));
-                var info = {size: file.size, mime: file.type};
+
+                var info = {size: file.size, name: file.name, mime: file.type, uniqueId: file.uniqueId};
                 infos[file.name] = info;
             }
             msgattrs.files = JSON.stringify(infos);
@@ -497,7 +501,7 @@ RtcSession.prototype = {
             declineHandler = null;
 
             self._freeLocalStreamIfUnused();
-            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), sid: sid, type: 'megaCallCancel'}));
+            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), sid: sid, type: 'megaCallCancel', isDataCall:!!options.files}));
             return true;
         } else if (state === 0) {
             state = 4;

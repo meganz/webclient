@@ -1575,3 +1575,15 @@ function readLocalStorage(name, type, val)
 	}
 	return v || (val && val.def);
 }
+
+function obj_values(obj) {
+    var vals = [];
+
+    Object.keys(obj).forEach(function(memb) {
+        if (obj.hasOwnProperty(memb)) {
+            vals.push(obj[memb]);
+        }
+    });
+
+    return vals;
+}

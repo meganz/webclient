@@ -193,6 +193,7 @@ DownloadHandler.prototype.onmessage = function(event) {
         delete this._files[info.name];
         info.id = header[1];
         info.mime = listFile.mime;
+        info.uniqueId = listFile.uniqueId;
         info = Object.freeze(info);
         this._currentFile = info;
         this._bytesRecv = 0;

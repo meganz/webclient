@@ -112,7 +112,7 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
         .append($container);
 
     $('.chat-username', $m).after(
-        $('<span class="attachment-label"> had shared ' + (
+        $('<span class="attachment-label"> shared ' + (
             Object.keys(attachments).length == 1 ? " a file" : "files"
             ) + ':</span>')
     );

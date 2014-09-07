@@ -358,7 +358,7 @@ var JinglePlugin = {
             self.connection.deleteHandler(elsewhereHandler);
             elsewhereHandler = null;
 
-            self.onCallCanceled.call(self.eventHandler, from, {event: 'canceled'});
+            self.onCallCanceled.call(self.eventHandler, from, {event: 'canceled'}, $(msg).attr("isdatacall") ? true : false);
         }, null, 'message', 'megaCallCancel', null, from, {matchBare:true});
 
         setTimeout(function() {
@@ -387,8 +387,13 @@ var JinglePlugin = {
         var files = strFiles?JSON.parse(strFiles):undefined;
 // Notify about incoming call
         self.onIncomingCallRequest.call(self.eventHandler, 
-             {peer:from, reqStillValid:reqStillValid,
-              peerMedia: peerMedia, files: files},
+             {
+                 peer:from,
+                 reqStillValid:reqStillValid,
+                 peerMedia: peerMedia,
+                 files: files,
+                 sessionId: $(callmsg).attr('sid')
+             },
           function(accept, obj) {
 // If dialog was displayed for too long, the peer timed out waiting for response,
 // or user was at another client and that other client answred.
@@ -432,7 +437,7 @@ var JinglePlugin = {
                     self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'timed out waiting for caller to start call');
                 }, self.jingleAutoAcceptTimeout);
 
-                self.prepareToSendMessage(function() {
+                self.preloadCryptoKeyForJid(function() {
                     self.connection.send($msg({
                         sid: sid,
                         to: from,

@@ -53,9 +53,6 @@ function Mads()
 	else startMads();
 	
 	var pf = navigator.platform.toUpperCase();
-	
-	pf = 'LINUX';
-
 	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
 	else sync_switchOS('windows');
@@ -509,7 +506,7 @@ function sync_switchOS(os)
 		var c = $(this).attr('class');
 		if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
 		else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
-		else if (c && c.indexOf('linux') > -1) sync_switchOS('linux');
+		else if (c && c.indexOf('linux') > -1) document.location.hash = 'sync';
 		return false;
 	});
 }

@@ -874,7 +874,7 @@ function mozClearStartupCache() {
 	{
 		value : function(ns, e)
 		{
-			if (ns !== 'http://www.w3.org/1999/xhtml')
+			if (ns !== 'http://www.w3.org/1999/xhtml' && ns !== 'http://www.w3.org/2000/svg')
 			{
 				ASSERT(0, 'Blocked namespace: ' + ns);
 				return null;
@@ -883,7 +883,7 @@ function mozClearStartupCache() {
 			var eL = e.toLowerCase();
 			if (eL === 'script' || eL === 'iframe')
 			{
-				var caller = Components.stack.caller.caller;
+				var caller = Components.stack.caller;
 
 				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secureboot.js' !== caller.filename.split('?')[0])
 				{
@@ -892,16 +892,25 @@ function mozClearStartupCache() {
 				}
 			}
 
-			// __cE_NS seems to cause some issue with the actions toolbar created on file selection..
-			// return __cE_NS.call(document, ns, e);
-			return __cE.call(document, e);
+			return __cE_NS.call(document, ns, e);
 		}
 	});
 	Object.defineProperty(document, 'createElement',
 	{
 		value : function(e)
 		{
-			return document.createElementNS('http://www.w3.org/1999/xhtml', e);
+			var eL = e.toLowerCase();
+			if (eL === 'script' || eL === 'iframe')
+			{
+				var caller = Components.stack.caller;
+
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secureboot.js' !== caller.filename.split('?')[0])
+				{
+					ASSERT(0, 'Blocked '+e+' element creation');
+					return null;
+				}
+			}
+			return __cE.call(document, e);
 		}
 	});
 

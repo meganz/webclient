@@ -779,17 +779,32 @@ function ul_filereader(fs, file) {
 
 		fs.pos = task.start;
 		fs.onerror = function(evt) {
-			done(new Error(evt))
+			done(new Error(evt));
+			done = null;
 		};
-		fs.onloadend = function(evt) {
-			var r = null;
-			if (evt.target.readyState == FileReader.DONE) try {
-				task.bytes = new Uint8Array(evt.target.result);
-			} catch(e) {
-				console.error(e);
-				r = e;
+		fs.onloadend = function(evt)
+		{
+			if (done)
+			{
+				var target = evt.target, error = true;
+				if (target.readyState == FileReader.DONE)
+				{
+					if (target.result instanceof ArrayBuffer)
+					{
+						try
+						{
+							task.bytes = new Uint8Array(target.result);
+							error = null;
+						}
+						catch(e)
+						{
+							console.error(e);
+							error = e;
+						}
+					}
+				}
+				done(error);
 			}
-			done(r);
 			blob = undefined;
 		};
 		try {
@@ -797,6 +812,7 @@ function ul_filereader(fs, file) {
 		} catch(e) {
 			console.error(e);
 			done(e);
+			done = null;
 		}
 	}, 1);
 }

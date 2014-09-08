@@ -344,7 +344,7 @@ function ul_upload(File) {
 		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
 	}
 
-	onUploadStart(file.id);
+	onUploadStart(file);
 	file.done_starting();
 }
 
@@ -424,7 +424,7 @@ ChunkUpload.prototype.updateprogress = function() {
 	this.file.progressevents = (this.file.progressevents || 0)+1;
 
 	onUploadProgress(
-		this.file.id,
+		this.file,
 		Math.floor(tp/this.file.size*100),
 		tp,
 		this.file.size,
@@ -472,8 +472,11 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		if (!response.length || response == 'OK' || response.length == 27) {
 			this.file.sent += this.bytes.buffer.length || this.bytes.length;
-			delete this.file.progress[this.start];
-			this.updateprogress();
+			if (this.file.progress) {
+				delete this.file.progress[this.start];
+				this.updateprogress();
+			}
+			else if (d) console.error('*** CHECK THIS ***');
 
 			if (response.length == 27) {
 				var t = [], ul_key = this.file.ul_key
@@ -514,15 +517,14 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			DEBUG("Invalid upload response: " + response);
 			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
-
 	}
 
-	DEBUG("bad response from server", [
+	if (d) console.log("bad response from server",
 		xhr.status,
 		this.file.name,
 		typeof xhr.response == 'string',
 		xhr.statusText
-	]);
+	);
 
 	return this.on_error(null, null, "bad response from server");
 }
@@ -840,7 +842,7 @@ Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	if (!file) {
 		// TODO: This upload was cancelled, we should terminate the worker rather than waiting
 		if (d) console.error('This upload was cancelled, we should terminate the worker rather than waiting');
-		return e.data[0] == '[' || done();
+		return typeof e.data == 'string' || done();
 	}
 
 	if (typeof e.data == 'string') {
@@ -873,7 +875,11 @@ function resetUploadDownload() {
 		GlobalProgress = {};
 		delete $.transferprogress;
 		if ($.transferClose) $.transferClose(); /* in case it isn't closed already.. */
-		if ($.mTransferAnalysis) clearInterval($.mTransferAnalysis);
+		if ($.mTransferAnalysis)
+		{
+			clearInterval($.mTransferAnalysis);
+			delete $.mTransferAnalysis;
+		}
 	}
 
 	if (d) console.log("resetUploadDownload", ul_queue.length, dl_queue.length);

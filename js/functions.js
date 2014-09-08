@@ -841,15 +841,34 @@ function setupTransferAnalysis()
 				{
 					(function(p, t)
 					{
+						var r = '', data = [];
+
+						if (t === 'Upload')
+						{
+							var w = GlobalProgress[i];
+							if (w && (w = w.working) && w.length)
+							{
+								var j = w.length;
+								r = '(resurrecting ' + j + ')';
+								while (j--)
+								{
+									w[j].on_error(0,0,'Stuck');
+									data.push(''+(w[j].xhr&&w[j].xhr.__failed)+','+(!!w[j].bytes));
+								}
+							}
+						}
+						console.error(t + ' stuck. ' + r, i, p[0], p[1], Math.floor(p[0]/p[1]*100), data.join("~"));
+
 						Soon(function()
 						{
-							throw new Error(t + ' stuck.');
+							throw new Error(t + ' Stuck ' + r);
 						});
 					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
+					delete prev[i];
 				}
 			}
 		}
-	}, 35000);
+	}, 97000);
 }
 
 function percent_megatitle()

@@ -3111,7 +3111,10 @@ MegaChatRoom.prototype._cancelCallRequest = function() {
 
         self._resetCallStateNoCall();
     }
-    self.megaChat.rtc.hangup();
+
+    if(self.megaChat.rtc && self.megaChat.rtc.hangup) { // have support for rtc?
+        self.megaChat.rtc.hangup();
+    }
 };
 
 MegaChatRoom.prototype._startCall = function() {

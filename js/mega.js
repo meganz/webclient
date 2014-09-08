@@ -1068,21 +1068,25 @@ function MegaData ()
         return folders;
     };
 
-	this.buildtree = function(n)
+	this.buildtree = function(n, dialog)
 	{
 		var stype = "cloud-drive";
+		// ToDo: What lu represents?
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
 		{
-			$('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
+			if (typeof dialog === 'undefined') $('.content-panel.cloud-drive').html('<ul id="treesub_' + htmlentities(M.RootID) + '"></ul>');
+				else $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
 		}
 		else if (n.h == 'shares' && $('.content-panel.shared-with-me lu').length == 0)
 		{
-			$('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
+			if (typeof dialog === 'undefined') $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
+				else $('.' + dialog + ' .shared-with-me .dialog-content-block').html('<ul id="mctreesub_shares"></ul>');
 			stype = "shared-with-me";
 		}
 		else if (n.h == M.RubbishID && $('.content-panel.rubbish-bin lu').length == 0)
 		{
-			$('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+			if (typeof dialog === 'undefined') $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
+				else $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
 			stype = "rubbish-bin";
 		}
 
@@ -1124,12 +1128,33 @@ function MegaData ()
 				var openedc = '';
 				if (M.currentdirid == folders[i].h) openedc = 'opened';
 
-				var html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
-				if ((!treesearch || (treesearch && folders[i].name && folders[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) && $('#treeli_'+folders[i].h).length == 0)
+				var k, html = '';
+				if (typeof dialog === 'undefined')
 				{
-					if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
-					else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
-					else $('#treesub_' + n.h).append(html);
+					html = '<li id="treeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="treea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="treesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+					k = $('#treeli_'+folders[i].h).length;
+				}
+				else
+				{
+					html = '<li id="mctreeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="mctreea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="mctreesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
+					k = $('#mctreeli_'+folders[i].h).length;
+				}
+					
+					
+				if ((!treesearch || (treesearch && folders[i].name && folders[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) && k == 0)
+				{
+					if (typeof dialog === 'undefined')
+					{
+						if (folders[i-1] && $('#treeli_' + folders[i-1].h).length > 0) $('#treeli_' + folders[i-1].h).after(html);
+						else if (i == 0 && $('#treesub_' + n.h + ' li').length > 0) $($('#treesub_' + n.h + ' li')[0]).before(html);
+						else $('#treesub_' + n.h).append(html);
+					}
+					else
+					{
+						if (folders[i-1] && $('#mctreeli_' + folders[i-1].h).length > 0) $('#mctreeli_' + folders[i-1].h).after(html);
+						else if (i == 0 && $('#mctreesub_' + n.h + ' li').length > 0) $($('#mctreesub_' + n.h + ' li')[0]).before(html);
+						else $('#mctreesub_' + n.h).append(html);
+					}
 				}
 				if (buildnode) this.buildtree(folders[i]);
 			}
@@ -3329,6 +3354,7 @@ function createfolder(toid,name,ulparams)
 			newnodes=[];
 			M.addNode(res.f[0]);
 			rendernew();
+			refreshDialogContent();
 			loadingDialog.hide();
 			if (ctx.ulparams) ulparams.callback(ctx.ulparams,res.f[0].h);
 		}

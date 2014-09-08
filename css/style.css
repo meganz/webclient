@@ -12847,6 +12847,8 @@ h5.main-italic-header {
 	width: 140px;
 	height: 140px;
 	margin: 50px auto 0 auto;
+	text-align:center;
+	font-size:12px;
 }
 .reg-st5-key-gen {
 	width: 140px;
@@ -12882,7 +12884,7 @@ h5.main-italic-header {
 }
 .reg-st5-complete-block {
 	text-align: center;
-	margin: 64px 0 38px 0;
+	margin: 38px 0 38px 0;
 }
 .reg-st5-complete-button {
 	height: 40px;

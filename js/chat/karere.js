@@ -1067,10 +1067,11 @@ makeMetaAware(Karere);
                     assert(jid, "invalid jid found in <presence><x/></presence> stanza.");
 
                     if(role != "unavailable" && role != "none") {
-                        if(users[jid] != role) {
-                            users[jid] = role;
-                            newUsers[jid] = item.getAttribute('role');
+                        if(!users[jid]) {
+                            newUsers[jid] = role;
                         }
+                        users[jid] = role;
+
                     } else { // left/kicked
                         delete users[jid];
                         delete newUsers[jid];

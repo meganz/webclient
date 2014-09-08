@@ -56,19 +56,17 @@ var chatui;
         }
 
         chatJids.push(megaChat.karere.getBareJid());
-        $promise = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
+        var resp = megaChat.openChat(chatJids, chatJids.length == 2 ? "private" : "group");
 
-        if($promise) {
-            $promise.done(function(roomJid, room) {
-                room.show();
-            });
-        }
+        $promise = resp[2];
+
+        resp[1].show();
 
 
         $('.fm-chat-block').removeClass('hidden');
 
-        $('.message-textarea').unbind('keyup.autoresize');
-        $('.message-textarea').bind('keyup.autoresize',function() {
+        $(document.body).undelegate('.message-textarea', 'keyup.autoresize');
+        $(document.body).delegate('.message-textarea', 'keyup.autoresize',function() {
             megaChat.resized();
         });
 
@@ -276,7 +274,7 @@ var chatui;
                             var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
 
 
-                            $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sessionId, function() {
+                            $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
                                 resp.cancel();
                             });
 
@@ -343,8 +341,8 @@ var chatui;
             }
         };
 
-        $('.message-textarea').unbind('keyup.send');
-        $('.message-textarea').bind('keyup.send', function(e) {
+        $(document.body).undelegate('.message-textarea', 'keyup.send');
+        $(document.body).delegate('.message-textarea', 'keyup.send', function(e) {
             if($(this).val().length > 0) {
                 if(!typingTimeout) {
                     var room = megaChat.getCurrentRoom();
@@ -362,21 +360,21 @@ var chatui;
                 stoppedTyping();
             }
         });
-        $('.message-textarea').unbind('keydown.send');
-        $('.message-textarea').bind('keydown.send',function(e) {
+        $(document.body).undelegate('.message-textarea', 'keydown.send');
+        $(document.body).delegate('.message-textarea', 'keydown.send',function(e) {
             var key = e.keyCode || e.which;
 
 
             if(key == 13 && e.shiftKey !== true) {
                 var msg = $(this).val();
                 if(msg.trim().length > 0) {
+                    stoppedTyping();
+
                     megaChat.sendMessage(
                         megaChat.getCurrentRoomJid(),
                         msg
                     );
                     $(this).val('');
-
-                    stoppedTyping();
 
                     megaChat.resized();
                     return false;
@@ -472,7 +470,6 @@ var chatui;
             });
         }
     });
-
 })();
 
 
@@ -1132,7 +1129,6 @@ MegaChat.prototype.init = function() {
         self.rtc.ftManager.updateGui = function() {
             var uploadAndDownloadSessions = obj_values(this.downloads).concat(obj_values(this.uploads));
 
-
             $.each(uploadAndDownloadSessions, function(k, v) {
                 if (!v.currentFile()) {
                     return; // continue
@@ -1173,9 +1169,9 @@ MegaChat.prototype.init = function() {
 
                     return;
                 }
-                var $promise = self.openChat([fromBareJid], "private");
+                var resp = self.openChat([fromBareJid], "private");
 
-                $promise.done(function(roomJid, room) {
+                resp[2].done(function(roomJid, room) {
                     room.trigger(e, eventData);
                 });
             } else {
@@ -1235,7 +1231,7 @@ MegaChat.prototype.init = function() {
             }
         };
         $(self.rtc.ftManager).on('ftsess-remove', _ftSessEndHandler);
-        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler); // issue #699
+//        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
 
     } catch(e) {
         // no RTC support.
@@ -1275,6 +1271,8 @@ MegaChat.prototype.init = function() {
                 .text('Start chat')
                 .removeClass("active");
         }
+        room._cancelCallRequest();
+        room._resetCallStateNoCall();
     });
     $(document)
         .unbind('megaulcomplete.megaChat')
@@ -1344,17 +1342,19 @@ MegaChat.prototype._generateIncomingRtcFileMessage = function(room, filesList, s
     $('.chat-username', $message).text(name);
 
     $.each(filesList, function(k, v) {
+        var name = v.name ? v.name : k;
+
         var $file = $('<div class="nw-chat-sharing-body main-body">' +
             '<div class="nw-chat-icons-area">' +
-            '<span class="block-view-file-type ' + fileicon({name: v.name})+ '"></span>' +
+            '<span class="block-view-file-type ' + fileicon({name: name})+ '"></span>' +
             '</div>' +
             '<div class="nw-chat-sharing-filename">' +
-            v.name +
+            name +
             '</div>' +
             '<div class="nw-chat-sharing-filesize">' +
             bytesToSize(v.size) +
             '</div>' +
-            '<div class="nw-chat-sharing-filesize direct-progressbar hidden"><div class="progressbar"><div class="progressbarfill" style="width: 24%;"></div></div></div>' +
+            '<div class="nw-chat-sharing-filesize direct-progressbar hidden"><div class="progressbar"><div class="progressbarfill" style="width: 1%;"></div></div></div>' +
             '<div class="clear"></div>' +
             '</div>');
         $file.attr('data-file-uniqueId', v.uniqueId);
@@ -1870,8 +1870,10 @@ MegaChat.prototype.renderContactTree = function() {
 
         if(contact.u != u_handle) {
             $element.unbind("click.megaChat");
-            $element.bind("click.megaChat", function() {
+            $element.bind("click.megaChat", function(e) {
                 window.location = "#fm/chat/" + contact.u;
+                e.stopPropagation();
+                return false;
             });
 
             var room = self.chats[
@@ -1985,7 +1987,7 @@ MegaChat.prototype.getMyXMPPPassword = function() {
  *
  * @param jids {Array} list of bare jids
  * @param type {String} "private" or "group"
- * @returns {Deferred}
+ * @returns [roomJid {string}, room {MegaChatRoom}, {Deferred}]
  */
 MegaChat.prototype.openChat = function(jids, type) {
     var self = this;
@@ -1999,7 +2001,7 @@ MegaChat.prototype.openChat = function(jids, type) {
         if(self.chats[roomJid]) {
 //            self.chats[roomJid].show();
             $promise.resolve(roomJid, self.chats[roomJid]);
-            return $promise;
+            return [roomJid, self.chats[roomJid], $promise];
         } else {
             // open new chat
         }
@@ -2049,7 +2051,7 @@ MegaChat.prototype.openChat = function(jids, type) {
 
 
     if(self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return;
+        return [roomJid, room, (new $.Deferred()).reject(roomJid, room)];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);
@@ -2085,7 +2087,7 @@ MegaChat.prototype.openChat = function(jids, type) {
 
 
 
-    return $promise;
+    return [roomJid, room, $promise];
 };
 
 
@@ -2284,7 +2286,6 @@ MegaChat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
     } else {
-        return "https://karere-001.developers.mega.co.nz:5281/http-bind";// TODO: change this when Marek fixes the cluster
         return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
     }
 };
@@ -2292,6 +2293,8 @@ MegaChat.prototype.getBoshServiceUrl = function() {
 
 /**
  * Called when Conversations tab is opened
+ *
+ * @returns boolean true if room was automatically shown and false if the listing page is shown
  */
 MegaChat.prototype.renderListing = function() {
     var self = this;
@@ -2320,12 +2323,15 @@ MegaChat.prototype.renderListing = function() {
             // show something, instead of a blank/white screen if there are currently opened chats
             if(self.lastOpenedChat) {
                 self.chats[self.lastOpenedChat].show();
+                return true;
             } else {
                 var $firstConversation = $('.nw-conversations-item:visible[data-room-jid]:first');
                 self.chats[$firstConversation.attr("data-room-jid") + "@conference." + self.options.xmppDomain].show();
+                return true;
             }
         }
     }
+    return false;
 
     //TODO: show something? some kind of list of conversations summary/overview screen or something?
 };
@@ -2738,7 +2744,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
             );
         } else if(eventData.files) {
             // file transfer
-            var $message = megaChat._generateIncomingRtcFileMessage(self, eventData.files, eventData.sessionId,
+            var $message = megaChat._generateIncomingRtcFileMessage(self, eventData.files, eventData.sid,
                 function() {
                     eventData.answer(false, {});
                 },
@@ -2827,7 +2833,7 @@ var MegaChatRoom = function(megaChat, roomJid) {
         var msg;
         var peer = eventData.peer ? eventData.peer : eventData.from;
         var userJid = peer;
-        var sessionId = eventData.sessionId;
+        var sessionId = eventData.sid;
 
         var $transferElement = $('.webrtc-transfer[data-transfer-sid="' + sessionId  + '"]');
 
@@ -2861,7 +2867,23 @@ var MegaChatRoom = function(megaChat, roomJid) {
     });
 
     self.bind('call-canceled', function(e, eventData) {
-        if(eventData.isDataCall) {
+        if(eventData.info.isDataCall) {
+
+            var sessionId = eventData.info.sid;
+
+            var $transferElement = $('.webrtc-transfer[data-transfer-sid="' + sessionId  + '"]');
+
+            if($transferElement.size() > 0) {
+                $('.primary-button:first', $transferElement).replaceWith(
+                    $("<em>" + ("Canceled") + "</em>")
+                );
+                $('.primary-button', $transferElement).remove();
+
+                self.refreshUI();
+
+                return;
+            }
+
             return;
         }
 
@@ -2869,9 +2891,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "canceled-call-" + unixtime(),
-                    eventData.from,
+                    eventData.peer,
                     "call-from-different-device",
-                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was handled on some other device.",
+                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was handled on some other device.",
                     []
                 )
             );
@@ -2879,9 +2901,9 @@ var MegaChatRoom = function(megaChat, roomJid) {
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "canceled-call-" + unixtime(),
-                    eventData.from,
+                    eventData.peer,
                     "call-canceled",
-                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.from) + " was canceled.",
+                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
                     []
                 )
             );
@@ -3545,7 +3567,9 @@ MegaChatRoom.prototype._resetCallStateInCall = function() {
 
     self.refreshScrollUI();
 
-    self.refreshUI();
+    self.refreshUI(true);
+
+    self.resized();
 };
 
 /**
@@ -4031,7 +4055,6 @@ MegaChatRoom.prototype.destroy = function(notifyOtherDevices) {
 MegaChatRoom.prototype.show = function() {
     var self = this;
 
-
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');
@@ -4075,21 +4098,27 @@ MegaChatRoom.prototype.show = function() {
 };
 
 
+
+MegaChatRoom.prototype.getRoomUrl = function() {
+    var self = this;
+    if(self.type == "private") {
+        var participants = self.getParticipantsExceptMe();
+        var contact = self.megaChat.getContactFromJid(participants[0]);
+        if(contact) {
+            return "#fm/chat/" + contact.u;
+        }
+    } else {
+        throw new Error("Not implemented");
+    }
+}
 /**
  * If this is not the currently active room, then this method will navigate the user to this room (using window.location)
  */
 MegaChatRoom.prototype.activateWindow = function() {
     var self = this;
 
-    if(self.type == "private") {
-        var participants = self.getParticipantsExceptMe();
-        var contact = self.megaChat.getContactFromJid(participants[0]);
-        if(contact) {
-            window.location = "#fm/chat/" + contact.u;
-        }
-    } else {
-        throw new Error("Not implemented");
-    }
+    window.location = self.getRoomUrl();
+
 };
 
 /**
@@ -5190,6 +5219,9 @@ MegaChatRoom.prototype._conversationEnded = function(userFullJid) {
     var self = this;
 
     if(self && self._leaving !== true) {
+        self._resetCallStateNoCall();
+        self._cancelCallRequest();
+
         self.setState(MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS);
 
         [self.$header, self.$messages].forEach(function(k, v) {

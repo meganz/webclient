@@ -16,6 +16,7 @@ var FTPTYPE_FILE_NACK = 6;
 function FileTransferManager(jingle) {
     this._jingle = jingle;
     this._timer = null;
+    this._fileUidCtr = 0;
     this.uploads = {};
     this.downloads = {};
     this.updateGui = function(){};
@@ -45,8 +46,7 @@ FileTransferManager.prototype.cancelTransfer = function(sid) {
         handler = this.downloads[sid];
     if (!handler)
         return false;
-    if (!this._jingle.terminateBySid(sid, 'user'))
-        handler.remove('user');
+    handler.cancel();
 }
 FileTransferManager.prototype.checkDisableTimer = function() {
     if (this._timer && (Object.keys(this.downloads).length < 1) &&
@@ -144,6 +144,11 @@ TransferHandlerBase.prototype.peerJid = function() {
     return this._peerJid;
 }
 
+TransferHandlerBase.prototype.cancel = function() {
+    if (!this._ftManager._jingle.terminateBySid(this._sid, 'cancel'))
+       this.remove('cancel');
+}
+
 TransferHandlerBase.prototype.error = function(e, dontThrow, params) {
     var event = {ftSess:this, error:e};
     if (params)
@@ -193,7 +198,6 @@ DownloadHandler.prototype.onmessage = function(event) {
         delete this._files[info.name];
         info.id = header[1];
         info.mime = listFile.mime;
-        info.uniqueId = listFile.uniqueId;
         info = Object.freeze(info);
         this._currentFile = info;
         this._bytesRecv = 0;
@@ -267,9 +271,9 @@ DownloadHandler.prototype.sendFileNack = function(errMsg) {
     this._dataChan.send(buf);
 }
 DownloadHandler.prototype.remove = function(reason, text) {
-    if ((reason === 'user') || (this._files.length === 0))
+    if (reason === 'complete')
         $(this._ftManager).trigger('ftsess-remove', {ftSess:this});
-     else if (reason === 'peer-user')
+     else if ((reason == 'cancel') || (reason === 'peer-cancel'))
         $(this._ftManager).trigger('ftsess-canceled', {ftSess: this});
      else
         this.error("Download session terminated: "+reason, true);
@@ -350,7 +354,7 @@ UploadHandler.prototype.onclose = function() {
         clearInterval(this._timer);
         this._timer = null;
     }
-    if (this._state == FTSTATE_SEND_FILE)
+    if (this._state === FTSTATE_SEND_FILE)
         this.error("Data channel closed while sending file");
 }
 
@@ -364,13 +368,13 @@ UploadHandler.prototype.onmessage = function(event) {
         if (header[1] != this._fileSendId)
             this.error("FILE_ACK received with wrong fileId");
         this._state = FTSTATE_READY_NEXT_FILE;
-        $(this._ftManager).trigger('send-complete', {file:this._currentSentFile.name, size:this._currentSentFile.size});
+        $(this._ftManager).trigger('send-complete', this._currentSentFile);
         this._currentSentFile = null;
         this.nextFile();
     }
     else if (ptype === FTPTYPE_FILE_NACK) {
         var errMsg = readStringFromArrBuf(packet, 4);
-        this.error("Remote error sending file: "+errMsg, {file:this._currentSentFile.name, size:this._currentSentFile.size});
+        this.error("Remote error sending file: "+errMsg, this._currentSentFile);
         this._currentSentFile = null;
         $(this._ftManager).trigger("send-queue-updated", {ftSess:this});
     }
@@ -384,7 +388,7 @@ UploadHandler.prototype.nextFile = function() {
             clearInterval(this._timer);
             this._timer = null;
         }
-        this._ftManager._jingle.terminateBySid(this._sid, "user");
+        this._ftManager._jingle.terminateBySid(this._sid, "complete");
         return false;
     }
     var file = this._currentSentFile = this._files.shift();
@@ -395,8 +399,8 @@ UploadHandler.prototype.nextFile = function() {
     if (this._ftManager.createHasher)
         this._hasher = this._ftManager.createHasher();
     $(this._ftManager).trigger("send-queue-updated", {ftSess:this});
-    $(this._ftManager).trigger("send-new", {ftSess: this, file:{name:file.name, size:file.size}});
-    var info = JSON.stringify({name: file.name, size: file.size});
+    $(this._ftManager).trigger("send-new", {ftSess: this, file: file});
+    var info = JSON.stringify({name: file.name, size: file.size, uniqueId: file.uniqueId});
     var nfbuf = new ArrayBuffer(4+info.length*2);
     writeStringToArrBuf(info, nfbuf, 4);
     this.addPacketHeader(nfbuf, FTPTYPE_FILE_START);
@@ -472,9 +476,9 @@ UploadHandler.prototype.endFile = function() {
 }
 
 UploadHandler.prototype.remove = function(reason, text) {
-    if ((reason === 'user') || (this._files.length === 0))
+    if (reason === 'complete')
         $(this._ftManager).trigger('ftsess-remove', {ftSess: this});
-    else if (reason === 'peer-user')
+    else if ((reason === 'cancel' ) || (reason === 'peer-cancel'))
         $(this._ftManager).trigger('ftsess-canceled', {ftSess: this});
     else
         this.error("Upload session terminated: "+reason, true);

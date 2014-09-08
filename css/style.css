@@ -18610,7 +18610,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background: #4c4c4c;
+	/*background: #4c4c4c;*/
 }
 .video-full-canvas-block.another-user {
 	width: 100%;

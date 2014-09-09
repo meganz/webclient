@@ -20,6 +20,12 @@ function newXhr() {
 	};
 
 	xhr._abort = xhr.abort;
+	xhr._send  = xhr.send
+
+	xhr.send = function() {
+		xhr.started = Date.now()
+		xhr._send.apply(this, arguments)
+	}
 
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
@@ -41,6 +47,12 @@ function newXhr() {
 		if (!this.listener) return this.nolistener();
 		this.setup_timeout();
 		switch(this.readyState) {
+			case this.HEADERS_RECEIVED:
+				if (Date.now() > this.started+30000) {
+					// first byte took more than 30 seconds to arrive
+					// I should log this incident
+				}
+				break;
 			case 4:
 				if (this.listener.on_ready) {
 					this.clear_timeout();

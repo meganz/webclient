@@ -4967,13 +4967,22 @@ function dialogPositioning(s)
 	$('.fm-dialog' + '.' + s + '-dialog').css('margin-top', '-' + $('.fm-dialog' + '.' + s + '-dialog').height()/2 + 'px');
 };
 
-function handleDialogTabContent(s, m, n, c)
+/**
+ * Handle DOM directly, no return value
+ * @param {string} s - dialog tab
+ * @param {string} m - tag of source element
+ * @param {string} n - dialog prefix (copy|move)
+ * @param {string} x - html, content
+ * 
+ * @returns {undefined}
+ */
+function handleDialogTabContent(s, m, n, x)
 {
-	var b = c.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_');;
+	var b = x.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_');;
 	$('.' + n + '-dialog-tree-panel' + '.' + s + ' .dialog-content-block')
 		.empty()
 		.html(b);
-	if (!$('.' + n + '-dialog-tree-panel' + '.' + s + ' .dialog-content-block ' + m).length)
+	if (!$('.' + n + '-dialog-tree-panel' + '.' + s + ' .dialog-content-block ' + m).length)// No items available, empty message
 	{
 		$('.' + n + '-dialog-empty' + '.' + s).addClass('active');
 		$('.' + n + '-dialog-tree-panel' + '.' + s + ' ' + '.' + n + '-dialog-panel-header').addClass('hidden');
@@ -4985,6 +4994,33 @@ function handleDialogTabContent(s, m, n, c)
 	}	
 }
 
+// Find shared folders marked read-only and disable it in dialog
+function disableReadOnlySharedFolders(m)
+{
+	var $ro = $('.' + m + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+	var x, i;
+	$ro.each(function(i, v)
+	{
+		x = $(v).attr('id').replace('mctreea_', '');
+		i = M.d[x].r;
+		if (typeof i == 'undefined' || i === 0)
+		{
+			$(v).addClass('disabled');
+		}
+	});
+};
+
+/**
+ * Copy|Move dialogs content  handler
+ * 
+ * @param {string} s - dialog tab
+ * @param {string} m - tag of source element
+ * @param {boolean} c - should we show new folder button
+ * @param {string} n - dialog prefix (copy|move)
+ * @param {string} t - action button label
+ * @param {string} i - in case of conversations tab
+ * @returns {undefined}
+ */
 function handleDialogContent(s, m, c, n, t, i)
 {
 	$('.' + n + '-dialog-txt').removeClass('active');
@@ -5028,6 +5064,8 @@ function handleDialogContent(s, m, c, n, t, i)
 	else b = $('.content-panel ' + i).html();
 
 	handleDialogTabContent(s, m, n, b);
+	if (s === 'shared-with-me') disableReadOnlySharedFolders(n);
+	
 	//  'New Folder' button
 	if (c) $('.dialog-newfolder-button').removeClass('hidden');
 	else $('.dialog-newfolder-button').addClass('hidden');
@@ -5084,7 +5122,12 @@ function copyDialog()
 			default:
 				$.mcseleced = undefined;
 				break;
-		}		
+		}
+		// Disable/enable button
+		var $btn = $('.dialog-copy-button');
+		if (typeof $.mcselected != 'undefined') $btn.removeClass('disabled');
+		else $btn.addClass('disabled');
+		
 	};
 	
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').unbind('click');
@@ -5144,6 +5187,7 @@ function copyDialog()
 				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
 			}
 			switch (type) {
+				// Sort contacts
 //				case 'contacts':
 //					M.contacts();
 //					break;
@@ -5153,11 +5197,7 @@ function copyDialog()
 				case 'cloud-drive':
 					M.buildtree(M.d[M.RootID], 'copy-dialog');
 					break;
-//				case 'rubbish-bin':
-//					M.buildtree({h:M.RubbishID});
-//					break;
 			}
-//			initializeTreePanelSorting()
 			
             $(this).parent().find('.sorting-menu-item').removeClass('active');
             $(this).addClass('active');
@@ -5182,6 +5222,7 @@ function copyDialog()
 		M.buildtree(M.d[$.mcselected]);
 		var html = $('#treesub_' + $.mcselected).html();
 		if (html) $('#mctreesub_' + $.mcselected).html(html.replace(/treea_/ig,'mctreea_').replace(/treesub_/ig,'mctreesub_').replace(/treeli_/ig,'mctreeli_'));
+		disableReadOnlySharedFolders('copy');
 		var $btn = $('.dialog-copy-button');
 
 		var c = $(e.target).attr('class');
@@ -5262,7 +5303,10 @@ function copyDialog()
 					M.copyNodes(n, $.mcselected);
 					break;
 				case 'shared-with-me':
-					// ToDo: Not clear for what this is used
+					var n = [];
+					for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
+					closeDialog();
+					M.copyNodes(n, $.mcselected);
 					break;
 				case 'conversations':
 					var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
@@ -5272,16 +5316,7 @@ function copyDialog()
 				default:
 					break;
 			}
-	}
-		
-//			if ($.mctype == 'copy-contacts' && t.length == 8)
-//			{
-//				if (RightsbyID(t) == 0)
-//				{
-//					alert(l[1023]);
-//					return false;
-//				}
-//			}
+		}
 	});
 }
 
@@ -5307,6 +5342,10 @@ function moveDialog()
 				$.mcseleced = undefined;
 				break;
             }
+		// Disable/enable button
+		var $btn = $('.dialog-move-button');
+		if (typeof $.mcselected != 'undefined') $btn.removeClass('disabled');
+		else $btn.addClass('disabled');			
 	};
 	
 	$('.move-dialog .fm-dialog-close, .move-dialog .dialog-cancel-button').unbind('click');
@@ -5366,9 +5405,6 @@ function moveDialog()
 				localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
 			}
 			switch (type) {
-//				case 'contacts':
-//					M.contacts();
-//					break;
 				case 'shared-with-me':
 					M.buildtree({h:'shares'}, 'move-dialog');
 					break;
@@ -5463,14 +5499,6 @@ function moveDialog()
 			closeDialog();
 			M.moveNodes(n, $.mcselected);
 		}
-//			if ($.mctype == 'copy-contacts' && t.length == 8)
-//			{
-//				if (RightsbyID(t) == 0)
-//				{
-//					alert(l[1023]);
-//					return false;
-//				}
-//			}
 	});
 }
 

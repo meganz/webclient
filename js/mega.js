@@ -1787,12 +1787,13 @@ function MegaData ()
 		$(elem).appendTo('.transfer-table')
 	}
 
+	var __ul_id = 8000;
 	this.addUpload = function(u)
 	{
 		for (var i in u)
 		{
 			var f = u[i];
-			var ul_id = ul_queue.length;
+			var ul_id = ++__ul_id;
 			if (!f.flashid) f.flashid = false;
 			f.target = M.currentdirid;
 			f.id = ul_id;
@@ -1813,8 +1814,10 @@ function MegaData ()
 		ul_uploading = !!ul_queue.length;
 	}
 
-	this.ulprogress = function(id, perc, bl, bt, bps)
+	this.ulprogress = function(ul, perc, bl, bt, bps)
 	{
+		var id = ul.id;
+
 		if ($('.transfer-table #ul_' + id + ' .progress-block').length == 0)
 		{
 			$('.transfer-table #ul_' + id + ' .transfer-status').removeClass('queued');
@@ -1822,8 +1825,8 @@ function MegaData ()
 			$('.transfer-table #ul_' + id + ' td:eq(3)').html('<div class="progress-block" style=""><div class="progressbar-percents">0%</div><div class="progressbar"><div class="progressbarfill" style="width:0%;"></div></div><div class="clear"></div></div>');
 			$.transferHeader();
 		}
-		if (!bl || !ul_queue[id] || !ul_queue[id]['starttime']) return false;
-		var eltime = (new Date().getTime()-ul_queue[id]['starttime'])/1000;
+		if (!bl || !ul.starttime) return false;
+		var eltime = (new Date().getTime()-ul.starttime)/1000;
 		var retime = bps > 1000 ? (bt-bl)/bps : -1;
 		if (!$.transferprogress) $.transferprogress={};
 		if (bl && bt && !uldl_hold)
@@ -1850,8 +1853,9 @@ function MegaData ()
 		percent_megatitle();
 	}
 
-	this.ulcomplete = function(id,h,k)
+	this.ulcomplete = function(ul,h,k)
 	{
+		var id = ul.id;
 		this.mobile_ul_completed=true;
 		for(var i in this.mobileuploads)
 		{
@@ -1891,13 +1895,14 @@ function MegaData ()
 		Soon(resetUploadDownload);
 	}
 
-	this.ulstart = function(id)
+	this.ulstart = function(ul)
 	{
+		var id = ul.id;
 		if (d) console.log('ulstart',id);
 		$('.transfer-table #ul_' + id + ' td:eq(3)').html('<span class="transfer-status initiliazing">'+htmlentities(l[1042])+'</span>');
-		ul_queue[id].starttime = new Date().getTime();
+		ul.starttime = new Date().getTime();
 		$('.transfer-table').prepend($('.transfer-table #ul_' + id));
-		M.ulprogress(id, 0, 0, 0);
+		M.ulprogress(ul, 0, 0, 0);
 		$.transferHeader();
 	}
 }

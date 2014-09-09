@@ -1,6 +1,37 @@
 (function (window) {
 	"use strict";
 
+	function storage_s2n(s)
+	{
+		return s.toLowerCase() === 'persistent' ? window.PERSISTENT : window.TEMPORARY;
+	}
+	function storage_n2s(n)
+	{
+		return +n == window.PERSISTENT ? 'Persistent' : 'Temporary';
+	}
+	function queryUsageAndQuota(aType, aSuccess, aError)
+	{
+		var sType = storage_n2s(aType);
+
+		if (navigator['webkit'+sType+'Storage'])
+		{
+			return navigator['webkit'+sType+'Storage'].queryUsageAndQuota(aSuccess, aError);
+		}
+
+		return window.webkitStorageInfo.queryUsageAndQuota(aType, aSuccess, aError);
+	}
+	function requestQuota(aType, aSize, aSuccess, aError)
+	{
+		var sType = storage_n2s(aType);
+
+		if (navigator['webkit'+sType+'Storage'])
+		{
+			return navigator['webkit'+sType+'Storage'].requestQuota(aSize, aSuccess, aError);
+		}
+
+		return window.webkitStorageInfo.requestQuota(aType, aSize, aSuccess, aError);
+	}
+
 	function clearit(storagetype, t, callback)
 	{
 		var tsec = t || 3600;
@@ -86,12 +117,11 @@
 		var totalsize = 0;
 		if (window.webkitRequestFileSystem)
 		{
-			var st = storagetype ? 'Persistent':'Temporary';
-			navigator['webkit'+st+'Storage'].queryUsageAndQuota(function(used, remaining)
+			queryUsageAndQuota(storagetype, function(used, remaining)
 			{
 				if (used+remaining)
 				{
-					if (d) console.log('Cleaning '+st+' Storage...', bytesToSize(used), bytesToSize(remaining));
+					if (d) console.log('Cleaning %s Storage...', storage_n2s(storagetype), bytesToSize(used), bytesToSize(remaining));
 					window.webkitRequestFileSystem(storagetype, 1024, onInitFs, errorHandler2);
 				}
 				else
@@ -140,11 +170,11 @@
 
 		if (d) console.log("Requesting disk space for %s (%d bytes)", bytesToSize(reqsize), reqsize);
 
-		navigator.webkitPersistentStorage.queryUsageAndQuota(function onPQU(used, remaining)
+		queryUsageAndQuota(PERSISTENT, function onPQU(used, remaining)
 		{
 			if (d) console.log('Used persistent storage: %s, remaining: %s', bytesToSize(used), bytesToSize(remaining));
 
-			navigator.webkitTemporaryStorage.queryUsageAndQuota(function onTQU(tused, tremaining)
+			queryUsageAndQuota(TEMPORARY, function onTQU(tused, tremaining)
 			{
 				if (d) console.log('Used temporary storage: %s, remaining: %s', bytesToSize(tused), bytesToSize(tremaining));
 
@@ -179,7 +209,7 @@
 						 * Highly likely that we will run out of 20% of 50% of free our diskspace
 						 * -> request persistent storage to be able to use all remaining disk space.
 						 */
-						navigator.webkitPersistentStorage.requestQuota(HUGE_QUOTA, function onRQ(grantedBytes)
+						requestQuota(PERSISTENT, HUGE_QUOTA, function onRQ(grantedBytes)
 						{
 							if (d) console.log('Granted persistent storage: %s', bytesToSize(grantedBytes));
 
@@ -284,7 +314,8 @@
 								ASSERT(dl_fw.readyState === dl_fw.DONE, 'Error truncating file!');
 								if (dl_fw.readyState === dl_fw.DONE)
 								{
-									that.begin();
+									if (that.begin) that.begin();
+									else if (d) console.error("No 'begin' function, this must be aborted...", dl);
 									that = null;
 								}
 								return;
@@ -345,7 +376,7 @@
 				}
 				dl_storagetype = aStorageType !== 1 ? 0 : 1;
 
-				if (d) console.log('Using Storage: '+ ({0:'Temporary',1:'Persistent'})[dl_storagetype], aStorageType, aEvent, aFail);
+				if (d) console.log('Using Storage: '+ storage_n2s(dl_storagetype), aStorageType, aEvent, aFail);
 
 				window.requestFileSystem(
 					dl_storagetype,

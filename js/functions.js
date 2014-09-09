@@ -17,9 +17,9 @@ var inherits = (function(){
  *
  *	Tiny helper to queue related tasks, in which the output of one function
  *	is the input of the next task. It is asynchronous
- *	
+ *
  *		function([prevarg, arg], next)
- *	
+ *
  *	Author: @crodas
  */
 function Cascade(tasks, fnc, done, value)
@@ -36,7 +36,7 @@ function Cascade(tasks, fnc, done, value)
 }
 
 /**
- *	Simple interface to run things in parallel (safely) once, and 
+ *	Simple interface to run things in parallel (safely) once, and
  *	get a safe callback
  *
  *	Author: @crodas
@@ -108,25 +108,22 @@ function jScrollFade(id)
 	$(id + ' .jspTrack').unbind('mouseover');
 	$(id + ' .jspTrack').bind('mouseover',function(e)
 	{
-		$(this).find('.jspDrag').addClass('jspActive');		
+		$(this).find('.jspDrag').addClass('jspActive');
 		$(this).closest('.jspContainer').uniqueId();
 		jScrollFadeOut($(this).closest('.jspContainer').attr('id'));
 	});
-	
 
-	
 	if (!$.jScroll) $.jScroll={};
 	for (var i in $.jScroll) if ($.jScroll[i] == 0) delete $.jScroll[i];
 	$(id).unbind('jsp-scroll-y.fade');
 	$(id).bind('jsp-scroll-y.fade',function(event, scrollPositionY, isAtTop, isAtBottom)
-	{		
-		$(this).find('.jspDrag').addClass('jspActive');				
+	{
+		$(this).find('.jspDrag').addClass('jspActive');
 		$(this).find('.jspContainer').uniqueId();
 		var id = $(this).find('.jspContainer').attr('id');
 		jScrollFadeOut(id);
 	});
 }
-
 
 function jScrollFadeOut(id)
 {
@@ -134,36 +131,34 @@ function jScrollFadeOut(id)
 	$.jScroll[id]++;
 	setTimeout(function(id)
 	{
-		$.jScroll[id]--;			
+		$.jScroll[id]--;
 		if ($.jScroll[id] == 0) $('#' + id + ' .jspDrag').removeClass('jspActive');
 	},500,id);
 }
 
-
 function inputfocus(id,defaultvalue,pw)
 {
-	if (pw) $('#'+id)[0].type = 'password';	
+	if (pw) $('#'+id)[0].type = 'password';
 	if ($('#'+id)[0].value == defaultvalue)  $('#'+id)[0].value = '';
 }
 
 function inputblur(id,defaultvalue,pw)
 {
-	if ($('#'+id)[0].value == '')  $('#'+id)[0].value = defaultvalue;				
-	if (($('#'+id)[0].value == defaultvalue) && (pw)) $('#'+id)[0].type = 'text';	
+	if ($('#'+id)[0].value == '')  $('#'+id)[0].value = defaultvalue;
+	if (($('#'+id)[0].value == defaultvalue) && (pw)) $('#'+id)[0].type = 'text';
 }
 
-function easeOutCubic (t, b, c, d) 
+function easeOutCubic (t, b, c, d)
 {
   return c*((t=t/d-1)*t*t + 1) + b;
 }
 
-
-function ellipsis (text,location, maxCharacters) 
+function ellipsis (text,location, maxCharacters)
 {
-	if (text.length > 0 && text.length > maxCharacters) 
+	if (text.length > 0 && text.length > maxCharacters)
 	{
 		if (typeof (location) == 'undefined') location = 'end';
-		switch (location) 
+		switch (location)
 		{
 			case 'center':
 				var center = (maxCharacters / 2);
@@ -178,25 +173,25 @@ function ellipsis (text,location, maxCharacters)
 }
 
 function translate(html)
-{	
-	var arr = html.split("[$");	
-	var items = [];	
+{
+	var arr = html.split("[$");
+	var items = [];
 	for (var i in arr)
 	{
 		var tmp = arr[i].split(']');
 		if (tmp.length > 1)
 		{
-			var t = tmp[0];				
+			var t = tmp[0];
 			items.push(t);
 		}
-	}	
+	}
 	for (var i in items)
 	{
-		var tmp = items[i].split('.');			
+		var tmp = items[i].split('.');
 		if (tmp.length > 1)
 		{
 			if (tmp[1] == 'dq')
-			{		
+			{
 				l[items[i]] = l[tmp[0]].replace('"','&quot;');
 			}
 			else if (tmp[1] == 'q')
@@ -207,47 +202,46 @@ function translate(html)
 			{
 				l[items[i]] = l[tmp[0]].replace("'","\\'");
 				l[items[i]] = l[items[i]].replace('"','&quot;');
-			}		
+			}
 		}
-		html = html.replace(new RegExp( "\\[\\$" +items[i] + "\\]", "g"),l[items[i]]);		
+		html = html.replace(new RegExp( "\\[\\$" +items[i] + "\\]", "g"),l[items[i]]);
 	}
 	return html;
 }
 
-
 function megatitle(nperc)
 {
 	if (!nperc) nperc='';
-	var a = parseInt($('.notification-num').text());		
+	var a = parseInt($('.notification-num').text());
 	if (a > 0) a = '(' + a + ') ';
-	else a = '';	
+	else a = '';
 	if (document.title != a + 'MEGA' + nperc) document.title = a + 'MEGA' + nperc;
 }
 
 function populate_l()
 {
 	l[0] = 'Mega Limited ' + new Date().getFullYear();
-	if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';	
-	l[1] = l[398];	
+	if ((lang == 'es') || (lang == 'pt') || (lang == 'sk')) l[0] = 'Mega Ltd.';
+	l[1] = l[398];
 	if (lang == 'en') l[1] = 'Go Pro';
 	l[438] = l[438].replace('[X]','');
 	l['439a'] = l[439];
 	l[439] = l[439].replace('[X1]','').replace('[X2]','');
 	l['466a'] = l[466];
-	l[466] = l[466].replace('[X]','');	
-	l[543] = l[543].replace('[X]','');	
-	l[456] = l[456].replace(':','');	
+	l[466] = l[466].replace('[X]','');
+	l[543] = l[543].replace('[X]','');
+	l[456] = l[456].replace(':','');
 	l['471a'] = l[471].replace('[X]',10);
 	l['471b'] = l[471].replace('[X]',100);
 	l['471c'] = l[471].replace('[X]',250);
 	l['471d'] = l[471].replace('[X]',500);
-	l['471e'] = l[471].replace('[X]',1000);	
+	l['471e'] = l[471].replace('[X]',1000);
 	l['469a'] = l[469].replace('[X]',10);
 	l['469b'] = l[469].replace('[X]',100);
-	l['469c'] = l[469].replace('[X]',250);	
+	l['469c'] = l[469].replace('[X]',250);
 	l['472a'] = l[472].replace('[X]',10);
 	l['472b'] = l[472].replace('[X]',100);
-	l['472c'] = l[472].replace('[X]',250);	
+	l['472c'] = l[472].replace('[X]',250);
 	l['208a'] = l[208].replace('[A]','<a href="#terms" class="red">');
 	l['208a'] = l['208a'].replace('[/A]','</a>');
 	l[208] = l[208].replace('[A]','<a href="#terms">');
@@ -255,51 +249,46 @@ function populate_l()
 	l[517] = l[517].replace('[A]','<a href="#help">').replace('[/A]','</a>');
 	l[521] = l[521].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
 	l[553] = l[553].replace('[A]','<a href="mailto:resellers@mega.co.nz">').replace('[/A]','</a>');
-	l[555] = l[555].replace('[A]','<a href="#terms">').replace('[/A]','</a>');	
+	l[555] = l[555].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
 	l[754] = l[754].replace('[A]','<a href="http://www.google.com/chrome" target="_blank" style="color:#D9290B;">');
-	l[754] = l[754].replace('[/A]','</a>');	
-	l[871] = l[871].replace('[B]','<strong>').replace('[/B]','</strong>').replace('[A]','<a href="#pro">').replace('[/A]','</a>');	
+	l[754] = l[754].replace('[/A]','</a>');
+	l[871] = l[871].replace('[B]','<strong>').replace('[/B]','</strong>').replace('[A]','<a href="#pro">').replace('[/A]','</a>');
 	l[924] = l[924].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[501] = l[501].replace('17','').replace('%','');
 	l[1066] = l[1066].replace('[A]','<a class="red">').replace('[/A]','</a>');
 	l[1067] = l[1067].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[1094] = l[1094].replace('[A]','<a href="#plugin">').replace('[/A]','</a>');		
-	l[1095] = l[1095].replace('[A]','<span class="red">').replace('[/A]','</span>');	
-	l[1133] = l[1133].replace('[A]','<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]','</a>');	
-	l[1134] = l[1134].replace('[A]','<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]','</a>');	
+	l[1094] = l[1094].replace('[A]','<a href="#plugin">').replace('[/A]','</a>');
+	l[1095] = l[1095].replace('[A]','<span class="red">').replace('[/A]','</span>');
+	l[1133] = l[1133].replace('[A]','<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank">').replace('[/A]','</a>');
+	l[1134] = l[1134].replace('[A]','<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank">').replace('[/A]','</a>');
 	l[1148] = l[1148].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1151] = l[1151].replace('[A]','<span class="red">').replace('[/A]','</span>');
-	l[731] = l[731].replace('[A]','<a href="#terms">').replace('[/A]','</a>');	
+	l[731] = l[731].replace('[A]','<a href="#terms">').replace('[/A]','</a>');
 	if (lang == 'en') l[965] = 'Legal & policies';
 	l[1159] = l[1159].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1171] = l[1171].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1185] = l[1185].replace('[X]','<strong>MEGA.crx</strong>');
-	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');	
+	l[1242] = l[1242].replace('[A]','<a href="#affiliateterms" target="_blank">').replace('[/A]','</a>');
 	l[1218] = l[1218].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
-	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');	
+	l[1212] = l[1212].replace('[A]','<a href="#sdk" class="red">').replace('[/A]','</a>');
 	l[1274] = l[1274].replace('[A]','<a href="#takedown">').replace('[/A]','</a>');
-	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');	
+	l[1275] = l[1275].replace('[A]','<a href="#copyright">').replace('[/A]','</a>');
 	l[1244] = l[1244].replace('[A]','<a href="#affiliateterms" class="red">').replace('[/A]','</a>');
 	l[1201] = l[1201].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1208] = l[1208].replace('[B]','<strong>').replace('[/B]','</strong>');
-	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');	
+	l[1915] = l[1915].replace('[A]','<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank">').replace('[/A]','</a>');
 	l[1936] = l[1936].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
-	l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');	
+	l[1942] = l[1942].replace('[A]','<a href="#backup">').replace('[/A]','</a>');
 	l[1943] = l[1943].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
 	l[1948] = l[1948].replace('[A]','<a href="mailto:support@mega.co.nz">').replace('[/A]','</a>');
-	l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');	
-	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');		
+	l[1957] = l[1957].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
+	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
 	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
-	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');		
+	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l['year'] = new Date().getFullYear();
 }
 
-
-
-
-
-
-function GetNextNode (labelid) 
+function GetNextNode (labelid)
 {
     var label = document.getElementById (labelid);
 	var select_id = document.getElementById (labelid+"_option");
@@ -307,10 +296,10 @@ function GetNextNode (labelid)
 	return select_id.options[select_id.selectedIndex].value;
 }
 
-function showmoney(number) 
+function showmoney(number)
 {
-    var number = number.toString(), 
-    dollars = number.split('.')[0], 
+    var number = number.toString(),
+    dollars = number.split('.')[0],
     cents = (number.split('.')[1] || '') +'00';
     dollars = dollars.split('').reverse().join('')
         .replace(/(\d{3}(?!$))/g, '$1,')
@@ -318,11 +307,11 @@ function showmoney(number)
     return dollars + '.' + cents.slice(0, 2);
 }
 
-function getHeight() 
+function getHeight()
 {
   var myHeight = 0;
-  if( typeof( window.innerWidth ) == 'number' )  myHeight = window.innerHeight;  
-  else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) )  myHeight = document.documentElement.clientHeight;   
+  if( typeof( window.innerWidth ) == 'number' )  myHeight = window.innerHeight;
+  else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) )  myHeight = document.documentElement.clientHeight;
   else if (document.body && ( document.body.clientWidth || document.body.clientHeight ) )  myHeight = document.body.clientHeight;
   return myHeight;
 }
@@ -331,11 +320,11 @@ function divscroll(el)
 {
 	document.getElementById(el).scrollIntoView();
 	$('body').scrollLeft(0);
-	$('html').scrollTop(0);	
+	$('html').scrollTop(0);
 	if (page == 'start') start_menu(el);
 }
 
-function removeHash () { 
+function removeHash () {
     var scrollV, scrollH, loc = window.location;
     if ("pushState" in history)
         history.pushState("", document.title, loc.pathname + loc.search);
@@ -358,34 +347,34 @@ function browserdetails(useragent)
 	var icon = '';
 	var name = '';
 	if (useragent.toLowerCase().indexOf('android') > 0) os = 'Android';
-	else if (useragent.toLowerCase().indexOf('windows') > 0) os = 'Windows';	
+	else if (useragent.toLowerCase().indexOf('windows') > 0) os = 'Windows';
 	else if (useragent.toLowerCase().indexOf('iphone') > 0) os = 'iPhone';
 	else if (useragent.toLowerCase().indexOf('imega') > 0) os = 'iPhone';
-	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';	
+	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';
 	else if (useragent.toLowerCase().indexOf('mac') > 0) os = 'Apple';
 	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'Linux';
 	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.toLowerCase().indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';	
-	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';	
+	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';
+	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';
 	else if (useragent.toLowerCase().indexOf('opera') > 0) browser = 'Opera';
-	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';	
+	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';
 	else if (useragent.toLowerCase().indexOf('msie') > 0) browser = 'Internet Explorer';
 	else if (useragent.toLowerCase().indexOf('megasync') > 0) browser = 'MEGAsync';
 	if ((os) && (browser))
 	{
-		name = browser + ' on ' + os;		
+		name = browser + ' on ' + os;
 		if (browser == 'Internet Explorer') icon = 'ie.png';
 		else icon = browser.toLowerCase() + '.png';
 	}
 	else if (os)
-	{	
+	{
 		name = os;
 		icon = os.toLowerCase() + '.png';
 	}
 	else if (browser)
 	{
-		name = browser;	
+		name = browser;
 		if (browser == 'Internet Explorer') icon = 'ie.png';
 		else icon = browser.toLowerCase() + '.png';
 	}
@@ -394,48 +383,48 @@ function browserdetails(useragent)
 		name = 'Unknown';
 		icon = 'unknown.png';
 	}
-	var browserdetails = {};	
+	var browserdetails = {};
 	browserdetails.name = name;
-	browserdetails.icon = icon;	
+	browserdetails.icon = icon;
 	return browserdetails;
 }
 
 function countrydetails(isocode)
 {
-	var cdetails = 
+	var cdetails =
 	{
 		name: isocountries[isocode],
-		icon: isocode.toLowerCase() + '.gif'	
+		icon: isocode.toLowerCase() + '.gif'
 	};
 	return cdetails;
 }
 
 function time2date(unixtime,ignoretime)
 {
-	var MyDate = new Date(unixtime*1000);	
-	var MyDateString = 
+	var MyDate = new Date(unixtime*1000);
+	var MyDateString =
 	MyDate.getFullYear() + '-'
 	+ ('0' + (MyDate.getMonth()+1)).slice(-2) + '-'
 	+ ('0' + MyDate.getDate()).slice(-2);
 	if (!ignoretime)
 	{
-		MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'	
+		MyDateString += ' ' + ('0' + MyDate.getHours()).slice(-2) + ':'
 		+ ('0' + MyDate.getMinutes()).slice(-2);
 	}
     return MyDateString;
-}	
+}
 
 var date_months = [l[408],l[409],l[410],l[411],l[412],l[413],l[414],l[415],l[416],l[417],l[418],l[419]];
 
 function acc_time2date(unixtime)
-{	
-	var MyDate = new Date(unixtime*1000);	
+{
+	var MyDate = new Date(unixtime*1000);
 	var th = 'th';
 	if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
 	else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
 	else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
-	if (lang !== 'en') th = ',';	
-	return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();     
+	if (lang !== 'en') th = ',';
+	return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
 }
 
 function time2last(timestamp)
@@ -451,14 +440,13 @@ function time2last(timestamp)
 	else return l[879].replace('[X]',Math.ceil(sec/86400));
 }
 
-
-function uplpad(number, length) 
-{   
+function uplpad(number, length)
+{
     var str = '' + number;
-    while (str.length < length) 
+    while (str.length < length)
 	{
         str = '0' + str;
-    }   
+    }
     return str;
 }
 
@@ -467,15 +455,14 @@ function secondsToTime(secs)
 	if (isNaN(secs)) return '--:--:--';
 	if (secs < 0) return '';
 
-	var hours = uplpad(Math.floor(secs / (60 * 60)),2);	
+	var hours = uplpad(Math.floor(secs / (60 * 60)),2);
 	var divisor_for_minutes = secs % (60 * 60);
 	var minutes = uplpad(Math.floor(divisor_for_minutes / 60),2);
 	var divisor_for_seconds = divisor_for_minutes % 60;
-	var seconds = uplpad(Math.floor(divisor_for_seconds),2);	
+	var seconds = uplpad(Math.floor(divisor_for_seconds),2);
 	var returnvar = hours + ':' + minutes + ':' + seconds;
 	return returnvar;
 }
-
 
 function htmlentities(value)
 {
@@ -492,27 +479,27 @@ function bytesToSize(bytes, precision)
 	var s_mb = 'MB';
 	var s_gb = 'GB';
 	var s_tb = 'TB';
-	
+
 	if (lang == 'fr')
 	{
 		s_b = 'O';
 		s_kb = 'Ko';
 		s_mb = 'Mo';
 		s_gb = 'Go';
-		s_tb = 'To';	
+		s_tb = 'To';
 	}
-	
+
 	var kilobyte = 1024;
 	var megabyte = kilobyte * 1024;
 	var gigabyte = megabyte * 1024;
-	var terabyte = gigabyte * 1024;	
+	var terabyte = gigabyte * 1024;
 	if (bytes > 1024*1024*1024) precision = 2;
-	else if (bytes > 1024*1024) precision = 1;	
-	if ((bytes >= 0) && (bytes < kilobyte)) return parseInt(bytes) + ' ' + s_b;	 
-	else if ((bytes >= kilobyte) && (bytes < megabyte)) return (bytes / kilobyte).toFixed(precision) + ' '+ s_kb;	 
+	else if (bytes > 1024*1024) precision = 1;
+	if ((bytes >= 0) && (bytes < kilobyte)) return parseInt(bytes) + ' ' + s_b;
+	else if ((bytes >= kilobyte) && (bytes < megabyte)) return (bytes / kilobyte).toFixed(precision) + ' '+ s_kb;
 	else if ((bytes >= megabyte) && (bytes < gigabyte))  return (bytes / megabyte).toFixed(precision) + ' ' + s_mb;
-	else if ((bytes >= gigabyte) && (bytes < terabyte))  return (bytes / gigabyte).toFixed(precision) + ' ' + s_gb;	 
-	else if (bytes >= terabyte)  return (bytes / terabyte).toFixed(precision) + ' ' + s_tb;	
+	else if ((bytes >= gigabyte) && (bytes < terabyte))  return (bytes / gigabyte).toFixed(precision) + ' ' + s_gb;
+	else if (bytes >= terabyte)  return (bytes / terabyte).toFixed(precision) + ' ' + s_tb;
 	else  return parseInt(bytes) + ' ' + s_b;
 }
 
@@ -522,22 +509,22 @@ function checkPassword(strPassword)
 	var m_strLowerCase = "abcdefghijklmnopqrstuvwxyz";
 	var m_strNumber = "0123456789";
 	var m_strCharacters = "!@#$%^&*?_~";
-    var nScore = 0;	
-	nScore += countDif(strPassword)*2;	
-	var extra = countDif(strPassword)*strPassword.length/3;	
-	if (extra > 25) extra = 25;	
+    var nScore = 0;
+	nScore += countDif(strPassword)*2;
+	var extra = countDif(strPassword)*strPassword.length/3;
+	if (extra > 25) extra = 25;
 	nScore += extra;
     var nUpperCount = countContain(strPassword, m_strUpperCase);
     var nLowerCount = countContain(strPassword, m_strLowerCase);
-    var nLowerUpperCount = nUpperCount + nLowerCount;    
-    if (nUpperCount == 0 && nLowerCount != 0) nScore += 10; 
-    else if (nUpperCount != 0 && nLowerCount != 0) nScore += 10; 
+    var nLowerUpperCount = nUpperCount + nLowerCount;
+    if (nUpperCount == 0 && nLowerCount != 0) nScore += 10;
+    else if (nUpperCount != 0 && nLowerCount != 0) nScore += 10;
     var nNumberCount = countContain(strPassword, m_strNumber);
-    if (nNumberCount == 1) nScore += 10;    
+    if (nNumberCount == 1) nScore += 10;
     if (nNumberCount >= 3) nScore += 15;
     var nCharacterCount = countContain(strPassword, m_strCharacters);
     if (nCharacterCount == 1) nScore += 10;
-    if (nCharacterCount > 1) nScore += 10;    
+    if (nCharacterCount > 1) nScore += 10;
     if (nNumberCount != 0 && nLowerUpperCount != 0) nScore += 2;
     if (nNumberCount != 0 && nLowerUpperCount != 0 && nCharacterCount != 0) nScore += 3;
     if (nNumberCount != 0 && nUpperCount != 0 && nLowerCount != 0 && nCharacterCount != 0) nScore += 5;
@@ -545,13 +532,13 @@ function checkPassword(strPassword)
 }
 
 function countDif(strPassword)
-{    
+{
 	var chararr = [];
 	var nCount = 0;
-    for (i = 0; i < strPassword.length; i++) 
+    for (i = 0; i < strPassword.length; i++)
     {
 		if (!chararr[strPassword.charAt(i)])
-		{	
+		{
 			chararr[strPassword.charAt(i)] = true;
 			nCount++;
 		}
@@ -560,20 +547,20 @@ function countDif(strPassword)
 }
 
 function countContain(strPassword, strCheck)
-{    
+{
     var nCount = 0;
     for (i = 0; i < strPassword.length; i++)
     {
-        if (strCheck.indexOf(strPassword.charAt(i)) > -1)  nCount++;         
-    } 
-    return nCount; 
+        if (strCheck.indexOf(strPassword.charAt(i)) > -1)  nCount++;
+    }
+    return nCount;
 }
 
-function logincheckboxCheck (ch_id) 
+function logincheckboxCheck (ch_id)
 {
 	   var ch_div=ch_id + "_div";
-	   if (document.getElementById(ch_id).checked)	document.getElementById(ch_div).className="checkboxOn";  	   
-	   else document.getElementById(ch_div).className="checkboxOff";  	   
+	   if (document.getElementById(ch_id).checked)	document.getElementById(ch_div).className="checkboxOn";
+	   else document.getElementById(ch_div).className="checkboxOff";
 }
 
 function makeid(len)
@@ -589,8 +576,8 @@ function checkMail(email)
 {
 	email = email.replace('+','');
 	var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-	if (filter.test(email)) return false;	
-	else return true;	
+	if (filter.test(email)) return false;
+	else return true;
 }
 
 function NOW() {
@@ -659,7 +646,7 @@ function removeValue(array, value, can_fail) {
 }
 
 function setTransferStatus( dl, status, ethrow, lock) {
-	var id = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+	var id = dl && DownloadManager.GetGID(dl);
 	var text = '' + status;
 	if (text.length > 44) text = text.substr(0,42) + '...';
 	$('.transfer-table #' + id + ' td:eq(3)').text(text);
@@ -690,37 +677,36 @@ function dlFatalError(dl, error, ethrow) {
 	DownloadManager.abort(dl);
 }
 
-
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
- * 
+ *
  * @author <a href="mailto:gary.court.gmail.com">Gary Court</a>
  * @see http://github.com/garycourt/murmurhash-js
  * @author <a href="mailto:aappleby.gmail.com">Austin Appleby</a>
  * @see http://sites.google.com/site/murmurhash/
- * 
+ *
  * @param {string} key ASCII only
  * @param {number} seed Positive integer only
- * @return {number} 32-bit positive integer hash 
+ * @return {number} 32-bit positive integer hash
  */
 function MurmurHash3(key, seed) {
 	var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
-	
+
 	remainder = key.length & 3; // key.length % 4
 	bytes = key.length - remainder;
 	h1 = seed || 0xe6546b64;
 	c1 = 0xcc9e2d51;
 	c2 = 0x1b873593;
 	i = 0;
-	
+
 	while (i < bytes) {
-	  	k1 = 
+	  	k1 =
 	  	  ((key.charCodeAt(i) & 0xff)) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 8) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 16) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 24);
 		++i;
-		
+
 		k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
 		k1 = (k1 << 15) | (k1 >>> 17);
 		k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
@@ -730,20 +716,20 @@ function MurmurHash3(key, seed) {
 		h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
 		h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
 	}
-	
+
 	k1 = 0;
-	
+
 	switch (remainder) {
 		case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
 		case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
 		case 1: k1 ^= (key.charCodeAt(i) & 0xff);
-		
+
 		k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
 		k1 = (k1 << 15) | (k1 >>> 17);
 		k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
 		h1 ^= k1;
 	}
-	
+
 	h1 ^= key.length;
 
 	h1 ^= h1 >>> 16;
@@ -757,7 +743,7 @@ function MurmurHash3(key, seed) {
 
 /**
  *	Create a pool of workers, it returns a Queue object
- *	so it can be called many times and it'd be throttled 
+ *	so it can be called many times and it'd be throttled
  *	by the queue
  */
 function CreateWorkers(url, message, size) {
@@ -775,8 +761,8 @@ function CreateWorkers(url, message, size) {
 	}
 
 	function create(i) {
-		var w;		
-		
+		var w;
+
 		w  = new Worker(url);
 
 		w.id   = i;
@@ -809,7 +795,6 @@ function CreateWorkers(url, message, size) {
 	}, size);
 }
 
-
 function dcTracer(ctr) {
 	var name = ctr.name, proto = ctr.prototype;
 	for(var fn in proto) {
@@ -836,7 +821,7 @@ function dcTracer(ctr) {
 function setupTransferAnalysis()
 {
 	if ($.mTransferAnalysis) return;
-	
+
 	var prev = {};
 	$.mTransferAnalysis = setInterval(function()
 	{
@@ -856,26 +841,45 @@ function setupTransferAnalysis()
 				{
 					(function(p, t)
 					{
+						var r = '', data = [];
+
+						if (t === 'Upload')
+						{
+							var w = GlobalProgress[i];
+							if (w && (w = w.working) && w.length)
+							{
+								var j = w.length;
+								r = '(resurrecting ' + j + ')';
+								while (j--)
+								{
+									w[j].on_error(0,0,'Stuck');
+									data.push(''+(w[j].xhr&&w[j].xhr.__failed)+','+(!!w[j].bytes));
+								}
+							}
+						}
+						console.error(t + ' stuck. ' + r, i, p[0], p[1], Math.floor(p[0]/p[1]*100), data.join("~"));
+
 						Soon(function()
 						{
-							throw new Error(t + ' stuck.');
+							throw new Error(t + ' Stuck ' + r);
 						});
 					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
+					delete prev[i];
 				}
 			}
 		}
-	}, 35000);
+	}, 97000);
 }
 
 function percent_megatitle()
 {
 	var dl_r = 0, dl_t = 0, ul_r = 0, ul_t = 0, tp = $.transferprogress || {};
-	
+
 	for (var i in dl_queue)
 	{
 		var q = dl_queue[i];
 		var t = tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
-		
+
 		if (t)
 		{
 			dl_r += t[0];
@@ -886,11 +890,11 @@ function percent_megatitle()
 			dl_t += q.size || 0;
 		}
 	}
-	
+
 	for (var i in ul_queue)
 	{
 		var t = tp['ul_' + ul_queue[i].id];
-		
+
 		if (t)
 		{
 			ul_r += t[0];
@@ -903,7 +907,7 @@ function percent_megatitle()
 	}
 	if (dl_t) { dl_t += tp['dlc'] || 0; dl_r += tp['dlc'] || 0 }
 	if (ul_t) { ul_t += tp['ulc'] || 0; ul_r += tp['ulc'] || 0 }
-	
+
 	if (dl_t && ul_t)
 	{
 		t = ' \u2191 ' + Math.floor(ul_r/ul_t*100) + '% \u2193 ' + Math.floor(dl_r/dl_t*100) + '%';
@@ -936,7 +940,7 @@ function __percent_megatitle()
 		percentage += p;
 		total++;
 	});
-	
+
 	percentage = Math.floor(percentage / total)
 
 	if (total == 0 || percentage == 0 || percentage == 100) {
@@ -984,15 +988,15 @@ function bucketspeedometer(initialp)
 			var now, min, oldest;
 			var total;
 			var t;
-			
+
 			now = NOW();
 			now -= now % this.interval;
 
 			this.h[now] = (this.h[now] || 0)+p-this.prevp;
 			this.prevp = p;
-			
+
 			min = now-this.interval*this.num;
-			
+
 			oldest = now;
 			total = 0;
 
@@ -1007,7 +1011,7 @@ function bucketspeedometer(initialp)
 			}
 
 			if (now-oldest < 1000) return 0;
-			
+
 			p = 1000*total/(now-oldest);
 
 			// protect against negative returns due to repeated chunks etc.
@@ -1089,7 +1093,7 @@ function disableDescendantFolders(id)
 {
 	var folders = [];
 	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
-	
+
 	for (var i in folders)
 	{
 		var sub = false;

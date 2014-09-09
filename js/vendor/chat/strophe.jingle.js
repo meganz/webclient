@@ -329,6 +329,9 @@ var JinglePlugin = {
         if (!sid)
             throw new Error("Incoming call message does not have a 'sid' attribute");
         var bareJid = Strophe.getBareJidFromJid(from);
+        var strFiles = $(callmsg).attr('files');
+        var files = strFiles?JSON.parse(strFiles):undefined;
+
         var tsReceived = Date.now();
 
     // Add a 'handled-elsewhere' handler that will invalidate the call request if a notification
@@ -344,8 +347,13 @@ var JinglePlugin = {
 
             var by = $(msg).attr('by');
             if (by != self.connection.jid)
-                self.onCallCanceled.call(self.eventHandler, from,
-                 {event: 'handled-elsewhere', by: by, accepted:($(msg).attr('accepted')==='1')});
+                self.onCallCanceled.call(self.eventHandler, from, {
+                    event: 'handled-elsewhere',
+                    by: by,
+                    accepted:($(msg).attr('accepted')==='1'),
+                    isDataCall: !!files,
+                    sid: sid
+                });
         }, null, 'message', 'megaNotifyCallHandled', null, from, {matchBare:true});
 
     // Add a 'cancel' handler that will ivalidate the call request if the caller sends a cancel message
@@ -358,7 +366,11 @@ var JinglePlugin = {
             self.connection.deleteHandler(elsewhereHandler);
             elsewhereHandler = null;
 
-            self.onCallCanceled.call(self.eventHandler, from, {event: 'canceled'});
+            self.onCallCanceled.call(self.eventHandler, from, {
+                event: 'canceled',
+                isDataCall: !!files,
+                sid: sid
+            });
         }, null, 'message', 'megaCallCancel', null, from, {matchBare:true});
 
         setTimeout(function() {
@@ -370,7 +382,11 @@ var JinglePlugin = {
             self.connection.deleteHandler(cancelHandler);
             cancelHandler = null;
 
-            self.onCallCanceled.call(self.eventHandler, from, {event:'timeout'});
+            self.onCallCanceled.call(self.eventHandler, from, {
+                  event:'timeout',
+                  isDataCall:!!files,
+                  sid: sid
+            });
         }, self.callAnswerTimeout+10000);
 
 //tsTillUser measures the time since the req was received till the user answers it
@@ -383,12 +399,14 @@ var JinglePlugin = {
         };
         var strPeerMedia = $(callmsg).attr('media');
         var peerMedia = strPeerMedia?self.peerMediaToObj(strPeerMedia):undefined;
-        var strFiles = $(callmsg).attr('files');
-        var files = strFiles?JSON.parse(strFiles):undefined;
 // Notify about incoming call
-        self.onIncomingCallRequest.call(self.eventHandler, 
-             {peer:from, reqStillValid:reqStillValid,
-              peerMedia: peerMedia, files: files},
+        self.onIncomingCallRequest.call(self.eventHandler, {
+            peer:from,
+            reqStillValid:reqStillValid,
+            peerMedia: peerMedia,
+            files: files,
+            sid: sid
+          },
           function(accept, obj) {
 // If dialog was displayed for too long, the peer timed out waiting for response,
 // or user was at another client and that other client answred.
@@ -432,7 +450,7 @@ var JinglePlugin = {
                     self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'timed out waiting for caller to start call');
                 }, self.jingleAutoAcceptTimeout);
 
-                self.prepareToSendMessage(function() {
+                self.preloadCryptoKeyForJid(function() {
                     self.connection.send($msg({
                         sid: sid,
                         to: from,
@@ -465,7 +483,7 @@ var JinglePlugin = {
             delete this.acceptCallsFrom[aid];
         } else {
             delete this.acceptCallsFrom[aid];
-            this.onCallTerminated.call(this.eventHandler, {fake: true, peerjid: item.from, isInitiator: false},
+            this.onCallTerminated.call(this.eventHandler, {fake: true, sid: aid, peerjid: item.from, isInitiator: false},
                 reason, text);
         }
         return true;
@@ -529,7 +547,7 @@ var JinglePlugin = {
     terminate: function(sess, reason, text, nosend)
     {
         if ((!sess) || (!this.sessions[sess.sid])) {
-            console.warn("Unknown session:", sid)
+            console.warn("Unknown session:", sess.sid)
             return false;
         }
         if (sess.state != 'ended')

@@ -142,10 +142,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -678,10 +680,12 @@ describe("Chat.js - Karere UI integration", function() {
             Strophe.getBareJidFromJid(user2jid)
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -847,10 +851,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -1090,10 +1096,12 @@ describe("Chat.js - Karere UI integration", function() {
 
         var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
         assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.JOINING, "Invalid room state, expected joining");
 
@@ -1162,10 +1170,12 @@ describe("Chat.js - Karere UI integration", function() {
 
         var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
         // fake user join
         var users = {};
@@ -1285,10 +1295,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -1490,10 +1502,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -1617,10 +1631,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -1699,10 +1715,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         var rtcMocker;
@@ -1865,10 +1883,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(
@@ -1940,10 +1960,12 @@ describe("Chat.js - Karere UI integration", function() {
             user2jid
         ];
 
-        var $promise = megaChat.openChat(
+        var resp = megaChat.openChat(
             jids,
             "private"
         );
+
+        var $promise= resp[2];
 
 
         expect(

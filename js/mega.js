@@ -916,7 +916,10 @@ function MegaData ()
 			this.chat=true;
 			id = 'chat';
 
-            megaChat.renderListing();
+            if(megaChat.renderListing() === true) {
+                window.location = megaChat.getCurrentRoom().getRoomUrl();
+                return;
+            }
 
             sharedfolderUI();
             treeUI();
@@ -1050,14 +1053,18 @@ function MegaData ()
         $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
             var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
             window.location = "#fm/chat/" + user_handle;
+
+            return false; // stop propagation!
         });
 
-		$('.nw-contact-item').unbind('click');
-		$('.nw-contact-item').bind('click',function(e)
-		{
+		$('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
+		$('.fm-tree-panel').delegate('.nw-contact-item', 'click',function(e)
+        {
 			var id = $(this).attr('id');
 			if (id) id = id.replace('contact_','');
 			M.openFolder(id);
+
+            return false; // stop propagation!
 		});
 	};
 

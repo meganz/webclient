@@ -104,6 +104,8 @@ initiate: function(isInitiator) {
             break;
         case 'disconnected':
             this.stopTime = new Date();
+            if (this.state != 'ended')
+                self.jingle.terminate(self, "ice-disconnect");
             break;
         }
         self.jingle.onIceConnStateChange.call(self.eventHandler, self, event);

@@ -28,7 +28,6 @@ var FunctionsMocker = function() {
     $.fn.fullScreen = function() { return false; };
 
     self.restore = function() {
-        $.fn.fullScreen = origFullscreenPlug;
         self.objectMocker.restore();
     }
 };

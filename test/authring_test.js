@@ -16,8 +16,8 @@ describe("authring unit test", function() {
     // Some test data.
     var ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-    var ED25519_HEX_FINGERPRINT = '5b27aa5589179770e47575b162a1ded97b8bfc6d';
-    var ED25519_STRING_FINGERPRINT = base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+    var ED25519_HEX_FINGERPRINT = '21fe31dfa154a261626bf854046fd2271b7bed4b';
+    var ED25519_STRING_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
     var RSA_PUB_KEY = [atob('1XJHwX9WYEVk7KOack5nhOgzgnYWrVdt0UY2yn5Lw38mPzkVn'
                             + 'kHCmguqWIfL5bzVpbHHhlG9yHumvyyu9r1gKUMz4Y/1cf69'
                             + '1WIQmRGfg8dB2TeRUSvwb2A7EFGeFqQZHclgvpM2aq4PXrP'
@@ -27,8 +27,8 @@ describe("authring unit test", function() {
                             + 'dcvskHUydAL0qNOqbCwvt1Y7xIQfclR0SQE/AbwuJui0mt3'
                             + 'PuGjM42T/DQ=='),
                        atob('AQE='), 2048];
-    var RSA_HEX_FINGERPRINT = 'c8a7835ba37147f2f5bb60b059c9f003fa69a552';
-    var RSA_STRING_FINGERPRINT = base64urldecode('yKeDW6NxR_L1u2CwWcnwA_pppVI');
+    var RSA_HEX_FINGERPRINT = '18ddac5acba45a711aaea54f4bb984e6c3eba37f';
+    var RSA_STRING_FINGERPRINT = base64urldecode('GN2sWsukWnEarqVPS7mE5sPro38');
     var RSA_SIGNED_PUB_KEY = atob('AAAAAFPqtrj3Qr4d83Oz/Ya6svzJfeoSBtWPC7KBU4'
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
@@ -45,7 +45,7 @@ describe("authring unit test", function() {
         it("_serialiseRecord()", function() {
             var tests = [['ohKpg1j6E64', ED25519_STRING_FINGERPRINT, 0x02, 0x04],
                          ['ohKpg1j6E64', ED25519_HEX_FINGERPRINT, 0x02, 0x04]];
-            var expected = 'ohKpg1j6E65bJ6pViReXcOR1dbFiod7Ze4v8bUI=';
+            var expected = 'ohKpg1j6E64h/jHfoVSiYWJr+FQEb9InG3vtS0I=';
             for (var i = 0; i < tests.length; i++) {
                 var userhandle = tests[i][0];
                 var fingerprint = tests[i][1];
@@ -62,12 +62,12 @@ describe("authring unit test", function() {
                         'you456789xw': {fingerprint: ED25519_HEX_FINGERPRINT,
                                         method: 0x02,
                                         confidence: 0x04}};
-            var expected = 'me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==';
+            var expected = 'me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==';
             assert.strictEqual(btoa(ns.serialise(test)), expected);
         });
 
         it('_splitSingleTAuthRecord()', function() {
-            var tests = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
+            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
             var result = ns._deserialiseRecord(tests);
             assert.strictEqual(result.userhandle, 'me3456789xw');
             assert.deepEqual(result.value, {fingerprint: ED25519_STRING_FINGERPRINT,
@@ -77,7 +77,7 @@ describe("authring unit test", function() {
         });
 
         it('deserialise()', function() {
-            var tests = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
+            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
             var expected = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                             method: ns.AUTHENTICATION_METHOD.SEEN,
                                             confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -89,14 +89,14 @@ describe("authring unit test", function() {
     });
 
     describe('getting/setting u_authring.Ed25519', function() {
-        var aSerialisedRing = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
+        var aSerialisedRing = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
         var aRing = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                      method: ns.AUTHENTICATION_METHOD.SEEN,
                                      confidence: ns.KEY_CONFIDENCE.UNSURE},
                      'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                      method: 0x02,
                                      confidence: 0x04}};
-        var aSerialisedRingRSA = atob('me3456789xzIp4Nbo3FH8vW7YLBZyfAD+mmlUgDKi7jnrvz3HMing1ujcUfy9btgsFnJ8AP6aaVSQg==');
+        var aSerialisedRingRSA = atob('me3456789xwY3axay6RacRqupU9LuYTmw+ujfwDKi7jnrvz3HBjdrFrLpFpxGq6lT0u5hObD66N/Qg==');
         var aRingRSA = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
                                         method: ns.AUTHENTICATION_METHOD.SEEN,
                                         confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -231,6 +231,7 @@ describe("authring unit test", function() {
                 ns.setContacts('RSA');
                 sinon.assert.calledOnce(setUserAttribute);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authRSA');
+                assert.strictEqual(setUserAttribute.args[0][1][''], aSerialisedRingRSA);
             });
         });
     });

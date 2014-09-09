@@ -312,9 +312,9 @@ var authring = (function () {
             value = key[0] + key[1];
         }
         if (format === "string") {
-            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
+            return asmCrypto.bytes_to_string(asmCrypto.SHA256.bytes(value)).substring(0, 20);
         } else if (format === "hex") {
-            return asmCrypto.SHA1.hex(value);
+            return asmCrypto.SHA256.hex(value).substring(0, 40);
         }
     };
 

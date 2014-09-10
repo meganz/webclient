@@ -363,10 +363,9 @@ var chatui;
         $(document.body).undelegate('.message-textarea', 'keydown.send');
         $(document.body).delegate('.message-textarea', 'keydown.send',function(e) {
             var key = e.keyCode || e.which;
-
-
-            if(key == 13 && e.shiftKey !== true) {
-                var msg = $(this).val();
+            var msg = $(this).val();
+            
+            if(key == 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
                 if(msg.trim().length > 0) {
                     stoppedTyping();
 
@@ -378,8 +377,14 @@ var chatui;
 
                     megaChat.resized();
                     return false;
-                }
-            }
+                } else {
+					e.preventDefault();
+				}
+            } else if (key == 13) {
+				if(msg.trim().length == 0) {
+					e.preventDefault();
+				}
+			}
         });
         $('.message-textarea').unbind('blur.stoppedcomposing');
         $('.message-textarea').bind('blur.stoppedcomposing',function(e) {

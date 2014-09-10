@@ -851,8 +851,8 @@ function setupTransferAnalysis()
 								r = '(resurrecting ' + j + ')';
 								while (j--)
 								{
-									w[j].on_error(0,0,'Stuck');
 									data.push(''+(w[j].xhr&&w[j].xhr.__failed)+','+(!!w[j].bytes));
+									w[j].on_error(0,0,'Stuck');
 								}
 							}
 						}
@@ -860,7 +860,7 @@ function setupTransferAnalysis()
 
 						Soon(function()
 						{
-							throw new Error(t + ' Stuck. ' + r);
+							throw new Error(t + ' Stuck.. ' + r);
 						});
 					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
 					delete prev[i];

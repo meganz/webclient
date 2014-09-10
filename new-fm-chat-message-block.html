@@ -11,81 +11,17 @@
 <script type="text/javascript">
 $(document).ready(function() {  
 
-  function initTreePanelScroll()
-  {
-	  $('.fm-tree-panel').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-  }
-  initTreePanelScroll();
-  $(window).bind('resize', function () 
-  {
-	  initTreePanelScroll();
-  });
-  $('.nw-fm-tree-folder').bind('click', function() {
-	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
-	  if(fmTreeItem.attr('class').indexOf('selected') == -1) {
-		  $('.nw-fm-tree-item.selected').removeClass('selected');
-		  fmTreeItem.addClass('selected');
-	  }
-  });
-  $('.contains-folders > .nw-fm-arrow-icon').bind('click', function() {
-	  var fmTreeItem = $(this).parent('.nw-fm-tree-item');
-	  if(fmTreeItem.attr('class').indexOf('expanded') == -1) {
-		  fmTreeItem.addClass('expanded');
-		  fmTreeItem.next('ul').addClass('opened');
-		  initTreePanelScroll();
-	  } else {
-		  fmTreeItem.removeClass('expanded');
-		  fmTreeItem.next('ul').removeClass('opened');
-		  initTreePanelScroll();
-	  }
-  });
-  $('.nw-fm-left-icon').bind('click', function() {
-	  var currentPanelTitle = $(this).attr('class').split(' ')[1];
-	  if($(this).attr('class').indexOf('active') == -1) {
-		  $('.nw-fm-left-icon.active').removeClass('active');
-		  $(this).addClass('active');
-		  $('.content-panel.active').removeClass('active');
-		  $('.content-panel.'+currentPanelTitle).addClass('active');
-		  initTreePanelScroll();
-		  $('.fm-left-menu').removeClass().addClass('fm-left-menu ' + currentPanelTitle);
-	  }
-  });
-  $('.nw-contact-item').bind('click', function() {
-	  if($(this).attr('class').indexOf('selected') == -1) {
-		  $('.nw-contact-item.selected').removeClass('selected');
-		  $(this).addClass('selected');
-	  }
-  });
-  $('.nw-conversations-item').bind('click', function() {
-	  if($(this).attr('class').indexOf('selected') == -1) {
-		  $('.nw-conversations-item.selected').removeClass('selected');
-		  $(this).addClass('selected');
-	  }
-  });
-  var initial;
-  $('.nw-fm-left-icon').bind('mouseover', function () {
-	  var  tooltip = $(this).find('.nw-fm-left-tooltip');
-	  clearTimeout( initial );
-	  initial = window.setTimeout( 
-      function() {
-        $(tooltip).addClass('hovered');
-      }, 1000);
-  });
-  $('.nw-fm-left-icon').bind('mouseout', function () {
-	    $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
-		clearTimeout( initial );
-  });
-   
-
-    //Demo of scripts.
+// Multiline message textarea demo scripts
 
     function initChatScrolling() {
+	   // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height 
 	   var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-input-scroll').outerHeight() - $('.fm-right-header').outerHeight();
 	   $('.fm-chat-message-scroll').height(scrollBlockHeight);
 	   $('.fm-chat-message-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
     }
 	initChatScrolling();
 	
+	// Textarea resizing
 	function messageAreaResizing(textfield) {
 	  var txt = $('.message-textarea'),
 	      txtHeight =  txt.outerHeight(), 
@@ -124,162 +60,11 @@ $(document).ready(function() {
 	});
 	
 	$(window).bind('resize', function () {
+		//Important. We need to reinit Resizing and Scrolling scripts for case if some linebreaks appeared/dissapeared after resizing
 		messageAreaResizing();
 		initChatScrolling();
 	});
 
-
-	$('.fm-chat-attach-file').bind('click', function() {
-		if ($(this).attr('class').indexOf('active') > -1) {
-			 $('.fm-chat-attach-popup').addClass('hidden');
-			 $(this).removeClass('active');
-		} else {
-			 $('.fm-chat-attach-popup').removeClass('hidden');
-			 $(this).addClass('active');
-			 var positionY = $('.fm-chat-line-block').outerHeight() - $('.fm-chat-attach-arrow').position().top;
-			 $('.fm-chat-attach-popup').css('bottom', positionY - 17 + 'px');
-		}
-	});
-
-	$('.nw-chat-button.red').bind('click', function() {
-		var chatDownloadPopup = $('.fm-chat-download-popup');
-		if ($(this).attr('class').indexOf('active') == -1) {
-			 $('.nw-chat-button.red.active').removeClass('active');
-			 var p = $(this);
-			 var positionY = $(this).closest('.fm-chat-message-pad').outerHeight() - $(this).position().top;
-			 var positionX = $(this).position().left;
-	        // if (positionY - 174 > 0) {
-			   $(chatDownloadPopup).css('bottom', positionY + 10  + 'px');
-			// } else {
-			//   $(chatDownloadPopup).css('bottom', positionY + 'px');
-			//   $(chatDownloadPopup).addClass('top');
-			// }
-			 chatDownloadPopup.addClass('active');
-			 chatDownloadPopup.css('margin-left', '-'+ chatDownloadPopup.outerWidth()/2 + 'px');
-			 chatDownloadPopup.css('left', positionX + $(this).outerWidth()/2 + 10  + 'px');
-		     $(this).addClass('active');
-		} 
-		else {
-			 $(this).removeClass('active');
-			 chatDownloadPopup.removeClass('active');
-			 chatDownloadPopup.css('left', '-' + 10000 + 'px');
-		}
-
-	});
-	$('.fm-chat-download-button').bind('click', function() {
-		var chatDownloadPopup = $('.fm-chat-download-popup.active');
-		chatDownloadPopup.removeClass('active');
-		chatDownloadPopup.css('left', '-' + 10000 + 'px');
-		$('.nw-chat-button.red.active').removeClass('active');
-	});
-
-    function closeChatPopups() {
-		var activePopup = $('.chat-popup.active');
-		var activeButton = $('.chat-button.active');
-		activeButton.removeClass('active');
-		activePopup.removeClass('active');
-		if (activePopup.attr('class')) {
-		  activeButton.removeClass('active');
-		  activePopup.removeClass('active');
-		  if (activePopup.attr('class').indexOf('fm-add-contact-popup') == -1) activePopup.css('left', '-' + 10000 + 'px'); 
-		  else activePopup.css('right', '-' + 10000 + 'px'); 
-		}
-	}
-
-	$('.fm-add-user').bind('click', function() {
-	    var positionX = $(this).position().left;
-		var addUserPopup = $('.fm-add-contact-popup');
-		if ($(this).attr('class').indexOf('active') == -1) {
-			 closeChatPopups();
-			 addUserPopup.addClass('active');
-			 $(this).addClass('active');
-			 $('.fm-add-contact-arrow').css('right', $(this).outerWidth()/2  + 'px'); 
-			 addUserPopup.css('right', 0 + 'px'); 
-		} else {
-			 addUserPopup.removeClass('active');
-			 addUserPopup.css('right', '-' + '10000' + 'px'); 
-			 $(this).removeClass('active');
-
-		}
-	});
-
-	$('.fm-send-files').bind('click', function() {
-	    var positionX = $(this).position().left;
-		var sendFilesPopup = $('.fm-send-files-popup');
-		if ($(this).attr('class').indexOf('active') == -1) {
-			 closeChatPopups();
-			 sendFilesPopup.addClass('active');
-			 $(this).addClass('active');
-			 $('.fm-send-files-arrow').css('left', $(this).outerWidth()/2  + 'px'); 
-			 sendFilesPopup.css('left',  $(this).position().left + 'px'); 
-		} else {
-			 sendFilesPopup.removeClass('active');
-			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
-			 $(this).removeClass('active');
-
-		}
-	});
-
-
-	$('.fm-start-call').bind('click', function() {
-	    var positionX = $(this).position().left;
-		var sendFilesPopup = $('.fm-start-call-popup');
-		if ($(this).attr('class').indexOf('active') == -1) {
-			 closeChatPopups();
-			 sendFilesPopup.addClass('active');
-			 $(this).addClass('active');
-			 $('.fm-start-call-arrow').css('left', $(this).outerWidth()/2  + 'px'); 
-			 sendFilesPopup.css('left',  $(this).position().left + 'px'); 
-		} else {
-			 sendFilesPopup.removeClass('active');
-			 sendFilesPopup.css('left', '-' + '10000' + 'px'); 
-			 $(this).removeClass('active');
-
-		}
-	});
-
-	$('.fm-chat-emotions-icon').bind('click', function() {
-		if ($(this).attr('class').indexOf('active') == -1) {
-			$(this).addClass('active');
-			$('.fm-chat-emotion-popup').addClass('active');
-		} else {
-			$(this).removeClass('active');
-			$('.fm-chat-emotion-popup').removeClass('active');
-		}
-	});
-
-	$('.fm-chat-smile').bind('click', function() {
-			$('.fm-chat-emotions-icon').removeClass('active');
-			$('.fm-chat-emotion-popup').removeClass('active');
-	});
-
-	$('.multiple-sharing .nw-chat-expand-arrow').bind('click', function() {
-		var sharingBlock = $(this).closest('.fm-chat-messages-block');
-		if ($(sharingBlock).attr('class').indexOf('expanded') > -1) 
-			  sharingBlock.removeClass('expanded');
-		else sharingBlock.addClass('expanded');
-		var chatDownloadPopup = $('.fm-chat-download-popup.active');
-		chatDownloadPopup.removeClass('active');
-		chatDownloadPopup.css('left', '-' + 10000 + 'px');
-		$('.nw-chat-button.red.active').removeClass('active');
-
-	    initChatScrolling();
-	});
-
-	$('.fm-chat-popup-button.from-cloud').bind('click', function() {
-		$('.fm-dialog-overlay').removeClass('hidden');
-		$('.fm-chat-attach-popup').removeClass('hidden');
-	});
-
-	$('.fm-chat-popup-button.add-contact').bind('click', function() {
-		$('.fm-dialog-overlay').removeClass('hidden');
-		$('.fm-add-user-popup').removeClass('hidden');
-	});
-
-	$('.nw-fm-close-button').bind('click', function() {
-		$('.fm-dialog-overlay').addClass('hidden');
-		$(this).closest('.fm-dialog-popup').addClass('hidden');
-	});
 
 });
 </script>

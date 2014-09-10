@@ -5147,9 +5147,9 @@ MegaChatRoom.prototype.resized = function(scrollToBottom) {
         $el.height($el.prop("scrollHeight"));
         self.refreshUI(true);
     }
-    else if ($el.height() > 27)
+    else if ($el.height() > 21)
     {
-        $el.height('27px');
+        $el.height('21px');
     }
 
     var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight();

@@ -95,7 +95,7 @@ var ZIPClass = function(totalSize) {
 	if (isZip64 && !localStorage.zip64warnShown)
 	{
 		localStorage.zip64warnShown = !0;
-		msgDialog('warninga', l[34], 'Downloading ZIP files larger than 2GB might require an additional unpacker tool (such as "7zip"). Unfortunately, ZIP64 is not natively supported on all operating systems.');
+		msgDialog('warninga', l[34], l[2033]);
 	}
 	
 	// Constants

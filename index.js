@@ -841,7 +841,7 @@ function mLogout()
 function topmenuUI()
 {
 	if (u_type === 0) $('.top-login-button').text(l[967]);
-	$('.cloud-popup-icon').hide();
+	//$('.cloud-popup-icon').hide();
 	$('.warning-popup-icon').addClass('hidden');
 	$('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').hide();
 	$('.top-menu-item.register,.top-menu-item.login').hide();

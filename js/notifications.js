@@ -402,7 +402,7 @@ function donotifypopup(id,html)
 function initNotifications()
 {
 	if (typeof notifications !== 'undefined' && notifications.length > 0) $('.cloud-popup-icon').show();
-	else $('.cloud-popup-icon').hide();
+	//else $('.cloud-popup-icon').hide();
 	
 	$('.cloud-popup-icon').unbind('click');
 	$('.cloud-popup-icon').bind('click',function() 

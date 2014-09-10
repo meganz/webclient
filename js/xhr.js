@@ -48,7 +48,7 @@ function newXhr() {
 		this.setup_timeout();
 		switch(this.readyState) {
 			case this.HEADERS_RECEIVED:
-				ASSERT(Date.now() > this.started+30000, 'Server took too long to reply')
+				ASSERT(Date.now() < this.started+30000, 'Server took too long to reply')
 				break;
 			case 4:
 				if (this.listener.on_ready) {

@@ -875,7 +875,7 @@ function openTransferpanel()
 
 }
 
-function doAddContact(e,dialog)
+function doAddContact(dialog)
 {
 	var c = '.add-user-popup input';
 	if (dialog) c = '.add-contact-dialog input';
@@ -1281,6 +1281,7 @@ function initContextUI()
 		{
 			$.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
 			handleShareDialogContent();
+			$.hideContextMenu();
 			$('.share-dialog').removeClass('hidden');
 			$('.fm-dialog-overlay').removeClass('hidden');
 		}
@@ -4894,6 +4895,7 @@ function handleShareDialogContent()
 	$(dc + ' .fm-dialog-title').text('Share "' + M.d[$.selected].name + '"');
 
     dialogPositioning('.fm-dialog.share-dialog');
+	
 }
 
 function shareDialog()

@@ -99,7 +99,6 @@ $(document).ready(function() {
 	  
 	  if (txtHeight != hiddenDiv.outerHeight() ) {
 		txt.height(hiddenDiv.outerHeight());
-		initChatScrolling();
 	
 	    if( $('.fm-chat-input-block').outerHeight()>=200) {
 	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5}); 
@@ -116,6 +115,7 @@ $(document).ready(function() {
 			  txt.focus();
 			}
 		}
+		initChatScrolling();
 	  }
 	}
 	

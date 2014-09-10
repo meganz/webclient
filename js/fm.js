@@ -5676,11 +5676,11 @@ function refreshDialogContent()
 	var b = $('.content-panel.cloud-drive').html();
 	if($.copyDialog)
 	{
-		handleDialogTabContent('.cloud-drive', 'ul', 'copy', b);
+		handleDialogTabContent('cloud-drive', 'ul', 'copy', b);
 	}
 	else if ($.moveDialog)
 	{
-		handleDialogTabContent('.cloud-drive', 'ul', 'move', b);
+		handleDialogTabContent('cloud-drive', 'ul', 'move', b);
 	}	
 }
 

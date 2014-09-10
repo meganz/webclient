@@ -101,7 +101,6 @@ body {
 	background: #d22000;
 	color: white;
 }
-
 ::-moz-selection {
  background: #d22000;
  color: white;
@@ -7275,8 +7274,8 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 15px;
 	height: 18px;
 	position: absolute;
-	right: 102px;
-	top: 14px;
+	right: 100px;
+    top: 11px;
 	font-family: "Open Sans Semibold", Arial;
 	font-variant: small-caps;
 }
@@ -7477,25 +7476,27 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-chat-line-block {
 	background-color: rgba(0,0,0,0.05);
-	padding: 10px 0 11px 0;
+	padding: 0 0 0 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	margin-left: 2px;
+	border-left: 2px solid white;
+	border-top: 2px solid white;
 }
 .fm-chat-emotions-icon {
-	float: right;
+	position: absolute;
+	right: 0;
+	z-index: 10;
 	width: 27px;
 	height: 27px;
-	margin: 0 12px 0 10px;
+	margin: 10px 12px 0 10px;
 	background-position: 1px -2417px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	cursor: pointer;
-	position: relative;
 	-webkit-transition: all 200ms ease-in-out;
 	-moz-transition: all 200ms ease-in-out;
 	-o-transition: all 200ms ease-in-out;
@@ -7513,11 +7514,11 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.5;
 }
 .fm-chat-input-block {
-	margin: 0 50px 0 0px;
+	margin: 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 0 0 50px;
+	padding: 13px 0 14px 50px;
 	overflow: hidden;
 	position: relative;
 }
@@ -7552,24 +7553,52 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 28px;
 	left: 10px;
 }
-.fm-chat-input-block textarea {
+.fm-chat-input-scroll {
+	width: 100% !important;
+	max-height: 200px;
+	overflow: hidden;
+}
+.fm-chat-input-scroll .jspContainer {
+	width: 100% !important;
+}
+.fm-chat-input-block textarea, .hiddendiv {
 	width: 100%;
-	height: 27px;
-	min-height: 27px;
-	padding: 0 15px 0 0;
+	height: 21px;
+	min-height: 21px;
+	padding: 0 50px 0 0;
 	margin: 0 0 0 0;
 	border: 0;
 	outline: none;
 	font-size: 12px;
-	line-height: 27px;
+	line-height: 21px;
 	color: #666666;
 	resize: none;
-	max-height: 200px;
-	overflow: auto;
+	overflow: hidden;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: transparent;
+	font-family: 'Open Sans', Arail;
+}
+.message-textarea::-webkit-input-placeholder {
+ color: #666666;
+}
+.message-textarea:-moz-placeholder {
+ color: #666666;
+ opacity: 1;
+}
+.message-textarea::-moz-placeholder {
+ color: #666666;
+ opacity: 1;
+}
+.message-textarea:-ms-input-placeholder {
+ color: #666666;
+}
+.hiddendiv {
+	display: none;
+	height: auto;
+	padding: 0 50px;
+	word-break: break-word;
 }
 .grid-share-table tr td:nth-child(1) {
 	padding-left: 12px;
@@ -12847,8 +12876,8 @@ h5.main-italic-header {
 	width: 140px;
 	height: 140px;
 	margin: 50px auto 0 auto;
-	text-align:center;
-	font-size:12px;
+	text-align: center;
+	font-size: 12px;
 }
 .reg-st5-key-gen {
 	width: 140px;
@@ -16278,7 +16307,8 @@ h1.help-home-header {
 	cursor: pointer;
 	background-position: right top;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-repeat: no-repeat
+	background-repeat: no-repeat;
+	padding: 0 35px 0 0;
 }
 .arrow.asc {
 	background-position: right -1226px;
@@ -18609,8 +18639,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: absolute;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	/*background: #4c4c4c;*/
+	box-sizing: border-box;/*background: #4c4c4c;*/
 }
 .video-full-canvas-block.another-user {
 	width: 100%;

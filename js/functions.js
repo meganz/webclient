@@ -832,12 +832,11 @@ function setupTransferAnalysis()
 
 			for (var i in tp)
 			{
-				if (GlobalProgress[i] && GlobalProgress[i].paused)
+				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1])
 				{
 					delete prev[i];
 				}
-				else if (!prev[i]) prev[i] = tp[i][0];
-				else if (prev[i] == tp[i][0])
+				else if (prev[i] && prev[i] == tp[i][0])
 				{
 					(function(p, t)
 					{
@@ -861,11 +860,12 @@ function setupTransferAnalysis()
 
 						Soon(function()
 						{
-							throw new Error(t + ' Stuck ' + r);
+							throw new Error(t + ' Stuck. ' + r);
 						});
 					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
 					delete prev[i];
 				}
+				else prev[i] = tp[i][0];
 			}
 		}
 	}, 97000);

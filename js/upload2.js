@@ -40,7 +40,7 @@ function ul_completepending2(res,ctx)
 		rendernew();
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
-		onUploadSuccess(ul_queue[ctx.ul_queue_num].id);
+		onUploadSuccess(ul_queue[ctx.ul_queue_num]);
 		ul_queue[ctx.ul_queue_num] = {}
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
@@ -74,7 +74,7 @@ function ul_deduplicate(File, identical) {
 			} else if (typeof res == 'number' || res.e) {
 				ul_start(File);
 			} else if (ctx.skipfile) {
-				onUploadSuccess(uq.id);
+				onUploadSuccess(uq);
 				File.file.ul_failed = false;
 				File.file.retries   = 0;
 				File.file.done_starting();
@@ -435,6 +435,7 @@ ChunkUpload.prototype.updateprogress = function() {
 };
 
 ChunkUpload.prototype.abort = function() {
+	if (this.oet) clearTimeout(this.oet);
 	if (this.xhr) this.xhr.xhr_cleanup(0x9ffe);
 	if (GlobalProgress[this.gid]) removeValue(GlobalProgress[this.gid].working, this, 1);
 	else if (d) console.error('This should not be reached twice or after FileUpload destroy...');
@@ -449,18 +450,15 @@ ChunkUpload.prototype.on_upload_progress = function(args, xhr) {
 };
 
 ChunkUpload.prototype.on_error = function(args, xhr, reason) {
-	if (!this.file || this.file.abort) return this.done();
-	this.file.progress[this.start] = 0;
-	this.updateprogress();
-	if (args == EKEY) {
-		UploadManager.restart(this.file);
-	} else {
-		UploadManager.retry(this.file, this, "xhr failed: " + reason);
+	if (this.file && !this.file.abort && this.file.progress)
+	{
+		this.file.progress[this.start] = 0;
+		this.updateprogress();
+
+		if (args == EKEY) UploadManager.restart(this.file);
+		else UploadManager.retry(this.file, this, "xhr failed: " + reason);
 	}
-	setTimeout(function() {
-		// wait a few seconds before we release out slot
-		this.done();
-	}.bind(this), 5000);
+	this.done();
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
@@ -526,7 +524,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 		xhr.statusText
 	);
 
-	return this.on_error(null, null, "bad response from server");
+	this.oet = setTimeout(this.on_error.bind(this, null, null, "bad response from server"), 950+Math.floor(Math.random()*2e3));
 }
 
 ChunkUpload.prototype.upload = function() {

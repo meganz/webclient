@@ -265,11 +265,13 @@ var UploadManager =
 
 		ulQueue.pause(); // Hmm..
 		if (!file.__umRetries) file.__umRetries = 1;
-		file.__umRetryTimer = setTimeout(function()
+		if (!file.__umRetryTimer) file.__umRetryTimer = {};
+		var tid = ++file.__umRetries;
+		file.__umRetryTimer[tid] = setTimeout(function()
 		{
-			delete file.__umRetryTimer;
+			delete file.__umRetryTimer[tid];
 
-			if (++file.__umRetries < 66)
+			if (reason.indexOf('IO failed') == -1 || tid < 66)
 			{
 				var newTask = new ChunkUpload(file, start, end);
 				ulQueue.pushFirst(newTask);
@@ -641,7 +643,11 @@ FileUpload.prototype.destroy = function() {
 	{
 		this.file._close();
 	}
-	if (this.file.__umRetryTimer) clearTimeout(this.file.__umRetryTimer);
+	if (this.file.__umRetryTimer)
+	{
+		var t = this.file.__umRetryTimer;
+		for (var i in t) clearTimeout(t[i]);
+	}
 	if (this.file.done_starting) Soon(this.file.done_starting);
 	this.file.ul_reader.filter(this.gid);
 	this.file.ul_reader.destroy();

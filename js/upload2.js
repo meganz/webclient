@@ -215,16 +215,20 @@ var UploadManager =
 					if (d) console.log('Aborting ' + gid, ul.name);
 
 					ul.abort = true;
-					FUs.push(ul.mFiU);
-					ul_queue[l] = Object.freeze({});
+					FUs.push([ul.mFiU,l]);
 				}
 			}
 
 			ulQueue.pause(gid);
 			ulQueue.filter(gid);
+			FUs.map(function(o)
+			{
+				var ul = o[0], idx = o[1];
+				if (ul) ul.destroy();
+				ul_queue[idx] = Object.freeze({});
+			});
 			if (!this._multiAbort) Soon(resetUploadDownload);
 			$('#' + gid).fadeOut('slow', function() { $(this).remove() });
-			FUs.map(function(o) { if (o) o.destroy() });
 		}
 	},
 
@@ -252,16 +256,37 @@ var UploadManager =
 
 	retry : function UM_retry(file, chunk, reason)
 	{
+		var start = chunk.start, end = chunk.end, cid = '' + chunk;
+
 		file.ul_failed = true;
 		api_reportfailure(hostname(file.posturl), network_error_check);
 
 		// reschedule
 
-		var newTask = new ChunkUpload(file, chunk.start, chunk.end);
-		ulQueue.pushFirst(newTask);
+		ulQueue.pause(); // Hmm..
+		if (!file.__umRetries) file.__umRetries = 1;
+		file.__umRetryTimer = setTimeout(function()
+		{
+			delete file.__umRetryTimer;
+
+			if (++file.__umRetries < 66)
+			{
+				var newTask = new ChunkUpload(file, start, end);
+				ulQueue.pushFirst(newTask);
+			}
+			else
+			{
+				if (d) console.error('Too many retries for ' + cid);
+				msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
+				UploadManager.abort(file);
+			}
+			ulQueue.resume();
+		}, 950+Math.floor(Math.random()*2e3))
 
 		ERRDEBUG("retrying chunk because of", reason + "")
 		onUploadError(file.id, "Upload failed - retrying");
+
+		chunk.done(); /* release worker */
 	},
 
 	isReady : function UM_isReady(Task)
@@ -470,11 +495,8 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 
 		if (!response.length || response == 'OK' || response.length == 27) {
 			this.file.sent += this.bytes.buffer.length || this.bytes.length;
-			if (this.file.progress) {
-				delete this.file.progress[this.start];
-				this.updateprogress();
-			}
-			else if (d) console.error('*** CHECK THIS ***');
+			delete this.file.progress[this.start];
+			this.updateprogress();
 
 			if (response.length == 27) {
 				var t = [], ul_key = this.file.ul_key
@@ -558,12 +580,12 @@ ChunkUpload.prototype.upload = function() {
 ChunkUpload.prototype.io_ready = function(task, args) {
 	if (args[0] || !this.file || !this.file.ul_keyNonce)
 	{
-		if (this.file && this.file.done_starting)
+		if (this.file)
 		{
-			if (d) console.error('UL IO Error');
+			if (d) console.error('UL IO Error', args[0]);
 
-			this.file.done_starting();
-			return UploadManager.retry(this.file, this, "IO failed: " + args[0]);
+			if (this.file.done_starting) this.file.done_starting();
+			UploadManager.retry(this.file, this, "IO failed: " + args[0]);
 		}
 		else
 		{
@@ -619,6 +641,7 @@ FileUpload.prototype.destroy = function() {
 	{
 		this.file._close();
 	}
+	if (this.file.__umRetryTimer) clearTimeout(this.file.__umRetryTimer);
 	if (this.file.done_starting) Soon(this.file.done_starting);
 	this.file.ul_reader.filter(this.gid);
 	this.file.ul_reader.destroy();
@@ -764,18 +787,7 @@ function ul_finalize(file) {
 
 function ul_filereader(fs, file) {
 	return new MegaQueue(function(task, done) {
-		if (fs.readyState == fs.LOADING) {
-			return this.reschedule(); // --------- XXX: ???
-		}
-		var end = task.start+task.end
-			, blob
-		if (file.slice || file.mozSlice) {
-			if (file.slice) blob = file.slice(task.start, end);
-			else blob = file.mozSlice(task.start, end);
-			xhr_supports_typed_arrays = true;
-		} else {
-			blob = file.webkitSlice(task.start, end);
-		}
+		var end = task.start+task.end, blob;
 
 		fs.pos = task.start;
 		fs.onerror = function(evt) {
@@ -808,6 +820,13 @@ function ul_filereader(fs, file) {
 			blob = undefined;
 		};
 		try {
+			if (file.slice || file.mozSlice) {
+				if (file.slice) blob = file.slice(task.start, end);
+				else blob = file.mozSlice(task.start, end);
+				xhr_supports_typed_arrays = true;
+			} else {
+				blob = file.webkitSlice(task.start, end);
+			}
 			fs.readAsArrayBuffer(blob);
 		} catch(e) {
 			console.error(e);
@@ -837,7 +856,7 @@ var ul_queue  = new UploadQueue
 
 Encrypter = CreateWorkers('encrypter.js', function(context, e, done) {
 	var file = context.file
-	if (!file) {
+	if (!file || !file.ul_macs) {
 		// TODO: This upload was cancelled, we should terminate the worker rather than waiting
 		if (d) console.error('This upload was cancelled, we should terminate the worker rather than waiting');
 		return typeof e.data == 'string' || done();

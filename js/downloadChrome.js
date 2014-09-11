@@ -18,7 +18,12 @@
 			return navigator['webkit'+sType+'Storage'].queryUsageAndQuota(aSuccess, aError);
 		}
 
-		return window.webkitStorageInfo.queryUsageAndQuota(aType, aSuccess, aError);
+		if (window.webkitStorageInfo)
+		{
+			return window.webkitStorageInfo.queryUsageAndQuota(aType, aSuccess, aError);
+		}
+
+		Soon(aError.bind(window, new Error('Unknown FileSystem API')));
 	}
 	function requestQuota(aType, aSize, aSuccess, aError)
 	{
@@ -29,7 +34,12 @@
 			return navigator['webkit'+sType+'Storage'].requestQuota(aSize, aSuccess, aError);
 		}
 
-		return window.webkitStorageInfo.requestQuota(aType, aSize, aSuccess, aError);
+		if (window.webkitStorageInfo)
+		{
+			return window.webkitStorageInfo.requestQuota(aType, aSize, aSuccess, aError);
+		}
+
+		Soon(aError.bind(window, new Error('Unknown FileSystem API.')));
 	}
 
 	function clearit(storagetype, t, callback)
@@ -463,7 +473,8 @@
 
 	if (navigator.webkitGetUserMedia) Later(function()
 	{
-		window.webkitRequestFileSystem(0, 0x10000,
+		if (dlMethod === FileSystemAPI)
+		  window.webkitRequestFileSystem(0, 0x10000,
 			function (fs)
 			{
 				free_space();

@@ -860,7 +860,7 @@ function setupTransferAnalysis()
 
 						Soon(function()
 						{
-							throw new Error(t + ' Stuck.. ' + r);
+							throw new Error('['+dlMethod.name+'] ' + t + ' Stuck ' + r);
 						});
 					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
 					delete prev[i];

@@ -457,6 +457,11 @@ ZipWriter.prototype.destroy = function(error) {
 function dlZipWriterIOWorker(task, done) {
 	var file = task.zfile.file;
 
+	if (typeof file === 'undefined') {
+		if (d) console.error('File aborted...', task);
+		return done();
+	}
+
 	this.hashes[file.id] = crc32(task.data, this.hashes[file.id] || 0, task.data.byteLength)
 	this.file_offset += task.data.byteLength;
 

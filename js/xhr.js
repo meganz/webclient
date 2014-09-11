@@ -4,7 +4,7 @@ var _xhr_queue = []
 	, total = 0
 
 function newXhr() {
-	var xhr = new XMLHttpRequest;
+	var xhr = getxhr();
 	xhr.__id = ++total
 	xhr.__timeout = null;
 	xhr.__timeout_ms = localStorage.xhrtimeout || 2*60*1000;

@@ -382,18 +382,21 @@ else
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 
+		Object.defineProperty(window, "__cd_v", { value : 3, writable : false });
+
 		if (!d)
 		{
-			var __cdumps = [], __cd_t, __cd_v = 3;
+			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				if (__cdumps.length > 8) return false;
+				if (__cdumps.length > 4) return false;
 
 				var dump = { m : '' + msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
 
 				if (errobj)
 				{
 					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
+					if (errobj.udata) dump.d = errobj.udata;
 				}
 				if (cn) dump.c = cn;
 
@@ -431,8 +434,6 @@ else
 					{
 						var dump = __cdumps[i];
 
-						// todo cesar: var source = $.get() ....
-
 						if (dump.x)
 						{
 							ids.push(dump.x);
@@ -444,6 +445,7 @@ else
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+					report.gp = Object.keys(GlobalProgress);
 					report.tp = $.transferprogress;
 					report.id = ids.join(",");
 					report.cc = cc;

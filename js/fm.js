@@ -1810,7 +1810,7 @@ function accountUI()
 		$(window).unbind('resize.account');
 		$(window).bind('resize.account', function () 
 		{			
-			if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
+			if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		});
 		
 		initAccountScroll();

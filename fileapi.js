@@ -876,7 +876,8 @@ function mozClearStartupCache() {
 		{
 			if (ns !== 'http://www.w3.org/1999/xhtml' && ns !== 'http://www.w3.org/2000/svg')
 			{
-				ASSERT(0, 'Blocked namespace: ' + ns);
+				var err = new Error('Blocked namespace: ' + ns);
+				setTimeout(function() { throw err }, 4);
 				return null;
 			}
 
@@ -885,9 +886,10 @@ function mozClearStartupCache() {
 			{
 				var caller = Components.stack.caller;
 
-				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secureboot.js' !== caller.filename.split('?')[0])
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secure' !== caller.filename.substr(0,11))
 				{
-					ASSERT(0, 'Blocked '+e+' element creation');
+					var err = new Error('Blocked '+e+' element creation');
+					setTimeout(function() { throw err }, 4);
 					return null;
 				}
 			}
@@ -904,9 +906,10 @@ function mozClearStartupCache() {
 			{
 				var caller = Components.stack.caller;
 
-				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secureboot.js' !== caller.filename.split('?')[0])
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secure' !== caller.filename.substr(0,11))
 				{
-					ASSERT(0, 'Blocked '+e+' element creation');
+					var err = new Error('Blocked '+e+' element creation');
+					setTimeout(function() { throw err }, 4);
 					return null;
 				}
 			}
@@ -920,9 +923,10 @@ function mozClearStartupCache() {
 
 		if (/\.mega\.co\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
 
-		ASSERT(0, 'Blocked XHR to ' + url);
+		var err = new Error('Blocked XHR to ' + url);
+		setTimeout(function() { throw err }, 4);
 	};
-	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
+	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
 })(self);
 

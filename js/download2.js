@@ -126,7 +126,9 @@ var DownloadManager =
 						console.error(e);
 					}
 					dl.cancelled = true;
-					if (dl.zipid) Zips[dl.zipid].cancelled = true;
+					if (dl.zipid && Zips[dl.zipid]) {
+						Zips[dl.zipid].cancelled = true;
+					}
 					if (dl.io && typeof dl.io.begin === 'function')
 					{
 						/**

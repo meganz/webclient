@@ -46,13 +46,17 @@ function dlClearActiveTransfer(dl_id)
 if (localStorage.aTransfers)
 {
 	Soon(function() {
-		var data = JSON.parse(localStorage.aTransfers), now = NOW();
+		var data = {}, now = NOW();
+		try {
+			data = JSON.parse(localStorage.aTransfers);
+		} catch(e) {}
 		for (var r in data)
 		{
 			// Let's assume there was a system/browser crash...
 			if ((now - data[r]) > 86400000) delete data[r];
 		}
-		localStorage.aTransfers = JSON.stringify(data);
+		if (!$.len(data)) delete localStorage.aTransfers;
+		else localStorage.aTransfers = JSON.stringify(data);
 	});
 }
 
@@ -399,7 +403,7 @@ ClassFile.prototype.run = function(task_done) {
 	this.dl.io.begin = function() {
 		var tasks = [];
 
-		if (this.dl.cancelled)
+		if (!this.dl || this.dl.cancelled)
 		{
 			if (d) console.log(this + ' cancelled while initializing.');
 		}
@@ -441,8 +445,10 @@ ClassFile.prototype.run = function(task_done) {
 			fetchingFile = 0;
 			task_done();
 
-			delete this.dl.urls;
-			delete this.dl.io.begin;
+			if (this.dl) {
+				delete this.dl.urls;
+				delete this.dl.io.begin;
+			}
 			task_done = null;
 		}
 

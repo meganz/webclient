@@ -642,8 +642,22 @@
       // Add a token to the token list based on user input
       function add_token (item) {
           var callback = $(input).data("settings").onAdd;
+		  var validEmail = $(input).data("settings").emailValidation ? IsEmail(item[settings.tokenValue]) : true;
+		  if (!validEmail)
+		  {
+			var $d = $('.add-user-popup');
+			$d.addClass('error');
+			setTimeout(function()
+			{
+				$d.removeClass('error');
+			}, 3000);
+			
+			return false
+		  }
+			  
+//		  if ( $(input).data("settings").emailValidation && IsEmail(item));
           // See if the token already exists and select it if we don't want duplicates
-          if(token_count > 0 && $(input).data("settings").preventDuplicates) {
+          if(token_count > 0 && $(input).data("settings").preventDuplicates && validEmail) {
               var found_existing_token = null;
               token_list.children().each(function () {
                   var existing_token = $(this);
@@ -665,7 +679,7 @@
           input_box.width(1);
 
           // Insert the new tokens
-          if($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit) {
+          if($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && validEmail) {
               insert_token(item);
               // Remove the placeholder so it's not seen after you've added a token
               input_box.attr("placeholder", null)
@@ -680,7 +694,7 @@
 
           // Execute the onAdd callback if defined
           if($.isFunction(callback)) {
-              callback.call(hidden_input,item);
+              callback.call(hidden_input, item);
           }
       }
 

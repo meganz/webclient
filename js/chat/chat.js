@@ -1131,10 +1131,7 @@ MegaChat.prototype.init = function() {
         self.rtc.ftManager.updateGui = function() {
             var uploadAndDownloadSessions = obj_values(this.downloads).concat(obj_values(this.uploads));
 
-            console.error("updateGui: ", uploadAndDownloadSessions);
-
             $.each(uploadAndDownloadSessions, function(k, v) {
-                console.error("current file: ", v.currentFile(), v.progress());
                 if (!v.currentFile()) {
                     return; // continue
                 }

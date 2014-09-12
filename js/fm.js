@@ -655,17 +655,6 @@ function initUI()
 		// todo: enable folder link in header
 	}
 	else folderlink=0;
-	$('.add-user-popup-button').unbind('click');
-	$('.add-user-popup-button').bind('click',function(e)
-	{
-		if (u_type === 0) ephemeralDialog(l[997]);
-		else doAddContact(e);
-	});
-	$('.add-user-popup input').unbind('keypress');
-	$('.add-user-popup input').bind('keypress',function(e)
-	{
-		if (e.which == 13) doAddContact(e);
-	});
 	if (u_type === 0 && !u_attr.terms)
 	{
 		$.termsAgree = function()
@@ -877,6 +866,7 @@ function openTransferpanel()
 
 function doAddContact(dialog)
 {
+	// ToDo: comment this
 	var c = '.add-user-popup input';
 	if (dialog) c = '.add-contact-dialog input';
 	if (checkMail($(c).val()))
@@ -895,7 +885,8 @@ function doAddContact(dialog)
 	{
 		loadingDialog.show();
 		M.addContact($(c).val());
-		if (dialog) addContactDialog(1);
+		// Absolute we are using add-contact-dialog ToDo: replace with add-user-popup
+//		if (dialog) addContactDialog(1);
 	}
 }
 
@@ -1034,29 +1025,96 @@ function addnotification(n)
 
 function addUserUI()
 {
-	$('.fm-add-user').unbind('click');
-	$('.fm-add-user').bind('click',function(e)
+	iconSize = function(par)
 	{
-		var c = $(this).attr('class');
-		var c2 = $(e.target).attr('class');
-		var d1 = $('.add-user-popup');
-        
-		if ((!c2 || c2.indexOf('fm-add-user') == -1) && $(e.target).prop('tagName') !== 'SPAN') return false;
-		if (c.indexOf('active') == -1)
+		if (par)// full size icon, popup at bottom of Add contact button
 		{
-			$(this).addClass('active');
-			d1.removeClass('dialog hidden');
-			var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
-	        if(w1 > 8 ) d1.css('right', w1 + 'px');
-	        else d1.css('right', 8 + 'px');
+			$('.add-user-size-icon')
+				.removeClass('short-size')
+				.addClass('full-size');
+			$('.fm-add-user').addClass('active');
 		}
-		else {
-			$(this).removeClass('active');
-			d1.addClass('dialog hidden');
-			d1.removeAttr('style');
+		else// short size icon, centered dialog
+		{
+			$('.add-user-size-icon')
+				.removeClass('full-size')
+				.addClass('short-size');
+			$('.fm-add-user').removeClass('active');
 		}
+	};
+	
+	$('.fm-add-user').unbind('click');
+	$('.fm-add-user').bind('click',function()
+	{
 		$.hideContextMenu();
+		
+		var $this = $(this);
+		var $d = $('.add-user-popup');
+		if ($this.is('.active'))// Hide
+		{
+			$this.removeClass('active');
+			$d.addClass('hidden');
+		}
+		else// Show
+		{
+			$this.addClass('active');
+			$d.removeClass('hidden dialog');
+
+			var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
+			// Positioning, not less then 8px from right side
+	        if (pos > 8)
+			{
+				$d.css('right', pos + 'px');
+			}
+	        else
+			{
+				$d.css('right', 8 + 'px');
+			}
+		}
+		
+		iconSize(true);
 	});
+	
+	$('.add-user-size-icon').off('click');
+	$('.add-user-size-icon').on('click', function()
+	{
+		if ($(this).is('.full-size'))
+		{
+			$('.add-user-popup').addClass('dialog');
+			$('.fm-dialog-overlay').removeClass('hidden');
+			iconSize(false);
+		// ToDo: remove up arrow from .fm-right-header
+		}
+		else// .short-size
+		{
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('.add-user-popup').removeClass('dialog');
+			iconSize(true);
+		}
+	});
+	
+	$('.add-user-popup-button').off('click');
+	$('.add-user-popup-button').on('click', function()
+	{
+		if ($(this).is('.add'))// Add
+		{
+			// ToDo: add contact
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else doAddContact(e);
+		}
+
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+	});
+	
+	$('.add-user-popup input').unbind('keypress');
+	$('.add-user-popup input').bind('keypress',function(e)
+	{
+//		if (e.which == 13) doAddContact(e);
+	});
+
+
 }
 
 function ephemeralDialog(msg)
@@ -1390,12 +1448,13 @@ function initContextUI()
 		doClearbin();
 	});
 
-	$(c+'.addcontact-item').unbind('click');
-	$(c+'.addcontact-item').bind('click',function(event)
-	{
-		addContactDialog();
-		if (d) console.log('addcontact');
-	});
+// Absolute
+//	$(c+'.addcontact-item').unbind('click');
+//	$(c+'.addcontact-item').bind('click',function(event)
+//	{
+//		addContactDialog();
+//		if (d) console.log('addcontact');
+//	});
 
 	$(c+'.move-up').unbind('click');
 	$(c+'.move-up').bind('click',function(event)

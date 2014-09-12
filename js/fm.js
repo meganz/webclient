@@ -57,6 +57,7 @@ function initContactsGridScrolling()
 
 function initContactsBlocksScrolling()
 {
+	if ($('.contacts-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
@@ -65,6 +66,7 @@ function initContactsBlocksScrolling()
 
 function initShareBlocksScrolling()
 {
+	if ($('.shared-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.shared-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
@@ -1144,6 +1146,12 @@ function addContactUI()
 			}
 		}
 
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+	});
+	$('.add-user-popup .fm-dialog-close').off('click');
+	$('.add-user-popup .fm-dialog-close').on('click', function() {
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');

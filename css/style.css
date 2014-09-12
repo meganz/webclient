@@ -6472,6 +6472,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 16px;
 	right: 40px;
 }
+.add-user-popup .fm-dialog-close, .add-user-popup .nw-fm-dialog-title {
+	display:none;
+}
+.add-user-popup.dialog .fm-dialog-close, .add-user-popup.dialog .nw-fm-dialog-title {
+	display:block;
+}
+.add-user-popup.dialog .add-user-popup-pad {
+	margin-top:12px;
+}
 .create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select, .rename-input-bl, .fm-version-select {
 	float: left;
 	width: 235px;

@@ -1149,6 +1149,12 @@ function addContactUI()
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
 	});
+	$('.add-user-popup .fm-dialog-close').off('click');
+	$('.add-user-popup .fm-dialog-close').on('click', function() {
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+	});
 }
 
 function ephemeralDialog(msg)

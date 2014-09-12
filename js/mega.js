@@ -1583,8 +1583,8 @@ function MegaData ()
 				msgDialog('info',l[150],l[151].replace('[X]',talready));
 			}
 			else if (res == -2) msgDialog('info',l[135],l[152]);
-			$('.add-user-popup input').val('');
-			loadingDialog.hide();
+//			$('.add-user-popup input').val('');
+//			loadingDialog.hide();
 		  }
 		});
 	};

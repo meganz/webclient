@@ -17947,8 +17947,11 @@ ul.token-input-list-mega {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 10px 4px 31px;
+	padding: 0 35px 4px 31px;
 	overflow: hidden;
+}
+.add-user-popup-pad {
+	padding: 0 10px 4px 31px;
 }
 .multiple-input {
 	-moz-border-radius: 5px;

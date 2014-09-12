@@ -18886,6 +18886,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	color: rgba(255,255,255,0.3);
 	font-family: 'Open Sans Light';
 }
+.chat-call-block video, .video-full-container video {
+    transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+}
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
 	min-width: 648px;

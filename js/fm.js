@@ -1059,21 +1059,65 @@ function addContactUI()
 //		}
 //		else// Valid email
 //		{
-//			var id = Math.floor((Math.random() * 10000));
-//			$('.add-contact-multiple-input').tokenInput({id: id, name: val});
+//			$('.add-contact-multiple-input').tokenInput({id: val, name: val});
 //		}
 	};
 
 
 	// Plugin configuration
-	$('.add-contact-multiple-input').tokenInput(null, {
+	// ToDo: add path to user json list
+	var knownEmails = [];
+	for (var i in M.u)
+	{
+		knownEmails.push({id: M.u[i].u, name: M.u[i].m});
+	}
+	$('.add-contact-multiple-input').tokenInput(knownEmails, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",
+		searchingText:		"Searching for existing contacts...",
 		addAvatar:			false,
 		autocomplete:		null,
 		searchDropdown:		false,
 		emailValidation:	true,
-		preventDuplicates:	true
+		preventDuplicates:	true,
+		resultsLimit:		5,
+		minChars:			2,
+		onAdd: function()
+		{
+			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 1)
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');			
+			}
+		},
+		onDelete: function()
+		{
+			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 0)
+			{
+				$('.add-user-popup-button.add').addClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else if (itemNum === 1)
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');			
+			}
+		}
     });
 
 	$('.fm-add-user').unbind('click');
@@ -1093,6 +1137,10 @@ function addContactUI()
 			$this.addClass('active');
 			$d.removeClass('hidden dialog');
 			$('.add-user-popup .multiple-input .token-input-token-mega').remove();
+			
+			$('.add-user-popup-button.add').addClass('disabled');
+			$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+			
 			var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
 			// Positioning, not less then 8px from right side
 	        if (pos > 8)
@@ -1130,26 +1178,32 @@ function addContactUI()
 	$('.add-user-popup-button').off('click');
 	$('.add-user-popup-button').on('click', function()
 	{
-		if ($(this).is('.add'))// Add
+		$this = $(this);
+		if ($this.is('.add') && !$this.is('.disabled'))// Add
 		{
 			if (u_type === 0) ephemeralDialog(l[997]);
 			else
 			{
-//				loadingDialog.show();
 				var $mails = $('.token-input-list-mega .token-input-token-mega');
-				// Can I send array of email addreses to server at once?
-				$mails.each(function(index, value)
+				if ($mails.length)
 				{
-					M.addContact($(value).text());
-				});
-//				loadingDialog.hide();
+					var a = [];
+					// Can I send array of email addreses to server at once?
+					$mails.each(function(index, value)
+					{
+						a.push($(value).text());
+					});
+					M.addContact(a);
+				}
 			}
+			
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('.add-user-popup').addClass('hidden');
+			$('.fm-add-user').removeClass('active');
 		}
 
-		$('.fm-dialog-overlay').addClass('hidden');
-		$('.add-user-popup').addClass('hidden');
-		$('.fm-add-user').removeClass('active');
 	});
+	
 	$('.add-user-popup .fm-dialog-close').off('click');
 	$('.add-user-popup .fm-dialog-close').on('click', function() {
 		$('.fm-dialog-overlay').addClass('hidden');

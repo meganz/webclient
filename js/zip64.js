@@ -91,6 +91,12 @@ var ZIPClass = function(totalSize) {
 		, isZip64 = totalSize > maxZipSize || localStorage.zip64 == 1
 
 	this.isZip64 = isZip64 /* make it public */
+
+	if (isZip64 && !localStorage.zip64warnShown)
+	{
+		localStorage.zip64warnShown = !0;
+		msgDialog('warninga', l[34], l[2033]);
+	}
 	
 	// Constants
 	var fileHeaderLen				= 30
@@ -450,6 +456,11 @@ ZipWriter.prototype.destroy = function(error) {
 
 function dlZipWriterIOWorker(task, done) {
 	var file = task.zfile.file;
+
+	if (typeof file === 'undefined') {
+		if (d) console.error('File aborted...', task);
+		return done();
+	}
 
 	this.hashes[file.id] = crc32(task.data, this.hashes[file.id] || 0, task.data.byteLength)
 	this.file_offset += task.data.byteLength;

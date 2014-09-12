@@ -866,6 +866,72 @@ function mozClearStartupCache() {
 
 })(self);
 
+(function __mozSecurityTraps(scope) {
+
+	const __cE = document.createElement;
+	const __cE_NS = document.createElementNS;
+	const __XHR_Open = XMLHttpRequest.prototype.open;
+
+	Object.defineProperty(document, 'createElementNS',
+	{
+		value : function(ns, e)
+		{
+			if (ns !== 'http://www.w3.org/1999/xhtml' && ns !== 'http://www.w3.org/2000/svg')
+			{
+				var err = new Error('Blocked namespace: ' + ns);
+				setTimeout(function() { throw err }, 4);
+				return null;
+			}
+
+			var eL = e.split(':').pop().toLowerCase();
+			if (eL === 'script' || eL === 'iframe')
+			{
+				var caller = Components.stack.caller;
+
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secure' !== caller.filename.substr(0,11))
+				{
+					var err = new Error('Blocked '+e+' element creation');
+					setTimeout(function() { throw err }, 4);
+					return null;
+				}
+			}
+
+			return __cE_NS.call(document, ns, e);
+		}
+	});
+	Object.defineProperty(document, 'createElement',
+	{
+		value : function(e)
+		{
+			var eL = e.split(':').pop().toLowerCase();
+			if (eL === 'script' || eL === 'iframe')
+			{
+				var caller = Components.stack.caller;
+
+				if (caller.filename.substr(0,14) !== 'chrome://mega/' && 'mega:secure' !== caller.filename.substr(0,11))
+				{
+					var err = new Error('Blocked '+e+' element creation');
+					setTimeout(function() { throw err }, 4);
+					return null;
+				}
+			}
+			return __cE.call(document, e);
+		}
+	});
+
+	XMLHttpRequest.prototype.open = function(meth, url)
+	{
+		var uri = Services.io.newURI(url, null, null);
+
+		if (/\.mega\.co\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+
+		var err = new Error('Blocked XHR to ' + url);
+		setTimeout(function() { throw err }, 4);
+	};
+	// XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
+
+})(self);
+
 (function __mozPreferences(scope) {
 	scope.mozPrefs = Services.prefs.getBranch('extensions.mega.');
 
@@ -890,7 +956,7 @@ function mozClearStartupCache() {
 
 	scope.mozAskDownloadsFolder = function(m)
 	{
-		var folder = mozFilePicker(null,2,{title : m || l[136] || 'Please choose downloads folder'});
+		var folder = mozFilePicker(null,2,{title : m || (typeof l !== 'undefined'&&l[136]) || 'Please choose downloads folder'});
 
 		if (folder)
 		{

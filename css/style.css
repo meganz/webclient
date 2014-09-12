@@ -930,10 +930,6 @@ input.radioOn, input.radioOff {
 	width: 18px;
 	height: 18px;
 }
-option[selected], option selected, option[selected=selected] {
-	background-color: #D9290B !important;
-	color: #FFFFFF !important;
-}
 .terms-main {
 	color: #595959;
 	font-size: 14px;
@@ -2441,7 +2437,7 @@ a.blog-new-archive-lnk {
 }
 .new-bottom-pages .blog-new-full p.small-pad-paragraph {
 	padding-top: 0;
-	padding-bottom: 30px
+	padding-bottom: 20px
 }
 .new-bottom-pages .blog-new-full ul.ul-small-pad {
 	padding-top: 0;
@@ -14002,7 +13998,6 @@ span.browsers-update {
 }
 .sync-button-txt {
 	display: block;
-}
 .new-app .sync-button-txt {
 	font-size: 16px;
 	color: #999999;

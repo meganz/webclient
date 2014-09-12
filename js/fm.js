@@ -641,6 +641,7 @@ function initUI()
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e)
 	{
+		if (!M.currentdirid) return;
 		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/' || M.currentdirid.substr(0,5) == 'chat/') window.history.back();
 		else
 		{
@@ -831,7 +832,7 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();
-	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	if (!uldl_hold) ulQueue.resume();
 	else// make sure that terms of service are accepted before any action
 	{
 		$('.transfer-pause-icon').addClass('active');
@@ -2476,11 +2477,11 @@ function accountUI()
 		else $('.fm-account-avatar img').attr('src',staticpath + 'images/mega/default-avatar.png');
 
 		$(window).unbind('resize.account');
-		$(window).bind('resize.account', function ()
-		{
-			if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
+		$(window).bind('resize.account', function () 
+		{			
+			if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		});
-
+		
 		initAccountScroll();
 	},1);
 
@@ -4051,9 +4052,9 @@ function menuItems()
 	var n = M.d[$.selected[0]];
 	if (n && n.p.length == 11) items['removeshare'] = 1;
 	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
-	if ($.selected.length == 1 && M.d[$.selected[0]].t) items['open'] = 1;
-	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name)) items['preview'] = 1;
-	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) items['sharing'] = 1;
+	if (n && $.selected.length == 1 && n.t) items['open'] = 1;					
+	if (n && $.selected.length == 1 && is_image(n.name)) items['preview'] = 1;	
+	if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink) items['sharing'] = 1;	
 	if (sourceRoot == M.RootID && !folderlink)
 	{
 		items['move'] = 1;
@@ -4110,11 +4111,13 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
+			var flt = '.refresh-item,.properties-item';
+			if (folderlink) flt += ',.zipdownload-item';
 			$.selected = [M.RootID];
-			$(t).filter('.refresh-item,.properties-item').show();
+			$(t).filter(flt).show();
 		}
-		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();
-		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();
+		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
+		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
 		else if (c && c.indexOf('messages-item') > -1)
 		{
 			e.preventDefault();

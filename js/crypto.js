@@ -1473,7 +1473,11 @@ function api_cachepubkeys2(res, ctx) {
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                throw new Error('Fingerprint does not match previously seen one!');
+                if (d) {
+                    authring.scrubAuthRing();
+                } else {
+                    throw new Error('Fingerprint does not match previously seen one!');
+                }
             }
             if (observed === false) {
                 authring.setContactAuthenticated(ctx.u, fingerprint, 'RSA',
@@ -2773,7 +2777,15 @@ function getPubEd25519(userhandle, callback) {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
     if (pubEd25519[userhandle]) {
-        var value = _checkFingerprintEd25519(userhandle);
+        try {
+            var value = _checkFingerprintEd25519(userhandle);
+        } catch (e) {
+            if (d && e === 'Fingerprint does not match previously authenticated one!') {
+                authring.scrubAuthRing();
+            } else {
+                throw e;
+            }
+        }
         if (callback) {
             callback(value, userhandle);
         }

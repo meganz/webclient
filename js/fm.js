@@ -57,6 +57,7 @@ function initContactsGridScrolling()
 
 function initContactsBlocksScrolling()
 {
+	if ($('.contacts-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
@@ -65,6 +66,7 @@ function initContactsBlocksScrolling()
 
 function initShareBlocksScrolling()
 {
+	if ($('.shared-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.shared-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});

@@ -146,11 +146,8 @@ var chatui;
                 $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
                 $('.copy-dialog .dialog-copy-button').addClass('active');
                 $('.copy-dialog').removeClass('hidden');
-                handleDialogContent('.cloud-drive', 'ul', true, 'copy', 'Send');
+                handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
-
-                //TODO: fix this after #602 is ready.
-
             });
 
             $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
@@ -274,8 +271,13 @@ var chatui;
                             var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
 
 
-                            $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
-                                resp.cancel();
+                            var $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
+
+                                if(megaChat.rtc.ftManager.downloads[resp.sid] || megaChat.rtc.ftManager.uploads[resp.sid]) {
+                                    megaChat.rtc.ftManager.cancelTransfer(resp.sid);
+                                } else {
+                                    resp.cancel();
+                                }
                             });
 
                             room.appendDomMessage($message);
@@ -1129,7 +1131,10 @@ MegaChat.prototype.init = function() {
         self.rtc.ftManager.updateGui = function() {
             var uploadAndDownloadSessions = obj_values(this.downloads).concat(obj_values(this.uploads));
 
+            console.error("updateGui: ", uploadAndDownloadSessions);
+
             $.each(uploadAndDownloadSessions, function(k, v) {
+                console.error("current file: ", v.currentFile(), v.progress());
                 if (!v.currentFile()) {
                     return; // continue
                 }
@@ -1216,13 +1221,14 @@ MegaChat.prototype.init = function() {
             var $elem = $('.webrtc-transfer[data-transfer-sid="' + sess._sid + '"]');
 
             $('.primary-button', $elem).replaceWith(
-                $("<em>" + /* (e.type == "ftsess-remove" ? */ "Done" /* : "Canceled") */ + "</em>")
+                $("<em>" + (e.type == "ftsess-remove" ? "Done" : "Canceled") + "</em>")
             );
 
-//            if(e.type == "ftsess-remove") { // completed
+            if(e.type == "ftsess-remove") { // completed
+                $('.nw-chat-sharing-body', $elem).removeAttr('title');
                 $('.progressbarfill', $elem).css('width', '100%');
                 $('.direct-progressbar', $elem).removeClass("hidden");
-//            }
+            }
 
             var roomJid = $('.webrtc-transfer').parents('.fm-chat-message-scroll').prev().attr("data-room-jid");
             var room = megaChat.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
@@ -1231,7 +1237,7 @@ MegaChat.prototype.init = function() {
             }
         };
         $(self.rtc.ftManager).on('ftsess-remove', _ftSessEndHandler);
-//        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
+        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
 
     } catch(e) {
         // no RTC support.
@@ -2286,6 +2292,7 @@ MegaChat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
     } else {
+        return "https://karere-001.developers.mega.co.nz:5281/http-bind"; // issue #692 again
         return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
     }
 };
@@ -2746,7 +2753,11 @@ var MegaChatRoom = function(megaChat, roomJid) {
             // file transfer
             var $message = megaChat._generateIncomingRtcFileMessage(self, eventData.files, eventData.sid,
                 function() {
-                    eventData.answer(false, {});
+                    if(self.megaChat.rtc.ftManager.downloads[eventData.sid] || self.megaChat.rtc.ftManager.uploads[eventData.sid]) {
+                        self.megaChat.rtc.ftManager.cancelTransfer(eventData.sid);
+                    } else {
+                        eventData.answer(false, {});
+                    }
                 },
                 function() {
                     eventData.answer(true, {});
@@ -3471,7 +3482,9 @@ MegaChatRoom.prototype._renderAudioVideoScreens = function() {
 
         );
     } else {
-        console.error("no media opts");
+        if(localStorage.d) {
+            console.error("no media opts");
+        }
     }
 
     // others

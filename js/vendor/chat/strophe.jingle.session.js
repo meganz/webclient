@@ -98,15 +98,10 @@ initiate: function(isInitiator) {
     this.peerconnection.oniceconnectionstatechange = function (event) {
         if (!(self && self.peerconnection)) return;
         console.log('iceconnectionstatechange', self.peerconnection.iceConnectionState, event);
-        switch (self.peerconnection.iceConnectionState) {
-        case 'connected':
-            this.startTime = new Date();
-            break;
-        case 'disconnected':
-            this.stopTime = new Date();
-            if (this.state != 'ended')
+        if (self.peerconnection.iceConnectionState === 'disconnected') {
+            if (self.state != 'ended') {
                 self.jingle.terminate(self, "ice-disconnect");
-            break;
+            }
         }
         self.jingle.onIceConnStateChange.call(self.eventHandler, self, event);
     };
@@ -589,7 +584,7 @@ sendTerminate: function (reason, text) {
     }
 
     this.sendIq(term, 'terminate', function() {});
-    obj.terminate();
+    this.jingle.connection.flush();
     debugLog("sent TERMINATE to", this.peerjid);
 },
 

@@ -5,6 +5,7 @@ var FTSTATE_SEND_FILE = Object.freeze({code:4, text:"Sending file"});
 var FTSTATE_WAIT_FILE_ACK = Object.freeze({code:5, text:"Waiting for file receive acknowledge"});
 var FTSTATE_READY_NEXT_FILE = Object.freeze({code:6, text:"Waiting for next file"});
 var FTSTATE_ERROR = Object.freeze({code:7, text:"Transfer error"});
+var FTSTATE_CANCELING = Object.freeze({code:8, text:"Canceling transfer"});
 
 var FTPTYPE_FILE_LIST = 1;
 var FTPTYPE_FILE_START = 2;
@@ -21,7 +22,7 @@ function FileTransferManager(jingle) {
     this.downloads = {};
     this.updateGui = function(){};
 }
-
+;
 FileTransferManager.prototype.createDownloadHandler = function(sid, peerJid, files) {
     if (this.downloads[sid])
         throw new Error("Assertion failed: download with the specified sid already exists");
@@ -78,7 +79,7 @@ FileTransferManager.prototype.sendQueue = function() {
         var upload = this.uploads[sid];
         for (var i = 0; i<upload._files.length; i++) {
             var file = upload._files[i];
-            result.push({ftSess: upload, name: file.name, size: file.size, mime:file.type});
+            result.push({ftSess: upload, name: file.name, size: file.size, mime:file.type, uniqueId: file.uniqueId});
         }
     }
     return result;
@@ -90,7 +91,7 @@ FileTransferManager.prototype.recvQueue = function() {
         var download = this.downloads[sid];
         for (var f in download._files) {
             var file = download._files[f];
-            result.push({ftSess: download, name: f, size: file.size, mime:file.type});
+            result.push({ftSess: download, name: f, size: file.size, mime:file.type, uniqueId: file.uniqueId});
         }
     }
     return result;
@@ -126,9 +127,6 @@ TransferHandlerBase.prototype.bindToDataChannel = function(dataChan) {
     dataChan.onerror = this.onerror.bind(this);
 }
 
-TransferHandlerBase.prototype.onclose = function() {
-}
-
 TransferHandlerBase.prototype.state = function() {
     return this._state;
 }
@@ -145,6 +143,7 @@ TransferHandlerBase.prototype.peerJid = function() {
 }
 
 TransferHandlerBase.prototype.cancel = function() {
+    this._state = FTSTATE_CANCELING;
     if (!this._ftManager._jingle.terminateBySid(this._sid, 'cancel'))
        this.remove('cancel');
 }
@@ -270,13 +269,22 @@ DownloadHandler.prototype.sendFileNack = function(errMsg) {
     writeStringToArrBuf(errMsg, buf, 4);
     this._dataChan.send(buf);
 }
+
+DownloadHandler.prototype.onclose = function() {
+    if (this._state === FTSTATE_RECEIVE_FILE)
+        this.error("Data channel closed while receiving file");
+}
+
 DownloadHandler.prototype.remove = function(reason, text) {
-    if (reason === 'complete')
+    if ((this._state === FTSTATE_WAIT_FILE_HDR) &&
+       ((reason === 'peer-complete') || (reason === 'ice-disconnect'))) {
         $(this._ftManager).trigger('ftsess-remove', {ftSess:this});
-     else if ((reason == 'cancel') || (reason === 'peer-cancel'))
+    }
+     else if ((reason === 'cancel') || (reason === 'peer-cancel')) {
         $(this._ftManager).trigger('ftsess-canceled', {ftSess: this});
-     else
+    } else {
         this.error("Download session terminated: "+reason, true);
+    }
      delete this._ftManager.downloads[this._sid];
      if (this._ftManager.checkDisableTimer())
          this._ftManager.updateGui();
@@ -437,6 +445,8 @@ UploadHandler.prototype.sendFileData = function() {
     var blob = this._currentSentFile.slice(this._fileSendPos, end);
     this._fileSendPos = end;
     reader.onload = function(event) {
+        if (self._state != FTSTATE_SEND_FILE)
+            return;
         var arrBuf = event.target.result;
         var packet = new ArrayBuffer(arrBuf.byteLength+4);
         self.addPacketHeader(packet, FTPTYPE_FILE_DATA);

@@ -17950,7 +17950,7 @@ ul.token-input-list-mega {
 	padding: 0 35px 4px 31px;
 	overflow: hidden;
 }
-.add-user-popup-pad {
+.add-user-popup-pad ul.token-input-list-mega {
 	padding: 0 10px 4px 31px;
 }
 .multiple-input {

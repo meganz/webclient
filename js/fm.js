@@ -1044,28 +1044,39 @@ function addContactUI()
 		}
 	};
 
-	// Due problems with tokeninput plugin this is absolute
-	fillContactTokenInput = function(val, $d)
+	function existingEmailMsg()
 	{
-//		if (checkMail(val))// !!! Not valid email
-//		{
-//			$d.addClass('error');
-//			setTimeout(function()
-//			{
-//				$d.removeClass('error');
-//			}, 3000);
-//			
-//			return false;
-//		}
-//		else// Valid email
-//		{
-//			$('.add-contact-multiple-input').tokenInput({id: val, name: val});
-//		}
-	};
-
-
+		var $d = $('.add-user-popup');
+		var $s = $('.add-user-popup .multiple-input-warning span');
+		$s.text('You already have contact with exact email!');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+			$s.text('Looks like there’s a malformed email!');
+		}, 3000);			
+	}
+	
+	function wrongEmailMsg()
+	{
+		var $d = $('.add-user-popup');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+		}, 3000);			
+	}
+	
+	function focusOnInput()
+	{
+		var $tokenInput = $('#token-input-');
+		
+		$tokenInput
+//				.show()
+				.val('')
+				.focus();
+	}
 	// Plugin configuration
-	// ToDo: add path to user json list
 	var knownEmails = [];
 	for (var i in M.u)
 	{
@@ -1078,10 +1089,12 @@ function addContactUI()
 		addAvatar:			false,
 		autocomplete:		null,
 		searchDropdown:		false,
-		emailValidation:	true,
-		preventDuplicates:	true,
+		emailCheck:			true,
+		preventDoublet:		true,
 		resultsLimit:		5,
 		minChars:			2,
+		onEmailCheck: wrongEmailMsg,
+		onDoublet: existingEmailMsg,
 		onAdd: function()
 		{
 			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
@@ -1125,6 +1138,7 @@ function addContactUI()
 	{
 		$.hideContextMenu();
 		
+		$.dialog = 'add-contact-popup';
 		var $this = $(this);
 		var $d = $('.add-user-popup');
 		if ($this.is('.active'))// Hide
@@ -1137,6 +1151,7 @@ function addContactUI()
 			$this.addClass('active');
 			$d.removeClass('hidden dialog');
 			$('.add-user-popup .multiple-input .token-input-token-mega').remove();
+			focusOnInput();
 			
 			$('.add-user-popup-button.add').addClass('disabled');
 			$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
@@ -1165,6 +1180,8 @@ function addContactUI()
 			$('.fm-dialog-overlay').removeClass('hidden');
 			iconSize(false);
 			$('.fm-add-user').removeClass('active');
+			focusOnInput();
+
 		}
 		else// .short-size
 		{
@@ -1172,6 +1189,7 @@ function addContactUI()
 			$('.add-user-popup').removeClass('dialog');
 			iconSize(true);
 			$('.fm-add-user').addClass('active');
+			focusOnInput();
 		}
 	});
 	
@@ -1196,11 +1214,11 @@ function addContactUI()
 					M.addContact(a);
 				}
 			}
-			
-			$('.fm-dialog-overlay').addClass('hidden');
-			$('.add-user-popup').addClass('hidden');
-			$('.fm-add-user').removeClass('active');
 		}
+		
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
 
 	});
 	
@@ -5075,6 +5093,10 @@ function closeDialog()
 		$('.fm-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.dialog-content-block,.share-dialog-contacts').empty();
+		// add contact popup
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+		
 		delete $.copyDialog;
 		delete $.moveDialog;
 	}

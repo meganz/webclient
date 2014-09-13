@@ -28,7 +28,7 @@
 		searchDropdown: true,
 		enableHTML: false,
 		addAvatar: true,
-		emailValidation: false,
+		emailCheck: false,
 		resultsFormatter: function(item) {
 			var string = item[this.propertyToSearch];
 			var avatar = "<span class='nw-contact-avatar color10'>UU</span>";
@@ -44,7 +44,7 @@
 		// Tokenization settings
 		tokenLimit: null,
 		tokenDelimiter: ",",
-		preventDuplicates: true,
+		preventDoublet: true,
 		tokenValue: "id",
 		// Behavioral settings
 		allowFreeTagging: true,
@@ -57,6 +57,8 @@
 		onFreeTaggingAdd: true,
 		onDelete: null,
 		onReady: null,
+		onEmailCheck: null,
+		onDoublet: null,
 		// Other settings
 		idPrefix: "token-input-",
 		// Keep track if the input is currently in disabled mode
@@ -494,7 +496,10 @@
 		};
 
 		this.add = function(item) {
-			add_token(item);
+			if (beforeAdd(item))
+			{
+				add_token(item);
+			}
 		};
 
 		this.remove = function(item) {
@@ -635,46 +640,44 @@
 			return $this_token;
 		}
 
-		function existingTokenMsg()
-		{
-			var $d = $('.add-user-popup');
-			var $s = $('.add-user-popup .multiple-input-warning span');
-			$s.text('You already have contact with same email!');
-			$d.addClass('error');
-			setTimeout(function()
-			{
-				$d.removeClass('error');
-				$s.text('Looks like there’s a malformed email!');
-			}, 3000);			
-		}
 		// Add a token to the token list based on user input
 		function add_token(item) {
 			var callback = $(input).data("settings").onAdd;
-			// Validate email
-			var isValidEmail = $(input).data("settings").emailValidation ? IsEmail(item[settings.tokenValue]) : true;
-			if (!isValidEmail)
-			{
-				var $d = $('.add-user-popup');
-				$d.addClass('error');
-				setTimeout(function()
-				{
-					$d.removeClass('error');
-				}, 3000);
 
-				return false
-			}
-			// Check do we have contact with same email address
-			var exist = $.grep($(input).data("settings").local_data, function(row) {
-				return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(item[settings.tokenValue].toLowerCase()) > -1;
-			});
-			if (exist.length)
+			if ($(input).data("settings").emailCheck)
 			{
-				existingTokenMsg();
-				return false;
+				var isValidEmail = IsEmail(item[settings.tokenValue]);
+				if (!isValidEmail)// Prevent further execution if email format is wrong
+				{
+					select_token(item);
+					var cb = $(input).data("settings").onEmailCheck;
+					if ($.isFunction(cb)) {
+						cb.call(hidden_input, item);
+					}
+					
+					return;
+				}
 			}
 			
-			// See if the token already exists and select it if we don't want duplicates
-			if (token_count > 0 && $(input).data("settings").preventDuplicates && isValidEmail) {
+			// this setting will be renamed, to someting like preventLocalDoublet 
+			// will disting from existing which check multi-input list
+			if ($(input).data("settings").preventDoublet)
+			{
+				var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
+					return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(item[settings.tokenValue].toLowerCase()) > -1;
+				});
+				if (doubleEmail.length)// Prevent further execution if email is duplicated
+				{
+					var cb = $(input).data("settings").onDoublet;
+					if ($.isFunction(cb)) {
+						cb.call(hidden_input, item);
+					}
+					
+					return;
+				}
+			}
+			// See if the token already exists and select it if we don't want duplicates (only current multi-input list)
+			if (token_count > 0 && $(input).data("settings").preventDoublet) {
 				var found_existing_token = null;
 				token_list.children().each(function() {
 					var existing_token = $(this);
@@ -687,7 +690,10 @@
 
 				if (found_existing_token) {
 					select_token(found_existing_token);
-					existingTokenMsg();
+					var cb = $(input).data("settings").onDoublet;
+					if ($.isFunction(cb)) {
+						cb.call(hidden_input, item);
+					}
 					return;
 				}
 			}

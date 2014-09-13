@@ -4,7 +4,7 @@ var _xhr_queue = []
 	, total = 0
 
 function newXhr() {
-	var xhr = new XMLHttpRequest;
+	var xhr = getxhr();
 	xhr.__id = ++total
 	xhr.__timeout = null;
 	xhr.__timeout_ms = localStorage.xhrtimeout || 2*60*1000;
@@ -20,6 +20,12 @@ function newXhr() {
 	};
 
 	xhr._abort = xhr.abort;
+	xhr._send  = xhr.send
+
+	xhr.send = function() {
+		xhr.started = Date.now()
+		xhr._send.apply(this, arguments)
+	}
 
 	xhr.abort = function() {
 		DEBUG('Socket: aborting', this.__id);
@@ -41,6 +47,9 @@ function newXhr() {
 		if (!this.listener) return this.nolistener();
 		this.setup_timeout();
 		switch(this.readyState) {
+			case this.HEADERS_RECEIVED:
+				ASSERT(Date.now() < this.started+30000, 'Server took too long to reply')
+				break;
 			case 4:
 				if (this.listener.on_ready) {
 					this.clear_timeout();
@@ -118,6 +127,7 @@ w.getXhr = function(object) {
 	for (var i = 0; i < _xhr_queue.length; i++) {
 		if (!_xhr_queue[i].listener && _xhr_queue[i].type == zclass) {
 			_xhr_queue[i].listener  = object;
+			_xhr_queue[i].lname = '' + object;
 			_xhr_queue[i].__failed = false;
 			return _xhr_queue[i];
 		}
@@ -126,6 +136,7 @@ w.getXhr = function(object) {
 	/* create a new xhr object */
 	var xhr = newXhr();
 	xhr.listener = object;
+	xhr.lname = ''+object;
 	xhr.type     = zclass;
 
 	/* add it to the queue so we can recicle it */

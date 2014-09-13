@@ -4,7 +4,7 @@
 var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
-var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega';
+var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
@@ -51,28 +51,31 @@ try
 		Cu['import']("resource://gre/modules/Services.jsm");
 		XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
 
-        (function(global) {
-            global.loadSubScript = function(file,scope) {
-                if (global.d) {
-                    Services.scriptloader.loadSubScriptWithOptions(file,{
-                        target : scope||global, charset: "UTF-8",
-                        ignoreCache : true
-                    });
-                } else {
-                    Services.scriptloader.loadSubScript(file,scope||global);
-                }
-            };
-        })(this);
+		(function(global) {
+			global.loadSubScript = function(file,scope) {
+				if (global.d) {
+					Services.scriptloader.loadSubScriptWithOptions(file,{
+						target : scope||global, charset: "UTF-8",
+						ignoreCache : true
+					});
+				} else {
+					Services.scriptloader.loadSubScript(file,scope||global);
+				}
+			};
+		})(this);
+
+		try {
+			var mozBrowserID =
+			[	Services.appinfo.name,
+				Services.appinfo.platformVersion,
+				Services.appinfo.platformBuildID,
+				Services.appinfo.OS,
+				Services.appinfo.XPCOMABI].join(" ");
+		} catch(e) {
+			var mozBrowserID = ua;
+		}
 
         try {
-            var mozBrowserID =
-                [	Services.appinfo.vendor,
-                    Services.appinfo.name,
-                    Services.appinfo.platformVersion,
-                    Services.appinfo.platformBuildID,
-                    Services.appinfo.OS,
-                    Services.appinfo.XPCOMABI].join(" ");
-
             loadSubScript('chrome://mega/content/strg2.js');
 
             if(!(localStorage instanceof Ci.nsIDOMStorage)) {
@@ -401,18 +404,20 @@ else
 			};
 		})(console);
 
+		Object.defineProperty(window, "__cd_v", { value : 4, writable : false });
 		if (!d)
 		{
-			var __cdumps = [], __cd_t, __cd_v = 2;
+			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				if (__cdumps.length > 8) return false;
+				if (__cdumps.length > 4) return false;
 
 				var dump = { m : '' + msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
 
 				if (errobj)
 				{
 					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
+					if (errobj.udata) dump.d = errobj.udata;
 				}
 				if (cn) dump.c = cn;
 
@@ -450,8 +455,6 @@ else
 					{
 						var dump = __cdumps[i];
 
-						// todo cesar: var source = $.get() ....
-
 						if (dump.x)
 						{
 							ids.push(dump.x);
@@ -463,6 +466,7 @@ else
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+					report.gp = Object.keys(GlobalProgress);
 					report.tp = $.transferprogress;
 					report.id = ids.join(",");
 					report.cc = cc;
@@ -524,6 +528,7 @@ else
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
         jsl.push({f:'js/jquery.jscrollpane.min.js', n: 'jscrollpane_js', j:1});
+        jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
         jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
         jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});

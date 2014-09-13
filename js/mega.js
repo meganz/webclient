@@ -950,7 +950,7 @@ function MegaData ()
 		{
 			// do nothing here
 		}
-		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
+		else if (id && id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			if (d) console.time('time for rendering');
@@ -1583,8 +1583,8 @@ function MegaData ()
 				msgDialog('info',l[150],l[151].replace('[X]',talready));
 			}
 			else if (res == -2) msgDialog('info',l[135],l[152]);
-			$('.add-user-popup input').val('');
-			loadingDialog.hide();
+//			$('.add-user-popup input').val('');
+//			loadingDialog.hide();
 		  }
 		});
 	};
@@ -2245,6 +2245,7 @@ function MegaData ()
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
+			setupTransferAnalysis();
 			downloading = !!dl_queue.length;
 		}
 
@@ -2615,6 +2616,7 @@ function MegaData ()
 		}
 		else openTransferpanel();
 
+		setupTransferAnalysis();
 		ul_uploading = !!ul_queue.length;
 	}
 

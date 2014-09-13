@@ -52,8 +52,8 @@
     </div>
 </div>
 
-
-<div class="fm-dialog add-contact-dialog hidden">
+<!--We are using add-user-popup instead-->
+<!--<div class="fm-dialog add-contact-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$101]</div>
         <div class="fm-dialog-close"></div>
@@ -68,8 +68,7 @@
             <div class="fm-dialog-add-contact-button">[$155]</div>
         </div>
     </div>
-</div>
-
+</div>-->
 
 <div class="fm-dialog dlkey-dialog hidden">
     <div class="fm-dialog-header">
@@ -815,15 +814,18 @@
 </div>
 
 <div class="add-user-popup dialog hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title">Add Contact</div>
     <div class="add-user-popup-pad">
         <div class="add-user-size-icon full-size"></div>
         <div class="add-user-icon">
             <div class="multiple-input-warning">
                 <div class="arrow"></div>
-                <span>Looks like there’s a malformed email there!</span></div>
+                <span>Looks like there’s a malformed email!</span>
+            </div>
         </div>
         <div class="multiple-input">
-            <input type="text" class="add-multiple-input"  name="" />
+            <input type="text" class="add-contact-multiple-input"  name="" />
             <div class="clear"></div>
         </div>
         <div class="default-dialog-bottom">

@@ -57,6 +57,7 @@ function initContactsGridScrolling()
 
 function initContactsBlocksScrolling()
 {
+	if ($('.contacts-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.contacts-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.contacts-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
@@ -65,6 +66,7 @@ function initContactsBlocksScrolling()
 
 function initShareBlocksScrolling()
 {
+	if ($('.shared-blocks-scrolling:visible').length == 0) return;
 	var jsp = $('.shared-blocks-scrolling').data('jsp');
 	if (jsp) jsp.destroy();
 	$('.shared-blocks-scrolling').jScrollPane({enableKeyboardNavigation:false,showArrows:true,arrowSize:5});
@@ -578,7 +580,7 @@ function initUI()
 	shareDialog();
 	transferPanelUI();
 	UIkeyevents();
-	addUserUI();
+	addContactUI();
 
 	$('.fm-files-view-icon').unbind('click');
 	$('.fm-files-view-icon').bind('click',function(event)
@@ -641,6 +643,7 @@ function initUI()
 	$('.fm-back-button').unbind('click');
 	$('.fm-back-button').bind('click', function(e)
 	{
+		if (!M.currentdirid) return;
 		if (M.currentdirid == 'notifications' || M.currentdirid.substr(0,7) == 'search/' || M.currentdirid.substr(0,5) == 'chat/') window.history.back();
 		else
 		{
@@ -655,17 +658,6 @@ function initUI()
 		// todo: enable folder link in header
 	}
 	else folderlink=0;
-	$('.add-user-popup-button').unbind('click');
-	$('.add-user-popup-button').bind('click',function(e)
-	{
-		if (u_type === 0) ephemeralDialog(l[997]);
-		else doAddContact(e);
-	});
-	$('.add-user-popup input').unbind('keypress');
-	$('.add-user-popup input').bind('keypress',function(e)
-	{
-		if (e.which == 13) doAddContact(e);
-	});
 	if (u_type === 0 && !u_attr.terms)
 	{
 		$.termsAgree = function()
@@ -842,7 +834,7 @@ function openTransferpanel()
 	if (M.currentdirid == 'notifications') notificationsScroll();
 	else if (M.viewmode) initFileblocksScrolling();
 	else initGridScrolling();
-	if (!uldl_hold && (u_type || u_attr.terms)) ulQueue.resume();
+	if (!uldl_hold) ulQueue.resume();
 	else// make sure that terms of service are accepted before any action
 	{
 		$('.transfer-pause-icon').addClass('active');
@@ -877,6 +869,7 @@ function openTransferpanel()
 
 function doAddContact(dialog)
 {
+	// ToDo: comment this
 	var c = '.add-user-popup input';
 	if (dialog) c = '.add-contact-dialog input';
 	if (checkMail($(c).val()))
@@ -895,7 +888,8 @@ function doAddContact(dialog)
 	{
 		loadingDialog.show();
 		M.addContact($(c).val());
-		if (dialog) addContactDialog(1);
+		// Absolute we are using add-contact-dialog ToDo: replace with add-user-popup
+//		if (dialog) addContactDialog(1);
 	}
 }
 
@@ -1032,30 +1026,207 @@ function addnotification(n)
 	donotify();
 }
 
-function addUserUI()
+function addContactUI()
 {
-	$('.fm-add-user').unbind('click');
-	$('.fm-add-user').bind('click',function(e)
+	iconSize = function(par)
 	{
-		var c = $(this).attr('class');
-		var c2 = $(e.target).attr('class');
-		var d1 = $('.add-user-popup');
-        
-		if ((!c2 || c2.indexOf('fm-add-user') == -1) && $(e.target).prop('tagName') !== 'SPAN') return false;
-		if (c.indexOf('active') == -1)
+		if (par)// full size icon, popup at bottom of Add contact button
 		{
-			$(this).addClass('active');
-			d1.removeClass('dialog hidden');
-			var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
-	        if(w1 > 8 ) d1.css('right', w1 + 'px');
-	        else d1.css('right', 8 + 'px');
+			$('.add-user-size-icon')
+				.removeClass('short-size')
+				.addClass('full-size');
 		}
-		else {
-			$(this).removeClass('active');
-			d1.addClass('dialog hidden');
-			d1.removeAttr('style');
+		else// short size icon, centered dialog
+		{
+			$('.add-user-size-icon')
+				.removeClass('full-size')
+				.addClass('short-size');
 		}
+	};
+
+	function existingEmailMsg()
+	{
+		var $d = $('.add-user-popup');
+		var $s = $('.add-user-popup .multiple-input-warning span');
+		$s.text('You already have contact with exact email!');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+			$s.text('Looks like there’s a malformed email!');
+		}, 3000);			
+	}
+	
+	function wrongEmailMsg()
+	{
+		var $d = $('.add-user-popup');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+		}, 3000);			
+	}
+	
+	function focusOnInput()
+	{
+		var $tokenInput = $('#token-input-');
+		
+		$tokenInput
+//				.show()
+				.val('')
+				.focus();
+	}
+	// Plugin configuration
+	var knownEmails = [];
+	for (var i in M.u)
+	{
+		knownEmails.push({id: M.u[i].u, name: M.u[i].m});
+	}
+	$('.add-contact-multiple-input').tokenInput(knownEmails, {
+		theme:				"mega",
+		hintText:			"Type in a contact email",
+		searchingText:		"Searching for existing contacts...",
+		addAvatar:			false,
+		autocomplete:		null,
+		searchDropdown:		false,
+		emailCheck:			true,
+		preventDoublet:		true,
+		resultsLimit:		5,
+		minChars:			2,
+		onEmailCheck: wrongEmailMsg,
+		onDoublet: existingEmailMsg,
+		onAdd: function()
+		{
+			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 1)
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');			
+			}
+		},
+		onDelete: function()
+		{
+			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 0)
+			{
+				$('.add-user-popup-button.add').addClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else if (itemNum === 1)
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+				
+			}
+			else
+			{
+				$('.add-user-popup-button.add').removeClass('disabled');
+				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');			
+			}
+		}
+    });
+
+	$('.fm-add-user').unbind('click');
+	$('.fm-add-user').bind('click',function()
+	{
 		$.hideContextMenu();
+		
+		$.dialog = 'add-contact-popup';
+		var $this = $(this);
+		var $d = $('.add-user-popup');
+		if ($this.is('.active'))// Hide
+		{
+			$this.removeClass('active');
+			$d.addClass('hidden');
+		}
+		else// Show
+		{
+			$this.addClass('active');
+			$d.removeClass('hidden dialog');
+			$('.add-user-popup .multiple-input .token-input-token-mega').remove();
+			focusOnInput();
+			
+			$('.add-user-popup-button.add').addClass('disabled');
+			$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+			
+			var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
+			// Positioning, not less then 8px from right side
+	        if (pos > 8)
+			{
+				$d.css('right', pos + 'px');
+			}
+	        else
+			{
+				$d.css('right', 8 + 'px');
+			}
+		}
+		
+		iconSize(true);
+	});
+	
+	$('.add-user-size-icon').off('click');
+	$('.add-user-size-icon').on('click', function()
+	{
+		if ($(this).is('.full-size'))
+		{
+			$('.add-user-popup').addClass('dialog');
+			$('.fm-dialog-overlay').removeClass('hidden');
+			iconSize(false);
+			$('.fm-add-user').removeClass('active');
+			focusOnInput();
+
+		}
+		else// .short-size
+		{
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('.add-user-popup').removeClass('dialog');
+			iconSize(true);
+			$('.fm-add-user').addClass('active');
+			focusOnInput();
+		}
+	});
+	
+	$('.add-user-popup-button').off('click');
+	$('.add-user-popup-button').on('click', function()
+	{
+		$this = $(this);
+		if ($this.is('.add') && !$this.is('.disabled'))// Add
+		{
+			if (u_type === 0) ephemeralDialog(l[997]);
+			else
+			{
+				var $mails = $('.token-input-list-mega .token-input-token-mega');
+				if ($mails.length)
+				{
+					var a = [];
+					// Can I send array of email addreses to server at once?
+					$mails.each(function(index, value)
+					{
+						a.push($(value).text());
+					});
+					M.addContact(a);
+				}
+			}
+		}
+		
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+
+	});
+	
+	$('.add-user-popup .fm-dialog-close').off('click');
+	$('.add-user-popup .fm-dialog-close').on('click', function() {
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
 	});
 }
 
@@ -1390,12 +1561,13 @@ function initContextUI()
 		doClearbin();
 	});
 
-	$(c+'.addcontact-item').unbind('click');
-	$(c+'.addcontact-item').bind('click',function(event)
-	{
-		addContactDialog();
-		if (d) console.log('addcontact');
-	});
+// Absolute
+//	$(c+'.addcontact-item').unbind('click');
+//	$(c+'.addcontact-item').bind('click',function(event)
+//	{
+//		addContactDialog();
+//		if (d) console.log('addcontact');
+//	});
 
 	$(c+'.move-up').unbind('click');
 	$(c+'.move-up').bind('click',function(event)
@@ -2385,11 +2557,11 @@ function accountUI()
 		else $('.fm-account-avatar img').attr('src',staticpath + 'images/mega/default-avatar.png');
 
 		$(window).unbind('resize.account');
-		$(window).bind('resize.account', function ()
-		{
-			if (M.currentdirid.substr(0,7) == 'account') initAccountScroll();
+		$(window).bind('resize.account', function () 
+		{			
+			if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
 		});
-
+		
 		initAccountScroll();
 	},1);
 
@@ -3960,9 +4132,9 @@ function menuItems()
 	var n = M.d[$.selected[0]];
 	if (n && n.p.length == 11) items['removeshare'] = 1;
 	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
-	if ($.selected.length == 1 && M.d[$.selected[0]].t) items['open'] = 1;
-	if ($.selected.length == 1 && is_image(M.d[$.selected[0]].name)) items['preview'] = 1;
-	if (sourceRoot == M.RootID && $.selected.length == 1 && M.d[$.selected[0]].t && !folderlink) items['sharing'] = 1;
+	if (n && $.selected.length == 1 && n.t) items['open'] = 1;					
+	if (n && $.selected.length == 1 && is_image(n.name)) items['preview'] = 1;	
+	if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink) items['sharing'] = 1;	
 	if (sourceRoot == M.RootID && !folderlink)
 	{
 		items['move'] = 1;
@@ -4019,11 +4191,13 @@ function contextmenuUI(e,ll,topmenu)
 		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
+			var flt = '.refresh-item,.properties-item';
+			if (folderlink) flt += ',.zipdownload-item';
 			$.selected = [M.RootID];
-			$(t).filter('.refresh-item,.properties-item').show();
+			$(t).filter(flt).show();
 		}
-		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();
-		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();
+		else if (c && c.indexOf('recycle-item') > -1) $(t).filter('.refresh-item,.clearbin-item').show();				
+		else if (c && c.indexOf('contacts-item') > -1) $(t).filter('.refresh-item,.addcontact-item').show();		
 		else if (c && c.indexOf('messages-item') > -1)
 		{
 			e.preventDefault();
@@ -4919,6 +5093,10 @@ function closeDialog()
 		$('.fm-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.dialog-content-block,.share-dialog-contacts').empty();
+		// add contact popup
+		$('.add-user-popup').addClass('hidden');
+		$('.fm-add-user').removeClass('active');
+		
 		delete $.copyDialog;
 		delete $.moveDialog;
 	}

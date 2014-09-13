@@ -930,10 +930,6 @@ input.radioOn, input.radioOff {
 	width: 18px;
 	height: 18px;
 }
-option[selected], option selected, option[selected=selected] {
-	background-color: #D9290B !important;
-	color: #FFFFFF !important;
-}
 .terms-main {
 	color: #595959;
 	font-size: 14px;
@@ -2441,7 +2437,7 @@ a.blog-new-archive-lnk {
 }
 .new-bottom-pages .blog-new-full p.small-pad-paragraph {
 	padding-top: 0;
-	padding-bottom: 30px
+	padding-bottom: 20px
 }
 .new-bottom-pages .blog-new-full ul.ul-small-pad {
 	padding-top: 0;
@@ -6041,6 +6037,9 @@ span.search-number {
 .fm-add-user {
 	padding: 0 10px 0 28px;
 }
+.chat-button.fm-add-user {
+	padding: 0 0 0 28px;
+}
 .fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
 	padding: 0 0 0 33px;
 }
@@ -6098,7 +6097,7 @@ span.search-number {
 .fm-start-call:hover, .fm-start-call.active {
 	background-color: rgba(6,160,236,1);
 }
-.fm-add-user:hover, .fm-add-user.active, .fm-start-call:hover, .fm-start-call.active {
+.fm-add-user:hover, .fm-add-user.active {
 	background-color: rgba(107,177,54,1);
 }
 .fm-chatbutton-arrow {
@@ -6472,6 +6471,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 16px;
 	right: 40px;
 }
+.add-user-popup .fm-dialog-close, .add-user-popup .nw-fm-dialog-title {
+	display: none;
+}
+.add-user-popup.dialog .fm-dialog-close, .add-user-popup.dialog .nw-fm-dialog-title {
+	display: block;
+}
+.add-user-popup.dialog .add-user-popup-pad {
+	margin-top: 12px;
+}
 .create-folder-input-bl, .add-user-popup-input-bl, .fm-account-input, .fm-account-select, .rename-input-bl, .fm-version-select {
 	float: left;
 	width: 235px;
@@ -6486,7 +6494,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	width: 100%;
 	float: none;
 }
-.create-folder-input-bl input, .fm-account-input input, .rename-input-bl input {
+.create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .fm-account-select, .fm-version-select {
 	width: 100%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -6494,9 +6502,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: white;
 	line-height: 18px;
 	margin-top: 0;
-	font-size: 11px;
+	font-size: 12px;
 	color: #868686;
-	padding: 6px 10px 2px 34px;
+	padding: 6px 10px 8px 34px;
 	margin: 0;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-position: 0 -1890px;
@@ -6551,15 +6559,16 @@ color: white;
 	margin: 10px 0 0 0;
 }
 .fm-account-input input {
-	padding: 7px 10px 0 10px;
+	padding: 6px 10px 8px 10px;
 	background-image: none;
 }
 .fm-account-select, .fm-version-select {
-	background-position: right -6593px;
+	background-position: right -6595px;
 	background-image: url(../images/mega/main-sprite.png?v=7);
 	background-repeat: no-repeat;
 	padding: 0;
 	position: relative;
+	background-color: rgba(0,0,0,0.05);
 }
 .fm-account-select select, .fm-version-select select {
 	height: 32px;
@@ -7275,7 +7284,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 18px;
 	position: absolute;
 	right: 100px;
-    top: 11px;
+	top: 11px;
 	font-family: "Open Sans Semibold", Arial;
 	font-variant: small-caps;
 }
@@ -11159,7 +11168,7 @@ table {
 	margin: 18px 0;
 	width: 250px;
 }
-.account-select-txt {
+.account-select-txt, .version-select-txt {
 	display: block;
 	line-height: 30px;
 	font-size: 12px;
@@ -13942,6 +13951,16 @@ span.browsers-update {
 }
 .sync-button.linux {
 	background-position: -462px -322px;
+}
+.linux-install-txt {
+	text-align: center;
+	padding: 0;
+	display: inline-block;
+	margin-top: 15px;
+	color: rgba(0,0,0,0.6);
+	font-size: 12px;
+	margin-bottom: -10px;
+	line-height: 24px;
 }
 .sync-button-block {
 	display: inline-block;
@@ -17931,8 +17950,11 @@ ul.token-input-list-mega {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding: 0 10px 4px 31px;
+	padding: 0 35px 4px 31px;
 	overflow: hidden;
+}
+.add-user-popup-pad ul.token-input-list-mega {
+	padding: 0 10px 4px 31px;
 }
 .multiple-input {
 	-moz-border-radius: 5px;
@@ -17968,12 +17990,14 @@ ul.token-input-list-mega {
 	position: absolute;
 	right: -14px;
 	width: 20px;
+	padding:0;
 }
 ul.token-input-list-mega li input, .multiple-input input {
 	border: 0;
 	width: 100px;
 	padding: 0;
 	background-color: transparent;
+	font-size: 12px;
 	line-height: 18px;
 	margin: 0;
 	padding: 6px 3px 4px 3px;
@@ -18675,6 +18699,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .video-full-canvas-block.video-off img, .video-full-canvas-block.video-off video {
 	display: none;
+}
+.ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
+	display: inline-block;
+	min-width: 234px;
+	width: auto;
+	border-color: #8d8c8c;
+}
+.ads-bottom-block .sync-button:hover, .ads-bottom-block .sync-button.active, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
+	border-color: #DB3200;
+	min-width: 240px;
+>>>>>>> master
 }
 .video-call-border {
 	width: 40px;

@@ -998,7 +998,7 @@ function removeValue(array, value, can_fail) {
 }
 
 function setTransferStatus( dl, status, ethrow, lock) {
-	var id = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id;
+	var id = dl && DownloadManager.GetGID(dl);
 	var text = '' + status;
 	if (text.length > 44) text = text.substr(0,42) + '...';
 	$('.transfer-table #' + id + ' td:eq(6)').text(text);
@@ -1146,34 +1146,34 @@ function megaUserIdEncodeForXmpp(handle) {
 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
- * 
+ *
  * @author <a href="mailto:gary.court.gmail.com">Gary Court</a>
  * @see http://github.com/garycourt/murmurhash-js
  * @author <a href="mailto:aappleby.gmail.com">Austin Appleby</a>
  * @see http://sites.google.com/site/murmurhash/
- * 
+ *
  * @param {string} key ASCII only
  * @param {number} seed Positive integer only
- * @return {number} 32-bit positive integer hash 
+ * @return {number} 32-bit positive integer hash
  */
 function MurmurHash3(key, seed) {
 	var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
-	
+
 	remainder = key.length & 3; // key.length % 4
 	bytes = key.length - remainder;
 	h1 = seed || 0xe6546b64;
 	c1 = 0xcc9e2d51;
 	c2 = 0x1b873593;
 	i = 0;
-	
+
 	while (i < bytes) {
-	  	k1 = 
+	  	k1 =
 	  	  ((key.charCodeAt(i) & 0xff)) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 8) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 16) |
 	  	  ((key.charCodeAt(++i) & 0xff) << 24);
 		++i;
-		
+
 		k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
 		k1 = (k1 << 15) | (k1 >>> 17);
 		k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
@@ -1183,20 +1183,20 @@ function MurmurHash3(key, seed) {
 		h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
 		h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
 	}
-	
+
 	k1 = 0;
-	
+
 	switch (remainder) {
 		case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
 		case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
 		case 1: k1 ^= (key.charCodeAt(i) & 0xff);
-		
+
 		k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
 		k1 = (k1 << 15) | (k1 >>> 17);
 		k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
 		h1 ^= k1;
 	}
-	
+
 	h1 ^= key.length;
 
 	h1 ^= h1 >>> 16;
@@ -1210,7 +1210,7 @@ function MurmurHash3(key, seed) {
 
 /**
  *	Create a pool of workers, it returns a Queue object
- *	so it can be called many times and it'd be throttled 
+ *	so it can be called many times and it'd be throttled
  *	by the queue
  */
 function CreateWorkers(url, message, size) {
@@ -1289,10 +1289,62 @@ function str_mtrunc(str, len)
 {
 	if (!len) len = 35;
 	if (len > (str||'').length) return str;
-
 	var p1 = Math.ceil(0.60 * len),
 		p2 = Math.ceil(0.30 * len);
 	return str.substr(0, p1) + '\u2026' + str.substr(-p2);
+}
+
+function setupTransferAnalysis()
+{
+	if ($.mTransferAnalysis) return;
+
+	var prev = {};
+	$.mTransferAnalysis = setInterval(function()
+	{
+		if (uldl_hold) prev = {};
+		else if ($.transferprogress)
+		{
+			var tp = $.transferprogress;
+
+			for (var i in tp)
+			{
+				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1])
+				{
+					delete prev[i];
+				}
+				else if (prev[i] && prev[i] == tp[i][0])
+				{
+					(function(p, t)
+					{
+						var r = '', data = [];
+
+						if (t === 'Upload')
+						{
+							var w = GlobalProgress[i];
+							if (w && (w = w.working) && w.length)
+							{
+								var j = w.length;
+								r = '(resurrecting ' + j + ')';
+								while (j--)
+								{
+									data.push(''+(w[j].xhr&&w[j].xhr.__failed)+','+(!!w[j].bytes));
+									w[j].on_error(0,0,'Stuck');
+								}
+							}
+						}
+						console.error(t + ' stuck. ' + r, i, p[0], p[1], Math.floor(p[0]/p[1]*100), data.join("~"));
+
+						Soon(function()
+						{
+							throw new Error('['+dlMethod.name+'] ' + t + ' Stuck ' + r);
+						});
+					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
+					delete prev[i];
+				}
+				else prev[i] = tp[i][0];
+			}
+		}
+	}, 97000);
 }
 
 function percent_megatitle()
@@ -1526,7 +1578,7 @@ function disableDescendantFolders(id, pref)
 {
 	var folders = [];
 	for(var i in M.c[id]) if (M.d[i] && M.d[i].t === 1 && M.d[i].name) folders.push(M.d[i]);
-	
+
 	for (var i in folders)
 	{
 		var sub = false;

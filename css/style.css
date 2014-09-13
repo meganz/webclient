@@ -6037,6 +6037,9 @@ span.search-number {
 .fm-add-user {
 	padding: 0 10px 0 28px;
 }
+.chat-button.fm-add-user {
+	padding: 0 0 0 28px;
+}
 .fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
 	padding: 0 0 0 33px;
 }
@@ -6094,7 +6097,7 @@ span.search-number {
 .fm-start-call:hover, .fm-start-call.active {
 	background-color: rgba(6,160,236,1);
 }
-.fm-add-user:hover, .fm-add-user.active, .fm-start-call:hover, .fm-start-call.active {
+.fm-add-user:hover, .fm-add-user.active {
 	background-color: rgba(107,177,54,1);
 }
 .fm-chatbutton-arrow {

@@ -148,6 +148,7 @@ var chatui;
                 $('.copy-dialog').removeClass('hidden');
                 handleDialogContent('.cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
+				$('body').addClass('overlayed');
 
                 //TODO: fix this after #602 is ready.
 

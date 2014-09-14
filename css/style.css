@@ -18709,7 +18709,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .ads-bottom-block .sync-button:hover, .ads-bottom-block .sync-button.active, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
 	border-color: #DB3200;
 	min-width: 240px;
->>>>>>> master
 }
 .video-call-border {
 	width: 40px;
@@ -18949,6 +18948,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 100%;
 	color: rgba(255,255,255,0.3);
 	font-family: 'Open Sans Light';
+}
+.overlayed .fmholder, .overlayed #mobilefmholder {
+	-webkit-filter: blur(0.5em);
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

@@ -80,10 +80,12 @@ function startRecovery()
 					$('.fm-dialog.reset-success .fm-dialog-button').bind('click',function(e)
 					{
 						$('.fm-dialog-overlay').addClass('hidden');
+						$('body').removeClass('overlayed');
 						$('.fm-dialog.reset-success').addClass('hidden');
 						delete $.dialog;
 					});
 					$('.fm-dialog-overlay').removeClass('hidden');
+					$('body').addClass('overlayed');
 					$('.fm-dialog.reset-success').removeClass('hidden');
 					$.dialog = 'resetsuccess';
 				}

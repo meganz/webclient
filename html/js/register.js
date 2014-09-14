@@ -108,6 +108,7 @@ function registeraccount()
 				{
 					$('.fm-dialog.registration-success').removeClass('hidden');
 					$('.fm-dialog-overlay').removeClass('hidden');
+					$('body').addClass('overlayed');
 					$('.fm-dialog.registration-success').unbind('click');
 				}
 				var ops = {a:'up'};				

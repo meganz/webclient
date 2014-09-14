@@ -398,6 +398,7 @@ function dlcomplete(id)
 	if ($('#dlswf_' + id).length > 0)
 	{
 		$('.fm-dialog-overlay').removeClass('hidden');
+		$('body').addClass('overlayed');
 		$('.fm-dialog.download-dialog').css('left','50%');
 		$('.fm-dialog.download-dialog .fm-dialog-close').unbind('click');
 		$('.fm-dialog.download-dialog .fm-dialog-close').bind('click',function(e)
@@ -410,6 +411,7 @@ function dlcomplete(id)
 				{
 					$('.fm-dialog.download-dialog').css('left','50%');
 					$('.fm-dialog-overlay').removeClass('hidden');
+					$('body').addClass('overlayed');
 				}
 			});
 		});
@@ -437,6 +439,7 @@ function dlkeyDialog()
 	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
 	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
 	$('.fm-dialog-overlay').removeClass('hidden');	
+	$('body').addClass('overlayed');
 	$('.fm-dialog.dlkey-dialog input').unbind('focus');
 	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
 	{
@@ -458,6 +461,7 @@ function dlkeyDialog()
 	{
 		$('.fm-dialog.dlkey-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');	
+		$('body').removeClass('overlayed');
 		document.location.hash = '#!' + dlpage_ph + '!' + $('.fm-dialog.dlkey-dialog input').val();
 	});	
 	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
@@ -465,6 +469,7 @@ function dlkeyDialog()
 	{
 		$('.fm-dialog.dlkey-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');	
+		$('body').removeClass('overlayed');
 	});
 }
 

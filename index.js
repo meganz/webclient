@@ -1256,6 +1256,7 @@ function topmenuUI()
 	{
 		$('.fm-dialog.registration-success').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
+		$('body').removeClass('overlayed');
 	}
 
 	if (page.substr(0,2) !== 'fm' && u_type == 3 && !avatars[u_handle]) M.avatars();
@@ -1390,6 +1391,7 @@ function languageDialog(close)
 	{
 		$('.fm-dialog.languages-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
+		$('body').removeClass('overlayed');
 		$.dialog=false;
 		return false;
 	}
@@ -1422,6 +1424,7 @@ function languageDialog(close)
 	$('.languages-dialog-body').html(html);
 	$('.fm-dialog.languages-dialog').removeClass('hidden');
 	$('.fm-dialog-overlay').removeClass('hidden');
+	$('body').addClass('overlayed');
 	$.dialog='languages';
 	$('.fm-dialog.languages-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.languages-dialog .fm-dialog-close').bind('click',function(e)

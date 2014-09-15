@@ -23,8 +23,14 @@ function newXhr() {
 	xhr._send  = xhr.send
 
 	xhr.send = function() {
-		xhr.started = Date.now()
-		xhr._send.apply(this, arguments)
+		if (arguments.length == 0)	{
+			// download
+			xhr.started = Date.now()
+			return xhr._send();
+		}
+
+		// upload
+		return xhr._send.apply(this, arguments)
 	}
 
 	xhr.abort = function() {
@@ -70,6 +76,11 @@ function newXhr() {
 	xhr.upload.onprogress = function() {
 		if (!xhr.listener) return xhr.nolistener(); /* no one is listening */
 		xhr.setup_timeout();
+		/**
+		 *	Update the start time, so we meassure the response time
+		 *	not the upload time
+		 */
+		xhr.started = Date.now()
 
 		if (xhr.listener.on_upload_progress) {
 			xhr.listener.on_upload_progress(arguments, xhr);

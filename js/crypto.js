@@ -1474,6 +1474,7 @@ function api_cachepubkeys2(res, ctx) {
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
                 if (d) {
+                    // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
                     authring.scrubAuthRing();
                 } else {
                     throw new Error('Fingerprint does not match previously seen one!');
@@ -2746,7 +2747,12 @@ function _checkFingerprintEd25519(userhandle) {
     var value = {pubkey: pubEd25519[userhandle],
                  authenticated: recorded};
     if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        throw new Error('Fingerprint does not match previously authenticated one!');
+        if (d) {
+            // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
+            authring.scrubAuthRing();
+        } else {
+            throw new Error('Fingerprint does not match previously authenticated one!');
+        }
     }
     if (recorded === false) {
         authring.setContactAuthenticated(userhandle, fingerprint, 'Ed25519',
@@ -2777,15 +2783,7 @@ function getPubEd25519(userhandle, callback) {
         throw new Error('First initialise u_authring by calling authring.getContacts()');
     }
     if (pubEd25519[userhandle]) {
-        try {
-            var value = _checkFingerprintEd25519(userhandle);
-        } catch (e) {
-            if (d && e === 'Fingerprint does not match previously authenticated one!') {
-                authring.scrubAuthRing();
-            } else {
-                throw e;
-            }
-        }
+        var value = _checkFingerprintEd25519(userhandle);
         if (callback) {
             callback(value, userhandle);
         }

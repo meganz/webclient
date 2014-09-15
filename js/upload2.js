@@ -31,6 +31,7 @@ function ul_completepending(target)
 function ul_completepending2(res,ctx)
 {
 	DEBUG("ul_completepending2", res, ctx)
+	ASSERT(typeof res == 'object' && res.f, 'Unexpected UL Server Response.', res);
 	if (typeof res == 'object' && res.f)
 	{
 		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
@@ -234,18 +235,18 @@ var UploadManager =
 
 	restart : function UM_restart(file)
 	{
+		var gid = this.GetGID(file);
+
 		file.retries  = 0;
 		file.sent     = 0;
 		file.progress = {};
 		file.posturl  = "";
 		file.completion = [];
-
-		ERRDEBUG("restart()", file.name)
-		ulQueue._queue = $.grep(ulQueue._queue, function(task) {
-			return task[0].file != file;
-		});
-
 		file.abort = true;
+
+		ERRDEBUG("restart()", file.name, gid);
+		ulQueue.pause(gid);
+		ulQueue.filter(gid);
 
 		ERRDEBUG("fatal error restarting", file.name)
 		onUploadError(file.id, "Upload failed - restarting upload");
@@ -269,9 +270,12 @@ var UploadManager =
 		var tid = ++file.__umRetries;
 		file.__umRetryTimer[tid] = setTimeout(function()
 		{
-			delete file.__umRetryTimer[tid];
+			var q = file.__umRetryTimer || {};
+			delete q[tid];
+			
+			if (reason.indexOf('IO failed') == -1) tid = --file.__umRetries;
 
-			if (reason.indexOf('IO failed') == -1 || tid < 66)
+			if (tid < 66)
 			{
 				var newTask = new ChunkUpload(file, start, end);
 				ulQueue.pushFirst(newTask);
@@ -282,11 +286,15 @@ var UploadManager =
 				msgDialog('warninga', l[1309], l[1498] + ': ' + file.name, reason);
 				UploadManager.abort(file);
 			}
-			ulQueue.resume();
+			if (!$.len(q))
+			{
+				delete file.__umRetryTimer;
+				ulQueue.resume();
+			}
 		}, 950+Math.floor(Math.random()*2e3))
 
 		ERRDEBUG("retrying chunk because of", reason + "")
-		onUploadError(file.id, "Upload failed - retrying");
+		onUploadError(file.id, "Upload failed - retrying", reason.substr(0,2) == 'IO' ? 'IO Failed' : reason);
 
 		chunk.done(); /* release worker */
 	},
@@ -489,6 +497,10 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 }
 
 ChunkUpload.prototype.on_ready = function(args, xhr) {
+	if (!this.file || !this.file.progress) {
+		if (d) console.error('Upload aborted... ' + this, this);
+		return Soon(this.done.bind(this));
+	}
 	if (xhr.status == 200 && typeof xhr.response == 'string' && xhr.statusText == 'OK') {
 		var response = xhr.response
 		if (response.length > 27) {
@@ -510,19 +522,20 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 				var filekey = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^mac[0]^mac[1],ul_key[3]^mac[2]^mac[3],ul_key[4],ul_key[5],mac[0]^mac[1],mac[2]^mac[3]];
 
 				if (u_k_aes && !this.file.ul_completing) {
-					var ctx = {
-						file: this.file,
-						size: this.file.size,
-						ul_queue_num : this.file.pos,
-						callback : ul_completepending2,
-						faid : this.file.faid
-					};
+					// var ctx = {
+						// file: this.file,
+						// size: this.file.size,
+						// ul_queue_num : this.file.pos,
+						// callback : ul_completepending2,
+						// faid : this.file.faid
+					// };
+					//api_completeupload(response, ul_queue[file.id], filekey,ctx);
 					this.file.ul_completing = true;
 					this.file.filekey       = filekey
 					this.file.response      = base64urlencode(response)
 					ul_finalize(this.file);
-					//api_completeupload(response, ul_queue[file.id], filekey,ctx);
 				} else {
+					ASSERT(0, 'BUG: Assigning to file.completion which is unused.');
 					this.file.completion.push([
 						response.url, this.file, filekey, this.file.id
 					]);
@@ -536,19 +549,21 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			return this.done();
 
 		} else {
-			DEBUG("Invalid upload response: " + response);
+			ASSERT(0, "Invalid upload response: " + response);
 			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
 	}
+	
+	this.srverr = xhr.status + 1;
 
-	if (d) console.log("bad response from server",
+	if (d) console.log(this+" bad response from server",
 		xhr.status,
 		this.file.name,
 		typeof xhr.response == 'string',
 		xhr.statusText
 	);
 
-	this.oet = setTimeout(this.on_error.bind(this, null, null, "bad response from server"), 950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.on_error.bind(this, null, null, "bad response from server"), 1950+Math.floor(Math.random()*2e3));
 }
 
 ChunkUpload.prototype.upload = function() {
@@ -637,6 +652,7 @@ FileUpload.prototype.toString = function() {
 
 FileUpload.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this);
+	if (!this.file) return;
 	// Hmm, looks like there are more ChunkUploads than what we really upload (!?)
 	if (d) ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
 	if (is_chrome_firefox && this.file._close)
@@ -647,10 +663,14 @@ FileUpload.prototype.destroy = function() {
 	{
 		var t = this.file.__umRetryTimer;
 		for (var i in t) clearTimeout(t[i]);
+		ulQueue.resume();
 	}
 	if (this.file.done_starting) Soon(this.file.done_starting);
-	this.file.ul_reader.filter(this.gid);
-	this.file.ul_reader.destroy();
+	if (this.file.ul_reader)
+	{
+		this.file.ul_reader.filter(this.gid);
+		this.file.ul_reader.destroy();
+	}
 	delete GlobalProgress[this.gid];
 	oDestroy(this.file);
 	oDestroy(this);

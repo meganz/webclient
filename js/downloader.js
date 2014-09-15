@@ -179,10 +179,9 @@ ClassChunk.prototype.isCancelled = function() {
 
 // finish_download {{{
 ClassChunk.prototype.finish_download = function() {
-	ASSERT(!!this.xhr || !this.dl || this.dl.cancelled, "Don't call me twice!");
+	if (d) ASSERT(!!this.xhr || !this.dl || this.dl.cancelled, "Don't call me twice!");
 	if (this.xhr) {
-		this.xhr.xhr_cleanup(0x9ffe);
-		delete this.xhr;
+		this.abort();
 		this.task_done.apply(this, arguments);
 	}
 }

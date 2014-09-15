@@ -389,14 +389,30 @@ else
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
 			{
-				if (__cdumps.length > 4) return false;
+				function mTrim(s)
+				{
+					return s
+						.replace(/resource:.+->\s/,'')
+						.replace(/blob:[^:\s]+/, '..')
+						.replace(/\.\.:\/\/[^:\s]+/, '..')
+						.replace('chrome://mega/content','..')
+						.replace(/file:.+extensions/,'..fx')
+						.replace(/(?: line \d+ > eval)+/g,' >.eval')
+				}
+				if (__cdumps.length > 3) return false;
 
-				var dump = { m : '' + msg, f : ('' + url).replace(/^blob:[^:]+/, '..'), l : ln }, cc;
+				var dump = {
+					m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
+					f : mTrim('' + url), l : ln
+				}, cc;
 
 				if (errobj)
 				{
-					if (errobj.stack) dump.s = ('' + errobj.stack).replace(/blob:[^:\s]+/g, '..');
 					if (errobj.udata) dump.d = errobj.udata;
+					if (errobj.stack)
+					{
+						dump.s = ('' + errobj.stack).split("\\n").splice(0,9).map(mTrim).join("\\n");
+					}
 				}
 				if (cn) dump.c = cn;
 
@@ -429,32 +445,30 @@ else
 				if (__cd_t) clearTimeout(__cd_t);
 				__cd_t = setTimeout(safeCall(function()
 				{
-					var ids = [];
+					var ids = [], uds = [], r = 1;
 					for (var i in __cdumps)
 					{
 						var dump = __cdumps[i];
 
-						if (dump.x)
-						{
-							ids.push(dump.x);
-							delete dump.x;
-						}
+						if (dump.x) { ids.push(dump.x); delete dump.x; }
+						if (dump.d) { uds.push(dump.d); delete dump.d; }
+						if (dump.l < 0) r = 0;
 					}
 
 					var report = {};
 					report.ua = navigator.userAgent;
 					report.io = dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
-					report.gp = Object.keys(GlobalProgress);
 					report.tp = $.transferprogress;
 					report.id = ids.join(",");
+					report.ud = uds;
 					report.cc = cc;
 
 					if (is_chrome_firefox)
 					{
 						report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
 					}
-					report = JSON.stringify(report);
+					report = JSON.stringify(r? report:{});
 
 					for (var i in __cdumps)
 					{

@@ -49,7 +49,7 @@ function newXhr() {
 		switch(this.readyState) {
 			case this.HEADERS_RECEIVED:
 				var ttfb = Date.now() - this.started 
-				ASSERT(ttfb <= 10000, hostname(this.responseURL) + ' replied in ' + ttfb + 'ms');
+				ASSERT(ttfb <= 10000, hostname(this.responseURL) + ' took too long to reply');
 				break;
 			case 4:
 				if (this.listener.on_ready) {

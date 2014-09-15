@@ -1132,7 +1132,7 @@ function accountUI()
 						$('<div id="acc_dls_folder" style="margin-top:25px">' +
 							'<div class="account-bandwidth-txt">Downloads folder:</div>' +
 							'<input type="button" value="Browse..." style="-moz-appearance:' +
-								'progressbar;margin-right:12px;cursor:pointer" />' +
+								'button;margin-right:12px;cursor:pointer" />' +
 							'</div>'));
 					var fld = mozGetDownloadsFolder();
 					$('#acc_dls_folder').append($('<span/>').text(fld && fld.path));

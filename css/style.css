@@ -18950,6 +18950,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	font-family: 'Open Sans Light';
 }
 .overlayed .fmholder, .overlayed #mobilefmholder {
+	filter: blur(0.5em);
 	-webkit-filter: blur(0.5em);
 }
  @media only screen and (max-width: 1593px) {

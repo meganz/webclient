@@ -15,13 +15,13 @@ if (typeof loadingDialog == 'undefined')
 	loadingDialog.show = function()
 	{
 		$('.dark-overlay').show();
-		$('body').addClass('overlayed');
+		//$('body').addClass('overlayed');
 		$('.loading-spinner').show();
 	};
 	loadingDialog.hide = function()
 	{
 		$('.dark-overlay').hide();
-		$('body').removeClass('overlayed');
+		//$('body').removeClass('overlayed');
 		$('.loading-spinner').hide();
 	};
 }

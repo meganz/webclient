@@ -46,13 +46,17 @@ function dlClearActiveTransfer(dl_id)
 if (localStorage.aTransfers)
 {
 	Soon(function() {
-		var data = JSON.parse(localStorage.aTransfers), now = NOW();
+		var data = {}, now = NOW();
+		try {
+			data = JSON.parse(localStorage.aTransfers);
+		} catch(e) {}
 		for (var r in data)
 		{
 			// Let's assume there was a system/browser crash...
 			if ((now - data[r]) > 86400000) delete data[r];
 		}
-		localStorage.aTransfers = JSON.stringify(data);
+		if (!$.len(data)) delete localStorage.aTransfers;
+		else localStorage.aTransfers = JSON.stringify(data);
 	});
 }
 
@@ -197,7 +201,10 @@ ClassChunk.prototype.on_progress = function(args) {
 // XHR::on_error {{{
 ClassChunk.prototype.on_error = function(args, xhr) {
 	if (d) console.error('ClassChunk.on_error', this.task&&this.task.chunk_id, args, xhr, this);
-	if (!this.dl) return;
+	if (this.isCancelled()) {
+		ASSERT(0, 'This chunk should have been destroyed before reaching XHR.onerror..');
+		return;
+	}
 
 	this.Progress.data[this.xid][0] = 0; /* reset progress */
 	this.updateProgress(2);
@@ -299,7 +306,7 @@ ClassEmptyChunk.prototype.run = function(task_done) {
 function ClassFile(dl) {
 	this.task = dl;
 	this.dl   = dl;
-	this.gid  = dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id
+	this.gid  = DownloadManager.GetGID(dl);
 	if (!dl.zipid || !GlobalProgress[this.gid])
 	{
 		GlobalProgress[this.gid] = {data: {}, done: 0, working:[]};
@@ -396,7 +403,7 @@ ClassFile.prototype.run = function(task_done) {
 	this.dl.io.begin = function() {
 		var tasks = [];
 
-		if (this.dl.cancelled)
+		if (!this.dl || this.dl.cancelled)
 		{
 			if (d) console.log(this + ' cancelled while initializing.');
 		}
@@ -438,8 +445,10 @@ ClassFile.prototype.run = function(task_done) {
 			fetchingFile = 0;
 			task_done();
 
-			delete this.dl.urls;
-			delete this.dl.io.begin;
+			if (this.dl) {
+				delete this.dl.urls;
+				delete this.dl.io.begin;
+			}
 			task_done = null;
 		}
 

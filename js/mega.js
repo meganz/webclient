@@ -15,11 +15,13 @@ if (typeof loadingDialog == 'undefined')
 	loadingDialog.show = function()
 	{
 		$('.dark-overlay').show();
+		//$('body').addClass('overlayed');
 		$('.loading-spinner').show();
 	};
 	loadingDialog.hide = function()
 	{
 		$('.dark-overlay').hide();
+		//$('body').removeClass('overlayed');
 		$('.loading-spinner').hide();
 	};
 }
@@ -439,7 +441,7 @@ function MegaData ()
 		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
 		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
-		if (sharedfolderUI()) $(lSel).parent().find('.fm-empty-pad.fm-empty-sharef').remove();
+		sharedfolderUI()
 		$(window).trigger('resize');
 
 		hideEmptyMsg();
@@ -807,6 +809,15 @@ function MegaData ()
 		else Soon(gridUI);
 		Soon(fmtopUI);
 
+		$('.shared-details-info-block .grid-url-arrow').unbind('click');
+		$('.shared-details-info-block .grid-url-arrow').bind('click', function(e) {
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = $('ul#treesub_shares .selected')
+			e.type = 'context-menu'; // FIXME: I shouldn't do this to show the right position
+			$.selected = [e.currentTarget.attr('id').substr(6)] 
+			contextmenuUI(e,1);
+		});
+
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {
 			var target = $(this).closest('tr');
@@ -950,7 +961,7 @@ function MegaData ()
 		{
 			// do nothing here
 		}
-		else if (id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
+		else if (id && id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
 			$('.fm-right-files-block').removeClass('hidden');
 			if (d) console.time('time for rendering');
@@ -1583,8 +1594,8 @@ function MegaData ()
 				msgDialog('info',l[150],l[151].replace('[X]',talready));
 			}
 			else if (res == -2) msgDialog('info',l[135],l[152]);
-			$('.add-user-popup input').val('');
-			loadingDialog.hide();
+//			$('.add-user-popup input').val('');
+//			loadingDialog.hide();
 		  }
 		});
 	};
@@ -2245,6 +2256,7 @@ function MegaData ()
 			initGridScrolling();
 			initFileblocksScrolling();
 			initTreeScroll();
+			setupTransferAnalysis();
 			downloading = !!dl_queue.length;
 		}
 
@@ -2615,6 +2627,7 @@ function MegaData ()
 		}
 		else openTransferpanel();
 
+		setupTransferAnalysis();
 		ul_uploading = !!ul_queue.length;
 	}
 

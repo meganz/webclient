@@ -312,9 +312,9 @@ var authring = (function () {
             value = key[0] + key[1];
         }
         if (format === "string") {
-            return asmCrypto.bytes_to_string(asmCrypto.SHA1.bytes(value));
+            return asmCrypto.bytes_to_string(asmCrypto.SHA256.bytes(value)).substring(0, 20);
         } else if (format === "hex") {
-            return asmCrypto.SHA1.hex(value);
+            return asmCrypto.SHA256.hex(value).substring(0, 40);
         }
     };
 
@@ -464,6 +464,38 @@ var authring = (function () {
         }
 
         return value;
+    };
+
+
+    /**
+     * Purges all fingerprints from the authentication rings.
+     *
+     * @return
+     *     void
+     */
+    ns.scrubAuthRing = function() {
+        u_authring.Ed25519 = {};
+        ns.setContacts('Ed25519');
+        u_authring.RSA = {};
+        ns.setContacts('RSA');
+    };
+
+
+    /**
+     * Purges/regenerated Ed25519 key pair and RSA pub key signature.
+     *
+     * @return
+     *     void
+     */
+    ns.scrubEd25519KeyPair = function() {
+        u_privEd25519 = jodid25519.eddsa.generateKeySeed();
+        u_keyring = {prEd255 : u_privEd25519};
+        u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
+        setUserAttribute('keyring', u_keyring, false);
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+        var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),
+                                       'RSA');
+        setUserAttribute('sigPubk', base64urlencode(sigPubk), true);
     };
 
 

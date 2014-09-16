@@ -13,7 +13,7 @@ describe("crypto unit test", function() {
 
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-    var ED25519_FINGERPRINT = base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+    var ED25519_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
 
     var stdoutHook;
     var _echo = function(x) { return x; };
@@ -241,7 +241,7 @@ describe("crypto unit test", function() {
                 callback(base64urlencode(ED25519_PUB_KEY), theCtx);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+                assert.strictEqual(myCallback.args[0][0], '21fe31dfa154a261626bf854046fd2271b7bed4b');
             });
 
             it("internal callback, custom callback", function() {
@@ -250,7 +250,7 @@ describe("crypto unit test", function() {
                 getFingerprintEd25519('you456789xw', myCallback);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+                assert.strictEqual(myCallback.args[0][0], '21fe31dfa154a261626bf854046fd2271b7bed4b');
             });
 
             it("internal callback, custom callback, hex", function() {
@@ -259,7 +259,7 @@ describe("crypto unit test", function() {
                 getFingerprintEd25519('you456789xw', myCallback ,"hex");
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
-                assert.strictEqual(myCallback.args[0][0], '5b27aa5589179770e47575b162a1ded97b8bfc6d');
+                assert.strictEqual(myCallback.args[0][0], '21fe31dfa154a261626bf854046fd2271b7bed4b');
             });
 
             it("internal callback, custom callback, string", function() {
@@ -270,7 +270,7 @@ describe("crypto unit test", function() {
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
                 assert.deepEqual(base64urlencode(myCallback.args[0][0]),
-                                 'WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+                                 'If4x36FUomFia_hUBG_SJxt77Us');
             });
         });
     });

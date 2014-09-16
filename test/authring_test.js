@@ -16,8 +16,8 @@ describe("authring unit test", function() {
     // Some test data.
     var ED25519_PRIV_KEY = atob('nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A=');
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-    var ED25519_HEX_FINGERPRINT = '5b27aa5589179770e47575b162a1ded97b8bfc6d';
-    var ED25519_STRING_FINGERPRINT = base64urldecode('WyeqVYkXl3DkdXWxYqHe2XuL_G0');
+    var ED25519_HEX_FINGERPRINT = '21fe31dfa154a261626bf854046fd2271b7bed4b';
+    var ED25519_STRING_FINGERPRINT = base64urldecode('If4x36FUomFia/hUBG/SJxt77Us');
     var RSA_PUB_KEY = [atob('1XJHwX9WYEVk7KOack5nhOgzgnYWrVdt0UY2yn5Lw38mPzkVn'
                             + 'kHCmguqWIfL5bzVpbHHhlG9yHumvyyu9r1gKUMz4Y/1cf69'
                             + '1WIQmRGfg8dB2TeRUSvwb2A7EFGeFqQZHclgvpM2aq4PXrP'
@@ -27,11 +27,26 @@ describe("authring unit test", function() {
                             + 'dcvskHUydAL0qNOqbCwvt1Y7xIQfclR0SQE/AbwuJui0mt3'
                             + 'PuGjM42T/DQ=='),
                        atob('AQE='), 2048];
-    var RSA_HEX_FINGERPRINT = 'c8a7835ba37147f2f5bb60b059c9f003fa69a552';
-    var RSA_STRING_FINGERPRINT = base64urldecode('yKeDW6NxR_L1u2CwWcnwA_pppVI');
+    var RSA_HEX_FINGERPRINT = '18ddac5acba45a711aaea54f4bb984e6c3eba37f';
+    var RSA_STRING_FINGERPRINT = base64urldecode('GN2sWsukWnEarqVPS7mE5sPro38');
     var RSA_SIGNED_PUB_KEY = atob('AAAAAFPqtrj3Qr4d83Oz/Ya6svzJfeoSBtWPC7KBU4'
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
+
+    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
+    var RING_ED25519 = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
+                                 method: ns.AUTHENTICATION_METHOD.SEEN,
+                                 confidence: ns.KEY_CONFIDENCE.UNSURE},
+                 'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
+                                 method: 0x02,
+                                 confidence: 0x04}};
+    var SERIALISED_RING_RSA = atob('me3456789xwY3axay6RacRqupU9LuYTmw+ujfwDKi7jnrvz3HBjdrFrLpFpxGq6lT0u5hObD66N/Qg==');
+    var RING_RSA = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                    method: ns.AUTHENTICATION_METHOD.SEEN,
+                                    confidence: ns.KEY_CONFIDENCE.UNSURE},
+                    'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
+                                    method: 0x02,
+                                    confidence: 0x04}};
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
@@ -45,7 +60,7 @@ describe("authring unit test", function() {
         it("_serialiseRecord()", function() {
             var tests = [['ohKpg1j6E64', ED25519_STRING_FINGERPRINT, 0x02, 0x04],
                          ['ohKpg1j6E64', ED25519_HEX_FINGERPRINT, 0x02, 0x04]];
-            var expected = 'ohKpg1j6E65bJ6pViReXcOR1dbFiod7Ze4v8bUI=';
+            var expected = 'ohKpg1j6E64h/jHfoVSiYWJr+FQEb9InG3vtS0I=';
             for (var i = 0; i < tests.length; i++) {
                 var userhandle = tests[i][0];
                 var fingerprint = tests[i][1];
@@ -62,12 +77,12 @@ describe("authring unit test", function() {
                         'you456789xw': {fingerprint: ED25519_HEX_FINGERPRINT,
                                         method: 0x02,
                                         confidence: 0x04}};
-            var expected = 'me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==';
+            var expected = 'me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==';
             assert.strictEqual(btoa(ns.serialise(test)), expected);
         });
 
         it('_splitSingleTAuthRecord()', function() {
-            var tests = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
+            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
             var result = ns._deserialiseRecord(tests);
             assert.strictEqual(result.userhandle, 'me3456789xw');
             assert.deepEqual(result.value, {fingerprint: ED25519_STRING_FINGERPRINT,
@@ -77,7 +92,7 @@ describe("authring unit test", function() {
         });
 
         it('deserialise()', function() {
-            var tests = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
+            var tests = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LQg==');
             var expected = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                             method: ns.AUTHENTICATION_METHOD.SEEN,
                                             confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -89,21 +104,6 @@ describe("authring unit test", function() {
     });
 
     describe('getting/setting u_authring.Ed25519', function() {
-        var aSerialisedRing = atob('me3456789xxbJ6pViReXcOR1dbFiod7Ze4v8bQDKi7jnrvz3HFsnqlWJF5dw5HV1sWKh3tl7i/xtQg==');
-        var aRing = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                     method: ns.AUTHENTICATION_METHOD.SEEN,
-                                     confidence: ns.KEY_CONFIDENCE.UNSURE},
-                     'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                     method: 0x02,
-                                     confidence: 0x04}};
-        var aSerialisedRingRSA = atob('me3456789xzIp4Nbo3FH8vW7YLBZyfAD+mmlUgDKi7jnrvz3HMing1ujcUfy9btgsFnJ8AP6aaVSQg==');
-        var aRingRSA = {'me3456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                        method: ns.AUTHENTICATION_METHOD.SEEN,
-                                        confidence: ns.KEY_CONFIDENCE.UNSURE},
-                        'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                        method: 0x02,
-                                        confidence: 0x04}};
-
         describe('getContacts()', function() {
             it("internal callback error, no custom callback", function() {
                 sandbox.stub(u_authring, 'Ed25519', undefined);
@@ -125,8 +125,8 @@ describe("authring unit test", function() {
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
-                callback({'': aSerialisedRing}, theCtx);
-                assert.deepEqual(u_authring.Ed25519, aRing);
+                callback({'': SERIALISED_RING_ED25519}, theCtx);
+                assert.deepEqual(u_authring.Ed25519, RING_ED25519);
             });
 
             it("internal callback error, custom callback", function() {
@@ -153,10 +153,10 @@ describe("authring unit test", function() {
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
-                callback({'': aSerialisedRing}, theCtx);
+                callback({'': SERIALISED_RING_ED25519}, theCtx);
                 sinon.assert.calledOnce(myCallback);
-                assert.deepEqual(myCallback.args[0][0], aRing);
-                assert.deepEqual(u_authring.Ed25519, aRing);
+                assert.deepEqual(myCallback.args[0][0], RING_ED25519);
+                assert.deepEqual(u_authring.Ed25519, RING_ED25519);
             });
 
             it("unsupported key type", function() {
@@ -172,8 +172,8 @@ describe("authring unit test", function() {
                 assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
                 var callback = getUserAttribute.args[0][3];
                 var theCtx = getUserAttribute.args[0][4];
-                callback({'': aSerialisedRingRSA}, theCtx);
-                assert.deepEqual(u_authring.RSA, aRingRSA);
+                callback({'': SERIALISED_RING_RSA}, theCtx);
+                assert.deepEqual(u_authring.RSA, RING_RSA);
             });
         });
 
@@ -181,7 +181,7 @@ describe("authring unit test", function() {
             var aesKey = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
 
             it("no custom callback", function() {
-                sandbox.stub(u_authring, 'Ed25519', aRing);
+                sandbox.stub(u_authring, 'Ed25519', RING_ED25519);
                 sandbox.stub(window, 'setUserAttribute');
                 ns.setContacts('Ed25519');
                 sinon.assert.calledOnce(setUserAttribute);
@@ -189,7 +189,7 @@ describe("authring unit test", function() {
             });
 
             it("custom callback with error", function() {
-                sandbox.stub(u_authring, 'Ed25519', aRing);
+                sandbox.stub(u_authring, 'Ed25519', RING_ED25519);
                 sandbox.stub(window, 'u_k', aesKey);
                 sandbox.stub(window, 'api_req');
                 sandbox.spy(window, 'setUserAttribute');
@@ -205,7 +205,7 @@ describe("authring unit test", function() {
             });
 
             it("custom callback", function() {
-                sandbox.stub(u_authring, 'Ed25519', aRing);
+                sandbox.stub(u_authring, 'Ed25519', RING_ED25519);
                 sandbox.stub(window, 'u_k', aesKey);
                 sandbox.stub(window, 'api_req');
                 sandbox.spy(window, 'setUserAttribute');
@@ -226,11 +226,12 @@ describe("authring unit test", function() {
             });
 
             it("authring for RSA", function() {
-                sandbox.stub(u_authring, 'RSA', aRingRSA);
+                sandbox.stub(u_authring, 'RSA', RING_RSA);
                 sandbox.stub(window, 'setUserAttribute');
                 ns.setContacts('RSA');
                 sinon.assert.calledOnce(setUserAttribute);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authRSA');
+                assert.strictEqual(setUserAttribute.args[0][1][''], SERIALISED_RING_RSA);
             });
         });
     });
@@ -483,6 +484,54 @@ describe("authring unit test", function() {
                     assert.throws(function() { ns._byteStringToLong(testString); },
                                   'Integer not suitable for lossless conversion in JavaScript.');
                 }
+            });
+        });
+    });
+
+    describe('scrubber', function() {
+        describe('scrubAuthRing()', function() {
+            it("with populated u_authring", function() {
+                u_authring = {'Ed25519': RING_ED25519, 'RSA': RING_RSA};
+                sandbox.stub(ns, 'setContacts');
+                ns.scrubAuthRing();
+                assert.strictEqual(ns.setContacts.args.length, 2);
+                assert.deepEqual(ns.setContacts.args[0], ['Ed25519']);
+                assert.deepEqual(ns.setContacts.args[1], ['RSA']);
+                assert.deepEqual(u_authring, {'Ed25519': {}, 'RSA': {}});
+            });
+
+            it("with unpopulated u_authring", function() {
+                u_authring = {'Ed25519': {}, 'RSA': {}};
+                sandbox.stub(ns, 'setContacts');
+                ns.scrubAuthRing();
+                assert.strictEqual(ns.setContacts.args.length, 2);
+                assert.deepEqual(ns.setContacts.args[0], ['Ed25519']);
+                assert.deepEqual(ns.setContacts.args[1], ['RSA']);
+                assert.deepEqual(u_authring, {'Ed25519': {}, 'RSA': {}});
+            });
+        });
+
+
+        describe('scrubEd25519KeyPair()', function() {
+            it("with populated u_authring", function() {
+                u_authring = {'Ed25519': RING_ED25519, 'RSA': RING_RSA};
+                u_privEd25519 = ED25519_PRIV_KEY;
+                u_pubEd25519 = ED25519_PUB_KEY;
+                u_keyring = {prEd255 : u_privEd25519};
+                u_attr = {pubk : RSA_PUB_KEY};
+                sandbox.stub(window, 'setUserAttribute');
+                ns.scrubEd25519KeyPair();
+                assert.strictEqual(u_attr.pubk, RSA_PUB_KEY);
+                assert.notStrictEqual(u_privEd25519, ED25519_PRIV_KEY);
+                assert.notStrictEqual(u_pubEd25519, ED25519_PUB_KEY);
+                assert.notDeepEqual(u_keyring, {prEd255 : ED25519_PRIV_KEY});
+                assert.strictEqual(setUserAttribute.args.length, 3);
+                assert.strictEqual(setUserAttribute.args[0][0], 'keyring');
+                assert.strictEqual(setUserAttribute.args[0][2], false);
+                assert.strictEqual(setUserAttribute.args[1][0], 'puEd255');
+                assert.strictEqual(setUserAttribute.args[1][2], true);
+                assert.strictEqual(setUserAttribute.args[2][0], 'sigPubk');
+                assert.strictEqual(setUserAttribute.args[2][2], true);
             });
         });
     });

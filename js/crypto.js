@@ -122,7 +122,6 @@ function prepare_key_pw(password)
 var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
 var b64a = b64.split('');
 
-
 // unsubstitute standard base64 special characters, restore padding
 function base64urldecode(data)
 {
@@ -959,7 +958,7 @@ function api_proc(q)
 			{
 				var response = this.responseText || this.response;
 
-				if (d) console.log('API response: ' + this.response);
+				if (d) console.log('API response: ', response);
 
 				try {
 					t = JSON.parse(response);
@@ -1835,6 +1834,8 @@ function is_image(name)
 
 var storedattr = {};
 var faxhrs = [];
+var faxhrfail = {};
+var faxhrlastgood = {};
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id,type,key,data,ctx)
@@ -1877,6 +1878,7 @@ function api_fareq(res,ctx)
 			}
 
 			faxhrs[slot].ctx = ctx;
+			faxhrs[slot].fa_slot = slot;
 
 			if (d) console.log("Using file attribute channel " + slot);
 
@@ -1898,37 +1900,62 @@ function api_fareq(res,ctx)
 				{ // Huh? Gecko..
 					faxhrs[slot].onprogress = function() {};
 				}
+
+				faxhrs[slot].timeout = 180000;
+				faxhrs[slot].ontimeout = function(e)
+				{
+					if (d) console.error('api_fareq timeout', e);
+
+					if (!faxhrfail[this.fa_host])
+					{
+						if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
+						{
+							faxhrfail[this.fa_host] = failtime = 1;
+							api_reportfailure(this.fa_host, function() {});
+						}
+					}
+				};
 			}
 
 			faxhrs[slot].faeot = function()
 			{
-				if (this.fart) clearTimeout(this.fart);
-				if (!this.ctx.errfa) return;
-				if (d) console.log('FAEOT', this);
-
-				var ctx = this.ctx;
-				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				if (id !== slideshowid)
+				if (faxhrs[this.fa_slot])
 				{
-					if (id)
-					{
-						pfails[id] = 1;
-						delete preqs[id];
-					}
+					faxhrs[this.fa_slot] = undefined;
+					this.fa_slot = -1;
 
-					return;
+					if (this.ctx.errfa)
+					{
+						var ctx = this.ctx;
+						var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+
+						if (d) console.error('FAEOT', id, this);
+
+						if (id !== slideshowid)
+						{
+							if (id)
+							{
+								pfails[id] = 1;
+								delete preqs[id];
+							}
+						}
+						else
+						{
+							this.abort();
+							this.ctx.errfa(id,1);
+						}
+					}
 				}
 
-				this.abort();
-				this.ctx.errfa(id,1);
+				if (this.fart) clearTimeout(this.fart);
 			};
 
 			faxhrs[slot].onerror = function()
 			{
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				if (this.ctx.errfa) this.ctx.errfa(id,1);
-				else console.error('errfa', id);
+				if (ctx.errfa) ctx.errfa(id,1);
+				else console.error('api_fareq', id, this);
 			}
 
 			faxhrs[slot].onreadystatechange = function()
@@ -2002,6 +2029,8 @@ function api_fareq(res,ctx)
 								api_attachfileattr(storedattr[ctx.id].target,ctx.id);
 							}
 						}
+
+						faxhrlastgood[this.fa_host] = Date.now();
 					}
 					else
 					{
@@ -2063,6 +2092,7 @@ function api_fareq(res,ctx)
 
                 if (t < 0) t = pp[m].length-1;
 
+				faxhrs[slot].fa_host = hostname(pp[m].substr(0,t+1));
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
 
 				faxhrs[slot].responseType = 'arraybuffer';
@@ -2214,7 +2244,6 @@ function crypto_procsr(sr)
 
 	ctx.callback(false,ctx);
 }
-
 
 var keycache = {};
 
@@ -2520,7 +2549,6 @@ function crypto_share_rsa2aes()
 	}
 }
 
-
 (function __FileFingerprint(scope) {
 
 	var CRC_SIZE   = 16;
@@ -2684,9 +2712,6 @@ function crypto_share_rsa2aes()
 	};
 })(this);
 
-
-
-
 var u_keyring;
 var u_privEd25519;
 var u_pubEd25519;
@@ -2703,7 +2728,6 @@ function u_initAuthentication() {
     // Load/initialise the authenticated contacts ring.
     getUserAttribute(u_handle, 'keyring', false, u_initAuthentication2);
 }
-
 
 /**
  * Provide Ed25519 key pair and a signed RSA pub key.
@@ -2740,7 +2764,6 @@ function u_initAuthentication2(res, ctx) {
     getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
 }
 
-
 function _checkFingerprintEd25519(userhandle) {
     var recorded = authring.getContactAuthenticated(userhandle, 'Ed25519');
     var fingerprint = authring.computeFingerprint(pubEd25519[userhandle], 'Ed25519', 'string');
@@ -2761,7 +2784,6 @@ function _checkFingerprintEd25519(userhandle) {
     }
     return value;
 }
-
 
 /**
  * Cached Ed25519 public key retrieval utility.
@@ -2807,7 +2829,6 @@ function getPubEd25519(userhandle, callback) {
         getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
     }
 }
-
 
 /**
  * Computes a user's Ed25519 key finger print. This function uses the

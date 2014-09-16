@@ -498,6 +498,7 @@ function MegaData ()
 					M.renderMain(u);
 				});
 			}
+			else $.rmItemsInView = n_cache;
 		}
 
 		delete this.cRenderMainN;
@@ -786,6 +787,7 @@ function MegaData ()
 		if (this.viewmode == 1)
 		{
 			fa_duplicates = {};
+			fa_reqcnt = 0;
 		}
 
 		this.rmSetupUI();
@@ -2441,6 +2443,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
+		else window.onerror('onDownloadError :: ' + error, '', -1);
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2622,7 +2625,7 @@ function MegaData ()
 		var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
 		delete $.onDroppedTreeFolder;
 
-		if ((onChat = (M.currentdirid.substr(0,4) === 'chat')))
+		if ((onChat = (M.currentdirid && M.currentdirid.substr(0,4) === 'chat')))
 		{
 			if (!$.ulBunch) $.ulBunch = {};
 			if (!$.ulBunch[M.currentdirid]) $.ulBunch[M.currentdirid] = {};
@@ -2826,9 +2829,11 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr)
+function onUploadError(fileid, errorstr, reason)
 {
-	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+	if (!d) window.onerror('onUploadError :: ' + errorstr + (reason ? ': ' + reason : ''), '', -1);
+
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
 
 	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')

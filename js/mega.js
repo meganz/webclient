@@ -2595,7 +2595,7 @@ function MegaData ()
 		var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
 		delete $.onDroppedTreeFolder;
 
-		if ((onChat = (M.currentdirid.substr(0,4) === 'chat')))
+		if ((onChat = (M.currentdirid && M.currentdirid.substr(0,4) === 'chat')))
 		{
 			if (!$.ulBunch) $.ulBunch = {};
 			if (!$.ulBunch[M.currentdirid]) $.ulBunch[M.currentdirid] = {};

@@ -630,7 +630,7 @@ function MegaData ()
 					{
 						t = '.grid-table.fm';
 						el = 'tr';
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><span class="grid-url-arrow"><span></span></span></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>';
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
@@ -808,6 +808,15 @@ function MegaData ()
 		}
 		else Soon(gridUI);
 		Soon(fmtopUI);
+
+		$('.shared-details-info-block .grid-url-arrow').unbind('click');
+		$('.shared-details-info-block .grid-url-arrow').bind('click', function(e) {
+			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
+			e.currentTarget = $('ul#treesub_shares .selected')
+			e.type = 'context-menu'; // FIXME: I shouldn't do this to show the right position
+			$.selected = [e.currentTarget.attr('id').substr(6)] 
+			contextmenuUI(e,1);
+		});
 
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
 		$('.grid-scrolling-table .grid-url-arrow').bind('click',function(e) {

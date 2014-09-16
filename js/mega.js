@@ -2269,7 +2269,7 @@ function MegaData ()
 		}
 
 		var p = ui_paused ? 'paused' : ''
-		if (z) this.addToTransferTable('<tr id="zip_'+zipid+'">'
+		if (z && zipsize) this.addToTransferTable('<tr id="zip_'+zipid+'">'
 			+ '<td><span class="row-number"></span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
 			+ '<td><span class="transfer-type download'+p+'">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'

@@ -152,6 +152,7 @@ function cacheselect()
 function hideEmptyMsg()
 {
 	$('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming, .fm-empty-contacts').addClass('hidden');
+	$('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
 function reselect(n)

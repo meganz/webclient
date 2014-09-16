@@ -441,7 +441,7 @@ function MegaData ()
 		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
 		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
-		if (sharedfolderUI()) $(lSel).parent().find('.fm-empty-pad.fm-empty-sharef').remove();
+		sharedfolderUI()
 		$(window).trigger('resize');
 
 		hideEmptyMsg();

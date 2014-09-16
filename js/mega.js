@@ -809,13 +809,43 @@ function MegaData ()
 		else Soon(gridUI);
 		Soon(fmtopUI);
 
+		function prepareShareMenuHandler(e) {
+			e.preventDefault(); e.stopPropagation();
+			e.currentTarget = $('ul#treesub_shares .selected')
+			e.calculatePosition = true;
+			$.selected = [e.currentTarget.attr('id').substr(6)] 
+		}
+
 		$('.shared-details-info-block .grid-url-arrow').unbind('click');
 		$('.shared-details-info-block .grid-url-arrow').bind('click', function(e) {
-			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
-			e.currentTarget = $('ul#treesub_shares .selected')
-			e.type = 'context-menu'; // FIXME: I shouldn't do this to show the right position
-			$.selected = [e.currentTarget.attr('id').substr(6)] 
+			prepareShareMenuHandler(e);
 			contextmenuUI(e,1);
+		});
+
+		$('.shared-details-info-block .fm-share-download').unbind('click');
+		$('.shared-details-info-block .fm-share-download').bind('click', function(e) {
+			prepareShareMenuHandler(e);
+			var $this = $(this);
+			e.clientX = $this.offset().left;
+			e.clientY = $this.offset().top + $this.height()
+
+			contextmenuUI(e,3);
+		});
+
+		$('.shared-details-info-block .fm-share-copy').unbind('click');
+		$('.shared-details-info-block .fm-share-copy').bind('click', function(e) {
+			$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+			$.mcselected = M.RootID;
+			$('.copy-dialog .dialog-copy-button').addClass('active');
+			$('.copy-dialog').removeClass('hidden');
+			handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+			$('.fm-dialog-overlay').removeClass('hidden');
+			$('body').addClass('overlayed');
+		});
+
+		$('.shared-details-info-block .fm-leave-share').unbind('click');
+		$('.shared-details-info-block .fm-leave-share').bind('click', function(e) {
+			$('.nw-fm-left-icon.cloud-drive').trigger('click');
 		});
 
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');

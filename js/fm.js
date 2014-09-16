@@ -622,7 +622,7 @@ function initUI()
 		$('.fm-tree-header').removeClass('dragover');
 		$('.nw-fm-tree-item').removeClass('dragover');
 		// Set to default
-		var a = $('.context-menu.files-menu');
+		var a = $('.context-menu.files-menu,.context-menu.download');
 		a.addClass('hidden');
 		var b = a.find('.context-submenu');
 		b.attr('style', '');
@@ -4176,7 +4176,7 @@ function contextmenuUI(e,ll,topmenu)
 
 	$.hideContextMenu();
 
-	var m = $('.context-menu.files-menu');// container/wrapper around menu
+	var m = $('.context-menu.files-menu');// container/wrap		else if (c && c.indexOf('cloud-drive-item') > -1)
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)
@@ -4190,6 +4190,13 @@ function contextmenuUI(e,ll,topmenu)
 		}
 		else return false;
 	}
+	else if (ll == 3) // we want just the download menu
+	{
+		$(t).hide();
+		m.hide();
+		var m = $('.context-menu.download');
+		t = '.context-menu.download .context-menu-item';
+	}
 	else if (ll)// click on item
 	{
 		$(t).hide();// Hide all menu-items
@@ -4200,6 +4207,8 @@ function contextmenuUI(e,ll,topmenu)
 
 		// detect and show right menu
 		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
+		else if (c && c.indexOf('cloud-drive-item') > -1) {
+		}
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';
@@ -4259,7 +4268,7 @@ function adjustContextMenuPosition(e, m)
 	var mPos;// menu position
 	var mX = e.clientX, mY = e.clientY;	// mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
 
-	if (e.type === 'click')// clicked on file-settings-icon
+	if (e.type === 'click' && !e.calculatePosition)// clicked on file-settings-icon
 	{
 		var ico = {'x':e.currentTarget.context.clientWidth, 'y':e.currentTarget.context.clientHeight};
 		var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon

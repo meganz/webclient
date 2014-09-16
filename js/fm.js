@@ -3689,7 +3689,7 @@ function selectddUI()
 		distance:10,
 		revertDuration:200,
 		revert: true,
-		cursorAt:{right:88,bottom:58},
+		cursorAt:{right:90,bottom:56},
 		helper: function(e,ui)
 		{
 			$(this).draggable( "option", "containment", [72,42,$(window).width(),$(window).height()] );
@@ -4480,7 +4480,7 @@ function scrollMegaSubMenu(e)
 
 function treeUI()
 {
-	console.error('treeUI');
+	// console.error('treeUI');
 	if (d) console.time('treeUI');
 	$('.fm-tree-panel .nw-fm-tree-item').draggable(
 	{

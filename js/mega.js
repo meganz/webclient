@@ -498,6 +498,7 @@ function MegaData ()
 					M.renderMain(u);
 				});
 			}
+			else $.rmItemsInView = n_cache;
 		}
 
 		delete this.cRenderMainN;
@@ -786,6 +787,7 @@ function MegaData ()
 		if (this.viewmode == 1)
 		{
 			fa_duplicates = {};
+			fa_reqcnt = 0;
 		}
 
 		this.rmSetupUI();

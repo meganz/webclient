@@ -1,13 +1,11 @@
 
 
 function createnodethumbnail(node,aes,id,imagedata,onPreviewRetry)
-{	
+{
 	storedattr[id] = {};
 	storedattr[id] = { target : node };
 	createthumbnail(false,aes,id,imagedata,node,onPreviewRetry);
 }
-
-
 
 function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 {
@@ -20,16 +18,16 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 		{
 			var t = new Date().getTime();
 			var n = M.d[node];
-					
+
 			// thumbnail:
 			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
 			{
-				var canvas = document.createElement('canvas');				
+				var canvas = document.createElement('canvas');
 				var sx=0;
 				var sy=0;
 				var x = this.width;
 				var y = this.height;
-				
+
 				if (d) console.log(x + ' by ' + y);
 				if (this.width > this.height)
 				{
@@ -47,51 +45,51 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				{
 					if (d) console.log('square');
 				}
-				
+
 				var ctx = canvas.getContext("2d");
 				canvas.width  = 120;
 				canvas.height = 120;
 				ctx.drawImage(this, sx, sy, x, y, 0, 0, 120, 120);
-				
+
 				if (d) console.log('resizing time:', new Date().getTime()-t);
 				myURL.revokeObjectURL(this.src);
 				var dataURI = canvas.toDataURL('image/jpeg',0.85);
-				
+
 				var ab = dataURLToAB(dataURI);
-				
-				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key			
-			}		
-			
-			// preview image:			
+
+				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
+			}
+
+			// preview image:
 			if (!n || !n.fa || n.fa.indexOf(':1*') < 0 || onPreviewRetry)
-			{			
+			{
 				var canvas2 = document.createElement('canvas');
 				var preview_x=this.width,preview_y=this.height;
 				if (preview_x > 1000)
-				{					
+				{
 					preview_y=Math.round(preview_y*1000/preview_x);
 					preview_x=1000;
 				}
 				else if (preview_y > 1000)
-				{					
+				{
 					preview_x=Math.round(preview_x*1000/preview_y);
 					preview_y=1000;
-				}				
+				}
 				var ctx2 = canvas2.getContext("2d");
 				canvas2.width  = preview_x;
-				canvas2.height = preview_y;			
+				canvas2.height = preview_y;
 				ctx2.drawImage(this, 0, 0, preview_x, preview_y);
-				
-				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);						
-				
+
+				var dataURI2 = canvas2.toDataURL('image/jpeg',0.85);
+
 				var ab2 = dataURLToAB(dataURI2);
-				
+
 				// only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
-				
-				if (!onPreviewRetry || !n || (n && n.u == u_handle)) api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key				
-				
+
+				if (!onPreviewRetry || !n || (n && n.u == u_handle)) api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+
 				if (node) previewimg(node,ab2);
-				
+
 				if (d) console.log('total time:', new Date().getTime()-t);
 			}
 		};
@@ -176,28 +174,27 @@ function dataURLToAB(dataURL)
 	return uInt8Array;
 }
 
-
 var ba_images=[],ba_time=0,ba_id=0,ba_result=[];
 
 function benchmarki()
 {
-	var a=0;	
-	ba_images=[];	
+	var a=0;
+	ba_images=[];
 	for (var i in M.d)
 	{
 		if (M.d[i].name && is_image(M.d[i].name) && M.d[i].fa)
-		{	
+		{
 			ba_images.push(M.d[i]);
 		}
 		else a++;
 	}
 	console.log('found ' + ba_images.length + ' images with file attr ('+a+' don\'t have file attributes)');
-	
+
 	ba_images = shuffle(ba_images);
-	
+
 	ba_result['success']=0;
 	ba_result['error']=0;
-	
+
 	benchmarkireq();
 }
 
@@ -232,42 +229,44 @@ function benchmarkireq()
 		for (var i in ba_images)
 		{
 			if (ba_images[i].h == id)
-			{		
-				ba_result['error']++;				
+			{
+				ba_result['error']++;
 				console.log('error',new Date().getTime()-ba_time,err);
 				console.log(ba_images[i].fa);
 				ba_id++;
 				benchmarkireq();
-			}		
+			}
 		}
 	}
 	eot.timeout = 5100;
 
-	var n = ba_images[ba_id];	
+	var n = ba_images[ba_id];
 	if (n)
 	{
 		var treq = {};
 		treq[n.h] = {fa:n.fa,k:n.key};
+		preqs[slideshowid = n.h] = 1;
 		api_getfileattr(treq,1,function(ctx,id,uint8arr)
 		{
 			for (var i in ba_images)
 			{
 				if (ba_images[i].h == id)
 				{
-					ba_result['success']++;					
+					ba_result['success']++;
 					console.log('success',uint8arr.length,new Date().getTime()-ba_time);
 					ba_id++;
 					benchmarkireq();
-					
+
 					previewsrc(myURL.createObjectURL(new Blob([uint8arr],{ type: 'image/jpeg' })));
-				}		
+				}
 			}
 		},eot);
 	}
-	else 
+	else
 	{
 		console.log('ready');
+		slideshowid = undefined;
+		preqs = {};
 	}
 
 }
-

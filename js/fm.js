@@ -6767,7 +6767,7 @@ function sharedfolderUI()
 				+'<div class="shared-details-info-block">'
 					+'<div class="shared-details-pad">'
 						+'<div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div>'
-						+'<a href="" class="grid-url-arrow"><span></span></a>'
+						+'<span href="" class="grid-url-arrow"><span></span></span>'
 						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
 						+'<div class="clear"></div>'
 						+'<div class="nw-contact-avatar color10">' + avatar + '</div>'

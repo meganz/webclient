@@ -2411,6 +2411,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
+		else window.onerror('onDownloadError :: ' + error, '', -1);
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2796,9 +2797,11 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr)
+function onUploadError(fileid, errorstr, reason)
 {
-	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+	if (!d) window.onerror('onUploadError :: ' + errorstr + (reason ? ': ' + reason : ''), '', -1);
+
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
 
 	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')

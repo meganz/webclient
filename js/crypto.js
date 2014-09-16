@@ -959,7 +959,7 @@ function api_proc(q)
 			{
 				var response = this.responseText || this.response;
 
-				if (d) console.log('API response: ' + this.response);
+				if (d) console.log('API response: ', response);
 
 				try {
 					t = JSON.parse(response);

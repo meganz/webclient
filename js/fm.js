@@ -546,14 +546,14 @@ function initUI()
 					M.moveNodes($.moveids,$.movet);
 				},50);
 			}
-			else if (dd == 'copy')
+			else if (dd == 'copy' || dd == 'copydel')
 			{
 				nRevert();
 				$.copyids=ids;
 				$.copyt=t;
 				setTimeout(function()
 				{
-					M.copyNodes($.copyids,$.copyt,0,function()
+					M.copyNodes($.copyids,$.copyt,dd == 'copydel',function()
 					{
 						// Update files count...
 						if (M.currentdirid === 'shares' && !M.viewmode)

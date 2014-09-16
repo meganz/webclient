@@ -322,11 +322,6 @@ ClassFile.prototype.destroy = function() {
 	if (d) console.log('Destroying ' + this, this.dl? (this.dl.cancelled? 'cancelled':'finished'):'expunged');
 	if (!this.dl) return;
 
-	if (!this.dl.cancelled && !this.emptyFile && !checkLostChunks(this.dl) &&
-		(typeof skipcheck == 'undefined' || !skipcheck)) {
-		dl_reportstatus(this.dl, EKEY);
-	}
-
 	if (this.dl.quota_t) {
 		clearTimeout(this.dl.quota_t);
 		delete this.dl.quota_t;
@@ -343,7 +338,14 @@ ClassFile.prototype.destroy = function() {
 	}
 	else
 	{
-		if (this.dl.zipid)
+		if (!this.emptyFile && !checkLostChunks(this.dl)
+		&& (typeof skipcheck == 'undefined' || !skipcheck))
+		{
+			dl_reportstatus(this.dl, EKEY);
+
+			if (this.dl.zipid) Zips[this.dl.zipid].destroy( EKEY );
+		}
+		else if (this.dl.zipid)
 		{
 			Zips[this.dl.zipid].done(this);
 		}

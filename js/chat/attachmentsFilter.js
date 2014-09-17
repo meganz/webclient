@@ -70,7 +70,7 @@ AttachmentsFilter.prototype.processBeforeRenderMessage = function(e, eventData) 
                 '<div class="nw-chat-sharing-filesize">' +
                     '750 kb' +
                 '</div>' +
-                '<div class="nw-chat-button red active save-button">Save...</div>' +
+                '<div class="nw-chat-button red save-button">Save...</div>' +
                 '<div class="nw-chat-button cancel-button">Cancel</div>' +
                 '<div class="clear"></div>' +
             '</div>'

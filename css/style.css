@@ -6992,50 +6992,12 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	transition: border 200ms ease-in-out, background-color 200ms ease-in-out;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -8px -6807px;
-	top: 8px;
-	right: 8px;
 	-webkit-background-clip: padding-box;
 	-moz-background-clip: padding-box;
 	background-clip: padding-box;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-}
-.video-call-button.size-icon.active {
-	background-position: -8px -6867px;
-}
-.video-call-button:hover {
-	border: 4px solid rgba(255,255,255,1);
-	background-color: rgba(0,0,0,0.7);
-}
-.video-call-button.audio-icon {
-	bottom: 8px;
-	left: 8px;
-	background-position: -8px -6928px;
-	top: auto;
-}
-.video-call-button.audio-icon.active {
-	background-position: -7px -7137px;
-}
-.video-call-button.video-icon {
-	bottom: 8px;
-	left: 52px;
-	background-position: -8px -6987px;
-	top: auto;
-}
-.video-call-button.video-icon.active {
-	background-position: -8px -7087px;
-}
-.video-call-button.hang-up-icon {
-	bottom: 8px;
-	right: 8px;
-	background-position: -8px -7048px;
-	top: auto;
-	background-color: rgba(219,6,5,0.7);
-}
-.video-call-button.hang-up-icon:hover {
-	background-color: rgba(219,6,5,1);
 }
 .current-user-video-container, .current-user-audio-container {
 	bottom: 0;
@@ -7079,7 +7041,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 6px;
 }
 .current-user-video-container {
-	width: 212px;
+	width: 209px;
 	min-height: 0;
 	min-width: 0;
 }
@@ -7279,7 +7241,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 4px;
 	border: 1px solid rgba(0,0,0,0.1);
 	color: rgba(0,0,0,0.3);
-	padding: 0px 2px 0px 2px;
+	padding: 0px 10px 0px 10px;
 	line-height: 15px;
 	height: 18px;
 	position: absolute;
@@ -7298,7 +7260,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(222,0,0,0.7);
 }
 .fm-chat-message .label.text-message {
-	right: 144px;
+	right: 160px;
 }
 .fm-chat-messages-pad {
 	margin: 0 0 0 0;
@@ -7403,17 +7365,16 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-chat-file-button {
 	float: none;
-	height: 24px;
 	background-color: rgba(222,0,0,0.7);
 	font-size: 12px;
+	height: 24px;
 	line-height: 22px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
 	padding: 0 10px;
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
-	border: 2px solid #b2b2b2;
 	color: white;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -7425,6 +7386,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 	border: 0;
+}
+.fm-chat-message .fm-chat-file-button {
+	margin-top: 0;
 }
 .fm-chat-file-button:hover {
 	background-color: rgba(222,0,0,1);
@@ -8530,7 +8494,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
-	min-width: 65px;
 }
 .multiple-sharing.expanded .main-body .nw-chat-button, .nw-chat-button {
 	height: 24px;
@@ -17990,7 +17953,7 @@ ul.token-input-list-mega {
 	position: absolute;
 	right: -14px;
 	width: 20px;
-	padding:0;
+	padding: 0;
 }
 ul.token-input-list-mega li input, .multiple-input input {
 	border: 0;
@@ -18621,10 +18584,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: -24px 0 0 0;
 }
 .video-full-container .video-call-button.audio-icon {
-	background-position: -8px -8758px;
+	background-position: -9px -8758px;
 }
 .video-full-container .video-call-button.audio-icon.active {
-	background-position: -8px -8928px;
+	background-position: -9px -8928px;
 }
 .video-full-container .video-call-button.video-icon {
 	background-position: -8px -8817px;
@@ -18642,7 +18605,30 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: -8px -7188px;
 	background-color: black;
 }
-.video-full-container .video-call-button {
+.fm-right-header .video-call-button.audio-icon {
+	background-position: -5px -8754px;
+}
+.fm-right-header .video-call-button.audio-icon.active {
+	background-position: -5px -8924px;
+	background-color: #4c4c4c;
+}
+.fm-right-header .video-call-button.video-icon {
+	background-position: -4px -8813px;
+}
+.fm-right-header .video-call-button.video-icon.active {
+	background-position: -4px -8872px;
+	background-color: #4c4c4c;
+}
+.fm-right-header .video-call-button.size-icon {
+	background-position: -4px -8633px;
+}
+.fm-right-header .video-call-button.size-icon.active {
+	background-position: -4px -8693px;
+}
+.fm-right-header .video-call-button.hang-up-icon {
+	background-position: -4px -7044px;
+}
+.video-full-container .video-call-button, .fm-right-header .video-call-button {
 	position: relative;
 	background-color: transparent;
 	border-color: transparent;
@@ -18730,16 +18716,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-ms-transition: all 100ms ease-in-out;
 	transition: all 100ms ease-in-out;
 }
-.video-full-container .video-call-button:hover .video-call-border {
+.video-full-container .video-call-button:hover .video-call-border, .fm-right-header .video-call-button:hover .video-call-border {
 	border-color: rgba(255,255,255,0.50);
 	margin: -24px 0 0 -24px;
 	width: 48px;
 	height: 48px;
 }
-.video-call-button.hang-up-icon .video-call-border {
+.fm-right-header .video-call-button:hover {
+	border-color: #b7b7b7;
+}
+.fm-right-header .video-call-button .video-call-border, .fm-right-header .video-call-button:hover .video-call-border {
+	border: 4px solid rgba(255,255,255,1);
+}
+.video-full-container .video-call-button.hang-up-icon .video-call-border {
 	border: 4px solid rgba(223,0,0,0.6);
 }
-.video-call-button.hang-up-icon:hover .video-call-border {
+.video-full-container .video-call-button.hang-up-icon:hover .video-call-border {
 	border: 4px solid rgba(223,0,0,0.8);
 }
 .video-full-buttons .video-call-button {
@@ -18811,6 +18803,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	-khtml-opacity: 1;
 	opacity: 1;
 }
+fm-right-header .video-controls {
+	bottom: 32px;
+}
 .video-controls.hidden-controls {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
@@ -18828,6 +18823,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 	left: 0;
 	top: 0;
 	margin: 0;
+}
+.fm-right-header .video-controls .video-full-buttons, .fm-right-header .video-controls .video-size-button {
+	background-color: rgba(255,255,255,0.7);
+}
+.fm-right-header .video-call-button {
+	left: 0;
+	top: 0;
+	position: relative;
+	border: 0;
+	background-color: #b7b7b7;
+}
+.fm-right-header .video-call-button.hang-up-icon, .fm-right-header .video-call-button.hang-up-icon:hover {
+	background-color: #e65050;
 }
 .video-controls .video-size-button {
 	height: 60px;
@@ -18955,8 +18963,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
-    transform: scale(-1, 1);
-    -webkit-transform: scale(-1, 1);
+	transform: scale(-1, 1);
+	-webkit-transform: scale(-1, 1);
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

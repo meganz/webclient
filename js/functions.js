@@ -957,10 +957,11 @@ function DEBUG() {
 	}
 }
 
-function ASSERT(what, msg) {
+function ASSERT(what, msg, udata) {
 	if (!what)
 	{
 		var af = new Error('failed assertion; ' + msg);
+		if (udata) af.udata = udata;
 		Soon(function() { throw af; });
 		if (console.assert) console.assert(what, msg);
 		else console.error('FAILED ASSERTION', msg);
@@ -1298,7 +1299,7 @@ function setupTransferAnalysis()
 {
 	if ($.mTransferAnalysis) return;
 
-	var prev = {};
+	var prev = {}, tlen = {}, time = {}, chunks = {};
 	$.mTransferAnalysis = setInterval(function()
 	{
 		if (uldl_hold) prev = {};
@@ -1314,37 +1315,77 @@ function setupTransferAnalysis()
 				}
 				else if (prev[i] && prev[i] == tp[i][0])
 				{
-					(function(p, t)
+					var p = tp[i], t = i[0] === 'u' ? 'Upload':'Download', r = '', data = [];
+					var s = GlobalProgress[i].speed, w = GlobalProgress[i].working || [];
+					var c = p[0]+'/'+p[1]+'-'+Math.floor(p[0]/p[1]*100)+'%';
+					var u = w.map(function(c)
 					{
-						var r = '', data = [];
+						var x = c.xhr || {};
+						return [''+c,x.__failed,x.__timeout,!!x.listener,x.__id,x.readyState>1&&x.status];
+					});
+					
+					if (d) console.warn(i + ' might be stuck, checking...', c, w.length, u);
 
-						if (t === 'Upload')
+					if (w.length)
+					{
+						var j = w.length;
+						while (j--)
 						{
-							var w = GlobalProgress[i];
-							if (w && (w = w.working) && w.length)
+							/**
+							 * if there's a timer, no need to call on_error ourselves
+							 * since the chunk will get restarted there by the xhr
+							 */
+							var stuck = w[j].xhr && !w[j].xhr.__timeout;
+							if (stuck)
 							{
-								var j = w.length;
-								r = '(resurrecting ' + j + ')';
-								while (j--)
+								var chunk_id = '' + w[j], n = u[j];
+								
+								if (w[j].dl && w[j].dl.lasterror) r = '[DLERR'+w[j].dl.lasterror+']';
+								else if (w[j].srverr) r = '[SRVERR'+(w[j].srverr-1)+']';
+								
+								try {
+									w[j].on_error(0,{},'Stuck');
+								} catch(e) {
+									n.push(e.message);
+								}
+								
+								if (!chunks[chunk_id])
 								{
-									data.push(''+(w[j].xhr&&w[j].xhr.__failed)+','+(!!w[j].bytes));
-									w[j].on_error(0,0,'Stuck');
+									chunks[chunk_id] = 1;
+									data.push(n);
 								}
 							}
 						}
-						console.error(t + ' stuck. ' + r, i, p[0], p[1], Math.floor(p[0]/p[1]*100), data.join("~"));
-
-						Soon(function()
+						
+						if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1))
 						{
-							throw new Error('['+dlMethod.name+'] ' + t + ' Stuck ' + r);
-						});
-					})(tp[i],i[0] === 'u' ? 'Upload':'Download');
+							r = s ? '[TIMEOUT]' : '[ETHERR]';
+							data = ['Chunks are taking too long to complete... ', u];
+						}
+					}
+					else
+					{
+						r = '[!]';
+						data = 'GlobalProgress.' + i + ' exists with no working chunks.';
+					}
+					
+					if (data.length)
+					{
+						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
+						console.error(t + ' stuck. ' + r, i, udata );
+						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
+					}
 					delete prev[i];
 				}
-				else prev[i] = tp[i][0];
+				else
+				{
+					time[i] = Date.now();
+					tlen[i] = Math.max(tlen[i] || 0, tp[i][0]);
+					prev[i] = tp[i][0];
+				}
 			}
 		}
-	}, 97000);
+	}, mXHRTimeoutMS * 1.2);
 }
 
 function percent_megatitle()

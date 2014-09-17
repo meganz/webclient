@@ -1,3 +1,5 @@
+var mXHRTimeoutMS = localStorage.xhrtimeout || 2*60*1000;
+
 (function(w) {
 
 var _xhr_queue = []
@@ -7,7 +9,7 @@ function newXhr() {
 	var xhr = getxhr();
 	xhr.__id = ++total
 	xhr.__timeout = null;
-	xhr.__timeout_ms = localStorage.xhrtimeout || 2*60*1000;
+	xhr.__timeout_ms = mXHRTimeoutMS;
 	xhr.clear_timeout = function() {
 		if (this.__timeout) {
 			clearTimeout(this.__timeout);
@@ -16,15 +18,22 @@ function newXhr() {
 	};
 	xhr.setup_timeout = function() {
 		this.clear_timeout();
-		this.__timeout = setTimeout(this.ontimeout.bind(this), this.__timeout_ms);
+		this.__timeout = setTimeout(this.mOnTimeout, this.__timeout_ms);
 	};
 
 	xhr._abort = xhr.abort;
 	xhr._send  = xhr.send
 
 	xhr.send = function() {
-		xhr.started = Date.now()
-		xhr._send.apply(this, arguments)
+		this.setup_timeout();
+		if (arguments.length == 0)	{
+			// download
+			xhr.started = Date.now()
+			return xhr._send();
+		}
+
+		// upload
+		return xhr._send.apply(this, arguments)
 	}
 
 	xhr.abort = function() {
@@ -48,7 +57,11 @@ function newXhr() {
 		this.setup_timeout();
 		switch(this.readyState) {
 			case this.HEADERS_RECEIVED:
-				ASSERT(Date.now() < this.started+30000, 'Server took too long to reply')
+				if ((Date.now() - this.started) > 10000) {
+					var ttfb = hostname(this.responseURL) + ' taking more than 10s to reply.';
+					if (d) console.log(ttfb);
+					else window.onerror(ttfb, '', -1);
+				}
 				break;
 			case 4:
 				if (this.listener.on_ready) {
@@ -69,6 +82,11 @@ function newXhr() {
 	xhr.upload.onprogress = function() {
 		if (!xhr.listener) return xhr.nolistener(); /* no one is listening */
 		xhr.setup_timeout();
+		/**
+		 *	Update the start time, so we meassure the response time
+		 *	not the upload time
+		 */
+		xhr.started = Date.now()
 
 		if (xhr.listener.on_upload_progress) {
 			xhr.listener.on_upload_progress(arguments, xhr);
@@ -97,7 +115,7 @@ function newXhr() {
 		}
 	};
 	xhr.onerror = xhr.xhr_cleanup;
-	xhr.ontimeout = xhr.xhr_cleanup;
+	xhr.mOnTimeout = xhr.xhr_cleanup.bind(xhr, {type:'mtimeout'});
 
 	xhr.onprogress = function() {
 		if (!this.listener) return this.nolistener();

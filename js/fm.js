@@ -2778,7 +2778,7 @@ function gridUI()
 				$.contactgridHeader();
 				initContactsGridScrolling();
 			}
-			else if (M.currentid == 'shares')
+			else if (M.currentdirid == 'shares')
 			{
 				initGridScrolling();
 				$.sharedgridHeader();

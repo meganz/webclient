@@ -487,6 +487,7 @@ function failureFunction(task, args) {
 	{
 		DownloadManager.newUrl(dl, function(rg)
 		{
+			if (!task.url) return;
 			task.url = rg + "/" + task.url.replace(/.+\//, '');
 			dlQueuePushBack(task);
 		});

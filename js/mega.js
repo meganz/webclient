@@ -498,6 +498,7 @@ function MegaData ()
 					M.renderMain(u);
 				});
 			}
+			else $.rmItemsInView = n_cache;
 		}
 
 		delete this.cRenderMainN;
@@ -786,6 +787,7 @@ function MegaData ()
 		if (this.viewmode == 1)
 		{
 			fa_duplicates = {};
+			fa_reqcnt = 0;
 		}
 
 		this.rmSetupUI();
@@ -809,13 +811,43 @@ function MegaData ()
 		else Soon(gridUI);
 		Soon(fmtopUI);
 
+		function prepareShareMenuHandler(e) {
+			e.preventDefault(); e.stopPropagation();
+			e.currentTarget = $('ul#treesub_shares .selected')
+			e.calculatePosition = true;
+			$.selected = [e.currentTarget.attr('id').substr(6)] 
+		}
+
 		$('.shared-details-info-block .grid-url-arrow').unbind('click');
 		$('.shared-details-info-block .grid-url-arrow').bind('click', function(e) {
-			e.preventDefault(); e.stopPropagation(); // do not treat it as a regular click on the file
-			e.currentTarget = $('ul#treesub_shares .selected')
-			e.type = 'context-menu'; // FIXME: I shouldn't do this to show the right position
-			$.selected = [e.currentTarget.attr('id').substr(6)] 
+			prepareShareMenuHandler(e);
 			contextmenuUI(e,1);
+		});
+
+		$('.shared-details-info-block .fm-share-download').unbind('click');
+		$('.shared-details-info-block .fm-share-download').bind('click', function(e) {
+			prepareShareMenuHandler(e);
+			var $this = $(this);
+			e.clientX = $this.offset().left;
+			e.clientY = $this.offset().top + $this.height()
+
+			contextmenuUI(e,3);
+		});
+
+		$('.shared-details-info-block .fm-share-copy').unbind('click');
+		$('.shared-details-info-block .fm-share-copy').bind('click', function(e) {
+			$.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
+			$.mcselected = M.RootID;
+			$('.copy-dialog .dialog-copy-button').addClass('active');
+			$('.copy-dialog').removeClass('hidden');
+			handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+			$('.fm-dialog-overlay').removeClass('hidden');
+			$('body').addClass('overlayed');
+		});
+
+		$('.shared-details-info-block .fm-leave-share').unbind('click');
+		$('.shared-details-info-block .fm-leave-share').bind('click', function(e) {
+			$('.nw-fm-left-icon.cloud-drive').trigger('click');
 		});
 
 		$('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
@@ -2237,7 +2269,7 @@ function MegaData ()
 		}
 
 		var p = ui_paused ? 'paused' : ''
-		if (z) this.addToTransferTable('<tr id="zip_'+zipid+'">'
+		if (z && zipsize) this.addToTransferTable('<tr id="zip_'+zipid+'">'
 			+ '<td><span class="row-number"></span></td>'
 			+ '<td><span class="transfer-filtype-icon ' + fileicon({name:'archive.zip'}) + '"></span><span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
 			+ '<td><span class="transfer-type download'+p+'">' + l[373] + '<span class="speed"></span></span>'+ flashhtml +'</td>'
@@ -2411,6 +2443,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
+		else window.onerror('onDownloadError :: ' + error, '', -1);
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2592,7 +2625,7 @@ function MegaData ()
 		var target = $.onDroppedTreeFolder || M.currentdirid, onChat;
 		delete $.onDroppedTreeFolder;
 
-		if ((onChat = (M.currentdirid.substr(0,4) === 'chat')))
+		if ((onChat = (M.currentdirid && M.currentdirid.substr(0,4) === 'chat')))
 		{
 			if (!$.ulBunch) $.ulBunch = {};
 			if (!$.ulBunch[M.currentdirid]) $.ulBunch[M.currentdirid] = {};
@@ -2796,9 +2829,11 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr)
+function onUploadError(fileid, errorstr, reason)
 {
-	DEBUG('OnUploadError ' + fileid + ' ' + errorstr);
+	if (!d) window.onerror('onUploadError :: ' + errorstr + (reason ? ': ' + reason : ''), '', -1);
+
+	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
 
 	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')

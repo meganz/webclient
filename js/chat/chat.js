@@ -102,8 +102,8 @@ var chatui;
             }
         });
 
-        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.red.active');
-        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.red.active', function() {
+        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.red');
+        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.red', function() {
             var currentRoom = megaChat.getCurrentRoom();
 
             var $chatDownloadPopup = $('.fm-chat-download-popup',currentRoom.$messages);

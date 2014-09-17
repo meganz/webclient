@@ -963,8 +963,6 @@ function MegaData ()
                 window.location = megaChat.getCurrentRoom().getRoomUrl();
                 return;
             }
-
-            sharedfolderUI();
             treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
@@ -991,7 +989,8 @@ function MegaData ()
 
 		if (this.chat)
 		{
-			// do nothing here
+			sharedfolderUI(); // remove shares-specific UI
+			$(window).trigger('resize');
 		}
 		else if (id && id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{

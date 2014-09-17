@@ -2717,6 +2717,7 @@ function avatarDialog(close)
 
 function gridUI()
 {
+	if (M.chat) return;
 	if (d) console.time('gridUI');
 	// $.gridDragging=false;
 	$.gridLastSelected=false;

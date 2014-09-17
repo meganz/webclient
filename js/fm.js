@@ -1048,7 +1048,7 @@ function addContactUI()
 	{
 		var $d = $('.add-user-popup');
 		var $s = $('.add-user-popup .multiple-input-warning span');
-		$s.text('You already have contact with exact email!');
+		$s.text('You already have contact with that email!');
 		$d.addClass('error');
 		setTimeout(function()
 		{
@@ -5049,7 +5049,8 @@ function handleDialogContent(s, m, c, n, t, i)
 
 function handleShareDialogContent()
 {
-	var SCROLL_NUM = -1;// Number of items in dialog before scroll is implemented
+	var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
+	
 	handleDialogScroll = function(num, dc)
 	{
 		// Add scroll in case that we have more then 5 items in list
@@ -5065,30 +5066,128 @@ function handleShareDialogContent()
 		}
 	};
 	
-	function addShareDialogContactToContent(type, email, name, perm, permText)
+	function addShareDialogContactToContent(type, av_color, av, name, permClass, permText)
 	{
-		for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
-		{
-			M.u[i].m; // email
-			i.r; // permission
-			var img = '';
-			var html = '<div class="share-dialog-contact-bl ' + type + '">\n\
-							<div class="nw-contact-avatar ' + color + '">' + img + '</div>\n\
-							<div class="fm-chat-user-info"><div class="fm-chat-user">xxx</div></div>\n\
-							<div class="share-dialog-permissions ' + perm + '">\n\
-							<span></span>' + permText + '\n\
-							</div>';
+		var html = '<div class="share-dialog-contact-bl ' + type + '">\n\
+						<div class="nw-contact-avatar ' + av_color + '">' + av + '</div>\n\
+						<div class="fm-chat-user-info"><div class="fm-chat-user">' + name + '</div></div>\n\
+						<div class="share-dialog-permissions ' + permClass + '">\n\
+						<span></span>' + permText + '\n\
+					</div>';
 
-			var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
+		var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
 
-			$('').append(html);
-		}
+		return html + htmlEnd;
 	}
 	
 	fillDialogWithContent = function()
 	{
-		return;
+		for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
+		{
+			var user = M.u[i];
+			var name = (typeof user.name != 'undefined' && user.name.length < 2) ? user.name : user.m;
+			var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
+			var av;
+			av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+			var permText, permClass;
+			
+			switch (M.d[i].r)// Permission level
+			{
+				case 1: // Read and write
+					permClass = 'read-and-write';
+					permText = l[56];
+					break;
+				case 2: // Full Access
+					permClass = 'full-access';
+					permText = l[57];
+					break;	
+				default: // 0 or any === read only
+					permClass = 'read-only';
+					permText = l[56];
+					break;
+			}
+			var html = addShareDialogContactToContent('', av_color, av, name, permClass, permText);
+
+			$('.share-dialog .share-dialog-contacts').append(html);
+		}
 	};
+	
+	function existingEmailMsg()
+	{
+		var $d = $('.share-dialog');
+		var $s = $('.share-dialog .multiple-input-warning span');
+		$s.text('You already have contact with that email!');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+			$s.text('Looks like there’s a malformed email!');
+		}, 3000);
+	}
+
+	function wrongEmailMsg()
+	{
+		var $d = $('.share-dialog');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+		}, 3000);
+	}
+
+	// Plugin configuration
+	var contacts = [];
+	for (var i in M.u)
+	{
+		contacts.push({id: M.u[i].u, name: M.u[i].m});
+	}
+	$('.share-multiple-input').tokenInput(contacts, {
+		theme:				"mega",
+		hintText:			"Type in a contact email",
+		searchingText:		"Searching for existing contacts...",
+		addAvatar:			false,
+		autocomplete:		null,
+		searchDropdown:		true,
+		emailCheck:			true,
+		preventDoublet:		true,
+		resultsLimit:		5,
+		minChars:			2,
+		onEmailCheck: wrongEmailMsg,
+		onDoublet: existingEmailMsg,
+		onAdd: function()
+		{
+			var $btn = $('.dialog-share-button');
+			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 1)
+			{
+				$btn.removeClass('disabled');
+
+			}
+			else
+			{
+				$btn.removeClass('disabled');
+			}
+		},
+		onDelete: function()
+		{
+			var $btn = $('.dialog-share-button');
+			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 0)
+			{
+				$btn.addClass('disabled');
+
+			}
+			else if (itemNum === 1)
+			{
+				$btn.removeClass('disabled');
+
+			}
+			else
+			{
+				$btn.removeClass('disabled');
+			}
+		}
+    });
 
 	var dc = '.share-dialog';
 	// Disable/enable button
@@ -5111,7 +5210,7 @@ function handleShareDialogContent()
 	}
 
 	// Update dialog title text
-	$(dc + ' .fm-dialog-title').text('Share "' + M.d[$.selected].name + '"');
+	$(dc + ' .fm-dialog-title').text(l[1344] + ' "' + M.d[$.selected].name + '"');
 
     dialogPositioning('.fm-dialog.share-dialog');
 
@@ -5124,6 +5223,74 @@ function shareDialog()
 	{
 		closeDialog();
 	});
+
+	$('.share-dialog').off('click', '.share-dialog-permissions');
+	$('.share-dialog').on('click', '.share-dialog-permissions', function ()
+	{
+		var $this = $(this);
+		var m = $('.permissions-menu');
+		m.removeClass('search-permissions');
+		if ($(this).attr('class').indexOf('active') == -1)
+		{
+			var x = $(this).position().left + 42;
+			var y = $(this).position().top + 13;
+			m.css('left', x + 'px');
+			m.css('top', y + 'px');
+			m.removeClass('hidden');
+			$(this).addClass('active');
+		}
+		else
+		{
+			m.addClass('hidden');
+			$(this).removeClass('active');
+		}
+	});
+
+	$('.share-dialog .permissions-icon').unbind('click');
+	$('.share-dialog .permissions-icon').bind('click', function ()
+	{
+		var $this = $(this);
+		var m = $('.permissions-menu');
+		if ($this.attr('class').indexOf('active') == -1)
+		{
+			var x = $this.position().left + 35;
+			var y = $this.position().top - 8;
+			m.css('left', x + 'px');
+			m.css('top', y + 'px');
+			m.removeClass('hidden');
+			$this.addClass('active');
+			m.addClass('search-permissions');
+		}
+		else
+		{	
+			m.addClass('hidden');
+			$this.removeClass('active');
+			m.removeClass('search-permissions');
+		}
+	});
+
+	$('.permissions-menu-item').unbind('click');
+	$('.permissions-menu-item').bind('click', function ()
+	{
+		var $this = $(this);
+		if ($this.attr('class').indexOf('active') == -1)
+		{
+			$this.parent().find('.permissions-menu-item.active').removeClass('active');
+			var p = $this.attr('class').replace('permissions-menu-item', '').split(" ").join("");
+			if ($this.attr('class').indexOf('search-permissions') == -1)
+			{
+				$('.permissions-icon').removeClass('read-only read-and-write full-access');
+				$('.permissions-icon').addClass(p);
+			}
+			$this.addClass('active');
+		} else
+			$this.removeClass('active');
+		$('.permissions-menu').addClass('hidden');
+		$('.permissions-icon.active').removeClass('active');
+		$('.share-dialog-permissions.active').removeClass('active');
+
+	});
+
 }
 
 function closeDialog()

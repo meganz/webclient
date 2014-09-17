@@ -550,7 +550,7 @@ else
         jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
-        jsl.push({f:'js/jquery.fullscreen-min.js', n: 'jquery_fullscreen', j:1,w:10});
+        jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
 
         jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});

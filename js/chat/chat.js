@@ -149,9 +149,6 @@ var chatui;
                 handleDialogContent('.cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
 				$('body').addClass('overlayed');
-
-                //TODO: fix this after #602 is ready.
-
             });
 
             $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
@@ -275,8 +272,13 @@ var chatui;
                             var resp = megaChat.rtc.startMediaCall(participants[0], {files: filesList});
 
 
-                            $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
-                                resp.cancel();
+                            var $message = megaChat._generateIncomingRtcFileMessage(room, filesList, resp.sid, function() {
+
+                                if(megaChat.rtc.ftManager.downloads[resp.sid] || megaChat.rtc.ftManager.uploads[resp.sid]) {
+                                    megaChat.rtc.ftManager.cancelTransfer(resp.sid);
+                                } else {
+                                    resp.cancel();
+                                }
                             });
 
                             room.appendDomMessage($message);
@@ -365,7 +367,7 @@ var chatui;
         $(document.body).delegate('.message-textarea', 'keydown.send',function(e) {
             var key = e.keyCode || e.which;
             var msg = $(this).val();
-            
+
             if(key == 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
                 if(msg.trim().length > 0) {
                     stoppedTyping();
@@ -376,7 +378,10 @@ var chatui;
                     );
                     $(this).val('');
 
+                    messageAreaResizing();
+
                     megaChat.resized();
+
                     return false;
                 } else {
 					e.preventDefault();
@@ -386,10 +391,50 @@ var chatui;
 					e.preventDefault();
 				}
 			}
+
         });
         $('.message-textarea').unbind('blur.stoppedcomposing');
         $('.message-textarea').bind('blur.stoppedcomposing',function(e) {
             stoppedTyping();
+        });
+
+        // Textarea resizing
+        function messageAreaResizing() {
+            var txt = $('.message-textarea'),
+                txtHeight =  txt.outerHeight(),
+                hiddenDiv = $('.hiddendiv'),
+                pane = $('.fm-chat-input-scroll'),
+                content = txt.val(),
+                api;
+
+            content = content.replace(/\n/g, '<br />');
+            hiddenDiv.html(content + '<br />');
+
+            if (txtHeight != hiddenDiv.outerHeight() ) {
+                txt.height(hiddenDiv.outerHeight());
+
+                if( $('.fm-chat-input-block').outerHeight()>=200) {
+                    pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+                    api = pane.data('jsp');
+                    txt.blur();
+                    txt.focus();
+                    api.scrollByY(0);
+                }
+                else {
+                    api = pane.data('jsp');
+                    if (api) {
+                        api.destroy();
+                        txt.blur();
+                        txt.focus();
+                    }
+                }
+                megaChat.resized();
+            }
+        }
+
+        $(document.body).undelegate('.message-textarea', 'keyup.resize');
+        $(document.body).delegate('.message-textarea', 'keyup.resize', function() {
+            messageAreaResizing();
         });
 
 
@@ -1222,13 +1267,14 @@ MegaChat.prototype.init = function() {
             var $elem = $('.webrtc-transfer[data-transfer-sid="' + sess._sid + '"]');
 
             $('.primary-button', $elem).replaceWith(
-                $("<em>" + /* (e.type == "ftsess-remove" ? */ "Done" /* : "Canceled") */ + "</em>")
+                $("<em>" + (e.type == "ftsess-remove" ? "Done" : "Canceled") + "</em>")
             );
 
-//            if(e.type == "ftsess-remove") { // completed
+            if(e.type == "ftsess-remove") { // completed
+                $('.nw-chat-sharing-body', $elem).removeAttr('title');
                 $('.progressbarfill', $elem).css('width', '100%');
                 $('.direct-progressbar', $elem).removeClass("hidden");
-//            }
+            }
 
             var roomJid = $('.webrtc-transfer').parents('.fm-chat-message-scroll').prev().attr("data-room-jid");
             var room = megaChat.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
@@ -1237,7 +1283,7 @@ MegaChat.prototype.init = function() {
             }
         };
         $(self.rtc.ftManager).on('ftsess-remove', _ftSessEndHandler);
-//        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
+        $(self.rtc.ftManager).on('ftsess-canceled', _ftSessEndHandler);
 
     } catch(e) {
         // no RTC support.
@@ -2292,6 +2338,7 @@ MegaChat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz:5281/http-bind";
     } else {
+        return "https://karere-001.developers.mega.co.nz:5281/http-bind"; // issue #692 again
         return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
     }
 };
@@ -2752,7 +2799,11 @@ var MegaChatRoom = function(megaChat, roomJid) {
             // file transfer
             var $message = megaChat._generateIncomingRtcFileMessage(self, eventData.files, eventData.sid,
                 function() {
-                    eventData.answer(false, {});
+                    if(self.megaChat.rtc.ftManager.downloads[eventData.sid] || self.megaChat.rtc.ftManager.uploads[eventData.sid]) {
+                        self.megaChat.rtc.ftManager.cancelTransfer(eventData.sid);
+                    } else {
+                        eventData.answer(false, {});
+                    }
                 },
                 function() {
                     eventData.answer(true, {});
@@ -3477,7 +3528,9 @@ MegaChatRoom.prototype._renderAudioVideoScreens = function() {
 
         );
     } else {
-        console.error("no media opts");
+        if(localStorage.d) {
+            console.error("no media opts");
+        }
     }
 
     // others
@@ -5143,22 +5196,9 @@ MegaChatRoom.prototype.recover = function() {
 MegaChatRoom.prototype.resized = function(scrollToBottom) {
     var self = this;
 
-    var $el = $('.message-textarea');
-    $el.height('auto');
-    var text = $el.val();
-    var lines = text.split("\n");
-    var count = lines.length;
-    if ($el.val().length != 0 && count>1)
-    {
-        $el.height($el.prop("scrollHeight"));
-        self.refreshUI(true);
-    }
-    else if ($el.height() > 21)
-    {
-        $el.height('21px');
-    }
+    // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
+    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-input-scroll').outerHeight() - $('.fm-right-header').outerHeight();
 
-    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight();
     if (scrollBlockHeight != self.$messages.outerHeight())
     {
         self.$messages.height(scrollBlockHeight);

@@ -367,7 +367,7 @@ var chatui;
         $(document.body).delegate('.message-textarea', 'keydown.send',function(e) {
             var key = e.keyCode || e.which;
             var msg = $(this).val();
-            
+
             if(key == 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
                 if(msg.trim().length > 0) {
                     stoppedTyping();
@@ -378,7 +378,10 @@ var chatui;
                     );
                     $(this).val('');
 
+                    messageAreaResizing();
+
                     megaChat.resized();
+
                     return false;
                 } else {
 					e.preventDefault();
@@ -388,10 +391,50 @@ var chatui;
 					e.preventDefault();
 				}
 			}
+
         });
         $('.message-textarea').unbind('blur.stoppedcomposing');
         $('.message-textarea').bind('blur.stoppedcomposing',function(e) {
             stoppedTyping();
+        });
+
+        // Textarea resizing
+        function messageAreaResizing() {
+            var txt = $('.message-textarea'),
+                txtHeight =  txt.outerHeight(),
+                hiddenDiv = $('.hiddendiv'),
+                pane = $('.fm-chat-input-scroll'),
+                content = txt.val(),
+                api;
+
+            content = content.replace(/\n/g, '<br />');
+            hiddenDiv.html(content + '<br />');
+
+            if (txtHeight != hiddenDiv.outerHeight() ) {
+                txt.height(hiddenDiv.outerHeight());
+
+                if( $('.fm-chat-input-block').outerHeight()>=200) {
+                    pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+                    api = pane.data('jsp');
+                    txt.blur();
+                    txt.focus();
+                    api.scrollByY(0);
+                }
+                else {
+                    api = pane.data('jsp');
+                    if (api) {
+                        api.destroy();
+                        txt.blur();
+                        txt.focus();
+                    }
+                }
+                megaChat.resized();
+            }
+        }
+
+        $(document.body).undelegate('.message-textarea', 'keyup.resize');
+        $(document.body).delegate('.message-textarea', 'keyup.resize', function() {
+            messageAreaResizing();
         });
 
 
@@ -5153,22 +5196,9 @@ MegaChatRoom.prototype.recover = function() {
 MegaChatRoom.prototype.resized = function(scrollToBottom) {
     var self = this;
 
-    var $el = $('.message-textarea');
-    $el.height('auto');
-    var text = $el.val();
-    var lines = text.split("\n");
-    var count = lines.length;
-    if ($el.val().length != 0 && count>1)
-    {
-        $el.height($el.prop("scrollHeight"));
-        self.refreshUI(true);
-    }
-    else if ($el.height() > 21)
-    {
-        $el.height('21px');
-    }
+    // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
+    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-input-scroll').outerHeight() - $('.fm-right-header').outerHeight();
 
-    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight();
     if (scrollBlockHeight != self.$messages.outerHeight())
     {
         self.$messages.height(scrollBlockHeight);

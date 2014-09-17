@@ -18953,7 +18953,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	filter: blur(0.5em);
 	-webkit-filter: blur(0.5em);
 }
-.chat-call-block video, .video-full-container video {
+/* video mirroring, applied ONLY to the local video */
+video.localViewport {
     transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
 }

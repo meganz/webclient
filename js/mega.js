@@ -963,8 +963,6 @@ function MegaData ()
                 window.location = megaChat.getCurrentRoom().getRoomUrl();
                 return;
             }
-
-            sharedfolderUI();
             treeUI();
 		}
 		else if (id && id.substr(0,7) == 'account') accountUI();
@@ -991,7 +989,8 @@ function MegaData ()
 
 		if (this.chat)
 		{
-			// do nothing here
+			sharedfolderUI(); // remove shares-specific UI
+			$(window).trigger('resize');
 		}
 		else if (id && id.substr(0,7) !== 'account' && id.substr(0,13) !== 'notifications')
 		{
@@ -1796,6 +1795,9 @@ function MegaData ()
 		rendernew();
 		this.rubbishIco();
 		processmove(j);
+		Soon(function() {
+			$(window).trigger('resize');
+		});
 	}
 
 	this.accountData = function(cb,blockui)
@@ -2536,7 +2538,7 @@ function MegaData ()
 
 			if (d) console.log('resize.tfsdynlist', JSON.stringify(T));
 
-			if (T.left > 0) flush_cached_nodes(T.left+1);
+			if (T.left > 0) flush_cached_nodes(T.left+3);
 
 			T = T.size;
 			$tst.bind('jsp-scroll-y.tfsdynlist', function(ev, pos, top, bot)
@@ -2750,6 +2752,7 @@ function MegaData ()
 		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
 		{
 			$(this).remove();
+			$(window).trigger('resize');
 		});
 		var a=ul_queue.filter(isQueueActive).length;
 		if (a < 2 && !ul_uploading)

@@ -229,7 +229,11 @@ var UploadManager =
 				ul_queue[idx] = Object.freeze({});
 			});
 			if (!this._multiAbort) Soon(resetUploadDownload);
-			$('#' + gid).fadeOut('slow', function() { $(this).remove() });
+			$('#' + gid).fadeOut('slow', function()
+			{
+				$(this).remove();
+				$(window).trigger('resize');
+			});
 		}
 	},
 

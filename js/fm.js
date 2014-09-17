@@ -1450,7 +1450,7 @@ function initContextUI()
 	});
 
 	$(c+'.sharing-item').unbind('click');
-	$(c+'.sharing-item').bind('click',function(event)
+	$(c+'.sharing-item').bind('click',function()
 	{
 		if (u_type === 0) ephemeralDialog(l[1006]);
 		else
@@ -5042,6 +5042,7 @@ function handleDialogContent(s, m, c, n, t, i)
 function handleShareDialogContent()
 {
 	var SCROLL_NUM = -1;// Number of items in dialog before scroll is implemented
+	
 	handleDialogScroll = function(num, dc)
 	{
 		// Add scroll in case that we have more then 5 items in list
@@ -5057,9 +5058,44 @@ function handleShareDialogContent()
 		}
 	};
 	
+	function addShareDialogContactToContent(type, email, name, perm, permText)
+	{
+		for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
+		{
+			M.u[i].m; // email
+			i.r; // permission
+			var img = '';
+			var html = '<div class="share-dialog-contact-bl ' + type + '">\n\
+							<div class="nw-contact-avatar ' + color + '">' + img + '</div>\n\
+							<div class="fm-chat-user-info"><div class="fm-chat-user">xxx</div></div>\n\
+							<div class="share-dialog-permissions ' + perm + '">\n\
+							<span></span>' + permText + '\n\
+							</div>';
+
+			var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
+
+			$('').append(html);
+		}
+	}
+	
 	fillDialogWithContent = function()
 	{
-		return;
+		// Filter whole list and fill content with already sharing contacts
+		// Add permission menus (show/hide)
+		
+//		M.u - contacts
+//		u_handle - logged user id
+//		M.d[$.selected[0]].shares && .u (owner id)
+
+		if (typeof $.selected != undefined && M.d[$.selected[0]].u === u_handle)// is owner actual logged in user
+		{
+			addShareDialogContactToContent();
+			// handle contacts in content and ddl list (exlude/add)
+			
+		}
+		
+		
+ 		return;
 	};
 
 	var dc = '.share-dialog';
@@ -7038,12 +7074,6 @@ function FMResizablePane(element, opts) {
 //			$('.fm-share-add-contacts').removeClass('active');
 //			$('.fm-share-contacts-popup').addClass('hidden');
 //		}
-//	});
-//	$('.cancel-contact-button').unbind('click');
-//	$('.cancel-contact-button').bind('click',function()
-//	{
-//	    $('.fm-share-contacts-popup').addClass('hidden');
-//		$('.fm-share-add-contacts').removeClass('active');
 //	});
 //	$('.add-contact-button, .fm-share-contacts-search').unbind('click');
 //	$('.add-contact-button, .fm-share-contacts-search').bind('click',function()

@@ -3128,6 +3128,28 @@ var QuickFinder = function(searchable_elements, containers) {
                 return false;
             }
         }
+		else if (charCode >= 33 && charCode <= 36)
+		{
+			var e = '.files-grid-view.fm';
+			if (M.viewmode == 1) e = '.fm-blocks-view.fm';
+
+			if ($(e + ':visible').length)
+			{
+				e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
+				var jsp = e.data('jsp');
+
+				if (jsp)
+				{
+					switch(charCode)
+					{
+						case 33: /* Page Up   */  jsp.scrollByY(-e.height(),!0);  break;
+						case 34: /* Page Down */  jsp.scrollByY( e.height(),!0);  break;
+						case 35: /* End       */  jsp.scrollToBottom(!0);         break;
+						case 36: /* Home      */  jsp.scrollToY(0,!0);            break;
+					}
+				}
+			}
+		}
     });
 
     // hide the search field when the user had clicked somewhere in the document

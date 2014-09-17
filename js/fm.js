@@ -6772,8 +6772,22 @@ function sharedfolderUI()
 		r = true;
 	}
 
-	var n = M.d[M.currentdirid];
-	if (n && n.p.length == 11 || RootbyId(M.currentdirid) === 'shares')
+	var c,n = M.d[M.currentdirid];
+	if (!n || n.p.length != 11)
+	{
+		n = null;
+
+		var p = M.getPath(M.currentdirid);
+		if (p[p.length-1] === 'shares')
+		{
+			c = M.d[p[0]];
+			n = M.d[p[p.length-3]];
+
+			if (n.p.length != 11) n = 0;
+		}
+	}
+
+	if ( n )
 	{
 		var u_h = n.p;
 		var user = M.d[u_h];
@@ -6800,7 +6814,7 @@ function sharedfolderUI()
 				+'<div class="shared-details-icon"></div>'
 				+'<div class="shared-details-info-block">'
 					+'<div class="shared-details-pad">'
-						+'<div class="shared-details-folder-name">'+ htmlentities(n.name) +'</div>'
+						+'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
 						+'<a href="" class="grid-url-arrow"><span></span></a>'
 						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
 						+'<div class="clear"></div>'

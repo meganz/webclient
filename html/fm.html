@@ -460,21 +460,23 @@
         <!-- audio/video elements -->
         <!-- Please set height to this block while main block resizing !-->
         <div class="chat-call-block">
-
-            <!-- Audio & Video container !-->
+            <div class="video-controls">
+                <div class="video-full-buttons">
+                   <div class="video-call-button audio-icon"><div class="video-call-border"></div></div>
+                   <div class="video-call-button video-icon"><div class="video-call-border"></div></div>
+                   <div class="video-call-button hang-up-icon"><div class="video-call-border"></div></div>
+                </div>
+                <div class="video-size-button">
+                  <div class="video-call-button size-icon"><div class="video-call-border"></div></div>
+                </div>
+            </div>
             <div class="others-av-screen video-call-container audio-call-container hidden">
-
-                <!-- Please add "active" class if video block is fullsized. Please add "full-sized" class to .fm-chat-block also !-->
-                <div class="video-call-button size-icon"></div>
-                <img alt="" src="" class="other-avatar"/>
+              <img alt="" src="" class="other-avatar"/>
             </div>
 
             <!-- Current user audio container !-->
             <div class="my-av-screen current-user-audio-container current-user-video-container hidden">
                 <div class="current-user-resizer video-only"><div></div></div>
-                <div class="video-call-button audio-icon"></div>
-                <div class="video-call-button video-icon"></div>
-                <div class="video-call-button hang-up-icon"></div>
 
                 <img style="height:100%;" src="" class="my-avatar"/>
             </div>

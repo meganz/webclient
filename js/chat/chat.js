@@ -102,8 +102,8 @@ var chatui;
             }
         });
 
-        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.red.active');
-        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.red.active', function() {
+        $('.fm-chat-block').off('click.megachat', '.nw-chat-button.red');
+        $('.fm-chat-block').on('click.megachat', '.nw-chat-button.red', function() {
             var currentRoom = megaChat.getCurrentRoom();
 
             var $chatDownloadPopup = $('.fm-chat-download-popup',currentRoom.$messages);
@@ -483,11 +483,11 @@ var chatui;
     $(document.body).delegate('.video-full-container.full-mode', 'mousemove.megaChatVideo', function(ev) {
         if(!forceMouseHide) {
             $('.video-full-container.full-mode').css('cursor', '');
-            $('.video-controls').removeClass('hidden-controls');
+            $('.video-full-container .video-controls').removeClass('hidden-controls');
             clearTimeout(idleMouseTimer);
             idleMouseTimer = setTimeout(function() {
                 $(".video-full-container.full-mode").css('cursor', 'none');
-                $('.video-controls').addClass('hidden-controls');
+                $('.video-full-container .video-controls').addClass('hidden-controls');
                 forceMouseHide = true;
                 setTimeout(function() {
                     forceMouseHide = false;

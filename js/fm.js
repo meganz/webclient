@@ -6783,7 +6783,7 @@ function sharedfolderUI()
 			c = M.d[p[0]];
 			n = M.d[p[p.length-3]];
 
-			if (n.p.length != 11) n = 0;
+			if (!n || n.p.length != 11) n = 0;
 		}
 	}
 

@@ -1475,7 +1475,7 @@ makeMetaAware(Karere);
             eventDataObject = eventData;
             if($.isPlainObject(eventDataObject)) {
                 if(localStorage.d) {
-                    console.error("Don't know how to convert event of type: " + stanzaType + " to EventObject, with eventData:", eventData);
+                    console.warn("Karere will not handle incoming message type of type: " + stanzaType + ", with eventData:", eventData, ", so it should be handled by directly using Strophe.js's API.");
                 }
             }
 

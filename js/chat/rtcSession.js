@@ -756,9 +756,10 @@ RtcSession.prototype = {
         @event "remote-player-remove"
         @type object
         @property {string} id The id of the html video element to be removed
+        @property {string} peer The full jid of the peer
         @property {SessWrapper} sess
     */
-    this.trigger('remote-player-remove', {id: '#remotevideo_'+sess.sid, sess:new SessWrapper(sess)});
+    this.trigger('remote-player-remove', {id: '#remotevideo_'+sess.sid, peer: sess.peerjid, sess:new SessWrapper(sess)});
  },
 
  onMediaRecv: function(playerElem, sess, stream) {

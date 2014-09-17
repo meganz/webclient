@@ -6773,7 +6773,7 @@ function sharedfolderUI()
 	}
 
 	var n = M.d[M.currentdirid];
-	if (n && n.p.length == 11)
+	if (n && n.p.length == 11 || RootbyId(M.currentdirid) === 'shares')
 	{
 		var u_h = n.p;
 		var user = M.d[u_h];

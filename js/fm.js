@@ -5352,12 +5352,10 @@ function initShareDialog()
 				});
 				
 				closeDialog();
-				
 				if (t.length > 0)
 				{
 					loadingDialog.show();
-					doshare($.selected[0],t);
-					loadingDialog.close();
+					doshare($.selected[0],t, true);
 				}
 			}
 		}

@@ -463,6 +463,7 @@ function MegaData ()
 			$('.contacts-blocks-scrolling a').remove();
 		}
 
+		$(lSel).parent().children('table').show();
 		if (this.v.length == 0)
 		{
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
@@ -475,6 +476,7 @@ function MegaData ()
 			else if (RootbyId(M.currentdirid) == 'shares')
 			{
 				$(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
+				$(lSel).parent().children('table').hide();
 				$(window).trigger('resize');
 			}
 			else if (RootbyId(M.currentdirid) == 'contacts') $('.fm-empty-incoming.contact-details-view').removeClass('hidden');

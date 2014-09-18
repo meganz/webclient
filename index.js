@@ -155,6 +155,9 @@ function init_page()
 	blogmonth=false;
 	blogsearch=false;
 
+
+	closeDialog();
+
 	if (page.substr(0,7) == 'voucher')
 	{
 		loadingDialog.show();

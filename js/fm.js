@@ -5344,8 +5344,8 @@ function initShareDialog()
 					aPerm = $(val).find('.share-dialog-permissions');
 					id = $(val).find('.fm-chat-user').text();
 					
-					if (aPerm) perm = 1;
-					else if (aPerm) perm = 2;
+					if (aPerm === 'read-and-write') perm = 1;
+					else if (aPerm === 'full-access') perm = 2;
 					else perm = 0;
 					
 					if (id && !(s && s[id])) t.push({u: id,r: perm});

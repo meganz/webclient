@@ -4,8 +4,8 @@ function importGoogleContacts() {
     var m8_uri = 'https://www.google.com/m8/feeds/';
 
 // *** GOOGLE *** /
-    var client_id = '84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
-    var redirect_uri = 'http://5d0ec37.ngrok.com';
+    var client_id = '';//e.g. 84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
+    var redirect_uri = '';// e.g. http://5d0ec37.ngrok.com';
 
     var POPUP_WIDTH = 800;
     var POPUP_HEIGHT = 600;
@@ -46,7 +46,7 @@ function importGoogleContacts() {
 }
 
 function getContactList() {
-	var ACAO = 'http://5d0ec37.ngrok.com';
+	var ACAO = '';// e.g http://5d0ec37.ngrok.com';
     var data = {
         access_token: accessToken,
         v: '3.0'

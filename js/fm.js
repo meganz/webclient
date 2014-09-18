@@ -578,7 +578,7 @@ function initUI()
 	M.buildSubmenu();
 	copyDialog();
 	moveDialog();
-	shareDialog();
+	initShareDialog();
 	transferPanelUI();
 	UIkeyevents();
 	addContactUI();
@@ -1048,7 +1048,7 @@ function addContactUI()
 	{
 		var $d = $('.add-user-popup');
 		var $s = $('.add-user-popup .multiple-input-warning span');
-		$s.text('You already have contact with exact email!');
+		$s.text('You already have contact with that email!');
 		$d.addClass('error');
 		setTimeout(function()
 		{
@@ -1449,7 +1449,7 @@ function initContextUI()
 	});
 
 	$(c+'.sharing-item').unbind('click');
-	$(c+'.sharing-item').bind('click',function(event)
+	$(c+'.sharing-item').bind('click',function()
 	{
 		if (u_type === 0) ephemeralDialog(l[1006]);
 		else
@@ -4198,7 +4198,7 @@ function contextmenuUI(e,ll,topmenu)
 
 	$.hideContextMenu();
 
-	var m = $('.context-menu.files-menu');// container/wrap		else if (c && c.indexOf('cloud-drive-item') > -1)
+	var m = $('.context-menu.files-menu');// container/wrapper around menu
 	var t = '.context-menu.files-menu .context-menu-item';
 	// it seems that ll == 2 is used when right click is occured outside item, on empty canvas
 	if (ll == 2)
@@ -5070,34 +5070,12 @@ function handleDialogContent(s, m, c, n, t, i)
 	$('.' + n + '-dialog-button' + '.' + s).addClass('active');//Activate tab
 }
 
-function handleShareDialogContent()
+function shareDialogContacts()
 {
-	var SCROLL_NUM = -1;// Number of items in dialog before scroll is implemented
-	handleDialogScroll = function(num, dc)
-	{
-		// Add scroll in case that we have more then 5 items in list
-		if (num > SCROLL_NUM)
-		{
-			dialogScroll(dc + ' .share-dialog-contacts');
-		}
-		else
-		{
-			var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
-			var el = $x.data('jsp');
-			el.destroy();
-		}
-	};
-
-	fillDialogWithContent = function()
-	{
-		return;
-	};
-
 	var dc = '.share-dialog';
 	// Disable/enable button
 	var $btn = $('.fm-dialog-button .dialog-share-button');
 
-	this.fillDialogWithContent();
 	var num = $(dc + ' .share-dialog-contacts .share-dialog-contact-bl').length;
 	if (num)
 	{
@@ -5112,20 +5090,363 @@ function handleShareDialogContent()
 		$(dc + ' .share-dialog-img').removeClass('hidden');
 		$(dc + ' .share-dialog-contacts').addClass('hidden');
 	}
-
-	// Update dialog title text
-	$(dc + ' .fm-dialog-title').text('Share "' + M.d[$.selected].name + '"');
-
-    dialogPositioning('.fm-dialog.share-dialog');
-
 }
 
-function shareDialog()
+function addShareDialogContactToContent (type, av_color, av, name, permClass, permText)
 {
+	var html = '<div class="share-dialog-contact-bl ' + type + '">\n\
+					<div class="nw-contact-avatar color' + av_color + '">' + av + '</div>\n\
+					<div class="fm-chat-user-info"><div class="fm-chat-user">' + name + '</div></div>\n\
+					<div class="share-dialog-permissions ' + permClass + '">\n\
+						<span></span>' + permText + '\n\
+					</div>';
+
+	var htmlEnd = '<div class="share-dialog-remove-button"></div><div class="clear"></div></div>';
+
+	return html + htmlEnd;
+};
+
+function fillShareDialogWithContent()
+{
+	for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
+	{
+		var user = M.u[i];
+		var name = (typeof user.name != 'undefined' && user.name.length < 2) ? user.name : user.m;
+		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
+		var av;
+		av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+		var permText, permClass;
+		
+		switch (M.d[i].r)// Permission level
+		{
+			case 1: // Read and write
+				permClass = 'read-and-write';
+				permText = l[56];
+				break;
+			case 2: // Full Access
+				permClass = 'full-access';
+				permText = l[57];
+				break;	
+			default: // 0 or any === read only
+				permClass = 'read-only';
+				permText = l[55];
+				break;
+		}
+		var html = addShareDialogContactToContent('', av_color, av, name, permClass, permText);
+
+		$('.share-dialog .share-dialog-contacts').append(html);
+	}
+};
+
+function handleShareDialogContent()
+{
+	var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
+	
+	handleDialogScroll = function(num, dc)
+	{
+		// Add scroll in case that we have more then 5 items in list
+		if (num > SCROLL_NUM)
+		{
+			dialogScroll(dc + ' .share-dialog-contacts');
+		}
+		else
+		{
+			var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
+			var el = $x.data('jsp');
+			el.destroy();
+		}
+	};
+	
+	fillShareDialogWithContent();
+	
+	shareDialogContacts();
+
+	var dc = '.share-dialog';
+	$('.share-dialog-icon.permissions-icon')
+			.removeClass('active full-access read-and-write')
+			.addClass('read-only');
+	// Update dialog title text
+	$(dc + ' .fm-dialog-title').text(l[1344] + ' "' + M.d[$.selected].name + '"');
+	
+	$('.share-dialog .multiple-input .token-input-token-mega').remove();
+
+    dialogPositioning('.fm-dialog.share-dialog');
+}
+
+function initShareDialog()
+{
+	function existingEmailMsg()
+	{
+		var $d = $('.share-dialog');
+		var $s = $('.share-dialog .multiple-input-warning span');
+		$s.text('You already have contact with that email!');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+			$s.text('Looks like there’s a malformed email!');
+		}, 3000);
+	}
+
+	function wrongEmailMsg()
+	{
+		var $d = $('.share-dialog');
+		$d.addClass('error');
+		setTimeout(function()
+		{
+			$d.removeClass('error');
+		}, 3000);
+	}
+
+	// Plugin configuration
+	var contacts = [];
+	for (var i in M.u)
+	{
+		contacts.push({id: M.u[i].u, name: M.u[i].m});
+	}
+	$('.share-multiple-input').tokenInput(contacts, {
+		theme:				"mega",
+		hintText:			"Type in a contact email",
+		searchingText:		"Searching for existing contacts...",
+		addAvatar:			false,
+		autocomplete:		null,
+		searchDropdown:		true,
+		emailCheck:			true,
+		preventDoublet:		true,
+		resultsLimit:		5,
+		minChars:			2,
+		onEmailCheck: wrongEmailMsg,
+		onDoublet: existingEmailMsg,
+		onAdd: function()
+		{
+			var $btn = $('.dialog-share-button');
+			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 1)
+			{
+				$btn.removeClass('disabled');
+
+			}
+			else
+			{
+				$btn.removeClass('disabled');
+			}
+		},
+		onDelete: function()
+		{
+			var $btn = $('.dialog-share-button');
+			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+			if (itemNum === 0)
+			{
+				$btn.addClass('disabled');
+
+			}
+			else if (itemNum === 1)
+			{
+				$btn.removeClass('disabled');
+
+			}
+			else
+			{
+				$btn.removeClass('disabled');
+			}
+		}
+    });
+	
+	checkPermission = function($this)
+	{
+		var perm; 
+		if ($this.is('.read-and-write'))
+		{
+			perm = ['read-and-write', l[56]];
+		}
+		else if ($this.is('.full-access'))
+		{
+			perm = ['full-access', l[57]];
+		}
+		else// read-only
+		{
+			perm = ['read-only', l[55]];
+		}
+		
+		return perm;
+	};
+	
+	menuPermissionState = function($this)
+	{
+		var mi = '.permissions-menu .permissions-menu-item';
+		$(mi).removeClass('active');
+		
+		var cls = checkPermission($this);
+		
+		$(mi + '.' + cls[0]).addClass('active');
+	};
+	
+	handlePermissionMenu = function($this, m, x, y)
+	{
+		m.css('left', x + 'px');
+		m.css('top', y + 'px');
+		menuPermissionState($this);
+		m.removeClass('hidden');
+		$this.addClass('active');
+	};
+	
+	determineContactParams = function(item, perm)
+	{
+		var name = item;// email address
+		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
+		var av;
+//		av = name.charAt(0) + name.charAt(1);
+		
+		var html = addShareDialogContactToContent('email', av_color, '', name, perm[0], perm[1]);
+		
+		$('.share-dialog .share-dialog-contacts').append(html);
+		
+	};
+	
 	$('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').unbind('click');
 	$('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').bind('click',function()
 	{
 		closeDialog();
+	});
+
+	$('.share-dialog .dialog-share-button').unbind('click');
+	$('.share-dialog .dialog-share-button').bind('click',function()
+	{
+		$this = $(this);
+		
+		// If share button is NOT disabled
+		if (!$this.is('.disabled'))
+		{
+			// If there's a contacts in multi-input add them to top
+			var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
+			if ($items.length)
+			{
+				$.each($items, function(ind, val) {
+					determineContactParams(val.innerText, checkPermission($('.share-dialog .permissions-icon')));
+				});
+				
+				$('.share-dialog .multiple-input .token-input-token-mega').remove();
+				
+				shareDialogContacts();
+			}
+			else
+			{
+				// recreate complete share event, remove old one adn add new
+//				this will NEVER happend for newly imported contacts
+				// There's a problem with importing (non existing emails) they don't have id!!!
+				var t = [];
+				var s = M.d[$.selected[0]].shares;
+				var id;
+				var contact;
+				var perm, aPerm;
+				var $items = $('.share-dialog-contact-bl');
+				$.each($items, function(ind, val) {
+					aPerm = $(val).find('.share-dialog-permissions');
+					id = $(val).find('.fm-chat-user').text();
+					
+					if (aPerm === 'read-and-write') perm = 1;
+					else if (aPerm === 'full-access') perm = 2;
+					else perm = 0;
+					
+					if (id && !(s && s[id])) t.push({u: id,r: perm});
+				});
+				
+				closeDialog();
+				if (t.length > 0)
+				{
+					loadingDialog.show();
+					doshare($.selected[0],t, true);
+				}
+			}
+		}
+	});
+
+	$(document).off('click', '.share-dialog-remove-button');
+	$(document).on('click', '.share-dialog-remove-button', function ()
+	{
+		var $this = $(this);
+		$this.parent().remove();
+	
+		shareDialogContacts();
+	});
+
+	// related to specific contact
+	$(document).off('click', '.share-dialog-permissions');
+	$(document).on('click', '.share-dialog-permissions', function ()
+	{
+		var $this = $(this);
+		var $m = $('.permissions-menu');
+		if ($this.is('.active') && !$m.is('.hidden'))
+		{
+			$m.addClass('hidden');
+			$this.removeClass('active');
+			return false;
+		}
+		else
+		{
+			$m.addClass('hidden');
+			$('.share-dialog .share-dialog-permissions').removeClass('active');// Remove from previously active
+			var x = $this.position().left + 42;
+			var y = $this.position().top + 13;
+			handlePermissionMenu($this, $m, x, y);			
+		}
+	});
+
+	// related to multi-input contacts
+	$('.share-dialog .permissions-icon').unbind('click');
+	$('.share-dialog .permissions-icon').bind('click', function ()
+	{
+		var $this = $(this);
+		var $m = $('.permissions-menu');
+		if ($this.is('.active') && !$m.is('.hidden'))
+		{
+			$m.addClass('hidden');
+			$this.removeClass('active');
+			return;
+		}
+		else
+		{
+			$('.share-dialog .share-dialog-permissions').removeClass('active');// Remove from previously active
+			var x = $this.position().left + 35;
+			var y = $this.position().top - 8;
+			handlePermissionMenu($this, $m, x, y);			
+		}
+	});
+
+	$('.permissions-menu-item').unbind('click');
+	$('.permissions-menu-item').bind('click', function ()
+	{
+		var $this = $(this);
+		
+		$('.permissions-menu').addClass('hidden');
+		// Find where we are permissions-icon or share-dialog-permissions
+
+		var cls = checkPermission($this);
+		
+		var $i = $('.share-dialog .share-dialog-permissions.active');// Specific contact
+		var $g = $('.share-dialog .permissions-icon.active');// Group permissions
+
+		var acls = [];// active permission
+		if ($i.length)
+		{
+			acls = checkPermission($i);
+			$i
+				.removeClass(acls[0])
+				.removeClass('active')
+				.html('<span></span>' + cls[1])
+				.addClass(cls[0]);
+		}
+		else if ($g.length)// Group permission, permissions-icon
+		{
+			acls = checkPermission($g);
+			$g
+				.removeClass(acls[0])
+				.removeClass('active')
+				.addClass(cls[0]);
+		}
+		
+		$('.permissions-icon.active').removeClass('active');
+		$('.share-dialog-permissions.active').removeClass('active');
 	});
 }
 
@@ -5145,6 +5466,9 @@ function closeDialog()
 		// add contact popup
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		// share dialog permission menu
+		$('.permissions-menu').addClass('hidden');
+		$('.permissions-icon').removeClass('active');
 
 		delete $.copyDialog;
 		delete $.moveDialog;
@@ -6782,7 +7106,6 @@ function fm_resize_handler() {
     }
 
 }
-
 function sharedfolderUI()
 {
 	var r = false;
@@ -7054,68 +7377,6 @@ function FMResizablePane(element, opts) {
 //	$('.fm-share-contacts-popup').addClass('hidden');
 //
 //	$.dialog='sharing';
-//	$('.fm-share-add-contacts').unbind('click');
-//	$('.fm-share-add-contacts').bind('click',function()
-//	{
-//		if ($(this).attr('class').indexOf('active') == -1)
-//		{
-//			var jsp = $('.fm-share-contacts-body').data('jsp');
-//			if (jsp) jsp.destroy();
-//			var u = [];
-//			var html='';
-//			for(var i in M.c['contacts']) if (M.u[i]) u.push(M.u[i]);
-//			u.sort(function(a,b)
-//			{
-//				if (a.name && b.name) return a.name.localeCompare(b.name);
-//				else  return -1;
-//			});
-//			for (var i in u)
-//			{
-//				var avatar= staticpath + 'images/mega/default-top-avatar.png';
-//				if (avatars[u[i].h]) avatar = avatars[u[i].h].url;
-//				html += '<a class="add-contact-item" id="'+htmlentities(u[i].h)+'"><span class="add-contact-pad"><span class="avatar '+ u[i].h +'"><span><img src="' + avatar + '" alt=""></span></span><span class="add-contact-username">'+htmlentities(u[i].m)+'</span></span></a>';
-//			}
-//			$('.fm-share-contacts-body').html(html);
-//			$('.fm-share-contacts-popup').removeClass('hidden');
-//			$('.fm-share-contacts-popup input').val(l[1019]);
-//			$('.fm-share-contacts-popup input').unbind('click');
-//			$('.fm-share-contacts-popup input').bind('click',function()
-//			{
-//				if ($(this).val() == l[1019]) $(this).val('');
-//			});
-//
-//			$('.fm-share-contacts-popup input').unbind('keyup');
-//			$('.fm-share-contacts-popup input').bind('keyup',function()
-//			{
-//				if (!checkMail($(this).val())) $('.add-contact-button').addClass('active');
-//			});
-//
-//			$('.fm-share-contacts-body .add-contact-item').unbind('click');
-//			$('.fm-share-contacts-body .add-contact-item').bind('click',function()
-//			{
-//				if ($(this).attr('class').indexOf('ui-selected') > -1) $(this).removeClass('ui-selected');
-//				else $(this).addClass('ui-selected');
-//
-//				var sl = $('.fm-share-contacts-body .ui-selected');
-//				if (sl.length > 0) $('.add-contact-button').addClass('active');
-//				else $('.add-contact-button').removeClass('active');
-//			});
-//			$(this).addClass('active');
-//			$('.fm-share-contacts-body').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-//			jScrollFade('.fm-share-contacts-body');
-//		}
-//		else
-//		{
-//			$('.fm-share-add-contacts').removeClass('active');
-//			$('.fm-share-contacts-popup').addClass('hidden');
-//		}
-//	});
-//	$('.cancel-contact-button').unbind('click');
-//	$('.cancel-contact-button').bind('click',function()
-//	{
-//	    $('.fm-share-contacts-popup').addClass('hidden');
-//		$('.fm-share-add-contacts').removeClass('active');
-//	});
 //	$('.add-contact-button, .fm-share-contacts-search').unbind('click');
 //	$('.add-contact-button, .fm-share-contacts-search').bind('click',function()
 //	{
@@ -7226,53 +7487,3 @@ function FMResizablePane(element, opts) {
 //		if (sops.length > 0) api_req({a:'s',n:$.selected[0],s:sops,ha:'',i: requesti});
 //		shareDialog(1);
 //	});
-//	$('.fm-share-dropdown').unbind('click');
-//	$('.fm-share-dropdown').bind('click',function()
-//	{
-//		$('.fm-share-permissions-block').addClass('hidden');
-//		$(this).next().removeClass('hidden');
-//		var dropdownPosition  = $(this).next().offset().top + 140;
-//		var scrBlockPosition = 	$(this).closest('.fm-share-body').offset().top + 318;
-//		if (scrBlockPosition - dropdownPosition < 10)
-//		{
-//			$(this).next().addClass('bottom');
-//		}
-//	});
-//
-//	$('.fm-dialog,.fm-dialog-overlay').unbind('click')
-//	$('.fm-dialog,.fm-dialog-overlay').bind('click', function(e) {
-//		if (!$(e.target).is('.fm-share-dropdown')) {
-//			$('.fm-share-permissions-block').addClass('hidden');
-//		}
-//	});
-//
-//	$('.fm-share-permissions').unbind('click');
-//	$('.fm-share-permissions').bind('click',function()
-//	{
-//		$(this).parent().parent().find('.fm-share-permissions').removeClass('active');
-//		$(this).addClass('active');
-//		var r = $(this).attr('id');
-//		if (r) r = r.replace('rights_','');
-//		var t = '';
-//		if (r == 0) 	t = l[55];
-//		else if (r == 1) t = l[56];
-//		else if (r == 2) t = l[57];
-//		else if (r == 3) t = l[83];
-//		$(this).parent().parent().find('.fm-share-dropdown').text(t);
-//		var id = $(this).parent().parent().parent().attr('id');
-//		if (r == 3)
-//		{
-//			if (!$.delShare) $.delShare=[];
-//			$.delShare.push(id);
-//			if (d) console.log('delShare',$.delShare);
-//		}
-//		else doshare($.selected[0],[{u:id,r:r}]);
-//		$('.fm-share-permissions-block').addClass('hidden');
-//	});
-//	$('.share-dialog').removeClass('hidden');
-//	$('.share-dialog').css('margin-top','-'+$('.share-dialog').height()/2+'px');
-//	$('.fm-dialog-overlay').removeClass('hidden');
-//  $('body').addClass('overlayed');
-//	$('.fm-share-body').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
-//	jScrollFade('.fm-share-body');
-//}

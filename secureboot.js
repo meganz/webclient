@@ -575,6 +575,9 @@ else
         // Other
         jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
 
+		// Google Import Contacts
+        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
+
 
         // MEGA CHAT
         jsl.push({f:'js/chat/rtcStats.js', n: 'mega_js', j:1,w:7});

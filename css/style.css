@@ -98,8 +98,7 @@ body {
 	min-width: 987px;
 }
 ::selection {
-	background: #d22000;
-	color: white;
+	background: rgba(0,0,0,0.1);
 }
 ::-moz-selection {
  background: #d22000;
@@ -8679,6 +8678,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-dialog-button.dialog-share-button {
 	background-color: rgba(255,179,0,0.5);
+}
+.fm-dialog-button.dialog-share-button:hover {
+	background-color: rgba(255,179,0,1);
+}
+.fm-dialog-button.dialog-share-button.disabled, .fm-dialog-button.dialog-share-button.disabled:hover {
+	background-color: rgba(0,0,0,0.2);
+	cursor: default;
 }
 .fm-dialog-button.dialog-share-button:hover {
 	background-color: rgba(255,179,0,1);
@@ -18073,6 +18079,10 @@ div.token-input-dropdown-mega ul li {
 	background-color: rgb(255, 255, 255, 1);
 	padding: 3px;
 	margin: 0;
+	height: 54px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 	list-style-type: none;
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
@@ -18243,7 +18253,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 	cursor: pointer;
 }
-.import-contacts-link:hover {
+.import-contacts-link:hover, .import-contacts-link.active {
 	color: rgb(102,102,102);
 }
 .import-contacts-link span {
@@ -18265,7 +18275,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	opacity: 0.3;
 	display: block;
 }
-.import-contacts-link:hover span {
+.import-contacts-link:hover span, .import-contacts-link.active span {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 	-moz-opacity: 0.6;
 	-khtml-opacity: 0.6;
@@ -18395,6 +18405,168 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .export-content-block .jspDrag {
 	width: 4px;
 	background-color: black;
+}
+.import-contacts-dialog {
+	position: absolute;
+	min-width: 206px;
+	z-index: 10;
+	border: 2px solid rgba(0,0,0,0.15);
+	background-color: white;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 8px 0 0 8px;
+}
+.import-contacts-header {
+	height: 36px;
+}
+.import-contacts-header .import-contacts-link {
+	margin: 0px 35px 0 10px;
+	float: none;
+	padding-top: 6px;
+}
+.import-contacts-service {
+	height: 48px;
+	background-color: #F6F6F6;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-right-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-right-radius: 7px;
+	cursor: pointer;
+}
+.import-contacts-service.imported {
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: right -2163px;
+	background-repeat: no-repeat;
+}
+.import-contacts-service span {
+	display: block;
+	font-size: 11px;
+	line-height: 24px;
+	padding-left: 22px;
+	float: left;
+	margin: 12px 0 0 10px;
+	font-family: 'Open Sans Semibold', Arial;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -11px -2074px;
+	background-repeat: no-repeat;
+}
+.import-contacts-info {
+	width: 14px;
+	height: 14px;
+	float: right;
+	position: relative;
+	margin: 11px 11px 0 0;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	background-color: rgba(0,0,0,0.2);
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: 1px -2137px;
+	background-repeat: no-repeat;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.import-contacts-info:hover {
+	background-color: rgba(0,0,0,0.5);
+}
+.import-contacts-info-txt {
+	position: absolute;
+	width: 206px;
+	bottom: 22px;
+	right: -13px;
+	background-color: #444444;
+	padding: 10px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	font-size: 11px;
+	color: #CCCCCC;
+	line-height: 18px;
+	display: none;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
+}
+.import-contacts-info:hover .import-contacts-info-txt {
+	display: block;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
+}
+.import-contacts-info-txt .import-arrow {
+	width: 16px;
+	height: 6px;
+	position: absolute;
+	bottom: -6px;
+	right: 12px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -5px -2117px;
+	background-repeat: no-repeat;
+}
+.imported-notification-close {
+	position: absolute;
+	right: 6px;
+	top: 5px;
+	width: 20px;
+	height: 20px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: -2px -3178px;
+	background-repeat: no-repeat;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	cursor: pointer;
+}
+.imported-notification-close:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+}
+.imported-contacts-notification {
+	background-color: #127927;
+	color: rgba(255, 255, 255, 0.8);
+	position: absolute;
+	z-index: 1101;
+	bottom: 8px;
+	left: 50%;
+	font-size: 11px;
+	line-height: 30px;
+	height: 32px;
+	padding: 0 30px 0 10px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .copy-dialog .fm-dialog-body, .move-dialog .fm-dialog-body {
 	padding: 14px 0 0 0;

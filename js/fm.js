@@ -325,6 +325,7 @@ function treesearchUI()
 					M.buildtree({h:M.RubbishID});
 					break;
 			}
+			treeUI(); // reattach events
 		}
 	});
 	initializeTreePanelSorting()

@@ -17648,16 +17648,16 @@ span.incoming-call-name {
 	left: auto;
 	top: auto;
 	margin: 6px 0 0 11px;
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
--moz-opacity: 0;
--khtml-opacity: 0;
-opacity: 0;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	-moz-opacity: 0;
+	-khtml-opacity: 0;
+	opacity: 0;
 }
 .shared-top-details:hover .shared-details-pad .grid-url-arrow {
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
--moz-opacity: 1;
--khtml-opacity: 1;
-opacity: 1;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+	-moz-opacity: 1;
+	-khtml-opacity: 1;
+	opacity: 1;
 }
 .contact-top-details {
 	height: 235px;
@@ -18570,6 +18570,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	font-size: 11px;
 	line-height: 30px;
 	height: 32px;
+	margin-left: -135px;
 	padding: 0 30px 0 10px;
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;

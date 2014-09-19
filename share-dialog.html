@@ -98,10 +98,10 @@ $(document).ready(function() {
 	$('.import-contacts-link').bind('click', function() {
 		if($(this).attr('class').indexOf('active') == -1) {
 		   $('.import-contacts-link').addClass('active');
-		   $('.import-contacts-dialog').removeClass('hidden');
+		   $('.import-contacts-dialog').fadeIn(200);
 		} else {
 		   $('.import-contacts-link').removeClass('active');
-		   $('.import-contacts-dialog').addClass('hidden');
+		   $('.import-contacts-dialog').fadeOut(200);
 		}
 	});
 	
@@ -110,17 +110,17 @@ $(document).ready(function() {
 		var n = $('.imported-contacts-notification');
 		if($(this).attr('class').indexOf('imported') == -1) {
 		   $(this).addClass('imported');
-		   n.css('margin-left', '-' + n.outherWidth/2 + 'px');
-		   n.removeClass('hidden');
+		   n.css('margin-left', '-' + n.outerWidth()/2 +'px');
+		   n.fadeIn(200);
 		} else {
 		   $(this).removeClass('imported');
-		   n.addClass('hidden');
+		   n.fadeOut(200);
 		}
 	});
 	
 	$('.imported-notification-close').unbind('click');
 	$('.imported-notification-close').bind('click', function() {
-		   $('.imported-contacts-notification').addClass('hidden');
+		   $('.imported-contacts-notification').fadeOut(200);
 	});
 	
 });

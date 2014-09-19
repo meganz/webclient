@@ -5109,31 +5109,31 @@ function addShareDialogContactToContent (type, av_color, av, name, permClass, pe
 
 function fillShareDialogWithContent()
 {
-	for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
+	var sel = $.selected[0];
+	for (var i in M.d[sel].shares)// list users that are already use folder
 	{
 		var user = M.u[i];
 		var name = (typeof user.name != 'undefined' && user.name.length < 2) ? user.name : user.m;
 		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
-		var av;
-		av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
-		var permText, permClass;
+		var av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+		var perm;
 		
-		switch (M.d[i].r)// Permission level
+		var pl = 0;
+		if (typeof M.d[sel].shares.r != 'undefined') pl = M.d[i].shares.r;
+		
+		switch (pl)// Permission level
 		{
 			case 1: // Read and write
-				permClass = 'read-and-write';
-				permText = l[56];
+				perm = ['read-and-write', l[56]];
 				break;
 			case 2: // Full Access
-				permClass = 'full-access';
-				permText = l[57];
+				perm = ['full-access', l[57]];
 				break;	
 			default: // 0 or any === read only
-				permClass = 'read-only';
-				permText = l[55];
+				perm = ['read-only', l[55]];
 				break;
 		}
-		var html = addShareDialogContactToContent('', av_color, av, name, permClass, permText);
+		var html = addShareDialogContactToContent('', av_color, av, name, perm[0], perm[1]);
 
 		$('.share-dialog .share-dialog-contacts').append(html);
 	}
@@ -5173,6 +5173,25 @@ function handleShareDialogContent()
 
     dialogPositioning('.fm-dialog.share-dialog');
 }
+
+checkMultiInputPermission = function($this)
+{
+	var perm; 
+	if ($this.is('.read-and-write'))
+	{
+		perm = ['read-and-write', l[56]];
+	}
+	else if ($this.is('.full-access'))
+	{
+		perm = ['full-access', l[57]];
+	}
+	else// read-only
+	{
+		perm = ['read-only', l[55]];
+	}
+	
+	return perm;
+};
 
 function initShareDialog()
 {
@@ -5253,31 +5272,12 @@ function initShareDialog()
 		}
     });
 	
-	checkPermission = function($this)
-	{
-		var perm; 
-		if ($this.is('.read-and-write'))
-		{
-			perm = ['read-and-write', l[56]];
-		}
-		else if ($this.is('.full-access'))
-		{
-			perm = ['full-access', l[57]];
-		}
-		else// read-only
-		{
-			perm = ['read-only', l[55]];
-		}
-		
-		return perm;
-	};
-	
 	menuPermissionState = function($this)
 	{
 		var mi = '.permissions-menu .permissions-menu-item';
 		$(mi).removeClass('active');
 		
-		var cls = checkPermission($this);
+		var cls = checkMultiInputPermission($this);
 		
 		$(mi + '.' + cls[0]).addClass('active');
 	};
@@ -5323,7 +5323,7 @@ function initShareDialog()
 			if ($items.length)
 			{
 				$.each($items, function(ind, val) {
-					determineContactParams(val.innerText, checkPermission($('.share-dialog .permissions-icon')));
+					determineContactParams(val.innerText, checkMultiInputPermission($('.share-dialog .permissions-icon')));
 				});
 				
 				$('.share-dialog .multiple-input .token-input-token-mega').remove();
@@ -5332,9 +5332,7 @@ function initShareDialog()
 			}
 			else
 			{
-				// recreate complete share event, remove old one adn add new
-//				this will NEVER happend for newly imported contacts
-				// There's a problem with importing (non existing emails) they don't have id!!!
+				// ToDo: wait for new import contact logic on server
 				var t = [];
 				var s = M.d[$.selected[0]].shares;
 				var id;
@@ -5342,14 +5340,27 @@ function initShareDialog()
 				var perm, aPerm;
 				var $items = $('.share-dialog-contact-bl');
 				$.each($items, function(ind, val) {
-					aPerm = $(val).find('.share-dialog-permissions');
 					id = $(val).find('.fm-chat-user').text();
 					
-					if (aPerm === 'read-and-write') perm = 1;
-					else if (aPerm === 'full-access') perm = 2;
-					else perm = 0;
+					aPerm = $(val).find('.share-dialog-permissions');
 					
-					if (id && !(s && s[id])) t.push({u: id,r: perm});
+					if (aPerm === 'read-and-write')
+					{
+						perm = 1;
+					}
+					else if (aPerm === 'full-access')
+					{
+						perm = 2;
+					}
+					else
+					{
+						perm = 0;
+					}
+					
+					if (!(s && s[id]))// ToDo: make this condition better
+					{
+						t.push({u: id, r: perm});
+					}
 				});
 				
 				closeDialog();
@@ -5360,6 +5371,39 @@ function initShareDialog()
 				}
 			}
 		}
+	});
+
+	$('.import-contacts-link').unbind('click');
+	$('.import-contacts-link').bind('click', function() {
+		if($(this).attr('class').indexOf('active') == -1) {
+		   $('.import-contacts-link').addClass('active');
+		   $('.import-contacts-dialog').fadeIn(200);
+		   
+		   //if contacts are imported, then do:
+//	       $('.import-contacts-service').addClass('imported');
+		   var n = $('.imported-contacts-notification');
+//	       n.css('margin-left', '-' + n.outerWidth()/2 +'px');
+//	       n.fadeIn(200);
+	
+	       $('.imported-notification-close').unbind('click');
+	       $('.imported-notification-close').bind('click', function() {
+		      n.fadeOut(200);
+	       });
+		   
+		} else {
+		   $('.import-contacts-link').removeClass('active');
+		   $('.import-contacts-dialog').fadeOut(200);
+		   $('.imported-contacts-notification').fadeOut(200);
+		}
+	});
+	
+	$('.import-contacts-info').unbind('mouseover');
+	$('.import-contacts-info').bind('mouseover', function() {
+		   $('.import-contacts-info-txt').fadeIn(200);
+	});
+	$('.import-contacts-info').unbind('mouseout');
+	$('.import-contacts-info').bind('mouseout', function() {
+		   $('.import-contacts-info-txt').fadeOut(200);
 	});
 
 	$(document).off('click', '.share-dialog-remove-button');
@@ -5422,7 +5466,7 @@ function initShareDialog()
 		$('.permissions-menu').addClass('hidden');
 		// Find where we are permissions-icon or share-dialog-permissions
 
-		var cls = checkPermission($this);
+		var cls = checkMultiInputPermission($this);
 		
 		var $i = $('.share-dialog .share-dialog-permissions.active');// Specific contact
 		var $g = $('.share-dialog .permissions-icon.active');// Group permissions
@@ -5430,7 +5474,7 @@ function initShareDialog()
 		var acls = [];// active permission
 		if ($i.length)
 		{
-			acls = checkPermission($i);
+			acls = checkMultiInputPermission($i);
 			$i
 				.removeClass(acls[0])
 				.removeClass('active')
@@ -5439,7 +5483,7 @@ function initShareDialog()
 		}
 		else if ($g.length)// Group permission, permissions-icon
 		{
-			acls = checkPermission($g);
+			acls = checkMultiInputPermission($g);
 			$g
 				.removeClass(acls[0])
 				.removeClass('active')
@@ -5449,6 +5493,32 @@ function initShareDialog()
 		$('.permissions-icon.active').removeClass('active');
 		$('.share-dialog-permissions.active').removeClass('active');
 	});
+}
+
+function addImportedData(data, from)
+{
+	var perm, av_color, av, html;
+	$.each(data, function(ind, val) {
+		// Read permission from multi-input permission box
+		perm = checkMultiInputPermission($('.share-dialog .permissions-icon'));
+		av_color = val.charCodeAt(0)%6 + val.charCodeAt(1)%6;
+		av = val.charAt(0) + val.charAt(1);
+		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
+		
+		var html = addShareDialogContactToContent(from, av_color, '', val,perm[0], perm[1]);
+		$('.share-dialog .share-dialog-contacts').append(html);
+	});
+	
+	shareDialogContacts();
+	
+	closeImportContactNotification();
+}
+
+function closeImportContactNotification()
+{
+	$('.imported-contacts-notification').fadeOut(200);//.addClass('hidden');
+	$('.import-contacts-dialog').fadeOut(200);//.addClass('hidden');
+	$('.import-contacts-link').removeClass('active');
 }
 
 function closeDialog()
@@ -5470,6 +5540,7 @@ function closeDialog()
 		// share dialog permission menu
 		$('.permissions-menu').addClass('hidden');
 		$('.permissions-icon').removeClass('active');
+		closeImportContactNotification();
 
 		delete $.copyDialog;
 		delete $.moveDialog;

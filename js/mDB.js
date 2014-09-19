@@ -25,7 +25,7 @@ if (indexedDB)
 			else mDBreload();
 		});
 	}
-	
+
 	function mDBactive(act)
 	{
 		if (act !== mDBact) return;
@@ -36,13 +36,13 @@ if (indexedDB)
 	function mDBstart()
 	{
 		if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+1000 > new Date().getTime())
-		{	
+		{
 			if (d) console.log('existing mDB session, fetch live data');
 			mDB=undefined;
 			loadfm();
 			return;
 		}
-		mDBact = Math.random();	
+		mDBact = Math.random();
 		mDBactive(mDBact);
 		loadingDialog.show();
 		if (d) console.log('mDBstart()');
@@ -66,7 +66,7 @@ if (indexedDB)
 			}
 		}
 		request.onsuccess = function(event)
-		{	
+		{
 			if (!mDB) return false;
 			mDB=request.result;
 			if (localStorage[u_handle + '_mDBcount'] && (!localStorage[u_handle + '_mDBv'] || parseInt(localStorage[u_handle + '_mDBv']) < mDBv))
@@ -76,8 +76,8 @@ if (indexedDB)
 				mDBact=false;
 				mDBreload();
 				return false;
-			}	
-			if (d) console.log('mDB success');			
+			}
+			if (d) console.log('mDB success');
 			if (localStorage[u_handle + '_mDBcount'] && localStorage[u_handle + '_mDBcount'] == 0 && localStorage[u_handle + '_maxaction'])
 			{
 				mDBcount('f',function(c)
@@ -95,7 +95,7 @@ if (indexedDB)
 				if (d) console.log('fetching live data');
 				mDBfetch();
 			}
-			
+
 		};
 		request.onupgradeneeded = function(event)
 		{
@@ -104,7 +104,7 @@ if (indexedDB)
 			db.createObjectStore("f",  { keyPath:  "h"});
 			db.createObjectStore("ok", { keyPath:  "h"});
 			db.createObjectStore("s",  { keyPath:  "h_u"});
-			db.createObjectStore("u",  { keyPath:  "u"});		
+			db.createObjectStore("u",  { keyPath:  "u"});
 		};
 
 		setTimeout(function()
@@ -121,7 +121,7 @@ if (indexedDB)
 	var mDBqueue = {};
 
 	function mDBadd(t,n)
-	{	
+	{
 		var a = n;
 		if (a.name && a.p !== 'contacts') delete a.name;
 		if (a.ar && a.p !== 'contacts') delete a.ar;
@@ -133,7 +133,7 @@ if (indexedDB)
 	var mDBt = {};
 
 	function mDBprocess()
-	{	
+	{
 		if (!Qt) Qt = new Date().getTime();
 		for (var t in mDBqueue)
 		{
@@ -200,7 +200,7 @@ if (indexedDB)
 	function mDBquery(t)
 	{
 		if (d) console.log('mDBquery()');
-		var dt = t;
+		var fr, dt = t;
 		if (t == 'f_sk') dt='f';
 		var objectStore = mDB.transaction(dt,'readonly').objectStore(dt);
 		objectStore.openCursor().onsuccess = function(event)
@@ -208,7 +208,16 @@ if (indexedDB)
 			var rec = event.target.result;
 			if (rec)
 			{
-				if (t == 'ok') process_ok([rec.value]);
+				var value;
+
+				try {
+					value = rec.value;
+				} catch(e) {
+					if (d) console.error('mDBquery', t, e);
+				}
+
+				if (typeof value === 'undefined') fr = true;
+				else if (t == 'ok') process_ok([rec.value]);
 				else if (t == 'f') M.addNode(rec.value,1);
 				else if (t == 'f_sk')
 				{
@@ -218,6 +227,11 @@ if (indexedDB)
 				else if (t == 'u') M.addUser(rec.value,1);
 				else if (t == 's') M.nodeShare(rec.value.h,rec.value,1);
 				rec.continue();
+			}
+			else if ( fr )
+			{
+				if (d) console.log('mDBquery: forcing reload');
+				mDBreload();
 			}
 			else
 			{
@@ -231,8 +245,8 @@ if (indexedDB)
 						return false;
 					}
 				}
-				maxaction = localStorage[u_handle + '_maxaction'];				
-				for (var i in M.d) 
+				maxaction = localStorage[u_handle + '_maxaction'];
+				for (var i in M.d)
 				{
 					var entries=true;
 					break;
@@ -249,7 +263,7 @@ if (indexedDB)
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.callback = callback;
 		dbreq.onsuccess = function(event)
-		{			
+		{
 			if (d) console.log('db deleted');
 			if (dbreq.callback) dbreq.callback();
 		};
@@ -258,7 +272,7 @@ if (indexedDB)
 	function mDBreload()
 	{
 		mDB.close();
-		mDB=2;		
+		mDB=2;
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.onsuccess = function(event)
 		{
@@ -287,7 +301,7 @@ if (indexedDB)
 			delete localStorage[u_handle + '_mDBcount'];
 			delete localStorage[u_handle + '_maxaction'];
 			delete localStorage[u_handle + '_mDBactive'];
-			mDBact = Math.random();			
+			mDBact = Math.random();
 			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 			Qt=undefined;
 			request=undefined;

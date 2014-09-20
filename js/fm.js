@@ -1151,7 +1151,7 @@ function addContactUI()
 		else// Show
 		{
 			$('.add-user-popup .import-contacts-dialog').fadeOut(0);
-			$('.import-contact-link').removeClass('active');
+			$('.import-contacts-link').removeClass('active');
 			$this.addClass('active');
 			$d.removeClass('hidden dialog');
 			$('.add-user-popup .multiple-input .token-input-token-mega').remove();
@@ -1179,7 +1179,7 @@ function addContactUI()
 	$('.add-user-size-icon').on('click', function()
 	{
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
-		$('.import-contact-link').removeClass('active');
+		$('.import-contacts-link').removeClass('active');
 		if ($(this).is('.full-size'))
 		{
 			$('.add-user-popup').addClass('dialog');
@@ -1225,7 +1225,7 @@ function addContactUI()
 		}
 
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
-		$('.import-contact-link').removeClass('active');
+		$('.import-contacts-link').removeClass('active');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
@@ -1515,11 +1515,11 @@ function initContextUI()
 		else
 		{
 			$.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
-			handleShareDialogContent();
 			$.hideContextMenu();
 			$('.share-dialog').removeClass('hidden');
 			$('.fm-dialog-overlay').removeClass('hidden');
 			$('body').addClass('overlayed');
+			handleShareDialogContent();
 		}
 	});
 
@@ -5142,7 +5142,7 @@ function shareDialogContacts()
 		$btn.removeClass('disabled');
 		$(dc + ' .share-dialog-img').addClass('hidden');
 		$(dc + ' .share-dialog-contacts').removeClass('hidden');
-		this.handleDialogScroll(num, dc);
+		handleDialogScroll(num, dc);
 	}
 	else
 	{
@@ -5174,7 +5174,7 @@ function fillShareDialogWithContent()
 		if (M.u[i])
 		{
 			var user = M.u[i];
-			var name = (typeof user.name != 'undefined' && user.name.length < 2) ? user.name : user.m;
+			var name = (user.name && user.name.length < 2) ? user.name : user.m;
 			var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
 			var av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
 			var perm;
@@ -5201,25 +5201,26 @@ function fillShareDialogWithContent()
 	}
 };
 
-function handleShareDialogContent()
+handleDialogScroll = function(num, dc)
 {
 	var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
-	
-	handleDialogScroll = function(num, dc)
+	//
+	// Add scroll in case that we have more then 5 items in list
+	if (num > SCROLL_NUM)
 	{
-		// Add scroll in case that we have more then 5 items in list
-		if (num > SCROLL_NUM)
-		{
-			dialogScroll(dc + ' .share-dialog-contacts');
-		}
-		else
-		{
-			var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
-			var el = $x.data('jsp');
-			el.destroy();
-		}
-	};
-	
+		dialogScroll(dc + ' .share-dialog-contacts');
+	}
+	else
+	{
+		var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
+		var el = $x.data('jsp');
+		el.destroy();
+	}
+};
+
+function handleShareDialogContent()
+{
+
 	fillShareDialogWithContent();
 	
 	shareDialogContacts();
@@ -5458,6 +5459,8 @@ function initShareDialog()
 	$('.share-dialog .import-contacts-link').bind('click', function()
 	{
 		$('.permissions-menu').fadeOut(200);
+		$('.share-dialog-permissions').removeClass('active');
+		$('.permissions-icon').removeClass('active');
 		if(!$(this).is('.active'))
 		{
 			$('.share-dialog .import-contacts-link').addClass('active');

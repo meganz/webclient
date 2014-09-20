@@ -98,30 +98,37 @@ $(document).ready(function() {
 	$('.import-contacts-link').bind('click', function() {
 		if($(this).attr('class').indexOf('active') == -1) {
 		   $('.import-contacts-link').addClass('active');
-		   $('.import-contacts-dialog').removeClass('hidden');
+		   $('.import-contacts-dialog').fadeIn(200);
+		   
+		   //if contacts are imported, then do:
+	       $('.import-contacts-service').addClass('imported');
+		   var n = $('.imported-contacts-notification');
+	       n.css('margin-left', '-' + n.outerWidth()/2 +'px');
+	       n.fadeIn(200);
+	
+	       $('.imported-notification-close').unbind('click');
+	       $('.imported-notification-close').bind('click', function() {
+		      n.fadeOut(200);
+	       });
+		   
 		} else {
 		   $('.import-contacts-link').removeClass('active');
-		   $('.import-contacts-dialog').addClass('hidden');
+		   $('.import-contacts-dialog').fadeOut(200);
+		   $('.imported-contacts-notification').fadeOut(200);
 		}
 	});
 	
-	$('.import-contacts-service').unbind('click');
-	$('.import-contacts-service').bind('click', function() {
-		var n = $('.imported-contacts-notification');
-		if($(this).attr('class').indexOf('imported') == -1) {
-		   $(this).addClass('imported');
-		   n.css('margin-left', '-' + n.outherWidth/2 + 'px');
-		   n.removeClass('hidden');
-		} else {
-		   $(this).removeClass('imported');
-		   n.addClass('hidden');
-		}
+	$('.import-contacts-info').unbind('mouseover');
+	$('.import-contacts-info').bind('mouseover', function() {
+		   $('.import-contacts-info-txt').fadeIn(200);
+	});
+	$('.import-contacts-info').unbind('mouseout');
+	$('.import-contacts-info').bind('mouseout', function() {
+		   $('.import-contacts-info-txt').fadeOut(200);
 	});
 	
-	$('.imported-notification-close').unbind('click');
-	$('.imported-notification-close').bind('click', function() {
-		   $('.imported-contacts-notification').addClass('hidden');
-	});
+	
+	
 	
 });
 </script>

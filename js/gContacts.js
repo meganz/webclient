@@ -1,4 +1,4 @@
-function importGoogleContacts(param) {
+function importGoogleContacts() {
     var access_token_uri = 'https://accounts.google.com/o/oauth2/token';
     var authenticate_uri = 'https://accounts.google.com/o/oauth2/auth';
     var m8_uri = 'https://www.google.com/m8/feeds/';
@@ -38,7 +38,7 @@ function importGoogleContacts(param) {
                 var url = win.document.URL;
                 accessToken = extractQueryValue(url, 'access_token');
                 win.close();
-                getContactList(param);
+                getContactList();
             }
         } catch (e) {
         }
@@ -50,7 +50,7 @@ function importGoogleContacts(param) {
  * @param {boolean} false = addContacts, true=share dialog
  * @returns {undefined}
  */
-function getContactList(param) {
+function getContactList() {
 	var ACAO = 'http://aloncar.entrydns.org/';
     var data = {
         access_token: accessToken,
@@ -67,7 +67,7 @@ function getContactList(param) {
         url: "https://www.google.com/m8/feeds/contacts/default/full",
         dataType: "jsonp",
         data: data,
-        done: function(data)
+        success: function(data)
 		{
             var gData = readAllEmails(data);
 			addImportedData(gData, 'gmail');

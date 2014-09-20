@@ -5589,7 +5589,7 @@ function addImportedData(data, from)
 		av = val.charAt(0) + val.charAt(1);
 		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
 		
-		var html = addShareDialogContactToContent(from, av_color, '', val,perm[0], perm[1]);
+		html = addShareDialogContactToContent(from, av_color, '', val, perm[0], perm[1]);
 		$('.share-dialog .share-dialog-contacts').append(html);
 	});
 	

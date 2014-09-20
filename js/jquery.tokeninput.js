@@ -339,6 +339,7 @@
 							break;
 
 						case KEY.TAB:
+						case KEY.SPACE:
 						case KEY.ENTER:
 						case KEY.NUMPAD_ENTER:
 						case KEY.COMMA:

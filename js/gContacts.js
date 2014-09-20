@@ -1,11 +1,11 @@
-function importGoogleContacts() {
+function importGoogleContacts(param) {
     var access_token_uri = 'https://accounts.google.com/o/oauth2/token';
     var authenticate_uri = 'https://accounts.google.com/o/oauth2/auth';
     var m8_uri = 'https://www.google.com/m8/feeds/';
 
 // *** GOOGLE *** /
-    var client_id = '';//84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
-    var redirect_uri = '';//http://aloncar.entrydns.org/';// e.g. http://5d0ec37.ngrok.com';
+    var client_id = '84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
+    var redirect_uri = 'http://aloncar.entrydns.org/';// e.g. http://5d0ec37.ngrok.com';
 
     var POPUP_WIDTH = 800;
     var POPUP_HEIGHT = 600;
@@ -38,15 +38,20 @@ function importGoogleContacts() {
                 var url = win.document.URL;
                 accessToken = extractQueryValue(url, 'access_token');
                 win.close();
-                getContactList();
+                getContactList(param);
             }
         } catch (e) {
         }
     }, 500);
 }
 
-function getContactList() {
-	var ACAO = '';//http://aloncar.entrydns.org/';
+/**
+ * 
+ * @param {boolean} false = addContacts, true=share dialog
+ * @returns {undefined}
+ */
+function getContactList(param) {
+	var ACAO = 'http://aloncar.entrydns.org/';
     var data = {
         access_token: accessToken,
         v: '3.0'
@@ -62,11 +67,17 @@ function getContactList() {
         url: "https://www.google.com/m8/feeds/contacts/default/full",
         dataType: "jsonp",
         data: data,
-        success: function(data) {
+        done: function(data)
+		{
             var gData = readAllEmails(data);
 			addImportedData(gData, 'gmail');
+			$('.import-contacts-dialog').fadeOut(200);
+			$('.import-contacts-link').removeClass('active');
+			$('.import-contacts-service').addClass('imported');						
+			
 //            $('body').append(JSON.stringify(jsonData));
-        }});
+        }
+	});
 }
 
 function xPathNameSpaceResolver(prefix) {

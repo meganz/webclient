@@ -4,8 +4,8 @@ function importGoogleContacts() {
     var m8_uri = 'https://www.google.com/m8/feeds/';
 
 // *** GOOGLE *** /
-    var client_id = '';//e.g. 84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
-    var redirect_uri = '';// e.g. http://5d0ec37.ngrok.com';
+    var client_id = '84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
+    var redirect_uri = 'http://aloncar.entrydns.org/';// e.g. http://5d0ec37.ngrok.com';
 
     var POPUP_WIDTH = 800;
     var POPUP_HEIGHT = 600;
@@ -45,8 +45,13 @@ function importGoogleContacts() {
     }, 500);
 }
 
+/**
+ * 
+ * @param {boolean} false = addContacts, true=share dialog
+ * @returns {undefined}
+ */
 function getContactList() {
-	var ACAO = '';// e.g http://5d0ec37.ngrok.com';
+	var ACAO = 'http://aloncar.entrydns.org/';
     var data = {
         access_token: accessToken,
         v: '3.0'
@@ -62,10 +67,17 @@ function getContactList() {
         url: "https://www.google.com/m8/feeds/contacts/default/full",
         dataType: "jsonp",
         data: data,
-        success: function(data) {
-            var jsonData = readAllEmails(data);
+        success: function(data)
+		{
+            var gData = readAllEmails(data);
+			addImportedData(gData, 'gmail');
+			$('.import-contacts-dialog').fadeOut(200);
+			$('.import-contacts-link').removeClass('active');
+			$('.import-contacts-service').addClass('imported');						
+			
 //            $('body').append(JSON.stringify(jsonData));
-        }});
+        }
+	});
 }
 
 function xPathNameSpaceResolver(prefix) {
@@ -84,17 +96,17 @@ function readAllEmails(xml) {
 //        var names = xmlDoc.evaluate("/def:feed/def:entry/def:title", xmlDoc, nameSpace, 4, null);
     var index = 0;
 //    var jsonData = {};
-	var data = [];
+	var arrData = [];
 
     var node = emails.iterateNext();
     while (node)
 	{
-		data.push(node.value);
+		arrData.push(node.value);
 //        jsonData[node.value] = (index);
-//        node = emails.iterateNext();
-//        index++;
+        node = emails.iterateNext();
     }
-    return jsonData;
+//    return jsonData;
+    return arrData;
 }
 
 function validateToken(accessToken) {

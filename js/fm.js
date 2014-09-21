@@ -1092,6 +1092,7 @@ function addContactUI()
 		searchDropdown:		false,
 		emailCheck:			true,
 		preventDoublet:		true,
+		tokenValue:			"name",
 		resultsLimit:		5,
 		minChars:			2,
 		onEmailCheck: wrongEmailMsg,
@@ -1149,6 +1150,8 @@ function addContactUI()
 		}
 		else// Show
 		{
+			$('.add-user-popup .import-contacts-dialog').fadeOut(0);
+			$('.import-contacts-link').removeClass('active');
 			$this.addClass('active');
 			$d.removeClass('hidden dialog');
 			$('.add-user-popup .multiple-input .token-input-token-mega').remove();
@@ -1175,6 +1178,8 @@ function addContactUI()
 	$('.add-user-size-icon').off('click');
 	$('.add-user-size-icon').on('click', function()
 	{
+		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
+		$('.import-contacts-link').removeClass('active');
 		if ($(this).is('.full-size'))
 		{
 			$('.add-user-popup').addClass('dialog');
@@ -1219,6 +1224,8 @@ function addContactUI()
 			}
 		}
 
+		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
+		$('.import-contacts-link').removeClass('active');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
@@ -1232,6 +1239,58 @@ function addContactUI()
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+	});
+	
+	$('.add-user-popup .import-contacts-service').unbind('click');
+	$('.add-user-popup .import-contacts-service').bind('click', function()
+	{
+		// NOT imported
+		if (!$(this).is('.imported'))
+		{
+			importGoogleContacts();
+		}
+		else
+		{
+			var n = $('.imported-contacts-notification');
+			n.css('margin-left', '-' + n.outerWidth()/2 +'px');
+			n.fadeIn(200);
+			$('.share-dialog .import-contacts-dialog').fadeOut(200);
+
+		}
+	});
+
+	$('.add-user-popup .import-contacts-link').unbind('click');
+	$('.add-user-popup .import-contacts-link').bind('click', function()
+	{
+		if(!$(this).is('.active'))
+		{
+			$('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
+			$('.add-user-popup .import-contacts-dialog').fadeIn(200);
+
+			$('.imported-notification-close').unbind('click');
+			$('.imported-notification-close').bind('click', function()
+			{
+				$('.imported-contacts-notification').fadeOut(200);
+			});
+		}
+		else
+		{
+			$('.add-user-popup .import-contacts-link').removeClass('active');
+			$('.add-user-popup .import-contacts-dialog').fadeOut(200);
+			$('.imported-contacts-notification').fadeOut(200);
+		}
+	});
+	
+	$('.add-user-popup .import-contacts-info').unbind('mouseover');
+	$('.add-user-popup .import-contacts-info').bind('mouseover', function()
+	{
+		$('.add-user-popup .import-contacts-info-txt').fadeIn(200);
+	});
+	
+	$('.add-user-popup .import-contacts-info').unbind('mouseout');
+	$('.add-user-popup .import-contacts-info').bind('mouseout', function()
+	{
+		$('.add-user-popup .import-contacts-info-txt').fadeOut(200);
 	});
 }
 
@@ -1456,11 +1515,11 @@ function initContextUI()
 		else
 		{
 			$.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
-			handleShareDialogContent();
 			$.hideContextMenu();
 			$('.share-dialog').removeClass('hidden');
 			$('.fm-dialog-overlay').removeClass('hidden');
 			$('body').addClass('overlayed');
+			handleShareDialogContent();
 		}
 	});
 
@@ -5083,7 +5142,7 @@ function shareDialogContacts()
 		$btn.removeClass('disabled');
 		$(dc + ' .share-dialog-img').addClass('hidden');
 		$(dc + ' .share-dialog-contacts').removeClass('hidden');
-		this.handleDialogScroll(num, dc);
+		handleDialogScroll(num, dc);
 	}
 	else
 	{
@@ -5109,55 +5168,59 @@ function addShareDialogContactToContent (type, av_color, av, name, permClass, pe
 
 function fillShareDialogWithContent()
 {
-	for (var i in M.d[$.selected[0]].shares)// list users that are already use folder
+	var sel = $.selected[0];
+	for (var i in M.d[sel].shares)// list users that are already use folder
 	{
-		var user = M.u[i];
-		var name = (typeof user.name != 'undefined' && user.name.length < 2) ? user.name : user.m;
-		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
-		var av;
-		av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
-		var permText, permClass;
-		
-		switch (M.d[i].r)// Permission level
+		if (M.u[i])
 		{
-			case 1: // Read and write
-				permClass = 'read-and-write';
-				permText = l[56];
-				break;
-			case 2: // Full Access
-				permClass = 'full-access';
-				permText = l[57];
-				break;	
-			default: // 0 or any === read only
-				permClass = 'read-only';
-				permText = l[55];
-				break;
-		}
-		var html = addShareDialogContactToContent('', av_color, av, name, permClass, permText);
+			var user = M.u[i];
+			var name = (user.name && user.name.length < 2) ? user.name : user.m;
+			var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
+			var av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+			var perm;
 
-		$('.share-dialog .share-dialog-contacts').append(html);
+			var pl = 0;
+			if (typeof M.d[sel].shares.r != 'undefined') pl = M.d[i].shares.r;
+
+			switch (pl)// Permission level
+			{
+				case 1: // Read and write
+					perm = ['read-and-write', l[56]];
+					break;
+				case 2: // Full Access
+					perm = ['full-access', l[57]];
+					break;	
+				default: // 0 or any === read only
+					perm = ['read-only', l[55]];
+					break;
+			}
+			var html = addShareDialogContactToContent('', av_color, av, name, perm[0], perm[1]);
+
+			$('.share-dialog .share-dialog-contacts').append(html);
+		}
+	}
+};
+
+handleDialogScroll = function(num, dc)
+{
+	var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
+	//
+	// Add scroll in case that we have more then 5 items in list
+	if (num > SCROLL_NUM)
+	{
+		dialogScroll(dc + ' .share-dialog-contacts');
+	}
+	else
+	{
+		var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
+		var el = $x.data('jsp');
+		el.destroy();
 	}
 };
 
 function handleShareDialogContent()
 {
-	var SCROLL_NUM = 5;// Number of items in dialog before scroll is implemented
-	
-	handleDialogScroll = function(num, dc)
-	{
-		// Add scroll in case that we have more then 5 items in list
-		if (num > SCROLL_NUM)
-		{
-			dialogScroll(dc + ' .share-dialog-contacts');
-		}
-		else
-		{
-			var $x = $(dc + ' .share-dialog-contacts').jScrollPane();
-			var el = $x.data('jsp');
-			el.destroy();
-		}
-	};
-	
+
 	fillShareDialogWithContent();
 	
 	shareDialogContacts();
@@ -5173,6 +5236,25 @@ function handleShareDialogContent()
 
     dialogPositioning('.fm-dialog.share-dialog');
 }
+
+checkMultiInputPermission = function($this)
+{
+	var perm; 
+	if ($this.is('.read-and-write'))
+	{
+		perm = ['read-and-write', l[56]];
+	}
+	else if ($this.is('.full-access'))
+	{
+		perm = ['full-access', l[57]];
+	}
+	else// read-only
+	{
+		perm = ['read-only', l[55]];
+	}
+	
+	return perm;
+};
 
 function initShareDialog()
 {
@@ -5213,7 +5295,8 @@ function initShareDialog()
 		autocomplete:		null,
 		searchDropdown:		true,
 		emailCheck:			true,
-		preventDoublet:		true,
+		preventDoublet:		false,
+		tokenValue:			"name",
 		resultsLimit:		5,
 		minChars:			2,
 		onEmailCheck: wrongEmailMsg,
@@ -5253,31 +5336,12 @@ function initShareDialog()
 		}
     });
 	
-	checkPermission = function($this)
-	{
-		var perm; 
-		if ($this.is('.read-and-write'))
-		{
-			perm = ['read-and-write', l[56]];
-		}
-		else if ($this.is('.full-access'))
-		{
-			perm = ['full-access', l[57]];
-		}
-		else// read-only
-		{
-			perm = ['read-only', l[55]];
-		}
-		
-		return perm;
-	};
-	
 	menuPermissionState = function($this)
 	{
 		var mi = '.permissions-menu .permissions-menu-item';
 		$(mi).removeClass('active');
 		
-		var cls = checkPermission($this);
+		var cls = checkMultiInputPermission($this);
 		
 		$(mi + '.' + cls[0]).addClass('active');
 	};
@@ -5287,7 +5351,7 @@ function initShareDialog()
 		m.css('left', x + 'px');
 		m.css('top', y + 'px');
 		menuPermissionState($this);
-		m.removeClass('hidden');
+		m.fadeIn(200);
 		$this.addClass('active');
 	};
 	
@@ -5323,7 +5387,7 @@ function initShareDialog()
 			if ($items.length)
 			{
 				$.each($items, function(ind, val) {
-					determineContactParams(val.innerText, checkPermission($('.share-dialog .permissions-icon')));
+					determineContactParams(val.innerText, checkMultiInputPermission($('.share-dialog .permissions-icon')));
 				});
 				
 				$('.share-dialog .multiple-input .token-input-token-mega').remove();
@@ -5332,9 +5396,7 @@ function initShareDialog()
 			}
 			else
 			{
-				// recreate complete share event, remove old one adn add new
-//				this will NEVER happend for newly imported contacts
-				// There's a problem with importing (non existing emails) they don't have id!!!
+				// ToDo: wait for new import contact logic on server
 				var t = [];
 				var s = M.d[$.selected[0]].shares;
 				var id;
@@ -5342,14 +5404,27 @@ function initShareDialog()
 				var perm, aPerm;
 				var $items = $('.share-dialog-contact-bl');
 				$.each($items, function(ind, val) {
-					aPerm = $(val).find('.share-dialog-permissions');
 					id = $(val).find('.fm-chat-user').text();
 					
-					if (aPerm === 'read-and-write') perm = 1;
-					else if (aPerm === 'full-access') perm = 2;
-					else perm = 0;
+					aPerm = $(val).find('.share-dialog-permissions');
 					
-					if (id && !(s && s[id])) t.push({u: id,r: perm});
+					if (aPerm === 'read-and-write')
+					{
+						perm = 1;
+					}
+					else if (aPerm === 'full-access')
+					{
+						perm = 2;
+					}
+					else
+					{
+						perm = 0;
+					}
+					
+					if (!(s && s[id]))// ToDo: make this condition better
+					{
+						t.push({u: id, r: perm});
+					}
 				});
 				
 				closeDialog();
@@ -5360,6 +5435,59 @@ function initShareDialog()
 				}
 			}
 		}
+	});
+
+	$('.share-dialog .import-contacts-service').unbind('click');
+	$('.share-dialog .import-contacts-service').bind('click', function()
+	{
+		// NOT imported
+		if (!$(this).is('.imported'))
+		{
+			importGoogleContacts();
+		}
+		else
+		{
+			var n = $('.imported-contacts-notification');
+			n.css('margin-left', '-' + n.outerWidth()/2 +'px');
+			n.fadeIn(200);			
+			$('.share-dialog .import-contacts-dialog').fadeOut(200);
+
+		}
+	});
+	
+	$('.share-dialog .import-contacts-link').unbind('click');
+	$('.share-dialog .import-contacts-link').bind('click', function()
+	{
+		$('.permissions-menu').fadeOut(200);
+		$('.share-dialog-permissions').removeClass('active');
+		$('.permissions-icon').removeClass('active');
+		if(!$(this).is('.active'))
+		{
+			$('.share-dialog .import-contacts-link').addClass('active');
+			$('.share-dialog .import-contacts-dialog').fadeIn(200);
+		   
+			$('.imported-notification-close').unbind('click');
+			$('.imported-notification-close').bind('click', function()
+			{
+				$('.imported-contacts-notification').fadeOut(200);
+			});
+		}
+		else
+		{
+			$('.share-dialog .import-contacts-link').removeClass('active');
+			$('.share-dialog .import-contacts-dialog').fadeOut(200);
+			$('.imported-contacts-notification').fadeOut(200);
+		}
+	});
+	
+	$('.share-dialog .import-contacts-info').unbind('mouseover');
+	$('.share-dialog .import-contacts-info').bind('mouseover', function() {
+		$('.share-dialog .import-contacts-info-txt').fadeIn(200);
+	});
+	
+	$('.share-dialog .import-contacts-info').unbind('mouseout');
+	$('.share-dialog .import-contacts-info').bind('mouseout', function() {
+		$('.share-dialog .import-contacts-info-txt').fadeOut(200);
 	});
 
 	$(document).off('click', '.share-dialog-remove-button');
@@ -5377,16 +5505,17 @@ function initShareDialog()
 	{
 		var $this = $(this);
 		var $m = $('.permissions-menu');
-		if ($this.is('.active') && !$m.is('.hidden'))
+		if ($this.is('.active'))// fadeOut this popup
 		{
-			$m.addClass('hidden');
+			$m.fadeOut(200);
 			$this.removeClass('active');
 			return false;
 		}
 		else
 		{
-			$m.addClass('hidden');
-			$('.share-dialog .share-dialog-permissions').removeClass('active');// Remove from previously active
+			$m.fadeOut(0);
+			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			closeImportContactNotification('.share-dialog');
 			var x = $this.position().left + 42;
 			var y = $this.position().top + 13;
 			handlePermissionMenu($this, $m, x, y);			
@@ -5399,15 +5528,17 @@ function initShareDialog()
 	{
 		var $this = $(this);
 		var $m = $('.permissions-menu');
-		if ($this.is('.active') && !$m.is('.hidden'))
+		if ($this.is('.active'))// fadeOut permission menu for this icon
 		{
-			$m.addClass('hidden');
+			$m.fadeOut(200);
 			$this.removeClass('active');
 			return;
 		}
 		else
 		{
-			$('.share-dialog .share-dialog-permissions').removeClass('active');// Remove from previously active
+			$m.fadeOut(0);
+			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			closeImportContactNotification('.share-dialog');
 			var x = $this.position().left + 35;
 			var y = $this.position().top - 8;
 			handlePermissionMenu($this, $m, x, y);			
@@ -5422,7 +5553,7 @@ function initShareDialog()
 		$('.permissions-menu').addClass('hidden');
 		// Find where we are permissions-icon or share-dialog-permissions
 
-		var cls = checkPermission($this);
+		var cls = checkMultiInputPermission($this);
 		
 		var $i = $('.share-dialog .share-dialog-permissions.active');// Specific contact
 		var $g = $('.share-dialog .permissions-icon.active');// Group permissions
@@ -5430,7 +5561,7 @@ function initShareDialog()
 		var acls = [];// active permission
 		if ($i.length)
 		{
-			acls = checkPermission($i);
+			acls = checkMultiInputPermission($i);
 			$i
 				.removeClass(acls[0])
 				.removeClass('active')
@@ -5439,7 +5570,7 @@ function initShareDialog()
 		}
 		else if ($g.length)// Group permission, permissions-icon
 		{
-			acls = checkPermission($g);
+			acls = checkMultiInputPermission($g);
 			$g
 				.removeClass(acls[0])
 				.removeClass('active')
@@ -5449,6 +5580,32 @@ function initShareDialog()
 		$('.permissions-icon.active').removeClass('active');
 		$('.share-dialog-permissions.active').removeClass('active');
 	});
+}
+
+function addImportedData(data, from)
+{
+	var perm, av_color, av, html;
+	$.each(data, function(ind, val) {
+		// Read permission from multi-input permission box
+		perm = checkMultiInputPermission($('.share-dialog .permissions-icon'));
+		av_color = val.charCodeAt(0)%6 + val.charCodeAt(1)%6;
+		av = val.charAt(0) + val.charAt(1);
+		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
+		
+		html = addShareDialogContactToContent(from, av_color, '', val, perm[0], perm[1]);
+		$('.share-dialog .share-dialog-contacts').append(html);
+	});
+	
+	shareDialogContacts();
+	
+	closeImportContactNotification('.share-dialog');
+}
+
+function closeImportContactNotification(c)
+{
+	$('.imported-contacts-notification').fadeOut(200);
+	$(c + ' .import-contacts-dialog').fadeOut(200);
+	$('.import-contacts-link').removeClass('active');
 }
 
 function closeDialog()
@@ -5463,13 +5620,22 @@ function closeDialog()
 		$('.fm-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
-		$('.dialog-content-block,.share-dialog-contacts').empty();
+		$('.dialog-content-block').empty();
 		// add contact popup
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		// share dialog
+		$('.share-dialog-contact-bl').remove();
+		$('.import-contacts-service').removeClass('imported');
+		var $x = $('.share-dialog-contacts').jScrollPane();
+		var el = $x.data('jsp');
+		el.destroy();
 		// share dialog permission menu
-		$('.permissions-menu').addClass('hidden');
+		$('.permissions-menu').fadeOut(0);
+		$('.import-contacts-dialog').fadeOut(0);
 		$('.permissions-icon').removeClass('active');
+		closeImportContactNotification('.share-dialog');
+		closeImportContactNotification('.add-user-popup');
 
 		delete $.copyDialog;
 		delete $.moveDialog;

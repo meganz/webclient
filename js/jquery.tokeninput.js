@@ -31,9 +31,22 @@
 		emailCheck: false,
 		resultsFormatter: function(item) {
 			var string = item[this.propertyToSearch];
-			var avatar = "<span class='nw-contact-avatar color10'>UU</span>";
-			return "<li class='share-search-result'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
-
+			var email = '';
+			var name = item.name;
+			if (name)
+			{
+				email = "<span class='fm-chat-user-email'>" + string + "</span>";
+			}
+			
+			var av_color = string.charCodeAt(0)%6 + string.charCodeAt(1)%6;
+			
+			var av = (this.addAvatar && avatars[string] && avatars[string].url) 
+				? '<img src="' + avatars[string].url + '">'
+				: (string.charAt(0) + string.charAt(1));
+				
+			var avatar = "<span class='nw-contact-avatar color'>" + av_color + "</span>";
+			
+			return "<li class='share-search-result gmail'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span>" + email + "</span><span class='clear'></span></li>";			
 		},
 		tokenFormatter: function(item) {
 			if (item)
@@ -703,7 +716,7 @@
 			input_box.width(1);
 
 			// Insert the new tokens
-			if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && validEmail) {
+			if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isValidEmail) {
 				insert_token(item);
 				// Remove the placeholder so it's not seen after you've added a token
 				input_box.attr("placeholder", null)

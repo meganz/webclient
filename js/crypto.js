@@ -978,7 +978,7 @@ function api_proc(q)
 
 			if (typeof t == 'object')
 			{
-				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i]);
+				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
 
 				this.q.rawreq = false;	
 				this.q.backoff = 0;			// request succeeded - reset backoff timer
@@ -1813,6 +1813,8 @@ function is_image(name)
 
 var storedattr = {};
 var faxhrs = [];
+var faxhrfail = {};
+var faxhrlastgood = {};
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id,type,key,data,ctx)
@@ -1829,8 +1831,16 @@ function api_storefileattr(id,type,key,data,ctx)
 	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
 }
 
-function api_fareq(res,ctx)
+function api_fareq(res,ctx,xhr)
 {
+	if (d && ctx.startTime) console.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
+
+	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
+	{
+		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
+		window.onerror('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s','',-1);
+	}
+
 	if (typeof res == 'object' && res.p)
 	{
 		var data;			
@@ -1855,6 +1865,7 @@ function api_fareq(res,ctx)
 			}
 
 			faxhrs[slot].ctx = ctx;
+			faxhrs[slot].fa_slot = slot;
 
 			if (d) console.log("Using file attribute channel " + slot);
 
@@ -1876,44 +1887,80 @@ function api_fareq(res,ctx)
 				{ // Huh? Gecko..
 					faxhrs[slot].onprogress = function() {};
 				}
+
+				faxhrs[slot].timeout = 180000;
+				faxhrs[slot].ontimeout = function(e)
+				{
+					if (d) console.error('api_fareq timeout', e);
+
+					if (!faxhrfail[this.fa_host])
+					{
+						if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
+						{
+							faxhrfail[this.fa_host] = failtime = 1;
+							api_reportfailure(this.fa_host, function() {});
+
+							if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
+						}
+					}
+				};
 			}
 
 			faxhrs[slot].faeot = function()
 			{
-				if (this.fart) clearTimeout(this.fart);
-				if (!this.ctx.errfa) return;
-				if (d) console.log('FAEOT', this);
-
-				var ctx = this.ctx;
-				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				if (id !== slideshowid)
+				if (faxhrs[this.fa_slot])
 				{
-					if (id)
-					{
-						pfails[id] = 1;
-						delete preqs[id];
-					}
+					faxhrs[this.fa_slot] = undefined;
+					this.fa_slot = -1;
 
-					return;
+					if (this.ctx.errfa)
+					{
+						var ctx = this.ctx;
+						var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+
+						if (d) console.error('FAEOT', id, this);
+						else window.onerror('api_fareq: eot for ' + this.fa_host, '', -1);
+
+						if (id !== slideshowid)
+						{
+							if (id)
+							{
+								pfails[id] = 1;
+								delete preqs[id];
+							}
+						}
+						else
+						{
+							this.abort();
+							this.ctx.errfa(id,1);
+						}
+					}
 				}
 
-				this.abort();
-				this.ctx.errfa(id,1);
+				if (this.fart) clearTimeout(this.fart);
 			};
-			
+
 			faxhrs[slot].onerror = function()
 			{
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-				if (this.ctx.errfa) this.ctx.errfa(id,1);
-				else console.error('errfa', id);
+				if (ctx.errfa) ctx.errfa(id,1);
+				else console.error('api_fareq', id, this);
 			}
 
 			faxhrs[slot].onreadystatechange = function()
 			{
 				if (this.onprogress) this.onprogress();
 
-				if (this.readyState == this.DONE)
+				if (this.readyState == 2)
+				{
+					if (!d && (Date.now() - this.startTime) > 10000)
+					{
+						window.onerror('api_fareq: ' + this.fa_host + ' took +10s', '', -1);
+						delete this.startTime;
+					}
+				}
+				else if (this.readyState == this.DONE)
 				{
 					var ctx = this.ctx;
 
@@ -1980,6 +2027,8 @@ function api_fareq(res,ctx)
 								api_attachfileattr(storedattr[ctx.id].target,ctx.id);
 							}
 						}
+
+						faxhrlastgood[this.fa_host] = Date.now();
 					}
 					else
 					{
@@ -2041,10 +2090,12 @@ function api_fareq(res,ctx)
                 
                 if (t < 0) t = pp[m].length-1;
 
+				faxhrs[slot].fa_host = hostname(pp[m].substr(0,t+1));
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
 
 				faxhrs[slot].responseType = 'arraybuffer';
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
+				faxhrs[slot].startTime = Date.now();
 				faxhrs[slot].send(data);
 			}
 		}
@@ -2103,7 +2154,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in p)
 	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa };
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW()};
 		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl},ctx);
 	}
 }

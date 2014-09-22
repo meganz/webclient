@@ -463,9 +463,13 @@ function MegaData ()
 			$('.contacts-blocks-scrolling a').remove();
 		}
 
+		var u_h = M.currentdirid;
+		var user = M.d[u_h];
 		$(lSel).parent().children('table').show();
-		$('.contact-share-notification').text(this.v.length).removeClass('hidden');
 
+		if (user) {
+			$('.contact-share-notification').text(user.name + ' shared the following folders with you:').removeClass('hidden');
+		}
 		if (this.v.length == 0)
 		{
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');

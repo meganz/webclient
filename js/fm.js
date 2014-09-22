@@ -5176,7 +5176,7 @@ function fillShareDialogWithContent()
 			var user = M.u[i];
 			var name = (user.name && user.name.length < 2) ? user.name : user.m;
 			var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
-			var av = (typeof avatars[i] != 'undefined' && typeof avatars[i].url != 'undefined') ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+			var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
 			var perm;
 
 			var pl = 0;
@@ -5195,7 +5195,7 @@ function fillShareDialogWithContent()
 					break;
 			}
 			var html = addShareDialogContactToContent('', av_color, av, name, perm[0], perm[1]);
-
+			
 			$('.share-dialog .share-dialog-contacts').append(html);
 		}
 	}

@@ -833,7 +833,8 @@ function setupTransferAnalysis()
 
 			for (var i in tp)
 			{
-				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1])
+				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1]
+					|| (i[0] === 'u' ? ulQueue : dlQueue).isPaused())
 				{
 					delete prev[i];
 				}

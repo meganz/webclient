@@ -9,6 +9,7 @@ if (indexedDB)
 {
 	var mDB=1;
 	var request;
+	var mDBStartError;
 
 	function mDBfetch()
 	{
@@ -35,6 +36,15 @@ if (indexedDB)
 
 	function mDBstart()
 	{
+		function rOnError(event)
+		{
+			if (d) console.log('mDB error',event);
+			if (mDB)
+			{
+				mDB=undefined;
+				loadfm();
+			}
+		}
 		if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+1000 > new Date().getTime())
 		{
 			if (d) console.log('existing mDB session, fetch live data');
@@ -46,16 +56,20 @@ if (indexedDB)
 		mDBactive(mDBact);
 		loadingDialog.show();
 		if (d) console.log('mDBstart()');
-		request = indexedDB.open("MEGA_" + u_handle,2);
-		request.onerror = function(event)
-		{
-			if (d) console.log('mDB error',event);
-			if (mDB)
+		try {
+			request = indexedDB.open("MEGA_" + u_handle,2);
+		} catch(e) {
+			if (!mDBStartError)
 			{
-				mDB=undefined;
-				loadfm();
+				if (d) console.log('mDB.open error', e);
+				mDBreload();
 			}
-		};
+			else rOnError(e);
+			mDBStartError = 1;
+			return;
+		}
+		mDBStartError = 0;
+		request.onerror = rOnError;
 		request.onblocked = function(event)
 		{
 			if (d) console.log('mDB blocked',event);
@@ -271,7 +285,7 @@ if (indexedDB)
 
 	function mDBreload()
 	{
-		mDB.close();
+		if (mDB && mDB.close) mDB.close();
 		mDB=2;
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.onsuccess = function(event)

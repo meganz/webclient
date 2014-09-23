@@ -566,7 +566,9 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 		xhr.statusText
 	);
 
-	this.oet = setTimeout(this.on_error.bind(this, null, xhr, "BRFS"), 1950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.on_error.bind(this, null, xhr,
+		"BRFS [l:" + (xhr.response ? xhr.response.length : 'Unk') + "]")
+		, 1950+Math.floor(Math.random()*2e3));
 }
 
 ChunkUpload.prototype.upload = function() {

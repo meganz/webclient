@@ -156,7 +156,7 @@ function network_error_check() {
 				 *	starts from scratch
 				 */
 				ERRDEBUG("restarting because it failed", ul_queue[i].retries, 'times',  ul);
-				UploadManager.restart( ul_queue[i] );
+				UploadManager.restart( ul_queue[i], 'network_error_check' );
 				ul_queue[i].retries = 0;
 			}
 			ul.error++;
@@ -233,9 +233,9 @@ var UploadManager =
 		}
 	},
 
-	restart : function UM_restart(file)
+	restart : function UM_restart(file, reason, xhr)
 	{
-		var gid = this.GetGID(file);
+		var gid = this.GetGID(file), hn = hostname(file.posturl);
 
 		file.retries  = 0;
 		file.sent     = 0;
@@ -249,13 +249,13 @@ var UploadManager =
 		ulQueue.filter(gid);
 
 		ERRDEBUG("fatal error restarting", file.name)
-		onUploadError(file.id, "Upload failed - restarting upload");
+		onUploadError(file.id, "Upload failed - restarting upload",''+reason, xhr, hn);
 
 		// reschedule
 		ulQueue.pushFirst(new FileUpload(file));
 	},
 
-	retry : function UM_retry(file, chunk, reason)
+	retry : function UM_retry(file, chunk, reason, xhr)
 	{
 		var start = chunk.start, end = chunk.end, cid = '' + chunk;
 
@@ -294,7 +294,9 @@ var UploadManager =
 		}, 950+Math.floor(Math.random()*2e3))
 
 		ERRDEBUG("retrying chunk because of", reason + "")
-		onUploadError(file.id, "Upload failed - retrying", reason.substr(0,2) == 'IO' ? 'IO Failed' : reason);
+		onUploadError(file.id, "Upload failed - retrying",
+			reason.substr(0,2) == 'IO' ? 'IO Failed' : reason,
+			xhr, hostname(file.posturl));
 
 		chunk.done(); /* release worker */
 	},
@@ -490,8 +492,9 @@ ChunkUpload.prototype.on_error = function(args, xhr, reason) {
 		this.file.progress[this.start] = 0;
 		this.updateprogress();
 
-		if (args == EKEY) UploadManager.restart(this.file);
-		else UploadManager.retry(this.file, this, "xhr failed: " + reason);
+		if (!xhr) xhr = this.xhr;
+		if (args == EKEY) UploadManager.restart(this.file, reason, xhr);
+		else UploadManager.retry(this.file, this, "xhr failed: " + reason, xhr);
 	}
 	this.done();
 }
@@ -563,7 +566,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 		xhr.statusText
 	);
 
-	this.oet = setTimeout(this.on_error.bind(this, null, null, "bad response from server"), 1950+Math.floor(Math.random()*2e3));
+	this.oet = setTimeout(this.on_error.bind(this, null, xhr, "BRFS"), 1950+Math.floor(Math.random()*2e3));
 }
 
 ChunkUpload.prototype.upload = function() {
@@ -574,6 +577,7 @@ ChunkUpload.prototype.upload = function() {
 	}
 
 	var xhr = getXhr(this);
+	xhr._murl = this.file.posturl;
 
 	if (d) console.log("pushing", this.file.posturl + this.suffix)
 

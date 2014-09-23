@@ -897,6 +897,7 @@ function setupTransferAnalysis()
 					if (data.length)
 					{
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
+						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
 						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
 					}

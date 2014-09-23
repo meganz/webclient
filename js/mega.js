@@ -1705,7 +1705,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		else window.onerror('onDownloadError :: ' + error, '', -1);
+		else window.onerror('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''), '', -1);
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -1944,9 +1944,19 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr, reason)
+function onUploadError(fileid, errorstr, reason, xhr, hostname)
 {
-	if (!d) window.onerror('onUploadError :: ' + errorstr + (reason ? ': ' + reason : ''), '', -1);
+	if (!d && (!xhr || (xhr.readyState > 1 && xhr.status)))
+	{
+		var details = [
+			browserdetails(ua).name,
+			reason,
+			xhr && xhr.status,
+			hostname
+		];
+		window.onerror('onUploadError :: ' + errorstr
+			+ ' [' + details.join("] [") + ']', '', -1);
+	}
 
 	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
 

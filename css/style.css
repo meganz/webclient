@@ -2799,39 +2799,29 @@ img.blog-new-logos {
 	margin-left: 220px;
 	padding: 29px 20px 0 0;
 }
-.retina .properties-icon {
-	width: 170px;
-	float: left;
-	padding: 0;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 20px 0 0 30px;
-}
-.retina .properties-icon img {
-	width: 110px;
-}
-.retina .properties-info-block {
-	margin-left: 170px;
-	padding: 29px 20px 0 0;
-}
 .properties-small-gray {
-	font-size: 13px;
-	color: #767F7F;
+	font-size: 11px;
+	color: #CCCCCC;
 	line-height: 21px;
 	display: block;
 }
 .propreties-dark-txt {
 	font-size: 12px;
-	color: #50504E;
-	line-height: 24px;
+	color: #666666;
+	line-height: 14px;
 	display: block;
 	padding-bottom: 16px;
+}
+.propreties-dark-txt b {
+	font-family: 'Open Sans', Arial;
+	font-size: 18px;
+	display: block;
+	padding-top: 12px;
 }
 .properties-float-bl {
 	float: left;
 	width: 50%;
-	min-height: 61px;
+	min-height: 51px;
 }
 a.tips-button.properties {
 	margin-right: 10px;
@@ -4785,7 +4775,7 @@ th.grid-first-th {
 	width: 160px;
 	height: 160px;
 }
-.fm-blocks-view.shared-view .block-view-file-type.folder, .properties-file-icon div.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder {
+.fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder {
 	width: 94px;
 	height: 77px;
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -5217,156 +5207,156 @@ table {
 	height: 120px;
 	margin: -60px 0 0 -60px;
 }
-.block-view-file-type.word, .properties-file-icon div.word {
+.block-view-file-type.word {
 	background-position: center -5916px;
 }
-.block-view-file-type.web-lang, .properties-file-icon div.web-lang {
+.block-view-file-type.web-lang {
 	background-position: center -6026px;
 }
-.block-view-file-type.web-data, .properties-file-icon div.web-data {
+.block-view-file-type.web-data {
 	background-position: center -6146px;
 }
-.block-view-file-type.video, .properties-file-icon div.video {
+.block-view-file-type.video {
 	background-position: center -6266px;
 }
-.block-view-file-type.video-vob, .properties-file-icon div.video-vob {
+.block-view-file-type.video-vob {
 	background-position: center -6386px;
 }
-.block-view-file-type.video-subtitles, .properties-file-icon div.video-subtitles {
+.block-view-file-type.video-subtitles {
 	background-position: center -6506px;
 }
-.block-view-file-type.vector, .properties-file-icon div.vector {
+.block-view-file-type.vector {
 	background-position: center -6626px;
 }
-.block-view-file-type.vcard, .properties-file-icon div.vcard {
+.block-view-file-type.vcard {
 	background-position: center -6746px;
 }
-.block-view-file-type.torrent, .properties-file-icon div.torrent {
+.block-view-file-type.torrent {
 	background-position: center -6866px;
 }
-.block-view-file-type.text, .properties-file-icon div.text {
+.block-view-file-type.text {
 	background-position: center -6986px;
 }
-.block-view-file-type.swf, .properties-file-icon div.swf {
+.block-view-file-type.swf {
 	background-position: center -7106px;
 }
-.block-view-file-type.spreadsheet, .properties-file-icon div.spreadsheet {
+.block-view-file-type.spreadsheet {
 	background-position: center -7226px;
 }
-.block-view-file-type.sourcecode, .properties-file-icon div.sourcecode {
+.block-view-file-type.sourcecode {
 	background-position: center -7346px;
 }
-.block-view-file-type.real-audio, .properties-file-icon div.real-audio {
+.block-view-file-type.real-audio {
 	background-position: center -7466px;
 }
-.block-view-file-type.raw, .properties-file-icon div.raw {
+.block-view-file-type.raw {
 	background-position: center -7586px;
 }
-.block-view-file-type.premiere, .properties-file-icon div.premiere {
+.block-view-file-type.premiere {
 	background-position: center -7706px;
 }
-.block-view-file-type.powerpoint, .properties-file-icon div.powerpoint {
+.block-view-file-type.powerpoint {
 	background-position: center -7826px;
 }
-.block-view-file-type.podcast, .properties-file-icon div.podcast {
+.block-view-file-type.podcast {
 	background-position: center -7946px;
 }
-.block-view-file-type.playlist, .properties-file-icon div.playlist {
+.block-view-file-type.playlist {
 	background-position: center -8066px;
 }
-.block-view-file-type.photoshop, .properties-file-icon div.photoshop {
+.block-view-file-type.photoshop {
 	background-position: center -8186px;
 }
-.block-view-file-type.pdf, .properties-file-icon div.pdf {
+.block-view-file-type.pdf {
 	background-position: center -8306px;
 }
-.block-view-file-type.midi, .properties-file-icon div.midi {
+.block-view-file-type.midi {
 	background-position: center -8426px;
 }
-.block-view-file-type.java, .properties-file-icon div.java {
+.block-view-file-type.java {
 	background-position: center -8546px;
 }
-.block-view-file-type.indesign, .properties-file-icon div.indesign {
+.block-view-file-type.indesign {
 	background-position: center -8666px;
 }
-.block-view-file-type.image, .properties-file-icon div.image {
+.block-view-file-type.image {
 	background-position: center -8786px;
 }
-.block-view-file-type.illustrator, .properties-file-icon div.illustrator {
+.block-view-file-type.illustrator {
 	background-position: center -8906px;
 }
-.block-view-file-type.html, .properties-file-icon div.html {
+.block-view-file-type.html {
 	background-position: center -9026px;
 }
-.block-view-file-type.graphic, .properties-file-icon div.graphic {
+.block-view-file-type.graphic {
 	background-position: center -9146px;
 }
-.block-view-file-type.gis, .properties-file-icon div.gis {
+.block-view-file-type.gis {
 	background-position: center -9266px;
 }
-.block-view-file-type.generic, .properties-file-icon div.generic {
+.block-view-file-type.generic {
 	background-position: center -9386px;
 }
-.block-view-file-type.font, .properties-file-icon div.font {
+.block-view-file-type.font {
 	background-position: center -9506px;
 }
-.block-view-file-type.folder, .properties-file-icon div.folder {
+.block-view-file-type.folder {
 	background-position: center -9626px;
 }
-.block-view-file-type.folder-shared, .properties-file-icon div.folder-shared {
+.block-view-file-type.folder-shared {
 	background-position: center -9746px;
 }
-.rubbish-bin .block-view-file-type.folder, .rubbish-bin .properties-file-icon div.folder {
+.rubbish-bin .block-view-file-type.folder {
 	background-position: center -1223px;
 	background-image: url(../images/mega/shared-sprite.svg);
 }
-.rubbish-bin .block-view-file-type.folder-shared, .rubbish-bin .properties-file-icon div.folder-shared {
+.rubbish-bin .block-view-file-type.folder-shared {
 	background-position: center -1323px;
 	background-image: url(../images/mega/shared-sprite.svg);
 }
-.block-view-file-type.flash, .properties-file-icon div.flash {
+.block-view-file-type.flash {
 	background-position: center -9866px;
 }
-.block-view-file-type.flash-video, .properties-file-icon div.flash-video {
+.block-view-file-type.flash-video {
 	background-position: center -9986px;
 }
-.block-view-file-type.fla-lang, .properties-file-icon div.fla-lang {
+.block-view-file-type.fla-lang {
 	background-position: center -10106px;
 }
-.block-view-file-type.executable, .properties-file-icon div.executable {
+.block-view-file-type.executable {
 	background-position: center -10226px;
 }
-.block-view-file-type.excel, .properties-file-icon div.exel {
+.block-view-file-type.excel {
 	background-position: center -10346px;
 }
-.block-view-file-type.dreamweaver, .properties-file-icon div.dreamweaver {
+.block-view-file-type.dreamweaver {
 	background-position: center -10466px;
 }
-.block-view-file-type.database, .properties-file-icon div.database {
+.block-view-file-type.database {
 	background-position: center -10586px;
 }
-.block-view-file-type.compressed, .properties-file-icon div.compressed {
+.block-view-file-type.compressed {
 	background-position: center -10706px;
 }
-.block-view-file-type.cad, .properties-file-icon div.cad {
+.block-view-file-type.cad {
 	background-position: center -10826px;
 }
-.block-view-file-type.audio, .properties-file-icon div.audio {
+.block-view-file-type.audio {
 	background-position: center -10946px;
 }
-.block-view-file-type.aftereffects, .properties-file-icon div.aftereffects {
+.block-view-file-type.aftereffects {
 	background-position: center -11066px;
 }
-.block-view-file-type.threed, .properties-file-icon div.threed {
+.block-view-file-type.threed {
 	background-position: center -11186px;
 }
-.block-view-file-type.win-folder, .properties-file-icon div.win-folder {
+.block-view-file-type.win-folder {
 	background-position: center -11306px;
 }
-.block-view-file-type.apple-folder, .properties-file-icon div.apple-folder {
+.block-view-file-type.apple-folder {
 	background-position: center -11426px;
 }
-.block-view-file-type.photo-folder, .properties-file-icon div.photo-folder {
+.block-view-file-type.photo-folder {
 	background-position: center -11546px;
 }
 .dragger-icon.word, .export-icon.word, .new-download-file-icon.word, .share-folder-icon div.word {
@@ -5660,6 +5650,156 @@ table {
 }
 .nw-chat-icons-area .block-view-file-type.photo-folder {
 	background-position: center -14364px;
+}
+.properties-file-icon div.word {
+	background-position: center 38px;
+}
+.properties-file-icon div.web-lang {
+	background-position: center -185px;
+}
+.properties-file-icon div.web-data {
+	background-position: center -428px;
+}
+.properties-file-icon div.video {
+	background-position: center -671px;
+}
+.properties-file-icon div.video-vob {
+	background-position: center -915px;
+}
+.properties-file-icon div.video-subtitles {
+	background-position: center -1158px;
+}
+.properties-file-icon div.vector {
+	background-position: center -1401px;
+}
+.properties-file-icon div.vcard {
+	background-position: center -1644px;
+}
+.properties-file-icon div.torrent {
+	background-position: center -1888px;
+}
+.properties-file-icon div.text {
+	background-position: center -2131px;
+}
+.properties-file-icon div.swf {
+	background-position: center -2374px;
+}
+.properties-file-icon div.spreadsheet {
+	background-position: center -2617px;
+}
+.properties-file-icon div.sourcecode {
+	background-position: center -2861px;
+}
+.properties-file-icon div.real-audio {
+	background-position: center -3104px;
+}
+.properties-file-icon div.raw {
+	background-position: center -3347px;
+}
+.properties-file-icon div.premiere {
+	background-position: center -3590px;
+}
+.properties-file-icon div.powerpoint {
+	background-position: center -3834px;
+}
+.properties-file-icon div.podcast {
+	background-position: center -4077px;
+}
+.properties-file-icon div.playlist {
+	background-position: center -4320px;
+}
+.properties-file-icon div.photoshop {
+	background-position: center -4563px;
+}
+.properties-file-icon div.pdf {
+	background-position: center -4806px;
+}
+.properties-file-icon div.midi {
+	background-position: center -5050px;
+}
+.properties-file-icon div.java {
+	background-position: center -5293px;
+}
+.properties-file-icon div.indesign {
+	background-position: center -5536px;
+}
+.properties-file-icon div.image {
+	background-position: center -5779px;
+}
+.properties-file-icon div.illustrator {
+	background-position: center -6023px;
+}
+.properties-file-icon div.html {
+	background-position: center -6266px;
+}
+.properties-file-icon div.graphic {
+	background-position: center -6509px;
+}
+.properties-file-icon div.gis {
+	background-position: center -6752px;
+}
+.properties-file-icon div.generic {
+	background-position: center -6995px;
+}
+.properties-file-icon div.font {
+	background-position: center -7239px;
+}
+.properties-file-icon div.folder {
+	background-position: center -7482px;
+}
+.properties-file-icon div.folder-shared {
+	background-position: center -7725px;
+}
+.rubbish-bin .properties-file-icon div.folder, .properties-file-icon div.deleted-folder {
+	background-position: center -11617px;
+}
+.rubbish-bin .properties-file-icon div.folder-shared, .properties-file-icon div.deleted-shared-folder {
+	background-position: center -11860px;
+}
+.properties-file-icon div.flash {
+	background-position: center -7968px;
+}
+.properties-file-icon div.flash-video {
+	background-position: center -8212px;
+}
+.properties-file-icon div.fla-lang {
+	background-position: center -8455px;
+}
+.properties-file-icon div.executable {
+	background-position: center -8698px;
+}
+.properties-file-icon div.exel {
+	background-position: center -8941px;
+}
+.properties-file-icon div.dreamweaver {
+	background-position: center -9184px;
+}
+.properties-file-icon div.database {
+	background-position: center -9428px;
+}
+.properties-file-icon div.compressed {
+	background-position: center -9671px;
+}
+.properties-file-icon div.cad {
+	background-position: center -9914px;
+}
+.properties-file-icon div.audio {
+	background-position: center -10157px;
+}
+.properties-file-icon div.aftereffects {
+	background-position: center -10401px;
+}
+.properties-file-icon div.threed {
+	background-position: center -10644px;
+}
+.properties-file-icon div.win-folder {
+	background-position: center -10887px;
+}
+.properties-file-icon div.apple-folder {
+	background-position: center -11130px;
+}
+.properties-file-icon div.photo-folder {
+	background-position: center -11373px;
 }
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
 	width: 24px;
@@ -8179,9 +8319,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	overflow: hidden;
 }
 .fm-dialog.properties-dialog.shared {
-	width: 704px;
-	min-height: 304px;
-	margin: -222px 0 0 -352px;
+	width: 640px;
+	min-height: 260px;
+	margin: -130px 0 0 -320px;
 	overflow: visible;
 }
 .notification-header {
@@ -9312,7 +9452,10 @@ span.orange {
 	display: none;
 }
 .properties-body {
-	min-height: 218px;
+	min-height: 256px;
+}
+.properties-dialog .fm-dialog-title {
+	display: none;
 }
 .export-links-dialog .iPhoneCheckContainer, .fm-account-blocks .iPhoneCheckContainer, .share-dialog .iPhoneCheckContainer {
 	width: 60px;
@@ -9487,25 +9630,26 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 }
 .properties-file-icon {
 	float: left;
-	padding: 0 0 0 30px;
-	height: 142px;
-	width: 142px;
+	padding: 8px;
+	height: 256px;
+	width: 256px;
 	position: relative;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
+	background-color: rgba(0,0,0,0.05);
 }
 .properties-file-icon div {
-	width: 80px;
-	height: 86px;
+	width: 240px;
+	height: 240px;
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	display: none;
-	background-image: url(../images/mega/files-icons.svg);
+	background-image: url(../images/mega/properties-sprite.svg);
 	background-position: 0 0;
 	background-repeat: no-repeat;
-	margin: 29px 0 0 29px;
+	margin: 8px;
 }
 .properties-file-icon div:nth-child(1) {
 	display: block;
@@ -9513,27 +9657,79 @@ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
 .multiple .properties-float-bl.second span {
 	display: none;
 }
-.multiple .properties-file-icon div:nth-child(1) {
-	position: absolute;
+.multiple .properties-file-icon div:nth-child(3) {
 	top: 10px;
 	left: 10px;
 	display: block;
+	transition: opacity 200ms ease-in-out;
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+	-moz-opacity: 0.2;
+	-khtml-opacity: 0.2;
+	opacity: 0.2;
+	z-index: 1;
+}
+.properties-elements-counter {
+	display: none;
+	height: 40px;
+	width: 113px;
+	left: 143px;
+	top: 24px;
+	text-align: center;
+	position: absolute;
+	z-index: 10;
+}
+.folders-only .properties-elements-counter {
+	top: 54px;
+}
+.multiple .properties-elements-counter {
+	display: block;
+}
+.properties-elements-counter span {
+	display: inline-block;
+	min-width: 40px;
+	height: 40px;
+	border: 4px solid #F2F2F2;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	text-align: center;
+	line-height: 30px;
+	color: white;
+	-moz-border-radius: 40px;
+	-webkit-border-radius: 40px;
+	border-radius: 40px;
+	background-color: #FF1A53;
+	padding: 0 3px;
+	font-family: 'Open Sans Semibold', Arial;
+	font-size: 18px;
 }
 .multiple .properties-file-icon div:nth-child(2) {
-	position: absolute;
 	top: 0px;
 	left: 0px;
 	display: block;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	z-index: 2;
 }
-.multiple .properties-file-icon div:nth-child(3) {
-	position: absolute;
+.multiple .properties-file-icon div:nth-child(1) {
 	top: -10px;
 	left: -10px;
 	display: block;
+	z-index: 3;
+}
+.multiple.two-elements .properties-file-icon div:nth-child(2) {
+	top: 5px;
+	left: 5px;
+}
+.multiple.two-elements .properties-file-icon div:nth-child(1) {
+	top: -5px;
+	left: -5px;
 }
 .properties-txt-pad {
-	margin: 0 0 0 142px;
-	padding: 28px 20px 0 0;
+	margin: 0 0 0 300px;
+	padding: 60px 20px 0 0;
 }
 .properties-link-block {
 	height: 70px;

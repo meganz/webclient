@@ -6611,21 +6611,22 @@ function browserDialog(close)
 }
 
 function propertiesDialog(close)
-{
+{ 
+    var pd = $('.fm-dialog.properties-dialog');
 	if (close)
 	{
 		$.dialog = false;
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
-		$('.fm-dialog.properties-dialog').addClass('hidden');
+		pd.addClass('hidden');
 		return true;
 	}
 	$.dialog = 'properties';
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
-	$('.fm-dialog.properties-dialog').removeClass('hidden');
-	$('.fm-dialog.properties-dialog .fm-dialog-close,.fm-dialog.properties-dialog .close-button').unbind('click');
-	$('.fm-dialog.properties-dialog .fm-dialog-close,.fm-dialog.properties-dialog .close-button').bind('click',function()
+	pd.removeClass('hidden multiple folders-only two-elements');
+	$('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
+	$('.fm-dialog.properties-dialog .fm-dialog-close').bind('click',function()
 	{
 		propertiesDialog(1);
 	});
@@ -6661,8 +6662,7 @@ function propertiesDialog(close)
 	{
 		p.t6='';
 		p.t7='';
-
-		$('.fm-dialog.properties-dialog').removeClass('multiple');
+		
 		if (filecnt)
 		{
 			p.t3 = l[87] + ':';
@@ -6693,9 +6693,9 @@ function propertiesDialog(close)
 	}
 	else
 	{
-		$('.fm-dialog.properties-dialog').addClass('multiple');
+		pd.addClass('multiple folders-only');
 		p.t1 = '';
-		p.t2 = '<b>' + fm_contains(filecnt+sfilecnt,foldercnt+sfoldercnt) + '</b>';
+		p.t2 = '<b>' + fm_contains(filecnt,foldercnt) + '</b>';
 		p.t3 = l[894] + ':';
 		p.t4 = bytesToSize(size);
 		p.t5 = ' second';
@@ -6707,40 +6707,22 @@ function propertiesDialog(close)
 	if ((filecnt + foldercnt) == 1) $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
 	else
 	{
-		var a = 0,done = {};
+		if ((filecnt + foldercnt) == 2) pd.addClass('two-elements');
+		$('.properties-elements-counter span').text(filecnt + foldercnt);
+		var a = 0;
 		$('.properties-file-icon').html('');
 		for (var i in $.selected)
 		{
 			var ico = fileicon(M.d[$.selected[i]]);
-			if (a < 3 && !done[ico])
+			
+			if (a <= 3)
 			{
-				done[ico]=1;
+				if (ico.indexOf('folder')==-1) pd.removeClass('folders-only');
 				$('.properties-file-icon').prepend('<div class="'+ ico + '"></div>');
 				a++;
 			}
 		}
 	}
-	$('.on_off :checkbox').iphoneStyle({checkedLabel:l[1021],uncheckedLabel:l[1022],resizeContainer: false, resizeHandle: false, onChange: function(elem, data)
-	{
-		if(data) $(elem).closest('.on_off').addClass('active');
-		else $(elem).closest('.on_off').removeClass('active');
-	}});
-	$('input[name=properties-checkbox]').unbind('click');
-	$('input[name=properties-checkbox]').bind('click',function()
-	{
-		if ($(this).attr('class').indexOf('checkboxOn') == -1)
-		{
-			$('.properties-file-lnk-pad').addClass('show-key');
-			$(this).attr('class', 'checkboxOn');
-			$(this).parent().attr('class', 'checkboxOn');
-			$(this).attr('checked', true);
-		} else {
-			$('.properties-file-lnk-pad').removeClass('show-key');
-			$(this).attr('class', 'checkboxOff');
-			$(this).parent().attr('class', 'checkboxOff');
-			$(this).attr('checked', false);
-		}
-	});
 }
 
 function paypalDialog(url,close)

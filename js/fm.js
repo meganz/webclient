@@ -4006,6 +4006,10 @@ function transferPanelUI()
 		$('.transfer-table tr').unbind('click contextmenu');
 		$('.transfer-table tr').bind('click contextmenu', function (e)
 		{
+			$('.ui-selected').filter(function() {
+				return $(this).parents('.transfer-table').length == 0;
+			}).removeClass('ui-selected');
+
 			if (e.type == 'contextmenu')
 			{
 				transferPanelContextMenu($(this));

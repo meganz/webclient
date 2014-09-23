@@ -2816,7 +2816,8 @@ img.blog-new-logos {
 	font-family: 'Open Sans', Arial;
 	font-size: 18px;
 	display: block;
-	padding-top: 12px;
+	padding-top: 8px;
+	line-height: 22px;
 }
 .properties-float-bl {
 	float: left;

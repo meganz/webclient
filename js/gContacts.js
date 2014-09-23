@@ -1,4 +1,4 @@
-function importGoogleContacts() {
+function importGoogleContacts(where) {
     var access_token_uri = 'https://accounts.google.com/o/oauth2/token';
     var authenticate_uri = 'https://accounts.google.com/o/oauth2/auth';
     var m8_uri = 'https://www.google.com/m8/feeds/';
@@ -38,7 +38,7 @@ function importGoogleContacts() {
                 var url = win.document.URL;
                 accessToken = extractQueryValue(url, 'access_token');
                 win.close();
-                getContactList();
+                getContactList(where);
             }
         } catch (e) {
         }
@@ -50,7 +50,7 @@ function importGoogleContacts() {
  * @param {boolean} false = addContacts, true=share dialog
  * @returns {undefined}
  */
-function getContactList() {
+function getContactList(where) {
 	var ACAO = 'http://aloncar.entrydns.org/';
     var data = {
         access_token: accessToken,
@@ -70,7 +70,14 @@ function getContactList() {
         success: function(data)
 		{
             var gData = readAllEmails(data);
-			addImportedData(gData, 'gmail');
+			if (where === 'shared')
+			{
+				addImportedDataToSharedDialog(gData, 'gmail');
+			}
+			else if (where === 'contacts')
+			{
+				addImportedDataToAddContactsDialog(gData, 'gmail');
+			}
 			$('.import-contacts-dialog').fadeOut(200);
 			$('.import-contacts-link').removeClass('active');
 			$('.import-contacts-service').addClass('imported');						

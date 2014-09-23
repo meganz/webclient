@@ -3572,7 +3572,7 @@ function UIkeyevents()
 			{
 				// we should encapsule the click handler
 				// to call a function rather than use this hacking
-				$('.tranfer-clear').trigger('click');
+				if (e) $('.tranfer-clear').trigger('click');
 			});
 		}
 		else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1)

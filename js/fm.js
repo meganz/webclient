@@ -1704,7 +1704,7 @@ function initContextUI()
 
 		toabort = Object.keys(toabort);
 		DownloadManager.abort(toabort);
-		  UploadManager.abort(toabort);
+		UploadManager.abort(toabort);
 
 		Soon(function() {
 			// XXX: better way to stretch the scrollbar?
@@ -3447,6 +3447,7 @@ function UIkeyevents()
 		var sl=false,s;
 		if (M.viewmode) s = $('.file-block.ui-selected');
 		else s = $('.grid-table tr.ui-selected');
+		selPanel = $('.transfer-panel tr.ui-selected').not('.clone-of-header')
 
 		if (M.chat) return true;
 
@@ -3560,6 +3561,19 @@ function UIkeyevents()
 				$.selected.push($(e).attr('id'));
 			});
 			fmremove();
+		}
+		else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1)
+		{
+			var selected=[];
+			selPanel.each(function() {
+				selected.push($(this).attr('id'));
+			});
+			msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?",false,function(e)
+			{
+				// we should encapsule the click handler
+				// to call a function rather than use this hacking
+				$('.tranfer-clear').trigger('click');
+			});
 		}
 		else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1)
 		{

@@ -1216,7 +1216,7 @@ function addContactUI()
 					// Can I send array of email addreses to server at once?
 					$mails.each(function(index, value)
 					{
-						a.push($(value).text());
+						a.push($(value).contents().eq(1).text());
 					});
 					M.addContact(a);
 				}

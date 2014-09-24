@@ -4308,8 +4308,6 @@ function contextmenuUI(e,ll,topmenu)
 
 		// detect and show right menu
 		if (id && id.length === 11) $(t).filter('.refresh-item,.remove-item').show();// transfer panel
-		else if (c && c.indexOf('cloud-drive-item') > -1) {
-		}
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';

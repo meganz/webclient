@@ -2908,9 +2908,8 @@ function gridUI()
 	{
 		$('.file-block').removeClass('ui-selected');
 		$.selected=[];
-		if (contextmenuUI(e,2)) return true;
-		else return false;
 		$.hideTopMenu();
+		return !!contextmenuUI(e,2);
 	});
         // enable add star on first column click (make favorite)
 	$('.grid-table.fm tr td:first-child').unbind('click');
@@ -3832,8 +3831,8 @@ function selectddUI()
 		}
 		cacheselect();
 		searchPath();
-		if (contextmenuUI(e,1)) return true;
-		else return false;
+		$.hideTopMenu();
+		return !!contextmenuUI(e,1);
 	});
 
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).unbind('click');
@@ -3960,9 +3959,8 @@ function iconUI()
 		$('.file-block').removeClass('ui-selected');
 		selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
 		$.selected=[];
-		if (contextmenuUI(e,2)) return true;
-		else return false;
 		$.hideTopMenu();
+		return !!contextmenuUI(e,2);
 	});
 
 	if (M.currentdirid == 'contacts')
@@ -4031,8 +4029,7 @@ function transferPanelUI()
 				if (!c || (c && c.indexOf('ui-selected') == -1)) $('.transfer-table tr').removeClass('ui-selected');
 				$(this).addClass('ui-selected');
 				$(this).addClass('dragover');
-				if (contextmenuUI(e)) return true;
-				else return false;
+				return !!contextmenuUI(e);
 			}
 			else
 			{
@@ -4294,7 +4291,7 @@ function contextmenuUI(e,ll,topmenu)
 	else if (ll == 3) // we want just the download menu
 	{
 		$(t).hide();
-		m.hide();
+		// m.hide();
 		var m = $('.context-menu.download');
 		t = '.context-menu.download .context-menu-item';
 	}
@@ -4665,8 +4662,7 @@ function treeUI()
 			$('.nw-fm-tree-item').removeClass('dragover');
 			$(this).addClass('dragover');
 			$.selected=[id];
-			if (contextmenuUI(e,1)) return true;
-			else return false;
+			return !!contextmenuUI(e,1);
 		}
 		var c = $(e.target).attr('class');
 		if (c && c.indexOf('nw-fm-arrow-icon') > -1)

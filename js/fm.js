@@ -934,7 +934,9 @@ function removeUInode(h)
 			break;
 		case "contacts":
 			//Clear left panel:
-			$('#contact_' + h).remove();
+			$('#contact_' + h).fadeOut('slow', function() { $(this).remove(); });
+			//Clear right panel:
+			$('.grid-table.contacts tr#' + h).fadeOut('slow', function() { $(this).remove(); });
 			// clear the contacts grid:
 			$('.contacts-grid-view #' + h).remove();
 			// TODO: remove from conversations?

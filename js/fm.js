@@ -7426,8 +7426,8 @@ function contactUI()
 		$('.contact-top-details .contact-details-user-name').text(user.name);
 		$('.contact-top-details .contact-details-email').text(user.m);
 
+		var fprint = $('.contact-fingerprint-txt').empty()
 		getFingerprintEd25519(user.h, function(response) {
-			var fprint = $('.contact-fingerprint-txt').empty()
 			$.each(response.toUpperCase().match(/.{4}/g), function(k, value) {
 				$('<span>').text(value).appendTo(
 					fprint.filter(k <= 4 ? ':first' : ':last')

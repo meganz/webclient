@@ -1080,11 +1080,7 @@ function addContactUI()
 				.focus();
 	}
 	// Plugin configuration
-	var knownEmails = [];
-	for (var i in M.u)
-	{
-		knownEmails.push({id: M.u[i].m, name: M.u[i].name});
-	}
+	var knownEmails = getContactsEMails();
 	$('.add-contact-multiple-input').tokenInput(knownEmails, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",
@@ -5276,6 +5272,16 @@ checkMultiInputPermission = function($this)
 	return perm;
 };
 
+function getContactsEMails()
+{
+	var contacts = [];
+	for (var i in M.u)
+	{
+		if (M.u[i].c) contacts.push({id: M.u[i].m, name: M.u[i].name});
+	}
+	return contacts;
+}
+
 function initShareDialog()
 {
 	function existingEmailMsg()
@@ -5302,11 +5308,7 @@ function initShareDialog()
 	}
 
 	// Plugin configuration
-	var contacts = [];
-	for (var i in M.u)
-	{
-		contacts.push({id: M.u[i].m, name: M.u[i].name});
-	}
+	var contacts = getContactsEMails();
 	$('.share-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",

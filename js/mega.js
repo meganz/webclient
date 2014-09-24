@@ -1582,16 +1582,17 @@ function MegaData ()
 				M.delHash(M.d[h]);
 				delete M.d[h];
 			}
-                        // Update M.v it's used for at least preview slideshow
-                        for (var k in M.v)
-                        {
-                                if (M.v[k].h === h)
-                                {
-                                        M.v.splice(k, 1);
-                                        break;
-                                }
-                        }
-                        if (typeof M.u.h === 'object') M.u.h.c = 0;
+			// Update M.v it's used for at least preview slideshow
+			for (var k in M.v)
+			{
+				if (M.v[k].h === h)
+				{
+					M.v.splice(k, 1);
+					break;
+				}
+			}
+			// if (M.u[h]) delete M.u[h];
+			if (typeof M.u[h] === 'object') M.u[h].c = 0;
 		}
 		ds(h);
 	};

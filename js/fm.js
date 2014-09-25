@@ -6618,27 +6618,28 @@ function browserDialog(close)
 
 function propertiesDialog(close)
 {
-    var pd = $('.fm-dialog.properties-dialog');
+    var pd = $('.fm-dialog.properties-dialog'),
+	    c = $('.properties-elements-counter span');
 	if (close)
 	{
 		$.dialog = false;
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 		pd.addClass('hidden');
+		$('.contact-list-icon').removeClass('active');
+		$('.properties-context-menu').fadeOut(200);
 		return true;
 	}
 	$.dialog = 'properties';
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
-	pd.removeClass('hidden multiple folders-only two-elements');
+	pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
+	$('.properties-elements-counter span').text('');	
 	$('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.properties-dialog .fm-dialog-close').bind('click',function()
 	{
 		propertiesDialog(1);
 	});
-	$('.fm-dialog.properties-dialog .properties-shared-block').hide();
-	$('.fm-dialog.properties-dialog .properties-link-block').hide();
-	$('.fm-dialog.properties-dialog #keyoption').hide();
 	var filecnt=0, foldercnt=0, size=0,sfilecnt=0,sfoldercnt=0;
 	for (var i in $.selected)
 	{
@@ -6663,6 +6664,14 @@ function propertiesDialog(close)
 			size+= n.s;
 		}
 	}
+	
+	if (fileicon(n).indexOf('shared')>-1) pd.addClass('shared');
+	
+	//TODO: Please add "shared-with-me" classname to pd element if folder is shared to current user
+	//Please add "read-only"/"read-and_write"/"full-access" to pd element if folder is shared to current user
+	//if () pd.addClass('shared-with-me')
+	
+	
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
@@ -6688,14 +6697,37 @@ function propertiesDialog(close)
 		p.t1 = l[86] + ':';
 		p.t2 = htmlentities(n.name);
 		p.t4 = bytesToSize(size);
-		if (foldercnt)
-		{
-			p.t6 = l[897] + ':';
-			p.t7 = fm_contains(sfilecnt,sfoldercnt);
-		}
-
 		p.t8 = l[896] + ':';
 		p.t9 = htmlentities(time2date(n.ts));
+		p.t10 = '';
+		p.t11 = '';
+		if (foldercnt)
+		{
+			
+			p.t6 = l[897] + ':';
+			p.t7 = fm_contains(sfilecnt,sfoldercnt);
+			if (pd.attr('class').indexOf('shared')>-1) { 
+			  // TODO: Contacts number implementation 
+			  // $('.properties-elements-counter span').text('number of contacts');
+			  p.t8 = 'Shared with:';
+		      p.t9 = '1 contact';	
+			  p.t10 = l[896];
+		      p.t11 = htmlentities(time2date(n.ts));
+			}
+			if (pd.attr('class').indexOf('shared-with-me')>-1) { 
+			  // TODO: Permissions and Owner implementation 
+			  p.t3 = 'Permissions:';
+			  p.t4 = 'Full access';
+			  p.t6 = 'Owner';
+			  p.t7 = 'Alex Brunskill';
+			  p.t8 = l[894] + ':';
+		      p.t9 = bytesToSize(size);	
+			  p.t10 = l[897] + ':';
+		      p.t11 = fm_contains(sfilecnt,sfoldercnt);
+			}
+		}
+
+		
 	}
 	else
 	{
@@ -6708,9 +6740,33 @@ function propertiesDialog(close)
 		p.t8 = l[93] + ':';
 		p.t9 = l[1025];
 	}
-	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="propreties-dark-txt">'+ p.t2 + '</div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt">' + p.t9 +'</div>';
+	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">'+ p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 +'<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
 	$('.properties-txt-pad').html(html);
-	if ((filecnt + foldercnt) == 1) $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
+	
+	if (pd.attr('class').indexOf('shared')>-1) { 
+		$('.contact-list-icon').unbind('click');
+		$('.contact-list-icon').bind('click', function() {
+			if ($(this).attr('class').indexOf('active')==-1) {
+				$(this).addClass('active');
+				$('.properties-context-menu').css({
+					'left': $(this).position().left + 8 + 'px',
+					'top': $(this).position().top - $('.properties-context-menu').outerHeight() -8 + 'px',
+					'margin-left': '-' + $('.properties-context-menu').width()/2 + 'px'
+				});
+				$('.properties-context-menu').fadeIn(200);
+			} else {
+				$(this).removeClass('active');
+				$('.properties-context-menu').fadeOut(200);
+			}
+		});
+		$('.properties-context-item').unbind('click');
+		$('.properties-context-item').bind('click', function() {
+			$('.contact-list-icon').removeClass('active');
+			$('.properties-context-menu').fadeOut(200);
+		});
+	}
+	
+	if ((filecnt + foldercnt) == 1)  $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
 	else
 	{
 		if ((filecnt + foldercnt) == 2) pd.addClass('two-elements');

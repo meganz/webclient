@@ -30,6 +30,7 @@
 		addAvatar: true,
 		emailCheck: false,
 		accountHolder: '',
+		scrollLocation: 'add',
 		resultsFormatter: function(item) {
 			var string = item[this.propertyToSearch];
 			var av_color = string.charCodeAt(0)%6 + string.charCodeAt(1)%6;
@@ -291,7 +292,6 @@
 				.keydown(function(event) {
 					var previous_token;
 					var next_token;
-					initShareInputScroll();
 					switch (event.keyCode) {
 						case KEY.LEFT:
 						case KEY.RIGHT:
@@ -752,9 +752,9 @@
 			// Execute the onAdd callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, item);
-				$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
-				initShareInputScroll();
 			}
+			$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
+			multiInputScroll();
 		}
 
 		// Select a token in the token list
@@ -843,13 +843,13 @@
 			// Execute the onDelete callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, token_data);
-				var b = $(input).data("settings").local_data;
-				$.each(b, function(ind, val) {
-					if (token_data[settings.tokenValue] === val[settings.tokenValue])
-					{
-						$(input).data("settings").local_data.splice(ind, 1);					}
-				});
+				var ld = $(input).data("settings").local_data
+				for (var n in ld)
+				{
+					if (ld[n].id === token_data.id) $(input).data("settings").local_data.splie(n, 1);
+				}
 			}
+			multiInputScroll();
 		}
 
 
@@ -871,13 +871,38 @@
 
 		}
 
-		function initShareInputScroll() {
-			var h1 = $('.token-input-list-mega').outerHeight();
-			var h2 = $('.multiple-input').outerHeight()
-			if (h1 > 144 && h1 > h2) {
-				var element = $('.multiple-input').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
-				focus_with_timeout(input_box);
-			} //else if (element) element.destroy()
+		function multiInputScroll()
+		{
+			var $a, $b;
+			if (settings.scrollLocation === 'add')
+			{
+				$a = $('.add-user-popup .share-added-contact.token-input-token-mega');
+				$b = $('.add-user-popup .multiple-input');
+			}
+			else
+			{
+				$a = $('.share-dialog .share-added-contact.token-input-token-mega');
+				$b = $('.share-dialog .multiple-input');
+			}
+			var h1 = $a.height();
+			var h2 = $b.height();
+			
+			var $data = $b.jScrollPane().data('jsp');
+			if (h2/h1 > 5)
+			{
+				if (!$data)
+				{
+					$b.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+					focus_with_timeout(input_box);
+				}
+			}
+			else
+			{
+				if ($data)
+				{
+					$b.jScrollPane().data('jsp').destroy();
+				}
+			}
 		}
 
 		// Hide and clear the results dropdown

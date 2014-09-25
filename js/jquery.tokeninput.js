@@ -29,6 +29,7 @@
 		enableHTML: false,
 		addAvatar: true,
 		emailCheck: false,
+		accountHolder: '',
 		resultsFormatter: function(item) {
 			var string = item[this.propertyToSearch];
 			var av_color = string.charCodeAt(0)%6 + string.charCodeAt(1)%6;
@@ -78,6 +79,7 @@
 		onReady: null,
 		onEmailCheck: null,
 		onDoublet: null,
+		onHolder: null,
 		// Other settings
 		idPrefix: "token-input-",
 		// Keep track if the input is currently in disabled mode
@@ -669,7 +671,6 @@
 				var isValidEmail = IsEmail(item[settings.tokenValue]);
 				if (!isValidEmail)// Prevent further execution if email format is wrong
 				{
-					select_token(item);
 					var cb = $(input).data("settings").onEmailCheck;
 					if ($.isFunction(cb)) {
 						cb.call(hidden_input, item);
@@ -679,8 +680,20 @@
 				}
 			}
 			
-			// this setting will be renamed, to someting like preventLocalDoublet 
-			// will disting from existing which check multi-input list
+			if ($(input).data("settings").accountHolder)
+			{
+				if ($(input).data("settings").accountHolder.toLowerCase() === item[settings.tokenValue].toLowerCase())
+				{
+					select_token(item);
+					var cb = $(input).data("settings").onHolder;
+					if ($.isFunction(cb)) {
+						cb.call(hidden_input, item);
+					}
+					
+					return;
+				}				
+			}
+			
 			if ($(input).data("settings").preventDoublet)
 			{
 				var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
@@ -688,6 +701,7 @@
 				});
 				if (doubleEmail.length)// Prevent further execution if email is duplicated
 				{
+					select_token(item);
 					var cb = $(input).data("settings").onDoublet;
 					if ($.isFunction(cb)) {
 						cb.call(hidden_input, item);
@@ -738,6 +752,8 @@
 			// Execute the onAdd callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, item);
+				$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
+				initShareInputScroll();
 			}
 		}
 
@@ -827,6 +843,12 @@
 			// Execute the onDelete callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, token_data);
+				var b = $(input).data("settings").local_data;
+				$.each(b, function(ind, val) {
+					if (token_data[settings.tokenValue] === val[settings.tokenValue])
+					{
+						$(input).data("settings").local_data.splice(ind, 1);					}
+				});
 			}
 		}
 

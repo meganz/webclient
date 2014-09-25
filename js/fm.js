@@ -1051,29 +1051,18 @@ function addContactUI()
 		}
 	};
 
-	function existingEmailMsg()
+	function errorMsg(msg)
 	{
 		var $d = $('.add-user-popup');
 		var $s = $('.add-user-popup .multiple-input-warning span');
-		$s.text('You already have contact with that email!');
-		$d.addClass('error');
-		setTimeout(function()
-		{
-			$d.removeClass('error');
-			$s.text('Looks like there’s a malformed email!');
-		}, 3000);
-	}
-
-	function wrongEmailMsg()
-	{
-		var $d = $('.add-user-popup');
+		$s.text(msg);
 		$d.addClass('error');
 		setTimeout(function()
 		{
 			$d.removeClass('error');
 		}, 3000);
 	}
-
+	
 	function focusOnInput()
 	{
 		var $tokenInput = $('#token-input-');
@@ -1084,8 +1073,20 @@ function addContactUI()
 				.focus();
 	}
 	// Plugin configuration
-	var knownEmails = getContactsEMails();
-	$('.add-contact-multiple-input').tokenInput(knownEmails, {
+//	var knownEmails = getContactsEMails();
+	var contacts = [];
+	var n;
+	for (var i in M.u)
+	{
+		if (M.u[i])
+		{
+			n = M.u[i];
+			// Added account holder n.c == 2to prevent duplication
+			if (n.c && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
+		}
+	}
+	
+	$('.add-contact-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",
 		searchingText:		"Searching for existing contacts...",
@@ -1098,8 +1099,10 @@ function addContactUI()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		onEmailCheck: wrongEmailMsg,
-		onDoublet: existingEmailMsg,
+		accountHolder:		M.u[u_handle].m,
+		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
+		onDoublet: function() {errorMsg('You already have contact with that email!');},
+		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()
 		{
 			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
@@ -5276,34 +5279,13 @@ checkMultiInputPermission = function($this)
 	return perm;
 };
 
-function getContactsEMails()
-{
-	var contacts = [];
-	for (var i in M.u)
-	{
-		if (M.u[i].c) contacts.push({id: M.u[i].m, name: M.u[i].name});
-	}
-	return contacts;
-}
-
 function initShareDialog()
 {
-	function existingEmailMsg()
+	function errorMsg(msg)
 	{
 		var $d = $('.share-dialog');
 		var $s = $('.share-dialog .multiple-input-warning span');
-		$s.text('You already have contact with that email!');
-		$d.addClass('error');
-		setTimeout(function()
-		{
-			$d.removeClass('error');
-			$s.text('Looks like there’s a malformed email!');
-		}, 3000);
-	}
-
-	function wrongEmailMsg()
-	{
-		var $d = $('.share-dialog');
+		$s.text(msg);
 		$d.addClass('error');
 		setTimeout(function()
 		{
@@ -5312,7 +5294,19 @@ function initShareDialog()
 	}
 
 	// Plugin configuration
-	var contacts = getContactsEMails();
+	var contacts = [];
+	var n;
+	for (var i in M.u)
+	{
+		if (M.u[i])
+		{
+			n = M.u[i];
+			// n.c = 2 is account holder, exclude it for search
+			if (n.c && n.c !== 2 && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
+		}
+	}
+	
+//	var contacts = getContactsEMails();
 	$('.share-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",
@@ -5326,8 +5320,10 @@ function initShareDialog()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		onEmailCheck: wrongEmailMsg,
-		onDoublet: existingEmailMsg,
+		accountHolder:		M.u[u_handle].m,
+		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
+		onDoublet: function() {errorMsg('You already have contact with that email!');},
+		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()
 		{
 			var $btn = $('.dialog-share-button');
@@ -5543,13 +5539,14 @@ function initShareDialog()
 		if (id !== '')
 		{
 			M.delnodeShare(sel, id);
+			
 			api_req({
 				a:'s',
 				n:sel,
-				s:{
+				s:[{
 					u:id,
 					r:''
-				},
+				}],
 				ha:'',
 				i: requesti
 			});

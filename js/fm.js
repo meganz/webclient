@@ -5226,7 +5226,7 @@ function fetchsrc(id)
 		delete pfails[id];
 		M.addDownload([id],false,err? -1:true);
 	}
-	eot.timeout = 5100;
+	eot.timeout = 12000;
 
 	if (pfails[id])
 	{ // for slideshow_next/prev

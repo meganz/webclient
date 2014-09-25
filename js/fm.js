@@ -1870,10 +1870,17 @@ function createfolderUI()
 
 function docreatefolderUI(e)
 {
-	if ($('.create-folder-input-bl input').val() == '') $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() { $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function(){$('.create-folder-input-bl input').focus();});});
-	else {
-		createfolder(M.currentdirid,$('.create-folder-input-bl input').val());
+	if ($('.create-folder-input-bl input').val() == '')
+	{
+		$('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function()
+		{
+			$('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function()
+			{
+				$('.create-folder-input-bl input').focus();
+			});
+		});
 	}
+	else createfolder(M.currentdirid,$('.create-folder-input-bl input').val());
 }
 
 function fmtopUI()

@@ -2991,6 +2991,7 @@ function rendernew()
 	if (UItree)
 	{
 		treeUI();
+		if (RootbyId(M.currentdirid) === 'shares') M.renderTree();
 		treeUIopen(M.currentdirid);
 	}
 	if (newcontact)

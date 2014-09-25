@@ -429,7 +429,7 @@ ClassFile.prototype.run = function(task_done) {
 				}));
 			}
 
-			if (this.dl.zipid && (this.emptyFile = (tasks.length == 0)))
+			if ((this.emptyFile = (tasks.length == 0)) && this.dl.zipid)
 			{
 				tasks.push(new ClassEmptyChunk(this.dl));
 			}

@@ -381,6 +381,18 @@ function MegaData ()
 		}
 	};
 
+	this.emptySharefolderUI = function(lSel)
+	{
+		if (!lSel) lSel = this.fsViewSel;
+		$(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
+		$(lSel).parent().children('table').hide();
+		$(window).trigger('resize');
+	};
+	Object.defineProperty(this, 'fsViewSel', {
+		value : '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
+		configurable : false
+	});
+
 	this.renderMain = function(u)
 	{
 		function flush_cached_nodes(n)
@@ -438,7 +450,7 @@ function MegaData ()
 		}
 		var cache = [], n_cache, files = 0, jsp, t, lSel;
 
-		lSel = '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling';
+		lSel = this.fsViewSel;
 		$(lSel).unbind('jsp-scroll-y.dynlist');
 		$(window).unbind("resize.dynlist");
 		sharedfolderUI();
@@ -479,13 +491,9 @@ function MegaData ()
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
 			else if (RootbyId(M.currentdirid) == M.RootID) $('.fm-empty-folder').removeClass('hidden');
-			else if (RootbyId(M.currentdirid) == 'shares')
+			else if (RootbyId(M.currentdirid) == 'shares') this.emptySharefolderUI(lSel);
+			else if (RootbyId(M.currentdirid) == 'contacts')
 			{
-				$(lSel).before($('.fm-empty-folder .fm-empty-pad:first').clone().removeClass('hidden').addClass('fm-empty-sharef'));
-				$(lSel).parent().children('table').hide();
-				$(window).trigger('resize');
-			}
-			else if (RootbyId(M.currentdirid) == 'contacts') {
 				$('.fm-empty-incoming.contact-details-view').removeClass('hidden');
 				$('.contact-share-notification').addClass('hidden');
 			}
@@ -826,7 +834,7 @@ function MegaData ()
 			e.preventDefault(); e.stopPropagation();
 			e.currentTarget = $('ul#treesub_shares .selected')
 			e.calculatePosition = true;
-			$.selected = [e.currentTarget.attr('id').substr(6)] 
+			$.selected = [e.currentTarget.attr('id').substr(6)]
 		}
 
 		$('.shared-details-info-block .grid-url-arrow').unbind('click');
@@ -1199,8 +1207,7 @@ function MegaData ()
 					html = '<li id="mctreeli_' + folders[i].h + '"><span class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + '" id="mctreea_'+ htmlentities(folders[i].h) +'"><span class="nw-fm-arrow-icon"></span><span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(folders[i].name) + '</span></span><ul id="mctreesub_' + folders[i].h + '" ' + ulc + '></ul></li>';
 					k = $('#mctreeli_'+folders[i].h).length;
 				}
-					
-					
+
 				if ((!treesearch || (treesearch && folders[i].name && folders[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1)) && k == 0)
 				{
 					if (typeof dialog === 'undefined')

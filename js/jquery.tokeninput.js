@@ -846,7 +846,7 @@
 				var ld = $(input).data("settings").local_data
 				for (var n in ld)
 				{
-					if (ld[n].id === token_data.id) $(input).data("settings").local_data.splie(n, 1);
+					if (ld[n].id === token_data.id) $(input).data("settings").local_data.splice(n, 1);
 				}
 			}
 			multiInputScroll();

@@ -55,13 +55,25 @@ if (indexedDB)
 		mDBact = Math.random();
 		mDBactive(mDBact);
 		loadingDialog.show();
+
 		if (d) console.log('mDBstart()');
+
+		setTimeout(function()
+		{
+			if (mDB === 1)
+			{
+				if (d) console.log('mDBstart timeout (2000ms), fetching live data');
+				mDB=undefined;
+				loadfm();
+			}
+		},2000);
+
 		try {
 			request = indexedDB.open("MEGA_" + u_handle,2);
 		} catch(e) {
 			if (!mDBStartError)
 			{
-				if (d) console.log('mDB.open error', e);
+				console.error('mDB.open error', e);
 				mDBreload();
 			}
 			else rOnError(e);
@@ -120,16 +132,6 @@ if (indexedDB)
 			db.createObjectStore("s",  { keyPath:  "h_u"});
 			db.createObjectStore("u",  { keyPath:  "u"});
 		};
-
-		setTimeout(function()
-		{
-			if (mDB === 1)
-			{
-				if (d) console.log('mDBstart timeout (2000ms), fetching live data');
-				mDB=undefined;
-				loadfm();
-			}
-		},2000);
 	}
 
 	var mDBqueue = {};
@@ -287,6 +289,15 @@ if (indexedDB)
 	{
 		if (mDB && mDB.close) mDB.close();
 		mDB=2;
+		setTimeout(function()
+		{
+			if (mDB === 2)
+			{
+				if (d) console.log('mDBreload timeout (2000ms), fetching live data');
+				mDB=undefined;
+				loadfm();
+			}
+		},2000);
 		var dbreq= indexedDB.deleteDatabase("MEGA_" + u_handle);
 		dbreq.onsuccess = function(event)
 		{
@@ -297,15 +308,6 @@ if (indexedDB)
 		{
 			mDBrestart();
 		};
-		setTimeout(function()
-		{
-			if (mDB === 2)
-			{
-				if (d) console.log('mDBreload timeout (2000ms), fetching live data');
-				mDB=undefined;
-				loadfm();
-			}
-		},2000);
 	}
 
 	function mDBrestart()

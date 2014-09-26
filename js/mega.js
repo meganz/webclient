@@ -1946,12 +1946,12 @@ function voucherData(arr)
 
 function onUploadError(fileid, errorstr, reason, xhr, hostname)
 {
-	if (!d && (!xhr || (xhr.readyState > 1 && xhr.status)))
+	if (!d && (!xhr || xhr.readyState < 2 || xhr.status))
 	{
 		var details = [
 			browserdetails(ua).name,
 			reason,
-			xhr && xhr.status,
+			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hostname
 		];
 		window.onerror('onUploadError :: ' + errorstr

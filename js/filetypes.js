@@ -236,7 +236,7 @@ function fileicon(n)
 {	
 	var ico;	
 	var name = n.name;		
-	if (n.t && n.shares) ico = 'folder-shared';
+	if (n.t && n.shares || typeof n.r == "number") ico = 'folder-shared';
 	else if (n.t) ico = 'folder';
 	else if (ext[fileext(n.name)]) ico = ext[fileext(n.name)][0];
 	else ico = 'generic';

@@ -6668,10 +6668,17 @@ function propertiesDialog(close)
 	}
 	
 	if (fileicon(n).indexOf('shared')>-1) pd.addClass('shared');
-	
-	//TODO: Please add "shared-with-me" classname to pd element if folder is shared to current user
-	//Please add "read-only"/"read-and_write"/"full-access" to pd element if folder is shared to current user
-	//if () pd.addClass('shared-with-me')
+	if (typeof n.r == "number")
+	{
+		var cs = M.contactstatus(n.h)
+		var zclass = "read-only";
+		if (n.r == 1) {
+			zclass = "read-and-write"
+		} else if (n.r == 2) {
+			zclass = "full-access"
+		}
+		pd.addClass('shared shared-with-me '  + zclass)
+	}
 	
 	
 	var p = {};

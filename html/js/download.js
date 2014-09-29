@@ -188,12 +188,14 @@ function dl_g(res)
 			{
 				ulQueue.pause();
 				dlQueue.pause();
+				ui_paused = true;
 				$(this).addClass('active');
 			}
 			else 
 			{
 				dlQueue.resume();
 				ulQueue.resume();
+				ui_paused = false;
 				$(this).removeClass('active');
 			}					
 		});				

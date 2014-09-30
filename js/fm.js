@@ -5355,8 +5355,11 @@ function initShareDialog()
 	
 	$('.share-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
-		hintText:			"Type in a contact email",
-		searchingText:		"Searching for existing contacts...",
+//		hintText:			"Type in a contact email",
+		hintText:			"",
+		searchingText:		"",
+//		searchingText:		"Searching for existing contacts...",
+		noResultsText:		"",
 		addAvatar:			true,
 		autocomplete:		null,
 		searchDropdown:		true,

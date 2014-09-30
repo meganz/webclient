@@ -6798,10 +6798,37 @@ function propertiesDialog(close)
 			if (pd.attr('class').indexOf('shared')>-1) { 
 			  // TODO: Contacts number implementation 
 			  // $('.properties-elements-counter span').text('number of contacts');
+			  var shares, susers, total = 0
+		      shares = Object.keys(n.shares).length
 			  p.t8 = 'Shared with:';
-		      p.t9 = '1 contact';	
+		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';	
 			  p.t10 = l[896];
 		      p.t11 = htmlentities(time2date(n.ts));
+			  susers = pd.find('.properties-body .properties-context-menu')
+				  .empty()
+				  .append('<div class="properties-context-arrow"></div>')
+			  for (var u in n.shares) {
+					if (M.u[u]) {
+						var u = M.u[u]
+						var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+						if (++total <= 5) 
+							susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
+								+ '<div class="properties-contact-status"></div>'
+								+ '<span>' + htmlentities(u.name || u.m)  + '</span>'
+							+ '</div>');
+					}
+			  }
+
+			  if (total > 5) {
+				susers.append(
+					'<div class="properties-context-item show-more">'
+					+ '<span>... and ' + (total-5) + ' more</span>'
+					+ '</div>'
+				);
+			  }
+
+			  if (total == 0) p.hideContacts = true;
+
 			}
 			if (pd.attr('class').indexOf('shared-with-me')>-1) { 
 			  // TODO: Permissions and Owner implementation 
@@ -6811,7 +6838,7 @@ function propertiesDialog(close)
 			  p.t7 = 'Alex Brunskill';
 			  p.t8 = l[894] + ':';
 		      p.t9 = bytesToSize(size);	
-			  p.t10 = l[897] + ':';
+			  p.t10 = l[897] +  ':';
 		      p.t11 = fm_contains(sfilecnt,sfoldercnt);
 			}
 		}
@@ -6831,6 +6858,10 @@ function propertiesDialog(close)
 	}
 	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">'+ p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 +'<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
 	$('.properties-txt-pad').html(html);
+
+	if (p.hideContacts) {
+		$('.properties-txt-pad .contact-list-icon').hide();
+	}
 	
 	if (pd.attr('class').indexOf('shared')>-1) { 
 		$('.contact-list-icon').unbind('click');

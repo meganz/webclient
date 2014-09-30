@@ -559,10 +559,7 @@
 		};
 
 		this.add = function(item) {
-//			if (beforeAdd(item))
-//			{
-				add_token(item);
-//			}
+			add_token(item);
 		};
 
 		this.remove = function(item) {
@@ -798,18 +795,16 @@
 			}
 
 			// Clear input box
-//			input_box.val("");
+			input_box.val("");
 
 			// Don't show the help dropdown, they've got the idea
-//			hide_dropdown();
-
-			select_token(item);
+			hide_dropdown();
 			// Execute the onAdd callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, item);
 			}
+			
 			$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
-			multiInputScroll();
 		}
 
 		// Select a token in the token list
@@ -888,6 +883,7 @@
 
 			token_count -= 1;
 
+
 			if ($(input).data("settings").tokenLimit !== null) {
 				input_box
 						.show()
@@ -904,7 +900,6 @@
 					if (ld[n].id === token_data.id) $(input).data("settings").local_data.splice(n, 1);
 				}
 			}
-			multiInputScroll();
 		}
 
 
@@ -924,40 +919,6 @@
 			});
 			hidden_input.val(token_values.join($(input).data("settings").tokenDelimiter));
 
-		}
-
-		function multiInputScroll()
-		{
-			var $a, $b;
-			if (settings.scrollLocation === 'add')
-			{
-				$a = $('.add-user-popup .share-added-contact.token-input-token-mega');
-				$b = $('.add-user-popup .multiple-input');
-			}
-			else
-			{
-				$a = $('.share-dialog .share-added-contact.token-input-token-mega');
-				$b = $('.share-dialog .multiple-input');
-			}
-			var h1 = $a.height();
-			var h2 = $b.height();
-			
-			var $data = $b.jScrollPane().data('jsp');
-			if (h2/h1 > 5)
-			{
-				if (!$data)
-				{
-					$b.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
-					focus_with_timeout(input_box);
-				}
-			}
-			else
-			{
-				if ($data)
-				{
-					$b.jScrollPane().data('jsp').destroy();
-				}
-			}
 		}
 
 		// Hide and clear the results dropdown

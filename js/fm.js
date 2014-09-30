@@ -1118,16 +1118,36 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
-
 			}
 			else
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
+				
+				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
+				var $b = $('.add-user-popup .multiple-input');
+				var h1 = $a.outerHeight(true);// margin included
+				var h2 = $b.height();
+				
+				if (5 <= h2/h1 && h2/h1 < 6)
+				{
+					$b.jScrollPane({
+						enableKeyboardNavigation: false,
+						showArrows: true,
+						arrowSize: 8,
+						animateScroll: true
+					});
+					setTimeout(function() {
+						$('.add-user-popup .token-input-input-token-mega input').focus();
+					}, 0);
+				}
 			}
 		},
 		onDelete: function()
 		{
+			setTimeout(function() {
+				$('.add-user-popup .token-input-input-token-mega input').blur();
+			}, 0);
 			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
 			if (itemNum === 0)
 			{
@@ -1145,6 +1165,19 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
+				
+				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
+				var $b = $('.add-user-popup .multiple-input');
+				var $c = $('.add-user-popup .multiple-input .jspPane')[0];
+				var h1 = $a.outerHeight(true);// margin included
+				var h2;
+				if ($c) h2 = $c.scrollHeight;
+				else h2 = $b.height();
+
+				if (h2/h1 < 6)
+				{
+					clearScrollPanel('.add-user-popup');
+				}
 			}
 		}
     });
@@ -1245,6 +1278,7 @@ function addContactUI()
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 
 	});
 
@@ -1254,6 +1288,7 @@ function addContactUI()
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 	});
 
 	$('.add-user-popup .import-contacts-service').unbind('click');
@@ -5339,10 +5374,31 @@ function initShareDialog()
 		onAdd: function()
 		{
 			$('.dialog-share-button').removeClass('disabled');
-		},
+			
+			var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
+			var $b = $('.share-dialog .multiple-input');
+			var h1 = $a.outerHeight(true);// margin 
+			var h2 = $b.height();
+
+			if (5 <= h2/h1 && h2/h1 < 6)
+			{
+				$b.jScrollPane({
+					enableKeyboardNavigation: false,
+					showArrows: true,
+					arrowSize: 8,
+					animateScroll: true
+				});
+				setTimeout(function() {
+					$('.share-dialog .token-input-input-token-mega input').focus();
+				}, 0);
+			}
+	},
 		onDelete: function()
 		{
 			var $btn = $('.dialog-share-button');
+			setTimeout(function() {
+				$('.share-dialog .token-input-input-token-mega input').blur();
+			}, 0);
 			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length + $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length;
 			if (itemNum === 0)
 			{
@@ -5351,6 +5407,19 @@ function initShareDialog()
 			else
 			{
 				$btn.removeClass('disabled');
+				
+				var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
+				var $b = $('.share-dialog .multiple-input');
+				var $c = $('.share-dialog .multiple-input .jspPane')[0];
+				var h1 = $a.outerHeight();// margin excluded
+				var h2;
+				if ($c) h2 = $c.scrollHeight;
+				else h2 = $b.height();
+
+				if (h2/h1 < 6)
+				{
+					clearScrollPanel('.share-dialog');
+				}
 			}
 		}
     });
@@ -5688,6 +5757,13 @@ function closeImportContactNotification(c)
 	$('.import-contacts-link').removeClass('active');
 }
 
+function clearScrollPanel(from)
+{
+	$(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
+	$(from + ' .multiple-input .jspPane').unwrap();
+	$(from + ' .multiple-input .jspPane:first-child').unwrap();	
+}
+
 function closeDialog()
 {
 	if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog))
@@ -5704,12 +5780,12 @@ function closeDialog()
 		// add contact popup
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 		// share dialog
 		$('.share-dialog-contact-bl').remove();
 		$('.import-contacts-service').removeClass('imported');
-		var $x = $('.share-dialog-contacts').jScrollPane();
-		var el = $x.data('jsp');
-		el.destroy();
+		clearScrollPanel('.share-dialog');
+		
 		// share dialog permission menu
 		$('.permissions-menu').fadeOut(0);
 		$('.import-contacts-dialog').fadeOut(0);

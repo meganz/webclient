@@ -6782,6 +6782,13 @@ function propertiesDialog(close)
 	}
 	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">'+ p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 +'<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
 	$('.properties-txt-pad').html(html);
+	pd.find('.file-settings-icon').rebind('click context', function(e) {
+		e.preventDefault(); e.stopPropagation();
+		e.currentTarget = $('#' +  n.h)
+		e.calculatePosition = true;
+		$.selected = [n.h];
+		contextmenuUI(e, 1);
+	});
 
 	if (p.hideContacts) {
 		$('.properties-txt-pad .contact-list-icon').hide();

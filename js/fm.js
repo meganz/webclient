@@ -925,6 +925,7 @@ function removeUInode(h)
     switch (M.currentdirid)
     {
 		case "shares":
+			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
             {
 				$('.files-grid-view .grid-table-header tr').remove();

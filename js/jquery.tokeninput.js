@@ -232,6 +232,18 @@
 				closest.append(tmpInput);
 				return tmpInput;
 			}
+		},
+		remove_contact: function(item) {
+			var ld = $('.share-multiple-input').data("settings").local_data;
+			for (var n in ld)
+			{
+				if (ld[n].id === item.id)
+				{
+					$('.share-multiple-input').data("settings").local_data.splice(n, 1);
+					$('.add-contact-multiple-input').data("settings").local_data.splice(n, 1);
+					break;
+				}
+			}
 		}
 	};
 
@@ -561,7 +573,7 @@
 		this.add = function(item) {
 			add_token(item);
 		};
-
+		
 		this.remove = function(item) {
 			token_list.children("li").each(function() {
 				if ($(this).children("input").length === 0) {

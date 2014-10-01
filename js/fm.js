@@ -1393,6 +1393,7 @@ function fmremove()
 					}
 					M.delNode($.selected[i]);
 					api_req({a:'ur',u:$.selected[i],l:'0',i: requesti});
+					$('.share-multiple-input').tokenInput("remove_contact", {id: M.u[$.selected[i]].m});
 				}
 			}
 		});
@@ -5526,8 +5527,7 @@ function initShareDialog()
 						perm = 0;
 					}
 					
-//					if (!s[id] || (typeof s[id].r == 'undefined') || s[id].r !== perm)
-					if (!s[id] || s[id].r !== perm)
+					if (!s || !s[id] || s[id].r !== perm)
 						t.push({u: id, r: perm});
 				});
 

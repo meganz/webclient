@@ -5485,7 +5485,10 @@ function initShareDialog()
 		// This's sensitive to dialog DOM element positioning
 		var trg = e.originalEvent.path[0];
 		var trg1 = e.originalEvent.path[1];
-		if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions') && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
+		var trg2 = e.originalEvent.path[2];
+		if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+				&& !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+				&& !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
 		{
 			// share dialog permission menu
 			$('.permissions-menu').fadeOut(200);
@@ -5664,17 +5667,20 @@ function initShareDialog()
 		var $m = $('.permissions-menu');
 		if ($this.is('.active'))// fadeOut this popup
 		{
-			$m.fadeOut(0);
+			$m.fadeOut(200);
 			$this.removeClass('active');
 		}
 		else
 		{
-			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
 			var x = $this.position().left + 30;
 			var y = $this.position().top - 1;
 			handlePermissionMenu($this, $m, x, y);
 		}
+		
+		e.stopProgagation();
 	});
 
 	// related to multi-input contacts
@@ -5685,12 +5691,13 @@ function initShareDialog()
 		var $m = $('.permissions-menu');
 		if ($this.is('.active'))// fadeOut permission menu for this icon
 		{
-			$m.fadeOut(0);
+			$m.fadeOut(200);
 			$this.removeClass('active');
 		}
 		else
 		{
-			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
 			var x = $this.position().left + 31;
 			var y = $this.position().top - 9;

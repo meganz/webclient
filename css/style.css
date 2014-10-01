@@ -4847,7 +4847,7 @@ th.grid-first-th {
 .file-block .file-status-icon.star.new, .contact-status-icon.star.new, .file-block.ui-selected .file-status-icon.star.new, .file-block.dragover .file-status-icon.star.new, .ui-selected .contact-status-icon.star.new, .dragover .contact-status-icon.star.new {
 	background-position: -7px -1469px;
 }
-.file-block .file-status-icon, .contact-status-icon {
+.file-block .file-status-icon, .contact-status-icon, .properties-body .file-status-icon {
 	position: absolute;
 	left: 4px;
 	top: 4px;
@@ -4856,7 +4856,11 @@ th.grid-first-th {
 	width: 20px;
 	background-position: 1px -3679px;
 }
-.file-block .file-status-icon.star, .contact-status-icon.star {
+.properties-body .file-status-icon {
+	left: 14px;
+	top: 14px;
+}
+.file-block .file-status-icon.star, .contact-status-icon.star, .properties-body .file-status-icon.star {
 	background-position: -14px -7738px;
 }
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
@@ -8313,6 +8317,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
 	z-index: 900;
+}
+.arrange-to-front, .context-menu.arrange-to-front {
+	z-index: 1300;
 }
 .fm-dialog.download-dialog {
 	width: 504px;
@@ -19454,9 +19461,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	color: rgba(255,255,255,0.3);
 	font-family: 'Open Sans Light';
 }
-.overlayed .fmholder, .overlayed #mobilefmholder {
+.overlayed .main-blur-block {
 	filter: blur(0.5em);
 	-webkit-filter: blur(0.5em);
+}
+.main-blur-block {
+	height: 100%;
+}
+#topmenu {
+	height:48px;
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
@@ -20631,173 +20644,6 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 }
 .rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div {
 	direction: ltr;
-}
-.rtl .tranfer-filetype-txt, .rtl .fm-browsers-txt, .rtl .fm-flags-txt, .rtl.fm-member-icon-txt {
-	padding: 0 28px 0 0;
-	text-align: right;
-}
-.rtl .transfer-table th, .rtl .transfer-table td, .rtl .transfer-table-header th, .rtl .grid-table th, .rtl .grid-table td, .rtl .grid-share-table th, .rtl .grid-share-table td, .rtl .grid-table-header th, .rtl .contacts-grid-header th, .rtl .contacts-grid-table th, .rtl .contacts-grid-table td {
-	padding-right: 12px;
-	padding-left: 0;
-	text-align: right;
-	border-right: 2px solid white;
-	border-left: 0;
-}
-.rtl .transfer-table td, .rtl .grid-table td, .rtl .grid-share-table td, .rtl .contacts-grid-table td {
-	padding-right: 12px;
-	padding-left: 0;
-	text-align: right;
-	border-right: 0;
-}
-.rtl th.grid-first-th {
-	padding: 0;
-}
-.rtl .fm-new-folder, .rtl .search-files-result {
-	padding: 0 44px 0 10px;
-	background-position: 109% -3357px;
-	background-position: -webkit-calc(100% + 13px) -3357px;
-	background-position: right -13px -3357px;
-}
-.rtl .search-files-result {
-	padding: 0 32px 0 10px;
-	background-position: 104% -11446px;
-	background-position: -webkit-calc(100% + 7px) -11446px;
-	background-position: right -7px -11446px;
-}
-.rtl .fm-new-folder.active, .rtl .fm-new-folder.hovered {
-	background-position: 113% -4513px;
-	background-position: -webkit-calc(100% + 18px) -4513px;
-	background-position: right -18px -4513px;
-}
-.rtl .fm-file-upload, .rtl .search-messages-result {
-	padding: 0 41px 0 10px;
-	background-position: 109% -3422px;
-	background-position: -webkit-calc(100% + 13px) -3422px;
-	background-position: right -13px -3422px;
-}
-.rtl .search-messages-result {
-	padding: 0 40px 0 10px;
-	background-position: 104% -11536px;
-	background-position: -webkit-calc(100% + 6px) -11536px;
-	background-position: right -6px -11536px;
-}
-.rtl .fm-file-upload:hover, .rtl .fm-file-upload.active, .rtl .search-files-result.active, .rtl .search-files-result:hover, .rtl .search-messages-result.active, .rtl .search-messages-result:hover {
-	background-position: 120% -4568px;
-	background-position: -webkit-calc(100% + 20px) -4568px;
-	background-position: right -20px -4568px;
-}
-.rtl .search-files-result:hover, .rtl .search-files-result.active {
-	background-position: 101% -11496px;
-	background-position: -webkit-calc(100% + 1px) -11496px;
-	background-position: right -1px -11496px;
-}
-.rtl .search-messages-result.active, .rtl .search-messages-result:hover {
-	background-position: 104% -11576px;
-	background-position: -webkit-calc(100% + 6px) -11576px;
-	background-position: right -6px -11576px;
-}
-.rtl .fm-folder-upload {
-	padding: 0 32px 0 10px;
-	background-position: 109% -3497px;
-	background-position: -webkit-calc(100% + 13px) -3497px;
-	background-position: right -13px -3497px;
-}
-.rtl .fm-folder-upload:hover, .rtl .fm-folder-upload.active {
-	background-position: 120% -4622px;
-	background-position: -webkit-calc(100% + 20px) -4622px;
-	background-position: right -20px -4622px;
-}
-.rtl .fm-add-user, .rtl .fm-clearbin-button, .rtl .fm-notification-settings {
-	padding: 0 32px 0 10px;
-	background-position: 103% -5571px;
-	background-position: -webkit-calc(100% + 4px) -5571px;
-	background-position: right -4px -5571px;
-}
-.rtl .fm-add-user:hover, .rtl .fm-add-user.active {
-	background-position: 103% -5646px;
-	background-position: -webkit-calc(100% + 4px) -5646px;
-	background-position: right -4px -5646px;
-}
-.rtl .fm-notification-settings {
-	background-position: 108% 4px;
-	background-position: -webkit-calc(100% + 9px) 4px;
-	background-position: right -9px 4px;
-	padding: 0 32px 0 10px;
-}
-.rtl .fm-notification-settings:hover {
-	background-position: 108% -66px;
-	background-position: -webkit-calc(100% + 9px) -66px;
-	background-position: right -9px -66px;
-}
-.rtl .fm-clearbin-button {
-	padding: 0 32px 0 10px;
-	background-position: 106% -8941px;
-	background-position: -webkit-calc(100% + 9px) -8941px;
-	background-position: right -9px -8941px;
-}
-.rtl .fm-clearbin-button:hover, .rtl .fm-clearbin-button.active {
-	background-position: 106% -9006px;
-	background-position: -webkit-calc(100% + 9px) -9006px;
-	background-position: right -9px -9006px;
-}
-.rtl th.grid-first-th {
-	border-right: 0;
-}
-.rtl .contacts-sorting-by, .rtl .contacts-sorting-type {
-	padding: 0 35px 0 15px;
-}
-.rtl .context-menu-item {
-	padding: 0 47px 0 15px;
-}
-.rtl .folderupload-item label, .rtl .fileupload-item label {
-	padding: 0 47px 0 15px;
-}
-.rtl .top-search-input {
-	text-align: left;
-}
-.rtl .transfer-type, .rtl .transfer-status {
-	padding: 0 27px 0 0;
-}
-.rtl .transfer-type.safari-downloaded {
-	background-position: 115% -10990px;
-	background-position: -webkit-calc(100% + 30px) -10990px;
-	background-position: right -30px -10990px;
-}
-.rtl .transfer-type.download {
-	background-position: 115% -3979px;
-	background-position: -webkit-calc(100% + 30px) -3979px;
-	background-position: right -30px -3979px;
-}
-.rtl .transfer-type.upload {
-	background-position: 115% -4034px;
-	background-position: -webkit-calc(100% + 30px) -4034px;
-	background-position: right -30px -4034px;
-}
-.rtl .transfer-status.completed {
-	background-position: 115% -4083px;
-	background-position: -webkit-calc(100% + 30px) -4083px;
-	background-position: right -30px -4083px;
-}
-.rtl .transfer-status.queued {
-	background-position: 115% -4138px;
-	background-position: -webkit-calc(100% + 30px) -4138px;
-	background-position: right -30px -4138px;
-}
-.rtl .transfer-status.error {
-	background-position: 115% -10574px;
-	background-position: -webkit-calc(100% + 30px) -10574px;
-	background-position: right -30px -10574px;
-}
-.rtl .transfer-status.initiliazing {
-	background-position: 115% -10513px;
-	background-position: -webkit-calc(100% + 30px) -10513px;
-	background-position: right -30px -10513px;
-}
-.rtl .fm-file-upload, .rtl .search-messages-result {
-	padding: 0 41px 0 10px;
-}
-.rtl .fm-new-folder, .rtl .search-files-result {
-	padding: 0 44px 0 10px;
 }
 .keyspinner {
 	margin: 50px auto;

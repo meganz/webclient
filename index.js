@@ -591,7 +591,7 @@ function init_page()
 		if (!fminitialized)
 		{
 			if (id) M.currentdirid = id;
-			if (!m && $('#fmholder').html() == '') $('#fmholder').html('<div id="topmenu"></div>' + translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
+			if (!m && $('#fmholder').html() == '') $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
 			if (typeof mDB !== 'undefined' && !pfid) mDBstart();
 			else loadfm();
 			andreiScripts();

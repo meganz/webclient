@@ -617,6 +617,7 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
+		
 		$('.nw-sorting-menu').addClass('hidden')
 		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
@@ -689,6 +690,7 @@ function initUI()
 	{
 		if (!localStorage.contextmenu) e.preventDefault();
 	});
+	
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
@@ -6715,6 +6717,7 @@ function propertiesDialog(close)
 		pd.addClass('hidden');
 		$('.contact-list-icon').removeClass('active');
 		$('.properties-context-menu').fadeOut(200);
+		$.hideContextMenu();
 		return true;
 	}
 	$.dialog = 'properties';
@@ -6864,11 +6867,19 @@ function propertiesDialog(close)
 	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">'+ p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 +'<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
 	$('.properties-txt-pad').html(html);
 	pd.find('.file-settings-icon').rebind('click context', function(e) {
+	  if ($(this).attr('class').indexOf('active')==-1) {
 		e.preventDefault(); e.stopPropagation();
+		$(this).addClass('active');
+		$('.context-menu').addClass('arrange-to-front');
 		e.currentTarget = $('#' +  n.h)
 		e.calculatePosition = true;
 		$.selected = [n.h];
 		contextmenuUI(e, 1);
+	  } else {
+		$(this).removeClass('active');
+		$('.context-menu').removeClass('arrange-to-front');
+		$.hideContextMenu();
+	  }
 	});
 
 	if (p.hideContacts) {
@@ -7431,7 +7442,7 @@ function fm_resize_handler() {
             $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
         )
     );
-
+	
     $('.fm-main.default').css({
        'height': right_pane_height  + "px"
     });

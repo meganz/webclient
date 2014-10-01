@@ -314,7 +314,7 @@
 					}
 					token_list.addClass($(input).data("settings").classes.focused);
 					$('.multiple-input').parent().addClass('active');
-					$('.permissions-menu').addClass('hidden');
+					$('.permissions-menu').fadeOut(200);
 					$('.permissions-icon.active').removeClass('active');
 					$('.share-dialog-permissions.active').removeClass('active');
 					$('.permissions-menu').removeClass('search-permissions');

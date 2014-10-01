@@ -1337,7 +1337,7 @@ function fmremove()
 			api_req({a:'d',n:$.selected[i],i:requesti});
 			delete u_sharekeys[$.selected[i]];
 		}
-		M.openFolder('shares');
+		M.openFolder('shares', true);
 	}
 	else if (contactcnt)
 	{

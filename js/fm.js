@@ -1409,6 +1409,15 @@ function fmremove()
 		if(c>1) {
 			$('#msgDialog').addClass('multiple');
 			$('.fm-del-contacts-number').text($.selected.length);
+			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
+			$('#msgDialog .fm-del-contact-avatar span').empty()
+		} else {
+			var user = M.d[$.selected[0]];
+			var avatar = user.name.substr(0,2), 
+				av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+			if (avatars[user.h]) avatar = '<img src="' + avatars[user.h].url + '">';
+			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
+			$('#msgDialog .fm-del-contact-avatar span').html(avatar)
 		}
 			
 		

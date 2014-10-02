@@ -379,7 +379,7 @@ input[type="checkbox"] {
 	user-select: none;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
-	margin: 17px 11px 0 15px;
+	margin: 17px 11px 0 18px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
 	margin: 9px 11px 0 0;
@@ -8356,7 +8356,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	min-height: 50px;
 	margin: -97px 0 0 -302px
 }
-.fm-dialog.clear-bin-dialog, .fm-dialog.notification-dialog, .fm-dialog.warning-dialog-b, .fm-dialog.warning-dialog-a, .fm-dialog.confirmation-dialog {
+.fm-dialog.clear-bin-dialog, .fm-dialog.notification-dialog, .fm-dialog.warning-dialog-b, .fm-dialog.warning-dialog-a, .fm-dialog.confirmation-dialog, .fm-dialog.delete-contact {
 	width: 504px;
 	min-height: 194px;
 	margin: -97px 0 0 -267px;
@@ -9243,7 +9243,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-notification-icon {
 	float: left;
-	width: 109px;
+	width: 106px;
 	height: 75px;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-repeat: no-repeat;
@@ -9252,22 +9252,93 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: 10px -2333px;
 }
 .warning-dialog-b .fm-notification-icon {
-	background-position: 10px -2229px;
+	background-position: 9px -2229px;
 }
 .confirmation-dialog .fm-notification-icon {
-	background-position: 10px -2443px;
+	background-position: 9px -2443px;
 }
 .clear-bin-dialog .fm-notification-icon, .confirmation-dialog.remove-dialog .fm-notification-icon {
 	background-position: 10px -1720px;
 }
 .warning-dialog-a .fm-notification-icon {
-	background-position: 10px -2553px;
+	background-position: 9px -2553px;
 }
 .notifications-premission .fm-notification-icon {
 	background-position: 10px -1615px;
 }
 .clear-bin-dialog .fm-dialog-title span, .notification-dialog .fm-dialog-title span, .confirmation-dialog .fm-dialog-title span {
 	display: none;
+}
+.delete-contact .fm-notification-icon {
+	background-image: none;
+	width: 94px;
+}
+.fm-del-contact-avatar {
+	display: none;
+}
+.delete-contact .fm-del-contact-avatar {
+	display: block;
+	width: 64px;
+	height: 64px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	margin: 8px 0 0 4px;
+	background-position: -5px -3080px;
+	position: relative;
+	color: white;
+	line-height: 63px;
+	text-align: center;
+	font-size: 30px;
+	font-family: 'Open Sans Semiblod', Arial;
+}
+.delete-contact .fm-del-contact-avatar img {
+	width: 64px;
+	height: 64px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.fm-del-contacts-number {
+	display: none;
+}
+.delete-contact.multiple .fm-del-contacts-number {
+	display: block;
+	min-width: 30px;
+	height: 30px;
+	position: absolute;
+	z-index: 10;
+	top: -7px;
+	right: -7px;
+	border: 3px solid white;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 30px;
+	background-color: #777777;
+	color: white;
+	line-height: 24px;
+	text-align: center;
+	padding: 0 8px;
+	font-size: 14px;
+	font-family: 'Open Sans Semiblod', Arial;
+}
+.delete-contact .fm-dialog-title span {
+	display: inline;
+}
+.delete-contact.multiple .fm-del-contact-avatar {
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -5px -3080px;
+	background-color: rgba(0,0,0,0.2);
+}
+.delete-contact .fm-dialog-button.notification-button.confirm {
+	background-color: rgba(211,26,0,0.7);
+}
+.delete-contact .fm-dialog-button.notification-button.confirm:hover {
+	background-color: rgba(211,26,0,1);
 }
 .fm-notification-info {
 	margin-left: 90px;
@@ -19469,7 +19540,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	height: 100%;
 }
 #topmenu {
-	height:48px;
+	height: 48px;
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {

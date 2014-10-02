@@ -1379,7 +1379,12 @@ function fmremove()
 	}
 	else if (contactcnt)
 	{
-		msgDialog('confirmation',l[1001],l[1002].replace('[X]',M.d[$.selected[0]].name),false,function(e)
+		var t, c = $.selected.length;
+		// TODO: Need translation "delete N (users)"
+		if(c>1) t = c + ' users';
+		else t = '<strong>'+ M.d[$.selected[0]].name + '</strong>';
+		
+		msgDialog('delete-contact',l[1001],l[1002].replace('[X]',t),false,function(e)
 		{
 			if (e)
 			{
@@ -1401,6 +1406,12 @@ function fmremove()
 				}
 			}
 		});
+		if(c>1) {
+			$('#msgDialog').addClass('multiple');
+			$('.fm-del-contacts-number').text($.selected.length);
+		}
+			
+		
 	}
 	else if (RootbyId($.selected[0]) == M.RubbishID)
 	{
@@ -1939,11 +1950,11 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{
 		$('.fm-clearbin-button').removeClass('hidden');
-		$('.files-grid-view.fm,.fm-blocks-view.fm').addClass('rubbish-bin');
+		$('.fm-right-files-block').addClass('rubbish-bin');
 	}
 	else
 	{
-		$('.files-grid-view.fm,.fm-blocks-view.fm').removeClass('rubbish-bin');
+		$('.fm-right-files-block').removeClass('rubbish-bin');
 	    if (RootbyId(M.currentdirid) == M.InboxID)
 	    {
 		   if (d) console.log('Inbox');
@@ -4981,7 +4992,7 @@ function dorename()
 function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
-	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog');
+	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact multiple');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
 	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
@@ -4990,6 +5001,21 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 		$('#msgDialog').addClass('clear-bin-dialog');
 		$('#msgDialog .icon').addClass('fm-bin-clear-icon');
 		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
+		{
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(true);
+		});
+		$('#msgDialog .fm-dialog-button').eq(1).bind('click',function()
+		{
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(false);
+		});
+	}
+	if (type == 'delete-contact')
+	{
+		$('#msgDialog').addClass('delete-contact');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();

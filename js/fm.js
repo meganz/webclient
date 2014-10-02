@@ -7497,15 +7497,10 @@ function fm_resize_handler() {
 
     $('.fm-main.notifications > .new-notification-top').each(function() {
         $(this).css({
-            'margin-left':  right_panel_margin
+            'margin-left':  right_panel_margin + 48
         });
     });
 
-    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
-        $(this).css({
-            'margin-left':  (304 - right_panel_margin) * -1
-        });
-    });
 
     $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (
@@ -7533,7 +7528,12 @@ function fm_resize_handler() {
     });
 
     $('.fm-right-files-block').css({
-		'margin-left' : ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+	});
+	
+	
+	$('.new-notifications-scroll').css({
+		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() -353) + "px"
 	});
 
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();

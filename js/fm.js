@@ -979,7 +979,7 @@ function removeUInode(h)
 			}
 			break;
 		default:
-			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			if (i == 0 && n) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)

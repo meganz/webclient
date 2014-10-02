@@ -6790,6 +6790,10 @@ function propertiesDialog(close)
 		}
 	}
 	
+	var star = ''
+	if (n.fav) star = ' star';
+	pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
+	
 	if (fileicon(n).indexOf('shared')>-1) pd.addClass('shared');
 	if (typeof n.r == "number")
 	{
@@ -6842,7 +6846,7 @@ function propertiesDialog(close)
 			  // TODO: Contacts number implementation 
 			  // $('.properties-elements-counter span').text('number of contacts');
 			  var shares, susers, total = 0
-		      shares = Object.keys(n.shares).length
+		      shares = Object.keys(n.shares || {}).length
 			  p.t8 = 'Shared with:';
 		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';	
 			  p.t10 = l[896];

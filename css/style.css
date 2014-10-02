@@ -6192,6 +6192,7 @@ table {
 	background-position: -18px -6106px;
 	color: white;
 	padding: 0 10px 0 28px;
+	margin: 12px 10px 0 0;
 }
 .fm-file-upload, .search-messages-result, .fm-folder-upload {
 	-moz-border-radius: 8px;

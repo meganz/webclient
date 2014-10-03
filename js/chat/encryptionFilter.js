@@ -39,13 +39,13 @@ var EncryptionFilter = function(megaChat) {
                 self.flushQueue(megaRoom, handler);
             },
             function(handler) {
-                if(handler.state === mpenc.handler.STATE.INITIALISED && (megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED)) {
+                if(handler.state === mpenc.handler.STATE.INITIALISED && (megaRoom.state === ChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === ChatRoom.STATE.PLUGINS_PAUSED)) {
                     megaRoom.setState(
-                        MegaChatRoom.STATE.PLUGINS_READY
+                        ChatRoom.STATE.PLUGINS_READY
                     )
-                } else if(handler.state !== mpenc.handler.STATE.INITIALISED && megaRoom.state === MegaChatRoom.STATE.READY) {
+                } else if(handler.state !== mpenc.handler.STATE.INITIALISED && megaRoom.state === ChatRoom.STATE.READY) {
                     megaRoom.setState(
-                        MegaChatRoom.STATE.PLUGINS_PAUSED
+                        ChatRoom.STATE.PLUGINS_PAUSED
                     )
                 }
 
@@ -85,7 +85,7 @@ var EncryptionFilter = function(megaChat) {
         );
 
         megaRoom.bind("onStateChange", function(e, oldState, newState) {
-            if(newState == MegaChatRoom.STATE.LEAVING) {
+            if(newState == ChatRoom.STATE.LEAVING) {
                 if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
                     megaRoom.encryptionOpQueue.queue('quit');
                 }
@@ -132,7 +132,7 @@ var EncryptionFilter = function(megaChat) {
 //        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED) {
 
         e.stopPropagation();
-        megaRoom.setState(MegaChatRoom.STATE.PLUGINS_PAUSED);
+        megaRoom.setState(ChatRoom.STATE.PLUGINS_PAUSED);
 
 //        }
     });
@@ -167,9 +167,9 @@ var EncryptionFilter = function(megaChat) {
         }
 
         // i'm the only user in the room, set state to ready.
-        if((megaRoom.state === MegaChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === MegaChatRoom.STATE.PLUGINS_PAUSED) && users.length == 1) {
+        if((megaRoom.state === ChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === ChatRoom.STATE.PLUGINS_PAUSED) && users.length == 1) {
             megaRoom.setState(
-                MegaChatRoom.STATE.PLUGINS_READY
+                ChatRoom.STATE.PLUGINS_READY
             );
         }
     });
@@ -293,7 +293,7 @@ EncryptionFilter.MPENC_MSG_TAG = "?mpENC";
 /**
  * Flush all queues in mpENC
  *
- * @param megaRoom {MegaChatRoom}
+ * @param megaRoom {ChatRoom}
  * @param handler {mpenc.ProtocolHandler}
  */
 EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
@@ -464,7 +464,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 /**
  * Goes thru the list of users in the specific `megaRoom` and tries to sync that with the `mpenc.ProtocolHandler`
  *
- * @param megaRoom {MegaChatRoom}
+ * @param megaRoom {ChatRoom}
  * @param forceRecover {boolean}
  */
 EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {

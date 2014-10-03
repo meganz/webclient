@@ -3,8 +3,7 @@ function expect() {
 };
 
 function fail(msg) {
-    console.error(msg + " " + (Array.prototype.splice.call(arguments, 1)).join(" "));
-    expect(true).toBeFalsy();
+    assert(false, msg + " " + (Array.prototype.splice.call(arguments, 1)).join(" "));
 }
 
 function expectToBeResolved($promise, msg) {

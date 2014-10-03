@@ -516,7 +516,7 @@ makeMetaAware(Karere);
 
                 if (status == Karere.CONNECTION_STATE.CONNECTING) {
                     if(localStorage.d) {
-		                console.debug(self.getNickname(), 'Karere is connecting.');
+		                console.error(self.getNickname(), 'Karere is connecting.');
                     }
 
                     self.trigger('onConnecting');

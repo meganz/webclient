@@ -167,7 +167,7 @@ function u_logout(logout)
 
             if(megaChat.is_initialized) {
                 megaChat.destroy().always(function() {
-                    window.megaChat = new MegaChat();
+                    window.megaChat = new Chat();
                     localStorage.removeItem("megaChatPresence");
                     localStorage.removeItem("megaChatPresenceMtime");
                 });

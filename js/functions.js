@@ -1680,3 +1680,48 @@ function obj_values(obj) {
 
     return vals;
 }
+
+
+
+function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
+    return function() {
+        var self = this;
+        var args = toArray(arguments);
+        var event = new $.Event("onBefore" + eventSuffix);
+        self.trigger(event, args);
+
+        if(event.isPropagationStopped()) {
+            DEBUG("Propagation stopped for event: ", event);
+            if(dontReturnPromises) {
+                return false;
+            } else {
+               return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
+            }
+
+        }
+
+        var returnedValue = fn.apply(self, args);
+
+        var done = function() {
+            var event2 = new $.Event("onAfter" + eventSuffix);
+            self.trigger(event2, args.concat(returnedValue));
+
+            if(event2.isPropagationStopped()) {
+                DEBUG("Propagation stopped for event: ", event);
+                if(dontReturnPromises) {
+                    return false;
+                } else {
+                    return Promise.reject("Propagation stopped by onAfter" + eventSuffix);
+                }
+            }
+        };
+
+        if(returnedValue && returnedValue.then) {
+            returnedValue.then(function() { done(); });
+        } else {
+            done();
+        }
+
+        return returnedValue;
+    }
+};

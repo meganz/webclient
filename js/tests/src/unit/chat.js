@@ -387,7 +387,7 @@ describe("Chat.js - Karere UI integration", function() {
         );
 
         assert(
-            megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY,
+            megaChat.chats[roomJid].state == ChatRoom.STATE.READY,
             "Invalid state found. Expected: READY, got: " + megaChat.chats[roomJid].getStateAsText()
         );
 
@@ -512,7 +512,7 @@ describe("Chat.js - Karere UI integration", function() {
 
 
         assert(
-            megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY,
+            megaChat.chats[roomJid].state == ChatRoom.STATE.READY,
             "Invalid state found. Expected: READY, got: " + megaChat.chats[roomJid].getStateAsText()
         );
 
@@ -1076,7 +1076,7 @@ describe("Chat.js - Karere UI integration", function() {
                 if(!self.ready[roomJid]) {
                     self.ready[roomJid] = true;
                     self.megaChat.chats[roomJid].encryptionHandler = {'state': 3};
-                    self.megaChat.chats[roomJid].setState(MegaChatRoom.STATE.PLUGINS_READY);
+                    self.megaChat.chats[roomJid].setState(ChatRoom.STATE.PLUGINS_READY);
 
                 } else {
                     self.ready[roomJid] = false;
@@ -1103,7 +1103,7 @@ describe("Chat.js - Karere UI integration", function() {
 
         var $promise= resp[2];
 
-        assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.JOINING, "Invalid room state, expected joining");
+        assert(megaChat.chats[roomJid].state == ChatRoom.STATE.JOINING, "Invalid room state, expected joining");
 
         // fake user join
         var users = {};
@@ -1126,7 +1126,7 @@ describe("Chat.js - Karere UI integration", function() {
             users
         ));
 
-        assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.WAITING_FOR_PARTICIPANTS, "Invalid state of the room, should be WAITING_FOR_PARTICIPANTS");
+        assert(megaChat.chats[roomJid].state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS, "Invalid state of the room, should be WAITING_FOR_PARTICIPANTS");
 
         expect(megaChat.chats[roomJid].getParticipants().length).to.equal(2);
 
@@ -1144,12 +1144,12 @@ describe("Chat.js - Karere UI integration", function() {
         ));
 
         $promise.done(function() {
-            assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.PLUGINS_WAIT, "Plugin did not halted the room creation");
+            assert(megaChat.chats[roomJid].state == ChatRoom.STATE.PLUGINS_WAIT, "Plugin did not halted the room creation");
 
 
             megaChat.plugins['demoFilterPlugin'].toggleReady(roomJid);
 
-            assert(megaChat.chats[roomJid].state == MegaChatRoom.STATE.READY, "Plugin did not managed to set the state to ready");
+            assert(megaChat.chats[roomJid].state == ChatRoom.STATE.READY, "Plugin did not managed to set the state to ready");
 
 
             done();
@@ -1414,7 +1414,7 @@ describe("Chat.js - Karere UI integration", function() {
                     sinon.stub(v, 'recover', v.recover);
 
                     expect(v.state).to.eql(
-                        MegaChatRoom.STATE.INITIALIZED
+                        ChatRoom.STATE.INITIALIZED
                     );
                 });
 
@@ -1435,7 +1435,7 @@ describe("Chat.js - Karere UI integration", function() {
                     );
 
                     expect(v.state).to.eql(
-                        MegaChatRoom.STATE.JOINING
+                        ChatRoom.STATE.JOINING
                     );
 
                     expect(onRoomCreatedTriggerCount).to.eql(
@@ -1451,7 +1451,7 @@ describe("Chat.js - Karere UI integration", function() {
                 expect(
                     room.state
                 ).to.eql(
-                        MegaChatRoom.STATE.LEFT
+                        ChatRoom.STATE.LEFT
                     );
 
                 expect(
@@ -1459,7 +1459,7 @@ describe("Chat.js - Karere UI integration", function() {
                 ).to.eql(1);
 
                 // restore room state so that the afterEach wont crash
-                megaChat.chats[roomJid].state = MegaChatRoom.STATE.READY;
+                megaChat.chats[roomJid].state = ChatRoom.STATE.READY;
 
                 done();
             });
@@ -2050,7 +2050,7 @@ describe("Chat.js - Karere UI integration", function() {
                     )
                 ];
 
-                megaRoom.setState(MegaChatRoom.STATE.READY);
+                megaRoom.setState(ChatRoom.STATE.READY);
                 megaRoom._flushMessagesQueue();
 
                 expect(megaRoom._messagesQueue.length).to.eql(0);

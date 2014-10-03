@@ -2762,6 +2762,8 @@ function u_initAuthentication2(res, ctx) {
         }
     };
     getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
+
+    $(window).trigger('megaAuthenticationFinished');
 }
 
 function _checkFingerprintEd25519(userhandle) {

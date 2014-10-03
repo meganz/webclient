@@ -604,9 +604,12 @@ function init_page()
 			}
 			
 			if(MegaChatEnabled) {
-				if(u_type && !megaChat.is_initialized) {
-					megaChat.init();
-				}
+                $(window).unbind('megaAuthenticationFinished.megaChat');
+                $(window).bind('megaAuthenticationFinished.megaChat', function() {
+                    if(u_type && !megaChat.is_initialized) {
+                        megaChat.init();
+                    }
+                });
 			}			
 		}
 		else if (!pfid && id && id !== M.currentdirid) M.openFolder(id);

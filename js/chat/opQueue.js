@@ -4,7 +4,7 @@
  *
  * @param ctx {mpenc.ProtocolHandler}
  *
- * @param megaRoom {MegaChatRoom}
+ * @param megaRoom {ChatRoom}
  *
  * @param validateFn {Function} function that will return true/false whenever the current state of the `ctx` can
  *                              execute operations

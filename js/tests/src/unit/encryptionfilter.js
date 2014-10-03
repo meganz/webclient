@@ -42,7 +42,7 @@ describe("EncryptionFilter", function() {
             return megaUserIdEncodeForXmpp(nodeId) + "@jid.com";
         };
         self.getContactFromJid = function() {
-            return MegaChat.prototype.getContactFromJid.apply(this, toArray(arguments))
+            return Chat.prototype.getContactFromJid.apply(this, toArray(arguments))
         };
 
         $.each([
@@ -708,8 +708,8 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler = origMockedHandler;
             room.encryptionOpQueue = origMockedOpQueue;
 
-            room.state = MegaChatRoom.STATE.INITIALIZED;
-            expect(room.state).to.eql(MegaChatRoom.STATE.INITIALIZED);
+            room.state = ChatRoom.STATE.INITIALIZED;
+            expect(room.state).to.eql(ChatRoom.STATE.INITIALIZED);
 
             done();
         });
@@ -728,8 +728,8 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler = origMockedHandler;
             room.encryptionOpQueue = origMockedOpQueue;
 
-            room.state = MegaChatRoom.STATE.INITIALIZED;
-            expect(room.state).to.eql(MegaChatRoom.STATE.INITIALIZED);
+            room.state = ChatRoom.STATE.INITIALIZED;
+            expect(room.state).to.eql(ChatRoom.STATE.INITIALIZED);
 
 
 
@@ -748,7 +748,7 @@ describe("EncryptionFilter", function() {
                     Object.keys(newUsers)[0]
                 ];
             };
-            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
+            room.iAmRoomOwner = ChatRoom.prototype.iAmRoomOwner;
 
 
                 megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
@@ -858,8 +858,8 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler = origMockedHandler;
             room.encryptionOpQueue = origMockedOpQueue;
 
-            room.state = MegaChatRoom.STATE.INITIALIZED;
-            expect(room.state).to.eql(MegaChatRoom.STATE.INITIALIZED);
+            room.state = ChatRoom.STATE.INITIALIZED;
+            expect(room.state).to.eql(ChatRoom.STATE.INITIALIZED);
 
 
 
@@ -879,7 +879,7 @@ describe("EncryptionFilter", function() {
                 ];
             };
 
-            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
+            room.iAmRoomOwner = ChatRoom.prototype.iAmRoomOwner;
 
 
                 megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
@@ -1010,8 +1010,8 @@ describe("EncryptionFilter", function() {
             room.encryptionHandler = origMockedHandler;
             room.encryptionOpQueue = origMockedOpQueue;
 
-            room.state = MegaChatRoom.STATE.INITIALIZED;
-            expect(room.state).to.eql(MegaChatRoom.STATE.INITIALIZED);
+            room.state = ChatRoom.STATE.INITIALIZED;
+            expect(room.state).to.eql(ChatRoom.STATE.INITIALIZED);
 
 
 
@@ -1029,9 +1029,9 @@ describe("EncryptionFilter", function() {
                 ];
             };
 
-            room.iAmRoomOwner = MegaChatRoom.prototype.iAmRoomOwner;
+            room.iAmRoomOwner = ChatRoom.prototype.iAmRoomOwner;
 
-            room.state =  MegaChatRoom.STATE.PLUGINS_WAIT;
+            room.state =  ChatRoom.STATE.PLUGINS_WAIT;
             megaChatObj.karere.trigger("onUsersUpdatedDone", new KarereEventObjects.UsersUpdated(
                 /* fromJid */ room.roomJid,
                 /* toJid */ megaChatObj.karere.getJid(),
@@ -1042,9 +1042,9 @@ describe("EncryptionFilter", function() {
             ));
 
             expect(room.iHadJoined).to.be.ok;
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY, "Room State was not changed to PLUGINS_READY");
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_READY, "Room State was not changed to PLUGINS_READY");
 
-            room.state =  MegaChatRoom.STATE.PLUGINS_WAIT;
+            room.state =  ChatRoom.STATE.PLUGINS_WAIT;
             newUsers[megaChatObj.karere.getJid() + "/user2"] = 'owner'; //add second user
 
             // set myself as owner
@@ -1065,7 +1065,7 @@ describe("EncryptionFilter", function() {
             ));
 
             expect(room.iHadJoined).to.be.ok;
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_WAIT, "Room State should not have been changed (e.g. should be PLUGINS_WAIT");
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_WAIT, "Room State should not have been changed (e.g. should be PLUGINS_WAIT");
 
 
 
@@ -1098,7 +1098,7 @@ describe("EncryptionFilter", function() {
             });
             expect(e.isPropagationStopped()).to.be.ok;
 
-            expect(e.stateChanged).to.eql(MegaChatRoom.STATE.PLUGINS_PAUSED);
+            expect(e.stateChanged).to.eql(ChatRoom.STATE.PLUGINS_PAUSED);
 
             done();
         });
@@ -1269,37 +1269,37 @@ describe("EncryptionFilter", function() {
 
             // initialized + plugins wait
             encHandler.state = mpenc.handler.STATE.INITIALISED;
-            room.state = MegaChatRoom.STATE.PLUGINS_WAIT;
+            room.state = ChatRoom.STATE.PLUGINS_WAIT;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY);
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_READY);
             expect(room.setState.callCount).to.eql(1);
             expect(opQueue.pop.callCount).to.eql(1);
 
             // not initialized + room ready
             encHandler.state = mpenc.handler.STATE.AUX_UPFLOW;
-            room.state = MegaChatRoom.STATE.READY;
+            room.state = ChatRoom.STATE.READY;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_PAUSED);
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_PAUSED);
             expect(room.setState.callCount).to.eql(2);
 
 
             // initialized + paused
             encHandler.state = mpenc.handler.STATE.INITIALISED;
-            room.state = MegaChatRoom.STATE.PLUGINS_PAUSED;
+            room.state = ChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY);
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_READY);
             expect(room.setState.callCount).to.eql(3);
             expect(opQueue.pop.callCount).to.eql(2);
 
             // initialized + paused
             encHandler.state = mpenc.handler.STATE.INITIALISED;
-            room.state = MegaChatRoom.STATE.PLUGINS_PAUSED;
+            room.state = ChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
-            expect(room.state).to.eql(MegaChatRoom.STATE.PLUGINS_READY);
+            expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_READY);
             expect(room.setState.callCount).to.eql(4);
             expect(opQueue.pop.callCount).to.eql(3);
 

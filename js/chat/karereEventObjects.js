@@ -983,8 +983,12 @@ KarereEventObjects.OutgoingMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setToJid = function(val) {
+    var oldVal = this.toJid;
     assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
     this.toJid = val;
+    if (oldVal != this.toJid) {
+        jQuery(this).trigger("onChange", [this, "toJid", oldVal, this.toJid]);
+    }
     return this;
 };
 /**
@@ -1002,8 +1006,12 @@ KarereEventObjects.OutgoingMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setFromJid = function(val) {
+    var oldVal = this.fromJid;
     assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
     this.fromJid = val;
+    if (oldVal != this.fromJid) {
+        jQuery(this).trigger("onChange", [this, "fromJid", oldVal, this.fromJid]);
+    }
     return this;
 };
 /**
@@ -1021,8 +1029,12 @@ KarereEventObjects.OutgoingMessage.prototype.getType = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setType = function(val) {
+    var oldVal = this.type;
     assert(typeof(val) == "string", "Invalid argument passed for: type, expected string got " + typeof(val));
     this.type = val;
+    if (oldVal != this.type) {
+        jQuery(this).trigger("onChange", [this, "type", oldVal, this.type]);
+    }
     return this;
 };
 /**
@@ -1040,8 +1052,12 @@ KarereEventObjects.OutgoingMessage.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setMessageId = function(val) {
+    var oldVal = this.messageId;
     assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
     this.messageId = val;
+    if (oldVal != this.messageId) {
+        jQuery(this).trigger("onChange", [this, "messageId", oldVal, this.messageId]);
+    }
     return this;
 };
 /**
@@ -1059,7 +1075,11 @@ KarereEventObjects.OutgoingMessage.prototype.getContents = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setContents = function(val) {
+    var oldVal = this.contents;
     this.contents = val || "";
+    if (oldVal != this.contents) {
+        jQuery(this).trigger("onChange", [this, "contents", oldVal, this.contents]);
+    }
     return this;
 };
 /**
@@ -1077,7 +1097,11 @@ KarereEventObjects.OutgoingMessage.prototype.getMeta = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setMeta = function(val) {
+    var oldVal = this.meta;
     this.meta = val || {};
+    if (oldVal != this.meta) {
+        jQuery(this).trigger("onChange", [this, "meta", oldVal, this.meta]);
+    }
     return this;
 };
 /**
@@ -1095,7 +1119,11 @@ KarereEventObjects.OutgoingMessage.prototype.getDelay = function() {
  * @returns {KarereEventObjects.OutgoingMessage}
  */
 KarereEventObjects.OutgoingMessage.prototype.setDelay = function(val) {
+    var oldVal = this.delay;
     this.delay = val || unixtime();
+    if (oldVal != this.delay) {
+        jQuery(this).trigger("onChange", [this, "delay", oldVal, this.delay]);
+    }
     return this;
 };
 /**
@@ -1119,6 +1147,9 @@ KarereEventObjects.OutgoingMessage.prototype.setState = function(val) {
     this.state = val || KarereEventObjects.OutgoingMessage.STATE.NOT_SENT;
     if (oldVal != this.state) {
         jQuery(this).trigger("onStateChange", [this, oldVal, this.state]);
+    }
+    if (oldVal != this.state) {
+        jQuery(this).trigger("onChange", [this, "state", oldVal, this.state]);
     }
     return this;
 };

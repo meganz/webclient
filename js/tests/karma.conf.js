@@ -8,6 +8,8 @@ module.exports = function(config) {
             "vendor/mocha/sinon-chai.js",
             "vendor/sinon-1.7.3.js",
 
+            "vendor/IndexedDBShim.min.js",
+
             "../jquery-min-1.8.1.js",
             "../jquery-ui.js",
 
@@ -23,6 +25,9 @@ module.exports = function(config) {
              "../fm.js",
              "../user.js",
              "../megakvstorage.js",
+             "../vendor/promise-6.0.0.js",
+             "../vendor/db.js",
+             "../megadb.js",
              "../tlvstore.js",
 
              "../chat/mpenc.js",
@@ -47,17 +52,19 @@ module.exports = function(config) {
              "../chat/fileTransfer.js",
              "../chat/rtcSession.js",
 
-             "../megafilepicker.js",
-             "../chat/megaIncomingCallDialog.js",
+             "../filepicker.js",
+             "../chat/incomingCallDialog.js",
 
              "../chat/attachmentsFilter.js",
              "../chat/urlFilter.js",
              "../chat/emoticonsFilter.js",
              "../chat/encryptionFilter.js",
+             "../chat/chatStore.js",
 
              "../chat/karereEventObjects.js",
              "../chat/karere.js",
              "../chat/chat.js",
+             "../chat/chatroom.js",
 
             "src/helpers/functionsmocker.js",
             "src/helpers/megadatamocker.js",

@@ -154,8 +154,8 @@ describe("OpQueue Unit Test", function() {
         var mdMocker = new MegaDataMocker();
 
         megaRoom.megaChat = {
-            'getContactFromJid': MegaChat.prototype.getContactFromJid,
-            'getJidFromNodeId': MegaChat.prototype.getJidFromNodeId,
+            'getContactFromJid': Chat.prototype.getContactFromJid,
+            'getJidFromNodeId': Chat.prototype.getJidFromNodeId,
             'options': {
                 'xmppDomain': "developers.mega.co.nz"
             }

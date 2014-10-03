@@ -154,7 +154,7 @@ function megainfotxt()
 		$('.infotxt8').text(l[1073]);
 		$('.infotxt9').text(l[1368].replace('[X]',''));
 		$('.infotxt10').text(l[1369].replace('[X]',''));		
-		$('fmholder').addClass(lang);
+		$('.fmholder').addClass(lang);
 	}	
 	if (lang == 'fr') $('.st-small-red-txt.tb').text('To');
 	

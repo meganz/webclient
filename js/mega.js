@@ -482,6 +482,7 @@ function MegaData ()
 		if (user) {
 			$('.contact-share-notification').text(user.name + ' shared the following folders with you:').removeClass('hidden');
 		}
+
 		if (this.v.length == 0)
 		{
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
@@ -2991,6 +2992,7 @@ function rendernew()
 	if (UItree)
 	{
 		treeUI();
+		if (RootbyId(M.currentdirid) === 'shares') M.renderTree();
 		treeUIopen(M.currentdirid);
 	}
 	if (newcontact)

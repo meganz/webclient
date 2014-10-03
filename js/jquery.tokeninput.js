@@ -30,14 +30,32 @@
 		addAvatar: true,
 		emailCheck: false,
 		accountHolder: '',
+		scrollLocation: 'add',
 		resultsFormatter: function(item) {
-			var string = item[this.propertyToSearch];
-			var av_color = string.charCodeAt(0)%6 + string.charCodeAt(1)%6;
-			var av = (this.addAvatar && avatars[string] && avatars[string].url) 
-				? '<img src="' + avatars[string].url + '">'
-				: (string.charAt(0) + string.charAt(1));
+			var email = item[this.propertyToSearch];
+			var id;
+			$.each(M.u, function(ind, val) {
+				if (val.m === email)
+				{
+					id = ind;
+					return false;
+				};
+			});
+			var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+			var av = (this.addAvatar && avatars[id] && avatars[id].url) 
+				? '<img src="' + avatars[id].url + '">'
+				: (email.charAt(0) + email.charAt(1));
+
+			var type = '';
+			
+			if (!id)
+			{
+				type = 'email';
+				av = '';
+			}
+			
 			var avatar = "<span class='nw-contact-avatar color" + av_color + "'>" + av + "</span>";
-			return "<li class='share-search-result'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
+			return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? email : _escapeHTML(email)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
 //			var email = '';
 //			var name = item.name;
 //			if (name)
@@ -56,10 +74,34 @@
 //			return "<li class='share-search-result gmail'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? string : _escapeHTML(string)) + "</span>" + email + "</span><span class='clear'></span></li>";			
 		},
 		tokenFormatter: function(item) {
-			if (item)
-				var string = item[this.propertyToSearch];
-			var avatar = "<span class='search-avatar color3'>UU</span>";
-			return "<li class='share-added-contact " + (this.addAvatar ? '' : 'no-avatar') + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? string : _escapeHTML(string)) + "</li>";
+			
+//			if (item)
+//				var string = item[this.propertyToSearch];
+//			var avatar = "<span class='search-avatar color3'>UU</span>";
+			var email = item[this.propertyToSearch];
+			var id;
+			$.each(M.u, function(ind, val) {
+				if (val.m === email)
+				{
+					id = ind;
+					return false;
+				};
+			});
+			var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+			var av = (this.addAvatar && avatars[id] && avatars[id].url) 
+				? '<img src="' + avatars[id].url + '">'
+				: (email.charAt(0) + email.charAt(1));
+			
+			var type = '';
+			
+			if (!id)
+			{
+				type = 'email';
+				av = '';
+			}
+			var avatar = "<span class='search-avatar color" + av_color + "'>" + av + "</span>";
+			
+			return "<li class='share-added-contact " + type + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
 		},
 		// Tokenization settings
 		tokenLimit: null,
@@ -190,6 +232,18 @@
 				closest.append(tmpInput);
 				return tmpInput;
 			}
+		},
+		remove_contact: function(item) {
+			var ld = $('.share-multiple-input').data("settings").local_data;
+			for (var n in ld)
+			{
+				if (ld[n].id === item.id)
+				{
+					$('.share-multiple-input').data("settings").local_data.splice(n, 1);
+					$('.add-contact-multiple-input').data("settings").local_data.splice(n, 1);
+					break;
+				}
+			}
 		}
 	};
 
@@ -272,7 +326,7 @@
 					}
 					token_list.addClass($(input).data("settings").classes.focused);
 					$('.multiple-input').parent().addClass('active');
-					$('.permissions-menu').addClass('hidden');
+					$('.permissions-menu').fadeOut(200);
 					$('.permissions-icon.active').removeClass('active');
 					$('.share-dialog-permissions.active').removeClass('active');
 					$('.permissions-menu').removeClass('search-permissions');
@@ -291,7 +345,6 @@
 				.keydown(function(event) {
 					var previous_token;
 					var next_token;
-					initShareInputScroll();
 					switch (event.keyCode) {
 						case KEY.LEFT:
 						case KEY.RIGHT:
@@ -518,12 +571,9 @@
 		};
 
 		this.add = function(item) {
-//			if (beforeAdd(item))
-//			{
-				add_token(item);
-//			}
+			add_token(item);
 		};
-
+		
 		this.remove = function(item) {
 			token_list.children("li").each(function() {
 				if ($(this).children("input").length === 0) {
@@ -690,7 +740,7 @@
 						cb.call(hidden_input, item);
 					}
 					
-					return;
+					return false;
 				}				
 			}
 			
@@ -699,6 +749,7 @@
 				var doubleEmail = $.grep($(input).data("settings").local_data, function(row) {
 					return row[$(input).data("settings").propertyToSearch].toLowerCase().indexOf(item[settings.tokenValue].toLowerCase()) > -1;
 				});
+
 				if (doubleEmail.length)// Prevent further execution if email is duplicated
 				{
 					select_token(item);
@@ -707,11 +758,23 @@
 						cb.call(hidden_input, item);
 					}
 					
-					return;
+					return false;
 				}
 			}
-			// See if the token already exists and select it if we don't want duplicates (only current multi-input list)
-			if (token_count > 0 && $(input).data("settings").preventDoublet) {
+			
+			if ($.inArray(item[settings.tokenValue], $.sharedTokens) !== -1)// compare against already added contacts, for shared folder exlusivelly
+			{
+				var cb = $(input).data("settings").onDoublet;
+				if ($.isFunction(cb)) {
+					cb.call(hidden_input, item);
+				}
+				
+				return false;
+			}
+			
+			// check current multi-input list
+//			if (token_count > 0 && $(input).data("settings").preventDoublet) {
+			if (token_count > 0) {
 				var found_existing_token = null;
 				token_list.children().each(function() {
 					var existing_token = $(this);
@@ -748,13 +811,12 @@
 
 			// Don't show the help dropdown, they've got the idea
 			hide_dropdown();
-
 			// Execute the onAdd callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, item);
-				$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
-				initShareInputScroll();
 			}
+			
+			$(input).data("settings").local_data.push({id: item[settings.tokenValue], name: item[settings.tokenValue]});
 		}
 
 		// Select a token in the token list
@@ -833,6 +895,7 @@
 
 			token_count -= 1;
 
+
 			if ($(input).data("settings").tokenLimit !== null) {
 				input_box
 						.show()
@@ -843,12 +906,11 @@
 			// Execute the onDelete callback if defined
 			if ($.isFunction(callback)) {
 				callback.call(hidden_input, token_data);
-				var b = $(input).data("settings").local_data;
-				$.each(b, function(ind, val) {
-					if (token_data[settings.tokenValue] === val[settings.tokenValue])
-					{
-						$(input).data("settings").local_data.splice(ind, 1);					}
-				});
+				var ld = $(input).data("settings").local_data
+				for (var n in ld)
+				{
+					if (ld[n].id === token_data.id) $(input).data("settings").local_data.splice(n, 1);
+				}
 			}
 		}
 
@@ -869,15 +931,6 @@
 			});
 			hidden_input.val(token_values.join($(input).data("settings").tokenDelimiter));
 
-		}
-
-		function initShareInputScroll() {
-			var h1 = $('.token-input-list-mega').outerHeight();
-			var h2 = $('.multiple-input').outerHeight()
-			if (h1 > 144 && h1 > h2) {
-				var element = $('.multiple-input').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
-				focus_with_timeout(input_box);
-			} //else if (element) element.destroy()
 		}
 
 		// Hide and clear the results dropdown

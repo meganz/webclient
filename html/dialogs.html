@@ -1,6 +1,8 @@
 <div class="dark-overlay" style="display:none;"></div>  
 <div class="slideshow-overlay hidden"></div>
 
+
+
 <div class="loading-spinner" style="display:none;">
     <div class="main-loader">
         <div class="wBall" id="wBall_1">
@@ -330,7 +332,12 @@
         <div class="clear"></div>
     </div>
     <div class="fm-notification-body">
-        <div class="fm-notification-icon"></div>
+        <div class="fm-notification-icon">
+          <div class="fm-del-contact-avatar">
+            <span></span>
+            <div class="fm-del-contacts-number">1</div>
+          </div>
+        </div>
         <div class="fm-notification-info">
             <p>[$15]</p>
             <div class="fm-notification-warning">[$1007]</div>
@@ -562,12 +569,36 @@
         <div class="clear"></div>
     </div>
     <div class="properties-body">
+        <div class="properties-context-menu hidden">
+           <div class="properties-context-arrow"></div>
+           <div class="properties-context-item away">
+              <div class="properties-contact-status"></div>
+              <span>Alex Brunskill</span>
+           </div>
+           <div class="properties-context-item online">
+              <div class="properties-contact-status"></div>
+              <span>Wiremu tane</span>
+           </div>
+           <div class="properties-context-item show-more">
+              <span>...and 5 more</span>
+           </div>
+            
+           <div class="context-menu-divider"></div>
+           <div class="properties-context-item properties-share-options">
+              <div class="properties-share-icon"></div>
+              <span>Share options</span>
+           </div>
+        </div>
+        <span class="file-status-icon"></span>
         <div class="properties-elements-counter"><span></span></div>
         <div class="properties-file-icon">
         </div>
         <div class="properties-txt-pad">
             <div class="properties-small-gray">Name:</div>
-            <div class="propreties-dark-txt">Filename.ext</div>
+            <div class="priperties-name-block">
+              <div class="propreties-dark-txt">Filename.ext</div>
+              <span class="file-settings-icon"><span></span></span>
+            </div>
             <div class="properties-float-bl">
                 <span class="properties-small-gray">Size:</span>
                 <span class="propreties-dark-txt">100kb</span>
@@ -580,37 +611,6 @@
             <div class="propreties-dark-txt">Filename.ext</div>
         </div>
         <div class="clear"></div>
-        <div class="properties-shared-block">
-            <div class="properties-file-txt">[$1036]</div>
-            <div class="clear"></div>
-            <div class="properties-contacts-block">
-                <div class="properties-contact">
-                    <span class="avatar"><span><img src="" alt=""></span></span>
-                    <div class="properties-contact-close"></div>
-                    <span class="add-contact-username"></span>
-                </div>
-            </div>
-            <div class="properties-contacts-block">          
-                <div class="fm-share-contacts-popup properties-contacts-popup ">                  
-                    <div class="fm-share-contacts-body">
-                        <a class="add-contact-item properties-shared-to">
-                            <span class="add-contact-pad">
-                                <span class="avatar">
-                                    <span>
-                                        <img src="" alt="">
-                                    </span>
-                                </span>
-                                <span class="properties-contact-delete"></span>
-                                <span class="add-contact-username"></span>
-                            </span>
-                        </a>
-                    </div> 
-                    <div class="properties-arrow"></div>
-                </div>          
-                <div class="properties-more-contacts"> and <span class="red">10 more contacts</span>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

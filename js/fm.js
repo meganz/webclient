@@ -617,6 +617,7 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
+		
 		$('.nw-sorting-menu').addClass('hidden')
 		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
@@ -689,6 +690,7 @@ function initUI()
 	{
 		if (!localStorage.contextmenu) e.preventDefault();
 	});
+	
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
@@ -925,6 +927,7 @@ function removeUInode(h)
     switch (M.currentdirid)
     {
 		case "shares":
+			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
             {
 				$('.files-grid-view .grid-table-header tr').remove();
@@ -976,7 +979,7 @@ function removeUInode(h)
 			}
 			break;
 		default:
-			if (i == 0) $('#treea_'+n.p).removeClass('contains-folders expanded');
+			if (i == 0 && n) $('#treea_'+n.p).removeClass('contains-folders expanded');
 			$('#' + h).remove();// remove item
 			$('#treeli_' + h).remove();// remove folder and subfolders
 			if (!hasItems)
@@ -1033,8 +1036,26 @@ function addnotification(n)
 	donotify();
 }
 
+function getContactsEMails()
+{
+	var contacts = [];
+	var n;
+	for (var i in M.u)
+	{
+		if (M.u[i])
+		{
+			n = M.u[i];
+			if (n.c && n.c !== 2 && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
+		}
+	}
+	
+	return contacts;
+}
+
 function addContactUI()
 {
+	$.shareTokens = [];
+	
 	iconSize = function(par)
 	{
 		if (par)// full size icon, popup at bottom of Add contact button
@@ -1073,19 +1094,8 @@ function addContactUI()
 				.focus();
 	}
 	// Plugin configuration
-//	var knownEmails = getContactsEMails();
-	var contacts = [];
-	var n;
-	for (var i in M.u)
-	{
-		if (M.u[i])
-		{
-			n = M.u[i];
-			// Added account holder n.c == 2to prevent duplication
-			if (n.c && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
-		}
-	}
-	
+	var contacts = getContactsEMails();
+
 	$('.add-contact-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
 		hintText:			"Type in a contact email",
@@ -1100,6 +1110,7 @@ function addContactUI()
 		resultsLimit:		5,
 		minChars:			2,
 		accountHolder:		M.u[u_handle].m,
+		scrollLocation:		'add',
 		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
 		onDoublet: function() {errorMsg('You already have contact with that email!');},
 		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
@@ -1110,16 +1121,36 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
-
 			}
 			else
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
+				
+				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
+				var $b = $('.add-user-popup .multiple-input');
+				var h1 = $a.outerHeight(true);// margin included
+				var h2 = $b.height();
+				
+				if (5 <= h2/h1 && h2/h1 < 6)
+				{
+					$b.jScrollPane({
+						enableKeyboardNavigation: false,
+						showArrows: true,
+						arrowSize: 8,
+						animateScroll: true
+					});
+					setTimeout(function() {
+						$('.add-user-popup .token-input-input-token-mega input').focus();
+					}, 0);
+				}
 			}
 		},
 		onDelete: function()
 		{
+			setTimeout(function() {
+				$('.add-user-popup .token-input-input-token-mega input').blur();
+			}, 0);
 			var itemNum = $('.token-input-list-mega .token-input-token-mega').length;
 			if (itemNum === 0)
 			{
@@ -1137,6 +1168,19 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
+				
+				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
+				var $b = $('.add-user-popup .multiple-input');
+				var $c = $('.add-user-popup .multiple-input .jspPane')[0];
+				var h1 = $a.outerHeight(true);// margin included
+				var h2;
+				if ($c) h2 = $c.scrollHeight;
+				else h2 = $b.height();
+
+				if (h2/h1 < 6)
+				{
+					clearScrollPanel('.add-user-popup');
+				}
 			}
 		}
     });
@@ -1149,6 +1193,7 @@ function addContactUI()
 		$.dialog = 'add-contact-popup';
 		var $this = $(this);
 		var $d = $('.add-user-popup');
+		$.sharedTokens = [];
 		if ($this.is('.active'))// Hide
 		{
 			$this.removeClass('active');
@@ -1236,6 +1281,7 @@ function addContactUI()
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 
 	});
 
@@ -1245,6 +1291,7 @@ function addContactUI()
 		$('body').removeClass('overlayed');
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 	});
 
 	$('.add-user-popup .import-contacts-service').unbind('click');
@@ -1328,10 +1375,16 @@ function fmremove()
 			api_req({a:'d',n:$.selected[i],i:requesti});
 			delete u_sharekeys[$.selected[i]];
 		}
+		M.openFolder('shares', true);
 	}
 	else if (contactcnt)
 	{
-		msgDialog('confirmation',l[1001],l[1002].replace('[X]',M.d[$.selected[0]].name),false,function(e)
+		var t, c = $.selected.length;
+		// TODO: Need translation "delete N (users)"
+		if(c>1) t = c + ' users';
+		else t = '<strong>'+ M.d[$.selected[0]].name + '</strong>';
+		
+		msgDialog('delete-contact',l[1001],l[1002].replace('[X]',t),false,function(e)
 		{
 			if (e)
 			{
@@ -1349,9 +1402,25 @@ function fmremove()
 					}
 					M.delNode($.selected[i]);
 					api_req({a:'ur',u:$.selected[i],l:'0',i: requesti});
+					$('.share-multiple-input').tokenInput("remove_contact", {id: M.u[$.selected[i]].m});
 				}
 			}
 		});
+		if(c>1) {
+			$('#msgDialog').addClass('multiple');
+			$('.fm-del-contacts-number').text($.selected.length);
+			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
+			$('#msgDialog .fm-del-contact-avatar span').empty()
+		} else {
+			var user = M.d[$.selected[0]];
+			var avatar = user.name.substr(0,2), 
+				av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+			if (avatars[user.h]) avatar = '<img src="' + avatars[user.h].url + '">';
+			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
+			$('#msgDialog .fm-del-contact-avatar span').html(avatar)
+		}
+			
+		
 	}
 	else if (RootbyId($.selected[0]) == M.RubbishID)
 	{
@@ -1870,10 +1939,17 @@ function createfolderUI()
 
 function docreatefolderUI(e)
 {
-	if ($('.create-folder-input-bl input').val() == '') $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() { $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function(){$('.create-folder-input-bl input').focus();});});
-	else {
-		createfolder(M.currentdirid,$('.create-folder-input-bl input').val());
+	if ($('.create-folder-input-bl input').val() == '')
+	{
+		$('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function()
+		{
+			$('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function()
+			{
+				$('.create-folder-input-bl input').focus();
+			});
+		});
 	}
+	else createfolder(M.currentdirid,$('.create-folder-input-bl input').val());
 }
 
 function fmtopUI()
@@ -1883,11 +1959,11 @@ function fmtopUI()
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{
 		$('.fm-clearbin-button').removeClass('hidden');
-		$('.files-grid-view.fm,.fm-blocks-view.fm').addClass('rubbish-bin');
+		$('.fm-right-files-block').addClass('rubbish-bin');
 	}
 	else
 	{
-		$('.files-grid-view.fm,.fm-blocks-view.fm').removeClass('rubbish-bin');
+		$('.fm-right-files-block').removeClass('rubbish-bin');
 	    if (RootbyId(M.currentdirid) == M.InboxID)
 	    {
 		   if (d) console.log('Inbox');
@@ -4925,7 +5001,7 @@ function dorename()
 function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
-	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog');
+	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact multiple');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
 	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
@@ -4934,6 +5010,21 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 		$('#msgDialog').addClass('clear-bin-dialog');
 		$('#msgDialog .icon').addClass('fm-bin-clear-icon');
 		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
+		{
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(true);
+		});
+		$('#msgDialog .fm-dialog-button').eq(1).bind('click',function()
+		{
+			closeMsg();
+			if ($.warningCallback) $.warningCallback(false);
+		});
+	}
+	if (type == 'delete-contact')
+	{
+		$('#msgDialog').addClass('delete-contact');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();
@@ -5153,7 +5244,7 @@ function handleDialogContent(s, m, c, n, t, i)
  * @returns {undefined}
  *
  */
-function shareDialogContacts()
+function shareDialogContentCheck()
 {
 	var dc = '.share-dialog';
 	// Disable/enable button
@@ -5192,18 +5283,20 @@ function addShareDialogContactToContent (type, id, av_color, av, name, permClass
 function fillShareDialogWithContent()
 {
 	var sel = $.selected[0];
-	for (var i in M.d[sel].shares)// list users that are already use folder
+	$.sharedTokens = [];
+			
+	for (var i in M.d[sel].shares)// list users that are already use item
 	{
 		if (M.u[i])
 		{
 			var user = M.u[i];
-			var name = (user.name && user.name.length < 2) ? user.name : user.m;
+			var name = (user.name && user.name.length > 1) ? user.name : user.m;
 			var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
 			var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
 			var perm;
 
 			var pl = 0;
-			if (typeof M.d[sel].shares.r != 'undefined') pl = M.d[i].shares.r;
+			if (typeof M.d[sel].shares[i].r != 'undefined') pl = M.d[sel].shares[i].r;
 
 			switch (pl)// Permission level
 			{
@@ -5217,6 +5310,9 @@ function fillShareDialogWithContent()
 					perm = ['read-only', l[55]];
 					break;
 			}
+			
+			$.sharedTokens.push(user.m);// add contact
+			
 			var html = addShareDialogContactToContent('', i, av_color, av, name, perm[0], perm[1]);
 
 			$('.share-dialog .share-dialog-contacts').append(html);
@@ -5246,7 +5342,7 @@ function handleShareDialogContent()
 
 	fillShareDialogWithContent();
 
-	shareDialogContacts();
+	shareDialogContentCheck();
 
 	var dc = '.share-dialog';
 	$('.share-dialog-icon.permissions-icon')
@@ -5281,6 +5377,7 @@ checkMultiInputPermission = function($this)
 
 function initShareDialog()
 {
+	$.shareTokens = [];
 	function errorMsg(msg)
 	{
 		var $d = $('.share-dialog');
@@ -5294,23 +5391,15 @@ function initShareDialog()
 	}
 
 	// Plugin configuration
-	var contacts = [];
-	var n;
-	for (var i in M.u)
-	{
-		if (M.u[i])
-		{
-			n = M.u[i];
-			// n.c = 2 is account holder, exclude it for search
-			if (n.c && n.c !== 2 && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
-		}
-	}
+	var contacts = getContactsEMails();
 	
-//	var contacts = getContactsEMails();
 	$('.share-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
-		hintText:			"Type in a contact email",
-		searchingText:		"Searching for existing contacts...",
+//		hintText:			"Type in a contact email",
+		hintText:			"",
+		searchingText:		"",
+//		searchingText:		"Searching for existing contacts...",
+		noResultsText:		"",
 		addAvatar:			true,
 		autocomplete:		null,
 		searchDropdown:		true,
@@ -5321,40 +5410,59 @@ function initShareDialog()
 		resultsLimit:		5,
 		minChars:			2,
 		accountHolder:		M.u[u_handle].m,
+		scrollLocation:		'share',
 		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
 		onDoublet: function() {errorMsg('You already have contact with that email!');},
 		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()
 		{
-			var $btn = $('.dialog-share-button');
-			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
-			if (itemNum === 1)
-			{
-				$btn.removeClass('disabled');
+			$('.dialog-share-button').removeClass('disabled');
+			
+			var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
+			var $b = $('.share-dialog .multiple-input');
+			var h1 = $a.outerHeight(true);// margin 
+			var h2 = $b.height();
 
-			}
-			else
+			if (5 <= h2/h1 && h2/h1 < 6)
 			{
-				$btn.removeClass('disabled');
+				$b.jScrollPane({
+					enableKeyboardNavigation: false,
+					showArrows: true,
+					arrowSize: 8,
+					animateScroll: true
+				});
+				setTimeout(function() {
+					$('.share-dialog .token-input-input-token-mega input').focus();
+				}, 0);
 			}
-		},
+	},
 		onDelete: function()
 		{
 			var $btn = $('.dialog-share-button');
-			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+			setTimeout(function() {
+				$('.share-dialog .token-input-input-token-mega input').blur();
+			}, 0);
+			var itemNum = $('.share-dialog .token-input-list-mega .token-input-token-mega').length + $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length;
 			if (itemNum === 0)
 			{
 				$btn.addClass('disabled');
-
-			}
-			else if (itemNum === 1)
-			{
-				$btn.removeClass('disabled');
-
 			}
 			else
 			{
 				$btn.removeClass('disabled');
+				
+				var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
+				var $b = $('.share-dialog .multiple-input');
+				var $c = $('.share-dialog .multiple-input .jspPane')[0];
+				var h1 = $a.outerHeight();// margin excluded
+				var h2;
+				if ($c) h2 = $c.scrollHeight;
+				else h2 = $b.height();
+
+				if (h2/h1 < 6)
+				{
+					clearScrollPanel('.share-dialog');
+				}
 			}
 		}
     });
@@ -5395,6 +5503,8 @@ function initShareDialog()
 		var av;
 //		av = name.charAt(0) + name.charAt(1);
 
+		$.sharedTokens.push(item);
+		
 		var html = addShareDialogContactToContent('email', id, av_color, '', name, perm[0], perm[1]);
 
 		$('.share-dialog .share-dialog-contacts').append(html);
@@ -5419,35 +5529,35 @@ function initShareDialog()
 			var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
 			if ($items.length)
 			{
-				$.each($items, function(ind, val) {
-					determineContactParams(val.innerText, checkMultiInputPermission($('.share-dialog .permissions-icon')));
+				$.each($items, function(ind, val)
+				{
+					determineContactParams($(val).contents().eq(1).text(), checkMultiInputPermission($('.share-dialog .permissions-icon')));
 				});
 
 				$('.share-dialog .multiple-input .token-input-token-mega').remove();
 
-				shareDialogContacts();
+				shareDialogContentCheck();
 			}
 			else
 			{
 				var t = [];
 				var s = M.d[$.selected[0]].shares;
 				var id = '';
-				var contact;
 				var perm, aPerm;
 				var $items = $('.share-dialog-contact-bl');
 				$.each($items, function(ind, val) {
 
 					id = $(val).attr('id').replace('sdcbl_', '');
-					if (id === '')
+					if (id === '')// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
 						id = $(val).find('.fm-chat-user').text();
 
 					aPerm = $(val).find('.share-dialog-permissions');
 
-					if (aPerm === 'read-and-write')
+					if ($(aPerm).is('.read-and-write'))
 					{
 						perm = 1;
 					}
-					else if (aPerm === 'full-access')
+					else if ($(aPerm).is('.full-access'))
 					{
 						perm = 2;
 					}
@@ -5455,11 +5565,9 @@ function initShareDialog()
 					{
 						perm = 0;
 					}
-
-					if (!(s && s[id]))// ToDo: make this condition better
-					{
+					
+					if (!s || !s[id] || s[id].r !== perm)
 						t.push({u: id, r: perm});
-					}
 				});
 
 				closeDialog();
@@ -5526,7 +5634,7 @@ function initShareDialog()
 	});
 
 	$(document).off('click', '.share-dialog-remove-button');
-	$(document).on('click', '.share-dialog-remove-button', function ()
+	$(document).on('click', '.share-dialog-remove-button', function () 
 	{
 		var $this = $(this);
 
@@ -5550,9 +5658,15 @@ function initShareDialog()
 				ha:'',
 				i: requesti
 			});
+			
+			$.sharedTokens.splice($.sharedTokens.indexOf(M.u[id].m), 1);
 		}
 
-		shareDialogContacts();
+		shareDialogContentCheck();
+		
+		var num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
+		if (!num) $('.dialog-share-button').addClass('disabled');
+		
 	});
 
 	// related to specific contact
@@ -5606,7 +5720,7 @@ function initShareDialog()
 	{
 		var $this = $(this);
 
-		$('.permissions-menu').addClass('hidden');
+		$('.permissions-menu').fadeOut(200);
 		// Find where we are permissions-icon or share-dialog-permissions
 
 		var cls = checkMultiInputPermission($this);
@@ -5640,32 +5754,42 @@ function initShareDialog()
 
 function addImportedDataToSharedDialog(data, from)
 {
-	var perm, av_color, av, html;
 	$.each(data, function(ind, val)
 	{
-		// Read permission from multi-input permission box
-		perm = checkMultiInputPermission($('.share-dialog .permissions-icon'));
-		av_color = val.charCodeAt(0)%6 + val.charCodeAt(1)%6;
-		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
-		// ToDo: Check here for name available, is exists add it
-		av = val.charAt(0) + val.charAt(1);
-
-		html = addShareDialogContactToContent(from, '', av_color, '', val, perm[0], perm[1]);
-		$('.share-dialog .share-dialog-contacts').append(html);
+		$('.share-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
 	});
-
-	shareDialogContacts();
+	
+//	var perm, av_color, av, html;
+//	$.sharedTokens = [];
+//
+//	$.each(data, function(ind, val)
+//	{
+//		// Read permission from multi-input permission box
+//		perm = checkMultiInputPermission($('.share-dialog .permissions-icon'));
+//		av_color = val.charCodeAt(0)%6 + val.charCodeAt(1)%6;
+//		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
+//		// ToDo: Check here for name available, is exists add it
+//		av = val.charAt(0) + val.charAt(1);
+//		
+//		$.sharedTokens.push(val);// in this case val represents e-mail
+//
+//		html = addShareDialogContactToContent(from, '', av_color, '', val, perm[0], perm[1]);
+//		$('.share-dialog .share-dialog-contacts').append(html);
+//	});
+//
+//	shareDialogContentCheck();
 
 	closeImportContactNotification('.share-dialog');
 }
 
 function addImportedDataToAddContactsDialog(data, from)
 {
-//	var perm, av_color, av, html;
 	$.each(data, function(ind, val)
 	{
-		$('.add-contact-multiple-input').tokenInput("add", {id: val, name: val});
+		$('.add-user-popup .add-contact-multiple-input').tokenInput("add", {id: val, name: val});
 	});
+	
+	closeImportContactNotification('.add-user-popup');
 }
 
 function closeImportContactNotification(c)
@@ -5673,6 +5797,13 @@ function closeImportContactNotification(c)
 	$('.imported-contacts-notification').fadeOut(200);
 	$(c + ' .import-contacts-dialog').fadeOut(200);
 	$('.import-contacts-link').removeClass('active');
+}
+
+function clearScrollPanel(from)
+{
+	$(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
+	$(from + ' .multiple-input .jspPane').unwrap();
+	$(from + ' .multiple-input .jspPane:first-child').unwrap();	
 }
 
 function closeDialog()
@@ -5691,12 +5822,12 @@ function closeDialog()
 		// add contact popup
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
+		clearScrollPanel('.add-user-popup');
 		// share dialog
 		$('.share-dialog-contact-bl').remove();
 		$('.import-contacts-service').removeClass('imported');
-		var $x = $('.share-dialog-contacts').jScrollPane();
-		var el = $x.data('jsp');
-		el.destroy();
+		clearScrollPanel('.share-dialog');
+		
 		// share dialog permission menu
 		$('.permissions-menu').fadeOut(0);
 		$('.import-contacts-dialog').fadeOut(0);
@@ -6611,27 +6742,29 @@ function browserDialog(close)
 
 function propertiesDialog(close)
 {
-    var pd = $('.fm-dialog.properties-dialog');
+    var pd = $('.fm-dialog.properties-dialog'),
+	    c = $('.properties-elements-counter span');
 	if (close)
 	{
 		$.dialog = false;
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 		pd.addClass('hidden');
+		$('.contact-list-icon').removeClass('active');
+		$('.properties-context-menu').fadeOut(200);
+		$.hideContextMenu();
 		return true;
 	}
 	$.dialog = 'properties';
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
-	pd.removeClass('hidden multiple folders-only two-elements');
+	pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
+	$('.properties-elements-counter span').text('');	
 	$('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.properties-dialog .fm-dialog-close').bind('click',function()
 	{
 		propertiesDialog(1);
 	});
-	$('.fm-dialog.properties-dialog .properties-shared-block').hide();
-	$('.fm-dialog.properties-dialog .properties-link-block').hide();
-	$('.fm-dialog.properties-dialog #keyoption').hide();
 	var filecnt=0, foldercnt=0, size=0,sfilecnt=0,sfoldercnt=0;
 	for (var i in $.selected)
 	{
@@ -6656,6 +6789,25 @@ function propertiesDialog(close)
 			size+= n.s;
 		}
 	}
+	
+	var star = ''
+	if (n.fav) star = ' star';
+	pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
+	
+	if (fileicon(n).indexOf('shared')>-1) pd.addClass('shared');
+	if (typeof n.r == "number")
+	{
+		var cs = M.contactstatus(n.h)
+		var zclass = "read-only";
+		if (n.r == 1) {
+			zclass = "read-and-write"
+		} else if (n.r == 2) {
+			zclass = "full-access"
+		}
+		pd.addClass('shared shared-with-me '  + zclass)
+	}
+	
+	
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
@@ -6681,14 +6833,64 @@ function propertiesDialog(close)
 		p.t1 = l[86] + ':';
 		p.t2 = htmlentities(n.name);
 		p.t4 = bytesToSize(size);
-		if (foldercnt)
-		{
-			p.t6 = l[897] + ':';
-			p.t7 = fm_contains(sfilecnt,sfoldercnt);
-		}
-
 		p.t8 = l[896] + ':';
 		p.t9 = htmlentities(time2date(n.ts));
+		p.t10 = '';
+		p.t11 = '';
+		if (foldercnt)
+		{
+			
+			p.t6 = l[897] + ':';
+			p.t7 = fm_contains(sfilecnt,sfoldercnt);
+			if (pd.attr('class').indexOf('shared')>-1) { 
+			  // TODO: Contacts number implementation 
+			  // $('.properties-elements-counter span').text('number of contacts');
+			  var shares, susers, total = 0
+		      shares = Object.keys(n.shares || {}).length
+			  p.t8 = 'Shared with:';
+		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';	
+			  p.t10 = l[896];
+		      p.t11 = htmlentities(time2date(n.ts));
+			  susers = pd.find('.properties-body .properties-context-menu')
+				  .empty()
+				  .append('<div class="properties-context-arrow"></div>')
+			  for (var u in n.shares) {
+					if (M.u[u]) {
+						var u = M.u[u]
+						var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
+						if (++total <= 5) 
+							susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
+								+ '<div class="properties-contact-status"></div>'
+								+ '<span>' + htmlentities(u.name || u.m)  + '</span>'
+							+ '</div>');
+					}
+			  }
+
+			  if (total > 5) {
+				susers.append(
+					'<div class="properties-context-item show-more">'
+					+ '<span>... and ' + (total-5) + ' more</span>'
+					+ '</div>'
+				);
+			  }
+
+			  if (total == 0) p.hideContacts = true;
+
+			}
+			if (pd.attr('class').indexOf('shared-with-me')>-1) { 
+			  // TODO: Permissions and Owner implementation 
+			  p.t3 = 'Permissions:';
+			  p.t4 = 'Full access';
+			  p.t6 = 'Owner';
+			  p.t7 = 'Alex Brunskill';
+			  p.t8 = l[894] + ':';
+		      p.t9 = bytesToSize(size);	
+			  p.t10 = l[897] +  ':';
+		      p.t11 = fm_contains(sfilecnt,sfoldercnt);
+			}
+		}
+
+		
 	}
 	else
 	{
@@ -6701,9 +6903,52 @@ function propertiesDialog(close)
 		p.t8 = l[93] + ':';
 		p.t9 = l[1025];
 	}
-	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="propreties-dark-txt">'+ p.t2 + '</div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt">' + p.t9 +'</div>';
+	var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">'+ p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">'+ p.t3 +'</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl'+p.t5+'"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 +'<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
 	$('.properties-txt-pad').html(html);
-	if ((filecnt + foldercnt) == 1) $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
+	pd.find('.file-settings-icon').rebind('click context', function(e) {
+	  if ($(this).attr('class').indexOf('active')==-1) {
+		e.preventDefault(); e.stopPropagation();
+		$(this).addClass('active');
+		$('.context-menu').addClass('arrange-to-front');
+		e.currentTarget = $('#' +  n.h)
+		e.calculatePosition = true;
+		$.selected = [n.h];
+		contextmenuUI(e, 1);
+	  } else {
+		$(this).removeClass('active');
+		$('.context-menu').removeClass('arrange-to-front');
+		$.hideContextMenu();
+	  }
+	});
+
+	if (p.hideContacts) {
+		$('.properties-txt-pad .contact-list-icon').hide();
+	}
+	
+	if (pd.attr('class').indexOf('shared')>-1) { 
+		$('.contact-list-icon').unbind('click');
+		$('.contact-list-icon').bind('click', function() {
+			if ($(this).attr('class').indexOf('active')==-1) {
+				$(this).addClass('active');
+				$('.properties-context-menu').css({
+					'left': $(this).position().left + 8 + 'px',
+					'top': $(this).position().top - $('.properties-context-menu').outerHeight() -8 + 'px',
+					'margin-left': '-' + $('.properties-context-menu').width()/2 + 'px'
+				});
+				$('.properties-context-menu').fadeIn(200);
+			} else {
+				$(this).removeClass('active');
+				$('.properties-context-menu').fadeOut(200);
+			}
+		});
+		$('.properties-context-item').unbind('click');
+		$('.properties-context-item').bind('click', function() {
+			$('.contact-list-icon').removeClass('active');
+			$('.properties-context-menu').fadeOut(200);
+		});
+	}
+	
+	if ((filecnt + foldercnt) == 1)  $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
 	else
 	{
 		if ((filecnt + foldercnt) == 2) pd.addClass('two-elements');
@@ -7236,7 +7481,7 @@ function fm_resize_handler() {
             $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
         )
     );
-
+	
     $('.fm-main.default').css({
        'height': right_pane_height  + "px"
     });
@@ -7265,15 +7510,10 @@ function fm_resize_handler() {
 
     $('.fm-main.notifications > .new-notification-top').each(function() {
         $(this).css({
-            'margin-left':  right_panel_margin
+            'margin-left':  right_panel_margin + 48
         });
     });
 
-    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
-        $(this).css({
-            'margin-left':  (304 - right_panel_margin) * -1
-        });
-    });
 
     $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (
@@ -7301,7 +7541,12 @@ function fm_resize_handler() {
     });
 
     $('.fm-right-files-block').css({
-		'margin-left' : ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+	});
+	
+	
+	$('.new-notifications-scroll').css({
+		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() -353) + "px"
 	});
 
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();

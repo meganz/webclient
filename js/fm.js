@@ -7482,7 +7482,7 @@ function fm_resize_handler() {
         )
     );
 	
-    $('.fm-main.default').css({
+    $('.fm-main.default, .fm-main.notifications').css({
        'height': right_pane_height  + "px"
     });
 
@@ -7514,6 +7514,11 @@ function fm_resize_handler() {
         });
     });
 
+    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
+        $(this).css({
+            'margin-left':  (305 - right_panel_margin) * -1
+        });
+    });
 
     $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (
@@ -7541,12 +7546,7 @@ function fm_resize_handler() {
     });
 
     $('.fm-right-files-block').css({
-		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-	});
-	
-	
-	$('.new-notifications-scroll').css({
-		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() -353) + "px"
+		'margin-left' : ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
 	});
 
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();

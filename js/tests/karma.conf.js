@@ -8,8 +8,6 @@ module.exports = function(config) {
             "vendor/mocha/sinon-chai.js",
             "vendor/sinon-1.7.3.js",
 
-            "vendor/IndexedDBShim.min.js",
-
             "../jquery-min-1.8.1.js",
             "../jquery-ui.js",
 

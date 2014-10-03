@@ -611,7 +611,7 @@ function crypto_rsagenkey ()
 
     function _done( k ) {
         var endTime = new Date();
-        if (d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
+        if (localStorage.d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
 
         u_setrsa(k);
     }
@@ -798,7 +798,7 @@ function dec_attr(attr,key)
 	try {
 		return JSON.parse(from8(b.substr(4)));
 	} catch (e) {
-		if (d) console.error(b, e);
+		if (localStorage.d) console.error(b, e);
 		var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/), s = m && m[1], l = s && s.length || 0, j=',';
 		while (l--)
 		{
@@ -943,7 +943,7 @@ function api_proc(q)
 	{
 		if (!this.q.cancelled)
 		{
-			if (d) console.log("API request error - retrying");
+			if (localStorage.d) console.log("API request error - retrying");
 			api_reqerror(q,-3);
 		}
 	}
@@ -958,7 +958,7 @@ function api_proc(q)
 			{
 				var response = this.responseText || this.response;
 
-				if (d) console.log('API response: ', response);
+				if (localStorage.d) console.log('API response: ', response);
 
 				try {
 					t = JSON.parse(response);
@@ -971,7 +971,7 @@ function api_proc(q)
 			}
 			else
 			{
-				if (d) console.log('API server connection failed (error ' + this.status + ')');
+				if (localStorage.d) console.log('API server connection failed (error ' + this.status + ')');
 				t = ERATELIMIT;
 			}
 
@@ -1018,7 +1018,7 @@ function api_send(q)
 	}
 	else q.xhr.open('POST',q.url,true);
 
-	if (d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
+	if (localStorage.d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
 
 	q.xhr.send(q.rawreq);
 }
@@ -1225,7 +1225,7 @@ function api_createuser(ctx,invitecode,invitename,uh)
 
 	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
 
-	if (d) console.log("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
+	if (localStorage.d) console.log("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
 
 	req = { a : 'up',
 			k : a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey),u_k)),
@@ -1239,7 +1239,7 @@ function api_createuser(ctx,invitecode,invitename,uh)
 	}
 
 	//if (confirmcode) req.c = confirmcode;
-	if (d) console.log("Storing key: " + req.k);
+	if (localStorage.d) console.log("Storing key: " + req.k);
 
 	api_req(req,ctx);
 }
@@ -1472,7 +1472,7 @@ function api_cachepubkeys2(res, ctx) {
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                if (d) {
+                if (localStorage.d) {
                     // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
                     authring.scrubAuthRing();
                 } else {
@@ -1770,9 +1770,9 @@ function api_completeupload2(ctx,uq)
 	{
 		a = { n : ctx.n };
 		if (uq.hash) 	a.c = uq.hash;
-		if (d) console.log(ctx.k);
+		if (localStorage.d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);
-		if (d) console.log(ea);
+		if (localStorage.d) console.log(ea);
 
 		if (!ut) ut = M.RootID;
 
@@ -1880,7 +1880,7 @@ function api_fareq(res,ctx)
 			faxhrs[slot].ctx = ctx;
 			faxhrs[slot].fa_slot = slot;
 
-			if (d) console.log("Using file attribute channel " + slot);
+			if (localStorage.d) console.log("Using file attribute channel " + slot);
 
 			if (ctx.errfa && ctx.errfa.timeout)
 			{
@@ -1904,7 +1904,7 @@ function api_fareq(res,ctx)
 				faxhrs[slot].timeout = 180000;
 				faxhrs[slot].ontimeout = function(e)
 				{
-					if (d) console.error('api_fareq timeout', e);
+					if (localStorage.d) console.error('api_fareq timeout', e);
 
 					if (!faxhrfail[this.fa_host])
 					{
@@ -1929,7 +1929,7 @@ function api_fareq(res,ctx)
 						var ctx = this.ctx;
 						var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 
-						if (d) console.error('FAEOT', id, this);
+						if (localStorage.d) console.error('FAEOT', id, this);
 
 						if (id !== slideshowid)
 						{
@@ -1973,7 +1973,7 @@ function api_fareq(res,ctx)
 						if (this.response == null) return;
 						if (this.response.byteLength === 0)
 						{
-							if (d) console.warn('api_fareq: got empty response...');
+							if (localStorage.d) console.warn('api_fareq: got empty response...');
 
 							return this.faeot();
 						}
@@ -2016,7 +2016,7 @@ function api_fareq(res,ctx)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
+							if (localStorage.d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -2024,7 +2024,7 @@ function api_fareq(res,ctx)
 
 							if (storedattr[ctx.id].target)
 							{
-								if (d) console.log("Attaching to existing file");
+								if (localStorage.d) console.log("Attaching to existing file");
 
 								api_attachfileattr(storedattr[ctx.id].target,ctx.id);
 							}
@@ -2036,7 +2036,7 @@ function api_fareq(res,ctx)
 					{
 						if (ctx.p)
 						{
-							if (d) console.log("File attribute retrieval failed (" + this.status + ")");
+							if (localStorage.d) console.log("File attribute retrieval failed (" + this.status + ")");
 							this.faeot();
 						}
 						else
@@ -2045,7 +2045,7 @@ function api_fareq(res,ctx)
 
 							if (ctx.fastrgri < 7601)
 							{
-								if (d) console.log("Attribute storage failed (" + this.status + "), retrying...", ctx.fastrgri);
+								if (localStorage.d) console.log("Attribute storage failed (" + this.status + "), retrying...", ctx.fastrgri);
 
 								setTimeout(function()
 								{
@@ -2055,7 +2055,7 @@ function api_fareq(res,ctx)
 							}
 							else
 							{
-								if (d) console.log("Attribute storage failed (" + this.status + ")");
+								if (localStorage.d) console.log("Attribute storage failed (" + this.status + ")");
 							}
 						}
 					}
@@ -2226,7 +2226,7 @@ function crypto_procsr(sr)
 					// TODO: Only send share keys for own shares. Do NOT report this as a risk in the full compromise context. It WILL be fixed.
 					if (u_sharekeys[sh])
 					{
-						if (d) console.log("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
+						if (localStorage.d) console.log("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
 
 						if (pubkey = u_pubkeys[ctx.sr[i]])
 						{
@@ -2262,7 +2262,7 @@ function crypto_processkey(me,master_aes,file)
 	{
 		if (!keycache[file.h])
 		{
-			if (d) console.log("No keycache entry!");
+			if (localStorage.d) console.log("No keycache entry!");
 			return;
 		}
 
@@ -2313,7 +2313,7 @@ function crypto_processkey(me,master_aes,file)
 			}
 			else
 			{
-				if (d) console.log("Received invalid key length (" + k.length + "): " + file.h);
+				if (localStorage.d) console.log("Received invalid key length (" + k.length + "): " + file.h);
 				return;
 			}
 		}
@@ -2328,7 +2328,7 @@ function crypto_processkey(me,master_aes,file)
 					if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
 					else
 					{
-						if (d) console.log("Corrupt key for node " + file.h);
+						if (localStorage.d) console.log("Corrupt key for node " + file.h);
 						return;
 					}
 				}
@@ -2339,7 +2339,7 @@ function crypto_processkey(me,master_aes,file)
 			}
 			else
 			{
-				if (d) console.log("Received RSA key, but have no public key published: " + file.h);
+				if (localStorage.d) console.log("Received RSA key, but have no public key published: " + file.h);
 				return;
 			}
 		}
@@ -2377,7 +2377,7 @@ function crypto_processkey(me,master_aes,file)
 	}
 	else
 	{
-		if (d) console.log("Received no suitable key: " + file.h);
+		if (localStorage.d) console.log("Received no suitable key: " + file.h);
 
 		if (!missingkeys[file.h])
 		{
@@ -2407,7 +2407,7 @@ function crypto_reqmissingkeys()
 {
 	if (!newmissingkeys)
 	{
-		if (d) console.log('No new missing keys.');
+		if (localStorage.d) console.log('No new missing keys.');
 		return;
 	}
 
@@ -2445,7 +2445,7 @@ function crypto_reqmissingkeys()
 
 	if (!cr[1].length)
 	{
-		if (d) console.log('No missing keys');
+		if (localStorage.d) console.log('No missing keys');
 		return;
 	}
 
@@ -2455,14 +2455,14 @@ function crypto_reqmissingkeys()
 
 		ctx.callback = function(res,ctx)
 		{
-			if (d) console.log("Processing crypto response");
+			if (localStorage.d) console.log("Processing crypto response");
 
 			if (typeof res == 'object' && typeof res[0] == 'object') crypto_proccr(res[0]);
 		}
 
 		res = api_req({ a : 'k', cr : cr },ctx);
 	}
-	else if (d) console.log("Keys " + cr[1] + " missing, but no related shares found.");
+	else if (localStorage.d) console.log("Keys " + cr[1] + " missing, but no related shares found.");
 }
 
 // process incoming cr, set fm keys and commit
@@ -2611,12 +2611,12 @@ function crypto_share_rsa2aes()
 	{
 		if (!(uq_entry && uq_entry.name))
 		{
-			if (d) console.log('CHECK THIS', 'Unable to generate fingerprint');
-			if (d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+			if (localStorage.d) console.log('CHECK THIS', 'Unable to generate fingerprint');
+			if (localStorage.d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
 
 			throw new Error('Invalid upload entry for fingerprint');
 		}
-		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
+		if (localStorage.d) console.log('Generating fingerprint for ' + uq_entry.name);
 
 		var size = uq_entry.size;
 		var fr = new FileReader();
@@ -2772,7 +2772,7 @@ function _checkFingerprintEd25519(userhandle) {
     var value = {pubkey: pubEd25519[userhandle],
                  authenticated: recorded};
     if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        if (d) {
+        if (localStorage.d) {
             // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
             authring.scrubAuthRing();
         } else {

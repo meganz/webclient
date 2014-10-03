@@ -16,7 +16,7 @@ function u_login(ctx,email,password,uh,permanent)
 {
 	ctx.result = u_login2;
 	ctx.permanent = permanent;
-	
+
 	api_getsid(ctx,email,prepare_key_pw(password),uh);
 }
 
@@ -59,7 +59,7 @@ function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 		}
 	}
 }
-		
+
 function u_checklogin2(ctx,u)
 {
 	if (u === false) ctx.checkloginresult(ctx,false);
@@ -71,15 +71,15 @@ function u_checklogin2(ctx,u)
 }
 
 function u_checklogin2a(ctx,ks)
-{	
+{
 	if (ks === false) ctx.checkloginresult(ctx,false);
 	else
 	{
 		u_k = ks[0];
-		u_sid = ks[1];		
+		u_sid = ks[1];
 		api_setsid(u_sid);
 		u_storage.k = JSON.stringify(u_k);
-		u_storage.sid = u_sid;		
+		u_storage.sid = u_sid;
 		u_checklogin3(ctx);
 	}
 }
@@ -89,7 +89,7 @@ function u_checklogin3(ctx)
 	ctx.callback = u_checklogin3a;
 	api_getuser(ctx);
 }
-	
+
 function u_checklogin3a(res,ctx)
 {
 	var r = false;
@@ -103,7 +103,7 @@ function u_checklogin3a(res,ctx)
 	{
 		u_attr = res;
 		var exclude = ['c','email','k','name','p','privk','pubk','s','ts','u','currk'];
-	
+
 		for (var n in u_attr)
 		{
 			if (exclude.indexOf(n) == -1)
@@ -112,10 +112,10 @@ function u_checklogin3a(res,ctx)
 					u_attr[n] = from8(base64urldecode(u_attr[n]));
 				} catch(e) {
 					u_attr[n] = base64urldecode(u_attr[n]);
-				}				
+				}
 			}
 		}
-		
+
 		u_storage.attr = JSON.stringify(u_attr);
 		u_storage.handle = u_handle = u_attr.u;
 
@@ -132,7 +132,7 @@ function u_checklogin3a(res,ctx)
 		else if (!u_attr.c) r = 1;
 		else if (!u_attr.privk) r = 2;
 		else r = 3;
-		
+
 		if (r == 3) {
 		    // Load/initialise the authentication system.
 		    u_initAuthentication();
@@ -144,7 +144,7 @@ function u_checklogin3a(res,ctx)
 
 // erase all local user/session information
 function u_logout(logout)
-{	
+{
 	var a = [localStorage,sessionStorage];
 	for (var i = 2; i--; )
 	{
@@ -201,13 +201,13 @@ function u_logout(logout)
 		M = new MegaData();
 		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
 		$.hideContextMenu = function () {};
-		api_reset();	
-		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};	
+		api_reset();
+		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
 		$.hideContextMenu= function () {};
 		if (waitxhr)
 		{
 			waitxhr.abort();
-			waitxhr=undefined;	
+			waitxhr=undefined;
 		}
 	}
 }
@@ -223,7 +223,9 @@ function u_setrsa(rsakey)
 {
 	var ctx = {
 	    callback : function(res,ctx) {
-	        if (d) console.log("RSA key put result=" + res);
+	        if (localStorage.d) {
+	            console.log("RSA key put result=" + res);
+	        }
 
 	        u_privk = rsakey;
 	        u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
@@ -257,7 +259,7 @@ function createanonuser2(u,ctx)
 function setpwreq(newpw,ctx)
 {
 	var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newpw));
-	
+
 	api_req({ a : 'upkm',
 		k : a32_to_base64(encrypt_key(pw_aes,u_k)),
 		uh : stringhash(u_attr['email'].toLowerCase(),pw_aes)
@@ -309,7 +311,7 @@ function verifysignupcode2(res,ctx)
 	{
 		u_signupenck = base64_to_a32(res[3]);
 		u_signuppwcheck = base64_to_a32(res[4]);
-		
+
 		ctx.signupcodeok(base64urldecode(res[0]),base64urldecode(res[1]));
 	}
 	else ctx.signupcodebad(res);
@@ -319,18 +321,18 @@ function checksignuppw(password)
 {
 	var pw_aes = new sjcl.cipher.aes(prepare_key_pw(password));
 	var t = decrypt_key(pw_aes,u_signuppwcheck);
-	
+
 	if (t[1] || t[2]) return false;
-	
+
 	u_k = decrypt_key(pw_aes,u_signupenck);
-	
+
 	return true;
 }
 
 function checkquota(ctx)
 {
 	var req = { a : 'uq', xfer : 1 };
-	
+
 	api_req(req,ctx);
 }
 
@@ -341,23 +343,23 @@ function processquota1(res,ctx)
 		if (res.tah)
 		{
 			var i;
-			
+
 			var tt = 0;
 			var tft = 0;
 			var tfh = -1;
-			
+
 			for (i = 0; i < res.tah.length; i++)
 			{
 				tt += res.tah[i];
-				
+
 				if (tfh < 0)
 				{
 					tft += res.tah[i];
-					
+
 					if (tft > 1048576) tfh = i;
 				}
 			}
-			
+
 			ctx.processquotaresult(ctx,[tt,tft,(6-tfh)*3600-res.bt,res.tar,res.tal]);
 		}
 		else ctx.processquotaresult(ctx,false);
@@ -482,7 +484,7 @@ function generateAvatarElement(user_hash) {
     return $element;
 }
 
-/*
+/**
  * Retrieves a user attribute.
  *
  * @param userhandle {string}
@@ -503,7 +505,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
     } else {
         attribute = '*' + attribute;
     }
-    
+
     // Assemble context for this async API request.
     var myCtx = ctx || {};
     myCtx.u = userhandle;
@@ -517,7 +519,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
                                                            u_k);
                 value = tlvstore.tlvRecordsToContainer(clearContainer);
             }
-            if (d) {
+            if (localStorage.d) {
                 console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
                             + '" is "' + value + '".');
             }
@@ -525,7 +527,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
                 ctx.callback2(value, ctx);
             }
         } else {
-            if (d) {
+            if (localStorage.d) {
                 console.log('Error retrieving attribute "' + ctx.ua
                             + '" for user "' + ctx.u + '": ' + res + '!');
             }
@@ -535,7 +537,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
         }
     };
     myCtx.callback2 = callback;
-    
+
     // Fire it off.
     api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
 }
@@ -571,11 +573,11 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         value = base64urlencode(tlvstore.blockEncrypt(
             tlvstore.containerToTlvRecords(value), u_k, mode));
     }
-    
+
     // Assemble context for this async API request.
     var myCtx = {
         callback: function(res, ctx) {
-            if (d) {
+            if (localStorage.d) {
                 if (typeof res !== 'number') {
                     console.log('Setting user attribute "'
                                 + ctx.ua + '", result: ' + res);
@@ -591,7 +593,7 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         ua: attribute,
         callback2: callback,
     };
-    
+
     // Fire it off.
     var apiCall = {'a': 'up'};
     apiCall[attribute] = value;

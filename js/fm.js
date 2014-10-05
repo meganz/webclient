@@ -4937,6 +4937,7 @@ function renameDialog()
 		else $('.rename-dialog .fm-dialog-title').text(l[426]);
 		$('.rename-dialog input').val(n.name);
 		var ext = fileext(n.name);
+		$('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileicon(n))
 		if (!n.t && ext.length > 0)
 		{
 			$('.rename-dialog input')[0].selectionStart=0;

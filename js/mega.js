@@ -1508,8 +1508,27 @@ function MegaData ()
 		else return false;
 	};
 
+	this.rubNodes = {};
+
 	this.addNode = function(n,ignoreDB)
 	{
+		if (n.p == this.RubbishID) 
+		{
+			this.rubNodes[n.h] = true;
+			this.rubbishIco();
+		}
+		if (n.t == 4) 
+		{
+			for (var i in this.d)
+			{
+				if (this.d[i].p == n.h)
+				{
+					this.rubNodes[this.d[i].h] = true;
+				}
+			}
+			this.rubbishIco();
+		}
+
 		if (!this.c['shares']) this.c['shares'] = [];
 		if (!M.d[n.p] && n.p !== 'contacts')
 		{
@@ -1574,9 +1593,11 @@ function MegaData ()
 
 	this.delNode = function(h)
 	{
+
 		var a =0;
 		function ds(h)
 		{
+
 			removeUInode(h);
 			if (M.c[h] && h.length < 11)
 			{
@@ -1602,7 +1623,9 @@ function MegaData ()
 			// if (M.u[h]) delete M.u[h];
 			if (typeof M.u[h] === 'object') M.u[h].c = 0;
 		}
+		if (this.rubNodes[h]) delete this.rubNodes[h];
 		ds(h);
+		this.rubbishIco();
 	};
 
 	this.delHash = function(n)
@@ -1687,6 +1710,7 @@ function MegaData ()
 			if (M.viewmode) iconUI();
 			else gridUI();
 		}
+		this.rubNodes = {}
 		this.rubbishIco();
 		treeUI();
 	}
@@ -1781,11 +1805,20 @@ function MegaData ()
 
 	this.moveNodes = function(n,t)
 	{
+		if (t == this.RubbishID) 
+		{
+			for (var i in n)
+			{
+				this.rubNodes[n[i]] = true;
+			}
+		}
+
 		newnodes=[];
 		var j = [];
 		for (var i in n)
 		{
 			var h = n[i];
+			if (this.rubNodes[this.d[h].h] && t != this.RubbishID) delete this.rubNodes[this.d[h].h]
 			j.push(
 			{
 				a: 'm',
@@ -1958,6 +1991,8 @@ function MegaData ()
 			$('.fm-tree-header.recycle-item').removeClass('recycle-notification expanded contains-subfolders');
 			$('.fm-tree-header.recycle-item').prev('.fm-connector-first').removeClass('active');
 		}
+		if (Object.keys(this.rubNodes).length == 0) $('.nw-fm-left-icon.rubbish-bin').removeClass('filled')
+		else $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
 	}
 
 	this.nodeAttr = function(a)

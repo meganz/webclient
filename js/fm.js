@@ -1193,7 +1193,7 @@ function addContactUI()
 		$.dialog = 'add-contact-popup';
 		var $this = $(this);
 		var $d = $('.add-user-popup');
-		$.sharedTokens = [];
+		$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
 		if ($this.is('.active'))// Hide
 		{
 			$this.removeClass('active');
@@ -5287,7 +5287,7 @@ function addShareDialogContactToContent (type, id, av_color, av, name, permClass
 function fillShareDialogWithContent()
 {
 	var sel = $.selected[0];
-	$.sharedTokens = [];
+	$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
 			
 	for (var i in M.d[sel].shares)// list users that are already use item
 	{
@@ -5503,13 +5503,15 @@ function initShareDialog()
 				break;
 			}
 		}
+		
+		var user = M.u[id];
+		var name = (user.name && user.name.length > 1) ? user.name : user.m;
 		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
-		var av;
-//		av = name.charAt(0) + name.charAt(1);
-
+		var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+		
 		$.sharedTokens.push(item);
 		
-		var html = addShareDialogContactToContent('email', id, av_color, '', name, perm[0], perm[1]);
+		var html = addShareDialogContactToContent('', id, av_color, av, name, perm[0], perm[1]);
 
 		$('.share-dialog .share-dialog-contacts').append(html);
 

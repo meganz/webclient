@@ -6470,8 +6470,12 @@ function createfolderDialog(close)
 	{
 		$.dialog = false;
 		if ($.cftarget) delete $.cftarget;
-		$('.fm-dialog-overlay').addClass('hidden');
-		$('body').removeClass('overlayed');
+		if (!($.copyDialog || $.moveDialog))
+		{
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('body').removeClass('overlayed');
+		}
+		$('.fm-dialog').removeClass('arrange-to-back');
 		$('.fm-dialog.create-folder-dialog').addClass('hidden');
 		return true;
 	}
@@ -6535,7 +6539,7 @@ function createfolderDialog(close)
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
 	$('.fm-dialog.create-folder-dialog').removeClass('hidden');
-        $('.create-folder-input-bl input').focus();
+    $('.create-folder-input-bl input').focus();
 	$('.create-folder-dialog').removeClass('active');
 }
 

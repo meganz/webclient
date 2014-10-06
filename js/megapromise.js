@@ -39,7 +39,11 @@ function MegaPromise(fn) {
     return this;
 };
 
-MegaPromise._origPromise = Promise;
+if(typeof(Promise) != "undefined") {
+    MegaPromise._origPromise = Promise;
+} else {
+    MegaPromise._origPromise = undefined;
+}
 
 /**
  * Convert Native and jQuery promises to MegaPromises, by creating a MegaPromise proxy which will be attached
@@ -147,7 +151,7 @@ MegaPromise.all = function(promisesList) {
 
     var _jQueryPromisesList = [];
     promisesList.forEach(function(v, k) {
-        if(v instanceof MegaPromise._origPromise) {
+        if(MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
             v = MegaPromise.asMegaPromiseProxy(v);
         }
         _jQueryPromisesList.push(v);

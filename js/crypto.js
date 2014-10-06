@@ -1885,12 +1885,13 @@ function api_faretry(ctx, error, host)
 	{
 		if (!ctx.fastrgri) ctx.fastrgri = 400;
 
-		if (ctx.fastrgri < 7601)
+		if (ctx.fastrgri < 22801)
 		{
 			if (d) console.log("Attribute storage failed (" + error + "), retrying...", ctx.fastrgri);
 
 			return setTimeout(function()
 			{
+				ctx.startTime = Date.now();
 				api_storefileattr(null,null,null,null,ctx);
 
 			}, ctx.fastrgri += 800);

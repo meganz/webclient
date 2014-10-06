@@ -5,7 +5,11 @@
  * localStorage.dxmpp = 1; localStorage.stopOnAssertFail = true; localStorage.d = 1;
  * @type {boolean}
  */
-var MegaChatEnabled = true;
+var MegaChatDisabled = localStorage.chatDisabled == true ? true : false;
+
+if(MegaChatDisabled) {
+    $(document.body).addClass("megaChatDisabled");
+}
 
 var chatui;
 (function() {
@@ -1863,8 +1867,14 @@ Chat.prototype.renderContactTree = function() {
             var contact = self.getContactFromJid(chatWithJid);
             var name = self.getContactNameFromJid(chatWithJid);
 
-            var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
-            $('.content-panel.conversations .conversations-container').prepend(html2);
+            if(contact) {
+                var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread"></div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
+                $('.content-panel.conversations .conversations-container').prepend(html2);
+            } else {
+                if(localStorage.d) {
+                    console.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
+                }
+            }
 
         } else {
             throw new Error("TBD");

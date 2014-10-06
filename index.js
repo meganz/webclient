@@ -158,7 +158,7 @@ function init_page()
 
 	closeDialog();
 
-	if (page.substr(0,7) == 'voucher')
+    if (page.substr(0,7) == 'voucher')
 	{
 		loadingDialog.show();
 		var vouchercode = page.substr(7,page.length-7);
@@ -603,7 +603,7 @@ function init_page()
 				$('.fm-menu-item').hide();
 			}
 			
-			if(MegaChatEnabled) {
+			if(!MegaChatDisabled) {
                 $(window).unbind('megaAuthenticationFinished.megaChat');
                 $(window).bind('megaAuthenticationFinished.megaChat', function() {
                     if(u_type && !megaChat.is_initialized) {
@@ -635,6 +635,10 @@ function init_page()
 			else if (M.currentdirid == 'notifications') notificationsUI();
 			else if (M.currentdirid == 'search') searchFM();
 		}
+
+        if(typeof(MegaChatDisabled) != "undefined" && MegaChatDisabled === true) {
+            $(document.body).addClass("megaChatDisabled");
+        }
 	}
 	else if (page.substr(0,2) == 'fm' && !u_type)
 	{
@@ -901,7 +905,7 @@ function topmenuUI()
 		}		
 		$('.membership-status').show();
 
-        if(MegaChatEnabled) {
+        if(!MegaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
         }
@@ -1306,7 +1310,7 @@ function parsepage(pagehtml,pp)
 	if (page == 'notifications') $('body').addClass('notification-body');
 	else if (page == 'start') $('body').addClass('new-startpage');
 	else $('body').addClass('bottom-pages');
-	var top = parsetopmenu();
+    var top = parsetopmenu();
 	var bmenu = pages['bottom'];
 	var bmenu2 = pages['bottom2'];
 	if (document.location.href.substr(0,19) == 'chrome-extension://') bmenu2 = bmenu2.replace(/\/#/g,'/' + urlrootfile + '#');

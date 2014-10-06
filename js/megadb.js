@@ -37,9 +37,6 @@ function MegaDB(name, suffix, version, schema) {
         ERRDEBUG("Could not initialise MegaDB: ", arguments, name, version, schema);
     });
 
-    if(localStorage.d) {
-        logAllCallsOnObject(this, console.error, true, "mdb");
-    }
     return this;
 };
 

@@ -21043,3 +21043,14 @@ background-color:#1DA2E9
 	opacity: 0.6;
 	display: block;
 }
+
+
+/**
+ * Hide UI elements when the chat is disabled
+ */
+.megaChatDisabled .fm-start-conversation,
+.megaChatDisabled .nw-contact-status,
+.megaChatDisabled .nw-fm-left-icon.conversations,
+.megaChatDisabled .fm-send-files {
+    display: none;
+}

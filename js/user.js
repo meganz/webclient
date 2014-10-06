@@ -161,7 +161,7 @@ function u_logout(logout)
 
 	if (logout)
 	{
-        if(MegaChatEnabled) {
+        if(!MegaChatDisabled) {
             localStorage.removeItem("audioVideoScreenSize");
 
 

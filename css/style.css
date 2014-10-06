@@ -4293,17 +4293,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: calc(100% - 96px);
 	overflow: hidden;
 }
-.transfer-panel-opened .fm-main {
-	height: -webkit-calc(100% - 240px);
-	height: -moz-calc(100% - 240px);
-	height: calc(100% - 240px);
-}
 .fm-left-panel {
 	width: 256px;
 	height: 100%;
 	float: left;
 	background-color: #f2f2f2;
 	position: relative;
+}
+.notifications .fm-left-panel {
+	width: 304px;
 }
 .fm-left-menu {
 	height: 48px;
@@ -4419,6 +4417,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
 }
+
 .nw-fm-search-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -4497,6 +4496,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(213,22,0,0);
 	background-position: center 13px;
 }
+.nw-fm-left-icon.notifications {
+	background-position: left -6142px;
+}
 .nw-fm-left-icon.shared-with-me {
 	background-color: rgba(252,173,0,0);
 	background-position: center -35px;
@@ -4525,11 +4527,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: center -511px;
 	background-color: rgba(43,166,222,0.8);
 }
-.nw-fm-left-icon.cloud-drive.active, .nw-fm-left-icon.notifications {
+.nw-fm-left-icon.cloud-drive.active {
 	background-color: rgba(217,0,7,1);
 	background-position: center -367px;
 }
 .nw-fm-left-icon.notifications {
+	background-color: rgba(217,0,7,1);
 	background-position: left -6142px;
 }
 .nw-fm-left-icon.shared-with-me.active {
@@ -5257,12 +5260,18 @@ table {
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
 	background-position: -14px -7535px;
 }
-.rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.shared-folder {
+.rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-position: -7px -1974px;
 }
-.focused .rename-input-bl .transfer-filtype-icon.folder, .focused .rename-input-bl .transfer-filtype-icon.shared-folder {
+.focused .rename-input-bl .transfer-filtype-icon.folder {
 	background-position: -7px -2014px;
+}
+.rename-input-bl .transfer-filtype-icon.folder-shared {
+	background-position: -7px -3214px;
+}
+.focused .rename-input-bl .transfer-filtype-icon.folder-shared {
+	background-position: -7px -3254px;
 }
 .rubbish-bin .transfer-filtype-icon.folder, .rubbish-bin .search-path-icon-span.folder {
 	background-position: -14px -7595px;

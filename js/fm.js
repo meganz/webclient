@@ -1313,7 +1313,7 @@ function addContactUI()
 	});
 
 	$('.add-user-popup .import-contacts-link').unbind('click');
-	$('.add-user-popup .import-contacts-link').bind('click', function()
+	$('.add-user-popup .import-contacts-link').bind('click', function(e)
 	{
 		if(!$(this).is('.active'))
 		{
@@ -1332,6 +1332,9 @@ function addContactUI()
 			$('.add-user-popup .import-contacts-dialog').fadeOut(200);
 			$('.imported-contacts-notification').fadeOut(200);
 		}
+		
+		e.stopPropagation();
+		e.preventDefault();
 	});
 
 	$('.add-user-popup .import-contacts-info').unbind('mouseover');
@@ -4937,6 +4940,7 @@ function renameDialog()
 		else $('.rename-dialog .fm-dialog-title').text(l[426]);
 		$('.rename-dialog input').val(n.name);
 		var ext = fileext(n.name);
+		$('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileicon(n))
 		if (!n.t && ext.length > 0)
 		{
 			$('.rename-dialog input')[0].selectionStart=0;
@@ -5482,8 +5486,8 @@ function initShareDialog()
 		m.css('left', x + 'px');
 		m.css('top', y + 'px');
 		menuPermissionState($this);
-		m.fadeIn(200);
 		$this.addClass('active');
+		m.fadeIn(200);
 	};
 
 	// called when multi-input box is not empty
@@ -5510,6 +5514,27 @@ function initShareDialog()
 		$('.share-dialog .share-dialog-contacts').append(html);
 
 	};
+
+	$('.share-dialog').unbind('click');
+	$('.share-dialog').bind('click',function(e)
+	{
+		// This's sensitive to dialog DOM element positioning
+		var trg = e.originalEvent.path[0];
+		var trg1 = e.originalEvent.path[1];
+		var trg2 = e.originalEvent.path[2];
+		if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+				&& !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+				&& !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
+		{
+			// share dialog permission menu
+			$('.permissions-menu').fadeOut(200);
+			$('.import-contacts-dialog').fadeOut(200);
+			$('.permissions-icon').removeClass('active');
+			$('.share-dialog-permissions').removeClass('active');
+			closeImportContactNotification('.share-dialog');
+			$('.import-contacts-service').removeClass('imported');
+		}
+	});
 
 	$('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').unbind('click');
 	$('.share-dialog .fm-dialog-close, .share-dialog .dialog-cancel-button').bind('click',function()
@@ -5594,12 +5619,11 @@ function initShareDialog()
 			n.css('margin-left', '-' + n.outerWidth()/2 +'px');
 			n.fadeIn(200);
 			$('.share-dialog .import-contacts-dialog').fadeOut(200);
-
 		}
 	});
 
 	$('.share-dialog .import-contacts-link').unbind('click');
-	$('.share-dialog .import-contacts-link').bind('click', function()
+	$('.share-dialog .import-contacts-link').bind('click', function(e)
 	{
 		$('.permissions-menu').fadeOut(200);
 		$('.share-dialog-permissions').removeClass('active');
@@ -5621,6 +5645,8 @@ function initShareDialog()
 			$('.share-dialog .import-contacts-dialog').fadeOut(200);
 			$('.imported-contacts-notification').fadeOut(200);
 		}
+		
+		e.stopPropagation();
 	});
 
 	$('.share-dialog .import-contacts-info').unbind('mouseover');
@@ -5633,8 +5659,9 @@ function initShareDialog()
 		$('.share-dialog .import-contacts-info-txt').fadeOut(200);
 	});
 
+
 	$(document).off('click', '.share-dialog-remove-button');
-	$(document).on('click', '.share-dialog-remove-button', function () 
+	$(document).on('click', '.share-dialog-remove-button', function (e) 
 	{
 		var $this = $(this);
 
@@ -5666,12 +5693,11 @@ function initShareDialog()
 		
 		var num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
 		if (!num) $('.dialog-share-button').addClass('disabled');
-		
 	});
 
 	// related to specific contact
 	$(document).off('click', '.share-dialog-permissions');
-	$(document).on('click', '.share-dialog-permissions', function ()
+	$(document).on('click', '.share-dialog-permissions', function (e)
 	{
 		var $this = $(this);
 		var $m = $('.permissions-menu');
@@ -5679,22 +5705,23 @@ function initShareDialog()
 		{
 			$m.fadeOut(200);
 			$this.removeClass('active');
-			return false;
 		}
 		else
 		{
-			$m.fadeOut(0);
-			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 42;
-			var y = $this.position().top + 13;
+			var x = $this.position().left + 30;
+			var y = $this.position().top - 1;
 			handlePermissionMenu($this, $m, x, y);
 		}
+		
+		e.stopProgagation();
 	});
 
 	// related to multi-input contacts
 	$('.share-dialog .permissions-icon').unbind('click');
-	$('.share-dialog .permissions-icon').bind('click', function ()
+	$('.share-dialog .permissions-icon').bind('click', function (e)
 	{
 		var $this = $(this);
 		var $m = $('.permissions-menu');
@@ -5702,21 +5729,22 @@ function initShareDialog()
 		{
 			$m.fadeOut(200);
 			$this.removeClass('active');
-			return;
 		}
 		else
 		{
-			$m.fadeOut(0);
-			$('.share-dialog .share-dialog-permissions').removeClass('active');
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 35;
-			var y = $this.position().top - 8;
+			var x = $this.position().left + 31;
+			var y = $this.position().top - 9;
 			handlePermissionMenu($this, $m, x, y);
 		}
+		
+		e.stopProgagation();
 	});
 
 	$('.permissions-menu-item').unbind('click');
-	$('.permissions-menu-item').bind('click', function ()
+	$('.permissions-menu-item').bind('click', function (e)
 	{
 		var $this = $(this);
 
@@ -5749,6 +5777,8 @@ function initShareDialog()
 
 		$('.permissions-icon.active').removeClass('active');
 		$('.share-dialog-permissions.active').removeClass('active');
+		
+		e.stopPropagation();
 	});
 }
 
@@ -7482,7 +7512,7 @@ function fm_resize_handler() {
         )
     );
 	
-    $('.fm-main.default').css({
+    $('.fm-main.default, .fm-main.notifications').css({
        'height': right_pane_height  + "px"
     });
 
@@ -7514,6 +7544,11 @@ function fm_resize_handler() {
         });
     });
 
+    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
+        $(this).css({
+            'margin-left':  (305 - right_panel_margin) * -1
+        });
+    });
 
     $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (
@@ -7541,12 +7576,7 @@ function fm_resize_handler() {
     });
 
     $('.fm-right-files-block').css({
-		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-	});
-	
-	
-	$('.new-notifications-scroll').css({
-		'margin-left' : ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() -353) + "px"
+		'margin-left' : ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
 	});
 
 	var shared_block_height = $('.shared-details-block').height()-$('.shared-top-details').height();

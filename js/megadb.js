@@ -53,29 +53,14 @@ MegaDB.DB_STATE = {
 };
 
 
-MegaDB._promiseAtoJQueryPromise = function(p) {
-    var $promise = new $.Deferred();
-
-    p.then(function(argument) {
-        $promise.resolve(argument)
-    }, function(argument) {
-        if(localStorage.d) {
-            var stack;
-            // try to get the stack trace
-            try {
-                throw new Error("DEBUG")
-            } catch(e) {
-                stack = e.stack;
-            }
-            console.error("Promise rejected: ", argument, p, stack);
-        }
-        $promise.reject(argument);
-    });
-
-    return $promise;
-};
-
-
+/**
+ * Wrap `fn` with a function which will create a "proxy" promise, which will wait for the DB state to be ready and then
+ * actually execute the code in `fn`
+ *
+ * @param fn {Function} the function, which should be wrapped
+ * @returns {Function}
+ * @private
+ */
 MegaDB._delayFnCallUntilDbReady = function(fn) {
     return function() {
         var self = this;
@@ -91,7 +76,7 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
         if(megaDb.dbState === MegaDB.DB_STATE.INITIALIZED) {
             return fn.apply(self, args);
         } else if(megaDb.dbState === MegaDB.DB_STATE.OPENING) {
-            var $promise = new $.Deferred();
+            var $promise = new MegaPromise();
 
 
             megaDb._dbOpenPromise.then(
@@ -125,6 +110,11 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
 };
 
 
+/**
+ * Place holder for code, which should be executed to initialize the db (executed when the db is ready)
+ * Also, trigger "onReady" event on the MegaDB instance.
+ *
+ */
 MegaDB.prototype.initialize = function() {
     var self = this;
 
@@ -135,78 +125,115 @@ MegaDB.prototype.initialize = function() {
 };
 
 
+/**
+ * add a db record
+ *
+ * @param tableName {String} name of the table in which the object/row should be inserted
+ * @param val {Object} object containing data to be inserted
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.add = function(tableName, val) {
+    assert(this.server[tableName], 'table not found:' + tableName);
+
+    // ignore any __privateProperties and get back the .id after .add is done
+    var tempObj = clone(val);
+
+    Object.keys(tempObj).forEach(function(k) {
+        if(k.toString().indexOf("__") === 0) {
+            delete tempObj[k];
+        }
+    });
+
+    return this.server[tableName].add(tempObj)
+        .then(function() {
+            if(tempObj.id && tempObj.id != val.id) {
+                val.id = tempObj.id;
+            }
+        });
+};
 
 MegaDB.prototype.add = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
-        function(tableName, val) {
-            assert(this.server[tableName], 'table not found:' + tableName);
-
-            // ignore any __privateProperties and get back the .id after .add is done
-            var tempObj = clone(val);
-
-            Object.keys(tempObj).forEach(function(k) {
-                if(k.toString().indexOf("__") === 0) {
-                    delete tempObj[k];
-                }
-            });
-
-            return MegaDB._promiseAtoJQueryPromise(this.server[tableName].add(tempObj))
-                .then(function() {
-                    if(tempObj.id && tempObj.id != val.id) {
-                        val.id = tempObj.id;
-                    }
-                });
-        }
+        MegaDB.prototype.add
     ),
     'Add'
 );
 
 
-//TODO: test me please
+/**
+ * Update an object/row, where `k` should be the ID of the object which should be updated
+ *
+ * @param tableName {String}
+ * @param k {Integer} id of the object to be updated
+ * @param val {Object} actual object, which will be used to replace the values in the current db
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.update = function(tableName, k, val) {
+    var self = this;
+
+    assert(this.server[tableName], 'table not found:' + tableName);
+
+    // ignore any __privateProperties and get back the .id after .add is done
+    var tempObj = clone(val);
+
+    Object.keys(tempObj).forEach(function(k) {
+        if(k.toString().indexOf("__") === 0) {
+            delete tempObj[k];
+        }
+    });
+
+    return self.query(tableName)
+        .filter('id', k)
+        .modify(val)
+        .execute();
+};
+
 MegaDB.prototype.update = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
-        function(tableName, k, val) {
-            var self = this;
-
-            assert(this.server[tableName], 'table not found:' + tableName);
-
-            // ignore any __privateProperties and get back the .id after .add is done
-            var tempObj = clone(val);
-
-            Object.keys(tempObj).forEach(function(k) {
-                if(k.toString().indexOf("__") === 0) {
-                    delete tempObj[k];
-                }
-            });
-
-            return self.query(tableName)
-                .filter('id', k)
-                .modify(val)
-                .execute();
-        }
+        MegaDB.prototype.update
     ),
     'Update'
 );
 
+
+/**
+ * Remove a row/object from `tableName` which pk/id equals to `id`
+ *
+ * @param tableName
+ * @param id
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.remove = function(tableName, id) {
+    return this.removeBy(
+        tableName,
+        "id",
+        id
+    );
+};
 MegaDB.prototype.remove = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
-        function(tableName, id) {
-            return this.removeBy(
-                tableName,
-                "id",
-                id
-            );
-        }
+        MegaDB.prototype.remove
     ),
     'Remove'
 );
 
+
+/**
+ * Remove object, which have a property `keyName` with value `value` (alias of .query(tableName).filter(keyName, value)
+ * + remove)
+ *
+ * @param tableName {String}
+ * @param keyName {String}
+ * @param value {String|Integer}
+ * @returns {MegaPromise}
+ */
 MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     var self = this;
 
     var q = self.query(tableName);
     if(!value && $.isPlainObject(keyName)) {
-        keyName.forEach(function(v, k) {
+        Object.keys(keyName).forEach(function(k) {
+            var v = keyName[k];
             q = q.filter(k, v);
         });
     } else {
@@ -214,101 +241,149 @@ MegaDB.prototype.removeBy = function(tableName, keyName, value) {
     }
 
 
-    return new Promise(function(resolve, reject) {
-        q.execute()
-            .then(function(r) {
-                if(r.length && r.length > 0) { // found
-                    var promises = [];
-                    r.forEach(function(v) {
-                        promises.push(
-                            self.server.remove(tableName, v["id"])
-                        );
-                    });
-                }
-                Promise.all(promises).then(function(ar) {
-                    resolve(ar);
-                }, function(ar) {
-                    reject(ar)
+    var promise = new $.Deferred();
+
+    q.execute()
+        .then(function(r) {
+            var promises = [];
+            if(r.length && r.length > 0) { // found
+                r.forEach(function(v) {
+                    promises.push(
+                        self.server.remove(tableName, v["id"])
+                    );
                 });
-            }, function() {
-                reject(arguments);
+            }
+
+            Promise.all(promises).then(function(ar) {
+                promise.resolve(ar);
+            }, function(ar) {
+                promise.reject(ar)
             });
-    });
+        }, function() {
+            promise.reject(arguments);
+        });
+
+    return promise;
 };
 
+
+/**
+ * Truncate a database (warning: this method will not reset the auto incremental counter!)
+ *
+ * @param tableName {String}
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.clear = function(tableName) {
+    return this.server.clear(tableName);
+};
 MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
-    function(tableName) {
-        return MegaDB._promiseAtoJQueryPromise(this.server.clear(tableName));
-    },
+    MegaDB.prototype.clear,
     'Clear'
 );
+
+
+/**
+ * Drop/delete the current database
+ *
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.drop = function() {
+    var self = this;
+    self.close();
+    return self.server.destroy();
+};
+
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(
-    function() {
-        var self = this;
-        self.close();
-        return MegaDB._promiseAtoJQueryPromise(self.server.destroy());
-    },
+    MegaDB.prototype.drop,
     'Drop'
 );
 
+
+/**
+ * Get one object which pk equals to `val` from table `tableName`
+ * If the row/object is not found, then the promise will be resolved with 1 argument, which will be empty array
+ *
+ * @param tableName {String}
+ * @param val {Integer}
+ * @returns {MegaPromise}
+ */
+MegaDB.prototype.get = function(tableName, val) {
+    var self = this;
+
+    assert(this.server[tableName], 'table not found:' + tableName);
+
+    var promise = new Promise(function(resolve, reject) {
+
+        self.query(tableName)
+            .filter("id", val)
+            .execute()
+            .then(
+            function(result) {
+                if($.isArray(result) && result.length == 1) {
+                    resolve.apply(null, [result[0]]);
+                } else if($.isArray(result) && result.length > 1) {
+                    resolve.apply(null, [result]);
+                }  else {
+                    resolve.apply(null, toArray(arguments));
+                }
+
+                // resolve with 1 OR multiple arguments please
+            },
+            function() {
+                reject.apply(null, toArray(arguments));
+            });
+    });
+    return promise;
+};
 MegaDB.prototype.get = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
-        function(tableName, val) {
-            var self = this;
-
-            assert(this.server[tableName], 'table not found:' + tableName);
-
-            var promise = new Promise(function(resolve, reject) {
-
-                self.query(tableName)
-                    .filter("id", val)
-                    .execute()
-                    .then(
-                        function(result) {
-                            if($.isArray(result) && result.length == 1) {
-                                resolve.apply(null, [result[0]]);
-                            } else if($.isArray(result) && result.length > 1) {
-                                resolve.apply(null, [result]);
-                            }  else {
-                                resolve.apply(null, toArray(arguments));
-                            }
-
-                            // resolve with 1 OR multiple arguments please
-                        },
-                        function() {
-                            reject.apply(null, toArray(arguments));
-                        });
-            });
-            return MegaDB._promiseAtoJQueryPromise(promise);
-        }
+        MegaDB.prototype.get
     ),
     'Get'
 );
 
 
-MegaDB.prototype.query = _wrapFnWithBeforeAndAfterEvents(
-    function(tableName) {
-        assert(this.schema[tableName], 'table not found:' + tableName);
+/**
+ * Alias to create a new {MegaDB.QuerySet} instance for the target `tableName`
+ *
+ * @param tableName {String}
+ * @returns {MegaDB.QuerySet}
+ */
+MegaDB.prototype.query = function(tableName) {
+    assert(this.schema[tableName], 'table not found:' + tableName);
 
-        return new MegaDB.QuerySet(this, tableName);
-    },
+    return new MegaDB.QuerySet(this, tableName);
+};
+
+MegaDB.prototype.query = _wrapFnWithBeforeAndAfterEvents(
+    MegaDB.prototype.query,
     'Query',
     true /* does not return a promise, may return false or instance of IndexQuery */
 );
 
 
+/**
+ * Close the connection to the DB.
+ * Warning: there is no way to re-open a db connection, so after .close is called this MegaDB instance will be useless
+ * and throw exceptions/errors in case any of its method get called.
+ *
+ * @returns {boolean}
+ */
+MegaDB.prototype.close = function() {
+    var self = this;
+    self.server.close();
+
+    if(localStorage.d) {
+        console.warn("Closing db: ", self);
+    }
+
+    self.dbState = MegaDB.DB_STATE.CLOSED;
+
+    return true;
+};
 MegaDB.prototype.close = _wrapFnWithBeforeAndAfterEvents(
     MegaDB._delayFnCallUntilDbReady(
-        function() {
-            var self = this;
-            self.server.close();
-
-            console.warn("Closing db: ", self);
-
-            self.dbState = MegaDB.DB_STATE.CLOSED;
-
-            return true;
-        }
+        MegaDB.prototype.close
     ),
     'Close',
     true
@@ -343,6 +418,13 @@ MegaDB.QuerySet = function(megaDb, tableName) {
     return this;
 };
 
+/**
+ * Internal method, for adding MegaDB operations in the internal queue
+ *
+ * @param opName {String}
+ * @param args {Array}
+ * @private
+ */
 MegaDB.QuerySet.prototype._queueOp = function(opName, args) {
     var self = this;
     self._ops.push(
@@ -350,6 +432,14 @@ MegaDB.QuerySet.prototype._queueOp = function(opName, args) {
     );
 };
 
+/**
+ * Dequeue all queued operations of a specific type/name
+ *
+ * @param q {Object} internal db.js queryset object
+ * @param opName {String}
+ * @returns {Object} internal db.js queryset object
+ * @private
+ */
 MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
     var self = this;
     self._ops.forEach(function(v) {
@@ -368,6 +458,12 @@ MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
 };
 
 
+/**
+ * Executes all queued operations and returns a promise, which will be resolved with 1 argument, an Array containing
+ * all found results.
+ *
+ * @returns {MegaPromise}
+ */
 MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
     function() {
         var self = this;
@@ -416,6 +512,6 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         q = self._dequeueOps(q, "modify");
 
 
-        return MegaDB._promiseAtoJQueryPromise(q.execute());
+        return q.execute();
     }
 );

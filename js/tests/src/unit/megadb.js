@@ -23,6 +23,7 @@ describe("MegaDB Unit Test", function() {
         mdb.drop()
             .fail(function() {
                 fail("db not dropped: ", toArray(arguments));
+                done();
             })
             .then(function() {
                 done();
@@ -48,7 +49,7 @@ describe("MegaDB Unit Test", function() {
                             .then(
                             function(r) {
                                 expect(r.firstName).to.eq("John");
-                                expect(r.answer).to.eq('12'); // because of the xor enc, 12 is conv to '12'
+                                expect(r.answer).to.eq(12);
 
                                 mdb.remove("people", 1)
                                     .then(function() {
@@ -100,7 +101,7 @@ describe("MegaDB Unit Test", function() {
                                 expect(r.length).to.eql(1);
 
                                 expect(r[0].firstName).to.eql("John");
-                                expect(r[0].answer).to.eql('12');
+                                expect(r[0].answer).to.eql(12);
 
                                 mdb.update('people', 1, {'firstName': "John3"})
                                     .then(function() {

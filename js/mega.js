@@ -949,7 +949,7 @@ function MegaData ()
 		this.buildtree({h:M.RubbishID});
 		this.contacts();
 		treeUI();
-        if(MegaChatEnabled) {
+        if(!MegaChatDisabled) {
             megaChat.renderContactTree();
         }
 	};
@@ -993,13 +993,17 @@ function MegaData ()
 			this.chat=true;
             treeUI();
 
-            chatui(id); // XX: using the old code...for now
+            if(!MegaChatDisabled) {
+                chatui(id); // XX: using the old code...for now
+            }
 		}
 		else if (!M.d[id]) id = this.RootID;
 
-		if (!this.chat) {
-            if(megaChat.getCurrentRoom()) {
-                megaChat.getCurrentRoom().hide();
+        if(!MegaChatDisabled) {
+            if (!this.chat) {
+                if (megaChat.getCurrentRoom()) {
+                    megaChat.getCurrentRoom().hide();
+                }
             }
         }
 
@@ -1099,7 +1103,13 @@ function MegaData ()
                 continue;
             }
 
-			var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
+            var onlinestatus;
+
+            if(!MegaChatDisabled) {
+                onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(contacts[i].u)));
+            } else {
+                onlinestatus = "offline";
+            }
 			if (!treesearch || (treesearch && contacts[i].name && contacts[i].name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1))
 			{
 				html += '<div class="nw-contact-item ' + onlinestatus[1] + '" id="contact_' + htmlentities(contacts[i].u) + '"><div class="nw-contact-status"></div><div class="nw-contact-name">' + htmlentities(contacts[i].name) + ' <a href="#" class="button start-chat-button"></a></div></div>';
@@ -1108,16 +1118,18 @@ function MegaData ()
 
 		$('.content-panel.contacts').html(html);
 
-        megaChat.renderContactTree();
+        if(!MegaChatDisabled) {
+            megaChat.renderContactTree();
 
-        //TMP: temporary start chat button event handling
-        $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
-        $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function() {
-            var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
-            window.location = "#fm/chat/" + user_handle;
+            //TMP: temporary start chat button event handling
+            $('.fm-tree-panel').undelegate('.start-chat-button', 'click.megaChat');
+            $('.fm-tree-panel').delegate('.start-chat-button', 'click.megaChat', function () {
+                var user_handle = $(this).parent().parent().attr('id').replace("contact_", "");
+                window.location = "#fm/chat/" + user_handle;
 
-            return false; // stop propagation!
-        });
+                return false; // stop propagation!
+            });
+        }
 
 		$('.fm-tree-panel').undelegate('.nw-contact-item', 'click');
 		$('.fm-tree-panel').delegate('.nw-contact-item', 'click',function(e)
@@ -2982,10 +2994,11 @@ function renderfm()
 		$('#treesub_' + M.RootID).addClass('opened');
 	}
 	M.openFolder(M.currentdirid);
-    if(MegaChatEnabled) {
+    if(!MegaChatDisabled) {
         megaChat.renderContactTree();
         megaChat.renderMyStatus();
     }
+
 	if (d) console.timeEnd('renderfm');
 }
 
@@ -3036,7 +3049,7 @@ function rendernew()
 		M.contacts();
 		treeUI();
 
-        if(MegaChatEnabled) {
+        if(!MegaChatDisabled) {
             megaChat.renderContactTree();
             megaChat.renderMyStatus();
         }

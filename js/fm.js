@@ -7714,26 +7714,28 @@ function contactUI()
 			});
 		});
 
-        if(onlinestatus[1] != "offline" && u_h != u_handle) {
-            // user is online, lets display the "Start chat" button
+        if(!MegaChatDisabled) {
+            if (onlinestatus[1] != "offline" && u_h != u_handle) {
+                // user is online, lets display the "Start chat" button
 
-            var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
-            $('.fm-start-conversation')
-                .removeClass('hidden')
-                .text(startChatTxt);
+                var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
+                $('.fm-start-conversation')
+                    .removeClass('hidden')
+                    .text(startChatTxt);
 
-        } else {
-            // user is offline, hide the button
-            $('.fm-start-conversation').addClass('hidden');
+            } else {
+                // user is offline, hide the button
+                $('.fm-start-conversation').addClass('hidden');
+            }
+
+            // bind the "start chat" button
+            $('.fm-start-conversation').unbind("click.megaChat");
+            $('.fm-start-conversation').bind("click.megaChat", function (e) {
+                window.location = "#fm/chat/" + u_h;
+
+                return false;
+            });
         }
-
-        // bind the "start chat" button
-        $('.fm-start-conversation').unbind("click.megaChat");
-        $('.fm-start-conversation').bind("click.megaChat", function(e) {
-            window.location = "#fm/chat/" + u_h;
-
-            return false;
-        });
 
 		$('.nw-contact-item#contact_' + u_h).addClass('selected');
 	}

@@ -3338,6 +3338,7 @@ function loadfm()
 	api_req({a:'f',c:1,r:1},{
 		callback : loadfm_callback
 	},n_h ? 1 : 0);
+
 }
 
 function RightsbyID(id)

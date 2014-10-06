@@ -375,6 +375,7 @@ function tpDragCursor() {
 
 function initUI()
 {
+	$('.fm-dialog-overlay').rebind('click', closeDialog);
 	if (!folderlink)
 	{
 		$('.fm-tree-header.cloud-drive-item').text(l[164]);

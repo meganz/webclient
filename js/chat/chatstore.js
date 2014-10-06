@@ -18,6 +18,9 @@ var ChatStore = function(megaChat) {
     return this;
 };
 
+/**
+ * Basic schema required to store offline messages
+ */
 ChatStore.DBSchema = {
     conversations: {
         key: { keyPath: 'id' , autoIncrement: true },
@@ -34,7 +37,11 @@ ChatStore.DBSchema = {
     }
 };
 
-
+/**
+ * Entry point, for attaching the chat store to a specific `Chat` instance
+ *
+ * @param megaChat
+ */
 ChatStore.prototype.attachToChat = function(megaChat) {
     var self = this;
 

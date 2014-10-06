@@ -23,7 +23,7 @@ module.exports = function(config) {
              "../fm.js",
              "../user.js",
              "../megakvstorage.js",
-             "../vendor/promise-6.0.0.js",
+             "../megapromise.js",
              "../vendor/db.js",
              "../megadb.js",
              "../tlvstore.js",

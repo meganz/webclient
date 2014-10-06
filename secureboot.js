@@ -550,7 +550,7 @@ else
 
         jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
 
-        jsl.push({f:'js/vendor/promise-6.0.0.js', n: 'promisepolyfill_js', j:1,w:5});
+        jsl.push({f:'js/megapromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
         jsl.push({f:'js/megadb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/megakvstorage.js', n: 'megakvstorage_js', j:1,w:5});

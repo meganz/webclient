@@ -523,10 +523,15 @@ else
 		jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
 		jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
 		jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
+		jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1});
 		jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 		jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+		if (is_extension)
+		{
+			jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
+		}
 		/* better download */
 		jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});

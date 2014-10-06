@@ -57,6 +57,9 @@ var EOVERQUOTA = -17;
 var ETEMPUNAVAIL = -18;
 var ETOOMANYCONNECTIONS = -19;
 
+// custom errors
+var ETOOERR = -400;
+
 function benchmark()
 {
 	var a = Array(1048577).join('a');
@@ -1796,20 +1799,65 @@ function is_devnull(email)
 	return false;
 }
 
+function is_rawimage(name, ext)
+{
+	ext = ext || (''+name).split('.').pop().toUpperCase();
+	
+	return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
+}
 function is_image(name)
 {
-	if (!name) return false;
-	var p;
-	
-	if ((p = name.lastIndexOf('.')) >= 0)
+	if (name)
 	{
-		name = name.substr(p+1);
+		var ext = (''+name).split('.').pop().toUpperCase();
 		
-		if (name.length == 3 && "jpg.png.gif.bmp".indexOf(name.toLowerCase()) >= 0) return true;
+		return is_image.def[ext] || is_rawimage(null, ext);
 	}
 
 	return false;
 }
+is_image.def = {
+	'JPG'  : 1,
+	'JPEG' : 1,
+	'GIF'  : 1,
+	'BMP'  : 1,
+	'PNG'  : 1
+};
+is_image.raw = {
+// http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
+// let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
+//   if(tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
+//     raw[tr.childNodes[0].textContent] = tr.childNodes[2].textContent;
+	"3FR":"Hasselblad RAW (TIFF-based)",
+	"ARW":"Sony Alpha RAW (TIFF-based)",
+	"CR2":"Canon RAW 2 (TIFF-based)",
+	"CRW":"Canon RAW Camera Image File Format (CRW spec.)",
+	"CIFF":"Canon RAW Camera Image File Format (CRW spec.)",
+	"CS1":"Sinar CaptureShop 1-shot RAW (PSD-based)",
+	"DCR":"Kodak Digital Camera RAW (TIFF-based)",
+	"DNG":"Digital Negative (TIFF-based)",
+	"ERF":"Epson RAW Format (TIFF-based)",
+	"IIQ":"Phase One Intelligent Image Quality RAW (TIFF-based)",
+	"K25":"Kodak DC25 RAW (TIFF-based)",
+	"KDC":"Kodak Digital Camera RAW (TIFF-based)",
+	"MEF":"Mamiya (RAW) Electronic Format (TIFF-based)",
+	"MOS":"Leaf Camera RAW File",
+	"MRW":"Minolta RAW",
+	"NEF":"Nikon (RAW) Electronic Format (TIFF-based)",
+	"NRW":"Nikon RAW (2) (TIFF-based)",
+	"ORF":"Olympus RAW Format (TIFF-based)",
+	"PEF":"Pentax (RAW) Electronic Format (TIFF-based)",
+	"RAF":"FujiFilm RAW Format",
+	"RAW":"Panasonic RAW (TIFF-based)",
+	"RW2":"Panasonic RAW 2 (TIFF-based)",
+	"RWL":"Leica RAW (TIFF-based)",
+	"SR2":"Sony RAW 2 (TIFF-based)",
+	"SRF":"Sony RAW Format (TIFF-based)",
+	"SRW":"Samsung RAW format (TIFF-based)",
+	"TIF":"Tagged Image File Format",
+	"TIFF":"Tagged Image File Format",
+	"X3F":"Sigma/Foveon RAW"
+};
 
 var storedattr = {};
 var faxhrs = [];
@@ -1825,23 +1873,53 @@ function api_storefileattr(id,type,key,data,ctx)
 
 		if (key) data = asmCrypto.AES_CBC.encrypt( data, a32_to_ab(key), false );
 
-		var ctx = { callback : api_fareq, id : id, type : type, data : data };
+		var ctx = { callback : api_fareq, id : id, type : type, data : data, startTime : Date.now() };
 	}
 
 	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
 }
 
+function api_faretry(ctx, error, host)
+{
+	if (!ctx.p)
+	{
+		if (!ctx.fastrgri) ctx.fastrgri = 400;
+
+		if (ctx.fastrgri < 7601)
+		{
+			if (d) console.log("Attribute storage failed (" + error + "), retrying...", ctx.fastrgri);
+
+			return setTimeout(function()
+			{
+				api_storefileattr(null,null,null,null,ctx);
+
+			}, ctx.fastrgri += 800);
+		}
+	}
+
+	var msg = "File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")";
+
+	if (d) console.error(msg);
+	else onerror(msg, '', -1);
+}
+
 function api_fareq(res,ctx,xhr)
 {
+	var error = typeof res === 'number' && res || '';
+
 	if (d && ctx.startTime) console.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
 
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		window.onerror('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s','',-1);
+		window.onerror('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error,'',-1);
 	}
 
-	if (typeof res == 'object' && res.p)
+	if ( error )
+	{
+		api_faretry( ctx, error, hostname(xhr.q && xhr.q.url));
+	}
+	else if (typeof res == 'object' && res.p)
 	{
 		var data;			
 		var slot, i, t;
@@ -1935,6 +2013,10 @@ function api_fareq(res,ctx,xhr)
 							this.ctx.errfa(id,1);
 						}
 					}
+					else
+					{
+						api_faretry(this.ctx, ETOOERR, this.fa_host);
+					}
 				}
 
 				if (this.fart) clearTimeout(this.fart);
@@ -1945,7 +2027,12 @@ function api_fareq(res,ctx,xhr)
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 				if (ctx.errfa) ctx.errfa(id,1);
-				else console.error('api_fareq', id, this);
+				else
+				{
+					console.error('api_fareq', id, this);
+					
+					api_faretry(this.ctx, ETOOERR, this.fa_host);
+				}
 			}
 
 			faxhrs[slot].onreadystatechange = function()
@@ -1968,10 +2055,9 @@ function api_fareq(res,ctx,xhr)
 
 					if (this.status == 200 && typeof this.response == 'object')
 					{
-						if (this.response == null) return;
-						if (this.response.byteLength === 0)
+						if (!this.response || this.response.byteLength === 0)
 						{
-							if (d) console.warn('api_fareq: got empty response...');
+							if (d) console.warn('api_fareq: got empty response...', this.response);
 
 							return this.faeot();
 						}
@@ -2039,26 +2125,11 @@ function api_fareq(res,ctx,xhr)
 						}
 						else
 						{
-							if (!ctx.fastrgri) ctx.fastrgri = 400;
-
-							if (ctx.fastrgri < 7601)
-							{
-								if (d) console.log("Attribute storage failed (" + this.status + "), retrying...", ctx.fastrgri);
-
-								setTimeout(function()
-								{
-									api_storefileattr(null,null,null,null,ctx);
-
-								}, ctx.fastrgri += 800);
-							}
-							else
-							{
-								if (d) console.log("Attribute storage failed (" + this.status + ")");
-							}
+							api_faretry(ctx, this.status, this.fa_host);
 						}
 					}
 				}
-			}
+			};
 
 			if (ctx.p)
 			{

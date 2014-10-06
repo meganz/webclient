@@ -47,10 +47,9 @@ function ul_completepending2(res,ctx)
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
+	else Later(resetUploadDownload);
 	if (ctx.file.mFiU) ctx.file.mFiU.destroy();
 	else oDestroy(ctx.file);
-	oDestroy(ctx);
-	Later(resetUploadDownload);
 }
 
 function ul_deduplicate(File, identical) {
@@ -376,9 +375,10 @@ function ul_upload(File) {
 		ulQueue.pushFirst(new ChunkUpload(file, 0,  0));
 	}
 
-	if (is_image(file.name)) {
+	var isi = have_ab && is_image(file.name);
+	if (isi) {
 		file.faid = ++ul_faid;
-		if (have_ab) createthumbnail(file, file.ul_aes, ul_faid);
+		createthumbnail(file, file.ul_aes, ul_faid, null, null, { raw : isi != 1 && isi });
 	}
 
 	onUploadStart(file);
@@ -436,7 +436,7 @@ function ChunkUpload(file, start, end)
 	this.gid   = file.mFiU.gid;
 	this.xid   = this.gid + '_' + start + '-' + end;
 	this[this.gid] = !0;
-	if (d) console.log('Creating ' + this);
+	// if (d) console.log('Creating ' + this);
 }
 
 ChunkUpload.prototype.toString = function() {
@@ -444,7 +444,7 @@ ChunkUpload.prototype.toString = function() {
 };
 
 ChunkUpload.prototype.destroy = function() {
-	if (d) console.log('Destroying ' + this);
+	// if (d) console.log('Destroying ' + this);
 	this.abort();
 	oDestroy(this);
 };

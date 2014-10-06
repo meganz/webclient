@@ -5260,12 +5260,18 @@ table {
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
 	background-position: -14px -7535px;
 }
-.rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.shared-folder {
+.rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-position: -7px -1974px;
 }
-.focused .rename-input-bl .transfer-filtype-icon.folder, .focused .rename-input-bl .transfer-filtype-icon.shared-folder {
+.focused .rename-input-bl .transfer-filtype-icon.folder {
 	background-position: -7px -2014px;
+}
+.rename-input-bl .transfer-filtype-icon.folder-shared {
+	background-position: -7px -3214px;
+}
+.focused .rename-input-bl .transfer-filtype-icon.folder-shared {
+	background-position: -7px -3254px;
 }
 .rubbish-bin .transfer-filtype-icon.folder, .rubbish-bin .search-path-icon-span.folder {
 	background-position: -14px -7595px;

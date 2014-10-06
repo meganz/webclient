@@ -332,7 +332,7 @@ function ul_upload(File) {
 	if (file.repair) {
 		var ul_key = file.repair;
 		file.ul_key = [ul_key[0]^ul_key[4],ul_key[1]^ul_key[5],ul_key[2]^ul_key[6],ul_key[3]^ul_key[7],ul_key[4],ul_key[5]]
-	} else {
+	} else if (!file.ul_key) {
 		file.ul_key = Array(6);
 		// generate ul_key and nonce
 		for (i = 6; i--; ) file.ul_key[i] = rand(0x100000000);
@@ -379,7 +379,7 @@ function ul_upload(File) {
 		ulQueue.pushFirst(new ChunkUpload(file, 0,  0));
 	}
 
-	var isi = have_ab && is_image(file.name);
+	var isi = have_ab && !file.faid && is_image(file.name);
 	if (isi) {
 		file.faid = ++ul_faid;
 		createthumbnail(file, file.ul_aes, ul_faid, null, null, { raw : isi != 1 && isi });
@@ -721,6 +721,8 @@ FileUpload.prototype.run = function(done) {
 	};
 
 	try {
+		if (file.hash && file.ts) throw "The fingerprint exists already.";
+
 		fingerprint(file, function(hash, ts) {
 			file.hash = hash;
 			file.ts   = ts;

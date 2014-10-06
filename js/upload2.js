@@ -368,9 +368,13 @@ function ul_upload(File) {
 		if (file.size-pp > 0) {
 			tasks[pp] = new ChunkUpload(file, pp, file.size-pp)
 		}
-		$.each(tasks, function(i, task) {
-			ulQueue.pushFirst(task);
+
+		// if (d) console.log('ulTasks', tasks);
+		Object.keys(tasks).reverse().forEach(function(s)
+		{
+			ulQueue.pushFirst(tasks[s]);
 		});
+
 	} else {
 		ulQueue.pushFirst(new ChunkUpload(file, 0,  0));
 	}

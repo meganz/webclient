@@ -375,6 +375,7 @@ function tpDragCursor() {
 
 function initUI()
 {
+	$('.fm-dialog-overlay').rebind('click', closeDialog);
 	if (!folderlink)
 	{
 		$('.fm-tree-header.cloud-drive-item').text(l[164]);
@@ -6879,14 +6880,13 @@ function propertiesDialog(close)
 			p.t6 = l[897] + ':';
 			p.t7 = fm_contains(sfilecnt,sfoldercnt);
 			if (pd.attr('class').indexOf('shared')>-1) { 
-			  // TODO: Contacts number implementation 
-			  // $('.properties-elements-counter span').text('number of contacts');
 			  var shares, susers, total = 0
 		      shares = Object.keys(n.shares || {}).length
 			  p.t8 = 'Shared with:';
 		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';	
 			  p.t10 = l[896];
 		      p.t11 = htmlentities(time2date(n.ts));
+			  $('.properties-elements-counter span').text(shares);
 			  susers = pd.find('.properties-body .properties-context-menu')
 				  .empty()
 				  .append('<div class="properties-context-arrow"></div>')

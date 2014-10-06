@@ -819,6 +819,15 @@ function dcTracer(ctr) {
 	}
 }
 
+function str_mtrunc(str, len)
+{
+	if (!len) len = 35;
+	if (len > (str||'').length) return str;
+	var p1 = Math.ceil(0.60 * len),
+	p2 = Math.ceil(0.30 * len);
+	return str.substr(0, p1) + '\u2026' + str.substr(-p2);
+}
+
 function setupTransferAnalysis()
 {
 	if ($.mTransferAnalysis) return;

@@ -271,10 +271,10 @@ var UploadManager =
 		{
 			var q = file.__umRetryTimer || {};
 			delete q[tid];
-			
+
 			if (reason.indexOf('IO failed') == -1) tid = --file.__umRetries;
 
-			if (tid < 66)
+			if (tid < 34)
 			{
 				var newTask = new ChunkUpload(file, start, end);
 				ulQueue.pushFirst(newTask);
@@ -556,7 +556,7 @@ ChunkUpload.prototype.on_ready = function(args, xhr) {
 			if (response != EKEY) return this.on_error(EKEY, null, "EKEY error")
 		}
 	}
-	
+
 	this.srverr = xhr.status + 1;
 
 	if (d) console.log(this+" bad response from server",
@@ -726,8 +726,21 @@ FileUpload.prototype.run = function(done) {
 			else ul_start(self);
 		});
 	} catch (e) {
-		DEBUG(file.name, 'FINGERPRINT ERROR', e.message || e);
-		ul_start(this);
+		if (d) console.error('FINGERPRINT ERROR', file.name, e.message || e);
+
+		if (!is_extension && e.result === 0x80520015 && file.size === 0)
+		{
+			var msg =
+				"Sorry, upload failed. "+
+				"If you were trying to upload a folder, "+
+				"please note you will need to use our extension for this to work.";
+
+			Later(firefoxDialog);
+			msgDialog('warninga', str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
+			UploadManager.abort(file);
+			this.destroy();
+		}
+		else ul_start(this);
 	}
 };
 

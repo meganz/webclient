@@ -831,7 +831,25 @@ function ul_finalize(file) {
 }
 
 function ul_filereader(fs, file) {
-	return new MegaQueue(function(task, done) {
+	var handler;
+	if (is_chrome_firefox && "u8" in file)
+	{
+		if (d) console.log('Using Firefox ulReader');
+
+		handler = function ulReader(task, done)
+		{
+			var error = null;
+
+			try {
+				task.bytes = file.u8( task.start, task.end );
+			} catch(e) {
+				error = e;
+			}
+			Soon(function() { done(error) })
+		};
+	}
+	if (!handler) handler = function(task, done)
+	{
 		var end = task.start+task.end, blob;
 
 		fs.pos = task.start;
@@ -878,7 +896,8 @@ function ul_filereader(fs, file) {
 			done(e);
 			done = null;
 		}
-	}, 1);
+	};
+	return new MegaQueue( handler, 1);
 }
 
 function worker_uploader(task, done) {

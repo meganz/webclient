@@ -473,7 +473,7 @@ function MegaData ()
 		else if (id && id.substr(0,13) == 'notifications') notificationsUI();
 		else if (id && id.substr(0,7) == 'search/') this.search=true;
 		else if (id && id.substr(0,5) == 'chat/') this.chat=true;
-		else if (!M.d[id]) id = this.RootID;
+		else if (!id || !M.d[id]) id = this.RootID;
 		this.currentdirid = id;
 
 		if (id == this.RootID) $('.fm-connector-first').removeClass('active');

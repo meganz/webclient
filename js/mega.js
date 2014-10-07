@@ -1944,23 +1944,25 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr, reason, xhr, hostname)
+function onUploadError(ul, errorstr, reason, xhr)
 {
+	var hn = hostname(ul.posturl);
+
 	if (!d && (!xhr || xhr.readyState < 2 || xhr.status))
 	{
 		var details = [
 			browserdetails(ua).name,
-			reason,
+			'' + reason,
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
-			hostname
+			hn
 		];
 		window.onerror('onUploadError :: ' + errorstr
 			+ ' [' + details.join("] [") + ']', '', -1);
 	}
 
-	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
+	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
 
-	$('.transfer-table #ul_' + fileid + ' td:eq(3)')
+	$('.transfer-table #ul_' + ul.id + ' td:eq(3)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 		.parents('tr').data({'failed' : NOW()});
 }

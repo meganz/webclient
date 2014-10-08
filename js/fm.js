@@ -622,7 +622,7 @@ function initUI()
 			}
 			if (c && c.indexOf('dropdown') > -1 && (c.indexOf('download-item') > -1 || c.indexOf('more-item') > -1) && c.indexOf('active') > -1) return false;
 		}
-		
+
 		$('.nw-sorting-menu').addClass('hidden')
 		$('.nw-tree-panel-arrows').removeClass('active')
 		$('.context-menu-item.dropdown').removeClass('active');
@@ -704,7 +704,6 @@ function initUI()
 	{
 		if (!localStorage.contextmenu) e.preventDefault();
 	});
-	
 
 	$('.nw-fm-left-icon').unbind('click');
 	$('.nw-fm-left-icon').bind('click',function()
@@ -1061,14 +1060,16 @@ function getContactsEMails()
 			if (n.c && n.c !== 2 && (n.m || n.name)) contacts.push({id: n.m, name: n.name});
 		}
 	}
-	
+
 	return contacts;
 }
 
 function addContactUI()
 {
+	if (!u_type) return; // not for ephemeral
+
 	$.shareTokens = [];
-	
+
 	iconSize = function(par)
 	{
 		if (par)// full size icon, popup at bottom of Add contact button
@@ -1095,10 +1096,10 @@ function addContactUI()
 		{
 			$d.removeClass('error');
 		}, 3000);
-		
+
 		if (u) $.addUserFail.push(u);
 	}
-	
+
 	function focusOnInput()
 	{
 		var $tokenInput = $('#token-input-');
@@ -1141,12 +1142,12 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
-				
+
 				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
 				var $b = $('.add-user-popup .multiple-input');
 				var h1 = $a.outerHeight(true);// margin included
 				var h2 = $b.height();
-				
+
 				if (5 <= h2/h1 && h2/h1 < 6)
 				{
 					$b.jScrollPane({
@@ -1183,7 +1184,7 @@ function addContactUI()
 			{
 				$('.add-user-popup-button.add').removeClass('disabled');
 				$('.add-user-popup .nw-fm-dialog-title').text('Add Contacts');
-				
+
 				var $a = $('.add-user-popup .share-added-contact.token-input-token-mega');
 				var $b = $('.add-user-popup .multiple-input');
 				var $c = $('.add-user-popup .multiple-input .jspPane')[0];
@@ -1351,7 +1352,7 @@ function addContactUI()
 			$('.add-user-popup .import-contacts-dialog').fadeOut(200);
 			$('.imported-contacts-notification').fadeOut(200);
 		}
-		
+
 		e.stopPropagation();
 		e.preventDefault();
 	});
@@ -1405,7 +1406,7 @@ function fmremove()
 		// TODO: Need translation "delete N (users)"
 		if(c>1) t = c + ' users';
 		else t = '<strong>'+ M.d[$.selected[0]].name + '</strong>';
-		
+
 		msgDialog('delete-contact',l[1001],l[1002].replace('[X]',t),false,function(e)
 		{
 			if (e)
@@ -1435,14 +1436,13 @@ function fmremove()
 			$('#msgDialog .fm-del-contact-avatar span').empty()
 		} else {
 			var user = M.d[$.selected[0]];
-			var avatar = user.name.substr(0,2), 
+			var avatar = user.name.substr(0,2),
 				av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 			if (avatars[user.h]) avatar = '<img src="' + avatars[user.h].url + '">';
 			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
 			$('#msgDialog .fm-del-contact-avatar span').html(avatar)
 		}
-			
-		
+
 	}
 	else if (RootbyId($.selected[0]) == M.RubbishID)
 	{
@@ -5342,7 +5342,7 @@ function fillShareDialogWithContent()
 {
 	var sel = $.selected[0];
 	$.sharedTokens = [];
-			
+
 	for (var i in M.d[sel].shares)// list users that are already use item
 	{
 		if (M.u[i])
@@ -5368,9 +5368,9 @@ function fillShareDialogWithContent()
 					perm = ['read-only', l[55]];
 					break;
 			}
-			
+
 			$.sharedTokens.push(user.m);// add contact
-			
+
 			var html = addShareDialogContactToContent('', i, av_color, av, name, perm[0], perm[1]);
 
 			$('.share-dialog .share-dialog-contacts').append(html);
@@ -5435,6 +5435,8 @@ checkMultiInputPermission = function($this)
 
 function initShareDialog()
 {
+	if (!u_type) return; // not for ephemeral
+
 	$.shareTokens = [];
 	function errorMsg(msg)
 	{
@@ -5450,7 +5452,7 @@ function initShareDialog()
 
 	// Plugin configuration
 	var contacts = getContactsEMails();
-	
+
 	$('.share-multiple-input').tokenInput(contacts, {
 		theme:				"mega",
 //		hintText:			"Type in a contact email",
@@ -5475,10 +5477,10 @@ function initShareDialog()
 		onAdd: function()
 		{
 			$('.dialog-share-button').removeClass('disabled');
-			
+
 			var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
 			var $b = $('.share-dialog .multiple-input');
-			var h1 = $a.outerHeight(true);// margin 
+			var h1 = $a.outerHeight(true);// margin
 			var h2 = $b.height();
 
 			if (5 <= h2/h1 && h2/h1 < 6)
@@ -5508,7 +5510,7 @@ function initShareDialog()
 			else
 			{
 				$btn.removeClass('disabled');
-				
+
 				var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
 				var $b = $('.share-dialog .multiple-input');
 				var $c = $('.share-dialog .multiple-input .jspPane')[0];
@@ -5562,7 +5564,7 @@ function initShareDialog()
 //		av = name.charAt(0) + name.charAt(1);
 
 		$.sharedTokens.push(item);
-		
+
 		var html = addShareDialogContactToContent('email', id, av_color, '', name, perm[0], perm[1]);
 
 		$('.share-dialog .share-dialog-contacts').append(html);
@@ -5642,7 +5644,7 @@ function initShareDialog()
 					{
 						perm = 0;
 					}
-					
+
 					if (!s || !s[id] || s[id].r !== perm)
 						t.push({u: id, r: perm});
 				});
@@ -5697,7 +5699,7 @@ function initShareDialog()
 			$('.share-dialog .import-contacts-dialog').fadeOut(200);
 			$('.imported-contacts-notification').fadeOut(200);
 		}
-		
+
 		e.stopPropagation();
 	});
 
@@ -5711,9 +5713,8 @@ function initShareDialog()
 		$('.share-dialog .import-contacts-info-txt').fadeOut(200);
 	});
 
-
 	$(document).off('click', '.share-dialog-remove-button');
-	$(document).on('click', '.share-dialog-remove-button', function (e) 
+	$(document).on('click', '.share-dialog-remove-button', function (e)
 	{
 		var $this = $(this);
 
@@ -5726,7 +5727,7 @@ function initShareDialog()
 		if (id !== '')
 		{
 			M.delnodeShare(sel, id);
-			
+
 			api_req({
 				a:'s',
 				n:sel,
@@ -5737,12 +5738,12 @@ function initShareDialog()
 				ha:'',
 				i: requesti
 			});
-			
+
 			$.sharedTokens.splice($.sharedTokens.indexOf(M.u[id].m), 1);
 		}
 
 		shareDialogContentCheck();
-		
+
 		var num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
 		if (!num) $('.dialog-share-button').addClass('disabled');
 	});
@@ -5767,7 +5768,7 @@ function initShareDialog()
 			var y = $this.position().top - 1;
 			handlePermissionMenu($this, $m, x, y);
 		}
-		
+
 		e.stopProgagation();
 	});
 
@@ -5791,7 +5792,7 @@ function initShareDialog()
 			var y = $this.position().top - 9;
 			handlePermissionMenu($this, $m, x, y);
 		}
-		
+
 		e.stopProgagation();
 	});
 
@@ -5829,7 +5830,7 @@ function initShareDialog()
 
 		$('.permissions-icon.active').removeClass('active');
 		$('.share-dialog-permissions.active').removeClass('active');
-		
+
 		e.stopPropagation();
 	});
 }
@@ -5840,7 +5841,7 @@ function addImportedDataToSharedDialog(data, from)
 	{
 		$('.share-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
 	});
-	
+
 //	var perm, av_color, av, html;
 //	$.sharedTokens = [];
 //
@@ -5852,7 +5853,7 @@ function addImportedDataToSharedDialog(data, from)
 //		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
 //		// ToDo: Check here for name available, is exists add it
 //		av = val.charAt(0) + val.charAt(1);
-//		
+//
 //		$.sharedTokens.push(val);// in this case val represents e-mail
 //
 //		html = addShareDialogContactToContent(from, '', av_color, '', val, perm[0], perm[1]);
@@ -5870,7 +5871,7 @@ function addImportedDataToAddContactsDialog(data, from)
 	{
 		$('.add-user-popup .add-contact-multiple-input').tokenInput("add", {id: val, name: val});
 	});
-	
+
 	closeImportContactNotification('.add-user-popup');
 }
 
@@ -5885,7 +5886,7 @@ function clearScrollPanel(from)
 {
 	$(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
 	$(from + ' .multiple-input .jspPane').unwrap();
-	$(from + ' .multiple-input .jspPane:first-child').unwrap();	
+	$(from + ' .multiple-input .jspPane:first-child').unwrap();
 }
 
 function closeDialog()
@@ -5909,7 +5910,7 @@ function closeDialog()
 		$('.share-dialog-contact-bl').remove();
 		$('.import-contacts-service').removeClass('imported');
 		clearScrollPanel('.share-dialog');
-		
+
 		// share dialog permission menu
 		$('.permissions-menu').fadeOut(0);
 		$('.import-contacts-dialog').fadeOut(0);
@@ -6841,7 +6842,7 @@ function propertiesDialog(close)
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
 	pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
-	$('.properties-elements-counter span').text('');	
+	$('.properties-elements-counter span').text('');
 	$('.fm-dialog.properties-dialog .properties-body').unbind('click');
 	$('.fm-dialog.properties-dialog .properties-body').bind('click',function()
 	{
@@ -6878,11 +6879,11 @@ function propertiesDialog(close)
 			size+= n.s;
 		}
 	}
-	
+
 	var star = ''
 	if (n.fav) star = ' star';
 	pd.find('.file-status-icon').attr('class', 'file-status-icon ' + star)
-	
+
 	if (fileicon(n).indexOf('shared')>-1) pd.addClass('shared');
 	if (typeof n.r == "number")
 	{
@@ -6895,8 +6896,7 @@ function propertiesDialog(close)
 		}
 		pd.addClass('shared shared-with-me '  + zclass)
 	}
-	
-	
+
 	var p = {};
 	if ((filecnt + foldercnt) == 1)
 	{
@@ -6928,14 +6928,14 @@ function propertiesDialog(close)
 		p.t11 = '';
 		if (foldercnt)
 		{
-			
+
 			p.t6 = l[897] + ':';
 			p.t7 = fm_contains(sfilecnt,sfoldercnt);
-			if (pd.attr('class').indexOf('shared')>-1) { 
+			if (pd.attr('class').indexOf('shared')>-1) {
 			  var shares, susers, total = 0
 		      shares = Object.keys(n.shares || {}).length
 			  p.t8 = 'Shared with:';
-		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';	
+		      p.t9 = shares == 1 ? '1 contact' : shares  + ' contacts';
 			  p.t10 = l[896];
 		      p.t11 = htmlentities(time2date(n.ts));
 			  $('.properties-elements-counter span').text(shares);
@@ -6946,7 +6946,7 @@ function propertiesDialog(close)
 					if (M.u[u]) {
 						var u = M.u[u]
 						var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
-						if (++total <= 5) 
+						if (++total <= 5)
 							susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
 								+ '<div class="properties-contact-status"></div>'
 								+ '<span>' + htmlentities(u.name || u.m)  + '</span>'
@@ -6965,14 +6965,14 @@ function propertiesDialog(close)
 			  if (total == 0) p.hideContacts = true;
 
 			}
-			if (pd.attr('class').indexOf('shared-with-me')>-1) { 
-			  // TODO: Permissions and Owner implementation 
+			if (pd.attr('class').indexOf('shared-with-me')>-1) {
+			  // TODO: Permissions and Owner implementation
 			  p.t3 = 'Permissions:';
 			  p.t4 = 'Full access';
 			  p.t6 = 'Owner';
 			  p.t7 = 'Alex Brunskill';
 			  p.t8 = l[894] + ':';
-		      p.t9 = bytesToSize(size);	
+		      p.t9 = bytesToSize(size);
 			  p.t10 = l[897] +  ':';
 		      p.t11 = fm_contains(sfilecnt,sfoldercnt);
 			}
@@ -7010,8 +7010,8 @@ function propertiesDialog(close)
 	if (p.hideContacts) {
 		$('.properties-txt-pad .contact-list-icon').hide();
 	}
-	
-	if (pd.attr('class').indexOf('shared')>-1) { 
+
+	if (pd.attr('class').indexOf('shared')>-1) {
 		$('.contact-list-icon').unbind('click');
 		$('.contact-list-icon').bind('click', function() {
 			if ($(this).attr('class').indexOf('active')==-1) {
@@ -7033,7 +7033,7 @@ function propertiesDialog(close)
 			$('.properties-context-menu').fadeOut(200);
 		});
 	}
-	
+
 	if ((filecnt + foldercnt) == 1)  $('.properties-file-icon').html('<div class="'+ fileicon(n) + '"></div>');
 	else
 	{
@@ -7575,7 +7575,7 @@ function fm_resize_handler() {
             $('#topmenu').outerHeight() + $('.transfer-panel').outerHeight()
         )
     );
-	
+
     $('.fm-main.default, .fm-main.notifications').css({
        'height': right_pane_height  + "px"
     });
@@ -7754,7 +7754,7 @@ function userAvatar(userid)
 	var user = M.u[userid];
 	if (!user || !user.u) return;
 
-	var avatar = user.name.substr(0,2), 
+	var avatar = user.name.substr(0,2),
 		av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
 
 	if (avatars[userid]) avatar = '<img src="' + avatars[userid].url + '">';
@@ -7800,7 +7800,7 @@ function fingerprintDialog(userid)
 			});
 		});
 
-		var target= $('.fingerprint-bott-txt .fingerprint-txt') 
+		var target= $('.fingerprint-bott-txt .fingerprint-txt')
 		fprint.forEach(function(v) {
 			$('<span>').text(v).appendTo(target);
 		});

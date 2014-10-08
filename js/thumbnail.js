@@ -1,16 +1,30 @@
 
 
-function createnodethumbnail(node,aes,id,imagedata,onPreviewRetry)
+function createnodethumbnail(node,aes,id,imagedata,opt)
 {
 	storedattr[id] = {};
 	storedattr[id] = { target : node };
-	createthumbnail(false,aes,id,imagedata,node,onPreviewRetry);
+	createthumbnail(false,aes,id,imagedata,node,opt);
 }
 
-function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
+function createthumbnail(file,aes,id,imagedata,node,opt)
 {
 	if (myURL)
 	{
+		var onPreviewRetry, isRawImage;
+		if (typeof opt === 'object')
+		{
+			isRawImage = opt.raw;
+			onPreviewRetry = opt.onPreviewRetry;
+
+			if (d && isRawImage) console.log('Processing RAW Image: ' + isRawImage);
+
+			ASSERT(!isRawImage || typeof dcraw !== 'undefined', 'DCRAW is unavailale.');
+		}
+		else onPreviewRetry = !!opt;
+
+		if (d) console.time('createthumbnail');
+
 		var img = new Image();
 		img.id = id;
 		img.aes = aes;
@@ -18,9 +32,27 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 		{
 			var t = new Date().getTime();
 			var n = M.d[node];
+			var fa = '' + (n && n.fa);
 
 			// thumbnail:
-			if (!n || !n.fa || n.fa.indexOf(':0*') < 0)
+			if (fa.indexOf(':0*') < 0)
+			{
+				var options = { width : 120, height : 120 };
+
+				if (d) console.time('smartcrop');
+				var crop = SmartCrop.crop(this,options).topCrop;
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext("2d");
+				canvas.width  = options.width;
+				canvas.height = options.height;
+				ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
+
+				var ab = dataURLToAB(canvas.toDataURL('image/jpeg',0.90));
+				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
+
+				if (d) console.timeEnd('smartcrop');
+			}
+			if (	0	&&fa.indexOf(':0*') < 0)
 			{
 				var canvas = document.createElement('canvas');
 				var sx=0;
@@ -52,7 +84,6 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				ctx.drawImage(this, sx, sy, x, y, 0, 0, 120, 120);
 
 				if (d) console.log('resizing time:', new Date().getTime()-t);
-				myURL.revokeObjectURL(this.src);
 				var dataURI = canvas.toDataURL('image/jpeg',0.85);
 
 				var ab = dataURLToAB(dataURI);
@@ -61,7 +92,7 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 			}
 
 			// preview image:
-			if (!n || !n.fa || n.fa.indexOf(':1*') < 0 || onPreviewRetry)
+			if (fa.indexOf(':1*') < 0 || onPreviewRetry)
 			{
 				var canvas2 = document.createElement('canvas');
 				var preview_x=this.width,preview_y=this.height;
@@ -86,11 +117,24 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 
 				// only store preview when the user is the file owner, and when it's not a retry (because then there is already a preview image, it's just unavailable:
 
-				if (!onPreviewRetry || !n || (n && n.u == u_handle)) api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+				if (!onPreviewRetry && (!n || n.u == u_handle) && fa.indexOf(':1*') < 0)
+				{
+					if (d) console.log('Storing preview...', n);
+					api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+				}
 
 				if (node) previewimg(node,ab2);
 
 				if (d) console.log('total time:', new Date().getTime()-t);
+			}
+
+			if (d) console.timeEnd('createthumbnail');
+		};
+		img.onerror = function (e)
+		{
+			if (d) {
+				console.error('createthumbnail error', e);
+				console.timeEnd('createthumbnail');
 			}
 		};
 		try
@@ -100,15 +144,76 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 				var ThumbFR = new FileReader();
 				ThumbFR.onload = function(e)
 				{
-					if (ThumbFR.ab) var thumbstr = ab_to_str(ThumbFR.result);
-					else var thumbstr = e.target.result;
-					img.exif = EXIF.getImageData(new BinaryFile(thumbstr));
-					if (file) var mpImg = new MegaPixImage(file);
-					else var mpImg = new MegaPixImage(thumbnailBlob);
-					var orientation = 1;
-					if (img.exif.Orientation) orientation = img.exif.Orientation;
-					mpImg.render(img, { maxWidth: 1000, maxHeight: 1000, quality: 0.8, orientation: orientation });
-				}
+					var u8 = new Uint8Array(ThumbFR.result), orientation;
+					if (isRawImage)
+					{
+						var FS = dcraw.FS, run = dcraw.run, thumbData;
+						var filename = file.name || (Math.random()*Date.now()).toString(36)+'.'+isRawImage;
+
+						try {
+							var cwd = '/MEGA-' + Date.now();
+							FS.mkdir(cwd);
+							FS.chdir(cwd);
+
+							if (d) console.time('dcraw-load');
+							var data = FS.createDataFile('.', filename, u8, true, false);
+							if (d) console.timeEnd('dcraw-load');
+
+							if (d) console.time('dcraw-proc');
+							if (d) run(['-i', '-v', filename]);
+							run(['-e', filename]);
+							if (d) console.timeEnd('dcraw-proc');
+						} catch(e) {
+							if (d) console.error('dcraw error', e);
+						} finally {
+							try {
+								FS.unlink(filename);
+							} catch(e) {
+								if (e.code !== 'ENOENT') console.error('FS.unlink error', e);
+							}
+						}
+
+						var thumb = filename.substr(0,filename.lastIndexOf('.'));
+						try {
+							thumbData = FS.readFile(thumb + '.thumb.jpg');
+						} catch(e) {
+							if (e.code !== 'ENOENT') console.error('FS.readFile error', e);
+
+							try {
+								var ppm = FS.readFile(thumb + '.thumb.ppm');
+								thumbData = ppmtojpeg(ppm);
+							} catch(e) {
+								if (e.code !== 'ENOENT') console.error('FS.readFile error', e);
+							}
+						}
+
+						if (thumbData) file = new Blob([thumbData], {type:'image/jpg'});
+
+						try {
+							FS.readdir('.').map(function(n) { n != '.' && n != '..' && FS.unlink(n)});
+							FS.readdir('/tmp').map(function(n) { n != '.' && n != '..' && FS.unlink('/tmp/'+n)});
+							FS.chdir('..');
+							FS.rmdir(cwd);
+						} catch(e) {
+							if (d) console.error('dcraw error', e);
+						}
+
+						switch(isRawImage)
+						{
+							// TODO: add other suitable formats
+							case 'PEF': orientation = +u8[115]; break;
+						}
+					}
+					if (undefined == orientation || orientation < 1 || orientation > 8) {
+						if (d) console.time('exif');
+						var exif = EXIF.getImageData(new BinaryFile(u8), true);
+						orientation = +exif.Orientation || 1;
+						if (d) console.timeEnd('exif');
+						if (d) console.debug('EXIF', exif, orientation);
+					}
+					var mpImg = new MegaPixImage(file);
+					mpImg.render(img, { maxWidth: 1000, maxHeight: 1000, quality: 0.96, orientation: orientation });
+				};
 				if (file)
 				{
 					if(is_chrome_firefox && "blob" in file)
@@ -118,39 +223,60 @@ function createthumbnail(file,aes,id,imagedata,node,onPreviewRetry)
 							return OS.File.read(file.mozFile.path).then(function(u8)
 							{
 								file = new Blob([u8],{type:file.type});
-								ThumbFR.onload({target:{result:mozAB2S(u8)}});
-							}).then(null,function(e)
-							{
-								console.error(e);
-								if (!(file instanceof Blob)) file=file.blob();
-								ThumbFR.readAsBinaryString(file);
+								ThumbFR.readAsArrayBuffer(file);
 							});
 						} catch(e) {}
 
 						file = file.blob();
 					}
 
-					if (ThumbFR.readAsBinaryString) ThumbFR.readAsBinaryString(file);
-					else
-					{
-						ThumbFR.ab=1;
-						ThumbFR.readAsArrayBuffer(file);
-					}
 				}
 				else
 				{
-					var thumbnailBlob = new Blob([new Uint8Array(imagedata)],{ type: 'image/jpeg' });
-					if (ThumbFR.readAsBinaryString) ThumbFR.readAsBinaryString(thumbnailBlob);
-					else
-					{
-						ThumbFR.ab=1;
-						ThumbFR.readAsArrayBuffer(thumbnailBlob);
-					}
+					file = new Blob([new Uint8Array(imagedata)],{ type: 'image/jpeg' });
 				}
+				ThumbFR.readAsArrayBuffer(file);
 			}
 		}
 		catch(e) { console.log('thumbnail error', e) }
 	}
+}
+
+function ppmtojpeg(ppm)
+{
+	var jpeg;
+	if (ppm[0] == 80 && ppm[1] == 54) // P6
+	{
+		var dim = '', i = 2,j;
+		if (d) console.time('ppmtojpeg');
+		while (ppm[++i] != 10) dim += String.fromCharCode(ppm[i]);
+		dim = dim.split(' ').map(Number);
+
+		if (ppm[i+1] == 50 && ppm[i+2] == 53 && ppm[i+3] == 53) // 255
+		{
+			ppm = ppm.subarray(i+5);
+			var canvas = document.createElement('canvas');
+			canvas.width = dim[0];
+			canvas.height = dim[1];
+			var ctx = canvas.getContext('2d');
+			var imageData = ctx.createImageData(canvas.width, canvas.height);
+			var ppmLen = ppm.byteLength, iLen = canvas.width*canvas.height*4;
+			i = 0;
+			j = 0;
+			while (i < ppmLen && j < iLen) {
+				imageData.data[j]   = ppm[i];   // R
+				imageData.data[j+1] = ppm[i+1]; // G
+				imageData.data[j+2] = ppm[i+2]; // B
+				imageData.data[j+3] = 0xBE;     // A
+				j += 4;
+				i += 3;
+			}
+			ctx.putImageData(imageData, 0, 0);
+			jpeg = dataURLToAB(canvas.toDataURL('image/png',0.90));
+		}
+		if (d) console.timeEnd('ppmtojpeg');
+	}
+	return jpeg;
 }
 
 function dataURLToAB(dataURL)

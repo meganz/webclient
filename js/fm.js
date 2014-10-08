@@ -655,13 +655,21 @@ function initUI()
 			if ((n && n.p && M.d[n.p]) || (n && n.p == 'contacts')) M.openFolder(n.p);
 		}
 	});
-
 	$('.fm-right-header.fm').removeClass('hidden');
-	if (folderlink)
-	{
-		// todo: enable folder link in header
-	}
+	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text((M.d[M.RootID]||{}).name||"\u30C4");
 	else folderlink=0;
+	$('.add-user-popup-button').unbind('click');
+	$('.add-user-popup-button').bind('click',function(e)
+	{
+		if (u_type === 0) ephemeralDialog(l[997]);
+		else doAddContact(e);
+	});
+	$('.add-user-popup input').unbind('keypress');
+	$('.add-user-popup input').bind('keypress',function(e)
+	{
+		if (e.which == 13) doAddContact(e);
+	});
+	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
 		$.termsAgree = function()
@@ -1009,7 +1017,6 @@ function sharedUInode(h,s)
 	$('.grid-table.fm #'+ h + ' .transfer-filtype-icon').addClass(fileicon({t:1,shares:s}));
 	$('.file-block#'+ h + ' .block-view-file-type').addClass(fileicon({t:1,shares:s}));
 }
-
 function addnotification(n)
 {
 	if (typeof notifications == 'undefined') return false;
@@ -1463,6 +1470,40 @@ function fmremove()
 		}
 	}
 }
+
+function fmremdupes(test)
+{
+  var hs = {}, i, f = [];
+  var cRootID = RootbyId(M.currentdirid);
+  loadingDialog.show();
+  for(i in M.d)
+    {
+      var n = M.d[i];
+      if(n && n.hash && n.h && RootbyId(n.h) === cRootID)
+        {
+          if(!hs[n.hash]) hs[n.hash] = [];
+          hs[n.hash].push(n.h);
+        }
+    }
+  for(i in hs)
+    {
+      var h = hs[i];
+      while(h.length > 1) f.push(h.pop());
+    }
+  for(i in f)
+    {
+      console.debug('Duplicate node: ' + f[i] + ' at ~/' + M.getPath(f[i]).reverse().map(function(n) { return M.d[n].name || '' }).filter(String).join("/"));
+    }
+  loadingDialog.hide();
+  console.log('Found ' + f.length + ' duplicated files.');
+  if(!test && f.length)
+    {
+      $.selected = f;
+      fmremove();
+    }
+  return f.length;
+}
+
 function initContextUI()
 {
 	var c = '.context-menu-item';
@@ -1782,7 +1823,7 @@ function initContextUI()
 
 		toabort = Object.keys(toabort);
 		DownloadManager.abort(toabort);
-		UploadManager.abort(toabort);
+		  UploadManager.abort(toabort);
 
 		Soon(function() {
 			// XXX: better way to stretch the scrollbar?
@@ -7175,6 +7216,8 @@ function slideshow_prev()
 
 function slideshow(id,close)
 {
+	if (d) console.log('slideshow', id, close, slideshowid);
+
 	if (close)
 	{
 		slideshowid=false;
@@ -7288,7 +7331,7 @@ function fetchsrc(id)
 		delete pfails[id];
 		M.addDownload([id],false,err? -1:true);
 	}
-	eot.timeout = 5100;
+	eot.timeout = 12000;
 
 	if (pfails[id])
 	{ // for slideshow_next/prev
@@ -7303,6 +7346,12 @@ function fetchsrc(id)
 	api_getfileattr(treq,1,function(ctx,id,uint8arr)
 	{
 		previewimg(id,uint8arr);
+		if (!n.fa || n.fa.indexOf(':0*') < 0)
+		{
+			if (d) console.log('Thumbnail found missing on preview, creating...', id, n);
+			var aes = new sjcl.cipher.aes([n.key[0],n.key[1],n.key[2],n.key[3]]);
+			createthumbnail(false, aes, id, uint8arr);
+		}
 		if (id == slideshowid) fetchnext();
 	},eot);
 }

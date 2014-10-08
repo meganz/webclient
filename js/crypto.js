@@ -982,7 +982,7 @@ function api_proc(q)
 			{
 				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
 
-				this.q.rawreq = false;	
+				this.q.rawreq = false;
 				this.q.backoff = 0;			// request succeeded - reset backoff timer
 				this.q.cmds[this.q.i] = [];
 				this.q.ctxs[this.q.i] = [];
@@ -1823,15 +1823,21 @@ function is_devnull(email)
 function is_rawimage(name, ext)
 {
 	ext = ext || (''+name).split('.').pop().toUpperCase();
-	
+
 	return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
 }
 function is_image(name)
 {
 	if (name)
 	{
+		if (typeof name === 'object')
+		{
+			if (name.fa && ~name.fa.indexOf(':1*')) return true;
+
+			name = name.name;
+		}
 		var ext = (''+name).split('.').pop().toUpperCase();
-		
+
 		return is_image.def[ext] || is_rawimage(null, ext);
 	}
 
@@ -1943,7 +1949,7 @@ function api_fareq(res,ctx,xhr)
 	}
 	else if (typeof res == 'object' && res.p)
 	{
-		var data;			
+		var data;
 		var slot, i, t;
 		var p, pp = [res.p], m;
 
@@ -1967,7 +1973,7 @@ function api_fareq(res,ctx,xhr)
 			faxhrs[slot].ctx = ctx;
 			faxhrs[slot].fa_slot = slot;
 
-			if (localStorage.d) console.log("Using file attribute channel " + slot);
+			if (d) console.log("Using file attribute channel " + slot);
 
 			if (ctx.errfa && ctx.errfa.timeout)
 			{
@@ -1987,23 +1993,6 @@ function api_fareq(res,ctx,xhr)
 				{ // Huh? Gecko..
 					faxhrs[slot].onprogress = function() {};
 				}
-
-				faxhrs[slot].timeout = 180000;
-				faxhrs[slot].ontimeout = function(e)
-				{
-					if (d) console.error('api_fareq timeout', e);
-
-					if (!faxhrfail[this.fa_host])
-					{
-						if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
-						{
-							faxhrfail[this.fa_host] = failtime = 1;
-							api_reportfailure(this.fa_host, function() {});
-
-							if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
-						}
-					}
-				};
 			}
 
 			faxhrs[slot].faeot = function()
@@ -2052,7 +2041,7 @@ function api_fareq(res,ctx,xhr)
 				else
 				{
 					console.error('api_fareq', id, this);
-					
+
 					api_faretry(this.ctx, ETOOERR, this.fa_host);
 				}
 			}
@@ -2122,7 +2111,7 @@ function api_fareq(res,ctx,xhr)
 						}
 						else
 						{
-							if (localStorage.d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -2130,7 +2119,7 @@ function api_fareq(res,ctx,xhr)
 
 							if (storedattr[ctx.id].target)
 							{
-								if (localStorage.d) console.log("Attaching to existing file");
+								if (d) console.log("Attaching to existing file");
 
 								api_attachfileattr(storedattr[ctx.id].target,ctx.id);
 							}
@@ -2142,7 +2131,7 @@ function api_fareq(res,ctx,xhr)
 					{
 						if (ctx.p)
 						{
-							if (localStorage.d) console.log("File attribute retrieval failed (" + this.status + ")");
+							if (d) console.log("File attribute retrieval failed (" + this.status + ")");
 							this.faeot();
 						}
 						else
@@ -2185,6 +2174,26 @@ function api_fareq(res,ctx,xhr)
 
 				faxhrs[slot].fa_host = hostname(pp[m].substr(0,t+1));
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
+
+				if (!(ctx.errfa && ctx.errfa.timeout))
+				{
+					faxhrs[slot].timeout = 180000;
+					faxhrs[slot].ontimeout = function(e)
+					{
+						if (d) console.error('api_fareq timeout', e);
+
+						if (!faxhrfail[this.fa_host])
+						{
+							if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
+							{
+								faxhrfail[this.fa_host] = failtime = 1;
+								api_reportfailure(this.fa_host, function() {});
+
+								if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
+							}
+						}
+					};
+				}
 
 				faxhrs[slot].responseType = 'arraybuffer';
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));

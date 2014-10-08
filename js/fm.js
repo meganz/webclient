@@ -3722,7 +3722,7 @@ function UIkeyevents()
 			{
 				var n = M.d[$.selected[0]];
 				if (n && n.t) M.openFolder(n.h);
-				else if ($.selected.length == 1 && M.d[$.selected[0]] && M.d[$.selected[0]].name && is_image(M.d[$.selected[0]].name)) slideshow($.selected[0]);
+				else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) slideshow($.selected[0]);
 				else M.addDownload($.selected);
 			}
 		}
@@ -4024,12 +4024,13 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e)
 	{
 		var h = $(e.currentTarget).attr('id');
-		if (M.d[h] && M.d[h].t)
+		var n = M.d[h] || {};
+		if (n.t)
 		{
 			$('.top-context-menu').hide();
 			M.openFolder(h);
 		}
-		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
+		else if (is_image(n)) slideshow(h);
 		else M.addDownload([h]);
 	});
 	if (d) console.timeEnd('selectddUI');
@@ -4379,7 +4380,7 @@ function menuItems()
 	if (n && n.p.length == 11) items['removeshare'] = 1;
 	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
 	if (n && $.selected.length == 1 && n.t) items['open'] = 1;
-	if (n && $.selected.length == 1 && is_image(n.name)) items['preview'] = 1;
+	if (n && $.selected.length == 1 && is_image(n)) items['preview'] = 1;
 	if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink) items['sharing'] = 1;
 	if (sourceRoot == M.RootID && !folderlink)
 	{
@@ -7167,7 +7168,7 @@ function slideshowsteps()
 	var forward = [], backward = [], ii = [], ci;
         // Loop through available items and extract images
         for (var i in M.v) {
-                if (M.v[i].name && is_image(M.v[i].name))
+                if (is_image(M.v[i]))
                 {
                         // is currently previewed item
                         if (M.v[i].h == slideshowid) ci = i;

@@ -19630,9 +19630,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .main-blur-block {
 	height: 100%;
 }
-#topmenu {
-	height: 48px;
-}
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
 	transform: scale(-1, 1);

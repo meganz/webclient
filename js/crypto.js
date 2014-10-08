@@ -63,17 +63,17 @@ var ETOOERR = -400;
 function benchmark()
 {
 	var a = Array(1048577).join('a');
-	
+
 	var ab = str_to_ab(a);
-	
+
 	var ab8 = new Uint8Array(ab);
-	
+
 	var aes = new sjcl.cipher.aes([0,1,2,3]);
-	
+
 	t = new Date().getTime();
 	for (var i = 16; i--; ) encrypt_ab_ctr(aes,ab8,[1,2],30000);
 	t = new Date().getTime()-t;
-	
+
 	console.log((a.length*16/1024)/(t/1000) + " KB/s");
 }
 
@@ -125,7 +125,6 @@ function prepare_key_pw(password)
 var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
 var b64a = b64.split('');
 
-
 // unsubstitute standard base64 special characters, restore padding
 function base64urldecode(data)
 {
@@ -134,7 +133,7 @@ function base64urldecode(data)
     if (typeof atob === 'function')
 	{
 		data = data.replace(/\-/g,'+').replace(/_/g,'/').replace(/,/g,'');
-		
+
 		try {
 			return atob(data);
 		} catch (e) {
@@ -205,19 +204,19 @@ function base64urlencode(data)
 	ac = 0,
 	enc = "",
 	tmp_arr = [];
- 
+
     do { // pack three octets into four hexets
         o1 = data.charCodeAt(i++);
         o2 = data.charCodeAt(i++);
         o3 = data.charCodeAt(i++);
- 
+
         bits = o1 << 16 | o2 << 8 | o3;
- 
+
         h1 = bits >> 18 & 0x3f;
         h2 = bits >> 12 & 0x3f;
         h3 = bits >> 6 & 0x3f;
         h4 = bits & 0x3f;
- 
+
         // use hexets to index into b64, and append result to encoded string
         tmp_arr[ac++] = b64a[h1] + b64a[h2] + b64a[h3] + b64a[h4];
     } while (i < data.length);
@@ -278,7 +277,7 @@ var firefox_boost = is_chrome_firefox && !!localStorage.fxboost;
 var ab_to_str = firefox_boost ? mozAB2S : function(ab)
 {
 	var b = '', i;
-	
+
 	if (have_ab)
 	{
 		var b = '';
@@ -317,9 +316,9 @@ var ab_to_str_depad = firefox_boost ? mozAB2SDepad : function(ab)
 	else
 	{
 		b = ab_to_str(ab);
-		
+
 		for (i = b.length; i-- && !b.charCodeAt(i); );
-		
+
 		b = b.substr(0,i+1);
 	}
 
@@ -330,7 +329,7 @@ var ab_to_str_depad = firefox_boost ? mozAB2SDepad : function(ab)
 function str_to_ab(b)
 {
 	var ab, i;
-	
+
 	if (have_ab)
 	{
 		ab = new ArrayBuffer((b.length+15)&-16);
@@ -363,7 +362,7 @@ function encrypt_ab_ctr(aes,ab,nonce,pos)
 	var mac = [ctr[0],ctr[1],ctr[0],ctr[1]];
 
 	var enc, i, j, len, v;
-	
+
 	if (have_ab)
 	{
 		var data0, data1, data2, data3;
@@ -371,7 +370,7 @@ function encrypt_ab_ctr(aes,ab,nonce,pos)
 		len = ab.buffer.byteLength-16;
 
 		var v = new DataView(ab.buffer);
-		
+
 		for (i = 0; i < len; i += 16)
 		{
 			data0 = v.getUint32(i,false);
@@ -441,7 +440,7 @@ function encrypt_ab_ctr(aes,ab,nonce,pos)
 			mac[2] ^= ab32[i+2];
 			mac[3] ^= ab32[i+3];
 			mac = aes.encrypt(mac);
-			
+
 			enc = aes.encrypt(ctr);
 			ab32[i] ^= enc[0];
 			ab32[i+1] ^= enc[1];
@@ -454,7 +453,7 @@ function encrypt_ab_ctr(aes,ab,nonce,pos)
 		if (i < ab32.length)
 		{
 			var v = [0,0,0,0];
-			
+
 			for (j = i; j < ab32.length; j++) v[j-i] = ab32[j];
 
 			mac[0] ^= v[0];
@@ -468,10 +467,10 @@ function encrypt_ab_ctr(aes,ab,nonce,pos)
 			v[1] ^= enc[1];
 			v[2] ^= enc[2];
 			v[3] ^= enc[3];
-			
+
 			for (j = i; j < ab32.length; j++) ab32[j] = v[j-i];
 		}
-		
+
 		ab.buffer = _a32_to_str(ab32,ab.buffer.length);
 	}
 
@@ -542,22 +541,22 @@ function chksum(buf)
 		if (ll)
 		{
 			d = new Uint8Array(buf,buf.byteLength-ll,ll);
-			
+
 			while (ll--) c[ll] ^= d[ll];
 		}
 	}
 	else
 	{
 		c = Array(12);
-		
+
 		for (l = 12; l--; ) c[l] = 0;
-	
+
 		for (l = buf.length; l--; ) c[l%12] ^= buf.charCodeAt(l);
-		
+
 	}
 
 	for (d = '', l = 0; l < 12; l++) d += String.fromCharCode(c[l]);
-	
+
 	return d;
 }
 
@@ -628,7 +627,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 {
 	var ctr = [nonce[0],nonce[1],(pos/0x1000000000) >>> 0,(pos/0x10) >>> 0];
 	var mac = [ctr[0],ctr[1],ctr[0],ctr[1]];
-	
+
 	var enc, len, i, j, v;
 
 	if (have_ab)
@@ -638,7 +637,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 		len = ab.buffer.byteLength-16;	// @@@ -15?
 
 		var v = new DataView(ab.buffer);
-		
+
 		for (i = 0; i < len; i += 16)
 		{
 			enc = aes.encrypt(ctr);
@@ -697,7 +696,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 	}
 	else
 	{
-		var ab32 = _str_to_a32(ab.buffer);		
+		var ab32 = _str_to_a32(ab.buffer);
 		len = ab32.length-3;
 
 		for (i = 0; i < len; i += 4)
@@ -715,7 +714,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 		if (i < ab32.length)
 		{
 			var v = [0,0,0,0];
-			
+
 			for (j = i; j < ab32.length; j++) v[j-i] = ab32[j];
 
 			enc = aes.encrypt(ctr);
@@ -725,7 +724,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 			v[3] ^= enc[3];
 
 			var j = ab.buffer.length & 15;
-			
+
 			var m = _str_to_a32(Array(j+1).join(String.fromCharCode(255))+Array(17-j).join(String.fromCharCode(0)));
 
 			mac[0] ^= v[0] & m[0];
@@ -733,7 +732,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 			mac[2] ^= v[2] & m[2];
 			mac[3] ^= v[3] & m[3];
 			mac = aes.encrypt(mac);
-			
+
 			for (j = i; j < ab32.length; j++) ab32[j] = v[j-i];
 		}
 
@@ -745,7 +744,7 @@ function decrypt_ab_ctr(aes,ab,nonce,pos)
 
 // encrypt/decrypt 4- or 8-element 32-bit integer array
 function encrypt_key(cipher,a)
-{	
+{
 	if (!a) a = [];
 	if (a.length == 4) return cipher.encrypt(a);
 	var x = [];
@@ -865,7 +864,7 @@ function api_setsid(sid)
 function api_setfolder(h)
 {
 	h = 'n=' + h;
-	
+
 	if (u_sid) h += '&sid=' + u_sid;
 
 	apixs[1].sid = h;
@@ -938,7 +937,7 @@ function api_proc(q)
 	if (q.ctxs[q.i].length || !q.ctxs[q.i^1].length) return;
 
 	q.i ^= 1;
-	
+
 	if (!q.xhr) q.xhr = getxhr();
 
 	q.xhr.q = q;
@@ -983,11 +982,11 @@ function api_proc(q)
 			{
 				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
 
-				this.q.rawreq = false;	
+				this.q.rawreq = false;
 				this.q.backoff = 0;			// request succeeded - reset backoff timer
 				this.q.cmds[this.q.i] = [];
 				this.q.ctxs[this.q.i] = [];
-				
+
 				api_proc(q);
 			}
 			else api_reqerror(this.q,t);
@@ -1005,7 +1004,7 @@ function api_proc(q)
 		}
 		else q.rawreq = JSON.stringify(q.cmds[q.i]);
 	}
-	
+
 	api_send(q);
 }
 
@@ -1020,7 +1019,7 @@ function api_send(q)
 		q.xhr.open('POST', q.url.substr(0,t+1), true);
 		q.xhr.setRequestHeader("MEGA-Chrome-Antileak",q.url.substr(t));
 	}
-	else q.xhr.open('POST',q.url,true);	
+	else q.xhr.open('POST',q.url,true);
 
 	if (d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
 
@@ -1047,7 +1046,7 @@ function api_retry()
 		if (apixs[i].timer)
 		{
 			clearTimeout(apixs[i].timer);
-			api_send(apixs[i]);		
+			api_send(apixs[i]);
 		}
 	}
 }
@@ -1079,7 +1078,7 @@ function api_reportfailure(hostname,callback)
 	failtime = t;
 
 	if (failxhr) failxhr.abort();
-	
+
 	failxhr = getxhr();
 	failxhr.open('POST', apipath + 'pf?h', true);
 	failxhr.callback = callback;
@@ -1106,7 +1105,7 @@ function stopsc()
 		waitxhr.abort();
 		waitxhr = false;
 	}
-	
+
 	if (waittimeout)
 	{
 		clearTimeout(waittimeout);
@@ -1117,7 +1116,7 @@ function stopsc()
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-	api_req('sn=' + maxaction + '&ssl=1',{		
+	api_req('sn=' + maxaction + '&ssl=1',{
 		fm : fm,
 		callback : function(res,ctx)
 		{
@@ -1130,7 +1129,7 @@ function getsc(fm)
 				}
 				else
 				{
-					if (res.sn) maxaction = res.sn;				
+					if (res.sn) maxaction = res.sn;
 					execsc(res.a);
 					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
 				}
@@ -1151,7 +1150,7 @@ function completewait(recheck)
 	if (this.waitid != waitid) return;
 
     stopsc();
-    
+
 	var t = new Date().getTime()-waitbegin;
 
 	if (t < 1000)
@@ -1228,7 +1227,7 @@ function api_createuser(ctx,invitecode,invitename,uh)
 	if (!u_k) api_create_u_k();
 
 	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
-	
+
 	if (d) console.log("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
 
 	req = { a : 'up',
@@ -1261,7 +1260,7 @@ function api_resetuser(ctx,c,email,pw)
 
     var ssc = Array(4);
 	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
-    
+
     api_req({ a : 'erx',
               c : c,
               x : a32_to_base64(encrypt_key(pw_aes,u_k)),
@@ -1319,7 +1318,7 @@ function api_getsid(ctx,user,passwordkey,hash)
 {
 	ctx.callback = api_getsid2;
 	ctx.passwordkey = passwordkey;
-	
+
 	api_req({ a : 'us', user : user, uh : hash },ctx);
 }
 
@@ -1331,7 +1330,7 @@ function api_getsid2(res,ctx)
 	if (typeof res == 'object')
 	{
 		var aes = new sjcl.cipher.aes(ctx.passwordkey);
-		
+
 		// decrypt master key
 		if (typeof res.k == 'string')
 		{
@@ -1342,7 +1341,7 @@ function api_getsid2(res,ctx)
 				k = decrypt_key(aes,k);
 
 				aes = new sjcl.cipher.aes(k);
-				
+
 				if (typeof res.tsid == 'string')
 				{
 					t = base64urldecode(res.tsid);
@@ -1391,7 +1390,7 @@ function api_changepw(ctx,passwordkey,masterkey,oldpw,newpw,email)
 	if (oldpw !== false)
 	{
 		var oldkey = prepare_key_pw(oldpw);
-		
+
 		// quick check of old pw
 		if (oldkey[0] != passwordkey[0]
 		|| oldkey[1] != passwordkey[1]
@@ -1405,10 +1404,10 @@ function api_changepw(ctx,passwordkey,masterkey,oldpw,newpw,email)
 	}
 
 	var aes = new sjcl.cipher.aes(newkey);
-	
+
 	// encrypt masterkey with the new password
 	var cmasterkey = encrypt_key(aes,masterkey);
-	
+
 	req = { a : 'up',
 		k : a32_to_base64(cmasterkey) };
 
@@ -1421,9 +1420,9 @@ function stringhash(s,aes)
 {
 	var s32 = str_to_a32(s);
 	var h32 = [0,0,0,0];
-	
+
 	for (i = 0; i < s32.length; i++) h32[i&3] ^= s32[i];
-	
+
 	for (i = 16384; i--; ) h32 = aes.encrypt(h32);
 
 	return a32_to_base64([h32[0],h32[2]]);
@@ -1434,7 +1433,7 @@ function stringhash(s,aes)
 function api_updateuser(ctx,newuser)
 {
 	newuser.a = 'up';
-	
+
 	res = api_req(newuser,ctx);
 }
 
@@ -1467,7 +1466,7 @@ function api_cachepubkeys2(res,ctx)
 	if (typeof res == 'object')
 	{
 		var spubkey, keylen, pubkey;
-		
+
 		if (res.pubk) u_pubkeys[ctx.u] = u_pubkeys[res.u] = crypto_decodepubkey(base64urldecode(res.pubk));
 	}
 
@@ -1529,7 +1528,7 @@ function api_setshare1(ctx)
 		if (typeof req.s[i].r != 'undefined')
 		{
 			if (!req.ok)
-			{						
+			{
 				if (u_sharekeys[ctx.node])
                 {
                     sharekey = u_sharekeys[ctx.node];
@@ -1539,13 +1538,13 @@ function api_setshare1(ctx)
 				{
 					// we only need to generate a key if one or more shares are being added to a previously unshared node
 					sharekey = [];
-					for (j = 4; j--; ) sharekey.push(rand(0x100000000));					
+					for (j = 4; j--; ) sharekey.push(rand(0x100000000));
 					u_sharekeys[ctx.node] = sharekey;
 				}
 
 				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
 				req.ha = crypto_handleauth(ctx.node);
-				ssharekey = a32_to_str(sharekey);				
+				ssharekey = a32_to_str(sharekey);
 			}
 		}
 	}
@@ -1557,7 +1556,7 @@ function api_setshare1(ctx)
 
 	// encrypt ssharekey to known users
 	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
-	
+
 	ctx.req = req;
 
 	ctx.callback = function(res,ctx)
@@ -1565,9 +1564,9 @@ function api_setshare1(ctx)
 		var i, n;
 
 		if (!ctx.maxretry) return;
-		
+
 		ctx.maxretry--;
-		
+
 		if (typeof res == 'object')
 		{
 			if (res.ok)
@@ -1576,7 +1575,7 @@ function api_setshare1(ctx)
 				ctx.req.ok = res.ok;
 				u_sharekeys[ctx.node] = decrypt_key(u_k_aes,base64_to_a32(res.ok));
 				ctx.req.ha = crypto_handleauth(ctx.node);
-				
+
 				var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
 
 				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[ctx.req.s[i].u]));
@@ -1588,7 +1587,7 @@ function api_setshare1(ctx)
 
 		api_req(ctx.req,ctx);
 	}
-	
+
 	api_req(ctx.req,ctx);
 }
 
@@ -1722,21 +1721,21 @@ function api_completeupload(t,uq,k,ctx)
 {
 	// Close nsIFile Stream
 	if (is_chrome_firefox && uq._close) uq._close();
-	
+
 	if (uq.repair) uq.target = M.RubbishID;
-	
+
 	api_completeupload2({callback: api_completeupload2, t : base64urlencode(t), path : uq.path, n : uq.name, k : k, fa : uq.faid ? api_getfa(uq.faid) : false, ctx : ctx },uq);
 }
 
 function api_completeupload2(ctx,uq)
 {
 	var p,ut = uq.target;
-	
+
 	if (ctx.path && ctx.path != ctx.n && (p = ctx.path.indexOf('/')) > 0)
 	{
-		var pc = ctx.path.substr(0,p);		
+		var pc = ctx.path.substr(0,p);
 		ctx.path = ctx.path.substr(p+1);
-		
+
 		fm_requestfolderid(ut,pc,
 		{
 			uq:uq,
@@ -1753,11 +1752,11 @@ function api_completeupload2(ctx,uq)
 		a = { n : ctx.n };
 		if (uq.hash) 	a.c = uq.hash;
 		if (d) console.log(ctx.k);
-		var ea = enc_attr(a,ctx.k);		
+		var ea = enc_attr(a,ctx.k);
 		if (d) console.log(ea);
-		
+
 		if (!ut) ut = M.RootID;
-		
+
 		var req = { a : 'p',
 			t : ut,
 			n : [{ h : ctx.t, t : 0, a : ab_to_base64(ea[0]), k : a32_to_base64(encrypt_key(u_k_aes,ctx.k))}],
@@ -1785,9 +1784,9 @@ function api_completeupload2(ctx,uq)
 function is_devnull(email)
 {
 	return false;
-	
+
 	var p, q;
-	
+
 	if ((p = email.indexOf('@')) >= 0)
 	{
 		if ((q = email.indexOf('.',p)) >= 0)
@@ -1802,15 +1801,21 @@ function is_devnull(email)
 function is_rawimage(name, ext)
 {
 	ext = ext || (''+name).split('.').pop().toUpperCase();
-	
+
 	return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
 }
 function is_image(name)
 {
 	if (name)
 	{
+		if (typeof name === 'object')
+		{
+			if (name.fa && ~name.fa.indexOf(':1*')) return true;
+
+			name = name.name;
+		}
 		var ext = (''+name).split('.').pop().toUpperCase();
-		
+
 		return is_image.def[ext] || is_rawimage(null, ext);
 	}
 
@@ -1922,14 +1927,14 @@ function api_fareq(res,ctx,xhr)
 	}
 	else if (typeof res == 'object' && res.p)
 	{
-		var data;			
+		var data;
 		var slot, i, t;
 		var p, pp = [res.p], m;
 
 		for (i = 0; p = res['p'+i]; i++) pp.push(p);
 
 		if (ctx.p && pp.length > 1) dd = ctx.p.length/pp.length;
-		
+
 		for (m = pp.length; m--; )
 		{
 			for (slot = 0; ; slot++)
@@ -1966,23 +1971,6 @@ function api_fareq(res,ctx,xhr)
 				{ // Huh? Gecko..
 					faxhrs[slot].onprogress = function() {};
 				}
-
-				faxhrs[slot].timeout = 180000;
-				faxhrs[slot].ontimeout = function(e)
-				{
-					if (d) console.error('api_fareq timeout', e);
-
-					if (!faxhrfail[this.fa_host])
-					{
-						if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
-						{
-							faxhrfail[this.fa_host] = failtime = 1;
-							api_reportfailure(this.fa_host, function() {});
-
-							if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
-						}
-					}
-				};
 			}
 
 			faxhrs[slot].faeot = function()
@@ -2031,7 +2019,7 @@ function api_fareq(res,ctx,xhr)
 				else
 				{
 					console.error('api_fareq', id, this);
-					
+
 					api_faretry(this.ctx, ETOOERR, this.fa_host);
 				}
 			}
@@ -2101,7 +2089,7 @@ function api_fareq(res,ctx,xhr)
 						}
 						else
 						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);						
+							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
 							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
 
@@ -2140,7 +2128,7 @@ function api_fareq(res,ctx,xhr)
 				if (dl)
 				{
 					data = new Uint8Array(dl);
-				
+
 					for (i = dl; i--; ) data[i] = ctx.p.charCodeAt(dp+i);
 
 					if (!chromehack) data = data.buffer;
@@ -2159,11 +2147,31 @@ function api_fareq(res,ctx,xhr)
 				else t = -1;
 
 				pp[m] += '/'+ctx.type;
-                
+
                 if (t < 0) t = pp[m].length-1;
 
 				faxhrs[slot].fa_host = hostname(pp[m].substr(0,t+1));
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
+
+				if (!(ctx.errfa && ctx.errfa.timeout))
+				{
+					faxhrs[slot].timeout = 180000;
+					faxhrs[slot].ontimeout = function(e)
+					{
+						if (d) console.error('api_fareq timeout', e);
+
+						if (!faxhrfail[this.fa_host])
+						{
+							if (!faxhrlastgood[this.fa_host] || (Date.now() - faxhrlastgood[this.fa_host]) > this.timeout)
+							{
+								faxhrfail[this.fa_host] = failtime = 1;
+								api_reportfailure(this.fa_host, function() {});
+
+								if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
+							}
+						}
+					};
+				}
 
 				faxhrs[slot].responseType = 'arraybuffer';
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
@@ -2188,8 +2196,8 @@ function api_getfa(id)
 function api_attachfileattr(node,id)
 {
 	var fa = api_getfa(id);
-	
-	storedattr[id].target = node;	
+
+	storedattr[id].target = node;
 
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});
 }
@@ -2221,7 +2229,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 				else p[r[1]] += t;
 			}
 		}
-		else if (errfa) errfa(n);		
+		else if (errfa) errfa(n);
 	}
 
 	for (n in p)
@@ -2247,7 +2255,7 @@ function crypto_makecr(source,shares,source_is_nodes)
 		if (u_sharekeys[shares[i]])
 		{
 			aes = new sjcl.cipher.aes(u_sharekeys[shares[i]]);
-			
+
 			for (j = source.length; j--; )
 			{
 				if (source_is_nodes ? (nk = u_nodekeys[source[j]]) : (nk = source[j]))
@@ -2274,7 +2282,7 @@ function crypto_procsr(sr)
 
 			if (typeof res == 'object' && typeof res.pubk == 'string') u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res.pubk));
 
-			// collect all required pubkeys	
+			// collect all required pubkeys
 			while (ctx.i < ctx.sr.length)
 			{
 				if (ctx.sr[ctx.i].length == 11 && !(pubkey = u_pubkeys[ctx.sr[ctx.i]]))
@@ -2309,13 +2317,12 @@ function crypto_procsr(sr)
 				else sh = ctx.sr[i];
 			}
 
-			if (rsr.length) api_req({ a : 'k', sr : rsr });			
+			if (rsr.length) api_req({ a : 'k', sr : rsr });
 		}
 	}
 
 	ctx.callback(false,ctx);
 }
-
 
 var keycache = {};
 
@@ -2332,12 +2339,12 @@ function crypto_processkey(me,master_aes,file)
 
 	if (!file.k)
 	{
-		if (!keycache[file.h]) 
+		if (!keycache[file.h])
 		{
 			if (d) console.log("No keycache entry!");
 			return;
 		}
-		
+
 		file.k = keycache[file.h];
 	}
 
@@ -2345,16 +2352,16 @@ function crypto_processkey(me,master_aes,file)
 
 	// do I own the file? (user key is guaranteed to be first in .k)
 	var p = file.k.indexOf(id + ':');
-	
+
 	if (p)
 	{
 		// I don't - do I have a suitable sharekey?
 		for (id in u_sharekeys)
 		{
 			p = file.k.indexOf(id + ':');
-			
+
 			if (p >= 0 && (!p || file.k.charAt(p-1) == '/')) break;
-			
+
 			p = -1;
 		}
 	}
@@ -2362,7 +2369,7 @@ function crypto_processkey(me,master_aes,file)
 	if (p >= 0)
 	{
 		delete keycache[file.h];
-	
+
 		var pp = file.k.indexOf('/',p);
 
 		if (pp < 0) pp = file.k.length;
@@ -2394,15 +2401,15 @@ function crypto_processkey(me,master_aes,file)
 			// long keys: RSA
 			if (u_privk)
 			{
-				var t = base64urldecode(key);				
+				var t = base64urldecode(key);
 				try
-				{				
+				{
 					if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
 					else
 					{
 						if (d) console.log("Corrupt key for node " + file.h);
 						return;
-					}	
+					}
 				}
 				catch(e)
 				{
@@ -2429,28 +2436,28 @@ function crypto_processkey(me,master_aes,file)
 					if (key.length >= 46) rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes,k));
 				}
 				if (typeof o.c == 'string') file.hash = o.c;
-				
+
 				if (file.hash)
-				{				
+				{
 					var h = base64urldecode(file.hash);
 					var t = 0;
 					for (var i = h.charCodeAt(16); i--; ) t = t*256+h.charCodeAt(17+i);
 					file.mtime=t;
 				}
-				
+
 				if (typeof o.t != 'undefined') file.mtime = o.t;
-				
+
 				file.key = k;
 				file.ar = o;
 				file.name = file.ar.n;
-				if (file.ar.fav) file.fav=1;				
+				if (file.ar.fav) file.fav=1;
 			}
 		}
 	}
 	else
 	{
 		if (d) console.log("Received no suitable key: " + file.h);
-		
+
 		if (!missingkeys[file.h])
 		{
 			newmissingkeys = true;
@@ -2464,9 +2471,9 @@ function crypto_sendrsa2aes()
 {
 	var n;
 	var nk = [];
-	
+
 	for (n in rsa2aes) nk.push(n,base64urlencode(rsa2aes[n]));
-		
+
 	if (nk.length) api_req({ a : 'k', nk : nk });
 
 	rsa2aes = {};
@@ -2504,7 +2511,7 @@ function crypto_reqmissingkeys()
 				si[s] = cr[0].length;
 				cr[0].push(s);
 			}
-			
+
 			if (typeof ni[n] == 'undefined')
 			{
 				ni[n] = cr[1].length;
@@ -2521,14 +2528,14 @@ function crypto_reqmissingkeys()
 		return;
 	}
 
-	if (cr[0].length) 
+	if (cr[0].length)
 	{
 		var ctx = {};
-		
+
 		ctx.callback = function(res,ctx)
 		{
 			if (d) console.log("Processing crypto response");
-			
+
 			if (typeof res == 'object' && typeof res[0] == 'object') crypto_proccr(res[0]);
 		}
 
@@ -2565,7 +2572,7 @@ function crypto_procmcr(mcr)
 		if (u_sharekeys[sh])
 		{
 			nh = mcr[1][mcr[2][i+1]];
-			
+
 			if (u_nodekeys[nh])
 			{
 				if (typeof si[sh] == 'undefined')
@@ -2573,7 +2580,7 @@ function crypto_procmcr(mcr)
 					sc[sh] = new sjcl.cipher.aes(u_sharekeys[sh]);
 					si[sh] = cr[0].length;
 					cr[0].push(sh);
-				}				
+				}
 				if (typeof ni[nh] == 'undefined')
 				{
 					ni[nh] = cr[1].length;
@@ -2621,9 +2628,8 @@ function crypto_share_rsa2aes()
 	}
 }
 
-
 (function __FileFingerprint(scope) {
-	
+
 	var CRC_SIZE   = 16;
 	var BLOCK_SIZE = CRC_SIZE*4;
 
@@ -2635,7 +2641,7 @@ function crypto_share_rsa2aes()
 			i >>  8 & 0xff,
 			i       & 0xff);
 	}
-	
+
 	function serialize(v)
 	{
 		var p = 0, b = [];
@@ -2686,7 +2692,7 @@ function crypto_share_rsa2aes()
 		{
 			if (d) console.log('CHECK THIS', 'Unable to generate fingerprint');
 			if (d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
-			
+
 			throw new Error('Invalid upload entry for fingerprint');
 		}
 		if (d) console.log('Generating fingerprint for ' + uq_entry.name);
@@ -2785,9 +2791,6 @@ function crypto_share_rsa2aes()
 	};
 })(this);
 
-
-
-
 var u_keyring;
 var u_privEd25519;
 var u_pubEd25519;
@@ -2833,5 +2836,5 @@ function getPubEd25519(userhandle, callback) {
 	        callback3: callback,
 	    };
 	    getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
-	}	
+	}
 }

@@ -386,13 +386,16 @@ function checkLostChunks(file)
 	}
 
 	if (file.data) {
+		var options = { onPreviewRetry : file.preview === -1 };
+		if (!file.zipid) options.raw = is_rawimage(file.n);
 		createnodethumbnail(
 			file.id,
 			new sjcl.cipher.aes([dl_key[0]^dl_key[4],dl_key[1]^dl_key[5],dl_key[2]^dl_key[6],dl_key[3]^dl_key[7]]),
 			++ul_faid,
 			file.data,
-			file.preview === -1
+			options
 		);
+		file.data = null;
 	}
 
 	return true;

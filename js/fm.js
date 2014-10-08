@@ -2980,12 +2980,13 @@ function selectddUI()
 	$($.selectddUIgrid + ' ' + $.selectddUIitem).bind('dblclick', function (e)
 	{
 		var h = $(e.currentTarget).attr('id');
-		if (M.d[h] && M.d[h].t)
+		var n = M.d[h] || {};
+		if (n.t)
 		{
 			$('.top-context-menu').hide();
 			M.openFolder(h);
 		}
-		else if (M.d[h] && M.d[h].name && is_image(M.d[h].name)) slideshow(h);
+		else if ((n.name && is_image(n.name)) || (n.fa && ~n.fa.indexOf(':1*'))) slideshow(h);
 		else M.addDownload([h]);
 	});
 }
@@ -4423,7 +4424,6 @@ function linksDialog(close)
 	{
 		linksDialog(1);
 	});
-
 
 	if (is_extension)
 	{

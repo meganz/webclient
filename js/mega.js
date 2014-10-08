@@ -464,7 +464,7 @@ function MegaData ()
 			fminitialized=true;
 			$('.top-search-bl').show();
 		}
-		else if (id == this.currentdirid && !force) return false;
+		else if (id && id == this.currentdirid && !force) return false;
 		if (id == 'rubbish') id = this.RubbishID;
 		else if (id == 'inbox') id = this.InboxID;
 		else if (id == 'cloudroot') id = this.RootID;

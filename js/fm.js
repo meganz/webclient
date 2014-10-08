@@ -658,6 +658,7 @@ function initUI()
 	$('.fm-right-header.fm').removeClass('hidden');
 	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text((M.d[M.RootID]||{}).name||"\u30C4");
 	else folderlink=0;
+	/* REMOVEME
 	$('.add-user-popup-button').unbind('click');
 	$('.add-user-popup-button').bind('click',function(e)
 	{
@@ -668,7 +669,7 @@ function initUI()
 	$('.add-user-popup input').bind('keypress',function(e)
 	{
 		if (e.which == 13) doAddContact(e);
-	});
+	});*/
 	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
@@ -1080,7 +1081,7 @@ function addContactUI()
 		}
 	};
 
-	function errorMsg(msg)
+	function errorMsg(msg, u)
 	{
 		var $d = $('.add-user-popup');
 		var $s = $('.add-user-popup .multiple-input-warning span');
@@ -1090,6 +1091,8 @@ function addContactUI()
 		{
 			$d.removeClass('error');
 		}, 3000);
+		
+		if (u) $.addUserFail.push(u);
 	}
 	
 	function focusOnInput()
@@ -1120,7 +1123,7 @@ function addContactUI()
 		accountHolder:		M.u[u_handle].m,
 		scrollLocation:		'add',
 		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
-		onDoublet: function() {errorMsg('You already have contact with that email!');},
+		onDoublet: function(u) {errorMsg('You already have contact with that email!', u.id);},
 		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()
 		{
@@ -1209,6 +1212,7 @@ function addContactUI()
 		}
 		else// Show
 		{
+			$.addUserFail = [];
 			$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 			$('.import-contacts-link').removeClass('active');
 			$this.addClass('active');
@@ -1263,7 +1267,7 @@ function addContactUI()
 	$('.add-user-popup-button').off('click');
 	$('.add-user-popup-button').on('click', function()
 	{
-		$this = $(this);
+		var $this = $(this), nobody = true;
 		if ($this.is('.add') && !$this.is('.disabled'))// Add
 		{
 			if (u_type === 0) ephemeralDialog(l[997]);
@@ -1272,15 +1276,19 @@ function addContactUI()
 				var $mails = $('.token-input-list-mega .token-input-token-mega');
 				if ($mails.length)
 				{
-					var a = [];
-					// Can I send array of email addreses to server at once?
+					// TODO: send array of email addreses to server at once?
 					$mails.each(function(index, value)
 					{
-						a.push($(value).contents().eq(1).text());
+						M.addContact($(value).contents().eq(1).text());
 					});
-					M.addContact(a);
+					nobody = false;
 				}
 			}
+		}
+
+		if (nobody && $.addUserFail.length)
+		{
+			msgDialog('info',l[150],l[151].replace('[X]','already'));
 		}
 
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
@@ -1290,7 +1298,6 @@ function addContactUI()
 		$('.add-user-popup').addClass('hidden');
 		$('.fm-add-user').removeClass('active');
 		clearScrollPanel('.add-user-popup');
-
 	});
 
 	$('.add-user-popup .fm-dialog-close').off('click');
@@ -5587,10 +5594,8 @@ function initShareDialog()
 	$('.share-dialog .dialog-share-button').unbind('click');
 	$('.share-dialog .dialog-share-button').bind('click',function()
 	{
-		$this = $(this);
-
 		// If share button is NOT disabled
-		if (!$this.is('.disabled'))
+		if (!$(this).is('.disabled'))
 		{
 			// If there's a contacts in multi-input add them to top
 			var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
@@ -5612,8 +5617,8 @@ function initShareDialog()
 				var id = '';
 				var perm, aPerm;
 				var $items = $('.share-dialog-contact-bl');
-				$.each($items, function(ind, val) {
-
+				$.each($items, function(ind, val)
+				{
 					id = $(val).attr('id').replace('sdcbl_', '');
 					if (id === '')// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
 						id = $(val).find('.fm-chat-user').text();

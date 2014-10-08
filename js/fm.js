@@ -7748,6 +7748,87 @@ function sharedfolderUI()
 	return r;
 }
 
+function userAvatar(userid)
+{
+	var user = M.u[userid];
+	if (!user || !user.u) return;
+
+	var avatar = user.name.substr(0,2), 
+		av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+
+	if (avatars[userid]) avatar = '<img src="' + avatars[userid].url + '">';
+
+	return {img: avatar, color: av_color};
+}
+
+function userFingerPrint(userid, next)
+{
+	var user = M.u[userid] || userid;
+	if (!user || !user.u) return next([])
+	getFingerprintEd25519(user.h, function(response) {
+		next(response.toUpperCase().match(/.{4}/g))
+	});
+}
+
+function fingerprintDialog(userid)
+{
+	var user = M.u[userid];
+	if (!user || !user.u) return;
+
+	var $this = $('.fingerprint-dialog')
+		, avatar = userAvatar(userid)
+
+	$this.find('.fingerprint-avatar')
+		.attr('class', 'fingerprint-avatar color' + avatar.color)
+		.html(avatar.img)
+
+	$this.find('.contact-details-user-name')
+			.text(user.name) // escape HTML things
+		.end()
+		.find('.contact-details-email')
+			.text(user.m) // escape HTML things
+
+	$this.find('.fingerprint-txt').empty()
+	userFingerPrint(user, function(fprint) {
+		var offset = 0;
+		$this.find('.fingerprint-code .fingerprint-txt').each(function() {
+			var that = $(this)
+			fprint.slice(offset, offset+5).forEach(function(v) {
+				$('<span>').text(v).appendTo(that)
+				offset++;
+			});
+		});
+
+		var target= $('.fingerprint-bott-txt .fingerprint-txt') 
+		fprint.forEach(function(v) {
+			$('<span>').text(v).appendTo(target);
+		});
+	})
+
+	$('.fm-dialog-close').rebind('click', function() {
+		$this.addClass('hidden');
+		$this = null;
+	});
+
+	$('.dialog-approve-button').rebind('click', function() {
+		alert("approve");
+		$this.addClass('hidden');
+		$this = null;
+	});
+
+	$('.dialog-skip-button').rebind('click', function() {
+		alert("cancel");
+		$this.addClass('hidden');
+		$this = null;
+	});
+
+	$this.removeClass('hidden')
+	  .css ({
+		'margin-top': '-' + $this.height()/2 +'px',
+		'margin-left': '-' + $this.width()/2 +'px'
+ 	  })
+}
+
 function contactUI()
 {
 	$('.nw-contact-item').removeClass('selected');
@@ -7758,11 +7839,12 @@ function contactUI()
 		var u_h = M.currentdirid;
 		var cs = M.contactstatus(u_h);
 		var user = M.d[u_h];
-		var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
-		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+
+		var avatar = userAvatar(u_h)
+
 		var onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
-		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + av_color);
-		$('.contact-top-details .nw-contact-block-avatar').html(avatar);
+		$('.contact-top-details .nw-contact-block-avatar').attr('class','nw-contact-block-avatar two-letters ' + htmlentities(u_h) + ' color' + avatar.color);
+		$('.contact-top-details .nw-contact-block-avatar').html(avatar.img);
 		$('.contact-top-details .onlinestatus').removeClass('away offline online busy');
 		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
 		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);

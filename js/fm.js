@@ -375,7 +375,11 @@ function tpDragCursor() {
 
 function initUI()
 {
-	$('.fm-dialog-overlay').rebind('click', closeDialog);
+	$('.fm-dialog-overlay').rebind('click', function()
+	{
+		closeDialog();
+		$.hideContextMenu();
+	});
 	if (!folderlink)
 	{
 		$('.fm-tree-header.cloud-drive-item').text(l[164]);
@@ -6837,6 +6841,13 @@ function propertiesDialog(close)
 	$('body').addClass('overlayed');
 	pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
 	$('.properties-elements-counter span').text('');	
+	$('.fm-dialog.properties-dialog .properties-body').unbind('click');
+	$('.fm-dialog.properties-dialog .properties-body').bind('click',function()
+	{
+		// Clicking anywhere in the dialog will close the context-menu, if open
+		var e = $('.fm-dialog.properties-dialog .file-settings-icon');
+		if (e.hasClass('active')) e.click();
+	});
 	$('.fm-dialog.properties-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.properties-dialog .fm-dialog-close').bind('click',function()
 	{
@@ -6965,8 +6976,6 @@ function propertiesDialog(close)
 		      p.t11 = fm_contains(sfilecnt,sfoldercnt);
 			}
 		}
-
-		
 	}
 	else
 	{

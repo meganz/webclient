@@ -2837,6 +2837,7 @@ img.blog-new-logos {
 	line-height: 14px;
 	display: block;
 	padding-bottom: 16px;
+	word-break: break-all;
 	word-wrap: break-word;
 }
 .properties-name-block {

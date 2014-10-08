@@ -4418,7 +4418,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
 }
-
 .nw-fm-search-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -8315,6 +8314,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-dialog.rename-dialog {
 	min-width: 360px;
 	margin: -77px 0 0 -180px;
+}
+.fm-dialog.fingerprint-dialog {
+	width: 600px;
+	margin: -229px 0 0 -300px;
+}
+.fingerprint-dialog .default-dialog-bottom {
+	margin: 0;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
 	width: 480px;
@@ -18042,7 +18048,7 @@ span.incoming-call-name {
 }
 .shared-details-folder-name, .contact-details-user-name {
 	font-size: 24px;
-	line-height: 28px;
+	line-height: 30px;
 	float: left;
 	color: #333333;
 	font-family: 'Open Sans Semibold', Arial;
@@ -18091,15 +18097,95 @@ span.incoming-call-name {
 	white-space: nowrap;
 	font-family: 'Open Sans Semibold';
 }
-.contact-fingerprint-txt {
+.contact-fingerprint-txt, .fingerprint-txt {
 	font-size: 12px;
 	white-space: nowrap;
 	color: #666666;
 	text-transform: uppercase;
-	padding-bottom: 5px;
+	padding-bottom: 4px;
 }
-.contact-fingerprint-txt span {
+.contact-fingerprint-txt span, .fingerprint-txt span {
 	padding-left: 10px;
+}
+.fingerprint-txt span {
+	padding: 0 5px;
+}
+.fingerprint-dialog .fm-dialog-body {
+	padding: 12px 0 0 0;
+}
+.fingerprint-top-text, .fingerprint-mid-txt, .fingerprint-bott-txt {
+	background-color: #F6F6F6;
+	color: #666666;
+	font-size: 13px;
+	line-height: 21px;
+	padding: 15px 24px;
+}
+.fingerprint-mid-txt {
+	background-color: rgba(255,165,0,0.1);
+}
+.fingerprint-bott-txt {
+	background-color: transparent;
+	padding: 15px 19px
+}
+.fingerprint-bott-txt .fingerprint-txt {
+	padding: 0;
+}
+.fingerprint-bott-header {
+	padding: 0 5px 9px 5px;
+	font-size: 13px;
+}
+.fingerprint-mid-info {
+	padding: 24px;
+}
+.fingerprint-avatar {
+	width: 96px;
+	height: 96px;
+	color: white;
+	line-height: 94px;
+	text-align: center;
+	font-size: 44px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	float: left;
+}
+.fingerprint-avatar img {
+	width: 96px;
+	height: 96px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.fingerprint-dialog .fm-dialog-button.dialog-approve-button {
+	background-color: rgba(109,176,63,0.7);
+}
+.fingerprint-dialog .fm-dialog-button.dialog-approve-button:hover {
+	background-color: rgba(109,176,63,1);
+}
+.fingerprint-code {
+	float: right;
+	width: 232px;
+	padding: 14px 18px 12px 18px;
+	background-color: #F6F6F6;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.fingerprint-code .contact-fingerprint-title {
+	padding: 0 5px 17px 5px;
+}
+.fingerprint-contact-info {
+	margin: 0 256px 0 120px;
+	padding: 21px 0 0 0;
+}
+.fingerprint-contact-info .contact-details-user-name, .fingerprint-contact-info .contact-details-email {
+	white-space: nowrap;
+	display: block;
+	float: none;
+	padding-right: 0;
 }
 .contact-details-pad {
 	margin-left: 200px;
@@ -18109,7 +18195,7 @@ span.incoming-call-name {
 .contact-details-email {
 	font-size: 12px;
 	color: #666666;
-	padding: 5px 0;
+	padding: 4px 0 5px 0;
 }
 .contact-details-pad .nw-contact-status {
 	margin: 2px 6px 0 0;
@@ -21044,14 +21130,9 @@ background-color:#1DA2E9
 	opacity: 0.6;
 	display: block;
 }
-
-
 /**
  * Hide UI elements when the chat is disabled
  */
-.megaChatDisabled .fm-start-conversation,
-.megaChatDisabled .nw-contact-status,
-.megaChatDisabled .nw-fm-left-icon.conversations,
-.megaChatDisabled .fm-send-files {
-    display: none;
+.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
+	display: none;
 }

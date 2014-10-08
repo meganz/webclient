@@ -2679,7 +2679,7 @@ function UIkeyevents()
 			{
 				var n = M.d[$.selected[0]];
 				if (n && n.t) M.openFolder(n.h);
-				else if ($.selected.length == 1 && M.d[$.selected[0]] && M.d[$.selected[0]].name && is_image(M.d[$.selected[0]].name)) slideshow($.selected[0]);
+				else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) slideshow($.selected[0]);
 				else M.addDownload($.selected);
 			}
 		}
@@ -2986,7 +2986,7 @@ function selectddUI()
 			$('.top-context-menu').hide();
 			M.openFolder(h);
 		}
-		else if ((n.name && is_image(n.name)) || (n.fa && ~n.fa.indexOf(':1*'))) slideshow(h);
+		else if (is_image(n)) slideshow(h);
 		else M.addDownload([h]);
 	});
 }
@@ -3341,7 +3341,7 @@ function menuItems()
 	if (n && n.p.length == 11) items['removeshare'] = 1;
 	else if (RightsbyID($.selected[0]) > 1) items['remove'] = 1;
 	if (n && $.selected.length == 1 && n.t) items['open'] = 1;
-	if (n && $.selected.length == 1 && is_image(n.name)) items['preview'] = 1;
+	if (n && $.selected.length == 1 && is_image(n)) items['preview'] = 1;
 	if (n && sourceRoot == M.RootID && $.selected.length == 1 && n.t && !folderlink) items['sharing'] = 1;
 	if (sourceRoot == M.RootID && !folderlink)
 	{
@@ -5012,7 +5012,7 @@ function slideshowsteps()
 	var check=false, forward = [], backward=[];
 	for (var i in M.v)
 	{
-		if (M.v[i].name && is_image(M.v[i].name))
+		if (is_image(M.v[i]))
 		{
 			if (M.v[i].h == slideshowid) check=true;
 			else if (check) forward.push(M.v[i].h);

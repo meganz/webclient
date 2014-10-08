@@ -1808,6 +1808,12 @@ function is_image(name)
 {
 	if (name)
 	{
+		if (typeof name === 'object')
+		{
+			if (name.fa && ~name.fa.indexOf(':1*')) return true;
+
+			name = name.name;
+		}
 		var ext = (''+name).split('.').pop().toUpperCase();
 
 		return is_image.def[ext] || is_rawimage(null, ext);

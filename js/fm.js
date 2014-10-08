@@ -1127,7 +1127,7 @@ function addContactUI()
 		minChars:			2,
 		accountHolder:		M.u[u_handle].m,
 		scrollLocation:		'add',
-		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
+		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function(u) {errorMsg('You already have contact with that email!', u.id);},
 		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()
@@ -5471,7 +5471,7 @@ function initShareDialog()
 		minChars:			2,
 		accountHolder:		M.u[u_handle].m,
 		scrollLocation:		'share',
-		onEmailCheck: function() {errorMsg('Looks like there’s a malformed email!');},
+		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function() {errorMsg('You already have contact with that email!');},
 		onHolder: function() {errorMsg('No need for that, you are THE owner!');},
 		onAdd: function()

@@ -1524,12 +1524,12 @@ function MegaData ()
 
 	this.addNode = function(n,ignoreDB)
 	{
-		if (n.p == this.RubbishID) 
+		if (n.p == this.RubbishID)
 		{
 			this.rubNodes[n.h] = true;
 			this.rubbishIco();
 		}
-		if (n.t == 4) 
+		if (n.t == 4)
 		{
 			for (var i in this.d)
 			{
@@ -1817,7 +1817,7 @@ function MegaData ()
 
 	this.moveNodes = function(n,t)
 	{
-		if (t == this.RubbishID) 
+		if (t == this.RubbishID)
 		{
 			for (var i in n)
 			{

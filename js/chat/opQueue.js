@@ -254,7 +254,8 @@ OpQueue.prototype.pop = function() {
 //                        }
                     }
 
-                    console.error("OpQueue caught mpenc exception: ", e, op);
+                    console.error("OpQueue caught mpenc exception: ", e, op, e.stack ? e.stack : "[no stack]");
+
                 }
             }
 

@@ -47,6 +47,8 @@ ChatStore.prototype.attachToChat = function(megaChat) {
 
     megaChat.unbind("onRoomCreated.chatStore");
     megaChat.bind("onRoomCreated.chatStore", function(e, megaRoom) {
+        assert(megaRoom.type, 'missing room type');
+
         self.db.query('conversations')
             .filter('roomJid', megaRoom.roomJid)
             .execute()
@@ -118,11 +120,8 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             } else {
                 $.each(results, function(k, v) {
                     if(!megaChat.chats[v.roomJid]) { // restore room from db
-                        megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid);
+                        megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.users, v.ctime);
                         megaChat.chats[v.roomJid]._conv_ended = v.ended;
-                        megaChat.chats[v.roomJid].setType(v.type);
-                        megaChat.chats[v.roomJid].ctime = v.ctime;
-                        megaChat.chats[v.roomJid].setUsers(v.users);
 
                         megaChat.chats[v.roomJid].setState(ChatRoom.STATE.JOINING);
                         megaChat.karere.joinChat(v.roomJid);

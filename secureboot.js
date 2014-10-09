@@ -550,10 +550,12 @@ else
 
         jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
 
-        jsl.push({f:'js/megapromise.js', n: 'megapromise_js', j:1,w:5});
+        jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:10});
+
+        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megadb.js', n: 'megadb_js', j:1,w:5});
-        jsl.push({f:'js/megakvstorage.js', n: 'megakvstorage_js', j:1,w:5});
+        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
+        jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 
         jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
@@ -590,17 +592,24 @@ else
         jsl.push({f:'js/filepicker.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
-        jsl.push({f:'js/chat/urlFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/encryptionFilter.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/chatstore.js', n: 'chatstore_js', j:1,w:7});
+        // notifications
+        jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
+        jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
+        jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
+        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+
+        jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/plugins/attachmentsFilter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/plugins/encryptionFilter.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/plugins/chatStore.js', n: 'chatstore_js', j:1,w:7});
+        jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1,w:7});
 
 
         jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1,w:7});
         jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1,w:7});
         jsl.push({f:'js/chat/chat.js', n: 'chat_js', j:1,w:7});
-        jsl.push({f:'js/chat/chatroom.js', n: 'chat_js', j:1,w:7});
+        jsl.push({f:'js/chat/chatRoom.js', n: 'chat_js', j:1,w:7});
 
         // END OF MEGA CHAT
         

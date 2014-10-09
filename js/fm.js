@@ -5808,7 +5808,7 @@ function initShareDialog()
 			handlePermissionMenu($this, $m, x, y);
 		}
 
-		e.stopProgagation();
+		e.stopPropagation();
 	});
 
 	// related to multi-input contacts
@@ -5832,7 +5832,7 @@ function initShareDialog()
 			handlePermissionMenu($this, $m, x, y);
 		}
 
-		e.stopProgagation();
+		e.stopPropagation();
 	});
 
 	$('.permissions-menu-item').unbind('click');

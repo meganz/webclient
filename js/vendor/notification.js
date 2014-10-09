@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Notification JS
  * Shims up the Notification API
  *

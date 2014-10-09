@@ -1,7 +1,7 @@
-﻿/**
+/**
  * Ion.Sound
  * version 2.0.2 Build 34
- * © 2014 Denis Ineshin | IonDen.com
+ * (c) 2014 Denis Ineshin | IonDen.com
  *
  * Project page:    http://ionden.com/a/plugins/ion.sound/en.html
  * GitHub page:     https://github.com/IonDen/ion.sound

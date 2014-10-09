@@ -1,5 +1,5 @@
 /*
-  Copyright 2010, François de Metz <francois@2metz.fr>
+  Copyright 2010, Francois de Metz <francois@2metz.fr>
 */
 /**
  * Roster Plugin

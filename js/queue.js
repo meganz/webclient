@@ -75,7 +75,7 @@ MegaQueue.prototype.filter = function(gid, foreach)
 
 	if (!len)
 	{
-		if (d) console.error('Nothing to filter', gid);
+		if (d) console.debug('Nothing to filter', gid);
 	}
 	else
 	{

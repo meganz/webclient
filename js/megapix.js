@@ -61,21 +61,22 @@
   /**
    * Rendering image element (with resizing) and get its data URL
    */
-  function renderImageToDataURL(img, options) {
+  function renderImageToDataURL(img, options, doSquash) {
     var canvas = document.createElement('canvas');
-    renderImageToCanvas(img, canvas, options);
+    renderImageToCanvas(img, canvas, options, doSquash);
     return canvas.toDataURL("image/jpeg", options.quality || 0.8);
   }
 
   /**
    * Rendering image element (with resizing) into the canvas element
    */
-  function renderImageToCanvas(img, canvas, options) {
+  function renderImageToCanvas(img, canvas, options, doSquash) {
     var iw = img.naturalWidth, ih = img.naturalHeight;
+    if (!(iw+ih)) return;
     var width = options.width, height = options.height;
     var ctx = canvas.getContext('2d');
     ctx.save();
-    transformCoordinate(canvas, width, height, options.orientation);
+    transformCoordinate(canvas, ctx, width, height, options.orientation);
     var subsampled = detectSubsampling(img);
     if (subsampled) {
       iw /= 2;
@@ -85,7 +86,7 @@
     var tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = tmpCanvas.height = d;
     var tmpCtx = tmpCanvas.getContext('2d');
-    var vertSquashRatio = detectVerticalSquash(img, iw, ih);
+    var vertSquashRatio = doSquash ? detectVerticalSquash(img, iw, ih) : 1;
     var dw = Math.ceil(d * width / iw);
     var dh = Math.ceil(d * height / ih / vertSquashRatio);
     var sy = 0;
@@ -111,7 +112,7 @@
    * Transform canvas coordination according to specified frame size and orientation
    * Orientation value is from EXIF tag
    */
-  function transformCoordinate(canvas, width, height, orientation) {
+  function transformCoordinate(canvas, ctx, width, height, orientation) {
     switch (orientation) {
       case 5:
       case 6:
@@ -124,7 +125,6 @@
         canvas.width = width;
         canvas.height = height;
     }
-    var ctx = canvas.getContext('2d');
     switch (orientation) {
       case 2:
         // horizontal flip
@@ -167,23 +167,24 @@
     }
   }
 
+  var URL = window.URL && window.URL.createObjectURL ? window.URL :
+            window.webkitURL && window.webkitURL.createObjectURL ? window.webkitURL :
+            null;
 
   /**
    * MegaPixImage class
    */
   function MegaPixImage(srcImage) {
-    if (srcImage instanceof Blob) {
-      var img = new Image();
-      var URL = window.URL && window.URL.createObjectURL ? window.URL :
-                window.webkitURL && window.webkitURL.createObjectURL ? window.webkitURL :
-                null;
+    if (window.Blob && srcImage instanceof Blob) {
       if (!URL) { throw Error("No createObjectURL function found to create blob url"); }
+      var img = new Image();
       img.src = URL.createObjectURL(srcImage);
+      this.blob = srcImage;
       srcImage = img;
     }
     if (!srcImage.naturalWidth && !srcImage.naturalHeight) {
       var _this = this;
-      srcImage.onload = function() {
+      srcImage.onload = srcImage.onerror = function() {
         var listeners = _this.imageLoadListeners;
         if (listeners) {
           _this.imageLoadListeners = null;
@@ -200,16 +201,17 @@
   /**
    * Rendering megapix image into specified target element
    */
-  MegaPixImage.prototype.render = function(target, options) {
+  MegaPixImage.prototype.render = function(target, options, callback) {
     if (this.imageLoadListeners) {
       var _this = this;
-      this.imageLoadListeners.push(function() { _this.render(target, options) });
+      this.imageLoadListeners.push(function() { _this.render(target, options, callback); });
       return;
     }
     options = options || {};
     var imgWidth = this.srcImage.naturalWidth, imgHeight = this.srcImage.naturalHeight,
         width = options.width, height = options.height,
-        maxWidth = options.maxWidth, maxHeight = options.maxHeight;
+        maxWidth = options.maxWidth, maxHeight = options.maxHeight,
+        doSquash = !this.blob || this.blob.type === 'image/jpeg';
     if (width && !height) {
       height = (imgHeight * width / imgWidth) << 0;
     } else if (height && !width) {
@@ -231,12 +233,19 @@
 
     var tagName = target.tagName.toLowerCase();
     if (tagName === 'img') {
-      target.src = renderImageToDataURL(this.srcImage, opt);
+      target.src = renderImageToDataURL(this.srcImage, opt, doSquash);
     } else if (tagName === 'canvas') {
-      renderImageToCanvas(this.srcImage, target, opt);
+      renderImageToCanvas(this.srcImage, target, opt, doSquash);
     }
     if (typeof this.onrender === 'function') {
       this.onrender(target);
+    }
+    if (callback) {
+      callback();
+    }
+    if (this.blob) {
+      this.blob = null;
+      URL.revokeObjectURL(this.srcImage.src);
     }
   };
 

@@ -2837,6 +2837,7 @@ img.blog-new-logos {
 	line-height: 14px;
 	display: block;
 	padding-bottom: 16px;
+	word-break: break-all;
 	word-wrap: break-word;
 }
 .properties-name-block {
@@ -4417,7 +4418,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
 }
-
 .nw-fm-search-icon {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -6487,20 +6487,20 @@ span.search-number {
 	margin-top: -151px;
 }
 .fm-empty-contacts .fm-empty-pad {
-	height: 240px;
-	margin-top: -120px;
+	height: 380px;
+	margin-top: -190px;
 }
 .fm-empty-messages .fm-empty-pad {
 	height: 264px;
 	margin-top: -132px;
 }
 .fm-empty-folder .fm-empty-pad, .fm-empty-incoming .fm-empty-pad {
-	height: 266px;
-	margin-top: -133px;
+	height: 280px;
+	margin-top: -140px;
 }
 .fm-empty-conversations .fm-empty-pad {
 	height: 286px;
-	margin-top: -142px;
+	margin-top: -118px;
 }
 .fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -6527,34 +6527,60 @@ span.search-number {
 	background-position: center -640px;
 }
 .fm-empty-contacts-bg {
-	height: 207px;
-	background-position: center -1512px;
+	height: 203px;
+	background-position: center -1514px;
 }
-.fm-empty-contacts-bg.hovered {
-	background-position: center -1852px;
+.hovered .fm-empty-contacts-bg {
+	background-position: center -1159px;
 }
 .fm-empty-messages-bg {
 	height: 207px;
 	background-position: center -1352px;
 }
-.fm-empty-folder-bg {
-	height: 210px;
-	background-position: center -589px;
-}
 .fm-empty-conversations-bg {
-	height: 229px;
-	background-position: center top;
+	height: 220px;
+	background-position: center -5px;
 }
-.fm-empty-incoming-bg {
-	height: 210px;
-	background-position: center -879px;
+.fm-empty-folder-bg, .fm-empty-incoming-bg {
+	height: 226px;
+	background-position: center -871px;
+}
+.fm-empty-description {
+	text-align: center;
+	color: #999999;
+	font-size: 15px;
+	line-height: 24px;
+	padding: 10px 20px 18px 20px;
+}
+.fm-empty-button {
+	cursor: pointer;
+	background-color: rgba(109,176,63,0.7);
+	display: inline-block;
+	padding: 0 24px;
+	color: white;
+	font-size: 15px;
+	height: 48px;
+	line-height: 46px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.fm-empty-button:hover {
+	background-color: rgba(109,176,63,1);
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;
-	font-size: 30px;
-	line-height: 38px;
+	font-size: 44px;
+	line-height: 52px;
 	text-align: center;
-	margin-top: 20px;
+	font-weight: lighter;
+	margin-top: 14px;
+	font-family: "Open Sans Light";
 }
 .transfer-panel-empty-txt {
 	position: absolute;
@@ -8314,6 +8340,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .fm-dialog.rename-dialog {
 	min-width: 360px;
 	margin: -77px 0 0 -180px;
+}
+.fm-dialog.fingerprint-dialog {
+	width: 600px;
+	margin: -229px 0 0 -300px;
+}
+.fingerprint-dialog .default-dialog-bottom {
+	margin: 0;
 }
 .fm-dialog.copy-dialog, .fm-dialog.move-dialog {
 	width: 480px;
@@ -12682,8 +12715,8 @@ h5.main-italic-header {
 	margin: 0;
 	font-size: 13px;
 	color: #868686;
-	line-height: 34px;
-	height: 34px;
+	line-height: 21px;
+	margin-top: 7px;
 	font-family: 'Open Sans', Arial;
 }
 .login-register-input.email {
@@ -18041,7 +18074,7 @@ span.incoming-call-name {
 }
 .shared-details-folder-name, .contact-details-user-name {
 	font-size: 24px;
-	line-height: 28px;
+	line-height: 30px;
 	float: left;
 	color: #333333;
 	font-family: 'Open Sans Semibold', Arial;
@@ -18090,15 +18123,100 @@ span.incoming-call-name {
 	white-space: nowrap;
 	font-family: 'Open Sans Semibold';
 }
-.contact-fingerprint-txt {
+.contact-fingerprint-txt, .fingerprint-txt {
 	font-size: 12px;
 	white-space: nowrap;
 	color: #666666;
 	text-transform: uppercase;
-	padding-bottom: 5px;
+	padding-bottom: 4px;
 }
-.contact-fingerprint-txt span {
+.contact-fingerprint-txt span, .fingerprint-txt span {
 	padding-left: 10px;
+	display: inline-block;
+	width: 42px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.fingerprint-txt span {
+	padding: 0 5px;
+}
+.fingerprint-dialog .fm-dialog-body {
+	padding: 12px 0 0 0;
+}
+.fingerprint-top-text, .fingerprint-mid-txt, .fingerprint-bott-txt {
+	background-color: #F6F6F6;
+	color: #666666;
+	font-size: 13px;
+	line-height: 21px;
+	padding: 15px 24px;
+}
+.fingerprint-mid-txt {
+	background-color: rgba(255,165,0,0.1);
+}
+.fingerprint-bott-txt {
+	background-color: transparent;
+	padding: 15px 19px
+}
+.fingerprint-bott-txt .fingerprint-txt {
+	padding: 0;
+}
+.fingerprint-bott-header {
+	padding: 0 5px 9px 5px;
+	font-size: 13px;
+}
+.fingerprint-mid-info {
+	padding: 24px;
+}
+.fingerprint-avatar {
+	width: 96px;
+	height: 96px;
+	color: white;
+	line-height: 94px;
+	text-align: center;
+	font-size: 44px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+	float: left;
+}
+.fingerprint-avatar img {
+	width: 96px;
+	height: 96px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.fingerprint-dialog .fm-dialog-button.dialog-approve-button {
+	background-color: rgba(109,176,63,0.7);
+}
+.fingerprint-dialog .fm-dialog-button.dialog-approve-button:hover {
+	background-color: rgba(109,176,63,1);
+}
+.fingerprint-code {
+	float: right;
+	width: 232px;
+	padding: 14px 18px 12px 18px;
+	background-color: #F6F6F6;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.fingerprint-code .contact-fingerprint-title {
+	padding: 0 5px 17px 5px;
+}
+.fingerprint-contact-info {
+	margin: 0 256px 0 120px;
+	padding: 21px 0 0 0;
+}
+.fingerprint-contact-info .contact-details-user-name, .fingerprint-contact-info .contact-details-email {
+	white-space: nowrap;
+	display: block;
+	float: none;
+	padding-right: 0;
 }
 .contact-details-pad {
 	margin-left: 200px;
@@ -18108,7 +18226,7 @@ span.incoming-call-name {
 .contact-details-email {
 	font-size: 12px;
 	color: #666666;
-	padding: 5px 0;
+	padding: 4px 0 5px 0;
 }
 .contact-details-pad .nw-contact-status {
 	margin: 2px 6px 0 0;
@@ -19542,9 +19660,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .main-blur-block {
 	height: 100%;
-}
-#topmenu {
-	height: 48px;
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
@@ -21043,14 +21158,9 @@ background-color:#1DA2E9
 	opacity: 0.6;
 	display: block;
 }
-
-
 /**
  * Hide UI elements when the chat is disabled
  */
-.megaChatDisabled .fm-start-conversation,
-.megaChatDisabled .nw-contact-status,
-.megaChatDisabled .nw-fm-left-icon.conversations,
-.megaChatDisabled .fm-send-files {
-    display: none;
+.megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
+	display: none;
 }

@@ -404,7 +404,7 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 4, writable : false });
+		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
 		if (!d)
 		{
 			var __cdumps = [], __cd_t;
@@ -478,7 +478,7 @@ else
 
 					var report = {};
 					report.ua = navigator.userAgent;
-					report.io = dlMethod.name;
+					report.io = window.dlMethod && dlMethod.name;
 					report.sb = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
 					report.tp = $.transferprogress;
 					report.id = ids.join(",");
@@ -546,6 +546,7 @@ else
         jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
         jsl.push({f:'js/exif.js', n: 'exif_js', j:1,w:3});
         jsl.push({f:'js/megapix.js', n: 'megapix_js', j:1});
+        jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
         jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
@@ -615,6 +616,10 @@ else
         
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+        if (is_extension)
+        {
+                jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
+        }
         /* better download */
         jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
         jsl.push({f:'js/events.js', n: 'events', j:1,w:4});

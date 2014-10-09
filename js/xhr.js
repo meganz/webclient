@@ -58,7 +58,7 @@ function newXhr() {
 		switch(this.readyState) {
 			case this.HEADERS_RECEIVED:
 				if ((Date.now() - this.started) > 10000) {
-					var ttfb = hostname(this.responseURL) + ' taking more than 10s to reply.';
+					var ttfb = hostname(this.responseURL || this._murl) + ' took +10s';
 					if (d) console.log(ttfb);
 					else window.onerror(ttfb, '', -1);
 				}

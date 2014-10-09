@@ -824,7 +824,7 @@ function toArray(val) {
 
 /**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
- * © 2011 Colin Snover <http://zetafleet.com>
+ * (c) 2011 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
  */
 (function (Date, undefined) {
@@ -832,12 +832,12 @@ function toArray(val) {
     Date.parse = function (date) {
         var timestamp, struct, minutesOffset = 0;
 
-        // ES5 §15.9.4.2 states that the string should attempt to be parsed as a Date Time String Format string
-        // before falling back to any implementation-specific date parsing, so that’s what we do, even if native
+        // ES5 15.9.4.2 states that the string should attempt to be parsed as a Date Time String Format string
+        // before falling back to any implementation-specific date parsing, so that's what we do, even if native
         // implementations could be faster
-        //              1 YYYY                2 MM       3 DD           4 HH    5 mm       6 ss        7 msec        8 Z 9 ±    10 tzHH    11 tzmm
+        //              1 YYYY                2 MM       3 DD           4 HH    5 mm       6 ss        7 msec        8 Z 9 +    10 tzHH    11 tzmm
         if ((struct = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/.exec(date))) {
-            // avoid NaN timestamps caused by “undefined” values being passed to Date.UTC
+            // avoid NaN timestamps caused by "undefined" values being passed to Date.UTC
             for (var i = 0, k; (k = numericKeys[i]); ++i) {
                 struct[k] = +struct[k] || 0;
             }
@@ -1309,7 +1309,8 @@ function setupTransferAnalysis()
 
 			for (var i in tp)
 			{
-				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1])
+				if (!GlobalProgress[i] || GlobalProgress[i].paused || tp[i][0] == tp[i][1]
+					|| (i[0] === 'u' ? ulQueue : dlQueue).isPaused())
 				{
 					delete prev[i];
 				}
@@ -1372,6 +1373,7 @@ function setupTransferAnalysis()
 					if (data.length)
 					{
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
+						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
 						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
 					}

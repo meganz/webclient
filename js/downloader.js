@@ -269,6 +269,7 @@ ClassChunk.prototype.run = function(task_done) {
 	/* let the fun begin! */
 	if (d) console.log(this + " Fetching " + this.url);
 	this.xhr = getXhr(this);
+	this.xhr._murl = this.url;
 
 	if (chromehack) {
 		var t = this.url.lastIndexOf('/dl/');
@@ -428,7 +429,7 @@ ClassFile.prototype.run = function(task_done) {
 				}));
 			}
 
-			if (this.dl.zipid && (this.emptyFile = (tasks.length == 0)))
+			if ((this.emptyFile = (tasks.length == 0)) && this.dl.zipid)
 			{
 				tasks.push(new ClassEmptyChunk(this.dl));
 			}

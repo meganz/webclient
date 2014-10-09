@@ -997,7 +997,7 @@ function MegaData ()
                 chatui(id); // XX: using the old code...for now
             }
 		}
-		else if (!M.d[id]) id = this.RootID;
+		else if (!id || !M.d[id]) id = this.RootID;
 
         if(!MegaChatDisabled) {
             if (!this.chat) {
@@ -1524,12 +1524,12 @@ function MegaData ()
 
 	this.addNode = function(n,ignoreDB)
 	{
-		if (n.p == this.RubbishID) 
+		if (n.p == this.RubbishID)
 		{
 			this.rubNodes[n.h] = true;
 			this.rubbishIco();
 		}
-		if (n.t == 4) 
+		if (n.t == 4)
 		{
 			for (var i in this.d)
 			{
@@ -1817,7 +1817,7 @@ function MegaData ()
 
 	this.moveNodes = function(n,t)
 	{
-		if (t == this.RubbishID) 
+		if (t == this.RubbishID)
 		{
 			for (var i in n)
 			{
@@ -2512,7 +2512,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		else window.onerror('onDownloadError :: ' + error, '', -1);
+		else window.onerror('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''), '', -1);
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2899,13 +2899,25 @@ function voucherData(arr)
 	return vouchers;
 }
 
-function onUploadError(fileid, errorstr, reason)
+function onUploadError(ul, errorstr, reason, xhr)
 {
-	if (!d) window.onerror('onUploadError :: ' + errorstr + (reason ? ': ' + reason : ''), '', -1);
+	var hn = hostname(ul.posturl);
 
-	DEBUG('OnUploadError ' + fileid + ' ' + errorstr, reason);
+	if (!d && (!xhr || xhr.readyState < 2 || xhr.status))
+	{
+		var details = [
+			browserdetails(ua).name,
+			'' + reason,
+			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
+			hn
+		];
+		window.onerror('onUploadError :: ' + errorstr
+			+ ' [' + details.join("] [") + ']', '', -1);
+	}
 
-	$('.transfer-table #ul_' + fileid + ' td:eq(5)')
+	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
+
+	$('.transfer-table #ul_' + ul.id + ' td:eq(3)')
 		.html('<span class="transfer-status error">'+htmlentities(errorstr)+'</span>')
 		.parents('tr').data({'failed' : NOW()});
 }

@@ -1201,7 +1201,7 @@ function addContactUI()
 		}
     });
 	
-	//TODO: Bind ivents if Contacts section is empty
+	//TODO: Bind events if Contacts section is empty
 	$('.fm-empty-contacts .fm-empty-button').unbind('mouseover');
 	$('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
 		$('.fm-empty-contacts').addClass('hovered');

@@ -294,6 +294,7 @@ var UploadManager =
 
 function ul_get_posturl(File) {
 	return function(res, ctx) {
+		if (!File.ul) return; /* cancelled */
 		delete ul_queue[ctx.reqindex].posturl; /* reset in case of a retry */
 		if (typeof res == 'object') {
 			if (typeof res.p == "string" && res.p.length > 0) {

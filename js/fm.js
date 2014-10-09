@@ -7797,8 +7797,10 @@ function userAvatar(userid)
 	var user = M.u[userid];
 	if (!user || !user.u) return;
 
-	var avatar = user.name.substr(0,2),
-		av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
+	var name = user.name || user.m;
+
+	var avatar = name.substr(0,2),
+		av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
 
 	if (avatars[userid]) avatar = '<img src="' + avatars[userid].url + '">';
 
@@ -7827,7 +7829,7 @@ function fingerprintDialog(userid)
 		.html(avatar.img)
 
 	$this.find('.contact-details-user-name')
-			.text(user.name) // escape HTML things
+			.text(user.name || user.m) // escape HTML things
 		.end()
 		.find('.contact-details-email')
 			.text(user.m) // escape HTML things
@@ -7892,7 +7894,7 @@ function contactUI()
 		$('.contact-top-details .onlinestatus').removeClass('away offline online busy');
 		$('.contact-top-details .onlinestatus').addClass(onlinestatus[1]);
 		$('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
-		$('.contact-top-details .contact-details-user-name').text(user.name);
+		$('.contact-top-details .contact-details-user-name').text(user.name||user.m);
 		$('.contact-top-details .contact-details-email').text(user.m);
 
 		var fprint = $('.contact-fingerprint-txt').empty()

@@ -2,6 +2,7 @@
  * Simple class which should link the MegaNotifications and Chat and add support for notifications.
  *
  * @param megaChat
+ * @param options {Object} options passed to MegaNotifications, see MegaNotifications.DEFAULT_OPTIONS
  * @returns {ChatNotifications}
  * @constructor
  */
@@ -21,10 +22,6 @@ var ChatNotifications = function(megaChat, options) {
         .bind('onCounterUpdated.chat', function(megaNotifications, group, notifObj) {
             megaChat.renderContactTree();
         });
-    if(localStorage.d) {
-        logAllCallsOnObject(self.notifications, console.error, true, "meganotif");
-        logAllCallsOnObject(ion.sound, console.error, true, "ion.sound");
-    }
 
     return this;
 };

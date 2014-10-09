@@ -3,17 +3,21 @@
  *
  * @param megaChat {Chat}
  * @param roomJid
+ * @param type {String} only "private" is supported for now
+ * @param ctime {Integer} unix time
+ * @param users {Array}
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomJid) {
+var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
     this.megaChat = megaChat;
-    this.users = [];
+    this.users = users ? users : [];
     this.hash = null;
     this.roomJid = roomJid;
-    this.type = null;
+    this.type = type;
     this.messages = [];
     this.messagesIndex = {};
+    this.ctime = ctime;
 
     this.callRequest = null;
     this.callIsActive = false;
@@ -267,6 +271,7 @@ var ChatRoom = function(megaChat, roomJid) {
                 if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
                     self.activateWindow();
                 }
+                self.megaChat.trigger('onCallAnswered', [self]);
 
                 self._resetCallStateInCall();
             };
@@ -297,6 +302,12 @@ var ChatRoom = function(megaChat, roomJid) {
                         avatar = avatars[contact.u].url;
                     }
 
+                    self.megaChat.trigger('onIncomingCall', [
+                        self,
+                        self.megaChat.getContactNameFromJid(participants[0]),
+                        avatar,
+                        eventData.peerMedia.video ? true : false,
+                    ]);
                     self.megaChat.incomingCallDialog.show(
                         self.megaChat.getContactNameFromJid(participants[0]),
                         avatar,
@@ -481,10 +492,13 @@ var ChatRoom = function(megaChat, roomJid) {
             )
         );
 
+        self.megaChat.trigger('onCallSuspended', [self]);
         self._resetCallStateNoCall();
     });
 
     self.bind('call-canceled', function(e, eventData) {
+        self.megaChat.trigger('onCallSuspended', self);
+
         if(eventData.info.isDataCall) {
 
             var sessionId = eventData.info.sid;
@@ -1713,7 +1727,6 @@ ChatRoom.prototype.show = function() {
 
     // update unread messages count
     $('.fm-chat-message-container.unread', self.$messages).removeClass('unread');
-    self.unreadCount = 0;
 
 
     self.resized();
@@ -1721,8 +1734,15 @@ ChatRoom.prototype.show = function() {
     self.megaChat.lastOpenedChat = self.roomJid;
 
     self.trigger('activity');
+    self.trigger('onChatShown');
 };
 
+/**
+ * Returns true/false if the current room is currently active (e.g. visible)
+ */
+ChatRoom.prototype.isActive = function() {
+    return $.windowActive && this.$header.is(":visible");
+};
 
 
 ChatRoom.prototype.getRoomUrl = function() {
@@ -1805,7 +1825,7 @@ ChatRoom.prototype.appendMessage = function(message) {
     var jid = Karere.getNormalizedBareJid(message.getFromJid());
 
 
-    if(jid != self.megaChat.karere.getBareJid() && self.roomJid != self.megaChat.getCurrentRoomJid()) {
+    if(jid != self.megaChat.karere.getBareJid() && !self.isActive()) {
         $message.addClass('unread');
     }
 
@@ -1950,18 +1970,19 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     self.resized();
 
     // update unread messages count
-    if(self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
-        var $navElement = self.getNavElement();
-        var $count = $('.nw-conversations-unread', $navElement);
+    if(self.megaChat.plugins.chatNotifications) {
+        if (self.roomJid != self.megaChat.getCurrentRoomJid() && $message.is('.unread')) {
+            var $navElement = self.getNavElement();
+            var $count = $('.nw-conversations-unread', $navElement);
 
-        var count = $('.fm-chat-message-container.unread', self.$messages).size();
-        if(count > 0) {
-            self.unreadCount = count;
-            $navElement.addClass("unread");
-        } else if(count === 0) {
-            self.unreadCount = 0;
+            var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
+
+            if (count > 0) {
+                $navElement.addClass("unread");
+            }
+
+            self.renderContactTree();
         }
-        self.renderContactTree();
     }
 
     $(messageObject).bind("onStateChange", function(e, msgObj, oldVal, newVal) {
@@ -1972,6 +1993,8 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
 
     self.refreshScrollUI();
     $jsp.scrollToBottom();
+
+    self.trigger('onAfterRenderMessage', [$message, messageObject]);
 
     self.trigger('activity');
 
@@ -2078,7 +2101,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
 
     var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
 
-    if(!read && self.roomJid != self.megaChat.getCurrentRoomJid()) {
+    if(!read && !self.isActive()) {
         $inlineDialog.addClass('unread');
     }
 
@@ -2721,13 +2744,16 @@ ChatRoom.prototype.renderContactTree = function() {
 
     var $count = $('.nw-conversations-unread', $navElement);
 
-    var count = self.unreadCount;
-    if(count > 0) {
-        $count.text(count);
-        $navElement.addClass("unread");
-    } else if(count === 0) {
-        $count.text("");
-        $navElement.removeClass("unread");
+    if(self.megaChat.plugins.chatNotifications) {
+        var count = self.megaChat.plugins.chatNotifications.notifications.getCounterGroup(self.roomJid);
+
+        if (count > 0) {
+            $count.text(count);
+            $navElement.addClass("unread");
+        } else if (count === 0) {
+            $count.text("");
+            $navElement.removeClass("unread");
+        }
     }
 
     $navElement.data('chatroom', self);

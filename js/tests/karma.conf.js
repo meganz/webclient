@@ -22,10 +22,10 @@ module.exports = function(config) {
              "../mega.js",
              "../fm.js",
              "../user.js",
-             "../_megaKvStorage.js",
-             "../_megaPromise.js",
+             "../megaKvStorage.js",
+             "../megaPromise.js",
              "../vendor/db.js",
-             "../_megaDb.js",
+             "../megaDb.js",
              "../megaNotifications.js",
              "../tlvstore.js",
 
@@ -58,7 +58,7 @@ module.exports = function(config) {
              "../chat/plugins/urlFilter.js",
              "../chat/plugins/emoticonsFilter.js",
              "../chat/plugins/encryptionFilter.js",
-             "../chat/plugins/_chatStore.js",
+             "../chat/plugins/chatStore.js",
              "../chat/plugins/chatNotifications.js",
 
              "../chat/karereEventObjects.js",

@@ -151,7 +151,7 @@ function cacheselect()
 
 function hideEmptyMsg()
 {
-	$('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming, .fm-empty-contacts').addClass('hidden');
+	$('.fm-empty-trashbin,.fm-empty-contacts,.fm-empty-search,.fm-empty-cloud,.fm-empty-messages,.fm-empty-folder,.fm-empty-conversations,.fm-empty-incoming').addClass('hidden');
 	$('.fm-empty-pad.fm-empty-sharef').remove();
 }
 
@@ -1200,12 +1200,24 @@ function addContactUI()
 			}
 		}
     });
+	
+	$('.fm-empty-contacts .fm-empty-button').unbind('mouseover');
+	$('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
+		$('.fm-empty-contacts').addClass('hovered');
+	});
+	$('.fm-empty-contacts .fm-empty-button').unbind('mouseout');
+	$('.fm-empty-contacts .fm-empty-button').bind('mouseout', function() {
+		$('.fm-empty-contacts').removeClass('hovered');
+	});
+	$('.fm-empty-contacts .fm-empty-button').unbind('click');
+	$('.fm-empty-contacts .fm-empty-button').bind('click', function() {
+		//TODO: Show Add user dialog
+	});
 
 	$('.fm-add-user').unbind('click');
 	$('.fm-add-user').bind('click',function()
 	{
 		$.hideContextMenu();
-
 		$.dialog = 'add-contact-popup';
 		var $this = $(this);
 		var $d = $('.add-user-popup');

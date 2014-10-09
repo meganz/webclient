@@ -1206,15 +1206,40 @@ function addContactUI()
 	$('.fm-empty-contacts .fm-empty-button').bind('mouseover', function() {
 		$('.fm-empty-contacts').addClass('hovered');
 	});
+	
 	$('.fm-empty-contacts .fm-empty-button').unbind('mouseout');
 	$('.fm-empty-contacts .fm-empty-button').bind('mouseout', function() {
 		$('.fm-empty-contacts').removeClass('hovered');
 	});
+	
 	$('.fm-empty-contacts .fm-empty-button').unbind('click');
-	$('.fm-empty-contacts .fm-empty-button').bind('click', function() {
-		//TODO: Show Add user dialog
+	$('.fm-empty-contacts .fm-empty-button').bind('click', function(e)
+	{
+		$.hideContextMenu();
+		$.dialog = 'add-contact-popup';
+		$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
+		$.addUserFail = [];
+		// Just in case hide import links
+		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
+		$('.import-contacts-link').removeClass('active');
+		// Prepare multi-input and dialog
+		$('.add-user-popup .multiple-input .token-input-token-mega').remove();
+		$('.add-user-popup-button.add').addClass('disabled');
+		$('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+		$('.fm-add-user').removeClass('active');
+		iconSize(false);
+		focusOnInput();
+		
+		$('.add-user-popup')
+				.addClass('dialog')
+				.removeClass('hidden');
+		
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('body').addClass('overlayed');
+		
+		e.stopPropagation();
 	});
-
+	
 	$('.fm-add-user').unbind('click');
 	$('.fm-add-user').bind('click',function()
 	{
@@ -1269,7 +1294,6 @@ function addContactUI()
 			iconSize(false);
 			$('.fm-add-user').removeClass('active');
 			focusOnInput();
-
 		}
 		else// .short-size
 		{

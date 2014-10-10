@@ -7825,7 +7825,8 @@ function isContactVerified(userid)
 
 function fingerprintDialog(userid)
 {
-	var user = M.u[userid.u || userid]
+	userid = userid.u || userid
+	var user = M.u[userid]
 	if (!user || !user.u) return;
 
 	var $this = $('.fingerprint-dialog')

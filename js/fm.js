@@ -7651,7 +7651,7 @@ function fm_resize_handler() {
         });
     });
 
-    $('.fm-main.notifications > .new-notifications-scroll').each(function() {
+    $('.new-notification-pad').each(function() {
         $(this).css({
             'margin-left':  (305 - right_panel_margin) * -1
         });

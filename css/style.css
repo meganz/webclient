@@ -4308,16 +4308,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 48px;
 	background-color: rgba(242,242,242,100);
 }
-.fm-left-menu.cloud-drive, .fm-left-menu.notifications {
-	background: #d90007;
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q5MDAwNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZjFhNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-linear-gradient(left, #d90007 0%, #ff1a53 100%);
-	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #d90007), color-stop(100%, #ff1a53));
-	background: -webkit-linear-gradient(left, #d90007 0%, #ff1a53 100%);
-	background: -o-linear-gradient(left, #d90007 0%, #ff1a53 100%);
-	background: -ms-linear-gradient(left, #d90007 0%, #ff1a53 100%);
-	background: linear-gradient(to right, #d90007 0%, #ff1a53 100%);
-}
 .fm-left-menu.shared-with-me {
 	background: #ffa500;
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmYTUwMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmQzMDAiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -4357,6 +4347,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background: -o-linear-gradient(left, #31b500 0%, #13e03c 100%);
 	background: -ms-linear-gradient(left, #31b500 0%, #13e03c 100%);
 	background: linear-gradient(to right, #31b500 0%, #13e03c 100%);
+}
+.fm-left-menu.cloud-drive, .fm-left-menu.notifications {
+	background: #d90007;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q5MDAwNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZjFhNTMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #d90007), color-stop(100%, #ff1a53));
+	background: -webkit-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -o-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: -ms-linear-gradient(left, #d90007 0%, #ff1a53 100%);
+	background: linear-gradient(to right, #d90007 0%, #ff1a53 100%);
 }
 .nw-fm-left-icons-panel {
 	background-color: #222222;
@@ -15880,14 +15880,14 @@ code, c {
 	height: -webkit-calc(100% - 48px);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
-	background-image: url(../images/mega/notification-icons.png);
-	background-position: -109px top;
-	background-repeat: repeat-y;
-	margin-left: -104px;
+	
 }
 .new-notification-pad {
 	padding: 19px 0 19px 0;
-	position: relative
+	position: relative;
+	background-image: url(../images/mega/notification-icons.png);
+	background-position: -109px top;
+	background-repeat: repeat-y;
 }
 .new-bottom-pages .copyrigths p span.text {
 	padding: 0;
@@ -20140,7 +20140,7 @@ background-size: 541px auto;
 background-image: url(../images/mega/sdk-sprite@2x.png);
 background-size: 904px auto;
 }
-.nt-info-connector, .new-notifications-scroll {
+.nt-info-connector, .new-notification-pad {
 background-image: url(../images/mega/notification-icons@2x.png);
 background-size: 414px auto;
 }

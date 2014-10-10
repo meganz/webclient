@@ -401,7 +401,7 @@ function countrydetails(isocode)
 
 function time2date(unixtime,ignoretime)
 {
-	var MyDate = new Date(unixtime*1000);
+	var MyDate = new Date(unixtime*1000||0);
 	var MyDateString =
 	MyDate.getFullYear() + '-'
 	+ ('0' + (MyDate.getMonth()+1)).slice(-2) + '-'

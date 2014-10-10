@@ -7810,9 +7810,10 @@ function userAvatar(userid)
 
 function userFingerprint(userid, next)
 {
-	var user = M.u[userid] || userid;
+	userid = userid.u || userid
+	var user = M.u[userid];
 	if (!user || !user.u) return next([])
-	getFingerprintEd25519(user.h, function(response) {
+	getFingerprintEd25519(user.h || userid, function(response) {
 		next(response.toUpperCase().match(/.{4}/g), response)
 	});
 }
@@ -7843,6 +7844,13 @@ function fingerprintDialog(userid)
 			.text(user.m) // escape HTML things
 
 	$this.find('.fingerprint-txt').empty()
+	userFingerprint(u_handle, function(fprint) {
+		var target= $('.fingerprint-bott-txt .fingerprint-txt')
+		fprint.forEach(function(v) {
+			$('<span>').text(v).appendTo(target);
+		});
+	});
+
 	userFingerprint(user, function(fprint) {
 		var offset = 0;
 		$this.find('.fingerprint-code .fingerprint-txt').each(function() {
@@ -7851,11 +7859,6 @@ function fingerprintDialog(userid)
 				$('<span>').text(v).appendTo(that)
 				offset++;
 			});
-		});
-
-		var target= $('.fingerprint-bott-txt .fingerprint-txt')
-		fprint.forEach(function(v) {
-			$('<span>').text(v).appendTo(target);
 		});
 	})
 

@@ -7794,7 +7794,8 @@ function sharedfolderUI()
 
 function userAvatar(userid)
 {
-	var user = M.u[userid];
+	userid = userid.u || userid
+	var user = M.u[userid]
 	if (!user || !user.u) return;
 
 	var name = user.name || user.m;
@@ -7807,18 +7808,24 @@ function userAvatar(userid)
 	return {img: avatar, color: av_color};
 }
 
-function userFingerPrint(userid, next)
+function userFingerprint(userid, next)
 {
 	var user = M.u[userid] || userid;
 	if (!user || !user.u) return next([])
 	getFingerprintEd25519(user.h, function(response) {
-		next(response.toUpperCase().match(/.{4}/g))
+		next(response.toUpperCase().match(/.{4}/g), response)
 	});
+}
+
+function isContactVerified(userid)
+{
+	userid = userid.u || userid
+	return (u_authring.Ed25519[userid]||{}).method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
 }
 
 function fingerprintDialog(userid)
 {
-	var user = M.u[userid];
+	var user = M.u[userid.u || userid]
 	if (!user || !user.u) return;
 
 	var $this = $('.fingerprint-dialog')
@@ -7835,7 +7842,7 @@ function fingerprintDialog(userid)
 			.text(user.m) // escape HTML things
 
 	$this.find('.fingerprint-txt').empty()
-	userFingerPrint(user, function(fprint) {
+	userFingerprint(user, function(fprint) {
 		var offset = 0;
 		$this.find('.fingerprint-code .fingerprint-txt').each(function() {
 			var that = $(this)
@@ -7857,13 +7864,14 @@ function fingerprintDialog(userid)
 	});
 
 	$('.dialog-approve-button').rebind('click', function() {
-		alert("approve");
 		$this.addClass('hidden');
+		userFingerprint(user, function(fprint, fprintraw) {
+			authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+		});
 		$this = null;
 	});
 
 	$('.dialog-skip-button').rebind('click', function() {
-		alert("cancel");
 		$this.addClass('hidden');
 		$this = null;
 	});
@@ -7898,13 +7906,21 @@ function contactUI()
 		$('.contact-top-details .contact-details-email').text(user.m);
 
 		var fprint = $('.contact-fingerprint-txt').empty()
-		getFingerprintEd25519(user.h, function(response) {
-			$.each(response.toUpperCase().match(/.{4}/g), function(k, value) {
+		userFingerprint(user, function(fprints) {
+			$.each(fprints, function(k, value) {
 				$('<span>').text(value).appendTo(
 					fprint.filter(k <= 4 ? ':first' : ':last')
 				)
 			});
 		});
+
+		if (isContactVerified(user)) {
+			$('.fm-verify').addClass('active').text('Verified')
+		} else {
+			$('.fm-verify').text('Verify...').removeClass('active').rebind('click', function() {
+				fingerprintDialog(user);
+			});
+		}
 
         if(!MegaChatDisabled) {
             if (onlinestatus[1] != "offline" && u_h != u_handle) {

@@ -4358,6 +4358,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background: -ms-linear-gradient(left, #d90007 0%, #ff1a53 100%);
 	background: linear-gradient(to right, #d90007 0%, #ff1a53 100%);
 }
+.fm-left-menu.folder-link {
+	background: #ff0f4f;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmMGY0ZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZjUwMWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(left, #ff0f4f 0%, #ff501d 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%, #ff0f4f), color-stop(100%, #ff501d));
+	background: -webkit-linear-gradient(left, #ff0f4f 0%, #ff501d 100%);
+	background: -o-linear-gradient(left, #ff0f4f 0%, #ff501d 100%);
+	background: -ms-linear-gradient(left, #ff0f4f 0%, #ff501d 100%);
+	background: linear-gradient(to right, #ff0f4f 0%, #ff501d 100%);
+}
 .nw-fm-left-icons-panel {
 	background-color: #222222;
 	width: 48px;
@@ -4415,7 +4425,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
  .nw-fm-tree-header input:-ms-input-placeholder {
  color:rgba(255,255,255,0.3);
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .folder-link .nw-fm-tree-header.folder-link, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications {
 	display: block;
 }
 .nw-fm-search-icon {
@@ -4496,6 +4506,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(213,22,0,0);
 	background-position: center 13px;
 }
+.not-logged .nw-fm-left-icon.cloud-drive {
+	background-position: center -9666px;
+}
+.not-logged .nw-fm-left-icon.cloud-drive.active, .not-logged .nw-fm-left-icon.cloud-drive:hover {
+	background-position: center 13px;
+}
+.nw-fm-left-icon.folder-link {
+	background-color: rgba(255,15,79,0);
+	background-position: center -9567px;
+	display: none;
+}
+.active-folder-link .nw-fm-left-icon.folder-link {
+	display: block;
+}
 .nw-fm-left-icon.notifications {
 	background-position: left -6142px;
 }
@@ -4503,17 +4527,39 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(252,173,0,0);
 	background-position: center -35px;
 }
+.not-logged .nw-fm-left-icon.shared-with-me {
+	background-position: center -9713px;
+}
+.not-logged .nw-fm-left-icon.shared-with-me:hover, .not-logged .nw-fm-left-icon.shared-with-me.active {
+	background-position: center -35px;
+}
 .nw-fm-left-icon.contacts {
 	background-color: rgba(113,173,58,0);
+	background-position: center -83px;
+}
+.not-logged .nw-fm-left-icon.contacts {
+	background-position: center -9761px;
+}
+.not-logged .nw-fm-left-icon.contacts:hover, .not-logged .nw-fm-left-icon.contacts.active {
 	background-position: center -83px;
 }
 .nw-fm-left-icon.conversations {
 	background-color: rgba(31,165,224,0);
 	background-position: center -131px;
 }
+.not-logged .nw-fm-left-icon.conversations {
+	background-position: center -9861px;
+}
+.not-logged .nw-fm-left-icon.conversations:hover, .not-logged .nw-fm-left-icon.conversations.active {
+	background-position: center -131px;
+}
 .nw-fm-left-icon.cloud-drive:hover {
 	background-position: center -367px;
 	background-color: rgba(217,0,7,0.7);
+}
+.nw-fm-left-icon.folder-link:hover {
+	background-color: rgba(255,15,79,0.8);
+	background-position: center -9617px;
 }
 .nw-fm-left-icon.shared-with-me:hover {
 	background-position: center -415px;
@@ -4530,6 +4576,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.cloud-drive.active {
 	background-color: rgba(217,0,7,1);
 	background-position: center -367px;
+}
+.nw-fm-left-icon.folder-link.active {
+	background-color: rgba(255,15,79,1);
+	background-position: center -9617px;
 }
 .nw-fm-left-icon.notifications {
 	background-color: rgba(217,0,7,1);
@@ -4572,6 +4622,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	bottom: 0;
 	cursor: pointer;
 	background-image: none;
+}
+.not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
+	display: none !important;
+}
+.not-logged .fm-files-view-icon {
+	display: none;
+}
+.not-logged .fm-files-view-icon {
+	display: none;
+}
+.not-logged .fm-right-header.folder-link {
+	display: block;
 }
 .nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.dragover {
 	background-color: rgba(49,183,0,0.7);
@@ -6134,6 +6196,9 @@ table {
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
 	background-position: 2px -544px;
 }
+.fm-breadcrumbs.folder-link .right-arrow-bg {
+	background-position: -3px -9819px;
+}
 .fm-dialog-breadcrumbs.shared-folder .right-arrow-bg {
 	background-position: 2px -541px;
 }
@@ -6459,7 +6524,7 @@ span.search-number {
 	opacity: 0.05;
 	cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -6478,9 +6543,21 @@ span.search-number {
 	top: 50%;
 	margin-top: -131px;
 }
+.fm-empty-cloud .fm-empty-pad {
+	height: 292px;
+	margin-top: -145px;
+}
+.not-logged .fm-empty-cloud .fm-empty-pad {
+	height: 398px;
+	margin-top: -199px;
+}
 .fm-empty-search .fm-empty-pad {
 	height: 310px;
 	margin-top: -155px;
+}
+.fm-invalid-folder .fm-empty-pad {
+	height: 404px;
+	margin-top: -202px;
 }
 .fm-empty-trashbin .fm-empty-pad {
 	height: 302px;
@@ -6494,13 +6571,28 @@ span.search-number {
 	height: 264px;
 	margin-top: -132px;
 }
+.not-logged .fm-empty-messages .fm-empty-pad {
+	height: 370px;
+	margin-top: -186px;
+}
 .fm-empty-folder .fm-empty-pad, .fm-empty-incoming .fm-empty-pad {
 	height: 280px;
 	margin-top: -140px;
 }
+.not-logged .fm-empty-incoming .fm-empty-pad {
+	height: 386px;
+	margin-top: -193px;
+}
+.not-logged .fm-empty-contacts .fm-empty-description, .not-logged .fm-empty-contacts .fm-empty-button {
+	display: none;
+}
 .fm-empty-conversations .fm-empty-pad {
 	height: 286px;
 	margin-top: -118px;
+}
+.not-logged .fm-empty-conversations .fm-empty-pad {
+	height: 390px;
+	margin-top: -171px;
 }
 .fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
@@ -6510,13 +6602,13 @@ span.search-number {
 	background-image: url(../images/mega/empty.png);
 	background-repeat: no-repeat;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg {
 	background-image: url(../images/mega/empty-sprite.svg);
 	background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
-	height: 206px;
-	background-position: center -300px;
+	height: 223px;
+	background-position: center -291px;
 }
 .fm-empty-search-bg {
 	height: 249px;
@@ -6529,6 +6621,10 @@ span.search-number {
 .fm-empty-contacts-bg {
 	height: 203px;
 	background-position: center -1514px;
+}
+.fm-invalid-folder-bg {
+	height: 304px;
+	background-position: center -1791px;
 }
 .hovered .fm-empty-contacts-bg {
 	background-position: center -1159px;
@@ -6545,20 +6641,30 @@ span.search-number {
 	height: 226px;
 	background-position: center -871px;
 }
-.fm-empty-description {
+.fm-empty-folder-link-bg {
+	height: 226px;
+	background-position: center -581px;
+}
+.fm-empty-description, .fm-not-logged-description {
 	text-align: center;
 	color: #999999;
-	font-size: 15px;
+	font-size: 14px;
 	line-height: 24px;
 	padding: 10px 20px 18px 20px;
 }
-.fm-empty-button {
+.fm-not-logged-text {
+	display: none;
+}
+.not-logged .fm-not-logged-text {
+	display: block;
+}
+.fm-empty-button, .fm-not-logged-button {
 	cursor: pointer;
 	background-color: rgba(109,176,63,0.7);
 	display: inline-block;
 	padding: 0 24px;
 	color: white;
-	font-size: 15px;
+	font-size: 14px;
 	height: 48px;
 	line-height: 46px;
 	-moz-border-radius: 4px;
@@ -6570,6 +6676,19 @@ span.search-number {
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
 }
+.fm-not-logged-button.login, .fm-not-logged-button.create-account {
+	background-color: rgba(119,119,119,0.7);
+	margin: 0 4px;
+}
+.fm-not-logged-button.login:hover {
+	background-color: rgba(119,119,119,1);
+}
+.fm-not-logged-button.create-account {
+	background-color: rgba(217,0,7,0.7);
+}
+.fm-not-logged-button.create-account:hover {
+	background-color: rgba(217,0,7,1);
+}
 .fm-empty-button:hover {
 	background-color: rgba(109,176,63,1);
 }
@@ -6579,7 +6698,7 @@ span.search-number {
 	line-height: 52px;
 	text-align: center;
 	font-weight: lighter;
-	margin-top: 14px;
+	margin-top: 20px;
 	font-family: "Open Sans Light";
 }
 .transfer-panel-empty-txt {
@@ -15880,10 +15999,9 @@ code, c {
 	height: -webkit-calc(100% - 48px);
 	height: -moz-calc(100% - 48px);
 	height: calc(100% - 48px);
-	
 }
 .new-notification-pad {
-	padding: 19px 0 19px 0;
+	padding: 19px 0 59px 0;
 	position: relative;
 	background-image: url(../images/mega/notification-icons.png);
 	background-position: -109px top;

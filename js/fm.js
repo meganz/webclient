@@ -386,7 +386,8 @@ function initUI()
 		$('.fm-tree-header').not('.cloud-drive-item').show();
 		$('.fm-menu-item').show();
 		$('.fm-left-menu .folderlink').addClass('hidden');
-	}
+		$('.fm-main').removeClass('active-folder-link');
+	} else $('.fm-main').addClass('active-folder-link');
 
 	treesearchUI();
 
@@ -660,7 +661,9 @@ function initUI()
 		}
 	});
 	$('.fm-right-header.fm').removeClass('hidden');
-	if (folderlink) $('.fm-tree-header.cloud-drive-item span').text((M.d[M.RootID]||{}).name||"\u30C4");
+	if (folderlink) {
+		$('.fm-tree-header.cloud-drive-item span').text('');
+	}
 	else folderlink=0;
 	/* REMOVEME
 	$('.add-user-popup-button').unbind('click');

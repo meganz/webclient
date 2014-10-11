@@ -3,7 +3,7 @@
 function FileDragHover(e)
 {
 	if (d) console.log('hover',$.dragging);
-	if (folderlink) return false;
+	if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
 	$.dragging=new Date().getTime();
 	e.stopPropagation();
 	e.preventDefault();
@@ -54,7 +54,7 @@ function FileDragHover(e)
 function FileDragLeave(e)
 {
 	if (d) console.log(e);
-	if (folderlink) return false;
+	if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
 	e.stopPropagation();
 	e.preventDefault();
 	setTimeout(function()
@@ -151,7 +151,7 @@ function start_anoupload()
 // file selection
 function FileSelectHandler(e)
 {
-	if (folderlink) return false;
+	if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
 
 	if (e.stopPropagation) e.stopPropagation();
 	if (e.preventDefault) e.preventDefault();

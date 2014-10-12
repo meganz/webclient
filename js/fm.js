@@ -749,7 +749,7 @@ function fmremove()
 
 function fmremdupes(test)
 {
-  var hs = {}, i, f = [];
+  var hs = {}, i, f = [], s = 0;
   var cRootID = RootbyId(M.currentdirid);
   loadingDialog.show();
   for(i in M.d)
@@ -769,9 +769,10 @@ function fmremdupes(test)
   for(i in f)
     {
       console.debug('Duplicate node: ' + f[i] + ' at ~/' + M.getPath(f[i]).reverse().map(function(n) { return M.d[n].name || '' }).filter(String).join("/"));
+      s += M.d[f[i]].s | 0;
     }
   loadingDialog.hide();
-  console.log('Found ' + f.length + ' duplicated files.');
+  console.log('Found ' + f.length + ' duplicated files using a sum of ' + bytesToSize(s));
   if(!test && f.length)
     {
       $.selected = f;
@@ -856,6 +857,30 @@ function initContextUI()
 	{
 		$.mctype='copy-cloud';
 		mcDialog();
+	});
+
+	$(c+'.import-item').unbind('click');
+	$(c+'.import-item').bind('click',function(event)
+	{
+		ASSERT(folderlink, 'Import needs to be used in folder links.');
+
+		var sel = [].concat($.selected || []);
+		if (sel.length)
+		{
+			var FLRootID = M.RootID;
+			document.location.hash = 'fm';
+			$(document).one('openFolder', SoonFc(function(e)
+			{
+				if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
+				{
+					if (d) console.log('Importing Nodes...', sel);
+					$.selected = sel;
+					$.mcImport = true;
+					$.mctype='copy-cloud';
+					mcDialog();
+				}
+			}))
+		}
 	});
 
 	$(c+'.newfolder-item').unbind('click');
@@ -3361,6 +3386,7 @@ function menuItems()
 		delete items['properties'];
 		delete items['copy'];
 		delete items['add-star'];
+		if (u_type) items['import'] = 1;
 	}
 
 	return items;
@@ -3392,7 +3418,7 @@ function contextmenuUI(e,ll,topmenu)
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';
-			if (folderlink) flt += ',.zipdownload-item';
+			if (folderlink) flt += ',.zipdownload-item,.import-item';
 			$.selected = [M.RootID];
 			$(t).filter(flt).show();
 		}
@@ -4156,6 +4182,7 @@ function mcDialog(close)
 	if (close)
 	{
 		$.dialog=false;
+		delete $.mcImport;
 		$('.move-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.move-dialog #mainsub').html('');
@@ -4166,11 +4193,12 @@ function mcDialog(close)
 	if (jsp) jsp.scrollTo(0,0,false);
 	if ($.selected.length > 0)
 	{
+		var mode = $.mcImport ? l[236] : l[63];
 		$.dialog = 'mc';
 		$('.move-dialog #topheader').removeClass('contacts-item cloud-drive-item active');
 		$('.move-dialog #bottomheader').removeClass('recycle-item recyle-notification contacts-item cloud-drive-item active');
-		$('.move-dialog .fm-dialog-title').text(l[63] + ' (' + l[118] + ')');
-		$('.move-dialog .move-button').text(l[63]);
+		$('.move-dialog .fm-dialog-title').text(mode + ' (' + l[118] + ')');
+		$('.move-dialog .move-button').text(mode);
 		if ($.mctype == 'move')
 		{
 			$('.move-dialog .fm-dialog-title').text(l[62] + ' (' + l[118] + ')');

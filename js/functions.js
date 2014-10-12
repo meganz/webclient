@@ -614,6 +614,7 @@ function ASSERT(what, msg, udata) {
 		if (console.assert) console.assert(what, msg);
 		else console.error('FAILED ASSERTION', msg);
 	}
+	return !!what;
 }
 
 function oDestroy(obj) {

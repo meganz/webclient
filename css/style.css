@@ -7134,10 +7134,10 @@ div .fm-tree-folder.dragover {
 .context-menu-item.rename-item:hover {
 	background-position: left -7250px;
 }
-.context-menu-item.copy-item {
+.context-menu-item.copy-item, .context-menu-item.import-item {
 	background-position: left -7300px;
 }
-.context-menu-item.copy-item:hover {
+.context-menu-item.copy-item:hover, .context-menu-item.import-item:hover {
 	background-position: left -7350px;
 }
 .context-menu-item.refresh-item {
@@ -16727,10 +16727,10 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .context-menu-item.rename-item:hover {
 	background-position: right -7250px;
 }
-.rtl .context-menu-item.copy-item {
+.rtl .context-menu-item.copy-item, .rtl .context-menu-item.import-item {
 	background-position: right -7300px;
 }
-.rtl .context-menu-item.copy-item:hover {
+.rtl .context-menu-item.copy-item:hover, .rtl .context-menu-item.import-item:hover {
 	background-position: right -7350px;
 }
 .rtl .context-menu-item.refresh-item {

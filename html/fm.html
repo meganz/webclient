@@ -97,6 +97,9 @@
 </div>
 <div class="fm-main default">
 <div class="nw-fm-left-icons-panel">
+    <div class="nw-fm-left-icon folder-link">
+        <div class="nw-fm-left-tooltip">Folder link</div>
+    </div>
     <div class="nw-fm-left-icon cloud-drive active">
         <div class="nw-fm-left-tooltip">Cloud Drive</div>
     </div>
@@ -132,8 +135,12 @@
   </div>
 </div>
 
-<!-- Please add one of necessary classname: "cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
+<!-- Please add one of necessary classname: "folder-link"/"cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
 <div class="fm-left-menu cloud-drive">
+    <div class="nw-fm-tree-header folder-link">
+        <input type="text" value="Folder link" placeholder="Folder link" />
+        <div class="nw-fm-search-icon"></div>
+    </div>
     <div class="nw-fm-tree-header cloud-drive">
         <input type="text" value="Cloud Drive" placeholder="Cloud Drive" />
         <div class="nw-fm-search-icon"></div>
@@ -162,6 +169,8 @@
        <div class="nw-tree-panel-arrows"></div>
 </div>
 <div class="content-panel cloud-drive active">
+</div>
+<div class="content-panel folder-link">
 </div>
 <div class="content-panel shared-with-me">
     <ul>
@@ -658,12 +667,38 @@
     <div class="fm-empty-pad">
         <div class="fm-empty-cloud-bg"></div>
         <div class="fm-empty-cloud-txt">Empty Cloud Drive</div>
+        <div class="fm-not-logged-text">
+           <div class="fm-not-logged-description">
+             Login or create an account to <span class="red">get 50GB FREE</span> and access them from all your devices.
+           </div>
+           <div class="fm-not-logged-button login">
+              Login
+           </div>
+           <div class="fm-not-logged-button create-account">
+              Create account
+           </div>
+        </div>
     </div>
 </div>
 <div class="fm-empty-folder hidden">
     <div class="fm-empty-pad">
         <div class="fm-empty-folder-bg"></div>
         <div class="fm-empty-cloud-txt">Empty Folder</div>
+    </div>
+</div>
+<div class="fm-empty-folder-link hidden">
+    <div class="fm-empty-pad">
+        <div class="fm-empty-folder-link-bg"></div>
+        <div class="fm-empty-cloud-txt">Empty Folder</div>
+    </div>
+</div>
+<div class="fm-invalid-folder hidden">
+    <div class="fm-empty-pad">
+        <div class="fm-invalid-folder-bg"></div>
+        <div class="fm-empty-cloud-txt">Invalid folder link</div>
+        <div class="fm-empty-description">
+          The folder you are trying to access does not exist.
+        </div>
     </div>
 </div>
 <div class="fm-empty-search hidden">
@@ -686,10 +721,21 @@
         <div class="fm-empty-contacts-bg"></div>
         <div class="fm-empty-cloud-txt">No Contacts</div>
         <div class="fm-empty-description">
-          Worry not! You can easily add new contacts by email or import existing contacts from other services
+          Worry not! You can easily add new contacts by email or import existing contacts from other services.
         </div>
         <div class="fm-empty-button">
            Add Contacts...
+        </div>
+        <div class="fm-not-logged-text">
+           <div class="fm-not-logged-description">
+             Login or create an account to <span class="red">get 50GB FREE</span> and connect with your friends and coworkers.
+           </div>
+           <div class="fm-not-logged-button login">
+              Login
+           </div>
+           <div class="fm-not-logged-button create-account">
+              Create account
+           </div>
         </div>
     </div>
 </div>
@@ -697,6 +743,17 @@
     <div class="fm-empty-pad">
         <div class="fm-empty-messages-bg"></div>
         <div class="fm-empty-cloud-txt">No Messages</div>
+        <div class="fm-not-logged-text">
+           <div class="fm-not-logged-description">
+             Login or create an account to <span class="red">get 50GB FREE</span> and get messages from your friends and coworkers.
+           </div>
+           <div class="fm-not-logged-button login">
+              Login
+           </div>
+           <div class="fm-not-logged-button create-account">
+              Create account
+           </div>
+        </div>
     </div>
 </div>
 
@@ -704,17 +761,36 @@
     <div class="fm-empty-pad">
         <div class="fm-empty-incoming-bg"></div>
         <div class="fm-empty-cloud-txt">No Incoming Shares</div>
+        <div class="fm-not-logged-text">
+           <div class="fm-not-logged-description">
+             Login or create an account to <span class="red">get 50GB FREE</span> and receive files from your contacts.
+           </div>
+           <div class="fm-not-logged-button login">
+              Login
+           </div>
+           <div class="fm-not-logged-button create-account">
+              Create account
+           </div>
+        </div>
     </div>
 </div>
 <div class="fm-empty-conversations hidden">
     <div class="fm-empty-pad">
         <div class="fm-empty-conversations-bg"></div>
         <div class="fm-empty-cloud-txt">No Conversations</div>
+        <div class="fm-not-logged-text">
+           <div class="fm-not-logged-description">
+             Login or create an account to <span class="red">get 50GB FREE</span> and speak with your friends and coworkers.
+           </div>
+           <div class="fm-not-logged-button login">
+              Login
+           </div>
+           <div class="fm-not-logged-button create-account">
+              Create account
+           </div>
+        </div>
     </div>
 </div>
-
-
-
 
 
 <div class="files-grid-view fm hidden">
@@ -828,7 +904,6 @@
   <div class="shared-blocks-scrolling">
   </div>
 </div>
-
 
 
 <div class="contacts-details-block hidden">

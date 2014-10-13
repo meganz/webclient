@@ -1128,7 +1128,7 @@ function addContactUI()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		accountHolder:		M.u[u_handle].m,
+		accountHolder:		(M.u[u_handle]||{}).m || '',
 		scrollLocation:		'add',
 		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function(u) {errorMsg('You already have contact with that email!', u.id);},
@@ -1524,7 +1524,7 @@ function fmremove()
 
 function fmremdupes(test)
 {
-  var hs = {}, i, f = [];
+  var hs = {}, i, f = [], s = 0;
   var cRootID = RootbyId(M.currentdirid);
   loadingDialog.show();
   for(i in M.d)
@@ -1544,9 +1544,10 @@ function fmremdupes(test)
   for(i in f)
     {
       console.debug('Duplicate node: ' + f[i] + ' at ~/' + M.getPath(f[i]).reverse().map(function(n) { return M.d[n].name || '' }).filter(String).join("/"));
+      s += M.d[f[i]].s | 0;
     }
   loadingDialog.hide();
-  console.log('Found ' + f.length + ' duplicated files.');
+  console.log('Found ' + f.length + ' duplicated files using a sum of ' + bytesToSize(s));
   if(!test && f.length)
     {
       $.selected = f;
@@ -1714,7 +1715,7 @@ function initContextUI()
 		$.mcselected = M.RootID;
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
-		handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+		handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : l[63]);
 		$('.fm-dialog-overlay').removeClass('hidden');
 		$('body').addClass('overlayed');
 	});
@@ -1730,6 +1731,29 @@ function initContextUI()
 		disableCircularTargets('#mctreea_');
 		$('.fm-dialog-overlay').removeClass('hidden');
 		$('body').addClass('overlayed');
+	});
+
+	$(c+'.import-item').unbind('click');
+	$(c+'.import-item').bind('click',function(event)
+	{
+		ASSERT(folderlink, 'Import needs to be used in folder links.');
+
+		var sel = [].concat($.selected || []);
+		if (sel.length)
+		{
+			var FLRootID = M.RootID;
+			document.location.hash = 'fm';
+			$(document).one('openFolder', SoonFc(function(e)
+			{
+				if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
+				{
+					if (d) console.log('Importing Nodes...', sel);
+					$.selected = sel;
+					$.mcImport = true;
+					$(c+'.copy-item').click();
+				}
+			}))
+		}
 	});
 
 	$(c+'.newfolder-item').unbind('click');
@@ -4440,6 +4464,7 @@ function menuItems()
 		delete items['properties'];
 		delete items['copy'];
 		delete items['add-star'];
+		if (u_type) items['import'] = 1;
 	}
 
 	return items;
@@ -4486,7 +4511,7 @@ function contextmenuUI(e,ll,topmenu)
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';
-			if (folderlink) flt += ',.zipdownload-item';
+			if (folderlink) flt += ',.zipdownload-item,.import-item';
 			$.selected = [M.RootID];
 			$(t).filter(flt).show();
 		}
@@ -5199,7 +5224,7 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 	$('#msgDialog .fm-dialog-close').unbind('click');
 	$('#msgDialog .fm-dialog-close').bind('click',function()
 	{
-		closeMsg();
+		closeMsg();n
 		if ($.warningCallback) $.warningCallback(false);
 	});
 	$('#msgDialog').removeClass('hidden');
@@ -5509,7 +5534,7 @@ function initShareDialog()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		accountHolder:		M.u[u_handle].m,
+		accountHolder:		(M.u[u_handle]||{}).m || '',
 		scrollLocation:		'share',
 		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function() {errorMsg('You already have contact with that email!');},
@@ -5969,6 +5994,7 @@ function closeDialog()
 	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
 
 	delete $.dialog;
+	delete $.mcImport;
 }
 
 function copyDialog()
@@ -6015,7 +6041,7 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogContent(section, 'ul', true, 'copy', 'Paste');
+					handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : l[63]);
                     break;
                 case 'shared-with-me':
 					handleDialogContent(section, 'ul', false, 'copy', l[1344]);
@@ -6138,6 +6164,7 @@ function copyDialog()
 		}
 		else $.mcselected = old;
 
+		dialogScroll('.copy-dialog-tree-panel');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
@@ -6355,6 +6382,7 @@ function moveDialog()
 		}
 		else $.mcselected = old;
 
+		dialogScroll('.move-dialog-tree-panel');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});

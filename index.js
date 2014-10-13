@@ -74,8 +74,6 @@ function scrollMenu()
 
 function init_page()
 {
-//	closeDialog();
-
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -156,7 +154,7 @@ function init_page()
 	blogsearch=false;
 
 
-	closeDialog();
+	if (!$.mcImport) closeDialog();
 
     if (page.substr(0,7) == 'voucher')
 	{

@@ -1060,7 +1060,6 @@ function MegaData ()
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
-		$(document).trigger('openFolder');
 	};
 
 	function sortContactByName(a, b) {

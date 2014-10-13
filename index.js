@@ -614,7 +614,8 @@ function init_page()
 		}
 		else if (!pfid && id && id !== M.currentdirid) M.openFolder(id);
 		$('#topmenu').html(parsetopmenu());
-		$('body').attr('class','');
+		if (!u_type) $('body').attr('class','not-logged');
+		else $('body').attr('class','');
 		$('#pageholder').hide();
 		$('#startholder').hide();
 		if ($('#fmholder:visible').length == 0)

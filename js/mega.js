@@ -2995,9 +2995,6 @@ var t;
 
 function renderfm()
 {
-	if (u_type) $('body').removeClass('not-logged')
-	else $('body').addClass('not-logged')
-
 	if (d) console.time('renderfm');
 	initUI();
 	loadingDialog.hide();

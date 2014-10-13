@@ -649,9 +649,10 @@ function MegaData ()
 					}
 					else
 					{
+						var time = time2date(this.v[i].ts || (this.v[i].p === 'contacts' && this.contactstatus(this.v[i].h).ts));
 						t = '.grid-table.fm';
 						el = 'tr';
-						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time2date(this.v[i].ts) + '</td><td width="42" class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>';
+						html = '<tr id="' + htmlentities(this.v[i].h) + '" class="' + c + '"><td width="30"><span class="grid-status-icon'+star+'"></span></td><td><span class="transfer-filtype-icon ' + fileicon(this.v[i]) + '"> </span><span class="tranfer-filetype-txt">' + htmlentities(this.v[i].name) + '</span></td><td width="100">' + s + '</td><td width="130">' + ftype + '</td><td width="120">' + time + '</td><td width="42" class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>';
 					}
 					if (!(this.v[i].seen = n_cache > files++))
 					{
@@ -968,7 +969,7 @@ function MegaData ()
 			fminitialized=true;
 			$('.top-search-bl').show();
 		}
-		else if (id == this.currentdirid && !force) return false;
+		else if (id && id == this.currentdirid && !force) return false;
 		if (id == 'rubbish') id = this.RubbishID;
 		else if (id == 'inbox') id = this.InboxID;
 		else if (id == 'cloudroot') id = this.RootID;
@@ -1059,6 +1060,7 @@ function MegaData ()
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
+		$(document).trigger('openFolder');
 	};
 
 	function sortContactByName(a, b) {

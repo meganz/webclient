@@ -7837,6 +7837,14 @@ function fingerprintDialog(userid)
 	var user = M.u[userid]
 	if (!user || !user.u) return;
 
+	function cleanup()
+	{
+		$('.fm-dialog-close').unbind('click');
+		$('.dialog-approve-button').unbind('click');
+		$('.dialog-skip-button').unbind('click');
+		$this = null;
+	}
+
 	var $this = $('.fingerprint-dialog')
 		, avatar = userAvatar(userid)
 
@@ -7871,7 +7879,7 @@ function fingerprintDialog(userid)
 
 	$('.fm-dialog-close').rebind('click', function() {
 		$this.addClass('hidden');
-		$this = null;
+		cleanup();
 	});
 
 	$('.dialog-approve-button').rebind('click', function() {
@@ -7879,12 +7887,12 @@ function fingerprintDialog(userid)
 		userFingerprint(user, function(fprint, fprintraw) {
 			authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 		});
-		$this = null;
+		cleanup();
 	});
 
 	$('.dialog-skip-button').rebind('click', function() {
 		$this.addClass('hidden');
-		$this = null;
+		cleanup();
 	});
 
 	$this.removeClass('hidden')

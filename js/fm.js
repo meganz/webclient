@@ -1128,7 +1128,7 @@ function addContactUI()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		accountHolder:		M.u[u_handle].m,
+		accountHolder:		(M.u[u_handle]||{}).m || '',
 		scrollLocation:		'add',
 		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function(u) {errorMsg('You already have contact with that email!', u.id);},
@@ -1715,7 +1715,7 @@ function initContextUI()
 		$.mcselected = M.RootID;
 		$('.copy-dialog .dialog-copy-button').addClass('active');
 		$('.copy-dialog').removeClass('hidden');
-		handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+		handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : l[63]);
 		$('.fm-dialog-overlay').removeClass('hidden');
 		$('body').addClass('overlayed');
 	});
@@ -1750,8 +1750,7 @@ function initContextUI()
 					if (d) console.log('Importing Nodes...', sel);
 					$.selected = sel;
 					$.mcImport = true;
-					$.mctype='copy-cloud';
-					mcDialog();
+					$(c+'.copy-item').click();
 				}
 			}))
 		}
@@ -5535,7 +5534,7 @@ function initShareDialog()
 		propertyToSearch:	"id",
 		resultsLimit:		5,
 		minChars:			2,
-		accountHolder:		M.u[u_handle].m,
+		accountHolder:		(M.u[u_handle]||{}).m || '',
 		scrollLocation:		'share',
 		onEmailCheck: function() {errorMsg("Looks like there's a malformed email!");},
 		onDoublet: function() {errorMsg('You already have contact with that email!');},
@@ -5995,6 +5994,7 @@ function closeDialog()
 	if ($.dialog == 'terms' && $.termsAgree) delete $.termsAgree;
 
 	delete $.dialog;
+	delete $.mcImport;
 }
 
 function copyDialog()
@@ -6041,7 +6041,7 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
-					handleDialogContent(section, 'ul', true, 'copy', 'Paste');
+					handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : l[63]);
                     break;
                 case 'shared-with-me':
 					handleDialogContent(section, 'ul', false, 'copy', l[1344]);

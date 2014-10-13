@@ -5199,7 +5199,7 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 	$('#msgDialog .fm-dialog-close').unbind('click');
 	$('#msgDialog .fm-dialog-close').bind('click',function()
 	{
-		closeMsg();
+		closeMsg();n
 		if ($.warningCallback) $.warningCallback(false);
 	});
 	$('#msgDialog').removeClass('hidden');
@@ -6138,6 +6138,7 @@ function copyDialog()
 		}
 		else $.mcselected = old;
 
+		dialogScroll('.copy-dialog-tree-panel');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
@@ -6355,6 +6356,7 @@ function moveDialog()
 		}
 		else $.mcselected = old;
 
+		dialogScroll('.move-dialog-tree-panel');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});

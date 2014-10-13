@@ -1514,6 +1514,13 @@ function MegaData ()
 			else if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/') return false;
 			M.openFolder($(this).attr('id').replace('path_',''));
 		});
+
+		if (folderlink)
+		{
+			$('.fm-breadcrumbs').addClass('folder-link')
+			$('.fm-breadcrumbs.folder span').empty()
+			$('.nw-tree-panel-header span').text(name);
+		}
 	};
 
 	this.getById = function(id)

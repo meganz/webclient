@@ -4945,6 +4945,13 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);
 	$('.fm-right-header').addClass('hidden');
 
+	if (id == 'cloud-drive' && folderlink)
+	{
+		$('.fm-right-header').addClass('folder-link')
+		$('.nw-fm-left-icon.folder-link').addClass('active');
+		$('.fm-left-menu').addClass('folder-link')
+	}
+
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
 	if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{

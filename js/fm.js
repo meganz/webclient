@@ -675,18 +675,6 @@ function initUI(){
 		$('.fm-tree-header.cloud-drive-item span').text('');
 	}
 	else folderlink=0;
-	/* REMOVEME
-	$('.add-user-popup-button').unbind('click');
-	$('.add-user-popup-button').bind('click',function(e)
-	{
-		if (u_type === 0) ephemeralDialog(l[997]);
-		else doAddContact(e);
-	});
-	$('.add-user-popup input').unbind('keypress');
-	$('.add-user-popup input').bind('keypress',function(e)
-	{
-		if (e.which == 13) doAddContact(e);
-	});*/
 	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
@@ -1340,19 +1328,18 @@ function addContactUI()
 				var $mails = $('.token-input-list-mega .token-input-token-mega');
 				if ($mails.length)
 				{
-					// TODO: send array of email addreses to server at once?
 					$mails.each(function(index, value)
 					{
 						M.addContact($(value).contents().eq(1).text());
 					});
 					nobody = false;
 				}
+				
+				if (nobody && $.addUserFail.length)
+				{
+					msgDialog('info',l[150],l[151].replace('[X]','already'));
+				}
 			}
-		}
-
-		if (nobody && $.addUserFail.length)
-		{
-			msgDialog('info',l[150],l[151].replace('[X]','already'));
 		}
 
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);

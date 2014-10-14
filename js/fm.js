@@ -319,6 +319,7 @@ function treesearchUI()
 					M.buildtree({h:'shares'});
 					break;
 				case 'cloud-drive':
+				case 'folder-link':
 					M.buildtree(M.d[M.RootID]);
 					break;
 				case 'rubbish-bin':
@@ -351,7 +352,7 @@ function treePanelSortElements(type, elements, handlers, ifEq) {
 function initializeTreePanelSorting()
 {
 	$.sortTreePanel = {};
-	$.each(['contacts', 'conversations', 'shared-with-me', 'cloud-drive','rubbish-bin'], function(key, type) {
+	$.each(['folder-link', 'contacts', 'conversations', 'shared-with-me', 'cloud-drive','rubbish-bin'], function(key, type) {
 		$.sortTreePanel[type] = {
 			by: anyOf(['name' , 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
 			dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
@@ -924,6 +925,15 @@ function doAddContact(dialog)
 function searchFM()
 {
 
+}
+
+function isValidShareLink()
+{
+	var valid = true;
+	for (var i in u_nodekeys) {
+		valid = valid && typeof u_nodekeys[i] == "object" 
+	}
+	return valid;
 }
 
 function removeUInode(h)
@@ -4947,12 +4957,25 @@ function sectionUIopen(id)
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);
 	$('.fm-right-header').addClass('hidden');
 
-	if (id == 'cloud-drive' && folderlink)
-	{
-		$('.fm-right-header').addClass('folder-link')
-		$('.nw-fm-left-icon.folder-link').addClass('active');
-		$('.fm-left-menu').addClass('folder-link')
-	}
+	if (folderlink) {
+		if (!isValidShareLink())
+		{
+			$('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder')
+		} 
+		else if (id == 'cloud-drive')
+		{
+			$('.fm-main').addClass('active-folder-link');
+			$('.fm-right-header').addClass('folder-link')
+			$('.nw-fm-left-icon.folder-link').addClass('active');
+			$('.fm-left-menu').addClass('folder-link')
+			$('.nw-fm-tree-header.folder-link').show();
+		} else {
+			$('.fm-main').removeClass('active-folder-link');
+			$('.fm-left-menu').removeClass('folder-link')
+			$('.nw-fm-tree-header.folder-link').hide();
+			$('.nw-fm-left-icon.folder-link').removeClass('active');
+		}
+ 	}
 
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
 	if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
@@ -4988,7 +5011,8 @@ function sectionUIopen(id)
 		headertxt = 'My folders';
 		break;
 	}
-	$('.nw-tree-panel-header span').text(headertxt);
+
+	if (!folderlink) $('.nw-tree-panel-header span').text(headertxt);
 }
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
@@ -5342,6 +5366,7 @@ function handleDialogContent(s, m, c, n, t, i)
 	switch (s)
 	{
 		case 'cloud-drive':
+		case 'folder-link':
 			$mnu.addClass('hidden');
 			break;
 		case 'shared-with-me':
@@ -6025,6 +6050,7 @@ function copyDialog()
 		switch (section)
 		{
 			case 'cloud-drive':
+			case 'folder-link':
 				$.mcselected = M.RootID;
                 break;
 			case 'shared-with-me':
@@ -6059,6 +6085,7 @@ function copyDialog()
             switch (section)
             {
                 case 'cloud-drive':
+				case 'folder-link':
 					handleDialogContent(section, 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
                     break;
                 case 'shared-with-me':
@@ -6109,6 +6136,7 @@ function copyDialog()
 					M.buildtree({h:'shares'}, 'copy-dialog');
 					break;
 				case 'cloud-drive':
+				case 'folder-link':
 					M.buildtree(M.d[M.RootID], 'copy-dialog');
 					break;
 			}
@@ -6212,6 +6240,7 @@ function copyDialog()
 			switch (section)
 			{
 				case 'cloud-drive':
+				case 'folder-link':
 					var n = [];
 					for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
 					closeDialog();
@@ -6245,6 +6274,7 @@ function moveDialog()
 		switch (section)
 		{
 			case 'cloud-drive':
+			case 'folder-link':
 				$.mcselected = M.RootID;
 				break;
 			case 'shared-with-me':
@@ -6278,6 +6308,7 @@ function moveDialog()
             switch (section)
             {
                 case 'cloud-drive':
+				case 'folder-link':
 					handleDialogContent(section, 'ul', true, 'move', l[62]);
                     break;
                 case 'shared-with-me':
@@ -6324,6 +6355,7 @@ function moveDialog()
 					M.buildtree({h:'shares'}, 'move-dialog');
 					break;
 				case 'cloud-drive':
+				case 'folder-link':
 					M.buildtree(M.d[M.RootID], 'move-dialog');
 					break;
 				case 'rubbish-bin':

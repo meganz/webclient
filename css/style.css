@@ -4520,6 +4520,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .active-folder-link .nw-fm-left-icon.folder-link {
 	display: block;
 }
+
+.active-folder-link .nw-fm-left-icon.cloud-drive,
+.active-folder-link .nw-fm-tree-header.cloud-drive {
+	display: none;
+}
+
 .nw-fm-left-icon.notifications {
 	background-position: left -6142px;
 }

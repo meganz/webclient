@@ -488,6 +488,14 @@ function MegaData ()
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
 			else if (M.currentdirid == 'contacts') $('.fm-empty-contacts').removeClass('hidden');
 			else if (M.currentdirid.substr(0,7) == 'search/') $('.fm-empty-search').removeClass('hidden');
+			else if (M.currentdirid == M.RootID && folderlink) 
+			{
+				if (!isValidShareLink())
+				{
+					$('.fm-invalid-folder').removeClass('hidden')
+				}
+				else $('.fm-empty-folder-link').removeClass('hidden')
+			}
 			else if (M.currentdirid == M.RootID) $('.fm-empty-cloud').removeClass('hidden');
 			else if (M.currentdirid == M.InboxID) $('.fm-empty-messages').removeClass('hidden');
 			else if (M.currentdirid == 'shares') $('.fm-empty-incoming').removeClass('hidden');
@@ -1170,6 +1178,8 @@ function MegaData ()
 			if (typeof dialog === 'undefined') $('.content-panel.rubbish-bin').html('<ul id="treesub_' + htmlentities(M.RubbishID) + '"></ul>');
 				else $('.' + dialog + ' .rubbish-bin .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RubbishID) + '"></ul>');
 			stype = "rubbish-bin";
+		} else if (folderlink) {
+			stype = "folder-link"
 		}
 
 		if (this.c[n.h])
@@ -1518,7 +1528,7 @@ function MegaData ()
 		{
 			$('.fm-breadcrumbs').addClass('folder-link')
 			$('.fm-breadcrumbs.folder span').empty()
-			$('.nw-tree-panel-header span').text(name);
+			if (folderlink && name) $('.nw-tree-panel-header span').text(name);
 		}
 	};
 
@@ -2206,7 +2216,6 @@ function MegaData ()
 				if(M.d[e].t == 1 && M.d[e].p == d)
 				{
 					var p = o || [];
-					if (!o) p.push(fm_safename(M.d[d].name));
 					p.push(fm_safename(M.d[e].name));
 					if (!getfolders(M.d[e].h,p)) dirs.push(p);
 					++c;

@@ -19,41 +19,56 @@
         The Strophe connection object to add Jingle/webRTC support to
     @param {object} options
         Configuration options
-    @param {object[]} [options.iceServers]
-        An array of objects, each describing a TURN or STUN server, like so:
-        [{url: 'stun:stun.l.google.com:19302'}]
-        If none is specified, NAT won't be traversed.
-    @param {function} options.encryptMessageForJid
+    @param {object[]} [options.iceServers] Initially sets the ice servers that will be used
+        in a call. These can be updated at any time via updateIceServers()
+        iceServers is an array of objects, each describing a TURN or STUN server, like so:
+        [{url: 'stun:stun.l.google.com:19302'}].
+        There are also other properties, such as credentials - for more info about the structure,
+        see the standard webrtc API documentation.
+        If no ICE servers are specified at construction, they must be specified prior to
+        starting a call. Otherwise NAT won't be traversed.
+    @param {boolean} [dummyCryptoFunctions] If this flag is provided and is true,
+        then all crypto functions will be set to default dummy implementations, and the
+        crypto object (see below) is not required and will be ignored.
+        This is used only for debugging and testing purposes.
+    @param {object} [crypto] An object holding all crypto functions that need to be provided
+    to the RtcSession object.
+    @param {function} options.crypto.encryptMessageForJid
         A function to encrypt the local SRTP fingerprint(or any other message)
         with the specified bare JID's public key. The function's signature is
         <i> encryptMessageForJid(msg:string, bareJid: string): string </i>
         It returns the encrypted message encoded in a string. If there is an error, the
         function must throw an exception
-    @param {function} options.decryptMessage
+    @param {function} options.crypto.decryptMessage
         A function that does the reverse of encryptMessageForJid() - given the
         message, encrypted by that function, encrypted for us (with our public key),
         decrypts it with our private key and returns it.
         The function signature is <i>decryptMessage(msg:string): string</i>
         If there was an error, the function must throw an exception
-    @param {function} options.generateMac
+    @param {function} options.crypto.generateMac
         A function that takes a message and a key and returns a MAC. Can be any
         standard MAC function such as hmac-sha1 or similar
         Signature: <i> generateMac(msg:string, key:string):string
         If there is an error, the function must throw an exception
-    @param {function} [options.generateMacKey]
+    @param {function} [options.crypto.generateMacKey]
         A function that generates a new, unpredictably random, never-used-before
         mac key, used to verify certificate fingerprints.
         If it is not provided, a built-in implementation is used that utilizes
         crypto.getRandomValues() to generate a 256-bit (32-byte, 8-int) key,
         encoding in base64 format.
         The function takes no parameters and returns the generated string.
-    @param {function} [options.preloadCryptoKeyForJid]
+    @param {function} [options.crypto.preloadCryptoKeyForJid]
         A function that preloads the public key of the peer jid and then calls the
         callback given. Used to send the first message when initiating
         a session. It takes two parameters (sendmsg, jid), where sendmsg is a
         0-argument function "sendmsg", and jid is the targetJid.
         If this is not provided, function(sendmsg, jid) { sendmsg(); } is used,
         which executes it immediately.
+    @param {function} [options.crypto.scrambleJid]
+        This function scrambles a given JID using our private key.
+        This is necessary for anonymizing jids in call ids for
+        webrtc statistics. It takes one string parameter, and returns a string.
+        This function is synchronous.
     @returns {RtcSession}
 */
 
@@ -86,19 +101,26 @@ function RtcSession(stropheConn, options) {
             self._dummyKeys[bareJid] = true;
             f();
         };
-    } else {
-        if (!options.encryptMessageForJid || !options.decryptMessage || !options.generateMac ||
-            !options.preloadCryptoKeyForJid) {
-                throw new Error("At least one crypto function is not provided in 'options'");
+        self.scrambleJid = function(jid) {
+            //dummy scrambling uses our bare jid as a key
+            return MD5.hexdigest(Strophe.getBareJidFromJid(jid));
         }
-        jingle.encryptMessageForJid = options.encryptMessageForJid;
-        jingle.decryptMessage = options.decryptMessage;
-        jingle.generateMac = options.generateMac;
-        jingle.generateMacKey = options.generateMacKey;
-        jingle.preloadCryptoKeyForJid = options.preloadCryptoKeyForJid;
+    } else {
+        var cr = options.crypto;
+        if (!cr.encryptMessageForJid || !cr.decryptMessage || !cr.generateMac ||
+            !cr.preloadCryptoKeyForJid || !cr.scrambleJid) {
+            debugger;
+                throw new Error("At least one crypto function is not provided in 'options.crypto'");
+        }
+        jingle.encryptMessageForJid = cr.encryptMessageForJid;
+        jingle.decryptMessage = cr.decryptMessage;
+        jingle.generateMac = cr.generateMac;
+        jingle.generateMacKey = cr.generateMacKey;
+        jingle.preloadCryptoKeyForJid = cr.preloadCryptoKeyForJid;
+        self.scrambleJid = cr.scrambleJid;
     }
-    if (options.generateMacKey) {
-        jingle.generateMacKey = options.generateMacKey;
+    if (options.crypto && options.crypto.generateMacKey) {
+        jingle.generateMacKey = options.crypto.generateMacKey;
     } else {
         jingle.generateMacKey = function() {
             var array = new Uint8Array(32);
@@ -109,6 +131,7 @@ function RtcSession(stropheConn, options) {
             return btoa(result);
         };
     }
+
     jingle.verifyMac = function(msg, key, actualMac) {
         if (!actualMac)
             return false;
@@ -129,7 +152,11 @@ function RtcSession(stropheConn, options) {
         return match;
     };
 //===
-    this.iceConfig = options.iceServers?options.iceServers:null;
+    if (!options.iceServers) {
+        console.warn("No default ice servers provided in options, you must set them before a call is started");
+    } else {
+        this.jingle.iceServers = options.iceServers;
+    }
     this.options = options;
     this.audioMuted = false;
     this.videoMuted = false;
@@ -142,7 +169,7 @@ function RtcSession(stropheConn, options) {
     this.list_members = [];
 //===
     this.jingle.onConnectionEvent = this.onConnectionEvent;
-    var self = this;
+
     if (RtcSession.RAWLOGGING)
     {
         this.connection.rawInput = function (data)
@@ -151,8 +178,6 @@ function RtcSession(stropheConn, options) {
         { if (RtcSession.RAWLOGGING) console.log('SEND: ' + data); };
     }
 
-    if (options.iceServers)
-        this.jingle.ice_config = {iceServers:options.iceServers};
     this.jingle.pc_constraints = RTC.pc_constraints;
 
     var j = this.jingle;
@@ -178,10 +203,12 @@ function RtcSession(stropheConn, options) {
     @property {string} [info.by]
         Only if event='handled-elsewhere'. The full JID that handled the call
   */
-    j.onCallCanceled = function(peer, info) {self.trigger('call-canceled', {
-      peer:peer,
-      info:info
-    });};
+    j.onCallCanceled = function(peer, info) {
+        self.trigger('call-canceled', {
+                         peer:peer,
+                         info:info
+                     });
+    };
     j.onCallAnswered = this.onCallAnswered;
     j.onCallTerminated = this.onCallTerminated;
     j.onRemoteStreamAdded = this.onRemoteStreamAdded;
@@ -199,7 +226,7 @@ function RtcSession(stropheConn, options) {
     @property {SessWrapper} sess
         The session on which the event occurred
     */
-        this.trigger('muted', {info:info, sess: new SessWrapper(sess)});
+        this.trigger('muted', {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
     };
     j.onUnmuted = function(sess, info) {
     /**
@@ -213,10 +240,10 @@ function RtcSession(stropheConn, options) {
         The session on which the event occurred
     */
 
-        this.trigger("unmuted", {info:info, sess: new SessWrapper(sess)});
+        this.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
     }
 
-    if (RTC.browser == 'firefox')
+    if (RTC.browser === 'firefox')
         this.jingle.media_constraints.mandatory.MozDontOfferDataChannel = true;
 }
 //global variables
@@ -291,9 +318,10 @@ RtcSession.prototype = {
         }
         case Strophe.Status.CONNECTED:
         {
+            this.rtcSession.ownAnonId = this.rtcSession.scrambleJid(
+                Strophe.getBareJidFromJid(this.connection.jid));
             this.connection.addHandler(RtcSession.prototype._onPresenceUnavailable.bind(this.rtcSession),
                null, 'presence', 'unavailable', null, null);
-            this.getStunAndTurnCredentials();
             break;
         }
     }
@@ -337,7 +365,7 @@ RtcSession.prototype = {
      state = 1;
 // Call accepted handler
      ansHandler = self.connection.addHandler(function(stanza) {
-         if ($(stanza).attr('sid') != sid)
+         if ($(stanza).attr('sid') !== sid)
              return true;
      try {
         if (state !== 1)
@@ -350,22 +378,35 @@ RtcSession.prototype = {
         var peerFprMacKey = $(stanza).attr('fprmackey');
         try {
             peerFprMacKey = self.jingle.decryptMessage(peerFprMacKey);
-            if (!peerFprMacKey)
+            if (!peerFprMacKey) {
                 peerFprMacKey = self.jingle.generateMacKey();
+            }
         } catch(e) {
             peerFprMacKey = self.jingle.generateMacKey();
         }
-        
+        var peerAnonId = $(stanza).attr('anonid');
+        if (!peerAnonId)
+            throw new Error("No anonId in peer's call answer stanza");
         var fullPeerJid = $(stanza).attr('from');
         if (isBroadcast)
-            self.connection.send($msg({to:Strophe.getBareJidFromJid(targetJid), type: 'megaNotifyCallHandled', sid: sid, by: fullPeerJid, accepted:'1'}));
+            self.connection.send($msg({
+                to:Strophe.getBareJidFromJid(targetJid),
+                type: 'megaNotifyCallHandled',
+                sid: sid,
+                by: fullPeerJid,
+                accepted:'1'
+            }));
 
-        self.jingle.initiate(sid, fullPeerJid, myJid ? myJid:self.connection.jid, sessStream,
-          sessStream?RtcSession.mediaOptionsToMutedState(options, sessStream):undefined, {
-           ownFprMacKey: ownFprMacKey,
-           peerFprMacKey: peerFprMacKey,
-           fileTransferHandler: options.files?
-                self.jingle.ftManager.createUploadHandler(sid, fullPeerJid, fileArr):undefined
+        var sess = self.jingle.initiate(sid, fullPeerJid,
+            myJid || self.connection.jid, sessStream,
+            sessStream?RtcSession.mediaOptionsToMutedState(options, sessStream):undefined, {
+              ownFprMacKey: ownFprMacKey,
+              peerFprMacKey: peerFprMacKey,
+              peerAnonId: peerAnonId,
+              fileTransferHandler: options.files?
+                  self.jingle.ftManager.createUploadHandler(sid, fullPeerJid, fileArr)
+                      :
+                  undefined
         });
         /**
             An outgoing call is being initiated by us
@@ -377,7 +418,12 @@ RtcSession.prototype = {
                 @property {bool} audio Present and true of peer has enabled audio
                 @property {bool} video Present and true of peer has enabled video
         */
-            self.trigger('call-init', {peer:fullPeerJid, sid: sid, isDataCall:!!options.files});
+        self.trigger('call-init', {
+            sess: new SessWrapper(sess),
+            peer:fullPeerJid,
+            sid: sid,
+            isDataCall:!!options.files
+        });
       } catch(e) {
         self._freeLocalStreamIfUnused();
         console.error("Exception in call answer handler:\n"+e.stack+'\nIgnoring call');
@@ -386,7 +432,7 @@ RtcSession.prototype = {
 
 //Call declined handler
     declineHandler = self.connection.addHandler(function(stanza) {
-        if ($(stanza).attr('sid') != sid) //this message was not for us
+        if ($(stanza).attr('sid') !== sid) //this message was not for us
             return true;
         if (state !== 1)
             return;
@@ -431,7 +477,8 @@ RtcSession.prototype = {
             to: targetJid,
             type: 'megaCall',
             sid: sid,
-            fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid)
+            fprmackey: self.jingle.encryptMessageForJid(ownFprMacKey, targetJid),
+            anonid: self.ownAnonId
         };
         if (options.files) {
             var infos = {};
@@ -838,7 +885,7 @@ RtcSession.prototype = {
         reason:reason, text:text
     };
     if (sess.statsRecorder)  {
-        var stats = obj.stats = sess.statsRecorder.terminate(RtcSession._makeCallId(sess));
+        var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
         stats.isCaller = sess.isInitiator?1:0;
         stats.termRsn = reason;
     }
@@ -848,16 +895,13 @@ RtcSession.prototype = {
             termRsn: reason,
             bws: RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'')
         };
-        if (sess.sid) {
-            if (sess.fake)
-                sess.me = this.jid; //makeCallId needs 'me' as well
-            bstats.cid = RtcSession._makeCallId(sess);
+
+        if (sess.fake) {
+            sess.me = this.jid; //just in case someone wants to access the own jid of the fake session
+            if (!sess.peerAnonId)
+                sess.peerAnonId = "_unknown";
         }
-        else
-            bstats.cid = RtcSession._makeCallId({
-                peerjid: sess.peerjid, me: this.jid, isInitiator: sess.isInitiator,
-                sid: "_fake:"+Math.random().toString(36).substr(2, 10)
-            });
+        bstats.cid = this._makeCallId(sess);
         if (sess.tsMediaStart) {
             bstats.ts = Math.round(sess.tsMediaStart/1000);
             bstats.dur = Math.ceil((Date.now()-sess.tsMediaStart)/1000);
@@ -1030,6 +1074,17 @@ RtcSession.prototype = {
     return sess;
  },
 
+/**
+  Updates the ICE servers that will be used in the next call.
+  @param {array} iceServers An array of ice server objects - same as the iceServers parameter in
+          the RtcSession constructor
+*/
+ updateIceServers: function(iceServers) {
+     if (!iceServers || (iceServers.length < 1))
+             console.warn("updateIceServers: Null or empty array of ice servers provided");
+     this.jingle.iceServers = iceServers;
+ },
+
  /**
     This is a <b>class</b> method (i.e. not called on an instance but directly on RtcSession).
     Registers a callback function that will be called
@@ -1117,6 +1172,20 @@ RtcSession.prototype = {
     this.hangup();
     this._freeLocalStream();
  },
+
+/** Returns whether the call or file transfer with the given
+    sessionId is being relaid via a TURN server or not.
+      @param {string} sid The session id of the call
+      @returns {integer} 1 if the call/transfer is being relayed, 0 if not, 'undefined' if the
+        status is unknown (not established yet or browser does not provide stats interface)
+*/
+ isRelay: function(sid) {
+     var sess = this.jingle.sessions[sid];
+     if (!sess || ! sess.statsRecorder)
+         return undefined;
+     return sess.statsRecorder.isRelay();
+ },
+
  _requiredLocalStream: function(channels) {
     if (channels.video)
         return RtcSession.gLocalAudioVideoStream;
@@ -1202,11 +1271,17 @@ RtcSession._enableLocalVid = function(rtc) {
  that is independent of whether the
  caller or callee generates it. Used only for sending stats
 */
-RtcSession._makeCallId = function(sess) {
+RtcSession.prototype._makeCallId = function(sess) {
     if (sess.isInitiator)
-        return sess.me+':'+sess.peerjid+':'+sess.sid;
+        return this.ownAnonId+':'+sess.peerAnonId+':'+sess.sid;
       else
-        return sess.peerjid+':'+sess.me+':'+sess.sid;
+        return sess.peerAnonId+':'+this.ownAnonId+':'+sess.sid;
+}
+/**
+ Anonymizes a JID
+*/
+RtcSession._anonJid = function(jid) {
+    return MD5.hexdigest(Strophe.getBareJidFromJid(jid)+"webrtc stats collection");
 }
 
 /**
@@ -1272,6 +1347,19 @@ isCaller: function() {
 */
 isFake: function() {
     return (this._sess.isFake === true);
+},
+
+/** Returns whether a call or file transfer is being relayed through a TURN server or not.
+      @returns {integer} If the status in unknown (not established yet or no stats
+         provided by browser, e.g. Firefox), the return value is 'undefined', otherwise
+         it is 0 if call is direct and 1 if call is relayed
+*/
+isRelay: function() {
+    var statsRec = this._sess.statsRecorder;
+    if (!statsRec)
+        return undefined;
+    else
+        return statsRec.isRelay();
 }
 }
 

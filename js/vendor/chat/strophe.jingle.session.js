@@ -23,7 +23,6 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.stopTime = null;
     this.media_constraints = null;
     this.pc_constraints = null;
-    this.ice_config = {},
     this.drip_container = [];
     this.responseTimeout = this.jingle.jingleTimeout;
 
@@ -53,10 +52,15 @@ initiate: function(isInitiator) {
     this.state = 'pending';
     this.initiator = isInitiator ? this.me : this.peerjid;
     this.responder = !isInitiator ? this.me : this.peerjid;
+    if (!this.jingle.iceServers) {
+        console.warn("session.initiate(): No ice servers provided, and no ice servers preconfigured in jingle plugin")
+    } else {
+        this.iceServers = this.jingle.iceServers;
+    }
 
     //console.log('create PeerConnection ' + JSON.stringify(this.ice_config));
     try {
-        this.peerconnection = new RTC.peerconnection(this.ice_config, this.pc_constraints);
+        this.peerconnection = new RTC.peerconnection({iceServers: this.iceServers}, this.pc_constraints);
         if ((RTC.Stats === undefined) && (typeof statsGlobalInit === 'function'))
             statsGlobalInit(this.peerconnection);
     } catch (e) {

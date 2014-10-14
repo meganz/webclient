@@ -392,4 +392,8 @@ statRecProto.terminate = function(cid) {
    
     return stats;
 }
+
+statRecProto.isRelay = function() {
+    return this._commonStats.rly;
+}
 };

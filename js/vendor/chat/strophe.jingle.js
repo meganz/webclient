@@ -1,4 +1,3 @@
-
 /* This code is based on strophe.jingle.js by ESTOS */
 
 var JinglePlugin = {
@@ -182,8 +181,8 @@ var JinglePlugin = {
             var ans = self.acceptCallsFrom[sid];
             if (!ans)
                 return true; //ignore silently - maybe there is no user on this client and some other client(resource) already accepted the call
-            if (ans.from != peerjid)
-                throw new Error('Sid and jid mismatch in session-initiate');
+            if (ans.from !== peerjid)
+                throw new Error('Sid and peer-jid mismatch in session-initiate');
             delete self.acceptCallsFrom[sid];
 // Verify SRTP fingerprint
             if (!ans.ownFprMacKey)
@@ -198,8 +197,11 @@ var JinglePlugin = {
                 }
                 try {
                   self.onCallTerminated.call(self.eventHandler, {
-                    fake: true, peerjid: peerjid, isInitiator: false,
-                    sid: sid, 
+                    fake: true,
+                    peerjid: peerjid,
+                    isInitiator: false,
+                    sid: sid,
+                    peerAnonId: ans.peerAnonId
                   }, "security", "Fingerprint verification failed");
                 } catch(e){
                     console.error(e);
@@ -210,11 +212,19 @@ var JinglePlugin = {
             if (!ans.fileTransferHandler)
                 sess = self.createSession($(iq).attr('to'), peerjid,
                     sid, ans.options.localStream,
-                    ans.options.muted, {peerFprMacKey: ans.peerFprMacKey});
+                    ans.options.muted, {
+                        peerFprMacKey: ans.peerFprMacKey,
+                        peerAnonId: ans.peerAnonId
+                    }
+                );
              else
                 sess = self.createSession($(iq).attr('to'), peerjid,
-                    sid, null, null, {peerFprMacKey: ans.peerFprMacKey,
-                                      fileTransferHandler: ans.fileTransferHandler});
+                    sid, null, null, {
+                        peerFprMacKey: ans.peerFprMacKey,
+                        peerAnonId: ans.peerAnonId,
+                        fileTransferHandler: ans.fileTransferHandler
+                    }
+                );
             sess.media_constraints = self.media_constraints;
             sess.pc_constraints = self.pc_constraints;
             sess.ice_config = self.ice_config;
@@ -328,6 +338,9 @@ var JinglePlugin = {
         var sid = $(callmsg).attr('sid'); //this will become the sid of the Jingle call once it is established
         if (!sid)
             throw new Error("Incoming call message does not have a 'sid' attribute");
+        var peerAnonId = $(callmsg).attr('anonid');
+        if (!peerAnonId)
+            throw new Error("Incoming call message does not have an 'anonId' attribute");
         var bareJid = Strophe.getBareJidFromJid(from);
         var strFiles = $(callmsg).attr('files');
         var files = strFiles?JSON.parse(strFiles):undefined;
@@ -346,7 +359,7 @@ var JinglePlugin = {
             cancelHandler = null;
 
             var by = $(msg).attr('by');
-            if (by != self.connection.jid)
+            if (by !== self.connection.jid)
                 self.onCallCanceled.call(self.eventHandler, from, {
                     event: 'handled-elsewhere',
                     by: by,
@@ -358,7 +371,7 @@ var JinglePlugin = {
 
     // Add a 'cancel' handler that will ivalidate the call request if the caller sends a cancel message
         cancelHandler = self.connection.addHandler(function(msg) {
-            if ($(msg).attr('sid') != sid)
+            if ($(msg).attr('sid') !== sid)
                 return true;
             if (!elsewhereHandler)
                 return;
@@ -436,6 +449,7 @@ var JinglePlugin = {
                     options: obj.options,
                     peerFprMacKey: peerFprMacKey,
                     ownFprMacKey: ownFprMacKey,
+                    peerAnonId: peerAnonId,
                     peerMedia: files?undefined:peerMedia
                 };
                 if (files) {
@@ -445,7 +459,7 @@ var JinglePlugin = {
 // This timer is for the period from the megaCallAnswer to the jingle-initiate stanza
                 setTimeout(function() { //invalidate auto-answer after a timeout
                     var call = self.acceptCallsFrom[sid];
-                    if (!call || (call.tsTill != tsTillJingle))
+                    if (!call || (call.tsTill !== tsTillJingle))
                         return; //entry was removed or updated by a new call request
                     self.cancelAutoAnswerEntry(sid, 'initiate-timeout', 'timed out waiting for caller to start call');
                 }, self.jingleAutoAcceptTimeout);
@@ -455,7 +469,8 @@ var JinglePlugin = {
                         sid: sid,
                         to: from,
                         type: 'megaCallAnswer',
-                        fprmackey: self.encryptMessageForJid(ownFprMacKey, bareJid)
+                        fprmackey: self.encryptMessageForJid(ownFprMacKey, bareJid),
+                        anonid: self.rtcSession.ownAnonId
                     }));
                 }, bareJid);
             } else {
@@ -483,8 +498,13 @@ var JinglePlugin = {
             delete this.acceptCallsFrom[aid];
         } else {
             delete this.acceptCallsFrom[aid];
-            this.onCallTerminated.call(this.eventHandler, {fake: true, sid: aid, peerjid: item.from, isInitiator: false},
-                reason, text);
+            this.onCallTerminated.call(this.eventHandler, {
+               fake: true,
+               sid: aid,
+               peerjid: item.from,
+               isInitiator: false,
+               peerAnonId: item.peerAnonId
+            }, reason, text);
         }
         return true;
     },
@@ -513,7 +533,6 @@ var JinglePlugin = {
         // configure session
         sess.media_constraints = this.media_constraints;
         sess.pc_constraints = this.pc_constraints;
-        sess.ice_config = this.ice_config;
 
         sess.initiate(true);
         sess.sendOffer(function() {sess.sendMutedState()});
@@ -609,91 +628,31 @@ var JinglePlugin = {
             res.video = true;
         return res;
     },
-    getStunAndTurnCredentials: function () {
-        // get stun and turn configuration from server via xep-0215
-        // uses time-limited credentials as described in
-        // http://tools.ietf.org/html/draft-uberti-behave-turn-rest-00
-        //
-        // see https://code.google.com/p/prosody-modules/source/browse/mod_turncredentials/mod_turncredentials.lua
-        // for a prosody module which implements this
-        //
-        // currently, this doesn't work with updateIce and therefore credentials with a long
-        // validity have to be fetched before creating the peerconnection
-        // TODO: implement refresh via updateIce as described in
-        //      https://code.google.com/p/webrtc/issues/detail?id=1650
-        this.connection.send(
-            $iq({type: 'get', to: this.connection.domain})
-                .c('services', {xmlns: 'urn:xmpp:extdisco:1'}).c('service', {host: 'turn.' + this.connection.domain}),
-            function (res) {
-                var iceservers = [];
-                $(res).find('>services>service').each(function (idx, el) {
-                    el = $(el);
-                    var dict = {};
-                    switch (el.attr('type')) {
-                    case 'stun':
-                        dict.url = 'stun:' + el.attr('host');
-                        if (el.attr('port')) {
-                            dict.url += ':' + el.attr('port');
-                        }
-                        iceservers.push(dict);
-                        break;
-                    case 'turn':
-                        dict.url = 'turn:';
-                        if (el.attr('username')) { // https://code.google.com/p/webrtc/issues/detail?id=1508
-                            if (navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./) && parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2], 10) < 28) {
-                                dict.url += el.attr('username') + '@';
-                            } else {
-                                dict.username = el.attr('username'); // only works in M28
-                            }
-                        }
-                        dict.url += el.attr('host');
-                        if (el.attr('port') && el.attr('port') != '3478') {
-                            dict.url += ':' + el.attr('port');
-                        }
-                        if (el.attr('transport') && el.attr('transport') != 'udp') {
-                            dict.url += '?transport=' + el.attr('transport');
-                        }
-                        if (el.attr('password')) {
-                            dict.credential = el.attr('password');
-                        }
-                        iceservers.push(dict);
-                        break;
-                    }
-                });
-                this.ice_config.iceServers = iceservers;
-            },
-            function (err) {
-                console.warn('getting turn credentials failed', err);
-                console.warn('is mod_turncredentials or similar installed?');
+    jsonStringifyOneLevel: function(obj) {
+        var str = '{';
+        for (var k in obj) {
+            if (!obj.hasOwnProperty(k))
+                continue;
+            str+=(k+':');
+            var prop = obj[k];
+            switch(typeof prop) {
+            case 'string': str+=('"'+prop+'"'); break;
+            case 'number': str+=prop; break;
+            case 'function': str+='(func)'; break;
+            case 'object':
+                if (prop instanceof Array)
+                    str+='(array)';
+                else
+                    str+='(object)';
+                break;
+            default: str+='(unk)'; break;
             }
-        );
-        // implement push?
- },
- jsonStringifyOneLevel: function(obj) {
-    var str = '{';
-    for (var k in obj) {
-        if (!obj.hasOwnProperty(k))
-            continue;
-        str+=(k+':');
-        var prop = obj[k];
-        switch(typeof prop) {
-          case 'string': str+=('"'+prop+'"'); break;
-          case 'number': str+=prop; break;
-          case 'function': str+='(func)'; break;
-          case 'object':
-            if (prop instanceof Array)
-                str+='(array)';
-            else
-                str+='(object)';
-            break;
-          default: str+='(unk)'; break;
-        }
         str+=', ';
+        }
+        if (str.length > 1)
+            str = str.substr(0, str.length-2)+'}';
+        return str;
     }
-    if (str.length > 1)
-        str = str.substr(0, str.length-2)+'}';
-    return str;
- }
 };
 
 function MuteInfo(affected) {

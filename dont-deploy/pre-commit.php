@@ -1,5 +1,13 @@
 #!/usr/bin/env php
 <?PHP
+/**
+ * This is simple dev tool, which I (@lp) use to validate if ANY of my files contains an UTF-8 character
+ * Its called pre-commit, because i manually run it in the webclient root folder before i commit & push my changes.
+ *
+ * As discussed in this thread: https://megaconz.slack.com/archives/new-design/p1412809640000246
+ *
+ * Some day: maybe refactor this to be extensible, to contain a list of checks to be executed on the current local code
+ */
 define("BASEDIR", realpath(dirname(__FILE__)."/../"));
 
 $FAILED = 0;

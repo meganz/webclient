@@ -562,35 +562,41 @@ var Chat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
         'rtcSession': {
-            encryptMessageForJid: function(msg, bareJid) {
-                var contact = megaChat.getContactFromJid(bareJid);
-                if (!u_pubkeys[contact.h]) {
-                    throw new Error("pubkey not loaded: " + contact);
-                }
-                return base64urlencode(crypto_rsaencrypt(msg, u_pubkeys[contact.h]));
-            },
-            decryptMessage: function(msg) {
-                var decryptedVal = crypto_rsadecrypt(base64urldecode(msg), u_privk);
-                if(decryptedVal && decryptedVal.length > 0) {
-                    return decryptedVal.substring(0, 44)
-                } else {
-                    return decryptedVal; // some null/falsy value
-                }
+            'crypto': {
+                encryptMessageForJid: function (msg, bareJid) {
+                    var contact = megaChat.getContactFromJid(bareJid);
+                    if (!u_pubkeys[contact.h]) {
+                        throw new Error("pubkey not loaded: " + contact);
+                    }
+                    return base64urlencode(crypto_rsaencrypt(msg, u_pubkeys[contact.h]));
+                },
+                decryptMessage: function (msg) {
+                    var decryptedVal = crypto_rsadecrypt(base64urldecode(msg), u_privk);
+                    if (decryptedVal && decryptedVal.length > 0) {
+                        return decryptedVal.substring(0, 44)
+                    } else {
+                        return decryptedVal; // some null/falsy value
+                    }
 
-            },
-            preloadCryptoKeyForJid: function(sendMsgFunc, bareJid) {
-                getPubk(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
-            },
-            generateMac: function(msg, key) {
-                var rawkey = key;
-                try {
-                    rawkey = atob(key);
-                } catch(e) {
-//                    if(e instanceof InvalidCharacterError) {
-//                        rawkey = key
-//                    }
+                },
+                preloadCryptoKeyForJid: function (sendMsgFunc, bareJid) {
+                    getPubk(megaChat.getContactFromJid(bareJid).h, sendMsgFunc);
+                },
+                generateMac: function (msg, key) {
+                    var rawkey = key;
+                    try {
+                        rawkey = atob(key);
+                    } catch (e) {
+                        //                    if(e instanceof InvalidCharacterError) {
+                        //                        rawkey = key
+                        //                    }
+                    }
+                    return asmCrypto.HMAC_SHA256.base64(rawkey, msg);
+                },
+                scrambleJid: function(bareJid) {
+                    var H = asmCrypto.SHA256.base64;
+                    return H(bareJid + H(u_privk + "webrtc stats collection"));
                 }
-                return asmCrypto.HMAC_SHA256.base64( rawkey, msg );
             },
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
@@ -1248,9 +1254,9 @@ Chat.prototype.init = function() {
         };
 
 
-        if(localStorage.webrtcStatsEnabled) {
-            self.rtc.statsUrl = "https://j100.server.lu:1378/stats";
-        }
+
+        self.rtc.statsUrl = "https://karere-stats.developers.mega.co.nz:1378/";
+
 
 
 

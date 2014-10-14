@@ -1106,8 +1106,6 @@ function addContactUI()
 		{
 			$d.removeClass('error');
 		}, 3000);
-
-		if (u) $.addUserFail.push(u);
 	}
 
 	function focusOnInput()
@@ -1228,7 +1226,6 @@ function addContactUI()
 		$.hideContextMenu();
 		$.dialog = 'add-contact-popup';
 		$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
-		$.addUserFail = [];
 		// Just in case hide import links
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 		$('.import-contacts-link').removeClass('active');
@@ -1265,7 +1262,6 @@ function addContactUI()
 		}
 		else// Show
 		{
-			$.addUserFail = [];
 			$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 			$('.import-contacts-link').removeClass('active');
 			$this.addClass('active');
@@ -1319,7 +1315,7 @@ function addContactUI()
 	$('.add-user-popup-button').off('click');
 	$('.add-user-popup-button').on('click', function()
 	{
-		var $this = $(this), nobody = true;
+		var $this = $(this);
 		if ($this.is('.add') && !$this.is('.disabled'))// Add
 		{
 			if (u_type === 0) ephemeralDialog(l[997]);
@@ -1332,12 +1328,6 @@ function addContactUI()
 					{
 						M.addContact($(value).contents().eq(1).text());
 					});
-					nobody = false;
-				}
-				
-				if (nobody && $.addUserFail.length)
-				{
-					msgDialog('info',l[150],l[151].replace('[X]','already'));
 				}
 			}
 		}

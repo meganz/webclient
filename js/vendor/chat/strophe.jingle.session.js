@@ -83,6 +83,12 @@ initiate: function(isInitiator) {
     this.hadturncandidate = false;
     this.lasticecandidate = false;
     this.peerconnection.onicecandidate = function (event) {
+        if(
+            event.candidate &&
+            event.candidate.candidate.indexOf("candidate") === 0
+        ) { // Chrome, normalizing the event.candidate to start with a=
+            event.candidate.candidate = "a=" + event.candidate.candidate;
+        }
         self.sendIceCandidate(event.candidate);
     };
     this.peerconnection.onaddstream = function (event) {

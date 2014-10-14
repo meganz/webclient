@@ -1255,7 +1255,7 @@ Chat.prototype.init = function() {
 
 
 
-        self.rtc.statsUrl = "https://karere-stats.developers.mega.co.nz:1378/";
+        self.rtc.statsUrl = "https://karere-stats.developers.mega.co.nz:1378/stats";
 
 
 

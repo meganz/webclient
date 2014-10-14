@@ -5,14 +5,14 @@
 
 describe("tlvstore unit test", function() {
     "use strict";
-    
+
     var assert = chai.assert;
-    
+
     var ns = tlvstore;
-    
+
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
-    
+
     // Create/restore Sinon stub/spy/mock sandboxes.
     var sandbox = null;
 
@@ -38,7 +38,7 @@ describe("tlvstore unit test", function() {
                 assert.strictEqual(ns._toTlvRecord(key, value), expected);
             }
         });
-        
+
         it("containerToTlvRecords", function() {
             var tests = [{'foo': 'bar',
                           'puEd255': ED25519_PUB_KEY},
@@ -50,7 +50,7 @@ describe("tlvstore unit test", function() {
                 assert.strictEqual(ns.containerToTlvRecords(tests[i]), expected[i]);
             }
         });
-        
+
         it('_splitSingleTlvRecord', function() {
             var tests = 'foo\u0000\u0000\u0003bar'
                       + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY;
@@ -59,7 +59,7 @@ describe("tlvstore unit test", function() {
             assert.strictEqual(result.record[1], 'bar');
             assert.strictEqual(result.rest, 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY);
         });
-        
+
         it('tlvRecordsToContainer', function() {
             var tests = ['foo\u0000\u0000\u0003bar'
                          + 'puEd255\u0000\u0000\u0020' + ED25519_PUB_KEY,
@@ -72,14 +72,15 @@ describe("tlvstore unit test", function() {
             }
         });
     });
-    
+
     describe('attribute en-/decryption', function() {
         it("blockEncrypt", function() {
             var iv = asmCrypto.hex_to_bytes('000102030405060708090a0b0c0d0e0f');
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
             var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
                          [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16, 12]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
@@ -112,6 +113,15 @@ describe("tlvstore unit test", function() {
                 'AgABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrE+a13ciKmM6k=',
                 'AgABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrw5l9HNUXDPk=',
                 'AgABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahGfgp845h0GDQ==',
+                'AwABAgMEBQYHCAkKC436kEyuBNzuW6p4fd5WoW0=',
+                'AwABAgMEBQYHCAkKCyi+Gse0PYhohpuaRdPeQ2zQzA==',
+                'AwABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqY=',
+                'AwABAgMEBQYHCAkKC1rg6sGDWwFpJX0Q14jMKRU1EqGtmyxNLrct68sME75wRH6Vz8mvGDc=',
+                'AwABAgMEBQYHCAkKC0zktMaKUFRTdXEQ05qfMx1zN+6AnDBdMJZPYx7hPtIuU1e9B+eiG4Z5jlqrYiW3FTqKXuJPuLb4jgJTeK0FsYowMw==',
+                'AwABAgMEBQYHCAkKC0hIAMYpvQFROnlMxVaEuPiXMq/Y4m8BUAgw',
+                'AwABAgMEBQYHCAkKC1RPN8aeWU0aczwwzYjMOBC6E2laTFsBrGOaoCAFb928',
+                'AwABAgMEBQYHCAkKC8wtQxM9jPC6hJ6nBz0JjczE3x9BOdz47C+7ks4K2Wb9lPQIBLG4INdpu990',
+                'AwABAgMEBQYHCAkKC3rj/KjtP0NbJ2wC+omKaEkVX+4AfwLqxP/4wY53WGn8+OKBozgJryuRjTGxCo5iBp5XKqex2bwO2Dz7BTgZ+/w+iDFjLEWwz/gvCRBqTQDSvEs=',
             ];
             for (var i = 0; i < modes.length; i++) {
                 var mode = modes[i][0];
@@ -131,12 +141,13 @@ describe("tlvstore unit test", function() {
                 asmCrypto.getRandomValues.restore();
             }
         });
-            
+
         it("blockDecrypt", function() {
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
             var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
                          [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16, 12]];
             var tests = [
                 'AAABAgMEBQYHCAkKC436kEyuBNzuW6p4fd5WoW0=',
                 'AAABAgMEBQYHCAkKCyi+Gse0PYhohpuaRdPeQ2zQzA==',
@@ -165,6 +176,15 @@ describe("tlvstore unit test", function() {
                 'AgABAgMEBQYHCAkQ42ARA3SckLi9f0NELTrE+a13ciKmM6k=',
                 'AgABAgMEBQYHCAmIgRTEoKEhME8f6Inx6I8YJ7GuiIL4QgaNZ8jrw5l9HNUXDPk=',
                 'AgABAgMEBQYHCAk+T6t/cBKS0eztTXRFa2qd9jFfycQmUC5dJJurGUm99XOLMSTw00I3LtHJ7HtLuKdAauFIGc5oCegTnlHVaAFIahGfgp845h0GDQ==',
+                'AwABAgMEBQYHCAkKC436kEyuBNzuW6p4fd5WoW0=',
+                'AwABAgMEBQYHCAkKCyi+Gse0PYhohpuaRdPeQ2zQzA==',
+                'AwABAgMEBQYHCAkKC1jj/Y+ZHFFbO3UUng4na9OXvdc4jSVHIfN7ZqY=',
+                'AwABAgMEBQYHCAkKC1rg6sGDWwFpJX0Q14jMKRU1EqGtmyxNLrct68sME75wRH6Vz8mvGDc=',
+                'AwABAgMEBQYHCAkKC0zktMaKUFRTdXEQ05qfMx1zN+6AnDBdMJZPYx7hPtIuU1e9B+eiG4Z5jlqrYiW3FTqKXuJPuLb4jgJTeK0FsYowMw==',
+                'AwABAgMEBQYHCAkKC0hIAMYpvQFROnlMxVaEuPiXMq/Y4m8BUAgw',
+                'AwABAgMEBQYHCAkKC1RPN8aeWU0aczwwzYjMOBC6E2laTFsBrGOaoCAFb928',
+                'AwABAgMEBQYHCAkKC8wtQxM9jPC6hJ6nBz0JjczE3x9BOdz47C+7ks4K2Wb9lPQIBLG4INdpu990',
+                'AwABAgMEBQYHCAkKC3rj/KjtP0NbJ2wC+omKaEkVX+4AfwLqxP/4wY53WGn8+OKBozgJryuRjTGxCo5iBp5XKqex2bwO2Dz7BTgZ+/w+iDFjLEWwz/gvCRBqTQDSvEs=',
             ];
             var expected = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                             "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
@@ -177,12 +197,13 @@ describe("tlvstore unit test", function() {
                 }
             }
         });
-        
+
         it("blockEncrypt/blockDecrypt round trip", function() {
             var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
             var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
                          [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16, 12]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',
@@ -197,12 +218,13 @@ describe("tlvstore unit test", function() {
                 }
             }
         });
-        
+
         it("blockEncrypt/blockDecrypt round trip with array key", function() {
             var key = [252579084, 185207048, 117835012, 50462976];
             var modes = [[ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16, 12],
                          [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_16, 10],
-                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10]];
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08, 10],
+                         [ns.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16, 12]];
             var tests = ['', '42', "Don't panic!", 'Flying Spaghetti Monster',
                          "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
                          'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст',

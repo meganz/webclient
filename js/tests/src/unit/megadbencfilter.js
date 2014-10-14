@@ -8,28 +8,8 @@ describe("MegaDB - Encryption Test and demo", function() {
      * @constructor
      */
     var MdbEncryptionFilter = function(mdbInstance) {
-        /**
-         * Dummy encrypt/decrypt funcs
-         */
-        var simpleXorEnc = function(s, k) {
-            var result = "";
-            s = s.toString();
-            for(i=0; i<s.length;i++)  {
-                result += String.fromCharCode(k^s.charCodeAt(i));
-            }
-            return result;
-        };
-
-        var simpleXorDec = function(s, k)  {
-            var result="";
-            for(i=0; i<s.length; i++)  {
-                result += String.fromCharCode(k^s.charCodeAt(i));
-            }
-            return result;
-        };
-
         // user's already loaded, static key (e.g. u_privk)
-        var encDecKey = 1;
+        var encDecKey = stringcrypt.newKey();
 
         // funcs which encrypt or decrypt the whole object
 
@@ -44,7 +24,7 @@ describe("MegaDB - Encryption Test and demo", function() {
                 var v = obj[k];
                 if(k == "__origObj") { return; }
 
-                obj[k] = simpleXorEnc(v, encDecKey);
+                obj[k] = strincrypt.stringEncrypter(v, encDecKey);
 
                 console.log(k, obj[k]);
             })
@@ -71,7 +51,7 @@ describe("MegaDB - Encryption Test and demo", function() {
                         return;
                     }
 
-                    obj[k] = simpleXorDec(v, encDecKey);
+                    obj[k] = stringcrypt.stringDecrypter(v, encDecKey);
                 })
             }
         };
@@ -125,7 +105,7 @@ describe("MegaDB - Encryption Test and demo", function() {
 
                 if(k == "id") { return; }
 
-                filters[i+1] = simpleXorEnc(v, encDecKey);
+                filters[i+1] = stringcrypt.stringEncrypter(v, encDecKey);
             };
             console.error(filters);
         });

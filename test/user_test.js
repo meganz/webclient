@@ -19,6 +19,8 @@ describe("user unit test", function() {
 
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
+        localStorage.clear();
+        localStorage.d = false;
     });
 
     afterEach(function() {

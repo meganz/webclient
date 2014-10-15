@@ -1526,8 +1526,8 @@ function MegaData ()
 
 		if (folderlink)
 		{
-			$('.fm-breadcrumbs').addClass('folder-link')
-			$('.fm-breadcrumbs.folder span').empty()
+			$('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link')
+			$('.fm-breadcrumbs:first span').empty()
 			if (folderlink && name) $('.nw-tree-panel-header span').text(name);
 		}
 	};

@@ -16,31 +16,20 @@ function isMobile()
 	return false;
 }
 
-
-function geoIP()
-{
-    return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent('geoip').replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || false;
-}
-
-
 function geoStaticpath(eu)
 {
-	if (!eu && !sessionStorage.skipcdn && geoIP() && 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW'.indexOf(geoIP()) == -1) return 'https://g.cdn1.mega.co.nz/';
+	if (!eu && !sessionStorage.skipcdn && 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW'.indexOf(((''+document.cookie).match(/\bgeoip\s*\=\s*([A-Z]{2})\b/)||[0,'FR'])[1]) == -1) return 'https://g.cdn1.mega.co.nz/';
 	else return 'https://eu.static.mega.co.nz/';
 }
-
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
 else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
 else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
+var apipath, staticpath = 'https://eu.static.mega.co.nz/';
 var myURL = window.URL || window.webkitURL;
 if (!myURL) b_u=1;
 
-var firefoxv = '2.0.0';
-
-if (b_u) document.location = 'update.html';
-
-try
+if (!b_u) try
 {
 	if (is_chrome_firefox)
 	{
@@ -74,69 +63,65 @@ try
 			var mozBrowserID = ua;
 		}
 
-		try {
-			loadSubScript('chrome://mega/content/strg2.js');
+		loadSubScript('chrome://mega/content/strg2.js');
 
-			if(!(localStorage instanceof Ci.nsIDOMStorage)) {
-				throw new Error('Initialization failed.');
-			}
-			var d = !!localStorage.d;
-		} catch(e) {
-			alert('Error setting up DOM Storage instance:\n\n'
-				+ e + '\n\n' + mozBrowserID);
-
-			throw new Error("FxEx");
+		if(!(localStorage instanceof Ci.nsIDOMStorage)) {
+			throw new Error('Invalid DOM Storage instance.');
 		}
+		var d = !!localStorage.d;
 	}
-	if (typeof localStorage == 'undefined')
-	{
-	  b_u = 1;
-	  var staticpath = 'https://eu.static.mega.co.nz/';
-	}
+	if (typeof localStorage == 'undefined') b_u = 1;
 	else
 	{
-		if (localStorage.dd) localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-		var staticpath = localStorage.staticpath || geoStaticpath();
-		var apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 		var contenterror = 0;
-		var nocontentcheck = localStorage.dd;
+		var nocontentcheck = !!localStorage.dd;
+		if (localStorage.dd) localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
+		staticpath = localStorage.staticpath || geoStaticpath();
+		apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 	}
+	throw 33;
 }
 catch(e)
 {
-	if(e.message != 'FxEx')
-	{
-		alert('Your browser does not allow data to be written. Please make sure you use default browser settings.');
-	}
+	alert(
+		"Sorry, we were unable to initialize the browser's local storage, "+
+		"either you're using an outdated browser or it's something from our side.\n"+
+		"\n"+
+		"If you think it's our fault, please report the issue back to us.\n"+
+		"\n"+
+		"Reason: " + (e.message || e)+
+		"\nBrowser: " + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua)
+	);
 	b_u = 1;
-	var staticpath = 'https://eu.static.mega.co.nz/';
 }
+
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
-if (document.location.href.substr(0,19) == 'chrome-extension://')
+if (!b_u && is_extension)
 {
-	bootstaticpath = chrome.extension.getURL("mega/");
-	urlrootfile = 'mega/secure.html';
+	if (is_chrome_firefox)
+	{
+		bootstaticpath = 'chrome://mega/content/';
+		urlrootfile = 'secure.html';
+		nocontentcheck=true;
+		staticpath = 'https://eu.static.mega.co.nz/';
+		try {
+			loadSubScript(bootstaticpath + 'fileapi.js');
+		} catch(e) {
+			b_u = 1;
+			Cu.reportError(e);
+			alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
+		}
+	}
+	else /* Google Chrome */
+	{
+		bootstaticpath = chrome.extension.getURL("mega/");
+		urlrootfile = 'mega/secure.html';
+	}
 }
 
-if (is_chrome_firefox)
-{
-	bootstaticpath = 'chrome://mega/content/';
-	urlrootfile = 'secure.html';
-	nocontentcheck=true;
-	staticpath = 'https://eu.static.mega.co.nz/';
-	if(!b_u) try
-	{
-		loadSubScript(bootstaticpath + 'fileapi.js');
-	}
-	catch(e)
-	{
-		b_u = 1;
-		Cu.reportError(e);
-		alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
-	}
-}
+if (b_u) document.location = 'update.html';
 
 window.URL = window.URL || window.webkitURL;
 

@@ -1200,7 +1200,7 @@ function topmenuUI()
 	$('.top-search-input').unbind('keyup');
 	$('.top-search-input').bind('keyup',function(e)
 	{
-		if (e.keyCode == 13)
+		if (e.keyCode == 13 || folderlink)
 		{
 			var val = $('.top-search-input').val();
 			if (folderlink || val.length > 2 || !asciionly(val))
@@ -1222,7 +1222,7 @@ function topmenuUI()
 				else document.location.hash = 'fm/search/' + val;
 			}
 		}
-    });
+	});
 
 	if (avatars[u_handle]) $('.fm-avatar img').attr('src',avatars[u_handle].url);
 	$('.fm-avatar img').unbind('click');

@@ -79,7 +79,6 @@ if (!b_u) try
 		staticpath = localStorage.staticpath || geoStaticpath();
 		apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 	}
-	throw 33;
 }
 catch(e)
 {

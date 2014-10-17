@@ -4638,7 +4638,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .not-logged .fm-files-view-icon {
 	display: none;
 }
-.not-logged .fm-right-header.folder-link {
+.not-logged .fm-right-header.folder-link .fm-files-view-icon {
 	display: block;
 }
 .nw-fm-left-icon.rubbish-bin:hover, .nw-fm-left-icon.rubbish-bin.dragover {
@@ -6360,7 +6360,7 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end {
+.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive {
 	height: 24px;
 	float: right;
 	font-size: 12px;
@@ -6466,6 +6466,19 @@ span.search-number {
 .fm-clearbin-button, .fm-share-download {
 	background-position: -3px -5820px;
 	background-color: rgba(211,26,0,0.7);
+}
+.fm-download-as-zip, .fm-import-to-cloudrive {
+	background-color: rgba(211,26,0,0.7);
+	padding: 0 10px 0 36px;
+}
+.fm-download-as-zip{
+	background-position: -4px -4730px;
+}
+.fm-import-to-cloudrive {
+	background-position: -7px -9978px;
+}
+.fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-download-as-zip.active, .fm-import-to-cloudrive.active {
+	background-color: rgba(211,26,0,1);
 }
 .fm-leave-share, .fm-share-copy, .fm-share-download {
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -18385,7 +18398,7 @@ span.incoming-call-name {
 	float: left;
 	left: auto;
 	top: auto;
-	margin: 6px 0 0 11px;
+	margin: 7px 0 0 11px;
 }
 .contact-top-details:hover .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);

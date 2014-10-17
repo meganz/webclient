@@ -3115,7 +3115,7 @@ function gridUI()
 		initGridScrolling();
 		$.gridHeader();
 	}
-	if (RootbyId(M.currentdirid) == 'contacts' || folderlink || RootbyId(M.currentdirid) == M.RubbishID)
+	if (folderlink || RootbyId(M.currentdirid) == M.RubbishID)
 	{
 		$('.grid-url-arrow').hide();
 		$('.grid-url-header').text('');

@@ -1160,6 +1160,11 @@ function MegaData ()
 
 	this.buildtree = function(n, dialog)
 	{
+		if (!n)
+		{
+			if (d) console.error('Invalid node passed to M.buildtree');
+			return;
+		}
 		var stype = "cloud-drive";
 		// ToDo: What lu represents?
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)

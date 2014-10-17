@@ -7915,8 +7915,10 @@ function fingerprintDialog(userid)
 	var user = M.u[userid]
 	if (!user || !user.u) return;
 
-	function cleanup()
-	{
+	function closeFngrPrntDialog() {
+	    $('.fm-dialog-overlay').addClass('hidden');
+	    $('body').removeClass('overlayed');
+		$this.addClass('hidden');
 		$('.fm-dialog-close').unbind('click');
 		$('.dialog-approve-button').unbind('click');
 		$('.dialog-skip-button').unbind('click');
@@ -7924,7 +7926,8 @@ function fingerprintDialog(userid)
 	}
 
 	var $this = $('.fingerprint-dialog')
-		, avatar = userAvatar(userid)
+		, avatar = userAvatar(userid);
+		
 
 	$this.find('.fingerprint-avatar')
 		.attr('class', 'fingerprint-avatar color' + avatar.color)
@@ -7956,28 +7959,28 @@ function fingerprintDialog(userid)
 	})
 
 	$('.fm-dialog-close').rebind('click', function() {
-		$this.addClass('hidden');
-		cleanup();
+		closeFngrPrntDialog();
 	});
 
 	$('.dialog-approve-button').rebind('click', function() {
-		$this.addClass('hidden');
 		userFingerprint(user, function(fprint, fprintraw) {
 			authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 		});
-		cleanup();
+		closeFngrPrntDialog();
 	});
 
 	$('.dialog-skip-button').rebind('click', function() {
-		$this.addClass('hidden');
-		cleanup();
+		closeFngrPrntDialog();
 	});
 
 	$this.removeClass('hidden')
 	  .css ({
 		'margin-top': '-' + $this.height()/2 +'px',
 		'margin-left': '-' + $this.width()/2 +'px'
- 	  })
+ 	  });
+	  $('.fm-dialog-overlay').removeClass('hidden');
+	  $('body').addClass('overlayed');
+	  
 }
 
 function contactUI()

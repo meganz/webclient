@@ -113,7 +113,8 @@ if (!b_u && is_extension)
 		bootstaticpath = 'chrome://mega/content/';
 		urlrootfile = 'secure.html';
 		nocontentcheck=true;
-		staticpath = 'https://eu.static.mega.co.nz/';
+		if (d) staticpath = bootstaticpath;
+		  else staticpath = 'https://eu.static.mega.co.nz/';
 		try {
 			loadSubScript(bootstaticpath + 'fileapi.js');
 		} catch(e) {

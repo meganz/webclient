@@ -962,7 +962,7 @@ function topmenuUI()
 			$('.top-menu-item.login').hide();
 			$('.top-menu-item.logout,.context-menu-divider.logout').show();
 		}
-		$('.top-login-arrow').css('margin-right',$('.top-menu-icon').width()+$('.create-account-button').width()+($('.top-login-button').width()/2)+78+'px');
+		$('.top-login-arrow').css('margin-right',$('.top-menu-icon').width()+$('.create-account-button').width()+($('.top-login-button').width()/2)+82+'px');
 	}
 	$('.top-menu-arrow').css('margin-right',$('.top-menu-icon').width()/2+'px');
 	$.hideTopMenu = function(e)
@@ -1047,6 +1047,7 @@ function topmenuUI()
 	    {
 			$(this).addClass('active');
 			$('.top-user-status-popup').addClass('active');
+			$('.top-user-status-popup').css('right',$('.top-menu-icon').outerWidth() + $('.user-name').outerWidth() + $('.membership-status-block').outerWidth() -34 + 'px');
 		}
 		else
 		{
@@ -1306,7 +1307,7 @@ function topmenuUI()
 		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));	
 	}
 	
-	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+108+'px');
+	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
 	initNotifications();
 }
 

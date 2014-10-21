@@ -1324,6 +1324,9 @@ function addContactUI()
 			$('.add-user-popup').removeClass('dialog');
 			iconSize(true);
 			$('.fm-add-user').addClass('active');
+			var pos = $(window).width() - $('.fm-add-user').offset().left - $('.add-user-popup').outerWidth() + 2;
+	        if (pos > 8) $('.add-user-popup').css('right', pos + 'px');
+	        else $('.add-user-popup').css('right', 8 + 'px');
 			focusOnInput();
 		}
 	});

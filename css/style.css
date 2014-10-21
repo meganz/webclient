@@ -1933,7 +1933,7 @@ form {
 	width: 720px;
 }
 .blog-new-item {
-	padding: 10px 35px 41px 3px;
+	padding: 10px 35px 41px 0;
 }
 .blog-new.new-bottom-pages h2 {
 	margin: 0;
@@ -2317,10 +2317,10 @@ a.blog-new-archive-lnk {
 	cursor: pointer;
 }
 .blog-new-full {
-	padding: 10px 35px 40px 3px;
+	padding: 10px 35px 40px 0;
 }
 .blog-new-full.empty-bottom {
-	padding: 10px 35px 7px 3px;
+	padding: 10px 35px 7px 0;
 }
 .new-bottom-pages .blog-new-full h2 {
 	float: left;

@@ -2411,10 +2411,10 @@ Chat.prototype.getChatNum = function(idx) {
  */
 Chat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
-        return "https://sandbox.developers.mega.co.nz:5281/http-bind";
+        return "https://sandbox.developers.mega.co.nz/http-bind";
     } else {
-        return "https://karere-001.developers.mega.co.nz:5281/http-bind";
-        return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz:5281/http-bind";
+        return "https://karere-001.developers.mega.co.nz/http-bind";
+        return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz/http-bind";
     }
 };
 

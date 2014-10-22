@@ -43,7 +43,7 @@
             assert(Favico, 'Favico.js is missing.');
 
 
-            $('link[rel="icon"]').attr('href', '/favicon.ico');
+            $('link[rel="icon"]').attr('href', bootstaticpath + 'favicon.ico');
 
             self.favico = new Favico({
                 type : 'rectangle',

@@ -586,6 +586,8 @@ if(is_chrome_firefox) {
 
 function crypto_rsagenkey ()
 {
+    var $promise = new MegaPromise();
+
     var startTime = new Date();
 
     if ( typeof msCrypto !== 'undefined' && msCrypto.subtle ) {
@@ -616,8 +618,13 @@ function crypto_rsagenkey ()
         var endTime = new Date();
         if (localStorage.d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
 
-        u_setrsa(k);
+        u_setrsa(k)
+            .done(function() {
+                $promise.resolve(k);
+            });
     }
+
+    return $promise;
 }
 
 /* }}} */
@@ -2827,13 +2834,15 @@ function u_initAuthentication() {
     authring.getContacts('RSA');
 
     // Load/initialise the authenticated contacts ring.
-    getUserAttribute(u_handle, 'keyring', false, u_initAuthentication2);
+    getUserAttribute(u_handle, 'keyring', false, function(res, ctx) {
+        u_initAuthentication2(res, ctx);
+    });
 }
 
 /**
  * Provide Ed25519 key pair and a signed RSA pub key.
  */
-function u_initAuthentication2(res, ctx) {
+function u_initAuthentication2(res, ctx, dontTriggerAuth) {
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
         // no furthe processing here.

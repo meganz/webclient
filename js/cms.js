@@ -41,6 +41,20 @@ window.cms_content = function(socket, ctx, buffer)
 					io.download(data['X-Label'], '');
 				});
 				break;
+
+			case 'url':
+				var blob;
+				try {
+                    blob = new Blob([response], { type: data['Content-Type'] });
+				} catch (e) {
+                    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+                    var bb = new BlobBuilder();
+                    for (var i in response) bb.append(response[i]);
+                    blob = bb.getBlob(data['Content-Type'])
+				}
+                response = window.URL.createObjectURL(blob);
+				break;
+
 			case 'application/json':
 				try {
 					response = JSON.parse(ab_to_str(response))
@@ -50,9 +64,9 @@ window.cms_content = function(socket, ctx, buffer)
 				}
 				break;
 			}
-			ctx.callback(false, { buffer: response, mime: data['Content-Type']}, ctx);
+			ctx.callback(false, { buffer: response, blob: response, mime: data['Content-Type']}, ctx);
 		} else {
-				ctx.callback(true, {} , ctx);
+			ctx.callback(true, {} , ctx);
 		}
 }
 

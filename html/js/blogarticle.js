@@ -1,4 +1,47 @@
+function fetch_asset(id) {
+	return function(next) {
+		api_req({a: 'blob', id: id}, {
+			expects: 'url',
+			callback: function(err,url) {
+				next(id, url.blob);
+			}
+		});
+	}
+}
+
+function replace_asset(id, url) {
+	var post = blogposts['post_' + blogid];
+	post.c = post.c.replace(new RegExp(id, "g"), url)
+	if (--post.lassets == 0) {
+		render_blogarticle();
+	}
+}
+
 function init_blogarticle()
+{
+	if (blogposts === null) {
+		init_blog();
+		return Later(init_blogarticle);
+	}
+	for(var i in blogposts)
+	{
+		if (blogposts[i].id == blogid)
+		{
+			var post = blogposts[i]
+			if (post.attaches.length == 0 || post.asset_ready) {
+				return render_blogarticle()
+			}
+
+			post.lassets = 0;
+			for (var e in post.attaches) {
+				fetch_asset(post.attaches[e])(replace_asset);
+				++post.lassets;
+			}
+		}
+	}
+}
+
+function render_blogarticle()
 {
 	var content = false;	
 	var by = 'Admin';

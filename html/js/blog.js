@@ -36,7 +36,8 @@ function init_blog()
 			{
 				if (e.keyCode == 13) blog_search();
 			});	
-			blog_load();
+			if (blogid) init_blogarticle();
+			else blog_load();
 		}
 	});
 }

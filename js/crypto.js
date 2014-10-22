@@ -2842,7 +2842,7 @@ function u_initAuthentication() {
 /**
  * Provide Ed25519 key pair and a signed RSA pub key.
  */
-function u_initAuthentication2(res, ctx, dontTriggerAuth) {
+function u_initAuthentication2(res, ctx) {
     if (typeof res !== 'number') {
         // Keyring is a private attribute, so it's been wrapped by a TLV store,
         // no furthe processing here.

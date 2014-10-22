@@ -16,6 +16,7 @@ $content = $rows[0];
 header("Content-Type: {$content->content_type}");
 header("Content-Length: {$content->content_size}");
 header("X-Mega-Authenticity: {$content->signature}");
+header("X-Label: {$content->label}");
 
 echo $content->content;
 exit;

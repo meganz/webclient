@@ -1,20 +1,15 @@
-function fetch_asset(id) {
-	return function(next) {
-		api_req({a: 'blob', id: id}, {
-			expects: 'url',
-			callback: function(err,url) {
-				next(id, url.blob);
-			}
-		});
-	}
+function my_replace(str, sep, id) {
+	return sep + "loading.png" + sep + " id=" + sep + "loading_" +  id 
 }
-
-function replace_asset(id, url) {
-	var post = blogposts['post_' + blogid];
-	post.c = post.c.replace(new RegExp(id, "g"), url)
-	if (--post.lassets == 0) {
-		render_blogarticle();
-	}
+function fetch_asset(html, id) {
+	html = html.replace(new RegExp('([\'"])(' + id + ')', 'g'), my_replace);
+	api_req({a: 'blob', id: id}, {
+		expects: 'url',
+		callback: function(err,url) {
+			$('#loading_' + id).attr({'id': '', 'src': url.blob})
+		}
+	});
+	return html;
 }
 
 function init_blogarticle()
@@ -23,22 +18,13 @@ function init_blogarticle()
 		init_blog();
 		return Later(init_blogarticle);
 	}
-	for(var i in blogposts)
-	{
-		if (blogposts[i].id == blogid)
-		{
-			var post = blogposts[i]
-			if (post.attaches.length == 0 || post.asset_ready) {
-				return render_blogarticle()
-			}
 
-			post.lassets = 0;
-			for (var e in post.attaches) {
-				fetch_asset(post.attaches[e])(replace_asset);
-				++post.lassets;
-			}
-		}
+	var post = blogposts['post_'  + blogid]
+	for (var e in post.attaches) {
+		post.c = fetch_asset(post.c, post.attaches[e])
 	}
+			
+	return render_blogarticle()
 }
 
 function render_blogarticle()

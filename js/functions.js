@@ -622,7 +622,7 @@ function ASSERT(what, msg, udata) {
 function srvlog(msg,data)
 {
 	if (d) console.error(msg);
-	else window.onerror(msg, '', data ? 1:-1, data ? { udata : data } : null);
+	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
 }
 
 function oDestroy(obj) {
@@ -917,7 +917,7 @@ function setupTransferAnalysis()
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
 						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
-						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
+						if (!d) srvlog(t + ' Stuck. ' + r, udata);
 					}
 					delete prev[i];
 				}

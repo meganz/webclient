@@ -2247,7 +2247,7 @@ function api_fareq(res,ctx,xhr)
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		window.onerror('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error,'',-1);
+		srvlog('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
 	}
 
 	if ( error )
@@ -2312,7 +2312,7 @@ function api_fareq(res,ctx,xhr)
 						var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 
 						if (d) console.error('FAEOT', id, this);
-						else window.onerror('api_fareq: eot for ' + this.fa_host, '', -1);
+						else srvlog('api_fareq: eot for ' + this.fa_host);
 
 						if (id !== slideshowid)
 						{
@@ -2358,7 +2358,7 @@ function api_fareq(res,ctx,xhr)
 				{
 					if (!d && (Date.now() - this.startTime) > 10000)
 					{
-						window.onerror('api_fareq: ' + this.fa_host + ' took +10s', '', -1);
+						srvlog('api_fareq: ' + this.fa_host + ' took +10s');
 					}
 					delete this.startTime;
 				}
@@ -2418,7 +2418,7 @@ function api_fareq(res,ctx,xhr)
 								faxhrfail[this.fa_host] = failtime = 1;
 								api_reportfailure(this.fa_host, function() {});
 
-								if (!d) window.onerror('api_fareq: 140s timeout for ' + this.fa_host, '', -1);
+								if (!d) srvlog('api_fareq: 140s timeout for ' + this.fa_host);
 							}
 						}
 					};

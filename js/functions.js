@@ -359,8 +359,9 @@ function browserdetails(useragent)
 	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
 	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
-	else if (useragent.indexOf('msie') > 0) browser = 'Internet Explorer';
 	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+	else if (useragent.indexOf('msie') > 0
+		|| "ActiveXObject" in window) browser = 'Internet Explorer';
 	if ((os) && (browser))
 	{
 		name = browser + ' on ' + os;
@@ -616,6 +617,12 @@ function ASSERT(what, msg, udata) {
 		else console.error('FAILED ASSERTION', msg);
 	}
 	return !!what;
+}
+
+function srvlog(msg,data)
+{
+	if (d) console.error(msg);
+	else window.onerror(msg, '', data ? 1:-1, data ? { udata : data } : null);
 }
 
 function oDestroy(obj) {

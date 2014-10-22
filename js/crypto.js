@@ -1935,19 +1935,22 @@ function fa_handler(xhr, ctx)
 
 		switch(fa_handler.browser)
 		{
-			case 'xFirefox':
-				this.parse = this.ab_parser;
+			case 'Firefox':
+				this.parse = this.moz_parser;
 				this.responseType = 'moz-chunked-arraybuffer';
 				break;
-			case 'xChrome':
+		/*	case 'Internet Explorer':
+			// Doh, all in one go :(
+				this.parse = this.stream_parser;
+				this.responseType = 'ms-stream';
+				this.stream_reader= this.msstream_reader;
+				break;
+		*/	case 'xChrome':
 				this.parse = this.stream_parser;
 				this.responseType = 'stream';
 				break;
 			default:
-				// this.parse = this.ab_parser;
-				// this.responseType = 'arraybuffer';
-				this.parse = this.str_parser;
-				this.responseType = 'text';
+				this.setParser('text');
 		}
 
 		this.done = this.Finish;
@@ -1962,8 +1965,7 @@ function fa_handler(xhr, ctx)
 
 	if (d) console.log('fah type:', this.responseType);
 }
-// fa_handler.chunked = !!/\b(?:chrome|firefox)\/[3-7]/.test(ua);
-fa_handler.chunked = !!d;
+fa_handler.chunked = true;
 fa_handler.prototype =
 {
 	PutFA : function(response)
@@ -2019,9 +2021,67 @@ fa_handler.prototype =
 		} while (i < bod);
 	},
 
+	setParser : function(type, parser)
+	{
+		if (type)
+		{
+			if (type === 'text') this.parse = this.str_parser;
+			else this.parse = parser.bind(this);
+			this.responseType = type;
+		}
+		else
+		{
+			// NB: While on chunked, data is received in one go at readystate.4
+			this.parse = this.ab_parser;
+			this.responseType = 'arraybuffer';
+		}
+		if (this.xhr.readyState == 1)
+		{
+			this.xhr.responseType = this.responseType;
+			if (d) console.log('New fah type:', this.xhr.responseType);
+		}
+	},
+
 	str_parser : function(data)
 	{
 		if (this.xhr.readyState > 2) this.pos += this.ab_parser(str_to_ab(data.slice(this.pos))) | 0;
+	},
+
+	msstream_reader : function(stream)
+	{
+		var self = this;
+		var reader = new MSStreamReader();
+		reader.onload = function(ev)
+		{
+			if (d) console.log('MSStream result', ev.target);
+
+			self.moz_parser(ev.target.result);
+			self.stream_parser(0x9ff);
+		};
+		reader.onerror = function(e)
+		{
+			if (d) console.error('MSStream error', e);
+			self.stream_parser(0x9ff);
+		};
+		reader.readAsArrayBuffer(stream);
+	},
+
+	stream_reader : function(stream)
+	{
+		var self = this;
+		stream.readType = 'arraybuffer';
+		stream.read().then(function(result)
+		{
+			if (d) console.log('Stream result', result);
+
+			self.moz_parser(result.data);
+			self.stream_parser(0x9ff);
+		},
+		function(e)
+		{
+			if (d) console.error('Stream error', e);
+			self.stream_parser(0x9ff);
+		});
 	},
 
 	stream_parser : function(stream, ev)
@@ -2037,9 +2097,9 @@ fa_handler.prototype =
 			{
 				if (this.wstream.length)
 				{
-					this.stream_parser(this.wstream.shift());
+					this.stream_reader(this.wstream.shift());
 				}
-				else delete this.wstream;
+				if (!this.wstream.length) delete this.wstream;
 			}
 		}
 		else if (this.wstream)
@@ -2048,21 +2108,27 @@ fa_handler.prototype =
 		}
 		else
 		{
-			var self = this;
 			this.wstream = [];
-			stream.readType = 'arraybuffer';
-			stream.read().then(function(result)
-			{
-				if (d) console.log('Stream result', result);
+			this.stream_reader(stream);
+		}
+	},
 
-				self.ab_parser(result.data);
-				self.stream_parser(0x9ff);
-			},
-			function(e)
+	moz_parser : function(response, ev)
+	{
+		if (response instanceof ArrayBuffer && response.byteLength > 0)
+		{
+			response = new Uint8Array(response);
+			if (this.chunk)
 			{
-				if (d) console.error('Stream error', e);
-				self.stream_parser(0x9ff);
-			});
+				var tmp = new Uint8Array(this.chunk.byteLength + response.byteLength);
+				tmp.set(this.chunk)
+				tmp.set(response, this.chunk.byteLength);
+				this.chunk = tmp;
+			}
+			else this.chunk = response;
+
+			var offset = this.ab_parser(this.chunk.buffer);
+			if (offset) this.chunk = this.chunk.subarray(offset);
 		}
 	},
 
@@ -2072,14 +2138,14 @@ fa_handler.prototype =
 		{
 			var buffer = new Uint8Array(response), dv = new DataView(response), c = 0;
 			var xhr = this.xhr, ctx = this.ctx, i = 0, p, h, k, l = buffer.byteLength;
-	if (d) console.warn(l, buffer, dv);
 
 			while (i+12 < l)
 			{
 				p = dv.getUint32(i+8,true);
 				if (i+12+p > l) break;
 				h = String.fromCharCode.apply(String, buffer.subarray(i,i+8));
-	if (d) console.debug(ctx.h[h], i, p, !!ctx.k[h]);
+				// if (d) console.debug(ctx.h[h], i, p, !!ctx.k[h]);
+
 				i += 12;
 				if (ctx.h[h] && (k = ctx.k[h]))
 				{
@@ -2133,33 +2199,43 @@ fa_handler.prototype =
 
 	Finish : function()
 	{
+		var pending = this.chunk && this.chunk.byteLength || (this.pos && this.xhr.response.substr(this.pos).length);
+
+		if (pending)
+		{
+			if (!fa_handler.errors) fa_handler.errors = 0;
+
+			if (++fa_handler.errors == 3) fa_handler.chunked = false;
+
+			srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
+		}
+
 		oDestroy(this);
 	}
 };
 
 function api_faretry(ctx, error, host)
 {
-	if (!ctx.p)
+	if (ctx.faRetryI) ctx.faRetryI *= 1.8;
+	else ctx.faRetryI = 250;
+
+	if (ctx.faRetryI < 5e5)
 	{
-		if (!ctx.fastrgri) ctx.fastrgri = 400;
+		if (d) console.log("Attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + "), retrying...", ctx.faRetryI);
 
-		if (ctx.fastrgri < 22801)
+		return setTimeout(function()
 		{
-			if (d) console.log("Attribute storage failed (" + error + "), retrying...", ctx.fastrgri);
-
-			return setTimeout(function()
+			ctx.startTime = Date.now();
+			if (ctx.p)
 			{
-				ctx.startTime = Date.now();
-				api_storefileattr(null,null,null,null,ctx);
+				api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
+			}
+			else api_storefileattr(null,null,null,null,ctx);
 
-			}, ctx.fastrgri += 800);
-		}
+		}, ctx.faRetryI);
 	}
 
-	var msg = "File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")";
-
-	if (d) console.error(msg);
-	else onerror(msg, '', -1);
+	srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
 function api_fareq(res,ctx,xhr)
@@ -2210,7 +2286,7 @@ function api_fareq(res,ctx,xhr)
 
 			faxhrs[slot].onprogress = function(ev)
 			{
-				if (d) console.log('fah ' + ev.type, ev.loaded, ev.total,
+				if (d>1) console.log('fah ' + ev.type, this.readyState, ev.loaded, ev.total,
 					typeof this.response === 'string' ? this.response.substr(0,12).split("")
 						.map(function(n) {return (n.charCodeAt(0) & 0xff).toString(16)}).join("."):this.response, ev);
 
@@ -2268,11 +2344,11 @@ function api_fareq(res,ctx,xhr)
 				if (ctx.errfa) ctx.errfa(id,1);
 				else
 				{
-					console.error('api_fareq', id, this);
+					if (d) console.error('api_fareq', id, this);
 
 					api_faretry(this.ctx, ETOOERR, this.fa_host);
 				}
-			}
+			};
 
 			faxhrs[slot].onreadystatechange = function(ev)
 			{
@@ -2348,7 +2424,13 @@ function api_fareq(res,ctx,xhr)
 					};
 				}
 
-				if ("text" === (faxhrs[slot].responseType = faxhrs[slot].fah.responseType))
+				faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
+				if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType)
+				{
+					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType);
+					faxhrs[slot].fah.setParser('text');
+				}
+				if ("text" === faxhrs[slot].responseType)
 					faxhrs[slot].overrideMimeType('text/plain; charset=x-user-defined');
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
 				faxhrs[slot].startTime = Date.now();

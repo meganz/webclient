@@ -52,9 +52,11 @@ function MemoryIO(dl_id, dl) {
 		if (d) DEBUG('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
 		if (size > 950*0x100000) {
 			dlFatalError(dl, Error('File too big to be reliably handled in memory.'));
+			ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
+		} else {
+			dblob = msie ? new MSBlobBuilder() : [];
+			this.begin();
 		}
-		dblob = msie ? new MSBlobBuilder() : [];
-		this.begin();
 	};
 
 	this.abort = function() {

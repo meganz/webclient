@@ -1160,6 +1160,11 @@ function MegaData ()
 
 	this.buildtree = function(n, dialog)
 	{
+		if (!n)
+		{
+			if (d) console.error('Invalid node passed to M.buildtree');
+			return;
+		}
 		var stype = "cloud-drive";
 		// ToDo: What lu represents?
 		if (n.h == M.RootID && $('.content-panel.cloud-drive lu').length == 0)
@@ -1526,8 +1531,8 @@ function MegaData ()
 
 		if (folderlink)
 		{
-			$('.fm-breadcrumbs').addClass('folder-link')
-			$('.fm-breadcrumbs.folder span').empty()
+			$('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link')
+			$('.fm-breadcrumbs:first span').empty()
 			if (folderlink && name) $('.nw-tree-panel-header span').text(name);
 		}
 	};

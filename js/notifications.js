@@ -409,7 +409,7 @@ function initNotifications()
 	  if ($(this).attr('class').indexOf('active') == -1)
 	  {
 		  $(this).addClass('active');
-		  $('.notification-popup').css('left', $(this).position().left);
+		  $('.notification-popup').css('right',$('.top-menu-icon').outerWidth() + $('.user-name').outerWidth() + $('.membership-status-block').outerWidth() -78 + 'px');
 		  $('.notification-popup').addClass('active');
 		  notifyclock();		
 		  donotify();		  

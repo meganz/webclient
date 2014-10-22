@@ -1457,17 +1457,21 @@ function percent_megatitle()
 	if (dl_s > 0) {
 		$('.tranfer-download-indicator')
 			.text(bytesToSize(dl_s, 1) + "/s")
-			.addClass('active')
+			.addClass('active');
+		$('.transfer-panel-title').addClass('active');
 	} else {
-		$('.tranfer-download-indicator').removeClass('active')
+		$('.tranfer-download-indicator').removeClass('active');
+		$('.transfer-panel-title').removeClass('active');
 	}
 
 	if (ul_s > 0) {
 		$('.tranfer-upload-indicator')
 			.text(bytesToSize(ul_s, 1) + "/s")
-			.addClass('active')
+			.addClass('active');
+        $('.transfer-panel-title').addClass('active');
 	} else {
-		$('.tranfer-upload-indicator').removeClass('active')
+		$('.tranfer-upload-indicator').removeClass('active');
+		$('.transfer-panel-title').removeClass('active');
 	}
 
 	$('.file-transfer-icon')

@@ -48,8 +48,10 @@ function init_key()
 	$('.key2').removeClass('hidden');
 	if (typeof u_privk == 'undefined')
 	{
-		crypto_rsagenkey();
-		u_ed25519();
+		crypto_rsagenkey()
+            .done(function() {
+                authring.scrubEd25519KeyPair();
+            });
 	}
 	else ui_keycomplete();	
 }
@@ -62,8 +64,10 @@ function key_step2()
 	$('.key2').removeClass('hidden');
 	if (typeof u_privk == 'undefined')
 	{
-		crypto_rsagenkey();
-		u_ed25519();
+		crypto_rsagenkey()
+            .done(function() {
+                authring.scrubEd25519KeyPair();
+            });
 	}
 	else ui_keycomplete();
 }

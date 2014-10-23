@@ -9,7 +9,11 @@
  */
 var ChatStore = function(megaChat) {
     var self = this;
-    self.db = new MegaDB("megaChat", u_handle, 1, ChatStore.DBSchema);
+    self.logger = MegaLogger.getLogger("chatStore", {}, megaChat.logger);
+
+    self.db = new MegaDB("megaChat", u_handle, 1, ChatStore.DBSchema, {
+        'parentLogger': self.logger
+    });
 
     megaChat.unbind("onInit.chatStore");
     megaChat.bind("onInit.chatStore", function(e) {
@@ -120,7 +124,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             } else {
                 $.each(results, function(k, v) {
                     if(!megaChat.chats[v.roomJid]) { // restore room from db
-                        megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.users, v.ctime);
+                        megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime);
                         megaChat.chats[v.roomJid]._conv_ended = v.ended;
 
                         megaChat.chats[v.roomJid].setState(ChatRoom.STATE.JOINING);

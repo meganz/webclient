@@ -74,6 +74,8 @@ function scrollMenu()
 
 function init_page()
 {
+    $(window).trigger('onMegaLoaded');
+
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;

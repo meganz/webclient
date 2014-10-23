@@ -1266,6 +1266,7 @@ function MegaData ()
 		{
 			$('#sm_move').remove();
 			var cs = '';
+            var sm = '';
 
 			for (var h in M.c[M.RootID])
 			{

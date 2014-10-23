@@ -25,8 +25,8 @@ var stringcrypt = (function () {
      */
     ns.stringEncrypter = function(plain, key) {
         var mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        var plainBytes = unescape(encodeURIComponent(data));
-        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode) {
+        var plainBytes = unescape(encodeURIComponent(plain));
+        var cipher = tlvstore.blockEncrypt(plainBytes, key, mode);
         return cipher;
     };
 
@@ -62,4 +62,4 @@ var stringcrypt = (function () {
 
 
     return ns;
-}();
+})();

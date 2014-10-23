@@ -425,6 +425,7 @@ else
 					if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
 					else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
 				}
+				if (location.hostname === 'beta.mega.nz') dump.m = '[Beta] ' + dump.m;
 
 				try
 				{

@@ -388,7 +388,7 @@ else
 		})(console);
 
 		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
-		if (!d)
+		if (!d || location.hostname === 'beta.mega.nz')
 		{
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)

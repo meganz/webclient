@@ -1,6 +1,8 @@
 // {{{
 // output of scripts/javascript.php
 // I should be replaced with production deploy keys
+var IMAGE_PLACEHOLDER = staticpath + "/images/loading.gif";
+
 (function(window, asmCrypto) {
 
 var pubkey = asmCrypto.base64_to_bytes('WyJhZGJiMGEwNGQ5YzRiYjMxNWQzMTA2YzQwZjE1YzBmYzNlZmJjMmJmODkyNGU4ODA0NzU5OTk1MDRiNmE0ZGJiMWZjMjZhYTdkNmI1N2Q0YjFjMDhhYTM3ZDQ0MGYxMDJiMDJmZGZiMmE5ZTNlNjAzODVmZGJhODFjZmY5Y2E2OSIsIjAxMDAwMSJd'); 
@@ -19,6 +21,29 @@ function verify_cms_content(content, signature)
 		return false;
 	}
 }
+
+var assets = {};
+
+function img_placeholder(str, sep, id) {
+	return "'" + IMAGE_PLACEHOLDER + "' id='loading_" +  id + "'" 
+}
+
+window.fetch_asset = function(html, id) {
+	if (!assets[id]) {
+		html = html.replace(new RegExp('([\'"])(' + id + ')([\'"])', 'g'), img_placeholder);
+		api_req({a: 'blob', id: id}, {
+			expects: 'url',
+			callback: function(err,url) {
+				$('#loading_' + id).attr({'id': '', 'src': url.blob})
+				assets[id] = url.blob;
+			}
+		});
+	} else {
+		html = html.replace(IMAGE_PLACEHOLDER + "' id='loading_" + id, assets[id]);
+	}
+	return html;
+}
+
 
 window.cms_content = function(socket, ctx, buffer)
 {

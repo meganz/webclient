@@ -1,17 +1,3 @@
-function my_replace(str, sep, id) {
-	return sep + "loading.png" + sep + " id=" + sep + "loading_" +  id 
-}
-function fetch_asset(html, id) {
-	html = html.replace(new RegExp('([\'"])(' + id + ')', 'g'), my_replace);
-	api_req({a: 'blob', id: id}, {
-		expects: 'url',
-		callback: function(err,url) {
-			$('#loading_' + id).attr({'id': '', 'src': url.blob})
-		}
-	});
-	return html;
-}
-
 function init_blogarticle()
 {
 	if (blogposts === null) {

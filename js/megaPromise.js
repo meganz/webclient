@@ -32,7 +32,7 @@ function MegaPromise(fn) {
                 self.resolve.apply(self, toArray(arguments));
             },
             function() {
-                self.resolve.reject(self, toArray(arguments));
+                self.reject.apply(self, toArray(arguments));
             }
         );
     }

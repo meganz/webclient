@@ -221,21 +221,29 @@ function u_wasloggedin()
 // set user's RSA key
 function u_setrsa(rsakey)
 {
+    var $promise = new $.Deferred();
+
 	var ctx = {
 	    callback : function(res,ctx) {
 	        if (localStorage.d) {
 	            console.log("RSA key put result=" + res);
 	        }
 
+
 	        u_privk = rsakey;
-	        u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
+	        u_attr.privk = u_storage.privk = base64urlencode(crypto_encodeprivkey(rsakey));
+	        u_attr.pubk = u_storage.pubk = base64urlencode(crypto_encodepubkey(rsakey));
 	        u_type = 3;
+
+            $promise.resolve(rsakey);
 
 	        ui_keycomplete();
 	    }
 	};
 
 	api_req({ a : 'up', privk : a32_to_base64(encrypt_key(u_k_aes,str_to_a32(crypto_encodeprivkey(rsakey)))), pubk : base64urlencode(crypto_encodepubkey(rsakey)) },ctx);
+
+    return $promise;
 }
 
 

@@ -8,6 +8,8 @@
 var EncryptionFilter = function(megaChat) {
     var self = this;
 
+    self.logger = MegaLogger.getLogger("encryptionFilter", {}, megaChat.logger);
+
     if(localStorage.d && mpenc) {
         mpenc.debug.decoder = true;
     }
@@ -18,7 +20,7 @@ var EncryptionFilter = function(megaChat) {
      * Initialize the mpenc.handler.ProtocolHandler and OpQueue when a room is created
      */
     megaChat.bind("onRoomCreated", function(e, megaRoom) {
-        console.error("ROOM created.");
+         self.logger.debug("ROOM created.");
 
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
@@ -93,9 +95,9 @@ var EncryptionFilter = function(megaChat) {
         });
 
 
-        EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0]);
+        EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0], megaRoom);
 
-        logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue");
+        logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue", self.logger);
     });
 
     /**
@@ -157,7 +159,7 @@ var EncryptionFilter = function(megaChat) {
 
         var users = megaRoom.getOrderedUsers();
 
-//        console.error("I'd Joined: ", users, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
+//         self.logger.debug("I'd Joined: ", users, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
 
         if(megaRoom.iAmRoomOwner()) {
             // i'm the new "owner"
@@ -215,21 +217,21 @@ var EncryptionFilter = function(megaChat) {
         var leftUsers = Object.keys(eventObject.getLeftUsers());
 
         // owner had left and i'm the new owner
-//        console.error("Left: ", users, leftUsers, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
+//         self.logger.debug("Left: ", users, leftUsers, megaRoom.megaChat.karere.getJid(), megaRoom, eventObject);
         if($.inArray(users[0], leftUsers) !== -1 && users[1] == megaRoom.megaChat.karere.getJid()) {
-            if(localStorage.d) { console.error("I'm the new owner of the room [1]!"); }
+             self.logger.debug("I'm the new owner of the room [1]!");
 
             // sync users list w/ encryption (join/exclude);
             self.syncRoomUsersWithEncMembers(megaRoom);
 
         } else if(megaRoom.iAmRoomOwner()) {
             // i'm the owner
-            if(localStorage.d) { console.error("I'm the new owner of the room [2]!"); }
+             self.logger.debug("I'm the new owner of the room [2]!");
 
             // sync users list w/ encryption (join/exclude);
             self.syncRoomUsersWithEncMembers(megaRoom);
         }
-//        console.error("got state change2?: ", users[0], megaRoom.megaChat.karere.getJid());
+//         self.logger.debug("got state change2?: ", users[0], megaRoom.megaChat.karere.getJid());
     });
 
 
@@ -276,8 +278,8 @@ var EncryptionFilter = function(megaChat) {
 
 
 
-    logAllCallsOnObject(this, console.error, true, "encFilter");
-    callLoggerWrapper(window, "getPubEd25519", console.error, "getPubEd25519");
+    logAllCallsOnObject(this, console.error, true, "encFilter", self.logger);
+    callLoggerWrapper(window, "getPubEd25519", console.error, "getPubEd25519", self.logger);
 
     return this;
 };
@@ -299,7 +301,7 @@ EncryptionFilter.MPENC_MSG_TAG = "?mpENC";
 EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
     var self = this;
 
-    if(localStorage.d) { console.error("Flushing: ", megaRoom, handler); }
+     self.logger.debug("Flushing: ", megaRoom, handler);
 
 
     while(handler.protocolOutQueue.length) {
@@ -325,7 +327,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
             );
         }
 
-        if(localStorage.d) { console.error("protocolOut: ", msg); }
+         self.logger.debug("protocolOut: ", msg);
     }
 
 
@@ -334,7 +336,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 
         var toJid = msg.to ? msg.to : megaRoom.roomJid;
 
-        console.error("sending out message to: ", toJid)
+         self.logger.debug("sending out message to: ", toJid)
 
         megaRoom.megaChat.karere.sendRawMessage(
             toJid,
@@ -345,7 +347,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
             msg.metadata ? msg.metadata.delay : undefined
         );
 
-        if(localStorage.d) { console.error("messageOut: ", msg); }
+         self.logger.debug("messageOut: ", msg);
     }
 
 
@@ -456,7 +458,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                 });
         }
 
-        if(localStorage.d) { console.error("uiQueue: ", wireMessage); }
+         self.logger.debug("uiQueue: ", wireMessage);
     }
 };
 
@@ -471,6 +473,8 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
     if(megaRoom._leaving) {
         return;
     }
+
+    var self = this;
 
     var xmppUsers = megaRoom.getOrderedUsers();
     var encUsers = megaRoom.encryptionHandler.askeMember.members;
@@ -506,37 +510,37 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
             return; // no need to ping users who are going to be excluded
         }
 
-        if(localStorage.d) { console.error("#PING pinging: ", v); }
+         self.logger.debug("#PING pinging: ", v);
 
         promises.push(
             megaRoom.megaChat.karere.sendPing(v)
                 .fail(function() {
-                    if(localStorage.d) { console.error("#PING ping failed for: ", v); }
+                     self.logger.debug("#PING ping failed for: ", v);
 
                     if(excludeUsers.indexOf(v) == -1) { // not excluded
-                        if(localStorage.d) { console.error("#PING ping failed caused exclude for: ", v); }
+                         self.logger.debug("#PING ping failed caused exclude for: ", v);
 
                         if(encUsers.indexOf(v) != -1) {
                             excludeUsers.push(
                                 v
                             );
                         } else if(joinUsers.indexOf(v) != -1) {
-                            if(localStorage.d) { console.error("#PING ping failed caused removal from JOIN users for: ", v); }
+                             self.logger.debug("#PING ping failed caused removal from JOIN users for: ", v);
 
                             joinUsers.splice(joinUsers.indexOf(v), 1);
                         }
                     }
                 })
                 .done(function() {
-                    if(localStorage.d) { console.error("#PING ping success for: ", v); }
+                     self.logger.debug("#PING ping success for: ", v);
                 })
         );
     });
 
     return $.when.apply($.when, promises)
         .always(function() {
-//                console.error("#PING got state // users to join:", joinUsers);
-//                console.error("#PING got state // users to exclude:", excludeUsers);
+             self.logger.debug("#PING got state // users to join:", joinUsers);
+             self.logger.debug("#PING got state // users to exclude:", excludeUsers);
 
             // filter .joinUsers who are NOT participants
             var participants = megaRoom.getParticipants();
@@ -566,9 +570,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                     } else if(excludeUsers.indexOf(v) === -1) {
                         newlyJoinedUsers.push(v);
                     } else {
-                        if(localStorage.d) {
-                            console.error("forceRecover: ignoring user: ", v);
-                        }
+                         self.logger.debug("forceRecover: ignoring user: ", v);
                     }
                 });
 
@@ -612,7 +614,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
 EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, karere) {
     var self = this;
 
-    console.debug("Processing outgoing message: ", e, eventObject, eventObject.isEmptyMessage())
+    self.logger.debug("Processing outgoing message: ", e, eventObject, eventObject.isEmptyMessage())
 
     if(eventObject.getMeta().action && eventObject.getMeta().roomJid) {
         // get room jid
@@ -641,7 +643,7 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
 
             e.stopPropagation();
         } else {
-            console.error("Room not found: ", roomJid, eventObject);
+             self.logger.debug("Room not found: ", roomJid, eventObject);
         }
     } else if(eventObject.getType() == "groupchat" && eventObject.getContents().indexOf(EncryptionFilter.MPENC_MSG_TAG) !== 0) {
 
@@ -665,7 +667,7 @@ EncryptionFilter.prototype.processOutgoingMessage = function(e, eventObject, kar
 
             e.stopPropagation();
         } else {
-            console.error("Room not found: ", roomJid, eventObject);
+             self.logger.debug("Room not found: ", roomJid, eventObject);
         }
     } else {
         // already encrypted OR a direct message, should not do anything.
@@ -693,7 +695,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
     var msg = eventObject.getContents ? eventObject.getContents() : (eventObject.getMessage ? eventObject.getMessage() : null);
     //XX: normalize the eventobject of type IncomingPrivateMessage to use getContents, instead of getMessage();
 
-    if(localStorage.d) { console.error("Processing incoming message: ", msg, e, eventObject, eventObject.isEmptyMessage()); }
+     self.logger.debug("Processing incoming message: ", msg, e, eventObject, eventObject.isEmptyMessage());
 
 
     if(msg && msg.indexOf(EncryptionFilter.MPENC_MSG_TAG) === 0) {
@@ -701,7 +703,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
             message: msg,
             from: Karere.getNormalizedFullJid(eventObject.getFromJid())
         });
-        if(localStorage.d) { console.error("Found enc in message: ", wireMessage); }
+         self.logger.debug("Found enc in message: ", wireMessage);
 
         if(eventObject.getRawType() == "groupchat") {
             var roomJid = eventObject.getRoomJid();
@@ -711,7 +713,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
 
                 e.stopPropagation();
             } else {
-                console.error("Room not found:" , eventObject);
+                 self.logger.debug("Room not found:" , eventObject);
             }
         } else if(eventObject.getRawType() == "chat") {
             // send to all chat rooms in which i'm currently having a chat w/ this user
@@ -724,7 +726,7 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
                 var fromJid = Karere.getNormalizedFullJid(eventObject.getFromJid());
                 $.each(self.megaChat.chats, function(k, v) {
                     if(v.getUsers()[fromJid]) {
-                        if(localStorage.d) { console.error("Found matching room for priv msg: ", v.roomJid, v, wireMessage); }
+                         self.logger.debug("Found matching room for priv msg: ", v.roomJid, v, wireMessage);
 
                         var resp = self.processMessage(e, v, wireMessage);
 
@@ -735,11 +737,11 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
                 });
             }
         } else {
-            console.error("No idea how to handle enc message: ", wireMessage);
+             self.logger.debug("No idea how to handle enc message: ", wireMessage);
         }
     } else {
         // should not do anything...or call e.stopPropagation() to disable ANY plain text messages.
-        if(localStorage.d) { console.debug("Got plaintext message: ", eventObject); }
+        self.logger.debug("Got plaintext message: ", eventObject);
     }
 };
 
@@ -794,21 +796,21 @@ EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject
  * @param eh
  * @param prefix
  */
-EncryptionFilter.debugEncryptionHandler = function(eh, prefix) {
+EncryptionFilter.debugEncryptionHandler = function(eh, prefix, megaRoom) {
     var old = eh.stateUpdatedCallback;
     eh.stateUpdatedCallback = function(handler) {
-        if(localStorage.d) { console.error("Got mpenc state change: ", handler.state); }
+        megaRoom.logger.debug("Got mpenc state change: ", handler.state);
         return old(handler);
     };
 
-    logAllCallsOnObject(eh, console.error, true, (prefix ? prefix + ":" : "") + "mpenc");
-    logAllCallsOnObject(eh.askeMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am");
-    logAllCallsOnObject(eh.askeMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:m");
-    logAllCallsOnObject(eh.askeMember.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:spkd");
-    logAllCallsOnObject(eh.cliquesMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm");
-    logAllCallsOnObject(eh.cliquesMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm:m");
-    logAllCallsOnObject(eh.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:spkd");
-    logAllCallsOnObject(eh.uiQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:uiQ");
-    logAllCallsOnObject(eh.protocolOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:poQ");
-    logAllCallsOnObject(eh.messageOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:moQ");
+    logAllCallsOnObject(eh, console.error, true, (prefix ? prefix + ":" : "") + "mpenc", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:m", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:spkd", megaRoom.logger);
+    logAllCallsOnObject(eh.cliquesMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm", megaRoom.logger);
+    logAllCallsOnObject(eh.cliquesMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm:m", megaRoom.logger);
+    logAllCallsOnObject(eh.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:spkd", megaRoom.logger);
+    logAllCallsOnObject(eh.uiQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:uiQ", megaRoom.logger);
+    logAllCallsOnObject(eh.protocolOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:poQ", megaRoom.logger);
+    logAllCallsOnObject(eh.messageOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:moQ", megaRoom.logger);
 };

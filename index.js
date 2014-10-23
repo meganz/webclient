@@ -74,6 +74,8 @@ function scrollMenu()
 
 function init_page()
 {
+    $(window).trigger('onMegaLoaded');
+
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
@@ -114,9 +116,19 @@ function init_page()
 		if (ar[0]) pfid  = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 		if (ar[1]) pfkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 		n_h = pfid;
-		api_setfolder(n_h);
-		if (waitxhr) waitsc();
-		u_n = pfid;
+		if (pfkey)
+		{
+			api_setfolder(n_h);
+			if (waitxhr) waitsc();
+			u_n = pfid;
+		}
+		else
+		{
+			$(document).one('MegaOpenFolder', SoonFc(function()
+			{
+				mKeyDialog(pfid, true);
+			}));
+		}
 		page = 'fm';
 	}
 	else
@@ -962,7 +974,7 @@ function topmenuUI()
 			$('.top-menu-item.login').hide();
 			$('.top-menu-item.logout,.context-menu-divider.logout').show();
 		}
-		$('.top-login-arrow').css('margin-right',$('.top-menu-icon').width()+$('.create-account-button').width()+($('.top-login-button').width()/2)+78+'px');
+		$('.top-login-arrow').css('margin-right',$('.top-menu-icon').width()+$('.create-account-button').width()+($('.top-login-button').width()/2)+82+'px');
 	}
 	$('.top-menu-arrow').css('margin-right',$('.top-menu-icon').width()/2+'px');
 	$.hideTopMenu = function(e)
@@ -1047,6 +1059,7 @@ function topmenuUI()
 	    {
 			$(this).addClass('active');
 			$('.top-user-status-popup').addClass('active');
+			$('.top-user-status-popup').css('right',$('.top-menu-icon').outerWidth() + $('.user-name').outerWidth() + $('.membership-status-block').outerWidth() -34 + 'px');
 		}
 		else
 		{
@@ -1306,7 +1319,7 @@ function topmenuUI()
 		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));	
 	}
 	
-	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+108+'px');
+	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
 	initNotifications();
 }
 

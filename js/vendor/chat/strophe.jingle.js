@@ -1,3 +1,4 @@
+
 /* This code is based on strophe.jingle.js by ESTOS */
 
 var JinglePlugin = {

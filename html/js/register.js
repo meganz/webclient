@@ -118,7 +118,7 @@ function registeraccount()
 					ops.terms = 'Mq';
 					ops.firstname = base64urlencode(to8($('#register-firstname').val()));
 					ops.lastname = base64urlencode(to8($('#register-lastname').val()));
-					ops.name2 = base64urlencode(to8($('#register-firstname') + ' ' + $('#register-lastname').val()));
+					ops.name2 = base64urlencode(to8($('#register-firstname').val() + ' ' + $('#register-lastname').val()));
 					u_attr.terms=1;
 				}				
 				api_req(ops);

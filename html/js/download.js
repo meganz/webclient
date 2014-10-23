@@ -262,7 +262,7 @@ function dl_g(res)
 			$('.new-download-file-size').text(bytesToSize(res.s));
 			$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));								
 		}
-		else dlkeyDialog();
+		else mKeyDialog(dlpage_ph);
 	}
 	else $('.download-mid-centered-block').addClass('not-available-some-reason');
 }
@@ -431,48 +431,6 @@ function dlcomplete(id)
 	else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
 	else $('.widget-circle').attr('class','widget-circle percents-0');
 	Soon(resetUploadDownload);
-}
-
-
-function dlkeyDialog()
-{
-	$('.new-download-buttons').addClass('hidden');
-	$('.new-download-file-title').text(l[1199]);	
-	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
-	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
-	$('.fm-dialog-overlay').removeClass('hidden');	
-	$('body').addClass('overlayed');
-	$('.fm-dialog.dlkey-dialog input').unbind('focus');
-	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
-	{
-		if ($(this).val() == l[1028]) $(this).val('');	
-	});	
-	$('.fm-dialog.dlkey-dialog input').unbind('blur');
-	$('.fm-dialog.dlkey-dialog input').bind('blur',function(e)
-	{
-		if ($(this).val() == '') $(this).val(l[1028]);
-	});	
-	$('.fm-dialog.dlkey-dialog input').unbind('keydown');
-	$('.fm-dialog.dlkey-dialog input').bind('keydown',function(e)
-	{
-		$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
-		if (e.keyCode == 13) $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
-	});
-	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').unbind('click');
-	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').bind('click',function(e)
-	{
-		$('.fm-dialog.dlkey-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');	
-		$('body').removeClass('overlayed');
-		document.location.hash = '#!' + dlpage_ph + '!' + $('.fm-dialog.dlkey-dialog input').val();
-	});	
-	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
-	$('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click',function(e)
-	{
-		$('.fm-dialog.dlkey-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');	
-		$('body').removeClass('overlayed');
-	});
 }
 
 function sync_switchOS(os)

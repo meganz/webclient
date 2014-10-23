@@ -547,6 +547,7 @@ var Chat = function() {
 
 
     this.is_initialized = false;
+    this.logger = MegaLogger.getLogger("chat");
 
     this.chats = {};
     this.currentlyOpenedChat = null;
@@ -763,9 +764,7 @@ Chat.prototype.init = function() {
                     }
 
                     if(room.participantExistsInRoom(bareJid) && !self.karere.userExistsInChat(roomJid, eventObject.getFromJid())) {
-                        if(localStorage.d) {
-                            console.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
-                        }
+                        self.logger.debug(self.karere.getNickname(), "Auto inviting: ", eventObject.getFromJid(), "to: ", roomJid);
 
                         self.karere.addUserToChat(roomJid, eventObject.getFromJid(), undefined, room.type, {
                             'ctime': room.ctime,
@@ -827,9 +826,7 @@ Chat.prototype.init = function() {
             e.stopPropagation();
             return false;
         }
-        if(localStorage.d) {
-            console.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
-        }
+        self.logger.debug(self.karere.getNickname(), "Got invitation to join", eventObject.getRoomJid(), "with eventData:", eventObject);
 
 
         var meta = eventObject.getMeta();
@@ -843,9 +840,7 @@ Chat.prototype.init = function() {
                 }
 
                 if(room.type == "private" && room.participantExistsInRoom(bareFromJid)) {
-                    if(localStorage.d) {
-                        console.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
-                    }
+                    self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
 
                     if(self.currentlyOpenedChat == room.roomJid) {
                         room.ctime = meta.ctime;
@@ -868,18 +863,15 @@ Chat.prototype.init = function() {
             }
         }
         if(self.chats[eventObject.getRoomJid()]) { //already joined
-            if(localStorage.d) {
-                console.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
-            }
+            self.logger.warn("I'm already in", eventObject.getRoomJid(), "(ignoring invitation from: ", eventObject.getFromJid(), ")");
 
             e.stopPropagation();
             return false; // stop doing anything
         }
 
         // if we are here..then join the room
-        if(localStorage.d) {
-            console.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
-        }
+        self.logger.debug("Initializing UI for new room: ", eventObject.getRoomJid(), "");
+
         self.chats[eventObject.getRoomJid()] = new ChatRoom(self, eventObject.getRoomJid(), meta.type, meta.participants, meta.ctime);
         self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.JOINING);
         self.karere.joinChat(eventObject.getRoomJid(), eventObject.getPassword());
@@ -1065,9 +1057,7 @@ Chat.prototype.init = function() {
                 delete msgObject;
             }
         } else {
-            if(localStorage.d) {
-                console.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
-            }
+            self.logger.error("Not sure how to handle action message: ", eventObject.getAction(), eventObject, e);
         }
     });
 
@@ -1262,16 +1252,14 @@ Chat.prototype.init = function() {
 
         // bind rtc events
         var rtcEventProxyToRoom = function(e, eventData) {
-            if(localStorage.d) {
-                console.debug("RTC: ", e, eventData);
-            }
+            self.logger.debug("RTC: ", e, eventData);
 
             var peer = eventData.peer;
 
             if(peer) {
                 var fromBareJid = Karere.getNormalizedBareJid(peer);
                 if(fromBareJid == self.karere.getBareJid()) {
-                    console.warn("Ignoring my own incoming request.");
+                    self.logger.warn("Ignoring my own incoming request.");
 
                     return;
                 }
@@ -1281,9 +1269,8 @@ Chat.prototype.init = function() {
                     room.trigger(e, eventData);
                 });
             } else {
-                if(localStorage.d) {
-                    console.warn("Routing RTC event to current room: ", e, eventData);
-                }
+                self.logger.warn("Routing RTC event to current room: ", e, eventData);
+
                 // local-stream-obtained = most likely this is the currently active window/room
                 var room = self.getCurrentRoom();
                 if(room) {
@@ -1313,9 +1300,7 @@ Chat.prototype.init = function() {
         //ftManager proxies
 
         var _ftSessEndHandler = function(e, eventData) {
-            if(localStorage.d) {
-                console.error("RTC ftSessHandler: ", e, eventData);
-            }
+            self.logger.error("RTC ftSessHandler: ", e, eventData);
 
             var sess = eventData.ftSess;
 
@@ -1342,7 +1327,7 @@ Chat.prototype.init = function() {
 
     } catch(e) {
         // no RTC support.
-        console.error("No rtc support: ", e);
+        self.logger.error("No rtc support: ", e);
     }
 
     if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED) {
@@ -1391,7 +1376,7 @@ Chat.prototype.init = function() {
 
             var megaRoom = self.chats[megaRoomId];
             if(!megaRoom) {
-                console.error("Room not found for file attachment:", target);
+                self.logger.error("Room not found for file attachment:", target);
             } else {
                 assert(ulBunch && ulBunch.length > 0, 'empty ulBunch');
 
@@ -1539,14 +1524,11 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
 
     // ignore empty messages (except attachments)
     if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
-        if(localStorage.d) {
-            console.error("Empty message, MegaChat will not process it: ", eventObject);
-        }
+        self.logger.error("Empty message, MegaChat will not process it: ", eventObject);
+
         return;
     } else {
-        if(localStorage.d) {
-            console.error("MegaChat is now processing incoming message: ", eventObject);
-        }
+        self.logger.error("MegaChat is now processing incoming message: ", eventObject);
     }
     // detect outgoing VS incoming messages here + sync their state
 
@@ -1554,9 +1536,7 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
     if(room) {
         room.appendMessage(eventObject);
     } else {
-        if(localStorage.d) {
-            console.debug("Room not found: ", eventObject.getRoomJid());
-        }
+        self.logger.debug("Room not found: ", eventObject.getRoomJid());
     }
 };
 
@@ -1614,9 +1594,7 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             if(self._syncRequests) {
                 $.each(self._syncRequests, function(k, v) {
                     if(v.userJid == diffUsers[0]) {
-                        if(localStorage.d) {
-                            console.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
-                        }
+                        self.logger.log("Canceling sync request from ", v.userJid, ", because he had just left the room.");
 
                         v.timeoutHandler();
                         clearTimeout(v.timer);
@@ -1925,9 +1903,7 @@ Chat.prototype.renderContactTree = function() {
                 var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread">0</div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
                 $('.content-panel.conversations .conversations-container').prepend(html2);
             } else {
-                if(localStorage.d) {
-                    console.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
-                }
+                self.logger.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
             }
 
         } else {
@@ -2267,9 +2243,7 @@ Chat.prototype.hideChat = function(roomJid) {
     if(room) {
         room.hide();
     } else {
-        if(localStorage.d) {
-            console.warn("Room not found: ", roomJid);
-        }
+        self.logger.warn("Room not found: ", roomJid);
     }
 };
 
@@ -2285,9 +2259,7 @@ Chat.prototype.sendMessage = function(roomJid, val) {
 
     // queue if room is not ready.
     if(!self.chats[roomJid]) {
-        if(localStorage.d) {
-            console.warn("Queueing message for room: ", roomJid, val);
-        }
+        self.logger.warn("Queueing message for room: ", roomJid, val);
 
         createTimeoutPromise(function() {
             return !!self.chats[roomJid]
@@ -2335,7 +2307,7 @@ Chat.prototype.getPrivateRoomJidFor = function(jid) {
 Chat.prototype.processNewUser = function(u) {
     var self = this;
 
-    if(localStorage.d) { console.error("added: ", u); }
+    self.logger.debug("added: ", u);
 
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u));
@@ -2352,7 +2324,7 @@ Chat.prototype.processNewUser = function(u) {
 Chat.prototype.processRemovedUser = function(u) {
     var self = this;
 
-    if(localStorage.d) { console.error("removed: ", u); }
+    self.logger.debug("removed: ", u);
 
 
     var room = self.getPrivateRoom(u);

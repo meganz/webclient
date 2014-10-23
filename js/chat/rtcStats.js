@@ -375,13 +375,14 @@ statRecProto.terminate = function(cid) {
         clearInterval(this._timer);
         this._timer = null;
     }
+
     var stats = {
         cid: cid,
         ts: Math.round(this._startTs/1000),
         dur: Math.ceil((Date.now()-this._startTs)/1000),
         sper: this._scanPeriod,
         samples: this.samples,
-        bws: RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'')
+        bws: stats_getBrowserVersion()
     }
     var cmn = this._commonStats;
     for (var k in cmn)
@@ -397,3 +398,24 @@ statRecProto.isRelay = function() {
     return this._commonStats.rly;
 }
 };
+
+function stats_getBrowserVersion() {
+    var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
+    var b = RTC.browser;
+    var ua = navigator.userAgent;
+    var ver;
+    if ((b === 'chrome') || (b === 'opera')) {
+        var m = ua.match(/Chrome\/(\d+)\./);
+        if(m && (m.length >= 2))
+            ver = m[1];
+    } else if (b === "firefox") {
+        var m = ua.match(/Firefox\/(\d+)\./);
+        if (m && (m.length >= 2))
+            ver = m[1];
+    } else {
+        ver = null;
+    }
+    if (ver)
+        browser+=(':'+ver);
+    return browser;
+}

@@ -97,18 +97,16 @@ FileTransferManager.prototype.recvQueue = function() {
     return result;
 }
 
-if (window.CryptoJS && CryptoJS.algo.SHA1)
+if (window.asmCrypto && asmCrypto.SHA256) {
     FileTransferManager.prototype.createHasher = function() {
-        var inst = CryptoJS.algo.SHA1.create();
-        var WordArray = CryptoJS.lib.WordArray;
-        var updateSave = inst.update;
-        inst.update = function(arrBuf) {
-                updateSave.call(inst, WordArray.create(arrBuf));
-            }
+        var inst = new asmCrypto.SHA256();
+        inst.reset();
+        inst.ftHashName = 'sha256'; //we should use some more mangled property name, because just 'type' might conflict with an already existing property
         return inst;
     }
-    else
-        console.warn("webrtcft: CryptoJS SHA1 not found, hash checks will be disabled");
+} else {
+        console.warn("webrtc FileTransfer: asmcrypto.SHA256 not found, hash checks will be disabled");
+}
 
 function TransferHandlerBase() {
 }
@@ -192,7 +190,7 @@ DownloadHandler.prototype.onmessage = function(event) {
         var listFile = this._files[info.name];
         if (!listFile)
             this.error("Peer pushed unexpected file");
-        if (info.size != listFile.size)
+        if (info.size !== listFile.size)
             this.error("File size in file header is different than file size in initial transfer request");
         delete this._files[info.name];
         info.id = header[1];
@@ -208,7 +206,7 @@ DownloadHandler.prototype.onmessage = function(event) {
         $(this._ftManager).trigger('recv-new', {ftSess: this, file:info});
     }
     else if (ptype === FTPTYPE_FILE_DATA) {
-        if (this._state != FTSTATE_RECEIVE_FILE)
+        if (this._state !== FTSTATE_RECEIVE_FILE)
             this.error("File data received, but there is no file transfer at the moment");
         if (header[1] != this._currentFile.id)
             this.error("File data packet received with incorrect fileId");
@@ -217,18 +215,18 @@ DownloadHandler.prototype.onmessage = function(event) {
         var chunk = packet.slice(4);
         this._fileSaver.addChunk(chunk);
         if (this._hasher)
-            this._hasher.update(chunk);
+            this._hasher.process(chunk);
     }
-    else if (ptype == FTPTYPE_FILE_END) {
-        if (this._state != FTSTATE_RECEIVE_FILE)
+    else if (ptype === FTPTYPE_FILE_END) {
+        if (this._state !== FTSTATE_RECEIVE_FILE)
             this.error("File end mark received, but there is no current file transfer");
         if (header[1] != this._currentFile.id)
             this.error("File end mark received with incorrect fileId");
         var strInfo = readStringFromArrBuf(packet, 4);
         var info = JSON.parse(strInfo);
         if (this._hasher) {
-            var hash = 'sha1:'+this._hasher.finalize();
-            if (hash != info.hash) {
+            var hash = this._hasher.ftHashName+':'+byteArrToHexString(this._hasher.finish().result);
+            if (hash !== info.hash) {
                 this.sendFileNack("Received file hash mismatch");
                 this.error("Received file hash mismatch");
             }
@@ -244,8 +242,8 @@ DownloadHandler.prototype.onmessage = function(event) {
         $(this._ftManager).trigger('recv-complete', info);
         this._fileSaver.completeFile();
     }
-    else if (ptype == FTPTYPE_FILE_LIST) {
-        if (this._state != FTSTATE_WAIT_FILE_HDR) {
+    else if (ptype === FTPTYPE_FILE_LIST) {
+        if (this._state !== FTSTATE_WAIT_FILE_HDR) {
             if (Object.keys(this._files).length > 0)
                 console.warn("New file list received but not all files from previous list received");
             this._files = JSON.parse(readStringFromArrBuf(data, 4));
@@ -294,7 +292,7 @@ DownloadHandler.prototype.remove = function(reason, text) {
 }
 
 DownloadHandler.prototype.progress = function() {
-    if (this._state != FTSTATE_RECEIVE_FILE)
+    if (this._state !== FTSTATE_RECEIVE_FILE)
         return 0;
     return ((this._bytesRecv*100)/this._currentFile.size);
 }
@@ -321,7 +319,7 @@ BlobChunksFileSaver.prototype.addChunk = function(blob) {
 }
 BlobChunksFileSaver.prototype.completeFile = function() {
     var assembled = new Blob(this._fileChunks, {type: this._fileInfo.mime});
-    if (assembled.size != this._fileInfo.size)
+    if (assembled.size !== this._fileInfo.size)
         this._parent.error('FileSaver: Received file size does not match');
     var link = document.createElement('a');
     link.href = window.URL.createObjectURL(assembled);
@@ -371,7 +369,7 @@ UploadHandler.prototype.onmessage = function(event) {
     var header = new Uint16Array(packet, 0, 2);
     var ptype = header[0];
     if (ptype === FTPTYPE_FILE_ACK) {
-        if (this._state != FTSTATE_WAIT_FILE_ACK)
+        if (this._state !== FTSTATE_WAIT_FILE_ACK)
             this.error("Unexpected FILE_ACK received");
         if (header[1] != this._fileSendId)
             this.error("FILE_ACK received with wrong fileId");
@@ -389,7 +387,7 @@ UploadHandler.prototype.onmessage = function(event) {
 }
 
 UploadHandler.prototype.nextFile = function() {
-    if (this._state != FTSTATE_READY_NEXT_FILE)
+    if (this._state !== FTSTATE_READY_NEXT_FILE)
         this.error("Requested to send next file, but current state does not allow");
     if (this._files.length < 1) {
         if (this._timer) {
@@ -423,7 +421,7 @@ UploadHandler.prototype.addPacketHeader = function(buf, ptype) {
 }
 
 UploadHandler.prototype.onTimer = function() {
-    if ((this._state != FTSTATE_SEND_FILE) || this._sendBurst)
+    if ((this._state !== FTSTATE_SEND_FILE) || this._sendBurst)
         return;
     if (this._dataChan.bufferedAmount <= UploadHandler.SEND_QUEUE_BYTES_MIN) {
         this._sendBurst = true;
@@ -445,7 +443,7 @@ UploadHandler.prototype.sendFileData = function() {
     var blob = this._currentSentFile.slice(this._fileSendPos, end);
     this._fileSendPos = end;
     reader.onload = function(event) {
-        if (self._state != FTSTATE_SEND_FILE)
+        if (self._state !== FTSTATE_SEND_FILE)
             return;
         var arrBuf = event.target.result;
         var packet = new ArrayBuffer(arrBuf.byteLength+4);
@@ -454,7 +452,7 @@ UploadHandler.prototype.sendFileData = function() {
         var data = new Uint8Array(arrBuf);
         payload.set(data);
         if (self._hasher)
-            self._hasher.update(arrBuf);
+            self._hasher.process(arrBuf);
         self._dataChan.send(packet);
         if(self._dataChan.bufferedAmount < UploadHandler.SEND_QUEUE_BYTES_MAX) {
  //           console.log("burst mode: output buflen:", self._dataChan.bufferedAmount);
@@ -473,10 +471,13 @@ UploadHandler.prototype.sendFileData = function() {
 }
 
 UploadHandler.prototype.endFile = function() {
-    if (this._state != FTSTATE_SEND_FILE)
+    if (this._state !== FTSTATE_SEND_FILE)
         this.error("endFile called, but no file is being sent");
 
-    var objInfo = this._hasher?{hash:'sha1:'+this._hasher.finalize()}:{};
+    var objInfo = this._hasher ? {
+            hash:this._hasher.ftHashName+':'+
+            byteArrToHexString(this._hasher.finish().result)
+        }:{};
     var info = JSON.stringify(objInfo);
     var buf = new ArrayBuffer(4+info.length*2);
     this.addPacketHeader(buf, FTPTYPE_FILE_END);
@@ -502,7 +503,7 @@ UploadHandler.prototype.remove = function(reason, text) {
 }
 
 UploadHandler.prototype.progress = function() {
-    if (this._state != FTSTATE_SEND_FILE)
+    if (this._state !== FTSTATE_SEND_FILE)
         return 0;
     return (this._fileSendPos-this._dataChan.bufferedAmount)*100 / this._fileSendSize;
 }
@@ -522,7 +523,7 @@ function writeStringToArrBuf(str, buf, offset) {
 }
 
 function readStringFromArrBuf(buf, offset, len) {
-    if (len != undefined) {
+    if (len !== undefined) {
         if (len & 1)
             throw new Error("String byte-length must be an even number (string are UTF-16 encoded)");
         if (offset+len >= buf.byteLength)
@@ -537,3 +538,14 @@ function readStringFromArrBuf(buf, offset, len) {
     var view = new Uint16Array(buf, offset, len);
     return String.fromCharCode.apply(null, view);
 }
+
+function byteArrToHexString(arr) {
+    var len = arr.length;
+    if (len & 1)
+        throw new Error("byteArrToHexString: Array size must be an even number");
+    var result = '';
+    for (var i=0; i<len; i++)
+        result+=arr[i].toString(16);
+    return result;
+}
+

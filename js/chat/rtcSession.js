@@ -109,7 +109,6 @@ function RtcSession(stropheConn, options) {
         var cr = options.crypto;
         if (!cr.encryptMessageForJid || !cr.decryptMessage || !cr.generateMac ||
             !cr.preloadCryptoKeyForJid || !cr.scrambleJid) {
-            debugger;
                 throw new Error("At least one crypto function is not provided in 'options.crypto'");
         }
         jingle.encryptMessageForJid = cr.encryptMessageForJid;
@@ -319,7 +318,9 @@ RtcSession.prototype = {
         case Strophe.Status.CONNECTED:
         {
             this.rtcSession.ownAnonId = this.rtcSession.scrambleJid(
-                Strophe.getBareJidFromJid(this.connection.jid));
+                Strophe.getBareJidFromJid(this.connection.jid))
+                .replace(/[\/\+&<>@\?'"=]/gi, ''); //must be valid for xml attribute and url param
+
             this.connection.addHandler(RtcSession.prototype._onPresenceUnavailable.bind(this.rtcSession),
                null, 'presence', 'unavailable', null, null);
             break;
@@ -893,7 +894,7 @@ RtcSession.prototype = {
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
             termRsn: reason,
-            bws: RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'')
+            bws: stats_getBrowserVersion()
         };
 
         if (sess.fake) {

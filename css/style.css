@@ -167,16 +167,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-color: #151412;
 	position: relative;
 }
-.bottom-pages .top-centered-margin {
-	width: 980px;
-	margin: 0 auto;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 0 10px;
-	padding: 0 9px 0 11px;
-	position: relative;
-}
 .logo {
 	display: block;
 	width: 30px;
@@ -1184,7 +1174,7 @@ a.blog-button:hover {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
-	color: rgba(255,255,255,0.5);
+	color: rgba(255,255,255,0.7);
 	float: right;
 	margin: 12px 10px 0 0;
 	-webkit-border-bottom-right-radius: 8px;
@@ -1196,7 +1186,7 @@ a.blog-button:hover {
 }
 .create-account-button:hover, .create-account-button.active {
 	background-color: rgba(211,34,0,0.7);
-	color: rgba(255,255,255,0.7);
+	color: rgba(255,255,255,0.8);
 }
 .top-login-button {
 	cursor: pointer;
@@ -1210,7 +1200,7 @@ a.blog-button:hover {
 	-o-transition: all 200ms ease-in-out;
 	-ms-transition: all 200ms ease-in-out;
 	transition: all 200ms ease-in-out;
-	color: rgba(255,255,255,0.5);
+	color: rgba(255,255,255,0.7);
 	float: right;
 	margin: 12px 2px 0 0;
 	-webkit-border-bottom-left-radius: 8px;
@@ -1222,7 +1212,7 @@ a.blog-button:hover {
 }
 .top-login-button:hover, .top-login-button.active {
 	background-color: rgba(255,255,255,0.5);
-	color: rgba(255,255,255,0.7);
+	color: rgba(255,255,255,0.8);
 }
 .unread-num {
 	display: inline-block;
@@ -2440,6 +2430,12 @@ a.blog-new-archive-lnk {
 	padding-top: 0;
 	padding-bottom: 30px
 }
+strong.small-header {
+	display: block;
+	font-family: 'Open Sans Bold', Arial;
+	font-weight: normal;
+	padding-bottom: 4px;
+}
 .new-bottom-pages .blog-new-full p .italic-quote {
 	color: #919091;
 	font-style: italic;
@@ -2673,6 +2669,271 @@ img.blog-new-logos {
 	display: block;
 	width: 140px;
 	margin-bottom: 33px
+}
+.investors-gray-block {
+	background-color: rgba(0,0,0,0.03);
+	margin: 30px -12px;
+	padding: 5px 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	color: #333333;
+	font-size: 13px;
+	line-height: 26px;
+}
+.investors-halfsized-bl {
+	float: left;
+	width: 300px;
+	padding-top: 3px;
+}
+.investors-halfsized-bl.second {
+	width: auto;
+	margin-left: 300px;
+	float: none;
+}
+.investors-halfsized-bl div {
+	padding: 1px 0;
+}
+.investors-halfsized-bl a {
+	color: #D22400;
+}
+.investors-img {
+	padding: 15px 0 10px 0;
+	max-width: 100%;
+}
+.investors-table-bl {
+	margin: 5px -12px 20px -12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	overflow: hidden;
+}
+.investors-table-bl table tr {
+	background-color: rgba(0,0,0,0.03);
+}
+.investors-table-bl table tr td {
+	border-top: 2px solid white;
+}
+.investors-table-bl table tr:first-child td {
+	border-top: 0;
+}
+.investors-table-bl table tr.investors-table-header {
+	background-color: rgba(0,0,0,0.1);
+}
+.investors-table-bl table tr td {
+	padding: 7px 12px 8px 12px;
+	font-size: 13px;
+	line-height: 26px;
+	color: #333333;
+	border-left: 2px solid white;
+}
+.investors-table-bl table tr.investors-table-header td {
+	color: #666666;
+	font-family: 'Open Sans Bold', Arial;
+}
+.investors-table-bl table tr td:first-child {
+	border-left: 0;
+	width: 220px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.investors-table-bl table tr td span {
+	padding: 0 0 0 10px;
+}
+.investors-table-bl table tr td:first-child span {
+	padding: 0 0 0 6px;
+}
+.investors-table-bl table tr td span.red-date, .investors-table-bl table tr td span.date {
+	padding: 0 0 0 26px;
+	background-image: url(../images/mega/bottom-sprite.svg);
+	background-position: -10px -6px;
+	background-repeat: no-repeat;
+}
+.investors-table-bl table tr td span.date {
+	background-position: -10px -66px;
+}
+.investors-bottom-link {
+	padding: 18px 0 0 0;
+	display: block;
+	font-size: 13px;
+	line-height: 26px;
+	color: #333333;
+}
+.investors-bottom-link strong {
+	font-size: 13px;
+	line-height: 26px;
+	color: #333333;
+}
+.investors-bottom-link a {
+	font-family: 'Open Sans Bold', Arial;
+	padding: 0 10px;
+	color: #D22400;
+	font-size: 13px;
+	line-height: 26px;
+}
+.investors-bottom-link a.short {
+	padding: 0 10px 0 0;
+}
+.investors-reader-button, a.investors-reader-button {
+	display: inline-block;
+	background-color: rgba(214,32,39,0.8);
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+	padding: 2px 2px 2px 36px;
+	height: 36px;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin-top: 20px;
+	background-image: url(../images/mega/bottom-sprite.svg);
+	background-position: -2px -163px;
+	background-repeat: no-repeat;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.investors-reader-button:hover, a.investors-reader-button:hover {
+	background-color: rgba(214,32,39,1);
+}
+.investors-reader-white-pad {
+	display: block;
+	height: 32px;
+	min-width: 102px;
+	background-color: white;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-image: url(../images/mega/bottom-sprite.svg);
+	background-position: right -125px;
+	background-repeat: no-repeat;
+}
+.investors-reader-txt1 {
+	display: block;
+	font-size: 10px;
+	color: #666666;
+	line-height: 12px;
+	padding: 4px 6px 0 6px;
+	font-family: 'Open Sans Semibold Italic', Arial;
+}
+.investors-reader-txt2 {
+	display: block;
+	font-size: 10px;
+	color: #222222;
+	text-transform: uppercase;
+	line-height: 12px;
+	padding: 0 6px;
+	font-family: 'Open Sans Semibold', Arial;
+}
+.investors-pdf-head {
+	padding: 10px 0 20px 0;
+}
+.investors-download-all, a.investors-download-all {
+	float: right;
+	height: 36px;
+	line-height: 34px;
+	padding: 0 18px;
+	font-size: 11px;
+	color: white;
+	background-color: rgba(0,0,0,0.5);
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin-top: 22px;
+	display: block;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.investors-download-all:hover, a.investors-download-all:hover {
+	background-color: rgba(0,0,0,0.7);
+}
+.new-bottom-pages.investors-nw hr {
+	border: 0;
+	margin: 0 0 10px 0;
+	padding: 0;
+	height: 2px;
+	background-color: rgba(0,0,0,0.1);
+}
+.new-bottom-pages.investors-nw hr.pdf-div {
+	margin: 10px 0 15px 0;
+}
+.investors-pdf-block {
+	padding: 10px 0
+}
+.investors-pdf-download, a.investors-pdf-download {
+	display: block;
+	float: right;
+	height: 36px;
+	line-height: 34px;
+	padding: 0 15px;
+	font-size: 11px;
+	color: white;
+	background-color: rgba(217,0,7,0.8);
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.investors-pdf-download:hover, a.investors-pdf-download:hover {
+	background-color: rgba(217,0,7,1);
+}
+.investors-pdf-icon-bl {
+	background-image: url(../images/mega/bottom-sprite.svg);
+	background-position: 5px -230px;
+	background-repeat: no-repeat;
+	padding: 0 0 0 58px;
+	height: 36px;
+	margin-right: 80px;
+}
+.investors-pdf-title {
+	color: #333333;
+	font-size: 13px;
+	line-height: 16px;
+	white-space: nowrap;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
+.new-bottom-pages.investors-nw {
+	padding-bottom: 40px;
+}
+.investors-pdf-date {
+	color: #666666;
+	font-size: 11px;
+	line-height: 24px
+}
+.new-bottom-pages h1.low-pad {
+	padding: 30px 0 0 0;
+}
+.new-bottom-pages p.investors-low-paragraph, .new-bottom-pages p.inverstors-low-pad {
+	padding-top: 15px;
+}
+.investors-nw.new-bottom-pages .new-right-content-block li {
+	margin-top: 6px;
+	background-image: url(../images/mega/bottom-sprite.svg);
+	background-position: -30px -301px;
+	background-repeat: no-repeat;
+	margin-left: -3px;
+	color: #3F4646;
+}
+.new-bottom-pages.investors-nw .new-right-content-block ul {
+	margin-top: 16px;
+}
+.new-bottom-pages.investors-nw .new-right-content-block ul.short {
+	margin-top: 8px;
+}
+.new-bottom-pages .new-right-content-block p.investors-bottom-block {
+	padding-top: 9px;
 }
 .browsers-top-icon {
 	width: 226px;
@@ -3962,8 +4223,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	height: 24px;
 	line-height: 22px;
 	font-size: 12px;
-	padding: 0 10px 0 26px;
-	color: rgba(255,255,255,0.5);
+	padding: 0 10px 0 27px;
+	color: rgba(255,255,255,0.7);
 	float: right;
 	margin: 12px 12px 0 0;
 	-moz-border-radius: 8px;
@@ -3981,7 +4242,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .top-menu-icon:hover, .top-menu-icon.active {
 	background-color: rgba(255,255,255,0.5);
-	color: rgba(255,255,255,0.7);
+	color: rgba(255,255,255,0.8);
 }
 .fm-avatar img {
 	width: 24px;
@@ -10466,7 +10727,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	padding: 0;
 }
 .membership-main-block, .membership-loading {
-	min-height: 213px;
+	min-height: 211px;
 	position: relative;
 }
 .membership-loader {
@@ -10577,10 +10838,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	border-right: 2px solid #f6f6f6;
+	border-left: 2px solid #f6f6f6;
 }
 .membership-usage-bl:first-child {
-	border-right: 2px solid #f6f6f6;
+	border-left: 0;
 	width: 235px;
 }
 .membership-circle {
@@ -12429,6 +12690,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	padding: 24px 0;
 }
+.nw-bottom-column:nth-child(1) {
+	min-width: 177px;
+}
+.nw-bottom-column:nth-child(2), .nw-bottom-column:nth-child(3) {
+	min-width: 140px;
+}
+.nw-bottom-column:nth-child(4) {
+	min-width: 160px;
+}
+.nw-bottom-column:nth-child(5) {
+	min-width: 180px;
+}
+.nw-bottom-column:nth-child(6) {
+	min-width: 60px;
+}
+.nw-bottom-column:nth-child(6) .nw-bottom-header, .nw-bottom-column:nth-child(6) .nw-bottom-link, .nw-bottom-column:nth-child(6) a.nw-bottom-link, .nw-bottom-column:nth-child(6) a.nw-bottom-link:visited, .nw-bottom-column:nth-child(6) a.nw-bottom-link:hover, .nw-bottom-column:nth-child(6) a.nw-bottom-link:active {
+	padding-right: 0;
+}
 .fr .nw-bottom-column {
 	min-width: 165px;
 }
@@ -12463,10 +12742,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 12px;
 	line-height: 21px;
 	text-transform: uppercase;
-	padding: 3px 40px 26px 0;
+	padding: 2px 40px 17px 0;
 	font-family: 'Open Sans Semibold', Arial;
 }
-.nw-bottom-link {
+.nw-bottom-link, a.nw-bottom-link, a.nw-bottom-link:visited, a.nw-bottom-link:hover, a.nw-bottom-link:active {
 	display: block;
 	cursor: pointer;
 	color: #666666;
@@ -13852,9 +14131,9 @@ h5.main-italic-header {
 	background-position: 68px -149px;
 }
 .new-bottom-pages h1, .terms-main h1 {
-	font-size: 18px;
+	font-size: 20px;
 	line-height: 30px;
-	font-family: 'Open Sans Semibold Italic', Arial;
+	font-family: 'Open Sans Semibold', Arial;
 	margin: 0;
 	padding: 25px 0 0 0;
 	font-weight: normal;
@@ -15697,7 +15976,7 @@ a.contact-new-button:hover {
 	right: 50%;
 	margin-right: 240px;
 }
-.main-mid-pad.new-bottom-pages.dev-nw, .main-mid-pad.new-bottom-pages.help-nw {
+.main-mid-pad.new-bottom-pages.dev-nw, .main-mid-pad.new-bottom-pages.help-nw, .main-mid-pad.new-bottom-pages.investors-nw {
 	padding-left: 10px;
 	z-index: 2;
 	position: relative;
@@ -15705,7 +15984,10 @@ a.contact-new-button:hover {
 .new-left-menu-block {
 	width: 241px;
 	float: left;
-	padding-top: 30px;
+	padding: 30px 0 0 2px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .new-right-content-block {
 	margin-left: 241px;
@@ -15722,12 +16004,12 @@ a.contact-new-button:hover {
 	margin-bottom: 10px;
 	cursor: pointer;
 }
-.new-left-menu-icon {
+.new-left-menu-icon, .new-left-link-pad {
 	vertical-align: middle;
 	display: table-cell;
 	padding-left: 44px;
 	font-size: 13px;
-	line-height: 18px;
+	line-height: 17px;
 	background-image: url(../images/mega/sdk-sprite.png);
 	background-position: -838px 5px;
 	background-repeat: no-repeat;
@@ -15735,13 +16017,17 @@ a.contact-new-button:hover {
 	padding-right: 20px;
 	color: #38393D;
 }
+.new-left-link-pad {
+	background: none;
+	padding-left: 12px;
+}
 .new-left-menu-icon.dev-home {
 	background-position: -838px 5px;
 }
 .new-left-menu-link:hover, .new-left-menu-link.active {
 	background-color: white;
 }
-.new-left-menu-link:hover .new-left-menu-icon, .new-left-menu-link.active .new-left-menu-icon {
+.new-left-menu-link:hover .new-left-menu-icon, .new-left-menu-link.active .new-left-menu-icon, .new-left-menu-link:hover .new-left-link-pad, .new-left-menu-link.active .new-left-link-pad {
 	color: #D8260B
 }
 .new-left-menu-icon.dev-home {
@@ -16309,7 +16595,7 @@ h1.help-home-header {
 	color: #333333;
 }
 .help-info-pages h1.help-home-header {
-	padding-bottom: 20px;
+	padding-bottom: 10px;
 }
 .new-bottom-pages .help-info-pages p {
 	padding: 15px 0 15px 0;
@@ -20307,6 +20593,10 @@ background-size: 541px auto;
 background-image: url(../images/mega/sdk-sprite@2x.png);
 background-size: 904px auto;
 }
+.investors-nw.new-bottom-pages .new-right-content-block li {
+ background-image: url(../images/mega/bottom-sprite.svg);
+ background-size:auto;
+}
 .nt-info-connector, .new-notification-pad {
 background-image: url(../images/mega/notification-icons@2x.png);
 background-size: 414px auto;
@@ -20999,7 +21289,7 @@ body.rtl, .rtl td, .rtl th, .rtl a, .rtl a:link, .rtl a:visited, .rtl a:hover, .
 .rtl .copyrights-bottom .new-registration-checkbox .radio-txt {
 	margin: -1px 35px 0 0;
 }
-.rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div {
+.rtl .blog-new.new-bottom-pages h2, .blog-new-item p span.blog-new-description, .rtl .blog-new-full, .rtl .blog-new-full div p, .rtl .new-bottom-pages .blog-new-right h2, .rtl .new-bottom-pages .rtl .blog-new-right h1, .rtl a.credits-block, .rtl a.credits-block span, .rtl .new-left-menu-block, .rtl .new-left-menu-link, .rtl .help-block, .rtl .help-block div, .rtl .dev-short-block.help-nw-short-blocks, .rtl c.main-mid-pad.dev-nw, .rtl c.main-mid-pad.dev-nw div, .rtl c.main-mid-pad.dev-nw p, .rtl c.main-mid-pad.dev-nw h1, .rtl c.main-mid-pad.dev-nw h2, .rtl c.main-mid-pad.dev-nw h3, .rtl .new-left-menu-link.dev, .rtl .new-left-menu-link.dev div, .rtl .affiliate-input-block, .rtl .affiliate-input-block input, .rtl .affiliate-input-block select, .rtl .ltr h1, .rtl div.ltr h2, .rtl div.ltr h3, .rtl div.ltr h4, .rtl .ltr p, .rtl div.ltr ul, .rtl .new-right-content-block.sdk div, .rtl .new-right-content-block.doc div, .rtl .new-right-content-block.dev div, .rtl .ltr div, .rtl c.main-mid-pad.investors-nw, .rtl c.main-mid-pad.investors-nw div, .rtl c.main-mid-pad.investors-nw p, .rtl c.main-mid-pad.investors-nw h1, .rtl c.main-mid-pad.investors-nw h2, .rtl c.main-mid-pad.investors-nw h3 {
 	direction: ltr;
 }
 .keyspinner {

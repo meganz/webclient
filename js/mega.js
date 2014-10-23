@@ -488,7 +488,7 @@ function MegaData ()
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
 			else if (M.currentdirid == 'contacts') $('.fm-empty-contacts').removeClass('hidden');
 			else if (M.currentdirid.substr(0,7) == 'search/') $('.fm-empty-search').removeClass('hidden');
-			else if (M.currentdirid == M.RootID && folderlink) 
+			else if (M.currentdirid == M.RootID && folderlink)
 			{
 				if (!isValidShareLink())
 				{
@@ -1257,9 +1257,6 @@ function MegaData ()
 		}
 	};
 
-	this.buildSubmenu = function(i, p)
-	{
-
 		var icon = '<span class="context-menu-icon"></span>';
 		var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 		// divider & advanced
@@ -1290,6 +1287,8 @@ function MegaData ()
 			$('.context-menu-item.move-item').after(html);
 		};
 
+	this.buildSubmenu = function(i, p)
+	{
 		var id;
 		if (typeof i === 'undefined')
 		{
@@ -1331,8 +1330,6 @@ function MegaData ()
 			$('#csb_' + id).append(html);
 			if (sub) this.buildSubmenu(fid);
 		}
-
-		initContextUI();
 	};
 
     this.sortContacts = function(folders) {
@@ -3088,6 +3085,7 @@ function rendernew()
         }
 	}
 	M.buildSubmenu();
+	initContextUI();
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 	if (d) console.timeEnd('rendernew');

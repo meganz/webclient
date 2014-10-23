@@ -349,26 +349,27 @@ function removeHash () {
 
 function browserdetails(useragent)
 {
-	useragent = ' ' + useragent;
+	useragent = (' ' + useragent).toLowerCase();
 	var os = false;
 	var browser = false;
 	var icon = '';
 	var name = '';
-	if (useragent.toLowerCase().indexOf('android') > 0) os = 'Android';
-	else if (useragent.toLowerCase().indexOf('windows') > 0) os = 'Windows';
-	else if (useragent.toLowerCase().indexOf('iphone') > 0) os = 'iPhone';
-	else if (useragent.toLowerCase().indexOf('imega') > 0) os = 'iPhone';
-	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';
-	else if (useragent.toLowerCase().indexOf('mac') > 0) os = 'Apple';
-	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'Linux';
-	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'MEGAsync';
-	else if (useragent.toLowerCase().indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';
-	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';
-	else if (useragent.toLowerCase().indexOf('opera') > 0) browser = 'Opera';
-	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';
-	else if (useragent.toLowerCase().indexOf('msie') > 0) browser = 'Internet Explorer';
-	else if (useragent.toLowerCase().indexOf('megasync') > 0) browser = 'MEGAsync';
+	if (useragent.indexOf('android') > 0) os = 'Android';
+	else if (useragent.indexOf('windows') > 0) os = 'Windows';
+	else if (useragent.indexOf('iphone') > 0) os = 'iPhone';
+	else if (useragent.indexOf('imega') > 0) os = 'iPhone';
+	else if (useragent.indexOf('ipad') > 0) os = 'iPad';
+	else if (useragent.indexOf('mac') > 0) os = 'Apple';
+	else if (useragent.indexOf('linux') > 0) os = 'Linux';
+	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
+	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
+	if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
+	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
+	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
+	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
+	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+	else if (useragent.indexOf('msie') > 0
+		|| "ActiveXObject" in window) browser = 'Internet Explorer';
 	if ((os) && (browser))
 	{
 		name = browser + ' on ' + os;
@@ -394,6 +395,7 @@ function browserdetails(useragent)
 	var browserdetails = {};
 	browserdetails.name = name;
 	browserdetails.icon = icon;
+	browserdetails.browser = browser;
 	return browserdetails;
 }
 
@@ -969,6 +971,12 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
+function srvlog(msg,data)
+{
+	if (d) console.error(msg);
+	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+}
+
 function oDestroy(obj) {
 	if (typeof(d) !== "undefined" && d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
@@ -1073,26 +1081,26 @@ function invertColor(hexTripletColor) {
  * @param fnName
  * @param loggerFn
  */
-function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
+function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     if(!localStorage.d) {
         return;
     }
 
     var origFn = ctx[fnName];
-    var textPrefix = textPrefix || "noname";
-    textPrefix = "[call logger: " + textPrefix + "]";
-    var clr = "#" + fastHashFunction(textPrefix).substr(0, 6);
+    var textPrefix = textPrefix || "missing-prefix";
 
-    var prefix1 = "%c" + textPrefix;
-    var prefix2 = "color: " + clr + "; background-color: " +invertColor(clr) + ";";
+    var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
 
     if(ctx[fnName].haveCallLogger) { // recursion
         return;
     }
     ctx[fnName] = function() {
-        loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
+        //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
+        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)));
+
         var res = origFn.apply(this, toArray(arguments));
-        loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
+        //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
+        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
 
         return res;
     };
@@ -1110,21 +1118,25 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix) {
  * @param [loggerFn] {Function}
  * @param [recursive] {boolean}
  */
-function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix) {
+function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger) {
     if(!localStorage.d) {
         return;
     }
     loggerFn = loggerFn || console.debug;
 
+    if(typeof(parentLogger) == "undefined") {
+        var logger = new MegaLogger(textPrefix);
+    }
     if(!window.callLoggerObjects) {
         window.callLoggerObjects = [];
     }
+
     $.each(ctx, function(k, v) {
         if(typeof(v) == "function") {
-            callLoggerWrapper(ctx, k, loggerFn, textPrefix);
+            callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
         } else if(typeof(v) == "object" && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
             window.callLoggerObjects.push(v);
-            logAllCallsOnObject(v, loggerFn, recursive, textPrefix + "." + k);
+            logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
         }
     });
 };
@@ -1376,7 +1388,7 @@ function setupTransferAnalysis()
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
 						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
-						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
+						if (!d) srvlog(t + ' Stuck. ' + r, udata);
 					}
 					delete prev[i];
 				}
@@ -1691,6 +1703,8 @@ function obj_values(obj) {
 
 
 function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
+    var logger = MegaLogger.getLogger("beforeAfterEvents: " + eventSuffix);
+
     return function() {
         var self = this;
         var args = toArray(arguments);
@@ -1698,7 +1712,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
         self.trigger(event, args);
 
         if(event.isPropagationStopped()) {
-            DEBUG("Propagation stopped for event: ", event);
+            logger.debug("Propagation stopped for event: ", event);
             if(dontReturnPromises) {
                 return false;
             } else {
@@ -1714,7 +1728,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
             self.trigger(event2, args.concat(returnedValue));
 
             if(event2.isPropagationStopped()) {
-                DEBUG("Propagation stopped for event: ", event);
+                logger.debug("Propagation stopped for event: ", event);
                 if(dontReturnPromises) {
                     return false;
                 } else {

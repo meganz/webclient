@@ -1,7 +1,4 @@
-﻿
-
-
-var b_u=0;
+﻿var b_u=0;
 var maintenance=false;
 var ua = window.navigator.userAgent.toLowerCase();
 var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
@@ -388,7 +385,7 @@ else
 		})(console);
 
 		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
-		if (!d)
+		if (!d || location.hostname === 'beta.mega.nz')
 		{
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -425,6 +422,7 @@ else
 					if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
 					else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
 				}
+				if (location.hostname === 'beta.mega.nz') dump.m = '[Beta] ' + dump.m;
 
 				try
 				{
@@ -510,14 +508,23 @@ else
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
         jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
-		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});		
+		jsl.push({f:'js/jodid25519.js', n: 'jodid25519_js', j:1,w:7});
+
+        jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});
 		
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
-        jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/jquery-2.1.1.min.js', n: 'jquery', j:1,w:10});
+
+
+        jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
+
+        jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
+
+
         jsl.push({f:'js/jquery-ui.min.js', n: 'jqueryui_js', j:1,w:10});
         jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -538,6 +545,7 @@ else
 
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
         jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
 

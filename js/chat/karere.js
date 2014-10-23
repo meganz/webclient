@@ -57,32 +57,18 @@ var Karere = function(user_options) {
     self.connection.disco.addNode('urn:xmpp:ping', {}); // supports pings
     self.connection.disco.addNode('karere', {}); // identify as a Karere client.
 
+    self.logger = MegaLogger.getLogger("karere", self.options.loggerOptions);
 
-    if(localStorage.dxmpp == 1) {
-        self.connection.rawInput = function (data) {
-            if(localStorage.d) {
-                var d = new Date();
-                console.debug("%c" + self.getNickname() + " RECV: ", "background: #333333; color: #00ff00;", d, data);
-            }
-        };
+    self.connection.rawInput = function (data) {
+        self.logger.debug(self.getNickname(), "RECV", data);
+    };
 
-        self.connection.rawOutput = function (data) {
-		    if(localStorage.d) {
-                var d = new Date();
-		        console.debug("%c" + self.getNickname() + " SEND: ", "background: #333333; color: #aaaaff;", d, data);
-            }
-        };
-    }
+    self.connection.rawOutput = function (data) {
+        self.logger.debug(self.getNickname(), "SENT", data);
+    };
 
-    // Uncomment the following line to see all the debug output.
-//    Strophe.log = function (level, msg) {
-//        if(localStorage.d) {
-//            console.log(level, 'LOG: ' + msg);
-//        }
-//    }
-
-    Strophe.fatal = function (msg) { Karere.error(msg); };
-    Strophe.error = function (msg) { Karere.error(msg); };
+    Strophe.fatal = function (msg) { self.error(msg); };
+    Strophe.error = function (msg) { self.error(msg); };
 
 
     // initialize the connection state
@@ -106,9 +92,7 @@ var Karere = function(user_options) {
 
             self.connection.disconnect();
 
-            if(localStorage.d) {
-		        console.warn("flushing out and disconnecting onbeforeunload");
-            }
+            self.logger.warn("flushing out and disconnecting onbeforeunload");
         }
     });
 
@@ -213,9 +197,7 @@ var Karere = function(user_options) {
             return;
         }
 
-        if(localStorage.d) {
-            console.error("Sending pong: ", eventObject);
-        }
+        self.logger.debug("Sending pong: ", eventObject);
 
         self.sendPong(eventObject.getFromJid(), eventObject.getMessageId());
     });
@@ -363,7 +345,13 @@ Karere.DEFAULTS = {
     /**
      * How much time we should keep the "Action" ids in memory (used to be checked if an Action was already triggered)
      */
-    actionMessageTriggerRegistryExpiration: 2000
+    actionMessageTriggerRegistryExpiration: 2000,
+
+    loggerOptions: {
+        isEnabled: function() {
+            return !!localStorage.dxmpp;
+        }
+    }
 };
 
 
@@ -508,38 +496,28 @@ makeMetaAware(Karere);
             self._fullJid,
             self._password,
             function(status) {
-                if(localStorage.d) {
-		            console.warn("Got connection status: ", self._fullJid, self._password, status);
-                }
+                self.logger.warn("Got connection status: ", self._fullJid, self._password, status);
 
                 self._connectionState = status;
 
                 if (status == Karere.CONNECTION_STATE.CONNECTING) {
-                    if(localStorage.d) {
-		                console.error(self.getNickname(), 'Karere is connecting.');
-                    }
+                    self.logger.debug(self.getNickname(), 'Karere is connecting.');
 
                     self.trigger('onConnecting');
                 } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
-                    if(localStorage.d) {
-		                console.warn(self.getNickname(), 'Karere failed to connect.');
-                    }
+                    self.logger.warn(self.getNickname(), 'Karere failed to connect.');
 
                     if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onConnfail');
                 } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
-                    if(localStorage.d) {
-		                console.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
-                    }
+                    self.logger.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
 
                     $promise.reject(status);
                     self.trigger('onAuthfail');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
-                    if(localStorage.d) {
-		                console.warn(self.getNickname(), 'Karere is disconnecting.');
-                    }
+                    self.logger.warn(self.getNickname(), 'Karere is disconnecting.');
 
                     if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
@@ -547,18 +525,15 @@ makeMetaAware(Karere);
 
                     self.trigger('onDisconnecting');
                 } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
-                    if(localStorage.d) {
-                        console.info(self.getNickname(), 'Karere is disconnected.');
-                    }
+                    self.logger.info(self.getNickname(), 'Karere is disconnected.');
 
                     if(self._connectionRetries >= self.options.maxConnectionRetries) {
                         $promise.reject(status);
                     }
                     self.trigger('onDisconnected');
                 } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
-                    if(localStorage.d) {
-                        console.info(self.getNickname(), 'Karere is connected.');
-                    }
+                    self.logger.info(self.getNickname(), 'Karere is connected.');
+
                     // connection.jid
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
                     self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
@@ -641,9 +616,7 @@ makeMetaAware(Karere);
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and _password
              */
             if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
-                if(localStorage.d) {
-		            console.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state.");
-                }
+                self.logger.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state.");
 
                 internalPromises.push(
                     createTimeoutPromise(
@@ -657,9 +630,7 @@ makeMetaAware(Karere);
             }
             else if(self.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
                 if(!self._isReconnecting) {
-                    if(localStorage.d) {
-                        console.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
-                    }
+                    self.logger.warn("Tried to call ", functionName, ", but Karere is not connected. Will try to reconnect first.");
                     self._isReconnecting = true;
 
                     internalPromises.push(
@@ -738,22 +709,16 @@ makeMetaAware(Karere);
                 self.getConnectionState() == Karere.CONNECTION_STATE.ATTACHED
             ) {
 
-            if(localStorage.d) {
-		        console.error("Will try to wait for the queue to get empty before disconnecting...");
-            }
+            self.logger.debug("Will try to wait for the queue to get empty before disconnecting...");
 
             self._connectionState = Karere.CONNECTION_STATE.DISCONNECTING;
 
             self._waitForRequestQueueToBeEmpty()
                 .fail(function() {
-                    if(localStorage.d) {
-		                console.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
-                    }
+                    self.logger.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
                 })
                 .done(function() {
-                    if(localStorage.d) {
-		                console.debug("Queue is empty. Calling disconnect.");
-                    }
+                    self.logger.debug("Queue is empty. Calling disconnect.");
                 })
                 .always(function() {
                     self.connection.disconnect();
@@ -970,12 +935,12 @@ makeMetaAware(Karere);
      * Helper method that should be used to proxy Strophe's .fatal and .error methods to actually LOG something to the
      * console.
      */
-    Karere.error = function() {
+    Karere.prototype.error = function() {
         var additional = "";
         if(arguments[0] instanceof Error) {
             additional = arguments[0].stack;
         }
-		console.error(toArray(arguments).join(" "), additional);
+        this.logger.error(toArray(arguments).join(" "), additional);
     }
 }
 
@@ -1120,9 +1085,7 @@ makeMetaAware(Karere);
 
 
         if(message.tagName.toLowerCase() == "message") {
-            if(localStorage.d) {
-		        console.warn(self.getNickname(), "Message: ", _type);
-            }
+            self.logger.warn(self.getNickname(), "Message: ", _type);
 
             var elems = message.getElementsByTagName('body');
 
@@ -1202,9 +1165,7 @@ makeMetaAware(Karere);
 
                 self.setMeta("rooms", eventData['room'], 'password', eventData['password']);
 
-                if(localStorage.d) {
-		            console.warn(self.getNickname(), "Got invited to join room: ", eventData['room']);
-                }
+                self.logger.warn(self.getNickname(), "Got invited to join room: ", eventData['room']);
 
                 if(!self._triggerEvent("InviteMessage", eventData)) { /// stop auto join by event prop. ?
                     return true;
@@ -1255,9 +1216,8 @@ makeMetaAware(Karere);
                 eventData['sent-stamp'] = $('delay', message).attr('sent-stamp') ? Date.parse($('delay', message).attr('sent-stamp'))/1000 : undefined;
             }
         } else {
-            if(localStorage.d) {
-//		        console.debug("Unknown stanza type: ", message.innerHTML);
-            }
+            self.logger.debug("Unknown stanza type: ", message.innerHTML);
+
             eventData['unknown'] = true;
             eventData['tag'] = message.tagName;
         }
@@ -1353,16 +1313,13 @@ makeMetaAware(Karere);
         }
 
         if(stanzaType == "ActionMessage" && self._triggeredActions[eventData.id]) {
-            if(localStorage.d) {
-                console.debug(self.getNickname(), "Ignoring Event (action with this id was already triggered/processed) for: ", stanzaType, "with event data:", eventData);
-            }
+            self.logger.debug(self.getNickname(), "Ignoring Event (action with this id was already triggered/processed) for: ", stanzaType, "with event data:", eventData);
+
             return false;
         }
         var targetedTypeEvent = new $.Event("on" + stanzaType);
 
-        if(localStorage.d) {
-    		console.debug(self.getNickname(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
-        }
+        self.logger.debug(self.getNickname(), "Triggering Event for: ", stanzaType, "with event data:", eventData);
 
 
         var eventDataObject = null;
@@ -1458,9 +1415,8 @@ makeMetaAware(Karere);
                 eventData.messageId
             );
 
-            if(localStorage.d) {
-                console.error(stanzaType, eventDataObject);
-            }
+            self.logger.debug("Got PingRequest", stanzaType, eventDataObject);
+
         } else if(stanzaType == "PingResponse") {
             eventDataObject = new KarereEventObjects.PingResponse(
                 eventData.toJid,
@@ -1468,15 +1424,12 @@ makeMetaAware(Karere);
                 eventData.messageId
             );
 
-            if(localStorage.d) {
-                console.error(stanzaType, eventDataObject);
-            }
+            self.logger.debug("Got PingResponse", stanzaType, eventDataObject);
+
         } else {
             eventDataObject = eventData;
             if($.isPlainObject(eventDataObject)) {
-                if(localStorage.d) {
-                    console.warn("Karere will not handle incoming message type of type: " + stanzaType + ", with eventData:", eventData, ", so it should be handled by directly using Strophe.js's API.");
-                }
+                self.logger.warn("Karere will not handle incoming message type of type: " + stanzaType + ", with eventData:", eventData, ", so it should be handled by directly using Strophe.js's API.");
             }
 
             //throw new Error("Don't know how to convert event of type: " + stanzaType + " to EventObject");
@@ -1495,9 +1448,7 @@ makeMetaAware(Karere);
                 ]
             );
         } catch(e) {
-            if(localStorage.d) {
-		        console.error('ERROR: ' + (e.stack ? e.stack : e));
-            }
+            self.logger.error('ERROR: ' + (e.stack ? e.stack : e));
         }
 
         // if none of the handlers have not stopped the event propagation, trigger a more generic event.
@@ -1684,9 +1635,8 @@ makeMetaAware(Karere);
             ]
         );
         if(event.isPropagationStopped()) {
-            if(localStorage.d) {
-                console.warn("Event propagation stopped sending of message: ", outgoingMessage)
-            }
+            self.logger.warn("Event propagation stopped sending of message: ", outgoingMessage)
+
             return messageId;
         }
 
@@ -1741,9 +1691,8 @@ makeMetaAware(Karere);
 //        self.connection.send(forwarded);
 
         //noinspection JSUnresolvedVariable
-        if(localStorage.dxmpp) {
-            console.debug(self.getNickname(), "sendin message w/ id", outgoingMessage);
-        }
+        self.logger.debug(self.getNickname(), "sendin message w/ id", outgoingMessage);
+
         return outgoingMessage.getMessageId();
     };
 
@@ -1894,9 +1843,8 @@ makeMetaAware(Karere);
                 }
             })
             .fail(function() {
-                if(localStorage.d) {
-		            console.error("Could not join my newly created room.")
-                }
+                self.logger.warn("Could not join my newly created room.")
+
                 $promise.reject();
             });
 
@@ -1926,27 +1874,23 @@ makeMetaAware(Karere);
             return self._waitForPresenceCache[waitCacheKey];
         }
 
-        if(localStorage.d) {
-            console.warn(
-                self.getNickname(),
-                (new Date()),
-                "Starting to wait for user to" + (eventName == "Joined" ? "join" : "leave") + ": ",
-                userJid,
-                "event idx:",
-                generatedEventName
-            );
-        }
+        self.logger.warn(
+            self.getNickname(),
+            (new Date()),
+            "Starting to wait for user to" + (eventName == "Joined" ? "join" : "leave") + ": ",
+            userJid,
+            "event idx:",
+            generatedEventName
+        );
 
 
         var joinedTimeout = setTimeout(function() {
-            if(localStorage.d) {
-		        console.error(
-                    self.getNickname(),
-                    (new Date()),
-                    "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ",
-                    userJid
-                );
-            }
+            self.logger.warn(
+                self.getNickname(),
+                (new Date()),
+                "Timeout waiting for user to " + (eventName == "Joined" ? "join" : "leave") + ": ",
+                userJid
+            );
 
             self.unbind(generatedEventName);
             $promise.reject(roomJid, userJid);
@@ -1957,9 +1901,7 @@ makeMetaAware(Karere);
         self.bind(generatedEventName, function(e, eventObject) {
             var joined = false;
 
-            if(localStorage.d) {
-//        		console.debug(eventName, roomJid, userJid, eventData[searchKey]);
-            }
+            self.logger.debug("_waitForUserPresenceInRoom: ", eventName, roomJid, userJid, eventObject[searchKey]);
 
             if(eventObject.getFromJid().split("/")[0] != roomJid) {
                 return;
@@ -1982,9 +1924,7 @@ makeMetaAware(Karere);
 
 
             if(joined) {
-                if(localStorage.d) {
-	            	console.warn(self.getNickname(), "User " + eventName + ": ", roomJid, userJid);
-                }
+                self.logger.warn(self.getNickname(), "User " + eventName + ": ", roomJid, userJid);
 
                 self.unbind(generatedEventName);
                 clearTimeout(joinedTimeout);
@@ -2002,7 +1942,8 @@ makeMetaAware(Karere);
         $promise.always(function() {
             // cleanup
             delete self._waitForPresenceCache[waitCacheKey];
-        })
+        });
+
         return $promise;
     };
 
@@ -2147,9 +2088,7 @@ makeMetaAware(Karere);
 
         self.connection.send(invitation);
 
-        if(localStorage.d) {
-		    console.warn(self.getNickname(), "Inviting: ", userJid, "to", roomJid, "with password", password);
-        }
+        self.logger.warn(self.getNickname(), "Inviting: ", userJid, "to", roomJid, "with password", password);
 
         return $promise;
     };
@@ -2182,9 +2121,7 @@ makeMetaAware(Karere);
             }
         });
 
-        if(localStorage.d) {
-            console.warn(self.getNickname(), "Removing user: ", userJid, "from chat", roomJid);
-        }
+        self.logger.warn(self.getNickname(), "Removing user: ", userJid, "from chat", roomJid);
 
         if(!nickname) {
             $promise.reject(
@@ -2487,7 +2424,7 @@ makeMetaAware(Karere);
 //            );
 
         } else {
-            if(localStorage.d) { console.error("Not connected"); }
+            self.logger.warn("Not connected");
         }
     };
 
@@ -2504,7 +2441,7 @@ makeMetaAware(Karere);
                 })
                 .c("item", {
                     jid: bareJid,
-                    subscription: 'none',
+                    subscription: 'remove',
                     name: bareJid.split("@")[0]
                 })
                 .c("group")
@@ -2520,7 +2457,7 @@ makeMetaAware(Karere);
 //                msg2.tree()
 //            );
         } else {
-            if(localStorage.d) { console.error("Not connected"); }
+            self.logger.warn("Not connected");
         }
     };
 }

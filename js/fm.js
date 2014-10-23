@@ -593,6 +593,7 @@ function initUI(){
 	createfolderUI();
 	cSortMenuUI();
 	M.buildSubmenu();
+	initContextUI();
 	copyDialog();
 	moveDialog();
 	initShareDialog();

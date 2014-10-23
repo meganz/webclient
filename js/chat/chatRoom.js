@@ -10,6 +10,8 @@
  * @constructor
  */
 var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
+    this.logger = MegaLogger.getLogger("room[" + roomJid + "]", {}, megaChat.logger);
+
     this.megaChat = megaChat;
     this.users = users ? users : [];
     this.hash = null;

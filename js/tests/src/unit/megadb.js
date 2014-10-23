@@ -1,6 +1,16 @@
-describe("MegaDB Unit Test", function() {
+describe("MegaDB - Unit Test", function() {
     var mdb;
+    var megaDataMocker;
+
+
     beforeEach(function(done) {
+        window.u_handle = "A_1234567890";
+        window.u_privk = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+
+        megaDataMocker = new MegaDataMocker();
+
+        localStorage.clear();
+
         var schema = {
             people: {
                 key: { keyPath: 'id' , autoIncrement: true },
@@ -19,16 +29,20 @@ describe("MegaDB Unit Test", function() {
 
 
     afterEach(function(done) {
+        megaDataMocker.restore();
+
+        localStorage.clear();
 
         mdb.drop()
             .fail(function() {
                 fail("db not dropped: ", toArray(arguments));
-                done();
             })
             .then(function() {
                 done();
             });
         return;
+
+        done();
     });
 
 
@@ -78,7 +92,7 @@ describe("MegaDB Unit Test", function() {
             });
     });
 
-    it(".query, .filter, .update", function(done) {
+    it(".query, .filter, .update (single row)", function(done) {
         mdb.add("people", {
             'firstName': "John",
             'lastName': "Doe",
@@ -113,6 +127,41 @@ describe("MegaDB Unit Test", function() {
                                                 done();
                                             })
                                     })
+                            })
+                            .fail(function() {
+                                fail("could not get obj with id 1");
+                            });
+                    });
+            });
+    });
+
+    it(".query, .filter, .modify (all matched rows)", function(done) {
+        mdb.add("people", {
+            'firstName': "John",
+            'lastName': "Doe",
+            'answer': 12
+        })
+            .then(function() {
+
+                mdb.add("people", {
+                    'firstName': "John",
+                    'lastName': "Doe2",
+                    'answer': 12
+                })
+                    .then(function() {
+                        mdb.query("people")
+                            .filter("firstName", "John")
+                            .filter("answer", 12)
+                            .modify({"firstName": "John22"})
+                            .execute()
+                            .then(function(r) {
+
+                                expect(r.length).to.eql(2);
+
+                                expect(r[0].firstName).to.eql("John22");
+                                expect(r[1].firstName).to.eql("John22");
+
+                                done();
                             })
                             .fail(function() {
                                 fail("could not get obj with id 1");

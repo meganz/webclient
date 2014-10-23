@@ -12,17 +12,29 @@
  * @returns {MegaDB}
  * @constructor
  */
-function MegaDB(name, suffix, version, schema) {
+function MegaDB(name, suffix, version, schema, options) {
     this.name = name;
     this.suffix = suffix;
+
+
+    this.logger = new MegaLogger("megaDB[" + name + "]", {}, options && options.parentLogger ? options.parentLogger : undefined);
+
 
     this.server = null;
 
     this.currentVersion = version;
     this.schema = schema;
     this.dbState = MegaDB.DB_STATE.OPENING;
+    this.plugins = {};
+    this.options = $.extend({}, clone(MegaDB.DEFAULT_OPTIONS), options);
 
     var self = this;
+
+    // init code goes here
+    $.each(self.options.plugins, function(k, v) {
+        self.plugins[k] = new v(self);
+    });
+
 
     self._dbOpenPromise = db.open({
         server: 'mdb_' + name + '_' + suffix,
@@ -34,7 +46,7 @@ function MegaDB(name, suffix, version, schema) {
         self.initialize();
     }, function() {
         self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
-        ERRDEBUG("Could not initialise MegaDB: ", arguments, name, version, schema);
+        self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
     });
 
     return this;
@@ -43,13 +55,22 @@ function MegaDB(name, suffix, version, schema) {
 makeObservable(MegaDB);
 
 /**
- * Static
+ * Static, DB state
  */
 MegaDB.DB_STATE = {
     'OPENING': 0,
     'INITIALIZED': 10,
     'FAILED_TO_INITIALIZE': 20,
     'CLOSED': 30
+};
+
+/**
+ * Static, default options
+ */
+MegaDB.DEFAULT_OPTIONS = {
+    'plugins': {
+        'megaDbEncryptionPlugin': MegaDBEncryption
+    }
 };
 
 
@@ -118,8 +139,6 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
 MegaDB.prototype.initialize = function() {
     var self = this;
 
-    // init code goes here
-
     // trigger ready
     self.trigger('onReady');
 };
@@ -135,10 +154,10 @@ MegaDB.prototype.initialize = function() {
 MegaDB.prototype.add = function(tableName, val) {
     assert(this.server[tableName], 'table not found:' + tableName);
 
-    // ignore any __privateProperties and get back the .id after .add is done
     var tempObj = clone(val);
 
     Object.keys(tempObj).forEach(function(k) {
+        // ignore any __privateProperties and
         if(k.toString().indexOf("__") === 0) {
             delete tempObj[k];
         }
@@ -146,6 +165,7 @@ MegaDB.prototype.add = function(tableName, val) {
 
     return this.server[tableName].add(tempObj)
         .then(function() {
+            // get back the .id after .add is done
             if(tempObj.id && tempObj.id != val.id) {
                 val.id = tempObj.id;
             }
@@ -184,7 +204,7 @@ MegaDB.prototype.update = function(tableName, k, val) {
 
     return self.query(tableName)
         .filter('id', k)
-        .modify(val)
+        .modify(tempObj)
         .execute();
 };
 
@@ -373,9 +393,8 @@ MegaDB.prototype.close = function() {
     var self = this;
     self.server.close();
 
-    if(localStorage.d) {
-        console.warn("Closing db: ", self);
-    }
+
+    self.logger.info("Closing db: ", self);
 
     self.dbState = MegaDB.DB_STATE.CLOSED;
 
@@ -404,6 +423,7 @@ MegaDB.QuerySet = function(megaDb, tableName) {
     var self = this;
     self.megaDb = megaDb;
     self.tableName = tableName;
+    self.logger = MegaLogger.getLogger("querySet[" + tableName + "]", {}, megaDb.logger);
 
     self._ops = [];
 
@@ -447,10 +467,25 @@ MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
             return; // continue;
         }
 
+        var args = v[1];
         if(opName == "filter") {
-            self.megaDb.trigger("onFilterQuery", [self.tableName, v[1]]);
+            args = clone(v[1]);
+            self.megaDb.trigger("onFilterQuery", [self.tableName, args]);
+        } else if(opName == "modify") {
+            args = clone(v[1]);
+            self.megaDb.trigger("onModifyQuery", [self.tableName, args]);
         }
-        q = q[opName].apply(q, v[1]);
+        self.logger.debug("dequeue op:", opName, args);
+
+        // if this was a modify() call, then trigger onBeforeUpdate
+        if(opName == "modify") {
+            q = q.map(function(r) {
+                self.megaDb.trigger("onBeforeUpdate", [self.tableName, r.id, r, true]);
+                return r;
+            });
+        }
+
+        q = q[opName].apply(q, args);
 
         v[2] = true; // mark as dequeued
     });

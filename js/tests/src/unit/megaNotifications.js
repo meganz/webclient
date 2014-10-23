@@ -13,6 +13,7 @@ describe("MegaNotifications Unit Test", function() {
                     sinon.spy(ion.sound, 'stop');
                 }
             },
+            'bootstaticpath': './',
             'Notification': function() {
                 this.close = function() {};
 

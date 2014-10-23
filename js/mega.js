@@ -488,7 +488,7 @@ function MegaData ()
 			if (M.currentdirid == M.RubbishID) $('.fm-empty-trashbin').removeClass('hidden');
 			else if (M.currentdirid == 'contacts') $('.fm-empty-contacts').removeClass('hidden');
 			else if (M.currentdirid.substr(0,7) == 'search/') $('.fm-empty-search').removeClass('hidden');
-			else if (M.currentdirid == M.RootID && folderlink) 
+			else if (M.currentdirid == M.RootID && folderlink)
 			{
 				if (!isValidShareLink())
 				{
@@ -1257,9 +1257,6 @@ function MegaData ()
 		}
 	};
 
-	this.buildSubmenu = function(i, p)
-	{
-
 		var icon = '<span class="context-menu-icon"></span>';
 		var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 		// divider & advanced
@@ -1269,6 +1266,7 @@ function MegaData ()
 		{
 			$('#sm_move').remove();
 			var cs = '';
+            var sm = '';
 
 			for (var h in M.c[M.RootID])
 			{
@@ -1290,6 +1288,8 @@ function MegaData ()
 			$('.context-menu-item.move-item').after(html);
 		};
 
+	this.buildSubmenu = function(i, p)
+	{
 		var id;
 		if (typeof i === 'undefined')
 		{
@@ -1331,8 +1331,6 @@ function MegaData ()
 			$('#csb_' + id).append(html);
 			if (sub) this.buildSubmenu(fid);
 		}
-
-		initContextUI();
 	};
 
     this.sortContacts = function(folders) {
@@ -2534,7 +2532,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		else window.onerror('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''), '', -1);
+		else srvlog('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''));
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2933,8 +2931,7 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		window.onerror('onUploadError :: ' + errorstr
-			+ ' [' + details.join("] [") + ']', '', -1);
+		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
@@ -3089,6 +3086,7 @@ function rendernew()
         }
 	}
 	M.buildSubmenu();
+	initContextUI();
 	if (newpath) M.renderPath();
 	newnodes=undefined;
 	if (d) console.timeEnd('rendernew');

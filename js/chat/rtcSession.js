@@ -318,7 +318,9 @@ RtcSession.prototype = {
         case Strophe.Status.CONNECTED:
         {
             this.rtcSession.ownAnonId = this.rtcSession.scrambleJid(
-                Strophe.getBareJidFromJid(this.connection.jid));
+                Strophe.getBareJidFromJid(this.connection.jid))
+                .replace(/[\/\+&<>@\?'"=]/gi, ''); //must be valid for xml attribute and url param
+
             this.connection.addHandler(RtcSession.prototype._onPresenceUnavailable.bind(this.rtcSession),
                null, 'presence', 'unavailable', null, null);
             break;

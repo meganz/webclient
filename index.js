@@ -116,9 +116,13 @@ function init_page()
 		if (ar[0]) pfid  = ar[0].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 		if (ar[1]) pfkey = ar[1].replace(/[^a-z^A-Z^0-9^_^-]/g,"");
 		n_h = pfid;
-		api_setfolder(n_h);
-		if (waitxhr) waitsc();
-		u_n = pfid;
+		if (pfkey)
+		{
+			api_setfolder(n_h);
+			if (waitxhr) waitsc();
+			u_n = pfid;
+		}
+		else mKeyDialog(pfid, true);
 		page = 'fm';
 	}
 	else

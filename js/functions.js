@@ -1276,6 +1276,49 @@ function CreateWorkers(url, message, size) {
 	}, size);
 }
 
+function mKeyDialog(ph, fl)
+{
+	$('.new-download-buttons').addClass('hidden');
+	$('.new-download-file-title').text(l[1199]);	
+	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
+	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
+	$('.fm-dialog-overlay').removeClass('hidden');	
+	$('.fm-dialog.dlkey-dialog input').unbind('focus');
+	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
+	{
+		if ($(this).val() == l[1028]) $(this).val('');	
+	});	
+	$('.fm-dialog.dlkey-dialog input').unbind('blur');
+	$('.fm-dialog.dlkey-dialog input').bind('blur',function(e)
+	{
+		if ($(this).val() == '') $(this).val(l[1028]);
+	});	
+	$('.fm-dialog.dlkey-dialog input').unbind('keydown');
+	$('.fm-dialog.dlkey-dialog input').bind('keydown',function(e)
+	{
+		$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
+		if (e.keyCode == 13) $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
+	});
+	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').unbind('click');
+	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').bind('click',function(e)
+	{
+		var key = $('.fm-dialog.dlkey-dialog input').val();
+
+		if (key && key !== l[1028])
+		{
+			$('.fm-dialog.dlkey-dialog').addClass('hidden');
+			$('.fm-dialog-overlay').addClass('hidden');	
+			document.location.hash = (fl ? '#F!':'#!') + ph + '!' + key;
+		}
+	});	
+	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
+	$('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click',function(e)
+	{
+		$('.fm-dialog.dlkey-dialog').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');	
+	});
+}
+
 function dcTracer(ctr) {
 	var name = ctr.name, proto = ctr.prototype;
 	for(var fn in proto) {

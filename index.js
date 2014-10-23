@@ -122,7 +122,13 @@ function init_page()
 			if (waitxhr) waitsc();
 			u_n = pfid;
 		}
-		else mKeyDialog(pfid, true);
+		else
+		{
+			$(document).one('MegaOpenFolder', SoonFc(function()
+			{
+				mKeyDialog(pfid, true);
+			}));
+		}
 		page = 'fm';
 	}
 	else

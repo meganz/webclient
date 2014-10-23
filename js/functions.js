@@ -1279,20 +1279,21 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl)
 {
 	$('.new-download-buttons').addClass('hidden');
-	$('.new-download-file-title').text(l[1199]);	
-	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
+	$('.new-download-file-title').text(l[1199]);
+	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));
 	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
-	$('.fm-dialog-overlay').removeClass('hidden');	
+	$('.fm-dialog-overlay').removeClass('hidden');
+	$('body').addClass('overlayed');
 	$('.fm-dialog.dlkey-dialog input').unbind('focus');
 	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
 	{
-		if ($(this).val() == l[1028]) $(this).val('');	
-	});	
+		if ($(this).val() == l[1028]) $(this).val('');
+	});
 	$('.fm-dialog.dlkey-dialog input').unbind('blur');
 	$('.fm-dialog.dlkey-dialog input').bind('blur',function(e)
 	{
 		if ($(this).val() == '') $(this).val(l[1028]);
-	});	
+	});
 	$('.fm-dialog.dlkey-dialog input').unbind('keydown');
 	$('.fm-dialog.dlkey-dialog input').bind('keydown',function(e)
 	{
@@ -1307,15 +1308,15 @@ function mKeyDialog(ph, fl)
 		if (key && key !== l[1028])
 		{
 			$('.fm-dialog.dlkey-dialog').addClass('hidden');
-			$('.fm-dialog-overlay').addClass('hidden');	
+			$('.fm-dialog-overlay').addClass('hidden');
 			document.location.hash = (fl ? '#F!':'#!') + ph + '!' + key;
 		}
-	});	
+	});
 	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click',function(e)
 	{
 		$('.fm-dialog.dlkey-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');	
+		$('.fm-dialog-overlay').addClass('hidden');
 	});
 }
 
@@ -1380,7 +1381,7 @@ function setupTransferAnalysis()
 						var x = c.xhr || {};
 						return [''+c,x.__failed,x.__timeout,!!x.listener,x.__id,x.readyState>1&&x.status];
 					});
-					
+
 					if (d) console.warn(i + ' might be stuck, checking...', c, w.length, u);
 
 					if (w.length)
@@ -1396,16 +1397,16 @@ function setupTransferAnalysis()
 							if (stuck)
 							{
 								var chunk_id = '' + w[j], n = u[j];
-								
+
 								if (w[j].dl && w[j].dl.lasterror) r = '[DLERR'+w[j].dl.lasterror+']';
 								else if (w[j].srverr) r = '[SRVERR'+(w[j].srverr-1)+']';
-								
+
 								try {
 									w[j].on_error(0,{},'Stuck');
 								} catch(e) {
 									n.push(e.message);
 								}
-								
+
 								if (!chunks[chunk_id])
 								{
 									chunks[chunk_id] = 1;
@@ -1413,7 +1414,7 @@ function setupTransferAnalysis()
 								}
 							}
 						}
-						
+
 						if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1))
 						{
 							r = s ? '[TIMEOUT]' : '[ETHERR]';
@@ -1425,7 +1426,7 @@ function setupTransferAnalysis()
 						r = '[!]';
 						data = 'GlobalProgress.' + i + ' exists with no working chunks.';
 					}
-					
+
 					if (data.length)
 					{
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
@@ -1742,8 +1743,6 @@ function obj_values(obj) {
 
     return vals;
 }
-
-
 
 function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
     var logger = MegaLogger.getLogger("beforeAfterEvents: " + eventSuffix);

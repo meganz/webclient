@@ -968,7 +968,7 @@ function MegaData ()
 		$('.fm-right-account-block').addClass('hidden');
 		$('.fm-files-view-icon').removeClass('hidden');
 
-		if (d) console.log('openFolder()',M.currentdirid,id);
+		if (d) console.log('openFolder()',M.currentdirid,id,force);
 		if (id !== 'notifications' && $('.fm-main.notifications').attr('class').indexOf('hidden') < 0) notificationsUI(1);
 		this.search=false;
 		this.chat=false;
@@ -1068,6 +1068,7 @@ function MegaData ()
 		}
 		if (!n_h) window.location.hash = '#fm/' + M.currentdirid;
 		searchPath();
+		$(document).trigger('MegaOpenFolder');
 	};
 
 	function sortContactByName(a, b) {

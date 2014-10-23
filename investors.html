@@ -1,0 +1,618 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html, charset=UTF-8" />
+<title>Untitled Document</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {  
+  function initMainScroll()
+  {
+	  $('.main-scroll-block').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+  }
+  initMainScroll();
+  $(window).bind('resize', function () 
+  {
+	  initMainScroll();
+  });
+  $('.new-left-menu-link').bind('click', function() {
+	  if($(this).attr('class').indexOf('active') == -1) {
+	    var current = $('.new-left-menu-link.active').attr('id');
+		$('.new-left-menu-link.active').removeClass('active');
+	    $(this).addClass('active');
+		$('.new-right-content-block.' + current).addClass('hidden');
+		$('.new-right-content-block.' + $(this).attr('id')).removeClass('hidden');
+		initMainScroll();
+	  }
+  });
+	
+	
+  
+});
+
+</script>
+</head>
+
+<body class="bottom-pages">
+<div id="startholder" class="fmholder" style="display: block;">
+  <div class="main-scroll-block">
+        <div class="main-pad-block">
+          <div class="top-head">
+            <div class="top-centered-margin"> 
+              <a class="logo"></a> 
+              <a class="top-menu-icon">Menu</a>
+              <a class="create-account-button hidden" style="display: inline;"> Create Account </a> <a class="top-login-button hidden" style="display: inline;"> Login </a>
+            </div>
+          </div>
+          <div class="dev-nw-gray-bg">
+            <div class="dev-nw-gray"></div>
+          </div>
+          <div class="main-mid-pad new-bottom-pages investors-nw">
+            <div class="new-left-menu-block" style="padding-top: 30px;">
+              <div class="new-left-menu-link investors active" id="investors">
+                <div class="new-left-link-pad">Investors</div>
+              </div>
+              <div class="new-left-menu-link shareholder-reports" id="shareholder-reports">
+                <div class="new-left-link-pad">Shareholder Reports</div>
+              </div>
+              <div class="new-left-menu-link press-releases" id="press-releases">
+                <div class="new-left-link-pad">Press Releases</div>
+              </div>
+              <div class="new-left-menu-link governance-policies" id="governance-policies">
+                <div class="new-left-link-pad">Governance Policies</div>
+              </div>
+            </div>
+            
+            <div class="new-right-content-block investors">
+              <h1>Investors</h1>
+              <p class="investors-low-paragraph">
+                 <strong class="small-header">Investor Relations</strong>
+                 Mega has been listed on the NZ Stock Exchange (NZX) since xx  xxx 2014 with the stock ticker xxx and ISINaaaaaaaa.
+              </p>
+              <p>Our current share price and recent announcements can be found on the <a href="">NZX website.</a></p>
+              
+              <img alt="" src="images/temp/img02.png" class="investors-img"/>
+              
+              <p>
+                <strong class="small-header">Investing from New Zealand</strong>
+                To invest in Mega please contact your usual stockbroker or contact one of the brokers listed on the NZX website <a href="https://nzx.com/investing/find_a_participant" target="_blank">https://nzx.com/investing/find_a_participant</a>
+              </p>
+              
+              <p>
+                <strong class="small-header">Investing outside of New Zealand</strong>
+                If you are resident outside New Zealand and wish to acquire Mega shares, please contact your local share broker to see if they have a relationship with a NZX registered broker or contact a New Zealand-based broker directly. See <a href="https://nzx.com/investing/find_a_participant" target="_blank">https://nzx.com/investing/find_a_participant</a>
+              </p>
+              
+              <p>
+                <strong class="small-header">Managing your shares</strong>
+                Contact Mega’s share registry at <a href="https-au.computershare.com/investor" target="_blank">https-au.computershare.com/investor</a> or 
+              </p>
+              
+              <div class="investors-gray-block">
+                  <strong>Computershare Investor Services Limited</strong><br />
+                  <div class="investors-halfsized-bl">
+                     <div>Private Bag 92 119, </div>
+                     <div>Auckland 1142 </div>
+                     <div>New Zealand </div>
+                  </div>
+                  <div class="investors-halfsized-bl second">
+                     <div>Telephone <a href="tel:6494888777">+64 9 488 8777</a> </div>
+                     <div>Facsimile <a href="tel:6494888787">+64 9 488 8787</a> </div>
+                  </div>
+                  <div class="clear"></div>
+              </div>
+              
+              <p>
+                <strong class="small-header">Upcoming Events</strong>
+              </p>
+              
+              <div class="investors-table-bl">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <span class="red-date">May - June 2015</span>
+                    </td>
+                    <td>
+                      <span>Annual report issued</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p>
+                <strong class="small-header">Past Events</strong>
+              </p>
+              
+              <div class="investors-table-bl">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td>
+                      <span class="date">XX November 2014</span>
+                    </td>
+                    <td>
+                      <span>Completion of Merger of Mega with TRS Investments Ltd</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p>
+                <strong class="small-header">Share Capital</strong>
+              </p>
+              
+              <div class="investors-table-bl">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr class="investors-table-header">
+                    <td>
+                      <span>Date</span>
+                    </td>
+                    <td>
+                      <span>Number of Shares</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>XX October 2014</span>
+                    </td>
+                    <td>
+                      <span>747,000,000</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p>
+                <strong class="small-header">Dividends</strong>
+                Mega has not declared or paid any dividends.
+              </p>
+              
+              <p>
+                <strong class="small-header">Key data</strong>
+              </p>
+              
+              <div class="investors-table-bl">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr class="investors-table-header">
+                    <td>
+                      <span></span>
+                    </td>
+                    <td>
+                      <span>Registered Users</span>
+                    </td>
+                    <td>
+                      <span>Files Uploaded</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>24 January 2013</span>
+                    </td>
+                    <td>
+                      <span>1,000,000</span>
+                    </td>
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>23 November 2013</span>
+                    </td>
+                    <td>
+                      <span>5,000,000</span>
+                    </td>
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>2 April 2014</span>
+                    </td>
+                    <td>
+                      <span>7,500,000</span>
+                    </td>
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>31 July 2014</span>
+                    </td>
+                    <td>
+                      <span>10,300,000</span>
+                    </td>
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>31 August 2014</span>
+                    </td>
+                    <td>
+                      <span>11,000,000</span>
+                    </td>
+                    <td>
+                      <span></span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p class="investors-bottom-block">
+                <span class="investors-bottom-link"><strong>Company Announcements and Presentations</strong> <a href="">(view all)</a></span>
+                <span class="investors-bottom-link"><strong>Financial Reports</strong> <a href="">(view all)</a></span>
+                <span class="investors-bottom-link"><strong>Governance</strong> <a href="">(view all)</a></span>
+                <span class="investors-bottom-link"><strong>Media Materials</strong> <a href="">(view all)</a></span>
+              </p>
+              
+            </div>
+            
+            <div class="new-right-content-block shareholder-reports hidden">
+              <h1>Governance Policies</h1>
+              <p class="investors-low-paragraph">
+                 The current board of Mega includes: 
+              </p>
+              
+              <div class="investors-table-bl">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr class="investors-table-header">
+                    <td>
+                      <span></span>
+                    </td>
+                    <td>
+                      <span>Appointed</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Stephen Hall - Chairman</span>
+                    </td>
+                    <td>
+                      <span>18 August 2014</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Glen Chean</span>
+                    </td>
+                    <td>
+                      <span>xx</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Brian Clarkson</span>
+                    </td>
+                    <td>
+                      <span>18 August 2014</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span>Zhaowu Shen</span>
+                    </td>
+                    <td>
+                      <span>16 June 2014</span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <p>
+                The Board of Mega is be committed to the highest standards of behaviour and accountability and will adopt formal policies to ensure these are achieved, consistent with best practice and stock exchange rules and recommendations regarding corporate governance.
+              </p>
+              
+              <p>
+                <strong class="small-header">Role of the Board</strong>
+                The directors of Mega will be elected by shareholders and will be responsible for the direction and supervision of Mega’s business. The board’s principal responsibilities are:
+              </p>
+              
+              <ul>
+                <li>to create shareholder value through the approval of appropriate corporate strategies with particular regard to return expectations, allocation of resources, financial policy and the review of performance against strategic objectives;</li>
+                <li>to monitor the appointment of senior executives, review their performance, remuneration and succession plans;</li>
+                <li>to ensure that material information is disclosed to the market as soon as possible in a fair, accurate and balanced manner;</li>
+                <li>to approve and foster a corporate culture that requires management and every employee to operate to the highest level of ethical and professional behaviour;</li>
+                <li>to approve major transactions relating to acquisitions and divestments and capital expenditure exceeding delegated authorities;</li>
+                <li>to review operating performance, achievements and the progress of regulatory procedures, against budgets and other performance goals and to monitor corrective action by management;</li>
+                <li>to ensure that appropriate external advice is available to management and the board;</li>
+                <li>to recruit directors and to regularly review and assess board and subcommittee performance;</li>
+                <li>to establish and review processes to assist the effective operation of the board;</li>
+                <li>to select auditors, communicate with shareholders and monitor regulatory compliance; and</li>
+                <li>to ensure governance issues are reviewed periodically and managed appropriately.</li>
+              </ul>
+              
+              <p class="inverstors-low-pad">
+                The performance of the board and individual directors will be reviewed annually.
+              </p>
+              <p class="inverstors-low-pad">
+                The performance of the Chief Executive will be reviewed annually by the board.
+              </p>
+              <p class="inverstors-low-pad">
+                Any director will be able to take independent professional advice at the expense of the company if required.
+              </p>
+              
+              <p>
+                <strong class="small-header">Delegation of Authority</strong>
+                The formulation and implementation of policies and reporting procedures, other than those set out above, has been delegated to management. The board monitors that delegation as part of the formal business of board meetings.
+              </p>
+              
+              <p>
+                <strong class="small-header">Board Membership</strong>
+                The board will initially comprise three non-executive Directors and one executive Director. The board will periodically review its membership and seek to maintain a balance of directors with complementary business expertise and experience who will, at all times, act with an independent mind, in accordance with the highest ethical standards and contribute in a positive and constructive manner to Board discussion and debate. The board will ensure that a majority of the directors are non-executive and have no professional relationship with Mega. Nomination and appointment of new directors will be undertaken by the full Board.
+In accordance with the Mega’s constitution, any newly appointed directors and those retiring by rotation will be subject to re-election at the next annual meeting.
+              </p>
+              
+              <p>
+                <strong class="small-header">Board Membership</strong>
+                Mega will promptly notify the NZSX if any Director or Officer acquires or disposes of Mega securities.
+              </p>
+              
+              <p>
+                <strong class="small-header">Board Committees</strong>
+                The board will address committee membership, function, responsibilities and reporting procedures. Mega will formally constitute two permanent Board Committees, an Audit Committee and a Remuneration Committee.
+The Audit Committee will be regulated by a charter that addresses membership, function, specific responsibilities, and reporting procedures, consistent with the requirements of NZX Listing Rule 3.6.3. It will be chaired by Stephen Hall who is a chartered accountant with significant financial experience. The initial members of the Audit Committee will be Messrs Hall and Jackson. 
+              </p>
+              
+              <p>
+                The Audit Committee responsibilities will include:
+              </p>
+              
+              <ul>
+                <li>reviewing draft annual and half yearly financial statements prior to submission to the board for approval;</li>
+                <li>agreeing with the external auditors on the nature, scope and cost of the audit;</li>
+                <li>reviewing the performance of the external auditors;</li>
+              </ul>
+              
+              <p>
+                The Remuneration Committee will be responsible for:
+              </p>
+              
+              <ul>
+                <li>establishing and reviewing remuneration policy;</li>
+                <li>reviewing succession planning;</li>
+                <li>review and recommendation of governance issues including Board and Committee membership./li>
+              </ul>
+              
+              <p>
+                In setting remuneration policy the Remuneration Committee will take into consideration employee performance and comparable market rates. These procedures are designed to attract, motivate and retain passionate staff. 
+              </p>
+              
+              <p>
+                Currently all directors of Mega will be members of the Remuneration Committee and the committee business will be conducted within Mega board meetings.Currently all directors of Mega will be members of the Remuneration Committee and the committee business will be conducted within Mega board meetings.
+              </p>
+              
+              <p>
+                <strong class="small-header">Shareholder Communication</strong>
+                Mega will ensure that information is provided to shareholders in accordance with the continuous disclosure requirements by release to the New Zealand Stock Exchange and by prompt posting on Mega’s web site. When appropriate, annual and half yearly reports will be supplemented by shareholder newsletters.
+              </p>
+              
+              <p>
+                <strong class="small-header">Risk Management</strong>
+                Mega will establish policies and reporting procedures for management of material business risks. Management will report to Mega to ensure that all material business risks are being managed effectively.
+              </p>
+              
+              <p>
+                Mega will request declarations from the Chief Executive Officer that in his opinion:
+              </p>
+              
+              <ul class="short">
+                <li>the financial records of the company for the financial year have been properly maintained;</li>
+                <li>the financial statements, and the notes for the financial year comply with the accounting standards; </li>
+                <li>the financial statements and notes for the financial year give a true and fair view; </li>
+                <li>any other matters that are prescribed in relation to the financial statements and the notes for the financial year are satisfied; and</li>
+                <li>the declarations are founded on a sound system of risk management and internal control and that the system is operating effectively in all material respects in relation to financial reporting risks.</li>
+              </ul>
+              
+              <p>
+                <strong class="small-header">Governance Principles</strong>
+                The corporate governance principles that will be adopted or followed by the Post Transaction Issuer are generally consistent with the NZX Corporate Governance Best Practice Code with the following exceptions:
+              </p>
+              
+              <ul class="short">
+                <li>the board will not have a separate nomination committee due to the size of the company. This function is undertaken by the full Board acting as the Remuneration Committee.</li>
+              </ul>
+              
+              <p>
+                <strong class="small-header">Other Policies</strong>
+                Mega has promulgated the following policies: 
+              </p>
+              
+              <div class="investors-bottom-link"><strong>Code of Ethics</strong> <a href="">(view)</a></div>
+              <div class="investors-bottom-link"><strong>Audit Committee Charter</strong> <a href="">(view)</a></div>
+              <div class="investors-bottom-link"><strong>Remuneration Committee Charter</strong> <a href="">(view)</a></div>
+              <div class="investors-bottom-link">Mega’s services are subject to its <strong>Terms of Service</strong> <a href="" class="short">(view)</a> <strong>and Privacy Policy</strong> <a href="" class="short">(view)</a></div>
+              
+            </div>
+            
+            <div class="new-right-content-block press-releases hidden">
+              <h1>Press releases</h1>
+              <p class="investors-low-paragraph">
+                 All documents on this page are provided in the PDF file format, and are viewable in <a href="http://get.adobe.com/ru/reader/" target="_blank">Adobe Reader</a>
+              </p>
+              <a href="http://get.adobe.com/ru/reader/"  target="_blank" class="investors-reader-button">
+                   <span class="investors-reader-white-pad">
+                       <span class="investors-reader-txt1">Get</span>
+                       <span class="investors-reader-txt2">Adobe Reader</span>
+                   </span>
+              </a>
+              
+              <div class="investors-pdf-head">
+                <p class="left">
+                  <strong class="small-header">Press Releases</strong>
+                </p>
+                <a href="" class="investors-download-all">
+                  Download All
+                </a>
+                <div class="clear"></div>
+              </div>
+              
+              <hr />
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <hr class="pdf-div" />
+              
+              <h1 class="low-pad">Media materials</h1>
+              <p class="investors-low-paragraph">
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <a href="">View brand guidelines page</a>
+              </p>
+              
+              <h1 class="low-pad">Press enquiries</h1>
+              <p class="investors-low-paragraph">
+                 Got a press enquiry? Send your question to our <a href="#contact">public relations team</a>
+              </p>
+              
+              <h1 class="low-pad">Blog</h1>
+              <p class="investors-low-paragraph">
+                 Read and see the latest news about MEGA written by the devs in our <a href="#blog">Blog</a>
+              </p>
+              
+            </div>
+            
+            <div class="new-right-content-block governance-policies hidden">
+              <h1>Shareholder Reports</h1>
+              <p class="investors-low-paragraph">
+                 For a full list of recent company announcements please visit the <a href="" target="_blank">NZX</a> and <a href="" target="_blank">ASX</a><br />
+                 All documents on this page are provided in the PDF file format, and are viewable in <a href="http://get.adobe.com/ru/reader/" target="_blank">Adobe Reader</a>
+              </p>
+              <a href="http://get.adobe.com/ru/reader/"  target="_blank" class="investors-reader-button">
+                   <span class="investors-reader-white-pad">
+                       <span class="investors-reader-txt1">Get</span>
+                       <span class="investors-reader-txt2">Adobe Reader</span>
+                   </span>
+              </a>
+              
+              <div class="investors-pdf-head">
+                <p class="left">
+                  <strong class="small-header">Reports & Presentations</strong>
+                </p>
+                <a href="" class="investors-download-all">
+                  Download All
+                </a>
+                <div class="clear"></div>
+              </div>
+              
+              <hr />
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <div class="investors-pdf-block">
+                <a href="" class="investors-pdf-download">Download</a>
+                <div class="investors-pdf-icon-bl">
+                   <div class="investors-pdf-title">Mega Limited Annual Report 2014</div>
+                   <div class="investors-pdf-date">25 August 2014</div>
+                </div>
+              </div>
+              
+              <hr class="pdf-div" />
+              
+              <h1 class="low-pad">Press releases</h1>
+              <p class="investors-low-paragraph">
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.<br />
+                 <a href="">View press releases</a>
+              </p>
+              
+              <h1 class="low-pad">Blog</h1>
+              <p class="investors-low-paragraph">
+                 Read and see the latest news about MEGA written by our devs and directors.<br />
+                 <a href="#blog">View blog</a>
+              </p>
+              
+            </div>
+            
+            <div class="clear"></div>
+          </div>
+          
+          <div class="nw-bottom-block en">
+            <div class="nw-bottom-pad">
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">MEGA</div>
+                <a href="#privacycompany" class="nw-bottom-link">The Privacy Company</a> <a href="#about" class="nw-bottom-link">About us</a> <a href="#credits" class="nw-bottom-link">Credits</a> <a href="#blog" class="nw-bottom-link">Blog</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Apps</div>
+                <a href="#mobile" class="nw-bottom-link">Mobile Apps</a> <a href="#sync" class="nw-bottom-link">Sync Client</a> <a href="#chrome" class="nw-bottom-link">Chrome App</a> <a href="#firefox" class="nw-bottom-link">Firefox App</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Support</div>
+                <a href="#help" class="nw-bottom-link">Help Centre</a> <a href="#contact" class="nw-bottom-link">Contact Us</a> <a href="#resellers" class="nw-bottom-link">Resellers</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Developers</div>
+                <a href="#dev" class="nw-bottom-link">SDK</a> <a href="#doc" class="nw-bottom-link">Documentation</a> <a href="#affiliates" class="nw-bottom-link">Affiliate Program</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">Legal &amp; policies</div>
+                <a href="#terms" class="nw-bottom-link">Terms of Service</a> <a href="#privacy" class="nw-bottom-link">Privacy Policy</a> <a href="#copyright" class="nw-bottom-link">Copyright</a> <a href="#takedown" class="nw-bottom-link">Takedown Guidance</a> </div>
+              <div class="nw-bottom-column">
+                <div class="nw-bottom-header">INVESTORS</div>
+                <a href="#terms" class="nw-bottom-link">Stock Exchange</a> <a href="#privacy" class="nw-bottom-link">Shareholder Reports</a> <a href="#copyright" class="nw-bottom-link">Press Releases</a> <a href="#takedown" class="nw-bottom-link">Governance Policies</a> </div>
+              <div class="clear"></div>
+            </div>
+            <div class="nw-bottom-pad-bg">
+              <div class="nw-bottom-pad-with-border"> <a href="https://twitter.com/MEGAprivacy" target="_blank" class="nw-bottom-social twitter"></a> <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="nw-bottom-social facebook"></a>
+                <div class="nw-bottom-copyrigths"> Mega Limited 2014 <span>All rights reserved</span> </div>
+                <div class="clear"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+</div>
+
+</body>
+</html>

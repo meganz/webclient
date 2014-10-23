@@ -18,27 +18,25 @@ var blogsearch = false;
 
 function init_blog()
 {
-	api_req({a: 'blob', id: 'blog'}, {
-		callback: function(err, data, ctx) {
-			if (err) return alert("Error fetching the blog data");
+	CMS.get('blog', function(err, data) {
+		if (err) return alert("Error fetching the blog data");
 
-			blogposts = data.buffer;
+		blogposts = data.object;
 		
-			$('#blog_searchinput').bind('focus', function(e) 
-			{
-				if (e.target.value == l[102]) e.target.value='';
-			});	
-			$('#blog_searchinput').bind('blur', function(e) 
-			{
-				if (e.target.value == '') e.target.value=l[102];	
-			});
-			$('#blog_searchinput').bind('keydown', function(e) 
-			{
-				if (e.keyCode == 13) blog_search();
-			});	
-			if (blogid) init_blogarticle();
-			else blog_load();
-		}
+		$('#blog_searchinput').bind('focus', function(e) 
+		{
+			if (e.target.value == l[102]) e.target.value='';
+		});	
+		$('#blog_searchinput').bind('blur', function(e) 
+		{
+			if (e.target.value == '') e.target.value=l[102];	
+		});
+		$('#blog_searchinput').bind('keydown', function(e) 
+		{
+			if (e.keyCode == 13) blog_search();
+		});	
+		if (blogid) init_blogarticle();
+		else blog_load();
 	});
 }
 

@@ -7,7 +7,7 @@ function init_blogarticle()
 
 	var post = blogposts['post_'  + blogid]
 	for (var e in post.attaches) {
-		post.c = fetch_asset(post.c, post.attaches[e])
+		post.c = CMS.imgLoader(post.c, post.attaches[e])
 	}
 			
 	return render_blogarticle()

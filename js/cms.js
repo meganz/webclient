@@ -1,10 +1,8 @@
-// {{{
-// output of scripts/javascript.php
-// I should be replaced with production deploy keys
 var IMAGE_PLACEHOLDER = staticpath + "/images/loading.gif";
 
 (function(window, asmCrypto) {
 
+// I should be replaced with production deploy keys
 var pubkey = asmCrypto.base64_to_bytes('WyJhZGJiMGEwNGQ5YzRiYjMxNWQzMTA2YzQwZjE1YzBmYzNlZmJjMmJmODkyNGU4ODA0NzU5OTk1MDRiNmE0ZGJiMWZjMjZhYTdkNmI1N2Q0YjFjMDhhYTM3ZDQ0MGYxMDJiMDJmZGZiMmE5ZTNlNjAzODVmZGJhODFjZmY5Y2E2OSIsIjAxMDAwMSJd'); 
 pubkey = JSON.parse(asmCrypto.bytes_to_string(pubkey));
 pubkey[0] = asmCrypto.hex_to_bytes(pubkey[0])
@@ -13,12 +11,64 @@ pubkey[1] = asmCrypto.hex_to_bytes(pubkey[1])
 function verify_cms_content(content, signature)
 {
 	var hash = asmCrypto.SHA256.hex(content);
-	signature = asmCrypto.base64_to_bytes(signature);
+
 	try {
 		return asmCrypto.RSA_PSS_SHA256.verify(signature, hash, pubkey);
 	} catch (e) {
 		/* rubbish data, invalid anyways */
 		return false;
+	}
+}
+
+function process_cms_response(socket, next)
+{
+	var bytes = socket.response;
+	var viewer = new Uint8Array(bytes)
+
+	var signature = bytes.slice(2, viewer[0]+2)
+	var mime = ab_to_str(bytes.slice(viewer[0]+2, viewer[0]+2+viewer[1]))
+	var content = bytes.slice(viewer[0]+viewer[1]+2)
+
+	delete bytes;
+
+	if (verify_cms_content(content, signature)) {
+		switch (mime) {
+		case 'image/png':
+		case 'image/gif':
+		case 'image/gif':
+		case 'image/jpg':
+			var blob;
+			try {
+                blob = new Blob([content], { type: mime });
+			} catch (e) {
+                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
+                var bb = new BlobBuilder();
+                for (var i in content) bb.append(content[i]);
+                blob = bb.getBlob(mime)
+			}
+            content = window.URL.createObjectURL(blob);
+			return next(false, { url: content, mime: mime})
+
+		case 'application/json':
+			try {
+				content = JSON.parse(ab_to_str(content))
+			} catch (e) {
+				/* invalid json, weird case */
+				return next(true, {signature: false});
+			}
+			return next(false, { object: content, mime: mime})
+
+		default:
+			var io = new MemoryIO("temp", {});
+			io.begin = function() {};
+			io.setCredentials("", content.byteLength, "", [], []);
+			io.write(content, 0, function() {
+				io.download(data['X-Label'], '');
+			});
+			break;
+		}
+	} else {
+		next(true, {error: 'Invalid signature', signature: true} );
 	}
 }
 
@@ -28,7 +78,26 @@ function img_placeholder(str, sep, id) {
 	return "'" + IMAGE_PLACEHOLDER + "' id='loading_" +  id + "'" 
 }
 
-window.fetch_asset = function(html, id) {
+function CMS() {
+}
+
+CMS.prototype.get = function(id, next) {
+	// I should be replaced with api_req instead of the socket
+	var q = getxhr();
+	q.onload = function() {
+		process_cms_response(q, next);
+	}
+	q.onerror = function() {
+		Later(function() {
+			window.CMS.get(id, next);
+		})
+	};
+	q.responseType = 'arraybuffer';
+	q.open("GET", "/blobs.php?id=" + id);
+	q.send();
+};
+
+CMS.prototype.imgLoader = function(html, id) {
 	if (!assets[id]) {
 		html = html.replace(new RegExp('([\'"])(' + id + ')([\'"])', 'g'), img_placeholder);
 		api_req({a: 'blob', id: id}, {
@@ -45,73 +114,6 @@ window.fetch_asset = function(html, id) {
 }
 
 
-window.cms_content = function(socket, ctx, buffer)
-{
-		var data = {}
-			, headers = ['X-Mega-Authenticity', 'Content-Type', 'X-Label']
-		for (var i in headers) {
-			try {
-				data[headers[i]] = socket.getResponseHeader(headers[i]);
-			} catch (e) {}
-		}
-
-		if (verify_cms_content(socket.response, data['X-Mega-Authenticity'])) {
-			var response = socket.response
-			switch (ctx.expects || data['Content-Type']) {
-			case 'download':
-				var io = new MemoryIO("temp", {});
-				io.begin = function() {};
-				io.setCredentials("", response.byteLength, "", [], []);
-				io.write(response, 0, function() {
-					io.download(data['X-Label'], '');
-				});
-				break;
-
-			case 'url':
-				var blob;
-				try {
-                    blob = new Blob([response], { type: data['Content-Type'] });
-				} catch (e) {
-                    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-                    var bb = new BlobBuilder();
-                    for (var i in response) bb.append(response[i]);
-                    blob = bb.getBlob(data['Content-Type'])
-				}
-                response = window.URL.createObjectURL(blob);
-				break;
-
-			case 'application/json':
-				try {
-					response = JSON.parse(ab_to_str(response))
-				} catch (e) {
-					/* invalid json, weird case */
-					return ctx.callback(true, {} , ctx);
-				}
-				break;
-			}
-			ctx.callback(false, { buffer: response, blob: response, mime: data['Content-Type']}, ctx);
-		} else {
-			ctx.callback(true, {} , ctx);
-		}
-}
+window.CMS = new CMS;
 
 })(this, asmCrypto)
-// }}}
-
-/* This is criminal, but it works! (This won't be on production) */
-old_api_req = api_req;
-api_req = function(req, ctx, c)
-{
-	if (req.a == "blob") {
-		var q = getxhr();
-		q.onload = function() {
-			cms_content(q, ctx);
-		};
-		q.responseType = 'arraybuffer';
-		q.open("GET", "/blobs.php?id=" + req.id);
-		q.send();
-		return;
-	}
-
-	return old_api_req(req, ctx, c);
-};

@@ -2534,7 +2534,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		else window.onerror('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''), '', -1);
+		else srvlog('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''));
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -2933,8 +2933,7 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		window.onerror('onUploadError :: ' + errorstr
-			+ ' [' + details.join("] [") + ']', '', -1);
+		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);

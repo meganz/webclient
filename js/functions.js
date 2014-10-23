@@ -349,26 +349,27 @@ function removeHash () {
 
 function browserdetails(useragent)
 {
-	useragent = ' ' + useragent;
+	useragent = (' ' + useragent).toLowerCase();
 	var os = false;
 	var browser = false;
 	var icon = '';
 	var name = '';
-	if (useragent.toLowerCase().indexOf('android') > 0) os = 'Android';
-	else if (useragent.toLowerCase().indexOf('windows') > 0) os = 'Windows';
-	else if (useragent.toLowerCase().indexOf('iphone') > 0) os = 'iPhone';
-	else if (useragent.toLowerCase().indexOf('imega') > 0) os = 'iPhone';
-	else if (useragent.toLowerCase().indexOf('ipad') > 0) os = 'iPad';
-	else if (useragent.toLowerCase().indexOf('mac') > 0) os = 'Apple';
-	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'Linux';
-	else if (useragent.toLowerCase().indexOf('linux') > 0) os = 'MEGAsync';
-	else if (useragent.toLowerCase().indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.toLowerCase().indexOf('chrome') > 0) browser = 'Chrome';
-	else if (useragent.toLowerCase().indexOf('safari') > 0) browser = 'Safari';
-	else if (useragent.toLowerCase().indexOf('opera') > 0) browser = 'Opera';
-	else if (useragent.toLowerCase().indexOf('firefox') > 0) browser = 'Firefox';
-	else if (useragent.toLowerCase().indexOf('msie') > 0) browser = 'Internet Explorer';
-	else if (useragent.toLowerCase().indexOf('megasync') > 0) browser = 'MEGAsync';
+	if (useragent.indexOf('android') > 0) os = 'Android';
+	else if (useragent.indexOf('windows') > 0) os = 'Windows';
+	else if (useragent.indexOf('iphone') > 0) os = 'iPhone';
+	else if (useragent.indexOf('imega') > 0) os = 'iPhone';
+	else if (useragent.indexOf('ipad') > 0) os = 'iPad';
+	else if (useragent.indexOf('mac') > 0) os = 'Apple';
+	else if (useragent.indexOf('linux') > 0) os = 'Linux';
+	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
+	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
+	if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
+	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
+	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
+	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
+	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+	else if (useragent.indexOf('msie') > 0
+		|| "ActiveXObject" in window) browser = 'Internet Explorer';
 	if ((os) && (browser))
 	{
 		name = browser + ' on ' + os;
@@ -394,6 +395,7 @@ function browserdetails(useragent)
 	var browserdetails = {};
 	browserdetails.name = name;
 	browserdetails.icon = icon;
+	browserdetails.browser = browser;
 	return browserdetails;
 }
 
@@ -969,6 +971,12 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
+function srvlog(msg,data)
+{
+	if (d) console.error(msg);
+	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+}
+
 function oDestroy(obj) {
 	if (typeof(d) !== "undefined" && d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
@@ -1376,7 +1384,7 @@ function setupTransferAnalysis()
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
 						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
-						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
+						if (!d) srvlog(t + ' Stuck. ' + r, udata);
 					}
 					delete prev[i];
 				}

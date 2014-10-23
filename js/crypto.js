@@ -1913,29 +1913,358 @@ function api_storefileattr(id,type,key,data,ctx)
 	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
 }
 
-function api_faretry(ctx, error, host)
+function api_getfileattr(fa,type,procfa,errfa)
 {
-	if (!ctx.p)
+	var r, n, t;
+
+	var p = {};
+	var h = {};
+	var k = {};
+
+	var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
+
+	for (n in fa)
 	{
-		if (!ctx.fastrgri) ctx.fastrgri = 400;
-
-		if (ctx.fastrgri < 22801)
+		if (r = re.exec(fa[n].fa))
 		{
-			if (d) console.log("Attribute storage failed (" + error + "), retrying...", ctx.fastrgri);
-
-			return setTimeout(function()
+			t = base64urldecode(r[2]);
+			if (t.length == 8)
 			{
-				ctx.startTime = Date.now();
-				api_storefileattr(null,null,null,null,ctx);
+				if (!h[t])
+				{
+					h[t] = n;
+					k[t] = fa[n].k;
+				}
 
-			}, ctx.fastrgri += 800);
+				if (!p[r[1]]) p[r[1]] = t;
+				else p[r[1]] += t;
+			}
 		}
+		else if (errfa) errfa(n);
 	}
 
-	var msg = "File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")";
+	for (n in p)
+	{
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW()};
+		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
+	}
+}
 
-	if (d) console.error(msg);
-	else onerror(msg, '', -1);
+function fa_handler(xhr, ctx)
+{
+	var chunked = ctx.p && fa_handler.chunked;
+
+	this.xhr = xhr;
+	this.ctx = ctx;
+	this.pos = 0;
+
+	if (chunked)
+	{
+		if (!fa_handler.browser) fa_handler.browser = browserdetails(ua).browser;
+
+		switch(fa_handler.browser)
+		{
+			case 'Firefox':
+				this.parse = this.moz_parser;
+				this.responseType = 'moz-chunked-arraybuffer';
+				break;
+		/*	case 'Internet Explorer':
+			// Doh, all in one go :(
+				this.parse = this.stream_parser;
+				this.responseType = 'ms-stream';
+				this.stream_reader= this.msstream_reader;
+				break;
+		*/	case 'xChrome':
+				this.parse = this.stream_parser;
+				this.responseType = 'stream';
+				break;
+			default:
+				this.setParser('text');
+		}
+
+		this.done = this.Finish;
+	}
+	else
+	{
+		this.responseType = 'arraybuffer';
+		if (ctx.p) this.proc = this.GetFA;
+		else this.proc = this.PutFA;
+		this.done = this.onDone;
+	}
+
+	if (d) console.log('fah type:', this.responseType);
+}
+fa_handler.chunked = true;
+fa_handler.prototype =
+{
+	PutFA : function(response)
+	{
+		var ctx = this.ctx;
+
+		if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
+
+		if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
+
+		storedattr[ctx.id][ctx.type] = ab_to_base64(response);
+
+		if (storedattr[ctx.id].target)
+		{
+			if (d) console.log("Attaching to existing file");
+			api_attachfileattr(storedattr[ctx.id].target,ctx.id);
+		}
+	},
+
+	GetFA : function(response)
+	{
+		var buffer = new Uint8Array(response);
+		var dv = new DataView(response);
+		var bod = -1, ctx = this.ctx;
+		var h, j, p, l, k;
+
+		i = 0;
+
+		// response is an ArrayBuffer structured
+		// [handle.8 position.4] data
+		do {
+			p = dv.getUint32(i+8,true);
+			if (bod < 0) bod = p;
+
+			if (i >= bod-12) l = response.byteLength-p;
+			else l = dv.getUint32(i+20,true)-p;
+
+			h = '';
+
+			for (j = 0; j < 8; j++) h += String.fromCharCode(buffer[i+j]);
+			if (!ctx.h[h]) break;
+
+			if ((k = ctx.k[h]))
+			{
+				var ts = new Uint8Array(response,p,l);
+
+				var td = asmCrypto.AES_CBC.decrypt( ts, a32_to_ab( [ k[0]^k[4], k[1]^k[5], k[2]^k[6], k[3]^k[7] ] ), false );
+
+				ctx.procfa(ctx,ctx.h[h],td);
+			}
+
+			i += 12;
+		} while (i < bod);
+	},
+
+	setParser : function(type, parser)
+	{
+		if (type)
+		{
+			if (type === 'text') this.parse = this.str_parser;
+			else this.parse = parser.bind(this);
+			this.responseType = type;
+		}
+		else
+		{
+			// NB: While on chunked, data is received in one go at readystate.4
+			this.parse = this.ab_parser;
+			this.responseType = 'arraybuffer';
+		}
+		if (this.xhr.readyState == 1)
+		{
+			this.xhr.responseType = this.responseType;
+			if (d) console.log('New fah type:', this.xhr.responseType);
+		}
+	},
+
+	str_parser : function(data)
+	{
+		if (this.xhr.readyState > 2) this.pos += this.ab_parser(str_to_ab(data.slice(this.pos))) | 0;
+	},
+
+	msstream_reader : function(stream)
+	{
+		var self = this;
+		var reader = new MSStreamReader();
+		reader.onload = function(ev)
+		{
+			if (d) console.log('MSStream result', ev.target);
+
+			self.moz_parser(ev.target.result);
+			self.stream_parser(0x9ff);
+		};
+		reader.onerror = function(e)
+		{
+			if (d) console.error('MSStream error', e);
+			self.stream_parser(0x9ff);
+		};
+		reader.readAsArrayBuffer(stream);
+	},
+
+	stream_reader : function(stream)
+	{
+		var self = this;
+		stream.readType = 'arraybuffer';
+		stream.read().then(function(result)
+		{
+			if (d) console.log('Stream result', result);
+
+			self.moz_parser(result.data);
+			self.stream_parser(0x9ff);
+		},
+		function(e)
+		{
+			if (d) console.error('Stream error', e);
+			self.stream_parser(0x9ff);
+		});
+	},
+
+	stream_parser : function(stream, ev)
+	{
+		// www.w3.org/TR/streams-api/
+		// https://code.google.com/p/chromium/issues/detail?id=240603
+
+		if (d) console.log('Stream Parser', stream);
+
+		if (stream === 0x9ff)
+		{
+			if (this.wstream)
+			{
+				if (this.wstream.length)
+				{
+					this.stream_reader(this.wstream.shift());
+				}
+				if (!this.wstream.length) delete this.wstream;
+			}
+		}
+		else if (this.wstream)
+		{
+			this.wstream.push(stream);
+		}
+		else
+		{
+			this.wstream = [];
+			this.stream_reader(stream);
+		}
+	},
+
+	moz_parser : function(response, ev)
+	{
+		if (response instanceof ArrayBuffer && response.byteLength > 0)
+		{
+			response = new Uint8Array(response);
+			if (this.chunk)
+			{
+				var tmp = new Uint8Array(this.chunk.byteLength + response.byteLength);
+				tmp.set(this.chunk)
+				tmp.set(response, this.chunk.byteLength);
+				this.chunk = tmp;
+			}
+			else this.chunk = response;
+
+			var offset = this.ab_parser(this.chunk.buffer);
+			if (offset) this.chunk = this.chunk.subarray(offset);
+		}
+	},
+
+	ab_parser : function(response, ev)
+	{
+		if (response instanceof ArrayBuffer)
+		{
+			var buffer = new Uint8Array(response), dv = new DataView(response), c = 0;
+			var xhr = this.xhr, ctx = this.ctx, i = 0, p, h, k, l = buffer.byteLength;
+
+			while (i+12 < l)
+			{
+				p = dv.getUint32(i+8,true);
+				if (i+12+p > l) break;
+				h = String.fromCharCode.apply(String, buffer.subarray(i,i+8));
+				// if (d) console.debug(ctx.h[h], i, p, !!ctx.k[h]);
+
+				i += 12;
+				if (ctx.h[h] && (k = ctx.k[h]))
+				{
+					var ts = buffer.subarray(i,p+i);
+					var td = asmCrypto.AES_CBC.decrypt( ts, a32_to_ab( [ k[0]^k[4], k[1]^k[5], k[2]^k[6], k[3]^k[7] ] ), false );
+
+					++c;
+					ctx.procfa(ctx,ctx.h[h],td);
+				}
+				i += p;
+			}
+
+			if (d) console.log('ab_parser.r', i, p, !!h, c);
+
+			return i;
+		}
+	},
+
+	onDone : function(ev)
+	{
+		var ctx = this.ctx, xhr = this.xhr;
+
+		if (xhr.status == 200 && typeof xhr.response == 'object')
+		{
+			if (!xhr.response || xhr.response.byteLength === 0)
+			{
+				if (d) console.warn('api_fareq: got empty response...', xhr.response);
+				xhr.faeot();
+			}
+			else
+			{
+				this.proc(xhr.response);
+				faxhrlastgood[xhr.fa_host] = Date.now();
+			}
+		}
+		else
+		{
+			if (ctx.p)
+			{
+				if (d) console.log("File attribute retrieval failed (" + xhr.status + ")");
+				xhr.faeot();
+			}
+			else
+			{
+				api_faretry(ctx, xhr.status, xhr.fa_host);
+			}
+		}
+
+		this.Finish();
+	},
+
+	Finish : function()
+	{
+		var pending = this.chunk && this.chunk.byteLength || (this.pos && this.xhr.response.substr(this.pos).length);
+
+		if (pending)
+		{
+			if (!fa_handler.errors) fa_handler.errors = 0;
+
+			if (++fa_handler.errors == 3) fa_handler.chunked = false;
+
+			srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
+		}
+
+		oDestroy(this);
+	}
+};
+
+function api_faretry(ctx, error, host)
+{
+	if (ctx.faRetryI) ctx.faRetryI *= 1.8;
+	else ctx.faRetryI = 250;
+
+	if (ctx.faRetryI < 5e5)
+	{
+		if (d) console.log("Attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + "), retrying...", ctx.faRetryI);
+
+		return setTimeout(function()
+		{
+			ctx.startTime = Date.now();
+			if (ctx.p)
+			{
+				api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
+			}
+			else api_storefileattr(null,null,null,null,ctx);
+
+		}, ctx.faRetryI);
+	}
+
+	srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
 }
 
 function api_fareq(res,ctx,xhr)
@@ -1947,7 +2276,7 @@ function api_fareq(res,ctx,xhr)
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		window.onerror('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error,'',-1);
+		srvlog('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
 	}
 
 	if ( error )
@@ -1977,30 +2306,27 @@ function api_fareq(res,ctx,xhr)
 				if (faxhrs[slot].readyState == XMLHttpRequest.DONE) break;
 			}
 
-			faxhrs[slot].ctx = ctx;
-			faxhrs[slot].fa_slot = slot;
+			faxhrs[slot].ctx        = ctx;
+			faxhrs[slot].fa_slot    = slot;
+			faxhrs[slot].fa_timeout = ctx.errfa && ctx.errfa.timeout;
+			faxhrs[slot].fah        = new fa_handler(faxhrs[slot], ctx);
 
 			if (d) console.log("Using file attribute channel " + slot);
 
-			if (ctx.errfa && ctx.errfa.timeout)
+			faxhrs[slot].onprogress = function(ev)
 			{
-				faxhrs[slot].fa_timeout = ctx.errfa.timeout;
+				if (d>1) console.log('fah ' + ev.type, this.readyState, ev.loaded, ev.total,
+					typeof this.response === 'string' ? this.response.substr(0,12).split("")
+						.map(function(n) {return (n.charCodeAt(0) & 0xff).toString(16)}).join("."):this.response, ev);
 
-				faxhrs[slot].onprogress = function()
+				if (this.fa_timeout)
 				{
 					if (this.fart) clearTimeout(this.fart);
 					this.fart = setTimeout(this.faeot.bind(this), this.fa_timeout);
-				};
-			}
-			else
-			{
-				delete faxhrs[slot].onprogress;
-
-				if (faxhrs[slot].onprogress)
-				{ // Huh? Gecko..
-					faxhrs[slot].onprogress = function() {};
 				}
-			}
+
+				if (this.fah.parse && this.response) this.fah.parse(this.response, ev);
+			};
 
 			faxhrs[slot].faeot = function()
 			{
@@ -2015,7 +2341,7 @@ function api_fareq(res,ctx,xhr)
 						var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 
 						if (d) console.error('FAEOT', id, this);
-						else window.onerror('api_fareq: eot for ' + this.fa_host, '', -1);
+						else srvlog('api_fareq: eot for ' + this.fa_host);
 
 						if (id !== slideshowid)
 						{
@@ -2047,105 +2373,30 @@ function api_fareq(res,ctx,xhr)
 				if (ctx.errfa) ctx.errfa(id,1);
 				else
 				{
-					console.error('api_fareq', id, this);
+					if (d) console.error('api_fareq', id, this);
 
 					api_faretry(this.ctx, ETOOERR, this.fa_host);
 				}
-			}
+			};
 
-			faxhrs[slot].onreadystatechange = function()
+			faxhrs[slot].onreadystatechange = function(ev)
 			{
-				if (this.onprogress) this.onprogress();
+				this.onprogress(ev);
 
-				if (this.readyState == 2)
+				if (this.startTime && this.readyState == 2)
 				{
 					if (!d && (Date.now() - this.startTime) > 10000)
 					{
-						window.onerror('api_fareq: ' + this.fa_host + ' took +10s', '', -1);
-						delete this.startTime;
+						srvlog('api_fareq: ' + this.fa_host + ' took +10s');
 					}
+					delete this.startTime;
 				}
-				else if (this.readyState == this.DONE)
-				{
-					var ctx = this.ctx;
 
+				if (this.readyState == 4)
+				{
 					if (this.fart) clearTimeout(this.fart);
 
-					if (this.status == 200 && typeof this.response == 'object')
-					{
-						if (!this.response || this.response.byteLength === 0)
-						{
-							if (d) console.warn('api_fareq: got empty response...', this.response);
-
-							return this.faeot();
-						}
-
-						if (ctx.p)
-						{
-							var buffer = new Uint8Array(this.response);
-							var dv = new DataView(this.response);
-							var bod = -1;
-							var h, j, p, l, k;
-
-							i = 0;
-
-							// response is an ArrayBuffer structured
-							// [handle.8 position.4] data
-							do {
-								p = dv.getUint32(i+8,true);
-								if (bod < 0) bod = p;
-
-								if (i >= bod-12) l = this.response.byteLength-p;
-								else l = dv.getUint32(i+20,true)-p;
-
-								h = '';
-
-								for (j = 0; j < 8; j++) h += String.fromCharCode(buffer[i+j]);
-
-								if (!ctx.h[h]) break;
-
-								if (k = ctx.k[h])
-								{
-									var ts = new Uint8Array(this.response,p,l);
-
-									var td = asmCrypto.AES_CBC.decrypt( ts, a32_to_ab( [ k[0]^k[4], k[1]^k[5], k[2]^k[6], k[3]^k[7] ] ), false );
-
-									ctx.procfa(ctx,ctx.h[h],td);
-								}
-
-								i += 12;
-							} while (i < bod);
-						}
-						else
-						{
-							if (d) console.log("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
-
-							if (!storedattr[ctx.id]) storedattr[ctx.id] = {};
-
-							storedattr[ctx.id][ctx.type] = ab_to_base64(this.response);
-
-							if (storedattr[ctx.id].target)
-							{
-								if (d) console.log("Attaching to existing file");
-
-								api_attachfileattr(storedattr[ctx.id].target,ctx.id);
-							}
-						}
-
-						faxhrlastgood[this.fa_host] = Date.now();
-					}
-					else
-					{
-						if (ctx.p)
-						{
-							if (d) console.log("File attribute retrieval failed (" + this.status + ")");
-							this.faeot();
-						}
-						else
-						{
-							api_faretry(ctx, this.status, this.fa_host);
-						}
-					}
+					this.fah.done(ev);
 				}
 			};
 
@@ -2182,9 +2433,9 @@ function api_fareq(res,ctx,xhr)
 				faxhrs[slot].fa_host = hostname(pp[m].substr(0,t+1));
 				faxhrs[slot].open('POST',pp[m].substr(0,t+1),true);
 
-				if (!(ctx.errfa && ctx.errfa.timeout))
+				if (!faxhrs[slot].fa_timeout)
 				{
-					faxhrs[slot].timeout = 180000;
+					faxhrs[slot].timeout = 140000;
 					faxhrs[slot].ontimeout = function(e)
 					{
 						if (d) console.error('api_fareq timeout', e);
@@ -2196,13 +2447,20 @@ function api_fareq(res,ctx,xhr)
 								faxhrfail[this.fa_host] = failtime = 1;
 								api_reportfailure(this.fa_host, function() {});
 
-								if (!d) window.onerror('api_fareq: 180s timeout for ' + this.fa_host, '', -1);
+								if (!d) srvlog('api_fareq: 140s timeout for ' + this.fa_host);
 							}
 						}
 					};
 				}
 
-				faxhrs[slot].responseType = 'arraybuffer';
+				faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
+				if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType)
+				{
+					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType);
+					faxhrs[slot].fah.setParser('text');
+				}
+				if ("text" === faxhrs[slot].responseType)
+					faxhrs[slot].overrideMimeType('text/plain; charset=x-user-defined');
 				if (chromehack) faxhrs[slot].setRequestHeader("MEGA-Chrome-Antileak",pp[m].substr(t));
 				faxhrs[slot].startTime = Date.now();
 				faxhrs[slot].send(data);
@@ -2229,43 +2487,6 @@ function api_attachfileattr(node,id)
 	storedattr[id].target = node;
 
 	if (fa) api_req({a : 'pfa', n : node, fa : fa});
-}
-
-function api_getfileattr(fa,type,procfa,errfa)
-{
-	var r, n, t;
-
-	var p = {};
-	var h = {};
-	var k = {};
-
-	var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
-
-	for (n in fa)
-	{
-		if (r = re.exec(fa[n].fa))
-		{
-			t = base64urldecode(r[2]);
-			if (t.length == 8)
-			{
-				if (!h[t])
-				{
-					h[t] = n;
-					k[t] = fa[n].k;
-				}
-
-				if (!p[r[1]]) p[r[1]] = t;
-				else p[r[1]] += t;
-			}
-		}
-		else if (errfa) errfa(n);
-	}
-
-	for (n in p)
-	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW()};
-		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl},ctx);
-	}
 }
 
 // generate crypto request response for the given nodes/shares matrix

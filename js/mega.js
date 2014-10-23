@@ -1041,9 +1041,11 @@ function MegaData ()
 			{
 				for (var i in M.v)
 				{
-					var ext = fileext(M.v[i].name);
-					var images = '|jpg|gif|png|';
-					if (images.indexOf('|'+ext+'|') >= 0) viewmode=1;
+					if (is_image(M.v[i]))
+					{
+						viewmode = 1;
+						break;
+					}
 				}
 			}
 			M.viewmode=viewmode;

@@ -20,25 +20,23 @@ function verify_cms_content(content, signature)
 	}
 }
 
-function process_cms_response(socket, next)
+function process_cms_response(socket, next, as)
 {
 	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
 
 	var signature = bytes.slice(2, 66); // 64 bytes, signature
-	var mime = ab_to_str(bytes.slice(66, viewer[0]+66)) // mime
-	var label = ab_to_str(bytes.slice(viewer[0]+66, viewer[0]+viewer[1]+66));
-	var content = bytes.slice(viewer[0]+viewer[1]+66)
+	var mime = viewer[0]
+	var label = ab_to_str(bytes.slice(66, viewer[1]+66));
+	var content = bytes.slice(viewer[1]+66)
 
 	delete bytes;
 
+	if (as == "download") mime = 3;
+
 	if (verify_cms_content(content, signature)) {
 		switch (mime) {
-		case 'image/png':
-		case 'image/gif':
-		case 'image/gif':
-		case 'image/jpeg':
-		case 'image/jpg':
+		case 1:
 			var blob;
 			try {
                 blob = new Blob([content], { type: mime });
@@ -51,7 +49,7 @@ function process_cms_response(socket, next)
             content = window.URL.createObjectURL(blob);
 			return next(false, { url: content, mime: mime})
 
-		case 'application/json':
+		case 2:
 			try {
 				content = JSON.parse(ab_to_str(content))
 			} catch (e) {
@@ -65,7 +63,7 @@ function process_cms_response(socket, next)
 			io.begin = function() {};
 			io.setCredentials("", content.byteLength, "", [], []);
 			io.write(content, 0, function() {
-				io.download(label, '');
+				io.download(label, 'application/octet-stream');
 			});
 			break;
 		}
@@ -76,22 +74,34 @@ function process_cms_response(socket, next)
 
 var assets = {};
 
-function img_placeholder(str, sep, id) {
-	return "'" + IMAGE_PLACEHOLDER + "' id='loading_" +  id + "'" 
+$(document).on('click', '*[data-cms-dl]', function(e) {
+	window.CMS.get($(this).data('cms-dl'), function() {
+	}, 'download');
+	return false;
+});
+
+var is_img
+function dl_placeholder(str, sep, rid, id) {
+	return "'" + Math.random() + "' data-cms-dl='"+id+"'"
+}
+
+function img_placeholder(str, sep, rid, id) {
+	is_img = true;
+	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
 }
 
 function CMS() {
 }
 
-CMS.prototype.get = function(id, next) {
+CMS.prototype.get = function(id, next, as) {
 	// I should be replaced with api_req instead of the socket
 	var q = getxhr();
 	q.onload = function() {
-		process_cms_response(q, next);
+		process_cms_response(q, next, as);
 	}
 	q.onerror = function() {
 		Later(function() {
-			window.CMS.get(id, next);
+			window.CMS.get(id, next, as);
 		})
 	};
 	q.responseType = 'arraybuffer';
@@ -101,14 +111,20 @@ CMS.prototype.get = function(id, next) {
 
 CMS.prototype.imgLoader = function(html, id) {
 	if (!assets[id]) {
-		html = html.replace(new RegExp('([\'"])(' + id + ')([\'"])', 'g'), img_placeholder);
+		is_img = false;
+		// replace images
+		html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
+		// replace download links
+		html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
 		
-		window.CMS.get(id, function(err, obj) {
-			$('#loading_' + id).attr({'id': '', 'src': obj.url})
-			assets[id] = obj.url;
-		});
+		if (is_img) {
+			window.CMS.get(id, function(err, obj) {
+				$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
+				assets[id] = obj.url;
+			});
+		}
 	} else {
-		html = html.replace(IMAGE_PLACEHOLDER + "' id='loading_" + id, assets[id]);
+		html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
 	}
 	return html;
 }

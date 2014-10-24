@@ -25,9 +25,10 @@ function process_cms_response(socket, next)
 	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
 
-	var signature = bytes.slice(2, viewer[0]+2)
-	var mime = ab_to_str(bytes.slice(viewer[0]+2, viewer[0]+2+viewer[1]))
-	var content = bytes.slice(viewer[0]+viewer[1]+2)
+	var signature = bytes.slice(2, 66); // 64 bytes, signature
+	var mime = ab_to_str(bytes.slice(66, viewer[0]+66)) // mime
+	var label = ab_to_str(bytes.slice(viewer[0]+66, viewer[0]+viewer[1]+66));
+	var content = bytes.slice(viewer[0]+viewer[1]+66)
 
 	delete bytes;
 
@@ -36,6 +37,7 @@ function process_cms_response(socket, next)
 		case 'image/png':
 		case 'image/gif':
 		case 'image/gif':
+		case 'image/jpeg':
 		case 'image/jpg':
 			var blob;
 			try {
@@ -63,7 +65,7 @@ function process_cms_response(socket, next)
 			io.begin = function() {};
 			io.setCredentials("", content.byteLength, "", [], []);
 			io.write(content, 0, function() {
-				io.download(data['X-Label'], '');
+				io.download(label, '');
 			});
 			break;
 		}
@@ -100,12 +102,10 @@ CMS.prototype.get = function(id, next) {
 CMS.prototype.imgLoader = function(html, id) {
 	if (!assets[id]) {
 		html = html.replace(new RegExp('([\'"])(' + id + ')([\'"])', 'g'), img_placeholder);
-		api_req({a: 'blob', id: id}, {
-			expects: 'url',
-			callback: function(err,url) {
-				$('#loading_' + id).attr({'id': '', 'src': url.blob})
-				assets[id] = url.blob;
-			}
+		
+		window.CMS.get(id, function(err, obj) {
+			$('#loading_' + id).attr({'id': '', 'src': obj.url})
+			assets[id] = obj.url;
 		});
 	} else {
 		html = html.replace(IMAGE_PLACEHOLDER + "' id='loading_" + id, assets[id]);

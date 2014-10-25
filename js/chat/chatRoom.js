@@ -410,6 +410,12 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
     });
 
     self.bind('local-media-fail', function(e, eventData) {
+        if (eventData.continue) {
+            eventData.wait = true;
+            eventData.continue(true);
+            return;
+        }
+
         if(self.callRequest) {
             self._cancelCallRequest();
         }

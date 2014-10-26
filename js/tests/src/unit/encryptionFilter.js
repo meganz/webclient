@@ -18,6 +18,10 @@ describe("EncryptionFilter", function() {
             return "user1@jid.com/res";
         };
 
+        this.getBareJid = function() {
+            return "user1@jid.com";
+        };
+
         this.sendPing = function() {
             var $promise = new $.Deferred();
             $promise.resolve();
@@ -460,7 +464,8 @@ describe("EncryptionFilter", function() {
                         },
                         "contents": "hello world",
                         "elements": "",
-                        "delay": 123
+                        "delay": 123,
+                        "seen": ""
                     }
                 )
             );
@@ -590,7 +595,7 @@ describe("EncryptionFilter", function() {
             expect(
                 JSON.stringify(encryptionFilter.processMessage.getCall(0).args[2])
             ).to.eql(
-                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"message":"?mpENC:[encrypted contents]","from":"' + otherUserJid + '"}'
+                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"seen":"","message":"?mpENC:[encrypted contents]","from":"' + otherUserJid + '"}'
                 );
 
             done();

@@ -974,7 +974,7 @@ function ASSERT(what, msg, udata) {
 function srvlog(msg,data)
 {
 	if (d) console.error(msg);
-	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
 }
 
 function oDestroy(obj) {

@@ -351,7 +351,7 @@ var JinglePlugin = {
     // Add a 'handled-elsewhere' handler that will invalidate the call request if a notification
     // is received that another resource answered/declined the call
         elsewhereHandler = self.connection.addHandler(function(msg) {
-            if ($(msg).attr('sid') != sid)
+            if ($(msg).attr('sid') !== sid)
                 return true;
             if (!cancelHandler)
                 return;
@@ -412,7 +412,9 @@ var JinglePlugin = {
             return ((tsTillUser > Date.now()) && (cancelHandler != null));
         };
         var strPeerMedia = $(callmsg).attr('media');
-        var peerMedia = strPeerMedia?self.peerMediaToObj(strPeerMedia):undefined;
+        if (typeof strPeerMedia !== 'string')
+            throw new Error("'media' attribute missing from call request stanza");
+        var peerMedia = self.peerMediaToObj(strPeerMedia);
 // Notify about incoming call
         self.onIncomingCallRequest.call(self.eventHandler, {
             peer:from,
@@ -617,12 +619,10 @@ var JinglePlugin = {
         return fps.join(';');
     },
     peerMediaToObj: function(peerMediaStr) {
-        var res = {};
-        if (!peerMediaStr) {
-            console.error("media attribute missing from megaCall request or is empty");
-            return res;
+        if ((peerMediaStr === null) || (peerMediaStr === undefined)) {
+            throw new Error("media attribute missing from megaCall request or is empty");
         }
-        
+        var res = {};
         if (peerMediaStr.indexOf('a') > -1)
             res.audio = true;
         if (peerMediaStr.indexOf('v') > -1)

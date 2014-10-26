@@ -39,15 +39,19 @@
 
 //        localStorage.contextmenu=1;
 
-//        localStorage.megachat = 1;
         localStorage.jj = 1;
 //        localStorage.dxmpp = 1;
 //        localStorage.stopOnAssertFail = 1;
         localStorage.d = 1;
 
-//        localStorage.webrtcStatsEnabled = 1; // enabled remote stats logging for rtc call
-
 //        localStorage.chatDisabled = 1;
+
+        if(window.location.host == "mega.dev") { // lp local env settings
+            localStorage.mpencDebug = 1;
+            localStorage.dxmpp = 1;
+            localStorage.stopOnAssertFail = 1;
+            localStorage.contextmenu=1;
+        }
 
         window.location = '../index.html';
 

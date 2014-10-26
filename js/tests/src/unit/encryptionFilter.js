@@ -26,6 +26,7 @@ describe("EncryptionFilter", function() {
         };
 
         this.sendRawMessage = function() {};
+        this.logger = new MegaLogger("karereMock");
     };
 
     var currentOrderedUsers = [];
@@ -44,6 +45,8 @@ describe("EncryptionFilter", function() {
         self.getContactFromJid = function() {
             return Chat.prototype.getContactFromJid.apply(this, toArray(arguments))
         };
+
+        this.logger = new MegaLogger("megaChatMock");
 
         $.each([
             'room1',
@@ -75,7 +78,8 @@ describe("EncryptionFilter", function() {
                     getUsers: function() {
                         return {};
                     },
-                    'roomJid': v + "@conference.jid.com"
+                    'roomJid': v + "@conference.jid.com",
+                    'logger': new MegaLogger("megaChatMock")
                 };
             }
         );
@@ -1429,7 +1433,9 @@ describe("EncryptionFilter", function() {
                 }
             );
 
-            EncryptionFilter.debugEncryptionHandler(ph1, "ph1");
+            var someMegaRoom = megaChatObj.chats["room1@conference.jid.com"];
+
+            EncryptionFilter.debugEncryptionHandler(ph1, "ph1", someMegaRoom);
 
             var ph2 = new mpenc.handler.ProtocolHandler(
                 "jid2",
@@ -1442,7 +1448,7 @@ describe("EncryptionFilter", function() {
                 function(handler) {
                 }
             );
-            EncryptionFilter.debugEncryptionHandler(ph2, "ph2");
+            EncryptionFilter.debugEncryptionHandler(ph2, "ph2", someMegaRoom);
 
             // initial start & handshake
             ph1.start([
@@ -1479,7 +1485,7 @@ describe("EncryptionFilter", function() {
                 function(handler) {
                 }
             );
-            EncryptionFilter.debugEncryptionHandler(ph21, "ph21");
+            EncryptionFilter.debugEncryptionHandler(ph21, "ph21", someMegaRoom);
 
             // since ph21 had joined the groupchat, he will start processing ANY of the mpenc encrypted messages
             // but since ph2 is now offline (detected via ping request), to start the key agreement, ph2 MUST be FIRST

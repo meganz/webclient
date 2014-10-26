@@ -129,8 +129,12 @@ var chatui;
 
 
             var _getNodeIdsForThisButton = function($button) {
+                var $attachmentContainer = $button.parents('.attachments-container');
+                var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
 
-                var accessibleNodeIds = [];
+                var attachments = message.getMeta().attachments; //alias
+
+                var accessibleNodeIds = Object.keys(attachments);
                 $.each([
                     $button.parents('.nw-chat-sharing-body').attr("data-node-id")
                 ], function(k, v) {
@@ -164,6 +168,7 @@ var chatui;
 
             $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
                 var accessibleNodeIds = _getNodeIdsForThisButton($button);
+                debugger;
                 assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
                 M.addDownload(accessibleNodeIds, false);
             });

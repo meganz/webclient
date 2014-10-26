@@ -367,19 +367,34 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                 );
                 self.megaChat.karere.trigger("onActionMessage", [eventObject]);
             } else {
-                var eventObject = new KarereEventObjects.IncomingMessage(
-                    /* toJid */ wireMessage.toJid,
-                    /* fromJid */ wireMessage.fromJid,
-                    /* type */ "Message",
-                    /* rawType */ wireMessage.rawType,
-                    /* messageId */ wireMessage.messageId,
-                    /* rawMessage */ undefined,
-                    /* roomJid */ wireMessage.roomJid,
-                    /* meta */ msgPayload[1],
-                    /* contents */ msgPayload[0],
-                    /* elements */ undefined,
-                    /* delay */ wireMessage.delay
-                );
+                var eventObject;
+                if(Karere.getNormalizedBareJid(wireMessage.fromJid) == self.megaChat.karere.getBareJid()) {
+                    eventObject = new KarereEventObjects.OutgoingMessage(
+                        /* toJid */ wireMessage.toJid,
+                        /* fromJid */ wireMessage.fromJid,
+                        /* type */ "Message",
+                        /* messageId */ wireMessage.messageId,
+                        /* contents */ msgPayload[0],
+                        /* meta */ msgPayload[1],
+                        /* delay */ wireMessage.delay,
+                        /* state */ KarereEventObjects.OutgoingMessage.STATE.SENT,
+                        /* roomJid */ wireMessage.roomJid
+                    );
+                } else {
+                    eventObject = new KarereEventObjects.IncomingMessage(
+                        /* toJid */ wireMessage.toJid,
+                        /* fromJid */ wireMessage.fromJid,
+                        /* type */ "Message",
+                        /* rawType */ wireMessage.rawType,
+                        /* messageId */ wireMessage.messageId,
+                        /* rawMessage */ undefined,
+                        /* roomJid */ wireMessage.roomJid,
+                        /* meta */ msgPayload[1],
+                        /* contents */ msgPayload[0],
+                        /* elements */ undefined,
+                        /* delay */ wireMessage.delay
+                    );
+                }
                 self.megaChat.karere.trigger("onChatMessage", [eventObject]);
             }
         } else {

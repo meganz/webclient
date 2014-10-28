@@ -1595,30 +1595,7 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
         if(presenceCssClass == "offline") {
             $('.btn-chat-call', self.$header).hide();
         } else {
-            var haveCallCapability = false;
-            if(self.megaChat.rtc) { // only check if the CLIENT have the required capabilities (.rtc = initialised)
-                $.each(participants, function(k, p) {
-                    if(!p || p === null) {
-                        return; //continue, user had been just removed (disconnected)
-                    }
-
-                    var capabilities = self.megaChat.karere.getCapabilities(p);
-
-                    if(!capabilities) {
-                        ERRDEBUG("No audio/video capabilities for user: ", p);
-                        return; // continue;
-                    }
-                    if(capabilities['audio'] || capabilities['video']) {
-                        haveCallCapability = true;
-                    }
-                });
-            }
-
-            if(haveCallCapability) {
-                $('.btn-chat-call', self.$header).show();
-            } else {
-                ERRDEBUG("No audio/video capabilities.");
-            }
+            $('.btn-chat-call', self.$header).show();
         }
     }
 
@@ -1814,7 +1791,8 @@ ChatRoom.prototype.appendMessage = function(message) {
             message.contents,
             message.meta,
             message.delay,
-            message.meta && message.meta.state ? message.meta.state : message.state
+            message.meta && message.meta.state ? message.meta.state : message.state,
+            message.roomJid
         );
     }
     if(self.messagesIndex[message.getMessageId()] !== undefined) {
@@ -1950,6 +1928,7 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         timestamp = messageObject.getDelay();
     }
 
+
     $message.attr('data-timestamp', timestamp);
 
     $('.jspContainer > .jspPane > .fm-chat-message-pad > .fm-chat-message-container', self.$messages).each(function() {
@@ -2003,6 +1982,10 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
     $jsp.scrollToBottom();
 
     self.trigger('onAfterRenderMessage', [$message, messageObject]);
+
+    if(messageObject.getSeen && messageObject.getSeen() == false) { // mark as seen
+        messageObject.setSeen(true);
+    }
 
     self.trigger('activity');
 
@@ -2108,6 +2091,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
     var self = this;
 
     var $inlineDialog = self.megaChat.$inline_dialog_tpl.clone();
+    $inlineDialog.attr('data-id', "idlg-" + rand(10000) + unixtime());
 
     if(!read && !self.isActive()) {
         $inlineDialog.addClass('unread');
@@ -2414,7 +2398,8 @@ ChatRoom.prototype.handleSyncResponse = function(response) {
                 msg.contents,
                 msg.meta,
                 msg.delay,
-                msg.state
+                msg.state,
+                msg.roomJid
             )
         } else {
             // Incoming
@@ -2507,7 +2492,9 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         messageId,
         message,
         meta,
-        unixtime()
+        unixtime(),
+        KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
+        self.roomJid
     );
 
 
@@ -2529,7 +2516,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
         }
 
         if(localStorage.dd) {
-            console.debug("Queueing: ", eventObject);
+            self.logger.debug("Queueing: ", eventObject);
         }
 
 

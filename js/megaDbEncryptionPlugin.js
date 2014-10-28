@@ -61,7 +61,7 @@ var MegaDBEncryption = function(mdbInstance) {
             } else {
                 obj[k] = stringcrypt.stringEncrypter(JSON.stringify(v), getEncDecKey());
             }
-            logger.debug("encrypted: {k=", k, "v=", v, "$v=", obj[k + "$v"], "objk=", obj[k], "}");
+            //logger.debug("encrypted: {k=", k, "v=", v, "$v=", obj[k + "$v"], "objk=", obj[k], "}");
         })
     };
 
@@ -107,7 +107,7 @@ var MegaDBEncryption = function(mdbInstance) {
                         }
                     }
                 }
-                logger.debug("decrypted: ", k, v, obj[k + "$v"], obj[k]);
+                //logger.debug("decrypted: ", k, v, obj[k + "$v"], obj[k]);
             });
         }
     };
@@ -119,38 +119,23 @@ var MegaDBEncryption = function(mdbInstance) {
     mdbInstance.bind("onBeforeAdd", function(e, table, obj) {
         logger.debug("onBeforeAdd: ", table, obj);
 
-        obj.__origObj = clone(obj); // safe reference of the orig obj, so that we can easily restore it, after its
-                                    // inserted
-
-        simpleEncryptObjFunction(table, obj);
-    });
-
-    mdbInstance.bind("onAfterAdd", function(e, table, obj, addFuncReturnValue) {
-        logger.debug("onAfterAdd: ", table, obj, addFuncReturnValue);
-
-
-        simpleDecryptObjFunction(table, obj);
+        e.returnedValue = [table, clone(obj)];
+        simpleEncryptObjFunction(table, e.returnedValue[1]);
     });
 
     mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
         logger.debug("onBeforeUpdate: ", table, obj);
 
+        e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
+
         if (!isQuerysetUpdate) {
-            obj.__origObj = clone(obj); // safe reference of the orig obj, so that we can easily restore it, after its
-                                        // inserted
-            simpleEncryptObjFunction(table, obj);
+            simpleEncryptObjFunction(table, e.returnedValue[2]);
         } else {
-            simpleDecryptObjFunction(table, obj);
+            simpleDecryptObjFunction(table, e.returnedValue[2]);
         }
 
 
     });
-    mdbInstance.bind("onAfterUpdate", function(e, table, k, obj, addFuncReturnValue) {
-        logger.debug("onAfterAdd: ", table, obj, addFuncReturnValue);
-
-        simpleDecryptObjFunction(table, obj);
-    });
-
     mdbInstance.bind("onDbRead", function(e, table, obj) {
         logger.debug("onDbRead: ", table, obj);
 

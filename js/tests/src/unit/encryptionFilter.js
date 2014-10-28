@@ -18,6 +18,10 @@ describe("EncryptionFilter", function() {
             return "user1@jid.com/res";
         };
 
+        this.getBareJid = function() {
+            return "user1@jid.com";
+        };
+
         this.sendPing = function() {
             var $promise = new $.Deferred();
             $promise.resolve();
@@ -26,6 +30,7 @@ describe("EncryptionFilter", function() {
         };
 
         this.sendRawMessage = function() {};
+        this.logger = new MegaLogger("karereMock");
     };
 
     var currentOrderedUsers = [];
@@ -44,6 +49,8 @@ describe("EncryptionFilter", function() {
         self.getContactFromJid = function() {
             return Chat.prototype.getContactFromJid.apply(this, toArray(arguments))
         };
+
+        this.logger = new MegaLogger("megaChatMock");
 
         $.each([
             'room1',
@@ -75,7 +82,8 @@ describe("EncryptionFilter", function() {
                     getUsers: function() {
                         return {};
                     },
-                    'roomJid': v + "@conference.jid.com"
+                    'roomJid': v + "@conference.jid.com",
+                    'logger': new MegaLogger("megaChatMock")
                 };
             }
         );
@@ -456,7 +464,8 @@ describe("EncryptionFilter", function() {
                         },
                         "contents": "hello world",
                         "elements": "",
-                        "delay": 123
+                        "delay": 123,
+                        "seen": ""
                     }
                 )
             );
@@ -586,7 +595,7 @@ describe("EncryptionFilter", function() {
             expect(
                 JSON.stringify(encryptionFilter.processMessage.getCall(0).args[2])
             ).to.eql(
-                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"message":"?mpENC:[encrypted contents]","from":"' + otherUserJid + '"}'
+                    '{"toJid":"' + myJid + '","fromJid":"' + otherUserJid + '","type":"Message","rawType":"groupchat","messageId":"msgId","rawMessage":null,"roomJid":"room1@conference.jid.com","meta":{"additionalMeta":true},"contents":"?mpENC:[encrypted contents]","elements":"","delay":123,"seen":"","message":"?mpENC:[encrypted contents]","from":"' + otherUserJid + '"}'
                 );
 
             done();
@@ -1429,7 +1438,9 @@ describe("EncryptionFilter", function() {
                 }
             );
 
-            EncryptionFilter.debugEncryptionHandler(ph1, "ph1");
+            var someMegaRoom = megaChatObj.chats["room1@conference.jid.com"];
+
+            EncryptionFilter.debugEncryptionHandler(ph1, "ph1", someMegaRoom);
 
             var ph2 = new mpenc.handler.ProtocolHandler(
                 "jid2",
@@ -1442,7 +1453,7 @@ describe("EncryptionFilter", function() {
                 function(handler) {
                 }
             );
-            EncryptionFilter.debugEncryptionHandler(ph2, "ph2");
+            EncryptionFilter.debugEncryptionHandler(ph2, "ph2", someMegaRoom);
 
             // initial start & handshake
             ph1.start([
@@ -1479,7 +1490,7 @@ describe("EncryptionFilter", function() {
                 function(handler) {
                 }
             );
-            EncryptionFilter.debugEncryptionHandler(ph21, "ph21");
+            EncryptionFilter.debugEncryptionHandler(ph21, "ph21", someMegaRoom);
 
             // since ph21 had joined the groupchat, he will start processing ANY of the mpenc encrypted messages
             // but since ph2 is now offline (detected via ping request), to start the key agreement, ph2 MUST be FIRST

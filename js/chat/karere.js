@@ -1623,7 +1623,9 @@ makeMetaAware(Karere);
             messageId,
             contents,
             meta,
-            delay
+            delay,
+            KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
+            type == "groupchat" ? Karere.getNormalizedBareJid(toJid) : undefined
         );
 
         var event = new $.Event("onOutgoingMessage");

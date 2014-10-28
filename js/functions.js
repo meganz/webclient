@@ -1750,6 +1750,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
     return function() {
         var self = this;
         var args = toArray(arguments);
+
         var event = new $.Event("onBefore" + eventSuffix);
         self.trigger(event, args);
 
@@ -1761,6 +1762,9 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
             }
 
+        }
+        if(typeof(event.returnedValue) != "undefined") {
+            args = event.returnedValue;
         }
 
         var returnedValue = fn.apply(self, args);

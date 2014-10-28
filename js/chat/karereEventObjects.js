@@ -269,9 +269,10 @@ KarereEventObjects.DiscoCapabilities.prototype.toString = function() {
  * @param [contents] {string} optional, message contents
  * @param [elements] {NodeList} child {Element} nodes from the XMPP's <message></message> node
  * @param [delay] {number} unix time stamp saying when this message was sent
+ * @param [seen] {boolean} used for notification to track whether we need to notify the message if it was not seen by the user
  * @constructor
  */
-KarereEventObjects.IncomingMessage = function(toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay) {
+KarereEventObjects.IncomingMessage = function(toJid, fromJid, type, rawType, messageId, rawMessage, roomJid, meta, contents, elements, delay, seen) {
     this.setToJid(toJid);
     this.setFromJid(fromJid);
     this.setType(type);
@@ -283,6 +284,7 @@ KarereEventObjects.IncomingMessage = function(toJid, fromJid, type, rawType, mes
     this.setContents(contents);
     this.setElements(elements);
     this.setDelay(delay);
+    this.setSeen(seen);
 };
 /**
  * Getter for property `toJid`
@@ -485,6 +487,30 @@ KarereEventObjects.IncomingMessage.prototype.getDelay = function() {
  */
 KarereEventObjects.IncomingMessage.prototype.setDelay = function(val) {
     this.delay = val || unixtime();
+    return this;
+};
+/**
+ * Getter for property `seen`
+ *
+ * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ */
+KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
+    return this.seen;
+};
+/**
+ * Setter for property `seen`
+ *
+ * @note: triggers onSeenChange event (using jQuery), with arguments [this, oldValue, newValue]
+ *
+ * @param [val] {boolean} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {KarereEventObjects.IncomingMessage}
+ */
+KarereEventObjects.IncomingMessage.prototype.setSeen = function(val) {
+    var oldVal = this.seen;
+    this.seen = val || "";
+    if (oldVal != this.seen) {
+        jQuery(this).trigger("onSeenChange", [this, oldVal, this.seen]);
+    }
     return this;
 };
 /**
@@ -951,9 +977,11 @@ KarereEventObjects.InviteMessage.prototype.isEmptyMessage = function() {
  * @param [meta] {Object} Attached META for this message (can be any JavaScript plain object)
  * @param [delay] {number} Unix time stamp saying when this message was sent
  * @param [state] {number} State of this message (see {KarereEventObjects.OutgoingMessage.STATE.*})
+ * @param [roomJid] {string} optional, may contain the Room JID (if this message was sent to a XMPP conf. room)
+ * @param [seen] {boolean} used for notification to track whether we need to notify the message if it was not seen by the user
  * @constructor
  */
-KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, contents, meta, delay, state) {
+KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, contents, meta, delay, state, roomJid, seen) {
     this.setToJid(toJid);
     this.setFromJid(fromJid);
     this.setType(type);
@@ -962,6 +990,8 @@ KarereEventObjects.OutgoingMessage = function(toJid, fromJid, type, messageId, c
     this.setMeta(meta);
     this.setDelay(delay);
     this.setState(state);
+    this.setRoomJid(roomJid);
+    this.setSeen(seen);
 };
 KarereEventObjects.OutgoingMessage.STATE = {
     'SENT': 10,
@@ -1150,6 +1180,55 @@ KarereEventObjects.OutgoingMessage.prototype.setState = function(val) {
     }
     if (oldVal != this.state) {
         jQuery(this).trigger("onChange", [this, "state", oldVal, this.state]);
+    }
+    return this;
+};
+/**
+ * Getter for property `roomJid`
+ *
+ * @returns {(string|"")} optional, may contain the Room JID (if this message was sent to a XMPP conf. room)
+ */
+KarereEventObjects.OutgoingMessage.prototype.getRoomJid = function() {
+    return this.roomJid;
+};
+/**
+ * Setter for property `roomJid`
+ *
+ * @param [val] {string} optional, may contain the Room JID (if this message was sent to a XMPP conf. room)
+ * @returns {KarereEventObjects.OutgoingMessage}
+ */
+KarereEventObjects.OutgoingMessage.prototype.setRoomJid = function(val) {
+    var oldVal = this.roomJid;
+    this.roomJid = val || "";
+    if (oldVal != this.roomJid) {
+        jQuery(this).trigger("onChange", [this, "roomJid", oldVal, this.roomJid]);
+    }
+    return this;
+};
+/**
+ * Getter for property `seen`
+ *
+ * @returns {(boolean|"")} used for notification to track whether we need to notify the message if it was not seen by the user
+ */
+KarereEventObjects.OutgoingMessage.prototype.getSeen = function() {
+    return this.seen;
+};
+/**
+ * Setter for property `seen`
+ *
+ * @note: triggers onSeenChange event (using jQuery), with arguments [this, oldValue, newValue]
+ *
+ * @param [val] {boolean} used for notification to track whether we need to notify the message if it was not seen by the user
+ * @returns {KarereEventObjects.OutgoingMessage}
+ */
+KarereEventObjects.OutgoingMessage.prototype.setSeen = function(val) {
+    var oldVal = this.seen;
+    this.seen = val || "";
+    if (oldVal != this.seen) {
+        jQuery(this).trigger("onSeenChange", [this, oldVal, this.seen]);
+    }
+    if (oldVal != this.seen) {
+        jQuery(this).trigger("onChange", [this, "seen", oldVal, this.seen]);
     }
     return this;
 };

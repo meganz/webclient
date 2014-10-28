@@ -676,18 +676,6 @@ function initUI(){
 		$('.fm-tree-header.cloud-drive-item span').text('');
 	}
 	else folderlink=0;
-	/* REMOVEME
-	$('.add-user-popup-button').unbind('click');
-	$('.add-user-popup-button').bind('click',function(e)
-	{
-		if (u_type === 0) ephemeralDialog(l[997]);
-		else doAddContact(e);
-	});
-	$('.add-user-popup input').unbind('keypress');
-	$('.add-user-popup input').bind('keypress',function(e)
-	{
-		if (e.which == 13) doAddContact(e);
-	});*/
 	if (ul_queue.length > 0) openTransferpanel();
 	if (u_type === 0 && !u_attr.terms)
 	{
@@ -1119,8 +1107,6 @@ function addContactUI()
 		{
 			$d.removeClass('error');
 		}, 3000);
-
-		if (u) $.addUserFail.push(u);
 	}
 
 	function focusOnInput()
@@ -1241,7 +1227,6 @@ function addContactUI()
 		$.hideContextMenu();
 		$.dialog = 'add-contact-popup';
 		$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
-		$.addUserFail = [];
 		// Just in case hide import links
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 		$('.import-contacts-link').removeClass('active');
@@ -1278,7 +1263,6 @@ function addContactUI()
 		}
 		else// Show
 		{
-			$.addUserFail = [];
 			$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 			$('.import-contacts-link').removeClass('active');
 			$this.addClass('active');
@@ -1335,7 +1319,7 @@ function addContactUI()
 	$('.add-user-popup-button').off('click');
 	$('.add-user-popup-button').on('click', function()
 	{
-		var $this = $(this), nobody = true;
+		var $this = $(this);
 		if ($this.is('.add') && !$this.is('.disabled'))// Add
 		{
 			if (u_type === 0) ephemeralDialog(l[997]);
@@ -1344,19 +1328,12 @@ function addContactUI()
 				var $mails = $('.token-input-list-mega .token-input-token-mega');
 				if ($mails.length)
 				{
-					// TODO: send array of email addreses to server at once?
 					$mails.each(function(index, value)
 					{
 						M.addContact($(value).contents().eq(1).text());
 					});
-					nobody = false;
 				}
 			}
-		}
-
-		if (nobody && $.addUserFail.length)
-		{
-			msgDialog('info',l[150],l[151].replace('[X]','already'));
 		}
 
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
@@ -5453,7 +5430,7 @@ function addShareDialogContactToContent (type, id, av_color, av, name, permClass
 function fillShareDialogWithContent()
 {
 	var sel = $.selected[0];
-	$.sharedTokens = [];// Holds items currently visible in share folder contet (above input)
+	$.sharedTokens = [];// Holds items currently visible in share folder content (above multi-input)
 
 	for (var i in M.d[sel].shares)// list users that are already use item
 	{
@@ -5658,7 +5635,17 @@ function initShareDialog()
 		m.fadeIn(200);
 	};
 
-	// called when multi-input box is not empty
+	/**
+	 * Called when multi-input is not empty
+	 * 
+	 * prepare params for dialog content addition
+	 * update global sharedTokens var
+	 * fill content with dialog contact
+	 * 
+	 * @param {email} item
+	 * @param {array} perm, permission class and text
+	 * @returns {undefined}
+	 */
 	determineContactParams = function(item, perm)
 	{
 		var name = item;// email address
@@ -5673,7 +5660,8 @@ function initShareDialog()
 		}
 
 		var user = M.u[id];
-		var name = (user.name && user.name.length > 1) ? user.name : user.m;
+		if (user)
+			name = (user.name && user.name.length > 1) ? user.name : user.m;
 		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
 		var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
 
@@ -5719,6 +5707,7 @@ function initShareDialog()
 		if (!$(this).is('.disabled'))
 		{
 			// If there's a contacts in multi-input add them to top
+			loadingDialog.show();
 			var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
 			if ($items.length)
 			{
@@ -5726,50 +5715,35 @@ function initShareDialog()
 				{
 					determineContactParams($(val).contents().eq(1).text(), checkMultiInputPermission($('.share-dialog .permissions-icon')));
 				});
-
-				$('.share-dialog .multiple-input .token-input-token-mega').remove();
-
-				shareDialogContentCheck();
 			}
-			else
+			var t = [];
+			var s = M.d[$.selected[0]].shares;
+			var id = '';
+			var perm, aPerm;
+			var $items = $('.share-dialog-contact-bl');// Get all items available in dialog content block (avatar, name/email, permission)
+			$.each($items, function(ind, val)
 			{
-				var t = [];
-				var s = M.d[$.selected[0]].shares;
-				var id = '';
-				var perm, aPerm;
-				var $items = $('.share-dialog-contact-bl');
-				$.each($items, function(ind, val)
-				{
-					id = $(val).attr('id').replace('sdcbl_', '');
-					if (id === '')// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
-						id = $(val).find('.fm-chat-user').text();
+				id = $(val).attr('id').replace('sdcbl_', '');// extract id of contact
+				if (id === '')// ToDo: This should not be happening, expand this to make sure all contacts are with id and exist in M.u
+					id = $(val).find('.fm-chat-user').text();
 
-					aPerm = $(val).find('.share-dialog-permissions');
+				aPerm = $(val).find('.share-dialog-permissions');
 
-					if ($(aPerm).is('.read-and-write'))
-					{
-						perm = 1;
-					}
-					else if ($(aPerm).is('.full-access'))
-					{
-						perm = 2;
-					}
-					else
-					{
-						perm = 0;
-					}
+				if ($(aPerm).is('.read-and-write')) perm = 1;
+				else if ($(aPerm).is('.full-access')) perm = 2;
+				else perm = 0;
 
-					if (!s || !s[id] || s[id].r !== perm)
-						t.push({u: id, r: perm});
-				});
+				if (!s || !s[id] || s[id].r !== perm)
+					t.push({u: id, r: perm});
+			});
 
-				closeDialog();
-				if (t.length > 0)
-				{
-					loadingDialog.show();
-					doshare($.selected[0], t, true);
-				}
+			closeDialog();
+			if (t.length > 0)
+			{
+				doshare($.selected[0], t, true);
 			}
+			
+			loadingDialog.hide();
 		}
 	});
 
@@ -5955,26 +5929,6 @@ function addImportedDataToSharedDialog(data, from)
 	{
 		$('.share-dialog .share-multiple-input').tokenInput("add", {id: val, name: val});
 	});
-
-//	var perm, av_color, av, html;
-//	$.sharedTokens = [];
-//
-//	$.each(data, function(ind, val)
-//	{
-//		// Read permission from multi-input permission box
-//		perm = checkMultiInputPermission($('.share-dialog .permissions-icon'));
-//		av_color = val.charCodeAt(0)%6 + val.charCodeAt(1)%6;
-//		// ToDo: It's possible to return name and probably picture of imported gmail contact maybe we could use that
-//		// ToDo: Check here for name available, is exists add it
-//		av = val.charAt(0) + val.charAt(1);
-//
-//		$.sharedTokens.push(val);// in this case val represents e-mail
-//
-//		html = addShareDialogContactToContent(from, '', av_color, '', val, perm[0], perm[1]);
-//		$('.share-dialog .share-dialog-contacts').append(html);
-//	});
-//
-//	shareDialogContentCheck();
 
 	closeImportContactNotification('.share-dialog');
 }

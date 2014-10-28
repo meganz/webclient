@@ -5660,7 +5660,8 @@ function initShareDialog()
 		}
 
 		var user = M.u[id];
-		var name = (user.name && user.name.length > 1) ? user.name : user.m;
+		if (user)
+			name = (user.name && user.name.length > 1) ? user.name : user.m;
 		var av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
 		var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
 

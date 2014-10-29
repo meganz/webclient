@@ -224,6 +224,22 @@ function init_page()
 		if (!blogsearch) document.location.hash = 'blog';
 		page = 'blog';
 	}
+	else if (page.substr(0,5) == 'page_')
+	{
+		var cpage = decodeURIComponent(page.substr(5,page.length-2));
+		 
+		CMS.get(cpage, function(err, content) {
+			alert(content.html)
+			parsepage(content.html)
+			$('.on-boot').each(function() {
+				var js = $(this).data('js');
+				if (typeof js == "string" && typeof window[js] == "function") {
+					window[js]();
+				}
+			});
+		});
+		page = 'cpage';
+	}
 	else if (page.substr(0,4) == 'blog' && page.length > 4 && page.length < 10)
 	{
 		blogid = page.substr(5,page.length-2);

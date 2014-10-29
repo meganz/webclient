@@ -2,8 +2,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/loading.gif";
 
 (function(window, asmCrypto) {
 
-// I should be replaced with production deploy keys
-var pubkey = asmCrypto.base64_to_bytes('WyJhZGJiMGEwNGQ5YzRiYjMxNWQzMTA2YzQwZjE1YzBmYzNlZmJjMmJmODkyNGU4ODA0NzU5OTk1MDRiNmE0ZGJiMWZjMjZhYTdkNmI1N2Q0YjFjMDhhYTM3ZDQ0MGYxMDJiMDJmZGZiMmE5ZTNlNjAzODVmZGJhODFjZmY5Y2E2OSIsIjAxMDAwMSJd'); 
+var pubkey = asmCrypto.base64_to_bytes('WyJlNzQwNWI3YTdlYzIwYjc5Y2MwNmFiNmRhYTRlYmVlMjJlODljOTkxMDY4OGQ4NGRjMjllMGMyMzIyZTg2NTc4ZTlkNmE1YjNjODQyMGU1YTViZWU5YjI1YzA1MTZiMzFjOTc5Y2IyNGRiOWI0NzZhMTEwMTExZjlkM2FkZTY5NyIsIjAxMDAwMSJd')
 pubkey = JSON.parse(asmCrypto.bytes_to_string(pubkey));
 pubkey[0] = asmCrypto.hex_to_bytes(pubkey[0])
 pubkey[1] = asmCrypto.hex_to_bytes(pubkey[1])
@@ -32,10 +31,15 @@ function process_cms_response(socket, next, as)
 
 	delete bytes;
 
-	if (as == "download") mime = 3;
+	if (as == "download") mime = 0;
 
 	if (verify_cms_content(content, signature)) {
 		switch (mime) {
+		case 3: // html
+			content = ab_to_str(content)
+			return next(false, { html: content, mime: mime})
+			break;
+
 		case 1:
 			var blob;
 			try {
@@ -133,3 +137,15 @@ CMS.prototype.imgLoader = function(html, id) {
 window.CMS = new CMS;
 
 })(this, asmCrypto)
+
+function corporate_boot()
+{
+	$('.new-left-menu-link').rebind('click', function() {
+		var $this = $(this)
+		$('.new-right-content-block').addClass('hidden');
+		$('.new-right-content-block.' + $this.attr('id')).removeClass('hidden');
+		$('.new-left-menu-link').removeClass('active');
+		$this.addClass('active');			
+	});
+	$('.new-left-menu-link:first').trigger('click');
+}

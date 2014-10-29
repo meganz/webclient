@@ -1845,7 +1845,7 @@ function is_image(name)
 		}
 		var ext = (''+name).split('.').pop().toUpperCase();
 
-		return is_image.def[ext] || is_rawimage(null, ext);
+		return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
 	}
 
 	return false;
@@ -1892,6 +1892,76 @@ is_image.raw = {
 	"TIFF":"Tagged Image File Format",
 	"X3F":"Sigma/Foveon RAW"
 };
+
+var mThumbHandler =
+{
+	sup : {},
+
+	add : function(exts, parser)
+	{
+		exts = exts.split(",");
+		for (var i in exts)
+		{
+			this.sup[exts[i].toUpperCase()] = parser;
+		}
+	},
+
+	has : function(name, ext)
+	{
+		ext = ext || (''+name).split('.').pop().toUpperCase();
+
+		return this.sup[ext];
+	}
+};
+mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb)
+{
+	// http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
+	var u8 = new Uint8Array(ab), dv = new DataView(ab), len = u8.byteLength, i = 0, result;
+	if (d) console.time('psd-proc');
+
+	while (len > i+12)
+	{
+		if (u8[i] == 0x38 && u8[i+1] == 0x42 && u8[i+2] == 0x49 && u8[i+3] == 0x4d) // 8BIM
+		{
+			var ir = dv.getUint16(i+=4);
+			var ps = dv.getUint8(i+=2) +1;
+
+			if (ps % 2) ++ps;
+			var rl = dv.getUint32(i+=ps);
+
+			i += 4;
+			if (len < i + rl) break;
+
+			if (ir == 1033 || ir == 1036)
+			{
+				if (d) console.log('Got thumbnail resource at offset %d with length %d', i, rl);
+
+				i += 28;
+				result = ab.slice(i,i+rl);
+				break;
+			}
+
+			i += rl;
+		}
+		else ++i;
+	}
+	if (d) console.timeEnd('psd-proc');
+	cb(result);
+});
+mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb)
+{
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext('2d');
+	var image = new Image();
+	image.onload = function()
+	{
+		canvas.height = image.height;
+		canvas.width = image.width;
+		ctx.drawImage(image, 0, 0);
+		cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+	};
+	image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+});
 
 var storedattr = {};
 var faxhrs = [];

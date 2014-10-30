@@ -1274,16 +1274,19 @@ a.blog-button:hover {
 	box-sizing: border-box;
 	padding: 0 !important;
 }
-.empty .notification-scr-list, .empty .fm-notifications-bottom {
+.empty .notification-scr-list, .no-new-notifications .notification-scr-list, .empty .fm-notifications-bottom {
 	display: none;
 }
 .notification-popup-empty {
 	display: none;
 }
-.empty .notification-popup-empty {
+.empty .notification-popup-empty, .no-new-notifications .notification-popup-empty {
 	display: block;
 	text-align: center;
 	height: 298px;
+}
+.empty .notification-header {
+	display: none;
 }
 .notification-popup-empty img {
 	width: 218px;
@@ -1294,9 +1297,6 @@ a.blog-button:hover {
 	line-height: 34px;
 	color: #999999;
 	padding-top: 12px;
-}
-.empty .notification-header {
-	display: none;
 }
 .notification-empty {
 	display: none;
@@ -4482,9 +4482,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .cloud-popup-icon {
 	float: none;
 }
-.notification-button {
-	position: relative;
-}
 .new-notification-info {
 	height: 24px;
 	line-height: 22px;
@@ -4496,7 +4493,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	white-space: nowrap;
 	font-size: 11px;
 	color: #CCCCCC;
-	margin: 55px 0 0 -57px;
+	margin: 55px 0 0 -40px;
 	position: absolute;
 	left: 50%;
 	z-index: 100;

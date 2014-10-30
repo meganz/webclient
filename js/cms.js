@@ -97,6 +97,17 @@ function img_placeholder(str, sep, rid, id) {
 function CMS() {
 }
 
+CMS.prototype.img = function(id) 
+{
+	if (!assets[id]) {
+		window.CMS.get(id, function(err, obj) {
+			$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
+			assets[id] = obj.url;
+		});
+	}
+	return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
+}
+
 CMS.prototype.get = function(id, next, as) {
 	// I should be replaced with api_req instead of the socket
 	var q = getxhr();
@@ -122,10 +133,7 @@ CMS.prototype.imgLoader = function(html, id) {
 		html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
 		
 		if (is_img) {
-			window.CMS.get(id, function(err, obj) {
-				$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
-				assets[id] = obj.url;
-			});
+			this.get(id);
 		}
 	} else {
 		html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');

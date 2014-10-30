@@ -64,7 +64,7 @@ function blog_load()
 				blogcontent +='<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
 				blogcontent +='<div class="blog-new-date-div"></div>';
 				blogcontent +='<div class="blog-new-small"><span>By:</span> ' + by + '</div>';
-				blogcontent +='<div class="clear"></div><img alt="" src="' + staticpath + blogposts[i].simg + '" />';
+				blogcontent +='<div class="clear"></div><img alt="" data-img="loading_' + blogposts[i].attaches.simg  + '" src="' + CMS.img(blogposts[i].attaches.simg) + '" />';
 				blogcontent +='<p><span class="blog-new-description">' + introtxt + '</span>';
 				blogcontent +='<a href="#blog_' + blogposts[i].id + '" class="blog-new-read-more">Read more</a>';
 				blogcontent +='<span class="clear"></span></p> </div>';				
@@ -183,7 +183,7 @@ if (typeof mobileblog !== 'undefined')
 		if (blogid == blogposts[i].id)
 		{
 			var content = '';
-			if (blogposts[i].bimg) content += '<img alt="" src="' + staticpath + blogposts[i].bimg + '" class="blog-new-full-img" />';
+			if (blogposts[i].attaches.bimg) content += '<img alt="" data-img="loading_'+blogposts[i].attaches.bimg+'" src="' + CMS.img(blogposts[i].attaches.bimg) + '" class="blog-new-full-img" />';
 			content += blogposts[i].c;				
 			content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
 			var date = new Date(blogposts[i].t*1000);			

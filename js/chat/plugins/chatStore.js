@@ -11,14 +11,28 @@ var ChatStore = function(megaChat) {
     var self = this;
     self.logger = MegaLogger.getLogger("chatStore", {}, megaChat.logger);
 
-    self.db = new MegaDB("megaChat", u_handle, 4, ChatStore.DBSchema, {
+    self.megaChat = megaChat;
+    self.db = new MegaDB("megaChat", u_handle, 5, ChatStore.DBSchema, {
         'parentLogger': self.logger
     });
 
     megaChat.unbind("onInit.chatStore");
     megaChat.bind("onInit.chatStore", function(e) {
         self.attachToChat(megaChat)
+
+        if(self.cleanupInterval) {
+            clearInterval(self.cleanupInterval);
+        }
+        self.cleanupInterval = setInterval(function() {
+            self.cleanup();
+        }, 30000); /* every 30sec? */
+
+        setTimeout(function() {
+            self.cleanup();
+        }, 10); // run in different thread.
+
     });
+
     return this;
 };
 
@@ -43,7 +57,8 @@ ChatStore.DBSchema = {
         key: { keyPath: 'id' , autoIncrement: true },
         indexes: {
             roomJid: { },
-            messageId: { }
+            messageId: { },
+            sessionId: { }
         }
     }
 };
@@ -60,6 +75,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
     megaChat.bind("onRoomCreated.chatStore", function(e, megaRoom) {
         assert(megaRoom.type, 'missing room type');
 
+
         self.db.query('conversations')
             .filter('roomJid', megaRoom.roomJid)
             .execute()
@@ -74,6 +90,9 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                         'ctime': megaRoom.ctime
                     });
                 }
+            })
+            .fail(function(r) {
+                self.logger.error("Could not persist: ", megaRoom);
             });
 
         megaRoom.unbind("onStateChange.chatStore");
@@ -244,8 +263,31 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 if(r.length === 0) { // not found
                     var msg = meta.message;
 
-                    if(meta.room.encryptionHandler && meta.room.encryptionHandler.askeMember.sessionId) {
-                        msg.sessionId = meta.room.encryptionHandler.askeMember.sessionId;
+                    if(meta.room.encryptionHandler) {
+                        if (meta.room.encryptionHandler.askeMember.sessionId) {
+                            msg.sessionId = meta.room.encryptionHandler.askeMember.sessionId;
+                        } else if(meta.sessionId) {
+                            msg.sessionId = meta.sessionId;
+                        } else {
+                            msg.sessionId = null;
+
+                            createTimeoutPromise(function () {
+                                return !!meta.room.encryptionHandler.askeMember.sessionId;
+                            }, 1500, 60000)
+                                .done(function () {
+
+                                    self.db.query('chatMessages')
+                                        .filter('messageId', msg.messageId)
+                                        .modify({'sessionId': meta.room.encryptionHandler.askeMember.sessionId})
+                                        .execute()
+                                        .done(function(r) {
+                                            self.logger.debug("Set session id for: ", msg.messageId, r);
+                                        });
+                                })
+                                .fail(function() {
+                                    self.logger.error("Could not ser session id for message: ", msg);
+                                });
+                        }
                     }
 
                     assert(msg.roomJid, 'missing .roomJid');
@@ -267,8 +309,6 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 var modOp = {};
                 modOp[k] = newVal;
 
-                self.logger.debug("onChange: ", obj, k, oldVal, newVal);
-
                 self.db.query('chatMessages')
                     .filter('messageId', obj.messageId)
                     .filter('roomJid', meta.room.roomJid)
@@ -277,4 +317,76 @@ ChatStore.prototype.attachToChat = function(megaChat) {
             }
         });
     });
+};
+
+ChatStore.prototype.cleanup = function() {
+    var self = this;
+    var maxMessagesCount = self.megaChat.options.chatStoreOptions.autoPurgeMaxMessagesPerRoom;
+
+    var msgCount = {};
+    self.logger.debug("Starting cleanup...");
+
+    self.db.query('chatMessages')
+        .execute()
+        .done(function(r) {
+            r.forEach(function(v, k) {
+                if(!msgCount[v.roomJid]) {
+                    msgCount[v.roomJid] = 0;
+                }
+                msgCount[v.roomJid]++;
+            });
+
+            Object.keys(msgCount).forEach(function(k) {
+                if(msgCount[k] > maxMessagesCount) {
+                    self.logger.debug("Cleaning up chat history for room: ", k);
+                    self._cleanupMessagesForRoom(k);
+                }
+            })
+        });
+};
+
+
+ChatStore.prototype._cleanupMessagesForRoom = function(roomJid) {
+    var self = this;
+    var maxMessagesCount = self.megaChat.options.chatStoreOptions.autoPurgeMaxMessagesPerRoom;
+
+    var _callAgainIfRequiresMoreCleaning = function() {
+        self.db.query('chatMessages')
+            .filter('roomJid', roomJid)
+            .execute()
+            .done(function (r) {
+                if (r.length > maxMessagesCount) {
+                    self._cleanupMessagesForRoom(roomJid);
+                }
+            });
+    };
+
+    self.db.query('chatMessages')
+        .filter('roomJid', roomJid)
+        .execute()
+        .done(function(r) {
+            if(r.length > 0) {
+                if(r[0].sessionId) {
+                    self.db.removeBy('chatMessages', 'sessionId', r[0].sessionId)
+                        .done(function (rr) {
+                            if(!rr || rr.length == 0) {
+                                // for some reason (diff db version), sessionId index not found
+                                self.db.removeBy('chatMessages', 'messageId', r[0].messageId)
+                                    .done(function() {
+                                        _callAgainIfRequiresMoreCleaning();
+                                    })
+                            } else {
+                                _callAgainIfRequiresMoreCleaning();
+                            }
+                        });
+                } else {
+                    // no session id, remove single item
+
+                    self.db.removeBy('chatMessages', 'messageId', r[0].messageId)
+                        .done(function () {
+                            _callAgainIfRequiresMoreCleaning();
+                        });
+                }
+            }
+        });
 };

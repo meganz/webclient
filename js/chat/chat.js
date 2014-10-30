@@ -1,8 +1,6 @@
 /**
- * How to make this work in your browser? copy/paste this in your browser console:
- * localStorage.staticpath = "http://localhost:5280/"; localStorage.dd=1; localStorage.contextmenu=1; localStorage.megachat=1; localStorage.jj=true;
- * and optionally:
- * localStorage.dxmpp = 1; localStorage.stopOnAssertFail = true; localStorage.d = 1;
+ * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "==" logical comparison!)
+ *
  * @type {boolean}
  */
 var MegaChatDisabled = localStorage.chatDisabled == true ? true : false;
@@ -666,6 +664,9 @@ var Chat = function() {
                 'incoming_file_transfer',
                 'incoming_voice_video_call'
             ]
+        },
+        'chatStoreOptions': {
+            'autoPurgeMaxMessagesPerRoom': 1024
         }
     };
 
@@ -1305,7 +1306,7 @@ Chat.prototype.init = function() {
         //ftManager proxies
 
         var _ftSessEndHandler = function(e, eventData) {
-            self.logger.error("RTC ftSessHandler: ", e, eventData);
+            self.logger.debug("RTC ftSessHandler: ", e, eventData);
 
             var sess = eventData.ftSess;
 
@@ -1529,11 +1530,11 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
 
     // ignore empty messages (except attachments)
     if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
-        self.logger.error("Empty message, MegaChat will not process it: ", eventObject);
+        self.logger.debug("Empty message, MegaChat will not process it: ", eventObject);
 
         return;
     } else {
-        self.logger.error("MegaChat is now processing incoming message: ", eventObject);
+        self.logger.debug("MegaChat is now processing incoming message: ", eventObject);
     }
     // detect outgoing VS incoming messages here + sync their state
 
@@ -1541,7 +1542,7 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
     if(room) {
         room.appendMessage(eventObject);
     } else {
-        self.logger.debug("Room not found: ", eventObject.getRoomJid());
+        self.logger.error("Room not found: ", eventObject.getRoomJid());
     }
 };
 

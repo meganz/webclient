@@ -110,3 +110,69 @@ var loopMochaTests = function() {
     };
     mocha.run(fn1);
 };
+
+
+var msgIdx = 0;
+function getOutgoingMessage(data) {
+    data = data || {};
+
+    return new KarereEventObjects.OutgoingMessage(
+        /* toJid */ "room@conference.jid.com",
+        /* fromJid */ "from@jid.com",
+        /* type */ "groupchat",
+        /* messageId */ rand(1000).toString() + "_" + msgIdx++,
+        /* contents */ data.contents ? data.contents : "message contents",
+        /* meta */ data.meta ? data.meta : {},
+        /* delay */ data.delay ? data.delay : unixtime(),
+        /* state */ data.state ? data.state : KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
+        /* roomJid */ data.roomJid ? data.roomJid : "room@conference.jid.com",
+        /* seen? */ data.seen ? data.seen : false
+    );
+}
+function getIncomingMessage(data) {
+    data = data || {};
+
+    return new KarereEventObjects.IncomingMessage(
+        /* toJid */ "room@conference.jid.com",
+        /* fromJid */ "from@jid.com",
+        /* type */ "groupchat",
+        /* rawType */ "groupchat",
+        /* messageId */ rand(1000).toString() + "_" + msgIdx++,
+        /* rawMessage */ undefined,
+        /* roomJid */ data.roomJid ? data.roomJid : "room@conference.jid.com",
+        /* meta */ data.meta ? data.meta : {},
+        /* contents */ data.contents ? data.contents : "message contents",
+        /* elements */ undefined,
+        /* delay */ data.delay ? data.delay : unixtime(),
+        /* seen? */ data.seen ? data.seen : false
+    )
+}
+
+var DummyRoom = function(){};
+makeObservable(DummyRoom);
+
+function getMegaRoom(data) {
+    data = data || {};
+
+    var obj = new DummyRoom();
+    obj.roomJid = data.roomJid ? data.roomJid : "room@conference.jid.com";
+    obj.type = data.type ? data.type : "private";
+    obj._conv_ended = data.ended ? data.ended : false;
+    obj.state = data.state ? data.state : ChatRoom.STATE.INITIALIZED;
+    obj.ctime = data.ctime ? data.ctime : unixtime();
+    obj.users = data.users ? data.users : [
+        'from@jid.com',
+        'to@jid.com',
+    ];
+    obj._messagesQueue = [];
+
+    obj.appendMessage = function(){};
+
+    sinon.spy(obj, 'appendMessage');
+    sinon.spy(obj, 'on');
+    sinon.spy(obj, 'bind');
+    sinon.spy(obj, 'unbind');
+    sinon.spy(obj, 'trigger');
+
+    return obj;
+}

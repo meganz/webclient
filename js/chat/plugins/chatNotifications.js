@@ -9,6 +9,10 @@
 var ChatNotifications = function(megaChat, options) {
     var self = this;
 
+    options = options || {};
+
+    options.parentLogger = megaChat.logger;
+
     self.notifications = new MegaNotifications(options);
 
     megaChat.unbind("onInit.chatNotifications");

@@ -118,6 +118,28 @@ MegaLogger.prototype._log = function(level, arguments) {
 
     if(this.options.isEnabled === true || ($.isFunction(this.options.isEnabled) && this.options.isEnabled())) {
         this.options.transport.apply(this.options.transport, args);
+
+        if(level == MegaLogger.LEVELS.ERROR && srvlog) {
+            var text;
+            //var noColorMsg = clone(args); // convert back to plain text before sending to the server
+            var noColorMsg = $.extend(true, {}, {'r': args})['r']; // convert back to plain text before sending to the server
+            if(noColorMsg[0].substr(0, 2) == "%c") {
+                noColorMsg[0] = noColorMsg[0].replace("%c", "");
+                delete noColorMsg[1];
+                noColorMsg.splice(1, 1);
+            }
+            // remove date
+            noColorMsg[0] = noColorMsg[0].split(":")[2];
+            noColorMsg[0] = noColorMsg[0].substr(noColorMsg[0].indexOf(" - ") + 3, noColorMsg[0].length);
+
+            try {
+                text = JSON.stringify(noColorMsg);
+            } catch(e) {
+                text = noColorMsg.join(' ');
+            }
+
+            srvlog(text, undefined, true);
+        }
     }
 
 };

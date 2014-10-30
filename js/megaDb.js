@@ -297,7 +297,7 @@ MegaDB.prototype.clear = function(tableName) {
     return this.server.clear(tableName);
 };
 MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
-    MegaDB.prototype.clear,
+    MegaDB._delayFnCallUntilDbReady(MegaDB.prototype.clear),
     'Clear'
 );
 
@@ -314,7 +314,7 @@ MegaDB.prototype.drop = function() {
 };
 
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(
-    MegaDB.prototype.drop,
+    MegaDB._delayFnCallUntilDbReady(MegaDB.prototype.drop),
     'Drop'
 );
 

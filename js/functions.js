@@ -907,9 +907,12 @@ AssertionFailed.prototype.name = 'AssertionFailed';
  */
 function assert(test, message) {
     if (!test) {
-        if(localStorage.d) {
+        if(MegaLogger && MegaLogger.rootLogger) {
+            MegaLogger.rootLogger.error("assertion failed: ", message);
+        } else if(localStorage.d) {
             console.error(message);
         }
+
         if(localStorage.stopOnAssertFail) {
             debugger;
         }
@@ -971,9 +974,9 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
-function srvlog(msg,data)
+function srvlog(msg,data, silent)
 {
-	if (d) console.error(msg);
+	if (!silent && d) console.error(msg);
 	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
 }
 

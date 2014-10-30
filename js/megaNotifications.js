@@ -20,6 +20,7 @@
         var self = this;
 
         self.options = $.extend({}, MegaNotifications.DEFAULT_OPTIONS, options);
+        self.logger = new MegaLogger("notifications", {}, options.parentLogger);
         self._notifications = [];
         self._counters = {};
 
@@ -329,7 +330,7 @@
                 };
             } else {
                 if(localStorage.d) {
-                    console.warn("Will skip showing desktop notification, since the text message is missing for type: ", self.type, self);
+                    self.logger.warn("Will skip showing desktop notification, since the text message is missing for type: ", self.type, self);
                 }
             }
         }

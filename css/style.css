@@ -1277,6 +1277,9 @@ a.blog-button:hover {
 .empty .notification-scr-list, .no-new-notifications .notification-scr-list, .empty .fm-notifications-bottom {
 	display: none;
 }
+.no-new-notifications .fm-dialog-button.notifications-button.clear {
+	display:none;
+}
 .notification-popup-empty {
 	display: none;
 }

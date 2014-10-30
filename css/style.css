@@ -1277,7 +1277,7 @@ a.blog-button:hover {
 .empty .notification-scr-list, .no-new-notifications .notification-scr-list, .empty .fm-notifications-bottom {
 	display: none;
 }
-.no-new-notifications .fm-dialog-button.notifications-button.clear {
+.no-new-notifications .fm-dialog-button.notifications-button.clear-button {
 	display:none;
 }
 .notification-popup-empty {
@@ -1397,6 +1397,9 @@ a.blog-button:hover {
 }
 .nt-contact-accepted .notification-avatar-icon {
 	background-position: -10px -351px;
+}
+.notification-popup .jspDrag {
+	width:4px;
 }
 .notification-avatar img {
 	-moz-border-radius: 100%;

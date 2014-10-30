@@ -425,7 +425,15 @@ function initNotifications()
 	  if ($(this).attr('class').indexOf('active') == -1)
 	  {
 		  $(this).addClass('active');
-		  $('.notification-popup').css('right',$('.top-head').outerWidth() - $('.cloud-popup-icon').position().left - 17 + 'px');
+		  var pos = $('.top-head').outerWidth() - $('.cloud-popup-icon').position().left - 17;
+		  if (pos - 240 < 20) {
+			  $('.notification-popup').css('right', (pos + Math.abs(pos - 240)) + 20 + 'px');
+			  $('.notification-popup .notification-arrow').css('margin-left', Math.abs(pos - 240) - 1 + 'px');
+		  }
+		  else {
+			  $('.notification-popup').css('right',pos + 'px');
+			  $('.notification-popup .notification-arrow').css('margin-left','-21px');
+		  }
 		  $('.notification-popup').addClass('active');
 		  notifyclock();		
 		  donotify();		  

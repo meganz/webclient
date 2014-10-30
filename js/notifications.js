@@ -54,13 +54,13 @@ function notifycounter()
 
 	if (a == 0)
 	{
-		$('.notification-num').hide();
+		$('.notification-num').css('display','none');
 		$('.notification-num').text(0);
 	}
 	else
 	{
 		$('.notification-num').text(a);
-		$('.notification-num').show();
+		$('.notification-num').css('display','inline-block');
 	}
 	megatitle();
 }
@@ -179,12 +179,12 @@ function donotify()
 	if (a == 0)
 	{
 		$('.notification-num').text(0);
-		$('.notification-num').hide();
+		$('.notification-num').css('display','none')
 	}
 	else
 	{
 		$('.notification-num').text(a);
-		$('.notification-num').show();
+		$('.notification-num').css('display','inline-block')
 	}
 	$('.notification-scr-list').html(phtml);
 
@@ -340,8 +340,15 @@ function notificationhtml(id,type,title,time,read)
 	rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
 	rhtml += '<span class="notification-status-icon">';
 	rhtml += '<span class="notification-status"></span>';
+	rhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
 	rhtml += '<span class="notification-type">';
+	rhtml += '<span class="notification-request-buttons">';
+	rhtml += '<span class="fm-dialog-button notifications-button accept">Accept</span>';
+	rhtml += '<span class="fm-dialog-button notifications-button">Not now</span>';
+	rhtml += '</span>';
+	rhtml += '<span class="notification-accepted">Accepted</span>';
 	rhtml += '<span class="notification-content">';
+	rhtml += '<span class="notification-username">User name</span>';
 	rhtml += '<span class="notification-info">' + title + '</span>';
 	rhtml += '<span class="notification-date">' + time2last(time) + '</span>';
 	rhtml += '</span></span></span></a>';
@@ -350,15 +357,24 @@ function notificationhtml(id,type,title,time,read)
 	phtml += '<div class="notification-type">'
 	phtml += '<div class="notification-content">';
 	phtml += '<div class="nt-popup-close"></div>';
+	
 	phtml += '<div class="notification-info" ' + nstyle2 + '>' + title + '</div>';
 	phtml += '</div></div></div>';
 
 	nhtml += '<div class="nt-main-date">' + time2last(time) + '</div>';
-	nhtml += '<div class="nt-info-block" id="no_'+id+'">';
-	nhtml += '<div class="nt-info-connector"></div>';
-	nhtml += '<div class="notification-type ' + className + '" ' + nstyle2 + ' id="type_' + htmlentities(id) + '"></div>';
+	nhtml += '<div class="nt-info-block ' + className + ' '  + nread + '" id="no_'+id+'">';
+	nhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
+	nhtml += '<span class="notification-status"></span>';
+	nhtml += '<span class="notification-request-buttons">';
+	nhtml += '<span class="fm-dialog-button notifications-button accept">Accept</span>';
+	nhtml += '<span class="fm-dialog-button notifications-button">Not now</span>';
+	nhtml += '</span>';
+	nhtml += '<span class="notification-accepted">Accepted</span>';
+	nhtml += '<div class="notification-nw-pad">';
+	nhtml += '<div class="notification-username">User name</div>';
+	nhtml += '<div class="notification-type" ' + nstyle2 + ' id="type_' + htmlentities(id) + '"></div>';
 	nhtml += '<div class="nt-info-txt" ' + nstyle2 + ' id="txt_' + htmlentities(id) + '">' + title + '</div>';
-	nhtml += '<div class="clear"></div></div><div class="clear"></div>';
+	nhtml += '</div></div><div class="clear"></div>';
 
 	var r =
 	{
@@ -409,7 +425,7 @@ function initNotifications()
 	  if ($(this).attr('class').indexOf('active') == -1)
 	  {
 		  $(this).addClass('active');
-		  $('.notification-popup').css('right',$('.top-menu-icon').outerWidth() + $('.user-name').outerWidth() + $('.membership-status-block').outerWidth() -78 + 'px');
+		  $('.notification-popup').css('right',$('.top-head').outerWidth() - $('.cloud-popup-icon').position().left - 17 + 'px');
 		  $('.notification-popup').addClass('active');
 		  notifyclock();		
 		  donotify();		  

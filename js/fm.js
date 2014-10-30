@@ -2131,6 +2131,8 @@ function notificationsUI(close)
 	notifymarkcount(true);
 	donotify();
 	$('.fm-main.notifications').removeClass('hidden');
+	$('.notifications .nw-fm-left-icon').removeClass('active');
+	notificationsScroll();
 	$('.fm-main.default').addClass('hidden');
     $(window).trigger('resize');
 }
@@ -7683,18 +7685,6 @@ function fm_resize_handler() {
         });
     });
 	*/
-
-    $('.fm-main.notifications > .new-notification-top').each(function() {
-        $(this).css({
-            'margin-left':  right_panel_margin + 48
-        });
-    });
-
-    $('.new-notification-pad').each(function() {
-        $(this).css({
-            'margin-left':  (305 - right_panel_margin) * -1
-        });
-    });
 
     $(['.files-grid-view .grid-scrolling-table','.file-block-scrolling','.contacts-grid-view .contacts-grid-scrolling-table '].join(", ")).css({
             'width': (

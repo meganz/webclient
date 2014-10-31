@@ -16,27 +16,32 @@ var blogpostnum;
 var blogmonth = false;
 var blogsearch = false;
 
+function init_blog_callback()
+{
+	$('#blog_searchinput').bind('focus', function(e) 
+	{
+		if (e.target.value == l[102]) e.target.value='';
+	});	
+	$('#blog_searchinput').bind('blur', function(e) 
+	{
+		if (e.target.value == '') e.target.value=l[102];	
+	});
+	$('#blog_searchinput').bind('keydown', function(e) 
+	{
+		if (e.keyCode == 13) blog_search();
+	});	
+	if (page == 'blogarticle') init_blogarticle();
+	else blog_load();
+}
+
 function init_blog()
 {
-	CMS.get('blog', function(err, data) {
+	if (blogposts) init_blog_callback();
+	else CMS.get('blog', function(err, data) {
 		if (err) return alert("Error fetching the blog data");
 
 		blogposts = data.object;
-		
-		$('#blog_searchinput').bind('focus', function(e) 
-		{
-			if (e.target.value == l[102]) e.target.value='';
-		});	
-		$('#blog_searchinput').bind('blur', function(e) 
-		{
-			if (e.target.value == '') e.target.value=l[102];	
-		});
-		$('#blog_searchinput').bind('keydown', function(e) 
-		{
-			if (e.keyCode == 13) blog_search();
-		});	
-		if (blogid) init_blogarticle();
-		else blog_load();
+		init_blog_callback();
 	});
 }
 

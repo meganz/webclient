@@ -11,13 +11,20 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 {
 	if (myURL)
 	{
-		var onPreviewRetry, isRawImage;
+		var onPreviewRetry, isRawImage, thumbHandler;
 		if (typeof opt === 'object')
 		{
 			isRawImage = opt.raw;
 			onPreviewRetry = opt.onPreviewRetry;
 
+			if (typeof isRawImage === 'function')
+			{
+				thumbHandler = isRawImage;
+				isRawImage = false;
+			}
+
 			if (d && isRawImage) console.log('Processing RAW Image: ' + isRawImage);
+			if (d && thumbHandler) console.log('ThumbHandler: ' + thumbHandler.name);
 
 			ASSERT(!isRawImage || typeof dcraw !== 'undefined', 'DCRAW is unavailale.');
 		}
@@ -145,6 +152,14 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 				ThumbFR.onload = function(e)
 				{
 					var u8 = new Uint8Array(ThumbFR.result), orientation;
+					if (thumbHandler)
+					{
+						return thumbHandler(u8.buffer, function(ab)
+						{
+							if (ab) __render_thumb(img, ab);
+						});
+					}
+
 					if (isRawImage)
 					{
 						var FS = dcraw.FS, run = dcraw.run, thumbData;
@@ -204,15 +219,8 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 							case 'PEF': orientation = +u8[115]; break;
 						}
 					}
-					if (undefined == orientation || orientation < 1 || orientation > 8) {
-						if (d) console.time('exif');
-						var exif = EXIF.getImageData(new BinaryFile(u8), true);
-						orientation = +exif.Orientation || 1;
-						if (d) console.timeEnd('exif');
-						if (d) console.debug('EXIF', exif, orientation);
-					}
-					var mpImg = new MegaPixImage(file);
-					mpImg.render(img, { maxWidth: 1000, maxHeight: 1000, quality: 0.96, orientation: orientation });
+
+					__render_thumb(img, u8, orientation, file);
 				};
 				if (file)
 				{
@@ -240,6 +248,20 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 		}
 		catch(e) { console.log('thumbnail error', e) }
 	}
+}
+
+function __render_thumb(img, u8, orientation, blob)
+{
+	if (undefined == orientation || orientation < 1 || orientation > 8) {
+		if (d) console.time('exif');
+		var exif = EXIF.getImageData(new BinaryFile(u8), true);
+		orientation = +exif.Orientation || 1;
+		if (d) console.timeEnd('exif');
+		if (d) console.debug('EXIF', exif, orientation);
+	}
+	if (!blob) blob = new Blob([u8], {type:'image/jpg'});
+	var mpImg = new MegaPixImage(blob);
+	mpImg.render(img, { maxWidth: 1000, maxHeight: 1000, quality: 0.96, orientation: orientation });
 }
 
 function ppmtojpeg(ppm)

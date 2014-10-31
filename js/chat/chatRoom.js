@@ -29,7 +29,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
          * Maximum time for waiting a message sync, before trying to send a request to someone else in the room or
          * failing the SYNC operation at all (if there are no other users to query for the sync op).
          */
-        'requestMessagesSyncTimeout': 2500,
+        'requestMessagesSyncTimeout': 5500,
 
         /**
          * Send any queued messages if the room is not READY
@@ -40,14 +40,14 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
          * Change the state of the room to READY in case there was no response in timely manner. (e.g. there were no
          * users who responded for a sync call).
          */
-        'messageSyncFailAfterTimeout': 20000, // XX: why is this so slow? optimise please.
+        'messageSyncFailAfterTimeout': 45000, // XX: why is this so slow? optimise please.
 
         /**
          * Used to cleanup the memory from sent sync requests.
          * This should be high enough, so that it will be enough for a response to be generated (message log to be
          * encrypted), send and received.
          */
-        'syncRequestCleanupTimeout': 40000,
+        'syncRequestCleanupTimeout': 50000,
 
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
@@ -2216,7 +2216,7 @@ ChatRoom.prototype.requestMessageSync = function(exceptFromUsers) {
     });
 
     if(ownUsers.length === 0) {
-        self.logger.error("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
+        self.logger.warn("No users to sync messages from for room: ", self.roomJid, "except list:", exceptFromUsers);
         return false;
     }
     var userNum = Math.floor(Math.random() * ownUsers.length) + 0;
@@ -2501,6 +2501,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 
         self.appendMessage(eventObject);
     } else {
+        self.appendMessage(eventObject);
         self._sendMessageToXmpp(eventObject);
     }
 };
@@ -2600,7 +2601,7 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
     // - users
     // for now simulate a random API call:
 
-    self.logger.debug("sendNodes: ", apinodes, apinodes);
+    this.logger.debug("sendNodes: ", apinodes, apinodes);
 
     api_req({a:'uq'},
         {

@@ -426,6 +426,9 @@ makeMetaAware(Karere);
                 } else if(localStorage.d) {
 		            console.error(e, e.stack);
                 }
+                if(localStorage.stopOnAssertFail) {
+                    debugger;
+                }
                 return true;
             }
         }

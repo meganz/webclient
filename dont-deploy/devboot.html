@@ -47,10 +47,18 @@
 //        localStorage.chatDisabled = 1;
 
         if(window.location.host == "mega.dev") { // lp local env settings
-            localStorage.mpencDebug = 1;
+//            localStorage.mpencDebug = 1;
             localStorage.dxmpp = 1;
-            localStorage.stopOnAssertFail = 1;
+//            localStorage.stopOnAssertFail = 1;
             localStorage.contextmenu=1;
+
+            // logger setup
+            localStorage.muteList = JSON.stringify([
+                "mdbEncryptionPlugin",
+                "querySet\\[chatMessages\\]",
+                "mDBEncryptionPlugin"
+            ]);
+            localStorage.minLogLevel = 0; /* debug */
         }
 
         window.location = '../index.html';

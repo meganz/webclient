@@ -1520,6 +1520,7 @@ describe("EncryptionFilter", function() {
 
             done();
         });
+
     });
 
     describe("25519 keys", function() {

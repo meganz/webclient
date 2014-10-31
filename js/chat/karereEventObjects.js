@@ -146,7 +146,7 @@ KarereEventObjects.ActionMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.ActionMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject ActionMessage(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -253,7 +253,7 @@ KarereEventObjects.DiscoCapabilities.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.DiscoCapabilities.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject DiscoCapabilities(...)";
 };
 /**
  * Event Object `IncomingMessage`
@@ -301,8 +301,12 @@ KarereEventObjects.IncomingMessage.prototype.getToJid = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setToJid = function(val) {
+    var oldVal = this.toJid;
     assert(typeof(val) == "string", "Invalid argument passed for: toJid, expected string got " + typeof(val));
     this.toJid = val;
+    if (oldVal != this.toJid) {
+        jQuery(this).trigger("onChange", [this, "toJid", oldVal, this.toJid]);
+    }
     return this;
 };
 /**
@@ -320,8 +324,12 @@ KarereEventObjects.IncomingMessage.prototype.getFromJid = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setFromJid = function(val) {
+    var oldVal = this.fromJid;
     assert(typeof(val) == "string", "Invalid argument passed for: fromJid, expected string got " + typeof(val));
     this.fromJid = val;
+    if (oldVal != this.fromJid) {
+        jQuery(this).trigger("onChange", [this, "fromJid", oldVal, this.fromJid]);
+    }
     return this;
 };
 /**
@@ -339,8 +347,12 @@ KarereEventObjects.IncomingMessage.prototype.getType = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setType = function(val) {
+    var oldVal = this.type;
     assert(typeof(val) == "string", "Invalid argument passed for: type, expected string got " + typeof(val));
     this.type = val;
+    if (oldVal != this.type) {
+        jQuery(this).trigger("onChange", [this, "type", oldVal, this.type]);
+    }
     return this;
 };
 /**
@@ -358,8 +370,12 @@ KarereEventObjects.IncomingMessage.prototype.getRawType = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setRawType = function(val) {
+    var oldVal = this.rawType;
     assert(typeof(val) == "string", "Invalid argument passed for: rawType, expected string got " + typeof(val));
     this.rawType = val;
+    if (oldVal != this.rawType) {
+        jQuery(this).trigger("onChange", [this, "rawType", oldVal, this.rawType]);
+    }
     return this;
 };
 /**
@@ -377,8 +393,12 @@ KarereEventObjects.IncomingMessage.prototype.getMessageId = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setMessageId = function(val) {
+    var oldVal = this.messageId;
     assert(typeof(val) == "string", "Invalid argument passed for: messageId, expected string got " + typeof(val));
     this.messageId = val;
+    if (oldVal != this.messageId) {
+        jQuery(this).trigger("onChange", [this, "messageId", oldVal, this.messageId]);
+    }
     return this;
 };
 /**
@@ -396,7 +416,11 @@ KarereEventObjects.IncomingMessage.prototype.getRawMessage = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setRawMessage = function(val) {
+    var oldVal = this.rawMessage;
     this.rawMessage = val || null;
+    if (oldVal != this.rawMessage) {
+        jQuery(this).trigger("onChange", [this, "rawMessage", oldVal, this.rawMessage]);
+    }
     return this;
 };
 /**
@@ -414,7 +438,11 @@ KarereEventObjects.IncomingMessage.prototype.getRoomJid = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setRoomJid = function(val) {
+    var oldVal = this.roomJid;
     this.roomJid = val || "";
+    if (oldVal != this.roomJid) {
+        jQuery(this).trigger("onChange", [this, "roomJid", oldVal, this.roomJid]);
+    }
     return this;
 };
 /**
@@ -432,7 +460,11 @@ KarereEventObjects.IncomingMessage.prototype.getMeta = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setMeta = function(val) {
+    var oldVal = this.meta;
     this.meta = val || {};
+    if (oldVal != this.meta) {
+        jQuery(this).trigger("onChange", [this, "meta", oldVal, this.meta]);
+    }
     return this;
 };
 /**
@@ -450,7 +482,11 @@ KarereEventObjects.IncomingMessage.prototype.getContents = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setContents = function(val) {
+    var oldVal = this.contents;
     this.contents = val || "";
+    if (oldVal != this.contents) {
+        jQuery(this).trigger("onChange", [this, "contents", oldVal, this.contents]);
+    }
     return this;
 };
 /**
@@ -468,7 +504,11 @@ KarereEventObjects.IncomingMessage.prototype.getElements = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setElements = function(val) {
+    var oldVal = this.elements;
     this.elements = val || "";
+    if (oldVal != this.elements) {
+        jQuery(this).trigger("onChange", [this, "elements", oldVal, this.elements]);
+    }
     return this;
 };
 /**
@@ -486,7 +526,11 @@ KarereEventObjects.IncomingMessage.prototype.getDelay = function() {
  * @returns {KarereEventObjects.IncomingMessage}
  */
 KarereEventObjects.IncomingMessage.prototype.setDelay = function(val) {
+    var oldVal = this.delay;
     this.delay = val || unixtime();
+    if (oldVal != this.delay) {
+        jQuery(this).trigger("onChange", [this, "delay", oldVal, this.delay]);
+    }
     return this;
 };
 /**
@@ -500,8 +544,6 @@ KarereEventObjects.IncomingMessage.prototype.getSeen = function() {
 /**
  * Setter for property `seen`
  *
- * @note: triggers onSeenChange event (using jQuery), with arguments [this, oldValue, newValue]
- *
  * @param [val] {boolean} used for notification to track whether we need to notify the message if it was not seen by the user
  * @returns {KarereEventObjects.IncomingMessage}
  */
@@ -509,7 +551,7 @@ KarereEventObjects.IncomingMessage.prototype.setSeen = function(val) {
     var oldVal = this.seen;
     this.seen = val || "";
     if (oldVal != this.seen) {
-        jQuery(this).trigger("onSeenChange", [this, oldVal, this.seen]);
+        jQuery(this).trigger("onChange", [this, "seen", oldVal, this.seen]);
     }
     return this;
 };
@@ -528,7 +570,7 @@ KarereEventObjects.IncomingMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.IncomingMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject IncomingMessage(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -777,7 +819,7 @@ KarereEventObjects.IncomingPrivateMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.IncomingPrivateMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject IncomingPrivateMessage(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -944,7 +986,7 @@ KarereEventObjects.InviteMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.InviteMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject InviteMessage(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -1247,7 +1289,7 @@ KarereEventObjects.OutgoingMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.OutgoingMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject OutgoingMessage(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -1420,7 +1462,7 @@ KarereEventObjects.PingRequest.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.PingRequest.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject PingRequest(...)";
 };
 /**
  * Event Object `PingResponse`
@@ -1507,7 +1549,7 @@ KarereEventObjects.PingResponse.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.PingResponse.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject PingResponse(...)";
 };
 /**
  * Event Object `Presence`
@@ -1653,7 +1695,7 @@ KarereEventObjects.Presence.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.Presence.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject Presence(...)";
 };
 /**
  * Returns true if this is an empty message (e.g. composing, paused composing, active state) with no message contents (text OR meta)
@@ -1779,7 +1821,7 @@ KarereEventObjects.StateActiveMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.StateActiveMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject StateActiveMessage(...)";
 };
 /**
  * Event Object `StateComposingMessage`
@@ -1885,7 +1927,7 @@ KarereEventObjects.StateComposingMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.StateComposingMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject StateComposingMessage(...)";
 };
 /**
  * Event Object `StatePausedMessage`
@@ -1991,7 +2033,7 @@ KarereEventObjects.StatePausedMessage.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.StatePausedMessage.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject StatePausedMessage(...)";
 };
 /**
  * Event Object `UsersJoined`
@@ -2119,7 +2161,7 @@ KarereEventObjects.UsersJoined.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.UsersJoined.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject UsersJoined(...)";
 };
 /**
  * Event Object `UsersLeft`
@@ -2247,7 +2289,7 @@ KarereEventObjects.UsersLeft.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.UsersLeft.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject UsersLeft(...)";
 };
 /**
  * Event Object `UsersUpdated`
@@ -2394,5 +2436,5 @@ KarereEventObjects.UsersUpdated.prototype.isMyOwn = function(karere) {
  * @returns {string}
  */
 KarereEventObjects.UsersUpdated.prototype.toString = function() {
-    return "EventObject " + this.getType() + "(...)";
+    return "EventObject UsersUpdated(...)";
 };

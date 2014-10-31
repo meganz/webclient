@@ -482,12 +482,15 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
  * Goes thru the list of users in the specific `megaRoom` and tries to sync that with the `mpenc.ProtocolHandler`
  *
  * @param megaRoom {ChatRoom}
- * @param forceRecover {boolean}
+ * @param [forceRecover] {boolean}
  */
 EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
     if(megaRoom._leaving) {
         return;
+    } else if(megaRoom._syncRoomMembersIsInProgress) {
+        return;
     }
+    megaRoom._syncRoomMembersIsInProgress = true; // lock
 
     var self = this;
 
@@ -525,7 +528,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
             return; // no need to ping users who are going to be excluded
         }
 
-         self.logger.debug("#PING pinging: ", v);
+        self.logger.debug("#PING pinging: ", v);
 
         promises.push(
             megaRoom.megaChat.karere.sendPing(v)
@@ -552,10 +555,12 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
         );
     });
 
-    return $.when.apply($.when, promises)
+    return $.when.apply($, promises)
         .always(function() {
-             self.logger.debug("#PING got state // users to join:", joinUsers);
-             self.logger.debug("#PING got state // users to exclude:", excludeUsers);
+            self.logger.debug("#PING got state // users to join:", joinUsers);
+            self.logger.debug("#PING got state // users to exclude:", excludeUsers);
+
+            megaRoom._syncRoomMembersIsInProgress = false;
 
             // filter .joinUsers who are NOT participants
             var participants = megaRoom.getParticipants();
@@ -588,6 +593,8 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                          self.logger.debug("forceRecover: ignoring user: ", v);
                     }
                 });
+
+                self.logger.error("had to recover, current users: ", currentUsers, "newly joined users: ", newlyJoinedUsers);
 
                 megaRoom.encryptionOpQueue.queue(
                     'recover',

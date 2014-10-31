@@ -1099,11 +1099,11 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     }
     ctx[fnName] = function() {
         //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)));
+        logger.debug.apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
 
         var res = origFn.apply(this, toArray(arguments));
         //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        logger.debug.apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
 
         return res;
     };

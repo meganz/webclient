@@ -2186,7 +2186,8 @@ Chat.prototype.openChat = function(jids, type) {
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {
-            $promise.reject.apply($promise, toArray(arguments))
+            $promise.reject.apply($promise, toArray(arguments));
+
             if(self.chats[$startChatPromise.roomJid]) {
                 self.chats[$startChatPromise.roomJid].destroy(false);
                 self.renderContactTree();

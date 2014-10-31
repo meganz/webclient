@@ -28,11 +28,11 @@ makeObservable(MegaLogger);
  * Static, log levels
  */
 MegaLogger.LEVELS = {
-    'ERROR': 0,
-    'DEBUG': 10,
-    'WARN': 20,
-    'INFO': 30,
-    'LOG': 40
+    'ERROR': 40,
+    'WARN': 30,
+    'INFO': 20,
+    'LOG': 10,
+    'DEBUG': 0
 };
 
 /**
@@ -55,10 +55,43 @@ MegaLogger.DEFAULT_OPTIONS = {
         return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + "." + d.getMilliseconds();
     },
     'transport': function() {
-        console.error.apply(console, arguments);
+        var level = Array.prototype.slice.call(arguments, 0);
+        var args = level.splice(1);
+        var fn = "log";
+
+        if(level == MegaLogger.LEVELS.DEBUG) {
+            fn = "debug"
+        } else if(level == MegaLogger.LEVELS.LOG) {
+            fn = "log"
+        } else if(level == MegaLogger.LEVELS.INFO) {
+            fn = "info"
+        } else if(level == MegaLogger.LEVELS.WARN) {
+            fn = "warn"
+        } else if(level == MegaLogger.LEVELS.ERROR) {
+            fn = "error"
+        }
+        console[fn].apply(console, args);
     },
     'isEnabled': function() {
         return MegaLogger.rootLogger.isEnabled(); // alias
+    },
+    'muteList': function() {
+        if(sessionStorage.muteList) {
+            return JSON.parse(sessionStorage.muteList);
+        } else if(localStorage.muteList) {
+            return JSON.parse(localStorage.muteList)
+        } else {
+            return [];
+        }
+    },
+    'minLogLevel': function() {
+        if(sessionStorage.minLogLevel) {
+            return JSON.parse(sessionStorage.minLogLevel);
+        } else if(localStorage.minLogLevel) {
+            return JSON.parse(localStorage.minLogLevel)
+        } else {
+            return MegaLogger.LEVELS.DEBUG;
+        }
     },
     /**
      * warning: this will use tons of CPU because of the trick of JSON.serialize/.stringify we are using for dereferencing
@@ -102,6 +135,8 @@ MegaLogger.prototype._getLoggerPath = function() {
 };
 
 MegaLogger.prototype._log = function(level, arguments) {
+    var self = this;
+
     var levelName = MegaLogger._intToLevel(level);
     var clr = this.options.levelColors[levelName];
     var logStyle = "color: " + "white" + "; background-color: " +  clr + "; padding-left: 1px; padding-right: 1px;";
@@ -117,9 +152,27 @@ MegaLogger.prototype._log = function(level, arguments) {
     }
 
     if(this.options.isEnabled === true || ($.isFunction(this.options.isEnabled) && this.options.isEnabled())) {
-        this.options.transport.apply(this.options.transport, args);
+        var txtMsg = args.join(" ");
+        var muted = false;
+        self.options.muteList().forEach(function(v) {
+            var r = new RegExp(v);
+            if(r.test(txtMsg)) {
+                muted = true;
+                return false; // break;
+            }
+        });
 
-        if(level == MegaLogger.LEVELS.ERROR && srvlog) {
+        if(muted) {
+            return;
+        }
+
+        if(level < self.options.minLogLevel()) { // check min log level
+            return;
+        }
+
+        self.options.transport.apply(this.options.transport, [level].concat(args));
+
+        if(level == MegaLogger.LEVELS.ERROR && srvlog && typeof(mocha) == "undefined") {
             var text;
             //var noColorMsg = clone(args); // convert back to plain text before sending to the server
             var noColorMsg = $.extend(true, {}, {'r': args})['r']; // convert back to plain text before sending to the server

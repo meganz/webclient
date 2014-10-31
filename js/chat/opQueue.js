@@ -22,8 +22,9 @@ var OpQueue = function(ctx, megaRoom, validateFn, recoverFailFn) {
 
     this.validateFn = validateFn;
     this.recoverFailFn = recoverFailFn;
-    this.MAX_ERROR_RETRIES = 10;
+    this.MAX_ERROR_RETRIES = 5;
     this.retryTimeout = 1000;
+    this.recoverTimeout = 5000;
 
     this._error_retries = 0;
 
@@ -117,6 +118,7 @@ OpQueue.prototype.preprocess = function(op) {
                     $promise1.resolve();
                 } catch(e) {
                     self.logger.error("Failed to process message", wireMessage, "with error:", e, e.stack);
+                    $promise1.reject();
                     if(localStorage.stopOnAssertFail) {
                         debugger;
                     }
@@ -131,6 +133,7 @@ OpQueue.prototype.preprocess = function(op) {
                     $promise2.resolve();
                 } catch(e) {
                     self.logger.error("Failed to process message", wireMessage, "with error:", e);
+                    $promise2.reject();
                     if(localStorage.stopOnAssertFail) {
                         debugger;
                     }
@@ -225,8 +228,9 @@ OpQueue.prototype.pop = function() {
             }
 
 
-            if(op[0] == "processMessage") {
-                self.logger.debug("Will process message with contents: ", mpenc.codec.inspectMessageContent(op[1]));
+            if(op[0] == "processMessage" && op[1].message && typeof(mocha) == "undefined") {
+                var classify = mpenc.codec.categoriseMessage(op[1].message);
+                self.logger.debug("Will process message with contents: ", mpenc.codec.inspectMessageContent(classify.content));
             }
 
 

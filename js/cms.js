@@ -2,7 +2,7 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/loading.gif";
 
 (function(window, asmCrypto) {
 
-var pubkey = asmCrypto.base64_to_bytes('WyJlNzQwNWI3YTdlYzIwYjc5Y2MwNmFiNmRhYTRlYmVlMjJlODljOTkxMDY4OGQ4NGRjMjllMGMyMzIyZTg2NTc4ZTlkNmE1YjNjODQyMGU1YTViZWU5YjI1YzA1MTZiMzFjOTc5Y2IyNGRiOWI0NzZhMTEwMTExZjlkM2FkZTY5NyIsIjAxMDAwMSJd')
+var pubkey = asmCrypto.base64_to_bytes('WyJkNGQyYTA3Zjk0YzY0ZTBhMDYwMmI5NGE4ZWIyYjRlZDE5ZjczMzg2YmM4ODYzYTc1YzgyYWMxNDNkODRlMzc3MzhkODFmMDQ4YmM1YjgzNmFiOGUxYzg1Zjg5Y2U1MGNjOTBiMmNlNWZhZTc1Y2YzYTQ5MWIyZmZlOTM5MjNlZCIsIjAxMDAwMSJd');
 pubkey = JSON.parse(asmCrypto.bytes_to_string(pubkey));
 pubkey[0] = asmCrypto.hex_to_bytes(pubkey[0])
 pubkey[1] = asmCrypto.hex_to_bytes(pubkey[1])
@@ -24,10 +24,11 @@ function process_cms_response(socket, next, as)
 	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
 
-	var signature = bytes.slice(2, 66); // 64 bytes, signature
-	var mime = viewer[0]
-	var label = ab_to_str(bytes.slice(66, viewer[1]+66));
-	var content = bytes.slice(viewer[1]+66)
+	var signature = bytes.slice(3, 67); // 64 bytes, signature
+	var version = viewer[0];
+	var mime = viewer[1];
+	var label = ab_to_str(bytes.slice(67, viewer[2]+67));
+	var content = bytes.slice(viewer[2]+67)
 
 	delete bytes;
 
@@ -120,7 +121,7 @@ CMS.prototype.get = function(id, next, as) {
 		})
 	};
 	q.responseType = 'arraybuffer';
-	q.open("GET", "/blobs.php?id=" + id);
+	q.open("GET", "http://cms.mega.nz/blob.php?id=" + id);
 	q.send();
 };
 

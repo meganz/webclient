@@ -31,7 +31,7 @@ function render_blogarticle()
 		$('#blog_prev').fadeTo(0,0.4);	
 		$('#blog_prev').removeClass('active');		
 	}			
-	if (blogposts['post_' + (parseInt(i)+1)])
+	if (blogposts['post_' + (parseInt(blogid)+1)])
 	{
 		$('#blog_next').attr('href','#blog_' + blogposts['post_'+(parseInt(blogid)+1)].id);
 		$('#blog_next').fadeTo(0,1);

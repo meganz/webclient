@@ -47,6 +47,7 @@ describe("mpenc integration and regression tests", function() {
                         var msg = v.protocolOutQueue.shift();
                         protocolHandlers.forEach(function(vv) {
                             if(vv == v) { return; }
+                            if(msg.from == vv.id) { return; }
                             if(!vv.enabled) { return; }
 
                             try {

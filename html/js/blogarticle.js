@@ -1,8 +1,7 @@
 function init_blogarticle()
 {
 	if (blogposts === null) {
-		init_blog();
-		return Later(init_blogarticle);
+		return init_blog();
 	}
 
 	var post = blogposts['post_'  + blogid]

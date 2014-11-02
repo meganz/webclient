@@ -109,20 +109,35 @@ CMS.prototype.img = function(id)
 	return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
 }
 
-CMS.prototype.get = function(id, next, as) {
-	// I should be replaced with api_req instead of the socket
+var fetching = {};
+
+function doRequest(id) {
 	var q = getxhr();
 	q.onload = function() {
-		process_cms_response(q, next, as);
+		for (var i in fetching[id]) {
+			process_cms_response(q, fetching[id][i][0], fetching[id][i][0]);
+		}
+		delete fetching[id]
+		q = null;
 	}
 	q.onerror = function() {
 		Later(function() {
-			window.CMS.get(id, next, as);
+			doRequest(id);
 		})
+		q = null;
 	};
 	q.responseType = 'arraybuffer';
-	q.open("GET", "http://cms.mega.nz/blob.php?id=" + id);
+	q.open("GET", "http://cms.mega.nz/" + id);
 	q.send();
+}
+
+CMS.prototype.get = function(id, next, as) {
+	// I should be replaced with api_req instead of the socket
+	if (typeof fetching[id] == "undefined") {
+		doRequest(id);
+		fetching[id] = [];
+	}
+	fetching[id].push([next, as]);
 };
 
 CMS.prototype.imgLoader = function(html, id) {

@@ -37,12 +37,17 @@ function init_blog_callback()
 function init_blog()
 {
 	if (blogposts) init_blog_callback();
-	else CMS.get('blog', function(err, data) {
-		if (err) return alert("Error fetching the blog data");
+	else 
+	{
+		loadingDialog.show();
+		CMS.get('blog', function(err, data) {
+			if (err) return alert("Error fetching the blog data");
 
-		blogposts = data.object;
-		init_blog_callback();
-	});
+			blogposts = data.object;
+			loadingDialog.hide();
+			init_blog_callback();
+		});
+	}
 }
 
 function blog_load()

@@ -228,8 +228,8 @@ function init_page()
 	{
 		var cpage = decodeURIComponent(page.substr(5,page.length-2));
 		 
+		loadingDialog.show();
 		CMS.get(cpage, function(err, content) {
-			alert(content.html)
 			parsepage(content.html)
 			$('.on-boot').each(function() {
 				var js = $(this).data('js');
@@ -237,8 +237,11 @@ function init_page()
 					window[js]();
 				}
 			});
+			topmenuUI();
+			loadingDialog.hide();
 		});
 		page = 'cpage';
+		return;
 	}
 	else if (page.substr(0,4) == 'blog' && page.length > 4 && page.length < 10)
 	{
@@ -1209,6 +1212,7 @@ function topmenuUI()
 		else if (c.indexOf('register') > -1) document.location.hash = 'register';
 		else if (c.indexOf('login') > -1) document.location.hash = 'login';
 		else if (c.indexOf('aboutus') > -1) document.location.hash = 'about';
+		else if (c.indexOf('corporate') > -1) document.location.hash = 'page_corporate';
 		else if (c.indexOf('megablog') > -1) document.location.hash = 'blog';
 		else if (c.indexOf('credits') > -1) document.location.hash = 'credits';
 		else if (c.indexOf('chrome') > -1) document.location.hash = 'chrome';

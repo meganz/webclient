@@ -69,6 +69,7 @@ function process_cms_response(socket, next, as)
 			io.setCredentials("", content.byteLength, "", [], []);
 			io.write(content, 0, function() {
 				io.download(label, 'application/octet-stream');
+				return next(false, {});
 			});
 			break;
 		}
@@ -127,12 +128,11 @@ function doRequest(id) {
 		q = null;
 	};
 	q.responseType = 'arraybuffer';
-	q.open("GET", "http://cms.mega.nz/" + id);
+	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + id);
 	q.send();
 }
 
 CMS.prototype.get = function(id, next, as) {
-	// I should be replaced with api_req instead of the socket
 	if (typeof fetching[id] == "undefined") {
 		doRequest(id);
 		fetching[id] = [];
@@ -156,6 +156,21 @@ CMS.prototype.imgLoader = function(html, id) {
 	}
 	return html;
 }
+
+$(document).on('click', '.cms-asset-download', function(e) {
+	var $this = $(this)
+		, target = $this.data('id');
+	if (!target) return;
+
+	e.preventDefault();
+
+	loadingDialog.show();
+	window.CMS.get(target, function() {
+		loadingDialog.hide();
+	}, 'download');
+
+	return false;
+});
 
 
 window.CMS = new CMS;

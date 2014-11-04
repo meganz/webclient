@@ -89,7 +89,7 @@ $(document).on('click', '*[data-cms-dl]', function(e) {
 
 var is_img
 function dl_placeholder(str, sep, rid, id) {
-	return "'" + javascript:void(0) + "' data-cms-dl='"+id+"'"
+	return "'javascript:void(0)' data-cms-dl='"+id+"'"
 }
 
 function img_placeholder(str, sep, rid, id) {

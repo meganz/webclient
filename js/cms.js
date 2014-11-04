@@ -68,7 +68,8 @@ function process_cms_response(socket, next, as)
 			io.begin = function() {};
 			io.setCredentials("", content.byteLength, "", [], []);
 			io.write(content, 0, function() {
-				io.download(label, 'application/octet-stream');
+				// second argument is never used anyways
+				io.download(label, label);
 				return next(false, {});
 			});
 			break;
@@ -81,14 +82,14 @@ function process_cms_response(socket, next, as)
 var assets = {};
 
 $(document).on('click', '*[data-cms-dl]', function(e) {
-	window.CMS.get($(this).data('cms-dl'), function() {
+	CMS.get($(this).data('cms-dl'), function() {
 	}, 'download');
 	return false;
 });
 
 var is_img
 function dl_placeholder(str, sep, rid, id) {
-	return "'" + Math.random() + "' data-cms-dl='"+id+"'"
+	return "'" + javascript:void(0) + "' data-cms-dl='"+id+"'"
 }
 
 function img_placeholder(str, sep, rid, id) {
@@ -96,13 +97,13 @@ function img_placeholder(str, sep, rid, id) {
 	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
 }
 
-function CMS() {
+function CMSClass() {
 }
 
-CMS.prototype.img = function(id) 
+CMSClass.prototype.img = function(id) 
 {
 	if (!assets[id]) {
-		window.CMS.get(id, function(err, obj) {
+		this.get(id, function(err, obj) {
 			$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
 			assets[id] = obj.url;
 		});
@@ -132,7 +133,7 @@ function doRequest(id) {
 	q.send();
 }
 
-CMS.prototype.get = function(id, next, as) {
+CMSClass.prototype.get = function(id, next, as) {
 	if (typeof fetching[id] == "undefined") {
 		doRequest(id);
 		fetching[id] = [];
@@ -140,7 +141,7 @@ CMS.prototype.get = function(id, next, as) {
 	fetching[id].push([next, as]);
 };
 
-CMS.prototype.imgLoader = function(html, id) {
+CMSClass.prototype.imgLoader = function(html, id) {
 	if (!assets[id]) {
 		is_img = false;
 		// replace images
@@ -165,7 +166,7 @@ $(document).on('click', '.cms-asset-download', function(e) {
 	e.preventDefault();
 
 	loadingDialog.show();
-	window.CMS.get(target, function() {
+	CMS.get(target, function() {
 		loadingDialog.hide();
 	}, 'download');
 
@@ -173,7 +174,7 @@ $(document).on('click', '.cms-asset-download', function(e) {
 });
 
 
-window.CMS = new CMS;
+window.CMS = new CMSClass;
 
 })(this, asmCrypto)
 

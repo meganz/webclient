@@ -45,7 +45,7 @@ function render_blogarticle()
 	content = '';
 	if (blogposts[i].attaches.bimg) content += '<img alt="" data-img="loading_'+blogposts[i].attaches.bimg+'" src="' + CMS.img(blogposts[i].attaches.bimg) + '" class="blog-new-full-img" />';
 	content += blogposts[i].c;				
-	content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
+	content = content.replace('[READMORE]','').replace(/(%7Bstaticpath%7D|{staticpath})/g,staticpath);
 	var by = 'Admin';
 	if (blogposts[i].by) by = blogposts[i].by;
 	var btitle = blogposts[i].h;

@@ -1,4 +1,4 @@
-var IMAGE_PLACEHOLDER = staticpath + "/images/loading.gif";
+var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
 

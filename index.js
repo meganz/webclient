@@ -239,6 +239,7 @@ function init_page()
 			});
 			topmenuUI();
 			loadingDialog.hide();
+			mainScroll();
 		});
 		page = 'cpage';
 		return;

@@ -1354,7 +1354,6 @@ Chat.prototype.init = function() {
             if(!c) { return; }
 
             $('#contact_' + c.u + ' .start-chat-button')
-                .text('Show chat')
                 .addClass("active");
         }
     });
@@ -1366,7 +1365,6 @@ Chat.prototype.init = function() {
             if(!c) { return; }
 
             $('#contact_' + c.u + ' .start-chat-button')
-                .text('Start chat')
                 .removeClass("active");
         }
         room._cancelCallRequest();
@@ -2004,13 +2002,8 @@ Chat.prototype.renderContactTree = function() {
 
         var u_h = node_id.replace("contact_", "");
 
-
-        var startChatTxt = "Start chat";
         $('.start-chat-button', $node)
-            .show()
-            .text(
-                startChatTxt
-            );
+            .show();
     });
 
 

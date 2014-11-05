@@ -18493,6 +18493,19 @@ span.incoming-call-name {
 	text-align: center;
 	padding: 0 4px 8px 4px;
 }
+.start-chat-button {
+	position:absolute;
+	right:4px;
+	top:5px;
+	width:16px;
+	height:16px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-position: left -1457px;
+	background-repeat: no-repeat;
+	cursor:pointer;
+	z-index:10;
+	display:block;
+}
 .icoming-call-button {
 	width: 64px;
 	height: 48px;

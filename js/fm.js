@@ -2997,6 +2997,15 @@ function gridUI()
 		  var headerColumn = $('.grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });
+		initTransferScroll(); 
+	}
+	$.detailsGridHeader = function()
+	{
+		$('.contact-details-view .grid-table tbody tr:first-child td').each(function(i,e)
+		{
+		  var headerColumn = $('.contact-details-view .grid-table-header th').get(i);
+		  $(headerColumn).width($(e).width());
+	    });
 		initTransferScroll();
 	}
 	$.contactgridHeader = function()
@@ -3009,7 +3018,7 @@ function gridUI()
 			if (i !== 0) w+=$(el[i]).width();
 			i++;
 		}
-		$('.files-grid-view.contacts-view .grid-scrolling-table tbody tr:first-child td').each(function(i,e)
+		$('.files-grid-view.contacts-view .grid-scrolling-table tr:first-child td').each(function(i,e)
 		{
 		  var headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
@@ -3027,7 +3036,7 @@ function gridUI()
 			if (i !== 0) w+=$(el[i]).width();
 			i++;
 		}
-		$('.shared-grid-view .grid-scrolling-table tbody tr:first-child td').each(function(i,e)
+		$('.shared-grid-view .grid-scrolling-table tr:first-child td').each(function(i,e)
 		{
 		  var headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
@@ -3054,6 +3063,7 @@ function gridUI()
 			{
 				initGridScrolling();
 				$.gridHeader();
+				$.detailsGridHeader();
 			}
 		}
     });
@@ -3088,8 +3098,8 @@ function gridUI()
 		if (M.v.length > 0)
 		{
 			$('.files-grid-view.contact-details-view').removeClass('hidden');
+			$.detailsGridHeader();
 			initGridScrolling();
-			$.gridHeader();
 		}
 	}
 	else

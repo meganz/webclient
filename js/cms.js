@@ -43,7 +43,7 @@ function process_cms_response(socket, next, as, id)
 			break;
 
 		case 1:
-			var blob = new Blob([content], { type: mime });
+			var blob = new Blob([content]);
 			content = window.URL.createObjectURL(blob);
 			next(false, { url: content, mime: mime})
 			return loaded(id);

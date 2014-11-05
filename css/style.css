@@ -1363,7 +1363,7 @@ a.blog-button:hover {
 	padding: 2px 0 2px 28px;
 	margin: 22px 14px 0 0;
 	display: none;
-	background-image: url(http://test/webclient/images/mega/notifications-sprite.svg);
+	background-image: url(../images/mega/notifications-sprite.svg);
 	background-position: -10px -350px;
 	background-repeat: no-repeat;
 }
@@ -16491,7 +16491,7 @@ code, c {
 }
 .notification-empty-icon {
 	height: 225px;
-	background-image: url(http://test/webclient/images/mega/dialogs-sprite.svg);
+	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-position: center -3245px;
 	background-repeat: no-repeat;
 }

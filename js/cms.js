@@ -43,16 +43,8 @@ function process_cms_response(socket, next, as, id)
 			break;
 
 		case 1:
-			var blob;
-			try {
-                blob = new Blob([content], { type: mime });
-			} catch (e) {
-                window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-                var bb = new BlobBuilder();
-                for (var i in content) bb.append(content[i]);
-                blob = bb.getBlob(mime)
-			}
-            content = window.URL.createObjectURL(blob);
+			var blob = new Blob([content], { type: mime });
+			content = window.URL.createObjectURL(blob);
 			next(false, { url: content, mime: mime})
 			return loaded(id);
 
@@ -142,20 +134,15 @@ function loaded(id)
 			_listeners[id][i]();
 		}
 	}
+	CMS.attachEvents();
 }
 
 var CMS = {
 
 	attachEvents: function() {
-		$('*[data-cms-dl]').rebind('click', function(e) {
-			CMS.get($(this).data('cms-dl'), function() {
-			}, 'download');
-			return false;
-		});
-
-		$('.cms-asset-download').rebind('click', function(e) {
+		$('*[data-cms-dl],.cms-asset-download').rebind('click', function(e) {
 			var $this = $(this)
-				, target = $this.data('id');
+				, target = $this.data('id') || $this.data('cms-dl');
 			if (!target) return;
 
 			e.preventDefault();

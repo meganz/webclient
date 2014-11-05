@@ -359,8 +359,9 @@ function browserdetails(useragent)
 	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
 	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
-	else if (useragent.indexOf('msie') > 0) browser = 'Internet Explorer';
 	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
+	else if (useragent.indexOf('msie') > 0
+		|| "ActiveXObject" in window) browser = 'Internet Explorer';
 	if ((os) && (browser))
 	{
 		name = browser + ' on ' + os;
@@ -618,6 +619,12 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
+function srvlog(msg,data)
+{
+	if (d) console.error(msg);
+	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+}
+
 function oDestroy(obj) {
 	if (d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
@@ -798,6 +805,49 @@ function CreateWorkers(url, message, size) {
 	}, size);
 }
 
+function mKeyDialog(ph, fl)
+{
+	$('.new-download-buttons').addClass('hidden');
+	$('.new-download-file-title').text(l[1199]);	
+	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
+	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
+	$('.fm-dialog-overlay').removeClass('hidden');	
+	$('.fm-dialog.dlkey-dialog input').unbind('focus');
+	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
+	{
+		if ($(this).val() == l[1028]) $(this).val('');	
+	});	
+	$('.fm-dialog.dlkey-dialog input').unbind('blur');
+	$('.fm-dialog.dlkey-dialog input').bind('blur',function(e)
+	{
+		if ($(this).val() == '') $(this).val(l[1028]);
+	});	
+	$('.fm-dialog.dlkey-dialog input').unbind('keydown');
+	$('.fm-dialog.dlkey-dialog input').bind('keydown',function(e)
+	{
+		$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').addClass('active');
+		if (e.keyCode == 13) $('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').click();
+	});
+	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').unbind('click');
+	$('.fm-dialog.dlkey-dialog .fm-dialog-new-folder-button').bind('click',function(e)
+	{
+		var key = $('.fm-dialog.dlkey-dialog input').val();
+
+		if (key && key !== l[1028])
+		{
+			$('.fm-dialog.dlkey-dialog').addClass('hidden');
+			$('.fm-dialog-overlay').addClass('hidden');	
+			document.location.hash = (fl ? '#F!':'#!') + ph + '!' + key;
+		}
+	});	
+	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
+	$('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click',function(e)
+	{
+		$('.fm-dialog.dlkey-dialog').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');	
+	});
+}
+
 function dcTracer(ctr) {
 	var name = ctr.name, proto = ctr.prototype;
 	for(var fn in proto) {
@@ -910,7 +960,7 @@ function setupTransferAnalysis()
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };
 						if (i[0] == 'z') t = 'zip' + t;
 						console.error(t + ' stuck. ' + r, i, udata );
-						if (!d) window.onerror(t + ' Stuck. ' + r, '', 1,0,{udata:udata});
+						if (!d) srvlog(t + ' Stuck. ' + r, udata);
 					}
 					delete prev[i];
 				}

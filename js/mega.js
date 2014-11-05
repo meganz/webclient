@@ -814,7 +814,7 @@ function MegaData ()
 			}
 			else console.log('something went wrong!',n.p,this.u[n.p]);
 		}
-		if (mDB && !ignoreDB && !pfkey) mDBadd('f',clone(n));
+		if (typeof mDB === 'object' && !ignoreDB && !pfkey) mDBadd('f',clone(n));
 		if (n.p)
 		{
 			if (typeof this.c[n.p] == 'undefined') this.c[n.p] = [];
@@ -865,7 +865,7 @@ function MegaData ()
 				for(var h2 in M.c[h]) ds(h2);
 				delete M.c[h];
 			}
-			if (mDB && !pfkey) mDBdel('f',h);
+			if (typeof mDB === 'object' && !pfkey) mDBdel('f',h);
 			if (M.d[h])
 			{
 				M.delIndex(M.d[h].p,h);
@@ -964,7 +964,7 @@ function MegaData ()
 	this.addUser = function(u,ignoreDB)
 	{
 		this.u[u.u]=u;
-		if (mDB && !ignoreDB && !pfkey) mDBadd('u',clone(u));
+		if (typeof mDB === 'object' && !ignoreDB && !pfkey) mDBadd('u',clone(u));
 	};
 
 	this.copyNodes = function(cn,t,del)
@@ -1223,7 +1223,7 @@ function MegaData ()
 		if (n)
 		{
 			for (var i in a) n[i]=a[i];
-			if (mDB && !pfkey) mDBadd('f',clone(n));
+			if (typeof mDB === 'object' && !pfkey) mDBadd('f',clone(n));
 		}
 	}
 
@@ -1290,14 +1290,14 @@ function MegaData ()
 		{
 			if (typeof this.d[h].shares == 'undefined') this.d[h].shares = [];
 			this.d[h].shares[s.u] = s;
-			if (mDB)
+			if (typeof mDB === 'object')
 			{
 				s['h_u'] = h + '_' + s.u;
-				if (mDB && !ignoreDB && !pfkey) mDBadd('s',clone(s));
+				if (typeof mDB === 'object' && !ignoreDB && !pfkey) mDBadd('s',clone(s));
 			}
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
-			if (mDB && !pfkey) mDBadd('ok',{h:h,k:a32_to_base64(encrypt_key(u_k_aes,u_sharekeys[h])),ha:crypto_handleauth(h)});
+			if (typeof mDB === 'object' && !pfkey) mDBadd('ok',{h:h,k:a32_to_base64(encrypt_key(u_k_aes,u_sharekeys[h])),ha:crypto_handleauth(h)});
 		}
 	}
 
@@ -1316,9 +1316,9 @@ function MegaData ()
 				M.nodeAttr({h:h,shares:undefined});
 				delete u_sharekeys[h];
 				sharedUInode(h,0);
-				if (mDB) mDBdel('ok',h);
+				if (typeof mDB === 'object') mDBdel('ok',h);
 			}
-			if (mDB) mDBdel('s',h + '_' + u);
+			if (typeof mDB === 'object') mDBdel('s',h + '_' + u);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
 		}
 	}
@@ -1698,7 +1698,7 @@ function MegaData ()
 	{
 		var errorstr, fileid=dl.dl_id, x;
 		if (d) console.log('dlerror',fileid,error);
-		else window.onerror('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''), '', -1);
+		else srvlog('onDownloadError :: ' + error + ' ['+hostname(dl.url)+'] ' + (dl.zipid ? 'isZIP':''));
 
 		switch (error) {
 			case ETOOMANYCONNECTIONS:  errorstr = l[18];  break;
@@ -1948,8 +1948,7 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		window.onerror('onUploadError :: ' + errorstr
-			+ ' [' + details.join("] [") + ']', '', -1);
+		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
@@ -2596,7 +2595,7 @@ function process_ok(ok)
 {
 	for(i in ok)
 	{
-		if (mDB && !pfkey) mDBadd('ok',ok[i]);
+		if (typeof mDB === 'object' && !pfkey) mDBadd('ok',ok[i]);
 		if (ok[i].ha ==  crypto_handleauth(ok[i].h)) u_sharekeys[ok[i].h] = decrypt_key(u_k_aes,base64_to_a32(ok[i].k));
 	}
 }
@@ -2624,7 +2623,7 @@ function loadfm_callback(res)
 	process_f(res.f);
 	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
 	maxaction = res.sn;
-	if (mDB) localStorage[u_handle + '_maxaction'] = maxaction;
+	if (typeof mDB === 'object') localStorage[u_handle + '_maxaction'] = maxaction;
 	renderfm();
 	if (!pfkey) pollnotifications();
 

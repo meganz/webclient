@@ -19,7 +19,7 @@ function verify_cms_content(content, signature)
 	}
 }
 
-function process_cms_response(socket, next, as)
+function process_cms_response(socket, next, as, id)
 {
 	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
@@ -38,7 +38,8 @@ function process_cms_response(socket, next, as)
 		switch (mime) {
 		case 3: // html
 			content = ab_to_str(content)
-			return next(false, { html: content, mime: mime})
+			 next(false, { html: content, mime: mime})
+			 return loaded(id);
 			break;
 
 		case 1:
@@ -52,7 +53,8 @@ function process_cms_response(socket, next, as)
                 blob = bb.getBlob(mime)
 			}
             content = window.URL.createObjectURL(blob);
-			return next(false, { url: content, mime: mime})
+			next(false, { url: content, mime: mime})
+			return loaded(id);
 
 		case 2:
 			try {
@@ -61,16 +63,17 @@ function process_cms_response(socket, next, as)
 				/* invalid json, weird case */
 				return next(true, {signature: false});
 			}
-			return next(false, { object: content, mime: mime})
+			next(false, { object: content, mime: mime})
+			return loaded(id);
 
 		default:
 			var io = new MemoryIO("temp", {});
 			io.begin = function() {};
 			io.setCredentials("", content.byteLength, "", [], []);
 			io.write(content, 0, function() {
-				// second argument is never used anyways
-				io.download(label, label);
-				return next(false, {});
+				io.download(label, "");
+				next(false, {});
+				return loaded(id);
 			});
 			break;
 		}
@@ -81,43 +84,40 @@ function process_cms_response(socket, next, as)
 
 var assets = {};
 
-$(document).on('click', '*[data-cms-dl]', function(e) {
-	CMS.get($(this).data('cms-dl'), function() {
-	}, 'download');
-	return false;
-});
-
 var is_img
+
+/**
+ *	Rewrite links. Basically this links 
+ *  shouldn't trigger the `CMS.get` and force
+ *  a download
+ */
 function dl_placeholder(str, sep, rid, id) {
 	return "'javascript:void(0)' data-cms-dl='"+id+"'"
 }
 
+/**
+ *	Images placeholder. Replace *all* the images 
+ *	with a placeholder until the image is fully loaded from 
+ *  the BLOB server
+ */
 function img_placeholder(str, sep, rid, id) {
 	is_img = true;
 	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
 }
 
-function CMSClass() {
-}
-
-CMSClass.prototype.img = function(id) 
-{
-	if (!assets[id]) {
-		this.get(id, function(err, obj) {
-			$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
-			assets[id] = obj.url;
-		});
-	}
-	return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
-}
-
+/**
+ *	Internal function to communicate with the BLOB server.
+ *	
+ *	It makes sure that optimize requests (makes sure we never
+ *	ask things twice). This is the right place to 
+ *	cache (perhaps towards localStorage).
+ */
 var fetching = {};
-
 function doRequest(id) {
 	var q = getxhr();
 	q.onload = function() {
 		for (var i in fetching[id]) {
-			process_cms_response(q, fetching[id][i][0], fetching[id][i][0]);
+			process_cms_response(q, fetching[id][i][0], fetching[id][i][0], id);
 		}
 		delete fetching[id]
 		q = null;
@@ -133,52 +133,91 @@ function doRequest(id) {
 	q.send();
 }
 
-CMSClass.prototype.get = function(id, next, as) {
-	if (typeof fetching[id] == "undefined") {
-		doRequest(id);
-		fetching[id] = [];
-	}
-	fetching[id].push([next, as]);
-};
+var _listeners = {};
 
-CMSClass.prototype.imgLoader = function(html, id) {
-	if (!assets[id]) {
-		is_img = false;
-		// replace images
-		html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
-		// replace download links
-		html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
-		
-		if (is_img) {
-			this.get(id);
+function loaded(id)
+{
+	if (_listeners[id]) {
+		for (var i in _listeners[id]) {
+			_listeners[id][i]();
 		}
-	} else {
-		html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
 	}
-	return html;
 }
 
-$(document).on('click', '.cms-asset-download', function(e) {
-	var $this = $(this)
-		, target = $this.data('id');
-	if (!target) return;
+var CMS = {
 
-	e.preventDefault();
+	attachEvents: function() {
+		$('*[data-cms-dl]').rebind('click', function(e) {
+			CMS.get($(this).data('cms-dl'), function() {
+			}, 'download');
+			return false;
+		});
 
-	loadingDialog.show();
-	CMS.get(target, function() {
-		loadingDialog.hide();
-	}, 'download');
+		$('.cms-asset-download').rebind('click', function(e) {
+			var $this = $(this)
+				, target = $this.data('id');
+			if (!target) return;
 
-	return false;
-});
+			e.preventDefault();
 
+			loadingDialog.show();
+			CMS.get(target, function() {
+				loadingDialog.hide();
+			}, 'download');
 
-window.CMS = new CMSClass;
+			return false;
+		});
+	},
+
+	img : function(id) {
+		if (!assets[id]) {
+			this.get(id, function(err, obj) {
+				$('*[data-img=loading_' + id + ']').attr({'id': '', 'src': obj.url})
+				assets[id] = obj.url;
+			});
+		}
+		return assets[id] ? assets[id] : IMAGE_PLACEHOLDER;
+	},
+	get: function(id, next, as) {
+		if (typeof fetching[id] == "undefined") {
+			doRequest(id);
+			fetching[id] = [];
+		}
+		fetching[id].push([next, as]);
+	},
+
+	on: function(id, callback)
+	{
+		if (!_listeners[id]) {
+			_listeners[id] = [];
+		}
+		_listeners[id].push(callback);
+	},
+
+	imgLoader: function(html, id) {
+		if (!assets[id]) {
+			is_img = false;
+			// replace images
+			html = html.replace(new RegExp('([\'"])(i:(' + id + '))([\'"])', 'g'), img_placeholder);
+			// replace download links
+			html = html.replace(new RegExp('([\'"])(d:(' + id + '))([\'"])', 'g'), dl_placeholder);
+		
+			if (is_img) {
+				this.get(id);
+			}
+		} else {
+			html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
+		}
+		return html;
+	}
+};
+
+/* Make it public */
+window.CMS = CMS;
 
 })(this, asmCrypto)
 
-function corporate_boot()
+CMS.on('corporate', function()
 {
 	$('.new-left-menu-link').rebind('click', function() {
 		var $this = $(this)
@@ -188,4 +227,4 @@ function corporate_boot()
 		$this.addClass('active');			
 	});
 	$('.new-left-menu-link:first').trigger('click');
-}
+});

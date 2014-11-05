@@ -12814,34 +12814,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-bottom-column:nth-child(6) .nw-bottom-header, .nw-bottom-column:nth-child(6) .nw-bottom-link, .nw-bottom-column:nth-child(6) a.nw-bottom-link, .nw-bottom-column:nth-child(6) a.nw-bottom-link:visited, .nw-bottom-column:nth-child(6) a.nw-bottom-link:hover, .nw-bottom-column:nth-child(6) a.nw-bottom-link:active {
 	padding-right: 0;
 }
-.fr .nw-bottom-column {
-	min-width: 165px;
-}
-.no .nw-bottom-column {
-	min-width: 149px;
-}
-.el .nw-bottom-column {
-	min-width: 110px;
-}
-.el .nw-bottom-link {
-	padding: 0 30px 5px 0;
-}
-.el .nw-start-nz {
-	margin-left: -30px;
-	margin-right: -10px;
-}
-.pl .nw-bottom-column, .uk .nw-bottom-column {
-	min-width: 160px;
-}
-.sk .nw-bottom-column {
-	min-width: 159px;
-}
-.ru .nw-bottom-column {
-	min-width: 129px;
-}
-.ru .nw-bottom-link {
-	padding: 0 30px 5px 0;
-}
 .nw-bottom-header {
 	display: block;
 	color: #333333;

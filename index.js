@@ -231,12 +231,6 @@ function init_page()
 		loadingDialog.show();
 		CMS.get(cpage, function(err, content) {
 			parsepage(content.html)
-			$('.on-boot').each(function() {
-				var js = $(this).data('js');
-				if (typeof js == "string" && typeof window[js] == "function") {
-					window[js]();
-				}
-			});
 			topmenuUI();
 			loadingDialog.hide();
 			mainScroll();

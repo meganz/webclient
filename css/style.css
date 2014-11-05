@@ -3523,16 +3523,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	-o-transition: all 150ms ease-in-out;
 	-ms-transition: all 150ms ease-in-out;
 	transition: all 150ms ease-in-out;
-	border-right: 2px solid rgba(0,0,0,0);
 }
 .nw-fm-tree-item:hover {
 	background-color: rgba(217,0,7,0.2);
-	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.selected {
 	background-color: rgba(217,0,7,0.5);
-	border-right: 2px solid rgba(217,0,7,0.5);
 	color: white;
 }
 .nw-fm-tree-item.disabled, .nw-conversations-item.disabled {
@@ -3543,31 +3540,24 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-tree-item.dragover {
 	background-color: rgba(217,0,7,0.3);
-	border-right: 2px solid rgba(217,0,7,0.5);
 }
 .shared-with-me .nw-fm-tree-item:hover {
 	background-color: rgba(255,179,0,0.3);
-	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.selected {
 	background-color: rgba(255,179,0,0.5);
-	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .shared-with-me .nw-fm-tree-item.dragover {
 	background-color: rgba(255,179,0,0.4);
-	border-right: 2px solid rgba(255,179,0,0.5);
 }
 .rubbish-bin .nw-fm-tree-item:hover {
 	background-color: rgba(39,183,0,0.3);
-	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
 	background-color: rgba(39,183,0,0.6);
-	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .rubbish-bin .nw-fm-tree-item.dragover {
 	background-color: rgba(39,183,0,0.4);
-	border-right: 2px solid rgba(39,183,0,0.6);
 }
 .fm-tree-panel li, .fm-move-dialog-body li, .fm-dialog-body li {
 	display: block;
@@ -3902,7 +3892,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding: 0 0 0 10px;
 	position: relative;
 	background-color: white;
-	border-right: 2px solid rgba(0,0,0,0.06);
 }
 .nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows {
 	height: 24px;
@@ -3988,22 +3977,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .nw-conversations-item:hover {
 	background-color: rgba(43,166,222,0.3);
-	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item:hover {
 	background-color: rgba(119,119,119,0.3);
-	border-right: 2px solid rgba(119,119,119,0.3);
 	color: white;
 }
 .fm-tree-panel .nw-contact-item.selected {
 	background-color: rgba(119,119,119,0.5);
-	border-right: 2px solid rgba(119,119,119,0.5);
 	color: white;
 }
 .nw-conversations-item.selected {
 	background-color: rgba(43,166,222,0.5);
-	border-right: 2px solid rgba(43,166,222,0.5);
 	color: white;
 }
 .nw-conversations-name, .fm-tree-panel .nw-contact-name {
@@ -18495,16 +18480,16 @@ span.incoming-call-name {
 }
 .start-chat-button {
 	position:absolute;
-	right:4px;
-	top:5px;
-	width:16px;
-	height:16px;
-	background-image: url(../images/mega/dialogs-sprite.svg);
-	background-position: left -1457px;
-	background-repeat: no-repeat;
-	cursor:pointer;
-	z-index:10;
-	display:block;
+right:3px;
+top:3px;
+width:18px;
+height:18px;
+background-image: url(../images/mega/dialogs-sprite.svg);
+background-position: -3px -3668px;
+background-repeat: no-repeat;
+cursor:pointer;
+z-index:10;
+display:block;
 }
 .icoming-call-button {
 	width: 64px;

@@ -1570,8 +1570,8 @@ describe("Chat.js - Karere UI integration", function() {
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
-                expect($elem1.is(".color1")).to.be.ok;
-                expect($elem2.is(".color2")).to.be.ok;
+                expect($elem1.find('span').is(".color1")).to.be.ok;
+                expect($elem2.find('span').is(".color2")).to.be.ok;
 
                 expect($elem1.text()).to.eql("LX");
                 expect($elem2.text()).to.eql("LZ");
@@ -1590,8 +1590,8 @@ describe("Chat.js - Karere UI integration", function() {
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
-                expect($elem1.is(".color1")).to.be.ok;
-                expect($elem2.is(".color2")).to.be.ok;
+                expect($elem1.find('span').is(".color1")).to.be.ok;
+                expect($elem2.find('span').is(".color2")).to.be.ok;
 
                 expect($elem1.text()).to.eql("L");
                 expect($elem2.text()).to.eql("B");
@@ -1611,13 +1611,11 @@ describe("Chat.js - Karere UI integration", function() {
 
                 expect($('img', $elem1).size()).to.eql(1);
                 expect($('img', $elem2).size()).to.eql(1);
-                expect($elem1.is(".color1")).to.be.ok;
-                expect($elem2.is(".color2")).to.be.ok;
+                expect($elem1.find('span').is(".color1")).to.be.ok;
+                expect($elem2.find('span').is(".color2")).to.be.ok;
 
                 expect($elem1.text()).to.eql("");
                 expect($elem2.text()).to.eql("");
-
-
                 done();
             });
     });

@@ -99,8 +99,8 @@ function ui_keycomplete()
 {
     $('.key1').addClass('hidden');
 	$('.key2').addClass('hidden');
-	$('.key3').removeClass('hidden');	
-	init_pro();	
+	$('.key3').removeClass('hidden');
+    init_pro();
 	mainScroll();
 }
 

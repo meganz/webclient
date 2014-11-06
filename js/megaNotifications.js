@@ -329,9 +329,7 @@
                     self.trigger('onClose');
                 };
             } else {
-                if(localStorage.d) {
-                    self.logger.warn("Will skip showing desktop notification, since the text message is missing for type: ", self.type, self);
-                }
+                self.megaNotifications.logger.warn("Will skip showing desktop notification, since the text message is missing for type: ", self.type, self);
             }
         }
 

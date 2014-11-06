@@ -142,6 +142,16 @@ MegaPromise.prototype.reject = function() {
 };
 
 /**
+ * Alias of .always
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.always = function() {
+    this._internalPromise.always.apply(this._internalPromise, toArray(arguments));
+    return this;
+};
+
+/**
  * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises
  * passed in the `promisesList`
  *
@@ -160,6 +170,48 @@ MegaPromise.all = function(promisesList) {
     return MegaPromise.asMegaPromiseProxy(
         $.when.apply($, _jQueryPromisesList)
     );
+};
+
+/**
+ * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises
+ * passed in the `promisesList`
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.allDone = function(promisesList, timeout) {
+
+    var totalLeft = promisesList.length;
+    var results = [];
+    var masterPromise = new MegaPromise();
+    var alwaysCb = function() {
+        totalLeft--;
+        results.push(arguments);
+
+        if(totalLeft === 0) {
+            masterPromise.resolve(results);
+        }
+    };
+
+
+    var _megaPromisesList = [];
+    promisesList.forEach(function(v, k) {
+        if(MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
+            v = MegaPromise.asMegaPromiseProxy(v);
+        }
+        _megaPromisesList.push(v);
+        v.done(alwaysCb);
+        v.fail(alwaysCb);
+    });
+
+    var timeout = setTimeout(function() {
+        masterPromise.reject(results);
+    }, timeout);
+
+    masterPromise.always(function() {
+        clearTimeout(timeout);
+    });
+
+    return masterPromise;
 };
 
 /**
@@ -186,6 +238,7 @@ MegaPromise.reject = function() {
 
     return p;
 };
+
 
 // replace the original Promise
 window.Promise = MegaPromise;

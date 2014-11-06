@@ -470,7 +470,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
 
         var $transferElement = $('.webrtc-transfer[data-transfer-sid="' + sessionId  + '"]');
 
-        if($transferElement.size() > 0) {
+        if($transferElement.length > 0) {
             $('.primary-button', $transferElement).replaceWith(
                 $("<em>" + ("Canceled") + "</em>")
             );
@@ -509,7 +509,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
 
             var $transferElement = $('.webrtc-transfer[data-transfer-sid="' + sessionId  + '"]');
 
-            if($transferElement.size() > 0) {
+            if($transferElement.length > 0) {
                 $('.primary-button:first', $transferElement).replaceWith(
                     $("<em>" + ("Canceled") + "</em>")
                 );
@@ -798,53 +798,6 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
     $('.btn-chat-call', self.$header).hide();
 
     if(e.type == "call-init" || e.type == "call-answered") {
-        $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').removeClass('hidden');
-
-        $('.nw-conversations-item.current-calling').attr('data-jid', self.roomJid);
-
-        $('.nw-conversations-item.current-calling .chat-cancel-icon').unbind('click.megaChat');
-        $('.nw-conversations-item.current-calling .chat-cancel-icon').bind('click.megaChat', function() {
-            self.megaChat.karere.connection.rtc.hangup();
-        });
-
-
-        // set header size if persisted
-        if(localStorage.audioVideoScreenSize) {
-            self.$header.css(
-                'height',
-                JSON.parse(localStorage.audioVideoScreenSize)
-            );
-
-            $(window).trigger('resize');
-        }
-
-        $('.nw-conversations-item.current-calling').unbind('click.megaChat');
-        $('.nw-conversations-item.current-calling').bind('click.megaChat', function() {
-            self.activateWindow();
-        });
-
-        var otherUsersJid = self.getParticipantsExceptMe()[0];
-
-        var contactName = self.megaChat.getContactNameFromJid(
-            otherUsersJid
-        );
-        if(contactName) {
-            $('.nw-conversations-item.current-calling .nw-conversations-name').text(
-                contactName
-            );
-        }
-
-        self._currentCallCounter = 0;
-        self._currentCallTimer = setInterval(function() {
-            $('.nw-conversations-item.current-calling .chat-time-txt').text(
-                secondsToTime(self._currentCallCounter)
-            );
-
-            self._currentCallCounter++;
-        }, 1000);
-
-        self.megaChat.renderContactTree();
-
         $('.drag-handle', self.$header).show();
         self.$header.parent().addClass("video-call"); // adds video-call or audio-call class name
 
@@ -1030,6 +983,22 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
             })
             [self.options.mediaOptions.video ? "removeClass" : "addClass"]("active");
 
+
+
+
+        // current-calling indicator
+        self.callIsActive = true;
+        $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').removeClass('hidden');
+        $('.nw-conversations-item.current-calling').addClass('selected');
+
+        self.getNavElement().hide();
+
+        $('.nw-conversations-item.current-calling').attr('data-jid', self.roomJid);
+
+        $('.nw-conversations-item.current-calling .chat-cancel-icon').unbind('click.megaChat');
+        $('.nw-conversations-item.current-calling .chat-cancel-icon').bind('click.megaChat', function() {
+            self.megaChat.karere.connection.rtc.hangup();
+        });
     }
 
     // .chat-header-indicator.muted-video and .muted-audio should be synced when the .mute event is called
@@ -1068,7 +1037,11 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     $('.btn-chat-call', self.$header).show();
 
 
-    $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').addClass('hidden');
+    $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling')
+        .addClass('hidden')
+        .removeClass('selected');
+
+    self.getNavElement().show();
 
     clearInterval(self._currentCallTimer);
 
@@ -1181,12 +1154,10 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
             }
         }
     }
-}
+};
+
 ChatRoom.prototype._resetCallStateInCall = function() {
     var self = this;
-
-    self.callIsActive = true;
-
 
     $('.btn-chat-call', self.$header).hide();
 
@@ -1201,6 +1172,49 @@ ChatRoom.prototype._resetCallStateInCall = function() {
     } else {
         $('.video-icon', self.$header).removeClass("active");
     }
+
+
+    // set header size if persisted
+    if(localStorage.audioVideoScreenSize) {
+        self.$header.css(
+            'height',
+            JSON.parse(localStorage.audioVideoScreenSize)
+        );
+
+        $(window).trigger('resize');
+    }
+
+    $('.nw-conversations-item.current-calling').unbind('click.megaChat');
+    $('.nw-conversations-item.current-calling').bind('click.megaChat', function() {
+        self.activateWindow();
+    });
+
+    var otherUsersJid = self.getParticipantsExceptMe()[0];
+
+    var contactName = self.megaChat.getContactNameFromJid(
+        otherUsersJid
+    );
+    if(contactName) {
+        $('.nw-conversations-item.current-calling .nw-conversations-name').text(
+            contactName
+        );
+    }
+
+    self._currentCallCounter = 0;
+    if(self._currentCallTimer) {
+        clearInterval(self._currentCallTimer);
+    }
+    self._currentCallTimer = setInterval(function() {
+        $('.nw-conversations-item.current-calling .chat-time-txt').text(
+            secondsToTime(self._currentCallCounter)
+        );
+
+        self._currentCallCounter++;
+    }, 1000);
+
+    self.megaChat.renderContactTree();
+
+
 
     self._renderAudioVideoScreens();
 
@@ -1367,10 +1381,11 @@ ChatRoom.prototype.syncUsers = function(jids) {
  * Check if participant exists in room
  *
  * @param jid {String} Full OR Bare jid
- * @param strict {boolean} If true, will only check for FULL jids.
+ * @param [strict] {boolean} If true, will only check for FULL jids.
+ * @param [notMe] {boolean} set to true if you want the search to ignore if the matched partcipant == my bare jid
  * @returns {boolean}
  */
-ChatRoom.prototype.participantExistsInRoom = function(jid, strict) {
+ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
     var self = this;
 
     strict = strict || false;
@@ -1384,6 +1399,11 @@ ChatRoom.prototype.participantExistsInRoom = function(jid, strict) {
             self.logger.error("missing contact: ", k);
 
             return;
+        }
+        if(notMe) {
+            if(Karere.getNormalizedBareJid(v) == self.megaChat.karere.getBareJid()) {
+                return; // continue
+            }
         }
         if(strict && v == jid) {
             result = true;
@@ -1499,8 +1519,19 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
     this.$header.attr("data-room-jid", this.roomJid.split("@")[0]);
 
     if(this.$header.is(":visible")) {
+        this.$header.removeClass("hidden");
         $('.nw-conversations-item').removeClass("selected");
         $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
+
+
+        // active call?
+        if(self.callIsActive) {
+            var $currentCall = $('.nw-conversations-item.current-calling[data-jid="' + self.roomJid + '"]');
+            if ($currentCall.length > 0) {
+                $currentCall.addClass('selected');
+            }
+        }
+
     }
 
     var $jsp = self.$messages.data("jsp");
@@ -1562,7 +1593,7 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
                 .addClass(presenceCssClass);
 
 
-            if($('#topmenu').children().size() == 0) {
+            if($('#topmenu').children().length == 0) {
                 $('#topmenu').html(parsetopmenu()); // we need the top menu!
             }
             var presenceText = $.trim($('.top-user-status-item > .' + presenceCssClass).parent().text());
@@ -1677,6 +1708,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
 ChatRoom.prototype.show = function() {
     var self = this;
 
+
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.contacts-grid-view').addClass('hidden');
@@ -1687,12 +1719,12 @@ ChatRoom.prototype.show = function() {
     $('.nw-conversations-item').removeClass('selected');
 
 
+
+
     sectionUIopen('conversations');
 
 
-    $('.nw-conversations-item').removeClass("selected");
     $('.nw-conversations-item[data-room-jid="' + self.roomJid.split("@")[0] + '"]').addClass("selected");
-
 
     self.$header.show();
     self.$messages.show();
@@ -1703,6 +1735,12 @@ ChatRoom.prototype.show = function() {
         if(oldRoom) {
             oldRoom.hide();
         }
+    }
+
+    if(self.callIsActive) {
+        self.$header.parent('.fm-chat-block').addClass('video-call');
+    } else {
+        self.$header.parent('.fm-chat-block').removeClass('video-call');
     }
 
     self.megaChat.currentlyOpenedChat = self.roomJid;
@@ -1794,7 +1832,7 @@ ChatRoom.prototype.appendMessage = function(message) {
     }
     if(self.messagesIndex[message.getMessageId()] !== undefined) {
 
-        self.logger.debug(self.roomJid.split("@")[0], message.getMessageId(), "This message is already added to the message list (and displayed).");
+        //self.logger.debug(self.roomJid.split("@")[0], message.getMessageId(), "This message is already added to the message list (and displayed).");
         return false;
     }
 
@@ -1997,19 +2035,19 @@ ChatRoom.prototype._renderMessageState = function($message, messageObject) {
     if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.SENT) {
         $message.addClass("msg-state-sent");
 
-        if($('.label.not-sent', $message).size() > 0) {
+        if($('.label.not-sent', $message).length > 0) {
             $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
         }
     } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.NOT_SENT) {
         $message.addClass("msg-state-not-sent");
 
-        if($('.label.not-sent.text-message', $message).size() == 0) {
+        if($('.label.not-sent.text-message', $message).length == 0) {
             var $elem = $('<span class="label not-sent text-message">not sent</span>');
             $elem.hide();
             $('.chat-username', $message).after($elem);
             $elem.fadeIn();
         }
-        if($('.label.not-sent.delete-button', $message).size() == 0) {
+        if($('.label.not-sent.delete-button', $message).length == 0) {
             var $elem = $('<a href="javascript:;" class="label not-sent delete-button">delete</a>');
             $elem.hide();
             $('.chat-username', $message).after($elem);
@@ -2018,13 +2056,13 @@ ChatRoom.prototype._renderMessageState = function($message, messageObject) {
     } else if(messageObject.getState() == KarereEventObjects.OutgoingMessage.STATE.DELIVERED) {
         $message.addClass("msg-state-delivered");
 
-        if($('.label.not-sent', $message).size() > 0) {
+        if($('.label.not-sent', $message).length > 0) {
             $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
         }
     } else {
         $message.addClass("msg-state-unknown");
 
-        if($('.label.not-sent', $message).size() > 0) {
+        if($('.label.not-sent', $message).length > 0) {
             $('.label.not-sent', $message).fadeOut(function() { $(this).remove(); });
         }
     }
@@ -2801,7 +2839,19 @@ ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
     var self = this;
 
     var contact = self.megaChat.getContactFromJid(fullJid);
-    var $element = generateAvatarElement(contact.u);
+
+    assert(contact, 'contact not found: ' + fullJid);
+
+    var $av = generateAvatarElement(contact.u);
+    var cls = $av.attr('class');
+    $av.attr('class', '');
+
+    var $element = $('<div class="nw-contact-avatar"></div>').append(
+        $av
+    );
+    $element.addClass(cls);
+    $element.addClass(contact.h);
+
 
     // TODO: implement verification logic
     if (contact.verified) {
@@ -2894,7 +2944,7 @@ ChatRoom.prototype.cancelAttachment = function(messageId, nodeId) {
 
 
     var $container = $('.attachments-container[data-message-id="' + messageId + '"] .nw-chat-sharing-body[data-node-id="' + nodeId + '"]', self.$messages);
-    if($container.size() > 0) {
+    if($container.length > 0) {
         $('.nw-chat-button:first', $container).after($('<em>Canceled</em>'));
 
         $('.nw-chat-button', $container).remove();

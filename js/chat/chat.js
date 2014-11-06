@@ -840,12 +840,14 @@ Chat.prototype.init = function() {
         if(meta && meta.type == "private") {
 
             var bareFromJid = eventObject.getFromJid().split("/")[0];
-            $.each(self.chats, function(roomJid, room) {
+            Object.keys(self.chats).forEach(function(roomJid) {
+                var room = self.chats[roomJid];
+
                 if(roomJid == eventObject.getRoomJid()) {
                     return; // continue
                 }
 
-                if(room.type == "private" && room.participantExistsInRoom(bareFromJid)) {
+                if(room.type == "private" && room.participantExistsInRoom(bareFromJid, false, true)) {
                     self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
 
                     if(self.currentlyOpenedChat == room.roomJid) {
@@ -926,6 +928,10 @@ Chat.prototype.init = function() {
     this.karere.bind("onAuthfail", updateMyConnectionStatus);
     this.karere.bind("onDisconnecting", updateMyConnectionStatus);
     this.karere.bind("onDisconnected", function() {
+        if(!u_handle) {
+            return;
+        }
+
         updateMyConnectionStatus();
 
         $.each(self.chats, function(k, v) {
@@ -1176,6 +1182,7 @@ Chat.prototype.init = function() {
     });
 
     self.$container = $('.fm-chat-block');
+
     self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
     assert(self.$header_tpl.length > 0, "Header template not found.");
 
@@ -1204,6 +1211,8 @@ Chat.prototype.init = function() {
     $('.fm-chat-message-scroll', self.$container).remove();
     $('.fm-chat-messages-block.message.template', self.$container).remove();
     $('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
+
+
 
     if(self.is_initialized) {
         self.destroy()
@@ -1245,6 +1254,10 @@ Chat.prototype.init = function() {
                 $elem.attr("title", title);
                 $('.direct-progressbar', $elem).removeClass("hidden");
                 $('.progressbarfill', $elem).css('width', progress + "%");
+
+                if(progress == 100) {
+                    $('.direct-progressbar', $elem).addClass("hidden");
+                }
             });
 
         };
@@ -1644,10 +1657,11 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
  *
  * @returns {*}
  */
-Chat.prototype.destroy = function() {
+Chat.prototype.destroy = function(isLogout) {
     var self = this;
-    localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
-    localStorage.megaChatPresenceMtime = unixtime();
+    //
+    //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
+    //localStorage.megaChatPresenceMtime = unixtime();
 
     if(self.filePicker) {
         self.filePicker.destroy();
@@ -1655,8 +1669,11 @@ Chat.prototype.destroy = function() {
     }
 
 
+
     $.each(self.chats, function(roomJid, room) {
-        room.destroy();
+        if(!isLogout) {
+            room.destroy();
+        }
         delete self.chats[roomJid];
     });
 
@@ -1889,15 +1906,15 @@ Chat.prototype.renderContactTree = function() {
 
     // update conversation list
     // -> add new convs to the ui
-    for(var k in self.chats) {
+    Object.keys(self.chats).forEach(function(k) {
         var megaRoom = self.chats[k];
 
         if(megaRoom._leaving) {
-            continue;
+            return; // continue;
         }
 
-        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').size() != 0) {
-            continue;
+        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').length != 0) {
+            return; // continue;
         }
 
         if(megaRoom.type == "private") {
@@ -1915,7 +1932,8 @@ Chat.prototype.renderContactTree = function() {
         } else {
             throw new Error("TBD");
         }
-    }
+    });
+
     // -> remove left chats from the ui
     $('.nw-conversations-item[data-room-jid]').each(function() {
         var megaRoom = self.chats[$(this).attr("data-room-jid") + "@" + self.karere.options.mucDomain];
@@ -1932,7 +1950,7 @@ Chat.prototype.renderContactTree = function() {
 
         var presence = self.karere.getPresence(self.getJidFromNodeId(contact.u));
 
-        var targetClassName = "offline"
+        var targetClassName = "offline";
         if(!presence || presence == Karere.PRESENCE.OFFLINE) {
             targetClassName = "offline";
         } else if(presence == Karere.PRESENCE.AWAY) {
@@ -1957,7 +1975,7 @@ Chat.prototype.renderContactTree = function() {
 
 
         // skip if element does not exists
-        if($element.size() == 0) {
+        if($element.length == 0) {
             return;
         }
 
@@ -1972,8 +1990,8 @@ Chat.prototype.renderContactTree = function() {
         $element.addClass(targetClassName);
 
         assert(
-            $element.size() == 1,
-            'nav elements not found (expected 1, got: ' + $element.size() + ')'
+            $element.length == 1,
+            'nav elements not found (expected 1, got: ' + $element.length + ')'
         );
 
         $element.attr("data-jid", self.getJidFromNodeId(contact.u));
@@ -2056,7 +2074,7 @@ Chat.prototype.reorderContactTree = function() {
 
         if(!$prevNode) {
             var $first = $('li:first:not(#treeli_' + v.u + ')', $container);
-            if($first.size() > 0) {
+            if($first.length > 0) {
                 $currentNode.insertBefore($first);
             } else {
                 $container.append($currentNode)
@@ -2416,7 +2434,7 @@ Chat.prototype.renderListing = function() {
 
     $('.fm-right-files-block').removeClass('hidden');
 
-    $('.nw-conversations-item').removeClass('selected');
+    //$('.nw-conversations-item').removeClass('selected');
 
 
     sectionUIopen('conversations');
@@ -2426,7 +2444,7 @@ Chat.prototype.renderListing = function() {
     } else {
         $('.fm-empty-conversations').addClass('hidden');
 
-        if(!self.currentlyOpenedChat && $('.fm-right-header:visible').size() == 0) {
+        if(!self.currentlyOpenedChat && $('.fm-right-header:visible').length == 0) {
             // show something, instead of a blank/white screen if there are currently opened chats
             if(self.lastOpenedChat) {
                 self.chats[self.lastOpenedChat].show();

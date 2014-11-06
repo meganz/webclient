@@ -1476,9 +1476,10 @@ function fmremove()
 			$('#msgDialog .fm-del-contact-avatar span').empty()
 		} else {
 			var user = M.d[$.selected[0]];
-			var avatar = user.name.substr(0,2),
-				av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
-			if (avatars[user.h]) avatar = '<img src="' + avatars[user.h].url + '">';
+            var av_meta = generateAvatarMeta(user.h);
+            var avatar = av_meta.shortName, av_color = av_meta.color;
+            if (av_meta.avatarUrl) avatar = '<img src="' + av_meta.avatarUrl + '">';
+
 			$('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar two-letters ' + htmlentities(user.h) + ' color' + av_color)
 			$('#msgDialog .fm-del-contact-avatar span').html(avatar)
 		}
@@ -7764,8 +7765,10 @@ function sharedfolderUI()
 	{
 		var u_h = n.p;
 		var user = M.d[u_h];
-		var avatar = user.name.substr(0,2);
-		if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+        var av_meta = generateAvatarMeta(u_h);
+        var avatar = av_meta.shortName, av_color = av_meta.color;
+        if (av_meta.avatarUrl) avatar = '<img src="' + av_meta.avatarUrl + '">';
+
 		var rights = 'Read only', rightsclass = ' read-only';
 		if (n.r == 1)
 		{
@@ -7829,8 +7832,9 @@ function userAvatar(userid)
 
 	var name = user.name || user.m;
 
-	var avatar = name.substr(0,2),
-		av_color = name.charCodeAt(0)%6 + name.charCodeAt(1)%6;
+    var av_meta = generateAvatarMeta(userid);
+    var avatar = av_meta.shortName, av_color = av_meta.color;
+    if (av_meta.avatarUrl) avatar = '<img src="' + av_meta.avatarUrl + '">';
 
 	if (avatars[userid]) avatar = '<img src="' + avatars[userid].url + '">';
 

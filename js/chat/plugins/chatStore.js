@@ -272,7 +272,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                             msg.sessionId = null;
 
                             createTimeoutPromise(function () {
-                                return !!meta.room.encryptionHandler.askeMember.sessionId;
+                                return meta.room.encryptionHandler && !!meta.room.encryptionHandler.askeMember.sessionId;
                             }, 1500, 60000)
                                 .done(function () {
 
@@ -321,6 +321,11 @@ ChatStore.prototype.attachToChat = function(megaChat) {
 
 ChatStore.prototype.cleanup = function() {
     var self = this;
+
+    if(MegaChatDisabled || !self.megaChat.is_initialized) {
+        return;
+    }
+
     var maxMessagesCount = self.megaChat.options.chatStoreOptions.autoPurgeMaxMessagesPerRoom;
 
     var msgCount = {};

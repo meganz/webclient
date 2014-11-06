@@ -1093,17 +1093,18 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     var textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
+    var logFnName = loggerFn == console.error ? "error" : "debug";
 
     if(ctx[fnName].haveCallLogger) { // recursion
         return;
     }
     ctx[fnName] = function() {
         //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger.debug.apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
+        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
 
         var res = origFn.apply(this, toArray(arguments));
         //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger.debug.apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
 
         return res;
     };

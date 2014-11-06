@@ -166,7 +166,7 @@ function u_logout(logout)
 
 
             if(megaChat.is_initialized) {
-                megaChat.destroy().always(function() {
+                megaChat.destroy(/* isLogout: */ true).always(function() {
                     window.megaChat = new Chat();
                     localStorage.removeItem("megaChatPresence");
                     localStorage.removeItem("megaChatPresenceMtime");
@@ -389,7 +389,12 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
     }
 
     if(shortFormat) {
-        return s.substr(0,1).toUpperCase();
+        var ss = s.split("@")[0];
+        if(ss.length == 2) {
+            return ss.toUpperCase();
+        } else {
+            return s.substr(0, 1).toUpperCase();
+        }
     } else {
         s = s.split(/[^a-z]/ig);
         s = s[0].substr(0, 1) + (s.length > 1 ? "" + s[1].substr(0, 1) : "");
@@ -431,24 +436,52 @@ function generateContactName(user_hash) {
  * @returns {*|jQuery|HTMLElement}
  */
 function generateAvatarElement(user_hash) {
-    var $element = $('<div class="nw-contact-avatar"></div>');
+    var $element = $('<span></span>');
+    var meta = generateAvatarMeta(user_hash);
+
+
+
+    $element.addClass("color" + meta.color);
+    $element.data("shortName", meta.shortName); // expose the generated name, so that other components can use it
+    $element.data("fullName", meta.fullName); // expose the generated name, so that other components can use it
+
+    if(meta.avatarUrl) {
+        $element.append(
+            '<img src="' + meta.avatarUrl + '"/>'
+        );
+    } else {
+        $element.text(
+            meta.shortName
+        );
+    }
+    return $element;
+}
+
+/**
+ * Generates meta data required for rendering avatars
+ *
+ * @param user_hash
+ * @returns {*|jQuery|HTMLElement}
+ */
+function generateAvatarMeta(user_hash) {
+    var meta = {};
 
     var contact = M.u[user_hash];
     if(!contact) {
         console.error('contact not found');
     }
 
-    var name = generateContactName(user_hash);
+    var fullName = generateContactName(user_hash);
 
 
-    var displayName = name.substr(0,1).toUpperCase();
+    var shortName = fullName.substr(0,1).toUpperCase();
     var avatar = avatars[contact.u];
 
     var color = 1;
 
 
-    if(contact.displayName && contact.displayColor) { // really simple in-memory cache
-        displayName = contact.displayName;
+    if(contact.shortName && contact.displayColor) { // really simple in-memory cache
+        shortName = contact.shortName;
         color = contact.displayColor;
     } else {
         $.each(Object.keys(M.u), function(k, v) {
@@ -460,36 +493,31 @@ function generateAvatarElement(user_hash) {
             }
 
             var dn;
-            if(displayName.length == 1) {
+            if(shortName.length == 1) {
                 dn = _generateReadableContactNameFromStr(n, true);
             } else {
                 dn = _generateReadableContactNameFromStr(n, false);
             }
 
             if(c.u == contact.u) {
-                color = Math.min(k+1, 10 /* we have max 10 colors */);
-            } else if(dn == displayName) { // duplicate name, if name != my current name
-                displayName = _generateReadableContactNameFromStr(n, false);
+                color = k%10;
+            } else if(dn == shortName) { // duplicate name, if name != my current name
+                shortName = _generateReadableContactNameFromStr(fullName, false);
             }
         });
 
-        contact.displayName = displayName;
+        contact.shortName = shortName;
         contact.displayColor = color;
     }
 
-    $element.addClass("color" + color);
+    meta.color = color;
+    meta.shortName = shortName;
+    meta.fullName = fullName;
+
     if(avatar) {
-        $element.append(
-            '<img src="' + avatar.url + '"/>'
-        );
-        $element.data("shortName", displayName); // expose the generated name, so that other components can use it
-        $element.data("fullName", name); // expose the generated name, so that other components can use it
-    } else {
-        $element.text(
-            displayName
-        );
+        meta.avatarUrl = avatar.url;
     }
-    return $element;
+    return meta;
 }
 
 /**
@@ -607,3 +635,14 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
     apiCall[attribute] = value;
     api_req(apiCall, myCtx);
 }
+
+
+(function(scope) {
+    var _is_authenticated = false;
+    scope.eventuallyTriggerAuthIfRequired = function() {
+        if(!_is_authenticated) {
+            $(window).trigger('megaAuthenticationFinished');
+            _is_authenticated = true;
+        }
+    };
+})(window);

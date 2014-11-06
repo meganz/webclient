@@ -37,7 +37,7 @@ var OpQueue = function(ctx, megaRoom, validateFn, recoverFailFn) {
  * Add operation to the queue
  *
  * @param opName
- * @param arrArgs
+ * @param [arrArgs]
  * @param [secondArg]
  * @param [thirdArg]
  */
@@ -271,4 +271,13 @@ OpQueue.prototype.pop = function() {
             return false;
         }
     });
+};
+
+OpQueue.prototype.destroy = function() {
+    var self = this;
+
+    if(self.tickTimer) {
+        clearTimeout(self.tickTimer);
+    }
+    self._queue = [];
 };

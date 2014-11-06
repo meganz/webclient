@@ -7618,9 +7618,12 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .nw-conversations-item.current-calling {
 	height: 48px;
+	cursor: pointer;
+}
+.nw-conversations-item.current-calling.selected {
 	background-color: rgba(31,165,224,0.5);
 	border-right: 2px solid rgba(31,165,224,0.5);
-	cursor: default;
+    cursor: default;
 }
 .current-calling .nw-contact-status {
 	border: 2px solid rgba(255,255,255,1);
@@ -7631,8 +7634,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .current-calling .nw-conversations-name {
 	line-height: 47px;
 	margin: 0 80px 0 32px;
-	color: white;
 }
+.current-calling.selected .nw-conversation-name {
+    color: white;
+}
+
 .chat-cancel-icon {
 	width: 16px;
 	height: 16px;
@@ -8095,6 +8101,42 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-chat-message-container.grouped-message .nw-contact-avatar, .fm-chat-message-container.grouped-message .chat-username {
 	display: none;
 }
+.fm-chat-message-container .inline-profile-link .nw-contact-avatar {
+    display: inline-block;
+    font-size: 8px;
+    width: 16px;
+    height: 16px;
+    margin: 3px 3px 0 0;
+    line-height: 16px;
+}
+.fm-chat-message-container .inline-profile-link .nw-contact-avatar img {
+    width: 16px;
+    height: 16px;
+}
+
+.fm-chat-message-container .inline-profile-link {
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 1px 3px 3px 3px;
+    display: inline-block;
+
+    cursor: pointer;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    -webkit-transition: all 150ms ease-in-out;
+    -moz-transition: all 150ms ease-in-out;
+    -o-transition: all 150ms ease-in-out;
+    -ms-transition: all 150ms ease-in-out;
+    transition: all 150ms ease-in-out;
+}
+
+.fm-chat-message-container .inline-profile-link:hover {
+    background-color: rgba(43,166,222,0.3);
+    border-color: rgba(43,166,222,0.5);
+    color: white;
+}
+
 .fm-chat-message-container.grouped-message.is-attachment .nw-contact-avatar {
 	display: block;
 }
@@ -8125,6 +8167,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .chat-message-txt {
 	margin-right: 89px;
 	padding-right: 26px;
+    word-wrap: break-word;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;

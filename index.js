@@ -72,6 +72,15 @@ function scrollMenu()
 	});
 }
 
+if(!MegaChatDisabled) {
+    $(window).unbind('megaAuthenticationFinished.megaChat');
+    $(window).bind('megaAuthenticationFinished.megaChat', function() {
+        if(u_type && !megaChat.is_initialized) {
+            megaChat.init();
+        }
+    });
+}
+
 function init_page()
 {
     $(window).trigger('onMegaLoaded');
@@ -612,15 +621,6 @@ function init_page()
 				$('.fm-tree-header').not('.cloud-drive-item').hide();
 				$('.fm-menu-item').hide();
 			}
-			
-			if(!MegaChatDisabled) {
-                $(window).unbind('megaAuthenticationFinished.megaChat');
-                $(window).bind('megaAuthenticationFinished.megaChat', function() {
-                    if(u_type && !megaChat.is_initialized) {
-                        megaChat.init();
-                    }
-                });
-			}			
 		}
 		else if (!pfid && id && id !== M.currentdirid) M.openFolder(id);
 		$('#topmenu').html(parsetopmenu());

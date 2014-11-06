@@ -17,7 +17,7 @@ function init_pro()
 				if (typeof res == 'object' && res.balance && res.balance[0]) pro_balance = res.balance[0][0];
 			}
 		});	
-	}	
+	}
 	if (document.location.hash.indexOf('#pro/') > -1)
 	{
 		localStorage.affid = document.location.hash.replace('#pro/','');
@@ -108,6 +108,7 @@ function pro_proceed(e)
 	{
 		if (page == 'fm') document.location.hash = '#start';
 		else document.location.hash = '#fm';
+
 		return false;
 	}
 	else if(c.indexOf('pro1') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro1_month';

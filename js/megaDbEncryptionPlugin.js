@@ -137,14 +137,23 @@ var MegaDBEncryption = function(mdbInstance) {
 
     });
     mdbInstance.bind("onDbRead", function(e, table, obj) {
-        logger.debug("onDbRead: ", table, obj);
+        //logger.debug("onDbRead: ", table, obj);
 
-        simpleDecryptObjFunction(table, obj);
+        try {
+            simpleDecryptObjFunction(table, obj);
+        } catch(exc) {
+            if(exc.message == "data integrity check failed") {
+                logger.warn("data integrity check failed for (will be removed): ", table, obj.id, obj);
+                mdbInstance.server.remove(table, obj.id);
+                e.stopPropagation();
+            }
+        }
+
 
     });
 
     mdbInstance.bind("onFilterQuery", function(e, table, filters) {
-        logger.debug("onFilterQuery: ", table, filters);
+        //logger.debug("onFilterQuery: ", table, filters);
         // since filters is an array containing key, value pairs, lets parse them
         for(var i = 0; i<filters.length; i+=2) {
             var k = filters[i];
@@ -157,7 +166,7 @@ var MegaDBEncryption = function(mdbInstance) {
 
             filters[i+1] = hasherFunc(JSON.stringify(v));
         };
-        logger.debug("filters:", filters);
+        //logger.debug("filters:", filters);
     });
 
     //mdbInstance.bind("onModifyQuery", function(e, table, args) {

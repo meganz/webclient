@@ -3,6 +3,10 @@ $(window).bind('megaAuthenticationFinished', function() {
         if(!localStorage.keysScrubbed) {
             authring.scrubEd25519KeyPair();
             localStorage.keysScrubbed = 1;
+
+            setTimeout(function() {
+                window.location = "/";
+            }, 1000);
         }
     }
 });

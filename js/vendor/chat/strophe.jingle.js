@@ -412,7 +412,7 @@ var JinglePlugin = {
             return ((tsTillUser > Date.now()) && (cancelHandler != null));
         };
         var strPeerMedia = $(callmsg).attr('media');
-        if (typeof strPeerMedia !== 'string')
+        if (!files && (typeof strPeerMedia !== 'string'))
             throw new Error("'media' attribute missing from call request stanza");
         var peerMedia = self.peerMediaToObj(strPeerMedia);
 // Notify about incoming call
@@ -620,7 +620,7 @@ var JinglePlugin = {
     },
     peerMediaToObj: function(peerMediaStr) {
         if ((peerMediaStr === null) || (peerMediaStr === undefined)) {
-            throw new Error("media attribute missing from megaCall request or is empty");
+            return null;
         }
         var res = {};
         if (peerMediaStr.indexOf('a') > -1)

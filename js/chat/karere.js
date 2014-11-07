@@ -19,7 +19,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
 
     if(MegaLogger && MegaLogger.rootLogger) {
         MegaLogger.rootLogger.error("request error, status: " + reqStatus + ", number of errors: " + karere._connectionRetries);
-    } else if(localStorage.d) {
+    } else if(window.d) {
 		console.warn("request error, status: " + reqStatus + ", number of errors: " + karere._connectionRetries);
     }
 
@@ -421,7 +421,7 @@ makeMetaAware(Karere);
             } catch(e) {
                 if(MegaLogger && MegaLogger.rootLogger) {
                     MegaLogger.rootLogger.error("exceptionSafeProxy caught: ", e, e.stack);
-                } else if(localStorage.d) {
+                } else if(window.d) {
 		            console.error(e, e.stack);
                 }
                 if(localStorage.stopOnAssertFail) {

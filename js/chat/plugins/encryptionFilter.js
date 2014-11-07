@@ -10,7 +10,7 @@ var EncryptionFilter = function(megaChat) {
 
     self.logger = MegaLogger.getLogger("encryptionFilter", {}, megaChat.logger);
 
-    if(localStorage.d && mpenc) {
+    if(window.d && mpenc) {
         mpenc.debug.decoder = true;
     }
     self.megaChat = megaChat;

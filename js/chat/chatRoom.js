@@ -1323,7 +1323,7 @@ ChatRoom.prototype.setType = function(type) {
     var self = this;
 
     if(!type) {
-        if(localStorage.d) {
+        if(window.d) {
             debugger;
         }
         self.logger.error("missing type in .setType call");
@@ -1393,7 +1393,7 @@ ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
     var result = false;
     $.each(self.users, function(k, v) {
         if(!v) {
-            if(localStorage.d) {
+            if(window.d) {
                 debugger;
             }
             self.logger.error("missing contact: ", k);
@@ -1431,7 +1431,7 @@ ChatRoom.prototype.getParticipants = function() {
 
     $.each(self.users, function(k, v) {
         if(!v) {
-            if(localStorage.d) {
+            if(window.d) {
                 debugger;
             }
             self.logger.error("missing contact/user: ", k);

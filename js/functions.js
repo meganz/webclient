@@ -780,7 +780,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     $promise.verify = function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -793,7 +793,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     var timeoutTimer = setTimeout(function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -909,7 +909,7 @@ function assert(test, message) {
     if (!test) {
         if(MegaLogger && MegaLogger.rootLogger) {
             MegaLogger.rootLogger.error("assertion failed: ", message);
-        } else if(localStorage.d) {
+        } else if(window.d) {
             console.error(message);
         }
 
@@ -1085,7 +1085,7 @@ function invertColor(hexTripletColor) {
  * @param loggerFn
  */
 function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
 
@@ -1123,7 +1123,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
  * @param [recursive] {boolean}
  */
 function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
     loggerFn = loggerFn || console.debug;

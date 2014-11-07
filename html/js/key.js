@@ -50,6 +50,7 @@ function init_key()
 	{
 		crypto_rsagenkey()
             .done(function() {
+                authring.scrubAuthRing();
                 authring.scrubEd25519KeyPair();
             });
 	}
@@ -66,6 +67,7 @@ function key_step2()
 	{
 		crypto_rsagenkey()
             .done(function() {
+                authring.scrubAuthRing();
                 authring.scrubEd25519KeyPair();
             });
 	}

@@ -1,8 +1,9 @@
 $(window).bind('megaAuthenticationFinished', function() {
     if(window.location.toString().indexOf("scrubKeys") > 0) {
-        if(!localStorage.keysScrubbed || localStorage.keysScrubbed == "1") {
+        if(!localStorage.keysScrubbed || localStorage.keysScrubbed == "1" || localStorage.keysScrubbed == "2") {
+            authring.scrubAuthRing();
             authring.scrubEd25519KeyPair();
-            localStorage.keysScrubbed = 2;
+            localStorage.keysScrubbed = 3;
 
             setTimeout(function() {
                 window.location = "/";

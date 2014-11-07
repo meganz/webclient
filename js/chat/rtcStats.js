@@ -1,5 +1,5 @@
 function statsGlobalInit(peerconn) {
-if (!peerconn.getStats) {
+if ((RTC.browser !== 'chrome') || (RTC.browser !== 'opera')) {
     RTC.Stats = false;
     return;
 }

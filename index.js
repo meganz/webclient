@@ -174,7 +174,6 @@ function init_page()
 	blogmonth=false;
 	blogsearch=false;
 
-
 	if (!$.mcImport) closeDialog();
 
     if (page.substr(0,7) == 'voucher')
@@ -591,13 +590,13 @@ function init_page()
 	{
 		var id = false;
 		if (page.substr(0,2) == 'fm')
-		{		
+		{
 			id = page.replace('fm/','');
 			if (id.length < 5 && id !== 'chat') id =false;
 		}
-		
+
 		if (!id && fminitialized) id = M.RootID;
-		
+
 		// switch between FM & folderlinks (completely reinitialize)
 		if ((!pfid && folderlink) || (pfid && folderlink === 0))
 		{
@@ -669,7 +668,7 @@ function init_page()
 		init_start();
 	}
 	topmenuUI();
-	loggedout=false;   
+	loggedout=false;
 }
 
 var avatars = {};
@@ -681,7 +680,7 @@ function loginDialog(close)
 		$('.top-login-popup').removeClass('active');
 		return false;
 	}
-	if (localStorage.hideloginwarning || document.location.href.substr(0,19) == 'chrome-extension://' || is_chrome_firefox) 
+	if (localStorage.hideloginwarning || is_extension)
 	{
 		$('.top-login-warning').hide();
 		$('.login-notification-icon').removeClass('hidden');
@@ -755,8 +754,8 @@ function loginDialog(close)
 	{
 		if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) localStorage.hideloginwarning=1;
 		$('.top-login-warning').removeClass('active');
-		$('.login-notification-icon').removeClass('hidden');	
-	});	
+		$('.login-notification-icon').removeClass('hidden');
+	});
 	$('.login-notification-icon').unbind('click');
 	$('.login-notification-icon').bind('click',function(e)
 	{
@@ -780,6 +779,7 @@ function loginDialog(close)
 		else $(c).addClass('checkboxOff');
 	});
 	$('.top-login-popup').addClass('active');
+	document.getElementById('login-name').focus()
 }
 
 function tooltiplogin()
@@ -874,46 +874,46 @@ function topmenuUI()
 	$('.warning-popup-icon').addClass('hidden');
 	$('.top-menu-item.upgrade-your-account').hide();
 	$('.context-menu-divider.upgrade-your-account').addClass('pro');
-	$('.top-menu-item.register,.top-menu-item.login').hide();	
+	$('.top-menu-item.register,.top-menu-item.login').hide();
 	$('.top-menu-item.logout,.context-menu-divider.logout').hide();
 	$('.top-menu-item.clouddrive,.top-menu-item.account').hide();
 	$('.activity-status,.activity-status-block').hide();
 	$('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
-	$('.membership-status').hide();	
-	$('.top-head .user-name').hide();	
+	$('.membership-status').hide();
+	$('.top-head .user-name').hide();
 	if (fminitialized) $('.top-search-bl').show();
 	else $('.top-search-bl').hide();
 	$('.fm-avatar').hide();
-	
+
 	if (u_type == 3 && u_attr.firstname)
 	{
 		$('#topmenu .user-name').text(u_attr.firstname);
 		$('#topmenu .user-name').show();
 	}
 	else $('#topmenu .user-name').hide();
-	
+
 	if (u_type)
-	{		
-		$('.top-menu-item.logout,.context-menu-divider.logout').show();		
-		$('.top-menu-item.clouddrive,.top-menu-item.account').show();		
+	{
+		$('.top-menu-item.logout,.context-menu-divider.logout').show();
+		$('.top-menu-item.clouddrive,.top-menu-item.account').show();
 		$('.fm-avatar').show();
 		if (u_attr.p)
 		{
 			$('.membership-icon-pad .membership-icon').attr('class','membership-icon pro' + u_attr.p);
 			if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
 			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');			
-			$('.membership-status-block').html('<div class="membership-status pro">PRO</div>');			
-			$('.context-menu-divider.upgrade-your-account').addClass('pro');			
-			$('.membership-popup.pro-popup');		
+			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
+			$('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
+			$('.context-menu-divider.upgrade-your-account').addClass('pro');
+			$('.membership-popup.pro-popup');
 		}
 		else
 		{
 			$('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
 			$('.context-menu-divider.upgrade-your-account').removeClass('pro');
 			$('.membership-status').addClass('free');
-			$('.membership-status').html(l[435]);	
-		}		
+			$('.membership-status').html(l[435]);
+		}
 		$('.membership-status').show();
 
         if(!MegaChatDisabled) {
@@ -994,7 +994,7 @@ function topmenuUI()
 		if (!e || ($(e.target).parents('.top-warning-popup').length == 0 && ((c && c.indexOf('warning-icon-area') == -1) || !c)))
 		{
 			$('.top-warning-popup').removeClass('active');
-		}		
+		}
 		if (!e || ($(e.target).parents('.top-user-status-popup').length == 0 && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c)))
 		{
 			$('.top-user-status-popup').removeClass('active');
@@ -1004,7 +1004,7 @@ function topmenuUI()
 		{
 			$('.notification-popup').removeClass('active');
 			$('.cloud-popup-icon').removeClass('active');
-		}		
+		}
 		if (!e || ($(e.target).parents('.top-login-popup').length == 0 && ((c && c.indexOf('top-login-button') == -1) || !c)))
 		{
 			$('.top-login-popup').removeClass('active');
@@ -1017,14 +1017,14 @@ function topmenuUI()
 				$('.fm-new-folder').removeClass('active filled-input');
 				$('.create-new-folder').addClass('hidden');
 			}
-		}		
+		}
 		if ((!e || $(e.target).parents('.fm-add-user,.add-user-popup').length == 0) && (!c || c.indexOf('fm-add-user') == -1))
 		{
 			$('.fm-add-user').removeClass('active');
 		    $('.add-user-popup').addClass('dialog hidden');
 			$('.add-user-popup').removeAttr('style');
 		}
-	}	
+	}
 	$('#pageholder').unbind('click');
 	$('#pageholder').bind('click',function(e)
 	{
@@ -1050,7 +1050,7 @@ function topmenuUI()
 			$(this).removeClass('active');
 			$('.top-menu-popup').removeClass('active');
 		}
-	});	
+	});
 	$('.activity-status-block').unbind('click.topui');
 	$('.activity-status-block').bind('click.topui',function(e)
 	{
@@ -1066,10 +1066,10 @@ function topmenuUI()
 			$(this).removeClass('active');
 			$('.top-user-status-popup').removeClass('active');
 		}
-	});	
+	});
 	$('.top-user-status-item').unbind('click.topui');
 	$('.top-user-status-item').bind('click.topui',function(e)
-	{   
+	{
 		if ($(this).attr('class').indexOf('active') == -1)
 	    {
 			$('.top-user-status-item').removeClass('active');
@@ -1077,25 +1077,24 @@ function topmenuUI()
 			$('.activity-status-block').find('.activity-status').attr('class', $(this).find('.activity-status').attr('class'));
 			$('.activity-status-block').removeClass('active');
 			$('.top-user-status-popup').removeClass('active');
-		} 
-	});	
+		}
+	});
 	$('.membership-status-block').unbind('click');
-	$('.membership-status-block').bind('click',function(e) 
-	{   
+	$('.membership-status-block').bind('click',function(e)
+	{
 	    $('.membership-popup .membership-main-block').hide();
 		$('.membership-popup .membership-loading').show();
-		
-		
+
 		if ($(this).attr('class').indexOf('active') == -1)
 	    {
-			$(this).addClass('active');			
+			$(this).addClass('active');
 			if (u_attr.p)  $('.pro-popup').addClass('active');
 			else $('.free-popup').addClass('active');
-			
+
 			M.accountData(function(account)
-			{				
-				var perc,warning,perc_c;				
-				$('.membership-popup .membership-loading').hide();				
+			{
+				var perc,warning,perc_c;
+				$('.membership-popup .membership-loading').hide();
 				$('.membership-popup .membership-main-block').show();
 				if (u_attr.p)
 				{
@@ -1309,16 +1308,16 @@ function topmenuUI()
 	$('.widget-block').bind('click',function(e)
 	{
 		if ($.infoscroll && page == 'download') startpageMain();
-		else if ($.dlhash) document.location.hash = $.dlhash;	
-		else document.location.hash ='fm';	
+		else if ($.dlhash) document.location.hash = $.dlhash;
+		else document.location.hash ='fm';
 	});
-	
+
 	if (M && M.currentdirid && M.currentdirid.substr(0,7) == 'search/')
-	{		
+	{
 		$('.top-search-bl').addClass('contains-value');
-		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));	
+		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));
 	}
-	
+
 	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
 	initNotifications();
 }
@@ -1424,9 +1423,6 @@ window.onhashchange = function()
         init_page();
     }
 }
-
-
-
 
 function languageDialog(close)
 {

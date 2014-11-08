@@ -676,6 +676,11 @@ function dlFatalError(dl, error, ethrow) {
 		Later(browserDialog);
 		m = l[1933];
 	}
+	else if (dlMethod === FlashIO)
+	{
+		Later(browserDialog);
+		m = l[1308];
+	}
 	else
 	{
 		Later(firefoxDialog);

@@ -385,7 +385,7 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
+		Object.defineProperty(window, "__cd_v", { value : 7, writable : false });
 		if (!d || onBetaW)
 		{
 			var __cdumps = [], __cd_t;

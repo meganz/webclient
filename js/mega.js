@@ -2954,7 +2954,10 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]'))
+		{
+			srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		}
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);

@@ -1118,6 +1118,63 @@ function addContactUI()
 				.val('')
 				.focus();
 	}
+	
+	$('.add-user-notification textarea').bind('focus', function() {
+		var $this = $(this);
+		if ($this.val() == 'Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
+		}
+	});
+	
+	$('.add-user-notification textarea').bind('blur', function() {
+		var $this = $(this);
+		if ($this.val() == '') 
+		$this.val('Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!');
+	});
+	
+	function addContactAreaResizing() {
+	  var txt = $('.add-user-notification textarea'),
+	      txtHeight =  txt.outerHeight(), 
+	      hiddenDiv = $('.add-contact-hidden'),
+		  pane = $('.add-user-nt-scrolling'),
+		  content = txt.val(),
+		  api;	  
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+	  
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+	
+	    if( $('.add-user-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5}); 
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+	
+	$('.add-user-notification textarea').on('keyup', function () {
+	    addContactAreaResizing();
+	});
+	
 	// Plugin configuration
 	var contacts = getContactsEMails();
 
@@ -2077,7 +2134,7 @@ function docreatefolderUI(e)
 
 function fmtopUI()
 {
-	$('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
+	$('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-contact-requests, .fm-received-requests').addClass('hidden');
 	$('.fm-new-folder').removeClass('filled-input')
 	if (RootbyId(M.currentdirid) == M.RubbishID)
 	{
@@ -2093,7 +2150,7 @@ function fmtopUI()
 	    }
 	    else if (M.currentdirid == 'contacts')
 	    {
-		   $('.fm-add-user').removeClass('hidden');
+		   $('.fm-add-user, .fm-contact-requests').removeClass('hidden');
 	    }
 	    else if (M.currentdirid.length == 8 && RightsbyID(M.currentdirid) > 0)
 	    {

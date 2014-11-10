@@ -126,7 +126,7 @@ strong {
 	font-weight: normal;
 	font-family: 'Open Sans Semibold', Arial;
 }
-input, div {
+input, div, textarea {
 	outline: none;
 	-moz-appearance: none;
 	font-family: 'Open Sans', Arial;
@@ -3800,7 +3800,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-tree-panel .nw-contact-avatar {
 	display: none;
 }
-.fm-avatar.color1, .color1 {
+.fm-avatar.color0, .nw-contact-avatar.color0, .contacts-avatar.color0, .avatar.color0, .fm-avatar.color0, .color0, .fm-avatar.color1, .nw-contact-avatar.color1, .contacts-avatar.color1, .avatar.color1, .fm-avatar.color1, .color1 {
 	background-color: #FF6A19;
 }
 .nw-contact-avatar.color2, .contacts-avatar.color2, .avatar.color2, .fm-avatar.color2, .color2 {
@@ -5165,10 +5165,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-repeat: no-repeat;
 	background-position: right -1528px;
 }
-.contacts-grid-view th:nth-child(4) {
-	background-image: none;
+.files-grid-view.contacts-view th:first-child, .files-grid-view.contacts-view td:first-child, .contact-requests-grid th:first-child, .contact-requests-grid td:first-child, .grid-table.contact-requests tr td:first-child, .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child {
+	padding-left: 16px;
 }
-.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3) {
+.files-grid-view th.grid-url-header, .files-grid-view th:nth-child(5), .contacts-grid-view th.grid-url-header, .grid-table-header th.grid-url-header, .transfer-table-header th:nth-child(7), .transfer-table-header th:nth-child(8), .files-grid-view.shared-view th:nth-child(4), .files-grid-view.shared-view th:nth-child(5), .shared-grid-view th:nth-child(4), .shared-grid-view th:nth-child(5), .files-grid-view.contacts-view th:nth-child(3), .files-grid-view.contacts-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(3), .contacts-grid-view th:nth-child(4), .sent-requests-grid th:first-child, .contact-requests-grid th:nth-child(2), .sent-requests-grid th:nth-child(2) {
 	background-image: none;
 }
 .grid-header-star {
@@ -5189,16 +5189,19 @@ th.grid-first-th {
 .grid-table td {
 	background-color: rgba(238,238,238,0);
 }
-.grid-table.shared-with-me td, .grid-table.contacts td {
+.grid-table.shared-with-me td, .grid-table.contacts td, .grid-table.contact-requests td, .grid-table.sent-requests td {
 	height: 48px;
 }
-.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td {
+.sent-requests-grid th {
+	width: 100%;
+}
+.grid-table tr:nth-child(odd) td, .fm-account-main .grid-table tr:nth-child(even) td, .grid-share-table tr:nth-child(odd) td, .contacts-grid-table tr:nth-child(odd) td, .transfer-table tr:nth-child(odd) td, .contact-requests-grid tr:nth-child(odd) td, .sent-requests-grid tr:nth-child(odd) td {
 	background-color: rgba(0,0,0,0.02);
 }
 .fm-account-main .grid-table tr:nth-child(odd) td {
 	background-color: white;
 }
-.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .grid-table tr:hover:nth-child(odd) td, .grid-share-table tr:hover:nth-child(odd) td, .contacts-grid-table tr:hover:nth-child(odd) td, .transfer-table tr:hover:nth-child(odd) td, .transfer-table tr:hover td {
+.grid-table tr:hover td, .grid-share-table tr:hover td, .contacts-grid-table tr:hover td, .grid-table tr:hover:nth-child(odd) td, .grid-share-table tr:hover:nth-child(odd) td, .contacts-grid-table tr:hover:nth-child(odd) td, .transfer-table tr:hover:nth-child(odd) td, .transfer-table tr:hover td, .contact-requests-grid tr:hover td, .sent-requests-grid tr:hover td {
 	background-color: rgba(0,0,0,0.035);
 	-webkit-transition: background-color 100ms ease-in-out;
 	-moz-transition: background-color 100ms ease-in-out;
@@ -5206,14 +5209,14 @@ th.grid-first-th {
 	-ms-transition: background-color 100ms ease-in-out;
 	transition: background-color 100ms ease-in-out;
 }
-.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
+.grid-table tr.ui-selected td, .grid-share-table tr.ui-selected td, .contacts-grid-table tr.ui-selected td, .contact-requests-grid tr.ui-selected td, .sent-requests-grid tr.ui-selected td, .grid-table tr.ui-selected:nth-child(odd) td, .grid-share-table tr.ui-selected:nth-child(odd) td, .contacts-grid-table tr.ui-selected:nth-child(odd) td, .contact-requests-grid tr.ui-selected:nth-child(odd) td, .sent-requests-grid tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected:nth-child(odd) td, .transfer-table tr.ui-selected td, .grid-table tr.ui-selecting td, .grid-share-table tr.ui-selecting td, .contacts-grid-table tr.ui-selecting td, .contact-requests-grid tr.ui-selecting td, .sent-requests-grid tr.ui-selecting td, .grid-table tr.ui-selecting:nth-child(odd) td, .grid-share-table tr.ui-selecting:nth-child(odd) td, .contacts-grid-table tr.ui-selecting:nth-child(odd) td, .contact-requests-grid tr.ui-selecting:nth-child(odd) td, .sent-requests-grid tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting:nth-child(odd) td, .transfer-table tr.ui-selecting td {
 	background-color: rgba(233,233,233,1);
 }
 .grid-table tr td:first-child, .grid-share-table tr td:first-child, .contacts-grid-table tr td:first-child {
 	padding: 0;
 }
 .grid-table.contacts tr td:first-child {
-	padding-left: 12px;
+	padding-left: 16px;
 }
 .grid-status-icon, .file-status-icon, .contact-status-icon {
 	height: 24px;
@@ -6534,6 +6537,120 @@ table {
 .fm-breadcrumbs.cloud-drive .right-arrow-bg {
 	padding: 0 10px 0 30px;
 }
+.fm-breadcrumbs.received-requests .right-arrow-bg {
+	background-position: 6px -3148px;
+}
+.fm-breadcrumbs.sent-requests .right-arrow-bg {
+	background-position: 6px -3068px;
+}
+.contact-request-button {
+	float: right;
+	height: 24px;
+	line-height: 22px;
+	background-color: rgba(0,0,0,0.3);
+	cursor: pointer;
+	padding: 0 10px;
+	color: white;
+	font-size: 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	margin: 0 8px 0 0;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+}
+.contact-request-button:hover {
+	background-color: rgba(0,0,0,0.5);
+}
+.contact-request-content {
+	font-size: 11px;
+	color: #666666;
+}
+.contact-request-button.ignore, .contact-request-button.cancel {
+	margin: 0 12px 0 0;
+}
+.deleted .contact-request-button.ignore {
+	display: block;
+}
+.contact-request-button.ignore, .deleted .contact-request-button.accept, .deleted .contact-request-button.delete, .ignored .contact-request-button.accept, .ignored .contact-request-button.delete, .ignored .contact-request-button.ignore {
+	display: none;
+}
+.deleted .nw-contact-avatar, .deleted .fm-chat-user-info, .ignored .nw-contact-avatar, .ignored .fm-chat-user-info {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+}
+.contact-request-ignored {
+	display: none;
+	font-size: 12px;
+	color: #333333;
+	padding: 0 20px 0 22px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: -2px -3304px;
+	float: right;
+	line-height: 21px;
+}
+.ignored .contact-request-ignored {
+	display: block;
+}
+.contact-request-button.accept {
+	background-color: rgba(109,176,63,0.8);
+}
+.contact-request-button.accept:hover {
+	background-color: rgba(109,176,63,1);
+}
+.contact-request-button.reinvite {
+	background-color: rgba(10,173,234,0.7);
+}
+.contact-request-button.reinvite:hover {
+	background-color: rgba(10,173,234,1);
+}
+.contact-request-button.delete {
+	background-color: rgba(217,0,7,0.7);
+	margin: 0 12px 0 0;
+}
+.contact-request-button.delete:hover {
+	background-color: rgba(217,0,7,1);
+}
+.empty-contact-requests, .empty-sent-requests, .contact-requests-grid, .sent-requests-grid {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	height: 100%;
+	height: -webkit-calc(100% - 48px);
+	height: -moz-calc(100% - 48px);
+	height: calc(100% - 48px);
+	position: relative;
+}
+.empty-requests-pad {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	top: 50%;
+	margin-top: -70px;
+}
+.empty-contact-requests-button, .empty-sent-requests-button {
+	margin: 40px 0 0 0;
+	height: 48px;
+	padding: 0 20px;
+	background-color: rgba(119,119,119,0.7);
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	color: white;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 46px;
+	display: inline-block;
+}
+.empty-requests-pad .fm-empty-cloud-txt {
+	margin-top: 0;
+}
 .fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg, .fm-breadcrumbs.contact .right-arrow-bg {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
@@ -6692,7 +6809,7 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive {
+.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-contact-requests, .fm-received-requests {
 	height: 24px;
 	float: right;
 	font-size: 12px;
@@ -6721,6 +6838,19 @@ span.search-number {
 }
 .fm-add-user {
 	padding: 0 10px 0 28px;
+}
+.fm-contact-requests, .fm-received-requests {
+	background-position: 1px -3035px;
+	padding: 0 10px 0 30px;
+	background-color: rgba(119,119,119,0.7);
+	margin-left: -2px;
+	margin-right: 12px;
+}
+.fm-received-requests {
+	background-position: 1px -3005px;
+}
+.fm-contact-requests:hover, .fm-sent-requests:hover {
+	background-color: rgba(119,119,119,1);
 }
 .chat-button.fm-add-user {
 	padding: 0 0 0 28px;
@@ -7312,9 +7442,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .add-user-nt-scrolling {
 	height: 50px;
 }
-.add-user-nt-scrolling textarea {
+.add-user-nt-scrolling .jspDrag {
+	width: 4px;
+}
+.add-user-nt-scrolling textarea, .add-contact-hidden {
 	border: 0;
-	width: 100px;
 	padding: 0;
 	background-color: transparent;
 	font-size: 11px;
@@ -7322,13 +7454,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	color: #999999;
 	width: 100%;
 	margin: 0;
-	height:50px;
-	padding: 7px 10px 7px 3px;
+	height: 50px;
+	padding: 0;
 	-webkit-appearance: caret;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	resize: none;
+	font-family: 'Open Sans', Arial;
+	overflow: hidden;
+	min-height: 36px;
+}
+.add-contact-hidden {
+	display: none;
+	height: auto;
+	overflow: visible;
+}
+.add-user-textarea {
+	padding: 7px 10px 7px 3px;
 }
 .add-user-nt-scrolling textarea::selection {
 	background-color: #333333;
@@ -7653,7 +7796,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .nw-conversations-item.current-calling.selected {
 	background-color: rgba(31,165,224,0.5);
 	border-right: 2px solid rgba(31,165,224,0.5);
-    cursor: default;
+	cursor: default;
 }
 .current-calling .nw-contact-status {
 	border: 2px solid rgba(255,255,255,1);
@@ -7666,9 +7809,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	margin: 0 80px 0 32px;
 }
 .current-calling.selected .nw-conversation-name {
-    color: white;
+	color: white;
 }
-
 .chat-cancel-icon {
 	width: 16px;
 	height: 16px;
@@ -8132,41 +8274,37 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	display: none;
 }
 .fm-chat-message-container .inline-profile-link .nw-contact-avatar {
-    display: inline-block;
-    font-size: 8px;
-    width: 16px;
-    height: 16px;
-    margin: 3px 3px 0 0;
-    line-height: 16px;
+	display: inline-block;
+	font-size: 8px;
+	width: 16px;
+	height: 16px;
+	margin: 3px 3px 0 0;
+	line-height: 16px;
 }
 .fm-chat-message-container .inline-profile-link .nw-contact-avatar img {
-    width: 16px;
-    height: 16px;
+	width: 16px;
+	height: 16px;
 }
-
 .fm-chat-message-container .inline-profile-link {
-    border: 1px solid #eee;
-    border-radius: 4px;
-    padding: 1px 3px 3px 3px;
-    display: inline-block;
-
-    cursor: pointer;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    -webkit-transition: all 150ms ease-in-out;
-    -moz-transition: all 150ms ease-in-out;
-    -o-transition: all 150ms ease-in-out;
-    -ms-transition: all 150ms ease-in-out;
-    transition: all 150ms ease-in-out;
+	border: 1px solid #eee;
+	border-radius: 4px;
+	padding: 1px 3px 3px 3px;
+	display: inline-block;
+	cursor: pointer;
+	white-space: nowrap;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	-webkit-transition: all 150ms ease-in-out;
+	-moz-transition: all 150ms ease-in-out;
+	-o-transition: all 150ms ease-in-out;
+	-ms-transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 }
-
 .fm-chat-message-container .inline-profile-link:hover {
-    background-color: rgba(43,166,222,0.3);
-    border-color: rgba(43,166,222,0.5);
-    color: white;
+	background-color: rgba(43,166,222,0.3);
+	border-color: rgba(43,166,222,0.5);
+	color: white;
 }
-
 .fm-chat-message-container.grouped-message.is-attachment .nw-contact-avatar {
 	display: block;
 }
@@ -8194,10 +8332,13 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-align: left;
 	position: relative; /* required for the "relative -> absolute" hack for positioning label.not-sent */
 }
+.left.email .nw-contact-avatar {
+	top: 7px;
+}
 .chat-message-txt {
 	margin-right: 89px;
 	padding-right: 26px;
-    word-wrap: break-word;
+	word-wrap: break-word;
 }
 .fm-chat-filename {
 	margin: 30px 0 0 15px;
@@ -18629,13 +18770,16 @@ span.incoming-call-name {
 .icoming-call-button.video-call:hover {
 	background-color: rgba(6,160,236,1);
 }
-.shared-with-me .nw-contact-avatar, .contacts-view td .nw-contact-avatar {
+.shared-with-me .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
 	position: absolute;
 	margin: 1px 0 0 0;
 }
-.shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info {
+.shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
 	float: none;
 	margin: 1px 0 0 44px;
+}
+.sent-requests-grid td .fm-chat-user-info {
+	margin: 2px 0 0 44px;
 }
 .shared-folder-icon {
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -19175,6 +19319,7 @@ ul.token-input-list-mega li input, .multiple-input input {
 	margin: 0;
 	padding: 6px 3px 4px 3px;
 	-webkit-appearance: caret;
+	font-family: 'Open Sans', Arial;
 }
 li.token-input-token-mega {
 	overflow: hidden;
@@ -19349,7 +19494,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	border-radius: 100%;
 }
 .email .nw-contact-avatar {
-	background-position: center -570px;
+	background-position: center -571px;
 }
 .gmail .nw-contact-avatar {
 	background-position: center -674px;

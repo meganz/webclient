@@ -884,7 +884,6 @@ function topmenuUI()
 	if (fminitialized) $('.top-search-bl').show();
 	else $('.top-search-bl').hide();
 	$('.fm-avatar').hide();
-
 	if (u_type == 3 && u_attr.firstname)
 	{
 		$('#topmenu .user-name').text(u_attr.firstname);
@@ -1059,7 +1058,7 @@ function topmenuUI()
 	    {
 			$(this).addClass('active');
 			$('.top-user-status-popup').addClass('active');
-			$('.top-user-status-popup').css('right',$('.top-menu-icon').outerWidth() + $('.user-name').outerWidth() + $('.membership-status-block').outerWidth() -34 + 'px');
+			$('.top-user-status-popup').css('right',$('.top-head').outerWidth() - $('.activity-status-block').position().left + -138 + 'px');
 		}
 		else
 		{

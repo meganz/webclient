@@ -325,7 +325,7 @@ if (m)
 		document.getElementById('m_title').innerHTML = 'A dedicated app for your device will be available soon.';
 		document.getElementById('m_desc').innerHTML = 'Follow us on Twitter or Facebook for updates.';
 	}
-	if (window.location.hash.substr(1,1) == '!')
+	if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
 	{
 		if (app) document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
 		if (ua.indexOf('chrome') > -1)

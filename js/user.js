@@ -161,7 +161,7 @@ function u_logout(logout)
 		if (mDBact)
 		{
 			mDBact=false;
-			localStorage[u_handle + '_mDBactive'];
+			delete localStorage[u_handle + '_mDBactive'];
 		}
 		fminitialized = false;
 		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;

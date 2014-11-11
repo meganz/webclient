@@ -4961,7 +4961,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	cursor: pointer;
 	background-image: none;
 }
-.not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
+.not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin, .not-logged .fm-contact-requests, .not-logged .fm-received-requests {
 	display: none !important;
 }
 .not-logged .fm-files-view-icon {

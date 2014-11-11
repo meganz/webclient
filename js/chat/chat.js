@@ -1,8 +1,6 @@
 /**
- * How to make this work in your browser? copy/paste this in your browser console:
- * localStorage.staticpath = "http://localhost:5280/"; localStorage.dd=1; localStorage.contextmenu=1; localStorage.megachat=1; localStorage.jj=true;
- * and optionally:
- * localStorage.dxmpp = 1; localStorage.stopOnAssertFail = true; localStorage.d = 1;
+ * Use this localStorage.chatDisabled flag to disable/enable the chat (note the "==" logical comparison!)
+ *
  * @type {boolean}
  */
 var MegaChatDisabled = localStorage.chatDisabled == true ? true : false;
@@ -129,8 +127,12 @@ var chatui;
 
 
             var _getNodeIdsForThisButton = function($button) {
+                var $attachmentContainer = $button.parents('.attachments-container');
+                var message = currentRoom.getMessageById($attachmentContainer.attr('data-message-id'));
 
-                var accessibleNodeIds = [];
+                var attachments = message.getMeta().attachments; //alias
+
+                var accessibleNodeIds = Object.keys(attachments);
                 $.each([
                     $button.parents('.nw-chat-sharing-body').attr("data-node-id")
                 ], function(k, v) {
@@ -164,6 +166,7 @@ var chatui;
 
             $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
                 var accessibleNodeIds = _getNodeIdsForThisButton($button);
+                debugger;
                 assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
                 M.addDownload(accessibleNodeIds, false);
             });
@@ -661,6 +664,9 @@ var Chat = function() {
                 'incoming_file_transfer',
                 'incoming_voice_video_call'
             ]
+        },
+        'chatStoreOptions': {
+            'autoPurgeMaxMessagesPerRoom': 1024
         }
     };
 
@@ -834,12 +840,14 @@ Chat.prototype.init = function() {
         if(meta && meta.type == "private") {
 
             var bareFromJid = eventObject.getFromJid().split("/")[0];
-            $.each(self.chats, function(roomJid, room) {
+            Object.keys(self.chats).forEach(function(roomJid) {
+                var room = self.chats[roomJid];
+
                 if(roomJid == eventObject.getRoomJid()) {
                     return; // continue
                 }
 
-                if(room.type == "private" && room.participantExistsInRoom(bareFromJid)) {
+                if(room.type == "private" && room.participantExistsInRoom(bareFromJid, false, true)) {
                     self.logger.debug(self.karere.getNickname(), "Possible invitation duplicate: ", eventObject.getRoomJid(), roomJid, "with eventData:", eventObject);
 
                     if(self.currentlyOpenedChat == room.roomJid) {
@@ -920,6 +928,10 @@ Chat.prototype.init = function() {
     this.karere.bind("onAuthfail", updateMyConnectionStatus);
     this.karere.bind("onDisconnecting", updateMyConnectionStatus);
     this.karere.bind("onDisconnected", function() {
+        if(!u_handle) {
+            return;
+        }
+
         updateMyConnectionStatus();
 
         $.each(self.chats, function(k, v) {
@@ -1170,6 +1182,7 @@ Chat.prototype.init = function() {
     });
 
     self.$container = $('.fm-chat-block');
+
     self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
     assert(self.$header_tpl.length > 0, "Header template not found.");
 
@@ -1198,6 +1211,8 @@ Chat.prototype.init = function() {
     $('.fm-chat-message-scroll', self.$container).remove();
     $('.fm-chat-messages-block.message.template', self.$container).remove();
     $('.fm-chat-messages-block.inline-dialog.template', self.$container).remove();
+
+
 
     if(self.is_initialized) {
         self.destroy()
@@ -1239,6 +1254,10 @@ Chat.prototype.init = function() {
                 $elem.attr("title", title);
                 $('.direct-progressbar', $elem).removeClass("hidden");
                 $('.progressbarfill', $elem).css('width', progress + "%");
+
+                if(progress == 100) {
+                    $('.direct-progressbar', $elem).addClass("hidden");
+                }
             });
 
         };
@@ -1300,7 +1319,7 @@ Chat.prototype.init = function() {
         //ftManager proxies
 
         var _ftSessEndHandler = function(e, eventData) {
-            self.logger.error("RTC ftSessHandler: ", e, eventData);
+            self.logger.debug("RTC ftSessHandler: ", e, eventData);
 
             var sess = eventData.ftSess;
 
@@ -1348,7 +1367,6 @@ Chat.prototype.init = function() {
             if(!c) { return; }
 
             $('#contact_' + c.u + ' .start-chat-button')
-                .text('Show chat')
                 .addClass("active");
         }
     });
@@ -1360,7 +1378,6 @@ Chat.prototype.init = function() {
             if(!c) { return; }
 
             $('#contact_' + c.u + ' .start-chat-button')
-                .text('Start chat')
                 .removeClass("active");
         }
         room._cancelCallRequest();
@@ -1524,11 +1541,11 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
 
     // ignore empty messages (except attachments)
     if(eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
-        self.logger.error("Empty message, MegaChat will not process it: ", eventObject);
+        self.logger.debug("Empty message, MegaChat will not process it: ", eventObject);
 
         return;
     } else {
-        self.logger.error("MegaChat is now processing incoming message: ", eventObject);
+        self.logger.debug("MegaChat is now processing incoming message: ", eventObject);
     }
     // detect outgoing VS incoming messages here + sync their state
 
@@ -1536,7 +1553,7 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
     if(room) {
         room.appendMessage(eventObject);
     } else {
-        self.logger.debug("Room not found: ", eventObject.getRoomJid());
+        self.logger.error("Room not found: ", eventObject.getRoomJid());
     }
 };
 
@@ -1638,10 +1655,11 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
  *
  * @returns {*}
  */
-Chat.prototype.destroy = function() {
+Chat.prototype.destroy = function(isLogout) {
     var self = this;
-    localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
-    localStorage.megaChatPresenceMtime = unixtime();
+    //
+    //localStorage.megaChatPresence = Karere.PRESENCE.OFFLINE;
+    //localStorage.megaChatPresenceMtime = unixtime();
 
     if(self.filePicker) {
         self.filePicker.destroy();
@@ -1649,8 +1667,11 @@ Chat.prototype.destroy = function() {
     }
 
 
+
     $.each(self.chats, function(roomJid, room) {
-        room.destroy();
+        if(!isLogout) {
+            room.destroy();
+        }
         delete self.chats[roomJid];
     });
 
@@ -1709,7 +1730,7 @@ Chat.prototype.getContactFromJid = function(jid) {
         // user B's contacts list is still not updated
         // user B receives a XMPP presence info that user A is online and tries to render a DOM element which requires
         // the user's name..so this method gets called.
-        if(localStorage.d) {
+        if(window.d) {
             //debugger;
         }
     }
@@ -1883,15 +1904,15 @@ Chat.prototype.renderContactTree = function() {
 
     // update conversation list
     // -> add new convs to the ui
-    for(var k in self.chats) {
+    Object.keys(self.chats).forEach(function(k) {
         var megaRoom = self.chats[k];
 
         if(megaRoom._leaving) {
-            continue;
+            return; // continue;
         }
 
-        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').size() != 0) {
-            continue;
+        if($('.nw-conversations-item[data-room-jid="' + k.split("@")[0] + '"]').length != 0) {
+            return; // continue;
         }
 
         if(megaRoom.type == "private") {
@@ -1903,13 +1924,14 @@ Chat.prototype.renderContactTree = function() {
                 var html2 = '<div class="nw-conversations-item offline" id="contact2_' + htmlentities(contact.u) + '" data-room-jid="' + k.split("@")[0] + '" data-jid="' + chatWithJid + '"><div class="nw-contact-status"></div><div class="nw-conversations-unread">0</div><div class="nw-conversations-name">' + htmlentities(name) + '</div></div>';
                 $('.content-panel.conversations .conversations-container').prepend(html2);
             } else {
-                self.logger.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
+                //self.logger.error("Contacts are still not loaded. Will not show user: ", chatWithJid, " until data for that contact is loaded.");
             }
 
         } else {
             throw new Error("TBD");
         }
-    }
+    });
+
     // -> remove left chats from the ui
     $('.nw-conversations-item[data-room-jid]').each(function() {
         var megaRoom = self.chats[$(this).attr("data-room-jid") + "@" + self.karere.options.mucDomain];
@@ -1926,7 +1948,7 @@ Chat.prototype.renderContactTree = function() {
 
         var presence = self.karere.getPresence(self.getJidFromNodeId(contact.u));
 
-        var targetClassName = "offline"
+        var targetClassName = "offline";
         if(!presence || presence == Karere.PRESENCE.OFFLINE) {
             targetClassName = "offline";
         } else if(presence == Karere.PRESENCE.AWAY) {
@@ -1951,7 +1973,7 @@ Chat.prototype.renderContactTree = function() {
 
 
         // skip if element does not exists
-        if($element.size() == 0) {
+        if($element.length == 0) {
             return;
         }
 
@@ -1966,8 +1988,8 @@ Chat.prototype.renderContactTree = function() {
         $element.addClass(targetClassName);
 
         assert(
-            $element.size() == 1,
-            'nav elements not found (expected 1, got: ' + $element.size() + ')'
+            $element.length == 1,
+            'nav elements not found (expected 1, got: ' + $element.length + ')'
         );
 
         $element.attr("data-jid", self.getJidFromNodeId(contact.u));
@@ -1998,13 +2020,8 @@ Chat.prototype.renderContactTree = function() {
 
         var u_h = node_id.replace("contact_", "");
 
-
-        var startChatTxt = "Start chat";
         $('.start-chat-button', $node)
-            .show()
-            .text(
-                startChatTxt
-            );
+            .show();
     });
 
 
@@ -2050,7 +2067,7 @@ Chat.prototype.reorderContactTree = function() {
 
         if(!$prevNode) {
             var $first = $('li:first:not(#treeli_' + v.u + ')', $container);
-            if($first.size() > 0) {
+            if($first.length > 0) {
                 $currentNode.insertBefore($first);
             } else {
                 $container.append($currentNode)
@@ -2180,7 +2197,8 @@ Chat.prototype.openChat = function(jids, type) {
             $promise.resolve(roomJid, self.chats[roomJid]);
         })
         .fail(function() {
-            $promise.reject.apply($promise, toArray(arguments))
+            $promise.reject.apply($promise, toArray(arguments));
+
             if(self.chats[$startChatPromise.roomJid]) {
                 self.chats[$startChatPromise.roomJid].destroy(false);
                 self.renderContactTree();
@@ -2409,7 +2427,7 @@ Chat.prototype.renderListing = function() {
 
     $('.fm-right-files-block').removeClass('hidden');
 
-    $('.nw-conversations-item').removeClass('selected');
+    //$('.nw-conversations-item').removeClass('selected');
 
 
     sectionUIopen('conversations');
@@ -2419,7 +2437,7 @@ Chat.prototype.renderListing = function() {
     } else {
         $('.fm-empty-conversations').addClass('hidden');
 
-        if(!self.currentlyOpenedChat && $('.fm-right-header:visible').size() == 0) {
+        if(!self.currentlyOpenedChat && $('.fm-right-header:visible').length == 0) {
             // show something, instead of a blank/white screen if there are currently opened chats
             if(self.lastOpenedChat) {
                 self.chats[self.lastOpenedChat].show();

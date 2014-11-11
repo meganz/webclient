@@ -7,8 +7,8 @@
  *
  * Note: requires sinon.js
  *
- * @param objectInstance
- * @param methods
+ * @param objectInstance {Object}
+ * @param methods {Object} k/v map, where k = method name, v = function to execute
  * @constructor
  */
 var ObjectMocker = function(objectInstance, methods) {

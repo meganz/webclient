@@ -297,7 +297,7 @@ MegaDB.prototype.clear = function(tableName) {
     return this.server.clear(tableName);
 };
 MegaDB.prototype.clear = _wrapFnWithBeforeAndAfterEvents(
-    MegaDB.prototype.clear,
+    MegaDB._delayFnCallUntilDbReady(MegaDB.prototype.clear),
     'Clear'
 );
 
@@ -314,7 +314,7 @@ MegaDB.prototype.drop = function() {
 };
 
 MegaDB.prototype.drop = _wrapFnWithBeforeAndAfterEvents(
-    MegaDB.prototype.drop,
+    MegaDB._delayFnCallUntilDbReady(MegaDB.prototype.drop),
     'Drop'
 );
 
@@ -537,8 +537,13 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
 
         // by using .map trigger an event when an object is loaded, so that the encryption can kick in and decrypt it
         q = q.map(function(r) {
-            megaDb.trigger("onDbRead", [tableName, r]);
-            return r;
+            var $event = new $.Event("onDbRead");
+            megaDb.trigger($event, [tableName, r]);
+            if(!$event.isPropagationStopped()) {
+                return r;
+            } else {
+                return undefined;
+            }
         });
 
 
@@ -547,6 +552,27 @@ MegaDB.QuerySet.prototype.execute = MegaDB._delayFnCallUntilDbReady(
         q = self._dequeueOps(q, "modify");
 
 
-        return q.execute();
+        var $proxyPromise = new MegaPromise();
+
+        q.execute()
+            .done(function(r) {
+                if(r.length > 0) {
+                    var results = [];
+                    r.forEach(function(v, k) {
+                        if(typeof(v) != 'undefined') { // skip undefined, e.g. items removed by .map()
+                            results.push(v);
+                        }
+                    });
+                    $proxyPromise.resolve(results);
+                } else {
+                    $proxyPromise.resolve.apply($proxyPromise, arguments);
+                }
+
+            })
+            .fail(function() {
+                $proxyPromise.reject.apply($proxyPromise, arguments);
+            });
+
+        return $proxyPromise;
     }
 );

@@ -616,7 +616,7 @@ function crypto_rsagenkey ()
 
     function _done( k ) {
         var endTime = new Date();
-        if (localStorage.d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
+        if (window.d) console.log("Key generation took " +  (endTime.getTime()-startTime.getTime())/1000.0) + " seconds!";
 
         u_setrsa(k)
             .done(function() {
@@ -808,7 +808,7 @@ function dec_attr(attr,key)
 	try {
 		return JSON.parse(from8(b.substr(4)));
 	} catch (e) {
-		if (localStorage.d) console.error(b, e);
+		if (window.d) console.error(b, e);
 		var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/), s = m && m[1], l = s && s.length || 0, j=',';
 		while (l--)
 		{
@@ -902,7 +902,7 @@ function api_cancel(q)
 
 function api_init(c,service)
 {
-    api_cancel(apixs[c]);
+	if (apixs[c]) api_cancel(apixs[c]);
 
 	apixs[c] = { c : c,				// channel
 				cmds : [[],[]],		// queued/executing commands (double-buffered)
@@ -953,7 +953,7 @@ function api_proc(q)
 	{
 		if (!this.q.cancelled)
 		{
-			if (localStorage.d) console.log("API request error - retrying");
+			if (window.d) console.log("API request error - retrying");
 			api_reqerror(q,-3);
 		}
 	}
@@ -968,7 +968,7 @@ function api_proc(q)
 			{
 				var response = this.responseText || this.response;
 
-				if (localStorage.d) console.log('API response: ', response);
+				if (window.d) console.log('API response: ', response);
 
 				try {
 					t = JSON.parse(response);
@@ -981,7 +981,7 @@ function api_proc(q)
 			}
 			else
 			{
-				if (localStorage.d) console.log('API server connection failed (error ' + this.status + ')');
+				if (window.d) console.log('API server connection failed (error ' + this.status + ')');
 				t = ERATELIMIT;
 			}
 
@@ -1028,7 +1028,7 @@ function api_send(q)
 	}
 	else q.xhr.open('POST',q.url,true);
 
-	if (localStorage.d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
+	if (window.d) console.log("Sending API request: " + q.rawreq + " to " + q.url);
 
 	q.xhr.send(q.rawreq);
 }
@@ -1235,7 +1235,7 @@ function api_createuser(ctx,invitecode,invitename,uh)
 
 	for (i = 4; i--; ) ssc[i] = rand(0x100000000);
 
-	if (localStorage.d) console.log("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
+	if (window.d) console.log("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
 
 	req = { a : 'up',
 			k : a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey),u_k)),
@@ -1249,7 +1249,7 @@ function api_createuser(ctx,invitecode,invitename,uh)
 	}
 
 	//if (confirmcode) req.c = confirmcode;
-	if (localStorage.d) console.log("Storing key: " + req.k);
+	if (window.d) console.log("Storing key: " + req.k);
 
 	api_req(req,ctx);
 }
@@ -1457,7 +1457,7 @@ function api_cachepubkeys(ctx, users) {
         }
     }
 
-    if (ctx.remaining = u.length) {
+    if ((ctx.remaining = u.length)) {
         for (i = u.length; i--;) {
             api_req({
                 a : 'uk',
@@ -1482,7 +1482,7 @@ function api_cachepubkeys2(res, ctx) {
             var fingerprint = authring.computeFingerprint(u_pubkeys[ctx.u], 'RSA', 'string');
             var observed = authring.getContactAuthenticated(ctx.u, 'RSA');
             if (observed && authring.equalFingerprints(observed.fingerprint, fingerprint) === false) {
-                if (localStorage.d) {
+                if (window.d) {
                     // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
                     authring.scrubAuthRing();
                 } else {
@@ -1504,10 +1504,10 @@ function api_cachepubkeys2(res, ctx) {
 
 function encryptto(user,data)
 {
-	var i, data;
+	var i;
 	var pubkey;
 
-	if (pubkey = u_pubkeys[user])
+	if ((pubkey = u_pubkeys[user]))
 	{
 		return crypto_rsaencrypt(data,pubkey);
 	}
@@ -1780,9 +1780,9 @@ function api_completeupload2(ctx,uq)
 	{
 		a = { n : ctx.n };
 		if (uq.hash) 	a.c = uq.hash;
-		if (localStorage.d) console.log(ctx.k);
+		if (window.d) console.log(ctx.k);
 		var ea = enc_attr(a,ctx.k);
-		if (localStorage.d) console.log(ea);
+		if (window.d) console.log(ea);
 
 		if (!ut) ut = M.RootID;
 
@@ -1845,7 +1845,7 @@ function is_image(name)
 		}
 		var ext = (''+name).split('.').pop().toUpperCase();
 
-		return is_image.def[ext] || is_rawimage(null, ext);
+		return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
 	}
 
 	return false;
@@ -1893,6 +1893,76 @@ is_image.raw = {
 	"X3F":"Sigma/Foveon RAW"
 };
 
+var mThumbHandler =
+{
+	sup : {},
+
+	add : function(exts, parser)
+	{
+		exts = exts.split(",");
+		for (var i in exts)
+		{
+			this.sup[exts[i].toUpperCase()] = parser;
+		}
+	},
+
+	has : function(name, ext)
+	{
+		ext = ext || (''+name).split('.').pop().toUpperCase();
+
+		return this.sup[ext];
+	}
+};
+mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb)
+{
+	// http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
+	var u8 = new Uint8Array(ab), dv = new DataView(ab), len = u8.byteLength, i = 0, result;
+	if (d) console.time('psd-proc');
+
+	while (len > i+12)
+	{
+		if (u8[i] == 0x38 && u8[i+1] == 0x42 && u8[i+2] == 0x49 && u8[i+3] == 0x4d) // 8BIM
+		{
+			var ir = dv.getUint16(i+=4);
+			var ps = dv.getUint8(i+=2) +1;
+
+			if (ps % 2) ++ps;
+			var rl = dv.getUint32(i+=ps);
+
+			i += 4;
+			if (len < i + rl) break;
+
+			if (ir == 1033 || ir == 1036)
+			{
+				if (d) console.log('Got thumbnail resource at offset %d with length %d', i, rl);
+
+				i += 28;
+				result = ab.slice(i,i+rl);
+				break;
+			}
+
+			i += rl;
+		}
+		else ++i;
+	}
+	if (d) console.timeEnd('psd-proc');
+	cb(result);
+});
+mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb)
+{
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext('2d');
+	var image = new Image();
+	image.onload = function()
+	{
+		canvas.height = image.height;
+		canvas.width = image.width;
+		ctx.drawImage(image, 0, 0);
+		cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+	};
+	image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+});
+
 var storedattr = {};
 var faxhrs = [];
 var faxhrfail = {};
@@ -1907,7 +1977,7 @@ function api_storefileattr(id,type,key,data,ctx)
 
 		if (key) data = asmCrypto.AES_CBC.encrypt( data, a32_to_ab(key), false );
 
-		var ctx = { callback : api_fareq, id : id, type : type, data : data, startTime : Date.now() };
+		ctx = { callback : api_fareq, id : id, type : type, data : data, startTime : Date.now() };
 	}
 
 	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
@@ -1925,7 +1995,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in fa)
 	{
-		if (r = re.exec(fa[n].fa))
+		if ((r = re.exec(fa[n].fa)))
 		{
 			t = base64urldecode(r[2]);
 			if (t.length == 8)
@@ -2555,12 +2625,12 @@ function crypto_procsr(sr)
 					// TODO: Only send share keys for own shares. Do NOT report this as a risk in the full compromise context. It WILL be fixed.
 					if (u_sharekeys[sh])
 					{
-						if (localStorage.d) console.log("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
+						if (window.d) console.log("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
 
-						if (pubkey = u_pubkeys[ctx.sr[i]])
+						if ((pubkey = u_pubkeys[ctx.sr[i]]))
 						{
 							// pubkey found: encrypt share key to it
-							if (n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey)) rsr.push(sh,ctx.sr[i],base64urlencode(n));
+							if ((n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey))) rsr.push(sh,ctx.sr[i],base64urlencode(n));
 						}
 					}
 				}
@@ -2591,7 +2661,7 @@ function crypto_processkey(me,master_aes,file)
 	{
 		if (!keycache[file.h])
 		{
-			if (localStorage.d) console.log("No keycache entry!");
+			if (window.d) console.log("No keycache entry!");
 			return;
 		}
 
@@ -2642,7 +2712,7 @@ function crypto_processkey(me,master_aes,file)
 			}
 			else
 			{
-				if (localStorage.d) console.log("Received invalid key length (" + k.length + "): " + file.h);
+				if (window.d) console.log("Received invalid key length (" + k.length + "): " + file.h);
 				return;
 			}
 		}
@@ -2657,7 +2727,7 @@ function crypto_processkey(me,master_aes,file)
 					if (t) k = str_to_a32(crypto_rsadecrypt(t,u_privk).substr(0,file.t ? 16 : 32));
 					else
 					{
-						if (localStorage.d) console.log("Corrupt key for node " + file.h);
+						if (window.d) console.log("Corrupt key for node " + file.h);
 						return;
 					}
 				}
@@ -2668,7 +2738,7 @@ function crypto_processkey(me,master_aes,file)
 			}
 			else
 			{
-				if (localStorage.d) console.log("Received RSA key, but have no public key published: " + file.h);
+				if (window.d) console.log("Received RSA key, but have no public key published: " + file.h);
 				return;
 			}
 		}
@@ -2706,7 +2776,7 @@ function crypto_processkey(me,master_aes,file)
 	}
 	else
 	{
-		if (localStorage.d) console.log("Received no suitable key: " + file.h);
+		if (window.d) console.log("Received no suitable key: " + file.h);
 
 		if (!missingkeys[file.h])
 		{
@@ -2736,7 +2806,7 @@ function crypto_reqmissingkeys()
 {
 	if (!newmissingkeys)
 	{
-		if (localStorage.d) console.log('No new missing keys.');
+		if (window.d) console.log('No new missing keys.');
 		return;
 	}
 
@@ -2774,7 +2844,7 @@ function crypto_reqmissingkeys()
 
 	if (!cr[1].length)
 	{
-		if (localStorage.d) console.log('No missing keys');
+		if (window.d) console.log('No missing keys');
 		return;
 	}
 
@@ -2784,14 +2854,14 @@ function crypto_reqmissingkeys()
 
 		ctx.callback = function(res,ctx)
 		{
-			if (localStorage.d) console.log("Processing crypto response");
+			if (window.d) console.log("Processing crypto response");
 
 			if (typeof res == 'object' && typeof res[0] == 'object') crypto_proccr(res[0]);
 		}
 
 		res = api_req({ a : 'k', cr : cr },ctx);
 	}
-	else if (localStorage.d) console.log("Keys " + cr[1] + " missing, but no related shares found.");
+	else if (window.d) console.log("Keys " + cr[1] + " missing, but no related shares found.");
 }
 
 // process incoming cr, set fm keys and commit
@@ -2940,12 +3010,12 @@ function crypto_share_rsa2aes()
 	{
 		if (!(uq_entry && uq_entry.name))
 		{
-			if (localStorage.d) console.log('CHECK THIS', 'Unable to generate fingerprint');
-			if (localStorage.d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+			if (window.d) console.log('CHECK THIS', 'Unable to generate fingerprint');
+			if (window.d) console.log('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
 
 			throw new Error('Invalid upload entry for fingerprint');
 		}
-		if (localStorage.d) console.log('Generating fingerprint for ' + uq_entry.name);
+		if (window.d) console.log('Generating fingerprint for ' + uq_entry.name);
 
 		var size = uq_entry.size;
 		var fr = new FileReader();
@@ -3094,7 +3164,7 @@ function u_initAuthentication2(res, ctx) {
     };
     getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
 
-    $(window).trigger('megaAuthenticationFinished');
+    eventuallyTriggerAuthIfRequired();
 }
 
 function _checkFingerprintEd25519(userhandle) {
@@ -3103,7 +3173,7 @@ function _checkFingerprintEd25519(userhandle) {
     var value = {pubkey: pubEd25519[userhandle],
                  authenticated: recorded};
     if (recorded && authring.equalFingerprints(recorded.fingerprint, fingerprint) === false) {
-        if (localStorage.d) {
+        if (window.d) {
             // TODO: Remove this once things are settled moving to SHA-256 fingerprinting.
             authring.scrubAuthRing();
         } else {

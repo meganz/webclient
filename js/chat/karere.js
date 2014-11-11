@@ -17,24 +17,24 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
     karere._connectionRetries++;
 
 
-    if(localStorage.d) {
+    if(MegaLogger && MegaLogger.rootLogger) {
+        MegaLogger.rootLogger.error("request error, status: " + reqStatus + ", number of errors: " + karere._connectionRetries);
+    } else if(window.d) {
 		console.warn("request error, status: " + reqStatus + ", number of errors: " + karere._connectionRetries);
     }
 
 
-    if (karere._connectionRetries > karere.options.maxConnectionRetries) {
+    if (karere._connectionRetries > (karere.options.maxConnectionRetries * 2)) {
+        /* *2, because every conn. counts as 2, 2 XHR conns = 1 jabber connection */
         this._onDisconnectTimeout();
     } else {
+        this._conn._doDisconnect();
+
         setTimeout(function() {
-            karere.disconnect()
-                .done(function() {
-                    karere.reconnect();
-                })
-                .fail(function() {
-                    karere.connection._doDisconnect(); // force disconnect
-                    karere.reconnect();
-                });
-        }, karere._connectionRetries * 1000)
+            if(karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTING) {
+                karere.reconnect();
+            }
+        }, karere._connectionRetries * 2500)
     }
 };
 
@@ -296,13 +296,13 @@ Karere.DEFAULTS = {
      * When a method which requires connection is called, Karere would try to connect and execute that method.
      * However, what is the timeout that should be used to determinate if the connect operation had timed out?
      */
-    connectionRequiredTimeout: 9000,
+    connectionRequiredTimeout: 13000,
 
 
     /**
      * Timeout when connecting
      */
-    connectTimeout: 10000,
+    connectTimeout: 15000,
 
 
     /**
@@ -315,7 +315,7 @@ Karere.DEFAULTS = {
     /**
      * Maximum connection retry in case of error OR timeout
      */
-    maxConnectionRetries: 3,
+    maxConnectionRetries: 50,
 
     /**
      * Timeout waiting for a ping response from user (note: using client-to-client xmpp ping)
@@ -419,8 +419,13 @@ makeMetaAware(Karere);
             try {
                 return fn.apply(context, toArray(arguments))
             } catch(e) {
-                if(localStorage.d) {
+                if(MegaLogger && MegaLogger.rootLogger) {
+                    MegaLogger.rootLogger.error("exceptionSafeProxy caught: ", e, e.stack);
+                } else if(window.d) {
 		            console.error(e, e.stack);
+                }
+                if(localStorage.stopOnAssertFail) {
+                    debugger;
                 }
                 return true;
             }
@@ -702,6 +707,9 @@ makeMetaAware(Karere);
     Karere.prototype.disconnect = function() {
         var self = this;
 
+        if(self._disconnectTimeoutPromise) {
+            return self._disconnectTimeoutPromise;
+        }
         if(
             self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED ||
                 self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING ||
@@ -714,15 +722,17 @@ makeMetaAware(Karere);
             self._connectionState = Karere.CONNECTION_STATE.DISCONNECTING;
 
             self._waitForRequestQueueToBeEmpty()
+                .always(function() {
+                    delete self._disconnectTimeoutPromise;
+                })
                 .fail(function() {
                     self.logger.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
+                    self.connection._doDisconnect();
                 })
                 .done(function() {
                     self.logger.debug("Queue is empty. Calling disconnect.");
-                })
-                .always(function() {
                     self.connection.disconnect();
-                })
+                });
 
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
             // do nothing, we are already in the process of disconnecting.
@@ -732,15 +742,20 @@ makeMetaAware(Karere);
 
         clearTimeout(self._connectionRetryInProgress);
 
-        return createTimeoutPromise(
+        self._disconnectTimeoutPromise = createTimeoutPromise(
             function() {
                 return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED;
             },
             200,
             self.options.disconnectTimeout
-        ).done(function() {
-            self.clearMeta('rooms');
-        });
+        )
+            .always(function() {
+                delete self._disconnectTimeoutPromise;
+            }).done(function() {
+                self.clearMeta('rooms');
+            });
+
+        return self._disconnectTimeoutPromise;
     };
 
     /**
@@ -940,7 +955,12 @@ makeMetaAware(Karere);
         if(arguments[0] instanceof Error) {
             additional = arguments[0].stack;
         }
-        this.logger.error(toArray(arguments).join(" "), additional);
+        var msg = toArray(arguments).join(" ");
+        if(msg.indexOf("_processRequest - sendFunc")) {
+            this.connection._proto._hitError(0);
+            return;
+        }
+        this.logger.error(msg, additional);
     }
 }
 
@@ -1623,7 +1643,9 @@ makeMetaAware(Karere);
             messageId,
             contents,
             meta,
-            delay
+            delay,
+            KarereEventObjects.OutgoingMessage.STATE.NOT_SENT,
+            type == "groupchat" ? Karere.getNormalizedBareJid(toJid) : undefined
         );
 
         var event = new $.Event("onOutgoingMessage");

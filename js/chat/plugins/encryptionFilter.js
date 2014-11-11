@@ -10,17 +10,16 @@ var EncryptionFilter = function(megaChat) {
 
     self.logger = MegaLogger.getLogger("encryptionFilter", {}, megaChat.logger);
 
-    if(localStorage.d && mpenc) {
+    if(window.d && mpenc) {
         mpenc.debug.decoder = true;
     }
     self.megaChat = megaChat;
     self.karere = megaChat.karere;
 
-    /**
-     * Initialize the mpenc.handler.ProtocolHandler and OpQueue when a room is created
-     */
-    megaChat.bind("onRoomCreated", function(e, megaRoom) {
-         self.logger.debug("ROOM created.");
+    self._reinitialiseEncryptionOpQueue = function(megaRoom) {
+        if(megaRoom.encryptionHandler) {
+            delete megaRoom.encryptionHandler;
+        }
 
         megaRoom.encryptionHandler = new mpenc.handler.ProtocolHandler(
             megaRoom.megaChat.karere.getJid(),
@@ -59,6 +58,11 @@ var EncryptionFilter = function(megaChat) {
 
         megaRoom.encryptionIsInitialized = false;
 
+        if(megaRoom.encryptionOpQueue) {
+            megaRoom.encryptionOpQueue.destroy();
+            delete megaRoom.encryptionOpQueue;
+        }
+
         megaRoom.encryptionOpQueue = new OpQueue(
             megaRoom.encryptionHandler,
             megaRoom,
@@ -86,24 +90,34 @@ var EncryptionFilter = function(megaChat) {
             }
         );
 
-        megaRoom.bind("onStateChange", function(e, oldState, newState) {
+
+        EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0], megaRoom);
+
+        logAllCallsOnObject(megaRoom.encryptionOpQueue, console.debug, true, "mpOpQueue", self.logger);
+    };
+    /**
+     * Initialize the mpenc.handler.ProtocolHandler and OpQueue when a room is created
+     */
+    megaChat.unbind("onRoomCreated.encFilter");
+    megaChat.bind("onRoomCreated.encFilter", function(e, megaRoom) {
+         self.logger.debug("ROOM created.");
+        self._reinitialiseEncryptionOpQueue(megaRoom);
+
+        megaRoom.unbind("onStateChange.encFilter");
+        megaRoom.bind("onStateChange.encFilter", function(e, oldState, newState) {
             if(newState == ChatRoom.STATE.LEAVING) {
                 if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
                     megaRoom.encryptionOpQueue.queue('quit');
                 }
             }
         });
-
-
-        EncryptionFilter.debugEncryptionHandler(megaRoom.encryptionHandler, megaRoom.roomJid.split("@")[0], megaRoom);
-
-        logAllCallsOnObject(megaRoom.encryptionOpQueue, console.error, true, "mpOpQueue", self.logger);
     });
 
     /**
      * Cleanup after room destroy
      */
-    megaChat.bind("onRoomDestroy", function(e, megaRoom) {
+    megaChat.unbind("onRoomDestroy.encFilter");
+    megaChat.bind("onRoomDestroy.encFilter", function(e, megaRoom) {
         if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED) {
             megaRoom.encryptionOpQueue.queue('quit');
         }
@@ -115,7 +129,8 @@ var EncryptionFilter = function(megaChat) {
     /**
      * Pause MegaChat's state machine if needed (so that the mpenc can set up the encryption)
      */
-    megaChat.bind("onPluginsWait", function(e, megaRoom) {
+    megaChat.unbind("onPluginsWait.encFilter");
+    megaChat.bind("onPluginsWait.encFilter", function(e, megaRoom) {
         /**
          * This event is triggered when i'd joined a new room (joined may also mean created and joined)
          * Also, this is the place where any initial key exchanges/crypto setup should be done.
@@ -148,7 +163,8 @@ var EncryptionFilter = function(megaChat) {
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersUpdated}
      */
-    megaChat.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
+    megaChat.karere.unbind("onUsersUpdatedDone.encFilter");
+    megaChat.karere.bind("onUsersUpdatedDone.encFilter", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
         if(!megaRoom) {
@@ -174,6 +190,7 @@ var EncryptionFilter = function(megaChat) {
                 ChatRoom.STATE.PLUGINS_READY
             );
         }
+        self.logger.debug("onUsersUpdatedDone", megaRoom.roomJid);
     });
 
     /**
@@ -182,7 +199,8 @@ var EncryptionFilter = function(megaChat) {
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersJoined}
      */
-    megaChat.karere.bind("onUsersJoined", function(e, eventObject) {
+    megaChat.karere.unbind("onUsersJoined.encFilter");
+    megaChat.karere.bind("onUsersJoined.encFilter", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
         assert(megaRoom, 'room not found');
@@ -206,7 +224,8 @@ var EncryptionFilter = function(megaChat) {
      * @param e {jQuery.Event}
      * @param eventObject {KarereEventObjects.UsersJoined}
      */
-    megaChat.karere.bind("onUsersLeft", function(e, eventObject) {
+    megaChat.karere.unbind("onUsersLeft.encFilter");
+    megaChat.karere.bind("onUsersLeft.encFilter", function(e, eventObject) {
         var megaRoom = megaChat.chats[eventObject.getRoomJid()];
 
         if(!megaRoom) {
@@ -269,17 +288,21 @@ var EncryptionFilter = function(megaChat) {
     };
 
     // incoming
-    megaChat.karere.bind("onChatMessage", processIncoming);
-    megaChat.karere.bind("onPrivateMessage", processIncoming);
-    megaChat.karere.bind("onActionMessage", processIncoming);
+    megaChat.karere.unbind("onChatMessage.encFilter");
+    megaChat.karere.bind("onChatMessage.encFilter", processIncoming);
+    megaChat.karere.unbind("onPrivateMessage.encFilter");
+    megaChat.karere.bind("onPrivateMessage.encFilter", processIncoming);
+    megaChat.karere.unbind("onActionMessage.encFilter");
+    megaChat.karere.bind("onActionMessage.encFilter", processIncoming);
 
     // outgoing
-    megaChat.karere.bind("onOutgoingMessage", processOutgoing);
+    megaChat.karere.unbind("onOutgoingMessage.encFilter");
+    megaChat.karere.bind("onOutgoingMessage.encFilter", processOutgoing);
 
 
 
-    logAllCallsOnObject(this, console.error, true, "encFilter", self.logger);
-    callLoggerWrapper(window, "getPubEd25519", console.error, "getPubEd25519", self.logger);
+    logAllCallsOnObject(this, console.debug, true, "encFilter", self.logger);
+    callLoggerWrapper(window, "getPubEd25519", console.debug, "getPubEd25519", self.logger);
 
     return this;
 };
@@ -307,12 +330,17 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
     while(handler.protocolOutQueue.length) {
         var msg = handler.protocolOutQueue.shift();
 
+        // always append the room's jid into the metadata, so that the encryption filter would know to which
+        // protocol handler to send the enc. message for processing
+        var meta = $.extend({}, msg.metadata, {'roomJid': megaRoom.roomJid});
+
         if(msg.to) {
+
             megaRoom.megaChat.karere.sendRawMessage(
                 msg.to,
                 (!msg.to || msg.to.indexOf("conference.") !== -1) ? "groupchat" : "chat",
                 msg.message,
-                (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
+                meta, /* sendTo roomJid */
                 msg.metadata ? msg.metadata.messageId : undefined,
                 msg.metadata ? msg.metadata.delay : undefined
             );
@@ -321,7 +349,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                 megaRoom.roomJid,
                 "groupchat",
                 msg.message,
-                (msg.metadata && msg.metadata.roomJid) ? {'roomJid': msg.metadata.roomJid} : undefined, /* sendTo roomJid */
+                meta,
                 msg.metadata ? msg.metadata.messageId : undefined,
                 msg.metadata ? msg.metadata.delay : undefined
             );
@@ -367,19 +395,34 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                 );
                 self.megaChat.karere.trigger("onActionMessage", [eventObject]);
             } else {
-                var eventObject = new KarereEventObjects.IncomingMessage(
-                    /* toJid */ wireMessage.toJid,
-                    /* fromJid */ wireMessage.fromJid,
-                    /* type */ "Message",
-                    /* rawType */ wireMessage.rawType,
-                    /* messageId */ wireMessage.messageId,
-                    /* rawMessage */ undefined,
-                    /* roomJid */ wireMessage.roomJid,
-                    /* meta */ msgPayload[1],
-                    /* contents */ msgPayload[0],
-                    /* elements */ undefined,
-                    /* delay */ wireMessage.delay
-                );
+                var eventObject;
+                if(Karere.getNormalizedBareJid(wireMessage.fromJid) == self.megaChat.karere.getBareJid()) {
+                    eventObject = new KarereEventObjects.OutgoingMessage(
+                        /* toJid */ wireMessage.toJid,
+                        /* fromJid */ wireMessage.fromJid,
+                        /* type */ "Message",
+                        /* messageId */ wireMessage.messageId,
+                        /* contents */ msgPayload[0],
+                        /* meta */ msgPayload[1],
+                        /* delay */ wireMessage.delay,
+                        /* state */ KarereEventObjects.OutgoingMessage.STATE.SENT,
+                        /* roomJid */ wireMessage.roomJid
+                    );
+                } else {
+                    eventObject = new KarereEventObjects.IncomingMessage(
+                        /* toJid */ wireMessage.toJid,
+                        /* fromJid */ wireMessage.fromJid,
+                        /* type */ "Message",
+                        /* rawType */ wireMessage.rawType,
+                        /* messageId */ wireMessage.messageId,
+                        /* rawMessage */ undefined,
+                        /* roomJid */ wireMessage.roomJid,
+                        /* meta */ msgPayload[1],
+                        /* contents */ msgPayload[0],
+                        /* elements */ undefined,
+                        /* delay */ wireMessage.delay
+                    );
+                }
                 self.megaChat.karere.trigger("onChatMessage", [eventObject]);
             }
         } else {
@@ -467,20 +510,29 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
  * Goes thru the list of users in the specific `megaRoom` and tries to sync that with the `mpenc.ProtocolHandler`
  *
  * @param megaRoom {ChatRoom}
- * @param forceRecover {boolean}
+ * @param [forceRecover] {boolean}
  */
 EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
+    var self = this;
+
     if(megaRoom._leaving) {
         return;
-    }
+    } else if(megaRoom._syncRoomMembersIsInProgress) {
+        megaRoom._syncRoomMembersIsInProgress.always(function() { // wait for the already started sync to finish and then
+                                                                  // re-try to sync if needed
+            self.syncRoomUsersWithEncMembers(megaRoom);
+        });
 
-    var self = this;
+        return;
+    }
 
     var xmppUsers = megaRoom.getOrderedUsers();
     var encUsers = megaRoom.encryptionHandler.askeMember.members;
 
     var excludeUsers = [];
     var joinUsers = [];
+
+    assert(xmppUsers.length + encUsers.length > 0, 'no users');
 
     $.each(encUsers, function(k, v) {
         if(xmppUsers.indexOf(v) == -1) {
@@ -510,7 +562,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
             return; // no need to ping users who are going to be excluded
         }
 
-         self.logger.debug("#PING pinging: ", v);
+        self.logger.debug("#PING pinging: ", v);
 
         promises.push(
             megaRoom.megaChat.karere.sendPing(v)
@@ -537,10 +589,12 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
         );
     });
 
-    return $.when.apply($.when, promises)
+    megaRoom._syncRoomMembersIsInProgress = MegaPromise.allDone(promises, megaRoom.megaChat.karere.options.pingTimeout + 1000)
         .always(function() {
-             self.logger.debug("#PING got state // users to join:", joinUsers);
-             self.logger.debug("#PING got state // users to exclude:", excludeUsers);
+            self.logger.debug("#PING got state // users to join:", joinUsers);
+            self.logger.debug("#PING got state // users to exclude:", excludeUsers);
+
+            megaRoom._syncRoomMembersIsInProgress = false;
 
             // filter .joinUsers who are NOT participants
             var participants = megaRoom.getParticipants();
@@ -574,6 +628,9 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                     }
                 });
 
+                self.logger.error("had to recover, current users: ", currentUsers, "newly joined users: ", newlyJoinedUsers);
+
+                /*
                 megaRoom.encryptionOpQueue.queue(
                     'recover',
                     array_unique(currentUsers)
@@ -584,6 +641,18 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                         array_unique(newlyJoinedUsers)
                     );
                 }
+                */
+                self._reinitialiseEncryptionOpQueue(megaRoom);
+
+                var allUsers = array_unique(array_unique(newlyJoinedUsers).concat(currentUsers));
+                var mePos = allUsers.indexOf(megaRoom.megaChat.karere.getJid());
+                if(mePos >= 0) {
+                    allUsers.splice(mePos, 1);
+                }
+                if(megaRoom.iAmRoomOwner()) {
+                    megaRoom.encryptionOpQueue.queue('start', allUsers);
+                }
+
             } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
                 // first start, then exclude
                 if(joinUsers.length > 0) {
@@ -602,6 +671,8 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                 }
             }
         });
+
+    return megaRoom._syncRoomMembersIsInProgress;
 };
 
 /**
@@ -717,24 +788,10 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
             }
         } else if(eventObject.getRawType() == "chat") {
             // send to all chat rooms in which i'm currently having a chat w/ this user
-            if(eventObject.getMeta().roomJid) {
-                self.processMessage(e, self.megaChat.chats[eventObject.getMeta().roomJid], wireMessage);
-                if(!e.isPropagationStopped()) {
-                    e.stopPropagation();
-                }
-            } else {
-                var fromJid = Karere.getNormalizedFullJid(eventObject.getFromJid());
-                $.each(self.megaChat.chats, function(k, v) {
-                    if(v.getUsers()[fromJid]) {
-                         self.logger.debug("Found matching room for priv msg: ", v.roomJid, v, wireMessage);
-
-                        var resp = self.processMessage(e, v, wireMessage);
-
-                        if(!e.isPropagationStopped()) {
-                            e.stopPropagation();
-                        }
-                    }
-                });
+            assert(eventObject.getMeta().roomJid, "roomJid missing from incoming encrypted message.");
+            self.processMessage(e, self.megaChat.chats[eventObject.getMeta().roomJid], wireMessage);
+            if(!e.isPropagationStopped()) {
+                e.stopPropagation();
             }
         } else {
              self.logger.debug("No idea how to handle enc message: ", wireMessage);
@@ -803,14 +860,14 @@ EncryptionFilter.debugEncryptionHandler = function(eh, prefix, megaRoom) {
         return old(handler);
     };
 
-    logAllCallsOnObject(eh, console.error, true, (prefix ? prefix + ":" : "") + "mpenc", megaRoom.logger);
-    logAllCallsOnObject(eh.askeMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am", megaRoom.logger);
-    logAllCallsOnObject(eh.askeMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:m", megaRoom.logger);
-    logAllCallsOnObject(eh.askeMember.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:am:spkd", megaRoom.logger);
-    logAllCallsOnObject(eh.cliquesMember, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm", megaRoom.logger);
-    logAllCallsOnObject(eh.cliquesMember.members, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:cm:m", megaRoom.logger);
-    logAllCallsOnObject(eh.staticPubKeyDir, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:spkd", megaRoom.logger);
-    logAllCallsOnObject(eh.uiQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:uiQ", megaRoom.logger);
-    logAllCallsOnObject(eh.protocolOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:poQ", megaRoom.logger);
-    logAllCallsOnObject(eh.messageOutQueue, console.error, true, (prefix ? prefix + ":" : "") + "mpenc:moQ", megaRoom.logger);
+    logAllCallsOnObject(eh, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:am", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember.members, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:am:m", megaRoom.logger);
+    logAllCallsOnObject(eh.askeMember.staticPubKeyDir, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:am:spkd", megaRoom.logger);
+    logAllCallsOnObject(eh.cliquesMember, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:cm", megaRoom.logger);
+    logAllCallsOnObject(eh.cliquesMember.members, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:cm:m", megaRoom.logger);
+    logAllCallsOnObject(eh.staticPubKeyDir, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:spkd", megaRoom.logger);
+    logAllCallsOnObject(eh.uiQueue, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:uiQ", megaRoom.logger);
+    logAllCallsOnObject(eh.protocolOutQueue, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:poQ", megaRoom.logger);
+    logAllCallsOnObject(eh.messageOutQueue, console.debug, true, (prefix ? prefix + ":" : "") + "mpenc:moQ", megaRoom.logger);
 };

@@ -306,8 +306,8 @@ function GetNextNode (labelid)
 
 function showmoney(number)
 {
-    var number = number.toString(),
-    dollars = number.split('.')[0],
+    number = number.toString();
+    var dollars = number.split('.')[0],
     cents = (number.split('.')[1] || '') +'00';
     dollars = dollars.split('').reverse().join('')
         .replace(/(\d{3}(?!$))/g, '$1,')
@@ -591,7 +591,7 @@ function makeid(len)
 
 function checkMail(email)
 {
-	email = email.replace('+','');
+	email = email.replace('+','','g');
 	var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (filter.test(email)) return false;
 	else return true;
@@ -780,7 +780,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     $promise.verify = function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -793,7 +793,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     var timeoutTimer = setTimeout(function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -907,9 +907,12 @@ AssertionFailed.prototype.name = 'AssertionFailed';
  */
 function assert(test, message) {
     if (!test) {
-        if(localStorage.d) {
+        if(MegaLogger && MegaLogger.rootLogger) {
+            MegaLogger.rootLogger.error("assertion failed: ", message);
+        } else if(window.d) {
             console.error(message);
         }
+
         if(localStorage.stopOnAssertFail) {
             debugger;
         }
@@ -971,10 +974,10 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
-function srvlog(msg,data)
+function srvlog(msg,data, silent)
 {
-	if (d) console.error(msg);
-	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+	if (!silent && d) console.error(msg);
+	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
 }
 
 function oDestroy(obj) {
@@ -1027,6 +1030,11 @@ function dlFatalError(dl, error, ethrow) {
 	{
 		Later(browserDialog);
 		m = l[1933];
+	}
+	else if (dlMethod === FlashIO)
+	{
+		Later(browserDialog);
+		m = l[1308];
 	}
 	else
 	{
@@ -1082,7 +1090,7 @@ function invertColor(hexTripletColor) {
  * @param loggerFn
  */
 function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
 
@@ -1090,17 +1098,18 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     var textPrefix = textPrefix || "missing-prefix";
 
     var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
+    var logFnName = loggerFn == console.error ? "error" : "debug";
 
     if(ctx[fnName].haveCallLogger) { // recursion
         return;
     }
     ctx[fnName] = function() {
         //loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, toArray(arguments)]);
-        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)));
+        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray(arguments)));
 
         var res = origFn.apply(this, toArray(arguments));
         //loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, toArray(arguments), res]);
-        logger.debug.apply(logger, ["arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
+        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray(arguments)).concat(["returned: ", res]));
 
         return res;
     };
@@ -1119,7 +1128,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
  * @param [recursive] {boolean}
  */
 function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
     loggerFn = loggerFn || console.debug;
@@ -1750,6 +1759,7 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
     return function() {
         var self = this;
         var args = toArray(arguments);
+
         var event = new $.Event("onBefore" + eventSuffix);
         self.trigger(event, args);
 
@@ -1761,6 +1771,9 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
                return Promise.reject("Propagation stopped by onBefore" + eventSuffix);
             }
 
+        }
+        if(typeof(event.returnedValue) != "undefined") {
+            args = event.returnedValue;
         }
 
         var returnedValue = fn.apply(self, args);

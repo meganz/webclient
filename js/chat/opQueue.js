@@ -17,12 +17,14 @@
 var OpQueue = function(ctx, megaRoom, validateFn, recoverFailFn) {
     this.ctx = ctx;
     this.megaRoom = megaRoom;
+    this.logger = new MegaLogger("opQueue", {}, megaRoom.logger);
     this._queue = [];
 
     this.validateFn = validateFn;
     this.recoverFailFn = recoverFailFn;
-    this.MAX_ERROR_RETRIES = 10;
+    this.MAX_ERROR_RETRIES = 5;
     this.retryTimeout = 1000;
+    this.recoverTimeout = 5000;
 
     this._error_retries = 0;
 
@@ -35,7 +37,7 @@ var OpQueue = function(ctx, megaRoom, validateFn, recoverFailFn) {
  * Add operation to the queue
  *
  * @param opName
- * @param arrArgs
+ * @param [arrArgs]
  * @param [secondArg]
  * @param [thirdArg]
  */
@@ -90,9 +92,7 @@ OpQueue.prototype.preprocess = function(op) {
 
         var fromBareJid = Karere.getNormalizedBareJid(wireMessage.from);
 
-        if(localStorage.d) {
-            console.error("Processing: ", wireMessage)
-        }
+        self.logger.debug("Processing: ", wireMessage)
 
         var contact = self.megaRoom.megaChat.getContactFromJid(fromBareJid);
         assert(!!contact, 'contact not found.');
@@ -106,14 +106,10 @@ OpQueue.prototype.preprocess = function(op) {
 
         $combPromise
             .fail(function() {
-                if(localStorage.d) {
-                    console.error("Could not process message: ", wireMessage);
-                }
+                self.logger.error("Could not process message: ", wireMessage);
             })
             .done(function() {
-                if(localStorage.d) {
-                    console.error("[processMessage mpenc]", self.ctx.state, wireMessage);
-                }
+                self.logger.debug("[processMessage mpenc]", self.ctx.state, wireMessage);
             });
 
         getPubEd25519(contact.u, function(r) {
@@ -121,11 +117,10 @@ OpQueue.prototype.preprocess = function(op) {
                 try {
                     $promise1.resolve();
                 } catch(e) {
-                    if(localStorage.d) {
-                        console.error("Failed to process message", wireMessage, "with error:", e);
-                        if(localStorage.stopOnAssertFail) {
-                            debugger;
-                        }
+                    self.logger.error("Failed to process message", wireMessage, "with error:", e, e.stack);
+                    $promise1.reject();
+                    if(localStorage.stopOnAssertFail) {
+                        debugger;
                     }
                 }
             } else {
@@ -137,11 +132,10 @@ OpQueue.prototype.preprocess = function(op) {
                 try {
                     $promise2.resolve();
                 } catch(e) {
-                    if(localStorage.d) {
-                        console.error("Failed to process message", wireMessage, "with error:", e);
-                        if(localStorage.stopOnAssertFail) {
-                            debugger;
-                        }
+                    self.logger.error("Failed to process message", wireMessage, "with error:", e);
+                    $promise2.reject();
+                    if(localStorage.stopOnAssertFail) {
+                        debugger;
                     }
                 }
             } else {
@@ -233,17 +227,15 @@ OpQueue.prototype.pop = function() {
                 op[1] = op1; // replace
             }
 
-            if(localStorage.d) {
-                if(op[0] == "processMessage") {
-                    console.error("Will process message with contents: ", mpenc.codec.inspectMessageContent(op[1]));
-                }
+
+            if(op[0] == "processMessage" && op[1].message && typeof(mocha) == "undefined") {
+                var classify = mpenc.codec.categoriseMessage(op[1].message);
+                self.logger.debug("Will process message with contents: ", mpenc.codec.inspectMessageContent(classify.content));
             }
 
 
             if(op[1].length == 0 && op[0] != "recover" && op[0] != "quit") {
-                if(localStorage.d) {
-                    console.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
-                }
+                self.logger.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
             } else {
                 try {
                     self.ctx[op[0]](op[1], op[2], op[3]);
@@ -254,7 +246,12 @@ OpQueue.prototype.pop = function() {
 //                        }
                     }
 
-                    console.error("OpQueue caught mpenc exception: ", e, op, e.stack ? e.stack : "[no stack]");
+
+                    self.logger.error("OpQueue caught mpenc exception: ", e, op, e.stack ? e.stack : "[no stack]");
+
+                    if(localStorage.mpencDebug) {
+                        debugger;
+                    }
 
                 }
             }
@@ -265,7 +262,8 @@ OpQueue.prototype.pop = function() {
                 self._error_retries = 0;
                 self.recoverFailFn(self);
             } else {
-                if(localStorage.d) { console.error("OpQueue Will retry: ", self._currentOp, self._queue[0]); }
+                self.logger.error("OpQueue Will retry: ", self._currentOp, self._queue[0]);
+
                 self._error_retries++;
 
                 self.tickTimer = self.retry();
@@ -273,4 +271,13 @@ OpQueue.prototype.pop = function() {
             return false;
         }
     });
+};
+
+OpQueue.prototype.destroy = function() {
+    var self = this;
+
+    if(self.tickTimer) {
+        clearTimeout(self.tickTimer);
+    }
+    self._queue = [];
 };

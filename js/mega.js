@@ -565,8 +565,9 @@ function MegaData ()
 						var interactionclass = 'never';
 					}
 					var user = M.d[u_h];
-					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
-					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+                    var av_meta = generateAvatarMeta(u_h);
+					var avatar = av_meta.shortName, av_color = av_meta.color;
+					if (av_meta.avatarUrl) avatar = '<img src="' + av_meta.avatarUrl + '">';
 
 					var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
 
@@ -590,8 +591,10 @@ function MegaData ()
 					if (cs.files == 0 && cs.folders == 0) contains = l[1050];
 					var u_h = this.v[i].p;
 					var user = M.d[u_h];
-					var avatar = user.name.substr(0,2), av_color = user.name.charCodeAt(0)%6 + user.name.charCodeAt(1)%6;
-					if (avatars[u_h]) avatar = '<img src="' + avatars[u_h].url + '">';
+                    var av_meta = generateAvatarMeta(u_h);
+                    var avatar = av_meta.shortName, av_color = av_meta.color;
+                    if (av_meta.avatarUrl) avatar = '<img src="' + av_meta.avatarUrl + '">';
+
 					var rights = 'Read only', rightsclass = ' read-only';
 					if (M.v[i].r == 1)
 					{
@@ -905,6 +908,8 @@ function MegaData ()
 			searchPath();
 			contextmenuUI(e,1);
 		});
+
+        eventuallyTriggerAuthIfRequired();
 	};
 
 	this.renderShare = function(h)
@@ -1159,6 +1164,21 @@ function MegaData ()
         for(var i in this.c[n.h]) if (this.d[i].t == 1 && this.d[i].name) folders.push(this.d[i]);
 
         return folders;
+    };
+    this.getContactByEmail = function(email) {
+        var self = this;
+
+        var found = false;
+
+        Object.keys(self.u).forEach(function(k) {
+            var v = self.u[k];
+            if(v.t == 1 && v.name && v.m == email) {
+                found = v;
+                return false; // break
+            }
+        });
+
+        return found;
     };
 
 	this.buildtree = function(n, dialog)
@@ -2934,7 +2954,10 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]'))
+		{
+			srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		}
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);

@@ -9,7 +9,7 @@ var page = document.location.hash;
 function isMobile()
 {
     if (is_chrome_firefox) return false;
-    mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
+    var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
 }
@@ -370,6 +370,7 @@ else
 	{
 		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
+		var onBetaW = location.hostname === 'beta.mega.nz';
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		if (d && !console.time) (function(c)
@@ -384,8 +385,8 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
-		if (!d || location.hostname === 'beta.mega.nz')
+		Object.defineProperty(window, "__cd_v", { value : 7, writable : false });
+		if (!d || onBetaW)
 		{
 			var __cdumps = [], __cd_t;
 			window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -653,6 +654,7 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+        jsl.push({f:'js/resetAuthringKeys.js', n: 'resetAuthringKeys_js', j:1});
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
@@ -1129,7 +1131,7 @@ else
     var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
     if (localStorage.sid) u_storage = localStorage;
     else u_storage = sessionStorage;
-    if (u_sid = u_storage.sid)
+    if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();

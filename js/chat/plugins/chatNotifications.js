@@ -9,6 +9,10 @@
 var ChatNotifications = function(megaChat, options) {
     var self = this;
 
+    options = options || {};
+
+    options.parentLogger = megaChat.logger;
+
     self.notifications = new MegaNotifications(options);
 
     megaChat.unbind("onInit.chatNotifications");
@@ -43,7 +47,12 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     var icon = $('.nw-contact-avatar img', $message).attr('src');
                     var n;
 
+                    if(message.seen === true) { // halt if already seen.
+                        return;
+                    }
+
                     if(message instanceof KarereEventObjects.IncomingMessage && !message.isMyOwn(megaChat.karere)) {
+
                         if(message.meta.attachments) {
                             n = self.notifications.notify(
                                 'incoming-attachment',

@@ -298,8 +298,8 @@ function GetNextNode (labelid)
 
 function showmoney(number)
 {
-    var number = number.toString(),
-    dollars = number.split('.')[0],
+    number = number.toString();
+    var dollars = number.split('.')[0],
     cents = (number.split('.')[1] || '') +'00';
     dollars = dollars.split('').reverse().join('')
         .replace(/(\d{3}(?!$))/g, '$1,')

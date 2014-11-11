@@ -895,7 +895,7 @@ function api_cancel(q)
 
 function api_init(c,service)
 {
-    api_cancel(apixs[c]);
+	if (apixs[c]) api_cancel(apixs[c]);
 
 	apixs[c] = { c : c,				// channel
 				cmds : [[],[]],		// queued/executing commands (double-buffered)
@@ -1447,7 +1447,7 @@ function api_cachepubkeys(ctx,users)
 
 	for (i = users.length; i--; ) if (users[i] != 'EXP' && !u_pubkeys[users[i]]) u.push(users[i]);
 
-	if (ctx.remaining = u.length)
+	if ((ctx.remaining = u.length))
 	{
 		for (i = u.length; i--; )
 		{
@@ -1475,10 +1475,10 @@ function api_cachepubkeys2(res,ctx)
 
 function encryptto(user,data)
 {
-	var i, data;
+	var i;
 	var pubkey;
 
-	if (pubkey = u_pubkeys[user])
+	if ((pubkey = u_pubkeys[user]))
 	{
 		return crypto_rsaencrypt(data,pubkey);
 	}
@@ -1878,7 +1878,7 @@ function api_storefileattr(id,type,key,data,ctx)
 
 		if (key) data = asmCrypto.AES_CBC.encrypt( data, a32_to_ab(key), false );
 
-		var ctx = { callback : api_fareq, id : id, type : type, data : data, startTime : Date.now() };
+		ctx = { callback : api_fareq, id : id, type : type, data : data, startTime : Date.now() };
 	}
 
 	api_req({a : 'ufa', s : ctx.data.byteLength, ssl : use_ssl},ctx,n_h ? 1 : 0);
@@ -1896,7 +1896,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in fa)
 	{
-		if (r = re.exec(fa[n].fa))
+		if ((r = re.exec(fa[n].fa)))
 		{
 			t = base64urldecode(r[2]);
 			if (t.length == 8)
@@ -2528,10 +2528,10 @@ function crypto_procsr(sr)
 					{
 						if (d) console.log("Encrypting sharekey " + sh + " to user " + ctx.sr[i]);
 
-						if (pubkey = u_pubkeys[ctx.sr[i]])
+						if ((pubkey = u_pubkeys[ctx.sr[i]]))
 						{
 							// pubkey found: encrypt share key to it
-							if (n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey)) rsr.push(sh,ctx.sr[i],base64urlencode(n));
+							if ((n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]),pubkey))) rsr.push(sh,ctx.sr[i],base64urlencode(n));
 						}
 					}
 				}

@@ -613,7 +613,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	}
 	else
 	{
-		var task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
+		task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
 		// TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
 		task[this.gid] = 1;
 		Encrypter.push( task, this.upload, this );

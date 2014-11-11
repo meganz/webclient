@@ -11,7 +11,7 @@ var page = document.location.hash;
 function isMobile()
 {
 	if (is_chrome_firefox) return false;
-	mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
+	var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
 	for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
 	return false;
 }
@@ -362,7 +362,7 @@ else
 	if (!b_u)
 	{
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}; }
-		var d = localStorage.d || 0;
+		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 
@@ -710,6 +710,21 @@ else
 				i++;
 			}
 		}
+		if (jj)
+		{
+			l=[];
+			var i = 3000;
+			while (i--) l[i]='l';
+			for (var i in jsl)
+			{
+				if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + Math.random() + '"></sc' + 'ript>');
+				else if (jsl[i].j === 2)
+				{
+					if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
+						document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
+				}
+			}
+		}
 		var pages = [], scripts = {};
 		function getxhr()
 		{
@@ -998,7 +1013,7 @@ else
 
 	u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
 
-	if (u_sid = u_storage.sid)
+	if ((u_sid = u_storage.sid))
 	{
 		loginresponse = true;
 		var lxhr = getxhr();

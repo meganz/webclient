@@ -1139,8 +1139,6 @@ function addContactUI()
 	$('.add-user-notification textarea').bind('blur', function() {
 		var $this = $(this);
 		$('.add-user-notification').removeClass('active');
-		if ($this.val() == ''); 
-		$this.val('Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!');
 	});
 	
 	function addContactAreaResizing() {

@@ -232,6 +232,20 @@ function init_page()
 		if (!blogsearch) document.location.hash = 'blog';
 		page = 'blog';
 	}
+	else if (page.substr(0,5) == 'page_')
+	{
+		var cpage = decodeURIComponent(page.substr(5,page.length-2));
+		 
+		loadingDialog.show();
+		CMS.get(cpage, function(err, content) {
+			parsepage(content.html)
+			topmenuUI();
+			loadingDialog.hide();
+			mainScroll();
+		});
+		page = 'cpage';
+		return;
+	}
 	else if (page.substr(0,4) == 'blog' && page.length > 4 && page.length < 10)
 	{
 		blogid = page.substr(5,page.length-2);
@@ -1191,6 +1205,7 @@ function topmenuUI()
 		else if (c.indexOf('register') > -1) document.location.hash = 'register';
 		else if (c.indexOf('login') > -1) document.location.hash = 'login';
 		else if (c.indexOf('aboutus') > -1) document.location.hash = 'about';
+		else if (c.indexOf('corporate') > -1) document.location.hash = 'page_corporate';
 		else if (c.indexOf('megablog') > -1) document.location.hash = 'blog';
 		else if (c.indexOf('credits') > -1) document.location.hash = 'credits';
 		else if (c.indexOf('chrome') > -1) document.location.hash = 'chrome';

@@ -39,7 +39,7 @@ function u_login2(ctx,ks)
 // if valid session present, return user type
 function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 {
-	if (u_sid = u_storage.sid)
+	if ((u_sid = u_storage.sid))
 	{
 		api_setsid(u_sid);
 		u_checklogin3(ctx);
@@ -187,7 +187,7 @@ function u_logout(logout)
 		if (mDBact)
 		{
 			mDBact=false;
-			localStorage[u_handle + '_mDBactive'];
+			delete localStorage[u_handle + '_mDBactive'];
 		}
 		fminitialized = false;
 		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;

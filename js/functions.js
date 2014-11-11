@@ -306,8 +306,8 @@ function GetNextNode (labelid)
 
 function showmoney(number)
 {
-    var number = number.toString(),
-    dollars = number.split('.')[0],
+    number = number.toString();
+    var dollars = number.split('.')[0],
     cents = (number.split('.')[1] || '') +'00';
     dollars = dollars.split('').reverse().join('')
         .replace(/(\d{3}(?!$))/g, '$1,')
@@ -591,7 +591,7 @@ function makeid(len)
 
 function checkMail(email)
 {
-	email = email.replace('+','');
+	email = email.replace('+','','g');
 	var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (filter.test(email)) return false;
 	else return true;
@@ -1030,6 +1030,11 @@ function dlFatalError(dl, error, ethrow) {
 	{
 		Later(browserDialog);
 		m = l[1933];
+	}
+	else if (dlMethod === FlashIO)
+	{
+		Later(browserDialog);
+		m = l[1308];
 	}
 	else
 	{

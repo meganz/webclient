@@ -9,7 +9,7 @@ var page = document.location.hash;
 function isMobile()
 {
     if (is_chrome_firefox) return false;
-    mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
+    var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
 }
@@ -1131,7 +1131,7 @@ else
     var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
     if (localStorage.sid) u_storage = localStorage;
     else u_storage = sessionStorage;
-    if (u_sid = u_storage.sid)
+    if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();

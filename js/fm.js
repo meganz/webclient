@@ -1119,8 +1119,10 @@ function addContactUI()
 				.focus();
 	}
 	
+	//Contact request textfiled scripts
 	$('.add-user-notification textarea').bind('focus', function() {
 		var $this = $(this);
+		$('.add-user-notification').addClass('active');
 		if ($this.val() == 'Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!') {
           $this.select();
           window.setTimeout(function() {
@@ -1136,7 +1138,8 @@ function addContactUI()
 	
 	$('.add-user-notification textarea').bind('blur', function() {
 		var $this = $(this);
-		if ($this.val() == '') 
+		$('.add-user-notification').removeClass('active');
+		if ($this.val() == ''); 
 		$this.val('Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!');
 	});
 	
@@ -1174,6 +1177,8 @@ function addContactUI()
 	$('.add-user-notification textarea').on('keyup', function () {
 	    addContactAreaResizing();
 	});
+	//end of Contact request textfiled scripts
+	
 	
 	// Plugin configuration
 	var contacts = getContactsEMails();

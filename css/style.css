@@ -6543,6 +6543,9 @@ table {
 .fm-breadcrumbs.sent-requests .right-arrow-bg {
 	background-position: 6px -3068px;
 }
+.fm-breadcrumbs.hidden {
+	display:none;
+}
 .contact-request-button {
 	float: right;
 	height: 24px;

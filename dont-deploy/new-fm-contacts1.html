@@ -29,7 +29,23 @@ $(document).ready(function() {
       $.gridRequestsHeader();
   });
   
-	
+  $('.fm-contact-requests').bind('click', function() {
+	  $(this).addClass('hidden');
+	  $('.fm-received-requests').removeClass('hidden');
+	  $('.contact-requests-grid').addClass('hidden');
+	  $('.sent-requests-grid').removeClass('hidden');
+	  $('.fm-breadcrumbs.received-requests').addClass('hidden');
+	  $('.fm-breadcrumbs.sent-requests').removeClass('hidden');
+  });
+  
+  $('.fm-received-requests').bind('click', function() {
+	  $(this).addClass('hidden');
+	  $('.fm-contact-requests').removeClass('hidden');
+	  $('.sent-requests-grid').addClass('hidden');
+	  $('.contact-requests-grid').removeClass('hidden');
+	  $('.fm-breadcrumbs.sent-requests').addClass('hidden');
+	  $('.fm-breadcrumbs.received-requests').removeClass('hidden');
+  });
 	
   
 });
@@ -103,9 +119,12 @@ $(document).ready(function() {
                      <a class="fm-breadcrumbs contacts contains-directories has-next-button">
                        <span class="right-arrow-bg"><span></span></span>
                      </a>
-                     <!-- Please replace "folder" on "received-requests" !-->
+                     <!-- Please replace "folder" on "received-requests"/"sent-requests" !-->
                      <a class="fm-breadcrumbs received-requests contains-directories">
                          <span class="right-arrow-bg ui-draggable"><span>Received Requests</span></span>
+                     </a>
+                     <a class="fm-breadcrumbs sent-requests contains-directories hidden">
+                         <span class="right-arrow-bg ui-draggable"><span>Sent Requests</span></span>
                      </a>
                      <div class="clear"></div>
                    </div>

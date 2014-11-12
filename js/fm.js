@@ -5403,6 +5403,13 @@ function disableReadOnlySharedFolders(m)
  */
 function handleDialogContent(s, m, c, n, t, i)
 {
+	if ($.onImportCopyNodes && (!c || n !== 'copy'))
+	{
+		// XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
+		$('.copy-dialog-button.'+s).fadeOut(200).fadeIn(100);
+		return;
+	}
+
 	$('.' + n + '-dialog-txt').removeClass('active');
 	$('.' + n + '-dialog-empty').removeClass('active');
 	$('.' + n + '-dialog-button').removeClass('active');

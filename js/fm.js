@@ -384,20 +384,24 @@ function initUI(){
 	{
 		document.location.hash = 'login';
 	});
-	
+
 	$('.fm-dialog-overlay').rebind('click', function()
 	{
 		closeDialog();
 		$.hideContextMenu();
 	});
-	if (!folderlink)
+	if (folderlink)
+	{
+		$('.fm-main').addClass('active-folder-link');
+	}
+	else
 	{
 		$('.fm-tree-header.cloud-drive-item').text(l[164]);
 		$('.fm-tree-header').not('.cloud-drive-item').show();
 		$('.fm-menu-item').show();
 		$('.fm-left-menu .folderlink').addClass('hidden');
 		$('.fm-main').removeClass('active-folder-link');
-	} else $('.fm-main').addClass('active-folder-link');
+	}
 
 	treesearchUI();
 
@@ -737,10 +741,7 @@ function initUI(){
 
 	if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
 	{
-		setTimeout(function()
-		{
-			browserDialog();
-		},2000);
+		setTimeout(browserDialog,2000);
 	}
 
     $.transferPaneResizable = new FMResizablePane($('.transfer-panel'), {
@@ -920,7 +921,7 @@ function isValidShareLink()
 {
 	var valid = true;
 	for (var i in u_nodekeys) {
-		valid = valid && typeof u_nodekeys[i] == "object" 
+		valid = valid && typeof u_nodekeys[i] == "object"
 	}
 	return valid;
 }
@@ -1118,7 +1119,7 @@ function addContactUI()
 				.val('')
 				.focus();
 	}
-	
+
 	//Contact request textfiled scripts
 	$('.add-user-notification textarea').bind('focus', function() {
 		var $this = $(this);
@@ -1135,27 +1136,27 @@ function addContactUI()
           $this.mouseup(mouseUpHandler);
 		}
 	});
-	
+
 	$('.add-user-notification textarea').bind('blur', function() {
 		var $this = $(this);
 		$('.add-user-notification').removeClass('active');
 	});
-	
+
 	function addContactAreaResizing() {
 	  var txt = $('.add-user-notification textarea'),
-	      txtHeight =  txt.outerHeight(), 
+	      txtHeight =  txt.outerHeight(),
 	      hiddenDiv = $('.add-contact-hidden'),
 		  pane = $('.add-user-nt-scrolling'),
 		  content = txt.val(),
-		  api;	  
+		  api;
       content = content.replace(/\n/g, '<br />');
       hiddenDiv.html(content + '<br/>');
-	  
+
 	  if (txtHeight != hiddenDiv.outerHeight() ) {
 		txt.height(hiddenDiv.outerHeight());
-	
+
 	    if( $('.add-user-textarea').outerHeight()>=50) {
-	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5}); 
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
 	        api = pane.data('jsp');
 		    txt.blur();
 		    txt.focus();
@@ -1171,13 +1172,12 @@ function addContactUI()
 		}
 	  }
 	}
-	
+
 	$('.add-user-notification textarea').on('keyup', function () {
 	    addContactAreaResizing();
 	});
 	//end of Contact request textfiled scripts
-	
-	
+
 	// Plugin configuration
 	var contacts = getContactsEMails();
 
@@ -1799,23 +1799,7 @@ function initContextUI()
 	{
 		ASSERT(folderlink, 'Import needs to be used in folder links.');
 
-		var sel = [].concat($.selected || []);
-		if (sel.length)
-		{
-			var FLRootID = M.RootID;
-			$.onImportCopyNodes = fm_getcopynodes(sel);
-			document.location.hash = 'fm';
-			$(document).one('onInitContextUI', SoonFc(function(e)
-			{
-				if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
-				{
-					if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
-					$.selected = sel;
-					$.mcImport = true;
-					$(c+'.copy-item').click();
-				}
-			}))
-		}
+		fm_importflnodes($.selected);
 	});
 
 	$(c+'.newfolder-item').unbind('click');
@@ -3059,7 +3043,7 @@ function gridUI()
 		  var headerColumn = $('.grid-table-header th').get(i);
 		  $(headerColumn).width($(e).width());
 	    });
-		initTransferScroll(); 
+		initTransferScroll();
 	}
 	$.detailsGridHeader = function()
 	{
@@ -5005,18 +4989,22 @@ function treeUIexpand(id,force,moveDialog)
 
 function sectionUIopen(id)
 {
+	if (d) console.log('sectionUIopen', id);
+
 	$('.nw-fm-left-icon').removeClass('active');
 	$('.content-panel').removeClass('active');
 	$('.nw-fm-left-icon.' + id).addClass('active');
 	$('.content-panel.' + id).addClass('active');
 	$('.fm-left-menu').removeClass('cloud-drive shared-with-me rubbish-bin contacts conversations').addClass(id);
-	$('.fm-right-header').addClass('hidden');
+	$('.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
+	$('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
-	if (folderlink) {
+	if (folderlink)
+	{
 		if (!isValidShareLink())
 		{
 			$('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder')
-		} 
+		}
 		else if (id == 'cloud-drive')
 		{
 			$('.fm-main').addClass('active-folder-link');
@@ -5024,7 +5012,24 @@ function sectionUIopen(id)
 			$('.nw-fm-left-icon.folder-link').addClass('active');
 			$('.fm-left-menu').addClass('folder-link')
 			$('.nw-fm-tree-header.folder-link').show();
-		} else {
+			$('.fm-import-to-cloudrive, .fm-download-as-zip').removeClass('hidden');
+			$('.fm-import-to-cloudrive, .fm-download-as-zip').bind('click', function()
+			{
+				var c = '' + $(this).attr('class');
+
+				if (~c.indexOf('fm-import-to-cloudrive'))
+				{
+					fm_importflnodes([M.currentdirid]);
+				}
+				else if (~c.indexOf('fm-download-as-zip'))
+				{
+					M.addDownload([M.currentdirid], true);
+				}
+			});
+			if (!u_type) $('.fm-import-to-cloudrive').addClass('hidden');
+		}
+		else
+		{
 			$('.fm-main').removeClass('active-folder-link');
 			$('.fm-left-menu').removeClass('folder-link')
 			$('.nw-fm-tree-header.folder-link').hide();
@@ -5718,11 +5723,11 @@ function initShareDialog()
 
 	/**
 	 * Called when multi-input is not empty
-	 * 
+	 *
 	 * prepare params for dialog content addition
 	 * update global sharedTokens var
 	 * fill content with dialog contact
-	 * 
+	 *
 	 * @param {email} item
 	 * @param {array} perm, permission class and text
 	 * @returns {undefined}
@@ -5823,7 +5828,7 @@ function initShareDialog()
 			{
 				doshare($.selected[0], t, true);
 			}
-			
+
 			loadingDialog.hide();
 		}
 	});
@@ -7704,6 +7709,32 @@ function fm_contains(filecnt,foldercnt)
 	return containstxt;
 }
 
+function fm_importflnodes(nodes)
+{
+	var sel = [].concat(nodes || []);
+	if (sel.length)
+	{
+		var FLRootID = M.RootID;
+
+		$.onImportCopyNodes = fm_getcopynodes(sel);
+		document.location.hash = 'fm';
+
+		$(document).one('onInitContextUI', SoonFc(function(e)
+		{
+			if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
+			{
+				if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
+
+				$.selected = sel;
+				$.mcImport = true;
+
+				// XXX: ...
+				$('.context-menu-item.copy-item').click();
+			}
+		}));
+	}
+}
+
 function clipboardcopycomplete()
 {
 	if (d) console.log('clipboard copied');
@@ -7959,7 +7990,6 @@ function fingerprintDialog(userid)
 
 	var $this = $('.fingerprint-dialog')
 		, avatar = userAvatar(userid);
-		
 
 	$this.find('.fingerprint-avatar')
 		.attr('class', 'fingerprint-avatar color' + avatar.color)
@@ -8012,7 +8042,7 @@ function fingerprintDialog(userid)
  	  });
 	  $('.fm-dialog-overlay').removeClass('hidden');
 	  $('body').addClass('overlayed');
-	  
+
 }
 
 function contactUI()

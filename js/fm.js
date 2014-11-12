@@ -868,12 +868,13 @@ function initContextUI()
 		if (sel.length)
 		{
 			var FLRootID = M.RootID;
+			$.onImportCopyNodes = fm_getcopynodes(sel);
 			document.location.hash = 'fm';
 			$(document).one('openFolder', SoonFc(function(e)
 			{
 				if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
 				{
-					if (d) console.log('Importing Nodes...', sel);
+					if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 					$.selected = sel;
 					$.mcImport = true;
 					$.mctype='copy-cloud';
@@ -4183,6 +4184,7 @@ function mcDialog(close)
 	{
 		$.dialog=false;
 		delete $.mcImport;
+		delete $.onImportCopyNodes;
 		$('.move-dialog').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('.move-dialog #mainsub').html('');

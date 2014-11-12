@@ -969,6 +969,11 @@ function MegaData ()
 
 	this.copyNodes = function(cn,t,del)
 	{
+		if ($.onImportCopyNodes && t.length == 11)
+		{
+			msgDialog('warninga', l[135], 'Operation not permitted.');
+			return false;
+		}
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
 		{
@@ -988,33 +993,7 @@ function MegaData ()
 			return false;
 		}
 
-		var a=[];
-		var r=[];
-		for (var i in cn)
-		{
-			var s = fm_getnodes(cn[i]);
-			for (var j in s) r.push(s[j]);
-			r.push(cn[i]);
-		}
-		for(var i in r)
-		{
-			var n = M.d[r[i]];
-			if (n)
-			{
-				var ar = clone(n.ar);
-				if (typeof ar.fav !== 'undefined') delete ar.fav;
-				var mkat = enc_attr(ar,n.key);
-				var attr = ab_to_base64(mkat[0]);
-				var key;
-				if (t.length == 11) key = base64urlencode(encryptto(t,a32_to_str(mkat[1])));
-				else key = a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
-				var nn = {h:n.h,t:n.t,a:attr,k:key};
-				var p=n.p;
-				for (var j in cn) if (cn[j] == nn.h) p=false;
-				if (p) nn.p=p;
-				a.push(nn);
-			}
-		}
+		var a=$.onImportCopyNodes || fm_getcopynodes(cn, t);
 		var ops = {a:'p',t:t,n:a,i:requesti};
 		var s = fm_getsharenodes(t);
 		if (s.length > 0)
@@ -1293,7 +1272,7 @@ function MegaData ()
 			if (typeof mDB === 'object')
 			{
 				s['h_u'] = h + '_' + s.u;
-				if (typeof mDB === 'object' && !ignoreDB && !pfkey) mDBadd('s',clone(s));
+				if (!ignoreDB && !pfkey) mDBadd('s',clone(s));
 			}
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
@@ -2466,12 +2445,51 @@ function fm_getsharenodes(h)
 {
 	var sn=[];
 	var n=M.d[h];
-	while (n && n.p && n)
+	while (n && n.p)
 	{
 		if (typeof n.shares !== 'undefined' || u_sharekeys[n.h]) sn.push(n.h);
 		n = M.d[n.p];
 	}
 	return sn;
+}
+
+function fm_getcopynodes(cn, t)
+{
+	var a=[];
+	var r=[];
+	var c=11 == (t || "").length;
+	for (var i in cn)
+	{
+		var s = fm_getnodes(cn[i]);
+		for (var j in s) r.push(s[j]);
+		r.push(cn[i]);
+	}
+	for(var i in r)
+	{
+		var n = M.d[r[i]];
+		if (n)
+		{
+			var ar = clone(n.ar);
+			if (typeof ar.fav !== 'undefined') delete ar.fav;
+			var mkat = enc_attr(ar,n.key);
+			var attr = ab_to_base64(mkat[0]);
+			var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
+						: a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
+			var nn = {h:n.h,t:n.t,a:attr,k:key};
+			var p=n.p;
+			for (var j in cn)
+			{
+				if (cn[j] == nn.h)
+				{
+					p=false;
+					break;
+				}
+			}
+			if (p) nn.p=p;
+			a.push(nn);
+		}
+	}
+	return a;
 }
 
 function createfolder(toid,name,ulparams)

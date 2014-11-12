@@ -1009,6 +1009,11 @@ function MegaData ()
 			t:t,
 			callback : function (res,ctx)
 			{
+				function done()
+				{
+					loadingDialog.hide();
+					rendernew();
+				}
 				if (ctx.del)
 				{
 					var j =[];
@@ -1020,9 +1025,8 @@ function MegaData ()
 				}
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
-				if (res.f) process_f(res.f);
-				loadingDialog.hide();
-				rendernew();
+				if (res.f) process_f(res.f, done);
+				else done();
 			}
 		});
 	};
@@ -2590,9 +2594,23 @@ function processmove(jsonmove)
 	}
 }
 
-function process_f(f)
+function process_f(f, cb)
 {
-	for (var i in f) M.addNode(f[i]);
+	// for (var i in f) M.addNode(f[i]);
+	var max = 0x8000, n;
+
+	while ((n = f.pop()))
+	{
+		M.addNode(n);
+
+		if (cb && --max == 0) break;
+	}
+
+	if (cb)
+	{
+		if (max) Soon(cb);
+		else setTimeout(process_f, 200, f, cb);
+	}
 }
 
 function process_u(u)
@@ -2641,17 +2659,19 @@ function loadfm_callback(res)
 	}
 	if (res.u) process_u(res.u);
 	if (res.ok) process_ok(res.ok);
-	process_f(res.f);
-	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
-	maxaction = res.sn;
-	if (typeof mDB === 'object') localStorage[u_handle + '_maxaction'] = maxaction;
-	renderfm();
-	if (!pfkey) pollnotifications();
+	process_f(res.f, function()
+	{
+		if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
+		maxaction = res.sn;
+		if (typeof mDB === 'object') localStorage[u_handle + '_maxaction'] = maxaction;
+		renderfm();
+		if (!pfkey) pollnotifications();
 
-	if (res.cr) crypto_procmcr(res.cr);
-	if (res.sr) crypto_procsr(res.sr);
+		if (res.cr) crypto_procmcr(res.cr);
+		if (res.sr) crypto_procsr(res.sr);
 
-	getsc();
+		getsc();
+	});
 }
 
 function storefmconfig(n,c)

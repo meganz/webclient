@@ -6070,7 +6070,6 @@ function closeDialog()
 
 	delete $.dialog;
 	delete $.mcImport;
-	delete $.onImportCopyNodes;
 }
 
 function copyDialog()
@@ -6107,6 +6106,7 @@ function copyDialog()
 	$('.copy-dialog .fm-dialog-close, .copy-dialog .dialog-cancel-button').bind('click',function()
 	{
 		closeDialog();
+		delete $.onImportCopyNodes;
 	});
 
     $('.copy-dialog-button').unbind('click');
@@ -6278,6 +6278,7 @@ function copyDialog()
 					for (var i in $.selected) if (!isCircular($.selected[i], $.mcselected)) n.push($.selected[i]);
 					closeDialog();
 					M.copyNodes(n, $.mcselected);
+					delete $.onImportCopyNodes;
 					break;
 				case 'shared-with-me':
 					var n = [];

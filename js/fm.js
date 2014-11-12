@@ -1803,12 +1803,13 @@ function initContextUI()
 		if (sel.length)
 		{
 			var FLRootID = M.RootID;
+			$.onImportCopyNodes = fm_getcopynodes(sel);
 			document.location.hash = 'fm';
 			$(document).one('onInitContextUI', SoonFc(function(e)
 			{
 				if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import'))
 				{
-					if (d) console.log('Importing Nodes...', sel);
+					if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 					$.selected = sel;
 					$.mcImport = true;
 					$(c+'.copy-item').click();
@@ -6069,6 +6070,7 @@ function closeDialog()
 
 	delete $.dialog;
 	delete $.mcImport;
+	delete $.onImportCopyNodes;
 }
 
 function copyDialog()

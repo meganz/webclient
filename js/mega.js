@@ -3485,7 +3485,7 @@ function fm_getnodes(h,ignore)
 	return nodes;
 }
 
-function fm_getsharenodes(h)
+function fm_getsharenodes(h, root)
 {
 	var sn=[];
 	var n=M.d[h];
@@ -3494,6 +3494,7 @@ function fm_getsharenodes(h)
 		if (typeof n.shares !== 'undefined' || u_sharekeys[n.h]) sn.push(n.h);
 		n = M.d[n.p];
 	}
+	if (root) root.handle = n && n.h;
 	return sn;
 }
 
@@ -3630,15 +3631,18 @@ function doshare(h,t, dontShowShareDialog)
 
 function processmove(jsonmove)
 {
-	for (i in jsonmove)
+	var rts = [M.RootID,M.RubbishID,M.InboxID];
+
+	for (var i in jsonmove)
 	{
-		var sharingnodes = fm_getsharenodes(jsonmove[i].t);
+		var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root);
 
 		if (sharingnodes.length)
 		{
 			var movingnodes = fm_getnodes(jsonmove[i].n);
 			movingnodes.push(jsonmove[i].n);
 			jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
+			if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes);
 		}
 
 		api_req(jsonmove[i]);

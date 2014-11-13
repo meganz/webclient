@@ -263,4 +263,48 @@ describe("MegaPromise Unit Test", function() {
                     });
             });
     });
+
+    it("Multiple promises, combined with $.when", function(done) {
+        var resolved = [];
+        var rejected = [];
+
+        var _trackPromise = function(p) {
+            return p
+                .done(function(a) {
+                    console.log("resolved: ", a);
+                    resolved.push(a);
+                })
+                .fail(function(a) {
+                    console.log("rejected: ", a);
+                    rejected.push(a);
+                });
+        };
+
+
+        var minOffset = 100;
+        var dummyTimedPromise = function(r, type) {
+            minOffset += rand(1, 100);
+            var p = (new MegaPromise());
+            setTimeout(function() {
+                p[type](r);
+            }, minOffset);
+
+            return p;
+        };
+
+
+        MegaPromise.allDone([
+            _trackPromise(dummyTimedPromise(1, 'resolve')),
+            _trackPromise(dummyTimedPromise(2, 'resolve')),
+            _trackPromise(dummyTimedPromise(3, 'reject')),
+            _trackPromise(dummyTimedPromise(4, 'reject')),
+            _trackPromise(dummyTimedPromise(5, 'resolve')),
+            _trackPromise(dummyTimedPromise(6, 'reject'))
+        ]).always(function() {
+            console.log("always: ", arguments);
+            expect(resolved).to.eql([1, 2, 5]);
+            expect(rejected).to.eql([3, 4, 6]);
+            done();
+        });
+    });
 });

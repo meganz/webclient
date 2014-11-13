@@ -654,10 +654,9 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
 
-        jsl.push({f:'js/resetAuthringKeys.js', n: 'resetAuthringKeys_js', j:1});
-
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
+
         var jsl2 =
         {
             'about': {f:'html/about.html', n: 'about', j:0},

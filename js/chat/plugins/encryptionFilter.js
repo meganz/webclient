@@ -604,6 +604,10 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                     joinUsers.splice(k, 1);
                 }
             });
+            if(!megaRoom.encryptionHandler) {
+                self.logger.warn('encryptionHandler is missing/not initialised');
+                return;
+            }
 
             if(forceRecover) {
                 megaRoom.encryptionOpQueue._queue = [];

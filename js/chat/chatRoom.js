@@ -128,6 +128,34 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
                     if(self.state == ChatRoom.STATE.PLUGINS_WAIT || self.state == ChatRoom.STATE.PLUGINS_PAUSED) {
                         self.logger.error("Plugins had timed out, setting state to PLUGINS_READY");
 
+                        if(self.encryptionHandler && self.encryptionHandler.state !== 3) {
+                            self.appendDomMessage(
+                                self.generateInlineDialog(
+                                    "error-" + unixtime(),
+                                    self.megaChat.karere.getBareJid(),
+                                    "mpenc-setup-failed",
+                                    "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
+                                    [],
+                                    undefined,
+                                    false
+                                )
+                            );
+
+                            var othersJid = self.getParticipantsExceptMe()[0];
+                            var data = {
+                                currentMpencState: self.encryptionHandler.state,
+                                currentKarereState: self.megaChat.karere.getConnectionState(),
+                                myPresence: self.megaChat.karere.getPresence(self.megaChat.karere.getJid()),
+                                otherUsersPresence: self.megaChat.karere.getPresence(othersJid),
+                                callIsActive: self.callIsActive,
+                                queuedMessagesCount: self._messagesQueue.length,
+                                opQueueErrorRetriesCount: self.encryptionOpQueue._error_retries
+                            };
+
+                            srvlog("Timed out initialising mpenc.", data, true);
+                            self.logger.error("Timed out initialising mpenc.", data);
+                        }
+
                         self.setState(ChatRoom.STATE.PLUGINS_READY);
                     }
                 });
@@ -1491,7 +1519,11 @@ ChatRoom.prototype.iAmRoomOwner = function() {
 
     return users[0] === self.megaChat.karere.getJid();
 };
-
+/**
+ *
+ * @param jids
+ * @returns {Array}
+ */
 ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
     var self = this;
     if(!jids) {
@@ -1690,11 +1722,12 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices) {
     var mc = self.megaChat;
     var roomJid = self.roomJid;
 
-    if(roomJid == mc.getCurrentRoomJid()) {
+    if(roomJid == mc.getCurrentRoomJid() || self.$header.is(":visible")) {
         window.location = "#fm/chat";
+        self.hide();
         setTimeout(function() {
             self.megaChat.renderListing();
-        }, 100);
+        }, 300);
     }
     setTimeout(function() {
         delete mc.chats[roomJid];
@@ -2500,7 +2533,25 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     var megaChat = this.megaChat;
     meta = meta || {};
 
+    if(self._conv_ended === true) {
+        self._conv_ended = false;
+        self.getParticipantsExceptMe().forEach(function(v) {
 
+            self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
+                'ctime': self.ctime,
+                'invitationType': 'resume',
+                'participants': self.users,
+                'users': self.megaChat.karere.getUsersInChat(self.roomJid)
+            });
+        });
+
+        if(self.megaChat.plugins.encryptionFilter) {
+            self.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(self);
+        }
+
+
+        self.megaChat.sendBroadcastAction("conv-start", {roomJid: self.roomJid, type: self.type, participants: self.getParticipants()});
+    }
     var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
     var eventObject = new KarereEventObjects.OutgoingMessage(
         self.roomJid,
@@ -2850,7 +2901,7 @@ ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
         $av
     );
     $element.addClass(cls);
-    $element.addClass(contact.h);
+    $element.addClass(contact.u);
 
 
     // TODO: implement verification logic

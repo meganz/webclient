@@ -475,12 +475,12 @@ MegaDB.QuerySet.prototype._dequeueOps = function(q, opName) {
             args = clone(v[1]);
             self.megaDb.trigger("onModifyQuery", [self.tableName, args]);
         }
-        self.logger.debug("dequeue op:", opName, args);
+        //self.logger.debug("dequeue op:", opName, args);
 
         // if this was a modify() call, then trigger onBeforeUpdate
         if(opName == "modify") {
             q = q.map(function(r) {
-                self.megaDb.trigger("onBeforeUpdate", [self.tableName, r.id, r, true]);
+                //self.megaDb.trigger("onBeforeUpdate", [self.tableName, r.id, r, true]);
                 return r;
             });
         }

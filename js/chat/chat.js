@@ -1349,7 +1349,7 @@ Chat.prototype.init = function() {
         self.logger.error("No rtc support: ", e);
     }
 
-    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED) {
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() == Karere.CONNECTION_STATE.AUTHFAIL) {
         self.karere.authSetup(
             self.getJidFromNodeId(u_handle),
             self.getMyXMPPPassword()
@@ -1430,7 +1430,7 @@ Chat.prototype.connect = function() {
     var self = this;
 
     // connection flow already started/in progress?
-    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING && self.karere._$connectingPromise) {
         return self.karere._$connectingPromise.always(function() {
             self.renderMyStatus();
         });
@@ -1822,7 +1822,7 @@ Chat.prototype.renderMyStatus = function() {
             presence = localStorage.megaChatPresence;
         }
 
-    } else if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
+    } else if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() == Karere.CONNECTION_STATE.AUTHFAIL || self.karere.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
         cssClass = "offline";
     }
 
@@ -2437,15 +2437,22 @@ Chat.prototype.renderListing = function() {
     } else {
         $('.fm-empty-conversations').addClass('hidden');
 
-        if(!self.currentlyOpenedChat && $('.fm-right-header:visible').length == 0) {
+
+        if($('.fm-right-header:visible').length === 0) {
             // show something, instead of a blank/white screen if there are currently opened chats
-            if(self.lastOpenedChat) {
+            if(self.lastOpenedChat && self.chats[self.lastOpenedChat] && self.chats[self.lastOpenedChat]._leaving !== true) {
+                // have last opened chat, which is active
                 self.chats[self.lastOpenedChat].show();
                 return true;
             } else {
+                // show first chat from the conv. list
                 var $firstConversation = $('.nw-conversations-item:visible[data-room-jid]:first');
-                self.chats[$firstConversation.attr("data-room-jid") + "@conference." + self.options.xmppDomain].show();
-                return true;
+                if($firstConversation.length === 1) {
+                    self.chats[$firstConversation.attr("data-room-jid") + "@conference." + self.options.xmppDomain].show();
+                    return true;
+                } else {
+                    $('.fm-empty-conversations').removeClass('hidden');
+                }
             }
         }
     }

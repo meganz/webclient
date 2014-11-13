@@ -621,7 +621,7 @@ makeMetaAware(Karere);
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and _password
              */
             if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
-                self.logger.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state.");
+                self.logger.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state, will queue for later execution.");
 
                 internalPromises.push(
                     createTimeoutPromise(
@@ -644,7 +644,7 @@ makeMetaAware(Karere);
                 }
             }
 
-            $.when.apply($, internalPromises)
+            MegaPromise.all(internalPromises)
                 .done(function() {
                     fn.apply(self, args)
                         .done(function() {
@@ -673,7 +673,7 @@ makeMetaAware(Karere);
     Karere.prototype.reconnect = function() {
         var self = this;
 
-        if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED) {
+        if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED && self.getConnectionState() != Karere.CONNECTION_STATE.AUTHFAIL) {
             throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
         }
         if(!self._jid || !self._password) {
@@ -744,7 +744,7 @@ makeMetaAware(Karere);
 
         self._disconnectTimeoutPromise = createTimeoutPromise(
             function() {
-                return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED;
+                return self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTED || self.getConnectionState() == Karere.CONNECTION_STATE.AUTHFAIL;
             },
             200,
             self.options.disconnectTimeout

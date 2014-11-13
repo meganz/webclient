@@ -245,6 +245,20 @@ OpQueue.prototype.pop = function() {
 //                            debugger;
 //                        }
                     }
+                    if(e.message && e.message.indexOf("Authentication of member failed") != -1 && localStorage.d) {
+                        self.logger.warn("Because of debug mode and caught Authentication failed, authring will be scrubbed.");
+                        authring.scrubAuthRing();
+
+                        var megaRoom = self.megaRoom;
+
+                        if(megaRoom.iAmRoomOwner() === true) {
+                            megaRoom.megaChat.plugins.encryptionFilter.syncRoomUsersWithEncMembers(megaRoom, true);
+                        } else if(megaRoom.encryptionHandler.state === 2) {
+                            megaRoom.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(megaRoom);
+                        }
+
+                        return false;
+                    }
 
 
                     self.logger.error("OpQueue caught mpenc exception: ", e, op, e.stack ? e.stack : "[no stack]");

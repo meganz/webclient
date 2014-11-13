@@ -13,7 +13,7 @@ describe("mpenc integration and regression tests", function() {
 
     beforeEach(function(done) {
         megaDataMocker = new MegaDataMocker();
-        localStorage.d = localStorage.dd = localStorage.stopOnAssertFail = 1;
+        localStorage.d = localStorage.dd = 1;
 
         done();
     });

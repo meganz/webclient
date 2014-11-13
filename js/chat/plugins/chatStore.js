@@ -103,7 +103,12 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                     'state': newState,
                     'ended': megaRoom._conv_ended
                 })
-                .execute();
+                .execute()
+                .done(function() {
+                    if(megaRoom._conv_ended === true) {
+                        megaRoom.megaChat.trigger("onRoomDestroy.chatStore", megaRoom);
+                    }
+                });
         });
 
         // restore & render any queued messages from the db
@@ -194,7 +199,12 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 return;
             } else {
                 $.each(results, function(k, v) {
-                    if(!megaChat.chats[v.roomJid]) { // restore room from db
+                    var foundRoom = megaChat.chats[v.roomJid];
+
+                    if(!foundRoom) { // restore room from db
+                        if(v.ended) {
+                            megaChat.trigger("onRoomDestroy.chatStore", v);
+                        }
                         megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime);
                         megaChat.chats[v.roomJid]._conv_ended = v.ended;
 

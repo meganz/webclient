@@ -2065,6 +2065,27 @@ function fa_handler(xhr, ctx)
 	if (d) console.log('fah type:', this.responseType);
 }
 fa_handler.chunked = true;
+fa_handler.aboort  = function()
+{
+	for (var i = 0 ; faxhrs[i] ; i++ )
+	{
+		if (faxhrs[i].readyState && faxhrs[i].readyState != 4 && faxhrs[i].ctx.p)
+		{
+			var ctx = faxhrs[i].ctx;
+			faxhrs[i].ctx = {fabort:1};
+			faxhrs[i].fah.parse = null;
+
+			if (d) console.log('fah_abort', i, faxhrs[i]);
+
+			faxhrs[i].abort();
+
+			for (var i in ctx.h)
+			{
+				ctx.procfa(ctx,ctx.h[i],0xDEAD);
+			}
+		}
+	}
+};
 fa_handler.prototype =
 {
 	PutFA : function(response)
@@ -2441,7 +2462,7 @@ function api_fareq(res,ctx,xhr)
 				var ctx = this.ctx;
 				var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 				if (ctx.errfa) ctx.errfa(id,1);
-				else
+				else if (!ctx.fabort)
 				{
 					if (d) console.error('api_fareq', id, this);
 
@@ -2812,7 +2833,6 @@ function api_updfkey(h)
 			nk.push(h, a32_to_base64(encrypt_key(u_k_aes,u_nodekeys[h])));
 		}
 	}
-
 
 	if (nk.length)
 	{

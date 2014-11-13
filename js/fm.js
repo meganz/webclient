@@ -5039,6 +5039,7 @@ function sectionUIopen(id)
  	}
 
 	if (id !== 'conversations') $('.fm-right-header').removeClass('hidden');
+
 	if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares')))
 	{
 		$('.files-grid-view.fm').addClass('hidden');
@@ -5060,20 +5061,27 @@ function sectionUIopen(id)
 	switch(id)
 	{
 		case 'contacts':
-		headertxt = 'My contacts';
-		break;
+			headertxt = 'My contacts';
+			break;
 		case 'conversations':
-		headertxt = 'My conversations';
-		break;
+			headertxt = 'My conversations';
+			break;
 		case 'shared-with-me':
-		headertxt = 'My incoming shares';
-		break;
+			headertxt = 'My incoming shares';
+			break;
 		case 'cloud-drive':
-		headertxt = 'My folders';
-		break;
+			headertxt = 'My folders';
+			break;
 	}
 
 	if (!folderlink) $('.nw-tree-panel-header span').text(headertxt);
+
+	if ($.fah_abort_timer) clearTimeout($.fah_abort_timer);
+
+	if (id === 'conversations')
+	{
+		$.fah_abort_timer = setTimeout(fah_handler.abort, 2000);
+	}
 }
 
 function treeUIopen(id,event,ignoreScroll,dragOver,DragOpen)
@@ -7651,6 +7659,12 @@ function fm_thumbnails()
 			var rt = Date.now();
 			api_getfileattr(treq,0,function(ctx,node,uint8arr)
 			{
+				if (uint8arr === 0xDEAD)
+				{
+					if (d) console.log('Aborted thumbnail retrieval for ' + node);
+					delete th_requested[node];
+					return;
+				}
 				if (rt)
 				{
 					if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300)) fa_addcnt = 301;

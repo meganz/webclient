@@ -2795,6 +2795,8 @@ function api_updfkey(h)
 {
 	var nk = [], sn;
 
+	if (d) console.log('api_updfkey', h);
+
 	if (typeof h !== 'string') sn = h;
 	else
 	{
@@ -2811,9 +2813,12 @@ function api_updfkey(h)
 		}
 	}
 
-	if (d) console.log('api_updfkey', nk);
 
-	if (nk.length) api_req({ a : 'k', nk : nk });
+	if (nk.length)
+	{
+		if (d) console.log('api_updfkey.r', nk);
+		api_req({ a : 'k', nk : nk });
+	}
 }
 
 function crypto_sendrsa2aes()

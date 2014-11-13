@@ -1494,6 +1494,7 @@ function fmremove()
 	{
 		for(var i in $.selected)
 		{
+			api_updfkey($.selected[i]);
 			M.delNode($.selected[i]);
 			api_req({a:'d',n:$.selected[i],i:requesti});
 			delete u_sharekeys[$.selected[i]];

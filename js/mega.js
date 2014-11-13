@@ -2122,6 +2122,7 @@ function MegaData ()
 	{
 		if (this.d[h] && typeof this.d[h].shares !== 'undefined')
 		{
+			api_updfkey(h);
 			delete this.d[h].shares[u];
 			var a = 0;
 			for (var i in this.d[h].shares) if (this.d[h].shares[i]) a++;

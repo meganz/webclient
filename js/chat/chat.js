@@ -1730,7 +1730,7 @@ Chat.prototype.getContactFromJid = function(jid) {
         // user B's contacts list is still not updated
         // user B receives a XMPP presence info that user A is online and tries to render a DOM element which requires
         // the user's name..so this method gets called.
-        if(localStorage.d) {
+        if(window.d) {
             //debugger;
         }
     }

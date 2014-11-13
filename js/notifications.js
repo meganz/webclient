@@ -205,7 +205,7 @@ function donotify()
 	}
 
 	$('.notification-item').unbind('click');
-	$('.notification-item').bind('click',function(el,i)
+	$('.notification-item').bind('click',function(el)
 	{
 		notifymarkcount(true);
 		notifycounter();

@@ -59,7 +59,7 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
     p.then(function() {
         $promise.resolve.apply($promise, toArray(arguments))
     }, function(argument) {
-        if(localStorage.d) {
+        if(window.d) {
             var stack;
             // try to get the stack trace
             try {

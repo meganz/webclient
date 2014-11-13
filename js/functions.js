@@ -306,8 +306,8 @@ function GetNextNode (labelid)
 
 function showmoney(number)
 {
-    var number = number.toString(),
-    dollars = number.split('.')[0],
+    number = number.toString();
+    var dollars = number.split('.')[0],
     cents = (number.split('.')[1] || '') +'00';
     dollars = dollars.split('').reverse().join('')
         .replace(/(\d{3}(?!$))/g, '$1,')
@@ -591,7 +591,7 @@ function makeid(len)
 
 function checkMail(email)
 {
-	email = email.replace('+','');
+	email = email.replace('+','','g');
 	var filter  = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (filter.test(email)) return false;
 	else return true;
@@ -780,7 +780,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     $promise.verify = function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -793,7 +793,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     var timeoutTimer = setTimeout(function() {
         if(validateFunction()) {
-            if(localStorage.d) {
+            if(window.d) {
                 console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -909,7 +909,7 @@ function assert(test, message) {
     if (!test) {
         if(MegaLogger && MegaLogger.rootLogger) {
             MegaLogger.rootLogger.error("assertion failed: ", message);
-        } else if(localStorage.d) {
+        } else if(window.d) {
             console.error(message);
         }
 
@@ -1031,6 +1031,11 @@ function dlFatalError(dl, error, ethrow) {
 		Later(browserDialog);
 		m = l[1933];
 	}
+	else if (dlMethod === FlashIO)
+	{
+		Later(browserDialog);
+		m = l[1308];
+	}
 	else
 	{
 		Later(firefoxDialog);
@@ -1085,7 +1090,7 @@ function invertColor(hexTripletColor) {
  * @param loggerFn
  */
 function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
 
@@ -1123,7 +1128,7 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
  * @param [recursive] {boolean}
  */
 function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger) {
-    if(!localStorage.d) {
+    if(!window.d) {
         return;
     }
     loggerFn = loggerFn || console.debug;

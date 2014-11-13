@@ -1779,6 +1779,11 @@ function MegaData ()
 
 	this.copyNodes = function(cn,t,del,callback)
 	{
+		if ($.onImportCopyNodes && t.length == 11)
+		{
+			msgDialog('warninga', l[135], 'Operation not permitted.');
+			return false;
+		}
 		loadingDialog.show();
 		if (t.length == 11 && !u_pubkeys[t])
 		{
@@ -1798,33 +1803,7 @@ function MegaData ()
 			return false;
 		}
 
-		var a=[];
-		var r=[];
-		for (var i in cn)
-		{
-			var s = fm_getnodes(cn[i]);
-			for (var j in s) r.push(s[j]);
-			r.push(cn[i]);
-		}
-		for(var i in r)
-		{
-			var n = M.d[r[i]];
-			if (n)
-			{
-				var ar = clone(n.ar);
-				if (typeof ar.fav !== 'undefined') delete ar.fav;
-				var mkat = enc_attr(ar,n.key);
-				var attr = ab_to_base64(mkat[0]);
-				var key;
-				if (t.length == 11) key = base64urlencode(encryptto(t,a32_to_str(mkat[1])));
-				else key = a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
-				var nn = {h:n.h,t:n.t,a:attr,k:key};
-				var p=n.p;
-				for (var j in cn) if (cn[j] == nn.h) p=false;
-				if (p) nn.p=p;
-				a.push(nn);
-			}
-		}
+		var a=$.onImportCopyNodes || fm_getcopynodes(cn, t);
 		var ops = {a:'p',t:t,n:a,i:requesti};
 		var s = fm_getsharenodes(t);
 		if (s.length > 0)
@@ -1840,6 +1819,12 @@ function MegaData ()
 			t:t,
 			callback : function (res,ctx)
 			{
+				function done()
+				{
+					loadingDialog.hide();
+					if (callback) callback(res);
+					rendernew();
+				}
 				if (ctx.del)
 				{
 					var j =[];
@@ -1851,10 +1836,8 @@ function MegaData ()
 				}
 				newnodes = [];
 				if (res.u) process_u(res.u,true);
-				if (res.f) process_f(res.f);
-				loadingDialog.hide();
-				if (callback) callback(res);
-				rendernew();
+				if (res.f) process_f(res.f, done);
+				else done();
 			}
 		});
 	};
@@ -2127,7 +2110,7 @@ function MegaData ()
 			if (typeof mDB === 'object')
 			{
 				s['h_u'] = h + '_' + s.u;
-				if (typeof mDB === 'object' && !ignoreDB && !pfkey) mDBadd('s',clone(s));
+				if (!ignoreDB && !pfkey) mDBadd('s',clone(s));
 			}
 			sharedUInode(h,1);
 			if ($.dialog == 'sharing' && $.selected && $.selected[0] == h) shareDialog();
@@ -2139,6 +2122,7 @@ function MegaData ()
 	{
 		if (this.d[h] && typeof this.d[h].shares !== 'undefined')
 		{
+			api_updfkey(h);
 			delete this.d[h].shares[u];
 			var a = 0;
 			for (var i in this.d[h].shares) if (this.d[h].shares[i]) a++;
@@ -2954,7 +2938,10 @@ function onUploadError(ul, errorstr, reason, xhr)
 			xhr ? (xhr.readyState > 1 && xhr.status) : 'NoXHR',
 			hn
 		];
-		srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		if (details[1].indexOf('mtimeout') == -1 && -1 == details[1].indexOf('BRFS [l:Unk]'))
+		{
+			srvlog('onUploadError :: ' + errorstr + ' [' + details.join("] [") + ']');
+		}
 	}
 
 	if (d) console.error('onUploadError', ul.id, ul.name, errorstr, reason, hn);
@@ -3499,16 +3486,56 @@ function fm_getnodes(h,ignore)
 	return nodes;
 }
 
-function fm_getsharenodes(h)
+function fm_getsharenodes(h, root)
 {
 	var sn=[];
 	var n=M.d[h];
-	while (n && n.p && n)
+	while (n && n.p)
 	{
 		if (typeof n.shares !== 'undefined' || u_sharekeys[n.h]) sn.push(n.h);
 		n = M.d[n.p];
 	}
+	if (root) root.handle = n && n.h;
 	return sn;
+}
+
+function fm_getcopynodes(cn, t)
+{
+	var a=[];
+	var r=[];
+	var c=11 == (t || "").length;
+	for (var i in cn)
+	{
+		var s = fm_getnodes(cn[i]);
+		for (var j in s) r.push(s[j]);
+		r.push(cn[i]);
+	}
+	for(var i in r)
+	{
+		var n = M.d[r[i]];
+		if (n)
+		{
+			var ar = clone(n.ar);
+			if (typeof ar.fav !== 'undefined') delete ar.fav;
+			var mkat = enc_attr(ar,n.key);
+			var attr = ab_to_base64(mkat[0]);
+			var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
+						: a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
+			var nn = {h:n.h,t:n.t,a:attr,k:key};
+			var p=n.p;
+			for (var j in cn)
+			{
+				if (cn[j] == nn.h)
+				{
+					p=false;
+					break;
+				}
+			}
+			if (p) nn.p=p;
+			a.push(nn);
+		}
+	}
+	return a;
 }
 
 function createfolder(toid,name,ulparams)
@@ -3605,24 +3632,41 @@ function doshare(h,t, dontShowShareDialog)
 
 function processmove(jsonmove)
 {
-	for (i in jsonmove)
+	var rts = [M.RootID,M.RubbishID,M.InboxID];
+
+	for (var i in jsonmove)
 	{
-		var sharingnodes = fm_getsharenodes(jsonmove[i].t);
+		var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root);
 
 		if (sharingnodes.length)
 		{
 			var movingnodes = fm_getnodes(jsonmove[i].n);
 			movingnodes.push(jsonmove[i].n);
 			jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
+			if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes);
 		}
 
 		api_req(jsonmove[i]);
 	}
 }
 
-function process_f(f)
+function process_f(f, cb)
 {
-	for (var i in f) M.addNode(f[i]);
+	// for (var i in f) M.addNode(f[i]);
+	var max = 0x8000, n;
+
+	while ((n = f.pop()))
+	{
+		M.addNode(n);
+
+		if (cb && --max == 0) break;
+	}
+
+	if (cb)
+	{
+		if (max) Soon(cb);
+		else setTimeout(process_f, 200, f, cb);
+	}
 }
 
 function process_u(u)
@@ -3671,17 +3715,19 @@ function loadfm_callback(res)
 	}
 	if (res.u) process_u(res.u);
 	if (res.ok) process_ok(res.ok);
-	process_f(res.f);
-	if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
-	maxaction = res.sn;
-	if (typeof mDB === 'object') localStorage[u_handle + '_maxaction'] = maxaction;
-	renderfm();
-	if (!pfkey) pollnotifications();
+	process_f(res.f, function()
+	{
+		if (res.s) for (var i in res.s) M.nodeShare(res.s[i].h,res.s[i]);
+		maxaction = res.sn;
+		if (typeof mDB === 'object') localStorage[u_handle + '_maxaction'] = maxaction;
+		renderfm();
+		if (!pfkey) pollnotifications();
 
-	if (res.cr) crypto_procmcr(res.cr);
-	if (res.sr) crypto_procsr(res.sr);
+		if (res.cr) crypto_procmcr(res.cr);
+		if (res.sr) crypto_procsr(res.sr);
 
-	getsc();
+		getsc();
+	});
 }
 
 function storefmconfig(n,c)

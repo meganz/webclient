@@ -9,7 +9,7 @@ var page = document.location.hash;
 function isMobile()
 {
     if (is_chrome_firefox) return false;
-    mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
+    var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
 }
@@ -332,7 +332,7 @@ if (m)
         document.getElementById('m_title').innerHTML = 'A dedicated app for your device will be available soon.';
         document.getElementById('m_desc').innerHTML = 'Follow us on Twitter or Facebook for updates.';
     }
-    if (window.location.hash.substr(1,1) == '!')
+    if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
         if (app) document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
         if (ua.indexOf('chrome') > -1)
@@ -385,7 +385,7 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 6, writable : false });
+		Object.defineProperty(window, "__cd_v", { value : 7, writable : false });
 		if (!d || onBetaW)
 		{
 			var __cdumps = [], __cd_t;
@@ -653,6 +653,8 @@ else
         jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
@@ -1130,7 +1132,7 @@ else
     var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
     if (localStorage.sid) u_storage = localStorage;
     else u_storage = sessionStorage;
-    if (u_sid = u_storage.sid)
+    if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();

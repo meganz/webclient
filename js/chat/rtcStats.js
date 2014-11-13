@@ -1,5 +1,6 @@
 function statsGlobalInit(peerconn) {
-if (!peerconn.getStats) {
+//Firefox already has getStats() but is not compatible with our current code
+if (!peerconn.getStats || ((RTC.browser !== 'chrome') && (RTC.browser !== 'opera'))) {
     RTC.Stats = false;
     return;
 }
@@ -17,7 +18,7 @@ Stats.setVideoQuality = function(desc, params)
 	var vp8id = parseInt(m[1]);
 	var line = '';
 	var lastch = sdp[sdp.length-1];
-	if ((lastch != '\n') && (lastch != '\r'))
+    if ((lastch != '\n') && (lastch != '\r'))
 		line+= '\r\n';
 	line+= ('a=fmtp:'+m[1]);
 	if (params.vidbr)

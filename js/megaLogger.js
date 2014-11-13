@@ -219,7 +219,7 @@ $(window).bind('onMegaLoaded', function() {
     MegaLogger.rootLogger = new MegaLogger(
         "", {
             isEnabled: function() {
-                return !!localStorage.d;
+                return !!window.d;
             }
         },
         MegaLogger.rootLogger ? MegaLogger.rootLogger : false

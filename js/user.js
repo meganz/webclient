@@ -39,7 +39,7 @@ function u_login2(ctx,ks)
 // if valid session present, return user type
 function u_checklogin(ctx,force,passwordkey,invitecode,invitename,uh)
 {
-	if (u_sid = u_storage.sid)
+	if ((u_sid = u_storage.sid))
 	{
 		api_setsid(u_sid);
 		u_checklogin3(ctx);
@@ -187,7 +187,7 @@ function u_logout(logout)
 		if (mDBact)
 		{
 			mDBact=false;
-			localStorage[u_handle + '_mDBactive'];
+			delete localStorage[u_handle + '_mDBactive'];
 		}
 		fminitialized = false;
 		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
@@ -225,7 +225,7 @@ function u_setrsa(rsakey)
 
 	var ctx = {
 	    callback : function(res,ctx) {
-	        if (localStorage.d) {
+	        if (window.d) {
 	            console.log("RSA key put result=" + res);
 	        }
 
@@ -555,7 +555,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
                                                            u_k);
                 value = tlvstore.tlvRecordsToContainer(clearContainer);
             }
-            if (localStorage.d) {
+            if (window.d) {
                 console.log('Attribute "' + ctx.ua + '" for user "' + ctx.u
                             + '" is "' + value + '".');
             }
@@ -563,7 +563,7 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
                 ctx.callback2(value, ctx);
             }
         } else {
-            if (localStorage.d) {
+            if (window.d) {
                 console.log('Error retrieving attribute "' + ctx.ua
                             + '" for user "' + ctx.u + '": ' + res + '!');
             }
@@ -613,7 +613,7 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
     // Assemble context for this async API request.
     var myCtx = {
         callback: function(res, ctx) {
-            if (localStorage.d) {
+            if (window.d) {
                 if (typeof res !== 'number') {
                     console.log('Setting user attribute "'
                                 + ctx.ua + '", result: ' + res);

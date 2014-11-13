@@ -2065,7 +2065,7 @@ function fa_handler(xhr, ctx)
 	if (d) console.log('fah type:', this.responseType);
 }
 fa_handler.chunked = true;
-fa_handler.aboort  = function()
+fa_handler.abort  = function()
 {
 	for (var i = 0 ; faxhrs[i] ; i++ )
 	{

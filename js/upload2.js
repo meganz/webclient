@@ -34,13 +34,15 @@ function ul_completepending2(res,ctx)
 	ASSERT(typeof res == 'object' && res.f, 'Unexpected UL Server Response.', res);
 	if (typeof res == 'object' && res.f)
 	{
+		var n = res.f[0];
+
 		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
 
 		newnodes = [];
 		process_f(res.f);
 		rendernew();
 		fm_thumbnails();
-		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(n.h,ctx.faid);
 		onUploadSuccess(ul_queue[ctx.ul_queue_num]);
 		ul_queue[ctx.ul_queue_num] = {}
 		ctx.file.ul_failed = false;

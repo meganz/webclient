@@ -2581,7 +2581,11 @@ function crypto_processkey(me,master_aes,file)
 		{
 			p = file.k.indexOf(id + ':');
 
-			if (p >= 0 && (!p || file.k.charAt(p-1) == '/')) break;
+			if (p >= 0 && (!p || file.k.charAt(p-1) == '/'))
+			{
+				file.fk = 1;
+				break;
+			}
 
 			p = -1;
 		}
@@ -2686,6 +2690,31 @@ function crypto_processkey(me,master_aes,file)
 		}
 		keycache[file.h] = file.k;
 	}
+}
+
+function api_updfkey(h)
+{
+	var nk = [], sn;
+
+	if (typeof h !== 'string') sn = h;
+	else
+	{
+		sn = fm_getnodes(h,1);
+		sn.push(h);
+	}
+
+	for (var i in sn)
+	{
+		h = sn[i];
+		if (u_nodekeys[h] && M.d[h] && M.d[h].fk)
+		{
+			nk.push(h, a32_to_base64(encrypt_key(u_k_aes,u_nodekeys[h])));
+		}
+	}
+
+	if (d) console.log('api_updfkey', nk);
+
+	if (nk.length) api_req({ a : 'k', nk : nk });
 }
 
 function crypto_sendrsa2aes()

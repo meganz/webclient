@@ -153,7 +153,7 @@ var chatui;
                 $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
                 $('.copy-dialog .dialog-copy-button').addClass('active');
                 $('.copy-dialog').removeClass('hidden');
-                handleDialogContent('.cloud-drive', 'ul', true, 'copy', 'Send');
+                handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
 				$('body').addClass('overlayed');
             });
@@ -166,7 +166,6 @@ var chatui;
 
             $('.to-computer', $chatDownloadPopup).bind('click.megachat', function() {
                 var accessibleNodeIds = _getNodeIdsForThisButton($button);
-                debugger;
                 assert(accessibleNodeIds.length > 0, 'the file download list is empty.');
                 M.addDownload(accessibleNodeIds, false);
             });
@@ -1332,7 +1331,7 @@ Chat.prototype.init = function() {
             if(e.type == "ftsess-remove") { // completed
                 $('.nw-chat-sharing-body', $elem).removeAttr('title');
                 $('.progressbarfill', $elem).css('width', '100%');
-                $('.direct-progressbar', $elem).removeClass("hidden");
+                $('.direct-progressbar', $elem).addClass("hidden");
             }
 
             var roomJid = $('.webrtc-transfer').parents('.fm-chat-message-scroll').prev().attr("data-room-jid");

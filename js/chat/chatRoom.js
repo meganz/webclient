@@ -780,7 +780,10 @@ ChatRoom.prototype._cancelCallRequest = function() {
     }
 
     if(self.megaChat.rtc && self.megaChat.rtc.hangup) { // have support for rtc?
-        self.megaChat.rtc.hangup();
+        var otherUsersJid = self.getParticipantsExceptMe()[0];
+        if(otherUsersJid) {
+            self.megaChat.rtc.hangup(otherUsersJid);
+        }
     }
 };
 
@@ -1046,6 +1049,8 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
 ChatRoom.prototype._resetCallStateNoCall = function() {
     var self = this;
 
+    var callWasActive = self.callIsActive;
+
     self.callIsActive = false;
 
     self.$header.parent()
@@ -1065,13 +1070,18 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     $('.btn-chat-call', self.$header).show();
 
 
-    $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling')
-        .addClass('hidden')
-        .removeClass('selected');
+    if(callWasActive) {
+        $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling')
+            .addClass('hidden')
+            .removeClass('selected');
 
-    self.getNavElement().show();
+        self.getNavElement().show();
+        clearInterval(self._currentCallTimer);
+    }
 
-    clearInterval(self._currentCallTimer);
+
+
+
 
     self.getInlineDialogInstance("incoming-call").remove();
     self.getInlineDialogInstance("outgoing-call").remove();
@@ -2750,17 +2760,24 @@ ChatRoom.prototype.attachNodes = function(ids, message) {
             var attachments = {};
             $.each(ids, function(k, nodeId) {
                 var node = M.d[nodeId];
-                attachments[nodeId] = {
-                    'name': node.name,
-                    'h': nodeId,
-                    's': node.s,
-                    't': node.t,
-                    'sharedWith': users
-                };
+
+                if(node) {
+                    attachments[nodeId] = {
+                        'name': node.name,
+                        'h': nodeId,
+                        's': node.s,
+                        't': node.t,
+                        'sharedWith': users
+                    };
+                } else {
+                    self.logger.warn("Node not accessible, so can't be shared: ", nodeId);
+                }
             });
-            var messageId = self.sendMessage(message, {
-                'attachments': attachments
-            });
+            if(Object.keys(attachments).length > 0) {
+                var messageId = self.sendMessage(message, {
+                    'attachments': attachments
+                });
+            }
             $masterPromise.resolve(
                 messageId,
                 attachments,

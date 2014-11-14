@@ -1782,7 +1782,7 @@ ChatRoom.prototype.show = function() {
     $('.fm-chat-message-container.unread', self.$messages).removeClass('unread');
 
 
-    self.resized();
+    self.resized(true);
 
     self.megaChat.lastOpenedChat = self.roomJid;
 

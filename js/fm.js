@@ -5080,7 +5080,7 @@ function sectionUIopen(id)
 
 	if (id === 'conversations')
 	{
-		$.fah_abort_timer = setTimeout(fah_handler.abort, 2000);
+		$.fah_abort_timer = setTimeout(fa_handler.abort, 2000);
 	}
 }
 

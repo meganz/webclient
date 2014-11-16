@@ -4353,9 +4353,9 @@ function transferPanelUI()
     });
 
 	$.transferClose = function() {
-		var panel = $('.transfer-panel')
-
-		$('.transfer-drag-handle').css('cursor', 'n-resize')
+        
+		var panel = $('.transfer-panel');
+		$('.transfer-drag-handle').css('cursor', 'n-resize');
 
         panel.animate({'height': $('.transfer-panel-title').height()}, {
 			complete: function() {
@@ -4364,49 +4364,62 @@ function transferPanelUI()
 				$(window).trigger('resize');
 			},
 			progress: fm_resize_handler
-		})
-	}
+		});
+	};
 
 	$.transferOpen = function(force, dont_animate)
 	{
-		if($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
+		if ($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-			$.transferHeader();
-
-			var height = 192
-            if(localStorage.transferPaneHeight && $.transferPaneResizable) {
-				height = Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight)
+            			
+            // Initialise the functionality within the transfers pane
+            $.transferHeader();
+            
+            // If the user has previously resized the transfer panel
+            var height = 192;
+            if (localStorage.transferPaneHeight && $.transferPaneResizable) {
+                
+                // Load the previously configured panel height
+				height = Math.max($.transferPaneResizable.options.minHeight, localStorage.transferPaneHeight);
 			}
 
-			var panel = $('.transfer-panel')
+			var panel = $('.transfer-panel');
 
 			if (dont_animate) {
 				panel.css({'height': height});
 				return fm_resize_handler();
 			}
 
-			panel.animate({'height': height}, {
+			panel.animate({ 'height': height }, {
 				complete: function() {
 					tpDragCursor();
 					$.transferHeader();
 					$(window).trigger('resize');
 				},
 				progress: fm_resize_handler
-			})
-
+			});
 		}
-		else
-		{
+		else {
+            // Close the File Transfers Pane
 			$.transferClose();
 		}
+        
 		initTreeScroll();
-		if (M.currentdirid == 'notifications') notificationsScroll();
-		else if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
-		else if (M.viewmode == 1) initFileblocksScrolling();
-		else initGridScrolling();
-        $(window).trigger('resize');
+        
+        if (M.currentdirid === 'notifications') {
+            notificationsScroll();
+        }
+        else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
+            initAccountScroll();
+        }
+        else if (M.viewmode == 1) {
+            initFileblocksScrolling();
+        }
+        else {
+            initGridScrolling();
+        }
 	};
 
 	$('.transfer-settings-icon').unbind('click');

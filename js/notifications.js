@@ -7,143 +7,172 @@ function pollnotifications()
 	if (u_type == 3 && typeof notifications == 'undefined')
 	{
 		notifications = [];
-		if (M.currentdirid == 'notifications') loadingDialog.show();
-		api_req('c=100',
-		{
-			callback: function (json,params)
+		if (M.currentdirid == 'notifications')
+			loadingDialog.show();
+		api_req('c=100', {
+			callback: function (json, params)
 			{
 				if (typeof json == 'object' && json.fsn && u_type)
 				{
-					if (M.currentdirid == 'notifications') loadingDialog.hide();
+					if (M.currentdirid == 'notifications')
+						loadingDialog.hide();
 					notifications = [];
-					var currtime = Math.floor(new Date().getTime()/1000);
+					var currtime = Math.floor(new Date().getTime() / 1000);
 					for (var i in json.c)
 					{
 						notifications.push({
-							id: 		makeid(10),
-							type: 		json.c[i].t,
-							timestamp:  currtime-json.c[i].td,
-							user:		json.c[i].u,
-							folderid: 	json.c[i].n,
-							nodes:		json.c[i].f,
-							read:		json.c[i].td >= (json.ltd || 0),
-							popup:		true,
-							count:		json.c[i].td >= (json.ltd || 0),
-							rendered:	true
+							id: makeid(10),
+							type: json.c[i].t,
+							timestamp: currtime - json.c[i].td,
+							user: json.c[i].u,
+							folderid: json.c[i].n,
+							nodes: json.c[i].f,
+							read: json.c[i].td >= (json.ltd || 0),
+							popup: true,
+							count: json.c[i].td >= (json.ltd || 0),
+							rendered: true
 						});
 					}
-					var c = $('.notification-popup').attr('class');
 					donotify();
 					$('.cloud-popup-icon').show();
 				}
 			}
-		 },3);
+		}, 3);
 	}
 }
 
-var lastnotification=0;
+var lastnotification = 0;
 
 function notifycounter()
 {
-	if (typeof notifications == 'undefined') return false;
-	var a=0;
-	$.each(notifications, function(i,n)
+	if (typeof notifications == 'undefined')
+		return false;
+	var a = 0;
+	$.each(notifications, function (i, n)
 	{
-		if (!n.count) a++;
+		if (!n.count)
+			a++;
 	});
 
 	if (a == 0)
 	{
-		$('.notification-num').css('display','none');
+		$('.notification-num').css('display', 'none');
 		$('.notification-num').text(0);
 	}
 	else
 	{
 		$('.notification-num').text(a);
-		$('.notification-num').css('display','inline-block');
+		$('.notification-num').css('display', 'inline-block');
 	}
 	megatitle();
 }
 
 function donotify()
 {
-	if (typeof notifications == 'undefined') return false;
+	if (typeof notifications == 'undefined')
+		return false;
 	var useremails = {};
-	if (M && M.u) for (var i in M.u) useremails[i] = M.u[i].m;
-	notifications.sort(function(a,b)
+	if (M && M.u)
+		for (var i in M.u)
+			useremails[i] = M.u[i].m;
+	notifications.sort(function (a, b)
 	{
-		if (a.timestamp > b.timestamp) return -1;
-		else if (a.timestamp < b.timestamp) return 1;
-		else return 0;
+		if (a.timestamp > b.timestamp)
+			return -1;
+		else if (a.timestamp < b.timestamp)
+			return 1;
+		else
+			return 0;
 	});
 
-	var phtml = '',nhtml = '';
-	var i=0,a=0;
+	var phtml = '', nhtml = '';
+	var i = 0, a = 0;
 	var curdate = false;
 
-	$.each(notifications, function(i,n)
+	$.each(notifications, function (i, n)
 	{
-		if ((i > 100) && (page != 'notifications')) return false;
-		var date = 	new Date(n.timestamp*1000).getFullYear() + '-' + new Date(n.timestamp*1000).getMonth() + '-' + new Date(n.timestamp*1000).getDate();
+		if ((i > 100) && (page != 'notifications'))
+			return false;
+		var date = new Date(n.timestamp * 1000).getFullYear() + '-' + new Date(n.timestamp * 1000).getMonth() + '-' + new Date(n.timestamp * 1000).getDate();
 		if (curdate != date)
 		{
-			nhtml += ntdatehtml(n.timestamp*1000);
+			nhtml += ntdatehtml(n.timestamp * 1000);
 			curdate = date;
 		}
-		var obj=false;
-		var title='';
+		var obj = false;
+		var title = '';
 		if (n.type == 'share')
 		{
 			// new share
-			if (useremails[n.user]) title = l[824].replace('[X]',htmlentities(useremails[n.user]));
-			else title = l[825];
-			obj= notificationhtml(n.id,'share',title,n.timestamp,n.read);
+			if (useremails[n.user])
+				title = l[824].replace('[X]', htmlentities(useremails[n.user]));
+			else
+				title = l[825];
+			obj = notificationhtml(n.id, 'share', title, n.timestamp, n.read, n.user);
 		}
 		else if (n.type == 'dshare')
 		{
 			// revoked share
-			if (useremails[n.user]) title = l[826].replace('[X]',htmlentities(useremails[n.user]));
-			else title = l[827];
-			obj = notificationhtml(n.id,'dshare',title,n.timestamp,n.read);
+			if (useremails[n.user])
+				title = l[826].replace('[X]', htmlentities(useremails[n.user]));
+			else
+				title = l[827];
+			obj = notificationhtml(n.id, 'dshare', title, n.timestamp, n.read, n.user);
 		}
 		else if (n.type == 'put')
 		{
 			// put nodes
 			var nodes = n.nodes;
-			var filecnt=0;
-			var foldercnt=0;
-			var ntext='';
-			for(var j in nodes)
+			var filecnt = 0;
+			var foldercnt = 0;
+			var ntext = '';
+			for (var j in nodes)
 			{
-				if (nodes[j].t == 1) foldercnt++;
-				else filecnt++;
+				if (nodes[j].t == 1)
+					foldercnt++;
+				else
+					filecnt++;
 			}
-			if ((foldercnt > 1) && (filecnt > 1)) ntext = l[828].replace('[X1]',foldercnt).replace('[X2]',filecnt);
-			else if ((foldercnt > 1) && (filecnt == 1)) ntext = l[829].replace('[X]',foldercnt);
-			else if ((foldercnt == 1) && (filecnt > 1)) ntext = l[830].replace('[X]',filecnt);
-			else if ((foldercnt == 1) && (filecnt == 1)) ntext = l[831];
-			else if (foldercnt > 1)  ntext = l[832].replace('[X]',foldercnt);
-			else if (filecnt > 1)  ntext = l[833].replace('[X]',filecnt);
-			else if (foldercnt == 1)  ntext = l[834];
-			else if (filecnt == 1)  ntext = l[835];
-			if (useremails[n.user]) title = l[836].replace('[X]',htmlentities(useremails[n.user])).replace('[DATA]',ntext);
-			else if ((filecnt + foldercnt) > 1) title = l[837].replace('[X]',ntext);
-			else title = l[838].replace('[X]',ntext);
-			obj = notificationhtml(n.id,'put',title,n.timestamp,n.read);
+			if ((foldercnt > 1) && (filecnt > 1))
+				ntext = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
+			else if ((foldercnt > 1) && (filecnt == 1))
+				ntext = l[829].replace('[X]', foldercnt);
+			else if ((foldercnt == 1) && (filecnt > 1))
+				ntext = l[830].replace('[X]', filecnt);
+			else if ((foldercnt == 1) && (filecnt == 1))
+				ntext = l[831];
+			else if (foldercnt > 1)
+				ntext = l[832].replace('[X]', foldercnt);
+			else if (filecnt > 1)
+				ntext = l[833].replace('[X]', filecnt);
+			else if (foldercnt == 1)
+				ntext = l[834];
+			else if (filecnt == 1)
+				ntext = l[835];
+			if (useremails[n.user])
+				title = l[836].replace('[X]', htmlentities(useremails[n.user])).replace('[DATA]', ntext);
+			else if ((filecnt + foldercnt) > 1)
+				title = l[837].replace('[X]', ntext);
+			else
+				title = l[838].replace('[X]', ntext);
+			obj = notificationhtml(n.id, 'put', title, n.timestamp, n.read, n.user);
 		}
 		if (obj)
 		{
 			nhtml += obj.nhtml;
-			var max = Math.floor(($('body').height()-50)/70);
-			if (max > 10) max = 10;
-			if (i < max) phtml += obj.rhtml;
+			var max = Math.floor(($('body').height() - 50) / 70);
+			if (max > 10)
+				max = 10;
+			if (i < max)
+				phtml += obj.rhtml;
 			if (!n.popup)
 			{
-				n.popup=true;
-				donotifypopup(n.id,obj.phtml);
+				n.popup = true;
+				donotifypopup(n.id, obj.phtml);
 			}
 		}
-		if (!n.count) a++;
+		if (!n.count)
+			a++;
 	});
 
 	if (M.currentdirid == 'notifications')
@@ -152,21 +181,22 @@ function donotify()
 		notifycounter();
 		$('.new-notification-pad').html(nhtml);
 		$('.nt-info-txt,.new-notification-pad .notification-type').unbind('click');
-		$('.nt-info-txt,.new-notification-pad .notification-type').bind('click', function(e)
+		$('.nt-info-txt,.new-notification-pad .notification-type').bind('click', function (e)
 		{
 			var id = $(this).attr('id');
 			if (id)
 			{
-				id = id.replace('no_','');
-				id = id.replace('type_','');
-				id = id.replace('txt_','');
+				id = id.replace('no_', '');
+				id = id.replace('type_', '');
+				id = id.replace('txt_', '');
 
 				for (var i in notifications)
 				{
 					if (notifications[i].id == id && (notifications[i].type == 'put' || notifications[i].type == 'share'))
 					{
-						$.selected=[];
-						for (var j in notifications[i].nodes) $.selected.push(notifications[i].nodes[j].h);
+						$.selected = [];
+						for (var j in notifications[i].nodes)
+							$.selected.push(notifications[i].nodes[j].h);
 						M.openFolder(notifications[i].folderid);
 						reselect(1);
 					}
@@ -176,21 +206,29 @@ function donotify()
 		notificationsScroll();
 	}
 
-	if (a == 0)
+	// Check counted notification number
+	if (a === 0)
 	{
 		$('.notification-num').text(0);
-		$('.notification-num').css('display','none')
+		$('.notification-num').css('display', 'none');
+		$('.notification-popup').addClass('no-new-notifications');
+		// Hide clear button
+		$('.notifications-button.clear-button').addClass('hidden');
 	}
 	else
 	{
 		$('.notification-num').text(a);
-		$('.notification-num').css('display','inline-block')
+		$('.notification-num').css('display', 'inline-block');
+		$('.notification-popup').removeClass('no-new-notifications');
+		// Show clear button
+		$('.notifications-button.clear-button').removeClass('hidden');
 	}
 	$('.notification-scr-list').html(phtml);
 
 	var jsp = $('.notification-scroll').data('jsp');
-	if (jsp) jsp.destroy();
-	$('.notification-scroll').jScrollPane({showArrows:true, arrowSize:5});
+	if (jsp)
+		jsp.destroy();
+	$('.notification-scroll').jScrollPane({showArrows: true, arrowSize: 5});
 	jScrollFade('.notification-scroll');
 
 	if (notifications.length == 0)
@@ -205,7 +243,7 @@ function donotify()
 	}
 
 	$('.notification-item').unbind('click');
-	$('.notification-item').bind('click',function(el)
+	$('.notification-item').bind('click', function (el)
 	{
 		notifymarkcount(true);
 		notifycounter();
@@ -218,8 +256,9 @@ function donotify()
 			{
 				if (notifications[i].id == id && (notifications[i].type == 'put' || notifications[i].type == 'share'))
 				{
-					$.selected=[];
-					for (var j in notifications[i].nodes) $.selected.push(notifications[i].nodes[j].h);
+					$.selected = [];
+					for (var j in notifications[i].nodes)
+						$.selected.push(notifications[i].nodes[j].h);
 					M.openFolder(notifications[i].folderid);
 					reselect(1);
 				}
@@ -231,13 +270,15 @@ function donotify()
 
 function notifyclock()
 {
-	 if ($(".cloud-popup-icon").attr('class').indexOf('active') > 0)
-	 {
+	if ($(".cloud-popup-icon").attr('class').indexOf('active') > 0)
+	{
 		donotify();
 		var node = typeof notifications !== 'undefined' && notifications[0];
-		if ((node) && (node.timestamp*1000 > new Date().getTime()-60000)) setTimeout(notifyclock,990);
-		else setTimeout(notifyclock,60000);
-	 }
+		if ((node) && (node.timestamp * 1000 > new Date().getTime() - 60000))
+			setTimeout(notifyclock, 990);
+		else
+			setTimeout(notifyclock, 60000);
+	}
 }
 
 function hide_notiblock()
@@ -247,20 +288,20 @@ function hide_notiblock()
 	$('.notification-popup').removeClass('active');
 }
 
-function popup(id,html)
+function popup(id, html)
 {
 	$('#popnotifications').append(html);
-	$('#popup_' + id).css('bottom', ($('.nt-popup').length*61)-50 + 'px');
-	$('#popup_' + id).css('opacity',0).show().animate({opacity:1});
-	setTimeout(hide_notipop,5000,id);
+	$('#popup_' + id).css('bottom', ($('.nt-popup').length * 61) - 50 + 'px');
+	$('#popup_' + id).css('opacity', 0).show().animate({opacity: 1});
+	setTimeout(hide_notipop, 5000, id);
 }
 
 function hide_notipop(id)
 {
 	if ((id) && ($('#popup_' + id).css('opacity') == 1))
 	{
-		$('#popup_' + id).css('opacity',1).show().animate({opacity:0});
-		setTimeout(remove_notipop,1000);
+		$('#popup_' + id).css('opacity', 1).show().animate({opacity: 0});
+		setTimeout(remove_notipop, 1000);
 	}
 }
 
@@ -274,73 +315,114 @@ function click_noti(id)
 
 function remove_notipop()
 {
-	$('.nt-popup').each(function(id,el)
+	$('.nt-popup').each(function (id, el)
 	{
-		if ($(el).css('opacity') == 0) $(el).remove();
+		if ($(el).css('opacity') == 0)
+			$(el).remove();
 	});
 }
 
 function notifymarkcount(nread)
 {
-	var a=0;
-	for (i in notifications)
+	var a = 0;
+	for (var i in notifications)
 	{
 		var n = notifications[i];
-		n.count=true;
+		n.count = true;
 		if (nread && !n.read)
 		{
-			n.read=true;
+			n.read = true;
 			a++;
 		}
 	}
 	if (nread && $.maxnotification !== maxaction && a > 0)
 	{
-		$.maxnotification=maxaction;
-		api_req({a:'sla',i:requesti});
+		$.maxnotification = maxaction;
+		api_req({a: 'sla', i: requesti});
 	}
+}
+
+function countUnReadNotifications()
+{
+	var num = 0;
+	for (var i in notifications)
+	{
+		var n = notifications[i];
+		if (!n.read)
+		{
+			num++;
+		}
+	}
+
+	return num;
 }
 
 function render_notifications()
 {
-	for (i in notifications)
+	for (var i in notifications)
 	{
 		var n = notifications[i];
-		n.count=true;
+		n.count = true;
 	}
 }
 
 function ntdatehtml(timestamp)
 {
-	var months = [l[850],l[851],l[852],l[853],l[854],l[855],l[856],l[857],l[858],l[859],l[860],l[861]];
+	var months = [l[850], l[851], l[852], l[853], l[854], l[855], l[856], l[857], l[858], l[859], l[860], l[861]];
 	var month = months[new Date(timestamp).getMonth()];
 	var day = new Date(timestamp).getDate();
 	return '<div class="nt-circle-bg1"><div class="nt-circle-bg2"><div class="nt-circle-bg3"><span class="nt-circle-date">' + day + '</span><span class="nt-circle-month">' + month + '</span></div></div></div>';
 }
 
-function notificationhtml(id,type,title,time,read)
+function notificationhtml(id, type, title, time, read, userid)
 {
-	var className='',rhtml='',phtml='',nread='',href='',nstyle='',nstyle2='',onclick = '',nhtml='';
-	if (read) nread = 'read';
+	var className = '', rhtml = '', phtml = '', nread = '', href = '', nstyle = '', nstyle2 = '', onclick = '', nhtml = '';
+	if (read)
+		nread = 'read';
 	if (type == 'share')
 	{
-		 className = 'nt-incoming-share';
-		 nstyle2 = 'style="cursor:pointer;"';
+		className = 'nt-incoming-share';
+		nstyle2 = 'style="cursor:pointer;"';
 	}
 	else if (type == 'put')
 	{
-		 className = 'nt-new-files';
-		 nstyle2 = 'style="cursor:pointer;"';
+		className = 'nt-new-files';
+		nstyle2 = 'style="cursor:pointer;"';
 	}
 	else if (type == 'dshare')
 	{
 		className = 'nt-revocation-of-incoming';
 		nstyle = 'style="cursor:default;"';
+	}// ToDo: next 3 else if contains imaginary types, api_req('c=100', callbakc...) should return new types for API v2.0
+	else if (type === 'deleted')
+	{
+		className = 'nt-deleted-files';
+		nstyle2 = 'style="cursor:pointer;"';
 	}
+	else if (type === 'contactRequest')
+	{
+		className = 'nt-contact-request';
+		nstyle2 = 'style="cursor:pointer;"';
+		// ToDo: show accept and 'not now' buttons
+		// ToDo: Handle behavior of that buttons when user click on them
+	}
+	else if (type === 'contactAccepted')
+	{
+		className = 'nt-contact-accepted';
+		nstyle2 = 'style="cursor:pointer;"';
+	}
+
+	var email = M.u[userid].m;
+	var avatarColor = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+	var avatar = (avatars[userid] && avatars[userid].url)
+		? '<img src="' + avatars[userid].url + '">'
+		: (email.charAt(0) + email.charAt(1));
 
 	rhtml += '<a class="notification-item ' + className + ' ' + nread + '" ' + nstyle + ' id="' + htmlentities(id) + '">';
 	rhtml += '<span class="notification-status-icon">';
 	rhtml += '<span class="notification-status"></span>';
-	rhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
+//	rhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
+	rhtml += '<span class="notification-avatar color' + avatarColor + '">' + avatar + ' <span class="notification-avatar-icon"></span></span>';
 	rhtml += '<span class="notification-type">';
 	rhtml += '<span class="notification-request-buttons">';
 	rhtml += '<span class="fm-dialog-button notifications-button accept">Accept</span>';
@@ -348,7 +430,8 @@ function notificationhtml(id,type,title,time,read)
 	rhtml += '</span>';
 	rhtml += '<span class="notification-accepted">Accepted</span>';
 	rhtml += '<span class="notification-content">';
-	rhtml += '<span class="notification-username">User name</span>';
+//	rhtml += '<span class="notification-username">User name</span>';
+	rhtml += '<span class="notification-username">' + email + '</span>';
 	rhtml += '<span class="notification-info">' + title + '</span>';
 	rhtml += '<span class="notification-date">' + time2last(time) + '</span>';
 	rhtml += '</span></span></span></a>';
@@ -357,13 +440,14 @@ function notificationhtml(id,type,title,time,read)
 	phtml += '<div class="notification-type">'
 	phtml += '<div class="notification-content">';
 	phtml += '<div class="nt-popup-close"></div>';
-	
+
 	phtml += '<div class="notification-info" ' + nstyle2 + '>' + title + '</div>';
 	phtml += '</div></div></div>';
 
 	nhtml += '<div class="nt-main-date">' + time2last(time) + '</div>';
-	nhtml += '<div class="nt-info-block ' + className + ' '  + nread + '" id="no_'+id+'">';
-	nhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
+	nhtml += '<div class="nt-info-block ' + className + ' ' + nread + '" id="no_' + id + '">';
+//	nhtml += '<span class="notification-avatar color1">AD <span class="notification-avatar-icon"></span></span>';
+	nhtml += '<span class="notification-avatar color' + avatarColor + '">' + avatar + ' <span class="notification-avatar-icon"></span></span>';
 	nhtml += '<span class="notification-status"></span>';
 	nhtml += '<span class="notification-request-buttons">';
 	nhtml += '<span class="fm-dialog-button notifications-button accept">Accept</span>';
@@ -371,39 +455,41 @@ function notificationhtml(id,type,title,time,read)
 	nhtml += '</span>';
 	nhtml += '<span class="notification-accepted">Accepted</span>';
 	nhtml += '<div class="notification-nw-pad">';
-	nhtml += '<div class="notification-username">User name</div>';
+//	nhtml += '<div class="notification-username">User name</div>';
+	nhtml += '<div class="notification-username">' + email + '</div>';
 	nhtml += '<div class="notification-type" ' + nstyle2 + ' id="type_' + htmlentities(id) + '"></div>';
 	nhtml += '<div class="nt-info-txt" ' + nstyle2 + ' id="txt_' + htmlentities(id) + '">' + title + '</div>';
 	nhtml += '</div></div><div class="clear"></div>';
 
 	var r =
-	{
-		nhtml: nhtml,
-		rhtml: rhtml,
-		phtml: phtml
-	};
+		{
+			nhtml: nhtml,
+			rhtml: rhtml,
+			phtml: phtml
+		};
 	return r;
 }
 
-function donotifypopup(id,html)
+function donotifypopup(id, html)
 {
 	$('#popnotifications').append(html);
-	$('#popup_' + id).css('bottom', ($('.nt-popup').length*61)-50 + 'px');
-	$('#popup_' + id).css('opacity',0).show().animate({opacity:1});
+	$('#popup_' + id).css('bottom', ($('.nt-popup').length * 61) - 50 + 'px');
+	$('#popup_' + id).css('opacity', 0).show().animate({opacity: 1});
 
 	$('.nt-popup').bind('unbind');
-	$('.nt-popup').bind('click',function(e)
+	$('.nt-popup').bind('click', function (e)
 	{
 		var id = $(this).attr('id');
 		if (id)
 		{
-			id = id.replace('popup_','');
+			id = id.replace('popup_', '');
 			for (var i in notifications)
 			{
 				if (notifications[i].id == id && (notifications[i].type == 'put' || notifications[i].type == 'share'))
 				{
-					$.selected=[];
-					for (var j in notifications[i].nodes) $.selected.push(notifications[i].nodes[j].h);
+					$.selected = [];
+					for (var j in notifications[i].nodes)
+						$.selected.push(notifications[i].nodes[j].h);
 					M.openFolder(notifications[i].folderid);
 					reselect(1);
 				}
@@ -411,48 +497,85 @@ function donotifypopup(id,html)
 			hide_notipop(id);
 		}
 	});
-	setTimeout(hide_notipop,5000,id);
+	setTimeout(hide_notipop, 5000, id);
+}
+
+function handleNotificationTooltip(num)
+{
+	if (num === 1)
+	{
+		$('.new-notification-info').text(num + ' ' + l[2041] + ' ' + l[2042]);// 1 New Notification
+	}
+	else
+	{
+		$('.new-notification-info').text(num + ' ' + l[2041] + ' ' + l[862]);// X New Notifications
+	}
+	$('.new-notification-info').show(200);
+	$('.new-notification-info').css('margin-left', '-' + $('.new-notification-info').outerWidth() / 2 + 17 + 'px');
+	setTimeout($('.new-notification-info').hide(200), 1000);
 }
 
 function initNotifications()
 {
-	if (typeof notifications !== 'undefined' && notifications.length > 0) $('.cloud-popup-icon').show();
+	if (typeof notifications !== 'undefined' && notifications.length > 0)
+	{
+		$('.cloud-popup-icon').show();
+	}
 	//else $('.cloud-popup-icon').hide();
 
-	$('.cloud-popup-icon').unbind('click');
-	$('.cloud-popup-icon').bind('click',function()
+	var unReadNotifNum = countUnReadNotifications();
+	if (unReadNotifNum > 0)
 	{
-	  if ($(this).attr('class').indexOf('active') == -1)
-	  {
-		  $(this).addClass('active');
-		  var pos = $('.top-head').outerWidth() - $('.cloud-popup-icon').position().left - 17;
-		  if (pos - 240 < 20) {
-			  $('.notification-popup').css('right', (pos + Math.abs(pos - 240)) + 20 + 'px');
-			  $('.notification-popup .notification-arrow').css('margin-left', Math.abs(pos - 240) - 1 + 'px');
-		  }
-		  else {
-			  $('.notification-popup').css('right',pos + 'px');
-			  $('.notification-popup .notification-arrow').css('margin-left','-21px');
-		  }
-		  $('.notification-popup').addClass('active');
-		  notifyclock();		
-		  donotify();		  
-	  } 
-	  else 
-	  {
-		  notifymarkcount(true);
-		  notifycounter();
-		  $(this).removeClass('active');
-		  $('.notification-popup').removeClass('active');
-	  }
+		handleNotificationTooltip(unReadNotifNum);
+	}
+
+	$('.cloud-popup-icon').unbind('click');
+	$('.cloud-popup-icon').bind('click', function ()
+	{
+		if ($(this).attr('class').indexOf('active') == -1)
+		{
+			$(this).addClass('active');
+			var pos = $('.top-head').outerWidth() - $('.cloud-popup-icon').position().left - 17;
+			if (pos - 240 < 20) {
+				$('.notification-popup').css('right', (pos + Math.abs(pos - 240)) + 20 + 'px');
+				$('.notification-popup .notification-arrow').css('margin-left', Math.abs(pos - 240) - 1 + 'px');
+			}
+			else {
+				$('.notification-popup').css('right', pos + 'px');
+				$('.notification-popup .notification-arrow').css('margin-left', '-21px');
+			}
+			$('.notification-popup').addClass('active');
+			notifyclock();
+			donotify();
+		}
+		else
+		{
+			notifymarkcount(true);
+			notifycounter();
+			$(this).removeClass('active');
+			$('.notification-popup').removeClass('active');
+		}
 	});
 
-	$('.notifications-button').unbind('click');
-	$('.notifications-button').bind('click',function(e)
+	$('.notifications-button.red').unbind('click');
+	$('.notifications-button.red').bind('click', function ()
 	{
 		$('.cloud-popup-icon').removeClass('active');
 		$('.notification-popup').removeClass('active');
 		document.location.hash = 'fm/notifications';
+	});
+
+	$('.notifications-button.clear-button').unbind('click');
+	$('.notifications-button.clear-button').bind('click', function ()
+	{
+		$('.notification-popup').addClass('no-new-notifications');
+		var jsp = $('.notification-scroll').data('jsp');
+		if (jsp)
+		{
+			jsp.destroy();
+		}
+		// Mark all notifications [] counted
+		render_notifications();
 	});
 
 	notifycounter();

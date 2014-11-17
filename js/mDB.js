@@ -1,7 +1,7 @@
 
-var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
-window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+if (!window.indexedDB) window.indexedDB = window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+if (!window.IDBKeyRange) window.IDBKeyRange = window.webkitIDBKeyRange || window.msIDBKeyRange;
+if (!window.IDBTransaction) window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 
 var mDBact,mDBv=6;
 
@@ -30,8 +30,8 @@ if (indexedDB)
 	function mDBactive(act)
 	{
 		if (act !== mDBact) return;
-		localStorage[u_handle + '_mDBactive']=new Date().getTime();
-		setTimeout(mDBactive,500,act);
+		localStorage[u_handle + '_mDBactive']=Date.now();
+		setTimeout(mDBactive,2000,act);
 	}
 
 	function mDBstart()
@@ -45,7 +45,7 @@ if (indexedDB)
 				loadfm();
 			}
 		}
-		if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+1000 > new Date().getTime())
+		if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+4000 > Date.now())
 		{
 			if (d) console.log('existing mDB session, fetch live data');
 			mDB=undefined;

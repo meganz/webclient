@@ -535,8 +535,6 @@ ZipWriter.prototype.done = function(zfile) {
 		
 		buf.set(end, offset);
 
-		delete buffer;
-
 		return this.io.write(buf, this.offset, this._eof.bind(this));
 	}
 

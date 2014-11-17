@@ -34,13 +34,15 @@ function ul_completepending2(res,ctx)
 	ASSERT(typeof res == 'object' && res.f, 'Unexpected UL Server Response.', res);
 	if (typeof res == 'object' && res.f)
 	{
+		var n = res.f[0];
+
 		if (ctx.faid) storedattr[ctx.faid].target = res.f[0].h;
 
 		newnodes = [];
 		process_f(res.f);
 		rendernew();
 		fm_thumbnails();
-		if (ctx.faid) api_attachfileattr(res.f[0].h,ctx.faid);
+		if (ctx.faid) api_attachfileattr(n.h,ctx.faid);
 		onUploadSuccess(ul_queue[ctx.ul_queue_num]);
 		ul_queue[ctx.ul_queue_num] = {}
 		ctx.file.ul_failed = false;
@@ -613,7 +615,7 @@ ChunkUpload.prototype.io_ready = function(task, args) {
 	}
 	else
 	{
-		var task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
+		task = [this, this.file.ul_keyNonce, this.start/16, this.bytes];
 		// TODO: Modify CreateWorkers() and use this gid to terminate over cancelled uploads
 		task[this.gid] = 1;
 		Encrypter.push( task, this.upload, this );
@@ -926,6 +928,8 @@ function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) {
 		ul_queue = new UploadQueue();
 		ul_uploading = false;
+		ulQueue._running = 0;
+		ulQueue._pending = [];
 	}
 	if (!dl_queue.some(isQueueActive)) {
 		dl_queue = new DownloadQueue();
@@ -994,6 +998,26 @@ ulQueue.poke = function(file, meth)
 		file.owner      = new FileUpload(file);
 		file.ul_reader  = ul_filereader(new FileReader, file);
 		ulQueue[meth || 'push'](file.owner);
+	}
+};
+
+ulQueue.stuck = function() {
+	srvlog('ulQueue seems stuck...');
+
+	// Check certain conditions to make sure the workaround isn't worse than the problem...
+	if (ulQueue._running == 1 && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload)
+	{
+		if (ASSERT(ulQueue._pending.length == 1, 'Invalid ulQueue pending state'))
+		{
+			var chunk = ulQueue._pending[0];
+			if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk'))
+			{
+				var id = UploadManager.GetGID(chunk.ul);
+				$('.transfer-table #' + id + ' td:eq(3)').text('Internal Error (0x7f023)');
+				$('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
+				UploadManager.abort(id);
+			}
+		}
 	}
 };
 

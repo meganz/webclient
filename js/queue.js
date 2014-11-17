@@ -8,6 +8,7 @@ function MegaQueue(worker, limit) {
 	this._worker  = worker
 	this._noTaskCount = 0;
 	this._qpaused = {};
+	this._pending = [];
 }
 inherits(MegaQueue, MegaEvents)
 
@@ -150,14 +151,16 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 
 MegaQueue.prototype.run_in_context = function(task) {
 	this._running++;
+	this._pending.push(task[0]);
 	this._worker(task[0], function MQRicStub() {
 		ASSERT(task[0], 'This should not be reached twice.');
 		if (!task[0]) return; /* already called */
 		this._running--;
 		var done = task[1] || task[0].onQueueDone;
 		if (done) done.apply(task[2] || this, [task[0], arguments]);
-		task[0] = task[1] = task[2] = undefined;
 		this._process();
+		removeValue(this._pending, task[0]);
+		task[0] = task[1] = task[2] = undefined;
 	}.bind(this));
 }
 
@@ -194,6 +197,8 @@ MegaQueue.prototype.process = function() {
 				 */
 				if (d) console.error('*** CHECK THIS ***', this);
 				this._noTaskCount = -1;
+				if (this.stuck) this.stuck();
+				else srvlog('MegaQueue got stuck...');
 				return false;
 			}
 			this._process(1200);

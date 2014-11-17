@@ -95,11 +95,23 @@ function MegaData ()
 
 	this.sortByName = function(d)
 	{
-		this.sortfn = function(a,b,d)
+		// if (typeof Intl !== 'undefined' && Intl.Collator)
+		// {
+			// var intl = new Intl.Collator('co', { numeric: true });
+
+			// this.sortfn = function(a,b,d)
+			// {
+				// return intl.compare(a.name,b.name)*d;
+			// };
+		// }
+		// else
 		{
-			if (typeof a.name == 'string' && typeof b.name == 'string') return a.name.localeCompare(b.name)*d;
-			else return -1;
-		};
+			this.sortfn = function(a,b,d)
+			{
+				if (typeof a.name == 'string' && typeof b.name == 'string') return a.name.localeCompare(b.name)*d;
+				else return -1;
+			};
+		}
 		this.sortd=d;
 		this.sort();
 	};

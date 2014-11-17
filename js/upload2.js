@@ -928,6 +928,8 @@ function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) {
 		ul_queue = new UploadQueue();
 		ul_uploading = false;
+		ulQueue._running = 0;
+		ulQueue._pending = [];
 	}
 	if (!dl_queue.some(isQueueActive)) {
 		dl_queue = new DownloadQueue();
@@ -996,6 +998,26 @@ ulQueue.poke = function(file, meth)
 		file.owner      = new FileUpload(file);
 		file.ul_reader  = ul_filereader(new FileReader, file);
 		ulQueue[meth || 'push'](file.owner);
+	}
+};
+
+ulQueue.stuck = function() {
+	srvlog('ulQueue seems stuck...');
+
+	// Check certain conditions to make sure the workaround isn't worse than the problem...
+	if (ulQueue._running == 1 && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload)
+	{
+		if (ASSERT(ulQueue._pending.length == 1, 'Invalid ulQueue pending state'))
+		{
+			var chunk = ulQueue._pending[0];
+			if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk'))
+			{
+				var id = UploadManager.GetGID(chunk.ul);
+				$('.transfer-table #' + id + ' td:eq(3)').text('Internal Error (0x7f023)');
+				$('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
+				UploadManager.abort(id);
+			}
+		}
 	}
 };
 

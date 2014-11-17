@@ -981,6 +981,8 @@ function MegaData ()
 
 	this.copyNodes = function(cn,t,del)
 	{
+		if (d) console.log('copyNodes', n, t);
+
 		if ($.onImportCopyNodes && t.length == 11)
 		{
 			msgDialog('warninga', l[135], 'Operation not permitted.');
@@ -1045,6 +1047,8 @@ function MegaData ()
 
 	this.moveNodes = function(n,t)
 	{
+		if (d) console.log('moveNodes', n, t);
+
 		newnodes=[];
 		var j = [];
 		for (var i in n)
@@ -2595,17 +2599,21 @@ function processmove(jsonmove)
 {
 	var rts = [M.RootID,M.RubbishID,M.InboxID];
 
+	if (d) console.log('processmove', jsonmove);
+
 	for (var i in jsonmove)
 	{
-		var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root);
+		var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root), movingnodes = 0;
+
+		if (d) console.log('sharingnodes', sharingnodes.length, sharingnodes, root.handle);
 
 		if (sharingnodes.length)
 		{
-			var movingnodes = fm_getnodes(jsonmove[i].n);
+			movingnodes = fm_getnodes(jsonmove[i].n);
 			movingnodes.push(jsonmove[i].n);
 			jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
-			if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes);
 		}
+		if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes || jsonmove[i].n);
 
 		api_req(jsonmove[i]);
 	}

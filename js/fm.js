@@ -2513,9 +2513,11 @@ function accountUI()
 			u_attr.birthmonth = $('.fm-account-select.month select').val();
 			u_attr.birthyear = $('.fm-account-select.year select').val();
 			u_attr.country = $('.fm-account-select.country select').val();
-			api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
+			
+            api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
 			$('.fm-account-save-block').addClass('hidden');
-			if (M.account.dl_maxSlots)
+			
+            if (M.account.dl_maxSlots)
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
 				dl_maxSlots = M.account.dl_maxSlots;

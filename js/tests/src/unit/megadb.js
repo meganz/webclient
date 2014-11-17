@@ -75,7 +75,7 @@ describe("MegaDB - Unit Test", function() {
                                             }
                                         }, function() {
                                             fail("person with id 1 not removed.");
-                                        })
+                                        });
                                     },function() {
                                         fail("could not remove obj with id 1");
                                     });
@@ -125,8 +125,8 @@ describe("MegaDB - Unit Test", function() {
                                             .then(function(r) {
                                                 expect(r.length).to.eql(1);
                                                 done();
-                                            })
-                                    })
+                                            });
+                                    });
                             })
                             .fail(function() {
                                 fail("could not get obj with id 1");

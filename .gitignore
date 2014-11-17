@@ -245,3 +245,9 @@ js/tests/node_modules/
 =======
 >>>>>>> master
 /dont-deploy/sandbox.html
+
+#############
+## Netbeans project metadata
+#############
+
+nbproject/

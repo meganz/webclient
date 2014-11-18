@@ -155,7 +155,9 @@
                 <span>My folders</span>
                 <div class="copy-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!--Shared with me-->
@@ -164,7 +166,9 @@
                 <span>Incoming [$1384]</span>
                 <div class="copy-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!--Conversations--> 
@@ -173,7 +177,9 @@
                 <span>MEGA [$165]</span>
                 <div class="copy-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!-- Please add "active" classname to necessary "copy-dialog-empty" block !-->
@@ -259,7 +265,9 @@
                 <span>My folders</span>
                 <div class="move-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!--Shared with me-->
@@ -268,7 +276,9 @@
                 <span>Incoming [$1384]</span>
                 <div class="move-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!--Rubbish Bin--> 
@@ -277,7 +287,9 @@
                 <span>Deleted folders</span>
                 <div class="move-dialog-panel-arrows"></div>
             </div>
-            <div class="dialog-content-block">
+            <div class="dialog-tree-panel-scroll">
+              <div class="dialog-content-block">
+              </div>
             </div>
         </div>
         <!-- Please add "active" classname to necessary "move-dialog-empty" block !-->
@@ -1027,3 +1039,53 @@ These will not be added to you MEGA Contacts but will remain accessible to share
         <div class="clear"></div>
     </div>
 </div><!--End Contact Fingerprint Dialog-->
+
+<div class="fm-dialog share-with-contact-dialog hidden">
+  <div class="fm-dialog-header">
+    <div class="fm-dialog-title">Share folder with contacts</div>
+    <div class="fm-dialog-close"></div>
+    <div class="clear"></div>
+  </div>
+  <div class="fm-dialog-body">
+    <div class="permissions-menu hidden">
+      <div class="permissions-menu-arrow"></div>
+      <div class="permissions-menu-item read-only">
+        <div class="context-menu-icon"></div>
+        [$55]</div>
+      <div class="permissions-menu-item read-and-write">
+        <div class="context-menu-icon"></div>
+        [$56]</div>
+      <div class="permissions-menu-item full-access">
+        <div class="context-menu-icon"></div>
+        [$57]</div>
+    </div>
+    <div class="dialog-sorting-menu hiddendiv">
+      <div class="context-menu-section hidden">
+        <div class="sorting-menu-arrow"></div>
+        <div data-by="name" class="sorting-menu-item active">[$86]</div>
+        <div data-by="status" class="sorting-menu-item">[$89]</div>
+        <div data-by="last-interaction" class="sorting-menu-item">Last Interaction</div>
+        <div class="sorting-item-divider"></div>
+      </div>
+      <div class="context-menu-section">
+        <div data-dir="1" class="sorting-menu-item active">Ascending</div>
+        <div data-dir="-1" class="sorting-menu-item">Descending</div>
+      </div>
+    </div>
+    <div class="share-dialog-contacts"> </div>
+    <div class="share-dialog-tree-panel">
+      <div class="share-dialog-panel-header"> <span>My folders</span>
+        <div class="share-dialog-panel-arrows"></div>
+      </div>
+      <div class="dialog-tree-panel-scroll">
+        <div class="dialog-content-block"> </div>
+      </div>
+    </div>
+  </div>
+  <div class="fm-notifications-bottom">
+    <div class="fm-dialog-button dialog-newfolder-button"> [$68] </div>
+    <div class="fm-dialog-button dialog-share-button"> [$1344] </div>
+    <div class="fm-dialog-button dialog-cancel-button"> [$1597] </div>
+    <div class="clear"></div>
+  </div>
+</div>

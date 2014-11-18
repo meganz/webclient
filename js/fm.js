@@ -6279,7 +6279,7 @@ function copyDialog()
 		}
 		else $.mcselected = old;
 
-		dialogScroll('.copy-dialog-tree-panel');
+		dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
@@ -6502,7 +6502,7 @@ function moveDialog()
 		}
 		else $.mcselected = old;
 
-		dialogScroll('.move-dialog-tree-panel');
+		dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});

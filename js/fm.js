@@ -8122,10 +8122,12 @@ function contactUI()
                 $('.fm-start-conversation')
                     .removeClass('hidden')
                     .text(startChatTxt);
+				$('.fm-send-files').removeClass('hidden');
 
             } else {
                 // user is offline, hide the button
                 $('.fm-start-conversation').addClass('hidden');
+				$('.fm-send-files').addClass('hidden');
             }
 
             // bind the "start chat" button

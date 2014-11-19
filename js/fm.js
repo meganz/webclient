@@ -2513,9 +2513,11 @@ function accountUI()
 			u_attr.birthmonth = $('.fm-account-select.month select').val();
 			u_attr.birthyear = $('.fm-account-select.year select').val();
 			u_attr.country = $('.fm-account-select.country select').val();
-			api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
+			
+            api_req({a:'up',firstname:base64urlencode(to8(u_attr.firstname)),lastname:base64urlencode(to8(u_attr.lastname)),birthday:base64urlencode(u_attr.birthday),birthmonth:base64urlencode(u_attr.birthmonth),birthyear:base64urlencode(u_attr.birthyear),country:base64urlencode(u_attr.country)});
 			$('.fm-account-save-block').addClass('hidden');
-			if (M.account.dl_maxSlots)
+			
+            if (M.account.dl_maxSlots)
 			{
 				localStorage.dl_maxSlots = M.account.dl_maxSlots;
 				dl_maxSlots = M.account.dl_maxSlots;
@@ -4353,9 +4355,9 @@ function transferPanelUI()
     });
 
 	$.transferClose = function() {
-		var panel = $('.transfer-panel')
-
-		$('.transfer-drag-handle').css('cursor', 'n-resize')
+        
+		var panel = $('.transfer-panel');
+		$('.transfer-drag-handle').css('cursor', 'n-resize');
 
         panel.animate({'height': $('.transfer-panel-title').height()}, {
 			complete: function() {
@@ -4364,49 +4366,62 @@ function transferPanelUI()
 				$(window).trigger('resize');
 			},
 			progress: fm_resize_handler
-		})
-	}
+		});
+	};
 
 	$.transferOpen = function(force, dont_animate)
 	{
-		if($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
+		if ($('.tranfer-view-icon').attr('class').indexOf('active') == -1 || force)
 		{
 			$('.tranfer-view-icon').addClass('active');
 			$('#fmholder').addClass('transfer-panel-opened');
-			$.transferHeader();
-
-			var height = 192
-            if(localStorage.transferPaneHeight && $.transferPaneResizable) {
-				height = Math.max($.transferPaneResizable.options.minHeight,localStorage.transferPaneHeight)
+            			
+            // Initialise the functionality within the transfers pane
+            $.transferHeader();
+            
+            // If the user has previously resized the transfer panel
+            var height = 192;
+            if (localStorage.transferPaneHeight && $.transferPaneResizable) {
+                
+                // Load the previously configured panel height
+				height = Math.max($.transferPaneResizable.options.minHeight, localStorage.transferPaneHeight);
 			}
 
-			var panel = $('.transfer-panel')
+			var panel = $('.transfer-panel');
 
 			if (dont_animate) {
 				panel.css({'height': height});
 				return fm_resize_handler();
 			}
 
-			panel.animate({'height': height}, {
+			panel.animate({ 'height': height }, {
 				complete: function() {
 					tpDragCursor();
 					$.transferHeader();
 					$(window).trigger('resize');
 				},
 				progress: fm_resize_handler
-			})
-
+			});
 		}
-		else
-		{
+		else {
+            // Close the File Transfers Pane
 			$.transferClose();
 		}
+        
 		initTreeScroll();
-		if (M.currentdirid == 'notifications') notificationsScroll();
-		else if (M.currentdirid && M.currentdirid.substr(0,7) == 'account') initAccountScroll();
-		else if (M.viewmode == 1) initFileblocksScrolling();
-		else initGridScrolling();
-        $(window).trigger('resize');
+        
+        if (M.currentdirid === 'notifications') {
+            notificationsScroll();
+        }
+        else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
+            initAccountScroll();
+        }
+        else if (M.viewmode == 1) {
+            initFileblocksScrolling();
+        }
+        else {
+            initGridScrolling();
+        }
 	};
 
 	$('.transfer-settings-icon').unbind('click');
@@ -6264,7 +6279,7 @@ function copyDialog()
 		}
 		else $.mcselected = old;
 
-		dialogScroll('.copy-dialog-tree-panel');
+		dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
@@ -6487,7 +6502,7 @@ function moveDialog()
 		}
 		else $.mcselected = old;
 
-		dialogScroll('.move-dialog-tree-panel');
+		dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
 		// Disable action button if there is no selected items
 		if (typeof $.mcselected == 'undefined') $btn.addClass('disabled');
 	});
@@ -8107,10 +8122,12 @@ function contactUI()
                 $('.fm-start-conversation')
                     .removeClass('hidden')
                     .text(startChatTxt);
+				$('.fm-send-files').removeClass('hidden');
 
             } else {
                 // user is offline, hide the button
                 $('.fm-start-conversation').addClass('hidden');
+				$('.fm-send-files').addClass('hidden');
             }
 
             // bind the "start chat" button

@@ -3467,52 +3467,52 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	padding-left: 360px;
 }
 .fm-dialog-body ul .nw-fm-tree-item {
-	padding-left: 27px;
+	padding-left: 15px;
 }
 .fm-dialog-body ul ul .nw-fm-tree-item {
-	padding-left: 51px;
+	padding-left: 39px;
 }
 .fm-dialog-body ul ul ul .nw-fm-tree-item {
-	padding-left: 75px;
+	padding-left: 63px;
 }
 .fm-dialog-body ul ul ul ul .nw-fm-tree-item {
-	padding-left: 99px;
+	padding-left: 87px;
 }
 .fm-dialog-body ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 123px;
+	padding-left: 111px;
 }
 .fm-dialog-body ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 147px;
+	padding-left: 135px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 171px;
+	padding-left: 159px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 195px;
+	padding-left: 183px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 219px;
+	padding-left: 207px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 243px;
+	padding-left: 231px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 267px;
+	padding-left: 255px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 291px;
+	padding-left: 279px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 315px;
+	padding-left: 303px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 339px;
+	padding-left: 327px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 363px;
+	padding-left: 351px;
 }
 .fm-dialog-body ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
-	padding-left: 387px;
+	padding-left: 375px;
 }
 .nw-fm-tree-item {
 	display: block;
@@ -3882,7 +3882,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-contact-item.selected .nw-contact-name, .selected .contacts-username, .selected .add-contact-username {
 	color: white;
 }
-.nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header {
+.nw-conversations-header, .nw-tree-panel-header, .copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
 	height: 24px;
 	font-family: 'Open Sans Semibold', Arial;
 	font-size: 12px;
@@ -3892,7 +3892,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	position: relative;
 	background-color: white;
 }
-.nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows {
+.nw-tree-panel-arrows, .copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	height: 24px;
 	width: 24px;
 	position: absolute;
@@ -6544,7 +6544,7 @@ table {
 	background-position: 6px -3068px;
 }
 .fm-breadcrumbs.hidden {
-	display:none;
+	display: none;
 }
 .contact-request-button {
 	float: right;
@@ -9157,13 +9157,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	min-height: 416px;
 	margin: -229px 0 0 -332px;
 }
-.fm-dialog.share-dialog {
+.fm-dialog.share-dialog, .fm-dialog.share-with-contact-dialog {
 	width: 480px;
 	height: auto;
 	min-height: 10px;
 	margin: -119px 0 0 -240px;
 }
-.fm-dialog.share-dialog .fm-dialog-body {
+.fm-dialog.share-dialog .fm-dialog-body, .fm-dialog.share-with-contact-dialog .fm-dialog-body {
 	position: relative;
 }
 .fm-dialog.export-links-dialog {
@@ -11694,7 +11694,7 @@ table {
 	background-position: -3px -4556px;
 }
 .shared-folder-item .context-menu-icon {
-	background-position: -3px -4666px;
+	background-position: -4px -4666px;
 }
 .newfolder-item .context-menu-icon {
 	background-position: -3px -5160px;
@@ -16672,7 +16672,7 @@ code, c {
 	letter-spacing: 0.5px;
 }
 .new-notification-pad {
-	padding: 0 0 60px 0;
+	padding: 0 0 312px 0;
 	position: relative;
 }
 .fm-main.notifications {
@@ -19984,7 +19984,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	overflow: hidden;
 	display: none;
 }
-.copy-dialog-panel-header, .move-dialog-panel-header {
+.share-dialog-tree-panel {
+	overflow: hidden;
+	margin: -12px;
+}
+.share-dialog-tree-panel .jspVerticalBar {
+	width: 22px;
+}
+.share-dialog-tree-panel .nw-fm-tree-item {
+	padding-right: 28px;
+}
+.copy-dialog-panel-header, .move-dialog-panel-header, .share-dialog-panel-header {
 	height: 48px;
 	padding: 12px 2px 0 24px;
 	-moz-box-sizing: border-box;
@@ -19992,9 +20002,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	box-sizing: border-box;
 	border: 0;
 }
-.copy-dialog-panel-arrows, .move-dialog-panel-arrows {
+.copy-dialog-panel-arrows, .move-dialog-panel-arrows, .share-dialog-panel-arrows {
 	right: 11px;
 	top: 11px;
+}
+.dialog-tree-panel-scroll {
+	height: 192px;
 }
 .dialog-content-block {
 	padding-bottom: 20px;
@@ -20021,7 +20034,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog-txt.active, .move-dialog-txt.active {
 	display: inline;
 }
-.copy-dialog-empty.active, .copy-dialog-tree-panel.active, .move-dialog-empty.active, .move-dialog-tree-panel.active {
+.copy-dialog-empty.active, .copy-dialog-tree-panel.active, .move-dialog-empty.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
 	display: block;
 }
 .video-full-container {

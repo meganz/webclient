@@ -88,7 +88,7 @@ function init_page()
 	if ('-fa-ar-he-'.indexOf('-'+lang+'-') > -1) $('body').addClass('rtl');
 
 	if ($.startscroll) delete $.startscroll;
-	if ($.dlscroll) delete $.dlscroll
+	if ($.dlscroll) delete $.dlscroll;
 	if ($.infoscroll) delete $.infoscroll;
 
 	if (page == 'plugin')
@@ -176,11 +176,11 @@ function init_page()
 
 	if (!$.mcImport) closeDialog();
 
-    if (page.substr(0,7) == 'voucher')
+    if (page.substr(0, 7) == 'voucher')
 	{
 		loadingDialog.show();
-		var vouchercode = page.substr(7,page.length-7);
-		api_req({a:'uavq',v:vouchercode},{
+		var vouchercode = page.substr(7, page.length - 7);
+		api_req({ a: 'uavq', v: vouchercode }, {
 		callback: function(res)
 		{
 			if (typeof res == 'number')
@@ -213,20 +213,25 @@ function init_page()
 			}
 			else document.location.hash='fm/account';
 		}});
+    
 		return false;
 	}
+    
 	if (localStorage.voucher && u_type !== false)
 	{
-		api_req({a: 'uavr',v: localStorage.voucher},
+		api_req({ a: 'uavr', v: localStorage.voucher },
 		{
 			callback : function(res)
 			{
-				if (typeof res != 'number' || res >= 0) balance2pro();
+				if (typeof res != 'number' || res >= 0) {
+                    balance2pro();
+                }
 			}
 		});
+        
 		delete localStorage.voucher;
 	}
-	if (page.substr(0,10) == 'blogsearch')
+	if (page.substr(0, 10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
 		if (!blogsearch) document.location.hash = 'blog';
@@ -238,7 +243,7 @@ function init_page()
 		 
 		loadingDialog.show();
 		CMS.get(cpage, function(err, content) {
-			parsepage(content.html)
+			parsepage(content.html);
 			topmenuUI();
 			loadingDialog.hide();
 			mainScroll();
@@ -881,118 +886,146 @@ function mLogout()
 	else $.dologout();
 }
 
-function topmenuUI()
-{
-	if (u_type === 0) $('.top-login-button').text(l[967]);
-	// $('.cloud-popup-icon').hide();
-	$('.warning-popup-icon').addClass('hidden');
-	$('.top-menu-item.upgrade-your-account').hide();
-	$('.context-menu-divider.upgrade-your-account').addClass('pro');
-	$('.top-menu-item.register,.top-menu-item.login').hide();
-	$('.top-menu-item.logout,.context-menu-divider.logout').hide();
-	$('.top-menu-item.clouddrive,.top-menu-item.account').hide();
-	$('.activity-status,.activity-status-block').hide();
-	$('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
-	$('.membership-status').hide();
-	$('.top-head .user-name').hide();
-	if (fminitialized) $('.top-search-bl').show();
-	else $('.top-search-bl').hide();
-	$('.fm-avatar').hide();
-	if (u_type == 3 && u_attr.firstname)
-	{
-		$('#topmenu .user-name').text(u_attr.firstname);
-		$('#topmenu .user-name').show();
-	}
-	else $('#topmenu .user-name').hide();
+function topmenuUI() {
+    if (u_type === 0) {
+        $('.top-login-button').text(l[967]);
+    }
 
-	if (u_type)
-	{
-		$('.top-menu-item.logout,.context-menu-divider.logout').show();
-		$('.top-menu-item.clouddrive,.top-menu-item.account').show();
-		$('.fm-avatar').show();
-		if (u_attr.p)
-		{
-			$('.membership-icon-pad .membership-icon').attr('class','membership-icon pro' + u_attr.p);
-			if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
-			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
-			else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
-			$('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
-			$('.context-menu-divider.upgrade-your-account').addClass('pro');
-			$('.membership-popup.pro-popup');
-		}
-		else
-		{
-			$('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-			$('.context-menu-divider.upgrade-your-account').removeClass('pro');
-			$('.membership-status').addClass('free');
-			$('.membership-status').html(l[435]);
-		}
-		$('.membership-status').show();
+    $('.warning-popup-icon').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account').hide();
+    $('.context-menu-divider.upgrade-your-account').addClass('pro');
+    $('.top-menu-item.register,.top-menu-item.login').hide();
+    $('.top-menu-item.logout,.context-menu-divider.logout').hide();
+    $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
+    $('.activity-status,.activity-status-block').hide();
+    $('.membership-status-block').html('<div class="membership-status free">' + l[435] + '</div>');
+    $('.membership-status').hide();
+    $('.top-head .user-name').hide();
 
-        if(!MegaChatDisabled) {
+    if (fminitialized) {
+        $('.top-search-bl').show();
+    }
+    else {
+        $('.top-search-bl').hide();
+    }
+
+    $('.fm-avatar').hide();
+
+    // If the 'firstname' property is set, display it
+    if (u_type == 3 && u_attr.firstname) {
+        $('.top-head .user-name').text(u_attr.firstname);
+        $('.top-head .user-name').show();
+    }
+
+    // Check for pages that do not have the 'firstname' property set e.g. #about
+    else if ((u_type == 3) && (u_attr.firstname === '') && (u_attr.name !== '')) {
+
+        // Try get the first name from the full 'name' property and display
+        var nameParts = u_attr.name.split(' ');
+        $('.top-head .user-name').text(nameParts[0]);
+        $('.top-head .user-name').show();
+    }
+
+    if (u_type) {
+
+        $('.top-menu-item.logout,.context-menu-divider.logout').show();
+        $('.top-menu-item.clouddrive,.top-menu-item.account').show();
+        $('.fm-avatar').show();
+
+        if (u_attr.p) {
+            $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
+            if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO I');
+            else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO II');
+            else if (u_attr.p == 1) $('.membership-icon-pad .membership-big-txt.red').text('PRO III');
+            $('.membership-status-block').html('<div class="membership-status pro">PRO</div>');
+            $('.context-menu-divider.upgrade-your-account').addClass('pro');
+            $('.membership-popup.pro-popup');
+        }
+        else {
+            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
+            $('.context-menu-divider.upgrade-your-account').removeClass('pro');
+            $('.membership-status').addClass('free');
+            $('.membership-status').html(l[435]);
+        }
+
+        $('.membership-status').show();
+
+        if (!MegaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
         }
-	}
-	else
-	{
-		if (u_type === 0 && !confirmok && page !== 'key')
-		{
-			$('.top-menu-item.register').text(l[968]);
-			$('.top-menu-item.clouddrive').show();
-			$('.warning-popup-icon').removeClass('hidden');
-			$('.warning-icon-area').unbind('click');
-			$('.warning-icon-area').bind('click',function(e)
-			{
-				var c= $('.top-warning-popup').attr('class');
-				if (c && c.indexOf('active') > -1) {
-					$('.top-warning-popup').removeClass('active');
-				}
-				else {
-					$('.top-warning-popup').addClass('active');
-				}
-			});
-			$('.top-warning-popup').unbind('click');
-			$('.top-warning-popup').bind('click',function(e)
-			{
-				$('.top-warning-popup').removeClass('active');
-				document.location.hash = 'register';
-			});
-			if (page !== 'register') $('.top-warning-popup').addClass('active');
-		}
-		$('.top-menu-item.upgrade-your-account').show();
-		$('.top-menu-item.upgrade-your-account').text(l[129]);
-		$('.membership-status-block').hide();
-		$('.create-account-button').show();
-		$('.create-account-button').unbind('click');
-		$('.create-account-button').bind('click',function()
-		{
-			document.location.hash = 'register';
-		});
-		$('.top-login-button').show();
-		$('.top-login-button').unbind('click');
-		$('.top-login-button').bind('click',function()
-		{
-			if (u_type === 0) mLogout();
-			else
-			{
-				var c = $('.top-login-popup').attr('class');
-				if (c && c.indexOf('active') > -1) loginDialog(1);
-				else loginDialog();
-			}
-		});
-		$('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
-		if (u_type === 0)
-		{
-			$('.top-menu-item.login').hide();
-			$('.top-menu-item.logout,.context-menu-divider.logout').show();
-		}
-		$('.top-login-arrow').css('margin-right',$('.top-menu-icon').width()+$('.create-account-button').width()+($('.top-login-button').width()/2)+82+'px');
-	}
-	$('.top-menu-arrow').css('margin-right',$('.top-menu-icon').width()/2+'px');
-	$.hideTopMenu = function(e)
-	{
+    }
+    else {
+        if (u_type === 0 && !confirmok && page !== 'key') {
+
+            $('.top-menu-item.register').text(l[968]);
+            $('.top-menu-item.clouddrive').show();
+            $('.warning-popup-icon').removeClass('hidden');
+            $('.warning-icon-area').unbind('click');
+            $('.warning-icon-area').bind('click', function(e) {
+
+                var c = $('.top-warning-popup').attr('class');
+
+                if (c && c.indexOf('active') > -1) {
+                    $('.top-warning-popup').removeClass('active');
+                }
+                else {
+                    $('.top-warning-popup').addClass('active');
+                }
+            });
+            $('.top-warning-popup').unbind('click');
+            $('.top-warning-popup').bind('click', function(e) {
+
+                $('.top-warning-popup').removeClass('active');
+                document.location.hash = 'register';
+            });
+
+            if (page !== 'register') {
+                $('.top-warning-popup').addClass('active');
+            }
+        }
+
+        $('.top-menu-item.upgrade-your-account').show();
+        $('.top-menu-item.upgrade-your-account').text(l[129]);
+        $('.membership-status-block').hide();
+        $('.create-account-button').show();
+        $('.create-account-button').unbind('click');
+        $('.create-account-button').bind('click', function() {
+            document.location.hash = 'register';
+        });
+        $('.top-login-button').show();
+        $('.top-login-button').unbind('click');
+        $('.top-login-button').bind('click', function() {
+            if (u_type === 0) {
+                mLogout();
+            }
+            else {
+                var c = $('.top-login-popup').attr('class');
+                if (c && c.indexOf('active') > -1) {
+                    loginDialog(1);
+                }
+                else {
+                    loginDialog();
+                }
+            }
+        });
+
+        $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
+
+        if (u_type === 0) {
+            $('.top-menu-item.login').hide();
+            $('.top-menu-item.logout,.context-menu-divider.logout').show();
+        }
+
+        $('.top-login-arrow').css('margin-right', $('.top-menu-icon').width() + $('.create-account-button').width() + ($('.top-login-button').width() / 2) + 82 + 'px');
+    }
+
+    $('.top-menu-arrow').css('margin-right', $('.top-menu-icon').width() / 2 + 'px');
+        
+    $.hideTopMenu = function(e) {
+        
 		var c;
+        
 		if (e) c = $(e.target).attr('class');
 		if (!e || ($(e.target).parents('.membership-popup').length == 0 && ((c && c.indexOf('membership-status') == -1) || !c)) || (c && c.indexOf('membership-button') > -1))
 		{
@@ -1037,7 +1070,8 @@ function topmenuUI()
 		    $('.add-user-popup').addClass('dialog hidden');
 			$('.add-user-popup').removeAttr('style');
 		}
-	}
+	};
+    
 	$('#pageholder').unbind('click');
 	$('#pageholder').bind('click',function(e)
 	{

@@ -1,14 +1,15 @@
 // cr@mega.co.nz
 var DEFAULT_CONCURRENCY = 4
 
-function MegaQueue(worker, limit) {
-    this._limit = limit || 5;
+function MegaQueue(worker, limit, name) {
+	this._limit = limit || 5;
 	this._queue = [];
-    this._running = 0
+	this._running = 0
 	this._worker  = worker
 	this._noTaskCount = 0;
 	this._qpaused = {};
 	this._pending = [];
+	Object.defineProperty(this, "qname", { value : String(name||'unk'), writable : false });
 }
 inherits(MegaQueue, MegaEvents)
 
@@ -158,8 +159,12 @@ MegaQueue.prototype.run_in_context = function(task) {
 		this._running--;
 		var done = task[1] || task[0].onQueueDone;
 		if (done) done.apply(task[2] || this, [task[0], arguments]);
-		this._process();
-		removeValue(this._pending, task[0]);
+		if (!oIsFrozen(this)) {
+			this._process();
+			if (ASSERT(this._pending, 'MegaQueue pending array got expunged, ' + this.qname)) {
+				removeValue(this._pending, task[0]);
+			}
+		}
 		task[0] = task[1] = task[2] = undefined;
 	}.bind(this));
 }
@@ -188,20 +193,22 @@ MegaQueue.prototype.process = function() {
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
 		if (args === null) {
-			if ( ++this._noTaskCount == 666 && !$.len(this._qpaused))
+			if ( ++this._noTaskCount == 666 )
 			{
 				/**
 				 * XXX: Prevent an infinite loop when there's a connection hang,
 				 * with the UI reporting either "Temporary error; retrying" or
 				 * a stalled % Status... [dc]
 				 */
-				if (d) console.error('*** CHECK THIS ***', this);
 				this._noTaskCount = -1;
-				if (this.stuck) this.stuck();
-				else srvlog('MegaQueue got stuck...');
-				return false;
+				if (!$.len(this._qpaused))
+				{
+					if (d) console.error('*** CHECK THIS ***', this);
+					if (this.stuck) this.stuck();
+					srvlog('MegaQueue.getNextTask gave no tasks for too long... ('+this.qname+')');
+				}
 			}
-			this._process(1200);
+			this._process(1600);
 			return false;
 		}
 		this._noTaskCount = 0;
@@ -227,7 +234,7 @@ MegaQueue.prototype.destroy = function() {
 	// this._limit = -1
 	// this._queue = null;
 	// this._queue = [];
-	if (d) ASSERT(this._queue.length == 0, 'This queue was not properly cleaned...');
+	if (d && this.qname !== 'downloads') ASSERT(this._queue.length == 0, 'This queue was not properly cleaned...');
 	oDestroy(this);
 }
 

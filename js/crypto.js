@@ -2247,7 +2247,7 @@ function api_fareq(res,ctx,xhr)
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		srvlog('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
+		srvlog('api_'+(ctx.p?'get':'store')+'fileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
 	}
 
 	if ( error )

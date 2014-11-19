@@ -631,8 +631,14 @@ function oDestroy(obj) {
 	Object.keys(obj).forEach(function(memb) {
 		if (obj.hasOwnProperty(memb)) delete obj[memb];
 	});
+	Object.defineProperty(obj, ":$:frozen:", { value : String(new Date()), writable : false });
 
 	if (d) Object.freeze(obj);
+}
+
+function oIsFrozen(obj)
+{
+	return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
 }
 
 /**
@@ -807,7 +813,7 @@ function CreateWorkers(url, message, size) {
 				worker[i].postMessage(t);
 			}
 		});
-	}, size);
+	}, size, 'worker-' + url);
 }
 
 function mKeyDialog(ph, fl)

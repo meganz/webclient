@@ -527,7 +527,7 @@ function dl_writer(dl, is_ready) {
 
 			return finish_write(task, done);
 		});
-	}, 1);
+	}, 1, 'download-writer');
 
 	throttleByIO(dl.writer);
 

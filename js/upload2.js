@@ -882,7 +882,7 @@ function ul_filereader(fs, file) {
 			done = null;
 		}
 	};
-	return new MegaQueue( handler, 1);
+	return new MegaQueue( handler, 1, 'ul-filereader');
 }
 
 function worker_uploader(task, done) {
@@ -893,7 +893,7 @@ function worker_uploader(task, done) {
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 })
 	, Encrypter
-	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
+	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots, 'uploads')
 	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0
@@ -928,7 +928,7 @@ function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) {
 		ul_queue = new UploadQueue();
 		ul_uploading = false;
-		ulQueue._running = 0;
+		ASSERT(ulQueue._running == 0, 'ulQueue._running inconsistency on completion');
 		ulQueue._pending = [];
 	}
 	if (!dl_queue.some(isQueueActive)) {
@@ -1002,8 +1002,6 @@ ulQueue.poke = function(file, meth)
 };
 
 ulQueue.stuck = function() {
-	srvlog('ulQueue seems stuck...');
-
 	// Check certain conditions to make sure the workaround isn't worse than the problem...
 	if (ulQueue._running == 1 && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload)
 	{
@@ -1015,6 +1013,7 @@ ulQueue.stuck = function() {
 				var id = UploadManager.GetGID(chunk.ul);
 				$('.transfer-table #' + id + ' td:eq(3)').text('Internal Error (0x7f023)');
 				$('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
+				srvlog('Upload automatically aborted on stuck detection');
 				UploadManager.abort(id);
 			}
 		}

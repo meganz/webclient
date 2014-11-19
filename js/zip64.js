@@ -402,7 +402,7 @@ function ZipWriter(dl_id, dl) {
 	else this.io = new dlMethod(dl_id, dl)
 
 	this.io.is_zip = true;
-	this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1);
+	this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1, 'zip-writer');
 	this.zwriter.validateTask = dlZipWriterValidate.bind(this);
 
 	this.io.begin  = function() {

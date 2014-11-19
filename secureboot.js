@@ -909,6 +909,7 @@ else
 			for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
 			for (var i in jsl)
 			{
+			  // if (d) console.warn(jsl[i].j, jsl[i].f, (''+jsl[i].text).substr(0,80))
 			  jsl_loaded[jsl[i].n]=1;
 			  if ((jsl[i].j == 1) && (!jj))
 			  {
@@ -978,6 +979,7 @@ else
 				jsl_done=true;
 				boot_done();
 			}
+			jj = 0; //prevent further 'silent_loading' loads from failing..
 		}
 	}
 	if (ua.indexOf('android') > 0 && !sessionStorage.androidsplash && document.location.hash.indexOf('#confirm') == -1)

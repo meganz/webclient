@@ -2624,7 +2624,7 @@ function process_f(f, cb)
 	// for (var i in f) M.addNode(f[i]);
 	var max = 0x8000, n;
 
-	while ((n = f.pop()))
+	if (f) while ((n = f.pop()))
 	{
 		M.addNode(n);
 

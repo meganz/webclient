@@ -15,8 +15,8 @@ function FlashIO(dl_id, dl) {
 			{
 				if (!dl.cancelled)
 				{
-					if (++retries < 400) IO.write(buffer, position, done);
-					else dlFatalError(dl, 'FlashIO Object unavailable');
+					if (++retries < 100) IO.write(buffer, position, done);
+					else dlFatalError(dl, 'FlashIO error -- Do you have Adobe Flash installed?');
 				}
 			}, 300);
 		}

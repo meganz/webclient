@@ -3,7 +3,7 @@ var dlMethod
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, ui_paused = false
-	, dlQueue = new TransferQueue(downloader, dl_maxSlots)
+	, dlQueue = new TransferQueue(downloader, dl_maxSlots, 'downloads')
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {

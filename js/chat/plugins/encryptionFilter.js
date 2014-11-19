@@ -17,6 +17,8 @@ var EncryptionFilter = function(megaChat) {
     self.karere = megaChat.karere;
 
     self._reinitialiseEncryptionOpQueue = function(megaRoom) {
+        self.destroyEncryptionFilterForRoom(megaRoom);
+
         if(megaRoom.encryptionHandler) {
             delete megaRoom.encryptionHandler;
         }
@@ -304,6 +306,14 @@ var EncryptionFilter = function(megaChat) {
     logAllCallsOnObject(this, console.debug, true, "encFilter", self.logger);
     callLoggerWrapper(window, "getPubEd25519", console.debug, "getPubEd25519", self.logger);
 
+
+    /**
+     * used to mark which room had been marked for a resync, so that multiple resync don't create a forever loops.
+     * @type {Object}
+     * @private
+     */
+    self._queuedResyncs = {};
+
     return this;
 };
 
@@ -515,13 +525,21 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
 EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forceRecover) {
     var self = this;
 
+
     if(megaRoom._leaving) {
         return;
-    } else if(megaRoom._syncRoomMembersIsInProgress) {
-        megaRoom._syncRoomMembersIsInProgress.always(function() { // wait for the already started sync to finish and then
-                                                                  // re-try to sync if needed
-            self.syncRoomUsersWithEncMembers(megaRoom);
-        });
+    } else if(megaRoom._syncRoomMembersIsInProgress && megaRoom._syncRoomMembersIsInProgress.state() != "resolved") {
+
+        if(!self._queuedResyncs[megaRoom.roomJid]) {
+            self._queuedResyncs[megaRoom.roomJid] = true;
+
+            megaRoom._syncRoomMembersIsInProgress.always(function () { // wait for the already started sync to finish and then
+                // re-try to sync if needed
+                self.syncRoomUsersWithEncMembers(megaRoom);
+
+                delete self._queuedResyncs[megaRoom.roomJid];
+            });
+        }
 
         return;
     }
@@ -589,6 +607,7 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
         );
     });
 
+
     megaRoom._syncRoomMembersIsInProgress = MegaPromise.allDone(promises, megaRoom.megaChat.karere.options.pingTimeout + 1000)
         .always(function() {
             self.logger.debug("#PING got state // users to join:", joinUsers);
@@ -632,31 +651,36 @@ EncryptionFilter.prototype.syncRoomUsersWithEncMembers = function(megaRoom, forc
                     }
                 });
 
-                self.logger.error("had to recover, current users: ", currentUsers, "newly joined users: ", newlyJoinedUsers);
+                self.logger.warn("had to recover, current users: ", currentUsers, "newly joined users: ", newlyJoinedUsers);
 
-                /*
-                megaRoom.encryptionOpQueue.queue(
-                    'recover',
-                    array_unique(currentUsers)
-                );
-                if(newlyJoinedUsers.length > 0) {
+                if(currentUsers.length == 1) { // e.g. if i'm the only one left in the room, then a brand new mpenc
+                                               // protocol handler should be initialised
+                    self._reinitialiseEncryptionOpQueue(megaRoom);
+
+                    var allUsers = array_unique(array_unique(newlyJoinedUsers).concat(currentUsers));
+                    var mePos = allUsers.indexOf(megaRoom.megaChat.karere.getJid());
+                    if(mePos >= 0) {
+                        allUsers.splice(mePos, 1);
+                    }
+
+                    if(megaRoom.iAmRoomOwner()) {
+                        //if(allUsers.length == 0 || !allUsers) {
+                        //    debugger;
+                        //}
+                        megaRoom.encryptionOpQueue.queue('start', allUsers);
+                    }
+                } else {
                     megaRoom.encryptionOpQueue.queue(
-                        'join',
-                        array_unique(newlyJoinedUsers)
+                        'recover',
+                        array_unique(currentUsers)
                     );
+                    if(newlyJoinedUsers.length > 0) {
+                        megaRoom.encryptionOpQueue.queue(
+                            'join',
+                            array_unique(newlyJoinedUsers)
+                        );
+                    }
                 }
-                */
-                self._reinitialiseEncryptionOpQueue(megaRoom);
-
-                var allUsers = array_unique(array_unique(newlyJoinedUsers).concat(currentUsers));
-                var mePos = allUsers.indexOf(megaRoom.megaChat.karere.getJid());
-                if(mePos >= 0) {
-                    allUsers.splice(mePos, 1);
-                }
-                if(megaRoom.iAmRoomOwner()) {
-                    megaRoom.encryptionOpQueue.queue('start', allUsers);
-                }
-
             } else  if(megaRoom.encryptionHandler.state === mpenc.handler.STATE.NULL) {
                 // first start, then exclude
                 if(joinUsers.length > 0) {
@@ -772,7 +796,6 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
 
      self.logger.debug("Processing incoming message: ", msg, e, eventObject, eventObject.isEmptyMessage());
 
-
     if(msg && msg.indexOf(EncryptionFilter.MPENC_MSG_TAG) === 0) {
         var wireMessage = $.extend({}, eventObject, {
             message: msg,
@@ -793,9 +816,14 @@ EncryptionFilter.prototype.processIncomingMessage = function(e, eventObject, kar
         } else if(eventObject.getRawType() == "chat") {
             // send to all chat rooms in which i'm currently having a chat w/ this user
             assert(eventObject.getMeta().roomJid, "roomJid missing from incoming encrypted message.");
-            self.processMessage(e, self.megaChat.chats[eventObject.getMeta().roomJid], wireMessage);
-            if(!e.isPropagationStopped()) {
-                e.stopPropagation();
+
+            if(self.megaChat.chats[eventObject.getMeta().roomJid]) {
+                self.processMessage(e, self.megaChat.chats[eventObject.getMeta().roomJid], wireMessage);
+                if (!e.isPropagationStopped()) {
+                    e.stopPropagation();
+                }
+            } else {
+                self.logger.debug("Room not found:" , eventObject);
             }
         } else {
              self.logger.debug("No idea how to handle enc message: ", wireMessage);
@@ -850,6 +878,23 @@ EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject
             megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED
         );
 };
+
+
+/**
+ * Utility func to cleanup any states, timers and timeouts currently active on a specific megaRoom
+ * Most cases, this should be used before doing delete on an object.
+ *
+ * @param megaRoom
+ */
+EncryptionFilter.prototype.destroyEncryptionFilterForRoom = function(megaRoom) {
+    var self = this;
+
+    if(megaRoom._syncRoomMembersIsInProgress) {
+        megaRoom._syncRoomMembersIsInProgress.reject();
+    }
+
+};
+
 
 /**
  * Helper method that will attach debug loggers to a encryption/ProtocolHandler

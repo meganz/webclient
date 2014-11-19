@@ -564,6 +564,7 @@ var Chat = function() {
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
+        'loadbalancerService': 'karere-001.developers.mega.co.nz:4434',
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {
@@ -683,6 +684,7 @@ var Chat = function() {
 
     self.incomingCallDialog = new MegaIncomingCallDialog();
 
+    //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
 
     return this;
 };
@@ -1429,7 +1431,7 @@ Chat.prototype.connect = function() {
     var self = this;
 
     // connection flow already started/in progress?
-    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING && self.karere._$connectingPromise) {
+    if(self.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING || (self.karere._$connectingPromise && self.karere._$connectingPromise.state() == 'pending')) {
         return self.karere._$connectingPromise.always(function() {
             self.renderMyStatus();
         });
@@ -2402,8 +2404,21 @@ Chat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
         return "https://sandbox.developers.mega.co.nz/http-bind";
     } else {
-        return "https://karere-001.developers.mega.co.nz/http-bind";
-        return "https://karere-00" + (rand(3) + 1) + ".developers.mega.co.nz/http-bind";
+        var $promise = new MegaPromise();
+
+        $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=xmpp")
+            .done(function(r) {
+                if(r.xmpp && r.xmpp.length > 0) {
+                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/http-bind");
+                } else {
+                    $promise.resolve("https://karere-001.developers.mega.co.nz:443/http-bind");
+                }
+            })
+            .fail(function() {
+                $promise.reject();
+            });
+
+        return $promise;
     }
 };
 
@@ -2435,7 +2450,6 @@ Chat.prototype.renderListing = function() {
         $('.fm-empty-conversations').removeClass('hidden');
     } else {
         $('.fm-empty-conversations').addClass('hidden');
-
 
         if($('.fm-right-header:visible').length === 0) {
             // show something, instead of a blank/white screen if there are currently opened chats

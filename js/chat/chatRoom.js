@@ -52,7 +52,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
         /**
          * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
          */
-        'pluginsReadyTimeout': 30000,
+        'pluginsReadyTimeout': 60000, // XX: Because of the middle earth's internet, this should have been increased :)
 
         /**
          * Default media options
@@ -787,6 +787,36 @@ ChatRoom.prototype._cancelCallRequest = function() {
     }
 };
 
+ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
+    var self = this;
+
+    var $promise = new MegaPromise();
+
+    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn")
+        .done(function(r) {
+            if(r.turn && r.turn.length > 0) {
+                var servers = [];
+                r.turn.forEach(function(v) {
+                    servers.push({
+                        url: 'turn:' + v.host + ':' + v.port + '?transport=udp',
+                        username: "inoo20jdnH",
+                        credential: '02nNKDBkkS'
+                    });
+                });
+                self.megaChat.rtc.updateIceServers(servers);
+
+                $promise.resolve();
+            } else {
+                $promise.resolve();
+            }
+        })
+        .fail(function() {
+            $promise.reject();
+        });
+
+    return $promise;
+};
+
 ChatRoom.prototype._startCall = function() {
     var self = this;
 
@@ -798,7 +828,14 @@ ChatRoom.prototype._startCall = function() {
     if(self.callRequest) {
         self._cancelCallRequest();
     }
-    self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
+
+    var $promise = self._retrieveTurnServerFromLoadBalancer();
+
+    $promise.always(function() {
+        self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
+    });
+
+
 
     $('.btn-chat-cancel-active-call', self.$header).bind('click.megaChat', function() {
         self._cancelCallRequest();
@@ -829,6 +866,11 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
     $('.btn-chat-call', self.$header).hide();
 
     if(e.type == "call-init" || e.type == "call-answered") {
+        // current-calling indicator
+        if(self.megaChat.activeCallRoom && self.megaChat.activeCallRoom != self) {
+            self.megaChat.activeCallRoom._cancelCallRequest();
+        }
+
         $('.drag-handle', self.$header).show();
         self.$header.parent().addClass("video-call"); // adds video-call or audio-call class name
 
@@ -1016,9 +1058,8 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
 
 
 
-
-        // current-calling indicator
         self.callIsActive = true;
+        self.megaChat.activeCallRoom = self;
         $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling').removeClass('hidden');
         $('.nw-conversations-item.current-calling').addClass('selected');
 
@@ -1049,13 +1090,10 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
 ChatRoom.prototype._resetCallStateNoCall = function() {
     var self = this;
 
+
     var callWasActive = self.callIsActive;
 
     self.callIsActive = false;
-
-    self.$header.parent()
-        .removeClass("video-call")
-        .removeClass("audio-call");
 
     $('.drag-handle', self.$header).hide();
 
@@ -1064,13 +1102,18 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     self.megaChat.incomingCallDialog.hide();
 
 
-    $('.chat-header-indicator.muted-video').addClass("hidden");
-    $('.chat-header-indicator.muted-audio').addClass("hidden");
+    $('.chat-header-indicator.muted-video', self.$header).addClass("hidden");
+    $('.chat-header-indicator.muted-audio', self.$header).addClass("hidden");
 
     $('.btn-chat-call', self.$header).show();
 
 
     if(callWasActive) {
+        self.$header.parent()
+            .removeClass("video-call")
+            .removeClass("audio-call");
+
+
         $('.nw-conversations-header.call-started, .nw-conversations-item.current-calling')
             .addClass('hidden')
             .removeClass('selected');
@@ -1431,9 +1474,6 @@ ChatRoom.prototype.participantExistsInRoom = function(jid, strict, notMe) {
     var result = false;
     $.each(self.users, function(k, v) {
         if(!v) {
-            if(window.d) {
-                debugger;
-            }
             self.logger.error("missing contact: ", k);
 
             return;
@@ -1469,9 +1509,6 @@ ChatRoom.prototype.getParticipants = function() {
 
     $.each(self.users, function(k, v) {
         if(!v) {
-            if(window.d) {
-                debugger;
-            }
             self.logger.error("missing contact/user: ", k);
 
             return;
@@ -2989,11 +3026,9 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
 ChatRoom.prototype._conversationStarted = function(userFullJid) {
     var self = this;
 
-    if(!self._conv_ended) { // ended conversation that should be converted to started again?
-        if(Karere.getNormalizedBareJid(userFullJid) != self.megaChat.karere.getBareJid()) {
-            // the other user had joined, mark this conv as started again.
-            self._conv_ended = false;
-        }
+    if(Karere.getNormalizedBareJid(userFullJid) != self.megaChat.karere.getBareJid()) {
+        // the other user had joined, mark this conv as started again.
+        self._conv_ended = false;
     }
 
 

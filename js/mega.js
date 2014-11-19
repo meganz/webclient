@@ -3130,6 +3130,21 @@ function execsc(ap)
                         );
                     });
                 };
+            } else if(a.a == 'ua') {
+                for (var j in a.ua)
+                {
+                    if (a.ua[j] == '+a')
+                    {
+                        avatars[a.u]=undefined;
+                        loadavatars=true;
+                    } else if (a.ua[j] == '*authring')
+                    {
+                        authring.getContacts('Ed25519');
+                    } else if (a.ua[j] == '*authRSA')
+                    {
+                        authring.getContacts('RSA');
+                    }
+                }
             }
 		}
 		else if (a.a == 'fa')
@@ -3289,12 +3304,17 @@ function execsc(ap)
 		}
 		else if (a.a == 'ua' && fminitialized)
 		{
-			for (var i in a.ua)
+			for (var j in a.ua)
 			{
-				if (a.ua[i] == '+a')
+				if (a.ua[j] == '+a')
 				{
 					avatars[a.u]=undefined;
 					loadavatars=true;
+				} else if (a.ua[j] == '+puEd255')
+				{ // pubEd25519 key was updated!
+                    // force finger regen.
+                    delete pubEd25519[a.u];
+                    getPubEd25519(a.u);
 				}
 			}
 		}

@@ -3207,6 +3207,12 @@ function u_initAuthentication2(res, ctx) {
     u_attr.puEd255 = u_pubEd25519;
     pubEd25519[u_handle] = u_pubEd25519;
 
+    getUserAttribute(u_handle, "puEd255", true, function(res) {
+        if(res !== base64urlencode(u_pubEd25519)) {
+            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+        }
+    });
+
     // Ensure an RSA pub key signature.
     var storeSigPubkCallback = function(res, ctx) {
         if (typeof res === 'number') {

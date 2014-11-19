@@ -1522,7 +1522,6 @@ describe("Chat.js - Karere UI integration", function() {
             .done(function() {
                 var roomJid = megaChat.generatePrivateRoomName(jids) + "@conference.example.com";
 
-
                 expect(
                     megaChat.karere.addUserToChat
                 ).to.have.been.calledOnce;
@@ -1570,11 +1569,11 @@ describe("Chat.js - Karere UI integration", function() {
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
-                expect($elem1.find('span').is(".color1")).to.be.ok;
-                expect($elem2.find('span').is(".color2")).to.be.ok;
+                expect($elem1.find('span').parent().is(".color0")).to.be.ok;
+                expect($elem2.find('span').parent().is(".color1")).to.be.ok;
 
-                expect($elem1.text()).to.eql("LX");
-                expect($elem2.text()).to.eql("LZ");
+                expect($elem1.text()).to.eql("LZ");
+                expect($elem2.text()).to.eql("LX");
 
                 expect($('img', $elem1).size()).to.eql(0);
                 expect($('img', $elem2).size()).to.eql(0);
@@ -1590,8 +1589,8 @@ describe("Chat.js - Karere UI integration", function() {
                 $elem1 = megaRoom._generateContactAvatarElement(user1jid);
                 $elem2 = megaRoom._generateContactAvatarElement(user2jid);
 
-                expect($elem1.find('span').is(".color1")).to.be.ok;
-                expect($elem2.find('span').is(".color2")).to.be.ok;
+                expect($elem1.find('span').parent().is(".color0")).to.be.ok;
+                expect($elem2.find('span').parent().is(".color1")).to.be.ok;
 
                 expect($elem1.text()).to.eql("L");
                 expect($elem2.text()).to.eql("B");
@@ -1611,8 +1610,8 @@ describe("Chat.js - Karere UI integration", function() {
 
                 expect($('img', $elem1).size()).to.eql(1);
                 expect($('img', $elem2).size()).to.eql(1);
-                expect($elem1.find('span').is(".color1")).to.be.ok;
-                expect($elem2.find('span').is(".color2")).to.be.ok;
+                expect($elem1.find('span').parent().is(".color0")).to.be.ok;
+                expect($elem2.find('span').parent().is(".color1")).to.be.ok;
 
                 expect($elem1.text()).to.eql("");
                 expect($elem2.text()).to.eql("");
@@ -1672,8 +1671,8 @@ describe("Chat.js - Karere UI integration", function() {
 
                 expect($('.typing').size()).to.eql(1);
                 expect($('.typing:visible').size()).to.eql(1);
-                expect($('.typing .nw-contact-avatar.color2').size()).to.eql(1);
-                expect($('.typing .nw-contact-avatar.color2').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
 
 
 
@@ -1685,8 +1684,8 @@ describe("Chat.js - Karere UI integration", function() {
 
                 expect($('.typing').size()).to.eql(1);
                 expect($('.typing:visible').size()).to.eql(1);
-                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
-                expect($('.typing .nw-contact-avatar.color1').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color0').size()).to.eql(1);
+                expect($('.typing .nw-contact-avatar.color0').size()).to.eql(1);
 
                 megaChat.karere.trigger("onPausedMessage", new KarereEventObjects.StatePausedMessage(
                     user2jid,
@@ -1792,7 +1791,12 @@ describe("Chat.js - Karere UI integration", function() {
 
                 megaRoom.options.mediaOptions['audio'] = true;
                 megaRoom.options.mediaOptions['video'] = true;
+                megaRoom._retrieveTurnServerFromLoadBalancer = function() {
+                    return MegaPromise.resolve({'turn': [{'host': 'host', 'port': 1234}]});
+                };
+
                 megaRoom._startCall();
+
 
                 expect(megaChat.rtc.startMediaCall.callCount).to.eql(1);
                 expect(megaChat.rtc.startMediaCall.getCall(0).args[0]).to.eql(user2jid);

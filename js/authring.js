@@ -478,7 +478,6 @@ var authring = (function () {
         ns.setContacts('Ed25519');
         u_authring.RSA = {};
         ns.setContacts('RSA');
-        pubEd25519 = {};
     };
 
 

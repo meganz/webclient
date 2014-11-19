@@ -59,7 +59,9 @@
                 "querySet\\[chatMessages\\]",
                 "mDBEncryptionPlugin"
             ]);
-            localStorage.minLogLevel = 0; /* debug */
+
+            localStorage.minLogLevel = 0; /*  0 = MegaLogger.LEVELS.DEBUG, but since we don't have the megalogger
+                                               included on this page, we're hardcoding the int val */
         }
 
         window.location = '../index.html';

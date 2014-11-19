@@ -97,7 +97,7 @@ describe("Chat Filters", function() {
             undefined,
             "room@jid.com",
             {},
-            'this.is.a.test'
+            'This may be an invalid URL.Because of the missing space....yeah'
         );
         megaChat.trigger("onReceiveMessage", messageData);
 

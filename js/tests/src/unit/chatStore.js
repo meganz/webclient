@@ -3,6 +3,8 @@ describe("ChatStore plugin Unit Test", function() {
     var megaChatDummyInstance;
     var megaDataMocker;
     var MegaChatDummy = function() {
+        this.is_initialized = true;
+
         this.options = {
             'chatStoreOptions': {
                 'autoPurgeMaxMessagesPerRoom': 3
@@ -88,7 +90,7 @@ describe("ChatStore plugin Unit Test", function() {
             expect(chatStore.db.add.callCount).to.eql(1);
 
             done();
-        }, 10);
+        }, 50);
     });
 
     it("onQueueMessage", function(done) {

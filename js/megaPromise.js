@@ -111,6 +111,15 @@ MegaPromise.prototype.done = function(res, rej) {
 };
 
 /**
+ * Alias of .state
+ *
+ * @returns {String}
+ */
+MegaPromise.prototype.state = function() {
+    return this._internalPromise.state();
+};
+
+/**
  * Alias of .fail
  *
  * @param rej
@@ -176,6 +185,8 @@ MegaPromise.all = function(promisesList) {
  * Implementation of Promise.all/$.when, with a little bit more flexible way of handling different type of promises
  * passed in the `promisesList`
  *
+ * @param promisesList {Array}
+ * @param [timeout] {Integer} max ms to way for the master promise to be resolved before rejecting it
  * @returns {MegaPromise}
  */
 MegaPromise.allDone = function(promisesList, timeout) {
@@ -203,13 +214,15 @@ MegaPromise.allDone = function(promisesList, timeout) {
         v.fail(alwaysCb);
     });
 
-    var timeout = setTimeout(function() {
-        masterPromise.reject(results);
-    }, timeout);
+    if(timeout) {
+        var timeoutTimer = setTimeout(function () {
+            masterPromise.reject(results);
+        }, timeout);
 
-    masterPromise.always(function() {
-        clearTimeout(timeout);
-    });
+        masterPromise.always(function () {
+            clearTimeout(timeoutTimer);
+        });
+    }
 
     return masterPromise;
 };

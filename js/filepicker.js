@@ -83,7 +83,6 @@
         self.visible = true;
 
         if(self.options.buttonElement) {
-            debugger;
             self.options.buttonElement.addClass('active'); /* required to be visible, before the posY calc for the correct
                                                               re-positioning of the dialog */
 

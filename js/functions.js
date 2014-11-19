@@ -618,8 +618,14 @@ function makeObservable(kls) {
     var aliases = ['on', 'bind', 'unbind', 'one', 'trigger'];
 
     $.each(aliases, function(k, v) {
-        kls.prototype[v] = function() {
-            return $(this)[v].apply($(this), toArray(arguments));
+        if(kls.prototype) {
+            kls.prototype[v] = function () {
+                return $(this)[v].apply($(this), toArray(arguments));
+            }
+        } else {
+            kls[v] = function () {
+                return $(this)[v].apply($(this), toArray(arguments));
+            }
         }
     });
 };
@@ -769,10 +775,11 @@ function simpleStringHashCode(str){
  * @param tick {int}
  * @param timeout {int}
  * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
+ * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
  * @returns {Deferred}
  */
-function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs) {
-    var $promise = new $.Deferred();
+function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs, waitForPromise) {
+    var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if(!$.isArray(resolveRejectArgs)) {
         resolveRejectArgs = [resolveRejectArgs]
@@ -787,29 +794,39 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
         }
     };
 
-    var tickInterval = setInterval(function() {
-        $promise.verify();
-    }, tick);
+    var startTimerChecks = function() {
+        var tickInterval = setInterval(function() {
+            $promise.verify();
+        }, tick);
 
-    var timeoutTimer = setTimeout(function() {
-        if(validateFunction()) {
-            if(window.d) {
-                console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+        var timeoutTimer = setTimeout(function() {
+            if(validateFunction()) {
+                if(window.d) {
+                    console.debug("Resolving timeout promise", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                }
+                $promise.resolve.apply($promise, resolveRejectArgs);
+            } else {
+                console.error("Timed out after waiting", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
+                $promise.reject.apply($promise, resolveRejectArgs);
             }
-            $promise.resolve.apply($promise, resolveRejectArgs);
-        } else {
-            console.error("Timed out after waiting", timeout, "ms", "at", (new Date()), validateFunction, resolveRejectArgs);
-            $promise.reject.apply($promise, resolveRejectArgs);
-        }
-    }, timeout);
+        }, timeout);
 
-    // stop any running timers and timeouts
-    $promise.always(function() {
-        clearInterval(tickInterval);
-        clearTimeout(timeoutTimer)
-    });
+        // stop any running timers and timeouts
+        $promise.always(function() {
+            clearInterval(tickInterval);
+            clearTimeout(timeoutTimer)
+        });
 
-    $promise.verify();
+        $promise.verify();
+    };
+
+    if(!waitForPromise || !waitForPromise.done) {
+        startTimerChecks();
+    } else {
+        waitForPromise.always(function() {
+            startTimerChecks();
+        });
+    }
 
     return $promise;
 };

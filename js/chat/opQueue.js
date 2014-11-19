@@ -235,7 +235,7 @@ OpQueue.prototype.pop = function() {
 
 
             if(op[1].length == 0 && op[0] != "recover" && op[0] != "quit") {
-                self.logger.warn("OpQueue will ignore: ", op, "because of not enough arguments.");
+                self.logger.error("OpQueue will ignore: ", op, "because of not enough arguments.");
             } else {
                 try {
                     self.ctx[op[0]](op[1], op[2], op[3]);
@@ -245,8 +245,9 @@ OpQueue.prototype.pop = function() {
 //                            debugger;
 //                        }
                     }
-                    if(e.message && e.message.indexOf("Authentication of member failed") != -1 && localStorage.d) {
+                    if((e.message && e.message.indexOf("Authentication of member failed") != -1) && localStorage.d) {
                         self.logger.warn("Because of debug mode and caught Authentication failed, authring will be scrubbed.");
+
                         authring.scrubAuthRing();
 
                         var megaRoom = self.megaRoom;
@@ -273,10 +274,11 @@ OpQueue.prototype.pop = function() {
             return self.pop();
         } else {
             if(self._error_retries > self.MAX_ERROR_RETRIES) {
+                self.logger.error("OpQueue will try to recover: ", self._currentOp, self._queue[0]);
                 self._error_retries = 0;
                 self.recoverFailFn(self);
             } else {
-                self.logger.error("OpQueue Will retry: ", self._currentOp, self._queue[0]);
+                self.logger.error("OpQueue will retry: ", self._currentOp, self._queue[0]);
 
                 self._error_retries++;
 

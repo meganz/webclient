@@ -473,92 +473,106 @@ makeMetaAware(Karere);
     Karere.prototype.connect = function(jid, password) {
         var self = this;
 
-
-
         var $promise = new $.Deferred();
 
         // don't call Strophe.connect again if already connected/connecting
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
             $promise.resolve(Karere.CONNECTION_STATE.CONNECTED);
             return $promise;
-        } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+        } else if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING || (self._$connectingPromise && self._$connectingPromise.state() == "pending")) {
             return self._$connectingPromise;
         }
 
-
         self.authSetup(jid, password);
-
-
 
         self.connection.reset(); // clear any old attached handlers
 
+        var _doConnectTo = function() {
+            self.connection.connect(
+                self._fullJid,
+                self._password,
+                function(status) {
+                    self.logger.warn("Got connection status: ", self._fullJid, self._password, status);
+
+                    self._connectionState = status;
+
+                    if (status == Karere.CONNECTION_STATE.CONNECTING) {
+                        self.logger.debug(self.getNickname(), 'Karere is connecting.');
+
+                        self.trigger('onConnecting');
+                    } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
+                        self.logger.warn(self.getNickname(), 'Karere failed to connect.');
+
+                        if(self._connectionRetries >= self.options.maxConnectionRetries) {
+                            $promise.reject(status);
+                        }
+                        self.trigger('onConnfail');
+                    } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
+                        self.logger.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
+
+                        $promise.reject(status);
+                        self.trigger('onAuthfail');
+                    } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
+                        self.logger.warn(self.getNickname(), 'Karere is disconnecting.');
+
+                        if(self._connectionRetries >= self.options.maxConnectionRetries) {
+                            $promise.reject(status);
+                        }
+
+                        self.trigger('onDisconnecting');
+                    } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
+                        self.logger.info(self.getNickname(), 'Karere is disconnected.');
+
+                        if(self._connectionRetries >= self.options.maxConnectionRetries) {
+                            $promise.reject(status);
+                        }
+                        self.trigger('onDisconnected');
+                    } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
+                        self.logger.info(self.getNickname(), 'Karere is connected.');
+
+                        // connection.jid
+                        self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
+                        self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
+                        self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingIq, self), null, 'iq', null, null,  null);
+
+
+                        self._connectionRetries = 0; // reset connection errors
+
+                        self.trigger('onConnected');
+
+                        $promise.resolve(status);
+                    }
+
+                    return true;
+                }
+            );
+        };
+
+        var remoteBoshServiceUrlPromise = false;
         if($.isFunction(self.options.boshServiceUrl)) {
-            self.connection.service = self.options.boshServiceUrl();
+            var service = self.options.boshServiceUrl();
+            if(service.fail && service.resolve) { // its a promise!
+                self._connectionState = Karere.CONNECTION_STATE.CONNECTING;
+
+                remoteBoshServiceUrlPromise = service.done(function(serviceUrl) {
+                    self.connection.service = serviceUrl;
+                    _doConnectTo();
+                });
+            } else {
+                self.connection.service = service;
+                _doConnectTo();
+            }
+
         } else {
             self.connection.service = self.options.boshServiceUrl;
+            _doConnectTo();
         }
-        self.connection.connect(
-            self._fullJid,
-            self._password,
-            function(status) {
-                self.logger.warn("Got connection status: ", self._fullJid, self._password, status);
-
-                self._connectionState = status;
-
-                if (status == Karere.CONNECTION_STATE.CONNECTING) {
-                    self.logger.debug(self.getNickname(), 'Karere is connecting.');
-
-                    self.trigger('onConnecting');
-                } else if (status == Karere.CONNECTION_STATE.CONNFAIL) {
-                    self.logger.warn(self.getNickname(), 'Karere failed to connect.');
-
-                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
-                        $promise.reject(status);
-                    }
-                    self.trigger('onConnfail');
-                } else if (status == Karere.CONNECTION_STATE.AUTHFAIL) {
-                    self.logger.warn(self.getNickname(), 'Karere failed to connect - Authentication issue.');
-
-                    $promise.reject(status);
-                    self.trigger('onAuthfail');
-                } else if (status == Karere.CONNECTION_STATE.DISCONNECTING) {
-                    self.logger.warn(self.getNickname(), 'Karere is disconnecting.');
-
-                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
-                        $promise.reject(status);
-                    }
-
-                    self.trigger('onDisconnecting');
-                } else if (status == Karere.CONNECTION_STATE.DISCONNECTED) {
-                    self.logger.info(self.getNickname(), 'Karere is disconnected.');
-
-                    if(self._connectionRetries >= self.options.maxConnectionRetries) {
-                        $promise.reject(status);
-                    }
-                    self.trigger('onDisconnected');
-                } else if (status == Karere.CONNECTION_STATE.CONNECTED) {
-                    self.logger.info(self.getNickname(), 'Karere is connected.');
-
-                    // connection.jid
-                    self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'presence', null, null,  null);
-                    self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingStanza, self), null, 'message', null, null,  null);
-                    self.connection.addHandler(Karere._exceptionSafeProxy(self._onIncomingIq, self), null, 'iq', null, null,  null);
 
 
-                    self._connectionRetries = 0; // reset connection errors
-
-                    self.trigger('onConnected');
-
-                    $promise.resolve(status);
-                }
-
-                return true;
-            }
-        );
 
         self._$connectingPromise = createTimeoutPromise(function() {
             return self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED
-        }, 100, self.options.connectTimeout)
+        }, 100, self.options.connectTimeout, undefined, remoteBoshServiceUrlPromise)
             .fail(function() {
                 delete self._$connectingPromise;
 
@@ -591,6 +605,7 @@ makeMetaAware(Karere);
                     self._$connectingPromise.reject();
                 }
             });
+
         return self._$connectingPromise.always(function() {
             delete self._$connectingPromise;
         });
@@ -620,7 +635,7 @@ makeMetaAware(Karere);
             /**
              * Reconnect if connection is dropped or not available and there are actual credentials in _jid and _password
              */
-            if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING) {
+            if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTING || (self._$connectingPromise && self._$connectingPromise.state() == 'pending')) {
                 self.logger.warn("Tried to call ", functionName, ", while Karere is still in CONNECTING state, will queue for later execution.");
 
                 internalPromises.push(

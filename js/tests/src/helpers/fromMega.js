@@ -112,3 +112,8 @@ mozRunAsync = false;
 function is_fm() { return false; };
 
 function rand(n) { return Math.floor(Math.random() * n) + 1; };
+
+window.d = 1;
+is_extension = false;
+
+apipath = "http://localhost/"; // some invalid api path

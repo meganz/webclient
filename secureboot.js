@@ -855,7 +855,11 @@ else
         function jsl_start()
         {
             jslcomplete = 0;
-            xhr_progress = [0,0];
+            if(d && jj) {
+                xhr_progress = [0, 0, 0, 0, 0];
+            } else {
+                xhr_progress = [0, 0];
+            }
             xhr_stack = Array(xhr_progress.length);
             jsl_fm_current = 0;
             jsl_current = 0;
@@ -942,6 +946,18 @@ else
 
         function xhr_load(url,jsi,xhri)
         {
+            if(d && jj) {
+                if(jsl[jsi].j == 1 || jsl[jsi].j == 2) {
+                    // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
+
+                    jsl_current += jsl[jsi].w || 1;
+                    jsl_progress();
+                    if (++jslcomplete == jsl.length) initall();
+                    else jsl_load(xhri);
+
+                    return;
+                }
+            }
             xhr_stack[xhri] = getxhr();
             xhr_stack[xhri].onload = function()
             {

@@ -663,7 +663,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
     // make the audio/video screen resizable
     self.audioVideoPaneResizable = new FMResizablePane(self.$header, {
         'handle': $('.drag-handle', self.$header),
-        'persistanceKey': 'audioVideoScreenSize',
+        'persistanceKey': false,
         'direction': 's'
     });
     $('.drag-handle', self.$header).hide();
@@ -1255,16 +1255,6 @@ ChatRoom.prototype._resetCallStateInCall = function() {
     }
 
 
-    // set header size if persisted
-    if(localStorage.audioVideoScreenSize) {
-        self.$header.css(
-            'height',
-            JSON.parse(localStorage.audioVideoScreenSize)
-        );
-
-        $(window).trigger('resize');
-    }
-
     $('.nw-conversations-item.current-calling').unbind('click.megaChat');
     $('.nw-conversations-item.current-calling').bind('click.megaChat', function() {
         self.activateWindow();
@@ -1703,6 +1693,21 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
             $('.btn-chat-call', self.$header).hide();
         } else {
             $('.btn-chat-call', self.$header).show();
+        }
+    } else {
+        var $video = $('.others-av-screen.video-call-container video', self.$header);
+        if($video.length > 0) {
+            var $confCallUi = $('.chat-call-block', self.$header);
+            var $videoContainer = $video.parent();
+            var targetHeight = $confCallUi.outerHeight() - 50;
+
+            $videoContainer.css('height', targetHeight + 8);
+            $videoContainer.css('width',
+                Math.min(
+                    Math.round((targetHeight/9)*16) + 8,
+                    $video.outerWidth() + 8
+                )
+            );
         }
     }
 

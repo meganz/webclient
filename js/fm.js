@@ -8235,11 +8235,15 @@ function FMResizablePane(element, opts) {
 
                     $element.css(css_attrs);
 
-                    localStorage[opts.persistanceKey] = JSON.stringify(css_attrs);
+                    if(opts.persistanceKey) {
+                        localStorage[opts.persistanceKey] = JSON.stringify(css_attrs);
+                    }
                 } else {
                     css_attrs[size_attr] = ui.size[size_attr];
                     $element.css(css_attrs);
-                    localStorage[opts.persistanceKey] = JSON.stringify(ui.size[size_attr]);
+                    if(opts.persistanceKey) {
+                        localStorage[opts.persistanceKey] = JSON.stringify(ui.size[size_attr]);
+                    }
                 }
 
                 $self.trigger('resize', [e, ui]);

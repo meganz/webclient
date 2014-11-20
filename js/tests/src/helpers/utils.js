@@ -155,7 +155,7 @@ function getMegaRoom(data) {
     data = data || {};
 
     var obj = new DummyRoom();
-    obj.roomJid = data.roomJid ? data.roomJid : "room@conference.jid.com";
+    obj.roomJid = data.roomJid ? data.roomJid : "room123@conference.jid.com";
     obj.type = data.type ? data.type : "private";
     obj._conv_ended = data.ended ? data.ended : false;
     obj.state = data.state ? data.state : ChatRoom.STATE.INITIALIZED;

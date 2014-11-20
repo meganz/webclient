@@ -1093,8 +1093,6 @@ describe("EncryptionFilter", function() {
             expect(room.iHadJoined).to.be.ok;
             expect(room.state).to.eql(ChatRoom.STATE.PLUGINS_WAIT, "Room State should not have been changed (e.g. should be PLUGINS_WAIT");
 
-
-
             done();
         });
 

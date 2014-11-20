@@ -798,7 +798,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                 var servers = [];
                 r.turn.forEach(function(v) {
                     servers.push({
-                        url: 'turn:' + v.host + ':' + v.port + '?transport=udp',
+                        url: 'turn:' + v.host + ':' + /*v.port*/ "3478" + '?transport=udp',
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });

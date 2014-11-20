@@ -2411,7 +2411,7 @@ Chat.prototype.getBoshServiceUrl = function() {
                 if(r.xmpp && r.xmpp.length > 0) {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/http-bind");
                 } else {
-                    $promise.resolve("https://karere-001.developers.mega.co.nz:443/http-bind");
+                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/http-bind");
                 }
             })
             .fail(function() {

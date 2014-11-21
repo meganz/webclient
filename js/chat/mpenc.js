@@ -3579,6 +3579,9 @@ define('mpenc/handler',[
                     // In case of a key refresh (groupKey existent),
                     // the signing pubKeys won't be part of the message.
                     var signingPubKey = this.askeMember.getMemberEphemeralPubKey(wireMessage.from);
+                    if ((wireMessage.from === this.id) && (!signingPubKey)) {
+                        signingPubKey = this.askeMember.ephemeralPubKey;
+                    }
                     decodedMessage = codec.decodeMessageContent(classify.content,
                                                                 this.cliquesMember.groupKey.substring(0, 16),
                                                                 signingPubKey);

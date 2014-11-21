@@ -5369,8 +5369,7 @@ function savecomplete(id)
 {
 	$('.fm-dialog.download-dialog').addClass('hidden');
 	$('.fm-dialog-overlay').addClass('hidden');
-	if (!$.dialog)
-	$('#dlswf_'+id).remove();
+	if (!$.dialog) $('#dlswf_'+id).remove();
 	var dl = IdToFile(id);
 	M.dlcomplete(dl);
 	DownloadManager.cleanupUI(dl, true);

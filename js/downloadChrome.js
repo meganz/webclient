@@ -448,7 +448,11 @@
 			dl_done     = done;
 
 			if (d) console.log("Write " + buffer.length + " bytes at " + position + "/" + dl_fw.position);
-			dl_fw.write(new Blob([buffer]));
+			try {
+				dl_fw.write(new Blob([buffer]));
+			} catch(e) {
+				dlFatalError(dl, e);
+			}
 		};
 
 		this.download = function (name, path)

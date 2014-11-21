@@ -395,7 +395,7 @@ else
 					if (errobj.udata) dump.d = errobj.udata;
 					if (errobj.stack)
 					{
-						dump.s = ('' + errobj.stack).split("\\n").splice(0,9).map(mTrim).join("\\n");
+						dump.s = ('' + errobj.stack).split("\n").splice(0,9).map(mTrim).join("\n");
 					}
 				}
 				if (cn) dump.c = cn;

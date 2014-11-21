@@ -1080,14 +1080,6 @@ String.prototype.minutes = function() {
 	return parseInt(this) * 1000 * 60;
 }
 
-String.prototype.MB = function() {
-	return parseInt(this) * 1024 * 1024;
-}
-
-String.prototype.KB = function() {
-	return parseInt(this) * 1024;
-}
-
 // Quick hack for sane average speed readings
 function bucketspeedometer(initialp)
 {

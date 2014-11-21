@@ -60,6 +60,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                     'sound': 'incoming_file_transfer',
                                     'group': megaRoom.roomJid,
                                     'incrementCounter': true,
+                                    'alwaysPlaySound': true,
                                     'icon': icon,
                                     'params': {
                                         'from': $('.chat-username', $message).text(),
@@ -117,6 +118,27 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 .bind('onChatShown.chatNotifications', function(e) {
                     self.notifications.resetCounterGroup(megaRoom.roomJid);
                 })
+                .unbind('onIncomingDirectFileTransfer.chatNotifications')
+                .bind('onIncomingDirectFileTransfer.chatNotifications', function(e, megaRoom, contactName, attachments, $message) {
+                    var icon = $('.nw-contact-avatar img', $message).attr('src');
+                    var n = self.notifications.notify(
+                        'incoming-attachment',
+                        {
+                            'sound': 'incoming_file_transfer',
+                            'group': megaRoom.roomJid,
+                            'incrementCounter': true,
+                            'alwaysPlaySound': true,
+                            'icon': icon,
+                            'params': {
+                                'from': contactName,
+                                'attachments': attachments,
+                                'attachmentsCount': attachments.length
+                            }
+                        },
+                        $message.is('.unread')
+                    );
+
+                })
         })
         .unbind('onIncomingCall.chatNotifications')
         .bind('onIncomingCall.chatNotifications', function(e, room, contactName, avatar, isVideoCall) {
@@ -125,6 +147,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 {
                     'sound': 'incoming_voice_video_call',
                     'soundLoop': true,
+                    'alwaysPlaySound': true,
                     'group': room.roomJid,
                     'incrementCounter': true,
                     'icon': avatar,

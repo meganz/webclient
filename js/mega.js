@@ -557,13 +557,35 @@ function MegaData ()
 					var cs = this.contactstatus(u_h);
 					var contains = fm_contains(cs.files,cs.folders);
 					var time = time2last(cs.ts);
+
+                    var timems = cs.ts;
+
 					var interactionclass = 'cloud-drive';
-					if (cs.files == 0 && cs.folders == 0)
+
+                    if (cs.files == 0 && cs.folders == 0)
 					{
 						contains = l[1050];
 						time = l[1051];
 						var interactionclass = 'never';
 					}
+
+                    var contact = M.u[u_h];
+                    // chat is enabled?
+                    if(megaChat && megaChat.is_initialized && !MegaChatDisabled) {
+                        if (contact && contact.lastChatActivity > timems) {
+                            interactionclass = 'conversations';
+                            time = time2last(contact.lastChatActivity);
+
+                            var room = megaChat.getPrivateRoom(u_h);
+                            if(room && megaChat.plugins.chatNotifications) {
+                                if(megaChat.plugins.chatNotifications.notifications.getCounterGroup(room.roomJid) > 0) {
+                                    interactionclass = 'unread-conversations';
+                                }
+                            }
+
+                        }
+                    }
+
 					var user = M.d[u_h];
                     var av_meta = generateAvatarMeta(u_h);
 					var avatar = av_meta.shortName, av_color = av_meta.color;

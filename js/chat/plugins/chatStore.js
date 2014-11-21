@@ -87,7 +87,8 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                         'users': megaRoom.users,
                         'state': megaRoom.state,
                         'ended': megaRoom._conv_ended,
-                        'ctime': megaRoom.ctime
+                        'ctime': megaRoom.ctime,
+                        'lastActivity': megaRoom.lastActivity
                     });
                 }
             })
@@ -101,6 +102,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 .filter('roomJid', megaRoom.roomJid)
                 .modify({
                     'state': newState,
+                    'lastActivity': megaRoom.lastActivity,
                     'ended': megaRoom._conv_ended
                 })
                 .execute()
@@ -187,8 +189,6 @@ ChatStore.prototype.attachToChat = function(megaChat) {
     megaChat.unbind("onRoomDestroy.chatStore");
     megaChat.bind("onRoomDestroy.chatStore", function(e, megaRoom) {
         self.db.removeBy('conversations', 'roomJid', megaRoom.roomJid);
-        self.db.removeBy('outgoingQueue', 'toJid', megaRoom.roomJid);
-        self.db.removeBy('chatMessages', 'roomJid', megaRoom.roomJid);
     });
 
     // restore any conversations from the db
@@ -201,18 +201,25 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                 $.each(results, function(k, v) {
                     var foundRoom = megaChat.chats[v.roomJid];
 
-                    if(!foundRoom) { // restore room from db
+                    if(!foundRoom) { // restore room from db, if room not found
                         if(v.ended) {
                             megaChat.trigger("onRoomDestroy.chatStore", v);
                         }
-                        megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime);
-                        megaChat.chats[v.roomJid]._conv_ended = v.ended;
+                        var room = megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime, v.lastActivity);
 
-                        megaChat.chats[v.roomJid].setState(ChatRoom.STATE.JOINING);
+                        room._conv_ended = v.ended;
+
+                        room.setState(ChatRoom.STATE.JOINING);
                         megaChat.karere.joinChat(v.roomJid);
 
 
-                        megaChat.chats[v.roomJid].refreshUI();
+                        room.refreshUI();
+
+                        var participants = room.getParticipantsExceptMe();
+                        var c = megaChat.getContactFromJid(participants[0]);
+                        if(c) {
+                            M.u[c.h].lastChatActivity = room.lastActivity;
+                        }
                     }
                 })
             }

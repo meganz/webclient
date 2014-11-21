@@ -4,12 +4,13 @@
  * @param megaChat {Chat}
  * @param roomJid
  * @param type {String} only "private" is supported for now
- * @param ctime {Integer} unix time
  * @param users {Array}
+ * @param ctime {Integer} unix time
+ * @param [lastActivity] {Integer} unix time
  * @returns {ChatRoom}
  * @constructor
  */
-var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
+var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     this.logger = MegaLogger.getLogger("room[" + roomJid + "]", {}, megaChat.logger);
 
     this.megaChat = megaChat;
@@ -20,6 +21,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
     this.messages = [];
     this.messagesIndex = {};
     this.ctime = ctime;
+    this.lastActivity = lastActivity ? lastActivity : ctime;
 
     this.callRequest = null;
     this.callIsActive = false;
@@ -64,8 +66,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
     };
     this._syncRequests = {};
     this._messagesQueue = [];
-
-    this.lastActivity = [];
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
@@ -406,6 +406,13 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime) {
                 function() {
                     eventData.answer(true, {});
                 });
+
+            self.trigger('onIncomingDirectFileTransfer', [
+                self,
+                self.megaChat.getContactNameFromJid(eventData.peer),
+                eventData.files,
+                $message
+            ]);
 
             self.appendDomMessage($message);
         } else {
@@ -825,6 +832,10 @@ ChatRoom.prototype._startCall = function() {
     var participants = self.getParticipantsExceptMe();
     assert(participants.length > 0, "No participants.");
 
+    if(self._conv_ended === true) {
+        self._restartConversation();
+    }
+
     if(self.callRequest) {
         self._cancelCallRequest();
     }
@@ -867,7 +878,7 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
 
     if(e.type == "call-init" || e.type == "call-answered") {
         // current-calling indicator
-        if(self.megaChat.activeCallRoom && self.megaChat.activeCallRoom != self) {
+        if(self.megaChat.activeCallRoom && self.megaChat.activeCallRoom.roomJid != self.roomJid) {
             self.megaChat.activeCallRoom._cancelCallRequest();
         }
 
@@ -1094,6 +1105,9 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     var callWasActive = self.callIsActive;
 
     self.callIsActive = false;
+    if(self.megaChat.activeCallRoom && self.megaChat.activeCallRoom.roomJid == self.roomJid) {
+        self.megaChat.activeCallRoom = false;
+    }
 
     $('.drag-handle', self.$header).hide();
 
@@ -1604,6 +1618,7 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
     }
 
     var $jsp = self.$messages.data("jsp");
+    if(!$jsp) { debugger; }
     assert($jsp, "JSP not available?!");
 
     $jsp.reinitialise();
@@ -1840,6 +1855,7 @@ ChatRoom.prototype.show = function() {
 
     self.trigger('activity');
     self.trigger('onChatShown');
+    $('.message-textarea').focus();
 };
 
 /**
@@ -2100,7 +2116,9 @@ ChatRoom.prototype.appendDomMessage = function($message, messageObject) {
         messageObject.setSeen(true);
     }
 
-    self.trigger('activity');
+    if($message.is('.unread')) {
+        self.trigger('activity');
+    }
 
     self.megaChat.renderContactTree();
 
@@ -2586,23 +2604,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     meta = meta || {};
 
     if(self._conv_ended === true) {
-        self._conv_ended = false;
-        self.getParticipantsExceptMe().forEach(function(v) {
-
-            self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
-                'ctime': self.ctime,
-                'invitationType': 'resume',
-                'participants': self.users,
-                'users': self.megaChat.karere.getUsersInChat(self.roomJid)
-            });
-        });
-
-        if(self.megaChat.plugins.encryptionFilter) {
-            self.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(self);
-        }
-
-
-        self.megaChat.sendBroadcastAction("conv-start", {roomJid: self.roomJid, type: self.type, participants: self.getParticipants()});
+        self._restartConversation();
     }
     var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
     var eventObject = new KarereEventObjects.OutgoingMessage(
@@ -2983,6 +2985,27 @@ ChatRoom.prototype._waitingForOtherParticipants = function() {
         }
     });
     return !otherUsersInRoom;
+};
+
+ChatRoom.prototype._restartConversation = function() {
+    var self = this;
+
+    self._conv_ended = false;
+    self.getParticipantsExceptMe().forEach(function(v) {
+
+        self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
+            'ctime': self.ctime,
+            'invitationType': 'resume',
+            'participants': self.users,
+            'users': self.megaChat.karere.getUsersInChat(self.roomJid)
+        });
+    });
+
+    if(self.megaChat.plugins.encryptionFilter) {
+        self.megaChat.plugins.encryptionFilter._reinitialiseEncryptionOpQueue(self);
+    }
+
+    self.megaChat.sendBroadcastAction("conv-start", {roomJid: self.roomJid, type: self.type, participants: self.getParticipants()});
 };
 
 ChatRoom.prototype._conversationEnded = function(userFullJid) {

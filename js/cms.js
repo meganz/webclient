@@ -137,7 +137,22 @@ function loaded(id)
 	CMS.attachEvents();
 }
 
+var curType;
+var curCallback;
+
 var CMS = {
+	watch: function(type, callback)
+	{
+		curType = type;
+		curCallback = callback;
+	},
+
+	reRender: function(type, nodeId)
+	{
+		if (type == curType) {
+			curCallback(nodeId);
+		}
+	},
 
 	attachEvents: function() {
 		$('*[data-cms-dl],.cms-asset-download').rebind('click', function(e) {

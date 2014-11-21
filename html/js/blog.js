@@ -40,6 +40,10 @@ function init_blog()
 	else 
 	{
 		loadingDialog.show();
+		CMS.watch('blog', function(nodeId) {
+			alert(nodeId);
+		});
+
 		CMS.get('blog', function(err, data) {
 			if (err) return alert("Error fetching the blog data");
 

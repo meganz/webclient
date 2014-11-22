@@ -19,9 +19,8 @@ function verify_cms_content(content, signature)
 	}
 }
 
-function process_cms_response(socket, next, as, id)
+function process_cms_response(bytes, next, as, id)
 {
-	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
 
 	var signature = bytes.slice(3, 67); // 64 bytes, signature
@@ -97,6 +96,25 @@ function img_placeholder(str, sep, rid, id) {
 	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
 }
 
+function cmsObjectToId(name)
+{
+	var q = getxhr();
+	q.onload = function() {
+		assets[name] = ab_to_str(q.response).split(".")
+		q = null;
+		doRequest(name);
+	}
+	q.onerror = function() {
+		Later(function() {
+			cmsObjectToId(name);
+		})
+		q = null;
+	};
+	q.responseType = 'arraybuffer';
+	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + name);
+	q.send();
+}
+
 /**
  *	Internal function to communicate with the BLOB server.
  *	
@@ -106,23 +124,14 @@ function img_placeholder(str, sep, rid, id) {
  */
 var fetching = {};
 function doRequest(id) {
-	var q = getxhr();
-	q.onload = function() {
-		for (var i in fetching[id]) {
-			process_cms_response(q, fetching[id][i][0], fetching[id][i][0], id);
-		}
-		delete fetching[id]
-		q = null;
+	if (!assets[id]) {
+		return cmsObjectToId(id)
 	}
-	q.onerror = function() {
-		Later(function() {
-			doRequest(id);
-		})
-		q = null;
-	};
-	q.responseType = 'arraybuffer';
-	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + id);
-	q.send();
+	_cms_request(assets[id], function(blob) {
+		for (var i in fetching[id]) {
+			process_cms_response(blob, fetching[id][i][0], fetching[id][i][0], id);
+		}
+	});
 }
 
 var _listeners = {};
@@ -137,8 +146,49 @@ function loaded(id)
 	CMS.attachEvents();
 }
 
+function _concat_arraybuf(arr)
+{
+	var len = arr.reduce(function(prev, e) {
+		return prev+e.byteLength
+	}, 0);
+	var buffer = new Uint8Array(len)
+	var offset = 0
+	for (var i in arr) {
+		buffer.set(new Uint8Array(arr[i]), offset)
+		offset += arr[i].byteLength
+	}
+	return buffer.buffer
+}
+
+function _cms_request(ids, next)
+{
+	var args = []
+		, q  = []
+		, done = 0
+	for (var i in ids) {
+		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
+		q[i] = []
+	}
+
+	api_getfileattr(args, 1, function(ctx, id, bytes)
+	{
+		if (bytes.byteLength == 0) {
+			// end of fetching
+			q[id] = _concat_arraybuf(q[id])
+			if (++done == q.length) {
+				next(_concat_arraybuf(q))
+				q = undefined
+			}
+		} else {
+			q[id].push(bytes)
+		}
+	});
+}
+
 var curType;
 var curCallback;
+
+var aliases = {};
 
 var CMS = {
 	watch: function(type, callback)
@@ -149,6 +199,7 @@ var CMS = {
 
 	reRender: function(type, nodeId)
 	{
+		aliases[type] = nodeId;
 		if (type == curType) {
 			curCallback(nodeId);
 		}

@@ -1990,6 +1990,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 	var p = {};
 	var h = {};
 	var k = {};
+	var plain = {}
 
 	var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
 
@@ -2008,6 +2009,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 				if (!p[r[1]]) p[r[1]] = t;
 				else p[r[1]] += t;
+				plain[r[1]] = !!fa[n].plaintext
 			}
 		}
 		else if (errfa) errfa(n);
@@ -2015,7 +2017,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in p)
 	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW()};
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW(), plaintext: plain[n]};
 		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
 	}
 }
@@ -2049,7 +2051,11 @@ function fa_handler(xhr, ctx)
 				this.responseType = 'stream';
 				break;
 			default:
-				this.setParser('text');
+				if (this.plain_parser) {
+					this.setParser('arraybuffer', this.plain_parser)
+				} else {
+					this.setParser('text');
+				}
 		}
 
 		this.done = this.Finish;
@@ -2145,7 +2151,7 @@ fa_handler.prototype =
 	{
 		if (type)
 		{
-			if (type === 'text') this.parse = this.str_parser;
+			if (type === 'text' && !parser) this.parse = this.str_parser;
 			else this.parse = parser.bind(this);
 			this.responseType = type;
 		}
@@ -2159,6 +2165,17 @@ fa_handler.prototype =
 		{
 			this.xhr.responseType = this.responseType;
 			if (d) console.log('New fah type:', this.xhr.responseType);
+		}
+	},
+
+	plain_parser: function(data)
+	{
+		if (this.xhr.readyState > 2) 
+		{
+			if (!this.xpos)  this.xpos = 12;
+			var bytes = data.slice(this.xpos)
+			this.ctx.procfa(this.ctx, this.ctx.k[this.ctx.p], data.slice(this.xpos))
+			this.xpos += data.byteLength
 		}
 	},
 
@@ -2547,7 +2564,7 @@ function api_fareq(res,ctx,xhr)
 				faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
 				if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType)
 				{
-					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType);
+					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType)
 					faxhrs[slot].fah.setParser('text');
 				}
 				if ("text" === faxhrs[slot].responseType)

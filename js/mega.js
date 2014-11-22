@@ -3171,10 +3171,10 @@ function execsc(ap)
 		}
         else if(a.a == 'e') 
 		{
-			if (a.c.substr(0, 4) == "cms.")
+			if (a.c.substr(0, 5) == ".cms.")
 			{
-				var cmsType = a.c.split(".")[1]
-				var cmsId = a.c.substr(5 + cmsType.length)
+				var cmsType = a.c.split(".")[2]
+				var cmsId = a.c.substr(7 + cmsType.length)
 				CMS.reRender(cmsType, cmsId);
 			}
 		}

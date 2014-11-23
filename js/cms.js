@@ -73,7 +73,8 @@ function process_cms_response(bytes, next, as, id)
 	}
 }
 
-var assets = {};
+var assets = null;
+var booting = false;
 
 var is_img
 
@@ -100,9 +101,13 @@ function cmsObjectToId(name)
 {
 	var q = getxhr();
 	q.onload = function() {
-		assets[name] = ab_to_str(q.response).split(".")
+		if (name == '_all') {
+			assets = JSON.parse(ab_to_str(q.response));
+		} else {
+			assets[name] = ab_to_str(q.response).split(".")
+		}
 		q = null;
-		doRequest(name);
+		if (name != '_all') doRequest(name);
 	}
 	q.onerror = function() {
 		Later(function() {
@@ -124,6 +129,15 @@ function cmsObjectToId(name)
  */
 var fetching = {};
 function doRequest(id) {
+	if (assets === null) {
+		if (!booting) {
+			booting = true;
+			cmsObjectToId('_all');
+		}
+		return Later(function() {
+			doRequest(id);
+		});
+	}
 	if (!assets[id]) {
 		return cmsObjectToId(id)
 	}

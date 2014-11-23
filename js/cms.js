@@ -73,7 +73,7 @@ function process_cms_response(bytes, next, as, id)
 	}
 }
 
-var assets = null;
+var assets = {}, cmsToId = null
 var booting = false;
 
 var is_img
@@ -102,9 +102,9 @@ function cmsObjectToId(name)
 	var q = getxhr();
 	q.onload = function() {
 		if (name == '_all') {
-			assets = JSON.parse(ab_to_str(q.response));
+			cmsToId = JSON.parse(ab_to_str(q.response));
 		} else {
-			assets[name] = ab_to_str(q.response).split(".")
+			cmsToId[name] = ab_to_str(q.response).split(".")
 		}
 		q = null;
 		if (name != '_all') doRequest(name);
@@ -129,7 +129,7 @@ function cmsObjectToId(name)
  */
 var fetching = {};
 function doRequest(id) {
-	if (assets === null) {
+	if (cmsToId === null) {
 		if (!booting) {
 			booting = true;
 			cmsObjectToId('_all');
@@ -138,10 +138,10 @@ function doRequest(id) {
 			doRequest(id);
 		});
 	}
-	if (!assets[id]) {
+	if (!cmsToId[id]) {
 		return cmsObjectToId(id)
 	}
-	_cms_request(assets[id], function(blob) {
+	_cms_request(cmsToId[id], function(blob) {
 		for (var i in fetching[id]) {
 			process_cms_response(blob, fetching[id][i][0], fetching[id][i][0], id);
 		}
@@ -176,25 +176,24 @@ function _concat_arraybuf(arr)
 
 function _cms_request(ids, next)
 {
+	if (d) console.error("CMS: request", ids)
 	var args = []
 		, q  = []
 		, done = 0
 	for (var i in ids) {
 		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
-		q[i] = []
+		q[i] = null
 	}
 
 	api_getfileattr(args, 1, function(ctx, id, bytes)
 	{
-		if (bytes.byteLength == 0) {
-			// end of fetching
-			q[id] = _concat_arraybuf(q[id])
-			if (++done == q.length) {
-				next(_concat_arraybuf(q))
-				q = undefined
-			}
-		} else {
-			q[id].push(bytes)
+		if (d) console.error("Got response", id, bytes.byteLength, ctx)
+		
+		q[id] = bytes
+		if (++done == q.length) {
+			ERRDEBUG(done, q)
+			next(_concat_arraybuf(q))
+			q = undefined
 		}
 	});
 }

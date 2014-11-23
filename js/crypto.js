@@ -2170,12 +2170,14 @@ fa_handler.prototype =
 
 	plain_parser: function(data)
 	{
-		if (this.xhr.readyState > 2) 
+		if (this.xhr.readyState == 4) 
 		{
 			if (!this.xpos)  this.xpos = 12;
 			var bytes = data.slice(this.xpos)
-			this.ctx.procfa(this.ctx, this.ctx.k[this.ctx.p], data.slice(this.xpos))
-			this.xpos += data.byteLength
+			if (bytes.byteLength > 0) {
+				this.ctx.procfa(this.ctx, this.ctx.k[this.ctx.p], bytes);
+				this.xpos += bytes.byteLength
+			}
 		}
 	},
 

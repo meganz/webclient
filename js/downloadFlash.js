@@ -54,7 +54,7 @@ function FlashIO(dl_id, dl) {
 		// dl_chunksizes = sizes;
 		if (size > 950*0x100000) {
 			dlFatalError(dl, Error('File too big to be reliably handled with Flash.'));
-			ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
+			if (!this.is_zip) ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
 		} else {
 			IO.begin();
 		}

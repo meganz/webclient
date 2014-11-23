@@ -183,7 +183,7 @@ MegaQueue.prototype.getNextTask = function() {
 	return null;
 };
 
-MegaQueue.prototype.process = function() {
+MegaQueue.prototype.process = function(sp) {
 	var args;
 	if (this._paused) return;
 	if (this._later) {
@@ -192,7 +192,7 @@ MegaQueue.prototype.process = function() {
 	}
 	while (this._running < this._limit && this._queue.length > 0) {
 		args = this.getNextTask();
-		if (args === null) {
+		if (!args) {
 			if ( ++this._noTaskCount == 666 )
 			{
 				/**
@@ -205,10 +205,10 @@ MegaQueue.prototype.process = function() {
 				{
 					if (d) console.error('*** CHECK THIS ***', this);
 					if (this.stuck) this.stuck();
-					srvlog('MegaQueue.getNextTask gave no tasks for too long... ('+this.qname+')');
+					srvlog('MegaQueue.getNextTask gave no tasks for too long... ('+this.qname+')', sp);
 				}
 			}
-			this._process(1600);
+			this._process(1600, sp);
 			return false;
 		}
 		this._noTaskCount = 0;
@@ -238,9 +238,10 @@ MegaQueue.prototype.destroy = function() {
 	oDestroy(this);
 }
 
-MegaQueue.prototype._process = function(ms) {
+MegaQueue.prototype._process = function(ms, sp) {
 	if (this._later) clearTimeout(this._later);
-	this._later = setTimeout(this.process.bind(this), ms || 300);
+	if (!sp) sp = new Error(this.qname + ' stack pointer');
+	this._later = setTimeout(this.process.bind(this, sp), ms || 300);
 };
 
 MegaQueue.prototype.push = function(arg, next, self) {

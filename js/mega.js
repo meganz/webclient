@@ -1461,7 +1461,7 @@ function MegaData ()
 
 						for(var k in p)
 						{
-							if (p[k],M.d[p[k]].t) path = fm_safename(M.d[p[k]].name) + '/' + path;
+							if (M.d[p[k]] && M.d[p[k]].t) path = fm_safename(M.d[p[k]].name) + '/' + path;
 							if (p[k] == n[i]) break;
 						}
 
@@ -1492,9 +1492,12 @@ function MegaData ()
 		if (!$.totalDL) $.totalDL=0;
 		for (var i in nodes)
 		{
-			n = M.d[nodes[i]];
-			if (paths[nodes[i]]) path = paths[nodes[i]];
-			else path ='';
+			if (!(n = M.d[nodes[i]]))
+			{
+				if (d) console.error('** CHECK THIS **', 'Invalid node', nodes[i]);
+				continue;
+			}
+			path = paths[nodes[i]] || '';
 			$.totalDL+=n.s;
 			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
 			if (li.length == 0)
@@ -2136,7 +2139,7 @@ function execsc(ap)
 					// I deleted my share
 					M.delnodeShare(a.n,a.u);
 				}
-				else if (typeof M.d[a.n].shares != 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
+				else if (M.d[a.n] && typeof M.d[a.n].shares !== 'undefined' && M.d[a.n].shares[a.u] || a.ha == crypto_handleauth(a.n))
 				{
 					// I updated or created my share
 					u_sharekeys[a.n] = decrypt_key(u_k_aes,base64_to_a32(a.ok));
@@ -2403,7 +2406,7 @@ function ddtype(ids,toid)
 
 		if (folderlink) return false;
 
-		if (fromid == toid) return false;
+		if (fromid == toid || !M.d[fromid]) return false;
 
 		// never allow move to own inbox, or to own contacts
 		if (toid == M.InboxID || toid == 'contacts') return false;
@@ -2491,7 +2494,7 @@ function fm_getcopynodes(cn, t)
 		var n = M.d[r[i]];
 		if (n)
 		{
-			var ar = clone(n.ar);
+			var ar = n.ar && clone(n.ar) || {};
 			if (typeof ar.fav !== 'undefined') delete ar.fav;
 			var mkat = enc_attr(ar,n.key);
 			var attr = ab_to_base64(mkat[0]);

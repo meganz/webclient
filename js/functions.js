@@ -621,8 +621,9 @@ function ASSERT(what, msg, udata) {
 
 function srvlog(msg,data)
 {
+	if (data && !(data instanceof Error)) data = { udata : data };
 	if (d) console.error(msg);
-	else window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+	else window.onerror(msg, '', data ? 1:-1, 0, data || null);
 }
 
 function oDestroy(obj) {
@@ -784,7 +785,12 @@ function CreateWorkers(url, message, size) {
 	function create(i) {
 		var w;
 
-		w  = new Worker(url);
+		try {
+			w  = new Worker(url);
+		} catch(e) {
+			msgDialog('warninga', '' + url, '' + e, location.hostname);
+			throw e;
+		}
 
 		w.id   = i;
 		w.busy = false;

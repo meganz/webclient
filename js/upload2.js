@@ -377,6 +377,7 @@ function ul_upload(File) {
 }
 
 function ul_start(File) {
+	if (!File.file) return false;
 	if (File.file.posturl) return ul_upload(File);
 	var maxpf = 128*1048576
 		, next = ul_get_posturl(File)
@@ -709,6 +710,10 @@ FileUpload.prototype.run = function(done) {
 		if (file.hash && file.ts) throw "The fingerprint exists already.";
 
 		fingerprint(file, function(hash, ts) {
+			if (!(file && self.file)) {
+				if (d) console.log('fingerprint', hash, 'UPLOAD CANCELED');
+				return;
+			}
 			file.hash = hash;
 			file.ts   = ts;
 			var identical = ul_Identical(file.target, file.path || file.name, file.hash, file.size);

@@ -410,8 +410,12 @@
 				}
 				else if (err)
 				{
-					dl_fw.onerror=dl_fw.onwriteend=function(){};
-					dl_fw.truncate(0);
+					try {
+						dl_fw.onerror=dl_fw.onwriteend=function(){};
+						dl_fw.truncate(0);
+					} catch(e) {
+						if (d) console.error(e);
+					}
 				}
 			}
 		};

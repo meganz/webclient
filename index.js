@@ -47,6 +47,10 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
+	if (localStorage.sid) {
+		maxaction = localStorage[u_handle + '_maxaction']
+		getsc(1); // start pulling *for* CMS and other public events
+	}
 }
 
 function mainScroll()

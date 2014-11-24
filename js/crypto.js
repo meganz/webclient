@@ -987,7 +987,15 @@ function api_proc(q)
 
 			if (typeof t == 'object')
 			{
-				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
+				try {
+					for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
+				} catch (e) {
+					// if there is *any* issue on the callback
+					// we don't want to HALT, instead we let the channel 
+					// a chance to clean itself and continue
+					// Otherwise if we load #blog *or* #page_<something> 
+					// the whole site is buggy
+				}
 
 				this.q.rawreq = false;
 				this.q.backoff = 0;			// request succeeded - reset backoff timer

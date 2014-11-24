@@ -6,8 +6,6 @@ if (!m) megalogo = '<img alt="Mega" src="' + staticpath + 'images/mega/blogs/job
 var blogposts = null;
 
 
-
-
 var bloglimit = 5;
 var blogpage = 1;
 

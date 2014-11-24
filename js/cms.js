@@ -100,6 +100,7 @@ function img_placeholder(str, sep, rid, id) {
 function cmsObjectToId(name)
 {
 	var q = getxhr();
+	if (d) console.error("CMS: loading " + name)
 	q.onload = function() {
 		if (name == '_all') {
 			cmsToId = JSON.parse(ab_to_str(q.response));
@@ -129,6 +130,7 @@ function cmsObjectToId(name)
  */
 var fetching = {};
 function doRequest(id) {
+	if (d) console.error("CMS fetch element", id)
 	if (cmsToId === null) {
 		if (!booting) {
 			booting = true;
@@ -191,7 +193,6 @@ function _cms_request(ids, next)
 		
 		q[id] = bytes
 		if (++done == q.length) {
-			ERRDEBUG(done, q)
 			next(_concat_arraybuf(q))
 			q = undefined
 		}

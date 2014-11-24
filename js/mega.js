@@ -3174,7 +3174,7 @@ function execsc(ap)
 			if (a.c.substr(0, 5) == ".cms.")
 			{
 				var cmsType = a.c.split(".")[2]
-				var cmsId = a.c.substr(7 + cmsType.length)
+				var cmsId = a.c.substr(6 + cmsType.length).split(".")
 				CMS.reRender(cmsType, cmsId);
 			}
 		}

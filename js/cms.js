@@ -147,6 +147,7 @@ function doRequest(id) {
 		for (var i in fetching[id]) {
 			process_cms_response(blob, fetching[id][i][0], fetching[id][i][0], id);
 		}
+		delete fetching[id];
 	});
 }
 
@@ -202,8 +203,6 @@ function _cms_request(ids, next)
 var curType;
 var curCallback;
 
-var aliases = {};
-
 var CMS = {
 	watch: function(type, callback)
 	{
@@ -213,7 +212,7 @@ var CMS = {
 
 	reRender: function(type, nodeId)
 	{
-		aliases[type] = nodeId;
+		cmsToId[type] = nodeId;
 		if (type == curType) {
 			curCallback(nodeId);
 		}

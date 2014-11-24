@@ -39,7 +39,9 @@ function init_blog()
 	{
 		loadingDialog.show();
 		CMS.watch('blog', function(nodeId) {
-			alert(nodeId);
+			blogposts = null
+			if (d) console.error("CMS Blog", "update")
+			init_blog();
 		});
 
 		CMS.get('blog', function(err, data) {

@@ -51,7 +51,7 @@ function importGoogleContacts(where) {
  * @returns {undefined}
  */
 function getContactList(where) {
-	var ACAO = 'http://aloncar.entrydns.org/';
+	var ACAO = 'http://beta.developers.mega.co.nz/newdesign/';
     var data = {
         access_token: accessToken,
         v: '3.0'

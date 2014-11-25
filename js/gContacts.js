@@ -4,8 +4,8 @@ function importGoogleContacts(where) {
     var m8_uri = 'https://www.google.com/m8/feeds/';
 
 // *** GOOGLE *** /
-    var client_id = '84490490123-gm1t8dol8hisj6j0u1trk1b2ij2a9q9j.apps.googleusercontent.com';
-    var redirect_uri = 'http://aloncar.entrydns.org/';// e.g. http://5d0ec37.ngrok.com';
+    var client_id = '84490490123-si7f8qcg952ul35rokm0c0ao9b5oie76.apps.googleusercontent.com';
+    var redirect_uri = 'https://beta.developers.mega.co.nz/newdesign/';
 
     var POPUP_WIDTH = 800;
     var POPUP_HEIGHT = 600;
@@ -51,7 +51,7 @@ function importGoogleContacts(where) {
  * @returns {undefined}
  */
 function getContactList(where) {
-	var ACAO = 'http://aloncar.entrydns.org/';
+	var ACAO = 'https://beta.developers.mega.co.nz/newdesign/';
     var data = {
         access_token: accessToken,
         v: '3.0'

@@ -128,7 +128,12 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     if(self.state == ChatRoom.STATE.PLUGINS_WAIT || self.state == ChatRoom.STATE.PLUGINS_PAUSED) {
                         self.logger.error("Plugins had timed out, setting state to PLUGINS_READY");
 
-                        if(self.encryptionHandler && self.encryptionHandler.state !== 3) {
+                        var participants = self.getParticipantsExceptMe();
+                        var contact = participants[0];
+
+                        var pres = self.megaChat.karere.getPresence(contact);
+
+                        if(pres && pres != "offline" && sself.encryptionHandler && self.encryptionHandler.state !== 3) {
                             self.appendDomMessage(
                                 self.generateInlineDialog(
                                     "error-" + unixtime(),
@@ -1571,8 +1576,10 @@ ChatRoom.prototype.iAmRoomOwner = function() {
     return users[0] === self.megaChat.karere.getJid();
 };
 /**
+ * Get a list of the current participants for this room, excluding my jid (or if provided, exlucding any of the jids
+ * founds in arr `jids`).
  *
- * @param jids
+ * @param [jids] {Array}
  * @returns {Array}
  */
 ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
@@ -1957,12 +1964,11 @@ ChatRoom.prototype.appendMessage = function(message) {
     );
 
     var name = self.megaChat.getContactNameFromJid(jid);
+    var contact = self.megaChat.getContactFromJid(jid);
 
     $('.nw-contact-avatar', $message).replaceWith(self._generateContactAvatarElement(jid));
 
     $('.chat-username', $message).text(name);
-
-    var contact = self.megaChat.getContactFromJid(jid);
 
     // add .current-name if this is my own message
     if(jid != self.megaChat.karere.getBareJid()) {
@@ -1974,6 +1980,7 @@ ChatRoom.prototype.appendMessage = function(message) {
     $message.attr('data-timestamp', timestamp);
     $message.attr('data-id', message.getMessageId());
     $message.attr('data-from', jid.split("@")[0]);
+    $message.addClass(contact.u);
 
 
     if(!message.messageHtml) {

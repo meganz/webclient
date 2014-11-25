@@ -1377,24 +1377,28 @@ function addContactUI()
 	});
 
 	$('.add-user-popup-button').off('click');
-	$('.add-user-popup-button').on('click', function()
-	{
+	$('.add-user-popup-button').on('click', function() {
 		var $this = $(this);
 		if ($this.is('.add') && !$this.is('.disabled'))// Add
 		{
-			if (u_type === 0) ephemeralDialog(l[997]);
-			else
-			{
+			if (u_type === 0) {
+				ephemeralDialog(l[997]);
+			} else {
 				var $mails = $('.token-input-list-mega .token-input-token-mega');
-				if ($mails.length)
-				{
-					$mails.each(function(index, value)
-					{
+				if ($mails.length) {
+					$mails.each(function(index, value) {
 						M.addContact($(value).contents().eq(1).text());
 					});
 				}
 			}
 		}
+//        else if ($this.is('.cancel')) {
+//            // Get emails from multi-input
+//            var inputMails = [];// This's a list of emails available in multi-input
+//            for (var i in M.d) {
+//                $('.add-contact-multiple-input').tokenInput("remove_contact", {id: inputMails[i]});
+//            }
+//        }
 
 		$('.add-user-popup .import-contacts-dialog').fadeOut(0);
 		$('.import-contacts-link').removeClass('active');
@@ -1415,39 +1419,29 @@ function addContactUI()
 	});
 
 	$('.add-user-popup .import-contacts-service').unbind('click');
-	$('.add-user-popup .import-contacts-service').bind('click', function()
-	{
-		// NOT imported
-		if (!$(this).is('.imported'))
-		{
-			importGoogleContacts('contacts');
-		}
-		else
-		{
+	$('.add-user-popup .import-contacts-service').bind('click', function() {
+		if (!importGoogleContacts('contacts')) {
 			var n = $('.imported-contacts-notification');
 			n.css('margin-left', '-' + n.outerWidth()/2 +'px');
 			n.fadeIn(200);
-			$('.share-dialog .import-contacts-dialog').fadeOut(200);
-
-		}
+			$('.add-user-popup .import-contacts-dialog').fadeOut(200);
+		} else {
+			$('.import-contacts-service').addClass('imported');
+        }
+        closeImportContactNotification('.add-user-popup ');
 	});
 
 	$('.add-user-popup .import-contacts-link').unbind('click');
-	$('.add-user-popup .import-contacts-link').bind('click', function(e)
-	{
-		if(!$(this).is('.active'))
-		{
-			$('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
+	$('.add-user-popup .import-contacts-link').bind('click', function(e) {
+		if(!$(this).is('.active')) {
+			$('.add-user-popup .import-contacts-link').addClass('active');
 			$('.add-user-popup .import-contacts-dialog').fadeIn(200);
 
 			$('.imported-notification-close').unbind('click');
-			$('.imported-notification-close').bind('click', function()
-			{
+			$('.imported-notification-close').bind('click', function() {
 				$('.imported-contacts-notification').fadeOut(200);
 			});
-		}
-		else
-		{
+		} else {
 			$('.add-user-popup .import-contacts-link').removeClass('active');
 			$('.add-user-popup .import-contacts-dialog').fadeOut(200);
 			$('.imported-contacts-notification').fadeOut(200);
@@ -1458,14 +1452,12 @@ function addContactUI()
 	});
 
 	$('.add-user-popup .import-contacts-info').unbind('mouseover');
-	$('.add-user-popup .import-contacts-info').bind('mouseover', function()
-	{
+	$('.add-user-popup .import-contacts-info').bind('mouseover', function() {
 		$('.add-user-popup .import-contacts-info-txt').fadeIn(200);
 	});
 
 	$('.add-user-popup .import-contacts-info').unbind('mouseout');
-	$('.add-user-popup .import-contacts-info').bind('mouseout', function()
-	{
+	$('.add-user-popup .import-contacts-info').bind('mouseout', function() {
 		$('.add-user-popup .import-contacts-info-txt').fadeOut(200);
 	});
 }
@@ -5858,20 +5850,16 @@ function initShareDialog()
 	});
 
 	$('.share-dialog .import-contacts-service').unbind('click');
-	$('.share-dialog .import-contacts-service').bind('click', function()
-	{
-		// NOT imported
-		if (!$(this).is('.imported'))
-		{
-			importGoogleContacts('shared');
-		}
-		else
-		{
+	$('.share-dialog .import-contacts-service').bind('click', function() {
+        if (!importGoogleContacts('shared')) {
 			var n = $('.imported-contacts-notification');
 			n.css('margin-left', '-' + n.outerWidth()/2 +'px');
 			n.fadeIn(200);
 			$('.share-dialog .import-contacts-dialog').fadeOut(200);
-		}
+        } else {
+            $('.import-contacts-service').addClass('imported');
+        }
+        closeImportContactNotification('.share-dialog');
 	});
 
 	$('.share-dialog .import-contacts-link').unbind('click');

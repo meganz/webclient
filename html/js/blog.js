@@ -6,8 +6,6 @@ if (!m) megalogo = '<img alt="Mega" src="' + staticpath + 'images/mega/blogs/job
 var blogposts = null;
 
 
-
-
 var bloglimit = 5;
 var blogpage = 1;
 
@@ -40,6 +38,12 @@ function init_blog()
 	else 
 	{
 		loadingDialog.show();
+		CMS.watch('blog', function(nodeId) {
+			blogposts = null
+			if (d) console.error("CMS Blog", "update")
+			init_blog();
+		});
+
 		CMS.get('blog', function(err, data) {
 			if (err) return alert("Error fetching the blog data");
 

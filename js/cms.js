@@ -2,17 +2,15 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
 
-var pubkey = asmCrypto.base64_to_bytes('WyJkNGQyYTA3Zjk0YzY0ZTBhMDYwMmI5NGE4ZWIyYjRlZDE5ZjczMzg2YmM4ODYzYTc1YzgyYWMxNDNkODRlMzc3MzhkODFmMDQ4YmM1YjgzNmFiOGUxYzg1Zjg5Y2U1MGNjOTBiMmNlNWZhZTc1Y2YzYTQ5MWIyZmZlOTM5MjNlZCIsIjAxMDAwMSJd');
-pubkey = JSON.parse(asmCrypto.bytes_to_string(pubkey));
-pubkey[0] = asmCrypto.hex_to_bytes(pubkey[0])
-pubkey[1] = asmCrypto.hex_to_bytes(pubkey[1])
+var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
 function verify_cms_content(content, signature)
 {
-	var hash = asmCrypto.SHA256.hex(content);
+	var hash = asmCrypto.SHA256.hex(content)
+	signature = ab_to_str(signature)
 
 	try {
-		return asmCrypto.RSA_PSS_SHA256.verify(signature, hash, pubkey);
+		return jodid25519.eddsa.verify(signature, hash, pubkey);
 	} catch (e) {
 		/* rubbish data, invalid anyways */
 		return false;

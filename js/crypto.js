@@ -2051,28 +2051,31 @@ function fa_handler(xhr, ctx)
 	{
 		if (!fa_handler.browser) fa_handler.browser = browserdetails(ua).browser;
 
-		switch(fa_handler.browser)
-		{
-			case 'Firefox':
-				this.parse = this.moz_parser;
-				this.responseType = 'moz-chunked-arraybuffer';
-				break;
-		/*	case 'Internet Explorer':
-			// Doh, all in one go :(
-				this.parse = this.stream_parser;
-				this.responseType = 'ms-stream';
-				this.stream_reader= this.msstream_reader;
-				break;
-		*/	case 'xChrome':
-				this.parse = this.stream_parser;
-				this.responseType = 'stream';
-				break;
-			default:
-				if (this.plain_parser) {
-					this.setParser('arraybuffer', this.plain_parser)
-				} else {
+		if (ctx.plaintext) {
+			this.setParser('arraybuffer', this.plain_parser)
+		}
+		else
+		{	
+			switch(fa_handler.browser)
+			{	
+				case 'Firefox':
+					this.parse = this.moz_parser;
+					this.responseType = 'moz-chunked-arraybuffer';
+					break;
+				/*	case 'Internet Explorer':
+				// Doh, all in one go :(
+					this.parse = this.stream_parser;
+					this.responseType = 'ms-stream';
+					this.stream_reader= this.msstream_reader;
+					break;
+				*/	
+				case 'xChrome':
+						this.parse = this.stream_parser;
+						this.responseType = 'stream';
+						break;
+				default:
 					this.setParser('text');
-				}
+			}
 		}
 
 		this.done = this.Finish;

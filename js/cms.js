@@ -114,8 +114,8 @@ function cmsObjectToId(name)
 		})
 		q = null;
 	};
-	q.responseType = 'arraybuffer';
 	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + name);
+	q.responseType = 'arraybuffer';
 	q.send();
 }
 
@@ -210,6 +210,7 @@ var CMS = {
 
 	reRender: function(type, nodeId)
 	{
+		ERRDEBUG(type, nodeId)
 		// If cmsToId is NULL it means we didn't open
 		// *any* CMS content so we should ignore this
 		// update, we will get the newest version always

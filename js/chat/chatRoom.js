@@ -133,17 +133,21 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
                         var pres = self.megaChat.karere.getPresence(contact);
 
-                        if(pres && pres != "offline" && sself.encryptionHandler && self.encryptionHandler.state !== 3) {
+                        if(pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
+                            var $dialog = self.generateInlineDialog(
+                                "error-" + unixtime(),
+                                self.megaChat.karere.getBareJid(),
+                                "mpenc-setup-failed",
+                                "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
+                                [],
+                                undefined,
+                                false
+                            );
+
+                            self._mpencFailedDialog = $dialog;
+
                             self.appendDomMessage(
-                                self.generateInlineDialog(
-                                    "error-" + unixtime(),
-                                    self.megaChat.karere.getBareJid(),
-                                    "mpenc-setup-failed",
-                                    "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
-                                    [],
-                                    undefined,
-                                    false
-                                )
+                                $dialog
                             );
 
                             var othersJid = self.getParticipantsExceptMe()[0];
@@ -166,6 +170,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 });
         } else if(newState == ChatRoom.STATE.READY) {
             if(self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+                if(self._mpencFailedDialog) {
+                    self._mpencFailedDialog.remove();
+                    delete self._mpencFailedDialog;
+                }
                 self._flushMessagesQueue();
             }
         }
@@ -745,6 +753,22 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         });
 
     self.megaChat.trigger('onRoomCreated', [self]);
+
+
+
+    self.bind('onConversationStarted', function(e) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "conv-started",
+                self.megaChat.karere.getJid(),
+                "conv-started",
+                "You had joined the conversation.",
+                [],
+                {},
+                !self.isActive()
+            )
+        );
+    });
 
     return this;
 };
@@ -2997,7 +3021,17 @@ ChatRoom.prototype._waitingForOtherParticipants = function() {
 ChatRoom.prototype._restartConversation = function() {
     var self = this;
 
-    self._conv_ended = false;
+    if(self._conv_ended === true) {
+        self._conv_ended = self._leaving = false;
+
+        self.setState(
+            self._waitingForOtherParticipants() ? ChatRoom.STATE.WAITING_FOR_PARTICIPANTS : ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
+        );
+
+        self.trigger('onConversationStarted');
+    }
+
+
     self.getParticipantsExceptMe().forEach(function(v) {
 
         self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
@@ -3044,26 +3078,24 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
                 "user-left",
                 "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
                 [],
-                {
-                    'end-chat': {
-                        'type': 'primary',
-                        'text': "Close chat",
-                        'callback': function() {
-                            self.destroy(true);
-                        }
-                    }
-                }
+                {},
+                !self.isActive()
             )
         );
     }
 };
 
-ChatRoom.prototype._conversationStarted = function(userFullJid) {
+ChatRoom.prototype._conversationStarted = function(userBareJid) {
     var self = this;
 
-    if(Karere.getNormalizedBareJid(userFullJid) != self.megaChat.karere.getBareJid()) {
-        // the other user had joined, mark this conv as started again.
-        self._conv_ended = false;
+    if(self._conv_ended) {
+        if (Karere.getNormalizedBareJid(userBareJid) != self.megaChat.karere.getBareJid()) {
+            // the other user had joined, mark this conv as started again.
+            self._restartConversation();
+        }
+    } else {
+        // i'd joined
+        self.trigger('onConversationStarted');
     }
 
 

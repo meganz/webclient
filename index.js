@@ -47,7 +47,7 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
-	if (localStorage.sid) {
+	if (localStorage.sid && localStorage[u_handle + '_maxaction']) {
 		maxaction = localStorage[u_handle + '_maxaction']
 		getsc(); // start pulling *for* CMS and other public events
 	}

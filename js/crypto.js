@@ -1140,7 +1140,7 @@ function stopsc()
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-	api_req('sn=' + maxaction + '&ssl=1&e=Nc4AFJZK',{
+	api_req('sn=' + (maxaction||"") + '&ssl=1&e=Nc4AFJZK',{
 		fm : fm,
 		callback : function(res,ctx)
 		{

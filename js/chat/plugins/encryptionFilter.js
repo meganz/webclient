@@ -58,8 +58,6 @@ var EncryptionFilter = function(megaChat) {
             }
         );
 
-        megaRoom.encryptionIsInitialized = false;
-
         if(megaRoom.encryptionOpQueue) {
             megaRoom.encryptionOpQueue.destroy();
             delete megaRoom.encryptionOpQueue;

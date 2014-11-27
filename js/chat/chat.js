@@ -965,7 +965,7 @@ Chat.prototype.init = function() {
         return self._onUsersUpdate("left", e, eventData);
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
-        if(self.chats[eventObject.getRoomJid()] && self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.JOINING) {
+        if(self.chats[eventObject.getRoomJid()] && (self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.JOINING || self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
             if(self.chats[eventObject.getRoomJid()]._waitingForOtherParticipants() === false) {
                 self.chats[eventObject.getRoomJid()].setState(
                     ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
@@ -1599,7 +1599,9 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                         room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state == ChatRoom.STATE.JOINING
                     )
                 ) {
-                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
+                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                        room._conversationStarted(room.getParticipantsExceptMe()[0]);
+                    }
                 }
             }
         }
@@ -1632,7 +1634,13 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             var room = self.chats[eventObject.getRoomJid()];
             if(room) {
                 if(room._waitingForOtherParticipants() === false && room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    room._conversationStarted(eventObject.getFromJid());
+                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                        room._conversationStarted(eventObject.getFromJid());
+                    } else {
+                        if(room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
+                            room.setState(ChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
+                        }
+                    }
                 }
             }
         }

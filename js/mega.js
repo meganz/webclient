@@ -3169,6 +3169,16 @@ function execsc(ap)
                 }
             }
 		}
+        else if(a.a == 'e') 
+		{
+			var str = hex2bin(a.c)
+			if (str.substr(0, 5) == ".cms.")
+			{
+				var cmsType = str.split(".")[2]
+				var cmsId = str.substr(6 + cmsType.length).split(".")
+				CMS.reRender(cmsType, cmsId);
+			}
+		}
 		else if (a.a == 'fa')
 		{
 			M.nodeAttr({h:a.n,fa:a.fa});

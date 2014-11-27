@@ -47,6 +47,10 @@ function startMega()
 	}
 	jsl=[];
 	init_page();
+	if (localStorage.sid) {
+		maxaction = localStorage[u_handle + '_maxaction']
+		getsc(); // start pulling *for* CMS and other public events
+	}
 }
 
 function mainScroll()
@@ -241,13 +245,22 @@ function init_page()
 	{
 		var cpage = decodeURIComponent(page.substr(5,page.length-2));
 		 
-		loadingDialog.show();
-		CMS.get(cpage, function(err, content) {
-			parsepage(content.html);
-			topmenuUI();
-			loadingDialog.hide();
-			mainScroll();
-		});
+		function doRenderCMSPage()
+		{
+			loadingDialog.show();
+			CMS.watch(cpage, function() {
+				doRenderCMSPage();
+			});
+
+			CMS.get(cpage, function(err, content) {
+				parsepage(content.html);
+				topmenuUI();
+				loadingDialog.hide();
+				mainScroll();
+			});
+		}
+
+		doRenderCMSPage();
 		page = 'cpage';
 		return;
 	}

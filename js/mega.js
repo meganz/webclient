@@ -981,7 +981,7 @@ function MegaData ()
 
 	this.copyNodes = function(cn,t,del)
 	{
-		if (d) console.log('copyNodes', n, t);
+		if (d) console.log('copyNodes', cn, t, $.onImportCopyNodes);
 
 		if ($.onImportCopyNodes && t.length == 11)
 		{

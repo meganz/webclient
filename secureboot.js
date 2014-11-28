@@ -337,7 +337,7 @@ if (m)
 		}
 		else document.getElementById('m_iframe').src = 'mega://' + window.location.hash;
 	}
-	else if (window.location.hash.substr(1,7) == 'confirm')
+	else if (window.location.hash.substr(1,7) == 'confirm' || window.location.hash.substr(1,7) == 'account')
 	{
 		var i=0;
 		if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1) i=1;

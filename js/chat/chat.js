@@ -12,6 +12,7 @@ if(MegaChatDisabled) {
 
 var chatui;
 (function() {
+    var createChatDialog;
     chatui = function(id) {
 	
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
@@ -67,6 +68,40 @@ var chatui;
 
 
         $('.fm-chat-block').removeClass('hidden');
+
+        if(!createChatDialog) {
+            createChatDialog = new MegaDialog({
+                'className': 'create-chat-dialog',
+                'closable': true,
+                'focusable': true,
+                'expandable': true,
+                'title': 'Create New Chat',
+                'buttons': [
+                    {
+                        'label': 'Create',
+                        'className': 'fm-dialog-new-folder-button',
+                        'callback': function () {
+                            this.hide();
+                        }
+                    },
+                    {
+                        'label': 'Cancel',
+                        'className': 'create-folder-button-cancel',
+                        'callback': function () {
+                            this.hide();
+                        }
+                    }
+                ]
+            });
+        }
+
+        $('.fm-create-chat-button')
+            .show()
+            .rebind('click.megaChat', function(e) {
+                createChatDialog.toggle($(this));
+
+                return false;
+            });
 
         $(document.body).undelegate('.message-textarea', 'keyup.autoresize');
         $(document.body).delegate('.message-textarea', 'keyup.autoresize',function() {
@@ -1180,6 +1215,7 @@ Chat.prototype.init = function() {
         } else {
             lastOpenedRoom = null;
         }
+        $('.fm-create-chat-button').hide();
     });
 
     self.$container = $('.fm-chat-block');
@@ -2477,6 +2513,8 @@ Chat.prototype.renderListing = function() {
             }
         }
     }
+    $('.fm-create-chat-button').show();
+
     return false;
 
     //TODO: show something? some kind of list of conversations summary/overview screen or something?

@@ -21981,3 +21981,90 @@ background-color:#1DA2E9
 .megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
 	display: none;
 }
+
+
+/**
+ * MegaDialog.js
+ */
+
+.fm-mega-dialog {
+    position: absolute;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    width: 360px;
+    background-color: white;
+    margin: 46px 0 0 0;
+    z-index: 900;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    display: block;
+}
+.fm-mega-dialog.expanded {
+    z-index: 1200;
+}
+.fm-mega-dialog .fm-mega-dialog-pad {
+    margin: 12px 12px 12px 12px
+}
+
+
+.fm-mega-dialog-size-icon {
+    background-image: url(../images/mega/nw-fm-sprite.svg);
+    background-position: center -5509px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+    cursor: pointer;
+}
+.fm-mega-dialog-size-icon:hover {
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+}
+.fm-mega-dialog-size-icon.short-size {
+    background-position: center -5559px;
+    top: 16px;
+    right: 40px;
+}
+.fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
+    display: block;
+}
+
+.fm-mega-dialog-bottom {
+    height: 56px;
+    background-color: #F6F6F6;
+    margin: 12px -12px -12px -12px;
+    display: block;
+    -webkit-border-bottom-left-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-left-radius: 7px;
+    -webkit-border-bottom-right-radius: 7px;
+    -moz-border-radius-bottomright: 7px;
+    border-bottom-right-radius: 7px;
+    padding-right: 4px;
+}
+
+/**
+ * Start chat elements
+ */
+
+.fm-create-chat-button.active .add-user-popup-arrow {
+    margin-top: -4px;
+    z-index: 1210;
+}

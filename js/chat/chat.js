@@ -70,7 +70,7 @@ var chatui;
         $('.fm-chat-block').removeClass('hidden');
 
         if(!createChatDialog) {
-            createChatDialog = new MegaDialog({
+            createChatDialog = new mega.ui.Dialog({
                 'className': 'create-chat-dialog',
                 'closable': true,
                 'focusable': true,
@@ -717,7 +717,7 @@ var Chat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-    self.incomingCallDialog = new MegaIncomingCallDialog();
+    self.incomingCallDialog = new mega.ui.chat.IncomingCallDialog();
 
     //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
 
@@ -752,7 +752,7 @@ Chat.prototype.init = function() {
     });
 
     if(!self.filePicker) {
-        self.filePicker = new MegaFilePicker(self.options.filePickerOptions);
+        self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
         self.filePicker.bind('doneSelecting', function(e, selection) {
             if(selection.length == 0) {
                 return;

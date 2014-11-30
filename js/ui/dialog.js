@@ -1,4 +1,4 @@
-(function($) {
+(function($, scope) {
     var dialogIdx = 0;
 
     /**
@@ -8,7 +8,7 @@
      *  - maintaining state
      *  - collapse/expand
      *  - closable
-     *  - have support for events (hidden, shown, collapsed) on a global level (document) OR on a local (per MegaDialog
+     *  - have support for events (hidden, shown, collapsed) on a global level (document) OR on a local (per Dialog
      *  instance)
      *  - automatic positioning to screen/element
      *
@@ -16,7 +16,7 @@
      * @param opts {Object}
      * @constructor
      */
-    var MegaDialog = function(opts) {
+    var Dialog = function(opts) {
         var self = this;
 
         var defaultOptions = {
@@ -50,16 +50,16 @@
         self._renderButtons();
     };
 
-    makeObservable(MegaDialog);
+    makeObservable(Dialog);
 
-    MegaDialog.prototype._getEventSuffix = function() {
+    Dialog.prototype._getEventSuffix = function() {
         return this.options.className.replace(".", "");
     };
 
     /**
      * Binds once the events for toggling the file picker
      */
-    MegaDialog.prototype._initGenericEvents = function() {
+    Dialog.prototype._initGenericEvents = function() {
         var self = this;
 
         if(self.options.focusable) {
@@ -89,7 +89,7 @@
     /**
      * Render buttons passed to the options.buttons array
      */
-    MegaDialog.prototype._renderButtons = function() {
+    Dialog.prototype._renderButtons = function() {
         var self = this;
 
         if(self.options.buttons.length > 0) {
@@ -119,7 +119,7 @@
      * Reposition the element (exposed as pub method, so that when we need to change the content of the dialog on the fly
      * we can call .reposition)
      */
-    MegaDialog.prototype.reposition = function() {
+    Dialog.prototype.reposition = function() {
         var self = this;
 
         if(!self.visible) {
@@ -161,7 +161,7 @@
      * Show the picker (and if $toggleButton is passed, position it top/bottom)
      * @param [$toggleButton] {{jQuery|DomElement}} optional element to which to attach/render the dialog
      */
-    MegaDialog.prototype.show = function($toggleButton) {
+    Dialog.prototype.show = function($toggleButton) {
         var self = this;
 
         if(self.visible) {
@@ -193,7 +193,7 @@
     /**
      * Hide the picker
      */
-    MegaDialog.prototype.hide = function() {
+    Dialog.prototype.hide = function() {
         var self = this;
 
         if(!self.visible) {
@@ -223,7 +223,7 @@
     /**
      * Toggle (show/hide) the picker
      */
-    MegaDialog.prototype.toggle = function($toggleButton) {
+    Dialog.prototype.toggle = function($toggleButton) {
         var self = this;
         self.$toggleButton = $($toggleButton);
 
@@ -241,7 +241,7 @@
      *
      * @param [$toggleButton]
      */
-    MegaDialog.prototype.collapse = function($toggleButton) {
+    Dialog.prototype.collapse = function($toggleButton) {
         var self = this;
         self.expanded = false;
         $(self.options.expandableButtonClass)
@@ -270,7 +270,7 @@
     /**
      * Expand the dialog to "full screen" mode
      */
-    MegaDialog.prototype.expand = function() {
+    Dialog.prototype.expand = function() {
         var self = this;
         self.expanded = true;
 
@@ -299,7 +299,7 @@
     /**
      * Toggle (show/hide) the picker
      */
-    MegaDialog.prototype.toggleExpandCollapse = function() {
+    Dialog.prototype.toggleExpandCollapse = function() {
         var self = this;
         if(self.expanded) {
             self.collapse();
@@ -309,5 +309,7 @@
     };
 
     // export
-    window.MegaDialog = MegaDialog;
-})(jQuery);
+    scope.mega = scope.mega || {};
+    scope.mega.ui = scope.mega.ui || {};
+    scope.mega.ui.Dialog = Dialog;
+})(jQuery, window);

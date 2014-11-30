@@ -1,4 +1,4 @@
-(function($) {
+(function($, scope) {
     /**
      * Prototype of an File Picker that is currently:
      *  - Using M.d to show the files of the user
@@ -8,7 +8,7 @@
      * @param opts {Object}
      * @constructor
      */
-    var MegaFilePicker = function(opts) {
+    var FilePicker = function(opts) {
         var self = this;
 
         var defaultOptions = {
@@ -42,12 +42,12 @@
         self.initGenericEvents();
     };
 
-    makeObservable(MegaFilePicker);
+    makeObservable(FilePicker);
 
     /**
      * Binds once the events for toggling the file picker
      */
-    MegaFilePicker.prototype.initGenericEvents = function() {
+    FilePicker.prototype.initGenericEvents = function() {
         var self = this;
 
         if(self.options.buttonElement) {
@@ -70,7 +70,7 @@
     /**
      * Show the picker
      */
-    MegaFilePicker.prototype.show = function() {
+    FilePicker.prototype.show = function() {
         var self = this;
 
         if(!self.$picker) {
@@ -116,7 +116,7 @@
     /**
      * Hide the picker
      */
-    MegaFilePicker.prototype.hide = function() {
+    FilePicker.prototype.hide = function() {
         var self = this;
 
         if(!self.visible) {
@@ -148,7 +148,7 @@
     /**
      * Toggle (show/hide) the picker
      */
-    MegaFilePicker.prototype.toggle = function() {
+    FilePicker.prototype.toggle = function() {
         var self = this;
         if(self.visible) {
             self.hide();
@@ -166,10 +166,10 @@
      *
      * @private
      */
-    MegaFilePicker.prototype._createPicker = function() {
+    FilePicker.prototype._createPicker = function() {
 
         var self = this;
-        self.$picker = $(MegaFilePicker.PICKER_TEMPLATE);
+        self.$picker = $(FilePicker.PICKER_TEMPLATE);
 
         $('.attach-send', self.$picker).text(
             self.options.sendText
@@ -208,7 +208,7 @@
      *
      * @private
      */
-    MegaFilePicker.prototype._initPickerEvents = function() {
+    FilePicker.prototype._initPickerEvents = function() {
         var self = this;
         var $d = self.$picker;
 
@@ -371,7 +371,7 @@
      * @param [$nodeContainer] {HTMLElement}
      * @private
      */
-    MegaFilePicker.prototype._loadNodes = function(parentNodeId, $nodeContainer) {
+    FilePicker.prototype._loadNodes = function(parentNodeId, $nodeContainer) {
 
         var self = this;
         var filterFunc = function(n) {
@@ -417,7 +417,7 @@
         delete fileNodes;
 
         $.each(nodes, function(arrIdx, n) {
-            var $newNode = $(MegaFilePicker.NODE_TEMPLATE);
+            var $newNode = $(FilePicker.NODE_TEMPLATE);
             $('.tranfer-filetype-txt', $newNode).text(
                 n.name
             );
@@ -488,7 +488,7 @@
     /**
      * Mainly used by unit tests to cleanup in afterEach.
      */
-    MegaFilePicker.prototype.destroy = function() {
+    FilePicker.prototype.destroy = function() {
         var self = this;
         if(self.$picker) {
             self.$jsp.destroy();
@@ -506,7 +506,7 @@
      *
      * @type {string}
      */
-    MegaFilePicker.PICKER_TEMPLATE = '<div class="fm-chat-attach-popup fm-dialog-popup">\n' +
+    FilePicker.PICKER_TEMPLATE = '<div class="fm-chat-attach-popup fm-dialog-popup">\n' +
 '           <div class="fm-chat-attach-top">\n' +
 '               <span></span>\n' +
 '                <div class="clear"></div>\n' +
@@ -534,7 +534,7 @@
      *
      * @type {string}
      */
-    MegaFilePicker.NODE_TEMPLATE = '<tr>\n' +
+    FilePicker.NODE_TEMPLATE = '<tr>\n' +
 '        <td>\n' +
 '            <span class="transfer-filtype-icon"> </span>\n' +
 '            <span class="tranfer-filetype-txt"></span>\n' +
@@ -542,5 +542,7 @@
     '</tr>';
 
     // export
-    window.MegaFilePicker = MegaFilePicker;
-})(jQuery);
+    scope.mega = scope.mega || {};
+    scope.mega.ui = scope.mega.ui || {};
+    scope.mega.ui.FilePicker = FilePicker;
+})(jQuery, window);

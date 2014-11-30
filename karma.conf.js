@@ -41,7 +41,7 @@ module.exports = function(config) {
         'js/fm.js',
         'js/crypto.js',
         'js/user.js',
-        'js/filepicker.js',
+        'js/ui/filepicker.js',
         'js/tlvstore.js',
         'js/authring.js',
         

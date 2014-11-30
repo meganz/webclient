@@ -1,4 +1,4 @@
-(function($) {
+(function($, scope) {
     /**
      * Incoming Call Dialog
      *
@@ -7,7 +7,7 @@
      * @param opts {Object}
      * @constructor
      */
-    var MegaIncomingCallDialog = function(opts) {
+    var IncomingCallDialog = function(opts) {
         var self = this;
 
         var defaultOptions = {
@@ -22,13 +22,13 @@
 
     };
 
-    makeObservable(MegaIncomingCallDialog);
+    makeObservable(IncomingCallDialog);
 
 
     /**
      * Show the dialog
      */
-    MegaIncomingCallDialog.prototype.show = function(username, avatarImg, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
+    IncomingCallDialog.prototype.show = function(username, avatarImg, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
         var self = this;
 
         if(!self.$dialog) {
@@ -80,8 +80,8 @@
 //        $('.fm-dialog-overlay').removeClass('hidden');
 
         // auto hide on click out of the dialog
-        $(document).unbind('mouseup.MegaIncomingCallDialog');
-        $(document).bind('mouseup.MegaIncomingCallDialog', function(e) {
+        $(document).unbind('mouseup.IncomingCallDialog');
+        $(document).bind('mouseup.IncomingCallDialog', function(e) {
             if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
                 self.hide();
             }
@@ -93,15 +93,15 @@
     /**
      * Hide the dialog
      */
-    MegaIncomingCallDialog.prototype.hide = function() {
+    IncomingCallDialog.prototype.hide = function() {
         var self = this;
 
         if(!self.visible) {
             return;
         }
         // auto hide on click out of the dialog - cleanup
-        $(document).unbind('mouseup.MegaIncomingCallDialog');
-        $(document).unbind('keypress.MegaIncomingCallDialog');
+        $(document).unbind('mouseup.IncomingCallDialog');
+        $(document).unbind('keypress.IncomingCallDialog');
 
         self.visible = false;
         self.$dialog.addClass('hidden');
@@ -115,7 +115,7 @@
     /**
      * Toggle (show/hide) the dialog
      */
-    MegaIncomingCallDialog.prototype.toggle = function() {
+    IncomingCallDialog.prototype.toggle = function() {
         var self = this;
         if(self.visible) {
             self.hide();
@@ -130,10 +130,10 @@
      *
      * @private
      */
-    MegaIncomingCallDialog.prototype._createDialog = function() {
+    IncomingCallDialog.prototype._createDialog = function() {
 
         var self = this;
-        self.$dialog = $(MegaIncomingCallDialog.DIALOG_TEMPLATE);
+        self.$dialog = $(IncomingCallDialog.DIALOG_TEMPLATE);
 
         $(document.body).append(self.$dialog);
     };
@@ -143,7 +143,7 @@
     /**
      * Should be used by unit tests and when there is a new incoming call while the old dialog is still open
      */
-    MegaIncomingCallDialog.prototype.destroy = function() {
+    IncomingCallDialog.prototype.destroy = function() {
         var self = this;
         if(self.$dialog) {
             self.hide();
@@ -156,7 +156,7 @@
      *
      * @type {string}
      */
-    MegaIncomingCallDialog.DIALOG_TEMPLATE = '<div class="fm-dialog incoming-call-dialog hidden">\n' +
+    IncomingCallDialog.DIALOG_TEMPLATE = '<div class="fm-dialog incoming-call-dialog hidden">\n' +
         '<div class="fm-dialog-close"></div>\n' +
         '<div class="icoming-call-header">\n' +
         '   Incoming call...\n' +
@@ -179,5 +179,8 @@
     '</div>';
 
     // export
-    window.MegaIncomingCallDialog = MegaIncomingCallDialog;
-})(jQuery);
+    scope.mega = scope.mega || {};
+    scope.mega.ui = scope.mega.ui || {};
+    scope.mega.ui.chat = scope.mega.ui.chat || {};
+    scope.mega.ui.chat.IncomingCallDialog = IncomingCallDialog;
+})(jQuery, window);

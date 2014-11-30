@@ -1,6 +1,6 @@
 /**
- * MegaNotifications is a v2 compatible with audio, desktop, title/favicon and last, but not least flexible way of
- * managing notifications for MEGA's webclient
+ * MegaNotifications is a v2 compatible notifications mini-frameworks with audio, desktop, title/favicon and last,
+ * but not least flexible way of managing notifications for MEGA's webclient
  *
  * Dependencies:
  *  - http://ionden.com/a/plugins/ion.sound/en.html

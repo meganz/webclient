@@ -245,7 +245,7 @@ OpQueue.prototype.pop = function() {
 //                            debugger;
 //                        }
                     }
-                    if((e.message && e.message.indexOf("Authentication of member failed") != -1) && localStorage.d) {
+                    if((e.message && e.message.indexOf("Authentication of member failed") != -1) && window.d) {
                         self.logger.warn("Because of debug mode and caught Authentication failed, authring will be scrubbed.");
 
                         authring.scrubAuthRing();

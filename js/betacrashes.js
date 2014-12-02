@@ -96,14 +96,14 @@ if(window.location.hostname == "beta.mega.nz" || window.location.hostname == "me
 
             var sendReport = function() {
                 $.get(
-                    "https://mega.dev/slacklogger/",
+                    "./logger/",
                     { c : JSON.stringify(dump), v : report, uh: u_handle, ver: window.megaVersion }
                 );
             };
             if(window.megaVersion) {
                 sendReport();
             } else {
-                $.get("current_ver.txt")
+                $.get("./current_ver.txt")
                     .done(function(r) {
                         r = $.trim(r);
                         if(r.length == 40) {

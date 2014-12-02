@@ -4,7 +4,7 @@
     /**
      * Prototype of reusable Dialog, which will eventually implement the following features:
      *  - showing
-     *  - hidding
+     *  - hiding
      *  - maintaining state
      *  - collapse/expand
      *  - closable
@@ -24,12 +24,24 @@
              * Required: .dialog Class name (excl. the starting ".")
              */
             'className': '',
+
+            /**
+             * features:
+             */
             'focusable': true,
             'closable': true,
             'expandable': true,
+
+            /**
+             * css class names
+             */
             'expandableButtonClass': '.fm-mega-dialog-size-icon',
             'buttonContainerClassName': 'fm-mega-dialog-bottom',
             'buttonPlaceholderClassName': 'fm-mega-dialog-pad',
+
+            /**
+             * optional:
+             */
             'title': '',
             'buttons': []
         };

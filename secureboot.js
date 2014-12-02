@@ -657,6 +657,10 @@ else
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
 
+        // only used on beta
+        jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
+
+
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
 //        jsl.push({f:'html/js/register.js', n: 'register_js', j:1});
 

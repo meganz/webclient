@@ -302,7 +302,10 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                                         });
                                 })
                                 .fail(function() {
-                                    self.logger.error("Could not set session id for message: ", msg);
+                                    self.logger.error("Could not set session id for message: ", {
+                                        'messageId': msg.messageId,
+                                        'roomJid': meta.room.roomJid
+                                    });
                                 });
                         }
                     }

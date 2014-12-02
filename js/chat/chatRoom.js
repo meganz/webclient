@@ -2044,7 +2044,7 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
     if(event.isPropagationStopped()) {
-        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message)
+        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
         return false;
     }
     return self.appendDomMessage($message, message);

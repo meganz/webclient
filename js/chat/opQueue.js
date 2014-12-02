@@ -267,7 +267,6 @@ OpQueue.prototype.pop = function() {
                     if(localStorage.mpencDebug) {
                         debugger;
                     }
-
                 }
             }
 

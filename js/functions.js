@@ -355,9 +355,9 @@ function browserdetails(useragent)
 	else if (useragent.indexOf('linux') > 0) os = 'Linux';
 	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
+	if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
+	else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
 	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
-	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
 	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
 	else if (useragent.indexOf('msie') > 0

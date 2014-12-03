@@ -67,3 +67,8 @@ function MemoryIO(dl_id, dl) {
 		return msie ? dblob.getBlob() : new Blob(dblob);
 	};
 }
+
+MemoryIO.usable = function()
+{
+	return navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+};

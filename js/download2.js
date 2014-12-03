@@ -642,13 +642,15 @@ function IdToFile(id) {
 	return dl;
 }
 
+window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
 if(localStorage.dlMethod) {
 	dlMethod = window[localStorage.dlMethod];
 } else if (is_chrome_firefox & 4) {
 	dlMethod = FirefoxIO;
-} else if (window.webkitRequestFileSystem) {
+} else if (window.requestFileSystem) {
 	dlMethod = FileSystemAPI;
-} else if (navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
+} else if (MemoryIO.usable()) {
 	dlMethod = MemoryIO;
 } else {
 	dlMethod = FlashIO;

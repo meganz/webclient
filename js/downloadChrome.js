@@ -1,13 +1,15 @@
 (function (window) {
 	"use strict";
 
+	var TEMPORARY = window.TEMPORARY || 0, PERSISTENT = window.PERSISTENT || 1;
+
 	function storage_s2n(s)
 	{
-		return s.toLowerCase() === 'persistent' ? window.PERSISTENT : window.TEMPORARY;
+		return s.toLowerCase() === 'persistent' ? PERSISTENT : TEMPORARY;
 	}
 	function storage_n2s(n)
 	{
-		return +n == window.PERSISTENT ? 'Persistent' : 'Temporary';
+		return +n == PERSISTENT ? 'Persistent' : 'Temporary';
 	}
 	function queryUsageAndQuota(aType, aSuccess, aError)
 	{
@@ -125,14 +127,14 @@
 		var del = 0;
 		var entries = [];
 		var totalsize = 0;
-		if (window.webkitRequestFileSystem)
+		if (window.requestFileSystem)
 		{
 			queryUsageAndQuota(storagetype, function(used, remaining)
 			{
 				if (used+remaining)
 				{
 					if (d) console.log('Cleaning %s Storage...', storage_n2s(storagetype), bytesToSize(used), bytesToSize(remaining));
-					window.webkitRequestFileSystem(storagetype, 1024, onInitFs, errorHandler2);
+					window.requestFileSystem(storagetype, 1024, onInitFs, errorHandler2);
 				}
 				else
 				{
@@ -235,7 +237,7 @@
 								 * ideally it should call our errorHandler without bothering
 								 * the user... [CHROME 36.0.1985.125]
 								 */
-								window.webkitRequestFileSystem(PERSISTENT, grantedBytes,
+								window.requestFileSystem(PERSISTENT, grantedBytes,
 									function (fs) {
 										callback(PERSISTENT);
 									},
@@ -271,7 +273,7 @@
 				Later(this.fsInitOp.bind(this));
 				break;
 			default:
-				alert('webkitRequestFileSystem failed in ' + type);
+				alert('requestFileSystem failed in ' + type);
 		}
 	}
 
@@ -477,26 +479,37 @@
 		};
 	};
 
-	window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
-
 	if (navigator.webkitGetUserMedia) Later(function()
 	{
 		if (dlMethod === FileSystemAPI)
-		  window.webkitRequestFileSystem(0, 0x10000,
-			function (fs)
+		{
+			if (window.requestFileSystem)
 			{
-				free_space();
-			},
-			function (e)
-			{
-				if (e && e.code === FileError.SECURITY_ERR)
-				{
-					console.error('Switching to MemoryIO');
-					window.Incognito = true;
-					dlMethod = MemoryIO;
-				}
+				window.requestFileSystem(0, 0x10000,
+					function (fs)
+					{
+						free_space();
+					},
+					function (e)
+					{
+						if (e && e.code === FileError.SECURITY_ERR)
+						{
+							console.error('Switching to MemoryIO');
+							window.Incognito = true;
+							dlMethod = MemoryIO;
+						}
+					}
+				);
 			}
-		);
+			else if (MemoryIO.usable())
+			{
+				dlMethod = MemoryIO;
+			}
+			else
+			{
+				dlMethod = FlashIO;
+			}
+		}
 	});
 })(this);
 

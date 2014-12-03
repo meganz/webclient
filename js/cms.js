@@ -2,26 +2,23 @@ var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
 
 (function(window, asmCrypto) {
 
-var pubkey = asmCrypto.base64_to_bytes('WyJkNGQyYTA3Zjk0YzY0ZTBhMDYwMmI5NGE4ZWIyYjRlZDE5ZjczMzg2YmM4ODYzYTc1YzgyYWMxNDNkODRlMzc3MzhkODFmMDQ4YmM1YjgzNmFiOGUxYzg1Zjg5Y2U1MGNjOTBiMmNlNWZhZTc1Y2YzYTQ5MWIyZmZlOTM5MjNlZCIsIjAxMDAwMSJd');
-pubkey = JSON.parse(asmCrypto.bytes_to_string(pubkey));
-pubkey[0] = asmCrypto.hex_to_bytes(pubkey[0])
-pubkey[1] = asmCrypto.hex_to_bytes(pubkey[1])
+var pubkey = ab_to_str(asmCrypto.base64_to_bytes('gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4='))
 
 function verify_cms_content(content, signature)
 {
-	var hash = asmCrypto.SHA256.hex(content);
+	var hash = asmCrypto.SHA256.hex(content)
+	signature = ab_to_str(signature)
 
 	try {
-		return asmCrypto.RSA_PSS_SHA256.verify(signature, hash, pubkey);
+		return jodid25519.eddsa.verify(signature, hash, pubkey);
 	} catch (e) {
 		/* rubbish data, invalid anyways */
 		return false;
 	}
 }
 
-function process_cms_response(socket, next, as, id)
+function process_cms_response(bytes, next, as, id)
 {
-	var bytes = socket.response;
 	var viewer = new Uint8Array(bytes)
 
 	var signature = bytes.slice(3, 67); // 64 bytes, signature
@@ -74,7 +71,8 @@ function process_cms_response(socket, next, as, id)
 	}
 }
 
-var assets = {};
+var assets = {}, cmsToId = null
+var booting = false;
 
 var is_img
 
@@ -97,6 +95,30 @@ function img_placeholder(str, sep, rid, id) {
 	return "'" + IMAGE_PLACEHOLDER + "' data-img='loading_" +  id + "'" 
 }
 
+function cmsObjectToId(name)
+{
+	var q = getxhr();
+	if (d) console.error("CMS: loading " + name)
+	q.onload = function() {
+		if (name == '_all') {
+			cmsToId = JSON.parse(ab_to_str(q.response));
+		} else {
+			cmsToId[name] = ab_to_str(q.response).split(".")
+		}
+		q = null;
+		if (name != '_all') doRequest(name);
+	}
+	q.onerror = function() {
+		Later(function() {
+			cmsObjectToId(name);
+		})
+		q = null;
+	};
+	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + name);
+	q.responseType = 'arraybuffer';
+	q.send();
+}
+
 /**
  *	Internal function to communicate with the BLOB server.
  *	
@@ -106,23 +128,25 @@ function img_placeholder(str, sep, rid, id) {
  */
 var fetching = {};
 function doRequest(id) {
-	var q = getxhr();
-	q.onload = function() {
-		for (var i in fetching[id]) {
-			process_cms_response(q, fetching[id][i][0], fetching[id][i][0], id);
+	if (d) console.error("CMS fetch element", id)
+	if (cmsToId === null) {
+		if (!booting) {
+			booting = true;
+			cmsObjectToId('_all');
 		}
-		delete fetching[id]
-		q = null;
-	}
-	q.onerror = function() {
-		Later(function() {
+		return Later(function() {
 			doRequest(id);
-		})
-		q = null;
-	};
-	q.responseType = 'arraybuffer';
-	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + id);
-	q.send();
+		});
+	}
+	if (!cmsToId[id]) {
+		return cmsObjectToId(id)
+	}
+	_cms_request(cmsToId[id], function(blob) {
+		for (var i in fetching[id]) {
+			process_cms_response(blob, fetching[id][i][0], fetching[id][i][0], id);
+		}
+		delete fetching[id];
+	});
 }
 
 var _listeners = {};
@@ -137,7 +161,67 @@ function loaded(id)
 	CMS.attachEvents();
 }
 
+function _concat_arraybuf(arr)
+{
+	var len = arr.reduce(function(prev, e) {
+		return prev+e.byteLength
+	}, 0);
+	var buffer = new Uint8Array(len)
+	var offset = 0
+	for (var i in arr) {
+		buffer.set(new Uint8Array(arr[i]), offset)
+		offset += arr[i].byteLength
+	}
+	return buffer.buffer
+}
+
+function _cms_request(ids, next)
+{
+	if (d) console.error("CMS: request", ids)
+	var args = []
+		, q  = []
+		, done = 0
+	for (var i in ids) {
+		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
+		q[i] = null
+	}
+
+	api_getfileattr(args, 1, function(ctx, id, bytes)
+	{
+		if (d) console.error("Got response", id, bytes.byteLength, ctx)
+		
+		q[id] = bytes
+		if (++done == q.length) {
+			next(_concat_arraybuf(q))
+			q = undefined
+		}
+	});
+}
+
+var curType;
+var curCallback;
+
 var CMS = {
+	watch: function(type, callback)
+	{
+		curType = type;
+		curCallback = callback;
+	},
+
+	reRender: function(type, nodeId)
+	{
+		ERRDEBUG(type, nodeId)
+		// If cmsToId is NULL it means we didn't open
+		// *any* CMS content so we should ignore this
+		// update, we will get the newest version always
+		// when we need it (the first time)
+		if (!(cmsToId instanceof Object)) return;
+
+		cmsToId[type] = nodeId;
+		if (type == curType) {
+			curCallback(nodeId);
+		}
+	},
 
 	attachEvents: function() {
 		$('*[data-cms-dl],.cms-asset-download').rebind('click', function(e) {

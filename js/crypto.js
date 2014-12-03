@@ -987,7 +987,24 @@ function api_proc(q)
 
 			if (typeof t == 'object')
 			{
-				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++) if (this.q.ctxs[this.q.i][i].callback) this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
+				for (var i = 0; i < this.q.ctxs[this.q.i].length; i++)
+				{
+					if (this.q.ctxs[this.q.i][i].callback)
+					{
+						try 
+						{
+							this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
+						} catch (e)
+						{
+							// if there is *any* issue on the callback
+							// we don't want to HALT, instead we let the channel 
+							// a chance to clean itself and continue
+							// Otherwise if we load #blog *or* #page_<something> 
+							// the whole site is buggy
+							// Perhaps we should log this?
+						}
+					}
+				}
 
 				this.q.rawreq = false;
 				this.q.backoff = 0;			// request succeeded - reset backoff timer
@@ -1123,7 +1140,7 @@ function stopsc()
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-	api_req('sn=' + maxaction + '&ssl=1',{
+	api_req('sn=' + (maxaction||"") + '&ssl=1&e=Nc4AFJZK',{
 		fm : fm,
 		callback : function(res,ctx)
 		{
@@ -1990,6 +2007,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 	var p = {};
 	var h = {};
 	var k = {};
+	var plain = {}
 
 	var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
 
@@ -2008,6 +2026,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 				if (!p[r[1]]) p[r[1]] = t;
 				else p[r[1]] += t;
+				plain[r[1]] = !!fa[n].plaintext
 			}
 		}
 		else if (errfa) errfa(n);
@@ -2015,7 +2034,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
 	for (n in p)
 	{
-		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW()};
+		var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW(), plaintext: plain[n]};
 		api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
 	}
 }
@@ -2032,24 +2051,31 @@ function fa_handler(xhr, ctx)
 	{
 		if (!fa_handler.browser) fa_handler.browser = browserdetails(ua).browser;
 
-		switch(fa_handler.browser)
-		{
-			case 'Firefox':
-				this.parse = this.moz_parser;
-				this.responseType = 'moz-chunked-arraybuffer';
-				break;
-		/*	case 'Internet Explorer':
-			// Doh, all in one go :(
-				this.parse = this.stream_parser;
-				this.responseType = 'ms-stream';
-				this.stream_reader= this.msstream_reader;
-				break;
-		*/	case 'xChrome':
-				this.parse = this.stream_parser;
-				this.responseType = 'stream';
-				break;
-			default:
-				this.setParser('text');
+		if (ctx.plaintext) {
+			this.setParser('arraybuffer', this.plain_parser)
+		}
+		else
+		{	
+			switch(fa_handler.browser)
+			{	
+				case 'Firefox':
+					this.parse = this.moz_parser;
+					this.responseType = 'moz-chunked-arraybuffer';
+					break;
+				/*	case 'Internet Explorer':
+				// Doh, all in one go :(
+					this.parse = this.stream_parser;
+					this.responseType = 'ms-stream';
+					this.stream_reader= this.msstream_reader;
+					break;
+				*/	
+				case 'xChrome':
+						this.parse = this.stream_parser;
+						this.responseType = 'stream';
+						break;
+				default:
+					this.setParser('text');
+			}
 		}
 
 		this.done = this.Finish;
@@ -2145,7 +2171,7 @@ fa_handler.prototype =
 	{
 		if (type)
 		{
-			if (type === 'text') this.parse = this.str_parser;
+			if (type === 'text' && !parser) this.parse = this.str_parser;
 			else this.parse = parser.bind(this);
 			this.responseType = type;
 		}
@@ -2159,6 +2185,19 @@ fa_handler.prototype =
 		{
 			this.xhr.responseType = this.responseType;
 			if (d) console.log('New fah type:', this.xhr.responseType);
+		}
+	},
+
+	plain_parser: function(data)
+	{
+		if (this.xhr.readyState == 4) 
+		{
+			if (!this.xpos)  this.xpos = 12;
+			var bytes = data.slice(this.xpos)
+			if (bytes.byteLength > 0) {
+				this.ctx.procfa(this.ctx, this.ctx.k[this.ctx.p], bytes);
+				this.xpos += bytes.byteLength
+			}
 		}
 	},
 
@@ -2547,7 +2586,7 @@ function api_fareq(res,ctx,xhr)
 				faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
 				if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType)
 				{
-					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType);
+					if (d) console.error('Unsupported responseType', faxhrs[slot].fah.responseType)
 					faxhrs[slot].fah.setParser('text');
 				}
 				if ("text" === faxhrs[slot].responseType)

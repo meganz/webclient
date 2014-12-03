@@ -51,8 +51,8 @@ module.exports = function(config) {
              "../chat/fileTransfer.js",
              "../chat/rtcSession.js",
 
-             "../filepicker.js",
-             "../chat/incomingCallDialog.js",
+             "../ui/filepicker.js",
+             "../chat/ui/incomingCallDialog.js",
 
              "../chat/plugins/attachmentsFilter.js",
              "../chat/plugins/urlFilter.js",

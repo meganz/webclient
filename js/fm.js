@@ -385,7 +385,7 @@ function initUI(){
 		document.location.hash = 'login';
 	});
 
-	$('.fm-dialog-overlay').rebind('click', function()
+	$('.fm-dialog-overlay').rebind('click.fm', function()
 	{
 		closeDialog();
 		$.hideContextMenu();

@@ -128,17 +128,26 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     if(self.state == ChatRoom.STATE.PLUGINS_WAIT || self.state == ChatRoom.STATE.PLUGINS_PAUSED) {
                         self.logger.error("Plugins had timed out, setting state to PLUGINS_READY");
 
-                        if(self.encryptionHandler && self.encryptionHandler.state !== 3) {
+                        var participants = self.getParticipantsExceptMe();
+                        var contact = participants[0];
+
+                        var pres = self.megaChat.karere.getPresence(contact);
+
+                        if(pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
+                            var $dialog = self.generateInlineDialog(
+                                "error-" + unixtime(),
+                                self.megaChat.karere.getBareJid(),
+                                "mpenc-setup-failed",
+                                "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
+                                [],
+                                undefined,
+                                false
+                            );
+
+                            self._mpencFailedDialog = $dialog;
+
                             self.appendDomMessage(
-                                self.generateInlineDialog(
-                                    "error-" + unixtime(),
-                                    self.megaChat.karere.getBareJid(),
-                                    "mpenc-setup-failed",
-                                    "Could not initialise the encryption in a timely manner. To try again, you can close and start the chat again.",
-                                    [],
-                                    undefined,
-                                    false
-                                )
+                                $dialog
                             );
 
                             var othersJid = self.getParticipantsExceptMe()[0];
@@ -161,6 +170,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 });
         } else if(newState == ChatRoom.STATE.READY) {
             if(self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+                if(self._mpencFailedDialog) {
+                    self._mpencFailedDialog.remove();
+                    delete self._mpencFailedDialog;
+                }
                 self._flushMessagesQueue();
             }
         }
@@ -740,6 +753,22 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         });
 
     self.megaChat.trigger('onRoomCreated', [self]);
+
+
+
+    self.bind('onConversationStarted', function(e) {
+        self.appendDomMessage(
+            self.generateInlineDialog(
+                "conv-started",
+                self.megaChat.karere.getJid(),
+                "conv-started",
+                "You had joined the conversation.",
+                [],
+                {},
+                !self.isActive()
+            )
+        );
+    });
 
     return this;
 };
@@ -1571,8 +1600,10 @@ ChatRoom.prototype.iAmRoomOwner = function() {
     return users[0] === self.megaChat.karere.getJid();
 };
 /**
+ * Get a list of the current participants for this room, excluding my jid (or if provided, exlucding any of the jids
+ * founds in arr `jids`).
  *
- * @param jids
+ * @param [jids] {Array}
  * @returns {Array}
  */
 ChatRoom.prototype.getParticipantsExceptMe = function(jids) {
@@ -1957,12 +1988,11 @@ ChatRoom.prototype.appendMessage = function(message) {
     );
 
     var name = self.megaChat.getContactNameFromJid(jid);
+    var contact = self.megaChat.getContactFromJid(jid);
 
     $('.nw-contact-avatar', $message).replaceWith(self._generateContactAvatarElement(jid));
 
     $('.chat-username', $message).text(name);
-
-    var contact = self.megaChat.getContactFromJid(jid);
 
     // add .current-name if this is my own message
     if(jid != self.megaChat.karere.getBareJid()) {
@@ -1974,6 +2004,7 @@ ChatRoom.prototype.appendMessage = function(message) {
     $message.attr('data-timestamp', timestamp);
     $message.attr('data-id', message.getMessageId());
     $message.attr('data-from', jid.split("@")[0]);
+    $message.addClass(contact.u);
 
 
     if(!message.messageHtml) {
@@ -2013,7 +2044,7 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
     if(event.isPropagationStopped()) {
-        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message)
+        self.logger.warn("Event propagation stopped receiving (rendering) of message: ", message);
         return false;
     }
     return self.appendDomMessage($message, message);
@@ -2990,7 +3021,17 @@ ChatRoom.prototype._waitingForOtherParticipants = function() {
 ChatRoom.prototype._restartConversation = function() {
     var self = this;
 
-    self._conv_ended = false;
+    if(self._conv_ended === true) {
+        self._conv_ended = self._leaving = false;
+
+        self.setState(
+            self._waitingForOtherParticipants() ? ChatRoom.STATE.WAITING_FOR_PARTICIPANTS : ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
+        );
+
+        self.trigger('onConversationStarted');
+    }
+
+
     self.getParticipantsExceptMe().forEach(function(v) {
 
         self.megaChat.karere.addUserToChat(self.roomJid, Karere.getNormalizedBareJid(v), undefined, self.type, {
@@ -3037,26 +3078,24 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
                 "user-left",
                 "Conversation ended by user: " + self.megaChat.getContactNameFromJid(userFullJid),
                 [],
-                {
-                    'end-chat': {
-                        'type': 'primary',
-                        'text': "Close chat",
-                        'callback': function() {
-                            self.destroy(true);
-                        }
-                    }
-                }
+                {},
+                !self.isActive()
             )
         );
     }
 };
 
-ChatRoom.prototype._conversationStarted = function(userFullJid) {
+ChatRoom.prototype._conversationStarted = function(userBareJid) {
     var self = this;
 
-    if(Karere.getNormalizedBareJid(userFullJid) != self.megaChat.karere.getBareJid()) {
-        // the other user had joined, mark this conv as started again.
-        self._conv_ended = false;
+    if(self._conv_ended) {
+        if (Karere.getNormalizedBareJid(userBareJid) != self.megaChat.karere.getBareJid()) {
+            // the other user had joined, mark this conv as started again.
+            self._restartConversation();
+        }
+    } else {
+        // i'd joined
+        self.trigger('onConversationStarted');
     }
 
 

@@ -582,8 +582,9 @@ else
         jsl.push({f:'js/chat/rtcSession.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/fileTransfer.js', n: 'mega_js', j:1,w:7});
 
-        jsl.push({f:'js/filepicker.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/chat/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/filepicker.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/dialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'mega_js', j:1,w:7});
 
         // notifications
         jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
@@ -654,6 +655,10 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+
+        // only used on beta
+        jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
 
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});

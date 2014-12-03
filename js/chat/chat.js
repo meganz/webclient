@@ -12,6 +12,7 @@ if(MegaChatDisabled) {
 
 var chatui;
 (function() {
+    var createChatDialog;
     chatui = function(id) {
 	
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
@@ -67,6 +68,40 @@ var chatui;
 
 
         $('.fm-chat-block').removeClass('hidden');
+
+        if(!createChatDialog) {
+            createChatDialog = new mega.ui.Dialog({
+                'className': 'create-chat-dialog',
+                'closable': true,
+                'focusable': true,
+                'expandable': true,
+                'title': 'Create New Chat',
+                'buttons': [
+                    {
+                        'label': 'Create',
+                        'className': 'fm-dialog-new-folder-button',
+                        'callback': function () {
+                            this.hide();
+                        }
+                    },
+                    {
+                        'label': 'Cancel',
+                        'className': 'create-folder-button-cancel',
+                        'callback': function () {
+                            this.hide();
+                        }
+                    }
+                ]
+            });
+        }
+
+        $('.fm-create-chat-button')
+            .show()
+            .rebind('click.megaChat', function(e) {
+                createChatDialog.toggle($(this));
+
+                return false;
+            });
 
         $(document.body).undelegate('.message-textarea', 'keyup.autoresize');
         $(document.body).delegate('.message-textarea', 'keyup.autoresize',function() {
@@ -682,7 +717,7 @@ var Chat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-    self.incomingCallDialog = new MegaIncomingCallDialog();
+    self.incomingCallDialog = new mega.ui.chat.IncomingCallDialog();
 
     //logAllCallsOnObject(jodid25519.eddsa, console.error, true, 'jodid25519.eddsa');
 
@@ -717,7 +752,7 @@ Chat.prototype.init = function() {
     });
 
     if(!self.filePicker) {
-        self.filePicker = new MegaFilePicker(self.options.filePickerOptions);
+        self.filePicker = new mega.ui.FilePicker(self.options.filePickerOptions);
         self.filePicker.bind('doneSelecting', function(e, selection) {
             if(selection.length == 0) {
                 return;
@@ -965,7 +1000,7 @@ Chat.prototype.init = function() {
         return self._onUsersUpdate("left", e, eventData);
     });
     this.karere.bind("onUsersUpdatedDone", function(e, eventObject) {
-        if(self.chats[eventObject.getRoomJid()] && self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.JOINING) {
+        if(self.chats[eventObject.getRoomJid()] && (self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.JOINING || self.chats[eventObject.getRoomJid()].state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS)) {
             if(self.chats[eventObject.getRoomJid()]._waitingForOtherParticipants() === false) {
                 self.chats[eventObject.getRoomJid()].setState(
                     ChatRoom.STATE.PARTICIPANTS_HAD_JOINED
@@ -1180,6 +1215,7 @@ Chat.prototype.init = function() {
         } else {
             lastOpenedRoom = null;
         }
+        $('.fm-create-chat-button').hide();
     });
 
     self.$container = $('.fm-chat-block');
@@ -1599,7 +1635,9 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                         room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS || room.state == ChatRoom.STATE.JOINING
                     )
                 ) {
-                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
+                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                        room._conversationStarted(room.getParticipantsExceptMe()[0]);
+                    }
                 }
             }
         }
@@ -1632,7 +1670,13 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
             var room = self.chats[eventObject.getRoomJid()];
             if(room) {
                 if(room._waitingForOtherParticipants() === false && room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
-                    room._conversationStarted(eventObject.getFromJid());
+                    if (room._conv_ended === true || typeof(room._conv_ended) === 'undefined') {
+                        room._conversationStarted(eventObject.getFromJid());
+                    } else {
+                        if(room.state == ChatRoom.STATE.WAITING_FOR_PARTICIPANTS) {
+                            room.setState(ChatRoom.STATE.PARTICIPANTS_HAD_JOINED);
+                        }
+                    }
                 }
             }
         }
@@ -2469,6 +2513,8 @@ Chat.prototype.renderListing = function() {
             }
         }
     }
+    $('.fm-create-chat-button').show();
+
     return false;
 
     //TODO: show something? some kind of list of conversations summary/overview screen or something?

@@ -15,8 +15,8 @@ function FlashIO(dl_id, dl) {
 			{
 				if (!dl.cancelled)
 				{
-					if (++retries < 400) IO.write(buffer, position, done);
-					else dlFatalError(dl, 'FlashIO Object unavailable');
+					if (++retries < 100) IO.write(buffer, position, done);
+					else dlFatalError(dl, 'FlashIO error -- Do you have Adobe Flash installed?');
 				}
 			}, 300);
 		}
@@ -27,13 +27,18 @@ function FlashIO(dl_id, dl) {
 		else
 			len = buffer.buffer.length;
 
+		if (d) console.log('FlashIO', len, offset);
+		if (d) console.time('flash-io');
+
 		if (have_ab)
 			subdata = ab_to_base64(buffer);
 		else
 			subdata = base64urlencode(buffer.buffer);
 
 		node.flashdata(dl_id, subdata);
-		offset += len
+		if (d) console.timeEnd('flash-io');
+
+		offset += len;
 		Later(done);
 	};
 
@@ -47,7 +52,12 @@ function FlashIO(dl_id, dl) {
 		// dl_filename = filename;
 		// dl_chunks   = chunks;
 		// dl_chunksizes = sizes;
-		IO.begin();
+		if (size > 950*0x100000) {
+			dlFatalError(dl, Error('File too big to be reliably handled with Flash.'));
+			if (!this.is_zip) ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
+		} else {
+			IO.begin();
+		}
 	};
 }
 FlashIO.warn = true;

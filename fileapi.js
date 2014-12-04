@@ -921,9 +921,13 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
-		var uri = Services.io.newURI(url, null, null);
+		try
+		{
+			var uri = Services.io.newURI(url, null, null);
 
-		if (/\.mega\.co\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) return __XHR_Open.apply(this, arguments);
+		}
+		catch(e) {}
 
 		var err = new Error('Blocked XHR to ' + url);
 		setTimeout(function() { throw err }, 4);

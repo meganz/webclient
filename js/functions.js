@@ -363,9 +363,9 @@ function browserdetails(useragent)
 	else if (useragent.indexOf('linux') > 0) os = 'Linux';
 	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
+	if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
+	else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
 	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
-	else if (useragent.indexOf('opera') > 0) browser = 'Opera';
 	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
 	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
 	else if (useragent.indexOf('msie') > 0
@@ -991,20 +991,27 @@ function ASSERT(what, msg, udata) {
 	return !!what;
 }
 
-function srvlog(msg,data, silent)
+function srvlog(msg,data,silent)
 {
+	if (data && !(data instanceof Error)) data = { udata : data };
 	if (!silent && d) console.error(msg);
-	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data ? { udata : data } : null);
+	if (!d || onBetaW) window.onerror(msg, '', data ? 1:-1, 0, data || null);
 }
 
 function oDestroy(obj) {
-	if (typeof(d) !== "undefined" && d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
+	if (window.d) ASSERT(Object.isFrozen(obj) === false, 'Object already frozen...');
 
 	Object.keys(obj).forEach(function(memb) {
 		if (obj.hasOwnProperty(memb)) delete obj[memb];
 	});
+	Object.defineProperty(obj, ":$:frozen:", { value : String(new Date()), writable : false });
 
-	if (typeof(d) !== "undefined" && d) Object.freeze(obj);
+	if (window.d) Object.freeze(obj);
+}
+
+function oIsFrozen(obj)
+{
+	return obj && typeof obj === 'object' && obj.hasOwnProperty(":$:frozen:");
 }
 
 /**
@@ -1270,7 +1277,12 @@ function CreateWorkers(url, message, size) {
 	function create(i) {
 		var w;
 
-		w  = new Worker(url);
+		try {
+			w  = new Worker(url);
+		} catch(e) {
+			msgDialog('warninga', '' + url, '' + e, location.hostname);
+			throw e;
+		}
 
 		w.id   = i;
 		w.busy = false;
@@ -1299,7 +1311,7 @@ function CreateWorkers(url, message, size) {
 				worker[i].postMessage(t);
 			}
 		});
-	}, size);
+	}, size, 'worker-' + url);
 }
 
 function mKeyDialog(ph, fl)
@@ -1578,14 +1590,6 @@ String.prototype.seconds = function() {
 
 String.prototype.minutes = function() {
 	return parseInt(this) * 1000 * 60;
-}
-
-String.prototype.MB = function() {
-	return parseInt(this) * 1024 * 1024;
-}
-
-String.prototype.KB = function() {
-	return parseInt(this) * 1024;
 }
 
 // Quick hack for sane average speed readings

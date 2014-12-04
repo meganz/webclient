@@ -2364,12 +2364,14 @@ fa_handler.prototype =
 		{
 			if (!fa_handler.errors) fa_handler.errors = 0;
 
-			if (++fa_handler.errors == 3) fa_handler.chunked = false;
+			if (++fa_handler.errors == 7) fa_handler.chunked = false;
 
 			srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
 		}
 
 		oDestroy(this);
+
+		return pending;
 	}
 };
 
@@ -2406,7 +2408,7 @@ function api_fareq(res,ctx,xhr)
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		srvlog('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
+		srvlog('api_'+(ctx.p?'get':'store')+'fileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
 	}
 
 	if ( error )
@@ -2526,7 +2528,7 @@ function api_fareq(res,ctx,xhr)
 				{
 					if (this.fart) clearTimeout(this.fart);
 
-					this.fah.done(ev);
+					if (this.fah.done(ev)) Soon(fm_thumbnails);
 				}
 			};
 

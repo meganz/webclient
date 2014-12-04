@@ -380,6 +380,7 @@ function ul_upload(File) {
 }
 
 function ul_start(File) {
+	if (!File.file) return false;
 	if (File.file.posturl) return ul_upload(File);
 	var maxpf = 128*1048576
 		, next = ul_get_posturl(File)
@@ -695,6 +696,10 @@ FileUpload.prototype.run = function(done) {
 		if (file.hash && file.ts) throw "The fingerprint exists already.";
 
 		fingerprint(file, function(hash, ts) {
+			if (!(file && self.file)) {
+				if (d) console.log('fingerprint', hash, 'UPLOAD CANCELED');
+				return;
+			}
 			file.hash = hash;
 			file.ts   = ts;
 			var identical = ul_Identical(file.target, file.path || file.name, file.hash, file.size);
@@ -876,7 +881,7 @@ function ul_filereader(fs, file) {
 			done = null;
 		}
 	};
-	return new MegaQueue( handler, 1);
+	return new MegaQueue( handler, 1, 'ul-filereader');
 }
 
 function worker_uploader(task, done) {
@@ -887,7 +892,7 @@ function worker_uploader(task, done) {
 var ul_queue  = new UploadQueue
 	, ul_maxSlots = readLocalStorage('ul_maxSlots', 'int', { min:1, max:6, def:4 })
 	, Encrypter
-	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots)
+	, ulQueue = new TransferQueue(worker_uploader, ul_maxSlots, 'uploads')
 	, ul_skipIdentical = 0
 	, start_uploading = false
 	, ul_maxSpeed = 0
@@ -922,6 +927,8 @@ function resetUploadDownload() {
 	if (!ul_queue.some(isQueueActive)) {
 		ul_queue = new UploadQueue();
 		ul_uploading = false;
+		ASSERT(ulQueue._running == 0, 'ulQueue._running inconsistency on completion');
+		ulQueue._pending = [];
 	}
 	if (!dl_queue.some(isQueueActive)) {
 		dl_queue = new DownloadQueue();
@@ -996,6 +1003,25 @@ ulQueue.poke = function(file, meth)
 		file.owner      = new FileUpload(file);
 		file.ul_reader  = ul_filereader(new FileReader, file);
 		ulQueue[meth || 'push'](file.owner);
+	}
+};
+
+ulQueue.stuck = function() {
+	// Check certain conditions to make sure the workaround isn't worse than the problem...
+	if (ulQueue._running == 1 && ulQueue._limit > 1 && ulQueue._queue.length && ulQueue._queue[0][0] instanceof FileUpload)
+	{
+		if (ASSERT(ulQueue._pending.length == 1, 'Invalid ulQueue pending state'))
+		{
+			var chunk = ulQueue._pending[0];
+			if (ASSERT(chunk instanceof ChunkUpload, 'Invalid pending chunk'))
+			{
+				var id = UploadManager.GetGID(chunk.ul);
+				$('.transfer-table #' + id + ' td:eq(3)').text('Internal Error (0x7f023)');
+				$('.transfer-table #' + id).attr('id', 'STUCKed_' + id);
+				srvlog('Upload automatically aborted on stuck detection');
+				UploadManager.abort(id);
+			}
+		}
 	}
 };
 

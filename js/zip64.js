@@ -402,7 +402,7 @@ function ZipWriter(dl_id, dl) {
 	else this.io = new dlMethod(dl_id, dl)
 
 	this.io.is_zip = true;
-	this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1);
+	this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1, 'zip-writer');
 	this.zwriter.validateTask = dlZipWriterValidate.bind(this);
 
 	this.io.begin  = function() {
@@ -419,9 +419,7 @@ ZipWriter.prototype.toString = function() {
 ZipWriter.prototype.createZipObject = function() {
 	if (!this.ZipObject) {
 		
-		this.ZipObject = new ZIPClass(
-			this.size
-		);
+		this.ZipObject = new ZIPClass(this.size);
 
 		if (this.ZipObject.isZip64) {
 			this.size += this.nfiles * 28 // extra bytes for each ZipCentralDirectory 
@@ -431,10 +429,9 @@ ZipWriter.prototype.createZipObject = function() {
 			this.size += this.nfiles * 16 // extra bytes for each dataDescriptor
 			this.size += 22 // final bytes
 		}
+		if (d) console.error("isZip64", this.ZipObject.isZip64, this.size);
 
 		this.io.setCredentials("", this.size, this.dl.zipname);
-		ERRDEBUG("isZip64", this.ZipObject.isZip64, this.size);
-
 	}
 	return this.ZipObject;
 };
@@ -492,6 +489,7 @@ function dlZipWriterIOWorker(task, done) {
 function dlZipWriterValidate(t) {
 	if (!this.ZipObject) {
 		this.createZipObject(); /* create the zipobject if it doesnt exists */
+		if (!this.ZipObject) return false;
 	}
 
 	return this.is_ready && t.zfile == this.queues[0] && t.offset == this.file_offset;

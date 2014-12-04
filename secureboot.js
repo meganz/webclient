@@ -670,15 +670,27 @@ else
 			'recover': ['reset','reset_js']
 		};
 
-	    if (page && page.indexOf('%21') > -1) document.location.hash = page.replace('%21','!').replace('%21','!');
-
-		if (page) page = page.replace('#','').replace('%21','!');
-
-		for (var p in subpages)
+		if (page)
 		{
-			if (page && page.substr(0,p.length) == p)
+			if (page.indexOf('%25') !== -1)
 			{
-				for (i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
+				do {
+					page = page.replace('%25','%', 'g');
+				} while (~page.indexOf('%25'));
+			}
+			if (page.indexOf('%21') !== -1)
+			{
+				page = page.replace('%21','!', 'g');
+				document.location.hash = page;
+			}
+
+			page = page.replace('#','');
+			for (var p in subpages)
+			{
+				if (page.substr(0,p.length) == p)
+				{
+					for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
+				}
 			}
 		}
 		var downloading = false;

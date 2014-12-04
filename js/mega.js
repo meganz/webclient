@@ -2264,6 +2264,7 @@ function MegaData ()
 				if(M.d[e].t == 1 && M.d[e].p == d)
 				{
 					var p = o || [];
+					if (!o) p.push(fm_safename(M.d[d].name));
 					p.push(fm_safename(M.d[e].name));
 					if (!getfolders(M.d[e].h,p)) dirs.push(p);
 					++c;

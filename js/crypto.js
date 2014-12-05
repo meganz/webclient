@@ -1122,23 +1122,28 @@ function getsc(fm)
 		{
 			if (typeof res == 'object')
 			{
+				function done(sma)
+				{
+					if (sma !== false && typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB === 'object')
+						localStorage[u_handle + '_maxaction'] = maxaction;
+					
+					if (ctx.fm)
+					{
+						mDBloaded=true;
+						renderfm();
+						pollnotifications();
+					}
+				}
 				if (res.w)
 				{
 					waiturl = res.w;
 					waittimeout = setTimeout(waitsc,waitbackoff);
+					done(!1);
 				}
 				else
 				{
 					if (res.sn) maxaction = res.sn;
-					execsc(res.a);
-					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
-				}
-
-				if (ctx.fm)
-				{
-					mDBloaded=true;
-					renderfm();
-					pollnotifications();
+					execsc(res.a, done);
 				}
 			}
 		}
@@ -2556,6 +2561,8 @@ var rsa2aes = {};
 // master_aes - my master password's AES cipher
 // file - ufs node containing .k and .a
 // Output: .key and .name set if successful
+// **NB** Any changes made to this function
+//        must be populated to keydec.js
 function crypto_processkey(me,master_aes,file)
 {
 	var id, key, k, n;

@@ -825,20 +825,20 @@ function CreateWorkers(url, message, size) {
 function mKeyDialog(ph, fl)
 {
 	$('.new-download-buttons').addClass('hidden');
-	$('.new-download-file-title').text(l[1199]);	
-	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));	
+	$('.new-download-file-title').text(l[1199]);
+	$('.new-download-file-icon').addClass(fileicon({name:'unknown.unknown'}));
 	$('.fm-dialog.dlkey-dialog').removeClass('hidden');
-	$('.fm-dialog-overlay').removeClass('hidden');	
+	$('.fm-dialog-overlay').removeClass('hidden');
 	$('.fm-dialog.dlkey-dialog input').unbind('focus');
 	$('.fm-dialog.dlkey-dialog input').bind('focus',function(e)
 	{
-		if ($(this).val() == l[1028]) $(this).val('');	
-	});	
+		if ($(this).val() == l[1028]) $(this).val('');
+	});
 	$('.fm-dialog.dlkey-dialog input').unbind('blur');
 	$('.fm-dialog.dlkey-dialog input').bind('blur',function(e)
 	{
 		if ($(this).val() == '') $(this).val(l[1028]);
-	});	
+	});
 	$('.fm-dialog.dlkey-dialog input').unbind('keydown');
 	$('.fm-dialog.dlkey-dialog input').bind('keydown',function(e)
 	{
@@ -853,15 +853,15 @@ function mKeyDialog(ph, fl)
 		if (key && key !== l[1028])
 		{
 			$('.fm-dialog.dlkey-dialog').addClass('hidden');
-			$('.fm-dialog-overlay').addClass('hidden');	
+			$('.fm-dialog-overlay').addClass('hidden');
 			document.location.hash = (fl ? '#F!':'#!') + ph + '!' + key;
 		}
-	});	
+	});
 	$('.fm-dialog.dlkey-dialog .fm-dialog-close').unbind('click');
 	$('.fm-dialog.dlkey-dialog .fm-dialog-close').bind('click',function(e)
 	{
 		$('.fm-dialog.dlkey-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');	
+		$('.fm-dialog-overlay').addClass('hidden');
 	});
 }
 
@@ -886,6 +886,99 @@ function dcTracer(ctr) {
 			})(fn, proto[fn]);
 		}
 	}
+}
+
+function mSpawnWorker(url, data, callback)
+{
+	if (!Array.isArray(data))
+		throw new Error("'data' must be an array");
+	if (!(this instanceof mSpawnWorker))
+		return new mSpawnWorker(url, data, callback);
+
+	this.nworkers = 2;
+	this.complete = 0;
+	this.callback = callback;
+
+	var nw = this.nworkers, idx = 0,
+		l = Math.ceil(data.length/nw);
+
+	if (d) {
+		this.token = mRandomToken('mSpawnWorker.'+l);
+		console.time(this.token);
+	}
+
+	while (nw-- && this.add(url, data.slice(idx, idx+l))) idx += l;
+}
+mSpawnWorker.prototype = {
+	add: function mSW_Add(url, data)
+	{
+		var self = this, wrk;
+
+		try {
+			wrk = new Worker(url);
+		} catch(e) {
+			console.error(e);
+			msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
+			return false;
+		}
+
+		wrk.onmessage = function(ev)
+		{
+			if (d) console.log(self.token, ev.data);
+
+			if (ev.data[0] == 'console')
+			{
+				var args = ev.data[1];
+				args.unshift(self.token);
+				if (d) console.log.apply(console,args);
+				return;
+			}
+
+			self.done(ev.data);
+			Soon(function() {
+				wrk.terminate();
+				self = undefined;
+			});
+		};
+
+		if (d) console.log(this.token, 'Starting...');
+
+		wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
+		wrk.postMessage({
+			data        : data,
+			u_sharekeys : u_sharekeys,
+			u_privk     : u_privk,
+			u_handle    : u_handle,
+			u_k         : u_k
+		});
+
+		return true;
+	},
+	done: function mSW_Done(reply)
+	{
+		if (!this.result) this.result = reply.result;
+		else $.extend(this.result, reply.result);
+
+		if (reply.newmissingkeys)
+		{
+			newmissingkeys = true;
+			$.extend(missingkeys, reply.missingkeys);
+		}
+		if (reply.rsa2aes) $.extend(rsa2aes, reply.rsa2aes);
+
+		if (++this.complete == this.nworkers)
+		{
+			if (d) console.timeEnd(this.token);
+
+			this.callback(this.result);
+			oDestroy(this);
+		}
+	}
+};
+
+function mRandomToken(pfx)
+{
+	return (pfx || '!') + '$' + (Math.random()*Date.now()).toString(36);
 }
 
 function str_mtrunc(str, len)
@@ -926,7 +1019,7 @@ function setupTransferAnalysis()
 						var x = c.xhr || {};
 						return [''+c,x.__failed,x.__timeout,!!x.listener,x.__id,x.readyState>1&&x.status];
 					});
-					
+
 					if (d) console.warn(i + ' might be stuck, checking...', c, w.length, u);
 
 					if (w.length)
@@ -942,16 +1035,16 @@ function setupTransferAnalysis()
 							if (stuck)
 							{
 								var chunk_id = '' + w[j], n = u[j];
-								
+
 								if (w[j].dl && w[j].dl.lasterror) r = '[DLERR'+w[j].dl.lasterror+']';
 								else if (w[j].srverr) r = '[SRVERR'+(w[j].srverr-1)+']';
-								
+
 								try {
 									w[j].on_error(0,{},'Stuck');
 								} catch(e) {
 									n.push(e.message);
 								}
-								
+
 								if (!chunks[chunk_id])
 								{
 									chunks[chunk_id] = 1;
@@ -959,7 +1052,7 @@ function setupTransferAnalysis()
 								}
 							}
 						}
-						
+
 						if (!data.length && (Date.now() - time[i]) > (mXHRTimeoutMS * 3.1))
 						{
 							r = s ? '[TIMEOUT]' : '[ETHERR]';
@@ -971,7 +1064,7 @@ function setupTransferAnalysis()
 						r = '[!]';
 						data = 'GlobalProgress.' + i + ' exists with no working chunks.';
 					}
-					
+
 					if (data.length)
 					{
 						var udata = { i:i, p:c, d:data, j:[prev,tlen], s:s };

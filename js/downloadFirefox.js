@@ -85,6 +85,7 @@ function MemoryIO(dl_id, dl)
 		u8buf = undefined;
 	};
 }
+MemoryIO.usable = function() { return true }
 
 function mozIOError(name)
 {

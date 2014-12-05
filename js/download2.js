@@ -3,7 +3,7 @@ var dlMethod
 	, dl_legacy_ie = (typeof XDomainRequest != 'undefined') && (typeof ArrayBuffer == 'undefined')
 	, dl_maxchunk = 16*1048576
 	, ui_paused = false
-	, dlQueue = new TransferQueue(downloader, dl_maxSlots)
+	, dlQueue = new TransferQueue(downloader, dl_maxSlots, 'downloads')
 
 /** @FIXME: move me somewhere else */
 $.len = function(obj) {
@@ -429,25 +429,27 @@ DownloadQueue.prototype.getUrls = function(dl_chunks, dl_chunksizes, url) {
 
 DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	var dl_chunks = []
-		, dl_chunksizes = []
+		, dl_chunksizes = {}
 
 	var pp, p = pp = 0;
-	for (var i = 1; i <= 8 && p < dl_filesize-i*"128".KB(); i++) {
-		dl_chunksizes[p] = i*"128".KB()
+	for (var i = 1; i <= 8 && p < dl_filesize-i*131072; i++) {
+		dl_chunksizes[p] = i*131072;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
 	}
 
-	var chunksize = dl_filesize / dlQueue._limit / 2
+	var chunksize = dl_filesize / dlQueue._limit / 2;
+	if (chunksize > dl_maxchunk) chunksize = dl_maxchunk;
+	else if (chunksize <= 1048576) chunksize = 1048576;
+	else chunksize = 1048576 * Math.floor(chunksize / 1048576);
 
-	if (chunksize > "16".MB()) chunksize = "16".MB()
-	else if (chunksize <= "1".MB()) chunksize = "1".MB();
-	else chunksize = "1".MB() * Math.floor(chunksize / "1".MB())
-
-	var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
+	// var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
+	var reserved = dl_filesize - chunksize;
+	var eofcs = Math.max(Math.floor(chunksize/3),1048576);
 	while (p < dl_filesize) {
-		dl_chunksizes[p] = p > reserved ? "1".MB() : chunksize;
+		// dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
+		dl_chunksizes[p] = p > reserved ? eofcs : chunksize;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];
@@ -458,7 +460,9 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 		delete dl_chunks[dl_chunks.length-1];
 	}
 
-	return {chunks: dl_chunks, offsets: dl_chunksizes};
+	dl_chunks = {chunks: dl_chunks, offsets: dl_chunksizes};
+	if (d) console.log('dl_chunks', chunksize, dl_chunks);
+	return dl_chunks;
 }
 
 var dl_lastquotawarning = 0
@@ -641,13 +645,15 @@ function IdToFile(id) {
 	return dl;
 }
 
+window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
 if(localStorage.dlMethod) {
 	dlMethod = window[localStorage.dlMethod];
 } else if (is_chrome_firefox & 4) {
 	dlMethod = FirefoxIO;
-} else if (window.webkitRequestFileSystem) {
+} else if (window.requestFileSystem) {
 	dlMethod = FileSystemAPI;
-} else if (navigator.msSaveOrOpenBlob || "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a")) {
+} else if (MemoryIO.usable()) {
 	dlMethod = MemoryIO;
 } else {
 	dlMethod = FlashIO;

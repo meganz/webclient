@@ -1478,7 +1478,7 @@ function fmremove()
 		var n = M.d[$.selected[i]];
 		if (n && n.p.length == 11) removesharecnt++;
 		else if ($.selected[i].length == 11) contactcnt++;
-		else if (M.d[$.selected[i]].t) foldercnt++;
+		else if (n && n.t) foldercnt++;
 		else filecnt++;
 	}
 
@@ -6531,7 +6531,7 @@ function getclipboardlinks()
 			if (n.t) F='F';
 			if (i > 0) l += '\n';
 			l += 'https://mega.co.nz/#'+F+'!' + htmlentities(n.ph);
-			if ($('#export-checkbox').is(':checked')) l += '!' + a32_to_base64(key);
+			if (key && $('#export-checkbox').is(':checked')) l += '!' + a32_to_base64(key);
 		}
 	}
 	return l;
@@ -7768,8 +7768,7 @@ function savecomplete(id)
 	$('.fm-dialog.download-dialog').addClass('hidden');
 	$('.fm-dialog-overlay').addClass('hidden');
 	$('body').removeClass('overlayed');
-	if (!$.dialog)
-	$('#dlswf_'+id).remove();
+	if (!$.dialog) $('#dlswf_'+id).remove();
 	var dl = IdToFile(id);
 	M.dlcomplete(dl);
 	DownloadManager.cleanupUI(dl, true);

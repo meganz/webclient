@@ -3165,6 +3165,8 @@ function execsc(ap)
 			if (d) console.log('OWN ACTION PACKET');
 
             if(a.a == 'c') {
+                process_u(a.u);
+                
                 if(megaChat && megaChat.is_initialized) {
                     $.each(a.u, function(k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](

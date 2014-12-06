@@ -9,11 +9,22 @@
 		"mega.nz"    : 1,
 		"me.ga"      : 1
 	};
+	var mID = String(Components.stack.filename).split("=").pop();
+
+	addMessageListener("MEGA:"+mID+":bcast", m =>
+	{
+		m = m.data.split(':');
+
+		if (mID === m[1] && m[2]+m[0] === 'da')
+		{
+			mID = 0;
+		}
+	});
 
 	addEventListener("DOMContentLoaded", ev =>
 	{
 		var doc = ev.originalTarget;
-		if (doc.nodeName === "#document")
+		if (mID && doc.nodeName === "#document")
 		{
 			var l = doc.location;
 
@@ -27,7 +38,7 @@
 				}
 				catch(e)
 				{
-					if (e.result === 0x804b0012) sendSyncMessage('MEGA::loadURI', l);
+					if (e.result === 0x804b0012) sendSyncMessage('MEGA:'+mID+':loadURI', l);
 				}
 			}
 		}

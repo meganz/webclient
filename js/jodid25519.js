@@ -1872,7 +1872,13 @@ define('jodid25519/eddsa',[
         var bytes = new Array(cnt);
         for (var i = cnt - 1; i >= 0; i--) {
             bytes[i] = n[0] & 255; // n.and(0xff);
-            n = n.shiftRight(8);
+            if (typeof n.shiftRight === 'function') {
+                n = n.shiftRight(8);
+            } else {
+                var tmp = nbi();
+                n.rShiftTo(8,tmp);
+                n=tmp;
+            }
         }
         return bytes;
     }

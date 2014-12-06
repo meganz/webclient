@@ -1122,23 +1122,28 @@ function getsc(fm)
 		{
 			if (typeof res == 'object')
 			{
+				function done(sma)
+				{
+					if (sma !== false && typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB === 'object')
+						localStorage[u_handle + '_maxaction'] = maxaction;
+					
+					if (ctx.fm)
+					{
+						mDBloaded=true;
+						renderfm();
+						pollnotifications();
+					}
+				}
 				if (res.w)
 				{
 					waiturl = res.w;
 					waittimeout = setTimeout(waitsc,waitbackoff);
+					done(!1);
 				}
 				else
 				{
 					if (res.sn) maxaction = res.sn;
-					execsc(res.a);
-					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
-				}
-
-				if (ctx.fm)
-				{
-					mDBloaded=true;
-					renderfm();
-					pollnotifications();
+					execsc(res.a, done);
 				}
 			}
 		}
@@ -2205,12 +2210,14 @@ fa_handler.prototype =
 		{
 			if (!fa_handler.errors) fa_handler.errors = 0;
 
-			if (++fa_handler.errors == 3) fa_handler.chunked = false;
+			if (++fa_handler.errors == 7) fa_handler.chunked = false;
 
 			srvlog(this.xhr.fa_host + ' connection interrupted (chunked fa)');
 		}
 
 		oDestroy(this);
+
+		return pending;
 	}
 };
 
@@ -2247,7 +2254,7 @@ function api_fareq(res,ctx,xhr)
 	if (!d && ctx.startTime && (Date.now() - ctx.startTime) > 10000)
 	{
 		var host = (xhr.q && xhr.q.url || '~!').split('//').pop().split('/')[0];
-		srvlog('api_getfileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
+		srvlog('api_'+(ctx.p?'get':'store')+'fileattr for ' + host + ' with type ' + ctx.type + ' took +10s ' + error);
 	}
 
 	if ( error )
@@ -2367,7 +2374,7 @@ function api_fareq(res,ctx,xhr)
 				{
 					if (this.fart) clearTimeout(this.fart);
 
-					this.fah.done(ev);
+					if (this.fah.done(ev)) Soon(fm_thumbnails);
 				}
 			};
 
@@ -2554,6 +2561,8 @@ var rsa2aes = {};
 // master_aes - my master password's AES cipher
 // file - ufs node containing .k and .a
 // Output: .key and .name set if successful
+// **NB** Any changes made to this function
+//        must be populated to keydec.js
 function crypto_processkey(me,master_aes,file)
 {
 	var id, key, k, n;

@@ -1656,7 +1656,14 @@ function MegaData ()
 
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
-				crypto_processkey(u_handle,u_k_aes,n);
+				if (u_kdnodecache[n.h])
+				{
+					$.extend(n, u_kdnodecache[n.h]);
+				}
+				else
+				{
+					crypto_processkey(u_handle,u_k_aes,n);
+				}
 				u_nodekeys[n.h] = n.key;
 			}
 			else if (!n.k)
@@ -3144,12 +3151,13 @@ function rendernew()
 	if (d) console.timeEnd('rendernew');
 }
 
-function execsc(ap)
+function execsc(ap, callback)
 {
 	var tparentid = false;
 	var trights = false;
 	var tmoveid = false;
 	var rootsharenodes = [];
+	var async_procnodes = [];
 
 	var loadavatars=false;
 
@@ -3337,7 +3345,8 @@ function execsc(ap)
 
 			tparentid = false;
 			trights = false;
-			process_f(a.t.f);
+			// process_f(a.t.f);
+			async_procnodes = async_procnodes.concat(a.t.f);
 		}
 		else if (a.a == 'c')
 		{
@@ -3420,11 +3429,20 @@ function execsc(ap)
 			if (d) console.log('not processing this action packet',a);
 		}
 	}
-	if (newnodes.length > 0 && fminitialized) rendernew();
-	if (loadavatars) M.avatars();
-	fm_thumbnails();
-	if ($.dialog == 'properties') propertiesDialog();
-	getsc();
+	if (async_procnodes.length)
+	{
+		process_f(async_procnodes, done);
+	}
+	else done();
+
+	function done() {
+		if (newnodes.length > 0 && fminitialized) rendernew();
+		if (loadavatars) M.avatars();
+		fm_thumbnails();
+		if ($.dialog == 'properties') propertiesDialog();
+		getsc();
+		if (callback) Soon(callback);
+	}
 }
 
 var M = new MegaData();
@@ -3728,12 +3746,42 @@ function processmove(jsonmove)
 	}
 }
 
+var u_kdnodecache = {};
+
 function process_f(f, cb)
 {
-	// for (var i in f) M.addNode(f[i]);
-	var max = 0x8000, n;
+	if (f && f.length)
+	{
+		if (f.length < 200 || window.dk)
+		{
+			if (window.dk) console.log('Processing ' + f.length + ' nodes in the main thread');
+			if (d) console.time('proc_f');
+			__process_f1(f, cb);
+			if (d) console.timeEnd('proc_f');
+		}
+		else
+		{
+			mSpawnWorker('keydec.js', f, function(r)
+			{
+				if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
 
-	if (f) while ((n = f.pop()))
+				$.extend(u_kdnodecache, r);
+				__process_f2(f, cb);
+			});
+		}
+	}
+	else if (cb) Soon(cb);
+}
+function __process_f1(f, cb)
+{
+	for (var i in f) M.addNode(f[i]);
+	if (cb) Soon(cb);
+}
+function __process_f2(f, cb)
+{
+	var max = 12000, n;
+
+	while ((n = f.pop()))
 	{
 		M.addNode(n);
 
@@ -3743,7 +3791,7 @@ function process_f(f, cb)
 	if (cb)
 	{
 		if (max) Soon(cb);
-		else setTimeout(process_f, 200, f, cb);
+		else setTimeout(__process_f2, 200, f, cb);
 	}
 }
 

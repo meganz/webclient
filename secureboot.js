@@ -544,6 +544,7 @@ else
 		jsl.push({f:'js/chat.js', n: 'chat_js', j:1,w:7});
 		jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
 		jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+		jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
 		if (is_extension)
 		{
 			jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
@@ -589,6 +590,7 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+
 		var jsl2 =
 		{
 			'about': {f:'html/about.html', n: 'about', j:0},

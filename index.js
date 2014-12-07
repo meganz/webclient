@@ -884,6 +884,7 @@ function topmenuUI()
 	}
 	else
 	{
+
 		if (u_type === 0 && !confirmok && page !== 'key')
 		{
 			$('.top-menu-item.register').text(l[968]);
@@ -899,9 +900,27 @@ function topmenuUI()
 			$('.top-warning-popup').unbind('click');
 			$('.top-warning-popup').bind('click',function(e)
 			{
+                if(isNonActivatedAccount()) {
+                    return;
+                }
+
 				$('.top-warning-popup').removeClass('active');
 				document.location.hash = 'register';
 			});
+            if(isNonActivatedAccount()) {
+                var $dialog = $('.top-warning-popup');
+                $dialog.addClass('not-activated');
+                $('.warning-green-icon', $dialog).remove();
+                $('.fm-notifications-bottom', $dialog).remove();
+                $('.warning-popup-body', $dialog)
+                    .unbind('click')
+                    .empty()
+                    .append(
+                    $("<div class='warning-gray-icon mailbox-icon'></div>")
+                )
+                    .append('<p>Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.</p>'); //TODO: l[]
+
+            }
 			if (page !== 'register') $('.top-warning-popup').addClass('active');
 		}
 		$('.top-menu-item.upgrade-your-account').show();
@@ -1242,10 +1261,10 @@ function topmenuUI()
 		document.location.hash = '#';
 	});
 
-	var c = $('.fm-dialog.registration-success').attr('class');
+	var c = $('.fm-dialog.registration-page-success').attr('class');
 	if (c.indexOf('hidden') == -1)
 	{
-		$('.fm-dialog.registration-success').addClass('hidden');
+		$('.fm-dialog.registration-page-success').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 	}
 

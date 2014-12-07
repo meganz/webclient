@@ -2646,9 +2646,12 @@ function process_f(f, cb)
 {
 	if (f && f.length)
 	{
-		if (f.length < 200)
+		if (f.length < 200 || window.dk)
 		{
+			if (window.dk) console.log('Processing ' + f.length + ' nodes in the main thread');
+			if (d) console.time('proc_f');
 			__process_f1(f, cb);
+			if (d) console.timeEnd('proc_f');
 		}
 		else
 		{

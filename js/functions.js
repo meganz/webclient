@@ -895,7 +895,7 @@ function mSpawnWorker(url, data, callback)
 	if (!(this instanceof mSpawnWorker))
 		return new mSpawnWorker(url, data, callback);
 
-	this.nworkers = 2;
+	this.nworkers = 4;
 	this.complete = 0;
 	this.callback = callback;
 
@@ -924,15 +924,16 @@ mSpawnWorker.prototype = {
 
 		wrk.onmessage = function(ev)
 		{
-			if (d) console.log(self.token, ev.data);
-
 			if (ev.data[0] == 'console')
 			{
-				var args = ev.data[1];
-				args.unshift(self.token);
-				if (d) console.log.apply(console,args);
+				if (d) {
+					var args = ev.data[1];
+					args.unshift(self.token);
+					console.log.apply(console,args);
+				}
 				return;
 			}
+			if (d) console.log(self.token, ev.data);
 
 			self.done(ev.data);
 			Soon(function() {
@@ -946,6 +947,7 @@ mSpawnWorker.prototype = {
 		wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
 		wrk.postMessage({
 			data        : data,
+			debug       : !!window.d,
 			u_sharekeys : u_sharekeys,
 			u_privk     : u_privk,
 			u_handle    : u_handle,

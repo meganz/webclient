@@ -17216,8 +17216,10 @@ a.top-login-forgot-pass {
     cursor: pointer;
 }
 .pro-register-paypal-dialog .reg-success-icon {
-    background: url(../images/mega/creditcardpayment.png) 0 0 no-repeat;
-    background-size: 100px 100px;
+    background: url(../images/mega/creditcard_game_2.png) 0 0 no-repeat;
+    background-size: 200px 200px;
+    width: 200px;
+    height: 200px;
 }
 /* logged in PRO account, but not activated */
 .top-warning-popup.not-activated {

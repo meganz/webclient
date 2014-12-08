@@ -672,6 +672,14 @@ function redirectToPaypal() {
 
     var $dialog = $('.fm-dialog.pro-register-paypal-dialog');
 
+    var reposition = function() {
+        $dialog.css({
+            'margin-left': -1 * ($dialog.outerWidth() / 2),
+            'margin-top': -1 * ($dialog.outerHeight() / 2)
+        });
+    };
+    reposition();
+
     $dialog
         .addClass('active')
         .removeClass('hidden');

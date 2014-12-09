@@ -107,7 +107,16 @@ if(window.location.hostname == "beta.mega.nz" || window.location.hostname == "me
                     .done(function(r) {
                         r = $.trim(r);
                         if(r.length == 40) {
-                            window.megaVersion = r;
+                            if(window.megaPrevVersion && window.megaPrevVersion != r) {
+                                alert("You are using an outdated version. Please update!");
+                                window.megaVersion = window.megaPrevVersion;
+                            } else {
+                                window.megaVersion = r;
+                                window.megaPrevVersion = r;
+                            }
+                            setTimeout(function() {
+                                delete window.megaVersion;
+                            }, 10000);
                         } else {
                             window.megaVersion = "verNotFound";
                         }

@@ -766,6 +766,9 @@ makeMetaAware(Karere);
         )
             .always(function() {
                 delete self._disconnectTimeoutPromise;
+                if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
+                    self.connection._doDisconnect();
+                }
             }).done(function() {
                 self.clearMeta('rooms');
             });

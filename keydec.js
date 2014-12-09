@@ -10,10 +10,13 @@ self.postMessage = self.webkitPostMessage || self.postMessage;
 self.onmessage = function ( e ) {
 	var evd = e.data, nodes = evd.data, r = {}, dp = 0;
 
-	d = !!evd.debug;
-	u_privk = evd.u_privk;
-	u_k_aes = new sjcl.cipher.aes(evd.u_k);
-	u_sharekeys = evd.u_sharekeys;
+	d              = !!evd.debug;
+	u_privk        = evd.u_privk;
+	u_k_aes        = new sjcl.cipher.aes(evd.u_k);
+	u_sharekeys    = evd.u_sharekeys;
+	rsa2aes        = {};
+	missingkeys    = {};
+	newmissingkeys = false;
 
 	for (var i in nodes)
 	{
@@ -23,22 +26,23 @@ self.onmessage = function ( e ) {
 		{
 			var o = {};
 
-			// crypto_processkey(evd.u_handle,u_k_aes,n,o);
-			// r[n.h] = o;
+			crypto_processkey(evd.u_handle,u_k_aes,n,o);
+			r[n.h] = o;
 
-			try {
-				crypto_processkey(evd.u_handle,u_k_aes,n,o);
-				if (Object.keys(o).length) r[n.h] = o;
-				else ++dp;
-			} catch(e) {
-				console.log('ERROR: ' + e);
-			}
+			// try {
+				// crypto_processkey(evd.u_handle,u_k_aes,n,o);
+				// if (Object.keys(o).length) r[n.h] = o;
+				// else ++dp;
+			// } catch(e) {
+				// console.log('ERROR: ' + e);
+			// }
 		}
 	}
-	if (dp) console.log('Dummy process for ' + dp + ' nodes');
+	// if (dp) console.log('Dummy process for ' + dp + ' nodes');
 
 	self.postMessage({
 		result         : r,
+		jid            : evd.jid,
 		rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
 		missingkeys    : missingkeys,
 		newmissingkeys : newmissingkeys,

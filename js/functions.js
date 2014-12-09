@@ -888,12 +888,12 @@ function dcTracer(ctr) {
 	}
 }
 
-function mSpawnWorker(url, data, callback)
+function mSpawnSWorker(url, data, callback)
 {
 	if (!Array.isArray(data))
 		throw new Error("'data' must be an array");
-	if (!(this instanceof mSpawnWorker))
-		return new mSpawnWorker(url, data, callback);
+	if (!(this instanceof mSpawnSWorker))
+		return new mSpawnSWorker(url, data, callback);
 
 	this.nworkers = 4;
 	this.complete = 0;
@@ -903,13 +903,13 @@ function mSpawnWorker(url, data, callback)
 		l = Math.ceil(data.length/nw);
 
 	if (d) {
-		this.token = mRandomToken('mSpawnWorker.'+l);
+		this.token = mRandomToken('mSpawnSWorker.'+l);
 		console.time(this.token);
 	}
 
 	while (nw-- && this.add(url, data.slice(idx, idx+l))) idx += l;
 }
-mSpawnWorker.prototype = {
+mSpawnSWorker.prototype = {
 	add: function mSW_Add(url, data)
 	{
 		var self = this, wrk;
@@ -974,6 +974,176 @@ mSpawnWorker.prototype = {
 
 			this.callback(this.result);
 			oDestroy(this);
+		}
+	}
+};
+
+function mSpawnWorker(url, nw)
+{
+	if (!(this instanceof mSpawnWorker))
+		return new mSpawnWorker(url, nw);
+
+	this.jid = 1;
+	this.jobs = {};
+	this.nworkers=nw=nw||4;
+	this.wrk = new Array(nw);
+	this.token = mRandomToken('mSpawnWorker.'+url.split(".")[0]);
+
+	while (nw--) {
+		if (!(this.wrk[nw] = this.add(url))) {
+			throw new Error(this.token.split("$")[0]+' Setup Error');
+		}
+	}
+}
+mSpawnWorker.prototype = {
+	process: function mSW_Process(data, callback, onerror)
+	{
+		if (!Array.isArray(data)) {
+			var err = new Error("'data' must be an array");
+			if (onerror) return onerror(err);
+			throw err;
+		}
+		if (this.unreliably) {
+			return onerror(0xBADF);
+		}
+		var nw  = this.nworkers, l = Math.ceil(data.length/nw);
+		var id  = mRandomToken("mSWJobID"+this.jid++), idx = 0;
+		var job = { done: 0, data: [], callback: callback};
+
+		while (nw--) {
+			job.data.push(data.slice(idx, idx+=l));
+		}
+		if (onerror) job.onerror = onerror;
+		this.jobs[id] = job;
+		this.postNext();
+	},
+	postNext: function mSW_PostNext()
+	{
+		if (this.busy())
+			return;
+		for (var id in this.jobs)
+		{
+			var nw = this.nworkers;
+			var job = this.jobs[id], data;
+
+			while (nw--)
+			{
+				if (!this.wrk[nw].working)
+				{
+					data = job.data.shift();
+					if (data)
+					{
+						this.wrk[nw].working = !0;
+						this.wrk[nw].postMessage({
+							data        : data,
+							debug       : !!window.d,
+							u_sharekeys : u_sharekeys,
+							u_privk     : u_privk,
+							u_handle    : u_handle,
+							u_k         : u_k,
+							jid         : id
+						});
+
+						if (d && job.data.length == this.nworkers-1) console.time(id);
+					}
+				}
+			}
+		}
+	},
+	busy: function()
+	{
+		var nw = this.nworkers;
+		while (nw--) {
+			if (this.wrk[nw].working)
+				return true;
+		}
+		return false;
+	},
+	add: function mSW_Add(url)
+	{
+		var self = this, wrk;
+
+		try {
+			wrk = new Worker(url);
+		} catch(e) {
+			console.error(e);
+			if (!window[this.token]) {
+				window[this.token] = true;
+				msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
+			}
+			return false;
+		}
+
+		wrk.onerror = function mSW_OnError(err)
+		{
+			console.error(err);
+			Soon(function() {
+				throw err;
+			});
+			self.unreliably = true;
+			var nw = self.nworkers;
+			while (nw--) {
+				self.wrk[nw].terminate();
+			}
+			for (var id in self.jobs) {
+				var job = self.jobs[id];
+				if (job.onerror) job.onerror(err);
+			}
+			if (!window[self.token]) {
+				window[self.token] = true;
+				msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+			}
+			delete self.wrk;
+			delete self.jobs;
+			self = undefined;
+		};
+
+		wrk.onmessage = function mSW_OnMessage(ev)
+		{
+			if (ev.data[0] == 'console')
+			{
+				if (d) {
+					var args = ev.data[1];
+					args.unshift(self.token);
+					console.log.apply(console,args);
+				}
+				return;
+			}
+			if (d) console.log(self.token, ev.data);
+
+			wrk.working = false;
+			self.done(ev.data);
+		};
+
+		if (d) console.log(this.token, 'Starting...');
+
+		wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
+
+		return wrk;
+	},
+	done: function mSW_Done(reply)
+	{
+		var job = this.jobs[reply.jid];
+		if (!ASSERT(job,'Invalid worker reply.'))
+			return;
+
+		if (!job.result) job.result = reply.result;
+		else $.extend(job.result, reply.result);
+
+		if (reply.newmissingkeys)
+		{
+			newmissingkeys = true;
+			$.extend(missingkeys, reply.missingkeys);
+		}
+		if (reply.rsa2aes) $.extend(rsa2aes, reply.rsa2aes);
+
+		Soon(this.postNext.bind(this));
+		if (++job.done == this.nworkers)
+		{
+			if (d) console.timeEnd(reply.jid);
+
+			delete this.jobs[reply.jid];
+			job.callback(job.result);
 		}
 	}
 };

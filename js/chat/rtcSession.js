@@ -1193,6 +1193,15 @@ RtcSession.prototype = {
     RtcSession.gLocalStreamRefcount++;
     if (sendsVideo)
         RtcSession._enableLocalVid(this);
+    /**
+      @event "local-stream-connect"
+      @type {object}
+      @property {object} player The local video element
+      Fired when a call session connects to the local media stream, independent
+      of whether the local stream has been just obtained or not, i.e. this
+      event is always fired during a call setup
+    */
+    this.trigger('local-stream-connect', {player: RtcSession.gLocalVid});
  },
  _unrefLocalStream: function() {
     var cnt = --RtcSession.gLocalStreamRefcount;

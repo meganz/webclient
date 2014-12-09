@@ -17226,7 +17226,7 @@ a.top-login-forgot-pass {
     cursor: default;
 }
 .top-warning-popup.not-activated .mailbox-icon {
-    background: url(../images/mega/email_confirm_placeholder.png) 0 0 no-repeat;
+    background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
     background-size: 100px 100px;
     width: 100px;
     height: 100px;

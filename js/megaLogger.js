@@ -148,7 +148,11 @@ MegaLogger.prototype._log = function(level, arguments) {
 
     args = args.concat(arguments);
     if(this.options.dereferenceObjects) {
-        args = JSON.parse(JSON.stringify(args));
+        try {
+            args = JSON.parse(JSON.stringify(args));
+        } catch(e) {
+            // typeerror ?
+        }
     }
 
     if(this.options.isEnabled === true || ($.isFunction(this.options.isEnabled) && this.options.isEnabled())) {

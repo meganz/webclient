@@ -1007,7 +1007,7 @@ Chat.prototype.init = function() {
                 );
             } else {
                 self.chats[eventObject.getRoomJid()].setState(
-                    ChatRoom.STATE.JOINED
+                    ChatRoom.STATE.WAITING_FOR_PARTICIPANTS
                 );
             }
         }

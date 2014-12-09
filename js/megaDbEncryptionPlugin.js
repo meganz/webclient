@@ -117,14 +117,14 @@ var MegaDBEncryption = function(mdbInstance) {
      * attach those functions to the specific event handlers
      */
     mdbInstance.bind("onBeforeAdd", function(e, table, obj) {
-        logger.debug("onBeforeAdd: ", table, obj);
+        //logger.debug("onBeforeAdd: ", table, obj);
 
         e.returnedValue = [table, clone(obj)];
         simpleEncryptObjFunction(table, e.returnedValue[1]);
     });
 
     mdbInstance.bind("onBeforeUpdate", function(e, table, k, obj, isQuerysetUpdate) {
-        logger.debug("onBeforeUpdate: ", table, obj);
+        //logger.debug("onBeforeUpdate: ", table, obj);
 
         e.returnedValue = [table, k, clone(obj), isQuerysetUpdate];
 

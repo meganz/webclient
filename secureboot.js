@@ -16,8 +16,19 @@ function isMobile()
 
 function geoStaticpath(eu)
 {
-	if (!eu && !sessionStorage.skipcdn && 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW'.indexOf(((''+document.cookie).match(/\bgeoip\s*\=\s*([A-Z]{2})\b/)||[0,'FR'])[1]) == -1) return 'https://g.cdn1.mega.co.nz/';
-	else return 'https://eu.static.mega.co.nz/';
+	if (!eu) {
+		try {
+			if (!sessionStorage.skipcdn) {
+				var cc = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
+				var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
+				if (cm && cm[1] && cc.indexOf(cm[1]) == -1)
+					return 'https://g.cdn1.mega.co.nz/';
+			}
+		} catch(e) {
+			setTimeout(function() { throw e; }, 2100);
+		}
+	}
+	return 'https://eu.static.mega.co.nz/';
 }
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;

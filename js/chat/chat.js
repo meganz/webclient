@@ -1344,7 +1344,7 @@ Chat.prototype.init = function() {
         $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
         $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
         $(self.rtc).on('media-recv', rtcEventProxyToRoom);
-        $(self.rtc).on('local-stream-obtained', rtcEventProxyToRoom);
+        $(self.rtc).on('local-stream-connect', rtcEventProxyToRoom);
         $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
         $(self.rtc).on('local-player-remove', rtcEventProxyToRoom);
         $(self.rtc).on('local-media-fail', rtcEventProxyToRoom);

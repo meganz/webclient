@@ -657,7 +657,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
         self._resetCallStateInCall();
     });
-    self.bind('local-stream-obtained', function(event, obj) {
+    self.bind('local-stream-connect', function(event, obj) {
         $('.my-av-screen video', self.$header).remove();
 
         $('.my-av-screen', self.$header).append(obj.player);

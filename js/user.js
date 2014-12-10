@@ -469,6 +469,7 @@ function generateAvatarMeta(user_hash) {
     var contact = M.u[user_hash];
     if(!contact) {
         console.error('contact not found');
+        contact = {}; // dummy obj.
     }
 
     var fullName = generateContactName(user_hash);

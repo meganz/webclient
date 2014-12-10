@@ -210,7 +210,13 @@ ChatStore.prototype.attachToChat = function(megaChat) {
                         room._conv_ended = v.ended;
 
                         room.setState(ChatRoom.STATE.JOINING);
-                        megaChat.karere.joinChat(v.roomJid);
+                        if(megaChat.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+                            megaChat.karere.joinChat(v.roomJid);
+                        } else {
+                            megaChat.karere.one("onConnected.chatStore", function() {
+                                megaChat.karere.joinChat(v.roomJid);
+                            });
+                        }
 
 
                         room.refreshUI();

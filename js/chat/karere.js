@@ -26,9 +26,9 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
 
     if (karere._connectionRetries > (karere.options.maxConnectionRetries * 2)) {
         /* *2, because every conn. counts as 2, 2 XHR conns = 1 jabber connection */
-        this._onDisconnectTimeout();
+        karere.forceDisconnect();
     } else {
-        this._conn._doDisconnect();
+        karere.forceDisconnect();
 
         setTimeout(function() {
             if(karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTING) {
@@ -680,6 +680,11 @@ makeMetaAware(Karere);
     };
 
 
+    Karere.prototype.forceDisconnect = function() {
+        this.connection._onDisconnectTimeout();
+        this._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
+    };
+
     /**
      * Simple reconnect method
      *
@@ -688,12 +693,17 @@ makeMetaAware(Karere);
     Karere.prototype.reconnect = function() {
         var self = this;
 
-        if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED && self.getConnectionState() != Karere.CONNECTION_STATE.AUTHFAIL) {
-            throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
-        }
         if(!self._jid || !self._password) {
             throw new Error("Missing jid or password.");
         }
+
+        if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
+            self.forceDisconnect();
+        } else if(self.getConnectionState() != Karere.CONNECTION_STATE.DISCONNECTED && self.getConnectionState() != Karere.CONNECTION_STATE.AUTHFAIL) {
+            throw new Error("Invalid connection state. Karere should be DISCONNECTED, before calling .reconnect.");
+        }
+
+
 
         return self.connect(self._jid, self._password);
     };
@@ -742,7 +752,7 @@ makeMetaAware(Karere);
                 })
                 .fail(function() {
                     self.logger.warn("Queue did not emptied in the given timeout. Forcing disconnect.");
-                    self.connection._doDisconnect();
+                    self.forceDisconnect();
                 })
                 .done(function() {
                     self.logger.debug("Queue is empty. Calling disconnect.");
@@ -752,7 +762,7 @@ makeMetaAware(Karere);
         } else if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
             // do nothing, we are already in the process of disconnecting.
         } else {
-            self._connectionState = Karere.CONNECTION_STATE.DISCONNECTED
+            self.forceDisconnect();
         }
 
         clearTimeout(self._connectionRetryInProgress);
@@ -767,7 +777,7 @@ makeMetaAware(Karere);
             .always(function() {
                 delete self._disconnectTimeoutPromise;
                 if(self.getConnectionState() == Karere.CONNECTION_STATE.DISCONNECTING) {
-                    self.connection._doDisconnect();
+                    self.forceDisconnect();
                 }
             }).done(function() {
                 self.clearMeta('rooms');

@@ -2983,7 +2983,12 @@ ChatRoom.prototype._generateContactAvatarElement = function(fullJid) {
 
     var contact = self.megaChat.getContactFromJid(fullJid);
 
-    assert(contact, 'contact not found: ' + fullJid);
+    if(!contact) {
+        self.logger.error('contact not found: ' + fullJid);
+
+        return;
+    }
+
 
     var $av = generateAvatarElement(contact.u);
     var cls = $av.attr('class');

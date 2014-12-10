@@ -30,10 +30,17 @@ var EncryptionFilter = function(megaChat) {
             {
                 'get': function(jid) {
                     var contact = megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(jid));
-                    assert(!!contact, 'contact not found: ' + jid);
+                    if(!contact) {
+                        megaRoom.logger.error("contact not found: ", jid);
+                        return;
+                    }
 
                     var h = contact.u;
-                    assert(!!pubEd25519[h], 'pubEd25519 key not found for user: ' + h);
+                    if(!pubEd25519[h]) {
+                        megaRoom.logger.error('pubEd25519 key not found for user: ', h, "with jid: ", jid);
+                        debugger;
+                        return;
+                    }
 
                     return pubEd25519[h];
                 }

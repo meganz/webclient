@@ -88,20 +88,26 @@ OpQueue.prototype.preprocess = function(op) {
     var self = this;
 
     if(op[0] == "processMessage") {
+        var $promise1 = new $.Deferred();
+        var $promise2 = new $.Deferred();
+
+
+
+        var $combPromise = $.when($promise1, $promise2);
+
+
         var wireMessage = op[1];
 
         var fromBareJid = Karere.getNormalizedBareJid(wireMessage.from);
 
-        self.logger.debug("Processing: ", wireMessage)
+        self.logger.debug("Processing: ", wireMessage);
 
         var contact = self.megaRoom.megaChat.getContactFromJid(fromBareJid);
-        assert(!!contact, 'contact not found.');
-
-        var $promise1 = new $.Deferred();
-        var $promise2 = new $.Deferred();
-
-        var $combPromise = $.when($promise1, $promise2);
-
+        if(!contact) {
+            self.logger.error("contact not found: ", fromBareJid);
+            $combPromise.reject();
+            return $combPromise;
+        }
         var contact2 = self.megaRoom.megaChat.getContactFromJid(Karere.getNormalizedBareJid(wireMessage.toJid));
 
         $combPromise

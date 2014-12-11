@@ -194,6 +194,93 @@ if (indexedDB)
 		if (!mDBt.t) mDBprocess();
 	}
 
+	if (typeof safari !== 'undefined')
+	{
+		var mDBprocess = function _Safari_mDBprocess()
+		{
+			function __mDBIterate(t, act, queue)
+			{
+				function __mDBNext() {
+					var e = queue.shift();
+					if (e) {
+						try {
+							var r = objectStore[act](e);
+						} catch(e) {
+							// if (d) console.error('objectStore', e);
+							delete mDBt.t;
+							return __mDBIterate(t, act, queue);
+						}
+						if (r) {
+							r.onsuccess = function()
+							{
+								if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) {
+									localStorage[u_handle + '_mDBcount']--;
+								}
+								// if (d) console.log('__mDBNext.success');
+								if ((queue.length % 80) == 0) Soon(__mDBNext);
+								else __mDBNext();
+							};
+							r.onerror = function(err)
+							{
+								if (d) console.log('__mDBNext.error',err);
+								Later(__mDBNext);
+							};
+							return;
+						}
+					}
+
+					Soon(mDBprocess);
+				}
+				// if (d) console.log('__mDBIterate', arguments);
+
+				if (mDBt.t !== t)
+				{
+					mDBt.t = t;
+					mDBt.transation = mDB.transaction([t], "readwrite");
+				}
+				var objectStore = mDBt.transation.objectStore(t);
+				__mDBNext();
+			}
+
+			for (var t in mDBqueue)
+			{
+				var q = mDBqueue[t];
+
+				for (var a in q)
+				{
+					__mDBIterate(t, a, q[a]);
+					delete mDBqueue[t][a];
+					return;
+				}
+			}
+
+			if (d) console.timeEnd('mDBprocess');
+			mDBt = {};
+			mDBqueue = {};
+		};
+		var mDBaddQueue = function _Safari_mDBaddQueue(t,obj)
+		{
+			if (!localStorage[u_handle + '_mDBcount']) {
+				localStorage[u_handle + '_mDBcount']=0;
+			}
+			localStorage[u_handle + '_mDBcount']++;
+
+			var act = obj.d ? 'delete':'put';
+			if (!mDBqueue[t]) mDBqueue[t]={};
+			if (!mDBqueue[t][act]) mDBqueue[t][act]=[];
+			mDBqueue[t][act].push(obj.d||obj.a);
+
+			if (mDBt.stc) clearTimeout(mDBt.stc);
+			mDBt.stc = setTimeout(function() {
+				if (!mDBt.t) {
+					if (d) console.time('mDBprocess');
+					mDBprocess();
+				}
+				delete mDBt.stc;
+			}, 3100);
+		};
+	}
+
 	function mDBdel(t,id)
 	{
 		mDBaddQueue(t,{d:id});

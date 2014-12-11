@@ -433,6 +433,8 @@ else
 					var crashes = JSON.parse(localStorage.crashes || '{}');
 					var checksum = MurmurHash3(JSON.stringify(dump), 0x4ef5391a);
 
+					if (crashes.v != sbid) crashes = { v : sbid };
+
 					if (crashes[checksum])
 					{
 						// Reported less than 10 days ago?

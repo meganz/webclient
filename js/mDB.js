@@ -216,7 +216,7 @@ if (indexedDB)
 	function mDBquery(t)
 	{
 		if (d) console.log('mDBquery()');
-		var fr, dt = t;
+		var fr, dt = t, apn = [];
 		if (t == 'f_sk') dt='f';
 		var objectStore = mDB.transaction(dt,'readonly').objectStore(dt);
 		objectStore.openCursor().onsuccess = function(event)
@@ -234,7 +234,8 @@ if (indexedDB)
 
 				if (typeof value === 'undefined') fr = true;
 				else if (t == 'ok') process_ok([rec.value]);
-				else if (t == 'f') M.addNode(rec.value,1);
+				// else if (t == 'f') M.addNode(rec.value,1);
+				else if (t == 'f') apn.push(rec.value);
 				else if (t == 'f_sk')
 				{
 					var n = rec.value;
@@ -253,22 +254,32 @@ if (indexedDB)
 			{
 				if (d) console.log('mDBloaded',t);
 				mDBloaded[t]=1;
-				for (var dbt in mDBloaded)
-				{
-					if (mDBloaded[dbt] == 0)
+				function __mDB_Next() {
+					for (var dbt in mDBloaded)
 					{
-						mDBquery(dbt);
-						return false;
+						if (mDBloaded[dbt] == 0)
+						{
+							mDBquery(dbt);
+							return false;
+						}
 					}
+					maxaction = localStorage[u_handle + '_maxaction'];
+					for (var i in M.d)
+					{
+						var entries=true;
+						break;
+					}
+					if (!maxaction || typeof entries == 'undefined') mDBreload();
+					else getsc(1);
 				}
-				maxaction = localStorage[u_handle + '_maxaction'];
-				for (var i in M.d)
-				{
-					var entries=true;
-					break;
+				if (apn.length) {
+					$.mDBIgnoreDB = true;
+					process_f(apn, function() {
+						delete $.mDBIgnoreDB;
+						__mDB_Next();
+					});
 				}
-				if (!maxaction || typeof entries == 'undefined') mDBreload();
-				else getsc(1);
+				else __mDB_Next();
 			}
 		};
 	}

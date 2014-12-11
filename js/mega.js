@@ -847,6 +847,7 @@ function MegaData ()
 				}
 				else
 				{
+				console.error('prockey', n.h, new Date().toISOString());
 					crypto_processkey(u_handle,u_k_aes,n);
 				}
 				u_nodekeys[n.h] = n.key;
@@ -2641,31 +2642,49 @@ function processmove(jsonmove)
 }
 
 var u_kdnodecache = {};
+var kdWorker;
 
 function process_f(f, cb)
 {
 	if (f && f.length)
 	{
-		if (f.length < 200)
+		if (f.length < 200 || window.dk)
 		{
+			if (window.dk) console.log('Processing ' + f.length + ' nodes in the main thread');
+			if (d) console.time('proc_f');
 			__process_f1(f, cb);
+			if (d) console.timeEnd('proc_f');
 		}
 		else
 		{
-			mSpawnWorker('keydec.js', f, function(r)
-			{
-				if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
+			if (!kdWorker) try {
+				kdWorker = mSpawnWorker('keydec.js');
+			} catch(e) {
+				if (d) console.error(e);
+				return __process_f2(f, cb);
+			}
 
+			kdWorker.process(f.sort(function() { return Math.random() - 0.5}), function(r) {
+				if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
 				$.extend(u_kdnodecache, r);
 				__process_f2(f, cb);
+			}, function(err) {
+				if (d) console.error(err);
+				__process_f2(f, cb);
 			});
+			// mSpawnSWorker('keydec.js', f, function(r)
+			// {
+				// if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
+				// $.extend(u_kdnodecache, r);
+				// __process_f2(f, cb);
+			// });
 		}
 	}
 	else if (cb) Soon(cb);
 }
 function __process_f1(f, cb)
 {
-	for (var i in f) M.addNode(f[i]);
+	for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
 	if (cb) Soon(cb);
 }
 function __process_f2(f, cb)
@@ -2674,7 +2693,7 @@ function __process_f2(f, cb)
 
 	while ((n = f.pop()))
 	{
-		M.addNode(n);
+		M.addNode(n, !!$.mDBIgnoreDB);
 
 		if (cb && --max == 0) break;
 	}

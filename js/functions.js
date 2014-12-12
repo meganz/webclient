@@ -1546,11 +1546,8 @@ mSpawnWorker.prototype = {
 	busy: function()
 	{
 		var nw = this.nworkers;
-		while (nw--) {
-			if (this.wrk[nw].working)
-				return true;
-		}
-		return false;
+		while (nw-- && this.wrk[nw].working);
+		return nw == -1;
 	},
 	add: function mSW_Add(url)
 	{
@@ -1605,7 +1602,7 @@ mSpawnWorker.prototype = {
 			if (d) console.log(self.token, ev.data);
 
 			wrk.working = false;
-			self.done(ev.data);
+			if (!self.done(ev.data)) this.onerror(0xBADF);
 		};
 
 		if (d) console.log(this.token, 'Starting...');
@@ -1618,7 +1615,7 @@ mSpawnWorker.prototype = {
 	{
 		var job = this.jobs[reply.jid];
 		if (!ASSERT(job,'Invalid worker reply.'))
-			return;
+			return false;
 
 		if (!job.result) job.result = reply.result;
 		else $.extend(job.result, reply.result);
@@ -1628,7 +1625,9 @@ mSpawnWorker.prototype = {
 			newmissingkeys = true;
 			$.extend(missingkeys, reply.missingkeys);
 		}
-		if (reply.rsa2aes) $.extend(rsa2aes, reply.rsa2aes);
+		if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
+		if (reply.u_sharekeys)  $.extend(u_sharekeys,  reply.u_sharekeys);
+		if (reply.rsasharekeys) $.extend(rsasharekeys, reply.rsasharekeys);
 
 		Soon(this.postNext.bind(this));
 		if (++job.done == this.nworkers)
@@ -1638,6 +1637,8 @@ mSpawnWorker.prototype = {
 			delete this.jobs[reply.jid];
 			job.callback(job.result);
 		}
+
+		return true;
 	}
 };
 

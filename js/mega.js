@@ -1652,7 +1652,9 @@ function MegaData ()
 		if (n.t == 4) this.RubbishID 	= n.h;
 		if (!n.c)
 		{
-			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			if (n.sk && !u_sharekeys[n.h]) {
+				u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			}
 
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
@@ -1662,7 +1664,7 @@ function MegaData ()
 				}
 				else
 				{
-				console.error('prockey', n.h, new Date().toISOString());
+					// if (d) console.error('prockey', n.h, new Date().toISOString());
 					crypto_processkey(u_handle,u_k_aes,n);
 				}
 				u_nodekeys[n.h] = n.key;
@@ -3754,12 +3756,26 @@ function process_f(f, cb)
 {
 	if (f && f.length)
 	{
-		if (f.length < 200 || window.dk)
+		var ncn = f;
+		if ($.len(u_kdnodecache)) {
+			ncn = [];
+			for (var i in f) {
+				var n1 = f[i], n2 = u_kdnodecache[n1.h];
+				if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
+			}
+			if (d) console.log('non-cached nodes', ncn.length, ncn);
+		}
+
+		// if (typeof safari !== 'undefined') dk=1;
+
+		if (ncn.length < 200 || window.dk)
 		{
-			if (window.dk) console.log('Processing ' + f.length + ' nodes in the main thread');
-			if (d) console.time('proc_f');
+			if (d) {
+				console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
+				console.time('process_f');
+			}
 			__process_f1(f, cb);
-			if (d) console.timeEnd('proc_f');
+			if (d) console.timeEnd('process_f');
 		}
 		else
 		{
@@ -3770,8 +3786,8 @@ function process_f(f, cb)
 				return __process_f2(f, cb);
 			}
 
-			kdWorker.process(f.sort(function() { return Math.random() - 0.5}), function(r) {
-				if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
+			kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r) {
+				if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
 				$.extend(u_kdnodecache, r);
 				__process_f2(f, cb);
 			}, function(err) {

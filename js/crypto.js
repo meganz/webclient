@@ -3027,12 +3027,12 @@ function crypto_process_sharekey(handle,key)
 		rsasharekeys[handle] = true;
 		return k;
 	}
-	else return decrypt_key(u_k_aes,base64_to_a32(key));
+	return decrypt_key(u_k_aes,base64_to_a32(key));
 }
 
 function crypto_share_rsa2aes()
 {
-	var rsr = [];
+	var rsr = [], n;
 
 	for (n in rsasharekeys)
 	{

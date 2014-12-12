@@ -8,7 +8,7 @@ var sjcl={cipher:{}};sjcl.cipher.aes=function(a){this.a[0][0][0]||this.d();var d
 self.postMessage = self.webkitPostMessage || self.postMessage;
 
 self.onmessage = function ( e ) {
-	var evd = e.data, nodes = evd.data, r = {}, dp = 0;
+	var evd = e.data, nodes = evd.data, r = {}, dp = 0, new_sharekeys = {};
 
 	d              = !!evd.debug;
 	u_privk        = evd.u_privk;
@@ -16,26 +16,33 @@ self.onmessage = function ( e ) {
 	u_sharekeys    = evd.u_sharekeys;
 	rsa2aes        = {};
 	missingkeys    = {};
+	rsasharekeys   = {};
 	newmissingkeys = false;
 
 	for (var i in nodes)
 	{
 		var n = nodes[i];
 
-		if (!n.c && n.k && n.t !== 2 && n.t !== 3 && n.t !== 4)
-		{
-			var o = {};
+		if (!n.c) {
+			if (n.sk && !u_sharekeys[n.h]) {
+				new_sharekeys[n.h] = u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			}
 
-			crypto_processkey(evd.u_handle,u_k_aes,n,o);
-			r[n.h] = o;
+			if (n.k && n.t !== 2 && n.t !== 3 && n.t !== 4)
+			{
+				var o = {};
 
-			// try {
-				// crypto_processkey(evd.u_handle,u_k_aes,n,o);
-				// if (Object.keys(o).length) r[n.h] = o;
-				// else ++dp;
-			// } catch(e) {
-				// console.log('ERROR: ' + e);
-			// }
+				crypto_processkey(evd.u_handle,u_k_aes,n,o);
+				r[n.h] = o;
+
+				// try {
+					// crypto_processkey(evd.u_handle,u_k_aes,n,o);
+					// if (Object.keys(o).length) r[n.h] = o;
+					// else ++dp;
+				// } catch(e) {
+					// console.log('ERROR: ' + e);
+				// }
+			}
 		}
 	}
 	// if (dp) console.log('Dummy process for ' + dp + ' nodes');
@@ -44,6 +51,8 @@ self.onmessage = function ( e ) {
 		result         : r,
 		jid            : evd.jid,
 		rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
+		rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
+		u_sharekeys    : Object.keys(new_sharekeys).length && new_sharekeys,
 		missingkeys    : missingkeys,
 		newmissingkeys : newmissingkeys,
 	});
@@ -59,6 +68,19 @@ var have_ab = !0, d, u_privk, u_k_aes, u_sharekeys;
 var rsa2aes = {};
 var missingkeys = {};
 var newmissingkeys = false;
+var rsasharekeys = {};
+
+function crypto_process_sharekey(handle,key)
+{
+	if (key.length > 22)
+	{
+		key = base64urldecode(key);
+		var k = str_to_a32(crypto_rsadecrypt(key,u_privk).substr(0,16));
+		rsasharekeys[handle] = true;
+		return k;
+	}
+	return decrypt_key(u_k_aes,base64_to_a32(key));
+}
 
 // Try to decrypt ufs node.
 // Parameters: me - my user handle

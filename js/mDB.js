@@ -205,8 +205,8 @@ if (indexedDB)
 					if (e) {
 						try {
 							var r = objectStore[act](e);
-						} catch(e) {
-							// if (d) console.error('objectStore', e);
+						} catch(ex) {
+							// if (d) console.error('objectStore', ex);
 							delete mDBt.t;
 							queue.unshift(e);
 							return __mDBIterate(t, act, queue);

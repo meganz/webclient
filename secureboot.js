@@ -1094,7 +1094,7 @@ else
         {
             var jsar = [];
             var cssar = [];
-            for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+            //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
             for (var i in jsl)
             {
                 jsl_loaded[jsl[i].n]=1;

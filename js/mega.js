@@ -1881,6 +1881,7 @@ function MegaData ()
 		{
 			$(this).remove();
 		});
+		ul_queue[ul.pos] = Object.freeze({});
 		var a=ul_queue.filter(isQueueActive).length;
 		if (a < 2 && !ul_uploading)
 		{

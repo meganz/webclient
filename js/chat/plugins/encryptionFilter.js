@@ -11,7 +11,7 @@ var EncryptionFilter = function(megaChat) {
     self.logger = MegaLogger.getLogger("encryptionFilter", {}, megaChat.logger);
 
     if(window.d && mpenc) {
-        mpenc.debug.decoder = true;
+        window._dummyLoggerOff = false;
     }
     self.megaChat = megaChat;
     self.karere = megaChat.karere;
@@ -49,17 +49,17 @@ var EncryptionFilter = function(megaChat) {
                 self.flushQueue(megaRoom, handler);
             },
             function(handler) {
-                if(handler.state === mpenc.handler.STATE.INITIALISED && (megaRoom.state === ChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === ChatRoom.STATE.PLUGINS_PAUSED)) {
+                if(handler.state === mpenc.handler.STATE.READY && (megaRoom.state === ChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === ChatRoom.STATE.PLUGINS_PAUSED)) {
                     megaRoom.setState(
                         ChatRoom.STATE.PLUGINS_READY
                     )
-                } else if(handler.state !== mpenc.handler.STATE.INITIALISED && megaRoom.state === ChatRoom.STATE.READY) {
+                } else if(handler.state !== mpenc.handler.STATE.READY && megaRoom.state === ChatRoom.STATE.READY) {
                     megaRoom.setState(
                         ChatRoom.STATE.PLUGINS_PAUSED
                     )
                 }
 
-                if(handler.state === mpenc.handler.STATE.INITIALISED) {
+                if(handler.state === mpenc.handler.STATE.READY) {
                     megaRoom.encryptionOpQueue.pop();
                 }
             }
@@ -74,18 +74,18 @@ var EncryptionFilter = function(megaChat) {
             megaRoom.encryptionHandler,
             megaRoom,
             function(opQueue, nextOp) {
-                if(nextOp[0] == "quit" && opQueue.ctx.state !== mpenc.handler.STATE.INITIALISED) {
+                if(nextOp[0] == "quit" && opQueue.ctx.state !== mpenc.handler.STATE.READY) {
                     return false;
                 } else if(nextOp[0] == "recover") {
                     return true;
                 } else if(nextOp[0] == "start" && opQueue.ctx.state == mpenc.handler.STATE.NULL) {
                     return true;
-                } else if(nextOp[0] == "join" && opQueue.ctx.state == mpenc.handler.STATE.INITIALISED) {
+                } else if(nextOp[0] == "join" && opQueue.ctx.state == mpenc.handler.STATE.READY) {
                     return true;
                 } if(nextOp[0] == "processMessage") {  // greet/init enc messages
                     return true;
                 } else {
-                    return opQueue.ctx.state == mpenc.handler.STATE.INITIALISED || opQueue.ctx.state == mpenc.handler.STATE.NULL;
+                    return opQueue.ctx.state == mpenc.handler.STATE.READY || opQueue.ctx.state == mpenc.handler.STATE.NULL;
                 }
             },
             function(opQueue) {
@@ -113,7 +113,7 @@ var EncryptionFilter = function(megaChat) {
         megaRoom.unbind("onStateChange.encFilter");
         megaRoom.bind("onStateChange.encFilter", function(e, oldState, newState) {
             if(newState == ChatRoom.STATE.LEAVING) {
-                if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+                if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state === mpenc.handler.STATE.READY) {
                     megaRoom.encryptionOpQueue.queue('quit');
                 }
             }
@@ -125,7 +125,7 @@ var EncryptionFilter = function(megaChat) {
      */
     megaChat.unbind("onRoomDestroy.encFilter");
     megaChat.bind("onRoomDestroy.encFilter", function(e, megaRoom) {
-        if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state == mpenc.handler.STATE.INITIALISED) {
+        if(Object.keys(megaRoom.getUsers()).length > 1 && megaRoom.encryptionHandler && megaRoom.encryptionHandler.state == mpenc.handler.STATE.READY) {
             megaRoom.encryptionOpQueue.queue('quit');
         }
         delete megaRoom.encryptionHandler;
@@ -153,7 +153,7 @@ var EncryptionFilter = function(megaChat) {
          */
 
         // stop and wait for the crypto to be ready
-//        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED) {
+//        if(megaRoom.encryptionHandler.state !== mpenc.handler.STATE.READY) {
 
         e.stopPropagation();
         megaRoom.setState(ChatRoom.STATE.PLUGINS_PAUSED);
@@ -477,7 +477,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
             );
 
             createTimeoutPromise(function() {
-                return megaRoom.encryptionHandler.state === mpenc.handler.STATE.INITIALISED
+                return megaRoom.encryptionHandler.state === mpenc.handler.STATE.READY
             }, 500, 10000)
                 .done(function() {
                     removeThisTypeOfDialogs();
@@ -880,7 +880,7 @@ EncryptionFilter.prototype.messageShouldNotBeEncrypted = function(eventObject) {
  */
 EncryptionFilter.prototype.shouldQueueMessage = function(megaRoom, messageObject) {
     return (
-            megaRoom.encryptionHandler.state !== mpenc.handler.STATE.INITIALISED
+            megaRoom.encryptionHandler.state !== mpenc.handler.STATE.READY
         );
 };
 

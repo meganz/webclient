@@ -169,7 +169,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     }
                 });
         } else if(newState == ChatRoom.STATE.READY) {
-            if(self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.INITIALISED) {
+            if(self.encryptionHandler && self.encryptionHandler.state === mpenc.handler.STATE.READY) {
                 if(self._mpencFailedDialog) {
                     self._mpencFailedDialog.remove();
                     delete self._mpencFailedDialog;
@@ -2953,7 +2953,7 @@ ChatRoom.prototype.resized = function(scrollToBottom) {
 
 
 /**
- * This method will be called on room state change, only when the mpenc's state is === INITIALISED
+ * This method will be called on room state change, only when the mpenc's state is === READY
  *
  * @private
  */

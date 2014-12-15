@@ -155,7 +155,7 @@ if (indexedDB)
 		if (!Qt) Qt = new Date().getTime();
 		for (var t in mDBqueue)
 		{
-			if (!mDBi[t]) mDBi[t]=0;			
+			if (!mDBi[t]) mDBi[t]=0;
 			while (mDBi[t] < mDBqueue[t].length)
 			{
 				if (mDBt.t !== t)
@@ -163,13 +163,19 @@ if (indexedDB)
 					mDBt.t = t;
 					mDBt.transation = mDB.transaction([t], "readwrite");
 					mDBt.objectStore = mDBt.transation.objectStore(t);
-				}				
-			
-				if (mDBqueue[t][mDBi[t]])
+				}
+				var q = mDBqueue[t][mDBi[t]++];
+
+				if (mDBi[t] == mDBqueue[t].length)
 				{
-					if (mDBqueue[t][mDBi[t]].a) var request=mDBt.objectStore.put(mDBqueue[t][mDBi[t]].a);
-					else if (mDBqueue[t][mDBi[t]].d) var request=mDBt.objectStore.delete(mDBqueue[t][mDBi[t]].d);
-					
+					delete mDBqueue[t];
+					delete mDBi[t];
+				}
+
+				if (q)
+				{
+					var cmd = q.a ? 'put':'delete';
+					var request=mDBt.objectStore[cmd](q.d||q.a);
 					request.onsuccess = function(event)
 					{
 						if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) localStorage[u_handle + '_mDBcount']--;
@@ -180,16 +186,8 @@ if (indexedDB)
 						if (d) console.log('error',event);
 						mDBprocess();
 					};
-					
-					delete mDBqueue[t][mDBi[t]];
-					mDBi[t]++;					
-					if (mDBi[t] == mDBqueue[t].length)
-					{
-						delete mDBqueue[t];
-						delete mDBi[t];
-					}
 					return;
-				}			
+				}
 			}
 		}
 		if (d) console.log('Qt',Qt-new Date().getTime());

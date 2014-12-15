@@ -5974,8 +5974,8 @@ function initShareDialog()
 			$('.share-dialog-permissions').removeClass('active');
 			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 31;
-			var y = $this.position().top - 9;
+			var x = $this.position().left + 50;
+			var y = $this.position().top - 34;
 			handlePermissionMenu($this, $m, x, y);
 		}
 

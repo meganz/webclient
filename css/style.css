@@ -7427,7 +7427,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: transparent;
 	border: 0;
 }
-.add-user-notification {
+.add-user-notification, .share-message {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -7442,13 +7442,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-sizing: border-box;
 	margin-top: 12px;
 }
-.add-user-nt-scrolling {
+.add-user-nt-scrolling, .share-message-scrolling {
 	height: 50px;
 }
-.add-user-nt-scrolling .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag {
 	width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden {
 	border: 0;
 	padding: 0;
 	background-color: transparent;
@@ -7468,22 +7468,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	overflow: hidden;
 	min-height: 36px;
 }
-.add-contact-hidden {
+.add-contact-hidden, .share-message-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
 }
-.add-user-textarea {
+.add-user-textarea, .share-message-textarea {
 	padding: 7px 10px 7px 3px;
 }
-.add-user-nt-scrolling textarea::selection {
+.add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
 	background-color: #333333;
 	color: white;
 }
-.add-user-notification.active .add-user-nt-scrolling textarea {
+.add-user-notification.active .add-user-nt-scrolling textarea, .share-message.active textarea {
 	color: white;
 }
-.add-user-notification.active {
+.add-user-notification.active, .share-message.active {
 	background-position: -3px -3597px;
 	background-color: rgba(0,0,0,0.2);
 }
@@ -9487,6 +9487,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-bottom-right-radius: 7px;
 	position: relative;
 	padding-right: 4px;
+}
+.share-dialog .fm-notifications-bottom, .share-dialog .fm-notifications-bottom {
+	position: static;
 }
 .free-popup .fm-notifications-bottom, .pro-popup .fm-notifications-bottom {
 	-webkit-border-bottom-right-radius: 0;
@@ -11776,7 +11779,7 @@ table {
 	background-position: -75px -207px;
 }
 .read-only .context-menu-icon {
-	background-position: -75px -239px;
+	background-position: -75px -238px;
 }
 .top-user-status-item {
 	padding-left: 5px;
@@ -19538,48 +19541,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
-.share-dialog-icon.permissions-icon {
-	width: 30px;
-	background-position: -85px -275px;
-	right: 13px;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-	cursor: pointer;
-}
-.share-dialog-icon.permissions-icon:hover {
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-	-moz-opacity: 0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.5;
-}
 .active .share-dialog-icon, .active .add-user-icon, .error .share-dialog-icon, .error .add-user-icon {
 	background-position: -81px -314px;
-}
-.active .share-dialog-icon.permissions-icon, .error .share-dialog-icon.permissions-icon {
-	background-position: -85px -239px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
-.share-dialog-icon.permissions-icon.full-access {
-	background-position: -85px -355px;
-}
-.share-dialog-icon.permissions-icon.read-and-write {
-	background-position: -85px -393px;
-}
-.active .share-dialog-icon.permissions-icon.full-access {
-	background-position: -85px -175px;
-}
-.active .share-dialog-icon.permissions-icon.read-and-write {
-	background-position: -85px -207px;
 }
 .active .multiple-input {
 	background-color: rgba(0,0,0,0.2);
@@ -19642,6 +19605,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	margin-bottom: 12px;
 	overflow: hidden;
 }
+.share-with-contact-dialog .share-dialog-contacts {
+	max-height: 192px;
+}
 .share-dialog-contact-bl {
 	height: 48px;
 	-webkit-transition: background-color 200ms ease-in-out;
@@ -19659,7 +19625,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.05);
 }
 .share-dialog-contact-bl .fm-chat-user-info {
-	width: 228px;
+	width: 203px;
 	padding-right: 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -19674,29 +19640,53 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.share-dialog-permissions {
+.share-dialog-permissions, .share-dialog-icon.permissions-icon {
 	float: left;
-	line-height: 24px;
-	margin-top: 11px;
+	line-height: 28px;
+	height: 32px;
+	margin-top: 8px;
+	min-width: 159px;
 	color: #666666;
+	border: 2px solid rgba(0,0,0,0.05);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	box-sizing: padding-box;
+	background-color: white;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	max-width: 140px;
 	font-size: 11px;
-	padding-left: 30px;
+	padding: 0 20px 0 35px;
 	position: relative;
 	cursor: pointer;
+	-webkit-transition: border-color 200ms ease-in-out;
+	-moz-transition: border-color 200ms ease-in-out;
+	-o-transition: border-color 200ms ease-in-out;
+	-ms-transition: border-color 200ms ease-in-out;
+	transition: border-color 200ms ease-in-out;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -3714px;
 }
-.share-dialog-permissions span {
+.share-dialog-icon.permissions-icon {
+	margin: 12px;
+}
+.share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
+	border: 2px solid rgba(0,0,0,0.3);
+}
+.share-dialog-permissions span, .share-dialog-icon.permissions-icon span {
 	width: 24px;
 	height: 24px;
 	position: absolute;
-	left: 0;
+	top: 2px;
+	left: 8px;
 	display: block;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-repeat: no-repeat;
@@ -19711,13 +19701,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
-.share-dialog-permissions.full-access span {
-	background-position: -87px -357px;
+.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
+	background-position: -87px -358px;
 }
-.share-dialog-permissions.read-and-write span {
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write {
 	background-position: -87px -396px;
 }
-.share-dialog-permissions:hover span, .share-dialog-permissions.active span {
+.share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
@@ -19986,7 +19976,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .share-dialog-tree-panel {
 	overflow: hidden;
-	margin: -12px;
+	margin: 0 -12px 12px -12px;
 }
 .share-dialog-tree-panel .jspVerticalBar {
 	width: 22px;
@@ -20007,10 +19997,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	top: 11px;
 }
 .dialog-tree-panel-scroll {
-	height: 192px;
-}
-.dialog-content-block {
-	padding-bottom: 20px;
+	height: 168px;
 }
 .fm-dialog-body .nw-conversations-item {
 	padding-left: 13px;
@@ -21981,90 +21968,84 @@ background-color:#1DA2E9
 .megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
 	display: none;
 }
-
-
 /**
  * MegaDialog.js
  */
 
 .fm-mega-dialog {
-    position: absolute;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    width: 360px;
-    background-color: white;
-    margin: 46px 0 0 0;
-    z-index: 900;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    display: block;
+	position: absolute;
+	border: 2px solid rgba(0, 0, 0, 0.1);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	width: 360px;
+	background-color: white;
+	margin: 46px 0 0 0;
+	z-index: 900;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	display: block;
 }
 .fm-mega-dialog.expanded {
-    z-index: 1200;
+	z-index: 1200;
 }
 .fm-mega-dialog .fm-mega-dialog-pad {
-    margin: 12px 12px 12px 12px
+	margin: 12px 12px 12px 12px
 }
-
-
 .fm-mega-dialog-size-icon {
-    background-image: url(../images/mega/nw-fm-sprite.svg);
-    background-position: center -5509px;
-    background-repeat: no-repeat;
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    top: 6px;
-    right: 10px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
-    opacity: 0.3;
-    cursor: pointer;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -5509px;
+	background-repeat: no-repeat;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 6px;
+	right: 10px;
+	-webkit-transition: opacity 200ms ease-in-out;
+	-moz-transition: opacity 200ms ease-in-out;
+	-o-transition: opacity 200ms ease-in-out;
+	-ms-transition: opacity 200ms ease-in-out;
+	transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+	-moz-opacity: 0.3;
+	-khtml-opacity: 0.3;
+	opacity: 0.3;
+	cursor: pointer;
 }
 .fm-mega-dialog-size-icon:hover {
-    -moz-opacity: 0.6;
-    -khtml-opacity: 0.6;
-    opacity: 0.6;
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
 }
 .fm-mega-dialog-size-icon.short-size {
-    background-position: center -5559px;
-    top: 16px;
-    right: 40px;
+	background-position: center -5559px;
+	top: 16px;
+	right: 40px;
 }
 .fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
-    display: block;
+	display: block;
 }
-
 .fm-mega-dialog-bottom {
-    height: 56px;
-    background-color: #F6F6F6;
-    margin: 12px -12px -12px -12px;
-    display: block;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
-    padding-right: 4px;
+	height: 56px;
+	background-color: #F6F6F6;
+	margin: 12px -12px -12px -12px;
+	display: block;
+	-webkit-border-bottom-left-radius: 7px;
+	-moz-border-radius-bottomleft: 7px;
+	border-bottom-left-radius: 7px;
+	-webkit-border-bottom-right-radius: 7px;
+	-moz-border-radius-bottomright: 7px;
+	border-bottom-right-radius: 7px;
+	padding-right: 4px;
 }
-
 /**
  * Start chat elements
  */
 
 .fm-create-chat-button.active .add-user-popup-arrow {
-    margin-top: -4px;
-    z-index: 1210;
+	margin-top: -4px;
+	z-index: 1210;
 }

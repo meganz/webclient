@@ -44,8 +44,8 @@
 					var m = $('.permissions-menu');
 					m.removeClass('search-permissions');
 					if ($(this).attr('class').indexOf('active') == -1) {
-						var x = $(this).position().left + 42;
-						var y = $(this).position().top + 13;
+						var x = $(this).position().left + 50;
+						var y = $(this).position().top + 14;
 						m.css('left', x + 'px');
 						m.css('top', y + 'px');
 						m.removeClass('hidden');
@@ -91,6 +91,64 @@
 					$('.share-dialog-permissions.active').removeClass('active');
 
 				});
+				
+				
+				//Personal message
+	$('.share-message textarea').bind('focus', function() {
+		var $this = $(this);
+		$('.share-message').addClass('active');
+		if ($this.val() == 'Include personal message...') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
+		}
+	});
+
+	$('.share-message textarea').bind('blur', function() {
+		var $this = $(this);
+		$('.share-message').removeClass('active');
+	});
+
+	function  shareMessageResizing() {
+	  var txt = $('.share-message textarea'),
+	      txtHeight =  txt.outerHeight(),
+	      hiddenDiv = $('.share-message-hidden'),
+		  pane = $('.share-message-scrolling'),
+		  content = txt.val(),
+		  api;
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+
+	    if( $('.share-message-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+
+	$('.share-message textarea').on('keyup', function () {
+	    shareMessageResizing();
+	});
 			});
 
         </script>
@@ -204,13 +262,23 @@
                         <span>Looks like there’s a malformed email there!</span>
                     </div>
                 </div>
-                <div class="share-dialog-icon permissions-icon"></div>
                 <div class="multiple-input">
                     <input type="text" class="share-multiple-input" name="" />
                 </div>
+                <div class="share-message">
+                 <div class="share-message-scrolling">
+                  <div class="share-message-textarea">
+                    <textarea >Include personal message...</textarea>
+                    <div class="share-message-hidden"></div>
+                  </div>
+                 </div>
+                </div>
             </div>
             <div class="fm-notifications-bottom">
-                <div class="import-contacts-link"><span></span>Input contacts...</div>
+                <div class="share-dialog-icon permissions-icon">
+                  <span></span>
+                  Read only
+                </div>
                 <div class="fm-dialog-button dialog-share-button">
                     Share
                 </div>

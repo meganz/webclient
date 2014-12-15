@@ -4,12 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>MEGA 2.0</title>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
-<script type="text/javascript" src="js/jquery-min-1.8.1.js"></script>
-<script type="text/javascript" src="js/jquery.jscrollpane.min.js"></script>
-<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
-<script type="text/javascript" src="js/jquery.tokeninput.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-min-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.min.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {  
     
@@ -41,22 +40,7 @@ $(document).ready(function() {
 				
     });
 	
-	$('.share-dialog-permissions').unbind('click');
-    $('.share-dialog-permissions').bind('click', function() {
-		var m = $('.permissions-menu');
-		m.removeClass('search-permissions');
-		if($(this).attr('class').indexOf('active') == -1) {
-		  var x = $(this).position().left +42;
-		  var y = $(this).position().top + 13;
-		  m.css('left', x + 'px');
-		  m.css('top', y + 'px');
-		  m.removeClass('hidden');
-		  $(this).addClass('active');
-		} else {
-	      m.addClass('hidden');
-		  $(this).removeClass('active');
-		}
-	});
+	
 	
 	$('.permissions-icon').unbind('click');
     $('.permissions-icon').bind('click', function() {
@@ -93,38 +77,61 @@ $(document).ready(function() {
 		
 	});
 	
-	//New import contacts script
-	$('.import-contacts-link').unbind('click');
-	$('.import-contacts-link').bind('click', function() {
-		if($(this).attr('class').indexOf('active') == -1) {
-		   $('.import-contacts-link').addClass('active');
-		   $('.import-contacts-dialog').fadeIn(200);
-		   
-		   //if contacts are imported, then do:
-	       $('.import-contacts-service').addClass('imported');
-		   var n = $('.imported-contacts-notification');
-	       n.css('margin-left', '-' + n.outerWidth()/2 +'px');
-	       n.fadeIn(200);
-	
-	       $('.imported-notification-close').unbind('click');
-	       $('.imported-notification-close').bind('click', function() {
-		      n.fadeOut(200);
-	       });
-		   
-		} else {
-		   $('.import-contacts-link').removeClass('active');
-		   $('.import-contacts-dialog').fadeOut(200);
-		   $('.imported-contacts-notification').fadeOut(200);
+	//Personal message
+	$('.share-message textarea').bind('focus', function() {
+		var $this = $(this);
+		$('.share-message').addClass('active');
+		if ($this.val() == 'Include personal message...') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
 		}
 	});
-	
-	$('.import-contacts-info').unbind('mouseover');
-	$('.import-contacts-info').bind('mouseover', function() {
-		   $('.import-contacts-info-txt').fadeIn(200);
+
+	$('.share-message textarea').bind('blur', function() {
+		var $this = $(this);
+		$('.share-message').removeClass('active');
 	});
-	$('.import-contacts-info').unbind('mouseout');
-	$('.import-contacts-info').bind('mouseout', function() {
-		   $('.import-contacts-info-txt').fadeOut(200);
+
+	function  shareMessageResizing() {
+	  var txt = $('.share-message textarea'),
+	      txtHeight =  txt.outerHeight(),
+	      hiddenDiv = $('.share-message-hidden'),
+		  pane = $('.share-message-scrolling'),
+		  content = txt.val(),
+		  api;
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+
+	    if( $('.share-message-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+
+	$('.share-message textarea').on('keyup', function () {
+	    shareMessageResizing();
 	});
 	
 	
@@ -242,30 +249,25 @@ $(document).ready(function() {
              <span>Looks like there’s a malformed email there!</span>
        </div>
        </div>
-       <div class="share-dialog-icon permissions-icon"></div>
+       
        <div class="multiple-input">
            <input type="text" class="share-multiple-input" name="" />
        </div>
+       
+       <div class="share-message">
+         <div class="share-message-scrolling">
+          <div class="share-message-textarea">
+            <textarea >Include personal message...</textarea>
+            <div class="share-message-hidden"></div>
+          </div>
+         </div>
+       </div>
+       
      </div>
      <div class="fm-notifications-bottom">
-        <div class="import-contacts-link"><span></span>Import contacts...</div>
-        <div class="import-contacts-dialog hidden">
-           <div class="import-contacts-header">
-             <div class="import-contacts-info">
-                <div class="import-contacts-info-txt">
-                   You can choose to import contacts from third party services.
-These will not be added to you MEGA Contacts but will remain accessible to share and collaborate.
-                  <div class="import-arrow"></div>
-                </div>
-             </div>
-             <div class="import-contacts-link active"><span></span>Import contacts...</div>
-           </div>
-           <!--Please add "imported" classname if contact are already imported !-->
-           <div class="import-contacts-service gmail">
-              <span>
-                Gmail
-              </span>
-           </div>
+        <div class="share-dialog-icon permissions-icon">
+           <span></span>
+           Read only
         </div>
         
         <div class="fm-dialog-button dialog-share-button">

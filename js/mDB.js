@@ -9,6 +9,7 @@ if (indexedDB)
 {
 	var mDB=1;
 	var request;
+	var mDBloaded;
 	var mDBStartError;
 
 	function mDBfetch()
@@ -304,33 +305,31 @@ if (indexedDB)
 	function mDBquery(t)
 	{
 		if (d) console.log('mDBquery()');
-		var fr, dt = t, apn = [];
-		if (t == 'f_sk') dt='f';
-		var objectStore = mDB.transaction(dt,'readonly').objectStore(dt);
+		var fr, apn = [];
+		var objectStore = mDB.transaction(t,'readonly').objectStore(t);
 		objectStore.openCursor().onsuccess = function(event)
 		{
 			var rec = event.target.result;
 			if (rec)
 			{
-				var value;
+				var n;
 
 				try {
-					value = rec.value;
+					n = rec.value;
 				} catch(e) {
 					if (d) console.error('mDBquery', t, e);
 				}
 
-				if (typeof value === 'undefined') fr = true;
-				else if (t == 'ok') process_ok([rec.value]);
-				// else if (t == 'f') M.addNode(rec.value,1);
-				else if (t == 'f') apn.push(rec.value);
-				else if (t == 'f_sk')
-				{
-					var n = rec.value;
-					if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+				if (typeof n === 'undefined') fr = true;
+				else if (t == 'f') {
+					if (n.sk) {
+						u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+					}
+					apn.push(n);
 				}
-				else if (t == 'u') M.addUser(rec.value,1);
-				else if (t == 's') M.nodeShare(rec.value.h,rec.value,1);
+				else if (t == 'ok') process_ok([n]);
+				else if (t == 'u') M.addUser(n,1);
+				else if (t == 's') M.nodeShare(n.h,n,1);
 				rec.continue();
 			}
 			else if ( fr )
@@ -362,9 +361,13 @@ if (indexedDB)
 				}
 				if (apn.length) {
 					$.mDBIgnoreDB = true;
-					process_f(apn, function() {
+					process_f(apn, function(hasMissingKeys) {
 						delete $.mDBIgnoreDB;
-						__mDB_Next();
+						if (hasMissingKeys) {
+							mDBreload();
+						} else {
+							__mDB_Next();
+						}
 					});
 				}
 				else __mDB_Next();
@@ -417,7 +420,7 @@ if (indexedDB)
 			delete localStorage[u_handle + '_maxaction'];
 			delete localStorage[u_handle + '_mDBactive'];
 			mDBact = Math.random();
-			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+			mDBcls();
 			Qt=undefined;
 			request=undefined;
 			mDB=1;
@@ -425,5 +428,9 @@ if (indexedDB)
 		}
 	}
 
-	var mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+	function mDBcls()
+	{
+		mDBloaded = {'ok':0,'u':0, /*'f_sk':0,*/ 'f':0,'s':0};
+	}
+	mDBcls();
 }

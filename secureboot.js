@@ -962,7 +962,7 @@ else
 		{
 			var jsar = [];
 			var cssar = [];
-			for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+			// for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
 			for (var i in jsl)
 			{
 			  // if (d) console.warn(jsl[i].j, jsl[i].f, (''+jsl[i].text).substr(0,80))

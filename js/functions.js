@@ -1129,7 +1129,7 @@ mSpawnWorker.prototype = {
 
 		if (reply.newmissingkeys)
 		{
-			newmissingkeys = true;
+			job.newmissingkeys=newmissingkeys = true;
 			$.extend(missingkeys, reply.missingkeys);
 		}
 		if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
@@ -1142,7 +1142,7 @@ mSpawnWorker.prototype = {
 			if (d) console.timeEnd(reply.jid);
 
 			delete this.jobs[reply.jid];
-			job.callback(job.result);
+			job.callback(job.result, job);
 		}
 
 		return true;

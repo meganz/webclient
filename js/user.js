@@ -173,7 +173,7 @@ function u_logout(logout)
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
 		M = new MegaData();
-		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
+		mDBcls();
 		$.hideContextMenu = function () {};
 		api_reset();	
 	}

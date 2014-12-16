@@ -8,28 +8,51 @@ var sjcl={cipher:{}};sjcl.cipher.aes=function(a){this.a[0][0][0]||this.d();var d
 self.postMessage = self.webkitPostMessage || self.postMessage;
 
 self.onmessage = function ( e ) {
-	var d = e.data, nodes = d.data, r = {};
+	var evd = e.data, nodes = evd.data, r = {}, dp = 0, new_sharekeys = {};
 
-	u_privk = d.u_privk;
-	u_k_aes = new sjcl.cipher.aes(d.u_k);
-	u_sharekeys = d.u_sharekeys;
+	d              = !!evd.debug;
+	u_privk        = evd.u_privk;
+	u_k_aes        = new sjcl.cipher.aes(evd.u_k);
+	u_sharekeys    = evd.u_sharekeys;
+	rsa2aes        = {};
+	missingkeys    = {};
+	rsasharekeys   = {};
+	newmissingkeys = false;
 
 	for (var i in nodes)
 	{
 		var n = nodes[i];
 
-		if (!n.c && n.k && n.t !== 2 && n.t !== 3 && n.t !== 4)
-		{
-			var o = {};
+		if (!n.c) {
+			if (n.sk && !u_sharekeys[n.h]) {
+				new_sharekeys[n.h] = u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			}
 
-			crypto_processkey(d.u_handle,u_k_aes,n,o);
-			r[n.h] = o;
+			if (n.k && n.t !== 2 && n.t !== 3 && n.t !== 4)
+			{
+				var o = {};
+
+				crypto_processkey(evd.u_handle,u_k_aes,n,o);
+				r[n.h] = o;
+
+				// try {
+					// crypto_processkey(evd.u_handle,u_k_aes,n,o);
+					// if (Object.keys(o).length) r[n.h] = o;
+					// else ++dp;
+				// } catch(e) {
+					// console.log('ERROR: ' + e);
+				// }
+			}
 		}
 	}
+	// if (dp) console.log('Dummy process for ' + dp + ' nodes');
 
 	self.postMessage({
 		result         : r,
+		jid            : evd.jid,
 		rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
+		rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
+		u_sharekeys    : Object.keys(new_sharekeys).length && new_sharekeys,
 		missingkeys    : missingkeys,
 		newmissingkeys : newmissingkeys,
 	});
@@ -40,11 +63,24 @@ var console = {
 		self.postMessage(['console', [].slice.call(arguments)]);
 	}
 };
-var have_ab = !0, d = !0, u_privk, u_k_aes, u_sharekeys;
+var have_ab = !0, d, u_privk, u_k_aes, u_sharekeys;
 
 var rsa2aes = {};
 var missingkeys = {};
 var newmissingkeys = false;
+var rsasharekeys = {};
+
+function crypto_process_sharekey(handle,key)
+{
+	if (key.length > 22)
+	{
+		key = base64urldecode(key);
+		var k = str_to_a32(crypto_rsadecrypt(key,u_privk).substr(0,16));
+		rsasharekeys[handle] = true;
+		return k;
+	}
+	return decrypt_key(u_k_aes,base64_to_a32(key));
+}
 
 // Try to decrypt ufs node.
 // Parameters: me - my user handle
@@ -120,6 +156,7 @@ function crypto_processkey(me,master_aes,file,OUT)
 				}
 				catch(e)
 				{
+					if (d) console.log('u_privk error: ' + e);
 					return;
 				}
 			}
@@ -132,6 +169,8 @@ function crypto_processkey(me,master_aes,file,OUT)
 
 		var ab = base64_to_ab(file.a);
 		var o = dec_attr(ab,k);
+
+		// if (d) console.log('dec_attr', file.h, key,ab,k, o && o.n, o);
 
 		if (typeof o == 'object')
 		{
@@ -191,14 +230,18 @@ function decrypt_key(cipher,a)
 	return x;
 }
 
+// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
+// returns cleartext string
 function crypto_rsadecrypt(ciphertext,privkey)
 {
     var l = (ciphertext.charCodeAt(0)*256+ciphertext.charCodeAt(1)+7)>>3;
     ciphertext = ciphertext.substr(2,l);
 
     var cleartext = asmCrypto.bytes_to_string( asmCrypto.RSA_RAW.decrypt(ciphertext,privkey) );
+    if (cleartext.length < privkey[0].length) cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
+    if ( cleartext.charCodeAt(1) != 0 ) cleartext = String.fromCharCode(0) + cleartext; // Old bogus padding workaround
 
-	return cleartext.substr(1);
+    return cleartext.substr(2);
 }
 
 function str_to_a32(b)
@@ -245,6 +288,9 @@ function base64_to_a32(s)
 {
 	return str_to_a32(base64urldecode(s));
 }
+
+var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
+// var b64a = b64.split('');
 
 function base64urldecode(data)
 {
@@ -357,6 +403,27 @@ function ab_to_str_depad(ab)
 		for (i = b.length; i-- && !b.charCodeAt(i); );
 
 		b = b.substr(0,i+1);
+	}
+
+	return b;
+}
+
+// ArrayBuffer to binary string
+function ab_to_str(ab)
+{
+	var b = '', i;
+
+	if (have_ab)
+	{
+		var b = '';
+
+		var ab8 = new Uint8Array(ab);
+
+		for (i = 0; i < ab8.length; i++) b = b+String.fromCharCode(ab8[i]);
+	}
+	else
+	{
+		return ab.buffer;
 	}
 
 	return b;

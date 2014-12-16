@@ -9,6 +9,7 @@ if (indexedDB)
 {
 	var mDB=1;
 	var request;
+	var mDBloaded;
 	var mDBStartError;
 
 	function mDBfetch()
@@ -147,24 +148,34 @@ if (indexedDB)
 
 	var Qt;
 	var mDBt = {};
+	var mDBi = {};
 
 	function mDBprocess()
 	{
 		if (!Qt) Qt = new Date().getTime();
 		for (var t in mDBqueue)
 		{
-			for (var i in mDBqueue[t])
+			if (!mDBi[t]) mDBi[t]=0;
+			while (mDBi[t] < mDBqueue[t].length)
 			{
-				if (mDBqueue[t][i])
+				if (mDBt.t !== t)
 				{
-					if (mDBt.t !== t)
-					{
-						mDBt.t = t;
-						mDBt.transation = mDB.transaction([t], "readwrite");
-					}
-					var objectStore = mDBt.transation.objectStore(t);
-					if (mDBqueue[t][i].a) var request=objectStore.put(mDBqueue[t][i].a);
-					else if (mDBqueue[t][i].d) var request=objectStore.delete(mDBqueue[t][i].d);
+					mDBt.t = t;
+					mDBt.transation = mDB.transaction([t], "readwrite");
+					mDBt.objectStore = mDBt.transation.objectStore(t);
+				}
+				var q = mDBqueue[t][mDBi[t]++];
+
+				if (mDBi[t] == mDBqueue[t].length)
+				{
+					delete mDBqueue[t];
+					delete mDBi[t];
+				}
+
+				if (q)
+				{
+					var cmd = q.a ? 'put':'delete';
+					var request=mDBt.objectStore[cmd](q.d||q.a);
 					request.onsuccess = function(event)
 					{
 						if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) localStorage[u_handle + '_mDBcount']--;
@@ -175,7 +186,6 @@ if (indexedDB)
 						if (d) console.log('error',event);
 						mDBprocess();
 					};
-					delete mDBqueue[t][i];
 					return;
 				}
 			}
@@ -192,6 +202,94 @@ if (indexedDB)
 		if (!mDBqueue[t]) mDBqueue[t]=[];
 		mDBqueue[t].push(obj);
 		if (!mDBt.t) mDBprocess();
+	}
+
+	if (typeof safari !== 'undefined')
+	{
+		var mDBprocess = function _Safari_mDBprocess()
+		{
+			function __mDBIterate(t, act, queue)
+			{
+				function __mDBNext() {
+					var e = queue.shift();
+					if (e) {
+						try {
+							var r = objectStore[act](e);
+						} catch(ex) {
+							// if (d) console.error('objectStore', ex);
+							delete mDBt.t;
+							queue.unshift(e);
+							return __mDBIterate(t, act, queue);
+						}
+						if (r) {
+							r.onsuccess = function()
+							{
+								if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) {
+									localStorage[u_handle + '_mDBcount']--;
+								}
+								// if (d) console.log('__mDBNext.success');
+								if ((queue.length % 80) == 0) Soon(__mDBNext);
+								else __mDBNext();
+							};
+							r.onerror = function(err)
+							{
+								if (d) console.log('__mDBNext.error',err);
+								Later(__mDBNext);
+							};
+							return;
+						}
+					}
+
+					Soon(mDBprocess);
+				}
+				// if (d) console.log('__mDBIterate', arguments);
+
+				if (mDBt.t !== t)
+				{
+					mDBt.t = t;
+					mDBt.transation = mDB.transaction([t], "readwrite");
+				}
+				var objectStore = mDBt.transation.objectStore(t);
+				__mDBNext();
+			}
+
+			for (var t in mDBqueue)
+			{
+				var q = mDBqueue[t];
+
+				for (var a in q)
+				{
+					__mDBIterate(t, a, q[a]);
+					delete mDBqueue[t][a];
+					return;
+				}
+			}
+
+			if (d) console.timeEnd('mDBprocess');
+			mDBt = {};
+			mDBqueue = {};
+		};
+		var mDBaddQueue = function _Safari_mDBaddQueue(t,obj)
+		{
+			if (!localStorage[u_handle + '_mDBcount']) {
+				localStorage[u_handle + '_mDBcount']=0;
+			}
+			localStorage[u_handle + '_mDBcount']++;
+
+			var act = obj.d ? 'delete':'put';
+			if (!mDBqueue[t]) mDBqueue[t]={};
+			if (!mDBqueue[t][act]) mDBqueue[t][act]=[];
+			mDBqueue[t][act].push(obj.d||obj.a);
+
+			if (mDBt.stc) clearTimeout(mDBt.stc);
+			mDBt.stc = setTimeout(function() {
+				if (!mDBt.t) {
+					if (d) console.time('mDBprocess');
+					mDBprocess();
+				}
+				delete mDBt.stc;
+			}, 3100);
+		};
 	}
 
 	function mDBdel(t,id)
@@ -216,32 +314,31 @@ if (indexedDB)
 	function mDBquery(t)
 	{
 		if (d) console.log('mDBquery()');
-		var fr, dt = t;
-		if (t == 'f_sk') dt='f';
-		var objectStore = mDB.transaction(dt,'readonly').objectStore(dt);
+		var fr, apn = [];
+		var objectStore = mDB.transaction(t,'readonly').objectStore(t);
 		objectStore.openCursor().onsuccess = function(event)
 		{
 			var rec = event.target.result;
 			if (rec)
 			{
-				var value;
+				var n;
 
 				try {
-					value = rec.value;
+					n = rec.value;
 				} catch(e) {
 					if (d) console.error('mDBquery', t, e);
 				}
 
-				if (typeof value === 'undefined') fr = true;
-				else if (t == 'ok') process_ok([rec.value]);
-				else if (t == 'f') M.addNode(rec.value,1);
-				else if (t == 'f_sk')
-				{
-					var n = rec.value;
-					if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+				if (typeof n === 'undefined') fr = true;
+				else if (t == 'f') {
+					if (n.sk) {
+						u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+					}
+					apn.push(n);
 				}
-				else if (t == 'u') M.addUser(rec.value,1);
-				else if (t == 's') M.nodeShare(rec.value.h,rec.value,1);
+				else if (t == 'ok') process_ok([n]);
+				else if (t == 'u') M.addUser(n,1);
+				else if (t == 's') M.nodeShare(n.h,n,1);
 				rec.continue();
 			}
 			else if ( fr )
@@ -253,22 +350,36 @@ if (indexedDB)
 			{
 				if (d) console.log('mDBloaded',t);
 				mDBloaded[t]=1;
-				for (var dbt in mDBloaded)
-				{
-					if (mDBloaded[dbt] == 0)
+				function __mDB_Next() {
+					for (var dbt in mDBloaded)
 					{
-						mDBquery(dbt);
-						return false;
+						if (mDBloaded[dbt] == 0)
+						{
+							mDBquery(dbt);
+							return false;
+						}
 					}
+					maxaction = localStorage[u_handle + '_maxaction'];
+					for (var i in M.d)
+					{
+						var entries=true;
+						break;
+					}
+					if (!maxaction || typeof entries == 'undefined') mDBreload();
+					else getsc(1);
 				}
-				maxaction = localStorage[u_handle + '_maxaction'];
-				for (var i in M.d)
-				{
-					var entries=true;
-					break;
+				if (apn.length) {
+					$.mDBIgnoreDB = true;
+					process_f(apn, function(hasMissingKeys) {
+						delete $.mDBIgnoreDB;
+						if (hasMissingKeys) {
+							mDBreload();
+						} else {
+							__mDB_Next();
+						}
+					});
 				}
-				if (!maxaction || typeof entries == 'undefined') mDBreload();
-				else getsc(1);
+				else __mDB_Next();
 			}
 		};
 	}
@@ -318,7 +429,7 @@ if (indexedDB)
 			delete localStorage[u_handle + '_maxaction'];
 			delete localStorage[u_handle + '_mDBactive'];
 			mDBact = Math.random();
-			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+			mDBcls();
 			Qt=undefined;
 			request=undefined;
 			mDB=1;
@@ -326,5 +437,9 @@ if (indexedDB)
 		}
 	}
 
-	var mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+	function mDBcls()
+	{
+		mDBloaded = {'ok':0,'u':0, /*'f_sk':0,*/ 'f':0,'s':0};
+	}
+	mDBcls();
 }

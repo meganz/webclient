@@ -44,7 +44,6 @@ function ul_completepending2(res,ctx)
 		fm_thumbnails();
 		if (ctx.faid) api_attachfileattr(n.h,ctx.faid);
 		onUploadSuccess(ul_queue[ctx.ul_queue_num]);
-		ul_queue[ctx.ul_queue_num] = {}
 		ctx.file.ul_failed = false;
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
@@ -86,7 +85,7 @@ function ul_deduplicate(File, identical) {
 				File.file.faid     = ctx.n.fa
 				File.file.path     = ctx.uq.path
 				File.file.name     = ctx.uq.name
-				File.file.done_starting();
+				// File.file.done_starting();
 				ul_finalize(File.file)
 			}
 		}
@@ -666,7 +665,7 @@ FileUpload.prototype.destroy = function() {
 	}
 	ASSERT(this.file.owner === this, 'Invalid FileUpload Owner...');
 	ulQueue.poke(this.file, 0xdead);
-	if (this.file.done_starting) Soon(this.file.done_starting);
+	if (this.file.done_starting) this.file.done_starting();
 	delete GlobalProgress[this.gid];
 	oDestroy(this.file);
 	oDestroy(this);

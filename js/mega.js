@@ -837,7 +837,9 @@ function MegaData ()
 		if (n.t == 4) this.RubbishID 	= n.h;
 		if (!n.c)
 		{
-			if (n.sk) u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			if (n.sk && !u_sharekeys[n.h]) {
+				u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
+			}
 
 			if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
 			{
@@ -847,6 +849,7 @@ function MegaData ()
 				}
 				else
 				{
+					// if (d) console.error('prockey', n.h, new Date().toISOString());
 					crypto_processkey(u_handle,u_k_aes,n);
 				}
 				u_nodekeys[n.h] = n.key;
@@ -1878,6 +1881,7 @@ function MegaData ()
 		{
 			$(this).remove();
 		});
+		ul_queue[ul.pos] = Object.freeze({});
 		var a=ul_queue.filter(isQueueActive).length;
 		if (a < 2 && !ul_uploading)
 		{
@@ -2641,31 +2645,63 @@ function processmove(jsonmove)
 }
 
 var u_kdnodecache = {};
+var kdWorker;
 
 function process_f(f, cb)
 {
 	if (f && f.length)
 	{
-		if (f.length < 200)
+		var ncn = f;
+		if ($.len(u_kdnodecache)) {
+			ncn = [];
+			for (var i in f) {
+				var n1 = f[i], n2 = u_kdnodecache[n1.h];
+				if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
+			}
+			if (d) console.log('non-cached nodes', ncn.length, ncn);
+		}
+
+		// if (typeof safari !== 'undefined') dk=1;
+
+		if (ncn.length < 200 || window.dk)
 		{
+			if (d) {
+				console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
+				console.time('process_f');
+			}
 			__process_f1(f, cb);
+			if (d) console.timeEnd('process_f');
 		}
 		else
 		{
-			mSpawnWorker('keydec.js', f, function(r)
-			{
-				if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
+			if (!kdWorker) try {
+				kdWorker = mSpawnWorker('keydec.js');
+			} catch(e) {
+				if (d) console.error(e);
+				return __process_f2(f, cb);
+			}
 
+			kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
+				if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
 				$.extend(u_kdnodecache, r);
+				__process_f2(f, cb.bind(this, !!j.newmissingkeys));
+			}, function(err) {
+				if (d) console.error(err);
 				__process_f2(f, cb);
 			});
+			// mSpawnSWorker('keydec.js', f, function(r)
+			// {
+				// if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
+				// $.extend(u_kdnodecache, r);
+				// __process_f2(f, cb);
+			// });
 		}
 	}
 	else if (cb) Soon(cb);
 }
 function __process_f1(f, cb)
 {
-	for (var i in f) M.addNode(f[i]);
+	for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
 	if (cb) Soon(cb);
 }
 function __process_f2(f, cb)
@@ -2674,7 +2710,7 @@ function __process_f2(f, cb)
 
 	while ((n = f.pop()))
 	{
-		M.addNode(n);
+		M.addNode(n, !!$.mDBIgnoreDB);
 
 		if (cb && --max == 0) break;
 	}

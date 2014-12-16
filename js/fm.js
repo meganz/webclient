@@ -14,15 +14,41 @@ function voucherCentering(button)
 function reportQuota(chunksize)
 {
 	console.log('completed ' + chunksize + ' bytes');
+	
+	
 }
 
 function hasQuota(filesize, next)
 {
 	console.log('wants to download ' + filesize + ' data');
-	Soon(function() {
+	if (!localStorage.quota)
+	{
+		bandwidthDialog(1);
 		next(true);
-	});
+	}
+	else
+	{
+		bandwidthDialog();
+		next(false);
+	}
 }
+
+function bandwidthDialog(close)
+{
+	if (close)
+	{
+		$('.fm-dialog.bandwidth-quota').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');
+		$.dialog=false;
+	}
+	else
+	{
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-dialog.bandwidth-quota').removeClass('hidden');
+		$.dialog='bandwidth';
+	}
+}
+
 
 function andreiScripts()
 {

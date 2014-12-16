@@ -11,6 +11,17 @@ function voucherCentering(button)
 	}
 }
 
+function reportQuota(chunksize)
+{
+	console.log('completed ' + chunksize + ' bytes');
+}
+
+function hasQuota(filesize)
+{
+	console.log('wants to download ' + filesize + ' data');
+	return true;
+}
+
 function andreiScripts()
 {
 	/*

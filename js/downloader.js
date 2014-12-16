@@ -231,6 +231,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			new Uint8Array(r)
 		])
 		this.dl.retries = 0;
+		reportQuota(this.dl.size);
 		this.finish_download();
 		this.destroy();
 	} else if (!this.dl.cancelled) {
@@ -386,8 +387,15 @@ ClassFile.prototype.run = function(task_done) {
 		return task_done(); // Hmm..
 	}
 
-	fetchingFile = 1;
+	fetchingFile = 1; /* Block the fetchingFile state */
 	this.dl.retries = 0; /* set the retries flag */
+
+	if (!hasQuota(this.dl.size)) {
+		return setTimeout(function(a) {
+			return a.run(task_done);
+		}, 1000, this);
+	}
+
 
 	DEBUG("dl_key " + this.dl.key);
 	if (!GlobalProgress[this.gid].started) {

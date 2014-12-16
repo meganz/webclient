@@ -16,10 +16,12 @@ function reportQuota(chunksize)
 	console.log('completed ' + chunksize + ' bytes');
 }
 
-function hasQuota(filesize)
+function hasQuota(filesize, next)
 {
 	console.log('wants to download ' + filesize + ' data');
-	return true;
+	Soon(function() {
+		next(true);
+	});
 }
 
 function andreiScripts()

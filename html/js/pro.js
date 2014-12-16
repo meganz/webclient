@@ -92,6 +92,8 @@ function init_pro()
 		$('.pro-gray-block .register-st2-button-arrow').bind('click',function(e)
 		{
 			pro_proceed(e);
+
+            return false;
 		});		
 		$('.pro-bottom-button').unbind('click');
 		$('.pro-bottom-button').bind('click',function(e)
@@ -663,7 +665,6 @@ var doProRegister = function($dialog) {
 };
 
 function redirectToPaypal() {
-
     $('.pro-register-dialog')
         .removeClass('active')
         .addClass('hidden');

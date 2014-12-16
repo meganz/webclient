@@ -481,4 +481,6 @@
 <polygon opacity="0.3" fill-rule="evenodd" clip-rule="evenodd" points="142,3726 150,3726 146,3730 "/>
 <path fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" d="M11,3767.52l1.641,2.631H9.359L11,3767.52z M11,3764l-5,8h10
 	L11,3764z"/>
+<path fill="#333333" d="M3.34,3831.98C2.72,3831.35,1.88,3831,1,3831h16c-0.88,0-1.721,0.35-2.34,0.98l-4.49,4.52
+	c-0.65,0.67-1.689,0.67-2.34,0L3.34,3831.98z"/>
 </svg>

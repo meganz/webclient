@@ -19466,7 +19466,22 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	background-color: rgba(0,0,0,0.02);
 	color: #fff;
 }
-.search-avatar {
+.share-dialog-contact-bl .fm-chat-user span {
+	max-width: 100%;
+display: inline-block;
+text-overflow: ellipsis;
+overflow: hidden;
+-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	white-space:nowrap;
+}
+.share-dialog-contact-bl.pending .fm-chat-user span {
+	max-width: -webkit-calc(100% - 26px);
+	max-width: -moz-calc(100% - 26px);
+	max-width: calc(100% - 26px);
+}
+.search-avatar, .pending-indicator {
 	display: block;
 	width: 16px;
 	height: 16px;
@@ -19483,6 +19498,47 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	border-radius: 100%;
 	text-transform: uppercase;
 }
+.pending-indicator {
+	display:none;
+	
+}
+.share-pending-info {
+	width: 240px;
+padding: 10px 25px 12px 25px;
+position: absolute;
+z-index: 10;
+background-color: #333333;
+font-size: 11px;
+line-height: 18px;
+color: #FFDD00;
+text-align: center;
+-moz-border-radius: 8px;
+-webkit-border-radius: 8px;
+border-radius: 8px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.share-pending-arrow {
+	position: absolute;
+bottom: -10px;
+height: 10px;
+left: 50%;
+margin-left: -9px;
+width: 18px;
+background-image: url(../images/mega/dialogs-sprite.svg);
+background-repeat: no-repeat;
+background-position: left -3831px;
+}
+.pending .pending-indicator {
+	display: inline-block;
+	position:relative;
+	top:-1px;
+	margin:0 0 0 5px;
+}
+.pending .pending-indicator::before {
+	content: '\00a0';
+}
 .search-avatar img {
 	width: 16px;
 	height: 16px;
@@ -19490,7 +19546,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.email .search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar {
+.email .search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar, .pending .search-avatar, .pending-indicator {
 	background-color: transparent !important;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -19502,6 +19558,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 .gmail .search-avatar, .gmail .nw-contact-avatar {
 	background-color: #DD4B39 !important;
 	background-position: center -630px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.pending .search-avatar, .pending-indicator {
+	background-color: #FCAD00 !important;
+	background-position: -3px -3761px;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;

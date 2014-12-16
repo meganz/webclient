@@ -1230,6 +1230,8 @@ function accountUI()
             // this is the main entry point for users who just had upgraded their accounts
 
             if(isNonActivatedAccount()) {
+                megaAnalytics.log("pro", "showNonActivatedAccountDialog");
+
                 var $dialog = $('.top-warning-popup');
                 $dialog.addClass('not-activated');
                 $('.warning-green-icon', $dialog).remove();

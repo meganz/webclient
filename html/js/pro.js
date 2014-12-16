@@ -7,6 +7,8 @@ var pro_usebalance=false;
 
 function init_pro()
 {
+    megaAnalytics.log("pro", "view");
+
 	if (u_type == 3)
 	{
 		api_req(
@@ -118,7 +120,9 @@ function pro_proceed(e)
 	else if(c.indexOf('pro2') > -1) pro_package = 'pro2_year';
 	else if(c.indexOf('pro3') > -1 && $('#reg-checkbox').attr('checked')) pro_package = 'pro3_month';
 	else if(c.indexOf('pro3') > -1) pro_package = 'pro3_year';
-	
+
+    megaAnalytics.log("pro", "proc");
+
 	if (pro_package) pro_continue();
 }
 
@@ -126,6 +130,7 @@ function pro_continue()
 {
 
     if(!u_handle) {
+        megaAnalytics.log("pro", "loginreq");
         msgDialog('loginrequired', 'title', 'msg');
         return;
     } else if(isEphemeral()) {
@@ -157,9 +162,13 @@ function pro_continue()
 function pro_pay()
 {
 	var aff=0;	
-	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;	
-	loadingDialog.show();
-	api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff},
+	if (localStorage.affid && localStorage.affts > new Date().getTime()-86400000) aff = localStorage.affid;
+
+    if(!ul_uploading && !downloading) {
+        redirectToPaypal();
+    }
+
+    api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff},
 	{
 		callback : function (res)
 		{ 
@@ -172,7 +181,7 @@ function pro_pay()
 			{
 				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
 				else pro_m = 1;
-				
+
 				api_req({ a : 'utc', s : [res], m : pro_m },
 				{ 
 					callback : function (res)
@@ -208,9 +217,13 @@ function pro_pay()
 								if (ul_uploading || downloading)
 								{
 									loadingDialog.hide();
-									paypalDialog(ppurl);							
+									paypalDialog(ppurl);
+                                    redirectToPaypalHide();
 								}
-								else document.location = ppurl;
+								else {
+                                    loadingDialog.hide();
+                                    redirectToPaypal(ppurl);
+                                }
 							}			
 							else
 							{
@@ -226,6 +239,7 @@ function pro_pay()
 }
 
 function showLoginDialog() {
+    megaAnalytics.log("pro", "loginDialog");
     $.dialog = 'pro-login-dialog';
 
     var $dialog = $('.pro-login-dialog');
@@ -286,6 +300,8 @@ function showLoginDialog() {
 };
 
 var doProLogin = function($dialog) {
+    megaAnalytics.log("pro", "doLogin");
+
     loadingDialog.show();
     var ctx =
     {
@@ -334,6 +350,7 @@ var doProLogin = function($dialog) {
 };
 
 function showRegisterDialog() {
+    megaAnalytics.log("pro", "regDialog");
     $.dialog = 'pro-register-dialog';
 
     var $dialog = $('.pro-register-dialog');
@@ -494,6 +511,7 @@ function showRegisterDialog() {
 };
 
 var doProRegister = function($dialog) {
+    megaAnalytics.log("pro", "doRegister");
     loadingDialog.show();
 
     if (u_type > 0)
@@ -523,7 +541,7 @@ var doProRegister = function($dialog) {
 
                     api_req(ops);
 
-                    redirectToPaypal();
+                    proceedToPaypal();
                 }
                 else
                 {
@@ -664,7 +682,10 @@ var doProRegister = function($dialog) {
     }
 };
 
-function redirectToPaypal() {
+var paypalTimeout = null;
+function redirectToPaypal(url) {
+    clearTimeout(paypalTimeout);
+
     $('.pro-register-dialog')
         .removeClass('active')
         .addClass('hidden');
@@ -681,30 +702,55 @@ function redirectToPaypal() {
     };
     reposition();
 
+
+    var fadeOutInLoop = function($elm) {
+        $elm
+            .animate({
+                'opacity': 0.2
+            }, 600)
+            .animate({'opacity': 1}, 1000, function() {
+                fadeOutInLoop($elm);
+            });
+    };
+
+    fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
+
     $dialog
         .addClass('active')
         .removeClass('hidden');
 
 
-    var paypalRedirect = function() {
-        if(pro_package) {
-            var cls = pro_package
-                .replace("_month", "")
-                .replace("_year", "");
 
-            $('.reg-st3-membership-bl').removeClass('selected')
-            $('.reg-st3-membership-bl.' + cls).addClass('selected');
 
-            u_attr.p = parseInt(cls.replace("pro", ""));
-        }
+    if(url) {
+        megaAnalytics.log("pro", "proceedingToPaypal");
 
-        pro_continue();
-    };
-
-    $('.continue-to-paypal-button', $dialog)
-        .unbind('click.proDialog')
-        .bind('click.proDialog', function() {
-            paypalRedirect();
-        });
+        paypalTimeout = setTimeout(function () {
+            document.location = url;
+        }, 3000);
+    }
 
 }
+function redirectToPaypalHide() {
+    $('.fm-dialog.pro-register-paypal-dialog')
+        .removeClass('active')
+        .addClass('hidden');
+
+    $('.fm-dialog-overlay').addClass('hidden');
+}
+
+var proceedToPaypal = function() {
+
+    if(pro_package) {
+        var cls = pro_package
+            .replace("_month", "")
+            .replace("_year", "");
+
+        $('.reg-st3-membership-bl').removeClass('selected')
+        $('.reg-st3-membership-bl.' + cls).addClass('selected');
+
+        u_attr.p = parseInt(cls.replace("pro", ""));
+    }
+
+    pro_continue();
+};

@@ -607,6 +607,7 @@ else
 		jsl.push({f:'js/checkboxes.js', n: 'checkboxes_js', j:1});
 		jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
 		jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
+		jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
 		var jsl2 =
 		{

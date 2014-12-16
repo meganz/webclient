@@ -1,5 +1,3 @@
-
-
 function voucherCentering(button)
 {
 	var popupBlock = $('.fm-voucher-popup');
@@ -1190,6 +1188,23 @@ function accountUI()
 		}
 		else
 		{
+            // this is the main entry point for users who just had upgraded their accounts
+
+            if(isNonActivatedAccount()) {
+                var $dialog = $('.top-warning-popup');
+                $dialog.addClass('not-activated');
+                $('.warning-green-icon', $dialog).remove();
+                $('.fm-notifications-bottom', $dialog).remove();
+                $('.warning-popup-body', $dialog)
+                    .unbind('click')
+                    .empty()
+                    .append(
+                        $("<div class='warning-gray-icon mailbox-icon'></div>")
+                    )
+                    .append('<p>Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.</p>'); //TODO: l[]
+
+            }
+
 			$('.fm-account-overview-button').addClass('active');
 			$('.fm-account-overview').removeClass('hidden');
 		}
@@ -3877,7 +3892,8 @@ function dorename()
 function msgDialog(type,title,msg,submsg,callback)
 {
 	$.msgDialog = type;
-	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog');
+	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog loginrequired-dialog');
+    $('#msgDialog .fm-notifications-bottom').removeClass('hidden')
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
 	$.warningCallback = callback;
 	if (type == 'clear-bin')
@@ -3925,7 +3941,39 @@ function msgDialog(type,title,msg,submsg,callback)
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');
-	}
+	} else if (type == 'loginrequired')
+    {
+
+        $('#msgDialog').addClass('loginrequired-dialog');
+
+        $('#msgDialog .fm-notifications-bottom')
+            .addClass('hidden')
+            .html('');
+
+
+        $('#msgDialog .fm-dialog-button').bind('click',function()
+        {
+            closeMsg();
+            if ($.warningCallback) $.warningCallback(true);
+        });
+        $('#msgDialog').addClass('notification-dialog');
+        title = "You are not logged in";
+        msg = '<p>You need to have a MEGA account in order to complete your purchase:</p>\n' +
+            '<a class="top-login-button" href="#login">Login</a>\n' +
+            '<a class="create-account-button" href="#register">Create an account</a><br/>';
+
+        var $selectedPlan = $('.reg-st3-membership-bl.selected');
+        var plan = 1;
+        if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro2")) { plan = 2; }
+        else if($selectedPlan.is(".pro3")) { plan = 3; }
+
+        $('.loginrequired-dialog .fm-notification-icon')
+            .removeClass('plan1')
+            .removeClass('plan2')
+            .removeClass('plan3')
+            .addClass('plan' + plan);
+    }
 
 	$('#msgDialog .fm-dialog-title').text(title);
 	$('#msgDialog .fm-notification-info p').html(msg);
@@ -3943,12 +3991,34 @@ function msgDialog(type,title,msg,submsg,callback)
 	});
 	$('#msgDialog').removeClass('hidden');
 	$('.fm-dialog-overlay').removeClass('hidden');
+
+    if(type == 'loginrequired') {
+        $('#msgDialog .top-login-button')
+            .unbind('click.loginrequired')
+            .bind('click.loginrequired', function() {
+                closeMsg();
+                showLoginDialog();
+                return false;
+            });
+
+        $('#msgDialog .create-account-button')
+            .unbind('click.loginrequired')
+            .bind('click.loginrequired', function() {
+                closeMsg();
+                showRegisterDialog();
+                return false;
+            });
+    }
 }
 
 function closeMsg()
 {
 	$('#msgDialog').addClass('hidden');
-	$('.fm-dialog-overlay').addClass('hidden');
+
+    if(!$('.pro-register-dialog').is(':visible')) {
+        $('.fm-dialog-overlay').addClass('hidden');
+    }
+
 	delete $.msgDialog;
 }
 
@@ -4961,10 +5031,12 @@ function termsDialog(close,pp)
 	if (close)
 	{
 		$('.fm-dialog.terms-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');
+        if(!$('.pro-register-dialog').is(":visible")) {
+		    $('.fm-dialog-overlay').addClass('hidden');
+            $.dialog=false;
+        }
 		if ($.termsAgree) $.termsAgree=undefined;
 		if ($.termsDeny) $.termsDeny=undefined;
-		$.dialog=false;
 		return false;
 	}
 

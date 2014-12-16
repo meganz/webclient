@@ -450,3 +450,18 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
     apiCall[attribute] = value;
     api_req(apiCall, myCtx);
 }
+
+function isNonActivatedAccount() {
+    if(!u_privk && typeof(u_attr.p) != 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3)) {
+        return true;
+    } else {
+        return false;
+    }
+};
+function isEphemeral() {
+    if(u_handle && !u_privk && typeof(u_attr.p) == 'undefined') {
+        return true;
+    } else {
+        return false;
+    }
+};

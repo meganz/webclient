@@ -70,7 +70,7 @@ JavaScript files
 
 **js/hex.js** HEX conversion functions
 
-**js/jquery.jscrollpane.min.js** jScrollpane jQuery plugin for custom scrollbars
+**js/jquery.jscrollpane.js** jScrollpane jQuery plugin for custom scrollbars
 
 **js/jquery.mousewheel.js** jQuery mousewheel plugin for cross browser mousewheel event handling
 

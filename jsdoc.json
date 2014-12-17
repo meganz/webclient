@@ -3,7 +3,7 @@
     	"include": ["."],
     	"exclude": ["test/", "node_modules/", "js/json.js",
     				"fileapi.js",
-    	            "js/jquery.jscrollpane.min.js",
+    	            "js/jquery.jscrollpane.js",
     	            "js/jquery.mousewheel.js",
     	            "js/jquery-ui-1.10.4.js",
 					"js/jquery-1.8.1.js",

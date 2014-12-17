@@ -18,7 +18,7 @@ module.exports = function(config) {
              "../jsbn.js",
              "../jsbn2.js",
              "../jodid25519.js",
-             "../jquery.jscrollpane.min.js",
+             "../jquery.jscrollpane.js",
              "../mega.js",
              "../fm.js",
              "../user.js",

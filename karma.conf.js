@@ -20,7 +20,7 @@ module.exports = function(config) {
         // Basics.
         'js/jquery-1.8.1.js',
         'js/jquery-ui-1.10.4.js',
-        'js/jquery.jscrollpane.min.js',
+        'js/jquery.jscrollpane.js',
 
         // Libraries.
         'js/asmcrypto.js',

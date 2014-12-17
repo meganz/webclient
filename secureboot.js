@@ -562,7 +562,7 @@ else
         jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
         jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
-        jsl.push({f:'js/jquery-ui.min.js', n: 'jqueryui_js', j:1,w:10});
+        jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
         jsl.push({f:'js/base64.js', n: 'base64_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});

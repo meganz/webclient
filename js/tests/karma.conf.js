@@ -9,7 +9,7 @@ module.exports = function(config) {
             "vendor/sinon-1.7.3.js",
 
             "../jquery-1.8.1.js",
-            "../jquery-ui.js",
+            "../jquery-ui-1.10.4.js",
 
             "src/helpers/fromMega.js",
 

@@ -18,7 +18,7 @@ module.exports = function(config) {
         'node_modules/sinon/pkg/sinon.js',
 
         // Basics.
-        'js/jquery-min-1.8.1.js',
+        'js/jquery-1.8.1.js',
         'js/jquery-ui.js',
         'js/jquery.jscrollpane.min.js',
 

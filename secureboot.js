@@ -544,7 +544,7 @@ else
 		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
 		var langv = '';
 		if (typeof lv != 'undefined') langv = '_' + lv[lang];
-		var jsl = []
+		var jsl = [];
 
 		jsl.push({f:'lang/' + lang + langv + '.json', n: 'lang', j:3});
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon

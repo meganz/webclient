@@ -3,7 +3,6 @@
         this.loggerId = id;
         this.sessionId = makeid(16);
     };
-
     MegaAnalytics.prototype.log = function(c, e, data) {
         data = data || {};
         data = $.extend(
@@ -15,7 +14,6 @@
             },
             data
         );
-
         var msg = JSON.stringify({
             'c': c,
             'e': e,
@@ -27,6 +25,5 @@
         }
         api_req({ a: 'log',e: this.loggerId, m: msg},  {});
     };
-
     window.megaAnalytics = new MegaAnalytics(99999);
 })();

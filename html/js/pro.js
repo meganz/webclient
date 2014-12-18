@@ -94,9 +94,15 @@ function init_pro()
 		$('.pro-gray-block .register-st2-button-arrow').bind('click',function(e)
 		{
 			pro_proceed(e);
-
             return false;
 		});		
+		
+		$('.key3 .register-st2-button-arrow').unbind('click');
+		$('.key3 .register-st2-button-arrow').bind('click',function(e)
+		{
+			pro_proceed(e);
+		});		
+		
 		$('.pro-bottom-button').unbind('click');
 		$('.pro-bottom-button').bind('click',function(e)
 		{
@@ -107,6 +113,8 @@ function init_pro()
 
 function pro_proceed(e)
 {
+	if (page == 'key') sessionStorage.proref = 'accountcompletion';
+
 	var c = $('.reg-st3-membership-bl.selected').attr('class');
 	if (c.indexOf('free') > -1)
 	{
@@ -150,7 +158,7 @@ function pro_continue()
 	}
 	else if (parseFloat(pro_balance) >= parseFloat(pro_packs[pro_package][5]))
 	{
-		msgDialog('confirmation','Prepaid balance','Do you want to use your prepaid balance to proceed?',false,function(e)
+		msgDialog('confirmation',l[504],l[5844],false,function(e)
 		{
 			if(e) pro_paymentmethod = 'pro_prepaid';
 			pro_pay();		
@@ -167,8 +175,10 @@ function pro_pay()
     if(!ul_uploading && !downloading) {
         redirectToPaypal();
     }
+	
+	
 
-    api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff},
+    api_req({ a : 'uts', it: 0, si: pro_packs[pro_package][0], p: pro_packs[pro_package][5], c: pro_packs[pro_package][6], aff: aff, 'm':m},
 	{
 		callback : function (res)
 		{ 
@@ -181,11 +191,14 @@ function pro_pay()
 			{
 				if (pro_paymentmethod == 'pro_voucher' || pro_paymentmethod == 'pro_prepaid') pro_m = 0;
 				else pro_m = 1;
+				
+				var proref = '';
+				if (sessionStorage.proref) proref = sessionStorage.proref;
 
-				api_req({ a : 'utc', s : [res], m : pro_m },
+				api_req({ a : 'utc', s : [res], m : pro_m, r: proref },
 				{ 
 					callback : function (res)
-					{ 
+					{
 						if (pro_paymentmethod == 'pro_prepaid')
 						{							
 							loadingDialog.hide();
@@ -212,18 +225,9 @@ function pro_pay()
 									else ppurl += '&';
 									ppurl += i + '=' + encodeURIComponent(res.EUR[i]);
 									j++;
-								}
-								if (d) console.log(ppurl);
-								if (ul_uploading || downloading)
-								{
-									loadingDialog.hide();
-									paypalDialog(ppurl);
-                                    redirectToPaypalHide();
-								}
-								else {
-                                    loadingDialog.hide();
-                                    redirectToPaypal(ppurl);
-                                }
+								}								
+								loadingDialog.hide();
+								redirectToPaypal(ppurl);                                
 							}			
 							else
 							{
@@ -516,7 +520,7 @@ var doProRegister = function($dialog) {
 
     if (u_type > 0)
     {
-        msgDialog('warninga',l[135],'You are already logged in. You can only create one MEGA account.');
+        msgDialog('warninga',l[135],l[5843]);
         loadingDialog.show();
         return false;
     }
@@ -749,7 +753,7 @@ var proceedToPaypal = function() {
         $('.reg-st3-membership-bl').removeClass('selected')
         $('.reg-st3-membership-bl.' + cls).addClass('selected');
 
-        u_attr.p = parseInt(cls.replace("pro", ""));
+        u_type=1;
     }
 
     pro_continue();

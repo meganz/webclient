@@ -885,7 +885,7 @@ function topmenuUI()
 	else
 	{
 
-		if (u_type === 0 && !confirmok && page !== 'key')
+		if (u_type === 0 && !confirmok && page !== 'key' && page !== 'pro' && page !== 'sync')
 		{
 			$('.top-menu-item.register').text(l[968]);
 			$('.top-menu-item.clouddrive').show();
@@ -918,7 +918,7 @@ function topmenuUI()
                     .append(
                     $("<div class='warning-gray-icon mailbox-icon'></div>")
                 )
-                    .append('<p>Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.</p>'); //TODO: l[]
+                    .append(l[5847]); //TODO: l[]
 
             }
 			if (page !== 'register') $('.top-warning-popup').addClass('active');

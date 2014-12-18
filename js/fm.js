@@ -13,16 +13,133 @@ function voucherCentering(button)
 
 function reportQuota(chunksize)
 {
-	console.log('completed ' + chunksize + ' bytes');
+	if (u_attr && u_attr.p) return false;	
+	var quota = {}, t = Math.floor(new Date().getTime()/60000);
+	if (localStorage.q) quota = JSON.parse(localStorage.q);
+	for (var i in quota)
+	{
+		if (i < t-360) delete quota[i];
+	}
+	if (!quota[t]) quota[t]=0;
+	quota[t] += chunksize;
+	localStorage.q = JSON.stringify(quota);
 }
 
 function hasQuota(filesize, next)
 {
-	console.log('wants to download ' + filesize + ' data');
-	Soon(function() {
-		next(true);
-	});
+	checkQuota(filesize,function(r)
+	{	
+		if (r.sec == 0 || r.sec == -1)
+		{
+			bandwidthDialog(1);
+			next(true);
+		}
+		else
+		{
+			sessionStorage.proref='bwlimit';
+			if (!$.lastlimit) $.lastlimit=0;		
+			$('.fm-bandwidth-number-txt.used').html(bytesToSize(r.used).replace(' ',' <span class="small">') + '</span>');
+			$('.fm-bandwidth-number-txt.available').html(bytesToSize(r.filesize).replace(' ',' <span class="small">') + '</span>');			
+			var minutes = Math.ceil(r.sec/60);			
+			if (minutes == 1) $('.bwminutes').html(l[5838] + ' *');
+			else $('.bwminutes').html(l[5837].replace('[X]',minutes) + ' *');
+			bandwidthDialog();
+			if ($.lastlimit < new Date().getTime()-60000)  megaAnalytics.log("dl", "limit",{used:r.used,filesize:r.filesize,seconds:r.sec});			
+			$.lastlimit=new Date().getTime();	
+			next(false);
+		}
+	});	
 }
+
+function checkQuota(filesize,callback)
+{
+	if (u_attr && u_attr.p) 
+	{
+		if (callback) callback({sec:-1});
+		return false;	
+	}
+	api_req({a:'bq'},{callback:function(quotabytes)
+	{
+		if (localStorage.qb) quotabytes = localStorage.qb;
+		var consumed=0,quota = {};
+		if (localStorage.q) quota = JSON.parse(localStorage.q);		
+		var t = Math.floor(new Date().getTime()/60000);
+		var t2 = t-360;
+		var sec = 0,available=0, newbw=0;
+		while (t2 <= t)
+		{
+			if (quota[t2]) consumed += quota[t2];
+			t2++;
+		}
+		if (quotabytes == 0) sec=0;		
+		else if (quotabytes-filesize < 0) sec=-1;		
+		else if (quotabytes-consumed-filesize < 0)
+		{
+			var shortage = quotabytes-consumed-filesize;
+			var t2 = t-360;
+			while (t2 <= t)
+			{
+				if (quota[t2]) shortage += quota[t2];
+				if (shortage > 0)
+				{
+					newbw = shortage-quotabytes-consumed-filesize;
+					sec = (t2+360-t)*60;
+					break;
+				}
+				t2++;
+			}
+			if (sec == 0 || sec > 21600)
+			{
+				sec = 21600;
+				newbw = quotabytes;
+			}
+		}
+		else sec=0;		
+		if (callback) callback({used:consumed,sec:sec,filesize:filesize,newbw:newbw});
+	
+	}});
+}
+
+function bandwidthDialog(close)
+{
+	if (close)
+	{
+		$('.fm-dialog.bandwidth-quota').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');
+		$.dialog=false;
+	}
+	else
+	{	
+		if (!is_fm() && page !== 'download') return false;
+		
+		$('.fm-dialog-button.quota-later-button').unbind('click');
+		$('.fm-dialog-button.quota-later-button').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		$('.fm-dialog-button.quota-upgrade-button').unbind('click');
+		$('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
+		{
+			
+		
+			bandwidthDialog(1);
+			document.location = '#pro';
+		});
+	
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-dialog.bandwidth-quota').removeClass('hidden');
+		$.dialog='bandwidth';
+	}
+}
+
 
 function andreiScripts()
 {
@@ -3956,7 +4073,8 @@ function msgDialog(type,title,msg,submsg,callback)
 		});
 		$('#msgDialog .icon').addClass('fm-notification-icon');
 		$('#msgDialog').addClass('confirmation-dialog');
-	} else if (type == 'loginrequired')
+	} 
+	else if (type == 'loginrequired')
     {
 
         $('#msgDialog').addClass('loginrequired-dialog');
@@ -3972,10 +4090,10 @@ function msgDialog(type,title,msg,submsg,callback)
             if ($.warningCallback) $.warningCallback(true);
         });
         $('#msgDialog').addClass('notification-dialog');
-        title = "You are not logged in";
-        msg = '<p>You need to have a MEGA account in order to complete your purchase:</p>\n' +
-            '<a class="top-login-button" href="#login">Login</a>\n' +
-            '<a class="create-account-button" href="#register">Create an account</a><br/>';
+        title = l[5841];
+        msg = '<p>' + l[5842] + '</p>\n' +
+            '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
+            '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>';
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;

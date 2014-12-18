@@ -586,7 +586,7 @@ function init_page()
 			M.reset();
 			folderlink=0;
 			fminitialized=false;
-			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+			mDBcls();
 			notifications=undefined;
 		}
 		if (!fminitialized)

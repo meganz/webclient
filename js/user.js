@@ -458,10 +458,8 @@ function isNonActivatedAccount() {
         return false;
     }
 };
-function isEphemeral() {
-    if(u_handle && !u_privk && typeof(u_attr.p) == 'undefined') {
-        return true;
-    } else {
-        return false;
-    }
+function isEphemeral() 
+{
+    if(u_type === 0) return true;    
+	else  return false;   
 };

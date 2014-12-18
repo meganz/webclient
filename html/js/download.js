@@ -38,7 +38,10 @@ function Mads()
 		$('.ads-top-arrow').hide();
 		$('.ads-top-notification').hide();
 	}
-	console.error('Mads', typeof swiffy, silent_loading && silent_loading.name, silent_loading)
+	
+	
+	
+	//console.error('Mads', typeof swiffy, silent_loading && silent_loading.name, silent_loading);
 
 	$('body').addClass('ads');
 	if (typeof swiffy == 'undefined' && !silent_loading)

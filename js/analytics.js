@@ -3,7 +3,8 @@
         this.loggerId = id;
         this.sessionId = makeid(16);
     };
-    MegaAnalytics.prototype.log = function(c, e, data) {
+    MegaAnalytics.prototype.log = function(c, e, data) {	
+	
         data = data || {};
         data = $.extend(
             true,

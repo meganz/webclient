@@ -537,6 +537,21 @@ function checkPassword(strPassword)
     return nScore;
 }
 
+function showNonActivatedAccountDialog(log)
+{
+    if (log) megaAnalytics.log("pro", "showNonActivatedAccountDialog");
+
+    var $dialog = $('.top-warning-popup');
+    $dialog.addClass('not-activated');
+    $('.warning-green-icon', $dialog).remove();
+    $('.fm-notifications-bottom', $dialog).remove();
+    $('.warning-popup-body', $dialog)
+        .unbind('click')
+        .empty()
+        .append($("<div class='warning-gray-icon mailbox-icon'></div>"))
+        .append(l[5847]); //TODO: l[]
+}
+
 function countDif(strPassword)
 {
 	var chararr = [];

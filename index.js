@@ -908,18 +908,7 @@ function topmenuUI()
 				document.location.hash = 'register';
 			});
             if(isNonActivatedAccount()) {
-                var $dialog = $('.top-warning-popup');
-                $dialog.addClass('not-activated');
-                $('.warning-green-icon', $dialog).remove();
-                $('.fm-notifications-bottom', $dialog).remove();
-                $('.warning-popup-body', $dialog)
-                    .unbind('click')
-                    .empty()
-                    .append(
-                    $("<div class='warning-gray-icon mailbox-icon'></div>")
-                )
-                    .append(l[5847]); //TODO: l[]
-
+                showNonActivatedAccountDialog();
             }
 			if (page !== 'register') $('.top-warning-popup').addClass('active');
 		}

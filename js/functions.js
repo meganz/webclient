@@ -293,6 +293,10 @@ function populate_l()
 	l[1965] = l[1965].replace('[A]','<a href="#recovery">').replace('[/A]','</a>');
 	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
 	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
+	l[1371] = l[1371].replace('2014','2015');
+	l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');	
+	l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
+	
 	l['year'] = new Date().getFullYear();
 }
 

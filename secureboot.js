@@ -343,7 +343,10 @@ if (m)
     }
     if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
     {
-        if (app) document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+        if (app) {
+		document.getElementById('m_title').innerHTML = 'Install the free MEGA app to access this file from your mobile';
+		document.getElementById('m_appbtn').href += '&referrer=link';
+	}
         if (ua.indexOf('chrome') > -1)
         {
             setTimeout(function()
@@ -641,6 +644,7 @@ else
         
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
         if (is_extension)
         {
                 jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
@@ -687,7 +691,7 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-
+	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
         jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});

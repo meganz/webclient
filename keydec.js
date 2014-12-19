@@ -12,7 +12,7 @@ self.onmessage = function ( e ) {
 
 	d              = !!evd.debug;
 	u_privk        = evd.u_privk;
-	u_k_aes        = new sjcl.cipher.aes(evd.u_k);
+	u_k_aes        = evd.u_k && new sjcl.cipher.aes(evd.u_k);
 	u_sharekeys    = evd.u_sharekeys;
 	rsa2aes        = {};
 	missingkeys    = {};

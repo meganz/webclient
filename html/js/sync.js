@@ -48,6 +48,14 @@ var linuxsync =
 	'c':'sudo zypper in'
 },
 {
+	'name':'openSUSE 13.2',
+	'32':'openSUSE_13.2/i586/megasync-openSUSE_13.2.i586.rpm',
+	'32n':'openSUSE_13.2/i586/nautilus-megasync-openSUSE_13.2.i586.rpm',
+	'64':'openSUSE_13.2/x86_64/megasync-openSUSE_13.2.x86_64.rpm',
+	'64n':'openSUSE_13.2/x86_64/nautilus-megasync-openSUSE_13.2.x86_64.rpm',
+	'c':'sudo zypper in'
+},
+{
 	'name':'Ubuntu 12.04',
 	'32':'xUbuntu_12.04/i386/megasync-xUbuntu_12.04_i386.deb',
 	'32n':'xUbuntu_12.04/i386/nautilus-megasync-xUbuntu_12.04_i386.deb',
@@ -139,7 +147,7 @@ function sync_switchOS(os)
 	$('.sync-button-block.linux').addClass('hidden');
 	if (os == 'windows')
 	{
-		syncurl = 'https://mega.co.nz/MEGAsyncSetup.exe';
+		syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
 		$('.sync-button-txt.small').text(l[1158]);			
 		$('.sync-bottom-txt.button-txt').html(l[2025]);
 		$('.sync-button').removeClass('mac linux');
@@ -148,7 +156,7 @@ function sync_switchOS(os)
 	}
 	else if (os == 'mac')
 	{
-		syncurl = 'https://mega.co.nz/MEGAsyncSetup.dmg';
+		syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
 		var ostxt = l[2031];
 		if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');	
 		if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');			
@@ -250,8 +258,8 @@ function changeLinux(i)
 		var c = $('.linux32').parent().attr('class');
 		if (c && c.indexOf('radioOn') > -1) platform = '32';
 		var path = linuxsync[i][platform];
-		syncurl = 'https://mega.co.nz/linux/MEGAsync/' + path;
-		nautilusurl = 'https://mega.co.nz/linux/MEGAsync/' + linuxsync[i][platform + 'n'];
+		syncurl = 'https://mega.nz/linux/MEGAsync/' + path;
+		nautilusurl = 'https://mega.nz/linux/MEGAsync/' + linuxsync[i][platform + 'n'];
 		var filename = path.split('/');
 		filename = filename[filename.length-1];
 		$('.sync-button').attr('href',syncurl);

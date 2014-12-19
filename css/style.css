@@ -7163,7 +7163,7 @@ span.search-number {
 }
 .fm-empty-button, .fm-not-logged-button {
 	cursor: pointer;
-	background-color: rgba(109,176,63,0.7);
+	background-color: rgba(107,177,54,0.8);
 	display: inline-block;
 	padding: 0 24px;
 	color: white;
@@ -7193,7 +7193,7 @@ span.search-number {
 	background-color: rgba(217,0,7,1);
 }
 .fm-empty-button:hover {
-	background-color: rgba(109,176,63,1);
+	background-color: rgba(107,177,54,1);
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;

@@ -5555,12 +5555,12 @@ function closeMsg()
 {
 	$('#msgDialog').addClass('hidden');
 
-    if(!$('.pro-register-dialog').is(':visible')) {
-        $('.fm-dialog-overlay').addClass('hidden');
-    }
+	if(!$('.pro-register-dialog').is(':visible')) {
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('body').removeClass('overlayed');
+	}
 
 	delete $.msgDialog;
-	$('body').removeClass('overlayed');
 }
 
 function dialogScroll(s)
@@ -7469,11 +7469,11 @@ function termsDialog(close,pp)
 	if (close)
 	{
 		$('.fm-dialog.terms-dialog').addClass('hidden');
-        if(!$('.pro-register-dialog').is(":visible")) {
-		    $('.fm-dialog-overlay').addClass('hidden');
-		    $('body').removeClass('overlayed');
-            $.dialog=false;
-        }
+		if(!$('.pro-register-dialog').is(":visible")) {
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('body').removeClass('overlayed');
+			$.dialog=false;
+		}
 		if ($.termsAgree) $.termsAgree=undefined;
 		if ($.termsDeny) $.termsDeny=undefined;
 		return false;

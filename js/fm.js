@@ -3567,7 +3567,10 @@ function contextmenuUI(e,ll,topmenu)
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';
-			if (folderlink) flt += ',.zipdownload-item,.import-item';
+			if (folderlink) {
+				if (u_type) flt += ',.import-item';
+				if (M.v.length) flt += ',.zipdownload-item';
+			}
 			$.selected = [M.RootID];
 			$(t).filter(flt).show();
 		}

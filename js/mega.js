@@ -2684,7 +2684,7 @@ function process_f(f, cb)
 			kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
 				if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
 				$.extend(u_kdnodecache, r);
-				__process_f2(f, cb.bind(this, !!j.newmissingkeys));
+				__process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
 			}, function(err) {
 				if (d) console.error(err);
 				__process_f2(f, cb);

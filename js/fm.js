@@ -2374,24 +2374,11 @@ function accountUI()
 		}
 		else
 		{
-            // this is the main entry point for users who just had upgraded their accounts
+			// this is the main entry point for users who just had upgraded their accounts
 
-            if(isNonActivatedAccount()) {
-                megaAnalytics.log("pro", "showNonActivatedAccountDialog");
-
-                var $dialog = $('.top-warning-popup');
-                $dialog.addClass('not-activated');
-                $('.warning-green-icon', $dialog).remove();
-                $('.fm-notifications-bottom', $dialog).remove();
-                $('.warning-popup-body', $dialog)
-                    .unbind('click')
-                    .empty()
-                    .append(
-                        $("<div class='warning-gray-icon mailbox-icon'></div>")
-                    )
-                    .append('<p>Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.</p>'); //TODO: l[]
-
-            }
+			if(isNonActivatedAccount()) {
+				showNonActivatedAccountDialog(true);
+			}
 
 			$('.fm-account-overview-button').addClass('active');
 			$('.fm-account-overview').removeClass('hidden');

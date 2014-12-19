@@ -88,7 +88,6 @@ function init_pro()
 	{
 	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
 	   if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);	   
-	   $('.reg-st3-save-icon').removeClass('hidden');	   
 	   $('.reg-checkbox :checkbox').iphoneStyle({resizeContainer:false,resizeHandle:false,onChange:function(elem, data)
 	   {
 		 switch_pro(data);	     

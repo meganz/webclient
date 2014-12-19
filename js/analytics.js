@@ -11,10 +11,14 @@
             {}, {
                 'aid': this.sessionId,
                 'lang': typeof(lang) !== 'undefined' ? lang : null,
+				'browserlang': navigator.language,
                 'u_type': typeof(u_type) !== 'undefined' ? u_type : null
             },
             data
         );
+		
+		if (c == 'pro' && sessionStorage.proref) data['ref'] = sessionStorage.proref;
+		
         var msg = JSON.stringify({
             'c': c,
             'e': e,

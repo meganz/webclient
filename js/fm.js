@@ -51,16 +51,30 @@ function hasQuota(filesize, next)
 	});	
 }
 
+function apiQuota(callback2)
+{
+	// cache 'bq' for up to 60 seconds for each limitation
+	if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime()-60000) callback2($.bq);
+	else
+	{
+		api_req({a:'bq'},{callback:function(res)
+		{
+			$.bq=res;
+			callback2(res);	
+		}});	
+	}	
+}
+
 function checkQuota(filesize,callback)
 {
 	if (u_attr && u_attr.p) 
 	{
 		if (callback) callback({sec:-1});
 		return false;	
-	}
-	api_req({a:'bq'},{callback:function(quotabytes)
+	}	
+	apiQuota(function(quotabytes)
 	{
-		if (localStorage.qb) quotabytes = localStorage.qb;
+		if (localStorage.bq) quotabytes = localStorage.bq;
 		var consumed=0,quota = {};
 		if (localStorage.q) quota = JSON.parse(localStorage.q);		
 		var t = Math.floor(new Date().getTime()/60000);
@@ -97,7 +111,7 @@ function checkQuota(filesize,callback)
 		else sec=0;		
 		if (callback) callback({used:consumed,sec:sec,filesize:filesize,newbw:newbw});
 	
-	}});
+	});
 }
 
 function bandwidthDialog(close)

@@ -5,9 +5,52 @@ var pro_paymentmethod;
 var pro_m;
 var pro_usebalance=false;
 
+function switch_pro(data)
+{
+	 if(data)
+	 {
+		$('#month').addClass('red');
+		$('#year').removeClass('red');
+		$('.reg-st3-save-icon').addClass('hidden');
+		$('.pro-new-year').addClass('hidden');
+		$('.pro-new-month').removeClass('hidden');			
+		$('.pro1 .reg-st3-bott-title.right').html('9<span>.99 &euro;</span>');
+		$('.pro2 .reg-st3-bott-title.right').html('19<span>.99 &euro;</span>');
+		$('.pro3 .reg-st3-bott-title.right').html('29<span>.99 &euro;</span>');
+		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('1 <span>TB</span>');
+		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('4 <span>TB</span>');
+		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('8 <span>TB</span>');
+	 } 
+	 else 
+	 {
+		$('#month').removeClass('red');
+		$('#year').addClass('red');
+		$('.reg-st3-save-icon').removeClass('hidden');
+		$('.pro-new-year').removeClass('hidden');
+		$('.pro-new-month').addClass('hidden');			
+		$('.pro1 .reg-st3-bott-title.right').html('99<span>.99 &euro;</span>');
+		$('.pro2 .reg-st3-bott-title.right').html('199<span>.99 &euro;</span>');
+		$('.pro3 .reg-st3-bott-title.right').html('299<span>.99 &euro;</span>');			
+		$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('12 <span>TB</span>');
+		$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('48 <span>TB</span>');
+		$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');			
+	 }
+}
+
 function init_pro()
 {
-    megaAnalytics.log("pro", "view");
+	var DEFAULT = 'monthly'; 
+	
+	if (DEFAULT == 'monthly') 
+	{
+		$('#reg-checkbox').attr('checked',true);
+		switch_pro(true);
+	}
+	else
+	{
+		$('#reg-checkbox').attr('checked',false);
+		switch_pro(false);	
+	}
 
 	if (u_type == 3)
 	{
@@ -25,6 +68,10 @@ function init_pro()
 		localStorage.affid = document.location.hash.replace('#pro/','');
 		localStorage.affts = new Date().getTime();	
 	}
+	
+	if (document.location.hash.indexOf('#pro#') > -1) sessionStorage.proref = document.location.hash.replace('#pro#','');
+	
+	
 	$('body').addClass('pro');
 	if (lang != 'en') $('body').addClass(lang);	
 	json = JSON.parse(pro_json);				
@@ -41,37 +88,9 @@ function init_pro()
 	{
 	   if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
 	   if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);	   
-	   $('.reg-st3-save-icon').removeClass('hidden');	   
 	   $('.reg-checkbox :checkbox').iphoneStyle({resizeContainer:false,resizeHandle:false,onChange:function(elem, data)
 	   {
-	     if(data)
-		 {
-			$('#month').addClass('red');
-	        $('#year').removeClass('red');
-			$('.reg-st3-save-icon').addClass('hidden');
-			$('.pro-new-year').addClass('hidden');
-			$('.pro-new-month').removeClass('hidden');			
-			$('.pro1 .reg-st3-bott-title.right').html('9<span>.99 &euro;</span>');
-			$('.pro2 .reg-st3-bott-title.right').html('19<span>.99 &euro;</span>');
-			$('.pro3 .reg-st3-bott-title.right').html('29<span>.99 &euro;</span>');
-			$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('1 <span>TB</span>');
-			$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('4 <span>TB</span>');
-			$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('8 <span>TB</span>');
-	     } 
-		 else 
-		 {
-			$('#month').removeClass('red');
-	        $('#year').addClass('red');
-			$('.reg-st3-save-icon').removeClass('hidden');
-			$('.pro-new-year').removeClass('hidden');
-			$('.pro-new-month').addClass('hidden');			
-			$('.pro1 .reg-st3-bott-title.right').html('99<span>.99 &euro;</span>');
-			$('.pro2 .reg-st3-bott-title.right').html('199<span>.99 &euro;</span>');
-			$('.pro3 .reg-st3-bott-title.right').html('299<span>.99 &euro;</span>');			
-			$('.pro1 .reg-st3-bandwidth .reg-st3-big-txt').html('12 <span>TB</span>');
-			$('.pro2 .reg-st3-bandwidth .reg-st3-big-txt').html('48 <span>TB</span>');
-			$('.pro3 .reg-st3-bandwidth .reg-st3-big-txt').html('96 <span>TB</span>');			
-		 }
+		 switch_pro(data);	     
 		 if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
 		}
 	   });

@@ -231,6 +231,7 @@ ClassChunk.prototype.on_ready = function(args, xhr) {
 			new Uint8Array(r)
 		])
 		this.dl.retries = 0;
+		reportQuota(this.size);
 		this.finish_download();
 		this.destroy();
 	} else if (!this.dl.cancelled) {
@@ -379,6 +380,22 @@ ClassFile.prototype.destroy = function() {
 	oDestroy(this);
 }
 
+ClassFile.prototype.checkQuota = function(task_done) {
+	if (this.hasQuota) return true;
+
+	var that = this;
+
+	hasQuota(this.dl.size, function(hasQuota) {
+		that.hasQuota = hasQuota;
+		if (hasQuota) return that.run(task_done);
+		setTimeout(function() {
+			return that.run(task_done);
+		}, 1000);
+	});
+
+	return false;
+};
+
 ClassFile.prototype.run = function(task_done) {
 
 	ASSERT(this.gid && GlobalProgress[this.gid], 'Invalid ClassFile state (' + (!!this.gid) + ', ' + (this.dl&&!!this.dl.cancelled) + ')');
@@ -386,8 +403,12 @@ ClassFile.prototype.run = function(task_done) {
 		return task_done(); // Hmm..
 	}
 
-	fetchingFile = 1;
+	fetchingFile = 1; /* Block the fetchingFile state */
 	this.dl.retries = 0; /* set the retries flag */
+
+	if (!this.checkQuota(task_done)) {
+		return;
+	}
 
 	DEBUG("dl_key " + this.dl.key);
 	if (!GlobalProgress[this.gid].started) {

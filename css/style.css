@@ -7163,7 +7163,7 @@ span.search-number {
 }
 .fm-empty-button, .fm-not-logged-button {
 	cursor: pointer;
-	background-color: rgba(109,176,63,0.7);
+	background-color: rgba(107,177,54,0.8);
 	display: inline-block;
 	padding: 0 24px;
 	color: white;
@@ -7193,7 +7193,7 @@ span.search-number {
 	background-color: rgba(217,0,7,1);
 }
 .fm-empty-button:hover {
-	background-color: rgba(109,176,63,1);
+	background-color: rgba(107,177,54,1);
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;
@@ -22118,4 +22118,145 @@ background-color:#1DA2E9
 .fm-create-chat-button.active .add-user-popup-arrow {
 	margin-top: -4px;
 	z-index: 1210;
+}
+
+
+ /**
+  * PRO upgrade, new flow styling for the login/register popups and buttons
+  */
+
+
+.fm-dialog.loginrequired-dialog {
+    min-height: 176px;
+    width: 445px;
+}
+.loginrequired-dialog .fm-notification-body {
+    padding: 0 20px;
+}
+.fm-notification-info .top-login-button {
+    color: white;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    float: none;
+    display: inline-block;
+    clear: left;
+    background-color: rgb(127, 127, 127);
+    margin-right: 5px;
+}
+
+
+.fm-notification-info .create-account-button {
+    color: white;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    float: none;
+    display: inline-block;
+    background-color: rgb(217, 046, 000);
+}
+
+.loginrequired-dialog .fm-notification-info > p {
+    margin-top: 26px;
+}
+.loginrequired-dialog .fm-notification-info > p > p {
+    margin-bottom: 6px;
+    padding-top: 2px;
+}
+.loginrequired-dialog .fm-notification-icon {
+    width: 90px;
+    height: 90px;
+    background-image: url(../images/mega/register-big-sprite@2x.png);
+    background-size: 100px auto;
+    background-position: center -199px;
+    background-repeat: no-repeat;
+    margin: 0 26px 0 0;
+}
+.loginrequired-dialog .fm-notification-icon.plan1 {
+    background-position: center -329px;
+}
+
+.loginrequired-dialog .fm-notification-icon.plan2 {
+    background-position: center -459px;
+}
+.loginrequired-dialog .fm-notification-icon.plan3 {
+    background-position: center -589px;
+}
+
+/* login dialog */
+.pro-login-dialog {
+    z-index: 1200;
+    top: 50%;
+    left: 50%;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    border-right: 2px solid rgba(0, 0, 0, .3);
+    border-top: 2px solid rgba(0, 0, 0, .3);
+}
+.pro-login-dialog.hidden {
+    display: none;
+}
+.pro-login-dialog .fm-dialog-header {
+    margin-bottom: 10px;
+}
+a.top-login-forgot-pass {
+    font-size: 11px;
+    color: #999999;
+    line-height: 21px;
+    background-image: url(../images/mega/top-login-sprite_v4.png);
+    background-position: 0 -1582px;
+    background-repeat: no-repeat;
+    float: right;
+    padding: 0 0 0 23px;
+    cursor: pointer;
+}
+/* register */
+.pro-register-dialog {
+    z-index: 1180;
+    top: 50%;
+    left: 50%;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    border-right: 2px solid rgba(0, 0, 0, .3);
+    border-top: 2px solid rgba(0, 0, 0, .3);
+
+    min-width: 460px;
+}
+.pro-register-dialog.hidden {
+    display: none;
+}
+.pro-register-dialog .fm-dialog-header {
+    margin-bottom: 10px;
+}
+.pro-register-dialog .register-st2-button {
+    float: right;
+    cursor: pointer;
+}
+.pro-register-paypal-dialog .reg-success-icon {
+    background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
+    background-size: 200px 200px;
+    width: 200px;
+    height: 200px;
+}
+/* logged in PRO account, but not activated */
+.top-warning-popup.not-activated {
+    cursor: default;
+}
+.top-warning-popup.not-activated .mailbox-icon {
+    background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
+    background-size: 100px 100px;
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin-right: 10px;
+}
+.top-warning-popup.not-activated p {
+    margin-top: 10px;
+    padding-top: 9px;
+}
+
+.top-warning-popup.not-activated .warning-popup-body {
+    padding-bottom: 8px;
 }

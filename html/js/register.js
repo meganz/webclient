@@ -106,10 +106,10 @@ function registeraccount()
 				}
 				else
 				{
-					$('.fm-dialog.registration-success').removeClass('hidden');
+					$('.fm-dialog.registration-success,.fm-dialog.registration-page-success').removeClass('hidden');
 					$('.fm-dialog-overlay').removeClass('hidden');
 					$('body').addClass('overlayed');
-					$('.fm-dialog.registration-success').unbind('click');
+					$('.fm-dialog.registration-success,.fm-dialog.registration-page-success').unbind('click');
 				}
 				var ops = {a:'up'};				
 				if (m) ops.name2 = $('#register_name').val();
@@ -394,8 +394,8 @@ function init_register()
 			$(this)[0].type = 'text';
 		}
 	});	
-	$('.new-registration-checkbox .radio-txt,.register-check').unbind('click');
-	$('.new-registration-checkbox .radio-txt,.register-check').bind('click',function(e)
+	$('.new-registration-checkbox .radio-txt,.register-check').unbind('click.uiCheckboxes');
+	$('.new-registration-checkbox .radio-txt,.register-check').bind('click.uiCheckboxes',function(e)
 	{
 		if ($('.register-check').attr('class').indexOf('checkboxOn') > -1)
 		{
@@ -407,7 +407,7 @@ function init_register()
 			$('.register-check').addClass('checkboxOn');
 			$('.register-check').removeClass('checkboxOff');		
 		}
-	});	
+	});
 	if (typeof zxcvbn == 'undefined' && !silent_loading)
 	{
 		$('.login-register-input.password').addClass('loading');

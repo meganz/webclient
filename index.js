@@ -635,7 +635,7 @@ function init_page()
 			M.reset();
 			folderlink=0;
 			fminitialized=false;
-			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+			mDBcls();
 			notifications=undefined;
 		}
 		if (!fminitialized)
@@ -989,9 +989,17 @@ function topmenuUI() {
             $('.top-warning-popup').unbind('click');
             $('.top-warning-popup').bind('click', function(e) {
 
+		if(isNonActivatedAccount()) {
+			return;
+		}
+
                 $('.top-warning-popup').removeClass('active');
                 document.location.hash = 'register';
             });
+	    
+	    if(isNonActivatedAccount()) {
+                showNonActivatedAccountDialog();
+	    }
 
             if (page !== 'register') {
                 $('.top-warning-popup').addClass('active');
@@ -1354,10 +1362,10 @@ function topmenuUI() {
 		document.location.hash = '#';
 	});
 
-	var c = $('.fm-dialog.registration-success').attr('class');
+	var c = $('.fm-dialog.registration-page-success').attr('class');
 	if (c.indexOf('hidden') == -1)
 	{
-		$('.fm-dialog.registration-success').addClass('hidden');
+		$('.fm-dialog.registration-page-success').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 	}

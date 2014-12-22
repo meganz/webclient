@@ -1,5 +1,3 @@
-
-
 function voucherCentering(button)
 {
 	var popupBlock = $('.fm-voucher-popup');
@@ -12,6 +10,150 @@ function voucherCentering(button)
 		popupBlock.css('left', rigthPosition - 20);
 	}
 }
+
+function reportQuota(chunksize)
+{
+	if (u_attr && u_attr.p) return false;	
+	var quota = {}, t = Math.floor(new Date().getTime()/60000);
+	if (localStorage.q) quota = JSON.parse(localStorage.q);
+	for (var i in quota)
+	{
+		if (i < t-360) delete quota[i];
+	}
+	if (!quota[t]) quota[t]=0;
+	quota[t] += chunksize;
+	localStorage.q = JSON.stringify(quota);
+}
+
+function hasQuota(filesize, next)
+{
+	checkQuota(filesize,function(r)
+	{	
+		if (r.sec == 0 || r.sec == -1)
+		{
+			bandwidthDialog(1);
+			next(true);
+		}
+		else
+		{
+			sessionStorage.proref='bwlimit';
+			if (!$.lastlimit) $.lastlimit=0;		
+			$('.fm-bandwidth-number-txt.used').html(bytesToSize(r.used).replace(' ',' <span class="small">') + '</span>');
+			$('.fm-bandwidth-number-txt.available').html(bytesToSize(r.filesize).replace(' ',' <span class="small">') + '</span>');			
+			var minutes = Math.ceil(r.sec/60);			
+			if (minutes == 1) $('.bwminutes').html(l[5838] + ' *');
+			else $('.bwminutes').html(l[5837].replace('[X]',minutes) + ' *');
+			bandwidthDialog();
+			if ($.lastlimit < new Date().getTime()-60000)  megaAnalytics.log("dl", "limit",{used:r.used,filesize:r.filesize,seconds:r.sec});			
+			$.lastlimit=new Date().getTime();	
+			next(false);
+		}
+	});	
+}
+
+function apiQuota(callback2)
+{
+	// cache 'bq' for up to 60 seconds for each limitation
+	if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime()-60000) callback2($.bq);
+	else
+	{
+		api_req({a:'bq'},{callback:function(res)
+		{
+			$.bq=res;
+			callback2(res);	
+		}});	
+	}	
+}
+
+function checkQuota(filesize,callback)
+{
+	if (u_attr && u_attr.p) 
+	{
+		if (callback) callback({sec:-1});
+		return false;	
+	}	
+	apiQuota(function(quotabytes)
+	{
+		if (localStorage.bq) quotabytes = localStorage.bq;
+		var consumed=0,quota = {};
+		if (localStorage.q) quota = JSON.parse(localStorage.q);		
+		var t = Math.floor(new Date().getTime()/60000);
+		var t2 = t-360;
+		var sec = 0,available=0, newbw=0;
+		while (t2 <= t)
+		{
+			if (quota[t2]) consumed += quota[t2];
+			t2++;
+		}
+		if (quotabytes == 0) sec=0;		
+		else if (quotabytes-filesize < 0) sec=-1;		
+		else if (quotabytes-consumed-filesize < 0)
+		{
+			var shortage = quotabytes-consumed-filesize;
+			var t2 = t-360;
+			while (t2 <= t)
+			{
+				if (quota[t2]) shortage += quota[t2];
+				if (shortage > 0)
+				{
+					newbw = shortage-quotabytes-consumed-filesize;
+					sec = (t2+360-t)*60;
+					break;
+				}
+				t2++;
+			}
+			if (sec == 0 || sec > 21600)
+			{
+				sec = 21600;
+				newbw = quotabytes;
+			}
+		}
+		else sec=0;		
+		if (callback) callback({used:consumed,sec:sec,filesize:filesize,newbw:newbw});
+	
+	});
+}
+
+function bandwidthDialog(close)
+{
+	if (close)
+	{
+		$('.fm-dialog.bandwidth-quota').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');
+		$.dialog=false;
+	}
+	else
+	{	
+		if (!is_fm() && page !== 'download') return false;
+		
+		$('.fm-dialog-button.quota-later-button').unbind('click');
+		$('.fm-dialog-button.quota-later-button').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		$('.fm-dialog-button.quota-upgrade-button').unbind('click');
+		$('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
+		{
+			
+		
+			bandwidthDialog(1);
+			document.location = '#pro';
+		});
+	
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-dialog.bandwidth-quota').removeClass('hidden');
+		$.dialog='bandwidth';
+	}
+}
+
 
 function andreiScripts()
 {
@@ -2232,6 +2374,12 @@ function accountUI()
 		}
 		else
 		{
+			// this is the main entry point for users who just had upgraded their accounts
+
+			if(isNonActivatedAccount()) {
+				showNonActivatedAccountDialog(true);
+			}
+
 			$('.fm-account-overview-button').addClass('active');
 			$('.fm-account-overview').removeClass('hidden');
 		}
@@ -4579,7 +4727,10 @@ function contextmenuUI(e,ll,topmenu)
 		else if (c && c.indexOf('cloud-drive-item') > -1)
 		{
 			var flt = '.refresh-item,.properties-item';
-			if (folderlink) flt += ',.zipdownload-item,.import-item';
+			if (folderlink) {
+				if (u_type) flt += ',.import-item';
+				if (M.v.length) flt += ',.zipdownload-item';
+			}
 			$.selected = [M.RootID];
 			$(t).filter(flt).show();
 		}
@@ -5242,7 +5393,7 @@ function dorename()
 function msgDialog(type,title,msg,submsg,callback,checkbox)
 {
 	$.msgDialog = type;
-	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact multiple');
+	$('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a notification-dialog remove-dialog delete-contact loginrequired-dialog multiple');
 	$('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
 	$('#msgDialog .confirmation-checkbox').addClass('hidden');
 	$.warningCallback = callback;
@@ -5330,6 +5481,38 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 			});
 		}
 	}
+	else if (type == 'loginrequired')
+    {
+        $('#msgDialog').addClass('loginrequired-dialog');
+
+        $('#msgDialog .fm-notifications-bottom')
+            .addClass('hidden')
+            .html('');
+
+
+        $('#msgDialog .fm-dialog-button').bind('click',function()
+        {
+            closeMsg();
+            if ($.warningCallback) $.warningCallback(true);
+        });
+        $('#msgDialog').addClass('notification-dialog');
+        title = l[5841];
+        msg = '<p>' + l[5842] + '</p>\n' +
+            '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
+            '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>';
+
+        var $selectedPlan = $('.reg-st3-membership-bl.selected');
+        var plan = 1;
+        if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro2")) { plan = 2; }
+        else if($selectedPlan.is(".pro3")) { plan = 3; }
+
+        $('.loginrequired-dialog .fm-notification-icon')
+            .removeClass('plan1')
+            .removeClass('plan2')
+            .removeClass('plan3')
+            .addClass('plan' + plan);
+    }
 
 	$('#msgDialog .fm-dialog-title span').text(title);
 	$('#msgDialog .fm-notification-info p').html(msg);
@@ -5348,13 +5531,35 @@ function msgDialog(type,title,msg,submsg,callback,checkbox)
 	$('#msgDialog').removeClass('hidden');
 	$('.fm-dialog-overlay').removeClass('hidden');
 	$('body').addClass('overlayed');
+
+    if(type == 'loginrequired') {
+        $('#msgDialog .top-login-button')
+            .unbind('click.loginrequired')
+            .bind('click.loginrequired', function() {
+                closeMsg();
+                showLoginDialog();
+                return false;
+            });
+
+        $('#msgDialog .create-account-button')
+            .unbind('click.loginrequired')
+            .bind('click.loginrequired', function() {
+                closeMsg();
+                showRegisterDialog();
+                return false;
+            });
+    }
 }
 
 function closeMsg()
 {
 	$('#msgDialog').addClass('hidden');
-	$('.fm-dialog-overlay').addClass('hidden');
-	$('body').removeClass('overlayed');
+
+	if(!$('.pro-register-dialog').is(':visible')) {
+		$('.fm-dialog-overlay').addClass('hidden');
+		$('body').removeClass('overlayed');
+	}
+
 	delete $.msgDialog;
 }
 
@@ -7264,11 +7469,13 @@ function termsDialog(close,pp)
 	if (close)
 	{
 		$('.fm-dialog.terms-dialog').addClass('hidden');
-		$('.fm-dialog-overlay').addClass('hidden');
-		$('body').removeClass('overlayed');
+		if(!$('.pro-register-dialog').is(":visible")) {
+			$('.fm-dialog-overlay').addClass('hidden');
+			$('body').removeClass('overlayed');
+			$.dialog=false;
+		}
 		if ($.termsAgree) $.termsAgree=undefined;
 		if ($.termsDeny) $.termsDeny=undefined;
-		$.dialog=false;
 		return false;
 	}
 

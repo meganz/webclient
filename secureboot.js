@@ -524,10 +524,7 @@ else
 			return 'en';
 		}
 		var init_f = [];
-		var lang = detectlang();
-		
-		console.log(lang);
-		
+		var lang = detectlang();	
 		if ((typeof localStorage != 'undefined') && (localStorage.lang)) if (languages[localStorage.lang]) lang = localStorage.lang;
 		var langv = '';
 		if (typeof lv != 'undefined') langv = '_' + lv[lang];

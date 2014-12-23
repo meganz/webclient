@@ -102,7 +102,7 @@ function dev_init(pp,appkey)
 				$.termsAgree = function()
 				{
 					localStorage.sdkterms=true;
-					document.location = 'https://mega.co.nz/sdk.zip';							
+					document.location = 'https://github.com/meganz/sdk';							
 				};
 				termsDialog(false,'sdkterms');
 				return false;					

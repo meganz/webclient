@@ -197,100 +197,6 @@ if (indexedDB)
                     else if (mDBqueue[t][mDBi[t]].d)
                         var request = mDBt.objectStore.delete(mDBqueue[t][mDBi[t]].d);
 
-<<<<<<< HEAD
-	if (typeof safari !== 'undefined')
-	{
-		var mDBprocess = function _Safari_mDBprocess()
-		{
-			function __mDBIterate(t, act, queue)
-			{
-				function __mDBNext() {
-					var e = queue.shift();
-					if (e) {
-						try {
-							var r = objectStore[act](e);
-						} catch(ex) {
-							// if (d) console.error('objectStore', ex);
-							delete mDBt.t;
-							queue.unshift(e);
-							return __mDBIterate(t, act, queue);
-						}
-						if (r) {
-							r.onsuccess = function()
-							{
-								if (parseInt(localStorage[u_handle + '_mDBcount']) > 0) {
-									localStorage[u_handle + '_mDBcount']--;
-								}
-								// if (d) console.log('__mDBNext.success');
-								if ((queue.length % 80) == 0) Soon(__mDBNext);
-								else __mDBNext();
-							};
-							r.onerror = function(err)
-							{
-								if (d) console.log('__mDBNext.error',err);
-								Later(__mDBNext);
-							};
-							return;
-						}
-					}
-
-					Soon(mDBprocess);
-				}
-				// if (d) console.log('__mDBIterate', arguments);
-
-				if (mDBt.t !== t)
-				{
-					mDBt.t = t;
-					mDBt.transation = mDB.transaction([t], "readwrite");
-				}
-				var objectStore = mDBt.transation.objectStore(t);
-				__mDBNext();
-			}
-
-			for (var t in mDBqueue)
-			{
-				var q = mDBqueue[t];
-
-				for (var a in q)
-				{
-					__mDBIterate(t, a, q[a]);
-					delete mDBqueue[t][a];
-					return;
-				}
-			}
-
-			if (d) console.timeEnd('mDBprocess');
-			mDBt = {};
-			mDBqueue = {};
-		};
-		var mDBaddQueue = function _Safari_mDBaddQueue(t,obj)
-		{
-			if (!localStorage[u_handle + '_mDBcount']) {
-				localStorage[u_handle + '_mDBcount']=0;
-			}
-			localStorage[u_handle + '_mDBcount']++;
-
-			var act = obj.d ? 'delete':'put';
-			if (!mDBqueue[t]) mDBqueue[t]={};
-			if (!mDBqueue[t][act]) mDBqueue[t][act]=[];
-			mDBqueue[t][act].push(obj.d||obj.a);
-
-			if (mDBt.stc) clearTimeout(mDBt.stc);
-			mDBt.stc = setTimeout(function() {
-				if (!mDBt.t) {
-					if (d) console.time('mDBprocess');
-					mDBprocess();
-				}
-				delete mDBt.stc;
-			}, 3100);
-		};
-	}
-
-	function mDBdel(t,id)
-	{
-		mDBaddQueue(t,{d:id});
-	}
-=======
                     request.onsuccess = function (event)
                     {
                         if (parseInt(localStorage[u_handle + '_mDBcount']) > 0)
@@ -303,7 +209,6 @@ if (indexedDB)
                             console.log('error', event);
                         mDBprocess();
                     };
->>>>>>> contact_mgmt_revamp
 
                     delete mDBqueue[t][mDBi[t]];
                     mDBi[t]++;
@@ -322,80 +227,6 @@ if (indexedDB)
         mDBqueue = {};
     }
 
-<<<<<<< HEAD
-	function mDBquery(t)
-	{
-		if (d) console.log('mDBquery()');
-		var fr, apn = [];
-		var objectStore = mDB.transaction(t,'readonly').objectStore(t);
-		objectStore.openCursor().onsuccess = function(event)
-		{
-			var rec = event.target.result;
-			if (rec)
-			{
-				var n;
-
-				try {
-					n = rec.value;
-				} catch(e) {
-					if (d) console.error('mDBquery', t, e);
-				}
-
-				if (typeof n === 'undefined') fr = true;
-				else if (t == 'f') {
-					if (n.sk) {
-						u_sharekeys[n.h] = crypto_process_sharekey(n.h,n.sk);
-					}
-					apn.push(n);
-				}
-				else if (t == 'ok') process_ok([n]);
-				else if (t == 'u') M.addUser(n,1);
-				else if (t == 's') M.nodeShare(n.h,n,1);
-				rec.continue();
-			}
-			else if ( fr )
-			{
-				if (d) console.log('mDBquery: forcing reload');
-				mDBreload();
-			}
-			else
-			{
-				if (d) console.log('mDBloaded',t);
-				mDBloaded[t]=1;
-				function __mDB_Next() {
-					for (var dbt in mDBloaded)
-					{
-						if (mDBloaded[dbt] == 0)
-						{
-							mDBquery(dbt);
-							return false;
-						}
-					}
-					maxaction = localStorage[u_handle + '_maxaction'];
-					for (var i in M.d)
-					{
-						var entries=true;
-						break;
-					}
-					if (!maxaction || typeof entries == 'undefined') mDBreload();
-					else getsc(1);
-				}
-				if (apn.length) {
-					$.mDBIgnoreDB = true;
-					process_f(apn, function(hasMissingKeys) {
-						delete $.mDBIgnoreDB;
-						if (hasMissingKeys) {
-							mDBreload();
-						} else {
-							__mDB_Next();
-						}
-					});
-				}
-				else __mDB_Next();
-			}
-		};
-	}
-=======
     function mDBaddQueue(t, obj)
     {
         if (!localStorage[u_handle + '_mDBcount'])
@@ -428,7 +259,6 @@ if (indexedDB)
             mDBfetch();
         };
     }
->>>>>>> contact_mgmt_revamp
 
     function mDBquery(t)
     {
@@ -452,30 +282,6 @@ if (indexedDB)
                         console.error('mDBquery', t, e);
                 }
 
-<<<<<<< HEAD
-	function mDBrestart()
-	{
-		if (mDB)
-		{
-			delete localStorage[u_handle + '_mDBcount'];
-			delete localStorage[u_handle + '_maxaction'];
-			delete localStorage[u_handle + '_mDBactive'];
-			mDBact = Math.random();
-			mDBcls();
-			Qt=undefined;
-			request=undefined;
-			mDB=1;
-			mDBstart();
-		}
-	}
-
-	function mDBcls()
-	{
-		mDBloaded = {'ok':0,'u':0, /*'f_sk':0,*/ 'f':0,'s':0};
-	}
-	mDBcls();
-}
-=======
                 if (typeof value === 'undefined')
                     fr = true;
                 else if (t == 'ok')
@@ -592,4 +398,3 @@ if (indexedDB)
 
     var mDBloaded = {'ok': 0, 'u': 0, 'f_sk': 0, 'f': 0, 's': 0, 'opc': 0, 'ipc': 0, 'ps': 0};
 }
->>>>>>> contact_mgmt_revamp

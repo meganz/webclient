@@ -7,7 +7,7 @@ var pfid = false;
 var n_h = false;
 var n_k_aes = false;
 var fmdirid=false;
-var u_type,cur_page,u_checked
+var u_type,cur_page,u_checked;
 var confirmcode = false;
 var confirmok = false;
 var hash = window.location.hash;
@@ -59,7 +59,6 @@ function mainScroll()
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
 	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
-
 }
 
 function scrollMenu()
@@ -618,13 +617,13 @@ function init_page()
 		parsepage(pages['download'],'download');
 		dlinfo(dlid,dlkey,false);
 	}
-	else if (is_fm())
-	{
+	else if (is_fm()) {
 		var id = false;
-		if (page.substr(0,2) == 'fm')
-		{
+		if (page.substr(0,2) === 'fm') {
 			id = page.replace('fm/','');
-			if (id.length < 5 && id !== 'chat') id =false;
+			if (id.length < 5 && (id !== 'chat' && id !== 'opc' && id !== 'ipc')) {
+                id =false;
+            }
 		}
 
 		if (!id && fminitialized) id = M.RootID;
@@ -636,24 +635,30 @@ function init_page()
 			folderlink=0;
 			fminitialized=false;
 			mDBcls();
-			notifications=undefined;
+			notifyPopup.notifications = null;
 		}
-		if (!fminitialized)
-		{
-			if (id) M.currentdirid = id;
-			if (!m && $('#fmholder').html() == '') $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
-			if (typeof mDB !== 'undefined' && !pfid) mDBstart();
-			else loadfm();
+		if (!fminitialized) {
+			if (id) {
+                M.currentdirid = id;
+            }
+			if (!m && $('#fmholder').html() == '') {
+                $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
+            }
+			if (typeof mDB !== 'undefined' && !pfid) {
+                mDBstart();
+            } else {
+                loadfm();
+            }
 			andreiScripts();
-			if (pfid)
-			{
+			if (pfid) {
 				$('.fm-left-menu .folderlink').removeClass('hidden');
 				$('.fm-tree-header.cloud-drive-item span').text(l[808]);
 				$('.fm-tree-header').not('.cloud-drive-item').hide();
 				$('.fm-menu-item').hide();
 			}
-		}
-		else if (!pfid && id && id !== M.currentdirid) M.openFolder(id);
+		} else if (!pfid && id && id !== M.currentdirid) {
+            M.openFolder(id);
+        }
 		$('#topmenu').html(parsetopmenu());
 		if (!u_type) $('body').attr('class','not-logged');
 		else $('body').attr('class','');
@@ -682,19 +687,15 @@ function init_page()
             $(document.body).addClass("megaChatDisabled");
         }
 	}
-	else if (page.substr(0,2) == 'fm' && !u_type)
-	{
-		if (loggedout)
-		{
+	else if (page.substr(0,2) == 'fm' && !u_type) {
+		if (loggedout) {
 			document.location.hash = 'start';
 			return false;
 		}
 		login_next = page;
 		login_txt = l[1298];
 		document.location.hash = 'login';
-	}
-	else
-	{
+	} else {
 		page = 'start';
 		parsepage(pages['start'],'start');
 		init_start();
@@ -931,7 +932,7 @@ function topmenuUI() {
     }
 
     // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (u_attr.firstname === '') && (u_attr.name !== '')) {
+    else if ((u_type == 3) && (!u_attr.firstname) && (typeof u_attr.name != 'undefined') && (u_attr.name.indexOf(' ') != -1)) {
 
         // Try get the first name from the full 'name' property and display
         var nameParts = u_attr.name.split(' ');
@@ -963,6 +964,7 @@ function topmenuUI() {
 
         $('.membership-status').show();
 
+        // If the chat is disabled don't show the green status icon in the header
         if (!MegaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
@@ -989,17 +991,17 @@ function topmenuUI() {
             $('.top-warning-popup').unbind('click');
             $('.top-warning-popup').bind('click', function(e) {
 
-		if(isNonActivatedAccount()) {
-			return;
-		}
+				if(isNonActivatedAccount()) {
+					return;
+				}
 
                 $('.top-warning-popup').removeClass('active');
                 document.location.hash = 'register';
             });
 	    
-	    if(isNonActivatedAccount()) {
+	    	if(isNonActivatedAccount()) {
                 showNonActivatedAccountDialog();
-	    }
+	    	}
 
             if (page !== 'register') {
                 $('.top-warning-popup').addClass('active');
@@ -1387,14 +1389,19 @@ function topmenuUI() {
 		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));
 	}
 
-	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
-	initNotifications();
+	if (u_type) {
+        $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
+    }
+    
+	notifyPopup.initNotifications();
 }
 
-function is_fm()
-{
-	if ((u_type !== false && page == '') || (u_type !== false && page.substr(0,2) == 'fm') || (u_type !== false && page == 'start') || (u_type !== false && page.substr(0,7) == 'account') || pfid) return true;
-	else return false;
+function is_fm() {
+	if ((u_type !== false && page === '') || (u_type !== false && page.substr(0,2) === 'fm') || (u_type !== false && page === 'start') || (u_type !== false && page.substr(0,7) === 'account') || pfid) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function parsepage(pagehtml,pp)

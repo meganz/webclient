@@ -585,7 +585,7 @@ else
         jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
         jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/megaKvStorage.js', n: 'megakvstorage_js', j:1,w:5});
-        
+
         jsl.push({f:'js/chat/mpenc.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/chat/opQueue.js', n: 'mega_js', j:1,w:7});
 

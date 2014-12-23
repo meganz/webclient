@@ -1395,8 +1395,16 @@ a.blog-button:hover {
 .nt-contact-request .notification-avatar-icon {
 	background-position: -10px -287px;
 }
+.nt-contact-deleted .notification-avatar-icon {
+	background-position: -10px -89px;
+}
 .nt-contact-accepted .notification-avatar-icon {
 	background-position: -10px -351px;
+}
+.nt-contact-request-denied .notification-avatar-icon,
+.nt-contact-request-blocked .notification-avatar-icon,
+.nt-contact-request-ignored .notification-avatar-icon {
+	background-position: -10px -153px;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -4449,6 +4457,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .notification-popup-icon:hover, .notification-popup-icon.active {
 	background-position: -9px -325px;
 }
+.notification-button {
+    position: relative;
+}
 .cloud-popup-icon, .warning-popup-icon, .top-chat-notification {
 	float: right;
 	height: 24px;
@@ -4474,15 +4485,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .new-notification-info {
 	height: 24px;
 	line-height: 22px;
-	background-color: rgba(0,0,0,0.8);
-	padding: 0 8px;
-	border-radius: 8px;
+    background-color: #333;
+	padding: 0 8px;	
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
+    border-radius: 8px;
 	white-space: nowrap;
 	font-size: 11px;
 	color: #CCCCCC;
-	margin: 55px 0 0 -40px;
+	margin: 21px 0 0 -59px;
 	position: absolute;
 	left: 50%;
 	z-index: 100;
@@ -9494,9 +9505,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-bottom-right-radius: 7px;
 	position: relative;
 	padding-right: 4px;
-}
-.share-dialog .fm-notifications-bottom, .share-dialog .fm-notifications-bottom {
-	position: static;
 }
 .free-popup .fm-notifications-bottom, .pro-popup .fm-notifications-bottom {
 	-webkit-border-bottom-right-radius: 0;
@@ -22043,220 +22051,79 @@ background-color:#1DA2E9
  */
 
 .fm-mega-dialog {
-	position: absolute;
-	border: 2px solid rgba(0, 0, 0, 0.1);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	width: 360px;
-	background-color: white;
-	margin: 46px 0 0 0;
-	z-index: 900;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	display: block;
+    position: absolute;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    width: 360px;
+    background-color: white;
+    margin: 46px 0 0 0;
+    z-index: 900;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    display: block;
 }
 .fm-mega-dialog.expanded {
-	z-index: 1200;
+    z-index: 1200;
 }
 .fm-mega-dialog .fm-mega-dialog-pad {
-	margin: 12px 12px 12px 12px
+    margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-position: center -5509px;
-	background-repeat: no-repeat;
-	width: 20px;
-	height: 20px;
-	position: absolute;
-	top: 6px;
-	right: 10px;
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-	cursor: pointer;
+    background-image: url(../images/mega/nw-fm-sprite.svg);
+    background-position: center -5509px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+    cursor: pointer;
 }
 .fm-mega-dialog-size-icon:hover {
-	-moz-opacity: 0.6;
-	-khtml-opacity: 0.6;
-	opacity: 0.6;
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
 }
 .fm-mega-dialog-size-icon.short-size {
-	background-position: center -5559px;
-	top: 16px;
-	right: 40px;
+    background-position: center -5559px;
+    top: 16px;
+    right: 40px;
 }
 .fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
-	display: block;
+    display: block;
 }
 .fm-mega-dialog-bottom {
-	height: 56px;
-	background-color: #F6F6F6;
-	margin: 12px -12px -12px -12px;
-	display: block;
-	-webkit-border-bottom-left-radius: 7px;
-	-moz-border-radius-bottomleft: 7px;
-	border-bottom-left-radius: 7px;
-	-webkit-border-bottom-right-radius: 7px;
-	-moz-border-radius-bottomright: 7px;
-	border-bottom-right-radius: 7px;
-	padding-right: 4px;
+    height: 56px;
+    background-color: #F6F6F6;
+    margin: 12px -12px -12px -12px;
+    display: block;
+    -webkit-border-bottom-left-radius: 7px;
+    -moz-border-radius-bottomleft: 7px;
+    border-bottom-left-radius: 7px;
+    -webkit-border-bottom-right-radius: 7px;
+    -moz-border-radius-bottomright: 7px;
+    border-bottom-right-radius: 7px;
+    padding-right: 4px;
 }
 /**
  * Start chat elements
  */
 
 .fm-create-chat-button.active .add-user-popup-arrow {
-	margin-top: -4px;
-	z-index: 1210;
-}
-
-
- /**
-  * PRO upgrade, new flow styling for the login/register popups and buttons
-  */
-
-
-.fm-dialog.loginrequired-dialog {
-    min-height: 176px;
-    width: 445px;
-}
-.loginrequired-dialog .fm-notification-body {
-    padding: 0 20px;
-}
-.fm-notification-info .top-login-button {
-    color: white;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    float: none;
-    display: inline-block;
-    clear: left;
-    background-color: rgb(127, 127, 127);
-    margin-right: 5px;
-}
-
-
-.fm-notification-info .create-account-button {
-    color: white;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    float: none;
-    display: inline-block;
-    background-color: rgb(217, 046, 000);
-}
-
-.loginrequired-dialog .fm-notification-info > p {
-    margin-top: 26px;
-}
-.loginrequired-dialog .fm-notification-info > p > p {
-    margin-bottom: 6px;
-    padding-top: 2px;
-}
-.loginrequired-dialog .fm-notification-icon {
-    width: 90px;
-    height: 90px;
-    background-image: url(../images/mega/register-big-sprite@2x.png);
-    background-size: 100px auto;
-    background-position: center -199px;
-    background-repeat: no-repeat;
-    margin: 0 26px 0 0;
-}
-.loginrequired-dialog .fm-notification-icon.plan1 {
-    background-position: center -329px;
-}
-
-.loginrequired-dialog .fm-notification-icon.plan2 {
-    background-position: center -459px;
-}
-.loginrequired-dialog .fm-notification-icon.plan3 {
-    background-position: center -589px;
-}
-
-/* login dialog */
-.pro-login-dialog {
-    z-index: 1200;
-    top: 50%;
-    left: 50%;
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    border-radius: 7px;
-    border-right: 2px solid rgba(0, 0, 0, .3);
-    border-top: 2px solid rgba(0, 0, 0, .3);
-}
-.pro-login-dialog.hidden {
-    display: none;
-}
-.pro-login-dialog .fm-dialog-header {
-    margin-bottom: 10px;
-}
-a.top-login-forgot-pass {
-    font-size: 11px;
-    color: #999999;
-    line-height: 21px;
-    background-image: url(../images/mega/top-login-sprite_v4.png);
-    background-position: 0 -1582px;
-    background-repeat: no-repeat;
-    float: right;
-    padding: 0 0 0 23px;
-    cursor: pointer;
-}
-/* register */
-.pro-register-dialog {
-    z-index: 1180;
-    top: 50%;
-    left: 50%;
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    border-radius: 7px;
-    border-right: 2px solid rgba(0, 0, 0, .3);
-    border-top: 2px solid rgba(0, 0, 0, .3);
-
-    min-width: 460px;
-}
-.pro-register-dialog.hidden {
-    display: none;
-}
-.pro-register-dialog .fm-dialog-header {
-    margin-bottom: 10px;
-}
-.pro-register-dialog .register-st2-button {
-    float: right;
-    cursor: pointer;
-}
-.pro-register-paypal-dialog .reg-success-icon {
-    background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
-    background-size: 200px 200px;
-    width: 200px;
-    height: 200px;
-}
-/* logged in PRO account, but not activated */
-.top-warning-popup.not-activated {
-    cursor: default;
-}
-.top-warning-popup.not-activated .mailbox-icon {
-    background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
-    background-size: 100px 100px;
-    width: 100px;
-    height: 100px;
-    float: left;
-    margin-right: 10px;
-}
-.top-warning-popup.not-activated p {
-    margin-top: 10px;
-    padding-top: 9px;
-}
-
-.top-warning-popup.not-activated .warning-popup-body {
-    padding-bottom: 8px;
+    margin-top: -4px;
+    z-index: 1210;
 }

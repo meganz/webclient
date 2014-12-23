@@ -956,7 +956,7 @@ function api_proc(q)
 			if (window.d) console.log("API request error - retrying");
 			api_reqerror(q,-3);
 		}
-	}
+	};
 
 	q.xhr.onload = function()
 	{
@@ -1015,7 +1015,7 @@ function api_proc(q)
 			}
 			else api_reqerror(this.q,t);
 		}
-	}
+	};
 
 	if (q.rawreq === false)
 	{
@@ -1155,7 +1155,7 @@ function getsc(fm)
 					{
 						mDBloaded=true;
 						renderfm();
-						pollnotifications();
+						notifyPopup.pollNotifications();
 					}
 				}
 				if (res.w)
@@ -1168,6 +1168,14 @@ function getsc(fm)
 				{
 					if (res.sn) maxaction = res.sn;
 					execsc(res.a, done);
+					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
+				}
+
+				if (ctx.fm)
+				{
+					mDBloaded=true;
+					renderfm();
+					notifyPopup.pollNotifications();
 				}
 			}
 		}
@@ -1570,6 +1578,87 @@ function api_setshare1(ctx)
 	var newkey = true;
 
 	req = { a : 's',
+			n : ctx.node,
+			s : ctx.targets,
+			i : requesti };
+
+	for (i = req.s.length; i--; )
+	{
+		if (typeof req.s[i].r != 'undefined')
+		{
+			if (!req.ok)
+			{
+				if (u_sharekeys[ctx.node])
+                {
+                    sharekey = u_sharekeys[ctx.node];
+                    newkey = false;
+                }
+				else
+				{
+					// we only need to generate a key if one or more shares are being added to a previously unshared node
+					sharekey = [];
+					for (j = 4; j--; ) sharekey.push(rand(0x100000000));
+					u_sharekeys[ctx.node] = sharekey;
+				}
+
+				req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
+				req.ha = crypto_handleauth(ctx.node);
+				ssharekey = a32_to_str(sharekey);
+			}
+		}
+	}
+
+	if (newkey) req.cr = crypto_makecr(ctx.sharenodes,[ctx.node],true);
+
+	ctx.maxretry = 4;
+	ctx.ssharekey = ssharekey;
+
+	// encrypt ssharekey to known users
+	for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
+
+	ctx.req = req;
+
+	ctx.callback = function(res,ctx)
+	{
+		var i, n;
+
+		if (!ctx.maxretry) return;
+
+		ctx.maxretry--;
+
+		if (typeof res == 'object')
+		{
+			if (res.ok)
+			{
+				// sharekey clash: set & try again
+				ctx.req.ok = res.ok;
+				u_sharekeys[ctx.node] = decrypt_key(u_k_aes,base64_to_a32(res.ok));
+				ctx.req.ha = crypto_handleauth(ctx.node);
+
+				var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
+
+				for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[ctx.req.s[i].u]));
+
+				return api_req(ctx.req,ctx);
+			}
+			else return ctx.ctx.done(res,ctx.ctx);
+		}
+
+		api_req(ctx.req,ctx);
+	}
+
+	api_req(ctx.req,ctx);
+}
+
+function api_setshare2(ctx)
+{
+	var i, j, n, nk, sharekey, ssharekey;
+	var req, res;
+	var newkey = true;
+
+	req = { a : 's2',
+			e : M.u[u_handle].m,
+			msg: '',
 			n : ctx.node,
 			s : ctx.targets,
 			i : requesti };

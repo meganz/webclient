@@ -16,7 +16,7 @@ var chatui;
     chatui = function(id) {
 	
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
-        hideEmptyMsg();
+        hideEmptyGrids();
 		
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
@@ -612,7 +612,7 @@ var Chat = function() {
                 decryptMessage: function (msg) {
                     var decryptedVal = crypto_rsadecrypt(base64urldecode(msg), u_privk);
                     if (decryptedVal && decryptedVal.length > 0) {
-                        return decryptedVal.substring(0, 44)
+                        return decryptedVal.substring(0, 44);
                     } else {
                         return decryptedVal; // some null/falsy value
                     }
@@ -2475,7 +2475,7 @@ Chat.prototype.getBoshServiceUrl = function() {
 Chat.prototype.renderListing = function() {
     var self = this;
 
-    hideEmptyMsg();
+    hideEmptyGrids();
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');

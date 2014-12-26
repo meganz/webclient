@@ -534,7 +534,6 @@ else
 		}
 		function detectlang()
 		{
-			return 'en';
 			if (!navigator.language) return 'en';
 			var bl = navigator.language.toLowerCase();
 			var l2 = languages;
@@ -644,10 +643,10 @@ else
         
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+        jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
         if (is_extension)
         {
-                jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
+                jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
         }
         /* better download */
         jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
@@ -691,7 +690,7 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+        jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
         jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
@@ -869,7 +868,7 @@ else
         {
             l=[];
             var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
-	    while (i--) l[i]='l';
+            while (i--) l[i]='l';
             for (var i in jsl)
             {
                 if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + r + '"></sc' + 'ript>');

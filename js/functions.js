@@ -440,6 +440,7 @@ function acc_time2date(unixtime)
 	if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
 	else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
 	else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
+	else if (('' + MyDate.getDate()).slice(-1) == '3') th = 'rd';
 	if (lang !== 'en') th = ',';
 	return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
 }

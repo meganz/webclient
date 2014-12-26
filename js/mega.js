@@ -3767,8 +3767,6 @@ function process_f(f, cb)
 			if (d) console.log('non-cached nodes', ncn.length, ncn);
 		}
 
-		// if (typeof safari !== 'undefined') dk=1;
-
 		if (ncn.length < 200 || window.dk)
 		{
 			if (d) {
@@ -3795,12 +3793,6 @@ function process_f(f, cb)
 				if (d) console.error(err);
 				__process_f2(f, cb);
 			});
-			// mSpawnSWorker('keydec.js', f, function(r)
-			// {
-				// if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
-				// $.extend(u_kdnodecache, r);
-				// __process_f2(f, cb);
-			// });
 		}
 	}
 	else if (cb) Soon(cb);

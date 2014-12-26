@@ -59,44 +59,6 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 
 				if (d) console.timeEnd('smartcrop');
 			}
-			if (	0	&&fa.indexOf(':0*') < 0)
-			{
-				var canvas = document.createElement('canvas');
-				var sx=0;
-				var sy=0;
-				var x = this.width;
-				var y = this.height;
-
-				if (d) console.log(x + ' by ' + y);
-				if (this.width > this.height)
-				{
-					if (d) console.log('landscape');
-					sx = Math.floor((this.width - this.height)/2);
-					x = y;
-				}
-				else if(this.height > this.width)
-				{
-					if (d) console.log('portrait');
-					sy = Math.floor((this.height - this.width)*0.66/2);
-					y = x;
-				}
-				else
-				{
-					if (d) console.log('square');
-				}
-
-				var ctx = canvas.getContext("2d");
-				canvas.width  = 120;
-				canvas.height = 120;
-				ctx.drawImage(this, sx, sy, x, y, 0, 0, 120, 120);
-
-				if (d) console.log('resizing time:', new Date().getTime()-t);
-				var dataURI = canvas.toDataURL('image/jpeg',0.85);
-
-				var ab = dataURLToAB(dataURI);
-
-				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
-			}
 
 			// preview image:
 			if (fa.indexOf(':1*') < 0 || onPreviewRetry)

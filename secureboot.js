@@ -565,7 +565,6 @@ else
 		{
 			jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
 		}
-		// jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
 		/* better download */
 		jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
 		jsl.push({f:'js/events.js', n: 'events', j:1,w:4});

@@ -33,7 +33,8 @@ function mozFilePicker(f,m,o) {
 	var title = o.title || (m === 2 ? 'Select Folder':'Save File As');
 	var nsIFilePicker = Ci.nsIFilePicker,
 		fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-	fp.init(window,'MEGA :: ' + title + '...',m||nsIFilePicker.modeSave);
+	title = 'MEGA '+(mozMEGAExtensionVersion||'')+' :: ' + title + '...';
+	fp.init(window,title,m||nsIFilePicker.modeSave);
 	fp.appendFilters(nsIFilePicker.filterAll); // TODO: ext2filter?
 	if(m !== 2) {
 		fp.defaultString = f;
@@ -394,7 +395,7 @@ function mozClearStartupCache() {
 			}
 
 			var q = Services.prompt.confirmEx(scope,
-				'MEGA :: Out of disk space',
+				'MEGA '+(mozMEGAExtensionVersion||'')+' :: Out of disk space',
 				'Your drive is running out of disk space. '+
 				'Would you like to choose another downloads folder?',1027,'','','',null,{value:!1});
 
@@ -719,7 +720,7 @@ function mozClearStartupCache() {
 				var q = opts.fxo;
 				if (d) LOG(q);
 				File.filesize = q.size;
-				File.filename = mozSaneFileName(q.zipname || q.n);
+				File.filename = mozSaneFileName(q.zipname || q.n);//.replace(/\.lnk$/i,'-lnk.bin');
 
 				try {
 					if(q.p && !q.zipid)
@@ -727,6 +728,7 @@ function mozClearStartupCache() {
 					File.filetime = q.t || 0;
 				} catch(e) {}
 
+				var fce = 0;
 				function osd_cb(options) {
 
 					File.options = options;
@@ -743,6 +745,15 @@ function mozClearStartupCache() {
 						fs.init(f, 0x02 | 0x08 | 0x20, parseInt("0755",8), 0);
 					} catch(ex) {
 						mozError(ex);
+						if (++fce == 1 && ex.result === 0x80070057) {
+							/**
+							 * 0x80070057 (NS_ERROR_ILLEGAL_VALUE) [nsIFileOutputStream.init]
+							 * On Windows, this might fail while creating certain filetypes,
+							 * such as *.lnk
+							 */
+							File.filename = String(File.filename).replace(/\.(\w+)$/,'-$1.bin');
+							return mozOnSavingDownload(File,osd_cb);
+						}
 						var ps = Services.prompt,
 							btn = ['Yes','Yes, saving as default'],
 							flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_IS_STRING +
@@ -751,8 +762,8 @@ function mozClearStartupCache() {
 							msg = 'Unexpected Download Error:\n'
 								+ '\nFile: ' + f.path
 								+ '\nError: ' + ex.message
-								+ '\n\nWould you like to choose a different folder?',
-							r = ps.confirmEx(null,'MEGA',msg,flags,
+								+ '\n\nWould you like to choose a different downloads folder?',
+							r = ps.confirmEx(null,'MEGA '+(mozMEGAExtensionVersion||''),msg,flags,
 									btn[0],"",btn[1],null,{value:!1});
 
 						switch( r ) {
@@ -830,14 +841,18 @@ function mozClearStartupCache() {
 						}, false);
 
 					} else {
-						try {
-							scope.downloading = !1;
-							document.getElementById('download_statustxt').textContent = 'Download ' + (f ? 'Error!':'Cancelled.');
-							document.querySelector('.progress-block').style.display = 'none';
-							document.getElementById('download_speed').textContent = '\u221E';
-							document.getElementById('download_filename').style.marginBottom = '20px';
-						} catch(e) {
-							mozError(e);
+						if (typeof page !== 'undefined' && page === 'download') {
+							try {
+								scope.downloading = !1;
+
+								$('.downloading-txt.temporary-error').text('Download ' + (f ? 'Error!':'Cancelled.'));
+								$('.downloading-txt.temporary-error').removeClass('hidden');
+								$('.downloadings-icons').addClass('hidden');
+								$('.downloading-progress').hide();
+								$('.download-mid-centered-block .new-download-icon').css('background-position','68px -149px').html('');
+							} catch(e) {
+								mozError(e);
+							}
 						}
 					}
 				}

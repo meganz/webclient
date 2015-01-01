@@ -130,6 +130,12 @@ if (!b_u && is_extension)
 		bootstaticpath = chrome.extension.getURL("mega/");
 		urlrootfile = 'mega/secure.html';
 	}
+
+	Object.defineProperty(window, 'eval', {
+		value : function eval(code) {
+			throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
+		}
+	});
 }
 
 if (b_u) document.location = 'update.html';
@@ -718,7 +724,7 @@ else
 		var lightweight=false;
 		var njsl = [];
 		var fx_startup_cache = is_chrome_firefox && nocontentcheck;
-		if ((typeof Worker != 'undefined') && (typeof window.URL != 'undefined') && !fx_startup_cache)
+		if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
 		{
 			var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;',sjcl_sha_js,'self.onmessage = function(e) { try { e.data.hash = sha256(e.data.text);  self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
 			try  { var blob = new Blob(hashdata, { type: "text/javascript" }); }
@@ -826,7 +832,7 @@ else
 
 					if (jsl[jsi].j == 1)
 					{
-						try
+						if (file.indexOf('/mads') == -1) try
 						{
 							loadSubScript(file);
 						}
@@ -891,7 +897,7 @@ else
 			  {
 				jsl[this.jsi].text = this.response || this.responseText;
 
-				if (typeof hash_workers != 'undefined' && !nocontentcheck)
+				if (typeof hash_workers !== 'undefined' && !nocontentcheck)
 				{
 					hash_workers[this.xhri].postMessage({'text':jsl[this.jsi].text,'xhr':'test','jsi':this.jsi,'xhri':this.xhri});
 				}
@@ -924,6 +930,10 @@ else
 			  }
 			  xhr_stack[xhri].onerror = xhr_error;
 			  xhr_stack[xhri].ontimeout = xhr_error;
+			  if (is_extension && url.indexOf('/mads') > -1)
+			  {
+				jsl[jsi].text = ';';
+			  }
 			  if (jsl[jsi].text)
 			  {
 				if (++jslcomplete == jsl.length) initall();

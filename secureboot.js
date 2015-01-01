@@ -110,11 +110,12 @@ var urlrootfile = '';
 
 if (!b_u && is_extension)
 {
+	nocontentcheck=true;
+
 	if (is_chrome_firefox)
 	{
 		bootstaticpath = 'chrome://mega/content/';
 		urlrootfile = 'secure.html';
-		nocontentcheck=true;
 		staticpath = 'https://eu.static.mega.co.nz/';
 		try {
 			loadSubScript(bootstaticpath + 'fileapi.js');

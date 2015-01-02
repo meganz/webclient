@@ -470,8 +470,10 @@ function MegaData ()
 
 		hideEmptyMsg();
 
-		jsp = $('.file-block-scrolling').data('jsp');
-		if (jsp) jsp.destroy();
+		if (!u) {
+			jsp = $('.file-block-scrolling').data('jsp');
+			if (jsp) jsp.destroy();
+		}
 
 		jsp = $('.contacts-blocks-scrolling').data('jsp');
 		if (jsp) jsp.destroy();
@@ -856,12 +858,12 @@ function MegaData ()
 			fa_reqcnt = 0;
 		}
 
-		this.rmSetupUI();
+		this.rmSetupUI(u);
 
 		if (!u && n_cache) $.rmInitJSP = lSel;
 	};
 
-	this.rmSetupUI = function()
+	this.rmSetupUI = function(u)
 	{
 		if (this.viewmode == 1)
 		{
@@ -871,11 +873,13 @@ function MegaData ()
 				o.find('div.clear').remove();
 				o.append('<div class="clear"></div>');
 			}
-			iconUI();
+			iconUI(u);
 			fm_thumbnails();
 		}
 		else Soon(gridUI);
 		Soon(fmtopUI);
+
+		if (u) return;
 
 		function prepareShareMenuHandler(e) {
 			e.preventDefault(); e.stopPropagation();
@@ -3178,7 +3182,7 @@ function execsc(ap, callback)
 
             if(a.a == 'c') {
                 process_u(a.u);
-                
+
                 if(megaChat && megaChat.is_initialized) {
                     $.each(a.u, function(k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](
@@ -3203,7 +3207,7 @@ function execsc(ap, callback)
                 }
             }
 		}
-        else if(a.a == 'e') 
+        else if(a.a == 'e')
 		{
 			var str = hex2bin(a.c)
 			if (str.substr(0, 5) == ".cms.")

@@ -4312,9 +4312,10 @@ function selectddUI()
 	$(window).trigger('resize');
 }
 
-function iconUI()
+function iconUI(aQuiet)
 {
 	if (d) console.time('iconUI');
+	$(window).unbind('resize.icon');
 	$('.fm-files-view-icon.block-view').addClass('active');
 	$('.fm-files-view-icon.listing-view').removeClass('active');
 	$('.shared-grid-view').addClass('hidden');
@@ -4348,15 +4349,8 @@ function iconUI()
 	else
 	{
 		$('.fm-blocks-view.fm').removeClass('hidden');
-		initFileblocksScrolling();
+		if (!aQuiet) initFileblocksScrolling();
 	}
-	$(window).unbind('resize.icon');
-	$(window).bind('resize.icon', function ()
-	{
-		if (M.viewmode == 1 && M.currentdirid == 'contacts') initContactsBlocksScrolling();
-		else if (M.viewmode == 1 && M.currentdirid == 'shares') initShareBlocksScrolling();
-        else if (M.viewmode == 1) initFileblocksScrolling();
-    });
 
 	$('.fm-blocks-view,.shared-blocks-view').unbind('contextmenu');
 	$('.fm-blocks-view,.shared-blocks-view').bind('contextmenu',function(e)
@@ -4389,7 +4383,18 @@ function iconUI()
 		$.selectddUIitem = 'a';
 
 	}
-	setTimeout(selectddUI,10);
+	Soon(function iconLazyUI()
+	{
+		selectddUI();
+		$(window).bind('resize.icon', function iconUIonResize()
+		{
+			if (M.viewmode == 1) {
+				if (M.currentdirid == 'contacts') initContactsBlocksScrolling();
+				else if (M.currentdirid == 'shares') initShareBlocksScrolling();
+				else initFileblocksScrolling();
+			}
+		});
+	});
 	if (d) console.timeEnd('iconUI');
 }
 

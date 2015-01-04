@@ -14213,6 +14213,7 @@ h5.main-italic-header {
 	line-height: 18px;
 	color: #333333;
 	padding-top: 10px;
+	white-space: nowrap;
 }
 .new-download-file-size {
 	font-size: 11px;

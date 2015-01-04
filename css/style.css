@@ -10604,6 +10604,7 @@ to {
 	line-height: 18px;
 	color: #333333;
 	padding-top: 5px;
+	white-space: nowrap;
 }
 .new-download-file-size {
 	font-size: 11px;

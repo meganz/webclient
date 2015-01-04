@@ -2896,6 +2896,7 @@ function crypto_share_rsa2aes()
 
 	var CRC_SIZE   = 16;
 	var BLOCK_SIZE = CRC_SIZE*4;
+	var MAX_TSINT  = Math.pow(2,32) - 1;
 
 	function i2s(i)
 	{
@@ -2909,11 +2910,11 @@ function crypto_share_rsa2aes()
 	function serialize(v)
 	{
 		var p = 0, b = [];
-		v = parseInt(v);
-		while (v)
+		v = Math.min(MAX_TSINT,parseInt(v));
+		while (v > 0)
 		{
 			b[++p] = String.fromCharCode(v & 0xff);
-			v >>= 8;
+			v >>>= 8;
 		}
 		b[0] = String.fromCharCode(p);
 		return b.join("");

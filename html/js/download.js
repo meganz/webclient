@@ -263,7 +263,7 @@ function dl_g(res)
 				onDownloadError: dlerror,
 				onBeforeDownloadComplete: function() { }
 			};
-			$('.new-download-file-title').text(fdl_file.n);
+			$('.new-download-file-title').text(str_mtrunc(fdl_file.n,60));
 			$('.new-download-file-size').text(bytesToSize(res.s));
 			$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));
 		}

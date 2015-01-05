@@ -608,8 +608,10 @@ else
         jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
 
         // direct transfer deps.
-        jsl.push({f:'js/vendor/chat/hmac-sha1.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/lib-typedarrays-min.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
 
         // Other
         jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});

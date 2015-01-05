@@ -44,8 +44,10 @@ module.exports = function(config) {
              "../vendor/chat/hark.patched.js",
              "../vendor/chat/base32.js",
 
-             "../vendor/chat/hmac-sha1.js",
-             "../vendor/chat/lib-typedarrays.js",
+             "../vendor/chat/cryptojs-core.js",
+             "../vendor/chat/cryptojs-sha1.js",
+             "../vendor/chat/cryptojs-hmac.js",
+             "../vendor/chat/cryptojs-lib-typedarrays.js",
              "../vendor/Autolinker.js",
 
              "../chat/fileTransfer.js",

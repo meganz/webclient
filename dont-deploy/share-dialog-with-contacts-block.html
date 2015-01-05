@@ -62,7 +62,11 @@
 					if ($(this).attr('class').indexOf('active') == -1) {
 						var x = $(this).position().left + 35;
 						var y = $(this).position().top - 8;
-						m.css('left', x + 'px');
+						if ($(this).attr('class').indexOf('footer-button') > -1) {
+				           x = x + 14;
+				           y = y - 26;
+			             }
+		   				m.css('left', x + 'px');
 						m.css('top', y + 'px');
 						m.removeClass('hidden');
 						$(this).addClass('active');
@@ -115,7 +119,7 @@
 		$('.share-message').removeClass('active');
 	});
 
-	function  shareMessageResizing() {
+	function shareMessageResizing() {
 	  var txt = $('.share-message textarea'),
 	      txtHeight =  txt.outerHeight(),
 	      hiddenDiv = $('.share-message-hidden'),
@@ -300,7 +304,7 @@
                 </div>
             </div>
             <div class="fm-notifications-bottom">
-                <div class="share-dialog-icon permissions-icon">
+                <div class="share-dialog-icon permissions-icon footer-button">
                   <span></span>
                   Read only
                 </div>

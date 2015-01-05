@@ -6186,6 +6186,10 @@ function initShareDialog()
 			closeImportContactNotification('.share-dialog');
 			var x = $this.position().left + 50;
 			var y = $this.position().top - 34;
+			if ($this.attr('class').indexOf('footer-button') > -1) {
+				x = x + 14;
+				y = y - 26;
+			}
 			handlePermissionMenu($this, $m, x, y);
 		}
 

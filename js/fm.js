@@ -6227,6 +6227,7 @@ function initShareDialog()
 			$g
 				.removeClass(acls[0])
 				.removeClass('active')
+				.html('<span></span>' + cls[1])
 				.addClass(cls[0]);
 		}
 

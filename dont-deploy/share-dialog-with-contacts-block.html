@@ -1,18 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>MEGA 2.0</title>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-        <link rel="stylesheet" type="text/css" href="../css/style.css" />
-        <script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
-        <script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
-        <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
-        <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
-        <script type="text/javascript">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
+<script type="text/javascript">
 
-			$(document).ready(function ()
-			{
+$(document).ready(function ()
+{
 				function dialogPositioning() {
 					$('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
 				}
@@ -41,13 +41,18 @@
 
 				$('.share-dialog-permissions').unbind('click');
 				$('.share-dialog-permissions').bind('click', function () {
-					var m = $('.permissions-menu');
+					var m = $('.permissions-menu'),
+					    scrollPos = 0;
+					if ($('.share-dialog-contacts .jspPane'))
+					   scrollPos = $('.share-dialog-contacts .jspPane').position().top;
 					m.removeClass('search-permissions');
 					if ($(this).attr('class').indexOf('active') == -1) {
 						var x = $(this).position().left + 50;
-						var y = $(this).position().top + 14;
-						m.css('left', x + 'px');
-						m.css('top', y + 'px');
+						var y = $(this).position().top + 14 + scrollPos;
+						m.css({
+							'left': x,
+							'top': y
+						});
 						m.removeClass('hidden');
 						$(this).addClass('active');
 					} else {
@@ -60,14 +65,12 @@
 				$('.permissions-icon').bind('click', function () {
 					var m = $('.permissions-menu');
 					if ($(this).attr('class').indexOf('active') == -1) {
-						var x = $(this).position().left + 35;
-						var y = $(this).position().top - 8;
-						if ($(this).attr('class').indexOf('footer-button') > -1) {
-				           x = x + 14;
-				           y = y - 26;
-			             }
-		   				m.css('left', x + 'px');
-						m.css('top', y + 'px');
+						var x = $(this).position().left + 12;
+						var y = $(this).position().top  + 8;
+		   				m.css({
+							'left': x,
+							'top': y
+						});
 						m.removeClass('hidden');
 						$(this).addClass('active');
 						m.addClass('search-permissions');
@@ -96,8 +99,28 @@
 
 				});
 				
+	
+	//Pending info block
+	$('.pending-indicator').bind('mouseover', function() {
+		var x = $(this).position().left,
+		    y = $(this).position().top,
+			infoBlock = $('.share-pending-info'),
+			scrollPos = 0;
+		if ($('.share-dialog-contacts .jspPane'))
+			scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+		infoHeight = infoBlock.outerHeight();
+	    infoBlock.css({
+			'left': x,
+			'top': y - infoHeight + scrollPos
+		});
+		infoBlock.fadeIn(200);
+	});
+	$('.pending-indicator').bind('mouseout', function() {
+		$('.share-pending-info').fadeOut(200);
+	});
+	
 				
-				//Personal message
+	//Personal message
 	$('.share-message textarea').bind('focus', function() {
 		var $this = $(this);
 		$('.share-message').addClass('active');
@@ -153,12 +176,12 @@
 	$('.share-message textarea').on('keyup', function () {
 	    shareMessageResizing();
 	});
-			});
+});
 
-        </script>
-    </head>
+</script>
+</head>
 
-    <body id="bodyel" class="bottom-pages">
+<body id="bodyel" class="bottom-pages">
 
 
         <div class="fm-dialog-overlay"></div>
@@ -219,6 +242,38 @@
                         <div class="share-dialog-remove-button"></div>
                         <div class='clear'></div>
                     </div>
+                    
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl email">
+                        <div class="nw-contact-avatar color10"></div>
+                        <div class="fm-chat-user-info">
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="share-dialog-permissions read-and-write">
+                            <span></span>Read & write
+                        </div>
+                        <div class="share-dialog-remove-button"></div>
+                        <div class='clear'></div>
+                    </div>
+                    
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl email">
+                        <div class="nw-contact-avatar color10"></div>
+                        <div class="fm-chat-user-info">
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="share-dialog-permissions read-and-write">
+                            <span></span>Read & write
+                        </div>
+                        <div class="share-dialog-remove-button"></div>
+                        <div class='clear'></div>
+                    </div>
 
                     <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
                     <div class="share-dialog-contact-bl gmail">
@@ -237,8 +292,8 @@
                     </div>
 
                     <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
-                    <div class="share-dialog-contact-bl gmail">
-                        <div class="nw-contact-avatar color10"></div>
+                    <div class="share-dialog-contact-bl pending">
+                        <div class="nw-contact-avatar color2">AA</div>
                         <div class="fm-chat-user-info">
                             <div class="fm-chat-user">
                               <span>Username username username username username username username</span>
@@ -304,7 +359,7 @@
                 </div>
             </div>
             <div class="fm-notifications-bottom">
-                <div class="share-dialog-icon permissions-icon footer-button">
+                <div class="share-dialog-icon permissions-icon">
                   <span></span>
                   Read only
                 </div>

@@ -6148,8 +6148,13 @@ function initShareDialog()
 	$(document).off('click', '.share-dialog-permissions');
 	$(document).on('click', '.share-dialog-permissions', function (e)
 	{
-		var $this = $(this);
-		var $m = $('.permissions-menu');
+		var $this = $(this),
+		    $m = $('.permissions-menu'),
+			scrollBlock = $('.share-dialog-contacts .jspPane');
+			scrollPos = 0;
+		$m.removeClass('search-permissions');
+		if (scrollBlock.length)
+			scrollPos = scrollBlock.position().top;
 		if ($this.is('.active'))// fadeOut this popup
 		{
 			$m.fadeOut(200);
@@ -6160,8 +6165,8 @@ function initShareDialog()
 			$('.share-dialog-permissions').removeClass('active');
 			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 30;
-			var y = $this.position().top - 1;
+			var x = $this.position().left + 50;
+			var y = $this.position().top + 14 + scrollPos;
 			handlePermissionMenu($this, $m, x, y);
 		}
 
@@ -6172,8 +6177,8 @@ function initShareDialog()
 	$('.share-dialog .permissions-icon').unbind('click');
 	$('.share-dialog .permissions-icon').bind('click', function (e)
 	{
-		var $this = $(this);
-		var $m = $('.permissions-menu');
+		var $this = $(this),
+		    $m = $('.permissions-menu');
 		if ($this.is('.active'))// fadeOut permission menu for this icon
 		{
 			$m.fadeOut(200);
@@ -6183,13 +6188,10 @@ function initShareDialog()
 		{
 			$('.share-dialog-permissions').removeClass('active');
 			$('.permissions-icon').removeClass('active');
+			$m.addClass('search-permissions');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 50;
-			var y = $this.position().top - 34;
-			if ($this.attr('class').indexOf('footer-button') > -1) {
-				x = x + 14;
-				y = y - 26;
-			}
+			var x = $this.position().left + 12;
+			var y = $this.position().top + 8;
 			handlePermissionMenu($this, $m, x, y);
 		}
 

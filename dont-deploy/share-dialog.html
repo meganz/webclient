@@ -10,73 +10,115 @@
 <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {  
-    
-	function dialogPositioning () {
-		$('.fm-dialog').css('margin-top', '-'+$('.fm-dialog').outerHeight()/2+'px');
-	}
-	function shareContactsScroll() {
-	  $('.share-dialog-contacts').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:8,animateScroll: true}); 
-    }
-	dialogPositioning();
-	shareContactsScroll();
- 
-	$('.share-multiple-input').tokenInput([
-                {id: 7, name: "Ruby"},
-                {id: 11, name: "Python"},
-                {id: 13, name: "JavaScript"},
-                {id: 17, name: "ActionScript"},
-                {id: 19, name: "Scheme"},
-                {id: 23, name: "Lisp"},
-                {id: 29, name: "C#"},
-                {id: 31, name: "Fortran"},
-                {id: 37, name: "Visual Basic"},
-                {id: 41, name: "C"},
-                {id: 43, name: "C++"},
-                {id: 47, name: "Java"}
-            ], {
-                theme: "mega"
+$(document).ready(function ()
+{
+				function dialogPositioning() {
+					$('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
+				}
+				function shareContactsScroll() {
+					$('.share-dialog-contacts').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+				}
+				dialogPositioning();
+				shareContactsScroll();
+
+				$('.share-multiple-input').tokenInput([
+					{id: 7, name: "Ruby"},
+					{id: 11, name: "Python"},
+					{id: 13, name: "JavaScript"},
+					{id: 17, name: "ActionScript"},
+					{id: 19, name: "Scheme"},
+					{id: 23, name: "Lisp"},
+					{id: 29, name: "C#"},
+					{id: 31, name: "Fortran"},
+					{id: 37, name: "Visual Basic"},
+					{id: 41, name: "C"},
+					{id: 43, name: "C++"},
+					{id: 47, name: "Java"}
+				], {
+					theme: "mega"
+				});
+
+				$('.share-dialog-permissions').unbind('click');
+				$('.share-dialog-permissions').bind('click', function () {
+					var m = $('.permissions-menu'),
+					    scrollPos = 0;
+					if ($('.share-dialog-contacts .jspPane'))
+					   scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+					m.removeClass('search-permissions');
+					if ($(this).attr('class').indexOf('active') == -1) {
+						var x = $(this).position().left + 50;
+						var y = $(this).position().top + 14 + scrollPos;
+						m.css({
+							'left': x,
+							'top': y
+						});
+						m.removeClass('hidden');
+						$(this).addClass('active');
+					} else {
+						m.addClass('hidden');
+						$(this).removeClass('active');
+					}
+				});
+
+				$('.permissions-icon').unbind('click');
+				$('.permissions-icon').bind('click', function () {
+					var m = $('.permissions-menu');
+					if ($(this).attr('class').indexOf('active') == -1) {
+						var x = $(this).position().left + 12;
+						var y = $(this).position().top  + 8;
+		   				m.css({
+							'left': x,
+							'top': y
+						});
+						m.removeClass('hidden');
+						$(this).addClass('active');
+						m.addClass('search-permissions');
+					} else {
+						m.addClass('hidden');
+						$(this).removeClass('active');
+						m.removeClass('search-permissions');
+					}
+				});
+
+				$('.permissions-menu-item').unbind('click');
+				$('.permissions-menu-item').bind('click', function () {
+					if ($(this).attr('class').indexOf('active') == -1) {
+						$(this).parent().find('.permissions-menu-item.active').removeClass('active');
+						var p = $(this).attr('class').replace('permissions-menu-item', '').split(" ").join("");
+						if ($(this).attr('class').indexOf('search-permissions') == -1) {
+							$('.permissions-icon').removeClass('read-only read-and-write full-access');
+							$('.permissions-icon').addClass(p);
+						}
+						$(this).addClass('active');
+					} else
+						$(this).removeClass('active');
+					$('.permissions-menu').addClass('hidden');
+					$('.permissions-icon.active').removeClass('active');
+					$('.share-dialog-permissions.active').removeClass('active');
+
+				});
 				
-				
-    });
 	
-	
-	
-	$('.permissions-icon').unbind('click');
-    $('.permissions-icon').bind('click', function() {
-		var m = $('.permissions-menu');
-		if($(this).attr('class').indexOf('active') == -1) {
-		  var x = $(this).position().left +35;
-		  var y = $(this).position().top - 8;
-		  m.css('left', x + 'px');
-		  m.css('top', y + 'px');
-		  m.removeClass('hidden');
-		  $(this).addClass('active');
-		  m.addClass('search-permissions');
-		} else {
-	      m.addClass('hidden');
-		  $(this).removeClass('active');
-		  m.removeClass('search-permissions');
-		}
+	//Pending info block
+	$('.pending-indicator').bind('mouseover', function() {
+		var x = $(this).position().left,
+		    y = $(this).position().top,
+			infoBlock = $('.share-pending-info'),
+			scrollPos = 0;
+		if ($('.share-dialog-contacts .jspPane'))
+			scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+		infoHeight = infoBlock.outerHeight();
+	    infoBlock.css({
+			'left': x,
+			'top': y - infoHeight + scrollPos
+		});
+		infoBlock.fadeIn(200);
+	});
+	$('.pending-indicator').bind('mouseout', function() {
+		$('.share-pending-info').fadeOut(200);
 	});
 	
-	$('.permissions-menu-item').unbind('click');
-    $('.permissions-menu-item').bind('click', function() {
-		if($(this).attr('class').indexOf('active') == -1) {
-			$(this).parent().find('.permissions-menu-item.active').removeClass('active');
-			var p = $(this).attr('class').replace('permissions-menu-item', '').split(" ").join("");
-		    if($(this).attr('class').indexOf('search-permissions') == -1) {
-			  $('.permissions-icon').removeClass('read-only read-and-write full-access');
-			  $('.permissions-icon').addClass(p);
-		    }
-			$(this).addClass('active');
-		} else $(this).removeClass('active');
-		$('.permissions-menu').addClass('hidden');
-		$('.permissions-icon.active').removeClass('active');
-		$('.share-dialog-permissions.active').removeClass('active');
-		
-	});
-	
+				
 	//Personal message
 	$('.share-message textarea').bind('focus', function() {
 		var $this = $(this);
@@ -99,7 +141,7 @@ $(document).ready(function() {
 		$('.share-message').removeClass('active');
 	});
 
-	function  shareMessageResizing() {
+	function shareMessageResizing() {
 	  var txt = $('.share-message textarea'),
 	      txtHeight =  txt.outerHeight(),
 	      hiddenDiv = $('.share-message-hidden'),
@@ -133,11 +175,8 @@ $(document).ready(function() {
 	$('.share-message textarea').on('keyup', function () {
 	    shareMessageResizing();
 	});
-	
-	
-	
-	
 });
+
 </script>
 </head>
 

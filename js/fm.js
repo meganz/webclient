@@ -6148,8 +6148,13 @@ function initShareDialog()
 	$(document).off('click', '.share-dialog-permissions');
 	$(document).on('click', '.share-dialog-permissions', function (e)
 	{
-		var $this = $(this);
-		var $m = $('.permissions-menu');
+		var $this = $(this),
+		    $m = $('.permissions-menu'),
+			scrollBlock = $('.share-dialog-contacts .jspPane');
+			scrollPos = 0;
+		$m.removeClass('search-permissions');
+		if (scrollBlock.length)
+			scrollPos = scrollBlock.position().top;
 		if ($this.is('.active'))// fadeOut this popup
 		{
 			$m.fadeOut(200);
@@ -6160,8 +6165,8 @@ function initShareDialog()
 			$('.share-dialog-permissions').removeClass('active');
 			$('.permissions-icon').removeClass('active');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 30;
-			var y = $this.position().top - 1;
+			var x = $this.position().left + 50;
+			var y = $this.position().top + 14 + scrollPos;
 			handlePermissionMenu($this, $m, x, y);
 		}
 
@@ -6172,8 +6177,8 @@ function initShareDialog()
 	$('.share-dialog .permissions-icon').unbind('click');
 	$('.share-dialog .permissions-icon').bind('click', function (e)
 	{
-		var $this = $(this);
-		var $m = $('.permissions-menu');
+		var $this = $(this),
+		    $m = $('.permissions-menu');
 		if ($this.is('.active'))// fadeOut permission menu for this icon
 		{
 			$m.fadeOut(200);
@@ -6183,13 +6188,10 @@ function initShareDialog()
 		{
 			$('.share-dialog-permissions').removeClass('active');
 			$('.permissions-icon').removeClass('active');
+			$m.addClass('search-permissions');
 			closeImportContactNotification('.share-dialog');
-			var x = $this.position().left + 50;
-			var y = $this.position().top - 34;
-			if ($this.attr('class').indexOf('footer-button') > -1) {
-				x = x + 14;
-				y = y - 26;
-			}
+			var x = $this.position().left + 12;
+			var y = $this.position().top + 8;
 			handlePermissionMenu($this, $m, x, y);
 		}
 
@@ -6225,6 +6227,7 @@ function initShareDialog()
 			$g
 				.removeClass(acls[0])
 				.removeClass('active')
+				.html('<span></span>' + cls[1])
 				.addClass(cls[0]);
 		}
 
@@ -6232,6 +6235,83 @@ function initShareDialog()
 		$('.share-dialog-permissions.active').removeClass('active');
 
 		e.stopPropagation();
+	});
+	
+	//Pending info block
+	$('.pending-indicator').bind('mouseover', function() {
+		var x = $(this).position().left,
+		    y = $(this).position().top,
+			infoBlock = $('.share-pending-info'),
+			scrollPos = 0;
+		if ($('.share-dialog-contacts .jspPane'))
+			scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+		infoHeight = infoBlock.outerHeight();
+	    infoBlock.css({
+			'left': x,
+			'top': y - infoHeight + scrollPos
+		});
+		infoBlock.fadeIn(200);
+	});
+	$('.pending-indicator').bind('mouseout', function() {
+		$('.share-pending-info').fadeOut(200);
+	});
+	
+				
+	//Personal message
+	$('.share-message textarea').bind('focus', function() {
+		var $this = $(this);
+		$('.share-message').addClass('active');
+		if ($this.val() == 'Include personal message...') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
+		}
+	});
+
+	$('.share-message textarea').bind('blur', function() {
+		var $this = $(this);
+		$('.share-message').removeClass('active');
+	});
+
+	function shareMessageResizing() {
+	  var txt = $('.share-message textarea'),
+	      txtHeight =  txt.outerHeight(),
+	      hiddenDiv = $('.share-message-hidden'),
+		  pane = $('.share-message-scrolling'),
+		  content = txt.val(),
+		  api;
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+
+	    if( $('.share-message-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+
+	$('.share-message textarea').on('keyup', function () {
+	    shareMessageResizing();
 	});
 }
 

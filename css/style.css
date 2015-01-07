@@ -7277,7 +7277,7 @@ span.search-number {
 	background-position: 0 -4912px;
 }
 .context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
-	min-width: 164px;
+	min-width: 160px;
 	position: absolute;
 	background-color: #333333;
 	-moz-border-radius: 8px;
@@ -7290,6 +7290,9 @@ span.search-number {
 	box-sizing: border-box;
 	z-index: 500;
 	padding: 8px 0;
+}
+.search-permissions .permissions-menu-arrow {
+	display:none;
 }
 .nw-sorting-menu {
 	right: -156px;
@@ -19524,11 +19527,12 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .share-pending-info {
 	width: 240px;
-	padding: 10px 25px 12px 25px;
+	padding: 12px 15px 14px 15px;
 	position: absolute;
 	z-index: 10;
 	background-color: #333333;
-	font-size: 11px;
+	margin:6px 0 0 -98px;
+	font-size: 12px;
 	line-height: 18px;
 	color: #FFDD00;
 	text-align: center;
@@ -19554,7 +19558,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	display: inline-block;
 	position: relative;
 	top: 1px;
-	margin: 0 0 0 5px;
+	left:5px;
+	margin: 0;
 	font-size: 12px;
 	line-height: 17px;
 	vertical-align: top;
@@ -19697,6 +19702,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	margin-bottom: 12px;
 	overflow: hidden;
+	position:relative;
 }
 .share-with-contact-dialog .share-dialog-contacts {
 	max-height: 192px;
@@ -19797,7 +19803,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
 	background-position: -87px -358px;
 }
-.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write {
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
 	background-position: -87px -396px;
 }
 .share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {

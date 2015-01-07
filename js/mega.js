@@ -509,7 +509,7 @@ function MegaData()
                         </td>\n\
                         <td>' + ps + '</td>\n\
                         <td>\n\
-                            <div class="contact-request-button delete">' + l[5858]] + '</div>\n\
+                            <div class="contact-request-button delete">' + l[5858] + '</div>\n\
                             <div class="contact-request-button accept">' + l[5856] + '</div>\n\
                             <div class="contact-request-button ignore">' + l[5860] + '</div>\n\
                             <div class="contact-request-ignored">' + 'User ignored' + '</div>\n\

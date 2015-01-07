@@ -6728,7 +6728,6 @@ function initShareDialog()
 	$('.share-message textarea').on('keyup', function () {
 	    shareMessageResizing();
 	});
->>>>>>> origin/New-design
 }
 
 function addImportedDataToSharedDialog(data, from) {

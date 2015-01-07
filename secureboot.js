@@ -116,11 +116,12 @@ var urlrootfile = '';
 
 if (!b_u && is_extension)
 {
+	nocontentcheck=true;
+
 	if (is_chrome_firefox)
 	{
 		bootstaticpath = 'chrome://mega/content/';
 		urlrootfile = 'secure.html';
-		nocontentcheck=true;
 		if (d) staticpath = bootstaticpath;
 		  else staticpath = 'https://eu.static.mega.co.nz/';
 		try {
@@ -136,6 +137,12 @@ if (!b_u && is_extension)
 		bootstaticpath = chrome.extension.getURL("mega/");
 		urlrootfile = 'mega/secure.html';
 	}
+
+	Object.defineProperty(window, 'eval', {
+		value : function eval(code) {
+			throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
+		}
+	});
 }
 
 if (b_u) document.location = 'update.html';
@@ -534,7 +541,6 @@ else
 		}
 		function detectlang()
 		{
-			return 'en';
 			if (!navigator.language) return 'en';
 			var bl = navigator.language.toLowerCase();
 			var l2 = languages;
@@ -602,8 +608,10 @@ else
         jsl.push({f:'js/vendor/chat/base32.js', n: 'mega_js', j:1,w:7});
 
         // direct transfer deps.
-        jsl.push({f:'js/vendor/chat/hmac-sha1.js', n: 'mega_js', j:1,w:7});
-        jsl.push({f:'js/vendor/chat/lib-typedarrays-min.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-core.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-sha1.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-hmac.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/vendor/chat/cryptojs-lib-typedarrays.js', n: 'mega_js', j:1,w:7});
 
         // Other
         jsl.push({f:'js/vendor/Autolinker.js', n: 'mega_js', j:1,w:7});
@@ -644,10 +652,10 @@ else
         
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
-	jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
+        jsl.push({f:'js/miniui.js', n: 'miniui_js', j:1});
         if (is_extension)
         {
-                jsl.push({f:'js/dcraw.min.js', n: 'dcraw_js', j:1});
+                jsl.push({f:'js/dcraw.js', n: 'dcraw_js', j:1});
         }
         /* better download */
         jsl.push({f:'js/xhr.js', n: 'xhr_js', j:1});
@@ -691,7 +699,7 @@ else
         jsl.push({f:'js/Int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-	jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
+        jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
         jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
@@ -809,7 +817,7 @@ else
         var lightweight=false;
         var njsl = [];
         var fx_startup_cache = is_chrome_firefox && nocontentcheck;
-        if ((typeof Worker != 'undefined') && (typeof window.URL != 'undefined') && !fx_startup_cache)
+        if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
         {
             var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;',sjcl_sha_js,'self.onmessage = function(e) { try { e.data.hash = sha256(e.data.text);  self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
             try  { var blob = new Blob(hashdata, { type: "text/javascript" }); }
@@ -869,7 +877,7 @@ else
         {
             l=[];
             var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
-	    while (i--) l[i]='l';
+            while (i--) l[i]='l';
             for (var i in jsl)
             {
                 if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + r + '"></sc' + 'ript>');
@@ -933,7 +941,7 @@ else
 
                     if (jsl[jsi].j == 1)
                     {
-                        try
+                        if (file.indexOf('/mads') == -1) try
                         {
                             loadSubScript(file);
                         }
@@ -1043,6 +1051,10 @@ else
             }
             xhr_stack[xhri].onerror = xhr_error;
             xhr_stack[xhri].ontimeout = xhr_error;
+            if (is_extension && url.indexOf('/mads') > -1)
+            {
+                jsl[jsi].text = ';';
+            }
             if (jsl[jsi].text)
             {
                 if (++jslcomplete == jsl.length) initall();

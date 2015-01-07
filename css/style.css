@@ -2063,6 +2063,11 @@ form {
 	text-align: center;
 	line-height: 16px;
 	margin-left: 5px;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 a.blog-new-archive-lnk:hover .blog-archive-number {
 	background-color: #797979;
@@ -2084,6 +2089,11 @@ p .blog-new-read-more, p a.blog-new-read-more {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-family: 'Open Sans', Arial;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 p a.blog-new-read-more:hover {
 	color: white !important;
@@ -2189,6 +2199,11 @@ a.blog-new-archive-lnk {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 .blog-pagination-button:hover, .blog-pagination-button.active {
 	background-color: #D42400;
@@ -6754,6 +6769,11 @@ table {
 	border-top-right-radius: 0;
 	overflow: hidden;
 }
+.fm-file-upload.last-button {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+}
 .fm-file-upload {
 	background-position: 2px -1091px;
 }
@@ -7268,7 +7288,7 @@ span.search-number {
 	background-position: 0 -4912px;
 }
 .context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
-	min-width: 164px;
+	min-width: 160px;
 	position: absolute;
 	background-color: #333333;
 	-moz-border-radius: 8px;
@@ -7281,6 +7301,9 @@ span.search-number {
 	box-sizing: border-box;
 	z-index: 500;
 	padding: 8px 0;
+}
+.search-permissions .permissions-menu-arrow {
+	display:none;
 }
 .nw-sorting-menu {
 	right: -156px;
@@ -14221,6 +14244,7 @@ h5.main-italic-header {
 	line-height: 18px;
 	color: #333333;
 	padding-top: 10px;
+	white-space: nowrap;
 }
 .new-download-file-size {
 	font-size: 11px;
@@ -19476,13 +19500,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .share-dialog-contact-bl .fm-chat-user span {
 	max-width: 100%;
-display: inline-block;
-text-overflow: ellipsis;
-overflow: hidden;
--webkit-box-sizing: border-box;
+	display: inline-block;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	white-space:nowrap;
+	white-space: nowrap;
 }
 .share-dialog-contact-bl.pending .fm-chat-user span {
 	max-width: -webkit-calc(100% - 26px);
@@ -19507,42 +19531,46 @@ overflow: hidden;
 	text-transform: uppercase;
 }
 .pending-indicator {
-	display:none;
-	
+	display: none;
 }
 .share-pending-info {
 	width: 240px;
-padding: 10px 25px 12px 25px;
-position: absolute;
-z-index: 10;
-background-color: #333333;
-font-size: 11px;
-line-height: 18px;
-color: #FFDD00;
-text-align: center;
--moz-border-radius: 8px;
--webkit-border-radius: 8px;
-border-radius: 8px;
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
+	padding: 12px 15px 14px 15px;
+	position: absolute;
+	z-index: 10;
+	background-color: #333333;
+	margin:6px 0 0 -98px;
+	font-size: 12px;
+	line-height: 18px;
+	color: #FFDD00;
+	text-align: center;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .share-pending-arrow {
 	position: absolute;
-bottom: -10px;
-height: 10px;
-left: 50%;
-margin-left: -9px;
-width: 18px;
-background-image: url(../images/mega/dialogs-sprite.svg);
-background-repeat: no-repeat;
-background-position: left -3831px;
+	bottom: -10px;
+	height: 10px;
+	left: 50%;
+	margin-left: -9px;
+	width: 18px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -3831px;
 }
 .pending .pending-indicator {
 	display: inline-block;
-	position:relative;
-	top:-1px;
-	margin:0 0 0 5px;
+	position: relative;
+	top: 1px;
+	left:5px;
+	margin: 0;
+	font-size: 12px;
+	line-height: 17px;
+	vertical-align: top;
 }
 .pending .pending-indicator::before {
 	content: '\00a0';
@@ -19682,6 +19710,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	margin-bottom: 12px;
 	overflow: hidden;
+	position:relative;
 }
 .share-with-contact-dialog .share-dialog-contacts {
 	max-height: 192px;
@@ -19782,7 +19811,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
 	background-position: -87px -358px;
 }
-.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write {
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
 	background-position: -87px -396px;
 }
 .share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {
@@ -22124,6 +22153,138 @@ background-color:#1DA2E9
  */
 
 .fm-create-chat-button.active .add-user-popup-arrow {
-    margin-top: -4px;
-    z-index: 1210;
+	margin-top: -4px;
+	z-index: 1210;
+}
+/**
+  * PRO upgrade, new flow styling for the login/register popups and buttons
+  */
+
+
+.fm-dialog.loginrequired-dialog {
+	min-height: 176px;
+	width: 445px;
+}
+.loginrequired-dialog .fm-notification-body {
+	padding: 0 20px;
+}
+.fm-notification-info .top-login-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	clear: left;
+	background-color: rgb(127, 127, 127);
+	margin-right: 5px;
+}
+.fm-notification-info .create-account-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	background-color: rgb(217, 046, 000);
+}
+.loginrequired-dialog .fm-notification-info > p {
+	margin-top: 26px;
+}
+.loginrequired-dialog .fm-notification-info > p > p {
+	margin-bottom: 6px;
+	padding-top: 2px;
+}
+.loginrequired-dialog .fm-notification-icon {
+	width: 90px;
+	height: 90px;
+	background-image: url(../images/mega/register-big-sprite@2x.png);
+	background-size: 100px auto;
+	background-position: center -199px;
+	background-repeat: no-repeat;
+	margin: 0 26px 0 0;
+}
+.loginrequired-dialog .fm-notification-icon.plan1 {
+	background-position: center -329px;
+}
+.loginrequired-dialog .fm-notification-icon.plan2 {
+	background-position: center -459px;
+}
+.loginrequired-dialog .fm-notification-icon.plan3 {
+	background-position: center -589px;
+}
+/* login dialog */
+.pro-login-dialog {
+	z-index: 1200;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+}
+.pro-login-dialog.hidden {
+	display: none;
+}
+.pro-login-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+a.top-login-forgot-pass {
+	font-size: 11px;
+	color: #999999;
+	line-height: 21px;
+	background-image: url(../images/mega/top-login-sprite_v4.png);
+	background-position: 0 -1582px;
+	background-repeat: no-repeat;
+	float: right;
+	padding: 0 0 0 23px;
+	cursor: pointer;
+}
+/* register */
+.pro-register-dialog {
+	z-index: 1180;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+	min-width: 460px;
+}
+.pro-register-dialog.hidden {
+	display: none;
+}
+.pro-register-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+.pro-register-dialog .register-st2-button {
+	float: right;
+	cursor: pointer;
+}
+.pro-register-paypal-dialog .reg-success-icon {
+	background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
+	background-size: 200px 200px;
+	width: 200px;
+	height: 200px;
+}
+/* logged in PRO account, but not activated */
+.top-warning-popup.not-activated {
+	cursor: default;
+}
+.top-warning-popup.not-activated .mailbox-icon {
+	background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
+	background-size: 100px 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin-right: 10px;
+}
+.top-warning-popup.not-activated p {
+	margin-top: 10px;
+	padding-top: 9px;
+}
+.top-warning-popup.not-activated .warning-popup-body {
+	padding-bottom: 8px;
 }

@@ -466,17 +466,14 @@ var date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415
 
 function acc_time2date(unixtime)
 {
-    var MyDate = new Date(unixtime * 1000);
-    var th = 'th';
-    if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {
-    }
-    else if (('' + MyDate.getDate()).slice(-1) == '1')
-        th = 'st';
-    else if (('' + MyDate.getDate()).slice(-1) == '2')
-        th = 'nd';
-    if (lang !== 'en')
-        th = ',';
-    return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
+	var MyDate = new Date(unixtime*1000);
+	var th = 'th';
+	if ((parseInt(MyDate.getDate()) == 11) || (parseInt(MyDate.getDate()) == 12)) {}
+	else if (('' + MyDate.getDate()).slice(-1) == '1') th = 'st';
+	else if (('' + MyDate.getDate()).slice(-1) == '2') th = 'nd';
+	else if (('' + MyDate.getDate()).slice(-1) == '3') th = 'rd';
+	if (lang !== 'en') th = ',';
+	return date_months[MyDate.getMonth()] + ' ' + MyDate.getDate() + th + ' ' + MyDate.getFullYear();
 }
 
 function time2last(timestamp)
@@ -1481,26 +1478,202 @@ function mKeyDialog(ph, fl)
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name, proto = ctr.prototype;
-    for (var fn in proto) {
-        if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
-            console.log('Tracing ' + name + '.' + fn);
-            proto[fn] = (function(fn, fc) {
-                fc.dbg = function() {
-                    try {
-                        console.log('Entering ' + name + '.' + fn,
-                            this, '~####~', Array.prototype.slice.call(arguments));
-                        var r = fc.apply(this, arguments);
-                        console.log('Leaving ' + name + '.' + fn, r);
-                        return r;
-                    } catch (e) {
-                        console.error(e);
-                    }
-                };
-                return fc.dbg;
-            })(fn, proto[fn]);
-        }
-    }
+	var name = ctr.name, proto = ctr.prototype;
+	for(var fn in proto) {
+		if(proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
+			console.log('Tracing ' + name + '.' + fn);
+			proto[fn] = (function(fn, fc) {
+				fc.dbg = function() {
+					try {
+						console.log('Entering ' + name + '.' + fn,
+							this, '~####~', Array.prototype.slice.call(arguments));
+						var r = fc.apply(this, arguments);
+						console.log('Leaving ' + name + '.' + fn, r);
+						return r;
+					} catch(e) {
+						console.error(e);
+					}
+				};
+				return fc.dbg;
+			})(fn, proto[fn]);
+		}
+	}
+}
+
+function mSpawnWorker(url, nw)
+{
+	if (!(this instanceof mSpawnWorker))
+		return new mSpawnWorker(url, nw);
+
+	this.jid = 1;
+	this.jobs = {};
+	this.nworkers=nw=nw||4;
+	this.wrk = new Array(nw);
+	this.token = mRandomToken('mSpawnWorker.'+url.split(".")[0]);
+
+	while (nw--) {
+		if (!(this.wrk[nw] = this.add(url))) {
+			throw new Error(this.token.split("$")[0]+' Setup Error');
+		}
+	}
+}
+mSpawnWorker.prototype = {
+	process: function mSW_Process(data, callback, onerror)
+	{
+		if (!Array.isArray(data)) {
+			var err = new Error("'data' must be an array");
+			if (onerror) return onerror(err);
+			throw err;
+		}
+		if (this.unreliably) {
+			return onerror(0xBADF);
+		}
+		var nw  = this.nworkers, l = Math.ceil(data.length/nw);
+		var id  = mRandomToken("mSWJobID"+this.jid++), idx = 0;
+		var job = { done: 0, data: [], callback: callback};
+
+		while (nw--) {
+			job.data.push(data.slice(idx, idx+=l));
+		}
+		if (onerror) job.onerror = onerror;
+		this.jobs[id] = job;
+		this.postNext();
+	},
+	postNext: function mSW_PostNext()
+	{
+		if (this.busy())
+			return;
+		for (var id in this.jobs)
+		{
+			var nw = this.nworkers;
+			var job = this.jobs[id], data;
+
+			while (nw--)
+			{
+				if (!this.wrk[nw].working)
+				{
+					data = job.data.shift();
+					if (data)
+					{
+						this.wrk[nw].working = !0;
+						this.wrk[nw].postMessage({
+							data        : data,
+							debug       : !!window.d,
+							u_sharekeys : u_sharekeys,
+							u_privk     : u_privk,
+							u_handle    : u_handle,
+							u_k         : u_k,
+							jid         : id
+						});
+
+						if (d && job.data.length == this.nworkers-1) console.time(id);
+					}
+				}
+			}
+		}
+	},
+	busy: function()
+	{
+		var nw = this.nworkers;
+		while (nw-- && this.wrk[nw].working);
+		return nw == -1;
+	},
+	add: function mSW_Add(url)
+	{
+		var self = this, wrk;
+
+		try {
+			wrk = new Worker(url);
+		} catch(e) {
+			console.error(e);
+			if (!window[this.token]) {
+				window[this.token] = true;
+				msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
+			}
+			return false;
+		}
+
+		wrk.onerror = function mSW_OnError(err)
+		{
+			console.error(err);
+			Soon(function() {
+				throw err;
+			});
+			self.unreliably = true;
+			var nw = self.nworkers;
+			while (nw--) {
+				self.wrk[nw].terminate();
+			}
+			for (var id in self.jobs) {
+				var job = self.jobs[id];
+				if (job.onerror) job.onerror(err);
+			}
+			if (!window[self.token]) {
+				window[self.token] = true;
+				msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+			}
+			delete self.wrk;
+			delete self.jobs;
+			self = undefined;
+		};
+
+		wrk.onmessage = function mSW_OnMessage(ev)
+		{
+			if (ev.data[0] == 'console')
+			{
+				if (d) {
+					var args = ev.data[1];
+					args.unshift(self.token);
+					console.log.apply(console,args);
+				}
+				return;
+			}
+			if (d) console.log(self.token, ev.data);
+
+			wrk.working = false;
+			if (!self.done(ev.data)) this.onerror(0xBADF);
+		};
+
+		if (d) console.log(this.token, 'Starting...');
+
+		wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
+
+		return wrk;
+	},
+	done: function mSW_Done(reply)
+	{
+		var job = this.jobs[reply.jid];
+		if (!ASSERT(job,'Invalid worker reply.'))
+			return false;
+
+		if (!job.result) job.result = reply.result;
+		else $.extend(job.result, reply.result);
+
+		if (reply.newmissingkeys)
+		{
+			job.newmissingkeys=newmissingkeys = true;
+			$.extend(missingkeys, reply.missingkeys);
+		}
+		if (reply.rsa2aes)      $.extend(rsa2aes,      reply.rsa2aes);
+		if (reply.u_sharekeys)  $.extend(u_sharekeys,  reply.u_sharekeys);
+		if (reply.rsasharekeys) $.extend(rsasharekeys, reply.rsasharekeys);
+
+		Soon(this.postNext.bind(this));
+		if (++job.done == this.nworkers)
+		{
+			if (d) console.timeEnd(reply.jid);
+
+			delete this.jobs[reply.jid];
+			job.callback(job.result, job);
+		}
+
+		return true;
+	}
+};
+
+function mRandomToken(pfx)
+{
+	return (pfx || '!') + '$' + (Math.random()*Date.now()).toString(36);
 }
 
 function str_mtrunc(str, len)

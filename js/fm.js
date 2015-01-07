@@ -4657,10 +4657,11 @@ function selectddUI() {
     $(window).trigger('resize');
 }
 
-function iconUI()
+function iconUI(aQuiet)
 {
-    if (d)
-        console.time('iconUI');
+    if (d) console.time('iconUI');
+	$(window).unbind('resize.icon');
+    
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
     $('.shared-grid-view').addClass('hidden');
@@ -4694,18 +4695,8 @@ function iconUI()
     else
     {
         $('.fm-blocks-view.fm').removeClass('hidden');
-        initFileblocksScrolling();
+        if (!aQuiet) initFileblocksScrolling();
     }
-    $(window).unbind('resize.icon');
-    $(window).bind('resize.icon', function()
-    {
-        if (M.viewmode == 1 && M.currentdirid == 'contacts')
-            initContactsBlocksScrolling();
-        else if (M.viewmode == 1 && M.currentdirid == 'shares')
-            initShareBlocksScrolling();
-        else if (M.viewmode == 1)
-            initFileblocksScrolling();
-    });
 
     $('.fm-blocks-view,.shared-blocks-view').unbind('contextmenu');
     $('.fm-blocks-view,.shared-blocks-view').bind('contextmenu', function(e)
@@ -4736,11 +4727,20 @@ function iconUI()
     {
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
-
-    }
-    setTimeout(selectddUI, 10);
-    if (d)
-        console.timeEnd('iconUI');
+	}
+	Soon(function iconLazyUI()
+	{
+		selectddUI();
+		$(window).bind('resize.icon', function iconUIonResize()
+		{
+			if (M.viewmode == 1) {
+				if (M.currentdirid == 'contacts') initContactsBlocksScrolling();
+				else if (M.currentdirid == 'shares') initShareBlocksScrolling();
+				else initFileblocksScrolling();
+			}
+		});
+	});
+	if (d) console.timeEnd('iconUI');
 }
 
 function transferPanelUI()
@@ -6559,50 +6559,56 @@ function initShareDialog()
             $('.dialog-share-button').addClass('disabled');
     });
 
-    // related to specific contact
-    $(document).off('click', '.share-dialog-permissions');
-    $(document).on('click', '.share-dialog-permissions', function(e)
-    {
-        var $this = $(this);
-        var $m = $('.permissions-menu');
-        if ($this.is('.active'))// fadeOut this popup
-        {
-            $m.fadeOut(200);
-            $this.removeClass('active');
-        }
-        else
-        {
-            $('.share-dialog-permissions').removeClass('active');
-            $('.permissions-icon').removeClass('active');
-            closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 30;
-            var y = $this.position().top - 1;
-            handlePermissionMenu($this, $m, x, y);
-        }
+	// related to specific contact
+	$(document).off('click', '.share-dialog-permissions');
+	$(document).on('click', '.share-dialog-permissions', function (e)
+	{
+		var $this = $(this),
+		    $m = $('.permissions-menu'),
+			scrollBlock = $('.share-dialog-contacts .jspPane');
+			scrollPos = 0;
+		$m.removeClass('search-permissions');
+		if (scrollBlock.length)
+			scrollPos = scrollBlock.position().top;
+		if ($this.is('.active'))// fadeOut this popup
+		{
+			$m.fadeOut(200);
+			$this.removeClass('active');
+		}
+		else
+		{
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
+			closeImportContactNotification('.share-dialog');
+			var x = $this.position().left + 50;
+			var y = $this.position().top + 14 + scrollPos;
+			handlePermissionMenu($this, $m, x, y);
+		}
 
         e.stopPropagation();
     });
 
-    // related to multi-input contacts
-    $('.share-dialog .permissions-icon').unbind('click');
-    $('.share-dialog .permissions-icon').bind('click', function(e)
-    {
-        var $this = $(this);
-        var $m = $('.permissions-menu');
-        if ($this.is('.active'))// fadeOut permission menu for this icon
-        {
-            $m.fadeOut(200);
-            $this.removeClass('active');
-        }
-        else
-        {
-            $('.share-dialog-permissions').removeClass('active');
-            $('.permissions-icon').removeClass('active');
-            closeImportContactNotification('.share-dialog');
-            var x = $this.position().left + 31;
-            var y = $this.position().top - 9;
-            handlePermissionMenu($this, $m, x, y);
-        }
+	// related to multi-input contacts
+	$('.share-dialog .permissions-icon').unbind('click');
+	$('.share-dialog .permissions-icon').bind('click', function (e)
+	{
+		var $this = $(this),
+		    $m = $('.permissions-menu');
+		if ($this.is('.active'))// fadeOut permission menu for this icon
+		{
+			$m.fadeOut(200);
+			$this.removeClass('active');
+		}
+		else
+		{
+			$('.share-dialog-permissions').removeClass('active');
+			$('.permissions-icon').removeClass('active');
+			$m.addClass('search-permissions');
+			closeImportContactNotification('.share-dialog');
+			var x = $this.position().left + 12;
+			var y = $this.position().top + 8;
+			handlePermissionMenu($this, $m, x, y);
+		}
 
         e.stopPropagation();
     });
@@ -6620,30 +6626,109 @@ function initShareDialog()
         var $i = $('.share-dialog .share-dialog-permissions.active');// Specific contact
         var $g = $('.share-dialog .permissions-icon.active');// Group permissions
 
-        var acls = [];// active permission
-        if ($i.length)
-        {
-            acls = checkMultiInputPermission($i);
-            $i
-                .removeClass(acls[0])
-                .removeClass('active')
-                .html('<span></span>' + cls[1])
-                .addClass(cls[0]);
-        }
-        else if ($g.length)// Group permission, permissions-icon
-        {
-            acls = checkMultiInputPermission($g);
-            $g
-                .removeClass(acls[0])
-                .removeClass('active')
-                .addClass(cls[0]);
-        }
+		var acls = [];// active permission
+		if ($i.length)
+		{
+			acls = checkMultiInputPermission($i);
+			$i
+				.removeClass(acls[0])
+				.removeClass('active')
+				.html('<span></span>' + cls[1])
+				.addClass(cls[0]);
+		}
+		else if ($g.length)// Group permission, permissions-icon
+		{
+			acls = checkMultiInputPermission($g);
+			$g
+				.removeClass(acls[0])
+				.removeClass('active')
+				.html('<span></span>' + cls[1])
+				.addClass(cls[0]);
+		}
 
         $('.permissions-icon.active').removeClass('active');
         $('.share-dialog-permissions.active').removeClass('active');
 
-        e.stopPropagation();
-    });
+		e.stopPropagation();
+	});
+	
+	//Pending info block
+	$('.pending-indicator').bind('mouseover', function() {
+		var x = $(this).position().left,
+		    y = $(this).position().top,
+			infoBlock = $('.share-pending-info'),
+			scrollPos = 0;
+		if ($('.share-dialog-contacts .jspPane'))
+			scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+		infoHeight = infoBlock.outerHeight();
+	    infoBlock.css({
+			'left': x,
+			'top': y - infoHeight + scrollPos
+		});
+		infoBlock.fadeIn(200);
+	});
+	$('.pending-indicator').bind('mouseout', function() {
+		$('.share-pending-info').fadeOut(200);
+	});
+	
+				
+	//Personal message
+	$('.share-message textarea').bind('focus', function() {
+		var $this = $(this);
+		$('.share-message').addClass('active');
+		if ($this.val() == 'Include personal message...') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
+		}
+	});
+
+	$('.share-message textarea').bind('blur', function() {
+		var $this = $(this);
+		$('.share-message').removeClass('active');
+	});
+
+	function shareMessageResizing() {
+	  var txt = $('.share-message textarea'),
+	      txtHeight =  txt.outerHeight(),
+	      hiddenDiv = $('.share-message-hidden'),
+		  pane = $('.share-message-scrolling'),
+		  content = txt.val(),
+		  api;
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+
+	    if( $('.share-message-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+
+	$('.share-message textarea').on('keyup', function () {
+	    shareMessageResizing();
+	});
+>>>>>>> origin/New-design
 }
 
 function addImportedDataToSharedDialog(data, from) {

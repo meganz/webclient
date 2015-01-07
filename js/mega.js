@@ -676,9 +676,9 @@ function MegaData()
         hideEmptyGrids();
 
         // Clear scroll
-        jsp = $('.file-block-scrolling').data('jsp');
-        if (jsp) {
-            jsp.destroy();
+        if (!u) {
+            jsp = $('.file-block-scrolling').data('jsp');
+            if (jsp) jsp.destroy();
         }
         jsp = $('.contacts-blocks-scrolling').data('jsp');
         if (jsp) {
@@ -1047,25 +1047,29 @@ function MegaData()
             fa_reqcnt = 0;
         }
 
-        this.rmSetupUI();
+        this.rmSetupUI(u);
 
         if (!u && n_cache)
             $.rmInitJSP = lSel;
     };
 
-    this.rmSetupUI = function() {
+    this.rmSetupUI = function(u) {
         if (this.viewmode === 1) {
             if (this.v.length > 0) {
                 var o = $('.fm-blocks-view.fm .file-block-scrolling');
                 o.find('div.clear').remove();
                 o.append('<div class="clear"></div>');
             }
-            iconUI();
+            iconUI(u);
             fm_thumbnails();
-        } else {
+        }
+        
+        else {
             Soon(gridUI);
         }
         Soon(fmtopUI);
+        
+        if (u) return;
 
         function prepareShareMenuHandler(e) {
             e.preventDefault();

@@ -1587,7 +1587,7 @@ function addContactUI()
                                     title = l[150];
                                     msg = l[151].replace('[X]', email);
                                 } else {
-                                    title = l[165] + ' ' + l[2047];
+                                    title = l[165] + ' ' + l[5859];
                                     msg = l[151].replace('user [X]', 'users');
                                 }
                                 

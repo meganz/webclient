@@ -497,7 +497,7 @@ function MegaData()
                     if (ipc[i].ps && ipc[i].ps !== 0) {
                         ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
                     } else {
-                        ps = '<span class="contact-request-content">' + l[2039] + '</span>';
+                        ps = '<span class="contact-request-content">' + l[5851] + '</span>';
                     }
                     html = '<tr id="ipc_' + id + '"' + trClass + '>\n\
                         <td>\n\
@@ -509,10 +509,10 @@ function MegaData()
                         </td>\n\
                         <td>' + ps + '</td>\n\
                         <td>\n\
-                            <div class="contact-request-button delete">' + l[2046] + '</div>\n\
-                            <div class="contact-request-button accept">' + l[2043] + '</div>\n\
-                            <div class="contact-request-button ignore">' + l[2048] + '</div>\n\
-                            <div class="contact-request-ignored">' + l[2045] + '</div>\n\
+                            <div class="contact-request-button delete">' + l[5858]] + '</div>\n\
+                            <div class="contact-request-button accept">' + l[5856] + '</div>\n\
+                            <div class="contact-request-button ignore">' + l[5860] + '</div>\n\
+                            <div class="contact-request-ignored">' + 'User ignored' + '</div>\n\
                             <div class="clear"></div>\n\
                         </td>\n\
                     </tr>';
@@ -598,7 +598,7 @@ function MegaData()
                             </div>\n\
                         </div>\n\
                         <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + '' + l[738] + '</div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[2049] + '</div>\n\
+                        <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[5861] + '</div>\n\
                     </td>\n\
                 </tr>';
 

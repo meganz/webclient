@@ -628,7 +628,7 @@ var notifyPopup = {
         else {
             // Creates notification with "Sent you a contact request" with 'Not now' & 'Accept' buttons
             type = 'contactRequest';
-            message = l[2039];
+            message = l[5851];
         }
 
         return notifyPopup.getNotificationHtml(notification.id, type, message, timestamp, notification.read, null, email, pendingContactHtml);
@@ -652,11 +652,11 @@ var notifyPopup = {
         // If the user deleted the request
         if (action === 2) {                
             type = 'contactAccepted';
-            message = 'Accepted your contact request';
+            message = l[5852];
         }
         else if (action === 3) {
             type = 'contactRequestDenied';
-            message = 'Denied your contact request';
+            message = l[5853];
         }
         else {
             return false;
@@ -1003,10 +1003,10 @@ var notifyPopup = {
 
         // Change wording depending on number of notifications
         if (num === 1) {
-            $tooltip.text(num + ' ' + l[2041] + ' ' + l[2042]); // 1 New Notification
+            $tooltip.text(num + ' ' + l[5854] + ' ' + l[5855]); // 1 New Notification
         }
         else {
-            $tooltip.text(num + ' ' + l[2041] + ' ' + l[862]); // X New Notifications
+            $tooltip.text(num + ' ' + l[5854] + ' ' + l[862]); // X New Notifications
         }
 
         // When the user hovers over the Notifications icon, show the number of notifications

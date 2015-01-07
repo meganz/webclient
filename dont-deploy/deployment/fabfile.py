@@ -6,6 +6,8 @@ from fabric.state import env
 def beta():
     env.hosts = ['deployer@beta.mega.nz']
 
+def sandbox3():
+    env.hosts = ['deployer@sandbox3.developers.mega.co.nz']
 
 def deploy():
     with cd("/var/www"):

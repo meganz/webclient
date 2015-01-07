@@ -1797,10 +1797,10 @@ function MegaData()
                 name = l[165];
             } else if (a2[i] === 'opc') {
                 typeclass = 'sent-requests';
-                name = l[2050];
+                name = l[5862];
             } else if (a2[i] === 'ipc') {
                 typeclass = 'received-requests';
-                name = l[2051];
+                name = l[5863];
             } else if (a2[i] === 'shares') {
                 typeclass = 'shared-with-me';
                 name = '';

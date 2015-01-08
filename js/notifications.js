@@ -580,7 +580,7 @@ var notifyPopup = {
         var message= '';
         var mostRecentNotification = true;
         
-        // Check if a newer contact request for this user has already been rendered
+        // Check if a newer contact request for this user has already been rendered (notifications are sorted by timestamp)
         for (var i = 0, length = notifyPopup.renderedPendingContactRequests.length; i < length; i++) {
 
             // If this contact request has already been rendered, don't render the current notification with buttons
@@ -592,14 +592,18 @@ var notifyPopup = {
         // If this is the most recent IPC from this user
         if (mostRecentNotification) {
             
+            // If this notification also exists in the state
+            if (M.ipc[pendingContactId]) {
+                
+                // Render the Accept/Not now buttons
+                pendingContactHtml = '<span class="notification-request-buttons">'
+                                   +    '<span class="fm-dialog-button notifications-button accept" data-pending-contact-id="' + pendingContactId + '">Accept</span>'
+                                   +    '<span class="fm-dialog-button notifications-button not-now" data-pending-contact-id="' + pendingContactId + '">Not now</span>'
+                                   + '</span>';
+            }
+            
             // Set a flag so the buttons are not rendered again on older notifications
             notifyPopup.renderedPendingContactRequests.push(pendingContactId);
-
-            // Render the Accept/Not now buttons
-            pendingContactHtml = '<span class="notification-request-buttons">'
-                               +    '<span class="fm-dialog-button notifications-button accept" data-pending-contact-id="' + pendingContactId + '">Accept</span>'
-                               +    '<span class="fm-dialog-button notifications-button not-now" data-pending-contact-id="' + pendingContactId + '">Not now</span>'
-                               + '</span>';
         };
         
         // Search the contact requests that the user has temporarily hidden

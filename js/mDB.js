@@ -12,6 +12,7 @@ if (indexedDB)
 {
     var mDB = 1;
     var request;
+    var mDBloaded;
     var mDBStartError;
 
     function mDBfetch()
@@ -388,7 +389,7 @@ if (indexedDB)
             delete localStorage[u_handle + '_maxaction'];
             delete localStorage[u_handle + '_mDBactive'];
             mDBact = Math.random();
-            mDBloaded = {'ok': 0, 'u': 0, 'f_sk': 0, 'f': 0, 's': 0, 'opc': 0, 'ipc': 0, 'ps': 0};
+            mDBcls(); // clears mDBloaded
             Qt = undefined;
             request = undefined;
             mDB = 1;
@@ -396,5 +397,9 @@ if (indexedDB)
         }
     }
 
-    var mDBloaded = {'ok': 0, 'u': 0, 'f_sk': 0, 'f': 0, 's': 0, 'opc': 0, 'ipc': 0, 'ps': 0};
+    function mDBcls()
+    {
+        mDBloaded = {'ok': 0, 'u': 0, 'f_sk': 0, 'f': 0, 's': 0, 'opc': 0, 'ipc': 0, 'ps': 0};
+    }
+    mDBcls();
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script>
+        /**
+         devboot is a temp solution that is used in our CI for demo purposes... (no php there ;)), so if anyone wonders
+         whats the "dont-deploy" folder, it contains stuff which are used for development/debugging/internal demo
+         purposes and it should not be deployed to production.
+
+         the devboot.html also setups the localStorage so that:
+
+         0) clear the localStorage
+
+         1) debug mode is enabled - e.g. a lot of stuff will be printed in the dev console, via console.*
+
+         2) static path is dynamically set to ../../ (relative to dont-deploy/devboot.html) which means that the
+         staticPath should be correctly set even if you have your project running in localhost/meganz-webclient/ or
+         customVhost/ + it will work with http OR https
+
+         3) will enable the megaChat (<-- major thing, may change a lot of stuff)
+
+         4) will force the secureboot to load the actual .js files instead of just pushing ALL javascript files into a
+         single blog: (this was really helpful for me when i had to debug the js code using the Chrome debugger)
+
+         5) will enable stopOnAssertFail, which in case of assertion fail (mainly in the chat.js code) will run a
+         debugger; (something pretty handy during development)
+
+         */
+
+        var devhost = window.location.host;
+        var pathSuffix = window.location.pathname;
+        pathSuffix = pathSuffix.split("/").slice(0,-2).join("/");
+        
+        localStorage.clear();
+        
+        localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+
+        localStorage.dd = 1;
+
+        localStorage.jj = 1;
+        localStorage.d = 1;
+
+        localStorage.chatDisabled = 1;
+        
+        window.location = '../index.html';
+    </script>
+</head>
+<body>
+
+</body>
+</html>

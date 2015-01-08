@@ -234,6 +234,7 @@ function init_page()
         
 		delete localStorage.voucher;
 	}
+    
 	if (page.substr(0, 10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
@@ -273,7 +274,40 @@ function init_page()
 		blogmonth = page.substr(5,page.length-2);
 		page = 'blog';
 	}
-	if (page.substr(0,6) == 'signup')
+    
+    // If user has been invited to join MEGA and they are not already registered
+    else if (page.substr(0,9) == 'newsignup') {
+        
+        // Get the email and hash checksum from after the #newsignup tag
+        var emailAndHash = page.substr(9);
+        var emailAndHashDecoded = base64urldecode(emailAndHash);
+                
+        // Separate the email and checksum portions
+        var endOfEmailPosition = emailAndHashDecoded.length - 8;
+        var email = emailAndHashDecoded.substring(0, endOfEmailPosition);
+        var hashChecksum = emailAndHashDecoded.substring(endOfEmailPosition);
+        
+        // Hash the email address
+        var hashBytes = asmCrypto.SHA512.bytes(email);
+        
+        // Convert the first 8 bytes of the email to an ASCII string
+        var byteString = '';
+        for (var i=0; i < 8; i++) {
+            byteString += String.fromCharCode(parseInt(hashBytes[i]));
+        }
+        
+        // If the checksum matches, redirect to #register page
+        if (hashChecksum === byteString) {
+            
+            // Store in the localstorage as this gets pre-populated into the register form
+            localStorage.registeremail = email;
+            
+            // Redirect to the register page
+            removeHash();
+            location.hash = '#register';
+        }
+    }
+	else if (page.substr(0,6) == 'signup')
 	{
 		var signupcode = page.substr(6,page.length-1);
 		loadingDialog.show();

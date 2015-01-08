@@ -296,6 +296,9 @@ function init_page()
             byteString += String.fromCharCode(parseInt(hashBytes[i]));
         }
         
+        // Unset registration email
+        localStorage.removeItem('registeremail');
+        
         // If the checksum matches, redirect to #register page
         if (hashChecksum === byteString) {
             
@@ -305,6 +308,14 @@ function init_page()
             // Redirect to the register page
             removeHash();
             location.hash = '#register';
+        }
+        else {
+            // Redirect to the register page
+            removeHash();
+            location.hash = '#register';
+            
+            // Show message
+            alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
         }
     }
 	else if (page.substr(0,6) == 'signup')

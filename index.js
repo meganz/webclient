@@ -290,7 +290,7 @@ function init_page()
         // Hash the email address
         var hashBytes = asmCrypto.SHA512.bytes(email);
         
-        // Convert the first 8 bytes of the email to an ASCII string
+        // Convert the first 8 bytes of the email to a Latin1 string for comparison
         var byteString = '';
         for (var i=0; i < 8; i++) {
             byteString += String.fromCharCode(parseInt(hashBytes[i]));

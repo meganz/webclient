@@ -880,7 +880,14 @@ else
             while (i--) l[i]='l';
             for (var i in jsl)
             {
-                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + r + '"></sc' + 'ript>');
+                // If in Development turn off the current time string being appended to the URL.
+                // This enables debugging as breakpoints are not removed on page refresh.
+                var timeString = r;
+                if (d) {
+                    timeString = '';
+                }
+                
+                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + timeString + '"></sc' + 'ript>');
                 else if (jsl[i].j === 2)
                 {
                     if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
@@ -890,7 +897,14 @@ else
 
             if ( 0 ) for (var k in jsl2)
             {
-                if (jsl2[k].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl2[k].f + '?r=' + Math.random() + '"></sc' + 'ript>');
+                // If in Development turn off the random string being appended to the URL.
+                // This enables debugging as breakpoints are not removed on page refresh.
+                var randomString = Math.random();
+                if (d) {
+                    randomString = '';
+                }
+                
+                if (jsl2[k].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl2[k].f + '?r=' + randomString + '"></sc' + 'ript>');
                 else if (jsl2[k].j === 2)
                 {
                     if ((m && (jsl2[k].m)) || ((!m) && (jsl2[k].d)))

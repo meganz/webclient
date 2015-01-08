@@ -3911,33 +3911,45 @@ function execsc(actionPackets, callback) {
             if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
-                // Show a notification
-                addIpcOrContactNotification(actionPacket);
+                // Only show a notification if we did not trigger the action ourselves
+                if (actionPacket.ou !== u_attr.u) {
+                    addIpcOrContactNotification(actionPacket);
+                }
 
                 if (megaChat && megaChat.is_initialized) {
                     $.each(actionPacket.u, function(k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
-            } else if (actionPacket.a === 'opc') {    // Outgoing pending contact
+            }
+            else if (actionPacket.a === 'opc') {    // Outgoing pending contact
                 processOPC([actionPacket]);
 
                 // Don't append to sent grid on deletion
                 if (!actionPacket.dts) {
                     M.drawSentContactRequests([actionPacket]);
                 }
-            } else if (actionPacket.a === 'ipc') {    // Incoming pending contact
+            }
+            else if (actionPacket.a === 'ipc') {    // Incoming pending contact
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 addIpcOrContactNotification(actionPacket);
-            } else if (actionPacket.a === 's2') {     // Pending shares
+            }
+            else if (actionPacket.a === 's2') {     // Pending shares
                 processPS([actionPacket]);
-            } else if (actionPacket.a === 'upci') {   // Incomming request updated
+            }
+            else if (actionPacket.a === 'upci') {   // Incomming request updated
                 processUPCI([actionPacket]);
-            } else if (actionPacket.a === 'upco') {   // Outgoing request updated
+            }
+            else if (actionPacket.a === 'upco') {   // Outgoing request updated
                 processUPCO([actionPacket]);
-                addIpcOrContactNotification(actionPacket);
-            } else if (actionPacket.a === 'ua') {
+                
+                // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
+                if (actionPacket.s !== 2) {
+                    addIpcOrContactNotification(actionPacket);
+                }
+            }
+            else if (actionPacket.a === 'ua') {
                 for (var j in actionPacket.ua) {
                     if (actionPacket.ua[j] === '+a') {
                         avatars[actionPacket.u] = undefined;
@@ -4137,8 +4149,11 @@ function execsc(actionPackets, callback) {
                 $('#contact_' + actionPacket.ou).remove();
                 M.handleEmptyContactGrid();
             }
-            // Show a notification
-            addIpcOrContactNotification(actionPacket);
+            
+            // Only show a notification if we did not trigger the action ourselves
+            if (actionPacket.ou !== u_attr.u) {
+                addIpcOrContactNotification(actionPacket);
+            }
 
             if (megaChat && megaChat.is_initialized) {
                 $.each(actionPacket.u, function(k, v) {
@@ -4211,7 +4226,11 @@ function execsc(actionPackets, callback) {
             processUPCI([actionPacket]);
         } else if (actionPacket.a === 'upco') {
             processUPCO([actionPacket]);
-            addIpcOrContactNotification(actionPacket);
+            
+            // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
+            if (actionPacket.s !== 2) {
+                addIpcOrContactNotification(actionPacket);
+            }
         } else {
             if (d) {
                 console.log('not processing this action packet', actionPacket);

@@ -581,3 +581,5 @@ function countDif(strPassword)
 	}
 	return nCount;
 }
+
+

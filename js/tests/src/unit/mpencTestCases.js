@@ -110,9 +110,9 @@ describe("mpenc integration and regression tests", function() {
 
             phs[0].flushQueues();
 
-            expect(phs[0].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[1].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[2].state).to.eql(mpenc.handler.STATE.INITIALISED);
+            expect(phs[0].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[1].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[2].state).to.eql(mpenc.handler.STATE.READY);
 
 
             phs[1].enabled = phs[2].enabled = false; // mark as disabled, e.g. no messages will be processed
@@ -133,9 +133,9 @@ describe("mpenc integration and regression tests", function() {
 
             phs[0].flushQueues();
 
-            expect(phs[0].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[3].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[4].state).to.eql(mpenc.handler.STATE.INITIALISED);
+            expect(phs[0].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[3].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[4].state).to.eql(mpenc.handler.STATE.READY);
 
             done();
         });
@@ -155,9 +155,9 @@ describe("mpenc integration and regression tests", function() {
 
             phs[0].flushQueues();
 
-            expect(phs[0].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[1].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[2].state).to.eql(mpenc.handler.STATE.INITIALISED);
+            expect(phs[0].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[1].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[2].state).to.eql(mpenc.handler.STATE.READY);
 
 
             phs[1].enabled = phs[2].enabled = false; // mark as disabled, e.g. no messages will be processed
@@ -175,9 +175,9 @@ describe("mpenc integration and regression tests", function() {
 
             phs[0].flushQueues();
 
-            expect(phs[0].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[3].state).to.eql(mpenc.handler.STATE.INITIALISED);
-            expect(phs[4].state).to.eql(mpenc.handler.STATE.INITIALISED);
+            expect(phs[0].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[3].state).to.eql(mpenc.handler.STATE.READY);
+            expect(phs[4].state).to.eql(mpenc.handler.STATE.READY);
 
             done();
         });

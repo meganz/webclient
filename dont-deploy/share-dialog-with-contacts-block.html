@@ -1,18 +1,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>MEGA 2.0</title>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-        <link rel="stylesheet" type="text/css" href="../css/style.css" />
-        <script type="text/javascript" src="../js/jquery-min-1.8.1.js"></script>
-        <script type="text/javascript" src="../js/jquery.jscrollpane.min.js"></script>
-        <script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
-        <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
-        <script type="text/javascript">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>MEGA 2.0</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<script type="text/javascript" src="../js/jquery-1.8.1.js"></script>
+<script type="text/javascript" src="../js/jquery.jscrollpane.js"></script>
+<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="../js/jquery.tokeninput.js"></script>
+<script type="text/javascript">
 
-			$(document).ready(function ()
-			{
+$(document).ready(function ()
+{
 				function dialogPositioning() {
 					$('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
 				}
@@ -41,13 +41,18 @@
 
 				$('.share-dialog-permissions').unbind('click');
 				$('.share-dialog-permissions').bind('click', function () {
-					var m = $('.permissions-menu');
+					var m = $('.permissions-menu'),
+					    scrollPos = 0;
+					if ($('.share-dialog-contacts .jspPane'))
+					   scrollPos = $('.share-dialog-contacts .jspPane').position().top;
 					m.removeClass('search-permissions');
 					if ($(this).attr('class').indexOf('active') == -1) {
-						var x = $(this).position().left + 42;
-						var y = $(this).position().top + 13;
-						m.css('left', x + 'px');
-						m.css('top', y + 'px');
+						var x = $(this).position().left + 50;
+						var y = $(this).position().top + 14 + scrollPos;
+						m.css({
+							'left': x,
+							'top': y
+						});
 						m.removeClass('hidden');
 						$(this).addClass('active');
 					} else {
@@ -60,10 +65,12 @@
 				$('.permissions-icon').bind('click', function () {
 					var m = $('.permissions-menu');
 					if ($(this).attr('class').indexOf('active') == -1) {
-						var x = $(this).position().left + 35;
-						var y = $(this).position().top - 8;
-						m.css('left', x + 'px');
-						m.css('top', y + 'px');
+						var x = $(this).position().left + 12;
+						var y = $(this).position().top  + 8;
+		   				m.css({
+							'left': x,
+							'top': y
+						});
 						m.removeClass('hidden');
 						$(this).addClass('active');
 						m.addClass('search-permissions');
@@ -91,12 +98,90 @@
 					$('.share-dialog-permissions.active').removeClass('active');
 
 				});
-			});
+				
+	
+	//Pending info block
+	$('.pending-indicator').bind('mouseover', function() {
+		var x = $(this).position().left,
+		    y = $(this).position().top,
+			infoBlock = $('.share-pending-info'),
+			scrollPos = 0;
+		if ($('.share-dialog-contacts .jspPane'))
+			scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+		infoHeight = infoBlock.outerHeight();
+	    infoBlock.css({
+			'left': x,
+			'top': y - infoHeight + scrollPos
+		});
+		infoBlock.fadeIn(200);
+	});
+	$('.pending-indicator').bind('mouseout', function() {
+		$('.share-pending-info').fadeOut(200);
+	});
+	
+				
+	//Personal message
+	$('.share-message textarea').bind('focus', function() {
+		var $this = $(this);
+		$('.share-message').addClass('active');
+		if ($this.val() == 'Include personal message...') {
+          $this.select();
+          window.setTimeout(function() {
+            $this.select();
+          }, 1);
+          function mouseUpHandler() {
+            $this.off("mouseup", mouseUpHandler);
+            return false;
+          }
+          $this.mouseup(mouseUpHandler);
+		}
+	});
 
-        </script>
-    </head>
+	$('.share-message textarea').bind('blur', function() {
+		var $this = $(this);
+		$('.share-message').removeClass('active');
+	});
 
-    <body id="bodyel" class="bottom-pages">
+	function shareMessageResizing() {
+	  var txt = $('.share-message textarea'),
+	      txtHeight =  txt.outerHeight(),
+	      hiddenDiv = $('.share-message-hidden'),
+		  pane = $('.share-message-scrolling'),
+		  content = txt.val(),
+		  api;
+      content = content.replace(/\n/g, '<br />');
+      hiddenDiv.html(content + '<br/>');
+
+	  if (txtHeight != hiddenDiv.outerHeight() ) {
+		txt.height(hiddenDiv.outerHeight());
+
+	    if( $('.share-message-textarea').outerHeight()>=50) {
+	        pane.jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5});
+	        api = pane.data('jsp');
+		    txt.blur();
+		    txt.focus();
+		    api.scrollByY(0);
+		}
+		else {
+			api = pane.data('jsp');
+			if (api) {
+			  api.destroy();
+			  txt.blur();
+			  txt.focus();
+			}
+		}
+	  }
+	}
+
+	$('.share-message textarea').on('keyup', function () {
+	    shareMessageResizing();
+	});
+});
+
+</script>
+</head>
+
+<body id="bodyel" class="bottom-pages">
 
 
         <div class="fm-dialog-overlay"></div>
@@ -114,16 +199,26 @@
                     <div class="permissions-menu-item read-and-write"><div class="context-menu-icon"></div>Read & write</div>
                     <div class="permissions-menu-item read-only"><div class="context-menu-icon"></div>Read only</div>
                 </div> 
+                
+                <!-- Pending info block !-->
+                <div class="share-pending-info hidden">
+                  <div class="share-pending-arrow"></div>
+                  Share is on a pending state until a contact relationship is established.
+                </div>
+                
                 <!-- Please hide "share-dialog-img" if contacts list is not empty !-->
                 <div class="share-dialog-img hidden"></div>
                 <!-- Please unhide "share-dialog-contacts" if contacts list is not empty !-->
                 <div class="share-dialog-contacts">
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
-                    <div class="share-dialog-contact-bl">
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl pending">
                         <div class="nw-contact-avatar color10">UU</div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Bram van der Kolk</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions full-access">
                             <span></span>Full access
@@ -132,11 +227,46 @@
                         <div class='clear'></div>
                     </div>
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
                     <div class="share-dialog-contact-bl email">
                         <div class="nw-contact-avatar color10"></div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Andrei.d</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="share-dialog-permissions read-and-write">
+                            <span></span>Read & write
+                        </div>
+                        <div class="share-dialog-remove-button"></div>
+                        <div class='clear'></div>
+                    </div>
+                    
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl email">
+                        <div class="nw-contact-avatar color10"></div>
+                        <div class="fm-chat-user-info">
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="share-dialog-permissions read-and-write">
+                            <span></span>Read & write
+                        </div>
+                        <div class="share-dialog-remove-button"></div>
+                        <div class='clear'></div>
+                    </div>
+                    
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl email">
+                        <div class="nw-contact-avatar color10"></div>
+                        <div class="fm-chat-user-info">
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions read-and-write">
                             <span></span>Read & write
@@ -145,11 +275,14 @@
                         <div class='clear'></div>
                     </div>
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
                     <div class="share-dialog-contact-bl gmail">
                         <div class="nw-contact-avatar color10"></div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Andrei.d</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions read-only">
                             <span></span>Read only
@@ -158,11 +291,14 @@
                         <div class='clear'></div>
                     </div>
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
-                    <div class="share-dialog-contact-bl gmail">
-                        <div class="nw-contact-avatar color10"></div>
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
+                    <div class="share-dialog-contact-bl pending">
+                        <div class="nw-contact-avatar color2">AA</div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Andrei.d</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions read-only">
                             <span></span>Read only
@@ -171,11 +307,14 @@
                         <div class='clear'></div>
                     </div>
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
                     <div class="share-dialog-contact-bl gmail">
                         <div class="nw-contact-avatar color10"></div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Andrei.d</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions read-only">
                             <span></span>Read only
@@ -184,11 +323,14 @@
                         <div class='clear'></div>
                     </div>
 
-                    <!-- Please add "email"/"gmail" classnames. Please add "selected" classname. !-->
+                    <!-- Please add "email"/"gmail"/"pending" classnames. Please add "selected" classname. !-->
                     <div class="share-dialog-contact-bl gmail">
                         <div class="nw-contact-avatar color10"></div>
                         <div class="fm-chat-user-info">
-                            <div class="fm-chat-user">Andrei.d</div>
+                            <div class="fm-chat-user">
+                              <span>Username username username username username username username</span>
+                              <div class="pending-indicator"></div>
+                            </div>
                         </div>
                         <div class="share-dialog-permissions read-only">
                             <span></span>Read only
@@ -204,13 +346,23 @@
                         <span>Looks like there’s a malformed email there!</span>
                     </div>
                 </div>
-                <div class="share-dialog-icon permissions-icon"></div>
                 <div class="multiple-input">
                     <input type="text" class="share-multiple-input" name="" />
                 </div>
+                <div class="share-message">
+                 <div class="share-message-scrolling">
+                  <div class="share-message-textarea">
+                    <textarea >Include personal message...</textarea>
+                    <div class="share-message-hidden"></div>
+                  </div>
+                 </div>
+                </div>
             </div>
             <div class="fm-notifications-bottom">
-                <div class="import-contacts-link"><span></span>Input contacts...</div>
+                <div class="share-dialog-icon permissions-icon">
+                  <span></span>
+                  Read only
+                </div>
                 <div class="fm-dialog-button dialog-share-button">
                     Share
                 </div>

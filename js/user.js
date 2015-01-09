@@ -190,7 +190,8 @@ function u_logout(logout)
 			delete localStorage[u_handle + '_mDBactive'];
 		}
 		fminitialized = false;
-		notifications = u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
+		u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
+        notifyPopup.notifications = null;
 		api_setsid(false);
 		u_sharekeys = {};
 		u_nodekeys = {};
@@ -198,11 +199,12 @@ function u_logout(logout)
 		loggedout = true;
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
-		M = new MegaData();
-		mDBloaded = { 'ok' : 0, 'u' : 0, 'f_sk' : 0,'f' : 0, 's':0 };
+		M = new MegaData(); 
+        mDBcls(); // resets mDBloaded
 		$.hideContextMenu = function () {};
 		api_reset();
-		mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
+        mDBcls(); // resets mDBloaded (why is this done twice?)
+        
 		$.hideContextMenu= function () {};
 		if (waitxhr)
 		{
@@ -647,3 +649,16 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
         }
     };
 })(window);
+
+function isNonActivatedAccount() {
+    if(!u_privk && typeof(u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isEphemeral() 
+{
+    return (u_type === 0);
+}

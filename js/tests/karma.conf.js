@@ -8,8 +8,8 @@ module.exports = function(config) {
             "vendor/mocha/sinon-chai.js",
             "vendor/sinon-1.7.3.js",
 
-            "../jquery-min-1.8.1.js",
-            "../jquery-ui.js",
+            "../jquery-1.8.1.js",
+            "../jquery-ui-1.10.4.js",
 
             "src/helpers/fromMega.js",
 
@@ -18,7 +18,7 @@ module.exports = function(config) {
              "../jsbn.js",
              "../jsbn2.js",
              "../jodid25519.js",
-             "../jquery.jscrollpane.min.js",
+             "../jquery.jscrollpane.js",
              "../mega.js",
              "../fm.js",
              "../user.js",
@@ -44,8 +44,10 @@ module.exports = function(config) {
              "../vendor/chat/hark.patched.js",
              "../vendor/chat/base32.js",
 
-            "../vendor/chat/hmac-sha1.js",
-            "../vendor/chat/lib-typedarrays-min.js",
+             "../vendor/chat/cryptojs-core.js",
+             "../vendor/chat/cryptojs-sha1.js",
+             "../vendor/chat/cryptojs-hmac.js",
+             "../vendor/chat/cryptojs-lib-typedarrays.js",
              "../vendor/Autolinker.js",
 
              "../chat/fileTransfer.js",

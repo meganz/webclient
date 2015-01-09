@@ -117,7 +117,7 @@ describe("EncryptionFilter", function() {
     var megaChatMocker;
 
     var megaDataMocker;
-    
+
     var myJid;
     var otherUserJid;
 
@@ -1002,7 +1002,7 @@ describe("EncryptionFilter", function() {
             var room = megaChatObj.chats["room1@conference.jid.com"];
 
             var origMockedOpQueue = room.encryptionOpQueue;
-            // room containing users and the state == INITIALISED, should queue 'quit' op
+            // room containing users and the state == READY, should queue 'quit' op
             room.getUsers = function() {
                 return [
                 '1',
@@ -1010,7 +1010,7 @@ describe("EncryptionFilter", function() {
                 ]
             };
             room.encryptionHandler = {};
-            room.encryptionHandler.state = mpenc.handler.STATE.INITIALISED;
+            room.encryptionHandler.state = mpenc.handler.STATE.READY;
 
             megaChatObj.trigger("onRoomDestroy", room);
 
@@ -1102,7 +1102,7 @@ describe("EncryptionFilter", function() {
             e = new $.Event("onPluginsWait");
             megaChatObj.trigger(e, {
                 encryptionHandler: {
-                    state: mpenc.handler.STATE.INITIALISED
+                    state: mpenc.handler.STATE.READY
                 },
                 setState: function(newState) {
                     e.stateChanged = newState;
@@ -1200,7 +1200,7 @@ describe("EncryptionFilter", function() {
 
             // else 2 - true
             opQueue.ctx = {
-                'state': mpenc.handler.STATE.INITIALISED
+                'state': mpenc.handler.STATE.READY
             };
             expect(
                 opQueue.validateFn(
@@ -1299,7 +1299,7 @@ describe("EncryptionFilter", function() {
 
 
             // initialized + plugins wait
-            encHandler.state = mpenc.handler.STATE.INITIALISED;
+            encHandler.state = mpenc.handler.STATE.READY;
             room.state = ChatRoom.STATE.PLUGINS_WAIT;
             encHandler.stateUpdatedCallback(encHandler);
 
@@ -1317,7 +1317,7 @@ describe("EncryptionFilter", function() {
 
 
             // initialized + paused
-            encHandler.state = mpenc.handler.STATE.INITIALISED;
+            encHandler.state = mpenc.handler.STATE.READY;
             room.state = ChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
@@ -1326,7 +1326,7 @@ describe("EncryptionFilter", function() {
             expect(opQueue.pop.callCount).to.eql(2);
 
             // initialized + paused
-            encHandler.state = mpenc.handler.STATE.INITIALISED;
+            encHandler.state = mpenc.handler.STATE.READY;
             room.state = ChatRoom.STATE.PLUGINS_PAUSED;
             encHandler.stateUpdatedCallback(encHandler);
 
@@ -1340,7 +1340,7 @@ describe("EncryptionFilter", function() {
     });
 
     describe("Regression tests", function() {
-        it("issue 283 - ProtocolHandler changes his state to INITIALISED too early (BEFORE its actually initialised)", function(done) {
+        it("issue 283 - ProtocolHandler changes his state to READY too early (BEFORE its actually initialised)", function(done) {
             // ph1 is the owner of the room
             var ph1 = new mpenc.handler.ProtocolHandler(
                 "jid1",

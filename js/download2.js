@@ -444,12 +444,12 @@ DownloadQueue.prototype.splitFile = function(dl_filesize) {
 	else if (chunksize <= 1048576) chunksize = 1048576;
 	else chunksize = 1048576 * Math.floor(chunksize / 1048576);
 
-	// var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
-	var reserved = dl_filesize - chunksize;
-	var eofcs = Math.max(Math.floor(chunksize/3),1048576);
+	var reserved = dl_filesize - (chunksize * (dlQueue._limit - 1))
+	// var reserved = dl_filesize - chunksize;
+	// var eofcs = Math.max(Math.floor(chunksize/3),1048576);
 	while (p < dl_filesize) {
-		// dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
-		dl_chunksizes[p] = p > reserved ? eofcs : chunksize;
+		dl_chunksizes[p] = p > reserved ? 1048576 : chunksize;
+		// dl_chunksizes[p] = p > reserved ? eofcs : chunksize;
 		dl_chunks.push(p);
 		pp = p;
 		p += dl_chunksizes[p];

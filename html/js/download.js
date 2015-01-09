@@ -38,7 +38,10 @@ function Mads()
 		$('.ads-top-arrow').hide();
 		$('.ads-top-notification').hide();
 	}
-	console.error('Mads', typeof swiffy, silent_loading && silent_loading.name, silent_loading)
+	
+	
+	
+	//console.error('Mads', typeof swiffy, silent_loading && silent_loading.name, silent_loading);
 
 	$('body').addClass('ads');
 	if (typeof swiffy == 'undefined' && !silent_loading)
@@ -261,7 +264,13 @@ function dl_g(res)
 				onDownloadError: dlerror,
 				onBeforeDownloadComplete: function() { }
 			};
-			$('.new-download-file-title').text(fdl_file.n);
+			var n = fdl_file.n||'unknown', l = n.length;
+			$('.new-download-file-title').text(n);
+			var cs = $('.new-download-right-block').width() - parseInt($('.new-download-file-info').css('margin-left'));
+			while(l-- && $('.new-download-file-title').width() > cs) {
+				$('.new-download-file-title').text(str_mtrunc(n,l));
+			}
+			if (1 > l) $('.new-download-file-title').text(str_mtrunc(n,60));
 			$('.new-download-file-size').text(bytesToSize(res.s));
 			$('.new-download-file-icon').addClass(fileicon({name:fdl_file.n}));
 		}

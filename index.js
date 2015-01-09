@@ -7,7 +7,7 @@ var pfid = false;
 var n_h = false;
 var n_k_aes = false;
 var fmdirid=false;
-var u_type,cur_page,u_checked
+var u_type,cur_page,u_checked;
 var confirmcode = false;
 var confirmok = false;
 var hash = window.location.hash;
@@ -59,7 +59,6 @@ function mainScroll()
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
 	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
-
 }
 
 function scrollMenu()
@@ -235,6 +234,7 @@ function init_page()
         
 		delete localStorage.voucher;
 	}
+    
 	if (page.substr(0, 10) == 'blogsearch')
 	{
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
@@ -274,7 +274,51 @@ function init_page()
 		blogmonth = page.substr(5,page.length-2);
 		page = 'blog';
 	}
-	if (page.substr(0,6) == 'signup')
+    
+    // If user has been invited to join MEGA and they are not already registered
+    else if (page.substr(0,9) == 'newsignup') {
+        
+        // Get the email and hash checksum from after the #newsignup tag
+        var emailAndHash = page.substr(9);
+        var emailAndHashDecoded = base64urldecode(emailAndHash);
+                
+        // Separate the email and checksum portions
+        var endOfEmailPosition = emailAndHashDecoded.length - 8;
+        var email = emailAndHashDecoded.substring(0, endOfEmailPosition);
+        var hashChecksum = emailAndHashDecoded.substring(endOfEmailPosition);
+        
+        // Hash the email address
+        var hashBytes = asmCrypto.SHA512.bytes(email);
+        
+        // Convert the first 8 bytes of the email to a Latin1 string for comparison
+        var byteString = '';
+        for (var i=0; i < 8; i++) {
+            byteString += String.fromCharCode(parseInt(hashBytes[i]));
+        }
+        
+        // Unset registration email
+        localStorage.removeItem('registeremail');
+        
+        // If the checksum matches, redirect to #register page
+        if (hashChecksum === byteString) {
+            
+            // Store in the localstorage as this gets pre-populated into the register form
+            localStorage.registeremail = email;
+            
+            // Redirect to the register page
+            removeHash();
+            location.hash = '#register';
+        }
+        else {
+            // Redirect to the register page
+            removeHash();
+            location.hash = '#register';
+            
+            // Show message
+            alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
+        }
+    }
+	else if (page.substr(0,6) == 'signup')
 	{
 		var signupcode = page.substr(6,page.length-1);
 		loadingDialog.show();
@@ -618,13 +662,13 @@ function init_page()
 		parsepage(pages['download'],'download');
 		dlinfo(dlid,dlkey,false);
 	}
-	else if (is_fm())
-	{
+	else if (is_fm()) {
 		var id = false;
-		if (page.substr(0,2) == 'fm')
-		{
+		if (page.substr(0,2) === 'fm') {
 			id = page.replace('fm/','');
-			if (id.length < 5 && id !== 'chat') id =false;
+			if (id.length < 5 && (id !== 'chat' && id !== 'opc' && id !== 'ipc')) {
+                id =false;
+            }
 		}
 
 		if (!id && fminitialized) id = M.RootID;
@@ -635,25 +679,31 @@ function init_page()
 			M.reset();
 			folderlink=0;
 			fminitialized=false;
-			mDBloaded = {'ok':0,'u':0,'f_sk':0,'f':0,'s':0};
-			notifications=undefined;
+			mDBcls();
+			notifyPopup.notifications = null;
 		}
-		if (!fminitialized)
-		{
-			if (id) M.currentdirid = id;
-			if (!m && $('#fmholder').html() == '') $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
-			if (typeof mDB !== 'undefined' && !pfid) mDBstart();
-			else loadfm();
+		if (!fminitialized) {
+			if (id) {
+                M.currentdirid = id;
+            }
+			if (!m && $('#fmholder').html() == '') {
+                $('#fmholder').html( translate(pages['fm'].replace(/{staticpath}/g,staticpath)));
+            }
+			if (typeof mDB !== 'undefined' && !pfid) {
+                mDBstart();
+            } else {
+                loadfm();
+            }
 			andreiScripts();
-			if (pfid)
-			{
+			if (pfid) {
 				$('.fm-left-menu .folderlink').removeClass('hidden');
 				$('.fm-tree-header.cloud-drive-item span').text(l[808]);
 				$('.fm-tree-header').not('.cloud-drive-item').hide();
 				$('.fm-menu-item').hide();
 			}
-		}
-		else if (!pfid && id && id !== M.currentdirid) M.openFolder(id);
+		} else if (!pfid && id && id !== M.currentdirid) {
+            M.openFolder(id);
+        }
 		$('#topmenu').html(parsetopmenu());
 		if (!u_type) $('body').attr('class','not-logged');
 		else $('body').attr('class','');
@@ -682,19 +732,15 @@ function init_page()
             $(document.body).addClass("megaChatDisabled");
         }
 	}
-	else if (page.substr(0,2) == 'fm' && !u_type)
-	{
-		if (loggedout)
-		{
+	else if (page.substr(0,2) == 'fm' && !u_type) {
+		if (loggedout) {
 			document.location.hash = 'start';
 			return false;
 		}
 		login_next = page;
 		login_txt = l[1298];
 		document.location.hash = 'login';
-	}
-	else
-	{
+	} else {
 		page = 'start';
 		parsepage(pages['start'],'start');
 		init_start();
@@ -931,7 +977,7 @@ function topmenuUI() {
     }
 
     // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (u_attr.firstname === '') && (u_attr.name !== '')) {
+    else if ((u_type == 3) && (!u_attr.firstname) && (typeof u_attr.name != 'undefined') && (u_attr.name.indexOf(' ') != -1)) {
 
         // Try get the first name from the full 'name' property and display
         var nameParts = u_attr.name.split(' ');
@@ -963,6 +1009,7 @@ function topmenuUI() {
 
         $('.membership-status').show();
 
+        // If the chat is disabled don't show the green status icon in the header
         if (!MegaChatDisabled) {
             $('.activity-status-block, .activity-status').show();
             megaChat.renderMyStatus();
@@ -989,9 +1036,17 @@ function topmenuUI() {
             $('.top-warning-popup').unbind('click');
             $('.top-warning-popup').bind('click', function(e) {
 
+				if(isNonActivatedAccount()) {
+					return;
+				}
+
                 $('.top-warning-popup').removeClass('active');
                 document.location.hash = 'register';
             });
+	    
+	    	if(isNonActivatedAccount()) {
+                showNonActivatedAccountDialog();
+	    	}
 
             if (page !== 'register') {
                 $('.top-warning-popup').addClass('active');
@@ -1354,10 +1409,10 @@ function topmenuUI() {
 		document.location.hash = '#';
 	});
 
-	var c = $('.fm-dialog.registration-success').attr('class');
+	var c = $('.fm-dialog.registration-page-success').attr('class');
 	if (c.indexOf('hidden') == -1)
 	{
-		$('.fm-dialog.registration-success').addClass('hidden');
+		$('.fm-dialog.registration-page-success').addClass('hidden');
 		$('.fm-dialog-overlay').addClass('hidden');
 		$('body').removeClass('overlayed');
 	}
@@ -1379,14 +1434,19 @@ function topmenuUI() {
 		$('.top-search-bl input').val(M.currentdirid.replace('search/',''));
 	}
 
-	if (u_type) $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
-	initNotifications();
+	if (u_type) {
+        $('.membership-popup-arrow').css('margin-right',$('.top-menu-icon').width()+$('.membership-status-block').width()/2+57+'px');
+    }
+    
+	notifyPopup.initNotifications();
 }
 
-function is_fm()
-{
-	if ((u_type !== false && page == '') || (u_type !== false && page.substr(0,2) == 'fm') || (u_type !== false && page == 'start') || (u_type !== false && page.substr(0,7) == 'account') || pfid) return true;
-	else return false;
+function is_fm() {
+	if ((u_type !== false && page === '') || (u_type !== false && page.substr(0,2) === 'fm') || (u_type !== false && page === 'start') || (u_type !== false && page.substr(0,7) === 'account') || pfid) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function parsepage(pagehtml,pp)

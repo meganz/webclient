@@ -47,7 +47,7 @@ $.fn.removeClassWith = function(pfx)
 jQuery.fn.extend({
 	rebind: function(actions, callback) {
 		return this.each(function() {
-			var $this = $(this)
+			var $this = $(this);
 			$this.unbind(actions);
 			$this.bind(actions, callback);
 		});

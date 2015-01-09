@@ -1395,8 +1395,16 @@ a.blog-button:hover {
 .nt-contact-request .notification-avatar-icon {
 	background-position: -10px -287px;
 }
+.nt-contact-deleted .notification-avatar-icon {
+	background-position: -10px -89px;
+}
 .nt-contact-accepted .notification-avatar-icon {
 	background-position: -10px -351px;
+}
+.nt-contact-request-denied .notification-avatar-icon,
+.nt-contact-request-blocked .notification-avatar-icon,
+.nt-contact-request-ignored .notification-avatar-icon {
+	background-position: -10px -153px;
 }
 .notification-popup .jspDrag {
 	width: 4px;
@@ -2055,6 +2063,11 @@ form {
 	text-align: center;
 	line-height: 16px;
 	margin-left: 5px;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 a.blog-new-archive-lnk:hover .blog-archive-number {
 	background-color: #797979;
@@ -2076,6 +2089,11 @@ p .blog-new-read-more, p a.blog-new-read-more {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-family: 'Open Sans', Arial;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 p a.blog-new-read-more:hover {
 	color: white !important;
@@ -2181,6 +2199,11 @@ a.blog-new-archive-lnk {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
 }
 .blog-pagination-button:hover, .blog-pagination-button.active {
 	background-color: #D42400;
@@ -4449,6 +4472,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .notification-popup-icon:hover, .notification-popup-icon.active {
 	background-position: -9px -325px;
 }
+.notification-button {
+    position: relative;
+}
 .cloud-popup-icon, .warning-popup-icon, .top-chat-notification {
 	float: right;
 	height: 24px;
@@ -4474,15 +4500,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .new-notification-info {
 	height: 24px;
 	line-height: 22px;
-	background-color: rgba(0,0,0,0.8);
-	padding: 0 8px;
-	border-radius: 8px;
+    background-color: #333;
+	padding: 0 8px;	
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
+    border-radius: 8px;
 	white-space: nowrap;
 	font-size: 11px;
 	color: #CCCCCC;
-	margin: 55px 0 0 -40px;
+	margin: 21px 0 0 -59px;
 	position: absolute;
 	left: 50%;
 	z-index: 100;
@@ -6743,6 +6769,11 @@ table {
 	border-top-right-radius: 0;
 	overflow: hidden;
 }
+.fm-file-upload.last-button {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+}
 .fm-file-upload {
 	background-position: 2px -1091px;
 }
@@ -6854,6 +6885,13 @@ span.search-number {
 }
 .fm-contact-requests:hover, .fm-sent-requests:hover {
 	background-color: rgba(119,119,119,1);
+}
+.chat-button.disabled {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+	-moz-opacity: 0.6;
+	-khtml-opacity: 0.6;
+	opacity: 0.6;
+	cursor: default;
 }
 .chat-button.fm-add-user {
 	padding: 0 0 0 28px;
@@ -7156,7 +7194,7 @@ span.search-number {
 }
 .fm-empty-button, .fm-not-logged-button {
 	cursor: pointer;
-	background-color: rgba(109,176,63,0.7);
+	background-color: rgba(107,177,54,0.8);
 	display: inline-block;
 	padding: 0 24px;
 	color: white;
@@ -7186,7 +7224,7 @@ span.search-number {
 	background-color: rgba(217,0,7,1);
 }
 .fm-empty-button:hover {
-	background-color: rgba(109,176,63,1);
+	background-color: rgba(107,177,54,1);
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;
@@ -7250,7 +7288,7 @@ span.search-number {
 	background-position: 0 -4912px;
 }
 .context-menu, .nw-sorting-menu, .dialog-sorting-menu, .permissions-menu {
-	min-width: 164px;
+	min-width: 160px;
 	position: absolute;
 	background-color: #333333;
 	-moz-border-radius: 8px;
@@ -7263,6 +7301,9 @@ span.search-number {
 	box-sizing: border-box;
 	z-index: 500;
 	padding: 8px 0;
+}
+.search-permissions .permissions-menu-arrow {
+	display:none;
 }
 .nw-sorting-menu {
 	right: -156px;
@@ -7427,7 +7468,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: transparent;
 	border: 0;
 }
-.add-user-notification {
+.add-user-notification, .share-message {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
@@ -7442,13 +7483,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	box-sizing: border-box;
 	margin-top: 12px;
 }
-.add-user-nt-scrolling {
+.add-user-nt-scrolling, .share-message-scrolling {
 	height: 50px;
 }
-.add-user-nt-scrolling .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag {
 	width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden {
 	border: 0;
 	padding: 0;
 	background-color: transparent;
@@ -7468,22 +7509,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	overflow: hidden;
 	min-height: 36px;
 }
-.add-contact-hidden {
+.add-contact-hidden, .share-message-hidden {
 	display: none;
 	height: auto;
 	overflow: visible;
 }
-.add-user-textarea {
+.add-user-textarea, .share-message-textarea {
 	padding: 7px 10px 7px 3px;
 }
-.add-user-nt-scrolling textarea::selection {
+.add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
 	background-color: #333333;
 	color: white;
 }
-.add-user-notification.active .add-user-nt-scrolling textarea {
+.add-user-notification.active .add-user-nt-scrolling textarea, .share-message.active textarea {
 	color: white;
 }
-.add-user-notification.active {
+.add-user-notification.active, .share-message.active {
 	background-position: -3px -3597px;
 	background-color: rgba(0,0,0,0.2);
 }
@@ -11776,7 +11817,7 @@ table {
 	background-position: -75px -207px;
 }
 .read-only .context-menu-icon {
-	background-position: -75px -239px;
+	background-position: -75px -238px;
 }
 .top-user-status-item {
 	padding-left: 5px;
@@ -14203,6 +14244,7 @@ h5.main-italic-header {
 	line-height: 18px;
 	color: #333333;
 	padding-top: 10px;
+	white-space: nowrap;
 }
 .new-download-file-size {
 	font-size: 11px;
@@ -19456,7 +19498,22 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	background-color: rgba(0,0,0,0.02);
 	color: #fff;
 }
-.search-avatar {
+.share-dialog-contact-bl .fm-chat-user span {
+	max-width: 100%;
+	display: inline-block;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	white-space: nowrap;
+}
+.share-dialog-contact-bl.pending .fm-chat-user span {
+	max-width: -webkit-calc(100% - 26px);
+	max-width: -moz-calc(100% - 26px);
+	max-width: calc(100% - 26px);
+}
+.search-avatar, .pending-indicator {
 	display: block;
 	width: 16px;
 	height: 16px;
@@ -19473,6 +19530,51 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	border-radius: 100%;
 	text-transform: uppercase;
 }
+.pending-indicator {
+	display: none;
+}
+.share-pending-info {
+	width: 240px;
+	padding: 12px 15px 14px 15px;
+	position: absolute;
+	z-index: 10;
+	background-color: #333333;
+	margin:6px 0 0 -98px;
+	font-size: 12px;
+	line-height: 18px;
+	color: #FFDD00;
+	text-align: center;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.share-pending-arrow {
+	position: absolute;
+	bottom: -10px;
+	height: 10px;
+	left: 50%;
+	margin-left: -9px;
+	width: 18px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: left -3831px;
+}
+.pending .pending-indicator {
+	display: inline-block;
+	position: relative;
+	top: 1px;
+	left:5px;
+	margin: 0;
+	font-size: 12px;
+	line-height: 17px;
+	vertical-align: top;
+}
+.pending .pending-indicator::before {
+	content: '\00a0';
+}
 .search-avatar img {
 	width: 16px;
 	height: 16px;
@@ -19480,7 +19582,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.email .search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar {
+.email .search-avatar, .gmail .search-avatar, .gmail .nw-contact-avatar, .email .nw-contact-avatar, .pending .search-avatar, .pending-indicator {
 	background-color: transparent !important;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -19492,6 +19594,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 .gmail .search-avatar, .gmail .nw-contact-avatar {
 	background-color: #DD4B39 !important;
 	background-position: center -630px;
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
+}
+.pending .search-avatar, .pending-indicator {
+	background-color: #FCAD00 !important;
+	background-position: -3px -3761px;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -19538,48 +19647,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 	background-position: -81px -84px;
 	background-repeat: no-repeat;
 }
-.share-dialog-icon.permissions-icon {
-	width: 30px;
-	background-position: -85px -275px;
-	right: 13px;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
-	cursor: pointer;
-}
-.share-dialog-icon.permissions-icon:hover {
-	-webkit-transition: opacity 200ms ease-in-out;
-	-moz-transition: opacity 200ms ease-in-out;
-	-o-transition: opacity 200ms ease-in-out;
-	-ms-transition: opacity 200ms ease-in-out;
-	transition: opacity 200ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-	-moz-opacity: 0.5;
-	-khtml-opacity: 0.5;
-	opacity: 0.5;
-}
 .active .share-dialog-icon, .active .add-user-icon, .error .share-dialog-icon, .error .add-user-icon {
 	background-position: -81px -314px;
-}
-.active .share-dialog-icon.permissions-icon, .error .share-dialog-icon.permissions-icon {
-	background-position: -85px -239px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
-	-moz-opacity: 1;
-	-khtml-opacity: 1;
-	opacity: 1;
-}
-.share-dialog-icon.permissions-icon.full-access {
-	background-position: -85px -355px;
-}
-.share-dialog-icon.permissions-icon.read-and-write {
-	background-position: -85px -393px;
-}
-.active .share-dialog-icon.permissions-icon.full-access {
-	background-position: -85px -175px;
-}
-.active .share-dialog-icon.permissions-icon.read-and-write {
-	background-position: -85px -207px;
 }
 .active .multiple-input {
 	background-color: rgba(0,0,0,0.2);
@@ -19641,6 +19710,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	border-radius: 5px;
 	margin-bottom: 12px;
 	overflow: hidden;
+	position:relative;
+}
+.share-with-contact-dialog .share-dialog-contacts {
+	max-height: 192px;
 }
 .share-dialog-contact-bl {
 	height: 48px;
@@ -19659,7 +19732,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-color: rgba(0,0,0,0.05);
 }
 .share-dialog-contact-bl .fm-chat-user-info {
-	width: 228px;
+	width: 203px;
 	padding-right: 10px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -19674,29 +19747,53 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.share-dialog-permissions {
+.share-dialog-permissions, .share-dialog-icon.permissions-icon {
 	float: left;
-	line-height: 24px;
-	margin-top: 11px;
+	line-height: 28px;
+	height: 32px;
+	margin-top: 8px;
+	min-width: 159px;
 	color: #666666;
+	border: 2px solid rgba(0,0,0,0.05);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
-	box-sizing: border-box;
+	box-sizing: padding-box;
+	background-color: white;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	max-width: 140px;
 	font-size: 11px;
-	padding-left: 30px;
+	padding: 0 20px 0 35px;
 	position: relative;
 	cursor: pointer;
+	-webkit-transition: border-color 200ms ease-in-out;
+	-moz-transition: border-color 200ms ease-in-out;
+	-o-transition: border-color 200ms ease-in-out;
+	-ms-transition: border-color 200ms ease-in-out;
+	transition: border-color 200ms ease-in-out;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -3714px;
 }
-.share-dialog-permissions span {
+.share-dialog-icon.permissions-icon {
+	margin: 12px;
+}
+.share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
+	border: 2px solid rgba(0,0,0,0.3);
+}
+.share-dialog-permissions span, .share-dialog-icon.permissions-icon span {
 	width: 24px;
 	height: 24px;
 	position: absolute;
-	left: 0;
+	top: 2px;
+	left: 8px;
 	display: block;
 	background-image: url(../images/mega/dialogs-sprite.svg);
 	background-repeat: no-repeat;
@@ -19711,13 +19808,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-khtml-opacity: 0.3;
 	opacity: 0.3;
 }
-.share-dialog-permissions.full-access span {
-	background-position: -87px -357px;
+.share-dialog-permissions.full-access span, .share-dialog-icon.permissions-icon.full-access span {
+	background-position: -87px -358px;
 }
-.share-dialog-permissions.read-and-write span {
+.share-dialog-permissions.read-and-write span, .share-dialog-icon.permissions-icon.read-and-write span {
 	background-position: -87px -396px;
 }
-.share-dialog-permissions:hover span, .share-dialog-permissions.active span {
+.share-dialog-permissions:hover span, .share-dialog-permissions.active span, .share-dialog-icon.permissions-icon:hover span, .share-dialog-icon.permissions-icon.active span {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
@@ -19986,7 +20083,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .share-dialog-tree-panel {
 	overflow: hidden;
-	margin: -12px;
+	margin: 0 -12px 12px -12px;
 }
 .share-dialog-tree-panel .jspVerticalBar {
 	width: 22px;
@@ -20007,10 +20104,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	top: 11px;
 }
 .dialog-tree-panel-scroll {
-	height: 192px;
-}
-.dialog-content-block {
-	padding-bottom: 20px;
+	height: 168px;
 }
 .fm-dialog-body .nw-conversations-item {
 	padding-left: 13px;
@@ -21981,8 +22075,6 @@ background-color:#1DA2E9
 .megaChatDisabled .fm-start-conversation, .megaChatDisabled .nw-contact-status, .megaChatDisabled .nw-fm-left-icon.conversations, .megaChatDisabled .fm-send-files {
 	display: none;
 }
-
-
 /**
  * MegaDialog.js
  */
@@ -22010,8 +22102,6 @@ background-color:#1DA2E9
 .fm-mega-dialog .fm-mega-dialog-pad {
     margin: 12px 12px 12px 12px
 }
-
-
 .fm-mega-dialog-size-icon {
     background-image: url(../images/mega/nw-fm-sprite.svg);
     background-position: center -5509px;
@@ -22045,7 +22135,6 @@ background-color:#1DA2E9
 .fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
     display: block;
 }
-
 .fm-mega-dialog-bottom {
     height: 56px;
     background-color: #F6F6F6;
@@ -22059,12 +22148,143 @@ background-color:#1DA2E9
     border-bottom-right-radius: 7px;
     padding-right: 4px;
 }
-
 /**
  * Start chat elements
  */
 
 .fm-create-chat-button.active .add-user-popup-arrow {
-    margin-top: -4px;
-    z-index: 1210;
+	margin-top: -4px;
+	z-index: 1210;
+}
+/**
+  * PRO upgrade, new flow styling for the login/register popups and buttons
+  */
+
+
+.fm-dialog.loginrequired-dialog {
+	min-height: 176px;
+	width: 445px;
+}
+.loginrequired-dialog .fm-notification-body {
+	padding: 0 20px;
+}
+.fm-notification-info .top-login-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	clear: left;
+	background-color: rgb(127, 127, 127);
+	margin-right: 5px;
+}
+.fm-notification-info .create-account-button {
+	color: white;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	float: none;
+	display: inline-block;
+	background-color: rgb(217, 046, 000);
+}
+.loginrequired-dialog .fm-notification-info > p {
+	margin-top: 26px;
+}
+.loginrequired-dialog .fm-notification-info > p > p {
+	margin-bottom: 6px;
+	padding-top: 2px;
+}
+.loginrequired-dialog .fm-notification-icon {
+	width: 90px;
+	height: 90px;
+	background-image: url(../images/mega/register-big-sprite@2x.png);
+	background-size: 100px auto;
+	background-position: center -199px;
+	background-repeat: no-repeat;
+	margin: 0 26px 0 0;
+}
+.loginrequired-dialog .fm-notification-icon.plan1 {
+	background-position: center -329px;
+}
+.loginrequired-dialog .fm-notification-icon.plan2 {
+	background-position: center -459px;
+}
+.loginrequired-dialog .fm-notification-icon.plan3 {
+	background-position: center -589px;
+}
+/* login dialog */
+.pro-login-dialog {
+	z-index: 1200;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+}
+.pro-login-dialog.hidden {
+	display: none;
+}
+.pro-login-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+a.top-login-forgot-pass {
+	font-size: 11px;
+	color: #999999;
+	line-height: 21px;
+	background-image: url(../images/mega/top-login-sprite_v4.png);
+	background-position: 0 -1582px;
+	background-repeat: no-repeat;
+	float: right;
+	padding: 0 0 0 23px;
+	cursor: pointer;
+}
+/* register */
+.pro-register-dialog {
+	z-index: 1180;
+	top: 50%;
+	left: 50%;
+	-webkit-border-radius: 7px;
+	-moz-border-radius: 7px;
+	border-radius: 7px;
+	border-right: 2px solid rgba(0, 0, 0, .3);
+	border-top: 2px solid rgba(0, 0, 0, .3);
+	min-width: 460px;
+}
+.pro-register-dialog.hidden {
+	display: none;
+}
+.pro-register-dialog .fm-dialog-header {
+	margin-bottom: 10px;
+}
+.pro-register-dialog .register-st2-button {
+	float: right;
+	cursor: pointer;
+}
+.pro-register-paypal-dialog .reg-success-icon {
+	background: url(../images/mega/paypalgame_2-1.png) 0 0 no-repeat;
+	background-size: 200px 200px;
+	width: 200px;
+	height: 200px;
+}
+/* logged in PRO account, but not activated */
+.top-warning-popup.not-activated {
+	cursor: default;
+}
+.top-warning-popup.not-activated .mailbox-icon {
+	background: url(../images/mega/email_confirmation_warning.png) 0 0 no-repeat;
+	background-size: 100px 100px;
+	width: 100px;
+	height: 100px;
+	float: left;
+	margin-right: 10px;
+}
+.top-warning-popup.not-activated p {
+	margin-top: 10px;
+	padding-top: 9px;
+}
+.top-warning-popup.not-activated .warning-popup-body {
+	padding-bottom: 8px;
 }

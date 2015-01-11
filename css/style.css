@@ -6598,13 +6598,10 @@ table {
 	font-size: 11px;
 	color: #666666;
 }
-.contact-request-button.ignore, .contact-request-button.cancel {
+.contact-request-button.accept, .contact-request-button.cancel {
 	margin: 0 12px 0 0;
 }
-.deleted .contact-request-button.ignore {
-	display: block;
-}
-.contact-request-button.ignore, .deleted .contact-request-button.accept, .deleted .contact-request-button.delete, .ignored .contact-request-button.accept, .ignored .contact-request-button.delete, .ignored .contact-request-button.ignore {
+.deleted .contact-request-button.accept, .deleted .contact-request-button.delete, .deleted .contact-request-button.ignore, .ignored .contact-request-button.accept, .ignored .contact-request-button.delete, .ignored .contact-request-button.ignore {
 	display: none;
 }
 .deleted .nw-contact-avatar, .deleted .fm-chat-user-info, .ignored .nw-contact-avatar, .ignored .fm-chat-user-info {

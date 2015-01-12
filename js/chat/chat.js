@@ -632,7 +632,7 @@ var Chat = function() {
                         //                        rawkey = key
                         //                    }
                     }
-                    return asmCrypto.HMAC_SHA256.base64(rawkey, msg);
+                    return asmCrypto.HMAC_SHA256.base64(msg, rawkey);
                 },
                 scrambleJid: function(bareJid) {
                     var H = asmCrypto.SHA256.base64;

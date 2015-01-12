@@ -106,10 +106,10 @@ function registeraccount()
 				}
 				else
 				{
-					$('.fm-dialog.registration-success,.fm-dialog.registration-page-success').removeClass('hidden');
+					$('.fm-dialog.registration-page-success').removeClass('hidden');
 					$('.fm-dialog-overlay').removeClass('hidden');
 					$('body').addClass('overlayed');
-					$('.fm-dialog.registration-success,.fm-dialog.registration-page-success').unbind('click');
+					$('.fm-dialog.registration-page-success').unbind('click');
 				}
 				var ops = {a:'up'};				
 				if (m) ops.name2 = $('#register_name').val();
@@ -581,3 +581,5 @@ function countDif(strPassword)
 	}
 	return nCount;
 }
+
+

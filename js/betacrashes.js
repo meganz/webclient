@@ -1,4 +1,4 @@
-if(window.location.hostname == "beta.mega.nz" || window.location.hostname == "mega.dev") {
+if(window.location.hostname == "beta.mega.nz" || window.location.hostname == "mega.dev" || location.hostname.indexOf("developers.") > -1) {
     if (d)
     {
         window.onerror = function __MEGAExceptionHandler(msg, url, ln, cn, errobj)
@@ -41,7 +41,7 @@ if(window.location.hostname == "beta.mega.nz" || window.location.hostname == "me
                 if (dump.m.toLowerCase().indexOf('out of memory') != -1) dump.m = '!Fatal! Out Of Memory.';
                 else dump.m = dump.m.replace(/[^\s\w]/gi,'') || ('[!] ' + msg);
             }
-            if (location.hostname === 'beta.mega.nz') dump.m = '[Beta] ' + dump.m;
+            if (location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") > -1) dump.m = '[' + location.hostname + '] ' + dump.m;
 
 
             var ids = [], uds = [], r = 1;

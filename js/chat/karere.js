@@ -1788,32 +1788,45 @@ makeMetaAware(Karere);
      * Generates room config XML from the self.options.roomConfig to be used and sent as stanza when creating new rooms
      *
      * @param roomPassword
-     * @returns {HTMLElement}
+     * @returns {Array}
      * @private
      */
     Karere.prototype._getRoomConfig = function(roomPassword) {
         var self = this;
 
-        var configXml = "<x xmlns='jabber:x:data' type='submit'>" +
-            "<field var='FORM_TYPE'>" +
-            "<value>http://jabber.org/protocol/muc#roomconfig<\/value>" +
-            "<\/field>";
+        var elements = [];
+
+        var _toDomElement = function(s) {
+            return $.parseXML(s).documentElement;
+        };
+
+        elements.push(
+            _toDomElement(
+                "<field var='FORM_TYPE'>" +
+                    "<value>http://jabber.org/protocol/muc#roomconfig<\/value>" +
+                "<\/field>"
+            )
+        );
 
         var configDict = $.extend({}, self.options.roomConfig, {
             "muc#roomconfig_roomsecret": roomPassword ? roomPassword : ""
         });
 
         $.each(Object.keys(configDict), function(i, k) {
-            configXml += "<field var='" + k + "'>" +
-                "<value>" + configDict[k] + "<\/value>" +
-                "<\/field>";
+
+            elements.push(
+                _toDomElement(
+                    "<field var='" + k + "'>" +
+                        "<value>" + configDict[k] + "<\/value>" +
+                    "<\/field>"
+                )
+            );
         });
 
 
-        configXml += "<field var='muc#roomconfig_captcha_whitelist'/>" +
-            "<\/x>";
+        elements.push(_toDomElement("<field var='muc#roomconfig_captcha_whitelist'/>"));
 
-        return $.parseXML(configXml).documentElement;
+        return elements;
     };
 
     /**

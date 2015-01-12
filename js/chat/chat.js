@@ -5,6 +5,8 @@
  */
 var MegaChatDisabled = localStorage.chatDisabled == true ? true : false;
 
+var disableMpEnc = true;
+
 if(MegaChatDisabled) {
     $(document.body).addClass("megaChatDisabled");
 }
@@ -737,7 +739,7 @@ Chat.prototype.init = function() {
 
 
     // since this plugin act as filter, it should be added first. (only if in the real app!)
-    if(typeof(mocha) == "undefined" && !localStorage.disableMpEnc) {
+    if(typeof(mocha) == "undefined" && !disableMpEnc) {
         self.plugins['encryptionFilter'] = new EncryptionFilter(self);
     }
     if(typeof(mocha) == "undefined") {

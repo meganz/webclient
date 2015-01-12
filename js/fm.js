@@ -6025,18 +6025,15 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
 		else if (type == 'warningb') $('#msgDialog').addClass('warning-dialog-b');
 		else if (type == 'info') $('#msgDialog').addClass('notification-dialog');
 	}
-	else if (type == 'confirmation' || type == 'remove')
-	{
-		$('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' +l[229]+'</label></div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
+	else if (type == 'confirmation' || type == 'remove') {
+        $('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' + l[229] + '</label></div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function () {
             closeMsg();
             if ($.warningCallback)
                 $.warningCallback(true);
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function()
-        {
+        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function () {
             closeMsg();
             if ($.warningCallback)
                 $.warningCallback(false);
@@ -6046,27 +6043,54 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
         if (type == 'remove')
             $('#msgDialog').addClass('remove-dialog');
 
-        if (checkbox)
-        {
+        if (checkbox) {
             $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');
             $.warningCheckbox = false;
             $('#msgDialog .left.checkbox-block').removeClass('hidden');
             $('#msgDialog .left.checkbox-block').unbind('click');
-            $('#msgDialog .left.checkbox-block').bind('click', function(e)
-            {
+            $('#msgDialog .left.checkbox-block').bind('click', function (e) {
                 var c = $('#msgDialog .left.checkbox-block input').attr('class');
-                if (c && c.indexOf('checkboxOff') > -1)
-                {
+                if (c && c.indexOf('checkboxOff') > -1) {
                     $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOff').addClass('checkboxOn');
                     localStorage.skipDelWarning = 1;
                 }
-                else
-                {
+                else {
                     $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input').removeClass('checkboxOn').addClass('checkboxOff');
                     delete localStorage.skipDelWarning;
                 }
             });
         }
+    } else if (type == 'loginrequired') {
+
+        $('#msgDialog').addClass('loginrequired-dialog');
+
+        $('#msgDialog .fm-notifications-bottom')
+            .addClass('hidden')
+            .html('');
+
+
+        $('#msgDialog .fm-dialog-button').bind('click',function()
+        {
+            closeMsg();
+            if ($.warningCallback) $.warningCallback(true);
+        });
+        $('#msgDialog').addClass('notification-dialog');
+        title = l[5841];
+        msg = '<p>' + l[5842] + '</p>\n' +
+        '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
+        '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>';
+
+        var $selectedPlan = $('.reg-st3-membership-bl.selected');
+        var plan = 1;
+        if($selectedPlan.is(".pro1")) { plan = 1; }
+        else if($selectedPlan.is(".pro2")) { plan = 2; }
+        else if($selectedPlan.is(".pro3")) { plan = 3; }
+
+        $('.loginrequired-dialog .fm-notification-icon')
+            .removeClass('plan1')
+            .removeClass('plan2')
+            .removeClass('plan3')
+            .addClass('plan' + plan);
     }
 
     $('#msgDialog .fm-dialog-title span').text(title);

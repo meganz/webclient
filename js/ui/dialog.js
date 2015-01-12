@@ -31,6 +31,7 @@
             'focusable': true,
             'closable': true,
             'expandable': true,
+            'requiresOverlay': false,
 
             /**
              * css class names
@@ -165,6 +166,12 @@
                     'of': $(window)
                 });
             }
+        } else {
+            self.$dialog.position({
+                'my': 'center center',
+                'at': 'center center',
+                'of': $(window)
+            });
         }
     };
 
@@ -179,6 +186,8 @@
         if(self.visible) {
             return;
         }
+
+        self.trigger('onBeforeShow');
 
         self.visible = true;
 
@@ -195,9 +204,14 @@
                 }
             });
         }
+        if(!self.options.expandable && self.options.requiresOverlay) {
+            self._showOverlay();
+        }
+
         $(window).rebind('resize.dialogReposition' + self.dialogIdx, function(e) {
             self.reposition();
         });
+        self.reposition();
 
         self.trigger('onShow');
     };
@@ -226,6 +240,10 @@
             $(document.body).unbind('mousedown.dialogClose' + self.dialogIdx);
         }
         self.$dialog.addClass('hidden');
+
+        if(!self.options.expandable && self.options.requiresOverlay) {
+            self._hideOverlay();
+        }
 
         $(document.body).unbind('resize.dialogReposition' + self.dialogIdx);
 
@@ -260,11 +278,7 @@
             .addClass("short-size")
             .removeClass("full-size");
 
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
-
-
-        $('.fm-dialog-overlay').unbind('click.dialog' + self.dialogIdx);
+        self._hideOverlay();
 
         if($toggleButton) {
             self.$toggleButton = $toggleButton;
@@ -288,11 +302,7 @@
 
         self.$dialog.addClass('expanded');
 
-        $('.fm-dialog-overlay').rebind('click.dialog' + self.dialogIdx, function() {
-            self.hide();
-        });
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        self._showOverlay();
 
         $(self.options.expandableButtonClass)
             .removeClass("short-size")
@@ -308,6 +318,24 @@
 
     };
 
+    Dialog.prototype._showOverlay = function() {
+        var self = this;
+        $('.fm-dialog-overlay').rebind('click.dialog' + self.dialogIdx, function() {
+            self.hide();
+        });
+        $('.fm-dialog-overlay').removeClass('hidden');
+        $('body').addClass('overlayed');
+    };
+
+    Dialog.prototype._hideOverlay = function() {
+        var self = this;
+
+        $('.fm-dialog-overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+
+
+        $('.fm-dialog-overlay').unbind('click.dialog' + self.dialogIdx);
+    };
     /**
      * Toggle (show/hide) the picker
      */
@@ -317,6 +345,19 @@
             self.collapse();
         } else {
             self.expand();
+        }
+    };
+
+    /**
+     * Hide & cleanup
+     */
+    Dialog.prototype.destroy = function() {
+        var self = this;
+        if(self.visible) {
+            self.hide();
+        }
+        if(self.$dialog) {
+            self.$dialog.remove();
         }
     };
 

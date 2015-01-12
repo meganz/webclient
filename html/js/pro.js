@@ -159,7 +159,8 @@ function pro_continue()
 
     if(!u_handle) {
         megaAnalytics.log("pro", "loginreq");
-        msgDialog('loginrequired', 'title', 'msg');
+        //msgDialog('loginrequired', 'title', 'msg');
+        showSignupPromptDialog();
         return;
     } else if(isEphemeral()) {
         showRegisterDialog();
@@ -778,3 +779,67 @@ var proceedToPaypal = function() {
 
     pro_continue();
 };
+
+
+var signupPromptDialog = null;
+var showSignupPromptDialog = function() {
+    if(!signupPromptDialog) {
+        signupPromptDialog = new mega.ui.Dialog({
+            'className': 'loginrequired-dialog',
+            'closable': true,
+            'focusable': false,
+            'expandable': false,
+            'requiresOverlay': true,
+            'title': l[5841],
+            'buttons': []
+        });
+        signupPromptDialog.bind('onBeforeShow', function() {
+            $('.fm-dialog-title',this.$dialog)
+                .text(
+                    this.options.title
+                );
+
+            // custom buttons, because of the styling
+            $('.fm-notification-info p',this.$dialog)
+                .html(
+                    '<p>' + l[5842] + '</p>\n' +
+                    '<a class="top-login-button" href="#login">' + l[171] + '</a>\n' +
+                    '<a class="create-account-button" href="#register">' + l[1076] + '</a><br/>'
+                );
+
+            $('.fm-notifications-bottom', this.$dialog)
+                .addClass('hidden')
+                .html('');
+
+            $('.top-login-button', this.$dialog)
+                .unbind('click.loginrequired')
+                .bind('click.loginrequired', function() {
+                    signupPromptDialog.hide();
+                    showLoginDialog();
+                    return false;
+                });
+
+            $('.create-account-button', this.$dialog)
+                .unbind('click.loginrequired')
+                .bind('click.loginrequired', function() {
+                    signupPromptDialog.hide();
+                    showRegisterDialog();
+                    return false;
+                });
+        });
+    }
+
+    signupPromptDialog.show();
+
+    var $selectedPlan = $('.reg-st3-membership-bl.selected');
+    var plan = 1;
+    if($selectedPlan.is(".pro1")) { plan = 1; }
+    else if($selectedPlan.is(".pro2")) { plan = 2; }
+    else if($selectedPlan.is(".pro3")) { plan = 3; }
+
+    $('.loginrequired-dialog .fm-notification-icon')
+        .removeClass('plan1')
+        .removeClass('plan2')
+        .removeClass('plan3')
+        .addClass('plan' + plan);
+}

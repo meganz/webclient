@@ -1577,7 +1577,7 @@ function api_setshare1(ctx)
 	var req, res;
 	var newkey = true;
 
-	req = { a : 's',
+	req = { a : 's2',
 			n : ctx.node,
 			s : ctx.targets,
 			i : requesti };

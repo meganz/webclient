@@ -702,7 +702,9 @@ else
         jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
-        jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
+		if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
+			jsl.push({f: 'js/betacrashes.js', n: 'cms_js', j: 1});
+		}
 
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});

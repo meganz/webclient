@@ -3881,7 +3881,9 @@ var FMShortcuts = function() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            selectionManager.select_all();
+            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+                selectionManager.select_all();
+            }
             return false; // stop prop.
         } else if (
             (charTyped == "c" || charTyped == "x") &&

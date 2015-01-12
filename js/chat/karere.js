@@ -1198,6 +1198,10 @@ makeMetaAware(Karere);
                     // stop
                     return true;
                 }
+                if(!eventData.id && !eventData.message && eventData.from.split("/").length == 1 /* e.g. no resource in the from jid */) {
+                    // system type of message
+                    return true; // stop!
+                }
 
                 /**
                  * XXX: check the message, maybe this is an OTR req?

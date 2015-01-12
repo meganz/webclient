@@ -13,6 +13,149 @@ function voucherCentering(button)
     }
 }
 
+function reportQuota(chunksize)
+{
+	if (u_attr && u_attr.p) return false;	
+	var quota = {}, t = Math.floor(new Date().getTime()/60000);
+	if (localStorage.q) quota = JSON.parse(localStorage.q);
+	for (var i in quota)
+	{
+		if (i < t-360) delete quota[i];
+	}
+	if (!quota[t]) quota[t]=0;
+	quota[t] += chunksize;
+	localStorage.q = JSON.stringify(quota);
+}
+
+function hasQuota(filesize, next)
+{
+	checkQuota(filesize,function(r)
+	{	
+		if (r.sec == 0 || r.sec == -1)
+		{
+			bandwidthDialog(1);
+			next(true);
+		}
+		else
+		{
+			sessionStorage.proref='bwlimit';
+			if (!$.lastlimit) $.lastlimit=0;		
+			$('.fm-bandwidth-number-txt.used').html(bytesToSize(r.used).replace(' ',' <span class="small">') + '</span>');
+			$('.fm-bandwidth-number-txt.available').html(bytesToSize(r.filesize).replace(' ',' <span class="small">') + '</span>');			
+			var minutes = Math.ceil(r.sec/60);			
+			if (minutes == 1) $('.bwminutes').html(l[5838] + ' *');
+			else $('.bwminutes').html(l[5837].replace('[X]',minutes) + ' *');
+			bandwidthDialog();
+			if ($.lastlimit < new Date().getTime()-60000)  megaAnalytics.log("dl", "limit",{used:r.used,filesize:r.filesize,seconds:r.sec});			
+			$.lastlimit=new Date().getTime();	
+			next(false);
+		}
+	});	
+}
+
+function apiQuota(callback2)
+{
+	// cache 'bq' for up to 60 seconds for each limitation
+	if (typeof $.bq !== 'undefined' && $.lastlimit > new Date().getTime()-60000) callback2($.bq);
+	else
+	{
+		api_req({a:'bq'},{callback:function(res)
+		{
+			$.bq=res;
+			callback2(res);	
+		}});	
+	}	
+}
+
+function checkQuota(filesize,callback)
+{
+	if (u_attr && u_attr.p) 
+	{
+		if (callback) callback({sec:-1});
+		return false;	
+	}	
+	apiQuota(function(quotabytes)
+	{
+		if (localStorage.bq) quotabytes = localStorage.bq;
+		var consumed=0,quota = {};
+		if (localStorage.q) quota = JSON.parse(localStorage.q);		
+		var t = Math.floor(new Date().getTime()/60000);
+		var t2 = t-360;
+		var sec = 0,available=0, newbw=0;
+		while (t2 <= t)
+		{
+			if (quota[t2]) consumed += quota[t2];
+			t2++;
+		}
+		if (quotabytes == 0) sec=0;		
+		else if (quotabytes-filesize < 0) sec=-1;		
+		else if (quotabytes-consumed-filesize < 0)
+		{
+			var shortage = quotabytes-consumed-filesize;
+			var t2 = t-360;
+			while (t2 <= t)
+			{
+				if (quota[t2]) shortage += quota[t2];
+				if (shortage > 0)
+				{
+					newbw = shortage-quotabytes-consumed-filesize;
+					sec = (t2+360-t)*60;
+					break;
+				}
+				t2++;
+			}
+			if (sec == 0 || sec > 21600)
+			{
+				sec = 21600;
+				newbw = quotabytes;
+			}
+		}
+		else sec=0;		
+		if (callback) callback({used:consumed,sec:sec,filesize:filesize,newbw:newbw});
+	
+	});
+}
+
+function bandwidthDialog(close)
+{
+	if (close)
+	{
+		$('.fm-dialog.bandwidth-quota').addClass('hidden');
+		$('.fm-dialog-overlay').addClass('hidden');
+		$.dialog=false;
+	}
+	else
+	{	
+		if (!is_fm() && page !== 'download') return false;
+		
+		$('.fm-dialog-button.quota-later-button').unbind('click');
+		$('.fm-dialog-button.quota-later-button').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
+		$('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
+		{
+			bandwidthDialog(1);
+		});
+		
+		$('.fm-dialog-button.quota-upgrade-button').unbind('click');
+		$('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
+		{
+			
+		
+			bandwidthDialog(1);
+			document.location = '#pro';
+		});
+	
+		$('.fm-dialog-overlay').removeClass('hidden');
+		$('.fm-dialog.bandwidth-quota').removeClass('hidden');
+		$.dialog='bandwidth';
+	}
+}
+
 function andreiScripts()
 {
     /*
@@ -2015,7 +2158,14 @@ function initContextUI()
         {
             $.dialog = 'share';// this is used like identifier when key with key code 27 is pressed
             $.hideContextMenu();
-            $('.share-dialog').removeClass('hidden');
+            
+            // Show the share dialog
+            $shareDialog = $('.share-dialog');
+            $shareDialog.removeClass('hidden');
+            
+            // Hide the optional message by default. This gets enabled if they try share with a user who is not a contact
+            $shareDialog.find('.share-message').hide();
+            
             $('.fm-dialog-overlay').removeClass('hidden');
             $('body').addClass('overlayed');
             handleShareDialogContent();
@@ -6157,7 +6307,6 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 
     return html + htmlEnd;
 }
-;
 
 function fillShareDialogWithContent()
 {
@@ -6304,8 +6453,30 @@ function initShareDialog()
         onHolder: function() {
             errorMsg('No need for that, you are THE owner!');
         },
-        onAdd: function()
-        {
+        onAdd: function(item) {
+            
+            // Get the email entered into the share dialog (from Tokeninput)
+            var emailEntered = item.id;
+            var userIsAlreadyContact = false;
+            var userContacts = M.u;
+            
+            // Loop through the user's contacts
+            for (var contact in userContacts) {
+                if (userContacts.hasOwnProperty(contact)) {
+                    
+                    // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
+                    if (emailEntered === userContacts[contact].m) {
+                        userIsAlreadyContact = true;
+                    }
+                }
+            }
+            
+            // If the user is not already a contact, then show a text area 
+            // where they can add a custom message to the pending share request
+            if (userIsAlreadyContact === false) {
+                $('.share-message').show();
+            }
+                        
             $('.dialog-share-button').removeClass('disabled');
 
             var $a = $('.share-dialog .share-added-contact.token-input-token-mega');
@@ -6391,26 +6562,27 @@ function initShareDialog()
      */
     determineContactParams = function(item, perm)
     {
-        var name = item;// email address
+        var email = item;// email address
         var id = '';
-        for (var i in M.u)
+        /*for (var i in M.u)
         {
             if (M.u[i].m === item)
             {
                 id = i;
                 break;
             }
-        }
+        }*/
 
-        var user = M.u[id];
-        if (user)
-            name = (user.name && user.name.length > 1) ? user.name : user.m;
-        var av_color = name.charCodeAt(0) % 6 + name.charCodeAt(1) % 6;
-        var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
+        /*var user = M.u[id];
+        if (user) {
+            email = (user.name && user.name.length > 1) ? user.name : user.m;
+        }*/
+        var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+        var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (email.charAt(0) + email.charAt(1));
 
         $.sharedTokens.push(item);
 
-        var html = addShareDialogContactToContent('', id, av_color, av, name, perm[0], perm[1]);
+        var html = addShareDialogContactToContent('', id, av_color, av, email, perm[0], perm[1]);
 
         $('.share-dialog .share-dialog-contacts').append(html);
 
@@ -6419,21 +6591,26 @@ function initShareDialog()
     $('.share-dialog').unbind('click');
     $('.share-dialog').bind('click', function(e)
     {
-        // This's sensitive to dialog DOM element positioning
-        var trg = e.originalEvent.path[0];
-        var trg1 = e.originalEvent.path[1];
-        var trg2 = e.originalEvent.path[2];
-        if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
-            && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
-            && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
-        {
-            // share dialog permission menu
-            $('.permissions-menu').fadeOut(200);
-            $('.import-contacts-dialog').fadeOut(200);
-            $('.permissions-icon').removeClass('active');
-            $('.share-dialog-permissions').removeClass('active');
-            closeImportContactNotification('.share-dialog');
-            $('.import-contacts-service').removeClass('imported');
+        // Fix bug in console
+        if (typeof e.originalEvent.path != 'undefined') {
+                        
+            // This's sensitive to dialog DOM element positioning
+            var trg = e.originalEvent.path[0];
+            var trg1 = e.originalEvent.path[1];
+            var trg2 = e.originalEvent.path[2];
+            
+            if (!$(trg).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+                && !$(trg1).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions')
+                && !$(trg2).is('.permissions-icon,.import-contacts-link,.share-dialog-permissions'))
+            {
+                // share dialog permission menu
+                $('.permissions-menu').fadeOut(200);
+                $('.import-contacts-dialog').fadeOut(200);
+                $('.permissions-icon').removeClass('active');
+                $('.share-dialog-permissions').removeClass('active');
+                closeImportContactNotification('.share-dialog');
+                $('.import-contacts-service').removeClass('imported');
+            }
         }
     });
 
@@ -6452,6 +6629,7 @@ function initShareDialog()
             // If there's a contacts in multi-input add them to top
             loadingDialog.show();
             var $items = $('.share-dialog .token-input-list-mega .token-input-token-mega');
+            
             if ($items.length)
             {
                 $.each($items, function(ind, val)
@@ -6459,11 +6637,13 @@ function initShareDialog()
                     determineContactParams($(val).contents().eq(1).text(), checkMultiInputPermission($('.share-dialog .permissions-icon')));
                 });
             }
-            var t = [];
+            
+            var targets = [];
             var s = M.d[$.selected[0]].shares;
             var id = '';
             var perm, aPerm;
             var $items = $('.share-dialog-contact-bl');// Get all items available in dialog content block (avatar, name/email, permission)
+            
             $.each($items, function(ind, val)
             {
                 id = $(val).attr('id').replace('sdcbl_', '');// extract id of contact
@@ -6480,13 +6660,13 @@ function initShareDialog()
                     perm = 0;
 
                 if (!s || !s[id] || s[id].r !== perm)
-                    t.push({u: id, r: perm});
+                    targets.push({u: id, r: perm});
             });
 
             closeDialog();
-            if (t.length > 0)
+            if (targets.length > 0)
             {
-                doshare($.selected[0], t, true, 'Message');// ToDo: Update Message with appropriate field once UI html is available
+                doshare($.selected[0], targets, true, 'Message');// ToDo: Update Message with appropriate field once UI html is available
             }
 
             loadingDialog.hide();
@@ -6563,10 +6743,10 @@ function initShareDialog()
             M.delnodeShare(sel, id);
 
             api_req({
-                a: 's',
+                a: 's2',
                 n: sel,
                 s: [{
-                        u: id,
+                        u: M.u[id].m,
                         r: ''
                     }],
                 ha: '',
@@ -6696,21 +6876,27 @@ function initShareDialog()
 	});
 	
 				
-	//Personal message
+	// Personal message
 	$('.share-message textarea').bind('focus', function() {
-		var $this = $(this);
+		
+        var $this = $(this);
 		$('.share-message').addClass('active');
-		if ($this.val() == 'Include personal message...') {
-          $this.select();
-          window.setTimeout(function() {
-            $this.select();
-          }, 1);
-          function mouseUpHandler() {
-            $this.off("mouseup", mouseUpHandler);
-            return false;
-          }
-          $this.mouseup(mouseUpHandler);
-		}
+        
+        if ($this.val() == 'Include personal message for new contacts...') {
+
+            // Clear the default message
+            $this.val('');
+
+            window.setTimeout(function() {
+                $this.select();
+            }, 1);
+            
+            function mouseUpHandler() {
+                $this.off("mouseup", mouseUpHandler);
+                return false;
+            }
+            $this.mouseup(mouseUpHandler);
+        }
 	});
 
 	$('.share-message textarea').bind('blur', function() {

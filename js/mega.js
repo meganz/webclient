@@ -3908,6 +3908,7 @@ function execsc(actionPackets, callback) {
                 console.log('OWN ACTION PACKET');
             }
 
+            // If contact notification
             if (actionPacket.a === 'c') {
                 process_u(actionPacket.u);
 
@@ -3961,19 +3962,22 @@ function execsc(actionPackets, callback) {
                     }
                 }
             }
-        } else if (actionPacket.a === 'e') {
+        }
+        else if (actionPacket.a === 'e') {
             var str = hex2bin(a.c);
             if (str.substr(0, 5) === ".cms.") {
                 var cmsType = str.split(".")[2];
                 var cmsId = str.substr(6 + cmsType.length).split(".");
                 CMS.reRender(cmsType, cmsId);
             }
-        } else if (actionPacket.a === 'fa') {
+        }
+        else if (actionPacket.a === 'fa') {
             M.nodeAttr({
                 h: actionPacket.n,
                 fa: actionPacket.fa
             });
-        } else if (actionPacket.a === 's' && !folderlink) {
+        }
+        else if (actionPacket.a === 's' && !folderlink) {
             var tsharekey = '';
             var prockey = false;
 
@@ -4023,7 +4027,9 @@ function execsc(actionPackets, callback) {
                         }
                         delete u_sharekeys[actionPacket.n];
                     } else {
-                        console.log('I receive a share, prepare for receiving tree a');
+                        if (d) {
+                            console.log('I receive a share, prepare for receiving tree a');
+                        }
                         // I receive a share, prepare for receiving tree a
                         tparentid = actionPacket.o;
                         trights = actionPacket.r;
@@ -4510,16 +4516,16 @@ function getuid(email)
     return false;
 }
 
-function doshare(h, t, dontShowShareDialog)
+function doshare(h, targets, dontShowShareDialog)
 {
     var $promise = new $.Deferred();
 
     nodeids = fm_getnodes(h);
     nodeids.push(h);
 
-    api_setshare(h, t, nodeids,
+    api_setshare(h, targets, nodeids,
         {
-            t: t,
+            t: targets,
             h: h,
             done: function(res, ctx)
             {

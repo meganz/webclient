@@ -1406,7 +1406,7 @@ function topmenuUI() {
 	$('.top-head .logo').unbind('click');
 	$('.top-head .logo').bind('click',function(e)
 	{
-		document.location.hash = '#';
+		document.location.hash = '#index';
 	});
 
 	var c = $('.fm-dialog.registration-page-success').attr('class');

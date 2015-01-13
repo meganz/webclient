@@ -4735,7 +4735,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	float: left;
 	height: 100%;
 	position: relative;
-	min-height: 250px;
+	min-height: 288px;
 }
 .nw-fm-tree-header {
 	position: relative;
@@ -4957,6 +4957,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(119,119,119,1);
 	background-position: center -463px;
 }
+.nw-fm-left-icon.settings:hover {
+	background-color: rgba(119,119,119,0.8);
+}
+.nw-fm-left-icon.settings.active {
+	background-color: rgba(119,119,119,1);
+}
 .nw-fm-left-icon.conversations.active {
 	background-color: rgba(43,166,222,1);
 	background-position: center -511px;
@@ -4979,13 +4985,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 100%;
 	height: 100%;
 }
-.nw-fm-left-icon.rubbish-bin {
+.nw-fm-left-icon.rubbish-bin, .nw-fm-left-icon.settings {
 	height: 48px;
 	width: 48px;
 	position: absolute;
-	bottom: 0;
+	bottom: 48px;
 	cursor: pointer;
 	background-image: none;
+}
+.nw-fm-left-icon.settings {
+	bottom:0;
 }
 .not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin, .not-logged .fm-contact-requests, .not-logged .fm-received-requests {
 	display: none !important;
@@ -5005,7 +5014,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.rubbish-bin.active {
 	background-color: rgba(49,183,0,1);
 }
-.rubbish-bin-icon {
+.rubbish-bin-icon, .settings-icon {
 	height: 48px;
 	width: 48px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -5017,12 +5026,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	opacity: 0.3;
 	cursor: pointer;
 }
+.settings-icon { 
+	background-position: 0 -10080px;
+}
 .filled .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active .rubbish-bin-icon {
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active.filled .rubbish-bin-icon {
+.nw-fm-left-icon.rubbish-bin.filled:hover .rubbish-bin-icon, .nw-fm-left-icon.rubbish-bin.active.filled .rubbish-bin-icon, .nw-fm-left-icon.settings:hover .settings-icon, .nw-fm-left-icon.settings.active .settings-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=1);
 	-moz-opacity: 1;
 	-khtml-opacity: 1;
@@ -11621,7 +11633,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .context-menu-item.getlink-item:hover, .context-menu-item.sharing-item:hover, .context-menu-item.getlink-item.active, .context-menu-item.sharing-item.opened {
 	background-color: rgba(255,179,0,1);
 }
-.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.import-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.cloud-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened, .context-menu-item.rename-item.opened, .context-menu-item.copy-item.opened, .context-menu-item.import-item.opened, .context-menu-item.newfolder-item.opened, .context-menu-item.fileupload-item.opened, .context-menu-item.folderupload-item.opened, .context-menu-item.remove-item.opened, .context-menu-item.removeshare-item.opened, .context-menu-item.clearbin-item.opened, .context-menu-item.addcontact-item.opened, .context-menu-item.reply-item.opened, .context-menu-item.reply-to-all.opened, .context-menu-item.forward-item.opened, .context-menu-item.folder-item.opened, .context-menu-item.cloud-item.opened {
+.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.import-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.cloud-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.shared-folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened, .context-menu-item.rename-item.opened, .context-menu-item.copy-item.opened, .context-menu-item.import-item.opened, .context-menu-item.newfolder-item.opened, .context-menu-item.fileupload-item.opened, .context-menu-item.folderupload-item.opened, .context-menu-item.remove-item.opened, .context-menu-item.removeshare-item.opened, .context-menu-item.clearbin-item.opened, .context-menu-item.addcontact-item.opened, .context-menu-item.reply-item.opened, .context-menu-item.reply-to-all.opened, .context-menu-item.forward-item.opened, .context-menu-item.folder-item.opened, .context-menu-item.cloud-item.opened, .context-menu-item.shared-folder-item.opened {
 	background-color: rgba(49,181,0,1);
 }
 .context-menu-icon, .context-menu-points {
@@ -11743,8 +11755,11 @@ table {
 .folderupload-item .context-menu-icon {
 	background-position: -3px -5250px;
 }
-.removeshare-item .context-menu-icon, .remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
+.remove-item .context-menu-icon, .clearbin-item .context-menu-icon {
 	background-position: -3px -4479px;
+}
+.removeshare-item .context-menu-icon  {
+	background-position: -1px -10038px;
 }
 .properties-item .context-menu-icon {
 	background-position: -3px -4240px;

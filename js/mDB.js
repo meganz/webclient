@@ -347,9 +347,9 @@ if (indexedDB)
                 else if (t === 'ok')   process_ok([n]);
                 else if (t === 'u')    M.addUser(n,1);
                 else if (t === 's')    M.nodeShare(n.h,n,1);
-                else if (t === 'opc')  M.addOPC(n);
-                else if (t === 'ipc')  M.addIPC(n);
-                else if (t === 'ps')   M.addPS(n);
+                else if (t === 'opc')  M.addOPC(n,1);
+                else if (t === 'ipc')  M.addIPC(n,1);
+                else if (t === 'ps')   M.addPS(n,1);
                 rec.continue();
             }
             else if ( fr )

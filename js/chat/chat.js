@@ -2076,7 +2076,7 @@ Chat.prototype.renderContactTree = function() {
     var unreadCount = 0;
     for(var k in self.chats) {
         var megaRoom = self.chats[k];
-        var c = intval($('.nw-conversations-unread', megaRoom.getNavElement()).text());
+        var c = parseInt($('.nw-conversations-unread', megaRoom.getNavElement()).text());
         unreadCount += c;
 
         if (unreadCount > 0) {

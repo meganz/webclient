@@ -463,7 +463,7 @@ function MegaData()
     });
 
     /**
-     * 
+     *
      * @param {array of JSON objects} ipc - received requests
      * @param {bool} clearGrid
      * @returns {undefined}
@@ -559,7 +559,7 @@ function MegaData()
     };
 
     /**
-     * 
+     *
      * @param {array of JSON objects} opc - sent requests
      * @param {bool} clearGrid
      * @returns {undefined}
@@ -646,17 +646,6 @@ function MegaData()
                 M.dynlistRt = setTimeout(function() {
                     delete M.dynlistRt;
                     M.rmSetupUI();
-
-                    // var max = e[0][0];
-                    // for (var i = 0 ; i < max ; ++i)
-                    // {
-                    // var n = M.v[i];
-                    // if (n.seen && !$(t+' #'+n.h).visible())
-                    // {
-                    // n.seen = false;
-                    // $('.file-block#' + n.h + ' img').attr('src','about:blank');
-                    // }
-                    // }
                 }, 750);
                 $(window).trigger('resize');
             } else {
@@ -970,9 +959,8 @@ function MegaData()
                      }
                      else*/
                     if (this.v[i].t) {
-                        for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x) {
-                            cache.splice(x, 0, cc);
-                        }
+                        for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
+                        cache.splice(x, 0, cc);
                     } else {
                         cache.push(cc);
                     }
@@ -988,7 +976,7 @@ function MegaData()
                 } else if (this.v[i].t) {
                     // 4. new folder: insert new node before the first folder in the current view
                     $($(t + ' ' + el)[0]).before(html);
-                } else {// !this.v[i].t) 
+                } else {// !this.v[i].t)
                     // 5. new file: insert new node before the first file in the current view
                     var a = $(t + ' ' + el).not('.folder');
                     if (a.length > 0) {
@@ -1003,7 +991,7 @@ function MegaData()
 //            }// ToDo: previous END of if (this.v[i].name) {, can be huge change/bug cause wrapped big amount of code
         }
 
-        contactUI();// ToDo: Document this function, 
+        contactUI();// ToDo: Document this function,
 
         $(window).unbind('dynlist.flush');
         $(window).bind('dynlist.flush', function() {
@@ -1063,12 +1051,12 @@ function MegaData()
             iconUI(u);
             fm_thumbnails();
         }
-        
+
         else {
             Soon(gridUI);
         }
         Soon(fmtopUI);
-        
+
         if (u) return;
 
         function prepareShareMenuHandler(e) {
@@ -1109,13 +1097,13 @@ function MegaData()
         // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
         $('.shared-details-info-block .fm-leave-share').unbind('click');
         $('.shared-details-info-block .fm-leave-share').bind('click', function(e) {
-            
+
             // Get the share ID from the hash in the URL
             var shareId = window.location.hash.replace('#fm/', '');
-            
+
             // Remove user from the share
             removeShare(shareId);
-            
+
             // Open the shares folder
             M.openFolder('shares', true);
         });
@@ -1990,12 +1978,20 @@ function MegaData()
             this.RubbishID = n.h;
         if (!n.c)
         {
-            if (n.sk)
+            if (n.sk && !u_sharekeys[n.h]) {
                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
+            }
 
             if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k)
             {
-                crypto_processkey(u_handle, u_k_aes, n);
+                if (u_kdnodecache[n.h])
+                {
+                    $.extend(n, u_kdnodecache[n.h]);
+                }
+                else
+                {
+                    crypto_processkey(u_handle, u_k_aes, n);
+                }
                 u_nodekeys[n.h] = n.key;
             }
             else if (!n.k)
@@ -2080,18 +2076,18 @@ function MegaData()
 
     /**
      * Check existance of contact/pending contact
-     * 
-     * 
+     *
+     *
      * @param {email} email of invited contact
-     * 
+     *
      * @returns {number} error code, 0 proceed with request
-     * 
+     *
      * -12, Owner already invited user & expiration period didn't expired, fail.
      * -12 In case expiration period passed new upc is sent, but what to do with old request?
      * Delete it as soon as opc response is received for same email (idealy use user ID, if exist)
      * -10, User already invited Owner (ToDO. how to check diff emails for one account) (Check M.opc)
      * -2, User is already in contact list (check M.u)
-     * 
+     *
      */
     this.checkInviteContactPrerequisites = function(email) {
         var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
@@ -2130,11 +2126,11 @@ function MegaData()
     /**
      * Invite contacts using email address, also known as ongoing pending contacts
      * This uses API 2.0
-     * 
+     *
      * @param {email} owner
      * @param {email} target
      * @param {string} msg
-     * 
+     *
      * @returns {undefined}
      */
     this.inviteContact = function(owner, target, msg) {
@@ -2160,7 +2156,7 @@ function MegaData()
 
     /**
      * Handle all error codes for contact invitations and shows message
-     * 
+     *
      * @param {int} errorCode
      * @param {string} msg Can be undefined
      * @param {email} email  Can be undefined
@@ -2387,7 +2383,7 @@ function MegaData()
 
     /**
      * Delete opc record from localStorage using id
-     * 
+     *
      * @param {string} id
      * @returns {undefined}
      */
@@ -2408,7 +2404,7 @@ function MegaData()
 
     /**
      * Delete ipc record from localStorage using id
-     * 
+     *
      * @param {string} id
      * @returns {undefined}
      */
@@ -3953,7 +3949,7 @@ function execsc(actionPackets, callback) {
             }
             else if (actionPacket.a === 'upco') {   // Outgoing request updated
                 processUPCO([actionPacket]);
-                
+
                 // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
                 if (actionPacket.s !== 2) {
                     addIpcOrContactNotification(actionPacket);
@@ -3994,7 +3990,8 @@ function execsc(actionPackets, callback) {
                 if (typeof actionPacket.r == "undefined") {
                     // I deleted my share
                     M.delnodeShare(actionPacket.n, actionPacket.u);
-                } else if (typeof M.d[actionPacket.n].shares != 'undefined'
+                } else if (M.d[actionPacket.n]
+                    && typeof M.d[actionPacket.n].shares != 'undefined'
                     && M.d[actionPacket.n].shares[actionPacket.u]
                     || actionPacket.ha == crypto_handleauth(actionPacket.n)) {
                     // I updated or created my share
@@ -4159,7 +4156,8 @@ function execsc(actionPackets, callback) {
 
             tparentid = false;
             trights = false;
-            process_f(actionPacket.t.f);
+            //process_f(actionPacket.t.f);
+            async_procnodes = async_procnodes.concat(actionPacket.t.f);
         } else if (actionPacket.a === 'c') {
             process_u(actionPacket.u);
 
@@ -4168,7 +4166,7 @@ function execsc(actionPackets, callback) {
                 $('#contact_' + actionPacket.ou).remove();
                 M.handleEmptyContactGrid();
             }
-            
+
             // Only show a notification if we did not trigger the action ourselves
             if (actionPacket.ou !== u_attr.u) {
                 addIpcOrContactNotification(actionPacket);
@@ -4245,7 +4243,7 @@ function execsc(actionPackets, callback) {
             processUPCI([actionPacket]);
         } else if (actionPacket.a === 'upco') {
             processUPCO([actionPacket]);
-            
+
             // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
             if (actionPacket.s !== 2) {
                 addIpcOrContactNotification(actionPacket);
@@ -4261,7 +4259,7 @@ function execsc(actionPackets, callback) {
 	} else {
 		done();
 	}
-	
+
     function done() {
 		if (newnodes.length > 0 && fminitialized) rendernew();
 		if (loadavatars) M.avatars();
@@ -4318,25 +4316,22 @@ function RightsbyID(id)
 function isCircular(fromid, toid)
 {
     var n = M.d[fromid];
-    if (n && n.t)
+    if (n && n.t && toid != fromid)
     {
-        if (toid == fromid)
-            return false;
         var p1 = M.getPath(fromid);
         var p2 = M.getPath(toid);
         p1.reverse();
         p2.reverse();
         var c = 1;
-        for (var i in p1)
-            if (p1[i] !== p2[i])
+        for (var i in p1) {
+            if (p1[i] !== p2[i]) {
                 c = 0;
-        if (c)
-            return true;
-        else
-            return false;
+                break;
+            }
+        }
+        return !!c;
     }
-    else
-        return false;
+    return false;
 }
 
 function RootbyId(id)
@@ -4672,12 +4667,6 @@ function process_f(f, cb)
 				if (d) console.error(err);
 				__process_f2(f, cb);
 			});
-			// mSpawnSWorker('keydec.js', f, function(r)
-			// {
-				// if (d) console.log('KeyDecWorker processed %d/%d nodes', $.len(r), f.length, r);
-				// $.extend(u_kdnodecache, r);
-				// __process_f2(f, cb);
-			// });
 		}
 	}
 	else if (cb) Soon(cb);
@@ -4707,7 +4696,7 @@ function __process_f2(f, cb)
 
 /**
  * Handle incoming pending contacts
- * 
+ *
  * @param {array of JSON objects} pending contacts
  * @returns {undefined}
  */
@@ -4729,7 +4718,7 @@ function processIPC(ipc) {
 
 /**
  * Handle outgoing pending contacts
- * 
+ *
  * @param {array of JSON objects} pending contacts
  * @returns {undefined}
  */
@@ -4769,7 +4758,7 @@ function processOPC(opc) {
 
 /**
  * Handle pending shares
- * 
+ *
  * @param {array of JSON objects} pending shares
  * @returns {undefined}
  */
@@ -4782,7 +4771,7 @@ function processPS(ps) {
 
 /**
  * Handle upca response, upci, pending contact request updated (for whom it's incomming)
- * 
+ *
  * @param {array of JSON objects} ap (actionpackets)
  * @returns {undefined}
  */
@@ -4810,7 +4799,7 @@ function processUPCI(ap) {
 
 /**
  * Handle upca response, upc', pending contact request updated (for whom it's outgoing)
- * 
+ *
  * @param {array of JSON objects} ap (actionpackets)
  * @returns {undefined}
  */

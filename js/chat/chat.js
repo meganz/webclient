@@ -632,7 +632,7 @@ var Chat = function() {
                         //                        rawkey = key
                         //                    }
                     }
-                    return asmCrypto.HMAC_SHA256.base64(rawkey, msg);
+                    return asmCrypto.HMAC_SHA256.base64(msg, rawkey);
                 },
                 scrambleJid: function(bareJid) {
                     var H = asmCrypto.SHA256.base64;
@@ -2076,7 +2076,7 @@ Chat.prototype.renderContactTree = function() {
     var unreadCount = 0;
     for(var k in self.chats) {
         var megaRoom = self.chats[k];
-        var c = intval($('.nw-conversations-unread', megaRoom.getNavElement()).text());
+        var c = parseInt($('.nw-conversations-unread', megaRoom.getNavElement()).text());
         unreadCount += c;
 
         if (unreadCount > 0) {

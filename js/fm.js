@@ -1881,6 +1881,19 @@ function ephemeralDialog(msg)
     });
 }
 
+/**
+ * Removes the user from the share (they no longer want access to it)
+ * @param {String} shareId The share ID e.g. INlx1Kba
+ */
+function removeShare(shareId) {
+    
+    // Remove the share
+    api_updfkey(shareId);
+    M.delNode(shareId);
+    api_req({ a: 'd', n: shareId, i: requesti });
+    delete u_sharekeys[shareId];
+}
+
 function fmremove() {
     var filecnt = 0,
         foldercnt = 0,
@@ -2628,6 +2641,7 @@ function accountUI()
     $('.fm-account-sections').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
     $('.fm-right-account-block').removeClass('hidden');
+	$('.nw-fm-left-icon.settings').addClass('active');
     M.accountData(function(account)
     {
         var perc, warning, perc_c;
@@ -5071,13 +5085,15 @@ function transferPanelUI()
         }
     };
 
-    $('.transfer-settings-icon').unbind('click');
-    $('.transfer-settings-icon').bind('click', function()
+    $('.nw-fm-left-icon.settings .settings-icon').unbind('click');
+    $('.nw-fm-left-icon.settings .settings-icon').bind('click', function()
     {
         if (u_type === 0)
             ephemeralDialog('Transfer settings are for registered users only.');
-        else
+        else {
+			$('.nw-fm-left-icon').removeClass('active');
             document.location.hash = 'fm/account/settings';
+		}
     });
     $('.transfer-clear-all-icon').unbind('click');
     $('.transfer-clear-all-icon').bind('click', function() {

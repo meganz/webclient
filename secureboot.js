@@ -566,7 +566,6 @@ else
         jsl.push({f:'js/stringcrypt.js', n: 'stringcrypt_js', j:1});		
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-        jsl.push({f:'js/hex.js', n: 'hex_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
         jsl.push({f:'js/functions.js', n: 'functions_js', j:1});

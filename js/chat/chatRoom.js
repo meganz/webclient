@@ -686,6 +686,14 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         'persistanceKey': false,
         'direction': 's'
     });
+
+    $(self.audioVideoPaneResizable).bind("resizestop", function() {
+        self.resized();
+    });
+    $(self.audioVideoPaneResizable).bind("resize", function() {
+        self.resized();
+    });
+
     $('.drag-handle', self.$header).hide();
 
 
@@ -2939,7 +2947,7 @@ ChatRoom.prototype.resized = function(scrollToBottom) {
     var self = this;
 
     // Important. Please insure we have correct height detection for Chat messages block. We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
-    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-input-scroll').outerHeight() - $('.fm-right-header').outerHeight();
+    var scrollBlockHeight = $('.fm-chat-block').outerHeight() - $('.fm-chat-line-block').outerHeight() - self.$header.outerHeight() + 2;
 
     if (scrollBlockHeight != self.$messages.outerHeight())
     {

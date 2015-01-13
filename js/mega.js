@@ -4006,7 +4006,9 @@ function execsc(actionPackets, callback) {
 
                 if (typeof actionPacket.o != 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
-                        console.log('delete a share');
+                        if (d) {
+                            console.log('delete a share');
+                        }
                         // delete a share:
                         var n = M.d[actionPacket.n];
                         if (n && n.p.length !== 11) {
@@ -4041,7 +4043,9 @@ function execsc(actionPackets, callback) {
                                 su: actionPacket.o
                             });
                         } else {
-                            console.log('look up other root-share-nodes from this user');
+                            if (d) {
+                                console.log('look up other root-share-nodes from this user');
+                            }
                             // look up other root-share-nodes from this user:
                             if (typeof M.c[actionPacket.o] != 'undefined') {
                                 for (var i in M.c[actionPacket.o]) {
@@ -4996,6 +5000,11 @@ function fm_requestfolderid(h, name, ulparams)
     createfolder(h, name, ulparams);
 }
 
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
 function clone(obj)
 {
 
@@ -5021,9 +5030,19 @@ function clone(obj)
         var copy = {};
         for (var attr in obj)
         {
-            if (obj.hasOwnProperty(attr))
-                copy[attr] = clone(obj[attr]);
+            if (obj.hasOwnProperty(attr)) {
+                if(!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                } else if(!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                } else if($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                } else {
+                    copy[attr] = {};
+                }
+            }
         }
+
         return copy;
     }
 }

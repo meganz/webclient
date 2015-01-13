@@ -67,7 +67,8 @@ var notifyPopup = {
         // Notification popup which have an Accept or Not now button for contact requests
         $('.notification-scr-list, .new-notification-pad').on('click', '.notifications-button', function(event) {
 
-            var button = $(this);            
+            var button = $(this);
+            var notificationId = button.attr('data-notification-id');
             var pendingContactId = button.attr('data-pending-contact-id');
 
             // Stop the click bubbling up and going to the contacts screen
@@ -87,8 +88,12 @@ var notifyPopup = {
                 M.acceptPendingContactRequest(pendingContactId);
 
                 // Show the Accepted icon and text
-                button.closest('.notification-item').addClass('accepted');
+                button.closest('.notification-item').addClass('accepted');    
             }
+            
+            // Update popup counter
+            notifyPopup.markSpecificNotificationAsRead(notificationId);
+            
         });
 
         $('.notifications-button.red').unbind('click');
@@ -114,6 +119,29 @@ var notifyPopup = {
             notifyPopup.notifyCounter();
         });
 
+        notifyPopup.notifyCounter();
+    },
+
+    /**
+     * Sets a notification to read. Useful for when clicking Accept on an incoming pending contact notification
+     * @param {String} notificationId
+     */
+    markSpecificNotificationAsRead: function(notificationId) {
+        
+        // Search the notifications
+        for (var i = 0, length = notifyPopup.notifications.length; i < length; i++) {
+            
+            // If a match on the id
+            if (notifyPopup.notifications[i].id === notificationId) {
+                
+                // Mark the notification as read
+                notifyPopup.notifications[i].read = true;
+                notifyPopup.notifications[i].count = true;
+                break;
+            }
+        }
+        
+        // Update red circle and tooltip
         notifyPopup.notifyCounter();
     },
 
@@ -572,12 +600,13 @@ var notifyPopup = {
      */
     renderIncomingPendingContactNotification: function(notification) {
 
+        var notificationId = notification.id;
         var timestamp = notification.timestamp;
         var email = (notification.notificationObj.m) ? notification.notificationObj.m : notification.notificationObj.u[0].m;
         var pendingContactId = notification.notificationObj.p;                        
         var pendingContactHtml = '';
         var type = '';
-        var message= '';
+        var message = '';
         var mostRecentNotification = true;
         
         // Check if a newer contact request for this user has already been rendered (notifications are sorted by timestamp)
@@ -597,8 +626,8 @@ var notifyPopup = {
                 
                 // Render the Accept/Not now buttons
                 pendingContactHtml = '<span class="notification-request-buttons">'
-                                   +    '<span class="fm-dialog-button notifications-button accept" data-pending-contact-id="' + pendingContactId + '">Accept</span>'
-                                   +    '<span class="fm-dialog-button notifications-button not-now" data-pending-contact-id="' + pendingContactId + '">Not now</span>'
+                                   +    '<span class="fm-dialog-button notifications-button accept" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '">Accept</span>'
+                                   +    '<span class="fm-dialog-button notifications-button not-now" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '">Not now</span>'
                                    + '</span>';
             }
             
@@ -792,6 +821,19 @@ var notifyPopup = {
             $.maxnotification = maxaction;
             api_req({ a: 'sla', i: requesti });
         }
+    },
+    
+    markNotificationsRead: function() {
+        
+        for (var i in notifyPopup.notifications) {
+            
+            if (notifyPopup.notifications.hasOwnProperty(i)) { 
+                notifyPopup.notifications[i].count = true;
+                //notifyPopup.notifications[i].read = true;
+            }
+        }
+        
+        notifyPopup.notifyCounter();
     },
     
     /**

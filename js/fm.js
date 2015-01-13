@@ -5606,9 +5606,13 @@ function treeUI()
             }
         });
 
+
+    // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
-        if (!localStorage.contextmenu) {
+        if($(e.target).parents('.fm-chat-block').length > 0) {
+            return;
+        } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }
@@ -8791,7 +8795,7 @@ function fm_resize_handler() {
             initContactsGridScrolling();
     }
 
-    if (M.chat) {
+    if (typeof(megaChat) != 'undefined' && megaChat && megaChat.resized) {
         megaChat.resized();
     }
 

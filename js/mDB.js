@@ -6,7 +6,7 @@ if (!window.IDBKeyRange)
 if (!window.IDBTransaction)
     window.IDBTransaction = window.webkitIDBTransaction || window.OIDBTransaction || window.msIDBTransaction;
 
-var mDBact,mDBv=6;
+var mDBact, mDBv = 7;
 
 if (indexedDB)
 {

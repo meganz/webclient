@@ -1881,6 +1881,19 @@ function ephemeralDialog(msg)
     });
 }
 
+/**
+ * Removes the user from the share (they no longer want access to it)
+ * @param {String} shareId The share ID e.g. INlx1Kba
+ */
+function removeShare(shareId) {
+    
+    // Remove the share
+    api_updfkey(shareId);
+    M.delNode(shareId);
+    api_req({ a: 'd', n: shareId, i: requesti });
+    delete u_sharekeys[shareId];
+}
+
 function fmremove() {
     var filecnt = 0,
         foldercnt = 0,

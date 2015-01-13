@@ -4006,7 +4006,9 @@ function execsc(actionPackets, callback) {
 
                 if (typeof actionPacket.o != 'undefined') {
                     if (typeof actionPacket.r == "undefined") {
-                        console.log('delete a share');
+                        if (d) {
+                            console.log('delete a share');
+                        }
                         // delete a share:
                         var n = M.d[actionPacket.n];
                         if (n && n.p.length !== 11) {
@@ -4041,7 +4043,9 @@ function execsc(actionPackets, callback) {
                                 su: actionPacket.o
                             });
                         } else {
-                            console.log('look up other root-share-nodes from this user');
+                            if (d) {
+                                console.log('look up other root-share-nodes from this user');
+                            }
                             // look up other root-share-nodes from this user:
                             if (typeof M.c[actionPacket.o] != 'undefined') {
                                 for (var i in M.c[actionPacket.o]) {

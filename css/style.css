@@ -9538,6 +9538,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 	padding-right: 4px;
 }
+.share-dialog .fm-notifications-bottom {
+	position:static;
+}
 .free-popup .fm-notifications-bottom, .pro-popup .fm-notifications-bottom {
 	-webkit-border-bottom-right-radius: 0;
 	-moz-border-radius-bottomright: 0;

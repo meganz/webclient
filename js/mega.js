@@ -3969,7 +3969,7 @@ function execsc(actionPackets, callback) {
             }
         }
         else if (actionPacket.a === 'e') {
-            var str = hex2bin(a.c);
+            var str = hex2bin(actionPacket.c || "");
             if (str.substr(0, 5) === ".cms.") {
                 var cmsType = str.split(".")[2];
                 var cmsId = str.substr(6 + cmsType.length).split(".");

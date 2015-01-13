@@ -991,17 +991,19 @@ function api_proc(q)
 				{
 					if (this.q.ctxs[this.q.i][i].callback)
 					{
-						try 
-						{
+						try {
 							this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
-						} catch (e)
-						{
+						} catch (ex) {
 							// if there is *any* issue on the callback
-							// we don't want to HALT, instead we let the channel 
+							// we don't want to HALT, instead we let the channel
 							// a chance to clean itself and continue
-							// Otherwise if we load #blog *or* #page_<something> 
+							// Otherwise if we load #blog *or* #page_<something>
 							// the whole site is buggy
-							// Perhaps we should log this?
+
+							console.error(ex);
+							Soon(function() {
+								throw ex;
+							});
 						}
 					}
 				}
@@ -1150,7 +1152,7 @@ function getsc(fm)
 				{
 					if (sma !== false && typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB === 'object')
 						localStorage[u_handle + '_maxaction'] = maxaction;
-					
+
 					if (ctx.fm)
 					{
 						mDBloaded=true;
@@ -2149,9 +2151,9 @@ function fa_handler(xhr, ctx)
 			this.setParser('arraybuffer', this.plain_parser)
 		}
 		else
-		{	
+		{
 			switch(fa_handler.browser)
-			{	
+			{
 				case 'Firefox':
 					this.parse = this.moz_parser;
 					this.responseType = 'moz-chunked-arraybuffer';
@@ -2162,7 +2164,7 @@ function fa_handler(xhr, ctx)
 					this.responseType = 'ms-stream';
 					this.stream_reader= this.msstream_reader;
 					break;
-				*/	
+				*/
 				case 'xChrome':
 						this.parse = this.stream_parser;
 						this.responseType = 'stream';
@@ -2284,7 +2286,7 @@ fa_handler.prototype =
 
 	plain_parser: function(data)
 	{
-		if (this.xhr.readyState == 4) 
+		if (this.xhr.readyState == 4)
 		{
 			if (!this.xpos)  this.xpos = 12;
 			var bytes = data.slice(this.xpos)

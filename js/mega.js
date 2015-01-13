@@ -1106,9 +1106,18 @@ function MegaData()
             $('body').addClass('overlayed');
         });
 
+        // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
         $('.shared-details-info-block .fm-leave-share').unbind('click');
         $('.shared-details-info-block .fm-leave-share').bind('click', function(e) {
-            $('.nw-fm-left-icon.cloud-drive').trigger('click');
+            
+            // Get the share ID from the hash in the URL
+            var shareId = window.location.hash.replace('#fm/', '');
+            
+            // Remove user from the share
+            removeShare(shareId);
+            
+            // Open the shares folder
+            M.openFolder('shares', true);
         });
 
         $('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');

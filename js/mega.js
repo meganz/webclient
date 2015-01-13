@@ -5000,6 +5000,11 @@ function fm_requestfolderid(h, name, ulparams)
     createfolder(h, name, ulparams);
 }
 
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
 function clone(obj)
 {
 
@@ -5025,9 +5030,19 @@ function clone(obj)
         var copy = {};
         for (var attr in obj)
         {
-            if (obj.hasOwnProperty(attr))
-                copy[attr] = clone(obj[attr]);
+            if (obj.hasOwnProperty(attr)) {
+                if(!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                } else if(!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                } else if($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                } else {
+                    copy[attr] = {};
+                }
+            }
         }
+
         return copy;
     }
 }

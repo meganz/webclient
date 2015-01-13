@@ -199,13 +199,10 @@ function u_logout(logout)
 		loggedout = true;
 		$('#fmholder').html('');
 		$('#fmholder').attr('class','fmholder');
-		M = new MegaData(); 
+		M = new MegaData();
         mDBcls(); // resets mDBloaded
 		$.hideContextMenu = function () {};
 		api_reset();
-        mDBcls(); // resets mDBloaded (why is this done twice?)
-        
-		$.hideContextMenu= function () {};
 		if (waitxhr)
 		{
 			waitxhr.abort();
@@ -651,14 +648,10 @@ function setUserAttribute(attribute, value, pub, callback, mode) {
 })(window);
 
 function isNonActivatedAccount() {
-    if(!u_privk && typeof(u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (!u_privk && typeof(u_attr.p) !== 'undefined' && (u_attr.p == 1 || u_attr.p == 2 || u_attr.p == 3));
 }
 
-function isEphemeral() 
+function isEphemeral()
 {
     return (u_type === 0);
 }

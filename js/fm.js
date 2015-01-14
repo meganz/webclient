@@ -7471,15 +7471,15 @@ function moveDialog()
 
 function getclipboardlinks()
 {
-	var l='';
+	var link ='';
 	for (var i in M.links)
 	{
 		var n = M.d[M.links[i]];
-		var key,s;
+		var key, s;
 		if (n.t)
 		{
 			key = u_sharekeys[n.h];
-			s='';
+			s = '';
 		}
 		else
 		{
@@ -7488,14 +7488,20 @@ function getclipboardlinks()
 		}
 		if (n && n.ph)
 		{
-			var F='';
-			if (n.t) F='F';
-			if (i > 0) l += '\n';
-			l += 'https://mega.co.nz/#'+F+'!' + htmlentities(n.ph);
-			if (key && $('#export-checkbox').is(':checked')) l += '!' + a32_to_base64(key);
+			var F = '';
+			if (n.t) F = 'F';
+			if (i > 0) link += '\n';
+            
+            // Add the link to the file e.g. https://mega.co.nz/#!qRN33YbK
+			link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
+			
+            // If they want the file key as well, add it e.g. https://mega.co.nz/#!qRN33YbK!o4Z76qDqP...
+            if (key && $('#export-checkbox').is(':checked')) {
+                link += '!' + a32_to_base64(key);
+            }
 		}
 	}
-	return l;
+	return link;
 }
 
 function getclipboardkeys()
@@ -7534,23 +7540,38 @@ function linksDialog(close)
     for (var i in M.links)
     {
         var n = M.d[M.links[i]];
-        var key, s, F;
+        var key, fileSize, F;
         if (n.t)
         {
             F = 'F';
             key = u_sharekeys[n.h];
-            s = '';
+            fileSize = '';
         }
         else
         {
             F = '';
             key = n.key;
-            s = htmlentities(bytesToSize(n.s));
+            fileSize = htmlentities(bytesToSize(n.s));
         }
 
         if (n && n.ph)
         {
-            html += '<div class="export-link-item"><div class="export-icon ' + fileicon(n) + '" ></div><div class="export-link-text-pad"><div class="export-link-txt">' + htmlentities(n.name) + ' <span class="export-link-gray-txt">' + s + '</span></div><div class="export-link-txt">https://mega.co.nz/#' + F + '!' + htmlentities(n.ph) + '<span class="export-link-gray-txt file-key">!' + a32_to_base64(key) + '</span></div></div></div>';
+            var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
+            var fileUrlWithKey = fileUrlWithoutKey + '!' + a32_to_base64(key);
+            
+            html += '<div class="export-link-item">'
+                 +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
+                 +      '<div class="export-link-text-pad">'
+                 +          '<div class="export-link-txt">'
+                 +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
+                 +          '</div>'
+                 +          '<div>'
+                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrlWithKey + '">'
+                 +          '</div>'
+                 +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
+                 +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
+                 +      '</div>'
+                 +  '</div>';
         }
     }
     $('.export-links-warning-close').unbind('click');
@@ -7564,73 +7585,94 @@ function linksDialog(close)
         linksDialog(1);
     });
 
-    if (is_extension)
-    {
-        if (!is_chrome_firefox)
+    // If Flash is enabled setup the copy buttons
+    if (flashIsEnabled()) {
+        
+        // Setup the copy to clipboard buttons
+        if (is_extension)
         {
-            $('.fm-dialog-chrome-clipboard').removeClass('hidden');
-            $("#chromeclipboard").fadeTo(1, 0.01);
+            if (!is_chrome_firefox)
+            {
+                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
+                $("#chromeclipboard").fadeTo(1, 0.01);
+            }
+            // chrome & firefox extension:
+            $("#clipboardbtn1").unbind('click');
+            $("#clipboardbtn1").bind('click', function()
+            {
+                if (is_chrome_firefox)
+                    mozSetClipboard(getclipboardlinks());
+                else
+                {
+                    $('#chromeclipboard')[0].value = getclipboardlinks();
+                    $('#chromeclipboard').select();
+                    document.execCommand('copy');
+                }
+            });
+            $('#clipboardbtn2').unbind('click');
+            $('#clipboardbtn2').bind('click', function()
+            {
+                if (is_chrome_firefox)
+                    mozSetClipboard(getclipboardkeys());
+                else
+                {
+                    $('#chromeclipboard')[0].value = getclipboardkeys();
+                    $('#chromeclipboard').select();
+                    document.execCommand('copy');
+                }
+            });
+            $('#clipboardbtn1').text(l[370]);
+            $('#clipboardbtn2').text(l[1033]);
         }
-        // chrome & firefox extension:
-        $("#clipboardbtn1").unbind('click');
-        $("#clipboardbtn1").bind('click', function()
+        else
         {
-            if (is_chrome_firefox)
-                mozSetClipboard(getclipboardlinks());
-            else
-            {
-                $('#chromeclipboard')[0].value = getclipboardlinks();
-                $('#chromeclipboard').select();
-                document.execCommand('copy');
-            }
-        });
-        $('#clipboardbtn2').unbind('click');
-        $('#clipboardbtn2').bind('click', function()
-        {
-            if (is_chrome_firefox)
-                mozSetClipboard(getclipboardkeys());
-            else
-            {
-                $('#chromeclipboard')[0].value = getclipboardkeys();
-                $('#chromeclipboard').select();
-                document.execCommand('copy');
-            }
-        });
-        $('#clipboardbtn1').text(l[370]);
-        $('#clipboardbtn2').text(l[1033]);
-    }
-    else
-    {
-        $('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            $('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            $('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
-        $('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
-
-        $('#clipboardbtn1').unbind('mouseover');
-        $('#clipboardbtn1').bind('mouseover', function()
-        {
-            var e = $('#clipboardswf1')[0];
-            if (e && e.setclipboardtext)
-                e.setclipboardtext(getclipboardlinks());
-        });
-        $('#clipboardbtn2').unbind('mouseover');
-        $('#clipboardbtn2').bind('mouseover', function()
-        {
-            var e = $('#clipboardswf2')[0];
-            if (e && e.setclipboardtext)
-                e.setclipboardtext(getclipboardkeys());
-        });
+            $('#clipboardbtn1').unbind('mouseover');
+            $('#clipboardbtn1').bind('mouseover', function()
+            {
+                var e = $('#clipboardswf1')[0];
+                if (e && e.setclipboardtext)
+                    e.setclipboardtext(getclipboardlinks());
+            });
+            $('#clipboardbtn2').unbind('mouseover');
+            $('#clipboardbtn2').bind('mouseover', function()
+            {
+                var e = $('#clipboardswf2')[0];
+                if (e && e.setclipboardtext)
+                    e.setclipboardtext(getclipboardkeys());
+            });
+        }
     }
-    $('.export-checkbox :checkbox').iphoneStyle({resizeContainer: false, resizeHandle: false, onChange: function(elem, data)
+    else {
+        // Hide the clipboard buttons if Flash is disabled
+        $('#clipboardbtn1').addClass('hidden');
+        $('#clipboardbtn2').addClass('hidden');
+    }    
+    
+    // On Export File Links and Decryption Keys dialog
+    $('.export-checkbox :checkbox').iphoneStyle({
+        resizeContainer: false,
+        resizeHandle: false,
+        onChange: function(elem, data)
         {
             if (data) {
                 $(elem).closest('.on_off').addClass('on');
-                $('.export-links-dialog').addClass('file-keys-view');
+                
+                // Show link with key
+                var fileLinkWithKey = $('.file-link-with-key').text();
+                $('.export-link-url').val(fileLinkWithKey);
             }
             else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
-                $('.export-links-dialog').removeClass('file-keys-view');
+                
+                // Show link without key
+                var fileLinkWithoutKey = $('.file-link-without-key').text();
+                $('.export-link-url').val(fileLinkWithoutKey);
             }
-        }});
+        }
+    });
     $('.export-checkbox').addClass('on');
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);

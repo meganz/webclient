@@ -2143,3 +2143,37 @@ function hex2bin(hex)
 
 	return String.fromCharCode.apply(String, bytes);
 }
+
+/**
+ * Detects if Flash is enabled or disabled in the user's browser
+ * From http://stackoverflow.com/a/20095467
+ * @returns {Boolean}
+ */
+function flashIsEnabled() {
+    
+    var flashEnabled = false;
+    
+    try {
+        var flashObject = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+        if (flashObject) {
+            flashEnabled = true;
+        }
+    }
+    catch (e) {
+        if (navigator.mimeTypes && (navigator.mimeTypes['application/x-shockwave-flash'] != undefined) && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
+            flashEnabled = true;
+        }
+    }
+    
+    return flashEnabled;
+}
+
+/**
+ * Gets the current base URL of the page (protocol + hostname) e.g. If on beta.mega.nz it will return https://beta.mega.nz.
+ * If on the browser extension it will return the default https://mega.co.nz. If on localhost it will return https://mega.co.nz.
+ * This can be used to create external links, for example file downloads https://mega.co.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
+ * @returns {String}
+ */
+function getBaseUrl() {
+    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.co.nz');
+}

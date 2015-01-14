@@ -632,7 +632,11 @@ var Chat = function() {
                         //                        rawkey = key
                         //                    }
                     }
-                    return asmCrypto.HMAC_SHA256.base64(msg, rawkey);
+                    var b64 = asmCrypto.HMAC_SHA256.base64(msg, rawkey);
+                    //use the SDK's base64 alphabet, it is also safer for using in URLs
+                    b64.replace('/', '_');
+                    b64.replace('+', '-');
+                    return b64;
                 },
                 scrambleJid: function(bareJid) {
                     var H = asmCrypto.SHA256.base64;

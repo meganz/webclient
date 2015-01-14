@@ -6975,6 +6975,15 @@ span.search-number {
 .fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
 	background-position: right -1640px;
 }
+
+.fm-start-call.disabled:hover {
+	background-color: rgba(6, 160, 236, 0.7);
+	background-position: -9px -1670px;
+}
+.fm-start-call.disabled:hover .fm-chatbutton-arrow {
+	background-position: right -1610px;
+}
+
 .fm-clearbin-button, .fm-share-download {
 	background-position: -3px -5820px;
 	background-color: rgba(211,26,0,0.7);

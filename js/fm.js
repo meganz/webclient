@@ -7585,68 +7585,64 @@ function linksDialog(close)
         linksDialog(1);
     });
 
-    // If Flash is enabled setup the copy buttons
-    if (flashIsEnabled()) {
-        
-        // Setup the copy to clipboard buttons
-        if (is_extension)
+    // Setup the copy to clipboard buttons
+    if (is_extension)
+    {
+        if (!is_chrome_firefox)
         {
-            if (!is_chrome_firefox)
+            $('.fm-dialog-chrome-clipboard').removeClass('hidden');
+            $("#chromeclipboard").fadeTo(1, 0.01);
+        }
+        // chrome & firefox extension:
+        $("#clipboardbtn1").unbind('click');
+        $("#clipboardbtn1").bind('click', function()
+        {
+            if (is_chrome_firefox)
+                mozSetClipboard(getclipboardlinks());
+            else
             {
-                $('.fm-dialog-chrome-clipboard').removeClass('hidden');
-                $("#chromeclipboard").fadeTo(1, 0.01);
+                $('#chromeclipboard')[0].value = getclipboardlinks();
+                $('#chromeclipboard').select();
+                document.execCommand('copy');
             }
-            // chrome & firefox extension:
-            $("#clipboardbtn1").unbind('click');
-            $("#clipboardbtn1").bind('click', function()
-            {
-                if (is_chrome_firefox)
-                    mozSetClipboard(getclipboardlinks());
-                else
-                {
-                    $('#chromeclipboard')[0].value = getclipboardlinks();
-                    $('#chromeclipboard').select();
-                    document.execCommand('copy');
-                }
-            });
-            $('#clipboardbtn2').unbind('click');
-            $('#clipboardbtn2').bind('click', function()
-            {
-                if (is_chrome_firefox)
-                    mozSetClipboard(getclipboardkeys());
-                else
-                {
-                    $('#chromeclipboard')[0].value = getclipboardkeys();
-                    $('#chromeclipboard').select();
-                    document.execCommand('copy');
-                }
-            });
-            $('#clipboardbtn1').text(l[370]);
-            $('#clipboardbtn2').text(l[1033]);
-        }
-        else
+        });
+        $('#clipboardbtn2').unbind('click');
+        $('#clipboardbtn2').bind('click', function()
         {
-            $('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
-            $('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+            if (is_chrome_firefox)
+                mozSetClipboard(getclipboardkeys());
+            else
+            {
+                $('#chromeclipboard')[0].value = getclipboardkeys();
+                $('#chromeclipboard').select();
+                document.execCommand('copy');
+            }
+        });
+        $('#clipboardbtn1').text(l[370]);
+        $('#clipboardbtn2').text(l[1033]);
+    }
+    else if (flashIsEnabled())
+    {
+        $('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
-            $('#clipboardbtn1').unbind('mouseover');
-            $('#clipboardbtn1').bind('mouseover', function()
-            {
-                var e = $('#clipboardswf1')[0];
-                if (e && e.setclipboardtext)
-                    e.setclipboardtext(getclipboardlinks());
-            });
-            $('#clipboardbtn2').unbind('mouseover');
-            $('#clipboardbtn2').bind('mouseover', function()
-            {
-                var e = $('#clipboardswf2')[0];
-                if (e && e.setclipboardtext)
-                    e.setclipboardtext(getclipboardkeys());
-            });
-        }
+        $('#clipboardbtn1').unbind('mouseover');
+        $('#clipboardbtn1').bind('mouseover', function()
+        {
+            var e = $('#clipboardswf1')[0];
+            if (e && e.setclipboardtext)
+                e.setclipboardtext(getclipboardlinks());
+        });
+        $('#clipboardbtn2').unbind('mouseover');
+        $('#clipboardbtn2').bind('mouseover', function()
+        {
+            var e = $('#clipboardswf2')[0];
+            if (e && e.setclipboardtext)
+                e.setclipboardtext(getclipboardkeys());
+        });
     }
     else {
-        // Hide the clipboard buttons if Flash is disabled
+        // Hide the clipboard buttons if not using the extension and Flash is disabled
         $('#clipboardbtn1').addClass('hidden');
         $('#clipboardbtn2').addClass('hidden');
     }    

@@ -10234,6 +10234,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+    display: table;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
@@ -10251,9 +10252,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: 0 0;
 }
 .export-link-text-pad {
-	height: 56px;
-	vertical-align: middle;
 	display: table-cell;
+    height: 56px;
+    vertical-align: middle;
+    width: 100%;
 }
 .export-link-txt {
 	font-size: 11px;
@@ -10268,6 +10270,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .export-link-txt:first-child {
 	color: #666666;
 	font-size: 12px;
+}
+.export-link-url {
+    border: 0 none;
+    color: #d90007; 
+    font-size: 11px;
+    line-height: 19px;
+    width: 100%;
 }
 .export-link-gray-txt {
 	color: #999999;

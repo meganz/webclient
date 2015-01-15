@@ -1154,8 +1154,12 @@ function getsc(fm)
 			{
 				function done(sma)
 				{
-					if (sma !== false && typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB === 'object')
-						localStorage[u_handle + '_maxaction'] = maxaction;
+					if (sma !== -0x7ff
+                        && typeof mDBloaded !== 'undefined'
+                        && !folderlink && !pfid
+                        && typeof mDB !== 'undefined') {
+                            localStorage[u_handle + '_maxaction'] = maxaction;
+                        }
 
 					if (ctx.fm)
 					{
@@ -1168,20 +1172,12 @@ function getsc(fm)
 				{
 					waiturl = res.w;
 					waittimeout = setTimeout(waitsc,waitbackoff);
-					done(!1);
+					done(-0x7ff);
 				}
 				else
 				{
 					if (res.sn) maxaction = res.sn;
 					execsc(res.a, done);
-					if (typeof mDBloaded !== 'undefined' && !folderlink && !pfid && typeof mDB !== 'undefined') localStorage[u_handle + '_maxaction'] = maxaction;
-				}
-
-				if (ctx.fm)
-				{
-					mDBloaded=true;
-					renderfm();
-					notifyPopup.pollNotifications();
 				}
 			}
 		}
@@ -2136,7 +2132,6 @@ function api_getfileattr(fa,type,procfa,errfa)
 		}
 		else if (errfa) errfa(n);
 	}
-
 
 	for (n in p)
 	{

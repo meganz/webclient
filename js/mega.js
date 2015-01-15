@@ -3094,7 +3094,9 @@ function MegaData()
             initFileblocksScrolling();
             initTreeScroll();
             setupTransferAnalysis();
-            downloading = !!dl_queue.length;
+            if ((downloading = !!dl_queue.length)) {
+                $('.transfer-pause-icon').removeClass('hidden');
+            }
         }
 
         delete $.dlhash;
@@ -3508,7 +3510,9 @@ function MegaData()
             openTransferpanel();
 
         setupTransferAnalysis();
-        ul_uploading = !!ul_queue.length;
+        if ((ul_uploading = !!ul_queue.length)) {
+            $('.transfer-pause-icon').removeClass('hidden');
+        }
     }
 
     this.ulprogress = function(ul, perc, bl, bt, bps)

@@ -938,6 +938,7 @@ function resetUploadDownload() {
 	{
 		clearXhr(); /* destroy all xhr */
 
+		$('.transfer-pause-icon').addClass('hidden');
 		$('.transfer-panel-empty-txt').removeClass('hidden');
 		$('.transfer-table-header').hide(0);
 

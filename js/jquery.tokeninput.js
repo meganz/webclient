@@ -932,7 +932,7 @@
                         position: "absolute",
                         top: token_list.offset().top + token_list.outerHeight(true),
                         left: token_list.offset().left,
-                        width: token_list.width(),
+                        width: $(input).closest('.multiple-input').width() + 4,
                         'z-index': $(input).data("settings").zindex
                     })
                     .show();

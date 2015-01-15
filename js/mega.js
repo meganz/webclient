@@ -696,7 +696,7 @@ function MegaData()
         }
 
         // Check elements number, if empty draw empty grid
-        if (Object.keys(this.v).length === 0) {
+        if (this.v.length === 0) {
             if (M.currentdirid === M.RubbishID) {
                 $('.fm-empty-trashbin').removeClass('hidden');
             } else if (M.currentdirid === 'contacts') {
@@ -1302,13 +1302,16 @@ function MegaData()
                 M.doSort('name', 1);
             }
 
-            // ToDo: Cause this.v is not filled with .opc or .ipc adding it here
-            // Check how M.u is assigned to this.v or where it's assigned if not
-            // in previous part of code
             if (M.currentdirid === 'opc') {
-                this.v = M.opc;
+                this.v = [];
+                for (var i in M.opc) {
+                    this.v.push(M.opc[i]);
+                }
             } else if (M.currentdirid === 'ipc') {
-                this.v = M.ipc;
+                this.v = [];
+                for (var i in M.ipc) {
+                    this.v.push(M.ipc[i]);
+                }
             }
 
             M.renderMain();

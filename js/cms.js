@@ -182,7 +182,7 @@ function _cms_request(ids, next)
 		, q  = []
 		, done = 0
 	for (var i in ids) {
-		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
+		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true, apipath: 'https://eu.api.mega.co.nz/' })
 		q[i] = null
 	}
 

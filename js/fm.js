@@ -1405,10 +1405,7 @@ function addContactUI()
 
     function focusOnInput()
     {
-        var $tokenInput = $('#token-input-'),
-            width = $('.add-user-popup .add-user-popup-pad .multiple-input').width();
-
-        $('.token-input-dropdown-mega').css('width', width + 'px');
+        var $tokenInput = $('#token-input-');
 
         $tokenInput
             .val('')

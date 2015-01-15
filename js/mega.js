@@ -121,13 +121,25 @@ function MegaData()
 
     this.sortByName = function(d)
     {
-        this.sortfn = function(a, b, d)
+        // if (typeof Intl !== 'undefined' && Intl.Collator)
+        // {
+            // var intl = new Intl.Collator('co', { numeric: true });
+
+            // this.sortfn = function(a,b,d)
+            // {
+                // return intl.compare(a.name,b.name)*d;
+            // };
+        // }
+        // else
         {
-            if (typeof a.name == 'string' && typeof b.name == 'string')
-                return a.name.localeCompare(b.name) * d;
-            else
-                return -1;
-        };
+            this.sortfn = function(a,b,d)
+            {
+                if (typeof a.name == 'string' && typeof b.name == 'string')
+                    return a.name.localeCompare(b.name) * d;
+                else
+                    return -1;
+            };
+        }
         this.sortd = d;
         this.sort();
     };
@@ -654,7 +666,7 @@ function MegaData()
         }
         var cache = [], n_cache, files = 0, jsp, t, lSel;
 
-        DEBUG('renderMain');
+        if(d) console.log('renderMain', u);
 
         lSel = this.fsViewSel;
         $(lSel).unbind('jsp-scroll-y.dynlist');
@@ -747,22 +759,26 @@ function MegaData()
         delete this.cRenderMainN;
 
         for (var i in this.v) {
-            if (this.v[i].name) {
-                var s = '';
-                var ftype = '';
-                var c = '';
-                if (this.v[i].t) {
-                    ftype = l[1049];
-                    c = ' folder';
-                } else {
-                    ftype = filetype(this.v[i].name);
-                    s = htmlentities(bytesToSize(this.v[i].s));
-                }
-                var html, el, cc, star = '';
-                if (this.v[i].fav) {
-                    star = ' star';
-                }
+            if (!this.v[i].name) {
+                if (d) console.log('Skipping M.v node with no name.', M.v[i]);
+                continue;
             }
+
+            var s = '';
+            var ftype = '';
+            var c = '';
+            if (this.v[i].t) {
+                ftype = l[1049];
+                c = ' folder';
+            } else {
+                ftype = filetype(this.v[i].name);
+                s = htmlentities(bytesToSize(this.v[i].s));
+            }
+            var html, el, cc, star = '';
+            if (this.v[i].fav) {
+                star = ' star';
+            }
+
             if (this.currentdirid === 'contacts') {
                 var u_h = this.v[i].h;
                 var cs = this.contactstatus(u_h);
@@ -928,36 +944,6 @@ function MegaData()
                 if (cc) {
                     // console.log(i, this.v[i].name,cache.map(n=>n[2]));
 
-                    /*	if (u && this.v[i-1] && cache[this.v[i-1].h])
-                     {
-                     j = cache[this.v[i-1].h][0];
-                     for (var x = 0, m = cache.length ; x < m ; ++x)
-                     {
-                     if (cache[x][0] === j)
-                     {
-                     cache.splice(x,0,cc);
-                     break;
-                     }
-                     }
-                     // the cached node have to be found
-                     ASSERT(x!=m,'Huh..2b');
-                     }
-                     else if (u && this.v[i+1] && cache[this.v[i+1].h]) // XXX?
-                     {
-                     j = cache[this.v[i+1].h][0];
-                     for (var x = 0, m = cache.length ; x < m ; ++x)
-                     {
-                     if (cache[x][0] === j)
-                     {
-                     ASSERT(x>0,'3b');
-                     cache.splice(x-1,0,cc);
-                     break;
-                     }
-                     }
-                     // the cached node have to be found
-                     ASSERT(x!=m,'Huh..3b');
-                     }
-                     else*/
                     if (this.v[i].t) {
                         for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
                         cache.splice(x, 0, cc);
@@ -988,7 +974,6 @@ function MegaData()
                     }
                 }
             }
-//            }// ToDo: previous END of if (this.v[i].name) {, can be huge change/bug cause wrapped big amount of code
         }
 
         contactUI();// ToDo: Document this function,
@@ -2383,7 +2368,6 @@ function MegaData()
         }
     };
 
-
     /**
      * Delete opc record from localStorage using id
      *
@@ -2922,7 +2906,7 @@ function MegaData()
                 if (M.d[e].t == 1 && M.d[e].p == d)
                 {
                     var p = o || [];
-					if (!o) p.push(fm_safename(M.d[d].name));
+                    if (!o) p.push(fm_safename(M.d[d].name));
                     p.push(fm_safename(M.d[e].name));
                     if (!getfolders(M.d[e].h, p))
                         dirs.push(p);
@@ -3007,46 +2991,46 @@ function MegaData()
             }
         }
 
-		if (z)
-		{
-			zipid++;
-			z=zipid;
-			if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-			else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
-			var zipsize = 0;
-		}
-		else z = false;
-		if (!$.totalDL) $.totalDL=0;
-		for (var i in nodes)
-		{
-			if (!(n = M.d[nodes[i]]))
-			{
-				if (d) console.error('** CHECK THIS **', 'Invalid node', nodes[i]);
-				continue;
-			}
-			path = paths[nodes[i]] || '';
-			$.totalDL+=n.s;
-			var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
-			if (li.length == 0)
-			{
-				dl_queue.push(
-				{
-					id: n.h,
-					key: n.key,
-					n: n.name,
-					t: n.ts,
-					p: path,
-					size: n.s,
-					onDownloadProgress: this.dlprogress,
-					onDownloadComplete: this.dlcomplete,
-					onBeforeDownloadComplete: this.dlbeforecomplete,
-					onDownloadError: this.dlerror,
-					onDownloadStart: this.dlstart,
-					zipid: z,
-					zipname: zipname,
-					preview: preview
-				});
-				zipsize += n.s;
+        if (z)
+        {
+            zipid++;
+            z=zipid;
+            if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
+            else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
+            var zipsize = 0;
+        }
+        else z = false;
+        if (!$.totalDL) $.totalDL=0;
+        for (var i in nodes)
+        {
+            if (!(n = M.d[nodes[i]]))
+            {
+                if (d) console.error('** CHECK THIS **', 'Invalid node', nodes[i]);
+                continue;
+            }
+            path = paths[nodes[i]] || '';
+            $.totalDL+=n.s;
+            var li = $('.transfer-table #' + 'dl_'+htmlentities(n.h));
+            if (li.length == 0)
+            {
+                dl_queue.push(
+                {
+                    id: n.h,
+                    key: n.key,
+                    n: n.name,
+                    t: n.ts,
+                    p: path,
+                    size: n.s,
+                    onDownloadProgress: this.dlprogress,
+                    onDownloadComplete: this.dlcomplete,
+                    onBeforeDownloadComplete: this.dlbeforecomplete,
+                    onDownloadError: this.dlerror,
+                    onDownloadStart: this.dlstart,
+                    zipid: z,
+                    zipname: zipname,
+                    preview: preview
+                });
+                zipsize += n.s;
 
                 var flashhtml = '';
                 if (dlMethod == FlashIO) {
@@ -3086,8 +3070,8 @@ function MegaData()
                 + '<td><span class="transfer-status queued">Queued</span></td>'
                 + '<td class="grid-url-field"><a class="grid-url-arrow"><span></span></a></td></tr>');
 
-//		$('.tranfer-view-icon').addClass('active');
-//		$('.fmholder').addClass('transfer-panel-opened');
+//        $('.tranfer-view-icon').addClass('active');
+//        $('.fmholder').addClass('transfer-panel-opened');
         $.transferHeader();
 
         if (!preview)
@@ -3608,32 +3592,32 @@ function MegaData()
         $('.transfer-table #ul_' + id + ' td:eq(5)').html('<span class="transfer-status completed">' + l[554] + '</span>');
         $('.transfer-table #ul_' + id + ' td:eq(3)').text('');
 
-		$('.transfer-table #ul_' + id).fadeOut('slow', function(e)
-		{
-			$(this).remove();
-			$(window).trigger('resize');
-		});
-		ul_queue[ul.pos] = Object.freeze({});
-		var a=ul_queue.filter(isQueueActive).length;
-		if (a < 2 && !ul_uploading)
-		{
-			$('.widget-block').fadeOut('slow',function(e)
-			{
-				$('.widget-block').addClass('hidden');
-				$('.widget-block').css({opacity:1});
-			});
-		}
-		else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
-		else $('.widget-circle').attr('class','widget-circle percents-0');
-		if ($.transferprogress && $.transferprogress['ul_'+ id])
-		{
-			if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
-			$.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
-			delete $.transferprogress['ul_'+ id];
-		}
-		$.transferHeader();
-		Soon(resetUploadDownload);
-	}
+        $('.transfer-table #ul_' + id).fadeOut('slow', function(e)
+        {
+            $(this).remove();
+            $(window).trigger('resize');
+        });
+        ul_queue[ul.pos] = Object.freeze({});
+        var a=ul_queue.filter(isQueueActive).length;
+        if (a < 2 && !ul_uploading)
+        {
+            $('.widget-block').fadeOut('slow',function(e)
+            {
+                $('.widget-block').addClass('hidden');
+                $('.widget-block').css({opacity:1});
+            });
+        }
+        else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
+        else $('.widget-circle').attr('class','widget-circle percents-0');
+        if ($.transferprogress && $.transferprogress['ul_'+ id])
+        {
+            if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
+            $.transferprogress['ulc'] += $.transferprogress['ul_'+ id][1];
+            delete $.transferprogress['ul_'+ id];
+        }
+        $.transferHeader();
+        Soon(resetUploadDownload);
+    }
 
     this.ulstart = function(ul)
     {
@@ -3899,7 +3883,7 @@ function execsc(actionPackets, callback) {
     var trights = false;
     var tmoveid = false;
     var rootsharenodes = [];
-	var async_procnodes = [];
+    var async_procnodes = [];
 
     var loadavatars = false;
 
@@ -4184,14 +4168,19 @@ function execsc(actionPackets, callback) {
                     megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                 });
             }
-        } else if (actionPacket.a === 'd')
-        {
+        } else if (actionPacket.a === 'd') {
             M.delNode(actionPacket.n);
         } else if (actionPacket.a === 'ua' && fminitialized) {
             for (var i in actionPacket.ua) {
                 if (actionPacket.ua[i] === '+a') {
                     avatars[actionPacket.u] = undefined;
                     loadavatars = true;
+
+                } else if (actionPacket.ua[i] == '+puEd255') {
+                    // pubEd25519 key was updated!
+                    // force finger regen.
+                    delete pubEd25519[actionPacket.u];
+                    getPubEd25519(actionPacket.u);
                 }
             }
         } else if (actionPacket.a === 'u') {
@@ -4261,20 +4250,20 @@ function execsc(actionPackets, callback) {
             }
         }
     }
-	if (async_procnodes.length) {
-		process_f(async_procnodes, done);
-	} else {
-		done();
-	}
+    if (async_procnodes.length) {
+        process_f(async_procnodes, done);
+    } else {
+        done();
+    }
 
     function done() {
-		if (newnodes.length > 0 && fminitialized) rendernew();
-		if (loadavatars) M.avatars();
-		fm_thumbnails();
-		if ($.dialog === 'properties') propertiesDialog();
-		getsc();
-		if (callback) Soon(callback);
-	}
+        if (newnodes.length > 0 && fminitialized) rendernew();
+        if (loadavatars) M.avatars();
+        fm_thumbnails();
+        if ($.dialog === 'properties') propertiesDialog();
+        getsc();
+        if (callback) Soon(callback);
+    }
 }
 
 var M = new MegaData();
@@ -4359,8 +4348,8 @@ function ddtype(ids, toid, alt)
     {
         var fromid = ids[i], fromid_r;
 
-		if (fromid == toid || !M.d[fromid]) return false;
-		fromid_r = RootbyId(fromid);
+        if (fromid == toid || !M.d[fromid]) return false;
+        fromid_r = RootbyId(fromid);
 
         // never allow move to own inbox, or to own contacts
         if (toid == M.InboxID || toid == 'contacts')
@@ -4450,41 +4439,41 @@ function fm_getsharenodes(h, root)
 
 function fm_getcopynodes(cn, t)
 {
-	var a=[];
-	var r=[];
-	var c=11 == (t || "").length;
-	for (var i in cn)
-	{
-		var s = fm_getnodes(cn[i]);
-		for (var j in s) r.push(s[j]);
-		r.push(cn[i]);
-	}
-	for(var i in r)
-	{
-		var n = M.d[r[i]];
-		if (n)
-		{
-			var ar = n.ar && clone(n.ar) || {};
-			if (typeof ar.fav !== 'undefined') delete ar.fav;
-			var mkat = enc_attr(ar,n.key);
-			var attr = ab_to_base64(mkat[0]);
-			var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
-						: a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
-			var nn = {h:n.h,t:n.t,a:attr,k:key};
-			var p=n.p;
-			for (var j in cn)
-			{
-				if (cn[j] == nn.h)
-				{
-					p=false;
-					break;
-				}
-			}
-			if (p) nn.p=p;
-			a.push(nn);
-		}
-	}
-	return a;
+    var a=[];
+    var r=[];
+    var c=11 == (t || "").length;
+    for (var i in cn)
+    {
+        var s = fm_getnodes(cn[i]);
+        for (var j in s) r.push(s[j]);
+        r.push(cn[i]);
+    }
+    for(var i in r)
+    {
+        var n = M.d[r[i]];
+        if (n)
+        {
+            var ar = n.ar && clone(n.ar) || {};
+            if (typeof ar.fav !== 'undefined') delete ar.fav;
+            var mkat = enc_attr(ar,n.key);
+            var attr = ab_to_base64(mkat[0]);
+            var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
+                        : a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
+            var nn = {h:n.h,t:n.t,a:attr,k:key};
+            var p=n.p;
+            for (var j in cn)
+            {
+                if (cn[j] == nn.h)
+                {
+                    p=false;
+                    break;
+                }
+            }
+            if (p) nn.p=p;
+            a.push(nn);
+        }
+    }
+    return a;
 }
 
 function createfolder(toid, name, ulparams)
@@ -4607,26 +4596,26 @@ function doshare2(h, t, dontShowShareDialog, msg)
 
 function processmove(jsonmove)
 {
-	var rts = [M.RootID,M.RubbishID,M.InboxID];
+    var rts = [M.RootID,M.RubbishID,M.InboxID];
 
-	if (d) console.log('processmove', jsonmove);
+    if (d) console.log('processmove', jsonmove);
 
-	for (var i in jsonmove)
-	{
-		var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root), movingnodes = 0;
+    for (var i in jsonmove)
+    {
+        var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root), movingnodes = 0;
 
-		if (d) console.log('sharingnodes', sharingnodes.length, sharingnodes, root.handle);
+        if (d) console.log('sharingnodes', sharingnodes.length, sharingnodes, root.handle);
 
-		if (sharingnodes.length)
-		{
-			movingnodes = fm_getnodes(jsonmove[i].n);
-			movingnodes.push(jsonmove[i].n);
-			jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
-		}
-		if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes || jsonmove[i].n);
+        if (sharingnodes.length)
+        {
+            movingnodes = fm_getnodes(jsonmove[i].n);
+            movingnodes.push(jsonmove[i].n);
+            jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
+        }
+        if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes || jsonmove[i].n);
 
-		api_req(jsonmove[i]);
-	}
+        api_req(jsonmove[i]);
+    }
 }
 
 var u_kdnodecache = {};
@@ -4634,71 +4623,71 @@ var kdWorker;
 
 function process_f(f, cb)
 {
-	if (f && f.length)
-	{
-		var ncn = f;
-		if ($.len(u_kdnodecache)) {
-			ncn = [];
-			for (var i in f) {
-				var n1 = f[i], n2 = u_kdnodecache[n1.h];
-				if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
-			}
-			if (d) console.log('non-cached nodes', ncn.length, ncn);
-		}
+    if (f && f.length)
+    {
+        var ncn = f;
+        if ($.len(u_kdnodecache)) {
+            ncn = [];
+            for (var i in f) {
+                var n1 = f[i], n2 = u_kdnodecache[n1.h];
+                if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
+            }
+            if (d) console.log('non-cached nodes', ncn.length, ncn);
+        }
 
-		// if (typeof safari !== 'undefined') dk=1;
+        // if (typeof safari !== 'undefined') dk=1;
 
-		if (ncn.length < 200 || window.dk)
-		{
-			if (d) {
-				console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
-				console.time('process_f');
-			}
-			__process_f1(f, cb);
-			if (d) console.timeEnd('process_f');
-		}
-		else
-		{
-			if (!kdWorker) try {
-				kdWorker = mSpawnWorker('keydec.js');
-			} catch(e) {
-				if (d) console.error(e);
-				return __process_f2(f, cb);
-			}
+        if (ncn.length < 200 || window.dk)
+        {
+            if (d) {
+                console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
+                console.time('process_f');
+            }
+            __process_f1(f, cb);
+            if (d) console.timeEnd('process_f');
+        }
+        else
+        {
+            if (!kdWorker) try {
+                kdWorker = mSpawnWorker('keydec.js');
+            } catch(e) {
+                if (d) console.error(e);
+                return __process_f2(f, cb);
+            }
 
-			kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
-				if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
-				$.extend(u_kdnodecache, r);
-				__process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
-			}, function(err) {
-				if (d) console.error(err);
-				__process_f2(f, cb);
-			});
-		}
-	}
-	else if (cb) Soon(cb);
+            kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
+                if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
+                $.extend(u_kdnodecache, r);
+                __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
+            }, function(err) {
+                if (d) console.error(err);
+                __process_f2(f, cb);
+            });
+        }
+    }
+    else if (cb) Soon(cb);
 }
 function __process_f1(f, cb)
 {
-	for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
-	if (cb) Soon(cb);
+    for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
+    if (cb) Soon(cb);
 }
 function __process_f2(f, cb)
 {
-	var max = 12000, n;
+    var max = 12000, n;
 
-	while ((n = f.pop()))
-	{
-		M.addNode(n, !!$.mDBIgnoreDB);
+    while ((n = f.pop()))
+    {
+        M.addNode(n, !!$.mDBIgnoreDB);
 
-		if (cb && --max == 0) break;
-	}
+        if (cb && --max == 0) break;
+    }
 
-	if (cb)
-	{
-		if (max) Soon(cb);
-		else setTimeout(__process_f2, 200, f, cb);
-	}
+    if (cb)
+    {
+        if (max) Soon(cb);
+        else setTimeout(__process_f2, 200, f, cb);
+    }
 }
 
 /**

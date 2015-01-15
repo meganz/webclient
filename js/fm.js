@@ -1399,10 +1399,12 @@ function addContactUI()
 
     function focusOnInput()
     {
-        var $tokenInput = $('#token-input-');
+        var $tokenInput = $('#token-input-'),
+            width = $('.add-user-popup .add-user-popup-pad .multiple-input').width();
+
+        $('.token-input-dropdown-mega').css('width', width + 'px');
 
         $tokenInput
-//				.show()
             .val('')
             .focus();
     }
@@ -1470,11 +1472,14 @@ function addContactUI()
 
     $('.add-contact-multiple-input').tokenInput(contacts, {
         theme: "mega",
-        hintText: "Type in a contact email",
-        searchingText: "Searching for existing contacts...",
+        hintText: "Type in an email or contact",        
+//        hintText: "",
+//        placeholder: "Type in an email or contact",
+        searchingText: "",
+        noResultsText: "",
         addAvatar: true,
         autocomplete: null,
-        searchDropdown: false,
+        searchDropdown: true,
         emailCheck: true,
         preventDoublet: true,
         tokenValue: "id",
@@ -1620,29 +1625,25 @@ function addContactUI()
         {
             $this.removeClass('active');
             $d.addClass('hidden');
-        }
-        else// Show
-        {
+        } else {// Show
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
             $this.addClass('active');
             $d.removeClass('hidden dialog');
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
-            focusOnInput();
 
             $('.add-user-popup-button.add').addClass('disabled');
             $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
 
             var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
             // Positioning, not less then 8px from right side
-            if (pos > 8)
-            {
+            if (pos > 8) {
                 $d.css('right', pos + 'px');
-            }
-            else
-            {
+            } else {
                 $d.css('right', 8 + 'px');
             }
+            
+            focusOnInput();
         }
 
         iconSize(true);
@@ -6391,10 +6392,10 @@ function initShareDialog()
 
     $('.share-multiple-input').tokenInput(contacts, {
         theme: "mega",
-//		hintText:			"Type in a contact email",
-        hintText: "",
+		hintText: "Type in an email or contact",
+//        hintText: "",
+//        placeholder: "Type in an email or contact",
         searchingText: "",
-//		searchingText:		"Searching for existing contacts...",
         noResultsText: "",
         addAvatar: true,
         autocomplete: null,

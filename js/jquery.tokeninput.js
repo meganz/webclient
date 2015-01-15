@@ -31,51 +31,51 @@
         emailCheck: false,
         accountHolder: '',
         scrollLocation: 'add',
-        resultsFormatter: function(item) {
-            var email = item[this.propertyToSearch];
-            var id;
-            $.each(M.u, function(ind, val) {
+        resultsFormatter: function (item) {
+            var id, av_color, av, avatar;
+
+            var email = item[this.propertyToSearch],
+                type = '';
+
+            $.each(M.u, function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     return false;
                 }
             });
-            var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            var av = (this.addAvatar && avatars[id] && avatars[id].url)
-                    ? '<img src="' + avatars[id].url + '">'
-                    : (email.charAt(0) + email.charAt(1));
-
-            var type = '';
+            av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+            av = (this.addAvatar && avatars[id] && avatars[id].url)
+                ? '<img src="' + avatars[id].url + '">'
+                : (email.charAt(0) + email.charAt(1));
 
             if (!id) {
                 type = 'email';
                 av = '';
             }
 
-            var avatar = "<span class='nw-contact-avatar color" + av_color + "'>" + av + "</span>";
+            avatar = "<span class='nw-contact-avatar color" + av_color + "'>" + av + "</span>";
             return "<li class='share-search-result " + type + "'>" + (this.addAvatar ? avatar : '') + "<span class='fm-chat-user-info'><span class='fm-chat-user'>" + (this.enableHTML ? email : _escapeHTML(email)) + "</span><span class='fm-chat-user-email'>email</span></span><span class='clear'></span></li>";
         },
-        tokenFormatter: function(item) {
-            var email = item[this.propertyToSearch];
-            var id;
-            $.each(M.u, function(ind, val) {
+        tokenFormatter: function (item) {
+            var id, av_color, av, avatar;
+            var email = item[this.propertyToSearch],
+                type = '';
+            $.each(M.u, function (ind, val) {
                 if (val.m === email) {
                     id = ind;
                     return false;
                 }
             });
-            var av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
-            var av = (this.addAvatar && avatars[id] && avatars[id].url)
-                    ? '<img src="' + avatars[id].url + '">'
-                    : (email.charAt(0) + email.charAt(1));
-
-            var type = '';
+            av_color = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
+            av = (this.addAvatar && avatars[id] && avatars[id].url)
+                ? '<img src="' + avatars[id].url + '">'
+                : (email.charAt(0) + email.charAt(1));
 
             if (!id) {
                 type = 'email';
                 av = '';
             }
-            var avatar = "<span class='search-avatar color" + av_color + "'>" + av + "</span>";
+            avatar = "<span class='search-avatar color" + av_color + "'>" + av + "</span>";
 
             return "<li class='share-added-contact " + type + "'>" + (this.addAvatar ? avatar : '') + (this.enableHTML ? email : _escapeHTML(email)) + "</li>";
         },

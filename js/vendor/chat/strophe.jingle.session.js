@@ -189,6 +189,15 @@ sendIceCandidate: function (candidate) {
         return;
     var self = this;
     if (candidate && !self.lasticecandidate) {
+        var mid = candidate.sdpMid;
+        if (!mid || (mid.length < 1)) {
+            mid = SDPUtil.find_line(self.localSDP.media[candidate.sdpMLineIndex], 'm=').substr(2);
+            var pos = mid.indexOf(' ');
+            if (pos < 0)
+                throw new Error("Could not find sdpMid of media");
+            candidate.sdpMid = mid.substr(0, pos);
+        }
+
         var ice = SDPUtil.iceparams(self.localSDP.media[candidate.sdpMLineIndex], self.localSDP.session),
             jcand = SDPUtil.candidateToJingle(candidate.candidate);
         if (!(ice && jcand)) {

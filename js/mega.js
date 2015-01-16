@@ -1042,8 +1042,6 @@ function MegaData()
         }
         Soon(fmtopUI);
 
-        if (u) return;
-
         function prepareShareMenuHandler(e) {
             e.preventDefault();
             e.stopPropagation();

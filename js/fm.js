@@ -134,7 +134,6 @@ function bandwidthDialog(close)
 			bandwidthDialog(1);
 		});
 
-
 		$('.fm-dialog bandwidth-quota.fm-dialog-close').unbind('click');
 		$('.fm-dialog bandwidth-quota.fm-dialog-close').bind('click',function(e)
 		{
@@ -144,7 +143,6 @@ function bandwidthDialog(close)
 		$('.fm-dialog-button.quota-upgrade-button').unbind('click');
 		$('.fm-dialog-button.quota-upgrade-button').bind('click',function(e)
 		{
-
 
 			bandwidthDialog(1);
 			document.location = '#pro';
@@ -716,25 +714,25 @@ function initUI() {
             }, 890);
 
             if (dd == 'move')
-                $('body').addClass('dndc-move');
+                $.draggingClass = ('dndc-move');
             else if (dd == 'copy')
-                $('body').addClass('dndc-copy');
+                $.draggingClass = ('dndc-copy');
             else if (dd == 'download')
-                $('body').addClass('dndc-download');
+                $.draggingClass = ('dndc-download');
             else if (dd === 'nw-fm-left-icon')
             {
                 var c = '' + $(e.target).attr('class');
 
                 if (~c.indexOf('rubbish-bin'))
-                    $('body').addClass('dndc-to-rubbish');
+                    $.draggingClass = ('dndc-to-rubbish');
                 else if (~c.indexOf('shared-with-me'))
-                    $('body').addClass('dndc-to-shared');
+                    $.draggingClass = ('dndc-to-shared');
                 else if (~c.indexOf('contacts'))
-                    $('body').addClass('dndc-to-contacts');
+                    $.draggingClass = ('dndc-to-contacts');
                 else if (~c.indexOf('conversations'))
-                    $('body').addClass('dndc-to-conversations');
+                    $.draggingClass = ('dndc-to-conversations');
                 else if (~c.indexOf('cloud-drive'))
-                    $('body').addClass('dndc-to-conversations'); // XXX: cursor, please?
+                    $.draggingClass = ('dndc-to-conversations'); // TODO: cursor, please?
                 else
                     c = null;
 
@@ -748,8 +746,11 @@ function initUI() {
                 }
             }
             // else $('.dragger-block').addClass('drag');
-            else
-                $('body').addClass('dndc-warning');
+            else {
+                $.draggingClass = ('dndc-warning');
+            }
+
+            $('body').addClass($.draggingClass);
 
             $(e.target).addClass('dragover');
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
@@ -780,12 +781,17 @@ function initUI() {
             }
             else if (dd == 'move')
             {
-                nRevert(1);
+                nRevert(t !== M.RubbishID);
                 $.moveids = ids;
                 $.movet = t;
                 setTimeout(function()
                 {
-                    M.moveNodes($.moveids, $.movet);
+                    if ($.movet === M.RubbishID) {
+                        $.selected = $.moveids;
+                        fmremove();
+                    } else {
+                        M.moveNodes($.moveids, $.movet);
+                    }
                 }, 50);
             }
             else if (dd == 'copy' || dd == 'copydel')
@@ -1402,7 +1408,6 @@ function addContactUI()
         var $tokenInput = $('#token-input-');
 
         $tokenInput
-//				.show()
             .val('')
             .focus();
     }
@@ -1470,11 +1475,14 @@ function addContactUI()
 
     $('.add-contact-multiple-input').tokenInput(contacts, {
         theme: "mega",
-        hintText: "Type in a contact email",
-        searchingText: "Searching for existing contacts...",
+        hintText: "Type in an email or contact",
+//        hintText: "",
+//        placeholder: "Type in an email or contact",
+        searchingText: "",
+        noResultsText: "",
         addAvatar: true,
         autocomplete: null,
-        searchDropdown: false,
+        searchDropdown: true,
         emailCheck: true,
         preventDoublet: true,
         tokenValue: "id",
@@ -1620,29 +1628,25 @@ function addContactUI()
         {
             $this.removeClass('active');
             $d.addClass('hidden');
-        }
-        else// Show
-        {
+        } else {// Show
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
             $this.addClass('active');
             $d.removeClass('hidden dialog');
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
-            focusOnInput();
 
             $('.add-user-popup-button.add').addClass('disabled');
             $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
 
             var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
             // Positioning, not less then 8px from right side
-            if (pos > 8)
-            {
+            if (pos > 8) {
                 $d.css('right', pos + 'px');
-            }
-            else
-            {
+            } else {
                 $d.css('right', 8 + 'px');
             }
+
+            focusOnInput();
         }
 
         iconSize(true);
@@ -4586,11 +4590,12 @@ function selectddUI() {
             }
         });
     if ($.gridDragging)
-        $('body').addClass('dragging');
+        $('body').addClass('dragging ' + ($.draggingClass || ''));
     $($.selectddUIgrid + ' ' + $.selectddUIitem).draggable(
         {
             start: function(e, u)
             {
+                if (d) console.log('draggable.start');
                 $.hideContextMenu(e);
                 $.gridDragging = true;
                 $('body').addClass('dragging');
@@ -4639,12 +4644,16 @@ function selectddUI() {
             },
             stop: function(event)
             {
-                $.gridDragging = false;
+                if (d) console.log('draggable.stop');
+                $.gridDragging = $.draggingClass = false;
                 $('body').removeClass('dragging').removeClassWith("dndc-");
-                setTimeout(function()
-                {
-                    treeUIopen(M.currentdirid, false, true);
-                }, 500);
+                setTimeout(function __onDragStop() {
+                    if (M.currentdirid === 'contacts') {
+                        M.openFolder(M.RootID, true);
+                    } else {
+                        treeUIopen(M.currentdirid, false, true);
+                    }
+                }, 200);
             }
         });
 
@@ -5201,6 +5210,18 @@ function contextmenuUI(e, ll, topmenu)
         var m = $('.context-menu.download');
         t = '.context-menu.download .context-menu-item';
     }
+    else if (ll === 4) // contactUI
+    {
+        $(t).hide();
+        var items = menuItems();
+        delete items['download'];
+        delete items['zipdownload'];
+        delete items['copy'];
+        delete items['open'];
+        for (var item in items) {
+            $(t).filter('.' + item + '-item').show();
+        }
+    }
     else if (ll)// click on item
     {
         $(t).hide();// Hide all menu-items
@@ -5570,7 +5591,6 @@ function treeUI()
             }
         });
 
-
     // disabling right click, default contextmenu.
     $(document).unbind('contextmenu');
     $(document).bind('contextmenu', function(e) {
@@ -5670,7 +5690,10 @@ function sectionUIopen(id) {
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
     } else {
-        tmpId = id;
+        if (id && M.currentsection === id) {
+            return false;
+        }
+        M.currentsection = tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
@@ -6037,7 +6060,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
             .addClass('hidden')
             .html('');
 
-
         $('#msgDialog .fm-dialog-button').bind('click',function()
         {
             closeMsg();
@@ -6393,10 +6415,10 @@ function initShareDialog()
 
     $('.share-multiple-input').tokenInput(contacts, {
         theme: "mega",
-//		hintText:			"Type in a contact email",
-        hintText: "",
+		hintText: "Type in an email or contact",
+//        hintText: "",
+//        placeholder: "Type in an email or contact",
         searchingText: "",
-//		searchingText:		"Searching for existing contacts...",
         noResultsText: "",
         addAvatar: true,
         autocomplete: null,
@@ -6839,7 +6861,6 @@ function initShareDialog()
 	$('.pending-indicator').bind('mouseout', function() {
 		$('.share-pending-info').fadeOut(200);
 	});
-
 
 	// Personal message
 	$('.share-message textarea').bind('focus', function() {
@@ -7436,10 +7457,10 @@ function getclipboardlinks()
 			var F = '';
 			if (n.t) F = 'F';
 			if (i > 0) link += '\n';
-            
+
             // Add the link to the file e.g. https://mega.co.nz/#!qRN33YbK
 			link += getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
-			
+
             // If they want the file key as well, add it e.g. https://mega.co.nz/#!qRN33YbK!o4Z76qDqP...
             if (key && $('#export-checkbox').is(':checked')) {
                 link += '!' + a32_to_base64(key);
@@ -7502,8 +7523,9 @@ function linksDialog(close)
         if (n && n.ph)
         {
             var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
-            var fileUrlWithKey = fileUrlWithoutKey + '!' + a32_to_base64(key);
-            
+            var fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
+            var fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
+
             html += '<div class="export-link-item">'
                  +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
                  +      '<div class="export-link-text-pad">'
@@ -7511,7 +7533,7 @@ function linksDialog(close)
                  +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
                  +          '</div>'
                  +          '<div>'
-                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrlWithKey + '">'
+                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
                  +          '</div>'
                  +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
                  +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
@@ -7590,8 +7612,8 @@ function linksDialog(close)
         // Hide the clipboard buttons if not using the extension and Flash is disabled
         $('#clipboardbtn1').addClass('hidden');
         $('#clipboardbtn2').addClass('hidden');
-    }    
-    
+    }
+
     // On Export File Links and Decryption Keys dialog
     $('.export-checkbox :checkbox').iphoneStyle({
         resizeContainer: false,
@@ -7599,22 +7621,25 @@ function linksDialog(close)
         onChange: function(elem, data)
         {
             if (data) {
-                $(elem).closest('.on_off').addClass('on');
-                
+                $(elem).closest('.on_off').removeClass('off').addClass('on');
+
                 // Show link with key
                 var fileLinkWithKey = $('.file-link-with-key').text();
                 $('.export-link-url').val(fileLinkWithKey);
             }
             else {
                 $(elem).closest('.on_off').removeClass('on').addClass('off');
-                
+
                 // Show link without key
                 var fileLinkWithoutKey = $('.file-link-without-key').text();
                 $('.export-link-url').val(fileLinkWithoutKey);
             }
+            window.getLinkState = !!data;
         }
     });
-    $('.export-checkbox').addClass('on');
+    if (typeof window.getLinkState === 'undefined') {
+        $('.export-checkbox').removeClass('off').addClass('on');
+    }
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
     $('.fm-dialog-overlay').removeClass('hidden');
@@ -8873,28 +8898,28 @@ function sharedfolderUI() {
 
         $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
-            '<div class="shared-top-details">'
-            + '<div class="shared-details-icon"></div>'
-            + '<div class="shared-details-info-block">'
-            + '<div class="shared-details-pad">'
-            + '<div class="shared-details-folder-name">' + htmlentities((c || n).name) + '</div>'
-            + '<a href="" class="grid-url-arrow"><span></span></a>'
-            + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
-            + '<div class="clear"></div>'
-            + '<div class="nw-contact-avatar color10">' + avatar + '</div>'
-            + '<div class="fm-chat-user-info">'
-            + '<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
-            + '</div>'
-            + '</div>'
-            + '<div class="shared-details-buttons">'
-            + '<div class="fm-leave-share"><span>Leave share</span></div>'
-            + '<div class="fm-share-copy"><span>Copy</span></div>'
-            + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
-            + '<div class="clear"></div>'
-            + '</div>'
-            + '<div class="clear"></div>'
-            + '</div>'
-            + '</div>');
+			'<div class="shared-top-details">'
+				+'<div class="shared-details-icon"></div>'
+				+'<div class="shared-details-info-block">'
+					+'<div class="shared-details-pad">'
+						+'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
+						+'<a href="" class="grid-url-arrow"><span></span></a>'
+						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
+						+'<div class="clear"></div>'
+						+'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+						+'<div class="fm-chat-user-info">'
+							+'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+						+'</div>'
+					+'</div>'
+					+'<div class="shared-details-buttons">'
+						+'<div class="fm-leave-share"><span>Leave share</span></div>'
+						+'<div class="fm-share-copy"><span>Copy</span></div>'
+						+'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
+						+'<div class="clear"></div>'
+					+'</div>'
+					+'<div class="clear"></div>'
+				+'</div>'
+			+'</div>');
         $(e).addClass('shared-folder-content');
 
         // fm_resize_handler();
@@ -9028,6 +9053,7 @@ function fingerprintDialog(userid)
 
 function contactUI() {
     $('.nw-contact-item').removeClass('selected');
+    $('.contact-details-pad .grid-url-arrow').unbind('click');
 
     var n = M.u[M.currentdirid];
     if (n && n.u) {
@@ -9045,6 +9071,18 @@ function contactUI() {
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(user.name || user.m);
         $('.contact-top-details .contact-details-email').text(user.m);
+
+        $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); // do not treat it as a regular click on the file
+            $(this).addClass('active');
+            $('.context-menu').addClass('arrange-to-front');
+            e.currentTarget = $(this);
+            e.calculatePosition = true;
+            $.selected = [location.hash.replace('#fm/', '')];
+            searchPath();
+            contextmenuUI(e, 4);
+        });
 
         var fprint = $('.contact-fingerprint-txt').empty();
         userFingerprint(user, function(fprints) {

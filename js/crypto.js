@@ -962,7 +962,7 @@ function api_proc(q)
         }
     };
 
-    q.xhr.onload = function()
+    q.xhr.onload = function __onAPIProcXHRLoad()
     {
         if (!this.q.cancelled)
         {
@@ -991,12 +991,16 @@ function api_proc(q)
 
             if (typeof t == 'object')
             {
-                for (var i = 0; i < this.q.ctxs[this.q.i].length; i++)
+                var ctxs = this.q.ctxs[this.q.i];
+
+                for (var i = 0; i < ctxs.length; i++)
                 {
-                    if (this.q.ctxs[this.q.i][i].callback)
+                    var ctx = ctxs[i];
+
+                    if (ctx.callback)
                     {
                         try {
-                            this.q.ctxs[this.q.i][i].callback(t[i],this.q.ctxs[this.q.i][i],this);
+                            ctx.callback( t[i], ctx, this );
                         } catch (ex) {
                             // if there is *any* issue on the callback
                             // we don't want to HALT, instead we let the channel
@@ -1148,11 +1152,11 @@ function getsc(fm)
 {
     api_req('sn=' + (maxaction||"") + '&ssl=1&e=Nc4AFJZK',{
         fm : fm,
-        callback : function(res,ctx)
+        callback : function __onGetSC(res,ctx)
         {
             if (typeof res == 'object')
             {
-                function done(sma)
+                function getSCDone(sma)
                 {
                     if (sma !== -0x7ff
                         && typeof mDBloaded !== 'undefined'
@@ -1172,12 +1176,12 @@ function getsc(fm)
                 {
                     waiturl = res.w;
                     waittimeout = setTimeout(waitsc,waitbackoff);
-                    done(-0x7ff);
+                    getSCDone(-0x7ff);
                 }
                 else
                 {
                     if (res.sn) maxaction = res.sn;
-                    execsc(res.a, done);
+                    execsc(res.a, getSCDone);
                 }
             }
         }
@@ -1573,7 +1577,7 @@ function api_setshare(node,targets,sharenodes,ctx)
     },u);
 }
 
-function api_setshare1(ctx)
+function api_setshare1(ctx, params)
 {
     var i, j, n, nk, sharekey, ssharekey;
     var req, res;
@@ -1583,6 +1587,13 @@ function api_setshare1(ctx)
             n : ctx.node,
             s : ctx.targets,
             i : requesti };
+
+    if (params) {
+        if (d) console.log('api_setshare1.extend', params);
+        for (var i in params) {
+            req[i] = params[i];
+        }
+    }
 
     for (i = req.s.length; i--; )
     {
@@ -1616,7 +1627,11 @@ function api_setshare1(ctx)
     ctx.ssharekey = ssharekey;
 
     // encrypt ssharekey to known users
-    for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
+    for (i = req.s.length; i--; ) {
+        if (u_pubkeys[req.s[i].u]) {
+            req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
+        }
+    }
 
     ctx.req = req;
 
@@ -1654,83 +1669,10 @@ function api_setshare1(ctx)
 
 function api_setshare2(ctx)
 {
-    var i, j, n, nk, sharekey, ssharekey;
-    var req, res;
-    var newkey = true;
-
-    req = { a : 's2',
-            e : M.u[u_handle].m,
-            msg: '',
-            n : ctx.node,
-            s : ctx.targets,
-            i : requesti };
-
-    for (i = req.s.length; i--; )
-    {
-        if (typeof req.s[i].r != 'undefined')
-        {
-            if (!req.ok)
-            {
-                if (u_sharekeys[ctx.node])
-                {
-                    sharekey = u_sharekeys[ctx.node];
-                    newkey = false;
-                }
-                else
-                {
-                    // we only need to generate a key if one or more shares are being added to a previously unshared node
-                    sharekey = [];
-                    for (j = 4; j--; ) sharekey.push(rand(0x100000000));
-                    u_sharekeys[ctx.node] = sharekey;
-                }
-
-                req.ok = a32_to_base64(encrypt_key(u_k_aes,sharekey));
-                req.ha = crypto_handleauth(ctx.node);
-                ssharekey = a32_to_str(sharekey);
-            }
-        }
-    }
-
-    if (newkey) req.cr = crypto_makecr(ctx.sharenodes,[ctx.node],true);
-
-    ctx.maxretry = 4;
-    ctx.ssharekey = ssharekey;
-
-    // encrypt ssharekey to known users
-    for (i = req.s.length; i--; ) if (u_pubkeys[req.s[i].u]) req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[req.s[i].u]));
-
-    ctx.req = req;
-
-    ctx.callback = function(res,ctx)
-    {
-        var i, n;
-
-        if (!ctx.maxretry) return;
-
-        ctx.maxretry--;
-
-        if (typeof res == 'object')
-        {
-            if (res.ok)
-            {
-                // sharekey clash: set & try again
-                ctx.req.ok = res.ok;
-                u_sharekeys[ctx.node] = decrypt_key(u_k_aes,base64_to_a32(res.ok));
-                ctx.req.ha = crypto_handleauth(ctx.node);
-
-                var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
-
-                for (var i = ctx.req.s.length; i--; ) if (u_pubkeys[ctx.req.s[i].u]) ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,u_pubkeys[ctx.req.s[i].u]));
-
-                return api_req(ctx.req,ctx);
-            }
-            else return ctx.ctx.done(res,ctx.ctx);
-        }
-
-        api_req(ctx.req,ctx);
-    }
-
-    api_req(ctx.req,ctx);
+    api_setshare1(ctx, {
+        e   : M.u[u_handle].m,
+        msg : ''
+    });
 }
 
 function crypto_handleauth(h)

@@ -5667,7 +5667,7 @@ function treeUIexpand(id, force, moveDialog)
 function sectionUIopen(id) {
     var tmpId;
     if (d) {
-        console.error('sectionUIopen', id);
+        console.log('sectionUIopen', id);
     }
 
     $('.nw-fm-left-icon').removeClass('active');
@@ -5676,7 +5676,10 @@ function sectionUIopen(id) {
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
     } else {
-        tmpId = id;
+        if (id && M.currentsection === id) {
+            return false;
+        }
+        M.currentsection = tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');

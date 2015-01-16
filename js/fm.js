@@ -759,7 +759,7 @@ function initUI() {
                 $(e.target).addClass('ui-selected').find('.file-settings-icon, .grid-url-arrow').addClass('hide-settings-icon');
             }
         }
-        if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
+        // if (d) console.log('!a:'+a, dd, $(e.target).attr('id'), (M.d[$(e.target).attr('id').split('_').pop()]||{}).name, $(e.target).attr('class'), $(ui.draggable.context).attr('class'));
 
         if (a == 'drop' && dd)
         {
@@ -1475,7 +1475,7 @@ function addContactUI()
 
     $('.add-contact-multiple-input').tokenInput(contacts, {
         theme: "mega",
-        hintText: "Type in an email or contact",        
+        hintText: "Type in an email or contact",
 //        hintText: "",
 //        placeholder: "Type in an email or contact",
         searchingText: "",
@@ -1645,7 +1645,7 @@ function addContactUI()
             } else {
                 $d.css('right', 8 + 'px');
             }
-            
+
             focusOnInput();
         }
 
@@ -5207,6 +5207,18 @@ function contextmenuUI(e, ll, topmenu)
         // m.hide();
         var m = $('.context-menu.download');
         t = '.context-menu.download .context-menu-item';
+    }
+    else if (ll === 4) // contactUI
+    {
+        $(t).hide();
+        var items = menuItems();
+        delete items['download'];
+        delete items['zipdownload'];
+        delete items['copy'];
+        delete items['open'];
+        for (var item in items) {
+            $(t).filter('.' + item + '-item').show();
+        }
     }
     else if (ll)// click on item
     {
@@ -8884,28 +8896,28 @@ function sharedfolderUI() {
 
         $(e).wrap('<div class="shared-details-block"></div>');
         $('.shared-details-block').prepend(
-            '<div class="shared-top-details">'
-            + '<div class="shared-details-icon"></div>'
-            + '<div class="shared-details-info-block">'
-            + '<div class="shared-details-pad">'
-            + '<div class="shared-details-folder-name">' + htmlentities((c || n).name) + '</div>'
-            + '<a href="" class="grid-url-arrow"><span></span></a>'
-            + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
-            + '<div class="clear"></div>'
-            + '<div class="nw-contact-avatar color10">' + avatar + '</div>'
-            + '<div class="fm-chat-user-info">'
-            + '<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
-            + '</div>'
-            + '</div>'
-            + '<div class="shared-details-buttons">'
-            + '<div class="fm-leave-share"><span>Leave share</span></div>'
-            + '<div class="fm-share-copy"><span>Copy</span></div>'
-            + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
-            + '<div class="clear"></div>'
-            + '</div>'
-            + '<div class="clear"></div>'
-            + '</div>'
-            + '</div>');
+			'<div class="shared-top-details">'
+				+'<div class="shared-details-icon"></div>'
+				+'<div class="shared-details-info-block">'
+					+'<div class="shared-details-pad">'
+						+'<div class="shared-details-folder-name">'+ htmlentities((c||n).name) +'</div>'
+						+'<a href="" class="grid-url-arrow"><span></span></a>'
+						+'<div class="shared-folder-access'+ rightsclass + '">' + rights + '</div>'
+						+'<div class="clear"></div>'
+						+'<div class="nw-contact-avatar color10">' + avatar + '</div>'
+						+'<div class="fm-chat-user-info">'
+							+'<div class="fm-chat-user">' + htmlentities(user.name) + '</div>'
+						+'</div>'
+					+'</div>'
+					+'<div class="shared-details-buttons">'
+						+'<div class="fm-leave-share"><span>Leave share</span></div>'
+						+'<div class="fm-share-copy"><span>Copy</span></div>'
+						+'<div class="fm-share-download"><span class="fm-chatbutton-arrow">Download...</span></div>'
+						+'<div class="clear"></div>'
+					+'</div>'
+					+'<div class="clear"></div>'
+				+'</div>'
+			+'</div>');
         $(e).addClass('shared-folder-content');
 
         // fm_resize_handler();
@@ -9039,6 +9051,7 @@ function fingerprintDialog(userid)
 
 function contactUI() {
     $('.nw-contact-item').removeClass('selected');
+    $('.contact-details-pad .grid-url-arrow').unbind('click');
 
     var n = M.u[M.currentdirid];
     if (n && n.u) {
@@ -9056,6 +9069,18 @@ function contactUI() {
         $('.contact-top-details .fm-chat-user-status').text(onlinestatus[0]);
         $('.contact-top-details .contact-details-user-name').text(user.name || user.m);
         $('.contact-top-details .contact-details-email').text(user.m);
+
+        $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); // do not treat it as a regular click on the file
+            $(this).addClass('active');
+            $('.context-menu').addClass('arrange-to-front');
+            e.currentTarget = $(this);
+            e.calculatePosition = true;
+            $.selected = [location.hash.replace('#fm/', '')];
+            searchPath();
+            contextmenuUI(e, 4);
+        });
 
         var fprint = $('.contact-fingerprint-txt').empty();
         userFingerprint(user, function(fprints) {

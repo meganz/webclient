@@ -7509,7 +7509,8 @@ function linksDialog(close)
         if (n && n.ph)
         {
             var fileUrlWithoutKey = getBaseUrl() + '/#' + F + '!' + htmlentities(n.ph);
-            var fileUrlWithKey = fileUrlWithoutKey + '!' + a32_to_base64(key);
+            var fileUrlWithKey = fileUrlWithoutKey + (key ? '!' + a32_to_base64(key) : '');
+            var fileUrl = window.getLinkState === false ? fileUrlWithoutKey : fileUrlWithKey;
 
             html += '<div class="export-link-item">'
                  +      '<div class="export-icon ' + fileicon(n) + '" ></div>'
@@ -7518,7 +7519,7 @@ function linksDialog(close)
                  +               htmlentities(n.name) + ' <span class="export-link-gray-txt">' + fileSize + '</span>'
                  +          '</div>'
                  +          '<div>'
-                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrlWithKey + '">'
+                 +              '<input class="export-link-url" type="text" readonly="readonly" value="' + fileUrl + '">'
                  +          '</div>'
                  +          '<span class="file-link-without-key hidden">' + fileUrlWithoutKey + '</span>'
                  +          '<span class="file-link-with-key hidden">' + fileUrlWithKey + '</span>'
@@ -7606,7 +7607,7 @@ function linksDialog(close)
         onChange: function(elem, data)
         {
             if (data) {
-                $(elem).closest('.on_off').addClass('on');
+                $(elem).closest('.on_off').removeClass('off').addClass('on');
 
                 // Show link with key
                 var fileLinkWithKey = $('.file-link-with-key').text();
@@ -7619,9 +7620,12 @@ function linksDialog(close)
                 var fileLinkWithoutKey = $('.file-link-without-key').text();
                 $('.export-link-url').val(fileLinkWithoutKey);
             }
+            window.getLinkState = !!data;
         }
     });
-    $('.export-checkbox').addClass('on');
+    if (typeof window.getLinkState === 'undefined') {
+        $('.export-checkbox').removeClass('off').addClass('on');
+    }
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
     $('.fm-dialog-overlay').removeClass('hidden');

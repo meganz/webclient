@@ -3568,7 +3568,7 @@ function MegaData()
                 ub = Object.keys(ub).map(function(m) { return ub[m]});
                 Soon(function() {
                     $(document).trigger('megaulcomplete', [ul_target, ub]);
-                    delete $.ulBunch[ul.target];
+                    delete $.ulBunch[ul_target];
                     if (!$.len($.ulBunch)) {
                         delete $.ulBunch;
                     }

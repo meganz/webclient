@@ -3564,13 +3564,15 @@ function MegaData()
 
             if (!p)
             {
-                ub = Object.keys(ub).map(function(m) {
-                    return ub[m]
+                var ul_target = ul.target;
+                ub = Object.keys(ub).map(function(m) { return ub[m]});
+                Soon(function() {
+                    $(document).trigger('megaulcomplete', [ul_target, ub]);
+                    delete $.ulBunch[ul.target];
+                    if (!$.len($.ulBunch)) {
+                        delete $.ulBunch;
+                    }
                 });
-                $(document).trigger('megaulcomplete', [ul.target, ub]);
-                delete $.ulBunch[ul.target];
-                if (!$.len($.ulBunch))
-                    delete $.ulBunch;
             }
         }
 

@@ -48,7 +48,13 @@ function ul_completepending2(res,ctx)
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
-	else Later(resetUploadDownload);
+	else {
+        var n = ctx.file.name;
+        Later(resetUploadDownload);
+        Soon(function() {
+            msgDialog('warninga', l[1309], n, res);
+        });
+    }
 	if (ctx.file.owner) ctx.file.owner.destroy();
 	else oDestroy(ctx.file);
 }

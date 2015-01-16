@@ -180,7 +180,7 @@ function FileSelectHandler(e)
 	$($.ddhelper).remove();
 	$.ddhelper=undefined;
 
-	if (folderlink || RightsbyID(M.currentdirid || '') < 1)
+	if (folderlink || (RightsbyID(M.currentdirid || '') | 0) < 1)
 	{
 		msgDialog('warningb', l[1676], l[1023]);
 		return true;

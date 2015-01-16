@@ -189,6 +189,15 @@ sendIceCandidate: function (candidate) {
         return;
     var self = this;
     if (candidate && !self.lasticecandidate) {
+        var mid = candidate.sdpMid;
+        if (!mid || (mid.length < 1)) {
+            mid = SDPUtil.find_line(self.localSDP.media[candidate.sdpMLineIndex], 'm=').substr(2);
+            var pos = mid.indexOf(' ');
+            if (pos < 0)
+                throw new Error("Could not find sdpMid of media");
+            candidate.sdpMid = mid.substr(0, pos);
+        }
+
         var ice = SDPUtil.iceparams(self.localSDP.media[candidate.sdpMLineIndex], self.localSDP.session),
             jcand = SDPUtil.candidateToJingle(candidate.candidate);
         if (!(ice && jcand)) {
@@ -357,8 +366,9 @@ createdOffer: function (sdp, cb) {
     }
 },
 
-setRemoteDescription: function (elem, desctype, successCb, failCb)
+setRemoteDescription: function(elem, desctype, successCb, failCb)
 {
+    var self = this;
 //    console.log('setting remote description... ', desctype);
     this.remoteSDP = new SDP('');
     this.remoteSDP.fromJingle(elem);
@@ -395,14 +405,14 @@ setRemoteDescription: function (elem, desctype, successCb, failCb)
 //setRemoteDescription() takes some time on Firefox, and meanwhile ICE candidated start
 //being processed - the code thinks that ICE candidates start arriving before the answer,
 //and tries to use pranswer
-    this.peerconnection.setRemoteDescription(remotedesc,
-        function ()
+    self.peerconnection.setRemoteDescription(remotedesc,
+        function()
         {
             successCb();
         },
-        function (e)
+        function(e)
         {
-            this.reportError({type:'webrtc', op:'setRemoteDescription'}, e);
+            self.reportError({type:'webrtc', op:'setRemoteDescription'}, e);
             if (failCb)
                 failCb();
         }

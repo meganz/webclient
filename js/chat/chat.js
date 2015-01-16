@@ -614,7 +614,7 @@ var Chat = function() {
                 decryptMessage: function (msg) {
                     var decryptedVal = crypto_rsadecrypt(base64urldecode(msg), u_privk);
                     if (decryptedVal && decryptedVal.length > 0) {
-                        return decryptedVal.substring(0, 44);
+                        return decryptedVal.substring(0, 43);
                     } else {
                         return decryptedVal; // some null/falsy value
                     }
@@ -626,14 +626,22 @@ var Chat = function() {
                 generateMac: function (msg, key) {
                     var rawkey = key;
                     try {
-                        rawkey = atob(key);
+                        rawkey = base64urldecode(key);
                     } catch (e) {
-                        //                    if(e instanceof InvalidCharacterError) {
-                        //                        rawkey = key
-                        //                    }
                     }
-                    return asmCrypto.HMAC_SHA256.base64(msg, rawkey);
+                    //use the SDK's base64 alphabet, it is also safer for using in URLs
+                    return base64urlencode(asmCrypto.bytes_to_string(
+                        asmCrypto.HMAC_SHA256.bytes(msg, rawkey)));
                 },
+                generateMacKey: function() {
+                    var array = new Uint8Array(32);
+                    var result = '';
+                    window.crypto.getRandomValues(array);
+                    for (var i=0; i<32; i++)
+                        result+=String.fromCharCode(array[i]);
+                    return base64urlencode(result);
+                },
+
                 scrambleJid: function(bareJid) {
                     var H = asmCrypto.SHA256.base64;
                     return H(bareJid + H(u_privk + "webrtc stats collection"));
@@ -2076,7 +2084,7 @@ Chat.prototype.renderContactTree = function() {
     var unreadCount = 0;
     for(var k in self.chats) {
         var megaRoom = self.chats[k];
-        var c = intval($('.nw-conversations-unread', megaRoom.getNavElement()).text());
+        var c = parseInt($('.nw-conversations-unread', megaRoom.getNavElement()).text());
         unreadCount += c;
 
         if (unreadCount > 0) {
@@ -2448,16 +2456,16 @@ Chat.prototype.getChatNum = function(idx) {
  */
 Chat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
-        return "https://sandbox.developers.mega.co.nz/http-bind";
+        return "https://sandbox.developers.mega.co.nz/bosh";
     } else {
         var $promise = new MegaPromise();
 
         $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
-                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/http-bind");
+                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/http-bind");
+                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/bosh");
                 }
             })
             .fail(function() {

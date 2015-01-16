@@ -1,7 +1,6 @@
 var inherits = (function() {
     var createObject = Object.create || function createObject(source) {
-        var Host = function() {
-        };
+        var Host = function() {};
         Host.prototype = source;
         return new Host();
     };
@@ -232,7 +231,7 @@ function translate(html)
 }
 
 /**
- * Show the number of new notifications in the Browser's title bar e.g. (3) MEGA 
+ * Show the number of new notifications in the Browser's title bar e.g. (3) MEGA
  * @param {type} nperc
  */
 function megatitle(nperc) {
@@ -318,9 +317,9 @@ function populate_l()
 	l[1982] = l[1982].replace('[A]','<font style="color:#D21F00;">').replace('[/A]','</font>');
 	l[1993] = l[1993].replace('[A]','<span class="red">').replace('[/A]','</span>');
 	l[1371] = l[1371].replace('2014','2015');
-	l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');	
+	l[122] = l[122].replace('five or six hours','<span class="red">five or six hours</span>');
 	l[231] = l[231].replace('No thanks, I\'ll wait','I\'ll wait');
-	
+
 	l['year'] = new Date().getFullYear();
 }
 
@@ -460,7 +459,6 @@ function time2date(unixtime, ignoretime)
 if (typeof (l) == 'undefined') {
     l = [];
 }
-;
 
 var date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
 
@@ -682,6 +680,7 @@ function checkMail(email)
     else
         return true;
 }
+
 /**
  * Helper function for creating alias of a method w/ specific context
  *
@@ -715,7 +714,6 @@ function makeObservable(kls) {
         }
     });
 }
-;
 
 /**
  * Adds simple .setMeta and .getMeta functions, which can be used to store some meta information on the fly.
@@ -807,7 +805,6 @@ function makeMetaAware(kls) {
         }
     };
 }
-;
 
 /**
  * Simple method for generating unique event name with a .suffix that is a hash of the passed 3-n arguments
@@ -826,7 +823,6 @@ function generateEventSuffixFromArguments(eventName, name) {
 
     return eventName + "." + name + "_" + ("" + fastHashFunction(result)).replace("-", "_");
 }
-;
 
 /**
  * This is a placeholder, which will be used anywhere in our code where we need a simple and FAST hash function.
@@ -861,7 +857,6 @@ function simpleStringHashCode(str) {
     }
     return hash;
 }
-;
 
 /**
  * Creates a promise, which will fail if the validateFunction() don't return true in a timely manner (e.g. < timeout).
@@ -925,7 +920,6 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 
     return $promise;
 }
-;
 
 /**
  * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
@@ -936,7 +930,6 @@ function createTimeoutPromise(validateFunction, tick, timeout, resolveRejectArgs
 function toArray(val) {
     return Array.prototype.slice.call(val, val);
 }
-;
 
 /**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
@@ -994,9 +987,6 @@ function toArray(val) {
  * }
  * </pre>
  */
-
-"use strict";
-
 /**
  * Assertion exception.
  * @param message
@@ -1050,7 +1040,6 @@ function addZeroIfLenLessThen(val, len) {
     }
     return val;
 }
-;
 
 function NOW() {
     return Date.now();
@@ -1189,13 +1178,11 @@ function dlFatalError(dl, error, ethrow) {
 function RegExpEscape(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
-;
 
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
     return addZeroIfLenLessThen(date.getHours(), 2) + ":" + addZeroIfLenLessThen(date.getMinutes(), 2) + "." + addZeroIfLenLessThen(date.getSeconds(), 2)
 }
-;
 
 /**
  * Used in the callLoggerWrapper to generate dynamic colors depending on the textPrefix
@@ -1215,6 +1202,7 @@ function invertColor(hexTripletColor) {
     color = "#" + color;                  // prepend #
     return color;
 }
+
 /**
  * Simple wrapper function that will log all calls of `fnName`.
  * This function is intended to be used for dev/debugging/testing purposes only.
@@ -1249,7 +1237,6 @@ function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
     };
     ctx[fnName].haveCallLogger = true; // recursion
 }
-;
 
 /**
  * Simple Object instance call log helper
@@ -1284,7 +1271,6 @@ function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger)
         }
     });
 }
-;
 
 function array_unique(arr) {
     return $.grep(arr, function(v, k) {
@@ -1302,7 +1288,6 @@ function megaUserIdEncodeForXmpp(handle) {
     var s = base64urldecode(handle);
     return baseenc.b32encode(s).replace(/=/g, "");
 }
-;
 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
@@ -1904,14 +1889,6 @@ String.prototype.minutes = function() {
     return parseInt(this) * 1000 * 60;
 }
 
-String.prototype.MB = function() {
-    return parseInt(this) * 1024 * 1024;
-}
-
-String.prototype.KB = function() {
-    return parseInt(this) * 1024;
-}
-
 // Quick hack for sane average speed readings
 function bucketspeedometer(initialp)
 {
@@ -2155,42 +2132,6 @@ function _wrapFnWithBeforeAndAfterEvents(fn, eventSuffix, dontReturnPromises) {
         return returnedValue;
     }
 }
-;
-
-function intval(mixed_var, base) {
-    //  discuss at: http://phpjs.org/functions/intval/
-    // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // improved by: stensi
-    // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // bugfixed by: Brett Zamir (http://brett-zamir.me)
-    // bugfixed by: Rafal Kukawski (http://kukawski.pl)
-    //    input by: Matteo
-    //   example 1: intval('Kevin van Zonneveld');
-    //   returns 1: 0
-    //   example 2: intval(4.2);
-    //   returns 2: 4
-    //   example 3: intval(42, 8);
-    //   returns 3: 42
-    //   example 4: intval('09');
-    //   returns 4: 9
-    //   example 5: intval('1e', 16);
-    //   returns 5: 30
-
-    var tmp;
-
-    var type = typeof mixed_var;
-
-    if (type === 'boolean') {
-        return +mixed_var;
-    } else if (type === 'string') {
-        tmp = parseInt(mixed_var, base || 10);
-        return (isNaN(tmp) || !isFinite(tmp)) ? 0 : tmp;
-    } else if (type === 'number' && isFinite(mixed_var)) {
-        return mixed_var | 0;
-    } else {
-        return 0;
-    }
-}
 
 function hex2bin(hex)
 {
@@ -2201,4 +2142,38 @@ function hex2bin(hex)
 	}
 
 	return String.fromCharCode.apply(String, bytes);
+}
+
+/**
+ * Detects if Flash is enabled or disabled in the user's browser
+ * From http://stackoverflow.com/a/20095467
+ * @returns {Boolean}
+ */
+function flashIsEnabled() {
+    
+    var flashEnabled = false;
+    
+    try {
+        var flashObject = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+        if (flashObject) {
+            flashEnabled = true;
+        }
+    }
+    catch (e) {
+        if (navigator.mimeTypes && (navigator.mimeTypes['application/x-shockwave-flash'] != undefined) && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
+            flashEnabled = true;
+        }
+    }
+    
+    return flashEnabled;
+}
+
+/**
+ * Gets the current base URL of the page (protocol + hostname) e.g. If on beta.mega.nz it will return https://beta.mega.nz.
+ * If on the browser extension it will return the default https://mega.co.nz. If on localhost it will return https://mega.co.nz.
+ * This can be used to create external links, for example file downloads https://mega.co.nz/#!qRN33YbK!o4Z76qDqPbiK2G0I...
+ * @returns {String}
+ */
+function getBaseUrl() {
+    return 'https://' + (((location.protocol === 'https:') && location.host) || 'mega.co.nz');
 }

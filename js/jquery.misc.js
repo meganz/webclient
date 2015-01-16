@@ -1,3 +1,52 @@
+/**
+ * Helper function to get the jScrollPane container of this element
+ *
+ * @returns {*}
+ */
+$.fn.getParentJScrollPane = function() {
+    var $scrollable_parent = $(this).parents('.jspScrollable:first');
+    if ($scrollable_parent.size() > 0) {
+        var $jsp = $scrollable_parent.data('jsp');
+        if ($jsp) {
+            return $jsp;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
+ * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
+ * Pretty similar to the $.inArray, but will match the object IDs.
+ *
+ *
+ * @param el
+ * @param arr
+ * @returns int -1 or key index
+ */
+$.elementInArray = function(el, arr) {
+    var found = $.map(
+        arr,
+        function(n, i) {
+            return el.is(n) ? i : undefined;
+        }
+    );
+    return found.length > 0 ? found[0] : -1;
+};
+
+/**
+ * Case insensitive :istartswith.
+ *
+ * @param a
+ * @param i
+ * @param m
+ * @returns {boolean}
+ */
+jQuery.expr[':'].istartswith = function(a, i, m) {
+    return jQuery(a).text().toUpperCase()
+        .indexOf(m[3].toUpperCase()) == 0;
+};
+
 
 $.fn.visible = function (e, i)
 { // https://github.com/teamdf/jquery-visible

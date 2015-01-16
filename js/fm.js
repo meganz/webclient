@@ -9010,8 +9010,9 @@ function fingerprintDialog(userid)
     $('.dialog-approve-button').rebind('click', function() {
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+			$('.fm-verify').addClass('active').text('Verified').unbind('click');
+			closeFngrPrntDialog();
         });
-        closeFngrPrntDialog();
     });
 
     $('.dialog-skip-button').rebind('click', function() {
@@ -9064,6 +9065,14 @@ function contactUI() {
                 fingerprintDialog(user);
             });
         }
+
+		$('.contact-details-pad .grid-url-arrow').attr('id', u_h).rebind('click', function(e) {
+			e.currentTarget = $(this)
+			cacheselect();
+			searchPath();
+			contextmenuUI(e, 4);
+			return false;
+		});
 
         if (!MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {

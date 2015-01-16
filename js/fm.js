@@ -5688,10 +5688,7 @@ function sectionUIopen(id) {
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
     } else {
-        if (id && M.currentsection === id) {
-            return false;
-        }
-        M.currentsection = tmpId = id;
+        tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
@@ -9074,7 +9071,7 @@ function contactUI() {
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $(this).addClass('active');
+            // $(this).addClass('active');
             $('.context-menu').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
@@ -9099,14 +9096,6 @@ function contactUI() {
                 fingerprintDialog(user);
             });
         }
-
-		$('.contact-details-pad .grid-url-arrow').attr('id', u_h).rebind('click', function(e) {
-			e.currentTarget = $(this)
-			cacheselect();
-			searchPath();
-			contextmenuUI(e, 4);
-			return false;
-		});
 
         if (!MegaChatDisabled) {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {

@@ -8015,6 +8015,7 @@ function propertiesDialog(close)
     }
 
     var p = {}, user = M.d[n.p] || {};
+    if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {
         p.t6 = '';
@@ -8039,8 +8040,8 @@ function propertiesDialog(close)
         p.t1 = l[86] + ':';
         p.t2 = htmlentities(n.name);
         p.t4 = bytesToSize(size);
-        p.t8 = l[896] + ':';
-        p.t9 = htmlentities(time2date(n.ts));
+        p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
+        p.t8 = p.t9 ? (l[896] + ':') : '';
         p.t10 = '';
         p.t11 = '';
         if (foldercnt)
@@ -8052,8 +8053,8 @@ function propertiesDialog(close)
                 shares = Object.keys(n.shares || {}).length
                 p.t8 = l[1036] + ':';
                 p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
-                p.t10 = l[896];
-                p.t11 = htmlentities(time2date(n.ts));
+                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                p.t10 = p.t11 ? l[896] : '';
                 $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
                 susers = pd.find('.properties-body .properties-context-menu')
                     .empty()
@@ -8110,7 +8111,17 @@ function propertiesDialog(close)
         p.t8 = l[93] + ':';
         p.t9 = l[1025];
     }
-    var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 + '<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
+    var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
+        +'<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
+        +' <span class="file-settings-icon"><span></span></span></div>'
+        +'<div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span>'
+        +'<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
+        +'<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
+        +'<span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl">'
+        +'<div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9
+        +'<div class="contact-list-icon"></div></div></div>'
+        +'<div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div>'
+        +'<div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {

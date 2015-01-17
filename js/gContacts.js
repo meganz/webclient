@@ -123,7 +123,7 @@
             url: self.options.retreiveAllUrl,
             dataType: "jsonp",
             data: data,
-            done: function(data) {
+            success: function(data) {
                 var gData = self._readAllEmails(data);
                 if (where === 'shared') {
                     addImportedDataToSharedDialog(gData, 'gmail');

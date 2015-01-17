@@ -2041,6 +2041,8 @@ function MegaData()
         }
         ds(h);
         this.rubbishIco();
+        if (M.currentdirid === 'shares' && !M.viewmode)
+            M.openFolder('shares', 1);
     };
 
     this.delHash = function(n)
@@ -3852,6 +3854,8 @@ function rendernew()
         treeUI();
         if (RootbyId(M.currentdirid) === 'shares')
             M.renderTree();
+        if (M.currentdirid === 'shares' && !M.viewmode)
+            M.openFolder('shares', 1);
         treeUIopen(M.currentdirid);
     }
     if (newcontact)

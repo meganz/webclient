@@ -7954,7 +7954,7 @@ function propertiesDialog(close)
     $.dialog = 'properties';
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').unbind('click');
     $('.fm-dialog.properties-dialog .properties-body').bind('click', function()
@@ -8014,7 +8014,7 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {};
+    var p = {}, user = M.d[n.p] || {};
     if ((filecnt + foldercnt) == 1)
     {
         p.t6 = '';
@@ -8045,17 +8045,16 @@ function propertiesDialog(close)
         p.t11 = '';
         if (foldercnt)
         {
-
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
                 var shares, susers, total = 0
                 shares = Object.keys(n.shares || {}).length
-                p.t8 = 'Shared with:';
-                p.t9 = shares == 1 ? '1 contact' : shares + ' contacts';
+                p.t8 = l[1036] + ':';
+                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
                 p.t10 = l[896];
                 p.t11 = htmlentities(time2date(n.ts));
-                $('.properties-elements-counter span').text(shares);
+                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
                 susers = pd.find('.properties-body .properties-context-menu')
                     .empty()
                     .append('<div class="properties-context-arrow"></div>')
@@ -8081,14 +8080,18 @@ function propertiesDialog(close)
 
                 if (total == 0)
                     p.hideContacts = true;
-
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
-                // TODO: Permissions and Owner implementation
-                p.t3 = 'Permissions:';
-                p.t4 = 'Full access';
+                p.t3 = l[64];
+                var rights = l[55];
+                if (n.r == 1) {
+                    rights = l[56];
+                } else if (n.r == 2) {
+                    rights = l[57];
+                }
+                p.t4 = rights;
                 p.t6 = 'Owner';
-                p.t7 = 'Alex Brunskill';
+                p.t7 = user.name;
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -8895,12 +8898,12 @@ function sharedfolderUI() {
         if (av_meta.avatarUrl)
             avatar = '<img src="' + av_meta.avatarUrl + '">';
 
-        var rights = 'Read only', rightsclass = ' read-only';
+        var rights = l[55], rightsclass = ' read-only';
         if (n.r == 1) {
-            rights = 'Read and write';
+            rights = l[56];
             rightsclass = ' read-and-write';
         } else if (n.r == 2) {
-            rights = 'Full access';
+            rights = l[57];
             rightsclass = ' full-access';
         }
 

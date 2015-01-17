@@ -866,12 +866,12 @@ function MegaData()
                 if (av_meta.avatarUrl) {
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
-                var rights = 'Read only', rightsclass = ' read-only';
+                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
-                    rights = 'Read and write';
+                    rights = l[56];
                     rightsclass = ' read-and-write';
                 } else if (M.v[i].r === 2) {
-                    rights = 'Full access';
+                    rights = l[57];
                     rightsclass = ' full-access';
                 }
                 var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
@@ -890,12 +890,12 @@ function MegaData()
                 if (cs.files === 0 && cs.folders === 0) {
                     contains = l[1050];
                 }
-                var rights = 'Read only', rightsclass = ' read-only';
+                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
-                    rights = 'Read and write';
+                    rights = l[56];
                     rightsclass = ' read-and-write';
                 } else if (M.v[i].r === 2) {
-                    rights = 'Full access';
+                    rights = l[57];
                     rightsclass = ' full-access';
                 }
 

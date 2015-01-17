@@ -6956,6 +6956,9 @@ function closeImportContactNotification(c)
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');
+    
+    // Remove focus from input element, related to tokeninput plugin
+    $(c + ' input#token-input-').blur();
 }
 
 function clearScrollPanel(from)

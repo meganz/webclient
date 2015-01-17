@@ -348,6 +348,13 @@ function sync_switchOS(os)
 	});
 }
 
+function ImgError(source){
+    var empty1x1png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYII=";
+    source.src = "data:image/png;base64," + empty1x1png;
+    source.onerror = "";
+    return true;
+}
+
 /**
  * Changes the animated product images on the download page
  */
@@ -373,7 +380,7 @@ var gifSlider = {
             },
             {
                 name: 'sync-client',
-                animationLength: 12150,
+                animationLength: 12130,
                 href: '#sync',
                 title: 1626,
                 description: 1086,
@@ -384,8 +391,16 @@ var gifSlider = {
         // Slide show on right side of the page
         right: [
             {
-                name: 'browser-extension',
-                animationLength: 12120,
+                name: 'browser-extension-firefox',
+                animationLength: 12080,
+                href: '#firefox',
+                title: 1088,
+                description: 1929,
+                image: null
+            },
+            {
+                name: 'browser-extension-chrome',
+                animationLength: 12090,
                 href: '#chrome',
                 title: 1088,
                 description: 1929,
@@ -393,7 +408,7 @@ var gifSlider = {
             },
             {
                 name: 'mobile-app',
-                animationLength: 13600,
+                animationLength: 15190,
                 href: '#mobile',
                 title: 955,
                 description: 1930,
@@ -499,8 +514,9 @@ var gifSlider = {
         var slideLink = gifSlider.images[side][slideIndex].href;
 
         // Change the link and fade in the new image
+        $('.products-' + side + '-block .currentLink').attr('href', slideLink);
         $('.animations-' + side + '-container .currentLink').attr('href', slideLink);
-        $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc).fadeIn(gifSlider.fadeInSpeed);
+        $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc).css({ width: '260px', height: '300px'}).fadeIn(gifSlider.fadeInSpeed);
 
         // Set title and description
         $('.products-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);

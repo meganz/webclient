@@ -18546,30 +18546,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	top: 50%;
 	margin-top: -125px;
 }
-.animations-left-container img {
-    border: 0 none;
-    display: none;
-}
-.animations-right-container img {
-    border: 0 none;
-    display: none;
-}
-.animations-left-container div, .animations-right-container {
-    cursor: pointer;
-}
-.animations-left-container div.hidden {
-    display: none;
-}
-.animations-right-container .browser-extension {
-    background: url(../images/products/browser-extension.gif) no-repeat scroll left top transparent;
-    height: 300px;
-    width: 260px;
-}
-.animations-right-container .mobile-app {
-    background: url(../images/products/mobile-app.gif) no-repeat scroll left top transparent;
-    height: 300px;
-    width: 260px;
-}
 .products-bottom-block {
 	height: 130px;
 	width: 100%;

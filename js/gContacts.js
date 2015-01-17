@@ -13,7 +13,7 @@
             var index = self.options.domains.indexOf(window.location.host);
             if (index !== -1) {
                 self.client_id = self.options.client_ids[index].client_id;
-                self.redirect_url = self.options.client_ids[index].redirect_uri;
+                self.redirect_uri = self.options.client_ids[index].redirect_uri;
 
                 self.leftPix = Math.floor((window.screen.availWidth - self.options.width) / 2);
                 self.topPix = Math.floor((window.screen.availHeight - self.options.height) / 2);

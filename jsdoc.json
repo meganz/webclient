@@ -8,7 +8,7 @@
     	            "js/jquery-ui-1.10.4.js",
 					"js/jquery-1.8.1.js",
 					"js/jquery.remove.js",
-    	            "js/ads/", "js/mads.js"],
+    	            "js/ads/"],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },

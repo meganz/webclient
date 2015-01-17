@@ -753,8 +753,7 @@ else
             'contact': {f:'html/contact.html', n: 'contact', j:0},
             'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
             'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-            'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1},
-            'mads_js': {f:'js/mads.js', n: 'mads_js', j:1}
+            'zxcvbn_js': {f:'js/zxcvbn.js', n: 'zxcvbn_js', j:1}
         };
         var subpages =
         {
@@ -954,7 +953,7 @@ else
 
                     if (jsl[jsi].j == 1)
                     {
-                        if (file.indexOf('/mads') == -1) try
+                        try
                         {
                             loadSubScript(file);
                         }
@@ -1064,10 +1063,6 @@ else
             }
             xhr_stack[xhri].onerror = xhr_error;
             xhr_stack[xhri].ontimeout = xhr_error;
-            if (is_extension && url.indexOf('/mads') > -1)
-            {
-                jsl[jsi].text = ';';
-            }
             if (jsl[jsi].text)
             {
                 if (++jslcomplete == jsl.length) initall();
@@ -1079,7 +1074,7 @@ else
                 xhr_stack[xhri].jsi = jsi;
                 xhr_stack[xhri].xhri = xhri;
                 if (localStorage.dd) url += '?t=' + Date.now();
-				xhr_stack[xhri].open("GET", (!localStorage.dd && url.indexOf('mads_') > -1 ? 'https://eu.static.mega.co.nz/' : bootstaticpath) + url, true);
+                xhr_stack[xhri].open("GET", bootstaticpath + url, true);
                 xhr_stack[xhri].timeout = xhr_timeout;
                 if (is_chrome_firefox) xhr_stack[xhri].overrideMimeType('text/plain');
                 xhr_stack[xhri].send(null);

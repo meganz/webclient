@@ -866,12 +866,12 @@ function MegaData()
                 if (av_meta.avatarUrl) {
                     avatar = '<img src="' + av_meta.avatarUrl + '">';
                 }
-                var rights = 'Read only', rightsclass = ' read-only';
+                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
-                    rights = 'Read and write';
+                    rights = l[56];
                     rightsclass = ' read-and-write';
                 } else if (M.v[i].r === 2) {
-                    rights = 'Full access';
+                    rights = l[57];
                     rightsclass = ' full-access';
                 }
                 var onlinestatus = this.onlineStatusClass(megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h)));
@@ -890,12 +890,12 @@ function MegaData()
                 if (cs.files === 0 && cs.folders === 0) {
                     contains = l[1050];
                 }
-                var rights = 'Read only', rightsclass = ' read-only';
+                var rights = l[55], rightsclass = ' read-only';
                 if (M.v[i].r === 1) {
-                    rights = 'Read and write';
+                    rights = l[56];
                     rightsclass = ' read-and-write';
                 } else if (M.v[i].r === 2) {
-                    rights = 'Full access';
+                    rights = l[57];
                     rightsclass = ' full-access';
                 }
 
@@ -2041,6 +2041,8 @@ function MegaData()
         }
         ds(h);
         this.rubbishIco();
+        if (M.currentdirid === 'shares' && !M.viewmode)
+            M.openFolder('shares', 1);
     };
 
     this.delHash = function(n)
@@ -2944,43 +2946,77 @@ function MegaData()
         }
     }
 
-    this.addDownload = function(n, z, preview)
+    this.getDownloadFolderNodes = function(n, md, nodes, paths)
+    {
+        if (md) this.makeDir(n);
+
+        var subids = fm_getnodes(n);
+        for (var j in subids)
+        {
+            var p = this.getPath(subids[j]);
+            var path = '';
+
+            for (var k in p)
+            {
+                if (M.d[p[k]] && M.d[p[k]].t)
+                    path = fm_safename(M.d[p[k]].name) + '/' + path;
+                if (p[k] == n)
+                    break;
+            }
+
+            if (!M.d[subids[j]].t)
+            {
+                nodes.push(subids[j]);
+                paths[subids[j]] = path;
+            }
+            else {
+                console.log('0 path', path);
+            }
+        }
+    };
+
+    this.addDownload = function(n, z, preview, zipname)
     {
         // todo cesar: preview parameter indicates that this is a image fpreview download
         delete $.dlhash;
-        var zipname, path;
+        var path;
         var nodes = [];
         var paths = {};
-        for (var i in n)
+        if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO))
+        {
+            var nf = [], cbs = [];
+            for (var i in n)
+            {
+                if (M.d[n[i]] && M.d[n[i]].t) {
+                    var nn = [], pp = {};
+                    this.getDownloadFolderNodes(n[i], false, nn, pp);
+                    cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, M.d[n[i]].name));
+                } else {
+                    nf.push(n[i]);
+                }
+            }
+
+            n = nf;
+
+            if (cbs.length) {
+                for (var i in cbs) {
+                    Soon(cbs[i]);
+                }
+            }
+        }
+        if (z === 0x21f9A)
+        {
+            nodes = n;
+            paths = preview;
+            preview = false;
+        }
+        else for (var i in n)
         {
             if (M.d[n[i]])
             {
                 if (M.d[n[i]].t)
                 {
-                    if (!z)
-                        this.makeDir(n[i]);
-                    var subids = fm_getnodes(n[i]);
-                    for (var j in subids)
-                    {
-                        var p = this.getPath(subids[j]);
-                        var path = '';
-
-                        for (var k in p)
-                        {
-                            if (M.d[p[k]] && M.d[p[k]].t)
-                                path = fm_safename(M.d[p[k]].name) + '/' + path;
-                            if (p[k] == n[i])
-                                break;
-                        }
-
-                        if (!M.d[subids[j]].t)
-                        {
-                            nodes.push(subids[j]);
-                            paths[subids[j]] = path;
-                        }
-                        else
-                            console.log('0 path', path);
-                    }
+                    this.getDownloadFolderNodes(n[i], !!z, nodes, paths);
                 }
                 else
                 {
@@ -2994,7 +3030,7 @@ function MegaData()
             zipid++;
             z=zipid;
             if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-            else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
+            else zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
             var zipsize = 0;
         }
         else z = false;
@@ -3852,6 +3888,8 @@ function rendernew()
         treeUI();
         if (RootbyId(M.currentdirid) === 'shares')
             M.renderTree();
+        if (M.currentdirid === 'shares' && !M.viewmode)
+            M.openFolder('shares', 1);
         treeUIopen(M.currentdirid);
     }
     if (newcontact)

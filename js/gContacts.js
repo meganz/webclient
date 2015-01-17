@@ -123,16 +123,15 @@
             url: self.options.retreiveAllUrl,
             dataType: "jsonp",
             data: data,
-            done: function(data) {
+            success: function(data) {
                 var gData = self._readAllEmails(data);
+                
                 if (where === 'shared') {
                     addImportedDataToSharedDialog(gData, 'gmail');
-                }
-                else if (where === 'contacts') {
+                } else if (where === 'contacts') {
                     addImportedDataToAddContactsDialog(gData, 'gmail');
                 }
                 $('.import-contacts-dialog').fadeOut(200);
-                $('.import-contacts-link').removeClass('active');
 
                 self.isImported = true;
             }

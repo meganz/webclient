@@ -1768,7 +1768,14 @@ function addContactUI()
         // NOT imported
         if (!$(this).is('.imported'))
         {
-            importGoogleContacts('contacts');
+            var contacts = new mega.GContacts({'where': 'contacts'});
+            
+            // NOT failed
+            if (!contacts.options.failed) {
+                contacts.importGoogleContacts();
+            } else {
+                closeImportContactNotification('.add-user-popup');
+            }
         }
         else
         {
@@ -6661,7 +6668,14 @@ function initShareDialog()
         // NOT imported
         if (!$(this).is('.imported'))
         {
-            importGoogleContacts('shared');
+            var contacts = new mega.GContacts({'where': 'shared'});
+            
+            // NOT failed
+            if (!contacts.options.failed) {
+                contacts.importGoogleContacts();
+            } else {
+                closeImportContactNotification('.share-dialog');
+            }
         }
         else
         {

@@ -65,7 +65,7 @@
 
         self.isImported = false;
         self.client_id = '';
-        self.redirect_id = '';
+        self.redirect_uri = '';
         self.accessToken = '';
         self.leftPix = 0;
         self.topPix = 0;

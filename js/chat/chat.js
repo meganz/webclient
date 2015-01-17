@@ -2456,16 +2456,16 @@ Chat.prototype.getChatNum = function(idx) {
  */
 Chat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
-        return "https://sandbox.developers.mega.co.nz/http-bind";
+        return "https://sandbox.developers.mega.co.nz/bosh";
     } else {
         var $promise = new MegaPromise();
 
         $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
-                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/http-bind");
+                    $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/http-bind");
+                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/bosh");
                 }
             })
             .fail(function() {

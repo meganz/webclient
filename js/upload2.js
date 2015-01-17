@@ -48,7 +48,13 @@ function ul_completepending2(res,ctx)
 		ctx.file.retries   = 0;
 		ul_completepending(ctx.target);
 	}
-	else Later(resetUploadDownload);
+	else {
+        var n = ctx.file.name;
+        Later(resetUploadDownload);
+        Soon(function() {
+            msgDialog('warninga', l[1309], n, res);
+        });
+    }
 	if (ctx.file.owner) ctx.file.owner.destroy();
 	else oDestroy(ctx.file);
 }
@@ -693,6 +699,9 @@ FileUpload.prototype.run = function(done) {
 
 	try {
 		if (file.hash && file.ts) throw "The fingerprint exists already.";
+		if (!is_extension && file.gecko && !file.size && -1 == ua.indexOf('windows')) {
+			throw new Error('!ZeroByte');
+		}
 
 		fingerprint(file, function(hash, ts) {
 			if (!(file && self.file)) {
@@ -707,17 +716,20 @@ FileUpload.prototype.run = function(done) {
 			else ul_start(self);
 		});
 	} catch (e) {
-		if (d) console.error('FINGERPRINT ERROR', file.name, e.message || e);
+		if (d) console.error('FINGERPRINT ERROR', file.name, file.size, e.message || e);
 
-		if (!is_extension && e.result === 0x80520015 && file.size === 0)
+		if (!is_extension && e.result === 0x80520015 /* NS_ERROR_FILE_ACCESS_DENIED */ || e.message === '!ZeroByte')
 		{
 			var msg =
 				"Sorry, upload failed. "+
 				"If you were trying to upload a folder, "+
 				"please note you will need to use our extension for this to work.";
 
-			Later(firefoxDialog);
-			msgDialog('warninga', str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
+			if (!window['!ZeroByte']) {
+				window['!ZeroByte'] = true;
+				Later(firefoxDialog);
+				msgDialog('warninga', str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
+			}
 			UploadManager.abort(file);
 			this.destroy();
 		}
@@ -938,6 +950,7 @@ function resetUploadDownload() {
 	{
 		clearXhr(); /* destroy all xhr */
 
+		$('.transfer-pause-icon').addClass('hidden');
 		$('.transfer-panel-empty-txt').removeClass('hidden');
 		$('.transfer-table-header').hide(0);
 

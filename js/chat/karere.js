@@ -237,7 +237,7 @@ Karere.DEFAULTS = {
     /**
      * Used to connect to the BOSH service endpoint
      */
-    "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/http-bind',
+    "boshServiceUrl": 'https://sandbox.developers.mega.co.nz:5281/bosh',
 
     /**
      * Used when /resource is not passed when calling .connect() to generate a unique new resource id

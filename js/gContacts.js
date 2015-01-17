@@ -1,136 +1,202 @@
-function importGoogleContacts(where) {
-    var isImported = false,
-        access_token_uri = 'https://accounts.google.com/o/oauth2/token',
-        authenticate_uri = 'https://accounts.google.com/o/oauth2/auth',
-        m8_uri = 'https://www.google.com/m8/feeds/',
-        // *** GOOGLE *** /
-        client_id = '84490490123-si7f8qcg952ul35rokm0c0ao9b5oie76.apps.googleusercontent.com',
-        redirect_uri = 'https://beta.developers.mega.co.nz/newdesign/',
-        POPUP_WIDTH = 800,
-        POPUP_HEIGHT = 600,
-        tmpLeft = (window.screen.availWidth - POPUP_WIDTH) / 2,
-        tmpTop = (window.screen.availHeight - POPUP_HEIGHT) / 2,
-        leftPix = Math.floor(tmpLeft),
-        topPix = Math.floor(tmpTop);
+(function($, scope) {
+    /**
+     * Reusable Google contact importing
+     *
+     * @param opts {Object}
+     * @constructor
+     */
+    var GContacts = function(opts) {
+        var self = this;
 
-    var g_auth_uri = authenticate_uri + '?'
-        + '&response_type=token'
-        + '&client_id=' + client_id
-        + '&redirect_uri=' + redirect_uri
-        + '&scope=' + m8_uri
-        + '&state=' + String(Math.random());// Create random string
-//            + '&approval_prompt=force'
-//            + '&include_granted_scopes=true';
+        var initParams = function() {
 
-    var win = window.open(
-        g_auth_uri,
-        "GoogleAuthenticate",
-        'width=' + POPUP_WIDTH + ', height=' + POPUP_HEIGHT + ', left=' + leftPix + ', top=' + topPix
-        );
+            var index = self.options.domains.indexOf(window.location.host);
+            if (index !== -1) {
+                self.client_id = self.options.client_ids[index].client_id;
+                self.redirect_uri = self.options.client_ids[index].redirect_uri;
 
-    var pollTimer = window.setInterval(function () {
-        try {
-            console.log(win.document.URL);
-            if (win.document.URL.indexOf(redirect_uri) != -1) {
-                window.clearInterval(pollTimer);
-                var url = win.document.URL;
-                accessToken = extractQueryValue(url, 'access_token');
-                win.close();
-                isImported = getContactList(where);
+                self.leftPix = Math.floor((window.screen.availWidth - self.options.width) / 2);
+                self.topPix = Math.floor((window.screen.availHeight - self.options.height) / 2);
+
+                self.g_auth_uri = self.options.authenticate_uri + '?'
+                    + '&response_type=token'
+                    + '&client_id=' + self.client_id
+                    + '&redirect_uri=' + self.redirect_uri
+                    + '&scope=' + self.options.m8_uri
+                    + '&state=' + String(Math.random());
+                
+                // failed = false
+                return false;
+            } else {
+                DEBUG('Contacts importing is NOT allowed for host', window.location.host);
+                
+                // failed = true
+                return true;
             }
-        } catch (e) {
-        }
-    }, 500);
+        };
+        
+        var defaultOptions = {
+            'where': '',
+            'failed': false,
+            'm8_uri': 'https://www.google.com/m8/feeds/',
+            'authenticate_uri': 'https://accounts.google.com/o/oauth2/auth',
+            'access_token_uri': 'https://accounts.google.com/o/oauth2/token',
+            'validateTokenUrl': 'https://www.googleapis.com/oauth2/v1/tokeninfo',
+            'retreiveAllUrl': 'https://www.google.com/m8/feeds/contacts/default/full',
+            'width': '800', // popup width
+            'height': '600', // poput height
+            'domains': ['mega.nz', 'beta.mega.nz', 'sandbox3.developers.mega.co.nz'],
+            'client_ids': [
+                {// mega.nz
+                    'client_id': '84490490123-deqm1aegeqcmfhdq0aduptcj1rak2civ.apps.googleusercontent.com',
+                    'redirect_uri': 'https://mega.nz/'
+                },
+                {// beta.mega.nz'
+                    'client_id': '84490490123-qn3b905g0vg1qjmi7rmi93pud4ah0u4a.apps.googleusercontent.com',
+                    'redirect_uri': 'https://beta.mega.nz/'
+                },
+                {// sandbox3.developers.mega.co.nz
+                    'client_id': '84490490123-hnabnjak7pv6qo3ns2julvmh1dibb91c.apps.googleusercontent.com',
+                    'redirect_uri': 'https://sandbox3.developers.mega.co.nz/'
+                }]
+        };
 
-    return isImported;
-}
+        self.options = $.extend(true, {}, defaultOptions, opts);
 
-/**
- * 
- * @param {boolean} false = addContacts, true=share dialog
- * @returns {undefined}
- */
-function getContactList(where) {
-    var ACAO = 'https://beta.developers.mega.co.nz/newdesign/',
-        data = {
-            access_token: accessToken,
-            v: '3.0'
-        },
-        imported = false;
+        self.isImported = false;
+        self.client_id = '';
+        self.redirect_uri = '';
+        self.accessToken = '';
+        self.leftPix = 0;
+        self.topPix = 0;
+        self.g_auth_uri = '';
 
-    $.ajax({
-        beforeSend: function (request) {
-            if (ACAO !== '') {
-                request.setRequestHeader("Access-Control-Allow-Origin", ACAO);
-            }
-        },
-        type: 'GET',
-        url: "https://www.google.com/m8/feeds/contacts/default/full",
-        dataType: "jsonp",
-        data: data,
-        done: function (data) {
-            var gData = readAllEmails(data);
-            if (where === 'shared') {
-                addImportedDataToSharedDialog(gData, 'gmail');
-            }
-            else if (where === 'contacts') {
-                addImportedDataToAddContactsDialog(gData, 'gmail');
-            }
-            $('.import-contacts-dialog').fadeOut(200);
-            $('.import-contacts-link').removeClass('active');
-
-            imported = true;
-        }
-    });
-
-    return imported;
-}
-
-function xPathNameSpaceResolver(prefix) {
-    var ns = {
-        'def': 'http://www.w3.org/2005/Atom',
-        'gd': 'http://schemas.google.com/g/2005'
+        self.options.failed = initParams();
     };
 
-    return ns[prefix] || null;
-}
+    GContacts.prototype.importGoogleContacts = function() {
+        var self = this;
 
-function readAllEmails(xml) {
-    var parser = new DOMParser();
-    var xmlDoc = parser.parseFromString(xml, 'text/xml');
-    var emails = xmlDoc.evaluate("/def:feed/def:entry/gd:email/@address", xmlDoc, xPathNameSpaceResolver, 4, null);
-//        var names = xmlDoc.evaluate("/def:feed/def:entry/def:title", xmlDoc, nameSpace, 4, null);
-    var index = 0;
-//    var jsonData = {};
-    var arrData = [];
+        var win = window.open(
+                self.g_auth_uri,
+                'GoogleAuthenticate',
+                'width=' + self.options.width +
+                ', height=' + self.options.height +
+                ', left=' + self.leftPix +
+                ', top=' + self.topPix
+            );
 
-    var node = emails.iterateNext();
-    while (node) {
-        arrData.push(node.value);
-//        jsonData[node.value] = (index);
-        node = emails.iterateNext();
-    }
-//    return jsonData;
-    return arrData;
-}
+        var pollTimer = window.setInterval(function() {
+            try {
+                console.log(win.document.URL);
+                if (win.document.URL.indexOf(self.redirect_uri) !== -1) {
+                    window.clearInterval(pollTimer);
+                    var url = win.document.URL;
+                    self.accessToken = self._extractQueryValue(url, 'access_token');
+                    win.close();
+                    self.isImported = self.getContactList(self.options.where);
+                }
+            } catch (e) {
+            }
+        }, 1500);
+    };
 
-function validateToken(accessToken) {
-    var data = {access_token: accessToken};
+    /**
+     * _getContactList
+     * @param {boolean} false = addContacts, true=share dialog
+     */
+    GContacts.prototype.getContactList = function(where) {
+        var self = this;
 
-    // Validate access token
-    $.get("https://www.googleapis.com/oauth2/v1/tokeninfo", data, function (data) {
-        return true;
-    });
-}
+        var data = {
+            access_token: self.accessToken,
+            v: '3.0'
+        };
 
-function extractQueryValue(url, name) {
-    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    var regexS = "[\\#&]" + name + "=([^&#]*)";
-    var regex = new RegExp(regexS);
-    var results = regex.exec(url);
-    if (results == null) {
-        return "";
-    } else {
-        return results[1];
-    }
-}
+        $.ajax({
+            beforeSend: function(request) {
+                if (self.redirect_uri !== '') {
+                    request.setRequestHeader("Access-Control-Allow-Origin", self.redirect_uri);
+                }
+            },
+            type: 'GET',
+            url: self.options.retreiveAllUrl,
+            dataType: "jsonp",
+            data: data,
+            success: function(data) {
+                var gData = self._readAllEmails(data);
+                
+                if (where === 'shared') {
+                    addImportedDataToSharedDialog(gData, 'gmail');
+                } else if (where === 'contacts') {
+                    addImportedDataToAddContactsDialog(gData, 'gmail');
+                }
+                $('.import-contacts-dialog').fadeOut(200);
+
+                self.isImported = true;
+            }
+        });
+    };
+
+    GContacts.prototype._xPathNameSpaceResolver = function(prefix) {
+        var ns = {
+            'def': 'http://www.w3.org/2005/Atom',
+            'gd': 'http://schemas.google.com/g/2005'
+        };
+
+        return ns[prefix] || null;
+    };
+
+    GContacts.prototype._readAllEmails = function(xml) {
+        var self = this;
+
+        var parser = new DOMParser(),
+            xmlDoc = parser.parseFromString(xml, 'text/xml'),
+            emails = xmlDoc.evaluate("/def:feed/def:entry/gd:email/@address", xmlDoc, self._xPathNameSpaceResolver, 4, null),
+            arrData = [],
+            node = emails.iterateNext();
+
+        while (node) {
+            arrData.push(node.value);
+            node = emails.iterateNext();
+        }
+        return arrData;
+    };
+
+    /**
+     * Token validation
+     * 
+     * Tokens received on the fragment MUST be explicitly validated.
+     * Failure to verify tokens acquired this way makes your application
+     * more vulnerable to the confused deputy problem.
+     * @param {type} accessToken
+     * @returns {undefined}
+     */
+    GContacts.prototype._validateToken = function(accessToken) {
+        var self = this;
+
+        var data = {access_token: accessToken};
+
+        // Validate access token
+        $.get(self.options.validateTokenUrl, data, function() {
+            return true;
+        });
+    };
+
+
+    GContacts.prototype._extractQueryValue = function(url, name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regexS = "[\\#&]" + name + "=([^&#]*)";
+        var regex = new RegExp(regexS);
+        var results = regex.exec(url);
+        if (results == null) {
+            return "";
+        } else {
+            return results[1];
+        }
+    };
+
+    // export
+    scope.mega = scope.mega || {};
+    scope.mega.GContacts = GContacts;
+})(jQuery, window);

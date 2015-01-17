@@ -200,8 +200,9 @@ function FileSelectHandler(e)
 		$('span.nw-fm-tree-folder').css('background-color','');
 	}
 
-	var files = e.target.files || e.dataTransfer.files;
-	if (files.length == 0) return false;
+	var dataTransfer = e.dataTransfer;
+	var files = e.target.files || (dataTransfer && dataTransfer.files);
+	if (!files || files.length == 0) return false;
 	if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0 && e.dataTransfer.items[0].webkitGetAsEntry)
 	{
 		var items = e.dataTransfer.items;
@@ -247,7 +248,9 @@ function FileSelectHandler(e)
 	}
 	else
 	{
-		var u=[], gecko = ("mozItemCount" in e.dataTransfer);
+		var u=[];
+		var gecko = dataTransfer && ("mozItemCount" in dataTransfer)
+				|| browserdetails(ua).browser === 'Firefox';
 		for (var i = 0, f; f = files[i]; i++)
 		{
 			if (f.webkitRelativePath) f.path = f.webkitRelativePath;

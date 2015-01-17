@@ -713,9 +713,9 @@ FileUpload.prototype.run = function(done) {
 			else ul_start(self);
 		});
 	} catch (e) {
-		if (d) console.error('FINGERPRINT ERROR', file.name, e.message || e);
+		if (d) console.error('FINGERPRINT ERROR', file.name, file.size, e.message || e);
 
-		if (!is_extension && e.result === 0x80520015 && file.size === 0)
+		if (!is_extension && e.result === 0x80520015 /* NS_ERROR_FILE_ACCESS_DENIED */)
 		{
 			var msg =
 				"Sorry, upload failed. "+

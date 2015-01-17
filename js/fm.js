@@ -5695,10 +5695,7 @@ function sectionUIopen(id) {
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
     } else {
-        if (id && M.currentsection === id) {
-            return false;
-        }
-        M.currentsection = tmpId = id;
+        tmpId = id;
     }
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
@@ -9045,8 +9042,9 @@ function fingerprintDialog(userid)
     $('.dialog-approve-button').rebind('click', function() {
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+			$('.fm-verify').addClass('active').text('Verified').unbind('click');
+			closeFngrPrntDialog();
         });
-        closeFngrPrntDialog();
     });
 
     $('.dialog-skip-button').rebind('click', function() {
@@ -9087,7 +9085,7 @@ function contactUI() {
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $(this).addClass('active');
+            // $(this).addClass('active');
             $('.context-menu').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;

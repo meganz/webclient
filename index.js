@@ -268,6 +268,8 @@ function init_page()
 	{
 		blogid = page.substr(5,page.length-2);
 		page = 'blogarticle';
+		parsepage(pages['blogarticle']);
+		init_blogarticle();
 	}
 	else if (page.substr(0,4) == 'blog' && page.length > 4)
 	{
@@ -554,11 +556,6 @@ function init_page()
 	{
 		parsepage(pages['blog']);
 		init_blog();
-	}
-	else if (page == 'blogarticle')
-	{
-		parsepage(pages['blogarticle']);
-		init_blogarticle();
 	}
 	else if (page == 'copyright')
 	{

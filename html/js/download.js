@@ -5,150 +5,8 @@ var dl_import=false;
 var dl_attr;
 var fdl_queue_var=false;
 
-function Mads()
-{
-	if ('fr-de-ms-be-bs-ca-cy-ee-eu-hr-lv-lt-ru-sl-mk-uk-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-left-block .ads-bottom-block').css('padding-left','8px').css('padding-right','10px');
-	}
-	if ('ms-bs-be-ca-cz-cy-eu-fr-hr-lv-lt-hu-pl-ru-ro-sk-bg-sr-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','20px');
-	}
-	if ('uk-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-top-notification .red, .ads-top-notification .ads-top-white-txt1').css('font-size','18px');
-		$('.ads-top-notification .ads-top-white-txt2').css('font-size','13px');
-	}
-	if ('ms-de-eu-fr-hu-pt-ru-sk-bg-sr-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-tablet .ads-top-txt').css('line-height','22px');
-	}
-	if ('pt-ru-ro-sl-sk-tr-bg-mk-sr-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-right-block .ads-bottom-block,.ads-left-block .ads-bottom-block').css('padding-left','23px').css('padding-right','23px');
-	}
-	if ('ru-ro-sl-sk-tr-bg-mk-'.indexOf(lang+'-') > -1)
-	{
-		$('.ads-laptop .sync-button-txt').css('font-size','13px');
-	}
-
-	if (u_type)
-	{
-		$('.ads-top-arrow').hide();
-		$('.ads-top-notification').hide();
-	}
-	
-	
-	
-	//console.error('Mads', typeof swiffy, silent_loading && silent_loading.name, silent_loading);
-
-	$('body').addClass('ads');
-	if (typeof swiffy == 'undefined' && !silent_loading)
-	{
-		silent_loading=function()
-		{
-			Soon(startMads);
-		};
-		jsl.push(jsl2['mads_js']);
-		jsl_start();
-	}
-	else startMads();
-
-	var pf = navigator.platform.toUpperCase();
-	if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
-	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
-	else sync_switchOS('windows');
-}
-
-function startMads()
-{
-	if (typeof swiffy === 'undefined')
-	{
-		if (d) console.error('swiffy missing');
-		return;
-	}
-	adTime=new Date().getTime();
-	stage = new swiffy.Stage(document.getElementById('swiffycontainer'), swiffyobject);
-	ads1 = new swiffy.Stage(document.getElementById('browser-app'), swiffyobject2);
-	ads2 = new swiffy.Stage(document.getElementById('iphone-app'), swiffyobject3);
-	ads3 = new swiffy.Stage(document.getElementById('tablet-app'), swiffyobject4);
-	ads4 = new swiffy.Stage(document.getElementById('ipad-app'), swiffyobject5);
-	ads5 = new swiffy.Stage(document.getElementById('phone-app'), swiffyobject6);
-	stage.start();
-	ads1.start();
-	ads2.start();
-	ads2.start();
-	ads3.start();
-	ads4.start();
-	ads5.start();
-	$('.ads-slides-button').unbind('click');
-	$('.ads-slides-button').bind('click',function()
-	{
-		if ($(this).attr('class').indexOf('active') == -1)
-		{
-			showAd(this);
-		}
-	});
-	setTimeout(nextAd,10000);
-	setTimeout(function()
-	{
-		$('.ads-svg-container svg').css('cursor','pointer');
-		$('.ads-left-block .ads-svg-container svg').unbind('click');
-		$('.ads-left-block .ads-svg-container svg').bind('click',function()
-		{
-			document.location.hash = 'sync';
-		});
-		$('.ads-top-notification').unbind('click');
-		$('.ads-top-notification').bind('click',function()
-		{
-			document.location.hash = 'register';
-		});
-		$('.ads-laptop svg').unbind('click');
-		$('.ads-laptop svg').bind('click',function()
-		{
-			document.location.hash = 'chrome';
-		});
-		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').unbind('click');
-		$('.ads-iphone svg,.ads-tablet svg,.ads-ipad svg,.ads-phone svg').bind('click',function()
-		{
-			document.location.hash = 'mobile';
-		});
-
-		//1062
-	},500);
-}
-
-function showAd(el)
-{
-	adTime=new Date().getTime();
-	$('.ads-slides-block.active').fadeOut(50);
-	$('.ads-slides-block').removeClass('active');
-	var slideBlock = '#' + $(el).attr('id') + '-slide';
-	$(slideBlock).fadeIn(100);
-	$(slideBlock).addClass('active');
-	$(slideBlock).removeClass('hidden');
-	$('.ads-slides-button').removeClass('active');
-	$(el).addClass('active');
-	setTimeout(nextAd,10000);
-}
-
-function nextAd()
-{
-	if (new Date().getTime()-9900 > adTime)
-	{
-		var id = $('.ads-slides-button.active').attr('id');
-		if (!id) return false;
-		id = parseInt(id.replace('ads',''))+1;
-		if (id > 5) id=1;
-		showAd($('.ads-slides-button#ads'+id)[0]);
-	}
-}
-
 function dlinfo(ph,key,next)
 {
-	if (!(u_attr && u_attr.p) && !is_extension) Mads();
-
 	dl_next = next;
 	if ((lang == 'en') || (lang !== 'en' && l[1388] !== '[B]Download[/B] [A]to your computer[/A]'))
 	{
@@ -174,6 +32,9 @@ function dlinfo(ph,key,next)
 		dl_res = false;
 	}
 	else api_req({a:'g',p:ph},{callback:dl_g});
+    
+    // Initialise slide show
+    gifSlider.init();
 }
 
 function dl_g(res)
@@ -486,3 +347,163 @@ function sync_switchOS(os)
 		return false;
 	});
 }
+
+/**
+ * Changes the animated product images on the download page
+ */
+var gifSlider = {
+    
+    // Speed to fade in/out the images and text
+    fadeInSpeed: 3000,
+    fadeOutSpeed: 500,
+    
+    // There can be more or less images on either side e.g. 2 gifs on left and 
+    // 3 on right and it will still work because they are run independently.
+    images: {
+        
+        // Slide show on left side of the page
+        left: [
+            {
+                name: 'video-chat',         // Name & CSS class of the GIF
+                animationLength: 12120,     // Length of the GIF animation in milliseconds
+                href: '#register',          // Page link you go to when clicked
+                title: 5875,                // Title for above the GIF shown in red
+                description: 5876,          // Description next to the title
+                image: null                 // The image itself, preloaded and cached in memory
+            },
+            {
+                name: 'sync-client',
+                animationLength: 12150,
+                href: '#sync',
+                title: 1626,
+                description: 1086,
+                image: null
+            }
+        ],
+        
+        // Slide show on right side of the page
+        right: [
+            {
+                name: 'browser-extension',
+                animationLength: 12120,
+                href: '#chrome',
+                title: 1088,
+                description: 1929,
+                image: null
+            },
+            {
+                name: 'mobile-app',
+                animationLength: 13600,
+                href: '#mobile',
+                title: 955,
+                description: 1930,
+                image: null
+            }
+        ]
+    },
+    
+    /**
+     * Initialise the slide show
+     */
+    init: function() {
+        
+        // Preload the images into memory so they will display straight away
+        gifSlider.preLoadImages('left');
+        gifSlider.preLoadImages('right');
+        
+        // Show first two slides using order defined above
+        gifSlider.showImage('left', 0);
+        gifSlider.showImage('right', 0);
+        
+        // Setup loops to continually change after every slide has finished
+        gifSlider.continueSlideShow('left', 0);
+        gifSlider.continueSlideShow('right', 0);
+    },
+    
+    /**
+     * Preloads the images into memory
+     * @param {String} side The side of the page (left or right)
+     */
+    preLoadImages: function(side) {
+        
+        // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
+        var baseImagePath = location.href.replace(location.hash, '') + 'images/products/';
+                
+        // Check if using retina display
+        var retina = (window.devicePixelRatio > 1) ? '-2x' : '';
+        
+        // Loop through the available images
+        for (var i = 0, length = gifSlider.images[side].length; i < length; i++) {
+            
+            // Preload the image
+            var image = new Image();
+            image.src = baseImagePath + gifSlider.images[side][i].name + retina + '.gif';
+            
+            // Store for display later
+            gifSlider.images[side][i].image = image;            
+        }
+    },
+    
+    /**
+     * Iterates to the next image in the slideshow
+     * @param {String} side The side of the page (left or right)
+     * @param {Number} currentSlideIndex The current slide's index number (matches array above)
+     * @param {Number} oldIntervalId The interval ID to be cleared
+     */
+    continueSlideShow: function(side, currentSlideIndex, oldIntervalId) {
+        
+        // Find when to start the next image
+        var animationLengthForCurrentSlide = gifSlider.images[side][currentSlideIndex].animationLength;
+        var currentSlideImgSrc = gifSlider.images[side][currentSlideIndex].image.src;
+        
+        // Clear old interval ID
+        if (oldIntervalId) {
+            clearInterval(oldIntervalId);
+        }
+        
+        // Set timer to load the next slide after the current one has finished
+        var intervalId = setInterval(function() {
+            
+            // Fade out existing image            
+            $('.animations-' + side + '-container .currentImage').attr('src', currentSlideImgSrc).fadeOut(gifSlider.fadeOutSpeed, function() {
+                
+                // Increment to next image
+                var nextSlideIndex = currentSlideIndex + 1;
+
+                // If it has incremented past the last slide available, go back to start
+                if (nextSlideIndex === gifSlider.images[side].length) {
+                    nextSlideIndex = 0;
+                }
+
+                // Show the image now
+                gifSlider.showImage(side, nextSlideIndex);
+
+                // Setup the timer for the slide above, so after that finishes it will run the next one
+                gifSlider.continueSlideShow(side, nextSlideIndex, intervalId);
+            });
+        
+        }, animationLengthForCurrentSlide);
+    },
+    
+    /**
+     * Shows the animated image
+     * @param {String} side The side of the page (left or right)
+     * @param {Number} slideIndex The slide's index number to be shown
+     */
+    showImage: function(side, slideIndex) {
+        
+        // Set the details for the next slide
+        var slideTitle = l[gifSlider.images[side][slideIndex].title] + ':';
+        var slideDescription = l[gifSlider.images[side][slideIndex].description];
+        var slideImgSrc = gifSlider.images[side][slideIndex].image.src;
+        var slideLink = gifSlider.images[side][slideIndex].href;
+
+        // Change the link and fade in the new image
+        $('.animations-' + side + '-container .currentLink').attr('href', slideLink);
+        $('.animations-' + side + '-container .currentImage').attr('src', slideImgSrc).fadeIn(gifSlider.fadeInSpeed);
+
+        // Set title and description
+        $('.products-' + side + '-block .products-top-txt .red').html(slideTitle).fadeIn(gifSlider.fadeInSpeed);
+        $('.products-' + side + '-block .products-top-txt .description').text(slideDescription).fadeIn(gifSlider.fadeInSpeed);
+    }
+};

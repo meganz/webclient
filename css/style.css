@@ -18524,24 +18524,23 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 .password-dialog .fm-dialog-body {
 	padding: 14px 20px 14px 20px;
 }
-.ads-left-block, .ads-right-block {
+.products-left-block, .products-right-block {
 	background-color: #d9d8d8;
 	height: 100%;
 	width: 300px;
 	position: absolute;
 	min-height: 620px;
-	display: none;
 }
-.ads-left-block {
+.products-left-block {
 	left: 0;
 }
-.ads-right-block {
+.products-right-block {
 	right: 0;
 }
-.ads .ads-left-block, .ads .ads-right-block {
+.products .products-left-block, .products .products-right-block {
 	display: block;
 }
-.ads-top-txt {
+.products-top-txt {
 	padding: 0 20px;
 	position: absolute;
 	font-size: 13px;
@@ -18554,23 +18553,37 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	top: 18%;
 	line-height: 26px;
 }
-.ads-svg-container {
-	width: 260px;
-	height: 200px;
+.animations-left-container, .animations-right-container {
 	left: 20px;
 	position: absolute;
 	top: 50%;
 	margin-top: -125px;
 }
-.ads-iphone .ads-svg-container {
-	height: 222px;
-	top: 49%;
+.animations-left-container img {
+    border: 0 none;
+    display: none;
 }
-.ads-tablet .ads-svg-container, .ads-ipad .ads-svg-container {
-	height: 275px;
-	top: 46.3%;
+.animations-right-container img {
+    border: 0 none;
+    display: none;
 }
-.ads-bottom-block {
+.animations-left-container div, .animations-right-container {
+    cursor: pointer;
+}
+.animations-left-container div.hidden {
+    display: none;
+}
+.animations-right-container .browser-extension {
+    background: url(../images/products/browser-extension.gif) no-repeat scroll left top transparent;
+    height: 300px;
+    width: 260px;
+}
+.animations-right-container .mobile-app {
+    background: url(../images/products/mobile-app.gif) no-repeat scroll left top transparent;
+    height: 300px;
+    width: 260px;
+}
+.products-bottom-block {
 	height: 130px;
 	width: 100%;
 	position: absolute;
@@ -18580,13 +18593,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: #c5c3c3;
+    display: none;
 }
-.ads-bottom-block .sync-bottom-txt {
+.products-bottom-block .sync-bottom-txt {
 	font-size: 11px;
 	padding: 2px 0 0 0;
 	color: #3F4646;
 }
-.ads-right-block {
+.products-right-block {
 	background-color: #d9d8d8;
 	height: 100%;
 	width: 300px;
@@ -18594,7 +18608,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	right: 0;
 	min-height: 647px;
 }
-.ads-top-arrow {
+.products-top-arrow {
 	position: absolute;
 	width: 20px;
 	height: 9px;
@@ -18604,7 +18618,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	background-position: right -1449px;
 	background-repeat: no-repeat;
 }
-.ads-top-notification {
+.products-top-notification {
 	position: absolute;
 	background-color: #221e1f;
 	width: 220px;
@@ -18616,7 +18630,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	border-radius: 5px;
 	cursor: pointer;
 }
-.ads-top-white-txt1 {
+.products-top-white-txt1 {
 	font-size: 30px;
 	font-family: 'Open Sans Bold', Arial;
 	color: white;
@@ -18624,7 +18638,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	line-height: 46px;
 	padding: 10px 0 0 0;
 }
-.ads-top-white-txt2 {
+.products-top-white-txt2 {
 	font-size: 14px;
 	font-family: 'Open Sans Bold', Arial;
 	color: white;
@@ -18632,10 +18646,10 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	line-height: 18px;
 	padding: 0 0 18px 0;
 }
-.ads-slides-block {
+.products-slides-block {
 	height: 100%;
 }
-.ads-right-bottom-txt {
+.products-right-bottom-txt {
 	font-size: 11px;
 	text-align: center;
 	padding: 0 40px;
@@ -18645,13 +18659,14 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
-.ads-slides-buttons {
+.products-slides-buttons {
+    display: none;
 	width: 100%;
 	bottom: 198px;
 	text-align: center;
 	position: absolute;
 }
-.ads-slides-button {
+.products-slides-button {
 	display: inline-block;
 	width: 12px;
 	height: 12px;
@@ -18664,23 +18679,23 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	border-radius: 100%;
 	cursor: pointer;
 }
-.ads-slides-button.active {
+.products-slides-button.active {
 	background-color: white;
 }
-.ads-bottom-block .sync-button, .ads-bottom-block .chrome-app-button, .ads-bottom-block .ios-button, .ads-bottom-block .google-play-button {
+.products-bottom-block .sync-button, .products-bottom-block .chrome-app-button, .products-bottom-block .ios-button, .products-bottom-block .google-play-button {
 	display: inline-block;
 	min-width: 234px;
 	width: auto;
 	border-color: #8d8c8c;
 }
-.ads-bottom-block .sync-button:hover, .ads-bottom-block .chrome-app-button:hover, .ads-bottom-block .ios-button:hover, .ads-bottom-block .google-play-button:hover {
+.products-bottom-block .sync-button:hover, .products-bottom-block .chrome-app-button:hover, .products-bottom-block .ios-button:hover, .products-bottom-block .google-play-button:hover {
 	border-color: #DB3200;
 	min-width: 240px;
 }
-.ads-left-block rect, .ads-right-block rect {
+.products-left-block rect, .products-right-block rect {
 	fill: rgba(255,55,255,0);
 }
-.ads .new-download-right-block {
+.products .new-download-right-block {
 	overflow: visible;
 }
 .incoming-call-dialog .fm-dialog-close {

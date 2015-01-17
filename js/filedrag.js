@@ -247,10 +247,11 @@ function FileSelectHandler(e)
 	}
 	else
 	{
-		var u=[];
+		var u=[], gecko = ("mozItemCount" in e.dataTransfer);
 		for (var i = 0, f; f = files[i]; i++)
 		{
 			if (f.webkitRelativePath) f.path = f.webkitRelativePath;
+			if (gecko) f.gecko = true;
 			if (f.name != '.') u.push(f);
 		}
 		addupload(u);

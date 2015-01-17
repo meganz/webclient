@@ -6963,7 +6963,10 @@ function closeImportContactNotification(c)
 
 function clearScrollPanel(from)
 {
-    $(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
+    var j = $(from + ' .multiple-input').jScrollPane().data();
+    if (j && j.jsp) {
+        j.jsp.destroy();
+    }
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 }

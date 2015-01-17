@@ -10727,10 +10727,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .shared-with-me.read-and-write .properties-elements-counter span {
 	background-color: #FFD300;
 	background-position: -81px -207px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
 	background-color: #00E22C;
 	background-position: -81px -174px;
+	background-image: url(../images/mega/dialogs-sprite.svg);
+	background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
 	top: 0px;

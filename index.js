@@ -275,6 +275,8 @@ function init_page()
 	{
 		blogmonth = page.substr(5,page.length-2);
 		page = 'blog';
+		parsepage(pages['blog']);
+		init_blog();
 	}
     
     // If user has been invited to join MEGA and they are not already registered

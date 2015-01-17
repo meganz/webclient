@@ -126,11 +126,15 @@
             success: function(data) {
                 var gData = self._readAllEmails(data);
                 
-                // Remove focus from input element, related to tokeninput plugin
-                $('input#token-input-').blur();
                 if (where === 'shared') {
+                    
+                    // Remove focus from input element, related to tokeninput plugin
+                    $('.fm-dialog.share-dialog input#token-input-').blur();
                     addImportedDataToSharedDialog(gData, 'gmail');
                 } else if (where === 'contacts') {
+                    
+                    // Remove focus from input element, related to tokeninput plugin
+                    $('.add-user-popup-pad input#token-input-').blur();
                     addImportedDataToAddContactsDialog(gData, 'gmail');
                 }
                 $('.import-contacts-dialog').fadeOut(200);

@@ -1,6 +1,6 @@
 (function($, scope) {
     /**
-     * Reusable Google contact importing
+     * Google contact importing
      *
      * @param opts {Object}
      * @constructor
@@ -8,33 +8,6 @@
     var GContacts = function(opts) {
         var self = this;
 
-        var initParams = function() {
-
-            var index = self.options.domains.indexOf(window.location.host);
-            if (index !== -1) {
-                self.client_id = self.options.client_ids[index].client_id;
-                self.redirect_uri = self.options.client_ids[index].redirect_uri;
-
-                self.leftPix = Math.floor((window.screen.availWidth - self.options.width) / 2);
-                self.topPix = Math.floor((window.screen.availHeight - self.options.height) / 2);
-
-                self.g_auth_uri = self.options.authenticate_uri + '?'
-                    + '&response_type=token'
-                    + '&client_id=' + self.client_id
-                    + '&redirect_uri=' + self.redirect_uri
-                    + '&scope=' + self.options.m8_uri
-                    + '&state=' + String(Math.random());
-                
-                // failed = false
-                return false;
-            } else {
-                DEBUG('Contacts importing is NOT allowed for host', window.location.host);
-                
-                // failed = true
-                return true;
-            }
-        };
-        
         var defaultOptions = {
             'where': '',
             'failed': false,
@@ -71,19 +44,52 @@
         self.topPix = 0;
         self.g_auth_uri = '';
 
-        self.options.failed = initParams();
+        self._calcParams();
     };
+
+    /**
+     * Calculate parameters used for google contact importing
+     * @returns {undefined}
+     */
+    GContacts.prototype._calcParams = function() {
+        var self = this;
+        
+        var index = self.options.domains.indexOf(window.location.host);
+        if (index !== -1) {
+            self.client_id = self.options.client_ids[index].client_id;
+            self.redirect_uri = self.options.client_ids[index].redirect_uri;
+
+            self.leftPix = Math.floor((window.screen.availWidth - self.options.width) / 2);
+            self.topPix = Math.floor((window.screen.availHeight - self.options.height) / 2);
+
+            self.g_auth_uri = self.options.authenticate_uri + '?'
+                + '&response_type=token'
+                + '&client_id=' + self.client_id
+                + '&redirect_uri=' + self.redirect_uri
+                + '&scope=' + self.options.m8_uri
+                + '&state=' + String(Math.random());
+
+            // failed = false
+            self.options.failed = false;
+        } else {
+            DEBUG('Contacts importing is NOT allowed for host', window.location.host);
+
+            // failed = true
+            self.options.failed = true;
+        }
+    };
+
 
     GContacts.prototype.importGoogleContacts = function() {
         var self = this;
 
         var win = window.open(
-                self.g_auth_uri,
-                'GoogleAuthenticate',
-                'width=' + self.options.width +
-                ', height=' + self.options.height +
-                ', left=' + self.leftPix +
-                ', top=' + self.topPix
+            self.g_auth_uri,
+            'GoogleAuthenticate',
+            'width=' + self.options.width +
+            ', height=' + self.options.height +
+            ', left=' + self.leftPix +
+            ', top=' + self.topPix
             );
 
         var pollTimer = window.setInterval(function() {
@@ -125,7 +131,7 @@
             data: data,
             success: function(data) {
                 var gData = self._readAllEmails(data);
-                
+
                 if (where === 'shared') {
                     addImportedDataToSharedDialog(gData, 'gmail');
                 } else if (where === 'contacts') {

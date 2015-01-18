@@ -6,9 +6,10 @@
  * @author Emily Stark
  * @author Mike Hamburg
  * @author Dan Boneh
+ * 
+ * Version 1.0.0
  */
 
-"use strict";
 /*jslint indent: 2, bitwise: false, nomen: false, plusplus: false, white: false, regexp: false */
 /*global document, window, escape, unescape, module, require, Uint32Array */
 

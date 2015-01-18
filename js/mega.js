@@ -609,7 +609,7 @@ function MegaData()
                                <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
                             </div>\n\
                         </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + '' + l[738] + '</div>\n\
+                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + ' ' + l[738].toLowerCase() + '</div>\n\
                         <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[5861] + '</div>\n\
                     </td>\n\
                 </tr>';

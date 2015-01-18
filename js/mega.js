@@ -1503,7 +1503,7 @@ function MegaData()
         } else if (folderlink) {
             stype = "folder-link"
         }
-        if (d) console.error('buildtree', stype, n.h, n, dialog);
+        // if (d) console.log('buildtree', stype, n.h, n, dialog);
 
         if (this.c[n.h])
         {

@@ -2183,8 +2183,8 @@ function initContextUI()
         }
     });
 
-    $(c + '.advanced-item').unbind('click');
-    $(c + '.advanced-item').bind('click', function()
+    $(c + '.advanced-item, ' + c + '.move-item').unbind('click');
+    $(c + '.advanced-item, ' + c + '.move-item').bind('click', function()
     {
         $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
@@ -2204,21 +2204,6 @@ function initContextUI()
         $('.copy-dialog .dialog-copy-button').addClass('active');
         $('.copy-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
-        // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
-        dialogScroll('.dialog-tree-panel-scroll');
-    });
-
-    $(c + '.move-item').unbind('click');
-    $(c + '.move-item').bind('click', function()
-    {
-        $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.move-dialog .dialog-move-button').addClass('active');
-        $('.move-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-        disableCircularTargets('#mctreea_');
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
     });
@@ -6256,6 +6241,7 @@ function handleDialogContent(s, m, c, n, t, i)
 
     dialogPositioning('.fm-dialog' + '.' + n + '-dialog');
     // dialogScroll('.' + n + '-dialog-tree-panel');
+    dialogScroll('.dialog-tree-panel-scroll');
 
     $('.' + n + '-dialog-button' + '.' + s).addClass('active');//Activate tab
 }

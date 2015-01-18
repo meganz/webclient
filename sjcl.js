@@ -71,11 +71,6 @@ var sjcl = {
 if(typeof module !== 'undefined' && module.exports){
   module.exports = sjcl;
 }
-if (typeof define === "function") {
-    define([], function () {
-        return sjcl;
-    });
-}
 /** @fileOverview Low-level AES implementation.
  *
  * This file contains a low-level implementation of AES, optimized for
@@ -360,7 +355,7 @@ sjcl.bitArray = {
       return a1.concat(a2);
     }
     
-    var last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
+    var out, i, last = a1[a1.length-1], shift = sjcl.bitArray.getPartial(last);
     if (shift === 32) {
       return a1.concat(a2);
     } else {
@@ -469,20 +464,6 @@ sjcl.bitArray = {
    */
   _xor4: function(x,y) {
     return [x[0]^y[0],x[1]^y[1],x[2]^y[2],x[3]^y[3]];
-  },
-
-  /** byteswap a word array inplace.
-   * (does not handle partial words)
-   * @param {sjcl.bitArray} a word array
-   * @return {sjcl.bitArray} byteswapped array
-   */
-  byteswapM: function(a) {
-    var i, v, m = 0xff00;
-    for (i = 0; i < a.length; ++i) {
-      v = a[i];
-      a[i] = (v >>> 24) | ((v >>> 8) & m) | ((v & m) << 8) | (v << 24);
-    }
-    return a;
   }
 };
 /** @fileOverview Bit array codec implementations.
@@ -535,7 +516,7 @@ sjcl.codec.utf8String = {
 sjcl.codec.hex = {
   /** Convert from a bitArray to a hex string. */
   fromBits: function (arr) {
-    var out = "", i;
+    var out = "", i, x;
     for (i=0; i<arr.length; i++) {
       out += ((arr[i]|0)+0xF00000000000).toString(16).substr(4);
     }
@@ -864,7 +845,7 @@ sjcl.mode.ccm = {
    * @return {bitArray} The encrypted data, an array of bytes.
    */
   encrypt: function(prf, plaintext, iv, adata, tlen) {
-    var L, out = plaintext.slice(0), tag, w=sjcl.bitArray, ivl = w.bitLength(iv) / 8, ol = w.bitLength(out) / 8;
+    var L, i, out = plaintext.slice(0), tag, w=sjcl.bitArray, ivl = w.bitLength(iv) / 8, ol = w.bitLength(out) / 8;
     tlen = tlen || 64;
     adata = adata || [];
     
@@ -898,7 +879,7 @@ sjcl.mode.ccm = {
   decrypt: function(prf, ciphertext, iv, adata, tlen) {
     tlen = tlen || 64;
     adata = adata || [];
-    var L,
+    var L, i, 
         w=sjcl.bitArray,
         ivl = w.bitLength(iv) / 8,
         ol = w.bitLength(ciphertext), 
@@ -940,7 +921,7 @@ sjcl.mode.ccm = {
    */
   _computeTag: function(prf, plaintext, iv, adata, tlen, L) {
     // compute B[0]
-    var mac, tmp, i, macData = [], w=sjcl.bitArray, xor = w._xor4;
+    var q, mac, field = 0, offset = 24, tmp, i, macData = [], w=sjcl.bitArray, xor = w._xor4;
 
     tlen /= 8;
   
@@ -1000,7 +981,7 @@ sjcl.mode.ccm = {
    * @private
    */
   _ctrMode: function(prf, data, iv, tag, tlen, L) {
-    var enc, i, w=sjcl.bitArray, xor = w._xor4, ctr, l = data.length, bl=w.bitLength(data);
+    var enc, i, w=sjcl.bitArray, xor = w._xor4, ctr, b, l = data.length, bl=w.bitLength(data);
 
     // start the ctr
     ctr = w.concat([w.partial(8,L-1)],iv).concat([0,0,0]).slice(0,4);
@@ -1315,7 +1296,7 @@ sjcl.mode.gcm = {
    * @param {Number} tlen The length of the tag, in bits.
    */
   _ctrMode: function(encrypt, prf, data, adata, iv, tlen) {
-    var H, J0, S0, enc, i, ctr, tag, last, l, bl, abl, ivbl, w=sjcl.bitArray;
+    var H, J0, S0, enc, i, ctr, tag, last, l, bl, abl, ivbl, w=sjcl.bitArray, xor=w._xor4;
 
     // Calculate data lengths
     l = data.length;
@@ -1740,16 +1721,14 @@ sjcl.prng.prototype = {
       loadTimeCollector: this._bind(this._loadTimeCollector),
       mouseCollector: this._bind(this._mouseCollector),
       keyboardCollector: this._bind(this._keyboardCollector),
-      accelerometerCollector: this._bind(this._accelerometerCollector),
-      touchCollector: this._bind(this._touchCollector)
-    };
+      accelerometerCollector: this._bind(this._accelerometerCollector)
+    }
 
     if (window.addEventListener) {
       window.addEventListener("load", this._eventListener.loadTimeCollector, false);
       window.addEventListener("mousemove", this._eventListener.mouseCollector, false);
       window.addEventListener("keypress", this._eventListener.keyboardCollector, false);
       window.addEventListener("devicemotion", this._eventListener.accelerometerCollector, false);
-      window.addEventListener("touchmove", this._eventListener.touchCollector, false);
     } else if (document.attachEvent) {
       document.attachEvent("onload", this._eventListener.loadTimeCollector);
       document.attachEvent("onmousemove", this._eventListener.mouseCollector);
@@ -1770,7 +1749,6 @@ sjcl.prng.prototype = {
       window.removeEventListener("mousemove", this._eventListener.mouseCollector, false);
       window.removeEventListener("keypress", this._eventListener.keyboardCollector, false);
       window.removeEventListener("devicemotion", this._eventListener.accelerometerCollector, false);
-      window.removeEventListener("touchmove", this._eventListener.touchCollector, false);
     } else if (document.detachEvent) {
       document.detachEvent("onload", this._eventListener.loadTimeCollector);
       document.detachEvent("onmousemove", this._eventListener.mouseCollector);
@@ -1893,31 +1871,8 @@ sjcl.prng.prototype = {
   },
   
   _mouseCollector: function (ev) {
-    var x, y;
-
-    try {
-      x = ev.x || ev.clientX || ev.offsetX || 0;
-      y = ev.y || ev.clientY || ev.offsetY || 0;
-    } catch (err) {
-      // Event originated from a secure element. No mouse position available.
-      x = 0;
-      y = 0;
-    }
-
-    if (x != 0 && y!= 0) {
-      sjcl.random.addEntropy([x,y], 2, "mouse");
-    }
-
-    this._addCurrentTimeToEntropy(0);
-  },
-
-  _touchCollector: function(ev) {
-    var touch = ev.touches[0] || ev.changedTouches[0];
-    var x = touch.pageX || touch.clientX,
-        y = touch.pageY || touch.clientY;
-
-    sjcl.random.addEntropy([x,y],1,"touch");
-
+    var x = ev.x || ev.clientX || ev.offsetX || 0, y = ev.y || ev.clientY || ev.offsetY || 0;
+    sjcl.random.addEntropy([x,y], 2, "mouse");
     this._addCurrentTimeToEntropy(0);
   },
   
@@ -1926,7 +1881,7 @@ sjcl.prng.prototype = {
   },
 
   _addCurrentTimeToEntropy: function (estimatedEntropy) {
-    if (typeof window !== 'undefined' && window.performance && typeof window.performance.now === "function") {
+    if (window && window.performance && typeof window.performance.now === "function") {
       //how much entropy do we want to add here?
       sjcl.random.addEntropy(window.performance.now(), estimatedEntropy, "loadtime");
     } else {
@@ -1935,15 +1890,11 @@ sjcl.prng.prototype = {
   },
   _accelerometerCollector: function (ev) {
     var ac = ev.accelerationIncludingGravity.x||ev.accelerationIncludingGravity.y||ev.accelerationIncludingGravity.z;
+    var or = "";
     if(window.orientation){
-      var or = window.orientation;
-      if (typeof or === "number") {
-        sjcl.random.addEntropy(or, 1, "accelerometer");
-      }
+      or = window.orientation;
     }
-    if (ac) {
-      sjcl.random.addEntropy(ac, 2, "accelerometer");
-    }
+    sjcl.random.addEntropy([ac,or], 3, "accelerometer");
     this._addCurrentTimeToEntropy(0);
   },
 
@@ -1973,26 +1924,16 @@ sjcl.prng.prototype = {
 sjcl.random = new sjcl.prng(6);
 
 (function(){
-  // function for getting nodejs crypto module. catches and ignores errors.
-  function getCryptoModule() {
-    try {
-      return require('crypto');
-    }
-    catch (e) {
-      return null;
-    }
-  }
-
   try {
-    var buf, crypt, ab;
-
+    var buf, crypt, getRandomValues, ab;
     // get cryptographically strong entropy depending on runtime environment
-    if (typeof module !== 'undefined' && module.exports && (crypt = getCryptoModule()) && crypt.randomBytes) {
+    if (typeof module !== 'undefined' && module.exports) {
+      // get entropy for node.js
+      crypt = require('crypto');
       buf = crypt.randomBytes(1024/8);
-      buf = new Uint32Array(new Uint8Array(buf).buffer);
       sjcl.random.addEntropy(buf, 1024, "crypto.randomBytes");
 
-    } else if (typeof window !== 'undefined' && typeof Uint32Array !== 'undefined') {
+    } else if (window && Uint32Array) {
       ab = new Uint32Array(32);
       if (window.crypto && window.crypto.getRandomValues) {
         window.crypto.getRandomValues(ab);
@@ -2009,11 +1950,9 @@ sjcl.random = new sjcl.prng(6);
       // no getRandomValues :-(
     }
   } catch (e) {
-    if (typeof window !== 'undefined' && window.console) {
-      console.log("There was an error collecting entropy from the browser:");
-      console.log(e);
-      //we do not want the library to fail due to randomness not being maintained.
-    }
+    console.log("There was an error collecting entropy from the browser:");
+    console.log(e);
+    //we do not want the library to fail due to randomness not being maintained.
   }
 }());
 /** @fileOverview Convenince functions centered around JSON encapsulation.
@@ -2151,11 +2090,7 @@ sjcl.random = new sjcl.prng(6);
     j._add(rp, p);
     rp.key = password;
 
-    if (params.raw === 1) {
-      return ct;
-    } else {
-      return sjcl.codec.utf8String.fromBits(ct);
-    }
+    return sjcl.codec.utf8String.fromBits(ct);
   },
 
   /** Simple decryption function.
@@ -2223,15 +2158,13 @@ sjcl.random = new sjcl.prng(6);
     }
     var a = str.replace(/^\{|\}$/g, '').split(/,/), out={}, i, m;
     for (i=0; i<a.length; i++) {
-      if (!(m=a[i].match(/^\s*(?:(["']?)([a-z][a-z0-9]*)\1)\s*:\s*(?:(-?\d+)|"([a-z0-9+\/%*_.@=\-]*)"|(true|false))$/i))) {
+      if (!(m=a[i].match(/^(?:(["']?)([a-z][a-z0-9]*)\1):(?:(\d+)|"([a-z0-9+\/%*_.@=\-]*)")$/i))) {
         throw new sjcl.exception.invalid("json decode: this isn't json!");
       }
       if (m[3]) {
         out[m[2]] = parseInt(m[3],10);
-      } else if (m[4]) {
+      } else {
         out[m[2]] = m[2].match(/^(ct|salt|iv)$/) ? sjcl.codec.base64.toBits(m[4]) : unescape(m[4]);
-      } else if (m[5]) {
-        out[m[2]] = m[5] === 'true';
       }
     }
     return out;

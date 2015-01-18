@@ -84,12 +84,12 @@
         var self = this;
 
         var win = window.open(
-            self.g_auth_uri,
-            'GoogleAuthenticate',
-            'width=' + self.options.width +
-            ', height=' + self.options.height +
-            ', left=' + self.leftPix +
-            ', top=' + self.topPix
+                self.g_auth_uri,
+                'GoogleAuthenticate',
+                'width=' + self.options.width +
+                ', height=' + self.options.height +
+                ', left=' + self.leftPix +
+                ', top=' + self.topPix
             );
 
         var pollTimer = window.setInterval(function() {

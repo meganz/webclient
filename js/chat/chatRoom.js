@@ -2248,7 +2248,7 @@ ChatRoom.prototype._regroupMessages = function() {
  *
  * @param type {string} used internally, if late access to the DOM element of the dialog is required (e.g. to remove it)
  * @param [user] {undefined|null|string} can be used to pass jid (full or bare jid) so that the .generateInlineDialog will add avatars to the actual message
- * @param iconCssClass {Array} css classes to be added to the .nw-chat-notification-icon element
+ * @param iconCssClass {Array} css classes to be added to the .chat-notification element
  * @param messageContents {string} text that will be used as message content
  * @param cssClasses {Array} array of css class names to be added to the heading (used to append icons with css)
  * @param [buttons] {Array} Array of objects in the format of {type: "primary|seconday", text: "button 1", callback: fn(e)}
@@ -2287,11 +2287,11 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
 
     if($.isArray(iconCssClasses)) {
         $.each(iconCssClasses, function(k, v) {
-            $('.nw-chat-notification-icon', $inlineDialog).addClass(v);
+            $('.chat-notification', $inlineDialog).addClass(v);
         });
     } else if(iconCssClasses) {
         // is string
-        $('.nw-chat-notification-icon', $inlineDialog).addClass(iconCssClasses);
+        $('.chat-notification', $inlineDialog).addClass(iconCssClasses);
     }
 
     $.each(cssClasses, function(k, v) {

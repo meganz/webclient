@@ -22302,3 +22302,6 @@ a.top-login-forgot-pass {
 .top-warning-popup.not-activated .warning-popup-body {
 	padding-bottom: 8px;
 }
+.tree-item-on-search-hidden {
+	display: none !important;
+}

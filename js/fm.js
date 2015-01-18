@@ -365,6 +365,8 @@ var treesearch = false;
 
 function treeredraw()
 {
+    $('li.tree-item-on-search-hidden').removeClass('tree-item-on-search-hidden');
+
     if (RootbyId(M.currentdirid) == M.RootID)
         M.buildtree(M.d[M.RootID]);
     else if (RootbyId(M.currentdirid) == M.RubbishID)
@@ -497,14 +499,14 @@ function treesearchUI()
                     M.contacts();
                     break;
                 case 'shared-with-me':
-                    M.buildtree({h: 'shares'});
+                    M.buildtree({h: 'shares'}, 0x4fe);
                     break;
                 case 'cloud-drive':
                 case 'folder-link':
-                    M.buildtree(M.d[M.RootID]);
+                    M.buildtree(M.d[M.RootID], 0x4fe);
                     break;
                 case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID});
+                    M.buildtree({h: M.RubbishID}, 0x4fe);
                     break;
             }
             treeUI(); // reattach events
@@ -1764,7 +1766,7 @@ function addContactUI()
         // NOT imported
         if (!$(this).is('.imported')) {
             var contacts = new mega.GContacts({'where': 'contacts'});
-            
+
             // NOT failed
             if (!contacts.options.failed) {
                 contacts.importGoogleContacts();
@@ -2204,6 +2206,8 @@ function initContextUI()
         handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
+        // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+        dialogScroll('.dialog-tree-panel-scroll');
     });
 
     $(c + '.move-item').unbind('click');
@@ -6114,7 +6118,13 @@ function closeMsg()
 
 function dialogScroll(s)
 {
+    s+=':visible';
     $(s).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+    jScrollFade(s);
+    // var jsp = $(s).data('jsp');
+    // if (jsp) {
+        // jsp.reinitialise();
+    // }
 }
 
 function dialogPositioning(s)
@@ -6245,7 +6255,7 @@ function handleDialogContent(s, m, c, n, t, i)
     $('.' + n + '-dialog ul').removeClass('opened');
 
     dialogPositioning('.fm-dialog' + '.' + n + '-dialog');
-    dialogScroll('.' + n + '-dialog-tree-panel');
+    // dialogScroll('.' + n + '-dialog-tree-panel');
 
     $('.' + n + '-dialog-button' + '.' + s).addClass('active');//Activate tab
 }
@@ -6662,7 +6672,7 @@ function initShareDialog()
         if (!$(this).is('.imported'))
         {
             var contacts = new mega.GContacts({'where': 'shared'});
-            
+
             // NOT failed
             if (!contacts.options.failed) {
                 contacts.importGoogleContacts();
@@ -6948,7 +6958,7 @@ function closeImportContactNotification(c) {
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');
-    
+
     // Remove focus from input element, related to tokeninput plugin
     $(c + ' input#token-input-').blur();
 }
@@ -7187,7 +7197,8 @@ function copyDialog()
         else
             $.mcselected = old;
 
-        dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+        // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+        dialogScroll('.dialog-tree-panel-scroll');
         // Disable action button if there is no selected items
         if (typeof $.mcselected == 'undefined')
             $btn.addClass('disabled');
@@ -7421,7 +7432,8 @@ function moveDialog()
         else
             $.mcselected = old;
 
-        dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
+        // dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
+        dialogScroll('.dialog-tree-panel-scroll');
         // Disable action button if there is no selected items
         if (typeof $.mcselected == 'undefined')
             $btn.addClass('disabled');

@@ -665,6 +665,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
         $('.my-av-screen', self.$header).append(obj.player);
         self._myAvElement = obj.player;
+        self._myAvElement.play();
     });
 
     self.bind('local-player-remove', function(event, obj) {
@@ -701,8 +702,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
 
 
-    $('.my-av-screen', self.$header).draggable({
-        'containment': self.$header
+    var $avscreen = $('.my-av-screen', self.$header);
+    $avscreen.draggable({
+        'containment': $avscreen.parents('.chat-call-block'),
+        'scroll': false
     });
 
     // activity on a specific room (show, hidden, got new message, etc)
@@ -1754,17 +1757,18 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
     } else {
         var $video = $('.others-av-screen.video-call-container video', self.$header);
         if($video.length > 0) {
-            var $confCallUi = $('.chat-call-block', self.$header);
-            var $videoContainer = $video.parent();
-            var targetHeight = $confCallUi.outerHeight() - 50;
+            // not needed anymore, fixed by Andrei using css?
+            //var $confCallUi = $('.chat-call-block', self.$header);
+            //var $videoContainer = $video.parent();
+            //var targetHeight = $confCallUi.outerHeight() - 50;
 
-            $videoContainer.css('height', targetHeight + 8);
-            $videoContainer.css('width',
-                Math.min(
-                    Math.round((targetHeight/9)*16) + 8,
-                    $video.outerWidth() + 8
-                )
-            );
+            //$videoContainer.css('height', targetHeight + 8);
+            //$videoContainer.css('width',
+            //    Math.min(
+            //        Math.round((targetHeight/9)*16) + 8,
+            //        $video.outerWidth() + 8
+            //    )
+            //);
         }
     }
 

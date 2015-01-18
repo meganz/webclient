@@ -602,7 +602,7 @@ var Chat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'karere-001.developers.mega.co.nz:4434',
-        'fallbackXmppServer': 'https://karere-001.developers.mega.co.nz:443/http-bind',
+        'fallbackXmppServer': 'https://karere-001.developers.mega.co.nz:443/bosh',
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {

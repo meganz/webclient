@@ -1049,9 +1049,6 @@ function initUI() {
     $(window).unbind('resize.fmrh hashchange.fmrh');
     $(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (lang != 'en')
-        $('.download-standart-item').text(l[58]);
-
     megaChat.karere.unbind("onPresence.maintainUI");
     megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData)
     {
@@ -1474,19 +1471,19 @@ function addContactUI()
     var contacts = getContactsEMails();
 
     $('.add-contact-multiple-input').tokenInput(contacts, {
-        theme: "mega",
-        hintText: "Type in an email or contact",
-//        hintText: "",
-//        placeholder: "Type in an email or contact",
-        searchingText: "",
-        noResultsText: "",
+        theme: 'mega',
+        hintText: 'Type in an email or contact',
+//        hintText: '',
+//        placeholder: 'Type in an email or contact',
+        searchingText: '',
+        noResultsText: '',
         addAvatar: true,
         autocomplete: null,
         searchDropdown: true,
         emailCheck: true,
         preventDoublet: true,
-        tokenValue: "id",
-        propertyToSearch: "id",
+        tokenValue: 'id',
+        propertyToSearch: 'id',
         resultsLimit: 5,
         minChars: 2,
         accountHolder: (M.u[u_handle] || {}).m || '',
@@ -1506,7 +1503,7 @@ function addContactUI()
             if (itemNum === 1)
             {
                 $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
             }
             else
             {
@@ -1541,13 +1538,13 @@ function addContactUI()
             if (itemNum === 0)
             {
                 $('.add-user-popup-button.add').addClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             }
             else if (itemNum === 1)
             {
                 $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             }
             else
@@ -1598,7 +1595,7 @@ function addContactUI()
         // Prepare multi-input and dialog
         $('.add-user-popup .multiple-input .token-input-token-mega').remove();
         $('.add-user-popup-button.add').addClass('disabled');
-        $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+        $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
         $('.fm-add-user').removeClass('active');
 
         iconSize(false);
@@ -1636,7 +1633,7 @@ function addContactUI()
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
 
             $('.add-user-popup-button.add').addClass('disabled');
-            $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+            $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
             // Positioning, not less then 8px from right side
@@ -1763,11 +1760,9 @@ function addContactUI()
     });
 
     $('.add-user-popup .import-contacts-service').unbind('click');
-    $('.add-user-popup .import-contacts-service').bind('click', function()
-    {
+    $('.add-user-popup .import-contacts-service').bind('click', function() {
         // NOT imported
-        if (!$(this).is('.imported'))
-        {
+        if (!$(this).is('.imported')) {
             var contacts = new mega.GContacts({'where': 'contacts'});
             
             // NOT failed
@@ -1776,9 +1771,7 @@ function addContactUI()
             } else {
                 closeImportContactNotification('.add-user-popup');
             }
-        }
-        else
-        {
+        } else {
             var n = $('.imported-contacts-notification');
             n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
             n.fadeIn(200);
@@ -5143,9 +5136,9 @@ function menuItems()
                 $.delfav = 0;
         }
         if ($.delfav)
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[976]);
+            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         else
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[975]);
+            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
     }
     var n = M.d[$.selected[0]];
     if (n && n.p.length == 11)
@@ -6951,8 +6944,7 @@ function addImportedDataToAddContactsDialog(data, from) {
     closeImportContactNotification('.add-user-popup');
 }
 
-function closeImportContactNotification(c)
-{
+function closeImportContactNotification(c) {
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');
@@ -6963,7 +6955,10 @@ function closeImportContactNotification(c)
 
 function clearScrollPanel(from)
 {
-    $(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
+    var j = $(from + ' .multiple-input').jScrollPane().data();
+    if (j && j.jsp) {
+        j.jsp.destroy();
+    }
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 }

@@ -609,7 +609,7 @@ function MegaData()
                                <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
                             </div>\n\
                         </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + '' + l[738] + '</div>\n\
+                        <div class="contact-request-button cancel ' + hideCancel + '">' + l[156] + ' ' + l[738].toLowerCase() + '</div>\n\
                         <div class="contact-request-button reinvite ' + hideReinvite + '">' + l[5861] + '</div>\n\
                     </td>\n\
                 </tr>';
@@ -2946,43 +2946,77 @@ function MegaData()
         }
     }
 
-    this.addDownload = function(n, z, preview)
+    this.getDownloadFolderNodes = function(n, md, nodes, paths)
+    {
+        if (md) this.makeDir(n);
+
+        var subids = fm_getnodes(n);
+        for (var j in subids)
+        {
+            var p = this.getPath(subids[j]);
+            var path = '';
+
+            for (var k in p)
+            {
+                if (M.d[p[k]] && M.d[p[k]].t)
+                    path = fm_safename(M.d[p[k]].name) + '/' + path;
+                if (p[k] == n)
+                    break;
+            }
+
+            if (!M.d[subids[j]].t)
+            {
+                nodes.push(subids[j]);
+                paths[subids[j]] = path;
+            }
+            else {
+                console.log('0 path', path);
+            }
+        }
+    };
+
+    this.addDownload = function(n, z, preview, zipname)
     {
         // todo cesar: preview parameter indicates that this is a image fpreview download
         delete $.dlhash;
-        var zipname, path;
+        var path;
         var nodes = [];
         var paths = {};
-        for (var i in n)
+        if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO))
+        {
+            var nf = [], cbs = [];
+            for (var i in n)
+            {
+                if (M.d[n[i]] && M.d[n[i]].t) {
+                    var nn = [], pp = {};
+                    this.getDownloadFolderNodes(n[i], false, nn, pp);
+                    cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, M.d[n[i]].name));
+                } else {
+                    nf.push(n[i]);
+                }
+            }
+
+            n = nf;
+
+            if (cbs.length) {
+                for (var i in cbs) {
+                    Soon(cbs[i]);
+                }
+            }
+        }
+        if (z === 0x21f9A)
+        {
+            nodes = n;
+            paths = preview;
+            preview = false;
+        }
+        else for (var i in n)
         {
             if (M.d[n[i]])
             {
                 if (M.d[n[i]].t)
                 {
-                    if (!z)
-                        this.makeDir(n[i]);
-                    var subids = fm_getnodes(n[i]);
-                    for (var j in subids)
-                    {
-                        var p = this.getPath(subids[j]);
-                        var path = '';
-
-                        for (var k in p)
-                        {
-                            if (M.d[p[k]] && M.d[p[k]].t)
-                                path = fm_safename(M.d[p[k]].name) + '/' + path;
-                            if (p[k] == n[i])
-                                break;
-                        }
-
-                        if (!M.d[subids[j]].t)
-                        {
-                            nodes.push(subids[j]);
-                            paths[subids[j]] = path;
-                        }
-                        else
-                            console.log('0 path', path);
-                    }
+                    this.getDownloadFolderNodes(n[i], !!z, nodes, paths);
                 }
                 else
                 {
@@ -2996,7 +3030,7 @@ function MegaData()
             zipid++;
             z=zipid;
             if (M.d[n[0]] && M.d[n[0]].t) zipname = M.d[n[0]].name + '.zip';
-            else zipname = 'Archive-'+ Math.random().toString(16).slice(-4) + '.zip';
+            else zipname = (zipname || ('Archive-'+ Math.random().toString(16).slice(-4))) + '.zip';
             var zipsize = 0;
         }
         else z = false;

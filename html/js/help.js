@@ -1,5 +1,6 @@
 function init_help()
 {
+	return;
 	var subpage='',search ='';	
 	if (page.length > 4) subpage = page.substr(5,page.length-1);
 	if (subpage.substr(0,6) == 'search')

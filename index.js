@@ -58,14 +58,14 @@ function mainScroll()
 	$('.main-scroll-block').jScrollPane({showArrows:true,arrowSize:5,animateScroll:true,verticalDragMinHeight:150,enableKeyboardNavigation:true});
 	$('.main-scroll-block').unbind('jsp-scroll-y');
 	jScrollFade('.main-scroll-block');
-	if (page == 'doc' || page.substr(0,4) == 'help') scrollMenu();
+	if (page == 'doc' || page.substr(0,4) == 'help' || page == 'cpage') scrollMenu();
 }
 
 function scrollMenu()
 {
 	$('.main-scroll-block').bind('jsp-scroll-y',function(event, scrollPositionY, isAtTop, isAtBottom)
 	{
-		 if (page == 'doc' || page.substr(0,4) == 'help')
+		 if (page == 'doc' || page.substr(0,4) == 'help' || page == 'cpage')
 		 {
 			var sc = scrollPositionY-30;
 			if (isAtTop) sc = 30;
@@ -1455,7 +1455,9 @@ function parsepage(pagehtml,pp)
 	$('#pageholder').hide();
 	$('#startholder').hide();
 	megatitle();
-	pagehtml = translate(pagehtml);
+	try {
+		pagehtml = translate(pagehtml);
+	} catch (e) {}
 	pagehtml = pagehtml.replace(/{staticpath}/g,staticpath);
 	if (document.location.href.substr(0,19) == 'chrome-extension://') pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
 	$('body').removeClass('notification-body bottom-pages new-startpage');

@@ -8393,7 +8393,8 @@ function slideshow(id, close)
         return false;
     }
 
-    if (folderlink)
+    var n = M.d[id];
+    if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
         $('.slideshow-line').hide();
@@ -8408,7 +8409,6 @@ function slideshow(id, close)
     {
         slideshow(id, 1);
     });
-    var n = M.d[id];
     if (!n)
         return;
     $('.slideshow-filename').text(n.name);

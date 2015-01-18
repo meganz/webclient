@@ -3778,6 +3778,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 	border: 2px solid white;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 }
 .selected .nw-contact-status {
 	border: 2px solid rgba(255,255,255,1);
@@ -3818,10 +3821,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	background-color: black;
 }
 .nw-contact-avatar, .contacts-avatar, .avatar {
-	width: 32px;
-	height: 32px;
+	width: 36px;
+	height: 36px;
+	border: 2px solid white;
 	float: left;
-	margin: 8px 0 0 8px;
+	margin: 6px 0 0 8px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -3831,12 +3835,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	background-color: #FF6A19;
 	position: relative;
 	display: block;
-	font-size: 16px;
-	line-height: 30px;
+	font-size: 18px;
+	line-height: 32px;
 	color: white;
 	text-align: center;
-	font-family: 'Open Sans Semibold';
+	font-family: 'Open Sans Light';
 	display: block;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 }
 .nw-contact-avatar {
 	margin-bottom: 8px;
@@ -3882,15 +3889,26 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-verified-icon {
 	position: absolute;
-	width: 12px;
-	height: 12px;
+	width: 16px;
+	height: 16px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	z-index: 10;
 	background-position: -11px -2244px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 	background-repeat: no-repeat;
-	top: -2px;
-	right: -3px;
+	top: -4px;
+	right: -5px;
 	display: none;
+	background-color: #1FA4E7;
+	border: 2px solid white;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-border-radius: 100%;
+	-webkit-border-radius: 100%;
+	border-radius: 100%;
 }
 .verified .nw-verified-icon {
 	display: block;
@@ -3940,7 +3958,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 	height: 24px;
 	width: 24px;
 	position: absolute;
-	right: 2px;
+	right: 3px;
 	top: 0;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
@@ -3988,14 +4006,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-conversations-unread {
 	position: absolute;
 	z-index: 10;
-	right: 15px;
-	top: 5px;
+	right: 9px;
+	top: 4px;
 	color: white;
 	background-color: #1FA4E7;
-	height: 14px;
-	min-width: 14px;
+	border: 2px solid white;
+	height: 16px;
+	min-width: 16px;
 	text-align: center;
-	line-height: 14px;
+	line-height: 12px;
 	font-size: 9px;
 	padding: 0 3px;
 	-moz-border-radius: 14px;
@@ -4005,6 +4024,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	display: none;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 }
 .unread .nw-conversations-unread {
 	display: block;
@@ -4514,9 +4536,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-o-transition: background-color 200ms ease-in-out;
 	-ms-transition: background-color 200ms ease-in-out;
 	transition: background-color 200ms ease-in-out;
-}
-.cloud-popup-icon {
-	float: none;
 }
 .new-notification-info {
 	height: 24px;
@@ -6476,6 +6495,9 @@ table {
 	height: 100%;
 	margin-left: 304px;
 }
+.fm-right-header {
+	padding-right: 8px;
+}
 .fm-right-header, .new-notification-top {
 	height: 48px;
 	-webkit-box-sizing: border-box;
@@ -6536,6 +6558,15 @@ table {
 }
 .fm-dialog-breadcrumbs.contacts .right-arrow-bg {
 	background-position: 2px -935px;
+}
+.fm-breadcrumbs.conversations .right-arrow-bg {
+	background-position: -1px -9388px;
+}
+.fm-dialog-breadcrumb.conversations .right-arrow-bg {
+	background-position: -1px -9385px;
+}
+.fm-breadcrumbs.conversations .right-arrow-bg span {
+	display: none;
 }
 .fm-dialog-breadcrumbs:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -6836,25 +6867,16 @@ span.search-number {
 	line-height: 22px;
 	cursor: pointer;
 }
-.fm-add-user, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-contact-requests, .fm-received-requests {
-	height: 24px;
+.fm-add-user, .fm-start-video-call, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-contact-requests, .fm-received-requests {
+	height: 32px;
 	float: right;
-	font-size: 12px;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	line-height: 22px;
-	color: white;
-	padding: 0 10px 0 33px;
-	background-image: url(../images/mega/nw-fm-sprite.svg);
-	background-repeat: no-repeat;
-	background-position: -1px -8510px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	margin: 12px 8px 0 0;
+	padding: 4px;
+	margin: 8px 0 0 0;
 	cursor: pointer;
-	background-color: rgba(107,177,54,0.8);
+	background-color: rgba(255,255,255,0);
 	-webkit-transition: background-color 200ms ease-in-out;
 	-moz-transition: background-color 200ms ease-in-out;
 	-o-transition: background-color 200ms ease-in-out;
@@ -6862,145 +6884,132 @@ span.search-number {
 	transition: background-color 200ms ease-in-out;
 	cursor: pointer;
 	position: relative;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+	border-radius: 12px;
 }
-.fm-add-user {
-	padding: 0 10px 0 28px;
-}
-.fm-contact-requests, .fm-received-requests {
-	background-position: 1px -3035px;
-	padding: 0 10px 0 30px;
-	background-color: rgba(119,119,119,0.7);
-	margin-left: -2px;
-	margin-right: 12px;
-}
-.fm-received-requests {
-	background-position: 1px -3005px;
-}
-.fm-contact-requests:hover, .fm-sent-requests:hover {
-	background-color: rgba(119,119,119,1);
-}
-.chat-button.disabled {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
-	-moz-opacity: 0.6;
-	-khtml-opacity: 0.6;
-	opacity: 0.6;
-	cursor: default;
-}
-.chat-button.fm-add-user {
-	padding: 0 0 0 28px;
-}
-.fm-send-files, .fm-start-call, .fm-share-download, .contact-send-files {
-	padding: 0 0 0 33px;
-}
-.fm-add-user {
-	margin: 12px 10px 0 0;
-}
-.fm-send-files {
-	background-color: rgba(222,0,0,0.7);
-	background-position: -9px -1700px;
-}
-.fm-chat-end {
-	background-color: rgba(222,0,0,0.7);
-	background-position: 6px -8979px;
-}
-.fm-start-call {
-	background-color: rgba(6,160,236,0.7);
-	background-position: -9px -1670px;
-}
-.fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question {
-	background-image: url(../images/mega/shared-sprite.svg);
-}
-.fm-start-conversation {
-	background-color: rgba(6,160,236,0.7);
-	background-position: -4px -713px;
-}
-.fm-start-conversation:hover, .fm-start-conversation.active {
-	background-color: rgba(6,160,236,1);
-}
-.fm-share-folders {
-	background-color: rgba(255,179,0,0.8);
-	background-position: -2px -893px;
-}
-.fm-share-folders:hover, .fm-share-folders.active {
-	background-color: rgba(255,179,0,1);
-}
-.fm-verify {
-	background-color: rgba(153,153,153,0.8);
-	background-position: -4px -753px;
-	margin: 13px 8px 0 10px;
-	float: left;
-}
-.fm-verify:hover, .fm-verify.active, .fm-question:hover, .fm-question.active {
-	background-color: rgba(153,153,153,1);
-}
-.fm-question {
-	background-color: rgba(153,153,153,0.8);
-	background-position: -2px -792px;
-	padding: 0 10px 0 16px;
-	margin: 13px 8px 0 0;
-	float: left;
-}
-.fm-send-files:hover, .fm-send-files.active, .fm-chat-end:hover, .fm-chat-end.active {
-	background-color: rgba(222,0,0,1);
-}
-.fm-start-call:hover, .fm-start-call.active {
-	background-color: rgba(6,160,236,1);
-}
-.fm-add-user:hover, .fm-add-user.active {
-	background-color: rgba(107,177,54,1);
-}
-.fm-chatbutton-arrow {
+.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span, .fm-chat-end span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-contact-requests span, .fm-received-requests span {
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	background-color: rgba(255,255,255,1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	display: block;
+	font-size: 12px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	height: 24px;
+	border-radius: 8px;
+	line-height: 22px;
+	color: #777777;
+	padding: 0 10px 0 30px;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: right -1610px;
-	padding-right: 25px;
+	background-position: -1px -8510px;
 }
-.fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
-	background-position: right -1640px;
+.fm-start-call:hover, .fm-start-video-call:hover, .fm-send-files:hover, .fm-add-user:hover, .fm-start-call.active, .fm-start-video-call.active, .fm-send-files.active, .fm-add-user.active {
+	background-color: rgba(43,166,222,0.3);
 }
-.fm-clearbin-button, .fm-share-download {
+.fm-start-video-call span {
+	background-position: -7px -9531px;
+	padding: 0 10px 0 34px;
+}
+.fm-start-video-call:hover span, .fm-start-video-call.active span {
+	background-position: -7px -9561px;
+}
+.fm-start-call:hover span, .fm-start-video-call:hover span, .fm-send-files:hover span, .fm-add-user:hover span, .fm-start-call.active span, .fm-start-video-call.active span, .fm-send-files.active span, .fm-add-user:hover span {
+	color: rgba(43,166,222,1);
+}
+.fm-send-files:hover span, .fm-send-files.active span {
+	background-position: -9px -5855px;
+}
+.fm-start-call:hover span, .fm-start-call.active span {
+	background-position: -9px -1970px;
+}
+.fm-add-user:hover span, .fm-add-user.active span {
+	background-position: -9px -5925px;
+}
+.fm-add-user span {
+	background-position: -9px -1730px;
+}
+.fm-contact-requests, .fm-received-requests {
+	margin-left: -6px;
+	margin-right: 8px;
+}
+.fm-contact-requests span, .fm-received-requests span {
+	background-position: 1px -3035px;
+	padding: 0 10px 0 30px;
+}
+.fm-received-requests span {
+	background-position: 1px -3005px;
+}
+.chat-button.disabled {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+	-moz-opacity: 0.5;
+	-khtml-opacity: 0.5;
+	opacity: 0.5;
+	cursor: default;
+}
+.fm-add-user {
+	margin: 8px 6px 0 0;
+}
+.fm-send-files span {
+	background-position: -9px -1700px;
+}
+.fm-chat-end span {
+	background-position: 6px -8979px;
+}
+.fm-start-call span {
+	background-position: -9px -1670px;
+}
+.fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span {
+	background-image: url(../images/mega/shared-sprite.svg);
+}
+.fm-start-conversation span {
+	background-position: -4px -713px;
+}
+.fm-share-folders span {
+	background-position: -2px -893px;
+}
+.fm-verify {
+	margin: 9px 4px 0 6px;
+	float: left;
+}
+.fm-verify span {
+	background-position: -4px -753px;
+}
+.fm-question {
+	margin: 9px 4px 0 0;
+	float: left;
+}
+.fm-question span {
+	background-position: -2px -792px;
+	padding: 0 10px 0 16px;
+}
+.fm-clearbin-button span, .fm-share-download span {
 	background-position: -3px -5820px;
-	background-color: rgba(211,26,0,0.7);
 }
-.fm-download-as-zip, .fm-import-to-cloudrive {
-	background-color: rgba(211,26,0,0.7);
+.fm-download-as-zip span, .fm-import-to-cloudrive span {
 	padding: 0 10px 0 36px;
 }
-.fm-download-as-zip {
+.fm-download-as-zip span {
 	background-position: -4px -4730px;
 }
-.fm-import-to-cloudrive {
+.fm-import-to-cloudrive span {
 	background-position: -7px -9978px;
 }
-.fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-download-as-zip.active, .fm-import-to-cloudrive.active {
-	background-color: rgba(211,26,0,1);
-}
-.fm-leave-share, .fm-share-copy, .fm-share-download {
+.fm-leave-share span, .fm-share-copy span, .fm-share-download span {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -32px -378px;
 }
-.fm-leave-share {
+.fm-leave-share span {
 	background-position: -31px -458px;
-	background-color: rgba(102,102,102,0.7);
 }
-.fm-share-copy {
+.fm-share-copy span {
 	background-position: -32px -418px;
-	background-color: rgba(109,176,63,0.8);
 }
-.fm-leave-share:hover, .fm-leave-share.active {
-	background-color: rgba(102,102,102,1);
-}
-.fm-share-copy:hover, .fm-share-copy.active {
-	background-color: rgba(109,176,63,1);
-}
-.fm-share-download {
+.fm-share-download span {
 	background-position: -32px -378px;
-}
-.fm-clearbin-button:hover, .fm-clearbin-button.active, .fm-share-download:hover, .fm-share-download.active {
-	background-color: rgba(211,26,0,1);
-	color: white;
 }
 .fm-files-view-icon, .fm-contacts-view-icon {
 	width: 18px;
@@ -7026,7 +7035,7 @@ span.search-number {
 }
 .fm-files-view-icon.block-view, .fm-contacts-view-icon.block-view {
 	background-position: -24px -1335px;
-	margin: 15px 22px 0 0;
+	margin: 15px 14px 0 0;
 }
 .fm-files-view-icon.listing-view:hover, .fm-contacts-view-icon.listing-view:hover, .fm-files-view-icon.block-view:hover, .fm-contacts-view-icon.block-view:hover {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
@@ -7114,8 +7123,8 @@ span.search-number {
 	display: none;
 }
 .fm-empty-conversations .fm-empty-pad {
-	height: 286px;
-	margin-top: -118px;
+	height: 252px;
+	margin-top: -126px;
 }
 .not-logged .fm-empty-conversations .fm-empty-pad {
 	height: 390px;
@@ -7161,8 +7170,8 @@ span.search-number {
 	background-position: center -1352px;
 }
 .fm-empty-conversations-bg {
-	height: 220px;
-	background-position: center -5px;
+	height: 185px;
+	background-position: center 0px;
 }
 .fm-empty-folder-bg, .fm-empty-incoming-bg {
 	height: 226px;
@@ -7221,7 +7230,7 @@ span.search-number {
 }
 .fm-empty-cloud-txt {
 	color: #CCCCCC;
-	font-size: 44px;
+	font-size: 34px;
 	line-height: 52px;
 	text-align: center;
 	font-weight: lighter;
@@ -7829,10 +7838,14 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .nw-conversations-item.current-calling {
 	height: 48px;
 	cursor: pointer;
+	background-color: rgba(149,211,239,1);
+	color: white;
+	cursor: default;
+}
+.nw-conversations-item.current-calling .nw-conversations-name {
+	color: white;
 }
 .nw-conversations-item.current-calling.selected {
-	background-color: rgba(31,165,224,0.5);
-	border-right: 2px solid rgba(31,165,224,0.5);
 	cursor: default;
 }
 .current-calling .nw-contact-status {
@@ -7854,18 +7867,18 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	float: right;
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: -14px -6439px;
-	margin: 16px 1px 0 0;
+	background-position: -13px -6439px;
+	margin: 16px -3px 0 0;
 	cursor: pointer;
 }
 .chat-time-txt {
 	float: right;
 	background-color: white;
-	margin: 17px 10px 0 0;
+	margin: 16px 8px 0 0;
 	padding: 0 5px;
-	height: 14px;
-	color: #52B6E4;
-	line-height: 14px;
+	height: 16px;
+	color: #95D3EF;
+	line-height: 16px;
 	font-size: 11px;
 	box-sizing: border-box;
 	-moz-border-radius: 16px;
@@ -8178,7 +8191,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-chat-user-info {
 	float: left;
-	margin: 8px 0 0 12px;
+	margin: 7px 0 0 12px;
 	display: block;
 }
 .fm-chat-messages-block {
@@ -8190,6 +8203,54 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+.fm-call-dialog {
+	position: absolute;
+	right: 12px;
+	top: 50px;
+	width: 400px;
+	border: 2px solid rgba(0,0,0,0.15);
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	background-color: white;
+	padding: 8px 0;
+	z-index: 100;
+}
+.fm-call-dialog-arrow {
+	width: 23px;
+	height: 12px;
+	position: absolute;
+	right: 50%;
+	top: -12px;
+	margin-right: -13px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -9431px;
+	background-repeat: no-repeat;
+}
+.fm-call-dialog-scroll {
+	max-height: 480px;
+	min-height: 48px;
+	overflow: hidden;
+}
+.fm-call-dialog-item {
+	height: 48px;
+	clear: both;
+}
+.fm-call-dialog-item:nth-child(odd) {
+	background-color: rgba(0,0,0,0.02)
+}
+.fm-call-dialog-item .fm-chat-user {
+	color: #666666;
+}
+.fm-call-dialog-item .contact-email {
+	color: #666666;
+	font-size: 11px;
 }
 .fm-chat-user {
 	font-size: 12px;
@@ -8506,7 +8567,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	border-left: 2px solid white;
 	border-top: 2px solid white;
 }
 .fm-chat-emotions-icon {
@@ -8994,17 +9054,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(6,160,236,1);
 }
 .fm-chat-popup-button.start-audio {
-	background-position: -1px -1762px;
+	background-position: -1px -1764px;
 }
 .fm-chat-popup-button.start-audio:hover, .fm-chat-popup-button.start-audio.active {
-	background-position: -1px -1972px;
+	background-position: -1px -2004px;
 	background-color: rgba(29,161,233,1);
 }
 .fm-chat-popup-button.start-video {
-	background-position: -1px -1794px;
+	background-position: 1px -1799px;
 }
 .fm-chat-popup-button.start-video:hover, .fm-chat-popup-button.start-video.active {
-	background-position: -1px -2004px;
+	background-position: 0px -2259px;
 	background-color: rgba(29,161,233,1);
 }
 /** debug emoticons **/
@@ -18556,7 +18616,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	background-color: #c5c3c3;
-    display: none;
+	display: none;
 }
 .products-bottom-block .sync-bottom-txt {
 	font-size: 11px;
@@ -18623,7 +18683,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	box-sizing: border-box;
 }
 .products-slides-buttons {
-    display: none;
+	display: none;
 	width: 100%;
 	bottom: 198px;
 	text-align: center;
@@ -18819,14 +18879,14 @@ span.incoming-call-name {
 }
 .shared-with-me .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar {
 	position: absolute;
-	margin: 1px 0 0 0;
+	margin: -1px 0 0 0;
 }
 .shared-with-me .fm-chat-user-info, .contacts-view td .fm-chat-user-info, .contact-requests-grid td .fm-chat-user-info, .sent-requests-grid td .fm-chat-user-info {
 	float: none;
-	margin: 1px 0 0 44px;
+	margin: 0 0 0 44px;
 }
 .sent-requests-grid td .fm-chat-user-info {
-	margin: 2px 0 0 44px;
+	margin: 1px 0 0 44px;
 }
 .shared-folder-icon {
 	background-image: url(../images/mega/shared-sprite.svg);
@@ -19853,7 +19913,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-khtml-opacity: 0.5;
 	opacity: 0.5;
 }
-.share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .export-content-block .jspDrag {
+.share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .export-content-block .jspDrag, .fm-call-dialog .jspDrag {
 	width: 4px;
 	background-color: black;
 }

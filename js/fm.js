@@ -9052,7 +9052,7 @@ function fingerprintDialog(userid)
     $('.dialog-approve-button').rebind('click', function() {
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-			$('.fm-verify').addClass('active').text('Verified').unbind('click');
+			$('.fm-verify').addClass('active').find('span').text('Verified').unbind('click');
 			closeFngrPrntDialog();
         });
     });
@@ -9114,9 +9114,9 @@ function contactUI() {
         });
 
         if (isContactVerified(user)) {
-            $('.fm-verify').addClass('active').text('Verified');
+            $('.fm-verify').addClass('active').find('span').text('Verified');
         } else {
-            $('.fm-verify').text('Verify...').removeClass('active').rebind('click', function() {
+            $('.fm-verify').removeClass('active').find('span').text('Verify...').rebind('click', function() {
                 fingerprintDialog(user);
             });
         }

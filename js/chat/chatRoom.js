@@ -3082,7 +3082,7 @@ ChatRoom.prototype._conversationEnded = function(userFullJid) {
         });
 
 
-        $('.fm-chat-file-button.fm-chat-inline-dialog-button-end-chat', self.$messages).remove();
+        $('.fm-chat-file-button.fm-chat-inline-dialog-button-end-chat span', self.$messages).remove();
 
         self.appendDomMessage(
             self.generateInlineDialog(

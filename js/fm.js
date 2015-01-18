@@ -1049,9 +1049,6 @@ function initUI() {
     $(window).unbind('resize.fmrh hashchange.fmrh');
     $(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (lang != 'en')
-        $('.download-standart-item').text(l[58]);
-
     megaChat.karere.unbind("onPresence.maintainUI");
     megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData)
     {

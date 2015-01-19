@@ -484,10 +484,13 @@ function init_page()
 				doRenderHelp();
 			});
 			CMS.get('help:' + lang, function(err, content) {
-				parsepage(window.helpTemplate = content.html);
-				init_help();
-				loadingDialog.hide();
-				mainScroll();
+				CMS.get('help:' + lang + '.json', function(err, json) {
+					helpdata = json.object
+					parsepage(window.helpTemplate = content.html);
+					init_help();
+					loadingDialog.hide();
+					mainScroll();
+				});
 			});
 		}
 		doRenderHelp();

@@ -9127,10 +9127,13 @@ function contactUI() {
                 // user is online, lets display the "Start chat" button
 
                 var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
-                $('.fm-start-conversation')
-                    .removeClass('hidden');
-				$('.fm-start-conversation span').text(startChatTxt);
-                $('.fm-send-files').removeClass('hidden');
+                var startCall = 'Start conversation';
+                
+                $('.fm-start-conversation').removeClass('hidden');
+				$('.fm-start-conversation span').text(startCall);
+                
+                // Add this line back in when P2P file sharing is confirmed working
+                //$('.fm-send-files').removeClass('hidden');
 
             } else {
                 // user is offline, hide the button

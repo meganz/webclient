@@ -1606,8 +1606,7 @@ function addContactUI()
             .addClass('dialog')
             .removeClass('hidden');
 
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        fm_showoverlay();
 
         event.stopPropagation();
 
@@ -1690,16 +1689,14 @@ function addContactUI()
         if ($(this).is('.full-size'))
         {
             $('.add-user-popup').addClass('dialog');
-            $('.fm-dialog-overlay').removeClass('hidden');
-            $('body').addClass('overlayed');
+            fm_showoverlay();
             iconSize(false);
             $('.fm-add-user').removeClass('active');
             focusOnInput();
         }
         else// .short-size
         {
-            $('.fm-dialog-overlay').addClass('hidden');
-            $('body').removeClass('overlayed');
+            fm_hideoverlay();
             $('.add-user-popup').removeClass('dialog');
             iconSize(true);
             $('.fm-add-user').addClass('active');
@@ -1754,8 +1751,7 @@ function addContactUI()
 
     $('.add-user-popup .fm-dialog-close').off('click');
     $('.add-user-popup .fm-dialog-close').on('click', function() {
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $('.add-user-popup').addClass('hidden');
         $('.fm-add-user').removeClass('active');
         clearScrollPanel('.add-user-popup');
@@ -2138,6 +2134,9 @@ function initContextUI()
     $(c + '.getlink-item').unbind('click');
     $(c + '.getlink-item').bind('click', function(event)
     {
+        if ($.propertiesDialog) {
+            propertiesDialog(1);
+        }
         if (u_type === 0)
             ephemeralDialog(l[1005]);
         else {
@@ -2177,8 +2176,7 @@ function initContextUI()
             // Hide the optional message by default. This gets enabled if they try share with a user who is not a contact
             $shareDialog.find('.share-message').hide();
 
-            $('.fm-dialog-overlay').removeClass('hidden');
-            $('body').addClass('overlayed');
+            fm_showoverlay();
             handleShareDialogContent();
         }
     });
@@ -2192,8 +2190,7 @@ function initContextUI()
         $('.move-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
         disableCircularTargets('#mctreea_');
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        fm_showoverlay();
     });
 
     $(c + '.copy-item').unbind('click');
@@ -2204,8 +2201,7 @@ function initContextUI()
         $('.copy-dialog .dialog-copy-button').addClass('active');
         $('.copy-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        fm_showoverlay();
     });
 
     $(c + '.import-item').unbind('click');
@@ -3529,14 +3525,12 @@ function avatarDialog(close)
     {
         $.dialog = false;
         $('.avatar-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         return true;
     }
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar">' + l[1016] + '</label><div class="fm-account-change-avatar" id="fm-change-avatar">' + l[1017] + '</div><div  class="fm-account-change-avatar" id="fm-cancel-avatar">Cancel</div><div class="clear"></div></div></div></div>');
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
@@ -5847,6 +5841,19 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
     treeUI();
 }
 
+function fm_hideoverlay() {
+    if (!$.propertiesDialog) {
+        $('.fm-dialog-overlay').addClass('hidden');
+        $('body').removeClass('overlayed');
+    }
+    $(document).trigger('MegaCloseDialog');
+}
+
+function fm_showoverlay() {
+    $('.fm-dialog-overlay').removeClass('hidden');
+    $('body').addClass('overlayed');
+}
+
 function renameDialog()
 {
     if ($.selected.length > 0)
@@ -5854,15 +5861,13 @@ function renameDialog()
         $.dialog = 'rename';
         $('.rename-dialog').removeClass('hidden');
         $('.rename-dialog').addClass('active');
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
+        fm_showoverlay();
         $('.rename-dialog .fm-dialog-close').unbind('click');
         $('.rename-dialog .fm-dialog-close').bind('click', function()
         {
             $.dialog = false;
             $('.rename-dialog').addClass('hidden');
-            $('.fm-dialog-overlay').addClass('hidden');
-            $('body').removeClass('overlayed');
+            fm_hideoverlay();
         });
         $('.rename-dialog-button.rename').unbind('click');
         $('.rename-dialog-button.rename').bind('click', function()
@@ -5875,8 +5880,7 @@ function renameDialog()
         $('.rename-dialog-button.cancel').bind('click', function()
         {
             $('.rename-dialog').addClass('hidden');
-            $('.fm-dialog-overlay').addClass('hidden');
-            $('body').removeClass('overlayed');
+            fm_hideoverlay();
         });
         var n = M.d[$.selected[0]];
         if (n.t)
@@ -5948,8 +5952,7 @@ function dorename()
             M.rename(h, nn);
         $.dialog = false;
         $('.rename-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
     }
 }
 
@@ -6088,8 +6091,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
             $.warningCallback(false);
     });
     $('#msgDialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
 }
 
 function closeMsg()
@@ -6097,8 +6099,7 @@ function closeMsg()
 	$('#msgDialog').addClass('hidden');
 
 	if(!$('.pro-register-dialog').is(':visible')) {
-		$('.fm-dialog-overlay').addClass('hidden');
-		$('body').removeClass('overlayed');
+		fm_hideoverlay();
 	}
 
 	delete $.msgDialog;
@@ -6182,6 +6183,10 @@ function handleDialogContent(s, m, c, n, t, i)
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
         $('.copy-dialog-button.' + s).fadeOut(200).fadeIn(100);
         return;
+    }
+
+    if ($.propertiesDialog) {
+        propertiesDialog(1);
     }
 
     $('.' + n + '-dialog-txt').removeClass('active');
@@ -6964,13 +6969,23 @@ function clearScrollPanel(from)
 
 function closeDialog()
 {
+    if (d) console.log('closeDialog', $.dialog);
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
+        // if ($.propertiesDialog) {
+            // $('.fm-dialog.' + ($.copyDialog || $.moveDialog) + '-dialog').addClass('arrange-to-front');
+            // $('.fm-dialog.properties-dialog').addClass('arrange-to-back');
+        // }
     } else {
-        $('.fm-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        if ($.dialog === 'properties') {
+            propertiesDialog(1);
+        } else {
+            fm_hideoverlay();
+        }
+        if (!$.propertiesDialog) {
+            $('.fm-dialog').addClass('hidden');
+        }
         $('.dialog-content-block').empty();
 
         // add contact popup
@@ -7000,7 +7015,9 @@ function closeDialog()
         delete $.copyDialog;
         delete $.moveDialog;
     }
-    $('.fm-dialog').removeClass('arrange-to-back');
+    if (!$.propertiesDialog) {
+        $('.fm-dialog').removeClass('arrange-to-back');
+    }
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog == 'terms' && $.termsAgree)
@@ -7502,8 +7519,7 @@ function linksDialog(close)
     if (close)
     {
         $.dialog = false;
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $('.fm-dialog.export-links-dialog').addClass('hidden');
         $('.export-links-warning').addClass('hidden');
         return true;
@@ -7650,8 +7666,7 @@ function linksDialog(close)
     }
     $('.export-links-dialog').addClass('file-keys-view');
     $('.export-links-dialog .export-link-body').html(html);
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.export-links-warning').removeClass('hidden');
     $('.fm-dialog.export-links-dialog').removeClass('hidden');
     $('.export-link-body').removeAttr('style');
@@ -7686,8 +7701,7 @@ function createfolderDialog(close)
             delete $.cftarget;
         if (!($.copyDialog || $.moveDialog))
         {
-            $('.fm-dialog-overlay').addClass('hidden');
-            $('body').removeClass('overlayed');
+            fm_hideoverlay();
         }
         $('.fm-dialog').removeClass('arrange-to-back');
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
@@ -7756,8 +7770,7 @@ function createfolderDialog(close)
             createfolderDialog(1);
         }
     });
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.fm-dialog.create-folder-dialog').removeClass('hidden');
     $('.create-folder-input-bl input').focus();
     $('.create-folder-dialog').removeClass('active');
@@ -7768,13 +7781,11 @@ function chromeDialog(close)
     if (close)
     {
         $.dialog = false;
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $('.fm-dialog.chrome-dialog').addClass('hidden');
         return true;
     }
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.fm-dialog.chrome-dialog').removeClass('hidden');
     $.dialog = 'chrome';
     $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').unbind('click')
@@ -7807,8 +7818,7 @@ function firefoxDialog(close)
     if (close)
     {
         $.dialog = false;
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $('.fm-dialog.firefox-dialog').addClass('hidden');
         return true;
     }
@@ -7818,8 +7828,7 @@ function firefoxDialog(close)
     else
         $('.ff-extension-txt').text(l[1174]);
 
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.fm-dialog.firefox-dialog').removeClass('hidden');
     $.dialog = 'firefox';
     $('.firefox-dialog .browsers-button,.firefox-dialog .fm-dialog-close,.firefox-dialog .close-button').unbind('click')
@@ -7852,15 +7861,13 @@ function browserDialog(close)
     if (close)
     {
         $.dialog = false;
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $('.fm-dialog.browsers-dialog').addClass('hidden');
         return true;
     }
     $.browserDialog = 1;
     $.dialog = 'browser';
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.fm-dialog.browsers-dialog').removeClass('hidden');
     $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').unbind('click')
     $('.browsers-dialog .browsers-button,.browsers-dialog .fm-dialog-close').bind('click', function()
@@ -7936,20 +7943,20 @@ function propertiesDialog(close)
 {
     var pd = $('.fm-dialog.properties-dialog'),
         c = $('.properties-elements-counter span');
+    $(document).unbind('MegaCloseDialog.Properties');
     if (close)
     {
         $.dialog = false;
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        delete $.propertiesDialog;
+        fm_hideoverlay();
         pd.addClass('hidden');
         $('.contact-list-icon').removeClass('active');
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
         return true;
     }
-    $.dialog = 'properties';
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    $.propertiesDialog = $.dialog = 'properties';
+    fm_showoverlay();
     pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').unbind('click');
@@ -8124,17 +8131,25 @@ function propertiesDialog(close)
             e.preventDefault();
             e.stopPropagation();
             $(this).addClass('active');
+            $('.fm-dialog').addClass('arrange-to-front');
+            $('.properties-dialog').addClass('arrange-to-back');
             $('.context-menu').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
             contextmenuUI(e, n.h.length === 11 ? 5 : 1);
         } else {
-            $(this).removeClass('active');
-            $('.context-menu').removeClass('arrange-to-front');
-            $.hideContextMenu();
+            __fsi_close();
         }
     });
+    $(document).bind('MegaCloseDialog.Properties', __fsi_close);
+    function __fsi_close() {
+        pd.find('.file-settings-icon').removeClass('active');
+        $('.context-menu').removeClass('arrange-to-front');
+        $('.properties-dialog').removeClass('arrange-to-back');
+        $('.fm-dialog').removeClass('arrange-to-front');
+        $.hideContextMenu();
+    }
 
     if (p.hideContacts) {
         $('.properties-txt-pad .contact-list-icon').hide();
@@ -8192,15 +8207,13 @@ function paypalDialog(url, close)
     if (close)
     {
         $('.fm-dialog.paypal-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $.dialog = false;
         return false;
     }
     $.dialog = 'paypal';
     $('.fm-dialog.paypal-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $('.fm-dialog.paypal-dialog a').attr('href', url);
     $('.paypal-dialog .fm-dialog-close').unbind('click');
     $('.paypal-dialog .fm-dialog-close').bind('click', function(e)
@@ -8215,8 +8228,7 @@ function termsDialog(close, pp)
 	{
 		$('.fm-dialog.terms-dialog').addClass('hidden');
 		if(!$('.pro-register-dialog').is(":visible")) {
-			$('.fm-dialog-overlay').addClass('hidden');
-			$('body').removeClass('overlayed');
+			fm_hideoverlay();
 			$.dialog=false;
 		}
 		if ($.termsAgree) $.termsAgree=undefined;
@@ -8242,9 +8254,8 @@ function termsDialog(close, pp)
         return false;
     }
 
+    fm_showoverlay();
     $('.fm-dialog.terms-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
     $('.fm-dialog.terms-dialog .terms-main').html(pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', ''));
 
     $('.terms-body').jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
@@ -8280,8 +8291,7 @@ function slingshotDialog(close)
     if (close)
     {
         $('.fm-dialog.slingshot-dialog').addClass('hidden');
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $.dialog = false;
         return false;
     }
@@ -8291,8 +8301,7 @@ function slingshotDialog(close)
         slingshotDialog(1);
     });
     $('.fm-dialog.slingshot-dialog').removeClass('hidden');
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
     $.dialog = 'slingshot';
 }
 
@@ -8773,8 +8782,7 @@ function saveprogress(id, bytesloaded, bytestotal)
 function savecomplete(id)
 {
     $('.fm-dialog.download-dialog').addClass('hidden');
-    $('.fm-dialog-overlay').addClass('hidden');
-    $('body').removeClass('overlayed');
+    fm_hideoverlay();
     if (!$.dialog)
         $('#dlswf_' + id).remove();
     var dl = IdToFile(id);
@@ -9007,8 +9015,7 @@ function fingerprintDialog(userid)
         return;
 
     function closeFngrPrntDialog() {
-        $('.fm-dialog-overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        fm_hideoverlay();
         $this.addClass('hidden');
         $('.fm-dialog-close').unbind('click');
         $('.dialog-approve-button').unbind('click');
@@ -9069,8 +9076,7 @@ function fingerprintDialog(userid)
             'margin-top': '-' + $this.height() / 2 + 'px',
             'margin-left': '-' + $this.width() / 2 + 'px'
         });
-    $('.fm-dialog-overlay').removeClass('hidden');
-    $('body').addClass('overlayed');
+    fm_showoverlay();
 
 }
 

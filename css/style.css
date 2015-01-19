@@ -9208,6 +9208,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 480px;
 	margin: -200px 0 0 -240px;
 }
+.fm-dialog.properties-dialog.arrange-to-back {
+	z-index: 1101; /* fm-dialog-overlay's zindex+1 */
+}
 .fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
 	z-index: 900;
 }

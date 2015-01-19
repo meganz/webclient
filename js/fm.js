@@ -9128,8 +9128,8 @@ function contactUI() {
 
                 var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
                 $('.fm-start-conversation')
-                    .removeClass('hidden')
-                    .text(startChatTxt);
+                    .removeClass('hidden');
+				$('.fm-start-conversation span').text(startChatTxt);
                 $('.fm-send-files').removeClass('hidden');
 
             } else {

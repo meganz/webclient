@@ -6853,8 +6853,9 @@ table {
 .search-files-result span {
 	background-position: -4px -4559px;
 }
-.long-path .fm-new-folder, .long-path .search-files-result, .long-path .fm-file-upload, .long-path .search-messages-result, .long-path .fm-folder-upload {
+.long-path .fm-new-folder span, .long-path .search-files-result span, .long-path .fm-file-upload span, .long-path .search-messages-result span, .long-path .fm-folder-upload span {
 	padding: 0 10px 0 24px;
+	min-width: 0;
 }
 .fm-notification-settings span {
 	background-position: -18px -6106px;
@@ -8467,7 +8468,7 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	font-size: 12px;
 	line-height: 21px;
 	color: #333333;
-	padding: 12px 0px;
+	padding: 10px 0px;
 	text-align: left;
 	position: relative; /* required for the "relative -> absolute" hack for positioning label.not-sent */
 }

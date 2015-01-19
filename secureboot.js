@@ -814,6 +814,7 @@ else
         var downloading = false;
         var ul_uploading = false;
         var lightweight=false;
+		var waitingToBeLoaded = {};
         var njsl = [];
         var fx_startup_cache = is_chrome_firefox && nocontentcheck;
         if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
@@ -874,17 +875,56 @@ else
 
         if (jj)
         {
+
+			var headElement = document.querySelector("head");
+			var _queueWaitToBeLoaded = function(id, elem) {
+				waitingToBeLoaded[id] = true;
+				elem.onload = function() {
+					console.error("finished loading: ", id);
+
+					delete waitingToBeLoaded[id];
+
+					if(Object.keys(waitingToBeLoaded).length === 0) {
+						boot_done();
+					}
+				};
+			};
+
+			var createScriptTag = function(id, src) {
+				var elem = document.createElement("script");
+				headElement.appendChild(elem);
+				elem.id = id;
+				elem.async = false;
+				_queueWaitToBeLoaded(id, elem);
+				elem.src = src;
+				return elem;
+			};
+			var createStyleTag = function(id, src) {
+				var elem = document.createElement("link");
+				elem.rel = "stylesheet";
+				elem.type = "text/css";
+
+				headElement.appendChild(elem);
+				elem.id = id;
+				_queueWaitToBeLoaded(id, elem);
+				elem.href = src;
+				return elem;
+			};
+
             l=[];
             var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
             if (localStorage.allowBreakpointsOnReload) r = '';
             while (i--) l[i]='l';
             for (var i in jsl)
             {
-                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + r + '"></sc' + 'ript>');
+                if (jsl[i].j === 1) {
+					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + '?r=' + r);
+				}
                 else if (jsl[i].j === 2)
                 {
-                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
-                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '?r=' + r + '" />');
+                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
+						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + '?r=' + r)
+					}
                 }
             }
         }
@@ -1157,7 +1197,7 @@ else
             else
             {
                 jsl_done=true;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
 	    jj = 0; //prevent further 'silent_loading' loads from failing..
         }
@@ -1206,24 +1246,24 @@ else
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
                     else loginresponse = false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
                 catch (e)
                 {
                     loginresponse= false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
             }
             else
             {
                 loginresponse= false;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
         }
         lxhr.onerror = function()
         {
             loginresponse= false;
-            boot_done();
+			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
         }
         lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
@@ -1234,6 +1274,8 @@ else
         u_checked=true;
         startMega();
     }
+
+	var boot_done_called = false;
     function boot_done()
     {
         lxhr = dlxhr = undefined;
@@ -1247,6 +1289,16 @@ else
     }
     if (page.substr(0,1) == '!' && page.length > 1)
     {
+		/**
+		 * TODO: this is called twice: 1 time from the login success, 1 time from the loading finished. The secure boot
+		 * should be rewritten to have a proper ASYNC flow/process of doing loading + doing auth, without actually
+		 * triggering 2 boot_done calls, because this causes different race conditions on different connection speeds,
+		 * which are almost impossible to track.
+		 */
+		if(!boot_done_called) {
+			boot_done_called = true;
+			$(window).trigger('MegaLoaded');
+		}
         var dlxhr = getxhr(),dl_res = true;
         dlxhr.onload = function()
         {
@@ -1257,24 +1309,24 @@ else
                     dl_res = this.response || this.responseText;
                     if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
                     if (dl_res[0]) dl_res = dl_res[0];
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
                 catch (e)
                 {
                     dl_res = false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
             }
             else
             {
                 dl_res = false;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
         }
         dlxhr.onerror = function()
         {
             dl_res= false;
-            boot_done();
+			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
         dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));

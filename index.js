@@ -470,8 +470,27 @@ function init_page()
 	}
 	else if (page.substr(0,4) == 'help')
 	{
-		parsepage(pages['help']);
-		init_help();
+		function doRenderHelp()
+		{
+			if (window.helpTemplate) {
+				parsepage(window.helpTemplate);
+				init_help();
+				loadingDialog.hide();
+				mainScroll();
+				return;
+			}
+			loadingDialog.show();
+			CMS.watch(cpage, function() {
+				doRenderHelp();
+			});
+			CMS.get('help:' + lang, function(err, content) {
+				parsepage(window.helpTemplate = content.html);
+				init_help();
+				loadingDialog.hide();
+				mainScroll();
+			});
+		}
+		doRenderHelp();
 	}
 	else if (page == 'privacy')
 	{

@@ -240,6 +240,8 @@ function init_page()
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
 		if (!blogsearch) document.location.hash = 'blog';
 		page = 'blog';
+		parsepage(pages['blogarticle']);
+		init_blog();
 	}
 	else if (page.substr(0,5) == 'page_')
 	{

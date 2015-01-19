@@ -595,13 +595,13 @@ var Chat = function() {
 
     var xmppDomain = "developers.mega.co.nz";
     if(localStorage.megaChatUseSandbox) {
-        xmppDomain = "sandbox.developers.mega.co.nz";
+        xmppDomain = "developers.mega.co.nz";
     }
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'karere-001.developers.mega.co.nz:4434',
+        'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {
@@ -650,12 +650,12 @@ var Chat = function() {
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
                 {
-                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -2456,7 +2456,7 @@ Chat.prototype.getChatNum = function(idx) {
  */
 Chat.prototype.getBoshServiceUrl = function() {
     if(localStorage.megaChatUseSandbox) {
-        return "https://sandbox.developers.mega.co.nz/bosh";
+        return "https://karere-005.developers.mega.co.nz/bosh";
     } else {
         var $promise = new MegaPromise();
 
@@ -2465,7 +2465,7 @@ Chat.prototype.getBoshServiceUrl = function() {
                 if(r.xmpp && r.xmpp.length > 0) {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/bosh");
+                    $promise.resolve("https://pxy270n001.karere.mega.nz/bosh");
                 }
             })
             .fail(function() {

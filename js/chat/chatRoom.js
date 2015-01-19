@@ -202,6 +202,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     $('.chat-button > span', self.$header).unbind("click.megaChat");
 
     $('.chat-button.fm-start-call', self.$header).bind("click.megaChat", function() {
+        if($(this).is(".disabled")) {
+            return false;
+        }
         var positionX = $(this).position().left;
         var sendFilesPopup = $('.fm-start-call-popup', self.$header);
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -298,7 +301,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     self.bind('call-incoming-request', function(e, eventData) {
         if(eventData.peerMedia) {
-            $('.btn-chat-call', self.$header).hide();
+            $('.btn-chat-call', self.$header).addClass("disabled");
 
             var doAnswer = function() {
                 self.megaChat.incomingCallDialog.hide();
@@ -662,6 +665,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
         $('.my-av-screen', self.$header).append(obj.player);
         self._myAvElement = obj.player;
+        self._myAvElement.play();
     });
 
     self.bind('local-player-remove', function(event, obj) {
@@ -698,8 +702,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
 
 
-    $('.my-av-screen', self.$header).draggable({
-        'containment': self.$header
+    var $avscreen = $('.my-av-screen', self.$header);
+    $avscreen.draggable({
+        'containment': $avscreen.parents('.chat-call-block'),
+        'scroll': false
     });
 
     // activity on a specific room (show, hidden, got new message, etc)
@@ -911,7 +917,7 @@ ChatRoom.prototype._startCall = function() {
 ChatRoom.prototype._callStartedState = function(e, eventData) {
     var self = this;
 
-    $('.btn-chat-call', self.$header).hide();
+    $('.btn-chat-call', self.$header).addClass('disabled');
 
     if(e.type == "call-init" || e.type == "call-answered") {
         // current-calling indicator
@@ -1156,7 +1162,7 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     $('.chat-header-indicator.muted-video', self.$header).addClass("hidden");
     $('.chat-header-indicator.muted-audio', self.$header).addClass("hidden");
 
-    $('.btn-chat-call', self.$header).show();
+    $('.btn-chat-call', self.$header).removeClass('disabled')
 
 
     if(callWasActive) {
@@ -1291,7 +1297,7 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
 ChatRoom.prototype._resetCallStateInCall = function() {
     var self = this;
 
-    $('.btn-chat-call', self.$header).hide();
+    $('.btn-chat-call', self.$header).addClass('disabled');
 
     if(!self.options.mediaOptions.audio) {
         $('.audio-icon', self.$header).addClass("active");
@@ -1741,27 +1747,28 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
      */
 
     if(self.callIsActive === false) {
-        $('.btn-chat-call', self.$header).hide();
+        $('.btn-chat-call', self.$header).addClass('disabled');
 
         if(presenceCssClass == "offline") {
-            $('.btn-chat-call', self.$header).hide();
+            $('.btn-chat-call', self.$header).addClass('disabled');
         } else {
-            $('.btn-chat-call', self.$header).show();
+            $('.btn-chat-call', self.$header).removeClass('disabled');
         }
     } else {
         var $video = $('.others-av-screen.video-call-container video', self.$header);
         if($video.length > 0) {
-            var $confCallUi = $('.chat-call-block', self.$header);
-            var $videoContainer = $video.parent();
-            var targetHeight = $confCallUi.outerHeight() - 50;
+            // not needed anymore, fixed by Andrei using css?
+            //var $confCallUi = $('.chat-call-block', self.$header);
+            //var $videoContainer = $video.parent();
+            //var targetHeight = $confCallUi.outerHeight() - 50;
 
-            $videoContainer.css('height', targetHeight + 8);
-            $videoContainer.css('width',
-                Math.min(
-                    Math.round((targetHeight/9)*16) + 8,
-                    $video.outerWidth() + 8
-                )
-            );
+            //$videoContainer.css('height', targetHeight + 8);
+            //$videoContainer.css('width',
+            //    Math.min(
+            //        Math.round((targetHeight/9)*16) + 8,
+            //        $video.outerWidth() + 8
+            //    )
+            //);
         }
     }
 

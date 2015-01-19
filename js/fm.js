@@ -3533,6 +3533,7 @@ function avatarDialog(close)
     imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
         {
             cropButton: $('#fm-change-avatar'),
+            dragDropUploadPrompt:l[1390],
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
@@ -3821,7 +3822,9 @@ var FMShortcuts = function() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            selectionManager.select_all();
+            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+                selectionManager.select_all();
+            }
             return false; // stop prop.
         } else if (
             (charTyped == "c" || charTyped == "x") &&
@@ -5684,7 +5687,7 @@ function sectionUIopen(id) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
         } else if (id === 'cloud-drive') {
             $('.fm-main').addClass('active-folder-link');
-            $('.fm-right-header').addClass('folder-link')
+            $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();

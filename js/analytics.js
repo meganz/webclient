@@ -28,6 +28,9 @@
         if(d) {
             console.log("megaAnalytics: ", c, e, data);
         }
+        if(window.location.toString().indexOf("mega.dev") !== -1) {
+            return;
+        }
         api_req({ a: 'log',e: this.loggerId, m: msg},  {});
     };
     window.megaAnalytics = new MegaAnalytics(99999);

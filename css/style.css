@@ -7032,7 +7032,26 @@ span.search-number {
 	background-position: -2px -792px;
 	padding: 0 10px 0 16px;
 }
-.fm-clearbin-button span, .fm-share-download span {
+.fm-send-files:hover, .fm-send-files.active, .fm-chat-end:hover, .fm-chat-end.active {
+	background-color: rgba(222,0,0,1);
+}
+.fm-start-call:hover, .fm-start-call.active {
+	background-color: rgba(6,160,236,1);
+}
+.fm-add-user:hover, .fm-add-user.active {
+	background-color: rgba(107,177,54,1);
+}
+.fm-chatbutton-arrow {
+	display: block;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: right -1610px;
+	padding-right: 25px;
+}
+.fm-add-user:hover .fm-chatbutton-arrow, .fm-add-user.active .fm-chatbutton-arrow, .fm-start-call:hover .fm-chatbutton-arrow, .fm-start-call.active .fm-chatbutton-arrow, .fm-send-files:hover .fm-chatbutton-arrow, .fm-send-files.active .fm-chatbutton-arrow {
+	background-position: right -1640px;
+}
+.fm-clearbin-button, .fm-share-download {
 	background-position: -3px -5820px;
 }
 .fm-download-as-zip span, .fm-import-to-cloudrive span {

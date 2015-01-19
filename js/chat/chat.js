@@ -602,6 +602,7 @@ var Chat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
+        'fallbackXmppServer': "https://pxy270n001.karere.mega.nz/bosh",
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {
@@ -2455,21 +2456,26 @@ Chat.prototype.getChatNum = function(idx) {
  * BOSH service that should be used for connecting the current user.
  */
 Chat.prototype.getBoshServiceUrl = function() {
+    var self = this;
+
     if(localStorage.megaChatUseSandbox) {
         return "https://karere-005.developers.mega.co.nz/bosh";
     } else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=xmpp")
+        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    $promise.resolve("https://pxy270n001.karere.mega.nz/bosh");
+                    //$promise.resolve("https://pxy270n001.karere.mega.nz/bosh");
+                    $promise.resolve(self.options.fallbackXmppServer);
                 }
             })
             .fail(function() {
-                $promise.reject();
+                self.logger.warn("Could not connect to load balancing service for xmpp, will fallback to: " + self.options.fallbackXmppServer + ".");
+
+                $promise.resolve(self.options.fallbackXmppServer);
             });
 
         return $promise;

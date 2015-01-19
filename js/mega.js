@@ -569,7 +569,7 @@ function MegaData()
             }
         }
     };
-
+  
     /**
      *
      * @param {array of JSON objects} opc - sent requests
@@ -4874,7 +4874,7 @@ function processUPCI(ap) {
 }
 
 /**
- * Handle upca response, upc', pending contact request updated (for whom it's outgoing)
+ * Handle upco response, upco, pending contact request updated (for whom it's outgoing)
  *
  * @param {array of JSON objects} ap (actionpackets)
  * @returns {undefined}

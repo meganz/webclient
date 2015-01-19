@@ -582,7 +582,7 @@ RtcSession.prototype = {
         @type {object}
         @property {string} peer The JID of the callee
        */
-              self.trigger('call-answer-timeout', {peer: targetJid});
+              self.trigger('call-answer-timeout', {peer: targetJid, info: { sid: sid }});
           }, self.jingle.callAnswerTimeout);
   } //end initiateCallback()
   if (options.audio || options.video)

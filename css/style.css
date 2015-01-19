@@ -7457,7 +7457,7 @@ span.search-number {
 	-webkit-border-bottom-right-radius: 7px;
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
-	padding-right: 4px;
+	padding-right: 12px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -18812,8 +18812,8 @@ span.incoming-call-name {
 }
 .start-chat-button {
 	position: absolute;
-	right: 3px;
-	top: 8px;
+	right: 8px;
+	top: 3px;
 	width: 18px;
 	height: 18px;
 	background-image: url(../images/mega/dialogs-sprite.svg);
@@ -18995,6 +18995,9 @@ span.incoming-call-name {
 	text-overflow: ellipsis;
 	padding-right: 10px;
 	max-width: 100%;
+	max-width: -webkit-calc(100% - 56px);
+max-width: -moz-calc(100% - 56px);
+max-width: calc(100% - 56px);
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -19022,10 +19025,12 @@ span.incoming-call-name {
 .contact-top-details .nw-contact-block-avatar {
 	float: left;
 	margin: 22px 22px 0 22px;
+	position:absolute;
 }
 .contact-fingerprint-block {
-	float: right;
-	padding: 45px 45px 0 0;
+	padding: 52px 45px 0 0;
+position: absolute;
+right: 0;
 }
 .contact-fingerprint-title {
 	padding: 0 0 20px 10px;
@@ -19124,9 +19129,14 @@ span.incoming-call-name {
 	padding-right: 0;
 }
 .contact-details-pad {
-	margin-left: 200px;
-	overflow: hidden;
-	padding-top: 44px;
+	margin: 0 255px 0 205px;
+padding-top: 44px;
+vertical-align: top;
+position: relative;
+min-height: 182px;
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+box-sizing: border-box;
 }
 .contact-details-email {
 	font-size: 12px;
@@ -19138,7 +19148,10 @@ span.incoming-call-name {
 }
 .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
 	float: left;
-	margin: 20px 8px 0 0;
+	margin: 20px 4px 0 -4px;
+}
+.fm-question {
+	display:none;
 }
 .contact-share-notification {
 	font-size: 12px;

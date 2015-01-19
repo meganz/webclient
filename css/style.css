@@ -1417,10 +1417,14 @@ a.blog-button:hover {
 	height: 48px;
 }
 .notification-username {
-	font-size: 13px;
-	line-height: 16px;
-	padding: 0;
 	display: block;
+    font-size: 13px;
+    line-height: 16px;
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 205px;
 }
 .notification-content {
 	display: block;

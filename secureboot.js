@@ -559,8 +559,6 @@ else
 		jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1}); // Will be replaced with asmCrypto soon
 		jsl.push({f:'js/asmcrypto.js',n:'asmcrypto_js',j:1,w:1});
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-		jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
-		jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
 		jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
         jsl.push({f:'js/jsbn.js', n: 'jsbn_js', j:1,w:2});
 		jsl.push({f:'js/jsbn2.js', n: 'jsbn2_js', j:1,w:2});
@@ -569,6 +567,8 @@ else
         jsl.push({f:'js/user.js', n: 'user_js', j:1});
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+        jsl.push({f:'js/jquery-2.1.1.js', n: 'jquery', j:1,w:10});
+        jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
         jsl.push({f:'js/megaLogger.js', n: 'megaLogger_js', j:1});
         jsl.push({f:'js/jquery-ui-1.11.2.js', n: 'jqueryui_js', j:1,w:10});
         jsl.push({f:'js/base64.js', n: 'base64_js', j:1});

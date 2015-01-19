@@ -593,7 +593,7 @@ var Chat = function() {
     this.lastOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
 
-    var xmppDomain = "developers.mega.co.nz";
+    var xmppDomain = "karere.mega.nz";
     if(localStorage.megaChatUseSandbox) {
         xmppDomain = "developers.mega.co.nz";
     }

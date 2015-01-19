@@ -19138,6 +19138,7 @@ span.incoming-call-name {
 }
 .fingerprint-dialog .fm-dialog-button.dialog-approve-button {
 	background-color: rgba(109,176,63,0.7);
+    margin-right: 10px;
 }
 .fingerprint-dialog .fm-dialog-button.dialog-approve-button:hover {
 	background-color: rgba(109,176,63,1);

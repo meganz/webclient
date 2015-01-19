@@ -5200,7 +5200,7 @@ function contextmenuUI(e, ll, topmenu)
         var m = $('.context-menu.download');
         t = '.context-menu.download .context-menu-item';
     }
-    else if (ll === 4) // contactUI
+    else if (ll === 4 || ll === 5) // contactUI
     {
         $(t).hide();
         var items = menuItems();
@@ -5208,6 +5208,9 @@ function contextmenuUI(e, ll, topmenu)
         delete items['zipdownload'];
         delete items['copy'];
         delete items['open'];
+        if (ll == 5) {
+            delete items['properties'];
+        }
         for (var item in items) {
             $(t).filter('.' + item + '-item').show();
         }
@@ -8128,7 +8131,7 @@ function propertiesDialog(close)
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
-            contextmenuUI(e, 1);
+            contextmenuUI(e, n.h.length === 11 ? 5 : 1);
         } else {
             $(this).removeClass('active');
             $('.context-menu').removeClass('arrange-to-front');
@@ -8396,7 +8399,8 @@ function slideshow(id, close)
         return false;
     }
 
-    if (folderlink)
+    var n = M.d[id];
+    if (n && RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
         $('.slideshow-line').hide();
@@ -8411,7 +8415,6 @@ function slideshow(id, close)
     {
         slideshow(id, 1);
     });
-    var n = M.d[id];
     if (!n)
         return;
     $('.slideshow-filename').text(n.name);

@@ -759,26 +759,22 @@ function MegaData()
         delete this.cRenderMainN;
 
         for (var i in this.v) {
-            if (!this.v[i].name) {
-                if (d) console.log('Skipping M.v node with no name.', M.v[i]);
-                continue;
+            if (this.v[i].name) {
+                var s = '';
+                var ftype = '';
+                var c = '';
+                if (this.v[i].t) {
+                    ftype = l[1049];
+                    c = ' folder';
+                } else {
+                    ftype = filetype(this.v[i].name);
+                    s = htmlentities(bytesToSize(this.v[i].s));
+                }
+                var html, el, cc, star = '';
+                if (this.v[i].fav) {
+                    star = ' star';
+                }
             }
-
-            var s = '';
-            var ftype = '';
-            var c = '';
-            if (this.v[i].t) {
-                ftype = l[1049];
-                c = ' folder';
-            } else {
-                ftype = filetype(this.v[i].name);
-                s = htmlentities(bytesToSize(this.v[i].s));
-            }
-            var html, el, cc, star = '';
-            if (this.v[i].fav) {
-                star = ' star';
-            }
-
             if (this.currentdirid === 'contacts') {
                 var u_h = this.v[i].h;
                 var cs = this.contactstatus(u_h);
@@ -1503,7 +1499,7 @@ function MegaData()
         } else if (folderlink) {
             stype = "folder-link"
         }
-        if (d) console.error('buildtree', stype, n.h, n, dialog);
+        // if (d) console.log('buildtree', stype, n.h, n, dialog);
 
         if (this.c[n.h])
         {

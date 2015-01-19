@@ -6905,7 +6905,9 @@ span.search-number {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -8510px;
-	text-align:center;
+	text-align: center;
+	position: relative;
+	cursor: pointer;
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	margin: 11px -4px 0 4px;
@@ -6918,18 +6920,17 @@ span.search-number {
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
 	margin: 8px -4px 0 4px;
-	height:40px;
+	height: 40px;
 }
 .top-dialog-login-button {
-	margin-top:3px;
+	margin-top: 3px;
 }
 .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span {
-	height:32px;
-	line-height:30px;
+	height: 32px;
+	line-height: 30px;
 }
 .fm-notifications-bottom, .fm-notifications-bottom {
-	padding:0 9px;
-	
+	padding: 0 9px;
 }
 .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span {
 	padding: 0 10px;
@@ -6955,15 +6956,12 @@ span.search-number {
 	background-position: -7px -9561px;
 }
 /* gray border */
-.fm-add-user:hover, .fm-start-video-call:hover, .fm-clearbin-button:hover, .fm-send-files:hover, .fm-start-call:hover, .fm-leave-share:hover, .fm-share-copy:hover, .fm-share-download:hover, .contact-send-files:hover, .fm-start-conversation:hover, .fm-share-folders:hover, .fm-verify:hover, .fm-question:hover, .fm-chat-end:hover, .fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-contact-requests:hover, .fm-received-requests:hover, .fm-dialog-button:hover, .fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .top-dialog-login-button:hover, .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover,
-.fm-add-user.active, .fm-start-video-call.active, .fm-clearbin-button.active, .fm-send-files.active, .fm-start-call.active, .fm-leave-share.active, .fm-share-copy.active, .fm-share-download.active, .contact-send-files.active, .fm-start-conversation.active, .fm-share-folders.active, .fm-verify.active, .fm-question.active, .fm-chat-end.active, .fm-download-as-zip.active, .fm-import-to-cloudrive.active, .fm-contact-requests.active, .fm-received-requests.active, .fm-dialog-button.active, .fm-account-button.active, .avatar-dialog .fm-account-change-avatar.active, .top-dialog-login-button.active, .nw-chat-button.active, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.active, .fm-chat-contact-button.active {
+.fm-add-user:hover, .fm-start-video-call:hover, .fm-clearbin-button:hover, .fm-send-files:hover, .fm-start-call:hover, .fm-leave-share:hover, .fm-share-copy:hover, .fm-share-download:hover, .contact-send-files:hover, .fm-start-conversation:hover, .fm-share-folders:hover, .fm-verify:hover, .fm-question:hover, .fm-chat-end:hover, .fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-contact-requests:hover, .fm-received-requests:hover, .fm-dialog-button:hover, .fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .top-dialog-login-button:hover, .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover, .fm-add-user.active, .fm-start-video-call.active, .fm-clearbin-button.active, .fm-send-files.active, .fm-start-call.active, .fm-leave-share.active, .fm-share-copy.active, .fm-share-download.active, .contact-send-files.active, .fm-start-conversation.active, .fm-share-folders.active, .fm-verify.active, .fm-question.active, .fm-chat-end.active, .fm-download-as-zip.active, .fm-import-to-cloudrive.active, .fm-contact-requests.active, .fm-received-requests.active, .fm-dialog-button.active, .fm-account-button.active, .avatar-dialog .fm-account-change-avatar.active, .top-dialog-login-button.active, .nw-chat-button.active, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.active, .fm-chat-contact-button.active {
 	background-color: rgba(0,0,0,0.15);
 }
-.fm-add-user:hover span, .fm-start-video-call:hover span, .fm-clearbin-button:hover span, .fm-send-files:hover span, .fm-start-call:hover span, .fm-leave-share:hover span, .fm-share-copy:hover span, .fm-share-download:hover span, .contact-send-files:hover span, .fm-start-conversation:hover span, .fm-share-folders:hover span, .fm-verify:hover span, .fm-question:hover span, .fm-chat-end:hover span, .fm-download-as-zip:hover span, .fm-import-to-cloudrive:hover span, .fm-contact-requests:hover span, .fm-received-requests:hover span, .fm-chat-file-button:hover span, .fm-dialog-button:hover span, .fm-account-button:hover span, .avatar-dialog .fm-account-change-avatar:hover span, .top-dialog-login-button:hover span, .nw-chat-button:hover span, .multiple-sharing.expanded .main-body .nw-chat-button:hover span, .fm-chat-attach-button:hover span, .fm-chat-contact-button:hover span,
-.fm-add-user.active span, .fm-start-video-call.active span, .fm-clearbin-button.active span, .fm-send-files.active span, .fm-start-call.active span, .fm-leave-share.active span, .fm-share-copy.active span, .fm-share-download.active span, .contact-send-files.active span, .fm-start-conversation.active span, .fm-share-folders.active span, .fm-verify.active span, .fm-question.active span, .fm-chat-end.active span, .fm-download-as-zip.active span, .fm-import-to-cloudrive.active span, .fm-contact-requests.active span, .fm-received-requests.active span, .fm-chat-file-button.active span, .fm-dialog-button.active span, .fm-account-button.active span, .avatar-dialog .fm-account-change-avatar.active span, .top-dialog-login-button.active span, .nw-chat-button.active span, .multiple-sharing.expanded .main-body .nw-chat-button.active span, .fm-chat-attach-button.active span, .fm-chat-contact-button.active span {
-	color:#666666;
+.fm-add-user:hover span, .fm-start-video-call:hover span, .fm-clearbin-button:hover span, .fm-send-files:hover span, .fm-start-call:hover span, .fm-leave-share:hover span, .fm-share-copy:hover span, .fm-share-download:hover span, .contact-send-files:hover span, .fm-start-conversation:hover span, .fm-share-folders:hover span, .fm-verify:hover span, .fm-question:hover span, .fm-chat-end:hover span, .fm-download-as-zip:hover span, .fm-import-to-cloudrive:hover span, .fm-contact-requests:hover span, .fm-received-requests:hover span, .fm-chat-file-button:hover span, .fm-dialog-button:hover span, .fm-account-button:hover span, .avatar-dialog .fm-account-change-avatar:hover span, .top-dialog-login-button:hover span, .nw-chat-button:hover span, .multiple-sharing.expanded .main-body .nw-chat-button:hover span, .fm-chat-attach-button:hover span, .fm-chat-contact-button:hover span, .fm-add-user.active span, .fm-start-video-call.active span, .fm-clearbin-button.active span, .fm-send-files.active span, .fm-start-call.active span, .fm-leave-share.active span, .fm-share-copy.active span, .fm-share-download.active span, .contact-send-files.active span, .fm-start-conversation.active span, .fm-share-folders.active span, .fm-verify.active span, .fm-question.active span, .fm-chat-end.active span, .fm-download-as-zip.active span, .fm-import-to-cloudrive.active span, .fm-contact-requests.active span, .fm-received-requests.active span, .fm-chat-file-button.active span, .fm-dialog-button.active span, .fm-account-button.active span, .avatar-dialog .fm-account-change-avatar.active span, .top-dialog-login-button.active span, .nw-chat-button.active span, .multiple-sharing.expanded .main-body .nw-chat-button.active span, .fm-chat-attach-button.active span, .fm-chat-contact-button.active span {
+	color: #666666;
 }
-
 /* blue border */
 .fm-start-call:hover, .fm-start-video-call:hover, .fm-send-files:hover, .fm-add-user:hover, .fm-start-call.active, .fm-start-video-call.active, .fm-send-files.active, .fm-add-user.active {
 	background-color: rgba(43,166,222,0.3);
@@ -9850,31 +9848,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-chat-expand-arrow::before {
 	content: '\00a0';
 }
-.fm-dialog-button.warning-button {
-	background-color: rgba(143,196,98,0.9);
-}
-.fm-dialog-button.warning-button:hover {
-	background-color: rgba(143,196,98,1);
-}
 .top-dialog-login-button span {
-	min-width:40px;
-	position:relative;
-	
-}
-.fm-dialog-button.move-button.active, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
-	cursor: pointer;
+	min-width: 40px;
+	position: relative;
 }
 .fm-dialog-button.dialog-newfolder-button {
 	float: left;
-	margin-left: 12px;
-}
-.fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active, .nw-chat-button.active {
-	cursor: pointer;
-	position: relative;
-}
-.fm-dialog-button.cancel-button.active:hover, .fm-dialog-button.save-button.active:hover, .fm-dialog-button.add-contact-button.active:hover, .fm-dialog-button.cancel-contact-button.active:hover, .fm-dialog-button.notification-button.active:hover, .fm-dialog-button.links-button.active:hover, .fm-dialog-button.browsers-button.active:hover, .fm-dialog-button.fm-terms-cancel.active:hover, .fm-dialog-button.quota-later-button.active:hover, .fm-dialog-button.close-button.active:hover, .fm-dialog-button.notifications-button.active:hover, .fm-dialog-button.fm-languages-save.active:hover, .fm-dialog-button.membership-button.active:hover, .avatar-dialog .fm-account-change-avatar:hover, .fm-dialog-button.warning-button:hover {
-	color: white;
-	cursor: pointer;
+	margin-left: -4px;
 }
 .fm-account-button {
 	cursor: pointer;
@@ -9895,17 +9875,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 0;
 	left: 0;
 }
-.fm-dialog-button.quota-upgrade-button.active, .fm-dialog-button.quota-upgrade-button.active:hover, .fm-dialog-button.fm-terms-agree.active:hover {
-	color: white;
-	cursor: pointer;
-}
 .confirmation-checkbox {
 	margin: -5px 0 0 -16px;
 }
 .fm-dialog-button.add-contact-button, .fm-dialog-button.cancel-contact-button {
 	height: 32px;
 	line-height: 30px;
-	margin: 6px 6px 0 0;
 	min-width: 64px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
@@ -10235,12 +10210,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: -5px -3080px;
 	background-color: rgba(0,0,0,0.2);
 }
-.delete-contact .fm-dialog-button.notification-button.confirm {
-	background-color: rgba(211,26,0,0.7);
-}
-.delete-contact .fm-dialog-button.notification-button.confirm:hover {
-	background-color: rgba(211,26,0,1);
-}
 .fm-notification-info {
 	margin-left: 90px;
 	display: table-cell;
@@ -10357,12 +10326,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .file-keys-view .copy-keys-button {
 	display: none;
-}
-.fm-dialog-button.copy-to-clipboard {
-	background-color: rgba(255,179,0,0.8)
-}
-.fm-dialog-button.copy-to-clipboard:hover {
-	background-color: rgba(255,179,0,1)
 }
 .file-key {
 	display: none;
@@ -13406,13 +13369,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .top-login-bott-gray-block {
 	background-color: #F6F6F6;
-margin: 0 -15px -4px -15px;
-padding: 5px 15px 0 15px;
--webkit-border-bottom-left-radius: 8px;
--moz-border-radius-bottomleft: 8px;
-border-bottom-left-radius: 8px;
-height:56px;
--webkit-box-sizing: border-box;
+	margin: 0 -15px -4px -15px;
+	padding: 5px 15px 0 15px;
+	-webkit-border-bottom-left-radius: 8px;
+	-moz-border-radius-bottomleft: 8px;
+	border-bottom-left-radius: 8px;
+	height: 56px;
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
@@ -18576,11 +18539,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	float: none;
 	margin: 0;
 }
-.restore-success .fm-dialog-button.browsers-button:hover, .reset-success .fm-dialog-button.browsers-button:hover {
-	border-color: #D42400;
-	background-color: #D42400;
-	color: white;
-}
 .reset-account-lock-image {
 	height: 375px;
 	background-image: url(../images/mega/encr-sprite_v1.png);
@@ -19133,12 +19091,6 @@ span.incoming-call-name {
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
-}
-.fingerprint-dialog .fm-dialog-button.dialog-approve-button {
-	background-color: rgba(109,176,63,0.7);
-}
-.fingerprint-dialog .fm-dialog-button.dialog-approve-button:hover {
-	background-color: rgba(109,176,63,1);
 }
 .fingerprint-code {
 	float: right;

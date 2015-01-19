@@ -53,7 +53,7 @@
         <a class="context-menu-item folderupload-item"><span class="context-menu-icon"></span>[$98]</a>
         <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
         <a class="context-menu-item remove-item"><span class="context-menu-icon"></span>[$83]</a>
-        <a class="context-menu-item removeshare-item"><span class="context-menu-icon"></span>[$144]</a>
+        <a class="context-menu-item removeshare-item"><span class="context-menu-icon"></span>[$5866]</a>
         <a class="context-menu-item clearbin-item"><span class="context-menu-icon"></span>[$70]</a>
         <a class="context-menu-item addcontact-item"><span class="context-menu-icon"></span>[$71]</a>
         <a class="context-menu-item reply-item"><span class="context-menu-icon"></span>Reply</a>
@@ -78,24 +78,33 @@
     <div class="fm-main notifications hidden">
         <div class="nw-fm-left-icons-panel">
             <div class="nw-fm-left-icon folder-link">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Folder link</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Cloud Drive</div>
             </div>
+            <div class="nw-fm-left-icon inbox">
+                <div class="nw-fm-left-border"></div>
+                <div class="nw-fm-left-tooltip">Inbox</div>
+            </div>
             <div class="nw-fm-left-icon shared-with-me">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Shared with me</div>
             </div>
             <div class="nw-fm-left-icon contacts">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Contacts</div>
             </div>
             <div class="nw-fm-left-icon conversations">
+                <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">2</div>
                 <div class="nw-fm-left-tooltip">Conversations</div>
             </div>
             <!-- Please add "filled" classname if user have deleted items !-->
-            <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
-            <div class="nw-fm-left-icon settings"><div class="nw-fm-left-tooltip">Transfer settings</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
+            <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Transfer settings</div><div class="settings-icon"></div></div>
         </div>
 
         <div class="new-notifications-bg"></div>
@@ -111,24 +120,33 @@
     <div class="fm-main default">
         <div class="nw-fm-left-icons-panel">
             <div class="nw-fm-left-icon folder-link">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Folder link</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive active">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Cloud Drive</div>
             </div>
+            <div class="nw-fm-left-icon inbox active">
+                <div class="nw-fm-left-border"></div>
+                <div class="nw-fm-left-tooltip">Inbox</div>
+            </div>
             <div class="nw-fm-left-icon shared-with-me">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">Shared with me</div>
             </div>
             <div class="nw-fm-left-icon contacts">
+                <div class="nw-fm-left-border"></div>
                 <div class="nw-fm-left-tooltip">[$165]</div>
             </div>
             <div class="nw-fm-left-icon conversations">
+                <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">2</div>
                 <div class="nw-fm-left-tooltip">Conversations</div>
             </div>
             <!-- Please add "filled" classname if user have deleted items !-->
-            <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
-            <div class="nw-fm-left-icon settings"><div class="nw-fm-left-tooltip">Transfer settings</div><div class="settings-icon"></div></div>
+            <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
+            <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Transfer settings</div><div class="settings-icon"></div></div>
         </div>
 
         <div class="fm-left-panel">
@@ -138,8 +156,8 @@
             <div class="nw-sorting-menu hidden">
                 <div class="context-menu-section">
                     <div class="sorting-menu-arrow"></div>
-                    <div data-by="name" class="sorting-menu-item active">Name</div>
-                    <div data-by="status" class="sorting-menu-item">Status</div>
+                    <div data-by="name" class="sorting-menu-item active">[$86]</div>
+                    <div data-by="status" class="sorting-menu-item">[$89]</div>
                     <div data-by="last-interaction" class="sorting-menu-item">Last Interaction</div>
                     <div class="sorting-item-divider"></div>
                 </div>
@@ -157,6 +175,10 @@
                 </div>
                 <div class="nw-fm-tree-header cloud-drive">
                     <input type="text" value="Cloud Drive" placeholder="Cloud Drive" />
+                    <div class="nw-fm-search-icon"></div>
+                </div>
+                <div class="nw-fm-tree-header inbox">
+                    <input type="text" value="Inbox" placeholder="Inbox" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
                 <div class="nw-fm-tree-header shared-with-me">
@@ -447,8 +469,8 @@
                             <div class="chat-message-date">2:02 pm</div>
                             <div class="chat-message-txt"></div>
 
-                            <div class="fm-chat-file-button primary-button">Primary button</div>
-                            <div class="fm-chat-file-button secondary-button">Secondary button</div>
+                            <div class="fm-chat-file-button primary-button"><span>Primary button</span></div>
+                            <div class="fm-chat-file-button secondary-button"><span>Secondary button</span></div>
 
                             <div class="clear"></div>
                         </div>
@@ -561,8 +583,6 @@
                 <div class="fm-chat-message-scroll template">
                     <div class="fm-chat-message-pad">
                         <div class="chat-date-divider">
-                            <div class="chat-date-top-arrow"></div>
-                            <div class="chat-date-bottom-arrow"></div>
                         </div>
                         <!-- Unhide on "save-button" mouseover !-->
                         <div class="fm-chat-download-popup chat-popup">
@@ -798,12 +818,12 @@
             <div class="fm-empty-contacts hidden">
                 <div class="fm-empty-pad">
                     <div class="fm-empty-contacts-bg"></div>
-                    <div class="fm-empty-cloud-txt">No Contacts</div>
+                    <div class="fm-empty-cloud-txt">[$5737]</div>
                     <div class="fm-empty-description">
                         Worry not! You can easily add new contacts by email or import existing contacts from other services.
                     </div>
                     <div class="fm-empty-button">
-                        Add Contacts...
+                        [$71]...
                     </div>
                     <div class="fm-not-logged-text">
                         <div class="fm-not-logged-description">
@@ -944,8 +964,8 @@
             <div class="files-grid-view contacts-view hidden">               
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                     <tr>
-                        <th><div class="arrow name desc">Name</div></th>
-                    <th><div class="arrow status">Status</div></th>
+                        <th><div class="arrow name desc">[$86]</div></th>
+                    <th><div class="arrow status">[$89]</div></th>
                     <th><div class="arrow interaction">Last interaction</div></th>
                     </tr>
                 </table>
@@ -1053,6 +1073,7 @@
                             <span>Verify...</span>
                         </div>
                         <div class="fm-question">
+                          <span></span>
                         </div>
                         <div class="clear"></div>
                     </div>

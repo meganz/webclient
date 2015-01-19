@@ -945,7 +945,7 @@ var notifyPopup = {
         }
 
         // Otherwise use the userid
-        else if (M.u[userid].m) {
+        else if (M.u[userid]) {
             email = M.u[userid].m;
             avatarColor = email.charCodeAt(0) % 6 + email.charCodeAt(1) % 6;
             avatar = (avatars[userid] && avatars[userid].url)

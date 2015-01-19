@@ -460,7 +460,11 @@ if (typeof (l) == 'undefined') {
     l = [];
 }
 
-var date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
+var date_months = []
+
+$(window).on('onMegaLoaded', function() {
+	date_months = [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]];
+});
 
 function acc_time2date(unixtime)
 {

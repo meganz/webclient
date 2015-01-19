@@ -365,6 +365,8 @@ var treesearch = false;
 
 function treeredraw()
 {
+    $('li.tree-item-on-search-hidden').removeClass('tree-item-on-search-hidden');
+
     if (RootbyId(M.currentdirid) == M.RootID)
         M.buildtree(M.d[M.RootID]);
     else if (RootbyId(M.currentdirid) == M.RubbishID)
@@ -497,14 +499,14 @@ function treesearchUI()
                     M.contacts();
                     break;
                 case 'shared-with-me':
-                    M.buildtree({h: 'shares'});
+                    M.buildtree({h: 'shares'}, 0x4fe);
                     break;
                 case 'cloud-drive':
                 case 'folder-link':
-                    M.buildtree(M.d[M.RootID]);
+                    M.buildtree(M.d[M.RootID], 0x4fe);
                     break;
                 case 'rubbish-bin':
-                    M.buildtree({h: M.RubbishID});
+                    M.buildtree({h: M.RubbishID}, 0x4fe);
                     break;
             }
             treeUI(); // reattach events
@@ -1049,9 +1051,6 @@ function initUI() {
     $(window).unbind('resize.fmrh hashchange.fmrh');
     $(window).bind('resize.fmrh hashchange.fmrh', fm_resize_handler);
 
-    if (lang != 'en')
-        $('.download-standart-item').text(l[58]);
-
     megaChat.karere.unbind("onPresence.maintainUI");
     megaChat.karere.bind("onPresence.maintainUI", function(e, presenceEventData)
     {
@@ -1474,19 +1473,19 @@ function addContactUI()
     var contacts = getContactsEMails();
 
     $('.add-contact-multiple-input').tokenInput(contacts, {
-        theme: "mega",
-        hintText: "Type in an email or contact",
-//        hintText: "",
-//        placeholder: "Type in an email or contact",
-        searchingText: "",
-        noResultsText: "",
+        theme: 'mega',
+        hintText: 'Type in an email or contact',
+//        hintText: '',
+//        placeholder: 'Type in an email or contact',
+        searchingText: '',
+        noResultsText: '',
         addAvatar: true,
         autocomplete: null,
         searchDropdown: true,
         emailCheck: true,
         preventDoublet: true,
-        tokenValue: "id",
-        propertyToSearch: "id",
+        tokenValue: 'id',
+        propertyToSearch: 'id',
         resultsLimit: 5,
         minChars: 2,
         accountHolder: (M.u[u_handle] || {}).m || '',
@@ -1506,7 +1505,7 @@ function addContactUI()
             if (itemNum === 1)
             {
                 $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
             }
             else
             {
@@ -1541,13 +1540,13 @@ function addContactUI()
             if (itemNum === 0)
             {
                 $('.add-user-popup-button.add').addClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             }
             else if (itemNum === 1)
             {
                 $('.add-user-popup-button.add').removeClass('disabled');
-                $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+                $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             }
             else
@@ -1598,7 +1597,7 @@ function addContactUI()
         // Prepare multi-input and dialog
         $('.add-user-popup .multiple-input .token-input-token-mega').remove();
         $('.add-user-popup-button.add').addClass('disabled');
-        $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+        $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
         $('.fm-add-user').removeClass('active');
 
         iconSize(false);
@@ -1636,7 +1635,7 @@ function addContactUI()
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
 
             $('.add-user-popup-button.add').addClass('disabled');
-            $('.add-user-popup .nw-fm-dialog-title').text('Add Contact');
+            $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
             var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
             // Positioning, not less then 8px from right side
@@ -1763,15 +1762,18 @@ function addContactUI()
     });
 
     $('.add-user-popup .import-contacts-service').unbind('click');
-    $('.add-user-popup .import-contacts-service').bind('click', function()
-    {
+    $('.add-user-popup .import-contacts-service').bind('click', function() {
         // NOT imported
-        if (!$(this).is('.imported'))
-        {
-            importGoogleContacts('contacts');
-        }
-        else
-        {
+        if (!$(this).is('.imported')) {
+            var contacts = new mega.GContacts({'where': 'contacts'});
+
+            // NOT failed
+            if (!contacts.options.failed) {
+                contacts.importGoogleContacts();
+            } else {
+                closeImportContactNotification('.add-user-popup');
+            }
+        } else {
             var n = $('.imported-contacts-notification');
             n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
             n.fadeIn(200);
@@ -2181,8 +2183,8 @@ function initContextUI()
         }
     });
 
-    $(c + '.advanced-item').unbind('click');
-    $(c + '.advanced-item').bind('click', function()
+    $(c + '.advanced-item, ' + c + '.move-item').unbind('click');
+    $(c + '.advanced-item, ' + c + '.move-item').bind('click', function()
     {
         $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
@@ -2202,19 +2204,6 @@ function initContextUI()
         $('.copy-dialog .dialog-copy-button').addClass('active');
         $('.copy-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
-    });
-
-    $(c + '.move-item').unbind('click');
-    $(c + '.move-item').bind('click', function()
-    {
-        $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
-        $.mcselected = M.RootID;
-        $('.move-dialog .dialog-move-button').addClass('active');
-        $('.move-dialog').removeClass('hidden');
-        handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
-        disableCircularTargets('#mctreea_');
         $('.fm-dialog-overlay').removeClass('hidden');
         $('body').addClass('overlayed');
     });
@@ -5139,9 +5128,9 @@ function menuItems()
                 $.delfav = 0;
         }
         if ($.delfav)
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[976]);
+            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
         else
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[975]);
+            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
     }
     var n = M.d[$.selected[0]];
     if (n && n.p.length == 11)
@@ -6117,7 +6106,13 @@ function closeMsg()
 
 function dialogScroll(s)
 {
+    s+=':visible';
     $(s).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
+    jScrollFade(s);
+    // var jsp = $(s).data('jsp');
+    // if (jsp) {
+        // jsp.reinitialise();
+    // }
 }
 
 function dialogPositioning(s)
@@ -6248,7 +6243,8 @@ function handleDialogContent(s, m, c, n, t, i)
     $('.' + n + '-dialog ul').removeClass('opened');
 
     dialogPositioning('.fm-dialog' + '.' + n + '-dialog');
-    dialogScroll('.' + n + '-dialog-tree-panel');
+    // dialogScroll('.' + n + '-dialog-tree-panel');
+    dialogScroll('.dialog-tree-panel-scroll');
 
     $('.' + n + '-dialog-button' + '.' + s).addClass('active');//Activate tab
 }
@@ -6664,7 +6660,14 @@ function initShareDialog()
         // NOT imported
         if (!$(this).is('.imported'))
         {
-            importGoogleContacts('shared');
+            var contacts = new mega.GContacts({'where': 'shared'});
+
+            // NOT failed
+            if (!contacts.options.failed) {
+                contacts.importGoogleContacts();
+            } else {
+                closeImportContactNotification('.share-dialog');
+            }
         }
         else
         {
@@ -6940,16 +6943,21 @@ function addImportedDataToAddContactsDialog(data, from) {
     closeImportContactNotification('.add-user-popup');
 }
 
-function closeImportContactNotification(c)
-{
+function closeImportContactNotification(c) {
     $('.imported-contacts-notification').fadeOut(200);
     $(c + ' .import-contacts-dialog').fadeOut(200);
     $('.import-contacts-link').removeClass('active');
+
+    // Remove focus from input element, related to tokeninput plugin
+    $(c + ' input#token-input-').blur();
 }
 
 function clearScrollPanel(from)
 {
-    $(from + ' .multiple-input').jScrollPane().data().jsp.destroy();
+    var j = $(from + ' .multiple-input').jScrollPane().data();
+    if (j && j.jsp) {
+        j.jsp.destroy();
+    }
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 }
@@ -7178,7 +7186,8 @@ function copyDialog()
         else
             $.mcselected = old;
 
-        dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+        // dialogScroll('.copy-dialog-tree-panel .dialog-tree-panel-scroll');
+        dialogScroll('.dialog-tree-panel-scroll');
         // Disable action button if there is no selected items
         if (typeof $.mcselected == 'undefined')
             $btn.addClass('disabled');
@@ -7412,7 +7421,8 @@ function moveDialog()
         else
             $.mcselected = old;
 
-        dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
+        // dialogScroll('.move-dialog-tree-panel .dialog-tree-panel-scroll');
+        dialogScroll('.dialog-tree-panel-scroll');
         // Disable action button if there is no selected items
         if (typeof $.mcselected == 'undefined')
             $btn.addClass('disabled');
@@ -7940,7 +7950,7 @@ function propertiesDialog(close)
     $.dialog = 'properties';
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and_write full-access');
+    pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me read-only read-and-write full-access');
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').unbind('click');
     $('.fm-dialog.properties-dialog .properties-body').bind('click', function()
@@ -8000,7 +8010,8 @@ function propertiesDialog(close)
         pd.addClass('shared shared-with-me ' + zclass)
     }
 
-    var p = {};
+    var p = {}, user = M.d[n.p] || {};
+    if (d) console.log('propertiesDialog', n, user);
     if ((filecnt + foldercnt) == 1)
     {
         p.t6 = '';
@@ -8025,23 +8036,22 @@ function propertiesDialog(close)
         p.t1 = l[86] + ':';
         p.t2 = htmlentities(n.name);
         p.t4 = bytesToSize(size);
-        p.t8 = l[896] + ':';
-        p.t9 = htmlentities(time2date(n.ts));
+        p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
+        p.t8 = p.t9 ? (l[896] + ':') : '';
         p.t10 = '';
         p.t11 = '';
         if (foldercnt)
         {
-
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
                 var shares, susers, total = 0
                 shares = Object.keys(n.shares || {}).length
-                p.t8 = 'Shared with:';
-                p.t9 = shares == 1 ? '1 contact' : shares + ' contacts';
-                p.t10 = l[896];
-                p.t11 = htmlentities(time2date(n.ts));
-                $('.properties-elements-counter span').text(shares);
+                p.t8 = l[1036] + ':';
+                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
+                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                p.t10 = p.t11 ? l[896] : '';
+                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
                 susers = pd.find('.properties-body .properties-context-menu')
                     .empty()
                     .append('<div class="properties-context-arrow"></div>')
@@ -8067,14 +8077,18 @@ function propertiesDialog(close)
 
                 if (total == 0)
                     p.hideContacts = true;
-
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
-                // TODO: Permissions and Owner implementation
-                p.t3 = 'Permissions:';
-                p.t4 = 'Full access';
+                p.t3 = l[64];
+                var rights = l[55];
+                if (n.r == 1) {
+                    rights = l[56];
+                } else if (n.r == 2) {
+                    rights = l[57];
+                }
+                p.t4 = rights;
                 p.t6 = 'Owner';
-                p.t7 = 'Alex Brunskill';
+                p.t7 = user.name;
                 p.t8 = l[894] + ':';
                 p.t9 = bytesToSize(size);
                 p.t10 = l[897] + ':';
@@ -8093,7 +8107,17 @@ function propertiesDialog(close)
         p.t8 = l[93] + ':';
         p.t9 = l[1025];
     }
-    var html = '<div class="properties-small-gray">' + p.t1 + '</div><div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div> <span class="file-settings-icon"><span></span></span></div><div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span><span class="propreties-dark-txt">' + p.t4 + '</span></div><div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span><span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9 + '<div class="contact-list-icon"></div></div></div><div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div><div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
+    var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
+        +'<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
+        +' <span class="file-settings-icon"><span></span></span></div>'
+        +'<div><div class="properties-float-bl"><span class="properties-small-gray">' + p.t3 + '</span>'
+        +'<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
+        +'<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
+        +'<span class="propreties-dark-txt">' + p.t7 + '</span></div><div class="properties-float-bl">'
+        +'<div class="properties-small-gray">' + p.t8 + '</div><div class="propreties-dark-txt contact-list">' + p.t9
+        +'<div class="contact-list-icon"></div></div></div>'
+        +'<div class="properties-float-bl"><div class="properties-small-gray">' + p.t10 + '</div>'
+        +'<div class="propreties-dark-txt">' + p.t11 + '</div></div></div>';
     $('.properties-txt-pad').html(html);
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -8881,12 +8905,12 @@ function sharedfolderUI() {
         if (av_meta.avatarUrl)
             avatar = '<img src="' + av_meta.avatarUrl + '">';
 
-        var rights = 'Read only', rightsclass = ' read-only';
+        var rights = l[55], rightsclass = ' read-only';
         if (n.r == 1) {
-            rights = 'Read and write';
+            rights = l[56];
             rightsclass = ' read-and-write';
         } else if (n.r == 2) {
-            rights = 'Full access';
+            rights = l[57];
             rightsclass = ' full-access';
         }
 
@@ -9031,8 +9055,9 @@ function fingerprintDialog(userid)
     $('.dialog-approve-button').rebind('click', function() {
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+			$('.fm-verify').addClass('active').find('span').text('Verified').unbind('click');
+			closeFngrPrntDialog();
         });
-        closeFngrPrntDialog();
     });
 
     $('.dialog-skip-button').rebind('click', function() {
@@ -9073,7 +9098,7 @@ function contactUI() {
         $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $(this).addClass('active');
+            // $(this).addClass('active');
             $('.context-menu').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
@@ -9092,9 +9117,9 @@ function contactUI() {
         });
 
         if (isContactVerified(user)) {
-            $('.fm-verify').addClass('active').text('Verified');
+            $('.fm-verify').addClass('active').find('span').text('Verified');
         } else {
-            $('.fm-verify').text('Verify...').removeClass('active').rebind('click', function() {
+            $('.fm-verify').removeClass('active').find('span').text('Verify...').rebind('click', function() {
                 fingerprintDialog(user);
             });
         }

@@ -296,6 +296,7 @@ CMS.on('corporate', function()
 		$('.new-right-content-block.' + $this.attr('id')).removeClass('hidden');
 		$('.new-left-menu-link').removeClass('active');
 		$this.addClass('active');			
+		mainScroll();
 	});
 	$('.new-left-menu-link:first').trigger('click');
 });

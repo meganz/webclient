@@ -1543,7 +1543,7 @@ Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessi
 
     $('.chat-message-txt', $message).empty();
 
-    var $cancelButton = $('<div class="fm-chat-file-button primary-button">Cancel</div>');
+    var $cancelButton = $('<div class="fm-chat-file-button secondary-button"><span>Cancel</span></div>');
     $('.chat-message-txt', $message).append($cancelButton);
     $cancelButton.on('click', function() {
         var $p = $(this).parent();
@@ -1555,7 +1555,7 @@ Chat.prototype._generateIncomingRtcFileMessage = function(room, filesList, sessi
     });
 
     if(acceptFunc) {
-        var $acceptButton = $('<div class="fm-chat-file-button primary-button">Accept</div>');
+        var $acceptButton = $('<div class="fm-chat-file-button primary-button"><span>Accept</span></div>');
 
         $cancelButton.before($acceptButton);
 

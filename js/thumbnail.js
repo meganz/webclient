@@ -55,7 +55,7 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 				ctx.drawImage(this, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
 
 				var ab = dataURLToAB(canvas.toDataURL('image/jpeg',0.90));
-				api_storefileattr(this.id,0,this.aes.c[0].slice(0,4),ab.buffer); // FIXME hack into cipher and extract key
+				api_storefileattr(this.id, 0, this.aes._key[0].slice(0,4), ab.buffer); // FIXME hack into cipher and extract key
 
 				if (d) console.timeEnd('smartcrop');
 			}
@@ -89,7 +89,7 @@ function createthumbnail(file,aes,id,imagedata,node,opt)
 				if (!onPreviewRetry && (!n || n.u == u_handle) && fa.indexOf(':1*') < 0)
 				{
 					if (d) console.log('Storing preview...', n);
-					api_storefileattr(this.id,1,this.aes.c[0].slice(0,4),ab2.buffer); // FIXME hack into cipher and extract key
+					api_storefileattr(this.id, 1, this.aes._key[0].slice(0,4), ab2.buffer); // FIXME hack into cipher and extract key
 				}
 
 				if (node) previewimg(node,ab2);

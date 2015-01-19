@@ -6964,10 +6964,6 @@ function closeDialog()
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
-        // if ($.propertiesDialog) {
-            // $('.fm-dialog.' + ($.copyDialog || $.moveDialog) + '-dialog').addClass('arrange-to-front');
-            // $('.fm-dialog.properties-dialog').addClass('arrange-to-back');
-        // }
     } else {
         if ($.dialog === 'properties') {
             propertiesDialog(1);
@@ -7006,9 +7002,7 @@ function closeDialog()
         delete $.copyDialog;
         delete $.moveDialog;
     }
-    if (!$.propertiesDialog) {
-        $('.fm-dialog').removeClass('arrange-to-back');
-    }
+    $('.fm-dialog').removeClass('arrange-to-back');
 
     $('.export-links-warning').addClass('hidden');
     if ($.dialog == 'terms' && $.termsAgree)
@@ -7934,6 +7928,7 @@ function propertiesDialog(close)
 {
     var pd = $('.fm-dialog.properties-dialog'),
         c = $('.properties-elements-counter span');
+    $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
     if (close)
     {
@@ -8131,6 +8126,11 @@ function propertiesDialog(close)
             contextmenuUI(e, n.h.length === 11 ? 5 : 1);
         } else {
             __fsi_close();
+        }
+    });
+    $(document).bind('MegaNodeRename.Properties', function(e, h, name) {
+        if (n.h === h) {
+            pd.find('.properties-name-block .propreties-dark-txt').text(name);
         }
     });
     $(document).bind('MegaCloseDialog.Properties', __fsi_close);
@@ -9128,8 +9128,8 @@ function contactUI() {
 
                 var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
                 $('.fm-start-conversation')
-                    .removeClass('hidden')
-                    .text(startChatTxt);
+                    .removeClass('hidden');
+				$('.fm-start-conversation span').text(startChatTxt);
                 $('.fm-send-files').removeClass('hidden');
 
             } else {

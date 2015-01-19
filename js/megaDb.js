@@ -43,10 +43,12 @@ function MegaDB(name, suffix, version, schema, options) {
     }).then( function ( s ) {
         self.server = s;
         self.dbState = MegaDB.DB_STATE.INITIALIZED;
+        self.trigger('onDbStateReady');
         self.initialize();
     }, function() {
         self.dbState = MegaDB.DB_STATE.FAILED_TO_INITIALIZE;
         self.logger.error("Could not initialise MegaDB: ", arguments, name, version, schema);
+        self.trigger('onDbStateFailed');
     });
 
     return this;
@@ -126,6 +128,8 @@ MegaDB._delayFnCallUntilDbReady = function(fn) {
             );
 
             return $promise;
+        } else if (self.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+            return MegaPromise.reject("Failed to open database.");
         }
     }
 };

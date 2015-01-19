@@ -379,7 +379,7 @@ input[type="checkbox"] {
 	user-select: none;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
-	margin: 17px 11px 0 18px;
+	margin: 17px 11px 0 6px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
 	margin: 12px 11px 0 0;
@@ -906,12 +906,16 @@ input.radioOn, input.radioOff {
 }
 .radio-txt {
 	float: left;
-	font-size: 11px;
+	font-size: 12px;
 	line-height: 16px;
 	color: #666666;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	padding-right: 25px;
 	padding-top: 7px;
+}
+.fm-account-sections {
+	padding-bottom:10px;
+	
 }
 .reset-pass .radio-txt {
 	display: block;
@@ -6908,6 +6912,10 @@ span.search-number {
 	text-align: center;
 	position: relative;
 	cursor: pointer;
+	min-width:50px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	margin: 11px -4px 0 4px;
@@ -6929,9 +6937,7 @@ span.search-number {
 	height: 32px;
 	line-height: 30px;
 }
-.fm-notifications-bottom, .fm-notifications-bottom {
-	padding: 0 9px;
-}
+
 .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span {
 	padding: 0 10px;
 }
@@ -7451,7 +7457,7 @@ span.search-number {
 	-webkit-border-bottom-right-radius: 7px;
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
-	padding-right: 4px;
+	padding-right: 12px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -9644,6 +9650,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	position: relative;
 	padding: 0 12px;
 }
+.browsers-dialog .fm-notifications-bottom {
+	padding: 0 20px 0 0;
+}
 .share-dialog .fm-notifications-bottom {
 	position: static;
 }
@@ -10552,7 +10561,7 @@ span.orange {
 }
 .export-links-dialog .on_off {
 	width: auto;
-	margin: 0 0 0 10px;
+	margin: 0 0 0 -2px;
 	float: left;
 }
 .fm-account-blocks .on_off, .export-links-dialog.on_off {
@@ -18803,7 +18812,7 @@ span.incoming-call-name {
 }
 .start-chat-button {
 	position: absolute;
-	right: 3px;
+	right: 8px;
 	top: 3px;
 	width: 18px;
 	height: 18px;
@@ -18986,6 +18995,9 @@ span.incoming-call-name {
 	text-overflow: ellipsis;
 	padding-right: 10px;
 	max-width: 100%;
+	max-width: -webkit-calc(100% - 56px);
+max-width: -moz-calc(100% - 56px);
+max-width: calc(100% - 56px);
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -19013,10 +19025,12 @@ span.incoming-call-name {
 .contact-top-details .nw-contact-block-avatar {
 	float: left;
 	margin: 22px 22px 0 22px;
+	position:absolute;
 }
 .contact-fingerprint-block {
-	float: right;
-	padding: 45px 45px 0 0;
+	padding: 52px 45px 0 0;
+position: absolute;
+right: 0;
 }
 .contact-fingerprint-title {
 	padding: 0 0 20px 10px;
@@ -19115,9 +19129,14 @@ span.incoming-call-name {
 	padding-right: 0;
 }
 .contact-details-pad {
-	margin-left: 200px;
-	overflow: hidden;
-	padding-top: 44px;
+	margin: 0 255px 0 205px;
+padding-top: 44px;
+vertical-align: top;
+position: relative;
+min-height: 182px;
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+box-sizing: border-box;
 }
 .contact-details-email {
 	font-size: 12px;
@@ -19129,7 +19148,10 @@ span.incoming-call-name {
 }
 .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
 	float: left;
-	margin: 20px 8px 0 0;
+	margin: 20px 4px 0 -4px;
+}
+.fm-question {
+	display:none;
 }
 .contact-share-notification {
 	font-size: 12px;
@@ -19826,7 +19848,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: right -3714px;
 }
 .share-dialog-icon.permissions-icon {
-	margin: 12px;
+	margin: 12px 12px 12px 0;
 }
 .share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
 	border: 2px solid rgba(0,0,0,0.3);

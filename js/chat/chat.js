@@ -602,7 +602,12 @@ var Chat = function() {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
-        'fallbackXmppServer': "https://pxy270n001.karere.mega.nz/bosh",
+        'fallbackXmppServers': [
+            "https://pxy270n001.karere.mega.nz/bosh",
+            "https://pxy270n002.karere.mega.nz/bosh",
+            "https://pxy302n001.karere.mega.nz/bosh",
+            "https://pxy302n002.karere.mega.nz/bosh"
+        ],
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {
@@ -2469,13 +2474,14 @@ Chat.prototype.getBoshServiceUrl = function() {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
                     //$promise.resolve("https://pxy270n001.karere.mega.nz/bosh");
-                    $promise.resolve(self.options.fallbackXmppServer);
+                    $promise.resolve(array_random(self.options.fallbackXmppServers));
                 }
             })
             .fail(function() {
-                self.logger.warn("Could not connect to load balancing service for xmpp, will fallback to: " + self.options.fallbackXmppServer + ".");
+                var server = array_random(self.options.fallbackXmppServers);
+                self.logger.warn("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
-                $promise.resolve(self.options.fallbackXmppServer);
+                $promise.resolve(server);
             });
 
         return $promise;

@@ -1282,6 +1282,9 @@ function array_unique(arr) {
     });
 }
 
+function array_random(arr) {
+    return arr[rand(arr.length - 1)];
+}
 /**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *

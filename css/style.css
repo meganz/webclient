@@ -6940,7 +6940,10 @@ span.search-number {
 	background-position: -7px -9561px;
 }
 /* gray border */
-
+.fm-add-user:hover span, .fm-start-video-call:hover span, .fm-clearbin-button:hover span, .fm-send-files:hover span, .fm-start-call:hover span, .fm-leave-share:hover span, .fm-share-copy:hover span, .fm-share-download:hover span, .contact-send-files:hover span, .fm-start-conversation:hover span, .fm-share-folders:hover span, .fm-verify:hover span, .fm-question:hover span, .fm-chat-end:hover span, .fm-download-as-zip:hover span, .fm-import-to-cloudrive:hover span, .fm-contact-requests:hover span, .fm-received-requests:hover span, .fm-chat-file-button:hover span, .fm-dialog-button:hover span, .fm-account-button:hover span, .avatar-dialog .fm-account-change-avatar:hover span, .top-dialog-login-button:hover span, .nw-chat-button:hover span, .multiple-sharing.expanded .main-body .nw-chat-button:hover span, .fm-chat-attach-button:hover span, .fm-chat-contact-button:hover span,
+.fm-add-user.active span, .fm-start-video-call.active span, .fm-clearbin-button.active span, .fm-send-files.active span, .fm-start-call.active span, .fm-leave-share.active span, .fm-share-copy.active span, .fm-share-download.active span, .contact-send-files.active span, .fm-start-conversation.active span, .fm-share-folders.active span, .fm-verify.active span, .fm-question.active span, .fm-chat-end.active span, .fm-download-as-zip.active span, .fm-import-to-cloudrive.active span, .fm-contact-requests.active span, .fm-received-requests.active span, .fm-chat-file-button.active span, .fm-dialog-button.active span, .fm-account-button.active span, .avatar-dialog .fm-account-change-avatar.active span, .top-dialog-login-button.active span, .nw-chat-button.active span, .multiple-sharing.expanded .main-body .nw-chat-button.active span, .fm-chat-attach-button.active span, .fm-chat-contact-button.active span {
+	color:#666666;
+}
 
 /* blue border */
 .fm-start-call:hover, .fm-start-video-call:hover, .fm-send-files:hover, .fm-add-user:hover, .fm-start-call.active, .fm-start-video-call.active, .fm-send-files.active, .fm-add-user.active {

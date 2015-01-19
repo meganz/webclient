@@ -12308,7 +12308,7 @@ table {
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
-	border: 2px solid rgba(0, 0, 0, .3);
+	border: 2px solid rgba(0, 0, 0, .1);
 	background-color: white;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
@@ -12321,12 +12321,16 @@ table {
 	z-index: 400;
 }
 .redeem-voucher .notification-arrow {
-	height: 8px;
-	position: absolute;
-	top: 0;
-	margin-top: 24px;
 	display: none;
 	z-index: 401;
+	width: 25px;
+	height: 13px;
+	position: absolute;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-position: center -5891px;
+	background-repeat: no-repeat;
+	margin: 16px 0 0 -12px;
+	left: 50%;
 }
 .active.redeem-voucher .notification-arrow {
 	display: block;
@@ -12336,14 +12340,16 @@ table {
 }
 .fm-voucher-body .fm-dialog-new-folder-input.active {
 	width: 250px;
+	float: left;
 }
 .fm-voucher-body input {
 	color: #878787;
 }
 .fm-voucher-button, .fm-voucher-button.active {
-	margin-left: 260px;
+	margin: 0 0 0 260px;
 	background-color: #D42400;
 	border-color: #D42400;
+	float: none;
 	color: white;
 	cursor: pointer;
 }

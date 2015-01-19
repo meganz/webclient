@@ -306,6 +306,14 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             var doAnswer = function() {
                 self.megaChat.incomingCallDialog.hide();
 
+                if(self.callRequest && self.callRequest.sid != eventData.sid) {
+                    self._cancelCallRequest();
+                }
+
+                self.callRequest = {
+                    'sid': eventData.sid
+                };
+
                 eventData.answer(true, {
                     mediaOptions: self.getMediaOptions()
                 });
@@ -442,6 +450,14 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         } else {
+            if(self.callRequest && self.callRequest.sid != eventData.sid) {
+                self._cancelCallRequest();
+            }
+
+            self.callRequest = {
+                'sid': eventData.sid
+            };
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
@@ -511,7 +527,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 []
             )
         );
-        self._resetCallStateNoCall();
+        if(eventData.info.sid == self.callRequest.sid) {
+            self._resetCallStateNoCall();
+        }
     });
     self.bind('call-declined', function(e, eventData) {
         var msg;
@@ -595,7 +613,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 )
             );
         }
-        self._resetCallStateNoCall();
+        if(eventData.info.sid == self.callRequest.sid) {
+            self._resetCallStateNoCall();
+        }
     });
 
     self.bind('call-ended', function(e, eventData) {
@@ -823,18 +843,28 @@ ChatRoom.STATE = {
 ChatRoom.prototype._cancelCallRequest = function() {
     var self = this;
 
+    if(self.megaChat.rtc && self.megaChat.rtc.hangup) { // have support for rtc?
+        var otherUsersJid = self.getParticipantsExceptMe()[0];
+        if(otherUsersJid && self.callRequest) {
+            //self.megaChat.rtc.hangup(otherUsersJid);
+            var sid = self.callRequest.sid;
+            if(sid) {
+                var sess = self.megaChat.rtc.jingle.sessions[sid];
+                if(sess) {
+                    debugger;
+                    self.megaChat.rtc.jingle.terminate(sess, 'hangup');
+                }
+            }
+        }
+    }
+
+
     if(self.callRequest && self.callRequest.cancel) {
         self.callRequest.cancel();
 
         self._resetCallStateNoCall();
     }
-
-    if(self.megaChat.rtc && self.megaChat.rtc.hangup) { // have support for rtc?
-        var otherUsersJid = self.getParticipantsExceptMe()[0];
-        if(otherUsersJid) {
-            self.megaChat.rtc.hangup(otherUsersJid);
-        }
-    }
+    self.callRequest = null;
 };
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
@@ -923,7 +953,12 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
         // current-calling indicator
         if(self.megaChat.activeCallRoom && self.megaChat.activeCallRoom.roomJid != self.roomJid) {
             self.megaChat.activeCallRoom._cancelCallRequest();
+        } else if(self.callRequest && self.callRequest.sid != eventData.sid) {
+            self._cancelCallRequest();
         }
+        self.callRequest = {
+            'sid': eventData.sid
+        };
 
         $('.drag-handle', self.$header).show();
         self.$header.parent().addClass("video-call"); // adds video-call or audio-call class name

@@ -1004,7 +1004,7 @@ function api_proc(q)
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
 
-                            console.error(ex);
+							console.error(ex, ex.stack); // when dumping exceptions, also dump .stack because its reaaallyyy helpful!
                             Soon(function() {
                                 throw ex;
                             });

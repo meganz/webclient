@@ -50,13 +50,15 @@ if (indexedDB)
                 loadfm();
             }
         }
-        if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+4000 > Date.now())
-        {
-            if (d) console.log('existing mDB session, fetch live data');
+        
+        // Turn off IndexedDB on mega.nz for now (need to investigate inconsistencies)
+        //if (localStorage[u_handle + '_mDBactive'] && parseInt(localStorage[u_handle + '_mDBactive'])+4000 > Date.now())
+        //{            
+            //if (d) console.log('existing mDB session, fetch live data');
             mDB=undefined;
             loadfm();
             return;
-        }
+        //}
         mDBact = Math.random();
         mDBactive(mDBact);
         loadingDialog.show();

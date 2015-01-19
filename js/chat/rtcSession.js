@@ -1237,7 +1237,7 @@ RtcSession.prototype = {
     try {
         $(this).trigger(name, [obj]);
     } catch(e) {
-        console.warn("Exception thrown from user event handler '"+name+"':\n"+e.stack?e.stack:e);
+        console.error("Exception thrown from user event handler '"+name+"':\n"+e.stack?e.stack:e);
     }
  },
  /**

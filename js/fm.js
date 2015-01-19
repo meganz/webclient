@@ -1411,25 +1411,13 @@ function addContactUI()
             .focus();
     }
 
-    //Contact request textfiled scripts
-    $('.add-user-notification textarea').bind('focus', function() {
+    // Contact request text filled scripts
+    $('.add-user-notification textarea').on('focus', function() {
         var $this = $(this);
-        $('.add-user-notification').addClass('active');
-        if ($this.val() == 'Hello, join me on MEGA and get access to encrypted storage and communication. Get 50 GB free!') {
-            $this.select();
-            window.setTimeout(function() {
-                $this.select();
-            }, 1);
-            function mouseUpHandler() {
-                $this.off("mouseup", mouseUpHandler);
-                return false;
-            }
-            $this.mouseup(mouseUpHandler);
-        }
+        $this.parent().addClass('active');
     });
 
-    $('.add-user-notification textarea').bind('blur', function() {
-        var $this = $(this);
+    $('.add-user-notification textarea').on('blur', function() {
         $('.add-user-notification').removeClass('active');
     });
 
@@ -1719,10 +1707,12 @@ function addContactUI()
             } else {
                 var $mails = $('.token-input-list-mega .token-input-token-mega');
                 var mailNum = $mails.length;
+                var emailText = $('.add-user-textarea textarea').val();
+                                
                 if (mailNum) {
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
-                        if (!M.inviteContact(M.u[u_handle].m, email, $('.add-user-textarea').text())) {
+                        if (!M.inviteContact(M.u[u_handle].m, email, emailText)) {
                             $('.empty-sent-requests').addClass('hidden');
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
@@ -3537,6 +3527,7 @@ function avatarDialog(close)
     imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
         {
             cropButton: $('#fm-change-avatar'),
+            dragDropUploadPrompt:l[1390],
             onCrop: function(croppedDataURI)
             {
                 var data = dataURLToAB(croppedDataURI);
@@ -3825,7 +3816,9 @@ var FMShortcuts = function() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            selectionManager.select_all();
+            if(typeof(selectionManager) != 'undefined' && selectionManager) {
+                selectionManager.select_all();
+            }
             return false; // stop prop.
         } else if (
             (charTyped == "c" || charTyped == "x") &&
@@ -5688,7 +5681,7 @@ function sectionUIopen(id) {
             $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
         } else if (id === 'cloud-drive') {
             $('.fm-main').addClass('active-folder-link');
-            $('.fm-right-header').addClass('folder-link')
+            $('.fm-right-header').addClass('folder-link');
             $('.nw-fm-left-icon.folder-link').addClass('active');
             $('.fm-left-menu').addClass('folder-link');
             $('.nw-fm-tree-header.folder-link').show();
@@ -9280,4 +9273,25 @@ function FMResizablePane(element, opts) {
         $element.data('fmresizable', this)
     }
     return this;
+}
+
+/**
+ * Highlights some text inside an element as if you had selected it with the mouse
+ * From http://stackoverflow.com/a/987376
+ * @param {String} elementId
+ */
+function selectText(elementId) {
+    var doc = document, text = doc.getElementById(element), range, selection;
+    
+    if (doc.body.createTextRange) {
+        range = document.body.createTextRange();
+        range.moveToElementText(text);
+        range.select();
+    } else if (window.getSelection) {
+        selection = window.getSelection();        
+        range = document.createRange();
+        range.selectNodeContents(text);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
 }

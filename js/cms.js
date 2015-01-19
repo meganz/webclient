@@ -114,7 +114,8 @@ function cmsObjectToId(name)
 		})
 		q = null;
 	};
-	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + name);
+	var srv = apipath.replace(/https?:\/\//, '').replace(/\//g, '')
+	q.open("GET", (localStorage.cms || "//cms.mega.nz/") + srv + '/' + name);
 	q.responseType = 'arraybuffer';
 	q.send();
 }
@@ -182,7 +183,7 @@ function _cms_request(ids, next)
 		, q  = []
 		, done = 0
 	for (var i in ids) {
-		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true, apipath: 'https://eu.api.mega.co.nz/' })
+		args.push({fa:i+":1*" + ids[i], k:i, plaintext: true})
 		q[i] = null
 	}
 

@@ -20,7 +20,7 @@ var tlvstore = (function () {
      * character only!</p>
      */
     var ns = {};
-    
+
     /**
      * Generates a binary encoded TLV record from a key-value pair.
      *
@@ -37,8 +37,8 @@ var tlvstore = (function () {
                    + String.fromCharCode(value.length & 0xff);
         return key + '\u0000' + length + value;
     };
-    
-    
+
+
     /**
      * Generates a binary encoded TLV record container from an object containing
      * key-value pairs.
@@ -56,8 +56,8 @@ var tlvstore = (function () {
         }
         return result;
     };
-    
-    
+
+
     /**
      * Splits and decodes a TLV record off of a container into a key-value pair and
      * returns the record and the rest.
@@ -79,8 +79,8 @@ var tlvstore = (function () {
         var rest = tlvContainer.substring(keyLength + valueLength + 3);
         return {'record': [key, value], 'rest': rest};
     };
-    
-    
+
+
     /**
      * Decodes a binary encoded container of TLV records into an object
      * representation.
@@ -100,8 +100,8 @@ var tlvstore = (function () {
         }
         return container;
     };
-    
-    
+
+
     /**
      * "Enumeration" of block cipher encryption schemes for private attribute
      * containers.
@@ -124,8 +124,8 @@ var tlvstore = (function () {
         AES_GCM_12_16: 0x03,
         AES_GCM_10_08: 0x04,
     };
-    
-    
+
+
     /**
      * Parameters for supported block cipher encryption schemes.
      */
@@ -136,8 +136,8 @@ var tlvstore = (function () {
         0x03: {nonceSize: 12, macSize: 16}, // BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
         0x04: {nonceSize: 10, macSize:  8}, // BLOCK_ENCRYPTION_SCHEME.AES_GCM_10_08
     };
-    
-    
+
+
     /**
      * Encrypts clear text data to an authenticated ciphertext, armoured with
      * encryption mode indicator and IV.
@@ -168,8 +168,8 @@ var tlvstore = (function () {
         return String.fromCharCode(mode) + asmCrypto.bytes_to_string(nonceBytes)
                + asmCrypto.bytes_to_string(cipherBytes);
     };
-    
-    
+
+
     /**
      * Decrypts an authenticated cipher text armoured with a mode indicator and IV
      * to clear text data.
@@ -197,6 +197,6 @@ var tlvstore = (function () {
         return decodeURIComponent(escape(asmCrypto.bytes_to_string(clearBytes)));
     };
 
-    
+
     return ns;
 }());

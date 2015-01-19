@@ -9094,17 +9094,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-color: rgba(6,160,236,1);
 }
 .fm-chat-popup-button.start-audio {
-	background-position: -1px -1764px;
+	background-position: 1px -1799px;
 }
 .fm-chat-popup-button.start-audio:hover, .fm-chat-popup-button.start-audio.active {
-	background-position: -1px -2004px;
+	background-position: 0px -2259px;
 	background-color: rgba(29,161,233,1);
 }
 .fm-chat-popup-button.start-video {
-	background-position: 1px -1799px;
+	background-position: -1px -1764px;
 }
 .fm-chat-popup-button.start-video:hover, .fm-chat-popup-button.start-video.active {
-	background-position: 0px -2259px;
+	background-position: -1px -2004px;
 	background-color: rgba(29,161,233,1);
 }
 /** debug emoticons **/

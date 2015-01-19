@@ -16,18 +16,18 @@ var chatui;
 (function() {
     var createChatDialog;
     chatui = function(id) {
-	
+
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyGrids();
-		
+
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
         $('.fm-right-account-block').addClass('hidden');
-		$('.contacts-details-block').addClass('hidden');
-		
-		$('.shared-grid-view,.shared-blocks-view').addClass('hidden');
-		
+        $('.contacts-details-block').addClass('hidden');
+
+        $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+
 
         $('.fm-right-files-block').removeClass('hidden');
 
@@ -192,7 +192,7 @@ var chatui;
                 $('.copy-dialog').removeClass('hidden');
                 handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
-				$('body').addClass('overlayed');
+                $('body').addClass('overlayed');
             });
 
             $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
@@ -428,13 +428,13 @@ var chatui;
 
                     return false;
                 } else {
-					e.preventDefault();
-				}
+                    e.preventDefault();
+                }
             } else if (key == 13) {
-				if(msg.trim().length == 0) {
-					e.preventDefault();
-				}
-			}
+                if(msg.trim().length == 0) {
+                    e.preventDefault();
+                }
+            }
 
         });
         $('.message-textarea').unbind('blur.stoppedcomposing');

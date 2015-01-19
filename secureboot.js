@@ -404,7 +404,7 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 8, writable : false });
+		Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
 		if (!d || onBetaW)
 		{
 			var __cdumps = [], __cd_t;
@@ -788,28 +788,28 @@ else
         };
 
         if (page)
-	{
-		if (page.indexOf('%25') !== -1)
-		{
-			do {
-				page = page.replace('%25','%', 'g');
-			} while (~page.indexOf('%25'));
-		}
-		if (page.indexOf('%21') !== -1)
-		{
-			page = page.replace('%21','!', 'g');
-			document.location.hash = page;
-		}
+        {
+            if (page.indexOf('%25') !== -1)
+            {
+                do {
+                    page = page.replace('%25','%', 'g');
+                } while (~page.indexOf('%25'));
+            }
+            if (page.indexOf('%21') !== -1)
+            {
+                page = page.replace('%21','!', 'g');
+                document.location.hash = page;
+            }
 
-		page = page.replace('#','');
-		for (var p in subpages)
-		{
-			if (page.substr(0,p.length) == p)
-			{
-				for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
-			}
-		}
-	}
+            page = page.replace('#','');
+            for (var p in subpages)
+            {
+                if (page.substr(0,p.length) == p)
+                {
+                    for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
+                }
+            }
+        }
         var downloading = false;
         var ul_uploading = false;
         var lightweight=false;
@@ -875,38 +875,15 @@ else
         {
             l=[];
             var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
+            if (localStorage.allowBreakpointsOnReload) r = '';
             while (i--) l[i]='l';
             for (var i in jsl)
             {
-                // If in Development turn off the current time string being appended to the URL.
-                // This enables debugging as breakpoints are not removed on page refresh.
-                var timeString = r;
-                if (d) {
-                    timeString = '';
-                }
-                
-                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + timeString + '"></sc' + 'ript>');
+                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + r + '"></sc' + 'ript>');
                 else if (jsl[i].j === 2)
                 {
                     if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
-                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
-                }
-            }
-
-            if ( 0 ) for (var k in jsl2)
-            {
-                // If in Development turn off the random string being appended to the URL.
-                // This enables debugging as breakpoints are not removed on page refresh.
-                var randomString = Math.random();
-                if (d) {
-                    randomString = '';
-                }
-                
-                if (jsl2[k].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl2[k].f + '?r=' + randomString + '"></sc' + 'ript>');
-                else if (jsl2[k].j === 2)
-                {
-                    if ((m && (jsl2[k].m)) || ((!m) && (jsl2[k].d)))
-                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl2[k].f + '" />');
+                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '?r=' + r + '" />');
                 }
             }
         }

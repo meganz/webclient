@@ -2473,8 +2473,9 @@ Chat.prototype.getBoshServiceUrl = function() {
                 if(r.xmpp && r.xmpp.length > 0) {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    //$promise.resolve("https://pxy270n001.karere.mega.nz/bosh");
-                    $promise.resolve(array_random(self.options.fallbackXmppServers));
+                    var server = array_random(self.options.fallbackXmppServers);
+                    self.logger.warn("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
+                    $promise.resolve(server);
                 }
             })
             .fail(function() {

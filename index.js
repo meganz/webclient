@@ -243,6 +243,34 @@ function init_page()
 		parsepage(pages['blogarticle']);
 		init_blog();
 	}
+	else if (page.substr(0,9) == 'corporate')
+	{
+		function doRenderCorpPage()
+		{
+			if (window.corpTemplate) {
+				parsepage(window.corpTemplate)
+				topmenuUI();
+				loadingDialog.hide();
+				CMS.loaded('corporate')
+				mainScroll();
+				return;
+			}
+
+			loadingDialog.show();
+			CMS.watch('corporate', function() {
+				doRenderCorpPage();
+			});
+			CMS.get('corporate', function(err, content) {
+				parsepage(window.corpTemplate = content.html);
+				topmenuUI();
+				loadingDialog.hide();
+				mainScroll();
+			});
+		}
+
+		doRenderCorpPage();
+		page = 'cpage';
+	}
 	else if (page.substr(0,5) == 'page_')
 	{
 		var cpage = decodeURIComponent(page.substr(5,page.length-2));
@@ -482,7 +510,7 @@ function init_page()
 				return;
 			}
 			loadingDialog.show();
-			CMS.watch(cpage, function() {
+			CMS.watch('help:' + lang, function() {
 				doRenderHelp();
 			});
 			CMS.get('help:' + lang, function(err, content) {
@@ -1330,7 +1358,7 @@ function topmenuUI() {
 		else if (c.indexOf('register') > -1) document.location.hash = 'register';
 		else if (c.indexOf('login') > -1) document.location.hash = 'login';
 		else if (c.indexOf('aboutus') > -1) document.location.hash = 'about';
-		else if (c.indexOf('corporate') > -1) document.location.hash = 'page_corporate';
+		else if (c.indexOf('corporate') > -1) document.location.hash = 'corporate';
 		else if (c.indexOf('megablog') > -1) document.location.hash = 'blog';
 		else if (c.indexOf('credits') > -1) document.location.hash = 'credits';
 		else if (c.indexOf('chrome') > -1) document.location.hash = 'chrome';

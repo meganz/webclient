@@ -129,6 +129,7 @@ function cmsObjectToId(name)
  */
 var fetching = {};
 function doRequest(id) {
+	if (!id) throw new Error
 	if (d) console.error("CMS fetch element", id)
 	if (cmsToId === null) {
 		if (!booting) {
@@ -241,6 +242,8 @@ var CMS = {
 		});
 	},
 
+	loaded: loaded,
+
 	img : function(id) {
 		if (!assets[id]) {
 			this.get(id, function(err, obj) {
@@ -299,5 +302,10 @@ CMS.on('corporate', function()
 		$this.addClass('active');			
 		mainScroll();
 	});
-	$('.new-left-menu-link:first').trigger('click');
+	var ctype = document.location.hash.substr(11)
+	if ($('#' + ctype).length == 1) {
+		$('#' + ctype).trigger('click');
+	} else {
+		$('.new-left-menu-link:first').trigger('click');
+	}
 });

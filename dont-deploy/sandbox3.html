@@ -35,6 +35,8 @@
         localStorage.clear();
         
         localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+        //localStorage.apipath = 'https://staging.api.mega.co.nz/';
+        
 
         localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
@@ -45,7 +47,9 @@
 
         //localStorage.chatDisabled = 1;
         
-        window.location = '../index.html';
+        localStorage.allowBreakpointsOnReload = 1;
+        
+        window.location = '../index.html';        
     </script>
 </head>
 <body>

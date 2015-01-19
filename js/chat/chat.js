@@ -16,18 +16,18 @@ var chatui;
 (function() {
     var createChatDialog;
     chatui = function(id) {
-	
+
         //XX: code maintanance: move this code to MegaChat.constructor() and .show(jid)
         hideEmptyGrids();
-		
+
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
         $('.fm-right-account-block').addClass('hidden');
-		$('.contacts-details-block').addClass('hidden');
-		
-		$('.shared-grid-view,.shared-blocks-view').addClass('hidden');
-		
+        $('.contacts-details-block').addClass('hidden');
+
+        $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+
 
         $('.fm-right-files-block').removeClass('hidden');
 
@@ -192,7 +192,7 @@ var chatui;
                 $('.copy-dialog').removeClass('hidden');
                 handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Send');
                 $('.fm-dialog-overlay').removeClass('hidden');
-				$('body').addClass('overlayed');
+                $('body').addClass('overlayed');
             });
 
             $('.as-zip', $chatDownloadPopup).bind('click.megachat', function() {
@@ -428,13 +428,13 @@ var chatui;
 
                     return false;
                 } else {
-					e.preventDefault();
-				}
+                    e.preventDefault();
+                }
             } else if (key == 13) {
-				if(msg.trim().length == 0) {
-					e.preventDefault();
-				}
-			}
+                if(msg.trim().length == 0) {
+                    e.preventDefault();
+                }
+            }
 
         });
         $('.message-textarea').unbind('blur.stoppedcomposing');
@@ -593,15 +593,21 @@ var Chat = function() {
     this.lastOpenedChat = null;
     this._myPresence = localStorage.megaChatPresence;
 
-    var xmppDomain = "developers.mega.co.nz";
+    var xmppDomain = "karere.mega.nz";
     if(localStorage.megaChatUseSandbox) {
-        xmppDomain = "sandbox.developers.mega.co.nz";
+        xmppDomain = "developers.mega.co.nz";
     }
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
         'xmppDomain': xmppDomain,
-        'loadbalancerService': 'karere-001.developers.mega.co.nz:4434',
+        'loadbalancerService': 'gelb530n001.karere.mega.nz:443',
+        'fallbackXmppServers': [
+            "https://pxy270n001.karere.mega.nz/bosh",
+            "https://pxy270n002.karere.mega.nz/bosh",
+            "https://pxy302n001.karere.mega.nz/bosh",
+            "https://pxy302n002.karere.mega.nz/bosh"
+        ],
         'rtcSession': {
             'crypto': {
                 encryptMessageForJid: function (msg, bareJid) {
@@ -650,12 +656,12 @@ var Chat = function() {
             iceServers:[
 //                 {url: 'stun:stun.l.google.com:19302'},
                 {
-                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:karere-001.developers.mega.co.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -2383,7 +2389,7 @@ Chat.prototype.processNewUser = function(u) {
     self.logger.debug("added: ", u);
 
 
-    this.karere.subscribe(megaChat.getJidFromNodeId(u));
+    this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderContactTree();
     self.renderMyStatus();
@@ -2404,7 +2410,7 @@ Chat.prototype.processRemovedUser = function(u) {
     if(room) {
         room.destroy(true);
     }
-    this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
+    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderContactTree();
     self.renderMyStatus();
@@ -2455,21 +2461,28 @@ Chat.prototype.getChatNum = function(idx) {
  * BOSH service that should be used for connecting the current user.
  */
 Chat.prototype.getBoshServiceUrl = function() {
+    var self = this;
+
     if(localStorage.megaChatUseSandbox) {
-        return "https://sandbox.developers.mega.co.nz/bosh";
+        return "https://karere-005.developers.mega.co.nz/bosh";
     } else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=xmpp")
+        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
             .done(function(r) {
                 if(r.xmpp && r.xmpp.length > 0) {
                     $promise.resolve("https://" + r.xmpp[0].host + ":" + r.xmpp[0].port + "/bosh");
                 } else {
-                    $promise.resolve("https://karere-005.developers.mega.co.nz:443/bosh");
+                    var server = array_random(self.options.fallbackXmppServers);
+                    self.logger.warn("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
+                    $promise.resolve(server);
                 }
             })
             .fail(function() {
-                $promise.reject();
+                var server = array_random(self.options.fallbackXmppServers);
+                self.logger.warn("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
+
+                $promise.resolve(server);
             });
 
         return $promise;

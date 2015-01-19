@@ -202,6 +202,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     $('.chat-button > span', self.$header).unbind("click.megaChat");
 
     $('.chat-button.fm-start-call', self.$header).bind("click.megaChat", function() {
+        if($(this).is(".disabled")) {
+            return false;
+        }
         var positionX = $(this).position().left;
         var sendFilesPopup = $('.fm-start-call-popup', self.$header);
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -298,7 +301,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     self.bind('call-incoming-request', function(e, eventData) {
         if(eventData.peerMedia) {
-            $('.btn-chat-call', self.$header).hide();
+            $('.btn-chat-call', self.$header).addClass("disabled");
 
             var doAnswer = function() {
                 self.megaChat.incomingCallDialog.hide();
@@ -390,7 +393,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "incoming-call",
                     participants[0],
                     "incoming-call",
-                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer),
+                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer),
                     [],
                     {
                         'answer': {
@@ -504,7 +507,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 "rejected-call-" + unixtime(),
                 eventData.peer,
                 "call-timeout",
-                "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
+                "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
                 []
             )
         );
@@ -531,7 +534,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(Strophe.getBareJidFromJid(peer) == self.megaChat.karere.getBareJid()) {
             userJid = self.getParticipantsExceptMe()[0];
         }
-        msg = "Incoming Call with " + self.megaChat.getContactNameFromJid(userJid) + " was rejected.";
+        msg = "Incoming call with " + self.megaChat.getContactNameFromJid(userJid) + " was rejected.";
 
 
         self.appendDomMessage(
@@ -577,7 +580,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-from-different-device",
-                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was handled on some other device.",
+                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was handled on some other device.",
                     []
                 )
             );
@@ -587,7 +590,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-canceled",
-                    "Incoming Call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
+                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
                     []
                 )
             );
@@ -662,6 +665,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
         $('.my-av-screen', self.$header).append(obj.player);
         self._myAvElement = obj.player;
+        self._myAvElement.play();
     });
 
     self.bind('local-player-remove', function(event, obj) {
@@ -698,8 +702,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
 
 
-    $('.my-av-screen', self.$header).draggable({
-        'containment': self.$header
+    var $avscreen = $('.my-av-screen', self.$header);
+    $avscreen.draggable({
+        'containment': $avscreen.parents('.chat-call-block'),
+        'scroll': false
     });
 
     // activity on a specific room (show, hidden, got new message, etc)
@@ -770,7 +776,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 "conv-started",
                 self.megaChat.karere.getJid(),
                 "conv-started",
-                "You had joined the conversation.",
+                "You have joined the conversation.",
                 [],
                 {},
                 !self.isActive()
@@ -897,7 +903,7 @@ ChatRoom.prototype._startCall = function() {
             "outgoing-call",
             participants[0],
             "outgoing-call",
-            "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + "...",
+            "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + " ...",
             [], {
                 'reject': {
                     'type': 'secondary',
@@ -911,7 +917,7 @@ ChatRoom.prototype._startCall = function() {
 ChatRoom.prototype._callStartedState = function(e, eventData) {
     var self = this;
 
-    $('.btn-chat-call', self.$header).hide();
+    $('.btn-chat-call', self.$header).addClass('disabled');
 
     if(e.type == "call-init" || e.type == "call-answered") {
         // current-calling indicator
@@ -1156,7 +1162,7 @@ ChatRoom.prototype._resetCallStateNoCall = function() {
     $('.chat-header-indicator.muted-video', self.$header).addClass("hidden");
     $('.chat-header-indicator.muted-audio', self.$header).addClass("hidden");
 
-    $('.btn-chat-call', self.$header).show();
+    $('.btn-chat-call', self.$header).removeClass('disabled')
 
 
     if(callWasActive) {
@@ -1291,7 +1297,7 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
 ChatRoom.prototype._resetCallStateInCall = function() {
     var self = this;
 
-    $('.btn-chat-call', self.$header).hide();
+    $('.btn-chat-call', self.$header).addClass('disabled');
 
     if(!self.options.mediaOptions.audio) {
         $('.audio-icon', self.$header).addClass("active");
@@ -1741,27 +1747,28 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
      */
 
     if(self.callIsActive === false) {
-        $('.btn-chat-call', self.$header).hide();
+        $('.btn-chat-call', self.$header).addClass('disabled');
 
         if(presenceCssClass == "offline") {
-            $('.btn-chat-call', self.$header).hide();
+            $('.btn-chat-call', self.$header).addClass('disabled');
         } else {
-            $('.btn-chat-call', self.$header).show();
+            $('.btn-chat-call', self.$header).removeClass('disabled');
         }
     } else {
         var $video = $('.others-av-screen.video-call-container video', self.$header);
         if($video.length > 0) {
-            var $confCallUi = $('.chat-call-block', self.$header);
-            var $videoContainer = $video.parent();
-            var targetHeight = $confCallUi.outerHeight() - 50;
+            // not needed anymore, fixed by Andrei using css?
+            //var $confCallUi = $('.chat-call-block', self.$header);
+            //var $videoContainer = $video.parent();
+            //var targetHeight = $confCallUi.outerHeight() - 50;
 
-            $videoContainer.css('height', targetHeight + 8);
-            $videoContainer.css('width',
-                Math.min(
-                    Math.round((targetHeight/9)*16) + 8,
-                    $video.outerWidth() + 8
-                )
-            );
+            //$videoContainer.css('height', targetHeight + 8);
+            //$videoContainer.css('width',
+            //    Math.min(
+            //        Math.round((targetHeight/9)*16) + 8,
+            //        $video.outerWidth() + 8
+            //    )
+            //);
         }
     }
 
@@ -1997,6 +2004,11 @@ ChatRoom.prototype.appendMessage = function(message) {
 
     var name = self.megaChat.getContactNameFromJid(jid);
     var contact = self.megaChat.getContactFromJid(jid);
+
+    if(!contact) {
+        self.logger.error("Missing contact for jid: ", jid);
+        return false;
+    }
 
     $('.nw-contact-avatar', $message).replaceWith(self._generateContactAvatarElement(jid));
 

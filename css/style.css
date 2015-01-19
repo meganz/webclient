@@ -291,7 +291,7 @@ a.nlanguage-lnk:hover .nlanguage-tooltip {
 	background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
-	color: #d9290b;
+	color: #BF1900;
 }
 .languages-dialog-body {
 	min-height: 200px;
@@ -379,10 +379,10 @@ input[type="checkbox"] {
 	user-select: none;
 }
 .fm-dialog .checkboxOff, .fm-dialog .checkboxOn {
-	margin: 17px 11px 0 18px;
+	margin: 17px 11px 0 6px;
 }
 .top-login-popup .checkboxOn, .top-login-popup .checkboxOff {
-	margin: 9px 11px 0 0;
+	margin: 12px 11px 0 0;
 }
 .new-registration-checkbox .checkboxOn, .new-registration-checkbox .checkboxOff {
 	margin: 0 11px 20px 0;
@@ -418,7 +418,7 @@ input[type="checkbox"] {
 	user-select: none;
 }
 .top-login-popup .radio-txt {
-	padding-top: 11px;
+	padding-top: 14px;
 	font-size: 12px;
 }
 .new-registration-checkbox .radio-txt {
@@ -489,7 +489,7 @@ label span.black {
 	display: block;
 }
 .red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active, h1 span.red, h2 span.red, p span.red {
-	color: #d9290b;
+	color: #BF1900;
 }
 .progressbar {
 	background-color: rgba(0,0,0,0.2);
@@ -662,7 +662,7 @@ label span.black {
 	margin-top: 5px;
 }
 a.account-manage-button:hover {
-	background-color: #D9290B;
+	background-color: #BF1900;
 	color: white;
 }
 .account-bandwidth-txt {
@@ -906,12 +906,16 @@ input.radioOn, input.radioOff {
 }
 .radio-txt {
 	float: left;
-	font-size: 11px;
+	font-size: 12px;
 	line-height: 16px;
 	color: #666666;
 	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 	padding-right: 25px;
 	padding-top: 7px;
+}
+.fm-account-sections {
+	padding-bottom:10px;
+	
 }
 .reset-pass .radio-txt {
 	display: block;
@@ -1063,7 +1067,7 @@ input.radioOn, input.radioOff {
 	box-sizing: border-box;
 	padding: 1px 0 0 0;
 	text-align: center;
-	background-color: #D9290B;
+	background-color: #BF1900;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
@@ -1151,7 +1155,6 @@ a.blog-button:hover {
 }
 .notification-num {
 	display: inline-block;
-	position: relative;
 	z-index: 1;
 	margin: 6px 0 -22px 19px;
 }
@@ -1675,7 +1678,7 @@ a.nt-back-button:hover {
 	padding: 0 10px 0 8px;
 }
 a.nt-back-button:hover span {
-	background-color: #D9290B;
+	background-color: #BF1900;
 	color: white;
 }
 .nt-settings-button, a.nt-settings-button, a.nt-settings-button:link, a.nt-settings-button:visited, a.nt-settings-button:active {
@@ -1692,7 +1695,7 @@ a.nt-back-button:hover span {
 	float: left;
 }
 a.nt-settings-button:hover {
-	background-color: #D9290B;
+	background-color: #BF1900;
 	color: white;
 }
 a.nt-settings-button:hover span {
@@ -2656,7 +2659,7 @@ strong.small-header {
 	display: block;
 }
 .blog-new-full ul li a {
-	color: #d9290b;
+	color: #BF1900;
 }
 .blog-new-full ul ul {
 	margin: 0 0 0 30px;
@@ -3092,7 +3095,7 @@ img.blog-new-logos {
 	box-sizing: border-box;
 }
 .browsers-logo-lnk:hover {
-	border: 3px solid #D21F00;
+	border: 3px solid #BF1900;
 	height: 186px;
 	margin: -1px;
 }
@@ -6889,9 +6892,7 @@ span.search-number {
 	-webkit-border-radius: 12px;
 	border-radius: 12px;
 }
-
-.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span, .fm-chat-end span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-contact-requests span, .fm-received-requests span, .fm-chat-file-button span,
-.fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span {
+.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span, .fm-chat-end span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-contact-requests span, .fm-received-requests span, .fm-chat-file-button span, .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(255,255,255,1);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -6908,6 +6909,13 @@ span.search-number {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -1px -8510px;
+	text-align: center;
+	position: relative;
+	cursor: pointer;
+	min-width:50px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button {
 	margin: 11px -4px 0 4px;
@@ -6918,9 +6926,20 @@ span.search-number {
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
+.fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
+	margin: 8px -4px 0 4px;
+	height: 40px;
+}
+.top-dialog-login-button {
+	margin-top: 3px;
+}
+.fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span {
+	height: 32px;
+	line-height: 30px;
+}
+
 .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span {
-	padding:0 10px;
-	
+	padding: 0 10px;
 }
 .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button {
 	float: left;
@@ -6933,7 +6952,7 @@ span.search-number {
 	top: 12px;
 }
 .fm-chat-file-button span {
-	padding:0 10px;
+	padding: 0 10px;
 }
 .fm-start-video-call span {
 	background-position: -7px -9531px;
@@ -6943,8 +6962,12 @@ span.search-number {
 	background-position: -7px -9561px;
 }
 /* gray border */
-
-
+.fm-add-user:hover, .fm-start-video-call:hover, .fm-clearbin-button:hover, .fm-send-files:hover, .fm-start-call:hover, .fm-leave-share:hover, .fm-share-copy:hover, .fm-share-download:hover, .contact-send-files:hover, .fm-start-conversation:hover, .fm-share-folders:hover, .fm-verify:hover, .fm-question:hover, .fm-chat-end:hover, .fm-download-as-zip:hover, .fm-import-to-cloudrive:hover, .fm-contact-requests:hover, .fm-received-requests:hover, .fm-dialog-button:hover, .fm-account-button:hover, .avatar-dialog .fm-account-change-avatar:hover, .top-dialog-login-button:hover, .nw-chat-button:hover, .multiple-sharing.expanded .main-body .nw-chat-button:hover, .fm-chat-attach-button:hover, .fm-chat-contact-button:hover, .fm-add-user.active, .fm-start-video-call.active, .fm-clearbin-button.active, .fm-send-files.active, .fm-start-call.active, .fm-leave-share.active, .fm-share-copy.active, .fm-share-download.active, .contact-send-files.active, .fm-start-conversation.active, .fm-share-folders.active, .fm-verify.active, .fm-question.active, .fm-chat-end.active, .fm-download-as-zip.active, .fm-import-to-cloudrive.active, .fm-contact-requests.active, .fm-received-requests.active, .fm-dialog-button.active, .fm-account-button.active, .avatar-dialog .fm-account-change-avatar.active, .top-dialog-login-button.active, .nw-chat-button.active, .multiple-sharing.expanded .main-body .nw-chat-button.active, .fm-chat-attach-button.active, .fm-chat-contact-button.active {
+	background-color: rgba(0,0,0,0.15);
+}
+.fm-add-user:hover span, .fm-start-video-call:hover span, .fm-clearbin-button:hover span, .fm-send-files:hover span, .fm-start-call:hover span, .fm-leave-share:hover span, .fm-share-copy:hover span, .fm-share-download:hover span, .contact-send-files:hover span, .fm-start-conversation:hover span, .fm-share-folders:hover span, .fm-verify:hover span, .fm-question:hover span, .fm-chat-end:hover span, .fm-download-as-zip:hover span, .fm-import-to-cloudrive:hover span, .fm-contact-requests:hover span, .fm-received-requests:hover span, .fm-chat-file-button:hover span, .fm-dialog-button:hover span, .fm-account-button:hover span, .avatar-dialog .fm-account-change-avatar:hover span, .top-dialog-login-button:hover span, .nw-chat-button:hover span, .multiple-sharing.expanded .main-body .nw-chat-button:hover span, .fm-chat-attach-button:hover span, .fm-chat-contact-button:hover span, .fm-add-user.active span, .fm-start-video-call.active span, .fm-clearbin-button.active span, .fm-send-files.active span, .fm-start-call.active span, .fm-leave-share.active span, .fm-share-copy.active span, .fm-share-download.active span, .contact-send-files.active span, .fm-start-conversation.active span, .fm-share-folders.active span, .fm-verify.active span, .fm-question.active span, .fm-chat-end.active span, .fm-download-as-zip.active span, .fm-import-to-cloudrive.active span, .fm-contact-requests.active span, .fm-received-requests.active span, .fm-chat-file-button.active span, .fm-dialog-button.active span, .fm-account-button.active span, .avatar-dialog .fm-account-change-avatar.active span, .top-dialog-login-button.active span, .nw-chat-button.active span, .multiple-sharing.expanded .main-body .nw-chat-button.active span, .fm-chat-attach-button.active span, .fm-chat-contact-button.active span {
+	color: #666666;
+}
 /* blue border */
 .fm-start-call:hover, .fm-start-video-call:hover, .fm-send-files:hover, .fm-add-user:hover, .fm-start-call.active, .fm-start-video-call.active, .fm-send-files.active, .fm-add-user.active {
 	background-color: rgba(43,166,222,0.3);
@@ -6953,19 +6976,15 @@ span.search-number {
 	color: rgba(43,166,222,1);
 }
 /* red border */
-.fm-chat-end:hover, .fm-chat-end.active,  .fm-chat-file-button.secondary-button:hover, .fm-chat-file-button.secondary-button.active,
-.fm-dialog-button.red:hover, .nw-chat-button.red:hover, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover, .fm-chat-attach-button.red:hover, .fm-chat-contact-button.red:hover,
-.fm-dialog-button.red.active, .nw-chat-button.red.active, .multiple-sharing.expanded .main-body .nw-chat-button.red.active, .fm-chat-attach-button.red.active, .fm-chat-contact-button.red.active {
-	background-color: rgba(217,0,7,0.15);
+.fm-chat-end:hover, .fm-chat-end.active, .fm-chat-file-button.secondary-button:hover, .fm-chat-file-button.secondary-button.active, .fm-dialog-button.red:hover, .nw-chat-button.red:hover, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover, .fm-chat-attach-button.red:hover, .fm-chat-contact-button.red:hover, .fm-dialog-button.red.active, .nw-chat-button.red.active, .multiple-sharing.expanded .main-body .nw-chat-button.red.active, .fm-chat-attach-button.red.active, .fm-chat-contact-button.red.active {
+	background-color: rgba(217,0,7,0.2);
 }
-.fm-chat-end:hover span, .fm-chat-end.active span, .fm-chat-file-button.secondary-button:hover span, .fm-chat-file-button.secondary-button.active span,
-.fm-dialog-button.red:hover span, .nw-chat-button.red:hover span, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover span, .fm-chat-attach-button.red:hover span, .fm-chat-contact-button.red:hover span,
-.fm-dialog-button.red.active span, .nw-chat-button.red.active span, .multiple-sharing.expanded .main-body .nw-chat-button.red.active span, .fm-chat-attach-button.red.active span, .fm-chat-contact-button.red.active span {
+.fm-chat-end:hover span, .fm-chat-end.active span, .fm-chat-file-button.secondary-button:hover span, .fm-chat-file-button.secondary-button.active span, .fm-dialog-button.red:hover span, .nw-chat-button.red:hover span, .multiple-sharing.expanded .main-body .nw-chat-button.red:hover span, .fm-chat-attach-button.red:hover span, .fm-chat-contact-button.red:hover span, .fm-dialog-button.red.active span, .nw-chat-button.red.active span, .multiple-sharing.expanded .main-body .nw-chat-button.red.active span, .fm-chat-attach-button.red.active span, .fm-chat-contact-button.red.active span {
 	color: rgba(217,0,7,1);
 }
 /* green border */
 .fm-add-user:hover, .fm-add-user.active, .fm-chat-file-button.primary-button:hover, .fm-chat-file-button.primary-button.active {
-	background-color: rgba(49,181,0,0.15);
+	background-color: rgba(49,181,0,0.2);
 }
 .fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span {
 	color: rgba(49,181,0,1);
@@ -7032,7 +7051,7 @@ span.search-number {
 	background-position: -2px -792px;
 	padding: 0 10px 0 16px;
 }
-.fm-clearbin-button span, .fm-share-download span {
+.fm-clearbin-button, .fm-share-download {
 	background-position: -3px -5820px;
 }
 .fm-download-as-zip span, .fm-import-to-cloudrive span {
@@ -7438,7 +7457,7 @@ span.search-number {
 	-webkit-border-bottom-right-radius: 7px;
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
-	padding-right: 4px;
+	padding-right: 12px;
 }
 .filled-input .create-folder-bottom, .default-dialog-bottom {
 	display: block;
@@ -8528,21 +8547,21 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	cursor: pointer;
 	display: inline-block;
 	height: 32px;
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
-cursor: pointer;
-background-color: rgba(255,255,255,0);
--webkit-transition: background-color 200ms ease-in-out;
--moz-transition: background-color 200ms ease-in-out;
--o-transition: background-color 200ms ease-in-out;
--ms-transition: background-color 200ms ease-in-out;
-transition: background-color 200ms ease-in-out;
-cursor: pointer;
-position: relative;
--moz-border-radius: 12px;
--webkit-border-radius: 12px;
-border-radius: 12px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	cursor: pointer;
+	background-color: rgba(255,255,255,0);
+	-webkit-transition: background-color 200ms ease-in-out;
+	-moz-transition: background-color 200ms ease-in-out;
+	-o-transition: background-color 200ms ease-in-out;
+	-ms-transition: background-color 200ms ease-in-out;
+	transition: background-color 200ms ease-in-out;
+	cursor: pointer;
+	position: relative;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+	border-radius: 12px;
 }
 .fm-chat-message .fm-chat-file-button {
 	margin-top: 0;
@@ -9208,6 +9227,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	width: 480px;
 	margin: -200px 0 0 -240px;
 }
+.fm-dialog.properties-dialog.arrange-to-back {
+	z-index: 1101; /* fm-dialog-overlay's zindex+1 */
+}
 .fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
 	z-index: 900;
 }
@@ -9348,7 +9370,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	line-height: 30px;
 	font-size: 11px;
 	float: left;
-	color: #D21F00;
+	color: #BF1900;
 	padding-left: 10px;
 }
 .notification-txt {
@@ -9568,7 +9590,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: right -578px;
 	background-repeat: no-repeat;
 }
@@ -9626,7 +9648,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius-bottomright: 7px;
 	border-bottom-right-radius: 7px;
 	position: relative;
-	padding-right: 12px;
+	padding: 0 12px;
+}
+.browsers-dialog .fm-notifications-bottom {
+	padding: 0 20px 0 0;
 }
 .share-dialog .fm-notifications-bottom {
 	position: static;
@@ -9636,7 +9661,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius-bottomright: 0;
 	border-bottom-right-radius: 0;
 }
-
 .nw-chat-icons-area {
 	float: left;
 }
@@ -9833,39 +9857,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .nw-chat-expand-arrow::before {
 	content: '\00a0';
 }
-.fm-dialog-button.warning-button {
-	background-color: rgba(143,196,98,0.9);
-}
-.fm-dialog-button.warning-button:hover {
-	background-color: rgba(143,196,98,1);
-}
-.top-dialog-login-button {
-	margin: 5px 0px 10px 0;
-}
-.fm-dialog-button.move-button.active, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
-	cursor: pointer;
-}
-
-.fm-dialog-button.dialog-newfolder-button {
-	float: left;
-	margin-left: 12px;
-}
-.fm-dialog-button.cancel-button.active, .fm-dialog-button.share-button.active, .fm-dialog-button.add-contact-button.active, .fm-dialog-button.cancel-contact-button.active, .fm-dialog-button.notification-button.active, .fm-dialog-button.links-button.active, .fm-dialog-button.quota-later-button.active, .fm-dialog-button.fm-terms-cancel.active, .fm-dialog-button.fm-languages-save.active, .fm-dialog-button.fm-terms-agree.active, .fm-dialog-button.close-button.active, .fm-dialog-button.notifications-button.active, .fm-dialog-button.membership-button.active, .avatar-dialog .fm-account-change-avatar, .fm-dialog-button.warning-button.active, .nw-chat-button.active {
-	cursor: pointer;
+.top-dialog-login-button span {
+	min-width: 40px;
 	position: relative;
 }
-.fm-dialog-button.cancel-button.active:hover, .fm-dialog-button.save-button.active:hover, .fm-dialog-button.add-contact-button.active:hover, .fm-dialog-button.cancel-contact-button.active:hover, .fm-dialog-button.notification-button.active:hover, .fm-dialog-button.links-button.active:hover, .fm-dialog-button.browsers-button.active:hover, .fm-dialog-button.fm-terms-cancel.active:hover, .fm-dialog-button.quota-later-button.active:hover, .fm-dialog-button.close-button.active:hover, .fm-dialog-button.notifications-button.active:hover, .fm-dialog-button.fm-languages-save.active:hover, .fm-dialog-button.membership-button.active:hover, .avatar-dialog .fm-account-change-avatar:hover, .fm-dialog-button.warning-button:hover {
-	color: white;
-	cursor: pointer;
+.fm-dialog-button.dialog-newfolder-button {
+	float: left;
+	margin-left: -4px;
 }
 .fm-account-button {
 	cursor: pointer;
-	display: inline-block;
-	margin: 11px 5px 0 5px;
-	float: none;
-	font-size: 12px;
-	line-height: 25px;
-	height: 26px;
+display: inline-block;
+margin: 4px 0 0 0;
+float: none;
 }
 .fm-dialog-button.links-button {
 	position: relative;
@@ -9877,17 +9881,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	top: 0;
 	left: 0;
 }
-.fm-dialog-button.quota-upgrade-button.active, .fm-dialog-button.quota-upgrade-button.active:hover, .fm-dialog-button.fm-terms-agree.active:hover {
-	color: white;
-	cursor: pointer;
-}
 .confirmation-checkbox {
 	margin: -5px 0 0 -16px;
 }
 .fm-dialog-button.add-contact-button, .fm-dialog-button.cancel-contact-button {
 	height: 32px;
 	line-height: 30px;
-	margin: 6px 6px 0 0;
 	min-width: 64px;
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
@@ -10217,12 +10216,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: -5px -3080px;
 	background-color: rgba(0,0,0,0.2);
 }
-.delete-contact .fm-dialog-button.notification-button.confirm {
-	background-color: rgba(211,26,0,0.7);
-}
-.delete-contact .fm-dialog-button.notification-button.confirm:hover {
-	background-color: rgba(211,26,0,1);
-}
 .fm-notification-info {
 	margin-left: 90px;
 	display: table-cell;
@@ -10340,12 +10333,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .file-keys-view .copy-keys-button {
 	display: none;
 }
-.fm-dialog-button.copy-to-clipboard {
-	background-color: rgba(255,179,0,0.8)
-}
-.fm-dialog-button.copy-to-clipboard:hover {
-	background-color: rgba(255,179,0,1)
-}
 .file-key {
 	display: none;
 }
@@ -10453,7 +10440,7 @@ label.radio-txt {
 	text-align: center;
 	font-size: 30px;
 	line-height: 34px;
-	color: #D21F00;
+	color: #BF1900;
 	padding: 23px 0 0 0;
 }
 .fm-bandwidth-number-txt span.small {
@@ -10463,7 +10450,7 @@ label.radio-txt {
 	color: #71AD32;
 }
 .red {
-	color: #D21F00;
+	color: #BF1900;
 }
 .fm-bandwidth-small-txt {
 	text-align: center;
@@ -10574,7 +10561,7 @@ span.orange {
 }
 .export-links-dialog .on_off {
 	width: auto;
-	margin: 0 0 0 10px;
+	margin: 0 0 0 -2px;
 	float: left;
 }
 .fm-account-blocks .on_off, .export-links-dialog.on_off {
@@ -11255,7 +11242,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 	font-size: 18px;
 }
 .membership-big-txt.red {
-	color: #D21F00;
+	color: #BF1900;
 }
 .membership-big-txt.floating {
 	display: inline-block;
@@ -12627,7 +12614,7 @@ table {
 .st-main-button {
 	width: 220px;
 	height: 220px;
-	background-color: #D12B00;
+	background-color: #D90007;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
@@ -12648,7 +12635,7 @@ table {
 	margin: -130px 0 0 -130px;
 }
 .st-main-button-icon, .st-main-button-icon-hovered {
-	background-image: url(../images/mega/new-startpage-spite.png?v=1);
+	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
 	background-position: center 60px;
 	background-repeat: no-repeat;
 	width: 260px;
@@ -12672,7 +12659,7 @@ table {
 	width: 130px;
 	height: 100px;
 	position: absolute;
-	background-image: url(../images/mega/new-startpage-spite.png?v=1);
+	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
 	background-position: center -545px;
 	background-repeat: no-repeat;
 	left: 285px;
@@ -12690,10 +12677,10 @@ table {
 }
 .st-main-logo {
 	height: 120px;
-	background-image: url(../images/mega/new-startpage-spite.png?v=1);
-	background-position: center -793px;
+	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
+	background-position: center -786px;
 	background-repeat: no-repeat;
-	margin: 12px 0 22px 0;
+	margin: 12px 0 25px 0;
 }
 .st-main-info {
 	font-size: 20px;
@@ -12764,7 +12751,7 @@ table {
 	height: 29px;
 	width: 29px;
 	display: inline-block;
-	background-image: url(../images/mega/new-startpage-spite.png?v=1);
+	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
@@ -12801,7 +12788,7 @@ table {
 	border-radius: 12px;
 	font-size: 12px;
 	margin: 8px 0 0 0;
-	background-image: url(../images/mega/new-startpage-spite.png?v=1);
+	background-image: url(../images/mega/new-startpage-spite1.png?v=1);
 	background-position: center -1397px;
 	background-repeat: no-repeat;
 	cursor: pointer;
@@ -12832,7 +12819,7 @@ body.new-startpage {
 }
 .st-red-header {
 	text-align: center;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: -2px top;
 	background-repeat: no-repeat;
 	color: #333333;
@@ -12882,7 +12869,7 @@ body.new-startpage {
 	width: 50px;
 	height: 30px;
 	top: 0;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: left -1899px;
 	background-repeat: no-repeat;
 }
@@ -12918,7 +12905,7 @@ body.new-startpage {
 	width: 480px;
 	float: left;
 	height: 64px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: left -297px;
 	background-repeat: no-repeat;
 	margin-bottom: 50px;
@@ -12964,7 +12951,7 @@ body.new-startpage {
 .st-membership-icon {
 	padding-left: 150px;
 	min-height: 125px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: left -687px;
 	background-repeat: no-repeat;
 }
@@ -12991,7 +12978,7 @@ body.new-startpage {
 	width: 400px;
 	float: left;
 	height: 290px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: left -899px;
 	background-repeat: no-repeat;
 }
@@ -13021,7 +13008,7 @@ body.new-startpage {
 	float: left;
 	width: 40px;
 	height: 50px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: -612px -1128px;
 	background-repeat: no-repeat;
 	margin: 0 5px;
@@ -13058,7 +13045,7 @@ body.new-startpage {
 .st-cloud-icon {
 	margin-left: 520px;
 	height: 220px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: -530px -1250px;
 	background-repeat: no-repeat;
 }
@@ -13066,7 +13053,7 @@ body.new-startpage {
 	float: left;
 	width: 365px;
 	height: 235px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-position: left -1463px;
 	background-repeat: no-repeat;
 }
@@ -13393,6 +13380,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-webkit-border-bottom-left-radius: 8px;
 	-moz-border-radius-bottomleft: 8px;
 	border-bottom-left-radius: 8px;
+	height: 56px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 .top-login-forgot-pass {
 	font-size: 11px;
@@ -13562,12 +13553,8 @@ h5.main-italic-header {
 	padding: 0 10px 0 35px;
 	position: relative;
 }
-.top-dialog-login-button {
+.top-dialog-login-button span {
 	position: relative;
-	background-color: rgba(213,22,0,0.7);
-}
-.top-dialog-login-button:hover {
-	background-color: rgba(213,22,0,1);
 }
 .top-dialog-login-button img {
 	display: none;
@@ -13636,7 +13623,7 @@ h5.main-italic-header {
 	color: #666666;
 }
 .register-st2-txt-block p a {
-	color: #D21F00
+	color: #BF1900
 }
 .register-st2-button {
 	float: left;
@@ -15282,28 +15269,28 @@ span.browsers-update {
 	background-position: -343px -1447px;
 }
 .chrome-app-button {
-	background-image: url(../images/mega/chrome-app.png);
+	background-image: url(../images/mega/chrome-app1.png);
 	background-position: center -155px;
 	background-repeat: no-repeat;
 }
 .chrome-app-logo {
-	width: 220px;
+	width: 260px;
 	height: 60px;
 	margin: 38px auto 26px auto;
-	background-image: url(../images/mega/chrome-app.png);
-	background-position: center top;
+	background-image: url(../images/mega/chrome-app1.png);
+	background-position: -230px top;
 	background-repeat: no-repeat;
 }
 .chrome-app-scr {
 	width: 700px;
 	height: 418px;
 	margin: 30px auto -26px auto;
-	background-image: url(../images/mega/chrome-app.png);
+	background-image: url(../images/mega/chrome-app1.png);
 	background-position: center -155px;
 	background-repeat: no-repeat;
 }
 .chrome-app-button.new-app {
-	background-image: url(../images/mega/chrome-app.png);
+	background-image: url(../images/mega/chrome-app1.png);
 	background-repeat: no-repeat;
 	background-position: -230px -612px;
 }
@@ -15391,7 +15378,7 @@ span.browsers-update {
 .mobile-text-header {
 	font-size: 16px;
 	line-height: 25px;
-	color: #D21F00;
+	color: #BF1900;
 	padding-bottom: 5px;
 	font-family: 'Open Sans Semibold Italic';
 }
@@ -15458,7 +15445,7 @@ span.browsers-update {
 	margin: 10px 10px 0 10px;
 	cursor: pointer;
 	padding: 0 15px 0 70px;
-	background-image: url(../images/mega/chrome-app.png);
+	background-image: url(../images/mega/chrome-app1.png);
 	background-repeat: no-repeat;
 	background-position: -644px 8px;
 	-moz-box-sizing: border-box;
@@ -15564,7 +15551,7 @@ strong, b {
 .privacy-company-header {
 	font-size: 16px;
 	line-height: 20px;
-	color: #D21F00;
+	color: #BF1900;
 	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 2px 0 0 0;
 }
@@ -16599,7 +16586,7 @@ a.contact-new-button:hover {
 .dev-new-app-header {
 	font-size: 16px;
 	line-height: 24px;
-	color: #D21F00;
+	color: #BF1900;
 	font-family: 'Open Sans Semibold Italic', Arial;
 	padding: 13px 10px;
 }
@@ -16835,7 +16822,7 @@ span.roman-number {
 	text-align: center;
 }
 p.copyrights-red {
-	color: #d9290b;
+	color: #BF1900;
 	padding-bottom: 6px;
 }
 .register-st2-button.active.copyrights-form {
@@ -16984,7 +16971,7 @@ h1.help-home-header {
 	cursor: pointer;
 }
 .help-listing:hover {
-	color: #D21F00;
+	color: #BF1900;
 }
 .jspVerticalBar {
 	z-index: 120;
@@ -17013,7 +17000,7 @@ h1.help-home-header {
 	margin: 17px 0 -3px 0;
 }
 .help-block:hover {
-	border: 5px solid #D21F00;
+	border: 5px solid #BF1900;
 	margin: 37px 0 -3px 0;
 	min-height: 136px;
 }
@@ -17024,7 +17011,7 @@ h1.help-home-header {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	color: #D21F00;
+	color: #BF1900;
 	font-size: 16px;
 	line-height: 24px;
 	padding: 10px 20px 0 47px;
@@ -17222,7 +17209,7 @@ h1.help-home-header {
 .st-member-ship-right-bl {
 	float: right;
 	min-width: 140px;
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-repeat: no-repeat;
 	padding: 145px 0 0 0;
 	text-align: center;
@@ -17283,7 +17270,7 @@ h1.help-home-header {
 	line-height: 30px;
 }
 .st-apps-icon {
-	background-image: url(../images/mega/new-start-full.png);
+	background-image: url(../images/mega/new-start-full1.png);
 	background-repeat: no-repeat;
 	height: 155px;
 	-webkit-transition: opacity 250ms ease-in-out;
@@ -17859,10 +17846,9 @@ a.ff-extension-button:hover {
 	cursor: pointer;
 }
 .sync-top-logo {
-	width: 150px;
-	height: 35px;
-	background-image: url(../images/mega/sync_nw.png?v=1);
-	background-size: 148px auto;
+	width: 160px;
+	height: 42px;
+	background-image: url(../images/mega/sync_nw1.png?v=1);
 	background-position: center 1px;
 	background-repeat: no-repeat;
 	margin: 38px auto 26px auto;
@@ -17917,7 +17903,7 @@ a.ff-extension-button:hover {
 	margin: 0;
 	padding: 7px 0 7px 25px;
 	line-height: 28px;
-	background-image: url(../images/mega/sync_nw.png?v=1);
+	background-image: url(../images/mega/sync_nw1.png?v=1);
 	background-position: left -128px;
 	background-repeat: no-repeat;
 }
@@ -17941,7 +17927,7 @@ a.ff-extension-button:hover {
 	border-left: 0;
 }
 .sync-help-center {
-	background-image: url(../images/mega/sync_nw.png?v=1);
+	background-image: url(../images/mega/sync_nw1.png?v=1);
 	background-position: center -352px;
 	background-repeat: no-repeat;
 	text-align: center;
@@ -18559,11 +18545,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
 	float: none;
 	margin: 0;
 }
-.restore-success .fm-dialog-button.browsers-button:hover, .reset-success .fm-dialog-button.browsers-button:hover {
-	border-color: #D42400;
-	background-color: #D42400;
-	color: white;
-}
 .reset-account-lock-image {
 	height: 375px;
 	background-image: url(../images/mega/encr-sprite_v1.png);
@@ -18831,7 +18812,7 @@ span.incoming-call-name {
 }
 .start-chat-button {
 	position: absolute;
-	right: 3px;
+	right: 8px;
 	top: 3px;
 	width: 18px;
 	height: 18px;
@@ -19014,6 +18995,9 @@ span.incoming-call-name {
 	text-overflow: ellipsis;
 	padding-right: 10px;
 	max-width: 100%;
+	max-width: -webkit-calc(100% - 56px);
+max-width: -moz-calc(100% - 56px);
+max-width: calc(100% - 56px);
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);
@@ -19041,10 +19025,12 @@ span.incoming-call-name {
 .contact-top-details .nw-contact-block-avatar {
 	float: left;
 	margin: 22px 22px 0 22px;
+	position:absolute;
 }
 .contact-fingerprint-block {
-	float: right;
-	padding: 45px 45px 0 0;
+	padding: 52px 45px 0 0;
+position: absolute;
+right: 0;
 }
 .contact-fingerprint-title {
 	padding: 0 0 20px 10px;
@@ -19117,13 +19103,6 @@ span.incoming-call-name {
 	-webkit-border-radius: 100%;
 	border-radius: 100%;
 }
-.fingerprint-dialog .fm-dialog-button.dialog-approve-button {
-	background-color: rgba(109,176,63,0.7);
-    margin-right: 10px;
-}
-.fingerprint-dialog .fm-dialog-button.dialog-approve-button:hover {
-	background-color: rgba(109,176,63,1);
-}
 .fingerprint-code {
 	float: right;
 	width: 232px;
@@ -19150,9 +19129,14 @@ span.incoming-call-name {
 	padding-right: 0;
 }
 .contact-details-pad {
-	margin-left: 200px;
-	overflow: hidden;
-	padding-top: 44px;
+	margin: 0 255px 0 205px;
+padding-top: 44px;
+vertical-align: top;
+position: relative;
+min-height: 182px;
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+box-sizing: border-box;
 }
 .contact-details-email {
 	font-size: 12px;
@@ -19164,7 +19148,10 @@ span.incoming-call-name {
 }
 .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
 	float: left;
-	margin: 20px 8px 0 0;
+	margin: 20px 4px 0 -4px;
+}
+.fm-question {
+	display:none;
 }
 .contact-share-notification {
 	font-size: 12px;
@@ -19861,7 +19848,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	background-position: right -3714px;
 }
 .share-dialog-icon.permissions-icon {
-	margin: 12px;
+	margin: 12px 12px 12px 0;
 }
 .share-dialog-permissions:hover, .share-dialog-permissions.active, .share-dialog-icon.permissions-icon:hover, .share-dialog-icon.permissions-icon.active {
 	border: 2px solid rgba(0,0,0,0.3);
@@ -20764,8 +20751,8 @@ background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
  background-size: 200px auto;
 }
 .sync-top-logo, .sync-short-block li, .sync-help-center {
- background-image: url(../images/mega/sync_nw@2x.png?v=1);
- background-size: 148px auto;
+ background-image: url(../images/mega/sync_nw1@2x.png?v=1);
+ background-size: 168px auto;
 }
 .sync-main-img {
  background-image: url(../images/mega/img_sync_@2x.png);
@@ -21066,7 +21053,7 @@ top-login-spr .nlanguage-tooltip-bg, .nlanguage-bottom {
  background-size: 191px auto;
 }
 .active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
- background-image: url(../images/mega/new-start-full@2x.png);
+ background-image: url(../images/mega/new-start-full1@2x.png);
  background-size: 930px auto;
 }
 .green-circle, .blue-circle, .game-circle {
@@ -21146,7 +21133,7 @@ background-size: 217px auto;
  background-size: 886px auto;
 }
 .st-main-button-icon, .st-main-button-icon-hovered, .st-main-cursor, .st-main-logo, .st-bottom-button, .st-bottom-scroll-button {
- background-image: url(../images/mega/new-startpage-spite@2x.png?v=1);
+ background-image: url(../images/mega/new-startpage-spite1@2x.png?v=1);
  background-size: 356px auto;
 }
 .powered-logo, .powered-arrow {
@@ -21200,7 +21187,7 @@ background-image: url(../images/mega/quota-sprite@2x.png);
 background-size: 240px auto;
 }
 .chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-app-button.new-app, .chrome-download-button, a.chrome-download-button {
-background-image: url(../images/mega/chrome-app@2x.png);
+background-image: url(../images/mega/chrome-app1@2x.png);
 background-size: 700px auto;
 }
 .chrome-download-button:hover, a.chrome-download-button:hover {

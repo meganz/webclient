@@ -929,10 +929,6 @@ function api_req(req,ctx,c)
     q.cmds[q.i^1].push(req);
     q.ctxs[q.i^1].push(ctx);
 
-    if (ctx.apipath) {
-        q.apipath = ctx.apipath;
-    }
-
     if (!q.setimmediate) q.setimmediate = setTimeout(api_proc,0,q);
 }
 
@@ -1008,7 +1004,7 @@ function api_proc(q)
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
 
-                            console.error(ex);
+							console.error(ex, ex.stack); // when dumping exceptions, also dump .stack because its reaaallyyy helpful!
                             Soon(function() {
                                 throw ex;
                             });
@@ -1029,7 +1025,7 @@ function api_proc(q)
 
     if (q.rawreq === false)
     {
-        q.url = (q.apipath||apipath) + q.service + '?id=' + (q.seqno++) + '&' + q.sid;
+        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid;
 
         if (typeof q.cmds[q.i][0] == 'string')
         {
@@ -2051,8 +2047,6 @@ function api_getfileattr(fa,type,procfa,errfa)
 
     var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
 
-    var zapipath = apipath
-
     for (n in fa)
     {
         if ((r = re.exec(fa[n].fa)))
@@ -2069,9 +2063,6 @@ function api_getfileattr(fa,type,procfa,errfa)
                 if (!p[r[1]]) p[r[1]] = t;
                 else p[r[1]] += t;
                 plain[r[1]] = !!fa[n].plaintext
-                if (fa[n].apipath) {
-                    zapipath = fa[n].apipath;
-                }
             }
         }
         else if (errfa) errfa(n);
@@ -2079,7 +2070,7 @@ function api_getfileattr(fa,type,procfa,errfa)
 
     for (n in p)
     {
-        var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW(), plaintext: plain[n], apipath: zapipath};
+        var ctx = { callback : api_fareq, type : type, p : p[n], h : h, k : k, procfa : procfa, errfa : errfa, startTime : NOW(), plaintext: plain[n]};
         api_req({a : 'ufa', fah : base64urlencode(ctx.p.substr(0,8)), ssl : use_ssl, r : +fa_handler.chunked },ctx);
     }
 }

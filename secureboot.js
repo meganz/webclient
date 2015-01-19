@@ -404,7 +404,7 @@ else
 			};
 		})(console);
 
-		Object.defineProperty(window, "__cd_v", { value : 8, writable : false });
+		Object.defineProperty(window, "__cd_v", { value : 9, writable : false });
 		if (!d || onBetaW)
 		{
 			var __cdumps = [], __cd_t;
@@ -584,7 +584,7 @@ else
         jsl.push({f:'js/smartcrop.js', n: 'smartcrop_js', j:1,w:7});
         jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1,w:10});
-        jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:10});
+        jsl.push({f:'js/vendor/jquery.window-active.js', n: 'jquery_windowactive', j:1,w:2});
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
         jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
@@ -701,7 +701,9 @@ else
         jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
-        jsl.push({f:'js/betacrashes.js', n: 'cms_js', j:1});
+		if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
+			jsl.push({f: 'js/betacrashes.js', n: 'cms_js', j: 1});
+		}
 
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});
@@ -737,7 +739,6 @@ else
             'arkanoid_js': {f:'js/arkanoid.js', n: 'arkanoid_js', j:1},
             'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
             'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-            'help': {f:'html/help.html', n: 'help', j:0},
             'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
             'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
             'sync': {f:'html/sync.html', n: 'sync', j:0},
@@ -780,7 +781,7 @@ else
             'dev': ['dev','dev_js','sdkterms'],
             'sdk': ['dev','dev_js','sdkterms'],
             'doc': ['dev','dev_js','sdkterms'],
-            'help': ['help','help_js'],
+            'help': ['help_js'],
             'chrome': ['chrome'],
             'plugin': ['chrome','firefox'],
             'affiliate': ['affiliates','affiliateterms','affiliatesignup','affiliatesignup_js','affiliatemember','affiliatemember_js','affiliate_js'],
@@ -788,31 +789,32 @@ else
         };
 
         if (page)
-	{
-		if (page.indexOf('%25') !== -1)
-		{
-			do {
-				page = page.replace('%25','%', 'g');
-			} while (~page.indexOf('%25'));
-		}
-		if (page.indexOf('%21') !== -1)
-		{
-			page = page.replace('%21','!', 'g');
-			document.location.hash = page;
-		}
+        {
+            if (page.indexOf('%25') !== -1)
+            {
+                do {
+                    page = page.replace('%25','%', 'g');
+                } while (~page.indexOf('%25'));
+            }
+            if (page.indexOf('%21') !== -1)
+            {
+                page = page.replace('%21','!', 'g');
+                document.location.hash = page;
+            }
 
-		page = page.replace('#','');
-		for (var p in subpages)
-		{
-			if (page.substr(0,p.length) == p)
-			{
-				for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
-			}
-		}
-	}
+            page = page.replace('#','');
+            for (var p in subpages)
+            {
+                if (page.substr(0,p.length) == p)
+                {
+                    for (var i in subpages[p]) jsl.push(jsl2[subpages[p][i]]);
+                }
+            }
+        }
         var downloading = false;
         var ul_uploading = false;
         var lightweight=false;
+		var waitingToBeLoaded = {};
         var njsl = [];
         var fx_startup_cache = is_chrome_firefox && nocontentcheck;
         if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
@@ -873,40 +875,54 @@ else
 
         if (jj)
         {
+
+			var headElement = document.querySelector("head");
+			var _queueWaitToBeLoaded = function(id, elem) {
+				waitingToBeLoaded[id] = true;
+				elem.onload = function() {
+					delete waitingToBeLoaded[id];
+
+					if(Object.keys(waitingToBeLoaded).length === 0) {
+						boot_done();
+					}
+				};
+			};
+
+			var createScriptTag = function(id, src) {
+				var elem = document.createElement("script");
+				headElement.appendChild(elem);
+				elem.id = id;
+				elem.async = false;
+				_queueWaitToBeLoaded(id, elem);
+				elem.src = src;
+				return elem;
+			};
+			var createStyleTag = function(id, src) {
+				var elem = document.createElement("link");
+				elem.rel = "stylesheet";
+				elem.type = "text/css";
+
+				headElement.appendChild(elem);
+				elem.id = id;
+				_queueWaitToBeLoaded(id, elem);
+				elem.href = src;
+				return elem;
+			};
+
             l=[];
             var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
+            if (localStorage.allowBreakpointsOnReload) r = '';
             while (i--) l[i]='l';
             for (var i in jsl)
             {
-                // If in Development turn off the current time string being appended to the URL.
-                // This enables debugging as breakpoints are not removed on page refresh.
-                var timeString = r;
-                if (d) {
-                    timeString = '';
-                }
-                
-                if (jsl[i].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl[i].f + '?r=' + timeString + '"></sc' + 'ript>');
+                if (jsl[i].j === 1) {
+					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */);
+				}
                 else if (jsl[i].j === 2)
                 {
-                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d)))
-                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl[i].f + '" />');
-                }
-            }
-
-            if ( 0 ) for (var k in jsl2)
-            {
-                // If in Development turn off the random string being appended to the URL.
-                // This enables debugging as breakpoints are not removed on page refresh.
-                var randomString = Math.random();
-                if (d) {
-                    randomString = '';
-                }
-                
-                if (jsl2[k].j === 1) document.write('<' + 'script type="text/javascript" src="' + bootstaticpath + jsl2[k].f + '?r=' + randomString + '"></sc' + 'ript>');
-                else if (jsl2[k].j === 2)
-                {
-                    if ((m && (jsl2[k].m)) || ((!m) && (jsl2[k].d)))
-                        document.write('<link rel="stylesheet" type="text/css" href="' + bootstaticpath + jsl2[k].f + '" />');
+                    if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
+						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */)
+					}
                 }
             }
         }
@@ -1179,7 +1195,7 @@ else
             else
             {
                 jsl_done=true;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
 	    jj = 0; //prevent further 'silent_loading' loads from failing..
         }
@@ -1211,7 +1227,7 @@ else
         if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
         else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite@2x.png);	background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
+        document.write('<style type="text/css">.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.mid-centered-block {position: absolute;width: 494px;min-height: 158px;top: 50%;left: 50%;margin: -95px 0 0 -247px;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1.png?v=1);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -93px -1233px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -93px -1173px;}.st-bottom-button.st-facebook-button {background-position: -49px -1233px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -1173px;}.st-bottom-button.st-twitter-button {background-position: left -1233px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {background-position: left -1173px;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 -2128px;margin: 0 auto;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;padding-top: 55px;}.loading-progress-bar, .loading-progress-bar div {width: 80px;height: 80px;margin: 0 0 0 71px;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: 0 top;}.loading-progress-bar div {background-position: -71px -2183px;margin: 0;}.maintance-block {position: absolute;width: 484px;min-height: 94px;border: 2px solid #d9d9d9;-moz-border-radius: 7px;-webkit-border-radius: 7px;border-radius: 7px;padding: 10px;color: #333333;font-size: 13px;line-height: 30px;padding: 15px 15px 15px 102px;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;-ms-box-sizing: border-box;box-sizing: border-box;background-image: url(' + istaticpath + 'images/mega/loading-sprite1.png);background-repeat: no-repeat;background-position: -60px -2428px;margin-top: 45px;}.loading-progress-bar.percents-0 {background-position: 0 0;}.loading-progress-bar.percents-1, .loading-progress-bar.percents-2, .loading-progress-bar.percents-3 {background-position: -130px 0;}.loading-progress-bar.percents-4, .loading-progress-bar.percents-5, .loading-progress-bar.percents-6 {background-position: 0 -100px;}.loading-progress-bar.percents-7, .loading-progress-bar.percents-8, .loading-progress-bar.percents-9 {background-position: -130px -100px;}.loading-progress-bar.percents-10, .loading-progress-bar.percents-11, .loading-progress-bar.percents-12 {background-position: 0 -200px;}.loading-progress-bar.percents-13, .loading-progress-bar.percents-14, .loading-progress-bar.percents-15 {background-position: -130px -200px;}.loading-progress-bar.percents-16, .loading-progress-bar.percents-17, .loading-progress-bar.percents-18 {background-position: 0 -300px;}.loading-progress-bar.percents-19, .loading-progress-bar.percents-20, .loading-progress-bar.percents-21 {background-position: -130px -300px;}.loading-progress-bar.percents-22, .loading-progress-bar.percents-23, .loading-progress-bar.percents-24 {background-position: 0 -400px;}.loading-progress-bar.percents-25, .loading-progress-bar.percents-26, .loading-progress-bar.percents-27 {background-position: -130px -400px;}.loading-progress-bar.percents-28, .loading-progress-bar.percents-29, .loading-progress-bar.percents-30 {background-position: 0 -500px;}.loading-progress-bar.percents-31, .loading-progress-bar.percents-32, .loading-progress-bar.percents-33 {background-position: -130px -500px;}.loading-progress-bar.percents-34, .loading-progress-bar.percents-35 {background-position: 0 -600px;}.loading-progress-bar.percents-36, .loading-progress-bar.percents-37 {background-position: -130px -600px;}.loading-progress-bar.percents-38, .loading-progress-bar.percents-39 {background-position: 0 -700px;}.loading-progress-bar.percents-40, .loading-progress-bar.percents-41 {background-position: -130px -700px;}.loading-progress-bar.percents-42, .loading-progress-bar.percents-43 {background-position: 0 -800px;}.loading-progress-bar.percents-44, .loading-progress-bar.percents-45 {background-position: -130px -800px;}.loading-progress-bar.percents-46, .loading-progress-bar.percents-47 {background-position: 0 -900px;}.loading-progress-bar.percents-48, .loading-progress-bar.percents-49 {background-position: -130px -900px;}.loading-progress-bar.percents-50 {background-position: 0 -1000px;}.loading-progress-bar.percents-51, .loading-progress-bar.percents-52, .loading-progress-bar.percents-53 {background-position: -130px -1000px;}.loading-progress-bar.percents-54, .loading-progress-bar.percents-55, .loading-progress-bar.percents-56 {background-position: 0 -1100px;}.loading-progress-bar.percents-57, .loading-progress-bar.percents-58, .loading-progress-bar.percents-59 {background-position: -130px -1100px;}.loading-progress-bar.percents-60, .loading-progress-bar.percents-61, .loading-progress-bar.percents-62 {background-position: 0 -1200px;}.loading-progress-bar.percents-63, .loading-progress-bar.percents-64, .loading-progress-bar.percents-65 {background-position: -130px -1200px;}.loading-progress-bar.percents-66, .loading-progress-bar.percents-67, .loading-progress-bar.percents-68 {background-position: 0 -1300px;}.loading-progress-bar.percents-69, .loading-progress-bar.percents-70, .loading-progress-bar.percents-71 {background-position: -130px -1300px;}.loading-progress-bar.percents-72, .loading-progress-bar.percents-73, .loading-progress-bar.percents-74 {background-position: 0 -1400px;}.loading-progress-bar.percents-75, .loading-progress-bar.percents-76, .loading-progress-bar.percents-77 {background-position: -130px -1400px;}.loading-progress-bar.percents-78, .loading-progress-bar.percents-79, .loading-progress-bar.percents-80 {background-position: 0 -1500px;}.loading-progress-bar.percents-81, .loading-progress-bar.percents-82, .loading-progress-bar.percents-83 {background-position: -130px -1500px;}.loading-progress-bar.percents-84, .loading-progress-bar.percents-85, .loading-progress-bar.percents-86 {background-position: 0 -1600px;}.loading-progress-bar.percents-87, .loading-progress-bar.percents-88, .loading-progress-bar.percents-89 {background-position: -130px -1600px;}.loading-progress-bar.percents-90, .loading-progress-bar.percents-91, .loading-progress-bar.percents-92 {background-position: 0 -1800px;}.loading-progress-bar.percents-93, .loading-progress-bar.percents-94, .loading-progress-bar.percents-95 {background-position: -130px -1800px;}.loading-progress-bar.percents-96, .loading-progress-bar.percents-97 {background-position: 0 -1900px;}.loading-progress-bar.percents-98, .loading-progress-bar.percents-99 {background-position: -130px -1900px;}.loading-progress-bar.percents-100 {background-position: 0 -2000px;}.follow-txt {text-decoration:none; line-height: 28px; float:right; color:#666666; font-size:12px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-progress-bar, .loading-progress-bar div, .loading-cloud, .loading-bottom-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite1@2x.png);	background-size: 222px auto;}.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/new-startpage-spite1@2x.png?v=1);background-size: 356px auto;}}</style><div class="loading-main-block" id="loading"><div class="loading-mid-white-block"><div class="mid-centered-block"><div class="loading-cloud"><div class="loading-progress-bar percents-1" id="loadinganim"><div></div></div></div><div class="maintance-block hidden">Scheduled System Maintenance - Expect Disruptions<br/>Sunday 04:00 - 10:00 UTC </div></div><div class="st-social-block-load" id="bootbottom"><a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a><a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a><a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a></div></div></div>');
     }
     var u_storage,loginresponse,u_sid,jsl_done,dlresponse,dl_res;
     u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
@@ -1228,24 +1244,24 @@ else
                     loginresponse = this.response || this.responseText;
                     if (loginresponse && loginresponse[0] == '[') loginresponse = JSON.parse(loginresponse);
                     else loginresponse = false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
                 catch (e)
                 {
                     loginresponse= false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
             }
             else
             {
                 loginresponse= false;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
         }
         lxhr.onerror = function()
         {
             loginresponse= false;
-            boot_done();
+			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
         }
         lxhr.open("POST", apipath + 'cs?id=0&sid='+u_storage.sid, true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
@@ -1256,8 +1272,21 @@ else
         u_checked=true;
         startMega();
     }
+
+	var boot_done_called = false;
     function boot_done()
     {
+		/**
+		 * TODO: this is called twice: 1 time from the login success, 1 time from the loading finished. The secure boot
+		 * should be rewritten to have a proper ASYNC flow/process of doing loading + doing auth, without actually
+		 * triggering 2 boot_done calls, because this causes different race conditions on different connection speeds,
+		 * which are almost impossible to track.
+		 */
+		if(!boot_done_called) {
+			boot_done_called = true;
+			$(window).trigger('MegaLoaded');
+		}
+
         lxhr = dlxhr = undefined;
         if (loginresponse === true || dl_res === true || !jsl_done) return;
         else if (loginresponse)
@@ -1279,24 +1308,24 @@ else
                     dl_res = this.response || this.responseText;
                     if (dl_res[0] == '[') dl_res = JSON.parse(dl_res);
                     if (dl_res[0]) dl_res = dl_res[0];
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
                 catch (e)
                 {
                     dl_res = false;
-                    boot_done();
+					if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
                 }
             }
             else
             {
                 dl_res = false;
-                boot_done();
+				if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
             }
         }
         dlxhr.onerror = function()
         {
             dl_res= false;
-            boot_done();
+			if(Object.keys(waitingToBeLoaded).length === 0) boot_done();
         }
         dlxhr.open("POST", apipath + 'cs?id=0', true);
         dlxhr.send(JSON.stringify([{'a':'g',p:page.substr(1,8)}]));

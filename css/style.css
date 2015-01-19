@@ -9858,12 +9858,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-account-button {
 	cursor: pointer;
-	display: inline-block;
-	margin: 11px 5px 0 5px;
-	float: none;
-	font-size: 12px;
-	line-height: 25px;
-	height: 26px;
+display: inline-block;
+margin: 4px 0 0 0;
+float: none;
 }
 .fm-dialog-button.links-button {
 	position: relative;

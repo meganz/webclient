@@ -5107,6 +5107,8 @@ function clone(obj)
             if (obj.hasOwnProperty(attr)) {
                 if(!(obj[attr] instanceof Object)) {
                     copy[attr] = obj[attr];
+                } else if (obj[attr] instanceof Array) {
+                    copy[attr] = clone(obj[attr]);
                 } else if(!isNativeObject(obj[attr])) {
                     copy[attr] = clone(obj[attr]);
                 } else if($.isFunction(obj[attr])) {

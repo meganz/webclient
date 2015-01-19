@@ -1276,6 +1276,17 @@ else
 	var boot_done_called = false;
     function boot_done()
     {
+		/**
+		 * TODO: this is called twice: 1 time from the login success, 1 time from the loading finished. The secure boot
+		 * should be rewritten to have a proper ASYNC flow/process of doing loading + doing auth, without actually
+		 * triggering 2 boot_done calls, because this causes different race conditions on different connection speeds,
+		 * which are almost impossible to track.
+		 */
+		if(!boot_done_called) {
+			boot_done_called = true;
+			$(window).trigger('MegaLoaded');
+		}
+
         lxhr = dlxhr = undefined;
         if (loginresponse === true || dl_res === true || !jsl_done) return;
         else if (loginresponse)
@@ -1287,16 +1298,6 @@ else
     }
     if (page.substr(0,1) == '!' && page.length > 1)
     {
-		/**
-		 * TODO: this is called twice: 1 time from the login success, 1 time from the loading finished. The secure boot
-		 * should be rewritten to have a proper ASYNC flow/process of doing loading + doing auth, without actually
-		 * triggering 2 boot_done calls, because this causes different race conditions on different connection speeds,
-		 * which are almost impossible to track.
-		 */
-		if(!boot_done_called) {
-			boot_done_called = true;
-			$(window).trigger('MegaLoaded');
-		}
         var dlxhr = getxhr(),dl_res = true;
         dlxhr.onload = function()
         {

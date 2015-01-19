@@ -18,7 +18,7 @@ var ChatStore = function(megaChat) {
 
     megaChat.unbind("onInit.chatStore");
     megaChat.bind("onInit.chatStore", function(e) {
-        self.attachToChat(megaChat)
+        self.attachToChat(megaChat);
 
         if(self.cleanupInterval) {
             clearInterval(self.cleanupInterval);
@@ -191,45 +191,7 @@ ChatStore.prototype.attachToChat = function(megaChat) {
         self.db.removeBy('conversations', 'roomJid', megaRoom.roomJid);
     });
 
-    // restore any conversations from the db
-    self.db.query('conversations')
-        .execute()
-        .done(function(results) {
-            if(results.length == 0) { // no conversations
-                return;
-            } else {
-                $.each(results, function(k, v) {
-                    var foundRoom = megaChat.chats[v.roomJid];
-
-                    if(!foundRoom) { // restore room from db, if room not found
-                        if(v.ended) {
-                            megaChat.trigger("onRoomDestroy.chatStore", v);
-                        }
-                        var room = megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime, v.lastActivity);
-
-                        room._conv_ended = v.ended;
-
-                        room.setState(ChatRoom.STATE.JOINING);
-                        if(megaChat.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
-                            megaChat.karere.joinChat(v.roomJid);
-                        } else {
-                            megaChat.karere.one("onConnected.chatStore", function() {
-                                megaChat.karere.joinChat(v.roomJid);
-                            });
-                        }
-
-
-                        room.refreshUI();
-
-                        var participants = room.getParticipantsExceptMe();
-                        var c = megaChat.getContactFromJid(participants[0]);
-                        if(c) {
-                            M.u[c.h].lastChatActivity = room.lastActivity;
-                        }
-                    }
-                })
-            }
-        });
+    self.restoreConversationsFromDb();
 
     // persist queued messages
     megaChat.unbind("onQueueMessage.chatStoreQueue");
@@ -345,6 +307,62 @@ ChatStore.prototype.attachToChat = function(megaChat) {
     });
 };
 
+ChatStore.prototype.restoreConversationsFromDb = function() {
+    var self = this;
+
+    var _restore = function() {
+        // restore any conversations from the db
+        self.db.query('conversations')
+            .execute()
+            .done(function(results) {
+                if(results.length == 0) { // no conversations
+                    return;
+                } else {
+                    $.each(results, function(k, v) {
+                        var foundRoom = megaChat.chats[v.roomJid];
+
+                        if(!foundRoom) { // restore room from db, if room not found
+                            if(v.ended) {
+                                megaChat.trigger("onRoomDestroy.chatStore", v);
+                            }
+                            if(Object.keys(v.users).length == 0) {
+                                megaChat.trigger("onRoomDestroy.chatStore", v);
+                                self.logger.error("Could not restore room: ", v, ", because of missing v.users = {}.");
+                                return;
+                            }
+                            var room = megaChat.chats[v.roomJid] = new ChatRoom(megaChat, v.roomJid, v.type, v.users, v.ctime, v.lastActivity);
+
+                            room._conv_ended = v.ended;
+
+                            room.setState(ChatRoom.STATE.JOINING);
+                            if(megaChat.karere.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
+                                megaChat.karere.joinChat(v.roomJid);
+                            } else {
+                                megaChat.karere.one("onConnected.chatStore", function() {
+                                    megaChat.karere.joinChat(v.roomJid);
+                                });
+                            }
+
+
+                            room.refreshUI();
+
+                            var participants = room.getParticipantsExceptMe();
+                            var c = megaChat.getContactFromJid(participants[0]);
+                            if(c) {
+                                M.u[c.h].lastChatActivity = room.lastActivity;
+                            }
+                        }
+                    })
+                }
+            });
+    };
+
+    if(!boot_done_called) {
+        $(window).bind('MegaLoaded', _restore);
+    } else {
+        _restore();
+    }
+};
 ChatStore.prototype.cleanup = function() {
     var self = this;
 

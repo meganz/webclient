@@ -211,7 +211,7 @@ var CMS = {
 
 	reRender: function(type, nodeId)
 	{
-		ERRDEBUG(type, nodeId)
+		//ERRDEBUG(type, nodeId)
 		// If cmsToId is NULL it means we didn't open
 		// *any* CMS content so we should ignore this
 		// update, we will get the newest version always

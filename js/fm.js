@@ -2176,7 +2176,6 @@ function initContextUI()
     {
         $.moveDialog = 'move';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
-        $('.move-dialog .dialog-move-button').addClass('active');
         $('.move-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'move', 'Move');
         disableCircularTargets('#mctreea_');
@@ -2188,7 +2187,6 @@ function initContextUI()
     {
         $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
         $.mcselected = M.RootID;
-        $('.copy-dialog .dialog-copy-button').addClass('active');
         $('.copy-dialog').removeClass('hidden');
         handleDialogContent('cloud-drive', 'ul', true, 'copy', $.mcImport ? l[236] : "Paste" /*l[63]*/);
         fm_showoverlay();
@@ -6190,7 +6188,7 @@ function handleDialogContent(s, m, c, n, t, i)
     $('.' + n + '-dialog .dialog-sorting-menu').addClass('hidden');
     // Action button label
     var $btn = $('.dialog-' + n + '-button');
-    $btn.text(t);
+    $('.dialog-' + n + '-button span').text(t);
     // Disable/enable button
     if (typeof $.mcselected != 'undefined')
         $btn.removeClass('disabled');
@@ -9055,7 +9053,7 @@ function fingerprintDialog(userid)
     $('.dialog-approve-button').rebind('click', function() {
         userFingerprint(user, function(fprint, fprintraw) {
             authring.setContactAuthenticated(userid, fprintraw, 'Ed25519', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
-			$('.fm-verify').addClass('active').find('span').text('Verified').unbind('click');
+			$('.fm-verify').unbind('click').find('span').text('Verified');
 			closeFngrPrntDialog();
         });
     });
@@ -9116,9 +9114,10 @@ function contactUI() {
         });
 
         if (isContactVerified(user)) {
-            $('.fm-verify').addClass('active').find('span').text('Verified');
+            $('.fm-verify').find('span').text('Verified');
         } else {
-            $('.fm-verify').removeClass('active').find('span').text('Verify...').rebind('click', function() {
+			$('.fm-verify').find('span').text('Verify...');
+            $('.fm-verify').rebind('click', function() {
                 fingerprintDialog(user);
             });
         }

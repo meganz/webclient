@@ -5960,7 +5960,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
 	{
 		$('#msgDialog').addClass('clear-bin-dialog');
 		$('#msgDialog .icon').addClass('fm-bin-clear-icon');
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[1018] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[82] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[1018] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[82] + '</span></div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();
@@ -5975,7 +5975,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
 	if (type == 'delete-contact')
 	{
 		$('#msgDialog').addClass('delete-contact');
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').eq(0).bind('click',function()
 		{
 			closeMsg();
@@ -5989,7 +5989,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
 	}
 	else if (type == 'warninga' || type == 'warningb' || type == 'info')
 	{
-		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button active">' + l[81] + '</div><div class="clear"></div>');
+		$('#msgDialog .fm-notifications-bottom').html('<div class="fm-dialog-button notification-button"><span>' + l[81] + '</span></div><div class="clear"></div>');
 		$('#msgDialog .fm-dialog-button').bind('click',function()
 		{
 			closeMsg();
@@ -6001,7 +6001,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox)
 		else if (type == 'info') $('#msgDialog').addClass('notification-dialog');
 	}
 	else if (type == 'confirmation' || type == 'remove') {
-        $('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' + l[229] + '</label></div><div class="fm-dialog-button notification-button active confirm">' + l[78] + '</div><div class="fm-dialog-button notification-button active cancel">' + l[79] + '</div><div class="clear"></div>');
+        $('#msgDialog .fm-notifications-bottom').html('<div class="left checkbox-block hidden"><div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div> <label for="export-checkbox" class="radio-txt">' + l[229] + '</label></div><div class="fm-dialog-button notification-button confirm"><span>' + l[78] + '</span></div><div class="fm-dialog-button notification-button cancel"><span>' + l[79] + '</span></div><div class="clear"></div>');
 
         $('#msgDialog .fm-dialog-button').eq(0).bind('click', function () {
             closeMsg();
@@ -7607,8 +7607,8 @@ function linksDialog(close)
     }
     else if (flashIsEnabled())
     {
-        $('#clipboardbtn1').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
-        $('#clipboardbtn2').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="26" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('#clipboardbtn1 span').html(htmlentities(l[370]) + '<object data="OneClipboard.swf" id="clipboardswf1" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('#clipboardbtn2 span').html(htmlentities(l[1033]) + '<object data="OneClipboard.swf" id="clipboardswf2" type="application/x-shockwave-flash"  width="100%" height="32" allowscriptaccess="always"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworkin"><param name=FlashVars value="buttonclick=1" /></object>');
 
         $('#clipboardbtn1').unbind('mouseover');
         $('#clipboardbtn1').bind('mouseover', function()

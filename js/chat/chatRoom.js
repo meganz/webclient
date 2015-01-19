@@ -788,8 +788,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     self.megaChat.trigger('onRoomCreated', [self]);
 
-
-
+    // Hide this block until text chat is ready
+    /*
     self.bind('onConversationStarted', function(e) {
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -802,7 +802,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 !self.isActive()
             )
         );
-    });
+    });*/
 
     return this;
 };

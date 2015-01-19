@@ -2761,6 +2761,7 @@ function MegaData()
                 $('#treea_' + h + ' span:nth-child(2)').text(name);
                 if ($('#path_' + h).length > 0)
                     M.renderPath();
+                $(document).trigger('MegaNodeRename', [h, name]);
             }
         }
     }

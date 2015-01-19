@@ -1127,8 +1127,8 @@ var waitbackoff = 125;
 var waittimeout;
 var waitbegin;
 var waitid = 0;
-var cmsHandler = 'Nc4AFJZK'
-if (localStorage.apipath) cmsHandler = 'aA0DxYzI'
+var cmsNotifHandler = 'Nc4AFJZK'
+if (localStorage.cmsNotificationID) cmsNotifHandler = localStorage.cmsNotificationID
 
 function stopsc()
 {
@@ -1148,7 +1148,7 @@ function stopsc()
 // calls execsc() with server-client requests received
 function getsc(fm)
 {
-    api_req('sn=' + (maxaction||"") + '&ssl=1&e=' + cmsHandler,{
+    api_req('sn=' + (maxaction||"") + '&ssl=1&e=' + cmsNotifHandler,{
         fm : fm,
         callback : function __onGetSC(res,ctx)
         {

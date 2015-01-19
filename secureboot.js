@@ -880,8 +880,6 @@ else
 			var _queueWaitToBeLoaded = function(id, elem) {
 				waitingToBeLoaded[id] = true;
 				elem.onload = function() {
-					console.error("finished loading: ", id);
-
 					delete waitingToBeLoaded[id];
 
 					if(Object.keys(waitingToBeLoaded).length === 0) {

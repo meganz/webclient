@@ -2389,7 +2389,7 @@ Chat.prototype.processNewUser = function(u) {
     self.logger.debug("added: ", u);
 
 
-    this.karere.subscribe(megaChat.getJidFromNodeId(u));
+    this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderContactTree();
     self.renderMyStatus();
@@ -2410,7 +2410,7 @@ Chat.prototype.processRemovedUser = function(u) {
     if(room) {
         room.destroy(true);
     }
-    this.karere.unsubscribe(megaChat.getJidFromNodeId(u));
+    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderContactTree();
     self.renderMyStatus();

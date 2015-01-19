@@ -2461,7 +2461,7 @@ makeMetaAware(Karere);
 
 
 
-    Karere.prototype.subscribe = function(bareJid) {
+    Karere.prototype.subscribe = function(bareJid, name) {
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
@@ -2475,7 +2475,7 @@ makeMetaAware(Karere);
                 .c("item", {
                     jid: bareJid,
                     subscription: 'both',
-                    name: bareJid.split("@")[0]
+                    name: name ? name : bareJid.split("@")[0]
                 })
                 .c("group")
                     .t(self.options.defaultRosterGroupName);
@@ -2495,7 +2495,7 @@ makeMetaAware(Karere);
         }
     };
 
-    Karere.prototype.unsubscribe = function(bareJid) {
+    Karere.prototype.unsubscribe = function(bareJid, name) {
         var self = this;
 
         if(self.getConnectionState() == Karere.CONNECTION_STATE.CONNECTED) {
@@ -2509,7 +2509,7 @@ makeMetaAware(Karere);
                 .c("item", {
                     jid: bareJid,
                     subscription: 'remove',
-                    name: bareJid.split("@")[0]
+                    name: name ? name : bareJid.split("@")[0]
                 })
                 .c("group")
                     .t(self.options.defaultRosterGroupName);

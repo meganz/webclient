@@ -219,12 +219,14 @@
             }
         },
         removeContact: function(item, from) {
-            var ld = $(from).data("settings").local_data;
-            for (var n in ld) {
-                if (ld[n].id === item.id) {
-                    $('.share-multiple-input').data("settings").local_data.splice(n, 1);
-                    $('.add-contact-multiple-input').data("settings").local_data.splice(n, 1);
-                    break;
+            if ($(from).data("settings").local_data) {
+                var ld = $(from).data("settings").local_data;
+                for (var n in ld) {
+                    if (ld[n].id === item.id) {
+                        $('.share-multiple-input').data("settings").local_data.splice(n, 1);
+                        $('.add-contact-multiple-input').data("settings").local_data.splice(n, 1);
+                        break;
+                    }
                 }
             }
         }

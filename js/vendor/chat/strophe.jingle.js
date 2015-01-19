@@ -247,7 +247,7 @@ var JinglePlugin = {
                     sess.accept(function() {
                         if (!sess.fileTransferHandler)
                             sess.sendMutedState();
-                        self.onCallAnswered.call(self.eventHandler, {peer: peerjid, isDataCall: !!sess.fileTransferHandler});
+                        self.onCallAnswered.call(self.eventHandler, {peer: peerjid, isDataCall: !!sess.fileTransferHandler, sid: sess.sid});
 //now handle all packets queued up while we were waiting for user's accept of the call
                         self.processAndDeleteInputQueue(sess);
                     });

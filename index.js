@@ -240,6 +240,8 @@ function init_page()
 		blogsearch = decodeURIComponent(page.substr(11,page.length-2));
 		if (!blogsearch) document.location.hash = 'blog';
 		page = 'blog';
+		parsepage(pages['blogarticle']);
+		init_blog();
 	}
 	else if (page.substr(0,5) == 'page_')
 	{
@@ -470,8 +472,30 @@ function init_page()
 	}
 	else if (page.substr(0,4) == 'help')
 	{
-		parsepage(pages['help']);
-		init_help();
+		function doRenderHelp()
+		{
+			if (window.helpTemplate) {
+				parsepage(window.helpTemplate);
+				init_help();
+				loadingDialog.hide();
+				mainScroll();
+				return;
+			}
+			loadingDialog.show();
+			CMS.watch(cpage, function() {
+				doRenderHelp();
+			});
+			CMS.get('help:' + lang, function(err, content) {
+				CMS.get('help:' + lang + '.json', function(err, json) {
+					helpdata = json.object
+					parsepage(window.helpTemplate = content.html);
+					init_help();
+					loadingDialog.hide();
+					mainScroll();
+				});
+			});
+		}
+		doRenderHelp();
 	}
 	else if (page == 'privacy')
 	{

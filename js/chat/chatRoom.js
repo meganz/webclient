@@ -2005,6 +2005,11 @@ ChatRoom.prototype.appendMessage = function(message) {
     var name = self.megaChat.getContactNameFromJid(jid);
     var contact = self.megaChat.getContactFromJid(jid);
 
+    if(!contact) {
+        self.logger.error("Missing contact for jid: ", jid);
+        return false;
+    }
+
     $('.nw-contact-avatar', $message).replaceWith(self._generateContactAvatarElement(jid));
 
     $('.chat-username', $message).text(name);

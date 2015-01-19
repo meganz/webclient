@@ -6911,14 +6911,14 @@ span.search-number {
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
+.fm-dialog-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button {
 	margin: 8px -4px 0 4px;
 	height: 40px;
 }
 .top-dialog-login-button {
 	margin-top: 3px;
 }
-.fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span {
+.fm-dialog-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span {
 	height: 32px;
 	line-height: 30px;
 }
@@ -7159,8 +7159,8 @@ span.search-number {
 	margin-top: -96px;
 }
 .fm-empty-cloud .fm-empty-pad {
-	height: 292px;
-	margin-top: -145px;
+	height: 272px;
+	margin-top: -137px;
 }
 .not-logged .fm-empty-cloud .fm-empty-pad {
 	height: 398px;
@@ -7175,12 +7175,12 @@ span.search-number {
 	margin-top: -202px;
 }
 .fm-empty-trashbin .fm-empty-pad {
-	height: 302px;
-	margin-top: -151px;
+	height: 332px;
+	margin-top: -166px;
 }
 .fm-empty-contacts .fm-empty-pad {
-	height: 380px;
-	margin-top: -190px;
+	height: 370px;
+	margin-top: -185px;
 }
 .fm-empty-messages .fm-empty-pad {
 	height: 264px;
@@ -7203,13 +7203,13 @@ span.search-number {
 }
 .fm-empty-conversations .fm-empty-pad {
 	height: 252px;
-	margin-top: -126px;
+	margin-top: -102px;
 }
 .not-logged .fm-empty-conversations .fm-empty-pad {
 	height: 390px;
 	margin-top: -171px;
 }
-.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-messages-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	-moz-opacity: 0.5;
 	-khtml-opacity: 0.5;
@@ -7217,32 +7217,29 @@ span.search-number {
 	background-image: url(../images/mega/empty.png);
 	background-repeat: no-repeat;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg {
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg {
 	background-image: url(../images/mega/empty-sprite.svg);
 	background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
-	height: 223px;
-	background-position: center -291px;
+	height: 202px;
+	background-position: center -286px;
 }
 .fm-empty-search-bg {
 	height: 249px;
 	background-position: center -290px;
 }
 .fm-empty-trashbin-bg {
-	height: 233px;
-	background-position: center -640px;
+	height: 260px;
+	background-position: center -1446px;
 }
 .fm-empty-contacts-bg {
-	height: 203px;
-	background-position: center -1514px;
+	height: 192px;
+	background-position: center -1167px;
 }
 .fm-invalid-folder-bg {
-	height: 304px;
+	height: 290px;
 	background-position: center -1791px;
-}
-.hovered .fm-empty-contacts-bg {
-	background-position: center -1159px;
 }
 .fm-empty-messages-bg {
 	height: 207px;
@@ -7253,12 +7250,16 @@ span.search-number {
 	background-position: center 0px;
 }
 .fm-empty-folder-bg, .fm-empty-incoming-bg {
-	height: 226px;
-	background-position: center -871px;
+	height: 212px;
+	background-position: center -580px;
 }
 .fm-empty-folder-link-bg {
-	height: 226px;
+	height: 214px;
 	background-position: center -581px;
+}
+.fm-empty-folder-link .fm-empty-pad {
+	height: 282px;
+	margin-top: -141px;
 }
 .fm-empty-description, .fm-not-logged-description {
 	text-align: center;
@@ -9881,7 +9882,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-account-button {
 	cursor: pointer;
 	display: inline-block;
-	margin: 4px 0 0 0;
+	margin: 8px 0 0 0;
 	float: none;
 }
 .fm-dialog-button.links-button {
@@ -21173,7 +21174,7 @@ background-size: 36px auto;
  background-position:center -50px;
  background-size:60px auto;
 }
-.fm-empty-search-bg, .fm-empty-trashbin-bg, .fm-empty-messages-bg {
+.fm-empty-search-bg, .fm-empty-messages-bg {
 background-image: url(../images/mega/empty@2x.png);
  background-size: 300px auto;
 }

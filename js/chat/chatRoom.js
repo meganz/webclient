@@ -205,14 +205,17 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if($(this).is(".disabled")) {
             return false;
         }
-        var positionX = $(this).position().left;
+        var positionX = $(this).position().left - ($(this).outerWidth() * 0.75);
         var sendFilesPopup = $('.fm-start-call-popup', self.$header);
         if ($(this).attr('class').indexOf('active') == -1) {
             self.megaChat.closeChatPopups();
             sendFilesPopup.addClass('active');
             $(this).addClass('active');
-            $('.fm-start-call-arrow', self.$header).css('left', $(this).outerWidth()/2  + 'px');
-            sendFilesPopup.css('left',  $(this).position().left + 'px');
+
+            var $arrow = $('.fm-start-call-popup .fm-send-files-arrow', self.$header);
+
+            $arrow.css('left', $arrow.parent().outerWidth()*0.75  + 'px');
+            sendFilesPopup.css('left',  positionX + 'px');
         } else {
             self.megaChat.closeChatPopups();
 
@@ -788,8 +791,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     self.megaChat.trigger('onRoomCreated', [self]);
 
-
-
+    // Hide this block until text chat is ready
+    /*
     self.bind('onConversationStarted', function(e) {
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -802,7 +805,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 !self.isActive()
             )
         );
-    });
+    });*/
 
     return this;
 };

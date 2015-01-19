@@ -947,7 +947,7 @@ Chat.prototype.init = function() {
 
     var updateMyConnectionStatus = function() {
         self.renderMyStatus();
-        self.renderContactTree()
+        self.renderContactTree();
     };
 
 

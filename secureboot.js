@@ -5,6 +5,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:' && document.loc
 var is_extension = is_chrome_firefox || document.location.href.substr(0,19) == 'chrome-extension://';
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash;
+var boot_done_called = false;
 
 function isMobile()
 {
@@ -1273,7 +1274,6 @@ else
         startMega();
     }
 
-	var boot_done_called = false;
     function boot_done()
     {
 		/**

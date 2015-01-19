@@ -16,20 +16,39 @@ var ChatStore = function(megaChat) {
         'parentLogger': self.logger
     });
 
+    self.db.bind("onDbStateFailed", function() {
+        megaChat.unbind("onInit.chatStore");
+    });
+
     megaChat.unbind("onInit.chatStore");
     megaChat.bind("onInit.chatStore", function(e) {
-        self.attachToChat(megaChat);
+        var _attachToChat = function() {
+            self.attachToChat(megaChat);
 
-        if(self.cleanupInterval) {
-            clearInterval(self.cleanupInterval);
+            if(self.cleanupInterval) {
+                clearInterval(self.cleanupInterval);
+            }
+            self.cleanupInterval = setInterval(function() {
+                self.cleanup();
+            }, 30000); /* every 30sec? */
+
+            setTimeout(function() {
+                self.cleanup();
+            }, 10); // run in different thread.
+        };
+
+        if(self.db.dbState === MegaDB.DB_STATE.OPENING) {
+            self.db.bind("onDbStateReady", function() {
+                _attachToChat();
+            });
+            self.db.bind("onDbStateFailed", function() {
+                megaChat.unbind("onInit.chatStore");
+            });
+        } else if(self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+            megaChat.unbind("onInit.chatStore");
+        } else if(self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
+            _attachToChat();
         }
-        self.cleanupInterval = setInterval(function() {
-            self.cleanup();
-        }, 30000); /* every 30sec? */
-
-        setTimeout(function() {
-            self.cleanup();
-        }, 10); // run in different thread.
 
     });
 
@@ -70,6 +89,10 @@ ChatStore.DBSchema = {
  */
 ChatStore.prototype.attachToChat = function(megaChat) {
     var self = this;
+
+    if(self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
+        return;
+    }
 
     megaChat.unbind("onRoomCreated.chatStore");
     megaChat.bind("onRoomCreated.chatStore", function(e, megaRoom) {

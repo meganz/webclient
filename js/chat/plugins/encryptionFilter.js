@@ -453,7 +453,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                     self.syncRoomUsersWithEncMembers(megaRoom, true);
                 }
 
-                message = "Something went wrong. mpENC received recover request, will start the process now.";
+                message = "Something went wrong. Encrypted session received recover request, will start the process now.";
             }
 
             var $dialog = megaRoom.generateInlineDialog(
@@ -489,7 +489,7 @@ EncryptionFilter.prototype.flushQueue = function(megaRoom, handler) {
                         "mpEnc-ui-" + wireMessage.type,
                         false,
                         "mpenc-error",
-                        "Could not recover mpENC from the problem. Do you want to retry manually?",
+                        "Could not recover encrypted session from the problem. Do you want to retry manually?",
                         ['mpEnc-message', 'mpEnc-message-type-' + wireMessage.type, 'mpEnc-message-' + wireMessage.messageId], {
                             'retry': {
                                 'type': 'primary',

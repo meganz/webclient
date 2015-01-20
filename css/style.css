@@ -20674,9 +20674,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
-	transform: scale(-1, 1);
-	-webkit-transform: scale(-1, 1);
-}
+   transform: rotateY(180deg);
+   -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+   -moz-transform: none; /* Firefox */
+} 
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {
 	min-width: 648px;

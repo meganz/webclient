@@ -1779,6 +1779,7 @@ function MegaData()
                 if (this.d[id]) {
                     id = this.d[id].p;
                 }
+				else break;
             }
         }
         return a;

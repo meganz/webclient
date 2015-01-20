@@ -1717,10 +1717,10 @@ function addContactUI()
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
                                     title = l[150];
-                                    msg = l[151].replace('[X]', email);
+                                    msg = l[5898].replace('[X]', email);
                                 } else {
                                     title = l[165] + ' ' + l[5859];
-                                    msg = l[151].replace('user [X]', 'users');
+                                    msg = l[5899];
                                 }
 
                                 // It's important to call this function here and not after msgDialog

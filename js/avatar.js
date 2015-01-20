@@ -2183,7 +2183,7 @@ window.TextUtil = (function(){
                 return text;
             }
 
-            var replacement = (typeof opt_replacement === 'string') ? opt_replacement : '…',
+            var replacement = (typeof opt_replacement === 'string') ? opt_replacement : '\u2026',
                 removedCharCount = text.length - maxLength + replacement.length,
                 textCenter = Math.round(text.length/2);
 
@@ -2192,4 +2192,3 @@ window.TextUtil = (function(){
         }
     };
 })();
-

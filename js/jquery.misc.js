@@ -47,7 +47,6 @@ jQuery.expr[':'].istartswith = function(a, i, m) {
         .indexOf(m[3].toUpperCase()) == 0;
 };
 
-
 $.fn.visible = function (e, i)
 { // https://github.com/teamdf/jquery-visible
 	var a = $(this).eq(0),
@@ -75,6 +74,10 @@ $.fn.removeClassWith = function(pfx)
 				}).join(" "));
 	}
 	return this;
+};
+
+$.len = function(obj) {
+	return Object.keys(obj).length;
 };
 
 /*

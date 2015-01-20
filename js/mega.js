@@ -1752,7 +1752,7 @@ function MegaData()
         }
 
         return folders;
-    }
+    };
 
     this.getPath = function(id) {
         var a = [];
@@ -1775,7 +1775,9 @@ function MegaData()
                 g = 0;
             }
             if (g) {
-                id = this.d[id].p;
+                if (this.d[id]) {
+                    id = this.d[id].p;
+                }
             }
         }
         return a;

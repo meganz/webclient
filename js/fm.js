@@ -2159,7 +2159,7 @@ function initContextUI()
             $.hideContextMenu();
 
             // Show the share dialog
-            $shareDialog = $('.share-dialog');
+            var $shareDialog = $('.share-dialog');
             $shareDialog.removeClass('hidden');
 
             // Hide the optional message by default. This gets enabled if they try share with a user who is not a contact

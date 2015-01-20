@@ -4941,7 +4941,7 @@ function process_u(u) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
             }
         }
-        M.addUser(u[i]);
+        // M.addUser(u[i]);
     }
 
     if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {

@@ -145,7 +145,7 @@ function doRequest(id) {
 	}
 	_cms_request(cmsToId[id], function(blob) {
 		for (var i in fetching[id]) {
-			process_cms_response(blob, fetching[id][i][0], fetching[id][i][0], id);
+			process_cms_response(blob, fetching[id][i][0], fetching[id][i][1], id);
 		}
 		delete fetching[id];
 	});

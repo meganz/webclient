@@ -79,29 +79,30 @@
         <div class="nw-fm-left-icons-panel">
             <div class="nw-fm-left-icon folder-link">
                 <div class="nw-fm-left-border"></div>
-                <div class="nw-fm-left-tooltip">Folder link</div>
+                <div class="nw-fm-left-tooltip">[$808]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive">
                 <div class="nw-fm-left-border"></div>
-                <div class="nw-fm-left-tooltip">Cloud Drive</div>
+                <div class="nw-fm-left-tooltip">[$164]</div>
             </div>
             <div class="nw-fm-left-icon inbox">
                 <div class="nw-fm-left-border"></div>
-                <div class="nw-fm-left-tooltip">Inbox</div>
+                <div class="nw-fm-left-tooltip">[$166]</div>
             </div>
             <div class="nw-fm-left-icon shared-with-me">
                 <div class="nw-fm-left-border"></div>
-                <div class="nw-fm-left-tooltip">Shared with me</div>
+                <div class="nw-fm-left-tooltip">[$5589]</div>
             </div>
             <div class="nw-fm-left-icon contacts">
                 <div class="nw-fm-left-border"></div>
-                <div class="nw-fm-left-tooltip">Contacts</div>
+                <div class="nw-fm-left-tooltip">[$950]</div>
             </div>
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">2</div>
                 <div class="nw-fm-left-tooltip">Conversations</div>
             </div>
+            
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
             <div class="nw-fm-left-icon settings"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Transfer settings</div><div class="settings-icon"></div></div>
@@ -143,6 +144,7 @@
                 <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">2</div>
                 <div class="nw-fm-left-tooltip">Conversations</div>
+                <div class="beta-text">BETA</div>
             </div>
             <!-- Please add "filled" classname if user have deleted items !-->
             <div class="nw-fm-left-icon rubbish-bin"><div class="nw-fm-left-border"></div><div class="nw-fm-left-tooltip">Rubbish bin</div><div class="rubbish-bin-icon"></div></div>
@@ -364,11 +366,15 @@
 
                 </div>
                 <div class="content-panel conversations">
-                    <div class="nw-conversations-header call-started hidden">CURRENT CALLING</div>
-                    <div class="nw-conversations-item current-calling hidden"><div class="nw-contact-status"></div><div class="chat-cancel-icon"></div><div class="chat-time-txt"></div><div class="nw-conversations-name"></div></div>
-
                     <div class="conversations-container">
 
+                    </div>
+                    <div class="nw-conversations-header call-started hidden">CURRENT CALLING</div>
+                    <div class="nw-conversations-item current-calling hidden">
+                        <div class="nw-contact-status"></div>
+                        <div class="chat-cancel-icon"></div>
+                        <div class="chat-time-txt"></div>
+                        <div class="nw-conversations-name"></div>  
                     </div>
                 </div>
                 <div class="content-panel rubbish-bin">
@@ -525,7 +531,7 @@
                     <div class="chat-button fm-chat-end end-chat hidden"> <span class="fm-chatbutton">End chat</span> </div>
                     <div class="chat-button fm-send-files hidden"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
                     
-                    <div class="chat-button btn-chat-call fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+                    <div class="chat-button btn-chat-call fm-start-call"> <span class="fm-chatbutton-arrow">[$5883]</span> </div>
 
                     <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
                         <div class="fm-add-contact-arrow" style="right: 46px;"></div>
@@ -541,8 +547,8 @@
 
                     <div class="chat-popup fm-start-call-popup" style="left: -10000px;">
                         <div class="fm-send-files-arrow" style="left: 62px;"></div>
-                        <div class="fm-chat-popup-button start-audio">Start audio call</div>
-                        <div class="fm-chat-popup-button start-video">Start video conference</div>
+                        <div class="fm-chat-popup-button start-audio">[$5896]</div>
+                        <div class="fm-chat-popup-button start-video">[$5897]</div>
                     </div>
                     <div class="clear"></div>
 
@@ -562,6 +568,7 @@
                         </div>
                         <div class="others-av-screen video-call-container audio-call-container hidden">
                             <img alt="" src="" class="other-avatar"/>
+                            <div class="other-avatar-text" />
                         </div>
 
                         <!-- Current user audio container !-->
@@ -569,6 +576,7 @@
                             <div class="current-user-resizer video-only"><div></div></div>
 
                             <img style="height:100%;" src="" class="my-avatar"/>
+                            <div style="height:100%;" class="my-avatar-text"/>
                         </div>
 
                     </div>
@@ -743,11 +751,11 @@
                 </div>
 
                 <div class="fm-import-to-cloudrive hidden">
-                    <span>Import into your Cloud Drive</span>
+                    <span>[$1595]</span>
                 </div>
 
                 <div class="fm-download-as-zip hidden">
-                    <span>Download as Zip</span>
+                    <span>[$864]</span>
                 </div>
 
                 <div class="search-files-result hidden">
@@ -899,10 +907,10 @@
                     <tr>
                         <th class="grid-first-th" ><span class="grid-header-star"></span></th>
                         <th><div class="arrow name asc">[$86]</div></th>
-                    <th><div class="arrow size">[$87]</div></th>
-                    <th><div class="arrow type">[$93]</div></th>
-                    <th><div class="arrow date">[$896]</div></th>
-                    <th class="grid-url-header"></th>
+                        <th><div class="arrow size">[$87]</div></th>
+                        <th><div class="arrow type">[$93]</div></th>
+                        <th><div class="arrow date">[$896]</div></th>
+                        <th class="grid-url-header"></th>
                     </tr>
                 </table>
                 <div class="grid-scrolling-table">
@@ -1032,9 +1040,9 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                     <tr>
                         <th class="grid-first-th"><span class="grid-header-star"></span></th>
-                        <th><div class="arrow name desc">Name</div></th>
-                    <th><div class="arrow owner">Owner</div></th>
-                    <th><div class="arrow access">Access</div></th>
+                        <th><div class="arrow name desc">[$86]</div></th>
+                        <th><div class="arrow owner">Owner</div></th>
+                        <th><div class="arrow access">Access</div></th>
                     </tr>
                 </table>
 
@@ -1091,7 +1099,7 @@
                             <div class="clear"></div>
                         </div>
                         <div class="fm-start-conversation">
-                            <span>Start Conversation</span>
+                            <span>[$5885]</span>
                         </div>
                         
                         <!-- Remove hidden class when P2P file sharing is ready -->
@@ -1125,12 +1133,14 @@
                 <div class="files-grid-view contact-details-view hidden">
 
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                        <tbody><tr>
+                        <tbody>
+                            <tr>
                                 <th class="grid-first-th" style="width: 30px;"><span class="grid-header-star"></span></th>
-                                <th><div class="arrow name desc">Name</div></th>
-                        <th style="width: 270px;"><div class="arrow type">Access</div></th>
-                        </tr>
-                        </tbody></table>
+                                <th><div class="arrow name desc">[$86]</div></th>
+                                <th style="width: 270px;"><div class="arrow type">Access</div></th>
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <div class="grid-scrolling-table">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me">
@@ -1342,7 +1352,7 @@
                             <img alt="" src="" />
                         </div>
                         <div class="fm-account-info-block">
-                            <div class="fm-account-change-avatar"><span>[$993]</span>span></div>
+                            <div class="fm-account-change-avatar"><span>[$993]</span></div>
                             <div class="clear"></div>
                         </div>
                     </div>
@@ -1354,7 +1364,7 @@
                                 <label for="account-firstname">[$1096] <span class="red">*</span></label>
                             </div>
                             <div class="labels-block">
-                                <label for="account-lastname">[$1097] <span class="red">*</span></label>
+                                <label for="account-lastname">[$1097] </label>
                             </div>
                             <div class="labels-block">
                                 <label >[$995]</label>

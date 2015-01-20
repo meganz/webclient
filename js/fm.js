@@ -1156,7 +1156,6 @@ function isValidShareLink()
 
 function removeUInode(h)
 {
-
     var n = M.d[h];
     var i = 0;
     // check subfolders
@@ -1215,7 +1214,7 @@ function removeUInode(h)
             }
             break;
         case M.RubbishID:
-            if (i == 0)
+            if (i == 0 && n)
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
@@ -1226,7 +1225,7 @@ function removeUInode(h)
             }
             break;
         case M.RootID:
-            if (i == 0)
+            if (i == 0 && n)
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
@@ -1708,7 +1707,7 @@ function addContactUI()
                 var $mails = $('.token-input-list-mega .token-input-token-mega');
                 var mailNum = $mails.length;
                 var emailText = $('.add-user-textarea textarea').val();
-                                
+
                 if (mailNum) {
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
@@ -1717,10 +1716,10 @@ function addContactUI()
                             if (index === mailNum - 1) {
                                 if (mailNum === 1) {
                                     title = l[150];
-                                    msg = l[151].replace('[X]', email);
+                                    msg = l[5898].replace('[X]', email);
                                 } else {
                                     title = l[165] + ' ' + l[5859];
-                                    msg = l[151].replace('user [X]', 'users');
+                                    msg = l[5899];
                                 }
 
                                 // It's important to call this function here and not after msgDialog
@@ -1954,7 +1953,7 @@ function fmremove() {
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
             if ($(e).text() === l[1018])
-                $(e).text(l[83]);
+                $(e).html('<span>'+l[83]+'</span>');
         });
     } else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
@@ -2577,7 +2576,7 @@ function doClearbin()
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e)
     {
         if (e)
-            M.clearRubbish();
+            M.clearRubbish(!!($.selected || []).length);
     });
 }
 
@@ -2968,14 +2967,28 @@ function accountUI()
         $('.fm-account-save').unbind('click');
         $('.fm-account-save').bind('click', function(e)
         {
-            u_attr.firstname = $('#account-firstname').val();
-            u_attr.lastname = $('#account-lastname').val();
+            u_attr.firstname = $('#account-firstname').val().trim();
+            u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.fm-account-select.day select').val();
             u_attr.birthmonth = $('.fm-account-select.month select').val();
             u_attr.birthyear = $('.fm-account-select.year select').val();
             u_attr.country = $('.fm-account-select.country select').val();
 
-            api_req({a: 'up', firstname: base64urlencode(to8(u_attr.firstname)), lastname: base64urlencode(to8(u_attr.lastname)), birthday: base64urlencode(u_attr.birthday), birthmonth: base64urlencode(u_attr.birthmonth), birthyear: base64urlencode(u_attr.birthyear), country: base64urlencode(u_attr.country)});
+            api_req({
+                a : 'up',
+                firstname  : base64urlencode(to8(u_attr.firstname)),
+                lastname   : base64urlencode(to8(u_attr.lastname)),
+                birthday   : base64urlencode(u_attr.birthday),
+                birthmonth : base64urlencode(u_attr.birthmonth),
+                birthyear  : base64urlencode(u_attr.birthyear),
+                country    : base64urlencode(u_attr.country)
+            }, {
+                callback : function(res) {
+                    if (res === u_handle) {
+                        $('.user-name').text(u_attr.firstname);
+                    }
+                }
+            });
             $('.fm-account-save-block').addClass('hidden');
 
             if (M.account.dl_maxSlots)
@@ -3016,6 +3029,10 @@ function accountUI()
                 msgDialog('warninga', l[135], l[719], false, function()
                 {
                     $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
                 });
             }
             else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
@@ -3034,17 +3051,24 @@ function accountUI()
                     {
                         loadingDialog.hide();
                         if (res == EACCESS)
-                        {
+                        { // pwd incorrect
                             msgDialog('warninga', l[135], l[724], false, function()
                             {
                                 $('#account-password').val('');
                                 $('#account-password').focus();
+                                $('#account-password').bind('keyup.accpwd', function() {
+                                    $('.fm-account-save-block').removeClass('hidden');
+                                    $('#account-password').unbind('keyup.accpwd');
+                                });
                             });
                         }
                         else if (typeof res == 'number' && res < 0)
+                        { // something went wrong
+                            $('#account-confirm-password,#account-password,#account-new-password').val('');
                             msgDialog('warninga', 'Error', l[200]);
+                        }
                         else
-                        {
+                        { // success
                             msgDialog('info', l[726], l[725], false, function()
                             {
                                 $('#account-confirm-password,#account-password,#account-new-password').val('');
@@ -4466,78 +4490,85 @@ function UIkeyevents()
     });
 }
 
-function searchPath() {
-    if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
-        var sel;
-        if (M.viewmode)
-            sel = $('.fm-blocks-view .ui-selected');
-        else
-            sel = $('.grid-table .ui-selected');
-        if (sel.length === 1) {
-            var html = '';
-            var path = M.getPath($(sel[0]).attr('id'));
-            path.reverse();
-            for (var i in path) {
-                var c, name, id = false, iconimg = '';
-                var n = M.d[path[i]];
-                if (path[i].length === 11 && M.u[path[i]]) {
-                    id = path[i];
-                    c = 'contacts-item';
-                    name = M.u[path[i]].m;
-                } else if (path[i] === M.RootID) {
-                    id = M.RootID;
-                    c = 'cloud-drive';
-                    name = l[164];
-                } else if (path[i] === M.RubbishID) {
-                    id = M.RubbishID;
-                    c = 'recycle-item';
-                    name = l[168];
-                } else if (path[i] === M.InboxID) {
-                    id = M.InboxID;
-                    c = 'inbox-item';
-                    name = l[166];
-                } else if (n) {
-                    id = n.h;
-                    c = '';
-                    name = n.name;
-                    if (n.t)
-                        c = 'folder';
-                    else
-                        iconimg = '<span class="search-path-icon-span ' + fileicon(n) + '"></span>';
-                }
-                if (id) {
-                    html += '<div class="search-path-icon ' + c + '" id="spathicon_' + htmlentities(id) + '">' + iconimg + '</div><div class="search-path-txt" id="spathname_' + htmlentities(id) + '">' + htmlentities(name) + '</div>';
-                    if (i < path.length - 1)
-                        html += '<div class="search-path-arrow"></div>';
-                }
-            }
-            html += '<div class="clear"></div>';
-            $('.search-bottom-menu').html(html);
-            $('.fm-blocks-view,.files-grid-view').addClass('search');
-
-            $('.search-path-icon,.search-path-icon').unbind('click');
-            $('.search-path-icon,.search-path-txt').bind('click', function(e) {
-                var id = $(this).attr('id');
-                if (id) {
-                    id = id.replace('spathicon_', '').replace('spathname_', '');
-                    var n = M.d[id];
-                    $.selected = [];
-                    if (!n.t) {
-                        $.selected.push(id);
-                        id = n.p;
-                    }
-                    if (n)
-                        M.openFolder(id);
-                    if ($.selected.length > 0)
-                        reselect(1);
-                }
-            });
-        } else {
-            $('.fm-blocks-view,.files-grid-view').removeClass('search');
-        }
-    } else {
-        $('.fm-blocks-view,.files-grid-view').removeClass('search');
-    }
+function searchPath()
+{
+	if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/')
+	{
+		var sel;
+		if (M.viewmode) sel = $('.fm-blocks-view .ui-selected');
+		else sel = $('.grid-table .ui-selected');
+		if (sel.length == 1)
+		{
+			var html = '';
+			var path = M.getPath($(sel[0]).attr('id'));
+			path.reverse();
+			for (var i in path)
+			{
+				var c,name,id=false,iconimg='';;
+				var n = M.d[path[i]];
+				if (path[i].length == 11 && M.u[path[i]])
+				{
+					id = path[i];
+					c = 'contacts-item';
+					name = M.u[path[i]].m;
+				}
+				else if (path[i] == M.RootID)
+				{
+					id = M.RootID;
+					c = 'cloud-drive';
+					name = l[164];
+				}
+				else if (path[i] == M.RubbishID)
+				{
+					id = M.RubbishID;
+					c = 'recycle-item';
+					name = l[168];
+				}
+				else if (path[i] == M.InboxID)
+				{
+					id = M.InboxID;
+					c = 'inbox-item';
+					name = l[166];
+				}
+				else if (n)
+				{
+					id = n.h;
+					c = '';
+					name = n.name;
+					if (n.t) c = 'folder';
+					else iconimg = '<span class="search-path-icon-span ' + fileicon(n) + '"></span>';
+				}
+				if (id)
+				{
+					html += '<div class="search-path-icon '+c+'" id="spathicon_'+htmlentities(id) + '">' + iconimg + '</div><div class="search-path-txt" id="spathname_'+htmlentities(id) + '">' + htmlentities(name) + '</div>';
+					if (i < path.length-1) html += '<div class="search-path-arrow"></div>';
+				}
+			}
+			html += '<div class="clear"></div>';
+			$('.search-bottom-menu').html(html);
+			$('.fm-blocks-view,.files-grid-view').addClass('search');
+			$('.search-path-icon,.search-path-icon').unbind('click');
+			$('.search-path-icon,.search-path-txt').bind('click',function(e)
+			{
+				var id = $(this).attr('id');
+				if (id)
+				{
+					id = id.replace('spathicon_','').replace('spathname_','');
+					var n = M.d[id];
+					$.selected=[];
+					if (!n.t)
+					{
+						$.selected.push(id);
+						id = n.p;
+					}
+					if (n) M.openFolder(id);
+					if ($.selected.length > 0) reselect(1);
+				}
+			});
+		}
+		else $('.fm-blocks-view,.files-grid-view').removeClass('search');
+	}
+	else $('.fm-blocks-view,.files-grid-view').removeClass('search');
 }
 
 function selectddUI() {
@@ -9126,12 +9157,15 @@ function contactUI() {
             if (onlinestatus[1] !== "offline" && u_h !== u_handle) {
                 // user is online, lets display the "Start chat" button
 
-                var startChatTxt = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : "Start conversation";
-                var startCall = 'Start conversation';
-                
+                // Can use the line below again once text chat is ready
+                //var startConversationText = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : l[5885];
+
+                // Temporary for just video/audio only
+                var startConversationText = l[5885];
+
                 $('.fm-start-conversation').removeClass('hidden');
-				$('.fm-start-conversation span').text(startCall);
-                
+				$('.fm-start-conversation span').text(startConversationText);
+
                 // Add this line back in when P2P file sharing is confirmed working
                 //$('.fm-send-files').removeClass('hidden');
 
@@ -9284,13 +9318,13 @@ function FMResizablePane(element, opts) {
  */
 function selectText(elementId) {
     var doc = document, text = doc.getElementById(element), range, selection;
-    
+
     if (doc.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     } else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();

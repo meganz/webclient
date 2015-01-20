@@ -461,12 +461,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 'sid': eventData.sid
             };
 
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     []
                 )
             );
@@ -507,12 +510,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         } else {
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     [])
             );
 
@@ -521,12 +527,16 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
     self.bind('call-answer-timeout', function(e, eventData) {
+
+        // Substitute email into language string
+        var callWithString = l[5890].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+
         self.appendDomMessage(
             self.generateInlineDialog(
                 "rejected-call-" + unixtime(),
                 eventData.peer,
                 "call-timeout",
-                "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
+                callWithString,
                 []
             )
         );
@@ -555,8 +565,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(Strophe.getBareJidFromJid(peer) == self.megaChat.karere.getBareJid()) {
             userJid = self.getParticipantsExceptMe()[0];
         }
-        msg = "Incoming call with " + self.megaChat.getContactNameFromJid(userJid) + " was rejected.";
-
+        
+        // Show "Call with [X] was rejected."
+        msg = l[5892].replace('[X]', self.megaChat.getContactNameFromJid(userJid));
 
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -601,7 +612,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-from-different-device",
-                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was handled on some other device.",
+                    l[5895].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer)),    // Call with [X] was handled on some other device.
                     []
                 )
             );
@@ -611,12 +622,12 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-canceled",
-                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
+                    l[5894].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer)),    // Call with [X] was canceled.
                     []
                 )
             );
         }
-        if(eventData.info.sid == self.callRequest.sid) {
+        if(self.callRequest && eventData.info.sid == self.callRequest.sid) {
             self._resetCallStateNoCall();
         }
     });
@@ -626,7 +637,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             return;
         }
 
-        var msg = "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.";
+        // Substitute email into language string
+        var msg = l[5889].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
 
         if(eventData.reason == "security" || eventData.reason == "initiate-timeout") {
             self.appendDomMessage(
@@ -637,7 +649,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     msg + " " + eventData.text,
                     []
                 )
-            )
+            );
         } else {
             //TODO: should we add special UI notification for .reason === busy? do we have icon for this?
 
@@ -854,7 +866,6 @@ ChatRoom.prototype._cancelCallRequest = function() {
             if(sid) {
                 var sess = self.megaChat.rtc.jingle.sessions[sid];
                 if(sess) {
-                    debugger;
                     self.megaChat.rtc.jingle.terminate(sess, 'hangup');
                 }
             }
@@ -931,12 +942,15 @@ ChatRoom.prototype._startCall = function() {
 
     self._resetCallStateInCall();
 
+    // Substitute email into language string
+    var callingString = l[5891].replace('[X]', self.megaChat.getContactNameFromJid(participants[0]));
+
     self.appendDomMessage(
         self.generateInlineDialog(
             "outgoing-call",
             participants[0],
             "outgoing-call",
-            "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + " ...",
+            callingString,
             [], {
                 'reject': {
                     'type': 'secondary',
@@ -980,15 +994,48 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
         if(myAvatar) {
             $('.my-avatar', self.$header).attr('src', myAvatar.url);
             $('.my-avatar', self.$header).show();
+            $('.my-avatar-text', self.$header).hide();
         } else {
             $('.my-avatar', self.$header).hide();
+            var $txtAvatar = $('<div class="nw-contact-avatar"/>')
+                .append(
+                    generateAvatarElement(u_handle)
+                )
+                .addClass(u_handle)
+                .addClass(
+                    "color" + generateAvatarMeta(u_handle).color
+                );
+
+            $('.my-avatar-text', self.$header)
+                .empty()
+                .append(
+                    $txtAvatar
+                )
+              .show();
         }
         var otherUserContact = self.megaChat.getContactFromJid(self.getParticipantsExceptMe()[0]);
         if(otherUserContact.u && avatars[otherUserContact.u]) {
             $('.other-avatar', self.$header).attr('src', avatars[otherUserContact.u].url);
             $('.other-avatar', self.$header).show();
+            $('.other-avatar-text', self.$header).hide();
         } else {
             $('.other-avatar', self.$header).hide();
+
+            var $txtAvatar2 = $('<div class="nw-contact-avatar"/>')
+                .append(
+                    generateAvatarElement(otherUserContact.u)
+                )
+                .addClass(otherUserContact.u)
+                .addClass(
+                    "color" + generateAvatarMeta(otherUserContact.u).color
+                );
+
+            $('.other-avatar-text', self.$header)
+                .empty()
+                .append(
+                    $txtAvatar2
+                )
+                .show();
         }
 
 
@@ -1298,9 +1345,27 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
             .addClass(audioCssClass)
             .removeClass(videoCssClass);
 
-        $('.my-avatar, .other-avatar', $screenElement).show();
+        $('.my-avatar[src], .other-avatar[src]', $screenElement).show();
         $('.video-only', $screenElement).hide();
         $('video', $screenElement).hide();
+
+        if(videoCssClass == 'current-user-video-container') {
+            if($('.my-avatar', $screenElement).attr('src') != '') {
+                $('.my-avatar', $screenElement).show();
+                $('.my-avatar-text', $screenElement).hide();
+            } else {
+                $('.my-avatar', $screenElement).hide();
+                $('.my-avatar-text', $screenElement).show();
+            }
+        } else {
+            if($('.other-avatar', $screenElement).attr('src') != '') {
+                $('.other-avatar', $screenElement).show();
+                $('.other-avatar-text', $screenElement).hide();
+            } else {
+                $('.other-avatar', $screenElement).hide();
+                $('.other-avatar-text', $screenElement).show();
+            }
+        }
 
         if($('.video-full-container').is(":visible")) {
             if(videoCssClass == 'current-user-video-container') {
@@ -1315,7 +1380,7 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
             .removeClass(audioCssClass)
             .addClass(videoCssClass);
 
-        $('.my-avatar, .other-avatar', $screenElement).hide();
+        $('.my-avatar, .my-avatar-text, .other-avatar, .other-avatar-text', $screenElement).hide();
         $('.video-only', $screenElement).show();
         $('video', $screenElement).show();
 
@@ -1772,7 +1837,7 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
                 presenceText
             );
 
-            $('.nw-contact-avatar', self.$header).replaceWith(self._generateContactAvatarElement(participants[0]));
+            $('> .nw-contact-avatar', self.$header).replaceWith(self._generateContactAvatarElement(participants[0]));
 
         }
     } else {

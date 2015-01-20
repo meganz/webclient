@@ -654,14 +654,34 @@ var Chat = function() {
                 }
             },
             iceServers:[
-//                 {url: 'stun:stun.l.google.com:19302'},
+                // {url: 'stun:stun.l.google.com:19302'},
                 {
-                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+                    url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',   // NZ
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -703,7 +723,7 @@ var Chat = function() {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
-                        return "You have an incoming call from " + params.from;
+                        return l[5893].replace('[X]', params.from); // You have an incoming call from [X].
                     }
                 }
             },
@@ -756,9 +776,9 @@ Chat.prototype.init = function() {
     if(typeof(mocha) == "undefined" && !disableMpEnc) {
         self.plugins['encryptionFilter'] = new EncryptionFilter(self);
     }
-    if(typeof(mocha) == "undefined") {
-        self.plugins['chatStore'] = new ChatStore(self);
-    }
+    //if(typeof(mocha) == "undefined") {
+    //    self.plugins['chatStore'] = new ChatStore(self);
+    //}
     if(typeof(mocha) == "undefined") {
         self.plugins['chatNotifications'] = new ChatNotifications(self, self.options.chatNotificationOptions);
     }

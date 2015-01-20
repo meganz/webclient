@@ -442,7 +442,7 @@ var gifSlider = {
     preLoadImages: function(side) {
         
         // Get the current URL without the location hash (#xycabc), also add on the path to the images dir
-        var baseImagePath = location.href.replace(location.hash, '') + 'images/products/';
+        var baseImagePath = staticpath + 'images/products/';
                 
         // Check if using retina display
         var retina = (window.devicePixelRatio > 1) ? '-2x' : '';

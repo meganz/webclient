@@ -5,10 +5,6 @@ var dlMethod
 	, ui_paused = false
 	, dlQueue = new TransferQueue(downloader, dl_maxSlots, 'downloads')
 
-/** @FIXME: move me somewhere else */
-$.len = function(obj) {
-	return Object.keys(obj).length;
-};
 
 function dl_cancel() {
 	DownloadManager.abort(null);

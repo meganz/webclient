@@ -1,5 +1,11 @@
 var linuxsync = 
 [{
+	'name':'CentOS 7.0',
+	'64':'CentOS_7/x86_64/megasync-1.0.37-13.1.x86_64.rpm',
+	'64n':'CentOS_7/x86_64/nautilus-megasync-1.0.37-5.1.x86_64.rpm',
+	'c':'sudo yum localinstall'
+},
+{
 	'name':'Debian 7.0',
 	'32':'Debian_7.0/i386/megasync-Debian_7.0_i386.deb',
 	'32n':'Debian_7.0/i386/nautilus-megasync-Debian_7.0_i386.deb',
@@ -22,6 +28,22 @@ var linuxsync =
 	'64':'Fedora_20/x86_64/megasync-Fedora_20.x86_64.rpm',
 	'64n':'Fedora_20/x86_64/nautilus-megasync-Fedora_20.x86_64.rpm',
 	'c':'sudo yum localinstall'
+},
+{
+	'name':'Fedora 21',
+	'32':'Fedora_21/i686/megasync-Fedora_21.i686.rpm',
+	'32n':'Fedora_21/i686/nautilus-megasync-Fedora_21.i686.rpm',
+	'64':'Fedora_21/x86_64/megasync-Fedora_21.x86_64.rpm',
+	'64n':'Fedora_21/x86_64/nautilus-megasync-Fedora_21.x86_64.rpm',
+	'c':'sudo yum localinstall'
+},
+{
+	'name':'Mint 17',
+	'32':'xUbuntu_14.04/i386/megasync-xUbuntu_14.04_i386.deb',
+	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
+	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
+	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
+	'c':'sudo gdebi'
 },
 {
 	'name':'openSUSE 12.2',
@@ -56,6 +78,12 @@ var linuxsync =
 	'c':'sudo zypper in'
 },
 {
+	'name':'Red Hat 7',
+	'64':'RHEL_7/x86_64/megasync-1.0.37-13.1.x86_64.rpm',
+	'64n':'RHEL_7/x86_64/nautilus-megasync-1.0.37-5.1.x86_64.rpm',
+	'c':'sudo yum localinstall'
+},
+{
 	'name':'Ubuntu 12.04',
 	'32':'xUbuntu_12.04/i386/megasync-xUbuntu_12.04_i386.deb',
 	'32n':'xUbuntu_12.04/i386/nautilus-megasync-xUbuntu_12.04_i386.deb',
@@ -85,6 +113,14 @@ var linuxsync =
 	'32n':'xUbuntu_14.04/i386/nautilus-megasync-xUbuntu_14.04_i386.deb',
 	'64':'xUbuntu_14.04/amd64/megasync-xUbuntu_14.04_amd64.deb',
 	'64n':'xUbuntu_14.04/amd64/nautilus-megasync-xUbuntu_14.04_amd64.deb',
+	'c':'sudo gdebi'
+},
+{
+	'name':'Ubuntu 14.10',
+	'32':'xUbuntu_14.10/i386/megasync-xUbuntu_14.10_i386.deb',
+	'32n':'xUbuntu_14.10/i386/nautilus-megasync-xUbuntu_14.10_i386.deb',
+	'64':'xUbuntu_14.10/amd64/megasync-xUbuntu_14.10_amd64.deb',
+	'64n':'xUbuntu_14.10/amd64/nautilus-megasync-xUbuntu_14.10_amd64.deb',
 	'c':'sudo gdebi'
 }];
 
@@ -249,6 +285,17 @@ function sync_switchOS(os)
 
 function changeLinux(i)
 {
+	if (linuxsync[i]['32'])
+	{
+		$('.linux32').parent().show();
+		$('.radio-txt.32').show();
+	}
+	else
+	{
+		$('.linux32').parent().hide();
+		$('.radio-txt.32').hide();
+	}
+
 	if (linuxsync[i])
 	{
 		$('.version-select-txt').text(linuxsync[i].name);

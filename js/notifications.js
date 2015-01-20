@@ -93,7 +93,6 @@ var notifyPopup = {
             
             // Update popup counter
             notifyPopup.markSpecificNotificationAsRead(notificationId);
-            
         });
 
         $('.notifications-button.red').unbind('click');
@@ -143,6 +142,9 @@ var notifyPopup = {
         
         // Update red circle and tooltip
         notifyPopup.notifyCounter();
+        
+        // Update server so it knows which notifications the user has seen
+        api_req({ a: 'sla', i: requesti });
     },
 
     /**
@@ -626,8 +628,8 @@ var notifyPopup = {
                 
                 // Render the Accept/Not now buttons
                 pendingContactHtml = '<span class="notification-request-buttons">'
-                                   +    '<span class="fm-dialog-button notifications-button accept" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '">Accept</span>'
-                                   +    '<span class="fm-dialog-button notifications-button not-now" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '">Not now</span>'
+                                   +    '<span class="fm-dialog-button notifications-button accept" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '"><span>Accept</span></span>'
+                                   +    '<span class="fm-dialog-button notifications-button not-now" data-notification-id="' + notificationId + '" data-pending-contact-id="' + pendingContactId + '"><span>Not now</span></span>'
                                    + '</span>';
             }
             

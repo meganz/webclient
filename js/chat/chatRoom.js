@@ -2361,7 +2361,6 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
         unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
     );
 
-
     var $primaryButton = $('.primary-button', $inlineDialog).detach();
     var $secondaryButton = $('.secondary-button', $inlineDialog).detach();
 
@@ -2369,7 +2368,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
         $.each(buttons, function(k, v) {
             var $button = v.type == "primary" ? $primaryButton.clone() : $secondaryButton.clone();
             $button.addClass('fm-chat-inline-dialog-button-' + k);
-            $button.text(v.text);
+            $button.find('span').text(v.text);
             $button.bind('click', function(e) {
                 v.callback(e);
             });

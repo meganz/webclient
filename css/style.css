@@ -1417,10 +1417,14 @@ a.blog-button:hover {
 	height: 48px;
 }
 .notification-username {
-	font-size: 13px;
-	line-height: 16px;
-	padding: 0;
 	display: block;
+    font-size: 13px;
+    line-height: 16px;
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 205px;
 }
 .notification-content {
 	display: block;
@@ -8538,6 +8542,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-moz-border-radius: 12px;
 	-webkit-border-radius: 12px;
 	border-radius: 12px;
+}
+.fm-chat-file-button.secondary-button.fm-chat-inline-dialog-button-reject {
+    margin-left: 5px;
 }
 .fm-chat-message .fm-chat-file-button {
 	margin-top: 0;

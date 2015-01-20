@@ -461,12 +461,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 'sid': eventData.sid
             };
 
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     []
                 )
             );
@@ -507,12 +510,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         } else {
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+            
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     [])
             );
 
@@ -521,12 +527,16 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
     self.bind('call-answer-timeout', function(e, eventData) {
+        
+        // Substitute email into language string
+        var callWithString = l[5890].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+        
         self.appendDomMessage(
             self.generateInlineDialog(
                 "rejected-call-" + unixtime(),
                 eventData.peer,
                 "call-timeout",
-                "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
+                callWithString,
                 []
             )
         );
@@ -625,8 +635,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         }
-
-        var msg = "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.";
+        
+        // Substitute email into language string
+        var msg = l[5889].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
 
         if(eventData.reason == "security" || eventData.reason == "initiate-timeout") {
             self.appendDomMessage(
@@ -637,7 +648,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     msg + " " + eventData.text,
                     []
                 )
-            )
+            );
         } else {
             //TODO: should we add special UI notification for .reason === busy? do we have icon for this?
 
@@ -931,12 +942,15 @@ ChatRoom.prototype._startCall = function() {
 
     self._resetCallStateInCall();
 
-    self.appendDomMessage(
+    // Substitute email into language string
+    var callingString = l[5891].replace('[X]', self.megaChat.getContactNameFromJid(participants[0]));
+
+    self.appendDomMessage(     
         self.generateInlineDialog(
             "outgoing-call",
             participants[0],
             "outgoing-call",
-            "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + " ...",
+            callingString,
             [], {
                 'reject': {
                     'type': 'secondary',

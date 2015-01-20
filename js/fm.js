@@ -1156,7 +1156,6 @@ function isValidShareLink()
 
 function removeUInode(h)
 {
-
     var n = M.d[h];
     var i = 0;
     // check subfolders
@@ -1215,7 +1214,7 @@ function removeUInode(h)
             }
             break;
         case M.RubbishID:
-            if (i == 0)
+            if (i == 0 && n)
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
@@ -1226,7 +1225,7 @@ function removeUInode(h)
             }
             break;
         case M.RootID:
-            if (i == 0)
+            if (i == 0 && n)
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders

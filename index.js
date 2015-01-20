@@ -925,14 +925,14 @@ function tooltiplogin()
 	else if ($('#login-password').val() == '' || $('#login-password').val() == l[909]) $('.top-login-input-block.password').addClass('incorrect');
 	else
 	{
-		$('.top-dialog-login-button').html('<img alt="" src="'+staticpath+'images/mega/ajax-loader.gif">');
+		$('.top-dialog-login-button span').html('<img alt="" src="'+staticpath+'images/mega/ajax-loader.gif">');
 		$('.top-dialog-login-button').addClass('loading');
 		if ($('.loginwarning-checkbox').attr('class').indexOf('checkboxOn') > -1) localStorage.hideloginwarning=1;
 		var remember;
 		if ($('.login-checkbox').attr('class').indexOf('checkboxOn') > -1) remember=1;
 		postLogin($('#login-name').val(),$('#login-password').val(),remember,function(r)
 		{
-			$('.top-dialog-login-button').html(l[171]);
+			$('.top-dialog-login-button span').html(l[171]);
 			$('.top-dialog-login-button').removeClass('loading');
 			if (r == EBLOCKED)
 			{

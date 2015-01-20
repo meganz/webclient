@@ -4928,18 +4928,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: relative;
 }
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
-	background: #646464;
-	border-radius: 10px;
-	color: #000;
-	font-size: 10px;
-	font-weight: bold;
-	left: 4px;
-	padding: 0 7px;
+	left: 6px;
+	height: 14px;
 	position: absolute;
-	top: 49px;
+	top: 48px;
+	width: 36px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -10008px;
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
-	background: #34A7DC;
+	background-position: center -9958px;
 }
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -367px;
@@ -5271,10 +5270,6 @@ th.grid-first-th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
- ilter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
 }
 .grid-status-icon {
 	background-position: -7px -1494px;
@@ -6845,33 +6840,33 @@ table {
 .fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	position: relative;
 }
-.search-files-result span {
+.search-files-result span, .search-files-result.disabled span {
 	background-position: -4px -4559px;
 }
 .long-path .fm-new-folder span, .long-path .search-files-result span, .long-path .fm-file-upload span, .long-path .search-messages-result span, .long-path .fm-folder-upload span {
 	padding: 0 10px 0 24px;
 	min-width: 0;
 }
-.fm-notification-settings span {
+.fm-notification-settings span, .fm-notification-settings.disabled span {
 	background-position: -18px -6106px;
 	padding: 0 10px 0 28px;
 }
 .fm-new-folder span, .fm-file-upload span, .fm-folder-upload span {
 	padding-left: 31px;
 }
-.fm-new-folder span {
+.fm-new-folder span, .fm-new-folder.disabled span {
 	background-position: 2px -1038px;
 }
 .fm-new-folder:hover span, .fm-new-folder.active span {
 	background-position: 2px -1065px;
 }
-.fm-file-upload span {
+.fm-file-upload span, .fm-file-upload.disabled span {
 	background-position: 2px -1090px;
 }
 .fm-file-upload:hover span, .fm-file-upload.active span {
 	background-position: 2px -1120px;
 }
-.fm-folder-upload span {
+.fm-folder-upload span, .fm-folder-upload.disabled span {
 	background-position: 2px -1157px;
 }
 .fm-folder-upload:hover span, .fm-folder-upload.active span {
@@ -6917,7 +6912,7 @@ table {
 .fm-chat-file-button span {
 	padding: 0 10px;
 }
-.fm-start-video-call span {
+.fm-start-video-call span, .fm-start-video-call.disabled span {
 	background-position: -7px -9531px;
 	padding: 0 10px 0 34px;
 }
@@ -6959,8 +6954,17 @@ table {
 .fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span {
 	color: rgba(49,181,0,1);
 }
+/* disabled */
+.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-contact-requests.disabled, .fm-received-requests.disabled, .fm-dialog-button.disabled, .fm-account-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled {
+	cursor: default;
+	background-color: rgba(255,255,255,0);
+}
+.fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span {
+	cursor: default;
+	color: #777777;
+}
 .fm-chat-file-button.primary-button.fm-chat-inline-dialog-button-answer {
-    margin-left: 10px;
+	margin-left: 10px;
 }
 .fm-send-files:hover span, .fm-send-files.active span {
 	background-position: -9px -5855px;
@@ -6971,17 +6975,17 @@ table {
 .fm-add-user:hover span, .fm-add-user.active span {
 	background-position: -9px -5925px;
 }
-.fm-add-user span {
+.fm-add-user span, .fm-add-user.disabled span {
 	background-position: -9px -1730px;
 }
 .fm-chat-end:hover span, .fm-chat-end.active span {
 	background-position: 6px -8544px;
 }
-.fm-contact-requests span, .fm-received-requests span {
+.fm-contact-requests span, .fm-received-requests span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span {
 	background-position: 1px -3035px;
 	padding: 0 10px 0 32px;
 }
-.fm-received-requests span {
+.fm-received-requests span, .fm-received-requests.disabled span {
 	background-position: 1px -3005px;
 }
 .chat-button.disabled {
@@ -6991,22 +6995,22 @@ table {
 	opacity: 0.5;
 	cursor: default;
 }
-.fm-send-files span {
+.fm-send-files span, .fm-send-files.disabled span {
 	background-position: -9px -1700px;
 }
-.fm-chat-end span {
+.fm-chat-end span, .fm-chat-end.disabled span {
 	background-position: 6px -8979px;
 }
-.fm-start-call span {
+.fm-start-call span, .fm-start-call.disabled span {
 	background-position: -9px -1670px;
 }
 .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span {
 	background-image: url(../images/mega/shared-sprite.svg);
 }
-.fm-start-conversation span {
+.fm-start-conversation span, .fm-start-conversation.disabled span {
 	background-position: -4px -713px;
 }
-.fm-share-folders span {
+.fm-share-folders span, .fm-share-folders.disabled span {
 	background-position: -2px -883px;
 	padding: 0 10px 0 32px;
 }
@@ -7017,7 +7021,7 @@ table {
 	margin: 9px 4px 0 6px;
 	float: left;
 }
-.fm-verify span {
+.fm-verify span, .fm-verify.disabled span {
 	background-position: -4px -743px;
 }
 .fm-verify:hover span, .fm-verify.active span {
@@ -7027,11 +7031,11 @@ table {
 	margin: 9px 4px 0 0;
 	float: left;
 }
-.fm-question span {
+.fm-question span, .fm-question.disabled span {
 	background-position: -2px -792px;
 	padding: 0 10px 0 16px;
 }
-.fm-clearbin-button span, .fm-share-download span {
+.fm-clearbin-button span, .fm-share-download span, .fm-clearbin-button.disabled span, .fm-share-download.disabled span {
 	background-position: -5px -5790px;
 	padding: 0 10px 0 29px;
 }
@@ -7041,25 +7045,25 @@ table {
 .fm-download-as-zip span, .fm-import-to-cloudrive span {
 	padding: 0 10px 0 36px;
 }
-.fm-download-as-zip span {
+.fm-download-as-zip span, .fm-download-as-zip.disabled span {
 	background-position: -4px -4730px;
 }
-.fm-import-to-cloudrive span {
+.fm-import-to-cloudrive span, .fm-import-to-cloudrive.disabled span {
 	background-position: -7px -9978px;
 }
-.fm-leave-share span, .fm-share-copy span, .fm-share-download span {
+.fm-leave-share span, .fm-share-copy span, .fm-share-download span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -32px -378px;
 }
-.fm-leave-share span {
+.fm-leave-share span, .fm-leave-share.disabled span {
 	background-position: -31px -458px;
 	padding-left: 31px;
 }
-.fm-share-copy span {
+.fm-share-copy span, .fm-share-copy.disabled span {
 	background-position: -32px -418px;
 }
-.fm-share-download span {
+.fm-share-download span, .fm-share-download.disabled span {
 	background-position: -32px -378px;
 	padding-left: 30px;
 }
@@ -8012,9 +8016,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	border-radius: 6px;
 	height: 100%;
 }
-
-
-
 /** text avatars in a/v calls **/
 .other-avatar-text .nw-contact-avatar {
 	width: 247px;
@@ -8038,9 +8039,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	box-shadow: none;
 	border-radius: 5px;
 }
-
-
-
 .video-resizer {
 	height: 16px;
 	width: 16px;
@@ -19143,6 +19141,9 @@ span.incoming-call-name {
 }
 .fingerprint-contact-info .contact-details-user-name, .fingerprint-contact-info .contact-details-email {
 	white-space: nowrap;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 	display: block;
 	float: none;
 	padding-right: 0;
@@ -20666,8 +20667,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
-	transform: scale(-1, 1);
-	-webkit-transform: scale(-1, 1);
+	transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
+	-moz-transform: none; /* Firefox */
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

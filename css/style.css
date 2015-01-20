@@ -4933,7 +4933,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	color: #000;
 	font-size: 10px;
 	font-weight: bold;
-	left: 4px;
+	left: 3px;
 	padding: 0 7px;
 	position: absolute;
 	top: 49px;
@@ -5271,10 +5271,6 @@ th.grid-first-th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
- ilter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
 }
 .grid-status-icon {
 	background-position: -7px -1494px;

@@ -1418,6 +1418,7 @@ function MegaData()
             // Get the user handle and change to conversations screen
             var user_handle = id.replace('contact_', '');
             window.location = '#fm/chat/' + user_handle;
+
         });
     };
 

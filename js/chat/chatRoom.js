@@ -627,7 +627,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 )
             );
         }
-        if(eventData.info.sid == self.callRequest.sid) {
+        if(self.callRequest && eventData.info.sid == self.callRequest.sid) {
             self._resetCallStateNoCall();
         }
     });
@@ -866,7 +866,6 @@ ChatRoom.prototype._cancelCallRequest = function() {
             if(sid) {
                 var sess = self.megaChat.rtc.jingle.sessions[sid];
                 if(sess) {
-                    debugger;
                     self.megaChat.rtc.jingle.terminate(sess, 'hangup');
                 }
             }
@@ -995,15 +994,48 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
         if(myAvatar) {
             $('.my-avatar', self.$header).attr('src', myAvatar.url);
             $('.my-avatar', self.$header).show();
+            $('.my-avatar-text', self.$header).hide();
         } else {
             $('.my-avatar', self.$header).hide();
+            var $txtAvatar = $('<div class="nw-contact-avatar"/>')
+                .append(
+                    generateAvatarElement(u_handle)
+                )
+                .addClass(u_handle)
+                .addClass(
+                    "color" + generateAvatarMeta(u_handle).color
+                );
+
+            $('.my-avatar-text', self.$header)
+                .empty()
+                .append(
+                    $txtAvatar
+                )
+              .show();
         }
         var otherUserContact = self.megaChat.getContactFromJid(self.getParticipantsExceptMe()[0]);
         if(otherUserContact.u && avatars[otherUserContact.u]) {
             $('.other-avatar', self.$header).attr('src', avatars[otherUserContact.u].url);
             $('.other-avatar', self.$header).show();
+            $('.other-avatar-text', self.$header).hide();
         } else {
             $('.other-avatar', self.$header).hide();
+
+            var $txtAvatar2 = $('<div class="nw-contact-avatar"/>')
+                .append(
+                    generateAvatarElement(otherUserContact.u)
+                )
+                .addClass(otherUserContact.u)
+                .addClass(
+                    "color" + generateAvatarMeta(otherUserContact.u).color
+                );
+
+            $('.other-avatar-text', self.$header)
+                .empty()
+                .append(
+                    $txtAvatar2
+                )
+                .show();
         }
 
 
@@ -1313,9 +1345,27 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
             .addClass(audioCssClass)
             .removeClass(videoCssClass);
 
-        $('.my-avatar, .other-avatar', $screenElement).show();
+        $('.my-avatar[src], .other-avatar[src]', $screenElement).show();
         $('.video-only', $screenElement).hide();
         $('video', $screenElement).hide();
+
+        if(videoCssClass == 'current-user-video-container') {
+            if($('.my-avatar', $screenElement).attr('src') != '') {
+                $('.my-avatar', $screenElement).show();
+                $('.my-avatar-text', $screenElement).hide();
+            } else {
+                $('.my-avatar', $screenElement).hide();
+                $('.my-avatar-text', $screenElement).show();
+            }
+        } else {
+            if($('.other-avatar', $screenElement).attr('src') != '') {
+                $('.other-avatar', $screenElement).show();
+                $('.other-avatar-text', $screenElement).hide();
+            } else {
+                $('.other-avatar', $screenElement).hide();
+                $('.other-avatar-text', $screenElement).show();
+            }
+        }
 
         if($('.video-full-container').is(":visible")) {
             if(videoCssClass == 'current-user-video-container') {
@@ -1330,7 +1380,7 @@ ChatRoom.prototype._renderSingleAudioVideoScreen = function($screenElement, medi
             .removeClass(audioCssClass)
             .addClass(videoCssClass);
 
-        $('.my-avatar, .other-avatar', $screenElement).hide();
+        $('.my-avatar, .my-avatar-text, .other-avatar, .other-avatar-text', $screenElement).hide();
         $('.video-only', $screenElement).show();
         $('video', $screenElement).show();
 
@@ -1787,7 +1837,7 @@ ChatRoom.prototype.refreshUI = function(scrollToBottom) {
                 presenceText
             );
 
-            $('.nw-contact-avatar', self.$header).replaceWith(self._generateContactAvatarElement(participants[0]));
+            $('> .nw-contact-avatar', self.$header).replaceWith(self._generateContactAvatarElement(participants[0]));
 
         }
     } else {

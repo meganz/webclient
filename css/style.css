@@ -8012,6 +8012,35 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	border-radius: 6px;
 	height: 100%;
 }
+
+
+
+/** text avatars in a/v calls **/
+.other-avatar-text .nw-contact-avatar {
+	width: 247px;
+	height: 248px;
+	margin-left: 1px;
+	margin-top: -1px;
+	font-size: 80px;
+}
+.other-avatar-text .nw-contact-avatar span {
+	line-height: 244px;
+}
+.my-avatar-text .nw-contact-avatar {
+	width: 100%;
+	height: 100%;
+	border-radius: 100% !important;
+	margin: 0;
+	font-size: 60px;
+	line-height: 162px;
+	border: 0;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border-radius: 5px;
+}
+
+
+
 .video-resizer {
 	height: 16px;
 	width: 16px;

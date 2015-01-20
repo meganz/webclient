@@ -2968,8 +2968,8 @@ function accountUI()
         $('.fm-account-save').unbind('click');
         $('.fm-account-save').bind('click', function(e)
         {
-            u_attr.firstname = $('#account-firstname').val();
-            u_attr.lastname = $('#account-lastname').val();
+            u_attr.firstname = $('#account-firstname').val().trim();
+            u_attr.lastname = $('#account-lastname').val().trim()||' ';
             u_attr.birthday = $('.fm-account-select.day select').val();
             u_attr.birthmonth = $('.fm-account-select.month select').val();
             u_attr.birthyear = $('.fm-account-select.year select').val();

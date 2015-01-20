@@ -6986,6 +6986,9 @@ table {
 .fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span {
 	color: rgba(49,181,0,1);
 }
+.fm-chat-file-button.primary-button.fm-chat-inline-dialog-button-answer {
+    margin-left: 10px;
+}
 .fm-send-files:hover span, .fm-send-files.active span {
 	background-position: -9px -5855px;
 }

@@ -1418,13 +1418,13 @@ a.blog-button:hover {
 }
 .notification-username {
 	display: block;
-    font-size: 13px;
-    line-height: 16px;
-    overflow: hidden;
-    padding: 0;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 205px;
+	font-size: 13px;
+	line-height: 16px;
+	overflow: hidden;
+	padding: 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 205px;
 }
 .notification-content {
 	display: block;
@@ -4923,50 +4923,29 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .nw-fm-left-icon.notifications {
 	background-position: 0 -6142px;
 }
-.nw-fm-left-icon.shared-with-me {
+.nw-fm-left-icon.shared-with-me, .not-logged .nw-fm-left-icon.shared-with-me:hover, .not-logged .nw-fm-left-icon.shared-with-me.active {
 	background-position: 0 -35px;
 }
-.not-logged .nw-fm-left-icon.shared-with-me {
-	background-position: 0 -9713px;
-}
-.not-logged .nw-fm-left-icon.shared-with-me:hover, .not-logged .nw-fm-left-icon.shared-with-me.active {
-	background-position: 0 -35px;
-}
-.nw-fm-left-icon.contacts {
+.nw-fm-left-icon.contacts, .not-logged .nw-fm-left-icon.contacts:hover, .not-logged .nw-fm-left-icon.contacts.active {
 	background-position: 0 -83px;
 }
-.not-logged .nw-fm-left-icon.contacts {
-	background-position: 0 -9761px;
-}
-.not-logged .nw-fm-left-icon.contacts:hover, .not-logged .nw-fm-left-icon.contacts.active {
-	background-position: 0 -83px;
-}
-.nw-fm-left-icon.conversations {
+.nw-fm-left-icon.conversations, .not-logged .nw-fm-left-icon.conversations, .not-logged .nw-fm-left-icon.conversations:hover, .not-logged .nw-fm-left-icon.conversations.active {
 	background-position: 0 -131px;
-    position: relative;
+	position: relative;
 }
-.nw-fm-left-icon.conversations .beta-text {
-    background: #646464;
-    border-radius: 10px;
-    color: #000;
-    font-size: 10px;
-    font-weight: bold;
-    left: 4px;
-    padding: 0 7px;
-    position: absolute;
-    top: 49px;
+.nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
+	background: #646464;
+	border-radius: 10px;
+	color: #000;
+	font-size: 10px;
+	font-weight: bold;
+	left: 4px;
+	padding: 0 7px;
+	position: absolute;
+	top: 49px;
 }
-.nw-fm-left-icon.conversations.active .beta-text {
-    background: #34A7DC;
-}
-.nw-fm-left-icon.conversations:hover .beta-text {
-    background: #34A7DC;
-}
-.not-logged .nw-fm-left-icon.conversations {
-	background-position: 0 -9861px;
-}
-.not-logged .nw-fm-left-icon.conversations:hover, .not-logged .nw-fm-left-icon.conversations.active {
-	background-position: 0 -131px;
+.nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
+	background: #34A7DC;
 }
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -367px;
@@ -8486,16 +8465,16 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-chat-message {
 	margin: 0 0 0 56px;
-font-size: 12px;
-line-height: 21px;
-color: #333333;
-padding: 13px 0px 14px 0;
-min-height: 48px;
-text-align: left;
-position: relative;
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box; /* required for the "relative -> absolute" hack for positioning label.not-sent */
+	font-size: 12px;
+	line-height: 21px;
+	color: #333333;
+	padding: 13px 0px 14px 0;
+	min-height: 48px;
+	text-align: left;
+	position: relative;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box; /* required for the "relative -> absolute" hack for positioning label.not-sent */
 }
 .left.email .nw-contact-avatar {
 	top: 7px;
@@ -8565,7 +8544,7 @@ box-sizing: border-box; /* required for the "relative -> absolute" hack for posi
 	border-radius: 12px;
 }
 .fm-chat-file-button.secondary-button.fm-chat-inline-dialog-button-reject {
-    margin-left: 5px;
+	margin-left: 5px;
 }
 .fm-chat-message .fm-chat-file-button {
 	margin-top: 0;
@@ -12617,7 +12596,7 @@ table {
 	margin: -130px 0 0 -325px;
 }
 .download-mid-centered-block.not-available-some-reason {
-    margin-left: -389px;
+	margin-left: -389px;
 }
 .st-main-button-bl {
 	height: 260px;

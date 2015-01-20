@@ -565,8 +565,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(Strophe.getBareJidFromJid(peer) == self.megaChat.karere.getBareJid()) {
             userJid = self.getParticipantsExceptMe()[0];
         }
-        msg = "Incoming call with " + self.megaChat.getContactNameFromJid(userJid) + " was rejected.";
-
+        
+        // Show "Call with [X] was rejected."
+        msg = l[5892].replace('[X]', self.megaChat.getContactNameFromJid(userJid));
 
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -611,7 +612,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-from-different-device",
-                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was handled on some other device.",
+                    l[5895].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer)),    // Call with [X] was handled on some other device.
                     []
                 )
             );
@@ -621,7 +622,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-canceled",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
+                    l[5894].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer)),    // Call with [X] was canceled.
                     []
                 )
             );

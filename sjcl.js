@@ -1177,7 +1177,7 @@ sjcl.mode.ocb2 = {
 };
 /** @fileOverview GCM mode implementation.
  *
- * @author Juho Vähä-Herttua
+ * @author Juho Vaha-Herttua
  */
 
 /** @namespace Galois/Counter mode. */

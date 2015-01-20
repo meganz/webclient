@@ -413,7 +413,7 @@ ChatStore.prototype.cleanup = function() {
                     self.logger.debug("Cleaning up chat history for room: ", k);
                     self._cleanupMessagesForRoom(k);
                 }
-            })
+            });
         });
 };
 

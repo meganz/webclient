@@ -679,6 +679,11 @@ var Chat = function() {
                     url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',   // NZ
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
                 }
             ]
         },

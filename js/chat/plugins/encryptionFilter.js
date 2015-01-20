@@ -52,11 +52,11 @@ var EncryptionFilter = function(megaChat) {
                 if(handler.state === mpenc.handler.STATE.READY && (megaRoom.state === ChatRoom.STATE.PLUGINS_WAIT || megaRoom.state === ChatRoom.STATE.PLUGINS_PAUSED)) {
                     megaRoom.setState(
                         ChatRoom.STATE.PLUGINS_READY
-                    )
+                    );
                 } else if(handler.state !== mpenc.handler.STATE.READY && megaRoom.state === ChatRoom.STATE.READY) {
                     megaRoom.setState(
                         ChatRoom.STATE.PLUGINS_PAUSED
-                    )
+                    );
                 }
 
                 if(handler.state === mpenc.handler.STATE.READY) {

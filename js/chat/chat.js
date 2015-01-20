@@ -1257,7 +1257,10 @@ Chat.prototype.init = function() {
     self.$container = $('.fm-chat-block');
 
     self.$header_tpl = $('.fm-right-header', self.$container).clone().removeClass("template");
-    assert(self.$header_tpl.length > 0, "Header template not found.");
+    if(self.$header_tpl.length === 0) {
+      self.logger.warn("Header template not found.");
+        return;
+    }
 
     self.$messages_tpl = $('.fm-chat-message-scroll', self.$container).clone().removeClass("template");
     assert(self.$messages_tpl.length > 0, "Messages template not found.");

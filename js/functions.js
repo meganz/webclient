@@ -1588,13 +1588,16 @@ mSpawnWorker.prototype = {
 		wrk.onerror = function mSW_OnError(err)
 		{
 			console.error(err);
+			if (!self.wrk) return;
 			Soon(function() {
 				throw err;
 			});
 			self.unreliably = true;
 			var nw = self.nworkers;
 			while (nw--) {
-				self.wrk[nw].terminate();
+				if (self.wrk[nw]) {
+					self.wrk[nw].terminate();
+				}
 			}
 			for (var id in self.jobs) {
 				var job = self.jobs[id];
@@ -1602,7 +1605,9 @@ mSpawnWorker.prototype = {
 			}
 			if (!window[self.token]) {
 				window[self.token] = true;
-				msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+				if (err.filename) {
+					msgDialog('warninga', "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
+				}
 			}
 			delete self.wrk;
 			delete self.jobs;

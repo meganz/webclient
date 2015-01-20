@@ -1348,7 +1348,7 @@ a.blog-button:hover {
 }
 .notification-request-buttons {
 	float: right;
-	padding: 9px 4px 0 8px;
+	padding: 9px 20px 0 8px;
 	display: none;
 }
 .nt-contact-request .notification-request-buttons {

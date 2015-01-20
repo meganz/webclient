@@ -4928,18 +4928,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	position: relative;
 }
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
-	background: #646464;
-	border-radius: 10px;
-	color: #000;
-	font-size: 10px;
-	font-weight: bold;
-	left: 4px;
-	padding: 0 7px;
+	left: 6px;
+	height: 14px;
 	position: absolute;
-	top: 49px;
+	top: 48px;
+	width: 36px;
+	background-image: url(../images/mega/nw-fm-sprite.svg);
+	background-repeat: no-repeat;
+	background-position: center -10008px;
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
-	background: #34A7DC;
+	background-position: center -9958px;
 }
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -367px;
@@ -5271,10 +5270,6 @@ th.grid-first-th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -7px -1469px;
- ilter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-	-moz-opacity: 0.3;
-	-khtml-opacity: 0.3;
-	opacity: 0.3;
 }
 .grid-status-icon {
 	background-position: -7px -1494px;
@@ -5621,97 +5616,97 @@ table {
 	display: none;
 }
 .transfer-filtype-icon.word, .search-path-icon-span.word {
-	background-position: -62px 4px;
+	background-position: -61px 4px;
 }
 .transfer-filtype-icon.web-lang, .search-path-icon-span.web-lang {
-	background-position: -62px -36px;
+	background-position: -61px -36px;
 }
 .transfer-filtype-icon.web-data, .search-path-icon-span.web-data {
-	background-position: -62px -76px;
+	background-position: -61px -76px;
 }
 .transfer-filtype-icon.video, .search-path-icon-span.video {
-	background-position: -62px -116px;
+	background-position: -61px -116px;
 }
 .transfer-filtype-icon.video-vob, .search-path-icon-span.video-vob {
-	background-position: -62px -156px;
+	background-position: -61px -156px;
 }
 .transfer-filtype-icon.video-subtitles, .search-path-icon-span.video-subtitles {
-	background-position: -62px -196px;
+	background-position: -61px -196px;
 }
 .transfer-filtype-icon.vector, .search-path-icon-span.vector {
-	background-position: -62px -236px;
+	background-position: -61px -236px;
 }
 .transfer-filtype-icon.vcard, .search-path-icon-span.vcard {
-	background-position: -62px -276px;
+	background-position: -61px -276px;
 }
 .transfer-filtype-icon.torrent, .search-path-icon-span.torrent {
-	background-position: -62px -316px;
+	background-position: -61px -316px;
 }
 .transfer-filtype-icon.text, .search-path-icon-span.text {
-	background-position: -62px -356px;
+	background-position: -61px -356px;
 }
 .transfer-filtype-icon.swf, .search-path-icon-span.swf {
-	background-position: -62px -396px;
+	background-position: -61px -396px;
 }
 .transfer-filtype-icon.spreadsheet, .search-path-icon-span.spreadsheet {
-	background-position: -62px -436px;
+	background-position: -61px -436px;
 }
 .transfer-filtype-icon.sourcecode, .search-path-icon-span.sourcecode {
-	background-position: -62px -476px;
+	background-position: -61px -476px;
 }
 .transfer-filtype-icon.real-audio, .search-path-icon-span.real-audio {
-	background-position: -62px -516px;
+	background-position: -61px -516px;
 }
 .transfer-filtype-icon.raw, .search-path-icon-span.raw {
-	background-position: -62px -556px;
+	background-position: -61px -556px;
 }
 .transfer-filtype-icon.premiere, .search-path-icon-span.premiere {
-	background-position: -62px -596px;
+	background-position: -61px -596px;
 }
 .transfer-filtype-icon.powerpoint, .search-path-icon-span.powerpoint {
-	background-position: -62px -636px;
+	background-position: -61px -636px;
 }
 .transfer-filtype-icon.podcast, .search-path-icon-span.podcast {
-	background-position: -62px -676px;
+	background-position: -61px -676px;
 }
 .transfer-filtype-icon.playlist, .search-path-icon-span.playlist {
-	background-position: -62px -716px;
+	background-position: -61px -716px;
 }
 .transfer-filtype-icon.photoshop, .search-path-icon-span.photoshop {
-	background-position: -62px -756px;
+	background-position: -61px -756px;
 }
 .transfer-filtype-icon.pdf, .search-path-icon-span.pdf {
-	background-position: -62px -796px;
+	background-position: -61px -796px;
 }
 .transfer-filtype-icon.midi, .search-path-icon-span.midi {
-	background-position: -62px -836px;
+	background-position: -61px -836px;
 }
 .transfer-filtype-icon.java, .search-path-icon-span.java {
-	background-position: -62px -876px;
+	background-position: -61px -876px;
 }
 .transfer-filtype-icon.indesign, .search-path-icon-span.indesign {
-	background-position: -62px -916px;
+	background-position: -61px -916px;
 }
 .transfer-filtype-icon.image, .search-path-icon-span.image {
-	background-position: -62px -956px;
+	background-position: -61px -956px;
 }
 .transfer-filtype-icon.illustrator, .search-path-icon-span.illustrator {
-	background-position: -62px -996px;
+	background-position: -61px -996px;
 }
 .transfer-filtype-icon.html, .search-path-icon-span.html {
-	background-position: -62px -1036px;
+	background-position: -61px -1036px;
 }
 .transfer-filtype-icon.graphic, .search-path-icon-span.graphic {
-	background-position: -62px -1076px;
+	background-position: -61px -1076px;
 }
 .transfer-filtype-icon.gis, .search-path-icon-span.gis {
-	background-position: -62px -1116px;
+	background-position: -61px -1116px;
 }
 .transfer-filtype-icon.generic, .search-path-icon-span.generic {
-	background-position: -62px -1156px;
+	background-position: -61px -1156px;
 }
 .transfer-filtype-icon.font, .search-path-icon-span.font {
-	background-position: -62px -1196px;
+	background-position: -61px -1196px;
 }
 .transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
@@ -5741,59 +5736,59 @@ table {
 	background-position: -14px -7625px;
 }
 .transfer-filtype-icon.flash, .search-path-icon-span.flash {
-	background-position: -62px -1316px;
+	background-position: -61px -1316px;
 }
 .transfer-filtype-icon.flash-video, .search-path-icon-span.flash-video {
-	background-position: -62px -1356px;
+	background-position: -61px -1356px;
 }
 .transfer-filtype-icon.fla-lang, .search-path-icon-span.fla-lang {
-	background-position: -62px -1396px;
+	background-position: -61px -1396px;
 }
 .transfer-filtype-icon.executable, .search-path-icon-span.executable {
-	background-position: -62px -1436px;
+	background-position: -61px -1436px;
 }
 .transfer-filtype-icon.excel, .search-path-icon-span.excel {
-	background-position: -62px -1476px;
+	background-position: -61px -1476px;
 }
 .transfer-filtype-icon.dreamweaver, .search-path-icon-span.dreamweaver {
-	background-position: -62px -1516px;
+	background-position: -61px -1516px;
 }
 .transfer-filtype-icon.database, .search-path-icon-span.database {
-	background-position: -62px -1556px;
+	background-position: -61px -1556px;
 }
 .transfer-filtype-icon.compressed, .search-path-icon-span.compressed {
-	background-position: -62px -1596px;
+	background-position: -61px -1596px;
 }
 .transfer-filtype-icon.cad, .search-path-icon-span.cad {
-	background-position: -62px -1636px;
+	background-position: -61px -1636px;
 }
 .transfer-filtype-icon.audio, .search-path-icon-span.audio {
-	background-position: -62px -1676px;
+	background-position: -61px -1676px;
 }
 .transfer-filtype-icon.aftereffects, .search-path-icon-span.aftereffects {
-	background-position: -62px -1716px;
+	background-position: -61px -1716px;
 }
 .transfer-filtype-icon.threed, .search-path-icon-span.threed {
-	background-position: -62px -1756px;
+	background-position: -61px -1756px;
 }
 .transfer-filtype-icon.win-folder, .search-path-icon-span.win-folder {
-	background-position: -62px -1796px;
+	background-position: -61px -1796px;
 }
 .transfer-filtype-icon.apple-folder, .search-path-icon-span.apple-folder {
-	background-position: -62px -1836px;
+	background-position: -61px -1836px;
 }
 .transfer-filtype-icon.photo-folder, .search-path-icon-span.photo-folder {
-	background-position: -62px -1836px;
+	background-position: -61px -1836px;
 }
 .block-view-file-type {
-	width: 74px;
+	width: 82px;
 	height: 84px;
 	display: block;
 	background-position: 0 0px;
 	background-image: url(../images/mega/files-icons.svg);
 	background-repeat: no-repeat;
 	position: absolute;
-	margin: -42px 0 0 -37px;
+	margin: -42px 0 0 -41px;
 	left: 50%;
 	top: 50%;
 }
@@ -6247,154 +6242,154 @@ table {
 	background-position: center -14364px;
 }
 .properties-file-icon div.word {
-	background-position: center 38px;
+	background-position: center 37px;
 }
 .properties-file-icon div.web-lang {
-	background-position: center -185px;
+	background-position: center -203px;
 }
 .properties-file-icon div.web-data {
-	background-position: center -428px;
+	background-position: center -443px;
 }
 .properties-file-icon div.video {
-	background-position: center -671px;
+	background-position: center -683px;
 }
 .properties-file-icon div.video-vob {
-	background-position: center -915px;
+	background-position: center -923px;
 }
 .properties-file-icon div.video-subtitles {
-	background-position: center -1158px;
+	background-position: center -1163px;
 }
 .properties-file-icon div.vector {
-	background-position: center -1401px;
+	background-position: center -1403px;
 }
 .properties-file-icon div.vcard {
-	background-position: center -1644px;
+	background-position: center -1643px;
 }
 .properties-file-icon div.torrent {
-	background-position: center -1888px;
+	background-position: center -1883px;
 }
 .properties-file-icon div.text {
-	background-position: center -2131px;
+	background-position: center -2123px;
 }
 .properties-file-icon div.swf {
-	background-position: center -2374px;
+	background-position: center -2363px;
 }
 .properties-file-icon div.spreadsheet {
-	background-position: center -2617px;
+	background-position: center -2603px;
 }
 .properties-file-icon div.sourcecode {
-	background-position: center -2861px;
+	background-position: center -2843px;
 }
 .properties-file-icon div.real-audio {
-	background-position: center -3104px;
+	background-position: center -3083px;
 }
 .properties-file-icon div.raw {
-	background-position: center -3347px;
+	background-position: center -3323px;
 }
 .properties-file-icon div.premiere {
-	background-position: center -3590px;
+	background-position: center -3563px;
 }
 .properties-file-icon div.powerpoint {
-	background-position: center -3834px;
+	background-position: center -3803px;
 }
 .properties-file-icon div.podcast {
-	background-position: center -4077px;
+	background-position: center -4043px;
 }
 .properties-file-icon div.playlist {
-	background-position: center -4320px;
+	background-position: center -4283px;
 }
 .properties-file-icon div.photoshop {
-	background-position: center -4563px;
+	background-position: center -4523px;
 }
 .properties-file-icon div.pdf {
-	background-position: center -4806px;
+	background-position: center -4763px;
 }
 .properties-file-icon div.midi {
-	background-position: center -5050px;
+	background-position: center -5003px;
 }
 .properties-file-icon div.java {
-	background-position: center -5293px;
+	background-position: center -5243px;
 }
 .properties-file-icon div.indesign {
-	background-position: center -5536px;
+	background-position: center -5483px;
 }
 .properties-file-icon div.image {
-	background-position: center -5779px;
+	background-position: center -5723px;
 }
 .properties-file-icon div.illustrator {
-	background-position: center -6023px;
+	background-position: center -5963px;
 }
 .properties-file-icon div.html {
-	background-position: center -6266px;
+	background-position: center -6203px;
 }
 .properties-file-icon div.graphic {
-	background-position: center -6509px;
+	background-position: center -6443px;
 }
 .properties-file-icon div.gis {
-	background-position: center -6752px;
+	background-position: center -6683px;
 }
 .properties-file-icon div.generic {
-	background-position: center -6995px;
+	background-position: center -6923px;
 }
 .properties-file-icon div.font {
-	background-position: center -7239px;
+	background-position: center -7163px;
 }
 .properties-file-icon div.folder {
-	background-position: center -7482px;
+	background-position: center -7403px;
 }
 .properties-file-icon div.folder-shared {
-	background-position: center -7725px;
+	background-position: center -7643px;
 }
 .rubbish-bin .properties-file-icon div.folder, .properties-file-icon div.deleted-folder {
-	background-position: center -11617px;
+	background-position: center -7883px;
 }
 .rubbish-bin .properties-file-icon div.folder-shared, .properties-file-icon div.deleted-shared-folder {
-	background-position: center -11860px;
+	background-position: center -8123px;
 }
 .properties-file-icon div.flash {
-	background-position: center -7968px;
+	background-position: center -8363px;
 }
 .properties-file-icon div.flash-video {
-	background-position: center -8212px;
+	background-position: center -8603px;
 }
 .properties-file-icon div.fla-lang {
-	background-position: center -8455px;
+	background-position: center -8843px;
 }
 .properties-file-icon div.executable {
-	background-position: center -8698px;
+	background-position: center -9083px;
 }
 .properties-file-icon div.exel {
-	background-position: center -8941px;
+	background-position: center -9323px;
 }
 .properties-file-icon div.dreamweaver {
-	background-position: center -9184px;
+	background-position: center -9563px;
 }
 .properties-file-icon div.database {
-	background-position: center -9428px;
+	background-position: center -9803px;
 }
 .properties-file-icon div.compressed {
-	background-position: center -9671px;
+	background-position: center -10043px;
 }
 .properties-file-icon div.cad {
-	background-position: center -9914px;
+	background-position: center -10283px;
 }
 .properties-file-icon div.audio {
-	background-position: center -10157px;
+	background-position: center -10523px;
 }
 .properties-file-icon div.aftereffects {
-	background-position: center -10401px;
+	background-position: center -10763px;
 }
 .properties-file-icon div.threed {
-	background-position: center -10644px;
+	background-position: center -11003px;
 }
 .properties-file-icon div.win-folder {
-	background-position: center -10887px;
+	background-position: center -11243px;
 }
 .properties-file-icon div.apple-folder {
-	background-position: center -11130px;
+	background-position: center -11483px;
 }
 .properties-file-icon div.photo-folder {
-	background-position: center -11373px;
+	background-position: center -11723px;
 }
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
 	width: 24px;
@@ -6845,33 +6840,33 @@ table {
 .fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	position: relative;
 }
-.search-files-result span {
+.search-files-result span, .search-files-result.disabled span {
 	background-position: -4px -4559px;
 }
 .long-path .fm-new-folder span, .long-path .search-files-result span, .long-path .fm-file-upload span, .long-path .search-messages-result span, .long-path .fm-folder-upload span {
 	padding: 0 10px 0 24px;
 	min-width: 0;
 }
-.fm-notification-settings span {
+.fm-notification-settings span, .fm-notification-settings.disabled span {
 	background-position: -18px -6106px;
 	padding: 0 10px 0 28px;
 }
 .fm-new-folder span, .fm-file-upload span, .fm-folder-upload span {
 	padding-left: 31px;
 }
-.fm-new-folder span {
+.fm-new-folder span, .fm-new-folder.disabled span {
 	background-position: 2px -1038px;
 }
 .fm-new-folder:hover span, .fm-new-folder.active span {
 	background-position: 2px -1065px;
 }
-.fm-file-upload span {
+.fm-file-upload span, .fm-file-upload.disabled span {
 	background-position: 2px -1090px;
 }
 .fm-file-upload:hover span, .fm-file-upload.active span {
 	background-position: 2px -1120px;
 }
-.fm-folder-upload span {
+.fm-folder-upload span, .fm-folder-upload.disabled span {
 	background-position: 2px -1157px;
 }
 .fm-folder-upload:hover span, .fm-folder-upload.active span {
@@ -6917,7 +6912,7 @@ table {
 .fm-chat-file-button span {
 	padding: 0 10px;
 }
-.fm-start-video-call span {
+.fm-start-video-call span, .fm-start-video-call.disabled span {
 	background-position: -7px -9531px;
 	padding: 0 10px 0 34px;
 }
@@ -6959,8 +6954,17 @@ table {
 .fm-add-user:hover span, .fm-add-user.active span, .fm-chat-file-button.primary-button:hover span, .fm-chat-file-button.primary-button.active span, .fm-verify:hover span, .fm-verify.active span, .fm-share-copy:hover span, .fm-share-copy.active span, .fm-new-folder:hover span, .fm-new-folder.active span, .create-folder-button:hover span, .create-folder-button.active span, .add-user-popup-button.add:hover span, .add-user-popup-button.add.active span, .fm-dialog-new-folder-button:hover span, .fm-dialog-new-folder-button.active span, .rename-dialog-button.rename:hover span, .rename-dialog-button.rename.active span {
 	color: rgba(49,181,0,1);
 }
+/* disabled */
+.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-contact-requests.disabled, .fm-received-requests.disabled, .fm-dialog-button.disabled, .fm-account-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled {
+	cursor: default;
+	background-color: rgba(255,255,255,0);
+}
+.fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span {
+	cursor: default;
+	color: #777777;
+}
 .fm-chat-file-button.primary-button.fm-chat-inline-dialog-button-answer {
-    margin-left: 10px;
+	margin-left: 10px;
 }
 .fm-send-files:hover span, .fm-send-files.active span {
 	background-position: -9px -5855px;
@@ -6971,17 +6975,17 @@ table {
 .fm-add-user:hover span, .fm-add-user.active span {
 	background-position: -9px -5925px;
 }
-.fm-add-user span {
+.fm-add-user span, .fm-add-user.disabled span {
 	background-position: -9px -1730px;
 }
 .fm-chat-end:hover span, .fm-chat-end.active span {
 	background-position: 6px -8544px;
 }
-.fm-contact-requests span, .fm-received-requests span {
+.fm-contact-requests span, .fm-received-requests span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span {
 	background-position: 1px -3035px;
 	padding: 0 10px 0 32px;
 }
-.fm-received-requests span {
+.fm-received-requests span, .fm-received-requests.disabled span {
 	background-position: 1px -3005px;
 }
 .chat-button.disabled {
@@ -6991,22 +6995,22 @@ table {
 	opacity: 0.5;
 	cursor: default;
 }
-.fm-send-files span {
+.fm-send-files span, .fm-send-files.disabled span {
 	background-position: -9px -1700px;
 }
-.fm-chat-end span {
+.fm-chat-end span, .fm-chat-end.disabled span {
 	background-position: 6px -8979px;
 }
-.fm-start-call span {
+.fm-start-call span, .fm-start-call.disabled span {
 	background-position: -9px -1670px;
 }
 .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span {
 	background-image: url(../images/mega/shared-sprite.svg);
 }
-.fm-start-conversation span {
+.fm-start-conversation span, .fm-start-conversation.disabled span {
 	background-position: -4px -713px;
 }
-.fm-share-folders span {
+.fm-share-folders span, .fm-share-folders.disabled span {
 	background-position: -2px -883px;
 	padding: 0 10px 0 32px;
 }
@@ -7017,7 +7021,7 @@ table {
 	margin: 9px 4px 0 6px;
 	float: left;
 }
-.fm-verify span {
+.fm-verify span, .fm-verify.disabled span {
 	background-position: -4px -743px;
 }
 .fm-verify:hover span, .fm-verify.active span {
@@ -7027,11 +7031,11 @@ table {
 	margin: 9px 4px 0 0;
 	float: left;
 }
-.fm-question span {
+.fm-question span, .fm-question.disabled span {
 	background-position: -2px -792px;
 	padding: 0 10px 0 16px;
 }
-.fm-clearbin-button span, .fm-share-download span {
+.fm-clearbin-button span, .fm-share-download span, .fm-clearbin-button.disabled span, .fm-share-download.disabled span {
 	background-position: -5px -5790px;
 	padding: 0 10px 0 29px;
 }
@@ -7041,25 +7045,25 @@ table {
 .fm-download-as-zip span, .fm-import-to-cloudrive span {
 	padding: 0 10px 0 36px;
 }
-.fm-download-as-zip span {
+.fm-download-as-zip span, .fm-download-as-zip.disabled span {
 	background-position: -4px -4730px;
 }
-.fm-import-to-cloudrive span {
+.fm-import-to-cloudrive span, .fm-import-to-cloudrive.disabled span {
 	background-position: -7px -9978px;
 }
-.fm-leave-share span, .fm-share-copy span, .fm-share-download span {
+.fm-leave-share span, .fm-share-copy span, .fm-share-download span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span {
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
 	background-position: -32px -378px;
 }
-.fm-leave-share span {
+.fm-leave-share span, .fm-leave-share.disabled span {
 	background-position: -31px -458px;
 	padding-left: 31px;
 }
-.fm-share-copy span {
+.fm-share-copy span, .fm-share-copy.disabled span {
 	background-position: -32px -418px;
 }
-.fm-share-download span {
+.fm-share-download span, .fm-share-download.disabled span {
 	background-position: -32px -378px;
 	padding-left: 30px;
 }
@@ -8011,6 +8015,29 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
 	height: 100%;
+}
+/** text avatars in a/v calls **/
+.other-avatar-text .nw-contact-avatar {
+	width: 247px;
+	height: 248px;
+	margin-left: 1px;
+	margin-top: -1px;
+	font-size: 80px;
+}
+.other-avatar-text .nw-contact-avatar span {
+	line-height: 244px;
+}
+.my-avatar-text .nw-contact-avatar {
+	width: 100%;
+	height: 100%;
+	border-radius: 100% !important;
+	margin: 0;
+	font-size: 60px;
+	line-height: 162px;
+	border: 0;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border-radius: 5px;
 }
 .video-resizer {
 	height: 16px;
@@ -18962,7 +18989,7 @@ span.incoming-call-name {
 	float: left;
 	background-image: url(../images/mega/shared-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: center top;
+	background-position: center 3px;
 	margin: 23px 0 0 20px;
 }
 .shared-details-info-block {
@@ -19114,6 +19141,9 @@ span.incoming-call-name {
 }
 .fingerprint-contact-info .contact-details-user-name, .fingerprint-contact-info .contact-details-email {
 	white-space: nowrap;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 	display: block;
 	float: none;
 	padding-right: 0;
@@ -20637,8 +20667,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 /* video mirroring, applied ONLY to the local video */
 video.localViewport {
-	transform: scale(-1, 1);
-	-webkit-transform: scale(-1, 1);
+	transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
+	-moz-transform: none; /* Firefox */
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

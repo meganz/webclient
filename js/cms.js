@@ -295,16 +295,15 @@ window.CMS = CMS;
 CMS.on('corporate', function()
 {
 	$('.new-left-menu-link').rebind('click', function() {
-		var $this = $(this)
-		$('.new-right-content-block').addClass('hidden');
-		$('.new-right-content-block.' + $this.attr('id')).removeClass('hidden');
-		$('.new-left-menu-link').removeClass('active');
-		$this.addClass('active');			
-		mainScroll();
+		document.location.hash = "#corporate/" + $(this).attr('id')
 	});
 	var ctype = document.location.hash.substr(11)
 	if ($('#' + ctype).length == 1) {
-		$('#' + ctype).trigger('click');
+		$('.new-right-content-block').addClass('hidden');
+		$('.new-right-content-block.' + ctype).removeClass('hidden');
+		$('.new-left-menu-link').removeClass('active');
+		$('#' + ctype).addClass('active');			
+		mainScroll();
 	} else {
 		$('.new-left-menu-link:first').trigger('click');
 	}

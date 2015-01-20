@@ -1418,6 +1418,7 @@ function MegaData()
             // Get the user handle and change to conversations screen
             var user_handle = id.replace('contact_', '');
             window.location = '#fm/chat/' + user_handle;
+
         });
     };
 
@@ -1752,7 +1753,7 @@ function MegaData()
         }
 
         return folders;
-    }
+    };
 
     this.getPath = function(id) {
         var a = [];
@@ -1775,7 +1776,10 @@ function MegaData()
                 g = 0;
             }
             if (g) {
-                id = this.d[id].p;
+                if (this.d[id]) {
+                    id = this.d[id].p;
+                }
+				else break;
             }
         }
         return a;

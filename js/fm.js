@@ -1708,7 +1708,7 @@ function addContactUI()
                 var $mails = $('.token-input-list-mega .token-input-token-mega');
                 var mailNum = $mails.length;
                 var emailText = $('.add-user-textarea textarea').val();
-                                
+
                 if (mailNum) {
                     $mails.each(function(index, value) {
                         email = $(value).contents().eq(1).text();
@@ -2975,7 +2975,21 @@ function accountUI()
             u_attr.birthyear = $('.fm-account-select.year select').val();
             u_attr.country = $('.fm-account-select.country select').val();
 
-            api_req({a: 'up', firstname: base64urlencode(to8(u_attr.firstname)), lastname: base64urlencode(to8(u_attr.lastname)), birthday: base64urlencode(u_attr.birthday), birthmonth: base64urlencode(u_attr.birthmonth), birthyear: base64urlencode(u_attr.birthyear), country: base64urlencode(u_attr.country)});
+            api_req({
+                a : 'up',
+                firstname  : base64urlencode(to8(u_attr.firstname)),
+                lastname   : base64urlencode(to8(u_attr.lastname)),
+                birthday   : base64urlencode(u_attr.birthday),
+                birthmonth : base64urlencode(u_attr.birthmonth),
+                birthyear  : base64urlencode(u_attr.birthyear),
+                country    : base64urlencode(u_attr.country)
+            }, {
+                callback : function(res) {
+                    if (res === u_handle) {
+                        $('.user-name').text(u_attr.firstname);
+                    }
+                }
+            });
             $('.fm-account-save-block').addClass('hidden');
 
             if (M.account.dl_maxSlots)
@@ -3016,6 +3030,10 @@ function accountUI()
                 msgDialog('warninga', l[135], l[719], false, function()
                 {
                     $('#account-password').focus();
+                    $('#account-password').bind('keyup.accpwd', function() {
+                        $('.fm-account-save-block').removeClass('hidden');
+                        $('#account-password').unbind('keyup.accpwd');
+                    });
                 });
             }
             else if ($('#account-new-password').val() !== $('#account-confirm-password').val())
@@ -3034,17 +3052,24 @@ function accountUI()
                     {
                         loadingDialog.hide();
                         if (res == EACCESS)
-                        {
+                        { // pwd incorrect
                             msgDialog('warninga', l[135], l[724], false, function()
                             {
                                 $('#account-password').val('');
                                 $('#account-password').focus();
+                                $('#account-password').bind('keyup.accpwd', function() {
+                                    $('.fm-account-save-block').removeClass('hidden');
+                                    $('#account-password').unbind('keyup.accpwd');
+                                });
                             });
                         }
                         else if (typeof res == 'number' && res < 0)
+                        { // something went wrong
+                            $('#account-confirm-password,#account-password,#account-new-password').val('');
                             msgDialog('warninga', 'Error', l[200]);
+                        }
                         else
-                        {
+                        { // success
                             msgDialog('info', l[726], l[725], false, function()
                             {
                                 $('#account-confirm-password,#account-password,#account-new-password').val('');
@@ -9128,13 +9153,13 @@ function contactUI() {
 
                 // Can use the line below again once text chat is ready
                 //var startConversationText = megaChat.getPrivateRoom(u_h) !== false ? "Show conversation" : l[5885];
-                
+
                 // Temporary for just video/audio only
                 var startConversationText = l[5885];
-                
+
                 $('.fm-start-conversation').removeClass('hidden');
 				$('.fm-start-conversation span').text(startConversationText);
-                
+
                 // Add this line back in when P2P file sharing is confirmed working
                 //$('.fm-send-files').removeClass('hidden');
 
@@ -9287,13 +9312,13 @@ function FMResizablePane(element, opts) {
  */
 function selectText(elementId) {
     var doc = document, text = doc.getElementById(element), range, selection;
-    
+
     if (doc.body.createTextRange) {
         range = document.body.createTextRange();
         range.moveToElementText(text);
         range.select();
     } else if (window.getSelection) {
-        selection = window.getSelection();        
+        selection = window.getSelection();
         range = document.createRange();
         range.selectNodeContents(text);
         selection.removeAllRanges();

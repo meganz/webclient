@@ -654,14 +654,29 @@ var Chat = function() {
                 }
             },
             iceServers:[
-//                 {url: 'stun:stun.l.google.com:19302'},
+                // {url: 'stun:stun.l.google.com:19302'},
                 {
-                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+                    url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    username: "inoo20jdnH",
+                    credential: '02nNKDBkkS'
+                },
+                {
+                    url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }

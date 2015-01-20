@@ -205,14 +205,17 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if($(this).is(".disabled")) {
             return false;
         }
-        var positionX = $(this).position().left;
+        var positionX = $(this).position().left - ($(this).outerWidth() * 0.75);
         var sendFilesPopup = $('.fm-start-call-popup', self.$header);
         if ($(this).attr('class').indexOf('active') == -1) {
             self.megaChat.closeChatPopups();
             sendFilesPopup.addClass('active');
             $(this).addClass('active');
-            $('.fm-start-call-arrow', self.$header).css('left', $(this).outerWidth()/2  + 'px');
-            sendFilesPopup.css('left',  $(this).position().left + 'px');
+
+            var $arrow = $('.fm-start-call-popup .fm-send-files-arrow', self.$header);
+
+            $arrow.css('left', $arrow.parent().outerWidth()*0.75  + 'px');
+            sendFilesPopup.css('left',  positionX + 'px');
         } else {
             self.megaChat.closeChatPopups();
 
@@ -458,12 +461,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 'sid': eventData.sid
             };
 
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     []
                 )
             );
@@ -504,12 +510,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         } else {
+            // Substitute email into language string
+            var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+            
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
                     eventData.peer,
                     "call-started",
-                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " started.",
+                    callWithString,
                     [])
             );
 
@@ -518,12 +527,16 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
     self.bind('call-answer-timeout', function(e, eventData) {
+        
+        // Substitute email into language string
+        var callWithString = l[5890].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
+        
         self.appendDomMessage(
             self.generateInlineDialog(
                 "rejected-call-" + unixtime(),
                 eventData.peer,
                 "call-timeout",
-                "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was not answered in a timely manner.",
+                callWithString,
                 []
             )
         );
@@ -622,8 +635,9 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         }
-
-        var msg = "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " ended.";
+        
+        // Substitute email into language string
+        var msg = l[5889].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
 
         if(eventData.reason == "security" || eventData.reason == "initiate-timeout") {
             self.appendDomMessage(
@@ -634,7 +648,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     msg + " " + eventData.text,
                     []
                 )
-            )
+            );
         } else {
             //TODO: should we add special UI notification for .reason === busy? do we have icon for this?
 
@@ -788,8 +802,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     self.megaChat.trigger('onRoomCreated', [self]);
 
-
-
+    // Hide this block until text chat is ready
+    /*
     self.bind('onConversationStarted', function(e) {
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -802,7 +816,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 !self.isActive()
             )
         );
-    });
+    });*/
 
     return this;
 };
@@ -928,12 +942,15 @@ ChatRoom.prototype._startCall = function() {
 
     self._resetCallStateInCall();
 
-    self.appendDomMessage(
+    // Substitute email into language string
+    var callingString = l[5891].replace('[X]', self.megaChat.getContactNameFromJid(participants[0]));
+
+    self.appendDomMessage(     
         self.generateInlineDialog(
             "outgoing-call",
             participants[0],
             "outgoing-call",
-            "Calling " + self.megaChat.getContactNameFromJid(participants[0]) + " ...",
+            callingString,
             [], {
                 'reject': {
                     'type': 'secondary',
@@ -2358,7 +2375,6 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
         unixtimeToTimeString(timestamp) //time2last is a too bad performance idea.
     );
 
-
     var $primaryButton = $('.primary-button', $inlineDialog).detach();
     var $secondaryButton = $('.secondary-button', $inlineDialog).detach();
 
@@ -2366,7 +2382,7 @@ ChatRoom.prototype.generateInlineDialog = function(type, user, iconCssClasses, m
         $.each(buttons, function(k, v) {
             var $button = v.type == "primary" ? $primaryButton.clone() : $secondaryButton.clone();
             $button.addClass('fm-chat-inline-dialog-button-' + k);
-            $button.text(v.text);
+            $button.find('span').text(v.text);
             $button.bind('click', function(e) {
                 v.callback(e);
             });

@@ -364,11 +364,15 @@
 
                 </div>
                 <div class="content-panel conversations">
-                    <div class="nw-conversations-header call-started hidden">CURRENT CALLING</div>
-                    <div class="nw-conversations-item current-calling hidden"><div class="nw-contact-status"></div><div class="chat-cancel-icon"></div><div class="chat-time-txt"></div><div class="nw-conversations-name"></div></div>
-
                     <div class="conversations-container">
 
+                    </div>
+                    <div class="nw-conversations-header call-started hidden">CURRENT CALLING</div>
+                    <div class="nw-conversations-item current-calling hidden">
+                        <div class="nw-contact-status"></div>
+                        <div class="chat-cancel-icon"></div>
+                        <div class="chat-time-txt"></div>
+                        <div class="nw-conversations-name"></div>  
                     </div>
                 </div>
                 <div class="content-panel rubbish-bin">
@@ -521,10 +525,11 @@
                     <div class="chat-header-indicator muted-video hidden"></div> <!-- todo -->
                     <!-- end of Chat audio/video indicators !-->
 
-                    <div class="chat-button fm-chat-end end-chat"> <span class="fm-chatbutton">End chat</span> </div>
-
-                    <div class="chat-button fm-send-files"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
-                    <div class="chat-button btn-chat-call fm-start-call"> <span class="fm-chatbutton-arrow">Start call ...</span> </div>
+                    <!-- Remove hidden class when Chat is ready -->
+                    <div class="chat-button fm-chat-end end-chat hidden"> <span class="fm-chatbutton">End chat</span> </div>
+                    <div class="chat-button fm-send-files hidden"> <span class="fm-chatbutton-arrow">Send files ...</span> </div>
+                    
+                    <div class="chat-button btn-chat-call fm-start-call"> <span class="fm-chatbutton-arrow">[$5883]</span> </div>
 
                     <div class="chat-popup fm-add-contact-popup" style="right: -10000px;">
                         <div class="fm-add-contact-arrow" style="right: 46px;"></div>
@@ -642,7 +647,8 @@
                     </div>
 
                     <div class="nw-chat-message-icon"></div>
-                    <div class="fm-chat-input-scroll">
+                    <!-- Remove the hidden class when Chat is ready -->
+                    <div class="fm-chat-input-scroll hidden">
                         <div class="fm-chat-input-block">
                             <textarea class="message-textarea" placeholder="Write a message..."></textarea>
                         </div>
@@ -1089,13 +1095,18 @@
                             <div class="clear"></div>
                         </div>
                         <div class="fm-start-conversation">
-                            <span>Start Conversation</span>
+                            <span>[$5885]</span>
                         </div>
-                        <div class="fm-send-files">
+                        
+                        <!-- Remove hidden class when P2P file sharing is ready -->
+                        <div class="fm-send-files hidden">
                             <span class="fm-chatbutton-arrow">Send files...</span>
                         </div>
+                        
                         <div class="fm-share-folders">
-                            <span>Share Folders</span>
+                            <a href="#fm">
+                                <span>Share Folders</span>
+                            </a>
                         </div>
 
                         <div class="clear"></div>

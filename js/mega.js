@@ -1407,6 +1407,18 @@ function MegaData()
 
             return false; // stop propagation!
         });
+
+        // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
+        $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
+            
+            // Get the element ID
+            var $this = $(this);
+            var id = $this.attr('id');
+            
+            // Get the user handle and change to conversations screen
+            var user_handle = id.replace('contact_', '');
+            window.location = '#fm/chat/' + user_handle;
+        });
     };
 
     this.getContacts = function(n) {

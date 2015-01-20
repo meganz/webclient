@@ -258,6 +258,7 @@ function init_page()
 
 			loadingDialog.show();
 			CMS.watch('corporate', function() {
+				window.corpTemplate = null;
 				doRenderCorpPage();
 			});
 			CMS.get('corporate', function(err, content) {
@@ -511,6 +512,7 @@ function init_page()
 			}
 			loadingDialog.show();
 			CMS.watch('help:' + lang, function() {
+				window.helpTemplate = null;
 				doRenderHelp();
 			});
 			CMS.get('help:' + lang, function(err, content) {

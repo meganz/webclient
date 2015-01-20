@@ -144,7 +144,7 @@ var notifyPopup = {
         notifyPopup.notifyCounter();
         
         // Update server so it knows which notifications the user has seen
-        api_req({ a: 'sla', i: requesti });
+        //api_req({ a: 'sla', i: requesti });
     },
 
     /**

@@ -4943,6 +4943,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.conversations {
 	background-position: 0 -131px;
+    position: relative;
+}
+.nw-fm-left-icon.conversations .beta-text {
+    background: #646464;
+    border-radius: 10px;
+    color: #000;
+    font-size: 10px;
+    font-weight: bold;
+    left: 4px;
+    padding: 0 7px;
+    position: absolute;
+    top: 49px;
+}
+.nw-fm-left-icon.conversations.active .beta-text {
+    background: #34A7DC;
+}
+.nw-fm-left-icon.conversations:hover .beta-text {
+    background: #34A7DC;
 }
 .not-logged .nw-fm-left-icon.conversations {
 	background-position: 0 -9861px;

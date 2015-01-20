@@ -512,7 +512,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         } else {
             // Substitute email into language string
             var callWithString = l[5888].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
-            
+
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "started-call-" + unixtime(),
@@ -527,10 +527,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     });
 
     self.bind('call-answer-timeout', function(e, eventData) {
-        
+
         // Substitute email into language string
         var callWithString = l[5890].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
-        
+
         self.appendDomMessage(
             self.generateInlineDialog(
                 "rejected-call-" + unixtime(),
@@ -621,7 +621,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     "canceled-call-" + unixtime(),
                     eventData.peer,
                     "call-canceled",
-                    "Incoming call from " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
+                    "Call with " + self.megaChat.getContactNameFromJid(eventData.peer) + " was canceled.",
                     []
                 )
             );
@@ -635,7 +635,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(eventData.isDataCall) {
             return;
         }
-        
+
         // Substitute email into language string
         var msg = l[5889].replace('[X]', self.megaChat.getContactNameFromJid(eventData.peer));
 
@@ -945,7 +945,7 @@ ChatRoom.prototype._startCall = function() {
     // Substitute email into language string
     var callingString = l[5891].replace('[X]', self.megaChat.getContactNameFromJid(participants[0]));
 
-    self.appendDomMessage(     
+    self.appendDomMessage(
         self.generateInlineDialog(
             "outgoing-call",
             participants[0],

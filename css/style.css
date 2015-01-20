@@ -4894,13 +4894,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	left: 56px;
 	margin: 12px 0 0 0;
 }
-.nw-fm-left-icon.cloud-drive {
-	background-position: 0 13px;
-}
-.not-logged .nw-fm-left-icon.cloud-drive {
-	background-position: 0 -9666px;
-}
-.not-logged .nw-fm-left-icon.cloud-drive.active, .not-logged .nw-fm-left-icon.cloud-drive:hover {
+.nw-fm-left-icon.cloud-drive, .not-logged .nw-fm-left-icon.cloud-drive.active, .not-logged .nw-fm-left-icon.cloud-drive:hover {
 	background-position: 0 13px;
 }
 .nw-fm-left-icon.folder-link {

@@ -8543,6 +8543,9 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-webkit-border-radius: 12px;
 	border-radius: 12px;
 }
+.fm-chat-file-button.secondary-button.fm-chat-inline-dialog-button-reject {
+    margin-left: 5px;
+}
 .fm-chat-message .fm-chat-file-button {
 	margin-top: 0;
 }

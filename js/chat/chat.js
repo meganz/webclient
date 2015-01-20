@@ -776,9 +776,9 @@ Chat.prototype.init = function() {
     if(typeof(mocha) == "undefined" && !disableMpEnc) {
         self.plugins['encryptionFilter'] = new EncryptionFilter(self);
     }
-    if(typeof(mocha) == "undefined") {
-        self.plugins['chatStore'] = new ChatStore(self);
-    }
+    //if(typeof(mocha) == "undefined") {
+    //    self.plugins['chatStore'] = new ChatStore(self);
+    //}
     if(typeof(mocha) == "undefined") {
         self.plugins['chatNotifications'] = new ChatNotifications(self, self.options.chatNotificationOptions);
     }

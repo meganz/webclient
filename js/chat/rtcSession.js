@@ -749,7 +749,7 @@ RtcSession.prototype = {
     if (RtcSession.gLocalVid)
         throw new Error("Local stream just obtained, but localVid was not null");
 
-    var vid = $('<video class="'+elemClass+'" autoplay="autoplay" />');
+    var vid = $('<video autoplay="autoplay" />');
     if (vid.length < 1)
         throw new Error("Failed to create local video element");
     vid = vid[0];

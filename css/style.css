@@ -12611,7 +12611,10 @@ table {
 .download-mid-centered-block {
 	min-width: 748px;
 	height: 210px;
-	margin: -130px 0 0 -304px;
+	margin: -130px 0 0 -325px;
+}
+.download-mid-centered-block.not-available-some-reason {
+    margin-left: -389px;
 }
 .st-main-button-bl {
 	height: 260px;

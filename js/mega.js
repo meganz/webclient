@@ -2359,7 +2359,8 @@ function MegaData()
 
     this.clearRubbish = function(sel)
     {
-        var selids = [];
+        if (d) console.log('clearRubbish', sel);
+        var selids = {};
         if (sel && $.selected)
             for (var i in $.selected)
                 selids[$.selected[i]] = 1;

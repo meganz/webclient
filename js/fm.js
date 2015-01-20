@@ -1954,7 +1954,7 @@ function fmremove() {
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
             if ($(e).text() === l[1018])
-                $(e).text(l[83]);
+                $(e).html('<span>'+l[83]+'</span>');
         });
     } else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
@@ -2577,7 +2577,7 @@ function doClearbin()
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e)
     {
         if (e)
-            M.clearRubbish();
+            M.clearRubbish(!!($.selected || []).length);
     });
 }
 

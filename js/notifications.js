@@ -116,6 +116,9 @@ var notifyPopup = {
             // Mark all notifications [] counted
             notifyPopup.markNotificationsCounted();
             notifyPopup.notifyCounter();
+            
+            // Update the server so we don't see these again
+            api_req({ a: 'sla', i: requesti });
         });
 
         notifyPopup.notifyCounter();

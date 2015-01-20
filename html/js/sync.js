@@ -159,16 +159,6 @@ function init_sync()
 	else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
 	else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
 	else sync_switchOS('windows');
-	if (typeof swiffy == 'undefined' && !silent_loading)
-	{
-		silent_loading=function()
-		{
-			startSync();			
-		};
-		jsl.push(jsl2['mads_js']);
-		jsl_start();
-	}
-	else startSync();
 }
 
 
@@ -324,14 +314,4 @@ function changeLinux(i)
 		$('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
 		$('.version-select-txt').html(l[2029]);	
 	}
-}
-
-function startSync()
-{
-	stage = new swiffy.Stage(document.getElementById('syncanim'), swiffyobject);
-	stage.start();
-	setTimeout(function()
-	{
-		$('#syncanim svg').css('cursor','pointer');
-	},500);
 }

@@ -703,7 +703,7 @@ var Chat = function() {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
-                        return "You have an incoming call from " + params.from;
+                        return l[5893].replace('[X]', params.from); // You have an incoming call from [X].
                     }
                 }
             },

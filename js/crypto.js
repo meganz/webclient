@@ -919,7 +919,7 @@ function api_init(c,service)
                 setimmediate : false };
 }
 
-function api_req(req,ctx,c)
+function api_req(req, ctx, c)
 {
     if (typeof c == 'undefined') c = 0;
     if (typeof ctx == 'undefined') ctx = { };
@@ -1029,7 +1029,7 @@ function api_proc(q)
 
     if (q.rawreq === false)
     {
-        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid;
+        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid + '&domain=meganz';
 
         if (typeof q.cmds[q.i][0] == 'string')
         {

@@ -4738,7 +4738,7 @@ function process_f(f, cb)
 
         // if (typeof safari !== 'undefined') dk=1;
 
-        if (ncn.length < 200 || window.dk)
+        if (1 || ncn.length < 200 || window.dk)
         {
             if (d) {
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);

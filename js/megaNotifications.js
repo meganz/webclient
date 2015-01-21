@@ -84,7 +84,7 @@
         textMessages: {
         },
         sounds: [],
-        soundsPath: "sounds/",
+        soundsPath: staticpath + "sounds/",
         soundsPreload: true,
         soundsVolume: 1,
         showFaviconCounter: true,

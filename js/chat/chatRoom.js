@@ -307,6 +307,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             $('.btn-chat-call', self.$header).addClass("disabled");
 
             var doAnswer = function() {
+                self.show();
                 self.megaChat.incomingCallDialog.hide();
 
                 if(self.callRequest && self.callRequest.sid != eventData.sid) {
@@ -364,6 +365,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                     self.megaChat.incomingCallDialog.show(
                         self.megaChat.getContactNameFromJid(participants[0]),
                         avatar,
+                        eventData.sid,
                         eventData.peerMedia.video ? true : false,
                         function() {
                             self.options.mediaOptions.audio = true;
@@ -565,7 +567,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if(Strophe.getBareJidFromJid(peer) == self.megaChat.karere.getBareJid()) {
             userJid = self.getParticipantsExceptMe()[0];
         }
-        
+
         // Show "Call with [X] was rejected."
         msg = l[5892].replace('[X]', self.megaChat.getContactNameFromJid(userJid));
 
@@ -579,12 +581,14 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             )
         );
 
-        self.megaChat.trigger('onCallSuspended', [self]);
+        self.megaChat.trigger('onCallSuspended', [self, eventData]);
+        self.trigger('onCallSuspended', [eventData]);
         self._resetCallStateNoCall();
     });
 
     self.bind('call-canceled', function(e, eventData) {
-        self.megaChat.trigger('onCallSuspended', self);
+        self.megaChat.trigger('onCallSuspended', [self, eventData]);
+        self.trigger('onCallSuspended', [eventData]);
 
         if(eventData.info.isDataCall) {
 
@@ -666,6 +670,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
 
         self._resetCallStateNoCall();
+    });
+
+    self.bind('onCallSuspended', function(e, eventData) {
+        var sid = eventData.sid ? eventData.sid : (eventData.info ? eventData.info.sid : undefined);
+
+        if(self.megaChat.incomingCallDialog.sid == sid) {
+            self.megaChat.incomingCallDialog.hide();
+            self.getInlineDialogInstance("incoming-call").remove();
+        }
     });
 
     self.bind('media-recv', function(event, obj) {

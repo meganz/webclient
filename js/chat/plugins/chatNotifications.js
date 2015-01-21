@@ -145,7 +145,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
             var n = self.notifications.notify(
                 'incoming-voice-video-call',
                 {
-                    'sound': 'incoming_voice_video_call',
+                    'sound': room.megaChat.activeCallRoom ? undefined : 'incoming_voice_video_call',
                     'soundLoop': true,
                     'alwaysPlaySound': true,
                     'group': room.roomJid,

@@ -1364,10 +1364,11 @@ Chat.prototype.init = function() {
                     room.trigger(e, eventData);
                 });
             } else {
-                self.logger.warn("Routing RTC event to current room: ", e, eventData);
+                var room = self.getCurrentRoom();
+
+                self.logger.warn("Routing RTC event to current room: ", room, e, eventData);
 
                 // local-stream-obtained = most likely this is the currently active window/room
-                var room = self.getCurrentRoom();
                 if(room) {
                     room.trigger(e, eventData);
                 }

@@ -1277,6 +1277,8 @@ function MegaData()
                 M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             } else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
                 M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
+            } else if (M.currentdirid === 'contacts') {
+                M.doSort('status', 1);
             } else {
                 M.doSort('name', 1);
             }

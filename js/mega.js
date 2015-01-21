@@ -4743,7 +4743,6 @@ var kdWorker;
 
 function process_f(f, cb, onMissingKeysRetry)
 {
-    console.error('proc_f...')
     if (f && f.length)
     {
         var ncn = f;

@@ -1613,7 +1613,7 @@ body.notification-body {
 	width: 440px;
 }
 .notification-nw-pad {
-	padding: 0 0 0 74px;
+	padding: 0 0 0 64px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

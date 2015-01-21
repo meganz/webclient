@@ -219,8 +219,9 @@
             }
         },
         removeContact: function(item, from) {
-            if ($(from).data("settings").local_data) {
-                var ld = $(from).data("settings").local_data;
+            var settings = $(from).data("settings");
+            if (settings && settings.local_data) {
+                var ld = settings.local_data;
                 for (var n in ld) {
                     if (ld[n].id === item.id) {
                         $('.share-multiple-input').data("settings").local_data.splice(n, 1);

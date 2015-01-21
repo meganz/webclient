@@ -44,7 +44,7 @@
             assert(Favico, 'Favico.js is missing.');
 
 
-            $('link[rel="icon"]').attr('href', bootstaticpath + 'favicon.ico');
+            $('link[rel="icon"]').attr('href', (location.hostname === 'mega.nz' ? 'https://mega.nz/' : bootstaticpath) + 'favicon.ico');
 
             self.favico = new Favico({
                 type : 'rectangle',
@@ -84,7 +84,7 @@
         textMessages: {
         },
         sounds: [],
-        soundsPath: "sounds/",
+        soundsPath: staticpath + "sounds/",
         soundsPreload: true,
         soundsVolume: 1,
         showFaviconCounter: true,

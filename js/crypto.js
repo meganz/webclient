@@ -919,7 +919,7 @@ function api_init(c,service)
                 setimmediate : false };
 }
 
-function api_req(req,ctx,c)
+function api_req(req, ctx, c)
 {
     if (typeof c == 'undefined') c = 0;
     if (typeof ctx == 'undefined') ctx = { };
@@ -958,7 +958,7 @@ function api_proc(q)
         }
     };
 
-    q.xhr.onload = function __onAPIProcXHRLoad()
+    q.xhr.onload = function onAPIProcXHRLoad()
     {
         if (!this.q.cancelled)
         {
@@ -993,7 +993,7 @@ function api_proc(q)
                 {
                     var ctx = ctxs[i];
 
-                    if (ctx.callback)
+                    if (typeof ctx.callback === 'function')
                     {
                         try {
                             ctx.callback( t[i], ctx, this );
@@ -1004,8 +1004,12 @@ function api_proc(q)
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
 
-							console.error(ex, ex.stack); // when dumping exceptions, also dump .stack because its reaaallyyy helpful!
-                            Soon(function() {
+                            if (chromehack) {
+                                console.error(ex, ex.stack);
+                            } else {
+                                console.error(ex);
+                            }
+                            Soon(function sapith() {
                                 throw ex;
                             });
                         }
@@ -1025,7 +1029,7 @@ function api_proc(q)
 
     if (q.rawreq === false)
     {
-        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid;
+        q.url = apipath + q.service + '?id=' + (q.seqno++) + '&' + q.sid + '&domain=meganz';
 
         if (typeof q.cmds[q.i][0] == 'string')
         {
@@ -2416,7 +2420,11 @@ function api_faretry(ctx, error, host)
     if (ctx.faRetryI) ctx.faRetryI *= 1.8;
     else ctx.faRetryI = 250;
 
-    if (ctx.faRetryI < 5e5)
+    if (ctx.errfa && ctx.errfa.timeout && ctx.faRetryI > ctx.errfa.timeout)
+    {
+        api_faerrlauncher(ctx, host);
+    }
+    else if (ctx.faRetryI < 5e5)
     {
         if (d) console.log("Attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + "), retrying...", ctx.faRetryI);
 
@@ -2433,6 +2441,26 @@ function api_faretry(ctx, error, host)
     }
 
     srvlog("File attribute " + (ctx.p ? 'retrieval' : 'storage') + " failed (" + error + " @ " + host + ")");
+}
+
+function api_faerrlauncher(ctx, host)
+{
+    var r = false;
+    var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+
+    if (d) console.error('FAEOT', id);
+    else srvlog('api_fareq: eot for ' + host);
+
+    if (id !== slideshowid) {
+        if (id) {
+            pfails[id] = 1;
+            delete preqs[id];
+        }
+    } else {
+        r = true;
+        ctx.errfa(id, 1);
+    }
+    return r;
 }
 
 function api_fareq(res,ctx,xhr)
@@ -2505,24 +2533,9 @@ function api_fareq(res,ctx,xhr)
 
                     if (this.ctx.errfa)
                     {
-                        var ctx = this.ctx;
-                        var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
-
-                        if (d) console.error('FAEOT', id, this);
-                        else srvlog('api_fareq: eot for ' + this.fa_host);
-
-                        if (id !== slideshowid)
-                        {
-                            if (id)
-                            {
-                                pfails[id] = 1;
-                                delete preqs[id];
-                            }
-                        }
-                        else
+                        if (api_faerrlauncher(this.ctx, this.fa_host))
                         {
                             this.abort();
-                            this.ctx.errfa(id,1);
                         }
                     }
                     else

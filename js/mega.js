@@ -880,7 +880,7 @@ function MegaData()
                     el = 'tr';
                     html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + star + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';
                 }
-            } else if (this.currentdirid.length === 11) {
+            } else if (this.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
                 var cs = this.contactstatus(this.v[i].h);
                 var contains = fm_contains(cs.files, cs.folders);
                 if (cs.files === 0 && cs.folders === 0) {
@@ -1277,6 +1277,8 @@ function MegaData()
                 M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             } else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
                 M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
+            } else if (M.currentdirid === 'contacts') {
+                M.doSort('status', 1);
             } else {
                 M.doSort('name', 1);
             }
@@ -4015,6 +4017,7 @@ function execsc(actionPackets, callback) {
                     $.each(actionPacket.u, function(k, v) {
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
+                    megaChat.karere.forceReconnect();
                 }
             }
             else if (actionPacket.a === 'opc') {    // Outgoing pending contact
@@ -4735,7 +4738,7 @@ function process_f(f, cb)
 
         // if (typeof safari !== 'undefined') dk=1;
 
-        if (ncn.length < 200 || window.dk)
+        if (1 || ncn.length < 200 || window.dk)
         {
             if (d) {
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
@@ -4940,7 +4943,12 @@ function process_u(u) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
             }
         }
+        // XXX: We might be deleting the node/contact, so why are we adding it back?
         M.addUser(u[i]);
+    }
+
+    if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+        megaChat.karere.forceReconnect();
     }
 }
 

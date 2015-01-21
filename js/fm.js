@@ -3727,7 +3727,7 @@ function gridUI() {
         $('.shared-grid-view').removeClass('hidden');
         $.sharedGridHeader();
         initGridScrolling();
-    } else if (M.currentdirid.length === 11) {// Cloud-drive/File manager
+    } else if (M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {// Cloud-drive/File manager
         $('.contacts-details-block').removeClass('hidden');
         if (M.v.length > 0) {
             $('.files-grid-view.contact-details-view').removeClass('hidden');
@@ -3797,7 +3797,7 @@ function gridUI() {
         $.selectddUIgrid = '.contact-requests-grid .grid-scrolling-table';
     else if (M.currentdirid === 'opc')
         $.selectddUIgrid = '.sent-requests-grid .grid-scrolling-table';
-    else if (M.currentdirid.length === 11)
+    else if (M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts')
         $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
     else
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
@@ -4807,7 +4807,7 @@ function iconUI(aQuiet)
         $('.shared-blocks-view').removeClass('hidden');
         initShareBlocksScrolling();
     }
-    else if (M.currentdirid.length == 11)
+    else if (M.currentdirid.length == 11 && RootbyId(M.currentdirid) == 'contacts')
     {
         $('.contacts-details-block').removeClass('hidden');
         if (M.v.length > 0)
@@ -4842,7 +4842,7 @@ function iconUI(aQuiet)
         $.selectddUIgrid = '.shared-blocks-scrolling';
         $.selectddUIitem = 'a';
     }
-    else if (M.currentdirid.length == 11)
+    else if (M.currentdirid.length == 11 && RootbyId(M.currentdirid) == 'contacts')
     {
         $.selectddUIgrid = '.contact-details-view .file-block-scrolling';
         $.selectddUIitem = 'a';
@@ -5828,7 +5828,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }
             i++;
         }
-        if (ids[0] === 'contacts' && M.currentdirid && M.currentdirid.length === 11) {
+        if (ids[0] === 'contacts' && M.currentdirid && M.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
             sectionUIopen('contacts');
         } else if (ids[0] === 'contacts') {
             sectionUIopen('shared-with-me');
@@ -8530,7 +8530,7 @@ function fetchsrc(id)
         delete pfails[id];
         M.addDownload([id], false, err ? -1 : true);
     }
-    eot.timeout = 12000;
+    eot.timeout = 8500;
 
     if (pfails[id])
     { // for slideshow_next/prev

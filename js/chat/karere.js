@@ -432,6 +432,11 @@ makeMetaAware(Karere);
         }
     };
 
+    Karere.prototype._generateNewResource = function() {
+        var self = this;
+        return self.options.clientName + "-" + self._generateNewResourceIdx();
+    };
+
     /**
      * Initialize JID and password... (will not automatically connect, to use those credentials for connecting you can
      * always call .reconnect())
@@ -447,7 +452,7 @@ makeMetaAware(Karere);
 
         // if there is no /resource defined, generate one on the fly.
         if(bareJid == fullJid) {
-            var resource = self.options.clientName + "-" + self._generateNewResourceIdx();
+            var resource = self._generateNewResource();
             fullJid = fullJid + "/" + resource;
         }
 
@@ -683,6 +688,13 @@ makeMetaAware(Karere);
     Karere.prototype.forceDisconnect = function() {
         this.connection._onDisconnectTimeout();
         this._connectionState = Karere.CONNECTION_STATE.DISCONNECTED;
+    };
+
+    Karere.prototype.forceReconnect = function() {
+        var self = this;
+        self.forceDisconnect();
+        self._jid = self._jid.split("/")[0] + "/" + self._generateNewResource();
+        self.reconnect();
     };
 
     /**

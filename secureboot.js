@@ -23,19 +23,19 @@ function geoStaticpath(eu)
 				var cc = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
 				var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
 				if (cm && cm[1] && cc.indexOf(cm[1]) == -1)
-					return 'https://g.cdn1.mega.co.nz/';
+					return 'https://g.cdn1.mega.co.nz/3/';
 			}
 		} catch(e) {
 			setTimeout(function() { throw e; }, 2100);
 		}
 	}
-	return 'https://eu.static.mega.co.nz/';
+	return 'https://eu.static.mega.co.nz/3/';
 }
 
 if (ua.indexOf('chrome') > -1 && ua.indexOf('mobile') == -1 && parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10) < 22) b_u = 1;
 else if (ua.indexOf('firefox') > -1 && typeof DataView == 'undefined') b_u = 1;
 else if (ua.indexOf('opera') > -1 && typeof window.webkitRequestFileSystem == 'undefined') b_u = 1;
-var apipath, staticpath = 'https://eu.static.mega.co.nz/';
+var apipath, staticpath = 'https://eu.static.mega.co.nz/3/';
 var myURL = window.URL || window.webkitURL;
 if (!myURL) b_u=1;
 
@@ -124,7 +124,7 @@ if (!b_u && is_extension)
 		bootstaticpath = 'chrome://mega/content/';
 		urlrootfile = 'secure.html';
 		if (d) staticpath = bootstaticpath;
-		  else staticpath = 'https://eu.static.mega.co.nz/';
+		  else staticpath = 'https://eu.static.mega.co.nz/3/';
 		try {
 			loadSubScript(bootstaticpath + 'fileapi.js');
 		} catch(e) {
@@ -426,7 +426,7 @@ else
 				var dump = {
 					m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
 					f : mTrim('' + url), l : ln
-				}, cc, sbid = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+				}, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
 				if (~dump.m.indexOf('took +10s'))
 				{
@@ -911,18 +911,18 @@ else
 			};
 
             l=[];
-            var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
-            if (localStorage.allowBreakpointsOnReload) r = '';
+            var i = 3000, r = '?r=' + (new Date().toISOString().replace(/[^\w]/g,''));
+            if (!localStorage.jjnocache) r = '';
             while (i--) l[i]='l';
             for (var i in jsl)
             {
                 if (jsl[i].j === 1) {
-					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */);
+					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
 				}
                 else if (jsl[i].j === 2)
                 {
                     if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
-						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */)
+						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);
 					}
                 }
             }

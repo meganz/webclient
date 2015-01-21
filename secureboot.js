@@ -911,18 +911,18 @@ else
 			};
 
             l=[];
-            var i = 3000, r = new Date().toISOString().replace(/[^\w]/g,'');
-            if (localStorage.allowBreakpointsOnReload) r = '';
+            var i = 3000, r = '?r=' + (new Date().toISOString().replace(/[^\w]/g,''));
+            if (!localStorage.jjnocache) r = '';
             while (i--) l[i]='l';
             for (var i in jsl)
             {
                 if (jsl[i].j === 1) {
-					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */);
+					createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
 				}
                 else if (jsl[i].j === 2)
                 {
                     if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
-						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + '?r='/* + r */)
+						createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);
 					}
                 }
             }

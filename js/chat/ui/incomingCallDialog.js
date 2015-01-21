@@ -28,7 +28,7 @@
     /**
      * Show the dialog
      */
-    IncomingCallDialog.prototype.show = function(username, avatarImg, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
+    IncomingCallDialog.prototype.show = function(username, avatarImg, sid, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
         var self = this;
 
         if(!self.$dialog) {
@@ -38,6 +38,9 @@
             self.destroy();
             self._createDialog();
         }
+
+        self.sid = sid;
+
         if(self.visible) {
             return;
         }
@@ -67,6 +70,10 @@
         $('.video-call', self.$dialog).bind('mouseup', function() {
             answerVideoFn();
         });
+        $('.fm-dialog-close', self.$dialog).unbind('mouseup');
+        $('.fm-dialog-close', self.$dialog).bind('mouseup', function() {
+            self.hide();
+        });
 
 
         if(isVideoCall) {
@@ -77,15 +84,15 @@
         self.visible = true;
 
         self.$dialog.removeClass('hidden');
-//        $('.fm-dialog-overlay').removeClass('hidden');
+        $('.fm-dialog-overlay').removeClass('hidden');
 
         // auto hide on click out of the dialog
-        $(document).unbind('mouseup.IncomingCallDialog');
-        $(document).bind('mouseup.IncomingCallDialog', function(e) {
-            if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
-                self.hide();
-            }
-        });
+        //$(document).unbind('mouseup.IncomingCallDialog');
+        //$(document).bind('mouseup.IncomingCallDialog', function(e) {
+        //    if($(e.target).parents('.fm-chat-attach-popup').size() == 0 && !$(e.target).is(self.options.buttonElement)) {
+        //        self.hide();
+        //    }
+        //});
 
         //todo: close on esc (for all dialogs?)
     };
@@ -105,7 +112,7 @@
 
         self.visible = false;
         self.$dialog.addClass('hidden');
-//        $('.fm-dialog-overlay').addClass('hidden');
+        $('.fm-dialog-overlay').addClass('hidden');
 
         // cleaup & reset state
         self.$dialog.remove();

@@ -6992,6 +6992,10 @@ function clearScrollPanel(from)
 function closeDialog()
 {
     if (d) console.log('closeDialog', $.dialog);
+    if($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
+        // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
+        return false;
+    }
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');

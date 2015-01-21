@@ -569,7 +569,7 @@ function MegaData()
             }
         }
     };
-  
+
     /**
      *
      * @param {array of JSON objects} opc - sent requests
@@ -664,6 +664,56 @@ function MegaData()
                 $(lSel).unbind('jsp-scroll-y.dynlist');
             }
         }
+        function mInsertNode(aNode, aPrevNode, aNextNode, aTag, aElement, aHTMLContent, aUpdate, aDynCache) {
+            if (!aUpdate || $(aTag + ' ' + aElement).length === 0) {
+                // 1. if the current view does not have any nodes, just append it
+                if (aDynCache) {
+                    cache.push(aDynCache);
+                } else {
+                    $(aTag).append(aHTMLContent);
+                }
+            } else {
+                var j;
+                if ($(aTag + ' #' + aNode.h).length) {
+                    files--;
+                    aNode.seen = true;
+                    return;
+                }
+
+                if (aDynCache) {
+                    // console.log(i, aNode.name,cache.map(n=>n[2]));
+
+                    if (aNode.t) {
+                        for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
+                        cache.splice(x, 0, aDynCache);
+                    } else {
+                        cache.push(aDynCache);
+                    }
+                    return;
+                }
+
+                if (aUpdate && aPrevNode && $(aTag + ' #' + aPrevNode.h).length) {
+                    // 2. if there is a node before the new node in the current view, add it after that node:
+                    $(aTag + ' #' + aPrevNode.h).after(aHTMLContent);
+                } else if (aUpdate && aNextNode && $(aTag + ' #' + aNextNode.h).length) {
+                    // 3. if there is a node after the new node in the current view, add it before that node:
+                    $(aTag + ' #' + aNextNode.h).before(aHTMLContent);
+                } else if (aNode.t) {
+                    // 4. new folder: insert new node before the first folder in the current view
+                    $($(aTag + ' ' + aElement)[0]).before(aHTMLContent);
+                } else {// !aNode.t)
+                    // 5. new file: insert new node before the first file in the current view
+                    var a = $(aTag + ' ' + aElement).not('.folder');
+                    if (a.length > 0) {
+                        $(a[0]).before(aHTMLContent);
+                    } else {
+                        // 6. if this view does not have any files, insert after the last folder
+                        a = $(aTag + ' ' + aElement);
+                        $(a[a.length - 1]).after(aHTMLContent);
+                    }
+                }
+            }
+        }
         var cache = [], n_cache, files = 0, jsp, t, lSel;
 
         if(d) console.log('renderMain', u);
@@ -752,30 +802,21 @@ function MegaData()
                     return Soon(function() {
                         M.renderMain(u);
                     });
-            } else
+            } else {
                 $.rmItemsInView = n_cache;
+            }
         }
 
         delete this.cRenderMainN;
 
-        for (var i in this.v) {
-            if (this.v[i].name) {
-                var s = '';
-                var ftype = '';
-                var c = '';
-                if (this.v[i].t) {
-                    ftype = l[1049];
-                    c = ' folder';
-                } else {
-                    ftype = filetype(this.v[i].name);
-                    s = htmlentities(bytesToSize(this.v[i].s));
-                }
-                var html, el, cc, star = '';
-                if (this.v[i].fav) {
-                    star = ' star';
-                }
-            }
-            if (this.currentdirid === 'contacts') {
+        if (this.currentdirid === 'opc') {
+            DEBUG('RenderMain() opc');
+            this.drawSentContactRequests(this.v, 'clearGrid');
+        } else if (this.currentdirid === 'ipc') {
+            DEBUG('RenderMain() ipc');
+            this.drawReceivedContactRequests(this.v, 'clearGrid');
+        } else if (this.currentdirid === 'contacts') {
+            for (var i in this.v) {
                 var u_h = this.v[i].h;
                 var cs = this.contactstatus(u_h);
                 var contains = fm_contains(cs.files, cs.folders);
@@ -843,13 +884,29 @@ function MegaData()
                                     </td>\n\
                                 </tr>';
                 }
-            } else if (this.currentdirid === 'opc') {
-                DEBUG('RenderMain() opc');
-                this.drawSentContactRequests(this.v, 'clearGrid');
-            } else if (this.currentdirid === 'ipc') {
-                DEBUG('RenderMain() ipc');
-                this.drawReceivedContactRequests(this.v, 'clearGrid');
-            } else if (this.currentdirid === 'shares') {
+                mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u);
+            }
+        } else for (var i in this.v) {
+            if (!this.v[i].name) {
+                if (d) console.log('Skipping M.v node with no name.', this.v[i]);
+                continue;
+            }
+            var s = '';
+            var ftype = '';
+            var html, el;
+            var c = '', cc = null, star = '';
+            if (this.v[i].t) {
+                ftype = l[1049];
+                c = ' folder';
+            } else {
+                ftype = filetype(this.v[i].name);
+                s = htmlentities(bytesToSize(this.v[i].s));
+            }
+            if (this.v[i].fav) {
+                star = ' star';
+            }
+
+            if (this.currentdirid === 'shares') {
                 var cs = this.contactstatus(this.v[i].h);
                 var contains = fm_contains(cs.files, cs.folders);
                 if (cs.files == 0 && cs.folders == 0) {
@@ -880,7 +937,7 @@ function MegaData()
                     el = 'tr';
                     html = '<tr id="' + htmlentities(this.v[i].h) + '"><td width="30"><span class="grid-status-icon ' + star + '"></span></td><td><div class="shared-folder-icon"></div><div class="shared-folder-info-block"><div class="shared-folder-name">' + htmlentities(this.v[i].name) + '</div><div class="shared-folder-info">' + contains + '</div></div> </td><td width="240"><div class="nw-contact-avatar ' + htmlentities(u_h) + ' color' + av_color + '">' + avatar + '</div><div class="fm-chat-user-info todo-star ustatus ' + htmlentities(u_h) + ' ' + onlinestatus[1] + '"><div class="todo-fm-chat-user-star"></div><div class="fm-chat-user">' + htmlentities(user.name) + '</div><div class="nw-contact-status"></div><div class="fm-chat-user-status ' + htmlentities(u_h) + '">' + onlinestatus[0] + '</div><div class="clear"></div></div></td><td width="270"><div class="shared-folder-access' + rightsclass + '">' + rights + '</div></td></tr>';
                 }
-            } else if (this.currentdirid.length === 11 && RootbyId(M.currentdirid) == 'contacts') {
+            } else if (this.currentdirid.length === 11 && this.currentrootid === 'contacts') {
                 var cs = this.contactstatus(this.v[i].h);
                 var contains = fm_contains(cs.files, cs.folders);
                 if (cs.files === 0 && cs.folders === 0) {
@@ -921,55 +978,7 @@ function MegaData()
                     cc = [i, html, this.v[i].h, this.v[i].t];
                 }
             }
-
-            if (!u || $(t + ' ' + el).length === 0) {
-                // 1. if the current view does not have any nodes, just append it
-                if (cc) {
-                    cache.push(cc);
-                } else {
-                    $(t).append(html);
-                }
-            } else {
-                var j;
-                if ($(t + ' #' + this.v[i].h).length) {
-                    files--;
-                    this.v[i].seen = true;
-                    continue;
-                }
-
-                if (cc) {
-                    // console.log(i, this.v[i].name,cache.map(n=>n[2]));
-
-                    if (this.v[i].t) {
-                        for (var x = 0, m = cache.length; x < m && cache[x][3]; ++x);
-                        cache.splice(x, 0, cc);
-                    } else {
-                        cache.push(cc);
-                    }
-                    continue;
-                }
-
-                if (u && this.v[i - 1] && $(t + ' #' + this.v[i - 1].h).length) {
-                    // 2. if there is a node before the new node in the current view, add it after that node:
-                    $(t + ' #' + this.v[i - 1].h).after(html);
-                } else if (u && this.v[i + 1] && $(t + ' #' + this.v[i + 1].h).length) {
-                    // 3. if there is a node after the new node in the current view, add it before that node:
-                    $(t + ' #' + this.v[i + 1].h).before(html);
-                } else if (this.v[i].t) {
-                    // 4. new folder: insert new node before the first folder in the current view
-                    $($(t + ' ' + el)[0]).before(html);
-                } else {// !this.v[i].t)
-                    // 5. new file: insert new node before the first file in the current view
-                    var a = $(t + ' ' + el).not('.folder');
-                    if (a.length > 0) {
-                        $(a[0]).before(html);
-                    } else {
-                        // 6. if this view does not have any files, insert after the last folder
-                        a = $(t + ' ' + el);
-                        $(a[a.length - 1]).after(html);
-                    }
-                }
-            }
+            mInsertNode(this.v[i], this.v[i-1], this.v[i+1], t, el, html, u, cc);
         }
 
         contactUI();// ToDo: Document this function,
@@ -1242,6 +1251,7 @@ function MegaData()
         }
 
         this.currentdirid = id;
+        this.currentrootid = RootbyId(id);
 
         $('.nw-fm-tree-item').removeClass('opened');
 
@@ -1412,11 +1422,11 @@ function MegaData()
 
         // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
         $('.fm-tree-panel').delegate('.nw-contact-item.online', 'dblclick', function() {
-            
+
             // Get the element ID
             var $this = $(this);
             var id = $this.attr('id');
-            
+
             // Get the user handle and change to conversations screen
             var user_handle = id.replace('contact_', '');
             window.location = '#fm/chat/' + user_handle;

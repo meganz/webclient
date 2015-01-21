@@ -958,7 +958,7 @@ function api_proc(q)
         }
     };
 
-    q.xhr.onload = function __onAPIProcXHRLoad()
+    q.xhr.onload = function onAPIProcXHRLoad()
     {
         if (!this.q.cancelled)
         {
@@ -993,7 +993,7 @@ function api_proc(q)
                 {
                     var ctx = ctxs[i];
 
-                    if (ctx.callback)
+                    if (typeof ctx.callback === 'function')
                     {
                         try {
                             ctx.callback( t[i], ctx, this );
@@ -1004,8 +1004,12 @@ function api_proc(q)
                             // Otherwise if we load #blog *or* #page_<something>
                             // the whole site is buggy
 
-							console.error(ex, ex.stack); // when dumping exceptions, also dump .stack because its reaaallyyy helpful!
-                            Soon(function() {
+                            if (chromehack) {
+                                console.error(ex, ex.stack);
+                            } else {
+                                console.error(ex);
+                            }
+                            Soon(function sapith() {
                                 throw ex;
                             });
                         }

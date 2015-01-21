@@ -191,6 +191,16 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-color: rgba(208,39,47,1);
 	background-position: left -30px;
 }
+.beta-text-red {
+    background-image: url("../images/mega/beta.svg");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    height: 20px;
+    left: 56px;
+    position: absolute;
+    top: 14px;
+    width: 46px;
+}
 .nlanguage-popup {
 	position: absolute;
 	right: 0 !important;

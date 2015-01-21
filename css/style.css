@@ -4937,6 +4937,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: 0 -131px;
 	position: relative;
 }
+/*
 .nw-fm-left-icon.conversations .beta-text, .not-logged .nw-fm-left-icon.conversations:hover .beta-text, .not-logged .nw-fm-left-icon.conversations.active .beta-text {
 	left: 6px;
 	height: 14px;
@@ -4949,7 +4950,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 .nw-fm-left-icon.conversations.active .beta-text, .nw-fm-left-icon.conversations:hover .beta-text {
 	background-position: center -9958px;
-}
+}*/
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
 	background-position: 0 -367px;
 }

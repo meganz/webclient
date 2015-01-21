@@ -1588,7 +1588,7 @@ mSpawnWorker.prototype = {
 		wrk.onerror = function mSW_OnError(err)
 		{
 			console.error(err);
-			if (!self.wrk) return;
+			if (!(self && self.wrk)) return;
 			Soon(function() {
 				throw err;
 			});

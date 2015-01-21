@@ -390,7 +390,7 @@ if (indexedDB)
                         } else {
                             __mDB_Next();
                         }
-                    });
+                    }, 1);
                 }
                 else __mDB_Next();
             }

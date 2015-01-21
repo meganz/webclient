@@ -4732,23 +4732,24 @@ function processmove(jsonmove)
 var u_kdnodecache = {};
 var kdWorker;
 
-function process_f(f, cb)
+function process_f(f, cb, onMissingKeysRetry)
 {
+    console.error('proc_f...')
     if (f && f.length)
     {
         var ncn = f;
-        if ($.len(u_kdnodecache)) {
-            ncn = [];
-            for (var i in f) {
-                var n1 = f[i], n2 = u_kdnodecache[n1.h];
-                if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
-            }
-            if (d) console.log('non-cached nodes', ncn.length, ncn);
-        }
+        // if ($.len(u_kdnodecache)) {
+            // ncn = [];
+            // for (var i in f) {
+                // var n1 = f[i], n2 = u_kdnodecache[n1.h];
+                // if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
+            // }
+            // if (d) console.log('non-cached nodes', ncn.length, ncn);
+        // }
 
         // if (typeof safari !== 'undefined') dk=1;
 
-        if (1 || ncn.length < 200 || window.dk)
+        if ( ncn.length < 200 || window.dk)
         {
             if (d) {
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
@@ -4769,6 +4770,12 @@ function process_f(f, cb)
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
                 if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
                 $.extend(u_kdnodecache, r);
+                if (j.newmissingkeys) {
+                    if (d) console.log('Got missing keys, retrying?', !!onMissingKeysRetry);
+                    if (!onMissingKeysRetry) {
+                        return process_f( f, cb, 1);
+                    }
+                }
                 __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
             }, function(err) {
                 if (d) console.error(err);

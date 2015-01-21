@@ -982,8 +982,7 @@ RtcSession.prototype = {
     });
     this.trigger('call-ended', obj);
     if (!sess.fake) { //non-fake session
-        if (sess.localStream)
-            sess.localStream.stop();
+        delete sess.localStream;
         this.removeVideo(sess);
     }
     this._freeLocalStreamIfUnused();

@@ -426,7 +426,7 @@ else
 				var dump = {
 					m : ('' + msg).replace(/'(\w+:\/\/+[^/]+)[^']+'/,"'$1...'").replace(/^Uncaught\s*/,''),
 					f : mTrim('' + url), l : ln
-				}, cc, sbid = +(''+$('script[src*="secureboot"]').attr('src')).split('=').pop();
+				}, cc, sbid = +(''+(document.querySelector('script[src*="secureboot"]')||{}).src).split('=').pop()|0;
 
 				if (~dump.m.indexOf('took +10s'))
 				{

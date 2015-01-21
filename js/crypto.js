@@ -2446,20 +2446,20 @@ function api_faretry(ctx, error, host)
 function api_faerrlauncher(ctx, host)
 {
     var r = false;
-	var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
+    var id = ctx.p && ctx.h[ctx.p] && preqs[ctx.h[ctx.p]] && ctx.h[ctx.p];
 
-	if (d) console.error('FAEOT', id);
-	else srvlog('api_fareq: eot for ' + host);
+    if (d) console.error('FAEOT', id);
+    else srvlog('api_fareq: eot for ' + host);
 
-	if (id !== slideshowid) {
-		if (id) {
-			pfails[id] = 1;
-			delete preqs[id];
-		}
-	} else {
-		r = true;
-		ctx.errfa(id, 1);
-	}
+    if (id !== slideshowid) {
+        if (id) {
+            pfails[id] = 1;
+            delete preqs[id];
+        }
+    } else {
+        r = true;
+        ctx.errfa(id, 1);
+    }
     return r;
 }
 

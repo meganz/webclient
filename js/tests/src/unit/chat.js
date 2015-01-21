@@ -38,7 +38,7 @@ describe("Chat.js - Karere UI integration", function() {
 
                 $.each(M.u, function(k, v) {
                     if(v.c == 0 || v.c == 1) {
-                        var tpl = '<li id="treeli_$hash"><span class="fm-connector contact"></span><span class="fm-horizontal-connector contact"></span><a class="fm-tree-folder contact    ui-droppable offline-status dragover" id="treea_$hash" data-jid="$jid"><span><span class="avatar $hash"><span><img src="/images/mega/default-avatar.png" alt=""></span></span><span class="messages-icon"><span class="active"></span></span><span class="contact-name">$name</span></span></a><ul id="treesub_$hash"></ul></li>';
+                        var tpl = '<li id="treeli_$hash"><span class="fm-connector contact"></span><span class="fm-horizontal-connector contact"></span><a class="fm-tree-folder contact    ui-droppable offline-status dragover" id="treea_$hash" data-jid="$jid"><span><span class="avatar $hash"><span><img src="' + staticpath + '/images/mega/default-avatar.png" alt=""></span></span><span class="messages-icon"><span class="active"></span></span><span class="contact-name">$name</span></span></a><ul id="treesub_$hash"></ul></li>';
                         $('#treesub_contacts').append(
                             tpl
                                 .replace(

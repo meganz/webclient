@@ -163,7 +163,7 @@
         '</div>\n' +
         '<div class="incoming-call-avatar">\n' +
         '       <div class="incoming-call-shadow-bl"></div>\n' +
-        '       <img src="images/mega/default-avatar.png" alt="" />\n' +
+        '       <img src="' + staticpath + 'images/mega/default-avatar.png" alt="" />\n' +
         '</div>\n' +
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +

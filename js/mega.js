@@ -4941,7 +4941,8 @@ function process_u(u) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
             }
         }
-        // M.addUser(u[i]);
+        // XXX: We might be deleting the node/contact, so why are we adding it back?
+        M.addUser(u[i]);
     }
 
     if(megaChat && megaChat.karere && megaChat.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {

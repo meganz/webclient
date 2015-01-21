@@ -507,6 +507,7 @@ function init_page()
 				parsepage(window.helpTemplate);
 				init_help();
 				loadingDialog.hide();
+				topmenuUI();
 				mainScroll();
 				return;
 			}
@@ -521,6 +522,7 @@ function init_page()
 					parsepage(window.helpTemplate = content.html);
 					init_help();
 					loadingDialog.hide();
+				topmenuUI();
 					mainScroll();
 				});
 			});

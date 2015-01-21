@@ -2423,6 +2423,15 @@ function MegaData()
         treeUI();
     }
 
+    /**
+     * addUser, updates global .u variable with new user data
+     * adds/updates user indexedDB with newest user data
+     * 
+     * @param {object} u, user object data
+     * @param {boolean} ignoreDB, don't write to indexedDB
+     * 
+     * @returns {undefined}
+     */
     this.addUser = function(u, ignoreDB) {
         this.u[u.u] = u;
         if (typeof mDB === 'object' && !ignoreDB && !pfkey)
@@ -4953,7 +4962,6 @@ function process_u(u) {
                 $('.add-contact-multiple-input').tokenInput("removeContact", {id: u[i].m}, '.add-contact-multiple-input');
             }
         }
-        // XXX: We might be deleting the node/contact, so why are we adding it back?
         M.addUser(u[i]);
     }
 

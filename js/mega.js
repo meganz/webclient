@@ -4744,11 +4744,13 @@ function processmove(jsonmove)
 var u_kdnodecache = {};
 var kdWorker;
 
-function process_f(f, cb, onMissingKeysRetry)
+function process_f(f, cb, r)
 {
+    var onMainThread = window.dk ? 9e11 : 200;
+
     if (f && f.length)
     {
-        var ncn = f;
+        var ncn = f, skn = [];
         // if ($.len(u_kdnodecache)) {
             // ncn = [];
             // for (var i in f) {
@@ -4757,16 +4759,29 @@ function process_f(f, cb, onMissingKeysRetry)
             // }
             // if (d) console.log('non-cached nodes', ncn.length, ncn);
         // }
+        if (!r && ncn.length > onMainThread) {
+            for (var i in f) {
+                if (f[i].sk) skn.push(f[i]);
+            }
+            if (skn.length) {
+                ncn = skn;
+                if (d) console.log('processing share-keys first', ncn.length, ncn);
+            }
+        }
 
-        // if (typeof safari !== 'undefined') dk=1;
-
-        if ( ncn.length < 200 || window.dk)
+        if ( ncn.length < onMainThread )
         {
             if (d) {
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
                 console.time('process_f');
             }
-            __process_f1(f, cb);
+            __process_f1(ncn, function _mtProcF() {
+                if (ncn === skn) {
+                    process_f(f, cb, 1);
+                } else {
+                    if (cb) cb();
+                }
+            });
             if (d) console.timeEnd('process_f');
         }
         else
@@ -4781,9 +4796,9 @@ function process_f(f, cb, onMissingKeysRetry)
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
                 if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
                 $.extend(u_kdnodecache, r);
-                if (j.newmissingkeys) {
-                    if (d) console.log('Got missing keys, retrying?', !!onMissingKeysRetry);
-                    if (!onMissingKeysRetry) {
+                if (j.newmissingkeys || ncn === skn) {
+                    if (d && j.newmissingkeys) console.log('Got missing keys, retrying?', !r);
+                    if (!r) {
                         return process_f( f, cb, 1);
                     }
                 }

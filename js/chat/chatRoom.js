@@ -325,7 +325,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 if(self.megaChat.getCurrentRoomJid() != self.roomJid) {
                     self.activateWindow();
                 }
-                self.megaChat.trigger('onCallAnswered', [self]);
+                self.megaChat.trigger('onCallAnswered', [self, eventData]);
+                self.trigger('onCallAnswered', [eventData]);
 
                 self._resetCallStateInCall();
             };
@@ -336,6 +337,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                 eventData.answer(false, {reason:'busy'});
 
                 self.trigger('call-declined', eventData);
+                self.trigger('onCallDeclined', eventData);
             };
 
             var participants = self.getParticipantsExceptMe();
@@ -361,6 +363,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                         self.megaChat.getContactNameFromJid(participants[0]),
                         avatar,
                         eventData.peerMedia.video ? true : false,
+                        eventData.sid
                     ]);
                     self.megaChat.incomingCallDialog.show(
                         self.megaChat.getContactNameFromJid(participants[0]),
@@ -546,6 +549,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             self._resetCallStateNoCall();
         }
     });
+
     self.bind('call-declined', function(e, eventData) {
         var msg;
         var peer = eventData.peer ? eventData.peer : eventData.from;
@@ -944,6 +948,7 @@ ChatRoom.prototype._startCall = function() {
 
     $promise.always(function() {
         self.callRequest = self.megaChat.rtc.startMediaCall(participants[0], self.getMediaOptions());
+        self.trigger('onOutgoingCall', [self.callRequest]);
     });
 
 

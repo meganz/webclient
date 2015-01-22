@@ -283,7 +283,9 @@
         }
 
         if(self.options.soundLoop === true) {
-            ion.sound.stop(self.options.sound);
+            if(!self.options.alwaysPlaySound) {
+                ion.sound.stop(self.options.sound);
+            }
         }
         if(!val && self._desktopNotification) {
             self._desktopNotification.close();
@@ -294,6 +296,14 @@
         }
 
         return self;
+    };
+
+
+    MegaNotification.prototype.forceStopSound = function() {
+        var self = this;
+        if(self.options.sound) {
+            ion.sound.stop(self.options.sound);
+        }
     };
 
     /**

@@ -139,9 +139,55 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     );
 
                 })
+                .unbind('onOutgoingCall.chatNotifications')
+                .bind('onOutgoingCall.chatNotifications', function(e, eventData) {
+                    var sid = eventData.info && eventData.info.sid ? eventData.info.sid : eventData.sid;
+                    var n = self.notifications.notify(
+                        'outgoing-call',
+                        {
+                            'sound': megaRoom.megaChat.activeCallRoom ? undefined : 'incoming_voice_video_call',
+                            'soundLoop': true,
+                            'alwaysPlaySound': true,
+                            'group': megaRoom.roomJid,
+                            'incrementCounter': false,
+                            'icon': avatars[u_handle],
+                            'params': {
+                                'room': megaRoom,
+                                'from': generateAvatarMeta(u_handle).fullName,
+                                'isVideoCall': megaRoom.options.mediaOptions.video
+                            }
+                        },
+                        !megaRoom.isActive()
+                    );
+                    n.bind('onClick', function(e) {
+                        window.focus();
+                        room.show();
+                    });
+
+                    var evtId = generateEventSuffixFromArguments("", "chatNotifStopSoundOut", rand(10000));
+                    var stopSound = function(e, eventData) {
+                        var sid2 = eventData.info && eventData.info.sid ? eventData.info.sid : eventData.sid;
+                        if(sid2 == sid) {
+                            n.forceStopSound();
+                            megaRoom.unbind('onCallAnswered' + evtId);
+                            megaRoom.unbind('call-init' + evtId);
+                            megaRoom.unbind('onCallDeclined' + evtId);
+                            megaRoom.unbind('call-canceled' + evtId);
+                            megaRoom.unbind('call-declined' + evtId);
+                            megaRoom.unbind('call-canceled-caller' + evtId);
+                        }
+                    };
+
+                    megaRoom.bind('onCallAnswered' + evtId, stopSound);
+                    megaRoom.bind('call-init' + evtId, stopSound);
+                    megaRoom.bind('onCallDeclined' + evtId, stopSound);
+                    megaRoom.bind('call-canceled' + evtId, stopSound);
+                    megaRoom.bind('call-declined' + evtId, stopSound);
+                    megaRoom.bind('call-canceled-caller' + evtId, stopSound);
+                })
         })
         .unbind('onIncomingCall.chatNotifications')
-        .bind('onIncomingCall.chatNotifications', function(e, room, contactName, avatar, isVideoCall) {
+        .bind('onIncomingCall.chatNotifications', function(e, room, contactName, avatar, isVideoCall, sid) {
             var n = self.notifications.notify(
                 'incoming-voice-video-call',
                 {
@@ -164,6 +210,22 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 room.show();
             });
 
+            var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
+            var stopSound = function(e, eventData) {
+                var sid2 = eventData.info && eventData.info.sid ? eventData.info.sid : eventData.sid;
+                if(sid2 == sid) {
+                    n.forceStopSound();
+                    room.unbind('onCallAnswered' + evtId);
+                    room.unbind('onCallDeclined' + evtId);
+                    room.unbind('call-canceled' + evtId);
+                    room.unbind('call-declined' + evtId);
+                }
+            };
+
+            room.bind('onCallAnswered' + evtId, stopSound);
+            room.bind('onCallDeclined' + evtId, stopSound);
+            room.bind('call-canceled' + evtId, stopSound);
+            room.bind('call-declined' + evtId, stopSound);
         })
         .unbind('onCallSuspended.chatNotifications')
         .bind('onCallSuspended', function(e, room) {

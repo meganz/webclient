@@ -573,6 +573,7 @@ RtcSession.prototype = {
 
               self.connection.send($msg({
                   to:Strophe.getBareJidFromJid(targetJid),
+                  sid: sid,
                   type: 'megaCallCancel'
               }));
        /**
@@ -607,8 +608,10 @@ RtcSession.prototype = {
             self.connection.send($msg({
                 to:Strophe.getBareJidFromJid(targetJid),
                 sid: sid,
+                reason: 'caller',
                 type: 'megaCallCancel'
             }));
+            self.trigger('call-canceled-caller', {peer: targetJid, info: { sid: sid, reason: 'caller' }});
             return true;
         } else if (state === 0) {
             state = 4;

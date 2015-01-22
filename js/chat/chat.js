@@ -1378,6 +1378,7 @@ Chat.prototype.init = function() {
         $(self.rtc).on('call-declined', rtcEventProxyToRoom);
         $(self.rtc).on('call-answer-timeout', rtcEventProxyToRoom);
         $(self.rtc).on('call-canceled', rtcEventProxyToRoom);
+        $(self.rtc).on('call-canceled-caller', rtcEventProxyToRoom);
         $(self.rtc).on('media-recv', rtcEventProxyToRoom);
         $(self.rtc).on('local-stream-connect', rtcEventProxyToRoom);
         $(self.rtc).on('remote-player-remove', rtcEventProxyToRoom);
@@ -1949,37 +1950,37 @@ Chat.prototype.renderContactTree = function() {
 
     if(!$currentCallIndicator.is(".hidden")) { // if not hidden (e.g. there is active call)
         var roomJid = $currentCallIndicator.attr('data-jid');
-        assert(roomJid, 'room jid is missing from the current call indicator');
+        if(roomJid) {
+            $currentCallIndicator
+                .removeClass("online")
+                .removeClass("offline")
+                .removeClass("busy")
+                .removeClass("away")
+                .removeClass("no");
 
-        $currentCallIndicator
-            .removeClass("online")
-            .removeClass("offline")
-            .removeClass("busy")
-            .removeClass("away")
-            .removeClass("no");
 
+            var room = self.chats[roomJid];
 
-        var room = self.chats[roomJid];
+            assert(room, 'room not found');
 
-        assert(room, 'room not found');
+            var participantJid = room.getParticipantsExceptMe()[0];
+            var presence = self.karere.getPresence(participantJid);
 
-        var participantJid = room.getParticipantsExceptMe()[0];
-        var presence = self.karere.getPresence(participantJid);
+            var targetClassName = "offline"
+            if(!presence || presence == Karere.PRESENCE.OFFLINE) {
+                targetClassName = "offline";
+            } else if(presence == Karere.PRESENCE.AWAY) {
+                targetClassName = "away";
+            } else if(presence == Karere.PRESENCE.BUSY) {
+                targetClassName = "busy";
+            } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
+                targetClassName = "online";
+            } else {
+                targetClassName = "offline";
+            }
 
-        var targetClassName = "offline"
-        if(!presence || presence == Karere.PRESENCE.OFFLINE) {
-            targetClassName = "offline";
-        } else if(presence == Karere.PRESENCE.AWAY) {
-            targetClassName = "away";
-        } else if(presence == Karere.PRESENCE.BUSY) {
-            targetClassName = "busy";
-        } else if(presence === true || presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE) {
-            targetClassName = "online";
-        } else {
-            targetClassName = "offline";
+            $currentCallIndicator.addClass(targetClassName);
         }
-
-        $currentCallIndicator.addClass(targetClassName);
     }
 
     // update conversation list

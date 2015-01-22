@@ -26,6 +26,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
 
     if (karere._connectionRetries > (karere.options.maxConnectionRetries * 2)) {
         /* *2, because every conn. counts as 2, 2 XHR conns = 1 jabber connection */
+        karere._connectionRetries = 0;
         karere.forceDisconnect();
     } else {
         karere.forceDisconnect();
@@ -34,7 +35,7 @@ Strophe.Bosh.prototype._hitError = function (reqStatus) {
             if(karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTING) {
                 karere.reconnect();
             }
-        }, karere._connectionRetries * 2500)
+        }, karere._connectionRetries * 1500)
     }
 };
 
@@ -998,7 +999,6 @@ makeMetaAware(Karere);
         var msg = toArray(arguments).join(" ");
         if(msg.indexOf("_processRequest - sendFunc")) {
             this.connection._proto._hitError(0);
-            return;
         }
         this.logger.error(msg, additional);
     }

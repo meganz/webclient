@@ -5741,6 +5741,9 @@ function sectionUIopen(id) {
 
     if (id !== 'conversations') {
         $('.fm-right-header').removeClass('hidden');
+        $('.fm-chat-block').hide();
+    } else {
+        $('.fm-chat-block').show();
     }
 
     if ((id !== 'cloud-drive') && (id !== 'rubbish-bin') && ((id !== 'shared-with-me') && (M.currentdirid !== 'shares'))) {

@@ -439,8 +439,11 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status)
     {
-        if (u)
+        if (u && megaChat && megaChat.is_initialized)
         {
+            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
+            // user's devices, which is aggregated by Karere already
+            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
             var e = $('.ustatus.' + u.u);
             if (e.length > 0)
             {

@@ -539,7 +539,7 @@ function initializeTreePanelSorting()
     $.sortTreePanel = {};
     $.each(['folder-link', 'contacts', 'conversations', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
         $.sortTreePanel[type] = {
-            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || "name",
+            by: anyOf(['name', 'status', 'last-interaction'], localStorage['sort' + type + 'By']) || (type == 'contacts' ? "status":"name"),
             dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
         };
     });

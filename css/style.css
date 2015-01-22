@@ -192,14 +192,14 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 	background-position: left -30px;
 }
 .beta-text-red {
-    background-image: url("../images/mega/beta.svg");
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    height: 20px;
-    left: 56px;
-    position: absolute;
-    top: 14px;
-    width: 46px;
+	background-image: url("../images/mega/beta.svg");
+	background-position: 0 0;
+	background-repeat: no-repeat;
+	height: 20px;
+	left: 56px;
+	position: absolute;
+	top: 14px;
+	width: 46px;
 }
 .nlanguage-popup {
 	position: absolute;
@@ -7708,7 +7708,7 @@ color: white;
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -19026,6 +19026,9 @@ span.incoming-call-name {
 	max-width: -webkit-calc(100% - 56px);
 	max-width: -moz-calc(100% - 56px);
 	max-width: calc(100% - 56px);
+}
+.fm-dialog .shared-details-folder-name, .fm-dialog .contact-details-user-name {
+	max-width: 100%;
 }
 .shared-details-pad .grid-url-arrow {
 	border: 2px solid rgba(0,0,0,0.1);

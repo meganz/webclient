@@ -7479,7 +7479,11 @@ function moveDialog()
                 if (!isCircular($.selected[i], $.mcselected))
                     n.push($.selected[i]);
             closeDialog();
-            M.moveNodes(n, $.mcselected);
+            if (RootbyId($.mcselected) === 'shares') {
+                M.copyNodes(n, $.mcselected, true);
+            } else {
+                M.moveNodes(n, $.mcselected);
+            }
         }
     });
 }

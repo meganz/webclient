@@ -110,8 +110,9 @@ describe("authring unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 ns.getContacts('Ed25519');
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.lengthOf(getUserAttribute.args[0], 6);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                var callback = getUserAttribute.args[0][3];
+                var callback = getUserAttribute.args[0][4];
                 var theCtx = getUserAttribute.args[0][4];
                 callback(-3, theCtx);
                 assert.deepEqual(u_authring.Ed25519, {});
@@ -122,8 +123,9 @@ describe("authring unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 ns.getContacts('Ed25519');
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.lengthOf(getUserAttribute.args[0], 6);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                var callback = getUserAttribute.args[0][3];
+                var callback = getUserAttribute.args[0][4];
                 var theCtx = getUserAttribute.args[0][4];
                 callback({'': SERIALISED_RING_ED25519}, theCtx);
                 assert.deepEqual(u_authring.Ed25519, RING_ED25519);
@@ -135,9 +137,10 @@ describe("authring unit test", function() {
                 var myCallback = sinon.spy();
                 ns.getContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.lengthOf(getUserAttribute.args[0], 6);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(-3, theCtx);
                 sinon.assert.calledOnce(myCallback);
                 assert.deepEqual(myCallback.args[0][0], {});
@@ -150,9 +153,10 @@ describe("authring unit test", function() {
                 var myCallback = sinon.spy();
                 ns.getContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.lengthOf(getUserAttribute.args[0], 6);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authring');
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback({'': SERIALISED_RING_ED25519}, theCtx);
                 sinon.assert.calledOnce(myCallback);
                 assert.deepEqual(myCallback.args[0][0], RING_ED25519);
@@ -169,8 +173,9 @@ describe("authring unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 ns.getContacts('RSA');
                 sinon.assert.calledOnce(getUserAttribute);
+                assert.lengthOf(getUserAttribute.args[0], 6);
                 assert.strictEqual(getUserAttribute.args[0][1], 'authRSA');
-                var callback = getUserAttribute.args[0][3];
+                var callback = getUserAttribute.args[0][4];
                 var theCtx = getUserAttribute.args[0][4];
                 callback({'': SERIALISED_RING_RSA}, theCtx);
                 assert.deepEqual(u_authring.RSA, RING_RSA);
@@ -185,6 +190,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'setUserAttribute');
                 ns.setContacts('Ed25519');
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.lengthOf(setUserAttribute.args[0], 5);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authring');
             });
 
@@ -196,6 +202,7 @@ describe("authring unit test", function() {
                 var myCallback = sinon.spy();
                 ns.setContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.lengthOf(setUserAttribute.args[0], 5);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authring');
                 var ctx = api_req.args[0][1];
                 var callback = ctx.callback;
@@ -212,6 +219,7 @@ describe("authring unit test", function() {
                 var myCallback = sinon.spy();
                 ns.setContacts('Ed25519', myCallback);
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.lengthOf(setUserAttribute.args[0], 5);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authring');
                 var ctx = api_req.args[0][1];
                 var callback = ctx.callback;
@@ -230,6 +238,7 @@ describe("authring unit test", function() {
                 sandbox.stub(window, 'setUserAttribute');
                 ns.setContacts('RSA');
                 sinon.assert.calledOnce(setUserAttribute);
+                assert.lengthOf(setUserAttribute.args[0], 5);
                 assert.strictEqual(setUserAttribute.args[0][0], 'authRSA');
                 assert.strictEqual(setUserAttribute.args[0][1][''], SERIALISED_RING_RSA);
             });

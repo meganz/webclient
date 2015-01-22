@@ -20,7 +20,6 @@ describe("user unit test", function() {
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
         localStorage.clear();
-        localStorage.d = false;
     });
 
     afterEach(function() {
@@ -30,22 +29,22 @@ describe("user unit test", function() {
     describe('user attributes', function() {
         describe('getUserAttribute', function() {
             it("internal callback error, no custom callback", function() {
-                window.api_req = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, undefined);
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'puEd255', true, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
-                localStorage.d = true;
+                sandbox.stub(window, 'd', true);
                 callback(-3, theCtx);
                 assert.strictEqual(console.log.args[0][0],
                                    'Error retrieving attribute "+puEd255" for user "me": -3!');
             });
 
             it("internal callback error, custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, myCallback);
+                getUserAttribute('me', 'puEd255', true, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -54,22 +53,22 @@ describe("user unit test", function() {
             });
 
             it("internal callback OK, no custom callback", function() {
-                window.api_req = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, undefined);
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'puEd255', true, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
-                localStorage.d = true;
+                sandbox.stub(window, 'd', true);
                 callback('fortytwo', theCtx);
                 assert.strictEqual(console.log.args[0][0],
                                    'Attribute "+puEd255" for user "me" is "fortytwo".');
             });
 
             it("internal callback OK, custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                getUserAttribute('me', 'puEd255', true, myCallback);
+                getUserAttribute('me', 'puEd255', true, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -78,12 +77,12 @@ describe("user unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
                 sandbox.stub(tlvstore, 'blockDecrypt', _echo);
                 sandbox.stub(tlvstore, 'tlvRecordsToContainer', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
-                getUserAttribute('me', 'keyring', false, myCallback);
+                getUserAttribute('me', 'keyring', false, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -94,10 +93,10 @@ describe("user unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                getUserAttribute('me', 'keyring', false, myCallback);
+                getUserAttribute('me', 'keyring', false, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -108,45 +107,59 @@ describe("user unit test", function() {
             });
 
             it("public attribute", function() {
-                window.api_req = sinon.spy();
-                getUserAttribute('me', 'puEd255', undefined, undefined);
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'puEd255', undefined, undefined, undefined);
                 sinon.assert.calledOnce(api_req);
                 assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+puEd255'});
             });
 
+            it("public, non-historic attribute", function() {
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'puEd255', true, true, undefined);
+                sinon.assert.calledOnce(api_req);
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+!puEd255'});
+            });
+
             it("public attribute, two params", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 getUserAttribute('me', 'puEd255');
                 sinon.assert.calledOnce(api_req);
                 assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '+puEd255'});
             });
 
             it("private attribute", function() {
-                window.api_req = sinon.spy();
-                getUserAttribute('me', 'keyring', false, undefined);
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'keyring', false, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '*keyring'});
+            });
+
+            it("private, non-historic attribute", function() {
+                sandbox.stub(window, 'api_req');
+                getUserAttribute('me', 'keyring', false, true, undefined);
+                sinon.assert.calledOnce(api_req);
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me', ua: '*!keyring'});
             });
         });
 
         describe('setUserAttribute', function() {
             it("internal callback error, no custom callback", function() {
-                window.api_req = sinon.spy();
-                setUserAttribute('puEd255', 'foo', true, undefined);
+                sandbox.stub(window, 'api_req');
+                setUserAttribute('puEd255', 'foo', true, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
-                localStorage.d = true;
+                sandbox.stub(window, 'd', true);
                 callback(-3, theCtx);
                 assert.strictEqual(console.log.args[0][0],
                                    'Error setting user attribute "+puEd255", result: -3!');
             });
 
             it("internal callback error, custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                setUserAttribute('puEd255', 'foo', true, myCallback);
+                setUserAttribute('puEd255', 'foo', true, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -155,22 +168,22 @@ describe("user unit test", function() {
             });
 
             it("internal callback OK, no custom callback", function() {
-                window.api_req = sinon.spy();
-                setUserAttribute('puEd255', 'foo', true, undefined);
+                sandbox.stub(window, 'api_req');
+                setUserAttribute('puEd255', 'foo', true, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window.console, 'log');
-                localStorage.d = true;
+                sandbox.stub(window, 'd', true);
                 callback('OK', theCtx);
                 assert.strictEqual(console.log.args[0][0],
                                    'Setting user attribute "+puEd255", result: OK');
             });
 
             it("internal callback OK, custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
-                setUserAttribute('puEd255', 'foo', true, myCallback);
+                setUserAttribute('puEd255', 'foo', true, false, myCallback);
                 sinon.assert.calledOnce(api_req);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
@@ -179,12 +192,12 @@ describe("user unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 var myCallback = sinon.spy();
                 sandbox.stub(tlvstore, 'blockEncrypt', _echo);
                 sandbox.stub(tlvstore, 'containerToTlvRecords', _echo);
                 sandbox.stub(window, 'u_k', 'foo');
-                setUserAttribute('keyring', 'fortytwo', false, myCallback);
+                setUserAttribute('keyring', 'fortytwo', false, false, myCallback);
                 assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo', tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_CCM_12_16));
                 assert.ok(tlvstore.containerToTlvRecords.calledWith('fortytwo'));
                 sinon.assert.calledOnce(api_req);
@@ -195,9 +208,9 @@ describe("user unit test", function() {
             });
 
             it("private attribute, internal callback OK, no custom callback", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, undefined);
+                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
@@ -206,23 +219,23 @@ describe("user unit test", function() {
             });
 
             it("public attribute", function() {
-                window.api_req = sinon.spy();
-                setUserAttribute('puEd255', 'foo', true, undefined);
+                sandbox.stub(window, 'api_req');
+                setUserAttribute('puEd255', 'foo', true, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 assert.deepEqual(api_req.args[0][0], {a: 'up', '+puEd255': 'foo'});
             });
 
             it("public attribute, two params", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 setUserAttribute('puEd255', 'foo');
                 sinon.assert.calledOnce(api_req);
                 assert.deepEqual(api_req.args[0][0], {a: 'up', '+puEd255': 'foo'});
             });
 
             it("private attribute", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, undefined);
+                setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
                 sinon.assert.calledOnce(api_req);
                 var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');
@@ -232,10 +245,10 @@ describe("user unit test", function() {
             });
 
             it("private attribute, compact crypto mode", function() {
-                window.api_req = sinon.spy();
+                sandbox.stub(window, 'api_req');
                 sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
                 setUserAttribute('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY},
-                                 false, undefined, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
+                                 false, false, undefined, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_10_08);
                 sinon.assert.calledOnce(api_req);
                 var decoded = tlvstore.tlvRecordsToContainer(tlvstore.blockDecrypt(base64urldecode(api_req.args[0][0]['*keyring']), window.u_k));
                 assert.strictEqual(api_req.args[0][0].a, 'up');

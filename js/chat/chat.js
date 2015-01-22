@@ -1338,7 +1338,7 @@ Chat.prototype.init = function() {
 
         };
 
-        self.rtc.statsUrl = "https://stats.karere.mega.nz:1378/stats";
+        self.rtc.statsUrl = "https://stats.karere.mega.nz/stats";
 
         // bind rtc events
         var rtcEventProxyToRoom = function(e, eventData) {

@@ -4625,6 +4625,7 @@ function selectddUI() {
                 $('#draghelper .dragger-content').html(html.join(""));
                 $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
                 $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
+                $.draggerOrigin = M.currentdirid;
             },
             drag: function(e, ui)
             {
@@ -4650,9 +4651,12 @@ function selectddUI() {
                 if (d) console.log('draggable.stop');
                 $.gridDragging = $.draggingClass = false;
                 $('body').removeClass('dragging').removeClassWith("dndc-");
+                var origin = $.draggerOrigin;
                 setTimeout(function __onDragStop() {
                     if (M.currentdirid === 'contacts') {
-                        M.openFolder(M.RootID, true);
+                        if (origin !== 'contacts') {
+                            M.openFolder(origin, true);
+                        }
                     } else {
                         treeUIopen(M.currentdirid, false, true);
                     }

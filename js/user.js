@@ -529,28 +529,18 @@ function generateAvatarMeta(user_hash) {
  *     Name of the attribute.
  * @param pub {bool}
  *     True for public attributes (default: true).
- * @param nonHistoric {bool}
- *     True for non-historic attributes (default: false).  Non-historic
- *     attributes will overwrite the value, and not retain previous
- *     values on the API server.
  * @param callback {function}
  *     Callback function to call upon completion (default: none).
  * @param ctx {object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  */
-function getUserAttribute(userhandle, attribute, pub, nonHistoric,
-                          callback, ctx) {
-    var attributePrefix = '';
+function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
     if (pub === true || pub === undefined) {
-        attributePrefix = '+';
+        attribute = '+' + attribute;
     } else {
-        attributePrefix = '*';
+        attribute = '*' + attribute;
     }
-    if (nonHistoric === true || nonHistoric === 1) {
-        attributePrefix += '!';
-    }
-    attribute = attributePrefix + attribute;
 
     // Assemble context for this async API request.
     var myCtx = ctx || {};
@@ -599,10 +589,6 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  *     private ones have to be an object with key/value pairs.
  * @param pub {bool}
  *     True for public attributes (default: true).
- * @param nonHistoric {bool}
- *     True for non-historic attributes (default: false).  Non-historic
- *     attributes will overwrite the value, and not retain previous
- *     values on the API server.
  * @param callback {function}
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
@@ -610,13 +596,9 @@ function getUserAttribute(userhandle, attribute, pub, nonHistoric,
  * @param mode {integer}
  *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
  */
-function setUserAttribute(attribute, value, pub, nonHistoric, callback,
-                          mode) {
+function setUserAttribute(attribute, value, pub, callback, mode) {
     if (mode === undefined) {
         mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
-    }
-    if (nonHistoric === true || nonHistoric === 1) {
-        attribute = '!' + attribute;
     }
     if (pub === true || pub === undefined) {
         attribute = '+' + attribute;

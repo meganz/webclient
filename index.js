@@ -1428,7 +1428,7 @@ function topmenuUI() {
 	{
 		if (e.keyCode == 13 || folderlink)
 		{
-			var val = $('.top-search-input').val();
+			var val = $.trim($('.top-search-input').val());
 			if (folderlink || val.length > 2 || !asciionly(val))
 			{
 				if (folderlink)

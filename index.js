@@ -108,7 +108,7 @@ function init_page()
 		document.location.hash = 'signup' + localStorage.signupcode;
 		return false;
 	}
-	$('.top-head').remove();
+	if (!page.match(/^(blog|corporate|page_)/)) $('.top-head').remove();
 	$('#loading').hide();
 	if (loadingDialog) loadingDialog.hide();
 

@@ -314,9 +314,10 @@ RtcSession.prototype = {
                 } else {
                     RtcSession.gLocalStream = null;
                     RtcSession.gLocalStreamRefcount = 0;
-                    successCallback.call(self, sessStream);
+                    if (RtcSession.gLocalVid)
+                        console.warn("Assertion failed: Could not get local stream, but local video element is not null");
+                    successCallback.call(self, null);
                 }
-
             }
         };
 /**

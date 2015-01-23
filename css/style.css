@@ -11710,7 +11710,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
 	background-color: rgba(220,0,0,1);
 }
-.context-menu-item.getlink-item:hover, .context-menu-item.sharing-item:hover, .context-menu-item.getlink-item.active, .context-menu-item.sharing-item.opened {
+.context-menu-item.getlink-item:hover, .context-menu-item.sh4r1ng-item:hover, .context-menu-item.getlink-item.active, .context-menu-item.sh4r1ng-item.opened {
 	background-color: rgba(255,179,0,1);
 }
 .context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.import-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.cloud-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.shared-folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened, .context-menu-item.rename-item.opened, .context-menu-item.copy-item.opened, .context-menu-item.import-item.opened, .context-menu-item.newfolder-item.opened, .context-menu-item.fileupload-item.opened, .context-menu-item.folderupload-item.opened, .context-menu-item.remove-item.opened, .context-menu-item.removeshare-item.opened, .context-menu-item.clearbin-item.opened, .context-menu-item.addcontact-item.opened, .context-menu-item.reply-item.opened, .context-menu-item.reply-to-all.opened, .context-menu-item.forward-item.opened, .context-menu-item.folder-item.opened, .context-menu-item.cloud-item.opened, .context-menu-item.shared-folder-item.opened {
@@ -11808,7 +11808,7 @@ table {
 .getlink-item .context-menu-icon {
 	background-position: -3px -4344px;
 }
-.sharing-item .context-menu-icon {
+.sh4r1ng-item .context-menu-icon {
 	background-position: -3px -4800px;
 }
 .image-like-item .context-menu-icon {

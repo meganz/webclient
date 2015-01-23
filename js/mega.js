@@ -230,8 +230,12 @@ function MegaData()
             var statusa = M.getSortStatus(a.u), statusb = M.getSortStatus(b.u);
             if (statusa < statusb)
                 return -1 * d;
-            else
+            else if (statusa > statusb)
                 return 1 * d;
+            else if (typeof a.name == 'string' && typeof b.name == 'string')
+                return a.name.localeCompare(b.name) * d;
+            else
+                return 0;
         }
         this.sortd = d;
         this.sort();

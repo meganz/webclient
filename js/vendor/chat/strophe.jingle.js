@@ -362,7 +362,7 @@ var JinglePlugin = {
             var by = $(msg).attr('by');
             if (by !== self.connection.jid)
                 self.onCallCanceled.call(self.eventHandler, from, {
-                    event: 'handled-elsewhere',
+                    reason: 'handled-elsewhere',
                     by: by,
                     accepted:($(msg).attr('accepted')==='1'),
                     isDataCall: !!files,
@@ -370,10 +370,14 @@ var JinglePlugin = {
                 });
         }, null, 'message', 'megaNotifyCallHandled', null, from, {matchBare:true});
 
-    // Add a 'cancel' handler that will ivalidate the call request if the caller sends a cancel message
+    // Add a 'cancel' handler that will invalidate the call request if the caller sends a cancel message
         cancelHandler = self.connection.addHandler(function(msg) {
-            if ($(msg).attr('sid') !== sid)
+            var sidAttr = $(msg).attr('sid');
+            if (sidAttr !== sid) {
+                if (!sidAttr)
+                    console.warn("Received megaCallCancel without a sid attribute, ignoring");
                 return true;
+            }
             if (!elsewhereHandler)
                 return;
             cancelHandler = null;
@@ -381,7 +385,7 @@ var JinglePlugin = {
             elsewhereHandler = null;
 
             self.onCallCanceled.call(self.eventHandler, from, {
-                event: 'canceled',
+                reason: $(msg).attr('reason')||'canceled',
                 isDataCall: !!files,
                 sid: sid
             });
@@ -397,7 +401,7 @@ var JinglePlugin = {
             cancelHandler = null;
 
             self.onCallCanceled.call(self.eventHandler, from, {
-                  event:'timeout',
+                  reason:'answer-timeout',
                   isDataCall:!!files,
                   sid: sid
             });

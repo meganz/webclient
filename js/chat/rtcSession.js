@@ -574,7 +574,8 @@ RtcSession.prototype = {
               self.connection.send($msg({
                   to:Strophe.getBareJidFromJid(targetJid),
                   sid: sid,
-                  type: 'megaCallCancel'
+                  type: 'megaCallCancel',
+                  reason: 'answer-timeout'
               }));
        /**
         A call that we initiated was not answered (neither accepted nor rejected)

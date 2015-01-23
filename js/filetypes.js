@@ -232,19 +232,24 @@ function filetype(n)
 	else return 'File';
 }
  
-function fileicon(n)
-{	
-	var ico;	
-	var name = n.name;		
-	if (n.t && n.shares || typeof n.r == "number") ico = 'folder-shared';
-	else if (n.t) ico = 'folder';
-	else if (ext[fileext(n.name)]) ico = ext[fileext(n.name)][0];
-	else ico = 'generic';
-	var iconurl = ico;			
-	return iconurl;
+function fileicon(nodeInfo) {	
+	var icon;
+    
+	if (nodeInfo.t && nodeInfo.shares || typeof nodeInfo.r == "number" || nodeInfo.hasPendingShares) {
+        icon = 'folder-shared';
+    }
+	else if (nodeInfo.t) {
+        icon = 'folder';
+    }
+	else if (ext[fileext(nodeInfo.name)]) {
+        icon = ext[fileext(nodeInfo.name)][0];
+    }
+	else {
+        icon = 'generic';
+    }
+    
+	return icon;
 }
-
-
 
 function fileext(name)
 {	

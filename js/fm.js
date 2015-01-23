@@ -1256,18 +1256,20 @@ function removeUInode(h)
     }
 }
 
-function sharedUInode(h, s)
+function sharedUInode(nodeHandle, numberOfFullShares)
 {
-    if (s)
-        $('#treea_' + h + ' .nw-fm-tree-folder').addClass('shared-folder');
+    if (numberOfFullShares || M.d[nodeHandle].hasPendingShares)
+    {
+        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').addClass('shared-folder');
+    }
     else
     {
-        $('#treea_' + h + ' .nw-fm-tree-folder').removeClass('shared-folder');
-        $('.grid-table.fm #' + h + ' .transfer-filtype-icon').removeClass('folder-shared');
-        $('.file-block#' + h + ' .block-view-file-type').removeClass('folder-shared');
+        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared');
+        $('.file-block#' + nodeHandle + ' .block-view-file-type').removeClass('folder-shared');
     }
-    $('.grid-table.fm #' + h + ' .transfer-filtype-icon').addClass(fileicon({t: 1, shares: s}));
-    $('.file-block#' + h + ' .block-view-file-type').addClass(fileicon({t: 1, shares: s}));
+    $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(fileicon({ t: 1, shares: numberOfFullShares }));
+    $('.file-block#' + nodeHandle + ' .block-view-file-type').addClass(fileicon({ t: 1, shares: numberOfFullShares }));
 }
 
 function addnotification(notification) {
@@ -6326,43 +6328,86 @@ function addShareDialogContactToContent(type, id, av_color, av, name, permClass,
 
 function fillShareDialogWithContent()
 {
-    var sel = $.selected[0];
-    $.sharedTokens = [];// Holds items currently visible in share folder content (above multi-input)
+    var selectedNodeHandle = $.selected[0];
+    $.sharedTokens = [];    // Holds items currently visible in share folder content (above multi-input)
+    
+    var shares = M.d[selectedNodeHandle].shares;
 
-    for (var i in M.d[sel].shares)// list users that are already use item
+    // List users that are already use item
+    for (var userHandle in shares)
     {
-        if (M.u[i])
-        {
-            var user = M.u[i];
-            var name = (user.name && user.name.length > 1) ? user.name : user.m;
-            var av_color = name.charCodeAt(0) % 6 + name.charCodeAt(1) % 6;
-            var av = (avatars[i] && avatars[i].url) ? '<img src="' + avatars[i].url + '">' : (name.charAt(0) + name.charAt(1));
-            var perm;
-
-            var pl = 0;
-            if (typeof M.d[sel].shares[i].r != 'undefined')
-                pl = M.d[sel].shares[i].r;
-
-            switch (pl)// Permission level
+        if (shares.hasOwnProperty(userHandle)) {
+            
+            if (M.u[userHandle])
             {
-                case 1: // Read and write
-                    perm = ['read-and-write', l[56]];
-                    break;
-                case 2: // Full Access
-                    perm = ['full-access', l[57]];
-                    break;
-                default: // 0 or any === read only
-                    perm = ['read-only', l[55]];
-                    break;
+                var user = M.u[userHandle];
+                var email = user.m;
+                var name = (user.name && user.name.length > 1) ? user.name : user.m;
+                var shareRights = M.d[selectedNodeHandle].shares[userHandle].r;
+
+                generateShareDialogRow(name, email, shareRights, userHandle);
             }
-
-            $.sharedTokens.push(user.m);// add contact
-
-            var html = addShareDialogContactToContent('', i, av_color, av, name, perm[0], perm[1]);
-
-            $('.share-dialog .share-dialog-contacts').append(html);
         }
     }
+    
+    for (var pendingShareHandle in M.ps) {
+        
+        if (M.ps.hasOwnProperty(pendingShareHandle))
+        {
+            var pendingShare = M.ps[pendingShareHandle];
+            
+            // Is the pending share related to the selected node
+            if (pendingShare.h === selectedNodeHandle) {
+
+                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
+                if (M.opc[pendingShare.p]) {
+
+                    var pendingContactRequest = M.opc[pendingShare.p];
+                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShare.r);                
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Generates and inserts a share or pending share row into the share dialog
+ * @param {String} displayNameOrEmail
+ * @param {String} email
+ * @param {Number} shareRights
+ * @param {String} userHandle Optional
+ */
+function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle)
+{
+    var av_color = displayNameOrEmail.charCodeAt(0) % 6 + displayNameOrEmail.charCodeAt(1) % 6;
+    var av = (avatars[userHandle] && avatars[userHandle].url) ? '<img src="' + avatars[userHandle].url + '">' : (displayNameOrEmail.charAt(0) + displayNameOrEmail.charAt(1));
+    var perm = '';
+    var permissionLevel = 0;
+    
+    if (typeof shareRights != 'undefined')
+        permissionLevel = shareRights;
+
+    // Permission level
+    switch (permissionLevel)
+    {
+        case 1: // Read and write
+            perm = ['read-and-write', l[56]];
+            break;
+        case 2: // Full Access
+            perm = ['full-access', l[57]];
+            break;
+        default: // 0 or any === read only
+            perm = ['read-only', l[55]];
+            break;
+    }
+
+    // Add contact
+    $.sharedTokens.push(email);
+    
+    var rowId = (userHandle) ? userHandle : email;
+    var html = addShareDialogContactToContent('', rowId, av_color, av, displayNameOrEmail, perm[0], perm[1]);
+
+    $('.share-dialog .share-dialog-contacts').append(html);
 }
 
 function handleDialogScroll(num, dc)
@@ -6754,35 +6799,52 @@ function initShareDialog()
     {
         var $this = $(this);
 
-        var id = $this.parent().attr('id').replace('sdcbl_', '');
+        var handleOrEmail = $this.parent().attr('id').replace('sdcbl_', '');
         $this.parent()
             .fadeOut(200)
             .remove();
 
-        var sel = $.selected[0];
-        if (id !== '')
+        var selectedNodeHandle = $.selected[0];
+        if (handleOrEmail !== '')
         {
-            M.delnodeShare(sel, id);
+            // Due to pending shares, the id could be an email instead of a handle
+            var userEmail = handleOrEmail;
+            
+            // If it was a user handle, the share must be a full share
+            if (M.u[handleOrEmail]) {
+                
+                userEmail = M.u[handleOrEmail].m;
+                M.delnodeShare( selectedNodeHandle, handleOrEmail);
+            }
+            else
+            {
+                // Pending share 
+                // Work out pendingContactId
+                var pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
+                M.deletePendingShare(selectedNodeHandle, pendingContactId);
+            }
 
+            // The s2 api call can remove both shares and pending shares
             api_req({
                 a: 's2',
-                n: sel,
+                n:  selectedNodeHandle,
                 s: [{
-                        u: M.u[id].m,
+                        u: userEmail,
                         r: ''
                     }],
                 ha: '',
                 i: requesti
             });
 
-            $.sharedTokens.splice($.sharedTokens.indexOf(M.u[id].m), 1);
+            $.sharedTokens.splice($.sharedTokens.indexOf(userEmail), 1);
         }
 
         shareDialogContentCheck();
 
         var num = $('.share-dialog .share-dialog-contacts .share-dialog-contact-bl').length + $('.share-dialog .token-input-list-mega .token-input-token-mega').length;
-        if (!num)
+        if (!num) {
             $('.dialog-share-button').addClass('disabled');
+        }
     });
 
 	// related to specific contact

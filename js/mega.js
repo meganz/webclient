@@ -2483,11 +2483,12 @@ function MegaData()
     };
 
     // Update M.ps and related localStorage
-    this.addPS = function(u, ignoreDB)
+    this.addPS = function(pendingShare, ignoreDB)
     {
-        this.ps[u.p] = u;
+        this.ps[pendingShare.p] = pendingShare;
+        
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            mDBadd('ps', clone(u));
+            mDBadd('ps', clone(pendingShare));
         }
     };
 
@@ -2606,7 +2607,7 @@ function MegaData()
         Soon(function() {
             $(window).trigger('resize');
         });
-    }
+    };
 
     this.accountData = function(cb, blockui)
     {
@@ -2735,7 +2736,7 @@ function MegaData()
                 }
             });
         }
-    }
+    };
 
     this.delIndex = function(p, h)
     {
@@ -2751,7 +2752,7 @@ function MegaData()
             delete M.c[p];
             $('#treea_' + p).removeClass('contains-folders');
         }
-    }
+    };
 
     this.rubbishIco = function()
     {
@@ -2770,7 +2771,7 @@ function MegaData()
             $('.nw-fm-left-icon.rubbish-bin').removeClass('filled')
         else
             $('.nw-fm-left-icon.rubbish-bin').addClass('filled')
-    }
+    };
 
     this.nodeAttr = function(a)
     {
@@ -2782,7 +2783,7 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey)
                 mDBadd('f', clone(n));
         }
-    }
+    };
 
     this.rename = function(h, name)
     {
@@ -2805,7 +2806,7 @@ function MegaData()
                 $(document).trigger('MegaNodeRename', [h, name]);
             }
         }
-    }
+    };
 
     this.favourite = function(h_ar, del)
     {
@@ -2843,7 +2844,7 @@ function MegaData()
                 }
             }
         }
-    }
+    };
 
     this.nodeShare = function(h, s, ignoreDB)
     {
@@ -2864,7 +2865,7 @@ function MegaData()
             if (typeof mDB === 'object' && !pfkey)
                 mDBadd('ok', {h: h, k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])), ha: crypto_handleauth(h)});
         }
-    }
+    };
 
     this.delnodeShare = function(h, u)
     {
@@ -2890,7 +2891,79 @@ function MegaData()
             if ($.dialog == 'sharing' && $.selected && $.selected[0] == h)
                 shareDialog();
         }
-    }
+    };
+    
+    // Searches M.opc for the pending contact
+    this.findOutgoingPendingContactIdByEmail = function(email)
+    {
+        for (var index in M.opc)
+        {
+            var opc = M.opc[index];
+            
+            if (opc.m === email) 
+            {
+                return opc.p;
+            }
+        }            
+    };
+    
+    this.deletePendingShare = function(nodeHandle, pendingContactId)
+    {
+        if (this.d[nodeHandle]) {            
+            
+            if (this.ps[pendingContactId])
+            {
+                delete this.ps[pendingContactId];
+                
+                // Todo: Delete from mDB once mDB gets re-instated
+            }
+            
+            var pendingShareCount = 0;
+            
+            for (var index in this.ps)
+            {
+                var pendingShare = this.ps[index];
+                if (pendingShare.h === nodeHandle)
+                {
+                    pendingShareCount++;
+                }
+            }
+            
+            if (pendingShareCount == 0)
+            {
+                this.d[nodeHandle].hasPendingShares = false;
+                
+                // node.Shares will be deleted if there are no full shares. If there ARE no shares left then we should
+                // remove the share icon
+                var removeIcon = false;
+                
+                if (typeof this.d[nodeHandle].shares === 'undefined')
+                {
+                    removeIcon = true;
+                }
+                else
+                {
+                    var count = 0;
+                    for (var i in this.d[nodeHandle].shares)
+                    {
+                        if (this.d[nodeHandle].shares.hasOwnProperty(i))
+                        {
+                            count++;
+                        }
+                    }
+                    if (count==0)
+                    {
+                        removeIcon = true;
+                    }
+                }
+                
+                if (removeIcon)
+                {
+                    sharedUInode(nodeHandle, 0);
+                }
+            }
+        }
+    };
 
     this.getlinks = function(h)
     {
@@ -4056,7 +4129,8 @@ function execsc(actionPackets, callback) {
                 addIpcOrContactNotification(actionPacket);
             }
             else if (actionPacket.a === 's2') {     // Pending shares
-                processPS([actionPacket]);
+                var fromGettree = false;
+                processPS([actionPacket], fromGettree);
             }
             else if (actionPacket.a === 'upci') {   // Incomming request updated
                 processUPCI([actionPacket]);
@@ -4353,7 +4427,8 @@ function execsc(actionPackets, callback) {
             processOPC([actionPacket]);
             M.drawSentContactRequests([actionPacket]);
         } else if (actionPacket.a === 's2') {
-            processPS([actionPacket]);
+            var fromGettree = false;
+            processPS([actionPacket], fromGettree);
         } else if (actionPacket.a === 'ipc') {
             processIPC([actionPacket]);
             M.drawReceivedContactRequests([actionPacket]);
@@ -4669,9 +4744,19 @@ function doshare(h, targets, dontShowShareDialog)
                         {
                             var rights = ctx.t[i].r;
                             var user = ctx.t[i].u;
+                            
                             if (user.indexOf('@') >= 0)
+                            {
                                 user = getuid(ctx.t[i].u);
-                            M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                            }
+                            
+                            // A pending share may not have a corresponding user and should not be added
+                            // A pending share can also be identified by a user who is only a '0' contact
+                            // level (passive)
+                            if (user != false && this.u[user].c != 0)
+                            {
+                                M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
+                            }
                         }
                     }
                     if (dontShowShareDialog != true) {
@@ -4696,18 +4781,18 @@ function doshare(h, targets, dontShowShareDialog)
     return $promise;
 }
 
-function doshare2(h, t, dontShowShareDialog, msg)
+function doshare2(nodeHandle, t, dontShowShareDialog, msg)
 {
     // ToDo: wait for msg and implement it
     var $promise = new $.Deferred();
 
-    nodeids = fm_getnodes(h);
-    nodeids.push(h);
+    nodeids = fm_getnodes(nodeHandle);
+    nodeids.push(nodeHandle);
 
-    api_setshare2(h, t, nodeids,
+    api_setshare2(nodeHandle, t, nodeids,
         {
             t: t,
-            h: h,
+            h: nodeHandle,
             done: function(res, ctx)
             {
                 //ToDo: Handle response codes
@@ -4900,12 +4985,46 @@ function processOPC(opc) {
  * Handle pending shares
  *
  * @param {array of JSON objects} pending shares
+ * @param {boolean} fromGettree
  * @returns {undefined}
  */
-function processPS(ps) {
+function processPS(pendingShares, fromGettree) {
     DEBUG('processPS');
-    for (var i in ps) {
-        M.addPS(ps[i]);
+    
+    for (var i in pendingShares) {
+        if (fromGettree)
+        {
+            // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares' 
+            // flag will be set on the node after gettree is processed
+            M.addPS(pendingShares[i]);
+        }
+        else
+        {
+            var nodeHandle = pendingShares[i].n;
+            var pendingContactId = pendingShares[i].p;
+            var shareRights = pendingShares[i].r;
+            var timeStamp = pendingShares[i].ts;
+            
+            if (typeof shareRights === 'undefined')
+            {
+                // This is a delete packet, we should remove the pending share if this was not triggered by our own client
+                if (pendingShares[i].i == requesti) continue;
+                
+                // Delete the pending share
+                delete M.ps[pendingShares[i].p];
+            }
+            else
+            {
+                // We need to record that this node has a pending share, as this is not gettree
+                M.d[nodeHandle].hasPendingShares = true;
+            
+                // Add the pending share to state
+                M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
+                
+                // Update the ui
+                sharedUInode(nodeHandle, 1);
+            }
+        }        
     }
 }
 
@@ -5036,13 +5155,26 @@ function loadfm_callback(res)
         processIPC(res.ipc);
     }
     if (res.ps) {
-        processPS(res.ps);
+        var fromGettree = true;
+        processPS(res.ps, fromGettree);
     }
     process_f(res.f, function() {
 
+        // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {
-                M.nodeShare(res.s[i].h, res.s[i]);
+                var nodeHandle = res.s[i].h;
+                M.nodeShare(nodeHandle, res.s[i]);
+            }
+        }
+        
+        // If we have pending shares, and if any are for this node, set a flag
+        if (res.ps) {
+            for (var index in res.ps) {
+                var pendingShare = res.ps[index];
+                if (M.d[pendingShare.h]) {
+                    M.d[pendingShare.h].hasPendingShares = true;
+                }
             }
         }
 

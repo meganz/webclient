@@ -2,12 +2,12 @@
 
 
 // global variables holding the user's identity
-var u_handle;	// user handle
-var u_k;		// master key
-var u_k_aes;	// master key AES engine
-var u_p;		// prepared password
-var u_attr;		// attributes
-var u_privk;	// private key
+var u_handle;   // user handle
+var u_k;        // master key
+var u_k_aes;    // master key AES engine
+var u_p;        // prepared password
+var u_attr;     // attributes
+var u_privk;    // private key
 
 // log in
 // returns user type if successful, false if not
@@ -529,18 +529,28 @@ function generateAvatarMeta(user_hash) {
  *     Name of the attribute.
  * @param pub {bool}
  *     True for public attributes (default: true).
+ * @param nonHistoric {bool}
+ *     True for non-historic attributes (default: false).  Non-historic
+ *     attributes will overwrite the value, and not retain previous
+ *     values on the API server.
  * @param callback {function}
  *     Callback function to call upon completion (default: none).
  * @param ctx {object}
  *     Context, in case higher hierarchies need to inject a context
  *     (default: none).
  */
-function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
+function getUserAttribute(userhandle, attribute, pub, nonHistoric,
+                          callback, ctx) {
+    var attributePrefix = '';
     if (pub === true || pub === undefined) {
-        attribute = '+' + attribute;
+        attributePrefix = '+';
     } else {
-        attribute = '*' + attribute;
+        attributePrefix = '*';
     }
+    if (nonHistoric === true || nonHistoric === 1) {
+        attributePrefix += '!';
+    }
+    attribute = attributePrefix + attribute;
 
     // Assemble context for this async API request.
     var myCtx = ctx || {};
@@ -589,6 +599,10 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
  *     private ones have to be an object with key/value pairs.
  * @param pub {bool}
  *     True for public attributes (default: true).
+ * @param nonHistoric {bool}
+ *     True for non-historic attributes (default: false).  Non-historic
+ *     attributes will overwrite the value, and not retain previous
+ *     values on the API server.
  * @param callback {function}
  *     Callback function to call upon completion (default: none). This callback
  *     function expects two parameters: the attribute `name`, and its `value`.
@@ -596,9 +610,13 @@ function getUserAttribute(userhandle, attribute, pub, callback, ctx) {
  * @param mode {integer}
  *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_CCM_12_16).
  */
-function setUserAttribute(attribute, value, pub, callback, mode) {
+function setUserAttribute(attribute, value, pub, nonHistoric, callback,
+                          mode) {
     if (mode === undefined) {
         mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_CCM_12_16;
+    }
+    if (nonHistoric === true || nonHistoric === 1) {
+        attribute = '!' + attribute;
     }
     if (pub === true || pub === undefined) {
         attribute = '+' + attribute;

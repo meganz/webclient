@@ -194,7 +194,7 @@ var authring = (function () {
         var myCtx = {
             callback3: callback,
         };
-        getUserAttribute(u_handle, ns._properties[keyType], false,
+        getUserAttribute(u_handle, ns._properties[keyType], false, true,
                          myCallback, myCtx);
     };
 
@@ -217,7 +217,7 @@ var authring = (function () {
         }
         setUserAttribute(ns._properties[keyType],
                          {'': ns.serialise(u_authring[keyType])},
-                         false, callback);
+                         false, true, callback);
     };
 
 
@@ -491,11 +491,11 @@ var authring = (function () {
         u_privEd25519 = jodid25519.eddsa.generateKeySeed();
         u_keyring = {prEd255 : u_privEd25519};
         u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
-        setUserAttribute('keyring', u_keyring, false);
-        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+        setUserAttribute('keyring', u_keyring, false, false);
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
         var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),
                                        'RSA');
-        setUserAttribute('sigPubk', base64urlencode(sigPubk), true);
+        setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
     };
 
 

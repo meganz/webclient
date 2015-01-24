@@ -693,7 +693,7 @@ RtcSession.prototype = {
 // mutes all and the local video playback.
 // In Chrome all local streams are independent, so the local video stream has to be
 // muted explicitly as well
-    if (what.video && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
+    if (what.video && RtcSession.gLocalVid && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
         if (state)
             RtcSession._disableLocalVid(this);
         else

@@ -72,8 +72,9 @@ describe("crypto unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 getPubEd25519('you456789xw');
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(-3, theCtx);
                 assert.deepEqual(pubEd25519, {});
                 assert.deepEqual(u_authring.Ed25519, {});
@@ -86,8 +87,9 @@ describe("crypto unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 getPubEd25519('you456789xw');
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(base64urlencode(ED25519_PUB_KEY), theCtx);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 assert.deepEqual(u_authring.Ed25519, {'you456789xw': {fingerprint: ED25519_FINGERPRINT,
@@ -111,8 +113,9 @@ describe("crypto unit test", function() {
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(-3, theCtx);
                 assert.deepEqual(pubEd25519, {});
                 sinon.assert.calledOnce(myCallback);
@@ -128,8 +131,9 @@ describe("crypto unit test", function() {
                 var myCallback = sinon.spy();
                 getPubEd25519('you456789xw', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(base64urlencode(ED25519_PUB_KEY), theCtx);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);
@@ -146,8 +150,9 @@ describe("crypto unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 getPubEd25519('you456789xw');
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 assert.throws(function() { callback(base64urlencode(ED25519_PUB_KEY), theCtx); },
                               'Fingerprint does not match previously authenticated one!');
                 assert.deepEqual(u_authring.Ed25519, {'you456789xw': authenticated});
@@ -199,8 +204,9 @@ describe("crypto unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 getFingerprintEd25519('you456789xw');
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(-3, theCtx);
                 assert.deepEqual(pubEd25519, {});
             });
@@ -210,8 +216,9 @@ describe("crypto unit test", function() {
                 sandbox.spy(window, 'getUserAttribute');
                 getFingerprintEd25519('you456789xw');
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(base64urlencode(ED25519_PUB_KEY), theCtx);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
             });
@@ -222,8 +229,9 @@ describe("crypto unit test", function() {
                 var myCallback = sinon.spy();
                 getFingerprintEd25519('you456789xw', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(-3, theCtx);
                 assert.deepEqual(pubEd25519, {});
                 sinon.assert.calledOnce(myCallback);
@@ -236,8 +244,9 @@ describe("crypto unit test", function() {
                 var myCallback = sinon.spy();
                 getFingerprintEd25519('you456789xw', myCallback);
                 sinon.assert.calledOnce(getUserAttribute);
-                var callback = getUserAttribute.args[0][3];
-                var theCtx = getUserAttribute.args[0][4];
+                assert.lengthOf(getUserAttribute.args[0], 6);
+                var callback = getUserAttribute.args[0][4];
+                var theCtx = getUserAttribute.args[0][5];
                 callback(base64urlencode(ED25519_PUB_KEY), theCtx);
                 assert.deepEqual(pubEd25519, {'you456789xw': ED25519_PUB_KEY});
                 sinon.assert.calledOnce(myCallback);

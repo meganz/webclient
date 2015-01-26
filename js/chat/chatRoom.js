@@ -614,7 +614,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
             return;
         }
 
-        if(eventData.info && eventData.info.event == "handled-elsewhere") {
+        if(eventData.info && eventData.info.reason == "handled-elsewhere") {
             self.appendDomMessage(
                 self.generateInlineDialog(
                     "canceled-call-" + unixtime(),

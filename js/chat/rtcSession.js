@@ -314,9 +314,10 @@ RtcSession.prototype = {
                 } else {
                     RtcSession.gLocalStream = null;
                     RtcSession.gLocalStreamRefcount = 0;
-                    successCallback.call(self, sessStream);
+                    if (RtcSession.gLocalVid)
+                        console.warn("Assertion failed: Could not get local stream, but local video element is not null");
+                    successCallback.call(self, null);
                 }
-
             }
         };
 /**
@@ -574,7 +575,8 @@ RtcSession.prototype = {
               self.connection.send($msg({
                   to:Strophe.getBareJidFromJid(targetJid),
                   sid: sid,
-                  type: 'megaCallCancel'
+                  type: 'megaCallCancel',
+                  reason: 'answer-timeout'
               }));
        /**
         A call that we initiated was not answered (neither accepted nor rejected)
@@ -691,7 +693,7 @@ RtcSession.prototype = {
 // mutes all and the local video playback.
 // In Chrome all local streams are independent, so the local video stream has to be
 // muted explicitly as well
-    if (what.video && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
+    if (what.video && RtcSession.gLocalVid && (!jid || (sessions.length >= RtcSession.gLocalStreamRefcount))) {
         if (state)
             RtcSession._disableLocalVid(this);
         else

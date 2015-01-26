@@ -3272,7 +3272,7 @@ function u_initAuthentication() {
     authring.getContacts('RSA');
 
     // Load/initialise the authenticated contacts ring.
-    getUserAttribute(u_handle, 'keyring', false, function(res, ctx) {
+    getUserAttribute(u_handle, 'keyring', false, false, function(res, ctx) {
         u_initAuthentication2(res, ctx);
     });
 }
@@ -3291,8 +3291,8 @@ function u_initAuthentication2(res, ctx) {
         u_pubEd25519 = jodid25519.eddsa.publicKey(u_privEd25519);
         // Keyring is a private attribute here, so no preprocessing required
         // (will be wrapped in a TLV store).
-        setUserAttribute('keyring', u_keyring, false);
-        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+        setUserAttribute('keyring', u_keyring, false, false);
+        setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
     }
     u_attr.keyring = u_keyring;
     u_privEd25519 = u_keyring.prEd255;
@@ -3300,9 +3300,9 @@ function u_initAuthentication2(res, ctx) {
     u_attr.puEd255 = u_pubEd25519;
     pubEd25519[u_handle] = u_pubEd25519;
 
-    getUserAttribute(u_handle, "puEd255", true, function(res) {
+    getUserAttribute(u_handle, "puEd255", true, false, function(res) {
         if(res !== base64urlencode(u_pubEd25519)) {
-            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true);
+            setUserAttribute('puEd255', base64urlencode(u_pubEd25519), true, false);
         }
     });
 
@@ -3311,10 +3311,10 @@ function u_initAuthentication2(res, ctx) {
         if (typeof res === 'number') {
             // No signed RSA pub key, store it.
             var sigPubk = authring.signKey(crypto_decodepubkey(base64urldecode(u_attr.pubk)),'RSA');
-            setUserAttribute('sigPubk', base64urlencode(sigPubk), true);
+            setUserAttribute('sigPubk', base64urlencode(sigPubk), true, false);
         }
     };
-    getUserAttribute(u_handle, 'sigPubk', true, storeSigPubkCallback);
+    getUserAttribute(u_handle, 'sigPubk', true, false, storeSigPubkCallback);
 
     eventuallyTriggerAuthIfRequired();
 }
@@ -3381,7 +3381,7 @@ function getPubEd25519(userhandle, callback) {
             u: userhandle,
             callback3: callback,
         };
-        getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
+        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
     }
 }
 
@@ -3423,7 +3423,7 @@ function getFingerprintEd25519(userhandle, callback, format) {
             u: userhandle,
             callback3: callback,
         };
-        getUserAttribute(userhandle, 'puEd255', true, myCallback, myCtx);
+        getUserAttribute(userhandle, 'puEd255', true, false, myCallback, myCtx);
     }
 }
 

@@ -230,8 +230,12 @@ function MegaData()
             var statusa = M.getSortStatus(a.u), statusb = M.getSortStatus(b.u);
             if (statusa < statusb)
                 return -1 * d;
-            else
+            else if (statusa > statusb)
                 return 1 * d;
+            else if (typeof a.name == 'string' && typeof b.name == 'string')
+                return a.name.localeCompare(b.name) * d;
+            else
+                return 0;
         }
         this.sortd = d;
         this.sort();
@@ -2429,10 +2433,10 @@ function MegaData()
     /**
      * addUser, updates global .u variable with new user data
      * adds/updates user indexedDB with newest user data
-     * 
+     *
      * @param {object} u, user object data
      * @param {boolean} ignoreDB, don't write to indexedDB
-     * 
+     *
      * @returns {undefined}
      */
     this.addUser = function(u, ignoreDB) {
@@ -2529,7 +2533,7 @@ function MegaData()
             del: del,
             t: t,
             callback: function(res, ctx) {
-                function done() {
+                function onCopyNodesDone() {
                     loadingDialog.hide();
                     if (callback) {
                         callback(res);
@@ -2548,9 +2552,9 @@ function MegaData()
                     process_u(res.u, true);
                 }
                 if (res.f) {
-                    process_f(res.f, done);
+                    process_f(res.f, onCopyNodesDone);
                 } else {
-                    done();
+                    onCopyNodesDone();
                 }
             }
         });
@@ -4449,12 +4453,12 @@ function execsc(actionPackets, callback) {
         }
     }
     if (async_procnodes.length) {
-        process_f(async_procnodes, done);
+        process_f(async_procnodes, onExecSCDone);
     } else {
-        done();
+        onExecSCDone();
     }
 
-    function done() {
+    function onExecSCDone() {
         if (newnodes.length > 0 && fminitialized) rendernew();
         if (loadavatars) M.avatars();
         fm_thumbnails();
@@ -4829,9 +4833,12 @@ function processmove(jsonmove)
 var u_kdnodecache = {};
 var kdWorker;
 
-function process_f(f, cb, r)
+function process_f(f, cb, retry)
 {
     var onMainThread = window.dk ? 9e11 : 200;
+    var doNewNodes = (typeof newnodes !== 'undefined');
+
+    // if (d) console.error('process_f', doNewNodes);
 
     if (f && f.length)
     {
@@ -4844,7 +4851,7 @@ function process_f(f, cb, r)
             // }
             // if (d) console.log('non-cached nodes', ncn.length, ncn);
         // }
-        if (!r && ncn.length > onMainThread) {
+        if (!retry && ncn.length > onMainThread) {
             for (var i in f) {
                 if (f[i].sk) skn.push(f[i]);
             }
@@ -4860,13 +4867,12 @@ function process_f(f, cb, r)
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
                 console.time('process_f');
             }
-            __process_f1(ncn, function _mtProcF() {
-                if (ncn === skn) {
-                    process_f(f, cb, 1);
-                } else {
-                    if (cb) cb();
-                }
-            });
+            __process_f1(ncn);
+            if (skn.length) {
+                process_f(f, cb, 1);
+            } else {
+                if (cb) cb();
+            }
             if (d) console.timeEnd('process_f');
         }
         else
@@ -4878,30 +4884,35 @@ function process_f(f, cb, r)
                 return __process_f2(f, cb);
             }
 
-            kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function(r,j) {
+            kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
                 if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
                 $.extend(u_kdnodecache, r);
+                if (doNewNodes) {
+                    newnodes = newnodes || [];
+                }
                 if (j.newmissingkeys || ncn === skn) {
-                    if (d && j.newmissingkeys) console.log('Got missing keys, retrying?', !r);
-                    if (!r) {
+                    if (d && j.newmissingkeys) console.log('Got missing keys, retrying?', !retry);
+                    if (!retry) {
                         return process_f( f, cb, 1);
                     }
                 }
                 __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
-            }, function(err) {
+            }, function kdwError(err) {
                 if (d) console.error(err);
+                if (doNewNodes) {
+                    newnodes = newnodes || [];
+                }
                 __process_f2(f, cb);
             });
         }
     }
-    else if (cb) Soon(cb);
+    else if (cb) cb();
 }
-function __process_f1(f, cb)
+function __process_f1(f)
 {
     for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
-    if (cb) Soon(cb);
 }
-function __process_f2(f, cb)
+function __process_f2(f, cb, tick)
 {
     var max = 12000, n;
 
@@ -4914,8 +4925,19 @@ function __process_f2(f, cb)
 
     if (cb)
     {
-        if (max) Soon(cb);
-        else setTimeout(__process_f2, 200, f, cb);
+        if (max) cb();
+        else {
+            var doNewNodes = (typeof newnodes !== 'undefined');
+            if (!+tick || tick > 1e3) {
+                tick = 200;
+            }
+            setTimeout(function pf2n() {
+                if (doNewNodes) {
+                    newnodes = newnodes || [];
+                }
+                __process_f2(f, cb, tick);
+            }, tick *= 1.2);
+        }
     }
 }
 
@@ -5158,7 +5180,7 @@ function loadfm_callback(res)
         var fromGettree = true;
         processPS(res.ps, fromGettree);
     }
-    process_f(res.f, function() {
+    process_f(res.f, function onLoadFMDone() {
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {

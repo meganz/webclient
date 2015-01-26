@@ -4753,7 +4753,7 @@ function doshare(h, targets, dontShowShareDialog)
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
-                            if (user != false && this.u[user].c != 0)
+                            if (user != false && M.u[user].c != 0)
                             {
                                 M.nodeShare(ctx.h, {h: h, r: rights, u: user, ts: Math.floor(new Date().getTime() / 1000)});
                             }

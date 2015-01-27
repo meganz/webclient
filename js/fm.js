@@ -1483,7 +1483,11 @@ function addContactUI()
             errorMsg("Looks like there's a malformed email!");
         },
         onDoublet: function(u) {
-            errorMsg('You already have contact with that email!', u.id);
+                        
+            // If the email already exists in the state, show error
+            if (checkIfContactExists(u.id)) {
+                errorMsg('You already have contact with that email!');
+            };
         },
         onHolder: function() {
             errorMsg('No need for that, you are THE owner!');
@@ -6465,6 +6469,30 @@ function checkMultiInputPermission($this)
     return perm;
 }
 
+/**
+ * Checks if an email address is already known by the user
+ * @param {String} email
+ * @returns {Boolean} Returns true if it exists in the state, false if it is new
+ */
+function checkIfContactExists(email) {
+
+    var userIsAlreadyContact = false;
+    var userContacts = M.u;
+
+    // Loop through the user's contacts
+    for (var contact in userContacts) {
+        if (userContacts.hasOwnProperty(contact)) {
+
+            // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
+            if (email === userContacts[contact].m) {
+                userIsAlreadyContact = true;
+            }
+        }
+    }
+
+    return userIsAlreadyContact;
+}
+
 function initShareDialog()
 {
     if (!u_type)
@@ -6488,9 +6516,8 @@ function initShareDialog()
 
     $('.share-multiple-input').tokenInput(contacts, {
         theme: "mega",
-		hintText: "Type in an email or contact",
-//        hintText: "",
-//        placeholder: "Type in an email or contact",
+		hintText: "Type in an email or contact",        // l[5908] when generated
+        // placeholder: "Type in an email or contact",
         searchingText: "",
         noResultsText: "",
         addAvatar: true,
@@ -6507,33 +6534,21 @@ function initShareDialog()
         onEmailCheck: function() {
             errorMsg("Looks like there's a malformed email!");
         },
-        onDoublet: function() {
-            errorMsg('You already have contact with that email!');
+        onDoublet: function(item) {
+            
+            // If the email already exists in the state, show error
+            if (checkIfContactExists(item.id)) {
+                errorMsg('You already have contact with that email!');
+            };
         },
         onHolder: function() {
             errorMsg('No need for that, you are THE owner!');
         },
         onAdd: function(item) {
-
-            // Get the email entered into the share dialog (from Tokeninput)
-            var emailEntered = item.id;
-            var userIsAlreadyContact = false;
-            var userContacts = M.u;
-
-            // Loop through the user's contacts
-            for (var contact in userContacts) {
-                if (userContacts.hasOwnProperty(contact)) {
-
-                    // Check if the users are already contacts by comparing email addresses of known contacts and the one entered
-                    if (emailEntered === userContacts[contact].m) {
-                        userIsAlreadyContact = true;
-                    }
-                }
-            }
-
+            
             // If the user is not already a contact, then show a text area
             // where they can add a custom message to the pending share request
-            if (userIsAlreadyContact === false) {
+            if (checkIfContactExists(item.id) === false) {
                 $('.share-message').show();
             }
 

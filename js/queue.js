@@ -160,9 +160,11 @@ MegaQueue.prototype.run_in_context = function(task) {
 		var done = task[1] || task[0].onQueueDone;
 		if (done) done.apply(task[2] || this, [task[0], arguments]);
 		if (!oIsFrozen(this)) {
-			this._process();
 			if (ASSERT(this._pending, 'MegaQueue pending array got expunged, ' + this.qname)) {
 				removeValue(this._pending, task[0]);
+			}
+			if (!this.isEmpty() || $.len(this._qpaused)) {
+				this._process();
 			}
 		}
 		task[0] = task[1] = task[2] = undefined;

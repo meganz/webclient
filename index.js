@@ -1032,7 +1032,7 @@ function topmenuUI() {
     }
 
     // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (!u_attr.firstname) && (typeof u_attr.name != 'undefined') && (u_attr.name.indexOf(' ') != -1)) {
+    else if ((u_type == 3) && (!u_attr.firstname) && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
 
         // Try get the first name from the full 'name' property and display
         var nameParts = u_attr.name.split(' ');

@@ -1047,61 +1047,10 @@ function MegaData()
             }
             iconUI(u);
             fm_thumbnails();
-        }
-
-        else {
+        } else {
             Soon(gridUI);
         }
         Soon(fmtopUI);
-
-        function prepareShareMenuHandler(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.currentTarget = $('ul#treesub_shares .selected')
-            e.calculatePosition = true;
-            $.selected = [e.currentTarget.attr('id').substr(6)]
-        }
-
-        $('.shared-details-info-block .grid-url-arrow').unbind('click');
-        $('.shared-details-info-block .grid-url-arrow').bind('click', function(e) {
-            prepareShareMenuHandler(e);
-            contextmenuUI(e, 1);
-        });
-
-        $('.shared-details-info-block .fm-share-download').unbind('click');
-        $('.shared-details-info-block .fm-share-download').bind('click', function(e) {
-            prepareShareMenuHandler(e);
-            var $this = $(this);
-            e.clientX = $this.offset().left;
-            e.clientY = $this.offset().top + $this.height()
-
-            contextmenuUI(e, 3);
-        });
-
-        $('.shared-details-info-block .fm-share-copy').unbind('click');
-        $('.shared-details-info-block .fm-share-copy').bind('click', function(e) {
-            $.copyDialog = 'copy';// this is used like identifier when key with key code 27 is pressed
-            $.mcselected = M.RootID;
-            $('.copy-dialog .dialog-copy-button').addClass('active');
-            $('.copy-dialog').removeClass('hidden');
-            handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
-            $('.fm-dialog-overlay').removeClass('hidden');
-            $('body').addClass('overlayed');
-        });
-
-        // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
-        $('.shared-details-info-block .fm-leave-share').unbind('click');
-        $('.shared-details-info-block .fm-leave-share').bind('click', function(e) {
-
-            // Get the share ID from the hash in the URL
-            var shareId = window.location.hash.replace('#fm/', '');
-
-            // Remove user from the share
-            removeShare(shareId);
-
-            // Open the shares folder
-            M.openFolder('shares', true);
-        });
 
         $('.grid-scrolling-table .grid-url-arrow,.file-block .file-settings-icon').unbind('click');
         $('.grid-scrolling-table .grid-url-arrow').bind('click', function(e) {
@@ -1132,7 +1081,62 @@ function MegaData()
             contextmenuUI(e, 1);
         });
 
-        eventuallyTriggerAuthIfRequired();
+        if (!u) {
+
+            if (this.currentrootid === 'shares') {
+
+                function prepareShareMenuHandler(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget = $('#treeli_' + M.currentdirid);
+                    e.calculatePosition = true;
+                    $.selected = [M.currentdirid];
+                }
+
+                $('.shared-details-info-block .grid-url-arrow').unbind('click');
+                $('.shared-details-info-block .grid-url-arrow').bind('click', function (e) {
+                    prepareShareMenuHandler(e);
+                    contextmenuUI(e, 1);
+                });
+
+                $('.shared-details-info-block .fm-share-download').unbind('click');
+                $('.shared-details-info-block .fm-share-download').bind('click', function (e) {
+                    prepareShareMenuHandler(e);
+                    var $this = $(this);
+                    e.clientX = $this.offset().left;
+                    e.clientY = $this.offset().top + $this.height()
+
+                    contextmenuUI(e, 3);
+                });
+
+                $('.shared-details-info-block .fm-share-copy').unbind('click');
+                $('.shared-details-info-block .fm-share-copy').bind('click', function (e) {
+                    $.copyDialog = 'copy'; // this is used like identifier when key with key code 27 is pressed
+                    $.mcselected = M.RootID;
+                    $('.copy-dialog .dialog-copy-button').addClass('active');
+                    $('.copy-dialog').removeClass('hidden');
+                    handleDialogContent('cloud-drive', 'ul', true, 'copy', 'Paste');
+                    $('.fm-dialog-overlay').removeClass('hidden');
+                    $('body').addClass('overlayed');
+                });
+
+                // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
+                $('.shared-details-info-block .fm-leave-share').unbind('click');
+                $('.shared-details-info-block .fm-leave-share').bind('click', function (e) {
+
+                    // Get the share ID from the hash in the URL
+                    var shareId = window.location.hash.replace('#fm/', '');
+
+                    // Remove user from the share
+                    removeShare(shareId);
+
+                    // Open the shares folder
+                    M.openFolder('shares', true);
+                });
+            }
+
+            Soon(eventuallyTriggerAuthIfRequired);
+        }
     };
 
     this.renderShare = function(h)
@@ -2490,7 +2494,7 @@ function MegaData()
     this.addPS = function(pendingShare, ignoreDB)
     {
         this.ps[pendingShare.p] = pendingShare;
-        
+
         if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
             mDBadd('ps', clone(pendingShare));
         }
@@ -2896,34 +2900,34 @@ function MegaData()
                 shareDialog();
         }
     };
-    
+
     // Searches M.opc for the pending contact
     this.findOutgoingPendingContactIdByEmail = function(email)
     {
         for (var index in M.opc)
         {
             var opc = M.opc[index];
-            
-            if (opc.m === email) 
+
+            if (opc.m === email)
             {
                 return opc.p;
             }
-        }            
+        }
     };
-    
+
     this.deletePendingShare = function(nodeHandle, pendingContactId)
     {
-        if (this.d[nodeHandle]) {            
-            
+        if (this.d[nodeHandle]) {
+
             if (this.ps[pendingContactId])
             {
                 delete this.ps[pendingContactId];
-                
+
                 // Todo: Delete from mDB once mDB gets re-instated
             }
-            
+
             var pendingShareCount = 0;
-            
+
             for (var index in this.ps)
             {
                 var pendingShare = this.ps[index];
@@ -2932,15 +2936,15 @@ function MegaData()
                     pendingShareCount++;
                 }
             }
-            
+
             if (pendingShareCount == 0)
             {
                 this.d[nodeHandle].hasPendingShares = false;
-                
+
                 // node.Shares will be deleted if there are no full shares. If there ARE no shares left then we should
                 // remove the share icon
                 var removeIcon = false;
-                
+
                 if (typeof this.d[nodeHandle].shares === 'undefined')
                 {
                     removeIcon = true;
@@ -2960,7 +2964,7 @@ function MegaData()
                         removeIcon = true;
                     }
                 }
-                
+
                 if (removeIcon)
                 {
                     sharedUInode(nodeHandle, 0);
@@ -4748,12 +4752,12 @@ function doshare(h, targets, dontShowShareDialog)
                         {
                             var rights = ctx.t[i].r;
                             var user = ctx.t[i].u;
-                            
+
                             if (user.indexOf('@') >= 0)
                             {
                                 user = getuid(ctx.t[i].u);
                             }
-                            
+
                             // A pending share may not have a corresponding user and should not be added
                             // A pending share can also be identified by a user who is only a '0' contact
                             // level (passive)
@@ -5012,11 +5016,11 @@ function processOPC(opc) {
  */
 function processPS(pendingShares, fromGettree) {
     DEBUG('processPS');
-    
+
     for (var i in pendingShares) {
         if (fromGettree)
         {
-            // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares' 
+            // As this is from gettree and the node tree may not have been processed yet, the 'hasPendingShares'
             // flag will be set on the node after gettree is processed
             M.addPS(pendingShares[i]);
         }
@@ -5026,12 +5030,12 @@ function processPS(pendingShares, fromGettree) {
             var pendingContactId = pendingShares[i].p;
             var shareRights = pendingShares[i].r;
             var timeStamp = pendingShares[i].ts;
-            
+
             if (typeof shareRights === 'undefined')
             {
                 // This is a delete packet, we should remove the pending share if this was not triggered by our own client
                 if (pendingShares[i].i == requesti) continue;
-                
+
                 // Delete the pending share
                 delete M.ps[pendingShares[i].p];
             }
@@ -5039,14 +5043,14 @@ function processPS(pendingShares, fromGettree) {
             {
                 // We need to record that this node has a pending share, as this is not gettree
                 M.d[nodeHandle].hasPendingShares = true;
-            
+
                 // Add the pending share to state
                 M.addPS({'h':nodeHandle, 'p':pendingContactId, 'r':shareRights, 'ts':timeStamp});
-                
+
                 // Update the ui
                 sharedUInode(nodeHandle, 1);
             }
-        }        
+        }
     }
 }
 
@@ -5189,7 +5193,7 @@ function loadfm_callback(res)
                 M.nodeShare(nodeHandle, res.s[i]);
             }
         }
-        
+
         // If we have pending shares, and if any are for this node, set a flag
         if (res.ps) {
             for (var index in res.ps) {

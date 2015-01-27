@@ -4617,11 +4617,13 @@ function selectddUI() {
                 $.selected = [];
                 s.each(function(i, e)
                 {
-                    var n = $(e).attr('id');
-                    $.selected.push(n);
-                    n = M.d[n];
-                    if (max > i)
-                        html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+                    var id = $(e).attr('id'), n = M.d[id];
+                    if (n) {
+                        $.selected.push(id);
+                        if (max > i) {
+                            html.push('<div class="transfer-filtype-icon ' + fileicon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+                        }
+                    }
                 });
                 if (s.length > max)
                 {

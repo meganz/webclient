@@ -390,7 +390,7 @@ else
 	{
 		var d = localStorage.d || 0,l;
 		var jj = localStorage.jj || 0;
-		var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") > -1;
+		var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
 		var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'dk':['da'],'se':['sv'],'fi':['fi'],'no':['no'],'pl':['pl'],'cz':['cz','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'ca':['ca','ca-'],'eu':['eu','eu-'],'af':['af','af-'],'bs':['bs','bs-'],'sg':[],'tr':['tr','tr-'],'mk':[],'hi':[],'hr':['hr'],'ro':['ro','ro-'],'uk':['||'],'gl':['||'],'sr':['||'],'lt':['||'],'th':['||'],'lv':['||'],'fa':['||'],'ee':['et'],'ms':['ms'],'cy':['cy'],'bg':['bg'],'be':['br'],'tl':['en-ph'],'ka':['||']};
 		if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
 		if (d && !console.time) (function(c)
@@ -702,9 +702,9 @@ else
         jsl.push({f:'js/analytics.js', n: 'analytics_js', j:1});
 
         // only used on beta
-		if(window.location.hostname == "beta.mega.nz"/* || window.location.hostname == "mega.dev" */|| location.hostname.indexOf("developers.") > -1) {
-			jsl.push({f: 'js/betacrashes.js', n: 'cms_js', j: 1});
-		}
+        if(onBetaW) {
+            jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+        }
 
 
 //        jsl.push({f:'html/register.html', n: 'register', j:0});

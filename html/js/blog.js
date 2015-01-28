@@ -3,8 +3,19 @@ var megalogo='';
 if (!m) megalogo = '<img alt="Mega" src="' + staticpath + 'images/mega/blogs/jobs-mega-logo.png"  class="blog-jobs-mega" />';
 
 
-if (typeof blogposts == "undefined") {
-	var blogposts = null;
+var blogposts = null;
+
+function unsigned_blogposts(ready)
+{
+    var xhr = getxhr()
+    xhr.open("GET", "https://cms.mega.nz/unsigned/blog.json");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			blogposts = JSON.parse(xhr.responseText)
+			ready();
+		}
+	};
+    xhr.send(null);
 }
 
 
@@ -194,9 +205,7 @@ function blog_more()
 if (typeof mobileblog !== 'undefined')
 {
 	var blogid = document.location.hash.substr(1).replace('blog_','');
-	var bootBlog = setInterval(function() {
-		if (!blogposts) return;
-		clearInterval(bootBlog);
+	unsigned_blogposts(function() {
 
 		var i = "post_" + blogid
 		var content = '';
@@ -210,7 +219,7 @@ if (typeof mobileblog !== 'undefined')
 		if (android) document.body.className = 'android blog';
 		else if (ios) document.body.className = 'ios blog';
 		else document.body.className = 'another-os blog';
-	}, 100);
+	});
 	
 }
 

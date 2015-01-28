@@ -4905,7 +4905,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	margin: 12px 0 0 0;
 }
 .nw-fm-left-icon.cloud-drive, .not-logged .nw-fm-left-icon.cloud-drive.active, .not-logged .nw-fm-left-icon.cloud-drive:hover {
-	background-position: 0 13px;
+	background-position: 0 12px;
 }
 .nw-fm-left-icon.folder-link {
 	background-position: 0 -9754px;
@@ -4952,7 +4952,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	background-position: center -9958px;
 }*/
 .nw-fm-left-icon.cloud-drive:hover, .nw-fm-left-icon.cloud-drive.active {
-	background-position: 0 -367px;
+	background-position: 0 -368px;
 }
 .nw-fm-left-icon.shared-with-me:hover, .nw-fm-left-icon.shared-with-me.active {
 	background-position: 0 -415px;
@@ -5219,7 +5219,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .files-grid-view th, .contacts-grid-view th, .grid-table-header th, .transfer-table-header th, .grid-table th, .files-grid-view.shared-view th, .files-grid-view.contacts-view th, .shared-grid-view th {
 	background-image: url(../images/mega/nw-fm-sprite.svg);
 	background-repeat: no-repeat;
-	background-position: right -1528px;
+	background-position: right -1529px;
 }
 .files-grid-view.contacts-view th:first-child, .files-grid-view.contacts-view td:first-child, .contact-requests-grid th:first-child, .contact-requests-grid td:first-child, .grid-table.contact-requests tr td:first-child, .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child {
 	padding-left: 16px;
@@ -6759,7 +6759,7 @@ table {
 	cursor: pointer;
 	top: 0;
 }
-.fm-add-user, .fm-start-video-call, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-contact-requests, .fm-received-requests, .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button, .fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings, .create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button {
+.fm-add-user, .fm-start-video-call, .fm-clearbin-button, .fm-send-files, .fm-start-call, .fm-leave-share, .fm-share-copy, .fm-share-download, .contact-send-files, .fm-start-conversation, .fm-share-folders, .fm-verify, .fm-question, .fm-chat-end, .fm-download-as-zip, .fm-import-to-cloudrive, .fm-contact-requests, .fm-received-requests, .fm-dialog-button, .fm-account-button, .avatar-dialog .fm-account-change-avatar, .top-dialog-login-button, .nw-chat-button, .multiple-sharing.expanded .main-body .nw-chat-button, .fm-chat-attach-button, .fm-chat-contact-button, .fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings, .create-folder-button, .add-user-popup-button, .create-folder-button-cancel, .fm-dialog-new-folder-button, .rename-dialog-button {
 	height: 32px;
 	float: right;
 	-webkit-box-sizing: border-box;
@@ -6780,7 +6780,7 @@ table {
 	-webkit-border-radius: 12px;
 	border-radius: 12px;
 }
-.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span, .fm-chat-end span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-contact-requests span, .fm-received-requests span, .fm-chat-file-button span, .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .fm-new-folder span, .search-files-result span, .fm-file-upload span, .search-messages-result span, .fm-folder-upload span, .fm-notification-settings span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span {
+.fm-add-user span, .fm-start-video-call span, .fm-clearbin-button span, .fm-send-files span, .fm-start-call span, .fm-leave-share span, .fm-share-copy span, .fm-share-download span, .contact-send-files span, .fm-start-conversation span, .fm-share-folders span, .fm-verify span, .fm-question span, .fm-chat-end span, .fm-download-as-zip span, .fm-import-to-cloudrive span, .fm-contact-requests span, .fm-received-requests span, .fm-chat-file-button span, .fm-dialog-button span, .fm-account-button span, .avatar-dialog .fm-account-change-avatar span, .top-dialog-login-button span, .nw-chat-button span, .multiple-sharing.expanded .main-body .nw-chat-button span, .fm-chat-attach-button span, .fm-chat-contact-button span, .fm-new-folder span, .search-files-result span, .search-messages-result span, .fm-file-upload span, .search-messages-result span, .fm-folder-upload span, .fm-notification-settings span, .create-folder-button span, .add-user-popup-button span, .create-folder-button-cancel span, .fm-dialog-new-folder-button span, .rename-dialog-button span {
 	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 	background-color: rgba(255,255,255,1);
 	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -6848,10 +6848,10 @@ table {
 	-webkit-border-radius: 8px;
 	border-radius: 8px;
 }
-.fm-new-folder, .search-files-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
+.fm-new-folder, .search-files-result, .search-messages-result, .fm-file-upload, .search-messages-result, .fm-folder-upload, .fm-notification-settings {
 	position: relative;
 }
-.search-files-result span, .search-files-result.disabled span {
+.search-files-result span, .search-files-result.disabled span, .search-messages-result span, .search-messages-result.disabled span {
 	background-position: -4px -4559px;
 }
 .long-path .fm-new-folder span, .long-path .search-files-result span, .long-path .fm-file-upload span, .long-path .search-messages-result span, .long-path .fm-folder-upload span {
@@ -6966,11 +6966,11 @@ table {
 	color: rgba(49,181,0,1);
 }
 /* disabled */
-.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-contact-requests.disabled, .fm-received-requests.disabled, .fm-dialog-button.disabled, .fm-account-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled {
+.fm-add-user.disabled, .fm-start-video-call.disabled, .fm-clearbin-button.disabled, .fm-send-files.disabled, .fm-start-call.disabled, .fm-leave-share.disabled, .fm-share-copy.disabled, .fm-share-download.disabled, .contact-send-files.disabled, .fm-start-conversation.disabled, .fm-share-folders.disabled, .fm-verify.disabled, .fm-question.disabled, .fm-chat-end.disabled, .fm-download-as-zip.disabled, .fm-import-to-cloudrive.disabled, .fm-contact-requests.disabled, .fm-received-requests.disabled, .fm-dialog-button.disabled, .fm-account-button.disabled, .avatar-dialog .fm-account-change-avatar.disabled, .top-dialog-login-button.disabled, .nw-chat-button.disabled, .multiple-sharing.expanded .main-body .nw-chat-button.disabled, .fm-chat-attach-button.disabled, .fm-chat-contact-button.disabled, .fm-new-folder.disabled, .search-files-result.disabled, .search-messages-result.disabled, .fm-file-upload.disabled, .search-messages-result.disabled, .fm-folder-upload.disabled, .fm-notification-settings.disabled, .create-folder-button.disabled, .add-user-popup-button.disabled, .create-folder-button-cancel.disabled, .fm-dialog-new-folder-button.disabled, .rename-dialog-button.disabled {
 	cursor: default;
 	background-color: rgba(255,255,255,0);
 }
-.fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span {
+.fm-add-user.disabled span, .fm-start-video-call.disabled span, .fm-clearbin-button.disabled span, .fm-send-files.disabled span, .fm-start-call.disabled span, .fm-leave-share.disabled span, .fm-share-copy.disabled span, .fm-share-download.disabled span, .contact-send-files.disabled span, .fm-start-conversation.disabled span, .fm-share-folders.disabled span, .fm-verify.disabled span, .fm-question.disabled span, .fm-chat-end.disabled span, .fm-download-as-zip.disabled span, .fm-import-to-cloudrive.disabled span, .fm-contact-requests.disabled span, .fm-received-requests.disabled span, .fm-dialog-button.disabled span, .fm-account-button.disabled span, .avatar-dialog .fm-account-change-avatar.disabled span, .top-dialog-login-button.disabled span, .nw-chat-button.disabled span, .multiple-sharing.expanded .main-body .nw-chat-button.disabled span, .fm-chat-attach-button.disabled span, .fm-chat-contact-button.disabled span, .fm-new-folder.disabled span, .search-files-result.disabled span, .search-messages-result.disabled span, .fm-file-upload.disabled span, .search-messages-result.disabled span, .fm-folder-upload.disabled span, .fm-notification-settings.disabled span, .create-folder-button.disabled span, .add-user-popup-button.disabled span, .create-folder-button-cancel.disabled span, .fm-dialog-new-folder-button.disabled span, .rename-dialog-button.disabled span {
 	cursor: default;
 	color: #777777;
 }
@@ -7087,10 +7087,10 @@ table {
 .fm-share-download:hover span, .fm-share-download.active span {
 	background-position: -32px -1418px;
 }
-.search-files-result span {
+.search-files-result span, .search-messages-result span {
 	padding: 0 10px;
 }
-.search-files-result span.search-number, .search-files-result span.search-number:hover {
+.search-files-result span.search-number, .search-files-result span.search-number:hover, .search-messages-result span.search-number, .search-messages-result span.search-number:hover {
 	display: inline;
 	background-color: transparent;
 	padding: 0 4px;
@@ -7555,11 +7555,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	line-height: 18px;
 	margin-top: 0;
 	font-size: 12px;
-	color: #868686;
-	padding: 6px 10px 8px 34px;
+	color: #666666;
+	padding: 6px 10px 8px 42px;
 	margin: 0;
 	background-image: url(../images/mega/dialogs-sprite.svg);
-	background-position: 0 -1890px;
+	background-position: 3px -1890px;
 	background-repeat: no-repeat;
 	background-color: transparent;
 	border: 0;
@@ -7640,12 +7640,12 @@ color: white;
 }
 .focused .create-folder-input-bl input, .focused .rename-input-bl input {
 	color: white;
-	background-position: 0 -1930px;
+	background-position: 3px -1930px;
 }
 .rename-input-bl .transfer-filtype-icon {
 	width: 24px;
 	position: absolute;
-	left: 9px;
+	left: 12px;
 	height: 24px;
 	top: 4px;
 	background-repeat: no-repeat;
@@ -7708,7 +7708,7 @@ color: white;
 	-ms-user-select: none !important;
 	user-select: none !important;
 }
-.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt,   .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span {
+.fm-chat-message span, div.nw-chat-sharing-filename, div.nw-chat-sharing-filesize, .nw-chat-date-txt, .fm-chat-smile, .properties-file-link, .contact-fingerprint-txt, .contact-fingerprint-txt span, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span {
 	-webkit-touch-callout: text !important;
 	-webkit-user-select: text !important;
 	-khtml-user-select: text !important;
@@ -11794,10 +11794,10 @@ table {
 	background-position: -3px -5212px;
 }
 .download-standart-item .context-menu-icon {
-	background-position: -3px -4694px;
+	background-position: -3px -304px;
 }
 .zipdownload-item .context-menu-icon {
-	background-position: -3px -4726px;
+	background-position: -3px -336px;
 }
 .send-to-contact-item .context-menu-icon {
 	background-position: -3px -4694px;
@@ -19932,7 +19932,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 	-o-transition: opacity 200ms ease-in-out;
 	-ms-transition: opacity 200ms ease-in-out;
 	transition: opacity 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0.3;
@@ -20114,17 +20114,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 	cursor: pointer;
 }
 .copy-dialog-button.cloud-drive, .move-dialog-button.cloud-drive {
-	background-position: center -367px;
+	background-position: center -368px;
 }
 .copy-dialog-button.shared-with-me, .move-dialog-button.shared-with-me {
 	width: 158px;
 	background-position: center -415px;
 }
 .copy-dialog-button.conversations, .move-dialog-button.conversations {
-	background-position: center -510px;
+	background-position: center -511px;
 }
 .copy-dialog-button.rubbish-bin, .move-dialog-button.rubbish-bin {
-	background-position: 60px -3087px;
+	background-position: 60px -247px;
 }
 .copy-dialog-button.cloud-drive.active, .move-dialog-button.cloud-drive.active {
 	background-color: rgba(220,0,0,1);
@@ -20673,8 +20673,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	font-family: 'Open Sans Light';
 }
 .overlayed .main-blur-block {
-	filter: blur(0.5em);
-	-webkit-filter: blur(0.5em);
+	filter: blur(0.25em);
+	-webkit-filter: blur(0.25em);
 }
 .main-blur-block {
 	height: 100%;

@@ -380,18 +380,18 @@ function browserdetails(useragent)
 	else if (useragent.indexOf('linux') > 0) os = 'Linux';
 	else if (useragent.indexOf('linux') > 0) os = 'MEGAsync';
 	else if (useragent.indexOf('blackberry') > 0) os = 'Blackberry';
-	if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
+	if (useragent.indexOf('windows nt 1') > 0 && useragent.indexOf('edge/') > 0) browser = 'Spartan';
+	else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) browser = 'Opera';
 	else if (useragent.indexOf('chrome') > 0) browser = 'Chrome';
 	else if (useragent.indexOf('safari') > 0) browser = 'Safari';
 	else if (useragent.indexOf('firefox') > 0) browser = 'Firefox';
+	else if (useragent.indexOf('thunderbird') > 0) browser = 'Thunderbird';
 	else if (useragent.indexOf('megasync') > 0) browser = 'MEGAsync';
 	else if (useragent.indexOf('msie') > 0
 		|| "ActiveXObject" in window) browser = 'Internet Explorer';
 	if ((os) && (browser))
 	{
 		name = browser + ' on ' + os;
-		if (browser == 'Internet Explorer') icon = 'ie.png';
-		else icon = browser.toLowerCase() + '.png';
 	}
 	else if (os)
 	{
@@ -401,13 +401,16 @@ function browserdetails(useragent)
 	else if (browser)
 	{
 		name = browser;
-		if (browser == 'Internet Explorer') icon = 'ie.png';
-		else icon = browser.toLowerCase() + '.png';
 	}
 	else
 	{
 		name = 'Unknown';
 		icon = 'unknown.png';
+	}
+	if (!icon && browser)
+	{
+		if (browser == 'Internet Explorer' || browser == 'Spartan') icon = 'ie.png';
+		else icon = browser.toLowerCase() + '.png';
 	}
 	var browserdetails = {};
 	browserdetails.name = name;

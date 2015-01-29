@@ -271,6 +271,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     $('.audio-icon', self.$header).bind('click.megaChat', function() {
         if(self.options.mediaOptions.audio === false) { // un mute
+            if(!self._myAvElement) { return false; }
             self.options.mediaOptions.audio = true;
             self.megaChat.karere.connection.rtc.muteUnmute(false, {audio:true});
 
@@ -288,6 +289,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
 
     $('.video-icon', self.$header).bind('click.megaChat', function() {
         if(self.options.mediaOptions.video === false) { // un mute
+            if(!self._myAvElement) { return false; }
             self.options.mediaOptions.video = true;
             self.megaChat.karere.connection.rtc.muteUnmute(false, {video:true});
             $('.chat-header-indicator.muted-video', self.$header).addClass('hidden');
@@ -365,11 +367,15 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
                         eventData.peerMedia.video ? true : false,
                         eventData.sid
                     ]);
+
+                    // peerMedia, can be == {} in the cases then the user does not have/have not provided access to the cam & mic
+                    var showVideoButton = eventData.peerMedia.video ? true : false;
+
                     self.megaChat.incomingCallDialog.show(
                         self.megaChat.getContactNameFromJid(participants[0]),
                         avatar,
                         eventData.sid,
-                        eventData.peerMedia.video ? true : false,
+                        showVideoButton,
                         function() {
                             self.options.mediaOptions.audio = true;
                             self.options.mediaOptions.video = false;
@@ -487,18 +493,21 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
         if (eventData.continue) {
             eventData.wait = true;
             eventData.continue(true);
-            return;
-        }
-
-        if(self.callRequest) {
-            self._cancelCallRequest();
         }
 
         var msg = "Could not start call.";
 
-        if(eventData.error == "PermissionDeniedError" || eventData == "PermissionDeniedError") {
+        if(eventData.error === "PermissionDeniedError" || eventData == "PermissionDeniedError") {
             msg = "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.";
+        } else if(eventData.error === "DevicesNotFoundError") {
+            msg = "You may have forbidden camera access for that site previously - in this case any subsequent camera requests fail silently. You can check the camera icon next to the address bar, or in the site permissions settings.";
+        } else {
+            if(self.callRequest) {
+                self._cancelCallRequest();
+            }
         }
+
+
 
         self.appendDomMessage(
             self.generateInlineDialog(
@@ -715,7 +724,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity) {
     self.bind('local-stream-connect', function(event, obj) {
         $('.my-av-screen video', self.$header).remove();
 
-        $('.my-av-screen', self.$header).append(obj.player);
+        $('.localVideoWrapper', self.$header).append(obj.player);
         self._myAvElement = obj.player;
         self._myAvElement.play();
     });
@@ -1131,7 +1140,7 @@ ChatRoom.prototype._callStartedState = function(e, eventData) {
                 // move back the <video/> elements
                 if(self._myAvElement) {
                     $(self._myAvElement).css('height', '');
-                    $('.my-av-screen', self.$header).append(self._myAvElement);
+                    $('.localVideoWrapper', self.$header).append(self._myAvElement);
                     self._myAvElement.play();
                 }
                 if(self._othersAvElement) {
@@ -1334,12 +1343,16 @@ ChatRoom.prototype._renderAudioVideoScreens = function() {
         var otherUserJid = $(this).attr('data-jid');
 
         if(!otherUserJid) {
+            //debugger;
             return; //continue;
         }
         var otherUserMediaOpts = self.megaChat.rtc.getReceivedMediaTypes(otherUserJid);
 
         if(!otherUserMediaOpts) {
-            return; //continue
+            otherUserMediaOpts = {
+                video: false,
+                audio: false
+            };
         }
 
         self._renderSingleAudioVideoScreen(

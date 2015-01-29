@@ -8145,9 +8145,17 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .current-user-video-container video, .current-user-video-container img {
 	height: 100%;
+}
+.current-user-video-container .localVideoWrapper {
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
 	border-radius: 6px;
+	display: block;
+	height: 95%;
+	text-align: left;
+	overflow: hidden;
+	z-index: 9;
+	position: absolute;
 }
 .current-user-video-container {
 	width: 209px;
@@ -20690,7 +20698,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 video.localViewport {
 	transform: rotateY(180deg);
 	-webkit-transform: rotateY(180deg); /* Safari and Chrome */
-	-moz-transform: none; /* Firefox */
+	-moz-transform: rotateY(180deg); /* Firefox */
 }
  @media only screen and (max-width: 1593px) {
 .ads .download-mid-centered-block {

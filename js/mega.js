@@ -489,11 +489,11 @@ function MegaData()
      */
     this.drawReceivedContactRequests = function(ipc, clearGrid) {
         DEBUG('Draw received contacts grid.');
+        var html, email, av_color, shortcut, ps, trClass, id,
+            type = '',
+            drawn = false,
+            t = '.grid-table.contact-requests';
         if (M.currentdirid === 'ipc') {
-            var html, email, av_color, shortcut, ps, trClass, id,
-                type = '',
-                drawn = false,
-                t = '.grid-table.contact-requests';
 
             if (clearGrid) {
                 $(t + ' tr').remove();
@@ -585,9 +585,10 @@ function MegaData()
      */
     this.drawSentContactRequests = function(opc, clearGrid) {
         DEBUG('Draw sent invites.');
+        var html, hideCancel, hideReinvite, hideOPC,
+            drawn = false,
+            t = '.grid-table.sent-requests';
         if (M.currentdirid === 'opc') {
-            var html, hideCancel, hideReinvite, hideOPC,
-                t = '.grid-table.sent-requests';
 
             if (clearGrid) {
                 $(t + ' tr').remove();
@@ -622,17 +623,22 @@ function MegaData()
                 </tr>';
 
                 $(t).append(html);
+                
+                drawn = true;
             }
-            // Hide received grids
-            $('.empty-contact-requests').addClass('hidden');
-            $('.contact-requests-grid').addClass('hidden');
+            
+            if (drawn) {
+                // Hide received grids
+                $('.empty-contact-requests').addClass('hidden');
+                $('.contact-requests-grid').addClass('hidden');
 
-            // Show sent grids
-            $('.sent-requests-grid').removeClass('hidden');
-            $('.empty-sent-requests').addClass('hidden');
+                // Show sent grids
+                $('.sent-requests-grid').removeClass('hidden');
+                $('.empty-sent-requests').addClass('hidden');
 
-            initOpcGridScrolling();
-            initBindOPC();
+                initOpcGridScrolling();
+                initBindOPC();
+            }
         }
     };
 

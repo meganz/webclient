@@ -961,8 +961,7 @@ RtcSession.prototype = {
         var stats = obj.stats = sess.statsRecorder.terminate(this._makeCallId(sess));
         stats.isCaller = sess.isInitiator?1:0;
         stats.termRsn = reason;
-    }
-    else { //no stats, but will still provide callId and duration
+    } else { //no stats, but will still provide callId and duration
         var bstats = obj.basicStats = {
             isCaller: sess.isInitiator?1:0,
             termRsn: reason,
@@ -1135,15 +1134,13 @@ RtcSession.prototype = {
  getMediaSessionToJid: function(fullJid) {
  //TODO: We get only the first media session to fullJid, but there may be more
     var sessions = this.jingle.sessions;
-    var sess = null;
     for (var sid in sessions) {
         var s = sessions[sid];
-        if (s.localStream && (s.peerjid === fullJid)) {
-            sess = s;
-            break;
+        if (s.peerjid === fullJid) {
+            return s;
         }
     }
-    return sess;
+    return null;
  },
 
 /**

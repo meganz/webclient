@@ -5,6 +5,19 @@ if (!m) megalogo = '<img alt="Mega" src="' + staticpath + 'images/mega/blogs/job
 
 var blogposts = null;
 
+function unsigned_blogposts(ready)
+{
+    var xhr = getxhr()
+    xhr.open("GET", "https://cms.mega.nz/unsigned/blog.json");
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			blogposts = JSON.parse(xhr.responseText)
+			ready();
+		}
+	};
+    xhr.send(null);
+}
+
 
 var bloglimit = 5;
 var blogpage = 1;
@@ -192,23 +205,21 @@ function blog_more()
 if (typeof mobileblog !== 'undefined')
 {
 	var blogid = document.location.hash.substr(1).replace('blog_','');
-	for (var i in blogposts)
-	{
-		if (blogid == blogposts[i].id)
-		{
-			var content = '';
-			if (blogposts[i].attaches.bimg) content += '<img alt="" data-img="loading_'+blogposts[i].attaches.bimg+'" src="' + CMS.img(blogposts[i].attaches.bimg) + '" class="blog-new-full-img" />';
-			content += blogposts[i].c;				
-			content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
-			var date = new Date(blogposts[i].t*1000);			
-			var blogdate =  date.getDate() + '-' + (parseInt(date.getMonth())+1) + '-' + date.getFullYear();
-			var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">' + blogposts[i].h + '</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + blogposts[i].by + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="clear"></div></div></div></div>';
-			document.body.innerHTML = html;			
-			if (android) document.body.className = 'android blog';
-			else if (ios) document.body.className = 'ios blog';
-			else document.body.className = 'another-os blog';
-		}	
-	}
+	unsigned_blogposts(function() {
+
+		var i = "post_" + blogid
+		var content = '';
+		if (blogposts[i].attaches.bimg) content += '<img alt="" data-img="loading_'+blogposts[i].attaches.bimg+'" src="https://cms.mega.nz/unsigned/' + blogposts[i].attaches.bimg + '" class="blog-new-full-img" />';
+		content += blogposts[i].c;				
+		content = content.replace('[READMORE]','').replace(/{staticpath}/g,staticpath);
+		var date = new Date(blogposts[i].t*1000);			
+		var blogdate =  date.getDate() + '-' + (parseInt(date.getMonth())+1) + '-' + date.getFullYear();
+		var html = '<div class="main-scroll-block"><div class="main-content-block blog-new"><div class="blog-new-full empty-bottom"><h2 id="blogarticle_title">' + blogposts[i].h + '</h2><a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a> <a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a><div class="clear"></div><div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div><div class="blog-new-date-div"></div><div class="blog-new-small" id="blogarticle_by"><span>by:</span> ' + (blogposts[i].by||"Admin") + '</div><div class="clear"></div><div id="blogarticle_post">' + content + '</div><div class="clear"></div></div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="clear"></div></div></div></div>';
+		document.body.innerHTML = html;			
+		if (android) document.body.className = 'android blog';
+		else if (ios) document.body.className = 'ios blog';
+		else document.body.className = 'another-os blog';
+	});
 	
 }
 

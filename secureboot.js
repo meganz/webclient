@@ -373,11 +373,12 @@ if (m)
     }
     if (mobileblog)
     {
-        document.body.innerHTML = '';
-        var script = document.createElement('script');
-        script.type = "text/javascript";
-        document.head.appendChild(script);
-        script.src = 'https://mega.co.nz/blog.js';
+		document.body.innerHTML = '';
+		var script = document.createElement('script');
+		script.type = "text/javascript";
+		document.head.appendChild(script);
+		//script.src = 'https://mega.nz/blog.js'
+		script.src = '/html/js/blog.js'
     }
 }
 else if (page == '#android')

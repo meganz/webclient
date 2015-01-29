@@ -1769,7 +1769,6 @@ function addContactUI()
             n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
             n.fadeIn(200);
             $('.share-dialog .import-contacts-dialog').fadeOut(200);
-
         }
     });
 

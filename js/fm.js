@@ -1770,7 +1770,6 @@ function addContactUI()
             n.css('margin-left', '-' + n.outerWidth() / 2 + 'px');
             n.fadeIn(200);
             $('.share-dialog .import-contacts-dialog').fadeOut(200);
-
         }
     });
 
@@ -3747,7 +3746,7 @@ function gridUI() {
         $.gridHeader();
     }
 
-    if (folderlink || RootbyId(M.currentdirid) === M.RubbishID) {
+    if (folderlink) {
         $('.grid-url-arrow').hide();
         $('.grid-url-header').text('');
     } else {
@@ -5796,6 +5795,9 @@ function sectionUIopen(id) {
             break;
         case 'cloud-drive':
             headertxt = 'My folders';
+            break;
+		case 'rubbish-bin':
+            headertxt = 'Deleted folders';
             break;
     }
 

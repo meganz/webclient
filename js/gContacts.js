@@ -71,7 +71,7 @@
 
             // failed = false
             self.options.failed = false;
-        } else {
+       } else {
             DEBUG('Contacts importing is NOT allowed for host', window.location.host);
 
             // failed = true
@@ -114,34 +114,31 @@
     GContacts.prototype.getContactList = function(where) {
         var self = this;
 
-        var data = {
-            access_token: self.accessToken,
-            v: '3.0'
-        };
+        var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json";
 
-        $.ajax({
-            beforeSend: function(request) {
-                if (self.redirect_uri !== '') {
-                    request.setRequestHeader("Access-Control-Allow-Origin", self.redirect_uri);
+        api_req({ a: 'prox', url: url },
+        {
+            callback: function(res)
+            {
+                if (typeof res == 'number')
+                {
+                    console.log("Contact import failed");
+                    return false;
                 }
-            },
-            type: 'GET',
-            url: self.options.retreiveAllUrl,
-            dataType: "jsonp",
-            data: data,
-            success: function(data) {
-                var gData = self._readAllEmails(data);
+                else
+                {            
+                    var gData = self._readAllEmails(res);
+                    if (self.where === 'shared') {
+                        addImportedDataToSharedDialog(gData, 'gmail');
+                    } else if (where === 'contacts') {
+                        addImportedDataToAddContactsDialog(gData, 'gmail');
+                    }
+                    $('.import-contacts-dialog').fadeOut(200);
 
-                if (where === 'shared') {
-                    addImportedDataToSharedDialog(gData, 'gmail');
-                } else if (where === 'contacts') {
-                    addImportedDataToAddContactsDialog(gData, 'gmail');
+                    self.isImported = true;
                 }
-                $('.import-contacts-dialog').fadeOut(200);
-
-                self.isImported = true;
             }
-        });
+        });        
     };
 
     GContacts.prototype._xPathNameSpaceResolver = function(prefix) {
@@ -153,20 +150,20 @@
         return ns[prefix] || null;
     };
 
-    GContacts.prototype._readAllEmails = function(xml) {
+    GContacts.prototype._readAllEmails = function(json_data) {
         var self = this;
 
-        var parser = new DOMParser(),
-            xmlDoc = parser.parseFromString(xml, 'text/xml'),
-            emails = xmlDoc.evaluate("/def:feed/def:entry/gd:email/@address", xmlDoc, self._xPathNameSpaceResolver, 4, null),
-            arrData = [],
-            node = emails.iterateNext();
-
-        while (node) {
-            arrData.push(node.value);
-            node = emails.iterateNext();
+        var data = [];
+        for (var i = 0; i<json_data.feed.entry.length; i++)
+        {            
+            var obj = json_data.feed.entry[i];
+           
+            if (obj['gd$email']!=undefined)
+            {
+                data.push(obj['gd$email'][0].address);
+            }
         }
-        return arrData;
+        return data;       
     };
 
     /**

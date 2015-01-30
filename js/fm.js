@@ -1479,15 +1479,16 @@ function addContactUI()
         minChars: 2,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'add',
+        excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         onEmailCheck: function() {
             errorMsg("Looks like there's a malformed email!");
         },
         onDoublet: function(u) {
                         
             // If the email already exists in the state, show error
-            if (checkIfContactExists(u.id)) {
+//            if (checkIfContactExists(u.id)) {
                 errorMsg('You already have contact with that email!');
-            };
+//            };
         },
         onHolder: function() {
             errorMsg('No need for that, you are THE owner!');
@@ -6533,15 +6534,16 @@ function initShareDialog()
         minChars: 2,
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrollLocation: 'share',
+        excludeCurrent: true,// Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         onEmailCheck: function() {
             errorMsg("Looks like there's a malformed email!");
         },
         onDoublet: function(item) {
             
             // If the email already exists in the state, show error
-            if (checkIfContactExists(item.id)) {
+//            if (checkIfContactExists(item.id)) {
                 errorMsg('You already have contact with that email!');
-            };
+//            };
         },
         onHolder: function() {
             errorMsg('No need for that, you are THE owner!');
